@@ -10,22 +10,70 @@ processors:
       GREEDYMULTILINE: "(.|\n)*"
       ERL_PID: "\\<%{INT}+\\.%{INT}+\\.%{INT}+\\>"
     patterns:
-    - "%{DATESTAMP:timestamp} \\[%{WORD:log.level}\\] %{ERL_PID:rabbitmq.log.pid}
+    - "%{TIMESTAMP_ISO8601:timestamp} \\[%{WORD:log.level}\\] %{ERL_PID:rabbitmq.log.pid}
       %{GREEDYMULTILINE:message}"
     ignore_missing: true
+- grok:
+    field: message
+    patterns:
+    - "user '%{WORD:user.name}' %{ALLOWED:event.action}"
+    - "%{DENIED:event.action}: user '%{WORD:user.name}'"
+    - "%{CLOSING:event.action}%{GREEDYDATA}user: '%{WORD:user.name}'"
+    pattern_definitions:
+      ALLOWED: "authenticated and granted access"
+      DENIED: "access denied"
+      CLOSING: "closing"
+    ignore_missing: true
+    ignore_failure: true
+- set:
+    field: event.action
+    value: logged-in
+    if: 'ctx.event?.action == "authenticated and granted access"'
+- set:
+    field: event.action
+    value: close-connection
+    if: 'ctx.event?.action == "closing"'
+- set:
+    field: event.outcome
+    value: success
+    if: "ctx?.event?.action != null && ['logged-in', 'close-connection'].contains(ctx.event.action)"
+- set:
+    field: event.action
+    value: logon-failed
+    if: 'ctx.event?.action == "access denied"'
+- set:
+    field: event.outcome
+    value: failure
+    if: 'ctx.event?.action == "logon-failed"'
+- append:
+    field: event.category
+    value: authentication
+    if: "ctx?.event?.action != null && ['logged-in', 'logon-failed'].contains(ctx.event.action)"
+- append:
+    field: event.type
+    value:
+      - start
+      - access
+    if: "ctx?.event?.action != null && ['logged-in', 'logon-failed'].contains(ctx.event.action)"
+- append:
+    field: event.type
+    value:
+      - end
+      - access
+    if: ctx?.event?.action == 'close-connection'
 - date:
     if: "ctx.event.timezone == null"
     field: timestamp
     target_field: "@timestamp"
     formats:
-    - yy-MM-dd HH:mm:ss.SSS
+    - yyyy-MM-dd HH:mm:ss.SSSSSSZZZZZ
 - date:
     if: "ctx.event.timezone != null"
     field: "timestamp"
     target_field: "@timestamp"
     timezone: "{{ event.timezone }}"
     formats:
-    - yy-MM-dd HH:mm:ss.SSS
+    - yyyy-MM-dd HH:mm:ss.SSSSSSZZZZZ
 - remove:
     field:
     - timestamp

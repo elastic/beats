@@ -16,8 +16,6 @@
 // under the License.
 
 //go:build ((linux && go1.8) || (darwin && go1.10)) && cgo
-// +build linux,go1.8 darwin,go1.10
-// +build cgo
 
 package plugin
 
@@ -26,7 +24,7 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type pluginList struct {

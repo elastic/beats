@@ -17,7 +17,7 @@
 
 package blockinfo
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/elastic/elastic-agent-libs/mapstr"
 
 // SyncStatus represents the status of a sync action as Complete/Total. Will be 0/0 if no sync action is going on
 type SyncStatus struct {
@@ -42,5 +42,5 @@ type DiskStates struct {
 	Total  int
 	Failed int
 	Spare  int
-	States common.MapStr
+	States mapstr.M
 }

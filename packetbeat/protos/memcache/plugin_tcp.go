@@ -23,7 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
@@ -97,8 +97,6 @@ func (mc *memcache) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseMemcache(TCP) exception")
-
 	tcpConn := ensureMemcacheConnection(private)
 	debug("memcache connection %p", tcpConn)
 	tcpConn = mc.memcacheParseTCP(tcpConn, pkt, tcptuple, dir)
@@ -152,7 +150,7 @@ func (mc *memcache) memcacheParseTCP(
 		debug("stream(%p) try to content", stream)
 		msg, err := stream.parse(pkt.Ts)
 		if err != nil {
-			// parsing error, drop tcp stream and retry with next segement
+			// parsing error, drop tcp stream and retry with next segment
 			debug("Ignore Memcache message, drop tcp stream: %v", err)
 			mc.pushAllTCPTrans(conn)
 			tcpConn.drop(dir)
@@ -340,7 +338,6 @@ func (mc *memcache) GapInStream(
 ) (priv protos.ProtocolData, drop bool) {
 	debug("memcache(tcp) stream gap detected")
 
-	defer logp.Recover("GapInStream(memcache) exception")
 	if !isMemcacheConnection(private) {
 		return private, false
 	}
@@ -372,7 +369,7 @@ func (mc *memcache) GapInStream(
 		parser.state == parseStateIncompleteData
 	if inData {
 		if msg == nil {
-			logp.WTF("parser message is nil on data load")
+			logp.NewLogger("memcache").DPanic("parser message is nil on data load")
 			return private, true
 		}
 

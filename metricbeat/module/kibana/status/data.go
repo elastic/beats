@@ -19,15 +19,14 @@ package status
 
 import (
 	"encoding/json"
+	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kibana"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -54,13 +53,13 @@ var (
 
 func eventMapping(r mb.ReporterV2, content []byte, isXpack bool) error {
 	var event mb.Event
-	event.RootFields = common.MapStr{}
+	event.RootFields = mapstr.M{}
 	event.RootFields.Put("service.name", kibana.ModuleName)
 
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Kibana Status API response")
+		return fmt.Errorf("failure parsing Kibana Status API response: %w", err)
 	}
 
 	dataFields, _ := schema.Apply(data)

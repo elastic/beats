@@ -18,9 +18,8 @@
 package mage
 
 import (
+	"fmt"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 
 	"github.com/magefile/mage/sh"
 )
@@ -229,6 +228,6 @@ func toLibbeatLicenseName(name string) string {
 	case "Elastic License":
 		return "Elastic"
 	default:
-		panic(errors.Errorf("invalid license name '%v'", name))
+		panic(fmt.Errorf("invalid license name '%v'", name))
 	}
 }

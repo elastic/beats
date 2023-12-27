@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package redis
 
@@ -33,11 +32,12 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/format"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -78,7 +78,8 @@ func TestPublishListTLS(t *testing.T) {
 		"datatype": "list",
 		"timeout":  "5s",
 
-		"ssl.verification_mode": "full",
+		// Use certificate level verification to avoid verifying the hostname when using localhost.
+		"ssl.verification_mode": "certificate",
 		"ssl.certificate_authorities": []string{
 			"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
 		},
@@ -113,7 +114,8 @@ func TestWithSchema(t *testing.T) {
 				"datatype": "list",
 				"timeout":  "5s",
 
-				"ssl.verification_mode": "full",
+				// Use certificate level verification to avoid verifying the hostname when using localhost.
+				"ssl.verification_mode": "certificate",
 				"ssl.certificate_authorities": []string{
 					"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
 				},
@@ -191,7 +193,8 @@ func TestPublishChannelTLS(t *testing.T) {
 		"datatype": "channel",
 		"timeout":  "5s",
 
-		"ssl.verification_mode": "full",
+		// Use certificate level verification to avoid verifying the hostname when using localhost.
+		"ssl.verification_mode": "certificate",
 		"ssl.certificate_authorities": []string{
 			"../../../testing/environments/docker/sredis/pki/tls/certs/sredis.crt",
 		},
@@ -237,7 +240,7 @@ func testPublishChannel(t *testing.T, cfg map[string]interface{}) {
 	conn.Do("DEL", key)
 
 	// subscribe to packetbeat channel
-	psc := redis.PubSubConn{conn}
+	psc := redis.PubSubConn{Conn: conn}
 	if err := psc.Subscribe(key); err != nil {
 		t.Fatal(err)
 	}
@@ -317,7 +320,7 @@ func getSRedisAddr() string {
 }
 
 func newRedisTestingOutput(t *testing.T, cfg map[string]interface{}) outputs.Client {
-	config, err := common.NewConfigFrom(cfg)
+	config, err := conf.NewConfigFrom(cfg)
 	if err != nil {
 		t.Fatalf("Error reading config: %v", err)
 	}
@@ -362,10 +365,10 @@ func sendTestEvents(out outputs.Client, batches, N int) error {
 func createEvent(message int) beat.Event {
 	return beat.Event{
 		Timestamp: time.Now(),
-		Meta: common.MapStr{
+		Meta: mapstr.M{
 			"test": testMetaValue,
 		},
-		Fields: common.MapStr{"message": message},
+		Fields: mapstr.M{"message": message},
 	}
 }
 

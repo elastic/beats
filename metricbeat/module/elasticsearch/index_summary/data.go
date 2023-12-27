@@ -19,12 +19,11 @@ package index_summary
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -62,6 +61,9 @@ var indexSummaryDict = s.Schema{
 var indexingDict = c.Dict("indexing", s.Schema{
 	"index": s.Object{
 		"count": c.Int("index_total"),
+		"time": s.Object{
+			"ms": c.Int("index_time_in_millis"),
+		},
 	},
 })
 
@@ -95,21 +97,21 @@ func eventMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isXp
 
 	err := json.Unmarshal(content, &all)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch Stats API response")
+		return fmt.Errorf("failure parsing Elasticsearch Stats API response: %w", err)
 	}
 
 	fields, err := schema.Apply(all.Data, s.FailOnRequired)
 	if err != nil {
-		return errors.Wrap(err, "failure applying stats schema")
+		return fmt.Errorf("failure applying stats schema: %w", err)
 	}
 
 	var event mb.Event
-	event.RootFields = common.MapStr{}
-	event.RootFields.Put("service.name", elasticsearch.ModuleName)
+	event.RootFields = mapstr.M{}
+	_, _ = event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
-	event.ModuleFields = common.MapStr{}
-	event.ModuleFields.Put("cluster.name", info.ClusterName)
-	event.ModuleFields.Put("cluster.id", info.ClusterID)
+	event.ModuleFields = mapstr.M{}
+	_, _ = event.ModuleFields.Put("cluster.name", info.ClusterName)
+	_, _ = event.ModuleFields.Put("cluster.id", info.ClusterID)
 
 	event.MetricSetFields = fields
 

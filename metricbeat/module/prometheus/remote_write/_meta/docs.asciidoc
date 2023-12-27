@@ -22,7 +22,17 @@ However this will increase the memory usage of Metricbeat.
 - `capacity`: It is recommended to set capacity to 3-5 times `max_samples_per_send`.
 Capacity sets the number of samples that are queued in memory per shard, and hence capacity should be high enough so as to
 be able to cover `max_samples_per_send`.
-
+- `write_relabel_configs`: It is a relabeling, that applies to samples before sending them to the remote endpoint. This could be used to limit which samples are sent.
++
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+remote_write:
+  - url: "http://localhost:9201/write"
+    write_relabel_configs:
+      - source_labels: [job]
+        regex: 'prometheus'
+        action: keep
+------------------------------------------------------------------------------
 
 Metrics sent to the http endpoint will be put by default under the `prometheus.metrics` prefix with their labels under `prometheus.labels`.
 A basic configuration would look like:

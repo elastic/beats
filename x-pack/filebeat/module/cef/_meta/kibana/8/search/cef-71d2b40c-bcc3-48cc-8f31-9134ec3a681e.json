@@ -1,0 +1,68 @@
+{
+    "attributes": {
+        "columns": [
+            "cef.device.vendor",
+            "cef.device.product",
+            "event.action",
+            "event.outcome",
+            "destination.ip",
+            "destination.port",
+            "destination.domain",
+            "cef.device.event_class_id",
+            "cef.extensions.deviceCustomString1Label",
+            "cef.extensions.deviceCustomString1",
+            "cef.extensions.deviceCustomString2Label",
+            "cef.extensions.deviceCustomString2",
+            "cef.extension.deviceCustomString3Label",
+            "cef.extension.deviceCustomString3",
+            "cef.extension.deviceCustomString4Label",
+            "cef.extension.deviceCustomString4",
+            "cef.extensions.deviceEventCategory",
+            "event.severity",
+            "source.ip",
+            "source.port",
+            "network.transport",
+            "source.bytes",
+            "url.original"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "query_string": {
+                        "analyze_wildcard": true,
+                        "query": "cef.device.product:\"DNS Trace Log\""
+                    }
+                },
+                "version": true
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Microsoft DNS Events [Filebeat CEF]",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-71d2b40c-bcc3-48cc-8f31-9134ec3a681e",
+    "migrationVersion": {
+        "search": "8.0.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0NzUsMV0="
+}

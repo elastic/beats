@@ -21,9 +21,9 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type transactions struct {
@@ -34,7 +34,7 @@ type transactions struct {
 
 	onTransaction transactionHandler
 
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 }
 
 type transactionConfig struct {
@@ -48,7 +48,7 @@ type messageList struct {
 	head, tail *message
 }
 
-func (trans *transactions) init(c *transactionConfig, watcher procs.ProcessesWatcher, cb transactionHandler) {
+func (trans *transactions) init(c *transactionConfig, watcher *procs.ProcessesWatcher, cb transactionHandler) {
 	trans.config = c
 	trans.watcher = watcher
 	trans.onTransaction = cb

@@ -9,26 +9,27 @@ import (
 	"sync"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
-	"github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface"
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Resource type to look for.
 const eventAWSCloudFormationStack = "AWS::CloudFormation::Stack"
 
 type eventStackHandler interface {
-	sync(event cloudformation.StackEvent) bool
-	handle(event cloudformation.StackEvent)
+	sync(event types.StackEvent) bool
+	handle(event types.StackEvent)
 }
 
 // eventStackPoller takes a stack id and will report any events coming from it.
-// The event stream for a stack will return all the events for a specific existance of a stack,
-// its important to be able to skip some events and only report the meaningful events.
+// The event stream for a stack will return all the events for a specific existence of a stack,
+// it's important to be able to skip some events and only report the meaningful events.
 type eventStackPoller struct {
 	log           *logp.Logger
-	svc           cloudformationiface.ClientAPI
+	svc           cloudformation.DescribeStackEventsAPIClient
 	stackID       *string
 	periodicCheck time.Duration
 	handler       eventStackHandler
@@ -38,7 +39,7 @@ type eventStackPoller struct {
 
 func newEventStackPoller(
 	log *logp.Logger,
-	svc cloudformationiface.ClientAPI,
+	svc cloudformation.DescribeStackEventsAPIClient,
 	stackID *string,
 	periodicCheck time.Duration,
 	handler eventStackHandler,
@@ -78,8 +79,7 @@ func (e *eventStackPoller) poll() {
 
 		// Currently no way to skip items based on time.
 		// doc: https://docs.aws.amazon.com/AWSCloudFormation/latest/APIReference/API_DescribeStackEvents.html
-		req := e.svc.DescribeStackEventsRequest(input)
-		resp, err := req.Send(context.TODO())
+		resp, err := e.svc.DescribeStackEvents(context.TODO(), input)
 		if err != nil {
 			// This is not a fatal error because the check is made out of bound from the current status logic.
 			// I wanted to keep them separate so it is easier to deal with states and reporting.
@@ -131,19 +131,19 @@ func (e *eventStackPoller) poll() {
 
 type reportStackEvent struct {
 	skipBefore time.Time
-	callback   func(event cloudformation.StackEvent)
+	callback   func(event types.StackEvent)
 }
 
-func (r *reportStackEvent) sync(event cloudformation.StackEvent) bool {
+func (r *reportStackEvent) sync(event types.StackEvent) bool {
 	// Ignore anything before the Start pointer and everything which is not AWS::CloudFormation::Stack
 	if r.skipBefore.Before(*event.Timestamp) && *event.ResourceType == eventAWSCloudFormationStack {
 		// We are only interested in events thats `START` a request.
 		switch event.ResourceStatus {
-		case cloudformation.ResourceStatusCreateInProgress:
+		case types.ResourceStatusCreateInProgress:
 			return false
-		case cloudformation.ResourceStatusDeleteInProgress:
+		case types.ResourceStatusDeleteInProgress:
 			return false
-		case cloudformation.ResourceStatusUpdateInProgress:
+		case types.ResourceStatusUpdateInProgress:
 			return false
 		default:
 			return true
@@ -152,6 +152,6 @@ func (r *reportStackEvent) sync(event cloudformation.StackEvent) bool {
 	return true
 }
 
-func (r *reportStackEvent) handle(event cloudformation.StackEvent) {
+func (r *reportStackEvent) handle(event types.StackEvent) {
 	r.callback(event)
 }

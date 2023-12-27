@@ -3,6 +3,7 @@ mprotect
 set_robust_list
 tgkill
 time
+rseq
 
 # cgo os/user
 access
@@ -25,3 +26,6 @@ readlink
 rename
 unlink
 wait4
+
+# Reexec
+execve

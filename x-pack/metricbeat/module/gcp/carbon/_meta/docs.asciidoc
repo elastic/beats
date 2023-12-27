@@ -1,0 +1,31 @@
+The `carbon` metricset is designed to collect Carbon Footprint data from GCP
+BigQuery monthly cost detail table. BigQuery is a fully-managed, serverless
+data warehouse.
+
+Cloud Carbon export to BigQuery enables you to export detailed Google Cloud
+carbon footprint data (such as carbon produced by tier and service) automatically
+throughout the month to a BigQuery dataset that you specify. Then you can access
+your Cloud Carbon data from BigQuery for detailed analysis using Metricbeat.
+Please see https://cloud.google.com/carbon-footprint/docs/export[export carbon
+footprint data to BigQuery] for more details on how to export carbon footprint data.
+
+[float]
+=== Metricset-specific configuration notes
+* *dataset_id*: (Required) Dataset ID that points to the top-level container which contains
+the actual carbon footprint tables.
+* *table_pattern*: (Optional) The name of the table where carbon footprint data
+is stored. Default to `carbon_footprint`.
+
+[float]
+=== Configuration example
+[source,yaml]
+----
+- module: gcp
+  metricsets:
+    - carbon
+  period: 24h
+  project_id: "your project id"
+  credentials_file_path: "your JSON credentials file path"
+  dataset_id: "dataset id"
+  table_name: "table name"
+----

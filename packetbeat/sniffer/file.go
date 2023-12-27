@@ -26,7 +26,7 @@ import (
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type fileHandler struct {
@@ -37,6 +37,8 @@ type fileHandler struct {
 
 	topSpeed bool
 	lastTS   time.Time
+
+	log *logp.Logger
 }
 
 func newFileHandler(file string, topSpeed bool, maxLoopCount int) (*fileHandler, error) {
@@ -44,6 +46,7 @@ func newFileHandler(file string, topSpeed bool, maxLoopCount int) (*fileHandler,
 		file:         file,
 		topSpeed:     topSpeed,
 		maxLoopCount: maxLoopCount,
+		log:          logp.NewLogger("sniffer"),
 	}
 	if err := h.open(); err != nil {
 		return nil, err
@@ -65,7 +68,7 @@ func (h *fileHandler) open() error {
 func (h *fileHandler) ReadPacketData() ([]byte, gopacket.CaptureInfo, error) {
 	data, ci, err := h.pcapHandle.ReadPacketData()
 	if err != nil {
-		if err != io.EOF {
+		if err != io.EOF { //nolint:errorlint // io.EOF should never be wrapped.
 			return data, ci, err
 		}
 
@@ -77,9 +80,9 @@ func (h *fileHandler) ReadPacketData() ([]byte, gopacket.CaptureInfo, error) {
 			return data, ci, err
 		}
 
-		logp.Debug("sniffer", "Reopening the file")
+		h.log.Debug("Reopening the file")
 		if err = h.open(); err != nil {
-			return nil, ci, fmt.Errorf("Error reopening file: %s", err)
+			return nil, ci, fmt.Errorf("failed to reopen file: %w", err)
 		}
 
 		data, ci, err = h.pcapHandle.ReadPacketData()
@@ -96,7 +99,7 @@ func (h *fileHandler) ReadPacketData() ([]byte, gopacket.CaptureInfo, error) {
 		if sleep > 0 {
 			time.Sleep(sleep)
 		} else {
-			logp.Warn("Time in pcap went backwards: %d", sleep)
+			h.log.Warnf("Time in pcap went backwards: %d", sleep)
 		}
 	}
 

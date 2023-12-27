@@ -1,0 +1,19 @@
+Jul 15 13:38:14 216.160.83.56 : %ASA-6-302013: Built inbound TCP connection 3263493120 for DMZ:shule/5802 (shule/5802) to SERVERS:10.10.227.121/80 (10.10.227.121/80)
+Jul 15 13:38:11 216.160.83.56 : %ASA-6-302013: Built outbound TCP connection 3263492189 for MG:exp_srv/10050 (exp_srv/10050) to SERVERS:10.10.227.170/46145 (10.10.224.1/46145)
+Jul 15 13:38:08 81.2.69.142 %ASA-6-302015: Built outbound UDP connection 743108828 for outside:ns10/53 (ns10/53) to MND_sec:192.168.174.100/48347 (89.160.20.128/48347)
+Jul 15 13:38:03 81.2.69.142 %ASA-6-302015: Built outbound UDP connection 743108738 for outside:ns10/53 (ns10/53) to MND_sec:192.168.174.100/55653 (81.2.69.192/55653)
+Jul 15 13:36:59 216.160.83.56 : %ASA-6-106015: Deny TCP (no connection) from 10.12.227.40/389 to exp-angle/54703 flags RST on interface SH_INFRA_MGT
+Jul 15 13:36:39 216.160.83.56 : %ASA-6-106015: Deny TCP (no connection) from 89.160.20.128/56594 to sh-mailgw1/25 flags FIN ACK on interface outside
+Jul 15 13:38:47 216.160.83.56 : %ASA-6-305012: Teardown dynamic UDP translation from SERVERS:exp-wait/62409 to outside:81.2.69.142/62409 duration 0:00:41
+Jul 15 13:37:33 216.160.83.56 : %ASA-6-305012: Teardown dynamic UDP translation from SERVERS:exp-wait/56421 to outside:81.2.69.142/56421 duration 0:00:30
+Jul 15 13:39:04 216.160.83.56 : %ASA-6-305011: Built dynamic TCP translation from SERVERS:exp-srv/50578 to outside:81.2.69.142/50578
+Jul 15 13:37:02 216.160.83.56 : %ASA-6-305011: Built dynamic UDP translation from SERVERS:exp-wait/56570 to outside:81.2.69.142/56570
+Jul 15 13:18:06 216.160.83.56 : %ASA-4-106023: Deny tcp src MG:exp_srv/64593 dst SH_OSS:89.160.20.128/2511 by access-group "MGT_access_in" [0x0, 0x0]
+Jul 15 01:18:01 216.160.83.56 : %ASA-4-106023: Deny tcp src MG:exp_srv/63513 dst SH_OSS:89.160.20.128/2511 by access-group "MGT_access_in" [0x0, 0x0]
+Jul 15 13:30:09 81.2.69.142 %ASA-6-302020: Built inbound ICMP connection for faddr eth0_fw/6553 gaddr 81.2.69.192/0 laddr 81.2.69.192/0 type 8 code 0
+Jul 14 01:45:09 81.2.69.142 %ASA-6-302020: Built inbound ICMP connection for faddr eth0_fw/8396 gaddr 81.2.69.192/0 laddr 81.2.69.192/0 type 8 code 0
+Jul 15 13:30:09 81.2.69.142 %ASA-6-302021: Teardown ICMP connection for faddr eth0_fw/6553 gaddr 81.2.69.192/0 laddr 81.2.69.192/0 type 8 code 0
+Jul 14 01:45:09 81.2.69.142 %ASA-6-302021: Teardown ICMP connection for faddr eth0_fw/8396 gaddr 81.2.69.192/0 laddr 81.2.69.192/0 type 8 code 0
+Jul 15 12:18:51 81.2.69.192 %ASA-6-113039: Group <novpn> User <nt\minsk> IP <216.160.83.56> AnyConnect parent session started.
+Jul  1 09:27:13 216.160.83.56 : %ASA-6-113039: Group <Group_VPN> User <support\column> IP <81.2.69.192> AnyConnect parent session started.
+Jun 14 01:22:47 81.2.69.142 %ASA-5-304001: 192.168.14.22 Accessed URL mirror:http://mirror.example.com/path/to/resource

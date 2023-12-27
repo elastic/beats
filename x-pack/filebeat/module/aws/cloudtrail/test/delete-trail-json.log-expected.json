@@ -6,6 +6,7 @@
         "aws.cloudtrail.flattened.request_parameters.name": "arn:aws:cloudtrail:us-west-2:0123456789012:trail/test-trail",
         "aws.cloudtrail.read_only": false,
         "aws.cloudtrail.recipient_account_id": "0123456789012",
+        "aws.cloudtrail.request_id": "EXAMPLE-d44f-4a2a-966f-EXAMPLE",
         "aws.cloudtrail.request_parameters": "{name=arn:aws:cloudtrail:us-west-2:0123456789012:trail/test-trail}",
         "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY",
         "aws.cloudtrail.user_identity.arn": "arn:aws:iam::0123456789012:user/Alice",

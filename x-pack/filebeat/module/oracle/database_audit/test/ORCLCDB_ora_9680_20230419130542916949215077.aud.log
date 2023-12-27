@@ -1,0 +1,26 @@
+Audit file /opt/oracle/admin/ORCLCDB/adump/ORCLCDB_m005_24958_20201007115707242540239811.aud
+Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+Version 19.3.0.0.0
+Build label:    RDBMS_19.3.0.0.0DBRU_LINUX.X64_190417
+ORACLE_HOME:    /opt/oracle/product/19c/dbhome_1
+System name:	Linux
+Node name:	testlab.local
+Release:	3.10.0-1127.el7.x86_64
+Version:	#1 SMP Tue Mar 31 23:36:51 UTC 2020
+Machine:	x86_64
+Instance name: ORCLCDB
+Redo thread mounted by this instance: 1
+Oracle process number: 50
+Unix process pid: 24958, image: oracle@testlab.local (M005)
+
+Tue Apr 18 14:37:18 2023 +03:00
+LENGTH: "357"
+SESSIONID:[10] "4294967295" ENTRYID:[1] "1" STATEMENT:[1] "1" USERID:[8] "SHERLOCK" USERHOST:[8] "testhost" TERMINAL:[5] "pts/0" ACTION:[3] "100" RETURNCODE:[1] "0" COMMENT$TEXT:[100] "Authenticated by: DATABASE; Client address: (ADDRESS=(PROTOCOL=tcp)(HOST=10.10.10.10)(PORT=58864))" OS$USERID:[8] "sherlock" DBID:[10] "1956306463" PRIV$USED:[1] "5"
+
+Tue Apr 18 14:38:18 2023 +03:00
+LENGTH: "340"
+SESSIONID:[7] "4993385" ENTRYID:[1] "1" STATEMENT:[1] "1" USERID:[6] "SYSTEM" USERHOST:[8] "testhost" TERMINAL:[5] "pts/1" ACTION:[3] "100" RETURNCODE:[4] "1017" COMMENT$TEXT:[97] "Authenticated by: DATABASE; Client address: (ADDRESS=(PROTOCOL=tcp)(HOST=10.10.10.10)(PORT=34254))" OS$USERID:[6] "oracle" DBID:[10] "1956306463"
+
+Tue Apr 18 14:39:18 2023 +03:00
+LENGTH: "226"
+SESSIONID:[8] "10188168" ENTRYID:[1] "1" USERID:[8] "SHERLOCK" ACTION:[3] "101" RETURNCODE:[1] "0" LOGOFF$PREAD:[1] "0" LOGOFF$LREAD:[2] "94" LOGOFF$LWRITE:[1] "4" LOGOFF$DEAD:[1] "0" DBID:[10] "2433780671" SESSIONCPU:[1] "0"

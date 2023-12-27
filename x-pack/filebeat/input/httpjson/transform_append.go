@@ -7,10 +7,9 @@ package httpjson
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const appendName = "append"
@@ -24,7 +23,6 @@ type appendConfig struct {
 }
 
 type appendt struct {
-	log                 *logp.Logger
 	targetInfo          targetInfo
 	value               *valueTpl
 	defaultValue        *valueTpl
@@ -32,11 +30,13 @@ type appendt struct {
 	valueType           valueType
 
 	runFunc func(ctx *transformContext, transformable transformable, key string, val interface{}) error
+
+	log *logp.Logger
 }
 
 func (appendt) transformName() string { return appendName }
 
-func newAppendRequest(cfg *common.Config, log *logp.Logger) (transform, error) {
+func newAppendRequest(cfg *conf.C, log *logp.Logger) (transform, error) {
 	append, err := newAppend(cfg, log)
 	if err != nil {
 		return nil, err
@@ -56,7 +56,7 @@ func newAppendRequest(cfg *common.Config, log *logp.Logger) (transform, error) {
 	return &append, nil
 }
 
-func newAppendResponse(cfg *common.Config, log *logp.Logger) (transform, error) {
+func newAppendResponse(cfg *conf.C, log *logp.Logger) (transform, error) {
 	append, err := newAppend(cfg, log)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func newAppendResponse(cfg *common.Config, log *logp.Logger) (transform, error) 
 	return &append, nil
 }
 
-func newAppendPagination(cfg *common.Config, log *logp.Logger) (transform, error) {
+func newAppendPagination(cfg *conf.C, log *logp.Logger) (transform, error) {
 	append, err := newAppend(cfg, log)
 	if err != nil {
 		return nil, err
@@ -92,10 +92,10 @@ func newAppendPagination(cfg *common.Config, log *logp.Logger) (transform, error
 	return &append, nil
 }
 
-func newAppend(cfg *common.Config, log *logp.Logger) (appendt, error) {
+func newAppend(cfg *conf.C, log *logp.Logger) (appendt, error) {
 	c := &appendConfig{}
 	if err := cfg.Unpack(c); err != nil {
-		return appendt{}, errors.Wrap(err, "fail to unpack the append configuration")
+		return appendt{}, fmt.Errorf("fail to unpack the append configuration: %w", err)
 	}
 
 	ti, err := getTargetInfo(c.Target)
@@ -119,7 +119,7 @@ func newAppend(cfg *common.Config, log *logp.Logger) (appendt, error) {
 }
 
 func (append *appendt) run(ctx *transformContext, tr transformable) (transformable, error) {
-	value, err := append.value.Execute(ctx, tr, append.defaultValue, append.log)
+	value, err := append.value.Execute(ctx, tr, append.targetInfo.Name, append.defaultValue, append.log)
 	if err != nil && append.failOnTemplateError {
 		return transformable{}, err
 	}
@@ -136,7 +136,7 @@ func (append *appendt) run(ctx *transformContext, tr transformable) (transformab
 	return tr, nil
 }
 
-func appendToCommonMap(m common.MapStr, key string, val interface{}) error {
+func appendToCommonMap(m mapstr.M, key string, val interface{}) error {
 	var value interface{}
 	strVal, isString := val.(string)
 	if found, _ := m.HasKey(key); found {

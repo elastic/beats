@@ -18,14 +18,14 @@
 package query
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestQueryFetchEventContentInstantVector(t *testing.T) {
@@ -39,11 +39,11 @@ func TestQueryFetchEventContentInstantVector(t *testing.T) {
 	//  },
 	//  ...
 	//]
-	response, _ := ioutil.ReadFile(absPath + "/querymetrics_instant_vector.json")
+	response, _ := os.ReadFile(absPath + "/querymetrics_instant_vector.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
+		_, _ = w.Write(response)
 	}))
 	defer server.Close()
 
@@ -52,11 +52,11 @@ func TestQueryFetchEventContentInstantVector(t *testing.T) {
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
 		// queries do not have an actual role here since all http responses are mocked
-		"queries": []common.MapStr{
-			common.MapStr{
+		"queries": []mapstr.M{
+			mapstr.M{
 				"name": "up",
 				"path": "/api/v1/query",
-				"params": common.MapStr{
+				"params": mapstr.M{
 					"query": "up",
 				},
 			},
@@ -65,7 +65,7 @@ func TestQueryFetchEventContentInstantVector(t *testing.T) {
 	reporter := &mbtest.CapturingReporterV2{}
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	metricSet.Fetch(reporter)
+	_ = metricSet.Fetch(reporter)
 
 	events := reporter.GetEvents()
 	if len(events) != 2 {
@@ -88,11 +88,11 @@ func TestQueryFetchEventContentRangeVector(t *testing.T) {
 	//  },
 	//  ...
 	//]
-	response, _ := ioutil.ReadFile(absPath + "/querymetrics_range_vector.json")
+	response, _ := os.ReadFile(absPath + "/querymetrics_range_vector.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
+		_, _ = w.Write(response)
 	}))
 	defer server.Close()
 
@@ -101,11 +101,11 @@ func TestQueryFetchEventContentRangeVector(t *testing.T) {
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
 		// queries do not have an actual role here since all http responses are mocked
-		"queries": []common.MapStr{
-			common.MapStr{
+		"queries": []mapstr.M{
+			mapstr.M{
 				"name": "up_range",
 				"path": "/api/v1/query",
-				"params": common.MapStr{
+				"params": mapstr.M{
 					"query": "up",
 					"start": "2019-12-20T23:30:30.000Z",
 					"end":   "2019-12-21T23:31:00.000Z",
@@ -117,7 +117,7 @@ func TestQueryFetchEventContentRangeVector(t *testing.T) {
 	reporter := &mbtest.CapturingReporterV2{}
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	metricSet.Fetch(reporter)
+	_ = metricSet.Fetch(reporter)
 
 	events := reporter.GetEvents()
 	if len(events) != 6 {
@@ -134,11 +134,11 @@ func TestQueryFetchEventContentScalar(t *testing.T) {
 
 	// test with response format like:
 	//[ <unix_time>, "<scalar_value>" ]
-	response, _ := ioutil.ReadFile(absPath + "/querymetrics_scalar.json")
+	response, _ := os.ReadFile(absPath + "/querymetrics_scalar.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
+		_, _ = w.Write(response)
 	}))
 	defer server.Close()
 
@@ -147,11 +147,11 @@ func TestQueryFetchEventContentScalar(t *testing.T) {
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
 		// queries do not have an actual role here since all http responses are mocked
-		"queries": []common.MapStr{
-			common.MapStr{
+		"queries": []mapstr.M{
+			mapstr.M{
 				"name": "scalar",
 				"path": "/api/v1/query",
-				"params": common.MapStr{
+				"params": mapstr.M{
 					"query": "100",
 				},
 			},
@@ -160,7 +160,7 @@ func TestQueryFetchEventContentScalar(t *testing.T) {
 	reporter := &mbtest.CapturingReporterV2{}
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	metricSet.Fetch(reporter)
+	_ = metricSet.Fetch(reporter)
 
 	events := reporter.GetEvents()
 	if len(events) != 1 {
@@ -177,11 +177,11 @@ func TestQueryFetchEventContentString(t *testing.T) {
 
 	// test with response format like:
 	//[ <unix_time>, "<scalar_value>" ]
-	response, _ := ioutil.ReadFile(absPath + "/querymetrics_string.json")
+	response, _ := os.ReadFile(absPath + "/querymetrics_string.json")
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
+		_, _ = w.Write(response)
 	}))
 	defer server.Close()
 
@@ -190,11 +190,11 @@ func TestQueryFetchEventContentString(t *testing.T) {
 		"metricsets": []string{"query"},
 		"hosts":      []string{server.URL},
 		// queries do not have an actual role here since all http responses are mocked
-		"queries": []common.MapStr{
-			common.MapStr{
+		"queries": []mapstr.M{
+			mapstr.M{
 				"name": "string",
 				"path": "/api/v1/query",
-				"params": common.MapStr{
+				"params": mapstr.M{
 					"query": "some",
 				},
 			},
@@ -203,7 +203,7 @@ func TestQueryFetchEventContentString(t *testing.T) {
 	reporter := &mbtest.CapturingReporterV2{}
 
 	metricSet := mbtest.NewReportingMetricSetV2Error(t, config)
-	metricSet.Fetch(reporter)
+	_ = metricSet.Fetch(reporter)
 
 	events := reporter.GetEvents()
 	if len(events) != 1 {

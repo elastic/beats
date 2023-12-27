@@ -16,24 +16,23 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package eventlog
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
-	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	win "github.com/elastic/beats/v7/winlogbeat/sys/wineventlog"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -41,6 +40,14 @@ const (
 	// as both an event type and an API.
 	winEventLogExpAPIName = "wineventlog-experimental"
 )
+
+func init() {
+	// Register wineventlog API if it is available.
+	available, _ := win.IsAvailable()
+	if available {
+		Register(winEventLogExpAPIName, 10, newWinEventLogExp, win.Channels)
+	}
+}
 
 // winEventLogExp implements the EventLog interface for reading from the Windows
 // Event Log API.
@@ -56,192 +63,13 @@ type winEventLogExp struct {
 
 	iterator *win.EventIterator
 	renderer *win.Renderer
-}
 
-// Name returns the name of the event log (i.e. Application, Security, etc.).
-func (l *winEventLogExp) Name() string {
-	return l.id
-}
-
-func (l *winEventLogExp) Open(state checkpoint.EventLogState) error {
-	l.lastRead = state
-
-	var err error
-	l.iterator, err = win.NewEventIterator(
-		win.WithSubscriptionFactory(func() (handle win.EvtHandle, err error) {
-			return l.open(l.lastRead)
-		}),
-		win.WithBatchSize(l.maxRead))
-	return err
-}
-
-func (l *winEventLogExp) open(state checkpoint.EventLogState) (win.EvtHandle, error) {
-	var bookmark win.Bookmark
-	if len(state.Bookmark) > 0 {
-		var err error
-		bookmark, err = win.NewBookmarkFromXML(state.Bookmark)
-		if err != nil {
-			return win.NilHandle, err
-		}
-		defer bookmark.Close()
-	}
-
-	if l.file {
-		return l.openFile(state, bookmark)
-	}
-	return l.openChannel(bookmark)
-}
-
-func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) {
-	// Using a pull subscription to receive events. See:
-	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
-	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
-	if err != nil {
-		return win.NilHandle, err
-	}
-	defer windows.CloseHandle(signalEvent)
-
-	var flags win.EvtSubscribeFlag
-	if bookmark > 0 {
-		flags = win.EvtSubscribeStartAfterBookmark
-	} else {
-		flags = win.EvtSubscribeStartAtOldestRecord
-	}
-
-	l.log.Debugw("Using subscription query.", "winlog.query", l.query)
-	return win.Subscribe(
-		0, // Session - nil for localhost
-		signalEvent,
-		"",                      // Channel - empty b/c channel is in the query
-		l.query,                 // Query - nil means all events
-		win.EvtHandle(bookmark), // Bookmark - for resuming from a specific event
-		flags)
-}
-
-func (l *winEventLogExp) openFile(state checkpoint.EventLogState, bookmark win.Bookmark) (win.EvtHandle, error) {
-	path := l.channelName
-
-	h, err := win.EvtQuery(0, path, "", win.EvtQueryFilePath|win.EvtQueryForwardDirection)
-	if err != nil {
-		return win.NilHandle, errors.Wrapf(err, "failed to get handle to event log file %v", path)
-	}
-
-	if bookmark > 0 {
-		l.log.Debugf("Seeking to bookmark. timestamp=%v bookmark=%v",
-			state.Timestamp, state.Bookmark)
-
-		// This seeks to the last read event and strictly validates that the
-		// bookmarked record number exists.
-		if err = win.EvtSeek(h, 0, win.EvtHandle(bookmark), win.EvtSeekRelativeToBookmark|win.EvtSeekStrict); err == nil {
-			// Then we advance past the last read event to avoid sending that
-			// event again. This won't fail if we're at the end of the file.
-			err = errors.Wrap(
-				win.EvtSeek(h, 1, win.EvtHandle(bookmark), win.EvtSeekRelativeToBookmark),
-				"failed to seek past bookmarked position")
-		} else {
-			l.log.Warnf("s Failed to seek to bookmarked location in %v (error: %v). "+
-				"Recovering by reading the log from the beginning. (Did the file "+
-				"change since it was last read?)", path, err)
-			err = errors.Wrap(
-				win.EvtSeek(h, 0, 0, win.EvtSeekRelativeToFirst),
-				"failed to seek to beginning of log")
-		}
-
-		if err != nil {
-			return win.NilHandle, err
-		}
-	}
-
-	return h, err
-}
-
-func (l *winEventLogExp) Read() ([]Record, error) {
-	var records []Record
-
-	for h, ok := l.iterator.Next(); ok; h, ok = l.iterator.Next() {
-		record, err := l.processHandle(h)
-		if err != nil {
-			l.log.Warnw("Dropping event due to rendering error.", "error", err)
-			incrementMetric(dropReasons, err)
-			continue
-		}
-		records = append(records, *record)
-
-		// It has read the maximum requested number of events.
-		if len(records) >= l.maxRead {
-			return records, nil
-		}
-	}
-
-	// An error occurred while retrieving more events.
-	if err := l.iterator.Err(); err != nil {
-		return records, err
-	}
-
-	// Reader is configured to stop when there are no more events.
-	if Stop == l.config.NoMoreEvents {
-		return records, io.EOF
-	}
-
-	return records, nil
-}
-
-func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
-	defer h.Close()
-
-	// NOTE: Render can return an error and a partial event.
-	evt, err := l.renderer.Render(h)
-	if evt == nil {
-		return nil, err
-	}
-	if err != nil {
-		evt.RenderErr = append(evt.RenderErr, err.Error())
-	}
-
-	// TODO: Need to add XML when configured.
-
-	r := &Record{
-		API:   winEventLogExpAPIName,
-		Event: *evt,
-	}
-
-	if l.file {
-		r.File = l.id
-	}
-
-	r.Offset = checkpoint.EventLogState{
-		Name:         l.id,
-		RecordNumber: r.RecordID,
-		Timestamp:    r.TimeCreated.SystemTime,
-	}
-	if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
-		l.log.Warnw("Failed creating bookmark.", "error", err)
-	}
-	l.lastRead = r.Offset
-	return r, nil
-}
-
-func (l *winEventLogExp) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
-	bookmark, err := win.NewBookmarkFromEvent(evtHandle)
-	if err != nil {
-		return "", errors.Wrap(err, "failed to create new bookmark from event handle")
-	}
-	defer bookmark.Close()
-
-	return bookmark.XML()
-}
-
-func (l *winEventLogExp) Close() error {
-	l.log.Debug("Closing event log reader handles.")
-	return multierr.Combine(
-		l.iterator.Close(),
-		l.renderer.Close(),
-	)
+	metrics *inputMetrics
 }
 
 // newWinEventLogExp creates and returns a new EventLog for reading event logs
 // using the Windows Event Log.
-func newWinEventLogExp(options *common.Config) (EventLog, error) {
+func newWinEventLogExp(options *conf.C) (EventLog, error) {
 	var xmlQuery string
 	var err error
 	var isFile bool
@@ -301,15 +129,242 @@ func newWinEventLogExp(options *common.Config) (EventLog, error) {
 		maxRead:     c.BatchReadSize,
 		renderer:    renderer,
 		log:         log,
+		metrics:     newInputMetrics(c.Name, id),
 	}
 
 	return l, nil
 }
 
-func init() {
-	// Register wineventlog API if it is available.
-	available, _ := win.IsAvailable()
-	if available {
-		Register(winEventLogExpAPIName, 10, newWinEventLogExp, win.Channels)
+func (l *winEventLogExp) isForwarded() bool {
+	c := l.config
+	return (c.Forwarded != nil && *c.Forwarded) || (c.Forwarded == nil && c.Name == "ForwardedEvents")
+}
+
+// Name returns the name of the event log (i.e. Application, Security, etc.).
+func (l *winEventLogExp) Name() string {
+	return l.id
+}
+
+// Channel returns the event log's channel name.
+func (l *winEventLogExp) Channel() string {
+	return l.channelName
+}
+
+// IsFile returns true if the event log is an evtx file.
+func (l *winEventLogExp) IsFile() bool {
+	return l.file
+}
+
+func (l *winEventLogExp) Open(state checkpoint.EventLogState) error {
+	l.lastRead = state
+
+	var err error
+	l.iterator, err = win.NewEventIterator(
+		win.WithSubscriptionFactory(func() (handle win.EvtHandle, err error) {
+			return l.open(l.lastRead)
+		}),
+		win.WithBatchSize(l.maxRead))
+	return err
+}
+
+func (l *winEventLogExp) open(state checkpoint.EventLogState) (win.EvtHandle, error) {
+	var bookmark win.Bookmark
+	if len(state.Bookmark) > 0 {
+		var err error
+		bookmark, err = win.NewBookmarkFromXML(state.Bookmark)
+		if err != nil {
+			return win.NilHandle, err
+		}
+		defer bookmark.Close()
 	}
+
+	if l.file {
+		return l.openFile(state, bookmark)
+	}
+	return l.openChannel(bookmark)
+}
+
+func (l *winEventLogExp) openFile(state checkpoint.EventLogState, bookmark win.Bookmark) (win.EvtHandle, error) {
+	path := l.channelName
+
+	h, err := win.EvtQuery(0, path, l.query, win.EvtQueryFilePath|win.EvtQueryForwardDirection)
+	if err != nil {
+		return win.NilHandle, fmt.Errorf("failed to get handle to event log file %v: %w", path, err)
+	}
+
+	if bookmark > 0 {
+		l.log.Debugf("Seeking to bookmark. timestamp=%v bookmark=%v",
+			state.Timestamp, state.Bookmark)
+
+		// This seeks to the last read event and strictly validates that the
+		// bookmarked record number exists.
+		if err = win.EvtSeek(h, 0, win.EvtHandle(bookmark), win.EvtSeekRelativeToBookmark|win.EvtSeekStrict); err == nil {
+			// Then we advance past the last read event to avoid sending that
+			// event again. This won't fail if we're at the end of the file.
+			if seekErr := win.EvtSeek(h, 1, win.EvtHandle(bookmark), win.EvtSeekRelativeToBookmark); seekErr != nil {
+				err = fmt.Errorf("failed to seek past bookmarked position: %w", seekErr)
+			}
+		} else {
+			l.log.Warnf("s Failed to seek to bookmarked location in %v (error: %v). "+
+				"Recovering by reading the log from the beginning. (Did the file "+
+				"change since it was last read?)", path, err)
+			if seekErr := win.EvtSeek(h, 0, 0, win.EvtSeekRelativeToFirst); seekErr != nil {
+				err = fmt.Errorf("failed to seek to beginning of log: %w", seekErr)
+			}
+		}
+
+		if err != nil {
+			return win.NilHandle, err
+		}
+	}
+
+	return h, err
+}
+
+func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, error) {
+	// Using a pull subscription to receive events. See:
+	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa385771(v=vs.85).aspx#pull
+	signalEvent, err := windows.CreateEvent(nil, 0, 0, nil)
+	if err != nil {
+		return win.NilHandle, err
+	}
+	defer windows.CloseHandle(signalEvent) //nolint:errcheck // This is just a resource release.
+
+	var flags win.EvtSubscribeFlag
+	if bookmark > 0 {
+		flags = win.EvtSubscribeStartAfterBookmark
+		if !l.isForwarded() {
+			// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
+			// subscribe again from the beginning.
+			flags |= win.EvtSubscribeStrict
+		}
+	} else {
+		flags = win.EvtSubscribeStartAtOldestRecord
+	}
+
+	l.log.Debugw("Using subscription query.", "winlog.query", l.query)
+	h, err := win.Subscribe(
+		0, // Session - nil for localhost
+		signalEvent,
+		"",                      // Channel - empty b/c channel is in the query
+		l.query,                 // Query - nil means all events
+		win.EvtHandle(bookmark), // Bookmark - for resuming from a specific event
+		flags)
+
+	switch err { //nolint:errorlint // This is an errno or nil.
+	case nil:
+		return h, nil
+	case win.ERROR_NOT_FOUND, win.ERROR_EVT_QUERY_RESULT_STALE, win.ERROR_EVT_QUERY_RESULT_INVALID_POSITION:
+		// The bookmarked event was not found, we retry the subscription from the start.
+		incrementMetric(readErrors, err)
+		return win.Subscribe(0, signalEvent, "", l.query, 0, win.EvtSubscribeStartAtOldestRecord)
+	default:
+		return 0, err
+	}
+}
+
+func (l *winEventLogExp) Read() ([]Record, error) {
+	//nolint:prealloc // Avoid unnecessary preallocation for each reader every second when event log is inactive.
+	var records []Record
+	defer func() {
+		l.metrics.log(records)
+	}()
+
+	for h, ok := l.iterator.Next(); ok; h, ok = l.iterator.Next() {
+		record, err := l.processHandle(h)
+		if err != nil {
+			l.metrics.logError(err)
+			l.log.Warnw("Dropping event due to rendering error.", "error", err)
+			l.metrics.logDropped(err)
+			incrementMetric(dropReasons, err)
+			continue
+		}
+		records = append(records, *record)
+
+		// It has read the maximum requested number of events.
+		if len(records) >= l.maxRead {
+			return records, nil
+		}
+	}
+
+	// An error occurred while retrieving more events.
+	if err := l.iterator.Err(); err != nil {
+		l.metrics.logError(err)
+		return records, err
+	}
+
+	// Reader is configured to stop when there are no more events.
+	if Stop == l.config.NoMoreEvents {
+		return records, io.EOF
+	}
+
+	return records, nil
+}
+
+func (l *winEventLogExp) processHandle(h win.EvtHandle) (*Record, error) {
+	defer h.Close()
+
+	// NOTE: Render can return an error and a partial event.
+	evt, err := l.renderer.Render(h)
+	if evt == nil {
+		return nil, err
+	}
+	if err != nil {
+		evt.RenderErr = append(evt.RenderErr, err.Error())
+	}
+
+	//nolint:godox // Bad linter! Keep to have a record of feature disparity between non-experimental vs experimental.
+	// TODO: Need to add XML when configured.
+
+	r := &Record{
+		API:   winEventLogExpAPIName,
+		Event: *evt,
+	}
+
+	if l.file {
+		r.File = l.id
+	}
+
+	r.Offset = checkpoint.EventLogState{
+		Name:         l.id,
+		RecordNumber: r.RecordID,
+		Timestamp:    r.TimeCreated.SystemTime,
+	}
+	if r.Offset.Bookmark, err = l.createBookmarkFromEvent(h); err != nil {
+		l.metrics.logError(err)
+		l.log.Warnw("Failed creating bookmark.", "error", err)
+	}
+	l.lastRead = r.Offset
+	return r, nil
+}
+
+func (l *winEventLogExp) createBookmarkFromEvent(evtHandle win.EvtHandle) (string, error) {
+	bookmark, err := win.NewBookmarkFromEvent(evtHandle)
+	if err != nil {
+		return "", fmt.Errorf("failed to create new bookmark from event handle: %w", err)
+	}
+	defer bookmark.Close()
+
+	return bookmark.XML()
+}
+
+func (l *winEventLogExp) Reset() error {
+	l.log.Debug("Closing event log reader handles for reset.")
+	return l.close()
+}
+
+func (l *winEventLogExp) Close() error {
+	l.log.Debug("Closing event log reader handles.")
+	l.metrics.close()
+	return l.close()
+}
+
+func (l *winEventLogExp) close() error {
+	if l.iterator == nil {
+		return l.renderer.Close()
+	}
+	return multierr.Combine(
+		l.iterator.Close(),
+		l.renderer.Close(),
+	)
 }

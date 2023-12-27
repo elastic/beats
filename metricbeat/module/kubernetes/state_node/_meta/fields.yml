@@ -31,13 +31,17 @@
           type: keyword
           description: >
             Node PIDPressure status (true, false or unknown)
+        - name: network_unavailable
+          type: keyword
+          description: >
+            Node NetworkUnavailable status (true, false or unknown)
     - name: cpu
       type: group
       fields:
         - name: allocatable.cores
           type: float
           description: >
-            Node CPU allocatable cores
+            The allocatable CPU cores of a node that are available for pods scheduling
         - name: capacity.cores
           type: long
           description: >
@@ -49,7 +53,7 @@
           type: long
           format: bytes
           description: >
-            Node allocatable memory in bytes
+            The allocatable memory of a node in bytes that is available for pods scheduling
         - name: capacity.bytes
           type: long
           format: bytes
@@ -66,3 +70,7 @@
           type: long
           description: >
             Node pod capacity
+    - name: kubelet.version
+      type: keyword
+      description: >
+        Kubelet version.

@@ -22,8 +22,6 @@ import (
 	"net"
 	"net/url"
 	"strconv"
-
-	"github.com/pkg/errors"
 )
 
 // endpoint configures a host with all port numbers to be monitored by a dialer
@@ -87,7 +85,7 @@ func makeURLEndpoint(u *url.URL, ports []uint16) (endpoint, error) {
 	if u.Port() != "" {
 		pUint, err := strconv.ParseUint(u.Port(), 10, 16)
 		if err != nil {
-			return endpoint{}, errors.Wrapf(err, "no port(s) defined for TCP endpoint %s", u)
+			return endpoint{}, fmt.Errorf("no port(s) defined for TCP endpoint %s: %w", u, err)
 		}
 		ports = []uint16{uint16(pUint)}
 	}

@@ -28,11 +28,6 @@ For example, specifying a resource type of ec2 returns all Amazon EC2 resources
 only EC2 instances.
 * *statistic*: Statistics are metric data aggregations over specified periods of time.
 By default, statistic includes Average, Sum, Count, Maximum and Minimum.
-* *tags*: The tags to filter against. If tags are given in config, then only
-collect metrics from resources that have tag key and tag value matches the filter.
-For example, if tags parameter is given as `Organization=Engineering` under
-`AWS/ELB` namespace, then only collect metrics from ELBs with tag name equals to
-`Organization` and tag value equals to `Engineering`.
 
 [float]
 === Configuration examples
@@ -49,14 +44,14 @@ in configurations in order for this metricset to make proper AWS API calls.
   period: 300s
   metricsets:
     - cloudwatch
+  tags_filter: <3>
+    - key: "Organization"
+      value: "Engineering"
   metrics:
     - namespace: AWS/EBS <1>
     - namespace: AWS/ELB <2>
       resource_type: elasticloadbalancing
-      tags:
-        - key: "Organization"
-          value: "Engineering"
-    - namespace: AWS/EC2 <3>
+    - namespace: AWS/EC2 <4>
       name: CPUUtilization
       statistic: ["Average"]
       dimensions:
@@ -68,11 +63,14 @@ in configurations in order for this metricset to make proper AWS API calls.
 specific namespace, such as `AWS/EBS`.
 
 <2> `cloudwatch` metricset also has the ability to collect tags from AWS resources.
-If user specify `resource_type`, then tags will be collected and stored
+If `resource_type` is specified, then tags will be collected and stored
 as a part of the event. Please see https://docs.aws.amazon.com/resourcegroupstagging/latest/APIReference/API_GetResources.html[AWS API GetResources]
-for more details about `resource_type`.
+for more details about `resource_type`. 
 
-<3> If users knows exactly what are the cloudwatch metrics they want to collect,
+<3> If tags are collected (for metricsets with `resource_type` specified), events can also 
+be filtered by tag, using the `tags_filter` field in the module-specific configuration.
+
+<4> If users knows exactly what are the cloudwatch metrics they want to collect,
 this configuration format can be used. `namespace` and `metricname` need to be
 specified and `dimensions` can be used to filter cloudwatch metrics. Please see
 https://docs.aws.amazon.com/cli/latest/reference/cloudwatch/list-metrics.html[AWS List Metrics]
@@ -211,5 +209,5 @@ be any.
           value: "*"
         - name: TargetGroup
           value: "*"
-      tags.resource_type_filter: elasticloadbalancing
+      resource_type: elasticloadbalancing
 ----

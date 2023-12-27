@@ -35,7 +35,7 @@
                         "line_width": "2",
                         "metrics": [
                             {
-                                "field": null,
+                                "field": "prometheus.metrics.sys_host_disk_iopsinprogress",
                                 "id": "e4489e51-976b-11e9-b3d5-07b0ab7d6354",
                                 "type": "max",
                                 "unit": "1s"
@@ -61,7 +61,7 @@
                         "line_width": "2",
                         "metrics": [
                             {
-                                "field": null,
+                                "field": "prometheus.metrics.sys_host_disk_read_count",
                                 "id": "c938f9c1-976b-11e9-b3d5-07b0ab7d6354",
                                 "type": "positive_rate",
                                 "unit": "1s"
@@ -92,7 +92,7 @@
                         "line_width": "2",
                         "metrics": [
                             {
-                                "field": null,
+                                "field": "prometheus.metrics.sys_host_disk_write_count",
                                 "id": "0ed1bf81-976c-11e9-b3d5-07b0ab7d6354",
                                 "type": "positive_rate",
                                 "unit": "1s"

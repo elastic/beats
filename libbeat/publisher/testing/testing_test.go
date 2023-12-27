@@ -23,14 +23,14 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var cnt = 0
 
 func testEvent() beat.Event {
 	event := beat.Event{
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"message": "test",
 			"idx":     cnt,
 		},

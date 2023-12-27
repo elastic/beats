@@ -7,44 +7,22 @@
     },
     "kubernetes": {
         "scheduler": {
-            "handler": "prometheus",
-            "http": {
-                "request": {
-                    "duration": {
-                        "us": {
-                            "count": 4,
-                            "percentile": {
-                                "50": 7644.523,
-                                "90": 7644.523,
-                                "99": 7644.523
-                            },
-                            "sum": 16210.005000000001
-                        }
-                    },
-                    "size": {
-                        "bytes": {
-                            "count": 4,
-                            "percentile": {
-                                "50": 64,
-                                "90": 64,
-                                "99": 64
-                            },
-                            "sum": 256
-                        }
-                    }
+            "name": "RequestHeaderAuthRequestController",
+            "workqueue": {
+                "adds": {
+                    "count": 0
                 },
-                "response": {
-                    "size": {
-                        "bytes": {
-                            "count": 4,
-                            "percentile": {
-                                "50": 48741,
-                                "90": 48741,
-                                "99": 48741
-                            },
-                            "sum": 184429
-                        }
-                    }
+                "depth": {
+                    "count": 0
+                },
+                "longestrunning": {
+                    "sec": 0
+                },
+                "retries": {
+                    "count": 0
+                },
+                "unfinished": {
+                    "sec": 0
                 }
             }
         }

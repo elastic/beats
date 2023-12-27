@@ -20,8 +20,8 @@ package module
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Option specifies some optional arguments used for configuring the behavior
@@ -50,12 +50,12 @@ func WithEventModifier(modifier mb.EventModifier) Option {
 // module names. And it will add the host and rtt (round-trip time in
 // microseconds) values if they are non-zero values.
 //
-//     "metricset": {
-//       "host": "apache",
-//       "module": "apache",
-//       "name": "status",
-//       "rtt": 115
-//     }
+//	"metricset": {
+//	  "host": "apache",
+//	  "module": "apache",
+//	  "name": "status",
+//	  "rtt": 115
+//	}
 func WithMetricSetInfo() Option {
 	return WithEventModifier(mb.AddMetricSetInfo)
 }
@@ -76,7 +76,7 @@ func WithServiceName() Option {
 				return
 			}
 			if event.RootFields == nil {
-				event.RootFields = common.MapStr{}
+				event.RootFields = mapstr.M{}
 			} else if current, err := event.RootFields.GetValue("service.name"); err == nil && current != "" {
 				// Already set by the metricset, don't overwrite
 				return

@@ -14,9 +14,9 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 /*
@@ -278,7 +278,7 @@ func (g *guessInetSockIPv6) Trigger() error {
 
 // Extract scans stores the events from the two different kprobes and then
 // looks for the result in one of them.
-func (g *guessInetSockIPv6) Extract(event interface{}) (common.MapStr, bool) {
+func (g *guessInetSockIPv6) Extract(event interface{}) (mapstr.M, bool) {
 	if w, ok := event.(eventWrapper); ok {
 		g.ptrDump = w.event.([]byte)
 	} else {
@@ -295,7 +295,7 @@ func (g *guessInetSockIPv6) Extract(event interface{}) (common.MapStr, bool) {
 	return result, ok
 }
 
-func (g *guessInetSockIPv6) searchStructSock(raw []byte) (common.MapStr, bool) {
+func (g *guessInetSockIPv6) searchStructSock(raw []byte) (mapstr.M, bool) {
 	var expected []byte
 	expected = append(expected, g.clientAddr.Addr[:]...) // sck_v6_daddr
 	expected = append(expected, g.serverAddr.Addr[:]...) // sck_v6_rcv_saddr
@@ -303,7 +303,7 @@ func (g *guessInetSockIPv6) searchStructSock(raw []byte) (common.MapStr, bool) {
 	if offset == -1 {
 		return nil, false
 	}
-	return common.MapStr{
+	return mapstr.M{
 		"INET_SOCK_V6_TERM":    ":u64",
 		"INET_SOCK_V6_RADDR_A": fmt.Sprintf("+%d", offset),
 		"INET_SOCK_V6_RADDR_B": fmt.Sprintf("+%d", offset+8),
@@ -313,7 +313,7 @@ func (g *guessInetSockIPv6) searchStructSock(raw []byte) (common.MapStr, bool) {
 	}, true
 }
 
-func (g *guessInetSockIPv6) searchIPv6PInfo(raw []byte) (common.MapStr, bool) {
+func (g *guessInetSockIPv6) searchIPv6PInfo(raw []byte) (mapstr.M, bool) {
 	offset := bytes.Index(raw, g.serverAddr.Addr[:])
 	if offset == -1 {
 		return nil, false
@@ -323,7 +323,7 @@ func (g *guessInetSockIPv6) searchIPv6PInfo(raw []byte) (common.MapStr, bool) {
 		return nil, false
 	}
 	off := g.offsets[idx]
-	return common.MapStr{
+	return mapstr.M{
 		"INET_SOCK_V6_TERM":    "):u64",
 		"INET_SOCK_V6_RADDR_A": fmt.Sprintf("+%d(+%d", 32, off),
 		"INET_SOCK_V6_RADDR_B": fmt.Sprintf("+%d(+%d", 40, off),

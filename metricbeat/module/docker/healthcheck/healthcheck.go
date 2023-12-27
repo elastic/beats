@@ -16,16 +16,15 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package healthcheck
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
@@ -69,14 +68,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	// Fetch a list of all containers.
 	containers, err := m.dockerClient.ContainerList(context.TODO(), types.ContainerListOptions{})
 	if err != nil {
-		return errors.Wrap(err, "failed to get docker containers list")
+		return fmt.Errorf("failed to get docker containers list: %w", err)
 	}
 	eventsMapping(r, containers, m)
 
 	return nil
 }
 
-//Close stops the metricset
+// Close stops the metricset
 func (m *MetricSet) Close() error {
 
 	return m.dockerClient.Close()

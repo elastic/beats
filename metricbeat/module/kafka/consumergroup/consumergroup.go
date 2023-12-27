@@ -20,12 +20,10 @@ package consumergroup
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry.
@@ -81,25 +79,25 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	broker, err := m.Connect()
 	if err != nil {
-		return errors.Wrap(err, "error in connect")
+		return fmt.Errorf("error in connect: %w", err)
 	}
 	defer broker.Close()
 
-	brokerInfo := common.MapStr{
+	brokerInfo := mapstr.M{
 		"id":      broker.ID(),
 		"address": broker.AdvertisedAddr(),
 	}
 
-	emitEvent := func(event common.MapStr) {
+	emitEvent := func(event mapstr.M) {
 		// Helpful IDs to avoid scripts on queries
 		partitionTopicID := fmt.Sprintf("%d-%s", event["partition"], event["topic"])
 
-		moduleFields := common.MapStr{
+		moduleFields := mapstr.M{
 			"broker": brokerInfo,
-			"topic": common.MapStr{
+			"topic": mapstr.M{
 				"name": event["topic"],
 			},
-			"partition": common.MapStr{
+			"partition": mapstr.M{
 				"id":       event["partition"],
 				"topic_id": partitionTopicID,
 			},
@@ -114,7 +112,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 	err = fetchGroupInfo(emitEvent, broker, m.groups.pred(), m.topics.pred())
 	if err != nil {
-		return errors.Wrap(err, "error in fetch")
+		return fmt.Errorf("error in fetch: %w", err)
 	}
 
 	return nil

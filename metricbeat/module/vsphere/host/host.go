@@ -19,14 +19,13 @@ package host
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/property"
@@ -66,12 +65,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
-		return errors.Wrap(err, "error in NewClient")
+		return fmt.Errorf("error in NewClient: %w", err)
 	}
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debug(errors.Wrap(err, "error trying to logout from vshphere"))
+			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere: %w", err))
 		}
 	}()
 
@@ -82,12 +81,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"HostSystem"}, true)
 	if err != nil {
-		return errors.Wrap(err, "error in CreateContainerView")
+		return fmt.Errorf("error in CreateContainerView: %w", err)
 	}
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug(errors.Wrap(err, "error trying to destroy view from vshphere"))
+			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
 		}
 	}()
 
@@ -95,12 +94,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 	var hst []mo.HostSystem
 	err = v.Retrieve(ctx, []string{"HostSystem"}, []string{"summary"}, &hst)
 	if err != nil {
-		return errors.Wrap(err, "error in Retrieve")
+		return fmt.Errorf("error in Retrieve: %w", err)
 	}
 
 	for _, hs := range hst {
 
-		event := common.MapStr{}
+		event := mapstr.M{}
 
 		event["name"] = hs.Summary.Config.Name
 		event.Put("cpu.used.mhz", hs.Summary.QuickStats.OverallCpuUsage)

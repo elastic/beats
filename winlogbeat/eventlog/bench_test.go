@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package eventlog
 
@@ -30,7 +29,7 @@ import (
 
 	"golang.org/x/sys/windows/svc/eventlog"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const gigabyte = 1 << 30
@@ -44,7 +43,8 @@ var (
 // different batch sizes.
 //
 // Recommended usage:
-//   go test -run TestBenchmarkRead -benchmem -benchtime 10s -benchtest -v .
+//
+//	go test -run TestBenchmarkRead -benchmem -benchtime 10s -benchtest -v .
 func TestBenchmarkRead(t *testing.T) {
 	if !*benchTest {
 		t.Skip("-benchtest not enabled")
@@ -74,7 +74,7 @@ func TestBenchmarkRead(t *testing.T) {
 
 func benchmarkEventLog(api string, batchSize int) func(b *testing.B) {
 	return func(b *testing.B) {
-		conf := common.MapStr{
+		conf := mapstr.M{
 			"name":            providerName,
 			"batch_read_size": batchSize,
 			"no_more_events":  "stop",

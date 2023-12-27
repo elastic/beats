@@ -17,12 +17,11 @@
 
 package pipeline
 
-import "github.com/elastic/beats/v7/libbeat/monitoring"
+import "github.com/elastic/elastic-agent-libs/monitoring"
 
 type observer interface {
 	pipelineObserver
 	clientObserver
-	queueObserver
 	outputObserver
 
 	cleanup()
@@ -40,14 +39,11 @@ type clientObserver interface {
 	failedPublishEvent()
 }
 
-type queueObserver interface {
-	queueACKed(n int)
-	queueMaxEvents(n int)
-}
-
 type outputObserver interface {
 	eventsDropped(int)
 	eventsRetry(int)
+	queueACKed(n int)
+	queueMaxEvents(n int)
 }
 
 // metricsObserver is used by many component in the publisher pipeline, to report
@@ -84,7 +80,7 @@ func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 	return &metricsObserver{
 		metrics: metrics,
 		vars: metricsObserverVars{
-			clients: monitoring.NewUint(reg, "clients"),
+			clients: monitoring.NewUint(reg, "clients"), // Gauge
 
 			events:    monitoring.NewUint(reg, "events.total"),
 			filtered:  monitoring.NewUint(reg, "events.filtered"),
@@ -96,7 +92,7 @@ func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 			queueACKed:     monitoring.NewUint(reg, "queue.acked"),
 			queueMaxEvents: monitoring.NewUint(reg, "queue.max_events"),
 
-			activeEvents: monitoring.NewUint(reg, "events.active"),
+			activeEvents: monitoring.NewUint(reg, "events.active"), // Gauge
 		},
 	}
 }

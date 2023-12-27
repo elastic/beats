@@ -1,0 +1,206 @@
+[
+    {
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "pkt_dstaddr": "203.0.113.5",
+                "pkt_srcaddr": "10.0.1.5"
+            }
+        },
+        "destination": {
+            "address": "10.0.0.220",
+            "ip": "10.0.0.220"
+        },
+        "event": {
+            "type": [
+                "connection"
+            ]
+        },
+        "message": "- eni-1235b8ca123456789 10.0.1.5 10.0.0.220 10.0.1.5 203.0.113.5",
+        "network": {
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "10.0.1.5",
+                "10.0.0.220",
+                "203.0.113.5"
+            ]
+        },
+        "source": {
+            "address": "10.0.1.5",
+            "ip": "10.0.1.5"
+        }
+    },
+    {
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "pkt_dstaddr": "203.0.113.5",
+                "pkt_srcaddr": "10.0.0.220"
+            }
+        },
+        "destination": {
+            "address": "203.0.113.5",
+            "ip": "203.0.113.5"
+        },
+        "event": {
+            "type": [
+                "connection"
+            ]
+        },
+        "message": "- eni-1235b8ca123456789 10.0.0.220 203.0.113.5 10.0.0.220 203.0.113.5",
+        "network": {
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "10.0.0.220",
+                "203.0.113.5"
+            ]
+        },
+        "source": {
+            "address": "10.0.0.220",
+            "ip": "10.0.0.220"
+        }
+    },
+    {
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "pkt_dstaddr": "10.0.0.220",
+                "pkt_srcaddr": "203.0.113.5"
+            }
+        },
+        "destination": {
+            "address": "10.0.0.220",
+            "ip": "10.0.0.220"
+        },
+        "event": {
+            "type": [
+                "connection"
+            ]
+        },
+        "message": "- eni-1235b8ca123456789 203.0.113.5 10.0.0.220 203.0.113.5 10.0.0.220",
+        "network": {
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "203.0.113.5",
+                "10.0.0.220"
+            ]
+        },
+        "source": {
+            "address": "203.0.113.5",
+            "ip": "203.0.113.5"
+        }
+    },
+    {
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1235b8ca123456789",
+                "pkt_dstaddr": "10.0.1.5",
+                "pkt_srcaddr": "203.0.113.5"
+            }
+        },
+        "destination": {
+            "address": "10.0.1.5",
+            "ip": "10.0.1.5"
+        },
+        "event": {
+            "type": [
+                "connection"
+            ]
+        },
+        "message": "- eni-1235b8ca123456789 10.0.0.220 10.0.1.5 203.0.113.5 10.0.1.5",
+        "network": {
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "10.0.0.220",
+                "10.0.1.5",
+                "203.0.113.5"
+            ]
+        },
+        "source": {
+            "address": "10.0.0.220",
+            "ip": "10.0.0.220"
+        }
+    },
+    {
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1111aaaa2222bbbb3",
+                "pkt_dstaddr": "203.0.113.5",
+                "pkt_srcaddr": "10.0.1.5"
+            }
+        },
+        "cloud": {
+            "instance": {
+                "id": "i-01234567890123456"
+            }
+        },
+        "destination": {
+            "address": "203.0.113.5",
+            "ip": "203.0.113.5"
+        },
+        "event": {
+            "type": [
+                "connection"
+            ]
+        },
+        "message": "i-01234567890123456 eni-1111aaaa2222bbbb3 10.0.1.5 203.0.113.5 10.0.1.5 203.0.113.5",
+        "network": {
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "10.0.1.5",
+                "203.0.113.5"
+            ]
+        },
+        "source": {
+            "address": "10.0.1.5",
+            "ip": "10.0.1.5"
+        }
+    },
+    {
+        "aws": {
+            "vpcflow": {
+                "interface_id": "eni-1111aaaa2222bbbb3",
+                "pkt_dstaddr": "10.0.1.5",
+                "pkt_srcaddr": "203.0.113.5"
+            }
+        },
+        "cloud": {
+            "instance": {
+                "id": "i-01234567890123456"
+            }
+        },
+        "destination": {
+            "address": "10.0.1.5",
+            "ip": "10.0.1.5"
+        },
+        "event": {
+            "type": [
+                "connection"
+            ]
+        },
+        "message": "i-01234567890123456 eni-1111aaaa2222bbbb3 203.0.113.5 10.0.1.5 203.0.113.5 10.0.1.5",
+        "network": {
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "203.0.113.5",
+                "10.0.1.5"
+            ]
+        },
+        "source": {
+            "address": "203.0.113.5",
+            "ip": "203.0.113.5"
+        }
+    }
+]

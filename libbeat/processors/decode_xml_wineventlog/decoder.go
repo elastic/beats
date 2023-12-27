@@ -16,13 +16,12 @@
 // under the License.
 
 //go:build !windows
-// +build !windows
 
 package decode_xml_wineventlog
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/sys/winevent"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type nonWinDecoder struct{}
@@ -31,7 +30,7 @@ func newDecoder() decoder {
 	return nonWinDecoder{}
 }
 
-func (nonWinDecoder) decode(data []byte) (common.MapStr, common.MapStr, error) {
+func (nonWinDecoder) decode(data []byte) (mapstr.M, mapstr.M, error) {
 	evt, err := winevent.UnmarshalXML(data)
 	if err != nil {
 		return nil, nil, err

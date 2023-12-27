@@ -9,10 +9,10 @@ import (
 	"strings"
 
 	"github.com/hashicorp/go-multierror"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // ConfigBlacklist takes a ConfigBlocks object and filter it based on the given
@@ -35,7 +35,7 @@ func (f *ConfigBlacklistSettings) Unpack(from interface{}) error {
 	}
 
 	f.Patterns = map[string]string{}
-	for k, v := range common.MapStr(m).Flatten() {
+	for k, v := range mapstr.M(m).Flatten() {
 		f.Patterns[k] = fmt.Sprintf("%s", v)
 	}
 
@@ -51,7 +51,7 @@ func NewConfigBlacklist(cfg ConfigBlacklistSettings) (*ConfigBlacklist, error) {
 	for field, pattern := range cfg.Patterns {
 		exp, err := match.Compile(pattern)
 		if err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("Given expression is not a valid regexp: %s", pattern))
+			return nil, fmt.Errorf("given expression is not a valid regexp: %s", pattern)
 		}
 
 		list.patterns[field] = exp
@@ -101,7 +101,7 @@ func (c *ConfigBlacklist) isBlacklisted(blockType string, block *ConfigBlock) bo
 	return false
 }
 
-func (c *ConfigBlacklist) isBlacklistedBlock(pattern match.Matcher, segments []string, current *common.Config) bool {
+func (c *ConfigBlacklist) isBlacklistedBlock(pattern match.Matcher, segments []string, current *conf.C) bool {
 	if current.IsDict() {
 		switch len(segments) {
 		case 0:

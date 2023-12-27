@@ -16,17 +16,16 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package iostat
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/metric/system/diskio"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/diskio"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -72,7 +71,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	IOstats, err := diskio.IOCounters(m.includeDevices...)
 	if err != nil {
-		return errors.Wrap(err, "disk io counters")
+		return fmt.Errorf("disk io counters: %w", err)
 	}
 
 	// Sample the current cpu counter
@@ -82,7 +81,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	defer m.stats.CloseSampling()
 
 	for _, counters := range IOstats {
-		event := common.MapStr{
+		event := mapstr.M{
 			"name": counters.Name,
 		}
 		if counters.SerialNumber != "" {
@@ -90,7 +89,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 		}
 		result, err := m.stats.CalcIOStatistics(counters)
 		if err != nil {
-			return errors.Wrap(err, "error calculating iostat")
+			return fmt.Errorf("error calculating iostat: %w", err)
 		}
 		IOstats := AddLinuxIOStat(result)
 		event.DeepUpdate(IOstats)

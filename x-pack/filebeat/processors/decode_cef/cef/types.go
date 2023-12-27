@@ -5,12 +5,12 @@
 package cef
 
 import (
+	"errors"
+	"fmt"
 	"net"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 )
@@ -54,7 +54,7 @@ func toType(value string, typ DataType, settings *Settings) (interface{}, error)
 	case TimestampType:
 		return toTimestamp(value, settings)
 	default:
-		return nil, errors.Errorf("invalid data type: %v", typ)
+		return nil, fmt.Errorf("invalid data type: %v", typ)
 	}
 }
 

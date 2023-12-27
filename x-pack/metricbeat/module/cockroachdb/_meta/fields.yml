@@ -1,8 +1,8 @@
 - key: cockroachdb
   title: 'CockroachDB'
-  release: beta
+  release: ga
   description: >
-    CockroachDB module
+    CockroachDB module scrape metrics using Prometheus endpoint.
   settings: ["ssl", "http"]
   fields:
     - name: cockroachdb

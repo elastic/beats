@@ -27,7 +27,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -71,8 +72,8 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	_ procs.ProcessesWatcher,
-	cfg *common.Config,
+	_ *procs.ProcessesWatcher,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &rpc{}
 	config := defaultConfig
@@ -126,8 +127,6 @@ func (r *rpc) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseRPC exception")
-
 	conn := ensureRPCConnection(private)
 
 	conn = r.handleRPCFragment(conn, pkt, tcptuple, dir)
@@ -141,8 +140,6 @@ func (r *rpc) Parse(
 func (r *rpc) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ReceivedFinRpc exception")
-
 	// forced by TCP interface
 	return private
 }
@@ -152,8 +149,6 @@ func (r *rpc) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 func (r *rpc) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	defer logp.Recover("GapInRpcStream exception")
-
 	// forced by TCP interface
 	return private, false
 }

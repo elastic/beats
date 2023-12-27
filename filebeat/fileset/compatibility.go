@@ -19,19 +19,18 @@ package fileset
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // processorCompatibility defines a processor's minimum version requirements or
 // a transformation to make it compatible.
 type processorCompatibility struct {
-	checkVersion func(esVersion *common.Version) bool                           // Version check returns true if this check applies.
+	checkVersion func(esVersion *version.V) bool                                // Version check returns true if this check applies.
 	procType     string                                                         // Elasticsearch Ingest Node processor type.
 	adaptConfig  func(processor Processor, log *logp.Logger) (Processor, error) // Adapt the configuration to make it compatible.
 }
@@ -39,37 +38,37 @@ type processorCompatibility struct {
 var processorCompatibilityChecks = []processorCompatibility{
 	{
 		procType: "append",
-		checkVersion: func(esVersion *common.Version) bool {
-			return esVersion.LessThan(common.MustNewVersion("7.10.0"))
+		checkVersion: func(esVersion *version.V) bool {
+			return esVersion.LessThan(version.MustNew("7.10.0"))
 		},
 		adaptConfig: replaceAppendAllowDuplicates,
 	},
 	{
 		procType: "community_id",
-		checkVersion: func(esVersion *common.Version) bool {
-			return esVersion.LessThan(common.MustNewVersion("7.12.0"))
+		checkVersion: func(esVersion *version.V) bool {
+			return esVersion.LessThan(version.MustNew("7.12.0"))
 		},
 		adaptConfig: deleteProcessor,
 	},
 	{
 		procType: "set",
-		checkVersion: func(esVersion *common.Version) bool {
-			return esVersion.LessThan(common.MustNewVersion("7.9.0"))
+		checkVersion: func(esVersion *version.V) bool {
+			return esVersion.LessThan(version.MustNew("7.9.0"))
 		},
 		adaptConfig: replaceSetIgnoreEmptyValue,
 	},
 	{
 		procType: "uri_parts",
-		checkVersion: func(esVersion *common.Version) bool {
-			return esVersion.LessThan(common.MustNewVersion("7.12.0"))
+		checkVersion: func(esVersion *version.V) bool {
+			return esVersion.LessThan(version.MustNew("7.12.0"))
 		},
 		adaptConfig: deleteProcessor,
 	},
 	{
 		procType: "user_agent",
-		checkVersion: func(esVersion *common.Version) bool {
-			return esVersion.LessThan(common.MustNewVersion("7.0.0")) &&
-				!esVersion.LessThan(common.MustNewVersion("6.7.0"))
+		checkVersion: func(esVersion *version.V) bool {
+			return esVersion.LessThan(version.MustNew("7.0.0")) &&
+				!esVersion.LessThan(version.MustNew("6.7.0"))
 		},
 		adaptConfig: func(processor Processor, _ *logp.Logger) (Processor, error) {
 			processor.Set("ecs", true)
@@ -78,8 +77,8 @@ var processorCompatibilityChecks = []processorCompatibility{
 	},
 	{
 		procType: "user_agent",
-		checkVersion: func(esVersion *common.Version) bool {
-			return esVersion.LessThan(common.MustNewVersion("6.7.0"))
+		checkVersion: func(esVersion *version.V) bool {
+			return esVersion.LessThan(version.MustNew("6.7.0"))
 		},
 		adaptConfig: func(_ Processor, _ *logp.Logger) (Processor, error) {
 			return Processor{}, errors.New("user_agent processor requires option 'ecs: true', Elasticsearch 6.7 or newer required")
@@ -87,29 +86,29 @@ var processorCompatibilityChecks = []processorCompatibility{
 	},
 	{
 		procType: "convert",
-		checkVersion: func(esVersion *common.Version) bool {
-			return esVersion.LessThan(common.MustNewVersion("7.13.0"))
+		checkVersion: func(esVersion *version.V) bool {
+			return esVersion.LessThan(version.MustNew("7.13.0"))
 		},
 		adaptConfig: replaceConvertIP,
 	},
 	{
 		procType: "network_direction",
-		checkVersion: func(esVersion *common.Version) bool {
-			return esVersion.LessThan(common.MustNewVersion("7.13.0"))
+		checkVersion: func(esVersion *version.V) bool {
+			return esVersion.LessThan(version.MustNew("7.13.0"))
 		},
 		adaptConfig: deleteProcessor,
 	},
 	{
 		procType: "registered_domain",
-		checkVersion: func(esVersion *common.Version) bool {
-			return esVersion.LessThan(common.MustNewVersion("7.13.0"))
+		checkVersion: func(esVersion *version.V) bool {
+			return esVersion.LessThan(version.MustNew("7.13.0"))
 		},
 		adaptConfig: deleteProcessor,
 	},
 	{
 		procType: "*",
-		checkVersion: func(esVersion *common.Version) bool {
-			return esVersion.LessThan(common.MustNewVersion("7.9.0"))
+		checkVersion: func(esVersion *version.V) bool {
+			return esVersion.LessThan(version.MustNew("7.9.0"))
 		},
 		adaptConfig: removeDescription,
 	},
@@ -211,7 +210,7 @@ func (p *Processor) String() string {
 // adaptPipelineForCompatibility iterates over all processors in the pipeline
 // and adapts them for version of Elasticsearch used. Adapt can mean modifying
 // processor options or removing the processor.
-func AdaptPipelineForCompatibility(esVersion common.Version, pipelineID string, content map[string]interface{}, log *logp.Logger) (err error) {
+func AdaptPipelineForCompatibility(esVersion version.V, pipelineID string, content map[string]interface{}, log *logp.Logger) (err error) {
 	log = log.With("pipeline_id", pipelineID)
 	// Adapt the main processors in the pipeline.
 	if err = adaptProcessorsForCompatibility(esVersion, content, "processors", false, log); err != nil {
@@ -221,7 +220,7 @@ func AdaptPipelineForCompatibility(esVersion common.Version, pipelineID string, 
 	return adaptProcessorsForCompatibility(esVersion, content, "on_failure", true, log)
 }
 
-func adaptProcessorsForCompatibility(esVersion common.Version, content map[string]interface{}, section string, ignoreMissingsection bool, log *logp.Logger) (err error) {
+func adaptProcessorsForCompatibility(esVersion version.V, content map[string]interface{}, section string, ignoreMissingsection bool, log *logp.Logger) (err error) {
 	p, ok := content[section]
 	if !ok {
 		if ignoreMissingsection {
@@ -242,14 +241,14 @@ nextProcessor:
 	for i, obj := range processors {
 		processor, err := NewProcessor(obj)
 		if err != nil {
-			return errors.Wrapf(err, "cannot parse processor in section '%s' index %d body=%+v", section, i, obj)
+			return fmt.Errorf("cannot parse processor in section '%s' index %d body=%+v: %w", section, i, obj, err)
 		}
 
 		// Adapt any on_failure processors for this processor.
 		prevOnFailure, _ := processor.GetList("on_failure")
 		if err = adaptProcessorsForCompatibility(esVersion, processor.Config(), "on_failure", true,
 			log.With("parent_processor_type", processor.Name(), "parent_processor_index", i)); err != nil {
-			return errors.Wrapf(err, "cannot parse on_failure for processor in section '%s' index %d body=%+v", section, i, obj)
+			return fmt.Errorf("cannot parse on_failure for processor in section '%s' index %d body=%+v: %w", section, i, obj, err)
 		}
 		if onFailure, _ := processor.GetList("on_failure"); len(prevOnFailure) > 0 && len(onFailure) == 0 {
 			processor.Delete("on_failure")
@@ -260,7 +259,7 @@ nextProcessor:
 			processor.Set("processor", []interface{}{inner})
 			if err = adaptProcessorsForCompatibility(esVersion, processor.Config(), "processor", false,
 				log.With("parent_processor_type", processor.Name(), "parent_processor_index", i)); err != nil {
-				return errors.Wrapf(err, "cannot parse inner processor for foreach in section '%s' index %d", section, i)
+				return fmt.Errorf("cannot parse inner processor for foreach in section '%s' index %d: %w", section, i, err)
 			}
 			newList, _ := processor.GetList("processor")
 			switch len(newList) {

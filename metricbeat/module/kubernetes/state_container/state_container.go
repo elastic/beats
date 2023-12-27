@@ -21,21 +21,18 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
 	defaultScheme = "http"
 	defaultPath   = "/metrics"
-	// Nanocores conversion 10^9
-	nanocores = 1000000000
 )
 
 var (
@@ -61,19 +58,15 @@ var (
 					"memory": "memory.limit.bytes",
 				},
 			)),
-			"kube_pod_container_resource_limits_cpu_cores":      p.Metric("cpu.limit.cores"),
-			"kube_pod_container_resource_requests_cpu_cores":    p.Metric("cpu.request.cores"),
-			"kube_pod_container_resource_limits_memory_bytes":   p.Metric("memory.limit.bytes"),
-			"kube_pod_container_resource_requests_memory_bytes": p.Metric("memory.request.bytes"),
-			"kube_pod_container_status_ready":                   p.BooleanMetric("status.ready"),
-			"kube_pod_container_status_restarts":                p.Metric("status.restarts"),
-			"kube_pod_container_status_restarts_total":          p.Metric("status.restarts"),
-			"kube_pod_container_status_running":                 p.KeywordMetric("status.phase", "running"),
-			"kube_pod_container_status_terminated":              p.KeywordMetric("status.phase", "terminated"),
-			"kube_pod_container_status_waiting":                 p.KeywordMetric("status.phase", "waiting"),
-			"kube_pod_container_status_terminated_reason":       p.LabelMetric("status.reason", "reason"),
-			"kube_pod_container_status_waiting_reason":          p.LabelMetric("status.reason", "reason"),
-			"kube_pod_container_status_last_terminated_reason":  p.LabelMetric("status.last_terminated_reason", "reason"),
+
+			"kube_pod_container_status_ready":                  p.BooleanMetric("status.ready"),
+			"kube_pod_container_status_restarts_total":         p.Metric("status.restarts"),
+			"kube_pod_container_status_running":                p.KeywordMetric("status.phase", "running"),
+			"kube_pod_container_status_terminated":             p.KeywordMetric("status.phase", "terminated"),
+			"kube_pod_container_status_waiting":                p.KeywordMetric("status.phase", "waiting"),
+			"kube_pod_container_status_terminated_reason":      p.LabelMetric("status.reason", "reason"),
+			"kube_pod_container_status_waiting_reason":         p.LabelMetric("status.reason", "reason"),
+			"kube_pod_container_status_last_terminated_reason": p.LabelMetric("status.last_terminated_reason", "reason"),
 		},
 
 		Labels: map[string]p.LabelMap{
@@ -122,7 +115,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		prometheus:    prometheus,
-		enricher:      util.NewContainerMetadataEnricher(base, false),
+		enricher:      util.NewContainerMetadataEnricher(base, mod.GetMetricsRepo(), false),
 		mod:           mod,
 	}, nil
 }
@@ -135,11 +128,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
 	if err != nil {
-		return errors.Wrap(err, "error getting families")
+		return fmt.Errorf("error getting families: %w", err)
 	}
 	events, err := m.prometheus.ProcessMetrics(families, mapping)
 	if err != nil {
-		return errors.Wrap(err, "error getting event")
+		return fmt.Errorf("error getting event: %w", err)
 	}
 
 	m.enricher.Enrich(events)
@@ -147,22 +140,33 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	for _, event := range events {
 		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
 		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
-		containerFields := common.MapStr{}
+		containerFields := mapstr.M{}
 		if containerID, ok := event["id"]; ok {
 			// we don't expect errors here, but if any we would obtain an
 			// empty string
-			cID := (containerID).(string)
+			cID, ok := (containerID).(string)
+			if !ok {
+				m.Logger().Debugf("Error while casting containerID: %s", ok)
+			}
 			split := strings.Index(cID, "://")
 			if split != -1 {
-				containerFields.Put("runtime", cID[:split])
-				containerFields.Put("id", cID[split+3:])
+				kubernetes.ShouldPut(containerFields, "runtime", cID[:split], m.Logger())
+
+				// Add splitted container.id ECS field and update kubernetes.container.id with splitted value
+				kubernetes.ShouldPut(containerFields, "id", cID[split+3:], m.Logger())
+				kubernetes.ShouldPut(event, "id", cID[split+3:], m.Logger())
+
 			}
 		}
 		if containerImage, ok := event["image"]; ok {
-			cImage := (containerImage).(string)
-			containerFields.Put("image.name", cImage)
+			cImage, ok := (containerImage).(string)
+			if !ok {
+				m.Logger().Debugf("Error while casting containerImage: %s", ok)
+			}
+
+			kubernetes.ShouldPut(containerFields, "image.name", cImage, m.Logger())
 			// remove kubernetes.container.image field as value is the same as ECS container.image.name field
-			event.Delete("image")
+			kubernetes.ShouldDelete(event, "image", m.Logger())
 		}
 
 		e, err := util.CreateEvent(event, "kubernetes.container")
@@ -172,11 +176,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 		if len(containerFields) > 0 {
 			if e.RootFields != nil {
-				e.RootFields.DeepUpdate(common.MapStr{
+				e.RootFields.DeepUpdate(mapstr.M{
 					"container": containerFields,
 				})
 			} else {
-				e.RootFields = common.MapStr{
+				e.RootFields = mapstr.M{
 					"container": containerFields,
 				}
 			}

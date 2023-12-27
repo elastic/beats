@@ -19,14 +19,13 @@ package json
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry.
@@ -135,7 +134,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	if m.jsonIsArray {
-		var jsonBodyArr []common.MapStr
+		var jsonBodyArr []mapstr.M
 		if err = json.Unmarshal(body, &jsonBodyArr); err != nil {
 			return err
 		}
@@ -144,12 +143,12 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			event := m.processBody(response, obj)
 
 			if reported := reporter.Event(event); !reported {
-				m.Logger().Debug(errors.Errorf("error reporting event: %#v", event))
+				m.Logger().Debug(fmt.Errorf("error reporting event: %#v", event))
 				return nil
 			}
 		}
 	} else {
-		var jsonBody common.MapStr
+		var jsonBody mapstr.M
 		if err = json.Unmarshal(body, &jsonBody); err != nil {
 			return err
 		}
@@ -157,7 +156,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		event := m.processBody(response, jsonBody)
 
 		if reported := reporter.Event(event); !reported {
-			m.Logger().Debug(errors.Errorf("error reporting event: %#v", event))
+			m.Logger().Debug(fmt.Errorf("error reporting event: %#v", event))
 			return nil
 		}
 	}

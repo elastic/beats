@@ -9,27 +9,28 @@ import (
 	"errors"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
-	"github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/executor"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var periodicCheck = 2 * time.Second
 
-type checkStatusFunc = func(*cloudformation.StackStatus) (bool, error)
+type checkStatusFunc = func(status *types.StackStatus) (bool, error)
 
 type opWaitCloudFormation struct {
 	log         *logp.Logger
-	svc         cloudformationiface.ClientAPI
+	svc         *cloudformation.Client
 	checkStatus checkStatusFunc
 }
 
 func newOpWaitCloudFormation(
 	log *logp.Logger,
-	svc cloudformationiface.ClientAPI,
+	svc *cloudformation.Client,
 ) *opWaitCloudFormation {
 	return &opWaitCloudFormation{
 		log:         log,
@@ -44,7 +45,7 @@ func newWaitDeleteCloudFormation(
 ) *opWaitCloudFormation {
 	return &opWaitCloudFormation{
 		log:         log,
-		svc:         cloudformation.New(cfg),
+		svc:         cloudformation.NewFromConfig(cfg),
 		checkStatus: checkDeleteStatus,
 	}
 }
@@ -82,51 +83,50 @@ func (o *opWaitCloudFormation) Execute(ctx executor.Context) error {
 	}
 }
 
-func checkCreateStatus(status *cloudformation.StackStatus) (bool, error) {
+func checkCreateStatus(status *types.StackStatus) (bool, error) {
 	switch *status {
-	case cloudformation.StackStatusUpdateComplete: // OK
+	case types.StackStatusUpdateComplete: // OK
 		return true, nil
-	case cloudformation.StackStatusCreateComplete: // OK
+	case types.StackStatusCreateComplete: // OK
 		return true, nil
-	case cloudformation.StackStatusRollbackFailed:
+	case types.StackStatusRollbackFailed:
 		return true, errors.New("failed to create and rollback the stack")
-	case cloudformation.StackStatusRollbackComplete:
+	case types.StackStatusRollbackComplete:
 		return true, errors.New("failed to create the stack")
 	}
 	return false, nil
 }
 
-func checkDeleteStatus(status *cloudformation.StackStatus) (bool, error) {
+func checkDeleteStatus(status *types.StackStatus) (bool, error) {
 	switch *status {
-	case cloudformation.StackStatusDeleteComplete: // OK
+	case types.StackStatusDeleteComplete: // OK
 		return true, nil
-	case cloudformation.StackStatusDeleteFailed:
+	case types.StackStatusDeleteFailed:
 		return true, errors.New("failed to delete the stack")
-	case cloudformation.StackStatusRollbackFailed:
+	case types.StackStatusRollbackFailed:
 		return true, errors.New("failed to delete and rollback the stack")
-	case cloudformation.StackStatusRollbackComplete:
+	case types.StackStatusRollbackComplete:
 		return true, errors.New("failed to delete the stack")
 	}
 	return false, nil
 }
 
 func queryStack(
-	svc cloudformationiface.ClientAPI,
+	svc cloudformation.DescribeStacksAPIClient,
 	stackID *string,
 ) (*cloudformation.DescribeStacksOutput, error) {
 	input := &cloudformation.DescribeStacksInput{StackName: stackID}
-	req := svc.DescribeStacksRequest(input)
-	resp, err := req.Send(context.TODO())
+	resp, err := svc.DescribeStacks(context.TODO(), input)
 	if err != nil {
 		return nil, err
 	}
-	return resp.DescribeStacksOutput, nil
+	return resp, nil
 }
 
 func queryStackStatus(
-	svc cloudformationiface.ClientAPI,
+	svc cloudformation.DescribeStacksAPIClient,
 	stackID *string,
-) (*cloudformation.StackStatus, *string, error) {
+) (*types.StackStatus, *string, error) {
 	resp, err := queryStack(svc, stackID)
 	if err != nil {
 		return nil, nil, err
@@ -136,7 +136,7 @@ func queryStackStatus(
 	return &stack.StackStatus, stack.StackStatusReason, nil
 }
 
-func queryStackID(svc cloudformationiface.ClientAPI, stackName *string) (*string, error) {
+func queryStackID(svc cloudformation.DescribeStacksAPIClient, stackName *string) (*string, error) {
 	resp, err := queryStack(svc, stackName)
 	if err != nil {
 		return nil, err

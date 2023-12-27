@@ -23,8 +23,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -49,7 +51,7 @@ type pgsqlPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 
 	// function pointer for mocking
 	handlePgsql func(pgsql *pgsqlPlugin, m *pgsqlMessage, tcp *common.TCPTuple,
@@ -97,7 +99,7 @@ type pgsqlTransaction struct {
 	notes    []string
 	isError  bool
 
-	pgsql common.MapStr
+	pgsql mapstr.M
 
 	requestRaw  string
 	responseRaw string
@@ -137,8 +139,8 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	watcher *procs.ProcessesWatcher,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &pgsqlPlugin{}
 	config := defaultConfig
@@ -154,7 +156,7 @@ func New(
 	return p, nil
 }
 
-func (pgsql *pgsqlPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *pgsqlConfig) error {
+func (pgsql *pgsqlPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *pgsqlConfig) error {
 	pgsql.setFromConfig(config)
 
 	pgsql.log = logp.NewLogger("pgsql")
@@ -238,8 +240,6 @@ func (pgsql *pgsqlPlugin) ConnectionTimeout() time.Duration {
 func (pgsql *pgsqlPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple,
 	dir uint8, private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParsePgsql exception")
-
 	priv := pgsqlPrivateData{}
 	if private != nil {
 		var ok bool
@@ -332,8 +332,6 @@ func messageHasEnoughData(msg *pgsqlMessage) bool {
 func (pgsql *pgsqlPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	defer logp.Recover("GapInPgsqlStream exception")
-
 	if private == nil {
 		return private, false
 	}
@@ -412,7 +410,7 @@ func (pgsql *pgsqlPlugin) receivedPgsqlRequest(msg *pgsqlMessage) {
 			trans.src, trans.dst = trans.dst, trans.src
 		}
 
-		trans.pgsql = common.MapStr{}
+		trans.pgsql = mapstr.M{}
 		trans.query = query
 		trans.method = getQueryMethod(query)
 		trans.bytesIn = msg.size
@@ -445,12 +443,12 @@ func (pgsql *pgsqlPlugin) receivedPgsqlResponse(msg *pgsqlMessage) {
 		return
 	}
 
-	trans.pgsql.Update(common.MapStr{
+	trans.pgsql.Update(mapstr.M{
 		"num_rows":   msg.numberOfRows,
 		"num_fields": msg.numberOfFields,
 	})
 	if msg.isError {
-		trans.pgsql.Update(common.MapStr{
+		trans.pgsql.Update(mapstr.M{
 			"error_code":     msg.errorCode,
 			"error_message":  msg.errorInfo,
 			"error_severity": msg.errorSeverity,

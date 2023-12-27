@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -49,7 +49,7 @@ type Enabled struct {
 	Enabled bool `config:"enabled"`
 }
 
-type PluginConfig []map[string]common.Config
+type PluginConfig []map[string]conf.C
 
 func defaultNomadAnnotatorConfig() nomadAnnotatorConfig {
 	return nomadAnnotatorConfig{

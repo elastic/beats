@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux && cgo
-// +build linux,cgo
 
 package journalread
 
@@ -32,7 +31,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Reader implements a Journald base reader with backoff support. The reader
@@ -50,13 +49,12 @@ type canceler interface {
 
 type journal interface {
 	Close() error
-
 	Next() (uint64, error)
 	Wait(time.Duration) int
 	GetEntry() (*sdjournal.JournalEntry, error)
-
 	SeekHead() error
 	SeekTail() error
+	SeekRealtimeUsec(usec uint64) error
 	SeekCursor(string) error
 }
 
@@ -70,7 +68,7 @@ func NewReader(log *logp.Logger, journal journal, backoff backoff.Backoff) *Read
 }
 
 // Open opens a journal and creates a reader for it.
-// Additonal settings can be applied to the journal by passing functions to with.
+// Additional settings can be applied to the journal by passing functions to with.
 // Open returns an error if the journal can not be opened, or if one with-function failed.
 //
 // Open will opend the systems journal if the path is empty or matches LOCAL_SYSTEM_JOURNAL.
@@ -149,8 +147,15 @@ func (r *Reader) Seek(mode SeekMode, cursor string) (err error) {
 	return err
 }
 
+// SeekRealtimeUsec moves the read pointer to the entry with the
+// specified CLOCK_REALTIME timestamp. This corresponds to
+// sd_journal_seek_realtime_usec.
+func (r *Reader) SeekRealtimeUsec(usec uint64) error {
+	return r.journal.SeekRealtimeUsec(usec)
+}
+
 // Next reads a new journald entry from the journal. It blocks if there is
-// currently no entry available in the journal, or until an error has occured.
+// currently no entry available in the journal, or until an error has occurred.
 func (r *Reader) Next(cancel canceler) (*sdjournal.JournalEntry, error) {
 	for cancel.Err() == nil {
 		c, err := r.journal.Next()

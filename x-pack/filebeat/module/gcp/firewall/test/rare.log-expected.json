@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2019-11-06T16:41:38.394Z",
+        "@timestamp": "2019-11-06T16:41:38.394575419Z",
         "destination.address": "10.128.0.16",
         "destination.domain": "local-adrian-test",
         "destination.ip": "10.128.0.16",
@@ -67,7 +67,7 @@
         ]
     },
     {
-        "@timestamp": "2019-11-06T16:41:38.394Z",
+        "@timestamp": "2019-11-06T16:41:38.394575419Z",
         "destination.address": "10.128.0.10",
         "destination.domain": "test-es",
         "destination.ip": "10.128.0.10",

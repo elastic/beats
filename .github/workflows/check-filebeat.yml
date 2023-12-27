@@ -1,0 +1,29 @@
+name: check-filebeat
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/check-filebeat.yml'
+      - 'filebeat/**'
+      - 'x-pack/filebeat/**'
+
+env:
+  BEAT_MODULE: 'filebeat'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version-file: .go-version
+    - name: Update package lists
+      run: sudo apt-get update
+    - name: Install libsystemd-dev
+      run: sudo apt-get install -y libsystemd-dev
+    - name: Run check/update
+      run: |
+        go install github.com/magefile/mage
+        make -C ${{ env.BEAT_MODULE }} check update
+        make check-no-changes

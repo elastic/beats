@@ -16,15 +16,14 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package wineventlog
 
 import (
+	"fmt"
 	"os"
 	"syscall"
 
-	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 	"golang.org/x/sys/windows"
 )
@@ -59,7 +58,7 @@ func NewPublisherMetadata(session EvtHandle, name string) (*PublisherMetadata, e
 
 	handle, err := _EvtOpenPublisherMetadata(session, publisherName, logFile, 0, 0)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed in EvtOpenPublisherMetadata")
+		return nil, fmt.Errorf("failed in EvtOpenPublisherMetadata: %w", err)
 	}
 
 	return &PublisherMetadata{
@@ -79,7 +78,7 @@ func (m *PublisherMetadata) stringProperty(propertyID EvtPublisherMetadataProper
 	case nil:
 		return "", nil
 	default:
-		return "", errors.Errorf("unexpected data type: %T", v)
+		return "", fmt.Errorf("unexpected data type: %T", v)
 	}
 }
 
@@ -94,7 +93,7 @@ func (m *PublisherMetadata) PublisherGUID() (windows.GUID, error) {
 	case nil:
 		return windows.GUID{}, nil
 	default:
-		return windows.GUID{}, errors.Errorf("unexpected data type: %T", v)
+		return windows.GUID{}, fmt.Errorf("unexpected data type: %T", v)
 	}
 }
 
@@ -172,20 +171,20 @@ func NewMetadataKeywords(publisherMetadataHandle EvtHandle) ([]MetadataKeyword, 
 
 	arrayHandle, ok := v.(EvtObjectArrayPropertyHandle)
 	if !ok {
-		return nil, errors.Errorf("unexpected handle type: %T", v)
+		return nil, fmt.Errorf("unexpected handle type: %T", v)
 	}
 	defer arrayHandle.Close()
 
 	arrayLen, err := EvtGetObjectArraySize(arrayHandle)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get keyword array length")
+		return nil, fmt.Errorf("failed to get keyword array length: %w", err)
 	}
 
 	var values []MetadataKeyword
 	for i := uint32(0); i < arrayLen; i++ {
 		md, err := NewMetadataKeyword(publisherMetadataHandle, arrayHandle, i)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to get keyword at array index %v", i)
+			return nil, fmt.Errorf("failed to get keyword at array index %v: %w", i, err)
 		}
 
 		values = append(values, *md)
@@ -245,20 +244,20 @@ func NewMetadataOpcodes(publisherMetadataHandle EvtHandle) ([]MetadataOpcode, er
 
 	arrayHandle, ok := v.(EvtObjectArrayPropertyHandle)
 	if !ok {
-		return nil, errors.Errorf("unexpected handle type: %T", v)
+		return nil, fmt.Errorf("unexpected handle type: %T", v)
 	}
 	defer arrayHandle.Close()
 
 	arrayLen, err := EvtGetObjectArraySize(arrayHandle)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get opcode array length")
+		return nil, fmt.Errorf("failed to get opcode array length: %w", err)
 	}
 
 	var values []MetadataOpcode
 	for i := uint32(0); i < arrayLen; i++ {
 		md, err := NewMetadataOpcode(publisherMetadataHandle, arrayHandle, i)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to get opcode at array index %v", i)
+			return nil, fmt.Errorf("failed to get opcode at array index %v: %w", i, err)
 		}
 
 		values = append(values, *md)
@@ -318,20 +317,20 @@ func NewMetadataLevels(publisherMetadataHandle EvtHandle) ([]MetadataLevel, erro
 
 	arrayHandle, ok := v.(EvtObjectArrayPropertyHandle)
 	if !ok {
-		return nil, errors.Errorf("unexpected handle type: %T", v)
+		return nil, fmt.Errorf("unexpected handle type: %T", v)
 	}
 	defer arrayHandle.Close()
 
 	arrayLen, err := EvtGetObjectArraySize(arrayHandle)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get level array length")
+		return nil, fmt.Errorf("failed to get level array length: %w", err)
 	}
 
 	var values []MetadataLevel
 	for i := uint32(0); i < arrayLen; i++ {
 		md, err := NewMetadataLevel(publisherMetadataHandle, arrayHandle, i)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to get level at array index %v", i)
+			return nil, fmt.Errorf("failed to get level at array index %v: %w", i, err)
 		}
 
 		values = append(values, *md)
@@ -392,20 +391,20 @@ func NewMetadataTasks(publisherMetadataHandle EvtHandle) ([]MetadataTask, error)
 
 	arrayHandle, ok := v.(EvtObjectArrayPropertyHandle)
 	if !ok {
-		return nil, errors.Errorf("unexpected handle type: %T", v)
+		return nil, fmt.Errorf("unexpected handle type: %T", v)
 	}
 	defer arrayHandle.Close()
 
 	arrayLen, err := EvtGetObjectArraySize(arrayHandle)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get task array length")
+		return nil, fmt.Errorf("failed to get task array length: %w", err)
 	}
 
 	var values []MetadataTask
 	for i := uint32(0); i < arrayLen; i++ {
 		md, err := NewMetadataTask(publisherMetadataHandle, arrayHandle, i)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to get task at array index %v", i)
+			return nil, fmt.Errorf("failed to get task at array index %v: %w", i, err)
 		}
 
 		values = append(values, *md)
@@ -473,20 +472,20 @@ func NewMetadataChannels(publisherMetadataHandle EvtHandle) ([]MetadataChannel, 
 
 	arrayHandle, ok := v.(EvtObjectArrayPropertyHandle)
 	if !ok {
-		return nil, errors.Errorf("unexpected handle type: %T", v)
+		return nil, fmt.Errorf("unexpected handle type: %T", v)
 	}
 	defer arrayHandle.Close()
 
 	arrayLen, err := EvtGetObjectArraySize(arrayHandle)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get task array length")
+		return nil, fmt.Errorf("failed to get task array length: %w", err)
 	}
 
 	var values []MetadataChannel
 	for i := uint32(0); i < arrayLen; i++ {
 		md, err := NewMetadataChannel(publisherMetadataHandle, arrayHandle, i)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to get task at array index %v", i)
+			return nil, fmt.Errorf("failed to get task at array index %v: %w", i, err)
 		}
 
 		values = append(values, *md)
@@ -548,8 +547,8 @@ type EventMetadataIterator struct {
 
 func NewEventMetadataIterator(publisher *PublisherMetadata) (*EventMetadataIterator, error) {
 	eventMetadataEnumHandle, err := _EvtOpenEventMetadataEnum(publisher.Handle, 0)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to open event metadata enumerator with EvtOpenEventMetadataEnum")
+	if err != nil && err != windows.ERROR_FILE_NOT_FOUND { //nolint:errorlint // Bad linter! This is always errno or nil.
+		return nil, fmt.Errorf("failed to open event metadata enumerator with EvtOpenEventMetadataEnum: %w (%#v)", err, err)
 	}
 
 	return &EventMetadataIterator{
@@ -569,14 +568,18 @@ func (itr *EventMetadataIterator) Close() error {
 // no more items or an error occurred. You should call Err() to check for an
 // error.
 func (itr *EventMetadataIterator) Next() bool {
+	if itr.eventMetadataEnumHandle == 0 {
+		// This is only the case when we could not find the event metadata file.
+		return false
+	}
 	// Close existing handle.
 	itr.currentEvent.Close()
 
 	var err error
 	itr.currentEvent, err = _EvtNextEventMetadata(itr.eventMetadataEnumHandle, 0)
 	if err != nil {
-		if err != windows.ERROR_NO_MORE_ITEMS {
-			itr.lastErr = errors.Wrap(err, "failed advancing to next event metadata handle")
+		if err != windows.ERROR_NO_MORE_ITEMS { //nolint:errorlint // Bad linter! This is always errno or nil.
+			itr.lastErr = fmt.Errorf("failed advancing to next event metadata handle: %w", err)
 		}
 		return false
 	}
@@ -589,7 +592,7 @@ func (itr *EventMetadataIterator) Err() error {
 }
 
 func typeCastError(expected, got interface{}) error {
-	return errors.Errorf("wrong type for property. expected:%T got:%T", expected, got)
+	return fmt.Errorf("wrong type for property. expected:%T got:%T", expected, got)
 }
 
 func (itr *EventMetadataIterator) uint32Property(propertyID EvtEventMetadataPropertyID) (uint32, error) {

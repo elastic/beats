@@ -20,16 +20,18 @@ package memlog
 import (
 	"bufio"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cleanup"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // diskstore manages the on-disk state of the memlog store.
@@ -77,8 +79,8 @@ type dataFileInfo struct {
 
 // storeEntry is used to write entries to the checkpoint file only.
 type storeEntry struct {
-	Key    string        `struct:"_key"`
-	Fields common.MapStr `struct:",inline"`
+	Key    string   `struct:"_key"`
+	Fields mapstr.M `struct:",inline"`
 }
 
 // storeMeta is read from the meta file.
@@ -106,7 +108,7 @@ const (
 	keyField = "_key"
 )
 
-// newDiskStore initializes the disk store stucture only. The store must have
+// newDiskStore initializes the disk store structure only. The store must have
 // been opened already.  It tries to open the update log file for append
 // operations. If opening the update log file fails, it is marked as
 // 'corrupted', triggering a checkpoint operation on the first update to the store.
@@ -261,12 +263,12 @@ func (s *diskstore) LogOperation(op op) error {
 	if err := enc.Encode(logAction{Op: op.name(), ID: s.nextTxID}); err != nil {
 		return err
 	}
-	writer.WriteByte('\n')
+	_ = writer.WriteByte('\n')
 
 	if err := enc.Encode(op); err != nil {
 		return err
 	}
-	writer.WriteByte('\n')
+	_ = writer.WriteByte('\n')
 
 	if err := writer.Flush(); err != nil {
 		return err
@@ -288,7 +290,7 @@ func (s *diskstore) LogOperation(op op) error {
 // The active marker file is overwritten after all updates did succeed. The
 // marker file contains the filename of the current valid data-file.
 // NOTE: due to limitation on some Operating system or file systems, the active
-//       marker is not a symlink, but an actual file.
+// marker is not a symlink, but an actual file.
 func (s *diskstore) WriteCheckpoint(state map[string]entry) error {
 	tmpPath, err := s.checkpointTmpFile(filepath.Join(s.home, checkpointTmpFileName), state)
 	if err != nil {
@@ -327,7 +329,7 @@ func (s *diskstore) WriteCheckpoint(state map[string]entry) error {
 	}
 
 	// delete old transaction files
-	updateActiveMarker(s.log, s.home, s.activeDataFile.path)
+	_ = updateActiveMarker(s.log, s.home, s.activeDataFile.path)
 	s.removeOldDataFiles()
 
 	trySyncPath(s.home)
@@ -399,7 +401,7 @@ func (s *diskstore) checkpointClearLog() {
 
 	err := s.logFile.Truncate(0)
 	if err == nil {
-		_, err = s.logFile.Seek(0, os.SEEK_SET)
+		_, err = s.logFile.Seek(0, io.SeekStart)
 	}
 
 	if err != nil {
@@ -518,13 +520,15 @@ func loadDataFile(path string, tbl map[string]entry) error {
 		return nil
 	}
 
-	err := readDataFile(path, func(key string, state common.MapStr) {
+	err := readDataFile(path, func(key string, state mapstr.M) {
 		tbl[key] = entry{value: state}
 	})
 	return err
 }
 
-func readDataFile(path string, fn func(string, common.MapStr)) error {
+var ErrCorruptStore = errors.New("corrupted data file")
+
+func readDataFile(path string, fn func(string, mapstr.M)) error {
 	f, err := os.Open(path)
 	if err != nil {
 		return err
@@ -534,18 +538,18 @@ func readDataFile(path string, fn func(string, common.MapStr)) error {
 	var states []map[string]interface{}
 	dec := json.NewDecoder(f)
 	if err := dec.Decode(&states); err != nil {
-		return fmt.Errorf("corrupted data file: %v", err)
+		return fmt.Errorf("%w: %v", ErrCorruptStore, err)
 	}
 
 	for _, state := range states {
-		keyRaw := state["_key"]
+		keyRaw := state[keyField]
 		key, ok := keyRaw.(string)
 		if !ok {
 			continue
 		}
 
-		delete(state, "_key")
-		fn(key, common.MapStr(state))
+		delete(state, keyField)
+		fn(key, mapstr.M(state))
 	}
 
 	return nil
@@ -555,7 +559,7 @@ func readDataFile(path string, fn func(string, common.MapStr)) error {
 // memStore.
 // The txid is the transaction ID of the last known valid data file.
 // Transactions older then txid will be ignored.
-// loadLogFile returns the last commited txid in logTxid and the total number
+// loadLogFile returns the last committed txid in logTxid and the total number
 // of operations in logCount.
 func loadLogFile(
 	store *memstore,
@@ -679,7 +683,7 @@ func readMetaFile(home string) (storeMeta, error) {
 
 	dec := json.NewDecoder(f)
 	if err := dec.Decode(&meta); err != nil {
-		return meta, fmt.Errorf("can not read store meta file: %v", err)
+		return meta, fmt.Errorf("can not read store meta file: %w", err)
 	}
 
 	return meta, nil
@@ -687,9 +691,9 @@ func readMetaFile(home string) (storeMeta, error) {
 
 // isTxIDLessEqual compares two IDs by checking that their distance is < 2^63.
 // It always returns true if
-//  - a == b
-//  - a < b (mod 2^63)
-//  - b > a after an integer rollover that is still within the distance of <2^63-1
+//   - a == b
+//   - a < b (mod 2^63)
+//   - b > a after an integer rollover that is still within the distance of <2^63-1
 func isTxIDLessEqual(a, b uint64) bool {
 	return int64(a-b) <= 0
 }

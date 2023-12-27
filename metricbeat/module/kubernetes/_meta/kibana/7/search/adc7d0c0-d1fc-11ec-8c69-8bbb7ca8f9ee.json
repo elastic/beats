@@ -1,0 +1,63 @@
+{
+    "attributes": {
+        "columns": [
+            "kubernetes.event.type",
+            "kubernetes.event.reason",
+            "kubernetes.event.involved_object.kind",
+            "kubernetes.event.metadata.namespace",
+            "kubernetes.event.involved_object.name",
+            "message"
+        ],
+        "description": "Kubernetes Events",
+        "grid": {
+            "columns": {
+                "kubernetes.event.involved_object.kind": {
+                    "width": 198.30555555555554
+                },
+                "kubernetes.event.metadata.namespace": {
+                    "width": 249.83333333333337
+                },
+                "kubernetes.event.reason": {
+                    "width": 176.33333333333331
+                },
+                "kubernetes.event.type": {
+                    "width": 156.91666666666663
+                }
+            }
+        },
+        "hideChart": false,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "metricset.name:event"
+                }
+            }
+        },
+        "rowHeight": -1,
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Kubernetes Events [Metricbeat Kubernetes]"
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "adc7d0c0-d1fc-11ec-8c69-8bbb7ca8f9ee",
+    "migrationVersion": {
+        "search": "8.0.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2022-06-28T06:47:08.297Z",
+    "version": "WzU3ODEsM10="
+}

@@ -18,14 +18,13 @@
 package query
 
 import (
-	"io/ioutil"
+	"fmt"
+	"io"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -82,7 +81,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		m.http.SetURI(url)
 		response, err := m.http.FetchResponse()
 		if err != nil {
-			reporter.Error(errors.Wrapf(err, "unable to fetch data from prometheus endpoint: %v", url))
+			reporter.Error(fmt.Errorf("unable to fetch data from prometheus endpoint %v: %w", url, err))
 			continue
 		}
 		defer func() {
@@ -91,14 +90,14 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			}
 		}()
 
-		body, err := ioutil.ReadAll(response.Body)
+		body, err := io.ReadAll(response.Body)
 		if err != nil {
 			return err
 		}
 
 		events, parseErr := parseResponse(body, pathConfig)
 		if parseErr != nil {
-			reporter.Error(errors.Wrapf(parseErr, "error parsing response from: %v", url))
+			reporter.Error(fmt.Errorf("error parsing response from %v: %w", url, parseErr))
 			continue
 		}
 		for _, e := range events {
@@ -108,7 +107,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	return nil
 }
 
-func (m *MetricSet) getURL(path string, queryMap common.MapStr) string {
+func (m *MetricSet) getURL(path string, queryMap mapstr.M) string {
 	queryStr := mb.QueryParams(queryMap).String()
 	return m.baseURL + path + "?" + queryStr
 }

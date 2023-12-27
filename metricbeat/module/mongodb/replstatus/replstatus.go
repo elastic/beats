@@ -18,9 +18,10 @@
 package replstatus
 
 import (
-	"gopkg.in/mgo.v2"
+	"context"
+	"fmt"
 
-	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
@@ -36,14 +37,14 @@ func init() {
 // additional entries. These variables can be used to persist data or configuration between
 // multiple fetch calls.
 type MetricSet struct {
-	*mongodb.MetricSet
+	*mongodb.Metricset
 }
 
 // New creates a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	ms, err := mongodb.NewMetricSet(base)
+	ms, err := mongodb.NewMetricset(base)
 	if err != nil {
 		return nil, err
 	}
@@ -54,23 +55,25 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	// instantiate direct connections to each of the configured Mongo hosts
-	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
+	client, err := mongodb.NewClient(m.Metricset.Config, m.HostData().URI, m.Module().Config().Timeout, readpref.PrimaryMode)
 	if err != nil {
-		return errors.Wrap(err, "error creating new Session")
-	}
-	defer mongoSession.Close()
-
-	mongoSession.SetMode(mgo.Strong, true)
-
-	oplogInfo, err := getReplicationInfo(mongoSession)
-	if err != nil {
-		return errors.Wrap(err, "error getting replication info")
+		return fmt.Errorf("could not create mongodb client: %w", err)
 	}
 
-	replStatus, err := getReplicationStatus(mongoSession)
+	defer func() {
+		if disconnectErr := client.Disconnect(context.Background()); disconnectErr != nil {
+			m.Logger().Warn("client disconnection did not happen gracefully")
+		}
+	}()
+
+	oplogInfo, err := getReplicationInfo(client)
 	if err != nil {
-		return errors.Wrap(err, "error getting replication status")
+		return fmt.Errorf("error getting replication info: %w", err)
+	}
+
+	replStatus, err := getReplicationStatus(client)
+	if err != nil {
+		return fmt.Errorf("error getting replication status: %w", err)
 	}
 
 	event := eventMapping(*oplogInfo, *replStatus)

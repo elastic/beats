@@ -24,8 +24,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/vmware/govmomi/simulator"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetchEventContents(t *testing.T) {
@@ -52,25 +52,25 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, "localhost.localdomain", event["host.hostname"])
 	assert.True(t, strings.Contains(event["name"].(string), "ha-host_VM"))
 
-	cpu := event["cpu"].(common.MapStr)
+	cpu := event["cpu"].(mapstr.M)
 
-	cpuUsed := cpu["used"].(common.MapStr)
+	cpuUsed := cpu["used"].(mapstr.M)
 	assert.EqualValues(t, 0, cpuUsed["mhz"])
 
-	memory := event["memory"].(common.MapStr)
+	memory := event["memory"].(mapstr.M)
 
-	memoryUsed := memory["used"].(common.MapStr)
-	memoryUsedHost := memoryUsed["host"].(common.MapStr)
-	memoryUsedGuest := memoryUsed["guest"].(common.MapStr)
+	memoryUsed := memory["used"].(mapstr.M)
+	memoryUsedHost := memoryUsed["host"].(mapstr.M)
+	memoryUsedGuest := memoryUsed["guest"].(mapstr.M)
 	assert.EqualValues(t, 0, memoryUsedGuest["bytes"])
 	assert.EqualValues(t, 0, memoryUsedHost["bytes"])
 
-	memoryTotal := memory["total"].(common.MapStr)
-	memoryTotalGuest := memoryTotal["guest"].(common.MapStr)
+	memoryTotal := memory["total"].(mapstr.M)
+	memoryTotalGuest := memoryTotal["guest"].(mapstr.M)
 	assert.EqualValues(t, uint64(33554432), memoryTotalGuest["bytes"])
 
-	memoryFree := memory["free"].(common.MapStr)
-	memoryFreeGuest := memoryFree["guest"].(common.MapStr)
+	memoryFree := memory["free"].(mapstr.M)
+	memoryFreeGuest := memoryFree["guest"].(mapstr.M)
 	assert.EqualValues(t, uint64(33554432), memoryFreeGuest["bytes"])
 }
 

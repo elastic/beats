@@ -19,7 +19,10 @@ package memqueue
 
 import (
 	"errors"
+	"fmt"
 	"time"
+
+	c "github.com/elastic/elastic-agent-libs/config"
 )
 
 type config struct {
@@ -29,15 +32,31 @@ type config struct {
 }
 
 var defaultConfig = config{
-	Events:         4 * 1024,
-	FlushMinEvents: 2 * 1024,
-	FlushTimeout:   1 * time.Second,
+	Events:         3200,
+	FlushMinEvents: 1600,
+	FlushTimeout:   10 * time.Second,
 }
 
 func (c *config) Validate() error {
 	if c.FlushMinEvents > c.Events {
 		return errors.New("flush.min_events must be less events")
 	}
-
 	return nil
+}
+
+// SettingsForUserConfig unpacks a ucfg config from a Beats queue
+// configuration and returns the equivalent memqueue.Settings object.
+func SettingsForUserConfig(cfg *c.C) (Settings, error) {
+	config := defaultConfig
+	if cfg != nil {
+		if err := cfg.Unpack(&config); err != nil {
+			return Settings{}, fmt.Errorf("couldn't unpack memory queue config: %w", err)
+		}
+	}
+	//nolint:gosimple // Actually want this conversion to be explicit since the types aren't definitionally equal.
+	return Settings{
+		Events:         config.Events,
+		FlushMinEvents: config.FlushMinEvents,
+		FlushTimeout:   config.FlushTimeout,
+	}, nil
 }

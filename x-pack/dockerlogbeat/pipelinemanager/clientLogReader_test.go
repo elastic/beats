@@ -19,9 +19,9 @@ import (
 	"github.com/docker/docker/daemon/logger/jsonfilelog"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipereader"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConfigHosts(t *testing.T) {
@@ -55,7 +55,7 @@ func TestNewClient(t *testing.T) {
 
 	event := testReturn(t, client)
 	assert.Equal(t, event.Fields["message"], logString)
-	assert.Equal(t, event.Fields["container"].(common.MapStr)["name"], "testContainer")
+	assert.Equal(t, event.Fields["container"].(mapstr.M)["name"], "testContainer")
 }
 
 // setupTestReader sets up the "read side" of the pipeline, spawing a goroutine to read and event and send it back to the test.

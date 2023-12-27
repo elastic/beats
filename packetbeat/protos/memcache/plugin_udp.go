@@ -25,7 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
@@ -69,7 +69,7 @@ type udpTransaction struct {
 // to deal with possible thread safety issues
 //
 // Note: only for cleanup. Transaction was published already,
-//       as publishing is thread safe
+// as publishing is thread safe
 type udpExpTransList struct {
 	sync.Mutex
 	head *udpTransaction
@@ -83,8 +83,6 @@ type udpMessage struct {
 }
 
 func (mc *memcache) ParseUDP(pkt *protos.Packet) {
-	defer logp.Recover("ParseMemcache(UDP) exception")
-
 	buffer := streambuf.NewFixed(pkt.Payload)
 	header, err := parseUDPHeader(buffer)
 	if err != nil {
@@ -261,6 +259,9 @@ func (c *udpConnection) killTransaction(t *udpTransaction) {
 }
 
 func (lst *udpExpTransList) push(t *udpTransaction) {
+	if t == nil {
+		return
+	}
 	lst.Lock()
 	defer lst.Unlock()
 	t.next = lst.head

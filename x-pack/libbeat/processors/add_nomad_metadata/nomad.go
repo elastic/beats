@@ -6,18 +6,14 @@ package add_nomad_metadata
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
-)
-
-const (
-	timeout = time.Second * 5
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type nomadAnnotator struct {
@@ -38,30 +34,30 @@ func init() {
 }
 
 // New constructs a new add_nomad_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *conf.C) (beat.Processor, error) {
 	cfgwarn.Experimental("The add_nomad_metadata processor is experimental")
 
 	config := defaultNomadAnnotatorConfig()
 
 	err := cfg.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the nomad configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the nomad configuration: %w", err)
 	}
 
 	//Load default indexer configs
-	if config.DefaultIndexers.Enabled == true {
+	if config.DefaultIndexers.Enabled {
 		Indexing.RLock()
 		for key, cfg := range Indexing.GetDefaultIndexerConfigs() {
-			config.Indexers = append(config.Indexers, map[string]common.Config{key: cfg})
+			config.Indexers = append(config.Indexers, map[string]conf.C{key: cfg})
 		}
 		Indexing.RUnlock()
 	}
 
 	//Load default matcher configs
-	if config.DefaultMatchers.Enabled == true {
+	if config.DefaultMatchers.Enabled {
 		Indexing.RLock()
 		for key, cfg := range Indexing.GetDefaultMatcherConfigs() {
-			config.Matchers = append(config.Matchers, map[string]common.Config{key: cfg})
+			config.Matchers = append(config.Matchers, map[string]conf.C{key: cfg})
 		}
 		Indexing.RUnlock()
 	}
@@ -152,7 +148,7 @@ func (n *nomadAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 		return event, nil
 	}
 
-	event.Fields.DeepUpdate(common.MapStr{
+	event.Fields.DeepUpdate(mapstr.M{
 		"nomad": metadata.Clone(),
 	})
 

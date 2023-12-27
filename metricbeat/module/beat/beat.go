@@ -24,10 +24,10 @@ import (
 	"path"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -41,7 +41,7 @@ var metricSets = []string{"state", "stats"}
 
 // NewModule creates a new module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	return elastic.NewModule(&base, metricSets, logp.NewLogger(ModuleName))
+	return elastic.NewModule(&base, metricSets, []string{}, logp.NewLogger(ModuleName))
 }
 
 // ModuleName is the name of this module.
@@ -79,35 +79,35 @@ type State struct {
 }
 
 // GetInfo returns the data for the Beat's / endpoint.
-func GetInfo(m *MetricSet) (*Info, error) {
+func GetInfo(m *MetricSet) (Info, error) {
 	content, err := fetchPath(m.HTTP, "/")
 	if err != nil {
-		return nil, err
+		return Info{}, err
 	}
 
-	info := &Info{}
+	info := Info{}
 	err = json.Unmarshal(content, &info)
 	if err != nil {
-		return nil, err
+		return Info{}, err
 	}
 
 	return info, nil
 }
 
 // GetState returns the data for the Beat's /state endpoint.
-func GetState(m *MetricSet) (*State, error) {
+func GetState(m *MetricSet) (State, error) {
 	content, err := fetchPath(m.HTTP, "/state")
 	if err != nil {
-		return nil, err
+		return State{}, err
 	}
 
-	info := &State{}
-	err = json.Unmarshal(content, &info)
+	state := State{}
+	err = json.Unmarshal(content, &state)
 	if err != nil {
-		return nil, err
+		return State{}, err
 	}
 
-	return info, nil
+	return state, nil
 }
 
 func fetchPath(httpHelper *helper.HTTP, path string) ([]byte, error) {

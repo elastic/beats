@@ -18,19 +18,22 @@
 package idxmgmt
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"fmt"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/template"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // ClientHandler defines the interface between a remote service and the Manager for ILM and templates.
 type ClientHandler interface {
-	ilm.ClientHandler
+	lifecycle.ClientHandler
 	template.Loader
 }
 
 type clientHandler struct {
-	ilm.ClientHandler
+	lifecycle.ClientHandler
 	template.Loader
 }
 
@@ -38,29 +41,42 @@ type clientHandler struct {
 // prepare an index.
 type ESClient interface {
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
-	GetVersion() common.Version
+	GetVersion() version.V
+	IsServerless() bool
 }
 
 // FileClient defines the minimal interface required for the Loader to
 // prepare a policy and write alias.
 type FileClient interface {
-	GetVersion() common.Version
+	GetVersion() version.V
 	Write(component string, name string, body string) error
 }
 
 // NewClientHandler initializes and returns a new instance of ClientHandler
-func NewClientHandler(ilm ilm.ClientHandler, template template.Loader) ClientHandler {
+func NewClientHandler(ilm lifecycle.ClientHandler, template template.Loader) ClientHandler {
 	return &clientHandler{ilm, template}
 }
 
 // NewESClientHandler returns a new ESLoader instance,
 // initialized with an ilm and template client handler based on the passed in client.
-func NewESClientHandler(c ESClient) ClientHandler {
-	return NewClientHandler(ilm.NewESClientHandler(c), template.NewESLoader(c))
+func NewESClientHandler(client ESClient, info beat.Info, cfg lifecycle.RawConfig) (ClientHandler, error) {
+	esHandler, err := lifecycle.NewESClientHandler(client, info, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("error creating ES handler: %w", err)
+	}
+	loader, err := template.NewESLoader(client, esHandler)
+	if err != nil {
+		return nil, fmt.Errorf("error creating ES loader: %w", err)
+	}
+	return NewClientHandler(esHandler, loader), nil
 }
 
 // NewFileClientHandler returns a new ESLoader instance,
 // initialized with an ilm and template client handler based on the passed in client.
-func NewFileClientHandler(c FileClient) ClientHandler {
-	return NewClientHandler(ilm.NewFileClientHandler(c), template.NewFileLoader(c))
+func NewFileClientHandler(client FileClient, info beat.Info, cfg lifecycle.RawConfig) (ClientHandler, error) {
+	mgmt, err := lifecycle.NewFileClientHandler(client, info, cfg)
+	if err != nil {
+		return nil, fmt.Errorf("error creating client handler: %w", err)
+	}
+	return NewClientHandler(mgmt, template.NewFileLoader(client, mgmt.Mode() == lifecycle.DSL)), nil
 }

@@ -18,16 +18,16 @@
 package ratelimit
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
 	"github.com/jonboulle/clockwork"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/go-concert/unison"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -83,7 +83,7 @@ func newTokenBucket(config algoConfig) (algorithm, error) {
 	}
 
 	if err := config.config.Unpack(&cfg); err != nil {
-		return nil, errors.Wrap(err, "could not unpack token_bucket algorithm configuration")
+		return nil, fmt.Errorf("could not unpack token_bucket algorithm configuration: %w", err)
 	}
 
 	return &tokenBucket{

@@ -85,3 +85,5 @@ Jan 15 2021 19:12:37: %ASA-6-302015: Built inbound UDP connection 261311655 for 
 Jan 15 2021 19:12:37: %ASA-6-302016: Teardown UDP connection 261311655 for OUTSIDE:89.160.20.156/63790(LOCAL\domain\USER001) to INSIDE:192.168.0.1/53 duration 0:00:00 bytes 139 (domain\USER001)
 Jan 15 2021 19:12:37: %ASA-6-302013: Built inbound TCP connection 261246338 for OUTSIDE:89.160.20.156/50120 (67.43.156.13/50120)(LOCAL\domain\USER001) to OUTSIDE:40.0.0.1/443 (40.0.0.1/443) (domain\USER001)
 Jul 29 2021 08:35:29: %ASA-6-602304: IPSEC: An outbound LAN-to-LAN SA (SPI= 0xABCXYZ) between 81.2.69.1452 and 81.2.69.1452 (user= 81.2.69.1452) has been deleted.
+<13>Apr 26 2022 10:24:37: %ASA-4-434001: SFR card not up and fail-close mode used, dropping TCP packet from outside:54.239.28.85/443 to Inside:10.12.128.89/57388
+<13>May 30 2019 09:18:59: %ASA-4-434003: SFR requested to reset TCP connection from outside:54.239.28.85/443 to Inside:10.12.128.89/57388

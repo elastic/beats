@@ -6,8 +6,7 @@ package subscriptions
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -39,12 +38,12 @@ var (
 func eventMapping(content map[string]interface{}) (mb.Event, error) {
 	fields, err := subscriptionsSchema.Apply(content)
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "error applying subscription schema")
+		return mb.Event{}, fmt.Errorf("error applying subscription schema: %w", err)
 	}
 
 	moduleFields, err := moduleSchema.Apply(content)
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "error applying module schema")
+		return mb.Event{}, fmt.Errorf("error applying module schema: %w", err)
 	}
 
 	event := mb.Event{
@@ -88,7 +87,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 	var err error
 	channels := Channels{}
 	if err = json.Unmarshal(content, &channels); err != nil {
-		return errors.Wrap(err, "error unmarshaling Nats streaming channels detailed response to JSON")
+		return fmt.Errorf("error unmarshaling Nats streaming channels detailed response to JSON: %w", err)
 	}
 
 	for _, ch := range channels.Channels {
@@ -99,7 +98,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 			sub["cluster_id"] = channels.ClusterID
 			evt, err = eventMapping(sub)
 			if err != nil {
-				r.Error(errors.Wrap(err, "error mapping subscription event"))
+				r.Error(fmt.Errorf("error mapping subscription event: %w", err))
 				continue
 			}
 

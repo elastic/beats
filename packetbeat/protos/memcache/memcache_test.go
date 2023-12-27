@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package memcache
 
@@ -28,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type memcacheTest struct {
@@ -38,7 +38,7 @@ type memcacheTest struct {
 func newMemcacheTest(config memcacheConfig) *memcacheTest {
 	mct := &memcacheTest{}
 	mc := &memcache{}
-	mc.init(nil, procs.ProcessesWatcher{}, &config)
+	mc.init(nil, &procs.ProcessesWatcher{}, &config)
 	mc.handler = mct
 	mct.mc = mc
 	return mct
@@ -75,9 +75,9 @@ func makeBinMessage(
 	return binParseNoFail(t, buf.Bytes())
 }
 
-func makeTransactionEvent(t *testing.T, trans *transaction) common.MapStr {
+func makeTransactionEvent(t *testing.T, trans *transaction) mapstr.M {
 	event := beat.Event{
-		Fields: common.MapStr{},
+		Fields: mapstr.M{},
 	}
 	err := trans.Event(&event)
 	if err != nil {

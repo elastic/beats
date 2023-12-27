@@ -22,9 +22,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore/backend"
 	"github.com/elastic/beats/v7/libbeat/statestore/internal/storecompliance"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {

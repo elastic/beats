@@ -1,0 +1,19 @@
+filebeat.inputs:
+  - type: filestream
+    id: test-fix-global-id
+    enabled: true
+    paths:
+      - {{path}}
+
+{% if not skip_registry_config %}
+filebeat.registry:
+  path: {{ beat.working_dir + '/' }}{{ registry_home|default("registry")}}
+  file_permissions: {{ registry_file_permissions|default("0600") }}
+  {% if registry_migrate_file %}
+  migrate_file: {{ beat.working_dir + '/' + registry_migrate_file }}
+  {% endif %}
+{%endif%}
+
+filebeat.shutdown_timeout: {{ shutdown_timeout|default(0) }}
+
+{% include './tests/system/config/libbeat.yml.j2' %}

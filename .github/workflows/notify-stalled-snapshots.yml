@@ -1,0 +1,92 @@
+---
+name: notify-stalled-snapshots
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * 1'
+
+permissions:
+  contents: read
+
+env:
+  EMAIL_VAULT_SECRET: secret/observability-team/ci/service-account/email-github-actions
+  EMAIL: beats-contrib@elastic.co
+  URL_QUERY: 'https://github.com/elastic/beats/pulls?q=is%3Apr+is%3Aopen+label%3ATeam%3ABeats-On-Call'
+  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+jobs:
+  filter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      matrix: ${{ steps.generator.outputs.matrix }}
+    steps:
+      - id: generator
+        uses: elastic/apm-pipeline-library/.github/actions/elastic-stack-snapshot-branches@current
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [filter]
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: "${{ matrix.branch }}"
+
+      - id: date
+        run: echo "date=$(date +%Y-%m-%d)" >> "${GITHUB_OUTPUT}"
+
+      - id: search
+        run: |-
+          if git --no-pager \
+            log --pretty=format: \
+              --name-only \
+              --since="7 days ago" \
+            | grep 'testing/environments/snapshot.yml' ; then
+            echo "found=false" >> $GITHUB_OUTPUT
+          else
+            echo "found=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - if: ${{ contains(steps.search.outputs.found, 'true') }}
+        name: Report obsoleted branches (slack)
+        uses: elastic/apm-pipeline-library/.github/actions/slack-message@current
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          channel: "#ingest-notifications"
+          message: ":red_circle: Elastic Stack version for the `${{ matrix.branch }}` branch has not been updated for a while (`> 7 days`). Review the (<${{ env.URL_QUERY }}|open PRs>)"
+
+      - if: ${{ contains(steps.search.outputs.found, 'true') }}
+        uses: hashicorp/vault-action@v2.5.0
+        with:
+          url: ${{ secrets.VAULT_ADDR }}
+          roleId: ${{ secrets.VAULT_ROLE_ID }}
+          secretId: ${{ secrets.VAULT_SECRET_ID }}
+          method: approle
+          secrets: |
+            ${{ env.EMAIL_VAULT_SECRET }} username | MAIL_USERNAME ;
+            ${{ env.EMAIL_VAULT_SECRET }} app_token | MAIL_PASSWORD;
+            ${{ env.EMAIL_VAULT_SECRET }} from | MAIL_FROM;
+            ${{ env.EMAIL_VAULT_SECRET }} reply | MAIL_REPLY;
+            ${{ env.EMAIL_VAULT_SECRET }} server | MAIL_SERVER
+
+      - if: ${{ contains(steps.search.outputs.found, 'true') }}
+        name: Report obsoleted branches (email)
+        uses: dawidd6/action-send-mail@6063705cefe50cb915fc53bb06d4049cae2953b2
+        with:
+          server_address: ${{ env.MAIL_SERVER }}
+          username: ${{ env.MAIL_USERNAME }}
+          password: ${{ env.MAIL_PASSWORD }}
+          subject: '[${{ matrix.branch }}] ${{ steps.date.outputs.date }}: Elastic Stack version has not been updated recently.'
+          to: ${{ env.EMAIL }}
+          from: ${{ env.MAIL_FROM }}
+          reply_to: ${{ env.MAIL_REPLY }}
+          body: 'Elastic Stack version for the ${{ matrix.branch }} branch has not been updated for a while (> 7 days). Review the open PRs in ${{ env.URL_QUERY }}. Generated automatically with ${{ env.JOB_URL }}'

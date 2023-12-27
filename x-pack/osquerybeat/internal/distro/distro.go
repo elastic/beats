@@ -29,15 +29,26 @@ const (
 	osqueryDarwinApp       = "osquery.app"
 	osqueryDarwinPath      = "opt/osquery/lib/" + osqueryDarwinApp
 
-	osqueryLinuxPath = "opt/osquery/bin"
-	osqueryVersion   = "5.0.1"
-	osqueryMSIExt    = ".msi"
-	osqueryPkgExt    = ".pkg"
+	osqueryCertsPEM         = "certs.pem"
+	osqueryCertsPath        = "certs/" + osqueryCertsPEM
+	osqueryLinuxPath        = "opt/osquery/bin"
+	osqueryCertsLinuxPath   = "opt/osquery/share/osquery/certs/" + osqueryCertsPEM
+	osqueryCertsDarwinPath  = "private/var/osquery/certs/" + osqueryCertsPEM
+	osqueryCertsWindowsPath = "osquery/certs/" + osqueryCertsPEM
 
-	osqueryDistroDarwinSHA256   = "ec58996e64637d861ccead8dc6bc8865662728f6e5bc2694a3c92f0f4a371095"
-	osqueryDistroLinuxSHA256    = "acac95714d388f02d5f417b0aaf86de7dbb8f6b3788340a6f8517ee2cd314235"
-	osqueryDistroLinuxARMSHA256 = "712b704036929df14cbe5d3e41bd4e0ae325e698296691763af46dc0d6e77394"
-	osqueryDistroWindowsSHA256  = "e0d01f56e0739a0ce2b3beb03ecea277ed146754884e225cba45083043442acc"
+	osqueryLensesLinuxDir  = "opt/osquery/share/osquery/lenses"
+	osqueryLensesDarwinDir = "private/var/osquery/lenses"
+
+	osqueryLensesDir = "lenses"
+
+	osqueryVersion = "5.10.2"
+	osqueryMSIExt  = ".msi"
+	osqueryPkgExt  = ".pkg"
+
+	osqueryDistroDarwinSHA256   = "a01d1f7da016f1e6bed54955e97982d491b7e55311433ff0fc985269160633af"
+	osqueryDistroLinuxSHA256    = "61ef2351a07dbc36ae9ebff605e8a7ecc4e09a07ac11f540d2aed78c143addbe"
+	osqueryDistroLinuxARMSHA256 = "106ea8a90dff0ccff852f44137848fe47ab9e8cfd27e5cd3a5ef963024b0564b"
+	osqueryDistroWindowsSHA256  = "f5a6955db724559638e43aef181e26eadfe4bfb827907ffd134d9abb0512cc58"
 )
 
 type OSArch struct {
@@ -80,12 +91,40 @@ func OsquerydPath(dir string) string {
 	return OsquerydPathForOS(runtime.GOOS, dir)
 }
 
+func OsquerydCertsPath(dir string) string {
+	return filepath.Join(dir, osqueryCertsPath)
+}
+
+func OsquerydLensesDir(dir string) string {
+	return filepath.Join(dir, osqueryLensesDir)
+}
+
 func OsquerydDarwinDistroPath() string {
 	return osqueryDarwinPath
 }
 
 func OsquerydLinuxDistroPath() string {
 	return OsquerydPath(osqueryLinuxPath)
+}
+
+func OsquerydCertsLinuxDistroPath() string {
+	return osqueryCertsLinuxPath
+}
+
+func OsquerydCertsDarwinDistroPath() string {
+	return osqueryCertsDarwinPath
+}
+
+func OsquerydCertsWindowsDistroPath() string {
+	return osqueryCertsWindowsPath
+}
+
+func OsquerydLensesLinuxDistroDir() string {
+	return osqueryLensesLinuxDir
+}
+
+func OsquerydLensesDarwinDistroDir() string {
+	return osqueryLensesDarwinDir
 }
 
 func OsquerydDistroFilename() string {
@@ -97,7 +136,7 @@ func OsquerydDistroPlatformFilename(platform string) string {
 	case "windows":
 		return OsquerydFilenameForOS(platform)
 	case "darwin":
-		return osqueryName + "-" + osqueryVersion + osqueryPkgExt
+		return OsquerydDarwinApp()
 	}
 	return OsquerydFilename()
 }
@@ -137,7 +176,8 @@ func (s Spec) URL(osname string) string {
 var specs = map[OSArch]Spec{
 	{"linux", "amd64"}:   {"_1.linux_x86_64.tar.gz", osqueryDistroLinuxSHA256, true},
 	{"linux", "arm64"}:   {"_1.linux_aarch64.tar.gz", osqueryDistroLinuxARMSHA256, true},
-	{"darwin", "amd64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, false},
+	{"darwin", "amd64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
+	{"darwin", "arm64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
 	{"windows", "amd64"}: {osqueryMSIExt, osqueryDistroWindowsSHA256, false},
 }
 

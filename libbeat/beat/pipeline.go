@@ -20,7 +20,7 @@ package beat
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Pipeline provides access to libbeat event publishing by creating a Client
@@ -30,11 +30,14 @@ type Pipeline interface {
 	Connect() (Client, error)
 }
 
+// PipelineConnector wraps the Pipeline interface
 type PipelineConnector = Pipeline
 
 // Client holds a connection to the beats publisher pipeline
 type Client interface {
+	// Publish the event
 	Publish(Event)
+	// PublishAll events specified in the Event array
 	PublishAll([]Event)
 	Close() error
 }
@@ -54,25 +57,25 @@ type ClientConfig struct {
 	// is configured
 	WaitClose time.Duration
 
-	// Configure ACK callback.
-	ACKHandler ACKer
+	// Callbacks for when events are added / acknowledged
+	EventListener EventListener
 
-	// Events configures callbacks for common client callbacks
-	Events ClientEventer
+	// ClientListener configures callbacks for monitoring pipeline clients
+	ClientListener ClientListener
 }
 
-// ACKer can be registered with a Client when connecting to the pipeline.
-// The ACKer will be informed when events are added or dropped by the processors,
+// EventListener can be registered with a Client when connecting to the pipeline.
+// The EventListener will be informed when events are added or dropped by the processors,
 // and when an event has been ACKed by the outputs.
 //
 // Due to event publishing and ACKing are asynchronous operations, the
-// operations on ACKer are normally executed in different go routines. ACKers
+// operations on EventListener are normally executed in different go routines. ACKers
 // are required to be multi-threading safe.
-type ACKer interface {
-	// AddEvent informs the ACKer that a new event has been send to the client.
+type EventListener interface {
+	// AddEvent informs the listener that a new event has been sent to the client.
 	// AddEvent is called after the processors have handled the event. If the
-	// event has been dropped by the processor `published` will be set to true.
-	// This allows the ACKer to do some bookeeping for dropped events.
+	// event has been dropped by the processor `published` will be set to false.
+	// This allows the ACKer to do some bookkeeping for dropped events.
 	AddEvent(event Event, published bool)
 
 	// ACK Events from the output and pipeline queue are forwarded to ACKEvents.
@@ -80,16 +83,16 @@ type ACKer interface {
 	// ACKers might need to keep track of dropped events by themselves.
 	ACKEvents(n int)
 
-	// Close informs the ACKer that the Client used to publish to the pipeline has been closed.
-	// No new events should be published anymore. The ACKEvents method still will be actively called
+	// ClientClosed informs the ACKer that the Client used to publish to the pipeline has been closed.
+	// No new events should be published anymore. The ACKEvents method still will be called as long
 	// as long as there are pending events for the client in the pipeline. The Close signal can be used
-	// to supress any ACK event propagation if required.
+	// to suppress any ACK event propagation if required.
 	// Close might be called from another go-routine than AddEvent and ACKEvents.
-	Close()
+	ClientClosed()
 }
 
 // CloseRef allows users to close the client asynchronously.
-// A CloseReg implements a subset of function required for context.Context.
+// A CloseRef implements a subset of function required for context.Context.
 type CloseRef interface {
 	Done() <-chan struct{}
 	Err() error
@@ -99,17 +102,17 @@ type CloseRef interface {
 // pass to the publisher pipeline on Connect.
 type ProcessingConfig struct {
 	// EventMetadata configures additional fields/tags to be added to published events.
-	EventMetadata common.EventMetadata
+	EventMetadata mapstr.EventMetadata
 
 	// Meta provides additional meta data to be added to the Meta field in the beat.Event
 	// structure.
-	Meta common.MapStr
+	Meta mapstr.M
 
 	// Fields provides additional 'global' fields to be added to every event
-	Fields common.MapStr
+	Fields mapstr.M
 
 	// DynamicFields provides additional fields to be added to every event, supporting live updates
-	DynamicFields *common.MapStrPointer
+	DynamicFields *mapstr.Pointer
 
 	// Processors passes additional processor to the client, to be executed before
 	// the pipeline processors.
@@ -121,18 +124,24 @@ type ProcessingConfig struct {
 	// Disables the addition of host.name if it was enabled for the publisher.
 	DisableHost bool
 
+	// EventNormalization controls whether the event normalization processor
+	// is applied to events. If nil the Beat's default behavior prevails.
+	EventNormalization *bool
+
+	// Disables the addition of input.type
+	DisableType bool
+
 	// Private contains additional information to be passed to the processing
 	// pipeline builder.
 	Private interface{}
 }
 
-// ClientEventer provides access to internal client events.
-type ClientEventer interface {
+// ClientListener provides access to internal client events.
+type ClientListener interface {
 	Closing() // Closing indicates the client is being shutdown next
 	Closed()  // Closed indicates the client being fully shutdown
 
-	Published()             // event has been successfully forwarded to the publisher pipeline
-	FilteredOut(Event)      // event has been filtered out/dropped by processors
+	Published()             // event has successfully entered the queue
 	DroppedOnPublish(Event) // event has been dropped, while waiting for the queue
 }
 
@@ -157,19 +166,12 @@ const (
 	// DefaultGuarantees are up to the pipeline configuration itself.
 	DefaultGuarantees PublishMode = iota
 
-	// OutputChooses mode fully depends on the output and its configuration.
-	// Events might be dropped based on the users output configuration.
-	// In this mode no events are dropped within the pipeline. Events are only removed
-	// after the output has ACKed the events to the pipeline, even if the output
-	// did drop the events.
-	OutputChooses
-
 	// GuaranteedSend ensures events are retried until acknowledged by the output.
 	// Normally guaranteed sending should be used with some client ACK-handling
 	// to update state keeping track of the sending status.
 	GuaranteedSend
 
-	// DropIfFull drops an event to be send if the pipeline is currently full.
+	// DropIfFull drops an event to be sent if the pipeline is currently full.
 	// This ensures a beats internals can continue processing if the pipeline has
 	// filled up. Useful if an event stream must be processed to keep internal
 	// state up-to-date.

@@ -1,0 +1,84 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "title": "Kubernetes Dashboards [Metricbeat Kubernetes]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [],
+            "params": {
+                "axis_formatter": "number",
+                "axis_position": "left",
+                "axis_scale": "normal",
+                "drop_last_bucket": 0,
+                "id": "39383e82-d6d8-4850-81b3-696b74b2f8fd",
+                "index_pattern_ref_name": "metrics_0_index_pattern",
+                "interval": "",
+                "markdown": "[Kubernetes Overview](#/view/kubernetes-e0195ce0-bcaf-11ec-b64f-7dd6e8e82013),\n[Kubernetes Nodes](#/view/kubernetes-b945b7b0-bcb1-11ec-b64f-7dd6e8e82013), \n[Kubernetes Pods](#/view/kubernetes-3d4d9290-bcb1-11ec-b64f-7dd6e8e82013),  [Kubernetes Deployments](#/view/kubernetes-5be46210-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes StatefulSets](#/view/kubernetes-21694370-bcb2-11ec-b64f-7dd6e8e82013),  [Kubernetes DaemonSets](#/view/kubernetes-85879010-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes CronJobs](#/view/kubernetes-0a672d50-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes Jobs](#/view/kubernetes-9bf990a0-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes Volumes](#/view/kubernetes-3912d9a0-bcb2-11ec-b64f-7dd6e8e82013), [Kubernetes PV/PVC](#/view/kubernetes-dd081350-bcb1-11ec-b64f-7dd6e8e82013), [Kubernetes Services](#/view/kubernetes-ff1b3850-bcb1-11ec-b64f-7dd6e8e82013),\n[Kubernetes Api Server](#/view/e706b4a0-ee30-11ec-bb3e-1bec5bcfeb8c)\n",
+                "max_lines_legend": 1,
+                "series": [
+                    {
+                        "axis_position": "right",
+                        "chart_type": "line",
+                        "color": "#68BC00",
+                        "fill": 0.5,
+                        "formatter": "default",
+                        "id": "1fd56965-803f-4e90-8664-e3efe60908a9",
+                        "line_width": 1,
+                        "metrics": [
+                            {
+                                "id": "d4bdbb34-96ac-42ea-a05c-07e512f88b04",
+                                "type": "count"
+                            }
+                        ],
+                        "override_index_pattern": 0,
+                        "palette": {
+                            "name": "default",
+                            "type": "palette"
+                        },
+                        "point_size": 1,
+                        "separate_axis": 0,
+                        "series_drop_last_bucket": 0,
+                        "split_mode": "everything",
+                        "stacked": "none",
+                        "time_range_mode": "entire_time_range"
+                    }
+                ],
+                "show_grid": 1,
+                "show_legend": 1,
+                "time_field": "",
+                "time_range_mode": "entire_time_range",
+                "tooltip_mode": "show_all",
+                "truncate_legend": 1,
+                "type": "markdown",
+                "use_kibana_indexes": true
+            },
+            "title": "Kubernetes Dashboards [Metricbeat Kubernetes]",
+            "type": "metrics"
+        }
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "0797edf0-db40-11ec-a23d-5dd6249f86b6",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "metrics_0_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-06-28T07:00:57.783Z",
+    "version": "WzYzODIsM10="
+}

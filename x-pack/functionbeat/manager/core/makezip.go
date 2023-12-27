@@ -9,13 +9,11 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/config"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/manager/core/bundle"
+	"github.com/elastic/elastic-agent-libs/keystore"
 )
 
 func rawYaml() ([]byte, error) {
@@ -105,7 +103,7 @@ func keystorePackager() (keystore.Packager, error) {
 
 	store, err := instance.LoadKeystore(cfg, "functionbeat")
 	if err != nil {
-		return nil, errors.Wrapf(err, "cannot load the keystore for packaging")
+		return nil, fmt.Errorf("cannot load the keystore for packaging: %w", err)
 	}
 
 	packager, ok := store.(keystore.Packager)

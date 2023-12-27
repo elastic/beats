@@ -1,0 +1,274 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "80709478-7162-4fde-b885-5fdfe98f01c3": {
+                            "columnOrder": [
+                                "765fc87b-2c0c-42f0-8d38-71c10f3203c7",
+                                "1c1ae127-0672-489a-9258-758d8aa46efd",
+                                "d501a271-2cb7-415e-b4b8-f4a3ca84b9cd",
+                                "537ebe73-a367-4f29-81eb-4e3f79968c8c",
+                                "41a024c5-4aff-4a4d-8755-487eabac326d",
+                                "e7cff37a-07c8-4f11-9ada-c547e135997e",
+                                "1ab80f0a-6def-485a-9d41-aafc93ac116a",
+                                "661936ed-8366-4aa8-bc68-cb42a80607ad"
+                            ],
+                            "columns": {
+                                "1ab80f0a-6def-485a-9d41-aafc93ac116a": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Jobs",
+                                    "operationType": "unique_count",
+                                    "params": {
+                                        "emptyAsNull": true
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.job.name"
+                                },
+                                "1c1ae127-0672-489a-9258-758d8aa46efd": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Deployments",
+                                    "operationType": "unique_count",
+                                    "params": {
+                                        "emptyAsNull": true
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.deployment.name"
+                                },
+                                "41a024c5-4aff-4a4d-8755-487eabac326d": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Pods",
+                                    "operationType": "unique_count",
+                                    "params": {
+                                        "emptyAsNull": true
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.pod.name"
+                                },
+                                "537ebe73-a367-4f29-81eb-4e3f79968c8c": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "StatefulSets",
+                                    "operationType": "unique_count",
+                                    "params": {
+                                        "emptyAsNull": true
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.statefulset.name"
+                                },
+                                "661936ed-8366-4aa8-bc68-cb42a80607ad": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Services",
+                                    "operationType": "unique_count",
+                                    "params": {
+                                        "emptyAsNull": true
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.service.name"
+                                },
+                                "765fc87b-2c0c-42f0-8d38-71c10f3203c7": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Namespace",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "1c1ae127-0672-489a-9258-758d8aa46efd",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.namespace"
+                                },
+                                "d501a271-2cb7-415e-b4b8-f4a3ca84b9cd": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Daemonsets",
+                                    "operationType": "unique_count",
+                                    "params": {
+                                        "emptyAsNull": true
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.daemonset.name"
+                                },
+                                "e7cff37a-07c8-4f11-9ada-c547e135997e": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Cronjobs",
+                                    "operationType": "unique_count",
+                                    "params": {
+                                        "emptyAsNull": true
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.cronjob.name"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "54de981f-4c69-405a-9ae9-1203cb49879e",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": [
+                            "state_statefulset",
+                            "pod",
+                            "state_deployment",
+                            "state_daemonset",
+                            "state_cronjob",
+                            "state_job",
+                            "state_service"
+                        ],
+                        "type": "phrases"
+                    },
+                    "query": {
+                        "bool": {
+                            "minimum_should_match": 1,
+                            "should": [
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "state_statefulset"
+                                    }
+                                },
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "pod"
+                                    }
+                                },
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "state_deployment"
+                                    }
+                                },
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "state_daemonset"
+                                    }
+                                },
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "state_cronjob"
+                                    }
+                                },
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "state_job"
+                                    }
+                                },
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "state_service"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "labelsOrientation": {
+                    "x": -45,
+                    "yLeft": 0,
+                    "yRight": 0
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "1c1ae127-0672-489a-9258-758d8aa46efd",
+                            "d501a271-2cb7-415e-b4b8-f4a3ca84b9cd",
+                            "537ebe73-a367-4f29-81eb-4e3f79968c8c",
+                            "41a024c5-4aff-4a4d-8755-487eabac326d",
+                            "e7cff37a-07c8-4f11-9ada-c547e135997e",
+                            "1ab80f0a-6def-485a-9d41-aafc93ac116a",
+                            "661936ed-8366-4aa8-bc68-cb42a80607ad"
+                        ],
+                        "layerId": "80709478-7162-4fde-b885-5fdfe98f01c3",
+                        "layerType": "data",
+                        "seriesType": "bar_stacked",
+                        "xAccessor": "765fc87b-2c0c-42f0-8d38-71c10f3203c7"
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "maxLines": 1,
+                    "position": "right",
+                    "showSingleSeries": false
+                },
+                "preferredSeriesType": "bar_stacked",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide",
+                "yTitle": "Workloads"
+            }
+        },
+        "title": "Workloads per Namespace [Metricbeat Kubernetes]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "133df460-db40-11ec-a23d-5dd6249f86b6",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-80709478-7162-4fde-b885-5fdfe98f01c3",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "54de981f-4c69-405a-9ae9-1203cb49879e",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-06-28T06:47:08.297Z",
+    "version": "WzU3ODUsM10="
+}

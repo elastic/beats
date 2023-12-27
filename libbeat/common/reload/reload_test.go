@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 type reloadable struct{}
@@ -33,7 +34,8 @@ func TestRegisterReloadable(t *testing.T) {
 	obj := reloadable{}
 	r := NewRegistry()
 
-	r.Register("my.reloadable", obj)
+	err := r.Register("my.reloadable", obj)
+	require.NoError(t, err)
 
 	assert.Equal(t, obj, r.GetReloadable("my.reloadable"))
 }
@@ -42,7 +44,8 @@ func TestRegisterReloadableList(t *testing.T) {
 	objl := reloadableList{}
 	r := NewRegistry()
 
-	r.RegisterList("my.reloadable", objl)
+	err := r.RegisterList("my.reloadable", objl)
+	require.NoError(t, err)
 
 	assert.Equal(t, objl, r.GetReloadableList("my.reloadable"))
 }

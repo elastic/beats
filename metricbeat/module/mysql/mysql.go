@@ -22,11 +22,11 @@ package mysql
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 
 	"github.com/go-sql-driver/mysql"
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -51,8 +51,8 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 // ParseDSN creates a DSN (data source name) string by parsing the host.
 // It validates the resulting DSN and returns an error if the DSN is invalid.
 //
-//   Format:  [username[:password]@][protocol[(address)]]/
-//   Example: root:test@tcp(127.0.0.1:3306)/
+//	Format:  [username[:password]@][protocol[(address)]]/
+//	Example: root:test@tcp(127.0.0.1:3306)/
 func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 	c := struct {
 		Username string `config:"username"`
@@ -64,7 +64,7 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 
 	config, err := mysql.ParseDSN(host)
 	if err != nil {
-		return mb.HostData{}, errors.Wrapf(err, "error parsing mysql host")
+		return mb.HostData{}, fmt.Errorf("error parsing mysql host: %w", err)
 	}
 
 	if config.User == "" {
@@ -98,11 +98,11 @@ func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
 // NewDB returns a new mysql database handle. The dsn value (data source name)
 // must be valid, otherwise an error will be returned.
 //
-//   DSN Format: [username[:password]@][protocol[(address)]]/
+//	DSN Format: [username[:password]@][protocol[(address)]]/
 func NewDB(dsn string) (*sql.DB, error) {
 	db, err := sql.Open("mysql", dsn)
 	if err != nil {
-		return nil, errors.Wrap(err, "sql open failed")
+		return nil, fmt.Errorf("sql open failed: %w", err)
 	}
 	return db, nil
 }

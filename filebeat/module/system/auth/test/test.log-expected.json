@@ -11,7 +11,6 @@
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_success",
             "info"
         ],
         "fileset.name": "auth",
@@ -30,6 +29,7 @@
             "vagrant"
         ],
         "service.type": "system",
+        "source.address": "10.0.2.2",
         "source.ip": "10.0.2.2",
         "source.port": 63673,
         "system.auth.ssh.event": "Accepted",
@@ -49,7 +49,6 @@
         "event.outcome": "success",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_success",
             "info"
         ],
         "fileset.name": "auth",
@@ -68,6 +67,7 @@
             "vagrant"
         ],
         "service.type": "system",
+        "source.address": "192.168.33.1",
         "source.ip": "192.168.33.1",
         "source.port": 58803,
         "system.auth.ssh.event": "Accepted",
@@ -85,7 +85,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -104,6 +103,7 @@
             "test"
         ],
         "service.type": "system",
+        "source.address": "10.0.2.2",
         "source.ip": "10.0.2.2",
         "system.auth.ssh.event": "Invalid",
         "user.name": "test"
@@ -119,7 +119,6 @@
         "event.outcome": "failure",
         "event.timezone": "-02:00",
         "event.type": [
-            "authentication_failure",
             "info"
         ],
         "fileset.name": "auth",
@@ -138,6 +137,7 @@
             "root"
         ],
         "service.type": "system",
+        "source.address": "216.160.83.57",
         "source.as.number": 209,
         "source.geo.city_name": "Milton",
         "source.geo.continent_name": "North America",
@@ -315,5 +315,28 @@
         "system.auth.useradd.shell": "/sbin/nologin",
         "user.id": "48",
         "user.name": "apache"
+    },
+    {
+        "event.dataset": "system.auth",
+        "event.kind": "event",
+        "event.module": "system",
+        "event.timezone": "-02:00",
+        "fileset.name": "auth",
+        "host.hostname": "localhost",
+        "input.type": "log",
+        "log.offset": 1056,
+        "process.name": "sshd",
+        "process.pid": 10161,
+        "related.hosts": [
+            "localhost"
+        ],
+        "related.user": [
+            "test"
+        ],
+        "service.type": "system",
+        "source.address": "test.example.com",
+        "source.domain": "test.example.com",
+        "system.auth.ssh.event": "error: PAM: User not known to the underlying authentication module for illegal",
+        "user.name": "test"
     }
 ]

@@ -23,7 +23,6 @@ processors:
   - convert:
       field: crowdstrike.event.UserIp
       target_field: source.ip
-      type: string
+      type: ip
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.crowdstrike?.event?.UserIp != null && ctx?.crowdstrike?.event?.UserIp != ""

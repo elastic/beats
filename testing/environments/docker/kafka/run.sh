@@ -23,14 +23,17 @@ wait_for_port 2181
 	--entity-type users \
 	--entity-name beats
 
+# Start Kafka with three listeners. The INSIDE listener makes Kafka reachable inside of docker
+# networks when the container hostname matches KAFKA_ADVERTISED_HOST. The OUTSIDE and SASL_SSL both
+# bind to localhost and are reachable from the host machine on the loopback interface.
 echo "Starting Kafka broker"
 mkdir -p ${KAFKA_LOGS_DIR}
 ${KAFKA_HOME}/bin/kafka-server-start.sh ${KAFKA_HOME}/config/server.properties \
     --override delete.topic.enable=true \
-    --override advertised.host.name=${KAFKA_ADVERTISED_HOST} \
-    --override listeners=PLAINTEXT://0.0.0.0:9092,SASL_SSL://0.0.0.0:9093 \
-    --override advertised.listeners=PLAINTEXT://${KAFKA_ADVERTISED_HOST}:9092,SASL_SSL://${KAFKA_ADVERTISED_HOST}:9093 \
-    --override inter.broker.listener.name=PLAINTEXT \
+    --override listener.security.protocol.map=INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT,SASL_SSL:SASL_SSL \
+    --override listeners=INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094,SASL_SSL://0.0.0.0:9093 \
+    --override advertised.listeners=INSIDE://${KAFKA_ADVERTISED_HOST}:9092,OUTSIDE://localhost:9094,SASL_SSL://localhost:9093 \
+    --override inter.broker.listener.name=INSIDE \
     --override sasl.enabled.mechanisms=SCRAM-SHA-512 \
     --override listener.name.sasl_ssl.scram-sha-512.sasl.jaas.config="org.apache.kafka.common.security.scram.ScramLoginModule required;" \
     --override logs.dir=${KAFKA_LOGS_DIR} \

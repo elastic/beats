@@ -23,10 +23,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // List of metrics that are gauges. This is used to identify metrics that should
@@ -36,32 +37,34 @@ import (
 // TODO: Replace this with a proper solution that uses the metric type from
 // where it is defined. See: https://github.com/elastic/beats/issues/5433
 var gauges = map[string]bool{
-	"libbeat.output.events.active":   true,
-	"libbeat.pipeline.events.active": true,
-	"libbeat.pipeline.clients":       true,
-	"libbeat.config.module.running":  true,
-	"registrar.states.current":       true,
-	"filebeat.harvester.running":     true,
-	"filebeat.harvester.open_files":  true,
-	"beat.memstats.memory_total":     true,
-	"beat.memstats.memory_alloc":     true,
-	"beat.memstats.rss":              true,
-	"beat.memstats.gc_next":          true,
-	"beat.info.uptime.ms":            true,
-	"beat.cpu.user.ticks":            true,
-	"beat.cpu.system.ticks":          true,
-	"beat.cpu.total.value":           true,
-	"beat.cpu.total.ticks":           true,
-	"beat.handles.open":              true,
-	"beat.handles.limit.hard":        true,
-	"beat.handles.limit.soft":        true,
-	"beat.runtime.goroutines":        true,
-	"system.load.1":                  true,
-	"system.load.5":                  true,
-	"system.load.15":                 true,
-	"system.load.norm.1":             true,
-	"system.load.norm.5":             true,
-	"system.load.norm.15":            true,
+	"libbeat.output.events.active":       true,
+	"libbeat.pipeline.events.active":     true,
+	"libbeat.pipeline.clients":           true,
+	"libbeat.config.module.running":      true,
+	"registrar.states.current":           true,
+	"filebeat.events.active":             true,
+	"filebeat.harvester.running":         true,
+	"filebeat.harvester.open_files":      true,
+	"beat.memstats.memory_total":         true,
+	"beat.memstats.memory_alloc":         true,
+	"beat.memstats.rss":                  true,
+	"beat.memstats.gc_next":              true,
+	"beat.info.uptime.ms":                true,
+	"beat.cgroup.memory.mem.usage.bytes": true,
+	"beat.cpu.user.ticks":                true,
+	"beat.cpu.system.ticks":              true,
+	"beat.cpu.total.value":               true,
+	"beat.cpu.total.ticks":               true,
+	"beat.handles.open":                  true,
+	"beat.handles.limit.hard":            true,
+	"beat.handles.limit.soft":            true,
+	"beat.runtime.goroutines":            true,
+	"system.load.1":                      true,
+	"system.load.5":                      true,
+	"system.load.15":                     true,
+	"system.load.norm.1":                 true,
+	"system.load.norm.5":                 true,
+	"system.load.norm.15":                true,
 }
 
 // isGauge returns true when the given metric key name represents a gauge value.
@@ -99,7 +102,7 @@ type reporter struct {
 
 // MakeReporter returns a new Reporter that periodically reports metrics via
 // logp. If cfg is nil defaults will be used.
-func MakeReporter(beat beat.Info, cfg *common.Config) (report.Reporter, error) {
+func MakeReporter(beat beat.Info, cfg *conf.C) (report.Reporter, error) {
 	config := defaultConfig()
 	if cfg != nil {
 		if err := cfg.Unpack(&config); err != nil {
@@ -244,18 +247,18 @@ func toKeyValuePairs(snaps map[string]monitoring.FlatSnapshot) []interface{} {
 	args := []interface{}{logp.Namespace("monitoring")}
 
 	for name, snap := range snaps {
-		data := make(common.MapStr, snapshotLen(snap))
+		data := make(mapstr.M, snapshotLen(snap))
 		for k, v := range snap.Bools {
-			data.Put(k, v)
+			data.Put(k, v) //nolint:errcheck // All keys within the flat snapshot are unique and are for scalar values.
 		}
 		for k, v := range snap.Floats {
-			data.Put(k, v)
+			data.Put(k, v) //nolint:errcheck // All keys within the flat snapshot are unique and are for scalar values.
 		}
 		for k, v := range snap.Ints {
-			data.Put(k, v)
+			data.Put(k, v) //nolint:errcheck // All keys within the flat snapshot are unique and are for scalar values.
 		}
 		for k, v := range snap.Strings {
-			data.Put(k, v)
+			data.Put(k, v) //nolint:errcheck // All keys within the flat snapshot are unique and are for scalar values.
 		}
 		if len(data) > 0 {
 			args = append(args, logp.Reflect(name, data))

@@ -27,7 +27,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestLogFileTimedClosing(t *testing.T) {
@@ -80,8 +80,7 @@ func TestLogFileTimedClosing(t *testing.T) {
 			}
 
 			err = readUntilError(reader)
-
-			assert.Equal(t, test.expectedErr, err)
+			assert.ErrorIs(t, err, test.expectedErr)
 		})
 	}
 }

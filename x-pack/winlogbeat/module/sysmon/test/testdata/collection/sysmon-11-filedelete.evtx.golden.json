@@ -1,0 +1,149 @@
+[
+  {
+    "@timestamp": "2020-05-07T08:14:44.4899785Z",
+    "event": {
+      "code": "23",
+      "kind": "event",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "Archived": "true",
+        "Hashes": "MD5=199E1CF5B2250BD515ECCCF4CA686301,IMPHASH=D90D8C7812AEC8DA0FA173AFA1293AB2",
+        "Image": "C:\\Users\\vagrant\\.gvm\\versions\\go1.13.10.windows.amd64\\bin\\go.exe",
+        "IsExecutable": "true",
+        "ProcessGuid": "{42f11c3b-c36f-5eb3-2c07-290000000000}",
+        "ProcessId": "2184",
+        "RuleName": "-",
+        "TargetFilename": "C:\\Users\\vagrant\\AppData\\Local\\Temp\\1\\go-build583768550\\b001\\test.test.exe",
+        "User": "VAGRANT-2012-R2\\vagrant",
+        "UtcTime": "2020-05-07 08:14:44.489"
+      },
+      "event_id": "23",
+      "opcode": "Info",
+      "process": {
+        "pid": 664,
+        "thread": {
+          "id": 2360
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 612,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2020-05-07T07:27:18.7221361Z",
+    "event": {
+      "code": "23",
+      "kind": "event",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "Archived": "true",
+        "Hashes": "SHA1=115106F5B338C87AE6836D50DD890DE3DA296367",
+        "Image": "C:\\Windows\\System32\\svchost.exe",
+        "IsExecutable": "false",
+        "ProcessGuid": "{42f11c3b-b2b6-5eb3-18ab-000000000000}",
+        "ProcessId": "776",
+        "RuleName": "-",
+        "TargetFilename": "C:\\Windows\\ServiceProfiles\\LocalService\\AppData\\Local\\lastalive0.dat",
+        "User": "NT AUTHORITY\\LOCAL SERVICE",
+        "UtcTime": "2020-05-07 07:27:18.722"
+      },
+      "event_id": "23",
+      "opcode": "Info",
+      "process": {
+        "pid": 664,
+        "thread": {
+          "id": 2360
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 11,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2020-05-12T06:48:27.0840442Z",
+    "event": {
+      "code": "23",
+      "kind": "event",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant-2012-r2"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant-2012-r2",
+      "event_data": {
+        "Archived": "true",
+        "Hashes": "MD5=5A9BDDF83BE530B481F0FD24DB28A6FF,IMPHASH=00000000000000000000000000000000",
+        "Image": "C:\\Windows\\system32\\svchost.exe",
+        "IsExecutable": "false",
+        "ProcessGuid": "{42f11c3b-4664-5eba-91ae-000000000000}",
+        "ProcessId": "820",
+        "RuleName": "-",
+        "TargetFilename": "C:\\Windows\\System32\\LogFiles\\Scm\\8b34f644-f627-47e7-98e0-957ba1c5eb6d",
+        "User": "NT AUTHORITY\\SYSTEM",
+        "UtcTime": "2020-05-12 06:48:27.084"
+      },
+      "event_id": "23",
+      "opcode": "Info",
+      "process": {
+        "pid": 1188,
+        "thread": {
+          "id": 1600
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 2243,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  }
+]

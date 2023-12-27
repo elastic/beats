@@ -5,14 +5,13 @@
 package app_insights
 
 import (
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const metricsetName = "app_insights"
@@ -56,7 +55,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	client, err := NewClient(config)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error initializing the monitor client: module azure - %s metricset", metricsetName)
+		return nil, fmt.Errorf("error initializing the monitor client: module azure - %s metricset: %w", metricsetName, err)
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -69,7 +68,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	results, err := m.client.GetMetricValues()
 	if err != nil {
-		return errors.Wrap(err, "error retrieving metric values")
+		return fmt.Errorf("error retrieving metric values: %w", err)
 	}
 	events := EventsMapping(results, m.client.Config.ApplicationId, m.client.Config.Namespace)
 	for _, event := range events {

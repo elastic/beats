@@ -31,7 +31,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Input interface for cursor based inputs. This interface must be implemented
@@ -146,8 +146,8 @@ func (inp *managedInput) runSource(
 	}()
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:   ctx.Cancelation,
-		ACKHandler: newInputACKHandler(ctx.Logger),
+		CloseRef:      ctx.Cancelation,
+		EventListener: newInputACKHandler(ctx.Logger),
 	})
 	if err != nil {
 		return err
@@ -175,7 +175,7 @@ func (inp *managedInput) createSourceID(s Source) string {
 	return fmt.Sprintf("%v::%v", inp.manager.Type, s.Name())
 }
 
-func newInputACKHandler(log *logp.Logger) beat.ACKer {
+func newInputACKHandler(log *logp.Logger) beat.EventListener {
 	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
 		var n uint
 		var last int

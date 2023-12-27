@@ -21,9 +21,9 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstrstr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -103,9 +103,9 @@ var (
 )
 var reStats *regexp.Regexp = regexp.MustCompile(`cluster_manager.*|filesystem.*|access_log_file.*|runtime.*|listener_manager.*|stats.*|server.*|http2\..*`)
 
-func eventMapping(response []byte) (common.MapStr, error) {
+func eventMapping(response []byte) (mapstr.M, error) {
 	data := map[string]interface{}{}
-	var events common.MapStr
+	var events mapstr.M
 	var err error
 
 	data = findStats(data, response)
@@ -116,7 +116,7 @@ func eventMapping(response []byte) (common.MapStr, error) {
 	return events, nil
 }
 
-func findStats(data common.MapStr, response []byte) common.MapStr {
+func findStats(data mapstr.M, response []byte) mapstr.M {
 	matches := reStats.FindAllString(string(response), -1)
 	for i := 0; i < len(matches); i++ {
 		entries := strings.Split(matches[i], ": ")

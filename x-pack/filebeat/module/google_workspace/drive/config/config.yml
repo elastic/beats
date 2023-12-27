@@ -16,7 +16,17 @@ request.proxy_url: {{ .proxy_url }}
 request.transforms:
   - set:
       target: url.params.startTime
-      value: "[[.cursor.last_execution_datetime]]"
+      # If last pagination cycle was finished successully
+      # we move the startDate pointer forward
+      # else we reprocess the last interval from the beginning.
+      # If none of the values are in the cursor it means is a fresh start
+      # and we pick the default value.
+      value: >-
+        [[- if eq .cursor.pagination_finished "true" -]]
+          [[- .cursor.next_start_date -]]
+        [[- else -]]
+          [[- .cursor.last_response_date -]]
+        [[- end -]]
       default: '[[formatDate (now (parseDuration "-{{.initial_interval}}"))]]'
 response.split:
   target: body.items
@@ -26,11 +36,37 @@ response.split:
 response.pagination:
   - set:
       target: url.params.pageToken
-      value: "[[.last_response.body.nextPageToken]]"
+      value: >-
+        [[- if index .last_response.body "nextPageToken" -]]
+          [[- .last_response.body.nextPageToken -]]
+        [[- end -]]
       fail_on_template_error: true
 cursor:
-  last_execution_datetime:
-    value: "[[formatDate now]]"
+  pagination_finished:
+    # Use this flag to identify if an execution was interrupted in the middle
+    # of a pagination cycle.
+    value: '[[not (index .last_response.body "nextPageToken")]]'
+  last_response_date:
+    # Use this value to be able to resume from an interrupted pagination cycle.
+    value: '[[.last_response.url.params.Get "startTime"]]'
+  next_start_date:
+    # The API returns records sorted from newest to oldest,
+    # in order to pick the next startDate we keep the first event (newest) time.
+    value: >-
+      [[- $time := .first_event.id.time -]]
+      [[- if not (parseDate $time "RFC3339").IsZero -]]
+        [[- $time -]]
+      [[- else if not (parseDate $time "2006-01-02T15:04:05").IsZero -]]
+        [[- formatDate (parseDate $time "2006-01-02T15:04:05") -]]
+      [[- else if not (parseDate $time "2006-01-02T15:04:05Z").IsZero -]]
+        [[- formatDate (parseDate $time "2006-01-02T15:04:05Z") -]]
+      [[- else if not (parseDate $time "2006-01-02T15:04:05.999Z").IsZero -]]
+        [[- formatDate (parseDate $time "2006-01-02T15:04:05.999Z") -]]
+      [[- else if not (parseDate $time "2006-01-02T15:04:05 MST").IsZero -]]
+        [[- formatDate (parseDate $time "2006-01-02T15:04:05 MST") -]]
+      [[- else -]]
+        [[- formatDate now -]]
+      [[- end -]]
 
 {{ else if eq .input "file" }}
 type: log

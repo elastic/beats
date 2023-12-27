@@ -18,17 +18,18 @@
 package urldecode
 
 import (
+	"errors"
 	"fmt"
 	"net/url"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type urlDecode struct {
@@ -55,14 +56,14 @@ func init() {
 	jsprocessor.RegisterPlugin("URLDecode", New)
 }
 
-func New(c *common.Config) (processors.Processor, error) {
+func New(c *config.C) (beat.Processor, error) {
 	config := urlDecodeConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
 	}
 
 	if err := c.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("failed to unpack the configuration of urldecode processor: %s", err)
+		return nil, fmt.Errorf("failed to unpack the configuration of urldecode processor: %w", err)
 	}
 
 	return &urlDecode{
@@ -81,11 +82,13 @@ func (p *urlDecode) Run(event *beat.Event) (*beat.Event, error) {
 	for _, field := range p.config.Fields {
 		err := p.decodeField(field.From, field.To, event)
 		if err != nil {
-			errMsg := fmt.Errorf("failed to decode fields in urldecode processor: %v", err)
-			p.log.Debug(errMsg.Error())
+			errMsg := fmt.Errorf("failed to decode fields in urldecode processor: %w", err)
+			if publisher.LogWithTrace() {
+				p.log.Debug(errMsg.Error())
+			}
 			if p.config.FailOnError {
 				event = backup
-				event.PutValue("error.message", errMsg.Error())
+				_, _ = event.PutValue("error.message", errMsg.Error())
 				return event, err
 			}
 		}
@@ -97,10 +100,10 @@ func (p *urlDecode) Run(event *beat.Event) (*beat.Event, error) {
 func (p *urlDecode) decodeField(from string, to string, event *beat.Event) error {
 	value, err := event.GetValue(from)
 	if err != nil {
-		if p.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if p.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
-		return fmt.Errorf("could not fetch value for key: %s, Error: %v", from, err)
+		return fmt.Errorf("could not fetch value for key: %s, Error: %w", from, err)
 	}
 
 	encodedString, ok := value.(string)
@@ -110,7 +113,7 @@ func (p *urlDecode) decodeField(from string, to string, event *beat.Event) error
 
 	decodedData, err := url.QueryUnescape(encodedString)
 	if err != nil {
-		return fmt.Errorf("error trying to URL-decode %s: %v", encodedString, err)
+		return fmt.Errorf("error trying to URL-decode %s: %w", encodedString, err)
 	}
 
 	target := to
@@ -119,7 +122,7 @@ func (p *urlDecode) decodeField(from string, to string, event *beat.Event) error
 	}
 
 	if _, err := event.PutValue(target, decodedData); err != nil {
-		return fmt.Errorf("could not put value: %s: %v, %v", decodedData, target, err)
+		return fmt.Errorf("could not put value: %s: %v, %w", decodedData, target, err)
 	}
 
 	return nil

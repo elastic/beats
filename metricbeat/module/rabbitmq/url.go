@@ -28,6 +28,7 @@ const (
 	NodesPath       = "/api/nodes"
 	OverviewPath    = "/api/overview"
 	QueuesPath      = "/api/queues"
+	ShovelsPath     = "/api/shovels"
 )
 
 const (

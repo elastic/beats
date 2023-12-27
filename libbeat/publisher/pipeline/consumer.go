@@ -20,9 +20,9 @@ package pipeline
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // eventConsumer collects and forwards events from the queue to the outputs work queue.
@@ -46,17 +46,19 @@ type eventConsumer struct {
 	// eventConsumer.close().
 	done chan struct{}
 
+	// queueReader is a helper routine that fetches queue batches in a
+	// separate goroutine so we don't block on the control path.
+	queueReader queueReader
+
 	// This waitgroup is released when this eventConsumer's worker
 	// goroutines return.
 	wg sync.WaitGroup
-
-	// The queue the eventConsumer will retrieve batches from.
-	queue queue.Queue
 }
 
-// consumerTarget specifies the output channel and parameters needed for
-// eventConsumer to generate a batch.
+// consumerTarget specifies the queue to read from, the parameters needed
+// to generate a batch, and the output channel to send batches to.
 type consumerTarget struct {
+	queue      queue.Queue
 	ch         chan publisher.Batch
 	timeToLive int
 	batchSize  int
@@ -71,13 +73,12 @@ type retryRequest struct {
 
 func newEventConsumer(
 	log *logp.Logger,
-	queue queue.Queue,
 	observer outputObserver,
 ) *eventConsumer {
 	c := &eventConsumer{
-		logger:   log,
-		observer: observer,
-		queue:    queue,
+		logger:      log,
+		observer:    observer,
+		queueReader: makeQueueReader(),
 
 		targetChan: make(chan consumerTarget),
 		retryChan:  make(chan retryRequest),
@@ -89,6 +90,17 @@ func newEventConsumer(
 		defer c.wg.Done()
 		c.run()
 	}()
+
+	// Even though we start a goroutine here, we don't include it in the
+	// waitGroup used for shutdown: if the queue itself is not closed yet,
+	// then the queueReader may be blocked in a read call to the queue,
+	// and waiting on it would deadlock. (This scenario is common; the
+	// queue is rarely closed properly on shutdown.) The queueReader itself
+	// has no independent state to clean up, and can safely shut down
+	// after the eventConsumer is already gone, so nothing is lost by
+	// letting it happen asynchronously.
+	go c.queueReader.run(c.logger)
+
 	return c
 }
 
@@ -96,14 +108,6 @@ func (c *eventConsumer) run() {
 	log := c.logger
 
 	log.Debug("start pipeline event consumer")
-
-	// Create a queueReader to run our queue fetches in the background
-	c.wg.Add(1)
-	queueReader := makeQueueReader()
-	go func() {
-		defer c.wg.Done()
-		queueReader.run(log)
-	}()
 
 	var (
 		// Whether there's an outstanding request to queueReader
@@ -118,19 +122,17 @@ func (c *eventConsumer) run() {
 		// The output channel (and associated parameters) that will receive
 		// the batches we're loading.
 		target consumerTarget
-
-		// The queue.Consumer we get the raw batches from. Reset whenever
-		// the target changes.
-		consumer queue.Consumer = c.queue.Consumer()
 	)
 
 outerLoop:
 	for {
 		// If possible, start reading the next batch in the background.
-		if queueBatch == nil && !pendingRead {
+		// We require a non-nil target channel so we don't queue up a large
+		// batch before we know the real requested size for our output.
+		if queueBatch == nil && !pendingRead && target.queue != nil && target.ch != nil {
 			pendingRead = true
-			queueReader.req <- queueReaderRequest{
-				consumer:   consumer,
+			c.queueReader.req <- queueReaderRequest{
+				queue:      target.queue,
 				retryer:    c,
 				batchSize:  target.batchSize,
 				timeToLive: target.timeToLive,
@@ -171,15 +173,14 @@ outerLoop:
 
 		case target = <-c.targetChan:
 
-		case queueBatch = <-queueReader.resp:
+		case queueBatch = <-c.queueReader.resp:
 			pendingRead = false
 
 		case req := <-c.retryChan:
-			alive := true
 			if req.decreaseTTL {
 				countFailed := len(req.batch.Events())
 
-				alive = req.batch.reduceTTL()
+				alive := req.batch.reduceTTL()
 
 				countDropped := countFailed - len(req.batch.Events())
 				c.observer.eventsDropped(countDropped)
@@ -197,22 +198,8 @@ outerLoop:
 		}
 	}
 
-	// Close the queue.Consumer, otherwise queueReader can get blocked
-	// waiting on a read.
-	consumer.Close()
-
 	// Close the queueReader request channel so it knows to shutdown.
-	close(queueReader.req)
-
-	// If there's an outstanding request, we need to read the response
-	// to unblock it, but we won't pass on the value.
-	if pendingRead {
-		batch := <-queueReader.resp
-		if batch != nil {
-			// Inform any listeners that we couldn't deliver this batch.
-			batch.Drop()
-		}
-	}
+	close(c.queueReader.req)
 }
 
 func (c *eventConsumer) setTarget(target consumerTarget) {

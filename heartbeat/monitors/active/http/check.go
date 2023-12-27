@@ -22,9 +22,13 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/reason"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 )
+
+const cfgPositive = "positive"
+const cfgNegative = "negative"
 
 // multiValidator combines multiple validations of each type into a single easy to use object.
 type multiValidator struct {
@@ -117,7 +121,7 @@ func checkStatus(status []uint16) respValidator {
 
 func checkStatusOK(r *http.Response) error {
 	if r.StatusCode >= 400 {
-		return errors.New(r.Status)
+		return ecserr.NewBadHTTPStatusErr(r.StatusCode)
 	}
 	return nil
 }
@@ -155,15 +159,15 @@ func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher, err
 	// in this case, there will be 3 possibilities: positive + negative / positive / negative
 	if m, ok := b.(map[string]interface{}); ok {
 		for checkType, v := range m {
-			if checkType != "positive" && checkType != "negative" {
+			if checkType != cfgPositive && checkType != cfgNegative {
 				return positiveMatch, negativeMatch, errBodyNoValidCheckType
 			}
 			if params, ok := v.([]interface{}); ok {
 				for _, param := range params {
 					if pat, ok := param.(string); ok {
-						if checkType == "positive" {
+						if checkType == cfgPositive {
 							positiveMatch = append(positiveMatch, match.MustCompile(pat))
-						} else if checkType == "negative" {
+						} else if checkType == cfgNegative {
 							negativeMatch = append(negativeMatch, match.MustCompile(pat))
 						}
 					}
@@ -175,7 +179,9 @@ func parseBody(b interface{}) (positiveMatch, negativeMatch []match.Matcher, err
 	return positiveMatch, negativeMatch, errBodyIllegalBody
 }
 
-/* checkBody accepts 2 check types:
+/*
+	checkBody accepts 2 check types:
+
 1. positive
 2. negative
 So, there are 4 kinds of scenarios:

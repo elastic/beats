@@ -5,7 +5,13 @@
 
 == Snort module
 
+deprecated::[8.12.0,"This module is deprecated. Use the https://docs.elastic.co/integrations/snort[Snort] Elastic integration instead."]
+
 experimental[]
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
 
 This is a module for receiving Snort/Sourcefire logs over Syslog or a file.
 

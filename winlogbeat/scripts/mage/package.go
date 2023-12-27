@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/magefile/mage/mg"
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
@@ -72,7 +71,7 @@ func customizePackaging() {
 	mg.Deps(prepareModulePackaging)
 
 	moduleDir := devtools.PackageFile{
-		Mode:    0644,
+		Mode:    0o644,
 		Source:  dirModuleGenerated,
 		Config:  true,
 		Modules: true,
@@ -86,7 +85,7 @@ func customizePackaging() {
 			case devtools.Deb, devtools.RPM:
 				args.Spec.Files["/etc/{{.BeatName}}/module"] = moduleDir
 			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
+				panic(fmt.Errorf("unhandled package type: %v", pkgType))
 			}
 		}
 	}
@@ -102,8 +101,8 @@ func prepareModulePackaging() error {
 	return (&devtools.CopyTask{
 		Source:  devtools.XPackBeatDir("module"),
 		Dest:    dirModuleGenerated,
-		Mode:    0644,
-		DirMode: 0755,
+		Mode:    0o644,
+		DirMode: 0o755,
 		Exclude: []string{
 			"/_meta",
 			"/test",

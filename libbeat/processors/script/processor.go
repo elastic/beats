@@ -18,13 +18,13 @@
 package script
 
 import (
+	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
+	"github.com/elastic/elastic-agent-libs/config"
 
 	// Register javascript modules with the processor.
 	_ "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module"
@@ -35,7 +35,7 @@ func init() {
 }
 
 // New constructs a new script processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(c *config.C) (beat.Processor, error) {
 	var config = struct {
 		Lang string `config:"lang" validate:"required"`
 	}{}
@@ -47,6 +47,6 @@ func New(c *common.Config) (processors.Processor, error) {
 	case "javascript", "js":
 		return javascript.New(c)
 	default:
-		return nil, errors.Errorf("script type must be declared (e.g. type: javascript)")
+		return nil, fmt.Errorf("script type must be declared (e.g. type: javascript)")
 	}
 }

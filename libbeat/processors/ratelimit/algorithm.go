@@ -20,9 +20,7 @@ package ratelimit
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
 var registry = make(map[string]constructor, 0)
@@ -33,7 +31,7 @@ type algoConfig struct {
 	limit rate
 
 	// config is any algorithm-specific additional configuration.
-	config common.Config
+	config cfg.C
 }
 
 // algorithm is the interface that all rate limiting algorithms must
@@ -63,7 +61,7 @@ func factory(id string, config algoConfig) (algorithm, error) {
 
 	algorithm, err := ctor(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not construct algorithm")
+		return nil, fmt.Errorf("could not construct algorithm: %w", err)
 	}
 
 	return algorithm, nil

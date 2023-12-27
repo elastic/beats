@@ -23,19 +23,19 @@ import (
 	"fmt"
 	"path/filepath"
 
-	errw "github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // ImportDashboards tries to import the kibana dashboards.
 func ImportDashboards(
 	ctx context.Context,
 	beatInfo beat.Info, homePath string,
-	kibanaConfig, dashboardsConfig *common.Config,
+	kibanaConfig, dashboardsConfig *config.C,
 	msgOutputter MessageOutputter,
-	pattern common.MapStr,
+	pattern mapstr.M,
 ) error {
 	if dashboardsConfig == nil || !dashboardsConfig.Enabled() {
 		return nil
@@ -57,8 +57,8 @@ func ImportDashboards(
 	return setupAndImportDashboardsViaKibana(ctx, beatInfo.Hostname, beatInfo.Beat, kibanaConfig, &dashConfig, msgOutputter, pattern)
 }
 
-func setupAndImportDashboardsViaKibana(ctx context.Context, hostname, beatname string, kibanaConfig *common.Config,
-	dashboardsConfig *Config, msgOutputter MessageOutputter, fields common.MapStr) error {
+func setupAndImportDashboardsViaKibana(ctx context.Context, hostname, beatname string, kibanaConfig *config.C,
+	dashboardsConfig *Config, msgOutputter MessageOutputter, fields mapstr.M) error {
 
 	kibanaLoader, err := NewKibanaLoader(ctx, kibanaConfig, dashboardsConfig, hostname, msgOutputter, beatname)
 	if err != nil {
@@ -73,7 +73,7 @@ func setupAndImportDashboardsViaKibana(ctx context.Context, hostname, beatname s
 }
 
 // ImportDashboardsViaKibana imports Dashboards to Kibana
-func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader, fields common.MapStr) error {
+func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader, fields mapstr.M) error {
 	version := kibanaLoader.version
 	if !version.IsValid() {
 		return errors.New("No valid kibana version available")
@@ -89,12 +89,12 @@ func ImportDashboardsViaKibana(kibanaLoader *KibanaLoader, fields common.MapStr)
 	}
 
 	if err := importer.Import(); err != nil {
-		return errw.Wrap(err, "fail to import the dashboards in Kibana")
+		return fmt.Errorf("fail to import the dashboards in Kibana: %w", err)
 	}
 
 	return nil
 }
 
-func isKibanaAPIavailable(version common.Version) bool {
+func isKibanaAPIavailable(version version.V) bool {
 	return (version.Major == 5 && version.Minor >= 6) || version.Major >= 6
 }

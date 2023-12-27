@@ -47,7 +47,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -107,7 +108,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -167,7 +169,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -227,7 +230,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -365,7 +369,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -425,7 +430,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -489,7 +495,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -553,7 +560,8 @@
             "172.17.0.6:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.6"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -617,7 +625,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -681,7 +690,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -745,7 +755,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -809,7 +820,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -872,7 +884,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -936,7 +949,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -1000,7 +1014,8 @@
             "172.17.0.6:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.6"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -1064,7 +1079,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -1128,7 +1144,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -1189,7 +1206,8 @@
             "172.17.0.6:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.6"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -1252,7 +1270,8 @@
             "172.17.0.5:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.5"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -1316,7 +1335,8 @@
             "172.17.0.6:8080"
         ],
         "related.ip": [
-            "192.168.64.1"
+            "192.168.64.1",
+            "172.17.0.6"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.1",
@@ -1383,7 +1403,8 @@
             "172.17.0.7:8080"
         ],
         "related.ip": [
-            "192.168.64.14"
+            "192.168.64.14",
+            "172.17.0.7"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.14",
@@ -1450,7 +1471,8 @@
             "172.17.0.7:8080"
         ],
         "related.ip": [
-            "192.168.64.14"
+            "192.168.64.14",
+            "172.17.0.7"
         ],
         "service.type": "nginx",
         "source.address": "192.168.64.14",
@@ -1458,6 +1480,346 @@
         "url.extension": "mp4",
         "url.original": "/A%20Beka%20G1%20Howe/029_AND_30/15%20reading%20elephants.mp4",
         "url.path": "/A Beka G1 Howe/029_AND_30/15 reading elephants.mp4",
+        "user_agent.device.name": "Mac",
+        "user_agent.name": "Firefox",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",
+        "user_agent.os.full": "Mac OS X 10.14",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.14",
+        "user_agent.version": "72.0."
+    },
+    {
+        "@timestamp": "2022-08-24T21:04:17.000Z",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "2a02:cf40:: - remote_monitoring_user [24/Aug/2022:21:04:17 +0000] \"POST /_bulk HTTP/1.1\" 200 470 \"-\" \"Elastic-metricbeat/7.16.3 (linux; amd64; e7cede6a62ed4452bd9044fc6f4947df; 2022-01-07 00:50:33 +0000 UTC)\" 2057 0.033 [esmon-esmon-es-http-9200] [] [2a02:cf40::]:9200 470 0.036 200 3db73c6c673c4256ade033a6ce08c2ab",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "ingress_controller",
+        "http.request.id": "3db73c6c673c4256ade033a6ce08c2ab",
+        "http.request.method": "POST",
+        "http.response.body.bytes": 470,
+        "http.response.status_code": 200,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 6375,
+        "nginx.ingress_controller.http.request.id": "3db73c6c673c4256ade033a6ce08c2ab",
+        "nginx.ingress_controller.http.request.length": 2057,
+        "nginx.ingress_controller.http.request.time": 0.033,
+        "nginx.ingress_controller.remote_ip_list": [
+            "2a02:cf40::"
+        ],
+        "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "2a02:cf40::",
+        "nginx.ingress_controller.upstream.name": "esmon-esmon-es-http-9200",
+        "nginx.ingress_controller.upstream.port": 9200,
+        "nginx.ingress_controller.upstream.response.length": 470,
+        "nginx.ingress_controller.upstream.response.length_list": [
+            "470"
+        ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
+        "nginx.ingress_controller.upstream.response.status_code_list": [
+            "200"
+        ],
+        "nginx.ingress_controller.upstream.response.time": 0.036,
+        "nginx.ingress_controller.upstream.response.time_list": [
+            "0.036"
+        ],
+        "nginx.ingress_controller.upstream_address_list": [
+            "[2a02:cf40::]:9200"
+        ],
+        "related.ip": [
+            "2a02:cf40::"
+        ],
+        "related.user": [
+            "remote_monitoring_user"
+        ],
+        "service.type": "nginx",
+        "source.address": "2a02:cf40::",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "NO",
+        "source.geo.country_name": "Norway",
+        "source.geo.location.lat": 62.0,
+        "source.geo.location.lon": 10.0,
+        "source.ip": "2a02:cf40::",
+        "url.original": "/_bulk",
+        "url.path": "/_bulk",
+        "user.name": "remote_monitoring_user",
+        "user_agent.device.name": "Other",
+        "user_agent.name": "Other",
+        "user_agent.original": "Elastic-metricbeat/7.16.3 (linux; amd64; e7cede6a62ed4452bd9044fc6f4947df; 2022-01-07 00:50:33 +0000 UTC)",
+        "user_agent.os.name": "Linux"
+    },
+    {
+        "@timestamp": "2022-08-24T18:05:41.000Z",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "2a02:cf40::4e36 - - [24/Aug/2022:18:05:41 +0000] \"GET /favicon.ico HTTP/2.0\" 502 552 \"https://localhost:8080/\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36\" 27 0.000 [localhost-8080] [] [2a02:cf40::7]:5000, [2a02:cf40::4e36]:5000 0, 0 0.000, 0.000 502, 502 3db73c6c673c4256ade033a6ce08c2ab",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "ingress_controller",
+        "http.request.id": "3db73c6c673c4256ade033a6ce08c2ab",
+        "http.request.method": "GET",
+        "http.request.referrer": "https://localhost:8080/",
+        "http.response.body.bytes": 552,
+        "http.response.status_code": 502,
+        "http.version": "2.0",
+        "input.type": "log",
+        "log.offset": 6691,
+        "nginx.ingress_controller.http.request.id": "3db73c6c673c4256ade033a6ce08c2ab",
+        "nginx.ingress_controller.http.request.length": 27,
+        "nginx.ingress_controller.http.request.time": 0.0,
+        "nginx.ingress_controller.remote_ip_list": [
+            "2a02:cf40::4e36"
+        ],
+        "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "2a02:cf40::4e36",
+        "nginx.ingress_controller.upstream.name": "localhost-8080",
+        "nginx.ingress_controller.upstream.port": 5000,
+        "nginx.ingress_controller.upstream.response.length": 0,
+        "nginx.ingress_controller.upstream.response.length_list": [
+            "0",
+            "0"
+        ],
+        "nginx.ingress_controller.upstream.response.status_code": 502,
+        "nginx.ingress_controller.upstream.response.status_code_list": [
+            "502",
+            "502"
+        ],
+        "nginx.ingress_controller.upstream.response.time": 0.0,
+        "nginx.ingress_controller.upstream.response.time_list": [
+            "0.000",
+            "0.000"
+        ],
+        "nginx.ingress_controller.upstream_address_list": [
+            "[2a02:cf40::4e36]:5000",
+            "[2a02:cf40::7]:5000"
+        ],
+        "related.ip": [
+            "2a02:cf40::4e36"
+        ],
+        "service.type": "nginx",
+        "source.address": "2a02:cf40::4e36",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "NO",
+        "source.geo.country_name": "Norway",
+        "source.geo.location.lat": 62.0,
+        "source.geo.location.lon": 10.0,
+        "source.ip": "2a02:cf40::4e36",
+        "url.extension": "ico",
+        "url.original": "/favicon.ico",
+        "url.path": "/favicon.ico",
+        "user_agent.device.name": "Mac",
+        "user_agent.name": "Chrome",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+        "user_agent.os.full": "Mac OS X 10.15.7",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.15.7",
+        "user_agent.version": "104.0.0.0"
+    },
+    {
+        "@timestamp": "2022-08-24T18:05:41.000Z",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "2a02:cf40::4e36 - - [24/Aug/2022:18:05:41 +0000] \"GET /favicon.ico HTTP/2.0\" 502 552 \"https://localhost:8080/\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36\" 27 0.000 [localhost-8080] [] [2a02:cf40::7]:5000, [2a02:cf40::::::::4e36]:500000000 0, 0 0.000, 0.000 502, 502 3db73c6c673c4256ade033a6ce08c2ab",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "ingress_controller",
+        "http.request.id": "3db73c6c673c4256ade033a6ce08c2ab",
+        "http.request.method": "GET",
+        "http.request.referrer": "https://localhost:8080/",
+        "http.response.body.bytes": 552,
+        "http.response.status_code": 502,
+        "http.version": "2.0",
+        "input.type": "log",
+        "log.offset": 7055,
+        "nginx.ingress_controller.http.request.id": "3db73c6c673c4256ade033a6ce08c2ab",
+        "nginx.ingress_controller.http.request.length": 27,
+        "nginx.ingress_controller.http.request.time": 0.0,
+        "nginx.ingress_controller.remote_ip_list": [
+            "2a02:cf40::4e36"
+        ],
+        "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.name": "localhost-8080",
+        "nginx.ingress_controller.upstream.response.length": 0,
+        "nginx.ingress_controller.upstream.response.length_list": [
+            "0",
+            "0"
+        ],
+        "nginx.ingress_controller.upstream.response.status_code": 502,
+        "nginx.ingress_controller.upstream.response.status_code_list": [
+            "502",
+            "502"
+        ],
+        "nginx.ingress_controller.upstream.response.time": 0.0,
+        "nginx.ingress_controller.upstream.response.time_list": [
+            "0.000",
+            "0.000"
+        ],
+        "nginx.ingress_controller.upstream_address_list": [
+            "[2a02:cf40::7]:5000",
+            "[2a02:cf40::::::::4e36]:500000000"
+        ],
+        "related.ip": [
+            "2a02:cf40::4e36"
+        ],
+        "service.type": "nginx",
+        "source.address": "2a02:cf40::4e36",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "NO",
+        "source.geo.country_name": "Norway",
+        "source.geo.location.lat": 62.0,
+        "source.geo.location.lon": 10.0,
+        "source.ip": "2a02:cf40::4e36",
+        "url.extension": "ico",
+        "url.original": "/favicon.ico",
+        "url.path": "/favicon.ico",
+        "user_agent.device.name": "Mac",
+        "user_agent.name": "Chrome",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+        "user_agent.os.full": "Mac OS X 10.15.7",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.15.7",
+        "user_agent.version": "104.0.0.0"
+    },
+    {
+        "@timestamp": "2020-02-07T11:56:54.000Z",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "192.168.64.1 - - [07/Feb/2020:11:56:54 +0000] \"GET /products/42 HTTP/1.1\" 200 59 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15\" 369 0.002 [default-web-8080] [] unix:/var/run/php-fpm.sock 59 0.002 200 0f76ea730f282d5759018eb756b23b14",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "ingress_controller",
+        "http.request.id": "0f76ea730f282d5759018eb756b23b14",
+        "http.request.method": "GET",
+        "http.response.body.bytes": 59,
+        "http.response.status_code": 200,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 7430,
+        "nginx.ingress_controller.http.request.id": "0f76ea730f282d5759018eb756b23b14",
+        "nginx.ingress_controller.http.request.length": 369,
+        "nginx.ingress_controller.http.request.time": 0.002,
+        "nginx.ingress_controller.remote_ip_list": [
+            "192.168.64.1"
+        ],
+        "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.name": "default-web-8080",
+        "nginx.ingress_controller.upstream.response.length": 59,
+        "nginx.ingress_controller.upstream.response.length_list": [
+            "59"
+        ],
+        "nginx.ingress_controller.upstream.response.status_code": 200,
+        "nginx.ingress_controller.upstream.response.status_code_list": [
+            "200"
+        ],
+        "nginx.ingress_controller.upstream.response.time": 0.002,
+        "nginx.ingress_controller.upstream.response.time_list": [
+            "0.002"
+        ],
+        "nginx.ingress_controller.upstream_address_list": [
+            "unix:/var/run/php-fpm.sock"
+        ],
+        "related.ip": [
+            "192.168.64.1"
+        ],
+        "service.type": "nginx",
+        "source.address": "192.168.64.1",
+        "source.ip": "192.168.64.1",
+        "url.original": "/products/42",
+        "url.path": "/products/42",
+        "user_agent.device.name": "Mac",
+        "user_agent.name": "Safari",
+        "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.5 Safari/605.1.15",
+        "user_agent.os.full": "Mac OS X 10.14.6",
+        "user_agent.os.name": "Mac OS X",
+        "user_agent.os.version": "10.14.6",
+        "user_agent.version": "13.0.5"
+    },
+    {
+        "@timestamp": "2020-02-07T12:02:42.000Z",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "nginx.ingress_controller",
+        "event.kind": "event",
+        "event.module": "nginx",
+        "event.original": "192.168.64.14 - - [07/Feb/2020:12:02:42 +0000] \"GET /test/test.mp4 HTTP/1.1\" 200 61 \"-\" \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0\" 348 0.001 [default-web2-8080] [] 172.17.0.6:8080, 172.17.0.7:8080 - 0.100, - 200, - 835136ae24486dbb4156dcbe21f5d402",
+        "event.outcome": "success",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "info"
+        ],
+        "fileset.name": "ingress_controller",
+        "http.request.id": "835136ae24486dbb4156dcbe21f5d402",
+        "http.request.method": "GET",
+        "http.response.body.bytes": 61,
+        "http.response.status_code": 200,
+        "http.version": "1.1",
+        "input.type": "log",
+        "log.offset": 7742,
+        "nginx.ingress_controller.http.request.id": "835136ae24486dbb4156dcbe21f5d402",
+        "nginx.ingress_controller.http.request.length": 348,
+        "nginx.ingress_controller.http.request.time": 0.001,
+        "nginx.ingress_controller.remote_ip_list": [
+            "192.168.64.14"
+        ],
+        "nginx.ingress_controller.upstream.alternative_name": "",
+        "nginx.ingress_controller.upstream.ip": "172.17.0.7",
+        "nginx.ingress_controller.upstream.name": "default-web2-8080",
+        "nginx.ingress_controller.upstream.port": 8080,
+        "nginx.ingress_controller.upstream.response.status_code": 200,
+        "nginx.ingress_controller.upstream.response.status_code_list": [
+            "-",
+            "200"
+        ],
+        "nginx.ingress_controller.upstream.response.time": 0.1,
+        "nginx.ingress_controller.upstream.response.time_list": [
+            "-",
+            "0.100"
+        ],
+        "nginx.ingress_controller.upstream_address_list": [
+            "172.17.0.6:8080",
+            "172.17.0.7:8080"
+        ],
+        "related.ip": [
+            "172.17.0.7",
+            "192.168.64.14"
+        ],
+        "service.type": "nginx",
+        "source.address": "192.168.64.14",
+        "source.ip": "192.168.64.14",
+        "url.extension": "mp4",
+        "url.original": "/test/test.mp4",
+        "url.path": "/test/test.mp4",
         "user_agent.device.name": "Mac",
         "user_agent.name": "Firefox",
         "user_agent.original": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:72.0) Gecko/20100101 Firefox/72.0",

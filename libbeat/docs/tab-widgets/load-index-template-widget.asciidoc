@@ -1,0 +1,112 @@
+++++
+<div class="tabs" data-tab-group="os">
+  <div role="tablist" aria-label="Load index template">
+    <button role="tab"
+            aria-selected="true"
+            aria-controls="deb-tab-load-index-template"
+            id="deb-load-index-template">
+      DEB
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="rpm-tab-load-index-template"
+            id="rpm-load-index-template"
+            tabindex="-1">
+      RPM
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="mac-tab-load-index-template"
+            id="mac-load-index-template"
+            tabindex="-1">
+      MacOS
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="linux-tab-load-index-template"
+            id="linux-load-index-template"
+            tabindex="-1">
+      Linux
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="docker-tab-load-index-template"
+            id="docker-load-index-template"
+            tabindex="-1">
+      Docker
+    </button>
+    <button role="tab"
+            aria-selected="false"
+            aria-controls="win-tab-load-index-template"
+            id="win-load-index-template"
+            tabindex="-1">            
+      Windows
+    </button>
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="deb-tab-load-index-template"
+       aria-labelledby="deb-load-index-template">
+++++
+
+include::load-index-template.asciidoc[tag=deb]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="rpm-tab-load-index-template"
+       aria-labelledby="rpm-load-index-template"
+       hidden="">
+++++
+
+include::load-index-template.asciidoc[tag=rpm]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="mac-tab-load-index-template"
+       aria-labelledby="mac-load-index-template"
+       hidden="">
+++++
+
+include::load-index-template.asciidoc[tag=mac]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="linux-tab-load-index-template"
+       aria-labelledby="linux-load-index-template"
+       hidden="">
+++++
+
+include::load-index-template.asciidoc[tag=linux]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"
+       id="docker-tab-load-index-template"
+       aria-labelledby="docker-load-index-template"
+       hidden="">
+++++
+
+include::load-index-template.asciidoc[tag=docker]
+
+++++
+  </div>
+  <div tabindex="0"
+       role="tabpanel"v
+       id="win-tab-load-index-template"
+       aria-labelledby="win-load-index-template"
+       hidden="">
+++++
+
+include::load-index-template.asciidoc[tag=win]
+
+++++
+  </div>
+</div>
+++++

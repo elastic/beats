@@ -21,9 +21,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 type redisConfig struct {
@@ -40,6 +41,7 @@ type redisConfig struct {
 	Db          int                   `config:"db"`
 	DataType    string                `config:"datatype"`
 	Backoff     backoff               `config:"backoff"`
+	Queue       config.Namespace      `config:"queue"`
 }
 
 type backoff struct {

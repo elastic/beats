@@ -16,20 +16,19 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package service
 
 import (
 	"crypto/sha256"
 	"encoding/base64"
+	"fmt"
 	"strconv"
 	"syscall"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/windows/registry"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -54,7 +53,7 @@ type Reader struct {
 func NewReader() (*Reader, error) {
 	handle, err := openSCManager("", "", ScManagerEnumerateService|ScManagerConnect)
 	if err != nil {
-		return nil, errors.Wrap(err, "initialization failed")
+		return nil, fmt.Errorf("initialization failed: %w", err)
 	}
 
 	guid, err := getMachineGUID()
@@ -73,16 +72,16 @@ func NewReader() (*Reader, error) {
 	return r, nil
 }
 
-func (reader *Reader) Read() ([]common.MapStr, error) {
+func (reader *Reader) Read() ([]mapstr.M, error) {
 	services, err := GetServiceStates(reader.handle, reader.state, reader.protectedServices)
 	if err != nil {
 		return nil, err
 	}
 
-	result := make([]common.MapStr, 0, len(services))
+	result := make([]mapstr.M, 0, len(services))
 
 	for _, service := range services {
-		ev := common.MapStr{
+		ev := mapstr.M{
 			"id":           reader.getServiceID(service.ServiceName),
 			"display_name": service.DisplayName,
 			"name":         service.ServiceName,
@@ -152,12 +151,12 @@ func getMachineGUID() (string, error) {
 
 	k, err := registry.OpenKey(key, path, registry.READ|registry.WOW64_64KEY)
 	if err != nil {
-		return "", errors.Wrapf(err, `failed to open HKLM\%v`, path)
+		return "", fmt.Errorf(`failed to open HKLM\%v: %w`, path, err)
 	}
 
 	guid, _, err := k.GetStringValue(name)
 	if err != nil {
-		return "", errors.Wrapf(err, `failed to get value of HKLM\%v\%v`, path, name)
+		return "", fmt.Errorf(`failed to get value of HKLM\%v\%v: %w`, path, name, err)
 	}
 
 	return guid, nil

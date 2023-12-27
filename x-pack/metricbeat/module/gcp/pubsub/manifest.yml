@@ -51,3 +51,7 @@ input:
           - "topic/send_message_operation_count"
           - "topic/send_request_count"
           - "topic/unacked_bytes_by_region"
+          - "subscription/ack_latencies"
+          - "subscription/push_request_latencies"
+          - "topic/message_sizes"
+

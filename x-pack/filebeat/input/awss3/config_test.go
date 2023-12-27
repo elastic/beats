@@ -13,10 +13,11 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConfig(t *testing.T) {
@@ -27,7 +28,7 @@ func TestConfig(t *testing.T) {
 		// Have a separate copy of defaults in the test to make it clear when
 		// anyone changes the defaults.
 		parserConf := parser.Config{}
-		require.NoError(t, parserConf.Unpack(common.MustNewConfigFrom("")))
+		require.NoError(t, parserConf.Unpack(conf.MustNewConfigFrom("")))
 		return config{
 			QueueURL:            quequeURL,
 			BucketARN:           s3Bucket,
@@ -54,52 +55,52 @@ func TestConfig(t *testing.T) {
 		queueURL       string
 		s3Bucket       string
 		nonAWSS3Bucket string
-		config         common.MapStr
+		config         mapstr.M
 		expectedErr    string
-		expectedCfg    func(queueURL, s3Bucket string, nonAWSS3Bucket string) config
+		expectedCfg    func(queueURL, s3Bucket, nonAWSS3Bucket string) config
 	}{
 		{
-			"input with defaults for queueURL",
-			queueURL,
-			"",
-			"",
-			common.MapStr{
+			name:           "input with defaults for queueURL",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"queue_url": queueURL,
 			},
-			"",
-			makeConfig,
+			expectedErr: "",
+			expectedCfg: makeConfig,
 		},
 		{
-			"input with defaults for s3Bucket",
-			"",
-			s3Bucket,
-			"",
-			common.MapStr{
+			name:           "input with defaults for s3Bucket",
+			queueURL:       "",
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"bucket_arn":        s3Bucket,
 				"number_of_workers": 5,
 			},
-			"",
-			func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
+			expectedErr: "",
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
 				c := makeConfig("", s3Bucket, "")
 				c.NumberOfWorkers = 5
 				return c
 			},
 		},
 		{
-			"input with file_selectors",
-			queueURL,
-			"",
-			"",
-			common.MapStr{
+			name:           "input with file_selectors",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"queue_url": queueURL,
-				"file_selectors": []common.MapStr{
+				"file_selectors": []mapstr.M{
 					{
 						"regex": "/CloudTrail/",
 					},
 				},
 			},
-			"",
-			func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
+			expectedErr: "",
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
 				c := makeConfig(queueURL, "", "")
 				regex := match.MustCompile("/CloudTrail/")
 				c.FileSelectors = []fileSelectorConfig{
@@ -112,275 +113,455 @@ func TestConfig(t *testing.T) {
 			},
 		},
 		{
-			"error on no queueURL and s3Bucket and nonAWSS3Bucket",
-			"",
-			"",
-			"",
-			common.MapStr{
+			name:           "non-AWS_endpoint_with_explicit_region",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
+				"queue_url": queueURL,
+				"region":    "region",
+				"endpoint":  "ep",
+			},
+			expectedErr: "",
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
+				c := makeConfig(queueURL, "", "")
+				c.RegionName = "region"
+				c.AWSConfig.Endpoint = "ep"
+				return c
+			},
+		},
+		{
+			name:           "explicit_AWS_endpoint_with_explicit_region",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
+				"queue_url": "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+				"region":    "region",
+				"endpoint":  "amazonaws.com",
+			},
+			expectedErr: "",
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
+				c := makeConfig(queueURL, "", "")
+				c.QueueURL = "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs"
+				c.AWSConfig.Endpoint = "amazonaws.com"
+				c.RegionName = "region"
+				return c
+			},
+		},
+		{
+			name:           "inferred_AWS_endpoint_with_explicit_region",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
+				"queue_url": "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+				"region":    "region",
+			},
+			expectedErr: "",
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
+				c := makeConfig(queueURL, "", "")
+				c.QueueURL = "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs"
+				c.RegionName = "region"
+				return c
+			},
+		},
+		{
+			name:           "localstack_with_region_name",
+			queueURL:       "http://localhost:4566/000000000000/sample-queue",
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
+				"queue_url": "http://localhost:4566/000000000000/sample-queue",
+				"region":    "myregion",
+			},
+			expectedErr: "",
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
+				c := makeConfig(queueURL, "", "")
+				c.RegionName = "myregion"
+				return c
+			},
+		},
+		{
+			name:           "error on no queueURL and s3Bucket and nonAWSS3Bucket",
+			queueURL:       "",
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"queue_url":           "",
 				"bucket_arn":          "",
 				"non_aws_bucket_name": "",
 			},
-			"neither queue_url, bucket_arn nor non_aws_bucket_name were provided",
-			nil,
+			expectedErr: "neither queue_url, bucket_arn nor non_aws_bucket_name were provided",
+			expectedCfg: nil,
 		},
 		{
-			"error on both queueURL and s3Bucket",
-			queueURL,
-			s3Bucket,
-			"",
-			common.MapStr{
+			name:           "error on both queueURL and s3Bucket",
+			queueURL:       queueURL,
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"queue_url":  queueURL,
 				"bucket_arn": s3Bucket,
 			},
-			"queue_url <https://example.com>, bucket_arn <arn:aws:s3:::aBucket>, non_aws_bucket_name <> cannot be set at the same time",
-			nil,
+			expectedErr: "queue_url <https://example.com>, bucket_arn <arn:aws:s3:::aBucket>, non_aws_bucket_name <> cannot be set at the same time",
+			expectedCfg: nil,
 		},
 		{
-			"error on both queueURL and NonAWSS3Bucket",
-			queueURL,
-			"",
-			nonAWSS3Bucket,
-			common.MapStr{
+			name:           "error on both queueURL and NonAWSS3Bucket",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: nonAWSS3Bucket,
+			config: mapstr.M{
 				"queue_url":           queueURL,
 				"non_aws_bucket_name": nonAWSS3Bucket,
 			},
-			"queue_url <https://example.com>, bucket_arn <>, non_aws_bucket_name <minio-bucket> cannot be set at the same time",
-			nil,
+			expectedErr: "queue_url <https://example.com>, bucket_arn <>, non_aws_bucket_name <minio-bucket> cannot be set at the same time",
+			expectedCfg: nil,
 		},
 		{
-			"error on both s3Bucket and NonAWSS3Bucket",
-			"",
-			s3Bucket,
-			nonAWSS3Bucket,
-			common.MapStr{
+			name:           "error on both s3Bucket and NonAWSS3Bucket",
+			queueURL:       "",
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: nonAWSS3Bucket,
+			config: mapstr.M{
 				"bucket_arn":          s3Bucket,
 				"non_aws_bucket_name": nonAWSS3Bucket,
 			},
-			"queue_url <>, bucket_arn <arn:aws:s3:::aBucket>, non_aws_bucket_name <minio-bucket> cannot be set at the same time",
-			nil,
+			expectedErr: "queue_url <>, bucket_arn <arn:aws:s3:::aBucket>, non_aws_bucket_name <minio-bucket> cannot be set at the same time",
+			expectedCfg: nil,
 		},
 		{
-			"error on queueURL, s3Bucket, and NonAWSS3Bucket",
-			queueURL,
-			s3Bucket,
-			nonAWSS3Bucket,
-			common.MapStr{
+			name:           "error on queueURL, s3Bucket, and NonAWSS3Bucket",
+			queueURL:       queueURL,
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: nonAWSS3Bucket,
+			config: mapstr.M{
 				"queue_url":           queueURL,
 				"bucket_arn":          s3Bucket,
 				"non_aws_bucket_name": nonAWSS3Bucket,
 			},
-			"queue_url <https://example.com>, bucket_arn <arn:aws:s3:::aBucket>, non_aws_bucket_name <minio-bucket> cannot be set at the same time",
-			nil,
+			expectedErr: "queue_url <https://example.com>, bucket_arn <arn:aws:s3:::aBucket>, non_aws_bucket_name <minio-bucket> cannot be set at the same time",
+			expectedCfg: nil,
 		},
 		{
-			"error on api_timeout == 0",
-			queueURL,
-			"",
-			"",
-			common.MapStr{
+			name:           "error on api_timeout == 0",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"queue_url":   queueURL,
 				"api_timeout": "0",
 			},
-			"api_timeout <0s> must be greater than the sqs.wait_time <20s",
-			nil,
+			expectedErr: "api_timeout <0s> must be greater than the sqs.wait_time <20s",
+			expectedCfg: nil,
 		},
 		{
-			"error on visibility_timeout == 0",
-			queueURL,
-			"",
-			"",
-			common.MapStr{
+			name:           "error on visibility_timeout == 0",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"queue_url":          queueURL,
 				"visibility_timeout": "0",
 			},
-			"visibility_timeout <0s> must be greater than 0 and less than or equal to 12h",
-			nil,
+			expectedErr: "visibility_timeout <0s> must be greater than 0 and less than or equal to 12h",
+			expectedCfg: nil,
 		},
 		{
-			"error on visibility_timeout > 12h",
-			queueURL,
-			"",
-			"",
-			common.MapStr{
+			name:           "error on visibility_timeout > 12h",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"queue_url":          queueURL,
 				"visibility_timeout": "12h1ns",
 			},
-			"visibility_timeout <12h0m0.000000001s> must be greater than 0 and less than or equal to 12h",
-			nil,
+			expectedErr: "visibility_timeout <12h0m0.000000001s> must be greater than 0 and less than or equal to 12h",
+			expectedCfg: nil,
 		},
 		{
-			"error on bucket_list_interval == 0",
-			"",
-			s3Bucket,
-			"",
-			common.MapStr{
+			name:           "error on bucket_list_interval == 0",
+			queueURL:       "",
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"bucket_arn":           s3Bucket,
 				"bucket_list_interval": "0",
 			},
-			"bucket_list_interval <0s> must be greater than 0",
-			nil,
+			expectedErr: "bucket_list_interval <0s> must be greater than 0",
+			expectedCfg: nil,
 		},
 		{
-			"error on number_of_workers == 0",
-			"",
-			s3Bucket,
-			"",
-			common.MapStr{
+			name:           "error on number_of_workers == 0",
+			queueURL:       "",
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"bucket_arn":        s3Bucket,
 				"number_of_workers": "0",
 			},
-			"number_of_workers <0> must be greater than 0",
-			nil,
+			expectedErr: "number_of_workers <0> must be greater than 0",
+			expectedCfg: nil,
 		},
 		{
-			"error on max_number_of_messages == 0",
-			queueURL,
-			"",
-			"",
-			common.MapStr{
+			name:           "error on max_number_of_messages == 0",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"queue_url":              queueURL,
 				"max_number_of_messages": "0",
 			},
-			"max_number_of_messages <0> must be greater than 0",
-			nil,
+			expectedErr: "max_number_of_messages <0> must be greater than 0",
+			expectedCfg: nil,
 		},
 		{
-			"error on buffer_size == 0 ",
-			queueURL,
-			"",
-			"",
-			common.MapStr{
+			name:           "error on buffer_size == 0 ",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"queue_url":   queueURL,
 				"buffer_size": "0",
 			},
-			"buffer_size <0> must be greater than 0",
-			nil,
+			expectedErr: "buffer_size <0> must be greater than 0",
+			expectedCfg: nil,
 		},
 		{
-			"error on max_bytes == 0 ",
-			queueURL,
-			"",
-			"",
-			common.MapStr{
+			name:           "error on max_bytes == 0 ",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"queue_url": queueURL,
 				"max_bytes": "0",
 			},
-			"max_bytes <0> must be greater than 0",
-			nil,
+			expectedErr: "max_bytes <0> must be greater than 0",
+			expectedCfg: nil,
 		},
 		{
-			"error on expand_event_list_from_field and content_type != application/json ",
-			queueURL,
-			"",
-			"",
-			common.MapStr{
+			name:           "error on expand_event_list_from_field and content_type != application/json ",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"queue_url":                    queueURL,
 				"expand_event_list_from_field": "Records",
 				"content_type":                 "text/plain",
 			},
-			"content_type must be `application/json` when expand_event_list_from_field is used",
-			nil,
+			expectedErr: "content_type must be `application/json` when expand_event_list_from_field is used",
+			expectedCfg: nil,
 		},
 		{
-			"error on expand_event_list_from_field and content_type != application/json ",
-			"",
-			s3Bucket,
-			"",
-			common.MapStr{
+			name:           "error on expand_event_list_from_field and content_type != application/json ",
+			queueURL:       "",
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"bucket_arn":                   s3Bucket,
 				"expand_event_list_from_field": "Records",
 				"content_type":                 "text/plain",
 			},
-			"content_type must be `application/json` when expand_event_list_from_field is used",
-			nil,
+			expectedErr: "content_type must be `application/json` when expand_event_list_from_field is used",
+			expectedCfg: nil,
 		},
 		{
-			"input with defaults for non-AWS S3 Bucket",
-			"",
-			"",
-			nonAWSS3Bucket,
-			common.MapStr{
+			name:           "input with defaults for non-AWS S3 Bucket",
+			queueURL:       "",
+			s3Bucket:       "",
+			nonAWSS3Bucket: nonAWSS3Bucket,
+			config: mapstr.M{
 				"non_aws_bucket_name": nonAWSS3Bucket,
 				"number_of_workers":   5,
 			},
-			"",
-			func(queueURL, s3Bucket string, nonAWSS3Bucket string) config {
+			expectedErr: "",
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
 				c := makeConfig("", "", nonAWSS3Bucket)
 				c.NumberOfWorkers = 5
 				return c
 			},
 		},
 		{
-			"error on FIPS with non-AWS S3 Bucket",
-			"",
-			"",
-			nonAWSS3Bucket,
-			common.MapStr{
+			name:           "error on FIPS with non-AWS S3 Bucket",
+			queueURL:       "",
+			s3Bucket:       "",
+			nonAWSS3Bucket: nonAWSS3Bucket,
+			config: mapstr.M{
 				"non_aws_bucket_name": nonAWSS3Bucket,
 				"number_of_workers":   5,
 				"fips_enabled":        true,
 			},
-			"fips_enabled cannot be used with a non-AWS S3 bucket.",
-			nil,
+			expectedErr: "fips_enabled cannot be used with a non-AWS S3 bucket",
+			expectedCfg: nil,
 		},
 		{
-			"error on path_style with AWS native S3 Bucket",
-			"",
-			s3Bucket,
-			"",
-			common.MapStr{
+			name:           "error on path_style with AWS native S3 Bucket",
+			queueURL:       "",
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"bucket_arn":        s3Bucket,
 				"number_of_workers": 5,
 				"path_style":        true,
 			},
-			"path_style can only be used when polling non-AWS S3 services",
-			nil,
+			expectedErr: "path_style can only be used when polling non-AWS S3 services",
+			expectedCfg: nil,
 		},
 		{
-			"error on path_style with AWS SQS Queue",
-			queueURL,
-			"",
-			"",
-			common.MapStr{
-				"queue_url":         queueURL,
-				"number_of_workers": 5,
-				"path_style":        true,
-			},
-			"path_style can only be used when polling non-AWS S3 services",
-			nil,
-		},
-		{
-			"error on provider with AWS native S3 Bucket",
-			"",
-			s3Bucket,
-			"",
-			common.MapStr{
+			name:           "error on provider with AWS native S3 Bucket",
+			queueURL:       "",
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"bucket_arn":        s3Bucket,
 				"number_of_workers": 5,
 				"provider":          "asdf",
 			},
-			"provider can only be overriden when polling non-AWS S3 services",
-			nil,
+			expectedErr: "provider can only be overridden when polling non-AWS S3 services",
+			expectedCfg: nil,
 		},
 		{
-			"error on provider with AWS SQS Queue",
-			queueURL,
-			"",
-			"",
-			common.MapStr{
+			name:           "error on provider with AWS SQS Queue",
+			queueURL:       queueURL,
+			s3Bucket:       "",
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
 				"queue_url":         queueURL,
 				"number_of_workers": 5,
 				"provider":          "asdf",
 			},
-			"provider can only be overriden when polling non-AWS S3 services",
-			nil,
+			expectedErr: "provider can only be overridden when polling non-AWS S3 services",
+			expectedCfg: nil,
+		},
+		{
+			name:           "backup_to_bucket with AWS",
+			queueURL:       "",
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
+				"bucket_arn":              s3Bucket,
+				"backup_to_bucket_arn":    "arn:aws:s3:::bBucket",
+				"backup_to_bucket_prefix": "backup",
+				"number_of_workers":       5,
+			},
+			expectedErr: "",
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
+				c := makeConfig("", s3Bucket, "")
+				c.BackupConfig.BackupToBucketArn = "arn:aws:s3:::bBucket"
+				c.BackupConfig.BackupToBucketPrefix = "backup"
+				c.NumberOfWorkers = 5
+				return c
+			},
+		},
+		{
+			name:           "backup_to_bucket with non-AWS",
+			queueURL:       "",
+			s3Bucket:       "",
+			nonAWSS3Bucket: nonAWSS3Bucket,
+			config: mapstr.M{
+				"non_aws_bucket_name":           nonAWSS3Bucket,
+				"non_aws_backup_to_bucket_name": "bBucket",
+				"backup_to_bucket_prefix":       "backup",
+				"number_of_workers":             5,
+			},
+			expectedErr: "",
+			expectedCfg: func(queueURL, s3Bucket, nonAWSS3Bucket string) config {
+				c := makeConfig("", "", nonAWSS3Bucket)
+				c.NonAWSBucketName = nonAWSS3Bucket
+				c.BackupConfig.NonAWSBackupToBucketName = "bBucket"
+				c.BackupConfig.BackupToBucketPrefix = "backup"
+				c.NumberOfWorkers = 5
+				return c
+			},
+		},
+		{
+			name:           "error with non-AWS backup and AWS source",
+			queueURL:       "",
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
+				"bucket_arn":                    s3Bucket,
+				"non_aws_backup_to_bucket_name": "bBucket",
+				"number_of_workers":             5,
+			},
+			expectedErr: "backup to non-AWS bucket can only be used for non-AWS sources",
+			expectedCfg: nil,
+		},
+		{
+			name:           "error with AWS backup and non-AWS source",
+			queueURL:       "",
+			s3Bucket:       "",
+			nonAWSS3Bucket: nonAWSS3Bucket,
+			config: mapstr.M{
+				"non_aws_bucket_name":  nonAWSS3Bucket,
+				"backup_to_bucket_arn": "arn:aws:s3:::bBucket",
+				"number_of_workers":    5,
+			},
+			expectedErr: "backup to AWS bucket can only be used for AWS sources",
+			expectedCfg: nil,
+		},
+		{
+			name:           "error with same bucket backup and empty backup prefix",
+			queueURL:       "",
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
+				"bucket_arn":           s3Bucket,
+				"backup_to_bucket_arn": s3Bucket,
+				"number_of_workers":    5,
+			},
+			expectedErr: "backup_to_bucket_prefix is a required property when source and backup bucket are the same",
+			expectedCfg: nil,
+		},
+		{
+			name:           "error with same bucket backup (non-AWS) and empty backup prefix",
+			queueURL:       "",
+			s3Bucket:       "",
+			nonAWSS3Bucket: nonAWSS3Bucket,
+			config: mapstr.M{
+				"non_aws_bucket_name":           nonAWSS3Bucket,
+				"non_aws_backup_to_bucket_name": nonAWSS3Bucket,
+				"number_of_workers":             5,
+			},
+			expectedErr: "backup_to_bucket_prefix is a required property when source and backup bucket are the same",
+			expectedCfg: nil,
+		},
+		{
+			name:           "error with same bucket backup and backup prefix equal to list prefix",
+			queueURL:       "",
+			s3Bucket:       s3Bucket,
+			nonAWSS3Bucket: "",
+			config: mapstr.M{
+				"bucket_arn":              s3Bucket,
+				"backup_to_bucket_arn":    s3Bucket,
+				"number_of_workers":       5,
+				"backup_to_bucket_prefix": "processed_",
+				"bucket_list_prefix":      "processed_",
+			},
+			expectedErr: "backup_to_bucket_prefix cannot be the same as bucket_list_prefix, this will create an infinite loop",
+			expectedCfg: nil,
+		},
+		{
+			name:           "error with same bucket backup (non-AWS) and backup prefix equal to list prefix",
+			queueURL:       "",
+			s3Bucket:       "",
+			nonAWSS3Bucket: nonAWSS3Bucket,
+			config: mapstr.M{
+				"non_aws_bucket_name":           nonAWSS3Bucket,
+				"non_aws_backup_to_bucket_name": nonAWSS3Bucket,
+				"number_of_workers":             5,
+				"backup_to_bucket_prefix":       "processed_",
+				"bucket_list_prefix":            "processed_",
+			},
+			expectedErr: "backup_to_bucket_prefix cannot be the same as bucket_list_prefix, this will create an infinite loop",
+			expectedCfg: nil,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			in := common.MustNewConfigFrom(tc.config)
+			in := conf.MustNewConfigFrom(tc.config)
 
 			c := defaultConfig()
 			if err := in.Unpack(&c); err != nil {

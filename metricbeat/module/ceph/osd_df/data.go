@@ -19,10 +19,9 @@ package osd_df
 
 import (
 	"encoding/json"
+	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Node represents a node object
@@ -47,19 +46,19 @@ type OsdDfRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte) ([]mapstr.M, error) {
 	var d OsdDfRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting data for OSD_DF")
+		return nil, fmt.Errorf("error getting data for OSD_DF: %w", err)
 	}
 
 	nodeList := d.Output.Nodes
 
 	//osd node list
-	events := []common.MapStr{}
+	events := []mapstr.M{}
 	for _, node := range nodeList {
-		nodeInfo := common.MapStr{
+		nodeInfo := mapstr.M{
 			"id":             node.ID,
 			"name":           node.Name,
 			"total.byte":     node.Total,

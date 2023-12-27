@@ -20,10 +20,10 @@ package cmd
 import (
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/winlogbeat/beater"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	// Register fields.
 	_ "github.com/elastic/beats/v7/winlogbeat/include"
@@ -38,8 +38,8 @@ const (
 )
 
 // withECSVersion is a modifier that adds ecs.version to events.
-var withECSVersion = processing.WithFields(common.MapStr{
-	"ecs": common.MapStr{
+var withECSVersion = processing.WithFields(mapstr.M{
+	"ecs": mapstr.M{
 		"version": ecs.Version,
 	},
 })
@@ -52,7 +52,7 @@ func WinlogbeatSettings() instance.Settings {
 	return instance.Settings{
 		Name:          Name,
 		HasDashboards: true,
-		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithAgentMeta()),
+		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithAgentMeta()),
 	}
 }
 

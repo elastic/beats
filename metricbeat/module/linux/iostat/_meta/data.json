@@ -8,10 +8,10 @@
     "linux": {
         "iostat": {
             "await": 0,
-            "busy": 0,
-            "name": "sr0",
+            "busy": 0.1503,
+            "name": "sda",
             "queue": {
-                "avg_size": 0
+                "avg_size": 0.0005
             },
             "read": {
                 "await": 0,
@@ -24,17 +24,17 @@
                 }
             },
             "request": {
-                "avg_size": 0
+                "avg_size": 2867.2
             },
-            "service_time": 0,
+            "service_time": 0.3,
             "write": {
                 "await": 0,
                 "per_sec": {
-                    "bytes": 0
+                    "bytes": 14365.929
                 },
                 "request": {
                     "merges_per_sec": 0,
-                    "per_sec": 0
+                    "per_sec": 5.0104
                 }
             }
         }

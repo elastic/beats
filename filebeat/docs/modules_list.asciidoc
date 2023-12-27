@@ -56,6 +56,7 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-rabbitmq>>
   * <<filebeat-module-radware>>
   * <<filebeat-module-redis>>
+  * <<filebeat-module-salesforce>>
   * <<filebeat-module-santa>>
   * <<filebeat-module-snort>>
   * <<filebeat-module-snyk>>
@@ -129,6 +130,7 @@ include::modules/proofpoint.asciidoc[]
 include::modules/rabbitmq.asciidoc[]
 include::modules/radware.asciidoc[]
 include::modules/redis.asciidoc[]
+include::modules/salesforce.asciidoc[]
 include::modules/santa.asciidoc[]
 include::modules/snort.asciidoc[]
 include::modules/snyk.asciidoc[]

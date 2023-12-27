@@ -8,16 +8,15 @@ import (
 	"context"
 	"time"
 
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // MetadataService must be implemented by GCP services that requires non out-of-the box code that is not fulfil by the Stackdriver
 // metricset. For example, Compute instance labels.
 type MetadataService interface {
 	MetadataCollector
-	Identity
 }
 
 // MetadataCollector must be implemented by services that has special code needs that aren't fulfilled by the Stackdriver
@@ -55,20 +54,13 @@ type MetadataCollectorInputData struct {
 	ProjectID  string
 	Zone       string
 	Region     string
+	Regions    []string
 	Point      *monitoringpb.Point
 	Timestamp  *time.Time
 }
 
 // MetadataCollectorData contains the set of ECS and normal labels that we extract from GCP services
 type MetadataCollectorData struct {
-	Labels common.MapStr
-	ECS    common.MapStr
-}
-
-// Identity must be implemented by GCP services that can add some short of data to group their metrics (like instance
-// id on Compute or topic in PubSub)
-type Identity interface {
-
-	// ID returns a unique identifier to group many metrics into a single event
-	ID(ctx context.Context, in *MetadataCollectorInputData) (string, error)
+	Labels mapstr.M
+	ECS    mapstr.M
 }

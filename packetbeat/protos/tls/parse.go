@@ -18,7 +18,7 @@
 package tls
 
 import (
-	"crypto/dsa"
+	"crypto/dsa" //lint:ignore SA1019 Deprecated, but still used. So we have to handle it.
 	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/x509"
@@ -27,9 +27,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type direction uint8
@@ -212,8 +212,8 @@ func (header *recordHeader) isValid() bool {
 	return header.version.major == 3 && header.length <= maxTLSRecordLength
 }
 
-func (hello *helloMessage) toMap() common.MapStr {
-	m := common.MapStr{
+func (hello *helloMessage) toMap() mapstr.M {
+	m := mapstr.M{
 		"version": fmt.Sprintf("%d.%d", hello.version.major, hello.version.minor),
 	}
 	if len(hello.sessionID) != 0 {
@@ -309,14 +309,28 @@ func (parser *parser) parse(buf *streambuf.Buffer) parserResult {
 	return resultMore
 }
 
-func (parser *parser) bufferHandshake(buf *streambuf.Buffer, length int) error {
+func (parser *parser) bufferHandshake(buf *streambuf.Buffer, length int) (err error) {
 	// TODO: parse in-place if message in received buffer is complete
-	if err := parser.handshakeBuf.Append(buf.Bytes()[recordHeaderSize : recordHeaderSize+length]); err != nil {
+	err = parser.handshakeBuf.Append(buf.Bytes()[recordHeaderSize : recordHeaderSize+length])
+	if err != nil {
 		logp.Warn("failed appending to buffer: %v", err)
 		// Discard buffer
 		parser.handshakeBuf.Init(nil, false)
 		return err
 	}
+
+	// Recover from any bufferView.subview out of bounds errors.
+	defer func() {
+		r := recover()
+		switch r := r.(type) {
+		case nil:
+		case bufferViewError:
+			err = r
+		default:
+			panic(r)
+		}
+	}()
+
 	for parser.handshakeBuf.Avail(handshakeHeaderSize) {
 		// type
 		header, err := readHandshakeHeader(&parser.handshakeBuf)
@@ -621,8 +635,8 @@ func getKeySize(key interface{}) int {
 }
 
 // certToMap takes an x509 cert and converts it into a map.
-func certToMap(cert *x509.Certificate) common.MapStr {
-	certMap := common.MapStr{
+func certToMap(cert *x509.Certificate) mapstr.M {
+	certMap := mapstr.M{
 		"signature_algorithm":  cert.SignatureAlgorithm.String(),
 		"public_key_algorithm": toString(cert.PublicKeyAlgorithm),
 		"serial_number":        cert.SerialNumber.Text(10),
@@ -646,8 +660,8 @@ func certToMap(cert *x509.Certificate) common.MapStr {
 	return certMap
 }
 
-func toMap(name *pkix.Name) common.MapStr {
-	result := common.MapStr{}
+func toMap(name *pkix.Name) mapstr.M {
+	result := mapstr.M{}
 	fields := []struct {
 		name  string
 		value interface{}

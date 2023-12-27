@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package node
 
@@ -11,9 +10,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	// Register input module and metricset
 	_ "github.com/elastic/beats/v7/metricbeat/module/prometheus"

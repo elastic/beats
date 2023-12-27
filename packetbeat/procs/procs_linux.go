@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package procs
 
@@ -33,24 +32,24 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/go-sysinfo/types"
 	"github.com/elastic/gosigar"
 )
 
-type socketInfo struct {
-	srcIP, dstIP     net.IP
-	srcPort, dstPort uint16
-
-	uid   uint32
-	inode uint64
-}
-
-var procFiles = map[applayer.Transport]struct {
-	ipv4, ipv6 string
-}{
-	applayer.TransportUDP: {"/proc/net/udp", "/proc/net/udp6"},
-	applayer.TransportTCP: {"/proc/net/tcp", "/proc/net/tcp6"},
+// procName makes a best effort attempt to get a good name for the process. It
+// uses /proc/<pid>/comm if it is less than 16 bytes long (TASK_COMM_LEN) and
+// otherwise uses argv[0] if it is available, but falling back to the comm string
+// if it is not.
+func procName(info types.ProcessInfo) string {
+	// We cannot know that a 16 byte string is not truncated,
+	// so assume the worst and get the first argument if we
+	// are at TASK_COMM_LEN and the arg is available.
+	if len(info.Name) < 16 || len(info.Args) == 0 {
+		return info.Name
+	}
+	return filepath.Base(info.Args[0])
 }
 
 var warnIPv6Once sync.Once
@@ -97,7 +96,11 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	for _, pid := range pids.List {
 		inodes, err := findSocketsOfPid("", pid)
 		if err != nil {
-			logp.Err("FindSocketsOfPid: %s", err)
+			if os.IsNotExist(err) {
+				logp.Info("FindSocketsOfPid: %s", err)
+			} else {
+				logp.Err("FindSocketsOfPid: %s", err)
+			}
 			continue
 		}
 
@@ -111,29 +114,36 @@ func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transp
 	return ports, nil
 }
 
+var procFiles = map[applayer.Transport]struct {
+	ipv4, ipv6 string
+}{
+	applayer.TransportUDP: {"/proc/net/udp", "/proc/net/udp6"},
+	applayer.TransportTCP: {"/proc/net/tcp", "/proc/net/tcp6"},
+}
+
 func findSocketsOfPid(prefix string, pid int) (inodes []uint64, err error) {
 	dirname := filepath.Join(prefix, "/proc", strconv.Itoa(pid), "fd")
 	procfs, err := os.Open(dirname)
 	if err != nil {
-		return []uint64{}, fmt.Errorf("Open: %s", err)
+		return nil, err
 	}
 	defer procfs.Close()
 	names, err := procfs.Readdirnames(0)
 	if err != nil {
-		return []uint64{}, fmt.Errorf("Readdirnames: %s", err)
+		return nil, err
 	}
 
 	for _, name := range names {
 		link, err := os.Readlink(filepath.Join(dirname, name))
 		if err != nil {
-			logp.Debug("procs", "Readlink %s: %s", name, err)
+			logp.Debug("procs", err.Error())
 			continue
 		}
 
 		if strings.HasPrefix(link, "socket:[") {
 			inode, err := strconv.ParseInt(link[8:len(link)-1], 10, 64)
 			if err != nil {
-				logp.Debug("procs", "ParseInt: %s:", err)
+				logp.Debug("procs", err.Error())
 				continue
 			}
 
@@ -144,8 +154,19 @@ func findSocketsOfPid(prefix string, pid int) (inodes []uint64, err error) {
 	return inodes, nil
 }
 
-func socketsFromProc(filename string, ipv6 bool) ([]*socketInfo, error) {
-	file, err := os.Open(filename)
+// socketInfo hold details for network sockets obtained from /proc/net.
+type socketInfo struct {
+	srcIP, dstIP     net.IP
+	srcPort, dstPort uint16
+
+	uid   uint32 // uid is the effective UID of the process that created the socket.
+	inode uint64 // inode is the inode of the file corresponding to the socket.
+}
+
+// socketsFromProc returns the socket information held in the the /proc/net file
+// at path.
+func socketsFromProc(path string, ipv6 bool) ([]*socketInfo, error) {
+	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
@@ -155,18 +176,13 @@ func socketsFromProc(filename string, ipv6 bool) ([]*socketInfo, error) {
 
 // Parses the /proc/net/(tcp|udp)6? file
 func parseProcNetProto(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
-	buf := bufio.NewReader(input)
-
-	sockets := []*socketInfo{}
-	var err error
-	var line []byte
-	for err != io.EOF {
-		line, err = buf.ReadBytes('\n')
-		if err != nil && err != io.EOF {
-			logp.Err("Error reading proc net file: %s", err)
-			return nil, err
-		}
-		words := bytes.Fields(line)
+	var (
+		sockets []*socketInfo
+		err     error
+	)
+	sc := bufio.NewScanner(input)
+	for sc.Scan() {
+		words := bytes.Fields(sc.Bytes())
 		// Ignore empty lines and the header
 		if len(words) == 0 || bytes.Equal(words[0], []byte("sl")) {
 			continue
@@ -177,14 +193,11 @@ func parseProcNetProto(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
 		}
 
 		var sock socketInfo
-		var err error
-
 		sock.srcIP, sock.srcPort, err = hexToIPPort(words[1], ipv6)
 		if err != nil {
 			logp.Debug("procs", "Error parsing IP and port: %s", err)
 			continue
 		}
-
 		sock.dstIP, sock.dstPort, err = hexToIPPort(words[2], ipv6)
 		if err != nil {
 			logp.Debug("procs", "Error parsing IP and port: %s", err)
@@ -198,13 +211,18 @@ func parseProcNetProto(input io.Reader, ipv6 bool) ([]*socketInfo, error) {
 
 		sockets = append(sockets, &sock)
 	}
+	err = sc.Err()
+	if err != nil {
+		logp.Err("Error reading proc net file: %s", err)
+		return nil, err
+	}
 	return sockets, nil
 }
 
 func hexToIPPort(str []byte, ipv6 bool) (net.IP, uint16, error) {
-	words := bytes.Split(str, []byte(":"))
+	words := bytes.SplitN(str, []byte(":"), 2) // Use bytes.Cut when it becomes available.
 	if len(words) < 2 {
-		return nil, 0, errors.New("Didn't find ':' as a separator")
+		return nil, 0, errors.New("could not find port separator")
 	}
 
 	ip, err := hexToIP(string(words[0]), ipv6)

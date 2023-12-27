@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package socket
 
@@ -28,14 +27,12 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	sock "github.com/elastic/beats/v7/metricbeat/helper/socket"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 	"github.com/elastic/gosigar/sys/linux"
 )
 
@@ -120,7 +117,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	sockets, err := m.netlink.GetSocketList()
 	if err != nil {
-		return errors.Wrap(err, "failed requesting socket dump")
+		return fmt.Errorf("failed requesting socket dump: %w", err)
 	}
 	debugf("netlink returned %d sockets", len(sockets))
 
@@ -290,31 +287,31 @@ var (
 	}
 )
 
-func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.MapStr) {
+func (c *connection) ToMapStr() (fields mapstr.M, metricSetFields mapstr.M) {
 	localGroup := "server"
 	if g, ok := localHostInfoGroup[c.Direction.String()]; ok {
 		localGroup = g
 	}
 
-	fields = common.MapStr{
-		"network": common.MapStr{
+	fields = mapstr.M{
+		"network": mapstr.M{
 			"type":        c.Family.String(),
 			"iana_number": ianaNumbersMap[c.Family.String()],
 			"direction":   c.Direction.String(),
 		},
-		"user": common.MapStr{
+		"user": mapstr.M{
 			"id": strconv.Itoa(int(c.UID)),
 		},
 		// Aliases for this are not going to be possible, keeping
 		// duplicated fields by now for backwards comatibility
-		localGroup: common.MapStr{
+		localGroup: mapstr.M{
 			"ip":   c.LocalIP.String(),
 			"port": c.LocalPort,
 		},
 	}
 
-	metricSetFields = common.MapStr{
-		"local": common.MapStr{
+	metricSetFields = mapstr.M{
+		"local": mapstr.M{
 			"ip":   c.LocalIP.String(),
 			"port": c.LocalPort,
 		},
@@ -331,7 +328,7 @@ func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.Ma
 	if c.ProcessError != nil {
 		fields.Put("error.code", c.ProcessError.Error())
 	} else {
-		process := common.MapStr{"pid": c.PID}
+		process := mapstr.M{"pid": c.PID}
 
 		if c.PID > 0 {
 			addOptionalString(process, "executable", c.Exe)
@@ -339,7 +336,7 @@ func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.Ma
 
 			if len(c.Args) >= 0 {
 				process["args"] = c.Args
-				metricSetFields["process"] = common.MapStr{
+				metricSetFields["process"] = mapstr.M{
 					"cmdline": c.CmdLine,
 				}
 			}
@@ -355,7 +352,7 @@ func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.Ma
 	if c.RemotePort != 0 {
 		// Aliases for this are not going to be possible, keeping
 		// duplicated fields by now for backwards comatibility
-		remote := common.MapStr{
+		remote := mapstr.M{
 			"ip":   c.RemoteIP.String(),
 			"port": c.RemotePort,
 		}
@@ -369,7 +366,7 @@ func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.Ma
 
 		remoteGroup, ok := remoteHostInfoGroup[c.Direction.String()]
 		if ok {
-			fields[remoteGroup] = common.MapStr{
+			fields[remoteGroup] = mapstr.M{
 				"ip":   c.RemoteIP.String(),
 				"port": c.RemotePort,
 			}
@@ -379,7 +376,7 @@ func (c *connection) ToMapStr() (fields common.MapStr, metricSetFields common.Ma
 	return fields, metricSetFields
 }
 
-func addOptionalString(m common.MapStr, key, value string) {
+func addOptionalString(m mapstr.M, key, value string) {
 	if value == "" {
 		return
 	}

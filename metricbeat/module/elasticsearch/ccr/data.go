@@ -19,13 +19,12 @@ package ccr
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -35,6 +34,7 @@ import (
 
 var (
 	schema = s.Schema{
+		"remote_cluster": c.Str("remote_cluster"),
 		"leader": s.Object{
 			"index":             c.Str("leader_index"),
 			"max_seq_no":        c.Int("leader_max_seq_no"),
@@ -139,15 +139,15 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 	var data response
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch CCR Stats API response")
+		return fmt.Errorf("failure parsing Elasticsearch CCR Stats API response: %w", err)
 	}
 
 	var errs multierror.Errors
 	for _, followerIndex := range data.FollowStats.Indices {
 		for _, followerShard := range followerIndex.Shards {
 			event := mb.Event{}
-			event.RootFields = common.MapStr{}
-			event.ModuleFields = common.MapStr{}
+			event.RootFields = mapstr.M{}
+			event.ModuleFields = mapstr.M{}
 
 			event.RootFields.Put("service.name", elasticsearch.ModuleName)
 			event.ModuleFields.Put("cluster.name", info.ClusterName)

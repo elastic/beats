@@ -21,10 +21,15 @@ Example configuration:
 {beatname_lc}.inputs:
 - type: container
   paths: <1>
-    - '/var/lib/docker/containers/*/*.log'
+    - '/var/log/containers/*.log'
 ----
 
 <1> `paths` is required. All other settings are optional.
+
+
+NOTE: '/var/log/containers/*.log' is normally a symlink to '/var/log/pods/*/*/.log', 
+so above path can be edited accordingly
+
 
 ==== Configuration options
 

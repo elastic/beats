@@ -21,29 +21,29 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 type elasticsearchConfig struct {
-	Protocol           string                  `config:"protocol"`
-	Path               string                  `config:"path"`
-	Params             map[string]string       `config:"parameters"`
-	Headers            map[string]string       `config:"headers"`
-	Username           string                  `config:"username"`
-	Password           string                  `config:"password"`
-	APIKey             string                  `config:"api_key"`
-	LoadBalance        bool                    `config:"loadbalance"`
-	CompressionLevel   int                     `config:"compression_level" validate:"min=0, max=9"`
-	EscapeHTML         bool                    `config:"escape_html"`
-	Kerberos           *kerberos.Config        `config:"kerberos"`
-	BulkMaxSize        int                     `config:"bulk_max_size"`
-	MaxRetries         int                     `config:"max_retries"`
-	Backoff            Backoff                 `config:"backoff"`
-	NonIndexablePolicy *common.ConfigNamespace `config:"non_indexable_policy"`
-	AllowOlderVersion  bool                    `config:"allow_older_versions"`
+	Protocol           string            `config:"protocol"`
+	Path               string            `config:"path"`
+	Params             map[string]string `config:"parameters"`
+	Headers            map[string]string `config:"headers"`
+	Username           string            `config:"username"`
+	Password           string            `config:"password"`
+	APIKey             string            `config:"api_key"`
+	LoadBalance        bool              `config:"loadbalance"`
+	CompressionLevel   int               `config:"compression_level" validate:"min=0, max=9"`
+	EscapeHTML         bool              `config:"escape_html"`
+	Kerberos           *kerberos.Config  `config:"kerberos"`
+	BulkMaxSize        int               `config:"bulk_max_size"`
+	MaxRetries         int               `config:"max_retries"`
+	Backoff            Backoff           `config:"backoff"`
+	NonIndexablePolicy *config.Namespace `config:"non_indexable_policy"`
+	AllowOlderVersion  bool              `config:"allow_older_versions"`
+	Queue              config.Namespace  `config:"queue"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
 }
@@ -54,7 +54,7 @@ type Backoff struct {
 }
 
 const (
-	defaultBulkSize = 50
+	defaultBulkSize = 1600
 )
 
 var (
@@ -66,7 +66,7 @@ var (
 		Password:         "",
 		APIKey:           "",
 		MaxRetries:       3,
-		CompressionLevel: 0,
+		CompressionLevel: 1,
 		EscapeHTML:       false,
 		Kerberos:         nil,
 		LoadBalance:      true,
@@ -74,9 +74,17 @@ var (
 			Init: 1 * time.Second,
 			Max:  60 * time.Second,
 		},
-		Transport: httpcommon.DefaultHTTPTransportSettings(),
+		Transport: esDefaultTransportSettings(),
 	}
 )
+
+func esDefaultTransportSettings() httpcommon.HTTPTransportSettings {
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	// The ES output differs from the common transport settings by having
+	// a 3-second idle timeout
+	transport.IdleConnTimeout = 3 * time.Second
+	return transport
+}
 
 func (c *elasticsearchConfig) Validate() error {
 	if c.APIKey != "" && (c.Username != "" || c.Password != "") {

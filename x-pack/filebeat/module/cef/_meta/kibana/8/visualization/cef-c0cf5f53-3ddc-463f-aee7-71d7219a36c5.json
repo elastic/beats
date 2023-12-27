@@ -1,0 +1,151 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Outcomes by Device Type — ArcSight [Filebeat CEF]",
+        "uiStateJSON": {
+            "vis": {
+                "colors": {
+                    "/Failure": "#BF1B00"
+                },
+                "legendOpen": true
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "field": "cef.extensions.categoryDeviceType",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "field": "cef.extensions.categoryOutcome",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "group",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addLegend": true,
+                "addTimeMarker": false,
+                "addTooltip": true,
+                "categoryAxes": [
+                    {
+                        "id": "CategoryAxis-1",
+                        "labels": {
+                            "filter": false,
+                            "rotate": 0,
+                            "show": true,
+                            "truncate": 200
+                        },
+                        "position": "left",
+                        "scale": {
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {
+                            "text": "cef.extensions.categoryDeviceType: Descending"
+                        },
+                        "type": "category"
+                    }
+                ],
+                "defaultYExtents": false,
+                "drawLinesBetweenPoints": true,
+                "grid": {
+                    "categoryLines": false,
+                    "style": {
+                        "color": "#eee"
+                    }
+                },
+                "interpolate": "linear",
+                "legendPosition": "right",
+                "legendSize": "auto",
+                "radiusRatio": 9,
+                "scale": "linear",
+                "seriesParams": [
+                    {
+                        "data": {
+                            "id": "1",
+                            "label": "Count"
+                        },
+                        "drawLinesBetweenPoints": true,
+                        "mode": "normal",
+                        "show": true,
+                        "showCircles": true,
+                        "type": "histogram",
+                        "valueAxis": "ValueAxis-1"
+                    }
+                ],
+                "setYExtents": false,
+                "showCircles": true,
+                "times": [],
+                "valueAxes": [
+                    {
+                        "id": "ValueAxis-1",
+                        "labels": {
+                            "filter": true,
+                            "rotate": 75,
+                            "show": true,
+                            "truncate": 100
+                        },
+                        "name": "LeftAxis-1",
+                        "position": "bottom",
+                        "scale": {
+                            "mode": "normal",
+                            "type": "linear"
+                        },
+                        "show": true,
+                        "style": {},
+                        "title": {},
+                        "type": "value"
+                    }
+                ]
+            },
+            "title": "Outcomes by Device Type — ArcSight [Filebeat CEF]",
+            "type": "histogram"
+        }
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-c0cf5f53-3ddc-463f-aee7-71d7219a36c5",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-2f6c8e48-8c6a-476d-82e8-47c723c39715",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0NDQsMV0="
+}

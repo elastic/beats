@@ -18,21 +18,22 @@
 package add_process_metadata
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strconv"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 const (
@@ -40,7 +41,6 @@ const (
 	cacheExpiration     = time.Second * 30
 	cacheCapacity       = 32 << 10 // maximum number of process cache entries.
 	cacheEvictionEffort = 10       // number of entries to sample for expiry eviction.
-	containerIDMapping  = "container.id"
 )
 
 var (
@@ -64,7 +64,7 @@ type addProcessMetadata struct {
 	cgroupsCache *common.Cache
 	cidProvider  cidProvider
 	log          *logp.Logger
-	mappings     common.MapStr
+	mappings     mapstr.M
 }
 
 type processMetadata struct {
@@ -74,7 +74,7 @@ type processMetadata struct {
 	startTime                          time.Time
 	pid, ppid                          int
 	//
-	fields common.MapStr
+	fields mapstr.M
 }
 
 type processMetadataProvider interface {
@@ -91,17 +91,17 @@ func init() {
 }
 
 // New constructs a new add_process_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *conf.C) (beat.Processor, error) {
 	return newProcessMetadataProcessorWithProvider(cfg, &procCache, false)
 }
 
 // NewWithCache construct a new add_process_metadata processor with cache for container IDs.
 // Resulting processor implements `Close()` to release the cache resources.
-func NewWithCache(cfg *common.Config) (processors.Processor, error) {
+func NewWithCache(cfg *conf.C) (beat.Processor, error) {
 	return newProcessMetadataProcessorWithProvider(cfg, &procCache, true)
 }
 
-func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider processMetadataProvider, withCache bool) (proc processors.Processor, err error) {
+func newProcessMetadataProcessorWithProvider(cfg *conf.C, provider processMetadataProvider, withCache bool) (proc beat.Processor, err error) {
 	// Logging (each processor instance has a unique ID).
 	var (
 		id  = int(instanceID.Inc())
@@ -110,17 +110,25 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 
 	config := defaultConfig()
 	if err = cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
+	}
+
+	// If neither option is configured, then add a default. A default cgroup_regex
+	// cannot be added to the struct returned by defaultConfig() because if
+	// config_regex is set, it would take precedence over any user-configured
+	// cgroup_prefixes.
+	hasCgroupPrefixes, _ := cfg.Has("cgroup_prefixes", -1)
+	hasCgroupRegex, _ := cfg.Has("cgroup_regex", -1)
+	if !hasCgroupPrefixes && !hasCgroupRegex {
+		config.CgroupRegex = defaultCgroupRegex
 	}
 
 	mappings, err := config.getMappings()
 	if err != nil {
-		return nil, errors.Wrapf(err, "error unpacking %v.target_fields", processorName)
+		return nil, fmt.Errorf("error unpacking %v.target_fields: %w", processorName, err)
 	}
 
-	var p addProcessMetadata
-
-	p = addProcessMetadata{
+	p := addProcessMetadata{
 		config:   config,
 		provider: provider,
 		log:      log,
@@ -150,7 +158,7 @@ func newProcessMetadataProcessorWithProvider(cfg *common.Config, provider proces
 }
 
 // check if the value exist in mapping
-func containsValue(m common.MapStr, v string) bool {
+func containsValue(m mapstr.M, v string) bool {
 	for _, x := range m {
 		if x == v {
 			return true
@@ -164,13 +172,13 @@ func (p *addProcessMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	for _, pidField := range p.config.MatchPIDs {
 		result, err := p.enrich(event, pidField)
 		if err != nil {
-			switch err {
-			case common.ErrKeyNotFound:
+			switch {
+			case errors.Is(err, mapstr.ErrKeyNotFound):
 				continue
-			case ErrNoProcess:
+			case errors.Is(err, ErrNoProcess):
 				return event, err
 			default:
-				return event, errors.Wrapf(err, "error applying %s processor", processorName)
+				return event, fmt.Errorf("error applying %s processor: %w", processorName, err)
 			}
 		}
 		if result != nil {
@@ -189,22 +197,22 @@ func pidToInt(value interface{}) (pid int, err error) {
 	case string:
 		pid, err = strconv.Atoi(v)
 		if err != nil {
-			return 0, errors.Wrap(err, "error converting string to integer")
+			return 0, fmt.Errorf("error converting string to integer: %w", err)
 		}
 	case int:
 		pid = v
 	case int8, int16, int32, int64:
 		pid64 := reflect.ValueOf(v).Int()
 		if pid = int(pid64); int64(pid) != pid64 {
-			return 0, errors.Errorf("integer out of range: %d", pid64)
+			return 0, fmt.Errorf("integer out of range: %d", pid64)
 		}
 	case uint, uintptr, uint8, uint16, uint32, uint64:
 		pidu64 := reflect.ValueOf(v).Uint()
 		if pid = int(pidu64); pid < 0 || uint64(pid) != pidu64 {
-			return 0, errors.Errorf("integer out of range: %d", pidu64)
+			return 0, fmt.Errorf("integer out of range: %d", pidu64)
 		}
 	default:
-		return 0, errors.Errorf("not an integer or string, but %T", v)
+		return 0, fmt.Errorf("not an integer or string, but %T", v)
 	}
 	return pid, nil
 }
@@ -217,16 +225,16 @@ func (p *addProcessMetadata) enrich(event *beat.Event, pidField string) (result 
 
 	pid, err := pidToInt(pidIf)
 	if err != nil {
-		return nil, errors.Wrapf(err, "cannot parse pid field '%s'", pidField)
+		return nil, fmt.Errorf("cannot parse pid field '%s': %w", pidField, err)
 	}
 
-	var meta common.MapStr
+	var meta mapstr.M
 
 	metaPtr, err := p.provider.GetProcessMetadata(pid)
 	if err != nil || metaPtr == nil {
 		// no process metadata, lets still try to get container id
 		p.log.Debugf("failed to get process metadata for PID=%d: %v", pid, err)
-		meta = common.MapStr{}
+		meta = mapstr.M{}
 	} else {
 		meta = metaPtr.fields
 	}
@@ -235,7 +243,7 @@ func (p *addProcessMetadata) enrich(event *beat.Event, pidField string) (result 
 	if cid == "" || err != nil {
 		p.log.Debugf("failed to get container id for PID=%d: %v", pid, err)
 	} else {
-		if _, err = meta.Put("container", common.MapStr{"id": cid}); err != nil {
+		if _, err = meta.Put("container", mapstr.M{"id": cid}); err != nil {
 			return nil, err
 		}
 	}
@@ -254,7 +262,7 @@ func (p *addProcessMetadata) enrich(event *beat.Event, pidField string) (result 
 		}
 		if !p.config.OverwriteKeys {
 			if _, err := result.GetValue(dest); err == nil {
-				return nil, errors.Errorf("target field '%s' already exists and overwrite_keys is false", dest)
+				return nil, fmt.Errorf("target field '%s' already exists and overwrite_keys is false", dest)
 			}
 		}
 
@@ -301,21 +309,21 @@ func (p *addProcessMetadata) String() string {
 		p.config.OverwriteKeys, p.config.RestrictedFields, p.config.HostPath, p.config.CgroupPrefixes)
 }
 
-func (p *processMetadata) toMap() common.MapStr {
-	process := common.MapStr{
+func (p *processMetadata) toMap() mapstr.M {
+	process := mapstr.M{
 		"name":       p.name,
 		"title":      p.title,
 		"executable": p.exe,
 		"args":       p.args,
 		"env":        p.env,
 		"pid":        p.pid,
-		"parent": common.MapStr{
+		"parent": mapstr.M{
 			"pid": p.ppid,
 		},
 		"start_time": p.startTime,
 	}
 	if p.username != "" || p.userid != "" {
-		user := common.MapStr{}
+		user := mapstr.M{}
 		if p.username != "" {
 			user["name"] = p.username
 		}
@@ -325,7 +333,7 @@ func (p *processMetadata) toMap() common.MapStr {
 		process["owner"] = user
 	}
 
-	return common.MapStr{
+	return mapstr.M{
 		"process": process,
 	}
 }

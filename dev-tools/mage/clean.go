@@ -18,6 +18,11 @@
 package mage
 
 import (
+	"errors"
+	"fmt"
+	"os"
+	"strings"
+
 	"github.com/magefile/mage/sh"
 )
 
@@ -46,6 +51,12 @@ func Clean(pathLists ...[]string) error {
 		for _, f := range paths {
 			f = MustExpand(f)
 			if err := sh.Rm(f); err != nil {
+				if errors.Is(err, os.ErrPermission) ||
+					strings.Contains(err.Error(), "permission denied") {
+					fmt.Printf("warn: cannot delete %q: %v, proceeding anyway\n",
+						f, err)
+					continue
+				}
 				return err
 			}
 		}

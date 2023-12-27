@@ -6,14 +6,14 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "kube-system",
+        "namespace": "default",
         "node": {
-            "name": "minikube"
+            "name": "kind-control-plane"
         },
         "pod": {
-            "host_ip": "192.168.99.100",
-            "ip": "172.17.0.2",
-            "name": "tiller-deploy-3067024529-9lpmb",
+            "host_ip": "172.18.0.2",
+            "ip": "10.244.0.6",
+            "name": "web-0",
             "status": {
                 "phase": "running",
                 "ready": "true",

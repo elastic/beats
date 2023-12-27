@@ -16,18 +16,18 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package node_stats
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"path/filepath"
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/require"
 
@@ -35,19 +35,36 @@ import (
 )
 
 func TestEventMapping(t *testing.T) {
-	files, err := filepath.Glob("./_meta/test/node_stats.*.json")
-	require.NoError(t, err)
+	// Contain pipeline hash
+	containVersions := []string{}
+	containVersions = append(containVersions, "710")
+	containVersions = append(containVersions, "840")
+	EventMappingForFiles(t, containVersions, 1, 0)
+	// Don't contain pipeline hash
+	dontContainVersions := []string{}
+	dontContainVersions = append(dontContainVersions, "641")
+	dontContainVersions = append(dontContainVersions, "650")
+	dontContainVersions = append(dontContainVersions, "700")
+	EventMappingForFiles(t, dontContainVersions, 1, 0)
+	// Don't contain pipeline hash but should (partial)
+	partialVersions := []string{}
+	partialVersions = append(partialVersions, "840_partial")
+	EventMappingForFiles(t, partialVersions, 0, 0)
+}
 
-	for _, f := range files {
-		input, err := ioutil.ReadFile(f)
+func EventMappingForFiles(t *testing.T, fixtureVersions []string, expectedEvents int, expectedErrors int) {
+	logger := logp.NewLogger("logstash.node_stats")
+
+	for _, f := range fixtureVersions {
+		path := fmt.Sprintf("./_meta/test/node_stats.%s.json", f)
+		input, err := ioutil.ReadFile(path)
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}
-		err = eventMapping(reporter, input, true)
-
+		err = eventMapping(reporter, input, true, logger)
 		require.NoError(t, err, f)
-		require.True(t, len(reporter.GetEvents()) >= 1, f)
-		require.Equal(t, 0, len(reporter.GetErrors()), f)
+		require.True(t, len(reporter.GetEvents()) >= expectedEvents, f)
+		require.Equal(t, expectedErrors, len(reporter.GetErrors()), f)
 	}
 }
 

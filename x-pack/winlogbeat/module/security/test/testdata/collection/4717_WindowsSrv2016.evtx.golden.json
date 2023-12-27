@@ -1,0 +1,48 @@
+[
+  {
+    "@timestamp": "2020-07-27T09:30:41.9034803Z",
+    "event": {
+      "action": "Authentication Policy Change",
+      "code": "4717",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "WIN-BVM4LI1L1Q6"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "System security access was granted to an account.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-BVM4LI1L1Q6$\n\tAccount Domain:\t\tWORKGROUP\n\tLogon ID:\t\t0x3E7\n\nAccount Modified:\n\tAccount Name:\t\tS-1-5-9\n\nAccess Granted:\n\tAccess Right:\t\tSeNetworkLogonRight",
+    "winlog": {
+      "activity_id": "{b69bb9ff-63f5-0000-35ba-9bb6f563d601}",
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "WIN-BVM4LI1L1Q6",
+      "event_data": {
+        "AccessGranted": "SeNetworkLogonRight",
+        "SubjectDomainName": "WORKGROUP",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "WIN-BVM4LI1L1Q6$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetSid": "S-1-5-9"
+      },
+      "event_id": "4717",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 776,
+        "thread": {
+          "id": 820
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 1571,
+      "task": "Authentication Policy Change"
+    }
+  }
+]

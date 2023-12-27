@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package collstats
 
@@ -57,7 +56,7 @@ func TestData(t *testing.T) {
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
 	if err := mbtest.WriteEventsReporterV2Error(f, t, ""); err != nil {
-		t.Fatal("write", err)
+		t.Fatal("error trying to create data.json file:", err)
 	}
 }
 

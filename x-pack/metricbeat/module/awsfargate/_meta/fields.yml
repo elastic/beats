@@ -4,3 +4,21 @@
     `awsfargate` module collects AWS fargate metrics from task metadata endpoint.
   release: beta
   fields:
+    - name: awsfargate
+      type: group
+      fields:
+        - name: container.labels.com_amazonaws_ecs_cluster
+          type: keyword
+          description: ECS Cluster name
+        - name: container.labels.com_amazonaws_ecs_container-name
+          type: keyword
+          description: ECS container name
+        - name: container.labels.com_amazonaws_ecs_task-arn
+          type: keyword
+          description: ECS task ARN
+        - name: container.labels.com_amazonaws_ecs_task-definition-family
+          type: keyword
+          description: ECS task definition family
+        - name: container.labels.com_amazonaws_ecs_task-definition-version
+          type: keyword
+          description: ECS task definition version      

@@ -18,14 +18,15 @@
 // Package log harvests different inputs for new information. Currently
 // two harvester types exist:
 //
-//   * log
-//   * stdin
+//   - log
 //
-//  The log harvester reads a file line by line. In case the end of a file is found
-//  with an incomplete line, the line pointer stays at the beginning of the incomplete
-//  line. As soon as the line is completed, it is read and returned.
+//   - stdin
 //
-//  The stdin harvesters reads data from stdin.
+//     The log harvester reads a file line by line. In case the end of a file is found
+//     with an incomplete line, the line pointer stays at the beginning of the incomplete
+//     line. As soon as the line is completed, it is read and returned.
+//
+//     The stdin harvesters reads data from stdin.
 package log
 
 import (
@@ -42,8 +43,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	file_helper "github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"
@@ -54,6 +56,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
 	"github.com/elastic/beats/v7/libbeat/reader/readjson"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -123,13 +126,12 @@ type harvesterProgressMetrics struct {
 // NewHarvester creates a new harvester
 func NewHarvester(
 	logger *logp.Logger,
-	config *common.Config,
+	config *conf.C,
 	state file.State,
 	states *file.States,
 	publishState func(file.State) bool,
 	outletFactory OutletFactory,
 ) (*Harvester, error) {
-
 	id, err := uuid.NewV4()
 	if err != nil {
 		return nil, err
@@ -306,7 +308,7 @@ func (h *Harvester) Run() error {
 		}
 	}(h.state.Source)
 
-	logger.Info("Harvester started for file.")
+	logger.Infof("Harvester started for paths: %v", h.config.Paths)
 
 	h.doneWg.Add(1)
 	go func() {
@@ -429,10 +431,10 @@ func (h *Harvester) onMessage(
 		return err == nil
 	}
 
-	fields := common.MapStr{
-		"log": common.MapStr{
+	fields := mapstr.M{
+		"log": mapstr.M{
 			"offset": messageOffset, // Offset here is the offset before the starting char.
-			"file": common.MapStr{
+			"file": mapstr.M{
 				"path": state.Source,
 			},
 		},
@@ -440,12 +442,12 @@ func (h *Harvester) onMessage(
 	fields.DeepUpdate(message.Fields)
 
 	// Check if json fields exist
-	var jsonFields common.MapStr
+	var jsonFields mapstr.M
 	if f, ok := fields["json"]; ok {
-		jsonFields = f.(common.MapStr)
+		jsonFields = f.(mapstr.M)
 	}
 
-	var meta common.MapStr
+	var meta mapstr.M
 	timestamp := message.Ts
 	if h.config.JSON != nil && len(jsonFields) > 0 {
 		id, ts := readjson.MergeJSONFields(fields, jsonFields, &text, *h.config.JSON)
@@ -456,14 +458,11 @@ func (h *Harvester) onMessage(
 		}
 
 		if id != "" {
-			meta = common.MapStr{
+			meta = mapstr.M{
 				"_id": id,
 			}
 		}
-	} else if &text != nil {
-		if fields == nil {
-			fields = common.MapStr{}
-		}
+	} else if len(text) != 0 {
 		fields["message"] = text
 	}
 
@@ -641,12 +640,12 @@ func (h *Harvester) cleanup() {
 //
 // It creates a chain of readers which looks as following:
 //
-//   limit -> (multiline -> timeout) -> strip_newline -> json -> encode -> line -> log_file
+//	limit -> (multiline -> timeout) -> strip_newline -> json -> encode -> line -> log_file
 //
 // Each reader on the left, contains the reader on the right and calls `Next()` to fetch more data.
 // At the base of all readers the the log_file reader. That means in the data is flowing in the opposite direction:
 //
-//   log_file -> line -> encode -> json -> strip_newline -> (timeout -> multiline) -> limit
+//	log_file -> line -> encode -> json -> strip_newline -> (timeout -> multiline) -> limit
 //
 // log_file implements io.Reader interface and encode reader is an adapter for io.Reader to
 // reader.Reader also handling file encodings. All other readers implement reader.Reader

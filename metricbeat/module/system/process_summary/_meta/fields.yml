@@ -33,7 +33,30 @@
       type: long
       description: >
         Number of dead processes on this host. It's very unlikely that it will appear but in some special situations it may happen.
+    - name: wakekill
+      type: long
+      description: >
+        Number of wakekill-state processes on this host. Only found on older Linux Kernel versions.
+    - name: wake
+      type: long
+      description: >
+        Number of wake-state processes on this host. Only found on older Linux Kernel versions.
+    - name: parked
+      type: long
+      description: >
+        Number of parked-state processes on this host. Only found on older Linux Kernel versions, or under certain conditions.
     - name: unknown
       type: long
       description: >
         Number of processes for which the state couldn't be retrieved or is unknown.
+    - name: threads
+      title: Process Threads
+      type: group
+      description: Counts of individual threads on a system.
+      fields:
+        - name: running
+          type: long
+          description: Count of currently running threads.
+        - name: blocked
+          type: long
+          description: Count of threads blocked by I/O.

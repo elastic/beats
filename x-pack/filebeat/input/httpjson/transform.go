@@ -10,106 +10,106 @@ import (
 	"net/http"
 	"net/url"
 	"strconv"
-	"sync"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const logName = "httpjson.transforms"
-
-type transformsConfig []*common.Config
+type transformsConfig []*conf.C
 
 type transforms []transform
 
 type transformContext struct {
-	lock         sync.RWMutex
-	cursor       *cursor
-	firstEvent   *common.MapStr
-	lastEvent    *common.MapStr
-	lastResponse *response
+	cursor        *cursor
+	parentTrCtx   *transformContext
+	firstEvent    *mapstr.M
+	lastEvent     *mapstr.M
+	lastResponse  *response
+	firstResponse *response
 }
 
 func emptyTransformContext() *transformContext {
 	return &transformContext{
-		cursor:       &cursor{},
-		lastEvent:    &common.MapStr{},
-		firstEvent:   &common.MapStr{},
-		lastResponse: &response{},
+		cursor:        &cursor{},
+		lastEvent:     &mapstr.M{},
+		firstEvent:    &mapstr.M{},
+		lastResponse:  &response{},
+		firstResponse: &response{},
 	}
 }
 
-func (ctx *transformContext) cursorMap() common.MapStr {
-	ctx.lock.RLock()
-	defer ctx.lock.RUnlock()
+func (ctx *transformContext) cursorMap() mapstr.M {
 	return ctx.cursor.clone()
 }
 
-func (ctx *transformContext) lastEventClone() *common.MapStr {
-	ctx.lock.RLock()
-	defer ctx.lock.RUnlock()
+func (ctx *transformContext) lastEventClone() *mapstr.M {
 	clone := ctx.lastEvent.Clone()
 	return &clone
 }
 
-func (ctx *transformContext) firstEventClone() *common.MapStr {
-	ctx.lock.RLock()
-	defer ctx.lock.RUnlock()
+func (ctx *transformContext) firstEventClone() *mapstr.M {
 	clone := ctx.firstEvent.Clone()
 	return &clone
 }
 
+func (ctx *transformContext) firstResponseClone() *response {
+	return ctx.firstResponse.clone()
+}
+
 func (ctx *transformContext) lastResponseClone() *response {
-	ctx.lock.RLock()
-	defer ctx.lock.RUnlock()
 	return ctx.lastResponse.clone()
 }
 
 func (ctx *transformContext) updateCursor() {
-	ctx.lock.Lock()
-	defer ctx.lock.Unlock()
-
 	// we do not want to pass the cursor data to itself
 	newCtx := emptyTransformContext()
 	newCtx.lastEvent = ctx.lastEvent
 	newCtx.firstEvent = ctx.firstEvent
 	newCtx.lastResponse = ctx.lastResponse
+	newCtx.firstResponse = ctx.firstResponse
 
 	ctx.cursor.update(newCtx)
 }
 
-func (ctx *transformContext) updateLastEvent(e common.MapStr) {
-	ctx.lock.Lock()
-	defer ctx.lock.Unlock()
+func (ctx *transformContext) clone() *transformContext {
+	newCtx := emptyTransformContext()
+	newCtx.lastEvent = ctx.lastEvent
+	newCtx.firstEvent = ctx.firstEvent
+	newCtx.lastResponse = ctx.lastResponse
+	newCtx.firstResponse = ctx.firstResponse
+	newCtx.cursor = ctx.cursor
+	newCtx.parentTrCtx = ctx
+	return newCtx
+}
+
+func (ctx *transformContext) updateLastEvent(e mapstr.M) {
 	*ctx.lastEvent = e
 }
 
-func (ctx *transformContext) updateFirstEvent(e common.MapStr) {
-	ctx.lock.Lock()
-	defer ctx.lock.Unlock()
+func (ctx *transformContext) updateFirstEvent(e mapstr.M) {
 	*ctx.firstEvent = e
 }
 
 func (ctx *transformContext) updateLastResponse(r response) {
-	ctx.lock.Lock()
-	defer ctx.lock.Unlock()
 	*ctx.lastResponse = r
 }
 
+func (ctx *transformContext) updateFirstResponse(r response) {
+	*ctx.firstResponse = r
+}
+
 func (ctx *transformContext) clearIntervalData() {
-	ctx.lock.Lock()
-	defer ctx.lock.Unlock()
-	ctx.lastEvent = &common.MapStr{}
-	ctx.firstEvent = &common.MapStr{}
+	ctx.lastEvent = &mapstr.M{}
+	ctx.firstEvent = &mapstr.M{}
 	ctx.lastResponse = &response{}
 }
 
-type transformable common.MapStr
+type transformable mapstr.M
 
-func (tr transformable) access() common.MapStr {
-	return common.MapStr(tr)
+func (tr transformable) access() mapstr.M {
+	return mapstr.M(tr)
 }
 
 func (tr transformable) Put(k string, v interface{}) {
@@ -142,20 +142,20 @@ func (tr transformable) header() http.Header {
 	return header
 }
 
-func (tr transformable) setBody(v common.MapStr) {
+func (tr transformable) setBody(v mapstr.M) {
 	tr.Put("body", v)
 }
 
-func (tr transformable) body() common.MapStr {
+func (tr transformable) body() mapstr.M {
 	val, err := tr.GetValue("body")
 	if err != nil {
 		// if it does not exist, initialize it
-		body := common.MapStr{}
+		body := mapstr.M{}
 		tr.setBody(body)
 		return body
 	}
 
-	body, _ := val.(common.MapStr)
+	body, _ := val.(mapstr.M)
 
 	return body
 }
@@ -187,22 +187,12 @@ type basicTransform interface {
 	run(*transformContext, transformable) (transformable, error)
 }
 
-type maybeMsg struct {
-	err error
-	msg common.MapStr
-}
-
-func (e maybeMsg) failed() bool { return e.err != nil }
-
-func (e maybeMsg) Error() string { return e.err.Error() }
-
 // newTransformsFromConfig creates a list of transforms from a list of free user configurations.
-func newTransformsFromConfig(config transformsConfig, namespace string, log *logp.Logger) (transforms, error) {
-	var trans transforms
-
+func newTransformsFromConfig(registeredTransforms registry, config transformsConfig, namespace string, log *logp.Logger) (transforms, error) {
+	trans := make(transforms, 0, len(config))
 	for _, tfConfig := range config {
 		if len(tfConfig.GetFields()) != 1 {
-			return nil, errors.Errorf(
+			return nil, fmt.Errorf(
 				"each transform must have exactly one action, but found %d actions",
 				len(tfConfig.GetFields()),
 			)
@@ -216,10 +206,10 @@ func newTransformsFromConfig(config transformsConfig, namespace string, log *log
 
 		constructor, found := registeredTransforms.get(namespace, actionName)
 		if !found {
-			return nil, errors.Errorf("the transform %s does not exist. Valid transforms: %s", actionName, registeredTransforms.String())
+			return nil, fmt.Errorf("the transform %s does not exist. Valid transforms: %s", actionName, registeredTransforms)
 		}
 
-		cfg.PrintDebugf("Configure transform '%v' with:", actionName)
+		common.PrintConfigDebugf(cfg, "Configure transform '%v' with:", actionName)
 		transform, err := constructor(cfg, log)
 		if err != nil {
 			return nil, err
@@ -231,13 +221,13 @@ func newTransformsFromConfig(config transformsConfig, namespace string, log *log
 	return trans, nil
 }
 
-func newBasicTransformsFromConfig(config transformsConfig, namespace string, log *logp.Logger) ([]basicTransform, error) {
-	ts, err := newTransformsFromConfig(config, namespace, log)
+func newBasicTransformsFromConfig(registeredTransforms registry, config transformsConfig, namespace string, log *logp.Logger) ([]basicTransform, error) {
+	ts, err := newTransformsFromConfig(registeredTransforms, config, namespace, log)
 	if err != nil {
 		return nil, err
 	}
 
-	var rts []basicTransform
+	rts := make([]basicTransform, 0, len(ts))
 	for _, t := range ts {
 		rt, ok := t.(basicTransform)
 		if !ok {

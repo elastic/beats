@@ -28,8 +28,10 @@ import (
 	"unicode/utf8"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -57,7 +59,7 @@ type thriftPlugin struct {
 
 	publishQueue chan *thriftTransaction
 	results      protos.Reporter
-	watcher      procs.ProcessesWatcher
+	watcher      *procs.ProcessesWatcher
 	idl          *thriftIdl
 }
 
@@ -183,8 +185,8 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	watcher *procs.ProcessesWatcher,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &thriftPlugin{}
 	config := defaultConfig
@@ -203,7 +205,7 @@ func New(
 func (thrift *thriftPlugin) init(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
+	watcher *procs.ProcessesWatcher,
 	config *thriftConfig,
 ) error {
 	thrift.InitDefaults()
@@ -218,6 +220,7 @@ func (thrift *thriftPlugin) init(
 		protos.DefaultTransactionHashSize)
 	thrift.transactions.StartJanitor(thrift.transactionTimeout)
 
+	thrift.watcher = &procs.ProcessesWatcher{}
 	if !testMode {
 		thrift.publishQueue = make(chan *thriftTransaction, 1000)
 		thrift.results = results
@@ -915,8 +918,6 @@ func (thrift *thriftPlugin) ConnectionTimeout() time.Duration {
 func (thrift *thriftPlugin) Parse(pkt *protos.Packet, tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseThrift exception")
-
 	priv := thriftPrivateData{}
 	if private != nil {
 		var ok bool
@@ -1056,7 +1057,6 @@ func (thrift *thriftPlugin) ReceivedFin(tcptuple *common.TCPTuple, dir uint8,
 func (thrift *thriftPlugin) GapInStream(tcptuple *common.TCPTuple, dir uint8,
 	nbytes int, private protos.ProtocolData) (priv protos.ProtocolData, drop bool,
 ) {
-	defer logp.Recover("GapInStream(thrift) exception")
 	logp.Debug("thriftdetailed", "GapInStream called")
 
 	if private == nil {
@@ -1104,7 +1104,7 @@ func (thrift *thriftPlugin) publishTransactions() {
 		fields := evt.Fields
 		fields["type"] = pbf.Event.Dataset
 		fields["status"] = status
-		thriftFields := common.MapStr{}
+		thriftFields := mapstr.M{}
 		fields["thrift"] = thriftFields
 
 		if t.request != nil {

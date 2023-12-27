@@ -9,8 +9,10 @@ processors:
 - grok:
     field: event.original
     trace_match: true
+    pattern_definitions:
+      GREEDYMULTILINE: "(.|\r|\n)*"
     patterns:
-      - '%{TIMESTAMP_ISO8601:zookeeper.log.timestamp}%{SPACE}\[myid:(%{POSINT:service.node.name})?\]%{SPACE}-%{SPACE}%{LOGLEVEL:log.level}%{SPACE}\[%{DATA:zookeeper.log.process}\]%{SPACE}-%{SPACE}%{GREEDYDATA:message}'
+      - '%{TIMESTAMP_ISO8601:zookeeper.log.timestamp}%{SPACE}\[myid:(%{POSINT:service.node.name})?\]%{SPACE}-%{SPACE}%{LOGLEVEL:log.level}%{SPACE}\[%{DATA:zookeeper.log.process}\]%{SPACE}-%{SPACE}%{GREEDYMULTILINE:message}'
 - grok:
     field: zookeeper.log.process
     ignore_missing: true

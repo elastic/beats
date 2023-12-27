@@ -53,6 +53,8 @@ include::{libbeat-dir}/loggingconfig.asciidoc[]
 
 include::{libbeat-dir}/http-endpoint.asciidoc[]
 
+include::./metrics-winlogbeat.asciidoc[]
+
 include::{libbeat-dir}/shared-instrumentation.asciidoc[]
 
 include::{libbeat-dir}/reference-yml.asciidoc[]

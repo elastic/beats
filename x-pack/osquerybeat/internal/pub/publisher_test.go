@@ -21,6 +21,7 @@ func TestHitToEvent(t *testing.T) {
 
 	type params struct {
 		index, eventType, actionID, responseID string
+		meta                                   map[string]interface{}
 		hit                                    map[string]interface{}
 		ecsm                                   ecs.Mapping
 		reqData                                interface{}
@@ -61,7 +62,7 @@ func TestHitToEvent(t *testing.T) {
 
 	for i := 0; i < maxMask; i++ {
 		p := genParams(i)
-		ev := hitToEvent(p.index, p.eventType, p.actionID, p.responseID, p.hit, p.ecsm, p.reqData)
+		ev := hitToEvent(p.index, p.eventType, p.actionID, p.responseID, p.meta, p.hit, p.ecsm, p.reqData)
 
 		if p.index != "" {
 			diff := cmp.Diff(p.index, ev.Meta[events.FieldMetaRawIndex])

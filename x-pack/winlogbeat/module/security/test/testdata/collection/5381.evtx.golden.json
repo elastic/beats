@@ -1,0 +1,217 @@
+[
+  {
+    "event": {
+      "code": "5381",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "5048",
+        "CountOfCredentialsReturned": "0",
+        "Flags": "0",
+        "ProcessCreationTime": "2023-01-17T21:15:02.4069136Z",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "COMPUTER1$",
+        "SubjectUserSid": "S-1-5-18"
+      },
+      "event_id": "5381",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 772,
+        "thread": {
+          "id": 820
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 13342699,
+      "time_created": "2023-01-17T21:15:02.5490822Z"
+    }
+  },
+  {
+    "event": {
+      "code": "5381",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "4920",
+        "CountOfCredentialsReturned": "0",
+        "Flags": "0",
+        "ProcessCreationTime": "2023-01-17T17:52:51.3438795Z",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "COMPUTER1$",
+        "SubjectUserSid": "S-1-5-18"
+      },
+      "event_id": "5381",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 640,
+        "thread": {
+          "id": 1036
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 13334924,
+      "time_created": "2023-01-17T17:52:51.4882586Z"
+    }
+  },
+  {
+    "event": {
+      "code": "5381",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "4960",
+        "CountOfCredentialsReturned": "0",
+        "Flags": "0",
+        "ProcessCreationTime": "2023-01-17T15:34:59.6524351Z",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "COMPUTER1$",
+        "SubjectUserSid": "S-1-5-18"
+      },
+      "event_id": "5381",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 632,
+        "thread": {
+          "id": 8
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 13333282,
+      "time_created": "2023-01-17T15:35:00.493786Z"
+    }
+  },
+  {
+    "event": {
+      "code": "5381",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "4604",
+        "CountOfCredentialsReturned": "0",
+        "Flags": "0",
+        "ProcessCreationTime": "2023-01-17T15:06:27.3440799Z",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "COMPUTER1$",
+        "SubjectUserSid": "S-1-5-18"
+      },
+      "event_id": "5381",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 1020,
+        "thread": {
+          "id": 784
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 13332174,
+      "time_created": "2023-01-17T15:06:28.1323896Z"
+    }
+  },
+  {
+    "event": {
+      "code": "5381",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "COMPUTER1.contoso.com"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "channel": "Security",
+      "computer_name": "COMPUTER1.contoso.com",
+      "event_data": {
+        "ClientProcessId": "4772",
+        "CountOfCredentialsReturned": "0",
+        "Flags": "0",
+        "ProcessCreationTime": "2023-01-17T14:55:55.9592157Z",
+        "SubjectDomainName": "CONTOSO",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "COMPUTER1$",
+        "SubjectUserSid": "S-1-5-18"
+      },
+      "event_id": "5381",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 640,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 13331466,
+      "time_created": "2023-01-17T14:55:56.2978479Z"
+    }
+  }
+]

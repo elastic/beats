@@ -11,12 +11,12 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestSQS(t *testing.T) {
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := conf.MustNewConfigFrom(map[string]interface{}{
 		"name": "foobar",
 		"triggers": []map[string]interface{}{
 			map[string]interface{}{

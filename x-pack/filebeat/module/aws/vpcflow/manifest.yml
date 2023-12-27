@@ -24,6 +24,12 @@ var:
   - name: proxy_url
   - name: max_number_of_messages
   - name: ssl
+  - name: format
+    default:
+      - version account-id interface-id srcaddr dstaddr srcport dstport protocol packets bytes start end action log-status
+      - instance-id interface-id srcaddr dstaddr pkt-srcaddr pkt-dstaddr
+      - version interface-id account-id vpc-id subnet-id instance-id srcaddr dstaddr srcport dstport protocol tcp-flags type pkt-srcaddr pkt-dstaddr action log-status
+      - version vpc-id subnet-id instance-id interface-id account-id type srcaddr dstaddr srcport dstport pkt-srcaddr pkt-dstaddr protocol bytes packets start end action tcp-flags log-status
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/input.yml

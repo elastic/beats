@@ -8,7 +8,6 @@
         "event": {
           "action": "netflow_options",
           "category": [
-            "network_traffic",
             "network"
           ],
           "kind": "event"
@@ -49,7 +48,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 1000000,
@@ -128,7 +126,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 1000000,
@@ -207,7 +204,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 1000000,
@@ -286,7 +282,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 1000000,
@@ -365,7 +360,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 0,
@@ -444,7 +438,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 0,
@@ -523,7 +516,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 38081000000,
@@ -602,7 +594,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 5000000,

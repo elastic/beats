@@ -21,7 +21,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type matcherMap map[string]match.Matcher
@@ -93,7 +93,7 @@ func (c Matcher) Check(event ValuesMap) bool {
 		default:
 			str, err := ExtractString(value)
 			if err != nil {
-				logp.L().Named(logName).Warnf("unexpected type %T in %v condition as it accepts only strings.", value, c.name)
+				logp.L().Named(logName).Debugf("unexpected type %T in %v condition as it accepts only strings; value=%#v", value, c.name, value)
 				return false
 			}
 

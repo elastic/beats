@@ -17,9 +17,9 @@
 
 package server
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/elastic/elastic-agent-libs/mapstr"
 
-type Meta common.MapStr
+type Meta mapstr.M
 
 const (
 	EventDataKey = "data"
@@ -38,7 +38,7 @@ type Server interface {
 // Event is an interface that can be used to get the event and event source related information.
 type Event interface {
 	// Get the raw bytes of the event.
-	GetEvent() common.MapStr
+	GetEvent() mapstr.M
 	// Get any metadata associated with the data that was received. Ex: client IP for udp message,
 	// request/response headers for HTTP call.
 	GetMeta() Meta

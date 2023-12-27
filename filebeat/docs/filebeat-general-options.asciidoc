@@ -40,6 +40,9 @@ That means in case there are some states where the TTL expired, these are only r
 
 The permissions mask to apply on registry data file. The default value is 0600. The permissions option must be a valid Unix-style file permissions mask expressed in octal notation. In Go, numbers in octal notation must start with 0.
 
+The most permissive mask allowed is 0640. If a higher permissions mask is
+specified via this setting, it will be subject to an umask of 0027.
+
 This option is not supported on Windows.
 
 Examples:
@@ -59,7 +62,7 @@ filebeat.registry.file_permissions: 0600
 The timeout value that controls when registry entries are written to disk
 (flushed). When an unwritten update exceeds this value, it triggers a write to
 disk. When `registry.flush` is set to 0s, the registry is written to disk after
-each batch of events has been published successfully. The default value is 0s.
+each batch of events has been published successfully. The default value is 1s.
 
 NOTE: The registry is always updated when Filebeat shuts down normally. After an
 abnormal shutdown, the registry will not be up-to-date if the `registry.flush`

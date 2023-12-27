@@ -19,12 +19,11 @@ package activity
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/postgresql"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry.
@@ -60,11 +59,11 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	results, err := m.QueryStats(ctx, "SELECT * FROM pg_stat_activity")
 	if err != nil {
-		return errors.Wrap(err, "error in QueryStats")
+		return fmt.Errorf("error in QueryStats: %w", err)
 	}
 
 	for _, result := range results {
-		var data common.MapStr
+		var data mapstr.M
 		// If the activity is not connected to any database, it is from a backend service. This
 		// can be distingished by checking if the record has a database identifier (`datid`).
 		// Activity records on these cases have different sets of fields.

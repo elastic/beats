@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: aerospike
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/aerospike/_meta/docs.asciidoc
+
 
 [[metricbeat-module-aerospike]]
 == Aerospike module
@@ -22,6 +24,8 @@ The Aerospike module comes with a predefined dashboard for Aerospike namespace, 
 
 image::./images/metricbeat-aerospike-overview.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -48,3 +52,4 @@ The following metricsets are available:
 
 include::aerospike/namespace.asciidoc[]
 
+:edit_url!:

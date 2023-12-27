@@ -21,7 +21,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -35,7 +36,7 @@ type cassandra struct {
 	ports        protos.PortsConfig
 	parserConfig parserConfig
 	transConfig  transactionConfig
-	watcher      procs.ProcessesWatcher
+	watcher      *procs.ProcessesWatcher
 	pub          transPub
 }
 
@@ -60,8 +61,8 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	watcher *procs.ProcessesWatcher,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &cassandra{}
 	config := defaultConfig
@@ -77,7 +78,7 @@ func New(
 	return p, nil
 }
 
-func (cassandra *cassandra) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *cassandraConfig) error {
+func (cassandra *cassandra) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *cassandraConfig) error {
 	if err := cassandra.setFromConfig(config); err != nil {
 		return err
 	}
@@ -145,8 +146,6 @@ func (cassandra *cassandra) Parse(
 	tcptuple *common.TCPTuple, dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("Parse cassandra exception")
-
 	conn := cassandra.ensureConnection(private)
 	st := conn.streams[dir]
 	if st == nil {

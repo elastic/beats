@@ -18,86 +18,35 @@
 package state_storageclass
 
 import (
-	"fmt"
-
+	"github.com/elastic/beats/v7/metricbeat/helper/kubernetes"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
+// mapping stores the state metrics we want to fetch and will be used by this metricset
+var mapping = &p.MetricsMapping{
+	Metrics: map[string]p.MetricMap{
+		"kube_storageclass_info": p.InfoMetric(),
+		"kube_storageclass_labels": p.ExtendedInfoMetric(
+			p.Configuration{
+				StoreNonMappedLabels:     true,
+				NonMappedLabelsPlacement: mb.ModuleDataKey + ".labels",
+				MetricProcessingOptions:  []p.MetricOption{p.OpLabelKeyPrefixRemover("label_")},
+			}),
+		"kube_storageclass_created": p.Metric("created", p.OpUnixTimestampValue()),
+	},
+	Labels: map[string]p.LabelMap{
+		"storageclass":        p.KeyLabel("name"),
+		"provisioner":         p.Label("provisioner"),
+		"reclaimPolicy":       p.Label("reclaim_policy"),
+		"reclaim_policy":      p.Label("reclaim_policy"),
+		"volumeBindingMode":   p.Label("volume_binding_mode"),
+		"volume_binding_mode": p.Label("volume_binding_mode"),
+	},
+}
+
+// Register metricset
 func init() {
-	mb.Registry.MustAddMetricSet("kubernetes", "state_storageclass",
-		NewStorageClassMetricSet,
-		mb.WithHostParser(p.HostParser))
-}
-
-// StorageClassMetricSet is a prometheus based MetricSet that fetches
-// and reports kube-state-metrics storage class metrics
-type StorageClassMetricSet struct {
-	mb.BaseMetricSet
-	prometheus p.Prometheus
-	mapping    *p.MetricsMapping
-	mod        k8smod.Module
-}
-
-// NewStorageClassMetricSet returns a prometheus based metricset for Storage classes
-func NewStorageClassMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	prometheus, err := p.NewPrometheusClient(base)
-	if err != nil {
-		return nil, err
-	}
-	mod, ok := base.Module().(k8smod.Module)
-	if !ok {
-		return nil, fmt.Errorf("must be child of kubernetes module")
-	}
-	return &StorageClassMetricSet{
-		BaseMetricSet: base,
-		prometheus:    prometheus,
-		mod:           mod,
-		mapping: &p.MetricsMapping{
-			Metrics: map[string]p.MetricMap{
-				"kube_storageclass_info": p.InfoMetric(),
-				"kube_storageclass_labels": p.ExtendedInfoMetric(
-					p.Configuration{
-						StoreNonMappedLabels:     true,
-						NonMappedLabelsPlacement: mb.ModuleDataKey + ".labels",
-						MetricProcessingOptions:  []p.MetricOption{p.OpLabelKeyPrefixRemover("label_")},
-					}),
-				"kube_storageclass_created": p.Metric("created", p.OpUnixTimestampValue()),
-			},
-			Labels: map[string]p.LabelMap{
-				"storageclass":      p.KeyLabel("name"),
-				"provisioner":       p.Label("provisioner"),
-				"reclaimPolicy":     p.Label("reclaim_policy"),
-				"volumeBindingMode": p.Label("volume_binding_mode"),
-			},
-		},
-	}, nil
-}
-
-// Fetch prometheus metrics and treats those prefixed by mb.ModuleDataKey as
-// module rooted fields at the event that gets reported
-func (m *StorageClassMetricSet) Fetch(reporter mb.ReporterV2) {
-	families, err := m.mod.GetStateMetricsFamilies(m.prometheus)
-	if err != nil {
-		m.Logger().Error(err)
-		reporter.Error(err)
-		return
-	}
-	events, err := m.prometheus.ProcessMetrics(families, m.mapping)
-	if err != nil {
-		m.Logger().Error(err)
-		reporter.Error(err)
-		return
-	}
-
-	for _, event := range events {
-		event[mb.NamespaceKey] = "storageclass"
-		reported := reporter.Event(mb.TransformMapStrToEvent("kubernetes", event, nil))
-		if !reported {
-			m.Logger().Debug("error trying to emit event")
-			return
-		}
-	}
-	return
+	kubernetes.Init(util.StorageClassResource, mapping)
 }

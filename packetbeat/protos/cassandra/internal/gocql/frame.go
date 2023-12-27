@@ -24,7 +24,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/streambuf"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -168,11 +168,18 @@ func (f *Framer) ReadHeader() (head *frameHeader, err error) {
 // reads a frame form the wire into the framers buffer
 func (f *Framer) ReadFrame() (data map[string]interface{}, err error) {
 	defer func() {
-		if r := recover(); r != nil {
-			if _, ok := r.(runtime.Error); ok {
-				panic(r)
-			}
-			err = r.(error)
+		// The casandra plugin uses panic for flow control, panicking on
+		// errors, so return recovered errors unless they are runtime.Error.
+		// Re-panic anything else.
+		r := recover()
+		switch r := r.(type) {
+		case nil:
+		case runtime.Error:
+			panic(r)
+		case error:
+			err = r
+		default:
+			panic(r)
 		}
 	}()
 

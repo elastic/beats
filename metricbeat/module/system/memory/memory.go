@@ -16,19 +16,20 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || openbsd || windows || aix
-// +build darwin freebsd linux openbsd windows aix
 
 package memory
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/memory"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transform/typeconv"
+	metrics "github.com/elastic/elastic-agent-system-metrics/metric/memory"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func init() {
@@ -55,15 +56,36 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	eventRaw, err := metrics.Get(m.mod)
 	if err != nil {
-		return errors.Wrap(err, "error fetching memory metrics")
+		return fmt.Errorf("error fetching memory metrics: %w", err)
 	}
 
-	memory := common.MapStr{}
+	memory := mapstr.M{}
 	err = typeconv.Convert(&memory, &eventRaw)
-
+	if err != nil {
+		return err
+	}
 	r.Event(mb.Event{
 		MetricSetFields: memory,
 	})
 
 	return nil
+}
+
+// Diagnostics implmements the DiagnosticSet interface
+func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
+	m.Logger().Infof("got DiagnosticSetup request for system/memory")
+	if runtime.GOOS == "linux" {
+		return []diagnostics.DiagnosticSetup{{
+			Name:        "memory-meminfo",
+			Description: "/proc/meminfo file",
+			Filename:    "meminfo",
+			Callback:    m.getMemDiagnostic,
+		}}
+	}
+	return nil
+}
+
+func (m *MetricSet) getMemDiagnostic() []byte {
+	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	return diagnostics.GetRawFileOrErrorString(sys, "/proc/meminfo")
 }

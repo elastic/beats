@@ -24,6 +24,7 @@ import (
 	"net"
 )
 
+// FlowID records flow details and statistics.
 type FlowID struct {
 	rawFlowID
 	flow Flow // remember associated flow for faster lookup
@@ -35,6 +36,8 @@ type rawFlowID struct {
 	dir flowDirection
 }
 
+// flowIDMeta holds meta data describing the contents and layout
+// of a rawFlowID's flowID buffer.
 type flowIDMeta struct {
 	flags FlowIDFlag
 
@@ -97,6 +100,9 @@ const (
 		SizeTCPFlowID +
 		SizeUDPFlowID +
 		SizeConnectionID
+
+	// Ensure that SizeFlowIDMax is not greater than 255.
+	_ = uint8(SizeFlowIDMax)
 )
 
 const offUnset uint8 = 0xff
@@ -129,12 +135,6 @@ const (
 	flowDirForward
 	flowDirReversed
 )
-
-func init() {
-	if SizeFlowIDMax > 255 {
-		panic("SizeFlowIDMax exceeds size limit")
-	}
-}
 
 func newFlowID() *FlowID {
 	f := &FlowID{}
@@ -240,12 +240,7 @@ func (f *FlowID) AddConnectionID(id uint64) {
 	f.addID(&f.offID, ConnectionID, tmp[:], nil, flowDirUnset)
 }
 
-func (f *FlowID) addMultLayerID(
-	off, outerOff *uint8,
-	flag, outerFlag FlowIDFlag,
-	a, b []byte,
-	hint flowDirection,
-) {
+func (f *FlowID) addMultLayerID(off, outerOff *uint8, flag, outerFlag FlowIDFlag, a, b []byte, hint flowDirection) {
 	a, b = f.sortAddrWrite(a, b, hint)
 
 	flags := f.flags & (flag | outerFlag)
@@ -269,12 +264,7 @@ func (f *FlowID) addMultLayerID(
 	}
 }
 
-func (f *FlowID) addID(
-	off *uint8,
-	flag FlowIDFlag,
-	a, b []byte,
-	hint flowDirection,
-) {
+func (f *FlowID) addID(off *uint8, flag FlowIDFlag, a, b []byte, hint flowDirection) {
 	a, b = f.sortAddrWrite(a, b, hint)
 
 	if *off == offUnset {
@@ -287,11 +277,7 @@ func (f *FlowID) addID(
 	}
 }
 
-func (f *FlowID) addWithPorts(
-	off *uint8,
-	flag FlowIDFlag,
-	src, dst uint16,
-) {
+func (f *FlowID) addWithPorts(off *uint8, flag FlowIDFlag, src, dst uint16) {
 	var a, b [2]byte
 	binary.LittleEndian.PutUint16(a[:], src)
 	binary.LittleEndian.PutUint16(b[:], dst)
@@ -372,9 +358,9 @@ func (f *rawFlowID) Get(i FlowIDFlag) []byte {
 func (f *rawFlowID) Serialize() []byte {
 	buf := bytes.NewBuffer(nil)
 	enc := base64.NewEncoder(base64.RawStdEncoding, buf)
-
+	//nolint:errcheck // bytes.Buffer never returns a non-nil error on Write.
 	enc.Write([]byte{
-		byte(f.flags & 0xff),
+		byte(f.flags),
 		byte(f.flags >> 8),
 		f.offEth,
 		f.offOutterVlan,
@@ -392,6 +378,7 @@ func (f *rawFlowID) Serialize() []byte {
 		f.cntVlan,
 		f.cntIP,
 	})
+	//nolint:errcheck // bytes.Buffer never returns a non-nil error on Write.
 	enc.Write(f.flowID)
 	enc.Close()
 
@@ -478,12 +465,7 @@ func (f *rawFlowID) extractID(off, sz uint8) []byte {
 	if off == offUnset {
 		return nil
 	}
-
-	{
-		off := int(off)
-		sz := int(sz)
-		return f.flowID[off : off+sz]
-	}
+	return f.flowID[off : int(off)+int(sz)]
 }
 
 func (f *rawFlowID) sortAddrRead(off, sz uint8) ([]byte, []byte, bool) {

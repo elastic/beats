@@ -18,28 +18,29 @@
 package api
 
 import (
-	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"net/url"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/gorilla/mux"
+
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// Server takes cares of correctly starting the HTTP component of the API
-// and will answers all the routes defined in the received ServeMux.
+// Server takes care of correctly starting the HTTP component of the API
+// and will answer all the routes defined in the received ServeMux.
 type Server struct {
 	log    *logp.Logger
-	mux    *http.ServeMux
+	mux    *mux.Router
 	l      net.Listener
 	config Config
 }
 
-// New creates a new API Server.
-func New(log *logp.Logger, mux *http.ServeMux, config *common.Config) (*Server, error) {
+// New creates a new API Server with no routes attached.
+func New(log *logp.Logger, config *config.C) (*Server, error) {
 	if log == nil {
 		log = logp.NewLogger("")
 	}
@@ -55,7 +56,12 @@ func New(log *logp.Logger, mux *http.ServeMux, config *common.Config) (*Server, 
 		return nil, err
 	}
 
-	return &Server{mux: mux, l: l, config: cfg, log: log.Named("api")}, nil
+	return &Server{
+		mux:    mux.NewRouter().StrictSlash(true),
+		l:      l,
+		config: cfg,
+		log:    log.Named("api"),
+	}, nil
 }
 
 // Start starts the HTTP server and accepting new connection.
@@ -73,23 +79,19 @@ func (s *Server) Stop() error {
 	return s.l.Close()
 }
 
-// AttachHandler will attach a handler at the specified route and return an error instead of panicing.
+// AttachHandler will attach a handler at the specified route. Routes are
+// matched in the order in which that are attached.
 func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			switch r := r.(type) {
-			case error:
-				err = r
-			case string:
-				err = errors.New(r)
-			default:
-				err = fmt.Errorf("handle attempted to panic with %v", r)
-			}
-		}
-	}()
-	s.log.Infof("Attempting to attach %q to server.", route)
-	s.mux.Handle(route, h)
-	return
+	if err := s.mux.Handle(route, h).GetError(); err != nil {
+		return err
+	}
+	s.log.Debugf("Attached handler at %q to server.", route)
+	return nil
+}
+
+// Router returns the mux.Router that handles all request to the server.
+func (s *Server) Router() *mux.Router {
+	return s.mux
 }
 
 func parse(host string, port int) (string, string, error) {
@@ -98,7 +100,7 @@ func parse(host string, port int) (string, string, error) {
 		return "", "", err
 	}
 
-	// When you don't explicitely define the Scheme we fallback on tcp + host.
+	// When you don't explicitly define the Scheme we fall back on tcp + host.
 	if len(url.Host) == 0 && len(url.Scheme) == 0 {
 		addr := host + ":" + strconv.Itoa(port)
 		return "tcp", addr, nil

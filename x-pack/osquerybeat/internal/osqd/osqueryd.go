@@ -7,23 +7,22 @@ package osqd
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/dolmen-go/contextio"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -32,15 +31,25 @@ const (
 )
 
 const (
-	defaultExitTimeout           = 10 * time.Second
 	defaultDataDir               = "osquery"
+	defaultCertsDir              = "certs"
+	defaultLensesDir             = "lenses"
 	defaultConfigRefreshInterval = 30 // interval osqueryd will poll for configuration changed; scheduled queries configuration for now
 )
+
+const (
+	flagEnableTables  = "enable_tables"
+	flagDisableTables = "disable_tables"
+)
+
+var defaultDisabledTables = []string{"carves", "curl"}
 
 type OSQueryD struct {
 	socketPath string
 	binPath    string
 	dataPath   string
+	certsPath  string
+	lensesPath string
 
 	configPlugin string
 	loggerPlugin string
@@ -95,7 +104,7 @@ func WithLoggerPlugin(name string) Option {
 	}
 }
 
-func New(socketPath string, opts ...Option) *OSQueryD {
+func New(socketPath string, opts ...Option) (*OSQueryD, error) {
 	q := &OSQueryD{
 		socketPath:            socketPath,
 		extensionsTimeout:     defaultExtensionsTimeout,
@@ -106,11 +115,34 @@ func New(socketPath string, opts ...Option) *OSQueryD {
 		opt(q)
 	}
 
+	// The working directory is set to something like ./data/elastic-agent-3afa07/run/osquery-default by the agent
+	// Use the child dir osquery for that, so the full path is resolved to ./data/elastic-agent-3afa07/run/osquery-default/oquery
+	//
+	// The following files are currently created there by osqueryd executable when it is started
+	//
+	// -rw-------   1 root  wheel  149 Nov 28 17:46 osquery.autoload
+	// drwx------  11 root  wheel  352 Nov 28 19:00 osquery.db
+	// -rw-r--r--   1 root  wheel    0 Nov 28 17:46 osquery.flags
+	// -rw-------   1 root  wheel    5 Nov 28 18:48 osquery.pid
 	if q.dataPath == "" {
-		q.dataPath = filepath.Join(q.binPath, defaultDataDir)
+		q.dataPath = defaultDataDir
 	}
 
-	return q
+	// Initialize binPath before certsPath and the lensesPath are set
+	err := q.prepareBinPath()
+	if err != nil {
+		return nil, fmt.Errorf("failed to prepare bin path, %w", err)
+	}
+
+	if q.certsPath == "" {
+		q.certsPath = filepath.Join(q.binPath, defaultCertsDir)
+	}
+
+	if q.lensesPath == "" {
+		q.lensesPath = filepath.Join(q.binPath, defaultLensesDir)
+	}
+
+	return q, nil
 }
 
 func (q *OSQueryD) SocketPath() string {
@@ -128,6 +160,7 @@ func (q *OSQueryD) Check(ctx context.Context) error {
 		return fmt.Errorf("failed to prepare bin path, %w", err)
 	}
 
+	//nolint:gosec // works as expected
 	cmd := exec.Command(
 		osquerydPath(q.binPath),
 		"--S",
@@ -139,14 +172,12 @@ func (q *OSQueryD) Check(ctx context.Context) error {
 		return err
 	}
 
-	err = cmd.Wait()
-
-	return nil
+	return cmd.Wait()
 }
 
 // Run executes osqueryd binary as a child process
 func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
-	cleanup, err := q.prepare(ctx)
+	cleanup, err := q.prepare()
 	if err != nil {
 		return err
 	}
@@ -169,7 +200,7 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			q.logOSQueryOutput(ctx, stdout)
+			_ = q.logOSQueryOutput(ctx, stdout)
 		}()
 	}
 
@@ -226,7 +257,9 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 		}
 	case <-ctx.Done():
 		q.log.Debug("kill process group on context done")
-		killProcessGroup(cmd)
+		if err := killProcessGroup(cmd); err != nil {
+			q.log.Errorf("kill process group failed: %v", err)
+		}
 		// Wait till finished
 		<-finished
 	}
@@ -236,7 +269,7 @@ func (q *OSQueryD) Run(ctx context.Context, flags Flags) error {
 	return err
 }
 
-func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
+func (q *OSQueryD) prepare() (func(), error) {
 	err := q.prepareBinPath()
 	if err != nil {
 		return nil, fmt.Errorf("failed to prepare bin path, %w", err)
@@ -264,9 +297,9 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 	extensionPath := osqueryExtensionPath(q.binPath)
 	if _, err := os.Stat(extensionPath); err != nil {
 		if os.IsNotExist(err) {
-			return nil, errors.Wrapf(err, "extension path does not exist: %s", extensionPath)
+			return nil, fmt.Errorf("extension path does not exist: %s, %w", extensionPath, err)
 		} else {
-			return nil, errors.Wrapf(err, "failed to stat extension path")
+			return nil, fmt.Errorf("failed to stat extension path, %w", err)
 		}
 	}
 
@@ -274,7 +307,7 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 	extensionAutoloadPath := q.resolveDataPath(osqueryAutoload)
 	err = prepareAutoloadFile(extensionAutoloadPath, extensionPath, q.log)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to prepare extensions autoload file")
+		return nil, fmt.Errorf("failed to prepare extensions autoload file, %w", err)
 	}
 
 	// Write the flagsfile in order to lock down/prevent loading default flags from osquery global locations.
@@ -283,12 +316,12 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 	flagsfilePath := q.resolveDataPath(osqueryFlagfile)
 	exists, err := fileutil.FileExists(flagsfilePath)
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to check flagsfile path")
+		return nil, fmt.Errorf("failed to check flagsfile path, %w", err)
 	}
 	if !exists {
 		f, err := os.OpenFile(flagsfilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0644)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to create flagsfile")
+			return nil, fmt.Errorf("failed to create flagsfile, %w", err)
 		}
 		f.Close()
 	}
@@ -299,7 +332,7 @@ func (q *OSQueryD) prepare(ctx context.Context) (func(), error) {
 func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, log *logp.Logger) error {
 	ok, err := fileutil.FileExists(extensionAutoloadPath)
 	if err != nil {
-		return errors.Wrapf(err, "failed to check osquery.autoload file exists")
+		return fmt.Errorf("failed to check osquery.autoload file exists, %w", err)
 	}
 
 	rewrite := false
@@ -317,8 +350,8 @@ func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, l
 	}
 
 	if rewrite {
-		if err := ioutil.WriteFile(extensionAutoloadPath, []byte(mandatoryExtensionPath), 0644); err != nil {
-			return errors.Wrap(err, "failed write osquery extension autoload file")
+		if err := os.WriteFile(extensionAutoloadPath, []byte(mandatoryExtensionPath), 0600); err != nil {
+			return fmt.Errorf("failed write osquery extension autoload file, %w", err)
 		}
 	}
 	return nil
@@ -367,6 +400,11 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 
 	// Copy user flags
 	for k, userValue := range userFlags {
+		// Skip enable_tables and disable_tables flags, they are set later in this function
+		// after merging with default disabled tables
+		if k == flagEnableTables || flagEnableTables == flagDisableTables {
+			continue
+		}
 		flags[k] = userValue
 	}
 
@@ -379,6 +417,15 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 	flags["database_path"] = q.resolveDataPath(flags.GetString("database_path"))
 	flags["extensions_autoload"] = q.resolveDataPath(flags.GetString("extensions_autoload"))
 	flags["flagfile"] = q.resolveDataPath(flags.GetString("flagfile"))
+
+	flags["tls_server_certs"] = q.resolveCertsPath(flags.GetString("tls_server_certs"))
+
+	// Augeas lenses are not available on windows
+	if runtime.GOOS == "windows" {
+		delete(flags, "augeas_lenses")
+	} else {
+		flags["augeas_lenses"] = q.lensesPath
+	}
 
 	flags["extensions_socket"] = q.socketPath
 
@@ -404,10 +451,85 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 		flags["disable_logging"] = false
 	}
 
+	// Check enabled tables
+	// If the default disabled table shows up in the enabled tables list, remove it from disabled tables list
+	// This changes the behvaour for this flag in a sense that if `curl` table is enabled
+	// then it just removes is from disabled tables flag and doesn't disable all the other table
+	enabledTables, disabledTables := getEnabledDisabledTables(userFlags)
+	if len(enabledTables) != 0 {
+		flags[flagEnableTables] = strings.Join(enabledTables, ",")
+	}
+
+	if len(disabledTables) != 0 {
+		flags[flagDisableTables] = strings.Join(disabledTables, ",")
+	}
+
 	return convertToArgs(flags)
 }
 
+func arrayToSet(arr []string) map[string]struct{} {
+	m := make(map[string]struct{}, len(arr))
+	for _, n := range arr {
+		m[n] = struct{}{}
+	}
+	return m
+}
+
+// https://osquery.readthedocs.io/en/stable/installation/cli-flags/#enable-and-disable-flags
+// By default every table is enabled.
+// If a specific table is set in both --enable_tables and --disable_tables, disabling take precedence.
+// If --enable_tables is defined and --disable_tables is not set, every table but the one defined in --enable_tables
+func getEnabledDisabledTables(userFlags Flags) (enabled, disabled []string) {
+	enabledTables := make(map[string]struct{})
+
+	// Initialize with default disabled tables
+	disabledTables := arrayToSet(defaultDisabledTables)
+
+	iterate := func(key string, fn func(name string)) {
+		if tablesValue, ok := userFlags[key]; ok {
+			if tablesString, ok := tablesValue.(string); ok {
+				tables := strings.Split(tablesString, ",")
+				for _, table := range tables {
+					name := strings.TrimSpace(table)
+					if name == "" {
+						continue
+					}
+					fn(name)
+				}
+			}
+		}
+	}
+
+	normalize := func(tables map[string]struct{}) []string {
+		res := make([]string, 0, len(tables))
+		for name := range tables {
+			res = append(res, name)
+		}
+		if len(res) > 0 {
+			sort.Strings(res)
+		}
+		return res
+	}
+
+	// Append the disabled tables from flags
+	iterate("disable_tables", func(name string) {
+		disabledTables[name] = struct{}{}
+	})
+
+	// Check enabled tables flag and remove these tables from disabledTables
+	iterate("enable_tables", func(name string) {
+		if _, ok := disabledTables[name]; ok {
+			delete(disabledTables, name)
+		} else {
+			enabledTables[name] = struct{}{}
+		}
+	})
+
+	return normalize(enabledTables), normalize(disabledTables)
+}
+
 func (q *OSQueryD) createCommand(userFlags Flags) *exec.Cmd {
+	//nolint:gosec // works as expected
 	return exec.Command(
 		osquerydPath(q.binPath), q.args(userFlags)...)
 }
@@ -444,10 +566,14 @@ func (q *OSQueryD) resolveDataPath(filename string) string {
 	return filepath.Join(q.dataPath, filename)
 }
 
+func (q *OSQueryD) resolveCertsPath(filename string) string {
+	return filepath.Join(q.certsPath, filename)
+}
+
 func (q *OSQueryD) logOSQueryOutput(ctx context.Context, r io.ReadCloser) error {
 	log := q.log.With("ctx", "osqueryd output")
 
-	buf := make([]byte, 2048, 2048)
+	buf := make([]byte, 2048)
 LOOP:
 	for {
 		n, err := r.Read(buf[:])
@@ -455,7 +581,7 @@ LOOP:
 			log.Info(string(buf[:n]))
 		}
 		if err != nil {
-			if err == io.EOF {
+			if errors.Is(err, io.EOF) {
 				err = nil
 			}
 			return err

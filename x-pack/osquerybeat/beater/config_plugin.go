@@ -11,9 +11,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -54,8 +54,8 @@ type ConfigPlugin struct {
 	// and we would not be able to resolve types or ECS mapping or the namespace.
 	newQueryInfoMap queryInfoMap
 
-	// Datastream namesapces map that allows to lookup the namespace per query.
-	// The datastream namespaces map is handled separatelly from query info
+	// Datastream namespaces map that allows to lookup the namespace per query.
+	// The datastream namespaces map is handled separately from query info
 	// because if we delay updating it until the osqueryd config refresh (up to 1 minute, the way we do with queryinfo)
 	// we could be sending data into the datastream with namespace that we don't have permissions meanwhile
 	namespaces map[string]string
@@ -214,10 +214,14 @@ func (p *ConfigPlugin) set(inputs []config.InputConfig) (err error) {
 			Query:      qi.Query,
 			ECSMapping: ecsm,
 		}
-		namespaces[name] = p.namespace
+		namespaces[name] = ns
 		queriesCount++
 
-		qi.Snapshot = true
+		// Force snapshot by default
+		if qi.Snapshot == nil {
+			snapshot := true
+			qi.Snapshot = &snapshot
+		}
 		return qi, nil
 	}
 

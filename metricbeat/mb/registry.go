@@ -23,10 +23,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const initialSize = 20 // initialSize specifies the initial size of the Register.
@@ -267,7 +265,7 @@ func (r *Register) metricSetRegistration(module, name string) (MetricSetRegistra
 	if source := r.secondarySource; source != nil && source.HasMetricSet(module, name) {
 		registration, err := source.MetricSetRegistration(r, module, name)
 		if err != nil {
-			return MetricSetRegistration{}, errors.Wrapf(err, "failed to obtain registration for non-registered metricset '%s/%s'", module, name)
+			return MetricSetRegistration{}, fmt.Errorf("failed to obtain registration for non-registered metricset '%s/%s': %w", module, name, err)
 		}
 		return registration, nil
 	}

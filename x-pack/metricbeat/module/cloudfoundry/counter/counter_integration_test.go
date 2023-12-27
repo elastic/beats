@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build integration && cloudfoundry && !aix
-// +build integration,cloudfoundry,!aix
 
 package counter
 
@@ -13,9 +12,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry/mtest"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestFetch(t *testing.T) {

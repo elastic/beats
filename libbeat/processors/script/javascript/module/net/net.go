@@ -27,9 +27,8 @@ import (
 // Require registers the net module that provides utilities for working with IP
 // addresses. It can be accessed using:
 //
-//    // javascript
-//    var net = require('net');
-//
+//	// javascript
+//	var net = require('net');
 func Require(vm *goja.Runtime, module *goja.Object) {
 	o := module.Get("exports").(*goja.Object)
 	o.Set("isIP", isIP)

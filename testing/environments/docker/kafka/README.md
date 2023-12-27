@@ -10,23 +10,23 @@ The files in the `certs` directory were generated with these commands:
 
 ```sh
 # create the broker's key
-keytool -keystore broker.keystore.jks -storepass KafkaTest -alias broker -validity 5000 -keyalg RSA -genkey
+keytool -keystore broker.keystore.jks -storepass KafkaTest -alias broker -validity 5000 -keyalg RSA -sigalg SHA256withRSA -genkey
 
 What is your first and last name?
   [Unknown]:  kafka
   ...
 
-# create a new certificate authority
+# create a new certificate authority, use passphrase KafkaTest
 openssl req -new -x509 -keyout ca-key -out ca-cert -days 5000
 
 # add the CA to the kafka client's trust store
-keytool -keystore client.truststore.jks -storepass KafkaTest -alias CARoot -keyalg RSA -import -file ca-cert
+keytool -keystore client.truststore.jks -storepass KafkaTest -alias CARoot -keyalg RSA -sigalg SHA256withRSA -import -file ca-cert
 
 # export the server certificate
 keytool -keystore broker.keystore.jks -storepass KafkaTest -alias broker -certreq -file broker-cert
 
 # sign it with the CA
-openssl x509 -req -CA ca-cert -CAkey ca-key -in broker-cert -out broker-cert-signed -days 5000 -CAcreateserial -passin pass:KafkaTest
+openssl x509 -req -CA ca-cert -CAkey ca-key -in broker-cert -out broker-cert-signed -days 5000 -CAcreateserial -passin pass:KafkaTest -sha256
 
 # import CA and signed cert back into server keystore
 keytool -keystore broker.keystore.jks -storepass KafkaTest -alias CARoot -import -file ca-cert

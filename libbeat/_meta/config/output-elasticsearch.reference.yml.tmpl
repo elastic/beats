@@ -9,8 +9,17 @@ output.elasticsearch:
   # IPv6 addresses should always be defined as: https://[2001:db8::1]:9200
   hosts: ["localhost:9200"]
 
-  # Set gzip compression level.
-  #compression_level: 0
+  # Performance presets configure other output fields to recommended values
+  # based on a performance priority.
+  # Options are "balanced", "throughput", "scale", "latency" and "custom".
+  # Default if unspecified: "custom"
+  preset: balanced
+
+  # Set gzip compression level. Set to 0 to disable compression.
+  # This field may conflict with performance presets. To set it
+  # manually use "preset: custom".
+  # The default is 1.
+  #compression_level: 1
 
   # Configure escaping HTML symbols in strings.
   #escape_html: false
@@ -29,13 +38,22 @@ output.elasticsearch:
     #param2: value2
 
   # Number of workers per Elasticsearch host.
+  # This field may conflict with performance presets. To set it
+  # manually use "preset: custom".
   #worker: 1
+
+  # If set to true and multiple hosts are configured, the output plugin load
+  # balances published events onto all Elasticsearch hosts. If set to false,
+  # the output plugin sends all events to only one host (determined at random)
+  # and will switch to another host if the currently selected one becomes
+  # unreachable. The default value is true.
+  #loadbalance: true
 
   # Optional data stream or index name. The default is "{{.BeatIndexPrefix}}-%{[agent.version]}".
   # In case you modify this pattern you must update setup.template.name and setup.template.pattern accordingly.
   #index: "{{.BeatIndexPrefix}}-%{[agent.version]}"
 
-  # Optional ingest pipeline. By default no pipeline will be used.
+  # Optional ingest pipeline. By default, no pipeline will be used.
   #pipeline: ""
 
   # Optional HTTP path
@@ -59,8 +77,10 @@ output.elasticsearch:
   #max_retries: 3
 
   # The maximum number of events to bulk in a single Elasticsearch bulk API index request.
-  # The default is 50.
-  #bulk_max_size: 50
+  # This field may conflict with performance presets. To set it
+  # manually use "preset: custom".
+  # The default is 1600.
+  #bulk_max_size: 1600
 
   # The number of seconds to wait before trying to reconnect to Elasticsearch
   # after a network error. After waiting backoff.init seconds, the Beat
@@ -73,14 +93,30 @@ output.elasticsearch:
   # Elasticsearch after a network error. The default is 60s.
   #backoff.max: 60s
 
+  # The maximum amount of time an idle connection will remain idle
+  # before closing itself.  Zero means use the default of 60s. The
+  # format is a Go language duration (example 60s is 60 seconds).
+  # This field may conflict with performance presets. To set it
+  # manually use "preset: custom".
+  # The default is 3s.
+  # idle_connection_timeout: 3s
+
   # Configure HTTP request timeout before failing a request to Elasticsearch.
   #timeout: 90
 
-  # {{.BeatName}} expects Elasticsearch to be the same version or newer than the Beat.
-  # Lift the version restriction by setting allow_older_versions to true.
-  #allow_older_versions: false
+  # Prevents {{.BeatName}} from connecting to older Elasticsearch versions when set to `false`
+  #allow_older_versions: true
 
 {{include "ssl.reference.yml.tmpl" . | indent 2 }}
+
+  # Enables restarting {{.BeatName}} if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 

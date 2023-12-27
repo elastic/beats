@@ -18,12 +18,14 @@
 package input_logfile
 
 import (
+	"context"
+	"errors"
 	"time"
 
 	"github.com/elastic/go-concert/timed"
 	"github.com/elastic/go-concert/unison"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // cleaner removes finished entries from the registry file.
@@ -33,21 +35,25 @@ type cleaner struct {
 
 // run starts a loop that tries to clean entries from the registry.
 // The cleaner locks the store, such that no new states can be created
-// during the cleanup phase. Only resources that are finished and whos TTL
+// during the cleanup phase. Only resources that are finished and whose TTL
 // (clean_timeout setting) has expired will be removed.
 //
 // Resources are considered "Finished" if they do not have a current owner (active input), and
 // if they have no pending updates that still need to be written to the registry file after associated
 // events have been ACKed by the outputs.
+//
 // The event acquisition timestamp is used as reference to clean resources. If a resources was blocked
-// for a long time, and the life time has been exhausted, then the resource will be removed immediately
+// for a long time, and the lifetime has been exhausted, then the resource will be removed immediately
 // once the last event has been ACKed.
 func (c *cleaner) run(canceler unison.Canceler, store *store, interval time.Duration) {
 	started := time.Now()
-	timed.Periodic(canceler, interval, func() error {
+	err := timed.Periodic(canceler, interval, func() error {
 		gcStore(c.log, started, store)
 		return nil
 	})
+	if err != nil && !errors.Is(err, context.Canceled) {
+		c.log.Errorw("failed running periodic registry cleaning routine", "error", err)
+	}
 }
 
 // gcStore looks for resources to remove and deletes these. `gcStore` receives

@@ -1,0 +1,25 @@
+name: check-x-pack-libbeat
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/check-xpack-libbeat.yml'
+      - 'x-pack/libbeat/**'
+      - 'libbeat/**'
+
+env:
+  BEAT_MODULE: 'x-pack/libbeat'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version-file: .go-version
+    - name: Run check/update
+      run: |
+        go install github.com/magefile/mage
+        make -C ${{ env.BEAT_MODULE }} check update
+        make check-no-changes

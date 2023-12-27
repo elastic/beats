@@ -28,9 +28,18 @@ staleLabel: Stalled
 
 # Comment to post when marking as stale. Set to `false` to disable
 markComment: >
-  This issue has been automatically marked as stale because it has not had
-  recent activity. It will be closed if no further activity occurs. Thank you
-  for your contributions.
+  Hi!
+
+  We just realized that we haven't looked into this issue in a while. We're
+  sorry!
+
+
+  We're labeling this issue as `Stale` to make it hit our filters and
+  make sure we get back to it as soon as possible. In the meantime, it'd
+  be extremely helpful if you could take a look at it as well and confirm its
+  relevance. A simple comment with a nice emoji will be enough `:+1`.
+
+  Thank you for your contribution!
 
 # Comment to post when removing the stale label.
 # unmarkComment: >
@@ -57,13 +66,13 @@ pulls:
     sorry!
 
 
-    We're labeling this issue as `Stale` to make it hit our filters and 
-    make sure we get back to it in as soon as possible. In the meantime, it'd
+    We're labeling this issue as `Stale` to make it hit our filters and
+    make sure we get back to it as soon as possible. In the meantime, it'd
     be extremely helpful if you could take a look at it as well and confirm its
     relevance. A simple comment with a nice emoji will be enough `:+1`.
 
     Thank you for your contribution!
- 
+
   closeComment: >
     Hi!
 
@@ -76,7 +85,6 @@ pulls:
     Feel free to re-open this PR if you think it should stay open and is worth rebasing.
 
     Thank you for your contribution!
-
 
 # issues:
 #   exemptLabels:

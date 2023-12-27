@@ -32,3 +32,25 @@
 2021-04-19 03:05:03,965 [myid:1] - INFO  [NIOWorkerThread-7:MBeanRegistry@128] - Unregister MBean [org.apache.ZooKeeperService:name0=ReplicatedServer_id1,name1=replica.1,name2=Leader,name3=Connections,name4=172.17.0.2,name5=0x10000318e5f0022]
 2021-04-19 03:05:03,965 [myid:1] - INFO  [NIOWorkerThread-7:NIOServerCnxn@627] - Closed socket connection for client /172.17.0.2:58658 which had sessionid 0x10000318e5f0022
 2021-04-19 03:05:14,058 [myid:1] - INFO  [SessionTracker:ZooKeeperServer@391] - Expiring session 0x10000318e5f0022, timeout of 10000ms exceeded
+2021-04-19 03:05:15,053 [myid:1] - WARN  [RecvWorker:5:QuorumCnxManager$RecvWorker@1397] - Connection broken for id 5, my id = 1
+javax.net.ssl.SSLException: Socket is closed
+        at java.base/sun.security.ssl.Alert.createSSLException(Alert.java:127)
+        at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:349)
+        at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:292)
+        at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:287)
+        at java.base/sun.security.ssl.SSLSocketImpl.handleException(SSLSocketImpl.java:1591)
+        at java.base/sun.security.ssl.SSLSocketImpl$AppInputStream.read(SSLSocketImpl.java:989)
+        at org.apache.zookeeper.server.quorum.UnifiedServerSocket$UnifiedInputStream.read(UnifiedServerSocket.java:693)
+        at java.base/java.io.BufferedInputStream.fill(BufferedInputStream.java:252)
+        at java.base/java.io.BufferedInputStream.read(BufferedInputStream.java:271)
+        at java.base/java.io.DataInputStream.readInt(DataInputStream.java:392)
+        at org.apache.zookeeper.server.quorum.QuorumCnxManager$RecvWorker.run(QuorumCnxManager.java:1385)
+Caused by: java.net.SocketException: Socket is closed
+        at java.base/java.net.Socket.shutdownInput(Socket.java:1539)
+        at java.base/sun.security.ssl.BaseSSLSocketImpl.shutdownInput(BaseSSLSocketImpl.java:218)
+        at java.base/sun.security.ssl.SSLSocketImpl.shutdownInput(SSLSocketImpl.java:757)
+        at java.base/sun.security.ssl.SSLSocketImpl.shutdownInput(SSLSocketImpl.java:730)
+        at java.base/sun.security.ssl.SSLSocketImpl.handleEOF(SSLSocketImpl.java:1612)
+        at java.base/sun.security.ssl.SSLSocketImpl.readApplicationRecord(SSLSocketImpl.java:1366)
+        at java.base/sun.security.ssl.SSLSocketImpl$AppInputStream.read(SSLSocketImpl.java:973)
+        ... 5 more

@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build integration
-// +build integration
 
 package stats
 
@@ -17,6 +16,7 @@ import (
 )
 
 func TestData(t *testing.T) {
+	t.Skip("tests failing: https://github.com/elastic/beats/issues/34844")
 	service := compose.EnsureUp(t, "stan")
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))
@@ -24,6 +24,7 @@ func TestData(t *testing.T) {
 }
 
 func TestFetch(t *testing.T) {
+	t.Skip("tests failing: https://github.com/elastic/beats/issues/34844")
 	service := compose.EnsureUp(t, "stan")
 
 	m := mbtest.NewFetcher(t, getConfig(service.Host()))

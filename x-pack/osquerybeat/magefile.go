@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -20,6 +19,7 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
@@ -124,6 +124,12 @@ func extractFromMSI() error {
 			return err
 		}
 
+		fmt.Println("copy certs.pem from MSI")
+		err = devtools.Copy(filepath.Join(dip, distro.OsquerydCertsWindowsDistroPath()), distro.OsquerydCertsPath(dip))
+		if err != nil {
+			return err
+		}
+
 		fmt.Println("copy osqueryd.exe from MSI")
 		dp := distro.OsquerydPathForOS(osarch.OS, dip)
 		err = devtools.Copy(filepath.Join(dip, "osquery", "osqueryd", "osqueryd.exe"), dp)
@@ -189,6 +195,13 @@ func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
 }
 
+// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
+// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
+// were built and only performs the merge.
+func AssembleDarwinUniversal() error {
+	return build.AssembleDarwinUniversal()
+}
+
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
@@ -205,6 +218,14 @@ func Package() {
 	mg.Deps(Update, osquerybeat.FetchOsqueryDistros)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
+}
+
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
+	return nil
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).

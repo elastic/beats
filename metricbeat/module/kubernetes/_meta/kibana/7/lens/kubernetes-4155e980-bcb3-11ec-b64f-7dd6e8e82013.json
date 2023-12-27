@@ -1,0 +1,178 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "7711169c-3a7b-4071-98d0-3644aa1dde0b": {
+                            "columnOrder": [
+                                "0ef9858e-46db-48c0-ae7c-4da231c9744b",
+                                "8782d440-1d9a-4826-888b-07cda7c4668a",
+                                "e8b720ef-3fec-4c63-8a7a-b64900c938a1",
+                                "118dfa8c-388e-430c-860f-ce84cf88ac39"
+                            ],
+                            "columns": {
+                                "0ef9858e-46db-48c0-ae7c-4da231c9744b": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "CronJob ",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "118dfa8c-388e-430c-860f-ce84cf88ac39",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.cronjob.name"
+                                },
+                                "118dfa8c-388e-430c-860f-ce84cf88ac39": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Epoch Time until Next Schedule(sec)",
+                                    "operationType": "median",
+                                    "params": {
+                                        "format": {
+                                            "id": "number",
+                                            "params": {
+                                                "decimals": 0
+                                            }
+                                        }
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.cronjob.next_schedule.sec"
+                                },
+                                "8782d440-1d9a-4826-888b-07cda7c4668a": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Epoch Time since Creation(sec)",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "format": {
+                                            "id": "number",
+                                            "params": {
+                                                "decimals": 0
+                                            }
+                                        },
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.cronjob.created.sec"
+                                },
+                                "e8b720ef-3fec-4c63-8a7a-b64900c938a1": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Epoch Time since Last Schedule(sec)",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "format": {
+                                            "id": "number",
+                                            "params": {
+                                                "decimals": 0
+                                            }
+                                        },
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.cronjob.last_schedule.sec"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "eae93c72-eb87-4a07-850b-43393ea55bcf",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "state_cronjob"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "state_cronjob"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "0ef9858e-46db-48c0-ae7c-4da231c9744b",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "8782d440-1d9a-4826-888b-07cda7c4668a",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "e8b720ef-3fec-4c63-8a7a-b64900c938a1",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "118dfa8c-388e-430c-860f-ce84cf88ac39",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "7711169c-3a7b-4071-98d0-3644aa1dde0b",
+                "layerType": "data",
+                "rowHeight": "single",
+                "rowHeightLines": 1
+            }
+        },
+        "title": "CronJobs Informations [Metricbeat Kubernetes]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-4155e980-bcb3-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-7711169c-3a7b-4071-98d0-3644aa1dde0b",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "eae93c72-eb87-4a07-850b-43393ea55bcf",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-05-23T08:46:42.762Z",
+    "version": "WzY2NSwxXQ=="
+}

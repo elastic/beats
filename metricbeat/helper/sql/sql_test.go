@@ -28,8 +28,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type kv struct {
@@ -136,7 +136,7 @@ func TestFetchTableMode(t *testing.T) {
 	}
 }
 
-func checkValue(t *testing.T, res kv, ms common.MapStr) {
+func checkValue(t *testing.T, res kv, ms mapstr.M) {
 	switch v := res.v.(type) {
 	case string, bool:
 		if ms[res.k] != v {
@@ -186,10 +186,10 @@ func checkValue(t *testing.T, res kv, ms common.MapStr) {
 }
 
 func TestToDotKeys(t *testing.T) {
-	ms := common.MapStr{"key_value": "value"}
+	ms := mapstr.M{"key_value": "value"}
 	ms = ReplaceUnderscores(ms)
 
-	if ms["key"].(common.MapStr)["value"] != "value" {
+	if ms["key"].(mapstr.M)["value"] != "value" {
 		t.Fail()
 	}
 }

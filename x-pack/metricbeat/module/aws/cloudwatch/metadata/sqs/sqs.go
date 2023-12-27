@@ -11,48 +11,50 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
-	"github.com/aws/aws-sdk-go-v2/service/sqs/sqsiface"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 const metadataPrefix = "aws.sqs.queue"
 
 // AddMetadata adds metadata for SQS queues from a specific region
-func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) map[string]mb.Event {
-	sqsServiceName := awscommon.CreateServiceName("sqs", fips_enabled, regionName)
-	svc := sqs.New(awscommon.EnrichAWSConfigWithEndpoint(
-		endpoint, sqsServiceName, regionName, awsConfig))
+func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
+	svc := sqs.NewFromConfig(awsConfig, func(o *sqs.Options) {
+		if fips_enabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+
+	})
 
 	// Get queueUrls for each region
 	queueURLs, err := getQueueUrls(svc)
 	if err != nil {
-		logp.Error(fmt.Errorf("getQueueUrls failed, skipping region %s: %w", regionName, err))
-		return events
+		return events, fmt.Errorf("aws.sqs.queue fields are not available, skipping region %s: %w", regionName, err)
 	}
 
 	// collect monitoring state for each instance
 	for _, queueURL := range queueURLs {
 		queueURLParsed := strings.Split(queueURL, "/")
 		queueName := queueURLParsed[len(queueURLParsed)-1]
-		if _, ok := events[queueName]; !ok {
-			continue
+		for eventIdentifier := range events {
+			eventIdentifierComponents := strings.Split(eventIdentifier, "-")
+			potentialQueueName := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
+			if queueName != potentialQueueName {
+				continue
+			}
+
+			_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+".name", queueName)
 		}
-		events[queueName].RootFields.Put(metadataPrefix+".name", queueName)
 	}
-	return events
+	return events, nil
 }
 
-func getQueueUrls(svc sqsiface.ClientAPI) ([]string, error) {
+func getQueueUrls(svc *sqs.Client) ([]string, error) {
 	// ListQueues
 	listQueuesInput := &sqs.ListQueuesInput{}
-	req := svc.ListQueuesRequest(listQueuesInput)
-	output, err := req.Send(context.TODO())
+	output, err := svc.ListQueues(context.TODO(), listQueuesInput)
 	if err != nil {
-		err = errors.Wrap(err, "Error ListQueues")
+		err = fmt.Errorf("error ListQueues: %w", err)
 		return nil, err
 	}
 	return output.QueueUrls, nil

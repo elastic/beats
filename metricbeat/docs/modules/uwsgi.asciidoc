@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: uwsgi
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/uwsgi/_meta/docs.asciidoc
+
 
 [[metricbeat-module-uwsgi]]
 == uWSGI module
@@ -26,6 +28,8 @@ The uwsgi module comes with a predefined dashboard. For example:
 
 image::./images/uwsgi_dashboard.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -52,3 +56,4 @@ The following metricsets are available:
 
 include::uwsgi/status.asciidoc[]
 
+:edit_url!:

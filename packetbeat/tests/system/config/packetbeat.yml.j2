@@ -1,7 +1,9 @@
 #################### Packetbeat Configuration Template #########################
 
 # Select the network interfaces to sniff the data. You can use the "any"
-# keyword to sniff on all connected interfaces.
+# keyword to sniff on all connected interfaces. On all platforms, you
+# can use "default_route", "default_route_ipv4" or "default_route_ipv6"
+# to sniff on the device carrying the default route.
 packetbeat.interfaces.device: {{ iface_device|default("any") }}
 packetbeat.interfaces.internal_networks:
   - private
@@ -22,7 +24,7 @@ packetbeat.interfaces.bpf_filter: {{ bpf_filter }}
 # timed out.
 packetbeat.flows.timeout: 2s
 
-# Configure reporting period. If set to -1, only killed flows will be reported
+# Configure reporting period. If set to -1s, only killed flows will be reported
 packetbeat.flows.period: -1s
 {% endif %}
 
@@ -152,6 +154,7 @@ packetbeat.protocols:
 
 - type: sip
   ports: [{{ sip_ports|default([5060])|join(", ") }}]
+  transport_protocol: {{transport_protocol}}
 
 
 {% if procs_enabled %}
@@ -247,4 +250,8 @@ output.file:
   filename: "{{ output_file_filename|default("packetbeat") }}"
   rotate_every_kb: {{ rotate_every_kb | default(1000) }}
   #number_of_files: 7
+{%- endif %}
+
+{% if timestamp_precision %}
+timestamp.precision: {{ timestamp_precision }}
 {%- endif %}

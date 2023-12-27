@@ -1,0 +1,30 @@
+- name: shovel
+  type: group
+  release: beta
+  description: >
+    shovel
+  fields:
+    - name: name
+      type: keyword
+      description: >
+        The name of the shovel with non-ASCII characters escaped as in C.
+    - name: vhost
+      type: alias
+      path: rabbitmq.vhost
+      migration: true
+      description: >
+        Virtual host name with non-ASCII characters escaped as in C.
+    - name: node
+      type: alias
+      path: rabbitmq.node.name
+      migration: true
+      description: >
+        Node name.
+    - name: state
+      type: keyword
+      description: >
+        The state of the shovel. Normally 'running', but could be 'starting' or 'terminated'.
+    - name: type
+      type: keyword
+      description: >
+        The type of the shovel. Either 'static' or 'dynamic'.

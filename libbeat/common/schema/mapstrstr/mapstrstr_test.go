@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestConversions(t *testing.T) {
@@ -60,13 +61,13 @@ func TestConversions(t *testing.T) {
 	ts, err := time.Parse(time.RFC3339Nano, "2016-08-12T08:00:59.601478Z")
 	assert.NoError(t, err)
 
-	expected := common.MapStr{
+	expected := mapstr.M{
 		"test_string": "hello",
 		"test_int":    int64(42),
 		"test_bool":   true,
 		"test_float":  42.1,
 		"test_time":   common.Time(ts),
-		"test_obj": common.MapStr{
+		"test_obj": mapstr.M{
 			"test_obj_string": "hello, object",
 		},
 	}
@@ -122,7 +123,7 @@ func TestKeyInErrors(t *testing.T) {
 			assert.Contains(t, err.Error(), c.Expected, c.Description)
 		}
 
-		_, errs := c.Schema.ApplyTo(common.MapStr{}, c.Input)
+		_, errs := c.Schema.ApplyTo(mapstr.M{}, c.Input)
 		assert.Error(t, errs.Err(), c.Description)
 		if assert.Equal(t, 1, len(errs), c.Description) {
 			keyErr, ok := errs[0].(s.KeyError)

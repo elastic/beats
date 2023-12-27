@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package fileset
 
@@ -31,7 +30,8 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 func makeTestInfo(version string) beat.Info {
@@ -205,7 +205,7 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 				"close_eof": true,
 			},
 			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
-				c, ok := cfg.(*common.Config)
+				c, ok := cfg.(*conf.C)
 				if !ok {
 					t.FailNow()
 				}
@@ -225,7 +225,7 @@ func TestGetInputConfigNginxOverrides(t *testing.T) {
 				"pipeline": "foobar",
 			},
 			func(t require.TestingT, cfg interface{}, rest ...interface{}) {
-				c, ok := cfg.(*common.Config)
+				c, ok := cfg.(*conf.C)
 				if !ok {
 					t.FailNow()
 				}
@@ -270,7 +270,7 @@ func TestGetPipelineNginx(t *testing.T) {
 	fs := getModuleForTesting(t, "nginx", "access")
 	require.NoError(t, fs.Read(makeTestInfo("5.2.0")))
 
-	version := common.MustNewVersion("5.2.0")
+	version := version.MustNew("5.2.0")
 	pipelines, err := fs.GetPipelines(*version)
 	require.NoError(t, err)
 	assert.Len(t, pipelines, 1)

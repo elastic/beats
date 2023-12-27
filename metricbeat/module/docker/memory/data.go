@@ -18,51 +18,55 @@
 package memory
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func eventsMapping(r mb.ReporterV2, memoryDataList []MemoryData) {
-	for _, memoryData := range memoryDataList {
-		eventMapping(r, &memoryData)
+	for i := range memoryDataList {
+		eventMapping(r, &memoryDataList[i])
 	}
 }
 
 func eventMapping(r mb.ReporterV2, memoryData *MemoryData) {
 
 	//if we have windows memory data, just report windows stats
-	var fields common.MapStr
+	var fields mapstr.M
+	rootFields := memoryData.Container.ToMapStr()
+
 	if memoryData.Commit+memoryData.CommitPeak+memoryData.PrivateWorkingSet > 0 {
-		fields = common.MapStr{
-			"commit": common.MapStr{
+		fields = mapstr.M{
+			"commit": mapstr.M{
 				"total": memoryData.Commit,
 				"peak":  memoryData.CommitPeak,
 			},
-			"private_working_set": common.MapStr{
+			"private_working_set": mapstr.M{
 				"total": memoryData.PrivateWorkingSet,
 			},
 		}
 	} else {
-		fields = common.MapStr{
+		fields = mapstr.M{
 			"stats": memoryData.Stats,
-			"fail": common.MapStr{
+			"fail": mapstr.M{
 				"count": memoryData.Failcnt,
 			},
 			"limit": memoryData.Limit,
-			"rss": common.MapStr{
+			"rss": mapstr.M{
 				"total": memoryData.TotalRss,
 				"pct":   memoryData.TotalRssP,
 			},
-			"usage": common.MapStr{
+			"usage": mapstr.M{
 				"total": memoryData.Usage,
 				"pct":   memoryData.UsageP,
 				"max":   memoryData.MaxUsage,
 			},
 		}
+		// Add container ECS fields
+		_, _ = rootFields.Put("container.memory.usage", memoryData.UsageP)
 	}
 
 	r.Event(mb.Event{
-		RootFields:      memoryData.Container.ToMapStr(),
+		RootFields:      rootFields,
 		MetricSetFields: fields,
 	})
 }

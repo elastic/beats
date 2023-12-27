@@ -18,38 +18,38 @@
 package host
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/vmware/govmomi/vim25/mo"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(hs mo.HostSystem) common.MapStr {
+func eventMapping(hs mo.HostSystem) mapstr.M {
 	totalCPU := int64(hs.Summary.Hardware.CpuMhz) * int64(hs.Summary.Hardware.NumCpuCores)
 	freeCPU := int64(totalCPU) - int64(hs.Summary.QuickStats.OverallCpuUsage)
 	usedMemory := int64(hs.Summary.QuickStats.OverallMemoryUsage) * 1024 * 1024
 	freeMemory := int64(hs.Summary.Hardware.MemorySize) - usedMemory
 
-	event := common.MapStr{
+	event := mapstr.M{
 		"name": hs.Summary.Config.Name,
-		"cpu": common.MapStr{
-			"used": common.MapStr{
+		"cpu": mapstr.M{
+			"used": mapstr.M{
 				"mhz": hs.Summary.QuickStats.OverallCpuUsage,
 			},
-			"total": common.MapStr{
+			"total": mapstr.M{
 				"mhz": totalCPU,
 			},
-			"free": common.MapStr{
+			"free": mapstr.M{
 				"mhz": freeCPU,
 			},
 		},
-		"memory": common.MapStr{
-			"used": common.MapStr{
+		"memory": mapstr.M{
+			"used": mapstr.M{
 				"bytes": usedMemory,
 			},
-			"total": common.MapStr{
+			"total": mapstr.M{
 				"bytes": hs.Summary.Hardware.MemorySize,
 			},
-			"free": common.MapStr{
+			"free": mapstr.M{
 				"bytes": freeMemory,
 			},
 		},

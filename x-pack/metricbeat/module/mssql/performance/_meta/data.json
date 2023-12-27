@@ -12,25 +12,25 @@
     "mssql": {
         "performance": {
             "active_temp_tables": 0,
-            "batch_requests_per_sec": 3355,
+            "batch_requests_per_sec": 7453,
             "buffer": {
                 "cache_hit": {
-                    "pct": 0.22
+                    "pct": 0.55
                 },
-                "checkpoint_pages_per_sec": 295,
-                "database_pages": 2152,
+                "checkpoint_pages_per_sec": 124,
+                "database_pages": 2191,
                 "page_life_expectancy": {
-                    "sec": 1400
+                    "sec": 2721
                 },
-                "target_pages": 3178496
+                "target_pages": 1589248
             },
-            "compilations_per_sec": 1151,
-            "connections_reset_per_sec": 88,
-            "lock_waits_per_sec": 6,
-            "logins_per_sec": 1105,
-            "logouts_per_sec": 1103,
-            "page_splits_per_sec": 14,
-            "recompilations_per_sec": 2,
+            "compilations_per_sec": 2503,
+            "connections_reset_per_sec": 61,
+            "lock_waits_per_sec": 4,
+            "logins_per_sec": 2448,
+            "logouts_per_sec": 2446,
+            "page_splits_per_sec": 15,
+            "recompilations_per_sec": 0,
             "transactions": 0,
             "user_connections": 2
         }

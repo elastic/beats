@@ -18,22 +18,27 @@
 package readfile
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
+	"fmt"
+
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Reader produces lines by reading lines from an io.Reader
 // through a decoder converting the reader it's encoding to utf-8.
 type FileMetaReader struct {
-	reader reader.Reader
-	path   string
-	offset int64
+	reader      reader.Reader
+	path        string
+	fi          file.ExtendedFileInfo
+	fingerprint string
+	offset      int64
 }
 
 // New creates a new Encode reader from input reader by applying
 // the given codec.
-func NewFilemeta(r reader.Reader, path string, offset int64) reader.Reader {
-	return &FileMetaReader{r, path, offset}
+func NewFilemeta(r reader.Reader, path string, fi file.ExtendedFileInfo, fingerprint string, offset int64) reader.Reader {
+	return &FileMetaReader{r, path, fi, fingerprint, offset}
 }
 
 // Next reads the next line from it's initial io.Reader
@@ -47,15 +52,26 @@ func (r *FileMetaReader) Next() (reader.Message, error) {
 		return message, err
 	}
 
-	message.Fields.DeepUpdate(common.MapStr{
-		"log": common.MapStr{
+	message.Fields.DeepUpdate(mapstr.M{
+		"log": mapstr.M{
 			"offset": r.offset,
-			"file": common.MapStr{
+			"file": mapstr.M{
 				"path": r.path,
 			},
 		},
 	})
 
+	err = setFileSystemMetadata(r.fi, message.Fields)
+	if err != nil {
+		return message, fmt.Errorf("failed to set file system metadata: %w", err)
+	}
+
+	if r.fingerprint != "" {
+		_, err = message.Fields.Put("log.file.fingerprint", r.fingerprint)
+		if err != nil {
+			return message, fmt.Errorf("failed to set fingerprint: %w", err)
+		}
+	}
 	r.offset += int64(message.Bytes)
 
 	return message, err

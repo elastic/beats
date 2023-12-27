@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: enterprisesearch
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/enterprisesearch/_meta/docs.asciidoc
+
 
 [[metricbeat-module-enterprisesearch]]
 [role="xpack"]
@@ -31,6 +33,8 @@ monitoring index instead of the default index typically used by {metricbeat}.
 For more details about the monitoring index, see
 {ref}/config-monitoring-indices.html[Configuring indices for monitoring].
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -66,3 +70,4 @@ include::enterprisesearch/health.asciidoc[]
 
 include::enterprisesearch/stats.asciidoc[]
 
+:edit_url!:

@@ -11,8 +11,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/winlogbeat/module"
+	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
 // GenTemplateConfigCmd is the command used to export the elasticsearch template.
@@ -28,7 +28,7 @@ func GenExportPipelineCmd(settings instance.Settings) *cobra.Command {
 				fatalf("--es.version is required")
 			}
 
-			ver, err := common.NewVersion(version)
+			ver, err := libversion.New(version)
 			if err != nil {
 				fatalf("Unable to parse ES version from %s: %+v", version, err)
 			}

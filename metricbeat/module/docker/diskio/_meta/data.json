@@ -1,42 +1,39 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "container": {
-        "id": "8abaa1f3514d3554503034a1df6ee09457f328757bbc9555245244ee853c0b44",
+        "id": "3f2af516565acd770488bc82f55d8ed17b335988f13bb7c5cd3e2dc9abdac6f4",
         "image": {
-            "name": "zookeeper"
+            "name": "docker.elastic.co/elasticsearch/elasticsearch:8.2.0-SNAPSHOT"
         },
-        "name": "some-zookeeper",
+        "name": "elastic-package-stack_elasticsearch_1",
         "runtime": "docker"
     },
     "docker": {
         "diskio": {
             "read": {
-                "bytes": 42409984,
-                "ops": 1823,
+                "bytes": 65941504,
+                "ops": 0,
                 "queued": 0,
                 "rate": 0,
                 "service_time": 0,
                 "wait_time": 0
             },
-            "reads": 0,
             "summary": {
-                "bytes": 42414080,
-                "ops": 1824,
+                "bytes": 0,
+                "ops": 0,
                 "queued": 0,
                 "rate": 0,
                 "service_time": 0,
                 "wait_time": 0
             },
-            "total": 0,
             "write": {
-                "bytes": 4096,
-                "ops": 1,
+                "bytes": 182902059008,
+                "ops": 0,
                 "queued": 0,
                 "rate": 0,
                 "service_time": 0,
                 "wait_time": 0
-            },
-            "writes": 0
+            }
         }
     },
     "event": {

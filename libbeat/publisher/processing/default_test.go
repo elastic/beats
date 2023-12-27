@@ -27,12 +27,35 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_cloud_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_docker_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_host_metadata"
+	_ "github.com/elastic/beats/v7/libbeat/processors/add_kubernetes_metadata"
 )
+
+func TestGenerateProcessorList(t *testing.T) {
+	inputCfg := []mapstr.M{
+		{"add_host_metadata": nil},
+		{"add_cloud_metadata": nil},
+		{"add_docker_metadata": nil},
+		{"add_kubernetes_metadata": nil},
+	}
+
+	plugins, err := processors.NewPluginConfigFromList(inputCfg)
+	require.NoError(t, err)
+
+	processors, err := processors.New(plugins)
+	require.NoError(t, err)
+	// make sure the processor init got the config formatted in a way it expected
+	require.Equal(t, 4, len(processors.List))
+}
 
 func TestProcessorsConfigs(t *testing.T) {
 	defaultInfo := beat.Info{
@@ -44,7 +67,7 @@ func TestProcessorsConfigs(t *testing.T) {
 		Version:     "0.1",
 	}
 
-	ecsFields := common.MapStr{"version": ecs.Version}
+	ecsFields := mapstr.M{"version": ecs.Version}
 
 	cases := map[string]struct {
 		factory  SupportFactory
@@ -52,14 +75,14 @@ func TestProcessorsConfigs(t *testing.T) {
 		local    beat.ProcessingConfig
 		drop     bool
 		event    string
-		want     common.MapStr
-		wantMeta common.MapStr
+		want     mapstr.M
+		wantMeta mapstr.M
 		infoMod  func(beat.Info) beat.Info
 	}{
 		"user global fields and tags": {
 			global: "{fields: {global: 1}, fields_under_root: true, tags: [tag]}",
 			event:  `{"value": "abc"}`,
-			want: common.MapStr{
+			want: mapstr.M{
 				"value":  "abc",
 				"global": uint64(1),
 				"tags":   []string{"tag"},
@@ -68,10 +91,10 @@ func TestProcessorsConfigs(t *testing.T) {
 		"beat local fields": {
 			global: "",
 			local: beat.ProcessingConfig{
-				Fields: common.MapStr{"local": 1},
+				Fields: mapstr.M{"local": 1},
 			},
 			event: `{"value": "abc"}`,
-			want: common.MapStr{
+			want: mapstr.M{
 				"value": "abc",
 				"local": 1,
 			},
@@ -79,10 +102,10 @@ func TestProcessorsConfigs(t *testing.T) {
 		"beat local and user global fields": {
 			global: "{fields: {global: 1}, fields_under_root: true, tags: [tag]}",
 			local: beat.ProcessingConfig{
-				Fields: common.MapStr{"local": 1},
+				Fields: mapstr.M{"local": 1},
 			},
 			event: `{"value": "abc"}`,
-			want: common.MapStr{
+			want: mapstr.M{
 				"value":  "abc",
 				"global": uint64(1),
 				"local":  1,
@@ -92,10 +115,10 @@ func TestProcessorsConfigs(t *testing.T) {
 		"user global fields overwrite beat local fields": {
 			global: "{fields: {global: a, shared: global}, fields_under_root: true}",
 			local: beat.ProcessingConfig{
-				Fields: common.MapStr{"local": "b", "shared": "local"},
+				Fields: mapstr.M{"local": "b", "shared": "local"},
 			},
 			event: `{"value": "abc"}`,
-			want: common.MapStr{
+			want: mapstr.M{
 				"value":  "abc",
 				"local":  "b",
 				"global": "a",
@@ -104,15 +127,15 @@ func TestProcessorsConfigs(t *testing.T) {
 		},
 		"user local fields and tags": {
 			local: beat.ProcessingConfig{
-				EventMetadata: common.EventMetadata{
-					Fields: common.MapStr{"local": "a"},
+				EventMetadata: mapstr.EventMetadata{
+					Fields: mapstr.M{"local": "a"},
 					Tags:   []string{"tag"},
 				},
 			},
 			event: `{"value": "abc"}`,
-			want: common.MapStr{
+			want: mapstr.M{
 				"value": "abc",
-				"fields": common.MapStr{
+				"fields": mapstr.M{
 					"local": "a",
 				},
 				"tags": []string{"tag"},
@@ -120,14 +143,14 @@ func TestProcessorsConfigs(t *testing.T) {
 		},
 		"user local fields (under root) and tags": {
 			local: beat.ProcessingConfig{
-				EventMetadata: common.EventMetadata{
-					Fields:          common.MapStr{"local": "a"},
+				EventMetadata: mapstr.EventMetadata{
+					Fields:          mapstr.M{"local": "a"},
 					FieldsUnderRoot: true,
 					Tags:            []string{"tag"},
 				},
 			},
 			event: `{"value": "abc"}`,
-			want: common.MapStr{
+			want: mapstr.M{
 				"value": "abc",
 				"local": "a",
 				"tags":  []string{"tag"},
@@ -136,8 +159,8 @@ func TestProcessorsConfigs(t *testing.T) {
 		"user local fields overwrite user global fields": {
 			global: `{fields: {global: a, shared: global}, fields_under_root: true, tags: [global]}`,
 			local: beat.ProcessingConfig{
-				EventMetadata: common.EventMetadata{
-					Fields: common.MapStr{
+				EventMetadata: mapstr.EventMetadata{
+					Fields: mapstr.M{
 						"local":  "a",
 						"shared": "local",
 					},
@@ -146,7 +169,7 @@ func TestProcessorsConfigs(t *testing.T) {
 				},
 			},
 			event: `{"value": "abc"}`,
-			want: common.MapStr{
+			want: mapstr.M{
 				"value":  "abc",
 				"global": "a",
 				"local":  "a",
@@ -156,33 +179,33 @@ func TestProcessorsConfigs(t *testing.T) {
 		},
 		"with client metadata": {
 			local: beat.ProcessingConfig{
-				Meta: common.MapStr{"index": "test"},
+				Meta: mapstr.M{"index": "test"},
 			},
 			event:    `{"value": "abc"}`,
-			want:     common.MapStr{"value": "abc"},
-			wantMeta: common.MapStr{"index": "test"},
+			want:     mapstr.M{"value": "abc"},
+			wantMeta: mapstr.M{"index": "test"},
 		},
 		"with client processor": {
 			local: beat.ProcessingConfig{
 				Processor: func() beat.ProcessorList {
 					g := newGroup("test", logp.L())
-					g.add(actions.NewAddFields(common.MapStr{"custom": "value"}, true, true))
+					g.add(actions.NewAddFields(mapstr.M{"custom": "value"}, true, true))
 					return g
 				}(),
 			},
 			event: `{"value": "abc"}`,
-			want:  common.MapStr{"value": "abc", "custom": "value"},
+			want:  mapstr.M{"value": "abc", "custom": "value"},
 		},
 		"with beat default fields": {
 			factory: MakeDefaultBeatSupport(true),
 			global:  `{fields: {global: a, agent.foo: bar}, fields_under_root: true, tags: [tag]}`,
 			event:   `{"value": "abc"}`,
-			want: common.MapStr{
+			want: mapstr.M{
 				"ecs": ecsFields,
-				"host": common.MapStr{
+				"host": mapstr.M{
 					"name": "test.host.name",
 				},
-				"agent": common.MapStr{
+				"agent": mapstr.M{
 					"ephemeral_id": "123e4567-e89b-12d3-a456-426655440000",
 					"name":         "test.host.name",
 					"id":           "123e4567-e89b-12d3-a456-426655440001",
@@ -203,12 +226,12 @@ func TestProcessorsConfigs(t *testing.T) {
 				info.Name = "other.test.host.name"
 				return info
 			},
-			want: common.MapStr{
+			want: mapstr.M{
 				"ecs": ecsFields,
-				"host": common.MapStr{
+				"host": mapstr.M{
 					"name": "other.test.host.name",
 				},
-				"agent": common.MapStr{
+				"agent": mapstr.M{
 					"ephemeral_id": "123e4567-e89b-12d3-a456-426655440000",
 					"name":         "other.test.host.name",
 					"id":           "123e4567-e89b-12d3-a456-426655440001",
@@ -225,9 +248,9 @@ func TestProcessorsConfigs(t *testing.T) {
 			factory: MakeDefaultObserverSupport(false),
 			global:  `{fields: {global: a, observer.foo: bar}, fields_under_root: true, tags: [tag]}`,
 			event:   `{"value": "abc"}`,
-			want: common.MapStr{
+			want: mapstr.M{
 				"ecs": ecsFields,
-				"observer": common.MapStr{
+				"observer": mapstr.M{
 					"ephemeral_id": "123e4567-e89b-12d3-a456-426655440000",
 					"hostname":     "test.host.name",
 					"id":           "123e4567-e89b-12d3-a456-426655440001",
@@ -247,7 +270,7 @@ func TestProcessorsConfigs(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			cfg, err := common.NewConfigWithYAML([]byte(test.global), "test")
+			cfg, err := config.NewConfigWithYAML([]byte(test.global), "test")
 			require.NoError(t, err)
 
 			info := defaultInfo
@@ -257,7 +280,7 @@ func TestProcessorsConfigs(t *testing.T) {
 
 			factory := test.factory
 			if factory == nil {
-				factory = MakeDefaultSupport(true)
+				factory = MakeDefaultSupport(true, nil)
 			}
 
 			support, err := factory(info, logp.L(), cfg)
@@ -279,24 +302,61 @@ func TestProcessorsConfigs(t *testing.T) {
 	}
 }
 
+// TestEventNormalizationOverride verifies that the EventNormalization option
+// in beat.ProcessingConfig overrides the "skipNormalize" setting that is
+// specified in the builder (this is the default value set by the Beat).
+func TestEventNormalizationOverride(t *testing.T) {
+	boolPtr := func(b bool) *bool { return &b }
+
+	testCases := []struct {
+		skipNormalize          bool
+		normalizeOverride      *bool
+		hasGeneralizeProcessor bool
+	}{
+		{skipNormalize: false, normalizeOverride: nil, hasGeneralizeProcessor: true},
+		{skipNormalize: false, normalizeOverride: boolPtr(false), hasGeneralizeProcessor: false},
+		{skipNormalize: false, normalizeOverride: boolPtr(true), hasGeneralizeProcessor: true},
+		{skipNormalize: true, normalizeOverride: nil, hasGeneralizeProcessor: false},
+		{skipNormalize: true, normalizeOverride: boolPtr(false), hasGeneralizeProcessor: false},
+		{skipNormalize: true, normalizeOverride: boolPtr(true), hasGeneralizeProcessor: true},
+	}
+
+	for _, tc := range testCases {
+		builder, err := newBuilder(beat.Info{}, logp.NewLogger(""), nil, mapstr.EventMetadata{}, nil, tc.skipNormalize, false)
+		require.NoError(t, err)
+
+		processor, err := builder.Create(beat.ProcessingConfig{EventNormalization: tc.normalizeOverride}, false)
+		require.NoError(t, err)
+		group := processor.(*group)
+
+		if tc.hasGeneralizeProcessor {
+			if assert.NotEmpty(t, group.list) {
+				assert.Equal(t, "generalizeEvent", group.list[0].String())
+			}
+		} else {
+			assert.Empty(t, group.list)
+		}
+	}
+}
+
 func TestNormalization(t *testing.T) {
 	cases := map[string]struct {
 		normalize bool
-		in        common.MapStr
-		mod       common.MapStr
-		want      common.MapStr
+		in        mapstr.M
+		mod       mapstr.M
+		want      mapstr.M
 	}{
 		"no sharing if normalized": {
 			normalize: true,
-			in:        common.MapStr{"a": "b"},
-			mod:       common.MapStr{"change": "x"},
-			want:      common.MapStr{"a": "b"},
+			in:        mapstr.M{"a": "b"},
+			mod:       mapstr.M{"change": "x"},
+			want:      mapstr.M{"a": "b"},
 		},
 		"data sharing if not normalized": {
 			normalize: false,
-			in:        common.MapStr{"a": "b"},
-			mod:       common.MapStr{"change": "x"},
-			want:      common.MapStr{"a": "b", "change": "x"},
+			in:        mapstr.M{"a": "b"},
+			mod:       mapstr.M{"change": "x"},
+			want:      mapstr.M{"a": "b", "change": "x"},
 		},
 	}
 
@@ -305,7 +365,7 @@ func TestNormalization(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			t.Parallel()
 
-			s, err := MakeDefaultSupport(test.normalize)(beat.Info{}, logp.L(), common.NewConfig())
+			s, err := MakeDefaultSupport(test.normalize, nil)(beat.Info{}, logp.L(), config.NewConfig())
 			require.NoError(t, err)
 
 			prog, err := s.Create(beat.ProcessingConfig{}, false)
@@ -326,13 +386,13 @@ func TestNormalization(t *testing.T) {
 }
 
 func BenchmarkNormalization(b *testing.B) {
-	s, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
+	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
 	require.NoError(b, err)
 
 	prog, err := s.Create(beat.ProcessingConfig{}, false)
 	require.NoError(b, err)
 
-	fields := common.MapStr{"a": "b"}
+	fields := mapstr.M{"a": "b"}
 	for i := 0; i < b.N; i++ {
 		f := fields.Clone()
 		_, _ = prog.Run(&beat.Event{Fields: f})
@@ -340,7 +400,7 @@ func BenchmarkNormalization(b *testing.B) {
 }
 
 func TestAlwaysDrop(t *testing.T) {
-	s, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
+	s, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
 
 	prog, err := s.Create(beat.ProcessingConfig{}, true)
@@ -355,30 +415,30 @@ func TestAlwaysDrop(t *testing.T) {
 }
 
 func TestDynamicFields(t *testing.T) {
-	factory, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
 
-	dynFields := common.NewMapStrPointer(common.MapStr{})
+	dynFields := mapstr.NewPointer(mapstr.M{})
 	prog, err := factory.Create(beat.ProcessingConfig{
 		DynamicFields: &dynFields,
 	}, false)
 	require.NoError(t, err)
 
-	actual, err := prog.Run(&beat.Event{Fields: common.MapStr{"hello": "world"}})
+	actual, err := prog.Run(&beat.Event{Fields: mapstr.M{"hello": "world"}})
 	require.NoError(t, err)
-	assert.Equal(t, common.MapStr{"hello": "world"}, actual.Fields)
+	assert.Equal(t, mapstr.M{"hello": "world"}, actual.Fields)
 
-	dynFields.Set(common.MapStr{"dyn": "field"})
-	actual, err = prog.Run(&beat.Event{Fields: common.MapStr{"hello": "world"}})
+	dynFields.Set(mapstr.M{"dyn": "field"})
+	actual, err = prog.Run(&beat.Event{Fields: mapstr.M{"hello": "world"}})
 	require.NoError(t, err)
-	assert.Equal(t, common.MapStr{"hello": "world", "dyn": "field"}, actual.Fields)
+	assert.Equal(t, mapstr.M{"hello": "world", "dyn": "field"}, actual.Fields)
 
 	err = factory.Close()
 	require.NoError(t, err)
 }
 
 func TestProcessingClose(t *testing.T) {
-	factory, err := MakeDefaultSupport(true)(beat.Info{}, logp.L(), common.NewConfig())
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
 	require.NoError(t, err)
 
 	// Inject a processor in the builder that we can check if has been closed.
@@ -401,7 +461,7 @@ func TestProcessingClose(t *testing.T) {
 	// Check that both processors are called
 	assert.False(t, factoryProcessor.called)
 	assert.False(t, clientProcessor.called)
-	_, err = prog.Run(&beat.Event{Fields: common.MapStr{"hello": "world"}})
+	_, err = prog.Run(&beat.Event{Fields: mapstr.M{"hello": "world"}})
 	require.NoError(t, err)
 	assert.True(t, factoryProcessor.called)
 	assert.True(t, clientProcessor.called)
@@ -420,8 +480,16 @@ func TestProcessingClose(t *testing.T) {
 	assert.True(t, factoryProcessor.closed)
 }
 
-func fromJSON(in string) common.MapStr {
-	var tmp common.MapStr
+func TestProcessingDiagnostics(t *testing.T) {
+	factory, err := MakeDefaultSupport(true, nil)(beat.Info{}, logp.L(), config.NewConfig())
+	require.NoError(t, err)
+
+	p := factory.Processors()
+	assert.Empty(t, p)
+}
+
+func fromJSON(in string) mapstr.M {
+	var tmp mapstr.M
 	err := json.Unmarshal([]byte(in), &tmp)
 	if err != nil {
 		panic(err)

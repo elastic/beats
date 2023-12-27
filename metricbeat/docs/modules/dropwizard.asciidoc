@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: dropwizard
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/dropwizard/_meta/docs.asciidoc
+
 
 [[metricbeat-module-dropwizard]]
 == Dropwizard module
@@ -14,6 +16,8 @@ This is the http://dropwizard.io[Dropwizard] module. The default metricset is `c
 
 The Dropwizard module is tested with dropwizard metrics 3.2.6, 4.0.0 and 4.1.2.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -45,3 +49,4 @@ The following metricsets are available:
 
 include::dropwizard/collector.asciidoc[]
 
+:edit_url!:

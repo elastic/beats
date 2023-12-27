@@ -16,14 +16,13 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package add_docker_metadata
 
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/docker"
+	"github.com/elastic/elastic-agent-autodiscover/docker"
 )
 
 // Config for docker processor.

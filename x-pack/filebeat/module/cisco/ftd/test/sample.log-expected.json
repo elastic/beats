@@ -100,7 +100,7 @@
         ]
     },
     {
-        "@timestamp": "2014-04-15T11:34:34.000-02:00",
+        "@timestamp": "2014-04-15T13:34:34.000Z",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -120,7 +120,6 @@
         "event.original": "%FTD-session-5-106100: access-list acl_in permitted tcp inside/10.1.2.16(2241) -> outside/192.0.0.89(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "success",
         "event.severity": 5,
-        "event.timezone": "-02:00",
         "event.type": [
             "allowed",
             "connection"
@@ -1926,7 +1925,7 @@
         ]
     },
     {
-        "@timestamp": "2018-04-15T11:34:34.000-02:00",
+        "@timestamp": "2018-04-15T13:34:34.000Z",
         "cisco.ftd.destination_interface": "outside",
         "cisco.ftd.message_id": "106100",
         "cisco.ftd.rule_name": "acl_in",
@@ -1946,7 +1945,6 @@
         "event.original": "%FTD-session-5-106100: access-list acl_in permitted tcp inside/10.0.0.16(2241) -> outside/192.0.0.99(2000) hit-cnt 1 first hit [0x71a87d94, 0x0]",
         "event.outcome": "success",
         "event.severity": 5,
-        "event.timezone": "-02:00",
         "event.type": [
             "allowed",
             "connection"
@@ -3427,6 +3425,7 @@
         "destination.port": 80,
         "event.action": "firewall-rule",
         "event.category": [
+            "intrusion_detection",
             "network"
         ],
         "event.code": 338004,
@@ -3434,7 +3433,7 @@
         "event.kind": "event",
         "event.module": "cisco",
         "event.original": "%FTD-4-338004: Dynamic Filter monitored blacklisted TCP traffic from inside:10.1.1.1/33340 (10.2.1.1/33340) to outsidet:192.0.2.223/80 (192.0.2.225/80), destination 192.0.2.223 resolved from dynamic list: 192.0.2.223/255.255.255.255, threat-level: very-high, category: Malware",
-        "event.outcome": "monitored",
+        "event.outcome": "success",
         "event.severity": 4,
         "event.timezone": "-02:00",
         "event.type": [

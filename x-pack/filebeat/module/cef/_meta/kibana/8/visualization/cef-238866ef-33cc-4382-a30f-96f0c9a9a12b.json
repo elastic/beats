@@ -1,0 +1,65 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Application Protocols [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "field": "network.application",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 20
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "maxFontSize": 72,
+                "minFontSize": 26,
+                "orientation": "single",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "scale": "square root"
+            },
+            "title": "Top 10 Application Protocols [Filebeat CEF]",
+            "type": "tagcloud"
+        }
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-238866ef-33cc-4382-a30f-96f0c9a9a12b",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-d687d631-96df-4c49-99ee-9e51c7053084",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzIzODAsMV0="
+}

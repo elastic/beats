@@ -18,8 +18,9 @@
 package mage
 
 import (
+	"fmt"
+
 	"github.com/magefile/mage/mg"
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 )
@@ -36,13 +37,13 @@ func CustomizePackaging() {
 	var (
 		moduleTarget = "module"
 		module       = devtools.PackageFile{
-			Mode:   0644,
+			Mode:   0o644,
 			Source: dirModuleGenerated,
 		}
 
 		modulesDTarget = "modules.d"
 		modulesD       = devtools.PackageFile{
-			Mode:    0644,
+			Mode:    0o644,
 			Source:  dirModulesDGenerated,
 			Config:  true,
 			Modules: true,
@@ -59,7 +60,7 @@ func CustomizePackaging() {
 				args.Spec.Files["/usr/share/{{.BeatName}}/"+moduleTarget] = module
 				args.Spec.Files["/etc/{{.BeatName}}/"+modulesDTarget] = modulesD
 			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
+				panic(fmt.Errorf("unhandled package type: %v", pkgType))
 			}
 			break
 		}
@@ -101,8 +102,8 @@ func prepareModulePackaging(files ...struct{ Src, Dst string }) error {
 		err := (&devtools.CopyTask{
 			Source:  copyAction.Src,
 			Dest:    copyAction.Dst,
-			Mode:    0644,
-			DirMode: 0755,
+			Mode:    0o644,
+			DirMode: 0o755,
 			Exclude: []string{
 				"/_meta",
 				"/test",

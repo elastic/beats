@@ -35,7 +35,7 @@
                         "line_width": 1,
                         "metrics": [
                             {
-                                "field": null,
+                                "field": "prometheus.metrics.sql_bytesin",
                                 "id": "61ca57f2-469d-11e7-af02-69e470af7417",
                                 "type": "positive_rate",
                                 "unit": "1s"
@@ -67,7 +67,7 @@
                         "line_width": 1,
                         "metrics": [
                             {
-                                "field": null,
+                                "field": "prometheus.metrics.sql_bytesout",
                                 "id": "15553391-cd04-11ea-90ab-5112cd60bde7",
                                 "type": "positive_rate",
                                 "unit": "1s"

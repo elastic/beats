@@ -11,22 +11,27 @@ import (
 
 	"github.com/gofrs/uuid"
 
+	"github.com/elastic/elastic-agent-autodiscover/utils"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/keystore"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/nomad"
+	"github.com/elastic/elastic-agent-autodiscover/bus"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // NomadEventKey is the key under which custom metadata is going
 const NomadEventKey = "nomad"
 
 func init() {
-	autodiscover.Registry.AddProvider("nomad", AutodiscoverBuilder)
+	err := autodiscover.Registry.AddProvider("nomad", AutodiscoverBuilder)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
 }
 
 // Provider implements autodiscover provider for docker containers
@@ -47,7 +52,7 @@ func AutodiscoverBuilder(
 	name string,
 	bus bus.Bus,
 	uuid uuid.UUID,
-	c *common.Config,
+	c *conf.C,
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
 	cfgwarn.Experimental("The nomad autodiscover provider is experimental.")
@@ -65,7 +70,7 @@ func AutodiscoverBuilder(
 	}
 	client, err := nomad.NewClient(clientConfig)
 	if err != nil {
-		return nil, fmt.Errorf("failed to intialize nomad API client: %w", err)
+		return nil, fmt.Errorf("failed to initialize nomad API client: %w", err)
 	}
 
 	mapper, err := template.NewConfigMapper(config.Templates, keystore, nil)
@@ -198,8 +203,8 @@ func (p *Provider) emit(obj *nomad.Resource, flag string) {
 			flag:       true,
 			"host":     nodeName,
 			"nomad":    allocMeta,
-			"meta": common.MapStr{
-				"nomad": common.MapStrUnion(allocMeta, common.MapStr{
+			"meta": mapstr.M{
+				"nomad": mapstr.Union(allocMeta, mapstr.M{
 					"task": task,
 				}),
 			},
@@ -232,20 +237,20 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	// Beat specific.
 	e := bus.Event{}
 
-	var tags, container common.MapStr
-	var meta, tasks common.MapStr
+	var tags, container mapstr.M
+	var meta, tasks mapstr.M
 
 	rawMeta, ok := event["meta"]
 	if ok {
-		meta = rawMeta.(common.MapStr)
+		meta = rawMeta.(mapstr.M)
 		if nomadMeta, ok := meta["nomad"]; ok {
-			meta = nomadMeta.(common.MapStr)
+			meta = nomadMeta.(mapstr.M)
 		}
 
 		// The builder base config can configure any of the field values of nomad if need be.
 		e["nomad"] = meta
 		if rawAnn, ok := meta["tags"]; ok {
-			tags = rawAnn.(common.MapStr)
+			tags = rawAnn.(mapstr.M)
 
 			e["tags"] = tags
 		}
@@ -258,27 +263,27 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	// Nomad supports different runtimes, so it will not always be _container_ info, but we could add
 	// metadata about the runtime driver.
 	if rawCont, ok := meta["container"]; ok {
-		container = rawCont.(common.MapStr)
+		container = rawCont.(mapstr.M)
 		e["container"] = container
 	}
 
 	// for hints we look at the aggregated task's meta
 	if rawTasks, ok := meta["task"]; ok {
-		tasks, ok = rawTasks.(common.MapStr)
+		tasks, ok = rawTasks.(mapstr.M)
 		if !ok {
 			p.logger.Warnf("Could not get meta for the given task: %s", rawTasks)
 			return e
 		}
 	}
 
-	cname := builder.GetContainerName(container)
-	hints := builder.GenerateHints(tasks, cname, p.config.Prefix)
+	cname := utils.GetContainerName(container)
+	hints := utils.GenerateHints(tasks, cname, p.config.Prefix)
 	if len(hints) > 0 {
 		e["hints"] = hints
 	}
 
 	prefix := strings.Split(p.config.Prefix, ".")[0]
-	tasks.Delete(prefix)
+	_ = tasks.Delete(prefix)
 
 	return e
 }

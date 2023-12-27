@@ -23,15 +23,14 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
 
-	"go.elastic.co/apm"
+	"go.elastic.co/apm/v2"
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )
 
 type worker struct {
-	observer outputObserver
-	qu       chan publisher.Batch
-	done     chan struct{}
+	qu   chan publisher.Batch
+	done chan struct{}
 }
 
 // clientWorker manages output client of type outputs.Client, not supporting reconnect.
@@ -50,11 +49,10 @@ type netClientWorker struct {
 	tracer *apm.Tracer
 }
 
-func makeClientWorker(observer outputObserver, qu chan publisher.Batch, client outputs.Client, logger logger, tracer *apm.Tracer) outputWorker {
+func makeClientWorker(qu chan publisher.Batch, client outputs.Client, logger logger, tracer *apm.Tracer) outputWorker {
 	w := worker{
-		observer: observer,
-		qu:       qu,
-		done:     make(chan struct{}),
+		qu:   qu,
+		done: make(chan struct{}),
 	}
 
 	var c interface {

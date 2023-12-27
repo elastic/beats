@@ -18,18 +18,17 @@
 package status
 
 import (
+	"fmt"
 	"net"
 	"net/url"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/digitalocean/go-libvirt"
 	"github.com/digitalocean/go-libvirt/libvirttest"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -90,7 +89,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 		c, err = net.DialTimeout(u.Scheme, address, m.Timeout)
 		if err != nil {
-			return errors.Wrapf(err, "cannot connect to %v", u)
+			return fmt.Errorf("cannot connect to %v: %w", u, err)
 		}
 	}
 
@@ -98,11 +97,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	l := libvirt.New(c)
 	if err = l.Connect(); err != nil {
-		return errors.Wrap(err, "error connecting to libvirtd")
+		return fmt.Errorf("error connecting to libvirtd: %w", err)
 	}
 	defer func() {
 		if err = l.Disconnect(); err != nil {
-			msg := errors.Wrap(err, "failed to disconnect")
+			msg := fmt.Errorf("failed to disconnect: %w", err)
 			report.Error(msg)
 			m.Logger().Error(msg)
 		}
@@ -110,7 +109,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	domains, err := l.Domains()
 	if err != nil {
-		return errors.Wrap(err, "error listing domains")
+		return fmt.Errorf("error listing domains: %w", err)
 	}
 
 	for _, d := range domains {
@@ -119,11 +118,11 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			continue
 		}
 		reported := report.Event(mb.Event{
-			ModuleFields: common.MapStr{
+			ModuleFields: mapstr.M{
 				"id":   d.ID,
 				"name": d.Name,
 			},
-			MetricSetFields: common.MapStr{
+			MetricSetFields: mapstr.M{
 				"state": getDomainStateName(state),
 			},
 		})

@@ -1,0 +1,89 @@
+[
+    {
+        "@timestamp": "2021-03-26T03:29:09Z",
+        "aws": {
+            "vpcflow": {
+                "account_id": "64111117617",
+                "action": "REJECT",
+                "az_id": "use1-az5",
+                "bytes": 1,
+                "dstaddr": "10.200.0.0",
+                "dstport": 33004,
+                "end": "2021-03-26T03:29:09Z",
+                "flow_direction": "ingress",
+                "instance_id": "i-0axxxxxx1ad77",
+                "interface_id": "eni-069xxxxxb7a490",
+                "log_status": "OK",
+                "packets": 52,
+                "pkt_dst_aws_service": "CLOUDFRONT",
+                "pkt_dstaddr": "10.200.0.80",
+                "pkt_src_aws_service": "AMAZON",
+                "pkt_srcaddr": "89.160.20.156",
+                "protocol": 17,
+                "region": "us-east-1",
+                "srcaddr": "89.160.20.156",
+                "srcport": 50041,
+                "start": "2021-03-26T03:28:12Z",
+                "sublocation_id": "fake-id",
+                "sublocation_type": "wavelength",
+                "subnet_id": "subnet-02d645xxxxxxxdbc0",
+                "tcp_flags": 1,
+                "tcp_flags_array": [
+                    "fin"
+                ],
+                "traffic_path": 1,
+                "type": "IPv4",
+                "version": 5,
+                "vpc_id": "vpc-09676f97xxxxxb8a7"
+            }
+        },
+        "cloud": {
+            "account": {
+                "id": "64111117617"
+            },
+            "availability_zone": "use1-az5",
+            "instance": {
+                "id": "i-0axxxxxx1ad77"
+            },
+            "region": "us-east-1"
+        },
+        "destination": {
+            "address": "10.200.0.0",
+            "ip": "10.200.0.0",
+            "port": 33004
+        },
+        "event": {
+            "action": "reject",
+            "end": "2021-03-26T03:29:09Z",
+            "outcome": "failure",
+            "start": "2021-03-26T03:28:12Z",
+            "type": [
+                "connection",
+                "denied"
+            ]
+        },
+        "message": "5 64111117617 eni-069xxxxxb7a490 89.160.20.156 10.200.0.0 50041 33004 17 52 1 1616729292 1616729349 REJECT OK vpc-09676f97xxxxxb8a7 subnet-02d645xxxxxxxdbc0 i-0axxxxxx1ad77 1 IPv4 89.160.20.156 10.200.0.80 us-east-1 use1-az5 wavelength fake-id AMAZON CLOUDFRONT ingress 1",
+        "network": {
+            "bytes": 1,
+            "direction": "ingress",
+            "iana_number": "17",
+            "packets": 52,
+            "transport": "udp",
+            "type": "ipv4"
+        },
+        "related": {
+            "ip": [
+                "89.160.20.156",
+                "10.200.0.0",
+                "10.200.0.80"
+            ]
+        },
+        "source": {
+            "address": "89.160.20.156",
+            "bytes": 1,
+            "ip": "89.160.20.156",
+            "packets": 52,
+            "port": 50041
+        }
+    }
+]

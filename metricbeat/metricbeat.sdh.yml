@@ -1,0 +1,99 @@
+logging.level: info
+
+metricbeat.max_start_delay: 10s
+
+metricbeat.modules:
+- module: system
+  metricsets:
+    - uptime          # System Uptime
+  enabled: true
+  period: 10s
+
+- module: system
+  metricsets:
+    - cpu             # CPU usage
+    - load            # CPU load averages
+    - memory          # Memory usage
+    - network         # Network IO
+    #- socket_summary  # Socket summary
+    - core           # Per CPU core usage
+    - diskio         # Disk IO
+    - filesystem     # File system usage for each mountpoint
+    #- fsstat         # File system summary metrics
+    #- raid           # Raid
+    #- socket         # Sockets and connection info (linux only)
+    #- service        # systemd service information
+  enabled: true
+  period: 10s
+  cpu.metrics:  ["percentages","normalized_percentages"]  # The other available options are normalized_percentages and ticks.
+  core.metrics: ["percentages"]  # The other available option is ticks.
+
+- module: system
+  metricsets:
+    - process         # Per process metrics
+    - process_summary # Process summary
+  enabled: true
+  period: 10s
+  processes: ['.*']
+
+  process.include_top_n:
+    enabled: true
+    by_cpu: 15
+    by_memory: 15
+  process.cgroups.enabled: false
+  process.include_cpu_ticks: true
+
+ 
+
+fields:
+  labels.respteam: "Observability"
+  labels.assettag: "900523103"
+  labels.location: "MECCCM2"
+  labels.env: "PRO"
+  dc: "BE"
+  ou: "OU=UNIX,OU=BE,OU=BAS,DC=GLOW001,DC=AD,DC=SYS"
+
+fields_under_root: true
+
+max_procs: 1
+
+processors:
+  - add_host_metadata:
+     netinfo.enabled: true
+
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  username: elastic
+  password: changeme
+  ssl.verification_mode: none
+  allow_older_versions: true
+
+
+ 
+
+setup.dashboards.enabled: false
+
+setup.kibana.host: "http://localhost:5602/pat"
+setup.kibana.username: "elastic"
+setup.kibana.password: "changeme"
+
+logging.selectors: ["*"]
+
+logging.to_stderr: false
+
+logging.to_syslog: false
+
+logging.to_eventlog: false
+
+logging.metrics.enabled: false
+
+logging.to_files: false
+
+monitoring.enabled: false
+
+http.enabled: false
+
+seccomp.enabled: true
+
+migration.6_to_7.enabled: false
+

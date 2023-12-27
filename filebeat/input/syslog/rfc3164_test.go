@@ -793,7 +793,6 @@ func TestPriority(t *testing.T) {
 			ParserRFC3164([]byte(log), l)
 			assert.Equal(t, d, l.Priority())
 		})
-		return
 	}
 }
 

@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: stan
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/stan/_meta/docs.asciidoc
+
 
 [[metricbeat-module-stan]]
 [role="xpack"]
@@ -27,6 +29,8 @@ Dashboards for topic message count and queue depth are included:
 
 image::./images/metricbeat-stan-overview.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -66,3 +70,4 @@ include::stan/stats.asciidoc[]
 
 include::stan/subscriptions.asciidoc[]
 
+:edit_url!:

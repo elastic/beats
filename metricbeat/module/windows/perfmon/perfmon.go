@@ -16,17 +16,16 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package perfmon
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const metricsetName = "perfmon"
@@ -49,7 +48,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 	reader, err := NewReader(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "initialization of reader failed")
+		return nil, fmt.Errorf("initialization of reader failed: %w", err)
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -70,12 +69,12 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	if m.reader.config.RefreshWildcardCounters {
 		err := m.reader.RefreshCounterPaths()
 		if err != nil {
-			return errors.Wrap(err, "failed retrieving counters")
+			return fmt.Errorf("failed retrieving counters: %w", err)
 		}
 	}
 	events, err := m.reader.Read()
 	if err != nil {
-		return errors.Wrap(err, "failed reading counters")
+		return fmt.Errorf("failed reading counters: %w", err)
 	}
 
 	for _, event := range events {
@@ -92,7 +91,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 func (m *MetricSet) Close() error {
 	err := m.reader.Close()
 	if err != nil {
-		return errors.Wrap(err, "failed to close pdh query")
+		return fmt.Errorf("failed to close pdh query: %w", err)
 	}
 	return nil
 }

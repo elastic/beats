@@ -16,28 +16,29 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package add_docker_metadata
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"regexp"
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/docker"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/actions"
+	"github.com/elastic/elastic-agent-autodiscover/docker"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/safemapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 const (
@@ -58,7 +59,7 @@ type addDockerMetadata struct {
 	log             *logp.Logger
 	watcher         docker.Watcher
 	fields          []string
-	sourceProcessor processors.Processor
+	sourceProcessor beat.Processor
 
 	pidFields       []string         // Field names that contain PIDs.
 	cgroups         *common.Cache    // Cache of PID (int) to cgropus (map[string]string).
@@ -70,14 +71,14 @@ type addDockerMetadata struct {
 const selector = "add_docker_metadata"
 
 // New constructs a new add_docker_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *conf.C) (beat.Processor, error) {
 	return buildDockerMetadataProcessor(logp.NewLogger(selector), cfg, docker.NewWatcher)
 }
 
-func buildDockerMetadataProcessor(log *logp.Logger, cfg *common.Config, watcherConstructor docker.WatcherConstructor) (processors.Processor, error) {
+func buildDockerMetadataProcessor(log *logp.Logger, cfg *conf.C, watcherConstructor docker.WatcherConstructor) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
 	var dockerAvailable bool
@@ -90,14 +91,14 @@ func buildDockerMetadataProcessor(log *logp.Logger, cfg *common.Config, watcherC
 		dockerAvailable = true
 		log.Debugf("%v: docker environment detected", processorName)
 		if err = watcher.Start(); err != nil {
-			return nil, errors.Wrap(err, "failed to start watcher")
+			return nil, fmt.Errorf("failed to start watcher: %w", err)
 		}
 	}
 
 	// Use extract_field processor to get container ID from source file path.
-	var sourceProcessor processors.Processor
+	var sourceProcessor beat.Processor
 	if config.MatchSource {
-		var procConf, _ = common.NewConfigFrom(map[string]interface{}{
+		var procConf, _ = conf.NewConfigFrom(map[string]interface{}{
 			"field":     "log.file.path",
 			"separator": string(os.PathSeparator),
 			"index":     config.SourceIndex,
@@ -159,11 +160,11 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	if cid == "" && len(d.pidFields) > 0 {
 		id, err := d.lookupContainerIDByPID(event)
 		if err != nil {
-			return nil, errors.Wrap(err, "error reading container ID")
+			return nil, fmt.Errorf("error reading container ID: %w", err)
 		}
 		if id != "" {
 			cid = id
-			event.PutValue(dockerContainerIDKey, cid)
+			_, _ = event.PutValue(dockerContainerIDKey, cid)
 		}
 	}
 
@@ -188,24 +189,24 @@ func (d *addDockerMetadata) Run(event *beat.Event) (*beat.Event, error) {
 
 	container := d.watcher.Container(cid)
 	if container != nil {
-		meta := common.MapStr{}
+		meta := mapstr.M{}
 
 		if len(container.Labels) > 0 {
-			labels := common.MapStr{}
+			labels := mapstr.M{}
 			for k, v := range container.Labels {
 				if d.dedot {
 					label := common.DeDot(k)
-					labels.Put(label, v)
+					_, _ = labels.Put(label, v)
 				} else {
-					safemapstr.Put(labels, k, v)
+					_ = safemapstr.Put(labels, k, v)
 				}
 			}
-			meta.Put("container.labels", labels)
+			_, _ = meta.Put("container.labels", labels)
 		}
 
-		meta.Put("container.id", container.ID)
-		meta.Put("container.image.name", container.Image)
-		meta.Put("container.name", container.Name)
+		_, _ = meta.Put("container.id", container.ID)
+		_, _ = meta.Put("container.image.name", container.Image)
+		_, _ = meta.Put("container.name", container.Name)
 		event.Fields.DeepUpdate(meta.Clone())
 	} else {
 		d.log.Debugf("Container not found: cid=%s", cid)
@@ -224,7 +225,7 @@ func (d *addDockerMetadata) Close() error {
 	}
 	err := processors.Close(d.sourceProcessor)
 	if err != nil {
-		return errors.Wrap(err, "closing source processor of add_docker_metadata")
+		return fmt.Errorf("closing source processor of add_docker_metadata: %w", err)
 	}
 	return nil
 }
@@ -251,7 +252,7 @@ func (d *addDockerMetadata) lookupContainerIDByPID(event *beat.Event) (string, e
 		}
 
 		cgroups, err = d.getProcessCgroups(pid)
-		if err != nil && os.IsNotExist(errors.Cause(err)) {
+		if err != nil && errors.Is(err, fs.ErrNotExist) {
 			continue
 		}
 		if err != nil {
@@ -278,7 +279,7 @@ func (d *addDockerMetadata) getProcessCgroups(pid int) (cgroup.PathList, error) 
 
 	cgroups, err := processCgroupPaths(d.hostFS, pid)
 	if err != nil {
-		return cgroups, errors.Wrapf(err, "failed to read cgroups for pid=%v", pid)
+		return cgroups, fmt.Errorf("failed to read cgroups for pid=%v: %w", pid, err)
 	}
 
 	d.cgroups.Put(pid, cgroups)

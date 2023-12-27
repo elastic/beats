@@ -26,13 +26,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
+	"github.com/elastic/go-lookslike/validator"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/look"
-	"github.com/elastic/beats/v7/libbeat/common"
 )
 
 // Tests for the non-cert fields
@@ -40,14 +41,13 @@ func TestAddTLSMetadata(t *testing.T) {
 	// We always test with this one cert because addCertificateMetadata
 	// is tested in detail elsewhere
 	certs := []*x509.Certificate{parseCert(t, elasticCert)}
-	certMetadata := common.MapStr{}
-	AddCertMetadata(certMetadata, certs)
+	certMetadata := CertFields(certs[0], nil)
 
 	scenarios := []struct {
 		name      string
 		connState tls.ConnectionState
 		duration  time.Duration
-		expected  common.MapStr
+		expected  mapstr.M
 	}{
 		{
 			"simple TLSv1.1",
@@ -59,9 +59,9 @@ func TestAddTLSMetadata(t *testing.T) {
 				ServerName:        "example.net",
 			},
 			time.Duration(1),
-			common.MapStr{
+			mapstr.M{
 				"established":      true,
-				"rtt":              common.MapStr{"handshake": look.RTT(time.Duration(1))},
+				"rtt":              mapstr.M{"handshake": look.RTT(time.Duration(1))},
 				"version_protocol": "tls",
 				"version":          "1.1",
 				"cipher":           "ECDHE-ECDSA-AES-256-CBC-SHA",
@@ -78,9 +78,9 @@ func TestAddTLSMetadata(t *testing.T) {
 				NegotiatedProtocol: "h2",
 			},
 			time.Duration(1),
-			common.MapStr{
+			mapstr.M{
 				"established":      true,
-				"rtt":              common.MapStr{"handshake": look.RTT(time.Duration(1))},
+				"rtt":              mapstr.M{"handshake": look.RTT(time.Duration(1))},
 				"version_protocol": "tls",
 				"version":          "1.2",
 				"cipher":           "ECDHE-ECDSA-AES-256-CBC-SHA",
@@ -92,40 +92,41 @@ func TestAddTLSMetadata(t *testing.T) {
 	for _, s := range scenarios {
 		t.Run(s.name, func(t *testing.T) {
 			// Nest under the TLS namespace to match actual output
-			expected := common.MapStr{"tls": s.expected}
+			expected := mapstr.M{"tls": s.expected}
 
 			// Always add in the cert metadata since we test that in other test funcs, not here
-			expected.DeepUpdate(certMetadata)
+			expected.DeepUpdate(mapstr.M{"tls": certMetadata})
 
-			fields := common.MapStr{}
+			fields := mapstr.M{}
 			AddTLSMetadata(fields, s.connState, s.duration)
 			require.Equal(t, expected, fields)
 		})
 	}
 }
 
-func TestAddCertMetadata(t *testing.T) {
+func TestCertFields(t *testing.T) {
 	cert := parseCert(t, elasticCert)
-	chainCert := parseCert(t, elasticChainCert)
+	esChainCert := parseCert(t, elasticChainCert)
+
 	certNotBefore, err := time.Parse(time.RFC3339, "2019-08-16T01:40:25Z")
 	require.NoError(t, err)
 	certNotAfter, err := time.Parse(time.RFC3339, "2020-07-16T03:15:39Z")
 	require.NoError(t, err)
 
-	expectedFields := lookslike.Strict(lookslike.MustCompile(map[string]interface{}{
+	elasticCertFields := lookslike.Strict(lookslike.MustCompile(map[string]interface{}{
 		"certificate_not_valid_after":  certNotAfter,
 		"certificate_not_valid_before": certNotBefore,
-		"server": common.MapStr{
-			"hash": common.MapStr{
+		"server": mapstr.M{
+			"hash": mapstr.M{
 				"sha1":   "b7b4b89ef0d0caf39d223736f0fdbb03c7b426f1",
 				"sha256": "12b00d04db0db8caa302bfde043e88f95baceb91e86ac143e93830b4bbec726d",
 			},
-			"x509": common.MapStr{
-				"issuer": common.MapStr{
+			"x509": mapstr.M{
+				"issuer": mapstr.M{
 					"common_name":        "GlobalSign CloudSSL CA - SHA256 - G3",
 					"distinguished_name": "CN=GlobalSign CloudSSL CA - SHA256 - G3,O=GlobalSign nv-sa,C=BE",
 				},
-				"subject": common.MapStr{
+				"subject": mapstr.M{
 					"common_name":        "r2.shared.global.fastly.net",
 					"distinguished_name": "CN=r2.shared.global.fastly.net,O=Fastly\\, Inc.,L=San Francisco,ST=California,C=US",
 				},
@@ -140,27 +141,93 @@ func TestAddCertMetadata(t *testing.T) {
 		},
 	}))
 
+	letsEncryptCert := letsEncryptCerts(t)[0]
+
+	letsEncryptCertFields := func(notBefore time.Time, notAfter time.Time) validator.Validator {
+		return lookslike.Strict(lookslike.MustCompile(map[string]interface{}{
+			"certificate_not_valid_before": notBefore,
+			"certificate_not_valid_after":  notAfter,
+			"server": mapstr.M{
+				"hash": mapstr.M{
+					"sha1":   "98d7ca35e3608b0ee7accc9ec665babdbdc6e39c",
+					"sha256": "ada85303e669f8ad9c537c2355936a11d95089ff4dbae57db664937f266f61a5",
+				},
+				"x509": mapstr.M{
+					"issuer": mapstr.M{
+						"common_name":        letsEncryptCert.Issuer.CommonName,
+						"distinguished_name": "CN=R3,O=Let's Encrypt,C=US",
+					},
+					"subject": mapstr.M{
+						"common_name":        letsEncryptCert.Subject.CommonName,
+						"distinguished_name": "CN=lencr.org",
+					},
+					"not_before":           notBefore,
+					"not_after":            notAfter,
+					"serial_number":        letsEncryptCert.SerialNumber.String(),
+					"signature_algorithm":  letsEncryptCert.SignatureAlgorithm.String(),
+					"public_key_algorithm": letsEncryptCert.PublicKeyAlgorithm.String(),
+					"public_key_curve":     "P-256",
+				},
+			},
+		}))
+	}
+
+	leCertNotBefore, err := time.Parse(time.RFC3339, "2022-10-05T01:40:24Z")
+	require.NoError(t, err)
+	leCertNotAfter, err := time.Parse(time.RFC3339, "2023-01-03T01:40:23Z")
+	require.NoError(t, err)
+
+	// This is a bit awkward because our test chain includes two roots.
+	// In the real world the go stdlib would split this single chain chains across two verified chains
+	// however, the behavior in this scenario is correct
+	leXSignCertNotBefore, err := time.Parse(time.RFC3339, "2022-10-05T01:40:24Z")
+	require.NoError(t, err)
+	leXSignCertNotAfter, err := time.Parse(time.RFC3339, "2021-09-30T14:01:15Z")
+	require.NoError(t, err)
+
 	scenarios := []struct {
-		name  string
-		certs []*x509.Certificate
+		name           string
+		cert           *x509.Certificate
+		chain          [][]*x509.Certificate
+		expectedFields validator.Validator
 	}{
 		{
 			"single cert fields should all be present",
-			[]*x509.Certificate{cert},
+			cert,
+			nil,
+			elasticCertFields,
 		},
 		{
 			"cert chain should still show single cert fields",
-			[]*x509.Certificate{cert, chainCert},
+			cert,
+			[][]*x509.Certificate{{cert, esChainCert}},
+			elasticCertFields,
+		},
+		{
+			"cross signed chain, one root included",
+			letsEncryptCert,
+			[][]*x509.Certificate{letsEncryptCerts(t)},
+			letsEncryptCertFields(leCertNotBefore, leCertNotAfter),
+		},
+		{
+			"complex cross signed chain, multiple roots included, at least one expired",
+			letsEncryptCert,
+			[][]*x509.Certificate{letsEncryptXSignedDSTX3(t)},
+			letsEncryptCertFields(leXSignCertNotBefore, leXSignCertNotAfter),
+		},
+		{
+			"reversed cert should expire at same time",
+			cert,
+			[][]*x509.Certificate{{esChainCert, cert}},
+			elasticCertFields,
 		},
 	}
 
 	for _, scenario := range scenarios {
 		t.Run(scenario.name, func(t *testing.T) {
-			fields := common.MapStr{}
-			AddCertMetadata(fields, scenario.certs)
-			tls, err := fields.GetValue("tls")
+			tls := CertFields(scenario.cert, scenario.chain)
 			require.NoError(t, err)
-			testslike.Test(t, expectedFields, tls)
+			testslike.Test(t, scenario.expectedFields, tls)
 		})
 	}
 }
@@ -275,9 +342,10 @@ func TestCertExpirationMetadata(t *testing.T) {
 }
 
 func parseCert(t *testing.T, pemStr string) *x509.Certificate {
-	block, _ := pem.Decode([]byte(elasticCert))
+	block, _ := pem.Decode([]byte(pemStr))
 	if block == nil {
 		require.Fail(t, "Test cert could not be parsed")
+		return nil
 	}
 	cert, err := x509.ParseCertificate(block.Bytes)
 	require.NoError(t, err)
@@ -396,3 +464,126 @@ jzPXiq4Z0PySrS+6PKBIWEde/SBWlSDBch2rZpmk1Xg3SBufskw3Z3r9QtLTVp7T
 HY7EDGiWtkdREPd76xUJZPX58GMWLT3fI0I6k2PMq69PVwbH/hRVYs4nERnh9ELt
 IjBrNRpKBYCkZd/My2/Q
 -----END CERTIFICATE-----`
+
+func letsEncryptCerts(t *testing.T) (chain []*x509.Certificate) {
+	certStrs := []string{
+		`-----BEGIN CERTIFICATE-----
+MIIEqDCCA5CgAwIBAgISA35dhx5EhUFUA6M+5Ke/a0zOMA0GCSqGSIb3DQEBCwUA
+MDIxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQswCQYDVQQD
+EwJSMzAeFw0yMjEwMDUwMTQwMjRaFw0yMzAxMDMwMTQwMjNaMBQxEjAQBgNVBAMT
+CWxlbmNyLm9yZzBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABGoPGv9WEV9+30h4
+IIjmNVhoSCnRpecjIh05It4+wMFw3DTgEZlWB9u6cR4q/S7vMmU9zTbRx8MLfCnd
+oJZjfU+jggKfMIICmzAOBgNVHQ8BAf8EBAMCB4AwHQYDVR0lBBYwFAYIKwYBBQUH
+AwEGCCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwHQYDVR0OBBYEFPY8bUtJRRgcgZ+M
+MerILNagQ41PMB8GA1UdIwQYMBaAFBQusxe3WFbLrlAJQOYfr52LFMLGMFUGCCsG
+AQUFBwEBBEkwRzAhBggrBgEFBQcwAYYVaHR0cDovL3IzLm8ubGVuY3Iub3JnMCIG
+CCsGAQUFBzAChhZodHRwOi8vcjMuaS5sZW5jci5vcmcvMG8GA1UdEQRoMGaCCWxl
+bmNyLm9yZ4IPbGV0c2VuY3J5cHQuY29tgg9sZXRzZW5jcnlwdC5vcmeCDXd3dy5s
+ZW5jci5vcmeCE3d3dy5sZXRzZW5jcnlwdC5jb22CE3d3dy5sZXRzZW5jcnlwdC5v
+cmcwTAYDVR0gBEUwQzAIBgZngQwBAgEwNwYLKwYBBAGC3xMBAQEwKDAmBggrBgEF
+BQcCARYaaHR0cDovL2Nwcy5sZXRzZW5jcnlwdC5vcmcwggEEBgorBgEEAdZ5AgQC
+BIH1BIHyAPAAdwDoPtDaPvUGNTLnVyi8iWvJA9PL0RFr7Otp4Xd9bQa9bgAAAYOm
+BANbAAAEAwBIMEYCIQCChPanUa3D8IkGBs59vfeg3hdrl75pbBU5SZmpLfBIlQIh
+ANYzCYs7l+IJxEyVY4uuOG1h33oceoAmBiBxVi+maRLqAHUA36Veq2iCTx9sre64
+X04+WurNohKkal6OOxLAIERcKnMAAAGDpgQFVgAABAMARjBEAiALJZvcA8+1kZ44
+J/2TYur6bJSVb/EpYK1rHWaSQtRufwIgaiiX+wzGcGLKDS7xMZuQEAeGz0pz/JX9
+uEt18al2uD8wDQYJKoZIhvcNAQELBQADggEBAG8Iu74O4iWyejez1Jr3Q18zLv+c
+ol5OYSzD1E+ho83SgTkh6js9zkME9Gfjfp7Jp3uJjNMz9BeiKW8phUvPKe6CpLbI
+GySH/4rtWW24JDfnxpYw3IIoaYmXxDit7elAcxLGb7pCOE/iuVsikvQOtTmqe9E6
+fgScuvPXCBVDQelZNhXBNnT72VTyLOzih1Yx0lnh/58+B86i1XivHAoN1+0pP89D
+IqGqv2GhIwyymRhBuqBcVUkXi3gA3glnTcJA2u1i75kMi23veM13BoRltuBXC3gy
+u45klaTnRTKwl6ITgTE1buO8dND3wAJ2SCPbXTZnMHtsjKf02bWSp9uc0Hw=
+-----END CERTIFICATE-----`,
+		`-----BEGIN CERTIFICATE-----
+MIIFFjCCAv6gAwIBAgIRAJErCErPDBinU/bWLiWnX1owDQYJKoZIhvcNAQELBQAw
+TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwHhcNMjAwOTA0MDAwMDAw
+WhcNMjUwOTE1MTYwMDAwWjAyMQswCQYDVQQGEwJVUzEWMBQGA1UEChMNTGV0J3Mg
+RW5jcnlwdDELMAkGA1UEAxMCUjMwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+AoIBAQC7AhUozPaglNMPEuyNVZLD+ILxmaZ6QoinXSaqtSu5xUyxr45r+XXIo9cP
+R5QUVTVXjJ6oojkZ9YI8QqlObvU7wy7bjcCwXPNZOOftz2nwWgsbvsCUJCWH+jdx
+sxPnHKzhm+/b5DtFUkWWqcFTzjTIUu61ru2P3mBw4qVUq7ZtDpelQDRrK9O8Zutm
+NHz6a4uPVymZ+DAXXbpyb/uBxa3Shlg9F8fnCbvxK/eG3MHacV3URuPMrSXBiLxg
+Z3Vms/EY96Jc5lP/Ooi2R6X/ExjqmAl3P51T+c8B5fWmcBcUr2Ok/5mzk53cU6cG
+/kiFHaFpriV1uxPMUgP17VGhi9sVAgMBAAGjggEIMIIBBDAOBgNVHQ8BAf8EBAMC
+AYYwHQYDVR0lBBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMBMBIGA1UdEwEB/wQIMAYB
+Af8CAQAwHQYDVR0OBBYEFBQusxe3WFbLrlAJQOYfr52LFMLGMB8GA1UdIwQYMBaA
+FHm0WeZ7tuXkAXOACIjIGlj26ZtuMDIGCCsGAQUFBwEBBCYwJDAiBggrBgEFBQcw
+AoYWaHR0cDovL3gxLmkubGVuY3Iub3JnLzAnBgNVHR8EIDAeMBygGqAYhhZodHRw
+Oi8veDEuYy5sZW5jci5vcmcvMCIGA1UdIAQbMBkwCAYGZ4EMAQIBMA0GCysGAQQB
+gt8TAQEBMA0GCSqGSIb3DQEBCwUAA4ICAQCFyk5HPqP3hUSFvNVneLKYY611TR6W
+PTNlclQtgaDqw+34IL9fzLdwALduO/ZelN7kIJ+m74uyA+eitRY8kc607TkC53wl
+ikfmZW4/RvTZ8M6UK+5UzhK8jCdLuMGYL6KvzXGRSgi3yLgjewQtCPkIVz6D2QQz
+CkcheAmCJ8MqyJu5zlzyZMjAvnnAT45tRAxekrsu94sQ4egdRCnbWSDtY7kh+BIm
+lJNXoB1lBMEKIq4QDUOXoRgffuDghje1WrG9ML+Hbisq/yFOGwXD9RiX8F6sw6W4
+avAuvDszue5L3sz85K+EC4Y/wFVDNvZo4TYXao6Z0f+lQKc0t8DQYzk1OXVu8rp2
+yJMC6alLbBfODALZvYH7n7do1AZls4I9d1P4jnkDrQoxB3UqQ9hVl3LEKQ73xF1O
+yK5GhDDX8oVfGKF5u+decIsH4YaTw7mP3GFxJSqv3+0lUFJoi5Lc5da149p90Ids
+hCExroL1+7mryIkXPeFM5TgO9r0rvZaBFOvV2z0gp35Z0+L4WPlbuEjN/lxPFin+
+HlUjr8gRsI3qfJOQFy/9rKIJR0Y/8Omwt/8oTWgy1mdeHmmjk7j1nYsvC9JSQ6Zv
+MldlTTKB3zhThV1+XWYp6rjd5JW1zbVWEkLNxE7GJThEUG3szgBVGP7pSWTUTsqX
+nLRbwHOoq7hHwg==
+-----END CERTIFICATE-----`,
+		`-----BEGIN CERTIFICATE-----
+MIIFYDCCBEigAwIBAgIQQAF3ITfU6UK47naqPGQKtzANBgkqhkiG9w0BAQsFADA/
+MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT
+DkRTVCBSb290IENBIFgzMB4XDTIxMDEyMDE5MTQwM1oXDTI0MDkzMDE4MTQwM1ow
+TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
+cmNoIEdyb3VwMRUwEwYDVQQDEwxJU1JHIFJvb3QgWDEwggIiMA0GCSqGSIb3DQEB
+AQUAA4ICDwAwggIKAoICAQCt6CRz9BQ385ueK1coHIe+3LffOJCMbjzmV6B493XC
+ov71am72AE8o295ohmxEk7axY/0UEmu/H9LqMZshftEzPLpI9d1537O4/xLxIZpL
+wYqGcWlKZmZsj348cL+tKSIG8+TA5oCu4kuPt5l+lAOf00eXfJlII1PoOK5PCm+D
+LtFJV4yAdLbaL9A4jXsDcCEbdfIwPPqPrt3aY6vrFk/CjhFLfs8L6P+1dy70sntK
+4EwSJQxwjQMpoOFTJOwT2e4ZvxCzSow/iaNhUd6shweU9GNx7C7ib1uYgeGJXDR5
+bHbvO5BieebbpJovJsXQEOEO3tkQjhb7t/eo98flAgeYjzYIlefiN5YNNnWe+w5y
+sR2bvAP5SQXYgd0FtCrWQemsAXaVCg/Y39W9Eh81LygXbNKYwagJZHduRze6zqxZ
+Xmidf3LWicUGQSk+WT7dJvUkyRGnWqNMQB9GoZm1pzpRboY7nn1ypxIFeFntPlF4
+FQsDj43QLwWyPntKHEtzBRL8xurgUBN8Q5N0s8p0544fAQjQMNRbcTa0B7rBMDBc
+SLeCO5imfWCKoqMpgsy6vYMEG6KDA0Gh1gXxG8K28Kh8hjtGqEgqiNx2mna/H2ql
+PRmP6zjzZN7IKw0KKP/32+IVQtQi0Cdd4Xn+GOdwiK1O5tmLOsbdJ1Fu/7xk9TND
+TwIDAQABo4IBRjCCAUIwDwYDVR0TAQH/BAUwAwEB/zAOBgNVHQ8BAf8EBAMCAQYw
+SwYIKwYBBQUHAQEEPzA9MDsGCCsGAQUFBzAChi9odHRwOi8vYXBwcy5pZGVudHJ1
+c3QuY29tL3Jvb3RzL2RzdHJvb3RjYXgzLnA3YzAfBgNVHSMEGDAWgBTEp7Gkeyxx
++tvhS5B1/8QVYIWJEDBUBgNVHSAETTBLMAgGBmeBDAECATA/BgsrBgEEAYLfEwEB
+ATAwMC4GCCsGAQUFBwIBFiJodHRwOi8vY3BzLnJvb3QteDEubGV0c2VuY3J5cHQu
+b3JnMDwGA1UdHwQ1MDMwMaAvoC2GK2h0dHA6Ly9jcmwuaWRlbnRydXN0LmNvbS9E
+U1RST09UQ0FYM0NSTC5jcmwwHQYDVR0OBBYEFHm0WeZ7tuXkAXOACIjIGlj26Ztu
+MA0GCSqGSIb3DQEBCwUAA4IBAQAKcwBslm7/DlLQrt2M51oGrS+o44+/yQoDFVDC
+5WxCu2+b9LRPwkSICHXM6webFGJueN7sJ7o5XPWioW5WlHAQU7G75K/QosMrAdSW
+9MUgNTP52GE24HGNtLi1qoJFlcDyqSMo59ahy2cI2qBDLKobkx/J3vWraV0T9VuG
+WCLKTVXkcGdtwlfFRjlBz4pYg1htmf5X6DYO8A4jqv2Il9DjXA6USbW1FzXSLr9O
+he8Y4IWS6wY7bCkjCWDcRQJMEhg76fsO3txE+FiYruq9RUWhiF1myv4Q6W+CyBFC
+Dfvp7OOGAN6dEOM4+qR9sdjoSYKEBpsr6GtPAQw4dy753ec5
+-----END CERTIFICATE-----`,
+	}
+
+	for _, s := range certStrs {
+		chain = append(chain, parseCert(t, s))
+	}
+	return chain
+}
+
+func letsEncryptXSignedDSTX3(t *testing.T) (certs []*x509.Certificate) {
+	certs = letsEncryptCerts(t)
+	certs = append(certs, parseCert(t, `-----BEGIN CERTIFICATE-----
+MIIDSjCCAjKgAwIBAgIQRK+wgNajJ7qJMDmGLvhAazANBgkqhkiG9w0BAQUFADA/
+MSQwIgYDVQQKExtEaWdpdGFsIFNpZ25hdHVyZSBUcnVzdCBDby4xFzAVBgNVBAMT
+DkRTVCBSb290IENBIFgzMB4XDTAwMDkzMDIxMTIxOVoXDTIxMDkzMDE0MDExNVow
+PzEkMCIGA1UEChMbRGlnaXRhbCBTaWduYXR1cmUgVHJ1c3QgQ28uMRcwFQYDVQQD
+Ew5EU1QgUm9vdCBDQSBYMzCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB
+AN+v6ZdQCINXtMxiZfaQguzH0yxrMMpb7NnDfcdAwRgUi+DoM3ZJKuM/IUmTrE4O
+rz5Iy2Xu/NMhD2XSKtkyj4zl93ewEnu1lcCJo6m67XMuegwGMoOifooUMM0RoOEq
+OLl5CjH9UL2AZd+3UWODyOKIYepLYYHsUmu5ouJLGiifSKOeDNoJjj4XLh7dIN9b
+xiqKqy69cK3FCxolkHRyxXtqqzTWMIn/5WgTe1QLyNau7Fqckh49ZLOMxt+/yUFw
+7BZy1SbsOFU5Q9D8/RhcQPGX69Wam40dutolucbY38EVAjqr2m7xPi71XAicPNaD
+aeQQmxkqtilX4+U9m5/wAl0CAwEAAaNCMEAwDwYDVR0TAQH/BAUwAwEB/zAOBgNV
+HQ8BAf8EBAMCAQYwHQYDVR0OBBYEFMSnsaR7LHH62+FLkHX/xBVghYkQMA0GCSqG
+SIb3DQEBBQUAA4IBAQCjGiybFwBcqR7uKGY3Or+Dxz9LwwmglSBd49lZRNI+DT69
+ikugdB/OEIKcdBodfpga3csTS7MgROSR6cz8faXbauX+5v3gTt23ADq1cEmv8uXr
+AvHRAosZy5Q6XkjEGB5YGV8eAlrwDPGxrancWYaLbumR9YbK+rlmM6pZW87ipxZz
+R8srzJmwN0jP41ZL9c8PDHIyh8bwRLtTcm1D9SZImlJnt1ir/md2cXjbDaJWFBM5
+JDGFoqgCWjBH4d1QB7wCCZAA62RjYJsWvIjJEubSfZGL+T0yjWW06XyxV3bqxbYo
+Ob8VZRzI9neWagqNdwvYkQsEjgfbKbYK7p2CNTUQ
+-----END CERTIFICATE-----`))
+	return certs
+}

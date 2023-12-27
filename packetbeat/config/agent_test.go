@@ -22,11 +22,11 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestAgentInputNormalization(t *testing.T) {
-	cfg, err := common.NewConfigFrom(`
+	cfg, err := conf.NewConfigFrom(`
 type: packet
 data_stream:
   namespace: default
@@ -43,7 +43,7 @@ streams:
     period: 10s
     keep_null: false
     interface:
-      device: thisisignoredfornow
+      device: default_route
       snaplen: 1514
       type: af_packet
       buffer_size_mb: 100
@@ -69,6 +69,20 @@ streams:
     data_stream:
       dataset: packet.icmp
       type: logs
+  - type: http
+    interface:
+      device: en2
+      snaplen: 1514
+      type: af_packet
+      buffer_size_mb: 100
+    procs:
+      enabled: true
+      monitored:
+        - process: curl
+          cmdline_grep: curl
+    data_stream:
+      dataset: packet.http
+      type: logs
 `)
 	require.NoError(t, err)
 	config, err := NewAgentConfig(cfg)
@@ -76,11 +90,13 @@ streams:
 
 	require.Equal(t, config.Flows.Timeout, "10s")
 	require.Equal(t, config.Flows.Index, "logs-packet.flow-default")
-	require.Len(t, config.ProtocolsList, 1)
+	require.Len(t, config.ProtocolsList, 2)
 
 	var protocol map[string]interface{}
 	require.NoError(t, config.ProtocolsList[0].Unpack(&protocol))
 	require.Len(t, protocol["processors"].([]interface{}), 3)
-	require.Equal(t, config.Interfaces.Device, "en1")
-	require.Len(t, config.Procs.Monitored, 2)
+	require.Equal(t, "default_route", config.Interfaces[0].Device)
+	require.Equal(t, "en1", config.Interfaces[1].Device)
+	require.Equal(t, "en2", config.Interfaces[2].Device)
+	require.Len(t, config.Procs.Monitored, 3)
 }

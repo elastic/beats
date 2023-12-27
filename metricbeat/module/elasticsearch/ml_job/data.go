@@ -19,13 +19,13 @@ package ml_job
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -58,7 +58,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 	jobsData := &jobsStruct{}
 	err := json.Unmarshal(content, jobsData)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch ML Job Stats API response")
+		return fmt.Errorf("failure parsing Elasticsearch ML Job Stats API response: %w", err)
 	}
 
 	var errs multierror.Errors
@@ -75,10 +75,10 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 
 		event := mb.Event{}
 
-		event.RootFields = common.MapStr{}
+		event.RootFields = mapstr.M{}
 		event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
-		event.ModuleFields = common.MapStr{}
+		event.ModuleFields = mapstr.M{}
 		event.ModuleFields.Put("cluster.name", info.ClusterName)
 		event.ModuleFields.Put("cluster.id", info.ClusterID)
 

@@ -16,25 +16,23 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || windows || aix
-// +build darwin freebsd linux windows aix
 
 package process
 
 import (
+	"fmt"
 	"os"
 	"runtime"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/cgroup"
-	"github.com/elastic/beats/v7/libbeat/metric/system/process"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
-var debugf = logp.MakeDebug("system.process")
+var debugf = logp.NewLogger("system.process").Debugf
 
 func init() {
 	mb.Registry.MustAddMetricSet("system", "process", New,
@@ -105,7 +103,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	procs, roots, err := m.stats.Get()
 	if err != nil {
-		return errors.Wrap(err, "process stats")
+		return fmt.Errorf("process stats: %w", err)
 	}
 
 	for evtI := range procs {

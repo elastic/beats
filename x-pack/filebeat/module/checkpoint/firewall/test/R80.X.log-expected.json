@@ -1,0 +1,91 @@
+[
+    {
+        "@timestamp": "2022-07-06T15:53:08.000Z",
+        "event.action": "logon-failed",
+        "event.category": [
+            "authentication",
+            "network"
+        ],
+        "event.dataset": "checkpoint.firewall",
+        "event.id": "{0xf17d1a9b,0x453b1e67,0xf27bccbf,0x233793e1}",
+        "event.kind": "event",
+        "event.module": "checkpoint",
+        "event.outcome": "failure",
+        "event.sequence": 3,
+        "event.timezone": "UTC",
+        "event.type": [
+            "denied"
+        ],
+        "fileset.name": "firewall",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.direction": "inbound",
+        "observer.mac": "AA-AA-AA-AA-AA-AA",
+        "observer.name": "216.160.83.56",
+        "observer.product": "Connectra",
+        "observer.type": "firewall",
+        "observer.vendor": "Checkpoint",
+        "service.type": "checkpoint",
+        "tags": [
+            "checkpoint-firewall",
+            "forwarded"
+        ]
+    },
+    {
+        "@timestamp": "2022-07-06T16:08:25.000Z",
+        "checkpoint.auth_method": "User Authentication (Active Directory)",
+        "checkpoint.auth_status": "Successful Login",
+        "checkpoint.client_name": "Active Directory Query",
+        "checkpoint.client_version": "R80.30",
+        "checkpoint.identity_src": "AD Query",
+        "checkpoint.identity_type": "user",
+        "checkpoint.logid": "131073",
+        "checkpoint.roles": "Remote_Access_AR",
+        "checkpoint.snid": "ccaaffdd",
+        "client.ip": "81.2.69.192",
+        "client.user.group.name": "Remote_Access_Users",
+        "dns.question.name": "xxx.com",
+        "event.action": "logged-in",
+        "event.category": [
+            "authentication",
+            "network"
+        ],
+        "event.dataset": "checkpoint.firewall",
+        "event.id": "{0xf40caad8,0x2dccf344,0xbf0fb0c8,0x6e943a48}",
+        "event.kind": "event",
+        "event.module": "checkpoint",
+        "event.outcome": "success",
+        "event.sequence": 1,
+        "event.timezone": "UTC",
+        "event.type": [
+            "allowed"
+        ],
+        "fileset.name": "firewall",
+        "input.type": "log",
+        "log.offset": 372,
+        "network.direction": "inbound",
+        "observer.ip": "81.2.69.142",
+        "observer.name": "216.160.83.56",
+        "observer.product": "Identity Awareness",
+        "observer.type": "firewall",
+        "observer.vendor": "Checkpoint",
+        "related.ip": [
+            "81.2.69.192"
+        ],
+        "service.type": "checkpoint",
+        "source.geo.city_name": "London",
+        "source.geo.continent_name": "Europe",
+        "source.geo.country_iso_code": "GB",
+        "source.geo.country_name": "United Kingdom",
+        "source.geo.location.lat": 51.5142,
+        "source.geo.location.lon": -0.0931,
+        "source.geo.region_iso_code": "GB-ENG",
+        "source.geo.region_name": "England",
+        "source.ip": "81.2.69.192",
+        "source.user.group.name": "Remote_Access_Users",
+        "tags": [
+            "checkpoint-firewall",
+            "forwarded"
+        ]
+    }
+]

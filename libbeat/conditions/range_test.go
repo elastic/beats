@@ -24,7 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestRangeCreateNumeric(t *testing.T) {
@@ -90,10 +90,10 @@ var procCPURangeConfig = &Config{
 func TestOpenGteRangeConditionPositiveMatch(t *testing.T) {
 	mdWorkerTestEvent := &beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"proc": common.MapStr{
+		Fields: mapstr.M{
+			"proc": mapstr.M{
 				"cmdline": "/System/Library/Frameworks/CoreServices.framework/Frameworks/Metadata.framework/Versions/A/Support/mdworker -s mdworker -c MDSImporterWorker -m com.apple.mdworker.single",
-				"cpu": common.MapStr{
+				"cpu": mapstr.M{
 					"start_time": "09:19",
 					"system":     22,
 					"total":      66,

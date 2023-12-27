@@ -31,12 +31,18 @@ var _ unsafe.Pointer
 // Do the interface allocations only once for common
 // Errno values.
 const (
-	errnoERROR_IO_PENDING = 997
+	errnoERROR_IO_PENDING                        = 997
+	errnoERROR_NOT_FOUND                         = 1168
+	errnoERROR_EVT_QUERY_RESULT_STALE            = 15011
+	errnoERROR_EVT_QUERY_RESULT_INVALID_POSITION = 15012
 )
 
 var (
-	errERROR_IO_PENDING error = syscall.Errno(errnoERROR_IO_PENDING)
-	errERROR_EINVAL     error = syscall.EINVAL
+	ERROR_IO_PENDING                        error = syscall.Errno(errnoERROR_IO_PENDING)
+	ERROR_NOT_FOUND                         error = syscall.Errno(errnoERROR_NOT_FOUND)
+	ERROR_EVT_QUERY_RESULT_STALE            error = syscall.Errno(errnoERROR_EVT_QUERY_RESULT_STALE)
+	ERROR_EVT_QUERY_RESULT_INVALID_POSITION error = syscall.Errno(errnoERROR_EVT_QUERY_RESULT_INVALID_POSITION)
+	ERROR_EINVAL                            error = syscall.EINVAL
 )
 
 // errnoErr returns common boxed Errno values, to prevent
@@ -44,9 +50,15 @@ var (
 func errnoErr(e syscall.Errno) error {
 	switch e {
 	case 0:
-		return errERROR_EINVAL
+		return ERROR_EINVAL
 	case errnoERROR_IO_PENDING:
-		return errERROR_IO_PENDING
+		return ERROR_IO_PENDING
+	case errnoERROR_NOT_FOUND:
+		return ERROR_NOT_FOUND
+	case errnoERROR_EVT_QUERY_RESULT_STALE:
+		return ERROR_EVT_QUERY_RESULT_STALE
+	case ERROR_EVT_QUERY_RESULT_INVALID_POSITION:
+		return ERROR_EVT_QUERY_RESULT_INVALID_POSITION
 	}
 	// TODO: add more here, after collecting data on the common
 	// error values see on Windows. (perhaps when running
@@ -107,8 +119,8 @@ func _EvtCreateBookmark(bookmarkXML *uint16) (handle EvtHandle, err error) {
 	return
 }
 
-func _EvtCreateRenderContext(ValuePathsCount uint32, valuePaths uintptr, flags EvtRenderContextFlag) (handle EvtHandle, err error) {
-	r0, _, e1 := syscall.Syscall(procEvtCreateRenderContext.Addr(), 3, uintptr(ValuePathsCount), uintptr(valuePaths), uintptr(flags))
+func _EvtCreateRenderContext(ValuePathsCount uint32, valuePaths **uint16, flags EvtRenderContextFlag) (handle EvtHandle, err error) {
+	r0, _, e1 := syscall.Syscall(procEvtCreateRenderContext.Addr(), 3, uintptr(ValuePathsCount), uintptr(unsafe.Pointer(valuePaths)), uintptr(flags))
 	handle = EvtHandle(r0)
 	if handle == 0 {
 		err = errnoErr(e1)
@@ -116,8 +128,8 @@ func _EvtCreateRenderContext(ValuePathsCount uint32, valuePaths uintptr, flags E
 	return
 }
 
-func _EvtFormatMessage(publisherMetadata EvtHandle, event EvtHandle, messageID uint32, valueCount uint32, values uintptr, flags EvtFormatMessageFlag, bufferSize uint32, buffer *byte, bufferUsed *uint32) (err error) {
-	r1, _, e1 := syscall.Syscall9(procEvtFormatMessage.Addr(), 9, uintptr(publisherMetadata), uintptr(event), uintptr(messageID), uintptr(valueCount), uintptr(values), uintptr(flags), uintptr(bufferSize), uintptr(unsafe.Pointer(buffer)), uintptr(unsafe.Pointer(bufferUsed)))
+func _EvtFormatMessage(publisherMetadata EvtHandle, event EvtHandle, messageID uint32, valueCount uint32, values *EvtVariant, flags EvtFormatMessageFlag, bufferSize uint32, buffer *byte, bufferUsed *uint32) (err error) {
+	r1, _, e1 := syscall.Syscall9(procEvtFormatMessage.Addr(), 9, uintptr(publisherMetadata), uintptr(event), uintptr(messageID), uintptr(valueCount), uintptr(unsafe.Pointer(values)), uintptr(flags), uintptr(bufferSize), uintptr(unsafe.Pointer(buffer)), uintptr(unsafe.Pointer(bufferUsed)))
 	if r1 == 0 {
 		err = errnoErr(e1)
 	}

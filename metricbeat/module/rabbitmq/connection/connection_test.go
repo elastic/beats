@@ -20,9 +20,9 @@ package connection
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/rabbitmq/mtest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 
@@ -42,7 +42,7 @@ func TestFetchEventContents(t *testing.T) {
 	t.Logf("%s/%s event: %+v", metricSet.Module().Name(), metricSet.Name(), e.Fields.StringToPrint())
 
 	ee, _ := e.Fields.GetValue("rabbitmq.connection")
-	event := ee.(common.MapStr)
+	event := ee.(mapstr.M)
 
 	assert.EqualValues(t, "[::1]:60938 -> [::1]:5672", event["name"])
 	assert.EqualValues(t, 8, event["channels"])
@@ -50,19 +50,19 @@ func TestFetchEventContents(t *testing.T) {
 	assert.EqualValues(t, 131072, event["frame_max"])
 	assert.EqualValues(t, "network", event["type"])
 
-	packetCount := event["packet_count"].(common.MapStr)
+	packetCount := event["packet_count"].(mapstr.M)
 	assert.EqualValues(t, 376, packetCount["sent"])
 	assert.EqualValues(t, 376, packetCount["received"])
 	assert.EqualValues(t, 0, packetCount["pending"])
 
-	octetCount := event["octet_count"].(common.MapStr)
+	octetCount := event["octet_count"].(mapstr.M)
 	assert.EqualValues(t, 3840, octetCount["sent"])
 	assert.EqualValues(t, 3764, octetCount["received"])
 
 	assert.EqualValues(t, "::1", event["host"])
 	assert.EqualValues(t, 5672, event["port"])
 
-	peer := event["peer"].(common.MapStr)
+	peer := event["peer"].(mapstr.M)
 	assert.EqualValues(t, "::1", peer["host"])
 	assert.EqualValues(t, 60938, peer["port"])
 }

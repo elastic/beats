@@ -30,7 +30,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/heartbeat/config"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 // The runAt in the island of tarawa 🏝. Good test TZ because it's pretty rare for a local box
@@ -86,14 +86,15 @@ func TestSchedulerRun(t *testing.T) {
 	executed := make(chan string)
 
 	initialEvents := uint32(10)
-	s.Add(testSchedule{0}, "add", testTaskTimes(initialEvents, func(_ context.Context) []TaskFunc {
+	_, err := s.Add(testSchedule{0}, "add", testTaskTimes(initialEvents, func(_ context.Context) []TaskFunc {
 		executed <- "initial"
 		cont := func(_ context.Context) []TaskFunc {
 			executed <- "initialCont"
 			return nil
 		}
 		return []TaskFunc{cont}
-	}), "http", nil)
+	}), "http")
+	require.NoError(t, err)
 
 	removedEvents := uint32(1)
 	// This function will be removed after being invoked once
@@ -108,20 +109,21 @@ func TestSchedulerRun(t *testing.T) {
 	}
 	// Attempt to execute this twice to see if remove() had any effect
 	removeMtx.Lock()
-	remove, err := s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn), "http", nil)
+	remove, err = s.Add(testSchedule{}, "removed", testTaskTimes(removedEvents+1, testFn), "http")
 	require.NoError(t, err)
 	require.NotNil(t, remove)
 	removeMtx.Unlock()
 
 	postRemoveEvents := uint32(10)
-	s.Add(testSchedule{}, "postRemove", testTaskTimes(postRemoveEvents, func(_ context.Context) []TaskFunc {
+	_, err = s.Add(testSchedule{}, "postRemove", testTaskTimes(postRemoveEvents, func(_ context.Context) []TaskFunc {
 		executed <- "postRemove"
 		cont := func(_ context.Context) []TaskFunc {
 			executed <- "postRemoveCont"
 			return nil
 		}
 		return []TaskFunc{cont}
-	}), "http", nil)
+	}), "http")
+	require.NoError(t, err)
 
 	received := make([]string, 0)
 	// We test for a good number of events in this loop because we want to ensure that the remove() took effect
@@ -158,9 +160,8 @@ func TestScheduler_WaitForRunOnce(t *testing.T) {
 	defer s.Stop()
 
 	executed := new(uint32)
-	waits := new(uint32)
 
-	s.Add(testSchedule{0}, "runOnce", func(_ context.Context) []TaskFunc {
+	_, err := s.Add(testSchedule{0}, "runOnce", func(_ context.Context) []TaskFunc {
 		cont := func(_ context.Context) []TaskFunc {
 			// Make sure we actually wait for the task!
 			time.Sleep(time.Millisecond * 250)
@@ -168,11 +169,11 @@ func TestScheduler_WaitForRunOnce(t *testing.T) {
 			return nil
 		}
 		return []TaskFunc{cont}
-	}, "http", func() { atomic.AddUint32(waits, 1) })
+	}, "http")
+	require.NoError(t, err)
 
 	s.WaitForRunOnce()
 	require.Equal(t, uint32(1), atomic.LoadUint32(executed))
-	require.Equal(t, uint32(1), atomic.LoadUint32(waits))
 }
 
 func TestScheduler_Stop(t *testing.T) {
@@ -185,7 +186,7 @@ func TestScheduler_Stop(t *testing.T) {
 	_, err := s.Add(testSchedule{}, "testPostStop", testTaskTimes(1, func(_ context.Context) []TaskFunc {
 		executed <- struct{}{}
 		return nil
-	}), "http", nil)
+	}), "http")
 
 	assert.Equal(t, ErrAlreadyStopped, err)
 }
@@ -228,7 +229,7 @@ func TestSchedTaskLimits(t *testing.T) {
 			numJobs: 50,
 			limit:   math.MaxInt64,
 			expect: func(events []int) {
-				require.GreaterOrEqual(t, len(events), 50)
+				require.GreaterOrEqual(t, len(events), 250)
 			},
 		},
 		{
@@ -236,26 +237,30 @@ func TestSchedTaskLimits(t *testing.T) {
 			numJobs: 100,
 			limit:   0,
 			expect: func(events []int) {
-				require.GreaterOrEqual(t, len(events), 100)
+				require.GreaterOrEqual(t, len(events), 500)
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var jobConfigByType = map[string]config.JobLimit{}
+			var jobConfigByType = map[string]*config.JobLimit{}
 			jobType := "http"
 			if tt.limit > 0 {
-				jobConfigByType = map[string]config.JobLimit{
+				jobConfigByType = map[string]*config.JobLimit{
 					jobType: {Limit: tt.limit},
 				}
 			}
 			s := Create(math.MaxInt64, monitoring.NewRegistry(), tarawaTime(), jobConfigByType, false)
 			var taskArr []int
+			mtx := sync.Mutex{}
 			wg := sync.WaitGroup{}
 			wg.Add(tt.numJobs)
 			for i := 0; i < tt.numJobs; i++ {
 				num := i
 				tf := makeTasks(4, func() {
+					mtx.Lock()
+					defer mtx.Unlock() // taskArr is shared across goroutines
+
 					taskArr = append(taskArr, num)
 				})
 				go func(tff TaskFunc) {
@@ -280,7 +285,7 @@ func BenchmarkScheduler(b *testing.B) {
 		_, err := s.Add(sched, "testPostStop", func(_ context.Context) []TaskFunc {
 			executed <- struct{}{}
 			return nil
-		}, "http", nil)
+		}, "http")
 		assert.NoError(b, err)
 	}
 

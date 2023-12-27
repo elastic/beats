@@ -64,9 +64,6 @@
     # Strategy for fetching the topics metadata from the broker. Default is false.
     #full: false
 
-  # The number of concurrent load-balanced Kafka output workers.
-  #worker: 1
-
   # The number of times to retry publishing an event after a publishing failure.
   # After the specified number of retries, events are typically dropped.
   # Some Beats, such as Filebeat, ignore the max_retries setting and retry until
@@ -132,6 +129,14 @@
   #client_id: beats
 
 {{include "ssl.reference.yml.tmpl" . | indent 2 }}
+  # Enables restarting {{.BeatName}} if any file listed by `key`,
+  # `certificate`, or `certificate_authorities` is modified.
+  # This feature IS NOT supported on Windows.
+  #ssl.restart_on_cert_change.enabled: false
+
+  # Period to scan for changes on CA certificate files
+  #ssl.restart_on_cert_change.period: 1m
+
   # Enable Kerberos support. Kerberos is automatically enabled if any Kerberos setting is set.
   #kerberos.enabled: true
 

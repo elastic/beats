@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestReplaceStringInDashboard(t *testing.T) {
@@ -120,69 +120,69 @@ func TestReplaceIndexInIndexPattern(t *testing.T) {
 	// Also ensures that the inner types are not modified after replacement.
 	tests := []struct {
 		title    string
-		input    common.MapStr
+		input    mapstr.M
 		index    string
-		expected common.MapStr
+		expected mapstr.M
 	}{
 		{
 			title: "Replace in []mapstr.mapstr",
-			input: common.MapStr{
+			input: mapstr.M{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
-				"attributes": common.MapStr{
+				"attributes": mapstr.M{
 					"title":         "phonybeat-*",
 					"timeFieldName": "@timestamp",
 				}},
 			index: "otherindex-*",
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"id":   "otherindex-*",
 				"type": "index-pattern",
-				"attributes": common.MapStr{
+				"attributes": mapstr.M{
 					"title":         "otherindex-*",
 					"timeFieldName": "@timestamp",
 				}},
 		},
 		{
 			title: "Replace in []mapstr.interface(mapstr)",
-			input: common.MapStr{
+			input: mapstr.M{
 				"id":   "phonybeat-*",
 				"type": "index-pattern",
-				"attributes": interface{}(common.MapStr{
+				"attributes": interface{}(mapstr.M{
 					"title":         "phonybeat-*",
 					"timeFieldName": "@timestamp",
 				})},
 			index: "otherindex-*",
-			expected: common.MapStr{
+			expected: mapstr.M{
 				"id":   "otherindex-*",
 				"type": "index-pattern",
-				"attributes": interface{}(common.MapStr{
+				"attributes": interface{}(mapstr.M{
 					"title":         "otherindex-*",
 					"timeFieldName": "@timestamp",
 				})},
 		},
 		{
 			title: "Do not create missing attributes",
-			input: common.MapStr{
-				"attributes": common.MapStr{},
+			input: mapstr.M{
+				"attributes": mapstr.M{},
 				"id":         "phonybeat-*",
 				"type":       "index-pattern",
 			},
 			index: "otherindex-*",
-			expected: common.MapStr{
-				"attributes": common.MapStr{},
+			expected: mapstr.M{
+				"attributes": mapstr.M{},
 				"id":         "otherindex-*",
 				"type":       "index-pattern",
 			},
 		},
 		{
 			title: "Create missing id",
-			input: common.MapStr{
-				"attributes": common.MapStr{},
+			input: mapstr.M{
+				"attributes": mapstr.M{},
 				"type":       "index-pattern",
 			},
 			index: "otherindex-*",
-			expected: common.MapStr{
-				"attributes": common.MapStr{},
+			expected: mapstr.M{
+				"attributes": mapstr.M{},
 				"id":         "otherindex-*",
 				"type":       "index-pattern",
 			},

@@ -22,19 +22,18 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-autodiscover/bus"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-ucfg"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
 )
 
 type fakeBuilder struct{}
 
-func (f *fakeBuilder) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
-	return []*common.Config{common.NewConfig()}
+func (f *fakeBuilder) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf.C {
+	return []*conf.C{conf.NewConfig()}
 }
 
-func newFakeBuilder(_ *common.Config) (Builder, error) {
+func newFakeBuilder(_ *conf.C) (Builder, error) {
 	return &fakeBuilder{}, nil
 }
 
@@ -52,7 +51,7 @@ func TestBuilderRegistry(t *testing.T) {
 		Type: "fake",
 	}
 
-	cfg, err := common.NewConfigFrom(&config)
+	cfg, err := conf.NewConfigFrom(&config)
 
 	// Make sure that config building doesn't fail
 	assert.NoError(t, err)

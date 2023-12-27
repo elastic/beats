@@ -21,13 +21,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 type httpMetadataFetcher struct {
@@ -41,11 +41,11 @@ type httpMetadataFetcher struct {
 // to the result according the HTTP response.
 type responseHandler func(all []byte, res *result) error
 
-type schemaConv func(m map[string]interface{}) common.MapStr
+type schemaConv func(m map[string]interface{}) mapstr.M
 
 // newMetadataFetcher return metadataFetcher with one pass JSON responseHandler.
 func newMetadataFetcher(
-	c *common.Config,
+	c *cfg.C,
 	provider string,
 	headers map[string]string,
 	host string,
@@ -65,7 +65,7 @@ func newMetadataFetcher(
 // Some providers require multiple HTTP requests to gather the whole metadata,
 // len(f.responseHandlers)  > 1 indicates that multiple requests are needed.
 func (f *httpMetadataFetcher) fetchMetadata(ctx context.Context, client http.Client) result {
-	res := result{provider: f.provider, metadata: common.MapStr{}}
+	res := result{provider: f.provider, metadata: mapstr.M{}}
 	for url, responseHandler := range f.responseHandlers {
 		f.fetchRaw(ctx, client, url, responseHandler, &res)
 		if res.err != nil {
@@ -90,7 +90,7 @@ func (f *httpMetadataFetcher) fetchRaw(
 ) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		result.err = errors.Wrapf(err, "failed to create http request for %v", f.provider)
+		result.err = fmt.Errorf("failed to create http request for %v: %w", f.provider, err)
 		return
 	}
 	for k, v := range f.headers {
@@ -100,19 +100,19 @@ func (f *httpMetadataFetcher) fetchRaw(
 
 	rsp, err := client.Do(req)
 	if err != nil {
-		result.err = errors.Wrapf(err, "failed requesting %v metadata", f.provider)
+		result.err = fmt.Errorf("failed requesting %v metadata: %w", f.provider, err)
 		return
 	}
 	defer rsp.Body.Close()
 
 	if rsp.StatusCode != http.StatusOK {
-		result.err = errors.Errorf("failed with http status code %v", rsp.StatusCode)
+		result.err = fmt.Errorf("failed with http status code %v", rsp.StatusCode)
 		return
 	}
 
 	all, err := ioutil.ReadAll(rsp.Body)
 	if err != nil {
-		result.err = errors.Wrapf(err, "failed requesting %v metadata", f.provider)
+		result.err = fmt.Errorf("failed requesting %v metadata: %w", f.provider, err)
 		return
 	}
 
@@ -127,12 +127,12 @@ func (f *httpMetadataFetcher) fetchRaw(
 }
 
 // getMetadataURLs loads config and generates the metadata URLs.
-func getMetadataURLs(c *common.Config, defaultHost string, metadataURIs []string) ([]string, error) {
+func getMetadataURLs(c *cfg.C, defaultHost string, metadataURIs []string) ([]string, error) {
 	return getMetadataURLsWithScheme(c, "http", defaultHost, metadataURIs)
 }
 
 // getMetadataURLsWithScheme loads config and generates the metadata URLs.
-func getMetadataURLsWithScheme(c *common.Config, scheme string, defaultHost string, metadataURIs []string) ([]string, error) {
+func getMetadataURLsWithScheme(c *cfg.C, scheme string, defaultHost string, metadataURIs []string) ([]string, error) {
 	var urls []string
 	config := struct {
 		MetadataHostAndPort string            `config:"host"` // Specifies the host and port of the metadata service (for testing purposes only).
@@ -142,7 +142,7 @@ func getMetadataURLsWithScheme(c *common.Config, scheme string, defaultHost stri
 	}
 	err := c.Unpack(&config)
 	if err != nil {
-		return urls, errors.Wrap(err, "failed to unpack add_cloud_metadata config")
+		return urls, fmt.Errorf("failed to unpack add_cloud_metadata config: %w", err)
 	}
 	for _, uri := range metadataURIs {
 		urls = append(urls, scheme+"://"+config.MetadataHostAndPort+uri)
@@ -158,7 +158,7 @@ func makeJSONPicker(provider string) responseHandler {
 		dec.UseNumber()
 		err := dec.Decode(&res.metadata)
 		if err != nil {
-			err = errors.Wrapf(err, "failed to unmarshal %v JSON of '%v'", provider, string(all))
+			err = fmt.Errorf("failed to unmarshal %v JSON of '%v': %w", provider, string(all), err)
 			return err
 		}
 		return nil

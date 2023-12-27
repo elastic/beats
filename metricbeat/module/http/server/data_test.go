@@ -23,7 +23,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func GetMetricProcessor() *metricProcessor {
@@ -31,7 +31,7 @@ func GetMetricProcessor() *metricProcessor {
 		{
 			Namespace: "foo",
 			Path:      "/foo",
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"a": "b",
 			},
 		},

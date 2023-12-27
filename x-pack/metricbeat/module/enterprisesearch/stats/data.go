@@ -6,15 +6,16 @@ package stats
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -166,8 +167,8 @@ func eventMapping(report mb.ReporterV2, input []byte, isXpack bool) error {
 
 	// All events need to have a cluster_uuid to work with Stack Monitoring
 	event := mb.Event{
-		ModuleFields:    common.MapStr{},
-		MetricSetFields: common.MapStr{},
+		ModuleFields:    mapstr.M{},
+		MetricSetFields: mapstr.M{},
 	}
 	event.ModuleFields.Put("cluster_uuid", data["cluster_uuid"])
 
@@ -195,7 +196,7 @@ func eventMapping(report mb.ReporterV2, input []byte, isXpack bool) error {
 
 	event.MetricSetFields, err = schema.Apply(data)
 	if err != nil {
-		errs = append(errs, errors.Wrap(err, "failure to apply stats schema"))
+		errs = append(errs, fmt.Errorf("failure to apply stats schema: %w", err))
 	} else {
 		report.Event(event)
 	}

@@ -10,16 +10,22 @@ import (
 
 	"github.com/osquery/osquery-go/plugin/logger"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type SnapshotResult struct {
+type QueryResult struct {
 	Action       string              `json:"action"`
 	Name         string              `json:"name"`
-	Numeric      string              `json:"numeric"`
+	Numeric      bool                `json:"numeric"`
 	CalendarTime string              `json:"calendarTime"`
 	UnixTime     int64               `json:"unixTime"`
+	Epoch        int64               `json:"epoch"`
+	Counter      int64               `json:"counter"`
 	Hits         []map[string]string `json:"snapshot"`
+	DiffResults  struct {
+		Added   []map[string]string `json:"added"`
+		Removed []map[string]string `json:"removed"`
+	} `json:"diffResults"`
 }
 
 type osqueryLogMessage struct {
@@ -37,12 +43,13 @@ type osqLogSeverity int
 
 // The severity levels are taken from osquery source
 // https://github.com/osquery/osquery/blob/master/osquery/core/plugins/logger.h#L39
-//  enum StatusLogSeverity {
-// 	  O_INFO = 0,
-// 	  O_WARNING = 1,
-// 	  O_ERROR = 2,
-// 	  O_FATAL = 3,
-//  };
+//
+//	 enum StatusLogSeverity {
+//		  O_INFO = 0,
+//		  O_WARNING = 1,
+//		  O_ERROR = 2,
+//		  O_FATAL = 3,
+//	 };
 const (
 	severityInfo osqLogSeverity = iota
 	severityWarning
@@ -80,14 +87,14 @@ func (m *osqueryLogMessage) Log(typ logger.LogType, log *logp.Logger) {
 	}
 }
 
-type HandleSnapshotResultFunc func(res SnapshotResult)
+type HandleQueryResultFunc func(res QueryResult)
 
 type LoggerPlugin struct {
 	log           *logp.Logger
-	logSnapshotFn HandleSnapshotResultFunc
+	logSnapshotFn HandleQueryResultFunc
 }
 
-func NewLoggerPlugin(log *logp.Logger, logSnapshotFn HandleSnapshotResultFunc) *LoggerPlugin {
+func NewLoggerPlugin(log *logp.Logger, logSnapshotFn HandleQueryResultFunc) *LoggerPlugin {
 	return &LoggerPlugin{
 		log:           log.With("ctx", "logger"),
 		logSnapshotFn: logSnapshotFn,
@@ -95,12 +102,13 @@ func NewLoggerPlugin(log *logp.Logger, logSnapshotFn HandleSnapshotResultFunc) *
 }
 
 func (p *LoggerPlugin) Log(ctx context.Context, typ logger.LogType, logText string) error {
-	if typ == logger.LogTypeSnapshot {
-		var res SnapshotResult
+	if typ == logger.LogTypeSnapshot || typ == logger.LogTypeString {
+		var res QueryResult
 		if err := json.Unmarshal([]byte(logText), &res); err != nil {
 			p.log.Errorf("failed to unmarshal shapshot result: %v", err)
 			return err
 		}
+
 		if p.logSnapshotFn != nil {
 			p.logSnapshotFn(res)
 		}

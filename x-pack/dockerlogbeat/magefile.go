@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -25,10 +24,8 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/common"
 	// mage:import
@@ -73,7 +70,7 @@ func init() {
 func getPluginName() (string, error) {
 	version, err := devtools.BeatQualifiedVersion()
 	if err != nil {
-		return "", errors.Wrap(err, "error getting beats version")
+		return "", fmt.Errorf("error getting beats version: %w", err)
 	}
 	return dockerPluginName + ":" + version, nil
 }
@@ -82,35 +79,35 @@ func getPluginName() (string, error) {
 func createContainer(ctx context.Context, cli *client.Client, arch string) error {
 	dockerLogBeatDir, err := os.Getwd()
 	if err != nil {
-		return errors.Wrap(err, "error getting work dir")
+		return fmt.Errorf("error getting work dir: %w", err)
 	}
 
 	if !strings.Contains(dockerLogBeatDir, "dockerlogbeat") {
-		return errors.Errorf("not in dockerlogbeat directory: %s", dockerLogBeatDir)
+		return fmt.Errorf("not in dockerlogbeat directory: %s", dockerLogBeatDir)
 	}
 
 	dockerfile := filepath.Join(packageStagingDir, "Dockerfile")
 	err = devtools.ExpandFile(dockerfileTmpl, dockerfile, platformMap[arch])
 	if err != nil {
-		return errors.Wrap(err, "error while expanding Dockerfile template")
+		return fmt.Errorf("error while expanding Dockerfile template: %w", err)
 	}
 
 	// start to build the root container that'll be used to build the plugin
 	tmpDir, err := ioutil.TempDir("", "dockerBuildTar")
 	if err != nil {
-		return errors.Wrap(err, "error locating temp dir")
+		return fmt.Errorf("error locating temp dir: %w", err)
 	}
 	defer sh.Rm(tmpDir)
 
 	tarPath := filepath.Join(tmpDir, "tarRoot.tar")
 	err = sh.RunV("tar", "cf", tarPath, "./")
 	if err != nil {
-		return errors.Wrap(err, "error creating tar")
+		return fmt.Errorf("error creating tar: %w", err)
 	}
 
 	buildContext, err := os.Open(tarPath)
 	if err != nil {
-		return errors.Wrap(err, "error opening temp dur")
+		return fmt.Errorf("error opening temp dur: %w", err)
 	}
 	defer buildContext.Close()
 
@@ -118,16 +115,16 @@ func createContainer(ctx context.Context, cli *client.Client, arch string) error
 		Tags:       []string{rootImageName},
 		Dockerfile: dockerfile,
 	}
-	//build, wait for output
+	// build, wait for output
 	buildResp, err := cli.ImageBuild(ctx, buildContext, buildOpts)
 	if err != nil {
-		return errors.Wrap(err, "error building final container image")
+		return fmt.Errorf("error building final container image: %w", err)
 	}
 	defer buildResp.Body.Close()
 	// This blocks until the build operation completes
 	buildStr, errBufRead := ioutil.ReadAll(buildResp.Body)
 	if errBufRead != nil {
-		return errors.Wrap(err, "error reading from docker output")
+		return fmt.Errorf("error reading from docker output: %w", errBufRead)
 	}
 	fmt.Printf("%s\n", string(buildStr))
 
@@ -145,14 +142,14 @@ func BuildContainer(ctx context.Context) error {
 	// setup
 	cli, err := newDockerClient(ctx)
 	if err != nil {
-		return errors.Wrap(err, "error creating docker client")
+		return fmt.Errorf("error creating docker client: %w", err)
 	}
 
 	devtools.CreateDir(packageStagingDir)
 	devtools.CreateDir(packageEndDir)
 	err = os.MkdirAll(filepath.Join(buildDir, "rootfs"), 0755)
 	if err != nil {
-		return errors.Wrap(err, "error creating build dir")
+		return fmt.Errorf("error creating build dir: %w", err)
 	}
 
 	for _, plat := range devtools.Platforms {
@@ -164,13 +161,13 @@ func BuildContainer(ctx context.Context) error {
 
 		err = createContainer(ctx, cli, arch)
 		if err != nil {
-			return errors.Wrap(err, "error creating base container")
+			return fmt.Errorf("error creating base container: %w", err)
 		}
 
 		// create the container that will become our rootfs
 		CreatedContainerBody, err := cli.ContainerCreate(ctx, &container.Config{Image: rootImageName}, nil, nil, nil, "")
 		if err != nil {
-			return errors.Wrap(err, "error creating container")
+			return fmt.Errorf("error creating container: %w", err)
 		}
 
 		defer func() {
@@ -187,31 +184,31 @@ func BuildContainer(ctx context.Context) error {
 
 		file, err := os.Create(dockerExportPath)
 		if err != nil {
-			return errors.Wrap(err, "error creating tar archive")
+			return fmt.Errorf("error creating tar archive: %w", err)
 		}
 
 		// export the container to a tar file
 		exportReader, err := cli.ContainerExport(ctx, CreatedContainerBody.ID)
 		if err != nil {
-			return errors.Wrap(err, "error exporting container")
+			return fmt.Errorf("error exporting container: %w", err)
 		}
 
 		_, err = io.Copy(file, exportReader)
 		if err != nil {
-			return errors.Wrap(err, "error writing exported container")
+			return fmt.Errorf("error writing exported container: %w", err)
 		}
 
-		//misc prepare operations
+		// misc prepare operations
 
 		err = devtools.Copy("config.json", filepath.Join(buildDir, "config.json"))
 		if err != nil {
-			return errors.Wrap(err, "error copying config.json")
+			return fmt.Errorf("error copying config.json: %w", err)
 		}
 
 		// unpack the tar file into a root directory, which is the format needed for the docker plugin create tool
 		err = sh.RunV("tar", "-xf", dockerExportPath, "-C", filepath.Join(buildDir, "rootfs"))
 		if err != nil {
-			return errors.Wrap(err, "error unpacking exported container")
+			return fmt.Errorf("error unpacking exported container: %w", err)
 		}
 	}
 
@@ -222,12 +219,12 @@ func cleanDockerArtifacts(ctx context.Context, containerID string, cli *client.C
 	fmt.Printf("Removing container %s\n", containerID)
 	err := cli.ContainerRemove(ctx, containerID, types.ContainerRemoveOptions{RemoveVolumes: true, Force: true})
 	if err != nil {
-		return errors.Wrap(err, "error removing container")
+		return fmt.Errorf("error removing container: %w", err)
 	}
 
 	resp, err := cli.ImageRemove(ctx, rootImageName, types.ImageRemoveOptions{Force: true})
 	if err != nil {
-		return errors.Wrap(err, "error removing image")
+		return fmt.Errorf("error removing image: %w", err)
 	}
 	fmt.Printf("Removed image: %#v\n", resp)
 	return nil
@@ -237,13 +234,13 @@ func cleanDockerArtifacts(ctx context.Context, containerID string, cli *client.C
 func Uninstall(ctx context.Context) error {
 	cli, err := newDockerClient(ctx)
 	if err != nil {
-		return errors.Wrap(err, "error creating docker client")
+		return fmt.Errorf("error creating docker client: %w", err)
 	}
 
-	//check to see if we have a plugin we need to remove
+	// check to see if we have a plugin we need to remove
 	plugins, err := cli.PluginList(ctx, filters.Args{})
 	if err != nil {
-		return errors.Wrap(err, "error getting list of plugins")
+		return fmt.Errorf("error getting list of plugins: %w", err)
 	}
 
 	toRemoveName := ""
@@ -259,11 +256,11 @@ func Uninstall(ctx context.Context) error {
 
 	err = cli.PluginDisable(ctx, toRemoveName, types.PluginDisableOptions{Force: true})
 	if err != nil {
-		return errors.Wrap(err, "error disabling plugin")
+		return fmt.Errorf("error disabling plugin: %w", err)
 	}
 	err = cli.PluginRemove(ctx, toRemoveName, types.PluginRemoveOptions{Force: true})
 	if err != nil {
-		return errors.Wrap(err, "error removing plugin")
+		return fmt.Errorf("error removing plugin: %w", err)
 	}
 
 	return nil
@@ -283,22 +280,22 @@ func Install(ctx context.Context) error {
 
 	cli, err := newDockerClient(ctx)
 	if err != nil {
-		return errors.Wrap(err, "error creating docker client")
+		return fmt.Errorf("error creating docker client: %w", err)
 	}
 
 	archive, err := tar(buildDir, "rootfs", "config.json")
 	if err != nil {
-		return errors.Wrap(err, "error creating archive of work dir")
+		return fmt.Errorf("error creating archive of work dir: %w", err)
 	}
 
 	err = cli.PluginCreate(ctx, archive, types.PluginCreateOptions{RepoName: name})
 	if err != nil {
-		return errors.Wrap(err, "error creating plugin")
+		return fmt.Errorf("error creating plugin: %w", err)
 	}
 
 	err = cli.PluginEnable(ctx, name, types.PluginEnableOptions{})
 	if err != nil {
-		return errors.Wrap(err, "error enabling plugin")
+		return fmt.Errorf("error enabling plugin: %w", err)
 	}
 
 	return nil
@@ -310,7 +307,7 @@ func tar(dir string, files ...string) (io.Reader, error) {
 	args := append([]string{"-C", dir, "-cf", "-"}, files...)
 	_, err := sh.Exec(nil, &archive, &stdErr, "tar", args...)
 	if err != nil {
-		return nil, errors.Wrap(err, stdErr.String())
+		return nil, fmt.Errorf(stdErr.String()+": %w", err)
 	}
 
 	return &archive, nil
@@ -320,7 +317,7 @@ func tar(dir string, files ...string) (io.Reader, error) {
 func Export() error {
 	version, err := devtools.BeatQualifiedVersion()
 	if err != nil {
-		return errors.Wrap(err, "error getting beats version")
+		return fmt.Errorf("error getting beats version: %w", err)
 	}
 
 	if devtools.Snapshot {
@@ -335,15 +332,20 @@ func Export() error {
 
 		err = os.Chdir(packageStagingDir)
 		if err != nil {
-			return errors.Wrap(err, "error changing directory")
+			return fmt.Errorf("error changing directory: %w", err)
 		}
 
 		err = sh.RunV("tar", "zcf", outpath,
 			filepath.Join(logDriverName, "rootfs"),
 			filepath.Join(logDriverName, "config.json"))
 		if err != nil {
-			return errors.Wrap(err, "error creating release tarball")
+			return fmt.Errorf("error creating release tarball: %w", err)
 		}
+
+		if err = devtools.CreateSHA512File(outpath); err != nil {
+			return fmt.Errorf("failed to create .sha512 file: %w", err)
+		}
+		return nil
 	}
 
 	return nil
@@ -359,7 +361,7 @@ func Build() {
 	mg.SerialDeps(CrossBuild, BuildContainer)
 }
 
-// GolangCrossBuild build the Beat binary inside of the golang-builder.
+// GolangCrossBuild build the Beat binary inside the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
 	buildArgs := devtools.DefaultBuildArgs()
@@ -380,6 +382,14 @@ func Package() {
 	}
 
 	mg.SerialDeps(Build, Export)
+}
+
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
+	return nil
 }
 
 func isSupportedPlatform() bool {

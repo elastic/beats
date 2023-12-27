@@ -16,11 +16,18 @@
 // under the License.
 
 //go:build !linux && !windows
-// +build !linux,!windows
 
 package procs
 
-import "github.com/elastic/beats/v7/packetbeat/protos/applayer"
+import (
+	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
+	"github.com/elastic/go-sysinfo/types"
+)
+
+// procName returns the name for the process.
+func procName(info types.ProcessInfo) string {
+	return info.Name
+}
 
 // GetLocalPortToPIDMapping returns the list of local port numbers and the PID
 // that owns them.

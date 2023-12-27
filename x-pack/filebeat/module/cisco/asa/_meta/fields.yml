@@ -34,10 +34,20 @@
     description: >
       Name of the user that is the source for this event.
 
+  - name: source_user_security_group_tag
+    type: long
+    description: >
+      The Security Group Tag for the source user. Security Group Tag are 16-bit identifiers used to represent logical group privilege.
+
   - name: destination_username
     type: keyword
     description: >
       Name of the user that is the destination for this event.
+
+  - name: destination_user_security_group_tag
+    type: long
+    description: >
+      The Security Group Tag for the destination user. Security Group Tag are 16-bit identifiers used to represent logical group privilege.
 
   - name: mapped_source_ip
     type: ip

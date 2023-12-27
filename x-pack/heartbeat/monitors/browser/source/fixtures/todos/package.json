@@ -1,7 +1,7 @@
 {
   "name": "todos",
   "private": true,
-  "description": "This suite tests the examples that ship with the open source Vue.js project.",
+  "description": "This project tests the examples that ship with the open source Vue.js project.",
   "scripts": {},
   "dependencies": {
     "@elastic/synthetics": "^1.0.0-beta.1"

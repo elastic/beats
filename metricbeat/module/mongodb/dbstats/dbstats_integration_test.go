@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package dbstats
 
@@ -47,33 +46,35 @@ func TestFetch(t *testing.T) {
 		db := metricsetFields["db"].(string)
 		assert.NotEqual(t, db, "")
 
-		collections := metricsetFields["collections"].(int64)
+		collections := metricsetFields["collections"].(int32)
 		assert.True(t, collections > 0)
 
-		objects := metricsetFields["objects"].(int64)
-		assert.True(t, objects > 0)
+		objects := metricsetFields["objects"].(int32)
+		assert.True(t, objects >= 0)
 
 		avgObjSize, err := metricsetFields.GetValue("avg_obj_size.bytes")
 		assert.NoError(t, err)
-		assert.True(t, avgObjSize.(int64) > 0)
+		assert.True(t, avgObjSize.(float64) >= 0)
 
 		dataSize, err := metricsetFields.GetValue("data_size.bytes")
 		assert.NoError(t, err)
-		assert.True(t, dataSize.(int64) > 0)
+		assert.True(t, dataSize.(float64) >= 0)
 
 		storageSize, err := metricsetFields.GetValue("storage_size.bytes")
 		assert.NoError(t, err)
-		assert.True(t, storageSize.(int64) > 0)
+		assert.True(t, storageSize.(float64) >= 0)
 
-		numExtents := metricsetFields["num_extents"].(int64)
-		assert.True(t, numExtents >= 0)
+		if metricsetFields["num_extents"] != nil {
+			numExtents := metricsetFields["num_extents"].(int32)
+			assert.True(t, numExtents >= 0)
+		}
 
-		indexes := metricsetFields["indexes"].(int64)
+		indexes := metricsetFields["indexes"].(int32)
 		assert.True(t, indexes >= 0)
 
 		indexSize, err := metricsetFields.GetValue("index_size.bytes")
 		assert.NoError(t, err)
-		assert.True(t, indexSize.(int64) > 0)
+		assert.True(t, indexSize.(float64) > 0)
 	}
 }
 

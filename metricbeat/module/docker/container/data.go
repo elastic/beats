@@ -22,33 +22,36 @@ import (
 
 	"github.com/docker/docker/api/types"
 
+	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/docker"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventsMapping(r mb.ReporterV2, containersList []types.Container, dedot bool) {
-	for _, container := range containersList {
-		eventMapping(r, &container, dedot)
+func eventsMapping(r mb.ReporterV2, containersList []types.Container, dedot bool, logger *logp.Logger) {
+	for i := range containersList {
+		eventMapping(r, &containersList[i], dedot, logger)
 	}
 }
 
-func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool) {
-	event := common.MapStr{
-		"container": common.MapStr{
+func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool, logger *logp.Logger) {
+	event := mapstr.M{
+		"container": mapstr.M{
 			"id": cont.ID,
-			"image": common.MapStr{
+			"image": mapstr.M{
 				"name": cont.Image,
 			},
 			"name":    docker.ExtractContainerName(cont.Names),
 			"runtime": "docker",
 		},
-		"docker": common.MapStr{
-			"container": common.MapStr{
+		"docker": mapstr.M{
+			"container": mapstr.M{
 				"created":      common.Time(time.Unix(cont.Created, 0)),
 				"command":      cont.Command,
 				"ip_addresses": extractIPAddresses(cont.NetworkSettings),
-				"size": common.MapStr{
+				"size": mapstr.M{
 					"root_fs": cont.SizeRootFs,
 					"rw":      cont.SizeRw,
 				},
@@ -60,7 +63,7 @@ func eventMapping(r mb.ReporterV2, cont *types.Container, dedot bool) {
 	labels := docker.DeDotLabels(cont.Labels, dedot)
 
 	if len(labels) > 0 {
-		event.Put("docker.container.labels", labels)
+		kubernetes.ShouldPut(event, "docker.container.labels", labels, logger)
 	}
 
 	r.Event(mb.Event{

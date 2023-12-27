@@ -8,16 +8,15 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/testutil"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {
@@ -30,12 +29,13 @@ func renderFullConfigJSON(inputs []config.InputConfig) (string, error) {
 			Queries:   make(map[string]config.Query),
 		}
 		for _, stream := range input.Streams {
+			snapshot := true
 			query := config.Query{
 				Query:    stream.Query,
 				Interval: stream.Interval,
 				Platform: stream.Platform,
 				Version:  stream.Version,
-				Snapshot: true, // enforce snapshot for all queries
+				Snapshot: &snapshot, // enforce snapshot for all queries
 			}
 			pack.Queries[stream.ID] = query
 		}
@@ -161,7 +161,7 @@ func TestFlattenECSMappingEdges(t *testing.T) {
 	// max + 1 depth key map should return error
 	m = generateTestMapping(maxECSMappingDepth+1, "value", 2)
 	_, err = flattenECSMapping(m)
-	if err != ErrECSMappingIsTooDeep {
+	if !errors.Is(err, ErrECSMappingIsTooDeep) {
 		t.Fatalf("expected error: %v", ErrECSMappingIsTooDeep)
 	}
 }
@@ -369,7 +369,6 @@ func TestSet(t *testing.T) {
 
 			diff = cmp.Diff(tc.scfg, scfg)
 			if diff != "" {
-				fmt.Println(scfg)
 				t.Error(diff)
 			}
 

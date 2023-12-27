@@ -20,9 +20,10 @@ package processors
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	p "github.com/elastic/beats/v7/libbeat/plugin"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type processorPlugin struct {
@@ -47,14 +48,14 @@ func init() {
 	})
 }
 
-type Constructor func(config *common.Config) (Processor, error)
+type Constructor func(config *config.C) (beat.Processor, error)
 
 var registry = NewNamespace()
 
 func RegisterPlugin(name string, constructor Constructor) {
 	logp.L().Named(logName).Debugf("Register plugin %s", name)
 
-	err := registry.Register(name, constructor)
+	err := registry.Register(name, SafeWrap(constructor))
 	if err != nil {
 		panic(err)
 	}

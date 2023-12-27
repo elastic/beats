@@ -15,7 +15,7 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func createSocket(bindAddr unix.SockaddrInet4) (fd int, addr unix.SockaddrInet4, err error) {
@@ -92,7 +92,7 @@ func randomLocalIP() [4]byte {
 	return [4]byte{127, uint8(rand.Intn(256)), uint8(rand.Intn(256)), uint8(1 + rand.Intn(255))}
 }
 
-func getListField(m common.MapStr, key string) ([]int, error) {
+func getListField(m mapstr.M, key string) ([]int, error) {
 	iface, ok := m[key]
 	if !ok {
 		return nil, fmt.Errorf("field %s not found", key)
@@ -114,11 +114,11 @@ func getListField(m common.MapStr, key string) ([]int, error) {
 // Example
 // Input: [ {"A": [1,2,3,4], "B": [4, 5]}, {"A": [2,3,8], "B": [6]} ]
 // Output: { "A": [2,3], "B": [] }
-func consolidate(partials []common.MapStr) (result common.MapStr, err error) {
+func consolidate(partials []mapstr.M) (result mapstr.M, err error) {
 	if len(partials) == 0 {
 		return nil, errors.New("empty resultset to consolidate")
 	}
-	result = make(common.MapStr)
+	result = make(mapstr.M)
 
 	for k, v := range partials[0] {
 		baseList, ok := v.([]int)

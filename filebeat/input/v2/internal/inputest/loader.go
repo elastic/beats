@@ -21,8 +21,8 @@ import (
 	"testing"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Loader wraps the input Loader in order to provide additional methods for reuse in tests.
@@ -41,9 +41,9 @@ func MustNewTestLoader(t testing.TB, plugins []v2.Plugin, typeField, defaultType
 	return &Loader{t: t, Loader: l}
 }
 
-// MustConfigure confiures a new input. The test fails with t.Fatal if the
+// MustConfigure configures a new input. The test fails with t.Fatal if the
 // operation failed.
-func (l *Loader) MustConfigure(cfg *common.Config) v2.Input {
+func (l *Loader) MustConfigure(cfg *conf.C) v2.Input {
 	i, err := l.Configure(cfg)
 	if err != nil {
 		l.t.Fatalf("Failed to create the input: %v", err)

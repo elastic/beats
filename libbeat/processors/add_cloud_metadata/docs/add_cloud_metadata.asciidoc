@@ -19,6 +19,7 @@ The following cloud providers are supported:
 - Huawei Cloud (ECS)
 - Azure Virtual Machine
 - Openstack Nova
+- Hetzner Cloud
 
 The Alibaba Cloud and Tencent cloud providers are disabled by default, because
 they require to access a remote host. The `providers` setting allows users to
@@ -56,6 +57,7 @@ List of names the `providers` setting supports:
 - "openstack-ssl", or "nova-ssl" for Openstack Nova when SSL metadata APIs are enabled (enabled by default).
 - "tencent", or "qcloud" for Tencent Cloud (disabled by default).
 - "huawei" for Huawei Cloud (enabled by default).
+- "hetzner" for Hetzner Cloud (enabled by default).
 
 The third optional configuration setting is `overwrite`. When `overwrite` is
 `true`, `add_cloud_metadata` overwrites existing `cloud.*` fields (`false` by
@@ -183,6 +185,21 @@ _Openstack Nova_
     "availability_zone": "xxxx-az-c",
     "provider": "openstack",
     "machine.type": "m2.large"
+  }
+}
+-------------------------------------------------------------------------------
+
+_Hetzner Cloud_
+
+[source,json]
+-------------------------------------------------------------------------------
+{
+  "cloud": {
+    "availability_zone": "hel1-dc2",
+    "instance.name": "my-hetzner-instance",
+    "instance.id": "111111",
+    "provider": "hetzner",
+    "region": "eu-central"
   }
 }
 -------------------------------------------------------------------------------

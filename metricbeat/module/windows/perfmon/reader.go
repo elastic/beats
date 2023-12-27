@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package perfmon
 
@@ -29,14 +28,8 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 
-	"github.com/pkg/errors"
-
-	"math/rand"
-
-	"golang.org/x/sys/windows"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -89,11 +82,11 @@ func NewReader(config Config) (*Reader, error) {
 func (re *Reader) RefreshCounterPaths() error {
 	newCounters, err := re.getCounterPaths()
 	if err != nil {
-		return errors.Wrap(err, "failed retrieving counter paths")
+		return fmt.Errorf("failed retrieving counter paths: %w", err)
 	}
 	err = re.query.RemoveUnusedCounters(newCounters)
 	if err != nil {
-		return errors.Wrap(err, "failed removing unused counter values")
+		return fmt.Errorf("failed removing unused counter values: %w", err)
 	}
 	return nil
 }
@@ -105,17 +98,17 @@ func (re *Reader) Read() ([]mb.Event, error) {
 	if err := re.query.CollectData(); err != nil {
 		// users can encounter the case no counters are found (services/processes stopped), this should not generate an event with the error message,
 		//could be the case the specific services are started after and picked up by the next RefreshCounterPaths func
-		if err == pdh.PDH_NO_COUNTERS {
+		if err == pdh.PDH_NO_COUNTERS { //nolint:errorlint // Bad linter! This is always errno or nil.
 			re.log.Warnf("%s %v", collectFailedMsg, err)
 		} else {
-			return nil, errors.Wrap(err, collectFailedMsg)
+			return nil, fmt.Errorf("%v: %w", collectFailedMsg, err)
 		}
 	}
 
 	// Get the values.
 	values, err := re.getValues()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed formatting counter values")
+		return nil, fmt.Errorf("failed formatting counter values: %w", err)
 	}
 	var events []mb.Event
 	// GroupAllCountersTo config option where counters for all instances are aggregated and instance count is added in the event under the string value provided by this option.
@@ -130,42 +123,21 @@ func (re *Reader) Read() ([]mb.Event, error) {
 
 func (re *Reader) getValues() (map[string][]pdh.CounterValue, error) {
 	var val map[string][]pdh.CounterValue
-	rand.Seed(time.Now().UnixNano())
-	title := windows.StringToUTF16Ptr("metricbeat_perfmon" + randSeq(5))
-	event, err := windows.CreateEvent(nil, 0, 0, title)
+	// Sleep for one second before collecting the second raw value-
+	time.Sleep(time.Second)
+
+	// Collect the second raw value.
+	err := re.query.CollectData()
 	if err != nil {
 		return nil, err
 	}
-	defer windows.CloseHandle(event)
-	err = re.query.CollectDataEx(uint32(re.config.Period.Seconds()), event)
+
+	// Collect the displayable value.
+	val, err = re.query.GetFormattedCounterValues()
 	if err != nil {
 		return nil, err
-	}
-	waitFor, err := windows.WaitForSingleObject(event, windows.INFINITE)
-	if err != nil {
-		return nil, err
-	}
-	switch waitFor {
-	case windows.WAIT_OBJECT_0:
-		val, err = re.query.GetFormattedCounterValues()
-		if err != nil {
-			return nil, err
-		}
-	case windows.WAIT_FAILED:
-		return nil, errors.New("WaitForSingleObject has failed")
-	default:
-		return nil, errors.New("WaitForSingleObject was abandoned or still waiting for completion")
 	}
 	return val, err
-}
-
-func randSeq(n int) string {
-	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
 }
 
 // Close will close the PDH query for now.
@@ -181,7 +153,7 @@ func (re *Reader) getCounterPaths() ([]string, error) {
 		childQueries, err := re.query.GetCounterPaths(counter.QueryName)
 		if err != nil {
 			if re.config.IgnoreNECounters {
-				switch err {
+				switch err { //nolint:errorlint // Bad linter! This is always errno or nil.
 				case pdh.PDH_CSTATUS_NO_COUNTER, pdh.PDH_CSTATUS_NO_COUNTERNAME,
 					pdh.PDH_CSTATUS_NO_INSTANCE, pdh.PDH_CSTATUS_NO_OBJECT:
 					re.log.Infow("Ignoring non existent counter", "error", err,
@@ -189,7 +161,7 @@ func (re *Reader) getCounterPaths() ([]string, error) {
 					continue
 				}
 			} else {
-				return newCounters, errors.Wrapf(err, `failed to expand counter (query="%v")`, counter.QueryName)
+				return newCounters, fmt.Errorf("failed to expand counter (query='%v'): %w", counter.QueryName, err)
 			}
 		}
 		newCounters = append(newCounters, childQueries...)
@@ -197,7 +169,7 @@ func (re *Reader) getCounterPaths() ([]string, error) {
 		if err == nil && len(childQueries) >= 1 && !strings.Contains(childQueries[0], "*") {
 			for _, v := range childQueries {
 				if err := re.query.AddCounter(v, counter.InstanceName, counter.Format, isWildcard(childQueries, counter.InstanceName)); err != nil {
-					return newCounters, errors.Wrapf(err, "failed to add counter (query='%v')", counter.QueryName)
+					return newCounters, fmt.Errorf("failed to add counter (query='%v'): %w", counter.QueryName, err)
 				}
 				re.counters[i].ChildQueries = append(re.counters[i].ChildQueries, v)
 			}

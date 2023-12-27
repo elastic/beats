@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestConfigValidate(t *testing.T) {
@@ -49,8 +49,8 @@ func TestConfigValidate(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		cfg := common.MustNewConfigFrom(test.cfg)
-		c := defaultKubernetesAnnotatorConfig()
+		cfg := config.MustNewConfigFrom(test.cfg)
+		var c kubeAnnotatorConfig
 
 		err := cfg.Unpack(&c)
 		if test.error {
@@ -114,18 +114,18 @@ func TestConfigValidate_LogsPatchMatcher(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		cfg, _ := common.NewConfigFrom(test.matcherConfig)
+		cfg, _ := config.NewConfigFrom(test.matcherConfig)
 
-		c := defaultKubernetesAnnotatorConfig()
+		var c kubeAnnotatorConfig
+
+		_ = cfg.Unpack(&c)
 		c.DefaultMatchers = Enabled{false}
-
-		err := cfg.Unpack(&c)
 		c.Matchers = PluginConfig{
 			{
 				test.matcherName: *cfg,
 			},
 		}
-		err = c.Validate()
+		err := c.Validate()
 		if test.error {
 			require.NotNil(t, err)
 		} else {

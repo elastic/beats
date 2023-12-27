@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/cisco/_meta/docs.asciidoc
+
 [[filebeat-module-cisco]]
 [role="xpack"]
 
@@ -10,7 +12,13 @@ This file is generated! See scripts/docs_collector.py
 
 == Cisco module
 
+//temporarily override modulename to create working link
+:modulename: cisco_asa
+
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+//reset modulename
+:modulename: cisco
 
 This is a module for Cisco network device's logs and Cisco Umbrella. It includes the following
 filesets for receiving logs over syslog or read from a file:
@@ -70,25 +78,7 @@ include::../include/var-paths.asciidoc[]
 
 *`var.log_level`*::
 
-An integer between 1 and 7 that allows to filter messages based on the
-severity level. The different severity levels supported by the Cisco ASA are:
-
-[width="30%",cols="^1,2",options="header"]
-|===========================
-| log_level | severity
-|     1     | Alert
-|     2     | Critical
-|     3     | Error
-|     4     | Warning
-|     5     | Notification
-|     6     | Informational
-|     7     | Debugging
-|===========================
-
-A value of 7 (default) will not filter any messages. A lower value will drop
-any messages with a severity level higher than the specified value. For
-example, `var.log_level: 3` will allow messages of level 1 (Alert), 2 (Critical)
-and 3 (Error). All other messages will be dropped.
+include::../include/cisco-log-level.asciidoc[]
 
 *`var.syslog_host`*::
 
@@ -98,6 +88,11 @@ Set to 0.0.0.0 to bind to all available interfaces.
 *`var.syslog_port`*::
 
 The UDP port to listen for syslog traffic. Defaults to 9001.
+
+*`var.timezone_offset`*::
+
+IANA time zone or time offset (e.g. `+0200`) to use when interpreting syslog
+timestamps without a time zone. Defaults to UTC.
 
 *`var.tags`*::
 
@@ -218,25 +213,7 @@ include::../include/var-paths.asciidoc[]
 
 *`var.log_level`*::
 
-An integer between 1 and 7 that allows to filter messages based on the
-severity level. The different severity levels supported by the Cisco ASA are:
-
-[width="30%",cols="^1,2",options="header"]
-|===========================
-| log_level | severity
-|     1     | Alert
-|     2     | Critical
-|     3     | Error
-|     4     | Warning
-|     5     | Notification
-|     6     | Informational
-|     7     | Debugging
-|===========================
-
-A value of 7 (default) will not filter any messages. A lower value will drop
-any messages with a severity level higher than the specified value. For
-example, `var.log_level: 3` will allow messages of level 1 (Alert), 2 (Critical)
-and 3 (Error). All other messages will be dropped.
+include::../include/cisco-log-level.asciidoc[]
 
 *`var.syslog_host`*::
 
@@ -246,6 +223,11 @@ Set to 0.0.0.0 to bind to all available interfaces.
 *`var.syslog_port`*::
 
 The UDP port to listen for syslog traffic. Defaults to 9003.
+
+*`var.timezone_offset`*::
+
+IANA time zone or time offset (e.g. `+0200`) to use when interpreting syslog
+timestamps without a time zone. Defaults to UTC.
 
 *`var.tags`*::
 
@@ -299,6 +281,8 @@ include::../include/timezone-support.asciidoc[]
 [float]
 ==== `nexus` fileset settings
 
+deprecated::[8.12.0,"This fileset is deprecated. Use the https://docs.elastic.co/integrations/cisco_nexus[Cisco Nexus] Elastic integration instead."]
+
 experimental[]
 
 NOTE: This was converted from RSA NetWitness log parser XML "cisconxos" device revision 134.
@@ -343,6 +327,8 @@ will be found under `rsa.raw`. The default is false.
 
 [float]
 ==== `meraki` fileset settings
+
+deprecated::[8.12.0,"This fileset is deprecated. Use the https://docs.elastic.co/integrations/cisco_meraki[Cisco Meraki] Elastic integration instead."]
 
 experimental[]
 
@@ -544,3 +530,4 @@ image::./images/kibana-cisco-asa.png[]
 For a description of each field in the module, see the
 <<exported-fields-cisco,exported fields>> section.
 
+:edit_url!:

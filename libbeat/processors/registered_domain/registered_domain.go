@@ -19,17 +19,17 @@ package registered_domain
 
 import (
 	"encoding/json"
+	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
 	"golang.org/x/net/publicsuffix"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -48,10 +48,10 @@ type processor struct {
 }
 
 // New constructs a new processor built from ucfg config.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *conf.C) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, errors.Wrap(err, "fail to unpack the "+procName+" processor configuration")
+		return nil, fmt.Errorf("fail to unpack the %v processor configuration: %w", procName, err)
 	}
 
 	return newRegisteredDomain(c)
@@ -79,7 +79,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		if p.IgnoreMissing || p.IgnoreFailure {
 			return event, nil
 		}
-		return event, errors.Wrapf(err, "registered_domain source field [%v] not found", p.Field)
+		return event, fmt.Errorf("registered_domain source field [%v] not found: %w", p.Field, err)
 	}
 
 	domain, ok := v.(string)
@@ -87,7 +87,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		if p.IgnoreFailure {
 			return event, nil
 		}
-		return event, errors.Wrapf(err, "registered_domain source field [%v] is not a string", p.Field)
+		return event, fmt.Errorf("registered_domain source field [%v] is not a string", p.Field)
 	}
 
 	rd, err := publicsuffix.EffectiveTLDPlusOne(domain)
@@ -95,7 +95,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		if p.IgnoreFailure {
 			return event, nil
 		}
-		return event, errors.Wrap(err, "failed to determine the registered domain")
+		return event, fmt.Errorf("failed to determine the registered domain: %w", err)
 	}
 
 	_, err = event.PutValue(p.TargetField, rd)
@@ -103,14 +103,14 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 		if p.IgnoreFailure {
 			return event, nil
 		}
-		return event, errors.Wrapf(err, "failed to write registered domain to target field [%v]", p.TargetField)
+		return event, fmt.Errorf("failed to write registered domain to target field [%v]: %w", p.TargetField, err)
 	}
 
 	if p.TargetETLDField != "" {
 		tld, _ := publicsuffix.PublicSuffix(domain)
 		if tld != "" {
 			if _, err = event.PutValue(p.TargetETLDField, tld); err != nil && !p.IgnoreFailure {
-				return event, errors.Wrapf(err, "failed to write effective top-level domain to target field [%v]", p.TargetETLDField)
+				return event, fmt.Errorf("failed to write effective top-level domain to target field [%v]: %w", p.TargetETLDField, err)
 			}
 		}
 	}
@@ -123,7 +123,7 @@ func (p *processor) Run(event *beat.Event) (*beat.Event, error) {
 				if p.IgnoreFailure {
 					return event, nil
 				}
-				return event, errors.Wrapf(err, "failed to write subdomain to target field [%v]", p.TargetSubdomainField)
+				return event, fmt.Errorf("failed to write subdomain to target field [%v]: %w", p.TargetSubdomainField, err)
 			}
 		}
 	}

@@ -106,6 +106,47 @@ value specified for `timeout` is greater than `schedule`, intermediate checks
 will not be executed by the scheduler.
 
 [float]
+[[monitor-run-from]]
+=== `run_from`
+
+Use the `run_from` option to set the geographic location fields relevant to a given heartbeat monitor.
+
+The `run_from` option is used to label the geographic location where the monitor is running.
+Note, you can also set the `run_from` option on all monitors via the `heartbeat.run_from` option.
+
+The `run_from` option takes two top-level fields:
+
+* `id`: A string used to uniquely identify the geographic location. It is indexed as the `observer.name` field.
+* `geo`: A map conforming to {ecs-ref}/ecs-geo.html[ECS geo fields]. It is indexed under `observer.geo`.
+
+Example:
+
+```yaml
+- type: http
+  # Set enabled to true (or delete the following line) to enable this example monitor
+  enabled: true
+  # ID used to uniquely identify this monitor in elasticsearch even if the config changes
+  id: geo-test
+  # Human readable display name for this service in Uptime UI and elsewhere
+  name: Geo Test
+  # List or urls to query
+  urls: ["http://example.net"]
+  # Configure task schedule
+  schedule: '@every 10s'
+  run_from:
+    id: my-custom-geo
+    geo:
+      name: nyc-dc1-rack1
+      location: 40.7128, -74.0060
+      continent_name: North America
+      country_iso_code: US
+      region_name: New York
+      region_iso_code: NY
+      city_name: New York
+
+```
+
+[float]
 [[monitor-fields]]
 ==== `fields`
 
@@ -144,6 +185,19 @@ See <<filtering-and-enhancing-data>> for information about specifying
 processors in your config.
 
 [float]
+[[monitor-data-stream]]
+==== `data_stream`
+
+Contains options pertaining to data stream naming, following the conventions followed by {fleet-guide}/data-streams.html[Fleet Data Streams]. By default Heartbeat will
+write to a datastream named `heartbeat-VERSION`.
+
+
+```yaml
+# To enable data streams with the default namespace
+data_stream.namespace: default
+```
+
+[float]
 [[monitor-pipeline]]
 ===== `pipeline`
 
@@ -156,8 +210,9 @@ input is used.
 
 [float]
 [[monitor-index]]
-===== `index`
+===== `index` (deprecated)
 
+This setting is now deprecated in favor of the `data_stream` option.
 If present, this formatted string overrides the index for events from this input
 (for elasticsearch outputs), or sets the `raw_index` field of the event's
 metadata (for other outputs). This string can only refer to the agent name and

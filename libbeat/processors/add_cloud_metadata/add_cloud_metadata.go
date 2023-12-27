@@ -22,14 +22,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 const (
@@ -47,7 +46,7 @@ func init() {
 type addCloudMetadata struct {
 	initOnce sync.Once
 	initData *initData
-	metadata common.MapStr
+	metadata mapstr.M
 	logger   *logp.Logger
 }
 
@@ -59,15 +58,15 @@ type initData struct {
 }
 
 // New constructs a new add_cloud_metadata processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(c *cfg.C) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := c.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "failed to unpack add_cloud_metadata config")
+		return nil, fmt.Errorf("failed to unpack add_cloud_metadata config: %w", err)
 	}
 
 	tlsConfig, err := tlscommon.LoadTLSConfig(config.TLS)
 	if err != nil {
-		return nil, errors.Wrap(err, "TLS configuration load")
+		return nil, fmt.Errorf("TLS configuration load: %w", err)
 	}
 
 	initProviders := selectProviders(config.Providers, cloudMetaProviders)
@@ -107,7 +106,7 @@ func (p *addCloudMetadata) init() {
 	})
 }
 
-func (p *addCloudMetadata) getMeta() common.MapStr {
+func (p *addCloudMetadata) getMeta() mapstr.M {
 	p.init()
 	return p.metadata.Clone()
 }
@@ -129,7 +128,7 @@ func (p *addCloudMetadata) String() string {
 	return "add_cloud_metadata=" + p.getMeta().String()
 }
 
-func (p *addCloudMetadata) addMeta(event *beat.Event, meta common.MapStr) error {
+func (p *addCloudMetadata) addMeta(event *beat.Event, meta mapstr.M) error {
 	for key, metaVal := range meta {
 		// If key exists in event already and overwrite flag is set to false, this processor will not overwrite the
 		// meta fields. For example aws module writes cloud.instance.* to events already, with overwrite=false,

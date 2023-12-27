@@ -24,31 +24,31 @@ https://zookeeper.apache.org/doc/trunk/zookeeperAdmin.html
 
 ZooKeeper mntr Command Output
 
-  $ echo mntr | nc localhost 2185
-  zk_version	3.4.8--1, built on 02/06/2016 03:18 GMT
-  zk_avg_latency	0
-  zk_max_latency	0
-  zk_min_latency	0
-  zk_packets_received	10
-  zk_packets_sent	9
-  zk_num_alive_connections	1
-  zk_outstanding_requests	0
-  zk_server_state	standalone
-  zk_znode_count	4
-  zk_watch_count	0
-  zk_ephemerals_count	0
-  zk_approximate_data_size	27
-  zk_open_file_descriptor_count	25
-  zk_max_file_descriptor_count	1048576
+	$ echo mntr | nc localhost 2185
+	zk_version	3.4.8--1, built on 02/06/2016 03:18 GMT
+	zk_avg_latency	0
+	zk_max_latency	0
+	zk_min_latency	0
+	zk_packets_received	10
+	zk_packets_sent	9
+	zk_num_alive_connections	1
+	zk_outstanding_requests	0
+	zk_server_state	standalone
+	zk_znode_count	4
+	zk_watch_count	0
+	zk_ephemerals_count	0
+	zk_approximate_data_size	27
+	zk_open_file_descriptor_count	25
+	zk_max_file_descriptor_count	1048576
 */
 package mntr
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/zookeeper"
-
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -75,12 +75,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	outputReader, err := zookeeper.RunCommand("mntr", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "mntr command failed")
+		return fmt.Errorf("mntr command failed: %w", err)
 	}
 
 	serverID, err := zookeeper.ServerID(m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "error obtaining server id")
+		return fmt.Errorf("error obtaining server id: %w", err)
 	}
 
 	eventMapping(serverID, outputReader, r, m.Logger())

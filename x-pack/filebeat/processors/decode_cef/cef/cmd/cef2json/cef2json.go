@@ -9,16 +9,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
 )
 
-var (
-	fullExtensionNames bool
-)
+var fullExtensionNames bool
 
 func init() {
 	flag.BoolVar(&fullExtensionNames, "full", true, "Use full extension key names.")
@@ -59,6 +56,8 @@ func main() {
 			continue
 		}
 
-		fmt.Println(string(jsonData))
+		// Written as writes to avoid forbidigo.
+		os.Stdout.Write(jsonData)
+		os.Stdout.Write([]byte{'\n'})
 	}
 }

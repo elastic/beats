@@ -1,0 +1,49 @@
+[
+  {
+    "@timestamp": "2019-12-19T08:24:36.5952761Z",
+    "event": {
+      "action": "Distribution Group Management",
+      "code": "4753",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "DC_TEST2k12.TEST.SAAS"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "A security-disabled global group was deleted.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2794\n\tAccount Name:\t\tat_adm\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x2E67800\n\nGroup:\n\tSecurity ID:\t\tS-1-5-21-1717121054-434620538-60925301-2904\n\tGroup Name:\t\ttestglobal1\n\tGroup Domain:\t\tTEST\n\nAdditional Information:\n\tPrivileges:\t\t-",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "DC_TEST2k12.TEST.SAAS",
+      "event_data": {
+        "PrivilegeList": "-",
+        "SubjectDomainName": "TEST",
+        "SubjectLogonId": "0x2e67800",
+        "SubjectUserName": "at_adm",
+        "SubjectUserSid": "S-1-5-21-1717121054-434620538-60925301-2794",
+        "TargetDomainName": "TEST",
+        "TargetSid": "S-1-5-21-1717121054-434620538-60925301-2904",
+        "TargetUserName": "testglobal1"
+      },
+      "event_id": "4753",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 492,
+        "thread": {
+          "id": 1076
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 3707709,
+      "task": "Distribution Group Management"
+    }
+  }
+]

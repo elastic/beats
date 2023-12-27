@@ -22,9 +22,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // TestSingleProducerConsumer tests buffered events for a producer getting
@@ -32,7 +32,7 @@ import (
 // might still have active events not yet ACKed (not tested here).
 //
 // Note: queues not requiring consumers to ACK a events in order to
-//       return ACKs to the producer are not supported by this test.
+// return ACKs to the producer are not supported by this test.
 func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 	fn := withOptLogOutput(true, func(t *testing.T) {
 		var (
@@ -53,7 +53,7 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 
 		for ; i < N1; i++ {
 			log.Debugf("send event %v to first producer", i)
-			producer.Publish(makeEvent(common.MapStr{
+			producer.Publish(MakeEvent(mapstr.M{
 				"value": i,
 			}))
 		}
@@ -67,23 +67,24 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 		producer = b.Producer(queue.ProducerConfig{})
 		for ; i < N2; i++ {
 			log.Debugf("send event %v to new producer", i)
-			producer.Publish(makeEvent(common.MapStr{
+			producer.Publish(MakeEvent(mapstr.M{
 				"value": i,
 			}))
 		}
 
-		// consumer all events
-		consumer := b.Consumer()
+		// consume all events
 		total := N2 - N1
-		events := make([]publisher.Event, 0, total)
+		events := make([]interface{}, 0, total)
 		for len(events) < total {
-			batch, err := consumer.Get(-1) // collect all events
+			batch, err := b.Get(-1) // collect all events
 			if err != nil {
 				panic(err)
 			}
 
-			events = append(events, batch.Events()...)
-			batch.ACK()
+			for i := 0; i < batch.Count(); i++ {
+				events = append(events, batch.Entry(i))
+			}
+			batch.Done()
 		}
 
 		// verify
@@ -93,7 +94,10 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 		}
 
 		for i, event := range events {
-			value := event.Content.Fields["value"].(int)
+			pubEvent, ok := event.(publisher.Event)
+			assert.True(t, ok, "queue output should be the same type as its input")
+			value, ok := pubEvent.Content.Fields["value"].(int)
+			assert.True(t, ok, "event.value should be an int")
 			assert.Equal(t, i+N1, value)
 		}
 	})

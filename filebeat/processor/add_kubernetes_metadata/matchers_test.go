@@ -24,7 +24,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // A random container ID that we use for our tests
@@ -125,6 +126,28 @@ func TestLogsPathMatcher_InvalidVarLogPodSource(t *testing.T) {
 	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
 }
 
+func TestLogsPathMatcher_ValidVarLogPodSource(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	sourcePath := "/var/log/pods/namespace_pod-name_%s/container/0.log.20220221-210912"
+
+	if runtime.GOOS == "windows" {
+		cfgLogsPath = "C:\\var\\log\\pods\\"
+		sourcePath = "C:\\var\\log\\pods\\namespace_pod-name_%s\\container\\0.log.20220221-210912"
+	}
+	source := fmt.Sprintf(sourcePath, puid)
+	expectedResult := puid
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+}
+
+func TestLogsPathMatcher_InvalidVarLogPodSource2(t *testing.T) {
+	cfgLogsPath := "/var/log/pods/"
+	cfgResourceType := "pod"
+	source := fmt.Sprintf("/var/log/pods/namespace_pod-name_%s/container/0.log.20220221-210526.gz", puid)
+	expectedResult := ""
+	executeTestWithResourceType(t, cfgLogsPath, cfgResourceType, source, expectedResult)
+}
+
 func TestLogsPathMatcher_InvalidVarLogPodIDFormat(t *testing.T) {
 	cfgLogsPath := "/var/log/pods/"
 	cfgResourceType := "pod"
@@ -152,7 +175,7 @@ func executeTest(t *testing.T, cfgLogsPath string, source string, expectedResult
 }
 
 func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceType string, source string, expectedResult string) {
-	var testConfig = common.NewConfig()
+	testConfig := conf.NewConfig()
 	if cfgLogsPath != "" {
 		testConfig.SetString("logs_path", -1, cfgLogsPath)
 	}
@@ -164,9 +187,9 @@ func executeTestWithResourceType(t *testing.T, cfgLogsPath string, cfgResourceTy
 	logMatcher, err := newLogsPathMatcher(*testConfig)
 	assert.NoError(t, err)
 
-	input := common.MapStr{
-		"log": common.MapStr{
-			"file": common.MapStr{
+	input := mapstr.M{
+		"log": mapstr.M{
+			"file": mapstr.M{
 				"path": source,
 			},
 		},

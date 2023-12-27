@@ -3,15 +3,14 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !integration
-// +build !integration
 
 package health
 
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	_ "github.com/elastic/beats/v7/x-pack/metricbeat/module/enterprisesearch"
 )

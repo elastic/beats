@@ -37,4 +37,6 @@ import (
 	_ "go.elastic.co/go-licence-detector"
 
 	_ "github.com/elastic/go-licenser"
+
+	_ "github.com/elastic/elastic-agent-libs/dev-tools/mage"
 )

@@ -1,0 +1,231 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: heartbeat
+  namespace: kube-system
+  labels:
+    k8s-app: heartbeat
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: heartbeat
+  labels:
+    k8s-app: heartbeat
+rules:
+- apiGroups: [""]
+  resources:
+  - nodes
+  - namespaces
+  - pods
+  - services
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources:
+    - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+    - jobs
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: heartbeat
+  # should be the namespace where heartbeat is running
+  namespace: kube-system
+  labels:
+    k8s-app: heartbeat
+rules:
+  - apiGroups:
+      - coordination.k8s.io
+    resources:
+      - leases
+    verbs: ["get", "create", "update"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: heartbeat-kubeadm-config
+  namespace: kube-system
+  labels:
+    k8s-app: heartbeat
+rules:
+  - apiGroups: [""]
+    resources:
+      - configmaps
+    resourceNames:
+      - kubeadm-config
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: heartbeat
+subjects:
+- kind: ServiceAccount
+  name: heartbeat
+  namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: heartbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: heartbeat
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: heartbeat
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: heartbeat
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: heartbeat-kubeadm-config
+  namespace: kube-system
+subjects:
+  - kind: ServiceAccount
+    name: heartbeat
+    namespace: kube-system
+roleRef:
+  kind: Role
+  name: heartbeat-kubeadm-config
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: heartbeat-deployment-config
+  namespace: kube-system
+  labels:
+    k8s-app: heartbeat
+data:
+  heartbeat.yml: |-
+    heartbeat.autodiscover: # Enable one or more of the providers below
+     providers:
+       - type: kubernetes
+         resource: pod
+         scope: cluster
+         node: ${NODE_NAME}
+         hints.enabled: true
+
+       - type: kubernetes
+         resource: service
+         scope: cluster
+         node: ${NODE_NAME}
+         hints.enabled: true
+         output.console:
+           enabled: true
+           pretty: true
+    #
+    #    - type: kubernetes
+    #      resource: node
+    #      node: ${NODE_NAME}
+    #      scope: cluster
+    #      templates:
+    #        # Example, check SSH port of all cluster nodes:
+    #        - condition: ~
+    #          config:
+    #            - hosts:
+    #                - ${data.host}:22
+    #              name: ${data.kubernetes.node.name}
+    #              schedule: '@every 10s'
+    #              timeout: 5s
+    #              type: tcp
+
+    processors:
+      - add_cloud_metadata:
+
+    cloud.id: ${ELASTIC_CLOUD_ID}
+    cloud.auth: ${ELASTIC_CLOUD_AUTH}
+
+    output.elasticsearch:
+      hosts: ['${ELASTICSEARCH_HOST:elasticsearch}:${ELASTICSEARCH_PORT:9200}']
+      protocol: https
+      ssl.verification_mode: "none"
+      username: ${ELASTICSEARCH_USERNAME}
+      password: ${ELASTICSEARCH_PASSWORD}
+      allow_older_versions: true
+---
+# Deploy singleton instance in the whole cluster for some unique data sources, like kube-state-metrics
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: heartbeat
+  namespace: kube-system
+  labels:
+    k8s-app: heartbeat
+spec:
+  selector:
+    matchLabels:
+      k8s-app: heartbeat
+  template:
+    metadata:
+      labels:
+        k8s-app: heartbeat
+    spec:
+      serviceAccountName: heartbeat
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: heartbeat
+        image: heartbeat-run-image
+        args: [
+          "-c", "/etc/heartbeat.yml",
+          "-e",
+        ]
+        env:
+        - name: ELASTICSEARCH_HOST
+          value: elasticsearch
+        - name: ELASTICSEARCH_PORT
+          value: "9200"
+        - name: ELASTICSEARCH_USERNAME
+          value: elastic
+        - name: ELASTICSEARCH_PASSWORD
+          value: changeme
+        - name: ELASTIC_CLOUD_ID
+          value:
+        - name: ELASTIC_CLOUD_AUTH
+          value:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        securityContext:
+          runAsUser: 0
+        resources:
+          limits:
+            memory: 1536Mi
+          requests:
+            # for synthetics, 2 full cores is a good starting point for relatively consistent perform of a single concurrent check
+            # For lightweight checks as low as 100m is fine
+            cpu: 2000m
+            # A high value like this is encouraged for browser based monitors.
+            # Lightweight checks use substantially less, even 128Mi is fine for those.
+            memory: 1536Mi
+        volumeMounts:
+        - name: config
+          mountPath: /etc/heartbeat.yml
+          readOnly: true
+          subPath: heartbeat.yml
+        - name: data
+          mountPath: /usr/share/heartbeat/data
+      volumes:
+      - name: config
+        configMap:
+          defaultMode: 0600
+          name: heartbeat-deployment-config
+      - name: data
+        hostPath:
+          path: /var/lib/heartbeat-data
+          type: DirectoryOrCreate
+
+---

@@ -640,5 +640,27 @@
         "process.thread.name": "SessionTracker",
         "service.node.name": "1",
         "service.type": "zookeeper"
+    },
+    {
+        "@timestamp": "2021-04-19T03:05:15.053-02:00",
+        "event.dataset": "zookeeper.log",
+        "event.kind": "event",
+        "event.module": "zookeeper",
+        "event.original": "2021-04-19 03:05:15,053 [myid:1] - WARN  [RecvWorker:5:QuorumCnxManager$RecvWorker@1397] - Connection broken for id 5, my id = 1\njavax.net.ssl.SSLException: Socket is closed\n        at java.base/sun.security.ssl.Alert.createSSLException(Alert.java:127)\n        at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:349)\n        at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:292)\n        at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:287)\n        at java.base/sun.security.ssl.SSLSocketImpl.handleException(SSLSocketImpl.java:1591)\n        at java.base/sun.security.ssl.SSLSocketImpl$AppInputStream.read(SSLSocketImpl.java:989)\n        at org.apache.zookeeper.server.quorum.UnifiedServerSocket$UnifiedInputStream.read(UnifiedServerSocket.java:693)\n        at java.base/java.io.BufferedInputStream.fill(BufferedInputStream.java:252)\n        at java.base/java.io.BufferedInputStream.read(BufferedInputStream.java:271)\n        at java.base/java.io.DataInputStream.readInt(DataInputStream.java:392)\n        at org.apache.zookeeper.server.quorum.QuorumCnxManager$RecvWorker.run(QuorumCnxManager.java:1385)\nCaused by: java.net.SocketException: Socket is closed\n        at java.base/java.net.Socket.shutdownInput(Socket.java:1539)\n        at java.base/sun.security.ssl.BaseSSLSocketImpl.shutdownInput(BaseSSLSocketImpl.java:218)\n        at java.base/sun.security.ssl.SSLSocketImpl.shutdownInput(SSLSocketImpl.java:757)\n        at java.base/sun.security.ssl.SSLSocketImpl.shutdownInput(SSLSocketImpl.java:730)\n        at java.base/sun.security.ssl.SSLSocketImpl.handleEOF(SSLSocketImpl.java:1612)\n        at java.base/sun.security.ssl.SSLSocketImpl.readApplicationRecord(SSLSocketImpl.java:1366)\n        at java.base/sun.security.ssl.SSLSocketImpl$AppInputStream.read(SSLSocketImpl.java:973)",
+        "event.timezone": "-02:00",
+        "event.type": "info",
+        "fileset.name": "log",
+        "input.type": "log",
+        "log.flags": [
+            "multiline"
+        ],
+        "log.level": "WARN",
+        "log.logger": "QuorumCnxManager$RecvWorker",
+        "log.offset": 5169,
+        "log.origin.file.line": "1397",
+        "message": "Connection broken for id 5, my id = 1\njavax.net.ssl.SSLException: Socket is closed\n        at java.base/sun.security.ssl.Alert.createSSLException(Alert.java:127)\n        at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:349)\n        at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:292)\n        at java.base/sun.security.ssl.TransportContext.fatal(TransportContext.java:287)\n        at java.base/sun.security.ssl.SSLSocketImpl.handleException(SSLSocketImpl.java:1591)\n        at java.base/sun.security.ssl.SSLSocketImpl$AppInputStream.read(SSLSocketImpl.java:989)\n        at org.apache.zookeeper.server.quorum.UnifiedServerSocket$UnifiedInputStream.read(UnifiedServerSocket.java:693)\n        at java.base/java.io.BufferedInputStream.fill(BufferedInputStream.java:252)\n        at java.base/java.io.BufferedInputStream.read(BufferedInputStream.java:271)\n        at java.base/java.io.DataInputStream.readInt(DataInputStream.java:392)\n        at org.apache.zookeeper.server.quorum.QuorumCnxManager$RecvWorker.run(QuorumCnxManager.java:1385)\nCaused by: java.net.SocketException: Socket is closed\n        at java.base/java.net.Socket.shutdownInput(Socket.java:1539)\n        at java.base/sun.security.ssl.BaseSSLSocketImpl.shutdownInput(BaseSSLSocketImpl.java:218)\n        at java.base/sun.security.ssl.SSLSocketImpl.shutdownInput(SSLSocketImpl.java:757)\n        at java.base/sun.security.ssl.SSLSocketImpl.shutdownInput(SSLSocketImpl.java:730)\n        at java.base/sun.security.ssl.SSLSocketImpl.handleEOF(SSLSocketImpl.java:1612)\n        at java.base/sun.security.ssl.SSLSocketImpl.readApplicationRecord(SSLSocketImpl.java:1366)\n        at java.base/sun.security.ssl.SSLSocketImpl$AppInputStream.read(SSLSocketImpl.java:973)",
+        "process.thread.name": "RecvWorker:5",
+        "service.node.name": "1",
+        "service.type": "zookeeper"
     }
 ]

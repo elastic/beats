@@ -3,15 +3,14 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package cloudfoundry
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	cfcommon "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type ModuleV1 struct {

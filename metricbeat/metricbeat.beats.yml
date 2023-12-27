@@ -1,0 +1,17 @@
+path.home: ./beats-monitor
+http.port: 6000
+http.enabled: true
+monitoring.enabled: true
+
+metricbeat.modules:
+  - module: beat
+    xpack.enabled: true
+    period: 10s
+    hosts: ["http://localhost:5067"]
+
+output.elasticsearch:
+  hosts: [ "http://localhost:9200" ]
+  username: "elastic"
+  password: "changeme"
+  allow_older_versions: true
+  ssl.verification_mode: none

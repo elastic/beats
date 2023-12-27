@@ -18,16 +18,16 @@
 package kubernetes
 
 import (
+	"fmt"
 	"sync"
 	"time"
 
 	"github.com/mitchellh/hashstructure"
-	"github.com/pkg/errors"
-	dto "github.com/prometheus/client_model/go"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
 )
 
 func init() {
@@ -39,12 +39,13 @@ func init() {
 
 type Module interface {
 	mb.Module
-	GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error)
+	GetStateMetricsFamilies(prometheus p.Prometheus) ([]*p.MetricFamily, error)
 	GetKubeletStats(http *helper.HTTP) ([]byte, error)
+	GetMetricsRepo() *util.MetricsRepo
 }
 
 type familiesCache struct {
-	sharedFamilies     []*dto.MetricFamily
+	sharedFamilies     []*p.MetricFamily
 	lastFetchErr       error
 	lastFetchTimestamp time.Time
 }
@@ -84,6 +85,7 @@ type module struct {
 
 	kubeStateMetricsCache *kubeStateMetricsCache
 	kubeletStatsCache     *kubeletStatsCache
+	metricsRepo           *util.MetricsRepo
 	cacheHash             uint64
 }
 
@@ -94,22 +96,25 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 	kubeletStatsCache := &kubeletStatsCache{
 		cacheMap: make(map[uint64]*statsCache),
 	}
+	metricsRepo := util.NewMetricsRepo()
 	return func(base mb.BaseModule) (mb.Module, error) {
 		hash, err := generateCacheHash(base.Config().Hosts)
 		if err != nil {
-			return nil, errors.Wrap(err, "error generating cache hash for kubeStateMetricsCache")
+			return nil, fmt.Errorf("error generating cache hash for kubeStateMetricsCache: %w", err)
 		}
+
 		m := module{
 			BaseModule:            base,
 			kubeStateMetricsCache: kubeStateMetricsCache,
 			kubeletStatsCache:     kubeletStatsCache,
+			metricsRepo:           metricsRepo,
 			cacheHash:             hash,
 		}
 		return &m, nil
 	}
 }
 
-func (m *module) GetStateMetricsFamilies(prometheus p.Prometheus) ([]*dto.MetricFamily, error) {
+func (m *module) GetStateMetricsFamilies(prometheus p.Prometheus) ([]*p.MetricFamily, error) {
 	m.kubeStateMetricsCache.lock.Lock()
 	defer m.kubeStateMetricsCache.lock.Unlock()
 
@@ -152,4 +157,8 @@ func generateCacheHash(host []string) (uint64, error) {
 		return 0, err
 	}
 	return id, nil
+}
+
+func (m *module) GetMetricsRepo() *util.MetricsRepo {
+	return m.metricsRepo
 }

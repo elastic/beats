@@ -21,7 +21,8 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 var outputReg = map[string]Factory{}
@@ -31,7 +32,7 @@ type Factory func(
 	im IndexManager,
 	beat beat.Info,
 	stats Observer,
-	cfg *common.Config) (Group, error)
+	cfg *config.C) (Group, error)
 
 // IndexManager provides additional index related services to the outputs.
 type IndexManager interface {
@@ -39,7 +40,7 @@ type IndexManager interface {
 	// the outputs configuration.
 	// The defaultIndex is interpreted as format string and used as default fallback
 	// if no index is configured or all indices are guarded using conditionals.
-	BuildSelector(cfg *common.Config) (IndexSelector, error)
+	BuildSelector(cfg *config.C) (IndexSelector, error)
 }
 
 // IndexSelector is used to find the index name an event shall be indexed to.
@@ -49,10 +50,15 @@ type IndexSelector interface {
 
 // Group configures and combines multiple clients into load-balanced group of clients
 // being managed by the publisher pipeline.
+// If QueueFactory is set then the pipeline will use it to create the queue.
+// Currently it is only used to activate the proxy queue when using the Shipper
+// output, but it also provides a natural migration path for moving queue
+// configuration into the outputs.
 type Group struct {
-	Clients   []Client
-	BatchSize int
-	Retry     int
+	Clients      []Client
+	BatchSize    int
+	Retry        int
+	QueueFactory queue.QueueFactory
 }
 
 // RegisterType registers a new output type.
@@ -74,7 +80,7 @@ func Load(
 	info beat.Info,
 	stats Observer,
 	name string,
-	config *common.Config,
+	config *config.C,
 ) (Group, error) {
 	factory := FindFactory(name)
 	if factory == nil {

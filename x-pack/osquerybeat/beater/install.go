@@ -10,10 +10,9 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func installOsquery(ctx context.Context) error {
@@ -31,24 +30,20 @@ func installOsqueryWithDir(ctx context.Context, dir string) error {
 	log := logp.NewLogger("osqueryd_install").With("dir", dir)
 	log.Info("Check if osqueryd needs to be installed")
 
-	fn := distro.OsquerydDistroFilename()
+	fp := filepath.Join(dir, distro.OsquerydDistroFilename())
 	var installFunc func(context.Context, string, string, bool) error
 
-	if runtime.GOOS == "darwin" {
-		installFunc = install.InstallFromPkg
-	}
-
 	installing := false
-	ilog := log.With("file", fn)
+	ilog := log.With("file", fp)
 	if installFunc != nil {
-		exists, err := fileutil.FileExists(fn)
+		exists, err := fileutil.FileExists(fp)
 		if err != nil {
 			ilog.Errorf("Failed to access the install package file, error: %v", err)
 			return err
 		}
 		if exists {
 			ilog.Info("Found install package file, installing")
-			err = installFunc(ctx, fn, dir, true)
+			err = installFunc(ctx, fp, dir, true)
 			if err != nil {
 				ilog.Errorf("Failed to extract from install package, error: %v", err)
 				return err
@@ -65,8 +60,9 @@ func installOsqueryWithDir(ctx context.Context, dir string) error {
 		if runtime.GOOS == "darwin" {
 			osqfn = distro.OsquerydDarwinApp()
 		}
-		flog := log.With("file", osqfn)
-		exists, err := fileutil.FileExists(osqfn)
+		osqfp := filepath.Join(dir, osqfn)
+		flog := log.With("file", osqfp)
+		exists, err := fileutil.FileExists(osqfp)
 		if err != nil {
 			flog.Errorf("Failed to access the file, error: %v", err)
 			return err
@@ -78,7 +74,7 @@ func installOsqueryWithDir(ctx context.Context, dir string) error {
 			return os.ErrNotExist
 		}
 
-		if derr := os.Remove(fn); derr != nil {
+		if derr := os.Remove(fp); derr != nil {
 			ilog.Warn("Failed to delete install package after install")
 		}
 		log.Info("Successfully installed osqueryd")

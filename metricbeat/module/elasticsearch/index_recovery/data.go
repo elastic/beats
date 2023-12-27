@@ -20,15 +20,16 @@ package index_recovery
 import (
 	"encoding/json"
 
-	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/joeshaw/multierror"
+
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -80,6 +81,10 @@ var (
 		"start_time": s.Object{
 			"ms": c.Int("start_time_in_millis", s.Optional),
 		},
+
+		"total_time": s.Object{
+			"ms": c.Int("total_time_in_millis", s.Optional),
+		},
 	}
 )
 
@@ -89,7 +94,7 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Elasticsearch Recovery API response")
+		return fmt.Errorf("failure parsing Elasticsearch Recovery API response: %w", err)
 	}
 
 	var errs multierror.Errors
@@ -102,20 +107,21 @@ func eventsMapping(r mb.ReporterV2, info elasticsearch.Info, content []byte, isX
 		for _, data := range shards {
 			event := mb.Event{}
 
-			event.RootFields = common.MapStr{}
-			event.RootFields.Put("service.name", elasticsearch.ModuleName)
+			event.RootFields = mapstr.M{}
+			_, _ = event.RootFields.Put("service.name", elasticsearch.ModuleName)
 
-			event.ModuleFields = common.MapStr{}
-			event.ModuleFields.Put("cluster.name", info.ClusterName)
-			event.ModuleFields.Put("cluster.id", info.ClusterID)
-			event.ModuleFields.Put("index.name", indexName)
+			event.ModuleFields = mapstr.M{}
+			_, _ = event.ModuleFields.Put("cluster.name", info.ClusterName)
+			_, _ = event.ModuleFields.Put("cluster.id", info.ClusterID)
+			_, _ = event.ModuleFields.Put("index.name", indexName)
 
 			event.MetricSetFields, err = schema.Apply(data)
 			if err != nil {
-				errs = append(errs, errors.Wrap(err, "failure applying shard schema"))
+				errs = append(errs, fmt.Errorf("failure applying shard schema: %w", err))
+
 				continue
 			}
-			event.MetricSetFields.Put("name", indexName)
+			_, _ = event.MetricSetFields.Put("name", indexName)
 
 			// xpack.enabled in config using standalone metricbeat writes to `.monitoring` instead of `metricbeat-*`
 			// When using Agent, the index name is overwritten anyways.

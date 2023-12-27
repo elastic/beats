@@ -1,34 +1,3 @@
 Load Balancing metricset fetches metrics from https://cloud.google.com/load-balancing/[Load Balancing] in Google Cloud Platform.
 
-The `loadbalancing` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-loadbalancing[Stackdriver API]. The field names have been left untouched for people already familiar with them.
-
-[float]
-=== Metrics
-Here is a list of metrics collected by `loadbalancing` metricset:
-
-[float]
-==== https
-
-- `loadbalancing.https.backend_request_bytes_count`: The number of bytes sent as requests from HTTP/S load balancer to backends.
-- `loadbalancing.https.backend_request_count`: The number of requests served by backends of HTTP/S load balancer.
-- `loadbalancing.https.backend_response_bytes_count`: The number of bytes sent as responses from backends (or cache) to HTTP/S load balancer.
-- `loadbalancing.https.request_bytes_count`: The number of bytes sent as requests from clients to HTTP/S load balancer.
-- `loadbalancing.https.request_count`: The number of requests served by HTTP/S load balancer.
-- `loadbalancing.https.response_bytes_count`: The number of bytes sent as responses from HTTP/S load balancer to clients.
-
-[float]
-==== l3
-
-- `loadbalancing.l3.internal.egress_bytes_count`: The number of bytes sent from ILB backend to client (for TCP flows it's counting bytes on application stream only).
-- `loadbalancing.l3.internal.egress_packets_count`: The number of packets sent from ILB backend to client of the flow.
-- `loadbalancing.l3.internal.ingress_bytes_count`: The number of bytes sent from client to ILB backend (for TCP flows it's counting bytes on application stream only).
-- `loadbalancing.l3.internal.ingress_packets_count`: The number of packets sent from client to ILB backend.
-
-[float]
-==== tcp_ssl_proxy
-
-- `loadbalancing.tcp_ssl_proxy.closed_connections`: Number of connections that were terminated over TCP/SSL proxy.
-- `loadbalancing.tcp_ssl_proxy.egress_bytes_count`: Number of bytes sent from VM to client using proxy.
-- `loadbalancing.tcp_ssl_proxy.ingress_bytes_count`: Number of bytes sent from client to VM using proxy.
-- `loadbalancing.tcp_ssl_proxy.new_connections`: Number of connections that were created over TCP/SSL proxy.
-- `loadbalancing.tcp_ssl_proxy.open_connections`: Current number of outstanding connections through the TCP/SSL proxy.
+The `loadbalancing` metricset contains all metrics exported from the https://cloud.google.com/monitoring/api/metrics_gcp#gcp-loadbalancing[Stackdriver API]. The field names are aligned to {beats-devguide}/event-conventions.html[Beats naming conventions] with minor modifications to their GCP metrics name counterpart.

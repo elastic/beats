@@ -22,10 +22,11 @@ class Test(BaseTest):
 
         proc = self.start_beat()
 
+        msg = "Harvester started"
         self.wait_until(
-            lambda: self.log_contains(
-                "Harvester started for file."),
-            max_timeout=10)
+            lambda: self.log_contains(msg),
+            max_timeout=10,
+            err_msg=f"did not find '{msg}' in the logs")
 
         iterations1 = 5
         for n in range(0, iterations1):
@@ -102,4 +103,5 @@ class Test(BaseTest):
 
         filebeat = self.start_beat()
         filebeat.check_wait(exit_code=1)
-        assert self.log_contains("Exiting: stdin requires to be run in exclusive mode, configured inputs: stdin, udp")
+        msg = "Exiting: stdin requires to be run in exclusive mode, configured inputs: stdin, udp"
+        assert self.log_contains(msg), f"did not find '{msg}' in the logs"

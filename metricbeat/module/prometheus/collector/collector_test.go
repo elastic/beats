@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package collector
 
@@ -24,12 +23,13 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/golang/protobuf/proto"
-	dto "github.com/prometheus/client_model/go"
+	pl "github.com/prometheus/prometheus/pkg/labels"
+	"github.com/prometheus/prometheus/pkg/textparse"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
@@ -37,27 +37,27 @@ import (
 )
 
 func TestGetPromEventsFromMetricFamily(t *testing.T) {
-	labels := common.MapStr{
+	labels := mapstr.M{
 		"handler": "query",
 	}
 	tests := []struct {
-		Family *dto.MetricFamily
+		Family *p.MetricFamily
 		Event  []PromEvent
 	}{
 		{
-			Family: &dto.MetricFamily{
+			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
-				Type: dto.MetricType_COUNTER.Enum(),
-				Metric: []*dto.Metric{
+				Type: textparse.MetricTypeCounter,
+				Metric: []*p.OpenMetric{
 					{
-						Label: []*dto.LabelPair{
+						Label: []*pl.Label{
 							{
-								Name:  proto.String("handler"),
-								Value: proto.String("query"),
+								Name:  "handler",
+								Value: "query",
 							},
 						},
-						Counter: &dto.Counter{
+						Counter: &p.Counter{
 							Value: proto.Float64(10),
 						},
 					},
@@ -65,8 +65,8 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds": float64(10),
 						},
 					},
@@ -75,13 +75,13 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 		},
 		{
-			Family: &dto.MetricFamily{
+			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
-				Type: dto.MetricType_GAUGE.Enum(),
-				Metric: []*dto.Metric{
+				Type: textparse.MetricTypeGauge,
+				Metric: []*p.OpenMetric{
 					{
-						Gauge: &dto.Gauge{
+						Gauge: &p.Gauge{
 							Value: proto.Float64(10),
 						},
 					},
@@ -89,26 +89,26 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds": float64(10),
 						},
 					},
-					Labels: common.MapStr{},
+					Labels: mapstr.M{},
 				},
 			},
 		},
 		{
-			Family: &dto.MetricFamily{
+			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
-				Type: dto.MetricType_SUMMARY.Enum(),
-				Metric: []*dto.Metric{
+				Type: textparse.MetricTypeSummary,
+				Metric: []*p.OpenMetric{
 					{
-						Summary: &dto.Summary{
+						Summary: &p.Summary{
 							SampleCount: proto.Uint64(10),
 							SampleSum:   proto.Float64(10),
-							Quantile: []*dto.Quantile{
+							Quantile: []*p.Quantile{
 								{
 									Quantile: proto.Float64(0.99),
 									Value:    proto.Float64(10),
@@ -120,37 +120,37 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds_count": uint64(10),
 							"http_request_duration_microseconds_sum":   float64(10),
 						},
 					},
-					Labels: common.MapStr{},
+					Labels: mapstr.M{},
 				},
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds": float64(10),
 						},
 					},
-					Labels: common.MapStr{
+					Labels: mapstr.M{
 						"quantile": "0.99",
 					},
 				},
 			},
 		},
 		{
-			Family: &dto.MetricFamily{
+			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
-				Type: dto.MetricType_HISTOGRAM.Enum(),
-				Metric: []*dto.Metric{
+				Type: textparse.MetricTypeHistogram,
+				Metric: []*p.OpenMetric{
 					{
-						Histogram: &dto.Histogram{
+						Histogram: &p.Histogram{
 							SampleCount: proto.Uint64(10),
 							SampleSum:   proto.Float64(10),
-							Bucket: []*dto.Bucket{
+							Bucket: []*p.Bucket{
 								{
 									UpperBound:      proto.Float64(0.99),
 									CumulativeCount: proto.Uint64(10),
@@ -162,38 +162,38 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds_count": uint64(10),
 							"http_request_duration_microseconds_sum":   float64(10),
 						},
 					},
-					Labels: common.MapStr{},
+					Labels: mapstr.M{},
 				},
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds_bucket": uint64(10),
 						},
 					},
-					Labels: common.MapStr{"le": "0.99"},
+					Labels: mapstr.M{"le": "0.99"},
 				},
 			},
 		},
 		{
-			Family: &dto.MetricFamily{
+			Family: &p.MetricFamily{
 				Name: proto.String("http_request_duration_microseconds"),
 				Help: proto.String("foo"),
-				Type: dto.MetricType_UNTYPED.Enum(),
-				Metric: []*dto.Metric{
+				Type: textparse.MetricTypeUnknown,
+				Metric: []*p.OpenMetric{
 					{
-						Label: []*dto.LabelPair{
+						Label: []*pl.Label{
 							{
-								Name:  proto.String("handler"),
-								Value: proto.String("query"),
+								Name:  "handler",
+								Value: "query",
 							},
 						},
-						Untyped: &dto.Untyped{
+						Unknown: &p.Unknown{
 							Value: proto.Float64(10),
 						},
 					},
@@ -201,8 +201,8 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 			},
 			Event: []PromEvent{
 				{
-					Data: common.MapStr{
-						"metrics": common.MapStr{
+					Data: mapstr.M{
+						"metrics": mapstr.M{
 							"http_request_duration_microseconds": float64(10),
 						},
 					},
@@ -220,20 +220,20 @@ func TestGetPromEventsFromMetricFamily(t *testing.T) {
 }
 
 func TestSkipMetricFamily(t *testing.T) {
-	testFamilies := []*dto.MetricFamily{
+	testFamilies := []*p.MetricFamily{
 		{
 			Name: proto.String("http_request_duration_microseconds_a_a_in"),
 			Help: proto.String("foo"),
-			Type: dto.MetricType_COUNTER.Enum(),
-			Metric: []*dto.Metric{
+			Type: textparse.MetricTypeCounter,
+			Metric: []*p.OpenMetric{
 				{
-					Label: []*dto.LabelPair{
+					Label: []*pl.Label{
 						{
-							Name:  proto.String("handler"),
-							Value: proto.String("query"),
+							Name:  "handler",
+							Value: "query",
 						},
 					},
-					Counter: &dto.Counter{
+					Counter: &p.Counter{
 						Value: proto.Float64(10),
 					},
 				},
@@ -242,16 +242,16 @@ func TestSkipMetricFamily(t *testing.T) {
 		{
 			Name: proto.String("http_request_duration_microseconds_a_b_in"),
 			Help: proto.String("foo"),
-			Type: dto.MetricType_COUNTER.Enum(),
-			Metric: []*dto.Metric{
+			Type: textparse.MetricTypeCounter,
+			Metric: []*p.OpenMetric{
 				{
-					Label: []*dto.LabelPair{
+					Label: []*pl.Label{
 						{
-							Name:  proto.String("handler"),
-							Value: proto.String("query"),
+							Name:  "handler",
+							Value: "query",
 						},
 					},
-					Counter: &dto.Counter{
+					Counter: &p.Counter{
 						Value: proto.Float64(10),
 					},
 				},
@@ -260,10 +260,10 @@ func TestSkipMetricFamily(t *testing.T) {
 		{
 			Name: proto.String("http_request_duration_microseconds_b_in"),
 			Help: proto.String("foo"),
-			Type: dto.MetricType_GAUGE.Enum(),
-			Metric: []*dto.Metric{
+			Type: textparse.MetricTypeGauge,
+			Metric: []*p.OpenMetric{
 				{
-					Gauge: &dto.Gauge{
+					Gauge: &p.Gauge{
 						Value: proto.Float64(10),
 					},
 				},
@@ -272,13 +272,13 @@ func TestSkipMetricFamily(t *testing.T) {
 		{
 			Name: proto.String("http_request_duration_microseconds_c_in"),
 			Help: proto.String("foo"),
-			Type: dto.MetricType_SUMMARY.Enum(),
-			Metric: []*dto.Metric{
+			Type: textparse.MetricTypeSummary,
+			Metric: []*p.OpenMetric{
 				{
-					Summary: &dto.Summary{
+					Summary: &p.Summary{
 						SampleCount: proto.Uint64(10),
 						SampleSum:   proto.Float64(10),
-						Quantile: []*dto.Quantile{
+						Quantile: []*p.Quantile{
 							{
 								Quantile: proto.Float64(0.99),
 								Value:    proto.Float64(10),
@@ -291,13 +291,13 @@ func TestSkipMetricFamily(t *testing.T) {
 		{
 			Name: proto.String("http_request_duration_microseconds_d_in"),
 			Help: proto.String("foo"),
-			Type: dto.MetricType_HISTOGRAM.Enum(),
-			Metric: []*dto.Metric{
+			Type: textparse.MetricTypeHistogram,
+			Metric: []*p.OpenMetric{
 				{
-					Histogram: &dto.Histogram{
+					Histogram: &p.Histogram{
 						SampleCount: proto.Uint64(10),
 						SampleSum:   proto.Float64(10),
-						Bucket: []*dto.Bucket{
+						Bucket: []*p.Bucket{
 							{
 								UpperBound:      proto.Float64(0.99),
 								CumulativeCount: proto.Uint64(10),
@@ -310,16 +310,16 @@ func TestSkipMetricFamily(t *testing.T) {
 		{
 			Name: proto.String("http_request_duration_microseconds_e_in"),
 			Help: proto.String("foo"),
-			Type: dto.MetricType_UNTYPED.Enum(),
-			Metric: []*dto.Metric{
+			Type: textparse.MetricTypeUnknown,
+			Metric: []*p.OpenMetric{
 				{
-					Label: []*dto.LabelPair{
+					Label: []*pl.Label{
 						{
-							Name:  proto.String("handler"),
-							Value: proto.String("query"),
+							Name:  "handler",
+							Value: "query",
 						},
 					},
-					Untyped: &dto.Untyped{
+					Unknown: &p.Unknown{
 						Value: proto.Float64(10),
 					},
 				},

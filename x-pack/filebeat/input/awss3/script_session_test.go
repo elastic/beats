@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -27,9 +27,10 @@ func TestSessionScriptParams(t *testing.T) {
 	})
 
 	t.Run("register required for params", func(t *testing.T) {
-		_, err := newScriptFromConfig(log, &scriptConfig{Source: header + footer, Params: map[string]interface{}{
-			"p1": 42,
-		},
+		_, err := newScriptFromConfig(log, &scriptConfig{
+			Source: header + footer, Params: map[string]interface{}{
+				"p1": 42,
+			},
 		})
 		if assert.Error(t, err) {
 			assert.Contains(t, err.Error(), "params were provided")

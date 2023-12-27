@@ -223,6 +223,79 @@ processors:
       target_field: okta.transaction.type
       ignore_missing: true
       ignore_failure: true
+  - set:
+      field: okta.debug_context.debug_data.flattened
+      copy_from: json.debugContext.debugData
+      ignore_failure: true
+  - json:
+      field: okta.debug_context.debug_data.flattened.logOnlySecurityData
+      ignore_failure: true
+  - dissect:
+      field: okta.debug_context.debug_data.flattened.behaviors
+      pattern: "{%{okta.debug_context.debug_data.flattened.behaviors}}"
+      ignore_missing: true
+      ignore_failure: true
+  - kv:
+      field: okta.debug_context.debug_data.flattened.behaviors
+      field_split: ", "
+      value_split: "="
+      target_field: _behaviors_object
+      if: ctx.okta?.debug_context?.debug_data?.flattened?.behaviors != null
+  - remove:
+      field: okta.debug_context.debug_data.flattened.behaviors
+      if: ctx._behaviors_object != null
+  - rename:
+      field: _behaviors_object
+      target_field: okta.debug_context.debug_data.flattened.behaviors
+      ignore_missing: true
+      ignore_failure: true
+  - set:
+      field: okta.debug_context.debug_data.flattened.risk_object
+      copy_from: okta.debug_context.debug_data.flattened.risk
+      if: ctx.okta?.debug_context?.debug_data?.flattened?.risk != null
+  - dissect:
+      field: okta.debug_context.debug_data.flattened.risk
+      pattern: "{%{okta.debug_context.debug_data.flattened.risk}}"
+      ignore_missing: true
+      ignore_failure: true
+  - kv:
+      field: okta.debug_context.debug_data.flattened.risk
+      field_split: ", "
+      value_split: "="
+      target_field: _risk_object
+      if: ctx.okta?.debug_context?.debug_data?.flattened?.risk != null
+      on_failure:
+        - remove:
+            field: _risk_object
+  - remove:
+      field: okta.debug_context.debug_data.flattened.risk_object
+      if: ctx._risk_object != null
+
+  # Make heroic efforts to capture risk level and reason if kv could not get them.
+  - grok:
+      field: okta.debug_context.debug_data.flattened.risk
+      patterns:
+        - level=%{NOTSPACE:_risk_object.level}
+      if: ctx.okta?.debug_context?.debug_data?.flattened?.risk_object != null && ctx.okta?.debug_context?.debug_data?.flattened?.risk != null
+      ignore_failure: true
+  - grok:
+      field: okta.debug_context.debug_data.flattened.risk
+      patterns:
+        - reasons=%{DATA:_risk_object.reasons}, %{KEY}
+        - reasons=%{DATA:_risk_object.reasons}$
+      pattern_definitions:
+        KEY: '%{NOTSPACE}='
+      if: ctx.okta?.debug_context?.debug_data?.flattened?.risk_object != null && ctx.okta?.debug_context?.debug_data?.flattened?.risk != null
+      ignore_failure: true
+
+  - remove:
+      field: okta.debug_context.debug_data.flattened.risk
+      if: ctx._risk_object != null
+  - rename:
+      field: _risk_object
+      target_field: okta.debug_context.debug_data.flattened.risk
+      ignore_missing: true
+      ignore_failure: true
   - rename:
       field: json.debugContext.debugData.deviceFingerprint
       target_field: okta.debug_context.debug_data.device_fingerprint
@@ -314,6 +387,44 @@ processors:
       formats:
         - ISO8601
       if: ctx?.json?.debugContext?.debugData?.suspiciousActivityTimestamp != null
+  - set:
+      field: okta.debug_context.debug_data.risk_level
+      value: "{{{okta.debug_context.debug_data.flattened.logOnlySecurityData.risk.level}}}"
+      if: 'ctx.okta?.debug_context?.debug_data?.flattened?.logOnlySecurityData?.risk?.level != null && ctx.okta?.debug_context?.debug_data?.flattened?.logOnlySecurityData?.risk?.level != ""'
+  - set:
+      field: okta.debug_context.debug_data.risk_level
+      value: "{{{okta.debug_context.debug_data.flattened.risk.level}}}"
+      if: 'ctx.okta?.debug_context?.debug_data?.risk_level == null && ctx.okta?.debug_context?.debug_data?.flattened?.risk != null && ctx.okta?.debug_context?.debug_data?.flattened?.risk != ""'
+  - set:
+      field: okta.debug_context.debug_data.factor
+      value: "{{{okta.debug_context.debug_data.flattened.factor}}}"
+      if: 'ctx.okta?.debug_context?.debug_data?.factor == null && ctx.okta?.debug_context?.debug_data?.flattened?.factor != null && ctx.okta?.debug_context?.debug_data?.flattened?.factor != ""'
+  - split:
+      field: okta.debug_context.debug_data.flattened.logOnlySecurityData.risk.reasons
+      target_field: okta.debug_context.debug_data.risk_reasons
+      separator: ',\s*'
+      if: 'ctx.okta?.debug_context?.debug_data?.flattened?.logOnlySecurityData?.risk?.reasons != null && ctx.okta?.debug_context?.debug_data?.flattened?.logOnlySecurityData?.risk?.reasons != ""'
+  - split:
+      field: okta.debug_context.debug_data.flattened.risk.reasons
+      target_field: okta.debug_context.debug_data.risk_reasons
+      separator: ',\s*'
+      if: 'ctx.okta?.debug_context?.debug_data?.risk_reasons == null && ctx.okta?.debug_context?.debug_data?.flattened?.risk?.reasons != null && ctx.okta?.debug_context?.debug_data?.flattened?.risk?.reasons != ""'
+  - script:
+      lang: painless
+      source: |
+        def src = ctx.okta?.debug_context?.debug_data?.flattened?.behaviors;
+        if (src == null) {
+          return;
+        }
+        def dst = new ArrayList();
+        for (e in src.entrySet()) {
+          if (e != null && e.getValue() == "POSITIVE") {
+            dst.add(e.getKey());
+          }
+        }
+        if (dst.length != 0) {
+          ctx.okta.debug_context.debug_data['risk_behaviors'] = dst;
+        }
   - rename:
       field: json.authenticationContext.authenticationProvider
       target_field: okta.authentication_context.authentication_provider
@@ -374,6 +485,29 @@ processors:
       target_field: okta.security_context.isp
       ignore_missing: true
       ignore_failure: true
+  - rename:
+      field: json.request.ipChain
+      target_field: okta.request.ip_chain
+      ignore_missing: true
+      ignore_failure: true
+  - foreach:
+      field: okta.request.ip_chain
+      processor:
+        rename:
+          field: _ingest._value.geographicalContext
+          target_field: _ingest._value.geographical_context
+          ignore_missing: true
+          ignore_failure: true
+      ignore_missing: true
+  - foreach:
+      field: okta.request.ip_chain
+      processor:
+        rename:
+          field: _ingest._value.geographical_context.postalCode
+          target_field: _ingest._value.geographical_context.postal_code
+          ignore_missing: true
+          ignore_failure: true
+      ignore_missing: true
   - convert:
       field: okta.client.user_agent.raw_user_agent
       target_field: user_agent.original
@@ -394,10 +528,9 @@ processors:
       target_field: event.action
       type: string
       ignore_failure: true
-  - convert:
-      field: okta.security_context.as.number
-      target_field: client.as.number
-      type: string
+  - set:
+      field: client.as.number
+      copy_from: okta.security_context.as.number
       ignore_failure: true
   - convert:
       field: okta.security_context.as.organization.name

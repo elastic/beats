@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build linux
-// +build linux
 
 package login
 
@@ -21,7 +20,7 @@ import (
 	"syscall"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (

@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: mongodb
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/mongodb/_meta/docs.asciidoc
+
 
 [[metricbeat-module-mongodb]]
 == MongoDB module
@@ -24,6 +26,12 @@ format:
 [mongodb://][user:pass@]host[:port][?options]
 -----------------------------------
 
+Or
+
+-----------------------------------------------------------------------------------------
+mongodb://[username:password@]host1[:port1][,...hostN[:portN]][/[defaultauthdb][?options]]
+-----------------------------------------------------------------------------------------
+
 The URL can be as simple as:
 
 [source,yaml]
@@ -39,6 +47,32 @@ Or more complex like:
 - module: mongodb
   hosts: ["mongodb://myuser:mypass@localhost:40001", "otherhost:40001"]
 ----------------------------------------------------------------------
+
+Some more supported URLs are:
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["mongodb://localhost:27017,localhost:27022,localhost:27023"]
+----------------------------------------------------------------------
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["mongodb://localhost:27017/?directConnection=true"]
+----------------------------------------------------------------------
+
+When the parameter `directConnection=true` is included in the connection URI,
+all operations are executed on the host specified in the URI.
+It's important to note that `directConnection=true` must be explicitly specified in the URI,
+as it won't be added automatically unless specified.
+
+[source,yaml]
+----------------------------------------------------------------------
+- module: mongodb
+  hosts: ["mongodb://localhost:27017,localhost:27022,localhost:27023/?replicaSet=dbrs"]
+----------------------------------------------------------------------
+
 
 The username and password can be included in the URL or they can be set using
 the respective configuration options. The credentials in the URL take precedence
@@ -58,8 +92,8 @@ The default metricsets are `collstats`, `dbstats` and `status`.
 [float]
 === Compatibility
 
-The MongoDB metricsets were tested with MongoDB 3.4 and 3.0 and are expected to
-work with all versions >= 2.8.
+The MongoDB metricsets were tested with MongoDB 5.0 and are expected to
+work with all versions >= 5.0.
 
 [float]
 === MongoDB Privileges
@@ -88,6 +122,8 @@ You can use the following command in Mongo shell to grant the role to an existin
 db.grantRolesToUser("user", ["clusterMonitor"])
 ----
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -159,3 +195,4 @@ include::mongodb/replstatus.asciidoc[]
 
 include::mongodb/status.asciidoc[]
 
+:edit_url!:

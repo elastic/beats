@@ -19,11 +19,10 @@ package status
 
 import (
 	"encoding/json"
+	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type uwsgiCore struct {
@@ -81,7 +80,7 @@ func eventsMapping(content []byte, reporter mb.ReporterV2) error {
 	var stats uwsgiStat
 	err := json.Unmarshal(content, &stats)
 	if err != nil {
-		return errors.Wrap(err, "uwsgi statistics parsing failed")
+		return fmt.Errorf("uwsgi statistics parsing failed: %w", err)
 	}
 
 	totalRequests := 0
@@ -92,8 +91,8 @@ func eventsMapping(content []byte, reporter mb.ReporterV2) error {
 
 	// worker cores info
 	for _, worker := range stats.Workers {
-		workerEvent := common.MapStr{
-			"worker": common.MapStr{
+		workerEvent := mapstr.M{
+			"worker": mapstr.M{
 				"id":             worker.ID,
 				"pid":            worker.PID,
 				"accepting":      worker.Accepting,
@@ -119,11 +118,11 @@ func eventsMapping(content []byte, reporter mb.ReporterV2) error {
 			totalWriteErrors += core.WriteErrors
 			totalReadErrors += core.ReadErrors
 
-			coreEvent := common.MapStr{
-				"core": common.MapStr{
+			coreEvent := mapstr.M{
+				"core": mapstr.M{
 					"id":         coreID,
 					"worker_pid": worker.PID,
-					"requests": common.MapStr{
+					"requests": mapstr.M{
 						"total":     core.Requests,
 						"static":    core.StaticRequests,
 						"routed":    core.RoutedRequests,
@@ -141,8 +140,8 @@ func eventsMapping(content []byte, reporter mb.ReporterV2) error {
 	}
 
 	// overall
-	baseEvent := common.MapStr{
-		"total": common.MapStr{
+	baseEvent := mapstr.M{
+		"total": mapstr.M{
 			"requests":     totalRequests,
 			"exceptions":   totalExceptions,
 			"write_errors": totalWriteErrors,

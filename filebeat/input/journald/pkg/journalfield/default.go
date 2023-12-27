@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux && cgo
-// +build linux,cgo
 
 package journalfield
 

@@ -12,9 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // authTokenDoer is an HTTP requester that indcludes UAA tokens at the header
@@ -44,7 +42,7 @@ func (d *authTokenDoer) Do(r *http.Request) (*http.Response, error) {
 		// The reason for writing an error here is that pushing the error upstream
 		// is handled by loggregate library, which is beyond our reach.
 		d.log.Errorf("error creating UAA Auth Token: %+v", err)
-		return nil, errors.Wrap(err, "error retrieving UUA token")
+		return nil, fmt.Errorf("error retrieving UUA token: %w", err)
 	}
 	r.Header.Set("Authorization", t)
 	return d.httpClient.Do(r)

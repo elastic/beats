@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common/cli"
 	"github.com/elastic/beats/v7/libbeat/common/terminal"
-	"github.com/elastic/beats/v7/libbeat/keystore"
+	"github.com/elastic/elastic-agent-libs/keystore"
 )
 
 func getKeystore(settings instance.Settings) (keystore.Keystore, error) {
@@ -46,10 +46,10 @@ func getKeystore(settings instance.Settings) (keystore.Keystore, error) {
 
 // genKeystoreCmd initialize the Keystore command to manage the Keystore
 // with the following subcommands:
-//  - create
-//  - add
-//  - remove
-//  - list
+//   - create
+//   - add
+//   - remove
+//   - list
 func genKeystoreCmd(settings instance.Settings) *cobra.Command {
 	keystoreCmd := cobra.Command{
 		Use:   "keystore",

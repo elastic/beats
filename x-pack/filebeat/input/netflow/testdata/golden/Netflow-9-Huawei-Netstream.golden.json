@@ -14,7 +14,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 327060000000,

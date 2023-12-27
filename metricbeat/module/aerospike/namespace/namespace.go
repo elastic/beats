@@ -18,14 +18,14 @@
 package namespace
 
 import (
+	"fmt"
 	"strings"
 
 	as "github.com/aerospike/aerospike-client-go"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/aerospike"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry.
@@ -57,7 +57,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	host, err := aerospike.ParseHost(base.Host())
 	if err != nil {
-		return nil, errors.Wrap(err, "Invalid host format, expected hostname:port")
+		return nil, fmt.Errorf("Invalid host format, expected hostname:port: %w", err)
 	}
 
 	return &MetricSet{
@@ -71,7 +71,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if err := m.connect(); err != nil {
-		return errors.Wrap(err, "error connecting to Aerospike")
+		return fmt.Errorf("error connecting to Aerospike: %w", err)
 	}
 
 	for _, node := range m.client.GetNodes() {
@@ -90,7 +90,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 			data, _ := schema.Apply(aerospike.ParseInfo(info["namespace/"+namespace]))
 			data["name"] = namespace
-			data["node"] = common.MapStr{
+			data["node"] = mapstr.M{
 				"host": node.GetHost().String(),
 				"name": node.GetName(),
 			}

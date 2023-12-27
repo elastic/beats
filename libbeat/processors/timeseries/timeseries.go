@@ -21,10 +21,9 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/mapping"
-	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/mitchellh/hashstructure"
 )
@@ -38,7 +37,7 @@ type timeseriesProcessor struct {
 // Events are processed to extract all their dimensions (keyword fields that
 // hold a dimension of the metrics) and compute a hash of all their values into
 // `timeseries.instance` field.
-func NewTimeSeriesProcessor(fields mapping.Fields) processors.Processor {
+func NewTimeSeriesProcessor(fields mapping.Fields) beat.Processor {
 	cfgwarn.Experimental("timeseries.instance field is experimental")
 
 	dimensions := map[string]bool{}
@@ -67,7 +66,7 @@ func NewTimeSeriesProcessor(fields mapping.Fields) processors.Processor {
 
 func (t *timeseriesProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	if event.TimeSeries {
-		instanceFields := common.MapStr{}
+		instanceFields := mapstr.M{}
 
 		// map all dimensions & values
 		for k, v := range event.Fields.Flatten() {
@@ -81,7 +80,7 @@ func (t *timeseriesProcessor) Run(event *beat.Event) (*beat.Event, error) {
 			// this should not happen, keep the event in any case
 			return event, err
 		}
-		event.Fields["timeseries"] = common.MapStr{
+		event.Fields["timeseries"] = mapstr.M{
 			"instance": h,
 		}
 	}

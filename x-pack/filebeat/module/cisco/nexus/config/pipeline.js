@@ -339,35 +339,35 @@ var dup108 = match("MESSAGE#239:IF_XCVR_WARNING:01", "nwparser.payload", "Interf
 	dup4,
 ]));
 
-var hdr1 = match("HEADER#0:0001", "message", ": %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{hfld18}: %%{hfld19}-%{hfld20}-%{severity}-%{messageid}:%{payload}", processor_chain([
+var hdr1 = match("HEADER#0:0001", "message", ": %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{hfld18}: %%{hfld19}-%{hfld20}-%{severity}-%{messageid}: %{payload}", processor_chain([
 	setc("header_id","0001"),
 ]));
 
-var hdr2 = match("HEADER#1:0007", "message", "%{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{hfld18}: %%{hfld19}-%{hfld20}-%{severity}-%{messageid}:%{payload}", processor_chain([
+var hdr2 = match("HEADER#1:0007", "message", "%{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{hfld18}: %%{hfld19}-%{hfld20}-%{severity}-%{messageid}: %{payload}", processor_chain([
 	setc("header_id","0007"),
 ]));
 
-var hdr3 = match("HEADER#2:0005", "message", "%{hfld4->} %{hfld5->} %{hfld6->} %{hfld7->} : %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %%{hfld19}-%{severity}-%{messageid}:%{payload}", processor_chain([
+var hdr3 = match("HEADER#2:0005", "message", "%{hfld4->} %{hfld5->} %{hfld6->} %{hfld7->} : %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %%{hfld19}-%{severity}-%{messageid}: %{payload}", processor_chain([
 	setc("header_id","0005"),
 ]));
 
-var hdr4 = match("HEADER#3:0002", "message", ": %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %%{hfld19}-%{severity}-%{messageid}:%{payload}", processor_chain([
+var hdr4 = match("HEADER#3:0002", "message", ": %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %%{hfld19}-%{severity}-%{messageid}: %{payload}", processor_chain([
 	setc("header_id","0002"),
 ]));
 
-var hdr5 = match("HEADER#4:0012", "message", "%{fld13}: %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %%{hfld19}-%{severity}-%{messageid}:%{payload}", processor_chain([
+var hdr5 = match("HEADER#4:0012", "message", "%{fld13}: %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %%{hfld19}-%{severity}-%{messageid}: %{payload}", processor_chain([
 	setc("header_id","0012"),
 ]));
 
-var hdr6 = match("HEADER#5:0008", "message", "%{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %%{hfld19}-%{severity}-%{messageid}:%{payload}", processor_chain([
+var hdr6 = match("HEADER#5:0008", "message", "%{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %%{hfld19}-%{severity}-%{messageid}: %{payload}", processor_chain([
 	setc("header_id","0008"),
 ]));
 
-var hdr7 = match("HEADER#6:0011", "message", ": %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %{messageid}[%{hfld18}]:%{payload}", processor_chain([
+var hdr7 = match("HEADER#6:0011", "message", ": %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %{messageid}[%{hfld18}]: %{payload}", processor_chain([
 	setc("header_id","0011"),
 ]));
 
-var hdr8 = match("HEADER#7:0003", "message", ": %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %{messageid}:%{payload}", processor_chain([
+var hdr8 = match("HEADER#7:0003", "message", ": %{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %{messageid}: %{payload}", processor_chain([
 	setc("header_id","0003"),
 ]));
 
@@ -375,7 +375,7 @@ var hdr9 = match("HEADER#8:0004", "message", ": %{hfld14->} %{hfld15->} %{hfld16
 	setc("header_id","0004"),
 ]));
 
-var hdr10 = match("HEADER#9:0009", "message", "%{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %{messageid}:%{payload}", processor_chain([
+var hdr10 = match("HEADER#9:0009", "message", "%{hfld14->} %{hfld15->} %{hfld16->} %{hfld17->} %{timezone}: %{messageid}: %{payload}", processor_chain([
 	setc("header_id","0009"),
 ]));
 

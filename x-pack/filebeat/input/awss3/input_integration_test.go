@@ -5,7 +5,6 @@
 // See _meta/terraform/README.md for integration test usage instructions.
 
 //go:build integration && aws
-// +build integration,aws
 
 package awss3
 
@@ -15,30 +14,25 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/external"
-	"github.com/aws/aws-sdk-go-v2/service/s3/s3manager"
+	awsConfig "github.com/aws/aws-sdk-go-v2/config"
+	s3manager "github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sync/errgroup"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -46,7 +40,8 @@ const (
 )
 
 const (
-	terraformOutputYML = "_meta/terraform/outputs.yml"
+	terraformOutputYML   = "_meta/terraform/outputs.yml"
+	terraformOutputLsYML = "_meta/terraform/outputs-localstack.yml"
 )
 
 type terraformOutputData struct {
@@ -57,12 +52,21 @@ type terraformOutputData struct {
 	QueueURLForSNS   string `yaml:"queue_url_for_sns"`
 }
 
-func getTerraformOutputs(t *testing.T) terraformOutputData {
+func getTerraformOutputs(t *testing.T, isLocalStack bool) terraformOutputData {
 	t.Helper()
 
-	ymlData, err := ioutil.ReadFile(terraformOutputYML)
+	_, filename, _, _ := runtime.Caller(0)
+
+	var outputFile string
+	if isLocalStack {
+		outputFile = terraformOutputLsYML
+	} else {
+		outputFile = terraformOutputYML
+	}
+
+	ymlData, err := ioutil.ReadFile(path.Join(path.Dir(filename), outputFile))
 	if os.IsNotExist(err) {
-		t.Skipf("Run 'terraform apply' in %v to setup S3 and SQS for the test.", filepath.Dir(terraformOutputYML))
+		t.Skipf("Run 'terraform apply' in %v to setup S3 and SQS for the test.", filepath.Dir(outputFile))
 	}
 	if err != nil {
 		t.Fatalf("failed reading terraform output data: %v", err)
@@ -70,7 +74,6 @@ func getTerraformOutputs(t *testing.T) terraformOutputData {
 
 	var rtn terraformOutputData
 	dec := yaml.NewDecoder(bytes.NewReader(ymlData))
-	dec.SetStrict(true)
 	if err = dec.Decode(&rtn); err != nil {
 		t.Fatal(err)
 	}
@@ -78,15 +81,14 @@ func getTerraformOutputs(t *testing.T) terraformOutputData {
 	return rtn
 }
 
-func makeTestConfigS3(s3bucket string) *common.Config {
-	return common.MustNewConfigFrom(fmt.Sprintf(`---
+func makeTestConfigS3(s3bucket string) *conf.C {
+	return conf.MustNewConfigFrom(fmt.Sprintf(`---
 bucket_arn: aws:s3:::%s
 number_of_workers: 1
 file_selectors:
 -
   regex: 'events-array.json$'
   expand_event_list_from_field: Events
-  content_type: application/json
   include_s3_metadata:
     - last-modified
     - x-amz-version-id
@@ -95,7 +97,6 @@ file_selectors:
     - Content-Type
 -
   regex: '\.(?:nd)?json(\.gz)?$'
-  content_type: application/json
 -
   regex: 'multiline.txt$'
   parsers:
@@ -106,16 +107,16 @@ file_selectors:
 `, s3bucket))
 }
 
-func makeTestConfigSQS(queueURL string) *common.Config {
-	return common.MustNewConfigFrom(fmt.Sprintf(`---
+func makeTestConfigSQS(queueURL string) *conf.C {
+	return conf.MustNewConfigFrom(fmt.Sprintf(`---
 queue_url: %s
 max_number_of_messages: 1
 visibility_timeout: 30s
+region: us-east-1
 file_selectors:
 -
   regex: 'events-array.json$'
   expand_event_list_from_field: Events
-  content_type: application/json
   include_s3_metadata:
     - last-modified
     - x-amz-version-id
@@ -124,7 +125,6 @@ file_selectors:
     - Content-Type
 -
   regex: '\.(?:nd)?json(\.gz)?$'
-  content_type: application/json
 -
   regex: 'multiline.txt$'
   parsers:
@@ -135,29 +135,7 @@ file_selectors:
 `, queueURL))
 }
 
-type testInputStore struct {
-	registry *statestore.Registry
-}
-
-func openTestStatestore() beater.StateStore {
-	return &testInputStore{
-		registry: statestore.NewRegistry(storetest.NewMemoryStoreBackend()),
-	}
-}
-
-func (s *testInputStore) Close() {
-	s.registry.Close()
-}
-
-func (s *testInputStore) Access() (*statestore.Store, error) {
-	return s.registry.Get("filebeat")
-}
-
-func (s *testInputStore) CleanupInterval() time.Duration {
-	return 24 * time.Hour
-}
-
-func createInput(t *testing.T, cfg *common.Config) *s3Input {
+func createInput(t *testing.T, cfg *conf.C) *s3Input {
 	inputV2, err := Plugin(openTestStatestore()).Manager.Create(cfg)
 	if err != nil {
 		t.Fatal(err)
@@ -175,19 +153,127 @@ func newV2Context() (v2.Context, func()) {
 	}, cancel
 }
 
+// Creates a default config for Localstack based tests
+func defaultTestConfig(region, queueURL string) config {
+	c := config{
+		APITimeout:          120 * time.Second,
+		VisibilityTimeout:   300 * time.Second,
+		BucketListInterval:  120 * time.Second,
+		BucketListPrefix:    "",
+		SQSWaitTime:         20 * time.Second,
+		SQSMaxReceiveCount:  5,
+		MaxNumberOfMessages: 5,
+		PathStyle:           true,
+		RegionName:          region,
+		QueueURL:            queueURL,
+	}
+	c.ReaderConfig.InitDefaults()
+	return c
+}
+
+// Create an aws config for Localstack based tests
+func makeLocalstackConfig(awsRegion string) (aws.Config, error) {
+	awsLocalstackEndpoint := "http://localhost:4566" // Default Localstack endpoint
+
+	// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
+	customResolver := aws.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (aws.Endpoint, error) {
+		return aws.Endpoint{
+			PartitionID:   "aws",
+			URL:           awsLocalstackEndpoint,
+			SigningRegion: awsRegion,
+		}, nil
+	})
+
+	return awsConfig.LoadDefaultConfig(context.TODO(),
+		awsConfig.WithRegion(awsRegion),
+		awsConfig.WithEndpointResolverWithOptions(customResolver),
+	)
+}
+
+// Tests reading SQS notifcation via awss3 input when an object is PUT in S3
+// and a notification is generated to SQS on Localstack
+func TestInputRunSQSOnLocalstack(t *testing.T) {
+	logp.TestingSetup()
+
+	// Terraform is used to set up S3,SQS and must be executed manually.
+	tfConfig := getTerraformOutputs(t, true)
+
+	// Read the necessary terraform outputs
+	region := tfConfig.AWSRegion
+	bucketName := tfConfig.BucketName
+	queueUrl := tfConfig.QueueURL
+
+	// Create a default config for the awss3 input
+	config := defaultTestConfig(region, queueUrl)
+	awsCfg, err := makeLocalstackConfig(region)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Ensure SQS is empty before testing.
+	drainSQS(t, region, queueUrl, awsCfg)
+
+	// Upload test files to S3 to generate SQS notification
+	s3Client := s3.NewFromConfig(awsCfg, func(o *s3.Options) {
+		o.UsePathStyle = true
+	})
+	uploadS3TestFiles(t, region, bucketName, s3Client,
+		"testdata/events-array.json",
+		"testdata/invalid.json",
+		"testdata/log.json",
+		"testdata/log.ndjson",
+		"testdata/multiline.json",
+		"testdata/multiline.json.gz",
+		"testdata/multiline.txt",
+		"testdata/log.txt",
+	)
+
+	inputCtx, cancel := newV2Context()
+	t.Cleanup(cancel)
+	time.AfterFunc(15*time.Second, func() {
+		cancel()
+	})
+
+	// Initialize s3Input with the test config
+	s3Input := &s3Input{
+		config:    config,
+		awsConfig: awsCfg,
+		store:     openTestStatestore(),
+	}
+	// Run S3 Input with desired context
+	var errGroup errgroup.Group
+	errGroup.Go(func() error {
+		return s3Input.Run(inputCtx, &fakePipeline{})
+	})
+
+	if err := errGroup.Wait(); err != nil {
+		t.Fatal(err)
+	}
+
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesReceivedTotal.Get(), 8) // S3 could batch notifications.
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesInflight.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesDeletedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
+	assert.EqualValues(t, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 8)
+	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), uint64(0x13))
+	assert.Greater(t, s3Input.metrics.sqsLagTime.Mean(), 0.0)
+	assert.EqualValues(t, s3Input.metrics.sqsWorkerUtilization.Get(), 0.0) // Workers are reset after processing and hence utilization should be 0 at the end
+}
+
 func TestInputRunSQS(t *testing.T) {
 	logp.TestingSetup()
 
 	// Terraform is used to set up S3 and SQS and must be executed manually.
-	tfConfig := getTerraformOutputs(t)
+	tfConfig := getTerraformOutputs(t, false)
+	awsCfg := makeAWSConfig(t, tfConfig.AWSRegion)
 
 	// Ensure SQS is empty before testing.
-	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURL)
+	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURL, awsCfg)
 
-	// Ensure metrics are removed before testing.
-	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
-
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
+	s3Client := s3.NewFromConfig(awsCfg)
+	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName, s3Client,
 		"testdata/events-array.json",
 		"testdata/invalid.json",
 		"testdata/log.json",
@@ -206,51 +292,36 @@ func TestInputRunSQS(t *testing.T) {
 		cancel()
 	})
 
-	client := pubtest.NewChanClient(0)
-	defer close(client.Channel)
-	go func() {
-		for event := range client.Channel {
-			// Fake the ACK handling that's not implemented in pubtest.
-			event.Private.(*awscommon.EventACKTracker).ACK()
-		}
-	}()
-
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {
-		pipeline := pubtest.PublisherWithClient(client)
-		return s3Input.Run(inputCtx, pipeline)
+		return s3Input.Run(inputCtx, &fakePipeline{})
 	})
 
 	if err := errGroup.Wait(); err != nil {
 		t.Fatal(err)
 	}
 
-	snap := common.MapStr(monitoring.CollectStructSnapshot(
-		monitoring.GetNamespace("dataset").GetRegistry(),
-		monitoring.Full,
-		false))
-	t.Log(snap.StringToPrint())
-
-	assertMetric(t, snap, "sqs_messages_received_total", 8) // S3 could batch notifications.
-	assertMetric(t, snap, "sqs_messages_inflight_gauge", 0)
-	assertMetric(t, snap, "sqs_messages_deleted_total", 7)
-	assertMetric(t, snap, "sqs_messages_returned_total", 1) // Invalid JSON is returned so that it can eventually be DLQed.
-	assertMetric(t, snap, "sqs_visibility_timeout_extensions_total", 0)
-	assertMetric(t, snap, "s3_objects_inflight_gauge", 0)
-	assertMetric(t, snap, "s3_objects_requested_total", 7)
-	assertMetric(t, snap, "s3_events_created_total", 12)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesReceivedTotal.Get(), 8) // S3 could batch notifications.
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesInflight.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesDeletedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
+	assert.EqualValues(t, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
+	assert.Greater(t, s3Input.metrics.sqsLagTime.Mean(), 0.0)
+	assert.EqualValues(t, s3Input.metrics.sqsWorkerUtilization.Get(), 0.0) // Workers are reset after processing and hence utilization should be 0 at the end
 }
 
 func TestInputRunS3(t *testing.T) {
 	logp.TestingSetup()
 
 	// Terraform is used to set up S3 and must be executed manually.
-	tfConfig := getTerraformOutputs(t)
+	tfConfig := getTerraformOutputs(t, false)
+	awsCfg := makeAWSConfig(t, tfConfig.AWSRegion)
 
-	// Ensure metrics are removed before testing.
-	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
-
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
+	s3Client := s3.NewFromConfig(awsCfg)
+	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName, s3Client,
 		"testdata/events-array.json",
 		"testdata/invalid.json",
 		"testdata/log.json",
@@ -269,66 +340,49 @@ func TestInputRunS3(t *testing.T) {
 		cancel()
 	})
 
-	client := pubtest.NewChanClient(0)
-	defer close(client.Channel)
-	go func() {
-		for event := range client.Channel {
-			// Fake the ACK handling that's not implemented in pubtest.
-			event.Private.(*awscommon.EventACKTracker).ACK()
-		}
-	}()
-
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {
-		pipeline := pubtest.PublisherWithClient(client)
-		return s3Input.Run(inputCtx, pipeline)
+		return s3Input.Run(inputCtx, &fakePipeline{})
 	})
 
 	if err := errGroup.Wait(); err != nil {
 		t.Fatal(err)
 	}
 
-	snap := common.MapStr(monitoring.CollectStructSnapshot(
-		monitoring.GetNamespace("dataset").GetRegistry(),
-		monitoring.Full,
-		false))
-	t.Log(snap.StringToPrint())
-
-	assertMetric(t, snap, "s3_objects_inflight_gauge", 0)
-	assertMetric(t, snap, "s3_objects_requested_total", 7)
-	assertMetric(t, snap, "s3_objects_listed_total", 8)
-	assertMetric(t, snap, "s3_objects_processed_total", 7)
-	assertMetric(t, snap, "s3_objects_acked_total", 6)
-	assertMetric(t, snap, "s3_events_created_total", 12)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsListedTotal.Get(), 8)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsProcessedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsAckedTotal.Get(), 6)
+	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
 }
 
-func assertMetric(t *testing.T, snapshot common.MapStr, name string, value interface{}) {
-	n, _ := snapshot.GetValue(inputID + "." + name)
-	assert.EqualValues(t, value, n, name)
-}
-
-func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string) {
+func uploadS3TestFiles(t *testing.T, region, bucket string, s3Client *s3.Client, filenames ...string) {
 	t.Helper()
 
-	cfg, err := external.LoadDefaultAWSConfig()
-	if err != nil {
-		t.Fatal(err)
-	}
-	cfg.Region = region
+	uploader := s3manager.NewUploader(s3Client)
 
-	uploader := s3manager.NewUploader(cfg)
-
+	_, basefile, _, _ := runtime.Caller(0)
+	basedir := path.Dir(basefile)
 	for _, filename := range filenames {
-		data, err := ioutil.ReadFile(filename)
+		data, err := ioutil.ReadFile(path.Join(basedir, filename))
 		if err != nil {
 			t.Fatalf("Failed to open file %q, %v", filename, err)
 		}
 
+		contentType := ""
+		if strings.HasSuffix(filename, "ndjson") || strings.HasSuffix(filename, "ndjson.gz") {
+			contentType = contentTypeNDJSON + "; charset=UTF-8"
+		} else if strings.HasSuffix(filename, "json") || strings.HasSuffix(filename, "json.gz") {
+			contentType = contentTypeJSON + "; charset=UTF-8"
+		}
+
 		// Upload the file to S3.
-		result, err := uploader.Upload(&s3manager.UploadInput{
-			Bucket: aws.String(bucket),
-			Key:    aws.String(filepath.Base(filename)),
-			Body:   bytes.NewReader(data),
+		result, err := uploader.Upload(context.Background(), &s3.PutObjectInput{
+			Bucket:      aws.String(bucket),
+			Key:         aws.String(filepath.Base(filename)),
+			Body:        bytes.NewReader(data),
+			ContentType: aws.String(contentType),
 		})
 		if err != nil {
 			t.Fatalf("Failed to upload file %q: %v", filename, err)
@@ -337,15 +391,18 @@ func uploadS3TestFiles(t *testing.T, region, bucket string, filenames ...string)
 	}
 }
 
-func drainSQS(t *testing.T, region string, queueURL string) {
-	cfg, err := external.LoadDefaultAWSConfig()
+func makeAWSConfig(t *testing.T, region string) aws.Config {
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		t.Fatal(err)
 	}
 	cfg.Region = region
+	return cfg
+}
 
+func drainSQS(t *testing.T, region string, queueURL string, cfg aws.Config) {
 	sqs := &awsSQSAPI{
-		client:            sqs.New(cfg),
+		client:            sqs.NewFromConfig(cfg),
 		queueURL:          queueURL,
 		apiTimeout:        1 * time.Minute,
 		visibilityTimeout: 30 * time.Second,
@@ -382,16 +439,17 @@ func TestGetRegionForBucketARN(t *testing.T) {
 	logp.TestingSetup()
 
 	// Terraform is used to set up S3 and must be executed manually.
-	tfConfig := getTerraformOutputs(t)
+	tfConfig := getTerraformOutputs(t, false)
 
-	awsConfig, err := external.LoadDefaultAWSConfig()
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", awsConfig))
+	s3Client := s3.NewFromConfig(cfg)
 
 	regionName, err := getRegionForBucket(context.Background(), s3Client, getBucketNameFromARN(tfConfig.BucketName))
+	assert.NoError(t, err)
 	assert.Equal(t, tfConfig.AWSRegion, regionName)
 }
 
@@ -399,9 +457,11 @@ func TestPaginatorListPrefix(t *testing.T) {
 	logp.TestingSetup()
 
 	// Terraform is used to set up S3 and must be executed manually.
-	tfConfig := getTerraformOutputs(t)
+	tfConfig := getTerraformOutputs(t, false)
+	awsCfg := makeAWSConfig(t, tfConfig.AWSRegion)
 
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName,
+	s3Client := s3.NewFromConfig(awsCfg)
+	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketName, s3Client,
 		"testdata/events-array.json",
 		"testdata/invalid.json",
 		"testdata/log.json",
@@ -412,13 +472,11 @@ func TestPaginatorListPrefix(t *testing.T) {
 		"testdata/log.txt", // Skipped (no match).
 	)
 
-	awsConfig, err := external.LoadDefaultAWSConfig()
-	awsConfig.Region = tfConfig.AWSRegion
+	cfg, err := awsConfig.LoadDefaultConfig(context.TODO())
+	cfg.Region = tfConfig.AWSRegion
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	s3Client := s3.New(awscommon.EnrichAWSConfigWithEndpoint("", "s3", "", awsConfig))
 
 	s3API := &awsS3API{
 		client: s3Client,
@@ -426,14 +484,13 @@ func TestPaginatorListPrefix(t *testing.T) {
 
 	var objects []string
 	paginator := s3API.ListObjectsPaginator(tfConfig.BucketName, "log")
-	for paginator.Next(context.Background()) {
-		page := paginator.CurrentPage()
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(context.Background())
+		assert.NoError(t, err)
 		for _, object := range page.Contents {
 			objects = append(objects, *object.Key)
 		}
 	}
-
-	assert.NoError(t, paginator.Err())
 
 	expected := []string{
 		"log.json",
@@ -448,15 +505,14 @@ func TestInputRunSNS(t *testing.T) {
 	logp.TestingSetup()
 
 	// Terraform is used to set up S3, SNS and SQS and must be executed manually.
-	tfConfig := getTerraformOutputs(t)
+	tfConfig := getTerraformOutputs(t, false)
+	awsCfg := makeAWSConfig(t, tfConfig.AWSRegion)
 
 	// Ensure SQS is empty before testing.
-	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURLForSNS)
+	drainSQS(t, tfConfig.AWSRegion, tfConfig.QueueURLForSNS, awsCfg)
 
-	// Ensure metrics are removed before testing.
-	monitoring.GetNamespace("dataset").GetRegistry().Remove(inputID)
-
-	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketNameForSNS,
+	s3Client := s3.NewFromConfig(awsCfg)
+	uploadS3TestFiles(t, tfConfig.AWSRegion, tfConfig.BucketNameForSNS, s3Client,
 		"testdata/events-array.json",
 		"testdata/invalid.json",
 		"testdata/log.json",
@@ -475,36 +531,23 @@ func TestInputRunSNS(t *testing.T) {
 		cancel()
 	})
 
-	client := pubtest.NewChanClient(0)
-	defer close(client.Channel)
-	go func() {
-		for event := range client.Channel {
-			event.Private.(*awscommon.EventACKTracker).ACK()
-		}
-	}()
-
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {
-		pipeline := pubtest.PublisherWithClient(client)
-		return s3Input.Run(inputCtx, pipeline)
+		return s3Input.Run(inputCtx, &fakePipeline{})
 	})
 
 	if err := errGroup.Wait(); err != nil {
 		t.Fatal(err)
 	}
 
-	snap := common.MapStr(monitoring.CollectStructSnapshot(
-		monitoring.GetNamespace("dataset").GetRegistry(),
-		monitoring.Full,
-		false))
-	t.Log(snap.StringToPrint())
-
-	assertMetric(t, snap, "sqs_messages_received_total", 8) // S3 could batch notifications.
-	assertMetric(t, snap, "sqs_messages_inflight_gauge", 0)
-	assertMetric(t, snap, "sqs_messages_deleted_total", 7)
-	assertMetric(t, snap, "sqs_messages_returned_total", 1) // Invalid JSON is returned so that it can eventually be DLQed.
-	assertMetric(t, snap, "sqs_visibility_timeout_extensions_total", 0)
-	assertMetric(t, snap, "s3_objects_inflight_gauge", 0)
-	assertMetric(t, snap, "s3_objects_requested_total", 7)
-	assertMetric(t, snap, "s3_events_created_total", 12)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesReceivedTotal.Get(), 8) // S3 could batch notifications.
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesInflight.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesDeletedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.sqsMessagesReturnedTotal.Get(), 1) // Invalid JSON is returned so that it can eventually be DLQed.
+	assert.EqualValues(t, s3Input.metrics.sqsVisibilityTimeoutExtensionsTotal.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsInflight.Get(), 0)
+	assert.EqualValues(t, s3Input.metrics.s3ObjectsRequestedTotal.Get(), 7)
+	assert.EqualValues(t, s3Input.metrics.s3EventsCreatedTotal.Get(), 12)
+	assert.Greater(t, s3Input.metrics.sqsLagTime.Mean(), 0.0)
+	assert.EqualValues(t, s3Input.metrics.sqsWorkerUtilization.Get(), 0.0) // Workers are reset after processing and hence utilization should be 0 at the end
 }

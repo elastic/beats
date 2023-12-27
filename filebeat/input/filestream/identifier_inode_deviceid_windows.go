@@ -16,16 +16,15 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package filestream
 
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-func newINodeMarkerIdentifier(cfg *common.Config) (fileIdentifier, error) {
+func newINodeMarkerIdentifier(cfg *conf.C) (fileIdentifier, error) {
 	return nil, fmt.Errorf("inode_deviceid is not supported on Windows")
 }

@@ -19,12 +19,11 @@ package queue
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 )
@@ -88,7 +87,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 	var queues []map[string]interface{}
 	err := json.Unmarshal(content, &queues)
 	if err != nil {
-		return errors.Wrap(err, "error in mapping")
+		return fmt.Errorf("error in mapping: %w", err)
 	}
 
 	for _, queue := range queues {
@@ -102,7 +101,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 func eventMapping(queue map[string]interface{}) mb.Event {
 	fields, _ := schema.Apply(queue)
 
-	moduleFields := common.MapStr{}
+	moduleFields := mapstr.M{}
 	if v, err := fields.GetValue("vhost"); err == nil {
 		moduleFields.Put("vhost", v)
 		fields.Delete("vhost")

@@ -19,13 +19,12 @@ package heap
 
 import (
 	"encoding/json"
+	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var logger = logp.NewLogger("golang.heap")
@@ -81,14 +80,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	data, err := m.http.FetchContent()
 	if err != nil {
-		return errors.Wrap(err, "error in http fetch")
+		return fmt.Errorf("error in http fetch: %w", err)
 	}
 
 	var stats Stats
 
 	err = json.Unmarshal(data, &stats)
 	if err != nil {
-		return errors.Wrap(err, "error unmarshalling json")
+		return fmt.Errorf("error unmarshalling json: %w", err)
 	}
 
 	reporter.Event(mb.Event{

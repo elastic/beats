@@ -21,12 +21,10 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-/**
-Convert cmd array to cmd line
-*/
+// GetCmdStr Convert cmd array to cmd line
 func GetCmdStr(v interface{}) interface{} {
 	switch t := v.(type) {
 	case []interface{}:

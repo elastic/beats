@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package wineventlog
 
@@ -36,20 +35,23 @@ import (
 const (
 	winlogbeatTestLogName = "WinEventLogTestGo"
 
-	security4752File      = "../../../x-pack/winlogbeat/module/security/test/testdata/4752.evtx"
-	sysmon9File           = "../../../x-pack/winlogbeat/module/sysmon/test/testdata/sysmon-9.01.evtx"
+	security4752File      = "testdata/4752.evtx"
+	sysmon9File           = "testdata/sysmon-9.01.evtx"
 	winErrorReportingFile = "testdata/application-windows-error-reporting.evtx"
 )
 
 // createLog creates a new event log and returns a handle for writing events
 // to the log.
+//
+//nolint:errcheck // Errors are not checked since they always precede termination.
 func createLog(t testing.TB) (log *eventlog.Log, tearDown func()) {
+	t.Helper()
 	const name = winlogbeatTestLogName
 	const source = "wineventlog_test"
 
 	existed, err := eventlog.InstallAsEventCreate(name, source, eventlog.Error|eventlog.Warning|eventlog.Info)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("eventlog.InstallAsEventCreate failed: %v", err)
 	}
 
 	if existed {
@@ -60,7 +62,7 @@ func createLog(t testing.TB) (log *eventlog.Log, tearDown func()) {
 	if err != nil {
 		eventlog.RemoveSource(name, source)
 		eventlog.RemoveProvider(name)
-		t.Fatal(err)
+		t.Fatalf("eventlog.Open failed: %v", err)
 	}
 
 	setLogSize(t, winlogbeatTestLogName, 1024*1024*1024) // 1 GiB
@@ -76,6 +78,7 @@ func createLog(t testing.TB) (log *eventlog.Log, tearDown func()) {
 }
 
 func safeWriteEvent(t testing.TB, log *eventlog.Log, etype uint16, eid uint32, msgs []string) {
+	t.Helper()
 	deadline := time.Now().Add(time.Second * 10)
 	for {
 		err := log.Report(etype, eid, msgs)
@@ -91,6 +94,7 @@ func safeWriteEvent(t testing.TB, log *eventlog.Log, etype uint16, eid uint32, m
 
 // openLog opens an event log or .evtx file for reading.
 func openLog(t testing.TB, log string, eventIDFilters ...string) EvtHandle {
+	t.Helper()
 	var (
 		err   error
 		path               = log
@@ -129,12 +133,13 @@ func openLog(t testing.TB, log string, eventIDFilters ...string) EvtHandle {
 // nextHandle reads one handle from the log. It returns done=true when there
 // are no more items to read.
 func nextHandle(t *testing.T, log EvtHandle) (handle EvtHandle, done bool) {
+	t.Helper()
 	var numReturned uint32
 	var handles [1]EvtHandle
 
 	err := _EvtNext(log, 1, &handles[0], 0, 0, &numReturned)
 	if err != nil {
-		if err == windows.ERROR_NO_MORE_ITEMS {
+		if err == windows.ERROR_NO_MORE_ITEMS { //nolint:errorlint // Bad linter! x/sys errors are not wrapped.
 			return NilHandle, true
 		}
 		t.Fatal(err)
@@ -145,6 +150,7 @@ func nextHandle(t *testing.T, log EvtHandle) (handle EvtHandle, done bool) {
 
 // mustNextHandle reads one handle from the log.
 func mustNextHandle(t *testing.T, log EvtHandle) EvtHandle {
+	t.Helper()
 	h, done := nextHandle(t, log)
 	if done {
 		t.Fatal("No more items to read.")

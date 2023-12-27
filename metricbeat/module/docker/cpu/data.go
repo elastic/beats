@@ -18,50 +18,54 @@
 package cpu
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func eventsMapping(r mb.ReporterV2, cpuStatsList []CPUStats) {
-	for _, cpuStats := range cpuStatsList {
-		eventMapping(r, &cpuStats)
+	for i := range cpuStatsList {
+		eventMapping(r, &cpuStatsList[i])
 	}
 }
 
 func eventMapping(r mb.ReporterV2, stats *CPUStats) {
-	fields := common.MapStr{
+	fields := mapstr.M{
 		"core": stats.PerCPUUsage,
-		"total": common.MapStr{
+		"total": mapstr.M{
 			"pct": stats.TotalUsage,
-			"norm": common.MapStr{
+			"norm": mapstr.M{
 				"pct": stats.TotalUsageNormalized,
 			},
 		},
-		"kernel": common.MapStr{
+		"kernel": mapstr.M{
 			"ticks": stats.UsageInKernelmode,
 			"pct":   stats.UsageInKernelmodePercentage,
-			"norm": common.MapStr{
+			"norm": mapstr.M{
 				"pct": stats.UsageInKernelmodePercentageNormalized,
 			},
 		},
-		"user": common.MapStr{
+		"user": mapstr.M{
 			"ticks": stats.UsageInUsermode,
 			"pct":   stats.UsageInUsermodePercentage,
-			"norm": common.MapStr{
+			"norm": mapstr.M{
 				"pct": stats.UsageInUsermodePercentageNormalized,
 			},
 		},
-		"system": common.MapStr{
+		"system": mapstr.M{
 			"ticks": stats.SystemUsage,
 			"pct":   stats.SystemUsagePercentage,
-			"norm": common.MapStr{
+			"norm": mapstr.M{
 				"pct": stats.SystemUsagePercentageNormalized,
 			},
 		},
 	}
 
+	rootFields := stats.Container.ToMapStr()
+	// Add container ECS fields
+	_, _ = rootFields.Put("container.cpu.usage", stats.TotalUsageNormalized)
+
 	r.Event(mb.Event{
-		RootFields:      stats.Container.ToMapStr(),
+		RootFields:      rootFields,
 		MetricSetFields: fields,
 	})
 }

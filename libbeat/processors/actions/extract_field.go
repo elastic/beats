@@ -22,8 +22,8 @@ import (
 	"strings"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type extract_field struct {
@@ -44,7 +44,7 @@ func init() {
 }
 */
 
-func NewExtractField(c *common.Config) (processors.Processor, error) {
+func NewExtractField(c *conf.C) (beat.Processor, error) {
 	config := struct {
 		Field     string `config:"field"`
 		Separator string `config:"separator"`
@@ -53,7 +53,7 @@ func NewExtractField(c *common.Config) (processors.Processor, error) {
 	}{}
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the extract_field configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the extract_field configuration: %w", err)
 	}
 
 	/* remove read only fields */
@@ -89,7 +89,7 @@ func (f *extract_field) Run(event *beat.Event) (*beat.Event, error) {
 		return event, fmt.Errorf("index is out of range for field '%s'", f.Field)
 	}
 
-	event.PutValue(f.Target, parts[f.Index])
+	_, _ = event.PutValue(f.Target, parts[f.Index])
 
 	return event, nil
 }

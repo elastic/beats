@@ -23,12 +23,13 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport"
+
+	"github.com/elastic/beats/v7/heartbeat/ecserr"
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/look"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
 // TCPDialer creates a new NetDialer with constant event fields and default
@@ -38,12 +39,12 @@ import (
 //
 // The dialer will update the active events with:
 //
-//  {
-//    "tcp": {
-//      "port": ...,
-//      "rtt": { "connect": { "us": ... }}
-//    }
-//  }
+//	{
+//	  "tcp": {
+//	    "port": ...,
+//	    "rtt": { "connect": { "us": ... }}
+//	  }
+//	}
 func TCPDialer(to time.Duration) NetDialer {
 	return CreateNetDialer(to)
 }
@@ -55,12 +56,12 @@ func TCPDialer(to time.Duration) NetDialer {
 //
 // The dialer will update the active events with:
 //
-//  {
-//    "udp": {
-//      "port": ...,
-//      "rtt": { "connect": { "us": ... }}
-//    }
-//  }
+//	{
+//	  "udp": {
+//	    "port": ...,
+//	    "rtt": { "connect": { "us": ... }}
+//	  }
+//	}
 func UDPDialer(to time.Duration) NetDialer {
 	return CreateNetDialer(to)
 }
@@ -69,7 +70,7 @@ func UDPDialer(to time.Duration) NetDialer {
 func CreateNetDialer(timeout time.Duration) NetDialer {
 	return func(event *beat.Event) (transport.Dialer, error) {
 		return makeDialer(func(network, address string) (net.Conn, error) {
-			namespace := ""
+			var namespace string
 
 			switch network {
 			case "tcp", "tcp4", "tcp6":
@@ -92,8 +93,7 @@ func CreateNetDialer(timeout time.Duration) NetDialer {
 
 			addresses, err := net.LookupHost(host)
 			if err != nil {
-				logp.Warn(`DNS lookup failure "%s": %v`, host, err)
-				return nil, err
+				return nil, ecserr.NewDNSLookupFailedErr(host, err)
 			}
 
 			// dial via host IP by randomized iteration of known IPs
@@ -102,17 +102,17 @@ func CreateNetDialer(timeout time.Duration) NetDialer {
 			start := time.Now()
 			conn, err := transport.DialWith(dialer, network, host, addresses, port)
 			if err != nil {
-				return nil, err
+				return nil, ecserr.NewCouldNotConnectErr(host, port, err)
 			}
 
 			end := time.Now()
-			eventext.MergeEventFields(event, common.MapStr{
-				namespace: common.MapStr{
-					"rtt": common.MapStr{
-						"connect": look.RTT(end.Sub(start)),
-					},
+			ef := mapstr.M{}
+			ef[namespace] = mapstr.M{
+				"rtt": mapstr.M{
+					"connect": look.RTT(end.Sub(start)),
 				},
-			})
+			}
+			eventext.MergeEventFields(event, ef)
 
 			return conn, nil
 		}), nil

@@ -18,10 +18,11 @@
 package mage
 
 import (
+	"errors"
+	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
-
-	"github.com/pkg/errors"
 )
 
 const kibanaBuildDir = "build/kibana"
@@ -41,7 +42,7 @@ func KibanaDashboards(moduleDirs ...string) error {
 	// X-Pack Beats only add dashboards with modules (this will require a
 	// change if we have X-Pack only Beats).
 	cp := &CopyTask{Source: OSSBeatDir("_meta/kibana"), Dest: kibanaBuildDir}
-	if err := cp.Execute(); err != nil && !os.IsNotExist(errors.Cause(err)) {
+	if err := cp.Execute(); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return err
 	}
 
@@ -80,7 +81,7 @@ func PackageKibanaDashboardsFromBuildDir() {
 			case Deb, RPM:
 				pkgArgs.Spec.ReplaceFile("/usr/share/{{.BeatName}}/kibana", kibanaDashboards)
 			default:
-				panic(errors.Errorf("unhandled package type: %v", pkgType))
+				panic(fmt.Errorf("unhandled package type: %v", pkgType))
 			}
 			break
 		}

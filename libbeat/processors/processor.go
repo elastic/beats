@@ -18,28 +18,22 @@
 package processors
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const logName = "processors"
 
 // Processors is
 type Processors struct {
-	List []Processor
+	List []beat.Processor
 	log  *logp.Logger
-}
-
-// Processor is the interface that all processors must implement
-type Processor interface {
-	Run(event *beat.Event) (*beat.Event, error)
-	String() string
 }
 
 // Closer defines the interface for processors that should be closed after using
@@ -52,7 +46,7 @@ type Closer interface {
 }
 
 // Close closes a processor if it implements the Closer interface
-func Close(p Processor) error {
+func Close(p beat.Processor) error {
 	if closer, ok := p.(Closer); ok {
 		return closer.Close()
 	}
@@ -77,14 +71,14 @@ func New(config PluginConfig) (*Processors, error) {
 		if procConfig.HasField("if") {
 			p, err := NewIfElseThenProcessor(procConfig)
 			if err != nil {
-				return nil, errors.Wrap(err, "failed to make if/then/else processor")
+				return nil, fmt.Errorf("failed to make if/then/else processor: %w", err)
 			}
 			procs.AddProcessor(p)
 			continue
 		}
 
 		if len(procConfig.GetFields()) != 1 {
-			return nil, errors.Errorf("each processor must have exactly one "+
+			return nil, fmt.Errorf("each processor must have exactly one "+
 				"action, but found %d actions (%v)",
 				len(procConfig.GetFields()),
 				strings.Join(procConfig.GetFields(), ","))
@@ -103,10 +97,10 @@ func New(config PluginConfig) (*Processors, error) {
 				validActions = append(validActions, k)
 
 			}
-			return nil, errors.Errorf("the processor action %s does not exist. Valid actions: %v", actionName, strings.Join(validActions, ", "))
+			return nil, fmt.Errorf("the processor action %s does not exist. Valid actions: %v", actionName, strings.Join(validActions, ", "))
 		}
 
-		actionCfg.PrintDebugf("Configure processor action '%v' with:", actionName)
+		common.PrintConfigDebugf(actionCfg, "Configure processor action '%v' with:", actionName)
 		constructor := gen.Plugin()
 		plugin, err := constructor(actionCfg)
 		if err != nil {
@@ -123,7 +117,7 @@ func New(config PluginConfig) (*Processors, error) {
 }
 
 // AddProcessor adds a single Processor to Processors
-func (procs *Processors) AddProcessor(p Processor) {
+func (procs *Processors) AddProcessor(p beat.Processor) {
 	procs.List = append(procs.List, p)
 }
 
@@ -131,7 +125,7 @@ func (procs *Processors) AddProcessor(p Processor) {
 func (procs *Processors) AddProcessors(p Processors) {
 	// Subtlety: it is important here that we append the individual elements of
 	// p, rather than p itself, even though
-	// p implements the processors.Processor interface. This is
+	// p implements the beat.Processor interface. This is
 	// because the contents of what we return are later pulled out into a
 	// processing.group rather than a processors.Processors, and the two have
 	// different error semantics: processors.Processors aborts processing on
@@ -143,32 +137,13 @@ func (procs *Processors) AddProcessors(p Processors) {
 	procs.List = append(procs.List, p.List...)
 }
 
-// RunBC (run backwards-compatible) applies the processors, by providing the
-// old interface based on common.MapStr.
-// The event us temporarily converted to beat.Event. By this 'conversion' the
-// '@timestamp' field can not be accessed by processors.
-// Note: this method will be removed, when the publisher pipeline BC-API is to
-//       be removed.
-func (procs *Processors) RunBC(event common.MapStr) common.MapStr {
-	ret, err := procs.Run(&beat.Event{Fields: event})
-	if err != nil {
-		procs.log.Debugw("Error in processor pipeline", "error", err)
-	}
-	if ret == nil {
-		return nil
-	}
-	return ret.Fields
-}
-
 func (procs *Processors) All() []beat.Processor {
 	if procs == nil || len(procs.List) == 0 {
 		return nil
 	}
 
 	ret := make([]beat.Processor, len(procs.List))
-	for i, p := range procs.List {
-		ret[i] = p
-	}
+	copy(ret, procs.List)
 	return ret
 }
 
@@ -191,7 +166,7 @@ func (procs *Processors) Run(event *beat.Event) (*beat.Event, error) {
 	for _, p := range procs.List {
 		event, err = p.Run(event)
 		if err != nil {
-			return event, errors.Wrapf(err, "failed applying processor %v", p)
+			return event, fmt.Errorf("failed applying processor %v: %w", p, err)
 		}
 		if event == nil {
 			// Drop.

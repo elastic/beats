@@ -20,11 +20,10 @@ package postgresql
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	// Register postgresql database/sql driver
 	_ "github.com/lib/pq"
@@ -46,29 +45,29 @@ func (ms *MetricSet) DB(ctx context.Context) (*sql.Conn, error) {
 	if ms.db == nil {
 		db, err := sql.Open("postgres", ms.HostData().URI)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed to open connection")
+			return nil, fmt.Errorf("failed to open connection: %w", err)
 		}
 		ms.db = db
 	}
 	return ms.db.Conn(ctx)
 }
 
-//QueryStats makes the database call for a given metric
+// QueryStats makes the database call for a given metric
 func (ms *MetricSet) QueryStats(ctx context.Context, query string) ([]map[string]interface{}, error) {
 	db, err := ms.DB(ctx)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to obtain a connection with the database")
+		return nil, fmt.Errorf("failed to obtain a connection with the database: %w", err)
 	}
 	defer db.Close()
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to query database")
+		return nil, fmt.Errorf("failed to query database: %w", err)
 	}
 
 	columns, err := rows.Columns()
 	if err != nil {
-		return nil, errors.Wrap(err, "scanning columns")
+		return nil, fmt.Errorf("scanning columns: %w", err)
 	}
 	vals := make([][]byte, len(columns))
 	valPointers := make([]interface{}, len(columns))
@@ -81,7 +80,7 @@ func (ms *MetricSet) QueryStats(ctx context.Context, query string) ([]map[string
 	for rows.Next() {
 		err = rows.Scan(valPointers...)
 		if err != nil {
-			return nil, errors.Wrap(err, "scanning row")
+			return nil, fmt.Errorf("scanning row: %w", err)
 		}
 
 		result := map[string]interface{}{}
@@ -100,5 +99,9 @@ func (ms *MetricSet) Close() error {
 	if ms.db == nil {
 		return nil
 	}
-	return errors.Wrap(ms.db.Close(), "failed to close connection")
+
+	if err := ms.db.Close(); err != nil {
+		return fmt.Errorf("failed to close connection: %w", err)
+	}
+	return nil
 }

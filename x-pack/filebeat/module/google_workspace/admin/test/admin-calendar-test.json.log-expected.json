@@ -6,9 +6,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "8532315307422709518",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"CREATE_BUILDING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"8532315307422709518\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"CREATE_BUILDING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation"
@@ -55,9 +55,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-0659083432240076691",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"DELETE_BUILDING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-0659083432240076691\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"DELETE_BUILDING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion"
@@ -70,7 +70,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 413,
+        "log.offset": 433,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -104,9 +104,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "7633087410858312488",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"UPDATE_BUILDING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"FIELD_NAME\",\"value\":\"field\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"RESOURCE_IDENTIFIER\",\"value\":\"1234\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"7633087410858312488\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"UPDATE_BUILDING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"FIELD_NAME\",\"value\":\"field\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"RESOURCE_IDENTIFIER\",\"value\":\"1234\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -122,7 +122,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 826,
+        "log.offset": 867,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -156,9 +156,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "6755112859328875408",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"CREATE_CALENDAR_RESOURCE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"6755112859328875408\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"CREATE_CALENDAR_RESOURCE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation"
@@ -171,7 +171,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1358,
+        "log.offset": 1419,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -205,9 +205,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "9575225912544424510",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"DELETE_CALENDAR_RESOURCE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"9575225912544424510\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"DELETE_CALENDAR_RESOURCE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion"
@@ -220,7 +220,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 1780,
+        "log.offset": 1861,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -254,9 +254,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "6241185839134492934",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"CREATE_CALENDAR_RESOURCE_FEATURE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"6241185839134492934\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"CREATE_CALENDAR_RESOURCE_FEATURE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "creation"
@@ -269,7 +269,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2202,
+        "log.offset": 2303,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -303,9 +303,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "2500346109574312006",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"DELETE_CALENDAR_RESOURCE_FEATURE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"2500346109574312006\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"DELETE_CALENDAR_RESOURCE_FEATURE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "deletion"
@@ -318,7 +318,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 2632,
+        "log.offset": 2753,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -353,9 +353,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "9622511628546833370",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"UPDATE_CALENDAR_RESOURCE_FEATURE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"FIELD_NAME\",\"value\":\"field\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"RESOURCE_IDENTIFIER\",\"value\":\"1234\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"9622511628546833370\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"UPDATE_CALENDAR_RESOURCE_FEATURE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"FIELD_NAME\",\"value\":\"field\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"RESOURCE_IDENTIFIER\",\"value\":\"1234\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -371,7 +371,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3062,
+        "log.offset": 3203,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -405,9 +405,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "9712212126022923442",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"RENAME_CALENDAR_RESOURCE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"9712212126022923442\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"RENAME_CALENDAR_RESOURCE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -421,7 +421,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 3611,
+        "log.offset": 3772,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -455,9 +455,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "7069619938194786459",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"UPDATE_CALENDAR_RESOURCE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"FIELD_NAME\",\"value\":\"field\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"RESOURCE_IDENTIFIER\",\"value\":\"1234\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"7069619938194786459\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"UPDATE_CALENDAR_RESOURCE\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"FIELD_NAME\",\"value\":\"field\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"RESOURCE_IDENTIFIER\",\"value\":\"1234\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -473,7 +473,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 4068,
+        "log.offset": 4249,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -508,9 +508,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "2192158515573763382",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"CHANGE_CALENDAR_SETTING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"GROUP_EMAIL\",\"value\":\"group@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"2192158515573763382\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"CHANGE_CALENDAR_SETTING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"GROUP_EMAIL\",\"value\":\"group@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -529,7 +529,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 4609,
+        "log.offset": 4810,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -563,9 +563,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-3563925598261988641",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"CANCEL_CALENDAR_EVENTS\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-3563925598261988641\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"CANCEL_CALENDAR_EVENTS\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -577,7 +577,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 5197,
+        "log.offset": 5418,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -615,9 +615,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "9644678907482917042",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"RELEASE_CALENDAR_RESOURCES\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"9644678907482917042\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"CALENDAR_SETTINGS\",\"name\":\"RELEASE_CALENDAR_RESOURCES\",\"parameters\":[{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -629,7 +629,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 5586,
+        "log.offset": 5828,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"

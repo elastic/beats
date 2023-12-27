@@ -1,0 +1,19 @@
+{
+    "data_stream": {},
+    "index_patterns": ["json-ds"],
+    "template": {
+        "settings": {
+            "number_of_shards": 1
+        },
+        "mappings": {
+            "_source": {
+                "enabled": false
+            },
+            "properties": {
+                "host_name": {
+                    "type": "keyword"
+                }
+            }
+        }
+    }
+}

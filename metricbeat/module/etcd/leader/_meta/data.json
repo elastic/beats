@@ -3,8 +3,15 @@
     "etcd": {
         "api_version": "2",
         "leader": {
-            "followers": {},
-            "leader": "8e9e05c52164694d"
+            "follower": {
+                "id": "5a22bdba1efc5b4a",
+                "latency":{ 
+                    "ms": 0.001494 
+                },
+                "success_operations": 1248,
+                "failed_operations": 0,
+                "leader": "d3cf079af51fa9a8"
+            }
         }
     },
     "event": {

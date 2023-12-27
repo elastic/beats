@@ -18,19 +18,28 @@
 package mage
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
-
-	"github.com/pkg/errors"
 )
 
 // Copy copies a file or a directory (recursively) and preserves the permissions.
 func Copy(src, dest string) error {
 	copy := &CopyTask{Source: src, Dest: dest}
 	return copy.Execute()
+}
+
+// Copy copies a file and preserves the permissions.
+func CopyFile(src, dest string) error {
+	copy := &CopyTask{Source: src, Dest: dest}
+	info, err := os.Stat(src)
+	if err != nil {
+		return fmt.Errorf("copy failed: cannot stat source file %v: %w", src, err)
+	}
+	return copy.fileCopy(src, dest, info)
 }
 
 // CopyTask copies a file or directory (recursively) and preserves the permissions.
@@ -46,22 +55,27 @@ type CopyTask struct {
 // Execute executes the copy and returns an error of there is a failure.
 func (t *CopyTask) Execute() error {
 	if err := t.init(); err != nil {
-		return errors.Wrap(err, "copy failed")
+		return fmt.Errorf("copy failed: %w", err)
 	}
 
 	info, err := os.Stat(t.Source)
 	if err != nil {
-		return errors.Wrapf(err, "copy failed: cannot stat source file %v", t.Source)
+		return fmt.Errorf("copy failed: cannot stat source file %v: %w", t.Source, err)
 	}
 
-	return errors.Wrap(t.recursiveCopy(t.Source, t.Dest, info), "copy failed")
+	err = t.recursiveCopy(t.Source, t.Dest, info)
+	if err != nil {
+		return fmt.Errorf("copy failed: %w", err)
+	}
+
+	return nil
 }
 
 func (t *CopyTask) init() error {
 	for _, excl := range t.Exclude {
 		re, err := regexp.Compile(excl)
 		if err != nil {
-			return errors.Wrapf(err, "bad exclude pattern %v", excl)
+			return fmt.Errorf("bad exclude pattern %v: %w", excl, err)
 		}
 		t.excludes = append(t.excludes, re)
 	}
@@ -96,7 +110,7 @@ func (t *CopyTask) fileCopy(src, dest string, info os.FileInfo) error {
 	defer srcFile.Close()
 
 	if !info.Mode().IsRegular() {
-		return errors.Errorf("failed to copy source file because it is not a " +
+		return fmt.Errorf("failed to copy source file because it is not a " +
 			"regular file")
 	}
 
@@ -127,19 +141,19 @@ func (t *CopyTask) dirCopy(src, dest string, info os.FileInfo) error {
 		mode = info.Mode()
 	}
 	if err := os.MkdirAll(dest, mode&os.ModePerm); err != nil {
-		return errors.Wrap(err, "failed creating dirs")
+		return fmt.Errorf("failed creating dirs: %w", err)
 	}
 
 	contents, err := ioutil.ReadDir(src)
 	if err != nil {
-		return errors.Wrapf(err, "failed to read dir %v", src)
+		return fmt.Errorf("failed to read dir %v: %w", src, err)
 	}
 
 	for _, info := range contents {
 		srcFile := filepath.Join(src, info.Name())
 		destFile := filepath.Join(dest, info.Name())
 		if err = t.recursiveCopy(srcFile, destFile, info); err != nil {
-			return errors.Wrapf(err, "failed to copy %v to %v", srcFile, destFile)
+			return fmt.Errorf("failed to copy %v to %v: %w", srcFile, destFile, err)
 		}
 	}
 

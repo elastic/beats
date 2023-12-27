@@ -26,7 +26,7 @@ import (
 
 	rd "github.com/gomodule/redigo/redis"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Redis types
@@ -52,15 +52,39 @@ func ParseRedisInfo(info string) map[string]string {
 		// Values are separated by :
 		parts := ParseRedisLine(value, ":")
 		if len(parts) == 2 {
-			values[parts[0]] = parts[1]
+			if strings.Contains(parts[0], "cmdstat_") {
+				cmdstats := ParseRedisCommandStats(parts[0], parts[1])
+				for k, v := range cmdstats {
+					key := parts[0] + "_" + k
+					values[key] = v
+				}
+			} else {
+				values[parts[0]] = parts[1]
+			}
 		}
 	}
 	return values
 }
 
 // ParseRedisLine parses a single line returned by INFO
-func ParseRedisLine(s string, delimiter string) []string {
+func ParseRedisLine(s, delimiter string) []string {
 	return strings.Split(s, delimiter)
+}
+
+// ParseRedisCommandStats parses a map of stats returned by INFO COMMANDSTATS
+func ParseRedisCommandStats(key, s string) map[string]string {
+	// calls=XX,usec=XXX,usec_per_call=XXX
+	results := strings.Split(s, ",")
+
+	values := map[string]string{}
+
+	for _, value := range results {
+		parts := strings.Split(value, "=")
+		if len(parts) == 2 {
+			values[parts[0]] = parts[1]
+		}
+	}
+	return values
 }
 
 // FetchRedisInfo returns a map of requested stats.
@@ -184,27 +208,30 @@ func (p *Pool) DBNumber() int {
 }
 
 // CreatePool creates a redis connection pool
-func CreatePool(
-	host, password, network string,
-	dbNumber int,
-	maxConn int,
-	idleTimeout, connTimeout time.Duration,
-) *Pool {
+func CreatePool(host, username, password string, dbNumber int, config *Config, connTimeout time.Duration) *Pool {
 	pool := &rd.Pool{
-		MaxIdle:     maxConn,
-		IdleTimeout: idleTimeout,
+		MaxIdle:     config.MaxConn,
+		IdleTimeout: config.IdleTimeout,
 		Dial: func() (rd.Conn, error) {
-			return rd.Dial(network, host,
+			dialOptions := []rd.DialOption{
+				rd.DialUsername(username),
 				rd.DialPassword(password),
 				rd.DialDatabase(dbNumber),
 				rd.DialConnectTimeout(connTimeout),
 				rd.DialReadTimeout(connTimeout),
-				rd.DialWriteTimeout(connTimeout))
+				rd.DialWriteTimeout(connTimeout),
+			}
+
+			if config.TLS.IsEnabled() {
+				dialOptions = append(dialOptions,
+					rd.DialUseTLS(true),
+					rd.DialTLSConfig(config.UseTLSConfig),
+				)
+			}
+
+			return rd.Dial(config.Network, host, dialOptions...)
 		},
 	}
 
-	return &Pool{
-		Pool:     pool,
-		dbNumber: dbNumber,
-	}
+	return &Pool{Pool: pool, dbNumber: dbNumber}
 }

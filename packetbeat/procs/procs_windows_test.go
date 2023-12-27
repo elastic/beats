@@ -16,11 +16,12 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package procs
 
 import (
+	"bytes"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"net"
@@ -37,7 +38,7 @@ func TestParseTableRaw(t *testing.T) {
 	pid := uint32(0xCCCCCCCC)
 	for idx, testCase := range []struct {
 		name     string
-		factory  extractorFactory
+		factory  func(fn callbackFn) extractor
 		raw      string
 		expected []portProcMapping
 		mustErr  bool
@@ -110,8 +111,61 @@ func TestParseTableRaw(t *testing.T) {
 	}
 }
 
-func TestParseTableSizes(t *testing.T) {
-	// Make sure the structs in Golang have the expected size
-	assert.Equal(t, uintptr(sizeOfTCPRowOwnerPID), unsafe.Sizeof(TCPRowOwnerPID{}))
-	assert.Equal(t, uintptr(sizeOfTCP6RowOwnerPID), unsafe.Sizeof(TCP6RowOwnerPID{}))
+func TestAddressIPv4(t *testing.T) {
+	// The dwLocalAddr and dwRemoteAddr members are stored as a DWORD in the same format as the in_addr structure.
+	// e.g. https://docs.microsoft.com/en-us/windows/win32/api/tcpmib/ns-tcpmib-mib_tcprow_owner_pid#remarks
+	network := binary.BigEndian
+
+	for _, test := range []struct {
+		// https://docs.microsoft.com/en-us/windows/win32/api/winsock2/ns-winsock2-in_addr
+		a, b, c, d uint8
+	}{
+		{a: 1, b: 2, c: 3, d: 4},
+		{a: 128, b: 64, c: 196, d: 32},
+	} {
+		var buf bytes.Buffer
+		err := binary.Write(&buf, network, test)
+		if err != nil {
+			t.Errorf("failed to write %+v: %v", test, err)
+			continue
+		}
+		dword := *(*uint32)(unsafe.Pointer((*[4]byte)(buf.Bytes())))
+		got := addressIPv4(dword)
+		want := net.IP{test.a, test.b, test.c, test.d}
+		if !got.Equal(want) {
+			t.Errorf("unexpected result from %+v: got:%d want:%d", test, got, want)
+		}
+	}
+}
+
+func TestUint32FieldToPort(t *testing.T) {
+	// The dwLocalPort, and dwRemotePort members are in network byte order.
+	// e.g. https://docs.microsoft.com/en-us/windows/win32/api/tcpmib/ns-tcpmib-mib_tcprow_owner_pid#remarks
+	network := binary.BigEndian
+
+	for _, test := range []struct {
+		port  uint16
+		decoy uint16
+	}{
+		{port: 1, decoy: 0xffff},
+		{port: 2, decoy: 0xffff},
+		{port: 128, decoy: 0xffff},
+		{port: 256, decoy: 0xffff},
+		{port: 512, decoy: 0xffff},
+		{port: 512, decoy: 0xffff},
+		{port: 32767, decoy: 0xffff},
+	} {
+		var buf bytes.Buffer
+		err := binary.Write(&buf, network, test)
+		if err != nil {
+			t.Errorf("failed to write %+v: %v", test, err)
+			continue
+		}
+		dword0 := *(*uint32)(unsafe.Pointer((*[4]byte)(buf.Bytes())))
+		got := uint32FieldToPort(dword0)
+		want := test.port
+		if got != want {
+			t.Errorf("unexpected result from %+v: got:%d want:%d", test, got, want)
+		}
+	}
 }

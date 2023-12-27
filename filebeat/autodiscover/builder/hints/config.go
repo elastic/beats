@@ -17,30 +17,46 @@
 
 package hints
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import (
+	conf "github.com/elastic/elastic-agent-libs/config"
+)
 
 type config struct {
-	Key           string         `config:"key"`
-	DefaultConfig *common.Config `config:"default_config"`
+	Key           string  `config:"key"`
+	DefaultConfig *conf.C `config:"default_config"`
 }
 
 func defaultConfig() config {
 	defaultCfgRaw := map[string]interface{}{
-		"type": "container",
+		"type": "filestream",
+		"id":   "kubernetes-container-logs-${data.kubernetes.container.id}",
+		"prospector": map[string]interface{}{
+			"scanner": map[string]interface{}{
+				"fingerprint.enabled": true,
+				"symlinks":            true,
+			},
+		},
+		"file_identity.fingerprint": nil,
+		"parsers": []interface{}{
+			map[string]interface{}{
+				"container": map[string]interface{}{
+					"stream": "all",
+					"format": "auto",
+				},
+			},
+		},
 		"paths": []string{
-			// To be able to use this builder with CRI-O replace paths with:
-			// /var/log/pods/${data.kubernetes.pod.uid}/${data.kubernetes.container.name}/*.log
-			"/var/lib/docker/containers/${data.container.id}/*-json.log",
+			"/var/log/containers/*-${data.kubernetes.container.id}.log",
 		},
 	}
-	defaultCfg, _ := common.NewConfigFrom(defaultCfgRaw)
+	defaultCfg, _ := conf.NewConfigFrom(defaultCfgRaw)
 	return config{
 		Key:           "logs",
 		DefaultConfig: defaultCfg,
 	}
 }
 
-func (c *config) Unpack(from *common.Config) error {
+func (c *config) Unpack(from *conf.C) error {
 	tmpConfig := struct {
 		Key string `config:"key"`
 	}{
@@ -55,12 +71,12 @@ func (c *config) Unpack(from *common.Config) error {
 		if len(fields) == 1 && fields[0] == "enabled" {
 			// only enabling/disabling default config:
 			if err := c.DefaultConfig.Merge(config); err != nil {
-				return nil
+				return err
 			}
 		} else {
 			// full config provided, discard default. It must be a clone of the
 			// given config otherwise it could be updated across multiple inputs.
-			c.DefaultConfig = common.MustNewConfigFrom(config)
+			c.DefaultConfig = conf.MustNewConfigFrom(config)
 		}
 	}
 

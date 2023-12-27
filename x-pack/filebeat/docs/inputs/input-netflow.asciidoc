@@ -55,6 +55,17 @@ The time before an idle session or unused template is expired.
 Only applicable to v9 and IPFIX protocols. A value of zero disables expiration.
 
 [float]
+[[share_templates]]
+==== `share_templates`
+
+This option allows v9 and ipfix templates to be shared within a session without
+reference to the origin of the template.
+
+Note that setting this to true is not recommended as it can result in the wrong
+template being applied under certain conditions, but it may be required for some
+systems.
+
+[float]
 [[queue_size]]
 ==== `queue_size`
 

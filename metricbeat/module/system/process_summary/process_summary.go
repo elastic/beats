@@ -16,20 +16,22 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || windows || aix
-// +build darwin freebsd linux windows aix
 
 package process_summary
 
 import (
+	"fmt"
+	"io/ioutil"
 	"runtime"
+	"strconv"
+	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	sigar "github.com/elastic/gosigar"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // init registers the MetricSet with the central registry.
@@ -47,14 +49,17 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
+	sys resolve.Resolver
 }
 
 // New create a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
+	sys := base.Module().(resolve.Resolver)
 	return &MetricSet{
 		BaseMetricSet: base,
+		sys:           sys,
 	}, nil
 }
 
@@ -62,77 +67,70 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // It returns the event which is then forward to the output. In case of an error, a
 // descriptive error must be returned.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	pids := sigar.ProcList{}
-	err := pids.Get()
+
+	procList, err := process.ListStates(m.sys)
 	if err != nil {
-		return errors.Wrap(err, "failed to fetch the list of PIDs")
+		return fmt.Errorf("error fetching process list: %w", err)
 	}
 
-	var summary struct {
-		sleeping int
-		running  int
-		idle     int
-		stopped  int
-		zombie   int
-		unknown  int
-		dead     int
+	procStates := map[string]int{}
+	for _, proc := range procList {
+		if count, ok := procStates[string(proc.State)]; ok {
+			procStates[string(proc.State)] = count + 1
+		} else {
+			procStates[string(proc.State)] = 1
+		}
 	}
 
-	for _, pid := range pids.List {
-		state := sigar.ProcState{}
-		err = state.Get(pid)
+	outMap := mapstr.M{}
+	err = typeconv.Convert(&outMap, procStates)
+	if err != nil {
+		return fmt.Errorf("error formatting process stats: %w", err)
+	}
+	if runtime.GOOS == "linux" {
+		threads, err := threadStats(m.sys)
 		if err != nil {
-			summary.unknown++
-			continue
+			return fmt.Errorf("error fetching thread stats: %w", err)
 		}
-
-		switch byte(state.State) {
-		case 'S':
-			summary.sleeping++
-		case 'R':
-			summary.running++
-		case 'D':
-			summary.idle++
-		case 'I':
-			summary.idle++
-		case 'T':
-			summary.stopped++
-		case 'Z':
-			summary.zombie++
-		case 'X':
-			summary.dead++
-		default:
-			logp.Err("Unknown or unexpected state <%c> for process with pid %d", state.State, pid)
-			summary.unknown++
-		}
+		outMap["threads"] = threads
 	}
-
-	event := common.MapStr{}
-	if runtime.GOOS == "windows" {
-		event = common.MapStr{
-			"total":    len(pids.List),
-			"sleeping": summary.sleeping,
-			"running":  summary.running,
-			"unknown":  summary.unknown,
-		}
-	} else {
-		event = common.MapStr{
-			"total":    len(pids.List),
-			"sleeping": summary.sleeping,
-			"running":  summary.running,
-			"idle":     summary.idle,
-			"stopped":  summary.stopped,
-			"zombie":   summary.zombie,
-			"unknown":  summary.unknown,
-			"dead":     summary.dead,
-		}
-	}
-
+	outMap["total"] = len(procList)
 	r.Event(mb.Event{
 		// change the name space to use . instead of _
 		Namespace:       "system.process.summary",
-		MetricSetFields: event,
+		MetricSetFields: outMap,
 	})
 
 	return nil
+}
+
+// threadStats returns a map of state counts for running threads on a system
+func threadStats(sys resolve.Resolver) (mapstr.M, error) {
+	statPath := sys.ResolveHostFS("/proc/stat")
+	procData, err := ioutil.ReadFile(statPath)
+	if err != nil {
+		return nil, fmt.Errorf("error reading procfs file %s: %w", statPath, err)
+	}
+	threadData := mapstr.M{}
+	for _, line := range strings.Split(string(procData), "\n") {
+		// look for format procs_[STATE] [COUNT]
+		fields := strings.Fields(line)
+		if len(fields) < 2 {
+			continue
+		}
+		if strings.Contains(fields[0], "procs_") {
+			keyFields := strings.Split(fields[0], "_")
+			// the field isn't what we're expecting, continue
+			if len(keyFields) < 2 {
+				continue
+			}
+			procsInt, err := strconv.ParseInt(fields[1], 10, 64)
+			if err != nil {
+				return nil, fmt.Errorf("Error parsing value %s from %s: %w", fields[0], statPath, err)
+			}
+
+			threadData[keyFields[1]] = procsInt
+		}
+	}
+	return threadData, nil
 }

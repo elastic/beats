@@ -1,0 +1,52 @@
+name: OpenTelemetry Export Trace
+
+on:
+  workflow_run:
+    workflows:
+      - bump-elastic-stack-snapshot
+      - bump-golang
+      - check-auditbeat
+      - check-default
+      - check-dev-tools
+      - check-docs
+      - check-filebeat
+      - check-heartbeat
+      - check-libbeat
+      - check-metricbeat
+      - check-packetbeat
+      - check-winlogbeat
+      - check-x-pack-auditbeat
+      - check-x-pack-dockerlogbeat
+      - check-x-pack-filebeat
+      - check-x-pack-functionbeat
+      - check-x-pack-heartbeat
+      - check-x-pack-libbeat
+      - check-x-pack-metricbeat
+      - check-x-pack-osquerybeat
+      - check-x-pack-packetbeat
+      - check-x-pack-winlogbeat
+      - golangci-lint
+      - notify-stalled-snapshots
+      - auditbeat
+      - filebeat
+      - heartbeat
+      - metricbeat
+      - packetbeat
+      - x-pack-auditbeat
+      - x-pack-filebeat
+      - x-pack-functionbeat
+      - x-pack-heartbeat
+      - x-pack-metricbeat
+      - x-pack-osquerybeat
+      - x-pack-packetbeat
+    types: [completed]
+
+jobs:
+  otel-export-trace:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: elastic/apm-pipeline-library/.github/actions/opentelemetry@current
+        with:
+          vaultUrl: ${{ secrets.VAULT_ADDR }}
+          vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
+          vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}

@@ -19,19 +19,22 @@ package file_integrity
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/hex"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
+	"os/user"
+	"reflect"
 	"runtime"
+	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var testEventTime = time.Now().UTC()
@@ -173,7 +176,7 @@ func TestDiffEvents(t *testing.T) {
 }
 
 func TestHashFile(t *testing.T) {
-	f, err := ioutil.TempFile("", "input.txt")
+	f, err := os.CreateTemp(t.TempDir(), "input.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,8 +184,14 @@ func TestHashFile(t *testing.T) {
 
 	const data = "hello world!\n"
 	const dataLen = uint64(len(data))
-	f.WriteString(data)
-	f.Sync()
+	_, err = f.WriteString(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = f.Sync()
+	if err != nil {
+		t.Fatal(err)
+	}
 	f.Close()
 
 	t.Run("valid hashes", func(t *testing.T) {
@@ -278,7 +287,7 @@ func TestHashFile(t *testing.T) {
 }
 
 func TestNewEventFromFileInfoHash(t *testing.T) {
-	f, err := ioutil.TempFile("", "input.txt")
+	f, err := os.CreateTemp(t.TempDir(), "input.txt")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -286,8 +295,14 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 
 	const data = "hello world!\n"
 	const dataLen = uint64(len(data))
-	f.WriteString(data)
-	f.Sync()
+	_, err = f.WriteString(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = f.Sync()
+	if err != nil {
+		t.Fatal(err)
+	}
 	defer f.Close()
 
 	info, err := os.Stat(f.Name())
@@ -296,7 +311,7 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 	}
 
 	t.Run("file stays the same", func(t *testing.T) {
-		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1})
+		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1}, nil)
 		if !assert.NotNil(t, ev) {
 			t.Fatal("nil event")
 		}
@@ -306,9 +321,15 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 		assert.Equal(t, digest, ev.Hashes[SHA1])
 	})
 	t.Run("file grows before hashing", func(t *testing.T) {
-		f.WriteString(data)
-		f.Sync()
-		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1})
+		_, err = f.WriteString(data)
+		if err != nil {
+			t.Fatal(err)
+		}
+		err = f.Sync()
+		if err != nil {
+			t.Fatal(err)
+		}
+		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1}, nil)
 		if !assert.NotNil(t, ev) {
 			t.Fatal("nil event")
 		}
@@ -322,9 +343,12 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 		if !assert.NoError(t, err) {
 			t.Fatal(err)
 		}
-		f.Sync()
+		err = f.Sync()
+		if err != nil {
+			t.Fatal(err)
+		}
 		assert.NoError(t, err)
-		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1})
+		ev := NewEventFromFileInfo(f.Name(), info, nil, Updated, SourceFSNotify, MaxValidFileSizeLimit, []HashType{SHA1}, nil)
 		if !assert.NotNil(t, ev) {
 			t.Fatal("nil event")
 		}
@@ -336,7 +360,7 @@ func TestNewEventFromFileInfoHash(t *testing.T) {
 }
 
 func BenchmarkHashFile(b *testing.B) {
-	f, err := ioutil.TempFile("", "hash")
+	f, err := os.CreateTemp(b.TempDir(), "hash")
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -351,7 +375,10 @@ func BenchmarkHashFile(b *testing.B) {
 	}
 	size := uint64(iterations * len(zeros))
 	b.Logf("file size: %v bytes", size)
-	f.Sync()
+	err = f.Sync()
+	if err != nil {
+		b.Fatal(err)
+	}
 	f.Close()
 	b.ResetTimer()
 
@@ -515,12 +542,12 @@ func TestBuildEvent(t *testing.T) {
 func mustDecodeHex(v string) []byte {
 	data, err := hex.DecodeString(v)
 	if err != nil {
-		panic(fmt.Errorf("invalid hex value: %v", err))
+		panic(fmt.Errorf("invalid hex value: %w", err))
 	}
 	return data
 }
 
-func assertHasKey(t testing.TB, m common.MapStr, key string) bool {
+func assertHasKey(t testing.TB, m mapstr.M, key string) bool {
 	t.Helper()
 	found, err := m.HasKey(key)
 	if err != nil || !found {
@@ -528,4 +555,50 @@ func assertHasKey(t testing.TB, m common.MapStr, key string) bool {
 		return false
 	}
 	return true
+}
+
+func TestACLText(t *testing.T) {
+	// The xattr package returns raw bytes, but command line tools such as getfattr
+	// return a base64-encoded format, so use that here to make test validation
+	// easier.
+	//
+	// Depending on the system we are running this test on, we may or may not
+	// have a username associated with the user's UID in the xattr string, so
+	// dynamically determine the username here.
+	tests := []struct {
+		encoded string
+		want    []string
+	}{
+		0: {
+			encoded: "0sAgAAAAEABgD/////AgAGAG8AAAAEAAQA/////xAABgD/////IAAEAP////8=",
+			want:    []string{"user::rw-", "user:" + userNameOrUID("111") + ":rw-", "group::r--", "mask::rw-", "other::r--"},
+		},
+		1: { // Encoded string from https://www.bityard.org/wiki/tech/os/linux/xattrs.
+			encoded: "0sAgAAAAEABgD/////AgAHAHwAAAAEAAQA/////xAABwD/////IAAEAP////8=",
+			want:    []string{"user::rw-", "user:" + userNameOrUID("124") + ":rwx", "group::r--", "mask::rwx", "other::r--"},
+		},
+	}
+	for i, test := range tests {
+		b, err := base64.StdEncoding.DecodeString(strings.TrimPrefix(test.encoded, "0s"))
+		if err != nil {
+			t.Errorf("invalid test: unexpected base64 encoding error for test %d: %v", i, err)
+			continue
+		}
+		got, err := aclText(b)
+		if err != nil {
+			t.Errorf("unexpected error for test %d: %v", i, err)
+			continue
+		}
+		if !reflect.DeepEqual(got, test.want) {
+			t.Errorf("unexpected result for test %d:\ngot: %#v\nwant:%#v", i, got, test.want)
+		}
+	}
+}
+
+func userNameOrUID(uid string) string {
+	u, err := user.LookupId(uid)
+	if err != nil {
+		return uid
+	}
+	return u.Username
 }

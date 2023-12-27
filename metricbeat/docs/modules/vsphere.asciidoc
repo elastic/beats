@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: vsphere
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/vsphere/_meta/docs.asciidoc
+
 
 [[metricbeat-module-vsphere]]
 == vSphere module
@@ -19,6 +21,8 @@ The vsphere module comes with a predefined dashboard. For example:
 image::./images/metricbeat_vsphere_dashboard.png[]
 image::./images/metricbeat_vsphere_vm_dashboard.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -60,3 +64,4 @@ include::vsphere/host.asciidoc[]
 
 include::vsphere/virtualmachine.asciidoc[]
 
+:edit_url!:

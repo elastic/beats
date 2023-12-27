@@ -20,16 +20,17 @@ package actions
 import (
 	"bytes"
 	"compress/gzip"
+	"errors"
 	"fmt"
 	"io"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type decompressGzipField struct {
@@ -51,7 +52,7 @@ func init() {
 }
 
 // NewDecompressGzipFields construct a new decompress_gzip_fields processor.
-func NewDecompressGzipFields(c *common.Config) (processors.Processor, error) {
+func NewDecompressGzipFields(c *conf.C) (beat.Processor, error) {
 	config := decompressGzipFieldConfig{
 		IgnoreMissing: false,
 		FailOnError:   true,
@@ -59,7 +60,7 @@ func NewDecompressGzipFields(c *common.Config) (processors.Processor, error) {
 
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unpack the decompress_gzip_fields configuration: %+v", err)
+		return nil, fmt.Errorf("failed to unpack the decompress_gzip_fields configuration: %w", err)
 	}
 
 	return &decompressGzipField{config: config, log: logp.NewLogger("decompress_gzip_field")}, nil
@@ -74,11 +75,13 @@ func (f *decompressGzipField) Run(event *beat.Event) (*beat.Event, error) {
 
 	err := f.decompressGzipField(event)
 	if err != nil {
-		errMsg := fmt.Errorf("Failed to decompress field in decompress_gzip_field processor: %v", err)
-		f.log.Debug(errMsg.Error())
+		errMsg := fmt.Errorf("Failed to decompress field in decompress_gzip_field processor: %w", err)
+		if publisher.LogWithTrace() {
+			f.log.Debug(errMsg.Error())
+		}
 		if f.config.FailOnError {
 			event = backup
-			event.PutValue("error.message", errMsg.Error())
+			_, _ = event.PutValue("error.message", errMsg.Error())
 			return event, err
 		}
 	}
@@ -88,10 +91,10 @@ func (f *decompressGzipField) Run(event *beat.Event) (*beat.Event, error) {
 func (f *decompressGzipField) decompressGzipField(event *beat.Event) error {
 	data, err := event.GetValue(f.config.Field.From)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return nil
 		}
-		return fmt.Errorf("could not fetch value for key: %s, Error: %v", f.config.Field.From, err)
+		return fmt.Errorf("could not fetch value for key: %s, Error: %w", f.config.Field.From, err)
 	}
 
 	var inBuf *bytes.Buffer
@@ -106,23 +109,24 @@ func (f *decompressGzipField) decompressGzipField(event *beat.Event) error {
 
 	r, err := gzip.NewReader(inBuf)
 	if err != nil {
-		return errors.Wrapf(err, "error decompressing field %s", f.config.Field.From)
+		return fmt.Errorf("error decompressing field %s: %w", f.config.Field.From, err)
 	}
 
 	var outBuf bytes.Buffer
+	//nolint:gosec // This is potentially vulnerable to "decompression bomb" DoS but that is inherent to this processor.
 	_, err = io.Copy(&outBuf, r)
 	if err != nil {
 		r.Close()
-		return fmt.Errorf("error while decompressing field: %v", err)
+		return fmt.Errorf("error while decompressing field: %w", err)
 	}
 
 	err = r.Close()
 	if err != nil {
-		return fmt.Errorf("error closing gzip reader: %v", err)
+		return fmt.Errorf("error closing gzip reader: %w", err)
 	}
 
 	if _, err = event.PutValue(f.config.Field.To, outBuf.String()); err != nil {
-		return fmt.Errorf("could not put decompressed data: %v", err)
+		return fmt.Errorf("could not put decompressed data: %w", err)
 	}
 	return nil
 }

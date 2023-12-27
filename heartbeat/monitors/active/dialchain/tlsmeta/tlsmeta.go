@@ -18,7 +18,7 @@
 package tlsmeta
 
 import (
-	dsa2 "crypto/dsa"
+	dsa2 "crypto/dsa" //nolint:staticcheck // we need to calculate DSA stuff for completeness
 	"crypto/ecdsa"
 	"crypto/rsa"
 	"crypto/sha1"
@@ -29,76 +29,103 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/heartbeat/look"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // UnknownTLSHandshakeDuration to be used in AddTLSMetadata when the duration of the TLS handshake can't be determined.
 const UnknownTLSHandshakeDuration = time.Duration(-1)
 
-func AddTLSMetadata(fields common.MapStr, connState cryptoTLS.ConnectionState, duration time.Duration) {
-	fields.Put("tls.established", true)
+func AddTLSMetadata(fields mapstr.M, connState cryptoTLS.ConnectionState, duration time.Duration) {
+	_, _ = fields.Put("tls.established", true)
 	if duration != UnknownTLSHandshakeDuration {
-		fields.Put("tls.rtt.handshake", look.RTT(duration))
+		_, _ = fields.Put("tls.rtt.handshake", look.RTT(duration))
 	}
 	versionDetails := tlscommon.TLSVersion(connState.Version).Details()
 	// The only situation in which versionDetails would be nil is if an unknown TLS version were to be
 	// encountered. Not filling the fields here makes sense, since there's no standard 'unknown' value.
 	if versionDetails != nil {
-		fields.Put("tls.version_protocol", versionDetails.Protocol)
-		fields.Put("tls.version", versionDetails.Version)
+		_, _ = fields.Put("tls.version_protocol", versionDetails.Protocol)
+		_, _ = fields.Put("tls.version", versionDetails.Version)
 	}
 
 	if connState.NegotiatedProtocol != "" {
-		fields.Put("tls.next_protocol", connState.NegotiatedProtocol)
+		_, _ = fields.Put("tls.next_protocol", connState.NegotiatedProtocol)
 	}
-	fields.Put("tls.cipher", tlscommon.ResolveCipherSuite(connState.CipherSuite))
+	_, _ = fields.Put("tls.cipher", tlscommon.ResolveCipherSuite(connState.CipherSuite))
 
-	AddCertMetadata(fields, connState.PeerCertificates)
+	tlsFields := CertFields(connState.PeerCertificates[0], connState.VerifiedChains)
+
+	fields.DeepUpdate(mapstr.M{"tls": tlsFields})
 }
 
-func AddCertMetadata(fields common.MapStr, certs []*x509.Certificate) {
-	hostCert := certs[0]
+func CertFields(hostCert *x509.Certificate, verifiedChains [][]*x509.Certificate) (tlsFields mapstr.M) {
+	x509Fields := mapstr.M{}
+	serverFields := mapstr.M{"x509": x509Fields}
+	tlsFields = mapstr.M{"server": serverFields}
 
-	x509Fields := common.MapStr{}
-	serverFields := common.MapStr{"x509": x509Fields}
-	tlsFields := common.MapStr{"server": serverFields}
+	_, _ = serverFields.Put("hash.sha1", fmt.Sprintf("%x", sha1.Sum(hostCert.Raw)))
+	_, _ = serverFields.Put("hash.sha256", fmt.Sprintf("%x", sha256.Sum256(hostCert.Raw)))
 
-	serverFields.Put("hash.sha1", fmt.Sprintf("%x", sha1.Sum(hostCert.Raw)))
-	serverFields.Put("hash.sha256", fmt.Sprintf("%x", sha256.Sum256(hostCert.Raw)))
-
-	x509Fields.Put("issuer.common_name", hostCert.Issuer.CommonName)
-	x509Fields.Put("issuer.distinguished_name", hostCert.Issuer.String())
-	x509Fields.Put("subject.common_name", hostCert.Subject.CommonName)
-	x509Fields.Put("subject.distinguished_name", hostCert.Subject.String())
-	x509Fields.Put("serial_number", hostCert.SerialNumber.String())
-	x509Fields.Put("signature_algorithm", hostCert.SignatureAlgorithm.String())
-	x509Fields.Put("public_key_algorithm", hostCert.PublicKeyAlgorithm.String())
+	_, _ = x509Fields.Put("issuer.common_name", hostCert.Issuer.CommonName)
+	_, _ = x509Fields.Put("issuer.distinguished_name", hostCert.Issuer.String())
+	_, _ = x509Fields.Put("subject.common_name", hostCert.Subject.CommonName)
+	_, _ = x509Fields.Put("subject.distinguished_name", hostCert.Subject.String())
+	_, _ = x509Fields.Put("serial_number", hostCert.SerialNumber.String())
+	_, _ = x509Fields.Put("signature_algorithm", hostCert.SignatureAlgorithm.String())
+	_, _ = x509Fields.Put("public_key_algorithm", hostCert.PublicKeyAlgorithm.String())
+	_, _ = x509Fields.Put("not_before", hostCert.NotBefore)
+	_, _ = tlsFields.Put("certificate_not_valid_before", hostCert.NotBefore)
+	_, _ = x509Fields.Put("not_after", hostCert.NotAfter)
+	_, _ = tlsFields.Put("certificate_not_valid_after", hostCert.NotAfter)
 	if rsaKey, ok := hostCert.PublicKey.(*rsa.PublicKey); ok {
 		sizeInBits := rsaKey.Size() * 8
-		x509Fields.Put("public_key_size", sizeInBits)
-		x509Fields.Put("public_key_exponent", rsaKey.E)
+		_, _ = x509Fields.Put("public_key_size", sizeInBits)
+		_, _ = x509Fields.Put("public_key_exponent", rsaKey.E)
 	} else if dsaKey, ok := hostCert.PublicKey.(*dsa2.PublicKey); ok {
 		if dsaKey.Parameters.P != nil {
-			x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
+			_, _ = x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
 		} else {
-			x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
+			_, _ = x509Fields.Put("public_key_size", len(dsaKey.P.Bytes())*8)
 		}
 	} else if ecdsa, ok := hostCert.PublicKey.(*ecdsa.PublicKey); ok {
-		x509Fields.Put("public_key_curve", ecdsa.Curve.Params().Name)
+		_, _ = x509Fields.Put("public_key_curve", ecdsa.Curve.Params().Name)
 	}
 
-	chainNotBefore, chainNotAfter := calculateCertTimestamps(certs)
-	// Legacy non-ECS field
-	tlsFields.Put("certificate_not_valid_before", chainNotBefore)
-	x509Fields.Put("not_before", chainNotBefore)
-	if chainNotAfter != nil {
+	// If we have fully verified cert chains, use those for the
+	// not_before / not_after timestamps
+	//
+	// we compute the soonest point at which this cert chain will become invalid
+	// this only happens when strict verification is enabled
+	// due to the implementation in elastic-agent-libs
+	// which only gives us the chain metadata in that scenario, unlike
+	// the go stdlib
+	// https://github.com/elastic/elastic-agent-libs/blob/main/transport/tlscommon/tls_config.go#L240
+	var latestChainExpiration time.Time
+	now := time.Now()
+	for _, chain := range verifiedChains {
+		chainNotBefore, chainNotAfter := calculateCertTimestamps(chain)
+
+		// If this chain expires sooner than a previously seen chain we don't
+		// set any fields
+		if chainNotAfter != nil {
+			if chainNotAfter.Before(latestChainExpiration) && chainNotBefore.After(now) {
+				continue
+			}
+			latestChainExpiration = *chainNotAfter
+		}
+
 		// Legacy non-ECS field
-		tlsFields.Put("certificate_not_valid_after", *chainNotAfter)
-		x509Fields.Put("not_after", *chainNotAfter)
+		_, _ = tlsFields.Put("certificate_not_valid_before", chainNotBefore)
+		_, _ = x509Fields.Put("not_before", chainNotBefore)
+		if chainNotAfter != nil {
+			// Legacy non-ECS field
+			_, _ = tlsFields.Put("certificate_not_valid_after", *chainNotAfter)
+			_, _ = x509Fields.Put("not_after", *chainNotAfter)
+		}
 	}
 
-	fields.DeepUpdate(common.MapStr{"tls": tlsFields})
+	return tlsFields
 }
 
 func calculateCertTimestamps(certs []*x509.Certificate) (chainNotBefore time.Time, chainNotAfter *time.Time) {
@@ -134,5 +161,5 @@ func calculateCertTimestamps(certs []*x509.Certificate) (chainNotBefore time.Tim
 		}
 	}
 
-	return
+	return chainNotBefore, chainNotAfter
 }

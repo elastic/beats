@@ -18,10 +18,10 @@
 package mb
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // LightMetricSet contains the definition of a non-registered metric set
@@ -43,10 +43,10 @@ type LightMetricSet struct {
 func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error) {
 	registration, err := r.metricSetRegistration(m.Input.Module, m.Input.MetricSet)
 	if err != nil {
-		return registration, errors.Wrapf(err,
-			"failed to start light metricset '%s/%s' using '%s/%s' metricset as input",
+		return registration, fmt.Errorf(
+			"failed to start light metricset '%s/%s' using '%s/%s' metricset as input: %w",
 			m.Module, m.Name,
-			m.Input.Module, m.Input.MetricSet)
+			m.Input.Module, m.Input.MetricSet, err)
 	}
 
 	originalFactory := registration.Factory
@@ -69,7 +69,7 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 		base.name = m.Name
 		baseModule, err := m.baseModule(base.module)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to create base module for light module '%s', using base module '%s'", m.Module, base.module.Name())
+			return nil, fmt.Errorf("failed to create base module for light module '%s', using base module '%s': %w", m.Module, base.module.Name(), err)
 		}
 		base.module = baseModule
 
@@ -79,7 +79,7 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 		if moduleFactory != nil {
 			module, err := moduleFactory(*baseModule)
 			if err != nil {
-				return nil, errors.Wrapf(err, "module factory for module '%s' failed while creating light metricset '%s/%s'", m.Input.Module, m.Module, m.Name)
+				return nil, fmt.Errorf("module factory for module '%s' failed while creating light metricset '%s/%s': %w", m.Input.Module, m.Module, m.Name, err)
 			}
 			base.module = module
 		}
@@ -88,7 +88,7 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 		if originalHostParser != nil {
 			base.hostData, err = originalHostParser(base.module, base.host)
 			if err != nil {
-				return nil, errors.Wrapf(err, "host parser failed on light metricset factory for '%s/%s'", m.Module, m.Name)
+				return nil, fmt.Errorf("host parser failed on light metricset factory for '%s/%s': %w", m.Module, m.Name, err)
 			}
 			base.host = base.hostData.Host
 		}
@@ -103,20 +103,20 @@ func (m *LightMetricSet) Registration(r *Register) (MetricSetRegistration, error
 // taking into account the light metric set default configurations
 func (m *LightMetricSet) baseModule(from Module) (*BaseModule, error) {
 	// Initialize config using input defaults as raw config
-	rawConfig, err := common.NewConfigFrom(m.Input.Defaults)
+	rawConfig, err := conf.NewConfigFrom(m.Input.Defaults)
 	if err != nil {
-		return nil, errors.Wrap(err, "invalid input defaults")
+		return nil, fmt.Errorf("invalid input defaults: %w", err)
 	}
 
 	// Copy values from user configuration
 	if err = from.UnpackConfig(rawConfig); err != nil {
-		return nil, errors.Wrap(err, "failed to copy values from user configuration")
+		return nil, fmt.Errorf("failed to copy values from user configuration: %w", err)
 	}
 
 	// Create the base module
 	baseModule, err := newBaseModuleFromConfig(rawConfig)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create base module")
+		return nil, fmt.Errorf("failed to create base module: %w", err)
 	}
 	baseModule.name = m.Module
 

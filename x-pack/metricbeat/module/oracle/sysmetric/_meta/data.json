@@ -1,0 +1,24 @@
+{
+    "@timestamp": "2022-05-27T02:18:55.112Z",
+    "event": {
+        "dataset": "oracle.sysmetric",
+        "module": "oracle",
+        "duration": 408974115
+    },
+    "metricset": {
+        "name": "sysmetric",
+        "period": 60000
+    },
+    "oracle": {
+        "sysmetric": {
+            "physical_write_total_bytes_per_sec": 15323.3127812031,
+            "total_table_scans_per_txn": 40,
+            "physical_read_total_bytes_per_sec": 40680.153307782,
+            "total_pga_allocated": 2.364416e+08
+        }
+    },
+    "service": {
+        "address": "oracle://localhost:1521/ORCLCDB.localdomain",
+        "type": "oracle"
+    }
+}

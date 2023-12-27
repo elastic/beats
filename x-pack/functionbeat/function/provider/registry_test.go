@@ -12,12 +12,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/core"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type mockProvider struct {
@@ -59,14 +59,13 @@ func testProviderLookup(t *testing.T) {
 	name := "myprovider"
 	myprovider := &mockProvider{}
 
-	providerFn := func(log *logp.Logger, registry *Registry, config *common.Config) (Provider, error) {
+	providerFn := func(log *logp.Logger, registry *Registry, config *conf.C) (Provider, error) {
 		return myprovider, nil
 	}
 
-	f := Feature(
+	f := newFeature(
 		name,
 		providerFn,
-		feature.MakeDetails(name, "provider for testing", feature.Experimental),
 	)
 
 	t.Run("adding and retrieving a provider", withRegistry(func(
@@ -111,27 +110,22 @@ func testFunctionLookup(t *testing.T) {
 	name := "myprovider"
 	myprovider := &mockProvider{}
 
-	providerFn := func(log *logp.Logger, registry *Registry, config *common.Config) (Provider, error) {
+	providerFn := func(log *logp.Logger, registry *Registry, config *conf.C) (Provider, error) {
 		return myprovider, nil
 	}
 
-	f := Feature(
+	f := newFeature(
 		name,
 		providerFn,
-		feature.MakeDetails(name, "provider for testing", feature.Experimental),
 	)
 
 	fnName := "myfunc"
 	myfunction := &mockFunction{name}
-	functionFn := func(provider Provider, config *common.Config) (Function, error) {
+	functionFn := func(provider Provider, config *conf.C) (Function, error) {
 		return myfunction, nil
 	}
 
-	fnFeature := FunctionFeature(name, fnName, functionFn, feature.MakeDetails(
-		name,
-		"provider for testing",
-		feature.Experimental,
-	))
+	fnFeature := newFunctionFeature(name, fnName, functionFn)
 
 	t.Run("adding and retrieving a function", withRegistry(func(
 		t *testing.T,
@@ -204,7 +198,7 @@ func withRegistry(fn func(t *testing.T, global *feature.Registry, registry *Regi
 	}
 }
 
-func testStrInSlice(t *testing.T) {
+func TestStrInSlice(t *testing.T) {
 	haystack := []string{"bob", "aline"}
 	t.Run("when in slice return position", func(t *testing.T) {
 		assert.Equal(t, 1, strInSlice(haystack, "aline"))
@@ -221,8 +215,8 @@ func TestFindFunctionByName(t *testing.T) {
 		global *feature.Registry,
 		wrapper *Registry,
 	) {
-		configs := []*common.Config{
-			common.MustNewConfigFrom(map[string]interface{}{
+		configs := []*conf.C{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"name":    "mysqs",
 				"type":    "sqs",
 				"enabled": false,
@@ -241,8 +235,8 @@ func TestFindFunctionByName(t *testing.T) {
 		wrapper *Registry,
 	) {
 		fnName := "sqs"
-		configs := []*common.Config{
-			common.MustNewConfigFrom(map[string]interface{}{
+		configs := []*conf.C{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"name":    "mysqs",
 				"type":    fnName,
 				"enabled": true,
@@ -252,21 +246,17 @@ func TestFindFunctionByName(t *testing.T) {
 		name := "myprovider"
 		myprovider := &mockProvider{name: name}
 
-		providerFn := func(log *logp.Logger, registry *Registry, config *common.Config) (Provider, error) {
+		providerFn := func(log *logp.Logger, registry *Registry, config *conf.C) (Provider, error) {
 			return myprovider, nil
 		}
-		f := Feature(name, providerFn, feature.MakeDetails(name, "provider for testing", feature.Experimental))
+		f := newFeature(name, providerFn)
 
 		myfunction := &mockFunction{name}
-		functionFn := func(provider Provider, config *common.Config) (Function, error) {
+		functionFn := func(provider Provider, config *conf.C) (Function, error) {
 			return myfunction, nil
 		}
 
-		fnFeature := FunctionFeature(name, fnName, functionFn, feature.MakeDetails(
-			name,
-			"provider for testing",
-			feature.Experimental,
-		))
+		fnFeature := newFunctionFeature(name, fnName, functionFn)
 
 		err := global.Register(f)
 		if !assert.NoError(t, err) {

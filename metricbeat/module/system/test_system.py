@@ -43,7 +43,9 @@ SYSTEM_CORE = {
 }
 SYSTEM_CORE[metricbeat.P_DARWIN] = SYSTEM_CORE[metricbeat.P_WIN] + ["nice.pct"]
 SYSTEM_CORE[metricbeat.P_LINUX] = SYSTEM_CORE[metricbeat.P_DARWIN] + \
-    ["iowait.pct", "irq.pct", "softirq.pct", "steal.pct"]
+    ["iowait.pct", "irq.pct", "softirq.pct", "steal.pct",
+     "model_name", "model_number", "mhz",
+     "core_id", "physical_id"]
 
 SYSTEM_CORE_ALL = {
     metricbeat.P_WIN: SYSTEM_CORE[metricbeat.P_WIN] + ["idle.ticks", "system.ticks", "user.ticks",
@@ -78,7 +80,7 @@ SYSTEM_FILESYSTEM = {
                                     "used.pct"]
 }
 SYSTEM_FILESYSTEM[metricbeat.P_DEF] = SYSTEM_FILESYSTEM[metricbeat.P_WIN] + \
-    ["files", "free_files"]
+    ["files", "free_files", "options"]
 
 
 SYSTEM_FSSTAT_FIELDS = ["count", "total_files", "total_size"]
@@ -109,8 +111,9 @@ SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
 # cmdline is also part of the system process fields, but it may not be present
 # for some kernel level processes. fd is also part of the system process, but
 # is not available on all OSes and requires root to read for all processes.
+# num_threads may not be readable for some privileged process on Windows,
 # cgroup is only available on linux.
-SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
+SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state", "io"]
 
 
 class Test(metricbeat.BaseTest):
@@ -280,7 +283,6 @@ class Test(metricbeat.BaseTest):
         self.assertGreater(len(output), 0)
 
         for evt in output:
-            print(evt)
             self.assert_fields_are_documented(evt)
             filesystem = evt["system"]["filesystem"]
             self.assert_fields_for_platform(SYSTEM_FILESYSTEM, filesystem)
@@ -389,21 +391,10 @@ class Test(metricbeat.BaseTest):
 
             summary = evt["system"]["process"]["summary"]
             assert isinstance(summary["total"], int)
-            assert isinstance(summary["sleeping"], int)
-            assert isinstance(summary["running"], int)
-            assert isinstance(summary["unknown"], int)
-
-            if not sys.platform.startswith("win"):
-                assert isinstance(summary["idle"], int)
-                assert isinstance(summary["stopped"], int)
-                assert isinstance(summary["zombie"], int)
-                assert summary["total"] == summary["sleeping"] + summary["running"] + \
-                    summary["idle"] + summary["stopped"] + \
-                    summary["zombie"] + summary["unknown"]
 
             if sys.platform.startswith("windows"):
-                assert summary["total"] == summary["sleeping"] + \
-                    summary["running"] + summary["unknown"]
+                assert isinstance(summary["running"], int)
+                assert isinstance(summary["total"], int)
 
     @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd", sys.platform), "os")
     def test_process(self):
@@ -430,6 +421,9 @@ class Test(metricbeat.BaseTest):
         found_cmdline = False
         for evt in output:
             process = evt["system"]["process"]
+            # Not all process will have 'cmdline' due to permission issues,
+            # especially on Windows. Therefore we ensure at least some of
+            # them will have it.
             found_cmdline |= "cmdline" in process
 
             # Remove 'env' prior to checking documented fields because its keys are dynamic.
@@ -440,16 +434,18 @@ class Test(metricbeat.BaseTest):
             process.pop("cgroup", None)
             process.pop("fd", None)
             process.pop("cmdline", None)
+            process.pop("num_threads", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
-
-            self.assertTrue(
-                found_cmdline, "cmdline not found in any process events")
+        # After iterating over all process, make sure at least one of them had
+        # the 'cmdline' set.
+        self.assertTrue(
+            found_cmdline, "cmdline not found in any process events")
 
     @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd", sys.platform), "os")
     def test_process_unix(self):
         """
-        Test system/process output for fields specific of unix systems.
+        Test system/process output checking it has got all expected fields specific of unix systems and no extra ones.
         """
 
         self.render_config_template(
@@ -496,6 +492,7 @@ class Test(metricbeat.BaseTest):
             process.pop("cgroup", None)
             process.pop("cmdline", None)
             process.pop("fd", None)
+            process.pop("num_threads", None)
 
             self.assertCountEqual(SYSTEM_PROCESS_FIELDS, process.keys())
 

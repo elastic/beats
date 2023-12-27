@@ -27,20 +27,30 @@ import (
 	"time"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/kibana"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	beatversion "github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/kibana"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
-var importAPI = "/api/saved_objects/_import"
+var (
+	// We started using Saved Objects API in 7.15. But to help integration
+	// developers migrate their dashboards we are more lenient.
+	minimumRequiredVersionSavedObjects = version.MustNew("7.14.0")
+
+	// the base path of the saved objects API
+	// On serverless, you must add an x-elastic-internal-header to reach this API
+	importAPI = "/api/saved_objects/_import"
+)
 
 // KibanaLoader loads Kibana files
 type KibanaLoader struct {
 	client        *kibana.Client
 	config        *Config
-	version       common.Version
+	version       version.V
 	hostname      string
 	msgOutputter  MessageOutputter
 	defaultLogger *logp.Logger
@@ -49,15 +59,14 @@ type KibanaLoader struct {
 }
 
 // NewKibanaLoader creates a new loader to load Kibana files
-func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter, beatname string) (*KibanaLoader, error) {
-
+func NewKibanaLoader(ctx context.Context, cfg *config.C, dashboardsConfig *Config, hostname string, msgOutputter MessageOutputter, beatname string) (*KibanaLoader, error) {
 	if cfg == nil || !cfg.Enabled() {
-		return nil, fmt.Errorf("Kibana is not configured or enabled")
+		return nil, fmt.Errorf("kibana is not configured or enabled")
 	}
 
 	client, err := getKibanaClient(ctx, cfg, dashboardsConfig.Retry, 0, beatname)
 	if err != nil {
-		return nil, fmt.Errorf("Error creating Kibana client: %v", err)
+		return nil, fmt.Errorf("Error creating Kibana client: %w", err)
 	}
 
 	loader := KibanaLoader{
@@ -76,8 +85,8 @@ func NewKibanaLoader(ctx context.Context, cfg *common.Config, dashboardsConfig *
 	return &loader, nil
 }
 
-func getKibanaClient(ctx context.Context, cfg *common.Config, retryCfg *Retry, retryAttempt uint, beatname string) (*kibana.Client, error) {
-	client, err := kibana.NewKibanaClient(cfg, beatname)
+func getKibanaClient(ctx context.Context, cfg *config.C, retryCfg *Retry, retryAttempt uint, beatname string) (*kibana.Client, error) {
+	client, err := kibana.NewKibanaClient(cfg, beatname, beatversion.GetDefaultVersion(), beatversion.Commit(), beatversion.BuildTime().String())
 	if err != nil {
 		if retryCfg.Enabled && (retryCfg.Maximum == 0 || retryCfg.Maximum > retryAttempt) {
 			select {
@@ -87,15 +96,15 @@ func getKibanaClient(ctx context.Context, cfg *common.Config, retryCfg *Retry, r
 				return getKibanaClient(ctx, cfg, retryCfg, retryAttempt+1, beatname)
 			}
 		}
-		return nil, fmt.Errorf("Error creating Kibana client: %v", err)
+		return nil, fmt.Errorf("Error creating Kibana client: %w", err)
 	}
 	return client, nil
 }
 
 // ImportIndexFile imports an index pattern from a file
 func (loader KibanaLoader) ImportIndexFile(file string) error {
-	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
+		return fmt.Errorf("Kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
 	}
 
 	loader.statusMsg("Importing index file from %s", file)
@@ -103,22 +112,22 @@ func (loader KibanaLoader) ImportIndexFile(file string) error {
 	// read json file
 	reader, err := ioutil.ReadFile(file)
 	if err != nil {
-		return fmt.Errorf("fail to read index-pattern from file %s: %v", file, err)
+		return fmt.Errorf("fail to read index-pattern from file %s: %w", file, err)
 	}
 
-	var indexContent common.MapStr
+	var indexContent mapstr.M
 	err = json.Unmarshal(reader, &indexContent)
 	if err != nil {
-		return fmt.Errorf("fail to unmarshal the index content from file %s: %v", file, err)
+		return fmt.Errorf("fail to unmarshal the index content from file %s: %w", file, err)
 	}
 
 	return loader.ImportIndex(indexContent)
 }
 
 // ImportIndex imports the passed index pattern to Kibana
-func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
-	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+func (loader KibanaLoader) ImportIndex(pattern mapstr.M) error {
+	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
+		return fmt.Errorf("kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
 	}
 
 	var errs multierror.Errors
@@ -127,19 +136,20 @@ func (loader KibanaLoader) ImportIndex(pattern common.MapStr) error {
 	params.Set("overwrite", "true")
 
 	if err := ReplaceIndexInIndexPattern(loader.config.Index, pattern); err != nil {
-		errs = append(errs, errors.Wrapf(err, "error setting index '%s' in index pattern", loader.config.Index))
+		errs = append(errs, fmt.Errorf("error setting index '%s' in index pattern: %w", loader.config.Index, err))
 	}
 
-	if err := loader.client.ImportMultiPartFormFile(importAPI, params, "index-template.ndjson", pattern.String()); err != nil {
-		errs = append(errs, errors.Wrap(err, "error loading index pattern"))
+	err := loader.client.ImportMultiPartFormFile(importAPI, params, "index-template.ndjson", pattern.String())
+	if err != nil {
+		errs = append(errs, fmt.Errorf("error loading index pattern: %w", err))
 	}
 	return errs.Err()
 }
 
 // ImportDashboard imports the dashboard file
 func (loader KibanaLoader) ImportDashboard(file string) error {
-	if loader.version.LessThan(kibana.MinimumRequiredVersionSavedObjects) {
-		return fmt.Errorf("Kibana version must be at least " + kibana.MinimumRequiredVersionSavedObjects.String())
+	if loader.version.LessThan(minimumRequiredVersionSavedObjects) {
+		return fmt.Errorf("Kibana version must be at least " + minimumRequiredVersionSavedObjects.String())
 	}
 
 	loader.statusMsg("Importing dashboard from %s", file)
@@ -150,18 +160,18 @@ func (loader KibanaLoader) ImportDashboard(file string) error {
 	// read json file
 	content, err := ioutil.ReadFile(file)
 	if err != nil {
-		return fmt.Errorf("fail to read dashboard from file %s: %v", file, err)
+		return fmt.Errorf("fail to read dashboard from file %s: %w", file, err)
 	}
 
 	content = loader.formatDashboardAssets(content)
 
 	dashboardWithReferences, err := loader.addReferences(file, content)
 	if err != nil {
-		return fmt.Errorf("error getting references of dashboard: %+v", err)
+		return fmt.Errorf("error getting references of dashboard: %w", err)
 	}
 
 	if err := loader.client.ImportMultiPartFormFile(importAPI, params, correctExtension(file), dashboardWithReferences); err != nil {
-		return fmt.Errorf("error dashboard asset: %+v", err)
+		return fmt.Errorf("error dashboard asset: %w", err)
 	}
 
 	loader.loadedAssets[file] = true
@@ -180,7 +190,7 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 	var d dashboardObj
 	err := json.Unmarshal(dashboard, &d)
 	if err != nil {
-		return "", fmt.Errorf("failed to parse dashboard references: %+v", err)
+		return "", fmt.Errorf("failed to parse dashboard references: %w", err)
 	}
 
 	base := filepath.Dir(path)
@@ -195,22 +205,22 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 		}
 		refContents, err := ioutil.ReadFile(referencePath)
 		if err != nil {
-			return "", fmt.Errorf("fail to read referenced asset from file %s: %v", referencePath, err)
+			return "", fmt.Errorf("fail to read referenced asset from file %s: %w", referencePath, err)
 		}
 		refContents = loader.formatDashboardAssets(refContents)
 		refContentsWithReferences, err := loader.addReferences(referencePath, refContents)
 		if err != nil {
-			return "", fmt.Errorf("failed to get references of %s: %+v", referencePath, err)
+			return "", fmt.Errorf("failed to get references of %s: %w", referencePath, err)
 		}
 
 		result += refContentsWithReferences
 		loader.loadedAssets[referencePath] = true
 	}
 
-	var res common.MapStr
+	var res mapstr.M
 	err = json.Unmarshal(dashboard, &res)
 	if err != nil {
-		return "", fmt.Errorf("failed to convert asset: %+v", err)
+		return "", fmt.Errorf("failed to convert asset: %w", err)
 	}
 	result += res.String() + "\n"
 
@@ -220,7 +230,16 @@ func (loader KibanaLoader) addReferences(path string, dashboard []byte) (string,
 func (loader KibanaLoader) formatDashboardAssets(content []byte) []byte {
 	content = ReplaceIndexInDashboardObject(loader.config.Index, content)
 	content = EncodeJSONObjects(content)
-	content = ReplaceStringInDashboard("CHANGEME_HOSTNAME", loader.hostname, content)
+
+	replacements := loader.config.StringReplacements
+	if replacements == nil {
+		replacements = make(map[string]string)
+	}
+	replacements["CHANGEME_HOSTNAME"] = loader.hostname
+	for needle, replacement := range replacements {
+		content = ReplaceStringInDashboard(needle, replacement, content)
+	}
+
 	return content
 }
 

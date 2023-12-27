@@ -18,11 +18,14 @@
 package collstats
 
 import (
-	"github.com/pkg/errors"
+	"context"
+	"errors"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 func init() {
@@ -32,50 +35,64 @@ func init() {
 	)
 }
 
-// MetricSet type defines all fields of the MetricSet
+// Metricset type defines all fields of the Metricset
 // As a minimum it must inherit the mb.BaseMetricSet fields, but can be extended with
 // additional entries. These variables can be used to persist data or configuration between
 // multiple fetch calls.
-type MetricSet struct {
-	*mongodb.MetricSet
+type Metricset struct {
+	*mongodb.Metricset
 }
 
-// New creates a new instance of the MetricSet
+// New creates a new instance of the Metricset
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	ms, err := mongodb.NewMetricSet(base)
+	ms, err := mongodb.NewMetricset(base)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not create mongodb metricset: %w", err)
 	}
-	return &MetricSet{ms}, nil
+
+	return &Metricset{ms}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
-func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	// instantiate direct connections to each of the configured Mongo hosts
-	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
+func (m *Metricset) Fetch(reporter mb.ReporterV2) error {
+	client, err := mongodb.NewClient(m.Metricset.Config, m.HostData().URI, m.Module().Config().Timeout, 0)
 	if err != nil {
-		return errors.Wrap(err, "error creating new Session")
+		return fmt.Errorf("could not create mongodb client: %w", err)
 	}
-	defer mongoSession.Close()
 
-	result := common.MapStr{}
+	defer func() {
+		if disconnectErr := client.Disconnect(context.Background()); disconnectErr != nil {
+			m.Logger().Warn("client disconnection did not happen gracefully")
+		}
+	}()
 
-	err = mongoSession.Run("top", &result)
 	if err != nil {
-		return errors.Wrap(err, "Error retrieving collection totals from Mongo instance")
+		return fmt.Errorf("could not get a list of databases: %w", err)
+	}
+
+	// This info is only stored in 'admin' database
+	db := client.Database("admin")
+	res := db.RunCommand(context.Background(), bson.D{bson.E{Key: "top"}})
+	if err = res.Err(); err != nil {
+		return fmt.Errorf("'top' command failed: %w", err)
+	}
+
+	var result map[string]interface{}
+	if err = res.Decode(&result); err != nil {
+		return fmt.Errorf("could not decode mongo response: %w", err)
 	}
 
 	if _, ok := result["totals"]; !ok {
-		return errors.New("Error accessing collection totals in returned data")
+		return errors.New("collection 'totals' key not found in mongodb response")
 	}
 
-	totals, ok := result["totals"].(common.MapStr)
+	totals, ok := result["totals"].(map[string]interface{})
 	if !ok {
-		return errors.New("Collection totals are not a map")
+		return errors.New("collection 'totals' are not a map")
 	}
 
 	for group, info := range totals {
@@ -83,23 +100,21 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			continue
 		}
 
-		infoMap, ok := info.(common.MapStr)
+		infoMap, ok := info.(map[string]interface{})
 		if !ok {
-			err = errors.New("Unexpected data returned by mongodb")
-			reporter.Error(err)
-			m.Logger().Error(err)
+			reporter.Error(errors.New("unexpected data returned by mongodb"))
 			continue
 		}
 
 		event, err := eventMapping(group, infoMap)
 		if err != nil {
-			err = errors.Wrap(err, "Mapping of the event data filed")
-			reporter.Error(err)
-			m.Logger().Error(err)
+			reporter.Error(fmt.Errorf("mapping of the event data filed: %w", err))
 			continue
 		}
 
-		reporter.Event(mb.Event{MetricSetFields: event})
+		reporter.Event(mb.Event{
+			MetricSetFields: event,
+		})
 	}
 
 	return nil

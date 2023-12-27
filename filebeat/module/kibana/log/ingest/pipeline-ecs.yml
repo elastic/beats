@@ -1,0 +1,57 @@
+description: Pipeline for parsing Kibana ECS logs
+processors:
+- set:
+    field: event.ingested
+    value: '{{_ingest.timestamp}}'
+- set:
+    copy_from: '@timestamp'
+    field: event.created
+- script:
+    lang: painless
+    if: 'ctx.json != null'
+    description: Merges filebeat generated fields with ECS log content
+    source: |-
+      ctx.json.keySet().each(key -> ctx.merge(key, ctx.json.get(key), (oldValue, newValue) -> {
+        if (newValue instanceof Map) {
+          newValue.putAll(oldValue);
+        }
+
+        return newValue;
+      }))
+- rename:
+    field: http.request.headers
+    target_field: kibana.log.meta.req.headers
+    ignore_missing: true
+- rename:
+    field: http.response.headers
+    target_field: kibana.log.meta.res.headers
+    ignore_missing: true
+- set:
+    field: event.outcome
+    value: success
+    if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code < 400'
+- set:
+    field: event.outcome
+    value: failure
+    if: 'ctx?.http?.response?.status_code != null && ctx.http.response.status_code >= 400'
+- script:
+    lang: painless
+    description: Overrides log entry with custom field values. Applicable when fields_under_root is true
+    if: "ctx.fields != null"
+    source: |-
+      ctx.fields.keySet().each(key -> ctx.merge(key, ctx.fields.get(key), (oldValue, newValue) -> {
+        if (oldValue instanceof Map) {
+          oldValue.putAll(newValue);
+        }
+
+        return oldValue;
+      }));
+- remove:
+    field: fields
+    ignore_missing: true
+- remove:
+    field: json
+    ignore_missing: true
+- remove:
+    field: _ecs_json_message
+    ignore_missing: true

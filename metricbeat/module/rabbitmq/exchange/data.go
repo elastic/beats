@@ -19,13 +19,12 @@ package exchange
 
 import (
 	"encoding/json"
+	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -59,7 +58,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 	var exchanges []map[string]interface{}
 	err := json.Unmarshal(content, &exchanges)
 	if err != nil {
-		return errors.Wrap(err, "error in unmarshal")
+		return fmt.Errorf("error in unmarshal: %w", err)
 	}
 
 	for _, exchange := range exchanges {
@@ -72,13 +71,13 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 func eventMapping(exchange map[string]interface{}) mb.Event {
 	fields, _ := schema.Apply(exchange)
 
-	rootFields := common.MapStr{}
+	rootFields := mapstr.M{}
 	if v, err := fields.GetValue("user"); err == nil {
 		rootFields.Put("user.name", v)
 		fields.Delete("user")
 	}
 
-	moduleFields := common.MapStr{}
+	moduleFields := mapstr.M{}
 	if v, err := fields.GetValue("vhost"); err == nil {
 		moduleFields.Put("vhost", v)
 		fields.Delete("vhost")

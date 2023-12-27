@@ -3,13 +3,11 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package socket
 
 import (
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"net"
 	"os"
@@ -17,11 +15,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/joeshaw/multierror"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 )
@@ -44,6 +42,51 @@ func (l *logWrapper) Debugf(format string, args ...interface{}) {
 	l.Logf("debug: "+format, args...)
 }
 
+type testingState struct {
+	state
+	t         *testing.T
+	flows     []beat.Event
+	neverDone chan struct{}
+}
+
+func (ts *testingState) Event(event mb.Event) bool {
+	ts.flows = append(ts.flows, event.BeatEvent(moduleName, metricsetName))
+	return true
+}
+
+func (ts *testingState) Error(error) bool {
+	return true
+}
+
+func (ts *testingState) Done() <-chan struct{} {
+	return ts.neverDone
+}
+
+func (ts *testingState) feedEvents(evs []event) {
+	ts.t.Helper()
+	for idx, ev := range evs {
+		ts.t.Logf("Delivering event %d: %s", idx, ev.String())
+		if err := ev.Update(&ts.state); err != nil {
+			ts.t.Fatalf("error feeding event '%s': %v", ev.String(), err)
+		}
+	}
+}
+
+func (ts *testingState) getFlows() []beat.Event {
+	r := ts.flows
+	ts.flows = nil
+	return r
+}
+
+func makeTestingState(t *testing.T, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift time.Duration) *testingState {
+	ts := &testingState{
+		t:         t,
+		neverDone: make(chan struct{}),
+	}
+	ts.state = *makeState(ts, (*logWrapper)(t), inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift)
+	return ts
+}
+
 func TestTCPConnWithProcess(t *testing.T) {
 	const (
 		localIP            = "192.168.33.10"
@@ -52,7 +95,7 @@ func TestTCPConnWithProcess(t *testing.T) {
 		remotePort         = 443
 		sock       uintptr = 0xff1234
 	)
-	st := makeState(nil, (*logWrapper)(t), time.Second, time.Second, 0, time.Second)
+	st := makeTestingState(t, time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []event{
@@ -93,14 +136,9 @@ func TestTCPConnWithProcess(t *testing.T) {
 		},
 		&doExit{Meta: meta(1234, 1234, 18)},
 	}
-	if err := feedEvents(evs, st, t); err != nil {
-		t.Fatal(err)
-	}
-	st.ExpireOlder()
-	flows, err := getFlows(st.DoneFlows(), all)
-	if err != nil {
-		t.Fatal(err)
-	}
+	st.feedEvents(evs)
+	st.ExpireFlows()
+	flows := st.getFlows()
 	assert.Len(t, flows, 1)
 	flow := flows[0]
 	t.Log("read flow", flow)
@@ -125,7 +163,7 @@ func TestTCPConnWithProcess(t *testing.T) {
 		"user.id":             "0",
 		"user.name":           "root",
 		"event.type":          []string{"info", "connection"},
-		"event.category":      []string{"network", "network_traffic"},
+		"event.category":      []string{"network"},
 		"related.ip":          []string{localIP, remoteIP},
 		"related.user":        []string{"root"},
 	} {
@@ -146,7 +184,7 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 		socketTimeout         = time.Minute * 3
 		closeTimeout          = time.Minute
 	)
-	st := makeState(nil, (*logWrapper)(t), flowTimeout, socketTimeout, closeTimeout, time.Second)
+	st := makeTestingState(t, flowTimeout, socketTimeout, closeTimeout, time.Second)
 	now := time.Now()
 	st.clock = func() time.Time {
 		return now
@@ -180,15 +218,10 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 			RPort: rPort,
 		},
 	}
-	if err := feedEvents(evs, st, t); err != nil {
-		t.Fatal(err)
-	}
-	st.ExpireOlder()
+	st.feedEvents(evs)
+	st.ExpireFlows()
 	// Nothing expired just yet.
-	flows, err := getFlows(st.DoneFlows(), all)
-	if err != nil {
-		t.Fatal(err)
-	}
+	flows := st.getFlows()
 	assert.Empty(t, flows)
 
 	evs = []event{
@@ -220,16 +253,11 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 			RPort: rPort,
 		},
 	}
-	if err := feedEvents(evs, st, t); err != nil {
-		t.Fatal(err)
-	}
+	st.feedEvents(evs)
 	// Expire the first socket
 	now = now.Add(closeTimeout + 1)
-	st.ExpireOlder()
-	flows, err = getFlows(st.DoneFlows(), all)
-	if err != nil {
-		t.Fatal(err)
-	}
+	st.ExpireFlows()
+	flows = st.getFlows()
 	assert.Len(t, flows, 1)
 	flow := flows[0]
 	t.Log("read flow 0", flow)
@@ -253,7 +281,7 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 		"process.name":        "curl",
 		"user.id":             "501",
 		"event.type":          []string{"info", "connection"},
-		"event.category":      []string{"network", "network_traffic"},
+		"event.category":      []string{"network"},
 	} {
 		if !assertValue(t, flow, expected, field) {
 			t.Fatal("expected value not found")
@@ -262,20 +290,14 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 	// Wait until sock+1 expires due to inactivity. It won't be available
 	// just yet.
 	now = now.Add(socketTimeout + 1)
-	st.ExpireOlder()
-	flows, err = getFlows(st.DoneFlows(), all)
-	if err != nil {
-		t.Fatal(err)
-	}
+	st.ExpireFlows()
+	flows = st.getFlows()
 	assert.Empty(t, flows)
 
 	// Wait until the sock is closed completely.
 	now = now.Add(closeTimeout + 1)
-	st.ExpireOlder()
-	flows, err = getFlows(st.DoneFlows(), all)
-	if err != nil {
-		t.Fatal(err)
-	}
+	st.ExpireFlows()
+	flows = st.getFlows()
 	assert.Len(t, flows, 1)
 	flow = flows[0]
 
@@ -295,7 +317,7 @@ func TestTCPConnWithProcessSocketTimeouts(t *testing.T) {
 		"network.transport": "tcp",
 		"network.type":      "ipv4",
 		"event.type":        []string{"info", "connection"},
-		"event.category":    []string{"network", "network_traffic"},
+		"event.category":    []string{"network"},
 	} {
 		if !assertValue(t, flow, expected, field) {
 			t.Fatal("expected value not found")
@@ -310,23 +332,21 @@ func TestSocketExpirationWithOverwrittenSockets(t *testing.T) {
 		socketTimeout         = time.Minute * 3
 		closeTimeout          = time.Minute
 	)
-	st := makeState(nil, (*logWrapper)(t), flowTimeout, socketTimeout, closeTimeout, time.Second)
+	st := makeTestingState(t, flowTimeout, socketTimeout, closeTimeout, time.Second)
 	now := time.Now()
 	st.clock = func() time.Time {
 		return now
 	}
-	if err := feedEvents([]event{
+	st.feedEvents([]event{
 		&inetCreate{Meta: meta(1234, 1236, 5), Proto: 0},
 		&sockInitData{Meta: meta(1234, 1236, 5), Sock: sock},
 		&inetCreate{Meta: meta(1234, 1237, 5), Proto: 0},
 		&sockInitData{Meta: meta(1234, 1237, 5), Sock: sock},
-	}, st, t); err != nil {
-		t.Fatal(err)
-	}
+	})
 	now = now.Add(closeTimeout + 1)
-	st.ExpireOlder()
+	st.ExpireFlows()
 	now = now.Add(socketTimeout + 1)
-	st.ExpireOlder()
+	st.ExpireFlows()
 }
 
 func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
@@ -337,7 +357,7 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 		remotePort         = 53
 		sock       uintptr = 0xff1234
 	)
-	st := makeState(nil, (*logWrapper)(t), time.Second, time.Second, 0, time.Second)
+	st := makeTestingState(t, time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []event{
@@ -358,14 +378,9 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 		&inetReleaseCall{Meta: meta(1234, 1235, 17), Sock: sock},
 		&doExit{Meta: meta(1234, 1234, 18)},
 	}
-	if err := feedEvents(evs, st, t); err != nil {
-		t.Fatal(err)
-	}
-	st.ExpireOlder()
-	flows, err := getFlows(st.DoneFlows(), all)
-	if err != nil {
-		t.Fatal(err)
-	}
+	st.feedEvents(evs)
+	st.ExpireFlows()
+	flows := st.getFlows()
 	assert.Len(t, flows, 1)
 	flow := flows[0]
 	t.Log("read flow", flow)
@@ -389,7 +404,7 @@ func TestUDPOutgoingSinglePacketWithProcess(t *testing.T) {
 		"process.name":        "exfil-udp",
 		"user.id":             "501",
 		"event.type":          []string{"info", "connection"},
-		"event.category":      []string{"network", "network_traffic"},
+		"event.category":      []string{"network"},
 	} {
 		assertValue(t, flow, expected, field)
 	}
@@ -403,7 +418,7 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 		remotePort         = 53
 		sock       uintptr = 0xff1234
 	)
-	st := makeState(nil, (*logWrapper)(t), time.Second, time.Second, 0, time.Second)
+	st := makeTestingState(t, time.Second, time.Second, 0, time.Second)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	var packet [256]byte
@@ -430,14 +445,9 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 		&inetReleaseCall{Meta: meta(1234, 1235, 17), Sock: sock},
 		&doExit{Meta: meta(1234, 1234, 18)},
 	}
-	if err := feedEvents(evs, st, t); err != nil {
-		t.Fatal(err)
-	}
-	st.ExpireOlder()
-	flows, err := getFlows(st.DoneFlows(), all)
-	if err != nil {
-		t.Fatal(err)
-	}
+	st.feedEvents(evs)
+	st.ExpireFlows()
+	flows := st.getFlows()
 	assert.Len(t, flows, 1)
 	flow := flows[0]
 	t.Log("read flow", flow)
@@ -461,7 +471,7 @@ func TestUDPIncomingSinglePacketWithProcess(t *testing.T) {
 		"process.name":        "exfil-udp",
 		"user.id":             "501",
 		"event.type":          []string{"info", "connection"},
-		"event.category":      []string{"network", "network_traffic"},
+		"event.category":      []string{"network"},
 	} {
 		assertValue(t, flow, expected, field)
 	}
@@ -478,18 +488,6 @@ func be16(val uint16) uint16 {
 	return tracing.MachineEndian.Uint16(buf[:])
 }
 
-func be32(val uint32) uint32 {
-	var buf [4]byte
-	binary.BigEndian.PutUint32(buf[:], val)
-	return tracing.MachineEndian.Uint32(buf[:])
-}
-
-func be64(val uint64) uint64 {
-	var buf [8]byte
-	binary.BigEndian.PutUint64(buf[:], val)
-	return tracing.MachineEndian.Uint64(buf[:])
-}
-
 func ipv4(ip string) uint32 {
 	netIP := net.ParseIP(ip).To4()
 	if netIP == nil {
@@ -504,48 +502,6 @@ func ipv6(ip string) (hi uint64, lo uint64) {
 		panic("bad ip")
 	}
 	return tracing.MachineEndian.Uint64(netIP[:]), tracing.MachineEndian.Uint64(netIP[8:])
-}
-
-func feedEvents(evs []event, st *state, t *testing.T) error {
-	for idx, ev := range evs {
-		t.Logf("Delivering event %d: %s", idx, ev.String())
-		// TODO: err
-		if err := ev.Update(st); err != nil {
-			return fmt.Errorf("error feeding event '%s': %w", ev.String(), err)
-		}
-	}
-	return nil
-}
-
-func all(*flow) bool {
-	return true
-}
-
-type noDNSResolution struct{}
-
-func (noDNSResolution) ResolveIP(pid uint32, ip net.IP) (domain string, found bool) {
-	return "", false
-}
-
-func getFlows(list linkedList, filter func(*flow) bool) (evs []beat.Event, err error) {
-	var errs multierror.Errors
-	for elem := list.get(); elem != nil; elem = list.get() {
-		flow, ok := elem.(*flow)
-		if !ok || !flow.isValid() {
-			errs = append(errs, errors.New("invalid flow"))
-			continue
-		}
-		if !filter(flow) {
-			continue
-		}
-		ev, err := flow.toEvent(true)
-		if err != nil {
-			errs = append(errs, err)
-			continue
-		}
-		evs = append(evs, ev.BeatEvent(moduleName, metricsetName))
-	}
-	return evs, errs.Err()
 }
 
 func callExecve(meta tracing.Metadata, args []string) *execveCall {
@@ -795,7 +751,7 @@ func TestSocketReuse(t *testing.T) {
 		remotePort         = 53
 		sock       uintptr = 0xff1234
 	)
-	st := makeState(nil, (*logWrapper)(t), time.Hour, time.Hour, 0, time.Hour)
+	st := makeTestingState(t, time.Hour, time.Hour, 0, time.Hour)
 	lPort, rPort := be16(localPort), be16(remotePort)
 	lAddr, rAddr := ipv4(localIP), ipv4(remoteIP)
 	evs := []event{
@@ -814,7 +770,7 @@ func TestSocketReuse(t *testing.T) {
 			LPort:    lPort,
 			AltRPort: rPort,
 		},
-		// Asume inetRelease lost.
+		// Assume inetRelease lost.
 		&inetCreate{Meta: meta(1234, 1235, 5), Proto: 0},
 		&sockInitData{Meta: meta(1234, 1235, 5), Sock: sock},
 		&udpSendMsgCall{
@@ -827,14 +783,9 @@ func TestSocketReuse(t *testing.T) {
 			AltRPort: rPort,
 		},
 	}
-	if err := feedEvents(evs, st, t); err != nil {
-		t.Fatal(err)
-	}
-	st.ExpireOlder()
-	flows, err := getFlows(st.DoneFlows(), all)
-	if err != nil {
-		t.Fatal(err)
-	}
+	st.feedEvents(evs)
+	st.ExpireFlows()
+	flows := st.getFlows()
 	assert.Len(t, flows, 1)
 }
 

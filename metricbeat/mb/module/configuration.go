@@ -18,15 +18,15 @@
 package module
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // ConfiguredModules returns a list of all configured modules, including anyone present under dynamic config settings.
-func ConfiguredModules(modulesData []*common.Config, configModulesData *common.Config, moduleOptions []Option) ([]*Wrapper, error) {
+func ConfiguredModules(modulesData []*conf.C, configModulesData *conf.C, moduleOptions []Option) ([]*Wrapper, error) {
 	var modules []*Wrapper
 
 	for _, moduleCfg := range modulesData {
@@ -44,18 +44,18 @@ func ConfiguredModules(modulesData []*common.Config, configModulesData *common.C
 
 		modulesManager, err := cfgfile.NewGlobManager(config.Path, ".yml", ".disabled")
 		if err != nil {
-			return nil, errors.Wrap(err, "initialization error")
+			return nil, fmt.Errorf("initialization error: %w", err)
 		}
 
 		for _, file := range modulesManager.ListEnabled() {
 			confs, err := cfgfile.LoadList(file.Path)
 			if err != nil {
-				return nil, errors.Wrap(err, "error loading config files")
+				return nil, fmt.Errorf("error loading config files: %w", err)
 			}
 			for _, conf := range confs {
 				m, err := NewWrapper(conf, mb.Registry, moduleOptions...)
 				if err != nil {
-					return nil, errors.Wrap(err, "module initialization error")
+					return nil, fmt.Errorf("module initialization error: %w", err)
 				}
 				modules = append(modules, m)
 			}

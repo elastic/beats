@@ -24,7 +24,7 @@ import (
 
 	bolt "go.etcd.io/bbolt"
 
-	"github.com/elastic/beats/v7/libbeat/paths"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 var (
@@ -46,10 +46,25 @@ func OpenBucket(name string) (Bucket, error) {
 	return ds.OpenBucket(name)
 }
 
+// Update executes a function within the context of a read-write managed transaction.
+// If no error is returned from the function then the transaction is committed. If an
+// error is returned then the entire transaction is rolled back.
+func Update(fn func(tx *bolt.Tx) error) error {
+	initDatastoreOnce.Do(func() {
+		ds = &boltDatastore{
+			path: paths.Resolve(paths.Data, "beat.db"),
+			mode: 0o600,
+		}
+	})
+
+	return ds.Update(fn)
+}
+
 // Datastore
 
 type Datastore interface {
 	OpenBucket(name string) (Bucket, error)
+	Update(fn func(tx *bolt.Tx) error) error
 }
 
 type boltDatastore struct {
@@ -67,14 +82,8 @@ func New(path string, mode os.FileMode) Datastore {
 func (ds *boltDatastore) OpenBucket(bucket string) (Bucket, error) {
 	ds.mutex.Lock()
 	defer ds.mutex.Unlock()
-
-	// Initialize the Bolt DB.
-	if ds.db == nil {
-		var err error
-		ds.db, err = bolt.Open(ds.path, ds.mode, nil)
-		if err != nil {
-			return nil, err
-		}
+	if err := ds.init(); err != nil {
+		return nil, err
 	}
 
 	// Ensure the name exists.
@@ -87,6 +96,32 @@ func (ds *boltDatastore) OpenBucket(bucket string) (Bucket, error) {
 	}
 
 	return &boltBucket{ds, bucket}, nil
+}
+
+// Update executes a function within the context of a read-write managed transaction.
+// If no error is returned from the function then the transaction is committed. If an
+// error is returned then the entire transaction is rolled back.
+func (ds *boltDatastore) Update(fn func(tx *bolt.Tx) error) error {
+	ds.mutex.Lock()
+	defer ds.mutex.Unlock()
+	if err := ds.init(); err != nil {
+		return err
+	}
+
+	return ds.db.Update(fn)
+}
+
+// init initializes the backing data store if it is not already open.
+// Callers should hold the datastore mutex.
+func (ds *boltDatastore) init() error {
+	if ds.db == nil {
+		var err error
+		ds.db, err = bolt.Open(ds.path, ds.mode, nil)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (ds *boltDatastore) done() {

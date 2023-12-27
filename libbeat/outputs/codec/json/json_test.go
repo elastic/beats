@@ -23,26 +23,26 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestJsonCodec(t *testing.T) {
 	type testCase struct {
 		config   Config
 		ts       time.Time
-		in       common.MapStr
+		in       mapstr.M
 		expected string
 	}
 
 	cases := map[string]testCase{
 		"default json": testCase{
 			config:   defaultConfig,
-			in:       common.MapStr{"msg": "message"},
+			in:       mapstr.M{"msg": "message"},
 			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
 		},
 		"pretty enabled": testCase{
 			config: Config{Pretty: true},
-			in:     common.MapStr{"msg": "message"},
+			in:     mapstr.M{"msg": "message"},
 			expected: `{
   "@timestamp": "0001-01-01T00:00:00.000Z",
   "@metadata": {
@@ -55,27 +55,27 @@ func TestJsonCodec(t *testing.T) {
 		},
 		"html escaping enabled": {
 			config:   Config{EscapeHTML: true},
-			in:       common.MapStr{"msg": "<hello>world</hello>"},
+			in:       mapstr.M{"msg": "<hello>world</hello>"},
 			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"\u003chello\u003eworld\u003c/hello\u003e"}`,
 		},
 		"html escaping disabled": {
 			config:   Config{EscapeHTML: false},
-			in:       common.MapStr{"msg": "<hello>world</hello>"},
+			in:       mapstr.M{"msg": "<hello>world</hello>"},
 			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"<hello>world</hello>"}`,
 		},
 		"UTC timezone offset": {
 			config:   Config{LocalTime: true},
-			in:       common.MapStr{"msg": "message"},
+			in:       mapstr.M{"msg": "message"},
 			expected: `{"@timestamp":"0001-01-01T00:00:00.000+00:00","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
 		},
 		"PST timezone offset": {
 			config:   Config{LocalTime: true},
 			ts:       time.Time{}.In(time.FixedZone("PST", -8*60*60)),
-			in:       common.MapStr{"msg": "message"},
+			in:       mapstr.M{"msg": "message"},
 			expected: `{"@timestamp":"0000-12-31T16:00:00.000-08:00","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"msg":"message"}`,
 		},
 		"float undefined values": {
-			in:       common.MapStr{"nan": math.NaN()},
+			in:       mapstr.M{"nan": math.NaN()},
 			expected: `{"@timestamp":"0001-01-01T00:00:00.000Z","@metadata":{"beat":"test","type":"_doc","version":"1.2.3"},"nan":null}`,
 		},
 	}

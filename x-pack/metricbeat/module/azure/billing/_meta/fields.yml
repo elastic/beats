@@ -7,11 +7,19 @@
     - name: currency
       type: keyword
       description: >
-        The currency
+        Billing Currency.
     - name: pretax_cost
       type: float
       description: >
-        Cost
+        The amount of cost before tax.
+    - name: unit_price
+      type: float
+      description: >
+        Unit Price is the price applicable to you. (your EA or other contract price).
+    - name: quantity
+      type: float
+      description: >
+        Measure the quantity purchased or consumed. The amount of the meter used during the billing period.
     - name: department_name
       type: keyword
       description: >
@@ -19,7 +27,7 @@
     - name: product
       type: keyword
       description: >
-        The product type
+        Product name for the consumed service or purchase.
     - name: usage_start
       type: date
       description: >
@@ -31,11 +39,15 @@
     - name: billing_period_id
       type: keyword
       description: >
-        The billing period id
+        The billing period id.
     - name: account_name
       type: keyword
       description: >
-        The billing account name
+        Name of the Billing Account.
+    - name: account_id
+      type: keyword
+      description: >
+        Billing Account identifier.
     - name: actual_cost
       type: float
       description: >

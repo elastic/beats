@@ -24,6 +24,9 @@
         "mysql.slowlog.rows_sent": 10,
         "mysql.slowlog.schema": "employees",
         "mysql.thread_id": 14,
+        "related.user": [
+            "root"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "root"
@@ -71,7 +74,13 @@
         "mysql.slowlog.sort_scan_count": 1,
         "mysql.slowlog.tmp_disk_tables": 0,
         "mysql.slowlog.tmp_tables": 1,
-        "mysql.thread_id": "16",
+        "mysql.thread_id": [
+            16,
+            "16"
+        ],
+        "related.user": [
+            "root"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "root"

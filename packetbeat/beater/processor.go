@@ -22,11 +22,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/mitchellh/hashstructure"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/flows"
@@ -34,6 +37,7 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/publish"
 	"github.com/elastic/beats/v7/packetbeat/sniffer"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type processor struct {
@@ -69,7 +73,7 @@ func (p *processor) Start() {
 
 		err := p.sniffer.Run()
 		if err != nil {
-			p.err <- fmt.Errorf("sniffer loop failed: %v", err)
+			p.err <- fmt.Errorf("sniffer loop failed: %w", err)
 			return
 		}
 		p.err <- nil
@@ -90,14 +94,15 @@ func (p *processor) Stop() {
 	p.publisher.Stop()
 }
 
+// processorFactory controls construction of modules runners.
 type processorFactory struct {
 	name         string
 	err          chan error
 	beat         *beat.Beat
-	configurator func(*common.Config) (config.Config, error)
+	configurator func(*conf.C) (config.Config, error)
 }
 
-func newProcessorFactory(name string, err chan error, beat *beat.Beat, configurator func(*common.Config) (config.Config, error)) *processorFactory {
+func newProcessorFactory(name string, err chan error, beat *beat.Beat, configurator func(*conf.C) (config.Config, error)) *processorFactory {
 	return &processorFactory{
 		name:         name,
 		err:          err,
@@ -106,28 +111,52 @@ func newProcessorFactory(name string, err chan error, beat *beat.Beat, configura
 	}
 }
 
-func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *common.Config) (cfgfile.Runner, error) {
+// Create returns a new module runner that publishes to the provided pipeline, configured from cfg.
+func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) (cfgfile.Runner, error) {
 	config, err := p.configurator(cfg)
 	if err != nil {
 		logp.Err("Failed to read the beat config: %v, %v", err, config)
 		return nil, err
+	}
+	id, err := configID(cfg)
+	if err != nil {
+		logp.Err("Failed to generate ID from config: %v, %v", err, config)
+		return nil, err
+	}
+	if len(config.Interfaces) != 0 {
+		// Install Npcap if needed. This needs to happen before any other
+		// work on Windows, including config checking, because that involves
+		// probing interfaces.
+		//
+		// Users may block installation of Npcap, so we defer the install
+		// until we have a configuration that will tell us if it has been
+		// blocked. To do this we must have a valid config.
+		//
+		// When Packetbeat is managed by fleet we will only have this if
+		// Create has been called via the agent Reload process. We take
+		// the opportunity to not install the DLL if there is no configured
+		// interface.
+		err := installNpcap(p.beat, cfg)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	publisher, err := publish.NewTransactionPublisher(
 		p.beat.Info.Name,
 		p.beat.Publisher,
 		config.IgnoreOutgoing,
-		config.Interfaces.File == "",
-		config.Interfaces.InternalNetworks,
+		config.Interfaces[0].File == "",
+		config.Interfaces[0].InternalNetworks,
 	)
 	if err != nil {
 		return nil, err
 	}
 
-	watcher := procs.ProcessesWatcher{}
+	var watch procs.ProcessesWatcher
 	// Enable the process watcher only if capturing live traffic
-	if config.Interfaces.File == "" {
-		err = watcher.Init(config.Procs)
+	if config.Interfaces[0].File == "" {
+		err = watch.Init(config.Procs)
 		if err != nil {
 			logp.Critical(err.Error())
 			return nil, err
@@ -136,17 +165,11 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *common.C
 		logp.Info("Process watcher disabled when file input is used")
 	}
 
-	logp.Debug("main", "Initializing protocol plugins")
-	protocols := protos.NewProtocols()
-	err = protocols.Init(false, publisher, watcher, config.Protocols, config.ProtocolsList)
-	if err != nil {
-		return nil, fmt.Errorf("Initializing protocol analyzers failed: %v", err)
-	}
-	flows, err := setupFlows(pipeline, watcher, config)
+	flows, err := setupFlows(pipeline, &watch, config)
 	if err != nil {
 		return nil, err
 	}
-	sniffer, err := setupSniffer(config, protocols, workerFactory(publisher, protocols, watcher, flows, config))
+	sniffer, err := setupSniffer(id, config, publisher, &watch, flows)
 	if err != nil {
 		return nil, err
 	}
@@ -154,11 +177,107 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *common.C
 	return newProcessor(config.ShutdownTimeout, publisher, flows, sniffer, p.err), nil
 }
 
-func (p *processorFactory) CheckConfig(config *common.Config) error {
+// setupFlows returns a *flows.Flows that will publish to the provided pipeline,
+// configured with cfg and process enrichment via the provided watcher.
+func setupFlows(pipeline beat.Pipeline, watch *procs.ProcessesWatcher, cfg config.Config) (*flows.Flows, error) {
+	if !cfg.Flows.IsEnabled() {
+		return nil, nil
+	}
+
+	processors, err := processors.New(cfg.Flows.Processors)
+	if err != nil {
+		return nil, err
+	}
+
+	var meta mapstr.M
+	if cfg.Flows.Index != "" {
+		meta = mapstr.M{"raw_index": cfg.Flows.Index}
+	}
+	client, err := pipeline.ConnectWith(beat.ClientConfig{
+		Processing: beat.ProcessingConfig{
+			EventMetadata: cfg.Flows.EventMetadata,
+			Processor:     processors,
+			KeepNull:      cfg.Flows.KeepNull,
+			Meta:          meta,
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return flows.NewFlows(client.PublishAll, watch, cfg.Flows)
+}
+
+func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublisher, watch *procs.ProcessesWatcher, flows *flows.Flows) (*sniffer.Sniffer, error) {
+	icmp, err := cfg.ICMP()
+	if err != nil {
+		return nil, err
+	}
+
+	// Ensure interfaces are uniquely represented so we don't listen on the
+	// same interface with multiple sniffers.
+	interfaces := make([]config.InterfaceConfig, 0, len(cfg.Interfaces))
+	seen := make(map[uint64]bool)
+	for _, iface := range cfg.Interfaces {
+		// Currently we hash on all fields in the config. We can revise this in future.
+		h, err := hashstructure.Hash(iface, nil)
+		if err != nil {
+			return nil, fmt.Errorf("could not deduplicate interface configurations: %w", err)
+		}
+		if seen[h] {
+			continue
+		}
+		seen[h] = true
+		interfaces = append(interfaces, iface)
+	}
+
+	logp.Debug("main", "Initializing protocol plugins")
+	decoders := make(map[string]sniffer.Decoders)
+	for i, iface := range interfaces {
+		protocols := protos.NewProtocols()
+		err = protocols.InitFiltered(false, iface.Device, pub, watch, cfg.Protocols, cfg.ProtocolsList)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize protocol analyzers for %s: %w", iface.Device, err)
+		}
+		decoders[iface.Device] = sniffer.DecodersFor(id, pub, protocols, watch, flows, cfg)
+		if iface.BpfFilter != "" || cfg.Flows.IsEnabled() {
+			continue
+		}
+		interfaces[i].BpfFilter = protocols.BpfFilter(iface.WithVlans, icmp.Enabled())
+	}
+
+	return sniffer.New(id, false, "", decoders, interfaces)
+}
+
+// CheckConfig performs a dry-run creation of a Packetbeat pipeline based
+// on the provided configuration. This will involve setting up some dummy
+// sniffers and so will need libpcap to be loaded.
+func (p *processorFactory) CheckConfig(config *conf.C) error {
 	runner, err := p.Create(pipeline.NewNilPipeline(), config)
 	if err != nil {
 		return err
 	}
 	runner.Stop()
 	return nil
+}
+
+func configID(config *conf.C) (string, error) {
+	var tmp struct {
+		ID string `config:"id"`
+	}
+	if err := config.Unpack(&tmp); err != nil {
+		return "", fmt.Errorf("error extracting ID: %w", err)
+	}
+	if tmp.ID != "" {
+		return tmp.ID, nil
+	}
+
+	var h map[string]interface{}
+	_ = config.Unpack(&h)
+	id, err := hashstructure.Hash(h, nil)
+	if err != nil {
+		return "", fmt.Errorf("can not compute ID from configuration: %w", err)
+	}
+
+	return fmt.Sprintf("%16X", id), nil
 }

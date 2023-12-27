@@ -20,17 +20,17 @@ package winevent
 import (
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-const allXML = `
+const (
+	allXML = `
 <Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
   <System>
     <Provider Name="Microsoft-Windows-WinRM" Guid="{a7975c8f-ac13-49f1-87da-5a984a4ab417}" EventSourceName="Service Control Manager"/>
@@ -78,13 +78,94 @@ const allXML = `
 </Event>
 `
 
+	mensajeEnEspañol = `
+<Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+  <System>
+    <Provider Name="Microsoft-Windows-PowerShell" Guid="{b51b54b5-04a1-4c65-8760-04f9e2335cd5}" EventSourceName="Service Control Manager"/>
+    <EventID>4103</EventID>
+    <Version>1</Version>
+    <Level>4</Level>
+    <Task>9</Task>
+    <Opcode>0</Opcode>
+    <Keywords>0x8020000000000000</Keywords>
+    <TimeCreated SystemTime="2016-01-28T20:33:27.990735300Z"/>
+    <EventRecordID>100</EventRecordID>
+    <Correlation ActivityID="{BE97B1E6-710B-47D7-8941-50AB2A2C757F}" RelatedActivityID="{EDAD163F-52D0-4E89-BEF8-0500EC6F08AF}" />
+    <Execution ProcessID="920" ThreadID="1152"/>
+    <Channel>Microsoft-Windows-WinRM/Operational</Channel>
+    <Computer>vagrant-2012-r2</Computer>
+    <Security UserID="S-1-5-21-4564564786-2382305473-342768465-7452"/>
+  </System>
+  <EventData>
+    <Data Name="Nombre de script">C:\WINDOWS\Administrador\service-1\exec\Invoke.ps1</Data>
+    <Data Name="Id. de host">1f3cf2e0-1ae4-4672-a138-e96befdf9586</Data>
+    <Data Name="Id. de shell">Microsoft.PowerShell</Data>
+    <Data Name="Id. de espacio de ejecución">91bb420c-d23e-4926-912b-6d11190df3fb</Data>
+    <Data Name="Id. de canalización"></Data>
+    <Data Name="Usuario">GENTE\persona</Data>
+    <Data Name="Payload">CommandInvocation(Get-Date): "Get-Date"</Data>
+    <Data Name="Versión de host">5.1.19041.1320</Data>
+    <Data Name="Gravedad">Informational</Data>
+    <Data Name="Tipo de comando">Cmdlet</Data>
+    <Data Name="Nombre de host">ConsoleHost</Data>
+    <Data Name="Número de secuencia">4174</Data>
+    <Data Name="Versión del motor">5.1.19041.1320</Data>
+    <Data Name="Aplicación host">C:\WINDOWS\System32\WindowsPowerShell\V1.0\PowerShell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command  exit 1</Data>
+    <Data Name="Nombre de comando">Get-Dat</Data>
+    <Binary>770069006E006C006F00670062006500610074002F0034000000</Binary>
+  </EventData>
+  <UserData>
+    <EventXML xmlns="Event_NS">
+      <ServerName>\\VAGRANT-2012-R2</ServerName>
+      <UserName>vagrant</UserName>
+    </EventXML>
+  </UserData>
+  <ProcessingErrorData>
+    <ErrorCode>15005</ErrorCode>
+    <DataItemName>shellId</DataItemName>
+    <EventPayload>5463487987956</EventPayload>
+  </ProcessingErrorData>
+  <RenderingInfo Culture="en-US">
+    <Message>CommandInvocation(Get-Date): "Get-Date"
+
+
+Contexto:
+ Gravedad = Informational
+ Nombre de host = ConsoleHost
+ Versión de host = 5.1.19041.1320
+ Id. de host = 56995afd-2444-424e-871c-4c5513731a3b
+ Aplicación host = C:\WINDOWS\System32\WindowsPowerShell\V1.0\PowerShell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command  exit 1
+ Versión del motor = 5.1.19041.1320
+ Id. de espacio de ejecución = 91bb420c-d23e-4926-912b-6d11190df3fb
+ Id. de canalización = 1
+ Nombre de comando = Get-Date
+ Tipo de comando = Cmdlet
+ Nombre de script = C:\WINDOWS\Administrador\service-1\exec\Invoke.ps1
+ Ruta de acceso de comando =
+ Número de secuencia = 4174
+ Usuario = GENTE\persona
+ Usuario conectado =
+ Id. de shell = Microsoft.PowerShell
+
+
+Datos de usuario:</Message>
+    <Level>Information</Level>
+    <Task>Request handling</Task>
+    <Opcode>Para usar cuando la operación solo está ejecutando un método.</Opcode>
+    <Channel>Microsoft-Windows-PowerShell/Operational</Channel>
+    <Provider>Microsoft-Windows-PowerShell</Provider>
+  </RenderingInfo>
+</Event>
+`
+)
+
 func TestXML(t *testing.T) {
 	allXMLTimeCreated, _ := time.Parse(time.RFC3339Nano, "2016-01-28T20:33:27.990735300Z")
 
 	tests := []struct {
 		xml    string
 		event  Event
-		mapstr common.MapStr
+		mapstr mapstr.M
 	}{
 		{
 			xml: allXML,
@@ -97,6 +178,7 @@ func TestXML(t *testing.T) {
 				EventIdentifier: EventIdentifier{ID: 91},
 				LevelRaw:        4,
 				TaskRaw:         9,
+				OpcodeRaw:       new(uint8), // The value in the XML is 0.
 				KeywordsRaw:     0x8020000000000000,
 				TimeCreated:     TimeCreated{allXMLTimeCreated},
 				RecordID:        100,
@@ -133,6 +215,126 @@ func TestXML(t *testing.T) {
 			},
 		},
 		{
+			xml: mensajeEnEspañol,
+			event: Event{
+				Provider: Provider{
+					Name:            "Microsoft-Windows-PowerShell",
+					GUID:            "{b51b54b5-04a1-4c65-8760-04f9e2335cd5}",
+					EventSourceName: "Service Control Manager",
+				},
+				EventIdentifier: EventIdentifier{
+					ID: 0x1007,
+				},
+				Version:     0x1,
+				LevelRaw:    0x4,
+				TaskRaw:     0x9,
+				OpcodeRaw:   new(uint8),
+				KeywordsRaw: 0x8020000000000000,
+				TimeCreated: TimeCreated{allXMLTimeCreated},
+				RecordID:    0x64,
+				Correlation: Correlation{
+					ActivityID:        "{BE97B1E6-710B-47D7-8941-50AB2A2C757F}",
+					RelatedActivityID: "{EDAD163F-52D0-4E89-BEF8-0500EC6F08AF}",
+				},
+				Execution: Execution{
+					ProcessID: 0x398,
+					ThreadID:  0x480,
+				},
+				Channel:  "Microsoft-Windows-WinRM/Operational",
+				Computer: "vagrant-2012-r2",
+				User: SID{
+					Identifier: "S-1-5-21-4564564786-2382305473-342768465-7452",
+				},
+				EventData: EventData{
+					Pairs: []KeyValue{
+						{Key: "Nombre de script", Value: "C:\\WINDOWS\\Administrador\\service-1\\exec\\Invoke.ps1"},
+						{Key: "Id. de host", Value: "1f3cf2e0-1ae4-4672-a138-e96befdf9586"},
+						{Key: "Id. de shell", Value: "Microsoft.PowerShell"},
+						{Key: "Id. de espacio de ejecución", Value: "91bb420c-d23e-4926-912b-6d11190df3fb"},
+						{Key: "Id. de canalización"},
+						{Key: "Usuario", Value: "GENTE\\persona"},
+						{Key: "Payload", Value: "CommandInvocation(Get-Date): \"Get-Date\""},
+						{Key: "Versión de host", Value: "5.1.19041.1320"},
+						{Key: "Gravedad", Value: "Informational"},
+						{Key: "Tipo de comando", Value: "Cmdlet"},
+						{Key: "Nombre de host", Value: "ConsoleHost"},
+						{Key: "Número de secuencia", Value: "4174"},
+						{Key: "Versión del motor", Value: "5.1.19041.1320"},
+						{Key: "Aplicación host", Value: "C:\\WINDOWS\\System32\\WindowsPowerShell\\V1.0\\PowerShell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command  exit 1"},
+						{Key: "Nombre de comando", Value: "Get-Dat"},
+						{Key: "Binary", Value: "770069006E006C006F00670062006500610074002F0034000000"},
+					},
+				},
+				UserData: UserData{
+					Name: xml.Name{
+						Space: "Event_NS",
+						Local: "EventXML",
+					},
+					Pairs: []KeyValue{
+						{Key: "ServerName", Value: "\\\\VAGRANT-2012-R2"},
+						{Key: "UserName", Value: "vagrant"},
+					},
+				},
+				Message:                 "CommandInvocation(Get-Date): \"Get-Date\"\n\n\nContexto:\n Gravedad = Informational\n Nombre de host = ConsoleHost\n Versión de host = 5.1.19041.1320\n Id. de host = 56995afd-2444-424e-871c-4c5513731a3b\n Aplicación host = C:\\WINDOWS\\System32\\WindowsPowerShell\\V1.0\\PowerShell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command  exit 1\n Versión del motor = 5.1.19041.1320\n Id. de espacio de ejecución = 91bb420c-d23e-4926-912b-6d11190df3fb\n Id. de canalización = 1\n Nombre de comando = Get-Date\n Tipo de comando = Cmdlet\n Nombre de script = C:\\WINDOWS\\Administrador\\service-1\\exec\\Invoke.ps1\n Ruta de acceso de comando =\n Número de secuencia = 4174\n Usuario = GENTE\\persona\n Usuario conectado =\n Id. de shell = Microsoft.PowerShell\n\n\nDatos de usuario:",
+				Level:                   "Information",
+				Task:                    "Request handling",
+				Opcode:                  "Para usar cuando la operación solo está ejecutando un método.",
+				RenderErrorCode:         0x3a9d,
+				RenderErrorDataItemName: "shellId",
+			},
+			mapstr: mapstr.M{
+				"activity_id":   "{BE97B1E6-710B-47D7-8941-50AB2A2C757F}",
+				"channel":       "Microsoft-Windows-WinRM/Operational",
+				"computer_name": "vagrant-2012-r2",
+				"error": mapstr.M{
+					"code": uint32(0x3a9d),
+				},
+				"event_data": mapstr.M{
+					"Aplicación host":             "C:\\WINDOWS\\System32\\WindowsPowerShell\\V1.0\\PowerShell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command  exit 1",
+					"Binary":                      "770069006E006C006F00670062006500610074002F0034000000",
+					"Gravedad":                    "Informational",
+					"Id. de espacio de ejecución": "91bb420c-d23e-4926-912b-6d11190df3fb",
+					"Id. de host":                 "1f3cf2e0-1ae4-4672-a138-e96befdf9586",
+					"Id. de shell":                "Microsoft.PowerShell",
+					"Nombre de comando":           "Get-Dat",
+					"Nombre de host":              "ConsoleHost",
+					"Nombre de script":            "C:\\WINDOWS\\Administrador\\service-1\\exec\\Invoke.ps1",
+					"Número de secuencia":         "4174",
+					"Payload":                     "CommandInvocation(Get-Date): \"Get-Date\"",
+					"Tipo de comando":             "Cmdlet",
+					"Usuario":                     "GENTE\\persona",
+					"Versión de host":             "5.1.19041.1320",
+					"Versión del motor":           "5.1.19041.1320",
+				},
+				"event_id": "4103",
+				"level":    "information",
+				"message":  "CommandInvocation(Get-Date): \"Get-Date\"\n\n\nContexto:\n Gravedad = Informational\n Nombre de host = ConsoleHost\n Versión de host = 5.1.19041.1320\n Id. de host = 56995afd-2444-424e-871c-4c5513731a3b\n Aplicación host = C:\\WINDOWS\\System32\\WindowsPowerShell\\V1.0\\PowerShell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -Command  exit 1\n Versión del motor = 5.1.19041.1320\n Id. de espacio de ejecución = 91bb420c-d23e-4926-912b-6d11190df3fb\n Id. de canalización = 1\n Nombre de comando = Get-Date\n Tipo de comando = Cmdlet\n Nombre de script = C:\\WINDOWS\\Administrador\\service-1\\exec\\Invoke.ps1\n Ruta de acceso de comando =\n Número de secuencia = 4174\n Usuario = GENTE\\persona\n Usuario conectado =\n Id. de shell = Microsoft.PowerShell\n\n\nDatos de usuario:",
+				"opcode":   "Para usar cuando la operación solo está ejecutando un método.",
+				"outcome":  "success",
+				"process": mapstr.M{
+					"pid": uint32(0x398),
+					"thread": mapstr.M{
+						"id": uint32(0x480),
+					},
+				},
+				"provider_guid":       "{b51b54b5-04a1-4c65-8760-04f9e2335cd5}",
+				"provider_name":       "Microsoft-Windows-PowerShell",
+				"record_id":           uint64(0x64),
+				"related_activity_id": "{EDAD163F-52D0-4E89-BEF8-0500EC6F08AF}",
+				"task":                "Request handling",
+				"time_created":        allXMLTimeCreated,
+				"user": mapstr.M{
+					"identifier": "S-1-5-21-4564564786-2382305473-342768465-7452",
+				},
+				"user_data": mapstr.M{
+					"ServerName": "\\\\VAGRANT-2012-R2",
+					"UserName":   "vagrant",
+					"xml_name":   "EventXML",
+				},
+				"version": Version(0x1),
+			},
+		},
+		{
 			xml: `
 <Event>
   <UserData>
@@ -153,10 +355,10 @@ func TestXML(t *testing.T) {
 					},
 				},
 			},
-			mapstr: common.MapStr{
+			mapstr: mapstr.M{
 				"event_id":     "0",
 				"time_created": time.Time{},
-				"user_data": common.MapStr{
+				"user_data": mapstr.M{
 					"Id":       "{00000000-0000-0000-0000-000000000000}",
 					"xml_name": "Operation_ClientFailure",
 				},
@@ -180,7 +382,7 @@ func TestXML(t *testing.T) {
 			if err != nil {
 				t.Error(err)
 			}
-			fmt.Println(string(json))
+			t.Logf("%s", json)
 		}
 	}
 }
@@ -239,9 +441,9 @@ const nonUnsignedIntVersion = `
 // version number is not an unsigned byte as per the schema definition.
 // Microsoft documentation defines version as:
 //
-//     <xs:element name="Version"
-//        type="unsignedByte"
-//     />
+//	<xs:element name="Version"
+//	   type="unsignedByte"
+//	/>
 //
 // But some event producers don't adhere to the schema. The value space of
 // xsd:unsignedByte is the range of integers between 0 and 255 — the unsigned

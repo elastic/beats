@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !windows
-// +build !windows
 
 package pkg
 
@@ -11,7 +10,6 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"strings"
@@ -27,8 +25,8 @@ type InstallReceipt struct {
 	Source InstallReceiptSource
 }
 
-func listBrewPackages() ([]*Package, error) {
-	packageDirs, err := ioutil.ReadDir(homebrewCellarPath)
+func listBrewPackages(brewCellarPath string) ([]*Package, error) {
+	packageDirs, err := os.ReadDir(brewCellarPath)
 	if err != nil {
 		return nil, err
 	}
@@ -38,8 +36,8 @@ func listBrewPackages() ([]*Package, error) {
 		if !packageDir.IsDir() {
 			continue
 		}
-		pkgPath := path.Join(homebrewCellarPath, packageDir.Name())
-		versions, err := ioutil.ReadDir(pkgPath)
+		pkgPath := path.Join(brewCellarPath, packageDir.Name())
+		versions, err := os.ReadDir(pkgPath)
 		if err != nil {
 			return nil, fmt.Errorf("error reading directory: %s: %w", pkgPath, err)
 		}
@@ -49,16 +47,18 @@ func listBrewPackages() ([]*Package, error) {
 				continue
 			}
 			pkg := &Package{
-				Name:        packageDir.Name(),
-				Version:     version.Name(),
-				InstallTime: version.ModTime(),
-				Type:        "brew",
+				Name:    packageDir.Name(),
+				Version: version.Name(),
+				Type:    "brew",
+			}
+			if info, err := version.Info(); err == nil {
+				pkg.InstallTime = info.ModTime()
 			}
 
 			// Read formula
 			var formulaPath string
-			installReceiptPath := path.Join(homebrewCellarPath, pkg.Name, pkg.Version, "INSTALL_RECEIPT.json")
-			contents, err := ioutil.ReadFile(installReceiptPath)
+			installReceiptPath := path.Join(brewCellarPath, pkg.Name, pkg.Version, "INSTALL_RECEIPT.json")
+			contents, err := os.ReadFile(installReceiptPath)
 			if err != nil {
 				pkg.error = fmt.Errorf("error reading %v: %w", installReceiptPath, err)
 			} else {
@@ -73,7 +73,7 @@ func listBrewPackages() ([]*Package, error) {
 
 			if formulaPath == "" {
 				// Fallback to /usr/local/Cellar/{pkg.Name}/{pkg.Version}/.brew/{pkg.Name}.rb
-				formulaPath = path.Join(homebrewCellarPath, pkg.Name, pkg.Version, ".brew", pkg.Name+".rb")
+				formulaPath = path.Join(brewCellarPath, pkg.Name, pkg.Version, ".brew", pkg.Name+".rb")
 			}
 
 			file, err := os.Open(formulaPath)

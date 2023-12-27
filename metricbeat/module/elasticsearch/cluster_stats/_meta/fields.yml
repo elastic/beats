@@ -17,6 +17,8 @@
           type: keyword
         - name: state_uuid
           type: keyword
+        - name: nodes
+          type: flattened
     - name: status
       type: keyword
       description: Cluster status (green, yellow, red).
@@ -35,8 +37,6 @@
         type: long
         description: Number of master-eligible nodes in cluster.
       - name: data
-        type: long
-      - name: stats.data
         type: long
         description: Number of data nodes in cluster.
       - name: jvm

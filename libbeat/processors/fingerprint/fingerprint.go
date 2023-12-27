@@ -21,13 +21,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"strings"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -36,7 +37,7 @@ const (
 
 func init() {
 	processors.RegisterPlugin(procName, New)
-	jsprocessor.RegisterPlugin(strings.Title(procName), New)
+	jsprocessor.RegisterPlugin("Fingerprint", New)
 }
 
 type fingerprint struct {
@@ -46,7 +47,7 @@ type fingerprint struct {
 }
 
 // New constructs a new fingerprint processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *config.C) (beat.Processor, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, makeErrConfigUnpack(err)
@@ -84,6 +85,7 @@ func (p *fingerprint) Run(event *beat.Event) (*beat.Event, error) {
 }
 
 func (p *fingerprint) String() string {
+	//nolint:staticcheck // https://github.com/elastic/beats/issues/35174
 	json, _ := json.Marshal(p.config)
 	return procName + "=" + string(json)
 }
@@ -99,7 +101,7 @@ func (p *fingerprint) writeFields(to io.Writer, event *beat.Event) error {
 		}
 
 		switch vv := v.(type) {
-		case map[string]interface{}, []interface{}, common.MapStr:
+		case map[string]interface{}, []interface{}, mapstr.M:
 			return makeErrNonScalarField(k)
 		case time.Time:
 			// Ensure we consistently hash times in UTC.
@@ -109,6 +111,6 @@ func (p *fingerprint) writeFields(to io.Writer, event *beat.Event) error {
 		fmt.Fprintf(to, "|%v|%v", k, v)
 	}
 
-	io.WriteString(to, "|")
+	_, _ = io.WriteString(to, "|")
 	return nil
 }

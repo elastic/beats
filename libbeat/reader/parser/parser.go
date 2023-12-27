@@ -24,12 +24,14 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/beats/v7/libbeat/reader/filter"
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readjson"
+	"github.com/elastic/beats/v7/libbeat/reader/syslog"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -52,13 +54,13 @@ type Config struct {
 	Suffix string
 
 	pCfg    CommonConfig
-	parsers []common.ConfigNamespace
+	parsers []config.Namespace
 }
 
-func (c *Config) Unpack(cc *common.Config) error {
+func (c *Config) Unpack(cc *config.C) error {
 	tmp := struct {
-		Common  CommonConfig             `config:",inline"`
-		Parsers []common.ConfigNamespace `config:"parsers"`
+		Common  CommonConfig       `config:",inline"`
+		Parsers []config.Namespace `config:"parsers"`
 	}{
 		CommonConfig{
 			MaxBytes:       10 * humanize.MiByte,
@@ -80,7 +82,7 @@ func (c *Config) Unpack(cc *common.Config) error {
 	return nil
 }
 
-func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, error) {
+func NewConfig(pCfg CommonConfig, parsers []config.Namespace) (*Config, error) {
 	var suffix string
 	for _, ns := range parsers {
 		name := ns.Name()
@@ -90,21 +92,21 @@ func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, er
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
 			if err != nil {
-				return nil, fmt.Errorf("error while parsing multiline parser config: %+v", err)
+				return nil, fmt.Errorf("error while parsing multiline parser config: %w", err)
 			}
 		case "ndjson":
 			var config readjson.ParserConfig
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
 			if err != nil {
-				return nil, fmt.Errorf("error while parsing ndjson parser config: %+v", err)
+				return nil, fmt.Errorf("error while parsing ndjson parser config: %w", err)
 			}
 		case "container":
 			config := readjson.DefaultContainerConfig()
 			cfg := ns.Config()
 			err := cfg.Unpack(&config)
 			if err != nil {
-				return nil, fmt.Errorf("error while parsing container parser config: %+v", err)
+				return nil, fmt.Errorf("error while parsing container parser config: %w", err)
 			}
 			if config.Stream != readjson.All {
 				if suffix != "" {
@@ -112,8 +114,22 @@ func NewConfig(pCfg CommonConfig, parsers []common.ConfigNamespace) (*Config, er
 				}
 				suffix = config.Stream.String()
 			}
+		case "syslog":
+			config := syslog.DefaultConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return nil, fmt.Errorf("error while parsing syslog parser config: %w", err)
+			}
+		case "include_message":
+			config := filter.DefaultConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return nil, fmt.Errorf("error while parsing include_message parser config: %w", err)
+			}
 		default:
-			return nil, fmt.Errorf("%s: %s", ErrNoSuchParser, name)
+			return nil, fmt.Errorf("%s: %w", name, ErrNoSuchParser)
 		}
 	}
 
@@ -157,6 +173,22 @@ func (c *Config) Create(in reader.Reader) Parser {
 				return p
 			}
 			p = readjson.NewContainerParser(p, &config)
+		case "syslog":
+			config := syslog.DefaultConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return p
+			}
+			p = syslog.NewParser(p, &config)
+		case "include_message":
+			config := filter.DefaultConfig()
+			cfg := ns.Config()
+			err := cfg.Unpack(&config)
+			if err != nil {
+				return p
+			}
+			p = filter.NewParser(p, &config)
 		default:
 			return p
 		}

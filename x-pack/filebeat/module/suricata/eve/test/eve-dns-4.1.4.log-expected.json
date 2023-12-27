@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2019-08-22T23:48:27.924Z",
+        "@timestamp": "2019-08-22T23:48:27.924120Z",
         "destination.address": "10.0.2.3",
         "destination.ip": "10.0.2.3",
         "destination.port": 53,
@@ -48,7 +48,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-22T23:48:27.924Z",
+        "@timestamp": "2019-08-22T23:48:27.924282Z",
         "destination.address": "10.0.2.3",
         "destination.ip": "10.0.2.3",
         "destination.port": 53,
@@ -96,7 +96,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-22T23:48:27.950Z",
+        "@timestamp": "2019-08-22T23:48:27.950946Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 36993,
@@ -161,7 +161,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-22T23:48:27.957Z",
+        "@timestamp": "2019-08-22T23:48:27.957906Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 46686,
@@ -226,7 +226,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-22T23:48:48.839Z",
+        "@timestamp": "2019-08-22T23:48:48.839495Z",
         "destination.address": "10.0.2.3",
         "destination.ip": "10.0.2.3",
         "destination.port": 53,
@@ -275,7 +275,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-22T23:48:48.839Z",
+        "@timestamp": "2019-08-22T23:48:48.839714Z",
         "destination.address": "10.0.2.3",
         "destination.ip": "10.0.2.3",
         "destination.port": 53,
@@ -324,7 +324,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-22T23:48:48.901Z",
+        "@timestamp": "2019-08-22T23:48:48.901548Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 50720,
@@ -420,7 +420,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-22T23:48:48.902Z",
+        "@timestamp": "2019-08-22T23:48:48.902685Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 41979,
@@ -516,7 +516,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T01:22:31.812Z",
+        "@timestamp": "2019-08-23T01:22:31.812655Z",
         "destination.address": "10.0.2.3",
         "destination.ip": "10.0.2.3",
         "destination.port": 53,
@@ -565,7 +565,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T01:22:31.812Z",
+        "@timestamp": "2019-08-23T01:22:31.812828Z",
         "destination.address": "10.0.2.3",
         "destination.ip": "10.0.2.3",
         "destination.port": 53,
@@ -614,7 +614,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T01:22:31.846Z",
+        "@timestamp": "2019-08-23T01:22:31.846575Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 44773,
@@ -673,7 +673,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T01:22:31.846Z",
+        "@timestamp": "2019-08-23T01:22:31.846575Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 44773,
@@ -736,7 +736,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T01:22:31.846Z",
+        "@timestamp": "2019-08-23T01:22:31.846575Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 44773,
@@ -799,7 +799,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T01:22:31.846Z",
+        "@timestamp": "2019-08-23T01:22:31.846575Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 44773,
@@ -862,7 +862,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T01:22:31.846Z",
+        "@timestamp": "2019-08-23T01:22:31.846575Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 44773,
@@ -925,7 +925,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T01:22:31.847Z",
+        "@timestamp": "2019-08-23T01:22:31.847379Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 55246,
@@ -984,7 +984,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T01:22:31.847Z",
+        "@timestamp": "2019-08-23T01:22:31.847379Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 55246,
@@ -1047,7 +1047,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T01:22:31.847Z",
+        "@timestamp": "2019-08-23T01:22:31.847379Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 55246,
@@ -1110,7 +1110,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T01:22:31.847Z",
+        "@timestamp": "2019-08-23T01:22:31.847379Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 55246,
@@ -1173,7 +1173,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T01:22:31.847Z",
+        "@timestamp": "2019-08-23T01:22:31.847379Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 55246,
@@ -1236,7 +1236,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T02:03:36.578Z",
+        "@timestamp": "2019-08-23T02:03:36.578089Z",
         "destination.address": "10.0.2.3",
         "destination.ip": "10.0.2.3",
         "destination.port": 53,
@@ -1285,7 +1285,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T02:03:36.578Z",
+        "@timestamp": "2019-08-23T02:03:36.578262Z",
         "destination.address": "10.0.2.3",
         "destination.ip": "10.0.2.3",
         "destination.port": 53,
@@ -1334,7 +1334,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T02:03:36.619Z",
+        "@timestamp": "2019-08-23T02:03:36.619381Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 48288,
@@ -1430,7 +1430,7 @@
         ]
     },
     {
-        "@timestamp": "2019-08-23T02:03:36.626Z",
+        "@timestamp": "2019-08-23T02:03:36.626559Z",
         "destination.address": "10.0.2.15",
         "destination.ip": "10.0.2.15",
         "destination.port": 59203,

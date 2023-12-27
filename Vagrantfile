@@ -36,6 +36,9 @@ TEST_BOXES = [
   {:name => "centos7", :box => "bento/centos-7", :platform => "centos"},
   {:name => "centos8", :box => "bento/centos-7", :platform => "centos"},
 
+  {:name => "rhel7", :box => "generic/rhel7", :platform => "redhat" },
+  {:name => "rhel8", :box => "generic/rhel8", :platform => "redhat" },
+
   {:name => "win2012", :box => "https://s3.amazonaws.com/beats-files/vagrant/beats-win2012-r2-virtualbox-2016-10-28_1224.box", :platform => "windows"},
   {:name => "win2016", :box => "StefanScherer/windows_2016", :platform => "windows"},
   {:name => "win2019", :box => "StefanScherer/windows_2019", :platform => "windows"},
@@ -53,6 +56,8 @@ TEST_BOXES = [
   {:name => "amazon2", :box => "bento/amazonlinux-2", :platform => "centos"},
 
   # Unsupported platforms
+  {:name => "opensuse153", :box => "bento/opensuse-leap-15.3", :platform => "opensuse"},
+  {:name => "sles12", :box => "elastic/sles-12-x86_64", :platform => "sles"},
   {:name => "solaris", :box => "https://s3.amazonaws.com/beats-files/vagrant/beats-solaris-11.2-virtualbox-2016-11-02_1603.box", :platform => "unix"},
   {:name => "freebsd", :box => "bento/freebsd-13", :platform => "freebsd", :extras => "pkg install -y -q bash && chsh -s bash vagrant"},
   {:name => "openbsd", :box => "generic/openbsd6", :platform => "openbsd", :extras => "sudo pkg_add go"},
@@ -103,14 +108,14 @@ Vagrant.configure("2") do |config|
         end
       end
 
-      # Freebsd 
+      # Freebsd
       if node[:platform] == "freebsd"
         nodeconfig.vm.provision "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 freebsd #{GO_VERSION}", privileged: false
         nodeconfig.vm.provision "shell", inline: "sudo mount -t linprocfs /dev/null /proc", privileged: false
       end
 
       # gvm install
-      if node[:platform] == "centos" or node[:platform] == "ubuntu" or node[:platform] == "debian" or node[:platorm] == "archlinux"
+      if [:centos, :ubuntu, :debian, :archlinux, :opensuse, :sles, :redhat].include?(node[:platform].to_sym)
         nodeconfig.vm.provision "shell", type: "shell", path: "dev-tools/vagrant_scripts/unixProvision.sh", args: "gvm amd64 linux #{GO_VERSION}", privileged: false
       end
 
@@ -126,5 +131,49 @@ Vagrant.configure("2") do |config|
 
     end
   end
+
+    config.vm.define "beats" do |nodeconfig|
+      nodeconfig.vm.box = "ubuntu/jammy64"
+
+      # We deliberately set a fully-qualified domain name for the VM; it helps
+      # test the FQDN feature flag.
+      nodeconfig.vm.hostname = "beats-dev.elastic.dev.internal"
+
+      nodeconfig.vm.network "private_network",
+        hostname: true,
+        ip: "192.168.56.44" # only 192.168.56.0/21 range allowed: https://www.virtualbox.org/manual/ch06.html#network_hostonly
+      nodeconfig.vm.network "forwarded_port",
+        guest: 4244,
+        host: 4244,
+        id: "delve"
+
+      nodeconfig.vm.provider "virtualbox" do |vb|
+        # Display the VirtualBox GUI when booting the machine
+        vb.gui = false
+        vb.customize ["modifyvm", :id, "--vram", "128"]
+        # Customize the amount of memory on the VM:
+        vb.memory = "4096"
+      end
+
+      nodeconfig.vm.provision "shell", inline: <<-SHELL
+         apt-get update
+         apt-get install -y \
+          build-essential \
+          curl \
+          delve \
+          make \
+          unzip
+          vim \
+          wget
+         curl -sL -o /tmp/go#{GO_VERSION}.linux-amd64.tar.gz https://go.dev/dl/go#{GO_VERSION}.linux-amd64.tar.gz
+         tar -C /usr/local -xzf /tmp/go#{GO_VERSION}.linux-amd64.tar.gz
+         curl -sL -o /tmp/mage_1.15.0_Linux-64bit.tar.gz https://github.com/magefile/mage/releases/download/v1.15.0/mage_1.15.0_Linux-64bit.tar.gz
+         tar -C /tmp -xf /tmp/mage_1.15.0_Linux-64bit.tar.gz
+         mv /tmp/mage /usr/local/bin/mage
+         echo "alias ll='ls -la'" > /etc/profile.d/ll.sh
+         echo 'export PATH=$PATH:/usr/local/go/bin' > /etc/profile.d/go.sh
+         echo 'export PATH=$PATH:$(go env GOPATH)/bin' >> /etc/profile.d/go.sh
+      SHELL
+    end
 
 end

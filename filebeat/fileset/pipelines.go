@@ -24,8 +24,8 @@ import (
 
 	"github.com/joeshaw/multierror"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 // PipelineLoaderFactory builds and returns a PipelineLoader
@@ -36,7 +36,8 @@ type PipelineLoaderFactory func() (PipelineLoader, error)
 type PipelineLoader interface {
 	LoadJSON(path string, json map[string]interface{}) ([]byte, error)
 	Request(method, path string, pipeline string, params map[string]string, body interface{}) (int, []byte, error)
-	GetVersion() common.Version
+	GetVersion() version.V
+	IsServerless() bool
 }
 
 // MultiplePipelineUnsupportedError is an error returned when a fileset uses multiple pipelines but is
@@ -44,8 +45,8 @@ type PipelineLoader interface {
 type MultiplePipelineUnsupportedError struct {
 	module               string
 	fileset              string
-	esVersion            common.Version
-	minESVersionRequired common.Version
+	esVersion            version.V
+	minESVersionRequired version.V
 }
 
 func (m MultiplePipelineUnsupportedError) Error() string {
@@ -65,21 +66,22 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 			// check that all the required Ingest Node plugins are available
 			requiredProcessors := fileset.GetRequiredProcessors()
 			reg.log.Debugf("Required processors: %s", requiredProcessors)
-			if len(requiredProcessors) > 0 {
+			// APIs do not exist on serverless
+			if len(requiredProcessors) > 0 && !esClient.IsServerless() {
 				err := checkAvailableProcessors(esClient, requiredProcessors)
 				if err != nil {
-					return fmt.Errorf("error loading pipeline for fileset %s/%s: %v", module.config.Module, fileset.name, err)
+					return fmt.Errorf("error loading pipeline for fileset %s/%s: %w", module.config.Module, fileset.name, err)
 				}
 			}
 
 			pipelines, err := fileset.GetPipelines(esClient.GetVersion())
 			if err != nil {
-				return fmt.Errorf("error getting pipeline for fileset %s/%s: %v", module.config.Module, fileset.name, err)
+				return fmt.Errorf("error getting pipeline for fileset %s/%s: %w", module.config.Module, fileset.name, err)
 			}
 
 			// Filesets with multiple pipelines can only be supported by Elasticsearch >= 6.5.0
 			esVersion := esClient.GetVersion()
-			minESVersionRequired := common.MustNewVersion("6.5.0")
+			minESVersionRequired := version.MustNew("6.5.0")
 			if len(pipelines) > 1 && esVersion.LessThan(minESVersionRequired) {
 				return MultiplePipelineUnsupportedError{module.config.Module, fileset.name, esVersion, *minESVersionRequired}
 			}
@@ -88,7 +90,7 @@ func (reg *ModuleRegistry) LoadPipelines(esClient PipelineLoader, overwrite bool
 			for _, pipeline := range pipelines {
 				err = LoadPipeline(esClient, pipeline.id, pipeline.contents, overwrite, reg.log.With("pipeline", pipeline.id))
 				if err != nil {
-					err = fmt.Errorf("error loading pipeline for fileset %s/%s: %v", module.config.Module, fileset.name, err)
+					err = fmt.Errorf("error loading pipeline for fileset %s/%s: %w", module.config.Module, fileset.name, err)
 					break
 				}
 				pipelineIDsLoaded = append(pipelineIDsLoaded, pipeline.id)
@@ -169,7 +171,7 @@ func interpretError(initialErr error, body []byte) error {
 				"This is the response I got from Elasticsearch: %s", body)
 		}
 
-		return fmt.Errorf("couldn't load pipeline: %v. Additionally, error decoding response body: %s",
+		return fmt.Errorf("couldn't load pipeline: %w. Additionally, error decoding response body: %s",
 			initialErr, body)
 	}
 
@@ -182,7 +184,6 @@ func interpretError(initialErr error, body []byte) error {
 		return fmt.Errorf("this module requires an Elasticsearch plugin that provides the %s processor. "+
 			"Please visit the Elasticsearch documentation for instructions on how to install this plugin. "+
 			"Response body: %s", response.Error.RootCause[0].Header.ProcessorType, body)
-
 	}
 
 	// older ES version?
@@ -195,5 +196,5 @@ func interpretError(initialErr error, body []byte) error {
 			"This is the response I got from Elasticsearch: %s", body)
 	}
 
-	return fmt.Errorf("couldn't load pipeline: %v. Response body: %s", initialErr, body)
+	return fmt.Errorf("couldn't load pipeline: %w. Response body: %s", initialErr, body)
 }

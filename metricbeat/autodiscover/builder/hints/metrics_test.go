@@ -26,11 +26,11 @@ import (
 	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/keystore"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestGenerateHints(t *testing.T) {
@@ -38,69 +38,69 @@ func TestGenerateHints(t *testing.T) {
 		message string
 		event   bus.Event
 		len     int
-		result  []common.MapStr
+		result  []mapstr.M
 	}{
 		{
 			message: "Empty event hints should return empty config",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"kubernetes": common.MapStr{
-					"container": common.MapStr{
+				"kubernetes": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
-				"docker": common.MapStr{
-					"container": common.MapStr{
+				"docker": mapstr.M{
+					"container": mapstr.M{
 						"name": "foobar",
 						"id":   "abc",
 					},
 				},
 			},
 			len:    0,
-			result: []common.MapStr{},
+			result: []mapstr.M{},
 		},
 		{
 			message: "Hints without host should return nothing",
 			event: bus.Event{
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module": "mockmodule",
 					},
 				},
 			},
 			len:    0,
-			result: []common.MapStr{},
+			result: []mapstr.M{},
 		},
 		{
 			message: "Hints without matching port should return nothing",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 9090,
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module": "mockmoduledefaults",
 						"hosts":  "${data.host}:8888",
 					},
 				},
 			},
 			len:    0,
-			result: []common.MapStr{},
+			result: []mapstr.M{},
 		},
 		{
 			message: "Hints with multiple hosts return only the matching one",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 9090,
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module": "mockmoduledefaults",
 						"hosts":  "${data.host}:8888,${data.host}:9090",
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"metricsets": []string{"default"},
@@ -108,6 +108,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -116,15 +117,15 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 9090,
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module": "mockmoduledefaults",
 						"hosts":  "${data.host}:8888,${data.host}:${data.port}",
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"metricsets": []string{"default"},
@@ -132,6 +133,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -139,20 +141,21 @@ func TestGenerateHints(t *testing.T) {
 			message: "Only module hint should return all metricsets",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module": "mockmodule",
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmodule",
 					"metricsets": []string{"one", "two"},
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -160,21 +163,22 @@ func TestGenerateHints(t *testing.T) {
 			message: "Metricsets hint works",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module":     "mockmodule",
 						"metricsets": "one",
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmodule",
 					"metricsets": []string{"one"},
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -182,20 +186,21 @@ func TestGenerateHints(t *testing.T) {
 			message: "Only module, it should return defaults",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module": "mockmoduledefaults",
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"metricsets": []string{"default"},
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -203,14 +208,14 @@ func TestGenerateHints(t *testing.T) {
 			message: "Module defined in modules as a JSON string should return a config",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"raw": "{\"enabled\":true,\"metricsets\":[\"default\"],\"module\":\"mockmoduledefaults\",\"period\":\"1m\",\"timeout\":\"3s\"}",
 					},
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"metricsets": []string{"default"},
@@ -225,8 +230,8 @@ func TestGenerateHints(t *testing.T) {
 				"docker host network scenario",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "${data.host}:9090",
@@ -234,7 +239,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
@@ -243,6 +248,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -250,13 +256,13 @@ func TestGenerateHints(t *testing.T) {
 			message: "Module with processor config must return an module having the processor defined",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "${data.host}:9090",
-						"processors": common.MapStr{
-							"add_locale": common.MapStr{
+						"processors": mapstr.M{
+							"add_locale": mapstr.M{
 								"abbrevation": "MST",
 							},
 						},
@@ -264,7 +270,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
@@ -288,8 +294,8 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 0,
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "${data.host}:9090",
@@ -303,8 +309,8 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 9090,
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "${data.host}:9090",
@@ -312,7 +318,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
@@ -321,6 +327,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -329,9 +336,9 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 80,
-				"hints": []common.MapStr{
+				"hints": []mapstr.M{
 					{
-						"metrics": common.MapStr{
+						"metrics": mapstr.M{
 							"module":    "mockmoduledefaults",
 							"namespace": "test",
 							"hosts":     "${data.host}:8080",
@@ -340,15 +347,15 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len:    0,
-			result: []common.MapStr{},
+			result: []mapstr.M{},
 		},
 		{
 			message: "Non http URLs with valid host port combination should return a valid config",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 3306,
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "tcp(${data.host}:3306)/",
@@ -356,7 +363,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
@@ -365,6 +372,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -372,9 +380,9 @@ func TestGenerateHints(t *testing.T) {
 			message: "Named port in the hints should return the corresponding container port",
 			event: bus.Event{
 				"host":  "1.2.3.4",
-				"ports": common.MapStr{"some": 3306},
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"ports": mapstr.M{"some": 3306},
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "${data.host}:${data.ports.some}",
@@ -382,7 +390,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
@@ -391,6 +399,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -398,9 +407,9 @@ func TestGenerateHints(t *testing.T) {
 			message: "Named port in the hints should return the corresponding container port for complex hosts",
 			event: bus.Event{
 				"host":  "1.2.3.4",
-				"ports": common.MapStr{"prometheus": 3306},
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"ports": mapstr.M{"prometheus": 3306},
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "http://${data.host}:${data.ports.prometheus}/metrics",
@@ -408,7 +417,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
@@ -417,6 +426,7 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -425,9 +435,9 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host":  "1.2.3.4",
 				"port":  3306,
-				"ports": common.MapStr{"prometheus": 3306},
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"ports": mapstr.M{"prometheus": 3306},
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "${data.host}:${data.port}",
@@ -435,7 +445,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
@@ -444,21 +454,22 @@ func TestGenerateHints(t *testing.T) {
 					"timeout":    "3s",
 					"period":     "1m",
 					"enabled":    true,
+					"processors": []interface{}{},
 				},
 			},
 		},
 		{
-			message: "Module with mutliple sets of hints must return the right configs",
+			message: "Module with multiple sets of hints must return the right configs",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
-						"1": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
+						"1": mapstr.M{
 							"module":    "mockmoduledefaults",
 							"namespace": "test",
 							"hosts":     "${data.host}:9090",
 						},
-						"2": common.MapStr{
+						"2": mapstr.M{
 							"module":    "mockmoduledefaults",
 							"namespace": "test1",
 							"hosts":     "${data.host}:9090/fake",
@@ -467,7 +478,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 2,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
@@ -476,6 +487,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"processors": []interface{}{},
 				},
 				{
 					"module":     "mockmoduledefaults",
@@ -485,6 +497,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090/fake"},
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -492,8 +505,8 @@ func TestGenerateHints(t *testing.T) {
 			message: "Module with multiple hosts returns the right number of hints. Pod level hints need to be one per host",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "${data.host}:9090, ${data.host}:9091",
@@ -501,7 +514,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 2,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
@@ -510,6 +523,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"processors": []interface{}{},
 				},
 				{
 					"module":     "mockmoduledefaults",
@@ -519,6 +533,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9091"},
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -527,8 +542,8 @@ func TestGenerateHints(t *testing.T) {
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 9091,
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module":    "mockmoduledefaults",
 						"namespace": "test",
 						"hosts":     "${data.host}:9090, ${data.host}:9091",
@@ -536,7 +551,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "mockmoduledefaults",
 					"namespace":  "test",
@@ -545,6 +560,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9091"},
+					"processors": []interface{}{},
 				},
 			},
 		},
@@ -552,12 +568,12 @@ func TestGenerateHints(t *testing.T) {
 			message: "exclude/exclude in metrics filters are parsed as a list",
 			event: bus.Event{
 				"host": "1.2.3.4",
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module":    "prometheus",
 						"namespace": "test",
 						"hosts":     "${data.host}:9090",
-						"metrics_filters": common.MapStr{
+						"metrics_filters": mapstr.M{
 							"exclude": "foo, bar",
 							"include": "xxx, yyy",
 						},
@@ -565,7 +581,7 @@ func TestGenerateHints(t *testing.T) {
 				},
 			},
 			len: 1,
-			result: []common.MapStr{
+			result: []mapstr.M{
 				{
 					"module":     "prometheus",
 					"namespace":  "test",
@@ -574,6 +590,7 @@ func TestGenerateHints(t *testing.T) {
 					"period":     "1m",
 					"enabled":    true,
 					"hosts":      []interface{}{"1.2.3.4:9090"},
+					"processors": []interface{}{},
 					"metrics_filters": map[string]interface{}{
 						"exclude": []interface{}{"foo", "bar"},
 						"include": []interface{}{"xxx", "yyy"},
@@ -602,9 +619,9 @@ func TestGenerateHints(t *testing.T) {
 		if len(cfgs) == 0 {
 			continue
 		}
-		configs := make([]common.MapStr, 0)
+		configs := make([]mapstr.M, 0)
 		for _, cfg := range cfgs {
-			config := common.MapStr{}
+			config := mapstr.M{}
 			err := cfg.Unpack(&config)
 			ok := assert.Nil(t, err, test.message)
 			if !ok {
@@ -615,7 +632,9 @@ func TestGenerateHints(t *testing.T) {
 				if msets, ok := v.([]interface{}); ok {
 					metricsets := make([]string, len(msets))
 					for i, v := range msets {
-						metricsets[i] = v.(string)
+						var ok bool
+						metricsets[i], ok = v.(string)
+						assert.Truef(t, ok, "Failed to convert metricset: %d=%v", i, metricsets[i])
 					}
 					sort.Strings(metricsets)
 					config["metricsets"] = metricsets
@@ -632,22 +651,22 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 	path := getTemporaryKeystoreFile()
 	defer os.Remove(path)
 	// store the secret
-	keystore := createAnExistingKeystore(path, "stored_secret")
+	keystore := createAnExistingKeystore(t, path, "stored_secret")
 	os.Setenv("PASSWORD", "env_secret")
 
 	tests := []struct {
 		message string
 		event   bus.Event
 		len     int
-		result  common.MapStr
+		result  mapstr.M
 	}{
 		{
 			message: "Module, namespace, host hint should return valid config",
 			event: bus.Event{
 				"host": "1.2.3.4",
 				"port": 9090,
-				"hints": common.MapStr{
-					"metrics": common.MapStr{
+				"hints": mapstr.M{
+					"metrics": mapstr.M{
 						"module":   "mockmoduledefaults",
 						"hosts":    "${data.host}:9090",
 						"password": "${PASSWORD}",
@@ -656,7 +675,7 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 				"keystore": keystore,
 			},
 			len: 1,
-			result: common.MapStr{
+			result: mapstr.M{
 				"module":     "mockmoduledefaults",
 				"metricsets": []string{"default"},
 				"hosts":      []interface{}{"1.2.3.4:9090"},
@@ -664,6 +683,7 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 				"period":     "1m",
 				"enabled":    true,
 				"password":   "env_secret",
+				"processors": []interface{}{},
 			},
 		},
 	}
@@ -679,7 +699,7 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 		cfgs := m.CreateConfig(test.event)
 		assert.Equal(t, len(cfgs), test.len)
 		if len(cfgs) != 0 {
-			config := common.MapStr{}
+			config := mapstr.M{}
 			err := cfgs[0].Unpack(&config)
 			assert.Nil(t, err, test.message)
 
@@ -688,7 +708,9 @@ func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
 				if msets, ok := v.([]interface{}); ok {
 					metricsets := make([]string, len(msets))
 					for i, v := range msets {
-						metricsets[i] = v.(string)
+						var ok bool
+						metricsets[i], ok = v.(string)
+						assert.Truef(t, ok, "Failed to convert metricset: %d=%v", i, metricsets[i])
 					}
 					sort.Strings(metricsets)
 					config["metricsets"] = metricsets
@@ -709,7 +731,7 @@ func NewMockMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MockMetricSet{}, nil
 }
 
-func (ms *MockMetricSet) Fetch(report mb.Reporter) {
+func (ms *MockMetricSet) Fetch(report mb.ReporterV2) {
 
 }
 
@@ -723,7 +745,8 @@ func NewMockPrometheus(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // create a keystore with an existing key
 // `PASSWORD` with the value of `secret` variable.
-func createAnExistingKeystore(path string, secret string) keystore.Keystore {
+func createAnExistingKeystore(t *testing.T, path string, secret string) keystore.Keystore {
+	t.Helper()
 	keyStore, err := keystore.NewFileKeystore(path)
 	// Fail fast in the test suite
 	if err != nil {
@@ -735,8 +758,8 @@ func createAnExistingKeystore(path string, secret string) keystore.Keystore {
 		panic(err)
 	}
 
-	writableKeystore.Store("PASSWORD", []byte(secret))
-	writableKeystore.Save()
+	assert.NoError(t, writableKeystore.Store("PASSWORD", []byte(secret)))
+	assert.NoError(t, writableKeystore.Save())
 	return keyStore
 }
 

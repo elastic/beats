@@ -16,18 +16,20 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || openbsd || windows || aix
-// +build darwin freebsd linux openbsd windows aix
 
 package cpu
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
+	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	metrics "github.com/elastic/elastic-agent-system-metrics/metric/cpu"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func init() {
@@ -53,7 +55,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	opts, err := config.Validate()
 	if err != nil {
-		return nil, errors.Wrap(err, "error validating config")
+		return nil, fmt.Errorf("error validating config: %w", err)
 	}
 
 	if config.CPUTicks != nil && *config.CPUTicks {
@@ -71,24 +73,24 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	sample, err := m.cpu.Fetch()
 	if err != nil {
-		return errors.Wrap(err, "failed to fetch CPU times")
+		return fmt.Errorf("failed to fetch CPU times: %w", err)
 	}
 
 	event, err := sample.Format(m.opts)
 	if err != nil {
-		return errors.Wrap(err, "error formatting metrics")
+		return fmt.Errorf("error formatting metrics: %w", err)
 	}
 	event.Put("cores", sample.CPUCount())
 
 	//generate the host fields here, since we don't want users disabling it.
 	hostEvent, err := sample.Format(metrics.MetricOpts{NormalizedPercentages: true})
 	if err != nil {
-		return errors.Wrap(err, "error creating host fields")
+		return fmt.Errorf("error creating host fields: %w", err)
 	}
-	hostFields := common.MapStr{}
+	hostFields := mapstr.M{}
 	err = copyFieldsOrDefault(hostEvent, hostFields, "total.norm.pct", "host.cpu.usage", 0)
 	if err != nil {
-		return errors.Wrap(err, "error fetching normalized CPU percent")
+		return fmt.Errorf("error fetching normalized CPU percent: %w", err)
 	}
 
 	r.Event(mb.Event{
@@ -99,12 +101,45 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	return nil
 }
 
+// Diagnostics implmements the DiagnosticSet interface
+func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
+	m.Logger().Infof("got DiagnosticSetup request for system/cpu")
+	if runtime.GOOS == "linux" {
+		return []diagnostics.DiagnosticSetup{
+			{
+				Name:        "cpu-stat",
+				Description: "/proc/stat file",
+				Filename:    "stat",
+				Callback:    m.fetchRawCPU,
+			},
+			{
+				Name:        "cpu-cpuinfo",
+				Description: "/proc/cpuinfo file",
+				Filename:    "cpuinfo",
+				Callback:    m.fetchCPUInfo,
+			},
+		}
+	}
+	return nil
+
+}
+
+func (m *MetricSet) fetchRawCPU() []byte {
+	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	return diagnostics.GetRawFileOrErrorString(sys, "/proc/stat")
+}
+
+func (m *MetricSet) fetchCPUInfo() []byte {
+	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	return diagnostics.GetRawFileOrErrorString(sys, "/proc/cpuinfo")
+}
+
 // copyFieldsOrDefault copies the field specified by key to the given map. It will
 // overwrite the key if it exists. It will update the map with a default value if
 // the key does not exist in the source map.
-func copyFieldsOrDefault(from, to common.MapStr, key, newkey string, value interface{}) error {
+func copyFieldsOrDefault(from, to mapstr.M, key, newkey string, value interface{}) error {
 	v, err := from.GetValue(key)
-	if errors.Is(err, common.ErrKeyNotFound) {
+	if errors.Is(err, mapstr.ErrKeyNotFound) {
 		_, err = to.Put(newkey, value)
 		return err
 	}

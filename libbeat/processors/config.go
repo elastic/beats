@@ -18,11 +18,28 @@
 package processors
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
+	"fmt"
+
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// PluginConfig represents the list of processors.
-type PluginConfig []*common.Config
+// PluginConfig represents the list of processors given in beat configuration.
+type PluginConfig []*config.C
 
-// fields that should be always exported
+// MandatoryExportedFields are fields that should be always exported
 var MandatoryExportedFields = []string{"type"}
+
+// NewPluginConfigFromList creates a PluginConfig from a list of raw processor config objects
+func NewPluginConfigFromList(raw []mapstr.M) (PluginConfig, error) {
+	processors := make([]*config.C, len(raw))
+	for i := 0; i < len(raw); i++ {
+		cfg, err := config.NewConfigFrom(raw[i])
+		if err != nil {
+			return nil, fmt.Errorf("error creating processor config: %w", err)
+		}
+		processors[i] = cfg
+	}
+
+	return processors, nil
+}

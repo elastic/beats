@@ -79,11 +79,11 @@ func TestPCAPFiles(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				if err = os.MkdirAll(goldenDir, 0755); err != nil {
+				if err = os.MkdirAll(goldenDir, 0o755); err != nil {
 					t.Fatal(err)
 				}
 
-				err = ioutil.WriteFile(goldenName, data, 0644)
+				err = ioutil.WriteFile(goldenName, data, 0o644)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -111,11 +111,11 @@ func TestDatFiles(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				if err = os.MkdirAll(goldenDir, 0755); err != nil {
+				if err = os.MkdirAll(goldenDir, 0o755); err != nil {
 					t.Fatal(err)
 				}
 
-				err = ioutil.WriteFile(goldenName, data, 0644)
+				err = ioutil.WriteFile(goldenName, data, 0o644)
 				if err != nil {
 					t.Fatal(err)
 				}

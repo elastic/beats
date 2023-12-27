@@ -22,11 +22,11 @@ import (
 	"strings"
 
 	"github.com/docker/docker/api/types"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func eventsMapping(r mb.ReporterV2, containers []types.Container, m *MetricSet) {
@@ -42,7 +42,6 @@ func eventMapping(r mb.ReporterV2, cont *types.Container, m *MetricSet) {
 
 	container, err := m.dockerClient.ContainerInspect(context.TODO(), cont.ID)
 	if err != nil {
-		errors.Wrapf(err, "Error inspecting container %v", cont.ID)
 		return
 	}
 
@@ -58,10 +57,10 @@ func eventMapping(r mb.ReporterV2, cont *types.Container, m *MetricSet) {
 		return
 	}
 
-	fields := common.MapStr{
+	fields := mapstr.M{
 		"status":        container.State.Health.Status,
 		"failingstreak": container.State.Health.FailingStreak,
-		"event": common.MapStr{
+		"event": mapstr.M{
 			"start_date": common.Time(container.State.Health.Log[lastEvent].Start),
 			"end_date":   common.Time(container.State.Health.Log[lastEvent].End),
 			"exit_code":  container.State.Health.Log[lastEvent].ExitCode,

@@ -3,19 +3,20 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package add_cloudfoundry_metadata
 
 import (
+	"fmt"
+
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -34,7 +35,7 @@ type addCloudFoundryMetadata struct {
 const selector = "add_cloudfoundry_metadata"
 
 // New constructs a new add_cloudfoundry_metadata processor.
-func New(cfg *common.Config) (processors.Processor, error) {
+func New(cfg *conf.C) (beat.Processor, error) {
 	var config cloudfoundry.Config
 
 	// ShardID is required in cloudfoundry config to consume from the firehose,
@@ -42,14 +43,14 @@ func New(cfg *common.Config) (processors.Processor, error) {
 	config.ShardID = uuid.Must(uuid.NewV4()).String()
 
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "fail to unpack the %v configuration", processorName)
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
 	log := logp.NewLogger(selector)
 	hub := cloudfoundry.NewHub(&config, "add_cloudfoundry_metadata", log)
 	client, err := hub.ClientWithCache()
 	if err != nil {
-		return nil, errors.Wrapf(err, "%s: creating cloudfoundry client", processorName)
+		return nil, fmt.Errorf("%s: creating cloudfoundry client: %w", processorName, err)
 	}
 
 	return &addCloudFoundryMetadata{
@@ -64,7 +65,7 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 	}
 	valI, err := event.GetValue("cloudfoundry.app.id")
 	if err != nil {
-		// doesn't have the required cloudfoundry.app.id value to add more information
+		//nolint:nilerr // doesn't have the required cloudfoundry.app.id value to add more information
 		return event, nil
 	}
 	val, _ := valI.(string)
@@ -81,16 +82,16 @@ func (d *addCloudFoundryMetadata) Run(event *beat.Event) (*beat.Event, error) {
 		d.log.Debugf("failed to get application info for GUID(%s): %v", val, err)
 		return event, nil
 	}
-	event.Fields.DeepUpdate(common.MapStr{
-		"cloudfoundry": common.MapStr{
-			"app": common.MapStr{
+	event.Fields.DeepUpdate(mapstr.M{
+		"cloudfoundry": mapstr.M{
+			"app": mapstr.M{
 				"name": app.Name,
 			},
-			"space": common.MapStr{
+			"space": mapstr.M{
 				"id":   app.SpaceGuid,
 				"name": app.SpaceName,
 			},
-			"org": common.MapStr{
+			"org": mapstr.M{
 				"id":   app.OrgGuid,
 				"name": app.OrgName,
 			},
@@ -111,7 +112,7 @@ func (d *addCloudFoundryMetadata) Close() error {
 	}
 	err := d.client.Close()
 	if err != nil {
-		return errors.Wrap(err, "closing client")
+		return fmt.Errorf("closing client: %w", err)
 	}
 	return nil
 }

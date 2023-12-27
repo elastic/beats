@@ -23,7 +23,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -33,7 +33,7 @@ var (
 )
 
 // Map body to MapStr
-func eventMapping(scanner *bufio.Scanner, m *MetricSet) (common.MapStr, error) {
+func eventMapping(scanner *bufio.Scanner, m *MetricSet) (mapstr.M, error) {
 	// Nginx stub status sample:
 	// Active connections: 1
 	// server accepts handled requests
@@ -92,7 +92,7 @@ func eventMapping(scanner *bufio.Scanner, m *MetricSet) (common.MapStr, error) {
 	writing, _ = strconv.Atoi(matches[2])
 	waiting, _ = strconv.Atoi(matches[3])
 
-	event := common.MapStr{
+	event := mapstr.M{
 		"hostname": m.Host(),
 		"active":   active,
 		"accepts":  accepts,

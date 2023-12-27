@@ -75,7 +75,7 @@ Make sure that you update at least the description of the module.
 It's a common pattern to use a `testing.go` file in the module package to share some testing functionality among
 the metricsets. This file does not have `_test.go` in the name because otherwise it would not be compiled for sub packages.
 
-To see an example of the `testing.go` file, look at the https://github.com/elastic/beats/tree/master/metricbeat/module/mysql[mysql module].
+To see an example of the `testing.go` file, look at the https://github.com/elastic/beats/tree/{branch}/metricbeat/module/mysql[mysql module].
 
 [float]
 ===== Test a Metricbeat module manually
@@ -127,14 +127,14 @@ $ mage build
 $ ./metricbeat modules enable mysql
 ----
 
-This will enable the module and rename file `metricbeat/modules.d/mysql.yml.disabled` to `metricbeat/modules.d/mysql.yml`. According to our https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-mysql.html[documentation] we should specify username and password to user MySQL. It's always a good idea to take a look at the docs to see also that a pre-built dashboard is also available. So tweaking the config a bit, this is how it looks like:
+This will enable the module and rename file `metricbeat/modules.d/mysql.yml.disabled` to `metricbeat/modules.d/mysql.yml`. According to our {metricbeat-ref}/metricbeat-module-mysql.html[documentation] we should specify username and password to user MySQL. It's always a good idea to take a look at the docs to see also that a pre-built dashboard is also available. So tweaking the config a bit, this is how it looks like:
 
 [source,yaml]
 ----
 $ cat modules.d/mysql.yml
 
 # Module: mysql
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/master/metricbeat-module-mysql.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/current/metricbeat-module-mysql.html
 
 - module: mysql
   metricsets:

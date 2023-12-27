@@ -1,0 +1,33 @@
+name: check-docs
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/check-docs.yml'
+      - '**/*.asciidoc'
+      - '**/*.md'
+      - 'deploy/kubernetes/*-kubernetes.yaml'
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version-file: .go-version
+    - name: Update package lists
+      run: sudo apt-get update
+    - name: Install libpcap-dev
+      run: sudo apt-get install -y libpcap-dev
+    - name: Install libsystemd-dev
+      run: sudo apt-get install -y libsystemd-dev
+    - name: Install librpm-dev
+      run: sudo apt-get install -y librpm-dev
+    - name: Run check
+      run: |
+        make check

@@ -19,8 +19,8 @@ package v2
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/go-concert/unison"
 )
@@ -38,11 +38,11 @@ type InputManager interface {
 	// if inputs are only configured for testing/validation purposes.
 	Init(grp unison.Group, mode Mode) error
 
-	// Creates builds a new Input instance from the given configuation, or returns
+	// Create builds a new Input instance from the given configuation, or returns
 	// an error if the configuation is invalid.
 	// The input must establish any connection for data collection yet. The Beat
 	// will use the Test/Run methods of the input.
-	Create(*common.Config) (Input, error)
+	Create(*conf.C) (Input, error)
 }
 
 // Mode tells the InputManager in which mode it is initialized.
@@ -65,7 +65,7 @@ type Input interface {
 	// and filebeat.
 	Name() string
 
-	// Test checks the configuaration and runs additional checks if the Input can
+	// Test checks the configuration and runs additional checks if the Input can
 	// actually collect data for the given configuration (e.g. check if host/port or files are
 	// accessible).
 	Test(TestContext) error

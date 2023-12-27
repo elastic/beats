@@ -11,8 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestNewAppend(t *testing.T) {
@@ -116,7 +117,7 @@ func TestNewAppend(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(tc.config)
+			cfg := conf.MustNewConfigFrom(tc.config)
 			gotAppend, gotErr := tc.constructor(cfg, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
@@ -143,20 +144,20 @@ func TestAppendFunctions(t *testing.T) {
 			name:        "appendBody",
 			tfunc:       appendBody,
 			paramCtx:    &transformContext{},
-			paramTr:     transformable{"body": common.MapStr{"a_key": "a_value"}},
+			paramTr:     transformable{"body": mapstr.M{"a_key": "a_value"}},
 			paramKey:    "a_key",
 			paramVal:    "another_value",
-			expectedTr:  transformable{"body": common.MapStr{"a_key": []interface{}{"a_value", "another_value"}}},
+			expectedTr:  transformable{"body": mapstr.M{"a_key": []interface{}{"a_value", "another_value"}}},
 			expectedErr: nil,
 		},
 		{
 			name:        "appendBodyWithSingleValue",
 			tfunc:       appendBody,
 			paramCtx:    &transformContext{},
-			paramTr:     transformable{"body": common.MapStr{}},
+			paramTr:     transformable{"body": mapstr.M{}},
 			paramKey:    "a_key",
 			paramVal:    "a_value",
-			expectedTr:  transformable{"body": common.MapStr{"a_key": []interface{}{"a_value"}}},
+			expectedTr:  transformable{"body": mapstr.M{"a_key": []interface{}{"a_value"}}},
 			expectedErr: nil,
 		},
 		{
@@ -204,7 +205,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 		"value_type": "json",
 	}
 
-	cfg, err := common.NewConfigFrom(c1)
+	cfg, err := conf.NewConfigFrom(c1)
 	require.NoError(t, err)
 
 	transform, err := newAppendResponse(cfg, logp.NewLogger("test"))
@@ -218,7 +219,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	tr, err = testAppend.run(trCtx, tr)
 	require.NoError(t, err)
 
-	exp := common.MapStr{
+	exp := mapstr.M{
 		"p1": []interface{}{
 			map[string]interface{}{
 				"param": "value",
@@ -234,7 +235,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 		"value_type": "int",
 	}
 
-	cfg, err = common.NewConfigFrom(c2)
+	cfg, err = conf.NewConfigFrom(c2)
 	require.NoError(t, err)
 
 	transform, err = newAppendResponse(cfg, logp.NewLogger("test"))
@@ -247,7 +248,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	tr, err = testAppend.run(trCtx, tr)
 	require.NoError(t, err)
 
-	exp = common.MapStr{
+	exp = mapstr.M{
 		"p1": []interface{}{int64(1)},
 	}
 
@@ -255,7 +256,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 
 	c2["value_type"] = "string"
 
-	cfg, err = common.NewConfigFrom(c2)
+	cfg, err = conf.NewConfigFrom(c2)
 	require.NoError(t, err)
 
 	transform, err = newAppendResponse(cfg, logp.NewLogger("test"))
@@ -268,7 +269,7 @@ func TestDifferentAppendValueTypes(t *testing.T) {
 	tr, err = testAppend.run(trCtx, tr)
 	require.NoError(t, err)
 
-	exp = common.MapStr{
+	exp = mapstr.M{
 		"p1": []interface{}{"1"},
 	}
 

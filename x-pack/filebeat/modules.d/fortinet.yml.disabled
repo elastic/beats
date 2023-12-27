@@ -1,5 +1,5 @@
 # Module: fortinet
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-fortinet.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-fortinet.html
 
 - module: fortinet
   firewall:
@@ -24,6 +24,12 @@
     # based on a tagged interface. Both internal and external interfaces must be
     # set to leverage this functionality.
     #var.external_interfaces: [ "WAN" ]
+
+    # List of internal networks. Supports IPv4 and IPv6 addresses and ranges in CIDR notation.
+    # Also supports the named ranges listed
+    # [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/network-direction-processor.html#supported-named-network-ranges).
+    # This can't be used in combination with internal_interfaces and external_interfaces.
+    #var.internal_networks: [ "private" ]
 
   clientendpoint:
     enabled: false

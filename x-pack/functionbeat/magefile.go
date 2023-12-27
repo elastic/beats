@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -17,6 +16,7 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	functionbeat "github.com/elastic/beats/v7/x-pack/functionbeat/scripts/mage"
 
 	// mage:import
@@ -140,6 +140,13 @@ func Fields() { mg.Deps(functionbeat.Update.Fields) }
 // https://github.com/magefile/mage/issues/217.
 func Config() { mg.Deps(functionbeat.Update.Config) }
 
+// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
+// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
+// were built and only performs the merge.
+func AssembleDarwinUniversal() error {
+	return build.AssembleDarwinUniversal()
+}
+
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
@@ -152,6 +159,14 @@ func Package() {
 	mg.Deps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
+}
+
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
+	return nil
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).

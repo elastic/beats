@@ -19,12 +19,10 @@ package state
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-
-	"github.com/pkg/errors"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -69,37 +67,34 @@ var (
 
 func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool) error {
 	event := mb.Event{
-		RootFields:   common.MapStr{},
-		ModuleFields: common.MapStr{},
+		RootFields:   mapstr.M{},
+		ModuleFields: mapstr.M{},
 	}
 
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Beat's State API response")
+		return fmt.Errorf("failure parsing Beat's State API response: %w", err)
 	}
-
-	event.MetricSetFields, _ = schema.Apply(data)
 
 	clusterUUID := getMonitoringClusterUUID(data)
 	if clusterUUID == "" {
 		if isOutputES(data) {
 			clusterUUID = getClusterUUID(data)
-			if clusterUUID != "" {
-				event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 
-				if event.MetricSetFields != nil {
-					event.MetricSetFields.Put("cluster.uuid", clusterUUID)
-				}
+			if clusterUUID == "" {
+				return nil
 			}
 		}
 	}
+
+	event.ModuleFields.Put("elasticsearch.cluster.id", clusterUUID)
 
 	event.MetricSetFields, _ = schema.Apply(data)
 
 	if event.MetricSetFields != nil {
 		event.MetricSetFields.Put("cluster.uuid", clusterUUID)
-		event.MetricSetFields.Put("beat", common.MapStr{
+		event.MetricSetFields.Put("beat", mapstr.M{
 			"name":    info.Name,
 			"host":    info.Hostname,
 			"type":    info.Beat,
@@ -111,7 +106,7 @@ func eventMapping(r mb.ReporterV2, info beat.Info, content []byte, isXpack bool)
 	//Extract ECS fields from the host key
 	host, ok := event.MetricSetFields["host"]
 	if ok {
-		hostMap, ok := host.(common.MapStr)
+		hostMap, ok := host.(mapstr.M)
 		if ok {
 			arch, ok := hostMap["architecture"]
 			if ok {

@@ -16,14 +16,14 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package wineventlog
 
 import (
+	"errors"
+	"fmt"
 	"sync"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 )
 
@@ -148,7 +148,7 @@ func (itr *EventIterator) moreHandles() bool {
 		var numReturned uint32
 
 		err := itr.evtNext(itr.subscription, batchSize, &itr.handles[0], 0, 0, &numReturned)
-		switch err {
+		switch err { //nolint:errorlint // Bad linter! This is always errno or nil.
 		case nil:
 			itr.lastErr = nil
 			itr.active = itr.handles[:numReturned]
@@ -159,8 +159,7 @@ func (itr *EventIterator) moreHandles() bool {
 				itr.subscription.Close()
 				itr.subscription, err = itr.subscriptionFactory()
 				if err != nil {
-					itr.lastErr = errors.Wrap(err, "failed in EvtNext while trying to "+
-						"recover from RPC_S_INVALID_BOUND error")
+					itr.lastErr = fmt.Errorf("failed in EvtNext while trying to recover from RPC_S_INVALID_BOUND error: %w", err)
 					return false
 				}
 
@@ -168,9 +167,7 @@ func (itr *EventIterator) moreHandles() bool {
 				batchSize = batchSize / 2
 				continue
 			} else {
-				itr.lastErr = errors.Wrap(err, "failed in EvtNext (try "+
-					"reducing the batch size or providing a subscription "+
-					"factory for automatic recovery)")
+				itr.lastErr = fmt.Errorf("failed in EvtNext (try reducing the batch size or providing a subscription factory for automatic recovery): %w", err)
 			}
 		default:
 			itr.lastErr = err
@@ -198,6 +195,9 @@ func (itr *EventIterator) Err() error {
 
 // Close closes the subscription handle and any unread event handles.
 func (itr *EventIterator) Close() error {
+	if itr == nil {
+		return errors.New("closing nil event iterator")
+	}
 	itr.mutex.Lock()
 	defer itr.mutex.Unlock()
 

@@ -17,18 +17,12 @@
 
 package feature
 
-import (
-	"fmt"
-)
-
 // Registry is the global plugin registry, this variable is meant to be temporary to move all the
 // internal factory to receive a context that include the current beat registry.
 var registry = NewRegistry()
 
 // Featurable implements the description of a feature.
 type Featurable interface {
-	bundleable
-
 	// Namespace is the kind of plugin or functionality we want to expose as a feature.
 	// Examples: Autodiscover's provider, processors, outputs.
 	Namespace() string
@@ -41,19 +35,13 @@ type Featurable interface {
 	// Factory returns the function used to create an instance of the Feature, the signature
 	// of the method is type checked by the 'FindFactory' of each namespace.
 	Factory() interface{}
-
-	// Description return the avaiable information for a specific feature.
-	Description() Details
-
-	String() string
 }
 
 // Feature contains the information for a specific feature
 type Feature struct {
-	namespace   string
-	name        string
-	factory     interface{}
-	description Details
+	namespace string
+	name      string
+	factory   interface{}
 }
 
 // Namespace return the namespace of the feature.
@@ -71,28 +59,12 @@ func (f *Feature) Factory() interface{} {
 	return f.factory
 }
 
-// Description return the avaiable information for a specific feature.
-func (f *Feature) Description() Details {
-	return f.description
-}
-
-// Features return the current feature as a slice to be compatible with Bundle merging and filtering.
-func (f *Feature) Features() []Featurable {
-	return []Featurable{f}
-}
-
-// String return the debug information
-func (f *Feature) String() string {
-	return fmt.Sprintf("%s/%s (description: %s)", f.namespace, f.name, f.description)
-}
-
 // New returns a new Feature.
-func New(namespace, name string, factory interface{}, description Details) *Feature {
+func New(namespace, name string, factory interface{}) *Feature {
 	return &Feature{
-		namespace:   namespace,
-		name:        name,
-		factory:     factory,
-		description: description,
+		namespace: namespace,
+		name:      name,
+		factory:   factory,
 	}
 }
 
@@ -101,54 +73,20 @@ func GlobalRegistry() *Registry {
 	return registry
 }
 
-// RegisterBundle registers a bundle of features.
-func RegisterBundle(bundle *Bundle) error {
-	for _, f := range bundle.Features() {
-		err := GlobalRegistry().Register(f)
+// register registers new features on the global registry.
+func register(features []Featurable) error {
+	for _, f := range features {
+		err := registry.Register(f)
 		if err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-// MustRegisterBundle register a new bundle and panic on error.
-func MustRegisterBundle(bundle *Bundle) {
-	err := RegisterBundle(bundle)
-	if err != nil {
-		panic(err)
-	}
-}
-
-// OverwriteBundle register a bundle of feature and replace any existing feature with a new
-// implementation.
-func OverwriteBundle(bundle *Bundle) error {
-	for _, f := range bundle.Features() {
-		err := GlobalRegistry().Register(f)
-		if err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-// MustOverwriteBundle register a bundle of feature, replace any existing feature with a new
-// implementation and panic on error.
-func MustOverwriteBundle(bundle *Bundle) {
-	err := OverwriteBundle(bundle)
-	if err != nil {
-		panic(err)
-	}
-}
-
-// Register register a new feature on the global registry.
-func Register(feature Featurable) error {
-	return GlobalRegistry().Register(feature)
 }
 
 // MustRegister register a new Feature on the global registry and panic on error.
-func MustRegister(feature Featurable) {
-	err := Register(feature)
+func MustRegister(features ...Featurable) {
+	err := register(features)
 	if err != nil {
 		panic(err)
 	}

@@ -87,6 +87,9 @@ output:
   {% if elasticsearch.timeout %}
     timeout: {{elasticsearch.timeout}}
   {% endif %}
+  {% if elasticsearch.allow_older_versions %}
+    allow_older_versions: {{elasticsearch.allow_older_versions}}
+  {% endif %}
 {%- endif %}
 
 {% if logstash %}
@@ -115,3 +118,8 @@ path:
 #================================ keystore =====================================
 keystore.path: {{keystore_path}}
 {% endif %}
+
+# Enable periodic input metric logging.
+logging.metrics.namespaces:
+  - stats
+  - dataset

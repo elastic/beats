@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package rapl
 
@@ -25,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // func TestData(t *testing.T) {

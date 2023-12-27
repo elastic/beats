@@ -10,10 +10,12 @@
 {{header "Network device"}}
 
 # Select the network interface to sniff the data. You can use the "any"
-# keyword to sniff on all connected interfaces.
+# keyword to sniff on all connected interfaces. On all platforms, you
+# can use "default_route", "default_route_ipv4" or "default_route_ipv6"
+# to sniff on the device carrying the default route.
 packetbeat.interfaces.device: {{ call .device .GOOS }}
 
-# The network CIDR blocks that are considered "internal" networks for
+# The network CIDR blocks are considered "internal" networks for
 # the purpose of network perimeter boundary classification. The valid
 # values for internal_networks are the same as those that can be used
 # with processor network conditions.
@@ -37,25 +39,46 @@ packetbeat.interfaces.internal_networks:
 #packetbeat.interfaces.snaplen: 65535
 
 # The maximum size of the shared memory buffer to use between the kernel and
-# user space. A bigger buffer usually results in lower CPU usage, but consumes
+# user space. A bigger buffer usually results in lower CPU usage but consumes
 # more memory. This setting is only available for the af_packet sniffer type.
 # The default is 30 MB.
 #packetbeat.interfaces.buffer_size_mb: 30
 
+# Set the polling frequency for interface metrics. This currently only applies
+# to the "afpacket" interface type.
+# The default is 5s (seconds).
+#packetbeat.interfaces.metrics_interval: 5s
+
+# To scale processing across multiple Packetbeat processes, a fanout group
+# identifier can be specified. When `fanout_group` is used the Linux kernel splits
+# packets across Packetbeat instances in the same group by using a flow hash. It
+# computes the flow hash modulo with the number of Packetbeat processes in order
+# to consistently route flows to the same Packetbeat instance.
+#
+# The value must be between 0 and 65535. By default, no value is set.
+#
+# This is only available on Linux and requires using `type: af_packet`. Each process
+# must be running in the same network namespace. All processes must use the same
+# interface settings. You must take responsibility for running multiple instances
+# of Packetbeat.
+#packetbeat.interfaces.fanout_group: ~
+
 # Packetbeat automatically generates a BPF for capturing only the traffic on
-# ports where it expects to find known protocols. Use this settings to tell
+# ports where it expects to find known protocols. Use this setting to tell
 # Packetbeat to generate a BPF filter that accepts VLAN tags.
 #packetbeat.interfaces.with_vlans: true
 
 # Use this setting to override the automatically generated BPF filter.
 #packetbeat.interfaces.bpf_filter:
 
-# With `auto_promisc_mode` Packetbeat puts interface in promiscuous mode automatically on startup.
+# With `auto_promisc_mode` Packetbeat puts the interface in promiscuous mode automatically on startup.
 # This option does not work with `any` interface device.
 # The default option is false and requires manual set-up of promiscuous mode.
-# Warning: under some circumstances (e.g beat crash) promiscuous mode
+# Warning: under some circumstances (e.g., beat crash) promiscuous mode
 # can stay enabled even after beat is shut down.
 #packetbeat.interfaces.auto_promisc_mode: true
+
+{{- template "windows_npcap.yml.tmpl" .}}
 
 {{header "Flows"}}
 
@@ -67,7 +90,7 @@ packetbeat.flows:
   # timed out.
   timeout: 30s
 
-  # Configure reporting period. If set to -1, only killed flows will be reported
+  # Configure reporting period. If set to -1s, only killed flows will be reported
   period: 10s
 
   # Set to true to publish fields with null values in events.
@@ -109,7 +132,7 @@ packetbeat.protocols:
   # Default: false
   #parse_arguments: false
 
-  # Hide all methods relative to connection negotiation between server and
+  # Hide all methods relative to connection negotiation between the server and
   # client.
   # Default: true
   #hide_connection_information: true
@@ -141,7 +164,7 @@ packetbeat.protocols:
   #send_request: true
 
   # If this option is enabled, the raw message of the response (`cassandra_request.request_headers` field)
-  # is included in published events. The default is true. enable `send_request` first before enable this option.
+  # is included in published events. The default is true. enable `send_request` first before enabling this option.
   #send_request_header: true
 
   # If this option is enabled, the raw message of the response (`cassandra_response` field)
@@ -149,7 +172,7 @@ packetbeat.protocols:
   #send_response: true
 
   # If this option is enabled, the raw message of the response (`cassandra_response.response_headers` field)
-  # is included in published events. The default is true. enable `send_response` first before enable this option.
+  # is included in published events. The default is true. enable `send_response` first before enabling this option.
   #send_response_header: true
 
   # Set to true to publish fields with null values in events.
@@ -216,8 +239,8 @@ packetbeat.protocols:
   # the HTTP protocol by commenting out the list of ports.
   ports: [80, 8080, 8000, 5000, 8002]
 
-  # Uncomment the following to hide certain parameters in URL or forms attached
-  # to HTTP requests. The names of the parameters are case insensitive.
+  # Uncomment the following to hide certain parameters in the URL or forms attached
+  # to HTTP requests. The names of the parameters are case-insensitive.
   # The value of the parameters will be replaced with the 'xxxxx' string.
   # This is generally useful for avoiding storing user passwords or other
   # sensitive information.
@@ -595,6 +618,10 @@ packetbeat.protocols:
 
   # Preserve original contents in event.original
   keep_original: true
+
+  # You can monitor tcp SIP traffic by setting the transport_protocol option
+  # to tcp, it defaults to udp.
+  #transport_protocol: tcp
 
   # Overrides where this protocol's events are indexed.
   #index: my-custom-sip-index

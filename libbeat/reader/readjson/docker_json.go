@@ -20,15 +20,15 @@ package readjson
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"runtime"
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // DockerJSONReader processor renames a given field
@@ -134,7 +134,7 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 	}
 	ts, err := time.Parse(time.RFC3339Nano, string(log[i]))
 	if err != nil {
-		return errors.Wrap(err, "parsing CRI timestamp")
+		return fmt.Errorf("parsing CRI timestamp: %w", err)
 	}
 	message.Ts = ts
 	i++
@@ -157,7 +157,7 @@ func (p *DockerJSONReader) parseCRILog(message *reader.Message, msg *logLine) er
 	}
 
 	msg.Partial = partial
-	message.AddFields(common.MapStr{
+	message.AddFields(mapstr.M{
 		"stream": msg.Stream,
 	})
 	// Remove \n ending for partial messages
@@ -176,23 +176,23 @@ func (p *DockerJSONReader) parseDockerJSONLog(message *reader.Message, msg *logL
 	dec := json.NewDecoder(bytes.NewReader(message.Content))
 
 	if err := dec.Decode(&msg); err != nil {
-		return errors.Wrap(err, "decoding docker JSON")
+		return fmt.Errorf("decoding docker JSON: %w", err)
 	}
 
 	// Parse timestamp
 	ts, err := time.Parse(time.RFC3339, msg.Time)
 	if err != nil {
-		return errors.Wrap(err, "parsing docker timestamp")
+		return fmt.Errorf("parsing docker timestamp: %w", err)
 	}
 	message.Ts = ts
 
-	message.AddFields(common.MapStr{
+	message.AddFields(mapstr.M{
 		"stream": msg.Stream,
 	})
 
 	if len(msg.Attrs) > 0 {
-		message.AddFields(common.MapStr{
-			"docker": common.MapStr{
+		message.AddFields(mapstr.M{
+			"docker": mapstr.M{
 				"attrs": msg.Attrs,
 			},
 		})

@@ -19,12 +19,12 @@
 package stubstatus
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -78,7 +78,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	scanner, err := m.http.FetchScanner()
 	if err != nil {
-		return errors.Wrap(err, "error fetching status")
+		return fmt.Errorf("error fetching status: %w", err)
 	}
 	event, _ := eventMapping(scanner, m)
 	reporter.Event(mb.Event{MetricSetFields: event})

@@ -7,10 +7,7 @@
 ++++
 
 This section describes the minimum privileges or roles required to deploy
-functions to your cloud provider:
-
-* <<iam-permissions-aws>>
-
+functions to your cloud provider.
 
 [[iam-permissions-aws]]
 ==== Permissions required by AWS

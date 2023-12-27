@@ -29,9 +29,10 @@ type TemplateConfig struct {
 	Pattern string `config:"pattern"`
 	Fields  string `config:"fields"`
 	JSON    struct {
-		Enabled bool   `config:"enabled"`
-		Path    string `config:"path"`
-		Name    string `config:"name"`
+		Enabled      bool   `config:"enabled"`
+		Path         string `config:"path"`
+		Name         string `config:"name"`
+		IsDataStream bool   `config:"data_stream"`
 	} `config:"json"`
 	AppendFields mapping.Fields   `config:"append_fields"`
 	Overwrite    bool             `config:"overwrite"`
@@ -41,8 +42,9 @@ type TemplateConfig struct {
 
 // TemplateSettings are part of the Elasticsearch template and hold index and source specific information.
 type TemplateSettings struct {
-	Index  map[string]interface{} `config:"index"`
-	Source map[string]interface{} `config:"_source"`
+	Index     map[string]interface{} `config:"index"`
+	Source    map[string]interface{} `config:"_source"`
+	Lifecycle map[string]interface{} `config:"lifecycle"`
 }
 
 // DefaultConfig for index template

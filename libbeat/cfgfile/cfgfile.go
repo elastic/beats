@@ -23,7 +23,9 @@ import (
 	"path/filepath"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Command line flags.
@@ -31,11 +33,11 @@ var (
 	// The default config cannot include the beat name as it is not initialized
 	// when this variable is created. See ChangeDefaultCfgfileFlag which should
 	// be called prior to flags.Parse().
-	configfiles = common.StringArrFlag(nil, "c", "beat.yml", "Configuration file, relative to path.config")
-	overwrites  = common.SettingFlag(nil, "E", "Configuration overwrite")
+	configfiles = config.StringArrFlag(nil, "c", "beat.yml", "Configuration file, relative to path.config")
+	overwrites  = config.SettingFlag(nil, "E", "Configuration overwrite")
 
 	// Additional default settings, that must be available for variable expansion
-	defaults = common.MustNewConfigFrom(map[string]interface{}{
+	defaults = config.MustNewConfigFrom(map[string]interface{}{
 		"path": map[string]interface{}{
 			"home":   ".", // to be initialized by beat
 			"config": "${path.home}",
@@ -52,7 +54,7 @@ var (
 func init() {
 	// add '-path.x' options overwriting paths in 'overwrites' config
 	makePathFlag := func(name, usage string) *string {
-		return common.ConfigOverwriteFlag(nil, overwrites, name, name, "", usage)
+		return config.ConfigOverwriteFlag(nil, overwrites, name, name, "", usage)
 	}
 
 	homePath = makePathFlag("path.home", "Home path")
@@ -62,13 +64,13 @@ func init() {
 }
 
 // OverrideChecker checks if a config should be overwritten.
-type OverrideChecker func(*common.Config) bool
+type OverrideChecker func(*config.C) bool
 
 // ConditionalOverride stores a config which needs to overwrite the existing config based on the
 // result of the Check.
 type ConditionalOverride struct {
 	Check  OverrideChecker
-	Config *common.Config
+	Config *config.C
 }
 
 // ChangeDefaultCfgfileFlag replaces the value and default value for the `-c`
@@ -100,16 +102,16 @@ func HandleFlags() error {
 	home, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		if *homePath == "" {
-			return fmt.Errorf("The absolute path to %s could not be obtained. %v",
+			return fmt.Errorf("The absolute path to %s could not be obtained. %w",
 				os.Args[0], err)
 		}
 		home = *homePath
 	}
 
-	defaults.SetString("path.home", -1, home)
+	_ = defaults.SetString("path.home", -1, home)
 
 	if len(overwrites.GetFields()) > 0 {
-		overwrites.PrintDebugf("CLI setting overwrites (-E flag):")
+		common.PrintConfigDebugf(overwrites, "CLI setting overwrites (-E flag):")
 	}
 
 	return nil
@@ -132,74 +134,83 @@ func Read(out interface{}, path string) error {
 // Load reads the configuration from a YAML file structure. If path is empty
 // this method reads from the configuration file specified by the '-c' command
 // line flag.
-func Load(path string, beatOverrides []ConditionalOverride) (*common.Config, error) {
-	var config *common.Config
+// This function cares about the underlying fleet setting, and if beats is running with
+// the management.enabled flag, Load() will bypass reading a config file, and merely merge any overrides.
+func Load(path string, beatOverrides []ConditionalOverride) (*config.C, error) {
+	var c *config.C
 	var err error
 
 	cfgpath := GetPathConfig()
 
-	if path == "" {
-		list := []string{}
-		for _, cfg := range configfiles.List() {
-			if !filepath.IsAbs(cfg) {
-				list = append(list, filepath.Join(cfgpath, cfg))
-			} else {
-				list = append(list, cfg)
+	if !fleetmode.Enabled() {
+		if path == "" {
+			list := []string{}
+			for _, cfg := range configfiles.List() {
+				if !filepath.IsAbs(cfg) {
+					list = append(list, filepath.Join(cfgpath, cfg))
+				} else {
+					list = append(list, cfg)
+				}
 			}
+			c, err = common.LoadFiles(list...)
+		} else {
+			if !filepath.IsAbs(path) {
+				path = filepath.Join(cfgpath, path)
+			}
+			c, err = common.LoadFile(path)
 		}
-		config, err = common.LoadFiles(list...)
+		if err != nil {
+			return nil, err
+		}
 	} else {
-		if !filepath.IsAbs(path) {
-			path = filepath.Join(cfgpath, path)
-		}
-		config, err = common.LoadFile(path)
-	}
-	if err != nil {
-		return nil, err
+		c = config.NewConfig()
 	}
 
 	if beatOverrides != nil {
 		merged := defaults
 		for _, o := range beatOverrides {
-			if o.Check(config) {
-				merged, err = common.MergeConfigs(merged, o.Config)
+			if o.Check(c) {
+				merged, err = config.MergeConfigs(merged, o.Config)
 				if err != nil {
 					return nil, err
 				}
 			}
 		}
-		config, err = common.MergeConfigs(
+		c, err = config.MergeConfigs(
 			merged,
-			config,
+			c,
 			overwrites,
 		)
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		config, err = common.MergeConfigs(
+		c, err = config.MergeConfigs(
 			defaults,
-			config,
+			c,
 			overwrites,
 		)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	config.PrintDebugf("Complete configuration loaded:")
-	return config, nil
+	common.PrintConfigDebugf(c, "Complete configuration loaded:")
+	return c, nil
 }
 
 // LoadList loads a list of configs data from the given file.
-func LoadList(file string) ([]*common.Config, error) {
+func LoadList(file string) ([]*config.C, error) {
 	logp.Debug("cfgfile", "Load config from file: %s", file)
 	rawConfig, err := common.LoadFile(file)
 	if err != nil {
-		return nil, fmt.Errorf("invalid config: %s", err)
+		return nil, fmt.Errorf("invalid config: %w", err)
 	}
 
-	var c []*common.Config
+	var c []*config.C
 	err = rawConfig.Unpack(&c)
 	if err != nil {
-		return nil, fmt.Errorf("error reading configuration from file %s: %s", file, err)
+		return nil, fmt.Errorf("error reading configuration from file %s: %w", file, err)
 	}
 
 	return c, nil

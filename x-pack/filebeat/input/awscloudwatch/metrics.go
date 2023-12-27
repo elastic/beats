@@ -5,12 +5,12 @@
 package awscloudwatch
 
 import (
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type inputMetrics struct {
-	id     string               // Input ID.
-	parent *monitoring.Registry // Parent registry holding this input's ID as a key.
+	unregister func()
 
 	logEventsReceivedTotal       *monitoring.Uint // Number of CloudWatch log events received.
 	logGroupsTotal               *monitoring.Uint // Logs collected from number of CloudWatch log groups.
@@ -20,16 +20,14 @@ type inputMetrics struct {
 
 // Close removes the metrics from the registry.
 func (m *inputMetrics) Close() {
-	m.parent.Remove(m.id)
+	m.unregister()
 }
 
-func newInputMetrics(parent *monitoring.Registry, id string) *inputMetrics {
-	reg := parent.NewRegistry(id)
-	monitoring.NewString(reg, "input").Set(inputName)
-	monitoring.NewString(reg, "id").Set(id)
+func newInputMetrics(id string, optionalParent *monitoring.Registry) *inputMetrics {
+	reg, unreg := inputmon.NewInputRegistry(inputName, id, optionalParent)
+
 	out := &inputMetrics{
-		id:                           id,
-		parent:                       reg,
+		unregister:                   unreg,
 		logEventsReceivedTotal:       monitoring.NewUint(reg, "log_events_received_total"),
 		logGroupsTotal:               monitoring.NewUint(reg, "log_groups_total"),
 		cloudwatchEventsCreatedTotal: monitoring.NewUint(reg, "cloudwatch_events_created_total"),

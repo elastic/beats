@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: etcd
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/etcd/_meta/docs.asciidoc
+
 
 [[metricbeat-module-etcd]]
 == Etcd module
@@ -20,6 +22,8 @@ When using V2, metricsets available are `leader`, `self` and `store`.
 
 The etcd module is tested with etcd 3.2 and 3.3.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -60,3 +64,4 @@ include::etcd/self.asciidoc[]
 
 include::etcd/store.asciidoc[]
 
+:edit_url!:

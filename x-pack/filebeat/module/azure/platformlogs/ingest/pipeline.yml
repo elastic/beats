@@ -15,6 +15,12 @@ processors:
 - json:
     field: message
     target_field: azure.platformlogs
+- rename:
+    field: azure.platformlogs.identity
+    target_field: azure.platformlogs.identity_name
+    ignore_missing: true
+    description: 'Rename the field to `identity_name` to avoid conflicts with the `identity` containing a JSON object.'
+    if: "ctx.azure?.platformlogs?.identity instanceof String"
 - date:
     field: azure.platformlogs.time
     target_field: '@timestamp'

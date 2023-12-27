@@ -11,9 +11,8 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/Azure/azure-sdk-for-go/services/preview/appinsights/v1/insights"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Client represents the azure client which will make use of the azure sdk go metrics related clients
@@ -62,7 +61,7 @@ func (client *Client) GetMetricValues() (insights.ListMetricsResultsItem, error)
 			}
 			id, err := uuid.NewV4()
 			if err != nil {
-				return result, errors.Wrap(err, "could not generate identifier in client")
+				return result, fmt.Errorf("could not generate identifier in client: %w", err)
 			}
 			strId := id.String()
 			bodyMetrics = append(bodyMetrics, insights.MetricsPostBodySchema{ID: &strId, Parameters: &bodyMetric})
@@ -72,7 +71,7 @@ func (client *Client) GetMetricValues() (insights.ListMetricsResultsItem, error)
 	if err == nil {
 		return result, nil
 	}
-	return result, errors.Wrap(err, "could not retrieve app insights metrics from service")
+	return result, fmt.Errorf("could not retrieve app insights metrics from service: %w", err)
 }
 
 func calculateTimespan(duration time.Duration) *string {

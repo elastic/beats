@@ -9,11 +9,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/functionbeat/provider/local/local"
 )
 
-// Bundle feature enabled.
-var Bundle = feature.MustBundle(
-	local.Bundle,
-)
-
 func init() {
-	feature.MustRegisterBundle(Bundle)
+	feature.MustRegister(local.Features...)
 }

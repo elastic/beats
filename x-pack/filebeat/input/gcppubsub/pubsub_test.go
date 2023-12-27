@@ -6,6 +6,7 @@ package gcppubsub
 
 import (
 	"context"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -22,11 +23,11 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -62,6 +63,7 @@ func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 		httpClient := http.Client{Transport: &http.Transport{DisableKeepAlives: true}}
 
 		// Sanity check the emulator.
+		//nolint:noctx // this is just for the tests
 		resp, err := httpClient.Get("http://" + host)
 		if err != nil {
 			t.Fatalf("pubsub emulator at %s is not healthy: %v", host, err)
@@ -95,7 +97,7 @@ func resetPubSub(t *testing.T, client *pubsub.Client) {
 	topics := client.Topics(ctx)
 	for {
 		topic, err := topics.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 		if err != nil {
@@ -110,7 +112,7 @@ func resetPubSub(t *testing.T, client *pubsub.Client) {
 	subs := client.Subscriptions(ctx)
 	for {
 		sub, err := subs.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 		if err != nil {
@@ -197,8 +199,8 @@ func ifNotDone(ctx context.Context, f func()) func() {
 	}
 }
 
-func defaultTestConfig() *common.Config {
-	return common.MustNewConfigFrom(map[string]interface{}{
+func defaultTestConfig() *conf.C {
+	return conf.MustNewConfigFrom(map[string]interface{}{
 		"project_id": emulatorProjectID,
 		"topic":      emulatorTopic,
 		"subscription": map[string]interface{}{
@@ -213,11 +215,11 @@ func isInDockerIntegTestEnv() bool {
 	return os.Getenv("BEATS_INSIDE_INTEGRATION_TEST_ENV") != ""
 }
 
-func runTest(t *testing.T, cfg *common.Config, run func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T)) {
+func runTest(t *testing.T, cfg *conf.C, run func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T)) {
 	runTestWithACKer(t, cfg, ackEvent, run)
 }
 
-func runTestWithACKer(t *testing.T, cfg *common.Config, onEvent eventHandler, run func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T)) {
+func runTestWithACKer(t *testing.T, cfg *conf.C, onEvent eventHandler, run func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T)) {
 	if !isInDockerIntegTestEnv() {
 		// Don't test goroutines when using our compose.EnsureUp.
 		defer resources.NewGoroutinesChecker().Check(t)
@@ -236,7 +238,7 @@ func runTestWithACKer(t *testing.T, cfg *common.Config, onEvent eventHandler, ru
 	eventOutlet := newStubOutlet(onEvent)
 	defer eventOutlet.Close()
 
-	connector := channel.ConnectorFunc(func(_ *common.Config, cliCfg beat.ClientConfig) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *conf.C, cliCfg beat.ClientConfig) (channel.Outleter, error) {
 		eventOutlet.setClientConfig(cliCfg)
 		return eventOutlet, nil
 	})
@@ -277,12 +279,12 @@ func newStubOutlet(onEvent eventHandler) *stubOutleter {
 }
 
 func ackEvent(ev beat.Event, cfg beat.ClientConfig) bool {
-	if cfg.ACKHandler == nil {
+	if cfg.EventListener == nil {
 		return false
 	}
 
-	cfg.ACKHandler.AddEvent(ev, true)
-	cfg.ACKHandler.ACKEvents(1)
+	cfg.EventListener.AddEvent(ev, true)
+	cfg.EventListener.ACKEvents(1)
 	return true
 }
 
@@ -345,7 +347,7 @@ func TestTopicDoesNotExist(t *testing.T) {
 
 func TestSubscriptionDoesNotExistError(t *testing.T) {
 	cfg := defaultTestConfig()
-	cfg.SetBool("subscription.create", -1, false)
+	_ = cfg.SetBool("subscription.create", -1, false)
 
 	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
 		createTopic(t, client)
@@ -458,6 +460,9 @@ func TestEndToEndACK(t *testing.T) {
 			_, exists := got[id]
 			assert.True(t, exists)
 		}
+
+		assert.EqualValues(t, input.metrics.ackedMessageCount.Get(), len(seen))
+
 		input.Stop()
 		out.Close()
 		if err := group.Wait(); err != nil {

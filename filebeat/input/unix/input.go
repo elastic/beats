@@ -21,20 +21,23 @@ import (
 	"net"
 	"time"
 
+	"github.com/dustin/go-humanize"
+	"github.com/rcrowley/go-metrics"
+
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/unix"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 	"github.com/elastic/go-concert/ctxtool"
 )
-
-type server struct {
-	unix.Server
-	config
-}
 
 func Plugin() input.Plugin {
 	return input.Plugin{
@@ -46,13 +49,33 @@ func Plugin() input.Plugin {
 	}
 }
 
-func configure(cfg *common.Config) (stateless.Input, error) {
+func configure(cfg *conf.C) (stateless.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
 	return newServer(config)
+}
+
+type config struct {
+	unix.Config `config:",inline"`
+}
+
+func defaultConfig() config {
+	return config{
+		Config: unix.Config{
+			Timeout:        time.Minute * 5,
+			MaxMessageSize: 20 * humanize.MiByte,
+			SocketType:     unix.StreamSocket,
+			LineDelimiter:  "\n",
+		},
+	}
+}
+
+type server struct {
+	unix.Server
+	config
 }
 
 func newServer(config config) (*server, error) {
@@ -62,7 +85,7 @@ func newServer(config config) (*server, error) {
 func (s *server) Name() string { return "unix" }
 
 func (s *server) Test(_ input.TestContext) error {
-	l, err := net.Listen("unix", s.config.Path)
+	l, err := net.Listen("unix", s.config.Config.Path)
 	if err != nil {
 		return err
 	}
@@ -70,17 +93,27 @@ func (s *server) Test(_ input.TestContext) error {
 }
 
 func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
-	log := ctx.Logger.Named("input.unix").With("path", s.config.Config.Path)
+	log := ctx.Logger.With("path", s.config.Config.Path)
 
 	log.Info("Starting Unix socket input")
 	defer log.Info("Unix socket input stopped")
 
-	cb := inputsource.NetworkFunc(func(data []byte, metadata inputsource.NetworkMetadata) {
-		event := createEvent(data, metadata)
-		publisher.Publish(event)
-	})
+	metrics := newInputMetrics(ctx.ID, s.config.Path, log)
+	defer metrics.close()
 
-	server, err := unix.New(log, &s.config.Config, cb)
+	server, err := unix.New(log, &s.config.Config, func(data []byte, _ inputsource.NetworkMetadata) {
+		evt := beat.Event{
+			Timestamp: time.Now(),
+			Fields: mapstr.M{
+				"message": string(data),
+			},
+		}
+		publisher.Publish(evt)
+
+		// This must be called after publisher.Publish to measure
+		// the processing time metric.
+		metrics.log(data, evt.Timestamp)
+	})
 	if err != nil {
 		return err
 	}
@@ -96,11 +129,61 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	return err
 }
 
-func createEvent(raw []byte, metadata inputsource.NetworkMetadata) beat.Event {
-	return beat.Event{
-		Timestamp: time.Now(),
-		Fields: common.MapStr{
-			"message": string(raw),
-		},
+// inputMetrics handles the input's metric reporting.
+type inputMetrics struct {
+	unregister func()
+
+	lastPacket time.Time
+
+	path           *monitoring.String // name of the socket path being monitored
+	packets        *monitoring.Uint   // number of packets processed
+	bytes          *monitoring.Uint   // number of bytes processed
+	arrivalPeriod  metrics.Sample     // histogram of the elapsed time between packet arrivals
+	processingTime metrics.Sample     // histogram of the elapsed time between packet receipt and publication
+}
+
+// newInputMetrics returns an input metric for the unix socket processor. If id is empty
+// a nil inputMetric is returned.
+func newInputMetrics(id, path string, log *logp.Logger) *inputMetrics {
+	if id == "" {
+		return nil
 	}
+	reg, unreg := inputmon.NewInputRegistry("unix", id, nil)
+	out := &inputMetrics{
+		unregister:     unreg,
+		path:           monitoring.NewString(reg, "path"),
+		packets:        monitoring.NewUint(reg, "received_events_total"),
+		bytes:          monitoring.NewUint(reg, "received_bytes_total"),
+		arrivalPeriod:  metrics.NewUniformSample(1024),
+		processingTime: metrics.NewUniformSample(1024),
+	}
+	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
+	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.processingTime))
+
+	out.path.Set(path)
+
+	return out
+}
+
+// log logs metric for the given packet.
+func (m *inputMetrics) log(data []byte, timestamp time.Time) {
+	if m == nil {
+		return
+	}
+	m.processingTime.Update(time.Since(timestamp).Nanoseconds())
+	m.packets.Add(1)
+	m.bytes.Add(uint64(len(data)))
+	if !m.lastPacket.IsZero() {
+		m.arrivalPeriod.Update(timestamp.Sub(m.lastPacket).Nanoseconds())
+	}
+	m.lastPacket = timestamp
+}
+
+func (m *inputMetrics) close() {
+	if m == nil {
+		return
+	}
+	m.unregister()
 }

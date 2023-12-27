@@ -11,27 +11,27 @@ import (
 )
 
 // Bundle exposes the trigger supported by the AWS provider.
-var bundle = provider.MustCreate(
+var features = provider.Builder(
 	"aws",
 	provider.NewDefaultProvider("aws", provider.NewNullCli, provider.NewNullTemplateBuilder),
 	feature.MakeDetails("AWS Lambda", "listen to events on AWS lambda", feature.Stable),
-).MustAddFunction("cloudwatch_logs",
+).AddFunction("cloudwatch_logs",
 	aws.NewCloudwatchLogs,
 	aws.CloudwatchLogsDetails(),
-).MustAddFunction("api_gateway_proxy",
+).AddFunction("api_gateway_proxy",
 	aws.NewAPIGatewayProxy,
 	aws.APIGatewayProxyDetails(),
-).MustAddFunction("kinesis",
+).AddFunction("kinesis",
 	aws.NewKinesis,
 	aws.KinesisDetails(),
-).MustAddFunction("sqs",
+).AddFunction("sqs",
 	aws.NewSQS,
 	aws.SQSDetails(),
-).MustAddFunction("cloudwatch_logs_kinesis",
+).AddFunction("cloudwatch_logs_kinesis",
 	aws.NewCloudwatchKinesis,
 	aws.CloudwatchKinesisDetails(),
-).Bundle()
+).Features()
 
 func init() {
-	feature.MustRegisterBundle(bundle)
+	feature.MustRegister(features...)
 }

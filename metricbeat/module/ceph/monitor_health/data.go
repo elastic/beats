@@ -19,11 +19,10 @@ package monitor_health
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type Tick struct {
@@ -86,42 +85,42 @@ type HealthRequest struct {
 	Output Output `json:"output"`
 }
 
-func eventsMapping(content []byte) ([]common.MapStr, error) {
+func eventsMapping(content []byte) ([]mapstr.M, error) {
 	var d HealthRequest
 	err := json.Unmarshal(content, &d)
 	if err != nil {
-		return nil, errors.Wrapf(err, "could not get HealthRequest data")
+		return nil, fmt.Errorf("could not get HealthRequest data: %w", err)
 	}
 
-	events := []common.MapStr{}
+	events := []mapstr.M{}
 
 	for _, HealthService := range d.Output.Health.HealthServices {
 		for _, Mon := range HealthService.Mons {
-			event := common.MapStr{
+			event := mapstr.M{
 				"last_updated": Mon.LastUpdated,
 				"name":         Mon.Name,
-				"available": common.MapStr{
+				"available": mapstr.M{
 					"pct": Mon.AvailPercent,
 					"kb":  Mon.KbAvail,
 				},
-				"total": common.MapStr{
+				"total": mapstr.M{
 					"kb": Mon.KbTotal,
 				},
 				"health": Mon.Health,
-				"used": common.MapStr{
+				"used": mapstr.M{
 					"kb": Mon.KbUsed,
 				},
-				"store_stats": common.MapStr{
-					"log": common.MapStr{
+				"store_stats": mapstr.M{
+					"log": mapstr.M{
 						"bytes": Mon.StoreStats.BytesLog,
 					},
-					"misc": common.MapStr{
+					"misc": mapstr.M{
 						"bytes": Mon.StoreStats.BytesMisc,
 					},
-					"sst": common.MapStr{
+					"sst": mapstr.M{
 						"bytes": Mon.StoreStats.BytesSSt,
 					},
-					"total": common.MapStr{
+					"total": mapstr.M{
 						"bytes": Mon.StoreStats.BytesTotal,
 					},
 					"last_updated": Mon.StoreStats.LastUpdated,

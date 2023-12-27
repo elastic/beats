@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: awsfargate
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/awsfargate/_meta/docs.asciidoc
+
 
 [[metricbeat-module-awsfargate]]
 [role="xpack"]
@@ -73,6 +75,8 @@ network metrics and container metadata from both endpoint
 `${ECS_CONTAINER_METADATA_URI_V4}/task/stats` and `${ECS_CONTAINER_METADATA_URI_V4}/task`.
 
 
+:edit_url:
+
 [float]
 === Example configuration
 
@@ -97,3 +101,4 @@ The following metricsets are available:
 
 include::awsfargate/task_stats.asciidoc[]
 
+:edit_url!:

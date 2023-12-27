@@ -5,17 +5,15 @@
 package beater
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/processors"
 	_ "github.com/elastic/beats/v7/libbeat/processors/actions"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestProcessorsForFunction(t *testing.T) {
@@ -48,7 +46,7 @@ func TestProcessorsForFunction(t *testing.T) {
 	}
 	for description, test := range testCases {
 		if test.event.Fields == nil {
-			test.event.Fields = common.MapStr{}
+			test.event.Fields = mapstr.M{}
 		}
 		config, err := functionConfigFromString(test.configStr)
 		if err != nil {
@@ -113,40 +111,14 @@ func TestProcessorsForFunctionIsFlat(t *testing.T) {
 	assert.Equal(t, 2, len(processors.List))
 }
 
-// setRawIndex is a bare-bones processor to set the raw_index field to a
-// constant string in the event metadata. It is used to test order of operations
-// for processorsForConfig.
-type setRawIndex struct {
-	indexStr string
-}
-
-func (p *setRawIndex) Run(event *beat.Event) (*beat.Event, error) {
-	if event.Meta == nil {
-		event.Meta = common.MapStr{}
-	}
-	event.Meta[events.FieldMetaRawIndex] = p.indexStr
-	return event, nil
-}
-
-func (p *setRawIndex) String() string {
-	return fmt.Sprintf("set_raw_index=%v", p.indexStr)
-}
-
 // Helper function to convert from YML input string to an unpacked
 // fnExtraConfig
 func functionConfigFromString(s string) (fnExtraConfig, error) {
 	config := fnExtraConfig{}
-	cfg, err := common.NewConfigFrom(s)
+	cfg, err := conf.NewConfigFrom(s)
 	if err != nil {
 		return config, err
 	}
 	err = cfg.Unpack(&config)
 	return config, err
-}
-
-// makeProcessors wraps one or more bare Processor objects in Processors.
-func makeProcessors(procs ...processors.Processor) *processors.Processors {
-	procList := processors.NewList(nil)
-	procList.List = procs
-	return procList
 }

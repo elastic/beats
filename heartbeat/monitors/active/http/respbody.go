@@ -20,6 +20,7 @@ package http
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -28,8 +29,8 @@ import (
 	"github.com/docker/go-units"
 
 	"github.com/elastic/beats/v7/heartbeat/reason"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mime"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -42,7 +43,7 @@ const (
 	minBufferBodyBytes = 128
 )
 
-func processBody(resp *http.Response, config responseConfig, validator multiValidator) (common.MapStr, string, reason.Reason) {
+func processBody(resp *http.Response, config responseConfig, validator multiValidator) (mapstr.M, string, reason.Reason) {
 	// Determine how much of the body to actually buffer in memory
 	var bufferBodyBytes int
 	if validator.wantsBody() {
@@ -65,7 +66,7 @@ func processBody(resp *http.Response, config responseConfig, validator multiVali
 	// Run any validations
 	errReason := validator.validate(resp, respBody)
 
-	bodyFields := common.MapStr{
+	bodyFields := mapstr.M{
 		"hash":  bodyHash,
 		"bytes": bodyLenBytes,
 	}
@@ -116,12 +117,12 @@ func readPrefixAndHash(body io.ReadCloser, maxPrefixSize int) (respSize int, pre
 	}
 
 	// The ErrUnexpectedEOF message can be confusing to users, so we clarify it here
-	if err == io.ErrUnexpectedEOF {
+	if errors.Is(err, io.ErrUnexpectedEOF) {
 		return 0, "", "", fmt.Errorf("connection closed unexpectedly: %w", err)
 	}
 
 	// Note that io.EOF is distinct from io.ErrUnexpectedEOF
-	if err != nil && err != io.EOF {
+	if errors.Is(err, io.EOF) {
 		return 0, "", "", err
 	}
 

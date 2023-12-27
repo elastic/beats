@@ -18,7 +18,7 @@ class Test(BaseTest):
         assert objs[0]["client.ip"] == "0.0.0.0"
         assert objs[0]["client.port"] == 68
         assert objs[0]["destination.ip"] == "255.255.255.255"
-        assert objs[0]["dhcpv4.client_mac"] == "00:0b:82:01:fc:42"
+        assert objs[0]["dhcpv4.client_mac"] == "00-0B-82-01-FC-42"
         assert objs[0]["dhcpv4.flags"] == "unicast"
         assert objs[0]["dhcpv4.hardware_type"] == "Ethernet"
         assert objs[0]["dhcpv4.hops"] == 0
@@ -50,7 +50,7 @@ class Test(BaseTest):
         assert objs[1]["client.port"] == 68
         assert objs[1]["destination.ip"] == "192.168.0.10"
         assert objs[1]["dhcpv4.assigned_ip"] == "192.168.0.10"
-        assert objs[1]["dhcpv4.client_mac"] == "00:0b:82:01:fc:42"
+        assert objs[1]["dhcpv4.client_mac"] == "00-0B-82-01-FC-42"
         assert objs[1]["dhcpv4.flags"] == "unicast"
         assert objs[1]["dhcpv4.hardware_type"] == "Ethernet"
         assert objs[1]["dhcpv4.hops"] == 0
@@ -79,7 +79,7 @@ class Test(BaseTest):
         assert "event.start" in objs[2]
         assert objs[2]["client.ip"] == "0.0.0.0"
         assert objs[2]["client.port"] == 68
-        assert objs[2]["dhcpv4.client_mac"] == "00:0b:82:01:fc:42"
+        assert objs[2]["dhcpv4.client_mac"] == "00-0B-82-01-FC-42"
         assert objs[2]["dhcpv4.flags"] == "unicast"
         assert objs[2]["dhcpv4.hardware_type"] == "Ethernet"
         assert objs[2]["dhcpv4.hops"] == 0
@@ -111,7 +111,7 @@ class Test(BaseTest):
         assert objs[3]["client.port"] == 68
         assert objs[3]["destination.ip"] == "192.168.0.10"
         assert objs[3]["dhcpv4.assigned_ip"] == "192.168.0.10"
-        assert objs[3]["dhcpv4.client_mac"] == "00:0b:82:01:fc:42"
+        assert objs[3]["dhcpv4.client_mac"] == "00-0B-82-01-FC-42"
         assert objs[3]["dhcpv4.flags"] == "unicast"
         assert objs[3]["dhcpv4.hardware_type"] == "Ethernet"
         assert objs[3]["dhcpv4.hops"] == 0

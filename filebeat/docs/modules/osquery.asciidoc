@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/osquery/_meta/docs.asciidoc
+
 [[filebeat-module-osquery]]
 :modulename: osquery
 :has-dashboards: true
@@ -72,7 +74,7 @@ coming with this module won't work correctly. The default is true.
 === Example dashboard
 
 This module comes with a sample dashboard for visualizing the data collected by
-the "compliance" pack. To collect this data, enable the `id-compliance` pack in
+the "compliance" pack. To collect this data, enable the `it-compliance` pack in
 the osquery configuration file.
 
 [role="screenshot"]
@@ -91,3 +93,4 @@ image::./images/kibana-osquery-compatibility.png[]
 For a description of each field in the module, see the
 <<exported-fields-osquery,exported fields>> section.
 
+:edit_url!:

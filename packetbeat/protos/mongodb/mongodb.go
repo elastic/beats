@@ -23,8 +23,10 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -47,7 +49,7 @@ type mongodbPlugin struct {
 	transactionTimeout time.Duration
 
 	results protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 }
 
 type transactionKey struct {
@@ -64,8 +66,8 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	watcher *procs.ProcessesWatcher,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &mongodbPlugin{}
 	config := defaultConfig
@@ -81,7 +83,7 @@ func New(
 	return p, nil
 }
 
-func (mongodb *mongodbPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *mongodbConfig) error {
+func (mongodb *mongodbPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *mongodbConfig) error {
 	debugf("Init a MongoDB protocol parser")
 	mongodb.setFromConfig(config)
 
@@ -122,7 +124,6 @@ func (mongodb *mongodbPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseMongodb exception")
 	debugf("Parse method triggered")
 
 	conn := ensureMongodbConnection(private)
@@ -281,7 +282,7 @@ func newTransaction(requ, resp *mongodbMessage) *transaction {
 
 	// fill request
 	if requ != nil {
-		trans.mongodb = common.MapStr{}
+		trans.mongodb = mapstr.M{}
 		trans.event = requ.event
 		trans.method = requ.method
 

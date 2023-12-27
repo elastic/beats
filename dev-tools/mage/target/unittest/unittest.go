@@ -19,6 +19,8 @@ package unittest
 
 import (
 	"context"
+	"fmt"
+	"os/exec"
 
 	"github.com/magefile/mage/mg"
 
@@ -54,7 +56,15 @@ func UnitTest() {
 // Use RACE_DETECTOR=true to enable the race detector.
 func GoUnitTest(ctx context.Context) error {
 	mg.SerialCtxDeps(ctx, goTestDeps...)
-	return devtools.GoTest(ctx, devtools.DefaultGoTestUnitArgs())
+
+	utArgs := devtools.DefaultGoTestUnitArgs()
+	// If synthetics is installed run synthetics unit tests
+	synth := exec.Command("npx", "@elastic/synthetics", "-h")
+	if synth.Run() == nil {
+		fmt.Printf("npx @elastic/synthetics found, will run with synthetics tags")
+		utArgs.Tags = append(utArgs.Tags, "synthetics")
+	}
+	return devtools.GoTest(ctx, utArgs)
 }
 
 // PythonUnitTest executes the python system tests.
@@ -62,4 +72,14 @@ func PythonUnitTest() error {
 	mg.SerialDeps(pythonTestDeps...)
 	mg.Deps(devtools.BuildSystemTestBinary)
 	return devtools.PythonTest(devtools.DefaultPythonTestUnitArgs())
+}
+
+// PythonVirtualEnv creates the testing virtual environment and prints its location.
+func PythonVirtualEnv() error {
+	venv, err := devtools.PythonVirtualenv(true)
+	if err != nil {
+		return err
+	}
+	fmt.Println(venv)
+	return nil
 }

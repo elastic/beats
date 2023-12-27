@@ -14,18 +14,20 @@ import (
 
 // Config stores the configuration used by the NetFlow Collector.
 type Config struct {
-	protocols   []string
-	logOutput   io.Writer
-	expiration  time.Duration
-	detectReset bool
-	fields      fields.FieldDict
+	protocols       []string
+	logOutput       io.Writer
+	expiration      time.Duration
+	detectReset     bool
+	fields          fields.FieldDict
+	sharedTemplates bool
 }
 
 var defaultCfg = Config{
-	protocols:   []string{},
-	logOutput:   ioutil.Discard,
-	expiration:  time.Hour,
-	detectReset: true,
+	protocols:       []string{},
+	logOutput:       ioutil.Discard,
+	expiration:      time.Hour,
+	detectReset:     true,
+	sharedTemplates: false,
 }
 
 // Defaults returns a configuration object with defaults settings:
@@ -78,6 +80,14 @@ func (c *Config) WithCustomFields(dicts ...fields.FieldDict) *Config {
 	for _, dict := range dicts {
 		c.fields.Merge(dict)
 	}
+	return c
+}
+
+// WithSharedTemplates allows to toggle the sharing of templates within
+// a v9 neflow or ipfix session. If it is not enabled, the source address
+// must match the address of the source of the template.
+func (c *Config) WithSharedTemplates(enabled bool) *Config {
+	c.sharedTemplates = enabled
 	return c
 }
 

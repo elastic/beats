@@ -2,13 +2,17 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/sonicwall/_meta/docs.asciidoc
+
 [[filebeat-module-sonicwall]]
 [role="xpack"]
 
-:modulename: sonicwall
+:modulename: sonicwall_firewall
 :has-dashboards: false
 
 == Sonicwall module
+
+deprecated::[8.12.0,"This module is deprecated. Use the https://docs.elastic.co/integrations/sonicwall[SonicWall Firewall] Elastic integration instead."]
 
 experimental[]
 
@@ -79,3 +83,4 @@ will be found under `rsa.raw`. The default is false.
 For a description of each field in the module, see the
 <<exported-fields-sonicwall,exported fields>> section.
 
+:edit_url!:

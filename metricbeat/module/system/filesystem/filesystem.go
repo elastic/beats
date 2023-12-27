@@ -16,22 +16,23 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || openbsd || windows
-// +build darwin freebsd linux openbsd windows
 
 package filesystem
 
 import (
+	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
+	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-
-	"github.com/pkg/errors"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	fs "github.com/elastic/elastic-agent-system-metrics/metric/system/filesystem"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
-
-var debugf = logp.MakeDebug("system.filesystem")
 
 func init() {
 	mb.Registry.MustAddMetricSet("system", "filesystem", New,
@@ -39,10 +40,16 @@ func init() {
 	)
 }
 
+// Config stores the metricset-local config
+type Config struct {
+	IgnoreTypes []string `config:"filesystem.ignore_types"`
+}
+
 // MetricSet for fetching filesystem metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
 	config Config
+	sys    resolve.Resolver
 }
 
 // New creates and returns a new instance of MetricSet.
@@ -51,55 +58,80 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	sys := base.Module().(resolve.Resolver)
+	sys, ok := base.Module().(resolve.Resolver)
+	if !ok {
+		return nil, fmt.Errorf("resolver cannot be cast from the module")
+	}
+
 	if config.IgnoreTypes == nil {
-		config.IgnoreTypes = DefaultIgnoredTypes(sys)
+		config.IgnoreTypes = fs.DefaultIgnoredTypes(sys)
 	}
 	if len(config.IgnoreTypes) > 0 {
 		logp.Info("Ignoring filesystem types: %s", strings.Join(config.IgnoreTypes, ", "))
 	}
-
 	return &MetricSet{
 		BaseMetricSet: base,
 		config:        config,
+		sys:           sys,
 	}, nil
 }
 
 // Fetch fetches filesystem metrics for all mounted filesystems and returns
 // an event for each mount point.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	fss, err := GetFileSystemList()
+	fsList, err := fs.GetFilesystems(m.sys, fs.BuildFilterWithList(m.config.IgnoreTypes))
 	if err != nil {
-		return errors.Wrap(err, "error getting filesystem list")
-
+		return fmt.Errorf("error fetching filesystem list: %w", err)
 	}
 
-	if len(m.config.IgnoreTypes) > 0 {
-		fss = Filter(fss, BuildTypeFilter(m.config.IgnoreTypes...))
-	}
-
-	for _, fs := range fss {
-		stat, err := GetFileSystemStat(fs)
-		addStats := true
+	for _, fs := range fsList {
+		err := fs.GetUsage()
 		if err != nil {
-			addStats = false
-			m.Logger().Debugf("error fetching filesystem stats for '%s': %v", fs.DirName, err)
+			m.Logger().Errorf("error getting filesystem usage for %s: %s", fs.Directory, err)
+			continue
 		}
-		fsStat := FSStat{
-			FileSystemUsage: stat,
-			DevName:         fs.DevName,
-			Mount:           fs.DirName,
-			SysTypeName:     fs.SysTypeName,
+		out := mapstr.M{}
+		err = typeconv.Convert(&out, fs)
+		if err != nil {
+			m.Logger().Errorf("error converting filesystem event for %s: %s", fs.Device, err)
+			continue
 		}
-
-		AddFileSystemUsedPercentage(&fsStat)
 
 		event := mb.Event{
-			MetricSetFields: GetFilesystemEvent(&fsStat, addStats),
+			MetricSetFields: out,
 		}
 		if !r.Event(event) {
 			return nil
 		}
 	}
 	return nil
+}
+
+// Diagnostics implmements the DiagnosticSet interface
+func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
+	m.Logger().Infof("got DiagnosticSetup request for system/memory")
+	return []diagnostics.DiagnosticSetup{
+		{
+			Name:        "filesystem-filesystems",
+			Description: "Contents of /proc/filesystems",
+			Filename:    "filesystems",
+			Callback:    m.filesystemsDiag,
+		},
+		{
+			Name:        "filesystem-mounts",
+			Description: "Contents of /proc/mounts",
+			Filename:    "mounts",
+			Callback:    m.mountsDiag,
+		},
+	}
+}
+
+func (m *MetricSet) filesystemsDiag() []byte {
+	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	return diagnostics.GetRawFileOrErrorString(sys, "/proc/filesystems")
+}
+
+func (m *MetricSet) mountsDiag() []byte {
+	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	return diagnostics.GetRawFileOrErrorString(sys, "/proc/mounts")
 }

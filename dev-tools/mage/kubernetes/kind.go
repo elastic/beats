@@ -46,7 +46,7 @@ func (m *KindIntegrationTestStep) Use(dir string) (bool, error) {
 
 // Setup ensures that a kubernetes cluster is up and running.
 //
-// If `KUBECONFIG` is already deinfed in the env then it will do nothing.
+// If `KUBECONFIG` is already defined in the env then it will do nothing.
 func (m *KindIntegrationTestStep) Setup(env map[string]string) error {
 
 	envVars := []string{"KUBECONFIG", "KUBE_CONFIG"}

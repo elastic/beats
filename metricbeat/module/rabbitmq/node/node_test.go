@@ -20,9 +20,9 @@ package node
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/metricbeat/module/rabbitmq/mtest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -58,96 +58,96 @@ func testFetch(t *testing.T, collect string) {
 
 	t.Logf("%s/%s event: %+v", ms.Module().Name(), ms.Name(), event.StringToPrint())
 
-	disk := event["disk"].(common.MapStr)
-	free := disk["free"].(common.MapStr)
+	disk := event["disk"].(mapstr.M)
+	free := disk["free"].(mapstr.M)
 	assert.EqualValues(t, int64(98317942784), free["bytes"])
 
-	limit := free["limit"].(common.MapStr)
+	limit := free["limit"].(mapstr.M)
 	assert.EqualValues(t, 50000000, limit["bytes"])
 
-	fd := event["fd"].(common.MapStr)
+	fd := event["fd"].(mapstr.M)
 	assert.EqualValues(t, 1048576, fd["total"])
 	assert.EqualValues(t, 31, fd["used"])
 
-	gc := event["gc"].(common.MapStr)
-	num := gc["num"].(common.MapStr)
+	gc := event["gc"].(mapstr.M)
+	num := gc["num"].(mapstr.M)
 	assert.EqualValues(t, 1049055, num["count"])
-	reclaimed := gc["reclaimed"].(common.MapStr)
+	reclaimed := gc["reclaimed"].(mapstr.M)
 	assert.EqualValues(t, int64(27352751800), reclaimed["bytes"])
 
-	io := event["io"].(common.MapStr)
-	fileHandle := io["file_handle"].(common.MapStr)
-	openAttempt := fileHandle["open_attempt"].(common.MapStr)
-	avg := openAttempt["avg"].(common.MapStr)
+	io := event["io"].(mapstr.M)
+	fileHandle := io["file_handle"].(mapstr.M)
+	openAttempt := fileHandle["open_attempt"].(mapstr.M)
+	avg := openAttempt["avg"].(mapstr.M)
 	assert.EqualValues(t, 0, avg["ms"])
 	assert.EqualValues(t, 597670, openAttempt["count"])
 
-	read := io["read"].(common.MapStr)
-	avg = read["avg"].(common.MapStr)
+	read := io["read"].(mapstr.M)
+	avg = read["avg"].(mapstr.M)
 	assert.EqualValues(t, 0, avg["ms"])
 	assert.EqualValues(t, 1, read["bytes"])
 	assert.EqualValues(t, 3, read["count"])
 
-	reopen := io["reopen"].(common.MapStr)
+	reopen := io["reopen"].(mapstr.M)
 	assert.EqualValues(t, 3, reopen["count"])
 
-	seek := io["seek"].(common.MapStr)
-	avg = seek["avg"].(common.MapStr)
+	seek := io["seek"].(mapstr.M)
+	avg = seek["avg"].(mapstr.M)
 	assert.EqualValues(t, 0, avg["ms"])
 	assert.EqualValues(t, 23, seek["count"])
 
-	sync := io["sync"].(common.MapStr)
-	avg = sync["avg"].(common.MapStr)
+	sync := io["sync"].(mapstr.M)
+	avg = sync["avg"].(mapstr.M)
 	assert.EqualValues(t, 2, avg["ms"])
 	assert.EqualValues(t, 149402, sync["count"])
 
-	write := io["write"].(common.MapStr)
-	avg = write["avg"].(common.MapStr)
+	write := io["write"].(mapstr.M)
+	avg = write["avg"].(mapstr.M)
 	assert.EqualValues(t, 0, avg["ms"])
 	assert.EqualValues(t, 36305460, write["bytes"])
 	assert.EqualValues(t, 149402, write["count"])
 
-	mem := event["mem"].(common.MapStr)
-	limit = mem["limit"].(common.MapStr)
+	mem := event["mem"].(mapstr.M)
+	limit = mem["limit"].(mapstr.M)
 	assert.EqualValues(t, int64(6628692787), limit["bytes"])
-	used := mem["used"].(common.MapStr)
+	used := mem["used"].(mapstr.M)
 	assert.EqualValues(t, 105504768, used["bytes"])
 
-	mnesia := event["mnesia"].(common.MapStr)
-	disk = mnesia["disk"].(common.MapStr)
-	tx := disk["tx"].(common.MapStr)
+	mnesia := event["mnesia"].(mapstr.M)
+	disk = mnesia["disk"].(mapstr.M)
+	tx := disk["tx"].(mapstr.M)
 	assert.EqualValues(t, 1, tx["count"])
-	ram := mnesia["ram"].(common.MapStr)
-	tx = ram["tx"].(common.MapStr)
+	ram := mnesia["ram"].(mapstr.M)
+	tx = ram["tx"].(mapstr.M)
 	assert.EqualValues(t, 92, tx["count"])
 
-	msg := event["msg"].(common.MapStr)
-	storeRead := msg["store_read"].(common.MapStr)
+	msg := event["msg"].(mapstr.M)
+	storeRead := msg["store_read"].(mapstr.M)
 	assert.EqualValues(t, 0, storeRead["count"])
-	storeWrite := msg["store_write"].(common.MapStr)
+	storeWrite := msg["store_write"].(mapstr.M)
 	assert.EqualValues(t, 0, storeWrite["count"])
 
 	assert.EqualValues(t, "rabbit@e2b1ae6390fd", event["name"])
 
-	proc := event["proc"].(common.MapStr)
+	proc := event["proc"].(mapstr.M)
 	assert.EqualValues(t, 1048576, proc["total"])
 	assert.EqualValues(t, 403, proc["used"])
 
 	assert.EqualValues(t, 4, event["processors"])
 
-	queue := event["queue"].(common.MapStr)
-	index := queue["index"].(common.MapStr)
-	journalWrite := index["journal_write"].(common.MapStr)
+	queue := event["queue"].(mapstr.M)
+	index := queue["index"].(mapstr.M)
+	journalWrite := index["journal_write"].(mapstr.M)
 	assert.EqualValues(t, 448230, journalWrite["count"])
-	read = index["read"].(common.MapStr)
+	read = index["read"].(mapstr.M)
 	assert.EqualValues(t, 0, read["count"])
-	write = index["write"].(common.MapStr)
+	write = index["write"].(mapstr.M)
 	assert.EqualValues(t, 2, write["count"])
 
-	run := event["run"].(common.MapStr)
+	run := event["run"].(mapstr.M)
 	assert.EqualValues(t, 0, run["queue"])
 
-	socket := event["socket"].(common.MapStr)
+	socket := event["socket"].(mapstr.M)
 	assert.EqualValues(t, 943626, socket["total"])
 	assert.EqualValues(t, 3, socket["used"])
 

@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: couchbase
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/couchbase/_meta/docs.asciidoc
+
 
 [[metricbeat-module-couchbase]]
 == Couchbase module
@@ -23,6 +25,8 @@ The Couchbase module comes with a predefined dashboard for Couchbase cluster, no
 
 image::./images/metricbeat-couchbase-overview.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -60,3 +64,4 @@ include::couchbase/cluster.asciidoc[]
 
 include::couchbase/node.asciidoc[]
 
+:edit_url!:

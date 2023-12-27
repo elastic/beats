@@ -54,6 +54,7 @@ func Server(t *testing.T, c ServerConfig) *httptest.Server {
 		c.ManagementPathPrefix + "/api/nodes/rabbit@e2b1ae6390fd": {file: "node_sample_response.json"},
 		c.ManagementPathPrefix + "/api/overview":                  {file: "overview_sample_response.json"},
 		c.ManagementPathPrefix + "/api/queues":                    {file: "queue_sample_response.json"},
+		c.ManagementPathPrefix + "/api/shovels":                   {file: "shovel_sample_response.json"},
 	}
 
 	for k := range responses {
@@ -69,10 +70,10 @@ func Server(t *testing.T, c ServerConfig) *httptest.Server {
 		w.Header().Set("Content-Type", "application/json;")
 		if response, found := responses[r.URL.Path]; found {
 			w.WriteHeader(200)
-			w.Write(response.body)
+			_, _ = w.Write(response.body)
 		} else {
 			w.WriteHeader(404)
-			w.Write(notFound)
+			_, _ = w.Write(notFound)
 			t.Log("RabbitMQ 404 error, url requested: " + r.URL.Path)
 		}
 	}))

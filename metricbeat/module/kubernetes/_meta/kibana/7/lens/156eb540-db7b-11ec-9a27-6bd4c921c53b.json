@@ -1,0 +1,190 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "2ef0145f-ac0f-4dd6-9db2-6ea531a0bc31": {
+                            "columnOrder": [
+                                "28ea2553-630d-4917-b778-52da2d5bba86",
+                                "77f5c6a8-9fb9-4bdd-bf9e-80fc5bd19625",
+                                "0bcf546f-2a52-48e7-8c4e-3a908be9d6c4",
+                                "9b5ed643-7572-4d3b-a9af-6265b3a5a515"
+                            ],
+                            "columns": {
+                                "0bcf546f-2a52-48e7-8c4e-3a908be9d6c4": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.deployment.replicas.unavailable: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Replicas Unavailable",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.deployment.replicas.unavailable"
+                                },
+                                "28ea2553-630d-4917-b778-52da2d5bba86": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Deployment Name",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "77f5c6a8-9fb9-4bdd-bf9e-80fc5bd19625",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 20
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.deployment.name"
+                                },
+                                "77f5c6a8-9fb9-4bdd-bf9e-80fc5bd19625": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.deployment.replicas.available: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Replicas Available",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.deployment.replicas.available"
+                                },
+                                "9b5ed643-7572-4d3b-a9af-6265b3a5a515": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Replicas Desired",
+                                    "operationType": "median",
+                                    "params": {
+                                        "emptyAsNull": true
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.deployment.replicas.desired"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "0c33c9cb-ce1e-4bba-a35d-c3520d38a660",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "state_deployment"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "state_deployment"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "axisTitlesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "fittingFunction": "None",
+                "gridlinesVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "labelsOrientation": {
+                    "x": 0,
+                    "yLeft": 0,
+                    "yRight": 0
+                },
+                "layers": [
+                    {
+                        "accessors": [
+                            "77f5c6a8-9fb9-4bdd-bf9e-80fc5bd19625",
+                            "0bcf546f-2a52-48e7-8c4e-3a908be9d6c4",
+                            "9b5ed643-7572-4d3b-a9af-6265b3a5a515"
+                        ],
+                        "layerId": "2ef0145f-ac0f-4dd6-9db2-6ea531a0bc31",
+                        "layerType": "data",
+                        "seriesType": "bar_stacked",
+                        "xAccessor": "28ea2553-630d-4917-b778-52da2d5bba86",
+                        "yConfig": [
+                            {
+                                "color": "#f00e0e",
+                                "forAccessor": "0bcf546f-2a52-48e7-8c4e-3a908be9d6c4"
+                            },
+                            {
+                                "color": "#6092c0",
+                                "forAccessor": "9b5ed643-7572-4d3b-a9af-6265b3a5a515"
+                            }
+                        ]
+                    }
+                ],
+                "legend": {
+                    "isVisible": true,
+                    "position": "right"
+                },
+                "preferredSeriesType": "bar_stacked",
+                "tickLabelsVisibilitySettings": {
+                    "x": true,
+                    "yLeft": true,
+                    "yRight": true
+                },
+                "valueLabels": "hide"
+            }
+        },
+        "title": "Replicas per Deployment [Metricbeat Kubernetes]",
+        "visualizationType": "lnsXY"
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "156eb540-db7b-11ec-9a27-6bd4c921c53b",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-2ef0145f-ac0f-4dd6-9db2-6ea531a0bc31",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "0c33c9cb-ce1e-4bba-a35d-c3520d38a660",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-05-24T16:22:52.326Z",
+    "version": "WzEwNTEsMV0="
+}

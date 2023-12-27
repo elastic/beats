@@ -30,7 +30,7 @@ func TestNetflowProtocol_New(t *testing.T) {
 func TestOptionTemplates(t *testing.T) {
 	const sourceID = 1234
 	addr := test.MakeAddress(t, "127.0.0.1:12345")
-	key := MakeSessionKey(addr, sourceID)
+	key := MakeSessionKey(addr, sourceID, false)
 
 	t.Run("Single options template", func(t *testing.T) {
 		proto := New(config.Defaults())
@@ -153,7 +153,7 @@ func TestSessionReset(t *testing.T) {
 	flowsPacket := []uint16{
 		// Header
 		// Version, Count, Uptime, Ts, SeqNo, Source
-		9, 1, 11, 11, 22, 22, 00, 33, 0, 1234,
+		9, 1, 11, 11, 22, 22, 0o0, 33, 0, 1234,
 		// Set #1 (template)
 		999, 16, /*len of set*/
 		1, 1,

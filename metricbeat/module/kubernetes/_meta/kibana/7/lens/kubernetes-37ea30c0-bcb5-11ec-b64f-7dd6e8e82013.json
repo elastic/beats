@@ -1,0 +1,175 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "77c778d8-1664-4062-b5ff-7bbc982f49d2": {
+                            "columnOrder": [
+                                "33f00b6c-023d-4b71-98c5-7c5a56d3b9d8",
+                                "00c2aa45-0e8c-4f29-a478-4b8dbf419472",
+                                "8163b6c0-69e0-4e8f-9c21-6878a2e5e8e1",
+                                "b1e6a372-87f5-44cd-b0c3-132f94a4a860"
+                            ],
+                            "columns": {
+                                "00c2aa45-0e8c-4f29-a478-4b8dbf419472": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Completions Desired",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "format": {
+                                            "id": "number",
+                                            "params": {
+                                                "decimals": 0
+                                            }
+                                        },
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.job.completions.desired"
+                                },
+                                "33f00b6c-023d-4b71-98c5-7c5a56d3b9d8": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Job Name",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": true,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.job.name"
+                                },
+                                "8163b6c0-69e0-4e8f-9c21-6878a2e5e8e1": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Parallelism Desired",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "format": {
+                                            "id": "number",
+                                            "params": {
+                                                "decimals": 0
+                                            }
+                                        },
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.job.parallelism.desired"
+                                },
+                                "b1e6a372-87f5-44cd-b0c3-132f94a4a860": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Completed",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.job.status.complete"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "67b3ab4b-c221-4d31-b378-9a8c289ad494",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": {
+                            "query": "state_job"
+                        },
+                        "type": "phrase"
+                    },
+                    "query": {
+                        "match_phrase": {
+                            "metricset.name": "state_job"
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "33f00b6c-023d-4b71-98c5-7c5a56d3b9d8",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "00c2aa45-0e8c-4f29-a478-4b8dbf419472",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "8163b6c0-69e0-4e8f-9c21-6878a2e5e8e1",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "b1e6a372-87f5-44cd-b0c3-132f94a4a860",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "77c778d8-1664-4062-b5ff-7bbc982f49d2",
+                "layerType": "data",
+                "rowHeight": "single",
+                "rowHeightLines": 1
+            }
+        },
+        "title": "Informations per Job [Metricbeat Kubernetes]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-37ea30c0-bcb5-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-77c778d8-1664-4062-b5ff-7bbc982f49d2",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "67b3ab4b-c221-4d31-b378-9a8c289ad494",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-05-23T08:46:48.838Z",
+    "version": "WzcwOSwxXQ=="
+}

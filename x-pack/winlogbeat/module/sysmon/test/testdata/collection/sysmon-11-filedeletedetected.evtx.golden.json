@@ -1,0 +1,98 @@
+[
+  {
+    "@timestamp": "2022-01-24T05:12:34.3299803Z",
+    "event": {
+      "code": "26",
+      "kind": "event",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "Hashes": "SHA256=A94808E7C66973B122F66EC6611019C745A9602F8E944F53635CAB58AEF35A79",
+        "Image": "C:\\Windows\\System32\\svchost.exe",
+        "IsExecutable": "false",
+        "ProcessGuid": "{63a74932-a2b4-61ee-1b00-000000000700}",
+        "ProcessId": "1264",
+        "RuleName": "-",
+        "TargetFilename": "C:\\Windows\\ServiceState\\EventLog\\Data\\lastalive1.dat",
+        "User": "NT AUTHORITY\\LOCAL SERVICE",
+        "UtcTime": "2022-01-24 05:12:34.328"
+      },
+      "event_id": "26",
+      "opcode": "Info",
+      "process": {
+        "pid": 2764,
+        "thread": {
+          "id": 3792
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 456,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  },
+  {
+    "@timestamp": "2022-01-24T05:12:51.04227Z",
+    "event": {
+      "code": "26",
+      "kind": "event",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "Hashes": "SHA256=D78FBF654D84DDF2CB4FE221F7D8B61E0DECDEE48A4687915E6E4A2296E2418B",
+        "Image": "C:\\Windows\\system32\\svchost.exe",
+        "IsExecutable": "false",
+        "ProcessGuid": "{63a74932-3523-61ee-af00-000000000700}",
+        "ProcessId": "1364",
+        "RuleName": "-",
+        "TargetFilename": "C:\\ProgramData\\Microsoft\\Windows\\DeviceMetadataCache\\OLDCACHE.000",
+        "User": "NT AUTHORITY\\SYSTEM",
+        "UtcTime": "2022-01-24 05:12:51.031"
+      },
+      "event_id": "26",
+      "opcode": "Info",
+      "process": {
+        "pid": 2764,
+        "thread": {
+          "id": 3792
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 457,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  }
+]

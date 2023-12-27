@@ -19,8 +19,13 @@ type Query struct {
 	// Optional ECS mapping for the query, not rendered into osqueryd configuration
 	ECSMapping map[string]interface{} `config:"ecs_mapping" json:"-"`
 
-	// Always enforced as snapshot, can't be changed via configuration
-	Snapshot bool `json:"snapshot"`
+	// A boolean to set 'snapshot' mode, default true
+	// This is different from the default osquery behavior where the missing value defaults to false
+	Snapshot *bool `config:"snapshot,omitempty" json:"snapshot,omitempty"`
+
+	// A boolean to determine if "removed" actions should be logged, default true
+	// This is the same as osquery behavior
+	Removed *bool `config:"removed,omitempty" json:"removed,omitempty"`
 }
 
 type Pack struct {

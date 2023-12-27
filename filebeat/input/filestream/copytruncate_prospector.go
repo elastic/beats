@@ -28,7 +28,8 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/common/file"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -37,9 +38,7 @@ const (
 	copiedFileIdx                  = 0
 )
 
-var (
-	numericSuffixRegexp = regexp.MustCompile("\\d*$")
-)
+var numericSuffixRegexp = regexp.MustCompile(`\d*$`)
 
 // sorter is required for ordering rotated log files
 // The slice is ordered so the newest rotated file comes first.
@@ -169,12 +168,6 @@ func (r rotatedFilestreams) isOriginalAdded(path string) bool {
 	return ok
 }
 
-// originalSrc returns the original Source information of a given
-// original file path.
-func (r rotatedFilestreams) originalSrc(path string) loginp.Source {
-	return r.table[path].originalSrc
-}
-
 // addRotatedFile adds a new rotated file to the list and returns its index.
 // if a file is already added, the source is updated and the index is returned.
 func (r rotatedFilestreams) addRotatedFile(original, rotated string, src loginp.Source) int {
@@ -195,17 +188,6 @@ func (r rotatedFilestreams) addRotatedFile(original, rotated string, src loginp.
 	}
 
 	return -1
-}
-
-// addRotatedFile adds a new rotated file to the list and returns its index.
-// if a file is already added, the source is updated and the index is returned.
-func (r rotatedFilestreams) removeRotatedFile(original, rotated string) {
-	for idx, fi := range r.table[original].rotated {
-		if fi.path == rotated {
-			r.table[original].rotated = append(r.table[original].rotated[:idx], r.table[original].rotated[idx+1:]...)
-			return
-		}
-	}
 }
 
 type copyTruncateFileProspector struct {
@@ -261,12 +243,10 @@ func (p *copyTruncateFileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
-
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		if event.Op == loginp.OpCreate {
 			log.Debugf("A new file %s has been found", event.NewPath)
-
 		} else if event.Op == loginp.OpWrite {
 			log.Debugf("File %s has been updated", event.NewPath)
 		}
@@ -299,7 +279,10 @@ func (p *copyTruncateFileProspector) onFSEvent(
 	case loginp.OpTruncate:
 		log.Debugf("File %s has been truncated", event.NewPath)
 
-		updater.ResetCursor(src, state{Offset: 0})
+		err := updater.ResetCursor(src, state{Offset: 0})
+		if err != nil {
+			log.Errorf("failed to reset file cursor: %w", err)
+		}
 		group.Restart(ctx, src)
 
 	case loginp.OpDelete:
@@ -320,14 +303,12 @@ func (p *copyTruncateFileProspector) onFSEvent(
 		p.fileProspector.onRename(log, ctx, event, src, updater, group)
 
 	default:
-		log.Error("Unkown return value %v", event.Op)
+		log.Error("Unknown return value %v", event.Op)
 	}
 }
+
 func (p *copyTruncateFileProspector) isRotated(event loginp.FSEvent) bool {
-	if p.rotatedSuffix.MatchString(event.NewPath) {
-		return true
-	}
-	return false
+	return p.rotatedSuffix.MatchString(event.NewPath)
 }
 
 func (p *copyTruncateFileProspector) onRotatedFile(
@@ -349,7 +330,9 @@ func (p *copyTruncateFileProspector) onRotatedFile(
 			hg.Start(ctx, src)
 			return
 		}
-		originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Info: fi})
+		descCopy := fe.Descriptor
+		descCopy.Info = file.ExtendFileInfo(fi)
+		originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Descriptor: descCopy})
 		p.rotatedFiles.addOriginalFile(originalPath, originalSrc)
 		p.rotatedFiles.addRotatedFile(originalPath, fe.NewPath, src)
 		hg.Start(ctx, src)

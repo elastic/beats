@@ -18,10 +18,10 @@
 package mgr_osd_tree
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/ceph/mgr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -75,7 +75,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 
 	for _, event := range events {
 		reported := reporter.Event(mb.Event{
-			ModuleFields: common.MapStr{
+			ModuleFields: mapstr.M{
 				"osd_tree": event,
 			}})
 		if !reported {

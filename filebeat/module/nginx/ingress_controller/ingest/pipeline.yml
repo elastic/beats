@@ -17,16 +17,17 @@ processors:
           "(-|%{DATA:http.request.referrer})" "(-|%{DATA:user_agent.original})" %{NUMBER:nginx.ingress_controller.http.request.length:long}
           %{NUMBER:nginx.ingress_controller.http.request.time:double} \[%{DATA:nginx.ingress_controller.upstream.name}\]
           \[%{DATA:nginx.ingress_controller.upstream.alternative_name}\] (%{UPSTREAM_ADDRESS_LIST:nginx.ingress_controller.upstream_address_list}|-)
-          (%{UPSTREAM_RESPONSE_LENGTH_LIST:nginx.ingress_controller.upstream.response.length_list}|-) (%{UPSTREAM_RESPONSE_TIME_LIST:nginx.ingress_controller.upstream.response.time_list}|-)
-          (%{UPSTREAM_RESPONSE_STATUS_CODE_LIST:nginx.ingress_controller.upstream.response.status_code_list}|-) %{GREEDYDATA:nginx.ingress_controller.http.request.id}
+          (%{UPSTREAM_RESPONSE_LENGTH_LIST:nginx.ingress_controller.upstream.response.length_list}|-) (-|%{UPSTREAM_RESPONSE_TIME_LIST:nginx.ingress_controller.upstream.response.time_list})
+          (-|%{UPSTREAM_RESPONSE_STATUS_CODE_LIST:nginx.ingress_controller.upstream.response.status_code_list}) %{GREEDYDATA:nginx.ingress_controller.http.request.id}
       pattern_definitions:
         NGINX_HOST: (?:%{IP:destination.ip}|%{NGINX_NOTSEPARATOR:destination.domain})(:%{NUMBER:destination.port})?
         NGINX_NOTSEPARATOR: "[^\t ,:]+"
         NGINX_ADDRESS_LIST: (?:%{IP}|%{WORD})("?,?\s*(?:%{IP}|%{WORD}))*
-        UPSTREAM_ADDRESS_LIST: (?:%{IP}(:%{NUMBER})?)("?,?\s*(?:%{IP}(:%{NUMBER})?))*
+        UPSTREAM_ADDRESS_LIST: (unix:%{NOTSPACE}|(?:%{IP}(:%{NUMBER})?)("?,?\s*(?:%{IP}(:%{NUMBER})?))*)
         UPSTREAM_RESPONSE_LENGTH_LIST: (?:%{NUMBER})("?,?\s*(?:%{NUMBER}))*
-        UPSTREAM_RESPONSE_TIME_LIST: (?:%{NUMBER})("?,?\s*(?:%{NUMBER}))*
-        UPSTREAM_RESPONSE_STATUS_CODE_LIST: (?:%{NUMBER})("?,?\s*(?:%{NUMBER}))*
+        UPSTREAM_RESPONSE_TIME_LIST: (%{NUMBER}|(-|(?:%{NUMBER})),\s+(-|(?:%{NUMBER}))(\"?,?\s*(-|(?:%{NUMBER})))*)
+        UPSTREAM_RESPONSE_STATUS_CODE_LIST: (%{NUMBER}|(-|(?:%{NUMBER})),\s+(-|(?:%{NUMBER}))(\"?,?\s*(-|(?:%{NUMBER})))*)
+        IP: (?:\[?%{IPV6}\]?|%{IPV4})
       ignore_missing: true
   - grok:
       field: nginx.ingress_controller.info
@@ -103,7 +104,9 @@ processors:
           }
           float res_time = 0;
           for (def item : ctx.nginx.ingress_controller.upstream.response.time_list) {
-            res_time = res_time + Float.parseFloat(item);
+            if (item != '-') {
+              res_time = res_time + Float.parseFloat(item);
+            }
           }
           ctx.nginx.ingress_controller.upstream.response.time = res_time;
         }
@@ -120,7 +123,9 @@ processors:
           }
           int last_status_code;
           for (def item : ctx.nginx.ingress_controller.upstream.response.status_code_list) {
-            last_status_code = Integer.parseInt(item);
+            if (item != '-') {
+              last_status_code = Integer.parseInt(item);
+            }
           }
           ctx.nginx.ingress_controller.upstream.response.status_code = last_status_code;
         }
@@ -139,18 +144,42 @@ processors:
           for (def item : ctx.nginx.ingress_controller.upstream_address_list) {
             last_upstream = item;
           }
-          StringTokenizer tok = new StringTokenizer(last_upstream, ":");
-          if (tok.countTokens()>1) {
-            ctx.nginx.ingress_controller.upstream.ip = tok.nextToken();
-            ctx.nginx.ingress_controller.upstream.port = Integer.parseInt(tok.nextToken());
-          } else {
-            ctx.nginx.ingress_controller.upstream.ip = last_upstream;
-          }
+
+          ctx.nginx.ingress_controller.upstream.address = last_upstream;
         }
         catch (Exception e) {
-          ctx.nginx.ingress_controller.upstream.ip = null;
-          ctx.nginx.ingress_controller.upstream.port = null;
+          ctx.nginx.ingress_controller.upstream.address = null;
         }
+  - grok:
+      field: nginx.ingress_controller.upstream.address
+      patterns:
+        - "^%{IPV4:nginx.ingress_controller.upstream.ip}:%{NUMBER:nginx.ingress_controller.upstream.port}$"
+        - "^\\[%{IPV6:nginx.ingress_controller.upstream.ip}\\]:%{NUMBER:nginx.ingress_controller.upstream.port}$"
+        - "^%{IPV6NOCOMPRESS:nginx.ingress_controller.upstream.ip}:%{NUMBER:nginx.ingress_controller.upstream.port}$"
+        - "^%{IPV6:nginx.ingress_controller.upstream.ip}%{IPV6PORTSEP}%{NUMBER:nginx.ingress_controller.upstream.port}$"
+        - "^%{IPV6:nginx.ingress_controller.upstream.ip}%{IPV6PORTSEP}%{POSINT:nginx.ingress_controller.upstream.port}$"
+      pattern_definitions:
+        IPV6NOCOMPRESS: '([0-9A-Fa-f]{1,4}:){7}[0-9A-Fa-f]{1,4}'
+        IPV6PORTSEP: '(?: port |[p#.])'
+      ignore_missing: true
+      ignore_failure: true
+  - convert:
+      field: nginx.ingress_controller.upstream.ip
+      type: ip
+      ignore_missing: true
+      on_failure:
+      - remove:
+          field: nginx.ingress_controller.upstream.ip
+  - convert:
+      field: nginx.ingress_controller.upstream.port
+      type: long
+      ignore_missing: true
+      on_failure:
+      - remove:
+          field: nginx.ingress_controller.upstream.port
+  - remove:
+      field: nginx.ingress_controller.upstream.address
+      ignore_failure: true
   - script:
       if: ctx.nginx?.ingress_controller?.remote_ip_list != null && ctx.nginx.ingress_controller.remote_ip_list.length > 0
       lang: painless
@@ -266,10 +295,17 @@ processors:
       field: related.ip
       value: "{{source.ip}}"
       if: "ctx?.source?.ip != null"
+      allow_duplicates: false
   - append:
       field: related.ip
       value: "{{destination.ip}}"
       if: "ctx?.destination?.ip != null"
+      allow_duplicates: false
+  - append:
+      field: related.ip
+      value: "{{nginx.ingress_controller.upstream.ip}}"
+      if: "ctx?.nginx?.ingress_controller?.upstream?.ip != null"
+      allow_duplicates: false
   - append:
       field: related.user
       value: "{{user.name}}"

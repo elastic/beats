@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package fileset
 
@@ -26,21 +25,21 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 func TestAdaptPipelineForCompatibility(t *testing.T) {
 	cases := []struct {
 		name          string
-		esVersion     *common.Version
+		esVersion     *version.V
 		content       map[string]interface{}
 		expected      map[string]interface{}
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 6.7.0",
-			esVersion: common.MustNewVersion("6.6.0"),
+			esVersion: version.MustNew("6.6.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -48,12 +47,13 @@ func TestAdaptPipelineForCompatibility(t *testing.T) {
 							"field": "foo.http_user_agent",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: true,
 		},
 		{
 			name:      "ES == 6.7.0",
-			esVersion: common.MustNewVersion("6.7.0"),
+			esVersion: version.MustNew("6.7.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -89,7 +89,7 @@ func TestAdaptPipelineForCompatibility(t *testing.T) {
 		},
 		{
 			name:      "ES >= 7.0.0",
-			esVersion: common.MustNewVersion("7.0.0"),
+			esVersion: version.MustNew("7.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -142,14 +142,14 @@ func TestAdaptPipelineForCompatibility(t *testing.T) {
 func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 	cases := []struct {
 		name          string
-		esVersion     *common.Version
+		esVersion     *version.V
 		content       map[string]interface{}
 		expected      map[string]interface{}
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 7.9.0",
-			esVersion: common.MustNewVersion("7.8.0"),
+			esVersion: version.MustNew("7.8.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -159,7 +159,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"ignore_empty_value": true,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -175,7 +176,7 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 		},
 		{
 			name:      "ES == 7.9.0",
-			esVersion: common.MustNewVersion("7.9.0"),
+			esVersion: version.MustNew("7.9.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -185,7 +186,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"ignore_empty_value": true,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -201,7 +203,7 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 		},
 		{
 			name:      "ES > 7.9.0",
-			esVersion: common.MustNewVersion("8.0.0"),
+			esVersion: version.MustNew("8.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -211,7 +213,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"ignore_empty_value": true,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -227,7 +230,7 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 		},
 		{
 			name:      "existing if",
-			esVersion: common.MustNewVersion("7.7.7"),
+			esVersion: version.MustNew("7.7.7"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -238,7 +241,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"if":                 "ctx?.panw?.panos?.ruleset != null",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -248,12 +252,13 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"if":    "ctx?.panw?.panos?.ruleset != null",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
 			name:      "ignore_empty_value is false",
-			esVersion: common.MustNewVersion("7.7.7"),
+			esVersion: version.MustNew("7.7.7"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -264,7 +269,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"if":                 "ctx?.panw?.panos?.ruleset != null",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -274,12 +280,13 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"if":    "ctx?.panw?.panos?.ruleset != null",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
 			name:      "no value",
-			esVersion: common.MustNewVersion("7.7.7"),
+			esVersion: version.MustNew("7.7.7"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -288,7 +295,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"ignore_empty_value": false,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -296,7 +304,8 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 							"field": "rule.name",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 	}
@@ -319,14 +328,14 @@ func TestReplaceSetIgnoreEmptyValue(t *testing.T) {
 func TestReplaceAppendAllowDuplicates(t *testing.T) {
 	cases := []struct {
 		name          string
-		esVersion     *common.Version
+		esVersion     *version.V
 		content       map[string]interface{}
 		expected      map[string]interface{}
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 7.10.0: set to true",
-			esVersion: common.MustNewVersion("7.9.0"),
+			esVersion: version.MustNew("7.9.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -336,7 +345,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"allow_duplicates": true,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -351,7 +361,7 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 		},
 		{
 			name:      "ES < 7.10.0: set to false",
-			esVersion: common.MustNewVersion("7.9.0"),
+			esVersion: version.MustNew("7.9.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -361,7 +371,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"allow_duplicates": false,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -377,7 +388,7 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 		},
 		{
 			name:      "ES == 7.10.0",
-			esVersion: common.MustNewVersion("7.10.0"),
+			esVersion: version.MustNew("7.10.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -387,7 +398,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"allow_duplicates": false,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -403,7 +415,7 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 		},
 		{
 			name:      "ES > 7.10.0",
-			esVersion: common.MustNewVersion("8.0.0"),
+			esVersion: version.MustNew("8.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -413,7 +425,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"allow_duplicates": false,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -429,7 +442,7 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 		},
 		{
 			name:      "ES < 7.10.0: existing if",
-			esVersion: common.MustNewVersion("7.7.7"),
+			esVersion: version.MustNew("7.7.7"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -440,7 +453,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"if":               "ctx?.host?.hostname != null",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -450,12 +464,13 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"if":    "ctx?.host?.hostname != null && ((ctx?.related?.hosts instanceof List && !ctx?.related?.hosts.contains(ctx?.host?.hostname)) || ctx?.related?.hosts != ctx?.host?.hostname)",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
 			name:      "ES < 7.10.0: existing if with contains",
-			esVersion: common.MustNewVersion("7.7.7"),
+			esVersion: version.MustNew("7.7.7"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -466,7 +481,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"if":               "!ctx?.related?.hosts.contains(ctx?.host?.hostname)",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -476,12 +492,13 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"if":    "!ctx?.related?.hosts.contains(ctx?.host?.hostname)",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
 			name:      "ES < 7.10.0: no value",
-			esVersion: common.MustNewVersion("7.7.7"),
+			esVersion: version.MustNew("7.7.7"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -490,7 +507,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"allow_duplicates": false,
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -498,7 +516,8 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 							"field": "related.hosts",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 	}
@@ -521,14 +540,14 @@ func TestReplaceAppendAllowDuplicates(t *testing.T) {
 func TestRemoveURIPartsProcessor(t *testing.T) {
 	cases := []struct {
 		name          string
-		esVersion     *common.Version
+		esVersion     *version.V
 		content       map[string]interface{}
 		expected      map[string]interface{}
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 7.12.0",
-			esVersion: common.MustNewVersion("7.11.0"),
+			esVersion: version.MustNew("7.11.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -543,7 +562,8 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -558,7 +578,7 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 		},
 		{
 			name:      "ES == 7.12.0",
-			esVersion: common.MustNewVersion("7.12.0"),
+			esVersion: version.MustNew("7.12.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -573,7 +593,8 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -588,12 +609,13 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
 			name:      "ES > 7.12.0",
-			esVersion: common.MustNewVersion("8.0.0"),
+			esVersion: version.MustNew("8.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -608,7 +630,8 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -623,7 +646,8 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 	}
@@ -646,14 +670,14 @@ func TestRemoveURIPartsProcessor(t *testing.T) {
 func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 	cases := []struct {
 		name          string
-		esVersion     *common.Version
+		esVersion     *version.V
 		content       map[string]interface{}
 		expected      map[string]interface{}
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 7.13.0",
-			esVersion: common.MustNewVersion("7.12.34"),
+			esVersion: version.MustNew("7.12.34"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -670,7 +694,8 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -685,7 +710,7 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 		},
 		{
 			name:      "ES == 7.13.0",
-			esVersion: common.MustNewVersion("7.13.0"),
+			esVersion: version.MustNew("7.13.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -702,7 +727,8 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -719,12 +745,13 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
 			name:      "ES > 7.13.0",
-			esVersion: common.MustNewVersion("8.0.0"),
+			esVersion: version.MustNew("8.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -741,7 +768,8 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -758,7 +786,8 @@ func TestRemoveNetworkDirectionProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 	}
@@ -782,14 +811,14 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 	logp.TestingSetup()
 	cases := []struct {
 		name          string
-		esVersion     *common.Version
+		esVersion     *version.V
 		content       map[string]interface{}
 		expected      map[string]interface{}
 		isErrExpected bool
 	}{
 		{
 			name:      "ES >= 7.13.0: keep processor",
-			esVersion: common.MustNewVersion("7.13.0"),
+			esVersion: version.MustNew("7.13.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -816,7 +845,7 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 		},
 		{
 			name:      "ES < 7.13.0: replace with grok",
-			esVersion: common.MustNewVersion("7.12.0"),
+			esVersion: version.MustNew("7.12.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -844,7 +873,7 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 		},
 		{
 			name:      "implicit target",
-			esVersion: common.MustNewVersion("7.9.0"),
+			esVersion: version.MustNew("7.9.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -871,7 +900,7 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 		},
 		{
 			name:      "missing field",
-			esVersion: common.MustNewVersion("7.9.0"),
+			esVersion: version.MustNew("7.9.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -885,7 +914,7 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 		},
 		{
 			name:      "keep settings in grok",
-			esVersion: common.MustNewVersion("7.0.0"),
+			esVersion: version.MustNew("7.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -964,14 +993,14 @@ func TestReplaceConvertIPWithGrok(t *testing.T) {
 func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 	cases := []struct {
 		name          string
-		esVersion     *common.Version
+		esVersion     *version.V
 		content       map[string]interface{}
 		expected      map[string]interface{}
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 7.13.0",
-			esVersion: common.MustNewVersion("7.12.34"),
+			esVersion: version.MustNew("7.12.34"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -985,7 +1014,8 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 							"field": "foo",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1000,7 +1030,7 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 		},
 		{
 			name:      "ES == 7.13.0",
-			esVersion: common.MustNewVersion("7.13.0"),
+			esVersion: version.MustNew("7.13.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1014,7 +1044,8 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1028,12 +1059,13 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 		{
 			name:      "ES > 7.13.0",
-			esVersion: common.MustNewVersion("8.0.0"),
+			esVersion: version.MustNew("8.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1047,7 +1079,8 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1061,7 +1094,8 @@ func TestRemoveRegisteredDomainProcessor(t *testing.T) {
 							"value": "testvalue",
 						},
 					},
-				}},
+				},
+			},
 			isErrExpected: false,
 		},
 	}
@@ -1085,14 +1119,14 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 	logp.TestingSetup()
 	cases := []struct {
 		name          string
-		esVersion     *common.Version
+		esVersion     *version.V
 		content       map[string]interface{}
 		expected      map[string]interface{}
 		isErrExpected bool
 	}{
 		{
 			name:      "Replace in on_failure section",
-			esVersion: common.MustNewVersion("7.0.0"),
+			esVersion: version.MustNew("7.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}(nil),
 				"on_failure": []interface{}{
@@ -1136,7 +1170,7 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 		},
 		{
 			name:      "Replace in processor's on_failure",
-			esVersion: common.MustNewVersion("7.0.0"),
+			esVersion: version.MustNew("7.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1192,7 +1226,7 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 		},
 		{
 			name:      "Remove empty on_failure key",
-			esVersion: common.MustNewVersion("7.0.0"),
+			esVersion: version.MustNew("7.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1220,7 +1254,7 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 		},
 		{
 			name:      "process foreach processor",
-			esVersion: common.MustNewVersion("7.0.0"),
+			esVersion: version.MustNew("7.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1248,7 +1282,7 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 		},
 		{
 			name:      "Remove leftover foreach processor",
-			esVersion: common.MustNewVersion("7.0.0"),
+			esVersion: version.MustNew("7.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1268,7 +1302,7 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 		},
 		{
 			name:      "nested",
-			esVersion: common.MustNewVersion("7.0.0"),
+			esVersion: version.MustNew("7.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}(nil),
 				"on_failure": []interface{}{
@@ -1345,14 +1379,14 @@ func TestReplaceAlternativeFlowProcessors(t *testing.T) {
 func TestRemoveDescription(t *testing.T) {
 	cases := []struct {
 		name          string
-		esVersion     *common.Version
+		esVersion     *version.V
 		content       map[string]interface{}
 		expected      map[string]interface{}
 		isErrExpected bool
 	}{
 		{
 			name:      "ES < 7.9.0",
-			esVersion: common.MustNewVersion("7.8.0"),
+			esVersion: version.MustNew("7.8.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1369,7 +1403,8 @@ func TestRemoveDescription(t *testing.T) {
 							"description": "This is a description",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1390,7 +1425,7 @@ func TestRemoveDescription(t *testing.T) {
 		},
 		{
 			name:      "ES == 7.9.0",
-			esVersion: common.MustNewVersion("7.9.0"),
+			esVersion: version.MustNew("7.9.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1400,7 +1435,8 @@ func TestRemoveDescription(t *testing.T) {
 							"description": "This is a description",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1416,7 +1452,7 @@ func TestRemoveDescription(t *testing.T) {
 		},
 		{
 			name:      "ES > 7.9.0",
-			esVersion: common.MustNewVersion("8.0.0"),
+			esVersion: version.MustNew("8.0.0"),
 			content: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{
@@ -1426,7 +1462,8 @@ func TestRemoveDescription(t *testing.T) {
 							"description": "This is a description",
 						},
 					},
-				}},
+				},
+			},
 			expected: map[string]interface{}{
 				"processors": []interface{}{
 					map[string]interface{}{

@@ -19,6 +19,7 @@ package testing
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -27,23 +28,23 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/pkg/errors"
-
 	"github.com/mitchellh/hashstructure"
 	"gopkg.in/yaml.v2"
 
 	"github.com/elastic/beats/v7/libbeat/asset"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/testing/flags"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
 )
 
 const (
-	expectedExtension = "-expected.json"
-	applicationJson   = "application/json"
+	expectedExtension  = "-expected.json"
+	applicationJson    = "application/json"
+	expectedFolder     = "_meta/testdata"
+	expectedDataFolder = "_meta"
 )
 
 // DataConfig is the configuration for testdata tests
@@ -55,20 +56,26 @@ const (
 // url: "/server-status?auto="
 // suffix: plain
 // omit_documented_fields_check:
-//  - "apache.status.hostname"
+//   - "apache.status.hostname"
+//
 // remove_fields_from_comparison:
 // - "apache.status.hostname"
 // module:
-//   namespace: test
+//
+//	namespace: test
+//
 // ```
 // A test will be run for each file with the `plain` extension in the same directory
 // where a file with this configuration is placed.
 type DataConfig struct {
-	// Path is the directory containing this configuration
+	// Path is the directory containing the read files
 	Path string
 
 	// WritePath is the path where to write the generated files
 	WritePath string
+
+	// DataPath is the path to the data.json file
+	DataPath string
 
 	// The type of the test to run, usually `http`.
 	Type string
@@ -111,8 +118,9 @@ type DataConfig struct {
 
 func defaultDataConfig() DataConfig {
 	return DataConfig{
-		Path:        ".",
-		WritePath:   ".",
+		Path:        expectedFolder,
+		WritePath:   expectedFolder,
+		DataPath:    expectedDataFolder,
 		Suffix:      "json",
 		ContentType: applicationJson,
 	}
@@ -122,8 +130,7 @@ func defaultDataConfig() DataConfig {
 func ReadDataConfig(t *testing.T, f string) DataConfig {
 	t.Helper()
 	config := defaultDataConfig()
-	config.Path = filepath.Dir(f)
-	config.WritePath = filepath.Dir(config.Path)
+
 	configFile, err := ioutil.ReadFile(f)
 	if err != nil {
 		t.Fatalf("failed to read '%s': %v", f, err)
@@ -139,25 +146,42 @@ func ReadDataConfig(t *testing.T, f string) DataConfig {
 // from the usual path
 func TestDataConfig(t *testing.T) DataConfig {
 	t.Helper()
-	return ReadDataConfig(t, "_meta/testdata/config.yml")
+	f := filepath.Join(expectedFolder, "config.yml")
+	return ReadDataConfig(t, f)
 }
 
 // TestDataFiles run tests with config from the usual path (`_meta/testdata`)
 func TestDataFiles(t *testing.T, module, metricSet string) {
 	t.Helper()
 	config := TestDataConfig(t)
-	TestDataFilesWithConfig(t, module, metricSet, config)
+	TestDataFilesWithConfig(t, module, metricSet, config, "")
 }
 
 // TestDataFilesWithConfig run tests for a testdata config
-func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config DataConfig) {
+func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config DataConfig, testPrefix string) {
 	t.Helper()
-	ff, err := filepath.Glob(filepath.Join(config.Path, "*."+config.Suffix))
+
+	// the location of the read files
+	location := filepath.Join(config.Path, "*."+config.Suffix)
+
+	// if this function was called from data_test.go then the testPrefix is defined and not the default empty string
+	if testPrefix != "" {
+		// the prefix for read and write files should be ../../../module/moduleName/metricsetName
+		prefix := filepath.Join(testPrefix, module, metricSet)
+		location = filepath.Join(prefix, location)
+
+		// the prefix needs to be appended to the path of the expected files and the original files
+		config.WritePath = filepath.Join(prefix, config.WritePath)
+		config.Path = filepath.Join(prefix, config.Path)
+		config.DataPath = filepath.Join(prefix, expectedDataFolder)
+	}
+	ff, err := filepath.Glob(location)
+
 	if err != nil {
 		t.Fatal(err)
 	}
 	if len(ff) == 0 {
-		t.Fatalf("test path with config but without data files: %s", config.Path)
+		t.Fatalf("read test path without data files: %s", config.Path)
 	}
 
 	var files []string
@@ -178,7 +202,7 @@ func TestDataFilesWithConfig(t *testing.T, module, metricSet string, config Data
 
 // TestMetricsetFieldsDocumented checks metricset fields are documented from metricsets that cannot run `TestDataFiles` test which contains this check
 func TestMetricsetFieldsDocumented(t *testing.T, metricSet mb.MetricSet, events []mb.Event) {
-	var data []common.MapStr
+	var data []mapstr.M
 	for _, e := range events {
 		beatEvent := StandardizeEvent(metricSet, e, mb.AddMetricSetInfo)
 		data = append(data, beatEvent.Fields)
@@ -193,6 +217,26 @@ func TestMetricsetFieldsDocumented(t *testing.T, metricSet mb.MetricSet, events 
 }
 
 func runTest(t *testing.T, file string, module, metricSetName string, config DataConfig) {
+	filename := filepath.Base(file)
+	/*
+		If the expected suffix is '.json' we need to exclude the data.json file, since
+		by the end of this function we may create a data.json file if there is a docs file with the config suffix:
+			if strings.HasSuffix(file, "docs."+config.Suffix) {
+				writeDataJSON(t, data[0], filepath.Join(config.WritePath, "data.json"))
+			}
+		Since the expected file name is obtained through filename + expectedExtension, we could end up testing files like:
+			Metrics file: data.json
+			Expected metrics file: data.json-expected.json
+		If the config extension is '.json'.
+		This is not possible, since running go -test data does not produce an expected file for data.json files. This is why
+		we need to exclude this file from the tests.
+	*/
+	if filename == "data.json" {
+		return
+	}
+
+	t.Logf("Testing %s file\n", file)
+
 	// starts a server serving the given file under the given url
 	s := server(t, file, config.URL, config.ContentType)
 	defer s.Close()
@@ -220,7 +264,7 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 		events = append(events, mb.Event{Error: e})
 	}
 
-	var data []common.MapStr
+	var data []mapstr.M
 
 	for _, e := range events {
 		beatEvent := StandardizeEvent(metricSet, e, mb.AddMetricSetInfo)
@@ -242,24 +286,27 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 			err, module, metricSetName)
 	}
 
+	expectedFile := filepath.Join(config.WritePath, filename+expectedExtension)
+
 	// Overwrites the golden files if run with -generate
 	if *flags.DataFlag {
 		outputIndented, err := json.MarshalIndent(&data, "", "    ")
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err = ioutil.WriteFile(file+expectedExtension, outputIndented, 0644); err != nil {
+		if err = ioutil.WriteFile(expectedFile, outputIndented, 0644); err != nil {
 			t.Fatal(err)
 		}
 	}
 
 	// Read expected file
-	expected, err := ioutil.ReadFile(file + expectedExtension)
+	expected, err := ioutil.ReadFile(expectedFile)
 	if err != nil {
 		t.Fatalf("could not read file: %s", err)
 	}
+	t.Logf("Expected %s file\n", expectedFile)
 
-	expectedMap := []common.MapStr{}
+	expectedMap := []mapstr.M{}
 	if err := json.Unmarshal(expected, &expectedMap); err != nil {
 		t.Fatal(err)
 	}
@@ -307,11 +354,11 @@ func runTest(t *testing.T, file string, module, metricSetName string, config Dat
 	}
 
 	if strings.HasSuffix(file, "docs."+config.Suffix) {
-		writeDataJSON(t, data[0], filepath.Join(config.WritePath, "data.json"))
+		writeDataJSON(t, data[0], filepath.Join(config.DataPath, "data.json"))
 	}
 }
 
-func writeDataJSON(t *testing.T, data common.MapStr, path string) {
+func writeDataJSON(t *testing.T, data mapstr.M, path string) {
 	// Add hardcoded timestamp
 	data.Put("@timestamp", "2019-03-01T08:05:34.853Z")
 	output, err := json.MarshalIndent(&data, "", "    ")
@@ -321,7 +368,7 @@ func writeDataJSON(t *testing.T, data common.MapStr, path string) {
 }
 
 // checkDocumented checks that all fields which show up in the events are documented
-func checkDocumented(data []common.MapStr, omitFields []string) error {
+func checkDocumented(data []mapstr.M, omitFields []string) error {
 	fieldsData, err := asset.GetFields("metricbeat")
 	if err != nil {
 		return err
@@ -348,7 +395,7 @@ func checkDocumented(data []common.MapStr, omitFields []string) error {
 	return nil
 }
 
-func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interface{}, omitFields []string) error {
+func documentedFieldCheck(foundKeys mapstr.M, knownKeys map[string]interface{}, omitFields []string) error {
 	// Sort all found keys to guarantee consistent validation messages
 	sortedFoundKeys := make([]string, 0, len(foundKeys))
 	for k := range foundKeys {
@@ -369,7 +416,7 @@ func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interfac
 			splits := strings.Split(foundKey, ".")
 			found := false
 			for pos := 1; pos < len(splits)-1; pos++ {
-				key := strings.Join(splits[0:pos], ".") + ".*." + strings.Join(splits[pos+1:len(splits)], ".")
+				key := strings.Join(splits[0:pos], ".") + ".*." + strings.Join(splits[pos+1:], ".")
 				if _, ok := knownKeys[key]; ok {
 					found = true
 					break
@@ -398,7 +445,7 @@ func documentedFieldCheck(foundKeys common.MapStr, knownKeys map[string]interfac
 				}
 			}
 
-			return errors.Errorf("field missing '%s'", foundKey)
+			return fmt.Errorf("field missing '%s'", foundKey)
 		}
 	}
 

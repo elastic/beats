@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: envoyproxy
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/envoyproxy/_meta/docs.asciidoc
+
 
 [[metricbeat-module-envoyproxy]]
 == Envoyproxy module
@@ -16,6 +18,8 @@ The default metricset is `server`.
 
 The envoyproxy module is tested with Envoy 1.7.0 and 1.12.0.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -44,3 +48,4 @@ The following metricsets are available:
 
 include::envoyproxy/server.asciidoc[]
 
+:edit_url!:

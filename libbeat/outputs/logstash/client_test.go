@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package logstash
 
@@ -28,10 +27,10 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
 	"github.com/elastic/beats/v7/libbeat/common/transport/transptest"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport"
 	v2 "github.com/elastic/go-lumber/server/v2"
 )
 
@@ -106,7 +105,7 @@ func testSimpleEvent(t *testing.T, factory clientFactory) {
 	defer client.Stop()
 
 	event := beat.Event{
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"name": "me",
 			"line": 10,
 		},
@@ -141,7 +140,7 @@ func testSimpleEventWithTTL(t *testing.T, factory clientFactory) {
 
 	event := beat.Event{
 		Timestamp: time.Now(),
-		Fields:    common.MapStr{"type": "test", "name": "me", "line": 10},
+		Fields:    mapstr.M{"type": "test", "name": "me", "line": 10},
 	}
 	go client.Publish(outest.NewBatch(event))
 
@@ -161,7 +160,7 @@ func testSimpleEventWithTTL(t *testing.T, factory clientFactory) {
 
 	event = beat.Event{
 		Timestamp: time.Now(),
-		Fields:    common.MapStr{"type": "test", "name": "me", "line": 11},
+		Fields:    mapstr.M{"type": "test", "name": "me", "line": 11},
 	}
 	go client.Publish(outest.NewBatch(event))
 
@@ -191,21 +190,21 @@ func testStructuredEvent(t *testing.T, factory clientFactory) {
 	defer transp.Close()
 	defer client.Stop()
 
-	event := beat.Event{Fields: common.MapStr{
+	event := beat.Event{Fields: mapstr.M{
 		"type": "test",
 		"name": "test",
-		"struct": common.MapStr{
+		"struct": mapstr.M{
 			"field1": 1,
 			"field2": true,
 			"field3": []int{1, 2, 3},
 			"field4": []interface{}{
 				1,
 				"test",
-				common.MapStr{
+				mapstr.M{
 					"sub": "field",
 				},
 			},
-			"field5": common.MapStr{
+			"field5": mapstr.M{
 				"sub1": 2,
 			},
 		},

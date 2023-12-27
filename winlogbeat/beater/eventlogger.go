@@ -18,17 +18,19 @@
 package beater
 
 import (
+	"errors"
 	"io"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/add_formatted_index"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/winlogbeat/checkpoint"
 	"github.com/elastic/beats/v7/winlogbeat/eventlog"
@@ -36,14 +38,14 @@ import (
 
 type eventLogger struct {
 	source     eventlog.EventLog
-	eventMeta  common.EventMetadata
+	eventMeta  mapstr.EventMetadata
 	processors beat.ProcessorList
 	keepNull   bool
 	log        *logp.Logger
 }
 
 type eventLoggerConfig struct {
-	common.EventMetadata `config:",inline"` // Fields and tags to add to events.
+	mapstr.EventMetadata `config:",inline"` // Fields and tags to add to events.
 
 	Processors processors.PluginConfig  `config:"processors"`
 	Index      fmtstr.EventFormatString `config:"index"`
@@ -55,7 +57,7 @@ type eventLoggerConfig struct {
 func newEventLogger(
 	beatInfo beat.Info,
 	source eventlog.EventLog,
-	options *common.Config,
+	options *conf.C,
 	log *logp.Logger,
 ) (*eventLogger, error) {
 	config := eventLoggerConfig{}
@@ -85,7 +87,7 @@ func (e *eventLogger) connect(pipeline beat.Pipeline) (beat.Client, error) {
 			Processor:     e.processors,
 			KeepNull:      e.keepNull,
 		},
-		ACKHandler: acker.Counting(func(n int) {
+		EventListener: acker.Counting(func(n int) {
 			addPublished(e.source.Name(), n)
 			e.log.Debugw("Successfully published events.", "event.count", n)
 		}),
@@ -129,17 +131,39 @@ func (e *eventLogger) run(
 		}
 	}()
 
+	// Flag used to detect repeat "channel not found" errors, eliminating log spam.
+	channelNotFoundErrDetected := false
+
 runLoop:
 	for stop := false; !stop; {
+		select {
+		case <-done:
+			return
+		default:
+		}
+
 		err = api.Open(state)
-		if eventlog.IsRecoverable(err) {
-			e.log.Warnw("Open() encountered recoverable error. Trying again...", "error", err)
+
+		switch {
+		case eventlog.IsRecoverable(err):
+			e.log.Warnw("Open() encountered recoverable error. Trying again...", "error", err, "channel", api.Channel())
 			time.Sleep(time.Second * 5)
 			continue
-		} else if err != nil {
-			e.log.Warnw("Open() error. No events will be read from this source.", "error", err)
+		case !api.IsFile() && eventlog.IsChannelNotFound(err):
+			if !channelNotFoundErrDetected {
+				e.log.Warnw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
+			} else {
+				e.log.Debugw("Open() encountered channel not found error. Trying again...", "error", err, "channel", api.Channel())
+			}
+			channelNotFoundErrDetected = true
+			time.Sleep(time.Second * 5)
+			continue
+		case err != nil:
+			e.log.Warnw("Open() error. No events will be read from this source.", "error", err, "channel", api.Channel())
 			return
 		}
+		channelNotFoundErrDetected = false
+
 		e.log.Debug("Opened successfully.")
 
 		for !stop {
@@ -152,20 +176,28 @@ runLoop:
 			// Read from the event.
 			records, err := api.Read()
 			if eventlog.IsRecoverable(err) {
-				e.log.Warnw("Read() encountered recoverable error. Reopening handle...", "error", err)
-				if closeErr := api.Close(); closeErr != nil {
-					e.log.Warnw("Close() error.", "error", err)
+				e.log.Warnw("Read() encountered recoverable error. Reopening handle...", "error", err, "channel", api.Channel())
+				if resetErr := api.Reset(); resetErr != nil {
+					e.log.Warnw("Reset() error.", "error", err)
 				}
 				continue runLoop
 			}
-			switch err {
-			case nil:
-			case io.EOF:
-				// Graceful stop.
-				stop = true
-			default:
-				e.log.Warnw("Read() error.", "error", err)
-				return
+			if !api.IsFile() && eventlog.IsChannelNotFound(err) {
+				e.log.Warnw("Read() encountered channel not found error for channel %q. Reopening handle...", "error", err, "channel", api.Channel())
+				if resetErr := api.Reset(); resetErr != nil {
+					e.log.Warnw("Reset() error.", "error", err)
+				}
+				continue runLoop
+			}
+
+			if err != nil {
+				if errors.Is(err, io.EOF) {
+					// Graceful stop.
+					stop = true
+				} else {
+					e.log.Warnw("Read() error.", "error", err, "channel", api.Channel())
+					return
+				}
 			}
 
 			e.log.Debugf("Read() returned %d records.", len(records))
@@ -195,8 +227,7 @@ func processorsForConfig(
 	// added before the user processors.
 	if !config.Index.IsEmpty() {
 		staticFields := fmtstr.FieldsForBeat(beatInfo.Beat, beatInfo.Version)
-		timestampFormat, err :=
-			fmtstr.NewTimestampFormatString(&config.Index, staticFields)
+		timestampFormat, err := fmtstr.NewTimestampFormatString(&config.Index, staticFields)
 		if err != nil {
 			return nil, err
 		}

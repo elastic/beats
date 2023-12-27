@@ -18,57 +18,64 @@
 package readfile
 
 import (
+	"errors"
 	"io"
+	"os"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func TestMetaFieldsOffset(t *testing.T) {
+func TestMetaFields(t *testing.T) {
 	messages := []reader.Message{
-		reader.Message{
+		{
 			Content: []byte("my line"),
 			Bytes:   7,
-			Fields:  common.MapStr{},
+			Fields:  mapstr.M{},
 		},
-		reader.Message{
+		{
 			Content: []byte("my line again"),
 			Bytes:   13,
-			Fields:  common.MapStr{},
+			Fields:  mapstr.M{},
 		},
-		reader.Message{
+		{
 			Content: []byte(""),
 			Bytes:   10,
-			Fields:  common.MapStr{},
+			Fields:  mapstr.M{},
 		},
 	}
 
 	path := "test/path"
 	offset := int64(0)
-	in := &FileMetaReader{msgReader(messages), path, offset}
+
+	in := &FileMetaReader{msgReader(messages), path, createTestFileInfo(), "hash", offset}
 	for {
 		msg, err := in.Next()
-		if err == io.EOF {
+		if errors.Is(err, io.EOF) {
 			break
 		}
 
-		expectedFields := common.MapStr{}
+		expectedFields := mapstr.M{}
 		if len(msg.Content) != 0 {
-			expectedFields = common.MapStr{
-				"log": common.MapStr{
-					"file": common.MapStr{
-						"path": path,
+			expectedFields = mapstr.M{
+				"log": mapstr.M{
+					"file": mapstr.M{
+						"path":        path,
+						"fingerprint": "hash",
 					},
 					"offset": offset,
 				},
 			}
+			checkFields(t, expectedFields, msg.Fields)
+		} else {
+			require.Equal(t, expectedFields, msg.Fields)
 		}
 		offset += int64(msg.Bytes)
 
-		require.Equal(t, expectedFields, msg.Fields)
 		require.Equal(t, offset, in.offset)
 	}
 }
@@ -96,3 +103,17 @@ func (r *messageReader) Next() (reader.Message, error) {
 func (r *messageReader) Close() error {
 	return nil
 }
+
+type testFileInfo struct {
+	name string
+	size int64
+	time time.Time
+	sys  interface{}
+}
+
+func (t testFileInfo) Name() string       { return t.name }
+func (t testFileInfo) Size() int64        { return t.size }
+func (t testFileInfo) Mode() os.FileMode  { return 0 }
+func (t testFileInfo) ModTime() time.Time { return t.time }
+func (t testFileInfo) IsDir() bool        { return false }
+func (t testFileInfo) Sys() interface{}   { return t.sys }

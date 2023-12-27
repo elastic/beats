@@ -1381,7 +1381,7 @@
         "host.hostname": "precise32",
         "input.type": "log",
         "log.offset": 11099,
-        "message": " vagrant : (command continued) '/etc/metricbeat/metricbeat.yml)",
+        "message": "vagrant : (command continued) '/etc/metricbeat/metricbeat.yml)",
         "process.name": "sudo",
         "related.hosts": [
             "precise32"

@@ -1,0 +1,23 @@
+version: '2.3'
+services:
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      localstack: { condition: service_healthy }
+      
+  localstack:
+    container_name: "${localstack_integration_test_container}"
+    image: localstack/localstack:2.1.0 # Latest stable release
+    ports:
+      - "127.0.0.1:4566:4566"            # LocalStack Gateway
+    environment:
+      - DEBUG=1
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - LOCALSTACK_HOST=localhost
+      - S3_HOSTNAME=localhost
+      - PROVIDER_OVERRIDE_S3=asf
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./volume}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"

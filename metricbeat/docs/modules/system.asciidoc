@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: system
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/system/_meta/docs.asciidoc
+
 
 [[metricbeat-module-system]]
 == System module
@@ -153,6 +155,8 @@ Uptime metrics data (duration) should be available without elevated permissions.
 RAID metrics data (block, disks) requires access to the `/sys/block` mount point and all referenced devices.
 Otherwise an error will be reported.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -325,3 +329,4 @@ include::system/uptime.asciidoc[]
 
 include::system/users.asciidoc[]
 
+:edit_url!:

@@ -22,12 +22,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 type addLocale struct {
@@ -58,7 +56,7 @@ func init() {
 }
 
 // New constructs a new add_locale processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(c *config.C) (beat.Processor, error) {
 	config := struct {
 		Format string `config:"format"`
 	}{
@@ -67,7 +65,7 @@ func New(c *common.Config) (processors.Processor, error) {
 
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, errors.Wrap(err, "fail to unpack the add_locale configuration")
+		return nil, fmt.Errorf("fail to unpack the add_locale configuration: %w", err)
 	}
 
 	var loc addLocale
@@ -78,7 +76,7 @@ func New(c *common.Config) (processors.Processor, error) {
 	case "offset":
 		loc.TimezoneFormat = Offset
 	default:
-		return nil, errors.Errorf("'%s' is not a valid format option for the "+
+		return nil, fmt.Errorf("'%s' is not a valid format option for the "+
 			"add_locale processor. Valid options are 'abbreviation' and 'offset'.",
 			config.Format)
 
@@ -89,7 +87,7 @@ func New(c *common.Config) (processors.Processor, error) {
 func (l addLocale) Run(event *beat.Event) (*beat.Event, error) {
 	zone, offset := time.Now().Zone()
 	format := l.Format(zone, offset)
-	event.PutValue("event.timezone", format)
+	_, _ = event.PutValue("event.timezone", format)
 	return event, nil
 }
 

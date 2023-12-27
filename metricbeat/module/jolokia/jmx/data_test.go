@@ -24,7 +24,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestEventMapper(t *testing.T) {
@@ -62,14 +62,14 @@ func TestEventMapper(t *testing.T) {
 
 	require.NoError(t, err)
 
-	expected := []common.MapStr{
+	expected := []mapstr.M{
 		{
 			"uptime": float64(47283),
-			"gc": common.MapStr{
+			"gc": mapstr.M{
 				"cms_collection_time":  float64(53),
 				"cms_collection_count": float64(1),
 			},
-			"memory": common.MapStr{
+			"memory": mapstr.M{
 				"heap_usage": map[string]interface{}{
 					"init":      float64(1073741824),
 					"committed": float64(1037959168),
@@ -133,7 +133,7 @@ func TestEventGroupingMapper(t *testing.T) {
 
 	require.NoError(t, err)
 
-	expected := []common.MapStr{
+	expected := []mapstr.M{
 		{
 			"uptime": float64(47283),
 			"metrics": map[string]interface{}{
@@ -145,13 +145,13 @@ func TestEventGroupingMapper(t *testing.T) {
 			"server_info": "Apache Tomcat/9.0.7",
 		},
 		{
-			"gc": common.MapStr{
+			"gc": mapstr.M{
 				"cms_collection_time":  float64(53),
 				"cms_collection_count": float64(1),
 			},
 		},
 		{
-			"memory": common.MapStr{
+			"memory": mapstr.M{
 				"heap_usage": map[string]interface{}{
 					"init":      float64(1073741824),
 					"committed": float64(1037959168),
@@ -200,9 +200,9 @@ func TestEventGroupingMapperGetRequest(t *testing.T) {
 
 	require.NoError(t, err)
 
-	expected := []common.MapStr{
+	expected := []mapstr.M{
 		{
-			"memory": common.MapStr{
+			"memory": mapstr.M{
 				"heap_usage": map[string]interface{}{
 					"init":      float64(1073741824),
 					"committed": float64(1037959168),
@@ -247,9 +247,9 @@ func TestEventGroupingMapperGetRequestUptime(t *testing.T) {
 
 	require.NoError(t, err)
 
-	expected := []common.MapStr{
+	expected := []mapstr.M{
 		{
-			"runtime": common.MapStr{
+			"runtime": mapstr.M{
 				"uptime": float64(88622),
 			},
 		},
@@ -283,7 +283,7 @@ func TestEventMapperWithWildcard(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 2, len(events))
 
-	expected := []common.MapStr{
+	expected := []mapstr.M{
 		{
 			"mbean":           "Catalina:name=\"http-bio-8080\",type=ThreadPool",
 			"max_connections": float64(200),
@@ -324,7 +324,7 @@ func TestEventGroupingMapperWithWildcard(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 4, len(events))
 
-	expected := []common.MapStr{
+	expected := []mapstr.M{
 		{
 			"mbean": "Catalina:name=\"http-bio-8080\",type=ThreadPool",
 			"port":  float64(8080),

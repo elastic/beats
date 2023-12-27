@@ -22,13 +22,11 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 func init() {
@@ -40,7 +38,7 @@ func init() {
 
 // NewModule creates a new module
 func NewModule(base mb.BaseModule) (mb.Module, error) {
-	return elastic.NewModule(&base, []string{"node", "node_stats"}, logp.NewLogger(ModuleName))
+	return elastic.NewModule(&base, []string{"node", "node_stats"}, []string{}, logp.NewLogger(ModuleName))
 }
 
 // ModuleName is the name of this module.
@@ -48,7 +46,7 @@ const ModuleName = "logstash"
 
 // PipelineGraphAPIsAvailableVersion is the version of Logstash since when its APIs
 // can return pipeline graphs
-var PipelineGraphAPIsAvailableVersion = common.MustNewVersion("7.3.0")
+var PipelineGraphAPIsAvailableVersion = version.MustNew("7.3.0")
 
 // MetricSet can be used to build other metricsets within the Logstash module.
 type MetricSet struct {
@@ -109,7 +107,7 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 func GetPipelines(m *MetricSet) ([]PipelineState, string, error) {
 	content, err := fetchPath(m.HTTP, "_node/pipelines", "graph=true")
 	if err != nil {
-		return nil, "", errors.Wrap(err, "could not fetch node pipelines")
+		return nil, "", fmt.Errorf("could not fetch node pipelines: %w", err)
 	}
 
 	pipelinesResponse := struct {
@@ -121,7 +119,7 @@ func GetPipelines(m *MetricSet) ([]PipelineState, string, error) {
 
 	err = json.Unmarshal(content, &pipelinesResponse)
 	if err != nil {
-		return nil, "", errors.Wrap(err, "could not parse node pipelines response")
+		return nil, "", fmt.Errorf("could not parse node pipelines response: %w", err)
 	}
 
 	var pipelines []PipelineState
@@ -172,7 +170,7 @@ func GetVertexClusterUUID(vertex map[string]interface{}, overrideClusterUUID str
 	return clusterUUID
 }
 
-func (m *MetricSet) getVersion() (*common.Version, error) {
+func (m *MetricSet) getVersion() (*version.V, error) {
 	const rootPath = "/"
 	content, err := fetchPath(m.HTTP, rootPath, "")
 	if err != nil {
@@ -180,7 +178,7 @@ func (m *MetricSet) getVersion() (*common.Version, error) {
 	}
 
 	var response struct {
-		Version *common.Version `json:"version"`
+		Version *version.V `json:"version"`
 	}
 
 	err = json.Unmarshal(content, &response)

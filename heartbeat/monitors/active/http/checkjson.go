@@ -27,10 +27,10 @@ import (
 	"github.com/PaesslerAG/gval"
 	"github.com/PaesslerAG/jsonpath"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
 	"github.com/elastic/beats/v7/libbeat/conditions"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type jsonChecker func(interface{}) bool
@@ -76,7 +76,7 @@ func checkJson(checks []*jsonResponseCheck) (bodyValidator, error) {
 			checkFn := func(d interface{}) bool {
 				ms, ok := d.(map[string]interface{})
 				if ok {
-					return cond.Check(common.MapStr(ms))
+					return cond.Check(mapstr.M(ms))
 				} else {
 					return false
 				}

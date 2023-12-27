@@ -6,18 +6,13 @@ input:
     metrics:
       - service: dataproc
         metric_types:
-          - "batch/spark/executors"
           - "cluster/hdfs/datanodes"
           - "cluster/hdfs/storage_capacity"
           - "cluster/hdfs/storage_utilization"
           - "cluster/hdfs/unhealthy_blocks"
-          - "cluster/job/completion_time"
-          - "cluster/job/duration"
           - "cluster/job/failed_count"
           - "cluster/job/running_count"
           - "cluster/job/submitted_count"
-          - "cluster/operation/completion_time"
-          - "cluster/operation/duration"
           - "cluster/operation/failed_count"
           - "cluster/operation/running_count"
           - "cluster/operation/submitted_count"
@@ -28,3 +23,7 @@ input:
           - "cluster/yarn/nodemanagers"
           - "cluster/yarn/pending_memory_size"
           - "cluster/yarn/virtual_cores"
+          - "cluster/job/completion_time"
+          - "cluster/job/duration"
+          - "cluster/operation/completion_time"
+          - "cluster/operation/duration"

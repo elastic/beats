@@ -3,11 +3,11 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
@@ -15,6 +15,7 @@ import (
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
 	heartbeat "github.com/elastic/beats/v7/heartbeat/scripts/mage"
 
 	// mage:import
@@ -25,13 +26,14 @@ import (
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
 	// mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
+	test.RegisterDeps(IntegTest)
 
 	devtools.BeatLicense = "Elastic License"
 }
@@ -58,6 +60,15 @@ func Package() {
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
 
+// Ironbank packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	start := time.Now()
+	defer func() { fmt.Println("ironbank ran for", time.Since(start)) }()
+	return devtools.Ironbank()
+}
+
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
 func TestPackages() error {
 	return devtools.TestPackages(devtools.WithMonitorsD())
@@ -66,6 +77,18 @@ func TestPackages() error {
 // Update updates the generated files (aka make update).
 func Update() {
 	mg.SerialDeps(Fields, FieldDocs, Config)
+}
+
+func IntegTest() {
+	mg.SerialDeps(GoIntegTest)
+}
+
+func PythonIntegTest() {
+	// intentionally blank, CI runs this for every beat
+}
+
+func GoIntegTest(ctx context.Context) error {
+	return devtools.GoIntegTestFromHost(ctx, devtools.DefaultGoTestIntegrationFromHostArgs())
 }
 
 func Fields() error {

@@ -22,6 +22,10 @@ Users can either use `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY` and/or
 `AWS_SESSION_TOKEN`, or use shared AWS credentials file.
 Please see <<aws-credentials-config,AWS credentials options>> for more details.
 
+If you use AWS CloudWatch cross-account observability, credentials of the monitoring account
+should be used here and Metricbeat will collect all metrics from both the monitoring
+account and the linked source accounts.
+
 * *regions*
 
 This module also accepts optional configuration `regions` to specify which
@@ -37,6 +41,17 @@ or none get collected by Metricbeat. In this case, please specify a `latency`
 parameter so collection start time and end time will be shifted by the given
 latency amount.
 
+* *data_granularity*
+
+AWS CloudWatch allows to define the granularity of the returned data points, by setting "Period" while querying metrics.
+Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_MetricDataQuery.html[MetricDataQuery parameters] for more information.
+
+By default, metricbeat will query CloudWatch setting "Period" to Metricbeat collection period. If you wish to set a custom value for "Period", please specify a `data_granularity` parameter.
+By setting `period` and `data_granularity` together, you can control, respectively, how frequently you want your metrics to be collected and how granular they have to be.
+
+If you are concerned about reducing the cost derived by CloudWatch API calls made by Metricbeat with an extra delay in retrieving metrics as trade off, you may consider setting `data_granularity` and increase Metricbeat collection period. For example,
+setting `data_granularity` to your current value for `period`, and doubling the value of `period`, may lead to a 50% savings in terms of GetMetricData API calls cost.
+
 * *endpoint*
 
 Most AWS services offer a regional endpoint that can be used to make requests.
@@ -46,7 +61,32 @@ services do not include a region. In `aws` module, `endpoint` config is to set
 the `endpoint-code` part, such as `amazonaws.com`, `amazonaws.com.cn`, `c2s.ic.gov`,
 `sc2s.sgov.gov`.
 
-If endpoint is specified, `regions` config becomes required. For example:
+If endpoint is specified, `regions` config becomes required.
+
+* *include_linked_accounts*
+
+The `include_linked_accounts` parameter is used to enable the inclusion of metrics from different accounts linked to a
+main monitoring account. By setting this parameter to true, users can gather metrics from multiple AWS accounts that are
+linked through the https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.html[CloudWatch cross-account observability].
+By default, the `include_linked_accounts` parameter is set to true, meaning that only metrics from the main monitoring
+account and all linked accounts are all collected. When set to false, the parameter allows the CloudWatch service to
+only retrieve metrics from the monitoring account.
+
+*_Note_:* Users should ensure that the necessary IAM roles and policies are properly set up in order to link the monitoring
+account and source accounts together.
+Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account-Setup.html#CloudWatch-Unified-Cross-Account-Setup-permissions[Link monitoring accounts with source accounts] for more details.
+
+* *tags_filter*
+
+The tags to filter against. If tags are given in config, then only
+collect metrics from resources that have tag key and tag value matches the filter.
+For example, if tags parameter is given as `Organization=Engineering` under
+`AWS/ELB` namespace, then only collect metrics from ELBs with tag name equals to
+`Organization` and tag value equals to `Engineering`. In order to filter for different
+values for the same key, add the values to the value array (see example)
+
+Note: tag filtering only works for metricsets with `resource_type` specified in the
+metricset-specific configuration.
 
 [source,yaml]
 ----
@@ -56,6 +96,9 @@ If endpoint is specified, `regions` config becomes required. For example:
   regions: cn-north-1
   metricsets:
     - ec2
+  tags_filter:
+    - key: "Organization"
+      value: ["Engineering", "Product"]
 ----
 
 * *fips_enabled*
@@ -83,14 +126,9 @@ image::./images/metricbeat-aws-overview.png[]
 [float]
 == Metricsets
 
-Currently, we have `billing`, `cloudwatch`, `dynamodb`, `ebs`, `ec2`, `elb`,
-`lambda`, `natgateway`, `rds`, `s3_daily_storage`, `s3_request`, `sns`, `sqs`,
+Currently, we have `billing`, `cloudwatch`, `dynamodb`, `ebs`, `ec2`, `elb`, `kinesis`
+`lambda`, `mtest`, `natgateway`, `rds`, `s3_daily_storage`, `s3_request`, `sns`, `sqs`,
 `transitgateway`, `usage` and `vpn` metricset in `aws` module.
-
-Collecting `tags` for `ec2`, `rds`, `cloudwatch`, and metricset created based on
-`cloudwatch` using light module is supported.
-
-* *tags.*: Tag key value pairs from aws resources. A tag is a label that user assigns to an AWS resource.
 
 [float]
 === `billing`
@@ -264,7 +302,7 @@ GetMetricData max page size: 100, based on https://docs.aws.amazon.com/AmazonClo
 | IAM ListAccountAliases | 1 | Once on startup
 | STS GetCallerIdentity | 1 | Once on startup
 | EC2 DescribeRegions| 1 | Once on startup
-| CloudWatch ListMetrics | Total number of results / ListMetrics max page size | Per region per namespace per collection period
+| CloudWatch ListMetrics | Total number of results / ListMetrics max page size | Per region per collection period
 | CloudWatch GetMetricData | Total number of results / GetMetricData max page size | Per region per namespace per collection period
 |===
 `billing`, `ebs`, `elb`, `sns`, `usage` and `lambda` are the same as `cloudwatch` metricset.

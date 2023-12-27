@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -25,7 +26,6 @@ import (
 
 	"github.com/joeshaw/multierror"
 	"github.com/magefile/mage/mg"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -99,7 +99,7 @@ func (steps IntegrationTestSteps) Setup(env map[string]string) error {
 				// errors ignored
 				_ = steps.teardownFrom(prev, env)
 			}
-			return errors.Wrapf(err, "%s setup failed", step.Name())
+			return fmt.Errorf("%s setup failed: %w", step.Name(), err)
 		}
 	}
 	return nil
@@ -121,7 +121,7 @@ func (steps IntegrationTestSteps) teardownFrom(start int, env map[string]string)
 			fmt.Printf("Teardown %s...\n", steps[i].Name())
 		}
 		if err := steps[i].Teardown(env); err != nil {
-			errs = append(errs, errors.Wrapf(err, "%s teardown failed", steps[i].Name()))
+			errs = append(errs, fmt.Errorf("%s teardown failed: %w", steps[i].Name(), err))
 		}
 	}
 	return errs.Err()
@@ -165,32 +165,28 @@ func NewIntegrationRunners(path string, passInEnv map[string]string) (Integratio
 
 	// Load the overall steps to use (skipped inside of test environment, as they are never ran on the inside).
 	// These steps are duplicated per scenario.
-	var steps IntegrationTestSteps
 	if !IsInIntegTestEnv() {
 		for _, step := range globalIntegrationTestSetupSteps {
-			use, err := step.Use(dir)
+			_, err := step.Use(dir)
 			if err != nil {
-				return nil, errors.Wrapf(err, "%s step failed on Use", step.Name())
-			}
-			if use {
-				steps = append(steps, step)
+				return nil, fmt.Errorf("%s step failed on Use: %w", step.Name(), err)
 			}
 		}
 	}
 
 	// Create the runners (can only be multiple).
-	var runners IntegrationRunners
+	runners := make(IntegrationRunners, 0, len(globalIntegrationTesters))
 	for _, t := range globalIntegrationTesters {
 		use, err := t.Use(dir)
 		if err != nil {
-			return nil, errors.Wrapf(err, "%s tester failed on Use", t.Name())
+			return nil, fmt.Errorf("%s tester failed on Use: %w", t.Name(), err)
 		}
 		if !use {
 			continue
 		}
 		runner, err := initRunner(t, dir, passInEnv)
 		if err != nil {
-			return nil, errors.Wrapf(err, "initializing %s runner", t.Name())
+			return nil, fmt.Errorf("initializing %s runner: %w", t.Name(), err)
 		}
 		runners = append(runners, runner)
 	}
@@ -202,11 +198,11 @@ func NewIntegrationRunners(path string, passInEnv map[string]string) (Integratio
 		}
 		tester, ok := globalIntegrationTesters["docker"]
 		if !ok {
-			return nil, fmt.Errorf("docker integration test runner not registered")
+			return nil, errors.New("docker integration test runner not registered")
 		}
 		runner, err := initRunner(tester, dir, passInEnv)
 		if err != nil {
-			return nil, errors.Wrapf(err, "initializing docker runner")
+			return nil, fmt.Errorf("initializing docker runner: %w", err)
 		}
 		runners = append(runners, runner)
 	}
@@ -269,7 +265,7 @@ func (r *IntegrationRunner) Test(mageTarget string, test func() error) (err erro
 		var enabled bool
 		enabled, err = strconv.ParseBool(testEnvVar)
 		if err != nil {
-			err = errors.Wrap(err, "failed to parse TEST_ENVIRONMENT value")
+			err = fmt.Errorf("failed to parse TEST_ENVIRONMENT value: %w", err)
 			return
 		}
 		if !enabled {
@@ -320,7 +316,7 @@ func (r *IntegrationRunner) Test(mageTarget string, test func() error) (err erro
 			err = teardownErr
 		}
 	}
-	return
+	return err
 }
 
 // Test runs the test on each runner and collects the errors.

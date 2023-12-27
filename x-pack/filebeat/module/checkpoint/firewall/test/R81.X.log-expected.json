@@ -1,0 +1,43 @@
+[
+    {
+        "@timestamp": "2022-07-16T18:51:20.000Z",
+        "checkpoint.context_num": "1",
+        "checkpoint.elapsed": "0",
+        "checkpoint.logid": "6",
+        "client.bytes": 6345,
+        "client.packets": 22,
+        "destination.bytes": 7475,
+        "destination.packets": 30,
+        "event.action": "Accept",
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "checkpoint.firewall",
+        "event.id": "{0x8f6ff124,0xbeef4db4,0xbad40b,0xa9525929}",
+        "event.kind": "event",
+        "event.module": "checkpoint",
+        "event.sequence": 8,
+        "event.start": "1657997472",
+        "event.timezone": "UTC",
+        "fileset.name": "firewall",
+        "input.type": "log",
+        "log.offset": 0,
+        "network.bytes": 11930,
+        "network.direction": "inbound",
+        "network.packets": 37,
+        "observer.ingress.interface.name": "eth0.11",
+        "observer.name": "81.2.69.144",
+        "observer.product": "Log Update",
+        "observer.type": "firewall",
+        "observer.vendor": "Checkpoint",
+        "server.bytes": 7475,
+        "server.packets": 30,
+        "service.type": "checkpoint",
+        "source.bytes": 6345,
+        "source.packets": 22,
+        "tags": [
+            "checkpoint-firewall",
+            "forwarded"
+        ]
+    }
+]

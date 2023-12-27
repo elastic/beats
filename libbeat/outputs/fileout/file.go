@@ -23,12 +23,12 @@ import (
 	"path/filepath"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/file"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	c "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/file"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -49,29 +49,29 @@ func makeFileout(
 	_ outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
-	cfg *common.Config,
+	cfg *c.C,
 ) (outputs.Group, error) {
-	config := defaultConfig()
-	if err := cfg.Unpack(&config); err != nil {
+	foConfig := defaultConfig()
+	if err := cfg.Unpack(&foConfig); err != nil {
 		return outputs.Fail(err)
 	}
 
 	// disable bulk support in publisher pipeline
-	cfg.SetInt("bulk_max_size", -1, -1)
+	_ = cfg.SetInt("bulk_max_size", -1, -1)
 
 	fo := &fileOutput{
 		log:      logp.NewLogger("file"),
 		beat:     beat,
 		observer: observer,
 	}
-	if err := fo.init(beat, config); err != nil {
+	if err := fo.init(beat, foConfig); err != nil {
 		return outputs.Fail(err)
 	}
 
-	return outputs.Success(-1, 0, fo)
+	return outputs.Success(foConfig.Queue, -1, 0, fo)
 }
 
-func (out *fileOutput) init(beat beat.Info, c config) error {
+func (out *fileOutput) init(beat beat.Info, c fileOutConfig) error {
 	var path string
 	if c.Filename != "" {
 		path = filepath.Join(c.Path, c.Filename)

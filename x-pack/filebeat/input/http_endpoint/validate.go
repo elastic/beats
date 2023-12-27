@@ -13,16 +13,17 @@ import (
 	"errors"
 	"fmt"
 	"hash"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 )
 
-type validator interface {
-	// ValidateHeader checks the HTTP headers for compliance. The body must not
-	// be touched.
-	ValidateHeader(*http.Request) (int, error)
-}
+var (
+	errIncorrectUserOrPass    = errors.New("incorrect username or password")
+	errIncorrectHeaderSecret  = errors.New("incorrect header or header secret")
+	errMissingHMACHeader      = errors.New("missing HMAC header")
+	errIncorrectHMACSignature = errors.New("invalid HMAC signature")
+)
 
 type apiValidator struct {
 	basicAuth          bool
@@ -37,14 +38,7 @@ type apiValidator struct {
 	hmacPrefix         string
 }
 
-var (
-	errIncorrectUserOrPass    = errors.New("incorrect username or password")
-	errIncorrectHeaderSecret  = errors.New("incorrect header or header secret")
-	errMissingHMACHeader      = errors.New("missing HMAC header")
-	errIncorrectHMACSignature = errors.New("invalid HMAC signature")
-)
-
-func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
+func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) {
 	if v.basicAuth {
 		username, password, _ := r.BasicAuth()
 		if v.username != username || v.password != password {
@@ -82,12 +76,12 @@ func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 
 		// We need access to the request body to validate the signature, but we
 		// must leave the body intact for future processing.
-		buf, err := ioutil.ReadAll(r.Body)
+		buf, err := io.ReadAll(r.Body)
 		if err != nil {
 			return http.StatusInternalServerError, fmt.Errorf("failed to read request body: %w", err)
 		}
 		// Set r.Body back to untouched original value.
-		r.Body = ioutil.NopCloser(bytes.NewBuffer(buf))
+		r.Body = io.NopCloser(bytes.NewBuffer(buf))
 
 		// Compute HMAC of raw body.
 		var mac hash.Hash
@@ -108,5 +102,5 @@ func (v *apiValidator) ValidateHeader(r *http.Request) (int, error) {
 		}
 	}
 
-	return 0, nil
+	return http.StatusAccepted, nil
 }

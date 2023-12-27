@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: apache
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/apache/_meta/docs.asciidoc
+
 
 [[metricbeat-module-apache]]
 == Apache module
@@ -17,7 +19,7 @@ HTTPD] servers. The default metricset is `status`.
 [float]
 === Compatibility
 
-The Apache metricsets were tested with Apache 2.4.12 and 2.4.20 and are expected to work with
+The Apache metricsets were tested with Apache 2.4.12 and 2.4.54 and are expected to work with
 all versions >= 2.2.31 and >= 2.4.16.
 
 
@@ -28,6 +30,8 @@ The Apache module comes with a predefined dashboard. For example:
 
 image::./images/apache_httpd_server_status.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -68,3 +72,4 @@ The following metricsets are available:
 
 include::apache/status.asciidoc[]
 
+:edit_url!:

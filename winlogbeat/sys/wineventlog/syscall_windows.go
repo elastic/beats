@@ -23,7 +23,6 @@ import (
 	"time"
 	"unsafe"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/winlogbeat/sys"
@@ -41,13 +40,14 @@ const NilHandle EvtHandle = 0
 // Event log error codes.
 // https://msdn.microsoft.com/en-us/library/windows/desktop/ms681382(v=vs.85).aspx
 const (
-	ERROR_INVALID_HANDLE      syscall.Errno = 6
-	ERROR_INSUFFICIENT_BUFFER syscall.Errno = 122
-	ERROR_NO_MORE_ITEMS       syscall.Errno = 259
-	RPC_S_SERVER_UNAVAILABLE  syscall.Errno = 1722
-	RPC_S_INVALID_BOUND       syscall.Errno = 1734
-	RPC_S_CALL_CANCELLED      syscall.Errno = 1818
-	ERROR_INVALID_OPERATION   syscall.Errno = 4317
+	ERROR_INVALID_HANDLE        syscall.Errno = 6
+	ERROR_INSUFFICIENT_BUFFER   syscall.Errno = 122
+	ERROR_NO_MORE_ITEMS         syscall.Errno = 259
+	RPC_S_SERVER_UNAVAILABLE    syscall.Errno = 1722
+	RPC_S_INVALID_BOUND         syscall.Errno = 1734
+	RPC_S_CALL_CANCELLED        syscall.Errno = 1818
+	ERROR_INVALID_OPERATION     syscall.Errno = 4317
+	ERROR_EVT_CHANNEL_NOT_FOUND syscall.Errno = 15007
 )
 
 // EvtSubscribeFlag defines the possible values that specify when to start subscribing to events.
@@ -237,7 +237,7 @@ const (
 	EVENTLOG_VERBOSE_LEVEL
 )
 
-// Mapping of event levels to their string representations.
+// EventLevelToString maps event levels to their string representations.
 var EventLevelToString = map[EventLevel]string{
 	EVENTLOG_LOGALWAYS_LEVEL:   "Information",
 	EVENTLOG_INFORMATION_LEVEL: "Information",
@@ -492,7 +492,7 @@ func (v EvtVariant) Data(buf []byte) (interface{}, error) {
 	case EvtVarTypeEvtHandle:
 		return EvtHandle(v.ValueAsUintPtr()), nil
 	default:
-		return nil, errors.Errorf("unhandled type: %d", typ)
+		return nil, fmt.Errorf("unhandled type: %d", typ)
 	}
 }
 
@@ -547,15 +547,15 @@ const (
 func EvtGetPublisherMetadataProperty(publisherMetadataHandle EvtHandle, propertyID EvtPublisherMetadataPropertyID) (interface{}, error) {
 	var bufferUsed uint32
 	err := _EvtGetPublisherMetadataProperty(publisherMetadataHandle, propertyID, 0, 0, nil, &bufferUsed)
-	if err != windows.ERROR_INSUFFICIENT_BUFFER {
-		return "", errors.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %v", err)
+	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.
+		return "", fmt.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %w (%#v)", err, err)
 	}
 
 	buf := make([]byte, bufferUsed)
 	pEvtVariant := (*EvtVariant)(unsafe.Pointer(&buf[0]))
 	err = _EvtGetPublisherMetadataProperty(publisherMetadataHandle, propertyID, 0, uint32(len(buf)), pEvtVariant, &bufferUsed)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed in EvtGetPublisherMetadataProperty")
+		return nil, fmt.Errorf("failed in EvtGetPublisherMetadataProperty: %w", err)
 	}
 
 	v, err := pEvtVariant.Data(buf)
@@ -574,20 +574,20 @@ func EvtGetPublisherMetadataProperty(publisherMetadataHandle EvtHandle, property
 func EvtGetObjectArrayProperty(arrayHandle EvtObjectArrayPropertyHandle, propertyID EvtPublisherMetadataPropertyID, index uint32) (interface{}, error) {
 	var bufferUsed uint32
 	err := _EvtGetObjectArrayProperty(arrayHandle, propertyID, index, 0, 0, nil, &bufferUsed)
-	if err != windows.ERROR_INSUFFICIENT_BUFFER {
-		return nil, errors.Wrap(err, "failed in EvtGetObjectArrayProperty, expected ERROR_INSUFFICIENT_BUFFER")
+	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.
+		return nil, fmt.Errorf("failed in EvtGetObjectArrayProperty, expected ERROR_INSUFFICIENT_BUFFER: %w", err)
 	}
 
 	buf := make([]byte, bufferUsed)
 	pEvtVariant := (*EvtVariant)(unsafe.Pointer(&buf[0]))
 	err = _EvtGetObjectArrayProperty(arrayHandle, propertyID, index, 0, uint32(len(buf)), pEvtVariant, &bufferUsed)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed in EvtGetObjectArrayProperty")
+		return nil, fmt.Errorf("failed in EvtGetObjectArrayProperty: %w", err)
 	}
 
 	value, err := pEvtVariant.Data(buf)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read EVT_VARIANT value")
+		return nil, fmt.Errorf("failed to read EVT_VARIANT value: %w", err)
 	}
 	return value, nil
 }
@@ -609,15 +609,15 @@ func EvtGetObjectArraySize(handle EvtObjectArrayPropertyHandle) (uint32, error) 
 func GetEventMetadataProperty(metadataHandle EvtHandle, propertyID EvtEventMetadataPropertyID) (interface{}, error) {
 	var bufferUsed uint32
 	err := _EvtGetEventMetadataProperty(metadataHandle, 8, 0, 0, nil, &bufferUsed)
-	if err != windows.ERROR_INSUFFICIENT_BUFFER {
-		return nil, errors.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %v", err)
+	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.
+		return nil, fmt.Errorf("expected ERROR_INSUFFICIENT_BUFFER but got %w (%#v)", err, err)
 	}
 
 	buf := make([]byte, bufferUsed)
 	pEvtVariant := (*EvtVariant)(unsafe.Pointer(&buf[0]))
 	err = _EvtGetEventMetadataProperty(metadataHandle, propertyID, 0, uint32(len(buf)), pEvtVariant, &bufferUsed)
 	if err != nil {
-		return nil, errors.Wrap(err, "_EvtGetEventMetadataProperty")
+		return nil, fmt.Errorf("_EvtGetEventMetadataProperty: %w", err)
 	}
 
 	return pEvtVariant.Data(buf)
@@ -649,14 +649,14 @@ func EvtClearLog(session EvtHandle, channelPath string, targetFilePath string) e
 //sys   _EvtSubscribe(session EvtHandle, signalEvent uintptr, channelPath *uint16, query *uint16, bookmark EvtHandle, context uintptr, callback syscall.Handle, flags EvtSubscribeFlag) (handle EvtHandle, err error) = wevtapi.EvtSubscribe
 //sys   _EvtCreateBookmark(bookmarkXML *uint16) (handle EvtHandle, err error) = wevtapi.EvtCreateBookmark
 //sys   _EvtUpdateBookmark(bookmark EvtHandle, event EvtHandle) (err error) = wevtapi.EvtUpdateBookmark
-//sys   _EvtCreateRenderContext(ValuePathsCount uint32, valuePaths uintptr, flags EvtRenderContextFlag) (handle EvtHandle, err error) = wevtapi.EvtCreateRenderContext
+//sys   _EvtCreateRenderContext(ValuePathsCount uint32, valuePaths **uint16, flags EvtRenderContextFlag) (handle EvtHandle, err error) = wevtapi.EvtCreateRenderContext
 //sys   _EvtRender(context EvtHandle, fragment EvtHandle, flags EvtRenderFlag, bufferSize uint32, buffer *byte, bufferUsed *uint32, propertyCount *uint32) (err error) = wevtapi.EvtRender
 //sys   _EvtClose(object EvtHandle) (err error) = wevtapi.EvtClose
 //sys   _EvtSeek(resultSet EvtHandle, position int64, bookmark EvtHandle, timeout uint32, flags uint32) (success bool, err error) [!success] = wevtapi.EvtSeek
 //sys   _EvtNext(resultSet EvtHandle, eventArraySize uint32, eventArray *EvtHandle, timeout uint32, flags uint32, numReturned *uint32) (err error) = wevtapi.EvtNext
 //sys   _EvtOpenChannelEnum(session EvtHandle, flags uint32) (handle EvtHandle, err error) = wevtapi.EvtOpenChannelEnum
 //sys   _EvtNextChannelPath(channelEnum EvtHandle, channelPathBufferSize uint32, channelPathBuffer *uint16, channelPathBufferUsed *uint32) (err error) = wevtapi.EvtNextChannelPath
-//sys   _EvtFormatMessage(publisherMetadata EvtHandle, event EvtHandle, messageID uint32, valueCount uint32, values uintptr, flags EvtFormatMessageFlag, bufferSize uint32, buffer *byte, bufferUsed *uint32) (err error) = wevtapi.EvtFormatMessage
+//sys   _EvtFormatMessage(publisherMetadata EvtHandle, event EvtHandle, messageID uint32, valueCount uint32, values *EvtVariant, flags EvtFormatMessageFlag, bufferSize uint32, buffer *byte, bufferUsed *uint32) (err error) = wevtapi.EvtFormatMessage
 //sys   _EvtOpenPublisherMetadata(session EvtHandle, publisherIdentity *uint16, logFilePath *uint16, locale uint32, flags uint32) (handle EvtHandle, err error) = wevtapi.EvtOpenPublisherMetadata
 //sys   _EvtGetPublisherMetadataProperty(publisherMetadata EvtHandle, propertyID EvtPublisherMetadataPropertyID, flags uint32, bufferSize uint32, variant *EvtVariant, bufferUsed *uint32) (err error) = wevtapi.EvtGetPublisherMetadataProperty
 //sys   _EvtGetEventMetadataProperty(eventMetadata EvtHandle, propertyID EvtEventMetadataPropertyID, flags uint32, bufferSize uint32,  variant *EvtVariant, bufferUsed *uint32) (err error) = wevtapi.EvtGetEventMetadataProperty

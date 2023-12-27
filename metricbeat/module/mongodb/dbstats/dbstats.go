@@ -18,15 +18,17 @@
 package dbstats
 
 import (
-	"github.com/pkg/errors"
+	"context"
+	"errors"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"go.mongodb.org/mongo-driver/bson"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mongodb"
-)
 
-var logger = logp.NewLogger("mongodb.dbstats")
+	"github.com/elastic/elastic-agent-libs/mapstr"
+)
 
 // init registers the MetricSet with the central registry.
 // The New method will be called after the setup of the module and before starting to fetch data
@@ -42,14 +44,14 @@ func init() {
 // additional entries. These variables can be used to persist data or configuration between
 // multiple fetch calls.
 type MetricSet struct {
-	*mongodb.MetricSet
+	*mongodb.Metricset
 }
 
 // New creates a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	ms, err := mongodb.NewMetricSet(base)
+	ms, err := mongodb.NewMetricset(base)
 	if err != nil {
 		return nil, err
 	}
@@ -60,43 +62,48 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	// instantiate direct connections to each of the configured Mongo hosts
-	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
+	client, err := mongodb.NewClient(m.Metricset.Config, m.HostData().URI, m.Module().Config().Timeout, 0)
 	if err != nil {
-		return errors.Wrap(err, "error creating new Session")
+		return fmt.Errorf("could not create mongodb client: %w", err)
 	}
-	defer mongoSession.Close()
+
+	defer func() {
+		if disconnectErr := client.Disconnect(context.Background()); disconnectErr != nil {
+			m.Logger().Warn("client disconnection did not happen gracefully")
+		}
+	}()
 
 	// Get the list of databases names, which we'll use to call db.stats() on each
-	dbNames, err := mongoSession.DatabaseNames()
+	dbNames, err := client.ListDatabaseNames(context.Background(), bson.D{})
 	if err != nil {
-		return errors.Wrap(err, "Error retrieving database names from Mongo instance")
+		return fmt.Errorf("could not retrieve database names from Mongo instance: %w", err)
 	}
 
 	// for each database, call db.stats() and append to events
 	totalEvents := 0
 	for _, dbName := range dbNames {
-		db := mongoSession.DB(dbName)
+		db := client.Database(dbName)
 
-		result := common.MapStr{}
+		var result mapstr.M
 
-		err := db.Run("dbStats", &result)
-		if err != nil {
-			err = errors.Wrapf(err, "Failed to retrieve stats for db %s", dbName)
-			reporter.Error(err)
-			m.Logger().Error(err)
+		res := db.RunCommand(context.Background(), bson.D{bson.E{Key: "dbStats"}})
+		if err = res.Err(); err != nil {
+			reporter.Error(fmt.Errorf("failed to retrieve stats for db '%s': %w", dbName, err))
 			continue
 		}
-		data, _ := schema.Apply(result)
-		reported := reporter.Event(mb.Event{MetricSetFields: data})
-		if !reported {
-			return nil
+
+		if err = res.Decode(&result); err != nil {
+			reporter.Error(fmt.Errorf("could not decode mongodb response for db '%s': %w", dbName, err))
+			continue
 		}
+
+		data, _ := schema.Apply(result)
+		reporter.Event(mb.Event{MetricSetFields: data})
 		totalEvents++
 	}
 
 	if totalEvents == 0 {
-		return errors.New("Failed to retrieve dbStats from any databases")
+		return errors.New("failed to retrieve dbStats from all databases")
 
 	}
 

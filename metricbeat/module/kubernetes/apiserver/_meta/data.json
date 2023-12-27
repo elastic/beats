@@ -7,13 +7,20 @@
     },
     "kubernetes": {
         "apiserver": {
-            "etcd": {
-                "object": {
-                    "count": 0
-                }
+            "major": {
+                "version": "1"
+            },
+            "minor": {
+                "version": "21"
             },
             "request": {
-                "resource": "certificatesigningrequests.certificates.k8s.io"
+                "code": "0",
+                "component": "apiserver",
+                "count": 14,
+                "resource": "endpoints",
+                "scope": "cluster",
+                "verb": "WATCH",
+                "version": "v1"
             }
         }
     },

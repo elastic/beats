@@ -18,6 +18,7 @@
 package status
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -26,11 +27,9 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/uwsgi"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -55,8 +54,7 @@ func fetchStatData(URL string) ([]byte, error) {
 
 	u, err := url.Parse(URL)
 	if err != nil {
-
-		return nil, errors.Wrap(err, "parsing uwsgi stats url failed")
+		return nil, fmt.Errorf("parsing uwsgi stats url failed: %w", err)
 	}
 
 	switch u.Scheme {
@@ -93,7 +91,7 @@ func fetchStatData(URL string) ([]byte, error) {
 
 	data, err := ioutil.ReadAll(reader)
 	if err != nil {
-		return nil, errors.Wrap(err, "uwsgi data read failed")
+		return nil, fmt.Errorf("uwsgi data read failed: %w", err)
 	}
 
 	return data, nil
@@ -104,7 +102,7 @@ func fetchStatData(URL string) ([]byte, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	content, err := fetchStatData(m.HostData().URI)
 	if err != nil {
-		reporter.Event(mb.Event{MetricSetFields: common.MapStr{
+		reporter.Event(mb.Event{MetricSetFields: mapstr.M{
 			"error": err.Error(),
 		}},
 		)

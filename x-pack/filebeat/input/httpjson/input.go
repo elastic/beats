@@ -11,19 +11,31 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"path/filepath"
+	"strings"
 	"time"
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
+	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+
+	"github.com/elastic/mito/lib/xml"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -33,7 +45,7 @@ const (
 )
 
 var (
-	userAgent = useragent.UserAgent("Filebeat")
+	userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 	// for testing
 	timeNow = time.Now
@@ -96,38 +108,63 @@ func test(url *url.URL) error {
 	return nil
 }
 
-func run(
-	ctx v2.Context,
-	config config,
-	publisher inputcursor.Publisher,
-	cursor *inputcursor.Cursor,
-) error {
-	log := ctx.Logger.With("input_url", config.Request.URL)
+func runWithMetrics(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor) error {
+	reg, unreg := inputmon.NewInputRegistry("httpjson", ctx.ID, nil)
+	defer unreg()
+	return run(ctx, cfg, pub, crsr, reg)
+}
+
+func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcursor.Cursor, reg *monitoring.Registry) error {
+	log := ctx.Logger.With("input_url", cfg.Request.URL)
 
 	stdCtx := ctxtool.FromCanceller(ctx.Cancelation)
 
-	httpClient, err := newHTTPClient(stdCtx, config, log)
+	if cfg.Request.Tracer != nil {
+		id := sanitizeFileName(ctx.ID)
+		cfg.Request.Tracer.Filename = strings.ReplaceAll(cfg.Request.Tracer.Filename, "*", id)
+	}
+
+	metrics := newInputMetrics(reg)
+
+	client, err := newHTTPClient(stdCtx, cfg, log, reg)
 	if err != nil {
 		return err
 	}
 
-	requestFactory := newRequestFactory(config.Request, config.Auth, log)
-	pagination := newPagination(config, httpClient, log)
-	responseProcessor := newResponseProcessor(config.Response, pagination, log)
-	requester := newRequester(httpClient, requestFactory, responseProcessor, log)
+	requestFactory, err := newRequestFactory(stdCtx, cfg, log, metrics, reg)
+	if err != nil {
+		log.Errorf("Error while creating requestFactory: %v", err)
+		return err
+	}
+	var xmlDetails map[string]xml.Detail
+	if cfg.Response.XSD != "" {
+		xmlDetails, err = xml.Details([]byte(cfg.Response.XSD))
+		if err != nil {
+			log.Errorf("error while collecting xml decoder type hints: %v", err)
+			return err
+		}
+	}
+	pagination := newPagination(cfg, client, log)
+	responseProcessor := newResponseProcessor(cfg, pagination, xmlDetails, metrics, log)
+	requester := newRequester(client, requestFactory, responseProcessor, log)
 
 	trCtx := emptyTransformContext()
-	trCtx.cursor = newCursor(config.Cursor, log)
-	trCtx.cursor.load(cursor)
+	trCtx.cursor = newCursor(cfg.Cursor, log)
+	trCtx.cursor.load(crsr)
 
 	doFunc := func() error {
 		log.Info("Process another repeated request.")
 
-		if err := requester.doRequest(stdCtx, trCtx, publisher); err != nil {
+		startTime := time.Now()
+
+		var err error
+		if err = requester.doRequest(stdCtx, trCtx, pub); err != nil {
 			log.Errorf("Error while processing http request: %v", err)
 		}
 
-		if stdCtx.Err() != nil {
+		metrics.updateIntervalMetrics(err, startTime)
+
+		if err := stdCtx.Err(); err != nil {
 			return err
 		}
 
@@ -137,7 +174,7 @@ func run(
 	// we trigger the first call immediately,
 	// then we schedule it on the given interval using timed.Periodic
 	if err = doFunc(); err == nil {
-		err = timed.Periodic(stdCtx, config.Interval, doFunc)
+		err = timed.Periodic(stdCtx, cfg.Interval, doFunc)
 	}
 
 	log.Infof("Input stopped because context was cancelled with: %v", err)
@@ -145,39 +182,159 @@ func run(
 	return nil
 }
 
-func newHTTPClient(ctx context.Context, config config, log *logp.Logger) (*httpClient, error) {
-	// Make retryable HTTP client
-	netHTTPClient, err := config.Request.Transport.Client(
-		httpcommon.WithAPMHTTPInstrumentation(),
-		httpcommon.WithKeepaliveSettings{Disable: true},
-	)
+// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
+// The request.tracer.filename may have ":" when a httpjson input has cursor config and
+// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
+func sanitizeFileName(name string) string {
+	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
+	name = filepath.Clean(name)
+	return strings.ReplaceAll(name, string(filepath.Separator), "_")
+}
+
+func newHTTPClient(ctx context.Context, config config, log *logp.Logger, reg *monitoring.Registry) (*httpClient, error) {
+	client, err := newNetHTTPClient(ctx, config.Request, log, reg)
 	if err != nil {
 		return nil, err
 	}
 
-	netHTTPClient.CheckRedirect = checkRedirect(config.Request, log)
-
-	client := &retryablehttp.Client{
-		HTTPClient:   netHTTPClient,
-		Logger:       newRetryLogger(log),
-		RetryWaitMin: config.Request.Retry.getWaitMin(),
-		RetryWaitMax: config.Request.Retry.getWaitMax(),
-		RetryMax:     config.Request.Retry.getMaxAttempts(),
-		CheckRetry:   retryablehttp.DefaultRetryPolicy,
-		Backoff:      retryablehttp.DefaultBackoff,
+	if config.Request.Retry.getMaxAttempts() > 1 {
+		// Make retryable HTTP client if needed.
+		client = (&retryablehttp.Client{
+			HTTPClient:   client,
+			Logger:       newRetryLogger(log),
+			RetryWaitMin: config.Request.Retry.getWaitMin(),
+			RetryWaitMax: config.Request.Retry.getWaitMax(),
+			RetryMax:     config.Request.Retry.getMaxAttempts(),
+			CheckRetry:   retryablehttp.DefaultRetryPolicy,
+			Backoff:      retryablehttp.DefaultBackoff,
+		}).StandardClient()
 	}
 
 	limiter := newRateLimiterFromConfig(config.Request.RateLimit, log)
 
 	if config.Auth.OAuth2.isEnabled() {
-		authClient, err := config.Auth.OAuth2.client(ctx, client.StandardClient())
+		authClient, err := config.Auth.OAuth2.client(ctx, client)
 		if err != nil {
 			return nil, err
 		}
 		return &httpClient{client: authClient, limiter: limiter}, nil
 	}
 
-	return &httpClient{client: client.StandardClient(), limiter: limiter}, nil
+	return &httpClient{client: client, limiter: limiter}, nil
+}
+
+func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger, reg *monitoring.Registry) (*http.Client, error) {
+	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings())...)
+	if err != nil {
+		return nil, err
+	}
+
+	if cfg.Tracer != nil {
+		w := zapcore.AddSync(cfg.Tracer)
+		go func() {
+			// Close the logger when we are done.
+			<-ctx.Done()
+			cfg.Tracer.Close()
+		}()
+		core := ecszap.NewCore(
+			ecszap.NewDefaultEncoderConfig(),
+			w,
+			zap.DebugLevel,
+		)
+		traceLogger := zap.New(core)
+
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger)
+	}
+
+	if reg != nil {
+		netHTTPClient.Transport = httpmon.NewMetricsRoundTripper(netHTTPClient.Transport, reg)
+	}
+
+	netHTTPClient.CheckRedirect = checkRedirect(cfg, log)
+
+	return netHTTPClient, nil
+}
+
+func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, reg *monitoring.Registry, p ...*Policy) (*httpClient, error) {
+	client, err := newNetHTTPClient(ctx, requestCfg, log, reg)
+	if err != nil {
+		return nil, err
+	}
+
+	var retryPolicyFunc retryablehttp.CheckRetry
+	if len(p) != 0 {
+		retryPolicyFunc = p[0].CustomRetryPolicy
+	} else {
+		retryPolicyFunc = retryablehttp.DefaultRetryPolicy
+	}
+
+	if requestCfg.Retry.getMaxAttempts() > 1 {
+		// Make retryable HTTP client if needed.
+		client = (&retryablehttp.Client{
+			HTTPClient:   client,
+			Logger:       newRetryLogger(log),
+			RetryWaitMin: requestCfg.Retry.getWaitMin(),
+			RetryWaitMax: requestCfg.Retry.getWaitMax(),
+			RetryMax:     requestCfg.Retry.getMaxAttempts(),
+			CheckRetry:   retryPolicyFunc,
+			Backoff:      retryablehttp.DefaultBackoff,
+		}).StandardClient()
+	}
+
+	limiter := newRateLimiterFromConfig(requestCfg.RateLimit, log)
+
+	if authCfg != nil && authCfg.OAuth2.isEnabled() {
+		authClient, err := authCfg.OAuth2.client(ctx, client)
+		if err != nil {
+			return nil, err
+		}
+		return &httpClient{client: authClient, limiter: limiter}, nil
+	}
+
+	return &httpClient{client: client, limiter: limiter}, nil
+}
+
+// clientOption returns constructed client configuration options, including
+// setting up http+unix and http+npipe transports if requested.
+func clientOptions(u *url.URL, keepalive httpcommon.WithKeepaliveSettings) []httpcommon.TransportOption {
+	scheme, trans, ok := strings.Cut(u.Scheme, "+")
+	var dialer transport.Dialer
+	switch {
+	default:
+		fallthrough
+	case !ok:
+		return []httpcommon.TransportOption{
+			httpcommon.WithAPMHTTPInstrumentation(),
+			keepalive,
+		}
+
+	// We set the host for the unix socket and Windows named
+	// pipes schemes because the http.Transport expects to
+	// have a host and will error out if it is not present.
+	// The values here are just non-zero with a helpful name.
+	// They are not used in any logic.
+	case trans == "unix":
+		u.Host = "unix-socket"
+		dialer = socketDialer{u.Path}
+	case trans == "npipe":
+		u.Host = "windows-npipe"
+		dialer = npipeDialer{u.Path}
+	}
+	u.Scheme = scheme
+	return []httpcommon.TransportOption{
+		httpcommon.WithAPMHTTPInstrumentation(),
+		keepalive,
+		httpcommon.WithBaseDialer(dialer),
+	}
+}
+
+// socketDialer implements transport.Dialer to a constant socket path.
+type socketDialer struct {
+	path string
+}
+
+func (d socketDialer) Dial(_, _ string) (net.Conn, error) {
+	return net.Dial("unix", d.path)
 }
 
 func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, []*http.Request) error {
@@ -207,14 +364,14 @@ func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, 
 	}
 }
 
-func makeEvent(body common.MapStr) (beat.Event, error) {
+func makeEvent(body mapstr.M) (beat.Event, error) {
 	bodyBytes, err := json.Marshal(body)
 	if err != nil {
 		return beat.Event{}, err
 	}
 	now := timeNow()
-	fields := common.MapStr{
-		"event": common.MapStr{
+	fields := mapstr.M{
+		"event": mapstr.M{
 			"created": now,
 		},
 		"message": string(bodyBytes),

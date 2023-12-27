@@ -22,6 +22,7 @@ type config struct {
 	PacketQueueSize           int           `config:"queue_size"`
 	CustomDefinitions         []string      `config:"custom_definitions"`
 	DetectSequenceReset       bool          `config:"detect_sequence_reset"`
+	ShareTemplates            bool          `config:"share_templates"`
 }
 
 var defaultConfig = config{
@@ -38,4 +39,5 @@ var defaultConfig = config{
 	ExpirationTimeout:   time.Minute * 30,
 	PacketQueueSize:     8192,
 	DetectSequenceReset: true,
+	ShareTemplates:      false,
 }

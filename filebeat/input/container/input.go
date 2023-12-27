@@ -18,12 +18,13 @@
 package container
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/input/log"
-	"github.com/elastic/beats/v7/libbeat/common"
-
-	"github.com/pkg/errors"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -35,17 +36,17 @@ func init() {
 
 // NewInput creates a new container input
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	outletFactory channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
 	// Wrap log input with custom docker settings
 	config := defaultConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "reading container input config")
+		return nil, fmt.Errorf("reading container input config: %w", err)
 	}
 
-	err := cfg.Merge(common.MapStr{
+	err := cfg.Merge(mapstr.M{
 		"docker-json.partial":   true,
 		"docker-json.cri_flags": true,
 
@@ -59,7 +60,7 @@ func NewInput(
 		"symlinks": true,
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "update input config")
+		return nil, fmt.Errorf("update input config: %w", err)
 	}
 
 	// Add stream to meta to ensure different state per stream

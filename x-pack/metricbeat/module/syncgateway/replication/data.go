@@ -5,11 +5,11 @@
 package replication
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/syncgateway"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var replicationSchema = s.Schema{
@@ -32,7 +32,7 @@ func eventMapping(r mb.ReporterV2, content *syncgateway.SgResponse) {
 	for replID, replData := range content.Syncgateway.PerReplication {
 		replData, _ := replicationSchema.Apply(replData)
 		r.Event(mb.Event{
-			MetricSetFields: common.MapStr{
+			MetricSetFields: mapstr.M{
 				"id":      replID,
 				"metrics": replData,
 			},

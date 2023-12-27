@@ -27,10 +27,10 @@ import (
 	"net/http"
 	"strings"
 
-	"go.elastic.co/apm"
-	"go.elastic.co/apm/module/apmhttp"
+	apmHttpV2 "go.elastic.co/apm/module/apmhttp/v2"
+	"go.elastic.co/apm/v2"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -88,7 +88,7 @@ func (conn *Connection) Bulk(
 		apm.CaptureError(ctx, err).Send()
 		return 0, nil, err
 	}
-	requ.requ = apmhttp.RequestWithContext(ctx, requ.requ)
+	requ.requ = apmHttpV2.RequestWithContext(ctx, requ.requ)
 
 	return conn.sendBulkRequest(requ)
 }

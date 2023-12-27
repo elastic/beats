@@ -10,8 +10,27 @@
 {{header "Network device"}}
 
 # Select the network interface to sniff the data. On Linux, you can use the
-# "any" keyword to sniff on all connected interfaces.
+# "any" keyword to sniff on all connected interfaces. On all platforms, you
+# can use "default_route", "default_route_ipv4" or "default_route_ipv6"
+# to sniff on the device carrying the default route. If you wish to sniff
+# on multiple network interfaces you may specify an array of distinct interfaces
+# as a YAML array with each device's configuration specified individually.
+# Each device may only appear once in the array of interfaces.
+#
+# packetbeat.interfaces:
+# - device: en0
+#   internal_networks:
+#   - private
+# - device: en1
+#   internal_networks:
+#   - private
+#
 packetbeat.interfaces.device: {{ call .device .GOOS }}
+
+# Specify the amount of time between polling for changes in the default
+# route. This option is only used when one of the default route devices
+# is specified.
+packetbeat.interfaces.poll_default_route: 1m
 
 # The network CIDR blocks that are considered "internal" networks for
 # the purpose of network perimeter boundary classification. The valid
@@ -23,6 +42,8 @@ packetbeat.interfaces.device: {{ call .device .GOOS }}
 packetbeat.interfaces.internal_networks:
   - private
 
+{{- template "windows_npcap.yml.tmpl" .}}
+
 {{header "Flows"}}
 
 # Set `enabled: false` or comment out all options to disable flows reporting.
@@ -31,7 +52,7 @@ packetbeat.flows:
   # timed out.
   timeout: 30s
 
-  # Configure reporting period. If set to -1, only killed flows will be reported
+  # Configure reporting period. If set to -1s, only killed flows will be reported
   period: 10s
 
 {{header "Transaction protocols"}}
@@ -116,6 +137,9 @@ packetbeat.protocols:
   # Configure the ports where to listen for SIP traffic. You can disable
   # the SIP protocol by commenting out the list of ports.
   ports: [5060]
+  # You can monitor tcp SIP traffic by setting the transport_protocol option
+  # to tcp, it defaults to udp.
+  #transport_protocol: tcp
 
 {{header "Elasticsearch template setting"}}
 

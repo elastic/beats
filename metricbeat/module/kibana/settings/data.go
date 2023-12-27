@@ -19,11 +19,10 @@ package settings
 
 import (
 	"encoding/json"
+	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
@@ -34,7 +33,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Kibana API response")
+		return fmt.Errorf("failure parsing Kibana API response: %w", err)
 	}
 
 	schema := s.Schema{
@@ -54,7 +53,7 @@ func eventMapping(r mb.ReporterV2, content []byte) error {
 	event := mb.Event{
 		ModuleFields:    res,
 		MetricSetFields: nil,
-		RootFields:      make(common.MapStr),
+		RootFields:      make(mapstr.M),
 	}
 
 	// Set service address

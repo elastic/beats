@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build integration
-// +build integration
 
 package performance
 
@@ -12,10 +11,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	mtest "github.com/elastic/beats/v7/x-pack/metricbeat/module/mssql/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type keyAssertion struct {

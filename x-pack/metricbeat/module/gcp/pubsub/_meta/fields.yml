@@ -1,6 +1,6 @@
 - name: pubsub
   description: Google Cloud PubSub metrics
-  release: beta
+  release: ga
   type: group
   fields:
   - name: snapshot.backlog.bytes
@@ -81,9 +81,6 @@
   - name: subscription.push_request.count
     type: long
     description: Cumulative count of push attempts, grouped by result. Unlike pulls, the push server implementation does not batch user messages. So each request only contains one user message. The push server retries on errors, so a given user message can appear multiple times.
-  - name: subscription.push_request_latencies.value
-    type: long
-    description: Distribution of push request latencies (in microseconds), grouped by result.
   - name: subscription.retained_acked.bytes
     type: long
     description: Total byte size of the acknowledged messages retained in a subscription.
@@ -124,7 +121,8 @@
     type: long
     description: Cumulative count of configuration changes, grouped by operation type and result.
   - name: topic.message_sizes.bytes
-    type: long
+    type: object
+    object_type: histogram
     description: Distribution of publish message sizes (in bytes)
   - name: topic.oldest_retained_acked_message_age_by_region.value
     type: long
@@ -147,3 +145,11 @@
   - name: topic.unacked_bytes_by_region.bytes
     type: long
     description: Total byte size of the unacknowledged messages in a topic, broken down by Cloud region.
+  - name: subscription.ack_latencies.value
+    type: object
+    object_type: histogram
+    description: Distribution of ack latencies in milliseconds. The ack latency is the time between when Cloud Pub/Sub sends a message to a subscriber client and when Cloud Pub/Sub receives an Acknowledge request for that message.
+  - name: subscription.push_request_latencies.value
+    type: object
+    object_type: histogram
+    description: Distribution of push request latencies (in microseconds), grouped by result.

@@ -23,51 +23,52 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestDecodeCSVField(t *testing.T) {
 	tests := map[string]struct {
-		config   common.MapStr
+		config   mapstr.M
 		input    beat.Event
 		expected beat.Event
 		fail     bool
 	}{
 		"self target": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"message": "message",
 				},
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": "17,192.168.33.1,8.8.8.8",
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": []string{"17", "192.168.33.1", "8.8.8.8"},
 				},
 			},
 		},
 
 		"alternative target": {
-			config: common.MapStr{
-				"fields": common.MapStr{
-					"my": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
+					"my": mapstr.M{
 						"field": "message",
 					},
 				},
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
-					"my": common.MapStr{
+				Fields: mapstr.M{
+					"my": mapstr.M{
 						"field": "17,192.168.33.1,8.8.8.8",
 					},
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"my.field": "17,192.168.33.1,8.8.8.8",
 					"message":  []string{"17", "192.168.33.1", "8.8.8.8"},
 				},
@@ -75,8 +76,8 @@ func TestDecodeCSVField(t *testing.T) {
 		},
 
 		"non existing field": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"field": "my.field",
 				},
 			},
@@ -84,8 +85,8 @@ func TestDecodeCSVField(t *testing.T) {
 		},
 
 		"ignore missing": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"my_field": "my_field",
 				},
 
@@ -94,13 +95,13 @@ func TestDecodeCSVField(t *testing.T) {
 		},
 
 		"overwrite keys failure": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"message": "existing_field",
 				},
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message":        `"hello ""world"""`,
 					"existing_field": 42,
 				},
@@ -109,20 +110,20 @@ func TestDecodeCSVField(t *testing.T) {
 		},
 
 		"overwrite keys": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"message": "existing_field",
 				},
 				"overwrite_keys": true,
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message":        `"hello ""world"""`,
 					"existing_field": 42,
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message":        `"hello ""world"""`,
 					"existing_field": []string{`hello "world"`},
 				},
@@ -130,91 +131,91 @@ func TestDecodeCSVField(t *testing.T) {
 		},
 
 		"custom separator": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"message": "message",
 				},
 				"separator": ";",
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": "1.5;false;hello world;3",
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": []string{"1.5", "false", "hello world", "3"},
 				},
 			},
 		},
 
 		"trim leading space": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"message": "message",
 				},
 				"trim_leading_space": true,
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": " Here's,   some,   extra ,whitespace",
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": []string{"Here's", "some", "extra ", "whitespace"},
 				},
 			},
 		},
 
 		"tab separator": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"message": "message",
 				},
 				"separator":      "\t",
 				"overwrite_keys": true,
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": "Tab\tin\tASCII\thas\tthe\t\"decimal\tcharacter\tcode\"\t9",
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": []string{"Tab", "in", "ASCII", "has", "the", "decimal\tcharacter\tcode", "9"},
 				},
 			},
 		},
 
 		"unicode separator": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"message": "message",
 				},
 				"separator":      "🍺",
 				"overwrite_keys": true,
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": `🐢🍺🌔🐈🍺🍺🐥🐲`,
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": []string{"🐢", "🌔🐈", "", "🐥🐲"},
 				},
 			},
 		},
 
 		"bad type": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"message": "message",
 				},
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"message": 42,
 				},
 			},
@@ -222,20 +223,20 @@ func TestDecodeCSVField(t *testing.T) {
 		},
 
 		"multiple fields": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"a": "a_csv",
 					"b": "b_csv",
 				},
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"a": "1,2",
 					"b": "hello,world",
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"a":     "1,2",
 					"b":     "hello,world",
 					"a_csv": []string{"1", "2"},
@@ -245,20 +246,20 @@ func TestDecodeCSVField(t *testing.T) {
 		},
 
 		"multiple fields failure": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"a": "a.csv",
 					"b": "b.csv",
 				},
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"a": "1,2",
 					"b": "hello,world",
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"a": "1,2",
 					"b": "hello,world",
 				},
@@ -267,8 +268,8 @@ func TestDecodeCSVField(t *testing.T) {
 		},
 
 		"ignore errors": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"a": "a",
 					"b": "b",
 					"c": "a.b",
@@ -276,14 +277,14 @@ func TestDecodeCSVField(t *testing.T) {
 				"fail_on_error": false,
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"a": "1,2",
 					"b": "hello,world",
 					"c": ":)",
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"a": []string{"1", "2"},
 					"b": []string{"hello", "world"},
 					"c": ":)",
@@ -292,8 +293,8 @@ func TestDecodeCSVField(t *testing.T) {
 		},
 
 		"restore on errors": {
-			config: common.MapStr{
-				"fields": common.MapStr{
+			config: mapstr.M{
+				"fields": mapstr.M{
 					"a": "a",
 					"b": "b",
 					"c": "a.b",
@@ -301,14 +302,14 @@ func TestDecodeCSVField(t *testing.T) {
 				"fail_on_error": true,
 			},
 			input: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"a": "1,2",
 					"b": "hello,world",
 					"c": ":)",
 				},
 			},
 			expected: beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"a": "1,2",
 					"b": "hello,world",
 					"c": ":)",
@@ -320,7 +321,7 @@ func TestDecodeCSVField(t *testing.T) {
 
 	for title, tt := range tests {
 		t.Run(title, func(t *testing.T) {
-			processor, err := NewDecodeCSVField(common.MustNewConfigFrom(tt.config))
+			processor, err := NewDecodeCSVField(cfg.MustNewConfigFrom(tt.config))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -340,26 +341,26 @@ func TestDecodeCSVField(t *testing.T) {
 	}
 
 	t.Run("supports metadata as a target", func(t *testing.T) {
-		config := common.MapStr{
-			"fields": common.MapStr{
-				"@metadata": common.MapStr{
+		config := mapstr.M{
+			"fields": mapstr.M{
+				"@metadata": mapstr.M{
 					"field": "@metadata.message",
 				},
 			},
 		}
 
 		event := &beat.Event{
-			Meta: common.MapStr{
+			Meta: mapstr.M{
 				"field": "17,192.168.33.1,8.8.8.8",
 			},
-			Fields: common.MapStr{},
+			Fields: mapstr.M{},
 		}
-		expMeta := common.MapStr{
+		expMeta := mapstr.M{
 			"field":   "17,192.168.33.1,8.8.8.8",
 			"message": []string{"17", "192.168.33.1", "8.8.8.8"},
 		}
 
-		processor, err := NewDecodeCSVField(common.MustNewConfigFrom(config))
+		processor, err := NewDecodeCSVField(cfg.MustNewConfigFrom(config))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -372,8 +373,8 @@ func TestDecodeCSVField(t *testing.T) {
 }
 
 func TestDecodeCSVField_String(t *testing.T) {
-	p, err := NewDecodeCSVField(common.MustNewConfigFrom(common.MapStr{
-		"fields": common.MapStr{
+	p, err := NewDecodeCSVField(cfg.MustNewConfigFrom(mapstr.M{
+		"fields": mapstr.M{
 			"a": "csv.a",
 			"b": "csv.b",
 		},

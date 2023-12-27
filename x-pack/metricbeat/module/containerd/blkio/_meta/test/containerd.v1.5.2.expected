@@ -2,6 +2,14 @@
 	{
 		"RootFields": {
 			"container": {
+				"disk": {
+					"read": {
+						"bytes": 69246976
+					},
+					"write": {
+						"bytes": 24576
+					}
+				},
 				"id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
 			}
 		},

@@ -1,0 +1,235 @@
+{
+    "attributes": {
+        "description": "Metrics about Pods",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "syncColors": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "71adfb12-56d3-49e2-90f3-5a3f61971967",
+                    "w": 44,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "71adfb12-56d3-49e2-90f3-5a3f61971967",
+                "panelRefName": "panel_71adfb12-56d3-49e2-90f3-5a3f61971967",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "2fea1316-8b13-4915-a357-289c17c06c81",
+                    "w": 22,
+                    "x": 0,
+                    "y": 21
+                },
+                "panelIndex": "2fea1316-8b13-4915-a357-289c17c06c81",
+                "panelRefName": "panel_2fea1316-8b13-4915-a357-289c17c06c81",
+                "title": "CPU Usage as Pct of the Total Node CPU [Metricbeat Kubernetes]",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4abf5272-19ef-48ba-a352-5861e04c4453",
+                    "w": 22,
+                    "x": 22,
+                    "y": 21
+                },
+                "panelIndex": "4abf5272-19ef-48ba-a352-5861e04c4453",
+                "panelRefName": "panel_4abf5272-19ef-48ba-a352-5861e04c4453",
+                "title": "CPU Usage as Pct of the Defined Pod Limit [Metricbeat Kubernetes]",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "a2c1782e-d0c0-497c-a467-ca73d5ff4181",
+                    "w": 22,
+                    "x": 0,
+                    "y": 36
+                },
+                "panelIndex": "a2c1782e-d0c0-497c-a467-ca73d5ff4181",
+                "panelRefName": "panel_a2c1782e-d0c0-497c-a467-ca73d5ff4181",
+                "title": "Memory Usage as Pct of the Total Node Memory [Metricbeat Kubernetes]",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "965c954b-7629-4165-ad79-4eb8ee665ac5",
+                    "w": 22,
+                    "x": 22,
+                    "y": 36
+                },
+                "panelIndex": "965c954b-7629-4165-ad79-4eb8ee665ac5",
+                "panelRefName": "panel_965c954b-7629-4165-ad79-4eb8ee665ac5",
+                "title": "Memory Usage as Pct of the Defined Pod Limit [Metricbeat Kubernetes]",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "8407f4d5-7d36-4e90-a998-0849e70c0d75",
+                    "w": 22,
+                    "x": 0,
+                    "y": 51
+                },
+                "panelIndex": "8407f4d5-7d36-4e90-a998-0849e70c0d75",
+                "panelRefName": "panel_8407f4d5-7d36-4e90-a998-0849e70c0d75",
+                "title": "Working Set Memory Usage as Pct of the Defined Pod Limit [Metricbeat Kubernetes]",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "1dc3ceef-87e0-4dac-8ac4-870ec20e446d",
+                    "w": 22,
+                    "x": 22,
+                    "y": 51
+                },
+                "panelIndex": "1dc3ceef-87e0-4dac-8ac4-870ec20e446d",
+                "panelRefName": "panel_1dc3ceef-87e0-4dac-8ac4-870ec20e446d",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4dab1bc1-991a-406b-97d7-f5915911ee49",
+                    "w": 22,
+                    "x": 0,
+                    "y": 66
+                },
+                "panelIndex": "4dab1bc1-991a-406b-97d7-f5915911ee49",
+                "panelRefName": "panel_4dab1bc1-991a-406b-97d7-f5915911ee49",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "d3403a43-c217-43d1-9975-85cb571127e8",
+                    "w": 44,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "d3403a43-c217-43d1-9975-85cb571127e8",
+                "panelRefName": "panel_d3403a43-c217-43d1-9975-85cb571127e8",
+                "type": "lens",
+                "version": "8.3.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Kubernetes] Pods",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "kubernetes-3d4d9290-bcb1-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "dashboard": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "kubernetes-0c6fb540-bcb6-11ec-b64f-7dd6e8e82013",
+            "name": "71adfb12-56d3-49e2-90f3-5a3f61971967:panel_71adfb12-56d3-49e2-90f3-5a3f61971967",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-9abe1bb0-bcb7-11ec-b64f-7dd6e8e82013",
+            "name": "2fea1316-8b13-4915-a357-289c17c06c81:panel_2fea1316-8b13-4915-a357-289c17c06c81",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-9e5c9f30-bcb7-11ec-b64f-7dd6e8e82013",
+            "name": "4abf5272-19ef-48ba-a352-5861e04c4453:panel_4abf5272-19ef-48ba-a352-5861e04c4453",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-17849f40-bcb6-11ec-b64f-7dd6e8e82013",
+            "name": "a2c1782e-d0c0-497c-a467-ca73d5ff4181:panel_a2c1782e-d0c0-497c-a467-ca73d5ff4181",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-f8dc7fc0-bcb7-11ec-b64f-7dd6e8e82013",
+            "name": "965c954b-7629-4165-ad79-4eb8ee665ac5:panel_965c954b-7629-4165-ad79-4eb8ee665ac5",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-c048f060-bcb9-11ec-b64f-7dd6e8e82013",
+            "name": "8407f4d5-7d36-4e90-a998-0849e70c0d75:panel_8407f4d5-7d36-4e90-a998-0849e70c0d75",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-9d19db70-bcb6-11ec-b64f-7dd6e8e82013",
+            "name": "1dc3ceef-87e0-4dac-8ac4-870ec20e446d:panel_1dc3ceef-87e0-4dac-8ac4-870ec20e446d",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-a72d33f0-bcb6-11ec-b64f-7dd6e8e82013",
+            "name": "4dab1bc1-991a-406b-97d7-f5915911ee49:panel_4dab1bc1-991a-406b-97d7-f5915911ee49",
+            "type": "visualization"
+        },
+        {
+            "id": "95f0b070-db48-11ec-a23d-5dd6249f86b6",
+            "name": "d3403a43-c217-43d1-9975-85cb571127e8:panel_d3403a43-c217-43d1-9975-85cb571127e8",
+            "type": "lens"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2022-06-28T06:47:02.196Z",
+    "version": "WzU3MzEsM10="
+}

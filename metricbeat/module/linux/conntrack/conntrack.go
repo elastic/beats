@@ -18,13 +18,14 @@
 package conntrack
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+
 	"github.com/prometheus/procfs"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -63,11 +64,11 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	newFS, err := procfs.NewFS(m.mod.ResolveHostFS("/proc"))
 	if err != nil {
-		return errors.Wrapf(err, "error creating new Host FS at %s", m.mod.ResolveHostFS("/proc"))
+		return fmt.Errorf("error creating new Host FS at %s: %w", m.mod.ResolveHostFS("/proc"), err)
 	}
 	conntrackStats, err := newFS.ConntrackStat()
 	if err != nil {
-		return errors.Wrap(err, "error fetching conntrack stats")
+		return fmt.Errorf("error fetching conntrack stats: %w", err)
 	}
 
 	summedEvents := procfs.ConntrackStatEntry{}
@@ -83,8 +84,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	report.Event(mb.Event{
-		MetricSetFields: common.MapStr{
-			"summary": common.MapStr{
+		MetricSetFields: mapstr.M{
+			"summary": mapstr.M{
 				"entries":        summedEvents.Entries,
 				"found":          summedEvents.Found,
 				"invalid":        summedEvents.Invalid,

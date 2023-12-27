@@ -2,29 +2,69 @@
 
 ## Version history
 
-- June 2019, `v1.14.0`
+- December 2022, `v1.25.x`
 
 ## Resources
 
-https://github.com/kubernetes/kubernetes/blob/master/pkg/scheduler/metrics/metrics.go
+- [Process metrics](https://github.com/kubernetes/kubernetes/blob/master/vendor/github.com/prometheus/client_golang/prometheus/process_collector.go)
+- [Scheduler metrics](https://github.com/kubernetes/kubernetes/blob/master/pkg/scheduler/metrics/metrics.go)
+- [Rest client metrics](https://github.com/kubernetes/component-base/blob/master/metrics/prometheus/restclient/metrics.go)
+- [Workqueue metrics](https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/component-base/metrics/prometheus/workqueue/metrics.go)
+- [Metrics general information](https://kubernetes.io/docs/reference/instrumentation/metrics/)
+
 
 ## Metrics insight
 
-- leader_election_master_status
-    - name
-- scheduler_binding_duration_seconds_bucket
-- scheduler_e2e_scheduling_duration_seconds_bucket
-- scheduler_pod_preemption_victims
-- scheduler_schedule_attempts_total
+Metrics used are either stable (not explicit) or alpha (explicit).
+
+- process_cpu_seconds_total
+- process_resident_memory_bytes
+- process_virtual_memory_bytes
+- process_open_fds
+- process_start_time_seconds
+- process_max_fds
+
+
+- rest_client_requests_total (alpha)
+  - code
+  - host
+  - method
+- rest_client_response_size_bytes (alpha)
+  - host
+  - verb
+- rest_client_request_size_bytes (alpha)
+  - host
+  - verb
+- rest_client_request_duration_seconds (alpha)
+  - host
+  - verb
+
+
+- workqueue_longest_running_processor_seconds (alpha)
+  - name
+- workqueue_unfinished_work_seconds (alpha)
+  - name
+- workqueue_adds_total (alpha)
+  - name
+- workqueue_depth (alpha)
+  - name
+- workqueue_retries_total (alpha)
+  - name
+- workqueue_work_duration_seconds (alpha)
+  - name
+
+
+- scheduler_pending_pods
+  - queue
+- scheduler_preemption_victims
+- scheduler_preemption_attempts_total
+- scheduler_scheduling_attempt_duration_seconds
+  - profile
   - result
-- scheduler_scheduling_algorithm_duration_seconds_bucket
-- scheduler_scheduling_algorithm_predicate_evaluation_seconds_bucket
-- scheduler_scheduling_algorithm_preemption_evaluation_seconds_bucket
-- scheduler_scheduling_algorithm_priority_evaluation_seconds_bucket
-- scheduler_scheduling_duration_seconds
-  - operation
-- scheduler_volume_scheduling_duration_seconds_bucket
-  - operation
+
+
+- leader_election_master_status (alpha)
+  - name
 
 ## Setup environment for manual tests
 

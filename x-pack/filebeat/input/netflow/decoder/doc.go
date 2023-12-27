@@ -14,48 +14,48 @@
 // and expiration internally so the caller doesn't need to take care of
 // maintaining sessions nor templates.
 //
-// Status
+// # Status
 //
 // IPFIX
 //
-//  - Working implementation as of rfc7011.
-//  - Options records supported.
-//  - Variable-length fields supported.
-//  - Missing: Support for RFC6313 data-types (basicList, subTemplateList, subTemplateMultiList).
+//   - Working implementation as of rfc7011.
+//   - Options records supported.
+//   - Variable-length fields supported.
+//   - Missing: Support for RFC6313 data-types (basicList, subTemplateList, subTemplateMultiList).
 //
 // NetFlow 9
 //
-//  - Working implementation as of rfc3954.
-//  - Support Options templates.
+//   - Working implementation as of rfc3954.
+//   - Support Options templates.
 //
 // NetFlow 8
 //
-//  - Supports the following aggregation types as defined in
+//   - Supports the following aggregation types as defined in
+//
 // https://www.cisco.com/c/en/us/td/docs/net_mgmt/netflow_collection_engine/3-6/user/guide/format.html#wp1006730 :
 //
-// 	RouterAS
-//	RouterProtoPort
-//	RouterSrcPrefix
-//	RouterDstPrefix
-//	RouterPrefix
-//	DestOnly
-//	SrcDst
-//	FullFlow
-//	TosAS
-//	TosProtoPort
-//	TosSrcPrefix
-//	TosDstPrefix
-//	TosPrefix
-//	PrePortProtocol
+//		RouterAS
+//		RouterProtoPort
+//		RouterSrcPrefix
+//		RouterDstPrefix
+//		RouterPrefix
+//		DestOnly
+//		SrcDst
+//		FullFlow
+//		TosAS
+//		TosProtoPort
+//		TosSrcPrefix
+//		TosDstPrefix
+//		TosPrefix
+//		PrePortProtocol
 //
-//  - Untested: Only validated by comparing to Wireshark decoder.
+//	 - Untested: Only validated by comparing to Wireshark decoder.
 //
 // NetFlow 6 & 7
 //
-//  - Untested: Only validated by comparing to Wireshark decoder.
+//   - Untested: Only validated by comparing to Wireshark decoder.
 //
 // NetFlow 1 & 5
 //
-//  - Tested using softflowd
-//
+//   - Tested using softflowd
 package decoder

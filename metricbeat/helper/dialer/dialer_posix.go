@@ -16,17 +16,15 @@
 // under the License.
 
 //go:build !windows
-// +build !windows
 
 package dialer
 
 import (
+	"errors"
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/elastic-agent-libs/transport"
 )
 
 // UnixDialerBuilder creates a builder to dial over unix domain socket.

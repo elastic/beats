@@ -9,25 +9,24 @@ import (
 	"context"
 	"errors"
 	"io/ioutil"
-	"net/http"
-	"net/url"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.GetObjectResponse) {
+func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.GetObjectOutput) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		t.Fatal(err)
@@ -36,39 +35,21 @@ func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.Get
 	return newS3Event(filename), newS3GetObjectResponse(filename, data, contentType)
 }
 
-func newS3GetObjectResponse(filename string, data []byte, contentType string) *s3.GetObjectResponse {
+func newS3GetObjectResponse(filename string, data []byte, contentType string) *s3.GetObjectOutput {
 	r := bytes.NewReader(data)
-	contentLen := int64(r.Len())
-
-	req := &s3.GetObjectRequest{
-		Request: &awssdk.Request{
-			HTTPRequest: &http.Request{
-				URL: &url.URL{Path: filename},
-			},
-			Retryer: awssdk.NoOpRetryer{},
-			Data: &s3.GetObjectOutput{
-				Body:          ioutil.NopCloser(r),
-				ContentLength: &contentLen,
-			},
-		},
-		Input: &s3.GetObjectInput{
-			Bucket: awssdk.String("dummy_bucket"),
-			Key:    awssdk.String(filename),
-		},
-	}
-
-	resp, _ := req.Send(context.Background())
-
+	getObjectOutput := s3.GetObjectOutput{}
+	getObjectOutput.ContentLength = int64(r.Len())
+	getObjectOutput.Body = ioutil.NopCloser(r)
 	if contentType != "" {
-		resp.ContentType = &contentType
+		getObjectOutput.ContentType = &contentType
 	}
 
 	switch strings.ToLower(filepath.Ext(filename)) {
 	case ".gz":
 		gzipEncoding := "gzip"
-		resp.ContentEncoding = &gzipEncoding
+		getObjectOutput.ContentEncoding = &gzipEncoding
 	}
-	return resp
+	return &getObjectOutput
 }
 
 func TestS3ObjectProcessor(t *testing.T) {
@@ -84,7 +65,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 
 		// Unfortunately the config structs for the parser package are not
 		// exported to use config parsing.
-		cfg := common.MustNewConfigFrom(map[string]interface{}{
+		cfg := conf.MustNewConfigFrom(map[string]interface{}{
 			"parsers": []map[string]interface{}{
 				{
 					"multiline": map[string]interface{}{
@@ -131,6 +112,16 @@ func TestS3ObjectProcessor(t *testing.T) {
 		testProcessS3ObjectError(t, "testdata/events-array.json", "application/json", 0, sel)
 	})
 
+	t.Run("split array with expand_event_list_from_field equals .[]", func(t *testing.T) {
+		sel := fileSelectorConfig{ReaderConfig: readerConfig{ExpandEventListFromField: ".[]"}}
+		testProcessS3Object(t, "testdata/array.json", "application/json", 2, sel)
+	})
+
+	t.Run("split array without expand_event_list_from_field", func(t *testing.T) {
+		sel := fileSelectorConfig{ReaderConfig: readerConfig{ExpandEventListFromField: ""}}
+		testProcessS3Object(t, "testdata/array.json", "application/json", 1, sel)
+	})
+
 	t.Run("events have a unique repeatable _id", func(t *testing.T) {
 		// Hash of bucket ARN, object key, object versionId, and log offset.
 		events := testProcessS3Object(t, "testdata/log.txt", "text/plain", 2)
@@ -162,9 +153,9 @@ func TestS3ObjectProcessor(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil)
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupConfig{}, 1)
 		ack := awscommon.NewEventACKTracker(ctx)
-		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
 		require.Error(t, err)
 		assert.True(t, errors.Is(err, errFakeConnectivityFailure), "expected errFakeConnectivityFailure error")
 	})
@@ -184,9 +175,9 @@ func TestS3ObjectProcessor(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
 			Return(nil, nil)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil)
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupConfig{}, 1)
 		ack := awscommon.NewEventACKTracker(ctx)
-		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
 		require.Error(t, err)
 	})
 
@@ -211,10 +202,101 @@ func TestS3ObjectProcessor(t *testing.T) {
 				Times(2),
 		)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, nil)
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupConfig{}, 1)
 		ack := awscommon.NewEventACKTracker(ctx)
-		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
 		require.NoError(t, err)
+	})
+
+	t.Run("backups objects on finalize call", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockS3API := NewMockS3API(ctrl)
+		mockPublisher := NewMockBeatClient(ctrl)
+		s3Event, _ := newS3Object(t, "testdata/log.txt", "")
+
+		backupCfg := backupConfig{
+			BackupToBucketArn: "arn:aws:s3:::backup",
+		}
+
+		gomock.InOrder(
+			mockS3API.EXPECT().
+				CopyObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq("backup"), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq(s3Event.S3.Object.Key)).
+				Return(nil, nil),
+		)
+
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupCfg, 1)
+		ack := awscommon.NewEventACKTracker(ctx)
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).FinalizeS3Object()
+		require.NoError(t, err)
+	})
+
+	t.Run("deletes objects after backing up", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockS3API := NewMockS3API(ctrl)
+		mockPublisher := NewMockBeatClient(ctrl)
+		s3Event, _ := newS3Object(t, "testdata/log.txt", "")
+
+		backupCfg := backupConfig{
+			BackupToBucketArn: "arn:aws:s3:::backup",
+			Delete:            true,
+		}
+
+		gomock.InOrder(
+			mockS3API.EXPECT().
+				CopyObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq("backup"), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq(s3Event.S3.Object.Key)).
+				Return(nil, nil),
+			mockS3API.EXPECT().
+				DeleteObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key)).
+				Return(nil, nil),
+		)
+
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupCfg, 1)
+		ack := awscommon.NewEventACKTracker(ctx)
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).FinalizeS3Object()
+		require.NoError(t, err)
+	})
+
+	t.Run("prefixes objects when backing up", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockS3API := NewMockS3API(ctrl)
+		mockPublisher := NewMockBeatClient(ctrl)
+		s3Event, _ := newS3Object(t, "testdata/log.txt", "")
+
+		backupCfg := backupConfig{
+			BackupToBucketArn:    s3Event.S3.Bucket.ARN,
+			BackupToBucketPrefix: "backup/",
+		}
+
+		gomock.InOrder(
+			mockS3API.EXPECT().
+				CopyObject(gomock.Any(), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Bucket.Name), gomock.Eq(s3Event.S3.Object.Key), gomock.Eq("backup/testdata/log.txt")).
+				Return(nil, nil),
+		)
+
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupCfg, 1)
+		ack := awscommon.NewEventACKTracker(ctx)
+		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).FinalizeS3Object()
+		require.NoError(t, err)
+	})
+
+	t.Run("text file without end of line marker", func(t *testing.T) {
+		testProcessS3Object(t, "testdata/no-eol.txt", "text/plain", 1)
+	})
+
+	t.Run("text file without end of line marker but with newline", func(t *testing.T) {
+		testProcessS3Object(t, "testdata/no-eol-twolines.txt", "text/plain", 2)
 	})
 }
 
@@ -249,9 +331,9 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 			Times(numEvents),
 	)
 
-	s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, mockPublisher, selectors)
+	s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, selectors, backupConfig{}, 1)
 	ack := awscommon.NewEventACKTracker(ctx)
-	err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), ack, s3Event).ProcessS3Object()
+	err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
 
 	if !expectErr {
 		require.NoError(t, err)
@@ -267,7 +349,7 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 // TestNewMockS3Pager verifies that newMockS3Pager is behaving similar to
 // the AWS S3 Pager.
 func TestNewMockS3Pager(t *testing.T) {
-	fakeObjects := []s3.Object{
+	fakeObjects := []types.Object{
 		{Key: awssdk.String("foo")},
 		{Key: awssdk.String("bar")},
 		{Key: awssdk.String("baz")},
@@ -285,13 +367,15 @@ func TestNewMockS3Pager(t *testing.T) {
 	// Test the mock.
 	var keys []string
 	pager := mockS3API.ListObjectsPaginator("nombre", "")
-	for pager.Next(ctx) {
-		for _, s3Obj := range pager.CurrentPage().Contents {
+	for pager.HasMorePages() {
+		listObjectsV2Output, err := pager.NextPage(ctx)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		for _, s3Obj := range listObjectsV2Output.Contents {
 			keys = append(keys, *s3Obj.Key)
 		}
-	}
-	if err := pager.Err(); err != nil {
-		t.Fatal(err)
 	}
 
 	assert.Equal(t, []string{"foo", "bar", "baz"}, keys)
@@ -299,7 +383,7 @@ func TestNewMockS3Pager(t *testing.T) {
 
 // newMockS3Pager returns a s3Pager that paginates the given s3Objects based on
 // the specified page size. It never returns an error.
-func newMockS3Pager(ctrl *gomock.Controller, pageSize int, s3Objects []s3.Object) *MockS3Pager {
+func newMockS3Pager(ctrl *gomock.Controller, pageSize int, s3Objects []types.Object) *MockS3Pager {
 	mockS3Pager := NewMockS3Pager(ctrl)
 
 	currentPage := -1
@@ -308,22 +392,21 @@ func newMockS3Pager(ctrl *gomock.Controller, pageSize int, s3Objects []s3.Object
 		numPages++
 	}
 
-	mockS3Pager.EXPECT().Next(gomock.Any()).Times(numPages + 1).DoAndReturn(func(_ context.Context) interface{} {
+	mockS3Pager.EXPECT().HasMorePages().Times(numPages + 1).DoAndReturn(func() bool {
 		currentPage++
 		next := currentPage*pageSize < len(s3Objects)
 		return next
 	})
-	mockS3Pager.EXPECT().CurrentPage().AnyTimes().DoAndReturn(func() *s3.ListObjectsOutput {
+	mockS3Pager.EXPECT().NextPage(gomock.Any()).AnyTimes().DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
 		startIdx := currentPage * pageSize
 		endIdx := currentPage + 1*pageSize
 		if endIdx > len(s3Objects) {
 			endIdx = len(s3Objects)
 		}
-		return &s3.ListObjectsOutput{
+		return &s3.ListObjectsV2Output{
 			Contents: s3Objects[startIdx:endIdx],
-		}
+		}, nil
 	})
-	mockS3Pager.EXPECT().Err().Return(nil)
 
 	return mockS3Pager
 }

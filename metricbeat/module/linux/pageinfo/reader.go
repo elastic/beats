@@ -19,11 +19,10 @@ package pageinfo
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"regexp"
 	"strconv"
-
-	"github.com/pkg/errors"
 )
 
 // zones represents raw pagetypeinfo data
@@ -83,7 +82,7 @@ func readPageFile(reader *bufio.Reader) (pageInfo, error) {
 		match := matches[0]
 		nodeLevel, err = strconv.ParseInt(string(match[1]), 10, 64)
 		if err != nil {
-			return pageInfo{}, errors.Wrapf(err, "error parsing node number: %s", string(match[1]))
+			return pageInfo{}, fmt.Errorf("error parsing node number: %s: %w", string(match[1]), err)
 		}
 		if nodes[nodeLevel].DMA == nil {
 			nodes[nodeLevel] = zones{
@@ -100,7 +99,7 @@ func readPageFile(reader *bufio.Reader) (pageInfo, error) {
 		for order, count := range match[4:] {
 			zoneOrders[order], err = strconv.ParseInt(string(count), 10, 64)
 			if err != nil {
-				return pageInfo{}, errors.Wrapf(err, "error parsing zone: %s", string(count))
+				return pageInfo{}, fmt.Errorf("error parsing zone: %s: %w", string(count), err)
 			}
 			nodes[nodeLevel].OrderSummary[order] += zoneOrders[order]
 			if zoneType == "DMA" {

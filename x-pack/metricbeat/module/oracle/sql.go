@@ -8,12 +8,12 @@ import (
 	"database/sql"
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // SetSqlValueWithParentKey avoid setting an invalid empty value value on Metricbeat event
-func SetSqlValueWithParentKey(logger *logp.Logger, output map[string]common.MapStr, parentTargetFieldName, targetFieldName string, v SqlValue) {
+func SetSqlValueWithParentKey(logger *logp.Logger, output map[string]mapstr.M, parentTargetFieldName, targetFieldName string, v SqlValue) {
 	ms, ok := output[parentTargetFieldName]
 	if !ok {
 		logger.Debug(errors.New("no parent key found"))
@@ -23,8 +23,8 @@ func SetSqlValueWithParentKey(logger *logp.Logger, output map[string]common.MapS
 	SetSqlValue(logger, ms, targetFieldName, v)
 }
 
-//SetSqlValue avoid setting an invalid empty value value on Metricbeat event
-func SetSqlValue(logger *logp.Logger, output common.MapStr, targetFieldName string, v SqlValue) {
+// SetSqlValue avoid setting an invalid empty value value on Metricbeat event
+func SetSqlValue(logger *logp.Logger, output mapstr.M, targetFieldName string, v SqlValue) {
 	if v.isValid() {
 		if _, err := output.Put(targetFieldName, v.Value()); err != nil {
 			logger.Debug(errors.New("error trying to set value on common.Mapstr"))

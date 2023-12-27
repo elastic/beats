@@ -25,9 +25,11 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/dashboards"
-	"github.com/elastic/beats/v7/libbeat/kibana"
+	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/elastic-agent-libs/kibana"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 var (
@@ -41,6 +43,7 @@ const (
 
 func main() {
 	kibanaURL := flag.String("kibana", "http://localhost:5601", "Kibana URL")
+	insecure := flag.Bool("insecure", false, "Disable TLS verification.")
 	spaceID := flag.String("space-id", "", "Space ID")
 	dashboard := flag.String("dashboard", "", "Dashboard ID")
 	fileOutput := flag.String("output", "", "Output NDJSON file, when exporting dashboards for Beats, please use -folder instead")
@@ -62,14 +65,17 @@ func main() {
 	}
 
 	var user, pass string
+	user = "beats"
+	pass = "testing"
 	if u.User != nil {
 		user = u.User.Username()
 		pass, _ = u.User.Password()
 	}
-	user = "beats"
-	pass = "testing"
 	transport := httpcommon.DefaultHTTPTransportSettings()
 	transport.Timeout = kibanaTimeout
+	if *insecure {
+		transport.TLS = &tlscommon.Config{VerificationMode: tlscommon.VerifyNone}
+	}
 
 	client, err := kibana.NewClientWithConfig(&kibana.ClientConfig{
 		Protocol:  u.Scheme,
@@ -79,7 +85,7 @@ func main() {
 		Path:      u.Path,
 		SpaceID:   *spaceID,
 		Transport: transport,
-	}, "Beat Development Tools")
+	}, "Beat Development Tools", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 	if err != nil {
 		log.Fatalf("Error while connecting to Kibana: %v", err)
 	}
@@ -132,8 +138,8 @@ func exportDashboardsFromYML(client *kibana.Client, ymlFile string) error {
 func exportSingleDashboard(client *kibana.Client, dashboard, folder string) error {
 	result, err := dashboards.Export(client, dashboard)
 	if err != nil {
-		return fmt.Errorf("failed to export the dashboard: %+v", err)
+		return fmt.Errorf("failed to export the dashboard: %w", err)
 	}
-
+	result = dashboards.DecodeExported(result)
 	return dashboards.SaveToFolder(result, folder, client.GetVersion())
 }

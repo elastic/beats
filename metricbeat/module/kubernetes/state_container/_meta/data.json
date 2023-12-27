@@ -1,74 +1,51 @@
 {
-  "@timestamp": "2019-10-02T16:47:01.499Z",
-  "metricset": {
-    "name": "state_container",
-    "period": 10000
-  },
-  "service": {
-    "address": "kube-state-metrics.kube-system:8080",
-    "type": "kubernetes"
-  },
-  "kubernetes": {
-    "labels": {
-      "app": "playground"
-    },
+    "@timestamp": "2019-03-01T08:05:34.853Z",
     "container": {
-      "name": "ubuntu",
-      "cpu": {
-        "request": {
-            "cores": 0.15
+        "id": "eb97eb439a6c71ec0d24241d23c87b019776e770d09a3026a518b6910275ed5d",
+        "image": {
+            "name": "registry.k8s.io/etcd:3.5.7-0"
+        },
+        "runtime": "containerd"
+    },
+    "event": {
+        "dataset": "kubernetes.container",
+        "duration": 115000,
+        "module": "kubernetes"
+    },
+    "kubernetes": {
+        "container": {
+            "cpu": {
+                "request": {
+                    "cores": 0.1
+                }
+            },
+            "id": "eb97eb439a6c71ec0d24241d23c87b019776e770d09a3026a518b6910275ed5d",
+            "memory": {
+                "request": {
+                    "bytes": 104857600
+                }
+            },
+            "name": "etcd",
+            "status": {
+                "phase": "running",
+                "ready": true,
+                "restarts": 0
+            }
+        },
+        "namespace": "kube-system",
+        "node": {
+            "name": "kind-control-plane"
+        },
+        "pod": {
+            "name": "etcd-kind-control-plane"
         }
-      },
-      "id": "docker://5f8ce416d10ab0b28ce5c7d521de2264aa03ff4d001e1194076f6a02a330139f",
-      "status": {
-        "ready": true,
-        "restarts": 0,
-        "phase": "running"
-      }
     },
-    "pod": {
-      "name": "playground",
-      "uid": "d52bd3cb-df62-4cb5-b293-7009055bcaff"
+    "metricset": {
+        "name": "state_container",
+        "period": 10000
     },
-    "namespace": "default",
-    "node": {
-      "name": "minikube"
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "kubernetes"
     }
-  },
-  "host": {
-    "os": {
-      "codename": "bionic",
-      "platform": "ubuntu",
-      "version": "18.04.3 LTS (Bionic Beaver)",
-      "family": "debian",
-      "name": "Ubuntu",
-      "kernel": "4.15.0"
-    },
-    "containerized": false,
-    "hostname": "minikube",
-    "name": "minikube",
-    "architecture": "x86_64"
-  },
-  "agent": {
-    "version": "8.0.0",
-    "type": "metricbeat",
-    "ephemeral_id": "fed15ef3-ab8f-4e11-aded-115ff923bc1e",
-    "hostname": "minikube",
-    "id": "0df400e0-a5fc-40cc-a0c6-b99029a30cd5"
-  },
-  "ecs": {
-    "version": "1.1.0"
-  },
-  "container": {
-    "runtime": "docker",
-    "id": "5f8ce416d10ab0b28ce5c7d521de2264aa03ff4d001e1194076f6a02a330139f",
-    "image": {
-      "name": "ubuntu:latest"
-    },
-  },
-  "event": {
-    "dataset": "kubernetes.container",
-    "module": "kubernetes",
-    "duration": 33750820
-  }
 }

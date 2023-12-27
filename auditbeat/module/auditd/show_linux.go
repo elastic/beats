@@ -19,6 +19,7 @@ package auditd
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -41,8 +42,8 @@ func init() {
 		Short:   "Show currently installed auditd rules",
 		Aliases: []string{"audit-rules", "audit_rules", "rules", "auditdrules", "auditrules"},
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := showAuditdRules(); err != nil {
-				fmt.Fprintf(os.Stderr, "Failed to show auditd rules: %v\n", err)
+			if err := showAuditdRules(cmd.OutOrStdout(), cmd.ErrOrStderr()); err != nil {
+				fmt.Fprintf(cmd.ErrOrStderr(), "Failed to show auditd rules: %v\n", err)
 				os.Exit(1)
 			}
 		},
@@ -55,8 +56,8 @@ func init() {
 		Short:   "Show kernel auditd status",
 		Aliases: []string{"audit-status", "audit_status", "status", "auditdstatus", "auditrules"},
 		Run: func(cmd *cobra.Command, args []string) {
-			if err := showAuditdStatus(); err != nil {
-				fmt.Fprintf(os.Stderr, "Failed to show auditd rules: %v\n", err)
+			if err := showAuditdStatus(cmd.OutOrStdout()); err != nil {
+				fmt.Fprintf(cmd.ErrOrStderr(), "Failed to show auditd rules: %v\n", err)
 				os.Exit(1)
 			}
 		},
@@ -65,7 +66,7 @@ func init() {
 	cmd.ShowCmd.AddCommand(&showRules, &showStatus)
 }
 
-func showAuditdRules() error {
+func showAuditdRules(stdout, stderr io.Writer) error {
 	client, err := libaudit.NewAuditClient(nil)
 	if err != nil {
 		return fmt.Errorf("failed to create audit client: %w", err)
@@ -80,19 +81,19 @@ func showAuditdRules() error {
 	for idx, raw := range rules {
 		r, err := rule.ToCommandLine(raw, !dontResolveIDs)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error decoding rule %d: %v\n", idx, err)
-			fmt.Fprintf(os.Stderr, "Raw dump: <<<%v>>>\n", raw)
+			fmt.Fprintf(stderr, "Error decoding rule %d: %v\n", idx, err)
+			fmt.Fprintf(stderr, "Raw dump: <<<%v>>>\n", raw)
 		}
-		fmt.Println(r)
+		fmt.Fprintln(stdout, r)
 	}
 
 	if !noOutputIfEmpty && len(rules) == 0 {
-		fmt.Println("No rules")
+		fmt.Fprintln(stdout, "No rules")
 	}
 	return nil
 }
 
-func showAuditdStatus() error {
+func showAuditdStatus(out io.Writer) error {
 	client, err := libaudit.NewAuditClient(nil)
 	if err != nil {
 		return fmt.Errorf("failed to create audit client: %w", err)
@@ -115,7 +116,7 @@ func showAuditdStatus() error {
 		separator = ' '
 	}
 
-	fmt.Printf("enabled %d%c"+
+	fmt.Fprintf(out, "enabled %d%c"+
 		"failure %d%c"+
 		"pid %d%c"+
 		"rate_limit %d%c"+
@@ -123,6 +124,7 @@ func showAuditdStatus() error {
 		"lost %d%c"+
 		"backlog %d%c"+
 		"backlog_wait_time %d%c"+
+		"backlog_wait_time_actual %d%c"+
 		"features %s\n",
 		status.Enabled, separator,
 		status.Failure, separator,
@@ -132,6 +134,7 @@ func showAuditdStatus() error {
 		status.Lost, separator,
 		status.Backlog, separator,
 		status.BacklogWaitTime, separator,
+		status.BacklogWaitTimeActual, separator,
 		fmt.Sprintf("%#x", status.FeatureBitmap))
 
 	return nil

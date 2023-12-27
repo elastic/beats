@@ -18,12 +18,12 @@
 package health
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry.
@@ -66,13 +66,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	data, err := m.http.FetchJSON()
 	if err != nil {
-		return errors.Wrap(err, "failed to sample health")
+		return fmt.Errorf("failed to sample health: %w", err)
 	}
 
 	metricSetFields, _ := eventMapping(data)
 	event := mb.Event{
 		MetricSetFields: metricSetFields,
-		RootFields:      common.MapStr{},
+		RootFields:      mapstr.M{},
 	}
 	event.RootFields.Put("service.name", "traefik")
 

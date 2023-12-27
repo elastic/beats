@@ -4,10 +4,10 @@
 
 package containerd
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/elastic/elastic-agent-libs/mapstr"
 
 // GetAndDeleteCid deletes and returns container id from an event
-func GetAndDeleteCid(event common.MapStr) (cID string) {
+func GetAndDeleteCid(event mapstr.M) (cID string) {
 	if containerID, ok := event["id"]; ok {
 		cID = (containerID).(string)
 		event.Delete("id")
@@ -16,7 +16,7 @@ func GetAndDeleteCid(event common.MapStr) (cID string) {
 }
 
 // GetAndDeleteNamespace deletes and returns namespace from an event
-func GetAndDeleteNamespace(event common.MapStr) (namespace string) {
+func GetAndDeleteNamespace(event mapstr.M) (namespace string) {
 	if ns, ok := event["namespace"]; ok {
 		namespace = (ns).(string)
 		event.Delete("namespace")

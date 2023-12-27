@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"go/build"
 	"log"
@@ -27,7 +28,6 @@ import (
 
 	"github.com/josephspurrier/goversioninfo"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 )
 
 // BuildArgs are the arguments used for the "build" target and they define how
@@ -37,6 +37,7 @@ type BuildArgs struct {
 	InputFiles  []string
 	OutputDir   string
 	CGO         bool
+	BuildMode   string // Controls `go build -buildmode`
 	Static      bool
 	Env         map[string]string
 	LDFlags     []string
@@ -61,12 +62,12 @@ func DefaultBuildArgs() BuildArgs {
 	}
 
 	if positionIndependentCodeSupported() {
-		args.ExtraFlags = append(args.ExtraFlags, "-buildmode", "pie")
+		args.BuildMode = "pie"
 	}
 
 	if DevBuild {
 		// Disable optimizations (-N) and inlining (-l) for debugging.
-		args.ExtraFlags = append(args.ExtraFlags, `-gcflags`, `"all=-N -l"`)
+		args.ExtraFlags = append(args.ExtraFlags, `-gcflags=all=-N -l`)
 	} else {
 		// Strip all debug symbols from binary (does not affect Go stack traces).
 		args.LDFlags = append(args.LDFlags, "-s")
@@ -129,6 +130,27 @@ func GolangCrossBuild(params BuildArgs) error {
 
 	defer DockerChown(filepath.Join(params.OutputDir, params.Name+binaryExtension(GOOS)))
 	defer DockerChown(filepath.Join(params.OutputDir))
+
+	mountPoint, err := ElasticBeatsDir()
+	if err != nil {
+		return err
+	}
+	if err := sh.Run("git", "config", "--global", "--add", "safe.directory", mountPoint); err != nil {
+		return err
+	}
+
+	// Support projects outside of the beats directory.
+	repoInfo, err := GetProjectRepoInfo()
+	if err != nil {
+		return err
+	}
+
+	// TODO: Support custom build dir/subdir
+	projectMountPoint := filepath.ToSlash(filepath.Join("/go", "src", repoInfo.CanonicalRootImportPath))
+	if err := sh.Run("git", "config", "--global", "--add", "safe.directory", projectMountPoint); err != nil {
+		return err
+	}
+
 	return Build(params)
 }
 
@@ -161,6 +183,9 @@ func Build(params BuildArgs) error {
 		"-o",
 		filepath.Join(params.OutputDir, binaryName),
 	}
+	if params.BuildMode != "" {
+		args = append(args, "-buildmode", params.BuildMode)
+	}
 	args = append(args, params.ExtraFlags...)
 
 	// ldflags
@@ -184,7 +209,7 @@ func Build(params BuildArgs) error {
 		log.Println("Generating a .syso containing Windows file metadata.")
 		syso, err := MakeWindowsSysoFile()
 		if err != nil {
-			return errors.Wrap(err, "failed generating Windows .syso metadata file")
+			return fmt.Errorf("failed generating Windows .syso metadata file: %w", err)
 		}
 		defer os.Remove(syso)
 	}
@@ -237,7 +262,7 @@ func MakeWindowsSysoFile() (string, error) {
 	vi.Walk()
 	sysoFile := BeatName + "_windows_" + GOARCH + ".syso"
 	if err = vi.WriteSyso(sysoFile, GOARCH); err != nil {
-		return "", errors.Wrap(err, "failed to generate syso file with Windows metadata")
+		return "", fmt.Errorf("failed to generate syso file with Windows metadata: %w", err)
 	}
 	return sysoFile, nil
 }

@@ -10,10 +10,10 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/action"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/ecs"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
@@ -22,11 +22,11 @@ var (
 )
 
 type publisher interface {
-	Publish(index, actionID, responseID string, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
+	Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
 }
 
 type queryExecutor interface {
-	Query(ctx context.Context, sql string) ([]map[string]interface{}, error)
+	Query(ctx context.Context, sql string, timeout time.Duration) ([]map[string]interface{}, error)
 }
 
 type namespaceProvider interface {
@@ -68,7 +68,7 @@ func (a *actionHandler) Execute(ctx context.Context, req map[string]interface{})
 func (a *actionHandler) execute(ctx context.Context, req map[string]interface{}) (int, error) {
 	ac, err := action.FromMap(req)
 	if err != nil {
-		return 0, fmt.Errorf("%v: %w", err, ErrQueryExecution)
+		return 0, fmt.Errorf("%w: %w", err, ErrQueryExecution)
 	}
 
 	var namespace string
@@ -95,7 +95,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	start := time.Now()
 
-	hits, err := a.queryExec.Query(ctx, ac.Query)
+	hits, err := a.queryExec.Query(ctx, ac.Query, ac.Timeout)
 
 	if err != nil {
 		a.log.Errorf("Failed to execute query, err: %v", err)
@@ -104,7 +104,7 @@ func (a *actionHandler) executeQuery(ctx context.Context, index string, ac actio
 
 	a.log.Debugf("Completed query in: %v", time.Since(start))
 
-	a.publisher.Publish(index, ac.ID, responseID, hits, ac.ECSMapping, req["data"])
+	a.publisher.Publish(index, ac.ID, responseID, nil, hits, ac.ECSMapping, req["data"])
 
 	return len(hits), nil
 }

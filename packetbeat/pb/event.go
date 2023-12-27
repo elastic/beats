@@ -24,13 +24,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
 	"github.com/elastic/beats/v7/libbeat/conditions"
 	"github.com/elastic/beats/v7/libbeat/ecs"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // FieldsKey is the key under which a *pb.Fields value may be stored in a
@@ -95,7 +94,7 @@ func NewBeatEvent(timestamp time.Time) (beat.Event, *Fields) {
 	pbf := NewFields()
 	return beat.Event{
 		Timestamp: timestamp,
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			FieldsKey: pbf,
 		},
 	}, pbf
@@ -103,7 +102,7 @@ func NewBeatEvent(timestamp time.Time) (beat.Event, *Fields) {
 
 // GetFields returns a pointer to a Fields object if one is stored within the
 // given MapStr. It returns nil and no error if no Fields value is present.
-func GetFields(m common.MapStr) (*Fields, error) {
+func GetFields(m mapstr.M) (*Fields, error) {
 	v, found := m[FieldsKey]
 	if !found {
 		return nil, nil
@@ -111,7 +110,7 @@ func GetFields(m common.MapStr) (*Fields, error) {
 
 	fields, ok := v.(*Fields)
 	if !ok {
-		return nil, errors.Errorf("%v must be a *types.Fields, but is %T", FieldsKey, fields)
+		return nil, fmt.Errorf("%v must be a *types.Fields, but is %T", FieldsKey, fields)
 	}
 	return fields, nil
 }
@@ -365,7 +364,7 @@ func perimeterBasedDirection(source, destination net.IP, internalNetworks []stri
 // MarshalMapStr marshals the fields into MapStr. It returns an error if there
 // is a problem writing the keys to the given map (like if an intermediate key
 // exists and is not a map).
-func (f *Fields) MarshalMapStr(m common.MapStr) error {
+func (f *Fields) MarshalMapStr(m mapstr.M) error {
 	typ := reflect.TypeOf(*f)
 	val := reflect.ValueOf(*f)
 
@@ -397,11 +396,11 @@ func (f *Fields) MarshalMapStr(m common.MapStr) error {
 
 // MarshalStruct marshals any struct containing ecs or packetbeat tags into the
 // given MapStr. Zero-value and nil fields are always omitted.
-func MarshalStruct(m common.MapStr, key string, val interface{}) error {
+func MarshalStruct(m mapstr.M, key string, val interface{}) error {
 	return marshalStruct(m, key, reflect.ValueOf(val))
 }
 
-func marshalStruct(m common.MapStr, key string, val reflect.Value) error {
+func marshalStruct(m mapstr.M, key string, val reflect.Value) error {
 	// Dereference pointers.
 	if val.Type().Kind() == reflect.Ptr {
 		if val.IsNil() {

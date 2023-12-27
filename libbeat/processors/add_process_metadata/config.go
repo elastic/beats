@@ -19,12 +19,15 @@ package add_process_metadata
 
 import (
 	"fmt"
+	"regexp"
+	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+// defaultCgroupRegex captures 64-character lowercase hexadecimal container IDs found in cgroup paths.
+var defaultCgroupRegex = regexp.MustCompile(`[-/]([0-9a-f]{64})(\.scope)?$`)
 
 type config struct {
 	// IgnoreMissing: Ignore errors if event has no PID field.
@@ -51,40 +54,47 @@ type config struct {
 	// CgroupPrefix is the prefix where the container id is inside cgroup
 	CgroupPrefixes []string `config:"cgroup_prefixes"`
 
-	// CgroupRegex is the regular expression that captures the container id from cgroup path
-	CgroupRegex string `config:"cgroup_regex"`
+	// CgroupRegex is the regular expression that captures the container ID from a cgroup path.
+	CgroupRegex *regexp.Regexp `config:"cgroup_regex"`
 
 	// CgroupCacheExpireTime is the length of time before cgroup cache elements expire in seconds,
 	// set to 0 to disable the cgroup cache
 	CgroupCacheExpireTime time.Duration `config:"cgroup_cache_expire_time"`
 }
 
+func (c *config) Validate() error {
+	if c.CgroupRegex != nil && c.CgroupRegex.NumSubexp() != 1 {
+		return fmt.Errorf("cgroup_regexp must contain exactly one capturing group for the container ID")
+	}
+	return nil
+}
+
 // available fields by default
-var defaultFields = common.MapStr{
-	"process": common.MapStr{
+var defaultFields = mapstr.M{
+	"process": mapstr.M{
 		"name":       nil,
 		"title":      nil,
 		"executable": nil,
 		"args":       nil,
 		"pid":        nil,
-		"parent": common.MapStr{
+		"parent": mapstr.M{
 			"pid": nil,
 		},
 		"start_time": nil,
-		"owner": common.MapStr{
+		"owner": mapstr.M{
 			"name": nil,
 			"id":   nil,
 		},
 	},
-	"container": common.MapStr{
+	"container": mapstr.M{
 		"id": nil,
 	},
 }
 
 // fields declared in here will only appear when requested explicitly
 // with `restricted_fields: true`.
-var restrictedFields = common.MapStr{
-	"process": common.MapStr{
+var restrictedFields = mapstr.M{
+	"process": mapstr.M{
 		"env": nil,
 	},
 }
@@ -100,43 +110,42 @@ func defaultConfig() config {
 		RestrictedFields:      false,
 		MatchPIDs:             []string{"process.pid", "process.parent.pid"},
 		HostPath:              "/",
-		CgroupPrefixes:        []string{"/kubepods", "/docker"},
 		CgroupCacheExpireTime: cacheExpiration,
 	}
 }
 
-func (pf *config) getMappings() (mappings common.MapStr, err error) {
-	mappings = common.MapStr{}
+func (c *config) getMappings() (mappings mapstr.M, err error) {
+	mappings = mapstr.M{}
 	validFields := defaultFields
-	if pf.RestrictedFields {
+	if c.RestrictedFields {
 		validFields = restrictedFields
 	}
-	fieldPrefix := pf.Target
+	fieldPrefix := c.Target
 	if len(fieldPrefix) > 0 {
 		fieldPrefix += "."
 	}
-	wantedFields := pf.Fields
+	wantedFields := c.Fields
 	if len(wantedFields) == 0 {
 		wantedFields = []string{"process", "container"}
 	}
 	for _, docSrc := range wantedFields {
-		dstField := fieldPrefix + docSrc
+		dstField := constructPath(fieldPrefix, docSrc)
 		reqField, err := validFields.GetValue(docSrc)
 		if err != nil {
 			return nil, fmt.Errorf("field '%v' not found", docSrc)
 		}
 		if reqField != nil {
-			for subField := range reqField.(common.MapStr) {
+			for subField := range reqField.(mapstr.M) {
 				key := dstField + "." + subField
 				val := docSrc + "." + subField
 				if _, err = mappings.Put(key, val); err != nil {
-					return nil, errors.Wrapf(err, "failed to set mapping '%v' -> '%v'", dstField, docSrc)
+					return nil, fmt.Errorf("failed to set mapping '%v' -> '%v': %w", dstField, docSrc, err)
 				}
 			}
 		} else {
 			prev, err := mappings.Put(dstField, docSrc)
 			if err != nil {
-				return nil, errors.Wrapf(err, "failed to set mapping '%v' -> '%v'", dstField, docSrc)
+				return nil, fmt.Errorf("failed to set mapping '%v' -> '%v': %w", dstField, docSrc, err)
 			}
 			if prev != nil {
 				return nil, fmt.Errorf("field '%v' repeated", docSrc)
@@ -144,4 +153,14 @@ func (pf *config) getMappings() (mappings common.MapStr, err error) {
 		}
 	}
 	return mappings.Flatten(), nil
+}
+
+// constructPath returns a full JSON path given the prefix and target taking
+// care to ensure that parent process attributes are placed directly within the
+// parent object.
+func constructPath(prefix, target string) string {
+	if prefix == "parent." || strings.HasSuffix(prefix, ".parent.") {
+		return prefix + strings.TrimPrefix(target, "process.")
+	}
+	return prefix + target
 }

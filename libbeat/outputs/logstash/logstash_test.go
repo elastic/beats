@@ -31,6 +31,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/transport/transptest"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outest"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	v2 "github.com/elastic/go-lumber/server/v2"
 )
 
@@ -148,7 +150,7 @@ func testConnectionType(
 }
 
 func testEvent() beat.Event {
-	return beat.Event{Fields: common.MapStr{
+	return beat.Event{Fields: mapstr.M{
 		"@timestamp": common.Time(time.Now()),
 		"type":       "log",
 		"extra":      10,
@@ -178,7 +180,7 @@ func newTestLumberjackOutput(
 		}
 	}
 
-	cfg, _ := common.NewConfigFrom(config)
+	cfg, _ := conf.NewConfigFrom(config)
 	grp, err := outputs.Load(nil, beat.Info{}, nil, "logstash", cfg)
 	if err != nil {
 		t.Fatalf("init logstash output plugin failed: %v", err)

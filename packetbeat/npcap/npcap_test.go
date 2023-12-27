@@ -19,13 +19,12 @@ package npcap
 
 import (
 	"context"
-	"os"
 	"os/exec"
 	"path/filepath"
 	"runtime"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestNpcap(t *testing.T) {
@@ -36,12 +35,7 @@ func TestNpcap(t *testing.T) {
 	obs := logp.ObserverLogs()
 
 	// Working space.
-	dir, err := os.MkdirTemp("", "packetbeat-npcap-*")
-	if err != nil {
-		t.Fatalf("failed to create working directory: %v", err)
-	}
-	defer os.RemoveAll(dir)
-	path := filepath.Join(dir, "installer")
+	path := filepath.Join(t.TempDir(), "installer")
 	if runtime.GOOS == "windows" {
 		path += ".exe"
 	}

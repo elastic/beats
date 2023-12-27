@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package cloudfoundry
 
@@ -12,10 +11,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	cfcommon "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestDispatcher(t *testing.T) {
@@ -24,7 +23,7 @@ func TestDispatcher(t *testing.T) {
 
 	assertEventType := func(t *testing.T, expected string, e mb.Event) {
 		t.Helper()
-		cf := e.RootFields["cloudfoundry"].(common.MapStr)
+		cf := e.RootFields["cloudfoundry"].(mapstr.M)
 		assert.Equal(t, expected, cf["type"])
 	}
 

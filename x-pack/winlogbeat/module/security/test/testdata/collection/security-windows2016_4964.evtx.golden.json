@@ -1,0 +1,104 @@
+[
+  {
+    "@timestamp": "2020-03-21T23:50:34.347458Z",
+    "event": {
+      "action": "Special Logon",
+      "code": "4964",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "WIN-41OB2LO92CR.wlbeat.local"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "Special groups have been assigned to a new logon.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t{00000000-0000-0000-0000-000000000000}\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x1D22ED\n\tLogon GUID:\t{c25cdf73-2322-651f-f4fb-db862c0e03a8}\n\tSpecial Groups Assigned:\t\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-519}",
+    "winlog": {
+      "activity_id": "{af6b9825-ffd8-0000-2f9a-6bafd8ffd501}",
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
+      "event_data": {
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "SidList": "\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-519}",
+        "SubjectDomainName": "WLBEAT",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "WIN-41OB2LO92CR$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "WLBEAT",
+        "TargetLogonGuid": "{c25cdf73-2322-651f-f4fb-db862c0e03a8}",
+        "TargetLogonId": "0x1d22ed",
+        "TargetUserName": "Administrator",
+        "TargetUserSid": "S-1-5-21-101361758-2486510592-3018839910-500"
+      },
+      "event_id": "4964",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 788,
+        "thread": {
+          "id": 828
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 68259,
+      "task": "Special Logon"
+    }
+  },
+  {
+    "@timestamp": "2020-03-24T16:36:59.5703294Z",
+    "event": {
+      "action": "Special Logon",
+      "code": "4964",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "WIN-41OB2LO92CR.wlbeat.local"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "Special groups have been assigned to a new logon.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tWIN-41OB2LO92CR$\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x3E7\n\tLogon GUID:\t{00000000-0000-0000-0000-000000000000}\n\nNew Logon:\n\tSecurity ID:\t\tS-1-5-21-101361758-2486510592-3018839910-500\n\tAccount Name:\t\tAdministrator\n\tAccount Domain:\t\tWLBEAT\n\tLogon ID:\t\t0x7C0BE\n\tLogon GUID:\t{38fec9bc-577f-76f6-5d29-e0175ce19797}\n\tSpecial Groups Assigned:\t\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-512}\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-519}\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-1007}",
+    "winlog": {
+      "activity_id": "{a22b4bf4-ffdc-0000-ee4d-2ba2dcffd501}",
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "WIN-41OB2LO92CR.wlbeat.local",
+      "event_data": {
+        "LogonGuid": "{00000000-0000-0000-0000-000000000000}",
+        "SidList": "\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-512}\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-519}\n\t\t%{S-1-5-21-101361758-2486510592-3018839910-1007}",
+        "SubjectDomainName": "WLBEAT",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "WIN-41OB2LO92CR$",
+        "SubjectUserSid": "S-1-5-18",
+        "TargetDomainName": "WLBEAT",
+        "TargetLogonGuid": "{38fec9bc-577f-76f6-5d29-e0175ce19797}",
+        "TargetLogonId": "0x7c0be",
+        "TargetUserName": "Administrator",
+        "TargetUserSid": "S-1-5-21-101361758-2486510592-3018839910-500"
+      },
+      "event_id": "4964",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 784,
+        "thread": {
+          "id": 2608
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 68620,
+      "task": "Special Logon"
+    }
+  }
+]

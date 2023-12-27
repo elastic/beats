@@ -1,3 +1,4 @@
 type: http
 url: "/metrics"
 suffix: plain
+omit_documented_fields_check: ["kubernetes.controllermanager.client.request.duration.sec.bucket.*", "kubernetes.controllermanager.workqueue.work.duration.sec.bucket.*"]

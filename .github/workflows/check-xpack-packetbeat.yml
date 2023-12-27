@@ -1,0 +1,29 @@
+name: check-x-pack-packetbeat
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/check-xpack-packetbeat.yml'
+      - 'x-pack/packetbeat/**'
+      - 'packetbeat/**'
+
+env:
+  BEAT_MODULE: 'x-pack/packetbeat'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version-file: .go-version
+    - name: Update package lists
+      run: sudo apt-get update
+    - name: Install libpcap-dev
+      run: sudo apt-get install -y libpcap-dev
+    - name: Run check/update
+      uses: magefile/mage-action@v2
+      with:
+        args: check update
+        workdir: "${{ env.BEAT_MODULE }}"

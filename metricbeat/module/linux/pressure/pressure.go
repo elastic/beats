@@ -21,13 +21,12 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/pkg/errors"
 	"github.com/prometheus/procfs"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 const (
@@ -75,7 +74,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	events, err := fetchLinuxPSIStats(m)
 	if err != nil {
-		return errors.Wrap(err, "error fetching PSI stats")
+		return fmt.Errorf("error fetching PSI stats: %w", err)
 	}
 
 	for _, event := range events {
@@ -86,35 +85,35 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	return nil
 }
 
-func fetchLinuxPSIStats(m *MetricSet) ([]common.MapStr, error) {
+func fetchLinuxPSIStats(m *MetricSet) ([]mapstr.M, error) {
 	resources := []string{"cpu", "memory", "io"}
-	events := []common.MapStr{}
+	events := []mapstr.M{}
 
 	procfs, err := procfs.NewFS(m.mod.ResolveHostFS("/proc"))
 	if err != nil {
-		return nil, errors.Wrapf(err, "error creating new Host FS at %s", m.mod.ResolveHostFS("/proc"))
+		return nil, fmt.Errorf("error creating new Host FS at %s: %w", m.mod.ResolveHostFS("/proc"), err)
 	}
 
 	for _, resource := range resources {
 		psiMetric, err := procfs.PSIStatsForResource(resource)
 		if err != nil {
-			return nil, errors.Wrap(err, "check that /proc/pressure is available, and/or enabled")
+			return nil, fmt.Errorf("check that /proc/pressure is available, and/or enabled: %w", err)
 		}
 
-		event := common.MapStr{
-			resource: common.MapStr{
-				"some": common.MapStr{
-					"10": common.MapStr{
+		event := mapstr.M{
+			resource: mapstr.M{
+				"some": mapstr.M{
+					"10": mapstr.M{
 						"pct": psiMetric.Some.Avg10,
 					},
-					"60": common.MapStr{
+					"60": mapstr.M{
 						"pct": psiMetric.Some.Avg60,
 					},
-					"300": common.MapStr{
+					"300": mapstr.M{
 						"pct": psiMetric.Some.Avg300,
 					},
-					"total": common.MapStr{
-						"time": common.MapStr{
+					"total": mapstr.M{
+						"time": mapstr.M{
 							"us": psiMetric.Some.Total,
 						},
 					},

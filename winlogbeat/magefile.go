@@ -16,11 +16,12 @@
 // under the License.
 
 //go:build mage
-// +build mage
 
 package main
 
 import (
+	"fmt"
+
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
@@ -55,4 +56,12 @@ func Update() { mg.Deps(winlogbeat.Update.All) }
 // Dashboards collects all the dashboards and generates index patterns.
 func Dashboards() error {
 	return devtools.KibanaDashboards()
+}
+
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
+	return nil
 }

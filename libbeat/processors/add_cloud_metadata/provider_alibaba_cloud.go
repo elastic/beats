@@ -17,7 +17,10 @@
 
 package add_cloud_metadata
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import (
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+)
 
 // Alibaba Cloud Metadata Service
 // Document https://help.aliyun.com/knowledge_detail/49122.html
@@ -26,17 +29,17 @@ var alibabaCloudMetadataFetcher = provider{
 
 	Local: false,
 
-	Create: func(_ string, c *common.Config) (metadataFetcher, error) {
+	Create: func(_ string, c *conf.C) (metadataFetcher, error) {
 		ecsMetadataHost := "100.100.100.200"
 		ecsMetadataInstanceIDURI := "/latest/meta-data/instance-id"
 		ecsMetadataRegionURI := "/latest/meta-data/region-id"
 		ecsMetadataZoneURI := "/latest/meta-data/zone-id"
 
-		ecsSchema := func(m map[string]interface{}) common.MapStr {
-			m["service"] = common.MapStr{
+		ecsSchema := func(m map[string]interface{}) mapstr.M {
+			m["service"] = mapstr.M{
 				"name": "ECS",
 			}
-			return common.MapStr{"cloud": m}
+			return mapstr.M{"cloud": m}
 		}
 
 		urls, err := getMetadataURLs(c, ecsMetadataHost, []string{

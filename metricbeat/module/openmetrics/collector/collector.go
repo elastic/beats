@@ -18,16 +18,17 @@
 package collector
 
 import (
+	"fmt"
 	"regexp"
 
-	"github.com/pkg/errors"
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/openmetrics"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -47,7 +48,6 @@ var (
 	upMetricType          = textparse.MetricTypeGauge
 	upMetricInstanceLabel = "instance"
 	upMetricJobLabel      = "job"
-	upMetricJobValue      = "openmetrics"
 )
 
 func init() {
@@ -64,7 +64,7 @@ type OpenMetricsEventsGenerator interface {
 	Start()
 
 	// converts a OpenMetrics metric family into a list of OpenMetricsEvents
-	GenerateOpenMetricsEvents(mf *p.OpenMetricFamily) []OpenMetricEvent
+	GenerateOpenMetricsEvents(mf *prometheus.MetricFamily) []OpenMetricEvent
 
 	// Stop must be called when the generator won't be used anymore
 	Stop()
@@ -118,11 +118,11 @@ func MetricSetBuilder(namespace string, genFactory OpenMetricsEventsGeneratorFac
 		ms.host = ms.Host()
 		ms.excludeMetrics, err = p.CompilePatternList(config.MetricsFilters.ExcludeMetrics)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile exclude patterns")
+			return nil, fmt.Errorf("unable to compile exclude patterns: %w", err)
 		}
 		ms.includeMetrics, err = p.CompilePatternList(config.MetricsFilters.IncludeMetrics)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile include patterns")
+			return nil, fmt.Errorf("unable to compile include patterns: %w", err)
 		}
 
 		return ms, nil
@@ -137,13 +137,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	families, err := m.openmetrics.GetFamilies()
-	eventList := map[textparse.MetricType]map[string]common.MapStr{}
+	eventList := map[textparse.MetricType]map[string]mapstr.M{}
 	if err != nil {
 		// send up event only
 		families = append(families, m.upMetricFamily(0.0))
 
 		// set the error to report it after sending the up event
-		err = errors.Wrap(err, "unable to decode response from openmetrics endpoint")
+		err = fmt.Errorf("unable to decode response from openmetrics endpoint: %w", err)
 	} else {
 		// add up event to the list
 		families = append(families, m.upMetricFamily(1.0))
@@ -163,18 +163,18 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 				labelsHash = openMetricEvent.LabelsHash()
 			}
 			if _, ok := eventList[openMetricEvent.Type]; !ok {
-				eventList[openMetricEvent.Type] = make(map[string]common.MapStr)
+				eventList[openMetricEvent.Type] = make(map[string]mapstr.M)
 			}
 			if _, ok := eventList[openMetricEvent.Type][labelsHash]; !ok {
-				eventList[openMetricEvent.Type][labelsHash] = common.MapStr{}
+				eventList[openMetricEvent.Type][labelsHash] = mapstr.M{}
 
 				// Add default instance label if not already there
 				if exists, _ := openMetricEvent.Labels.HasKey(upMetricInstanceLabel); !exists {
-					openMetricEvent.Labels.Put(upMetricInstanceLabel, m.Host())
+					_, _ = openMetricEvent.Labels.Put(upMetricInstanceLabel, m.Host())
 				}
 				// Add default job label if not already there
 				if exists, _ := openMetricEvent.Labels.HasKey("job"); !exists {
-					openMetricEvent.Labels.Put("job", m.Module().Name())
+					_, _ = openMetricEvent.Labels.Put("job", m.Module().Name())
 				}
 				// Add labels
 				if len(openMetricEvent.Labels) > 0 {
@@ -206,7 +206,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	for _, e := range eventList {
 		for _, ev := range e {
 			isOpen := reporter.Event(mb.Event{
-				RootFields: common.MapStr{m.namespace: ev},
+				RootFields: mapstr.M{m.namespace: ev},
 			})
 			if !isOpen {
 				break
@@ -225,8 +225,8 @@ func (m *MetricSet) Close() error {
 	return nil
 }
 
-func (m *MetricSet) upMetricFamily(value float64) *p.OpenMetricFamily {
-	gauge := p.Gauge{
+func (m *MetricSet) upMetricFamily(value float64) *prometheus.MetricFamily {
+	gauge := prometheus.Gauge{
 		Value: &value,
 	}
 	label1 := labels.Label{
@@ -237,18 +237,18 @@ func (m *MetricSet) upMetricFamily(value float64) *p.OpenMetricFamily {
 		Name:  upMetricJobLabel,
 		Value: m.Module().Name(),
 	}
-	metric := p.OpenMetric{
+	metric := prometheus.OpenMetric{
 		Gauge: &gauge,
 		Label: []*labels.Label{&label1, &label2},
 	}
-	return &p.OpenMetricFamily{
+	return &prometheus.MetricFamily{
 		Name:   &upMetricName,
-		Type:   textparse.MetricType(upMetricType),
-		Metric: []*p.OpenMetric{&metric},
+		Type:   upMetricType,
+		Metric: []*prometheus.OpenMetric{&metric},
 	}
 }
 
-func (m *MetricSet) skipFamily(family *p.OpenMetricFamily) bool {
+func (m *MetricSet) skipFamily(family *prometheus.MetricFamily) bool {
 	if family == nil || family.Name == nil {
 		return false
 	}

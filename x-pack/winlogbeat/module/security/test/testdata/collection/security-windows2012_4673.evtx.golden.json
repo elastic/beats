@@ -1,0 +1,50 @@
+[
+  {
+    "@timestamp": "2020-04-06T06:39:04.5491199Z",
+    "event": {
+      "action": "Sensitive Privilege Use",
+      "code": "4673",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "DC_TEST2k12.TEST.SAAS"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "A privileged service was called.\n\nSubject:\n\tSecurity ID:\t\tS-1-5-18\n\tAccount Name:\t\tDC_TEST2K12$\n\tAccount Domain:\t\tTEST\n\tLogon ID:\t\t0x3E7\n\nService:\n\tServer:\tNT Local Security Authority / Authentication Service\n\tService Name:\tLsaRegisterLogonProcess()\n\nProcess:\n\tProcess ID:\t0x1f0\n\tProcess Name:\tC:\\Windows\\System32\\lsass.exe\n\nService Request Information:\n\tPrivileges:\t\tSeTcbPrivilege",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "DC_TEST2k12.TEST.SAAS",
+      "event_data": {
+        "ObjectServer": "NT Local Security Authority / Authentication Service",
+        "PrivilegeList": "SeTcbPrivilege",
+        "ProcessId": "0x1f0",
+        "ProcessName": "C:\\Windows\\System32\\lsass.exe",
+        "Service": "LsaRegisterLogonProcess()",
+        "SubjectDomainName": "TEST",
+        "SubjectLogonId": "0x3e7",
+        "SubjectUserName": "DC_TEST2K12$",
+        "SubjectUserSid": "S-1-5-18"
+      },
+      "event_id": "4673",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 496,
+        "thread": {
+          "id": 504
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 5109160,
+      "task": "Sensitive Privilege Use"
+    }
+  }
+]

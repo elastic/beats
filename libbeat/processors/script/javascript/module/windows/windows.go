@@ -97,9 +97,8 @@ func commandLineToArgv(cmd string) []string {
 // Require registers the windows module that has utilities specific to
 // Windows like parsing Windows command lines. It can be accessed using:
 //
-//    // javascript
-//    var windows = require('windows');
-//
+//	// javascript
+//	var windows = require('windows');
 func Require(vm *goja.Runtime, module *goja.Object) {
 	o := module.Get("exports").(*goja.Object)
 

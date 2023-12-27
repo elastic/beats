@@ -18,11 +18,11 @@
 package stat
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/haproxy"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -55,12 +55,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	hapc, err := haproxy.NewHaproxyClient(m.HostData().URI, m.BaseMetricSet)
 	if err != nil {
-		return errors.Wrap(err, "failed creating haproxy client")
+		return fmt.Errorf("failed creating haproxy client: %w", err)
 	}
 
 	res, err := hapc.GetStat()
 	if err != nil {
-		return errors.Wrap(err, "failed fetching haproxy stat")
+		return fmt.Errorf("failed fetching haproxy stat: %w", err)
 	}
 
 	eventMapping(res, reporter)

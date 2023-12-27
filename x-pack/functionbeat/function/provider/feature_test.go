@@ -8,37 +8,37 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestBuilder(t *testing.T) {
 	provider := "myprovider"
-	providerFactory := func(_ *logp.Logger, _ *Registry, _ *common.Config) (Provider, error) {
+	providerFactory := func(_ *logp.Logger, _ *Registry, _ *conf.C) (Provider, error) {
 		return nil, nil
 	}
 
-	fnFactory1 := func(_ Provider, _ *common.Config) (Function, error) { return nil, nil }
-	fnFactory2 := func(_ Provider, _ *common.Config) (Function, error) { return nil, nil }
+	fnFactory1 := func(_ Provider, _ *conf.C) (Function, error) { return nil, nil }
+	fnFactory2 := func(_ Provider, _ *conf.C) (Function, error) { return nil, nil }
 
-	b := MustCreate(
+	features := Builder(
 		provider,
 		providerFactory,
 		feature.MakeDetails("myprovider", "myprovider", feature.Experimental),
-	).MustAddFunction(
+	).AddFunction(
 		"f1",
 		fnFactory1,
 		feature.MakeDetails("fn1 description", "fn1", feature.Experimental),
-	).MustAddFunction("f2", fnFactory2, feature.MakeDetails(
+	).AddFunction("f2", fnFactory2, feature.MakeDetails(
 		"fn1 description",
 		"fn1",
 		feature.Experimental,
-	)).Bundle()
+	)).Features()
 
-	assert.Equal(t, 3, len(b.Features()))
-	features := b.Features()
+	require.Equal(t, 3, len(features))
 
 	assert.Equal(t, "myprovider", features[0].Name())
 	assert.Equal(t, "functionbeat.provider", features[0].Namespace())

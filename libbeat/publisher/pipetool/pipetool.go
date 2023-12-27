@@ -19,8 +19,8 @@ package pipetool
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // connectEditPipeline modifies the client configuration using edit before calling
@@ -87,12 +87,12 @@ func WithDefaultGuarantees(pipeline beat.PipelineConnector, mode beat.PublishMod
 	})
 }
 
-func WithACKer(pipeline beat.PipelineConnector, a beat.ACKer) beat.PipelineConnector {
+func WithACKer(pipeline beat.PipelineConnector, a beat.EventListener) beat.PipelineConnector {
 	return WithClientConfigEdit(pipeline, func(cfg beat.ClientConfig) (beat.ClientConfig, error) {
-		if h := cfg.ACKHandler; h != nil {
-			cfg.ACKHandler = acker.Combine(a, h)
+		if h := cfg.EventListener; h != nil {
+			cfg.EventListener = acker.Combine(a, h)
 		} else {
-			cfg.ACKHandler = a
+			cfg.EventListener = a
 		}
 		return cfg, nil
 	})
@@ -108,7 +108,7 @@ func WithClientWrapper(pipeline beat.PipelineConnector, wrap ClientWrapper) beat
 // WithDynamicFields ensures that dynamicFields from autodiscovery are setup
 // when connecting to the publisher pipeline.
 // Processing.DynamicFields will only be overwritten if not is not already set.
-func WithDynamicFields(pipeline beat.PipelineConnector, dynamicFields *common.MapStrPointer) beat.PipelineConnector {
+func WithDynamicFields(pipeline beat.PipelineConnector, dynamicFields *mapstr.Pointer) beat.PipelineConnector {
 	if dynamicFields == nil {
 		return pipeline
 	}

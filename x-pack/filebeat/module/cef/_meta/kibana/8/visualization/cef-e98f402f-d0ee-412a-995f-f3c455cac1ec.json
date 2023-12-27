@@ -1,0 +1,66 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Top 10 Destination Users [Filebeat CEF]",
+        "uiStateJSON": {},
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "customLabel": "Destination Users",
+                        "field": "destination.user.name",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 10
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "maxFontSize": 60,
+                "minFontSize": 10,
+                "orientation": "single",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                },
+                "scale": "linear"
+            },
+            "title": "Top 10 Destination Users [Filebeat CEF]",
+            "type": "tagcloud"
+        }
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-e98f402f-d0ee-412a-995f-f3c455cac1ec",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-12352cbd-ccbb-4ede-a98b-c4c82a358516",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzI0NjAsMV0="
+}

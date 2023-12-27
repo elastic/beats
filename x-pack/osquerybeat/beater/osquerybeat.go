@@ -19,14 +19,14 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqdcli"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pub"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 var (
@@ -38,14 +38,14 @@ var (
 )
 
 const (
-	scheduledOsqueriesTypesCacheSize = 256 // Default number of queries types kept in memory to avoid fetching GetQueryColumns all the time
-	adhocOsqueriesTypesCacheSize     = 256 // The final cache size equals the number of periodic queries plus this value, in order to have additional cache for ad-hoc queries
+	adhocOsqueriesTypesCacheSize = 256 // The final cache size equals the number of periodic queries plus this value, in order to have additional cache for ad-hoc queries
 
 	// The interval in second for configuration refresh;
 	// osqueryd child process requests configuration from the configuration plugin implemented in osquerybeat
 	configurationRefreshIntervalSecs = 60
 
-	osqueryTimeout = 60 * time.Second
+	osqueryTimeout    = 1 * time.Minute
+	osqueryMaxTimeout = 15 * time.Minute
 )
 
 const (
@@ -67,15 +67,18 @@ type osquerybeat struct {
 	// Beat lifecycle context, cancelled on Stop
 	cancel context.CancelFunc
 	mx     sync.Mutex
+
+	// parent process watcher
+	watcher *Watcher
 }
 
 // New creates an instance of osquerybeat.
-func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
+func New(b *beat.Beat, cfg *conf.C) (beat.Beater, error) {
 	log := logp.NewLogger("osquerybeat")
 
 	c := config.DefaultConfig
 	if err := cfg.Unpack(&c); err != nil {
-		return nil, fmt.Errorf("error reading config file: %v", err)
+		return nil, fmt.Errorf("error reading config file: %w", err)
 	}
 
 	bt := &osquerybeat{
@@ -88,7 +91,7 @@ func New(b *beat.Beat, cfg *common.Config) (beat.Beater, error) {
 	return bt, nil
 }
 
-func (bt *osquerybeat) initContext() (context.Context, error) {
+func (bt *osquerybeat) init() (context.Context, error) {
 	bt.mx.Lock()
 	defer bt.mx.Unlock()
 	if bt.cancel != nil {
@@ -96,6 +99,11 @@ func (bt *osquerybeat) initContext() (context.Context, error) {
 	}
 	var ctx context.Context
 	ctx, bt.cancel = context.WithCancel(context.Background())
+
+	if bt.watcher != nil {
+		bt.watcher.Close()
+	}
+	bt.watcher = NewWatcher(bt.log)
 	return ctx, nil
 }
 
@@ -109,11 +117,18 @@ func (bt *osquerybeat) close() {
 		bt.cancel()
 		bt.cancel = nil
 	}
+
+	// Start watching the parent process.
+	// The beat exits if the process gets orphaned.
+	if bt.watcher != nil {
+		go bt.watcher.Run()
+		bt.watcher = nil
+	}
 }
 
 // Run starts osquerybeat.
 func (bt *osquerybeat) Run(b *beat.Beat) error {
-	ctx, err := bt.initContext()
+	ctx, err := bt.init()
 	if err != nil {
 		return err
 	}
@@ -136,7 +151,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer cleanupFn()
 
 	// Create osqueryd runner
-	osq := osqd.New(
+	osq, err := osqd.New(
 		socketPath,
 		osqd.WithLogger(bt.log),
 		osqd.WithConfigRefresh(configurationRefreshIntervalSecs),
@@ -144,11 +159,19 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 		osqd.WithLoggerPlugin(loggerPluginName),
 	)
 
+	if err != nil {
+		return err
+	}
+
 	// Check that osqueryd exists and runnable
 	err = osq.Check(ctx)
 	if err != nil {
 		return err
 	}
+
+	// Set reseable action handler
+	rah := newResetableActionHandler(bt.log)
+	defer rah.Clear()
 
 	g, ctx := errgroup.WithContext(ctx)
 
@@ -158,7 +181,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	runner := newOsqueryRunner(bt.log)
 	g.Go(func() error {
 		return runner.Run(ctx, func(ctx context.Context, flags osqd.Flags, inputCh <-chan []config.InputConfig) error {
-			return bt.runOsquery(ctx, b, osq, flags, inputCh)
+			return bt.runOsquery(ctx, b, osq, flags, inputCh, rah)
 		})
 	})
 
@@ -166,8 +189,15 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	// This way we don't need to persist the configuration for configuration plugin, because osquery is not running until
 	// we have the first valid configuration
 	if len(bt.config.Inputs) > 0 {
-		runner.Update(ctx, bt.config.Inputs)
+		_ = runner.Update(ctx, bt.config.Inputs)
 	}
+
+	// Ensure that all the hooks and actions are ready before starting the Manager
+	// to receive configuration.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+	defer b.Manager.Stop()
 
 	// Set the osquery beat version to the manager payload. This allows the bundled osquery version to be reported to the stack.
 	bt.setManagerPayload(b)
@@ -186,21 +216,34 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 				bt.log.Info("osquerybeat context cancelled, exiting")
 				return ctx.Err()
 			case inputConfigs := <-inputConfigCh:
-				bt.pub.Configure(inputConfigs)
+				err = bt.pub.Configure(inputConfigs)
 				if err != nil {
 					bt.log.Errorf("Failed to connect beat publisher client, err: %v", err)
 					return err
 				}
-				runner.Update(ctx, inputConfigs)
+				err = runner.Update(ctx, inputConfigs)
+				if err != nil {
+					bt.log.Errorf("Failed to configure osquery runner, err: %v", err)
+				}
 			}
 		}
 	})
 
 	// Wait for clean exit
-	return g.Wait()
+	err = g.Wait()
+	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			bt.log.Debugf("osquerybeat Run exited, context cancelled")
+		} else {
+			bt.log.Errorf("osquerybeat Run exited with error: %v", err)
+		}
+	} else {
+		bt.log.Debugf("osquerybeat Run exited")
+	}
+	return err
 }
 
-func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.OSQueryD, flags osqd.Flags, inputCh <-chan []config.InputConfig) error {
+func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.OSQueryD, flags osqd.Flags, inputCh <-chan []config.InputConfig, rah *resetableActionHandler) error {
 	socketPath := osq.SocketPath()
 
 	// Create a cache for queries types resolution
@@ -233,6 +276,7 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 	cli := osqdcli.New(socketPath,
 		osqdcli.WithLogger(bt.log),
 		osqdcli.WithTimeout(osqueryTimeout),
+		osqdcli.WithMaxTimeout(osqueryMaxTimeout),
 		osqdcli.WithCache(cache, adhocOsqueriesTypesCacheSize),
 	)
 
@@ -242,8 +286,8 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 	cache.Resize(configPlugin.Count())
 
 	// Create osquery logger plugin
-	loggerPlugin := NewLoggerPlugin(bt.log, func(res SnapshotResult) {
-		bt.handleSnapshotResult(ctx, cli, configPlugin, res)
+	loggerPlugin := NewLoggerPlugin(bt.log, func(res QueryResult) {
+		bt.handleQueryResult(ctx, cli, configPlugin, res)
 	})
 
 	// Run main loop
@@ -255,14 +299,14 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 		}
 		defer cli.Close()
 
-		// Run extensions only after succesful connect, otherwise the extension server fails with windows pipes if the pipe was not created by osqueryd yet
+		// Run extensions only after successful connect, otherwise the extension server fails with windows pipes if the pipe was not created by osqueryd yet
 		g.Go(func() error {
 			return runExtensionServer(ctx, socketPath, configPlugin, loggerPlugin, osqueryTimeout)
 		})
 
 		// Register action handler
-		ah := bt.registerActionHandler(b, cli, configPlugin)
-		defer bt.unregisterActionHandler(b, ah)
+		bt.registerActionHandler(b, cli, configPlugin, rah)
+		defer bt.unregisterActionHandler(b, rah)
 
 		// Process input
 		for {
@@ -280,14 +324,26 @@ func (bt *osquerybeat) runOsquery(ctx context.Context, b *beat.Beat, osq *osqd.O
 			}
 		}
 	})
-	return g.Wait()
+
+	err = g.Wait()
+	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			bt.log.Debugf("runOsquery exited, context cancelled")
+		} else {
+			bt.log.Errorf("runOsquery exited with error: %v", err)
+		}
+		bt.log.Errorf("runOsquery exited with error: %v", err)
+	} else {
+		bt.log.Debugf("runOsquery exited")
+	}
+	return err
 }
 
 func runExtensionServer(ctx context.Context, socketPath string, configPlugin *ConfigPlugin, loggerPlugin *LoggerPlugin, timeout time.Duration) (err error) {
 	// Register config and logger extensions
 	extserver, err := osquery.NewExtensionManagerServer(extManagerServerName, socketPath, osquery.ServerTimeout(timeout))
 	if err != nil {
-		return
+		return err
 	}
 
 	// Register osquery configuration plugin
@@ -310,7 +366,7 @@ func runExtensionServer(ctx context.Context, socketPath string, configPlugin *Co
 	return g.Wait()
 }
 
-func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res SnapshotResult) {
+func (bt *osquerybeat) handleQueryResult(ctx context.Context, cli *osqdcli.Client, configPlugin *ConfigPlugin, res QueryResult) {
 	ns, ok := configPlugin.LookupNamespace(res.Name)
 	if !ok {
 		bt.log.Debugf("failed to lookup query namespace: %s, the query was possibly removed recently from the schedule", res.Name)
@@ -325,14 +381,59 @@ func (bt *osquerybeat) handleSnapshotResult(ctx context.Context, cli *osqdcli.Cl
 		return
 	}
 
-	hits, err := cli.ResolveResult(ctx, qi.Query, res.Hits)
-	if err != nil {
-		bt.log.Errorf("failed to resolve query result types: %s", res.Name)
-		return
-	}
+	var (
+		hits []map[string]interface{}
+	)
 
 	responseID := uuid.Must(uuid.NewV4()).String()
-	bt.pub.Publish(config.Datastream(ns), res.Name, responseID, hits, qi.ECSMapping, nil)
+
+	if res.Action == "snapshot" {
+		snapshot, err := cli.ResolveResult(ctx, qi.Query, res.Hits)
+		if err != nil {
+			bt.log.Errorf("failed to resolve snapshot query result types: %s", res.Name)
+			return
+		}
+		hits = append(hits, snapshot...)
+		meta := queryResultMeta("snapshot", "", res)
+		bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, hits, qi.ECSMapping, nil)
+	} else {
+		if len(res.DiffResults.Added) > 0 {
+			added, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Added)
+			if err != nil {
+				bt.log.Errorf(`failed to resolve diff query "added" result types: %s`, res.Name)
+				return
+			}
+			hits = append(hits, added...)
+			meta := queryResultMeta("diff", "added", res)
+			bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, hits, qi.ECSMapping, nil)
+		}
+		if len(res.DiffResults.Removed) > 0 {
+			removed, err := cli.ResolveResult(ctx, qi.Query, res.DiffResults.Added)
+			if err != nil {
+				bt.log.Errorf(`failed to resolve diff query "removed" result types: %s`, res.Name)
+				return
+			}
+			hits = append(hits, removed...)
+			meta := queryResultMeta("diff", "removed", res)
+			bt.pub.Publish(config.Datastream(ns), res.Name, responseID, meta, hits, qi.ECSMapping, nil)
+		}
+	}
+
+}
+
+func queryResultMeta(typ, action string, res QueryResult) map[string]interface{} {
+	m := map[string]interface{}{
+		"type":          typ,
+		"calendar_type": res.CalendarTime,
+		"unix_time":     res.UnixTime,
+		"epoch":         res.Epoch,
+		"counter":       res.Counter,
+	}
+
+	if action != "" {
+		m["action"] = action
+	}
+	return m
 }
 
 func (bt *osquerybeat) setManagerPayload(b *beat.Beat) {
@@ -348,9 +449,9 @@ func (bt *osquerybeat) Stop() {
 	bt.close()
 }
 
-func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, configPlugin *ConfigPlugin) *actionHandler {
+func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, configPlugin *ConfigPlugin, rah *resetableActionHandler) {
 	if b.Manager == nil {
-		return nil
+		return
 	}
 
 	ah := &actionHandler{
@@ -360,12 +461,12 @@ func (bt *osquerybeat) registerActionHandler(b *beat.Beat, cli *osqdcli.Client, 
 		queryExec: cli,
 		np:        configPlugin,
 	}
-	b.Manager.RegisterAction(ah)
-	return ah
+	rah.Attach(ah)
+	b.Manager.RegisterAction(rah)
 }
 
-func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, ah *actionHandler) {
-	if b.Manager != nil && ah != nil {
-		b.Manager.UnregisterAction(ah)
+func (bt *osquerybeat) unregisterActionHandler(b *beat.Beat, rah *resetableActionHandler) {
+	if b.Manager != nil && rah != nil {
+		b.Manager.UnregisterAction(rah)
 	}
 }

@@ -21,7 +21,7 @@ import (
 	"errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/match"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const logName = "conditions"
@@ -102,8 +102,8 @@ func NewCondition(config *Config) (Condition, error) {
 // NewConditionList takes a slice of Config objects and turns them into real Condition objects.
 func NewConditionList(config []Config) ([]Condition, error) {
 	out := make([]Condition, len(config))
-	for i, condConfig := range config {
-		cond, err := NewCondition(&condConfig)
+	for i := range config {
+		cond, err := NewCondition(&config[i])
 		if err != nil {
 			return nil, err
 		}

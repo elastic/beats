@@ -20,15 +20,14 @@ package config
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/conditions"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-autodiscover/bus"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -37,16 +36,16 @@ func init() {
 
 type config struct {
 	ConditionConfig *conditions.Config `config:"condition"`
-	Config          *common.Config     `config:"config"`
+	Config          *conf.C            `config:"config"`
 }
 
 type configAppender struct {
 	condition conditions.Condition
-	config    common.MapStr
+	config    mapstr.M
 }
 
 // NewConfigAppender creates a configAppender that can append templatized configs into built configs
-func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
+func NewConfigAppender(cfg *conf.C) (autodiscover.Appender, error) {
 	cfgwarn.Beta("The config appender is beta")
 
 	config := config{}
@@ -60,15 +59,15 @@ func NewConfigAppender(cfg *common.Config) (autodiscover.Appender, error) {
 	if config.ConditionConfig != nil {
 		cond, err = conditions.NewCondition(config.ConditionConfig)
 		if err != nil {
-			return nil, errors.Wrap(err, "unable to create condition due to error")
+			return nil, fmt.Errorf("unable to create condition due to error: %w", err)
 		}
 	}
 
 	// Unpack the config
-	cf := common.MapStr{}
+	cf := mapstr.M{}
 	err = config.Config.Unpack(&cf)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to unpack config due to error")
+		return nil, fmt.Errorf("unable to unpack config due to error: %w", err)
 	}
 
 	return &configAppender{condition: cond, config: cf}, nil
@@ -83,15 +82,15 @@ func (c *configAppender) Append(event bus.Event) {
 		return
 	}
 
-	cfgs, ok := cfgsRaw.([]*common.Config)
+	cfgs, ok := cfgsRaw.([]*conf.C)
 	// Config key doesnt have an array of config objects
 	if !ok {
 		return
 	}
-	if c.condition == nil || c.condition.Check(common.MapStr(event)) == true {
+	if c.condition == nil || c.condition.Check(mapstr.M(event)) == true {
 		// Merge the template with all the configs
 		for _, cfg := range cfgs {
-			cf := common.MapStr{}
+			cf := mapstr.M{}
 			err := cfg.Unpack(&cf)
 			if err != nil {
 				logp.Debug("config", "unable to unpack config due to error: %v", err)

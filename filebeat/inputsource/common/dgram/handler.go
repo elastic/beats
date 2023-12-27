@@ -19,13 +19,12 @@ package dgram
 
 import (
 	"context"
-	"fmt"
 	"net"
 	"runtime"
 	"strings"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // HandlerFactory returns a ConnectionHandler func
@@ -38,17 +37,13 @@ type ConnectionHandler func(context.Context, net.PacketConn) error
 type MetadataFunc func(net.Conn) inputsource.NetworkMetadata
 
 // DatagramReaderFactory allows creation of a handler which can read packets from connections.
-func DatagramReaderFactory(
-	family inputsource.Family,
-	logger *logp.Logger,
-	callback inputsource.NetworkFunc,
-) HandlerFactory {
+func DatagramReaderFactory(family inputsource.Family, logger *logp.Logger, callback inputsource.NetworkFunc) HandlerFactory {
 	return func(config ListenerConfig) ConnectionHandler {
 		return ConnectionHandler(func(ctx context.Context, conn net.PacketConn) error {
 			for ctx.Err() == nil {
 
 				buffer := make([]byte, config.MaxMessageSize)
-				//conn.SetDeadline(time.Now().Add(config.Timeout))
+				// conn.SetDeadline(time.Now().Add(config.Timeout))
 
 				// If you are using Windows and you are using a fixed buffer and you get a datagram which
 				// is bigger than the specified size of the buffer, it will return an `err` and the buffer will
@@ -58,7 +53,7 @@ func DatagramReaderFactory(
 				length, addr, err := conn.ReadFrom(buffer)
 				if err != nil {
 					if family == inputsource.FamilyUnix {
-						fmt.Println("connection handler error", err)
+						logger.Info("connection handler error", err)
 					}
 					// don't log any deadline events.
 					e, ok := err.(net.Error)
@@ -88,7 +83,7 @@ func DatagramReaderFactory(
 					callback(buffer[:length], inputsource.NetworkMetadata{RemoteAddr: addr})
 				}
 			}
-			fmt.Println("end of connection handling")
+			logger.Debug("end of connection handling")
 			return nil
 		})
 	}

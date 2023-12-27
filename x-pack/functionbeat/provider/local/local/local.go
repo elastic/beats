@@ -11,25 +11,26 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/provider"
 	"github.com/elastic/beats/v7/x-pack/functionbeat/function/telemetry"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const stdinName = "stdin"
 
-// Bundle exposes the local provider and the STDIN function.
-var Bundle = provider.MustCreate(
+// Features exposes the local provider and the STDIN function.
+var Features = provider.Builder(
 	"local",
 	provider.NewDefaultProvider("local", provider.NewNullCli, provider.NewNullTemplateBuilder),
 	feature.MakeDetails("local events", "allows to trigger events locally.", feature.Experimental),
-).MustAddFunction(
+).AddFunction(
 	stdinName,
 	NewStdinFunction,
 	feature.MakeDetails(stdinName, "read events from stdin", feature.Experimental),
-).Bundle()
+).Features()
 
 // StdinFunction reads events from STIN and terminates when stdin is completed.
 type StdinFunction struct{}
@@ -37,7 +38,7 @@ type StdinFunction struct{}
 // NewStdinFunction creates a new StdinFunction
 func NewStdinFunction(
 	provider provider.Provider,
-	functionConfig *common.Config,
+	functionConfig *conf.C,
 ) (provider.Function, error) {
 	return &StdinFunction{}, nil
 }
@@ -89,7 +90,7 @@ func (s *StdinFunction) Run(ctx context.Context, client pipeline.ISyncClient, _ 
 func (s *StdinFunction) newEvent(line string) beat.Event {
 	event := beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"message": line,
 		},
 	}

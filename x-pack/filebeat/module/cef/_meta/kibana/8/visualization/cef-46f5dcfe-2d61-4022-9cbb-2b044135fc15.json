@@ -1,0 +1,107 @@
+{
+    "attributes": {
+        "description": "",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": []
+            }
+        },
+        "savedSearchRefName": "search_0",
+        "title": "Outcomes by User Names — ArcSight [Filebeat CEF]",
+        "uiStateJSON": {
+            "vis": {
+                "colors": {
+                    "/Informational": "#7EB26D",
+                    "/Informational/Warning": "#EF843C",
+                    "/Success": "#64B0C8",
+                    "Anti-Virus": "#B7DBAB",
+                    "Host-based IDS/IPS": "#629E51",
+                    "Log Consolidator": "#E0F9D7",
+                    "Operating System": "#3F6833",
+                    "Recon": "#BF1B00",
+                    "Security Mangement": "#CFFAFF"
+                },
+                "legendOpen": true
+            }
+        },
+        "version": 1,
+        "visState": {
+            "aggs": [
+                {
+                    "enabled": true,
+                    "id": "1",
+                    "params": {},
+                    "schema": "metric",
+                    "type": "count"
+                },
+                {
+                    "enabled": true,
+                    "id": "2",
+                    "params": {
+                        "exclude": "Network-based IDS/IPS",
+                        "field": "cef.extensions.categoryDeviceType",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "3",
+                    "params": {
+                        "field": "cef.extensions.categoryOutcome",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 5
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                },
+                {
+                    "enabled": true,
+                    "id": "6",
+                    "params": {
+                        "field": "destination.user.name",
+                        "order": "desc",
+                        "orderBy": "1",
+                        "size": 10
+                    },
+                    "schema": "segment",
+                    "type": "terms"
+                }
+            ],
+            "listeners": {},
+            "params": {
+                "addTooltip": true,
+                "distinctColors": true,
+                "isDonut": false,
+                "legendDisplay": "show",
+                "legendPosition": "right",
+                "legendSize": "auto",
+                "palette": {
+                    "name": "kibana_palette",
+                    "type": "palette"
+                }
+            },
+            "title": "Outcomes by User Names — ArcSight [Filebeat CEF]",
+            "type": "pie"
+        }
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-46f5dcfe-2d61-4022-9cbb-2b044135fc15",
+    "migrationVersion": {
+        "visualization": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-2f6c8e48-8c6a-476d-82e8-47c723c39715",
+            "name": "search_0",
+            "type": "search"
+        }
+    ],
+    "type": "visualization",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzIzOTMsMV0="
+}

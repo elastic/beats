@@ -18,13 +18,13 @@
 package mapping
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-ucfg/yaml"
 )
 
@@ -132,15 +132,15 @@ type Analyzer struct {
 }
 
 func (a *Analyzer) Unpack(v interface{}) error {
-	var m common.MapStr
+	var m mapstr.M
 	switch v := v.(type) {
 	case string:
 		a.Name = v
 		return nil
-	case common.MapStr:
+	case mapstr.M:
 		m = v
 	case map[string]interface{}:
-		m = common.MapStr(v)
+		m = mapstr.M(v)
 	default:
 		return fmt.Errorf("'%v' is invalid analyzer setting", v)
 	}
@@ -158,7 +158,7 @@ func (a *Analyzer) Unpack(v interface{}) error {
 // Validate ensures objectTypeParams are not mixed with top level objectType configuration
 func (f *Field) Validate() error {
 	if err := f.validateType(); err != nil {
-		return errors.Wrapf(err, "incorrect type configuration for field '%s'", f.Name)
+		return fmt.Errorf("incorrect type configuration for field '%s': %w", f.Name, err)
 	}
 	if len(f.ObjectTypeParams) > 0 {
 		if f.ScalingFactor != 0 || f.ObjectTypeMappingType != "" || f.ObjectType != "" {
@@ -468,12 +468,12 @@ func (f Fields) canConcat(k string, keys []string) error {
 		}
 		// last key to compare
 		if len(keys) == 0 {
-			return errors.Errorf("fields contain key <%s>", k)
+			return fmt.Errorf("fields contain key <%s>", k)
 		}
 		// last field to compare, only valid if it is of type object
 		if len(field.Fields) == 0 {
 			if field.Type != "object" {
-				return errors.Errorf("fields contain non object node conflicting with key <%s>", k)
+				return fmt.Errorf("fields contain non object node conflicting with key <%s>", k)
 			}
 		}
 		return field.Fields.canConcat(k, keys)

@@ -4,7 +4,7 @@ var:
   - name: syslog_host
     default: localhost
   - name: tags
-    default: [sophos-xg, forwarded]
+    default: [sophos-xg, forwarded, preserve_original_event]
   - name: syslog_port
     default: 9005
   - name: input

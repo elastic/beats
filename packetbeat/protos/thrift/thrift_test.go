@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package thrift
 
@@ -26,15 +25,15 @@ import (
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func thriftForTests() *thriftPlugin {
 	t := &thriftPlugin{}
 	config := defaultConfig
-	t.init(true, nil, procs.ProcessesWatcher{}, &config)
+	t.init(true, nil, &procs.ProcessesWatcher{}, &config)
 	return t
 }
 

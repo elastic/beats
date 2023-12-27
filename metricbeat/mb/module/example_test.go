@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package module_test
 
@@ -27,11 +26,11 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // ExampleWrapper demonstrates how to create a single Wrapper
@@ -39,7 +38,7 @@ import (
 // module.
 func ExampleWrapper() {
 	// Build a configuration object.
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 	})
@@ -119,7 +118,7 @@ func ExampleRunner() {
 	// for demonstration purposes.
 	var b *beat.Beat
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 	})

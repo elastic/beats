@@ -22,9 +22,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	_ "github.com/elastic/beats/v7/metricbeat/module/linux"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestData(t *testing.T) {
@@ -50,7 +50,7 @@ func TestFetch(t *testing.T) {
 		Normal: map[int]int64{0: 3409, 1: 4916, 2: 4010, 3: 4853, 4: 3613, 5: 2472, 6: 793, 7: 552, 8: 189, 9: 148, 10: 292},
 	}
 
-	rawEvent := events[0].BeatEvent("linux", "pageinfo").Fields["linux"].(common.MapStr)["pageinfo"].(common.MapStr)["buddy_info"]
+	rawEvent := events[0].BeatEvent("linux", "pageinfo").Fields["linux"].(mapstr.M)["pageinfo"].(mapstr.M)["buddy_info"]
 
 	assert.Equal(t, testBuddyInfo, rawEvent)
 

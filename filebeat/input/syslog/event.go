@@ -23,8 +23,10 @@ import (
 	"time"
 )
 
-const severityMask = 7
-const facilityShift = 3
+const (
+	severityMask  = 7
+	facilityShift = 3
+)
 
 var month = map[string]time.Month{
 	"Jan": time.January,
@@ -60,9 +62,9 @@ var monthIndexed = []time.Month{
 // event is a parsed syslog event, validation of the format is done at the parser level.
 type event struct {
 	message    string
-	hostname   string //x
+	hostname   string // x
 	priority   int
-	program    string //x
+	program    string // x
 	pid        int
 	month      time.Month
 	day        int

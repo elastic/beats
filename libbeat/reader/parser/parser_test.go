@@ -25,11 +25,12 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/multiline"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestParsersConfigSuffix(t *testing.T) {
@@ -83,7 +84,7 @@ func TestParsersConfigSuffix(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.parsers)
+			cfg := config.MustNewConfigFrom(test.parsers)
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
 			require.NoError(t, err)
@@ -182,12 +183,130 @@ func TestParsersConfigAndReading(t *testing.T) {
 			},
 			expectedError: multiline.ErrMissingPattern.Error(),
 		},
+		"ndjson with syslog": {
+			parsers: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					{
+						"ndjson": map[string]interface{}{
+							"keys_under_root": true,
+							"message_key":     "log",
+						},
+					},
+					{
+						"syslog": map[string]interface{}{
+							"format":   "auto",
+							"timezone": "Local",
+						},
+					},
+				},
+			},
+			lines: `{"log": "<13>Jan 12 12:32:15 vagrant processd[123]: This is an RFC 3164 syslog message"}
+{"log": "<165>1 2003-10-11T22:14:15.003Z mymachine.example.com evntslog 1024 ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"][examplePriority@32473 class=\"high\"] This is an RFC 5424 syslog message"}
+{"log": "Not a valid message"}`,
+			expectedMessages: []string{
+				"This is an RFC 3164 syslog message",
+				"This is an RFC 5424 syslog message",
+				"Not a valid message",
+			},
+		},
+		"multiline syslog": {
+			parsers: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					{
+						"multiline": map[string]interface{}{
+							"match":        "after",
+							"negate":       true,
+							"pattern":      "^<\\d{1,3}>",
+							"skip_newline": true, // This option is set since testReader does not strip newlines when splitting lines.
+						},
+					},
+					{
+						"syslog": map[string]interface{}{
+							"format": "rfc5424",
+						},
+					},
+				},
+			},
+			lines: `<165>1 2003-08-24T05:14:15.000003-07:00 192.168.2.1 myproc 8710 - - [beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
+    at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+<165>1 2003-08-24T05:14:20.000003-07:00 192.168.2.1 myproc 8710 - - [beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
+    at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+<165>1 2003-08-24T05:14:30.000003-07:00 192.168.2.1 myproc 8710 - - This is some other debug message.`,
+			expectedMessages: []string{
+				`[beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
+    at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+`,
+				`[beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
+    at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+`,
+				`This is some other debug message.
+`,
+			},
+		},
+		"syslog multiline": {
+			parsers: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					{
+						"syslog": map[string]interface{}{
+							"format": "rfc5424",
+						},
+					},
+					{
+						"multiline": map[string]interface{}{
+							"match":        "after",
+							"pattern":      "^\\s",
+							"skip_newline": true, // This option is set since testReader does not strip newlines when splitting lines.
+						},
+					},
+				},
+			},
+			lines: `<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - - [beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
+<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
+<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
+<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
+<165>1 2003-08-24T05:14:15.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+<165>1 2003-08-24T05:14:20.000003-07:00 192.168.2.1 myproc 8710 - - This is some other debug message.
+<165>1 2003-08-24T05:14:30.000003-07:00 192.0.2.1 myproc 8710 - - [beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
+<165>1 2003-08-24T05:14:30.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
+<165>1 2003-08-24T05:14:30.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
+<165>1 2003-08-24T05:14:30.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
+<165>1 2003-08-24T05:14:30.000003-07:00 192.0.2.1 myproc 8710 - -     at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+`,
+			expectedMessages: []string{
+				`[beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
+    at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+`,
+				`This is some other debug message.
+`,
+				`[beat-logstash-some-name-832-2015.11.28] IndexNotFoundException[no such index]
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver$WildcardExpressionResolver.resolve(IndexNameExpressionResolver.java:566)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:133)
+    at org.elasticsearch.cluster.metadata.IndexNameExpressionResolver.concreteIndices(IndexNameExpressionResolver.java:77)
+    at org.elasticsearch.action.admin.indices.delete.TransportDeleteIndexAction.checkBlock(TransportDeleteIndexAction.java:75)
+`,
+			},
+		},
 	}
 
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.parsers)
+			cfg := config.MustNewConfigFrom(test.parsers)
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
 			require.NoError(t, err)
@@ -218,7 +337,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 		config          map[string]interface{}
 		expectedMessage reader.Message
 	}{
-		"no postprocesser, no processing": {
+		"no postprocessor, no processing": {
 			message: reader.Message{
 				Content: []byte("line 1"),
 			},
@@ -227,10 +346,10 @@ func TestJSONParsersWithFields(t *testing.T) {
 				Content: []byte("line 1"),
 			},
 		},
-		"JSON post processer with keys_under_root": {
+		"JSON post processor with keys_under_root": {
 			message: reader.Message{
 				Content: []byte("{\"key\":\"value\"}"),
-				Fields:  common.MapStr{},
+				Fields:  mapstr.M{},
 			},
 			config: map[string]interface{}{
 				"parsers": []map[string]interface{}{
@@ -243,15 +362,63 @@ func TestJSONParsersWithFields(t *testing.T) {
 			},
 			expectedMessage: reader.Message{
 				Content: []byte(""),
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"key": "value",
 				},
 			},
 		},
-		"JSON post processer with document ID": {
+		"JSON post processor with dotted target key": {
+			message: reader.Message{
+				Content: []byte("{\"key\":\"value\"}"),
+				Fields:  mapstr.M{},
+			},
+			config: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"ndjson": map[string]interface{}{
+							"target": "kubernetes.audit",
+						},
+					},
+				},
+			},
+			expectedMessage: reader.Message{
+				Content: []byte(""),
+				Fields: mapstr.M{
+					"kubernetes": mapstr.M{
+						"audit": mapstr.M{
+							"key": "value",
+						},
+					},
+				},
+			},
+		},
+		"JSON post processor with non-dotted target key": {
+			message: reader.Message{
+				Content: []byte("{\"key\":\"value\"}"),
+				Fields:  mapstr.M{},
+			},
+			config: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"ndjson": map[string]interface{}{
+							"target": "kubernetes",
+						},
+					},
+				},
+			},
+			expectedMessage: reader.Message{
+				Content: []byte(""),
+				Fields: mapstr.M{
+					"kubernetes": mapstr.M{
+						"key": "value",
+					},
+				},
+			},
+		},
+		"JSON post processor with document ID": {
 			message: reader.Message{
 				Content: []byte("{\"key\":\"value\", \"my-id-field\":\"my-id\"}"),
-				Fields:  common.MapStr{},
+				Fields:  mapstr.M{},
 			},
 			config: map[string]interface{}{
 				"parsers": []map[string]interface{}{
@@ -265,18 +432,18 @@ func TestJSONParsersWithFields(t *testing.T) {
 			},
 			expectedMessage: reader.Message{
 				Content: []byte(""),
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"key": "value",
 				},
-				Meta: common.MapStr{
+				Meta: mapstr.M{
 					"_id": "my-id",
 				},
 			},
 		},
-		"JSON post processer with overwrite keys and under root": {
+		"JSON post processor with overwrite keys and under root": {
 			message: reader.Message{
 				Content: []byte("{\"key\": \"value\"}"),
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"key":       "another-value",
 					"other-key": "other-value",
 				},
@@ -293,9 +460,138 @@ func TestJSONParsersWithFields(t *testing.T) {
 			},
 			expectedMessage: reader.Message{
 				Content: []byte(""),
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"key":       "value",
 					"other-key": "other-value",
+				},
+			},
+		},
+		"JSON post processor with type in message": {
+			message: reader.Message{
+				Content: []byte(`{"timestamp":"2016-04-05T18:47:18.444Z","level":"INFO","logger":"iapi.logger","thread":"JobCourier4","appInfo":{"appname":"SessionManager","appid":"Pooler","host":"demohost.mydomain.com","ip":"192.168.128.113","pid":13982},"userFields":{"ApplicationId":"PROFAPP_001","RequestTrackingId":"RetrieveTBProfileToken-6066477"},"source":"DataAccess\/FetchActiveSessionToken.process","msg":"FetchActiveSessionToken process ended", "type": "test"}`),
+				Fields:  mapstr.M{},
+			},
+			config: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"ndjson": map[string]interface{}{
+							"target":         "",
+							"overwrite_keys": true,
+							"add_error_key":  true,
+							"message_key":    "msg",
+						},
+					},
+				},
+			},
+			expectedMessage: reader.Message{
+				Content: []byte("FetchActiveSessionToken process ended"),
+				Fields: mapstr.M{
+					"appInfo": mapstr.M{
+						"appname": "SessionManager",
+						"appid":   "Pooler",
+						"host":    "demohost.mydomain.com",
+						"ip":      "192.168.128.113",
+						"pid":     int64(13982),
+					},
+					"level":  "INFO",
+					"logger": "iapi.logger",
+					"userFields": mapstr.M{
+						"ApplicationId":     "PROFAPP_001",
+						"RequestTrackingId": "RetrieveTBProfileToken-6066477",
+					},
+					"msg":       "FetchActiveSessionToken process ended",
+					"source":    "DataAccess/FetchActiveSessionToken.process",
+					"thread":    "JobCourier4",
+					"type":      "test",
+					"timestamp": "2016-04-05T18:47:18.444Z",
+				},
+			},
+		},
+		"JSON post processor on invalid type in message": {
+			message: reader.Message{
+				Content: []byte(`{"timestamp":"2016-04-05T18:47:18.444Z","level":"INFO","logger":"iapi.logger","thread":"JobCourier4","appInfo":{"appname":"SessionManager","appid":"Pooler","host":"demohost.mydomain.com","ip":"192.168.128.113","pid":13982},"userFields":{"ApplicationId":"PROFAPP_001","RequestTrackingId":"RetrieveTBProfileToken-6066477"},"source":"DataAccess\/FetchActiveSessionToken.process","msg":"FetchActiveSessionToken process ended", "type": 5}`),
+				Fields:  mapstr.M{},
+			},
+			config: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"ndjson": map[string]interface{}{
+							"target":         "",
+							"overwrite_keys": true,
+							"add_error_key":  true,
+							"message_key":    "msg",
+						},
+					},
+				},
+			},
+			expectedMessage: reader.Message{
+				Content: []byte("FetchActiveSessionToken process ended"),
+				Fields: mapstr.M{
+					"appInfo": mapstr.M{
+						"appname": "SessionManager",
+						"appid":   "Pooler",
+						"host":    "demohost.mydomain.com",
+						"ip":      "192.168.128.113",
+						"pid":     int64(13982),
+					},
+					"level":  "INFO",
+					"logger": "iapi.logger",
+					"userFields": mapstr.M{
+						"ApplicationId":     "PROFAPP_001",
+						"RequestTrackingId": "RetrieveTBProfileToken-6066477",
+					},
+					"msg":       "FetchActiveSessionToken process ended",
+					"source":    "DataAccess/FetchActiveSessionToken.process",
+					"thread":    "JobCourier4",
+					"timestamp": "2016-04-05T18:47:18.444Z",
+					"error": mapstr.M{
+						"message": "type not overwritten (not string)",
+						"type":    "json",
+					},
+				},
+			},
+		},
+		"JSON post processor on invalid struct under type in message": {
+			message: reader.Message{
+				Content: []byte(`{"timestamp":"2016-04-05T18:47:18.444Z","level":"INFO","logger":"iapi.logger","thread":"JobCourier4","appInfo":{"appname":"SessionManager","appid":"Pooler","host":"demohost.mydomain.com","ip":"192.168.128.113","pid":13982},"userFields":{"ApplicationId":"PROFAPP_001","RequestTrackingId":"RetrieveTBProfileToken-6066477"},"source":"DataAccess\/FetchActiveSessionToken.process","msg":"FetchActiveSessionToken process ended", "type": {"hello": "shouldn't work"}}`),
+				Fields:  mapstr.M{},
+			},
+			config: map[string]interface{}{
+				"parsers": []map[string]interface{}{
+					map[string]interface{}{
+						"ndjson": map[string]interface{}{
+							"target":         "",
+							"overwrite_keys": true,
+							"add_error_key":  true,
+							"message_key":    "msg",
+						},
+					},
+				},
+			},
+			expectedMessage: reader.Message{
+				Content: []byte("FetchActiveSessionToken process ended"),
+				Fields: mapstr.M{
+					"appInfo": mapstr.M{
+						"appname": "SessionManager",
+						"appid":   "Pooler",
+						"host":    "demohost.mydomain.com",
+						"ip":      "192.168.128.113",
+						"pid":     int64(13982),
+					},
+					"level":  "INFO",
+					"logger": "iapi.logger",
+					"userFields": mapstr.M{
+						"ApplicationId":     "PROFAPP_001",
+						"RequestTrackingId": "RetrieveTBProfileToken-6066477",
+					},
+					"msg":       "FetchActiveSessionToken process ended",
+					"source":    "DataAccess/FetchActiveSessionToken.process",
+					"thread":    "JobCourier4",
+					"timestamp": "2016-04-05T18:47:18.444Z",
+					"error": mapstr.M{
+						"message": "type not overwritten (not string)",
+						"type":    "json",
+					},
 				},
 			},
 		},
@@ -304,7 +600,7 @@ func TestJSONParsersWithFields(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.config)
+			cfg := config.MustNewConfigFrom(test.config)
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
 			require.NoError(t, err)
@@ -341,25 +637,25 @@ func TestContainerParser(t *testing.T) {
 			expectedMessages: []reader.Message{
 				reader.Message{
 					Content: []byte("Fetching main repository github.com/elastic/beats...\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},
 				reader.Message{
 					Content: []byte("Fetching dependencies...\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},
 				reader.Message{
 					Content: []byte("Execute /scripts/packetbeat_before_build.sh\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},
 				reader.Message{
 					Content: []byte("patching file vendor/github.com/tsg/gopacket/pcap/pcap.go\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},
@@ -380,7 +676,7 @@ func TestContainerParser(t *testing.T) {
 			expectedMessages: []reader.Message{
 				reader.Message{
 					Content: []byte("2017-09-12 22:32:21.212 [INFO][88] table.go 710: Invalidating dataplane cache\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},
@@ -401,13 +697,13 @@ func TestContainerParser(t *testing.T) {
 			expectedMessages: []reader.Message{
 				reader.Message{
 					Content: []byte("Fetching main repository github.com/elastic/beats...\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},
 				reader.Message{
 					Content: []byte("Execute /scripts/packetbeat_before_build.sh\n"),
-					Fields: common.MapStr{
+					Fields: mapstr.M{
 						"stream": "stdout",
 					},
 				},
@@ -418,7 +714,7 @@ func TestContainerParser(t *testing.T) {
 	for name, test := range tests {
 		test := test
 		t.Run(name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(test.parsers)
+			cfg := config.MustNewConfigFrom(test.parsers)
 			var parsersConfig testParsersConfig
 			err := cfg.Unpack(&parsersConfig)
 			require.NoError(t, err)
@@ -438,8 +734,42 @@ func TestContainerParser(t *testing.T) {
 	}
 }
 
+func TestParserIncludeMessages(t *testing.T) {
+	parserConfig := map[string]interface{}{
+		"parsers": []map[string]interface{}{
+			{
+				"include_message": map[string]interface{}{
+					"patterns": []string{"^INCLUDE"},
+				},
+			},
+		},
+	}
+
+	lines := "INCLUDE - FOO\ndo not include this line\n\nINCLUDE BAR\n"
+	expectedMessages := []string{
+		"INCLUDE - FOO\n",
+		"INCLUDE BAR\n",
+	}
+
+	cfg := config.MustNewConfigFrom(parserConfig)
+	var c inputParsersConfig
+	err := cfg.Unpack(&c)
+	require.NoError(t, err)
+
+	p := c.Parsers.Create(testReader(lines))
+
+	readMsgs := []string{}
+	msg, err := p.Next()
+	for err == nil {
+		readMsgs = append(readMsgs, string(msg.Content))
+		msg, err = p.Next()
+	}
+
+	require.Equal(t, expectedMessages, readMsgs, "fii")
+}
+
 type testParsersConfig struct {
-	Parsers []common.ConfigNamespace `struct:"parsers"`
+	Parsers []config.Namespace `struct:"parsers"`
 }
 
 func testReader(lines string) reader.Reader {

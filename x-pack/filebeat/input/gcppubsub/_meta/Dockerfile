@@ -1,6 +1,11 @@
 FROM debian:stretch
 ARG SDK_VERSION
 
+# TODO: use newer base
+RUN sed -i s/deb.debian.org/archive.debian.org/g /etc/apt/sources.list \
+    && sed -i 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list \
+    && sed -i '/stretch-updates/d' /etc/apt/sources.list 
+
 RUN \
     apt-get update \
 	&& apt-get install -y \
@@ -28,6 +33,6 @@ RUN \
 RUN \
     mkdir /data
 
-HEALTHCHECK --interval=1s --retries=90 CMD curl -s -f http://localhost:8432/
+HEALTHCHECK --interval=1s --retries=90 CMD curl -s -f --http2 http://localhost:8432/
 
 CMD gcloud beta emulators pubsub start --data-dir /data --host-port "0.0.0.0:8432"

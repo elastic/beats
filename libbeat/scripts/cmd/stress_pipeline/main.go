@@ -27,25 +27,26 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	logpcfg "github.com/elastic/beats/v7/libbeat/logp/configure"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/console"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/elasticsearch"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/fileout"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/logstash"
-	"github.com/elastic/beats/v7/libbeat/paths"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline/stress"
 	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
-	"github.com/elastic/beats/v7/libbeat/service"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	logpcfg "github.com/elastic/elastic-agent-libs/logp/configure"
+	"github.com/elastic/elastic-agent-libs/paths"
+	"github.com/elastic/elastic-agent-libs/service"
 )
 
 var (
 	duration   time.Duration // -duration <duration>
-	overwrites = common.SettingFlag(nil, "E", "Configuration overwrite")
+	overwrites = conf.SettingFlag(nil, "E", "Configuration overwrite")
 )
 
 type config struct {
 	Path    paths.Path
-	Logging *common.Config
+	Logging *conf.C
 }
 
 func main() {
@@ -92,7 +93,7 @@ func run() error {
 		return err
 	}
 
-	cfg.PrintDebugf("input config:")
+	common.PrintConfigDebugf(cfg, "input config:")
 
 	return stress.RunTests(info, duration, cfg, nil)
 }

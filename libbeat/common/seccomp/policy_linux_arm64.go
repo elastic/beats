@@ -26,7 +26,6 @@ func init() {
 			{
 				Action: seccomp.ActionErrno,
 				Names: []string{
-					"execve",
 					"execveat",
 				},
 			},

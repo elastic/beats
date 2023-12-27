@@ -1,0 +1,58 @@
+{
+  "@timestamp": "2023-01-19T19:08:28.770Z",
+  "elasticsearch": {
+    "cluster": {
+      "id": "WocBBA0QRma0sGpdQ7vLfQ",
+      "name": "my-cluster"
+    },
+    "node": {
+      "name": "27fb1c2fd783",
+      "roles": [
+        "ingest",
+        "remote_cluster_client"
+      ],
+      "id": "f5i3v9hMT_q__q6B9WOo5A"
+    },
+    "ingest_pipeline": {
+      "name": "my-pipeline",
+      "total": {
+        "count": 64,
+        "failed": 0,
+        "time": {
+          "total": {
+            "ms": 39
+          },
+          "self": {
+            "ms": 39
+          }
+        }
+      }
+    }
+  },
+  "ecs": {
+    "version": "8.0.0"
+  },
+  "host": {
+    "name": "myhost.local"
+  },
+  "agent": {
+    "type": "metricbeat",
+    "version": "8.7.0",
+    "ephemeral_id": "80fe51b6-57df-46d1-9240-20424df6d675",
+    "id": "faab8154-7ceb-470f-b2ca-0aee636951c3",
+    "name": "myhost.local"
+  },
+  "event": {
+    "dataset": "elasticsearch.ingest_pipeline",
+    "module": "elasticsearch",
+    "duration": 558169708
+  },
+  "metricset": {
+    "period": 10000,
+    "name": "ingest_pipeline"
+  },
+  "service": {
+    "address": "https://localhost:9200",
+    "type": "elasticsearch"
+  }
+}

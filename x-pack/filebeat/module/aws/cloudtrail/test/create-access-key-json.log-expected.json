@@ -9,6 +9,7 @@
         "aws.cloudtrail.flattened.response_elements.accessKey.status": "Active",
         "aws.cloudtrail.flattened.response_elements.accessKey.userName": "Bob",
         "aws.cloudtrail.recipient_account_id": "0123456789012",
+        "aws.cloudtrail.request_id": "EXAMPLE-823a-48dc-8fa9-EXAMPLE",
         "aws.cloudtrail.request_parameters": "{userName=Bob}",
         "aws.cloudtrail.response_elements": "{accessKey={accessKeyId=EXAMPLE_KEY_ID, userName=Bob, status=Active, createDate=Jan 8, 2020 8:43:06 PM}}",
         "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY",

@@ -9,19 +9,18 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/labelhash"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var logger = logp.NewLogger("statd")
 
 type metric struct {
-	name       string
-	tags       map[string]string
-	lastSeen   time.Time
-	sampleRate float32
-	metric     interface{}
+	name     string
+	tags     map[string]string
+	lastSeen time.Time
+	metric   interface{}
 }
 
 type registry struct {
@@ -182,7 +181,7 @@ func (t *samplingTimerSnapshot) Variance() float64 {
 
 type metricsGroup struct {
 	tags    map[string]string
-	metrics common.MapStr
+	metrics mapstr.M
 }
 
 func (r *registry) getMetric(metric interface{}) map[string]interface{} {
@@ -242,7 +241,7 @@ func (r *registry) GetAll() []metricsGroup {
 
 	tagGroups := []metricsGroup{}
 	for tagGroupKey, metricsMap := range r.metrics {
-		fields := common.MapStr{}
+		fields := mapstr.M{}
 		for key, m := range metricsMap {
 
 			// cleanups according to ttl
@@ -287,7 +286,7 @@ func (r *registry) getOrNew(name string, tags map[string]string, new func() inte
 	tc, ok := r.metrics[tagsKey]
 	if !ok {
 		counter := new()
-		r.metrics[tagsKey] = map[string]*metric{name: &metric{
+		r.metrics[tagsKey] = map[string]*metric{name: {
 			metric:   counter,
 			name:     name,
 			tags:     tags,
@@ -330,7 +329,6 @@ func (r *registry) GetOrNewCounter(name string, tags map[string]string) metrics.
 
 	r.clearTypeChanged(name, tags)
 	return r.GetOrNewCounter(name, tags)
-
 }
 
 func (r *registry) GetOrNewTimer(name string, tags map[string]string) *samplingTimer {
@@ -374,7 +372,7 @@ func (r *registry) GetOrNewSet(name string, tags map[string]string) *setMetric {
 }
 
 func (r *registry) metricHash(tags map[string]string) string {
-	mapstrTags := common.MapStr{}
+	mapstrTags := mapstr.M{}
 	for k, v := range tags {
 		mapstrTags[k] = v
 	}

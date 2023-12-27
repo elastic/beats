@@ -24,25 +24,25 @@ const (
 // Map type is a regular map with string keys and interface{} values. The valid
 // types for Map entries in a record are:
 //
-//  +---------+----------------------------------------+
-//  | uint64  | unsigned integer fields.               |
-//  +---------+----------------------------------------+
-//  | int64   | signed integer fields.                 |
-//  +---------+----------------------------------------+
-//  | float64 | floating-point fields.                 |
-//  +---------+----------------------------------------+
-//  | bool    | boolean fields.                        |
-//  +---------+----------------------------------------+
-//  |[]byte   | octetArray (raw) fields.               |
-//  +---------+----------------------------------------+
-//  | string  | string fields.                         |
-//  +---------+----------------------------------------+
-//  |time.Time| timestamp fields.                      |
-//  +---------+----------------------------------------+
-//  | net.IP  | IPv4 and IPv6 address fields.          |
-//  +---------+----------------------------------------+
-//  |  Map    | nested fields found in option records. |
-//  +---------+----------------------------------------+
+//	+---------+----------------------------------------+
+//	| uint64  | unsigned integer fields.               |
+//	+---------+----------------------------------------+
+//	| int64   | signed integer fields.                 |
+//	+---------+----------------------------------------+
+//	| float64 | floating-point fields.                 |
+//	+---------+----------------------------------------+
+//	| bool    | boolean fields.                        |
+//	+---------+----------------------------------------+
+//	|[]byte   | octetArray (raw) fields.               |
+//	+---------+----------------------------------------+
+//	| string  | string fields.                         |
+//	+---------+----------------------------------------+
+//	|time.Time| timestamp fields.                      |
+//	+---------+----------------------------------------+
+//	| net.IP  | IPv4 and IPv6 address fields.          |
+//	+---------+----------------------------------------+
+//	|  Map    | nested fields found in option records. |
+//	+---------+----------------------------------------+
 type Map map[string]interface{}
 
 // Record represents a NetFlow record extracted from a NetFlow packet.

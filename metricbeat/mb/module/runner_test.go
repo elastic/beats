@@ -16,26 +16,30 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package module_test
 
 import (
+	"runtime"
 	"testing"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system"
+	_ "github.com/elastic/beats/v7/metricbeat/module/system/cpu"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestRunner(t *testing.T) {
 	pubClient, factory := newPubClientFactory()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
+	config, err := conf.NewConfigFrom(map[string]interface{}{
 		"module":     moduleName,
 		"metricsets": []string{reportingFetcherName},
 	})
@@ -60,6 +64,62 @@ func TestRunner(t *testing.T) {
 	// Stop the module. This blocks until all MetricSets in the Module have
 	// stopped and the publisher.Client is closed.
 	runner.Stop()
+}
+
+func TestCPUDiagnostics(t *testing.T) {
+	pubClient, factory := newPubClientFactory()
+
+	config, err := conf.NewConfigFrom(map[string]interface{}{
+		"module":     "system",
+		"metricsets": []string{"cpu"},
+	})
+	require.NoError(t, err)
+
+	// Create a new Wrapper based on the configuration.
+	m, err := module.NewWrapper(config, mb.Registry, module.WithMetricSetInfo())
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	runner := module.NewRunner(factory(), m)
+
+	// First test, run before start. Shouldn't cause panics or other undefined behavior
+	diag, ok := runner.(diagnostics.DiagnosticReporter)
+	require.True(t, ok)
+	diags := diag.Diagnostics()
+	// This diagnostic set is only available on linux.
+	// On other OSes, the list should be empty
+	if runtime.GOOS == "linux" {
+		require.NotEmpty(t, diags)
+	} else {
+		require.Empty(t, diags)
+	}
+
+	runner.Start()
+	assert.NotNil(t, <-pubClient.Channel)
+
+	diag, ok = runner.(diagnostics.DiagnosticReporter)
+	require.True(t, ok)
+	diags = diag.Diagnostics()
+	if runtime.GOOS == "linux" {
+		require.NotEmpty(t, diags)
+		res := diags[0].Callback()
+		require.NotEmpty(t, res)
+	} else {
+		require.Empty(t, diags)
+	}
+
+	runner.Stop()
+	// stop, test again.
+	diag, ok = runner.(diagnostics.DiagnosticReporter)
+	require.True(t, ok)
+	diags = diag.Diagnostics()
+	if runtime.GOOS == "linux" {
+		require.NotEmpty(t, diags)
+	} else {
+		require.Empty(t, diags)
+	}
+
 }
 
 // newPubClientFactory returns a new ChanClient and a function that returns

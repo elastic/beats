@@ -15,10 +15,12 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//nolint:errcheck // All complaints are about mapstr.M puts.
 package dhcpv4
 
 import (
 	"fmt"
+	"net"
 	"strings"
 
 	"github.com/insomniacslk/dhcp/dhcpv4"
@@ -26,11 +28,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 var (
@@ -46,13 +50,13 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	watcher *procs.ProcessesWatcher,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	return newPlugin(testMode, results, watcher, cfg)
 }
 
-func newPlugin(testMode bool, results protos.Reporter, watcher procs.ProcessesWatcher, cfg *common.Config) (*dhcpv4Plugin, error) {
+func newPlugin(testMode bool, results protos.Reporter, watcher *procs.ProcessesWatcher, cfg *conf.C) (*dhcpv4Plugin, error) {
 	config := defaultConfig
 
 	if !testMode {
@@ -72,7 +76,7 @@ func newPlugin(testMode bool, results protos.Reporter, watcher procs.ProcessesWa
 type dhcpv4Plugin struct {
 	dhcpv4Config
 	report  protos.Reporter
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 	log     *logp.Logger
 }
 
@@ -124,14 +128,15 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 	fields["type"] = pbf.Event.Dataset
 	fields["status"] = "OK"
 
-	dhcpData := common.MapStr{
+	mac16 := v4.ClientHwAddr()
+	dhcpData := mapstr.M{
 		"op_code":        strings.ToLower(v4.OpcodeToString()),
 		"hardware_type":  v4.HwTypeToString(),
 		"hops":           v4.HopCount(), // Set to non-zero by relays.
 		"transaction_id": fmt.Sprintf("0x%08x", v4.TransactionID()),
 		"seconds":        v4.NumSeconds(),
 		"flags":          strings.ToLower(v4.FlagsToString()),
-		"client_mac":     v4.ClientHwAddrToString(),
+		"client_mac":     formatHardwareAddr(net.HardwareAddr(mac16[:v4.HwAddrLen()])),
 	}
 	fields["dhcpv4"] = dhcpData
 
@@ -158,8 +163,21 @@ func (p *dhcpv4Plugin) parseDHCPv4(pkt *protos.Packet) *beat.Event {
 		p.log.Warnw("Failed converting DHCP options to map",
 			"dhcpv4", v4, "error", err)
 	} else if len(opts) > 0 {
-		dhcpData.Put("option", opts)
+		_, _ = dhcpData.Put("option", opts)
 	}
 
 	return &evt
+}
+
+// formatHardwareAddr formats hardware addresses according to the ECS spec.
+func formatHardwareAddr(addr net.HardwareAddr) string {
+	buf := make([]byte, 0, len(addr)*3-1)
+	for _, b := range addr {
+		if len(buf) != 0 {
+			buf = append(buf, '-')
+		}
+		const hexDigit = "0123456789ABCDEF"
+		buf = append(buf, hexDigit[b>>4], hexDigit[b&0xf])
+	}
+	return string(buf)
 }

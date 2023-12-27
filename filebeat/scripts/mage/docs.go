@@ -26,7 +26,7 @@ import (
 // CollectDocs executes the Filebeat docs_collector script to collect/generate
 // documentation from each module.
 func CollectDocs() error {
-	ve, err := devtools.PythonVirtualenv()
+	ve, err := devtools.PythonVirtualenv(false)
 	if err != nil {
 		return err
 	}

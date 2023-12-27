@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package eslegclient
 
@@ -29,7 +28,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func ElasticsearchMock(code int, body []byte) *httptest.Server {

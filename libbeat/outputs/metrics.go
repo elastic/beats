@@ -17,7 +17,7 @@
 
 package outputs
 
-import "github.com/elastic/beats/v7/libbeat/monitoring"
+import "github.com/elastic/elastic-agent-libs/monitoring"
 
 // Stats implements the Observer interface, for collecting metrics on common
 // outputs events.
@@ -34,6 +34,9 @@ type Stats struct {
 	duplicates *monitoring.Uint // events sent and waiting for ACK/fail from output
 	dropped    *monitoring.Uint // total number of invalid events dropped by the output
 	tooMany    *monitoring.Uint // total number of too many requests replies from output
+
+	// Output batch stats
+	split *monitoring.Uint // total number of batches split for being too large
 
 	//
 	// Output network connection stats
@@ -58,6 +61,8 @@ func NewStats(reg *monitoring.Registry) *Stats {
 		duplicates: monitoring.NewUint(reg, "events.duplicates"),
 		active:     monitoring.NewUint(reg, "events.active"),
 		tooMany:    monitoring.NewUint(reg, "events.toomany"),
+
+		split: monitoring.NewUint(reg, "batches.split"),
 
 		writeBytes:  monitoring.NewUint(reg, "write.bytes"),
 		writeErrors: monitoring.NewUint(reg, "write.errors"),
@@ -116,6 +121,12 @@ func (s *Stats) Dropped(n int) {
 func (s *Stats) Cancelled(n int) {
 	if s != nil {
 		s.active.Sub(uint64(n))
+	}
+}
+
+func (s *Stats) Split() {
+	if s != nil {
+		s.split.Inc()
 	}
 }
 

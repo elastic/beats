@@ -22,83 +22,142 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/testslike"
 	"github.com/elastic/go-lookslike/validator"
 )
 
 func TestUnnestStream(t *testing.T) {
+	testRootId := "rootId"
+	testStreamId := "streamId"
+	testType := "montype"
+	testOrigin := "testOrigin"
+	testSched := "@every 10s"
+	testNs := "mynamespace"
+	testDs := "mydataset"
+
 	type testCase struct {
 		name string
-		cfg  common.MapStr
+		cfg  mapstr.M
 		v    validator.Validator
 	}
 	tests := []testCase{
 		{
-			name: "simple",
-			cfg: common.MapStr{
-				"id": "myuuid",
-				"streams": []common.MapStr{
+			name: "no datastream",
+			cfg: mapstr.M{
+				"id":       testRootId,
+				"type":     testType,
+				"schedule": testSched,
+			},
+			v: lookslike.MustCompile(mapstr.M{
+				"id":       testRootId,
+				"type":     testType,
+				"schedule": testSched,
+			}),
+		},
+		{
+			name: "simple datastream, with origin uses streamId",
+			cfg: mapstr.M{
+				"id": testRootId,
+				"streams": []mapstr.M{
 					{
-						"type":     "montype",
-						"streamid": "mystreamid",
-						"data_stream": common.MapStr{
-							"namespace": "mynamespace",
-							"dataset":   "mydataset",
-							"type":      "mytype",
+						"id":       testStreamId,
+						"type":     testType,
+						"schedule": testSched,
+						"origin":   testOrigin,
+						"data_stream": mapstr.M{
+							"namespace": testNs,
+							"dataset":   testDs,
+							"type":      testType,
 						},
 					},
 				},
 			},
-			v: lookslike.MustCompile(common.MapStr{
-				"id":   "myuuid",
-				"type": "montype",
-				"data_stream": common.MapStr{
-					"namespace": "mynamespace",
-					"dataset":   "mydataset",
-					"type":      "mytype",
+			v: lookslike.MustCompile(mapstr.M{
+				"id":       testStreamId,
+				"type":     testType,
+				"schedule": testSched,
+				"origin":   testOrigin,
+				"data_stream": mapstr.M{
+					"namespace": testNs,
+					"dataset":   testDs,
+					"type":      testType,
+				},
+			}),
+		},
+		{
+			name: "simple datastream, no origin, uses rootId",
+			cfg: mapstr.M{
+				"id": testRootId,
+				"streams": []mapstr.M{
+					{
+						"id":       testStreamId,
+						"type":     testType,
+						"schedule": testSched,
+						"data_stream": mapstr.M{
+							"namespace": testNs,
+							"dataset":   testDs,
+							"type":      testType,
+						},
+					},
+				},
+			},
+			v: lookslike.MustCompile(mapstr.M{
+				"id":       testRootId,
+				"type":     testType,
+				"schedule": testSched,
+				"data_stream": mapstr.M{
+					"namespace": testNs,
+					"dataset":   testDs,
+					"type":      testType,
 				},
 			}),
 		},
 		{
 			name: "split data stream",
-			cfg: common.MapStr{
-				"id":   "myuuid",
-				"type": "montype",
-				"data_stream": common.MapStr{
-					"namespace": "mynamespace",
+			cfg: mapstr.M{
+				"id":   testRootId,
+				"type": testType,
+				"data_stream": mapstr.M{
+					"namespace": testNs,
 				},
-				"streams": []common.MapStr{
+				"streams": []mapstr.M{
 					{
-						"type": "montype",
-						"data_stream": common.MapStr{
-							"type":    "mytype",
-							"dataset": "mydataset",
+						"id":       testStreamId,
+						"origin":   testOrigin,
+						"type":     testType,
+						"schedule": testSched,
+						"data_stream": mapstr.M{
+							"type":    testType,
+							"dataset": testDs,
 						},
 					},
 				},
 			},
-			v: lookslike.MustCompile(common.MapStr{
-				"id":   "myuuid",
-				"type": "montype",
-				"data_stream": common.MapStr{
-					"namespace": "mynamespace",
-					"dataset":   "mydataset",
-					"type":      "mytype",
+			v: lookslike.MustCompile(mapstr.M{
+				"id":       testStreamId,
+				"type":     testType,
+				"schedule": testSched,
+				"origin":   testOrigin,
+				"data_stream": mapstr.M{
+					"namespace": testNs,
+					"dataset":   testDs,
+					"type":      testType,
 				},
 			}),
 		},
 		{
 			name: "base is last, not first stream",
-			cfg: common.MapStr{
-				"id": "myuuid",
-				"data_stream": common.MapStr{
-					"namespace": "parentnamespace",
+			cfg: mapstr.M{
+				"id": testRootId,
+				"data_stream": mapstr.M{
+					"namespace": testNs,
 				},
-				"streams": []common.MapStr{
+				"streams": []mapstr.M{
 					{
-						"data_stream": common.MapStr{
+						"data_stream": mapstr.M{
 							// Intentionally missing `type` since
 							// this is not the base dataset.
 							// There is only one stream with `type`
@@ -106,21 +165,25 @@ func TestUnnestStream(t *testing.T) {
 						},
 					},
 					{
-						"type": "montype",
-						"data_stream": common.MapStr{
-							"type":    "basetype",
-							"dataset": "basedataset",
+						"id":       testStreamId,
+						"type":     testType,
+						"schedule": testSched,
+						"origin":   testOrigin,
+						"data_stream": mapstr.M{
+							"type":    testType,
+							"dataset": testDs,
 						},
 					},
 				},
 			},
-			v: lookslike.MustCompile(common.MapStr{
-				"id":   "myuuid",
-				"type": "montype",
-				"data_stream": common.MapStr{
-					"namespace": "parentnamespace",
-					"type":      "basetype",
-					"dataset":   "basedataset",
+			v: lookslike.MustCompile(mapstr.M{
+				"id":       testStreamId,
+				"type":     testType,
+				"schedule": testSched,
+				"data_stream": mapstr.M{
+					"namespace": testNs,
+					"type":      testType,
+					"dataset":   testDs,
 				},
 			}),
 		},
@@ -128,13 +191,13 @@ func TestUnnestStream(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			src, err := common.NewConfigFrom(test.cfg)
+			src, err := conf.NewConfigFrom(test.cfg)
 			require.NoError(t, err)
 
 			unnested, err := UnnestStream(src)
 			require.NoError(t, err)
 
-			unpacked := common.MapStr{}
+			unpacked := mapstr.M{}
 			err = unnested.Unpack(unpacked)
 			require.NoError(t, err)
 			testslike.Test(t, test.v, unpacked)

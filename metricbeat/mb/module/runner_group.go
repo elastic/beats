@@ -20,18 +20,21 @@ package module
 import (
 	"strings"
 	"sync"
+
+	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 )
 
 type runnerGroup struct {
-	runners []Runner
+	runners []cfgfile.Runner
 
 	startOnce sync.Once
 	stopOnce  sync.Once
 }
 
-var _ Runner = new(runnerGroup)
+var _ cfgfile.Runner = new(runnerGroup)
 
-func newRunnerGroup(runners []Runner) Runner {
+func newRunnerGroup(runners []cfgfile.Runner) cfgfile.Runner {
 	return &runnerGroup{
 		runners: runners,
 	}
@@ -59,4 +62,18 @@ func (rg *runnerGroup) String() string {
 		entries = append(entries, runner.String())
 	}
 	return "RunnerGroup{" + strings.Join(entries, ", ") + "}"
+}
+
+// Diagnostics, like the rest of the runner group methods, merely
+// calls all the "client" runners and combines the results
+func (rg *runnerGroup) Diagnostics() []diagnostics.DiagnosticSetup {
+	results := []diagnostics.DiagnosticSetup{}
+	for _, runner := range rg.runners {
+		if diagHandler, ok := runner.(diagnostics.DiagnosticReporter); ok {
+			diags := diagHandler.Diagnostics()
+			results = append(results, diags...)
+		}
+
+	}
+	return results
 }

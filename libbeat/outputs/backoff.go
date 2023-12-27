@@ -24,7 +24,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/elastic-agent-libs/testing"
 )
 
 type backoffClient struct {

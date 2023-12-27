@@ -23,23 +23,26 @@ import (
 
 	"github.com/elastic/go-ucfg"
 
+	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/elastic-agent-autodiscover/utils"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
-	autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
+	_ = autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
 }
 
 const (
-	montype    = "type"
 	schedule   = "schedule"
 	hosts      = "hosts"
 	processors = "processors"
+	scheme     = "type"
 )
 
 type heartbeatHints struct {
@@ -48,44 +51,51 @@ type heartbeatHints struct {
 }
 
 // NewHeartbeatHints builds a heartbeat hints builder
-func NewHeartbeatHints(cfg *common.Config) (autodiscover.Builder, error) {
+func NewHeartbeatHints(cfg *conf.C) (autodiscover.Builder, error) {
 	config := defaultConfig()
 	err := cfg.Unpack(config)
 
 	if err != nil {
-		return nil, fmt.Errorf("unable to unpack hints config due to error: %v", err)
+		return nil, fmt.Errorf("unable to unpack hints config due to error: %w", err)
 	}
 
-	return &heartbeatHints{config, logp.NewLogger("hints.builder")}, nil
+	return &heartbeatHints{config, logp.L()}, nil
 }
 
 // Create config based on input hints in the bus event
-func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*common.Config {
-	var hints common.MapStr
+func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf.C {
+	var (
+		hints    mapstr.M
+		podEvent bool
+	)
+
 	hIface, ok := event["hints"]
 	if ok {
-		hints, _ = hIface.(common.MapStr)
+		hints, _ = hIface.(mapstr.M)
 	}
 
 	monitorConfig := hb.getRawConfigs(hints)
 
 	// If explicty disabled, return nothing
-	if builder.IsDisabled(hints, hb.config.Key) {
+	if utils.IsDisabled(hints, hb.config.Key) {
 		hb.logger.Warnf("heartbeat config disabled by hint: %+v", event)
-		return []*common.Config{}
+		return []*conf.C{}
 	}
 
-	port, _ := common.TryToInt(event["port"])
+	port, ok := common.TryToInt(event["port"])
+	if !ok {
+		podEvent = true
+	}
 
 	host, _ := event["host"].(string)
 	if host == "" {
-		return []*common.Config{}
+		return []*conf.C{}
 	}
 
 	if monitorConfig != nil {
-		configs := []*common.Config{}
+		configs := []*conf.C{}
 		for _, cfg := range monitorConfig {
-			if config, err := common.NewConfigFrom(cfg); err == nil {
+			if config, err := conf.NewConfigFrom(cfg); err == nil {
 				configs = append(configs, config)
 			}
 		}
@@ -94,10 +104,10 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 		return template.ApplyConfigTemplate(event, configs)
 	}
 
-	tempCfg := common.MapStr{}
-	monitors := builder.GetHintsAsList(hints, hb.config.Key)
+	tempCfg := mapstr.M{}
+	monitors := utils.GetHintsAsList(hints, hb.config.Key)
 
-	var configs []*common.Config
+	configs := make([]*conf.C, 0, len(monitors))
 	for _, monitor := range monitors {
 		// If a monitor doesn't have a schedule associated with it then default it.
 		if _, ok := monitor[schedule]; !ok {
@@ -108,13 +118,18 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 			monitor[processors] = procs
 		}
 
-		h := hb.getHostsWithPort(monitor, port)
+		h, err := hb.getHostsWithPort(monitor, port, podEvent)
+		if err != nil {
+			hb.logger.Warnf("unable to find valid hosts for %+v: %w", monitor, err)
+			continue
+		}
+
 		monitor[hosts] = h
 
-		config, err := common.NewConfigFrom(monitor)
+		config, err := conf.NewConfigFrom(monitor)
 		if err != nil {
 			hb.logger.Debugf("unable to create config from MapStr %+v", tempCfg)
-			return []*common.Config{}
+			return []*conf.C{}
 		}
 		hb.logger.Debugf("hints.builder", "generated config %+v", config)
 		configs = append(configs, config)
@@ -124,44 +139,41 @@ func (hb *heartbeatHints) CreateConfig(event bus.Event, options ...ucfg.Option) 
 	return template.ApplyConfigTemplate(event, configs)
 }
 
-func (hb *heartbeatHints) getType(hints common.MapStr) common.MapStr {
-	return builder.GetHintMapStr(hints, hb.config.Key, montype)
+func (hb *heartbeatHints) getRawConfigs(hints mapstr.M) []mapstr.M {
+	return utils.GetHintAsConfigs(hints, hb.config.Key)
 }
 
-func (hb *heartbeatHints) getSchedule(hints common.MapStr) []string {
-	return builder.GetHintAsList(hints, hb.config.Key, schedule)
+func (hb *heartbeatHints) getProcessors(hints mapstr.M) []mapstr.M {
+	return utils.GetConfigs(hints, "", "processors")
 }
 
-func (hb *heartbeatHints) getRawConfigs(hints common.MapStr) []common.MapStr {
-	return builder.GetHintAsConfigs(hints, hb.config.Key)
-}
+func (hb *heartbeatHints) getHostsWithPort(hints mapstr.M, port int, podEvent bool) ([]string, error) {
+	thosts := utils.GetHintAsList(hints, "", hosts)
+	mType := utils.GetHintString(hints, "", scheme)
 
-func (hb *heartbeatHints) getProcessors(hints common.MapStr) []common.MapStr {
-	return builder.GetConfigs(hints, "", "processors")
-}
-
-func (hb *heartbeatHints) getHostsWithPort(hints common.MapStr, port int) []string {
-	var result []string
-	thosts := builder.GetHintAsList(hints, "", hosts)
-	// Only pick hosts that have ${data.port} or the port on current event. This will make
-	// sure that incorrect meta mapping doesn't happen
+	// We can't reliable detect duplicated monitors since we don't have all ports/hosts,
+	// relying on runner deduping monitors, see https://github.com/elastic/beats/pull/29041
+	hostSet := map[string]struct{}{}
 	for _, h := range thosts {
-		if strings.Contains(h, "data.port") || strings.Contains(h, fmt.Sprintf(":%d", port)) ||
-			// Use the event that has no port config if there is a ${data.host}:9090 like input
-			(port == 0 && strings.Contains(h, "data.host")) {
-			result = append(result, h)
-		} else if port == 0 && !strings.Contains(h, ":") {
-			// For ICMP like use cases allow only host to be passed if there is no port
-			result = append(result, h)
-		} else {
-			hb.logger.Warn("unable to frame a host from input host: %s", h)
+		if mType == "icmp" && strings.Contains(h, ":") {
+			hb.logger.Warnf("ICMP scheme does not support port specification: %s", h)
+			continue
+		} else if strings.Contains(h, "${data.port}") && podEvent {
+			// Pod events don't contain port metadata, skip
+			continue
 		}
+
+		hostSet[h] = struct{}{}
 	}
 
-	if len(thosts) > 0 && len(result) == 0 {
-		hb.logger.Debugf("no hosts selected for port %d with hints: %+v", port, thosts)
-		return nil
+	if len(hostSet) == 0 {
+		return nil, fmt.Errorf("no hosts selected for port %d with hints: %+v", port, thosts)
 	}
 
-	return result
+	result := make([]string, 0, len(hostSet))
+	for host := range hostSet {
+		result = append(result, host)
+	}
+
+	return result, nil
 }

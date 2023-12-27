@@ -13,25 +13,23 @@ import (
 	"strings"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
+
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
-	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/cloudwatchiface"
 	"github.com/aws/aws-sdk-go-v2/service/costexplorer"
-	"github.com/aws/aws-sdk-go-v2/service/costexplorer/costexploreriface"
+	costexplorertypes "github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 	"github.com/aws/aws-sdk-go-v2/service/organizations"
-	"github.com/aws/aws-sdk-go-v2/service/organizations/organizationsiface"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/aws"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
-	metricsetName  = "billing"
-	regionName     = "us-east-1"
-	labelSeparator = "|"
+	metricsetName = "billing"
+	regionName    = "us-east-1"
 
 	// This list is from https://github.com/aws/aws-sdk-go-v2/blob/master/service/costexplorer/api_enums.go#L60-L90
 	supportedDimensionKeys = []string{
@@ -66,7 +64,7 @@ type MetricSet struct {
 	CostExplorerConfig CostExplorerConfig `config:"cost_explorer_config"`
 }
 
-// Config holds a configuration specific for billing metricset.
+// CostExplorerConfig holds a configuration specific for billing metricset.
 type CostExplorerConfig struct {
 	GroupByDimensionKeys []string `config:"group_by_dimension_keys"`
 	GroupByTagKeys       []string `config:"group_by_tag_keys"`
@@ -117,25 +115,31 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	var config aws.Config
 	err := m.Module().UnpackConfig(&config)
 	if err != nil {
-		return nil
+		return err
 	}
-	monitoringServiceName := awscommon.CreateServiceName("monitoring", config.AWSConfig.FIPSEnabled, regionName)
 	// Get startDate and endDate
 	startDate, endDate := getStartDateEndDate(m.Period)
 
 	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(m.Period, m.Latency)
+	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
 
 	// get cost metrics from cost explorer
-	awsConfig := m.MetricSet.AwsConfig.Copy()
-	svcCostExplorer := costexplorer.New(awscommon.EnrichAWSConfigWithEndpoint(
-		m.Endpoint, monitoringServiceName, "", awsConfig))
+	awsBeatsConfig := m.MetricSet.AwsConfig.Copy()
+	svcCostExplorer := costexplorer.NewFromConfig(awsBeatsConfig, func(o *costexplorer.Options) {
+		if config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
 
-	awsConfig.Region = regionName
-	svcCloudwatch := cloudwatch.New(awscommon.EnrichAWSConfigWithEndpoint(
-		m.Endpoint, monitoringServiceName, regionName, awsConfig))
+	})
 
-	timePeriod := costexplorer.DateInterval{
+	awsBeatsConfig.Region = regionName
+	svcCloudwatch := cloudwatch.NewFromConfig(awsBeatsConfig, func(o *cloudwatch.Options) {
+		if config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+	})
+
+	timePeriod := costexplorertypes.DateInterval{
 		Start: awssdk.String(startDate),
 		End:   awssdk.String(endDate),
 	}
@@ -161,22 +165,22 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 }
 
 func (m *MetricSet) getCloudWatchBillingMetrics(
-	svcCloudwatch cloudwatchiface.ClientAPI,
+	svcCloudwatch *cloudwatch.Client,
 	startTime time.Time,
 	endTime time.Time) []mb.Event {
 	var events []mb.Event
 	namespace := "AWS/Billing"
-	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, svcCloudwatch)
+	listMetricsOutput, err := aws.GetListMetricsOutput(namespace, regionName, m.Period, m.IncludeLinkedAccounts, m.MonitoringAccountID, svcCloudwatch)
 	if err != nil {
 		m.Logger().Error(err.Error())
 		return nil
 	}
 
-	if listMetricsOutput == nil || len(listMetricsOutput) == 0 {
+	if len(listMetricsOutput) == 0 {
 		return events
 	}
 
-	metricDataQueriesTotal := constructMetricQueries(listMetricsOutput, m.Period)
+	metricDataQueriesTotal := constructMetricQueries(listMetricsOutput, m.DataGranularity)
 	metricDataOutput, err := aws.GetMetricDataResults(metricDataQueriesTotal, svcCloudwatch, startTime, endTime)
 	if err != nil {
 		err = fmt.Errorf("aws GetMetricDataResults failed with %w, skipping region %s", err, regionName)
@@ -184,26 +188,24 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 		return nil
 	}
 
-	// Find a timestamp for all metrics in output
-	timestamp := aws.FindTimestamp(metricDataOutput)
-	if timestamp.IsZero() {
-		return nil
-	}
-
 	for _, output := range metricDataOutput {
 		if len(output.Values) == 0 {
 			continue
 		}
-		exists, timestampIdx := aws.CheckTimestampInArray(timestamp, output.Timestamps)
-		if exists {
-			labels := strings.Split(*output.Label, labelSeparator)
+		for valI, metricDataResultValue := range output.Values {
+			labels := strings.Split(*output.Label, aws.LabelConst.LabelSeparator)
+			event := mb.Event{}
+			if labels[aws.LabelConst.AccountIdIdx] != "" {
+				event = aws.InitEvent("", labels[aws.LabelConst.AccountLabelIdx], labels[aws.LabelConst.AccountIdIdx], output.Timestamps[valI], "")
+			} else {
+				event = aws.InitEvent("", m.MonitoringAccountName, m.MonitoringAccountID, output.Timestamps[valI], "")
+			}
 
-			event := aws.InitEvent("", m.AccountName, m.AccountID, timestamp)
-			event.MetricSetFields.Put(labels[0], output.Values[timestampIdx])
+			_, _ = event.MetricSetFields.Put(labels[aws.LabelConst.MetricNameIdx], metricDataResultValue)
 
-			i := 1
+			i := aws.LabelConst.BillingDimensionStartIdx
 			for i < len(labels)-1 {
-				event.MetricSetFields.Put(labels[i], labels[i+1])
+				_, _ = event.MetricSetFields.Put(labels[i], labels[i+1])
 				i += 2
 			}
 			event.Timestamp = endTime
@@ -213,7 +215,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 	return events
 }
 
-func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, groupByDimKeys []string, groupByTags []string, timePeriod costexplorer.DateInterval, startDate string, endDate string) []mb.Event {
+func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupByDimKeys []string, groupByTags []string, timePeriod costexplorertypes.DateInterval, startDate string, endDate string) []mb.Event {
 	var events []mb.Event
 
 	// get linked account IDs and names
@@ -225,33 +227,35 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 	}
 	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", groupByDimKeys); ok {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
-		organizationsServiceName := awscommon.CreateServiceName("organizations", config.AWSConfig.FIPSEnabled, regionName)
 
-		svcOrg := organizations.New(awscommon.EnrichAWSConfigWithEndpoint(
-			m.Endpoint, organizationsServiceName, regionName, awsConfig))
+		svcOrg := organizations.NewFromConfig(awsConfig, func(o *organizations.Options) {
+			if config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+		})
 		accounts = m.getAccountName(svcOrg)
 	}
 
 	groupBys := getGroupBys(groupByTags, groupByDimKeys)
 	for _, groupBy := range groupBys {
-		var groupDefs []costexplorer.GroupDefinition
+		var groupDefs []costexplorertypes.GroupDefinition
 
 		if groupBy.dimension != "" {
-			groupDefs = append(groupDefs, costexplorer.GroupDefinition{
+			groupDefs = append(groupDefs, costexplorertypes.GroupDefinition{
 				Key:  awssdk.String(groupBy.dimension),
-				Type: costexplorer.GroupDefinitionTypeDimension,
+				Type: costexplorertypes.GroupDefinitionTypeDimension,
 			})
 		}
 
 		if groupBy.tag != "" {
-			groupDefs = append(groupDefs, costexplorer.GroupDefinition{
+			groupDefs = append(groupDefs, costexplorertypes.GroupDefinition{
 				Key:  awssdk.String(groupBy.tag),
-				Type: costexplorer.GroupDefinitionTypeTag,
+				Type: costexplorertypes.GroupDefinitionTypeTag,
 			})
 		}
 
 		groupByCostInput := costexplorer.GetCostAndUsageInput{
-			Granularity: costexplorer.GranularityDaily,
+			Granularity: costexplorertypes.GranularityDaily,
 			// no permission for "NetAmortizedCost" and "NetUnblendedCost"
 			Metrics: []string{"AmortizedCost", "BlendedCost",
 				"NormalizedUsageAmount", "UnblendedCost", "UsageQuantity"},
@@ -260,8 +264,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 			GroupBy: groupDefs,
 		}
 
-		groupByCostReq := svcCostExplorer.GetCostAndUsageRequest(&groupByCostInput)
-		groupByOutput, err := groupByCostReq.Send(context.Background())
+		groupByOutput, err := svcCostExplorer.GetCostAndUsage(context.Background(), &groupByCostInput)
 		if err != nil {
 			err = fmt.Errorf("costexplorer GetCostAndUsageRequest failed: %w", err)
 			m.Logger().Errorf(err.Error())
@@ -279,11 +282,11 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 					eventID += key
 					// key value like db.t2.micro or Amazon Simple Queue Service belongs to dimension
 					if !strings.Contains(key, "$") {
-						event.MetricSetFields.Put("group_by."+groupBy.dimension, key)
+						_, _ = event.MetricSetFields.Put("group_by."+groupBy.dimension, key)
 						if groupBy.dimension == "LINKED_ACCOUNT" {
 							if name, ok := accounts[key]; ok {
-								event.RootFields.Put("aws.linked_account.id", key)
-								event.RootFields.Put("aws.linked_account.name", name)
+								_, _ = event.RootFields.Put("aws.linked_account.id", key)
+								_, _ = event.RootFields.Put("aws.linked_account.name", name)
 							}
 						}
 						continue
@@ -292,7 +295,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 					// tag key value is separated by $
 					tagKey, tagValue := parseGroupKey(key)
 					if tagValue != "" {
-						event.MetricSetFields.Put("group_by."+tagKey, tagValue)
+						_, _ = event.MetricSetFields.Put("group_by."+tagKey, tagValue)
 					}
 				}
 
@@ -309,11 +312,11 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer costexploreriface.ClientAPI, 
 	return events
 }
 
-func (m *MetricSet) addCostMetrics(metrics map[string]costexplorer.MetricValue, groupDefinition costexplorer.GroupDefinition, startDate string, endDate string) mb.Event {
-	event := aws.InitEvent("", m.AccountName, m.AccountID, time.Now())
+func (m *MetricSet) addCostMetrics(metrics map[string]costexplorertypes.MetricValue, groupDefinition costexplorertypes.GroupDefinition, startDate string, endDate string) mb.Event {
+	event := aws.InitEvent("", m.MonitoringAccountName, m.MonitoringAccountID, time.Now(), "")
 
 	// add group definition
-	event.MetricSetFields.Put("group_definition", common.MapStr{
+	_, _ = event.MetricSetFields.Put("group_definition", mapstr.M{
 		"key":  *groupDefinition.Key,
 		"type": groupDefinition.Type,
 	})
@@ -327,23 +330,23 @@ func (m *MetricSet) addCostMetrics(metrics map[string]costexplorer.MetricValue, 
 			continue
 		}
 
-		value := common.MapStr{
+		value := mapstr.M{
 			"amount": costFloat,
 			"unit":   &cost.Unit,
 		}
 
-		event.MetricSetFields.Put(metricName, value)
-		event.MetricSetFields.Put("start_date", startDate)
-		event.MetricSetFields.Put("end_date", endDate)
+		_, _ = event.MetricSetFields.Put(metricName, value)
+		_, _ = event.MetricSetFields.Put("start_date", startDate)
+		_, _ = event.MetricSetFields.Put("end_date", endDate)
 	}
 	return event
 }
 
-func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period time.Duration) []cloudwatch.MetricDataQuery {
-	var metricDataQueries []cloudwatch.MetricDataQuery
-	metricDataQueryEmpty := cloudwatch.MetricDataQuery{}
+func constructMetricQueries(listMetricsOutput []aws.MetricWithID, dataGranularity time.Duration) []types.MetricDataQuery {
+	var metricDataQueries []types.MetricDataQuery
+	metricDataQueryEmpty := types.MetricDataQuery{}
 	for i, listMetric := range listMetricsOutput {
-		metricDataQuery := createMetricDataQuery(listMetric, i, period)
+		metricDataQuery := createMetricDataQuery(listMetric, i, dataGranularity)
 		if metricDataQuery == metricDataQueryEmpty {
 			continue
 		}
@@ -352,39 +355,44 @@ func constructMetricQueries(listMetricsOutput []cloudwatch.Metric, period time.D
 	return metricDataQueries
 }
 
-func createMetricDataQuery(metric cloudwatch.Metric, index int, period time.Duration) (metricDataQuery cloudwatch.MetricDataQuery) {
+func createMetricDataQuery(metric aws.MetricWithID, index int, dataGranularity time.Duration) types.MetricDataQuery {
 	statistic := "Maximum"
-	periodInSeconds := int64(period.Seconds())
+	dataGranularityInSeconds := int32(dataGranularity.Seconds())
 	id := metricsetName + strconv.Itoa(index)
-	metricDims := metric.Dimensions
-	metricName := *metric.MetricName
+	metricDims := metric.Metric.Dimensions
+	metricName := *metric.Metric.MetricName
 
-	label := metricName + labelSeparator
+	label := strings.Join([]string{metric.AccountID, aws.LabelConst.AccountLabel, metricName}, aws.LabelConst.LabelSeparator)
 	for _, dim := range metricDims {
-		label += *dim.Name + labelSeparator + *dim.Value + labelSeparator
+		label += aws.LabelConst.LabelSeparator + *dim.Name + aws.LabelConst.LabelSeparator + *dim.Value
 	}
 
-	metricDataQuery = cloudwatch.MetricDataQuery{
+	metricDataQuery := types.MetricDataQuery{
 		Id: &id,
-		MetricStat: &cloudwatch.MetricStat{
-			Period: &periodInSeconds,
+		MetricStat: &types.MetricStat{
+			Period: &dataGranularityInSeconds,
 			Stat:   &statistic,
-			Metric: &metric,
+			Metric: &metric.Metric,
 		},
 		Label: &label,
 	}
-	return
+
+	if metric.AccountID != "" {
+		metricDataQuery.AccountId = &metric.AccountID
+	}
+	return metricDataQuery
 }
 
-func getStartDateEndDate(period time.Duration) (startDate string, endDate string) {
+func getStartDateEndDate(period time.Duration) (string, string) {
 	currentTime := time.Now()
 	startTime := currentTime.Add(period * -1)
-	startDate = startTime.Format(dateLayout)
-	endDate = currentTime.Format(dateLayout)
-	return
+	startDate := startTime.Format(dateLayout)
+	endDate := currentTime.Format(dateLayout)
+	return startDate, endDate
 }
 
-func parseGroupKey(groupKey string) (tagKey string, tagValue string) {
+func parseGroupKey(groupKey string) (string, string) {
+	var tagKey, tagValue string
 	keys := strings.Split(groupKey, "$")
 	if len(keys) == 2 {
 		tagKey = keys[0]
@@ -397,9 +405,9 @@ func parseGroupKey(groupKey string) (tagKey string, tagValue string) {
 		}
 	} else {
 		tagKey = keys[0]
-		tagValue = ""
 	}
-	return
+
+	return tagKey, tagValue
 }
 
 type groupBy struct {
@@ -438,22 +446,22 @@ func generateEventID(eventID string) string {
 	return prefix[:20]
 }
 
-func (m *MetricSet) getAccountName(svc organizationsiface.ClientAPI) map[string]string {
+func (m *MetricSet) getAccountName(svc *organizations.Client) map[string]string {
 	// construct ListAccountsInput
-	ListAccountsInput := &organizations.ListAccountsInput{}
-	req := svc.ListAccountsRequest(ListAccountsInput)
-	p := organizations.NewListAccountsPaginator(req)
+	listAccountsInput := &organizations.ListAccountsInput{}
+	paginator := organizations.NewListAccountsPaginator(svc, listAccountsInput)
 
 	accounts := map[string]string{}
-	for p.Next(context.TODO()) {
-		page := p.CurrentPage()
+	for paginator.HasMorePages() {
+		page, err := paginator.NextPage(context.Background())
+		if err != nil {
+			m.Logger().Warnf("an error occurred while listing account: %s", err.Error())
+			return accounts
+		}
 		for _, a := range page.Accounts {
 			accounts[*a.Id] = *a.Name
 		}
 	}
 
-	if err := p.Err(); err != nil {
-		m.logger.Warnf("failed ListAccountsRequest", err)
-	}
 	return accounts
 }

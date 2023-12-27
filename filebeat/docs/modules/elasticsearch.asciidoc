@@ -2,11 +2,15 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/elasticsearch/_meta/docs.asciidoc
+
 [[filebeat-module-elasticsearch]]
 :modulename: elasticsearch
 :has-dashboards: false
 
 == Elasticsearch module
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 This is the elasticsearch module.
 
@@ -134,3 +138,4 @@ include::../include/timezone-support.asciidoc[]
 For a description of each field in the module, see the
 <<exported-fields-elasticsearch,exported fields>> section.
 
+:edit_url!:

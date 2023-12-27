@@ -6,11 +6,10 @@ package netflow
 
 import (
 	"bytes"
+	"fmt"
 	"net"
 	"sync"
 	"time"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/harvester"
@@ -18,12 +17,12 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -86,7 +85,7 @@ func (w *logDebugWrapper) Write(p []byte) (n int, err error) {
 
 // NewInput creates a new Netflow input
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	connector channel.Connector,
 	context input.Context,
 ) (input.Input, error) {
@@ -108,7 +107,7 @@ func NewInput(
 	for _, yamlPath := range config.CustomDefinitions {
 		f, err := LoadFieldDefinitionsFromFile(yamlPath)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed parsing custom field definitions from file '%s'", yamlPath)
+			return nil, fmt.Errorf("failed parsing custom field definitions from file '%s': %w", yamlPath, err)
 		}
 		customFields = append(customFields, f)
 	}
@@ -117,9 +116,10 @@ func NewInput(
 		WithExpiration(config.ExpirationTimeout).
 		WithLogOutput(&logDebugWrapper{Logger: logger}).
 		WithCustomFields(customFields...).
-		WithSequenceResetEnabled(config.DetectSequenceReset))
+		WithSequenceResetEnabled(config.DetectSequenceReset).
+		WithSharedTemplates(config.ShareTemplates))
 	if err != nil {
-		return nil, errors.Wrapf(err, "error initializing netflow decoder")
+		return nil, fmt.Errorf("error initializing netflow decoder: %w", err)
 	}
 
 	input := &netflowInput{

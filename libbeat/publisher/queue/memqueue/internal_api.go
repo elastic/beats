@@ -17,19 +17,26 @@
 
 package memqueue
 
-import "github.com/elastic/beats/v7/libbeat/publisher"
+import "github.com/elastic/beats/v7/libbeat/publisher/queue"
 
 // producer -> broker API
 
 type pushRequest struct {
-	event publisher.Event
-	seq   uint32
-	state *produceState
+	event interface{}
+
+	// The producer that generated this event, or nil if this producer does
+	// not require ack callbacks.
+	producer *ackProducer
+
+	// The index of the event in this producer only. Used to condense
+	// multiple acknowledgments for a producer to a single callback call.
+	producerID producerID
+	resp       chan queue.EntryID
 }
 
 type producerCancelRequest struct {
-	state *produceState
-	resp  chan producerCancelResponse
+	producer *ackProducer
+	resp     chan producerCancelResponse
 }
 
 type producerCancelResponse struct {
@@ -39,15 +46,29 @@ type producerCancelResponse struct {
 // consumer -> broker API
 
 type getRequest struct {
-	sz   int              // request sz events from the broker
-	resp chan getResponse // channel to send response to
+	entryCount   int              // request entryCount events from the broker
+	responseChan chan getResponse // channel to send response to
 }
 
 type getResponse struct {
-	ack *ackChan
-	buf []publisher.Event
+	ackChan chan batchDoneMsg
+	entries []queueEntry
 }
 
-type batchAckMsg struct{}
+type batchDoneMsg struct{}
 
-type batchCancelRequest struct{ ack *ackChan }
+// Metrics API
+
+type metricsRequest struct {
+	responseChan chan memQueueMetrics
+}
+
+// memQueueMetrics tracks metrics that are returned by the individual memory queue implementations
+type memQueueMetrics struct {
+	// the size of items in the queue
+	currentQueueSize int
+	// the number of items that have been read by a consumer but not yet ack'ed
+	occupiedRead int
+
+	oldestEntryID queue.EntryID
+}

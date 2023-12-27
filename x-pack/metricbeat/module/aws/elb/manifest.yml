@@ -30,6 +30,10 @@ input:
         statistic: ["Average"]
         name: ["ConsumedLCUs"]
         resource_type: elasticloadbalancing
+      - namespace: AWS/ApplicationELB
+        statistic: [ "Maximum" ]
+        name: [ "HealthyHostCount", "UnHealthyHostCount"]
+        resource_type: elasticloadbalancing
       - namespace: AWS/NetworkELB
         statistic: ["Average"]
         name: ["ActiveFlowCount", "ActiveFlowCount_TCP", "ActiveFlowCount_TLS", "ActiveFlowCount_UDP", "ConsumedLCUs", "ConsumedLCUs_TCP", "ConsumedLCUs_TLS", "ConsumedLCUs_UDP"]

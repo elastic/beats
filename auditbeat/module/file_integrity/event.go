@@ -23,12 +23,14 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
+	"encoding/binary"
 	"encoding/hex"
 	"fmt"
 	"hash"
 	"io"
 	"math"
 	"os"
+	"os/user"
 	"path/filepath"
 	"runtime"
 	"strconv"
@@ -39,9 +41,9 @@ import (
 	"golang.org/x/crypto/blake2b"
 	"golang.org/x/crypto/sha3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Source identifies the source of an event (i.e. what triggered it).
@@ -97,7 +99,7 @@ var typeNames = map[Type]string{
 	SymlinkType: "symlink",
 }
 
-// Digest is a output of a hash function.
+// Digest is an output of a hash function.
 type Digest []byte
 
 // String returns the digest value in lower-case hexadecimal form.
@@ -108,15 +110,16 @@ func (d Digest) String() string {
 // MarshalText encodes the digest to a hexadecimal representation of itself.
 func (d Digest) MarshalText() ([]byte, error) { return []byte(d.String()), nil }
 
-// Event describe the filesystem change and includes metadata about the file.
+// Event describes the filesystem change and includes metadata about the file.
 type Event struct {
-	Timestamp  time.Time           `json:"timestamp"`             // Time of event.
-	Path       string              `json:"path"`                  // The path associated with the event.
-	TargetPath string              `json:"target_path,omitempty"` // Target path for symlinks.
-	Info       *Metadata           `json:"info"`                  // File metadata (if the file exists).
-	Source     Source              `json:"source"`                // Source of the event.
-	Action     Action              `json:"action"`                // Action (like created, updated).
-	Hashes     map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
+	Timestamp     time.Time           `json:"timestamp"`             // Time of event.
+	Path          string              `json:"path"`                  // The path associated with the event.
+	TargetPath    string              `json:"target_path,omitempty"` // Target path for symlinks.
+	Info          *Metadata           `json:"info"`                  // File metadata (if the file exists).
+	Source        Source              `json:"source"`                // Source of the event.
+	Action        Action              `json:"action"`                // Action (like created, updated).
+	Hashes        map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
+	ParserResults mapstr.M            `json:"file,omitempty"`        // Results from running file parsers.
 
 	// Metadata
 	rtt        time.Duration // Time taken to collect the info.
@@ -126,20 +129,22 @@ type Event struct {
 
 // Metadata contains file metadata.
 type Metadata struct {
-	Inode  uint64      `json:"inode"`
-	UID    uint32      `json:"uid"`
-	GID    uint32      `json:"gid"`
-	SID    string      `json:"sid"`
-	Owner  string      `json:"owner"`
-	Group  string      `json:"group"`
-	Size   uint64      `json:"size"`
-	MTime  time.Time   `json:"mtime"`  // Last modification time.
-	CTime  time.Time   `json:"ctime"`  // Last metadata change time.
-	Type   Type        `json:"type"`   // File type (dir, file, symlink).
-	Mode   os.FileMode `json:"mode"`   // Permissions
-	SetUID bool        `json:"setuid"` // setuid bit (POSIX only)
-	SetGID bool        `json:"setgid"` // setgid bit (POSIX only)
-	Origin []string    `json:"origin"` // External origin info for the file (MacOS only)
+	Inode          uint64      `json:"inode"`
+	UID            uint32      `json:"uid"`
+	GID            uint32      `json:"gid"`
+	SID            string      `json:"sid"`
+	Owner          string      `json:"owner"`
+	Group          string      `json:"group"`
+	Size           uint64      `json:"size"`
+	MTime          time.Time   `json:"mtime"`            // Last modification time.
+	CTime          time.Time   `json:"ctime"`            // Last metadata change time.
+	Type           Type        `json:"type"`             // File type (dir, file, symlink).
+	Mode           os.FileMode `json:"mode"`             // Permissions
+	SetUID         bool        `json:"setuid"`           // setuid bit (POSIX only)
+	SetGID         bool        `json:"setgid"`           // setgid bit (POSIX only)
+	Origin         []string    `json:"origin"`           // External origin info for the file (macOS only)
+	SELinux        string      `json:"selinux"`          // security.selinux xattr value (Linux only)
+	POSIXACLAccess []byte      `json:"posix_acl_access"` // system.posix_acl_access xattr value (Linux only)
 }
 
 // NewEventFromFileInfo creates a new Event based on data from a os.FileInfo
@@ -153,6 +158,7 @@ func NewEventFromFileInfo(
 	source Source,
 	maxFileSize uint64,
 	hashTypes []HashType,
+	fileParsers []FileParser,
 ) Event {
 	event := Event{
 		Timestamp: time.Now().UTC(),
@@ -195,6 +201,16 @@ func NewEventFromFileInfo(
 				event.Hashes = hashes
 				event.Info.Size = nbytes
 			}
+
+			if len(fileParsers) != 0 && event.ParserResults == nil {
+				event.ParserResults = make(mapstr.M)
+			}
+			for _, p := range fileParsers {
+				err = p.Parse(event.ParserResults, path)
+				if err != nil {
+					event.errors = append(event.errors, err)
+				}
+			}
 		}
 	case SymlinkType:
 		event.TargetPath, _ = filepath.EvalSymlinks(event.Path)
@@ -211,6 +227,7 @@ func NewEvent(
 	source Source,
 	maxFileSize uint64,
 	hashTypes []HashType,
+	fileParsers []FileParser,
 ) Event {
 	info, err := os.Lstat(path)
 	if err != nil {
@@ -221,7 +238,7 @@ func NewEvent(
 			err = fmt.Errorf("failed to lstat: %w", err)
 		}
 	}
-	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes)
+	return NewEventFromFileInfo(path, info, err, action, source, maxFileSize, hashTypes, fileParsers)
 }
 
 func isASCIILetter(letter byte) bool {
@@ -243,13 +260,13 @@ func getDriveLetter(path string) string {
 }
 
 func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
-	file := common.MapStr{
+	file := mapstr.M{
 		"path": e.Path,
 	}
 	out := mb.Event{
 		Timestamp: e.Timestamp,
 		Took:      e.rtt,
-		MetricSetFields: common.MapStr{
+		MetricSetFields: mapstr.M{
 			"file": file,
 		},
 	}
@@ -306,14 +323,26 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		if len(info.Origin) > 0 {
 			file["origin"] = info.Origin
 		}
+		if info.SELinux != "" {
+			file["selinux"] = info.SELinux
+		}
+		if len(info.POSIXACLAccess) != 0 {
+			a, err := aclText(info.POSIXACLAccess)
+			if err == nil {
+				file["posix_acl_access"] = a
+			}
+		}
 	}
 
 	if len(e.Hashes) > 0 {
-		hashes := make(common.MapStr, len(e.Hashes))
+		hashes := make(mapstr.M, len(e.Hashes))
 		for hashType, digest := range e.Hashes {
 			hashes[string(hashType)] = digest
 		}
 		file["hash"] = hashes
+	}
+	for k, v := range e.ParserResults {
+		file[k] = v
 	}
 
 	out.MetricSetFields.Put("event.kind", "event")
@@ -338,6 +367,74 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		}
 	}
 	return out
+}
+
+func aclText(b []byte) ([]string, error) {
+	if (len(b)-4)%8 != 0 {
+		return nil, fmt.Errorf("unexpected ACL length: %d", len(b))
+	}
+	b = b[4:] // The first four bytes is the version, discard it.
+	a := make([]string, 0, len(b)/8)
+	for len(b) != 0 {
+		tag := binary.LittleEndian.Uint16(b)
+		perm := binary.LittleEndian.Uint16(b[2:])
+		qual := binary.LittleEndian.Uint32(b[4:])
+		a = append(a, fmt.Sprintf("%s:%s:%s", tags[tag], qualString(qual, tag), modeString(perm)))
+		b = b[8:]
+	}
+	return a, nil
+}
+
+var tags = map[uint16]string{
+	0x00: "undefined",
+	0x01: "user",
+	0x02: "user",
+	0x04: "group",
+	0x08: "group",
+	0x10: "mask",
+	0x20: "other",
+}
+
+func qualString(qual uint32, tag uint16) string {
+	if qual == math.MaxUint32 {
+		// 0xffffffff is undefined ID, so return zero.
+		return ""
+	}
+	const (
+		tagUser  = 0x02
+		tagGroup = 0x08
+	)
+	id := strconv.Itoa(int(qual))
+	switch tag {
+	case tagUser:
+		u, err := user.LookupId(id)
+		if err == nil {
+			return u.Username
+		}
+	case tagGroup:
+		g, err := user.LookupGroupId(id)
+		if err == nil {
+			return g.Name
+		}
+	}
+	// Fallback to the numeric ID if we can't get a name
+	// or the tag is other than user/group.
+	return id
+}
+
+func modeString(perm uint16) string {
+	var buf [3]byte
+	w := 0
+	const rwx = "rwx"
+	for i, c := range rwx {
+		if perm&(1<<uint(len(rwx)-1-i)) != 0 {
+			buf[w] = byte(c)
+		} else {
+			buf[w] = '-'
+		}
+		w++
+	}
+	return string(buf[:w])
 }
 
 // diffEvents returns true if the file info differs between the old event and
@@ -389,7 +486,8 @@ func diffEvents(old, new *Event) (Action, bool) {
 	if o, n := old.Info, new.Info; o != nil && n != nil {
 		// The owner and group names are ignored (they aren't persisted).
 		if o.Inode != n.Inode || o.UID != n.UID || o.GID != n.GID || o.SID != n.SID ||
-			o.Mode != n.Mode || o.Type != n.Type || o.SetUID != n.SetUID || o.SetGID != n.SetGID {
+			o.Mode != n.Mode || o.Type != n.Type || o.SetUID != n.SetUID || o.SetGID != n.SetGID ||
+			o.SELinux != n.SELinux || !bytes.Equal(o.POSIXACLAccess, n.POSIXACLAccess) {
 			result |= AttributesModified
 		}
 

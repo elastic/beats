@@ -19,6 +19,7 @@ package javascript
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -27,15 +28,14 @@ import (
 	"time"
 
 	"github.com/dop251/goja"
-	"github.com/pkg/errors"
 	"github.com/rcrowley/go-metrics"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
-	"github.com/elastic/beats/v7/libbeat/paths"
-	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/elastic-agent-libs/paths"
 )
 
 type jsProcessor struct {
@@ -47,7 +47,7 @@ type jsProcessor struct {
 }
 
 // New constructs a new Javascript processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(c *config.C) (beat.Processor, error) {
 	conf := defaultConfig()
 	if err := c.Unpack(&conf); err != nil {
 		return nil, err
@@ -58,7 +58,7 @@ func New(c *common.Config) (processors.Processor, error) {
 
 // NewFromConfig constructs a new Javascript processor from the given config
 // object. It loads the sources, compiles them, and validates the entry point.
-func NewFromConfig(c Config, reg *monitoring.Registry) (processors.Processor, error) {
+func NewFromConfig(c Config, reg *monitoring.Registry) (beat.Processor, error) {
 	err := c.Validate()
 	if err != nil {
 		return nil, err
@@ -114,12 +114,12 @@ func loadSources(files ...string) (string, []byte, error) {
 
 		f, err := os.Open(path)
 		if err != nil {
-			return errors.Wrapf(err, "failed to open file %v", path)
+			return fmt.Errorf("failed to open file %v: %w", path, err)
 		}
 		defer f.Close()
 
 		if _, err = io.Copy(buf, f); err != nil {
-			return errors.Wrapf(err, "failed to read file %v", path)
+			return fmt.Errorf("failed to read file %v: %w", path, err)
 		}
 		return nil
 	}
@@ -139,7 +139,7 @@ func loadSources(files ...string) (string, []byte, error) {
 	}
 
 	if len(sources) == 0 {
-		return "", nil, errors.Errorf("no sources were found in %v",
+		return "", nil, fmt.Errorf("no sources were found in %v",
 			strings.Join(files, ", "))
 	}
 
@@ -157,9 +157,9 @@ func annotateError(id string, err error) error {
 		return nil
 	}
 	if id != "" {
-		return errors.Wrapf(err, "failed in processor.javascript with id=%v", id)
+		return fmt.Errorf("failed in processor.javascript with id=%v: %w", id, err)
 	}
-	return errors.Wrap(err, "failed in processor.javascript")
+	return fmt.Errorf("failed in processor.javascript: %w", err)
 }
 
 // Run executes the processor on the given it event. It invokes the
@@ -219,7 +219,7 @@ func getStats(id string, reg *monitoring.Registry) *processorStats {
 	processorReg := reg.GetRegistry(namespace)
 	if processorReg != nil {
 		// If a module is reloaded then the namespace could already exist.
-		processorReg.Clear()
+		_ = processorReg.Clear()
 	} else {
 		processorReg = reg.NewRegistry(namespace, monitoring.DoNotReport)
 	}
@@ -228,7 +228,7 @@ func getStats(id string, reg *monitoring.Registry) *processorStats {
 		exceptions:  monitoring.NewInt(processorReg, "exceptions"),
 		processTime: metrics.NewUniformSample(2048),
 	}
-	adapter.NewGoMetrics(processorReg, "histogram", adapter.Accept).
+	_ = adapter.NewGoMetrics(processorReg, "histogram", adapter.Accept).
 		Register("process_time", metrics.NewHistogram(stats.processTime))
 
 	return stats

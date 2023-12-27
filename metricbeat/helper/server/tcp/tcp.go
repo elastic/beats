@@ -22,12 +22,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type TcpServer struct {
@@ -40,10 +38,10 @@ type TcpServer struct {
 }
 
 type TcpEvent struct {
-	event common.MapStr
+	event mapstr.M
 }
 
-func (m *TcpEvent) GetEvent() common.MapStr {
+func (m *TcpEvent) GetEvent() mapstr.M {
 	return m.event
 }
 
@@ -76,7 +74,7 @@ func NewTcpServer(base mb.BaseMetricSet) (server.Server, error) {
 func (g *TcpServer) Start() error {
 	listener, err := net.ListenTCP("tcp", g.tcpAddr)
 	if err != nil {
-		return errors.Wrap(err, "failed to start TCP server")
+		return fmt.Errorf("failed to start TCP server: %w", err)
 	}
 	g.listener = listener
 	logp.Info("Started listening for TCP on: %s", g.tcpAddr.String())
@@ -131,7 +129,7 @@ func (g *TcpServer) handle(conn net.Conn) {
 		// Drop the delimiter and send the data
 		if len(bytes) > 0 {
 			g.eventQueue <- &TcpEvent{
-				event: common.MapStr{
+				event: mapstr.M{
 					server.EventDataKey: bytes[:len(bytes)-1],
 				},
 			}

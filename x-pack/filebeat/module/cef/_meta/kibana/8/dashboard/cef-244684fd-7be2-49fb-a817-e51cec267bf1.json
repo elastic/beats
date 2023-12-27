@@ -1,0 +1,754 @@
+{
+    "attributes": {
+        "description": "Overview of Microsoft DNS activity",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "highlightAll": true,
+                "query": {
+                    "language": "kuery",
+                    "query": "event.dataset:cef.log"
+                },
+                "version": true
+            }
+        },
+        "optionsJSON": {
+            "darkTheme": false
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "1",
+                    "w": 8,
+                    "x": 40,
+                    "y": 4
+                },
+                "panelIndex": "1",
+                "panelRefName": "panel_1",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 100": "rgb(0,104,55)"
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "3",
+                    "w": 40,
+                    "x": 0,
+                    "y": 4
+                },
+                "panelIndex": "3",
+                "panelRefName": "panel_3",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "defaultColors": {
+                            "0 - 18k": "rgb(247,251,255)",
+                            "108k - 126k": "rgb(74,152,201)",
+                            "126k - 144k": "rgb(46,126,188)",
+                            "144k - 162k": "rgb(23,100,171)",
+                            "162k - 180k": "rgb(8,74,145)",
+                            "18k - 36k": "rgb(227,238,249)",
+                            "36k - 54k": "rgb(208,225,242)",
+                            "54k - 72k": "rgb(182,212,233)",
+                            "72k - 90k": "rgb(148,196,223)",
+                            "90k - 108k": "rgb(107,174,214)"
+                        },
+                        "legendOpen": false
+                    }
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "5",
+                    "w": 24,
+                    "x": 0,
+                    "y": 32
+                },
+                "panelIndex": "5",
+                "panelRefName": "panel_5",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "6",
+                    "w": 48,
+                    "x": 0,
+                    "y": 48
+                },
+                "panelIndex": "6",
+                "panelRefName": "panel_6",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "7",
+                    "w": 24,
+                    "x": 24,
+                    "y": 32
+                },
+                "panelIndex": "7",
+                "panelRefName": "panel_7",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 8,
+                    "i": "9",
+                    "w": 48,
+                    "x": 0,
+                    "y": 12
+                },
+                "panelIndex": "9",
+                "panelRefName": "panel_9",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "11",
+                    "w": 24,
+                    "x": 24,
+                    "y": 56
+                },
+                "panelIndex": "11",
+                "panelRefName": "panel_11",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 4,
+                    "i": "12",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "12",
+                "panelRefName": "panel_12",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "vis": {
+                        "params": {
+                            "sort": {
+                                "columnIndex": null,
+                                "direction": null
+                            }
+                        }
+                    }
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "13",
+                    "w": 24,
+                    "x": 0,
+                    "y": 56
+                },
+                "panelIndex": "13",
+                "panelRefName": "panel_13",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "14",
+                    "w": 24,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "14",
+                "panelRefName": "panel_14",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "15",
+                    "w": 24,
+                    "x": 24,
+                    "y": 20
+                },
+                "panelIndex": "15",
+                "panelRefName": "panel_15",
+                "type": "visualization",
+                "version": "8.0.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "layerListJSON": [
+                            {
+                                "alpha": 1,
+                                "id": "56b3b288-a0f1-416d-9d40-96a37c8484fd",
+                                "includeInFitToBounds": true,
+                                "label": null,
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "isAutoSelect": true,
+                                    "lightModeDefault": "road_map_desaturated",
+                                    "type": "EMS_TMS"
+                                },
+                                "style": {
+                                    "type": "TILE"
+                                },
+                                "type": "EMS_VECTOR_TILE",
+                                "visible": true
+                            },
+                            {
+                                "alpha": 0.75,
+                                "id": "d50cbece-4556-4421-bb06-fb015bfe7baa",
+                                "includeInFitToBounds": true,
+                                "joins": [],
+                                "label": "Top Sources by Events [Filebeat CEF]",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "applyForceRefresh": true,
+                                    "applyGlobalQuery": true,
+                                    "applyGlobalTime": true,
+                                    "geoField": "source.geo.location",
+                                    "id": "555cbeac-b098-4946-9498-6b700e745e8a",
+                                    "indexPatternRefName": "layer_1_source_index_pattern",
+                                    "metrics": [
+                                        {
+                                            "type": "count"
+                                        }
+                                    ],
+                                    "requestType": "point",
+                                    "resolution": "MOST_FINE",
+                                    "type": "ES_GEO_GRID"
+                                },
+                                "style": {
+                                    "isTimeAware": true,
+                                    "properties": {
+                                        "fillColor": {
+                                            "options": {
+                                                "color": "Yellow to Red",
+                                                "colorCategory": "palette_0",
+                                                "field": {
+                                                    "name": "doc_count",
+                                                    "origin": "source"
+                                                },
+                                                "fieldMetaOptions": {
+                                                    "isEnabled": false,
+                                                    "sigma": 3
+                                                },
+                                                "type": "ORDINAL"
+                                            },
+                                            "type": "DYNAMIC"
+                                        },
+                                        "icon": {
+                                            "options": {
+                                                "value": "marker"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconOrientation": {
+                                            "options": {
+                                                "orientation": 0
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconSize": {
+                                            "options": {
+                                                "size": 6
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderColor": {
+                                            "options": {
+                                                "color": "#FFFFFF"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderSize": {
+                                            "options": {
+                                                "size": "SMALL"
+                                            }
+                                        },
+                                        "labelColor": {
+                                            "options": {
+                                                "color": "#000000"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelSize": {
+                                            "options": {
+                                                "size": 14
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelText": {
+                                            "options": {
+                                                "value": ""
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineColor": {
+                                            "options": {
+                                                "color": "#3d3d3d"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineWidth": {
+                                            "options": {
+                                                "size": 1
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "symbolizeAs": {
+                                            "options": {
+                                                "value": "circle"
+                                            }
+                                        }
+                                    },
+                                    "type": "VECTOR"
+                                },
+                                "type": "GEOJSON_VECTOR",
+                                "visible": true
+                            }
+                        ],
+                        "mapStateJSON": {
+                            "center": {
+                                "lat": 16.40767,
+                                "lon": 0
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "refreshConfig": {
+                                "interval": 0,
+                                "isPaused": true
+                            },
+                            "settings": {
+                                "autoFitToDataBounds": false,
+                                "backgroundColor": "#ffffff",
+                                "browserLocation": {
+                                    "zoom": 2
+                                },
+                                "disableInteractive": false,
+                                "disableTooltipControl": false,
+                                "fixedLocation": {
+                                    "lat": 0,
+                                    "lon": 0,
+                                    "zoom": 2
+                                },
+                                "hideLayerControl": false,
+                                "hideToolbarOverlay": false,
+                                "hideViewControl": false,
+                                "initialLocation": "LAST_SAVED_LOCATION",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "showScaleControl": false,
+                                "showSpatialFilters": true,
+                                "showTimesliderToggleButton": true,
+                                "spatialFiltersAlpa": 0.3,
+                                "spatialFiltersFillColor": "#DA8B45",
+                                "spatialFiltersLineColor": "#DA8B45"
+                            },
+                            "timeFilters": {
+                                "from": "now-24h",
+                                "to": "now"
+                            },
+                            "zoom": 1.78
+                        },
+                        "references": [],
+                        "title": "Top Sources by Events [Filebeat CEF]",
+                        "uiStateJSON": {
+                            "isLayerTOCOpen": true,
+                            "openTOCDetails": []
+                        }
+                    },
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "isLayerTOCOpen": true,
+                    "mapBuffer": {
+                        "maxLat": 66.51326,
+                        "maxLon": 90,
+                        "minLat": -66.51326,
+                        "minLon": -90
+                    },
+                    "mapCenter": {
+                        "lat": 16.40767,
+                        "lon": 0,
+                        "zoom": 1.78
+                    },
+                    "openTOCDetails": [],
+                    "type": "map"
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "3cf2118b-5231-49f5-b685-0ff0e1f52c32",
+                    "w": 24,
+                    "x": 0,
+                    "y": 72
+                },
+                "panelIndex": "3cf2118b-5231-49f5-b685-0ff0e1f52c32",
+                "type": "map",
+                "version": "8.3.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "layerListJSON": [
+                            {
+                                "alpha": 1,
+                                "id": "5231e15c-d374-46ca-9553-3308d723ded3",
+                                "includeInFitToBounds": true,
+                                "label": null,
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "isAutoSelect": true,
+                                    "lightModeDefault": "road_map_desaturated",
+                                    "type": "EMS_TMS"
+                                },
+                                "style": {
+                                    "type": "TILE"
+                                },
+                                "type": "EMS_VECTOR_TILE",
+                                "visible": true
+                            },
+                            {
+                                "alpha": 0.75,
+                                "id": "8cdaae20-5dcc-4930-b105-802fc344fcb6",
+                                "includeInFitToBounds": true,
+                                "joins": [],
+                                "label": "Top Destinations by Events [Filebeat CEF]",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "applyForceRefresh": true,
+                                    "applyGlobalQuery": true,
+                                    "applyGlobalTime": true,
+                                    "geoField": "destination.geo.location",
+                                    "id": "88700fdc-3a96-46b8-b51f-3839111eb6ec",
+                                    "indexPatternRefName": "layer_1_source_index_pattern",
+                                    "metrics": [
+                                        {
+                                            "type": "count"
+                                        }
+                                    ],
+                                    "requestType": "point",
+                                    "resolution": "MOST_FINE",
+                                    "type": "ES_GEO_GRID"
+                                },
+                                "style": {
+                                    "isTimeAware": true,
+                                    "properties": {
+                                        "fillColor": {
+                                            "options": {
+                                                "color": "Yellow to Red",
+                                                "colorCategory": "palette_0",
+                                                "field": {
+                                                    "name": "doc_count",
+                                                    "origin": "source"
+                                                },
+                                                "fieldMetaOptions": {
+                                                    "isEnabled": false,
+                                                    "sigma": 3
+                                                },
+                                                "type": "ORDINAL"
+                                            },
+                                            "type": "DYNAMIC"
+                                        },
+                                        "icon": {
+                                            "options": {
+                                                "value": "marker"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconOrientation": {
+                                            "options": {
+                                                "orientation": 0
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconSize": {
+                                            "options": {
+                                                "size": 6
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderColor": {
+                                            "options": {
+                                                "color": "#FFFFFF"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderSize": {
+                                            "options": {
+                                                "size": "SMALL"
+                                            }
+                                        },
+                                        "labelColor": {
+                                            "options": {
+                                                "color": "#000000"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelSize": {
+                                            "options": {
+                                                "size": 14
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelText": {
+                                            "options": {
+                                                "value": ""
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineColor": {
+                                            "options": {
+                                                "color": "#3d3d3d"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineWidth": {
+                                            "options": {
+                                                "size": 1
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "symbolizeAs": {
+                                            "options": {
+                                                "value": "circle"
+                                            }
+                                        }
+                                    },
+                                    "type": "VECTOR"
+                                },
+                                "type": "GEOJSON_VECTOR",
+                                "visible": true
+                            }
+                        ],
+                        "mapStateJSON": {
+                            "center": {
+                                "lat": 16.40767,
+                                "lon": 0
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "refreshConfig": {
+                                "interval": 0,
+                                "isPaused": true
+                            },
+                            "settings": {
+                                "autoFitToDataBounds": false,
+                                "backgroundColor": "#ffffff",
+                                "browserLocation": {
+                                    "zoom": 2
+                                },
+                                "disableInteractive": false,
+                                "disableTooltipControl": false,
+                                "fixedLocation": {
+                                    "lat": 0,
+                                    "lon": 0,
+                                    "zoom": 2
+                                },
+                                "hideLayerControl": false,
+                                "hideToolbarOverlay": false,
+                                "hideViewControl": false,
+                                "initialLocation": "LAST_SAVED_LOCATION",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "showScaleControl": false,
+                                "showSpatialFilters": true,
+                                "showTimesliderToggleButton": true,
+                                "spatialFiltersAlpa": 0.3,
+                                "spatialFiltersFillColor": "#DA8B45",
+                                "spatialFiltersLineColor": "#DA8B45"
+                            },
+                            "timeFilters": {
+                                "from": "now-24h",
+                                "to": "now"
+                            },
+                            "zoom": 1.78
+                        },
+                        "references": [],
+                        "title": "Top Destinations by Events [Filebeat CEF]",
+                        "uiStateJSON": {
+                            "isLayerTOCOpen": true,
+                            "openTOCDetails": []
+                        }
+                    },
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "isLayerTOCOpen": true,
+                    "mapBuffer": {
+                        "maxLat": 66.51326,
+                        "maxLon": 90,
+                        "minLat": -66.51326,
+                        "minLon": -90
+                    },
+                    "mapCenter": {
+                        "lat": 16.40767,
+                        "lon": 0,
+                        "zoom": 1.78
+                    },
+                    "openTOCDetails": [],
+                    "type": "map"
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "07f92eca-2078-4aa6-8373-d27ca33595d6",
+                    "w": 24,
+                    "x": 24,
+                    "y": 72
+                },
+                "panelIndex": "07f92eca-2078-4aa6-8373-d27ca33595d6",
+                "type": "map",
+                "version": "8.3.0"
+            }
+        ],
+        "refreshInterval": {
+            "pause": true,
+            "value": 0
+        },
+        "timeFrom": "now-24h",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[Filebeat CEF] Microsoft DNS Overview",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.3.3",
+    "id": "cef-244684fd-7be2-49fb-a817-e51cec267bf1",
+    "migrationVersion": {
+        "dashboard": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "cef-c3b99882-cd00-4bc1-a64f-d7d7ac3ad292",
+            "name": "1:panel_1",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-1013a3cb-ca15-459e-b1a6-45f110958b5c",
+            "name": "3:panel_3",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-7cd4866d-4085-44d1-ad12-45559570a176",
+            "name": "5:panel_5",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-119bcab5-9bb0-4644-8dfa-15ff8848c0a2",
+            "name": "6:panel_6",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-8613b170-e504-4a37-b723-baeb94470380",
+            "name": "7:panel_7",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-1e9875ef-0cfd-40d1-b261-e02838274a7c",
+            "name": "9:panel_9",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-95877a19-0c82-4194-ad67-b311c458c6f4",
+            "name": "11:panel_11",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-5e4a73ac-198d-45b3-b1d8-41cb8a242927",
+            "name": "12:panel_12",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-6a5a6bfa-8f61-418e-8fc4-0c5d8ddb41e1",
+            "name": "13:panel_13",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-fb21024b-49db-405d-85fa-ab7fd43e3753",
+            "name": "14:panel_14",
+            "type": "visualization"
+        },
+        {
+            "id": "cef-bfc6d482-4f8e-40f8-b4ee-10ba19675d42",
+            "name": "15:panel_15",
+            "type": "visualization"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "3cf2118b-5231-49f5-b685-0ff0e1f52c32:layer_1_source_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "07f92eca-2078-4aa6-8373-d27ca33595d6:layer_1_source_index_pattern",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2022-08-24T00:29:51.550Z",
+    "version": "WzIzNDUsMV0="
+}

@@ -16,17 +16,18 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || openbsd || windows || aix
-// +build darwin freebsd linux openbsd windows aix
 
 package core
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
+	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
-	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	metrics "github.com/elastic/elastic-agent-system-metrics/metric/cpu"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func init() {
@@ -51,7 +52,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	opts, err := config.Validate()
 	if err != nil {
-		return nil, errors.Wrap(err, "error validating config")
+		return nil, fmt.Errorf("error validating config: %w", err)
 	}
 
 	if config.CPUTicks != nil && *config.CPUTicks {
@@ -69,14 +70,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	samples, err := m.cores.FetchCores()
 	if err != nil {
-		return errors.Wrap(err, "failed to sample CPU core times")
+		return fmt.Errorf("failed to sample CPU core times: %w", err)
 
 	}
 
 	for id, sample := range samples {
 		event, err := sample.Format(m.opts)
 		if err != nil {
-			return errors.Wrap(err, "error formatting core data")
+			return fmt.Errorf("error formatting core data: %w", err)
 		}
 		event.Put("id", id)
 
@@ -89,4 +90,25 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	}
 
 	return nil
+}
+
+// Diagnostics implmements the DiagnosticSet interface
+func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
+	m.Logger().Infof("got DiagnosticSetup request for system/core")
+	if runtime.GOOS == "linux" {
+		return []diagnostics.DiagnosticSetup{{
+			Name:        "core-stat",
+			Description: "/proc/stat file",
+			Filename:    "stat",
+			Callback:    m.getDiagData,
+		}}
+	} else {
+		return nil
+	}
+
+}
+
+func (m *MetricSet) getDiagData() []byte {
+	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	return diagnostics.GetRawFileOrErrorString(sys, "/proc/stat")
 }

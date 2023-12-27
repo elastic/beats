@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux
-// +build linux
 
 package socket_summary
 
@@ -25,11 +24,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/net"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/resolve"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // SockStat contains data from /proc/net/sockstat
@@ -61,13 +59,13 @@ type SockStat struct {
 }
 
 // applyEnhancements gets a list of platform-specific enhancements and apply them to our mapStr object.
-func applyEnhancements(data common.MapStr, sys resolve.Resolver) (common.MapStr, error) {
+func applyEnhancements(data mapstr.M, sys resolve.Resolver) (mapstr.M, error) {
 	dir := sys.ResolveHostFS("/proc/net/sockstat")
 	pageSize := os.Getpagesize()
 
 	stat, err := parseSockstat(dir)
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting sockstat data")
+		return nil, fmt.Errorf("error getting sockstat data: %w", err)
 	}
 	data.Put("tcp.all.orphan", stat.TCPOrphan)
 	data.Put("tcp.memory", pageSize*stat.TCPMem)
@@ -78,7 +76,7 @@ func applyEnhancements(data common.MapStr, sys resolve.Resolver) (common.MapStr,
 }
 
 // parseSockstat parses the ipv4 sockstat file
-//see net/ipv4/proc.c
+// see net/ipv4/proc.c
 func parseSockstat(path string) (SockStat, error) {
 	fd, err := os.Open(path)
 	if err != nil {
@@ -114,7 +112,7 @@ func parseSockstat(path string) (SockStat, error) {
 		txt := scanner.Text()
 		count, err := fmt.Sscanf(txt, scanfLines[iter], scanfOut[iter]...)
 		if err != nil {
-			return ss, errors.Wrap(err, "error reading sockstat")
+			return ss, fmt.Errorf("error reading sockstat: %w", err)
 		}
 		if count != len(scanfOut[iter]) {
 			return ss, fmt.Errorf("did not match fields in line %s", scanfLines[iter])
@@ -124,7 +122,7 @@ func parseSockstat(path string) (SockStat, error) {
 	}
 
 	if err = scanner.Err(); err != nil {
-		return ss, errors.Wrap(err, "error in scan")
+		return ss, fmt.Errorf("error in scan: %w", err)
 	}
 
 	return ss, nil

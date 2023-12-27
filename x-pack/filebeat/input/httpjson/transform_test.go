@@ -10,28 +10,29 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestEmptyTransformContext(t *testing.T) {
 	ctx := emptyTransformContext()
 	assert.Equal(t, &cursor{}, ctx.cursor)
-	assert.Equal(t, &common.MapStr{}, ctx.lastEvent)
-	assert.Equal(t, &common.MapStr{}, ctx.firstEvent)
+	assert.Equal(t, &mapstr.M{}, ctx.lastEvent)
+	assert.Equal(t, &mapstr.M{}, ctx.firstEvent)
 	assert.Equal(t, &response{}, ctx.lastResponse)
 }
 
 func TestEmptyTransformable(t *testing.T) {
 	tr := transformable{}
-	assert.Equal(t, common.MapStr{}, tr.body())
+	assert.Equal(t, mapstr.M{}, tr.body())
 	assert.Equal(t, http.Header{}, tr.header())
 }
 
 func TestTransformableNilClone(t *testing.T) {
 	var tr transformable
 	cl := tr.Clone()
-	assert.Equal(t, common.MapStr{}, cl.body())
+	assert.Equal(t, mapstr.M{}, cl.body())
 	assert.Equal(t, http.Header{}, cl.header())
 }
 
@@ -41,13 +42,16 @@ func TestTransformableClone(t *testing.T) {
 	_, _ = body.Put("key", "value")
 	tr.setBody(body)
 	cl := tr.Clone()
-	assert.Equal(t, common.MapStr{"key": "value"}, cl.body())
+	assert.Equal(t, mapstr.M{"key": "value"}, cl.body())
 	assert.Equal(t, http.Header{}, cl.header())
 }
 
 func TestNewTransformsFromConfig(t *testing.T) {
-	registerTransform("test", setName, newSetRequestPagination)
-	t.Cleanup(func() { registeredTransforms = newRegistry() })
+	registeredTransforms := registry{
+		"test": {
+			setName: newSetRequestPagination,
+		},
+	}
 
 	cases := []struct {
 		name               string
@@ -102,11 +106,12 @@ func TestNewTransformsFromConfig(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(tc.paramCfg)
-			gotTransforms, gotErr := newTransformsFromConfig(transformsConfig{cfg}, tc.paramNamespace, nil)
+			cfg := conf.MustNewConfigFrom(tc.paramCfg)
+			gotTransforms, gotErr := newTransformsFromConfig(registeredTransforms, transformsConfig{cfg}, tc.paramNamespace, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
 				tr := gotTransforms[0].(*set)
+
 				tr.runFunc = nil // we do not want to check func pointer
 				assert.EqualValues(t, tc.expectedTransforms, gotTransforms)
 			} else {
@@ -121,14 +126,14 @@ type fakeTransform struct{}
 func (fakeTransform) transformName() string { return "fake" }
 
 func TestNewBasicTransformsFromConfig(t *testing.T) {
-	fakeConstr := func(*common.Config, *logp.Logger) (transform, error) {
-
-		return fakeTransform{}, nil
+	registeredTransforms := registry{
+		"test": {
+			setName: newSetRequestPagination,
+			"fake": func(*conf.C, *logp.Logger) (transform, error) {
+				return fakeTransform{}, nil
+			},
+		},
 	}
-
-	registerTransform("test", setName, newSetRequestPagination)
-	registerTransform("test", "fake", fakeConstr)
-	t.Cleanup(func() { registeredTransforms = newRegistry() })
 
 	cases := []struct {
 		name           string
@@ -158,8 +163,8 @@ func TestNewBasicTransformsFromConfig(t *testing.T) {
 	for _, tc := range cases {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
-			cfg := common.MustNewConfigFrom(tc.paramCfg)
-			_, gotErr := newBasicTransformsFromConfig(transformsConfig{cfg}, tc.paramNamespace, nil)
+			cfg := conf.MustNewConfigFrom(tc.paramCfg)
+			_, gotErr := newBasicTransformsFromConfig(registeredTransforms, transformsConfig{cfg}, tc.paramNamespace, nil)
 			if tc.expectedErr == "" {
 				assert.NoError(t, gotErr)
 			} else {

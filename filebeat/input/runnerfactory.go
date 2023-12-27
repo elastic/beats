@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // RunnerFactory is a factory for registrars
@@ -45,7 +46,7 @@ func NewRunnerFactory(outlet channel.Factory, registrar *registrar.Registrar, be
 // Create creates a input based on a config
 func (r *RunnerFactory) Create(
 	pipeline beat.PipelineConnector,
-	c *common.Config,
+	c *conf.C,
 ) (cfgfile.Runner, error) {
 	connector := r.outlet(pipeline)
 	p, err := New(c, connector, r.beatDone, r.registrar.GetStates())
@@ -57,7 +58,7 @@ func (r *RunnerFactory) Create(
 	return p, nil
 }
 
-func (r *RunnerFactory) CheckConfig(cfg *common.Config) error {
+func (r *RunnerFactory) CheckConfig(cfg *conf.C) error {
 	runner, err := r.Create(pipeline.NewNilPipeline(), cfg)
 	if _, ok := err.(*common.ErrInputNotFinished); ok {
 		// error is related to state, and hence config can be considered valid

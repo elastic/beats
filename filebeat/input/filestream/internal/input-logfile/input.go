@@ -21,16 +21,16 @@ import (
 	"context"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/input/filestream/internal/task"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/go-concert/ctxtool"
-	"github.com/elastic/go-concert/unison"
 )
 
 type managedInput struct {
 	userID           string
+	metricsID        string
 	manager          *InputManager
 	ackCH            *updateChan
 	sourceIdentifier *sourceIdentifier
@@ -62,17 +62,23 @@ func (inp *managedInput) Run(
 	defer cancel()
 	ctx.Cancelation = cancelCtx
 
+	metrics := NewMetrics(inp.metricsID)
+	defer metrics.Close()
+
 	hg := &defaultHarvesterGroup{
 		pipeline:     pipeline,
-		readers:      newReaderGroupWithLimit(inp.harvesterLimit),
+		readers:      newReaderGroup(),
 		cleanTimeout: inp.cleanTimeout,
 		harvester:    inp.harvester,
 		store:        groupStore,
 		ackCH:        inp.ackCH,
 		identifier:   inp.sourceIdentifier,
-		tg: unison.TaskGroup{
-			OnQuit: unison.ContinueOnErrors, // harvester should keep running if a single harvester errored
-		},
+		tg: task.NewGroup(
+			inp.harvesterLimit,
+			time.Minute, // magic number
+			ctx.Logger,
+			"harvester:"),
+		metrics: metrics,
 	}
 
 	prospectorStore := inp.manager.getRetainedStore()
@@ -81,10 +87,14 @@ func (inp *managedInput) Run(
 
 	inp.prospector.Run(ctx, sourceStore, hg)
 
+	// Notify the manager the input has stopped, currently that is used to
+	// keep track of duplicated IDs
+	inp.manager.StopInput(inp.userID)
+
 	return nil
 }
 
-func newInputACKHandler(ch *updateChan, log *logp.Logger) beat.ACKer {
+func newInputACKHandler(ch *updateChan) beat.EventListener {
 	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
 		var n uint
 		var last int

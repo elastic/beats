@@ -7,12 +7,10 @@ package pipelinemanager
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // IdxSupport is a supporter type used by libbeat to manage index support
@@ -30,13 +28,13 @@ func newIndexSupporter(info beat.Info) *IdxSupport {
 }
 
 // BuildSelector implements the IndexManager interface
-func (s *IdxSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector, error) {
+func (s *IdxSupport) BuildSelector(cfg *config.C) (outputs.IndexSelector, error) {
 	//copy the config object we get before we send it to the BuildSelector
-	bsCfg := common.NewConfig()
+	bsCfg := config.NewConfig()
 	if cfg.HasField("indicies") {
 		sub, err := cfg.Child("indices", -1)
 		if err != nil {
-			return nil, errors.Wrap(err, "error getting indicies field")
+			return nil, fmt.Errorf("error getting indicies field: %w", err)
 		}
 		bsCfg.SetChild("indices", -1, sub)
 	}
@@ -64,7 +62,7 @@ func (s *IdxSupport) BuildSelector(cfg *common.Config) (outputs.IndexSelector, e
 
 	indexSel, err := outil.BuildSelectorFromConfig(bsCfg, buildSettings)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating build Selector")
+		return nil, fmt.Errorf("error creating build Selector: %w", err)
 	}
 
 	return indexSel, nil

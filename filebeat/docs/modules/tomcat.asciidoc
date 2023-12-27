@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/tomcat/_meta/docs.asciidoc
+
 [[filebeat-module-tomcat]]
 [role="xpack"]
 
@@ -9,6 +11,8 @@ This file is generated! See scripts/docs_collector.py
 :has-dashboards: false
 
 == Tomcat module
+
+deprecated::[8.12.0,"This module is deprecated. Use the https://docs.elastic.co/integrations/apache_tomcat[Apache Tomcat] Elastic integration instead."]
 
 experimental[]
 
@@ -83,3 +87,4 @@ will be found under `rsa.raw`. The default is false.
 For a description of each field in the module, see the
 <<exported-fields-tomcat,exported fields>> section.
 
+:edit_url!:

@@ -20,12 +20,11 @@ package streaming
 import (
 	"bufio"
 	"context"
+	"fmt"
 	"net"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/filebeat/inputsource"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // HandlerFactory returns a ConnectionHandler func
@@ -56,7 +55,7 @@ func SplitHandlerFactory(family inputsource.Family, logger *logp.Logger, metadat
 			buf := bufio.NewReader(r)
 			scanner := bufio.NewScanner(buf)
 			scanner.Split(splitFunc)
-			//16 is ratio of MaxScanTokenSize/startBufSize
+			// 16 is ratio of MaxScanTokenSize/startBufSize
 			buffer := make([]byte, maxMessageSize/16)
 			scanner.Buffer(buffer, int(maxMessageSize))
 			for {
@@ -76,7 +75,7 @@ func SplitHandlerFactory(family inputsource.Family, logger *logp.Logger, metadat
 					if IsMaxReadBufferErr(err) {
 						log.Errorw("split_client error", "error", err)
 					}
-					return errors.Wrap(err, string(family)+" split_client error")
+					return fmt.Errorf(string(family)+" split_client error: %w", err)
 				}
 				r.Reset()
 				callback(scanner.Bytes(), metadata)

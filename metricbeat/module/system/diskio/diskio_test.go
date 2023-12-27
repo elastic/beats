@@ -16,8 +16,6 @@
 // under the License.
 
 //go:build integration && ((darwin && cgo) || freebsd || linux || windows)
-// +build integration
-// +build darwin,cgo freebsd linux windows
 
 package diskio
 

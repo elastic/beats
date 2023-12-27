@@ -18,6 +18,14 @@
   # Only applicable to v9 and ipfix protocols. A value of zero disables expiration.
   #expiration_timeout: 30m
 
+  # Share Templates
+  # This option allows v9 and ipfix templates to be shared within a session without
+  # reference to the origin of the template.
+  #
+  # Setting this to true is not recommended as it can result in the wrong template
+  # being applied under certain conditions, but it may be required for some systems.
+  #share_templates: false
+
   # Queue size limits the number of netflow packets that are queued awaiting
   # processing.
   #queue_size: 8192
@@ -101,6 +109,16 @@
 
   # Overrides the `cloud.provider` field for non-AWS S3 buckets. See docs for auto recognized providers.
   #provider: minio
+
+  # Configures backing up processed files to another (or the same) bucket
+  #backup_to_bucket_arn: 'arn:aws:s3:::mybucket'
+  #non_aws_backup_to_bucket_name: 'mybucket'
+
+  # Sets a prefix to prepend to object keys when backing up
+  #backup_to_bucket_prefix: 'backup/'
+
+  # Controls deletion of objects after backing them up
+  #delete_after_backup: false
 
 #------------------------------ AWS CloudWatch input --------------------------------
 # Beta: Config options for AWS CloudWatch input

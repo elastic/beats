@@ -13,7 +13,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 6012000000,
@@ -91,7 +90,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 6020000000,
@@ -169,7 +167,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 50997000000,
@@ -247,7 +244,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 51015000000,

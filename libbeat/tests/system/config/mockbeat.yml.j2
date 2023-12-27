@@ -58,6 +58,9 @@ output:
   {% if elasticsearch.ssl_certificate_authorities %}
     ssl.certificate_authorities: {{elasticsearch.ssl_certificate_authorities}}
   {% endif %}
+  {% if elasticsearch.ssl_verification_mode %}
+    ssl.verification_mode: {{elasticsearch.ssl_verification_mode}}
+  {% endif %}
   {% if elasticsearch.ssl_ca_sha256 %}
     ssl.ca_sha256: {{ elasticsearch.ssl_ca_sha256 }}
   {% endif %}

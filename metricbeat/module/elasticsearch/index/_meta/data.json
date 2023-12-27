@@ -1,93 +1,155 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "elasticsearch": {
-        "cluster": {
-            "id": "WocBBA0QRma0sGpdQ7vLfQ",
-            "name": "docker-cluster"
-        },
-        "index": {
-            "hidden": false,
-            "name": ".kibana_task_manager_7.14.0_001",
-            "primaries": {
-                "docs": {
-                    "count": 14
-                },
-                "indexing": {
-                    "index_time_in_millis": 493,
-                    "index_total": 719,
-                    "throttle_time_in_millis": 0
-                },
-                "merges": {
-                    "total_size_in_bytes": 5885647
-                },
-                "refresh": {
-                    "total_time_in_millis": 2315
-                },
-                "segments": {
-                    "count": 6
-                },
-                "store": {
-                    "size_in_bytes": 148860
-                }
-            },
-            "shards": {
-                "total": 1,
-                "primaries": 1
-            },
-            "status": "green",
-            "total": {
-                "docs": {
-                    "count": 14
-                },
-                "fielddata": {
-                    "memory_size_in_bytes": 0
-                },
-                "indexing": {
-                    "index_time_in_millis": 493,
-                    "index_total": 719,
-                    "throttle_time_in_millis": 0
-                },
-                "merges": {
-                    "total_size_in_bytes": 5885647
-                },
-                "refresh": {
-                    "total_time_in_millis": 2315
-                },
-                "search": {
-                    "query_time_in_millis": 807,
-                    "query_total": 1339
-                },
-                "segments": {
-                    "count": 6,
-                    "doc_values_memory_in_bytes": 16616,
-                    "fixed_bit_set_memory_in_bytes": 376,
-                    "index_writer_memory_in_bytes": 0,
-                    "memory_in_bytes": 36280,
-                    "norms_memory_in_bytes": 1536,
-                    "points_memory_in_bytes": 0,
-                    "stored_fields_memory_in_bytes": 2960,
-                    "term_vectors_memory_in_bytes": 0,
-                    "terms_memory_in_bytes": 15168,
-                    "version_map_memory_in_bytes": 0
-                },
-                "store": {
-                    "size_in_bytes": 148860
-                }
-            },
-            "uuid": "1E4r6Df2RhOa5pgdPvOZEA"
-        }
+    "@timestamp": "2022-09-28T15:49:31.830Z",
+    "agent": {
+      "name": "host.example.com",
+      "type": "metricbeat",
+      "version": "8.6.0",
+      "ephemeral_id": "fc15d33f-c1e8-4e8a-ab69-3c0ea00c3c3e",
+      "id": "baa161a5-42b3-4ecc-8d2d-578df730f8f2"
+    },
+    "ecs": {
+      "version": "8.0.0"
     },
     "event": {
-        "dataset": "elasticsearch.index",
-        "duration": 115000,
-        "module": "elasticsearch"
+      "module": "elasticsearch",
+      "duration": 5974079,
+      "dataset": "elasticsearch.index"
     },
     "metricset": {
-        "name": "index",
-        "period": 10000
+      "name": "index",
+      "period": 10000
     },
     "service": {
-        "address": "172.19.0.2:9200",
-        "type": "elasticsearch"
+      "address": "http://localhost:9200",
+      "type": "elasticsearch"
+    },
+    "elasticsearch": {
+      "cluster": {
+        "id": "C69Yz6KEQwqRB3UM6eAw9Q",
+        "name": "elasticsearch"
+      },
+      "index": {
+        "name": ".kibana_task_manager_8.6.0_001",
+        "uuid": "LSnJxMuITNyjGmTxHcpTdA",
+        "primaries": {
+          "segments": {
+            "memory_in_bytes": 0,
+            "term_vectors_memory_in_bytes": 0,
+            "version_map_memory_in_bytes": 0,
+            "fixed_bit_set_memory_in_bytes": 21072,
+            "index_writer_memory_in_bytes": 0,
+            "norms_memory_in_bytes": 0,
+            "doc_values_memory_in_bytes": 0,
+            "count": 5,
+            "terms_memory_in_bytes": 0,
+            "stored_fields_memory_in_bytes": 0,
+            "points_memory_in_bytes": 0
+          },
+          "search": {
+            "query_total": 421083,
+            "query_time_in_millis": 2456214
+          },
+          "store": {
+            "size_in_bytes": 17759832
+          },
+          "query_cache": {
+            "memory_size_in_bytes": 21120,
+            "hit_count": 546992,
+            "miss_count": 12462882
+          },
+          "merges": {
+            "total_size_in_bytes": 2199683211
+          },
+          "request_cache": {
+            "hit_count": 0,
+            "miss_count": 11,
+            "evictions": 0,
+            "memory_size_in_bytes": 0
+          },
+          "docs": {
+            "count": 26,
+            "deleted": 166775
+          },
+          "indexing": {
+            "index_time_in_millis": 117187,
+            "throttle_time_in_millis": 0,
+            "index_total": 166797
+          },
+          "refresh": {
+            "total_time_in_millis": 2562826,
+            "external_total_time_in_millis": 2679779
+          }
+        },
+        "total": {
+          "fielddata": {
+            "memory_size_in_bytes": 0,
+            "evictions": 0
+          },
+          "merges": {
+            "total_size_in_bytes": 2199683211
+          },
+          "store": {
+            "size_in_bytes": 17759832
+          },
+          "indexing": {
+            "index_time_in_millis": 117187,
+            "throttle_time_in_millis": 0,
+            "index_total": 166797
+          },
+          "bulk": {
+            "total_operations": 123015,
+            "total_time_in_millis": 226600,
+            "total_size_in_bytes": 88785707,
+            "avg_time_in_millis": 1,
+            "avg_size_in_bytes": 848
+          },
+          "segments": {
+            "term_vectors_memory_in_bytes": 0,
+            "version_map_memory_in_bytes": 0,
+            "norms_memory_in_bytes": 0,
+            "index_writer_memory_in_bytes": 0,
+            "fixed_bit_set_memory_in_bytes": 21072,
+            "stored_fields_memory_in_bytes": 0,
+            "count": 5,
+            "memory_in_bytes": 0,
+            "terms_memory_in_bytes": 0,
+            "doc_values_memory_in_bytes": 0,
+            "points_memory_in_bytes": 0
+          },
+          "search": {
+            "query_total": 421083,
+            "query_time_in_millis": 2456214
+          },
+          "query_cache": {
+            "memory_size_in_bytes": 21120,
+            "hit_count": 546992,
+            "miss_count": 12462882,
+            "evictions": 20
+          },
+          "docs": {
+            "count": 26,
+            "deleted": 166775
+          },
+          "refresh": {
+            "external_total_time_in_millis": 2679779,
+            "total_time_in_millis": 2562826
+          },
+          "request_cache": {
+            "memory_size_in_bytes": 0,
+            "hit_count": 0,
+            "miss_count": 11,
+            "evictions": 0
+          }
+        },
+        "status": "green",
+        "hidden": true,
+        "shards": {
+          "total": 1,
+          "primaries": 1
+        }
+      }
+    },
+    "host": {
+      "name": "host.example.com"
     }
-}
+  }

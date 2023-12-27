@@ -1,0 +1,49 @@
+[
+  {
+    "@timestamp": "2020-04-01T07:32:55.0104462Z",
+    "event": {
+      "action": "Kerberos Service Ticket Operations",
+      "code": "4770",
+      "kind": "event",
+      "outcome": "success",
+      "provider": "Microsoft-Windows-Security-Auditing"
+    },
+    "host": {
+      "name": "DC_TEST2k12.TEST.SAAS"
+    },
+    "log": {
+      "level": "information"
+    },
+    "message": "A Kerberos service ticket was renewed.\n\nAccount Information:\n\tAccount Name:\t\tDC_TEST2K12$@TEST.SAAS\n\tAccount Domain:\t\tTEST.SAAS\n\nService Information:\n\tService Name:\t\tkrbtgt\n\tService ID:\t\tS-1-5-21-1717121054-434620538-60925301-502\n\nNetwork Information:\n\tClient Address:\t\t::1\n\tClient Port:\t\t0\n\nAdditional Information:\n\tTicket Options:\t\t0x10002\n\tTicket Encryption Type:\t0x12\n\nTicket options and encryption types are defined in RFC 4120.",
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Security",
+      "computer_name": "DC_TEST2k12.TEST.SAAS",
+      "event_data": {
+        "IpAddress": "::1",
+        "IpPort": "0",
+        "ServiceName": "krbtgt",
+        "ServiceSid": "S-1-5-21-1717121054-434620538-60925301-502",
+        "TargetDomainName": "TEST.SAAS",
+        "TargetUserName": "DC_TEST2K12$@TEST.SAAS",
+        "TicketEncryptionType": "0x12",
+        "TicketOptions": "0x10002"
+      },
+      "event_id": "4770",
+      "keywords": [
+        "Audit Success"
+      ],
+      "opcode": "Info",
+      "process": {
+        "pid": 496,
+        "thread": {
+          "id": 4468
+        }
+      },
+      "provider_guid": "{54849625-5478-4994-a5ba-3e3b0328c30d}",
+      "provider_name": "Microsoft-Windows-Security-Auditing",
+      "record_id": 5039598,
+      "task": "Kerberos Service Ticket Operations"
+    }
+  }
+]

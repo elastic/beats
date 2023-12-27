@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package mqtt
 
@@ -33,8 +32,9 @@ import (
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -45,7 +45,7 @@ const (
 
 var (
 	hostPort = fmt.Sprintf("tcp://%s:%s",
-		getOrDefault(os.Getenv("MOSQUITTO_HOST"), "mosquitto"),
+		getOrDefault(os.Getenv("MOSQUITTO_HOST"), "localhost"),
 		getOrDefault(os.Getenv("MOSQUITTO_PORT"), "1883"))
 	topic = fmt.Sprintf("topic-%d", time.Now().UnixNano())
 )
@@ -85,7 +85,7 @@ func TestInput(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("mqtt input", "libmqtt"))
 
 	// Setup the input config.
-	config := common.MustNewConfigFrom(common.MapStr{
+	config := conf.MustNewConfigFrom(mapstr.M{
 		"hosts":  []string{hostPort},
 		"topics": []string{topic},
 	})
@@ -97,7 +97,7 @@ func TestInput(t *testing.T) {
 	captor := newEventCaptor(eventsCh)
 	defer captor.Close()
 
-	connector := channel.ConnectorFunc(func(_ *common.Config, _ beat.ClientConfig) (channel.Outleter, error) {
+	connector := channel.ConnectorFunc(func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
 		return channel.SubOutlet(captor), nil
 	})
 

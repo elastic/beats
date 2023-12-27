@@ -19,11 +19,10 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-
-	"github.com/pkg/errors"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type V1 struct{}
@@ -32,18 +31,18 @@ func (v *V1) MapEvent(info *CommonInfo, in []byte) (mb.Event, error) {
 	var data ServerV1
 	err := json.Unmarshal(in, &data)
 	if err != nil {
-		return mb.Event{}, errors.Wrap(err, "error parsing v1 server JSON")
+		return mb.Event{}, fmt.Errorf("error parsing v1 server JSON: %w", err)
 	}
 
-	event := common.MapStr{
-		"httpd": common.MapStr{
+	event := mapstr.M{
+		"httpd": mapstr.M{
 			"view_reads":                 data.Httpd.ViewReads.Current,
 			"bulk_requests":              data.Httpd.BulkRequests.Current,
 			"clients_requesting_changes": data.Httpd.ClientsRequestingChanges.Current,
 			"temporary_view_reads":       data.Httpd.TemporaryViewReads.Current,
 			"requests":                   data.Httpd.Requests.Current,
 		},
-		"httpd_request_methods": common.MapStr{
+		"httpd_request_methods": mapstr.M{
 			"COPY":   data.HttpdRequestMethods.Copy.Current,
 			"HEAD":   data.HttpdRequestMethods.Head.Current,
 			"POST":   data.HttpdRequestMethods.Post.Current,
@@ -51,7 +50,7 @@ func (v *V1) MapEvent(info *CommonInfo, in []byte) (mb.Event, error) {
 			"GET":    data.HttpdRequestMethods.Get.Current,
 			"PUT":    data.HttpdRequestMethods.Put.Current,
 		},
-		"httpd_status_codes": common.MapStr{
+		"httpd_status_codes": mapstr.M{
 			"200": data.HttpdStatusCodes.Num200.Current,
 			"201": data.HttpdStatusCodes.Num201.Current,
 			"202": data.HttpdStatusCodes.Num202.Current,
@@ -66,7 +65,7 @@ func (v *V1) MapEvent(info *CommonInfo, in []byte) (mb.Event, error) {
 			"412": data.HttpdStatusCodes.Num412.Current,
 			"500": data.HttpdStatusCodes.Num500.Current,
 		},
-		"couchdb": common.MapStr{
+		"couchdb": mapstr.M{
 			"database_writes":   data.Couchdb.DatabaseWrites.Current,
 			"open_databases":    data.Couchdb.OpenDatabases.Current,
 			"auth_cache_misses": data.Couchdb.AuthCacheMisses.Current,
@@ -77,7 +76,7 @@ func (v *V1) MapEvent(info *CommonInfo, in []byte) (mb.Event, error) {
 		},
 	}
 
-	ecs := common.MapStr{}
+	ecs := mapstr.M{}
 	ecs.Put("service.id", info.UUID)
 	ecs.Put("service.version", info.Version)
 

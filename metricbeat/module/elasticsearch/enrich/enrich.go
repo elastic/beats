@@ -18,14 +18,13 @@
 package enrich
 
 import (
+	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 func init() {
@@ -70,7 +69,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
 	enrichUnavailableMessage, err := m.checkEnrichAvailability(info.Version.Number)
 	if err != nil {
-		return errors.Wrap(err, "error determining if Enrich is available")
+		return fmt.Errorf("error determining if Enrich is available: %w", err)
 	}
 
 	if enrichUnavailableMessage != "" {
@@ -86,10 +85,10 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	return eventsMapping(r, *info, content, m.XPackEnabled)
+	return eventsMapping(r, info, content, m.XPackEnabled)
 }
 
-func (m *MetricSet) checkEnrichAvailability(currentElasticsearchVersion *common.Version) (message string, err error) {
+func (m *MetricSet) checkEnrichAvailability(currentElasticsearchVersion *version.V) (message string, err error) {
 	isAvailable := elastic.IsFeatureAvailable(currentElasticsearchVersion, elasticsearch.EnrichStatsAPIAvailableVersion)
 
 	if !isAvailable {

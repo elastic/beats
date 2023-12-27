@@ -7,86 +7,90 @@ package rds
 import (
 	"context"
 	"fmt"
+	"strings"
+
+	"github.com/aws/aws-sdk-go-v2/service/rds/types"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/rds"
-	"github.com/aws/aws-sdk-go-v2/service/rds/rdsiface"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 const metadataPrefix = "aws.rds.db_instance."
 
 // AddMetadata adds metadata for RDS instances from a specific region
-func AddMetadata(endpoint string, regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) map[string]mb.Event {
-	rdsServiceName := awscommon.CreateServiceName("rds", fips_enabled, regionName)
-	svc := rds.New(awscommon.EnrichAWSConfigWithEndpoint(
-		endpoint, rdsServiceName, regionName, awsConfig))
+func AddMetadata(regionName string, awsConfig awssdk.Config, fips_enabled bool, events map[string]mb.Event) (map[string]mb.Event, error) {
+	svc := rds.NewFromConfig(awsConfig, func(o *rds.Options) {
+		if fips_enabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+	})
 
 	// Get DBInstance IDs per region
 	dbDetailsMap, err := getDBInstancesPerRegion(svc)
 	if err != nil {
-		logp.Error(fmt.Errorf("getInstancesPerRegion failed, skipping region %s: %w", regionName, err))
-		return events
+		return events, fmt.Errorf("aws.rds.db_instance fields are not available, skipping region %s: %w", regionName, err)
 	}
 
 	for _, event := range events {
 		cpuValue, err := event.RootFields.GetValue("aws.rds.metrics.CPUUtilization.avg")
 		if err == nil {
 			if value, ok := cpuValue.(float64); ok {
-				event.RootFields.Put("aws.rds.metrics.CPUUtilization.avg", value/100)
+				_, _ = event.RootFields.Put("aws.rds.metrics.CPUUtilization.avg", value/100)
 			}
 		}
 	}
 
-	for identifier, output := range dbDetailsMap {
-		if _, ok := events[identifier]; !ok {
-			continue
-		}
+	for dbInstanceIdentifier, output := range dbDetailsMap {
+		for eventIdentifier := range events {
+			eventIdentifierComponents := strings.Split(eventIdentifier, "-")
+			potentialDBInstanceIdentifier := strings.Join(eventIdentifierComponents[0:len(eventIdentifierComponents)-1], "-")
+			if dbInstanceIdentifier != potentialDBInstanceIdentifier {
+				continue
+			}
 
-		if output.DBInstanceArn != nil {
-			events[identifier].RootFields.Put(metadataPrefix+"arn", *output.DBInstanceArn)
-		}
+			if output.DBInstanceArn != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"arn", *output.DBInstanceArn)
+			}
 
-		if output.DBInstanceStatus != nil {
-			events[identifier].RootFields.Put(metadataPrefix+"status", *output.DBInstanceStatus)
-		}
+			if output.DBInstanceStatus != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"status", *output.DBInstanceStatus)
+			}
 
-		if output.DBInstanceIdentifier != nil {
-			events[identifier].RootFields.Put(metadataPrefix+"identifier", *output.DBInstanceIdentifier)
-		}
+			if output.DBInstanceIdentifier != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"identifier", *output.DBInstanceIdentifier)
+			}
 
-		if output.DBClusterIdentifier != nil {
-			events[identifier].RootFields.Put(metadataPrefix+"db_cluster_identifier", *output.DBClusterIdentifier)
-		}
+			if output.DBClusterIdentifier != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"db_cluster_identifier", *output.DBClusterIdentifier)
+			}
 
-		if output.DBInstanceClass != nil {
-			events[identifier].RootFields.Put(metadataPrefix+"class", *output.DBInstanceClass)
-		}
+			if output.DBInstanceClass != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"class", *output.DBInstanceClass)
+			}
 
-		if output.Engine != nil {
-			events[identifier].RootFields.Put(metadataPrefix+"engine_name", *output.Engine)
-		}
+			if output.Engine != nil {
+				_, _ = events[eventIdentifier].RootFields.Put(metadataPrefix+"engine_name", *output.Engine)
+			}
 
-		if output.AvailabilityZone != nil {
-			events[identifier].RootFields.Put("cloud.availability_zone", *output.AvailabilityZone)
+			if output.AvailabilityZone != nil {
+				_, _ = events[eventIdentifier].RootFields.Put("cloud.availability_zone", *output.AvailabilityZone)
+			}
 		}
 	}
-	return events
+	return events, nil
 }
 
-func getDBInstancesPerRegion(svc rdsiface.ClientAPI) (map[string]*rds.DBInstance, error) {
+func getDBInstancesPerRegion(svc *rds.Client) (map[string]*types.DBInstance, error) {
 	describeInstanceInput := &rds.DescribeDBInstancesInput{}
-	req := svc.DescribeDBInstancesRequest(describeInstanceInput)
-	output, err := req.Send(context.TODO())
+
+	output, err := svc.DescribeDBInstances(context.TODO(), describeInstanceInput)
 	if err != nil {
-		return nil, errors.Wrap(err, "Error DescribeDBInstancesRequest")
+		return nil, fmt.Errorf("error DescribeDBInstancesRequest: %w", err)
 	}
 
-	instancesOutputs := map[string]*rds.DBInstance{}
+	instancesOutputs := map[string]*types.DBInstance{}
 	for _, dbInstance := range output.DBInstances {
 		instance := dbInstance
 		instancesOutputs[*instance.DBInstanceIdentifier] = &instance

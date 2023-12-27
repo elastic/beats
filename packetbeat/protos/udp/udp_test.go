@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package udp
 
@@ -26,8 +25,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/protos"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	// import plugins for testing
 	_ "github.com/elastic/beats/v7/packetbeat/protos/http"
@@ -111,7 +110,7 @@ func testSetup(t *testing.T) *TestStruct {
 	plugin := &TestProtocol{Ports: []int{PORT}}
 	protocols.udp[PROTO] = plugin
 
-	udp, err := NewUDP(protocols)
+	udp, err := NewUDP(protocols, "test", "test", 0)
 	if err != nil {
 		t.Error("Error creating UDP handler: ", err)
 	}
@@ -191,7 +190,7 @@ func Test_buildPortsMap_portOverlapError(t *testing.T) {
 				mysqlProtocol: &TestProtocol{Ports: []int{3306}},
 				redisProtocol: &TestProtocol{Ports: []int{6379, 6380, 3306}},
 			},
-			Err: "Duplicate port (3306) exists",
+			Err: "duplicate port (3306) exists",
 		},
 	}
 
@@ -206,6 +205,7 @@ func Test_buildPortsMap_portOverlapError(t *testing.T) {
 // packet's source port.
 func Test_decideProtocol_bySrcPort(t *testing.T) {
 	test := testSetup(t)
+	defer test.udp.metrics.close()
 	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("192.168.0.1"), PORT,
 		net.ParseIP("10.0.0.1"), 34898)
@@ -216,6 +216,7 @@ func Test_decideProtocol_bySrcPort(t *testing.T) {
 // packet's destination port.
 func Test_decideProtocol_byDstPort(t *testing.T) {
 	test := testSetup(t)
+	defer test.udp.metrics.close()
 	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("10.0.0.1"), 34898,
 		net.ParseIP("192.168.0.1"), PORT)
@@ -226,6 +227,7 @@ func Test_decideProtocol_byDstPort(t *testing.T) {
 // which it does not have a plugin.
 func TestProcess_unknownProtocol(t *testing.T) {
 	test := testSetup(t)
+	defer test.udp.metrics.close()
 	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("10.0.0.1"), 34898,
 		net.ParseIP("192.168.0.1"), PORT+1)
@@ -235,6 +237,7 @@ func TestProcess_unknownProtocol(t *testing.T) {
 // Verify that Process ignores empty packets.
 func TestProcess_emptyPayload(t *testing.T) {
 	test := testSetup(t)
+	defer test.udp.metrics.close()
 	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("192.168.0.1"), PORT,
 		net.ParseIP("10.0.0.1"), 34898)
@@ -247,6 +250,7 @@ func TestProcess_emptyPayload(t *testing.T) {
 // ProcessUdp on it.
 func TestProcess_nonEmptyPayload(t *testing.T) {
 	test := testSetup(t)
+	defer test.udp.metrics.close()
 	tuple := common.NewIPPortTuple(4,
 		net.ParseIP("192.168.0.1"), PORT,
 		net.ParseIP("10.0.0.1"), 34898)

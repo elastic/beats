@@ -6,40 +6,40 @@ package compute
 
 import (
 	"context"
+	"errors"
+	"fmt"
+	"strconv"
 	"strings"
-	"time"
 
-	"github.com/pkg/errors"
-	"google.golang.org/api/compute/v1"
+	compute "cloud.google.com/go/compute/apiv1"
+	"cloud.google.com/go/compute/apiv1/computepb"
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
+	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // NewMetadataService returns the specific Metadata service for a GCP Compute resource
-func NewMetadataService(projectID, zone string, region string, opt ...option.ClientOption) (gcp.MetadataService, error) {
+func NewMetadataService(projectID, zone string, region string, regions []string, opt ...option.ClientOption) (gcp.MetadataService, error) {
 	return &metadataCollector{
-		projectID:     projectID,
-		zone:          zone,
-		region:        region,
-		opt:           opt,
-		instanceCache: common.NewCache(30*time.Second, 13),
-		logger:        logp.NewLogger("metrics-compute"),
+		projectID:        projectID,
+		zone:             zone,
+		region:           region,
+		regions:          regions,
+		opt:              opt,
+		computeInstances: make(map[uint64]*computepb.Instance),
+		logger:           logp.NewLogger("metrics-compute"),
 	}, nil
 }
 
 // computeMetadata is an object to store data in between the extraction and the writing in the destination (to uncouple
 // reading and writing in the same method)
 type computeMetadata struct {
-	projectID   string
 	zone        string
 	instanceID  string
 	machineType string
-
-	ts *monitoringpb.TimeSeries
 
 	User     map[string]string
 	Metadata map[string]string
@@ -48,26 +48,21 @@ type computeMetadata struct {
 }
 
 type metadataCollector struct {
-	projectID string
-	zone      string
-	region    string
-	opt       []option.ClientOption
-
-	computeMetadata *computeMetadata
-
-	instanceCache *common.Cache
-	logger        *logp.Logger
+	projectID        string
+	zone             string
+	region           string
+	regions          []string
+	opt              []option.ClientOption
+	computeInstances map[uint64]*computepb.Instance
+	logger           *logp.Logger
 }
 
 // Metadata implements googlecloud.MetadataCollector to the known set of labels from a Compute TimeSeries single point of data.
 func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.TimeSeries) (gcp.MetadataCollectorData, error) {
-	// NOTE: ignoring the return value because instanceMetadata changes s.computeMetadata in place.
-	// This is probably not thread safe.
-	_, err := s.instanceMetadata(ctx, s.instanceID(resp), s.instanceZone(resp))
+	computeMetadata, err := s.instanceMetadata(ctx, s.instanceID(resp), s.instanceZone(resp))
 	if err != nil {
 		return gcp.MetadataCollectorData{}, err
 	}
-
 	stackdriverLabels := gcp.NewStackdriverMetadataServiceForTimeSeries(resp)
 	metadataCollectorData, err := stackdriverLabels.Metadata(ctx, resp)
 	if err != nil {
@@ -75,23 +70,23 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 	}
 
 	if resp.Resource != nil && resp.Resource.Labels != nil {
-		metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceIDKey, resp.Resource.Labels[gcp.TimeSeriesResponsePathForECSInstanceID])
+		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceIDKey, resp.Resource.Labels[gcp.TimeSeriesResponsePathForECSInstanceID])
 	}
 
 	if resp.Metric.Labels != nil {
-		metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, resp.Metric.Labels[gcp.TimeSeriesResponsePathForECSInstanceName])
+		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudInstanceNameKey, resp.Metric.Labels[gcp.TimeSeriesResponsePathForECSInstanceName])
 	}
 
-	if s.computeMetadata.machineType != "" {
-		lastIndex := strings.LastIndex(s.computeMetadata.machineType, "/")
-		metadataCollectorData.ECS.Put(gcp.ECSCloudMachineTypeKey, s.computeMetadata.machineType[lastIndex+1:])
+	if computeMetadata.machineType != "" {
+		lastIndex := strings.LastIndex(computeMetadata.machineType, "/")
+		_, _ = metadataCollectorData.ECS.Put(gcp.ECSCloudMachineTypeKey, computeMetadata.machineType[lastIndex+1:])
 	}
 
-	s.computeMetadata.Metrics = metadataCollectorData.Labels[gcp.LabelMetrics]
-	s.computeMetadata.System = metadataCollectorData.Labels[gcp.LabelSystem]
+	computeMetadata.Metrics = metadataCollectorData.Labels[gcp.LabelMetrics]
+	computeMetadata.System = metadataCollectorData.Labels[gcp.LabelSystem]
 
-	if s.computeMetadata.User != nil {
-		metadataCollectorData.Labels[gcp.LabelUser] = s.computeMetadata.User
+	if computeMetadata.User != nil {
+		metadataCollectorData.Labels[gcp.LabelUser] = computeMetadata.User
 	}
 
 	/*
@@ -107,63 +102,58 @@ func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.Tim
 
 // instanceMetadata returns the labels of an instance
 func (s *metadataCollector) instanceMetadata(ctx context.Context, instanceID, zone string) (*computeMetadata, error) {
-	// FIXME: remove side effect on metadataCollector instance and use return value instead
-	i, err := s.instance(ctx, instanceID, zone)
+	instance, err := s.instance(ctx, instanceID)
 	if err != nil {
-		return nil, errors.Wrapf(err, "error trying to get data from instance '%s' in zone '%s'", instanceID, zone)
+		return nil, fmt.Errorf("error trying to get data from instance '%s' %w", instanceID, err)
 	}
 
-	s.computeMetadata = &computeMetadata{
+	computeMetadata := &computeMetadata{
 		instanceID: instanceID,
 		zone:       zone,
 	}
 
-	if i == nil {
-		return s.computeMetadata, nil
+	if instance == nil {
+		s.logger.Debugf("couldn't find instance %s, call Instances.AggregatedList", instanceID)
+		return computeMetadata, nil
 	}
 
-	if i.Labels != nil {
-		s.computeMetadata.User = i.Labels
+	labels := instance.GetLabels()
+	if labels != nil {
+		computeMetadata.User = labels
 	}
 
-	if i.MachineType != "" {
-		s.computeMetadata.machineType = i.MachineType
+	machineType := instance.GetMachineType()
+	if machineType != "" {
+		computeMetadata.machineType = machineType
 	}
 
-	if i.Metadata != nil && i.Metadata.Items != nil {
-		s.computeMetadata.Metadata = make(map[string]string)
+	metadata := instance.GetMetadata()
 
-		for _, i := range i.Metadata.Items {
-			s.computeMetadata.Metadata[i.Key] = *i.Value
+	if metadata != nil {
+		metadataItems := metadata.GetItems()
+
+		if metadataItems != nil {
+			computeMetadata.Metadata = make(map[string]string)
+
+			for _, item := range metadataItems {
+				computeMetadata.Metadata[item.GetKey()] = item.GetValue()
+			}
 		}
 	}
 
-	return s.computeMetadata, nil
+	return computeMetadata, nil
 }
 
 // instance returns data from an instance ID using the cache or making a request
-func (s *metadataCollector) instance(ctx context.Context, instanceID, zone string) (*compute.Instance, error) {
-	service, err := compute.NewService(ctx, s.opt...)
-	if err != nil {
-		return nil, errors.Wrapf(err, "error getting client from Compute service")
+func (s *metadataCollector) instance(ctx context.Context, instanceID string) (*computepb.Instance, error) {
+	s.getComputeInstances(ctx)
+
+	instanceIdInt, _ := strconv.Atoi(instanceID)
+	computeInstance, ok := s.computeInstances[uint64(instanceIdInt)]
+	if ok {
+		return computeInstance, nil
 	}
 
-	instanceCachedData := s.instanceCache.Get(instanceID)
-	if instanceCachedData != nil {
-		if computeInstance, ok := instanceCachedData.(*compute.Instance); ok {
-			return computeInstance, nil
-		}
-	}
-
-	if zone != "" {
-		instanceData, err := service.Instances.Get(s.projectID, zone, instanceID).Do()
-		if err != nil {
-			s.logger.Warnf("failed to get instance information for instance '%s' in zone '%s', skipping metadata for instance", instanceID, zone)
-			return nil, nil
-		}
-		s.instanceCache.Put(instanceID, instanceData)
-		return instanceData, nil
-	}
 	return nil, nil
 }
 
@@ -181,4 +171,41 @@ func (s *metadataCollector) instanceZone(ts *monitoringpb.TimeSeries) string {
 	}
 
 	return ""
+}
+
+func (s *metadataCollector) getComputeInstances(ctx context.Context) {
+	if len(s.computeInstances) > 0 {
+		return
+	}
+
+	s.logger.Debug("Compute API Instances.AggregatedList")
+
+	instancesClient, err := compute.NewInstancesRESTClient(ctx, s.opt...)
+	if err != nil {
+		s.logger.Errorf("error getting client from compute service: %v", err)
+		return
+	}
+
+	defer instancesClient.Close()
+
+	it := instancesClient.AggregatedList(ctx, &computepb.AggregatedListInstancesRequest{
+		Project: s.projectID,
+	})
+
+	for {
+		instancesScopedListPair, err := it.Next()
+		if errors.Is(err, iterator.Done) {
+			break
+		}
+
+		if err != nil {
+			s.logger.Errorf("error getting next instance from InstancesScopedListPairIterator: %v", err)
+			break
+		}
+
+		instances := instancesScopedListPair.Value.GetInstances()
+		for _, instance := range instances {
+			s.computeInstances[instance.GetId()] = instance
+		}
+	}
 }

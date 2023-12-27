@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -16,20 +15,23 @@ import (
 	"strings"
 	"time"
 
+	"go.uber.org/multierr"
+
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	metricbeat "github.com/elastic/beats/v7/metricbeat/scripts/mage"
 
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
+	//mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
 )
 
 func init() {
@@ -58,7 +60,10 @@ func GolangCrossBuild() error {
 	if isWindows32bitRunner() {
 		args.LDFlags = append(args.LDFlags, "-w")
 	}
-	return devtools.GolangCrossBuild(args)
+	return multierr.Combine(
+		devtools.GolangCrossBuild(args),
+		devtools.TestLinuxForCentosGLIBC(),
+	)
 }
 
 // CrossBuild cross-builds the beat for all target platforms.
@@ -134,6 +139,13 @@ func BuildSystemTestBinary() error {
 	return sh.RunV("go", args...)
 }
 
+// AssembleDarwinUniversal merges the darwin/amd64 and darwin/arm64 into a single
+// universal binary using `lipo`. It assumes the darwin/amd64 and darwin/arm64
+// were built and only performs the merge.
+func AssembleDarwinUniversal() error {
+	return build.AssembleDarwinUniversal()
+}
+
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
@@ -154,6 +166,15 @@ func Package() {
 	mg.Deps(Update, metricbeat.PrepareModulePackagingXPack)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
+}
+
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	start := time.Now()
+	defer func() { fmt.Println("ironbank ran for", time.Since(start)) }()
+	return devtools.Ironbank()
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
@@ -235,6 +256,9 @@ func PythonIntegTest(ctx context.Context) error {
 	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(BuildSystemTestBinary)
 		args := devtools.DefaultPythonTestIntegrationArgs()
+		// Always create a fresh virtual environment when running tests in a container, until we get
+		// get the requirements installed as part of the container build.
+		args.ForceCreateVenv = true
 		// On Windows 32-bit converage is not enabled.
 		if isWindows32bitRunner() {
 			args.Env["TEST_COVERAGE"] = "false"

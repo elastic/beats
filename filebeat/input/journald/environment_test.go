@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux && cgo && withjournald
-// +build linux,cgo,withjournald
 
 package journald
 
@@ -32,11 +31,11 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -77,7 +76,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 		e.t.Fatalf("failed to initialise manager: %+v", err)
 	}
 
-	c := common.MustNewConfigFrom(config)
+	c := conf.MustNewConfigFrom(config)
 	inp, err := manager.Create(c)
 	if err != nil {
 		e.t.Fatalf("failed to create input using manager: %+v", err)
@@ -123,7 +122,7 @@ func (e *inputTestingEnvironment) abspath(filename string) string {
 func (e *inputTestingEnvironment) mustWriteFile(filename string, lines []byte) {
 	e.t.Helper()
 	path := e.abspath(filename)
-	if err := os.WriteFile(path, lines, 0644); err != nil {
+	if err := os.WriteFile(path, lines, 0o644); err != nil {
 		e.t.Fatalf("failed to write file '%s': %+v", path, err)
 	}
 }
@@ -153,7 +152,7 @@ func (s *testInputStore) CleanupInterval() time.Duration {
 type mockClient struct {
 	publishing []beat.Event
 	published  []beat.Event
-	ackHandler beat.ACKer
+	ackHandler beat.EventListener
 	closed     bool
 	mtx        sync.Mutex
 	canceler   context.CancelFunc
@@ -246,7 +245,6 @@ func (pc *mockPipelineConnector) ConnectWith(config beat.ClientConfig) (beat.Cli
 	pc.clients = append(pc.clients, c)
 
 	return c, nil
-
 }
 
 func (pc *mockPipelineConnector) cancelAllClients() {
@@ -269,16 +267,15 @@ func (pc *mockPipelineConnector) cancelClient(i int) {
 	pc.clients[i].canceler()
 }
 
-func newMockACKHandler(starter context.Context, blocking bool, config beat.ClientConfig) beat.ACKer {
+func newMockACKHandler(starter context.Context, blocking bool, config beat.ClientConfig) beat.EventListener {
 	if !blocking {
-		return config.ACKHandler
+		return config.EventListener
 	}
 
-	return acker.Combine(blockingACKer(starter), config.ACKHandler)
-
+	return acker.Combine(blockingACKer(starter), config.EventListener)
 }
 
-func blockingACKer(starter context.Context) beat.ACKer {
+func blockingACKer(starter context.Context) beat.EventListener {
 	return acker.EventPrivateReporter(func(acked int, private []interface{}) {
 		for starter.Err() == nil {
 		}

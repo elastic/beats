@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package mtest
 
@@ -12,10 +11,10 @@ import (
 
 	"github.com/cloudfoundry/sonde-go/events"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	cfcommon "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/cloudfoundry"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // ModuleMock is a Module with a mocked hub

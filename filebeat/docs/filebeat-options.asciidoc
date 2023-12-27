@@ -21,11 +21,13 @@ input type more than once. For example:
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
-- type: log
+- type: filestream
+  id: my-filestream-id <1>
   paths:
     - /var/log/system.log
     - /var/log/wifi.log
-- type: log
+- type: filestream
+  id: apache-filestream-id
   paths:
     - "/var/log/apache2/*"
   fields:
@@ -33,14 +35,16 @@ input type more than once. For example:
   fields_under_root: true
 ----
 
+<1> Each filestream input must have a unique ID to allow tracking the state of files.
+
 For the most basic configuration, define a single input with a single path. For
 example:
 
 [source,yaml]
 -------------------------------------------------------------------------------------
 filebeat.inputs:
-- type: log
-  enabled: true
+- type: filestream
+  id: my-filestream-id
   paths:
     - /var/log/*.log
 -------------------------------------------------------------------------------------
@@ -65,15 +69,19 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-aws-cloudwatch>>
 * <<{beatname_lc}-input-aws-s3>>
 * <<{beatname_lc}-input-azure-eventhub>>
+* <<{beatname_lc}-input-azure-blob-storage>>
+* <<{beatname_lc}-input-cel>>
 * <<{beatname_lc}-input-cloudfoundry>>
+* <<{beatname_lc}-input-cometd>>
 * <<{beatname_lc}-input-container>>
+* <<{beatname_lc}-input-entity-analytics>>
 * <<{beatname_lc}-input-filestream>>
 * <<{beatname_lc}-input-gcp-pubsub>>
 * <<{beatname_lc}-input-http_endpoint>>
 * <<{beatname_lc}-input-httpjson>>
 * <<{beatname_lc}-input-journald>>
 * <<{beatname_lc}-input-kafka>>
-* <<{beatname_lc}-input-log>>
+* <<{beatname_lc}-input-log>> (deprecated in 7.16.0, use <<{beatname_lc}-input-filestream>>)
 * <<{beatname_lc}-input-mqtt>>
 * <<{beatname_lc}-input-netflow>>
 * <<{beatname_lc}-input-o365audit>>
@@ -82,7 +90,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-syslog>>
 * <<{beatname_lc}-input-tcp>>
 * <<{beatname_lc}-input-udp>>
-
+* <<{beatname_lc}-input-gcs>>
 
 include::multiline.asciidoc[]
 
@@ -92,9 +100,17 @@ include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
 
+include::../../x-pack/filebeat/docs/inputs/input-azure-blob-storage.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-cel.asciidoc[]
+
 include::../../x-pack/filebeat/docs/inputs/input-cloudfoundry.asciidoc[]
 
+include::../../x-pack/filebeat/docs/inputs/input-cometd.asciidoc[]
+
 include::inputs/input-container.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-entity-analytics.asciidoc[]
 
 include::inputs/input-filestream.asciidoc[]
 
@@ -127,3 +143,5 @@ include::inputs/input-tcp.asciidoc[]
 include::inputs/input-udp.asciidoc[]
 
 include::inputs/input-unix.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-gcs.asciidoc[]

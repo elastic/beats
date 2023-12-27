@@ -21,12 +21,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Product supported by X-Pack Monitoring
@@ -104,7 +104,7 @@ func MakeErrorForMissingField(field string, product Product) error {
 }
 
 // IsFeatureAvailable returns whether a feature is available in the current product version
-func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion *common.Version) bool {
+func IsFeatureAvailable(currentProductVersion, featureAvailableInProductVersion *version.V) bool {
 	return !currentProductVersion.LessThan(featureAvailableInProductVersion)
 }
 
@@ -118,9 +118,9 @@ func ReportAndLogError(err error, r mb.ReporterV2, l *logp.Logger) {
 // int, so that it is not serialized in scientific notation in the event. This is because
 // Elasticsearch cannot accepts scientific notation to represent millis-since-epoch values
 // for it's date fields: https://github.com/elastic/elasticsearch/pull/36691
-func FixTimestampField(m common.MapStr, field string) error {
+func FixTimestampField(m mapstr.M, field string) error {
 	v, err := m.GetValue(field)
-	if err == common.ErrKeyNotFound {
+	if err == mapstr.ErrKeyNotFound {
 		return nil
 	}
 	if err != nil {
@@ -136,14 +136,14 @@ func FixTimestampField(m common.MapStr, field string) error {
 }
 
 // NewModule returns a new Elastic stack module with the appropriate metricsets configured.
-func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *logp.Logger) (*mb.BaseModule, error) {
+func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, optionalXpackMetricsets []string, logger *logp.Logger) (*mb.BaseModule, error) {
 	moduleName := base.Name()
 
 	config := struct {
 		XPackEnabled bool `config:"xpack.enabled"`
 	}{}
 	if err := base.UnpackConfig(&config); err != nil {
-		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
+		return nil, fmt.Errorf("could not unpack configuration for module %v: %w", moduleName, err)
 	}
 
 	// No special configuration is needed if xpack.enabled != true
@@ -151,22 +151,49 @@ func NewModule(base *mb.BaseModule, xpackEnabledMetricsets []string, logger *log
 		return base, nil
 	}
 
-	var raw common.MapStr
+	var raw mapstr.M
 	if err := base.UnpackConfig(&raw); err != nil {
-		return nil, errors.Wrapf(err, "could not unpack configuration for module %v", moduleName)
+		return nil, fmt.Errorf("could not unpack configuration for module %v: %w", moduleName, err)
 	}
 
-	// These metricsets are exactly the ones required if xpack.enabled == true
-	raw["metricsets"] = xpackEnabledMetricsets
+	// Ensure all required metricsets are enabled when xpack.enabled == true, and add any additional which are optional
+	cfgdMetricsets, err := raw.GetValue("metricsets")
+	metricsets := xpackEnabledMetricsets
+	if err == nil && cfgdMetricsets != nil {
+		// Type cast the metricsets to a slice of strings
+		cfgdMetricsetsSlice := cfgdMetricsets.([]interface{})
+		cfgdMetricsetsStrings := make([]string, len(cfgdMetricsetsSlice))
+		for i := range cfgdMetricsetsSlice {
+			cfgdMetricsetsStrings[i] = cfgdMetricsetsSlice[i].(string)
+		}
 
-	newConfig, err := common.NewConfigFrom(raw)
+		// Add any optional metricsets which are not already configured
+		for _, cfgdMs := range cfgdMetricsetsStrings {
+			found := false
+			for _, ms := range optionalXpackMetricsets {
+				if ms == cfgdMs {
+					found = true
+					break
+				}
+			}
+
+			if found {
+				metricsets = append(metricsets, cfgdMs)
+			}
+		}
+
+	}
+
+	raw["metricsets"] = metricsets
+
+	newConfig, err := conf.NewConfigFrom(raw)
 	if err != nil {
-		return nil, errors.Wrapf(err, "could not create new configuration for module %v", moduleName)
+		return nil, fmt.Errorf("could not create new configuration for module %v: %w", moduleName, err)
 	}
 
 	newModule, err := base.WithConfig(*newConfig)
 	if err != nil {
-		return nil, errors.Wrapf(err, "could not reconfigure module %v", moduleName)
+		return nil, fmt.Errorf("could not reconfigure module %v: %w", moduleName, err)
 	}
 
 	logger.Debugf("Configuration for module %v modified because xpack.enabled was set to true", moduleName)

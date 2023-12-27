@@ -17,6 +17,9 @@ For Kuberentes autodiscover events users can leverage port names as well,
 like `http://${data.host}:${data.ports.prometheus}/metrics`.
 In the last one we refer to the container port with name `prometheus`.
 
+In order to target one specific exposed port `localhost:{data.ports.8222}` can be used
+in template config, where `8222` is the internal container port of the exposed targeted port.
+
 [float]
 ===== `co.elastic.metrics/metricsets`
 

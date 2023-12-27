@@ -1,0 +1,3 @@
+The test files here are from the powershell module tests and were chosen
+because they do not fail the tests without modification, so they can be
+used to test the testing infrastructure.

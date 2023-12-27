@@ -67,7 +67,6 @@ func (o *subOutlet) Done() <-chan struct{} {
 }
 
 func (o *subOutlet) OnEvent(event beat.Event) bool {
-
 	o.mutex.Lock()
 	defer o.mutex.Unlock()
 	select {

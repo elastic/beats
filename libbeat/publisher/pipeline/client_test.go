@@ -27,30 +27,30 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 func TestClient(t *testing.T) {
 	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
 		p, err := New(beat.Info{},
 			Monitors{},
-			func(_ queue.ACKListener) (queue.Queue, error) {
-				return qu, nil
-			},
+			conf.Namespace{},
 			outputs.Group{},
 			settings,
 		)
 		if err != nil {
 			panic(err)
 		}
+		// Inject a test queue so the outputController doesn't create one
+		p.outputController.queue = qu
 
 		return p
 	}
@@ -83,16 +83,14 @@ func TestClient(t *testing.T) {
 			},
 		}
 
-		if testing.Verbose() {
-			logp.TestingSetup()
-		}
+		logp.TestingSetup()
 
 		for name, test := range cases {
 			t.Run(name, func(t *testing.T) {
 				routinesChecker := resources.NewGoroutinesChecker()
 				defer routinesChecker.Check(t)
 
-				pipeline := makePipeline(Settings{}, makeBlockingQueue())
+				pipeline := makePipeline(Settings{}, makeTestQueue())
 				defer pipeline.Close()
 
 				var ctx context.Context
@@ -130,21 +128,21 @@ func TestClientWaitClose(t *testing.T) {
 	makePipeline := func(settings Settings, qu queue.Queue) *Pipeline {
 		p, err := New(beat.Info{},
 			Monitors{},
-			func(queue.ACKListener) (queue.Queue, error) { return qu, nil },
+			conf.Namespace{},
 			outputs.Group{},
 			settings,
 		)
 		if err != nil {
 			panic(err)
 		}
+		// Inject a test queue so the outputController doesn't create one
+		p.outputController.queue = qu
 
 		return p
 	}
-	if testing.Verbose() {
-		logp.TestingSetup()
-	}
+	logp.TestingSetup()
 
-	q := memqueue.NewQueue(logp.L(), memqueue.Settings{Events: 1})
+	q := memqueue.NewQueue(logp.L(), nil, memqueue.Settings{Events: 1}, 0)
 	pipeline := makePipeline(Settings{}, q)
 	defer pipeline.Close()
 
@@ -189,14 +187,15 @@ func TestClientWaitClose(t *testing.T) {
 		defer client.Close()
 
 		// Send an event which gets acknowledged immediately.
-		client.Publish(beat.Event{})
 		output := newMockClient(func(batch publisher.Batch) error {
 			batch.ACK()
 			return nil
 		})
 		defer output.Close()
-		pipeline.output.Set(outputs.Group{Clients: []outputs.Client{output}})
-		defer pipeline.output.Set(outputs.Group{})
+		pipeline.outputController.Set(outputs.Group{Clients: []outputs.Client{output}})
+		defer pipeline.outputController.Set(outputs.Group{})
+
+		client.Publish(beat.Event{})
 
 		closed := make(chan struct{})
 		go func() {
@@ -219,7 +218,7 @@ func TestMonitoring(t *testing.T) {
 		numClients = 42
 	)
 	var config Config
-	err := common.MustNewConfigFrom(map[string]interface{}{
+	err := conf.MustNewConfigFrom(map[string]interface{}{
 		"queue.mem.events":           maxEvents,
 		"queue.mem.flush.min_events": 1,
 	}).Unpack(&config)

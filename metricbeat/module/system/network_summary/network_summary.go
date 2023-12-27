@@ -18,11 +18,12 @@
 package network_summary
 
 import (
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/metric/system/network"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/network"
 	sysinfo "github.com/elastic/go-sysinfo"
 	sysinfotypes "github.com/elastic/go-sysinfo/types"
 )
@@ -64,7 +65,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	counterInfo, err := fetchNetStats()
 	if err != nil {
-		return errors.Wrap(err, "Error fetching stats")
+		return fmt.Errorf("Error fetching stats: %w", err)
 	}
 	if counterInfo == nil {
 		return errors.New("NetworkCounters not available on this platform")
@@ -81,13 +82,13 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 func fetchNetStats() (*sysinfotypes.NetworkCountersInfo, error) {
 	h, err := sysinfo.Host()
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read self process information")
+		return nil, fmt.Errorf("failed to read self process information: %w", err)
 	}
 
 	if vmstatHandle, ok := h.(sysinfotypes.NetworkCounters); ok {
 		info, err := vmstatHandle.NetworkCounters()
 		if err != nil {
-			return nil, errors.Wrap(err, "error getting network counters")
+			return nil, fmt.Errorf("error getting network counters: %w", err)
 		}
 		return info, nil
 	}

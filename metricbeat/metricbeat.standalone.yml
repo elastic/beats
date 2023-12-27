@@ -1,0 +1,11 @@
+path.home: ./beats-standalone
+http.port: 5068
+
+metricbeat.modules:
+  - module: logstash
+    xpack.enabled: true
+    period: 10s
+    hosts: [ "localhost:9600" ]
+
+output.console:
+  pretty: true

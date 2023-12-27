@@ -18,15 +18,13 @@
 package ccr
 
 import (
+	"fmt"
 	"time"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 func init() {
@@ -69,17 +67,15 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	// CCR is only available in Trial or Platinum license of Elasticsearch. So we check
-	// the license first.
 	ccrUnavailableMessage, err := m.checkCCRAvailability(info.Version.Number)
 	if err != nil {
-		return errors.Wrap(err, "error determining if CCR is available")
+		return fmt.Errorf("error determining if CCR is available: %w", err)
 	}
 
 	if ccrUnavailableMessage != "" {
 		if time.Since(m.lastCCRLicenseMessageTimestamp) > 1*time.Minute {
 			m.lastCCRLicenseMessageTimestamp = time.Now()
-			m.Logger().Debug(ccrUnavailableMessage)
+			m.Logger().Warn(ccrUnavailableMessage)
 		}
 		return nil
 	}
@@ -89,17 +85,17 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		return err
 	}
 
-	return eventsMapping(r, *info, content, m.XPackEnabled)
+	return eventsMapping(r, info, content, m.XPackEnabled)
 }
 
-func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *common.Version) (message string, err error) {
+func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *version.V) (message string, err error) {
 	license, err := elasticsearch.GetLicense(m.HTTP, m.GetServiceURI())
 	if err != nil {
-		return "", errors.Wrap(err, "error determining Elasticsearch license")
+		return "", fmt.Errorf("error determining Elasticsearch license: %w", err)
 	}
 
-	if !license.IsOneOf("trial", "platinum") {
-		message = "the CCR feature is available with a platinum Elasticsearch license. " +
+	if !license.IsOneOf("trial", "platinum", "enterprise") {
+		message = "the CCR feature is available with a platinum or enterprise Elasticsearch license. " +
 			"You currently have a " + license.Type + " license. " +
 			"Either upgrade your license or remove the ccr metricset from your Elasticsearch module configuration."
 		return
@@ -107,7 +103,7 @@ func (m *MetricSet) checkCCRAvailability(currentElasticsearchVersion *common.Ver
 
 	xpack, err := elasticsearch.GetXPack(m.HTTP, m.GetServiceURI())
 	if err != nil {
-		return "", errors.Wrap(err, "error determining xpack features")
+		return "", fmt.Errorf("error determining xpack features: %w", err)
 	}
 
 	if !xpack.Features.CCR.Enabled {

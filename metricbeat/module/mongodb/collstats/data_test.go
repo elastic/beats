@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package collstats
 
@@ -25,9 +24,9 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestEventMapping(t *testing.T) {
@@ -35,10 +34,13 @@ func TestEventMapping(t *testing.T) {
 	content, err := ioutil.ReadFile("./_meta/test/input.json")
 	assert.NoError(t, err)
 
-	data := common.MapStr{}
-	json.Unmarshal(content, &data)
+	data := mapstr.M{}
+	err = json.Unmarshal(content, &data)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	event, _ := eventMapping("unit.test", data)
 
-	assert.Equal(t, event["total"].(common.MapStr)["count"], float64(1))
+	assert.Equal(t, event["total"].(mapstr.M)["count"], float64(1))
 }

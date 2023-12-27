@@ -19,12 +19,11 @@ package datastore
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/vsphere"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/vmware/govmomi"
 	"github.com/vmware/govmomi/view"
@@ -61,12 +60,12 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	client, err := govmomi.NewClient(ctx, m.HostURL, m.Insecure)
 	if err != nil {
-		return errors.Wrap(err, "error in NewClient")
+		return fmt.Errorf("error in NewClient: %w", err)
 	}
 
 	defer func() {
 		if err := client.Logout(ctx); err != nil {
-			m.Logger().Debug(errors.Wrap(err, "error trying to logout from vshphere"))
+			m.Logger().Debug(fmt.Errorf("error trying to logout from vshphere: %w", err))
 		}
 	}()
 
@@ -77,19 +76,19 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 
 	v, err := mgr.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"Datastore"}, true)
 	if err != nil {
-		return errors.Wrap(err, "error in CreateContainerView")
+		return fmt.Errorf("error in CreateContainerView: %w", err)
 	}
 
 	defer func() {
 		if err := v.Destroy(ctx); err != nil {
-			m.Logger().Debug(errors.Wrap(err, "error trying to destroy view from vshphere"))
+			m.Logger().Debug(fmt.Errorf("error trying to destroy view from vshphere: %w", err))
 		}
 	}()
 
 	// Retrieve summary property for all datastores
 	var dst []mo.Datastore
 	if err = v.Retrieve(ctx, []string{"Datastore"}, []string{"summary"}, &dst); err != nil {
-		return errors.Wrap(err, "error in Retrieve")
+		return fmt.Errorf("error in Retrieve: %w", err)
 	}
 
 	for _, ds := range dst {
@@ -99,17 +98,17 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		}
 		usedSpaceBytes := ds.Summary.Capacity - ds.Summary.FreeSpace
 
-		event := common.MapStr{
+		event := mapstr.M{
 			"name":   ds.Summary.Name,
 			"fstype": ds.Summary.Type,
-			"capacity": common.MapStr{
-				"total": common.MapStr{
+			"capacity": mapstr.M{
+				"total": mapstr.M{
 					"bytes": ds.Summary.Capacity,
 				},
-				"free": common.MapStr{
+				"free": mapstr.M{
 					"bytes": ds.Summary.FreeSpace,
 				},
-				"used": common.MapStr{
+				"used": mapstr.M{
 					"bytes": usedSpaceBytes,
 					"pct":   usedSpacePercent,
 				},

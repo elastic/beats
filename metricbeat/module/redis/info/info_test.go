@@ -22,13 +22,13 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestNewMetricSet(t *testing.T) {
 	t.Run("regular url", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"module":     "redis",
 			"metricsets": []string{"info"},
 			"hosts": []string{
@@ -44,7 +44,7 @@ func TestNewMetricSet(t *testing.T) {
 	})
 
 	t.Run("pass in host", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"module":     "redis",
 			"metricsets": []string{"info"},
 			"hosts": []string{
@@ -62,7 +62,7 @@ func TestNewMetricSet(t *testing.T) {
 	})
 
 	t.Run("password in config", func(t *testing.T) {
-		c, err := common.NewConfigFrom(map[string]interface{}{
+		c, err := conf.NewConfigFrom(map[string]interface{}{
 			"module":     "redis",
 			"metricsets": []string{"info"},
 			"hosts": []string{

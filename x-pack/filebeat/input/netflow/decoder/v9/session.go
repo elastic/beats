@@ -22,7 +22,11 @@ type SessionKey struct {
 }
 
 // MakeSessionKey returns a session key.
-func MakeSessionKey(addr net.Addr, sourceID uint32) SessionKey {
+func MakeSessionKey(addr net.Addr, sourceID uint32, shared bool) SessionKey {
+	if shared {
+		// If templates are shared, do not store the addr.
+		return SessionKey{SourceID: sourceID}
+	}
 	return SessionKey{addr.String(), sourceID}
 }
 

@@ -13,7 +13,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 287000000,
@@ -49,8 +48,8 @@
           "mpls_label_stack_length": 2,
           "octet_delta_count": 421,
           "packet_delta_count": 6,
-          "post_destination_mac_address": "04:18:d6:f0:81:b5",
-          "post_source_mac_address": "00:11:bb:7f:20:42",
+          "post_destination_mac_address": "04-18-D6-F0-81-B5",
+          "post_source_mac_address": "00-11-BB-7F-20-42",
           "post_vlan_id": 0,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.100.5.2",
@@ -98,7 +97,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 30209000000,
@@ -134,8 +132,8 @@
           "mpls_label_stack_length": 2,
           "octet_delta_count": 7621,
           "packet_delta_count": 131,
-          "post_destination_mac_address": "04:18:d6:f0:81:b5",
-          "post_source_mac_address": "00:11:bb:7f:20:42",
+          "post_destination_mac_address": "04-18-D6-F0-81-B5",
+          "post_source_mac_address": "00-11-BB-7F-20-42",
           "post_vlan_id": 0,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.100.6.93",
@@ -183,7 +181,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 0,
@@ -219,8 +216,8 @@
           "mpls_label_stack_length": 3,
           "octet_delta_count": 95,
           "packet_delta_count": 1,
-          "post_destination_mac_address": "00:00:00:00:00:00",
-          "post_source_mac_address": "00:00:00:00:00:00",
+          "post_destination_mac_address": "00-00-00-00-00-00",
+          "post_source_mac_address": "00-00-00-00-00-00",
           "post_vlan_id": 0,
           "protocol_identifier": 17,
           "source_ipv4_address": "10.100.4.1",
@@ -268,7 +265,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 59651000000,
@@ -304,8 +300,8 @@
           "mpls_label_stack_length": 2,
           "octet_delta_count": 3162,
           "packet_delta_count": 30,
-          "post_destination_mac_address": "04:18:d6:f0:81:b5",
-          "post_source_mac_address": "00:11:bb:7f:20:42",
+          "post_destination_mac_address": "04-18-D6-F0-81-B5",
+          "post_source_mac_address": "00-11-BB-7F-20-42",
           "post_vlan_id": 0,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.100.6.93",
@@ -353,7 +349,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 40015000000,
@@ -389,8 +384,8 @@
           "mpls_label_stack_length": 2,
           "octet_delta_count": 2711,
           "packet_delta_count": 13,
-          "post_destination_mac_address": "04:18:d6:f0:81:b5",
-          "post_source_mac_address": "00:11:bb:7f:20:42",
+          "post_destination_mac_address": "04-18-D6-F0-81-B5",
+          "post_source_mac_address": "00-11-BB-7F-20-42",
           "post_vlan_id": 0,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.100.6.80",
@@ -438,7 +433,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 37121000000,
@@ -474,8 +468,8 @@
           "mpls_label_stack_length": 2,
           "octet_delta_count": 20855,
           "packet_delta_count": 346,
-          "post_destination_mac_address": "04:18:d6:f0:81:b5",
-          "post_source_mac_address": "00:11:bb:7f:20:42",
+          "post_destination_mac_address": "04-18-D6-F0-81-B5",
+          "post_source_mac_address": "00-11-BB-7F-20-42",
           "post_vlan_id": 0,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.100.6.93",
@@ -523,7 +517,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 31322000000,
@@ -559,8 +552,8 @@
           "mpls_label_stack_length": 2,
           "octet_delta_count": 7495,
           "packet_delta_count": 129,
-          "post_destination_mac_address": "04:18:d6:f0:81:b5",
-          "post_source_mac_address": "00:11:bb:7f:20:42",
+          "post_destination_mac_address": "04-18-D6-F0-81-B5",
+          "post_source_mac_address": "00-11-BB-7F-20-42",
           "post_vlan_id": 0,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.100.6.93",
@@ -608,7 +601,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 31226000000,
@@ -644,8 +636,8 @@
           "mpls_label_stack_length": 2,
           "octet_delta_count": 7049,
           "packet_delta_count": 119,
-          "post_destination_mac_address": "04:18:d6:f0:81:b5",
-          "post_source_mac_address": "00:11:bb:7f:20:42",
+          "post_destination_mac_address": "04-18-D6-F0-81-B5",
+          "post_source_mac_address": "00-11-BB-7F-20-42",
           "post_vlan_id": 0,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.100.6.93",
@@ -693,7 +685,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 30976000000,
@@ -729,8 +720,8 @@
           "mpls_label_stack_length": 2,
           "octet_delta_count": 1348,
           "packet_delta_count": 13,
-          "post_destination_mac_address": "04:18:d6:f0:81:b5",
-          "post_source_mac_address": "00:11:bb:7f:20:42",
+          "post_destination_mac_address": "04-18-D6-F0-81-B5",
+          "post_source_mac_address": "00-11-BB-7F-20-42",
           "post_vlan_id": 0,
           "protocol_identifier": 6,
           "source_ipv4_address": "10.100.6.93",
@@ -778,7 +769,6 @@
         "event": {
           "action": "netflow_flow",
           "category": [
-            "network_traffic",
             "network"
           ],
           "duration": 0,
@@ -814,8 +804,8 @@
           "mpls_label_stack_length": 2,
           "octet_delta_count": 82,
           "packet_delta_count": 1,
-          "post_destination_mac_address": "00:00:00:00:00:00",
-          "post_source_mac_address": "00:00:00:00:00:00",
+          "post_destination_mac_address": "00-00-00-00-00-00",
+          "post_source_mac_address": "00-00-00-00-00-00",
           "post_vlan_id": 0,
           "protocol_identifier": 17,
           "source_ipv4_address": "192.168.1.4",

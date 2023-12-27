@@ -22,14 +22,14 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestMergeHosts(t *testing.T) {
 	tests := map[string]struct {
-		outCfg      *common.Config
-		reporterCfg *common.Config
-		expectedCfg *common.Config
+		outCfg      *conf.C
+		reporterCfg *conf.C
+		expectedCfg *conf.C
 	}{
 		"no_hosts": {
 			expectedCfg: newConfigWithHosts(),
@@ -61,7 +61,7 @@ func TestMergeHosts(t *testing.T) {
 
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {
-			mergedCfg := common.MustNewConfigFrom(map[string]interface{}{})
+			mergedCfg := conf.MustNewConfigFrom(map[string]interface{}{})
 			err := mergeHosts(mergedCfg, test.outCfg, test.reporterCfg)
 			require.NoError(t, err)
 
@@ -70,9 +70,9 @@ func TestMergeHosts(t *testing.T) {
 	}
 }
 
-func newConfigWithHosts(hosts ...string) *common.Config {
+func newConfigWithHosts(hosts ...string) *conf.C {
 	if len(hosts) == 0 {
-		return common.MustNewConfigFrom(map[string][]string{})
+		return conf.MustNewConfigFrom(map[string][]string{})
 	}
-	return common.MustNewConfigFrom(map[string][]string{"hosts": hosts})
+	return conf.MustNewConfigFrom(map[string][]string{"hosts": hosts})
 }

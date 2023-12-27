@@ -19,7 +19,10 @@ package add_host_metadata
 
 import (
 	"fmt"
+	"net"
+	"os"
 	"runtime"
+	"sync"
 	"testing"
 	"time"
 
@@ -27,8 +30,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/features"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/types"
+
+	"github.com/foxcpp/go-mockdns"
 )
 
 var (
@@ -38,10 +45,10 @@ var (
 
 func TestConfigDefault(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{})
+	testConfig, err := conf.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -83,10 +90,10 @@ func TestConfigDefault(t *testing.T) {
 
 func TestConfigNetInfoDisabled(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
-	testConfig, err := common.NewConfigFrom(map[string]interface{}{
+	testConfig, err := conf.NewConfigFrom(map[string]interface{}{
 		"netinfo.enabled": false,
 	})
 	assert.NoError(t, err)
@@ -130,7 +137,7 @@ func TestConfigNetInfoDisabled(t *testing.T) {
 
 func TestConfigName(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
 
@@ -138,7 +145,7 @@ func TestConfigName(t *testing.T) {
 		"name": "my-host",
 	}
 
-	testConfig, err := common.NewConfigFrom(config)
+	testConfig, err := conf.NewConfigFrom(config)
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -158,7 +165,7 @@ func TestConfigName(t *testing.T) {
 
 func TestConfigGeoEnabled(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
 
@@ -173,7 +180,7 @@ func TestConfigGeoEnabled(t *testing.T) {
 		"geo.city_name":        "Yerevan",
 	}
 
-	testConfig, err := common.NewConfigFrom(config)
+	testConfig, err := conf.NewConfigFrom(config)
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -190,13 +197,13 @@ func TestConfigGeoEnabled(t *testing.T) {
 
 func TestConfigGeoDisabled(t *testing.T) {
 	event := &beat.Event{
-		Fields:    common.MapStr{},
+		Fields:    mapstr.M{},
 		Timestamp: time.Now(),
 	}
 
 	config := map[string]interface{}{}
 
-	testConfig, err := common.NewConfigFrom(config)
+	testConfig, err := conf.NewConfigFrom(config)
 	require.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -214,7 +221,7 @@ func TestConfigGeoDisabled(t *testing.T) {
 func TestEventWithReplaceFieldsFalse(t *testing.T) {
 	cfg := map[string]interface{}{}
 	cfg["replace_fields"] = false
-	testConfig, err := common.NewConfigFrom(cfg)
+	testConfig, err := conf.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -236,8 +243,8 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 		{
 			"replace_fields=false with only host.name",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"name": hostName,
 					},
 				},
@@ -249,8 +256,8 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 		{
 			"replace_fields=false with only host.id",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"id": hostID,
 					},
 				},
@@ -262,8 +269,8 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 		{
 			"replace_fields=false with host.name and host.id",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"name": hostName,
 						"id":   hostID,
 					},
@@ -282,10 +289,10 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 
 			v, err := newEvent.GetValue("host")
 			assert.NoError(t, err)
-			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(common.MapStr)) > 1)
-			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(common.MapStr)) == 1)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
 			if c.expectedHostFieldLength != -1 {
-				assert.Equal(t, c.expectedHostFieldLength, len(v.(common.MapStr)))
+				assert.Equal(t, c.expectedHostFieldLength, len(v.(mapstr.M)))
 			}
 		})
 	}
@@ -294,7 +301,7 @@ func TestEventWithReplaceFieldsFalse(t *testing.T) {
 func TestEventWithReplaceFieldsTrue(t *testing.T) {
 	cfg := map[string]interface{}{}
 	cfg["replace_fields"] = true
-	testConfig, err := common.NewConfigFrom(cfg)
+	testConfig, err := conf.NewConfigFrom(cfg)
 	assert.NoError(t, err)
 
 	p, err := New(testConfig)
@@ -315,8 +322,8 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 		{
 			"replace_fields=true with host.name",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"name": hostName,
 					},
 				},
@@ -327,8 +334,8 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 		{
 			"replace_fields=true with host.id",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"id": hostID,
 					},
 				},
@@ -339,8 +346,8 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 		{
 			"replace_fields=true with host.name and host.id",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"name": hostName,
 						"id":   hostID,
 					},
@@ -358,8 +365,8 @@ func TestEventWithReplaceFieldsTrue(t *testing.T) {
 
 			v, err := newEvent.GetValue("host")
 			assert.NoError(t, err)
-			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(common.MapStr)) > 1)
-			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(common.MapStr)) == 1)
+			assert.Equal(t, c.hostLengthLargerThanOne, len(v.(mapstr.M)) > 1)
+			assert.Equal(t, c.hostLengthEqualsToOne, len(v.(mapstr.M)) == 1)
 		})
 	}
 }
@@ -383,8 +390,8 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event only with host.name",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"name": hostName,
 					},
 				},
@@ -394,8 +401,8 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event only with host.id",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"id": hostID,
 					},
 				},
@@ -405,8 +412,8 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event with host.name and host.id",
 			beat.Event{
-				Fields: common.MapStr{
-					"host": common.MapStr{
+				Fields: mapstr.M{
+					"host": mapstr.M{
 						"name": hostName,
 						"id":   hostID,
 					},
@@ -417,14 +424,14 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event without host field",
 			beat.Event{
-				Fields: common.MapStr{},
+				Fields: mapstr.M{},
 			},
 			false,
 		},
 		{
 			"event with field type map[string]string hostID",
 			beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"host": hostIDMap,
 				},
 			},
@@ -433,7 +440,7 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event with field type map[string]string host name",
 			beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"host": hostNameMap,
 				},
 			},
@@ -442,7 +449,7 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event with field type map[string]string host ID and name",
 			beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"host": hostIDNameMap,
 				},
 			},
@@ -451,7 +458,7 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 		{
 			"event with field type string",
 			beat.Event{
-				Fields: common.MapStr{
+				Fields: mapstr.M{
 					"host": "string",
 				},
 			},
@@ -465,4 +472,140 @@ func TestSkipAddingHostMetadata(t *testing.T) {
 			assert.Equal(t, c.expectedSkip, skip)
 		})
 	}
+}
+
+func TestFQDNEventSync(t *testing.T) {
+	hostname, err := os.Hostname()
+	require.NoError(t, err)
+	srv, _ := mockdns.NewServer(map[string]mockdns.Zone{
+		hostname + ".": {
+			CNAME: "foo.bar.baz.",
+		},
+		"foo.bar.baz.": {
+			A: []string{"1.1.1.1"},
+		},
+	}, false)
+	defer srv.Close()
+
+	srv.PatchNet(net.DefaultResolver)
+	defer mockdns.UnpatchNet(net.DefaultResolver)
+
+	testConfig := conf.MustNewConfigFrom(map[string]interface{}{
+		"cache.ttl": "5m",
+	})
+
+	// Start with FQDN off
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": false,
+	}))
+	require.NoError(t, err)
+
+	p, err := New(testConfig)
+	require.NoError(t, err)
+
+	// update
+	err = features.UpdateFromConfig(conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": true,
+	}))
+	require.NoError(t, err)
+
+	t.Logf("updated FQDN")
+
+	// run a number of events, make sure none have wrong hostname.
+	checkWait := sync.WaitGroup{}
+	for i := 0; i < 10; i++ {
+		checkWait.Add(1)
+		go func() {
+			resp, err := p.Run(&beat.Event{
+				Fields: mapstr.M{},
+			})
+			require.NoError(t, err)
+			name, err := resp.Fields.GetValue("host.name")
+			require.NoError(t, err)
+			require.Equal(t, "foo.bar.baz", name)
+			checkWait.Done()
+		}()
+	}
+	t.Logf("Waiting for runners to return...")
+	checkWait.Wait()
+}
+
+func TestFQDNLookup(t *testing.T) {
+	hostname, err := os.Hostname()
+	require.NoError(t, err)
+
+	tests := map[string]struct {
+		cnameLookupResult             string
+		expectedHostName              string
+		expectedFQDNLookupFailedCount int64
+	}{
+		"lookup_succeeds": {
+			cnameLookupResult:             "example.com.",
+			expectedHostName:              "example.com",
+			expectedFQDNLookupFailedCount: 0,
+		},
+		"lookup_fails": {
+			cnameLookupResult:             "",
+			expectedHostName:              hostname,
+			expectedFQDNLookupFailedCount: 1,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			// Mock CNAME resolution
+			srv, _ := mockdns.NewServer(map[string]mockdns.Zone{
+				hostname + ".": {
+					CNAME: test.cnameLookupResult,
+				},
+				test.cnameLookupResult: {
+					A: []string{"1.1.1.1"},
+				},
+			}, false)
+			defer srv.Close()
+
+			srv.PatchNet(net.DefaultResolver)
+			defer mockdns.UnpatchNet(net.DefaultResolver)
+
+			// Enable FQDN feature flag
+			err = features.UpdateFromConfig(fqdnFeatureFlagConfig(true))
+			require.NoError(t, err)
+			defer func() {
+				err = features.UpdateFromConfig(fqdnFeatureFlagConfig(true))
+				require.NoError(t, err)
+			}()
+
+			// Create processor and check that FQDN lookup failed
+			testConfig, err := conf.NewConfigFrom(map[string]interface{}{})
+			require.NoError(t, err)
+
+			p, err := New(testConfig)
+			require.NoError(t, err)
+
+			addHostMetadataP, ok := p.(*addHostMetadata)
+			require.True(t, ok)
+			require.Equal(t, test.expectedFQDNLookupFailedCount, addHostMetadataP.metrics.FQDNLookupFailed.Get())
+			// reset so next run is correct, registry is global
+			addHostMetadataP.metrics.FQDNLookupFailed.Set(0)
+
+			// Run event through processor and check that hostname reported
+			// by processor is same as OS-reported hostname
+			event := &beat.Event{
+				Fields:    mapstr.M{},
+				Timestamp: time.Now(),
+			}
+			newEvent, err := p.Run(event)
+			require.NoError(t, err)
+
+			v, err := newEvent.GetValue("host.name")
+			require.NoError(t, err)
+			require.Equal(t, test.expectedHostName, v)
+		})
+	}
+}
+
+func fqdnFeatureFlagConfig(fqdnEnabled bool) *conf.C {
+	return conf.MustNewConfigFrom(map[string]interface{}{
+		"features.fqdn.enabled": fqdnEnabled,
+	})
 }

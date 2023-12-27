@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package health
 
@@ -29,8 +28,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	_ "github.com/elastic/beats/v7/metricbeat/module/traefik"
 )
@@ -62,16 +61,16 @@ func TestFetchEventContents(t *testing.T) {
 	fmt.Println(event.MetricSetFields)
 	metricSetFields := event.MetricSetFields
 
-	uptime := metricSetFields["uptime"].(common.MapStr)
+	uptime := metricSetFields["uptime"].(mapstr.M)
 	assert.EqualValues(t, 64283, uptime["sec"])
 
-	response := metricSetFields["response"].(common.MapStr)
+	response := metricSetFields["response"].(mapstr.M)
 	assert.EqualValues(t, 18, response["count"])
 
-	avgTime := response["avg_time"].(common.MapStr)
+	avgTime := response["avg_time"].(mapstr.M)
 	assert.EqualValues(t, 15, avgTime["us"])
 
-	statusCodes := response["status_codes"].(common.MapStr)
+	statusCodes := response["status_codes"].(mapstr.M)
 	assert.EqualValues(t, 17, statusCodes["200"])
 	assert.EqualValues(t, 1, statusCodes["404"])
 }

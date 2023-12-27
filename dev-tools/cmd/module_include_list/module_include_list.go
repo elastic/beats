@@ -30,8 +30,6 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/pkg/errors"
-
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/licenses"
 )
@@ -191,7 +189,7 @@ type Data struct {
 	Imports   []string
 }
 
-//stringSliceFlag is a flag type that allows more than one value to be specified.
+// stringSliceFlag is a flag type that allows more than one value to be specified.
 type stringSliceFlag []string
 
 func (f *stringSliceFlag) String() string { return strings.Join(*f, ", ") }
@@ -212,7 +210,7 @@ func findModuleAndDatasets() ([]string, error) {
 			filepath.Join(moduleDir, "*/*/_meta"),
 		)
 		if err != nil {
-			return nil, errors.Wrap(err, "failed finding modules and datasets")
+			return nil, fmt.Errorf("failed finding modules and datasets: %w", err)
 		}
 
 		for _, metaDir := range metaDirs {

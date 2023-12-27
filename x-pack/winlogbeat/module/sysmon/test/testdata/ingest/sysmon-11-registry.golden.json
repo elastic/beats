@@ -1,0 +1,362 @@
+[
+  {
+    "@timestamp": "2020-05-05T14:57:40.589Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "category": [
+        "configuration",
+        "registry"
+      ],
+      "code": "13",
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{5b522f6e-77ae-5eb1-2c03-000000000800}",
+      "executable": "C:\\Windows\\regedit.exe",
+      "name": "regedit.exe",
+      "pid": 6072
+    },
+    "registry": {
+      "data": {
+        "strings": [
+          "4"
+        ],
+        "type": "SZ_DWORD"
+      },
+      "hive": "HKU",
+      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 1",
+      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 1",
+      "value": "Key 1"
+    },
+    "user": {
+      "id": "S-1-5-18"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "EventType": "SetValue"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": "2682",
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  },
+  {
+    "@timestamp": "2020-05-05T14:57:44.714Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "category": [
+        "configuration",
+        "registry"
+      ],
+      "code": "13",
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+      "executable": "C:\\Windows\\Explorer.EXE",
+      "name": "Explorer.EXE",
+      "pid": 4320
+    },
+    "registry": {
+      "data": {
+        "strings": [
+          "Binary Data"
+        ],
+        "type": "REG_BINARY"
+      },
+      "hive": "HKU",
+      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA",
+      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA",
+      "value": "HRZR_PGYFRFFVBA"
+    },
+    "user": {
+      "id": "S-1-5-18"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "EventType": "SetValue"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": "2686",
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  },
+  {
+    "@timestamp": "2020-05-05T14:57:44.714Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "category": [
+        "configuration",
+        "registry"
+      ],
+      "code": "13",
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{5b522f6e-77ae-5eb1-2c03-000000000800}",
+      "executable": "C:\\Windows\\regedit.exe",
+      "name": "regedit.exe",
+      "pid": 6072
+    },
+    "registry": {
+      "data": {
+        "strings": [
+          "5"
+        ],
+        "type": "SZ_QWORD"
+      },
+      "hive": "HKU",
+      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 2",
+      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Key 2",
+      "value": "Key 2"
+    },
+    "user": {
+      "id": "S-1-5-18"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "EventType": "SetValue"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": "2687",
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  },
+  {
+    "@timestamp": "2020-05-05T14:57:46.808Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "category": [
+        "configuration",
+        "registry"
+      ],
+      "code": "13",
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+      "executable": "C:\\Windows\\Explorer.EXE",
+      "name": "Explorer.EXE",
+      "pid": 4320
+    },
+    "registry": {
+      "data": {
+        "strings": [
+          "Binary Data"
+        ],
+        "type": "REG_BINARY"
+      },
+      "hive": "HKU",
+      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\{S38OS404-1Q43-42S2-9305-67QR0O28SP23}\\ertrqvg.rkr",
+      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\{S38OS404-1Q43-42S2-9305-67QR0O28SP23}\\ertrqvg.rkr",
+      "value": "ertrqvg.rkr"
+    },
+    "user": {
+      "id": "S-1-5-18"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "EventType": "SetValue"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": "2690",
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  },
+  {
+    "@timestamp": "2020-05-05T14:57:46.808Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "category": [
+        "configuration",
+        "registry"
+      ],
+      "code": "13",
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
+    },
+    "host": {
+      "name": "vagrant"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{5b522f6e-7554-5eb1-6d00-000000000800}",
+      "executable": "C:\\Windows\\Explorer.EXE",
+      "name": "Explorer.EXE",
+      "pid": 4320
+    },
+    "registry": {
+      "data": {
+        "strings": [
+          "Binary Data"
+        ],
+        "type": "REG_BINARY"
+      },
+      "hive": "HKU",
+      "key": "S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA",
+      "path": "HKU\\S-1-5-21-1067164964-2079179834-2367582738-1000\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\UserAssist\\{CEBFF5CD-ACE2-4F4F-9178-9926F41749EA}\\Count\\HRZR_PGYFRFFVBA",
+      "value": "HRZR_PGYFRFFVBA"
+    },
+    "user": {
+      "id": "S-1-5-18"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "vagrant",
+      "event_data": {
+        "EventType": "SetValue"
+      },
+      "event_id": "13",
+      "opcode": "Info",
+      "process": {
+        "pid": 5496,
+        "thread": {
+          "id": 876
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": "2691",
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 2
+    }
+  }
+]

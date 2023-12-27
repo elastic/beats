@@ -1,3 +1,7 @@
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
+:modulename!:
+
 This module periodically fetches JMX metrics from Apache ActiveMQ.
 
 [float]
@@ -6,4 +10,4 @@ The module has been tested with ActiveMQ 5.13.0 and 5.15.9. Other versions are e
 
 [float]
 === Usage
-The ActiveMQ module requires <<metricbeat-module-jolokia,Jolokia>>to fetch JMX metrics. Refer to the link for instructions about how to use Jolokia.
+The ActiveMQ module requires <<metricbeat-module-jolokia,Jolokia>> to fetch JMX metrics. Refer to the link for instructions about how to use Jolokia.

@@ -20,10 +20,9 @@ processors:
   - convert:
       field: crowdstrike.event.UserIp
       target_field: source.ip
-      type: string
+      type: ip
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.crowdstrike?.event?.UserIp != null && ctx?.crowdstrike?.event?.UserIp != ""
   - script:
       lang: painless
       source: |

@@ -26,10 +26,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type DbClient struct {
@@ -46,23 +44,26 @@ type sqlRow interface {
 
 // NewDBClient gets a client ready to query the database
 func NewDBClient(driver, uri string, l *logp.Logger) (*DbClient, error) {
-	dbx, err := sql.Open(switchDriverName(driver), uri)
+	dbx, err := sql.Open(SwitchDriverName(driver), uri)
 	if err != nil {
-		return nil, errors.Wrap(err, "opening connection")
+		return nil, fmt.Errorf("opening connection: %w", err)
 	}
 	err = dbx.Ping()
 	if err != nil {
 		if closeErr := dbx.Close(); closeErr != nil {
-			return nil, errors.Wrapf(err, "failed to close with %s, after connection test failed", closeErr)
+			// NOTE(SS): Support for wrapping multiple errors is there in Go 1.20+.
+			// TODO(SS): When beats module starts using Go 1.20+, use: https://pkg.go.dev/errors#Join
+			// and until then, let's use the following workaround.
+			return nil, fmt.Errorf(fmt.Sprintf("failed to close with: %s", closeErr.Error())+" after connection test failed: %w", err)
 		}
-		return nil, errors.Wrap(err, "testing connection")
+		return nil, fmt.Errorf("testing connection: %w", err)
 	}
 
 	return &DbClient{DB: dbx, logger: l}, nil
 }
 
-// fetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
-func (d *DbClient) FetchTableMode(ctx context.Context, q string) ([]common.MapStr, error) {
+// FetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
+func (d *DbClient) FetchTableMode(ctx context.Context, q string) ([]mapstr.M, error) {
 	rows, err := d.QueryContext(ctx, q)
 	if err != nil {
 		return nil, err
@@ -71,12 +72,12 @@ func (d *DbClient) FetchTableMode(ctx context.Context, q string) ([]common.MapSt
 }
 
 // fetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
-func (d *DbClient) fetchTableMode(rows sqlRow) ([]common.MapStr, error) {
+func (d *DbClient) fetchTableMode(rows sqlRow) ([]mapstr.M, error) {
 	// Extracted from
 	// https://stackoverflow.com/questions/23507531/is-golangs-sql-package-incapable-of-ad-hoc-exploratory-queries/23507765#23507765
 	cols, err := rows.Columns()
 	if err != nil {
-		return nil, errors.Wrap(err, "error getting columns")
+		return nil, fmt.Errorf("error getting columns: %w", err)
 	}
 
 	for k, v := range cols {
@@ -88,15 +89,15 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]common.MapStr, error) {
 		vals[i] = new(interface{})
 	}
 
-	rr := make([]common.MapStr, 0)
+	rr := make([]mapstr.M, 0)
 	for rows.Next() {
 		err = rows.Scan(vals...)
 		if err != nil {
-			d.logger.Debug(errors.Wrap(err, "error trying to scan rows"))
+			d.logger.Debug(fmt.Errorf("error trying to scan rows: %w", err))
 			continue
 		}
 
-		r := common.MapStr{}
+		r := mapstr.M{}
 
 		for i, c := range cols {
 			value := getValue(vals[i].(*interface{}))
@@ -107,14 +108,14 @@ func (d *DbClient) fetchTableMode(rows sqlRow) ([]common.MapStr, error) {
 	}
 
 	if err = rows.Err(); err != nil {
-		d.logger.Debug(errors.Wrap(err, "error trying to read rows"))
+		d.logger.Debug(fmt.Errorf("error trying to read rows: %w", err))
 	}
 
 	return rr, nil
 }
 
 // fetchTableMode scan the rows and publishes the event for querys that return the response in a table format.
-func (d *DbClient) FetchVariableMode(ctx context.Context, q string) (common.MapStr, error) {
+func (d *DbClient) FetchVariableMode(ctx context.Context, q string) (mapstr.M, error) {
 	rows, err := d.QueryContext(ctx, q)
 	if err != nil {
 		return nil, err
@@ -123,15 +124,15 @@ func (d *DbClient) FetchVariableMode(ctx context.Context, q string) (common.MapS
 }
 
 // fetchVariableMode scan the rows and publishes the event for querys that return the response in a key/value format.
-func (d *DbClient) fetchVariableMode(rows sqlRow) (common.MapStr, error) {
-	data := common.MapStr{}
+func (d *DbClient) fetchVariableMode(rows sqlRow) (mapstr.M, error) {
+	data := mapstr.M{}
 
 	for rows.Next() {
 		var key string
 		var val interface{}
 		err := rows.Scan(&key, &val)
 		if err != nil {
-			d.logger.Debug(errors.Wrap(err, "error trying to scan rows"))
+			d.logger.Debug(fmt.Errorf("error trying to scan rows: %w", err))
 			continue
 		}
 
@@ -140,13 +141,14 @@ func (d *DbClient) fetchVariableMode(rows sqlRow) (common.MapStr, error) {
 	}
 
 	if err := rows.Err(); err != nil {
-		d.logger.Debug(errors.Wrap(err, "error trying to read rows"))
+		d.logger.Debug(fmt.Errorf("error trying to read rows: %w", err))
 	}
 
-	r := common.MapStr{}
+	r := mapstr.M{}
 
 	for key, value := range data {
-		value := getValue(&value)
+		value := value
+		value = getValue(&value)
 		r.Put(key, value)
 	}
 
@@ -155,8 +157,8 @@ func (d *DbClient) fetchVariableMode(rows sqlRow) (common.MapStr, error) {
 
 // ReplaceUnderscores takes the root keys of a common.Mapstr and rewrites them replacing underscores with dots. Check tests
 // to see an example.
-func ReplaceUnderscores(ms common.MapStr) common.MapStr {
-	dotMap := common.MapStr{}
+func ReplaceUnderscores(ms mapstr.M) mapstr.M {
+	dotMap := mapstr.M{}
 	for k, v := range ms {
 		dotMap.Put(strings.Replace(k, "_", ".", -1), v)
 	}
@@ -189,9 +191,9 @@ func getValue(pval *interface{}) interface{} {
 	}
 }
 
-// switchDriverName switches between driver name and a pretty name for a driver. For example, 'oracle' driver is called
+// SwitchDriverName switches between driver name and a pretty name for a driver. For example, 'oracle' driver is called
 // 'godror' so this detail implementation must be hidden to the user, that should only choose and see 'oracle' as driver
-func switchDriverName(d string) string {
+func SwitchDriverName(d string) string {
 	switch d {
 	case "oracle":
 		return "godror"

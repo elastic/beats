@@ -1,0 +1,2 @@
+Line1: This file does contain a final EOL.
+Line2: This file does contain a final EOL.

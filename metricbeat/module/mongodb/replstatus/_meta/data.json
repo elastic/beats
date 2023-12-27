@@ -1,16 +1,13 @@
 {
     "@timestamp": "2017-10-12T08:05:34.853Z",
-    "agent": {
-        "hostname": "host.example.com",
-        "name": "host.example.com"
-    },
     "event": {
         "dataset": "mongodb.replstatus",
         "duration": 115000,
         "module": "mongodb"
     },
     "metricset": {
-        "name": "replstatus"
+        "name": "replstatus",
+        "period": 10000
     },
     "mongodb": {
         "replstatus": {
@@ -32,8 +29,8 @@
                     "hosts": null
                 },
                 "primary": {
-                    "host": "22b4e1fb8197:27017",
-                    "optime": 1550700559
+                    "host": "7ba9ef86c3b0:27017",
+                    "optime": 1651925294
                 },
                 "recovering": {
                     "count": 0,
@@ -63,28 +60,28 @@
             },
             "oplog": {
                 "first": {
-                    "timestamp": 1550700557
+                    "timestamp": 1651925294
                 },
                 "last": {
-                    "timestamp": 1550700559
+                    "timestamp": 1651925294
                 },
                 "size": {
-                    "allocated": 40572728934,
-                    "used": 180
+                    "allocated": 2379247206,
+                    "used": 1323
                 },
-                "window": 2
+                "window": 0
             },
             "optimes": {
-                "applied": 1550700559,
-                "durable": 1550700559,
-                "last_committed": 1550700559
+                "applied": 1651925294,
+                "durable": 1651925294,
+                "last_committed": 1651925294
             },
-            "server_date": "2019-02-20T23:09:23.733+01:00",
+            "server_date": "2022-05-07T12:08:19.506Z",
             "set_name": "beats"
         }
     },
     "service": {
-        "address": "172.26.0.2:27017",
+        "address": "172.28.0.3:27017",
         "type": "mongodb"
     }
 }

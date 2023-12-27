@@ -1049,7 +1049,11 @@
         "log.level": "Note",
         "log.offset": 4808,
         "message": "Server socket created on IP: '127.0.0.1'.",
-        "service.type": "mysql"
+        "related.ip": [
+            "127.0.0.1"
+        ],
+        "service.type": "mysql",
+        "source.ip": "127.0.0.1"
     },
     {
         "@timestamp": "2016-12-09T14:18:58.000-02:00",
@@ -1428,7 +1432,11 @@
         "log.level": "Note",
         "log.offset": 6305,
         "message": "Server socket created on IP: '127.0.0.1'.",
-        "service.type": "mysql"
+        "related.ip": [
+            "127.0.0.1"
+        ],
+        "service.type": "mysql",
+        "source.ip": "127.0.0.1"
     },
     {
         "@timestamp": "2016-12-09T14:37:58.000-02:00",

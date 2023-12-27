@@ -21,49 +21,89 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
 )
 
 // A test to make sure serialization works correctly on multi-byte characters.
 func TestSerialize(t *testing.T) {
-	testCases := []struct {
-		name  string
-		value string
+	tests := map[string]struct {
+		value  string
+		format SerializationFormat
 	}{
-		{name: "Ascii only", value: "{\"name\": \"Momotaro\"}"},
-		{name: "Multi-byte", value: "{\"name\": \"桃太郎\"}"},
+		"Ascii only, CBOR": {
+			value:  "{\"name\": \"Momotaro\"}",
+			format: SerializationCBOR,
+		},
+		"Multi-byte, CBOR": {
+			value:  "{\"name\": \"桃太郎\"}",
+			format: SerializationCBOR,
+		},
+		"Ascii only, Protobuf": {
+			value:  "{\"name\": \"Momotaro\"}",
+			format: SerializationProtobuf,
+		},
+		"Multi-byte, Protobuf": {
+			value:  "{\"name\": \"桃太郎\"}",
+			format: SerializationProtobuf,
+		},
 	}
 
-	for _, test := range testCases {
-		encoder := newEventEncoder()
-		event := publisher.Event{
-			Content: beat.Event{
-				Fields: common.MapStr{
-					"test_field": test.value,
+	for name, tc := range tests {
+		encoder := newEventEncoder(tc.format)
+		var event interface{}
+		switch tc.format {
+		case SerializationCBOR:
+			event = publisher.Event{
+				Content: beat.Event{
+					Fields: mapstr.M{
+						"test_field": tc.value,
+					},
 				},
-			},
+			}
+		case SerializationProtobuf:
+			event = &messages.Event{
+				Fields: &messages.Struct{
+					Data: map[string]*messages.Value{
+						"test_field": {
+							Kind: &messages.Value_StringValue{
+								StringValue: tc.value,
+							},
+						},
+					},
+				},
+			}
 		}
-		serialized, err := encoder.encode(&event)
-		if err != nil {
-			t.Fatalf("[%v] Couldn't encode event: %v", test.name, err)
-		}
+		serialized, err := encoder.encode(event)
+		assert.NoErrorf(t, err, "%s: Couldn't encode event, error: %v", name, err)
 
 		// Use decoder to decode the serialized bytes.
 		decoder := newEventDecoder()
+		decoder.serializationFormat = tc.format
 		buf := decoder.Buffer(len(serialized))
 		copy(buf, serialized)
 		decoded, err := decoder.Decode()
-		if err != nil {
-			t.Fatalf("[%v] Couldn't decode serialized data: %v", test.name, err)
-		}
+		require.NoErrorf(t, err, "%s: Couldn't decode event", name)
 
-		decodedValue, err := decoded.Content.Fields.GetValue("test_field")
-		if err != nil {
-			t.Fatalf("[%v] Couldn't get field 'test_field': %v", test.name, err)
+		switch tc.format {
+		case SerializationCBOR:
+			event, ok := decoded.(publisher.Event)
+			require.True(t, ok)
+			decodedValue, err := event.Content.Fields.GetValue("test_field")
+			assert.NoErrorf(t, err, "%s: Couldn't get 'test_field'", name)
+			assert.Equal(t, tc.value, decodedValue)
+		case SerializationProtobuf:
+			event, ok := decoded.(*messages.Event)
+			require.True(t, ok)
+			d := event.GetFields().GetData()
+			test_field, prs := d["test_field"]
+			assert.Truef(t, prs, "'test_field' was not present in decoded event data")
+			decodedValue := test_field.GetStringValue()
+			assert.Equal(t, tc.value, decodedValue)
 		}
-		assert.Equal(t, test.value, decodedValue)
 	}
 }

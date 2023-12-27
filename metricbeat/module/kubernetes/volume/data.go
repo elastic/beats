@@ -21,46 +21,48 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventMapping(content []byte) ([]common.MapStr, error) {
-	events := []common.MapStr{}
+func eventMapping(content []byte, logger *logp.Logger) ([]mapstr.M, error) {
+	events := []mapstr.M{}
 
 	var summary kubernetes.Summary
 	err := json.Unmarshal(content, &summary)
 	if err != nil {
-		return nil, fmt.Errorf("Cannot unmarshal json response: %s", err)
+		return nil, fmt.Errorf("cannot unmarshal json response: %w", err)
 	}
 
 	node := summary.Node
 	for _, pod := range summary.Pods {
 		for _, volume := range pod.Volume {
-			volumeEvent := common.MapStr{
-				mb.ModuleDataKey: common.MapStr{
+			volumeEvent := mapstr.M{
+				mb.ModuleDataKey: mapstr.M{
 					"namespace": pod.PodRef.Namespace,
-					"node": common.MapStr{
+					"node": mapstr.M{
 						"name": node.NodeName,
 					},
-					"pod": common.MapStr{
+					"pod": mapstr.M{
 						"name": pod.PodRef.Name,
 					},
 				},
 
 				"name": volume.Name,
-				"fs": common.MapStr{
-					"available": common.MapStr{
+				"fs": mapstr.M{
+					"available": mapstr.M{
 						"bytes": volume.AvailableBytes,
 					},
-					"capacity": common.MapStr{
+					"capacity": mapstr.M{
 						"bytes": volume.CapacityBytes,
 					},
-					"used": common.MapStr{
+					"used": mapstr.M{
 						"bytes": volume.UsedBytes,
 					},
-					"inodes": common.MapStr{
+					"inodes": mapstr.M{
 						"used":  volume.InodesUsed,
 						"free":  volume.InodesFree,
 						"count": volume.Inodes,
@@ -68,7 +70,10 @@ func eventMapping(content []byte) ([]common.MapStr, error) {
 				},
 			}
 			if volume.CapacityBytes > 0 {
-				volumeEvent.Put("fs.used.pct", float64(volume.UsedBytes)/float64(volume.CapacityBytes))
+				kubernetes2.ShouldPut(volumeEvent, "fs.used.pct", float64(volume.UsedBytes)/float64(volume.CapacityBytes), logger)
+			}
+			if volume.Inodes > 0 {
+				kubernetes2.ShouldPut(volumeEvent, "fs.inodes.pct", float64(volume.InodesUsed)/float64(volume.Inodes), logger)
 			}
 			events = append(events, volumeEvent)
 		}

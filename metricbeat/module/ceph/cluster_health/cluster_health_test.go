@@ -24,8 +24,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -62,10 +62,10 @@ func TestFetchEventContents(t *testing.T) {
 
 	assert.EqualValues(t, "HEALTH_OK", event["overall_status"])
 
-	timechecks := event["timechecks"].(common.MapStr)
+	timechecks := event["timechecks"].(mapstr.M)
 	assert.EqualValues(t, 3, timechecks["epoch"])
 
-	round := timechecks["round"].(common.MapStr)
+	round := timechecks["round"].(mapstr.M)
 	assert.EqualValues(t, 0, round["value"])
 	assert.EqualValues(t, "finished", round["status"])
 }

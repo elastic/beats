@@ -22,6 +22,7 @@ processors:
       field: message
       patterns:
         - "%{GREEDYDATA:tmp_timestamp}\\\nLENGTH : '%{GREEDYDATA:LENGTH}'\\\n(?m)%{GREEDYDATA:audit}"
+        - "%{GREEDYDATA:tmp_timestamp}\\\nLENGTH: \"%{GREEDYDATA:LENGTH}\"\\\n(?m)%{GREEDYDATA:auth}"
   - kv:
       field: audit
       field_split: "\\\n(?=[a-zA-Z])"
@@ -29,6 +30,24 @@ processors:
       trim_value: " '"
       trim_key: " "
       prefix: oracle.database_audit.
+      if: ctx?.audit != null && ctx?.auth == null
+  - gsub:
+      field: auth
+      pattern: "\"\\s"
+      replacement: "\"\\|"
+      ignore_missing: true
+  - kv:
+      field: auth
+      field_split: "\\|"
+      value_split: ':\S\d+\S(?= ")'
+      prefix: oracle.database_audit.
+      trim_key: " "
+      trim_value: "\" "
+      if: ctx?.auth != null
+  - rename:
+      field: auth
+      target_field: audit
+      ignore_missing: true
   - grok:
       field: log.file.path
       patterns:
@@ -37,18 +56,68 @@ processors:
   - script:
       source: "ctx.oracle.database_audit = ctx.oracle.database_audit.entrySet().stream().collect(Collectors.toMap(entry -> entry.getKey().toLowerCase(), Map.Entry::getValue));"
       lang: painless
+      if: ctx.oracle?.database_audit != null
   # Replace all field names that has spaces in them with _
   - script:
       lang: painless
       source: "ctx.oracle.database_audit = ctx?.oracle?.database_audit.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().replace(' ', '_'), e -> e.getValue()));"
+      if: ctx.oracle?.database_audit != null
+  - script:
+      lang: painless
+      source: "ctx.oracle.database_audit = ctx.oracle.database_audit.entrySet().stream().collect(Collectors.toMap(e -> e.getKey().replace('$', '_'), e -> e.getValue()));"
+      if: ctx.oracle?.database_audit != null
+  - grok:
+      field: oracle.database_audit.comment$text
+      patterns:
+        - 'Authenticated by: DATABASE; Client address: \(ADDRESS=\(PROTOCOL=%{WORD:network.transport}\)\(HOST=%{IP:source.ip}\)\(PORT=%{INT:source.port}\)\)'
+      ignore_missing: true
+  - script:
+      source: |-
+        def x = ctx.oracle.database_audit.action_number;
+        if (x == 100) {
+            ctx.oracle.database_audit.action = "LOGON";
+        }
+        if (x == 101) {
+            ctx.oracle.database_audit.action = "LOGOFF";
+        }
+        if (x == 102) {
+            ctx.oracle.database_audit.action = "LOGOFF BY CLEANUP";
+        }
+      if: "[100, 101, 102].contains(ctx.oracle?.database_audit?.action_number)"
+  - append:
+      field: event.category
+      value:
+      - authentication
+      if: "(ctx.oracle?.database_audit?.action == '100' && ['0', '1017'].contains(ctx.oracle?.database_audit?.returncode)) || ['101', '102'].contains(ctx.oracle?.database_audit?.action)"
+  - append:
+      field: event.action
+      value:
+      - logon-failed
+      if: ctx.oracle?.database_audit?.action == '100' && ctx.oracle?.database_audit?.returncode == '1017'
+  - append:
+      field: event.action
+      value:
+      - logged-in
+      if: ctx.oracle?.database_audit?.action == '100' && ctx.oracle?.database_audit?.returncode == '0'
+  - append:
+      field: event.action
+      value:
+      - logout
+      if: "['101', '102'].contains(ctx.oracle?.database_audit?.action)"
+  - set:
+      field: event.outcome
+      value: failure
+      if: ctx.oracle?.database_audit?.action == '100' && ctx.oracle?.database_audit?.returncode == '1017'
   - gsub:
       field: "oracle.database_audit.action"
       pattern: "\\n"
       replacement: ""
+      if: ctx.oracle?.database_audit?.action != null
   - gsub:
       field: "oracle.database_audit.action"
       pattern: "\\s{2,}"
       replacement: " "
+      if: ctx.oracle?.database_audit?.action != null
   - trim:
       field: "oracle.database_audit.action_number"
       ignore_missing: true
@@ -85,7 +154,7 @@ processors:
       field: tmp_timestamp
       target_field: "@timestamp"
       formats:
-        - EEE MMM  d HH:mm:ss uuuu XXX
+        - EEE MMM [ d][dd] HH:mm:ss uuuu XXX
   - grok:
       field: tmp_timestamp
       patterns:
@@ -118,6 +187,7 @@ processors:
       field: oracle.database_audit.length
       type: long
       ignore_missing: true
+      if: ctx.oracle?.database_audit != null
   - grok:
       field: client.address
       patterns:
@@ -166,6 +236,101 @@ processors:
         - audit
         - message
       ignore_missing: true
+  - geoip:
+      field: source.ip
+      target_field: source.geo
+      ignore_missing: true
+  - geoip:
+      target_field: source.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+      database_file: GeoLite2-ASN.mmdb
+      field: source.ip
+  - rename:
+      target_field: source.as.number
+      ignore_missing: true
+      field: source.as.asn
+  - rename:
+      field: source.as.organization_name
+      target_field: source.as.organization.name
+      ignore_missing: true
+  - geoip:
+      field: client.ip
+      target_field: client.geo
+      ignore_missing: true
+  - geoip:
+      target_field: client.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+      database_file: GeoLite2-ASN.mmdb
+      field: client.ip
+  - rename:
+      target_field: client.as.number
+      ignore_missing: true
+      field: client.as.asn
+  - rename:
+      field: client.as.organization_name
+      target_field: client.as.organization.name
+      ignore_missing: true
+  - geoip:
+      field: server.ip
+      target_field: server.geo
+      ignore_missing: true
+  - geoip:
+      target_field: server.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+      database_file: GeoLite2-ASN.mmdb
+      field: server.ip
+  - rename:
+      target_field: server.as.number
+      ignore_missing: true
+      field: server.as.asn
+  - rename:
+      field: server.as.organization_name
+      target_field: server.as.organization.name
+      ignore_missing: true
+  - append:
+      value: "{{source.ip}}"
+      if: ctx?.source?.ip != null
+      allow_duplicates: false
+      field: related.ip
+  - append:
+      value: "{{client.ip}}"
+      if: ctx?.client?.ip != null
+      allow_duplicates: false
+      field: related.ip
+  - append:
+      value: "{{server.ip}}"
+      if: ctx?.server?.ip != null
+      allow_duplicates: false
+      field: related.ip
+  - append:
+      field: related.user
+      value: "{{client.user.name}}"
+      allow_duplicates: false
+      if: ctx.client?.user?.name != null && ctx.client.user.name != '/'
+  - append:
+      field: related.user
+      value: "{{server.user.name}}"
+      allow_duplicates: false
+      if: ctx.server?.user?.name != null && ctx.server.user.name != '/'
+  - append:
+      value: "{{server.domain}}"
+      if: ctx?.server?.domain != null
+      allow_duplicates: false
+      field: related.hosts
+  - append:
+      value: "{{client.domain}}"
+      if: ctx?.client?.domain != null
+      allow_duplicates: false
+      field: related.hosts
 on_failure:
   - set:
       field: error.message

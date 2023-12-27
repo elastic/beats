@@ -20,24 +20,24 @@ package elasticsearch
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
-	"go.elastic.co/apm"
-
-	"github.com/pkg/errors"
+	"go.elastic.co/apm/v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/monitoring/report"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/testing"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
-var createDocPrivAvailableESVersion = common.MustNewVersion("7.5.0")
+var createDocPrivAvailableESVersion = version.MustNew("7.5.0")
 
 type publishClient struct {
 	es     *eslegclient.Connection
@@ -64,7 +64,7 @@ func (c *publishClient) Connect() error {
 
 	err := c.es.Connect()
 	if err != nil {
-		return errors.Wrap(err, "cannot connect underlying Elasticsearch client")
+		return fmt.Errorf("cannot connect underlying Elasticsearch client: %w", err)
 	}
 
 	params := map[string]string{
@@ -72,7 +72,7 @@ func (c *publishClient) Connect() error {
 	}
 	status, body, err := c.es.Request("GET", "/_xpack", "", params, nil)
 	if err != nil {
-		return fmt.Errorf("X-Pack capabilities query failed with: %v", err)
+		return fmt.Errorf("X-Pack capabilities query failed with: %w", err)
 	}
 
 	if status != 200 {
@@ -161,7 +161,7 @@ func (c *publishClient) String() string {
 }
 
 func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, typ string) error {
-	meta := common.MapStr{
+	meta := mapstr.M{
 		"_index":   getMonitoringIndexName(),
 		"_routing": nil,
 	}
@@ -171,33 +171,34 @@ func (c *publishClient) publishBulk(ctx context.Context, event publisher.Event, 
 		meta["_type"] = "doc"
 	}
 
+	//nolint:typecheck // typecheck linter is buggy and thinks opType is unused.
 	opType := events.OpTypeCreate
 	if esVersion.LessThan(createDocPrivAvailableESVersion) {
 		opType = events.OpTypeIndex
 	}
 
-	action := common.MapStr{
+	action := mapstr.M{
 		opType.String(): meta,
 	}
 
-	event.Content.Fields.Put("timestamp", event.Content.Timestamp)
+	_, _ = event.Content.Fields.Put("timestamp", event.Content.Timestamp)
 
-	fields := common.MapStr{
+	fields := mapstr.M{
 		"type": typ,
 		typ:    event.Content.Fields,
 	}
 
 	interval, err := event.Content.Meta.GetValue("interval_ms")
 	if err != nil {
-		return errors.Wrap(err, "could not determine interval_ms field")
+		return fmt.Errorf("could not determine interval_ms field: %w", err)
 	}
-	fields.Put("interval_ms", interval)
+	_, _ = fields.Put("interval_ms", interval)
 
 	clusterUUID, err := event.Content.Meta.GetValue("cluster_uuid")
-	if err != nil && err != common.ErrKeyNotFound {
-		return errors.Wrap(err, "could not determine cluster_uuid field")
+	if err != nil && !errors.Is(err, mapstr.ErrKeyNotFound) {
+		return fmt.Errorf("could not determine cluster_uuid field: %w", err)
 	}
-	fields.Put("cluster_uuid", clusterUUID)
+	_, _ = fields.Put("cluster_uuid", clusterUUID)
 
 	document := report.Event{
 		Timestamp: event.Content.Timestamp,

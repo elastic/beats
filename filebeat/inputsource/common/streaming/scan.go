@@ -42,7 +42,7 @@ func FactoryDelimiter(delimiter []byte) bufio.SplitFunc {
 
 func dropDelimiter(data []byte, delimiter []byte) []byte {
 	if len(data) > len(delimiter) &&
-		bytes.Equal(data[len(data)-len(delimiter):len(data)], delimiter) {
+		bytes.Equal(data[len(data)-len(delimiter):], delimiter) {
 		return data[0 : len(data)-len(delimiter)]
 	}
 	return data
@@ -74,7 +74,7 @@ func FactoryRFC6587Framing(delimiter []byte) bufio.SplitFunc {
 					return end, data[i+1 : end], nil
 				}
 			}
-			//request more data
+			// request more data
 			return 0, nil, nil
 		}
 		if i := bytes.Index(data, delimiter); i >= 0 {

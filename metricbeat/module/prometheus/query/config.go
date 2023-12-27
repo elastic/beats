@@ -20,7 +20,7 @@ package query
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Config defines the "query" metricset's configuration
@@ -31,9 +31,9 @@ type Config struct {
 
 // QueryConfig is used to make an API request.
 type QueryConfig struct {
-	Path   string        `config:"path"`
-	Params common.MapStr `config:"params"`
-	Name   string        `config:"name"`
+	Path   string   `config:"path"`
+	Params mapstr.M `config:"params"`
+	Name   string   `config:"name"`
 }
 
 func defaultConfig() Config {

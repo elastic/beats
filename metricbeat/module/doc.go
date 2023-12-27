@@ -34,9 +34,7 @@ For the key names, metricbeat follows the naming conventions below:
 * Use singular and plural properly for the fields. Example: sec_per_request vs open_requests
 * Use singular names for metricsets. It easier to read the event created: system.process.load = 0.3
 
-
 The goal is to have a similar experience across all metrics.
-
 
 = Abbrevations
 
@@ -58,6 +56,5 @@ List of standardised words and units across all metricsets. On the left are the 
 * ns: nanoseconds
 * norm: normalized
 * us: microseconds
-
 */
 package module

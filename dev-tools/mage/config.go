@@ -19,6 +19,7 @@ package mage
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -30,7 +31,6 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	"github.com/pkg/errors"
 	"gopkg.in/yaml.v2"
 )
 
@@ -98,7 +98,7 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 	if types.IsShort() {
 		file := filepath.Join(targetDir, BeatName+".yml")
 		if err := makeConfigTemplate(file, 0600, args, ShortConfigType); err != nil {
-			return errors.Wrap(err, "failed making short config")
+			return fmt.Errorf("failed making short config: %w", err)
 		}
 	}
 
@@ -106,7 +106,7 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 	if types.IsReference() {
 		file := filepath.Join(targetDir, BeatName+".reference.yml")
 		if err := makeConfigTemplate(file, 0644, args, ReferenceConfigType); err != nil {
-			return errors.Wrap(err, "failed making reference config")
+			return fmt.Errorf("failed making reference config: %w", err)
 		}
 	}
 
@@ -114,7 +114,7 @@ func Config(types ConfigFileType, args ConfigFileParams, targetDir string) error
 	if types.IsDocker() {
 		file := filepath.Join(targetDir, BeatName+".docker.yml")
 		if err := makeConfigTemplate(file, 0600, args, DockerConfigType); err != nil {
-			return errors.Wrap(err, "failed making docker config")
+			return fmt.Errorf("failed making docker config: %w", err)
 		}
 	}
 
@@ -136,7 +136,7 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 		confFile = confParams.Docker
 		tmplParams = map[string]interface{}{"Docker": true}
 	default:
-		panic(errors.Errorf("Invalid config file type: %v", typ))
+		panic(fmt.Errorf("Invalid config file type: %v", typ))
 	}
 
 	// Build the dependencies.
@@ -149,6 +149,7 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 	params := map[string]interface{}{
 		"GOOS":                           EnvOr("DEV_OS", "linux"),
 		"GOARCH":                         EnvOr("DEV_ARCH", "amd64"),
+		"CI":                             EnvOr("CI", ""),
 		"BeatLicense":                    BeatLicense,
 		"Reference":                      false,
 		"Docker":                         false,
@@ -181,22 +182,28 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 	})
 	tmpl = tmpl.Funcs(funcs)
 
+	if params["GOOS"] == "aix" {
+		// Force the removal for docker and kubernetes parts for AIX.
+		params["UseDockerMetadataProcessor"] = false
+		params["UseKubernetesMetadataProcessor"] = false
+	}
+
 	fmt.Printf(">> Building %v for %v/%v\n", destination, params["GOOS"], params["GOARCH"])
 	var err error
 	for _, templateGlob := range confParams.Templates {
 		if tmpl, err = tmpl.ParseGlob(templateGlob); err != nil {
-			return errors.Wrapf(err, "failed to parse config templates in %q", templateGlob)
+			return fmt.Errorf("failed to parse config templates in %q: %w", templateGlob, err)
 		}
 	}
 
 	data, err := ioutil.ReadFile(confFile.Template)
 	if err != nil {
-		return errors.Wrapf(err, "failed to read config template %q", confFile.Template)
+		return fmt.Errorf("failed to read config template %q: %w", confFile.Template, err)
 	}
 
 	tmpl, err = tmpl.Parse(string(data))
 	if err != nil {
-		return errors.Wrap(err, "failed to parse template")
+		return fmt.Errorf("failed to parse template: %w", err)
 	}
 
 	out, err := os.OpenFile(CreateDir(destination), os.O_CREATE|os.O_TRUNC|os.O_WRONLY, mode)
@@ -206,7 +213,7 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 	defer out.Close()
 
 	if err = tmpl.Execute(out, EnvMap(params)); err != nil {
-		return errors.Wrapf(err, "failed building %v", destination)
+		return fmt.Errorf("failed building %v: %w", destination, err)
 	}
 
 	return nil

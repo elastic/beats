@@ -1,0 +1,222 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "e8ede311-8955-4a16-bf44-8c0ff0e0104b": {
+                            "columnOrder": [
+                                "7b08988e-0df9-450c-89d0-b1d71c49a7ec",
+                                "b15e8116-d875-4e7f-97f5-448ab367e5e1",
+                                "1398ca11-cb70-4d9d-bacf-b402bf000905",
+                                "457a059e-0824-4109-9178-6802eed70599",
+                                "388ad9b8-3fec-4e8d-9a13-d950d646bd5b",
+                                "6f4b28cd-dd85-41da-9921-af5faf9f33f8"
+                            ],
+                            "columns": {
+                                "1398ca11-cb70-4d9d-bacf-b402bf000905": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Volume",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.persistentvolumeclaim.volume_name"
+                                },
+                                "388ad9b8-3fec-4e8d-9a13-d950d646bd5b": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Access Mode",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.persistentvolumeclaim.access_mode"
+                                },
+                                "457a059e-0824-4109-9178-6802eed70599": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Capacity",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "format": {
+                                            "id": "bytes",
+                                            "params": {
+                                                "decimals": 0
+                                            }
+                                        },
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.persistentvolumeclaim.request_storage.bytes"
+                                },
+                                "6f4b28cd-dd85-41da-9921-af5faf9f33f8": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Storage Class",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.persistentvolumeclaim.storage_class"
+                                },
+                                "7b08988e-0df9-450c-89d0-b1d71c49a7ec": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Name",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": true,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": false,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.persistentvolumeclaim.name"
+                                },
+                                "b15e8116-d875-4e7f-97f5-448ab367e5e1": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Phase",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.persistentvolumeclaim.phase"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "882c4d26-0913-486c-9b14-d6ec44063542",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": [
+                            "state_persistentvolume",
+                            "state_persistentvolumeclaim"
+                        ],
+                        "type": "phrases"
+                    },
+                    "query": {
+                        "bool": {
+                            "minimum_should_match": 1,
+                            "should": [
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "state_persistentvolume"
+                                    }
+                                },
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "state_persistentvolumeclaim"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "alignment": "left",
+                        "columnId": "7b08988e-0df9-450c-89d0-b1d71c49a7ec",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "b15e8116-d875-4e7f-97f5-448ab367e5e1",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "1398ca11-cb70-4d9d-bacf-b402bf000905",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "6f4b28cd-dd85-41da-9921-af5faf9f33f8",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "457a059e-0824-4109-9178-6802eed70599",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "388ad9b8-3fec-4e8d-9a13-d950d646bd5b",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "e8ede311-8955-4a16-bf44-8c0ff0e0104b",
+                "layerType": "data",
+                "rowHeight": "single",
+                "rowHeightLines": 1
+            }
+        },
+        "title": "Persistent Volume Claims Informations [Metricbeat Kubernetes]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "kubernetes-f1d25db0-bcb9-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-e8ede311-8955-4a16-bf44-8c0ff0e0104b",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "882c4d26-0913-486c-9b14-d6ec44063542",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-06-28T06:47:07.287Z",
+    "version": "WzU3NzEsM10="
+}

@@ -18,8 +18,10 @@
 package metrics
 
 import (
-	"github.com/pkg/errors"
-	"gopkg.in/mgo.v2/bson"
+	"context"
+	"fmt"
+
+	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/elastic/beats/v7/libbeat/common/schema"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -38,14 +40,14 @@ func init() {
 // additional entries. These variables can be used to persist data or configuration between
 // multiple fetch calls.
 type MetricSet struct {
-	*mongodb.MetricSet
+	*mongodb.Metricset
 }
 
 // New creates a new instance of the MetricSet
 // Part of new is also setting up the configuration by processing additional
 // configuration entries if needed.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	ms, err := mongodb.NewMetricSet(base)
+	ms, err := mongodb.NewMetricset(base)
 	if err != nil {
 		return nil, err
 	}
@@ -56,21 +58,32 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
-	// instantiate direct connections to each of the configured Mongo hosts
-	mongoSession, err := mongodb.NewDirectSession(m.DialInfo)
+	client, err := mongodb.NewClient(m.Metricset.Config, m.HostData().URI, m.Module().Config().Timeout, 0)
 	if err != nil {
-		return errors.Wrap(err, "error creating new Session")
+		return fmt.Errorf("could not create mongodb client: %w", err)
 	}
-	defer mongoSession.Close()
+
+	defer func() {
+		if disconnectErr := client.Disconnect(context.Background()); disconnectErr != nil {
+			m.Logger().Warn("client disconnection did not happen gracefully")
+		}
+	}()
+
+	db := client.Database("admin")
 
 	result := map[string]interface{}{}
-	if err := mongoSession.DB("admin").Run(bson.D{{Name: "serverStatus", Value: 1}}, &result); err != nil {
-		return errors.Wrap(err, "failed to retrieve serverStatus")
+	res := db.RunCommand(context.Background(), bson.D{bson.E{Key: "serverStatus", Value: 1}})
+	if err = res.Err(); err != nil {
+		return fmt.Errorf("failed to retrieve data from 'serverStatus' command: %w", err)
+	}
+
+	if err = res.Decode(&result); err != nil {
+		reporter.Error(fmt.Errorf("could not decode mongodb 'serverStatus' response: %w", err))
 	}
 
 	data, err := schemaMetrics.Apply(result, schema.FailOnRequired)
 	if err != nil {
-		return errors.Wrap(err, "failed to apply schema")
+		return fmt.Errorf("failed to apply schema on 'serverStatus' response: %w", err)
 	}
 	reporter.Event(mb.Event{MetricSetFields: data})
 

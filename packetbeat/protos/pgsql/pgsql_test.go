@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package pgsql
 
@@ -30,7 +29,8 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -54,7 +54,7 @@ func pgsqlModForTests(store *eventStore) *pgsqlPlugin {
 
 	var pgsql pgsqlPlugin
 	config := defaultConfig
-	pgsql.init(callback, procs.ProcessesWatcher{}, &config)
+	pgsql.init(callback, &procs.ProcessesWatcher{}, &config)
 	return &pgsql
 }
 
@@ -326,7 +326,7 @@ func testTCPTuple() *common.TCPTuple {
 }
 
 // Helper function to read from the Publisher Queue
-func expectTransaction(t *testing.T, e *eventStore) common.MapStr {
+func expectTransaction(t *testing.T, e *eventStore) mapstr.M {
 	if len(e.events) == 0 {
 		t.Error("No transaction")
 		return nil

@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !windows
-// +build !windows
 
 package pkg
 
@@ -12,8 +11,10 @@ import (
 	"bytes"
 	"encoding/binary"
 	"encoding/gob"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -23,14 +24,14 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid"
 	"github.com/joeshaw/multierror"
+	"go.etcd.io/bbolt"
 
 	"github.com/elastic/beats/v7/auditbeat/datastore"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -38,7 +39,7 @@ const (
 	metricsetName = "package"
 	namespace     = "system.audit.package"
 
-	bucketName              = "package.v1"
+	bucketNameV2            = "package.v2"
 	bucketKeyPackages       = "packages"
 	bucketKeyStateTimestamp = "state_timestamp"
 
@@ -49,7 +50,7 @@ const (
 var (
 	rpmPath            = "/var/lib/rpm"
 	dpkgPath           = "/var/lib/dpkg"
-	homebrewCellarPath = "/usr/local/Cellar"
+	homebrewCellarPath = []string{"/usr/local/Cellar", "/opt/homebrew/Cellar"}
 )
 
 type eventAction uint8
@@ -127,6 +128,8 @@ type Package struct {
 }
 
 // Hash creates a hash for Package.
+//
+//nolint:errcheck // Writing to the hash never returns an error.
 func (pkg Package) Hash() uint64 {
 	h := xxhash.New()
 	h.WriteString(pkg.Name)
@@ -136,55 +139,55 @@ func (pkg Package) Hash() uint64 {
 	return h.Sum64()
 }
 
-func (pkg Package) toMapStr() (common.MapStr, common.MapStr) {
-	mapstr := common.MapStr{
+func (pkg Package) toMapStr() (mapstr.M, mapstr.M) {
+	nonECS := mapstr.M{
 		"name":    pkg.Name,
 		"version": pkg.Version,
 	}
-	ecsMapstr := common.MapStr{
+	ecs := mapstr.M{
 		"name":    pkg.Name,
 		"version": pkg.Version,
 	}
 
 	if pkg.Release != "" {
-		mapstr.Put("release", pkg.Release)
+		nonECS["release"] = pkg.Release
 	}
 
 	if pkg.Arch != "" {
-		mapstr.Put("arch", pkg.Arch)
-		ecsMapstr.Put("architecture", pkg.License)
+		nonECS["arch"] = pkg.Arch
+		ecs["architecture"] = pkg.License
 	}
 
 	if pkg.License != "" {
-		mapstr.Put("license", pkg.License)
-		ecsMapstr.Put("license", pkg.License)
+		nonECS["license"] = pkg.License
+		ecs["license"] = pkg.License
 	}
 
 	if !pkg.InstallTime.IsZero() {
-		mapstr.Put("installtime", pkg.InstallTime)
-		ecsMapstr.Put("installed", pkg.InstallTime)
+		nonECS["installtime"] = pkg.InstallTime
+		ecs["installed"] = pkg.InstallTime
 	}
 
 	if pkg.Size != 0 {
-		mapstr.Put("size", pkg.Size)
-		ecsMapstr.Put("size", pkg.Size)
+		nonECS["size"] = pkg.Size
+		ecs["size"] = pkg.Size
 	}
 
 	if pkg.Summary != "" {
-		mapstr.Put("summary", pkg.Summary)
-		ecsMapstr.Put("description", pkg.Summary)
+		nonECS["summary"] = pkg.Summary
+		ecs["description"] = pkg.Summary
 	}
 
 	if pkg.URL != "" {
-		mapstr.Put("url", pkg.URL)
-		ecsMapstr.Put("reference", pkg.URL)
+		nonECS["url"] = pkg.URL
+		ecs["reference"] = pkg.URL
 	}
 
 	if pkg.Type != "" {
-		ecsMapstr.Put("type", pkg.Type)
+		ecs["type"] = pkg.Type
 	}
 
-	return mapstr, ecsMapstr
+	return nonECS, ecs
 }
 
 // entityID creates an ID that uniquely identifies this package across machines.
@@ -198,14 +201,16 @@ func (pkg Package) entityID(hostID string) string {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The %v/%v dataset is beta", moduleName, metricsetName)
-
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
 	}
 
-	bucket, err := datastore.OpenBucket(bucketName)
+	if err := datastore.Update(migrateDatastoreSchema); err != nil {
+		return nil, fmt.Errorf("datastore schema migration failed: %w", err)
+	}
+
+	bucket, err := datastore.OpenBucket(bucketNameV2)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open persistent datastore: %w", err)
 	}
@@ -218,28 +223,21 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		bucket:          bucket,
 	}
 
-	// Load from disk: Time when state was last sent
-	err = bucket.Load(bucketKeyStateTimestamp, func(blob []byte) error {
-		if len(blob) > 0 {
-			return ms.lastState.UnmarshalBinary(blob)
-		}
-		return nil
-	})
+	ms.lastState, err = loadStateTimestamp(bucket)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to load state timestamp from bucket %v: %w", bucketNameV2, err)
 	}
 	if !ms.lastState.IsZero() {
 		ms.log.Debugf("Last state was sent at %v. Next state update by %v.", ms.lastState, ms.lastState.Add(ms.config.effectiveStatePeriod()))
 	} else {
-		ms.log.Debug("No state timestamp found")
+		ms.log.Debug("No state timestamp found.")
 	}
 
-	// Load from disk: Packages
-	packages, err := ms.restorePackagesFromDisk()
+	packages, err := loadPackages(ms.bucket)
 	if err != nil {
-		return nil, fmt.Errorf("failed to restore packages from disk: %w", err)
+		return nil, fmt.Errorf("failed to load persisted package metadata from disk: %w", err)
 	}
-	ms.log.Debugf("Restored %d packages from disk", len(packages))
+	ms.log.Debugf("Loaded %d packages from disk", len(packages))
 
 	ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
 
@@ -292,26 +290,20 @@ func (ms *MetricSet) reportState(report mb.ReporterV2) error {
 	if err != nil {
 		return fmt.Errorf("error generating state ID: %w", err)
 	}
+
 	for _, pkg := range packages {
 		event := ms.packageEvent(pkg, eventTypeState, eventActionExistingPackage)
-		event.RootFields.Put("event.id", stateID.String())
+		event.RootFields.Put("event.id", stateID.String()) //nolint:errcheck // This will not return an error as long as 'event' remains as a map.
 		report.Event(event)
 	}
 
 	// This will initialize the cache with the current packages
 	ms.cache.DiffAndUpdateCache(convertToCacheable(packages))
 
-	// Save time so we know when to send the state again (config.StatePeriod)
-	timeBytes, err := ms.lastState.MarshalBinary()
-	if err != nil {
-		return err
+	if err = storeStateTimestamp(ms.bucket, ms.lastState); err != nil {
+		return fmt.Errorf("error persisting state timestamp: %w", err)
 	}
-	err = ms.bucket.Store(bucketKeyStateTimestamp, timeBytes)
-	if err != nil {
-		return fmt.Errorf("error writing state timestamp to disk: %w", err)
-	}
-
-	return ms.savePackagesToDisk(packages)
+	return storePackages(ms.bucket, packages)
 }
 
 // reportChanges detects and reports any changes to installed packages on this system since the last call.
@@ -354,7 +346,7 @@ func (ms *MetricSet) reportChanges(report mb.ReporterV2) error {
 	}
 
 	if len(newPackages) > 0 || len(missingPackages) > 0 {
-		return ms.savePackagesToDisk(packages)
+		return storePackages(ms.bucket, packages)
 	}
 
 	return nil
@@ -373,8 +365,8 @@ func convertToPackage(cacheValues []interface{}) []*Package {
 func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAction) mb.Event {
 	pkgFields, ecsPkgFields := pkg.toMapStr()
 	event := mb.Event{
-		RootFields: common.MapStr{
-			"event": common.MapStr{
+		RootFields: mapstr.M{
+			"event": mapstr.M{
 				"kind":     eventType,
 				"category": []string{"package"},
 				"type":     []string{action.Type()},
@@ -387,11 +379,13 @@ func (ms *MetricSet) packageEvent(pkg *Package, eventType string, action eventAc
 	}
 
 	if ms.HostID() != "" {
-		event.MetricSetFields.Put("entity_id", pkg.entityID(ms.HostID()))
+		event.MetricSetFields["entity_id"] = pkg.entityID(ms.HostID())
 	}
 
 	if pkg.error != nil {
-		event.RootFields.Put("error.message", pkg.error.Error())
+		event.RootFields["error"] = mapstr.M{
+			"message": pkg.error.Error(),
+		}
 	}
 
 	return event
@@ -424,53 +418,65 @@ func convertToCacheable(packages []*Package) []cache.Cacheable {
 	return c
 }
 
-// restorePackagesFromDisk loads the packages from disk.
-func (ms *MetricSet) restorePackagesFromDisk() (packages []*Package, err error) {
-	var decoder *gob.Decoder
-	err = ms.bucket.Load(bucketKeyPackages, func(blob []byte) error {
+// loadStateTimestamp loads state timestamp from a bucket. This is the time
+// when all package state was last emitted as events.
+func loadStateTimestamp(bucket datastore.Bucket) (time.Time, error) {
+	var stateTimestamp time.Time
+	err := bucket.Load(bucketKeyStateTimestamp, func(blob []byte) error {
 		if len(blob) > 0 {
-			buf := bytes.NewBuffer(blob)
-			decoder = gob.NewDecoder(buf)
+			return stateTimestamp.UnmarshalBinary(blob)
 		}
+		return nil
+	})
+	if err != nil {
+		return time.Time{}, err
+	}
+
+	return stateTimestamp, nil
+}
+
+// storeStateTimestamp stores the timestamp of the last state update to
+// the given datastore bucket.
+func storeStateTimestamp(bucket datastore.Bucket, t time.Time) error {
+	data, err := t.MarshalBinary()
+	if err != nil {
+		return err
+	}
+
+	if err = bucket.Store(bucketKeyStateTimestamp, data); err != nil {
+		return fmt.Errorf("error writing state timestamp to disk: %w", err)
+	}
+	return nil
+}
+
+// loadPackages loads the persisted packages from the given datastore bucket.
+func loadPackages(bucket datastore.Bucket) (packages []*Package, err error) {
+	var data []byte
+	err = bucket.Load(bucketKeyPackages, func(blob []byte) error {
+		data = blob
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	if decoder != nil {
-		for {
-			pkg := new(Package)
-			err = decoder.Decode(pkg)
-			if err == nil {
-				packages = append(packages, pkg)
-			} else if err == io.EOF {
-				// Read all packages
-				break
-			} else {
-				return nil, fmt.Errorf("error decoding packages: %w", err)
-			}
+	if len(data) > 0 {
+		packages, err = decodePackagesFromContainer(data)
+		if err != nil {
+			return nil, err
 		}
 	}
 
 	return packages, nil
 }
 
-// Save packages to disk.
-func (ms *MetricSet) savePackagesToDisk(packages []*Package) error {
-	var buf bytes.Buffer
-	encoder := gob.NewEncoder(&buf)
+// storePackages stores packages to the given datastore bucket.
+func storePackages(bucket datastore.Bucket, packages []*Package) error {
+	builder, release := fbGetBuilder()
+	defer release()
 
-	for _, pkg := range packages {
-		err := encoder.Encode(*pkg)
-		if err != nil {
-			return fmt.Errorf("error encoding packages: %w", err)
-		}
-	}
-
-	err := ms.bucket.Store(bucketKeyPackages, buf.Bytes())
-	if err != nil {
-		return fmt.Errorf("error writing packages to disk: %w", err)
+	if err := bucket.Store(bucketKeyPackages, encodePackages(builder, packages)); err != nil {
+		return fmt.Errorf("error persisting packages to datastore: %w", err)
 	}
 	return nil
 }
@@ -508,24 +514,27 @@ func (ms *MetricSet) getPackages() (packages []*Package, err error) {
 		return nil, fmt.Errorf("error opening %v: %w", dpkgPath, err)
 	}
 
-	_, err = os.Stat(homebrewCellarPath)
-	if err == nil {
+	for _, path := range homebrewCellarPath {
+		_, err = os.Stat(path)
+		if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				continue
+			}
+			return nil, fmt.Errorf("error opening %v: %w", path, err)
+		}
 		foundPackageManager = true
-
-		homebrewPackages, err := listBrewPackages()
+		homebrewPackages, err := listBrewPackages(path)
 		if err != nil {
 			return nil, fmt.Errorf("error getting Homebrew packages: %w", err)
 		}
 		ms.log.Debugf("Homebrew packages: %v", len(homebrewPackages))
-
 		packages = append(packages, homebrewPackages...)
-	} else if err != nil && !os.IsNotExist(err) {
-		return nil, fmt.Errorf("error opening %v: %w", homebrewCellarPath, err)
+		break
 	}
 
 	if !foundPackageManager && !ms.suppressNoPackageWarnings {
 		ms.log.Warnf("No supported package managers found. None of %v, %v, %v exist.",
-			rpmPath, dpkgPath, homebrewCellarPath)
+			rpmPath, dpkgPath, strings.Join(homebrewCellarPath, ","))
 
 		// Only warn once at the start of Auditbeat.
 		ms.suppressNoPackageWarnings = true
@@ -624,7 +633,7 @@ func (ms *MetricSet) listDebPackages() ([]*Package, error) {
 func parseDpkgInstalledSize(value string) (size uint64, err error) {
 	// Installed-Size is an integer (KiB).
 	if size, err = strconv.ParseUint(value, 10, 64); err == nil {
-		return size, err
+		return size, nil
 	}
 
 	// Some rare third-party packages contain a unit at the end. This is ignored
@@ -649,4 +658,103 @@ func parseDpkgInstalledSize(value string) (size uint64, err error) {
 
 	size, err = strconv.ParseUint(value[:end], 10, 64)
 	return size * multiplier, err
+}
+
+// packageV1 is the struct used in packages.v1.
+// Do not modify this struct because this must remain the same as what
+// was used in earlier Auditbeat releases.
+type packageV1 struct {
+	Name        string
+	Version     string
+	Release     string
+	Arch        string
+	License     string
+	InstallTime time.Time
+	Size        uint64
+	Summary     string
+	URL         string
+	Type        string
+
+	//nolint:unused // This field is unused, but we are keeping this struct as is.
+	error error
+}
+
+// migrateDatastoreSchema migrates the contents of the data store to the latest
+// schema. This allows users of earlier versions of Auditbeat to upgrade to
+// new versions while maintaining existing state. This handles migrating data
+// from the package.v1 bucket into package.v2.
+//
+// It performs the migration entirely within the given write transaction such
+// that if any problems occur the changes are rolled back.
+func migrateDatastoreSchema(tx *bbolt.Tx) error {
+	const bucketNameV1 = "package.v1"
+
+	v2Bucket := tx.Bucket([]byte(bucketNameV2))
+	if v2Bucket != nil {
+		// Already exists. No need to migrate.
+		return nil
+	}
+
+	v1Bucket := tx.Bucket([]byte(bucketNameV1))
+	if v1Bucket == nil {
+		// No old data to migrate.
+		return nil
+	}
+
+	log := logp.NewLogger(metricsetName)
+	log.Debugf("Migrating data from %v to %v bucket.", bucketNameV1, bucketNameV2)
+
+	var timestampGob []byte
+	if timestampGob = v1Bucket.Get([]byte(bucketKeyStateTimestamp)); len(timestampGob) == 0 {
+		return fmt.Errorf("error migrating %v data: no timestamp found", bucketNameV1)
+	}
+
+	var packages []*Package
+	if data := v1Bucket.Get([]byte(bucketKeyPackages)); len(data) > 0 {
+		dec := gob.NewDecoder(bytes.NewReader(data))
+
+		for {
+			var pkgV1 packageV1
+			if err := dec.Decode(&pkgV1); err != nil {
+				if errors.Is(err, io.EOF) {
+					break
+				}
+				return fmt.Errorf("error migrating %v data: failed decoding packages: %w", bucketNameV1, err)
+			}
+			packages = append(packages, &Package{
+				Name:        pkgV1.Name,
+				Version:     pkgV1.Version,
+				Release:     pkgV1.Release,
+				Arch:        pkgV1.Arch,
+				License:     pkgV1.License,
+				InstallTime: pkgV1.InstallTime,
+				Size:        pkgV1.Size,
+				Summary:     pkgV1.Summary,
+				URL:         pkgV1.URL,
+				Type:        pkgV1.Type,
+			})
+		}
+	}
+
+	v2Bucket, err := tx.CreateBucketIfNotExists([]byte(bucketNameV2))
+	if err != nil {
+		return fmt.Errorf("error migrating data: failed to create %v bucket: %w", bucketNameV2, err)
+	}
+
+	if err = v2Bucket.Put([]byte(bucketKeyStateTimestamp), timestampGob); err != nil {
+		return fmt.Errorf("error migrating data: failed to write %v to %v bucket: %w", bucketKeyStateTimestamp, bucketNameV2, err)
+	}
+
+	builder, release := fbGetBuilder()
+	defer release()
+	if err = v2Bucket.Put([]byte(bucketKeyPackages), encodePackages(builder, packages)); err != nil {
+		return fmt.Errorf("error migrating data: failed to write %v to %v bucket: %w", bucketKeyPackages, bucketNameV2, err)
+	}
+
+	if err = tx.DeleteBucket([]byte(bucketNameV1)); err != nil {
+		return fmt.Errorf("error migrating data: failed to delete %v bucket: %w", bucketNameV1, err)
+	}
+
+	log.Debugf("Completed migrating data from %v to %v bucket. Moved %d packages.", bucketNameV1, bucketNameV2, len(packages))
+	return nil
 }

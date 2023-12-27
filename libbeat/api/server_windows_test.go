@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package api
 
@@ -29,20 +28,23 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestNamedPipe(t *testing.T) {
 	p := "npipe:///hello"
 
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"host": p,
 	})
 
-	s, err := New(nil, simpleMux(), cfg)
+	s, err := New(nil, cfg)
 	require.NoError(t, err)
+	attachEchoHelloHandler(t, s)
 	go s.Start()
-	defer s.Stop()
+	defer func() {
+		require.NoError(t, s.Stop())
+	}()
 
 	c := http.Client{
 		Transport: &http.Transport{

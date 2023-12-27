@@ -54,6 +54,19 @@ packetbeat.interfaces.type: af_packet
 packetbeat.interfaces.buffer_size_mb: 100
 ------------------------------------------------------------------------------
 
+[float]
+=== Windows Npcap installation options
+
+On Windows {beatname_uc} requires an Npcap DLL installation. This is provided by {beatname_uc}
+for users of the Elastic Licenced version. In some cases users may wish to use
+their own installed version. In order to do this the `packetbeat.npcap.never_install`
+option can be used. Setting this option to `true` will not attempt to install the
+bundled Npcap library on start-up unless no Npcap is already installed.
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.npcap.never_install: true
+------------------------------------------------------------------------------
 
 [float]
 === Sniffing configuration options
@@ -122,6 +135,13 @@ packetbeat.interfaces.device: 0
 
 Specifying the index is especially useful on Windows where device names can be long.
 
+Alternatively the `default_route`, `default_route_ipv4` or `default_route_ipv6` device
+may be specified. This will set the capture device to be the device that is associated
+with the first default route identified on Packetbeat start-up. `default_route` will
+select the first default route from either IPv4 or IPv6 with a preference for the IPv4
+route, while `default_route_ipv4` and `default_route_ipv6` will only select from the
+specified stack. The selected interface is not altered after it is chosen.
+
 [float]
 ==== `snaplen`
 
@@ -180,6 +200,47 @@ Example:
 packetbeat.interfaces.device: eth0
 packetbeat.interfaces.type: af_packet
 packetbeat.interfaces.buffer_size_mb: 100
+------------------------------------------------------------------------------
+
+[float]
+==== `fanout_group`
+
+To scale processing across multiple Packetbeat processes, a fanout group
+identifier can be specified. When `fanout_group` is used the Linux kernel splits
+packets across Packetbeat instances in the same group by using a flow hash. It
+computes the flow hash modulo with the number of Packetbeat processes in order
+to consistently route flows to the same Packetbeat instance.
+
+The value must be between 0 and 65535. By default, no value is set.
+
+This is only available on Linux and requires using `type: af_packet`. Each process
+must be running in same network namespace. All processes must use the same
+interface settings. You must take responsibility for running multiple instances
+of Packetbeat.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.interfaces.type: af_packet
+packetbeat.interfaces.fanout_group: 1
+------------------------------------------------------------------------------
+
+[float]
+==== `metrics_interval`
+
+Configure the metrics polling interval for supported interface types. Currently,
+only `af_packet` is supported.
+
+The value must be a duration string. The default is `5s` (5 seconds). A value
+less than or equal to zero will be set to the default value.
+
+Example:
+
+[source,yaml]
+------------------------------------------------------------------------------
+packetbeat.interfaces.type: af_packet
+packetbeat.interfaces.metrics_interval: 5s
 ------------------------------------------------------------------------------
 
 [float]
@@ -270,7 +331,7 @@ see the following published transactions (when `ignore_outgoing` is true):
  - Beat2: t1
  - Beat3: t2
 
- [float]
+[float]
 ==== `internal_networks`
 
 If the `internal_networks` option is specified, when monitoring network taps or mirror ports, Packetbeat
@@ -333,7 +394,7 @@ Here’s an example of a flow information sent by Packetbeat. See
   "destination": {
     "bytes": 460,
     "ip": "198.51.100.2",
-    "mac": "06:05:04:03:02:01",
+    "mac": "06-05-04-03-02-01",
     "packets": 2,
     "port": 80
   },
@@ -358,7 +419,7 @@ Here’s an example of a flow information sent by Packetbeat. See
   "source": {
     "bytes": 10,
     "ip": "203.0.113.3",
-    "mac": "01:02:03:04:05:06",
+    "mac": "01-02-03-04-05-06",
     "packets": 1,
     "port": 38901
   }

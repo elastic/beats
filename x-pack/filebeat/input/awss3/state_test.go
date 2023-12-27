@@ -21,13 +21,13 @@ func TestStateIsEqual(t *testing.T) {
 	tests := map[string]stateTestCase{
 		"two states pointing to the same key with same etag and same last modified not stored": {
 			[2]state{
-				state{
+				{
 					Bucket:       "bucket a",
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag",
 					LastModified: lastModifed,
 				},
-				state{
+				{
 					Bucket:       "bucket a",
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag",
@@ -38,14 +38,14 @@ func TestStateIsEqual(t *testing.T) {
 		},
 		"two states pointing to the same key with same etag and same last modified stored": {
 			[2]state{
-				state{
+				{
 					Bucket:       "bucket a",
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag",
 					LastModified: lastModifed,
 					Stored:       true,
 				},
-				state{
+				{
 					Bucket:       "bucket a",
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag",
@@ -56,14 +56,14 @@ func TestStateIsEqual(t *testing.T) {
 		},
 		"two states pointing to the same key with same etag and same last modified error": {
 			[2]state{
-				state{
+				{
 					Bucket:       "bucket a",
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag",
 					LastModified: lastModifed,
 					Error:        true,
 				},
-				state{
+				{
 					Bucket:       "bucket a",
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag",
@@ -74,13 +74,13 @@ func TestStateIsEqual(t *testing.T) {
 		},
 		"two states pointing to the same key with different etag and same last modified": {
 			[2]state{
-				state{
+				{
 					Bucket:       "bucket a",
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag1",
 					LastModified: lastModifed,
 				},
-				state{
+				{
 					Bucket:       "bucket a",
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag2",
@@ -91,13 +91,13 @@ func TestStateIsEqual(t *testing.T) {
 		},
 		"two states pointing to the same key with same etag and different last modified": {
 			[2]state{
-				state{
+				{
 					Bucket:       "bucket a",
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag",
 					LastModified: time.Now(),
 				},
-				state{
+				{
 					Bucket:       "bucket a",
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag",
@@ -108,13 +108,13 @@ func TestStateIsEqual(t *testing.T) {
 		},
 		"two states pointing to different key": {
 			[2]state{
-				state{
+				{
 					Bucket:       "bucket a",
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag",
 					LastModified: lastModifed,
 				},
-				state{
+				{
 					Bucket:       "bucket a",
 					Key:          "/key/to/this/file/2",
 					Etag:         "etag",
@@ -125,13 +125,13 @@ func TestStateIsEqual(t *testing.T) {
 		},
 		"two states pointing to different bucket": {
 			[2]state{
-				state{
+				{
 					Bucket:       "bucket b",
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag",
 					LastModified: lastModifed,
 				},
-				state{
+				{
 					Bucket:       "bucket a",
 					Key:          "/key/to/this/file/1",
 					Etag:         "etag",

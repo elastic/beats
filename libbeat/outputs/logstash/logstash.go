@@ -19,10 +19,10 @@ package logstash
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 const (
@@ -39,9 +39,9 @@ func makeLogstash(
 	_ outputs.IndexManager,
 	beat beat.Info,
 	observer outputs.Observer,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (outputs.Group, error) {
-	config, err := readConfig(cfg, beat)
+	lsConfig, err := readConfig(cfg, beat)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -51,14 +51,14 @@ func makeLogstash(
 		return outputs.Fail(err)
 	}
 
-	tls, err := tlscommon.LoadTLSConfig(config.TLS)
+	tls, err := tlscommon.LoadTLSConfig(lsConfig.TLS)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
 	transp := transport.Config{
-		Timeout: config.Timeout,
-		Proxy:   &config.Proxy,
+		Timeout: lsConfig.Timeout,
+		Proxy:   &lsConfig.Proxy,
 		TLS:     tls,
 		Stats:   observer,
 	}
@@ -72,18 +72,18 @@ func makeLogstash(
 			return outputs.Fail(err)
 		}
 
-		if config.Pipelining > 0 {
-			client, err = newAsyncClient(beat, conn, observer, config)
+		if lsConfig.Pipelining > 0 {
+			client, err = newAsyncClient(beat, conn, observer, lsConfig)
 		} else {
-			client, err = newSyncClient(beat, conn, observer, config)
+			client, err = newSyncClient(beat, conn, observer, lsConfig)
 		}
 		if err != nil {
 			return outputs.Fail(err)
 		}
 
-		client = outputs.WithBackoff(client, config.Backoff.Init, config.Backoff.Max)
+		client = outputs.WithBackoff(client, lsConfig.Backoff.Init, lsConfig.Backoff.Max)
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(config.LoadBalance, config.BulkMaxSize, config.MaxRetries, clients)
+	return outputs.SuccessNet(lsConfig.Queue, lsConfig.LoadBalance, lsConfig.BulkMaxSize, lsConfig.MaxRetries, clients)
 }

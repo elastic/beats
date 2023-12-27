@@ -5,6 +5,8 @@
 
 == ActiveMQ module
 
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
+
 This module parses Apache ActiveMQ logs. It supports application and audit logs.
 
 include::../include/what-happens.asciidoc[]

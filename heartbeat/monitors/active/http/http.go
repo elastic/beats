@@ -23,28 +23,26 @@ import (
 	"net/url"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/plugin"
+	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
+	"github.com/elastic/beats/v7/libbeat/version"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
 func init() {
 	plugin.Register("http", create, "synthetics/http")
 }
 
-var debugf = logp.MakeDebug("http")
-
-var userAgent = useragent.UserAgent("Heartbeat")
+var userAgent = useragent.UserAgent("Heartbeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 // Create makes a new HTTP monitor
 func create(
 	name string,
-	cfg *common.Config,
+	cfg *conf.C,
 ) (p plugin.Plugin, err error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
@@ -106,7 +104,7 @@ func create(
 
 	js := make([]jobs.Job, len(config.Hosts))
 	for i, urlStr := range config.Hosts {
-		u, _ := url.Parse(urlStr)
+		u, err := url.Parse(urlStr)
 		if err != nil {
 			return plugin.Plugin{}, err
 		}
@@ -118,7 +116,7 @@ func create(
 
 		// Assign any execution errors to the error field and
 		// assign the url field
-		js[i] = wrappers.WithURLField(u, job)
+		js[i] = wraputil.WithURLField(u, job)
 	}
 
 	return plugin.Plugin{Jobs: js, Endpoints: len(config.Hosts)}, nil

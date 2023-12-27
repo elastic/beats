@@ -16,19 +16,19 @@
 // under the License.
 
 //go:build (darwin && cgo) || freebsd || linux || windows
-// +build darwin,cgo freebsd linux windows
 
 package diskio
 
 import (
+	"fmt"
 	"runtime"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/metric/system/diskio"
+	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-
-	"github.com/pkg/errors"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/diskio"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 func init() {
@@ -73,25 +73,29 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	stats, err := diskio.IOCounters(m.includeDevices...)
 	if err != nil {
-		return errors.Wrap(err, "disk io counters")
+		return fmt.Errorf("disk io counters: %w", err)
 	}
 
 	// Sample the current cpu counter
-	m.statistics.OpenSampling()
+	err = m.statistics.OpenSampling()
+	// CPU sampling does not seem to be used by any of the diskio metrics we're using. Mostly used by iostat.
+	if err != nil {
+		m.Logger().Warnf("Error in CPU sampling for diskio: %w", err)
+	}
 
 	// Store the last cpu counter when finished
 	defer m.statistics.CloseSampling()
 
 	var diskReadBytes, diskWriteBytes uint64
 	for _, counters := range stats {
-		event := common.MapStr{
+		event := mapstr.M{
 			"name": counters.Name,
-			"read": common.MapStr{
+			"read": mapstr.M{
 				"count": counters.ReadCount,
 				"time":  counters.ReadTime,
 				"bytes": counters.ReadBytes,
 			},
-			"write": common.MapStr{
+			"write": mapstr.M{
 				"count": counters.WriteCount,
 				"time":  counters.WriteTime,
 				"bytes": counters.WriteBytes,
@@ -126,9 +130,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if m.prevCounters != (diskCounter{}) {
 		// convert network metrics from counters to gauges
 		r.Event(mb.Event{
-			RootFields: common.MapStr{
-				"host": common.MapStr{
-					"disk": common.MapStr{
+			RootFields: mapstr.M{
+				"host": mapstr.M{
+					"disk": mapstr.M{
 						"read.bytes":  diskReadBytes - m.prevCounters.prevDiskReadBytes,
 						"write.bytes": diskWriteBytes - m.prevCounters.prevDiskWriteBytes,
 					},
@@ -142,4 +146,22 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	m.prevCounters.prevDiskWriteBytes = diskWriteBytes
 
 	return nil
+}
+
+// Diagnostics implmements the DiagnosticSet interface
+func (m *MetricSet) Diagnostics() []diagnostics.DiagnosticSetup {
+	m.Logger().Infof("got DiagnosticSetup request for system/memory")
+	return []diagnostics.DiagnosticSetup{
+		{
+			Name:        "diskio-diskstats",
+			Description: "Contents of /proc/diskstats",
+			Filename:    "diskstats",
+			Callback:    m.diagDiskstats,
+		},
+	}
+}
+
+func (m *MetricSet) diagDiskstats() []byte {
+	sys := m.BaseMetricSet.Module().(resolve.Resolver)
+	return diagnostics.GetRawFileOrErrorString(sys, "/proc/diskstats")
 }

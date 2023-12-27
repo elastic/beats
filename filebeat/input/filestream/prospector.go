@@ -26,7 +26,8 @@ import (
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/logp"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -42,12 +43,10 @@ const (
 	prospectorDebugKey               = "file_prospector"
 )
 
-var (
-	ignoreInactiveSettings = map[string]ignoreInactiveType{
-		ignoreInactiveSinceLastStartStr:  IgnoreInactiveSinceLastStart,
-		ignoreInactiveSinceFirstStartStr: IgnoreInactiveSinceFirstStart,
-	}
-)
+var ignoreInactiveSettings = map[string]ignoreInactiveType{
+	ignoreInactiveSinceLastStartStr:  IgnoreInactiveSinceLastStart,
+	ignoreInactiveSinceFirstStartStr: IgnoreInactiveSinceFirstStart,
+}
 
 // fileProspector implements the Prospector interface.
 // It contains a file scanner which returns file system events.
@@ -62,8 +61,31 @@ type fileProspector struct {
 	stateChangeCloser   stateChangeCloserConfig
 }
 
-func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
+func (p *fileProspector) Init(
+	cleaner,
+	globalCleaner loginp.ProspectorCleaner,
+	newID func(loginp.Source) string,
+) error {
 	files := p.filewatcher.GetFiles()
+
+	// If this fileProspector belongs to an input that did not have an ID
+	// this will find its files in the registry and update them to use the
+	// new ID.
+	globalCleaner.FixUpIdentifiers(func(v loginp.Value) (id string, val interface{}) {
+		var fm fileMeta
+		err := v.UnpackCursorMeta(&fm)
+		if err != nil {
+			return "", nil
+		}
+
+		fd, ok := files[fm.Source]
+		if !ok {
+			return "", fm
+		}
+
+		newKey := newID(p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}))
+		return newKey, fm
+	})
 
 	if p.cleanRemoved {
 		cleaner.CleanIf(func(v loginp.Value) bool {
@@ -87,13 +109,13 @@ func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 			return "", nil
 		}
 
-		fi, ok := files[fm.Source]
+		fd, ok := files[fm.Source]
 		if !ok {
 			return "", fm
 		}
 
 		if fm.IdentifierName != identifierName {
-			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Info: fi}).Name()
+			newKey := p.identifier.GetSource(loginp.FSEvent{NewPath: fm.Source, Descriptor: fd}).Name()
 			fm.IdentifierName = identifierName
 			return newKey, fm
 		}
@@ -104,6 +126,8 @@ func (p *fileProspector) Init(cleaner loginp.ProspectorCleaner) error {
 }
 
 // Run starts the fileProspector which accepts FS events from a file watcher.
+//
+//nolint:dupl // Different prospectors have a similar run method
 func (p *fileProspector) Run(ctx input.Context, s loginp.StateMetadataUpdater, hg loginp.HarvesterGroup) {
 	log := ctx.Logger.With("prospector", prospectorDebugKey)
 	log.Debug("Starting prospector")
@@ -149,7 +173,6 @@ func (p *fileProspector) onFSEvent(
 	group loginp.HarvesterGroup,
 	ignoreSince time.Time,
 ) {
-
 	switch event.Op {
 	case loginp.OpCreate, loginp.OpWrite:
 		if event.Op == loginp.OpCreate {
@@ -165,15 +188,22 @@ func (p *fileProspector) onFSEvent(
 		}
 
 		if p.isFileIgnored(log, event, ignoreSince) {
+			err := updater.ResetCursor(src, state{Offset: event.Descriptor.Info.Size()})
+			if err != nil {
+				log.Errorf("setting cursor for ignored file: %v", err)
+			}
 			return
 		}
 
 		group.Start(ctx, src)
 
 	case loginp.OpTruncate:
-		log.Debugf("File %s has been truncated", event.NewPath)
+		log.Debugf("File %s has been truncated setting offset to 0", event.NewPath)
 
-		updater.ResetCursor(src, state{Offset: 0})
+		err := updater.ResetCursor(src, state{Offset: 0})
+		if err != nil {
+			log.Errorf("resetting cursor on truncated file: %v", err)
+		}
 		group.Restart(ctx, src)
 
 	case loginp.OpDelete:
@@ -187,19 +217,19 @@ func (p *fileProspector) onFSEvent(
 		p.onRename(log, ctx, event, src, updater, group)
 
 	default:
-		log.Error("Unkown return value %v", event.Op)
+		log.Error("Unknown return value %v", event.Op)
 	}
 }
 
 func (p *fileProspector) isFileIgnored(log *logp.Logger, fe loginp.FSEvent, ignoreInactiveSince time.Time) bool {
 	if p.ignoreOlder > 0 {
 		now := time.Now()
-		if now.Sub(fe.Info.ModTime()) > p.ignoreOlder {
+		if now.Sub(fe.Descriptor.Info.ModTime()) > p.ignoreOlder {
 			log.Debugf("Ignore file because ignore_older reached. File %s", fe.NewPath)
 			return true
 		}
 	}
-	if !ignoreInactiveSince.IsZero() && fe.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
+	if !ignoreInactiveSince.IsZero() && fe.Descriptor.Info.ModTime().Sub(ignoreInactiveSince) <= 0 {
 		log.Debugf("Ignore file because ignore_since.* reached time %v. File %s", p.ignoreInactiveSince, fe.NewPath)
 		return true
 	}
@@ -239,11 +269,12 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 	} else {
 		// update file metadata as the path has changed
 		var meta fileMeta
-		err := s.FindCursorMeta(src, meta)
+		err := s.FindCursorMeta(src, &meta)
 		if err != nil {
-			log.Errorf("Error while getting cursor meta data of entry %s: %v", src.Name(), err)
-
 			meta.IdentifierName = p.identifier.Name()
+			log.Warnf("Error while getting cursor meta data of entry '%s': '%w'"+
+				", using prospector's identifier: '%s'",
+				src.Name(), err, meta.IdentifierName)
 		}
 		err = s.UpdateMetadata(src, fileMeta{Source: fe.NewPath, IdentifierName: meta.IdentifierName})
 		if err != nil {
@@ -261,9 +292,9 @@ func (p *fileProspector) onRename(log *logp.Logger, ctx input.Context, fe loginp
 }
 
 func (p *fileProspector) stopHarvesterGroup(log *logp.Logger, hg loginp.HarvesterGroup) {
-	err := hg.StopGroup()
+	err := hg.StopHarvesters()
 	if err != nil {
-		log.Errorf("Error while stopping harverster group: %v", err)
+		log.Errorf("Error while stopping harvester group: %v", err)
 	}
 }
 

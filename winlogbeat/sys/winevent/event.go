@@ -24,10 +24,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	libxml "github.com/elastic/beats/v7/libbeat/common/encoding/xml"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/winlogbeat/sys"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Debug selectors used in this package.
@@ -44,11 +44,6 @@ var (
 const (
 	keywordAuditFailure = 0x10000000000000
 	keywordAuditSuccess = 0x20000000000000
-
-	// keywordClassic indicates the log was published with the "classic" event
-	// logging API.
-	// https://docs.microsoft.com/en-us/dotnet/api/system.diagnostics.eventing.reader.standardeventkeywords?view=netframework-4.8
-	keywordClassic = 0x80000000000000
 )
 
 // UnmarshalXML unmarshals the given XML into a new Event.
@@ -67,7 +62,7 @@ type Event struct {
 	Version         Version         `xml:"System>Version"`
 	LevelRaw        uint8           `xml:"System>Level"`
 	TaskRaw         uint16          `xml:"System>Task"`
-	OpcodeRaw       uint8           `xml:"System>Opcode"`
+	OpcodeRaw       *uint8          `xml:"System>Opcode,omitempty"`
 	KeywordsRaw     HexInt64        `xml:"System>Keywords"`
 	TimeCreated     TimeCreated     `xml:"System>TimeCreated"`
 	RecordID        uint64          `xml:"System>EventRecordID"`
@@ -93,9 +88,9 @@ type Event struct {
 	RenderErr               []string
 }
 
-func (e Event) Fields() common.MapStr {
+func (e Event) Fields() mapstr.M {
 	// Windows Log Specific data
-	win := common.MapStr{}
+	win := mapstr.M{}
 
 	AddOptional(win, "channel", e.Channel)
 	AddOptional(win, "event_id", fmt.Sprint(e.EventIdentifier.ID))
@@ -119,7 +114,7 @@ func (e Event) Fields() common.MapStr {
 	AddOptional(win, "message", sys.RemoveWindowsLineEndings(e.Message))
 
 	if e.User.Identifier != "" {
-		user := common.MapStr{
+		user := mapstr.M{
 			"identifier": e.User.Identifier,
 		}
 		win["user"] = user
@@ -258,7 +253,10 @@ func (u *UserData) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 			u.Name = se.Name
 			u.Pairs = in.Pairs
-			d.Skip()
+			err = d.Skip()
+			if err != nil {
+				return err
+			}
 			break
 		}
 	}
@@ -309,8 +307,7 @@ func (v *Version) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 	version, err := strconv.ParseUint(s, 10, 8)
 	if err != nil {
-		// Ignore invalid version values.
-		return nil
+		return nil //nolint:nilerr // Ignore invalid version values.
 	}
 
 	*v = Version(version)
@@ -341,20 +338,19 @@ func (v *HexInt64) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 func EnrichRawValuesWithNames(publisherMeta *WinMeta, event *Event) {
 	// Keywords. Each bit in the value can represent a keyword.
 	rawKeyword := int64(event.KeywordsRaw)
-	isClassic := keywordClassic&rawKeyword > 0
 
 	if len(event.Keywords) == 0 {
 		for mask, keyword := range defaultWinMeta.Keywords {
-			if rawKeyword&mask > 0 {
+			if rawKeyword&mask != 0 {
 				event.Keywords = append(event.Keywords, keyword)
-				rawKeyword -= mask
+				rawKeyword &^= mask
 			}
 		}
 		if publisherMeta != nil {
 			for mask, keyword := range publisherMeta.Keywords {
-				if rawKeyword&mask > 0 {
+				if rawKeyword&mask != 0 {
 					event.Keywords = append(event.Keywords, keyword)
-					rawKeyword -= mask
+					rawKeyword &^= mask
 				}
 			}
 		}
@@ -363,10 +359,10 @@ func EnrichRawValuesWithNames(publisherMeta *WinMeta, event *Event) {
 	var found bool
 	if event.Opcode == "" {
 		// Opcode (search in defaultWinMeta first).
-		if !isClassic {
-			event.Opcode, found = defaultWinMeta.Opcodes[event.OpcodeRaw]
+		if event.OpcodeRaw != nil {
+			event.Opcode, found = defaultWinMeta.Opcodes[*event.OpcodeRaw]
 			if !found && publisherMeta != nil {
-				event.Opcode = publisherMeta.Opcodes[event.OpcodeRaw]
+				event.Opcode = publisherMeta.Opcodes[*event.OpcodeRaw]
 			}
 		}
 	}

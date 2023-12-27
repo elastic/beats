@@ -1,0 +1,24 @@
+name: check-dev-tools
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/check-dev-tools.yml'
+      - 'dev-tools/**'
+      - 'libbeat/scripts/Makefile'
+
+env:
+  BEAT_MODULE: 'dev-tools'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version-file: .go-version
+    - name: Run check/update
+      run: |
+        go install github.com/magefile/mage
+        make -C ${{ env.BEAT_MODULE }} check

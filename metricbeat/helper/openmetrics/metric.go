@@ -24,7 +24,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 )
 
 // MetricMap defines the mapping from Openmetrics metric to a Metricbeat field
@@ -36,7 +39,7 @@ type MetricMap interface {
 	GetField() string
 
 	// GetValue returns the resulting value
-	GetValue(m *OpenMetric) interface{}
+	GetValue(m *prometheus.OpenMetric) interface{}
 	GetNilValue() interface{}
 
 	// GetConfiguration returns the configuration for the metric
@@ -69,13 +72,13 @@ type Configuration struct {
 	MetricProcessingOptions []MetricOption
 	// ExtraFields is used to add fields to the
 	// event where this metric is included
-	ExtraFields common.MapStr
+	ExtraFields mapstr.M
 }
 
 // MetricOption adds settings to Metric objects behavior
 type MetricOption interface {
 	// Process a tuple of field, value and labels from a metric, return the same tuple updated
-	Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr)
+	Process(field string, value interface{}, labels mapstr.M) (string, interface{}, mapstr.M)
 }
 
 // OpFilterMap only processes metrics matching the given filter
@@ -206,7 +209,7 @@ func (m *commonMetric) GetNilValue() interface{} {
 }
 
 // GetValue returns the resulting value
-func (m *commonMetric) GetValue(metric *OpenMetric) interface{} {
+func (m *commonMetric) GetValue(metric *prometheus.OpenMetric) interface{} {
 	info := metric.GetInfo()
 	if info != nil {
 		if info.HasValidValue() {
@@ -244,14 +247,14 @@ func (m *commonMetric) GetValue(metric *OpenMetric) interface{} {
 
 	summary := metric.GetSummary()
 	if summary != nil {
-		value := common.MapStr{}
+		value := mapstr.M{}
 		if !math.IsNaN(summary.GetSampleSum()) && !math.IsInf(summary.GetSampleSum(), 0) {
 			value["sum"] = summary.GetSampleSum()
 			value["count"] = summary.GetSampleCount()
 		}
 
 		quantiles := summary.GetQuantile()
-		percentileMap := common.MapStr{}
+		percentileMap := mapstr.M{}
 		for _, quantile := range quantiles {
 			if !math.IsNaN(quantile.GetValue()) && !math.IsInf(quantile.GetValue(), 0) {
 				key := strconv.FormatFloat(100*quantile.GetQuantile(), 'f', -1, 64)
@@ -268,14 +271,14 @@ func (m *commonMetric) GetValue(metric *OpenMetric) interface{} {
 
 	histogram := metric.GetHistogram()
 	if histogram != nil {
-		value := common.MapStr{}
+		value := mapstr.M{}
 		if !math.IsNaN(histogram.GetSampleSum()) && !math.IsInf(histogram.GetSampleSum(), 0) {
 			value["sum"] = histogram.GetSampleSum()
 			value["count"] = histogram.GetSampleCount()
 		}
 
 		buckets := histogram.GetBucket()
-		bucketMap := common.MapStr{}
+		bucketMap := mapstr.M{}
 		for _, bucket := range buckets {
 			if bucket.GetCumulativeCount() != uint64(math.NaN()) && bucket.GetCumulativeCount() != uint64(math.Inf(0)) {
 				key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
@@ -292,14 +295,14 @@ func (m *commonMetric) GetValue(metric *OpenMetric) interface{} {
 
 	gaugehistogram := metric.GetGaugeHistogram()
 	if gaugehistogram != nil {
-		value := common.MapStr{}
+		value := mapstr.M{}
 		if !math.IsNaN(gaugehistogram.GetSampleSum()) && !math.IsInf(gaugehistogram.GetSampleSum(), 0) {
 			value["gsum"] = gaugehistogram.GetSampleSum()
 			value["gcount"] = gaugehistogram.GetSampleCount()
 		}
 
 		buckets := gaugehistogram.GetBucket()
-		bucketMap := common.MapStr{}
+		bucketMap := mapstr.M{}
 		for _, bucket := range buckets {
 			if bucket.GetCumulativeCount() != uint64(math.NaN()) && bucket.GetCumulativeCount() != uint64(math.Inf(0)) {
 				key := strconv.FormatFloat(bucket.GetUpperBound(), 'f', -1, 64)
@@ -324,7 +327,7 @@ type keywordMetric struct {
 }
 
 // GetValue returns the resulting value
-func (m *keywordMetric) GetValue(metric *OpenMetric) interface{} {
+func (m *keywordMetric) GetValue(metric *prometheus.OpenMetric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil && gauge.GetValue() == 1 {
 		return m.keyword
 	}
@@ -336,7 +339,7 @@ type booleanMetric struct {
 }
 
 // GetValue returns the resulting value
-func (m *booleanMetric) GetValue(metric *OpenMetric) interface{} {
+func (m *booleanMetric) GetValue(metric *prometheus.OpenMetric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil {
 		return gauge.GetValue() == 1
 	}
@@ -349,14 +352,14 @@ type labelMetric struct {
 }
 
 // GetValue returns the resulting value
-func (m *labelMetric) GetValue(metric *OpenMetric) interface{} {
+func (m *labelMetric) GetValue(metric *prometheus.OpenMetric) interface{} {
 	if gauge := metric.GetGauge(); gauge != nil && gauge.GetValue() == 1 {
 		return getLabel(metric, m.label)
 	}
 	return nil
 }
 
-func getLabel(metric *OpenMetric, name string) string {
+func getLabel(metric *prometheus.OpenMetric, name string) string {
 	for _, label := range metric.GetLabel() {
 		if label.Name == name {
 			return label.Value
@@ -370,7 +373,7 @@ type infoMetric struct {
 }
 
 // GetValue returns the resulting value
-func (m *infoMetric) GetValue(metric *OpenMetric) interface{} {
+func (m *infoMetric) GetValue(metric *prometheus.OpenMetric) interface{} {
 	return ""
 }
 
@@ -388,7 +391,7 @@ type opFilterMap struct {
 // Check whether the value of the specified label is allowed and, if yes, return the metric via the specified mapped field
 // Else, if the specified label does not match the filter, return nil
 // This is useful in cases where multiple Metricbeat fields need to be defined per Openmetrics metric, based on label values
-func (o opFilterMap) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+func (o opFilterMap) Process(field string, value interface{}, labels mapstr.M) (string, interface{}, mapstr.M) {
 	for k, v := range o.filterMap {
 		if labels[o.label] == k {
 			return fmt.Sprintf("%v.%v", field, v), value, labels
@@ -400,7 +403,7 @@ func (o opFilterMap) Process(field string, value interface{}, labels common.MapS
 type opLowercaseValue struct{}
 
 // Process will lowercase the given value if it's a string
-func (o opLowercaseValue) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+func (o opLowercaseValue) Process(field string, value interface{}, labels mapstr.M) (string, interface{}, mapstr.M) {
 	if val, ok := value.(string); ok {
 		value = strings.ToLower(val)
 	}
@@ -412,12 +415,12 @@ type opMultiplyBuckets struct {
 }
 
 // Process will multiply the bucket labels if it is an histogram with numeric labels
-func (o opMultiplyBuckets) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
-	histogram, ok := value.(common.MapStr)
+func (o opMultiplyBuckets) Process(field string, value interface{}, labels mapstr.M) (string, interface{}, mapstr.M) {
+	histogram, ok := value.(mapstr.M)
 	if !ok {
 		return field, value, labels
 	}
-	bucket, ok := histogram["bucket"].(common.MapStr)
+	bucket, ok := histogram["bucket"].(mapstr.M)
 	if !ok {
 		return field, value, labels
 	}
@@ -425,7 +428,7 @@ func (o opMultiplyBuckets) Process(field string, value interface{}, labels commo
 	if !ok {
 		return field, value, labels
 	}
-	multiplied := common.MapStr{}
+	multiplied := mapstr.M{}
 	for k, v := range bucket {
 		if f, err := strconv.ParseFloat(k, 64); err == nil {
 			key := strconv.FormatFloat(f*o.multiplier, 'f', -1, 64)
@@ -444,7 +447,7 @@ type opSetNumericMetricSuffix struct {
 }
 
 // Process will extend the field's name with the given suffix
-func (o opSetNumericMetricSuffix) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+func (o opSetNumericMetricSuffix) Process(field string, value interface{}, labels mapstr.M) (string, interface{}, mapstr.M) {
 	_, ok := value.(float64)
 	if !ok {
 		return field, value, labels
@@ -457,7 +460,7 @@ type opUnixTimestampValue struct {
 }
 
 // Process converts a value in seconds into an unix time
-func (o opUnixTimestampValue) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+func (o opUnixTimestampValue) Process(field string, value interface{}, labels mapstr.M) (string, interface{}, mapstr.M) {
 	return field, common.Time(time.Unix(int64(value.(float64)), 0)), labels
 }
 
@@ -475,7 +478,7 @@ type opLabelKeyPrefixRemover struct {
 // For each label, if the key is found a new key will be created hosting the same value and the
 // old key will be deleted.
 // Fields, values and not prefixed labels will remain unmodified.
-func (o opLabelKeyPrefixRemover) Process(field string, value interface{}, labels common.MapStr) (string, interface{}, common.MapStr) {
+func (o opLabelKeyPrefixRemover) Process(field string, value interface{}, labels mapstr.M) (string, interface{}, mapstr.M) {
 	renameKeys := []string{}
 	for k := range labels {
 		if len(k) < len(o.Prefix) {

@@ -27,6 +27,7 @@ type config struct {
 	SQSScript           *scriptConfig        `config:"sqs.notification_parsing_script"`
 	MaxNumberOfMessages int                  `config:"max_number_of_messages"`
 	QueueURL            string               `config:"queue_url"`
+	RegionName          string               `config:"region"`
 	BucketARN           string               `config:"bucket_arn"`
 	NonAWSBucketName    string               `config:"non_aws_bucket_name"`
 	BucketListInterval  time.Duration        `config:"bucket_list_interval"`
@@ -37,6 +38,7 @@ type config struct {
 	ReaderConfig        readerConfig         `config:",inline"` // Reader options to apply when no file_selectors are used.
 	PathStyle           bool                 `config:"path_style"`
 	ProviderOverride    string               `config:"provider"`
+	BackupConfig        backupConfig         `config:",inline"`
 }
 
 func defaultConfig() config {
@@ -98,16 +100,50 @@ func (c *config) Validate() error {
 	}
 
 	if c.AWSConfig.FIPSEnabled && c.NonAWSBucketName != "" {
-		return errors.New("fips_enabled cannot be used with a non-AWS S3 bucket.")
+		return errors.New("fips_enabled cannot be used with a non-AWS S3 bucket")
 	}
-	if c.PathStyle && c.NonAWSBucketName == "" {
-		return errors.New("path_style can only be used when polling non-AWS S3 services")
+	if c.PathStyle && c.NonAWSBucketName == "" && c.QueueURL == "" {
+		return errors.New("path_style can only be used when polling non-AWS S3 services or SQS/SNS QueueURL")
 	}
 	if c.ProviderOverride != "" && c.NonAWSBucketName == "" {
-		return errors.New("provider can only be overriden when polling non-AWS S3 services")
+		return errors.New("provider can only be overridden when polling non-AWS S3 services")
+	}
+	if c.BackupConfig.NonAWSBackupToBucketName != "" && c.NonAWSBucketName == "" {
+		return errors.New("backup to non-AWS bucket can only be used for non-AWS sources")
+	}
+	if c.BackupConfig.BackupToBucketArn != "" && c.BucketARN == "" {
+		return errors.New("backup to AWS bucket can only be used for AWS sources")
+	}
+	if c.BackupConfig.BackupToBucketArn != "" && c.BackupConfig.NonAWSBackupToBucketName != "" {
+		return errors.New("backup_to_bucket_arn and non_aws_backup_to_bucket_name cannot be used together")
+	}
+	if c.BackupConfig.GetBucketName() != "" && c.QueueURL == "" {
+		if (c.BackupConfig.BackupToBucketArn != "" && c.BackupConfig.BackupToBucketArn == c.BucketARN) ||
+			(c.BackupConfig.NonAWSBackupToBucketName != "" && c.BackupConfig.NonAWSBackupToBucketName == c.NonAWSBucketName) {
+			if c.BackupConfig.BackupToBucketPrefix == "" {
+				return errors.New("backup_to_bucket_prefix is a required property when source and backup bucket are the same")
+			}
+			if c.BackupConfig.BackupToBucketPrefix == c.BucketListPrefix {
+				return errors.New("backup_to_bucket_prefix cannot be the same as bucket_list_prefix, this will create an infinite loop")
+			}
+		}
 	}
 
 	return nil
+}
+
+type backupConfig struct {
+	BackupToBucketArn        string `config:"backup_to_bucket_arn"`
+	NonAWSBackupToBucketName string `config:"non_aws_backup_to_bucket_name"`
+	BackupToBucketPrefix     string `config:"backup_to_bucket_prefix"`
+	Delete                   bool   `config:"delete_after_backup"`
+}
+
+func (c *backupConfig) GetBucketName() string {
+	if c.BackupToBucketArn != "" {
+		return getBucketNameFromARN(c.BackupToBucketArn)
+	}
+	return c.NonAWSBackupToBucketName
 }
 
 // fileSelectorConfig defines reader configuration that applies to a subset
@@ -127,6 +163,7 @@ type readerConfig struct {
 	LineTerminator           readfile.LineTerminator `config:"line_terminator"`
 	MaxBytes                 cfgtype.ByteSize        `config:"max_bytes"`
 	Parsers                  parser.Config           `config:",inline"`
+	Decoding                 decoderConfig           `config:"decoding"`
 }
 
 func (rc *readerConfig) Validate() error {

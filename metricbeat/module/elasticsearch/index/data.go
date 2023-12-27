@@ -22,13 +22,12 @@ import (
 	"fmt"
 
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/elasticsearch"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Based on https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L127-L203
@@ -49,7 +48,8 @@ type Index struct {
 
 type primaries struct {
 	Docs struct {
-		Count int `json:"count"`
+		Count   int `json:"count"`
+		Deleted int `json:"deleted"`
 	} `json:"docs"`
 	Indexing struct {
 		IndexTotal           int `json:"index_total"`
@@ -60,22 +60,50 @@ type primaries struct {
 		TotalSizeInBytes int `json:"total_size_in_bytes"`
 	} `json:"merges"`
 	Segments struct {
-		Count int `json:"count"`
+		Count                     int `json:"count"`
+		MemoryInBytes             int `json:"memory_in_bytes"`
+		TermsMemoryInBytes        int `json:"terms_memory_in_bytes"`
+		StoredFieldsMemoryInBytes int `json:"stored_fields_memory_in_bytes"`
+		TermVectorsMemoryInBytes  int `json:"term_vectors_memory_in_bytes"`
+		NormsMemoryInBytes        int `json:"norms_memory_in_bytes"`
+		PointsMemoryInBytes       int `json:"points_memory_in_bytes"`
+		DocValuesMemoryInBytes    int `json:"doc_values_memory_in_bytes"`
+		IndexWriterMemoryInBytes  int `json:"index_writer_memory_in_bytes"`
+		VersionMapMemoryInBytes   int `json:"version_map_memory_in_bytes"`
+		FixedBitSetMemoryInBytes  int `json:"fixed_bit_set_memory_in_bytes"`
 	} `json:"segments"`
 	Store struct {
 		SizeInBytes int `json:"size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
-		TotalTimeInMillis int `json:"total_time_in_millis"`
+		TotalTimeInMillis         int `json:"total_time_in_millis"`
+		ExternalTotalTimeInMillis int `json:"external_total_time_in_millis"`
 	} `json:"refresh"`
+	QueryCache struct {
+		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		HitCount          int `json:"hit_count"`
+		MissCount         int `json:"miss_count"`
+	} `json:"query_cache"`
+	RequestCache struct {
+		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		HitCount          int `json:"hit_count"`
+		MissCount         int `json:"miss_count"`
+		Evictions         int `json:"evictions"`
+	} `json:"request_cache"`
+	Search struct {
+		QueryTotal        int `json:"query_total"`
+		QueryTimeInMillis int `json:"query_time_in_millis"`
+	} `json:"search"`
 }
 
 type total struct {
 	Docs struct {
-		Count int `json:"count"`
+		Count   int `json:"count"`
+		Deleted int `json:"deleted"`
 	} `json:"docs"`
 	FieldData struct {
 		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		Evictions         int `json:"evictions"`
 	} `json:"fielddata"`
 	Indexing struct {
 		IndexTotal           int `json:"index_total"`
@@ -107,8 +135,21 @@ type total struct {
 		SizeInBytes int `json:"size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
-		TotalTimeInMillis int `json:"total_time_in_millis"`
+		TotalTimeInMillis         int `json:"total_time_in_millis"`
+		ExternalTotalTimeInMillis int `json:"external_total_time_in_millis"`
 	} `json:"refresh"`
+	QueryCache struct {
+		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		HitCount          int `json:"hit_count"`
+		MissCount         int `json:"miss_count"`
+		Evictions         int `json:"evictions"`
+	} `json:"query_cache"`
+	RequestCache struct {
+		MemorySizeInBytes int `json:"memory_size_in_bytes"`
+		HitCount          int `json:"hit_count"`
+		MissCount         int `json:"miss_count"`
+		Evictions         int `json:"evictions"`
+	} `json:"request_cache"`
 }
 
 type shardStats struct {
@@ -140,23 +181,23 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 	clusterStateMetrics := []string{"routing_table"}
 	clusterState, err := elasticsearch.GetClusterState(httpClient, httpClient.GetURI(), clusterStateMetrics)
 	if err != nil {
-		return errors.Wrap(err, "failure retrieving cluster state from Elasticsearch")
+		return fmt.Errorf("failure retrieving cluster state from Elasticsearch: %w", err)
 	}
 
 	var indicesStats stats
 	if err := parseAPIResponse(content, &indicesStats); err != nil {
-		return errors.Wrap(err, "failure parsing Indices Stats Elasticsearch API response")
+		return fmt.Errorf("failure parsing Indices Stats Elasticsearch API response: %w", err)
 	}
 
 	indicesSettings, err := elasticsearch.GetIndicesSettings(httpClient, httpClient.GetURI())
 	if err != nil {
-		return errors.Wrap(err, "failure retrieving indices settings from Elasticsearch")
+		return fmt.Errorf("failure retrieving indices settings from Elasticsearch: %w", err)
 	}
 
 	var errs multierror.Errors
 	for name, idx := range indicesStats.Indices {
 		event := mb.Event{
-			ModuleFields: common.MapStr{},
+			ModuleFields: mapstr.M{},
 		}
 		idx.Index = name
 
@@ -167,7 +208,7 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 
 		err = addClusterStateFields(&idx, clusterState)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure adding cluster state fields"))
+			errs = append(errs, fmt.Errorf("failure adding cluster state fields: %w", err))
 			continue
 		}
 
@@ -178,12 +219,12 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		// metricset level
 		indexBytes, err := json.Marshal(idx)
 		if err != nil {
-			errs = append(errs, errors.Wrap(err, "failure trying to convert metrics results to JSON"))
+			errs = append(errs, fmt.Errorf("failure trying to convert metrics results to JSON: %w", err))
 			continue
 		}
-		var indexOutput common.MapStr
+		var indexOutput mapstr.M
 		if err = json.Unmarshal(indexBytes, &indexOutput); err != nil {
-			errs = append(errs, errors.Wrap(err, "failure trying to convert JSON metrics back to mapstr"))
+			errs = append(errs, fmt.Errorf("failure trying to convert JSON metrics back to mapstr: %w", err))
 			continue
 		}
 
@@ -210,15 +251,15 @@ func parseAPIResponse(content []byte, indicesStats *stats) error {
 
 // Fields added here are based on same fields being added by internal collection in
 // https://github.com/elastic/elasticsearch/blob/master/x-pack/plugin/monitoring/src/main/java/org/elasticsearch/xpack/monitoring/collector/indices/IndexStatsMonitoringDoc.java#L62-L124
-func addClusterStateFields(idx *Index, clusterState common.MapStr) error {
+func addClusterStateFields(idx *Index, clusterState mapstr.M) error {
 	indexRoutingTable, err := getClusterStateMetricForIndex(clusterState, idx.Index, "routing_table")
 	if err != nil {
-		return errors.Wrap(err, "failed to get index routing table from cluster state")
+		return fmt.Errorf("failed to get index routing table from cluster state: %w", err)
 	}
 
 	shards, err := getShardsFromRoutingTable(indexRoutingTable)
 	if err != nil {
-		return errors.Wrap(err, "failed to get shards from routing table")
+		return fmt.Errorf("failed to get shards from routing table: %w", err)
 	}
 
 	// "index_stats.version.created", <--- don't think this is being used in the UI, so can we skip it?
@@ -226,30 +267,30 @@ func addClusterStateFields(idx *Index, clusterState common.MapStr) error {
 
 	status, err := getIndexStatus(shards)
 	if err != nil {
-		return errors.Wrap(err, "failed to get index status")
+		return fmt.Errorf("failed to get index status: %w", err)
 	}
 	idx.Status = status
 
 	shardStats, err := getIndexShardStats(shards)
 	if err != nil {
-		return errors.Wrap(err, "failed to get index shard stats")
+		return fmt.Errorf("failed to get index shard stats: %w", err)
 	}
 	idx.Shards = *shardStats
 	return nil
 }
 
-func getClusterStateMetricForIndex(clusterState common.MapStr, index, metricKey string) (common.MapStr, error) {
+func getClusterStateMetricForIndex(clusterState mapstr.M, index, metricKey string) (mapstr.M, error) {
 	fieldKey := metricKey + ".indices." + index
 	value, err := clusterState.GetValue(fieldKey)
 	if err != nil {
-		return nil, errors.Wrap(err, "'"+fieldKey+"'")
+		return nil, fmt.Errorf("'"+fieldKey+"': %w", err)
 	}
 
 	metric, ok := value.(map[string]interface{})
 	if !ok {
 		return nil, elastic.MakeErrorForMissingField(fieldKey, elastic.Elasticsearch)
 	}
-	return common.MapStr(metric), nil
+	return mapstr.M(metric), nil
 }
 
 func getIndexStatus(shards map[string]interface{}) (string, error) {
@@ -273,7 +314,7 @@ func getIndexStatus(shards map[string]interface{}) (string, error) {
 				return "", fmt.Errorf("%v.shards[%v] is not a map", indexName, shardIdx)
 			}
 
-			shard := common.MapStr(s)
+			shard := mapstr.M(s)
 
 			isPrimary := shard["primary"].(bool)
 			state := shard["state"].(string)
@@ -297,7 +338,7 @@ func getIndexStatus(shards map[string]interface{}) (string, error) {
 	return "red", nil
 }
 
-func getIndexShardStats(shards common.MapStr) (*shardStats, error) {
+func getIndexShardStats(shards mapstr.M) (*shardStats, error) {
 	primaries := 0
 	replicas := 0
 
@@ -322,7 +363,7 @@ func getIndexShardStats(shards common.MapStr) (*shardStats, error) {
 				return nil, fmt.Errorf("%v.shards[%v] is not a map", indexName, shardIdx)
 			}
 
-			shard := common.MapStr(s)
+			shard := mapstr.M(s)
 
 			isPrimary := shard["primary"].(bool)
 			state := shard["state"].(string)
@@ -369,7 +410,7 @@ func getIndexShardStats(shards common.MapStr) (*shardStats, error) {
 	}, nil
 }
 
-func getShardsFromRoutingTable(indexRoutingTable common.MapStr) (map[string]interface{}, error) {
+func getShardsFromRoutingTable(indexRoutingTable mapstr.M) (map[string]interface{}, error) {
 	s, err := indexRoutingTable.GetValue("shards")
 	if err != nil {
 		return nil, err

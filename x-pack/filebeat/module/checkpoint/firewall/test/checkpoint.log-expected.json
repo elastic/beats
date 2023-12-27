@@ -10,7 +10,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.sequence": 1,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 0,
@@ -37,7 +37,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.sequence": 2,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 345,
@@ -64,7 +64,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.sequence": 2,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 690,
@@ -100,7 +100,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 1,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -112,6 +112,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -157,7 +158,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 2,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -169,6 +170,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -212,7 +214,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 3,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -224,6 +226,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -271,7 +274,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 4,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -283,6 +286,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -326,7 +330,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 5,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -338,6 +342,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -383,7 +388,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 6,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -395,6 +400,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -438,7 +444,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 7,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -450,6 +456,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -495,7 +502,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 8,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -507,6 +514,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -550,7 +558,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 9,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -562,6 +570,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -609,7 +618,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 11,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -621,6 +630,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -664,7 +674,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 12,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -676,6 +686,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -721,7 +732,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 13,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -733,6 +744,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -776,7 +788,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 14,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -788,6 +800,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -833,7 +846,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 15,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -845,6 +858,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -888,7 +902,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 16,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -900,6 +914,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -947,7 +962,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 17,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -959,6 +974,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1002,7 +1018,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 18,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1014,6 +1030,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1059,7 +1076,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 19,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1071,6 +1088,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1114,7 +1132,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 20,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1126,6 +1144,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1171,7 +1190,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 21,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1183,6 +1202,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1226,7 +1246,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 1,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1238,6 +1258,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1283,7 +1304,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 2,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1295,6 +1316,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1338,7 +1360,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 3,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1350,6 +1372,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1395,7 +1418,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 4,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1407,6 +1430,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1450,7 +1474,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 6,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1462,6 +1486,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1509,7 +1534,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 7,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1521,6 +1546,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1564,7 +1590,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 8,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1576,6 +1602,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1621,7 +1648,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 9,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1633,6 +1660,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1676,7 +1704,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 10,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1688,6 +1716,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1733,7 +1762,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 11,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1745,6 +1774,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1788,7 +1818,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 12,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1800,6 +1830,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1847,7 +1878,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 13,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1859,6 +1890,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1902,7 +1934,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 15,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1914,6 +1946,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -1959,7 +1992,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 16,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -1971,6 +2004,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2014,7 +2048,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 17,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2026,6 +2060,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2070,7 +2105,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 22,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 30157,
@@ -2119,7 +2154,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 18,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2131,6 +2166,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2166,7 +2202,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.sequence": 2,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 31650,
@@ -2204,7 +2240,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 1,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2216,6 +2252,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2259,7 +2296,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 2,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2271,6 +2308,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2313,7 +2351,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 3,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2325,6 +2363,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2367,7 +2406,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 4,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2379,6 +2418,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2424,7 +2464,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 5,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2436,6 +2476,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2479,7 +2520,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 6,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2491,6 +2532,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2536,7 +2578,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 7,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2548,6 +2590,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2591,7 +2634,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 1,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2603,6 +2646,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2650,7 +2694,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 2,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2662,6 +2706,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2705,7 +2750,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 3,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2717,6 +2762,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2762,7 +2808,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 4,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2774,6 +2820,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2817,7 +2864,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 5,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2829,6 +2876,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2874,7 +2922,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 6,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2886,6 +2934,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2929,7 +2978,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 7,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -2941,6 +2990,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -2988,7 +3038,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 8,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3000,6 +3050,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3045,7 +3096,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 8,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 44652,
@@ -3091,7 +3142,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 10,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3103,6 +3154,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3148,7 +3200,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 11,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3160,6 +3212,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3203,7 +3256,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 12,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3215,6 +3268,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3260,7 +3314,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 13,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3272,6 +3326,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3315,7 +3370,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 1,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3327,6 +3382,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3374,7 +3430,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 2,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3386,6 +3442,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3429,7 +3486,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 4,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3441,6 +3498,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3486,7 +3544,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 5,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3498,6 +3556,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3541,7 +3600,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 6,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3553,6 +3612,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3598,7 +3658,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 7,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3610,6 +3670,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3658,7 +3719,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 1,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3670,6 +3731,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3713,7 +3775,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 2,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3725,6 +3787,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3767,7 +3830,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 4,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3779,6 +3842,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3824,7 +3888,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 5,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3836,6 +3900,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3879,7 +3944,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 6,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3891,6 +3956,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3936,7 +4002,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 7,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -3948,6 +4014,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -3982,7 +4049,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.sequence": 1,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 58627,
@@ -4009,7 +4076,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.sequence": 2,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 58971,
@@ -4036,7 +4103,7 @@
         "event.kind": "event",
         "event.module": "checkpoint",
         "event.sequence": 4,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "fileset.name": "firewall",
         "input.type": "log",
         "log.offset": 59316,
@@ -4075,7 +4142,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 1,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4087,6 +4154,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4130,7 +4198,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 2,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4142,6 +4210,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4184,7 +4253,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 3,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4196,6 +4265,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4243,7 +4313,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 4,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4255,6 +4325,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4298,7 +4369,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 5,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4310,6 +4381,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4355,7 +4427,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 6,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4367,6 +4439,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4410,7 +4483,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 7,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4422,6 +4495,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4467,7 +4541,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 8,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4479,6 +4553,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4522,7 +4597,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 9,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4534,6 +4609,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4581,7 +4657,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 10,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4593,6 +4669,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4636,7 +4713,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 1,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4648,6 +4725,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4693,7 +4771,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 2,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4705,6 +4783,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4748,7 +4827,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 3,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4760,6 +4839,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4805,7 +4885,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 4,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4817,6 +4897,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4860,7 +4941,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 5,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4872,6 +4953,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4919,7 +5001,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 6,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4931,6 +5013,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -4974,7 +5057,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 8,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -4986,6 +5069,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -5031,7 +5115,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 9,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -5043,6 +5127,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -5086,7 +5171,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 10,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -5098,6 +5183,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -5143,7 +5229,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 11,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -5155,6 +5241,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -5198,7 +5285,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 12,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -5210,6 +5297,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -5257,7 +5345,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 13,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -5269,6 +5357,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -5312,7 +5401,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 1,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -5324,6 +5413,7 @@
         "network.direction": "outbound",
         "network.iana_number": "17",
         "network.name": "Network",
+        "network.transport": "udp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",
@@ -5369,7 +5459,7 @@
         "event.module": "checkpoint",
         "event.outcome": "success",
         "event.sequence": 2,
-        "event.timezone": "-02:00",
+        "event.timezone": "UTC",
         "event.type": [
             "allowed",
             "connection"
@@ -5381,6 +5471,7 @@
         "network.direction": "outbound",
         "network.iana_number": "6",
         "network.name": "Network",
+        "network.transport": "tcp",
         "observer.egress.interface.name": "eth0",
         "observer.egress.zone": "Internal",
         "observer.ingress.zone": "Local",

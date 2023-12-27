@@ -17,7 +17,6 @@
 
 // skipping tests on windows 32 bit versions, not supported
 //go:build !integration && !windows && !386
-// +build !integration,!windows,!386
 
 package apiserver
 
@@ -29,25 +28,12 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
-const testFile = "_meta/test/metrics"
-
-func TestEventMappingV1_14(t *testing.T) {
+func TestEventMappingV2_0(t *testing.T) {
 	ptest.TestMetricSet(t, "kubernetes", "apiserver",
 		ptest.TestCases{
-			{
-				MetricsFile:  "./_meta/test/metrics.1.14",
-				ExpectedFile: "./_meta/test/metrics.1.14.expected",
-			},
-		},
-	)
-}
-
-func TestEventMappingV1_8(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", "apiserver",
-		ptest.TestCases{
-			{
-				MetricsFile:  "./_meta/test/metrics.1.8",
-				ExpectedFile: "./_meta/test/metrics.1.8.expected",
+			ptest.TestCase{
+				MetricsFile:  "./_meta/test/metrics.2.0",
+				ExpectedFile: "./_meta/test/metrics.2.0.expected",
 			},
 		},
 	)

@@ -19,6 +19,7 @@ remove_timestamp = {
     "cef.log",
     "cisco.asa",
     "cisco.ios",
+    "cisco.nexus",
     "citrix.netscaler",
     "cylance.protect",
     "f5.bigipafm",
@@ -339,7 +340,7 @@ def delete_key(obj, key):
 
 
 def file_contains(filepath, strings):
-    with open(filepath, 'r') as file:
+    with open(filepath, 'r', encoding="utf-8") as file:
         for line in file:
             for string in strings:
                 if string in line:

@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/rabbitmq/_meta/docs.asciidoc
+
 [[filebeat-module-rabbitmq]]
 :modulename: rabbitmq
 :has-dashboards: false
@@ -11,6 +13,7 @@ This file is generated! See scripts/docs_collector.py
 include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 This is the module for parsing https://www.rabbitmq.com/logging.html[RabbitMQ log files]
+It will only support RabbitMQ default i.e RFC 3339 timestamp format using TIMESTAMP_ISO8601.
 
 include::../include/what-happens.asciidoc[]
 
@@ -69,3 +72,4 @@ include::../include/timezone-support.asciidoc[]
 For a description of each field in the module, see the
 <<exported-fields-rabbitmq,exported fields>> section.
 
+:edit_url!:

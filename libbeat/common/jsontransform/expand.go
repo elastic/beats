@@ -21,10 +21,22 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+// ExpandFields de-dots the keys in m by expanding them in-place into a
+// nested object structure, merging objects as necessary. If there are any
+// conflicts (i.e. a common prefix where one field is an object and another
+// is a non-object), an error key is added to the event if add_error_key
+// is enabled.
+func ExpandFields(logger *logp.Logger, event *beat.Event, m mapstr.M, addErrorKey bool) {
+	if err := expandFields(m); err != nil {
+		logger.Errorf("JSON: failed to expand fields: %s", err)
+		event.SetErrorWithOption(err.Error(), addErrorKey, "", "")
+	}
+}
 
 // expandFields de-dots the keys in m by expanding them in-place into a
 // nested object structure, merging objects as necessary. If there are any
@@ -33,12 +45,12 @@ import (
 //
 // Note that expandFields is destructive, and in the case of an error the
 // map may be left in a semi-expanded state.
-func expandFields(m common.MapStr) error {
+func expandFields(m mapstr.M) error {
 	for k, v := range m {
 		newMap, newIsMap := getMap(v)
 		if newIsMap {
 			if err := expandFields(newMap); err != nil {
-				return errors.Wrapf(err, "error expanding %q", k)
+				return fmt.Errorf("error expanding %q: %w", k, err)
 			}
 		}
 		if dot := strings.IndexRune(k, '.'); dot < 0 {
@@ -55,7 +67,7 @@ func expandFields(m common.MapStr) error {
 		old, err := m.Put(k, v)
 		if err != nil {
 			// Put will return an error if we attempt to insert into a non-object value.
-			return fmt.Errorf("cannot expand %q: found conflicting key", k)
+			return fmt.Errorf("cannot expand %q: found conflicting key: %w", k, err)
 		}
 		if old == nil {
 			continue
@@ -68,7 +80,7 @@ func expandFields(m common.MapStr) error {
 				return fmt.Errorf("cannot expand %q: found conflicting key", k)
 			}
 			if err := mergeObjects(newMap, oldMap); err != nil {
-				return errors.Wrapf(err, "cannot expand %q", k)
+				return fmt.Errorf("cannot expand %q: %w", k, err)
 			}
 		}
 	}
@@ -81,7 +93,7 @@ func expandFields(m common.MapStr) error {
 // objects with the same key in each object. If there exist
 // two entries with the same key in each object which
 // are not both objects, then an error will result.
-func mergeObjects(lhs, rhs common.MapStr) error {
+func mergeObjects(lhs, rhs mapstr.M) error {
 	for k, rhsValue := range rhs {
 		lhsValue, ok := lhs[k]
 		if !ok {
@@ -97,7 +109,7 @@ func mergeObjects(lhs, rhs common.MapStr) error {
 			return fmt.Errorf("cannot merge %q: found (%T) value", k, rhsValue)
 		}
 		if err := mergeObjects(lhsMap, rhsMap); err != nil {
-			return errors.Wrapf(err, "cannot merge %q", k)
+			return fmt.Errorf("cannot merge %q: %w", k, err)
 		}
 	}
 	return nil
@@ -107,7 +119,7 @@ func getMap(v interface{}) (map[string]interface{}, bool) {
 	switch v := v.(type) {
 	case map[string]interface{}:
 		return v, true
-	case common.MapStr:
+	case mapstr.M:
 		return v, true
 	}
 	return nil, false

@@ -65,8 +65,7 @@ Listing of the S3 bucket will be polled according the time interval defined by
 The `aws-s3` input can also poll 3rd party S3 compatible services such as the self hosted Minio.
 Using non-AWS S3 compatible buckets requires the use of `access_key_id` and `secret_access_key` for authentication.
 To specify the S3 bucket name, use the `non_aws_bucket_name` config and the `endpoint` must be set to replace the default API endpoint.
-`endpoint` should be a full URI in the form of `https(s)://<s3 endpoint>`, that will be used as the API endpoint of the service, or a single domain.
-If a domain is provided, the full endpoint URI will be constructed with the region name in the standard form of `https://s3.<region>.<domain>` supported by AWS and several 3rd party providers.
+`endpoint` should be a full URI in the form of `https(s)://<s3 endpoint>` in the case of `non_aws_bucket_name`, that will be used as the API endpoint of the service.
 No `endpoint` is needed if using the native AWS S3 service hosted at `amazonaws.com`.
 Please see <<aws-credentials-config,Configuration parameters>> for alternate AWS domains that require a different endpoint.
 
@@ -116,13 +115,50 @@ it was uploaded. For example: `application/json`.
 The file encoding to use for reading data that contains international
 characters. This only applies to non-JSON logs. See <<_encoding_3>>.
 
+[id="input-{type}-decoding"]
+[float]
+==== `decoding`
+
+The file decoding option is used to specify a codec that will be used to
+decode the file contents. This can apply to any file stream data.  
+An example config is shown below:
+
+[source,yaml]
+----
+  decoding.codec.parquet.enabled: true
+----
+
+Currently supported codecs are given below:-
+
+    1. <<attrib-decoding-parquet,Parquet>>: This codec decodes parquet compressed data streams.
+ 
+[id="attrib-decoding-parquet"]
+[float]
+==== `the parquet codec`
+The `parquet` codec is used to decode parquet compressed data streams.
+Only enabling the codec will use the default codec options. The parquet codec supports
+two sub attributes which can make parquet decoding more efficient. The `batch_size` attribute and 
+the `process_parallel` attribute. The `batch_size` attribute can be used to specify the number of
+records to read from the parquet stream at a time. By default the `batch size` is set to `1` and 
+`process_parallel` is set to `false`. If the `process_parallel` attribute is set to `true` then functions 
+which read multiple columns will read those columns in parallel from the parquet stream with a 
+number of readers equal to the number of columns. Setting `process_parallel` to `true` will greatly
+increase the rate of processing at the cost of increased memory usage. Having a larger `batch_size`
+also helps to increase the rate of processing. An example config is shown below:
+
+[source,yaml]
+----
+  decoding.codec.parquet.enabled: true
+  decoding.codec.parquet.process_parallel: true
+  decoding.codec.parquet.batch_size: 1000
+----
 
 [float]
 ==== `expand_event_list_from_field`
 
 If the fileset using this input expects to receive multiple messages bundled
-under a specific field then the config option `expand_event_list_from_field`
-value can be assigned the name of the field. This setting will be able to split
+under a specific field or an array of objects then the config option `expand_event_list_from_field`
+value can be assigned the name of the field or `.[]`. This setting will be able to split
 the messages under the group value into separate events. For example, CloudTrail
 logs are in JSON format and events are found under the JSON object "Records".
 
@@ -144,6 +180,23 @@ logs are in JSON format and events are found under the JSON object "Records".
         }
     ]
 }
+----
+
+Or when `expand_event_list_from_field` is set to `.[]`, an array of objects will be split
+into separate events.
+
+["source","json"]
+----
+[
+   {
+      "id":"1234",
+      "message":"success"
+   },
+   {
+      "id":"5678",
+      "message":"failure"
+   }
+]
 ----
 
 Note: When `expand_event_list_from_field` parameter is given in the config,
@@ -257,6 +310,12 @@ configuring multiline options.
 ==== `queue_url`
 
 URL of the AWS SQS queue that messages will be received from. (Required when `bucket_arn` and `non_aws_bucket_name` are not set).
+
+[float]
+==== `region`
+
+The name of the AWS region of the end point. If this option is given it
+takes precedence over the region name obtained from the `queue_url` value.
 
 [float]
 ==== `visibility_timeout`
@@ -439,6 +498,34 @@ In order to make AWS API calls, `aws-s3` input requires AWS credentials. Please
 see <<aws-credentials-config,AWS credentials options>> for more details.
 
 [float]
+==== `backup_to_bucket_arn`
+
+The bucket ARN to backup processed files to. This will copy the processed file after it was fully read.
+When using the `non_aws_bucket_name`, please use `non_aws_backup_to_bucket_name` accordingly.
+
+Naming of the backed up files can be controlled with `backup_to_bucket_prefix`.
+
+[float]
+==== `backup_to_bucket_prefix`
+
+This prefix will be prepended to the object key when backing it up to another (or the same) bucket.
+
+[float]
+==== `non_aws_backup_to_bucket_name`
+
+The bucket name to backup processed files to. Use this parameter when not using AWS buckets. This will copy the processed file after it was fully read.
+When using the `bucket_arn`, please use `backup_to_bucket_arn` accordingly.
+
+Naming of the backed up files can be controlled with `backup_to_bucket_prefix`.
+
+[float]
+==== `delete_after_backup`
+
+Controls whether fully processed files will be deleted from the bucket.
+
+Can only be used together with the backup functionality.
+
+[float]
 === AWS Permissions
 
 Specific AWS permissions are required for IAM user to access SQS and S3
@@ -458,6 +545,21 @@ when using the polling list of S3 bucket objects:
 s3:GetObject
 s3:ListBucket
 s3:GetBucketLocation
+----
+
+In case `backup_to_bucket_arn` or `non_aws_backup_to_bucket_name` are set the following permission is required as well:
+----
+s3:PutObject
+----
+
+In case `delete_after_backup` is set the following permission is required as well:
+----
+s3:DeleteObject
+----
+
+In case optional SQS metric `sqs_messages_waiting_gauge` is desired, the following permission is required:
+----
+sqs:GetQueueAttributes
 ----
 
 [float]
@@ -684,7 +786,7 @@ Will produce the following output:
 === Metrics
 
 This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
-These metrics are exposed under the `/dataset` path. They can be used to
+These metrics are exposed under the `/inputs` path. They can be used to
 observe the activity of the input.
 
 [options="header"]
@@ -695,7 +797,10 @@ observe the activity of the input.
 | `sqs_messages_inflight_gauge`             | Number of SQS messages inflight (gauge).
 | `sqs_messages_returned_total`             | Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
 | `sqs_messages_deleted_total`              | Number of SQS messages deleted.
+| `sqs_messages_waiting_gauge`              | Number of SQS messages waiting in the SQS queue (gauge). The value is refreshed every minute via data from https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_GetQueueAttributes.html<GetQueueAttributes>. A value of `-1` indicates the metric is uninitialized or could not be collected due to an error.
+| `sqs_worker_utilization`                  | Rate of SQS worker utilization over previous 5 seconds. 0 indicates idle, 1 indicates all workers utilized.
 | `sqs_message_processing_time`             | Histogram of the elapsed SQS processing times in nanoseconds (time of receipt to time of delete/return).
+| `sqs_lag_time`                            | Histogram of the difference between the SQS SentTimestamp attribute and the time when the SQS message was received expressed in nanoseconds.
 | `s3_objects_requested_total`              | Number of S3 objects downloaded.
 | `s3_objects_listed_total`                 | Number of S3 objects returned by list operations.
 | `s3_objects_processed_total`              | Number of S3 objects that matched file_selectors rules.

@@ -20,24 +20,32 @@ type state struct {
 	Etag         string    `json:"etag" struct:"etag"`
 	LastModified time.Time `json:"last_modified" struct:"last_modified"`
 
+	// ListPrefix is used for unique of the key in the store for awsS3WriteCommitPrefix
+	ListPrefix string `json:"list_prefix" struct:"list_prefix"`
+
 	// A state has Stored = true when all events are ACKed.
 	Stored bool `json:"stored" struct:"stored"`
 	// A state has Error = true when ProcessS3Object returned an error
 	Error bool `json:"error" struct:"error"`
 }
 
+func stateID(bucket, key, etag string, lastModified time.Time) string {
+	return bucket + key + etag + lastModified.String()
+}
+
 // newState creates a new s3 object state
-func newState(bucket, key, etag string, lastModified time.Time) state {
+func newState(bucket, key, etag, listPrefix string, lastModified time.Time) state {
 	s := state{
 		Bucket:       bucket,
 		Key:          key,
 		LastModified: lastModified,
 		Etag:         etag,
+		ListPrefix:   listPrefix,
 		Stored:       false,
 		Error:        false,
 	}
 
-	s.ID = s.Bucket + s.Key + s.Etag + s.LastModified.String()
+	s.ID = stateID(s.Bucket, s.Key, s.Etag, s.LastModified)
 
 	return s
 }
@@ -50,6 +58,11 @@ func (s *state) MarkAsStored() {
 // MarkAsError set the error flag to true
 func (s *state) MarkAsError() {
 	s.Error = true
+}
+
+// IsProcessed checks if the state is either Stored or Error
+func (s *state) IsProcessed() bool {
+	return s.Stored || s.Error
 }
 
 // IsEqual checks if the two states point to the same s3 object.

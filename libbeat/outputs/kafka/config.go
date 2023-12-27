@@ -27,16 +27,16 @@ import (
 
 	"github.com/Shopify/sarama"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
-	"github.com/elastic/beats/v7/libbeat/monitoring/adapter"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 type backoffConfig struct {
@@ -56,7 +56,7 @@ type kafkaConfig struct {
 	Timeout            time.Duration             `config:"timeout"             validate:"min=1"`
 	Metadata           metaConfig                `config:"metadata"`
 	Key                *fmtstr.EventFormatString `config:"key"`
-	Partition          map[string]*common.Config `config:"partition"`
+	Partition          map[string]*config.C      `config:"partition"`
 	KeepAlive          time.Duration             `config:"keep_alive"          validate:"min=0"`
 	MaxMessageBytes    *int                      `config:"max_message_bytes"   validate:"min=1"`
 	RequiredACKs       *int                      `config:"required_acks"       validate:"min=-1"`
@@ -76,6 +76,7 @@ type kafkaConfig struct {
 	Codec              codec.Config              `config:"codec"`
 	Sasl               kafka.SaslConfig          `config:"sasl"`
 	EnableFAST         bool                      `config:"enable_krb5_fast"`
+	Queue              config.Namespace          `config:"queue"`
 }
 
 type metaConfig struct {
@@ -100,12 +101,6 @@ var compressionModes = map[string]sarama.CompressionCodec{
 	"lz4":    sarama.CompressionLZ4,
 	"snappy": sarama.CompressionSnappy,
 }
-
-const (
-	saslTypePlaintext   = sarama.SASLTypePlaintext
-	saslTypeSCRAMSHA256 = sarama.SASLTypeSCRAMSHA256
-	saslTypeSCRAMSHA512 = sarama.SASLTypeSCRAMSHA512
-)
 
 func defaultConfig() kafkaConfig {
 	return kafkaConfig{
@@ -143,7 +138,7 @@ func defaultConfig() kafkaConfig {
 	}
 }
 
-func readConfig(cfg *common.Config) (*kafkaConfig, error) {
+func readConfig(cfg *config.C) (*kafkaConfig, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, err

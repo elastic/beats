@@ -18,17 +18,16 @@
 package partition
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/Shopify/sarama"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/kafka"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the partition MetricSet with the central registry.
@@ -78,32 +77,32 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	broker, err := m.Connect()
 	if err != nil {
-		return errors.Wrap(err, "error in connect")
+		return fmt.Errorf("error in connect: %w", err)
 	}
 	defer broker.Close()
 
 	topics, err := broker.GetTopicsMetadata(m.topics...)
 	if err != nil {
-		return errors.Wrap(err, "error getting topic metadata")
+		return fmt.Errorf("error getting topic metadata: %w", err)
 	}
 	if len(topics) == 0 {
 		debugf("no topic could be read, check ACLs")
 		return nil
 	}
 
-	evtBroker := common.MapStr{
+	evtBroker := mapstr.M{
 		"id":      broker.ID(),
 		"address": broker.AdvertisedAddr(),
 	}
 
 	for _, topic := range topics {
 		debugf("fetch events for topic: ", topic.Name)
-		evtTopic := common.MapStr{
+		evtTopic := mapstr.M{
 			"name": topic.Name,
 		}
 
 		if topic.Err != 0 {
-			evtTopic["error"] = common.MapStr{
+			evtTopic["error"] = mapstr.M{
 				"code": topic.Err,
 			}
 		}
@@ -133,7 +132,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 					continue
 				}
 
-				partitionEvent := common.MapStr{
+				partitionEvent := mapstr.M{
 					"leader":         partition.Leader,
 					"replica":        id,
 					"is_leader":      partition.Leader == id,
@@ -141,7 +140,7 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				}
 
 				if partition.Err != 0 {
-					partitionEvent["error"] = common.MapStr{
+					partitionEvent["error"] = mapstr.M{
 						"code": partition.Err,
 					}
 				}
@@ -151,21 +150,21 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 				partitionTopicBrokerID := fmt.Sprintf("%s-%d", partitionTopicID, id)
 
 				// create event
-				event := common.MapStr{
+				event := mapstr.M{
 					// Common `kafka.partition` fields
 					"id":              partition.ID,
 					"topic_id":        partitionTopicID,
 					"topic_broker_id": partitionTopicBrokerID,
 
 					"partition": partitionEvent,
-					"offset": common.MapStr{
+					"offset": mapstr.M{
 						"newest": offNewest,
 						"oldest": offOldest,
 					},
 				}
 
 				sent := r.Event(mb.Event{
-					ModuleFields: common.MapStr{
+					ModuleFields: mapstr.M{
 						"broker": evtBroker,
 						"topic":  evtTopic,
 					},
@@ -190,12 +189,12 @@ func queryOffsetRange(
 ) (int64, int64, bool, error) {
 	oldest, err := b.PartitionOffset(replicaID, topic, partition, sarama.OffsetOldest)
 	if err != nil {
-		return -1, -1, false, errors.Wrap(err, "failed to get oldest offset")
+		return -1, -1, false, fmt.Errorf("failed to get oldest offset: %w", err)
 	}
 
 	newest, err := b.PartitionOffset(replicaID, topic, partition, sarama.OffsetNewest)
 	if err != nil {
-		return -1, -1, false, errors.Wrap(err, "failed to get newest offset")
+		return -1, -1, false, fmt.Errorf("failed to get newest offset: %w", err)
 	}
 
 	okOld := oldest != -1

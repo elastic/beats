@@ -7,19 +7,20 @@ package awss3
 import (
 	"context"
 	"errors"
+	"strconv"
 	"sync"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
 )
 
 const (
-	sqsRetryDelay = 10 * time.Second
+	sqsRetryDelay                  = 10 * time.Second
+	sqsApproximateNumberOfMessages = "ApproximateNumberOfMessages"
 )
 
 type sqsReader struct {
@@ -33,7 +34,8 @@ type sqsReader struct {
 
 func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, msgHandler sqsProcessor) *sqsReader {
 	if metrics == nil {
-		metrics = newInputMetrics(monitoring.NewRegistry(), "")
+		// Metrics are optional. Initialize a stub.
+		metrics = newInputMetrics("", nil, 0)
 	}
 	return &sqsReader{
 		maxMessagesInflight: maxMessagesInflight,
@@ -66,7 +68,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 				r.log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
 
 				// Throttle retries.
-				timed.Wait(ctx, sqsRetryDelay)
+				_ = timed.Wait(ctx, sqsRetryDelay)
 			}
 			continue
 		}
@@ -77,13 +79,13 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 		// Process each SQS message asynchronously with a goroutine.
 		r.log.Debugf("Received %v SQS messages.", len(msgs))
 		r.metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
-		r.metrics.sqsMessagesInflight.Add(uint64(len(msgs)))
 		workerWg.Add(len(msgs))
+
 		for _, msg := range msgs {
-			go func(msg sqs.Message, start time.Time) {
+			go func(msg types.Message, start time.Time) {
+				id := r.metrics.beginSQSWorker()
 				defer func() {
-					r.metrics.sqsMessagesInflight.Dec()
-					r.metrics.sqsMessageProcessingTime.Update(time.Since(start).Nanoseconds())
+					r.metrics.endSQSWorker(id)
 					workerWg.Done()
 					r.workerSem.Release(1)
 				}()
@@ -106,4 +108,16 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 		return nil
 	}
 	return ctx.Err()
+}
+
+func (r *sqsReader) GetApproximateMessageCount(ctx context.Context) (int, error) {
+	attributes, err := r.sqs.GetQueueAttributes(ctx, []types.QueueAttributeName{sqsApproximateNumberOfMessages})
+	if err == nil {
+		if c, found := attributes[sqsApproximateNumberOfMessages]; found {
+			if messagesCount, err := strconv.Atoi(c); err == nil {
+				return messagesCount, nil
+			}
+		}
+	}
+	return -1, err
 }

@@ -7,11 +7,10 @@ package performance
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type libraryCache struct {
@@ -36,7 +35,7 @@ func (e *performanceExtractor) libraryCache(ctx context.Context) ([]libraryCache
 		UNION
 		SELECT 'io_reloads' "Ratio", (SUM(reloads) / SUM(pins)) FROM V$LIBRARYCACHE`)
 	if err != nil {
-		return nil, errors.Wrap(err, "error executing query")
+		return nil, fmt.Errorf("error executing query: %w", err)
 	}
 
 	results := make([]libraryCache, 0)
@@ -53,8 +52,8 @@ func (e *performanceExtractor) libraryCache(ctx context.Context) ([]libraryCache
 	return results, nil
 }
 
-func (m *MetricSet) addLibraryCacheData(ls []libraryCache) common.MapStr {
-	out := common.MapStr{}
+func (m *MetricSet) addLibraryCacheData(ls []libraryCache) mapstr.M {
+	out := mapstr.M{}
 
 	for _, v := range ls {
 		if v.name.Valid {

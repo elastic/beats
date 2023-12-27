@@ -27,12 +27,11 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
 	"github.com/elastic/beats/v7/metricbeat/helper/dialer"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 const (
@@ -43,7 +42,7 @@ const (
 
 	// ModuleDataKey is the key used in events created by MetricSets to add data
 	// to an event that is common to the module. The data must be a
-	// common.MapStr and when the final event is built the object will be stored
+	// mapstr.M and when the final event is built the object will be stored
 	// in the event under a key that is the module name.
 	ModuleDataKey string = "_module"
 
@@ -76,7 +75,7 @@ type Module interface {
 type BaseModule struct {
 	name      string
 	config    ModuleConfig
-	rawConfig *common.Config
+	rawConfig *conf.C
 }
 
 func (m *BaseModule) String() string {
@@ -101,12 +100,12 @@ func (m *BaseModule) UnpackConfig(to interface{}) error {
 // Intended to be called from module factories. Note that if metricsets are specified
 // in the new configuration, those metricsets must already be registered with
 // mb.Registry.
-func (m *BaseModule) WithConfig(config common.Config) (*BaseModule, error) {
+func (m *BaseModule) WithConfig(config conf.C) (*BaseModule, error) {
 	var chkConfig struct {
 		Module string `config:"module"`
 	}
 	if err := config.Unpack(&chkConfig); err != nil {
-		return nil, errors.Wrap(err, "error parsing new module configuration")
+		return nil, fmt.Errorf("error parsing new module configuration: %w", err)
 	}
 
 	// Don't allow module name change
@@ -115,7 +114,7 @@ func (m *BaseModule) WithConfig(config common.Config) (*BaseModule, error) {
 	}
 
 	if err := config.SetString("module", -1, m.name); err != nil {
-		return nil, errors.Wrap(err, "unable to set existing module name in new configuration")
+		return nil, fmt.Errorf("unable to set existing module name in new configuration: %w", err)
 	}
 
 	newBM := &BaseModule{
@@ -124,7 +123,7 @@ func (m *BaseModule) WithConfig(config common.Config) (*BaseModule, error) {
 	}
 
 	if err := config.Unpack(&newBM.config); err != nil {
-		return nil, errors.Wrap(err, "error parsing new module configuration")
+		return nil, fmt.Errorf("error parsing new module configuration: %w", err)
 	}
 
 	return newBM, nil
@@ -159,9 +158,9 @@ type Closer interface {
 //
 // Deprecated: Use ReporterV2.
 type Reporter interface {
-	Event(event common.MapStr) bool               // Event reports a single successful event.
-	ErrorWith(err error, meta common.MapStr) bool // ErrorWith reports a single error event with the additional metadata.
-	Error(err error) bool                         // Error reports a single error event.
+	Event(event mapstr.M) bool               // Event reports a single successful event.
+	ErrorWith(err error, meta mapstr.M) bool // ErrorWith reports a single error event with the additional metadata.
+	Error(err error) bool                    // Error reports a single error event.
 }
 
 // ReportingMetricSet is a MetricSet that reports events or errors through the
@@ -260,7 +259,6 @@ type PushMetricSetV2WithContext interface {
 // configuration data like protocols, usernames, and passwords may also be
 // used to construct this HostData data. HostData also contains information when combined scheme are
 // used, like doing HTTP request over a UNIX socket.
-//
 type HostData struct {
 	Transport dialer.Builder // The transport builder to use when creating the connection.
 
@@ -364,6 +362,7 @@ func (b *BaseMetricSet) Registration() MetricSetRegistration {
 // the metricset fetches not only the predefined fields but add alls raw data under
 // the raw namespace to the event.
 type ModuleConfig struct {
+	ID          string        `config:"id"` // Optional ID (not guaranteed to be unique).
 	Hosts       []string      `config:"hosts"`
 	Period      time.Duration `config:"period"     validate:"positive"`
 	Timeout     time.Duration `config:"timeout"    validate:"positive"`
@@ -377,8 +376,8 @@ type ModuleConfig struct {
 
 func (c ModuleConfig) String() string {
 	return fmt.Sprintf(`{Module:"%v", MetricSets:%v, Enabled:%v, `+
-		`Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v, Query:%v}`,
-		c.Module, c.MetricSets, c.Enabled, len(c.Hosts), c.Period, c.Timeout,
+		`ID:"%s", Hosts:[%v hosts], Period:"%v", Timeout:"%v", Raw:%v, Query:%v}`,
+		c.Module, c.MetricSets, c.Enabled, c.ID, len(c.Hosts), c.Period, c.Timeout,
 		c.Raw, c.Query)
 }
 

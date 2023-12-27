@@ -19,14 +19,17 @@ package beater
 
 import (
 	"flag"
+	"fmt"
+	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/service"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/service"
 
 	"github.com/elastic/beats/v7/packetbeat/config"
 	"github.com/elastic/beats/v7/packetbeat/protos"
@@ -53,38 +56,38 @@ type flags struct {
 	dumpfile   *string
 }
 
-var cmdLineArgs flags
-
-func init() {
-	cmdLineArgs = flags{
-		file:       flag.String("I", "", "Read packet data from specified file"),
-		loop:       flag.Int("l", 1, "Loop file. 0 - loop forever"),
-		oneAtAtime: flag.Bool("O", false, "Read packets one at a time (press Enter)"),
-		topSpeed:   flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
-		dumpfile:   flag.String("dump", "", "Write all captured packets to this libpcap file"),
-	}
+var cmdLineArgs = flags{
+	file:       flag.String("I", "", "Read packet data from specified file"),
+	loop:       flag.Int("l", 1, "Loop file. 0 - loop forever"),
+	oneAtAtime: flag.Bool("O", false, "Read packets one at a time (press Enter)"),
+	topSpeed:   flag.Bool("t", false, "Read packets as fast as possible, without sleeping"),
+	dumpfile:   flag.String("dump", "", "Write all captured packets to libpcap files with this prefix - a timestamp and pcap extension are added"),
 }
 
 func initialConfig() config.Config {
-	return config.Config{
-		Interfaces: config.InterfacesConfig{
+	c := config.Config{
+		Interfaces: []config.InterfaceConfig{{
 			File:       *cmdLineArgs.file,
 			Loop:       *cmdLineArgs.loop,
 			TopSpeed:   *cmdLineArgs.topSpeed,
 			OneAtATime: *cmdLineArgs.oneAtAtime,
 			Dumpfile:   *cmdLineArgs.dumpfile,
-		},
+		}},
 	}
+	c.Interface = &c.Interfaces[0]
+	return c
 }
 
 // Beater object. Contains all objects needed to run the beat
 type packetbeat struct {
-	config  *common.Config
-	factory *processorFactory
-	done    chan struct{}
+	config   *conf.C
+	factory  *processorFactory
+	done     chan struct{}
+	stopOnce sync.Once
 }
 
-func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
+// New returns a new Packetbeat beat.Beater.
+func New(b *beat.Beat, rawConfig *conf.C) (beat.Beater, error) {
 	configurator := config.NewAgentConfig
 	if !b.Manager.Enabled() {
 		configurator = initialConfig().FromStatic
@@ -95,12 +98,6 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 		return nil, err
 	}
 
-	// Install Npcap if needed.
-	err := installNpcap(b)
-	if err != nil {
-		return nil, err
-	}
-
 	return &packetbeat{
 		config:  rawConfig,
 		factory: factory,
@@ -108,6 +105,10 @@ func New(b *beat.Beat, rawConfig *common.Config) (beat.Beater, error) {
 	}, nil
 }
 
+// Run starts the packetbeat network capture, decoding and event publication, sending
+// events to b.Publisher. If b is mananaged, packetbeat is registered with the
+// reload.Registry and handled by fleet. Otherwise it is run until cancelled or a
+// fatal error.
 func (pb *packetbeat) Run(b *beat.Beat) error {
 	defer func() {
 		if service.ProfileEnabled() {
@@ -117,12 +118,33 @@ func (pb *packetbeat) Run(b *beat.Beat) error {
 		}
 	}()
 
+	if b.API != nil {
+		err := inputmon.AttachHandler(b.API.Router())
+		if err != nil {
+			return fmt.Errorf("failed attach inputs api to monitoring endpoint server: %w", err)
+		}
+	}
+
+	if b.Manager != nil {
+		b.Manager.RegisterDiagnosticHook("input_metrics", "Metrics from active inputs.",
+			"input_metrics.json", "application/json", func() []byte {
+				data, err := inputmon.MetricSnapshotJSON()
+				if err != nil {
+					logp.L().Warnw("Failed to collect input metric snapshot for Agent diagnostics.", "error", err)
+					return []byte(err.Error())
+				}
+				return data
+			})
+	}
+
 	if !b.Manager.Enabled() {
 		return pb.runStatic(b, pb.factory)
 	}
 	return pb.runManaged(b, pb.factory)
 }
 
+// runStatic constructs a packetbeat runner and starts it, returning on cancellation
+// or the first fatal error.
 func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 	runner, err := factory.Create(b.Publisher, pb.config)
 	if err != nil {
@@ -136,18 +158,29 @@ func (pb *packetbeat) runStatic(b *beat.Beat, factory *processorFactory) error {
 	select {
 	case <-pb.done:
 	case err := <-factory.err:
-		close(pb.done)
+		pb.stopOnce.Do(func() { close(pb.done) })
 		return err
 	}
 	return nil
 }
 
+// runManaged registers a packetbeat runner with the reload.Registry and starts
+// the runner by starting the beat's manager. It returns on the first fatal error.
 func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error {
 	runner := newReloader(management.DebugK, factory, b.Publisher)
-	reload.Register.MustRegisterList("inputs", runner)
-	defer runner.Stop()
-
+	reload.RegisterV2.MustRegisterInput(runner)
 	logp.Debug("main", "Waiting for the runner to finish")
+
+	// Start the manager after all the hooks are registered and terminates when
+	// the function return.
+	if err := b.Manager.Start(); err != nil {
+		return err
+	}
+
+	defer func() {
+		runner.Stop()
+		b.Manager.Stop()
+	}()
 
 	for {
 		select {
@@ -158,7 +191,7 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 			// to stop if the sniffer(s) exited without an error
 			// this would happen during a configuration reload
 			if err != nil {
-				close(pb.done)
+				pb.stopOnce.Do(func() { close(pb.done) })
 				return err
 			}
 		}
@@ -168,5 +201,5 @@ func (pb *packetbeat) runManaged(b *beat.Beat, factory *processorFactory) error 
 // Called by the Beat stop function
 func (pb *packetbeat) Stop() {
 	logp.Info("Packetbeat send stop signal")
-	close(pb.done)
+	pb.stopOnce.Do(func() { close(pb.done) })
 }

@@ -45,6 +45,24 @@
             The name of the computer that generated the record. When using Windows
             event forwarding, this name can differ from `agent.hostname`.
 
+        - name: computerObject.domain
+          required: false
+          type: keyword
+          description: >
+            The domain of the account that was added, modified or deleted in the event.
+
+        - name: computerObject.id
+          required: false
+          type: keyword
+          description: >
+            A globally unique identifier that identifies the target device.
+
+        - name: computerObject.name
+          required: false
+          type: keyword
+          description: >
+            The account name that was added, modified or deleted in the event.
+
         - name: event_data
           type: object
           object_type: keyword
@@ -75,7 +93,13 @@
               type: keyword
             - name: BuildVersion
               type: keyword
+            - name: CallTrace
+              type: keyword
+            - name: ClientInfo
+              type: keyword
             - name: Company
+              type: keyword
+            - name: Configuration
               type: keyword
             - name: CorruptionActionState
               type: keyword
@@ -105,6 +129,10 @@
               type: keyword
             - name: EntryCount
               type: keyword
+            - name: EventType
+              type: keyword
+            - name: EventNamespace
+              type: keyword
             - name: ExtraInfo
               type: keyword
             - name: FailureName
@@ -114,6 +142,8 @@
             - name: FileVersion
               type: keyword
             - name: FinalStatus
+              type: keyword
+            - name: GrantedAccess
               type: keyword
             - name: Group
               type: keyword
@@ -159,11 +189,15 @@
               type: keyword
             - name: MinorVersion
               type: keyword
+            - name: Name
+              type: keyword
             - name: NewProcessId
               type: keyword
             - name: NewProcessName
               type: keyword
             - name: NewSchemeGuid
+              type: keyword
+            - name: NewThreadId
               type: keyword
             - name: NewTime
               type: keyword
@@ -174,6 +208,8 @@
             - name: OldSchemeGuid
               type: keyword
             - name: OldTime
+              type: keyword
+            - name: Operation
               type: keyword
             - name: OriginalFileName
               type: keyword
@@ -203,6 +239,8 @@
               type: keyword
             - name: QfeVersion
               type: keyword
+            - name: Query
+              type: keyword
             - name: Reason
               type: keyword
             - name: SchemaVersion
@@ -212,6 +250,8 @@
             - name: ServiceName
               type: keyword
             - name: ServiceVersion
+              type: keyword
+            - name: Session
               type: keyword
             - name: ShutdownActionType
               type: keyword
@@ -224,6 +264,12 @@
             - name: SignatureStatus
               type: keyword
             - name: Signed
+              type: keyword
+            - name: StartAddress
+              type: keyword
+            - name: StartFunction
+              type: keyword
+            - name: StartModule
               type: keyword
             - name: StartTime
               type: keyword
@@ -245,11 +291,17 @@
               type: keyword
             - name: TargetDomainName
               type: keyword
+            - name: TargetImage
+              type: keyword
             - name: TargetInfo
               type: keyword
             - name: TargetLogonGuid
               type: keyword
             - name: TargetLogonId
+              type: keyword
+            - name: TargetProcessGUID
+              type: keyword
+            - name: TargetProcessId
               type: keyword
             - name: TargetServerName
               type: keyword
@@ -262,6 +314,8 @@
             - name: TokenElevationType
               type: keyword
             - name: TransmittedServices
+              type: keyword
+            - name: Type
               type: keyword
             - name: UserSid
               type: keyword
@@ -365,6 +419,30 @@
           required: false
           description: >
             The event creation time.
+
+        - name: trustAttribute
+          required: false
+          type: keyword
+          description: >
+            The decimal value of attributes for new trust created to a domain.
+
+        - name: trustDirection
+          required: false
+          type: keyword
+          description: >
+            The direction of new trust created to a domain.
+
+            Possible values are `TRUST_DIRECTION_DISABLED`, `TRUST_DIRECTION_INBOUND`,
+            `TRUST_DIRECTION_OUTBOUND` and `TRUST_DIRECTION_BIDIRECTIONAL`
+
+        - name: trustType
+          required: false
+          type: keyword
+          description: >
+            The account name that was added, modified or deleted in the event.
+
+            Possible values are `TRUST_TYPE_DOWNLEVEL`, `TRUST_TYPE_UPLEVEL`,
+            `TRUST_TYPE_MIT` and `TRUST_TYPE_DCE`
 
         - name: process.thread.id
           type: long

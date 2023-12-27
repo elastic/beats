@@ -18,15 +18,16 @@
 package collector
 
 import (
+	"fmt"
 	"regexp"
 
-	"github.com/pkg/errors"
-	dto "github.com/prometheus/client_model/go"
+	"github.com/prometheus/prometheus/pkg/labels"
+	"github.com/prometheus/prometheus/pkg/textparse"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	p "github.com/elastic/beats/v7/metricbeat/helper/prometheus"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -43,7 +44,7 @@ var (
 	}.Build()
 
 	upMetricName          = "up"
-	upMetricType          = dto.MetricType_GAUGE
+	upMetricType          = textparse.MetricTypeGauge
 	upMetricInstanceLabel = "instance"
 	upMetricJobLabel      = "job"
 	upMetricJobValue      = "prometheus"
@@ -63,7 +64,7 @@ type PromEventsGenerator interface {
 	Start()
 
 	// GeneratePromEvents converts a Prometheus metric family into a list of PromEvents
-	GeneratePromEvents(mf *dto.MetricFamily) []PromEvent
+	GeneratePromEvents(mf *p.MetricFamily) []PromEvent
 
 	// Stop must be called when the generator won't be used anymore
 	Stop()
@@ -113,11 +114,11 @@ func MetricSetBuilder(namespace string, genFactory PromEventsGeneratorFactory) f
 		ms.host = ms.Host()
 		ms.excludeMetrics, err = p.CompilePatternList(config.MetricsFilters.ExcludeMetrics)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile exclude patterns")
+			return nil, fmt.Errorf("unable to compile exclude patterns: %w", err)
 		}
 		ms.includeMetrics, err = p.CompilePatternList(config.MetricsFilters.IncludeMetrics)
 		if err != nil {
-			return nil, errors.Wrapf(err, "unable to compile include patterns")
+			return nil, fmt.Errorf("unable to compile include patterns: %w", err)
 		}
 
 		return ms, nil
@@ -132,13 +133,13 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 
 	families, err := m.prometheus.GetFamilies()
-	eventList := map[string]common.MapStr{}
+	eventList := map[string]mapstr.M{}
 	if err != nil {
 		// send up event only
 		families = append(families, m.upMetricFamily(0.0))
 
 		// set the error to report it after sending the up event
-		err = errors.Wrap(err, "unable to decode response from prometheus endpoint")
+		err = fmt.Errorf("unable to decode response from prometheus endpoint: %w", err)
 	} else {
 		// add up event to the list
 		families = append(families, m.upMetricFamily(1.0))
@@ -151,18 +152,18 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		promEvents := m.promEventsGen.GeneratePromEvents(family)
 
 		for _, promEvent := range promEvents {
+			// Add default instance label if not already there
+			if exists, _ := promEvent.Labels.HasKey(upMetricInstanceLabel); !exists {
+				_, _ = promEvent.Labels.Put(upMetricInstanceLabel, m.host)
+			}
+			// Add default job label if not already there
+			if exists, _ := promEvent.Labels.HasKey("job"); !exists {
+				_, _ = promEvent.Labels.Put("job", m.Module().Name())
+			}
+			// Calculate labels hash after adding all relevant labels
 			labelsHash := promEvent.LabelsHash()
 			if _, ok := eventList[labelsHash]; !ok {
-				eventList[labelsHash] = common.MapStr{}
-
-				// Add default instance label if not already there
-				if exists, _ := promEvent.Labels.HasKey(upMetricInstanceLabel); !exists {
-					promEvent.Labels.Put(upMetricInstanceLabel, m.Host())
-				}
-				// Add default job label if not already there
-				if exists, _ := promEvent.Labels.HasKey("job"); !exists {
-					promEvent.Labels.Put("job", m.Module().Name())
-				}
+				eventList[labelsHash] = mapstr.M{}
 				// Add labels
 				if len(promEvent.Labels) > 0 {
 					eventList[labelsHash]["labels"] = promEvent.Labels
@@ -177,7 +178,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	// Report events
 	for _, e := range eventList {
 		isOpen := reporter.Event(mb.Event{
-			RootFields: common.MapStr{m.namespace: e},
+			RootFields: mapstr.M{m.namespace: e},
 		})
 		if !isOpen {
 			break
@@ -195,30 +196,30 @@ func (m *MetricSet) Close() error {
 	return nil
 }
 
-func (m *MetricSet) upMetricFamily(value float64) *dto.MetricFamily {
-	gauge := dto.Gauge{
+func (m *MetricSet) upMetricFamily(value float64) *p.MetricFamily {
+	gauge := p.Gauge{
 		Value: &value,
 	}
-	label1 := dto.LabelPair{
-		Name:  &upMetricInstanceLabel,
-		Value: &m.host,
+	label1 := labels.Label{
+		Name:  upMetricInstanceLabel,
+		Value: m.host,
 	}
-	label2 := dto.LabelPair{
-		Name:  &upMetricJobLabel,
-		Value: &upMetricJobValue,
+	label2 := labels.Label{
+		Name:  upMetricJobLabel,
+		Value: upMetricJobValue,
 	}
-	metric := dto.Metric{
+	metric := p.OpenMetric{
 		Gauge: &gauge,
-		Label: []*dto.LabelPair{&label1, &label2},
+		Label: []*labels.Label{&label1, &label2},
 	}
-	return &dto.MetricFamily{
+	return &p.MetricFamily{
 		Name:   &upMetricName,
-		Type:   &upMetricType,
-		Metric: []*dto.Metric{&metric},
+		Type:   upMetricType,
+		Metric: []*p.OpenMetric{&metric},
 	}
 }
 
-func (m *MetricSet) skipFamily(family *dto.MetricFamily) bool {
+func (m *MetricSet) skipFamily(family *p.MetricFamily) bool {
 	if family == nil {
 		return false
 	}

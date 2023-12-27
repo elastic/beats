@@ -26,10 +26,13 @@ import (
 	"path/filepath"
 
 	"github.com/magefile/mage/mg"
-	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
+
+	//mage:import
+	"github.com/elastic/elastic-agent-libs/dev-tools/mage"
+
 	"github.com/elastic/beats/v7/dev-tools/mage/gotool"
 )
 
@@ -44,6 +47,13 @@ var (
 		"x-pack/metricbeat",
 	}
 )
+
+// Aliases are shortcuts to long target names.
+// nolint: deadcode // it's used by `mage`.
+var Aliases = map[string]interface{}{
+	"llc":  mage.Linter.LastChange,
+	"lint": mage.Linter.All,
+}
 
 // PackageBeatDashboards packages the dashboards from all Beats into a zip
 // file. The dashboards must be generated first.
@@ -77,7 +87,7 @@ func PackageBeatDashboards() error {
 		} else if _, err := os.Stat(legacyDir); err == nil {
 			spec.Files[beatName] = devtools.PackageFile{Source: legacyDir}
 		} else {
-			return errors.Errorf("no dashboards found for %v", beatDir)
+			return fmt.Errorf("no dashboards found for %v", beatDir)
 		}
 	}
 

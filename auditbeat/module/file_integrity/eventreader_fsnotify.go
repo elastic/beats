@@ -16,11 +16,11 @@
 // under the License.
 
 //go:build linux || freebsd || openbsd || netbsd || windows
-// +build linux freebsd openbsd netbsd windows
 
 package file_integrity
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"syscall"
@@ -29,7 +29,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 
 	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/monitor"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type reader struct {
@@ -37,13 +37,16 @@ type reader struct {
 	config  Config
 	eventC  chan Event
 	log     *logp.Logger
+
+	parsers []FileParser
 }
 
 // NewEventReader creates a new EventProducer backed by fsnotify.
 func NewEventReader(c Config) (EventProducer, error) {
 	return &reader{
-		config: c,
-		log:    logp.NewLogger(moduleName),
+		config:  c,
+		log:     logp.NewLogger(moduleName),
+		parsers: FileParsers(c),
 	}, nil
 }
 
@@ -75,7 +78,7 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 	// deadlock. Do it on all platforms for simplicity.
 	for _, p := range r.config.Paths {
 		if err := r.watcher.Add(p); err != nil {
-			if err == syscall.EMFILE {
+			if errors.Is(err, syscall.EMFILE) {
 				r.log.Warnw("Failed to add watch (check the max number of "+
 					"open files allowed with 'ulimit -a')",
 					"file_path", p, "error", err)
@@ -154,7 +157,7 @@ func (r *reader) nextEvent(done <-chan struct{}) *Event {
 
 			start := time.Now()
 			e := NewEvent(event.Name, opToAction(event.Op), SourceFSNotify,
-				r.config.MaxFileSizeBytes, r.config.HashTypes)
+				r.config.MaxFileSizeBytes, r.config.HashTypes, r.parsers)
 			e.rtt = time.Since(start)
 
 			return &e

@@ -28,7 +28,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/elastic-agent-libs/transport"
 )
 
 const (
@@ -96,6 +96,7 @@ func (t *SimpleTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 	// read response
 	go func() {
+		//nolint:bodyclose // we leave it to the monitor consuming to actually close this
 		resp, err := t.readResponse(conn, req)
 		readerDone <- readReturn{resp, err}
 	}()

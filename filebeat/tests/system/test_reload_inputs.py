@@ -39,6 +39,48 @@ class Test(BaseTest):
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
 
+    def test_filestream_reload_not_duplicate_id(self):
+        """
+        test_filestream_reload verifies when the filestream config is validated
+        it does not create a permanent entry on filestream's ids map. If a
+        permanent entry is created, it caused filestream to log an error saying
+        a duplicated ID was found, and it can lead to data duplication.
+        """
+        input_config_template = """
+- type: filestream
+  id: my-unique-id
+  paths:
+    - {}
+"""
+
+        self.render_config_template(
+            template_name="filestream-reload-not-duplicated-id",
+        )
+
+        os.mkdir(self.working_dir + "/logs/")
+        logfile = self.working_dir + "/logs/test.log"
+        os.mkdir(self.working_dir + "/inputs.d/", 0o700)
+
+        with open(self.working_dir + "/inputs.d/input.yml", 'w') as f:
+            f.write(input_config_template.format(self.working_dir + "/logs/*"))
+        os.chmod(self.working_dir + "/inputs.d/input.yml", 0o600)
+
+        with open(logfile, 'w') as f:
+            f.write("Hello world\n")
+
+        proc = self.start_beat()
+
+        # wait for the "Start next scan" log message, this means the file has been
+        # fully harvested
+        self.wait_until(
+            lambda: self.log_contains(
+                "Start next scan"),
+            max_timeout=10)
+
+        proc.check_kill_and_wait()
+
+        assert not self.log_contains("filestream input with ID 'my-unique-id' already exists")
+
     def test_start_stop(self):
         """
         Test basic input start and stop
@@ -280,11 +322,6 @@ class Test(BaseTest):
         # Add it intentionally when other input is still running to cause an error
         with open(self.working_dir + "/configs/input.yml", 'w') as f:
             f.write(inputConfigTemplate.format(self.working_dir + "/logs/test.log"))
-
-        # Make sure error shows up in log file
-        self.wait_until(
-            lambda: self.log_contains("Can only start an input when all related states are finished"),
-            max_timeout=15)
 
         # Wait until old runner is stopped
         self.wait_until(

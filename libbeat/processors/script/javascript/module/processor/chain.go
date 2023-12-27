@@ -18,12 +18,15 @@
 package processor
 
 import (
-	"github.com/dop251/goja"
-	"github.com/pkg/errors"
+	"errors"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/dop251/goja"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/script/javascript"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 // chainBuilder builds a new processor chain.
@@ -43,10 +46,10 @@ func newChainBuilder(runtime *goja.Runtime) func(call goja.ConstructorCall) *goj
 
 		c := &chainBuilder{runtime: runtime, this: call.This}
 		for name, fn := range registry.Constructors() {
-			c.this.Set(name, c.makeBuilderFunc(fn))
+			_ = c.this.Set(name, c.makeBuilderFunc(fn))
 		}
-		call.This.Set("Add", c.Add)
-		call.This.Set("Build", c.Build)
+		_ = call.This.Set("Add", c.Add)
+		_ = call.This.Set("Build", c.Build)
 
 		return nil
 	}
@@ -85,7 +88,7 @@ func (b *chainBuilder) Add(call goja.FunctionCall) goja.Value {
 	case func(goja.FunctionCall) goja.Value:
 		b.procs = append(b.procs, newJSProcessor(v))
 	default:
-		panic(b.runtime.NewGoError(errors.Errorf("arg0 must be a processor object, but got %T", a0.Export())))
+		panic(b.runtime.NewGoError(fmt.Errorf("arg0 must be a processor object, but got %T", a0.Export())))
 	}
 
 	return b.this
@@ -130,24 +133,24 @@ func (p *jsProcessor) run(event javascript.Event) error {
 
 // nativeProcessor is a normal Beat processor.
 type nativeProcessor struct {
-	processors.Processor
+	beat.Processor
 }
 
 func newNativeProcessor(constructor processors.Constructor, call gojaCall) (processor, error) {
-	var config *common.Config
+	var cfg *config.C
 
 	if a0 := call.Argument(0); !goja.IsUndefined(a0) {
 		var err error
-		config, err = common.NewConfigFrom(a0.Export())
+		cfg, err = config.NewConfigFrom(a0.Export())
 		if err != nil {
 			return nil, err
 		}
 	} else {
 		// No config so use an empty config.
-		config = common.NewConfig()
+		cfg = config.NewConfig()
 	}
 
-	p, err := constructor(config)
+	p, err := constructor(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +162,7 @@ func newNativeProcessor(constructor processors.Constructor, call gojaCall) (proc
 		// be registered. If this error happens, a processor that needs to be closed is
 		// being registered, this should be avoided.
 		// See https://github.com/elastic/beats/pull/16349
-		return nil, errors.Errorf("stateful processor cannot be used in script processor, this is probably a bug: %s", p)
+		return nil, fmt.Errorf("stateful processor cannot be used in script processor, this is probably a bug: %s", p)
 	}
 
 	return &nativeProcessor{p}, nil

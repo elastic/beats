@@ -1,6 +1,6 @@
 - name: loadbalancing
   description: Google Cloud Load Balancing metrics
-  release: beta
+  release: ga
   type: group
   fields:
   - name: https.backend_request.bytes
@@ -60,3 +60,43 @@
   - name: tcp_ssl_proxy.open_connections.value
     type: long
     description: Current number of outstanding connections through the TCP/SSL proxy.
+  - name: https.backend_latencies.value
+    type: object
+    object_type: histogram
+    description: A distribution of the latency calculated from when the request was sent by the proxy to the backend until the proxy received from the backend the last byte of response.
+  - name: https.external.regional.backend_latencies.value
+    type: object
+    object_type: histogram
+    description: A distribution of the latency calculated from when the request was sent by the proxy to the backend until the proxy received from the backend the last byte of response.
+  - name: https.external.regional.total_latencies.value
+    type: object
+    object_type: histogram
+    description: A distribution of the latency calculated from when the request was received by the proxy until the proxy got ACK from client on last response byte.
+  - name: https.frontend_tcp_rtt.value
+    type: object
+    object_type: histogram
+    description: A distribution of the RTT measured for each connection between client and proxy.
+  - name: https.internal.backend_latencies.value
+    type: object
+    object_type: histogram
+    description: A distribution of the latency calculated from when the request was sent by the internal HTTP/S load balancer proxy to the backend until the proxy received from the backend the last byte of response. 
+  - name: https.internal.total_latencies.value
+    type: object
+    object_type: histogram
+    description: A distribution of the latency calculated from when the request was received by the internal HTTP/S load balancer proxy until the proxy got ACK from client on last response byte.
+  - name: https.total_latencies.value
+    type: object
+    object_type: histogram
+    description: A distribution of the latency calculated from when the request was received by the external HTTP/S load balancer proxy until the proxy got ACK from client on last response byte.
+  - name: l3.external.rtt_latencies.value
+    type: object
+    object_type: histogram
+    description: A distribution of the round trip time latency, measured over TCP connections for the external network load balancer.
+  - name: l3.internal.rtt_latencies.value
+    type: object
+    object_type: histogram
+    description: A distribution of RTT measured over TCP connections for internal TCP/UDP load balancer flows.
+  - name: tcp_ssl_proxy.frontend_tcp_rtt.value
+    type: object
+    object_type: histogram
+    description: A distribution of the smoothed RTT (in ms) measured by the proxy's TCP stack, each minute application layer bytes pass from proxy to client.

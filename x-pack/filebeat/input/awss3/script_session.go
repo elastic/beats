@@ -5,16 +5,16 @@
 package awss3
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"time"
 
 	"github.com/dop251/goja"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -47,11 +47,11 @@ func newSession(p *goja.Program, conf scriptConfig, test bool) (*session, error)
 		timeout: conf.Timeout,
 	}
 
-	// Register common.MapStr as being a simple map[string]interface{} for
+	// Register mapstr.M as being a simple map[string]interface{} for
 	// treatment within the JS VM.
-	s.vm.RegisterSimpleMapType(reflect.TypeOf(common.MapStr(nil)),
+	s.vm.RegisterSimpleMapType(reflect.TypeOf(mapstr.M(nil)),
 		func(i interface{}) map[string]interface{} {
-			return map[string]interface{}(i.(common.MapStr))
+			return map[string]interface{}(i.(mapstr.M))
 		},
 	)
 
@@ -93,7 +93,7 @@ func (s *session) setParseFunction() error {
 		return errors.New("parse is not a function")
 	}
 	if err := s.vm.ExportTo(parseFunc, &s.parseFunc); err != nil {
-		return errors.Wrap(err, "failed to export parse function")
+		return fmt.Errorf("failed to export parse function: %w", err)
 	}
 	return nil
 }
@@ -109,10 +109,10 @@ func (s *session) registerScriptParams(params map[string]interface{}) error {
 	}
 	var register goja.Callable
 	if err := s.vm.ExportTo(registerFunc, &register); err != nil {
-		return errors.Wrap(err, "failed to export register function")
+		return fmt.Errorf("failed to export register function: %w", err)
 	}
 	if _, err := register(goja.Undefined(), s.vm.ToValue(params)); err != nil {
-		return errors.Wrap(err, "failed to register script_params")
+		return fmt.Errorf("failed to register script_params: %w", err)
 	}
 	s.log.Debug("Registered params with script")
 	return nil
@@ -127,11 +127,11 @@ func (s *session) executeTestFunction() error {
 		}
 		var test goja.Callable
 		if err := s.vm.ExportTo(testFunc, &test); err != nil {
-			return errors.Wrap(err, "failed to export test function")
+			return fmt.Errorf("failed to export test function: %w", err)
 		}
 		_, err := test(goja.Undefined(), nil)
 		if err != nil {
-			return errors.Wrap(err, "failed in test() function")
+			return fmt.Errorf("failed in test() function: %w", err)
 		}
 		s.log.Debugf("Successful test() execution for script.")
 	}
@@ -144,7 +144,7 @@ func (s *session) runParseFunc(n string) (out []s3EventV2, err error) {
 		if r := recover(); r != nil {
 			s.log.Errorw("The javascript script caused an unexpected panic "+
 				"while parsing a notification. Recovering, but please report this.",
-				"notification", common.MapStr{"original": n},
+				"notification", mapstr.M{"original": n},
 				"panic", r,
 				zap.Stack("stack"))
 			err = fmt.Errorf("unexpected panic in javascript script: %v", r)

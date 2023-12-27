@@ -19,6 +19,7 @@ package util
 
 import (
 	"net"
+	"sort"
 
 	"github.com/joeshaw/multierror"
 )
@@ -40,10 +41,8 @@ func GetNetInfo() (ipList []string, hwList []string, err error) {
 			continue
 		}
 
-		hw := i.HardwareAddr.String()
-		// Skip empty hardware addresses
-		if hw != "" {
-			hwList = append(hwList, hw)
+		if len(i.HardwareAddr) != 0 {
+			hwList = append(hwList, formatHardwareAddr(i.HardwareAddr))
 		}
 
 		addrs, err := i.Addrs()
@@ -63,5 +62,38 @@ func GetNetInfo() (ipList []string, hwList []string, err error) {
 		}
 	}
 
-	return ipList, hwList, errs.Err()
+	return ipList, unique(hwList), errs.Err()
+}
+
+// formatHardwareAddr formats hardware addresses according to the ECS spec.
+func formatHardwareAddr(addr net.HardwareAddr) string {
+	buf := make([]byte, 0, len(addr)*3-1)
+	for _, b := range addr {
+		if len(buf) != 0 {
+			buf = append(buf, '-')
+		}
+		const hexDigit = "0123456789ABCDEF"
+		buf = append(buf, hexDigit[b>>4], hexDigit[b&0xf])
+	}
+	return string(buf)
+}
+
+// unique returns addrs lexically sorted and with repeated elements
+// omitted.
+func unique(addrs []string) []string {
+	if len(addrs) < 2 {
+		return addrs
+	}
+	sort.Strings(addrs)
+	curr := 0
+	for i, addr := range addrs {
+		if addr == addrs[curr] {
+			continue
+		}
+		curr++
+		if curr < i {
+			addrs[curr], addrs[i] = addrs[i], ""
+		}
+	}
+	return addrs[:curr+1]
 }

@@ -28,6 +28,9 @@
         "input.type": "log",
         "log.level": "notification",
         "log.offset": 0,
+        "log.syslog.facility.code": 20,
+        "log.syslog.priority": 165,
+        "log.syslog.severity.code": 5,
         "network.iana_number": 6,
         "network.transport": "tcp",
         "observer.egress.interface.name": "OUTSIDE",
@@ -45,7 +48,6 @@
         "source.address": "WHAT-IS-THIS-A-HOSTNAME-192.0.2.244",
         "source.domain": "WHAT-IS-THIS-A-HOSTNAME-192.0.2.244",
         "source.port": 27218,
-        "syslog.facility": 165,
         "tags": [
             "cisco-ftd",
             "forwarded"

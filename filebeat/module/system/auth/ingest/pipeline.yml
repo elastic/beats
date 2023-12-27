@@ -1,198 +1,240 @@
-description: Pipeline for parsing system authorisation/secure logs
+---
+description: Pipeline for parsing system authorization and secure logs.
 processors:
-- set:
-    field: event.ingested
-    value: '{{_ingest.timestamp}}'
-- grok:
-    field: message
-    ignore_missing: true
-    pattern_definitions:
-      GREEDYMULTILINE: |-
-        (.|
-        )*
-      TIMESTAMP: (?:%{TIMESTAMP_ISO8601}|%{SYSLOGTIMESTAMP})
-    patterns:
-    - '%{TIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname} %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?:
-      %{DATA:system.auth.ssh.event} %{DATA:system.auth.ssh.method} for (invalid user
-      )?%{DATA:user.name} from %{IPORHOST:source.ip} port %{NUMBER:source.port:long}
-      ssh2(: %{GREEDYDATA:system.auth.ssh.signature})?'
-    - '%{TIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname} %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?:
-      %{DATA:system.auth.ssh.event} user %{DATA:user.name} from %{IPORHOST:source.ip}'
-    - '%{TIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname} %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?:
-      Did not receive identification string from %{IPORHOST:system.auth.ssh.dropped_ip}'
-    - '%{TIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname} %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?:
-      \s*%{DATA:user.name} :( %{DATA:system.auth.sudo.error} ;)? TTY=%{DATA:system.auth.sudo.tty}
-      ; PWD=%{DATA:system.auth.sudo.pwd} ; USER=%{DATA:system.auth.sudo.user} ; COMMAND=%{GREEDYDATA:system.auth.sudo.command}'
-    - '%{TIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname} %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?:
-      new group: name=%{DATA:group.name}, GID=%{NUMBER:group.id}'
-    - '%{TIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname} %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?:
-      new user: name=%{DATA:user.name}, UID=%{NUMBER:user.id}, GID=%{NUMBER:group.id},
-      home=%{DATA:system.auth.useradd.home}, shell=%{DATA:system.auth.useradd.shell}$'
-    - '%{TIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname}? %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?:
-      %{GREEDYMULTILINE:system.auth.message}'
-- remove:
-    field: message
-- rename:
-    field: system.auth.message
-    target_field: message
-    ignore_missing: true
-    if: ctx?.system?.auth?.message != null && ctx?.system?.auth?.message != ""
-- grok:
-    field: message
-    ignore_missing: true
-    ignore_failure: true
-    patterns:
-    - 'for user \"?%{DATA:_temp.foruser}\"? by \"?%{DATA:_temp.byuser}\"?(?:\(uid=%{NUMBER:_temp.byuid}\))?$'
-    - 'for user \"?%{DATA:_temp.foruser}\"?$'
-    - 'by user \"?%{DATA:_temp.byuser}\"?$'
-    if: ctx?.message != null && ctx?.message != ""
-- rename:
-    field: _temp.byuser
-    target_field: user.name
-    ignore_missing: true
-    ignore_failure: true
-- rename:
-    field: _temp.byuid
-    target_field: user.id
-    ignore_missing: true
-    ignore_failure: true
-- rename:
-    field: _temp.foruser
-    target_field: user.name
-    ignore_missing: true
-    ignore_failure: true
-    if: ctx?.user?.name == null || ctx?.user?.name == ""
-- rename:
-    field: _temp.foruser
-    target_field: user.effective.name
-    ignore_missing: true
-    ignore_failure: true
-    if: ctx?.user?.name != null
-- convert:
-    field: system.auth.sudo.user
-    target_field: user.effective.name
-    type: string
-    ignore_failure: true
-    if: ctx?.system?.auth?.sudo?.user != null
-- set:
-    field: source.ip
-    value: '{{system.auth.ssh.dropped_ip}}'
-    ignore_empty_value: true
-- date:
-    if: ctx.event.timezone == null
-    field: system.auth.timestamp
-    target_field: '@timestamp'
-    formats:
-    - MMM  d HH:mm:ss
-    - MMM dd HH:mm:ss
-    - ISO8601
-    on_failure:
-    - append:
-        field: error.message
-        value: '{{ _ingest.on_failure_message }}'
-- date:
-    if: ctx.event.timezone != null
-    field: system.auth.timestamp
-    target_field: '@timestamp'
-    formats:
-    - MMM  d HH:mm:ss
-    - MMM dd HH:mm:ss
-    - ISO8601
-    timezone: '{{ event.timezone }}'
-    on_failure:
-    - append:
-        field: error.message
-        value: '{{ _ingest.on_failure_message }}'
-- remove:
-    field: system.auth.timestamp
-- geoip:
-    field: source.ip
-    target_field: source.geo
-    ignore_failure: true
-- geoip:
-    database_file: GeoLite2-ASN.mmdb
-    field: source.ip
-    target_field: source.as
-    properties:
-    - asn
-    - organization_name
-    ignore_missing: true
-- rename:
-    field: source.as.asn
-    target_field: source.as.number
-    ignore_missing: true
-- rename:
-    field: source.as.organization_name
-    target_field: source.as.organization.name
-    ignore_missing: true
-- set:
-    field: event.kind
-    value: event
-- script:
-    lang: painless
-    ignore_failure: true
-    source: >-
-      if (ctx.system.auth.ssh.event == "Accepted") {
-        ctx.event.type = ["authentication_success", "info"];
-        ctx.event.category = ["authentication","session"];
-        ctx.event.action = "ssh_login";
-        ctx.event.outcome = "success";
-      } else if (ctx.system.auth.ssh.event == "Invalid" || ctx.system.auth.ssh.event == "Failed") {
-        ctx.event.type = ["authentication_failure", "info"];
-        ctx.event.category = ["authentication"];
-        ctx.event.action = "ssh_login";
-        ctx.event.outcome = "failure";
-      }
-
-- append:
-    field: event.category
-    value: iam
-    if: "ctx?.process?.name != null && ['groupadd', 'groupdel', 'groupmod', 'useradd', 'userdel', 'usermod'].contains(ctx.process.name)"
-- set:
-    field: event.outcome
-    value: success
-    if: "ctx?.process?.name != null && ['groupadd', 'groupdel', 'groupmod', 'useradd', 'userdel', 'usermod'].contains(ctx.process.name)"
-- append:
-    field: event.type
-    value: user
-    if: "ctx?.process?.name != null && ['useradd', 'userdel', 'usermod'].contains(ctx.process.name)"
-- append:
-    field: event.type
-    value: group
-    if: "ctx?.process?.name != null && ['groupadd', 'groupdel', 'groupmod'].contains(ctx.process.name)"
-- append:
-    field: event.type
-    value: creation
-    if: "ctx?.process?.name != null && ['useradd', 'groupadd'].contains(ctx.process.name)"
-- append:
-    field: event.type
-    value: deletion
-    if: "ctx?.process?.name != null && ['userdel', 'groupdel'].contains(ctx.process.name)"
-- append:
-    field: event.type
-    value: change
-    if: "ctx?.process?.name != null && ['usermod', 'groupmod'].contains(ctx.process.name)"
-- append:
-    field: related.user
-    value: "{{user.name}}"
-    allow_duplicates: false
-    if: "ctx?.user?.name != null && ctx.user?.name != ''"
-- append:
-    field: related.user
-    value: "{{user.effective.name}}"
-    allow_duplicates: false
-    if: "ctx?.user?.effective?.name != null && ctx.user?.effective?.name != ''"
-- append:
-    field: related.ip
-    value: "{{source.ip}}"
-    allow_duplicates: false
-    if: "ctx?.source?.ip != null && ctx.source?.ip != ''"
-- append:
-    field: related.hosts
-    value: "{{host.hostname}}"
-    allow_duplicates: false
-    if: "ctx.host?.hostname != null && ctx.host?.hostname != ''"
+  - set:
+      field: event.ingested
+      copy_from: _ingest.timestamp
+  - rename:
+      if: ctx.event?.original == null
+      field: message
+      target_field: event.original
+      ignore_missing: true
+  - grok:
+      description: Grok the message header.
+      tag: grok-message-header
+      field: event.original
+      pattern_definitions:
+        GREEDYMULTILINE: '(.|\n)*'
+        TIMESTAMP: (?:%{TIMESTAMP_ISO8601}|%{SYSLOGTIMESTAMP})
+      patterns:
+        - '^%{TIMESTAMP:system.auth.timestamp} %{SYSLOGHOST:host.hostname}? %{DATA:process.name}(?:\[%{POSINT:process.pid:long}\])?:%{SPACE}%{GREEDYMULTILINE:_temp.message}$'
+  - grok:
+      description: Grok specific auth messages.
+      tag: grok-specific-messages
+      field: _temp.message
+      ignore_missing: true
+      patterns:
+        - '^%{DATA:system.auth.ssh.event} %{DATA:system.auth.ssh.method} for (invalid user)?%{DATA:user.name} from %{IPORHOST:source.address} port %{NUMBER:source.port:long} ssh2(: %{GREEDYDATA:system.auth.ssh.signature})?'
+        - '^%{DATA:system.auth.ssh.event} user %{DATA:user.name} from %{IPORHOST:source.address}'
+        - '^Did not receive identification string from %{IPORHOST:system.auth.ssh.dropped_ip}'
+        - '^%{DATA:user.name} :( %{DATA:system.auth.sudo.error} ;)? TTY=%{DATA:system.auth.sudo.tty} ; PWD=%{DATA:system.auth.sudo.pwd} ; USER=%{DATA:system.auth.sudo.user} ; COMMAND=%{GREEDYDATA:system.auth.sudo.command}'
+        - '^new group: name=%{DATA:group.name}, GID=%{NUMBER:group.id}'
+        - '^new user: name=%{DATA:user.name}, UID=%{NUMBER:user.id}, GID=%{NUMBER:group.id}, home=%{DATA:system.auth.useradd.home}, shell=%{DATA:system.auth.useradd.shell}$'
+      on_failure:
+        - rename:
+            description: Leave the unmatched content in message.
+            field: _temp.message
+            target_field: message
+  - remove:
+      field: _temp
+  - grok:
+      description: Grok usernames from PAM messages.
+      tag: grok-pam-users
+      field: message
+      ignore_missing: true
+      ignore_failure: true
+      patterns:
+        - 'for user %{QUOTE}?%{DATA:_temp.foruser}%{QUOTE}? by %{QUOTE}?%{DATA:_temp.byuser}%{QUOTE}?(?:\(uid=%{NUMBER:_temp.byuid}\))?$'
+        - 'for user %{QUOTE}?%{DATA:_temp.foruser}%{QUOTE}?$'
+        - 'by user %{QUOTE}?%{DATA:_temp.byuser}%{QUOTE}?$'
+        - '%{BOUNDARY} user %{QUOTE}%{DATA:_temp.user}%{QUOTE}'
+      pattern_definitions:
+        QUOTE: "['\"]"
+        BOUNDARY: "(?<! )"
+      if: ctx.message != null && ctx.message != ""
+  - rename:
+      field: _temp.byuser
+      target_field: user.name
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: _temp.byuid
+      target_field: user.id
+      ignore_missing: true
+      ignore_failure: true
+  - rename:
+      field: _temp.foruser
+      target_field: user.name
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx.user?.name == null || ctx.user?.name == ""
+  - rename:
+      field: _temp.user
+      target_field: user.name
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx.user?.name == null || ctx.user?.name == ""
+  - rename:
+      field: _temp.foruser
+      target_field: user.effective.name
+      ignore_missing: true
+      ignore_failure: true
+      if: ctx.user?.name != null
+  - remove:
+      field: _temp
+      ignore_missing: true
+  - convert:
+      field: source.address
+      target_field: source.ip
+      type: ip
+      ignore_missing: true
+      on_failure:
+        - set:
+            field: source.domain
+            copy_from: source.address
+            ignore_failure: true
+  - convert:
+      field: system.auth.sudo.user
+      target_field: user.effective.name
+      type: string
+      ignore_failure: true
+      if: ctx.system?.auth?.sudo?.user != null
+  - convert:
+      field: system.auth.ssh.dropped_ip
+      target_field: source.ip
+      type: ip
+      ignore_missing: true
+      on_failure:
+        - remove:
+            field: system.auth.ssh.dropped_ip
+  - date:
+      if: ctx.event?.timezone == null
+      field: system.auth.timestamp
+      target_field: '@timestamp'
+      formats:
+        - MMM  d HH:mm:ss
+        - MMM dd HH:mm:ss
+        - ISO8601
+      on_failure:
+        - append:
+            field: error.message
+            value: '{{{ _ingest.on_failure_message }}}'
+  - date:
+      if: ctx.event?.timezone != null
+      field: system.auth.timestamp
+      target_field: '@timestamp'
+      formats:
+        - MMM  d HH:mm:ss
+        - MMM dd HH:mm:ss
+        - ISO8601
+      timezone: '{{{ event.timezone }}}'
+      on_failure:
+        - append:
+            field: error.message
+            value: '{{{ _ingest.on_failure_message }}}'
+  - remove:
+      field: system.auth.timestamp
+  - geoip:
+      field: source.ip
+      target_field: source.geo
+      ignore_missing: true
+  - geoip:
+      database_file: GeoLite2-ASN.mmdb
+      field: source.ip
+      target_field: source.as
+      properties:
+        - asn
+        - organization_name
+      ignore_missing: true
+  - rename:
+      field: source.as.asn
+      target_field: source.as.number
+      ignore_missing: true
+  - rename:
+      field: source.as.organization_name
+      target_field: source.as.organization.name
+      ignore_missing: true
+  - set:
+      field: event.kind
+      value: event
+  - script:
+      description: Add event.category/action/output to SSH events.
+      tag: script-categorize-ssh-event
+      if: ctx.system?.auth?.ssh?.event != null
+      lang: painless
+      source: >-
+        if (ctx.system.auth.ssh.event == "Accepted") {
+          ctx.event.type = ["info"];
+          ctx.event.category = ["authentication", "session"];
+          ctx.event.action = "ssh_login";
+          ctx.event.outcome = "success";
+        } else if (ctx.system.auth.ssh.event == "Invalid" || ctx.system.auth.ssh.event == "Failed") {
+          ctx.event.type = ["info"];
+          ctx.event.category = ["authentication"];
+          ctx.event.action = "ssh_login";
+          ctx.event.outcome = "failure";
+        }
+  - append:
+      field: event.category
+      value: iam
+      if: ctx.process?.name != null && ['groupadd', 'groupdel', 'groupmod', 'useradd', 'userdel', 'usermod'].contains(ctx.process.name)
+  - set:
+      field: event.outcome
+      value: success
+      if: ctx.process?.name != null && (ctx.message == null || !ctx.message.contains("fail")) && ['groupadd', 'groupdel', 'groupmod', 'useradd', 'userdel', 'usermod'].contains(ctx.process.name)
+  - set:
+      field: event.outcome
+      value: failure
+      if: ctx.process?.name != null && (ctx.message != null && ctx.message.contains("fail")) && ['groupadd', 'groupdel', 'groupmod', 'useradd', 'userdel', 'usermod'].contains(ctx.process.name)
+  - append:
+      field: event.type
+      value: user
+      if: ctx.process?.name != null && ['useradd', 'userdel', 'usermod'].contains(ctx.process.name)
+  - append:
+      field: event.type
+      value: group
+      if: ctx.process?.name != null && ['groupadd', 'groupdel', 'groupmod'].contains(ctx.process.name)
+  - append:
+      field: event.type
+      value: creation
+      if: ctx.process?.name != null && ['useradd', 'groupadd'].contains(ctx.process.name)
+  - append:
+      field: event.type
+      value: deletion
+      if: ctx.process?.name != null && ['userdel', 'groupdel'].contains(ctx.process.name)
+  - append:
+      field: event.type
+      value: change
+      if: ctx.process?.name != null && ['usermod', 'groupmod'].contains(ctx.process.name)
+  - append:
+      field: related.user
+      value: "{{{ user.name }}}"
+      allow_duplicates: false
+      if: ctx.user?.name != null && ctx.user?.name != ''
+  - append:
+      field: related.user
+      value: "{{{ user.effective.name }}}"
+      allow_duplicates: false
+      if: ctx.user?.effective?.name != null && ctx.user?.effective?.name != ''
+  - append:
+      field: related.ip
+      value: "{{{ source.ip }}}"
+      allow_duplicates: false
+      if: ctx.source?.ip != null && ctx.source?.ip != ''
+  - append:
+      field: related.hosts
+      value: "{{{ host.hostname }}}"
+      allow_duplicates: false
+      if: ctx.host?.hostname != null && ctx.host?.hostname != ''
+  - set:
+      field: ecs.version
+      value: 8.0.0
+  - remove:
+      field: event.original
+      if: "ctx?.tags == null || !(ctx.tags.contains('preserve_original_event'))"
+      ignore_failure: true
+      ignore_missing: true
 on_failure:
-- set:
-    field: error.message
-    value: '{{ _ingest.on_failure_message }}'
+  - set:
+      field: error.message
+      value: '{{{ _ingest.on_failure_message }}}'

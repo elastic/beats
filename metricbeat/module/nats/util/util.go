@@ -23,9 +23,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // convertUptimeToSeconds converts uptime from formatted string to seconds
@@ -39,7 +37,7 @@ func convertUptimeToSeconds(uptime string) (seconds int64, err error) {
 		uptime = split[1]
 		years, err = strconv.ParseInt(split[0], 10, 64)
 		if err != nil {
-			err = errors.Wrap(err, "invalid years format in json data")
+			err = fmt.Errorf("invalid years format in json data: %w", err)
 			return
 		}
 		seconds += years * 31536000
@@ -50,7 +48,7 @@ func convertUptimeToSeconds(uptime string) (seconds int64, err error) {
 		uptime = split[1]
 		days, err = strconv.ParseInt(split[0], 10, 64)
 		if err != nil {
-			err = errors.Wrap(err, "invalid days format in json data")
+			err = fmt.Errorf("invalid days format in json data: %w", err)
 			return
 		}
 		seconds += days * 86400
@@ -61,7 +59,7 @@ func convertUptimeToSeconds(uptime string) (seconds int64, err error) {
 		uptime = split[1]
 		hours, err = strconv.ParseInt(split[0], 10, 64)
 		if err != nil {
-			err = errors.Wrap(err, "invalid hours format in json data")
+			err = fmt.Errorf("invalid hours format in json data: %w", err)
 			return
 		}
 		seconds += hours * 3600
@@ -72,7 +70,7 @@ func convertUptimeToSeconds(uptime string) (seconds int64, err error) {
 		uptime = split[1]
 		minutes, err = strconv.ParseInt(split[0], 10, 64)
 		if err != nil {
-			err = errors.Wrap(err, "invalid minutes format in json data")
+			err = fmt.Errorf("invalid minutes format in json data: %w", err)
 			return
 		}
 		seconds += minutes * 60
@@ -83,7 +81,7 @@ func convertUptimeToSeconds(uptime string) (seconds int64, err error) {
 		uptime = split[1]
 		secs, err = strconv.ParseInt(split[0], 10, 64)
 		if err != nil {
-			err = errors.Wrap(err, "invalid seconds format in json data")
+			err = fmt.Errorf("invalid seconds format in json data: %w", err)
 			return
 		}
 		seconds += secs
@@ -91,25 +89,25 @@ func convertUptimeToSeconds(uptime string) (seconds int64, err error) {
 	return
 }
 
-// UpdateDuration updates a duration in a common.MapStr from formatted string to seconds
-func UpdateDuration(event common.MapStr, key string) error {
+// UpdateDuration updates a duration in a mapstr.M from formatted string to seconds
+func UpdateDuration(event mapstr.M, key string) error {
 	item, err := event.GetValue(key)
 	if err != nil {
 		return nil
 	}
 	itemConverted, err := convertUptimeToSeconds(item.(string))
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("failure converting %v key from string to integer", key))
+		return fmt.Errorf(fmt.Sprintf("failure converting %v key from string to integer", key)+": %w", err)
 	}
 	_, err = event.Put(key, itemConverted)
 	if err != nil {
-		return errors.Wrap(err, fmt.Sprintf("failure updating %v key", key))
+		return fmt.Errorf(fmt.Sprintf("failure updating %v key", key)+": %w", err)
 	}
 	return nil
 }
 
 // GetNatsTimestamp gets the timestamp of base level metrics NATS server returns
-func GetNatsTimestamp(event common.MapStr) (time.Time, error) {
+func GetNatsTimestamp(event mapstr.M) (time.Time, error) {
 	var timeStamp time.Time
 	timestamp, _ := event.GetValue("server.time")
 	timestampString := timestamp.(string)

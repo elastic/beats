@@ -14,9 +14,9 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Guess the offsets within a struct inet_sock where the local and remote
@@ -140,7 +140,7 @@ func (g *guessInetSockIPv4) Trigger() error {
 // Extract receives the dump of a struct inet_sock* and scans it for the
 // random local and remote IPs and ports. Will return lists of all the
 // offsets were each value was found.
-func (g *guessInetSockIPv4) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessInetSockIPv4) Extract(ev interface{}) (mapstr.M, bool) {
 	data := ev.([]byte)
 
 	laddr := g.local.Addr[:]
@@ -182,7 +182,7 @@ func (g *guessInetSockIPv4) Extract(ev interface{}) (common.MapStr, bool) {
 		return nil, false
 	}
 
-	return common.MapStr{
+	return mapstr.M{
 		"INET_SOCK_LADDR": laddrHits,
 		"INET_SOCK_LPORT": lportHits,
 		"INET_SOCK_RADDR": raddrHits,
@@ -197,7 +197,7 @@ func (g *guessInetSockIPv4) NumRepeats() int {
 
 // Reduce receives the output from multiple runs (list of offsets for each field)
 // and for every field it returns the first offset that appeared all the runs.
-func (g *guessInetSockIPv4) Reduce(results []common.MapStr) (result common.MapStr, err error) {
+func (g *guessInetSockIPv4) Reduce(results []mapstr.M) (result mapstr.M, err error) {
 	if result, err = consolidate(results); err != nil {
 		return nil, err
 	}

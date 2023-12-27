@@ -5,15 +5,15 @@
 package cloudfoundry
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/cloudfoundry-community/go-cfclient"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // Client interface exposed by Hub.Client.
@@ -68,7 +68,7 @@ func (h *Hub) Client() (*cfclient.Client, error) {
 		UserAgent:         h.userAgent,
 	})
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating cloudfoundry client")
+		return nil, fmt.Errorf("error creating cloudfoundry client: %w", err)
 	}
 	if h.cfg.DopplerAddress != "" {
 		cf.Endpoint.DopplerEndpoint = h.cfg.DopplerAddress
@@ -131,7 +131,7 @@ func (h *Hub) DopplerConsumerFromClient(client *cfclient.Client, callbacks Doppl
 	}
 	tlsConfig, err := tlscommon.LoadTLSConfig(h.cfg.Transport.TLS)
 	if err != nil {
-		return nil, errors.Wrap(err, "loading tls config")
+		return nil, fmt.Errorf("loading tls config: %w", err)
 	}
 	proxy := h.cfg.Transport.Proxy.ProxyFunc()
 

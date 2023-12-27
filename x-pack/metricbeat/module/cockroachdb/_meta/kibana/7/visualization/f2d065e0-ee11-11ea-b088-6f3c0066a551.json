@@ -36,7 +36,7 @@
                         "line_width": 1,
                         "metrics": [
                             {
-                                "field": null,
+                                "field": "prometheus.metrics.clock_offset_stddevnanos",
                                 "id": "88d70bc0-9760-11e9-b3d5-07b0ab7d6354",
                                 "type": "max"
                             }

@@ -17,13 +17,11 @@
 
 package autodiscover
 
-import (
-	"github.com/elastic/beats/v7/libbeat/common"
-)
+import "github.com/elastic/elastic-agent-libs/config"
 
 // Config settings for Autodiscover
 type Config struct {
-	Providers []*common.Config `config:"providers"`
+	Providers []*config.C `config:"providers"`
 }
 
 // ProviderConfig settings

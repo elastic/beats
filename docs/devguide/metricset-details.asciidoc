@@ -100,7 +100,7 @@ include::../../metricbeat/module/mysql/_meta/fields.yml[]
 +
 * `metricbeat/module/{module}/{metricset}/_meta/fields.yml`: Contains all fields definitions retrieved by the metricset.
 As field types, each field must have a core data type
-https://www.elastic.co/guide/en/elasticsearch/reference/master/mapping-types.html#_core_datatypes[supported by elasticsearch]. Here's a very basic example that shows one group from the MySQL `status` metricset:
+{ref}/mapping-types.html#_core_datatypes[supported by elasticsearch]. Here's a very basic example that shows one group from the MySQL `status` metricset:
 +
 [source,yaml]
 ----

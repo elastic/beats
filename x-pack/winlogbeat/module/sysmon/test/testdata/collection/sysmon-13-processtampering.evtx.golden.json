@@ -1,0 +1,47 @@
+[
+  {
+    "@timestamp": "2021-02-25T14:43:23.5512694Z",
+    "event": {
+      "code": "25",
+      "kind": "event",
+      "provider": "Microsoft-Windows-Sysmon"
+    },
+    "host": {
+      "name": "DESKTOP-I9CQVAQ"
+    },
+    "log": {
+      "level": "information"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "DESKTOP-I9CQVAQ",
+      "event_data": {
+        "Image": "C:\\Program Files\\Git\\mingw64\\libexec\\git-core\\git.exe",
+        "ProcessGuid": "{9497d8d9-b78b-6037-6f13-000000001000}",
+        "ProcessId": "2628",
+        "RuleName": "-",
+        "Type": "Image is replaced",
+        "UtcTime": "2021-02-25 14:43:23.550"
+      },
+      "event_id": "25",
+      "opcode": "Info",
+      "process": {
+        "pid": 3800,
+        "thread": {
+          "id": 5080
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": 10737797,
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  }
+]

@@ -25,14 +25,13 @@ package query
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/helper/sql"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/mysql"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
@@ -82,7 +81,7 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
 		var err error
 		m.db, err = sql.NewDBClient("mysql", m.HostData().URI, m.Logger())
 		if err != nil {
-			return errors.Wrap(err, "mysql-status fetch failed")
+			return fmt.Errorf("mysql-status fetch failed: %w", err)
 		}
 	}
 
@@ -120,8 +119,8 @@ func (m *MetricSet) fetchQuery(ctx context.Context, query query, reporter mb.Rep
 	return nil
 }
 
-func (m *MetricSet) transformMapStrToEvent(query query, ms common.MapStr) mb.Event {
-	event := mb.Event{ModuleFields: common.MapStr{m.Config.Namespace: common.MapStr{}}}
+func (m *MetricSet) transformMapStrToEvent(query query, ms mapstr.M) mb.Event {
+	event := mb.Event{ModuleFields: mapstr.M{m.Config.Namespace: mapstr.M{}}}
 
 	data := ms
 	if query.ReplaceUnderscores {
@@ -129,7 +128,7 @@ func (m *MetricSet) transformMapStrToEvent(query query, ms common.MapStr) mb.Eve
 	}
 
 	if query.Namespace != "" {
-		event.ModuleFields[m.Config.Namespace] = common.MapStr{query.Namespace: data}
+		event.ModuleFields[m.Config.Namespace] = mapstr.M{query.Namespace: data}
 	} else {
 		event.ModuleFields[m.Config.Namespace] = data
 	}
@@ -142,5 +141,5 @@ func (m *MetricSet) Close() error {
 	if m.db == nil {
 		return nil
 	}
-	return errors.Wrap(m.db.Close(), "failed to close mysql database client")
+	return fmt.Errorf("failed to close mysql database client: %w", m.db.Close())
 }

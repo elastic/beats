@@ -3,21 +3,19 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build windows
-// +build windows
 
 package application_pool
 
 import (
+	"fmt"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const ecsProcessId = "process.pid"
@@ -78,7 +76,7 @@ func newReader(config Config) (*Reader, error) {
 
 	err := r.initAppPools()
 	if err != nil {
-		return nil, errors.Wrap(err, "error loading counters for existing app pools")
+		return nil, fmt.Errorf("error loading counters for existing app pools: %w", err)
 	}
 	return r, nil
 }
@@ -87,7 +85,7 @@ func newReader(config Config) (*Reader, error) {
 func (r *Reader) initAppPools() error {
 	apps, err := getApplicationPools(r.config.Names)
 	if err != nil {
-		return errors.Wrap(err, "failed retrieving running worker processes")
+		return fmt.Errorf("failed retrieving running worker processes: %w", err)
 	}
 	r.applicationPools = apps
 	if len(apps) == 0 {
@@ -117,14 +115,14 @@ func (r *Reader) initAppPools() error {
 		}
 		for _, v := range childQueries {
 			if err := r.query.AddCounter(v, "", "float", len(childQueries) > 1); err != nil {
-				return errors.Wrapf(err, `failed to add counter (query="%v")`, v)
+				return fmt.Errorf(`failed to add counter (query="%v"): %w`, v, err)
 			}
 			r.workerProcesses[v] = key
 		}
 	}
 	err = r.query.RemoveUnusedCounters(newQueries)
 	if err != nil {
-		return errors.Wrap(err, "failed removing unused counter values")
+		return fmt.Errorf("failed removing unused counter values: %w", err)
 	}
 	return nil
 }
@@ -139,14 +137,14 @@ func (r *Reader) read() ([]mb.Event, error) {
 	// Some counters, such as rate counters, require two counter values in order to compute a displayable value. In this case we must call PdhCollectQueryData twice before calling PdhGetFormattedCounterValue.
 	// For more information, see Collecting Performance Data (https://docs.microsoft.com/en-us/windows/desktop/PerfCtrs/collecting-performance-data).
 	if err := r.query.CollectData(); err != nil {
-		return nil, errors.Wrap(err, "failed querying counter values")
+		return nil, fmt.Errorf("failed querying counter values: %w", err)
 	}
 
 	// Get the values.
 	values, err := r.query.GetFormattedCounterValues()
 	if err != nil {
-		r.query.Close()
-		return nil, errors.Wrap(err, "failed formatting counter values")
+		r.close()
+		return nil, fmt.Errorf("failed formatting counter values: %w", err)
 	}
 	var events []mb.Event
 	eventGroup := r.mapEvents(values)
@@ -163,10 +161,10 @@ func (r *Reader) mapEvents(values map[string][]pdh.CounterValue) map[string]mb.E
 	events := make(map[string]mb.Event)
 	for _, appPool := range r.applicationPools {
 		events[appPool.name] = mb.Event{
-			MetricSetFields: common.MapStr{
+			MetricSetFields: mapstr.M{
 				"name": appPool.name,
 			},
-			RootFields: common.MapStr{},
+			RootFields: mapstr.M{},
 		}
 		for counterPath, value := range values {
 			for _, val := range value {

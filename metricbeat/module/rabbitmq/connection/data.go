@@ -19,13 +19,12 @@ package connection
 
 import (
 	"encoding/json"
+	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
 	c "github.com/elastic/beats/v7/libbeat/common/schema/mapstriface"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -64,7 +63,7 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 	var connections []map[string]interface{}
 	err := json.Unmarshal(content, &connections)
 	if err != nil {
-		return errors.Wrap(err, "error in unmarshal")
+		return fmt.Errorf("error in unmarshal: %w", err)
 	}
 
 	for _, node := range connections {
@@ -77,13 +76,13 @@ func eventsMapping(content []byte, r mb.ReporterV2) error {
 func eventMapping(connection map[string]interface{}) mb.Event {
 	fields, _ := schema.Apply(connection, s.FailOnRequired)
 
-	rootFields := common.MapStr{}
+	rootFields := mapstr.M{}
 	if v, err := fields.GetValue("user"); err == nil {
 		rootFields.Put("user.name", v)
 		fields.Delete("user")
 	}
 
-	moduleFields := common.MapStr{}
+	moduleFields := mapstr.M{}
 	if v, err := fields.GetValue("vhost"); err == nil {
 		moduleFields.Put("vhost", v)
 		fields.Delete("vhost")

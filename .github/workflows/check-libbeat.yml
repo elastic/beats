@@ -1,0 +1,29 @@
+name: check-libbeat
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/check-packetbeat.yml'
+      - 'libbeat/**'
+      - 'x-pack/libbeat/**'
+
+env:
+  BEAT_MODULE: 'libbeat'
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-go@v3
+      with:
+        go-version-file: .go-version
+    - name: Update package lists
+      run: sudo apt-get update
+    - name: Install libpcap-dev
+      run: sudo apt-get install -y libpcap-dev
+    - name: Run check/update
+      run: |
+        go install github.com/magefile/mage
+        make -C ${{ env.BEAT_MODULE }} check update
+        make check-no-changes

@@ -18,13 +18,13 @@
 package node
 
 import (
+	"errors"
+	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/munin"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -70,7 +70,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	node, err := munin.Connect(m.Host(), m.timeout)
 	if err != nil {
-		return errors.Wrap(err, "error in Connect")
+		return fmt.Errorf("error in Connect: %w", err)
 	}
 	defer node.Close()
 
@@ -78,14 +78,14 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	if len(plugins) == 0 {
 		plugins, err = node.List()
 		if err != nil {
-			return errors.Wrap(err, "error getting plugin list")
+			return fmt.Errorf("error getting plugin list: %w", err)
 		}
 	}
 
 	for _, plugin := range plugins {
 		metrics, err := node.Fetch(plugin, m.sanitize)
 		if err != nil {
-			msg := errors.Wrap(err, "error fetching metrics")
+			msg := fmt.Errorf("error fetching metrics: %w", err)
 			r.Error(err)
 			m.Logger().Error(msg)
 			continue
@@ -97,9 +97,9 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		}
 		event := mb.Event{
 			Service: plugin,
-			RootFields: common.MapStr{
-				"munin": common.MapStr{
-					"plugin": common.MapStr{
+			RootFields: mapstr.M{
+				"munin": mapstr.M{
+					"plugin": mapstr.M{
 						"name": plugin,
 					},
 					"metrics": metrics,

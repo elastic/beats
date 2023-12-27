@@ -1,5 +1,5 @@
 # Module: checkpoint
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/master/filebeat-module-checkpoint.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-checkpoint.html
 
 - module: checkpoint
   firewall:
@@ -22,3 +22,7 @@
     # Set external security zones. used to override parsed network.direction
     # based on zone egress and ingress
     #var.external_zones: [ "External" ]
+
+    # IANA time zone or time offset (e.g. `+0200`) to use when interpreting syslog
+    # timestamps without a time zone.
+    #var.timezone_offset: UTC

@@ -4,7 +4,7 @@
 
 package gcp
 
-import monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+import "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 
 const (
 	// ModuleName in Metricbeat
@@ -15,6 +15,7 @@ const (
 )
 
 // Metricsets / GCP services names
+// NOTE: if you are adding a service make sure to update tests in metrics/metrics_requester_test.go.
 const (
 	ServiceCloudFunctions = "cloudfunctions"
 	ServiceCompute        = "compute"
@@ -24,9 +25,11 @@ const (
 	ServiceStorage        = "storage"
 	ServiceFirestore      = "firestore"
 	ServiceDataproc       = "dataproc"
+	ServiceCloudSQL       = "cloudsql"
+	ServiceRedis          = "redis"
 )
 
-//Paths within the GCP monitoring.TimeSeries response, if converted to JSON, where you can find each ECS field required for the output event
+// Paths within the GCP monitoring.TimeSeries response, if converted to JSON, where you can find each ECS field required for the output event
 const (
 	TimeSeriesResponsePathForECSAvailabilityZone = "zone"
 	TimeSeriesResponsePathForECSAccountID        = "project_id"
@@ -76,7 +79,18 @@ const (
 	LabelMetadata = "metadata"
 )
 
-// Available perSeriesAligner map
+// NOTE: if you are adding labels make sure to update tests in metrics/metrics_requester_test.go.
+const (
+	DefaultResourceLabel  = "resource.label.zone"
+	ComputeResourceLabel  = "resource.labels.zone"
+	GKEResourceLabel      = "resource.label.location"
+	StorageResourceLabel  = "resource.label.location"
+	CloudSQLResourceLabel = "resource.labels.region"
+	DataprocResourceLabel = "resource.label.region"
+	RedisResourceLabel    = "resource.label.region"
+)
+
+// AlignersMapToGCP map contains available perSeriesAligner
 // https://cloud.google.com/monitoring/api/ref_v3/rest/v3/projects.alertPolicies#Aligner
 var AlignersMapToGCP = map[string]monitoringpb.Aggregation_Aligner{
 	"ALIGN_NONE":           monitoringpb.Aggregation_ALIGN_NONE,

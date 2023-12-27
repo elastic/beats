@@ -6,6 +6,10 @@ processors:
   - set:
       field: ecs.version
       value: '1.12.0'
+  - script:
+      description: Remove all empty values from event_data.
+      lang: painless
+      source: ctx.winlog?.event_data?.entrySet().removeIf(entry -> [null, "", "-", "{00000000-0000-0000-0000-000000000000}"].contains(entry.getValue()))
   - rename:
       field: winlog.level
       target_field: log.level
@@ -28,8 +32,8 @@ processors:
       if: ctx?.winlog?.event_data?.UtcTime != null
 
   - set:
-      field: event.ingested
-      value: '{{_ingest.timestamp}}'
+      field: event.module
+      value: sysmon
   - set:
       field: event.kind
       value: event
@@ -78,6 +82,16 @@ processors:
             - process
           type:
             - change
+        "8":
+          category:
+            - process
+          type:
+            - change
+        "9":
+          category:
+            - process
+          type:
+            - access
         "10":
           category:
             - process
@@ -126,6 +140,21 @@ processors:
             - file
           type:
             - access
+        "19":
+          category:
+            - process
+          type:
+            - creation
+        "20":
+          category:
+            - process
+          type:
+            - creation
+        "21":
+          category:
+            - process
+          type:
+            - access
         "22":
           category:
             - network
@@ -151,6 +180,23 @@ processors:
             - file
           type:
             - deletion
+        "27":
+          category:
+            - file
+          type:
+            - creation
+            - denied
+        "28":
+          category:
+            - file
+          type:
+            - deletion
+            - denied
+        "255":
+          category:
+            - process
+          type:
+            - error
       tag: Add ECS categorization fields
       source: |-
         if (ctx?.event?.code == null || params.get(ctx.event.code) == null) {
@@ -169,29 +215,26 @@ processors:
       target_field: error.code
       ignore_failure: true
       ignore_missing: true
-      if: ctx.event.code == "255" && ctx.winlog?.event_data?.ID != null && ctx.winlog?.event_data?.ID != ""
+      if: ctx.event.code == "255"
 
   - rename:
       field: winlog.event_data.RuleName
       target_field: rule.name
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.RuleName != null && ctx?.winlog?.event_data?.RuleName != "" && ctx?.winlog?.event_data?.RuleName != "-"
-
 
   - rename:
       field: winlog.event_data.Type
       target_field: message
       ignore_missing: true
       ignore_failure: true
-      if: ctx.event.code == "25" && ctx?.winlog?.event_data?.Type != null && ctx?.winlog?.event_data?.Type != ""
+      if: ctx.event.code == "25"
 
   - rename:
       field: winlog.event_data.Hash
       target_field: winlog.event_data.Hashes
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.Hash != null && ctx?.winlog?.event_data?.Hash != ""
   - kv:
       field: winlog.event_data.Hashes
       target_field: _temp.hashes
@@ -253,101 +296,86 @@ processors:
       target_field: process.entity_id
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.ProcessGuid != null && ctx?.winlog?.event_data?.ProcessGuid != ""
   - convert:
       field: winlog.event_data.ProcessId
       target_field: process.pid
       type: long
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.ProcessId != null && ctx?.winlog?.event_data?.ProcessId != ""
   - rename:
       field: winlog.event_data.Image
       target_field: process.executable
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.Image != null && ctx?.winlog?.event_data?.Image != ""
   - rename:
       field: winlog.event_data.SourceProcessGuid
       target_field: process.entity_id
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.SourceProcessGuid != null && ctx?.winlog?.event_data?.SourceProcessGuid != ""
   - rename:
       field: winlog.event_data.SourceProcessGUID
       target_field: process.entity_id
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.SourceProcessGUID != null && ctx?.winlog?.event_data?.SourceProcessGUID != ""
   - convert:
       field: winlog.event_data.SourceProcessId
       target_field: process.pid
       type: long
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.SourceProcessId != null && ctx?.winlog?.event_data?.SourceProcessId != ""
   - convert:
       field: winlog.event_data.SourceThreadId
       target_field: process.thread.id
       type: long
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.SourceThreadId != null && ctx?.winlog?.event_data?.SourceThreadId != ""
   - rename:
       field: winlog.event_data.SourceImage
       target_field: process.executable
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.SourceImage != null && ctx?.winlog?.event_data?.SourceImage != ""
   - rename:
       field: winlog.event_data.Destination
       target_field: process.executable
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.Destination != null && ctx?.winlog?.event_data?.Destination != ""
   - rename:
       field: winlog.event_data.CommandLine
       target_field: process.command_line
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.CommandLine != null && ctx?.winlog?.event_data?.CommandLine != ""
   - rename:
       field: winlog.event_data.CurrentDirectory
       target_field: process.working_directory
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.CurrentDirectory != null && ctx?.winlog?.event_data?.CurrentDirectory != ""
   - rename:
       field: winlog.event_data.ParentProcessGuid
       target_field: process.parent.entity_id
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.ParentProcessGuid != null && ctx?.winlog?.event_data?.ParentProcessGuid != ""
   - convert:
       field: winlog.event_data.ParentProcessId
       target_field: process.parent.pid
       type: long
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.ParentProcessId != null && ctx?.winlog?.event_data?.ParentProcessId != ""
   - rename:
       field: winlog.event_data.ParentImage
       target_field: process.parent.executable
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.ParentImage != null && ctx?.winlog?.event_data?.ParentImage != ""
   - rename:
       field: winlog.event_data.ParentCommandLine
       target_field: process.parent.command_line
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.ParentCommandLine != null && ctx?.winlog?.event_data?.ParentCommandLine != ""
   - rename:
       field: winlog.event_data.OriginalFileName
       target_field: process.pe.original_file_name
       ignore_missing: true
       ignore_failure: true
-      if: ctx.event.code != "7" && ctx?.winlog?.event_data?.OriginalFileName != null && ctx?.winlog?.event_data?.OriginalFileName != ""
+      if: ctx.event.code != "7"
   - set:
       field: process.pe.company
       copy_from: winlog.event_data.Company
@@ -512,25 +540,21 @@ processors:
       target_field: file.path
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.TargetFilename != null && ctx?.winlog?.event_data?.TargetFilename != ""
   - rename:
       field: winlog.event_data.Device
       target_field: file.path
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.Device != null && ctx?.winlog?.event_data?.Device != ""
   - rename:
       field: winlog.event_data.PipeName
       target_field: file.name
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.PipeName != null && ctx?.winlog?.event_data?.PipeName != ""
   - rename:
       field: winlog.event_data.ImageLoaded
       target_field: file.path
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.ImageLoaded != null && ctx?.winlog?.event_data?.ImageLoaded != ""
   - set:
       field: file.code_signature.subject_name
       copy_from: winlog.event_data.Signature
@@ -546,7 +570,7 @@ processors:
       target_field: file.pe.original_file_name
       ignore_missing: true
       ignore_failure: true
-      if: ctx.event.code == "7" && ctx?.winlog?.event_data?.OriginalFileName != null && ctx?.winlog?.event_data?.OriginalFileName != ""
+      if: ctx.event.code == "7"
   - set:
       field: file.pe.company
       copy_from: winlog.event_data.Company
@@ -574,11 +598,11 @@ processors:
   - set:
       field: file.code_signature.signed
       value: true
-      if: ctx?.winlog?.event_data?.Signed != null && ctx.winlog.event_data.Signed == true
+      if: ctx?.winlog?.event_data?.Signed == true
   - set:
       field: file.code_signature.valid
       value: true
-      if: ctx?.winlog?.event_data?.SignatureStatus != null && ctx?.winlog?.event_data?.SignatureStatus == "Valid"
+      if: ctx?.winlog?.event_data?.SignatureStatus == "Valid"
 
   - script:
       description: Adds file information.
@@ -607,19 +631,18 @@ processors:
       target_field: network.transport
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.Protocol != null && ctx?.winlog?.event_data?.Protocol != ""
   - rename:
       field: winlog.event_data.DestinationPortName
       target_field: network.protocol
       ignore_missing: true
       ignore_failure: true
-      if: ctx.event.code != "22" && ctx?.winlog?.event_data?.DestinationPortName != null && ctx?.winlog?.event_data?.DestinationPortName != ""
+      if: ctx.event.code != "22"
   - rename:
       field: winlog.event_data.SourcePortName
       target_field: network.protocol
       ignore_missing: true
       ignore_failure: true
-      if: ctx.event.code != "22" && ctx?.winlog?.event_data?.SourcePortName != null && ctx?.winlog?.event_data?.SourcePortName != ""
+      if: ctx.event.code != "22"
   - set:
       field: network.protocol
       value: dns
@@ -630,68 +653,61 @@ processors:
       type: ip
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.SourceIp != null && ctx?.winlog?.event_data?.SourceIp != ""
   - rename:
       field: winlog.event_data.SourceHostname
       target_field: source.domain
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.SourceHostname != null && ctx?.winlog?.event_data?.SourceHostname != ""
   - convert:
       field: winlog.event_data.SourcePort
       target_field: source.port
       type: long
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.SourcePort != null && ctx?.winlog?.event_data?.SourcePort != ""
   - convert:
       field: winlog.event_data.DestinationIp
       target_field: destination.ip
       type: ip
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.DestinationIp != null && ctx?.winlog?.event_data?.DestinationIp != ""
   - rename:
       field: winlog.event_data.DestinationHostname
       target_field: destination.domain
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.DestinationHostname != null && ctx?.winlog?.event_data?.DestinationHostname != ""
   - convert:
       field: winlog.event_data.DestinationPort
       target_field: destination.port
       type: long
       ignore_failure: true
       ignore_missing: true
-      if: ctx?.winlog?.event_data?.DestinationPort != null && ctx?.winlog?.event_data?.DestinationPort != ""
   - rename:
       field: winlog.event_data.QueryName
       target_field: dns.question.name
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.QueryName != null && ctx?.winlog?.event_data?.QueryName != ""
   - set:
       field: network.direction
       value: egress
-      if: ctx?.winlog?.event_data?.Initiated != null && ctx?.winlog?.event_data?.Initiated == "true"
+      if: ctx?.winlog?.event_data?.Initiated == "true"
   - set:
       field: network.direction
       value: ingress
-      if: ctx?.winlog?.event_data?.Initiated != null && ctx?.winlog?.event_data?.Initiated == "false"
+      if: ctx?.winlog?.event_data?.Initiated == "false"
   - set:
       field: network.type
       value: ipv4
-      if: ctx?.winlog?.event_data?.SourceIsIpv6 != null && ctx?.winlog?.event_data?.SourceIsIpv6 == "false"
+      if: ctx?.winlog?.event_data?.SourceIsIpv6 == "false"
   - set:
       field: network.type
       value: ipv6
-      if: ctx?.winlog?.event_data?.SourceIsIpv6 != null && ctx?.winlog?.event_data?.SourceIsIpv6 == "true"
+      if: ctx?.winlog?.event_data?.SourceIsIpv6 == "true"
   - script:
       description: |
         Splits the QueryResults field that contains the DNS responses.
         Example: "type:  5 f2.taboola.map.fastly.net;::ffff:151.101.66.2;::ffff:151.101.130.2;::ffff:151.101.194.2;::ffff:151.101.2.2;"
       lang: painless
-      if: ctx?.winlog?.event_data?.QueryResults != null && ctx?.winlog?.event_data?.QueryResults != ""
+      if: ctx?.winlog?.event_data?.QueryResults != null
       params:
         "1": "A"
         "2": "NS"
@@ -766,15 +782,20 @@ processors:
 
           if (answer.startsWith("type:")) {
             def parts = /\s+/.split(answer);
-            if (parts.length != 3) {
+            if (parts.length < 2) {
               throw new Exception("unexpected QueryResult format");
             }
-
-            answers.add([
-              "type": params[parts[1]],
-              "data": parts[2]
-            ]);
-            relatedHosts.add(parts[2]);
+            if (parts.length == 3) {
+              answers.add([
+                "type": params[parts[1]],
+                "data": parts[2]
+              ]);
+              relatedHosts.add(parts[2]);
+            } else {
+              answers.add([
+                "type": params[parts[1]]
+              ]);
+            }
           } else {
             answer = answer.replace("::ffff:", "");
             ips.add(answer);
@@ -888,7 +909,6 @@ processors:
       target_field: sysmon.dns.status
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.QueryStatus != null && ctx?.winlog?.event_data?.QueryStatus != ""
   - script:
       description: Translate DNS Query status.
       lang: painless
@@ -1102,14 +1122,12 @@ processors:
       type: boolean
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.Archived != null && ctx?.winlog?.event_data?.Archived != ""
   - convert:
       field: winlog.event_data.IsExecutable
       target_field: sysmon.file.is_executable
       type: boolean
       ignore_missing: true
       ignore_failure: true
-      if: ctx?.winlog?.event_data?.IsExecutable != null && ctx?.winlog?.event_data?.IsExecutable != ""
 
 ## Related fields
 
@@ -1138,8 +1156,7 @@ processors:
       description: Set registry fields.
       lang: painless
       if: |-
-        ctx?.winlog?.event_data?.TargetObject != null && ctx?.winlog?.event_data?.TargetObject != "" &&
-        ["12", "13", "14"].contains(ctx.event.code)
+        ctx?.winlog?.event_data?.TargetObject != null && ["12", "13", "14"].contains(ctx.event.code)
       params:
         HKEY_CLASSES_ROOT: "HKCR"
         HKCR: "HKCR"
@@ -1157,8 +1174,9 @@ processors:
         HKU: "HKU"
       source: |-
         ctx.registry = new HashMap();
-        Pattern qwordRegex = /(?i)QWORD \(((0x\d{8})-(0x\d{8}))\)/;
-        Pattern dwordRegex = /(?i)DWORD \((0x\d{8})\)/;
+        Pattern qwordRegex = /(?i)QWORD \(((0x[0-9A-F]{8})-(0x[0-9A-F]{8}))\)/;
+        Pattern dwordRegex = /(?i)DWORD \((0x[0-9A-F]{8})\)/;
+        Pattern binDataRegex = /Binary Data/;
 
         def path = ctx.winlog.event_data.TargetObject;
         ctx.registry.path = path;
@@ -1187,24 +1205,43 @@ processors:
             if (!Double.isNaN(parsedHighByte) && !Double.isNaN(parsedLowByte)) {
               dataType = "SZ_QWORD";
               dataValue = Long.toString(((parsedHighByte << 8) + parsedLowByte));
+              ctx.registry.data = [
+                "strings": [dataValue],
+                "type": dataType
+              ];
             }
-          } else {
-            matcher = dwordRegex.matcher(data);
-            if (matcher.matches()) {
-              def parsedValue = Long.parseLong(matcher.group(1).substring(prefixLen), 16);
-              if (!Double.isNaN(parsedValue)) {
-                dataType = "SZ_DWORD";
-                dataValue = matcher.group(1);
-              }
-            }
+            return;
           }
 
-          if (dataType != "") {
-            ctx.registry.data = [
-              "strings": [dataValue],
-              "type": dataType
-            ];
+          matcher = dwordRegex.matcher(data);
+          if (matcher.matches()) {
+            def parsedValue = Long.parseLong(matcher.group(1).substring(prefixLen), 16);
+            if (!Double.isNaN(parsedValue)) {
+              dataType = "SZ_DWORD";
+              dataValue = Long.toString(parsedValue);
+              ctx.registry.data = [
+                "strings": [dataValue],
+                "type": dataType
+              ];
+            }
+            return;
           }
+
+          matcher = binDataRegex.matcher(data);
+          if (matcher.matches()) {
+            // Data type could be REG_BINARY or REG_MULTI_SZ
+            ctx.registry.data = [
+              "strings": [data],
+              "type": "REG_BINARY"
+            ];
+            return;
+          }
+
+          // REG_SZ or REG_EXPAND_SZ
+          ctx.registry.data = [
+            "strings": [data],
+            "type": "REG_SZ"
+          ];
         }
 
 ## Cleanup
@@ -1240,10 +1277,6 @@ processors:
         - winlog.level
       ignore_failure: true
       ignore_missing: true
-  - script:
-      description: Remove all empty values from event_data.
-      lang: painless
-      source: ctx?.winlog?.event_data?.entrySet().removeIf(entry -> entry.getValue() == null || entry.getValue().equals("") || entry.getValue().equals("-"));
   - remove:
       description: Remove empty event data.
       field: winlog.event_data

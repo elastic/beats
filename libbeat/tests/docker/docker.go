@@ -19,16 +19,15 @@ package docker
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"io/ioutil"
 
-	"github.com/pkg/errors"
+	"github.com/elastic/elastic-agent-autodiscover/docker"
 
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
-
-	"github.com/elastic/beats/v7/libbeat/common/docker"
 )
 
 // Client for Docker
@@ -56,11 +55,11 @@ func (c Client) ContainerStart(image string, cmd []string, labels map[string]str
 		Labels: labels,
 	}, nil, nil, nil, "")
 	if err != nil {
-		return "", errors.Wrap(err, "creating container")
+		return "", fmt.Errorf("creating container: %w", err)
 	}
 
 	if err := c.cli.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
-		return "", errors.Wrap(err, "starting container")
+		return "", fmt.Errorf("starting container: %w", err)
 	}
 
 	return resp.ID, nil
@@ -78,14 +77,14 @@ func (c Client) imagePull(image string) (err error) {
 		err = func() error {
 			respBody, err := c.cli.ImagePull(ctx, image, types.ImagePullOptions{})
 			if err != nil {
-				return errors.Wrapf(err, "pullling image %s", image)
+				return fmt.Errorf("pullling image %s: %w", image, err)
 			}
 			defer respBody.Close()
 
 			// Read all the response, to be sure that the pull has finished before returning.
 			_, err = io.Copy(ioutil.Discard, respBody)
 			if err != nil {
-				return errors.Wrapf(err, "reading response for image %s", image)
+				return fmt.Errorf("reading response for image %s: %w", image, err)
 			}
 			return nil
 		}()

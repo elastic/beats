@@ -24,23 +24,24 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func (m *MetricSet) processBody(response *http.Response, jsonBody interface{}) mb.Event {
-	var event common.MapStr
+	var event mapstr.M
 
 	if m.deDotEnabled {
-		event = common.DeDotJSON(jsonBody).(common.MapStr)
+		event = common.DeDotJSON(jsonBody).(mapstr.M)
 	} else {
-		event = jsonBody.(common.MapStr)
+		event = jsonBody.(mapstr.M)
 	}
 
 	if m.requestEnabled {
-		event[mb.ModuleDataKey] = common.MapStr{
-			"request": common.MapStr{
+		event[mb.ModuleDataKey] = mapstr.M{
+			"request": mapstr.M{
 				"headers": m.getHeaders(response.Request.Header),
 				"method":  response.Request.Method,
-				"body": common.MapStr{
+				"body": mapstr.M{
 					"content": m.body,
 				},
 			},
@@ -49,8 +50,8 @@ func (m *MetricSet) processBody(response *http.Response, jsonBody interface{}) m
 
 	if m.responseEnabled {
 		phrase := strings.TrimPrefix(response.Status, strconv.Itoa(response.StatusCode)+" ")
-		event[mb.ModuleDataKey] = common.MapStr{
-			"response": common.MapStr{
+		event[mb.ModuleDataKey] = mapstr.M{
+			"response": mapstr.M{
 				"code":    response.StatusCode,
 				"phrase":  phrase,
 				"headers": m.getHeaders(response.Header),

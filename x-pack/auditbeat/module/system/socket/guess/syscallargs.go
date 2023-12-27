@@ -12,9 +12,9 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 /*
@@ -112,7 +112,7 @@ func (g *guessSyscallArgs) Trigger() error {
 }
 
 // Extract check which set of kprobe arguments received the magic values.
-func (g *guessSyscallArgs) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessSyscallArgs) Extract(ev interface{}) (mapstr.M, bool) {
 	args, ok := ev.(*syscallGuess)
 	if !ok {
 		return nil, false
@@ -120,7 +120,7 @@ func (g *guessSyscallArgs) Extract(ev interface{}) (common.MapStr, bool) {
 
 	if args.RegP1 == g.expected[0] && args.RegP2 == g.expected[1] {
 		// Current kernel uses the old calling convention.
-		return common.MapStr{
+		return mapstr.M{
 			"SYS_P1": g.ctx.Vars["_SYS_P1"],
 			"SYS_P2": g.ctx.Vars["_SYS_P2"],
 			"SYS_P3": g.ctx.Vars["_SYS_P3"],
@@ -134,7 +134,7 @@ func (g *guessSyscallArgs) Extract(ev interface{}) (common.MapStr, bool) {
 	// This hardcodes %di as arg1, which is only true for amd64, but this
 	// calling convention is only used under amd64.
 	if args.PtP1 == g.expected[0] && args.PtP2 == g.expected[1] {
-		return common.MapStr{
+		return mapstr.M{
 			"SYS_P1": "+0x70(%di)",
 			"SYS_P2": "+0x68(%di)",
 			"SYS_P3": "+0x60(%di)",

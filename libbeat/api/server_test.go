@@ -19,11 +19,10 @@ package api
 
 import (
 	"context"
-	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"runtime"
 	"testing"
@@ -31,7 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestConfiguration(t *testing.T) {
@@ -40,23 +39,23 @@ func TestConfiguration(t *testing.T) {
 		return
 	}
 	t.Run("when user is set", func(t *testing.T) {
-		cfg := common.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]interface{}{
 			"host": "unix:///tmp/ok",
 			"user": "admin",
 		})
 
-		_, err := New(nil, simpleMux(), cfg)
-		assert.Equal(t, err == nil, false)
+		_, err := New(nil, cfg)
+		require.Error(t, err)
 	})
 
 	t.Run("when security descriptor is set", func(t *testing.T) {
-		cfg := common.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]interface{}{
 			"host":                "unix:///tmp/ok",
 			"security_descriptor": "D:P(A;;GA;;;1234)",
 		})
 
-		_, err := New(nil, simpleMux(), cfg)
-		assert.Equal(t, err == nil, false)
+		_, err := New(nil, cfg)
+		require.Error(t, err)
 	})
 }
 
@@ -77,21 +76,23 @@ func TestSocket(t *testing.T) {
 	}
 
 	t.Run("socket doesn't exist before", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "testsocket")
+		tmpDir, err := os.MkdirTemp("", "testsocket")
 		require.NoError(t, err)
 		defer os.RemoveAll(tmpDir)
 
 		sockFile := tmpDir + "/test.sock"
+		t.Log(sockFile)
 
-		cfg := common.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]interface{}{
 			"host": "unix://" + sockFile,
 		})
 
-		s, err := New(nil, simpleMux(), cfg)
+		s, err := New(nil, cfg)
 		require.NoError(t, err)
+		attachEchoHelloHandler(t, s)
 		go s.Start()
 		defer func() {
-			s.Stop()
+			require.NoError(t, s.Stop())
 			// Make we cleanup behind
 			_, err := os.Stat(sockFile)
 			require.Error(t, err)
@@ -104,16 +105,17 @@ func TestSocket(t *testing.T) {
 		require.NoError(t, err)
 		defer r.Body.Close()
 
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		require.NoError(t, err)
 
 		assert.Equal(t, "ehlo!", string(body))
 		fi, err := os.Stat(sockFile)
+		require.NoError(t, err)
 		assert.Equal(t, socketFileMode, fi.Mode().Perm())
 	})
 
 	t.Run("starting beat and recover a dangling socket file", func(t *testing.T) {
-		tmpDir, err := ioutil.TempDir("", "testsocket")
+		tmpDir, err := os.MkdirTemp("", "testsocket")
 		require.NoError(t, err)
 		defer os.RemoveAll(tmpDir)
 
@@ -124,15 +126,16 @@ func TestSocket(t *testing.T) {
 		require.NoError(t, err)
 		f.Close()
 
-		cfg := common.MustNewConfigFrom(map[string]interface{}{
+		cfg := config.MustNewConfigFrom(map[string]interface{}{
 			"host": "unix://" + sockFile,
 		})
 
-		s, err := New(nil, simpleMux(), cfg)
+		s, err := New(nil, cfg)
 		require.NoError(t, err)
+		attachEchoHelloHandler(t, s)
 		go s.Start()
 		defer func() {
-			s.Stop()
+			require.NoError(t, s.Stop())
 			// Make we cleanup behind
 			_, err := os.Stat(sockFile)
 			require.Error(t, err)
@@ -145,12 +148,13 @@ func TestSocket(t *testing.T) {
 		require.NoError(t, err)
 		defer r.Body.Close()
 
-		body, err := ioutil.ReadAll(r.Body)
+		body, err := io.ReadAll(r.Body)
 		require.NoError(t, err)
 
 		assert.Equal(t, "ehlo!", string(body))
 
 		fi, err := os.Stat(sockFile)
+		require.NoError(t, err)
 		assert.Equal(t, socketFileMode, fi.Mode().Perm(), "incorrect mode for file %s", sockFile)
 	})
 }
@@ -159,65 +163,63 @@ func TestHTTP(t *testing.T) {
 	// select a random free port.
 	url := "http://localhost:0"
 
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
 		"host": url,
 	})
 
-	s, err := New(nil, simpleMux(), cfg)
+	s, err := New(nil, cfg)
 	require.NoError(t, err)
+	attachEchoHelloHandler(t, s)
 	go s.Start()
-	defer s.Stop()
+	defer func() {
+		require.NoError(t, s.Stop())
+	}()
 
 	r, err := http.Get("http://" + s.l.Addr().String() + "/echo-hello")
-	require.NoError(t, err)
-	defer r.Body.Close()
-
-	body, err := ioutil.ReadAll(r.Body)
-	require.NoError(t, err)
-
-	assert.Equal(t, "ehlo!", string(body))
-}
-
-func simpleMux() *http.ServeMux {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/echo-hello", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "ehlo!")
-	})
-	return mux
-}
-
-func TestAttachHandler(t *testing.T) {
-	url := "http://localhost:0"
-
-	cfg := common.MustNewConfigFrom(map[string]interface{}{
-		"host": url,
-	})
-
-	s, err := New(nil, simpleMux(), cfg)
-	require.NoError(t, err)
-	go s.Start()
-	defer s.Stop()
-
-	h := &testHandler{}
-
-	err = s.AttachHandler("/test", h)
-	require.NoError(t, err)
-
-	r, err := http.Get("http://" + s.l.Addr().String() + "/test")
 	require.NoError(t, err)
 	defer r.Body.Close()
 
 	body, err := io.ReadAll(r.Body)
 	require.NoError(t, err)
 
-	assert.Equal(t, "test!", string(body))
-
-	err = s.AttachHandler("/test", h)
-	assert.NotNil(t, err)
+	assert.Equal(t, "ehlo!", string(body))
 }
 
-type testHandler struct{}
+func attachEchoHelloHandler(t *testing.T, s *Server) {
+	t.Helper()
 
-func (t *testHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "test!")
+	if err := s.AttachHandler("/echo-hello", newTestHandler("ehlo!")); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestAttachHandler(t *testing.T) {
+	cfg := config.MustNewConfigFrom(map[string]interface{}{
+		"host": "http://localhost:0",
+	})
+
+	s, err := New(nil, cfg)
+	require.NoError(t, err)
+
+	req := httptest.NewRequest(http.MethodGet, "http://"+s.l.Addr().String()+"/test", nil)
+
+	// Test the first handler is attached.
+	err = s.AttachHandler("/test", newTestHandler("test!"))
+	require.NoError(t, err)
+	resp := httptest.NewRecorder()
+	s.mux.ServeHTTP(resp, req)
+	assert.Equal(t, "test!", resp.Body.String())
+
+	// Handlers are matched in order so the first one will take precedence.
+	err = s.AttachHandler("/test", newTestHandler("NOT test!"))
+	require.NoError(t, err)
+	resp = httptest.NewRecorder()
+	s.mux.ServeHTTP(resp, req)
+	assert.Equal(t, "test!", resp.Body.String())
+}
+
+func newTestHandler(response string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		_, _ = io.WriteString(w, response)
+	})
 }

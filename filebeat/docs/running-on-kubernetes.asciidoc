@@ -20,7 +20,7 @@ endif::[]
 You deploy {beatname_uc} as a https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/[DaemonSet]
 to ensure there's a running instance on each node of the cluster.
 
-The Docker logs host folder (`/var/lib/docker/containers`) is mounted on the
+The container logs host folder (`/var/log/containers`) is mounted on the
 {beatname_uc} container. {beatname_uc} starts an input for the files and
 begins harvesting them as soon as they appear in the folder.
 
@@ -111,6 +111,35 @@ oc patch namespace kube-system -p \
 +
 This command sets the node selector for the project to an empty string. If you
 don't run this command, the default node selector will skip master nodes.
+
+In order to support runtime environments with Openshift (eg. CRI-O, containerd) you need to configure following path:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: container
+  paths: <1>
+    - '/var/log/containers/*.log'
+----
+
+Same path needs to be configured in case autodiscovery needs to be enabled:
+
+["source","yaml",subs="attributes"]
+----
+filebeat.autodiscover:
+  providers:
+    - type: kubernetes
+      node: ${NODE_NAME}
+      hints.enabled: true
+      hints.default_config:
+        type: container
+        paths:
+          - /var/log/containers/*.log
+----
+
+NOTE: `/var/log/containers/\*.log` is normally a symlink to `/var/log/pods/*/*.log`, 
+so above paths can be edited accordingly
+
 
 [float]
 ==== Load {kib} dashboards

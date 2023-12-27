@@ -19,18 +19,18 @@ package actions
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strings"
 	"unicode/utf8"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type truncateFieldsConfig struct {
@@ -60,11 +60,11 @@ func init() {
 }
 
 // NewTruncateFields returns a new truncate_fields processor.
-func NewTruncateFields(c *common.Config) (processors.Processor, error) {
+func NewTruncateFields(c *conf.C) (beat.Processor, error) {
 	var config truncateFieldsConfig
 	err := c.Unpack(&config)
 	if err != nil {
-		return nil, fmt.Errorf("fail to unpack the truncate_fields configuration: %s", err)
+		return nil, fmt.Errorf("fail to unpack the truncate_fields configuration: %w", err)
 	}
 
 	var truncateFunc truncater
@@ -88,7 +88,7 @@ func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
 	}
 
 	for _, field := range f.config.Fields {
-		event, err := f.truncateSingleField(field, event)
+		err := f.truncateSingleField(field, event)
 		if err != nil {
 			f.logger.Debugf("Failed to truncate fields: %s", err)
 			if f.config.FailOnError {
@@ -101,13 +101,13 @@ func (f *truncateFields) Run(event *beat.Event) (*beat.Event, error) {
 	return event, nil
 }
 
-func (f *truncateFields) truncateSingleField(field string, event *beat.Event) (*beat.Event, error) {
+func (f *truncateFields) truncateSingleField(field string, event *beat.Event) error {
 	v, err := event.GetValue(field)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
-			return event, nil
+		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
+			return nil
 		}
-		return event, errors.Wrapf(err, "could not fetch value for key: %s", field)
+		return fmt.Errorf("could not fetch value for key '%s': %w", field, err)
 	}
 
 	switch value := v.(type) {
@@ -116,43 +116,41 @@ func (f *truncateFields) truncateSingleField(field string, event *beat.Event) (*
 	case string:
 		return f.addTruncatedString(field, value, event)
 	default:
-		return event, fmt.Errorf("value cannot be truncated: %+v", value)
+		return fmt.Errorf("value cannot be truncated: %+v", value)
 	}
 
 }
 
-func (f *truncateFields) addTruncatedString(field, value string, event *beat.Event) (*beat.Event, error) {
+func (f *truncateFields) addTruncatedString(field, value string, event *beat.Event) error {
 	truncated, isTruncated, err := f.truncate(f, []byte(value))
 	if err != nil {
-		return event, err
+		return err
 	}
 	_, err = event.PutValue(field, string(truncated))
 	if err != nil {
-		return event, fmt.Errorf("could not add truncated string value for key: %s, Error: %+v", field, err)
+		return fmt.Errorf("could not add truncated string value for key: %s, Error: %w", field, err)
 	}
 
 	if isTruncated {
-		common.AddTagsWithKey(event.Fields, "log.flags", []string{"truncated"})
+		_ = mapstr.AddTagsWithKey(event.Fields, "log.flags", []string{"truncated"})
 	}
-
-	return event, nil
+	return nil
 }
 
-func (f *truncateFields) addTruncatedByte(field string, value []byte, event *beat.Event) (*beat.Event, error) {
+func (f *truncateFields) addTruncatedByte(field string, value []byte, event *beat.Event) error {
 	truncated, isTruncated, err := f.truncate(f, value)
 	if err != nil {
-		return event, err
+		return err
 	}
 	_, err = event.PutValue(field, truncated)
 	if err != nil {
-		return event, fmt.Errorf("could not add truncated byte slice value for key: %s, Error: %+v", field, err)
+		return fmt.Errorf("could not add truncated byte slice value for key: %s, Error: %w", field, err)
 	}
 
 	if isTruncated {
-		common.AddTagsWithKey(event.Fields, "log.flags", []string{"truncated"})
+		_ = mapstr.AddTagsWithKey(event.Fields, "log.flags", []string{"truncated"})
 	}
-
-	return event, nil
+	return nil
 }
 
 func (f *truncateFields) truncateBytes(value []byte) ([]byte, bool, error) {

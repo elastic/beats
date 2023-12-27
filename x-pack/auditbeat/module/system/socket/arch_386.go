@@ -3,13 +3,12 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build linux
-// +build linux
 
 package socket
 
-import "github.com/elastic/beats/v7/libbeat/common"
+import "github.com/elastic/elastic-agent-libs/mapstr"
 
-var archVariables = common.MapStr{
+var archVariables = mapstr.M{
 	// Regular function call parameters 1 to 6
 	// This calling convention is used internally by the kernel
 	// which is built by default with (-mregparam=3)

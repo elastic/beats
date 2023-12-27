@@ -5,38 +5,51 @@
 package decode_cef
 
 import (
+	"errors"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef/cef"
 )
 
 type mappedField struct {
-	Target    string
+	// Target is the ECS target field for the mapped field.
+	Target string
+
+	// Translate is the mapping function required to translate
+	// the CEF field data into an ECS-conformant format.
+	// If Translate is nil, no translation is done.
+	// Translate should not mutate the input and should
+	// return an error if the input data cannot be correctly
+	// mapped to ECS-formatted data for the target field.
 	Translate func(in *cef.Field) (interface{}, error)
 }
 
 var ecsExtensionMapping = map[string]mappedField{
-	"agentAddress":                 {Target: "agent.ip"},
-	"agentDnsDomain":               {Target: "agent.name"},
-	"agentHostName":                {Target: "agent.name"},
-	"agentId":                      {Target: "agent.id"},
-	"agentMacAddress":              {Target: "agent.mac"},
-	"agentReceiptTime":             {Target: "event.created"},
-	"agentType":                    {Target: "agent.type"},
-	"agentVersion":                 {Target: "agent.version"},
-	"applicationProtocol":          {Target: "network.application"},
-	"bytesIn":                      {Target: "source.bytes"},
-	"bytesOut":                     {Target: "destination.bytes"},
-	"customerExternalID":           {Target: "organization.id"},
-	"customerURI":                  {Target: "organization.name"},
-	"destinationAddress":           {Target: "destination.ip"},
-	"destinationDnsDomain":         {Target: "destination.domain"},
-	"destinationGeoLatitude":       {Target: "destination.geo.location.lat"},
-	"destinationGeoLongitude":      {Target: "destination.geo.location.lon"},
-	"destinationHostName":          {Target: "destination.domain"},
-	"destinationMacAddress":        {Target: "destination.mac"},
+	"agentAddress":   {Target: "agent.ip"},
+	"agentDnsDomain": {Target: "agent.name"},
+	"agentHostName":  {Target: "agent.name"},
+	"agentId":        {Target: "agent.id"},
+	"agentMacAddress": {
+		Target:    "agent.mac",
+		Translate: ecsMAC,
+	},
+	"agentReceiptTime":        {Target: "event.created"},
+	"agentType":               {Target: "agent.type"},
+	"agentVersion":            {Target: "agent.version"},
+	"applicationProtocol":     {Target: "network.application"},
+	"bytesIn":                 {Target: "source.bytes"},
+	"bytesOut":                {Target: "destination.bytes"},
+	"customerExternalID":      {Target: "organization.id"},
+	"customerURI":             {Target: "organization.name"},
+	"destinationAddress":      {Target: "destination.ip"},
+	"destinationDnsDomain":    {Target: "destination.domain"},
+	"destinationGeoLatitude":  {Target: "destination.geo.location.lat"},
+	"destinationGeoLongitude": {Target: "destination.geo.location.lon"},
+	"destinationHostName":     {Target: "destination.domain"},
+	"destinationMacAddress": {
+		Target:    "destination.mac",
+		Translate: ecsMAC,
+	},
 	"destinationPort":              {Target: "destination.port"},
 	"destinationProcessId":         {Target: "destination.process.pid"},
 	"destinationProcessName":       {Target: "destination.process.name"},
@@ -47,7 +60,12 @@ var ecsExtensionMapping = map[string]mappedField{
 	"destinationUserName":          {Target: "destination.user.name"},
 	"destinationUserPrivileges":    {Target: "destination.user.group.name"},
 	"deviceAction":                 {Target: "event.action"},
-	"deviceAddress":                {Target: "observer.ip"},
+	"deviceAddress": {
+		Target: "observer.ip",
+		Translate: func(in *cef.Field) (interface{}, error) {
+			return []string{in.String}, nil
+		},
+	},
 	"deviceDirection": {
 		Target: "network.direction",
 		Translate: func(in *cef.Field) (interface{}, error) {
@@ -57,13 +75,16 @@ var ecsExtensionMapping = map[string]mappedField{
 			case "1":
 				return "outbound", nil
 			default:
-				return nil, errors.Errorf("deviceDirection must be 0 or 1")
+				return nil, errors.New("deviceDirection must be 0 or 1")
 			}
 		},
 	},
-	"deviceDnsDomain":          {Target: "observer.hostname"},
-	"deviceHostName":           {Target: "observer.hostname"},
-	"deviceMacAddress":         {Target: "observer.mac"},
+	"deviceDnsDomain": {Target: "observer.hostname"},
+	"deviceHostName":  {Target: "observer.hostname"},
+	"deviceMacAddress": {
+		Target:    "observer.mac",
+		Translate: ecsMAC,
+	},
 	"devicePayloadId":          {Target: "event.id"},
 	"deviceProcessId":          {Target: "process.pid"},
 	"deviceProcessName":        {Target: "process.name"},
@@ -92,14 +113,17 @@ var ecsExtensionMapping = map[string]mappedField{
 			return nil, nil
 		},
 	},
-	"requestMethod":           {Target: "http.request.method"},
-	"requestUrl":              {Target: "url.original"},
-	"sourceAddress":           {Target: "source.ip"},
-	"sourceDnsDomain":         {Target: "source.domain"},
-	"sourceGeoLatitude":       {Target: "source.geo.location.lat"},
-	"sourceGeoLongitude":      {Target: "source.geo.location.lon"},
-	"sourceHostName":          {Target: "source.domain"},
-	"sourceMacAddress":        {Target: "source.mac"},
+	"requestMethod":      {Target: "http.request.method"},
+	"requestUrl":         {Target: "url.original"},
+	"sourceAddress":      {Target: "source.ip"},
+	"sourceDnsDomain":    {Target: "source.domain"},
+	"sourceGeoLatitude":  {Target: "source.geo.location.lat"},
+	"sourceGeoLongitude": {Target: "source.geo.location.lon"},
+	"sourceHostName":     {Target: "source.domain"},
+	"sourceMacAddress": {
+		Target:    "source.mac",
+		Translate: ecsMAC,
+	},
 	"sourcePort":              {Target: "source.port"},
 	"sourceProcessId":         {Target: "source.process.pid"},
 	"sourceProcessName":       {Target: "source.process.name"},
@@ -117,4 +141,8 @@ var ecsExtensionMapping = map[string]mappedField{
 		},
 	},
 	"type": {Target: "event.kind"},
+}
+
+func ecsMAC(in *cef.Field) (interface{}, error) {
+	return strings.ToUpper(strings.ReplaceAll(in.String, ":", "-")), nil
 }

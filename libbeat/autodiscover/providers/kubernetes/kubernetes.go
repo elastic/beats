@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package kubernetes
 
@@ -31,20 +30,23 @@ import (
 	"k8s.io/client-go/tools/leaderelection/resourcelock"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes"
-	"github.com/elastic/beats/v7/libbeat/common/kubernetes/k8skeystore"
-	"github.com/elastic/beats/v7/libbeat/keystore"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes/k8skeystore"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func init() {
-	autodiscover.Registry.AddProvider("kubernetes", AutodiscoverBuilder)
+	err := autodiscover.Registry.AddProvider("kubernetes", AutodiscoverBuilder)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
 }
 
 // Eventer allows defining ways in which kubernetes resource events are observed and processed
@@ -91,13 +93,13 @@ func AutodiscoverBuilder(
 	beatName string,
 	bus bus.Bus,
 	uuid uuid.UUID,
-	c *common.Config,
+	c *config.C,
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("autodiscover")
 
 	errWrap := func(err error) error {
-		return errors.Wrap(err, "error setting up kubernetes autodiscover provider")
+		return fmt.Errorf("error setting up kubernetes autodiscover provider: %w", err)
 	}
 
 	config := defaultConfig()
@@ -171,8 +173,8 @@ func (p *Provider) publish(events []bus.Event) {
 		return
 	}
 
-	configs := make([]*common.Config, 0)
-	id, _ := events[0]["id"]
+	configs := make([]*config.C, 0)
+	id := events[0]["id"]
 	for _, event := range events {
 		// Ensure that all events have the same ID. If not panic
 		if event["id"] != id {
@@ -192,7 +194,7 @@ func (p *Provider) publish(events []bus.Event) {
 	}
 
 	// Since all the events belong to the same event ID pick on and add in all the configs
-	event := bus.Event(common.MapStr(events[0]).Clone())
+	event := bus.Event(mapstr.M(events[0]).Clone())
 	// Remove the port to avoid ambiguity during debugging
 	delete(event, "port")
 	event["config"] = configs
@@ -230,7 +232,7 @@ func (p *Provider) stopLeading(uuid string, eventID string) {
 
 func NewEventerManager(
 	uuid uuid.UUID,
-	c *common.Config,
+	c *config.C,
 	cfg *Config,
 	client k8s.Interface,
 	publish func(event []bus.Event),
@@ -346,8 +348,22 @@ func (p *leaderElectionManager) GenerateHints(event bus.Event) bus.Event {
 func (p *leaderElectionManager) startLeaderElector(ctx context.Context, lec leaderelection.LeaderElectionConfig) {
 	le, err := leaderelection.NewLeaderElector(lec)
 	if err != nil {
-		p.logger.Errorf("error while creating Leader Elector: %v", err)
+		p.logger.Errorf("error while creating Leader Elector: %w", err)
 	}
 	p.logger.Debugf("Starting Leader Elector")
 	go le.Run(ctx)
+}
+
+func ShouldPut(event mapstr.M, field string, value interface{}, logger *logp.Logger) {
+	_, err := event.Put(field, value)
+	if err != nil {
+		logger.Debugf("Failed to put field '%s' with value '%s': %s", field, value, err)
+	}
+}
+
+func ShouldDelete(event mapstr.M, field string, logger *logp.Logger) {
+	err := event.Delete(field)
+	if err != nil {
+		logger.Debugf("Failed to delete field '%s': %s", field, err)
+	}
 }

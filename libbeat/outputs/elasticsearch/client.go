@@ -25,17 +25,18 @@ import (
 	"strings"
 	"time"
 
-	"go.elastic.co/apm"
+	"go.elastic.co/apm/v2"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/testing"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 var (
@@ -101,6 +102,7 @@ func NewClient(
 		CompressionLevel: s.CompressionLevel,
 		EscapeHTML:       s.EscapeHTML,
 		Transport:        s.Transport,
+		IdleConnTimeout:  s.IdleConnTimeout,
 	})
 	if err != nil {
 		return nil, err
@@ -188,8 +190,23 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 	rest, err := client.publishEvents(ctx, events)
 
 	switch {
-	case err == errPayloadTooLarge:
-		batch.Drop()
+	case errors.Is(err, errPayloadTooLarge):
+		if batch.SplitRetry() {
+			// Report that we split a batch
+			client.observer.Split()
+		} else {
+			// If the batch could not be split, there is no option left but
+			// to drop it and log the error state.
+			batch.Drop()
+			client.observer.Dropped(len(events))
+			err := apm.CaptureError(ctx, fmt.Errorf("failed to perform bulk index operation: %w", err))
+			err.Send()
+			client.log.Error(err)
+		}
+		// Returning an error from Publish forces a client close / reconnect,
+		// so don't pass this error through since it doesn't indicate anything
+		// wrong with the connection.
+		return nil
 	case len(rest) == 0:
 		batch.ACK()
 	default:
@@ -229,11 +246,14 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 		return nil, nil
 	}
 
-	status, result, sendErr := client.conn.Bulk(ctx, "", "", nil, bulkItems)
+	params := map[string]string{"filter_path": "errors,items.*.error,items.*.status"}
+	status, result, sendErr := client.conn.Bulk(ctx, "", "", params, bulkItems)
 
 	if sendErr != nil {
 		if status == http.StatusRequestEntityTooLarge {
-			sendErr = errPayloadTooLarge
+			// This error must be handled by splitting the batch, propagate it
+			// back to Publish instead of reporting it directly
+			return data, errPayloadTooLarge
 		}
 		err := apm.CaptureError(ctx, fmt.Errorf("failed to perform any bulk index operations: %w", sendErr))
 		err.Send()
@@ -245,7 +265,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 
 	client.log.Debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
 		pubCount,
-		time.Now().Sub(begin))
+		time.Since(begin))
 
 	// check response for transient errors
 	var failedEvents []publisher.Event
@@ -282,7 +302,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 
 // bulkEncodePublishRequest encodes all bulk requests and returns slice of events
 // successfully added to the list of bulk items and the list of bulk items.
-func (client *Client) bulkEncodePublishRequest(version common.Version, data []publisher.Event) ([]publisher.Event, []interface{}) {
+func (client *Client) bulkEncodePublishRequest(version version.V, data []publisher.Event) ([]publisher.Event, []interface{}) {
 	okEvents := data[:0]
 	bulkItems := []interface{}{}
 	for i := range data {
@@ -303,7 +323,7 @@ func (client *Client) bulkEncodePublishRequest(version common.Version, data []pu
 	return okEvents, bulkItems
 }
 
-func (client *Client) createEventBulkMeta(version common.Version, event *beat.Event) (interface{}, error) {
+func (client *Client) createEventBulkMeta(version version.V, event *beat.Event) (interface{}, error) {
 	eventType := ""
 	if version.Major < 7 {
 		eventType = defaultEventType
@@ -311,13 +331,13 @@ func (client *Client) createEventBulkMeta(version common.Version, event *beat.Ev
 
 	pipeline, err := client.getPipeline(event)
 	if err != nil {
-		err := fmt.Errorf("failed to select pipeline: %v", err)
+		err := fmt.Errorf("failed to select pipeline: %w", err)
 		return nil, err
 	}
 
 	index, err := client.index.Select(event)
 	if err != nil {
-		err := fmt.Errorf("failed to select event index: %v", err)
+		err := fmt.Errorf("failed to select event index: %w", err)
 		return nil, err
 	}
 
@@ -350,7 +370,7 @@ func (client *Client) createEventBulkMeta(version common.Version, event *beat.Ev
 func (client *Client) getPipeline(event *beat.Event) (string, error) {
 	if event.Meta != nil {
 		pipeline, err := events.GetMetaStringValue(*event, events.FieldMetaPipeline)
-		if err == common.ErrKeyNotFound {
+		if errors.Is(err, mapstr.ErrKeyNotFound) {
 			return "", nil
 		}
 		if err != nil {
@@ -407,25 +427,28 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 				result, _ := data[i].Content.Meta.HasKey(dead_letter_marker_field)
 				if result {
 					stats.nonIndexable++
-					client.log.Errorf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
+					client.log.Errorf("Can't deliver to dead letter index event (status=%v). Enable debug logs to view the event and cause.", status)
+					client.log.Debugf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
 					// poison pill - this will clog the pipeline if the underlying failure is non transient.
 				} else if client.NonIndexableAction == dead_letter_index {
-					client.log.Warnf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
+					client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Enable debug logs to view the event and cause.", status)
+					client.log.Debugf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
 					if data[i].Content.Meta == nil {
-						data[i].Content.Meta = common.MapStr{
+						data[i].Content.Meta = mapstr.M{
 							dead_letter_marker_field: true,
 						}
 					} else {
-						data[i].Content.Meta.Put(dead_letter_marker_field, true)
+						data[i].Content.Meta[dead_letter_marker_field] = true
 					}
-					data[i].Content.Fields = common.MapStr{
+					data[i].Content.Fields = mapstr.M{
 						"message":       data[i].Content.Fields.String(),
 						"error.type":    status,
 						"error.message": string(msg),
 					}
 				} else { // drop
 					stats.nonIndexable++
-					client.log.Warnf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
+					client.log.Warnf("Cannot index event (status=%v): dropping event! Enable debug logs to view the event and cause.", status)
+					client.log.Debugf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
 					continue
 				}
 			}

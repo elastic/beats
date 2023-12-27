@@ -173,7 +173,9 @@
     },
     "message": "AppControl detectOnly",
     "observer": {
-      "ip": "192.168.33.128",
+      "ip": [
+        "192.168.33.128"
+      ],
       "product": "Deep Security Agent",
       "vendor": "Trend Micro",
       "version": "10.2.229"
@@ -220,7 +222,7 @@
     "destination": {
       "bytes": 1019,
       "ip": "72.14.204.147",
-      "mac": "00:50:56:f5:7f:47",
+      "mac": "00-50-56-F5-7F-47",
       "port": 80
     },
     "error": {
@@ -243,7 +245,7 @@
     },
     "source": {
       "ip": "192.168.126.150",
-      "mac": "00:0c:29:eb:35:de",
+      "mac": "00-0C-29-EB-35-DE",
       "port": 49617
     }
   },
@@ -332,7 +334,7 @@
     "destination": {
       "bytes": 1093,
       "ip": "72.14.204.105",
-      "mac": "00:50:56:f5:7f:47",
+      "mac": "00-50-56-F5-7F-47",
       "port": 80
     },
     "event": {
@@ -353,7 +355,7 @@
     },
     "source": {
       "ip": "192.168.126.150",
-      "mac": "00:0c:29:eb:35:de",
+      "mac": "00-0C-29-EB-35-DE",
       "port": 49786
     }
   },
@@ -800,7 +802,7 @@
     "agent": {
       "id": "4SNQXV30BABCAIi+-ZH3gxT==",
       "ip": "10.2.3.4",
-      "mac": "00:50:56:8e:c0:90",
+      "mac": "00-50-56-8E-C0-90",
       "name": "centos7.as",
       "type": "syslog",
       "version": "7.6.0.8009.0"
@@ -1028,7 +1030,9 @@
     },
     "observer": {
       "hostname": "super",
-      "ip": "111.111.111.99",
+      "ip": [
+        "111.111.111.99"
+      ],
       "product": "ASA",
       "vendor": "CISCO"
     },
@@ -1106,7 +1110,9 @@
     "message": "File Opened",
     "observer": {
       "hostname": "VirtualXP",
-      "ip": "192.168.131.65",
+      "ip": [
+        "192.168.131.65"
+      ],
       "product": "ArcSight",
       "vendor": "ArcSight",
       "version": "7.0.5.7132.1"
@@ -1174,7 +1180,9 @@
     "message": "Agent [NAT] type [sdkrfilereader] started",
     "observer": {
       "hostname": "VirtualXP",
-      "ip": "192.168.0.65",
+      "ip": [
+        "192.168.0.65"
+      ],
       "product": "ArcSight",
       "vendor": "ArcSight",
       "version": "7.0.5.7132.1"
@@ -1235,7 +1243,9 @@
     "message": "File processing started",
     "observer": {
       "hostname": "VirtualXP",
-      "ip": "192.168.131.65",
+      "ip": [
+        "192.168.131.65"
+      ],
       "product": "ArcSight",
       "vendor": "ArcSight",
       "version": "7.0.5.7132.1"
@@ -1304,7 +1314,9 @@
     "message": "Process Stopped by User",
     "observer": {
       "hostname": "VirtualXP",
-      "ip": "192.168.131.65",
+      "ip": [
+        "192.168.131.65"
+      ],
       "product": "ArcSight",
       "vendor": "ArcSight",
       "version": "7.0.5.7132.1"

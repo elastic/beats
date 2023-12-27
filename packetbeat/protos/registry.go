@@ -22,6 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 
 	"github.com/elastic/beats/v7/packetbeat/procs"
 )
@@ -29,8 +30,8 @@ import (
 type ProtocolPlugin func(
 	testMode bool,
 	results Reporter,
-	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	watcher *procs.ProcessesWatcher,
+	cfg *conf.C,
 ) (Plugin, error)
 
 // Reporter is used by plugin instances to report new transaction events.

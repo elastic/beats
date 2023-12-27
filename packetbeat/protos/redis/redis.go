@@ -24,8 +24,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/monitoring"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/packetbeat/pb"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -55,7 +56,7 @@ type redisPlugin struct {
 	transactionTimeout time.Duration
 	queueConfig        MessageQueueConfig
 
-	watcher procs.ProcessesWatcher
+	watcher *procs.ProcessesWatcher
 	results protos.Reporter
 }
 
@@ -76,8 +77,8 @@ func init() {
 func New(
 	testMode bool,
 	results protos.Reporter,
-	watcher procs.ProcessesWatcher,
-	cfg *common.Config,
+	watcher *procs.ProcessesWatcher,
+	cfg *conf.C,
 ) (protos.Plugin, error) {
 	p := &redisPlugin{}
 	config := defaultConfig
@@ -93,7 +94,7 @@ func New(
 	return p, nil
 }
 
-func (redis *redisPlugin) init(results protos.Reporter, watcher procs.ProcessesWatcher, config *redisConfig) error {
+func (redis *redisPlugin) init(results protos.Reporter, watcher *procs.ProcessesWatcher, config *redisConfig) error {
 	redis.setFromConfig(config)
 
 	redis.results = results
@@ -131,8 +132,6 @@ func (redis *redisPlugin) Parse(
 	dir uint8,
 	private protos.ProtocolData,
 ) protos.ProtocolData {
-	defer logp.Recover("ParseRedis exception")
-
 	conn := redis.ensureRedisConnection(private)
 	conn = redis.doParse(conn, pkt, tcptuple, dir)
 	if conn == nil {

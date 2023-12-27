@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: ceph
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/ceph/_meta/docs.asciidoc
+
 
 [[metricbeat-module-ceph]]
 == Ceph module
@@ -28,6 +30,8 @@ The Ceph module comes with a predefined dashboard showing Ceph cluster related m
 image::./images/ceph-overview-dashboard.png[]
 
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -119,3 +123,4 @@ include::ceph/osd_tree.asciidoc[]
 
 include::ceph/pool_disk.asciidoc[]
 
+:edit_url!:

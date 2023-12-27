@@ -6,12 +6,11 @@ package ec2
 
 import (
 	"context"
+	"fmt"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
 	awsauto "github.com/elastic/beats/v7/x-pack/libbeat/autodiscover/providers/aws"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type watcher struct {
@@ -61,7 +60,7 @@ func (w *watcher) forever() {
 		case <-w.ticker.C:
 			err := w.once()
 			if err != nil {
-				logp.Error(errors.Wrap(err, "error while fetching AWS EC2s"))
+				logp.Error(fmt.Errorf("error while fetching AWS EC2s: %w", err))
 			}
 		}
 	}

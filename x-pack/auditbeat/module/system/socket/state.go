@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package socket
 
@@ -18,6 +17,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/joeshaw/multierror"
 	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/libbeat/common"
@@ -26,12 +26,14 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-libaudit/v2/aucoalesce"
 )
 
 const (
-	// how often to collect and report expired and terminated flows.
-	reapInterval = time.Second
+	// how often to check for expired flows.
+	expireInterval = time.Second
+
 	// how often the state log generated (only in debug mode).
 	logInterval = time.Second * 30
 )
@@ -154,21 +156,8 @@ func newEndpointIPv6(beIPa uint64, beIPb uint64, bePort uint16, pkts uint64, byt
 	return e
 }
 
-type linkedElement interface {
-	Prev() linkedElement
-	Next() linkedElement
-	SetPrev(linkedElement)
-	SetNext(linkedElement)
-	Timestamp() time.Time
-}
-
-type linkedList struct {
-	head, tail linkedElement
-	size       uint
-}
-
 type flow struct {
-	prev, next linkedElement
+	prev, next helper.LinkedElement
 
 	sock              uintptr
 	inetType          inetType
@@ -190,22 +179,22 @@ func (f *flow) isValid() bool {
 }
 
 // Prev returns the previous flow in a linked list of flows.
-func (f *flow) Prev() linkedElement {
+func (f *flow) Prev() helper.LinkedElement {
 	return f.prev
 }
 
 // Next returns the next flow in a linked list of flows.
-func (f *flow) Next() linkedElement {
+func (f *flow) Next() helper.LinkedElement {
 	return f.next
 }
 
 // SetPrev sets previous flow in a linked list of flows.
-func (f *flow) SetPrev(e linkedElement) {
+func (f *flow) SetPrev(e helper.LinkedElement) {
 	f.prev = e
 }
 
 // SetNext sets the next flow in a linked list of flows.
-func (f *flow) SetNext(e linkedElement) {
+func (f *flow) SetNext(e helper.LinkedElement) {
 	f.next = e
 }
 
@@ -251,7 +240,7 @@ func (p *process) ResolveIP(ip net.IP) (domain string, found bool) {
 	p.RLock()
 	defer p.RUnlock()
 	domain, found = p.resolvedDomains[ip.String()]
-	return
+	return domain, found
 }
 
 type socket struct {
@@ -264,28 +253,28 @@ type socket struct {
 	process *process
 	// This signals that the socket is in the closeTimeout list.
 	closing    bool
-	prev, next linkedElement
+	prev, next helper.LinkedElement
 
 	createdTime, lastSeenTime time.Time
 }
 
 // Prev returns the previous socket in the linked list.
-func (s *socket) Prev() linkedElement {
+func (s *socket) Prev() helper.LinkedElement {
 	return s.prev
 }
 
 // Next returns the next socket in the linked list.
-func (s *socket) Next() linkedElement {
+func (s *socket) Next() helper.LinkedElement {
 	return s.next
 }
 
 // SetPrev sets the previous socket in the linked list.
-func (s *socket) SetPrev(e linkedElement) {
+func (s *socket) SetPrev(e helper.LinkedElement) {
 	s.prev = e
 }
 
 // SetNext sets the next socket in the linked list.
-func (s *socket) SetNext(e linkedElement) {
+func (s *socket) SetNext(e helper.LinkedElement) {
 	s.next = e
 }
 
@@ -369,22 +358,22 @@ type state struct {
 	clockMaxDrift                                time.Duration
 
 	// lru used for flow expiration.
-	flowLRU linkedList
+	flowLRU helper.LinkedList
 
 	// lru used for socket expiration.
-	socketLRU linkedList
-
-	// holds closed and expired flows.
-	done linkedList
+	socketLRU helper.LinkedList
 
 	// holds sockets in closing state. This is to keep them around until their
 	// close timeout expires.
-	closing linkedList
+	closing helper.LinkedList
 
 	dns dnsTracker
 
 	// Decouple time.Now()
 	clock func() time.Time
+
+	// currentPID is the PID of the beat.
+	currentPID int
 }
 
 func (s *state) getSocket(sock uintptr) *socket {
@@ -398,7 +387,7 @@ func (s *state) getSocket(sock uintptr) *socket {
 		lastSeenTime: now,
 	}
 	s.socks[sock] = socket
-	s.socketLRU.add(socket)
+	s.socketLRU.Add(socket)
 	return socket
 }
 
@@ -409,7 +398,7 @@ var kernelProcess = process{
 
 func NewState(r mb.PushReporterV2, log helper.Logger, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift time.Duration) *state {
 	s := makeState(r, log, inactiveTimeout, socketTimeout, closeTimeout, clockMaxDrift)
-	go s.reapLoop()
+	go s.expireLoop()
 	go s.logStateLoop()
 	return s
 }
@@ -427,15 +416,8 @@ func makeState(r mb.PushReporterV2, log helper.Logger, inactiveTimeout, socketTi
 		clockMaxDrift:   clockMaxDrift,
 		dns:             newDNSTracker(inactiveTimeout * 2),
 		clock:           time.Now,
+		currentPID:      os.Getpid(),
 	}
-}
-
-func (s *state) DoneFlows() linkedList {
-	s.Lock()
-	defer s.Unlock()
-	r := s.done
-	s.done = linkedList{}
-	return r
 }
 
 var (
@@ -449,9 +431,8 @@ func (s *state) logState() {
 	numSocks := len(s.socks)
 	numProcs := len(s.processes)
 	numThreads := len(s.threads)
-	flowLRUSize := s.flowLRU.size
-	doneSize := s.done.size
-	closingSize := s.closing.size
+	flowLRUSize := s.flowLRU.Size()
+	closingSize := s.closing.Size()
 	events := atomic.LoadUint64(&eventCount)
 	s.Unlock()
 
@@ -464,8 +445,8 @@ func (s *state) logState() {
 	if uint64(flowLRUSize) != numFlows {
 		errs = append(errs, "flow count mismatch")
 	}
-	msg := fmt.Sprintf("state flows=%d sockets=%d procs=%d threads=%d lru=%d done=%d closing=%d events=%d eps=%.1f",
-		numFlows, numSocks, numProcs, numThreads, flowLRUSize, doneSize, closingSize, events,
+	msg := fmt.Sprintf("state flows=%d sockets=%d procs=%d threads=%d lru=%d closing=%d events=%d eps=%.1f",
+		numFlows, numSocks, numProcs, numThreads, flowLRUSize, closingSize, events,
 		float64(newEvs)*float64(time.Second)/float64(took))
 	if errs == nil {
 		s.log.Debugf("%s", msg)
@@ -474,35 +455,15 @@ func (s *state) logState() {
 	}
 }
 
-func (s *state) reapLoop() {
-	reportTicker := time.NewTicker(reapInterval)
+func (s *state) expireLoop() {
+	reportTicker := time.NewTicker(expireInterval)
 	defer reportTicker.Stop()
 	for {
 		select {
 		case <-s.reporter.Done():
 			return
 		case <-reportTicker.C:
-			s.ExpireOlder()
-			flows := s.DoneFlows()
-			for elem := flows.get(); elem != nil; elem = flows.get() {
-				flow, ok := elem.(*flow)
-				if !ok || !flow.isValid() {
-					continue
-				}
-				if int(flow.pid) == os.Getpid() {
-					// Do not report flows for which we are the source
-					// to prevent a feedback loop.
-					continue
-				}
-				ev, err := flow.toEvent(true)
-				if err != nil {
-					s.log.Errorf("Failed to convert flow=%v err=%v", flow, err)
-					continue
-				}
-				if !s.reporter.Event(ev) {
-					return
-				}
-			}
+			s.ExpireFlows()
 		}
 	}
 }
@@ -520,38 +481,45 @@ func (s *state) logStateLoop() {
 	}
 }
 
-func (s *state) ExpireOlder() {
+func (s *state) ExpireFlows() {
+	start := s.clock()
+	toReport := s.expireFlows()
+	if sent := s.reportFlows(&toReport); sent != 0 {
+		s.log.Debugf("ExpireOlder took %v reported=%d", s.clock().Sub(start), sent)
+	}
+}
+
+func (s *state) expireFlows() (toReport helper.LinkedList) {
 	s.Lock()
 	defer s.Unlock()
-	deadline := s.clock().Add(-s.inactiveTimeout)
-	for item := s.flowLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
-		if flow, ok := item.(*flow); ok {
-			s.onFlowTerminated(flow)
-		} else {
-			s.flowLRU.get()
+	now := s.clock()
+	s.flowLRU.RemoveOlder(now.Add(-s.inactiveTimeout), func(e helper.LinkedElement) bool {
+		flow, ok := e.(*flow)
+		if ok {
+			flows := s.onFlowTerminated(flow)
+			toReport.Append(&flows)
 		}
-		item = s.flowLRU.peek()
-	}
-	deadline = s.clock().Add(-s.socketTimeout)
-	for item := s.socketLRU.peek(); item != nil && item.Timestamp().Before(deadline); {
-		if sock, ok := item.(*socket); ok {
+		return ok
+	})
+	s.socketLRU.RemoveOlder(now.Add(-s.socketTimeout), func(e helper.LinkedElement) bool {
+		sock, ok := e.(*socket)
+		if ok {
 			s.onSockDestroyed(sock.sock, sock, 0)
-		} else {
-			s.socketLRU.get()
 		}
-		item = s.socketLRU.peek()
-	}
-	deadline = s.clock().Add(-s.closeTimeout)
-	for item := s.closing.peek(); item != nil && item.Timestamp().Before(deadline); {
-		if sock, ok := item.(*socket); ok {
-			s.onSockTerminated(sock)
-		} else {
-			s.closing.get()
+		return ok
+	})
+	s.closing.RemoveOlder(now.Add(-s.closeTimeout), func(e helper.LinkedElement) bool {
+		sock, ok := e.(*socket)
+		if ok {
+			flows := s.onSockTerminated(sock)
+			toReport.Append(&flows)
 		}
-		item = s.closing.peek()
-	}
+		return ok
+	})
+
 	// Expire cached DNS
 	s.dns.CleanUp()
+	return toReport
 }
 
 func (s *state) CreateProcess(p *process) error {
@@ -646,23 +614,31 @@ func (s *state) ThreadLeave(tid uint32) (ev event, found bool) {
 	if ev, found = s.threads[tid]; found {
 		delete(s.threads, tid)
 	}
-	return
+	return ev, found
 }
 
-func (s *state) onSockTerminated(sock *socket) {
-	for _, flow := range sock.flows {
-		s.onFlowTerminated(flow)
+func (s *state) onSockTerminated(sock *socket) (toReport helper.LinkedList) {
+	for _, f := range sock.flows {
+		flows := s.onFlowTerminated(f)
+		toReport.Append(&flows)
 	}
+	sock.flows = nil
 	delete(s.socks, sock.sock)
 	if sock.closing {
-		s.closing.remove(sock)
+		s.closing.Remove(sock)
 	} else {
 		s.moveToClosing(sock)
 	}
+	return toReport
 }
 
 // CreateSocket allocates a new sock in the system
 func (s *state) CreateSocket(ref flow) error {
+	var toReport helper.LinkedList
+	// Send flows to the output as a deferred function to avoid
+	// holding on s mutex when there's backpressure from the output.
+	defer s.reportFlows(&toReport)
+
 	s.Lock()
 	defer s.Unlock()
 	ref.createdTime = s.kernTimestampToTime(ref.created)
@@ -677,7 +653,7 @@ func (s *state) CreateSocket(ref flow) error {
 			delete(prev.flows, ref.remote.String())
 		}
 		// terminate existing if sock ptr is reused
-		s.onSockTerminated(prev)
+		toReport = s.onSockTerminated(prev)
 	}
 	return s.createFlow(ref)
 }
@@ -724,8 +700,8 @@ func (s *state) mutualEnrich(sock *socket, f *flow) {
 	}
 	if !sock.closing {
 		sock.lastSeenTime = s.clock()
-		s.socketLRU.remove(sock)
-		s.socketLRU.add(sock)
+		s.socketLRU.Remove(sock)
+		s.socketLRU.Add(sock)
 	}
 }
 
@@ -745,7 +721,7 @@ func (s *state) createFlow(ref flow) error {
 		sock.flows = make(map[string]*flow, 1)
 	}
 	sock.flows[ref.remote.addr.String()] = ptr
-	s.flowLRU.add(ptr)
+	s.flowLRU.Add(ptr)
 	s.numFlows++
 	return nil
 }
@@ -755,15 +731,15 @@ func (s *state) OnSockDestroyed(ptr uintptr, pid uint32) error {
 	s.Lock()
 	defer s.Unlock()
 
-	return s.onSockDestroyed(ptr, nil, pid)
+	s.onSockDestroyed(ptr, nil, pid)
+	return nil
 }
 
-func (s *state) onSockDestroyed(ptr uintptr, sock *socket, pid uint32) error {
+func (s *state) onSockDestroyed(ptr uintptr, sock *socket, pid uint32) {
 	var found bool
 	if sock == nil {
-		sock, found = s.socks[ptr]
-		if !found {
-			return nil
+		if sock, found = s.socks[ptr]; !found {
+			return
 		}
 	}
 	// Enrich with pid
@@ -778,14 +754,13 @@ func (s *state) onSockDestroyed(ptr uintptr, sock *socket, pid uint32) error {
 	if !sock.closing {
 		s.moveToClosing(sock)
 	}
-	return nil
 }
 
 func (s *state) moveToClosing(sock *socket) {
 	sock.lastSeenTime = s.clock()
 	sock.closing = true
-	s.socketLRU.remove(sock)
-	s.closing.add(sock)
+	s.socketLRU.Remove(sock)
+	s.closing.Add(sock)
 }
 
 // UpdateFlow receives a partial flow and creates or updates an existing flow.
@@ -820,8 +795,8 @@ func (s *state) UpdateFlowWithCondition(ref flow, cond func(*flow) bool) error {
 	s.mutualEnrich(sock, &ref)
 	prev.updateWith(ref, s)
 	s.enrichDNS(prev)
-	s.flowLRU.remove(prev)
-	s.flowLRU.add(prev)
+	s.flowLRU.Remove(prev)
+	s.flowLRU.Add(prev)
 	return nil
 }
 
@@ -868,80 +843,55 @@ func (f *flow) updateWith(ref flow, s *state) {
 	f.remote.updateWith(ref.remote)
 }
 
-func (s *state) onFlowTerminated(f *flow) {
-	if f.done {
-		return
+func (s *state) reportFlow(f *flow) (reported bool) {
+	if f != nil && f.isValid() && int(f.pid) != s.currentPID {
+		if ev, err := f.toEvent(true); err == nil {
+			reported = s.reporter.Event(ev)
+		} else {
+			s.log.Errorf("Failed to convert flow=%v err=%v", f, err)
+		}
 	}
-	s.flowLRU.remove(f)
+	return reported
+}
+
+func (s *state) reportFlows(l *helper.LinkedList) (count int) {
+	for item := l.Get(); item != nil; item = l.Get() {
+		if f, ok := item.(*flow); ok {
+			if s.reportFlow(f) {
+				count++
+			}
+		}
+	}
+	return count
+}
+
+func (s *state) onFlowTerminated(f *flow) (toReport helper.LinkedList) {
+	if f.done {
+		return toReport
+	}
+	s.flowLRU.Remove(f)
 	f.done = true
 	// Unbind this flow from its parent
 	if parent, found := s.socks[f.sock]; found {
 		delete(parent.flows, f.remote.addr.String())
 	}
-	if f.isValid() {
-		s.done.add(f)
-	}
 	s.numFlows--
-}
-
-func (l *linkedList) add(f linkedElement) {
-	if f == nil || f.Next() != nil || f.Prev() != nil {
-		panic("bad flow in linked list")
-	}
-	l.size++
-	if l.tail == nil {
-		l.head = f
-		l.tail = f
-		f.SetNext(nil)
-		f.SetPrev(nil)
-		return
-	}
-	l.tail.SetNext(f)
-	f.SetPrev(l.tail)
-	l.tail = f
-	f.SetNext(nil)
-}
-
-func (l *linkedList) peek() linkedElement {
-	return l.head
-}
-
-func (l *linkedList) get() linkedElement {
-	f := l.head
-	if f != nil {
-		l.remove(f)
-	}
-	return f
-}
-
-func (l *linkedList) remove(e linkedElement) {
-	l.size--
-	if e.Prev() != nil {
-		e.Prev().SetNext(e.Next())
-	} else {
-		l.head = e.Next()
-	}
-	if e.Next() != nil {
-		e.Next().SetPrev(e.Prev())
-	} else {
-		l.tail = e.Prev()
-	}
-	e.SetPrev(nil)
-	e.SetNext(nil)
+	toReport.Add(f)
+	return toReport
 }
 
 func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	localAddr := f.local.addr
 	remoteAddr := f.remote.addr
 
-	local := common.MapStr{
+	local := mapstr.M{
 		"ip":      localAddr.IP.String(),
 		"port":    localAddr.Port,
 		"packets": f.local.packets,
 		"bytes":   f.local.bytes,
 	}
 
-	remote := common.MapStr{
+	remote := mapstr.M{
 		"ip":      remoteAddr.IP.String(),
 		"port":    remoteAddr.Port,
 		"packets": f.remote.packets,
@@ -976,12 +926,12 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 		eventType = append(eventType, "connection")
 	}
 
-	root := common.MapStr{
+	root := mapstr.M{
 		"source":      src,
 		"client":      src,
 		"destination": dst,
 		"server":      dst,
-		"network": common.MapStr{
+		"network": mapstr.M{
 			"direction": f.dir.String(),
 			"type":      inetType.String(),
 			"transport": f.proto.String(),
@@ -995,19 +945,25 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 				Protocol:        uint8(f.proto),
 			}),
 		},
-		"event": common.MapStr{
+		"event": mapstr.M{
 			"kind":     "event",
 			"action":   "network_flow",
-			"category": []string{"network", "network_traffic"},
+			"category": []string{"network"},
 			"type":     eventType,
 			"start":    f.createdTime,
 			"end":      f.lastSeenTime,
 			"duration": f.lastSeenTime.Sub(f.createdTime).Nanoseconds(),
 		},
-		"flow": common.MapStr{
+		"flow": mapstr.M{
 			"final":    final,
 			"complete": f.complete,
 		},
+	}
+	var errs multierror.Errors
+	rootPut := func(key string, value interface{}) {
+		if _, err := root.Put(key, value); err != nil {
+			errs = append(errs, err)
+		}
 	}
 
 	relatedIPs := []string{}
@@ -1018,15 +974,15 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 		relatedIPs = append(relatedIPs, remoteAddr.IP.String())
 	}
 	if len(relatedIPs) > 0 {
-		root.Put("related.ip", relatedIPs)
+		rootPut("related.ip", relatedIPs)
 	}
 
-	metricset := common.MapStr{
+	metricset := mapstr.M{
 		"kernel_sock_address": fmt.Sprintf("0x%x", f.sock),
 	}
 
 	if f.pid != 0 {
-		process := common.MapStr{
+		process := mapstr.M{
 			"pid": int(f.pid),
 		}
 		if f.process != nil {
@@ -1043,14 +999,14 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 			if f.process.hasCreds {
 				uid := strconv.Itoa(int(f.process.uid))
 				gid := strconv.Itoa(int(f.process.gid))
-				root.Put("user.id", uid)
-				root.Put("group.id", gid)
+				rootPut("user.id", uid)
+				rootPut("group.id", gid)
 				if name := userCache.LookupID(uid); name != "" {
-					root.Put("user.name", name)
-					root.Put("related.user", []string{name})
+					rootPut("user.name", name)
+					rootPut("related.user", []string{name})
 				}
 				if name := groupCache.LookupID(gid); name != "" {
-					root.Put("group.name", name)
+					rootPut("group.name", name)
 				}
 				metricset["uid"] = f.process.uid
 				metricset["gid"] = f.process.gid
@@ -1071,7 +1027,7 @@ func (f *flow) toEvent(final bool) (ev mb.Event, err error) {
 	return mb.Event{
 		RootFields:      root,
 		MetricSetFields: metricset,
-	}, nil
+	}, errs.Err()
 }
 
 func (s *state) SyncClocks(kernelNanos, userNanos uint64) error {

@@ -18,236 +18,342 @@
 package add_cloud_metadata
 
 import (
+	"context"
 	"fmt"
-	"net/http"
-	"net/http/httptest"
 	"os"
 	"testing"
 
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/feature/ec2/imds"
+	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	"github.com/aws/aws-sdk-go-v2/service/ec2/types"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func createEC2MockAPI(responseMap map[string]string) *httptest.Server {
-	h := func(w http.ResponseWriter, r *http.Request) {
-		if res, ok := responseMap[r.RequestURI]; ok {
-			w.Write([]byte(res))
-			return
-		}
-		http.Error(w, "not found", http.StatusNotFound)
-	}
-	return httptest.NewServer(http.HandlerFunc(h))
+type MockIMDSClient struct {
+	GetInstanceIdentityDocumentFunc func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error)
+}
+
+func (m *MockIMDSClient) GetInstanceIdentityDocument(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+	return m.GetInstanceIdentityDocumentFunc(ctx, params, optFns...)
+}
+
+type MockEC2Client struct {
+	DescribeTagsFunc func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error)
+}
+
+func (e *MockEC2Client) DescribeTags(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+	return e.DescribeTagsFunc(ctx, params, optFns...)
 }
 
 func TestMain(m *testing.M) {
 	logp.TestingSetup()
 	code := m.Run()
 	os.Exit(code)
-
 }
 
 func TestRetrieveAWSMetadataEC2(t *testing.T) {
-
-	const (
+	var (
 		// not the best way to use a response template
 		// but this should serve until we need to test
 		// documents containing very different values
 		accountIDDoc1        = "111111111111111"
 		regionDoc1           = "us-east-1"
 		availabilityZoneDoc1 = "us-east-1c"
-		instanceIDDoc1       = "i-11111111"
 		imageIDDoc1          = "ami-abcd1234"
 		instanceTypeDoc1     = "t2.medium"
-
-		instanceIDDoc2 = "i-22222222"
-
-		templateDoc = `{
-	  "accountId" : "%s",
-	  "region" : "%s",
-	  "availabilityZone" : "%s",
-	  "instanceId" : "%s",
-	  "imageId" : "%s",
-	  "instanceType" : "%s",
-	  "devpayProductCodes" : null,
-	  "privateIp" : "10.0.0.1",
-	  "version" : "2010-08-31",
-	  "billingProducts" : null,
-	  "pendingTime" : "2016-09-20T15:43:02Z",
-	  "architecture" : "x86_64",
-	  "kernelId" : null,
-	  "ramdiskId" : null
-	}`
+		instanceIDDoc2       = "i-22222222"
+		clusterNameKey       = "eks:cluster-name"
+		clusterNameValue     = "test"
+		instanceIDDoc1       = "i-11111111"
 	)
 
-	sampleEC2Doc1 := fmt.Sprintf(
-		templateDoc,
-		accountIDDoc1,
-		regionDoc1,
-		availabilityZoneDoc1,
-		instanceIDDoc1,
-		imageIDDoc1,
-		instanceTypeDoc1,
-	)
-
-	var testCases = []struct {
-		testName           string
-		ec2ResponseMap     map[string]string
-		processorOverwrite bool
-		previousEvent      common.MapStr
-
-		expectedEvent common.MapStr
+	var tests = []struct {
+		testName                string
+		mockGetInstanceIdentity func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error)
+		mockEc2Tags             func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error)
+		processorOverwrite      bool
+		previousEvent           mapstr.M
+		expectedEvent           mapstr.M
 	}{
 		{
-			testName:           "all fields from processor",
-			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
+			testName: "valid instance identity document, no cluster tags",
+			mockGetInstanceIdentity: func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+				return &imds.GetInstanceIdentityDocumentOutput{
+					InstanceIdentityDocument: imds.InstanceIdentityDocument{
+						AvailabilityZone: availabilityZoneDoc1,
+						Region:           regionDoc1,
+						InstanceID:       instanceIDDoc1,
+						InstanceType:     instanceTypeDoc1,
+						AccountID:        accountIDDoc1,
+						ImageID:          imageIDDoc1,
+					},
+				}, nil
+			},
+			mockEc2Tags: func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+				return &ec2.DescribeTagsOutput{
+					Tags: []types.TagDescription{},
+				}, nil
+			},
 			processorOverwrite: false,
-			previousEvent:      common.MapStr{},
-			expectedEvent: common.MapStr{
-				"cloud": common.MapStr{
+			previousEvent:      mapstr.M{},
+			expectedEvent: mapstr.M{
+				"cloud": mapstr.M{
 					"provider":          "aws",
-					"account":           common.MapStr{"id": accountIDDoc1},
-					"instance":          common.MapStr{"id": instanceIDDoc1},
-					"machine":           common.MapStr{"type": instanceTypeDoc1},
-					"image":             common.MapStr{"id": imageIDDoc1},
+					"account":           mapstr.M{"id": accountIDDoc1},
+					"instance":          mapstr.M{"id": instanceIDDoc1},
+					"machine":           mapstr.M{"type": instanceTypeDoc1},
+					"image":             mapstr.M{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
-					"service": common.MapStr{
-						"name": "EC2",
+					"service":           mapstr.M{"name": "EC2"},
+				},
+			},
+		},
+		{
+			testName: "all fields from processor",
+			mockGetInstanceIdentity: func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+				return &imds.GetInstanceIdentityDocumentOutput{
+					InstanceIdentityDocument: imds.InstanceIdentityDocument{
+						AvailabilityZone: availabilityZoneDoc1,
+						Region:           regionDoc1,
+						InstanceID:       instanceIDDoc1,
+						InstanceType:     instanceTypeDoc1,
+						AccountID:        accountIDDoc1,
+						ImageID:          imageIDDoc1,
+					},
+				}, nil
+			},
+			mockEc2Tags: func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+				return &ec2.DescribeTagsOutput{
+					Tags: []types.TagDescription{
+						{
+							Key:          &clusterNameKey,
+							ResourceId:   &instanceIDDoc1,
+							ResourceType: "instance",
+							Value:        &clusterNameValue,
+						},
+					},
+				}, nil
+			},
+			processorOverwrite: false,
+			previousEvent:      mapstr.M{},
+			expectedEvent: mapstr.M{
+				"cloud": mapstr.M{
+					"provider":          "aws",
+					"account":           mapstr.M{"id": accountIDDoc1},
+					"instance":          mapstr.M{"id": instanceIDDoc1},
+					"machine":           mapstr.M{"type": instanceTypeDoc1},
+					"image":             mapstr.M{"id": imageIDDoc1},
+					"region":            regionDoc1,
+					"availability_zone": availabilityZoneDoc1,
+					"service":           mapstr.M{"name": "EC2"},
+					"orchestrator": mapstr.M{
+						"cluster": mapstr.M{
+							"name": clusterNameValue,
+							"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
+						},
 					},
 				},
 			},
 		},
-
 		{
-			testName:           "instanceId pre-informed, no overwrite",
-			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
+			testName: "instanceId pre-informed, no overwrite",
+			mockGetInstanceIdentity: func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+				return &imds.GetInstanceIdentityDocumentOutput{
+					InstanceIdentityDocument: imds.InstanceIdentityDocument{
+						AvailabilityZone: availabilityZoneDoc1,
+						Region:           regionDoc1,
+						InstanceID:       instanceIDDoc1,
+						InstanceType:     instanceTypeDoc1,
+						AccountID:        accountIDDoc1,
+						ImageID:          imageIDDoc1,
+					},
+				}, nil
+			},
+			mockEc2Tags: func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+				return &ec2.DescribeTagsOutput{
+					Tags: []types.TagDescription{
+						{
+							Key:          &clusterNameKey,
+							ResourceId:   &instanceIDDoc1,
+							ResourceType: "instance",
+							Value:        &clusterNameValue,
+						},
+					},
+				}, nil
+			},
 			processorOverwrite: false,
-			previousEvent: common.MapStr{
-				"cloud": common.MapStr{
-					"instance": common.MapStr{"id": instanceIDDoc2},
+			previousEvent: mapstr.M{
+				"cloud": mapstr.M{
+					"instance": mapstr.M{"id": instanceIDDoc2},
 				},
 			},
-			expectedEvent: common.MapStr{
-				"cloud": common.MapStr{
-					"instance": common.MapStr{"id": instanceIDDoc2},
+			expectedEvent: mapstr.M{
+				"cloud": mapstr.M{
+					"instance": mapstr.M{"id": instanceIDDoc2},
 				},
 			},
 		},
-
 		{
 			// NOTE: In this case, add_cloud_metadata will overwrite cloud fields because
 			// it won't detect cloud.provider as a cloud field. This is not the behavior we
 			// expect and will find a better solution later in issue 11697.
-			testName:           "only cloud.provider pre-informed, no overwrite",
-			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
+			testName: "only cloud.provider pre-informed, no overwrite",
+			mockGetInstanceIdentity: func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+				return &imds.GetInstanceIdentityDocumentOutput{
+					InstanceIdentityDocument: imds.InstanceIdentityDocument{
+						AvailabilityZone: availabilityZoneDoc1,
+						Region:           regionDoc1,
+						InstanceID:       instanceIDDoc1,
+						InstanceType:     instanceTypeDoc1,
+						AccountID:        accountIDDoc1,
+						ImageID:          imageIDDoc1,
+					},
+				}, nil
+			},
+			mockEc2Tags: func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+				return &ec2.DescribeTagsOutput{
+					Tags: []types.TagDescription{
+						{
+							Key:          &clusterNameKey,
+							ResourceId:   &instanceIDDoc1,
+							ResourceType: "instance",
+							Value:        &clusterNameValue,
+						},
+					},
+				}, nil
+			},
 			processorOverwrite: false,
-			previousEvent: common.MapStr{
+			previousEvent: mapstr.M{
 				"cloud.provider": "aws",
 			},
-			expectedEvent: common.MapStr{
+			expectedEvent: mapstr.M{
 				"cloud.provider": "aws",
-				"cloud": common.MapStr{
+				"cloud": mapstr.M{
 					"provider":          "aws",
-					"account":           common.MapStr{"id": accountIDDoc1},
-					"instance":          common.MapStr{"id": instanceIDDoc1},
-					"machine":           common.MapStr{"type": instanceTypeDoc1},
-					"image":             common.MapStr{"id": imageIDDoc1},
+					"account":           mapstr.M{"id": accountIDDoc1},
+					"instance":          mapstr.M{"id": instanceIDDoc1},
+					"machine":           mapstr.M{"type": instanceTypeDoc1},
+					"image":             mapstr.M{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
-					"service": common.MapStr{
-						"name": "EC2",
+					"service":           mapstr.M{"name": "EC2"},
+					"orchestrator": mapstr.M{
+						"cluster": mapstr.M{
+							"name": clusterNameValue,
+							"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
+						},
 					},
 				},
 			},
 		},
-
 		{
-			testName:           "all fields from processor, overwrite",
-			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
+			testName: "instanceId pre-informed, overwrite",
+			mockGetInstanceIdentity: func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+				return &imds.GetInstanceIdentityDocumentOutput{
+					InstanceIdentityDocument: imds.InstanceIdentityDocument{
+						AvailabilityZone: availabilityZoneDoc1,
+						Region:           regionDoc1,
+						InstanceID:       instanceIDDoc1,
+						InstanceType:     instanceTypeDoc1,
+						AccountID:        accountIDDoc1,
+						ImageID:          imageIDDoc1,
+					},
+				}, nil
+			},
+			mockEc2Tags: func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+				return &ec2.DescribeTagsOutput{
+					Tags: []types.TagDescription{},
+				}, nil
+			},
 			processorOverwrite: true,
-			previousEvent:      common.MapStr{},
-			expectedEvent: common.MapStr{
-				"cloud": common.MapStr{
+			previousEvent: mapstr.M{
+				"cloud": mapstr.M{
+					"instance": mapstr.M{"id": instanceIDDoc2},
+				},
+			},
+			expectedEvent: mapstr.M{
+				"cloud": mapstr.M{
 					"provider":          "aws",
-					"account":           common.MapStr{"id": accountIDDoc1},
-					"instance":          common.MapStr{"id": instanceIDDoc1},
-					"machine":           common.MapStr{"type": instanceTypeDoc1},
-					"image":             common.MapStr{"id": imageIDDoc1},
+					"account":           mapstr.M{"id": accountIDDoc1},
+					"instance":          mapstr.M{"id": instanceIDDoc1},
+					"machine":           mapstr.M{"type": instanceTypeDoc1},
+					"image":             mapstr.M{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
-					"service": common.MapStr{
-						"name": "EC2",
-					},
+					"service":           mapstr.M{"name": "EC2"},
 				},
 			},
 		},
-
 		{
-			testName:           "instanceId pre-informed, overwrite",
-			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
+			testName: "only cloud.provider pre-informed, overwrite",
+			mockGetInstanceIdentity: func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+				return &imds.GetInstanceIdentityDocumentOutput{
+					InstanceIdentityDocument: imds.InstanceIdentityDocument{
+						AvailabilityZone: availabilityZoneDoc1,
+						Region:           regionDoc1,
+						InstanceID:       instanceIDDoc1,
+						InstanceType:     instanceTypeDoc1,
+						AccountID:        accountIDDoc1,
+						ImageID:          imageIDDoc1,
+					},
+				}, nil
+			},
+			mockEc2Tags: func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+				return &ec2.DescribeTagsOutput{
+					Tags: []types.TagDescription{},
+				}, nil
+			},
 			processorOverwrite: true,
-			previousEvent: common.MapStr{
-				"cloud": common.MapStr{
-					"instance": common.MapStr{"id": instanceIDDoc2},
-				},
-			},
-			expectedEvent: common.MapStr{
-				"cloud": common.MapStr{
-					"provider":          "aws",
-					"account":           common.MapStr{"id": accountIDDoc1},
-					"instance":          common.MapStr{"id": instanceIDDoc1},
-					"machine":           common.MapStr{"type": instanceTypeDoc1},
-					"image":             common.MapStr{"id": imageIDDoc1},
-					"region":            regionDoc1,
-					"availability_zone": availabilityZoneDoc1,
-					"service": common.MapStr{
-						"name": "EC2",
-					},
-				},
-			},
-		},
-
-		{
-			testName:           "only cloud.provider pre-informed, overwrite",
-			ec2ResponseMap:     map[string]string{ec2InstanceIdentityURI: sampleEC2Doc1},
-			processorOverwrite: false,
-			previousEvent: common.MapStr{
+			previousEvent: mapstr.M{
 				"cloud.provider": "aws",
 			},
-			expectedEvent: common.MapStr{
+			expectedEvent: mapstr.M{
 				"cloud.provider": "aws",
-				"cloud": common.MapStr{
+				"cloud": mapstr.M{
 					"provider":          "aws",
-					"account":           common.MapStr{"id": accountIDDoc1},
-					"instance":          common.MapStr{"id": instanceIDDoc1},
-					"machine":           common.MapStr{"type": instanceTypeDoc1},
-					"image":             common.MapStr{"id": imageIDDoc1},
+					"account":           mapstr.M{"id": accountIDDoc1},
+					"instance":          mapstr.M{"id": instanceIDDoc1},
+					"machine":           mapstr.M{"type": instanceTypeDoc1},
+					"image":             mapstr.M{"id": imageIDDoc1},
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
-					"service": common.MapStr{
-						"name": "EC2",
-					},
+					"service":           mapstr.M{"name": "EC2"},
 				},
 			},
 		},
 	}
 
-	for _, tc := range testCases {
+	for _, tc := range tests {
 		t.Run(tc.testName, func(t *testing.T) {
-			server := createEC2MockAPI(tc.ec2ResponseMap)
-			defer server.Close()
 
-			config, err := common.NewConfigFrom(map[string]interface{}{
-				"host":      server.Listener.Addr().String(),
+			NewIMDSClient = func(cfg awssdk.Config) IMDSClient {
+				return &MockIMDSClient{
+					GetInstanceIdentityDocumentFunc: tc.mockGetInstanceIdentity,
+				}
+			}
+			defer func() { NewIMDSClient = func(cfg awssdk.Config) IMDSClient { return imds.NewFromConfig(cfg) } }()
+
+			NewEC2Client = func(cfg awssdk.Config) EC2Client {
+				return &MockEC2Client{
+					DescribeTagsFunc: tc.mockEc2Tags,
+				}
+			}
+			defer func() { NewEC2Client = func(cfg awssdk.Config) EC2Client { return ec2.NewFromConfig(cfg) } }()
+
+			config, err := conf.NewConfigFrom(map[string]interface{}{
 				"overwrite": tc.processorOverwrite,
+				"providers": []string{"aws"},
 			})
 			if err != nil {
 				t.Fatalf("error creating config from map: %s", err.Error())
 			}
-
 			cmp, err := New(config)
 			if err != nil {
 				t.Fatalf("error creating new metadata processor: %s", err.Error())

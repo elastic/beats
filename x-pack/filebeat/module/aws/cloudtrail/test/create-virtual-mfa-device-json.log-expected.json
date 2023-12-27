@@ -7,6 +7,7 @@
         "aws.cloudtrail.flattened.request_parameters.virtualMFADeviceName": "Alice",
         "aws.cloudtrail.flattened.response_elements.virtualMFADevice.serialNumber": "arn:aws:iam::0123456789012:mfa/Alice",
         "aws.cloudtrail.recipient_account_id": "0123456789012",
+        "aws.cloudtrail.request_id": "EXAMPLE-303b-4b0e-a8c7-EXAMPLE",
         "aws.cloudtrail.request_parameters": "{path=/, virtualMFADeviceName=Alice}",
         "aws.cloudtrail.response_elements": "{virtualMFADevice={serialNumber=arn:aws:iam::0123456789012:mfa/Alice}}",
         "aws.cloudtrail.user_identity.access_key_id": "EXAMPLE_KEY",

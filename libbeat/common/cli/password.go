@@ -23,7 +23,8 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/pkg/errors"
+	"errors"
+
 	"golang.org/x/crypto/ssh/terminal"
 )
 
@@ -36,9 +37,8 @@ var methods = map[string]method{
 
 // ReadPassword allows to read a password passed as a command line parameter.
 // It offers several ways to read the password so it is not directly passed as a plain text argument:
-//   stdin - Will prompt the user to input the password
-//   env:VAR_NAME - Will read the password from the given env variable
-//
+// - stdin - Will prompt the user to input the password
+// - env:VAR_NAME - Will read the password from the given env variable
 func ReadPassword(def string) (string, error) {
 	if len(def) == 0 {
 		return "", errors.New("empty password definition")
@@ -64,7 +64,7 @@ func stdin(p string) (string, error) {
 	fmt.Print("Enter password: ")
 	bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
 	if err != nil {
-		return "", errors.Wrap(err, "reading password input")
+		return "", fmt.Errorf("reading password input: %w", err)
 	}
 	fmt.Println()
 	return string(bytePassword), nil

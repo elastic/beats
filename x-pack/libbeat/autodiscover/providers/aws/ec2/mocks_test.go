@@ -9,7 +9,7 @@ import (
 	"sync"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/ec2"
+	ec2types "github.com/aws/aws-sdk-go-v2/service/ec2/types"
 )
 
 // mockFetcher is a fetcher that returns a customizable list of results, useful for testing.
@@ -49,30 +49,30 @@ func (f *mockFetcher) setError(err error) {
 }
 
 func fakeEC2Instance() *ec2Instance {
-	runningCode := int64(16)
-	coreCount := int64(1)
-	threadsPerCore := int64(1)
+	runningCode := int32(16)
+	coreCount := int32(1)
+	threadsPerCore := int32(1)
 	publicDNSName := "ec2-1-2-3-4.us-west-1.compute.amazonaws.com"
 	publicIP := "1.2.3.4"
 	privateDNSName := "ip-5-6-7-8.us-west-1.compute.internal"
 	privateIP := "5.6.7.8"
 	instanceID := "i-123"
 
-	instance := ec2.Instance{
+	instance := ec2types.Instance{
 		InstanceId:   aws.String(instanceID),
-		InstanceType: ec2.InstanceTypeT2Medium,
-		Placement: &ec2.Placement{
+		InstanceType: ec2types.InstanceTypeT2Medium,
+		Placement: &ec2types.Placement{
 			AvailabilityZone: aws.String("us-west-1a"),
 		},
 		ImageId: aws.String("image-123"),
-		State: &ec2.InstanceState{
-			Name: ec2.InstanceStateNameRunning,
+		State: &ec2types.InstanceState{
+			Name: ec2types.InstanceStateNameRunning,
 			Code: &runningCode,
 		},
-		Monitoring: &ec2.Monitoring{
-			State: ec2.MonitoringStateDisabled,
+		Monitoring: &ec2types.Monitoring{
+			State: ec2types.MonitoringStateDisabled,
 		},
-		CpuOptions: &ec2.CpuOptions{
+		CpuOptions: &ec2types.CpuOptions{
 			CoreCount:      &coreCount,
 			ThreadsPerCore: &threadsPerCore,
 		},

@@ -19,16 +19,14 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
-
-	"github.com/elastic/beats/v7/libbeat/common"
 
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-
-	"github.com/pkg/errors"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 const (
@@ -92,15 +90,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	content, err := m.http.FetchContent()
 	if err != nil {
-		return errors.Wrap(err, "error in http fetch")
+		return fmt.Errorf("error in http fetch: %w", err)
 	}
 
 	if err = m.retrieveFetcher(); err != nil {
-		return errors.Wrapf(err, "error trying to get CouchDB version. Retrying on next fetch...")
+		return fmt.Errorf("error trying to get CouchDB version. Retrying on next fetch...: %w", err)
 	}
 	event, err := m.fetcher.MapEvent(m.info, content)
 	if err != nil {
-		return errors.Wrap(err, "error trying to get couchdb data")
+		return fmt.Errorf("error trying to get couchdb data: %w", err)
 	}
 	reporter.Event(event)
 
@@ -114,12 +112,12 @@ func (m *MetricSet) retrieveFetcher() (err error) {
 
 	m.info, err = m.getInfoFromCouchdbHost(m.Host())
 	if err != nil {
-		return errors.Wrap(err, "cannot start CouchDB metricbeat module")
+		return fmt.Errorf("cannot start CouchDB metricbeat module: %w", err)
 	}
 
-	version, err := common.NewVersion(m.info.Version)
+	version, err := version.New(m.info.Version)
 	if err != nil {
-		return errors.Wrap(err, "could not capture couchdb version")
+		return fmt.Errorf("could not capture couchdb version: %w", err)
 	}
 
 	m.Logger().Debugf("found couchdb version %d", version.Major)
@@ -154,18 +152,18 @@ func (m *MetricSet) getInfoFromCouchdbHost(h string) (*CommonInfo, error) {
 
 	hostdata, err := hpb.Build()(m.Module(), h)
 	if err != nil {
-		return nil, errors.Wrap(err, "error using host parser")
+		return nil, fmt.Errorf("error using host parser: %w", err)
 	}
 
 	res, err := c.Get(hostdata.URI)
 	if err != nil {
-		return nil, errors.Wrap(err, "error trying to do GET request to couchdb")
+		return nil, fmt.Errorf("error trying to do GET request to couchdb: %w", err)
 	}
 	defer res.Body.Close()
 
 	var info CommonInfo
 	if err = json.NewDecoder(res.Body).Decode(&info); err != nil {
-		return nil, errors.Wrap(err, "error trying to parse couchdb info")
+		return nil, fmt.Errorf("error trying to parse couchdb info: %w", err)
 	}
 
 	return &info, nil

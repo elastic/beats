@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/checkpoint/_meta/docs.asciidoc
+
 [[filebeat-module-checkpoint]]
 [role="xpack"]
 
@@ -63,6 +65,11 @@ Set to 0.0.0.0 to bind to all available interfaces.
 *`var.syslog_port`*::
 
 The UDP port to listen for syslog traffic. Defaults to 9001.
+
+*`var.timezone_offset`*::
+
+IANA time zone or time offset (e.g. `+0200`) to use when interpreting syslog
+timestamps without a time zone. Defaults to UTC.
 
 *`var.tags`*::
 
@@ -193,3 +200,4 @@ Check Point Syslog extensions are mapped as follows to ECS:
 For a description of each field in the module, see the
 <<exported-fields-checkpoint,exported fields>> section.
 
+:edit_url!:

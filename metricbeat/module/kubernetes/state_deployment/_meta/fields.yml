@@ -8,6 +8,16 @@
       type: boolean
       description: >
         Kubernetes deployment paused status
+    - name: status
+      type: group
+      fields:
+        - name: available
+          type: keyword
+          description: |
+            Deployment Available Condition status (true, false or unknown)
+        - name: progressing
+          type: keyword
+          description: Deployment Progresing Condition status (true, false or unknown)
     - name: replicas
       type: group
       description: >

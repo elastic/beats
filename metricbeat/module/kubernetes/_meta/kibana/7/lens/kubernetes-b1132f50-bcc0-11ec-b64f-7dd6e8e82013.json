@@ -1,0 +1,152 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "4bf1dfdb-7a60-482d-88d4-130d598ac7bb": {
+                            "columnOrder": [
+                                "d3f3271d-566f-4fe6-9bf1-69a47d59a2be",
+                                "f0a42b6b-873e-41f2-8ce3-e0598cd7ed64",
+                                "17247592-e6aa-4dba-b20d-b0accaf877dc"
+                            ],
+                            "columns": {
+                                "17247592-e6aa-4dba-b20d-b0accaf877dc": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "filter": {
+                                        "language": "kuery",
+                                        "query": "kubernetes.node.pod.allocatable.total: *"
+                                    },
+                                    "isBucketed": false,
+                                    "label": "Total Allocatable Pods",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.node.pod.allocatable.total"
+                                },
+                                "d3f3271d-566f-4fe6-9bf1-69a47d59a2be": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Node",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "columnId": "f0a42b6b-873e-41f2-8ce3-e0598cd7ed64",
+                                            "type": "column"
+                                        },
+                                        "orderDirection": "desc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.node.name"
+                                },
+                                "f0a42b6b-873e-41f2-8ce3-e0598cd7ed64": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Allocated Pods",
+                                    "operationType": "unique_count",
+                                    "params": {
+                                        "emptyAsNull": true
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.pod.name"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "e8a62a9a-b7a4-4091-a351-ce19ad9ba687",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": [
+                            "pod",
+                            "state_node"
+                        ],
+                        "type": "phrases"
+                    },
+                    "query": {
+                        "bool": {
+                            "minimum_should_match": 1,
+                            "should": [
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "pod"
+                                    }
+                                },
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "state_node"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "d3f3271d-566f-4fe6-9bf1-69a47d59a2be",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "f0a42b6b-873e-41f2-8ce3-e0598cd7ed64",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "17247592-e6aa-4dba-b20d-b0accaf877dc",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "4bf1dfdb-7a60-482d-88d4-130d598ac7bb",
+                "layerType": "data"
+            }
+        },
+        "title": "Allocated and Allocatable Pods per Node [Metricbeat Kubernetes]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-b1132f50-bcc0-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-4bf1dfdb-7a60-482d-88d4-130d598ac7bb",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "e8a62a9a-b7a4-4091-a351-ce19ad9ba687",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-05-23T08:46:49.863Z",
+    "version": "WzcxNSwxXQ=="
+}

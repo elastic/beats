@@ -11,14 +11,8 @@ when:
     parameters:                ## when parameter was selected in the UI.
         - "x-pack-dockerlogbeat"
     tags: true                 ## for all the tags
-platform: "immutable && ubuntu-18" ## default label for all the stages
+platform: "immutable && ubuntu-22" ## default label for all the stages
 stages:
-    lint:
-        make: |
-          make -C x-pack/dockerlogbeat check;
-          make -C x-pack/dockerlogbeat update;
-          make check-no-changes;
-        stage: lint
     unitTest:
         mage: "mage build unitTest"
         stage: mandatory
@@ -42,7 +36,7 @@ stages:
         e2e:
             enabled: false
         platforms:             ## override default label in this specific stage.
-          - "arm"
+          - "ubuntu-2204-aarch64"
         stage: packaging
         when:
             branches: false    ## Only on a PR basis for the time being

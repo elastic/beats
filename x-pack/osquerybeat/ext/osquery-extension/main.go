@@ -45,7 +45,7 @@ var (
 	socket   = flag.String("socket", "", "Path to the extensions UNIX domain socket")
 	timeout  = flag.Int("timeout", 3, "Seconds to wait for autoloaded extensions")
 	interval = flag.Int("interval", 3, "Seconds delay between connectivity checks")
-	verbose  = flag.Bool("verbose", false, "Verbose logging")
+	_        = flag.Bool("verbose", false, "Verbose logging")
 )
 
 func main() {
@@ -74,7 +74,7 @@ func main() {
 		log.Fatalf("Error creating extension: %s\n", err)
 	}
 
-	// Register the tables avaiable for the specific pltaform build
+	// Register the tables available for the specific pltaform build
 	RegisterTables(server)
 
 	if err := server.Run(); err != nil {
@@ -93,15 +93,14 @@ func monitorForParent() {
 	f := func() {
 		ppid := os.Getppid()
 		if ppid <= 1 {
-			fmt.Println("extension process no longer owned by osqueryd, quitting")
+			fmt.Fprintln(os.Stderr, "extension process no longer owned by osqueryd, quitting")
 			os.Exit(1)
 		}
 	}
 
 	f()
 
-	select {
-	case <-ticker.C:
+	for range ticker.C {
 		f()
 	}
 }

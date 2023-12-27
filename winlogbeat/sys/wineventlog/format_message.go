@@ -16,14 +16,12 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package wineventlog
 
 import (
-	"unsafe"
+	"fmt"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/winlogbeat/sys"
@@ -71,34 +69,39 @@ func getEventXML(metadata *PublisherMetadata, eventHandle EvtHandle) (string, er
 func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID uint32, values []EvtVariant, messageFlag EvtFormatMessageFlag) (string, error) {
 	var (
 		valuesCount = uint32(len(values))
-		valuesPtr   uintptr
+		valuesPtr   *EvtVariant
 	)
-	if len(values) > 0 {
-		valuesPtr = uintptr(unsafe.Pointer(&values[0]))
+	if len(values) != 0 {
+		valuesPtr = &values[0]
 	}
 
 	// Determine the buffer size needed (given in WCHARs).
 	var bufferUsed uint32
 	err := _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, 0, nil, &bufferUsed)
-	if err != windows.ERROR_INSUFFICIENT_BUFFER {
-		return "", errors.Wrap(err, "failed in EvtFormatMessage")
+	if err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno.
+		return "", fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	}
 
 	// Get a buffer from the pool and adjust its length.
 	bb := sys.NewPooledByteBuffer()
 	defer bb.Free()
+	// The documentation for EventFormatMessage specifies that the buffer is
+	// requested "in characters", and the buffer itself is LPWSTR, meaning the
+	// characters are WCHAR so double the value.
+	// https://docs.microsoft.com/en-us/windows/win32/api/winevt/nf-winevt-evtformatmessage
 	bb.Reserve(int(bufferUsed * 2))
 
-	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, uint32(bb.Len()/2), bb.PtrAt(0), &bufferUsed)
-	if err != nil {
-		switch err {
-		// Ignore some errors so it can tolerate missing or mismatched parameter values.
-		case windows.ERROR_EVT_UNRESOLVED_VALUE_INSERT:
-		case windows.ERROR_EVT_UNRESOLVED_PARAMETER_INSERT:
-		case windows.ERROR_EVT_MAX_INSERTS_REACHED:
-		default:
-			return "", errors.Wrap(err, "failed in EvtFormatMessage")
-		}
+	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, bufferUsed, bb.PtrAt(0), &bufferUsed)
+	switch err { //nolint:errorlint // This is an errno or nil.
+	case nil: // OK
+
+	// Ignore some errors so it can tolerate missing or mismatched parameter values.
+	case windows.ERROR_EVT_UNRESOLVED_VALUE_INSERT,
+		windows.ERROR_EVT_UNRESOLVED_PARAMETER_INSERT,
+		windows.ERROR_EVT_MAX_INSERTS_REACHED:
+
+	default:
+		return "", fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	}
 
 	return sys.UTF16BytesToString(bb.Bytes())

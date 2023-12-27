@@ -9,10 +9,9 @@ import (
 	"net/http"
 	"testing"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 func TestInitializeAWSConfig(t *testing.T) {
@@ -51,116 +50,6 @@ func TestGetAWSCredentials(t *testing.T) {
 	assert.Equal(t, inputConfig.AccessKeyID, retrievedAWSConfig.AccessKeyID)
 	assert.Equal(t, inputConfig.SecretAccessKey, retrievedAWSConfig.SecretAccessKey)
 	assert.Equal(t, inputConfig.SessionToken, retrievedAWSConfig.SessionToken)
-}
-
-func TestEnrichAWSConfigWithEndpoint(t *testing.T) {
-	cases := []struct {
-		title             string
-		endpoint          string
-		serviceName       string
-		region            string
-		awsConfig         awssdk.Config
-		expectedAWSConfig awssdk.Config
-	}{
-		{
-			"endpoint and serviceName given",
-			"amazonaws.com",
-			"ec2",
-			"",
-			awssdk.Config{},
-			awssdk.Config{
-				EndpointResolver: awssdk.ResolveWithEndpointURL("https://ec2.amazonaws.com"),
-			},
-		},
-		{
-			"endpoint, serviceName and region given",
-			"amazonaws.com",
-			"cloudwatch",
-			"us-west-1",
-			awssdk.Config{},
-			awssdk.Config{
-				EndpointResolver: awssdk.ResolveWithEndpointURL("https://cloudwatch.us-west-1.amazonaws.com"),
-			},
-		},
-		{
-			"full URI endpoint",
-			"https://s3.test.com:9000",
-			"s3",
-			"",
-			awssdk.Config{},
-			awssdk.Config{
-				EndpointResolver: awssdk.ResolveWithEndpointURL("https://s3.test.com:9000"),
-			},
-		},
-		{
-			"full non HTTPS URI endpoint",
-			"http://testobjects.com:9000",
-			"s3",
-			"",
-			awssdk.Config{},
-			awssdk.Config{
-				EndpointResolver: awssdk.ResolveWithEndpointURL("http://testobjects.com:9000"),
-			},
-		},
-	}
-	for _, c := range cases {
-		t.Run(c.title, func(t *testing.T) {
-			enrichedAWSConfig := EnrichAWSConfigWithEndpoint(c.endpoint, c.serviceName, c.region, c.awsConfig)
-			assert.Equal(t, c.expectedAWSConfig, enrichedAWSConfig)
-		})
-	}
-}
-
-func TestCreateServiceName(t *testing.T) {
-	cases := []struct {
-		title               string
-		serviceName         string
-		fips_enabled        bool
-		region              string
-		expectedServiceName string
-	}{
-		{
-			"S3 - non-fips - us-east-1",
-			"s3",
-			false,
-			"us-east-1",
-			"s3",
-		},
-		{
-			"S3 - non-fips - us-gov-east-1",
-			"s3",
-			false,
-			"us-gov-east-1",
-			"s3",
-		},
-		{
-			"S3 - fips - us-gov-east-1",
-			"s3",
-			true,
-			"us-gov-east-1",
-			"s3-fips",
-		},
-		{
-			"EC2 - fips - us-gov-east-1",
-			"ec2",
-			true,
-			"us-gov-east-1",
-			"ec2",
-		},
-		{
-			"EC2 - fips - us-east-1",
-			"ec2",
-			true,
-			"us-east-1",
-			"ec2-fips",
-		},
-	}
-	for _, c := range cases {
-		t.Run(c.title, func(t *testing.T) {
-			serviceName := CreateServiceName(c.serviceName, c.fips_enabled, c.region)
-			assert.Equal(t, c.expectedServiceName, serviceName)
-		})
-	}
 }
 
 func TestDefaultRegion(t *testing.T) {

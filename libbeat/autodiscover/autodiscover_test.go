@@ -18,26 +18,31 @@
 package autodiscover
 
 import (
+	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/keystore"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	"github.com/elastic/elastic-agent-autodiscover/bus"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type mockRunner struct {
 	mutex            sync.Mutex
-	config           *common.Config
+	config           *conf.C
 	started, stopped bool
 }
 
@@ -53,6 +58,7 @@ func (m *mockRunner) Stop() {
 	m.stopped = true
 	m.started = false
 }
+
 func (m *mockRunner) Clone() *mockRunner {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
@@ -66,35 +72,42 @@ func (m *mockRunner) String() string {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
-	out := common.MapStr{}
-	m.config.Unpack(&out)
+	out := mapstr.M{}
+	m.config.Unpack(&out) //nolint:errcheck // This is a test file
 	return fmt.Sprintf("config: %v, started=%v, stopped=%v", out.String(), m.started, m.stopped)
 }
 
 type mockAdapter struct {
 	mutex   sync.Mutex
-	configs []*common.Config
+	configs []*conf.C
 	runners []*mockRunner
 
 	CheckConfigCallCount int
 }
 
 // CreateConfig generates a valid list of configs from the given event, the received event will have all keys defined by `StartFilter`
-func (m *mockAdapter) CreateConfig(event bus.Event) ([]*common.Config, error) {
+func (m *mockAdapter) CreateConfig(event bus.Event) ([]*conf.C, error) {
 	if cfgs, ok := event["config"]; ok {
-		return cfgs.([]*common.Config), nil
+		if confs, ok := cfgs.([]*conf.C); ok {
+			return confs, nil
+		}
+
+		return nil, fmt.Errorf("event['config'] is of type '%T', expecting '[]*conf.C'", cfgs)
 	}
+
 	return m.configs, nil
 }
 
 // CheckConfig tests given config to check if it will work or not, returns errors in case it won't work
-func (m *mockAdapter) CheckConfig(c *common.Config) error {
+func (m *mockAdapter) CheckConfig(c *conf.C) error {
 	m.CheckConfigCallCount++
 
 	config := struct {
 		Broken bool `config:"broken"`
 	}{}
-	c.Unpack(&config)
+	if err := c.Unpack(&config); err != nil {
+		return fmt.Errorf("cannot unpack config: %w", err)
+	}
 
 	if config.Broken {
 		return fmt.Errorf("Broken config")
@@ -103,7 +116,7 @@ func (m *mockAdapter) CheckConfig(c *common.Config) error {
 	return nil
 }
 
-func (m *mockAdapter) Create(_ beat.PipelineConnector, config *common.Config) (cfgfile.Runner, error) {
+func (m *mockAdapter) Create(_ beat.PipelineConnector, config *conf.C) (cfgfile.Runner, error) {
 	runner := &mockRunner{
 		config: config,
 	}
@@ -146,33 +159,37 @@ func TestNilAutodiscover(t *testing.T) {
 }
 
 func TestAutodiscover(t *testing.T) {
+	printDebugLogsOnFailure(t)
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
 
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
 		return &mockProvider{}, nil
 	})
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
 
 	// Create a mock adapter
-	runnerConfig, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"runner": "1",
 	})
 	adapter := mockAdapter{
-		configs: []*common.Config{runnerConfig},
+		configs: []*conf.C{runnerConfig},
 	}
 
 	// and settings:
-	providerConfig, _ := common.NewConfigFrom(map[string]string{
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"type": "mock",
 	})
 	config := Config{
-		Providers: []*common.Config{providerConfig},
+		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
@@ -181,86 +198,115 @@ func TestAutodiscover(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// set the debounce period to something small in order to
+	// speed up the tests. This seems to be the sweet stop
+	// for the fastest test run
+	autodiscover.debouncePeriod = 99 * time.Millisecond
+
 	// Start it
 	autodiscover.Start()
 	defer autodiscover.Stop()
 	eventBus := <-busChan
 
 	// Test start event
+	// This start event will trigger an input reload
+	t.Log("Sending first start event, there will be 1 runner running")
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
 	})
-	wait(t, func() bool { return len(adapter.Runners()) == 1 })
 
+	requireRunningRunners(t, autodiscover, 1)
 	runners := adapter.Runners()
-	assert.Equal(t, len(runners), 1)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
-	assert.True(t, runners[0].started)
-	assert.False(t, runners[0].stopped)
+	require.Equal(t, len(runners), 1)
+	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
+	require.True(t, runners[0].started)
+	require.False(t, runners[0].stopped)
 
 	// Test update
+	// Autodiscover will not call "Reload" because the input
+	// is already running. This will not trigger an input reload
+	t.Log("Seeding first 'update' event, there will be 1 runner running")
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "baz",
 		},
 	})
 
+	requireRunningRunners(t, autodiscover, 1)
 	runners = adapter.Runners()
-	assert.Equal(t, len(runners), 1)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
-	assert.True(t, runners[0].started)
-	assert.False(t, runners[0].stopped)
+	require.Equal(t, len(runners), 1)
+	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
+	require.True(t, runners[0].started)
+	require.False(t, runners[0].stopped)
 
 	// Test stop/start
+	// This stop event will trigger an input Reload
+	t.Log("Seeding first stop event, there will be 0 runners running")
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
 		"stop":     true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "baz",
 		},
 	})
+
+	requireRunningRunners(t, autodiscover, 0)
+
+	// This start event will trigger an input reload
+	t.Log("Sending second start event, there will be 1 runner running")
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "baz",
 		},
 	})
-	wait(t, func() bool { return len(adapter.Runners()) == 2 })
 
+	requireRunningRunners(t, autodiscover, 1)
 	runners = adapter.Runners()
-	assert.Equal(t, len(runners), 2)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
-	assert.True(t, runners[0].stopped)
-	assert.True(t, runners[1].started)
-	assert.False(t, runners[1].stopped)
+	require.Equal(t, len(runners), 2)
+	require.Equal(t, len(autodiscover.configs["mock:foo"]), 1)
+	require.True(t, runners[0].stopped)
+	require.True(t, runners[1].started)
+	require.False(t, runners[1].stopped)
 
 	// Test stop event
+	// This stop event will trigger an input reload
+	t.Log("sending second stop event, there will be 0 runners running")
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
 		"stop":     true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "baz",
 		},
 	})
-	wait(t, func() bool { return adapter.Runners()[1].stopped })
+
+	// Instead of ensuring the number of running runners, ensure
+	// that the second started runner has stopped
+	require.Eventually(t,
+		func() bool {
+			return adapter.Runners()[1].stopped
+		},
+		10*time.Second,
+		100*time.Millisecond,
+		"adapter.Runners()[1] has not stopped")
 
 	runners = adapter.Runners()
-	assert.Equal(t, len(runners), 2)
-	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 0)
-	assert.False(t, runners[1].started)
-	assert.True(t, runners[1].stopped)
+	require.Equal(t, len(runners), 2)
+	require.Equal(t, len(autodiscover.configs["mock:foo"]), 0)
+	require.False(t, runners[1].started)
+	require.True(t, runners[1].stopped)
 }
 
 func TestAutodiscoverHash(t *testing.T) {
@@ -271,30 +317,33 @@ func TestAutodiscoverHash(t *testing.T) {
 	busChan := make(chan bus.Bus, 1)
 
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
 		return &mockProvider{}, nil
 	})
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
 
 	// Create a mock adapter
-	runnerConfig1, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig1, _ := conf.NewConfigFrom(map[string]string{
 		"runner": "1",
 	})
-	runnerConfig2, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig2, _ := conf.NewConfigFrom(map[string]string{
 		"runner": "2",
 	})
 	adapter := mockAdapter{
-		configs: []*common.Config{runnerConfig1, runnerConfig2},
+		configs: []*conf.C{runnerConfig1, runnerConfig2},
 	}
 
 	// and settings:
-	providerConfig, _ := common.NewConfigFrom(map[string]string{
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"type": "mock",
 	})
 	config := Config{
-		Providers: []*common.Config{providerConfig},
+		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
@@ -313,7 +362,7 @@ func TestAutodiscoverHash(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
 	})
@@ -336,27 +385,29 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 	busChan := make(chan bus.Bus, 1)
 
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
 		return &mockProvider{}, nil
 	})
-
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
 	// Create a mock adapter that returns a duplicated config
-	runnerConfig, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"id": "foo",
 	})
 	adapter := mockAdapter{
-		configs: []*common.Config{runnerConfig, runnerConfig},
+		configs: []*conf.C{runnerConfig, runnerConfig},
 	}
 
 	// and settings:
-	providerConfig, _ := common.NewConfigFrom(map[string]string{
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"type": "mock",
 	})
 	config := Config{
-		Providers: []*common.Config{providerConfig},
+		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
@@ -364,8 +415,6 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	autodiscover.workDone = make(chan struct{})
 
 	// Start it
 	autodiscover.Start()
@@ -378,13 +427,18 @@ func TestAutodiscoverDuplicatedConfigConfigCheckCalledOnce(t *testing.T) {
 			"id":       "foo",
 			"provider": "mock",
 			"start":    true,
-			"meta": common.MapStr{
+			"meta": mapstr.M{
 				"foo": "bar",
 			},
 		})
-		<-autodiscover.workDone
-		assert.Equal(t, 1, len(adapter.Runners()), "Only one runner should be started")
-		assert.Equal(t, 1, adapter.CheckConfigCallCount, "Check config should have been called only once")
+
+		assert.Eventually(t, func() bool {
+			return len(adapter.Runners()) == 1
+		}, 10*time.Second, 100*time.Millisecond, "Only one runner should be started")
+
+		assert.Eventually(t, func() bool {
+			return adapter.CheckConfigCallCount == 1
+		}, 10*time.Second, 100*time.Millisecond, "Check config should have been called only once")
 	}
 }
 
@@ -395,30 +449,33 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
 		return &mockProvider{}, nil
 	})
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
 
 	// Create a mock adapter
-	runnerConfig1, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig1, _ := conf.NewConfigFrom(map[string]string{
 		"broken": "true",
 	})
-	runnerConfig2, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig2, _ := conf.NewConfigFrom(map[string]string{
 		"runner": "2",
 	})
 	adapter := mockAdapter{
-		configs: []*common.Config{runnerConfig1, runnerConfig2},
+		configs: []*conf.C{runnerConfig1, runnerConfig2},
 	}
 
 	// and settings:
-	providerConfig, _ := common.NewConfigFrom(map[string]string{
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"type": "mock",
 	})
 	config := Config{
-		Providers: []*common.Config{providerConfig},
+		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
@@ -437,7 +494,7 @@ func TestAutodiscoverWithConfigCheckFailures(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
 	})
@@ -454,27 +511,30 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	// Register mock autodiscover provider
 	busChan := make(chan bus.Bus, 1)
 	Registry = NewRegistry()
-	Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *common.Config, k keystore.Keystore) (Provider, error) {
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
 		// intercept bus to mock events
 		busChan <- b
 
 		return &mockProvider{}, nil
 	})
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
 
 	// Create a mock adapter
-	runnerConfig, _ := common.NewConfigFrom(map[string]string{
+	runnerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"runner": "1",
 	})
 	adapter := mockAdapter{
-		configs: []*common.Config{runnerConfig},
+		configs: []*conf.C{runnerConfig},
 	}
 
 	// and settings:
-	providerConfig, _ := common.NewConfigFrom(map[string]string{
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
 		"type": "mock",
 	})
 	config := Config{
-		Providers: []*common.Config{providerConfig},
+		Providers: []*conf.C{providerConfig},
 	}
 	k, _ := keystore.NewFileKeystore("test")
 	// Create autodiscover manager
@@ -493,14 +553,14 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
-		"config": []*common.Config{
-			common.MustNewConfigFrom(map[string]interface{}{
+		"config": []*conf.C{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"a": "b",
 			}),
-			common.MustNewConfigFrom(map[string]interface{}{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"x": "y",
 			}),
 		},
@@ -510,21 +570,21 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	runners := adapter.Runners()
 	assert.Equal(t, len(runners), 2)
 	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
-	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"x": "y"}), true, false)
-	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
+	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"x": "y"}), true, false)
+	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
 	// Test start event with changed configurations
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
 		"start":    true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
-		"config": []*common.Config{
-			common.MustNewConfigFrom(map[string]interface{}{
+		"config": []*conf.C{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"a": "b",
 			}),
-			common.MustNewConfigFrom(map[string]interface{}{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"x": "c",
 			}),
 		},
@@ -532,33 +592,33 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 	wait(t, func() bool { return len(adapter.Runners()) == 3 })
 	runners = adapter.Runners()
 	// Ensure the first config is the same as before
-	fmt.Println(runners)
+	t.Log(runners)
 	assert.Equal(t, len(runners), 3)
 	assert.Equal(t, len(autodiscover.configs["mock:foo"]), 2)
-	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
+	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"a": "b"}), true, false)
 
 	// Ensure that the runner for the stale config is stopped
 	wait(t, func() bool {
-		check(t, adapter.Runners(), common.MustNewConfigFrom(map[string]interface{}{"x": "c"}), true, false)
+		check(t, adapter.Runners(), conf.MustNewConfigFrom(map[string]interface{}{"x": "c"}), true, false)
 		return true
 	})
 
 	// Ensure that the new runner is started
-	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"x": "c"}), true, false)
+	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"x": "c"}), true, false)
 
 	// Stop all the configs
 	eventBus.Publish(bus.Event{
 		"id":       "foo",
 		"provider": "mock",
 		"stop":     true,
-		"meta": common.MapStr{
+		"meta": mapstr.M{
 			"foo": "bar",
 		},
-		"config": []*common.Config{
-			common.MustNewConfigFrom(map[string]interface{}{
+		"config": []*conf.C{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"a": "b",
 			}),
-			common.MustNewConfigFrom(map[string]interface{}{
+			conf.MustNewConfigFrom(map[string]interface{}{
 				"x": "c",
 			}),
 		},
@@ -566,10 +626,147 @@ func TestAutodiscoverWithMutlipleEntries(t *testing.T) {
 
 	wait(t, func() bool { return adapter.Runners()[2].stopped == true })
 	runners = adapter.Runners()
-	check(t, runners, common.MustNewConfigFrom(map[string]interface{}{"x": "c"}), false, true)
+	check(t, runners, conf.MustNewConfigFrom(map[string]interface{}{"x": "c"}), false, true)
+}
+
+func TestAutodiscoverDebounce(t *testing.T) {
+	printDebugLogsOnFailure(t)
+	// Register mock autodiscover provider
+	busChan := make(chan bus.Bus, 1)
+	Registry = NewRegistry()
+	err := Registry.AddProvider("mock", func(beatName string, b bus.Bus, uuid uuid.UUID, c *conf.C, k keystore.Keystore) (Provider, error) {
+		// intercept bus to mock events
+		busChan <- b
+
+		return &mockProvider{}, nil
+	})
+	if err != nil {
+		t.Fatalf("cannot add provider to registry: %s", err)
+	}
+
+	providerConfig, _ := conf.NewConfigFrom(map[string]string{
+		"type": "mock",
+	})
+	config := Config{
+		Providers: []*conf.C{providerConfig},
+	}
+	k, _ := keystore.NewFileKeystore("test")
+
+	adapter := mockAdapter{}
+
+	// Create autodiscover manager
+	autodiscover, err := NewAutodiscover("test", nil, &adapter, &adapter, &config, k)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// set the debounce period to something small in order to
+	// speed up the tests. This seems to be the sweet stop
+	// for the fastest test run
+	autodiscover.debouncePeriod = 99 * time.Millisecond
+
+	// Start it
+	autodiscover.Start()
+	t.Cleanup(autodiscover.Stop)
+
+	eventBus := <-busChan
+
+	cfg, err := conf.NewConfigFrom(map[string]string{
+		"foo": "bar",
+	})
+	if err != nil {
+		t.Fatalf("error creating input config: %s", err)
+	}
+
+	// Send an event with config,
+	// `Autodiscover.handleStart` will return true and
+	// updated will be set to true
+	eventBus.Publish(bus.Event{
+		"id":       "foo",
+		"provider": "mock",
+		"start":    true,
+		"meta": mapstr.M{
+			"foo": "bar",
+		},
+		"config": []*conf.C{cfg},
+	})
+
+	// Send the second event without a config
+	// `Autodiscover.handleStart` will return false and
+	// updated must not be changed
+	eventBus.Publish(bus.Event{
+		"id":       "second,",
+		"provider": "mock",
+		"start":    true,
+		"meta": mapstr.M{
+			"foo": "bar",
+		},
+	})
+
+	// Ensure the input has been started
+	requireRunningRunners(t, autodiscover, 1)
+
+	// Repeat the process, but this time with a stop event.
+	// The same logic applies, but now we're testing the branch that calls
+	// `Autodiscover.handleStop`
+	eventBus.Publish(bus.Event{
+		"id":       "foo",
+		"provider": "mock",
+		"stop":     true,
+		"meta": mapstr.M{
+			"foo": "bar",
+		},
+		"config": []*conf.C{cfg},
+	})
+	eventBus.Publish(bus.Event{
+		"id":       "second,",
+		"provider": "mock",
+		"stop":     true,
+		"meta": mapstr.M{
+			"foo": "bar",
+		},
+	})
+	requireRunningRunners(t, autodiscover, 0)
+}
+
+func printDebugLogsOnFailure(t *testing.T) {
+	// Use the following line to have the logs being printed
+	// in real time.
+	// logp.DevelopmentSetup(logp.WithLevel(logp.DebugLevel), logp.WithSelectors("*"))
+	logp.DevelopmentSetup(logp.ToObserverOutput())
+
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Debug Logs:\n")
+			for _, log := range logp.ObserverLogs().TakeAll() {
+				data, err := json.Marshal(log)
+				if err != nil {
+					t.Errorf("failed encoding log as JSON: %s", err)
+				}
+				t.Logf("%s", string(data))
+			}
+			return
+		}
+	})
+}
+
+func requireRunningRunners(t *testing.T, autodiscover *Autodiscover, nRunners int) {
+	t.Helper()
+	nRunnersStr := strings.Builder{}
+	require.Eventuallyf(t,
+		func() bool {
+			nRunnersStr.Reset()
+			lenRunners := len(autodiscover.runners.Runners())
+			fmt.Fprint(&nRunnersStr, lenRunners)
+			return lenRunners == nRunners
+		},
+		30*time.Second,
+		100*time.Millisecond,
+		"expecting %d runners, got %s", nRunners, &nRunnersStr)
 }
 
 func wait(t *testing.T, test func() bool) {
+	t.Helper()
 	sleep := 20 * time.Millisecond
 	ready := test()
 	for !ready && sleep < 10*time.Second {
@@ -583,7 +780,8 @@ func wait(t *testing.T, test func() bool) {
 	}
 }
 
-func check(t *testing.T, runners []*mockRunner, expected *common.Config, started, stopped bool) {
+func check(t *testing.T, runners []*mockRunner, expected *conf.C, started, stopped bool) {
+	t.Helper()
 	for _, r := range runners {
 		if reflect.DeepEqual(expected, r.config) {
 			ok1 := assert.Equal(t, started, r.started)
@@ -596,7 +794,9 @@ func check(t *testing.T, runners []*mockRunner, expected *common.Config, started
 	}
 
 	// Fail the test case if the check fails
-	out := common.MapStr{}
-	expected.Unpack(&out)
+	out := mapstr.M{}
+	if err := expected.Unpack(&out); err != nil {
+		t.Fatalf("cannot unpack 'out' as 'mapstr.M', err: %s", err)
+	}
 	t.Fatalf("expected cfg %v to be started=%v stopped=%v but have %v", out, started, stopped, runners)
 }

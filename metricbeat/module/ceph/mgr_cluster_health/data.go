@@ -18,10 +18,10 @@
 package mgr_cluster_health
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/module/ceph/mgr"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type StatusResponse struct {
@@ -38,24 +38,24 @@ type TimeSyncStatusResponse struct {
 	} `json:"timechecks"`
 }
 
-func eventMapping(statusContent, timeSyncStatusContent []byte) (common.MapStr, error) {
+func eventMapping(statusContent, timeSyncStatusContent []byte) (mapstr.M, error) {
 	var statusResponse StatusResponse
 	err := mgr.UnmarshalResponse(statusContent, &statusResponse)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not unmarshal response")
+		return nil, fmt.Errorf("could not unmarshal response: %w", err)
 	}
 
 	var timeSyncStatusResponse TimeSyncStatusResponse
 	err = mgr.UnmarshalResponse(timeSyncStatusContent, &timeSyncStatusResponse)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not unmarshal response")
+		return nil, fmt.Errorf("could not unmarshal response: %w", err)
 	}
 
-	return common.MapStr{
+	return mapstr.M{
 		"overall_status": statusResponse.Health.Status,
-		"timechecks": common.MapStr{
+		"timechecks": mapstr.M{
 			"epoch": timeSyncStatusResponse.Timechecks.Epoch,
-			"round": common.MapStr{
+			"round": mapstr.M{
 				"value":  timeSyncStatusResponse.Timechecks.Round,
 				"status": timeSyncStatusResponse.Timechecks.RoundStatus,
 			},

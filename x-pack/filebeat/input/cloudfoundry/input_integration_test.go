@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build integration && cloudfoundry
-// +build integration,cloudfoundry
 
 package cloudfoundry
 
@@ -19,10 +18,9 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	cftest "github.com/elastic/beats/v7/x-pack/libbeat/common/cloudfoundry/test"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestInput(t *testing.T) {
@@ -38,7 +36,7 @@ func TestInput(t *testing.T) {
 }
 
 func testInput(t *testing.T, version string) {
-	config := common.MustNewConfigFrom(cftest.GetConfigFromEnv(t))
+	config := conf.MustNewConfigFrom(cftest.GetConfigFromEnv(t))
 	config.SetString("version", -1, version)
 
 	input, err := Plugin().Manager.Create(config)

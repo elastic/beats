@@ -16,30 +16,33 @@
 // under the License.
 
 //go:build linux || darwin || windows
-// +build linux darwin windows
 
 package docker
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
-	"github.com/elastic/beats/v7/libbeat/autodiscover/builder"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/bus"
-	"github.com/elastic/beats/v7/libbeat/common/docker"
-	"github.com/elastic/beats/v7/libbeat/common/safemapstr"
-	"github.com/elastic/beats/v7/libbeat/keystore"
-	"github.com/elastic/beats/v7/libbeat/logp"
+
+	"github.com/elastic/elastic-agent-autodiscover/bus"
+	"github.com/elastic/elastic-agent-autodiscover/docker"
+	"github.com/elastic/elastic-agent-autodiscover/utils"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/keystore"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/safemapstr"
 )
 
 func init() {
-	autodiscover.Registry.AddProvider("docker", AutodiscoverBuilder)
+	_ = autodiscover.Registry.AddProvider("docker", AutodiscoverBuilder)
 }
 
 // Provider implements autodiscover provider for docker containers
@@ -64,13 +67,13 @@ func AutodiscoverBuilder(
 	beatName string,
 	bus bus.Bus,
 	uuid uuid.UUID,
-	c *common.Config,
+	c *config.C,
 	keystore keystore.Keystore,
 ) (autodiscover.Provider, error) {
 	logger := logp.NewLogger("docker")
 
 	errWrap := func(err error) error {
-		return errors.Wrap(err, "error setting up docker autodiscover provider")
+		return fmt.Errorf("error setting up docker autodiscover provider: %w", err)
 	}
 
 	config := defaultConfig()
@@ -162,63 +165,72 @@ type dockerContainerMetadata struct {
 
 type dockerMetadata struct {
 	// Old selectors [Deprecated]
-	Docker common.MapStr
+	Docker mapstr.M
 
 	// New ECS-based selectors
-	Container common.MapStr
+	Container mapstr.M
 
 	// Metadata used to enrich events, like ECS-based selectors but can
 	// have modifications like dedotting
-	Metadata common.MapStr
+	Metadata mapstr.M
 }
 
 func (d *Provider) generateMetaDocker(event bus.Event) (*docker.Container, *dockerMetadata) {
 	container, ok := event["container"].(*docker.Container)
 	if !ok {
-		d.logger.Error(errors.New("Couldn't get a container from watcher event"))
+		d.logger.Error(errors.New("couldn't get a container from watcher event"))
 		return nil, nil
 	}
 
 	// Don't dedot selectors, dedot only metadata used for events enrichment
-	labelMap := common.MapStr{}
-	metaLabelMap := common.MapStr{}
+	labelMap := mapstr.M{}
+	metaLabelMap := mapstr.M{}
 	for k, v := range container.Labels {
-		safemapstr.Put(labelMap, k, v)
+		err := safemapstr.Put(labelMap, k, v)
+		if err != nil {
+			d.logger.Debugf("error adding k:v (%v:%v): %v", k, v, err)
+		}
 		if d.config.Dedot {
 			label := common.DeDot(k)
-			metaLabelMap.Put(label, v)
+			_, err := metaLabelMap.Put(label, v)
+			if err != nil {
+				d.logger.Debugf("error adding value (%v): %v", v, err)
+			}
 		} else {
-			safemapstr.Put(metaLabelMap, k, v)
+			err := safemapstr.Put(metaLabelMap, k, v)
+			if err != nil {
+				d.logger.Debugf("error adding k:v (%v:%v): %v", k, v, err)
+			}
 		}
 	}
 
 	meta := &dockerMetadata{
-		Docker: common.MapStr{
-			"container": common.MapStr{
+		Docker: mapstr.M{
+			"container": mapstr.M{
 				"id":     container.ID,
 				"name":   container.Name,
 				"image":  container.Image,
 				"labels": labelMap,
 			},
 		},
-		Container: common.MapStr{
+		Container: mapstr.M{
 			"id":   container.ID,
 			"name": container.Name,
-			"image": common.MapStr{
+			"image": mapstr.M{
 				"name": container.Image,
 			},
 			"labels": labelMap,
 		},
-		Metadata: common.MapStr{
-			"container": common.MapStr{
+		Metadata: mapstr.M{
+			"container": mapstr.M{
 				"id":   container.ID,
 				"name": container.Name,
-				"image": common.MapStr{
+				"image": mapstr.M{
 					"name": container.Image,
 				},
 			},
-			"docker": common.MapStr{
-				"container": common.MapStr{
+			"docker": mapstr.M{
+				"container": mapstr.M{
 					"labels": metaLabelMap,
 				},
 			},
@@ -265,20 +277,19 @@ func (d *Provider) scheduleStopContainer(event bus.Event) {
 }
 
 func (d *Provider) stopContainer(container *docker.Container, meta *dockerMetadata) {
-	if _, ok := d.stoppers[container.ID]; ok {
-		delete(d.stoppers, container.ID)
-	}
+	delete(d.stoppers, container.ID)
 
 	d.emitContainer(container, meta, "stop")
 }
 
 func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetadata, flag string) {
 	var host string
+	var ports mapstr.M
 	if len(container.IPAddresses) > 0 {
 		host = container.IPAddresses[0]
 	}
 
-	var events []bus.Event
+	events := make([]bus.Event, 0)
 	// Without this check there would be overlapping configurations with and without ports.
 	if len(container.Ports) == 0 {
 		event := bus.Event{
@@ -292,9 +303,14 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 		}
 
 		events = append(events, event)
+	} else {
+		ports = mapstr.M{}
+		for _, port := range container.Ports {
+			ports[strconv.FormatUint(uint64(port.PrivatePort), 10)] = port.PublicPort
+		}
 	}
-
 	// Emit container container and port information
+
 	for _, port := range container.Ports {
 		event := bus.Event{
 			"provider":  d.uuid,
@@ -302,6 +318,7 @@ func (d *Provider) emitContainer(container *docker.Container, meta *dockerMetada
 			flag:        true,
 			"host":      host,
 			"port":      port.PrivatePort,
+			"ports":     ports,
 			"docker":    meta.Docker,
 			"container": meta.Container,
 			"meta":      meta.Metadata,
@@ -316,7 +333,7 @@ func (d *Provider) publish(events []bus.Event) {
 		return
 	}
 
-	configs := make([]*common.Config, 0)
+	configs := make([]*config.C, 0)
 	for _, event := range events {
 		// Try to match a config
 		if config := d.templates.GetConfig(event); config != nil {
@@ -331,9 +348,10 @@ func (d *Provider) publish(events []bus.Event) {
 	}
 
 	// Since all the events belong to the same event ID pick on and add in all the configs
-	event := bus.Event(common.MapStr(events[0]).Clone())
+	event := bus.Event(mapstr.M(events[0]).Clone())
 	// Remove the port to avoid ambiguity during debugging
 	delete(event, "port")
+	delete(event, "ports")
 	event["config"] = configs
 
 	// Call all appenders to append any extra configuration
@@ -345,11 +363,14 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 	// Try to build a config with enabled builders. Send a provider agnostic payload.
 	// Builders are Beat specific.
 	e := bus.Event{}
-	var dockerMeta common.MapStr
+	var dockerMeta mapstr.M
+	var ok bool
 
-	if rawDocker, err := common.MapStr(event).GetValue("docker.container"); err == nil {
-		dockerMeta = rawDocker.(common.MapStr)
-		e["container"] = dockerMeta
+	if rawDocker, err := mapstr.M(event).GetValue("docker.container"); err == nil {
+		dockerMeta, ok = rawDocker.(mapstr.M)
+		if ok {
+			e["container"] = dockerMeta
+		}
 	}
 
 	if host, ok := event["host"]; ok {
@@ -358,8 +379,11 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 	if port, ok := event["port"]; ok {
 		e["port"] = port
 	}
+	if ports, ok := event["ports"]; ok {
+		e["ports"] = ports
+	}
 	if labels, err := dockerMeta.GetValue("labels"); err == nil {
-		hints := builder.GenerateHints(labels.(common.MapStr), "", d.config.Prefix)
+		hints := utils.GenerateHints(labels.(mapstr.M), "", d.config.Prefix)
 		e["hints"] = hints
 	}
 	return e

@@ -19,7 +19,7 @@ package publisher
 
 import (
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // Batch is used to pass a batch of events to the outputs and asynchronously listening
@@ -41,6 +41,23 @@ type Batch interface {
 	// Try sending the events in this list again; all others are acknowledged.
 	RetryEvents(events []Event)
 
+	// Split this batch's events into two smaller batches and retry them both.
+	// If SplitRetry returns false, the batch could not be split, and the
+	// caller is responsible for reporting the error (including calling
+	// batch.Drop() if necessary).
+	SplitRetry() bool
+
+	// Release the internal pointer to this batch's events but do not yet
+	// acknowledge this batch. This exists specifically for the shipper output,
+	// where there is potentially a long gap between when events are handed off
+	// to the shipper and when they are acknowledged upstream; during that time,
+	// we need to preserve batch metadata for producer end-to-end acknowledgments,
+	// but we do not need the events themselves since they are already queued by
+	// the shipper. It is only guaranteed to release event pointers when using the
+	// proxy queue.
+	// Never call this on a batch that might be retried.
+	FreeEntries()
+
 	// Send was aborted, try again but don't decrease the batch's TTL counter.
 	Cancelled()
 }
@@ -59,14 +76,15 @@ type EventFlags uint8
 // EventCache provides a space for outputs to define per-event metadata
 // that's intended to be used only within the scope of an output
 type EventCache struct {
-	m common.MapStr
+	m mapstr.M
 }
 
 // Put lets outputs put key-value pairs into the event cache
 func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
+	//nolint:typecheck // Nil checks are ok here
 	if ec.m == nil {
 		// uninitialized map
-		ec.m = common.MapStr{}
+		ec.m = mapstr.M{}
 	}
 
 	return ec.m.Put(key, value)
@@ -74,9 +92,10 @@ func (ec *EventCache) Put(key string, value interface{}) (interface{}, error) {
 
 // GetValue lets outputs retrieve values from the event cache by key
 func (ec *EventCache) GetValue(key string) (interface{}, error) {
+	//nolint:typecheck // Nil checks are ok here
 	if ec.m == nil {
 		// uninitialized map
-		return nil, common.ErrKeyNotFound
+		return nil, mapstr.ErrKeyNotFound
 	}
 
 	return ec.m.GetValue(key)

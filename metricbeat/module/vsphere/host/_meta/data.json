@@ -1,43 +1,46 @@
 {
-    "@timestamp": "2017-10-12T08:05:34.853Z",
-    "event": {
-        "dataset": "vsphere.host",
-        "duration": 115000,
-        "module": "vsphere"
-    },
+    "@timestamp": "2022-09-06T06:41:22.128Z",
     "metricset": {
-        "name": "host",
-        "period": 10000
+      "name": "host",
+      "period": 10000
     },
     "service": {
-        "address": "127.0.0.1:38517",
-        "type": "vsphere"
+      "address": "https://localhost:8989/sdk",
+      "type": "vsphere"
+    },
+    "event": {
+      "module": "vsphere",
+      "duration": 23519250,
+      "dataset": "vsphere.host"
     },
     "vsphere": {
-        "host": {
-            "cpu": {
-                "free": {
-                    "mhz": 4521
-                },
-                "total": {
-                    "mhz": 4588
-                },
-                "used": {
-                    "mhz": 67
-                }
-            },
-            "memory": {
-                "free": {
-                    "bytes": 2822230016
-                },
-                "total": {
-                    "bytes": 4294430720
-                },
-                "used": {
-                    "bytes": 1472200704
-                }
-            },
-            "name": "localhost.localdomain"
-        }
+      "host": {
+        "cpu": {
+          "used": {
+            "mhz": 67
+          },
+          "total": {
+            "mhz": 4588
+          },
+          "free": {
+            "mhz": 4521
+          }
+        },
+        "memory": {
+          "free": {
+            "bytes": 2822230016
+          },
+          "total": {
+            "bytes": 4294430720
+          },
+          "used": {
+            "bytes": 1472200704
+          }
+        },
+        "network_names": [
+          "VM Network"
+        ],
+        "name": "DC0_H0"
+      }
     }
 }

@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 )
 
 type PackageInstaller struct {
@@ -40,7 +39,6 @@ type PackageDependency struct {
 }
 
 var (
-	Linux386      = PlatformDescription{Name: "linux/386", Arch: "i386", DefaultTag: "i386"}
 	LinuxAMD64    = PlatformDescription{Name: "linux/amd64", Arch: "", DefaultTag: ""} // builders run on amd64 platform
 	LinuxARM64    = PlatformDescription{Name: "linux/arm64", Arch: "arm64", DefaultTag: "arm64"}
 	LinuxARM5     = PlatformDescription{Name: "linux/arm5", Arch: "armel", DefaultTag: "armel"}
@@ -114,7 +112,7 @@ func installDependencies(arch string, pkgs ...string) error {
 	if arch != "" {
 		err := sh.Run("dpkg", "--add-architecture", arch)
 		if err != nil {
-			return errors.Wrap(err, "error while adding architecture")
+			return fmt.Errorf("error while adding architecture: %w", err)
 		}
 	}
 

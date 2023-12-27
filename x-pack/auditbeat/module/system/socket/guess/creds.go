@@ -14,10 +14,21 @@ import (
 
 	"golang.org/x/sys/unix"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+/*
+struct mq_attr {
+	long mq_flags;
+	long mq_maxmsg;
+	long mq_msgsize;
+	long mq_curmsgs;
+	long __reserved[4];
+};
+*/
+import "C"
 
 /*
 	creds guess discovers the offsets of (E)UID/(E)GID fields within a
@@ -57,9 +68,7 @@ func init() {
 	}
 }
 
-type guessStructCreds struct {
-	ctx Context
-}
+type guessStructCreds struct{}
 
 // Name of this guess.
 func (g *guessStructCreds) Name() string {
@@ -79,20 +88,20 @@ func (g *guessStructCreds) Provides() []string {
 // Requires declares the variables required to run this guess.
 func (g *guessStructCreds) Requires() []string {
 	return []string{
-		"RET",
+		"P3",
 	}
 }
 
-// Probes returns a kretprobe on prepare_creds that dumps the first bytes
-// pointed to by the return value, which is a struct cred.
+// Probes returns a kprobe on dentry_open that dumps the first bytes
+// pointed to by the third parameter value, which is a struct cred.
 func (g *guessStructCreds) Probes() ([]helper.ProbeDef, error) {
 	return []helper.ProbeDef{
 		{
 			Probe: tracing.Probe{
-				Type:      tracing.TypeKRetProbe,
+				Type:      tracing.TypeKProbe,
 				Name:      "guess_struct_creds",
-				Address:   "prepare_creds",
-				Fetchargs: helper.MakeMemoryDump("{{.RET}}", 0, credDumpBytes),
+				Address:   "dentry_open",
+				Fetchargs: helper.MakeMemoryDump("{{.P3}}", 0, credDumpBytes),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -100,7 +109,7 @@ func (g *guessStructCreds) Probes() ([]helper.ProbeDef, error) {
 }
 
 // Prepare is a no-op.
-func (g *guessStructCreds) Prepare(ctx Context) error {
+func (g *guessStructCreds) Prepare(Context) error {
 	return nil
 }
 
@@ -110,7 +119,7 @@ func (g *guessStructCreds) Terminate() error {
 }
 
 // Extract receives the struct cred dump and discovers the offsets.
-func (g *guessStructCreds) Extract(ev interface{}) (common.MapStr, bool) {
+func (g *guessStructCreds) Extract(ev interface{}) (mapstr.M, bool) {
 	raw := ev.([]byte)
 	if len(raw) != credDumpBytes {
 		return nil, false
@@ -132,7 +141,7 @@ func (g *guessStructCreds) Extract(ev interface{}) (common.MapStr, bool) {
 		ptr[offset/4+1] != uint32(os.Getgid()) {
 		return nil, false
 	}
-	return common.MapStr{
+	return mapstr.M{
 		"STRUCT_CRED_UID":  offset,
 		"STRUCT_CRED_GID":  offset + 4,
 		"STRUCT_CRED_EUID": offset + 16,
@@ -140,11 +149,26 @@ func (g *guessStructCreds) Extract(ev interface{}) (common.MapStr, bool) {
 	}, true
 }
 
-// Trigger invokes the SYS_ACCESS syscall:
-//	  int access(const char *pathname, int mode);
-// The function call will return an error due to path being NULL, but it will
-// have invoked prepare_creds before argument validation.
+// Trigger invokes the SYS_MQ_OPEN syscall:
+//
+//	int mq_open(const char *name, int oflag, mode_t mode, struct mq_attr *attr);
 func (g *guessStructCreds) Trigger() error {
-	syscall.Syscall(unix.SYS_ACCESS, 0, 0, 0)
-	return nil
+	name, err := unix.BytePtrFromString("__guess_creds")
+	if err != nil {
+		return err
+	}
+	attr := C.struct_mq_attr{
+		mq_maxmsg:  1,
+		mq_msgsize: 8,
+	}
+	mqd, _, errno := syscall.Syscall6(unix.SYS_MQ_OPEN,
+		uintptr(unsafe.Pointer(name)),
+		uintptr(os.O_CREATE|os.O_RDWR),
+		0o644,
+		uintptr(unsafe.Pointer(&attr)),
+		0, 0)
+	if errno != 0 {
+		return errno
+	}
+	return unix.Close(int(mqd))
 }

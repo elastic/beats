@@ -16,14 +16,13 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package wineventlog
 
 import (
+	"fmt"
 	"syscall"
 
-	"github.com/pkg/errors"
 	"golang.org/x/sys/windows"
 
 	"github.com/elastic/beats/v7/winlogbeat/sys"
@@ -42,8 +41,8 @@ func (b Bookmark) XML() (string, error) {
 	var bufferUsed uint32
 
 	err := _EvtRender(NilHandle, EvtHandle(b), EvtRenderBookmark, 0, nil, &bufferUsed, nil)
-	if err != nil && err != windows.ERROR_INSUFFICIENT_BUFFER {
-		return "", errors.Wrap(err, "failed to determine necessary buffer size for EvtRender")
+	if err != nil && err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // Bad linter! This is always errno or nil.
+		return "", fmt.Errorf("failed to determine necessary buffer size for EvtRender: %w", err)
 	}
 
 	bb := sys.NewPooledByteBuffer()
@@ -52,7 +51,7 @@ func (b Bookmark) XML() (string, error) {
 
 	err = _EvtRender(NilHandle, EvtHandle(b), EvtRenderBookmark, uint32(bb.Len()), bb.PtrAt(0), &bufferUsed, nil)
 	if err != nil {
-		return "", errors.Wrap(err, "failed to render bookmark XML")
+		return "", fmt.Errorf("failed to render bookmark XML: %w", err)
 	}
 
 	return sys.UTF16BytesToString(bb.Bytes())

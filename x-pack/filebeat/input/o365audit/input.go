@@ -7,20 +7,22 @@ package o365audit
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
 	"github.com/joeshaw/multierror"
-	"github.com/pkg/errors"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/timed"
 )
@@ -65,10 +67,10 @@ func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 	}
 }
 
-func configure(cfg *common.Config) ([]cursor.Source, cursor.Input, error) {
+func configure(cfg *conf.C) ([]cursor.Source, cursor.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, nil, errors.Wrap(err, "reading config")
+		return nil, nil, fmt.Errorf("reading config: %w", err)
 	}
 
 	var sources []cursor.Source
@@ -98,7 +100,7 @@ func (inp *o365input) Test(src cursor.Source, ctx v2.TestContext) error {
 	}
 
 	if _, err := auth.Token(); err != nil {
-		return errors.Wrapf(err, "unable to acquire authentication token for tenant:%s", tenantID)
+		return fmt.Errorf("unable to acquire authentication token for tenant:%s: %w", tenantID, err)
 	}
 
 	return nil
@@ -116,7 +118,7 @@ func (inp *o365input) Run(
 			break
 		}
 		if ctx.Cancelation.Err() != err && err != context.Canceled {
-			msg := common.MapStr{}
+			msg := mapstr.M{}
 			msg.Put("error.message", err.Error())
 			msg.Put("event.kind", "pipeline_error")
 			event := beat.Event{
@@ -148,7 +150,7 @@ func (inp *o365input) runOnce(
 	}
 
 	if _, err := tokenProvider.Token(); err != nil {
-		return errors.Wrapf(err, "unable to acquire authentication token for tenant:%s", stream.tenantID)
+		return fmt.Errorf("unable to acquire authentication token for tenant:%s: %w", stream.tenantID, err)
 	}
 
 	config := &inp.config
@@ -162,14 +164,14 @@ func (inp *o365input) runOnce(
 		poll.WithLogger(log),
 		poll.WithContext(ctxtool.FromCanceller(ctx.Cancelation)),
 		poll.WithRequestDecorator(
-			autorest.WithUserAgent(useragent.UserAgent("Filebeat-"+pluginName)),
-			autorest.WithQueryParameters(common.MapStr{
+			autorest.WithUserAgent(useragent.UserAgent("Filebeat-"+pluginName, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())),
+			autorest.WithQueryParameters(mapstr.M{
 				"publisherIdentifier": tenantID,
 			}),
 		),
 	)
 	if err != nil {
-		return errors.Wrap(err, "failed to create API poller")
+		return fmt.Errorf("failed to create API poller: %w", err)
 	}
 
 	start := initCheckpoint(log, cursor, config.API.MaxRetention)
@@ -223,7 +225,7 @@ func initCheckpoint(log *logp.Logger, c cursor.Cursor, maxRetention time.Duratio
 }
 
 // Report returns an action that produces a beat.Event from the given object.
-func (env apiEnvironment) Report(raw json.RawMessage, doc common.MapStr, private interface{}) poll.Action {
+func (env apiEnvironment) Report(raw json.RawMessage, doc mapstr.M, private interface{}) poll.Action {
 	return func(poll.Enqueuer) error {
 		return env.Callback(env.toBeatEvent(raw, doc), private)
 	}
@@ -236,16 +238,16 @@ func (env apiEnvironment) ReportAPIError(err apiError) poll.Action {
 	}
 }
 
-func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc common.MapStr) beat.Event {
+func (env apiEnvironment) toBeatEvent(raw json.RawMessage, doc mapstr.M) beat.Event {
 	var errs multierror.Errors
 	ts, err := getDateKey(doc, "CreationTime", apiDateFormats)
 	if err != nil {
 		ts = time.Now()
-		errs = append(errs, errors.Wrap(err, "failed parsing CreationTime"))
+		errs = append(errs, fmt.Errorf("failed parsing CreationTime: %w", err))
 	}
 	b := beat.Event{
 		Timestamp: ts,
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			fieldsPrefix: doc,
 		},
 	}

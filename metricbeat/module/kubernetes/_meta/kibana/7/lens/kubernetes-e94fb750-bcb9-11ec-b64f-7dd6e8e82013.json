@@ -1,0 +1,183 @@
+{
+    "attributes": {
+        "state": {
+            "datasourceStates": {
+                "indexpattern": {
+                    "layers": {
+                        "e8ede311-8955-4a16-bf44-8c0ff0e0104b": {
+                            "columnOrder": [
+                                "8d5b3307-5817-411c-a1a4-dc2cc0a8b08c",
+                                "98d34e0f-186a-47a7-8fa3-de5123d43616",
+                                "420939ad-d9f0-43ee-a1a6-9b9fe5509086",
+                                "546bc1ba-c988-42f6-9d4d-3da5f21cff36"
+                            ],
+                            "columns": {
+                                "420939ad-d9f0-43ee-a1a6-9b9fe5509086": {
+                                    "customLabel": true,
+                                    "dataType": "number",
+                                    "isBucketed": false,
+                                    "label": "Capacity",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "format": {
+                                            "id": "bytes",
+                                            "params": {
+                                                "decimals": 0
+                                            }
+                                        },
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ratio",
+                                    "sourceField": "kubernetes.persistentvolume.capacity.bytes"
+                                },
+                                "546bc1ba-c988-42f6-9d4d-3da5f21cff36": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Storage Class",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.persistentvolume.storage_class"
+                                },
+                                "8d5b3307-5817-411c-a1a4-dc2cc0a8b08c": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": true,
+                                    "label": "Name",
+                                    "operationType": "terms",
+                                    "params": {
+                                        "missingBucket": false,
+                                        "orderBy": {
+                                            "fallback": true,
+                                            "type": "alphabetical"
+                                        },
+                                        "orderDirection": "asc",
+                                        "otherBucket": true,
+                                        "parentFormat": {
+                                            "id": "terms"
+                                        },
+                                        "size": 10
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.persistentvolume.name"
+                                },
+                                "98d34e0f-186a-47a7-8fa3-de5123d43616": {
+                                    "customLabel": true,
+                                    "dataType": "string",
+                                    "isBucketed": false,
+                                    "label": "Phase",
+                                    "operationType": "last_value",
+                                    "params": {
+                                        "showArrayValues": true,
+                                        "sortField": "@timestamp"
+                                    },
+                                    "scale": "ordinal",
+                                    "sourceField": "kubernetes.persistentvolume.phase"
+                                }
+                            },
+                            "incompleteColumns": {}
+                        }
+                    }
+                }
+            },
+            "filters": [
+                {
+                    "$state": {
+                        "store": "appState"
+                    },
+                    "meta": {
+                        "alias": null,
+                        "disabled": false,
+                        "index": "f0dd90fe-0915-4710-ac36-cd56b1bb3733",
+                        "key": "metricset.name",
+                        "negate": false,
+                        "params": [
+                            "state_persistentvolume",
+                            "state_persistentvolumeclaim"
+                        ],
+                        "type": "phrases"
+                    },
+                    "query": {
+                        "bool": {
+                            "minimum_should_match": 1,
+                            "should": [
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "state_persistentvolume"
+                                    }
+                                },
+                                {
+                                    "match_phrase": {
+                                        "metricset.name": "state_persistentvolumeclaim"
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "query": {
+                "language": "kuery",
+                "query": ""
+            },
+            "visualization": {
+                "columns": [
+                    {
+                        "columnId": "8d5b3307-5817-411c-a1a4-dc2cc0a8b08c",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "98d34e0f-186a-47a7-8fa3-de5123d43616",
+                        "isTransposed": false
+                    },
+                    {
+                        "columnId": "420939ad-d9f0-43ee-a1a6-9b9fe5509086",
+                        "isTransposed": false
+                    },
+                    {
+                        "alignment": "right",
+                        "columnId": "546bc1ba-c988-42f6-9d4d-3da5f21cff36",
+                        "isTransposed": false
+                    }
+                ],
+                "layerId": "e8ede311-8955-4a16-bf44-8c0ff0e0104b",
+                "layerType": "data",
+                "rowHeight": "single",
+                "rowHeightLines": 1
+            }
+        },
+        "title": "Persistent Volumes Informations [Metricbeat Kubernetes]",
+        "visualizationType": "lnsDatatable"
+    },
+    "coreMigrationVersion": "8.4.0",
+    "id": "kubernetes-e94fb750-bcb9-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "lens": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "indexpattern-datasource-layer-e8ede311-8955-4a16-bf44-8c0ff0e0104b",
+            "type": "index-pattern"
+        },
+        {
+            "id": "metricbeat-*",
+            "name": "f0dd90fe-0915-4710-ac36-cd56b1bb3733",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "lens",
+    "updated_at": "2022-06-28T06:47:07.287Z",
+    "version": "WzU3NzAsM10="
+}

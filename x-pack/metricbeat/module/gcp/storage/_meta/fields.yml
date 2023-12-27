@@ -1,12 +1,12 @@
 - name: storage
   description: Google Cloud Storage metrics
-  release: beta
+  release: ga
   type: group
   fields:
   - name: api.request.count
     type: long
     description: Delta count of API calls, grouped by the API method name and response code.
-  - name: authz.acl_based_object_access_.ount
+  - name: authz.acl_based_object_access.count
     type: long
     description: Delta count of requests that result in an object being granted access solely due to object ACLs.
   - name: authz.acl_operations.count

@@ -2,6 +2,8 @@
 This file is generated! See scripts/docs_collector.py
 ////
 
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/filebeat/module/fortinet/_meta/docs.asciidoc
+
 [[filebeat-module-fortinet]]
 [role="xpack"]
 
@@ -79,6 +81,8 @@ events. Defaults to `[fortinet-firewall, forwarded]`.
 [float]
 ==== `clientendpoint` fileset settings
 
+deprecated::[8.12.0,"This fileset is deprecated. Use the https://docs.elastic.co/integrations/fortinet_forticlient[Fortinet FortiClient Logs] Elastic integration instead."]
+
 experimental[]
 
 NOTE: This was converted from RSA NetWitness log parser XML "forticlientendpoint" device revision 0.
@@ -124,6 +128,8 @@ will be found under `rsa.raw`. The default is false.
 [float]
 ==== `fortimail` fileset settings
 
+deprecated::[8.12.0,"This fileset is deprecated. Use the https://docs.elastic.co/integrations/fortinet_fortimail[Fortinet FortiMail] Elastic integration instead."]
+
 experimental[]
 
 NOTE: This was converted from RSA NetWitness log parser XML "fortinetfortimail" device revision 131.
@@ -168,6 +174,8 @@ will be found under `rsa.raw`. The default is false.
 
 [float]
 ==== `fortimanager` fileset settings
+
+deprecated::[8.12.0,"This fileset is deprecated. Use the https://docs.elastic.co/integrations/fortinet_fortimanager[Fortinet FortiManager Logs] Elastic integration instead."]
 
 experimental[]
 
@@ -320,3 +328,4 @@ This is a list of FortiOS fields that are mapped to ECS.
 For a description of each field in the module, see the
 <<exported-fields-fortinet,exported fields>> section.
 
+:edit_url!:

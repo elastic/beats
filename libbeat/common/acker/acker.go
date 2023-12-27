@@ -25,7 +25,7 @@ import (
 )
 
 // Nil creates an ACKer that does nothing.
-func Nil() beat.ACKer {
+func Nil() beat.EventListener {
 	return nilACKer{}
 }
 
@@ -33,12 +33,12 @@ type nilACKer struct{}
 
 func (nilACKer) AddEvent(event beat.Event, published bool) {}
 func (nilACKer) ACKEvents(n int)                           {}
-func (nilACKer) Close()                                    {}
+func (nilACKer) ClientClosed()                             {}
 
 // RawCounting reports the number of ACKed events as has been reported by the outputs or queue.
 // The ACKer does not keep track of dropped events. Events after the client has
 // been closed will still be reported.
-func RawCounting(fn func(int)) beat.ACKer {
+func RawCounting(fn func(int)) beat.EventListener {
 	return countACKer(fn)
 }
 
@@ -46,7 +46,7 @@ type countACKer func(int)
 
 func (countACKer) AddEvent(_ beat.Event, _ bool) {}
 func (fn countACKer) ACKEvents(n int)            { fn(n) }
-func (countACKer) Close()                        {}
+func (countACKer) ClientClosed()                 {}
 
 // TrackingCounter keeps track of published and dropped events. It reports
 // the number of acked events from the queue in the 'acked' argument and the
@@ -55,16 +55,16 @@ func (countACKer) Close()                        {}
 // If N events have been acked by the output, then `total` will include all events dropped in between
 // the last forwarded N events and the 'tail' of dropped events. For example (X = send, D = dropped):
 //
-//  index: 0  1  2  3  4  5  6  7  8  9  10  11
-//  event: X  X  D  D  X  D  D  X  D  X   X   X
+//	index: 0  1  2  3  4  5  6  7  8  9  10  11
+//	event: X  X  D  D  X  D  D  X  D  X   X   X
 //
 // If the output ACKs 3 events, then all events from index 0 to 6 will be reported because:
-// - the drop sequence for events 2 and 3 is inbetween the number of forwarded and ACKed events
+// - the drop sequence for events 2 and 3 is in between the number of forwarded and ACKed events
 // - events 5-6 have been dropped as well, but event 7 is not ACKed yet
 //
 // If there is no event currently tracked by this ACKer and the next event is dropped by the processors,
 // then `fn` will be called immediately with acked=0 and total=1.
-func TrackingCounter(fn func(acked, total int)) beat.ACKer {
+func TrackingCounter(fn func(acked, total int)) beat.EventListener {
 	a := &trackingACKer{fn: fn}
 	init := &gapInfo{}
 	a.lst.head = init
@@ -74,7 +74,7 @@ func TrackingCounter(fn func(acked, total int)) beat.ACKer {
 
 // Counting returns an ACK count for all events a client has tried to publish.
 // The ACKer keeps track of dropped events as well, and adjusts the ACK from the outputs accordingly.
-func Counting(fn func(n int)) beat.ACKer {
+func Counting(fn func(n int)) beat.EventListener {
 	return TrackingCounter(func(_ int, total int) {
 		fn(total)
 	})
@@ -206,7 +206,7 @@ func (a *trackingACKer) ACKEvents(n int) {
 	a.fn(acked, total)
 }
 
-func (a *trackingACKer) Close() {}
+func (a *trackingACKer) ClientClosed() {}
 
 // EventPrivateReporter reports all private fields from all events that have
 // been published or removed.
@@ -217,20 +217,20 @@ func (a *trackingACKer) Close() {}
 // events and the 'tail' of dropped events. For example (X = send, D =
 // dropped):
 //
-//  index: 0  1  2  3  4  5  6  7  8  9  10  11
-//  event: X  X  D  D  X  D  D  X  D  X   X   X
+//	index: 0  1  2  3  4  5  6  7  8  9  10  11
+//	event: X  X  D  D  X  D  D  X  D  X   X   X
 //
 // If the output ACKs 3 events, then all events from index 0 to 6 will be reported because:
-// - the drop sequence for events 2 and 3 is inbetween the number of forwarded and ACKed events
+// - the drop sequence for events 2 and 3 is in between the number of forwarded and ACKed events
 // - events 5-6 have been dropped as well, but event 7 is not ACKed yet
-func EventPrivateReporter(fn func(acked int, data []interface{})) beat.ACKer {
+func EventPrivateReporter(fn func(acked int, data []interface{})) beat.EventListener {
 	a := &eventDataACKer{fn: fn}
-	a.ACKer = TrackingCounter(a.onACK)
+	a.EventListener = TrackingCounter(a.onACK)
 	return a
 }
 
 type eventDataACKer struct {
-	beat.ACKer
+	beat.EventListener
 	mu   sync.Mutex
 	data []interface{}
 	fn   func(acked int, data []interface{})
@@ -240,7 +240,7 @@ func (a *eventDataACKer) AddEvent(event beat.Event, published bool) {
 	a.mu.Lock()
 	a.data = append(a.data, event.Private)
 	a.mu.Unlock()
-	a.ACKer.AddEvent(event, published)
+	a.EventListener.AddEvent(event, published)
 }
 
 func (a *eventDataACKer) onACK(acked, total int) {
@@ -260,7 +260,7 @@ func (a *eventDataACKer) onACK(acked, total int) {
 
 // LastEventPrivateReporter reports only the 'latest' published and acked
 // event if a batch of events have been ACKed.
-func LastEventPrivateReporter(fn func(acked int, data interface{})) beat.ACKer {
+func LastEventPrivateReporter(fn func(acked int, data interface{})) beat.EventListener {
 	ignored := 0
 	return EventPrivateReporter(func(acked int, data []interface{}) {
 		for i := len(data) - 1; i >= 0; i-- {
@@ -277,11 +277,11 @@ func LastEventPrivateReporter(fn func(acked int, data interface{})) beat.ACKer {
 }
 
 // Combine forwards events to a list of ackers.
-func Combine(as ...beat.ACKer) beat.ACKer {
+func Combine(as ...beat.EventListener) beat.EventListener {
 	return ackerList(as)
 }
 
-type ackerList []beat.ACKer
+type ackerList []beat.EventListener
 
 func (l ackerList) AddEvent(event beat.Event, published bool) {
 	for _, a := range l {
@@ -295,22 +295,22 @@ func (l ackerList) ACKEvents(n int) {
 	}
 }
 
-func (l ackerList) Close() {
+func (l ackerList) ClientClosed() {
 	for _, a := range l {
-		a.Close()
+		a.ClientClosed()
 	}
 }
 
 // ConnectionOnly ensures that the given ACKer is only used for as long as the
 // pipeline Client is active.  Once the Client is closed, the ACKer will drop
 // its internal state and no more ACK events will be processed.
-func ConnectionOnly(a beat.ACKer) beat.ACKer {
+func ConnectionOnly(a beat.EventListener) beat.EventListener {
 	return &clientOnlyACKer{acker: a}
 }
 
 type clientOnlyACKer struct {
 	mu    sync.Mutex
-	acker beat.ACKer
+	acker beat.EventListener
 }
 
 func (a *clientOnlyACKer) AddEvent(event beat.Event, published bool) {
@@ -330,12 +330,12 @@ func (a *clientOnlyACKer) ACKEvents(n int) {
 	}
 }
 
-func (a *clientOnlyACKer) Close() {
+func (a *clientOnlyACKer) ClientClosed() {
 	a.mu.Lock()
 	sub := a.acker
 	a.acker = nil // drop the internal ACKer on Close and allow the runtime to gc accumulated state.
 	a.mu.Unlock()
 	if sub != nil {
-		sub.Close()
+		sub.ClientClosed()
 	}
 }

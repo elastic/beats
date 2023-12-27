@@ -18,12 +18,12 @@
 package core
 
 import (
+	"errors"
+	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	metrics "github.com/elastic/beats/v7/metricbeat/internal/metrics/cpu"
+	metrics "github.com/elastic/elastic-agent-system-metrics/metric/cpu"
 )
 
 // Core metric types.
@@ -56,7 +56,7 @@ func (c Config) Validate() (metrics.MetricOpts, error) {
 		case ticks:
 			opts.Ticks = true
 		default:
-			return opts, errors.Errorf("invalid core.metrics value '%v' (valid "+
+			return opts, fmt.Errorf("invalid core.metrics value '%v' (valid "+
 				"options are %v and %v)", metric, percentages, ticks)
 		}
 	}

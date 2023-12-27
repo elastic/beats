@@ -21,7 +21,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -57,7 +56,7 @@ func Test_handleRespBody(t *testing.T) {
 		{
 			"on_error with error",
 			args{
-				simpleHTTPResponse("hello"),
+				simpleHTTPResponse(), //nolint:bodyclose // closed later
 				"text/plain; charset=utf-8",
 				responseConfig{IncludeBody: "on_error", IncludeBodyMaxBytes: 3},
 				failingComboValidator,
@@ -68,7 +67,7 @@ func Test_handleRespBody(t *testing.T) {
 		{
 			"on_error with success",
 			args{
-				simpleHTTPResponse("hello"),
+				simpleHTTPResponse(), //nolint:bodyclose // closed later
 				"text/plain; charset=utf-8",
 				responseConfig{IncludeBody: "on_error", IncludeBodyMaxBytes: 3},
 				matchingComboValidator,
@@ -79,7 +78,7 @@ func Test_handleRespBody(t *testing.T) {
 		{
 			"always with error",
 			args{
-				simpleHTTPResponse("hello"),
+				simpleHTTPResponse(), //nolint:bodyclose // closed later
 				"text/plain; charset=utf-8",
 				responseConfig{IncludeBody: "always", IncludeBodyMaxBytes: 3},
 				failingComboValidator,
@@ -90,7 +89,7 @@ func Test_handleRespBody(t *testing.T) {
 		{
 			"always with success",
 			args{
-				simpleHTTPResponse("hello"),
+				simpleHTTPResponse(), //nolint:bodyclose // closed later
 				"text/plain; charset=utf-8",
 				responseConfig{IncludeBody: "always", IncludeBodyMaxBytes: 3},
 				matchingComboValidator,
@@ -101,7 +100,7 @@ func Test_handleRespBody(t *testing.T) {
 		{
 			"never with error",
 			args{
-				simpleHTTPResponse("hello"),
+				simpleHTTPResponse(), //nolint:bodyclose // closed later
 				"text/plain; charset=utf-8",
 				responseConfig{IncludeBody: "never", IncludeBodyMaxBytes: 3},
 				failingComboValidator,
@@ -112,7 +111,7 @@ func Test_handleRespBody(t *testing.T) {
 		{
 			"never with success",
 			args{
-				simpleHTTPResponse("hello"),
+				simpleHTTPResponse(), //nolint:bodyclose // closed later
 				"text/plain; charset=utf-8",
 				responseConfig{IncludeBody: "never", IncludeBodyMaxBytes: 3},
 				matchingComboValidator,
@@ -161,7 +160,7 @@ func Test_readResp(t *testing.T) {
 		{
 			name: "response exists",
 			args: args{
-				resp:           simpleHTTPResponse("hello"),
+				resp:           simpleHTTPResponse(), //nolint:bodyclose // closed later
 				maxSampleBytes: 3,
 			},
 			wantBodySample: "hel",
@@ -191,11 +190,6 @@ func Test_readResp(t *testing.T) {
 }
 
 func Test_readPrefixAndHash(t *testing.T) {
-	type args struct {
-		body          io.ReadCloser
-		maxPrefixSize int
-	}
-
 	longBytes := make([]byte, 2*1024*1024) //2MiB
 	for idx := range longBytes {
 		longBytes[idx] = 'x'
@@ -261,6 +255,6 @@ func Test_readPrefixAndHash(t *testing.T) {
 	}
 }
 
-func simpleHTTPResponse(body string) *http.Response {
-	return &http.Response{Body: ioutil.NopCloser(strings.NewReader(body))}
+func simpleHTTPResponse() *http.Response {
+	return &http.Response{Body: ioutil.NopCloser(strings.NewReader("hello"))}
 }

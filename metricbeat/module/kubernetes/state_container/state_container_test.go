@@ -16,38 +16,34 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package state_container
 
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
+	"github.com/stretchr/testify/require"
 
+	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
+	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
-	_ "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
+var filesFolder = "../_meta/test/KSM"
+var expectedFolder = "./_meta/test"
+
+const name = "state_container"
+
 func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", "state_container",
-		ptest.TestCases{
-			{
-				MetricsFile:  "../_meta/test/ksm.v1.3.0",
-				ExpectedFile: "./_meta/test/ksm.v1.3.0.expected",
-			},
-			{
-				MetricsFile:  "../_meta/test/ksm.v1.8.0",
-				ExpectedFile: "./_meta/test/ksm.v1.8.0.expected",
-			},
-			{
-				MetricsFile:  "../_meta/test/ksm.v2.0.0",
-				ExpectedFile: "./_meta/test/ksm.v2.0.0.expected",
-			},
-		},
-	)
+	testCases, err := k.GetTestCases(filesFolder, expectedFolder)
+	require.Equal(t, err, nil)
+	ptest.TestMetricSet(t, "kubernetes", name, testCases)
 }
 
 func TestData(t *testing.T) {
-	mbtest.TestDataFiles(t, "kubernetes", "state_container")
+	mbtest.TestDataFiles(t, "kubernetes", name)
+}
+
+func TestMetricsFamily(t *testing.T) {
+	k.TestMetricsFamilyFromFolder(t, filesFolder, mapping)
 }

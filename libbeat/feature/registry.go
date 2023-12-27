@@ -23,7 +23,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type mapper map[string]map[string]Featurable
@@ -96,26 +96,6 @@ func (r *Registry) Register(feature Featurable) error {
 	return nil
 }
 
-// Unregister removes a feature from the registry.
-func (r *Registry) Unregister(namespace, name string) error {
-	r.Lock()
-	defer r.Unlock()
-	ns := normalize(namespace)
-
-	v, found := r.namespaces[ns]
-	if !found {
-		return fmt.Errorf("unknown namespace named '%s'", ns)
-	}
-
-	_, found = v[name]
-	if !found {
-		return fmt.Errorf("unknown feature '%s' in namespace '%s'", name, ns)
-	}
-
-	delete(r.namespaces[ns], name)
-	return nil
-}
-
 // Lookup searches for a Feature by the namespace-name pair.
 func (r *Registry) Lookup(namespace, name string) (Featurable, error) {
 	r.RLock()
@@ -159,21 +139,8 @@ func (r *Registry) LookupAll(namespace string) ([]Featurable, error) {
 	return list, nil
 }
 
-// Overwrite allow to replace an existing feature with a new implementation.
-func (r *Registry) Overwrite(feature Featurable) error {
-	_, err := r.Lookup(feature.Namespace(), feature.Name())
-	if err == nil {
-		err := r.Unregister(feature.Namespace(), feature.Name())
-		if err != nil {
-			return err
-		}
-	}
-
-	return r.Register(feature)
-}
-
-// Size returns the number of registered features in the registry.
-func (r *Registry) Size() int {
+// size returns the number of registered features in the registry.
+func (r *Registry) size() int {
 	r.RLock()
 	defer r.RUnlock()
 

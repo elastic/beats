@@ -20,43 +20,27 @@ package diskqueue
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
-
-type diskQueueConsumer struct {
-	queue  *diskQueue
-	closed atomic.Bool
-	done   chan struct{}
-}
 
 type diskQueueBatch struct {
 	queue  *diskQueue
 	frames []*readFrame
 }
 
-//
-// diskQueueConsumer implementation of the queue.Consumer interface
-//
-
-func (consumer *diskQueueConsumer) Get(eventCount int) (queue.Batch, error) {
+func (dq *diskQueue) Get(eventCount int) (queue.Batch, error) {
 	// We can always eventually read at least one frame unless the queue or the
 	// consumer is closed.
-	var frames []*readFrame
-	select {
-	case frame, ok := <-consumer.queue.readerLoop.output:
-		if !ok {
-			return nil, fmt.Errorf("tried to read from a closed disk queue")
-		}
-		frames = []*readFrame{frame}
-	case <-consumer.done:
-		return nil, fmt.Errorf("tried to read from a closed disk queue consumer")
+	frame, ok := <-dq.readerLoop.output
+	if !ok {
+		return nil, fmt.Errorf("tried to read from a closed disk queue")
 	}
+	frames := []*readFrame{frame}
+
 eventLoop:
 	for eventCount <= 0 || len(frames) < eventCount {
 		select {
-		case frame, ok := <-consumer.queue.readerLoop.output:
+		case frame, ok := <-dq.readerLoop.output:
 			if !ok {
 				// The queue was closed while we were reading it, just send back
 				// what we have so far.
@@ -74,7 +58,7 @@ eventLoop:
 	// written to readerLoop.output may have been buffered before the
 	// queue was closed, and we may be reading its leftovers afterwards.
 	// We could try to detect this case here by checking the
-	// consumer.queue.done channel, and return nothing if it's been closed.
+	// queue.done channel, and return nothing if it's been closed.
 	// But this gives rise to another race: maybe the queue was
 	// closed _after_ we read those frames, and we _ought_ to return them
 	// to the reader. The queue interface doesn't specify the proper
@@ -85,35 +69,30 @@ eventLoop:
 	// "read," so we lose no consistency by returning them. If someone closes
 	// the queue while we are draining the channel, nothing changes functionally
 	// except that any ACKs after that point will be ignored. A well-behaved
-	// Beats shutdown will always ACK / close its consumers before closing the
+	// Beats shutdown will always ACK its batches before closing the
 	// queue itself, so we expect this corner case not to arise in practice, but
 	// if it does it is innocuous.
 	return &diskQueueBatch{
-		queue:  consumer.queue,
+		queue:  dq,
 		frames: frames,
 	}, nil
-}
-
-func (consumer *diskQueueConsumer) Close() error {
-	if consumer.closed.Swap(true) {
-		return fmt.Errorf("already closed")
-	}
-	close(consumer.done)
-	return nil
 }
 
 //
 // diskQueueBatch implementation of the queue.Batch interface
 //
 
-func (batch *diskQueueBatch) Events() []publisher.Event {
-	events := make([]publisher.Event, len(batch.frames))
-	for i, frame := range batch.frames {
-		events[i] = frame.event
-	}
-	return events
+func (batch *diskQueueBatch) Count() int {
+	return len(batch.frames)
 }
 
-func (batch *diskQueueBatch) ACK() {
+func (batch *diskQueueBatch) Entry(i int) interface{} {
+	return batch.frames[i].event
+}
+
+func (batch *diskQueueBatch) FreeEntries() {
+}
+
+func (batch *diskQueueBatch) Done() {
 	batch.queue.acks.addFrames(batch.frames)
 }

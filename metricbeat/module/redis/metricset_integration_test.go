@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package redis
 
@@ -27,10 +26,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 const (
@@ -130,7 +129,7 @@ func (m *dummyMetricSet) Fetch(r mb.ReporterV2) {
 func getMetricSet(t *testing.T, registry *mb.Register, config map[string]interface{}) *MetricSet {
 	t.Helper()
 
-	c, err := common.NewConfigFrom(config)
+	c, err := conf.NewConfigFrom(config)
 	require.NoError(t, err)
 
 	_, metricsets, err := mb.NewModule(c, registry)

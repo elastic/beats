@@ -16,13 +16,13 @@
 // under the License.
 
 //go:build integration
-// +build integration
 
 package elasticsearch_test
 
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
@@ -31,11 +31,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/tests/compose"
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -50,6 +47,8 @@ import (
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/node_stats"
 	_ "github.com/elastic/beats/v7/metricbeat/module/elasticsearch/shard"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/version"
 )
 
 var metricSets = []string{
@@ -180,7 +179,7 @@ func getConfig(host string) map[string]interface{} {
 	}
 }
 
-func setupTest(t *testing.T, esHost string, esVersion *common.Version) {
+func setupTest(t *testing.T, esHost string, esVersion *version.V) {
 	_, err := createIndex(esHost, false)
 	require.NoError(t, err)
 
@@ -205,14 +204,14 @@ func createIndex(host string, isHidden bool) (string, error) {
 
 	req, err := http.NewRequest("PUT", fmt.Sprintf("http://%v/%v", host, indexName), strings.NewReader(reqBody))
 	if err != nil {
-		return "", errors.Wrap(err, "could not build create index request")
+		return "", fmt.Errorf("could not build create index request: %w", err)
 	}
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", errors.Wrap(err, "could not send create index request")
+		return "", fmt.Errorf("could not send create index request: %w", err)
 	}
 	defer resp.Body.Close()
 	respBody, err := ioutil.ReadAll(resp.Body)
@@ -225,7 +224,7 @@ func createIndex(host string, isHidden bool) (string, error) {
 }
 
 // enableTrialLicense creates and elasticsearch index in case it does not exit yet
-func enableTrialLicense(host string, version *common.Version) error {
+func enableTrialLicense(host string, version *version.V) error {
 	client := &http.Client{}
 
 	enabled, err := checkTrialLicenseEnabled(host, version)
@@ -266,7 +265,7 @@ func enableTrialLicense(host string, version *common.Version) error {
 }
 
 // checkTrialLicenseEnabled creates and elasticsearch index in case it does not exit yet
-func checkTrialLicenseEnabled(host string, version *common.Version) (bool, error) {
+func checkTrialLicenseEnabled(host string, version *version.V) (bool, error) {
 	var licenseURL string
 	if version.Major < 7 {
 		licenseURL = "/_xpack/license"
@@ -301,7 +300,7 @@ func checkTrialLicenseEnabled(host string, version *common.Version) (bool, error
 	return active && isTrial, nil
 }
 
-func createMLJob(host string, version *common.Version) error {
+func createMLJob(host string, version *version.V) error {
 
 	mlJob, err := ioutil.ReadFile("ml_job/_meta/test/test_job.json")
 	if err != nil {
@@ -321,7 +320,7 @@ func createMLJob(host string, version *common.Version) error {
 
 	body, resp, err := httpPutJSON(host, jobURL, mlJob)
 	if err != nil {
-		return errors.Wrap(err, "error doing PUT request when creating ML job")
+		return fmt.Errorf("error doing PUT request when creating ML job: %w", err)
 	}
 
 	if resp.StatusCode != 200 {
@@ -334,17 +333,17 @@ func createMLJob(host string, version *common.Version) error {
 func createCCRStats(host string) error {
 	err := setupCCRRemote(host)
 	if err != nil {
-		return errors.Wrap(err, "error setup CCR remote settings")
+		return errors.New("error setup CCR remote settings")
 	}
 
 	err = createCCRLeaderIndex(host)
 	if err != nil {
-		return errors.Wrap(err, "error creating CCR leader index")
+		return errors.New("error creating CCR leader index")
 	}
 
 	err = createCCRFollowerIndex(host)
 	if err != nil {
-		return errors.Wrap(err, "error creating CCR follower index")
+		return errors.New("error creating CCR follower index")
 	}
 
 	// Give ES sufficient time to do the replication and produce stats
@@ -354,7 +353,7 @@ func createCCRStats(host string) error {
 
 	exists, err := waitForSuccess(checkCCRStats, 500*time.Millisecond, 10)
 	if err != nil {
-		return errors.Wrap(err, "error checking if CCR stats exist")
+		return fmt.Errorf("error checking if CCR stats exist: %w", err)
 	}
 
 	if !exists {
@@ -439,27 +438,27 @@ func checkExists(url string) bool {
 func createEnrichStats(host string) error {
 	err := createEnrichSourceIndex(host)
 	if err != nil {
-		return errors.Wrap(err, "error creating enrich source index")
+		return fmt.Errorf("error creating enrich source index: %w", err)
 	}
 
 	err = createEnrichPolicy(host)
 	if err != nil {
-		return errors.Wrap(err, "error creating enrich policy")
+		return fmt.Errorf("error creating enrich policy: %w", err)
 	}
 
 	err = executeEnrichPolicy(host)
 	if err != nil {
-		return errors.Wrap(err, "error executing enrich policy")
+		return fmt.Errorf("error executing enrich policy: %w", err)
 	}
 
 	err = createEnrichIngestPipeline(host)
 	if err != nil {
-		return errors.Wrap(err, "error creating ingest pipeline with enrich processor")
+		return fmt.Errorf("error creating ingest pipeline with enrich processor: %w", err)
 	}
 
 	err = ingestAndEnrichDoc(host)
 	if err != nil {
-		return errors.Wrap(err, "error ingesting doc for enrichment")
+		return fmt.Errorf("error ingesting doc for enrichment: %w", err)
 	}
 
 	return nil
@@ -535,7 +534,7 @@ func countCatItems(elasticsearchHostPort, catObject, extraParams string) (int, e
 		return 0, err
 	}
 
-	var data []common.MapStr
+	var data []mapstr.M
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return 0, err
@@ -544,9 +543,9 @@ func countCatItems(elasticsearchHostPort, catObject, extraParams string) (int, e
 	return len(data), nil
 }
 
-func checkSkip(t *testing.T, metricset string, version *common.Version) {
-	checkSkipFeature := func(name string, availableVersion *common.Version) {
-		isAPIAvailable := elastic.IsFeatureAvailable(version, availableVersion)
+func checkSkip(t *testing.T, metricset string, ver *version.V) {
+	checkSkipFeature := func(name string, availableVersion *version.V) {
+		isAPIAvailable := elastic.IsFeatureAvailable(ver, availableVersion)
 		if !isAPIAvailable {
 			t.Skipf("elasticsearch %s stats API is not available until %s", name, availableVersion)
 		}
@@ -560,7 +559,7 @@ func checkSkip(t *testing.T, metricset string, version *common.Version) {
 	}
 }
 
-func getElasticsearchVersion(elasticsearchHostPort string) (*common.Version, error) {
+func getElasticsearchVersion(elasticsearchHostPort string) (*version.V, error) {
 	resp, err := http.Get("http://" + elasticsearchHostPort + "/")
 	if err != nil {
 		return nil, err
@@ -572,18 +571,18 @@ func getElasticsearchVersion(elasticsearchHostPort string) (*common.Version, err
 		return nil, err
 	}
 
-	var data common.MapStr
+	var data mapstr.M
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		return nil, err
 	}
 
-	version, err := data.GetValue("version.number")
+	v, err := data.GetValue("version.number")
 	if err != nil {
 		return nil, err
 	}
 
-	return common.NewVersion(version.(string))
+	return version.New(v.(string))
 }
 
 func httpPutJSON(host, path string, body []byte) ([]byte, *http.Response, error) {

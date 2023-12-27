@@ -18,11 +18,12 @@
 package console
 
 import (
+	"fmt"
+
 	"github.com/dop251/goja"
 	"github.com/dop251/goja_nodejs/require"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	// Require the util module for handling the log format arguments.
 	_ "github.com/dop251/goja_nodejs/util"
@@ -53,7 +54,7 @@ func (c *Console) makeLogFunc(level logp.Level) func(call goja.FunctionCall) goj
 			case logp.ErrorLevel:
 				log.Error(ret.String())
 			default:
-				panic(errors.Errorf("unhandled logp.Level: %v", level))
+				panic(fmt.Errorf("unhandled logp.Level: %v", level))
 			}
 		} else {
 			panic(c.runtime.NewTypeError("util.format is not a function"))

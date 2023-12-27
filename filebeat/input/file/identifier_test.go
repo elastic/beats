@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !windows
-// +build !windows
 
 package file
 
@@ -27,8 +26,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/file"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 type stateTestCase struct {
@@ -40,11 +39,11 @@ func TestINodeDeviceIdentifier(t *testing.T) {
 	tests := map[string]stateTestCase{
 		"two states poiting to the same file": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/2",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
@@ -53,11 +52,11 @@ func TestINodeDeviceIdentifier(t *testing.T) {
 		},
 		"two states poiting to different files": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/2",
 					FileStateOS: file.StateOS{Inode: 2, Device: 1},
 				},
@@ -84,11 +83,11 @@ func TestPathIdentifier(t *testing.T) {
 	tests := map[string]stateTestCase{
 		"two states poiting to the same file": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
@@ -97,11 +96,11 @@ func TestPathIdentifier(t *testing.T) {
 		},
 		"two states poiting to different files": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/2",
 					FileStateOS: file.StateOS{Inode: 2, Device: 1},
 				},
@@ -127,11 +126,11 @@ func TestInodeMarkerIdentifier(t *testing.T) {
 	tests := map[string]stateTestCase{
 		"two states poiting to the same file i.": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
@@ -140,11 +139,11 @@ func TestInodeMarkerIdentifier(t *testing.T) {
 		},
 		"two states poiting to the same file ii.": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 2},
 				},
@@ -153,11 +152,11 @@ func TestInodeMarkerIdentifier(t *testing.T) {
 		},
 		"two states poiting to different files i.": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/2",
 					FileStateOS: file.StateOS{Inode: 2, Device: 1},
 				},
@@ -166,11 +165,11 @@ func TestInodeMarkerIdentifier(t *testing.T) {
 		},
 		"two states poiting to different files ii.": {
 			[2]State{
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 1, Device: 1},
 				},
-				State{
+				{
 					Source:      "/path/to/this/file/1",
 					FileStateOS: file.StateOS{Inode: 2, Device: 3},
 				},
@@ -193,7 +192,7 @@ func TestInodeMarkerIdentifier(t *testing.T) {
 }
 
 func newMockInodeMarkerIdentifier() StateIdentifier {
-	cfg := common.MustNewConfigFrom(map[string]string{"path": filepath.Join("testdata", "identifier_marker")})
+	cfg := conf.MustNewConfigFrom(map[string]string{"path": filepath.Join("testdata", "identifier_marker")})
 	i, err := newINodeMarkerIdentifier(cfg)
 	fmt.Println(err)
 	return i

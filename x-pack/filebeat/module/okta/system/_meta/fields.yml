@@ -193,6 +193,11 @@
       description: >
         The fingerprint of the device.
 
+    - name: factor
+      type: keyword
+      description: >
+        The factor used for authentication.
+
     - name: request_id
       type: keyword
       description: >
@@ -208,10 +213,30 @@
       description: >
         Threat suspected.
 
+    - name: risk_behaviors
+      type: keyword
+      description: >
+        The set of behaviors that contribute to a risk assessment.
+
+    - name: risk_level
+      type: keyword
+      description: >
+        The risk level assigned to the sign in attempt.
+
+    - name: risk_reasons
+      type: keyword
+      description: >
+        The reasons for the risk.
+
     - name: url
       type: keyword
       description: >
         The URL.
+
+    - name: flattened
+      type: flattened
+      description: >
+        The complete debug_data object.
 
     - name: suspicious_activity
       description: >
@@ -389,7 +414,7 @@
   - name: ip_chain
     description: >
       List of ip_chain objects.
-    type: group
+    type: flattened
     fields:
 
     - name: ip

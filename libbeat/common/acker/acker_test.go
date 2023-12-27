@@ -39,7 +39,7 @@ func TestNil(t *testing.T) {
 	acker.AddEvent(beat.Event{}, false)
 	acker.AddEvent(beat.Event{}, true)
 	acker.ACKEvents(3)
-	acker.Close()
+	acker.ClientClosed()
 }
 
 func TestCounting(t *testing.T) {
@@ -200,7 +200,7 @@ func TestCombine(t *testing.T) {
 	t.Run("Close distributes", func(t *testing.T) {
 		var c1, c2 int
 		acker := Combine(countACKerOps(nil, nil, &c1), countACKerOps(nil, nil, &c2))
-		acker.Close()
+		acker.ClientClosed()
 		require.Equal(t, 1, c1)
 		require.Equal(t, 1, c2)
 	})
@@ -217,13 +217,13 @@ func TestConnectionOnly(t *testing.T) {
 	t.Run("ignores ACKs after close", func(t *testing.T) {
 		var n int
 		acker := ConnectionOnly(RawCounting(func(acked int) { n = acked }))
-		acker.Close()
+		acker.ClientClosed()
 		acker.ACKEvents(3)
 		require.Equal(t, 0, n)
 	})
 }
 
-func countACKerOps(add, acked, close *int) beat.ACKer {
+func countACKerOps(add, acked, close *int) beat.EventListener {
 	return &fakeACKer{
 		AddEventFunc:  func(_ beat.Event, _ bool) { *add++ },
 		ACKEventsFunc: func(_ int) { *acked++ },
@@ -243,7 +243,7 @@ func (f *fakeACKer) ACKEvents(n int) {
 	}
 }
 
-func (f *fakeACKer) Close() {
+func (f *fakeACKer) ClientClosed() {
 	if f.CloseFunc != nil {
 		f.CloseFunc()
 	}

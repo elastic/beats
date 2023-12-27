@@ -20,7 +20,7 @@ package mqtt
 import (
 	"errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 type mqttInputConfig struct {
@@ -28,9 +28,10 @@ type mqttInputConfig struct {
 	Topics []string `config:"topics" validate:"required,min=1"`
 	QoS    int      `config:"qos" validate:"min=0,max=2"`
 
-	ClientID string `config:"client_id" validate:"nonzero"`
-	Username string `config:"username"`
-	Password string `config:"password"`
+	ClientID     string `config:"client_id" validate:"nonzero"`
+	Username     string `config:"username"`
+	Password     string `config:"password"`
+	CleanSession bool   `config:"clean_session"`
 
 	TLS *tlscommon.Config `config:"ssl"`
 }
@@ -38,8 +39,9 @@ type mqttInputConfig struct {
 // The default config for the mqtt input.
 func defaultConfig() mqttInputConfig {
 	return mqttInputConfig{
-		ClientID: "filebeat",
-		Topics:   []string{"#"},
+		ClientID:     "filebeat",
+		Topics:       []string{"#"},
+		CleanSession: true,
 	}
 }
 

@@ -11,6 +11,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
+	"log.level": "info",
         "log.offset": 0,
         "message": "Using Concurrent Mark Sweep",
         "process.pid": "32376",
@@ -30,7 +31,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 70,
+        "log.offset": 85,
         "message": "Heap address: 0x00000000c0000000, size: 1024 MB, Compressed Oops mode: 32-bit",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -47,7 +48,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 201,
+        "log.offset": 216,
         "message": "Application time: 0,0011068 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -64,7 +65,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 290,
+        "log.offset": 305,
         "message": "Total time for which application threads were stopped: 0,0000563 seconds, Stopping threads took: 0,0000092 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -81,7 +82,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 458,
+        "log.offset": 473,
         "message": "Application time: 0,0884133 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -98,7 +99,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 547,
+        "log.offset": 562,
         "message": "Total time for which application threads were stopped: 0,0000755 seconds, Stopping threads took: 0,0000103 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -115,7 +116,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 715,
+        "log.offset": 730,
         "message": "Application time: 0,0226148 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -132,7 +133,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 804,
+        "log.offset": 819,
         "message": "Total time for which application threads were stopped: 0,0000736 seconds, Stopping threads took: 0,0000115 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -149,7 +150,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 972,
+        "log.offset": 987,
         "message": "Application time: 0,1804640 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -166,7 +167,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 1061,
+        "log.offset": 1076,
         "message": "Total time for which application threads were stopped: 0,0001712 seconds, Stopping threads took: 0,0000212 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -183,7 +184,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 1229,
+        "log.offset": 1244,
         "message": "Application time: 0,0427365 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -200,7 +201,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 1318,
+        "log.offset": 1333,
         "message": "Total time for which application threads were stopped: 0,0000910 seconds, Stopping threads took: 0,0000104 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -217,7 +218,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 1486,
+        "log.offset": 1501,
         "message": "Application time: 0,0120864 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -234,7 +235,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 1575,
+        "log.offset": 1590,
         "message": "Total time for which application threads were stopped: 0,0002664 seconds, Stopping threads took: 0,0000334 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -251,7 +252,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 1743,
+        "log.offset": 1758,
         "message": "Application time: 0,0328884 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -268,7 +269,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 1832,
+        "log.offset": 1847,
         "message": "Total time for which application threads were stopped: 0,0001472 seconds, Stopping threads took: 0,0000279 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -285,7 +286,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 2000,
+        "log.offset": 2015,
         "message": "Application time: 0,1401198 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -302,7 +303,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 2089,
+        "log.offset": 2104,
         "message": "Total time for which application threads were stopped: 0,0001774 seconds, Stopping threads took: 0,0000166 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -319,7 +320,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 2257,
+        "log.offset": 2272,
         "message": "Application time: 0,2803587 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -336,7 +337,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 2346,
+        "log.offset": 2361,
         "message": "Total time for which application threads were stopped: 0,0002301 seconds, Stopping threads took: 0,0000177 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -353,7 +354,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 2514,
+        "log.offset": 2529,
         "message": "Application time: 0,0243595 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -370,7 +371,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 2603,
+        "log.offset": 2618,
         "message": "Total time for which application threads were stopped: 0,0001740 seconds, Stopping threads took: 0,0000114 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -387,7 +388,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 2771,
+        "log.offset": 2786,
         "message": "Application time: 0,2175677 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -404,7 +405,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 2860,
+        "log.offset": 2875,
         "message": "Total time for which application threads were stopped: 0,0002329 seconds, Stopping threads took: 0,0000205 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -421,7 +422,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 3028,
+        "log.offset": 3043,
         "message": "Application time: 0,0356169 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -438,7 +439,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 3117,
+        "log.offset": 3132,
         "message": "Total time for which application threads were stopped: 0,0002034 seconds, Stopping threads took: 0,0000405 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -455,7 +456,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 3285,
+        "log.offset": 3300,
         "message": "Application time: 0,0157189 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -472,7 +473,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 3374,
+        "log.offset": 3389,
         "message": "Total time for which application threads were stopped: 0,0002240 seconds, Stopping threads took: 0,0000540 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -489,7 +490,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 3542,
+        "log.offset": 3557,
         "message": "Application time: 0,0177385 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -506,7 +507,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 3631,
+        "log.offset": 3646,
         "message": "Total time for which application threads were stopped: 0,0002886 seconds, Stopping threads took: 0,0000213 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -523,7 +524,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 3799,
+        "log.offset": 3814,
         "message": "Application time: 0,0295439 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -540,7 +541,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 3888,
+        "log.offset": 3903,
         "message": "Total time for which application threads were stopped: 0,0001937 seconds, Stopping threads took: 0,0000221 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -557,7 +558,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 4056,
+        "log.offset": 4071,
         "message": "Application time: 0,2231589 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -574,7 +575,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 4145,
+        "log.offset": 4160,
         "message": "Total time for which application threads were stopped: 0,0002032 seconds, Stopping threads took: 0,0000222 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -591,7 +592,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 4313,
+        "log.offset": 4328,
         "message": "Application time: 0,0201046 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -608,7 +609,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 4402,
+        "log.offset": 4417,
         "message": "Total time for which application threads were stopped: 0,0001069 seconds, Stopping threads took: 0,0000242 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -625,7 +626,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 4570,
+        "log.offset": 4585,
         "message": "Application time: 0,0144240 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -642,7 +643,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 4659,
+        "log.offset": 4674,
         "message": "Total time for which application threads were stopped: 0,0001276 seconds, Stopping threads took: 0,0000219 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -659,7 +660,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 4827,
+        "log.offset": 4842,
         "message": "Application time: 0,0833044 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -676,7 +677,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 4916,
+        "log.offset": 4931,
         "message": "Total time for which application threads were stopped: 0,0001685 seconds, Stopping threads took: 0,0000201 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -693,7 +694,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 5084,
+        "log.offset": 5099,
         "message": "Application time: 0,1200701 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -711,7 +712,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 5173,
+        "log.offset": 5188,
         "message": "GC(0) Pause Young (Allocation Failure)",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -729,7 +730,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 5265,
+        "log.offset": 5280,
         "message": "GC(0) Using 8 workers of 8 for evacuation",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -747,7 +748,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 5360,
+        "log.offset": 5375,
         "message": "GC(0) Desired survivor size 17891328 bytes, new threshold 6 (max threshold 6)",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -765,7 +766,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 5491,
+        "log.offset": 5506,
         "message": "GC(0) Age table with threshold 6 (max threshold 6)",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -783,7 +784,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 5595,
+        "log.offset": 5610,
         "message": "GC(0) - age   1:   17876816 bytes,   17876816 total",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -803,7 +804,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 5700,
+        "log.offset": 5715,
         "message": "[2018-06-13T07:44:24.343+0000][32376][gc,heap      ] GC(0) ParNew: 279616K->17562K(314560K)",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -821,7 +822,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 5792,
+        "log.offset": 5807,
         "message": "GC(0) CMS: 0K->0K(699072K)",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -839,7 +840,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 5872,
+        "log.offset": 5887,
         "message": "GC(0) Metaspace: 22819K->22819K(1071104K)",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -856,7 +857,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 5967,
+        "log.offset": 5982,
         "message": "GC(0) Pause Young (Allocation FailurGe) 273M->17M(989M) 13,344ms",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -874,7 +875,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 6085,
+        "log.offset": 6100,
         "message": "GC(0) User=0,07s Sys=0,00s Real=0,01s",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -891,7 +892,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 6176,
+        "log.offset": 6191,
         "message": "Total time for which application threads were stopped: 0,0135152 seconds, Stopping threads took: 0,0000320 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -908,7 +909,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 6344,
+        "log.offset": 6359,
         "message": "Application time: 0,0000687 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -926,7 +927,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 6433,
+        "log.offset": 6448,
         "message": "GC(1) Pause Initial Mark",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -943,7 +944,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 6511,
+        "log.offset": 6526,
         "message": "GC(1) Pause Initial Mark 22M->22M(989M) 2,829ms",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -961,7 +962,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 6612,
+        "log.offset": 6627,
         "message": "GC(1) User=0,01s Sys=0,00s Real=0,00s",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -978,7 +979,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 6703,
+        "log.offset": 6718,
         "message": "Total time for which application threads were stopped: 0,0029891 seconds, Stopping threads took: 0,0000406 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -995,7 +996,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 6871,
+        "log.offset": 6886,
         "message": "GC(1) Concurrent Mark",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1013,7 +1014,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 6946,
+        "log.offset": 6961,
         "message": "GC(1) Using 2 workers of 2 for marking",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1030,7 +1031,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 7038,
+        "log.offset": 7053,
         "message": "GC(1) Concurrent Mark 0,937ms",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1048,7 +1049,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 7121,
+        "log.offset": 7136,
         "message": "GC(1) User=0,00s Sys=0,00s Real=0,00s",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1065,7 +1066,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 7212,
+        "log.offset": 7227,
         "message": "GC(1) Concurrent Preclean",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1082,7 +1083,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 7291,
+        "log.offset": 7306,
         "message": "GC(1) Concurrent Preclean 2,067ms",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1100,7 +1101,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 7378,
+        "log.offset": 7393,
         "message": "GC(1) User=0,00s Sys=0,00s Real=0,00s",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1117,7 +1118,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 7469,
+        "log.offset": 7484,
         "message": "GC(1) Concurrent Abortable Preclean",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1134,7 +1135,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 7558,
+        "log.offset": 7573,
         "message": "Application time: 0,2479945 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1151,7 +1152,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 7647,
+        "log.offset": 7662,
         "message": "Total time for which application threads were stopped: 0,0001480 seconds, Stopping threads took: 0,0000175 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1168,7 +1169,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 7815,
+        "log.offset": 7830,
         "message": "GC(1) Concurrent Abortable Preclean 245,156ms",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1186,7 +1187,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 7914,
+        "log.offset": 7929,
         "message": "GC(1) User=1,18s Sys=0,02s Real=0,25s",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1203,7 +1204,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 8005,
+        "log.offset": 8020,
         "message": "Application time: 0,0001310 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1221,7 +1222,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 8094,
+        "log.offset": 8109,
         "message": "GC(1) Pause Remark",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1238,7 +1239,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 8166,
+        "log.offset": 8181,
         "message": "GC(1) Pause Remark 169M->169M(989M) 23,325ms",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1256,7 +1257,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 8264,
+        "log.offset": 8279,
         "message": "GC(1) User=0,14s Sys=0,00s Real=0,02s",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1273,7 +1274,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 8355,
+        "log.offset": 8370,
         "message": "Total time for which application threads were stopped: 0,0234535 seconds, Stopping threads took: 0,0000128 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1290,7 +1291,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 8523,
+        "log.offset": 8538,
         "message": "GC(1) Concurrent Sweep",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1307,7 +1308,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 8599,
+        "log.offset": 8614,
         "message": "GC(1) Concurrent Sweep 0,034ms",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1325,7 +1326,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 8683,
+        "log.offset": 8698,
         "message": "GC(1) User=0,00s Sys=0,00s Real=0,00s",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1342,7 +1343,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 8774,
+        "log.offset": 8789,
         "message": "GC(1) Concurrent Reset",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1359,7 +1360,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 8850,
+        "log.offset": 8865,
         "message": "GC(1) Concurrent Reset 0,636ms",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1377,7 +1378,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 8934,
+        "log.offset": 8949,
         "message": "GC(1) User=0,00s Sys=0,00s Real=0,00s",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1397,7 +1398,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 9025,
+        "log.offset": 9040,
         "message": "[2018-06-13T07:44:24.619+0000][32376][gc,heap      ] GC(1) Old: 0K->0K(699072K)",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1414,7 +1415,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 9105,
+        "log.offset": 9120,
         "message": "Application time: 0,1444854 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1431,7 +1432,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 9194,
+        "log.offset": 9209,
         "message": "Total time for which application threads were stopped: 0,0003334 seconds, Stopping threads took: 0,0000230 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1448,7 +1449,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 9362,
+        "log.offset": 9377,
         "message": "Application time: 0,0132824 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1465,7 +1466,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 9451,
+        "log.offset": 9466,
         "message": "Total time for which application threads were stopped: 0,0003048 seconds, Stopping threads took: 0,0000297 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1482,7 +1483,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 9619,
+        "log.offset": 9634,
         "message": "Application time: 0,0066508 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1499,7 +1500,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 9708,
+        "log.offset": 9723,
         "message": "Total time for which application threads were stopped: 0,0004138 seconds, Stopping threads took: 0,0000365 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1516,7 +1517,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 9876,
+        "log.offset": 9891,
         "message": "Application time: 0,0239448 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1533,7 +1534,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 9965,
+        "log.offset": 9980,
         "message": "Total time for which application threads were stopped: 0,0003185 seconds, Stopping threads took: 0,0000191 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1550,7 +1551,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 10133,
+        "log.offset": 10148,
         "message": "Application time: 0,2640511 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1567,7 +1568,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 10222,
+        "log.offset": 10237,
         "message": "Total time for which application threads were stopped: 0,0012229 seconds, Stopping threads took: 0,0000654 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1584,7 +1585,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 10390,
+        "log.offset": 10405,
         "message": "Application time: 0,0649277 seconds",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1602,7 +1603,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 10479,
+        "log.offset": 10494,
         "message": "GC(2) Pause Young (Allocation Failure)",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1620,7 +1621,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 10571,
+        "log.offset": 10586,
         "message": "GC(2) Using 8 workers of 8 for evacuation",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1638,7 +1639,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 10666,
+        "log.offset": 10681,
         "message": "GC(2) Desired survivor size 17891328 bytes, new threshold 2 (max threshold 6)",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1656,7 +1657,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 10797,
+        "log.offset": 10812,
         "message": "GC(2) Age table with threshold 2 (max threshold 6)",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1674,7 +1675,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 10901,
+        "log.offset": 10916,
         "message": "GC(2) - age   1:   17302064 bytes,   17302064 total",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1692,7 +1693,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 11006,
+        "log.offset": 11021,
         "message": "GC(2) - age   2:    7206808 bytes,   24508872 total",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1712,7 +1713,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 11111,
+        "log.offset": 11126,
         "message": "[2018-06-13T07:44:25.167+0000][32376][gc,heap      ] GC(2) ParNew: 297178K->25722K(314560K)",
         "process.pid": "32376",
         "service.type": "elasticsearch"
@@ -1730,7 +1731,7 @@
         "event.type": "info",
         "fileset.name": "gc",
         "input.type": "log",
-        "log.offset": 11203,
+        "log.offset": 11218,
         "message": "GC(2) CMS: 0K->0K(699072K)",
         "process.pid": "32376",
         "service.type": "elasticsearch"

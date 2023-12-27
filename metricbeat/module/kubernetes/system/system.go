@@ -20,13 +20,12 @@ package system
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
+	"github.com/elastic/beats/v7/metricbeat/module/kubernetes/util"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -39,8 +38,6 @@ var (
 		DefaultScheme: defaultScheme,
 		DefaultPath:   defaultPath,
 	}.Build()
-
-	logger = logp.NewLogger("kubernetes.system")
 )
 
 // init registers the MetricSet with the central registry.
@@ -58,8 +55,9 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	http *helper.HTTP
-	mod  k8smod.Module
+	http        *helper.HTTP
+	mod         k8smod.Module
+	clusterMeta mapstr.M
 }
 
 // New create a new instance of the MetricSet
@@ -74,11 +72,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if !ok {
 		return nil, fmt.Errorf("must be child of kubernetes module")
 	}
-	return &MetricSet{
+	ms := &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
 		mod:           mod,
-	}, nil
+		clusterMeta:   util.AddClusterECSMeta(base),
+	}
+
+	return ms, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
@@ -87,16 +88,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	body, err := m.mod.GetKubeletStats(m.http)
 	if err != nil {
-		return errors.Wrap(err, "error doing HTTP request to fetch 'system' Metricset data")
+		return fmt.Errorf("error doing HTTP request to fetch 'system' Metricset data: %w", err)
 	}
 
-	events, err := eventMapping(body)
+	events, err := eventMapping(body, m.Logger())
 	if err != nil {
-		return errors.Wrap(err, "error in mapping")
+		return fmt.Errorf("error in mapping: %w", err)
 	}
 
 	for _, e := range events {
-		isOpen := reporter.Event(mb.TransformMapStrToEvent("kubernetes", e, nil))
+		event := mb.TransformMapStrToEvent("kubernetes", e, nil)
+		if len(m.clusterMeta) != 0 {
+			event.RootFields.DeepUpdate(m.clusterMeta)
+		}
+		isOpen := reporter.Event(event)
 		if !isOpen {
 			return nil
 		}

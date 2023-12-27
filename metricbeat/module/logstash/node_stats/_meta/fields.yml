@@ -4,6 +4,8 @@
     node_stats metrics.
   release: ga
   fields:
+    - name: id
+      type: keyword
     - name: state.pipeline
       type: group
       fields:
@@ -11,6 +13,28 @@
           type: keyword
         - name: hash
           type: keyword
+        - name: ephemeral_id
+          type: keyword
+        - name: batch_size
+          type: long
+        - name: workers
+          type: long
+        - name: representation
+          type: group
+          fields:
+            - name: hash
+              type: keyword
+            - name: type
+              type: keyword
+            - name: version
+              type: keyword
+            - name: graph
+              type: group
+              fields:
+                - name: edges
+                  type: object
+                - name: vertices
+                  type: object
     - name: host
       type: alias
       path: host.hostname
@@ -41,6 +65,8 @@
     - name: stats
       type: group
       fields:
+        - name: timestamp
+          type: date
         - name: jvm
           type: group
           fields:
@@ -89,11 +115,11 @@
                   type: group
                   fields:
                     - name: 15m
-                      type: long
+                      type: half_float
                     - name: 1m
-                      type: long
+                      type: half_float
                     - name: 5m
-                      type: long
+                      type: half_float
             - name: cgroup
               type: group
               fields:
@@ -102,6 +128,8 @@
                 - name: cpu
                   type: group
                   fields:
+                    - name: cfs_quota_micros
+                      type: long
                     - name: stat
                       type: group
                       fields:
@@ -116,6 +144,8 @@
         - name: pipelines
           type: nested
           fields:
+            - name: ephemeral_id
+              type: keyword
             - name: id
               type: keyword
             - name: hash
@@ -134,12 +164,18 @@
             - name: events
               type: group
               fields:
+                - name: in
+                  type: long
                 - name: out
                   type: long
                 - name: duration_in_millis
                   type: long
+                - name: queue_push_duration_in_millis
+                  type: long
+                - name: filtered
+                  type: long
             - name: vertices
-              type: group
+              type: nested
               fields:
                 - name: duration_in_millis
                   type: long
@@ -155,7 +191,21 @@
                   type: keyword
                   description: id
                 - name: queue_push_duration_in_millis
-                  type: float
+                  type: long
                   description: queue_push_duration_in_millis
+                - name: long_counters
+                  type: nested
+                  fields:
+                    - name: name
+                      type: keyword
+                    - name: value
+                      type: long
+            - name: reloads
+              type: group
+              fields:
+                - name: failures
+                  type: long
+                - name: successes
+                  type: long
         - name: queue.events_count
           type: long

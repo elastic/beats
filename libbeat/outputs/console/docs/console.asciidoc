@@ -7,7 +7,7 @@
 
 The Console output writes events in JSON format to stdout.
 
-WARNING: The Console output should be used only for debugging issues as it can produce a large amount of logging data. 
+WARNING: The Console output should be used only for debugging issues as it can produce a large amount of logging data.
 
 To use this output, edit the {beatname_uc} configuration file to disable the {es}
 output by commenting it out, and enable the console output by adding `output.console`.
@@ -19,6 +19,13 @@ Example configuration:
 output.console:
   pretty: true
 ------------------------------------------------------------------------------
+
+ifdef::apm-server[]
+[float]
+==== Configure the {kib} output
+
+include::../../../../shared-kibana-endpoint.asciidoc[tag=shared-kibana-config]
+endif::[]
 
 ==== Configuration options
 

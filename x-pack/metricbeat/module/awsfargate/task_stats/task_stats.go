@@ -5,25 +5,28 @@
 package task_stats
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/docker/docker/api/types"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/docker/cpu"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/awsfargate"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var (
-	metricsetName = "task_stats"
-	taskStatsPath = "task/stats"
-	taskPath      = "task"
+	metricsetName                    = "task_stats"
+	taskStatsPath                    = "task/stats"
+	taskPath                         = "task"
+	queryTaskMetadataEndpointTimeout = 60 * time.Second
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -47,9 +50,20 @@ type MetricSet struct {
 	taskEndpoint      string
 }
 
-// Stats is a struct represents information regarding a container
+// TaskInfo is a struct that represents information about a specific ECS Fargate Task
+type TaskInfo struct {
+	Cluster           string
+	TaskARN           string
+	Family            string
+	Revision          string
+	TaskDesiredStatus string
+	TaskKnownStatus   string
+}
+
+// Stats is a struct that represents information regarding a container
 type Stats struct {
 	Time         common.Time
+	taskInfo     TaskInfo
 	Container    *container
 	cpuStats     cpu.CPUStats
 	memoryStats  memoryStats
@@ -57,13 +71,21 @@ type Stats struct {
 	blkioStats   blkioStats
 }
 
-// TaskMetadata is an struct represents response body from ${ECS_CONTAINER_METADATA_URI_V4}/task
+// TaskMetadata is a struct that represents response body from ${ECS_CONTAINER_METADATA_URI_V4}/task
 type TaskMetadata struct {
-	Cluster    string       `json:"Cluster"`
-	TaskARN    string       `json:"TaskARN"`
-	Family     string       `json:"Family"`
-	Revision   string       `json:"Revision"`
-	Containers []*container `json:"Containers"`
+	Cluster       string       `json:"Cluster"`
+	TaskARN       string       `json:"TaskARN"`
+	Family        string       `json:"Family"`
+	Revision      string       `json:"Revision"`
+	DesiredStatus string       `json:"DesiredStatus"`
+	KnownStatus   string       `json:"KnownStatus"`
+	Limit         Limits       `json:"Limits"`
+	Containers    []*container `json:"Containers"`
+}
+
+// Limits is a struct that represents the memory limit from ${ECS_CONTAINER_METADATA_URI_V4}/task, which is the Hard Memory Limit set in AWS ECS
+type Limits struct {
+	Memory uint64 `json:"Memory"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -104,21 +126,35 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 }
 
 func (m *MetricSet) queryTaskMetadataEndpoints() ([]Stats, error) {
-	// Get response from ${ECS_CONTAINER_METADATA_URI_V4}/task/stats
-	taskStatsResp, err := http.Get(m.taskStatsEndpoint)
+	context, cancel := context.WithTimeout(context.Background(), queryTaskMetadataEndpointTimeout)
+	defer cancel()
+	// Collect information from ${ECS_CONTAINER_METADATA_URI_V4}/task/stats
+	req, err := http.NewRequestWithContext(context, http.MethodGet, m.taskStatsEndpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("http.NewRequestWithContext: %w", err)
+	}
+	taskStatsResp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("http.Get failed: %w", err)
 	}
+	defer taskStatsResp.Body.Close()
+
 	taskStatsOutput, err := getTaskStats(taskStatsResp)
 	if err != nil {
 		return nil, fmt.Errorf("getTaskStats failed: %w", err)
 	}
 
 	// Collect container metadata information from ${ECS_CONTAINER_METADATA_URI_V4}/task
-	taskResp, err := http.Get(m.taskEndpoint)
+	req, err = http.NewRequestWithContext(context, http.MethodGet, m.taskEndpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("http.NewRequestWithContext: %w", err)
+	}
+	taskResp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("http.Get failed: %w", err)
 	}
+	defer taskResp.Body.Close()
+
 	taskOutput, err := getTask(taskResp)
 	if err != nil {
 		return nil, fmt.Errorf("getTask failed: %w", err)
@@ -157,29 +193,33 @@ func getTask(taskResp *http.Response) (TaskMetadata, error) {
 }
 
 func getStatsList(taskStatsOutput map[string]types.StatsJSON, taskOutput TaskMetadata) []Stats {
-	containersInfo := map[string]ContainerMetadata{}
+	containersInfo := map[string]container{}
+
+	taskInfo := TaskInfo{
+		Family:            taskOutput.Family,
+		TaskARN:           taskOutput.TaskARN,
+		Cluster:           taskOutput.Cluster,
+		Revision:          taskOutput.Revision,
+		TaskDesiredStatus: taskOutput.DesiredStatus,
+		TaskKnownStatus:   taskOutput.KnownStatus,
+	}
+
 	for _, c := range taskOutput.Containers {
 		// Skip ~internal~ecs~pause container
 		if c.Name == "~internal~ecs~pause" {
 			continue
 		}
 
-		containerMetadata := ContainerMetadata{
-			Container: c,
-			Family:    taskOutput.Family,
-			TaskARN:   taskOutput.TaskARN,
-			Cluster:   taskOutput.Cluster,
-			Revision:  taskOutput.Revision,
-		}
-		containersInfo[c.DockerId] = containerMetadata
+		containersInfo[c.DockerId] = *c
 	}
 
 	var formattedStats []Stats
 	for id, taskStats := range taskStatsOutput {
-		if cInfo, ok := containersInfo[id]; ok {
+		if c, ok := containersInfo[id]; ok {
 			statsPerContainer := Stats{
 				Time:         common.Time(taskStats.Stats.Read),
-				Container:    getContainerStats(cInfo.Container),
+				taskInfo:     taskInfo,
+				Container:    getContainerMetadata(&c),
 				cpuStats:     getCPUStats(taskStats),
 				memoryStats:  getMemoryStats(taskStats),
 				networkStats: getNetworkStats(taskStats),

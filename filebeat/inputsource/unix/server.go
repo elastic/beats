@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/dgram"
 	"github.com/elastic/beats/v7/filebeat/inputsource/common/streaming"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // Server is run by the input.

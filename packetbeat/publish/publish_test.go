@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package publish
 
@@ -31,12 +30,13 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/packetbeat/pb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func testEvent() beat.Event {
 	return beat.Event{
 		Timestamp: time.Now(),
-		Fields: common.MapStr{
+		Fields: mapstr.M{
 			"type": "test",
 			"src":  &common.Endpoint{},
 			"dst":  &common.Endpoint{},
@@ -98,7 +98,7 @@ func TestPublish(t *testing.T) {
 	event := func() *beat.Event {
 		return &beat.Event{
 			Timestamp: time.Now(),
-			Fields: common.MapStr{
+			Fields: mapstr.M{
 				"type": "test",
 				"_packetbeat": &pb.Fields{
 					Source: &ecs.Source{

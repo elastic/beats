@@ -5,3 +5,6 @@
 You can further refine the behavior of the +{modulename}+ module by specifying
 <<{modulename}-settings,variable settings>> in the
 +modules.d/{modulename}.yml+ file, or overriding settings at the command line.
+
+You must enable at least one fileset in the module.
+**Filesets are disabled by default.**

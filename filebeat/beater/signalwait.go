@@ -18,10 +18,9 @@
 package beater
 
 import (
-	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type signalWait struct {
@@ -69,10 +68,6 @@ func (s *signalWait) AddTimeout(d time.Duration) {
 
 func (s *signalWait) Signal() {
 	s.Add(func() {})
-}
-
-func waitGroup(wg *sync.WaitGroup) signaler {
-	return wg.Wait
 }
 
 func waitChannel(c <-chan struct{}) signaler {

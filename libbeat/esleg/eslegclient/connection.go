@@ -18,26 +18,29 @@
 package eslegclient
 
 import (
+	"bytes"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"time"
 
-	"go.elastic.co/apm/module/apmelasticsearch"
+	"go.elastic.co/apm/module/apmelasticsearch/v2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
-	"github.com/elastic/beats/v7/libbeat/common/transport/httpcommon"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
-	"github.com/elastic/beats/v7/libbeat/common/useragent"
-	"github.com/elastic/beats/v7/libbeat/logp"
-	"github.com/elastic/beats/v7/libbeat/testing"
+	"github.com/elastic/beats/v7/libbeat/version"
+	cfg "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/testing"
+	"github.com/elastic/elastic-agent-libs/transport"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/useragent"
+	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
 type esHTTPClient interface {
@@ -45,7 +48,8 @@ type esHTTPClient interface {
 	CloseIdleConnections()
 }
 
-// Connection manages the connection for a given client.
+// Connection manages the connection for a given client. Each connection is not-thread-safe and should not be shared
+// between 2 different goroutines.
 type Connection struct {
 	ConnectionSettings
 
@@ -53,8 +57,11 @@ type Connection struct {
 	HTTP    esHTTPClient
 
 	apiKeyAuthHeader string // Authorization HTTP request header with base64-encoded API key
-	version          common.Version
+	version          libversion.V
 	log              *logp.Logger
+	responseBuffer   *bytes.Buffer
+
+	isServerless bool
 }
 
 // ConnectionSettings are the settings needed for a Connection
@@ -81,6 +88,16 @@ type ConnectionSettings struct {
 	Transport httpcommon.HTTPTransportSettings
 }
 
+type ESPingData struct {
+	Version ESVersionData `json:"version"`
+	Name    string        `json:"name"`
+}
+
+type ESVersionData struct {
+	Number      string `json:"number"`
+	BuildFlavor string `json:"build_flavor"`
+}
+
 // NewConnection returns a new Elasticsearch client
 func NewConnection(s ConnectionSettings) (*Connection, error) {
 	logger := logp.NewLogger("esclientleg")
@@ -91,7 +108,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 
 	u, err := url.Parse(s.URL)
 	if err != nil {
-		return nil, fmt.Errorf("failed to parse elasticsearch URL: %v", err)
+		return nil, fmt.Errorf("failed to parse elasticsearch URL: %w", err)
 	}
 
 	if u.User != nil {
@@ -118,7 +135,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 	if s.Beatname == "" {
 		s.Beatname = "Libbeat"
 	}
-	userAgent := useragent.UserAgent(s.Beatname)
+	userAgent := useragent.UserAgent(s.Beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 	// Default the product origin header to beats if it wasn't already set.
 	if _, ok := s.Headers[productorigin.Header]; !ok {
@@ -149,7 +166,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		if err != nil {
 			return nil, err
 		}
-		logp.Info("kerberos client created")
+		logger.Info("kerberos client created")
 	}
 
 	conn := Connection{
@@ -157,6 +174,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		HTTP:               esClient,
 		Encoder:            encoder,
 		log:                logger,
+		responseBuffer:     bytes.NewBuffer(nil),
 	}
 
 	if s.APIKey != "" {
@@ -170,13 +188,15 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 // configuration. It accepts the same configuration parameters as the Elasticsearch
 // output, except for the output specific configuration options.  If multiple hosts
 // are defined in the configuration, a client is returned for each of them.
-func NewClients(cfg *common.Config, beatname string) ([]Connection, error) {
+// The returned Connection is a non-thread-safe connection.
+func NewClients(cfg *cfg.C, beatname string) ([]Connection, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 
 	if proxyURL := config.Transport.Proxy.URL; proxyURL != nil {
+		logp.Debug("breaking down proxy URL. Scheme: '%s', host[:port]: '%s', path: '%s'", proxyURL.Scheme, proxyURL.Host, proxyURL.Path)
 		logp.Info("using proxy URL: %s", proxyURL.URI().String())
 	}
 
@@ -216,7 +236,8 @@ func NewClients(cfg *common.Config, beatname string) ([]Connection, error) {
 	return clients, nil
 }
 
-func NewConnectedClient(cfg *common.Config, beatname string) (*Connection, error) {
+// NewConnectedClient returns a non-thread-safe connection. Make sure for each goroutine you initialize a new connection.
+func NewConnectedClient(cfg *cfg.C, beatname string) (*Connection, error) {
 	clients, err := NewClients(cfg, beatname)
 	if err != nil {
 		return nil, err
@@ -242,13 +263,16 @@ func NewConnectedClient(cfg *common.Config, beatname string) (*Connection, error
 // the configured host, updates the known Elasticsearch version and calls
 // globally configured handlers.
 func (conn *Connection) Connect() error {
+	if conn.log == nil {
+		conn.log = logp.NewLogger("esclientleg")
+	}
 	if err := conn.getVersion(); err != nil {
 		return err
 	}
 
 	if conn.OnConnectCallback != nil {
 		if err := conn.OnConnectCallback(); err != nil {
-			return fmt.Errorf("Connection marked as failed because the onConnect callback failed: %v", err)
+			return fmt.Errorf("Connection marked as failed because the onConnect callback failed: %w", err)
 		}
 	}
 
@@ -256,33 +280,29 @@ func (conn *Connection) Connect() error {
 }
 
 // Ping sends a GET request to the Elasticsearch.
-func (conn *Connection) Ping() (string, error) {
+func (conn *Connection) Ping() (ESPingData, error) {
 	conn.log.Debugf("ES Ping(url=%v)", conn.URL)
 
 	status, body, err := conn.execRequest("GET", conn.URL, nil)
 	if err != nil {
 		conn.log.Debugf("Ping request failed with: %v", err)
-		return "", err
+		return ESPingData{}, err
 	}
 
 	if status >= 300 {
-		return "", fmt.Errorf("Non 2xx response code: %d", status)
+		return ESPingData{}, fmt.Errorf("non 2xx response code: %d", status)
 	}
 
-	var response struct {
-		Version struct {
-			Number string
-		}
-	}
+	response := ESPingData{}
 
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		return "", fmt.Errorf("Failed to parse JSON response: %v", err)
+		return ESPingData{}, fmt.Errorf("failed to parse JSON response: %w", err)
 	}
 
 	conn.log.Debugf("Ping status code: %v", status)
-	conn.log.Infof("Attempting to connect to Elasticsearch version %s", response.Version.Number)
-	return response.Version.Number, nil
+	conn.log.Infof("Attempting to connect to Elasticsearch version %s (%s)", response.Version.Number, response.Version.BuildFlavor)
+	return response, nil
 }
 
 // Close closes a connection.
@@ -362,7 +382,7 @@ func (conn *Connection) execRequest(
 	method, url string,
 	body io.Reader,
 ) (int, []byte, error) {
-	req, err := http.NewRequest(method, url, body)
+	req, err := http.NewRequest(method, url, body) //nolint:noctx // keep legacy behaviour
 	if err != nil {
 		conn.log.Warnf("Failed to create request %+v", err)
 		return 0, nil, err
@@ -374,25 +394,42 @@ func (conn *Connection) execRequest(
 }
 
 // GetVersion returns the elasticsearch version the client is connected to.
-func (conn *Connection) GetVersion() common.Version {
+func (conn *Connection) GetVersion() libversion.V {
 	if !conn.version.IsValid() {
-		conn.getVersion()
+		_ = conn.getVersion()
 	}
 
 	return conn.version
 }
 
+// IsServerless returns true if we're connected to a serverless ES instance
+func (conn *Connection) IsServerless() bool {
+	// make sure we've initialized the version state first
+	_ = conn.GetVersion()
+	return conn.isServerless
+}
+
 func (conn *Connection) getVersion() error {
-	versionString, err := conn.Ping()
+	versionData, err := conn.Ping()
 	if err != nil {
 		return err
 	}
 
-	if version, err := common.NewVersion(versionString); err != nil {
-		conn.log.Errorf("Invalid version from Elasticsearch: %v", versionString)
-		conn.version = common.Version{}
+	if v, err := libversion.New(versionData.Version.Number); err != nil {
+		conn.log.Errorf("Invalid version from Elasticsearch: %v", versionData.Version.Number)
+		conn.version = libversion.V{}
 	} else {
-		conn.version = *version
+		conn.version = *v
+	}
+
+	if versionData.Version.BuildFlavor == "serverless" {
+		conn.log.Info("build flavor of es is serverless, marking connection as serverless")
+		conn.isServerless = true
+	} else if versionData.Version.BuildFlavor == "default" {
+		conn.isServerless = false
+		// not sure if this is even possible, just being defensive
+	} else {
+		conn.log.Infof("Got unexpected build flavor '%s'", versionData.Version.BuildFlavor)
 	}
 
 	return nil
@@ -402,7 +439,7 @@ func (conn *Connection) getVersion() error {
 func (conn *Connection) LoadJSON(path string, json map[string]interface{}) ([]byte, error) {
 	status, body, err := conn.Request("PUT", path, "", nil, json)
 	if err != nil {
-		return body, fmt.Errorf("couldn't load json. Error: %s", err)
+		return body, fmt.Errorf("couldn't load json. Error: %w", err)
 	}
 	if status > 300 {
 		return body, fmt.Errorf("couldn't load json. Status: %v", status)
@@ -411,6 +448,8 @@ func (conn *Connection) LoadJSON(path string, json map[string]interface{}) ([]by
 	return body, nil
 }
 
+// execHTTPRequest executes the http request and consumes the response in a non-thread-safe way.
+// The return is a triple of status code, response as byte array, error if the request produced any error.
 func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) {
 	req.Header.Add("Accept", "application/json")
 
@@ -445,17 +484,18 @@ func (conn *Connection) execHTTPRequest(req *http.Request) (int, []byte, error) 
 	defer closing(resp.Body, conn.log)
 
 	status := resp.StatusCode
-	obj, err := ioutil.ReadAll(resp.Body)
+	conn.responseBuffer.Reset()
+	_, err = io.Copy(conn.responseBuffer, resp.Body)
 	if err != nil {
 		return status, nil, err
 	}
 
 	if status >= 300 {
 		// add the response body with the error returned by Elasticsearch
-		err = fmt.Errorf("%v: %s", resp.Status, obj)
+		err = fmt.Errorf("%v: %s", resp.Status, conn.responseBuffer.Bytes())
 	}
 
-	return status, obj, err
+	return status, conn.responseBuffer.Bytes(), err
 }
 
 func closing(c io.Closer, logger *logp.Logger) {

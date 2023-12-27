@@ -23,6 +23,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type mongodbMessage struct {
@@ -53,7 +54,7 @@ type mongodbMessage struct {
 
 	// Other fields vary very much depending on operation type
 	// lets just put them in a map
-	event common.MapStr
+	event mapstr.M
 }
 
 // Represent a stream being parsed that contains a mongodb message
@@ -87,9 +88,9 @@ type transaction struct {
 	bytesOut int
 	bytesIn  int
 
-	mongodb common.MapStr
+	mongodb mapstr.M
 
-	event     common.MapStr
+	event     mapstr.M
 	method    string
 	resource  string
 	error     string
@@ -150,7 +151,7 @@ func awaitsReply(c opCode) bool {
 	return c == opQuery || c == opGetMore
 }
 
-// List of mongodb user commands (send throuwh a query of the legacy protocol)
+// List of mongodb user commands (send through a query of the legacy protocol)
 // see http://docs.mongodb.org/manual/reference/command/
 //
 // This list was obtained by calling db.listCommands() and some grepping.

@@ -25,6 +25,20 @@ import (
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
+var mapping = &p.MetricsMapping{
+	Metrics: map[string]p.MetricMap{
+		"kube_resourcequota_created": p.Metric("created.sec"),
+		"kube_resourcequota":         p.Metric("quota"),
+	},
+	Labels: map[string]p.LabelMap{
+		"namespace":     p.KeyLabel(mb.ModuleDataKey + ".namespace"),
+		"resourcequota": p.KeyLabel("name"),
+
+		"resource": p.KeyLabel("resource"),
+		"type":     p.KeyLabel("type"),
+	},
+}
+
 func init() {
 	mb.Registry.MustAddMetricSet("kubernetes", "state_resourcequota",
 		NewResourceQuotaMetricSet,
@@ -57,19 +71,7 @@ func NewResourceQuotaMetricSet(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		BaseMetricSet: base,
 		prometheus:    prometheus,
 		mod:           mod,
-		mapping: &p.MetricsMapping{
-			Metrics: map[string]p.MetricMap{
-				"kube_resourcequota_created": p.Metric("created.sec"),
-				"kube_resourcequota":         p.Metric("quota"),
-			},
-			Labels: map[string]p.LabelMap{
-				"namespace":     p.KeyLabel(mb.ModuleDataKey + ".namespace"),
-				"resourcequota": p.KeyLabel("name"),
-
-				"resource": p.KeyLabel("resource"),
-				"type":     p.KeyLabel("type"),
-			},
-		},
+		mapping:       mapping,
 	}, nil
 }
 
@@ -97,5 +99,4 @@ func (m *ResourceQuotaMetricSet) Fetch(reporter mb.ReporterV2) {
 			return
 		}
 	}
-	return
 }

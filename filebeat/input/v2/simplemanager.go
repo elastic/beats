@@ -18,18 +18,18 @@
 package v2
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/unison"
 )
 
 type simpleInputManager struct {
-	configure func(*common.Config) (Input, error)
+	configure func(*conf.C) (Input, error)
 }
 
 // ConfigureWith creates an InputManager that provides no extra logic and
 // allows each input to fully control event collection and publishing in
 // isolation. The function fn will be called for every input to be configured.
-func ConfigureWith(fn func(*common.Config) (Input, error)) InputManager {
+func ConfigureWith(fn func(*conf.C) (Input, error)) InputManager {
 	return &simpleInputManager{configure: fn}
 }
 
@@ -39,6 +39,6 @@ func (*simpleInputManager) Init(grp unison.Group, m Mode) error { return nil }
 
 // Create builds a new Input instance from the given configuration, or returns
 // an error if the configuration is invalid.
-func (manager *simpleInputManager) Create(cfg *common.Config) (Input, error) {
+func (manager *simpleInputManager) Create(cfg *conf.C) (Input, error) {
 	return manager.configure(cfg)
 }

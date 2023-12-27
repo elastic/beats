@@ -12,5 +12,5 @@ func FileExists(fp string) (ok bool, err error) {
 	} else if os.IsNotExist(err) {
 		err = nil
 	}
-	return
+	return ok, err
 }

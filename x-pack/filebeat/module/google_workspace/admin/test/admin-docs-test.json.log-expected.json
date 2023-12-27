@@ -6,9 +6,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "-1385166453789681991",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"DOCS_SETTINGS\",\"name\":\"TRANSFER_DOCUMENT_OWNERSHIP\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"-1385166453789681991\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"DOCS_SETTINGS\",\"name\":\"TRANSFER_DOCUMENT_OWNERSHIP\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -62,9 +62,9 @@
         "event.dataset": "google_workspace.admin",
         "event.duration": 10800000000000,
         "event.end": "2002-10-02T15:00:00.000Z",
-        "event.id": "1",
+        "event.id": "9825692826262267980",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"DOCS_SETTINGS\",\"name\":\"DRIVE_DATA_RESTORE\",\"parameters\":[{\"name\":\"BEGIN_DATE_TIME\",\"value\":\"2002-10-02T12:00:00Z\"},{\"name\":\"END_DATE_TIME\",\"value\":\"2002-10-02T15:00:00Z\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"9825692826262267980\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"DOCS_SETTINGS\",\"name\":\"DRIVE_DATA_RESTORE\",\"parameters\":[{\"name\":\"BEGIN_DATE_TIME\",\"value\":\"2002-10-02T12:00:00Z\"},{\"name\":\"END_DATE_TIME\",\"value\":\"2002-10-02T15:00:00Z\"},{\"name\":\"USER_EMAIL\",\"value\":\"user@example.com\"}]}}",
         "event.provider": "admin",
         "event.start": "2002-10-02T12:00:00.000Z",
         "event.type": [
@@ -77,7 +77,7 @@
         "google_workspace.kind": "admin#reports#activity",
         "google_workspace.organization.domain": "elastic.com",
         "input.type": "log",
-        "log.offset": 470,
+        "log.offset": 491,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"
@@ -116,9 +116,9 @@
             "iam"
         ],
         "event.dataset": "google_workspace.admin",
-        "event.id": "1",
+        "event.id": "9487976858416964399",
         "event.module": "google_workspace",
-        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":1,\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"DOCS_SETTINGS\",\"name\":\"CHANGE_DOCS_SETTING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"GROUP_EMAIL\",\"value\":\"group@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
+        "event.original": "{\"kind\":\"admin#reports#activity\",\"id\":{\"time\":\"2020-10-02T15:00:00Z\",\"uniqueQualifier\":\"9487976858416964399\",\"applicationName\":\"admin\",\"customerId\":\"1\"},\"actor\":{\"callerType\":\"USER\",\"email\":\"foo@bar.com\",\"profileId\":1},\"ownerDomain\":\"elastic.com\",\"ipAddress\":\"67.43.156.13\",\"events\":{\"type\":\"DOCS_SETTINGS\",\"name\":\"CHANGE_DOCS_SETTING\",\"parameters\":[{\"name\":\"DOMAIN_NAME\",\"value\":\"example.com\"},{\"name\":\"GROUP_EMAIL\",\"value\":\"group@example.com\"},{\"name\":\"NEW_VALUE\",\"value\":\"new\"},{\"name\":\"OLD_VALUE\",\"value\":\"old\"},{\"name\":\"ORG_UNIT_NAME\",\"value\":\"org\"},{\"name\":\"SETTING_NAME\",\"value\":\"setting\"}]}}",
         "event.provider": "admin",
         "event.type": [
             "change"
@@ -137,7 +137,7 @@
         "group.domain": "example.com",
         "group.name": "group",
         "input.type": "log",
-        "log.offset": 965,
+        "log.offset": 1006,
         "organization.id": "1",
         "related.ip": [
             "67.43.156.13"

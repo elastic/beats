@@ -32,7 +32,7 @@ import (
 // * MODULE: Name of the module
 // * METRICSET: Name of the metricset
 func CreateMetricset() error {
-	ve, err := devtools.PythonVirtualenv()
+	ve, err := devtools.PythonVirtualenv(false)
 	if err != nil {
 		return err
 	}

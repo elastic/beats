@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build (linux && 386) || (linux && amd64)
-// +build linux,386 linux,amd64
 
 package helper
 
@@ -13,8 +12,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // ProbeDef couples a probe with a decoder factory.
@@ -24,14 +23,14 @@ type ProbeDef struct {
 }
 
 // ApplyTemplate returns a new probe definition after expanding all templates.
-func (pdef ProbeDef) ApplyTemplate(vars common.MapStr) ProbeDef {
+func (pdef ProbeDef) ApplyTemplate(vars mapstr.M) ProbeDef {
 	pdef.Probe.Address = applyTemplate(pdef.Probe.Address, vars)
 	pdef.Probe.Fetchargs = applyTemplate(pdef.Probe.Fetchargs, vars)
 	pdef.Probe.Filter = applyTemplate(pdef.Probe.Filter, vars)
 	return pdef
 }
 
-func applyTemplate(s string, vars common.MapStr) string {
+func applyTemplate(s string, vars mapstr.M) string {
 	buf := &bytes.Buffer{}
 	if err := template.Must(template.New("").Parse(s)).Execute(buf, vars); err != nil {
 		panic(err)

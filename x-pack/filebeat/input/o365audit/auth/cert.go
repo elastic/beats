@@ -10,9 +10,8 @@ import (
 	"fmt"
 
 	"github.com/Azure/go-autorest/autorest/adal"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common/transport/tlscommon"
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // NewProviderFromCertificate returns a TokenProvider that uses certificate-based
@@ -22,11 +21,11 @@ func NewProviderFromCertificate(
 	conf tlscommon.CertificateConfig) (sptp TokenProvider, err error) {
 	cert, privKey, err := loadConfigCerts(conf)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed loading certificates")
+		return nil, fmt.Errorf("failed loading certificates: %w", err)
 	}
 	oauth, err := adal.NewOAuthConfig(endpoint, tenantID)
 	if err != nil {
-		return nil, errors.Wrap(err, "error generating OAuthConfig")
+		return nil, fmt.Errorf("error generating OAuthConfig: %w", err)
 	}
 
 	spt, err := adal.NewServicePrincipalTokenFromCertificate(
@@ -46,14 +45,14 @@ func NewProviderFromCertificate(
 func loadConfigCerts(cfg tlscommon.CertificateConfig) (cert *x509.Certificate, key *rsa.PrivateKey, err error) {
 	tlsCert, err := tlscommon.LoadCertificate(&cfg)
 	if err != nil {
-		return nil, nil, errors.Wrapf(err, "error loading X509 certificate from '%s'", cfg.Certificate)
+		return nil, nil, fmt.Errorf("error loading X509 certificate from '%s': %w", cfg.Certificate, err)
 	}
 	if tlsCert == nil || len(tlsCert.Certificate) == 0 {
 		return nil, nil, fmt.Errorf("no certificates loaded from '%s'", cfg.Certificate)
 	}
 	cert, err = x509.ParseCertificate(tlsCert.Certificate[0])
 	if err != nil {
-		return nil, nil, errors.Wrapf(err, "error parsing X509 certificate from '%s'", cfg.Certificate)
+		return nil, nil, fmt.Errorf("error parsing X509 certificate from '%s': %w", cfg.Certificate, err)
 	}
 	if tlsCert.PrivateKey == nil {
 		return nil, nil, fmt.Errorf("failed loading private key from '%s'", cfg.Key)

@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2020-10-07T16:28:38.000Z",
+        "@timestamp": "2020-10-21T16:28:38.000Z",
         "event.action": "database_audit",
         "event.category": "database",
         "event.dataset": "oracle.database_audit",
@@ -23,6 +23,12 @@
         "oracle.database_audit.session_id": "20003",
         "oracle.database_audit.status": "0",
         "process.pid": "28264",
+        "related.hosts": [
+            "testlab.local"
+        ],
+        "related.user": [
+            "SYS"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "SYS",
@@ -56,6 +62,12 @@
         "oracle.database_audit.session_id": "20003",
         "oracle.database_audit.status": "0",
         "process.pid": "28264",
+        "related.hosts": [
+            "testlab.local"
+        ],
+        "related.user": [
+            "SYS"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "SYS",
@@ -89,6 +101,12 @@
         "oracle.database_audit.session_id": "20003",
         "oracle.database_audit.status": "0",
         "process.pid": "28264",
+        "related.hosts": [
+            "testlab.local"
+        ],
+        "related.user": [
+            "SYS"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "SYS",
@@ -122,6 +140,12 @@
         "oracle.database_audit.session_id": "20003",
         "oracle.database_audit.status": "0",
         "process.pid": "28264",
+        "related.hosts": [
+            "testlab.local"
+        ],
+        "related.user": [
+            "SYS"
+        ],
         "server.address": "testlab.local",
         "server.domain": "testlab.local",
         "server.user.name": "SYS",

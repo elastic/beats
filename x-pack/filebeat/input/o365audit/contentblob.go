@@ -6,15 +6,15 @@ package o365audit
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/Azure/go-autorest/autorest"
-	"github.com/pkg/errors"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit/poll"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // contentBlob is a poll.Transaction that processes "content blobs":
@@ -53,13 +53,13 @@ func (c contentBlob) OnResponse(response *http.Response) (actions []poll.Action)
 	}
 	var raws []json.RawMessage
 	if err := readJSONBody(response, &raws); err != nil {
-		return append(actions, poll.Terminate(errors.Wrap(err, "reading body failed")))
+		return append(actions, poll.Terminate(fmt.Errorf("reading body failed: %w", err)))
 	}
-	entries := make([]common.MapStr, len(raws))
+	entries := make([]mapstr.M, len(raws))
 	for idx, raw := range raws {
-		var entry common.MapStr
+		var entry mapstr.M
 		if err := json.Unmarshal(raw, &entry); err != nil {
-			return append(actions, poll.Terminate(errors.Wrap(err, "decoding json failed")))
+			return append(actions, poll.Terminate(fmt.Errorf("decoding json failed: %w", err)))
 		}
 		entries[idx] = entry
 		id, _ := getString(entry, "Id")

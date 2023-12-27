@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package node
 
@@ -25,24 +24,51 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/suite"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// this file is used for the tests to compare expected result
 const testFile = "../_meta/test/stats_summary.json"
 
-func TestEventMapping(t *testing.T) {
+type NodeTestSuite struct {
+	suite.Suite
+	Logger *logp.Logger
+}
+
+func (s *NodeTestSuite) SetupTest() {
+	s.Logger = logp.NewLogger("kubernetes.node")
+}
+
+func (s *NodeTestSuite) ReadTestFile(testFile string) []byte {
 	f, err := os.Open(testFile)
-	assert.NoError(t, err, "cannot open test file "+testFile)
+	s.NoError(err, "cannot open test file "+testFile)
 
 	body, err := ioutil.ReadAll(f)
-	assert.NoError(t, err, "cannot read test file "+testFile)
+	s.NoError(err, "cannot read test file "+testFile)
 
-	event, err := eventMapping(body)
-	assert.NoError(t, err, "error mapping "+testFile)
+	return body
+}
 
-	testCases := map[string]interface{}{
+func (s *NodeTestSuite) TestEventMapping() {
+	body := s.ReadTestFile(testFile)
+	event, err := eventMapping(body, s.Logger)
+
+	s.basicTests(event, err)
+}
+
+func (s *NodeTestSuite) testValue(event mapstr.M, field string, expected interface{}) {
+	data, err := event.GetValue(field)
+	s.NoError(err, "Could not read field "+field)
+	s.EqualValues(expected, data, "Wrong value for field "+field)
+}
+
+func (s *NodeTestSuite) basicTests(event mapstr.M, err error) {
+	s.NoError(err, "error mapping "+testFile)
+
+	basicTestCases := map[string]interface{}{
 		"cpu.usage.core.ns":   int64(4189523881380),
 		"cpu.usage.nanocores": 18691146,
 
@@ -72,13 +98,15 @@ func TestEventMapping(t *testing.T) {
 		"runtime.imagefs.used.bytes":      860204379,
 	}
 
+	s.RunMetricsTests(event, basicTestCases)
+}
+
+func (s *NodeTestSuite) RunMetricsTests(event mapstr.M, testCases map[string]interface{}) {
 	for k, v := range testCases {
-		testValue(t, event, k, v)
+		s.testValue(event, k, v)
 	}
 }
 
-func testValue(t *testing.T, event common.MapStr, field string, value interface{}) {
-	data, err := event.GetValue(field)
-	assert.NoError(t, err, "Could not read field "+field)
-	assert.EqualValues(t, data, value, "Wrong value for field "+field)
+func TestNodeTestSuite(t *testing.T) {
+	suite.Run(t, new(NodeTestSuite))
 }

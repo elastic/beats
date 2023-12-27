@@ -19,15 +19,14 @@ package jmx
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 	"sort"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type JMXMapping struct {
@@ -52,26 +51,28 @@ type Target struct {
 // RequestBlock is used to build the request blocks of the following format:
 //
 // [
-//    {
-//       "type":"read",
-//       "mbean":"java.lang:type=Runtime",
-//       "attribute":[
-//          "Uptime"
-//       ]
-//    },
-//    {
-//       "type":"read",
-//       "mbean":"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep",
-//       "attribute":[
-//          "CollectionTime",
-//          "CollectionCount"
-//       ],
-//       "target":{
-//          "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
-//          "user":"jolokia",
-//          "password":"s!cr!t"
-//       }
-//    }
+//
+//	{
+//	   "type":"read",
+//	   "mbean":"java.lang:type=Runtime",
+//	   "attribute":[
+//	      "Uptime"
+//	   ]
+//	},
+//	{
+//	   "type":"read",
+//	   "mbean":"java.lang:type=GarbageCollector,name=ConcurrentMarkSweep",
+//	   "attribute":[
+//	      "CollectionTime",
+//	      "CollectionCount"
+//	   ],
+//	   "target":{
+//	      "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
+//	      "user":"jolokia",
+//	      "password":"s!cr!t"
+//	   }
+//	}
+//
 // ]
 type RequestBlock struct {
 	Type      string                 `json:"type"`
@@ -83,11 +84,11 @@ type RequestBlock struct {
 
 // TargetBlock is used to build the target blocks of the following format into RequestBlock.
 //
-// "target":{
-//    "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
-//    "user":"jolokia",
-//    "password":"s!cr!t"
-// }
+//	"target":{
+//	   "url":"service:jmx:rmi:///jndi/rmi://targethost:9999/jmxrmi",
+//	   "user":"jolokia",
+//	   "password":"s!cr!t"
+//	}
 type TargetBlock struct {
 	URL      string `json:"url"`
 	User     string `json:"user,omitempty"`
@@ -117,12 +118,12 @@ type MBeanName struct {
 }
 
 // Parse strings with properties with the format key=value, being:
-// - Key a nonempty string of characters which may not contain any of the characters,
-//   comma (,), equals (=), colon, asterisk, or question mark.
-// - Value a string that can be quoted or unquoted, if unquoted it cannot be empty and
-//   cannot contain any of the characters comma, equals, colon, or quote.
-//   If quoted, it can contain any character, including newlines, but quote needs to be
-//   escaped with a backslash.
+//   - Key a nonempty string of characters which may not contain any of the characters,
+//     comma (,), equals (=), colon, asterisk, or question mark.
+//   - Value a string that can be quoted or unquoted, if unquoted it cannot be empty and
+//     cannot contain any of the characters comma, equals, colon, or quote.
+//     If quoted, it can contain any character, including newlines, but quote needs to be
+//     escaped with a backslash.
 var mbeanRegexp = regexp.MustCompile(`([^,=:*?]+)=([^,=:"]+|"([^\\"]|\\.)*?")`)
 
 // This replacer is responsible for adding a "!" before special characters in GET request URIs
@@ -245,8 +246,8 @@ type JolokiaHTTPRequestFetcher interface {
 	// BuildRequestsAndMappings builds the request information and mappings needed to fetch information from Jolokia server
 	BuildRequestsAndMappings(configMappings []JMXMapping) ([]*JolokiaHTTPRequest, AttributeMapping, error)
 	// Fetches the information from Jolokia server regarding MBeans
-	Fetch(m *MetricSet) ([]common.MapStr, error)
-	EventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error)
+	Fetch(m *MetricSet) ([]mapstr.M, error)
+	EventMapping(content []byte, mapping AttributeMapping) ([]mapstr.M, error)
 }
 
 // JolokiaHTTPGetFetcher constructs and executes an HTTP GET request
@@ -341,9 +342,9 @@ func (pc *JolokiaHTTPGetFetcher) buildGetRequestURIs(mappings []JMXMapping) ([]s
 }
 
 // Fetch perfrorms one or more GET requests to Jolokia server and gets information about MBeans.
-func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
+func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 
-	var allEvents []common.MapStr
+	var allEvents []mapstr.M
 
 	// Prepare Http request objects and attribute mappings according to selected Http method
 	httpReqs, mapping, err := pc.BuildRequestsAndMappings(m.mapping)
@@ -387,13 +388,13 @@ func (pc *JolokiaHTTPGetFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
 }
 
 // EventMapping maps a Jolokia response from a GET request is to one or more Metricbeat events
-func (pc *JolokiaHTTPGetFetcher) EventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error) {
+func (pc *JolokiaHTTPGetFetcher) EventMapping(content []byte, mapping AttributeMapping) ([]mapstr.M, error) {
 
 	var singleEntry Entry
 
 	// When we use GET, the response is a single Entry
 	if err := json.Unmarshal(content, &singleEntry); err != nil {
-		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
+		return nil, fmt.Errorf("failed to unmarshal jolokia JSON response '%v': %w", string(content), err)
 	}
 
 	return eventMapping([]Entry{singleEntry}, mapping)
@@ -470,7 +471,7 @@ func (pc *JolokiaHTTPPostFetcher) buildRequestBodyAndMapping(mappings []JMXMappi
 }
 
 // Fetch perfrorms a POST request to Jolokia server and gets information about MBeans.
-func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
+func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]mapstr.M, error) {
 
 	// Prepare Http POST request object and attribute mappings according to selected Http method
 	httpReqs, mapping, err := pc.BuildRequestsAndMappings(m.mapping)
@@ -482,7 +483,7 @@ func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
 	if logp.IsDebug(metricsetName) {
 		for _, r := range httpReqs {
 			m.log.Debugw("Jolokia request URI and body",
-				"httpMethod", r.HTTPMethod, "URI", r.URI, "body", string(r.Body), "type", "request")
+				"httpMethod", r.HTTPMethod, "URI", m.http.GetURI(), "body", string(r.Body), "type", "request")
 		}
 	}
 
@@ -509,14 +510,13 @@ func (pc *JolokiaHTTPPostFetcher) Fetch(m *MetricSet) ([]common.MapStr, error) {
 }
 
 // EventMapping maps a Jolokia response from a POST request is to one or more Metricbeat events
-func (pc *JolokiaHTTPPostFetcher) EventMapping(content []byte, mapping AttributeMapping) ([]common.MapStr, error) {
+func (pc *JolokiaHTTPPostFetcher) EventMapping(content []byte, mapping AttributeMapping) ([]mapstr.M, error) {
 
 	var entries []Entry
 
 	// When we use POST, the response is an array of Entry objects
 	if err := json.Unmarshal(content, &entries); err != nil {
-
-		return nil, errors.Wrapf(err, "failed to unmarshal jolokia JSON response '%v'", string(content))
+		return nil, fmt.Errorf("failed to unmarshal jolokia JSON response '%v': %w", string(content), err)
 	}
 
 	return eventMapping(entries, mapping)

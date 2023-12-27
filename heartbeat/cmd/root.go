@@ -21,11 +21,11 @@ import (
 
 	// include all heartbeat specific autodiscovery builders
 	_ "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"github.com/elastic/beats/v7/heartbeat/beater"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 
@@ -44,8 +44,8 @@ const (
 var RootCmd *cmd.BeatsRootCmd
 
 // withECSVersion is a modifier that adds ecs.version to events.
-var withECSVersion = processing.WithFields(common.MapStr{
-	"ecs": common.MapStr{
+var withECSVersion = processing.WithFields(mapstr.M{
+	"ecs": mapstr.M{
 		"version": ecs.Version,
 	},
 })
@@ -54,7 +54,7 @@ var withECSVersion = processing.WithFields(common.MapStr{
 func HeartbeatSettings() instance.Settings {
 	return instance.Settings{
 		Name:          Name,
-		Processing:    processing.MakeDefaultSupport(true, withECSVersion, processing.WithAgentMeta()),
+		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithAgentMeta()),
 		HasDashboards: false,
 	}
 }

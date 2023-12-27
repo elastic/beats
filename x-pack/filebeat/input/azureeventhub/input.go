@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build !aix
-// +build !aix
 
 package azureeventhub
 
@@ -15,22 +14,58 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
+	eventhub "github.com/Azure/azure-event-hubs-go/v3"
+	"github.com/Azure/azure-event-hubs-go/v3/eph"
+	"github.com/mitchellh/hashstructure"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
-
-	eventhub "github.com/Azure/azure-event-hubs-go/v3"
-	"github.com/Azure/azure-event-hubs-go/v3/eph"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
 	eventHubConnector        = ";EntityPath="
 	expandEventListFromField = "records"
+	inputName                = "azure-eventhub"
 )
+
+func init() {
+	err := input.Register(inputName, NewInput)
+	if err != nil {
+		panic(fmt.Errorf("failed to register %v input: %w", inputName, err))
+	}
+}
+
+// configID computes a unique ID for the input configuration.
+//
+// It is used to identify the input in the registry and to detect
+// changes in the configuration.
+//
+// We will remove this function as we upgrade the input to the
+// v2 API (there is an ID in the v2 context).
+func configID(config *conf.C) (string, error) {
+	var tmp struct {
+		ID string `config:"id"`
+	}
+	if err := config.Unpack(&tmp); err != nil {
+		return "", fmt.Errorf("error extracting ID: %w", err)
+	}
+	if tmp.ID != "" {
+		return tmp.ID, nil
+	}
+
+	var h map[string]interface{}
+	_ = config.Unpack(&h)
+	id, err := hashstructure.Hash(h, nil)
+	if err != nil {
+		return "", fmt.Errorf("can not compute ID from configuration: %w", err)
+	}
+
+	return fmt.Sprintf("%16X", id), nil
+}
 
 // azureInput struct for the azure-eventhub input
 type azureInput struct {
@@ -41,32 +76,31 @@ type azureInput struct {
 	workerCtx    context.Context         // worker goroutine context. It's cancelled when the input stops or the worker exits.
 	workerCancel context.CancelFunc      // used to signal that the worker should stop.
 	workerOnce   sync.Once               // guarantees that the worker goroutine is only started once.
-	workerWg     sync.WaitGroup          // waits on worker goroutine.
 	processor    *eph.EventProcessorHost // eph will be assigned if users have enabled the option
-	hub          *eventhub.Hub           // hub will be assigned
-	ackChannel   chan int
-}
-
-const (
-	inputName = "azure-eventhub"
-)
-
-func init() {
-	err := input.Register(inputName, NewInput)
-	if err != nil {
-		panic(errors.Wrapf(err, "failed to register %v input", inputName))
-	}
+	id           string                  // ID of the input; used to identify the input in the input metrics registry only, and will be removed once the input is migrated to v2.
+	metrics      *inputMetrics           // Metrics for the input.
 }
 
 // NewInput creates a new azure-eventhub input
 func NewInput(
-	cfg *common.Config,
+	cfg *conf.C,
 	connector channel.Connector,
 	inputContext input.Context,
 ) (input.Input, error) {
 	var config azureInputConfig
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrapf(err, "reading %s input config", inputName)
+		return nil, fmt.Errorf("reading %s input config: %w", inputName, err)
+	}
+
+	// Since this is a v1 input, we need to set the ID manually.
+	//
+	// We need an ID to identify the input in the input metrics
+	// registry.
+	//
+	// This is a temporary workaround until we migrate the input to v2.
+	inputId, err := configID(cfg)
+	if err != nil {
+		return nil, err
 	}
 
 	inputCtx, cancelInputCtx := context.WithCancel(context.Background())
@@ -82,7 +116,8 @@ func NewInput(
 	// to be recreated with each restart.
 	workerCtx, workerCancel := context.WithCancel(inputCtx)
 
-	in := &azureInput{
+	in := azureInput{
+		id:           inputId,
 		config:       config,
 		log:          logp.NewLogger(fmt.Sprintf("%s input", inputName)).With("connection string", stripConnectionString(config.ConnectionString)),
 		context:      inputContext,
@@ -95,77 +130,60 @@ func NewInput(
 	}
 	in.outlet = out
 	in.log.Infof("Initialized %s input.", inputName)
-	return in, nil
+
+	return &in, nil
 }
 
-// Run starts the input worker then returns. Only the first invocation
-// will ever start the worker.
+// Run starts the `azure-eventhub` input and then returns.
+//
+// The first invocation will start an input worker. All subsequent
+// invocations will be no-ops.
+//
+// The input worker will continue fetching data from the event hub until
+// the input Runner calls the `Stop()` method.
 func (a *azureInput) Run() {
+	// `Run` is invoked periodically by the input Runner. The `sync.Once`
+	// guarantees that we only start the worker once during the first
+	// invocation.
 	a.workerOnce.Do(func() {
-		a.workerWg.Add(1)
-		go func() {
-			a.log.Infof("%s input worker has started.", inputName)
-			defer a.log.Infof("%s input worker has stopped.", inputName)
-			defer a.workerWg.Done()
-			defer a.workerCancel()
-			err := a.runWithEPH()
-			if err != nil {
-				a.log.Error(err)
-				return
-			}
-		}()
+		a.log.Infof("%s input worker is starting.", inputName)
+
+		// We set up the metrics in the `Run()` method and tear them down
+		// in the `Stop()` method.
+		//
+		// The factory method `NewInput` is not a viable solution because
+		// the Runner invokes it during the configuration check without
+		// calling the `Stop()` function; this causes panics
+		// due to multiple metrics registrations.
+		a.metrics = newInputMetrics(a.id, nil)
+
+		err := a.runWithEPH()
+		if err != nil {
+			a.log.Errorw("error starting the input worker", "error", err)
+			return
+		}
+		a.log.Infof("%s input worker has started.", inputName)
 	})
 }
 
-// run will run the input with the non-eph version, this option will be available once a more reliable storage is in place, it is curently using an in-memory storage
-//func (a *azureInput) run() error {
-//	var err error
-//	a.hub, err = eventhub.NewHubFromConnectionString(fmt.Sprintf("%s%s%s", a.config.ConnectionString, eventHubConnector, a.config.EventHubName))
-//	if err != nil {
-//		return err
-//	}
-//	// listen to each partition of the Event Hub
-//	runtimeInfo, err := a.hub.GetRuntimeInformation(a.workerCtx)
-//	if err != nil {
-//		return err
-//	}
-//
-//	for _, partitionID := range runtimeInfo.PartitionIDs {
-//		// Start receiving messages
-//		handler := func(c context.Context, event *eventhub.Event) error {
-//			a.log.Info(string(event.Data))
-//			return a.processEvents(event, partitionID)
-//		}
-//		var err error
-//		// sending a nill ReceiveOption will throw an exception
-//		if a.config.ConsumerGroup != "" {
-//			_, err = a.hub.Receive(a.workerCtx, partitionID, handler, eventhub.ReceiveWithConsumerGroup(a.config.ConsumerGroup))
-//		} else {
-//			_, err = a.hub.Receive(a.workerCtx, partitionID, handler)
-//		}
-//		if err != nil {
-//			return err
-//		}
-//	}
-//	return nil
-//}
-
-// Stop stops TCP server
+// Stop stops `azure-eventhub` input.
 func (a *azureInput) Stop() {
-	if a.hub != nil {
-		err := a.hub.Close(a.workerCtx)
-		if err != nil {
-			a.log.Errorw(fmt.Sprintf("error while closing eventhub"), "error", err)
-		}
-	}
+	a.log.Infof("%s input worker is stopping.", inputName)
 	if a.processor != nil {
-		err := a.processor.Close(a.workerCtx)
+		// Tells the processor to stop processing events and release all
+		// resources (like scheduler, leaser, checkpointer, and client).
+		err := a.processor.Close(context.Background())
 		if err != nil {
-			a.log.Errorw(fmt.Sprintf("error while closing eventhostprocessor"), "error", err)
+			a.log.Errorw("error while closing eventhostprocessor", "error", err)
 		}
 	}
+
+	if a.metrics != nil {
+		a.metrics.Close()
+	}
+
 	a.workerCancel()
-	a.workerWg.Wait()
+	a.log.Infof("%s input worker has stopped.", inputName)
 }
 
 // Wait stop the current server
@@ -174,37 +192,62 @@ func (a *azureInput) Wait() {
 }
 
 func (a *azureInput) processEvents(event *eventhub.Event, partitionID string) bool {
-	timestamp := time.Now()
-	azure := common.MapStr{
+	processingStartTime := time.Now()
+	azure := mapstr.M{
 		// partitionID is only mapped in the non-eph option which is not available yet, this field will be temporary unavailable
 		//"partition_id":   partitionID,
 		"eventhub":       a.config.EventHubName,
 		"consumer_group": a.config.ConsumerGroup,
 	}
-	messages := a.parseMultipleMessages(event.Data)
-	for _, msg := range messages {
-		azure.Put("offset", event.SystemProperties.Offset)
-		azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
-		azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
+
+	// update the input metrics
+	a.metrics.receivedMessages.Inc()
+	a.metrics.receivedBytes.Add(uint64(len(event.Data)))
+
+	records := a.parseMultipleRecords(event.Data)
+
+	for _, record := range records {
+		_, _ = azure.Put("offset", event.SystemProperties.Offset)
+		_, _ = azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
+		_, _ = azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
 		ok := a.outlet.OnEvent(beat.Event{
-			Timestamp: timestamp,
-			Fields: common.MapStr{
-				"message": msg,
+			// this is the default value for the @timestamp field; usually the ingest
+			// pipeline replaces it with a value in the payload.
+			Timestamp: processingStartTime,
+			Fields: mapstr.M{
+				"message": record,
 				"azure":   azure,
 			},
 			Private: event.Data,
 		})
 		if !ok {
+			a.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
 			return ok
 		}
+
+		a.metrics.sentEvents.Inc()
 	}
+
+	a.metrics.processedMessages.Inc()
+	a.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
+
 	return true
 }
 
-// parseMultipleMessages will try to split the message into multiple ones based on the group field provided by the configuration
-func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
+// parseMultipleRecords will try to split the message into multiple ones based on the group field provided by the configuration
+func (a *azureInput) parseMultipleRecords(bMessage []byte) []string {
 	var mapObject map[string][]interface{}
 	var messages []string
+
+	// Clean up the message for known issues [1] where Azure services produce malformed JSON documents.
+	// Sanitization occurs if options are available and the message contains an invalid JSON.
+	//
+	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
+	if len(a.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
+		bMessage = sanitize(bMessage, a.config.SanitizeOptions...)
+		a.metrics.sanitizedMessages.Inc()
+	}
+
 	// check if the message is a "records" object containing a list of events
 	err := json.Unmarshal(bMessage, &mapObject)
 	if err == nil {
@@ -213,6 +256,7 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 				js, err := json.Marshal(ms)
 				if err == nil {
 					messages = append(messages, string(js))
+					a.metrics.receivedEvents.Inc()
 				} else {
 					a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
 				}
@@ -226,17 +270,21 @@ func (a *azureInput) parseMultipleMessages(bMessage []byte) []string {
 		if err != nil {
 			// return entire message
 			a.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
+			a.metrics.decodeErrors.Inc()
 			return []string{string(bMessage)}
 		}
+
 		for _, ms := range arrayObject {
 			js, err := json.Marshal(ms)
 			if err == nil {
 				messages = append(messages, string(js))
+				a.metrics.receivedEvents.Inc()
 			} else {
 				a.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
 			}
 		}
 	}
+
 	return messages
 }
 

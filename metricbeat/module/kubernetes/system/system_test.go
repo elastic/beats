@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build !integration
-// +build !integration
 
 package system
 
@@ -27,19 +26,22 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const testFile = "../_meta/test/stats_summary.json"
 
 func TestEventMapping(t *testing.T) {
+	logger := logp.NewLogger("kubernetes.system")
+
 	f, err := os.Open(testFile)
 	assert.NoError(t, err, "cannot open test file "+testFile)
 
 	body, err := ioutil.ReadAll(f)
 	assert.NoError(t, err, "cannot read test file "+testFile)
 
-	events, err := eventMapping(body)
+	events, err := eventMapping(body, logger)
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	assert.Len(t, events, 1, "got wrong number of events")
@@ -62,7 +64,7 @@ func TestEventMapping(t *testing.T) {
 	}
 }
 
-func testValue(t *testing.T, event common.MapStr, field string, value interface{}) {
+func testValue(t *testing.T, event mapstr.M, field string, value interface{}) {
 	data, err := event.GetValue(field)
 	assert.NoError(t, err, "Could not read field "+field)
 	assert.EqualValues(t, data, value, "Wrong value for field "+field)

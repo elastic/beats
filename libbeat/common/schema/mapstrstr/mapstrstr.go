@@ -29,12 +29,12 @@ into metricbeat events. For example, given this input object:
 
 And the requirement to transform it into this one:
 
-	common.MapStr{
+	mapstr.M{
 		"test_string": "hello",
 		"test_int":    int64(42),
 		"test_bool":   true,
 		"test_float":  42.1,
-		"test_obj": common.MapStr{
+		"test_obj": mapstr.M{
 			"test_obj_string": "hello, object",
 		},
 	}

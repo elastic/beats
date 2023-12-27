@@ -40,6 +40,9 @@
         "mysql.slowlog.tmp_table_sizes": 606208,
         "mysql.slowlog.tmp_tables": 376,
         "mysql.thread_id": 14367293,
+        "related.user": [
+            "exporter"
+        ],
         "service.type": "mysql",
         "source.domain": "localhost",
         "user.name": "exporter"
@@ -93,6 +96,12 @@
         "mysql.slowlog.tmp_table_sizes": 0,
         "mysql.slowlog.tmp_tables": 0,
         "mysql.thread_id": 14370752,
+        "related.ip": [
+            "192.168.123.123"
+        ],
+        "related.user": [
+            "test"
+        ],
         "service.type": "mysql",
         "source.ip": "192.168.123.123",
         "user.name": "test"

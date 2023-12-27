@@ -2,24 +2,38 @@
     "@timestamp": "2017-10-12T08:05:34.853Z",
     "event": {
         "action": "existing_package",
+        "category": [
+            "package"
+        ],
         "dataset": "package",
-        "id": "5cafbacd-9288-4022-be30-521db563f669",
+        "id": "6bed65c5-9797-4fb7-9ec7-2d1873c54371",
         "kind": "state",
-        "module": "system"
+        "module": "system",
+        "type": [
+            "info"
+        ]
     },
-    "message": "Package zstd (1.3.5) is already installed",
+    "message": "Package zstd (1.5.4) is already installed",
+    "package": {
+        "description": "Zstandard is a real-time compression algorithm",
+        "installed": "2023-02-15T20:40:24.390086982-05:00",
+        "name": "zstd",
+        "reference": "https://facebook.github.io/zstd/",
+        "type": "brew",
+        "version": "1.5.4"
+    },
     "service": {
         "type": "system"
     },
     "system": {
         "audit": {
             "package": {
-                "entity_id": "wsRV2fmTddn+/GHa",
-                "installtime": "2018-08-30T18:41:23.85657356+01:00",
+                "entity_id": "SxYD3ZMh/Ym0lBIk",
+                "installtime": "2023-02-15T20:40:24.390086982-05:00",
                 "name": "zstd",
                 "summary": "Zstandard is a real-time compression algorithm",
                 "url": "https://facebook.github.io/zstd/",
-                "version": "1.3.5"
+                "version": "1.5.4"
             }
         }
     }

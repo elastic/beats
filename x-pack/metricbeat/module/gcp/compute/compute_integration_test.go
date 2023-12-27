@@ -3,7 +3,6 @@
 // you may not use this file except in compliance with the Elastic License.
 
 //go:build integration && gcp
-// +build integration,gcp
 
 package compute
 
@@ -13,9 +12,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp/metrics"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestFetch(t *testing.T) {
@@ -33,8 +32,8 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
-	metricPrefixIs := func(metricPrefix string) func(e common.MapStr) bool {
-		return func(e common.MapStr) bool {
+	metricPrefixIs := func(metricPrefix string) func(e mapstr.M) bool {
+		return func(e mapstr.M) bool {
 			v, err := e.GetValue(metricPrefix)
 			return err == nil && v != nil
 		}

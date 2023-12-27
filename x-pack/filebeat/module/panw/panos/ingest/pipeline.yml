@@ -4,10 +4,16 @@ processors:
       field: event.ingested
       value: '{{_ingest.timestamp}}'
 
-  # keep message as event.original.
+  # # warn if event.original has already been set. this is most likely due to logstash ecs_compatibiliy setting.
+  - append:
+      if: ctx.event?.original != null
+      field: error.message
+      value: 'event.original is set before start of ingest pipeline'
+  # keep message as event.original if it has not already been set.
   - rename:
       field: message
       target_field: event.original
+      ignore_failure: true
 
 # Get the timezone from the IETF header if present. Otherwise the timezone
 # value added by the add_locale processor will be used.
@@ -431,7 +437,7 @@ processors:
   - grok:
       field: url.original
       patterns:
-        - '(%{ANY:url.scheme}\:\/\/)?(%{USERNAME:url.username}(\:%{PASSWORD:url.password})?\@)?%{DOMAIN:url.domain}(\:%{POSINT:url.port})?(%{PATH:url.path})?(\?%{QUERY:url.query})?(\#%{ANY:url.fragment})?'
+        - '(%{URIPROTO:url.scheme}\:\/\/)?(%{USERNAME:url.username}(\:%{PASSWORD:url.password})?\@)?%{DOMAIN:url.domain}(\:%{POSINT:url.port})?(%{PATH:url.path})?(\?%{QUERY:url.query})?(\#%{ANY:url.fragment})?'
       ignore_missing: true
       pattern_definitions:
         USERNAME: '[^\:]*'
@@ -564,7 +570,7 @@ processors:
       if: 'ctx?.destination?.nat?.ip == "0.0.0.0" && ctx?.destination?.nat?.port == 0'
 
 on_failure:
-  - set:
+  - append:
       field: "error.message"
       value: "{{ _ingest.on_failure_message }}"
   - remove:

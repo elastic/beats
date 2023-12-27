@@ -23,8 +23,6 @@ import (
 	"github.com/elastic/beats/v7/packetbeat/cmd"
 )
 
-var Name = "packetbeat"
-
 // Setups and Runs Packetbeat
 func main() {
 	if err := cmd.RootCmd.Execute(); err != nil {

@@ -22,14 +22,14 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const FieldMetaCustomDataset = "dataset"
 
 func SetEventDataset(event *beat.Event, ds string) {
 	if event.Meta == nil {
-		event.Meta = common.MapStr{
+		event.Meta = mapstr.M{
 			FieldMetaCustomDataset: ds,
 		}
 	} else {
@@ -68,7 +68,7 @@ func New(ds DataStream) *AddDataStream {
 func (p *AddDataStream) Run(event *beat.Event) (*beat.Event, error) {
 	eventDataStream := p.DataStream
 	if event.Meta == nil {
-		event.Meta = common.MapStr{
+		event.Meta = mapstr.M{
 			events.FieldMetaRawIndex: p.idxNameCache,
 		}
 	} else {
@@ -81,7 +81,7 @@ func (p *AddDataStream) Run(event *beat.Event) (*beat.Event, error) {
 		}
 	}
 	if event.Fields == nil {
-		event.Fields = common.MapStr{}
+		event.Fields = mapstr.M{}
 	}
 	event.PutValue("event.dataset", eventDataStream.Dataset)
 	event.PutValue("data_stream", eventDataStream)

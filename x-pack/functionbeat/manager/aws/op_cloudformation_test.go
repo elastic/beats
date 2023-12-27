@@ -5,21 +5,19 @@
 package aws
 
 import (
+	"context"
 	"errors"
-	"net/http"
 	"testing"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/cloudformation/types"
+
 	"github.com/aws/aws-sdk-go-v2/service/cloudformation"
-	"github.com/aws/aws-sdk-go-v2/service/cloudformation/cloudformationiface"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type mockCloudformationStack struct {
-	cloudformationiface.ClientAPI
-
 	respCreateStackOutput *cloudformation.CreateStackOutput
 	onCreateStackInput    func(*cloudformation.CreateStackInput)
 
@@ -34,80 +32,52 @@ type mockCloudformationStack struct {
 	err                   error
 }
 
-func (m *mockCloudformationStack) CreateStackRequest(
-	input *cloudformation.CreateStackInput,
-) cloudformation.CreateStackRequest {
+func (m *mockCloudformationStack) CreateStack(ctx context.Context, params *cloudformation.CreateStackInput, optFns ...func(*cloudformation.Options)) (*cloudformation.CreateStackOutput, error) {
 	if m.onCreateStackInput != nil {
-		m.onCreateStackInput(input)
+		m.onCreateStackInput(params)
 	}
 
-	httpReq, _ := http.NewRequest("", "", nil)
 	if m.err != nil {
-		return cloudformation.CreateStackRequest{
-			Request: &aws.Request{Data: m.respCreateStackOutput, Error: m.err, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
-		}
+		return m.respCreateStackOutput, m.err
 	}
 
-	return cloudformation.CreateStackRequest{
-		Request: &aws.Request{Data: m.respCreateStackOutput, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
-	}
+	return m.respCreateStackOutput, nil
 }
 
-func (m *mockCloudformationStack) DeleteStackRequest(
-	input *cloudformation.DeleteStackInput,
-) cloudformation.DeleteStackRequest {
+func (m *mockCloudformationStack) DeleteStack(ctx context.Context, params *cloudformation.DeleteStackInput, optFns ...func(*cloudformation.Options)) (*cloudformation.DeleteStackOutput, error) {
 	if m.onDeleteStackInput != nil {
-		m.onDeleteStackInput(input)
+		m.onDeleteStackInput(params)
 	}
 
-	httpReq, _ := http.NewRequest("", "", nil)
 	if m.err != nil {
-		return cloudformation.DeleteStackRequest{
-			Request: &aws.Request{Data: m.respDeleteStackOutput, Error: m.err, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
-		}
+		return m.respDeleteStackOutput, m.err
 	}
 
-	return cloudformation.DeleteStackRequest{
-		Request: &aws.Request{Data: m.respDeleteStackOutput, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
-	}
+	return m.respDeleteStackOutput, nil
 }
 
-func (m *mockCloudformationStack) DescribeStacksRequest(
-	input *cloudformation.DescribeStacksInput,
-) cloudformation.DescribeStacksRequest {
+func (m *mockCloudformationStack) DescribeStacks(ctx context.Context, params *cloudformation.DescribeStacksInput, optFns ...func(*cloudformation.Options)) (*cloudformation.DescribeStacksOutput, error) {
 	if m.onDescribeStacksInput != nil {
-		m.onDescribeStacksInput(input)
+		m.onDescribeStacksInput(params)
 	}
 
-	httpReq, _ := http.NewRequest("", "", nil)
 	if m.err != nil {
-		return cloudformation.DescribeStacksRequest{
-			Request: &aws.Request{Data: m.respDescribeStacksOutput, Error: m.err, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
-		}
+		return m.respDescribeStacksOutput, m.err
 	}
 
-	return cloudformation.DescribeStacksRequest{
-		Request: &aws.Request{Data: m.respDescribeStacksOutput, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
-	}
+	return m.respDescribeStacksOutput, nil
 }
 
-func (m *mockCloudformationStack) UpdateStackRequest(
-	input *cloudformation.UpdateStackInput,
-) cloudformation.UpdateStackRequest {
+func (m *mockCloudformationStack) UpdateStack(ctx context.Context, params *cloudformation.UpdateStackInput, optFns ...func(*cloudformation.Options)) (*cloudformation.UpdateStackOutput, error) {
 	if m.onUpdateStackInput != nil {
-		m.onUpdateStackInput(input)
+		m.onUpdateStackInput(params)
 	}
 
-	httpReq, _ := http.NewRequest("", "", nil)
 	if m.err != nil {
-		return cloudformation.UpdateStackRequest{
-			Request: &aws.Request{Data: m.respUpdateStackOutput, Error: m.err, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
-		}
+		return m.respUpdateStackOutput, m.err
 	}
 
-	return cloudformation.UpdateStackRequest{
-		Request: &aws.Request{Data: m.respUpdateStackOutput, HTTPRequest: httpReq, Retryer: aws.NoOpRetryer{}},
-	}
+	return m.respUpdateStackOutput, nil
 }
 
 func TestCreateStack(t *testing.T) {
@@ -171,7 +141,7 @@ func TestDeleteStack(t *testing.T) {
 				assert.Equal(t, stackName, *input.StackName)
 			},
 			respDescribeStacksOutput: &cloudformation.DescribeStacksOutput{
-				Stacks: []cloudformation.Stack{cloudformation.Stack{StackId: &stackID}},
+				Stacks: []types.Stack{types.Stack{StackId: &stackID}},
 			},
 		}
 		ctx := &stackContext{}

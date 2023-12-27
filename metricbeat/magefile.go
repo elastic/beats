@@ -16,7 +16,6 @@
 // under the License.
 
 //go:build mage
-// +build mage
 
 package main
 
@@ -35,23 +34,23 @@ import (
 	// register kubernetes runner
 	_ "github.com/elastic/beats/v7/dev-tools/mage/kubernetes"
 
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/dashboards"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/docs"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/pkg"
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/test"
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/compose"
-	// mage:import
+	//mage:import
+	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
+	//mage:import
 	_ "github.com/elastic/beats/v7/metricbeat/scripts/mage/target/metricset"
 )
 
@@ -62,6 +61,11 @@ func init() {
 	unittest.RegisterPythonTestDeps(Fields)
 
 	devtools.BeatDescription = "Metricbeat is a lightweight shipper for metrics."
+}
+
+// BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+func BuildSystemTestBinary() error {
+	return devtools.BuildSystemTestBinary()
 }
 
 // CollectAll generates the docs and the fields.
@@ -84,6 +88,14 @@ func Package() {
 	mg.Deps(Update)
 	mg.Deps(build.CrossBuild, build.CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
+}
+
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
+	return nil
 }
 
 // TestPackages tests the generated packages (i.e. file modes, owners, groups).
@@ -182,6 +194,15 @@ func CollectDocs() error {
 	return metricbeat.CollectDocs()
 }
 
+// ExportDashboard exports a dashboard and writes it into the correct directory.
+//
+// Required environment variables:
+// - MODULE: Name of the module
+// - ID:     Dashboard id
+func ExportDashboard() error {
+	return devtools.ExportDashboard()
+}
+
 // IntegTest executes integration tests (it uses Docker to run the tests).
 func IntegTest() {
 	mg.SerialDeps(GoIntegTest, PythonIntegTest)
@@ -208,12 +229,21 @@ func PythonIntegTest(ctx context.Context) error {
 	if !devtools.IsInIntegTestEnv() {
 		mg.SerialDeps(Fields, Dashboards)
 	}
-	runner, err := devtools.NewDockerIntegrationRunner(devtools.ListMatchingEnvVars("PYTEST_")...)
+
+	passThroughEnvVars := append(
+		[]string{"ELASTICSEARCH_VERSION", "KIBANA_VERSION", "BEAT_VERSION"},
+		devtools.ListMatchingEnvVars("PYTEST_")...,
+	)
+	runner, err := devtools.NewDockerIntegrationRunner(passThroughEnvVars...)
 	if err != nil {
 		return err
 	}
 	return runner.Test("pythonIntegTest", func() error {
 		mg.Deps(devtools.BuildSystemTestBinary)
-		return devtools.PythonTestForModule(devtools.DefaultPythonTestIntegrationArgs())
+		args := devtools.DefaultPythonTestIntegrationArgs()
+		// Always create a fresh virtual environment when running tests in a container, until we get
+		// get the requirements installed as part of the container build.
+		args.ForceCreateVenv = true
+		return devtools.PythonTestForModule(args)
 	})
 }

@@ -2,10 +2,10 @@ version: '2.3'
 
 services:
   googlepubsub:
-    image: docker.elastic.co/integrations-ci/beats-googlepubsub:emulator-${SDK_VERSION:-293.0.0-0}-1
+    image: docker.elastic.co/integrations-ci/beats-googlepubsub:emulator-${SDK_VERSION:-398.0.0-0}-1
     build:
       context: ./_meta
       args:
-        SDK_VERSION: ${SDK_VERSION:-293.0.0-0}
+        SDK_VERSION: ${SDK_VERSION:-398.0.0-0}
     ports:
-      - 8432
+      - '127.0.0.1:8432:8432'

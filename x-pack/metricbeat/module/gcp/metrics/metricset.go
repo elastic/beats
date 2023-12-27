@@ -6,23 +6,22 @@ package metrics
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
-	monitoring "cloud.google.com/go/monitoring/apiv3"
-	"github.com/golang/protobuf/ptypes/duration"
-	"github.com/pkg/errors"
+	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/genproto/googleapis/api/metric"
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+	"google.golang.org/protobuf/types/known/durationpb"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -50,7 +49,7 @@ type MetricSet struct {
 	MetricsConfig []metricsConfig `config:"metrics" validate:"nonzero,required"`
 }
 
-//metricsConfig holds a configuration specific for metrics metricset.
+// metricsConfig holds a configuration specific for metrics metricset.
 type metricsConfig struct {
 	ServiceName string `config:"service"  validate:"required"`
 	// ServiceMetricPrefix allows to specify the prefix string for MetricTypes
@@ -99,22 +98,21 @@ type metricMeta struct {
 }
 
 type config struct {
-	Zone                string `config:"zone"`
-	Region              string `config:"region"`
-	ProjectID           string `config:"project_id" validate:"required"`
-	ExcludeLabels       bool   `config:"exclude_labels"`
-	CredentialsFilePath string `config:"credentials_file_path"`
-	CredentialsJSON     string `config:"credentials_json"`
+	Zone                string   `config:"zone"`
+	Region              string   `config:"region"`
+	Regions             []string `config:"regions"`
+	ProjectID           string   `config:"project_id" validate:"required"`
+	ExcludeLabels       bool     `config:"exclude_labels"`
+	CredentialsFilePath string   `config:"credentials_file_path"`
+	CredentialsJSON     string   `config:"credentials_json"`
 
 	opt    []option.ClientOption
-	period *duration.Duration
+	period *durationpb.Duration
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The gcp '%s' metricset is beta.", MetricsetName)
-
 	m := &MetricSet{BaseMetricSet: base}
 
 	if err := base.Module().UnpackConfig(&m.config); err != nil {
@@ -132,16 +130,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	m.MetricsConfig = metricsConfigs.Metrics
 
 	if m.config.CredentialsFilePath != "" && m.config.CredentialsJSON != "" {
-		return m, errors.New("both credentials_file_path and credentials_json specified, you must use only one of them")
+		return m, fmt.Errorf("both credentials_file_path and credentials_json specified, you must use only one of them")
 	} else if m.config.CredentialsFilePath != "" {
 		m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
 	} else if m.config.CredentialsJSON != "" {
 		m.config.opt = []option.ClientOption{option.WithCredentialsJSON([]byte(m.config.CredentialsJSON))}
 	} else {
-		return m, errors.New("no credentials_file_path or credentials_json specified")
+		return m, fmt.Errorf("no credentials_file_path or credentials_json specified")
 	}
 
-	m.config.period = &duration.Duration{
+	m.config.period = &durationpb.Duration{
 		Seconds: int64(m.Module().Config().Period.Seconds()),
 	}
 
@@ -153,12 +151,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ctx := context.Background()
 	client, err := monitoring.NewMetricClient(ctx, m.config.opt...)
 	if err != nil {
-		return nil, errors.Wrap(err, "error creating Stackdriver client")
+		return nil, fmt.Errorf("error creating Stackdriver client: %w", err)
 	}
 
 	m.metricsMeta, err = m.metricDescriptor(ctx, client)
 	if err != nil {
-		return nil, errors.Wrap(err, "error calling metricDescriptor function")
+		return nil, fmt.Errorf("error calling metricDescriptor function: %w", err)
 	}
 
 	m.requester = &metricsRequester{
@@ -184,68 +182,50 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 		for _, v := range sdc.MetricTypes {
 			metricsToCollect[sdc.AddPrefixTo(v)] = m.metricsMeta[sdc.AddPrefixTo(v)]
 		}
-		responses, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, metricsToCollect)
+
+		// Collect time series values from Google Cloud Monitoring API
+		timeSeries, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, metricsToCollect)
 		if err != nil {
-			err = errors.Wrapf(err, "error trying to get metrics for project '%s' and zone '%s' or region '%s'", m.config.ProjectID, m.config.Zone, m.config.Region)
+			err = fmt.Errorf("error trying to get metrics for project '%s' and zone '%s' or region '%s': %w", m.config.ProjectID, m.config.Zone, m.config.Region, err)
 			m.Logger().Error(err)
 			return err
 		}
 
-		events, err := m.eventMapping(ctx, responses, sdc)
+		events, err := m.mapToEvents(ctx, timeSeries, sdc)
 		if err != nil {
-			err = errors.Wrap(err, "eventMapping failed")
+			err = fmt.Errorf("mapToEvents failed: %w", err)
 			m.Logger().Error(err)
 			return err
 		}
 
+		// Publish events to Elasticsearch
 		m.Logger().Debugf("Total %d of events are created for service name = %s and metric type = %s.", len(events), sdc.ServiceName, sdc.MetricTypes)
 		for _, event := range events {
 			reporter.Event(event)
 		}
 	}
+
 	return nil
 }
 
-func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
-	e := newIncomingFieldExtractor(m.Logger(), sdc)
+// mapToEvents maps time series data from GCP into events for Elasticsearch.
+func (m *MetricSet) mapToEvents(ctx context.Context, timeSeries []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
+	mapper := newIncomingFieldMapper(m.Logger(), sdc)
 
-	var gcpService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
+	var metadataService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
 	var err error
 
 	if !m.config.ExcludeLabels {
-		if gcpService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
-			return nil, errors.Wrap(err, "error trying to create metadata service")
+		if metadataService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
+			return nil, fmt.Errorf("error trying to create metadata service: %w", err)
 		}
 	}
 
-	tsGrouped, err := m.timeSeriesGrouped(ctx, gcpService, tss, e)
-	if err != nil {
-		return nil, errors.Wrap(err, "error trying to group time series data")
-	}
+	// Group the time series values by common traits.
+	timeSeriesGroups := m.groupTimeSeries(ctx, timeSeries, metadataService, mapper)
 
-	//Create single events for each group of data that matches some common patterns like labels and timestamp
-	events := make([]mb.Event, 0)
-	for _, groupedEvents := range tsGrouped {
-		event := mb.Event{
-			Timestamp: groupedEvents[0].Timestamp,
-			ModuleFields: common.MapStr{
-				"labels": groupedEvents[0].Labels,
-			},
-			MetricSetFields: common.MapStr{},
-		}
-
-		for _, singleEvent := range groupedEvents {
-			event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
-		}
-
-		if sdc.ServiceName == "compute" {
-			event.RootFields = addHostFields(groupedEvents)
-		} else {
-			event.RootFields = groupedEvents[0].ECS
-		}
-
-		events = append(events, event)
-	}
+	// Create single events for each time series group.
+	events := createEventsFromGroups(sdc.ServiceName, timeSeriesGroups)
 
 	return events, nil
 }
@@ -253,7 +233,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 // validatePeriodForGCP returns nil if the Period in the module config is in the accepted threshold
 func validatePeriodForGCP(d time.Duration) (err error) {
 	if d.Seconds() < gcp.MonitoringMetricsSamplingRate {
-		return errors.Errorf("period in Google Cloud config file cannot be set to less than %d seconds", gcp.MonitoringMetricsSamplingRate)
+		return fmt.Errorf("period in Google Cloud config file cannot be set to less than %d seconds", gcp.MonitoringMetricsSamplingRate)
 	}
 
 	return nil
@@ -268,7 +248,7 @@ func (mc *metricsConfig) Validate() error {
 
 	if mc.Aligner != "" {
 		if _, ok := gcp.AlignersMapToGCP[mc.Aligner]; !ok {
-			return errors.Errorf("the given aligner is not supported, please specify one of %s as aligner", gcpAlignerNames)
+			return fmt.Errorf("the given aligner is not supported, please specify one of %s as aligner", gcpAlignerNames)
 		}
 	}
 	return nil
@@ -290,8 +270,8 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 
 			for {
 				out, err := it.Next()
-				if err != nil && err != iterator.Done {
-					err = errors.Errorf("Could not make ListMetricDescriptors request for metric type %s: %v", mt, err)
+				if err != nil && !errors.Is(err, iterator.Done) {
+					err = fmt.Errorf("could not make ListMetricDescriptors request for metric type %s: %w", mt, err)
 					m.Logger().Error(err)
 					return metricsWithMeta, err
 				}
@@ -300,7 +280,7 @@ func (m *MetricSet) metricDescriptor(ctx context.Context, client *monitoring.Met
 					metricsWithMeta = m.getMetadata(out, metricsWithMeta)
 				}
 
-				if err == iterator.Done {
+				if errors.Is(err, iterator.Done) {
 					break
 				}
 
@@ -325,29 +305,31 @@ func (m *MetricSet) getMetadata(out *metric.MetricDescriptor, metricsWithMeta ma
 		ingestDelay:  0 * time.Second,
 	}
 
-	if out.Metadata.SamplePeriod != nil {
-		m.Logger().Debugf("For metric type %s: sample period = %s", out.Type, out.Metadata.SamplePeriod)
-		meta.samplePeriod = time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second
-	}
+	if out.Metadata != nil {
+		if out.Metadata.SamplePeriod != nil {
+			m.Logger().Debugf("For metric type %s: sample period = %s", out.Type, out.Metadata.SamplePeriod)
+			meta.samplePeriod = time.Duration(out.Metadata.SamplePeriod.Seconds) * time.Second
+		}
 
-	if out.Metadata.IngestDelay != nil {
-		m.Logger().Debugf("For metric type %s: ingest delay = %s", out.Type, out.Metadata.IngestDelay)
-		meta.ingestDelay = time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second
+		if out.Metadata.IngestDelay != nil {
+			m.Logger().Debugf("For metric type %s: ingest delay = %s", out.Type, out.Metadata.IngestDelay)
+			meta.ingestDelay = time.Duration(out.Metadata.IngestDelay.Seconds) * time.Second
+		}
 	}
 
 	metricsWithMeta[out.Type] = meta
 	return metricsWithMeta
 }
 
-func addHostFields(groupedEvents []KeyValuePoint) common.MapStr {
+func addHostFields(groupedEvents []KeyValuePoint) mapstr.M {
 	hostRootFields := groupedEvents[0].ECS
 	// add host.id and host.name
 	if hostID, err := groupedEvents[0].ECS.GetValue("cloud.instance.id"); err == nil {
-		hostRootFields.Put("host.id", hostID)
+		_, _ = hostRootFields.Put("host.id", hostID)
 	}
 
 	if hostName, err := groupedEvents[0].ECS.GetValue("cloud.instance.name"); err == nil {
-		hostRootFields.Put("host.name", hostName)
+		_, _ = hostRootFields.Put("host.name", hostName)
 	}
 
 	hostFieldTable := map[string]string{
@@ -362,7 +344,7 @@ func addHostFields(groupedEvents []KeyValuePoint) common.MapStr {
 
 	for _, singleEvent := range groupedEvents {
 		if hostMetricName, ok := hostFieldTable[singleEvent.Key]; ok {
-			hostRootFields.Put(hostMetricName, singleEvent.Value)
+			_, _ = hostRootFields.Put(hostMetricName, singleEvent.Value)
 		}
 	}
 	return hostRootFields

@@ -1,0 +1,99 @@
+{
+    "attributes": {
+        "description": "Metrics about Cronjobs",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "syncColors": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 6,
+                    "i": "db76c03a-1610-4f7e-859e-620e5284d486",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "db76c03a-1610-4f7e-859e-620e5284d486",
+                "panelRefName": "panel_db76c03a-1610-4f7e-859e-620e5284d486",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "9d8bec64-4157-4b20-ab57-e41ef6a352d3",
+                    "w": 16,
+                    "x": 0,
+                    "y": 6
+                },
+                "panelIndex": "9d8bec64-4157-4b20-ab57-e41ef6a352d3",
+                "panelRefName": "panel_9d8bec64-4157-4b20-ab57-e41ef6a352d3",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 14,
+                    "i": "48e8cbf3-6500-4b66-8376-eeda18da0e42",
+                    "w": 32,
+                    "x": 16,
+                    "y": 6
+                },
+                "panelIndex": "48e8cbf3-6500-4b66-8376-eeda18da0e42",
+                "panelRefName": "panel_48e8cbf3-6500-4b66-8376-eeda18da0e42",
+                "type": "lens",
+                "version": "8.3.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Kubernetes] Cronjobs",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-0a672d50-bcb1-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "dashboard": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "kubernetes-35246bf0-bcb3-11ec-b64f-7dd6e8e82013",
+            "name": "db76c03a-1610-4f7e-859e-620e5284d486:panel_db76c03a-1610-4f7e-859e-620e5284d486",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-3c9b47a0-bcb3-11ec-b64f-7dd6e8e82013",
+            "name": "9d8bec64-4157-4b20-ab57-e41ef6a352d3:panel_9d8bec64-4157-4b20-ab57-e41ef6a352d3",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-4155e980-bcb3-11ec-b64f-7dd6e8e82013",
+            "name": "48e8cbf3-6500-4b66-8376-eeda18da0e42:panel_48e8cbf3-6500-4b66-8376-eeda18da0e42",
+            "type": "lens"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2022-05-23T08:46:42.762Z",
+    "version": "WzY2NiwxXQ=="
+}

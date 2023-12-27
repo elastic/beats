@@ -16,8 +16,7 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -118,8 +117,7 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -228,8 +226,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -331,8 +328,7 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -441,8 +437,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -552,8 +547,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -655,8 +649,7 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -765,8 +758,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -868,8 +860,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -966,8 +957,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1060,8 +1050,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1162,8 +1151,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1273,8 +1261,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1376,8 +1363,7 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1478,8 +1464,7 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1580,8 +1565,7 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1690,8 +1674,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1801,8 +1784,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -1912,8 +1894,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2015,8 +1996,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2118,8 +2098,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2222,8 +2201,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2326,8 +2304,7 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2428,8 +2405,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2530,8 +2506,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -2632,8 +2607,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2735,8 +2709,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2839,8 +2812,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -2942,8 +2914,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3054,8 +3025,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3157,8 +3127,7 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3259,8 +3228,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3370,8 +3338,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3481,8 +3448,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3584,8 +3550,7 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3694,8 +3659,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3797,8 +3761,7 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -3899,8 +3862,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4003,8 +3965,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4114,8 +4075,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4225,8 +4185,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4328,8 +4287,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4431,8 +4389,7 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4533,8 +4490,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4636,8 +4592,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4738,8 +4693,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4841,8 +4795,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -4944,8 +4897,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5046,8 +4998,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5149,8 +5100,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5252,8 +5202,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5355,8 +5304,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5458,8 +5406,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5561,8 +5508,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5664,8 +5610,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5767,8 +5712,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5870,8 +5814,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -5972,8 +5915,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6075,8 +6017,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -6178,8 +6119,7 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6280,8 +6220,7 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6382,8 +6321,7 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6484,8 +6422,7 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6594,8 +6531,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6705,8 +6641,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6816,8 +6751,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -6919,8 +6853,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7022,8 +6955,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7124,8 +7056,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -7226,8 +7157,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7337,8 +7267,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7440,8 +7369,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7542,8 +7470,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 1000000000,
@@ -7644,8 +7571,7 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7754,8 +7680,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7857,8 +7782,7 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -7959,8 +7883,7 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8069,8 +7992,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8180,8 +8102,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8291,8 +8212,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8394,8 +8314,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8497,8 +8416,7 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8599,8 +8517,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8701,8 +8618,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8811,8 +8727,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -8922,8 +8837,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9033,8 +8947,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9136,8 +9049,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9239,8 +9151,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9349,8 +9260,7 @@
         "destination.port": 53,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9452,8 +9362,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9554,8 +9463,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9657,8 +9565,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9760,8 +9667,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9863,8 +9769,7 @@
         "destination.port": 443,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -9966,8 +9871,7 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10068,8 +9972,7 @@
         "destination.port": 514,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10178,8 +10081,7 @@
         "destination.port": 53,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10281,8 +10183,7 @@
         "destination.port": 514,
         "event.action": "flow_started",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,
@@ -10383,8 +10284,7 @@
         "destination.port": 443,
         "event.action": "flow_terminated",
         "event.category": [
-            "network",
-            "network_traffic"
+            "network"
         ],
         "event.dataset": "panw.panos",
         "event.duration": 0,

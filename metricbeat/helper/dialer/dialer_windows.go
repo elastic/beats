@@ -16,21 +16,19 @@
 // under the License.
 
 //go:build windows
-// +build windows
 
 package dialer
 
 import (
+	"errors"
 	"net"
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	winio "github.com/Microsoft/go-winio"
 
 	"github.com/elastic/beats/v7/libbeat/api/npipe"
-	"github.com/elastic/beats/v7/libbeat/common/transport"
+	"github.com/elastic/elastic-agent-libs/transport"
 )
 
 // UnixDialerBuilder creates a builder to dial over a unix domain socket.

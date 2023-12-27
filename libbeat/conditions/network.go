@@ -22,10 +22,8 @@ import (
 	"net"
 	"strings"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -121,7 +119,7 @@ func NewNetworkCondition(fields map[string]interface{}) (*Network, error) {
 			"strings or []strings are allowed", field, value, value)
 	}
 
-	for field, value := range common.MapStr(fields).Flatten() {
+	for field, value := range mapstr.M(fields).Flatten() {
 		switch v := value.(type) {
 		case string:
 			m, err := makeMatcher(v)
@@ -194,9 +192,12 @@ func (c *Network) String() string {
 // parseCIDR parses a network CIDR.
 func parseCIDR(value string) (*net.IPNet, error) {
 	_, mask, err := net.ParseCIDR(value)
-	return mask, errors.Wrap(err, "failed to parse CIDR, values must be "+
-		"an IP address and prefix length, like '192.0.2.0/24' or "+
-		"'2001:db8::/32', as defined in RFC 4632 and RFC 4291.")
+	if err != nil {
+		return mask, fmt.Errorf("failed to parse CIDR, values must be "+
+			"an IP address and prefix length, like '192.0.2.0/24' or "+
+			"'2001:db8::/32', as defined in RFC 4632 and RFC 4291: %w", err)
+	}
+	return mask, nil
 }
 
 // extractIP return an IP address if unk is an IP address string or a net.IP.

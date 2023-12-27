@@ -1,28 +1,12 @@
 version: '2.3'
 services:
-  beat:
-    build: ../../filebeat
-    depends_on:
-      - proxy_dep
-    environment:
-      - ES_BEATS=/go/src/github.com/elastic/beats
-      - BEAT_STRICT_PERMS=false
-      - ES_HOST=elasticsearch
-      - ES_PORT=9200
-      - ES_USER=beats
-      - ES_PASS=testing
-    working_dir: /go/src/github.com/elastic/beats/x-pack/filebeat
-    volumes:
-      - ${PWD}/../..:/go/src/github.com/elastic/beats/
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: make
-
   # This is a proxy used to block beats until all services are healthy.
   # See: https://github.com/docker/compose/issues/4369
   proxy_dep:
     image: busybox
     depends_on:
       elasticsearch: { condition: service_healthy }
+      cometd: { condition: service_healthy }
 
   elasticsearch:
     extends:
@@ -32,4 +16,11 @@ services:
       test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
       retries: 300
       interval: 1s
+    ports:
+      - 9200:9200
 
+  cometd:
+    build: ${ES_BEATS}/testing/environments/docker/cometd
+    hostname: cometd
+    ports:
+      - 8080:8080

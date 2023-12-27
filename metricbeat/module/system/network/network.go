@@ -16,19 +16,19 @@
 // under the License.
 
 //go:build darwin || freebsd || linux || windows || aix
-// +build darwin freebsd linux windows aix
 
 package network
 
 import (
+	"fmt"
+	"math"
 	"strings"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/pkg/errors"
 	"github.com/shirou/gopsutil/v3/net"
 )
 
@@ -44,16 +44,17 @@ func init() {
 // MetricSet for fetching system network IO metrics.
 type MetricSet struct {
 	mb.BaseMetricSet
-	interfaces   map[string]struct{}
-	prevCounters networkCounter
+	interfaces           map[string]struct{}
+	prevInterfaceCounter map[string]networkCounter
+	currentGaugeCounter  map[string]networkCounter
 }
 
 // networkCounter stores previous network counter values for calculating gauges in next collection
 type networkCounter struct {
-	prevNetworkInBytes    uint64
-	prevNetworkInPackets  uint64
-	prevNetworkOutBytes   uint64
-	prevNetworkOutPackets uint64
+	NetworkInBytes    uint64
+	NetworkInPackets  uint64
+	NetworkOutBytes   uint64
+	NetworkOutPackets uint64
 }
 
 // New is a mb.MetricSetFactory that returns a new MetricSet.
@@ -77,9 +78,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	return &MetricSet{
-		BaseMetricSet: base,
-		interfaces:    interfaceSet,
-		prevCounters:  networkCounter{},
+		BaseMetricSet:        base,
+		interfaces:           interfaceSet,
+		prevInterfaceCounter: map[string]networkCounter{},
+		currentGaugeCounter:  map[string]networkCounter{},
 	}, nil
 }
 
@@ -87,10 +89,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	stats, err := net.IOCounters(true)
 	if err != nil {
-		return errors.Wrap(err, "network io counters")
+		return fmt.Errorf("network io counters: %w", err)
 	}
-
-	var networkInBytes, networkOutBytes, networkInPackets, networkOutPackets uint64
 
 	for _, counters := range stats {
 		if m.interfaces != nil {
@@ -105,30 +105,60 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 			MetricSetFields: ioCountersToMapStr(counters),
 		})
 
-		// accumulate values from all interfaces
-		networkInBytes += counters.BytesRecv
-		networkOutBytes += counters.BytesSent
-		networkInPackets += counters.PacketsRecv
-		networkOutPackets += counters.PacketsSent
+		// sum the values at a per-interface level
+		// Makes us less likely to overload a value somewhere.
+		prevCounters, ok := m.prevInterfaceCounter[counters.Name]
+		if !ok {
+			m.prevInterfaceCounter[counters.Name] = networkCounter{
+				NetworkInBytes:    counters.BytesRecv,
+				NetworkInPackets:  counters.PacketsRecv,
+				NetworkOutBytes:   counters.BytesSent,
+				NetworkOutPackets: counters.PacketsSent,
+			}
+			continue
+		}
+		// create current set of gauges
+		currentDiff := networkCounter{
+			NetworkInBytes:    createGaugeWithRollover(counters.BytesRecv, prevCounters.NetworkInBytes),
+			NetworkInPackets:  createGaugeWithRollover(counters.PacketsRecv, prevCounters.NetworkInPackets),
+			NetworkOutBytes:   createGaugeWithRollover(counters.BytesSent, prevCounters.NetworkOutBytes),
+			NetworkOutPackets: createGaugeWithRollover(counters.PacketsSent, prevCounters.NetworkOutPackets),
+		}
+
+		m.currentGaugeCounter[counters.Name] = currentDiff
+
+		m.prevInterfaceCounter[counters.Name] = networkCounter{
+			NetworkInBytes:    counters.BytesRecv,
+			NetworkInPackets:  counters.PacketsRecv,
+			NetworkOutBytes:   counters.BytesSent,
+			NetworkOutPackets: counters.PacketsSent,
+		}
 
 		if !isOpen {
 			return nil
 		}
 	}
 
-	if m.prevCounters != (networkCounter{}) {
-		// convert network metrics from counters to gauges
+	if len(m.currentGaugeCounter) != 0 {
+
+		var totalNetworkInBytes, totalNetworkInPackets, totalNetworkOutBytes, totalNetworkOutPackets uint64
+		for _, iface := range m.currentGaugeCounter {
+			totalNetworkInBytes += iface.NetworkInBytes
+			totalNetworkInPackets += iface.NetworkInPackets
+			totalNetworkOutBytes += iface.NetworkOutBytes
+			totalNetworkOutPackets += iface.NetworkOutPackets
+		}
 		r.Event(mb.Event{
-			RootFields: common.MapStr{
-				"host": common.MapStr{
-					"network": common.MapStr{
-						"ingress": common.MapStr{
-							"bytes":   networkInBytes - m.prevCounters.prevNetworkInBytes,
-							"packets": networkInPackets - m.prevCounters.prevNetworkInPackets,
+			RootFields: mapstr.M{
+				"host": mapstr.M{
+					"network": mapstr.M{
+						"ingress": mapstr.M{
+							"bytes":   totalNetworkInBytes,
+							"packets": totalNetworkInPackets,
 						},
-						"egress": common.MapStr{
-							"bytes":   networkOutBytes - m.prevCounters.prevNetworkOutBytes,
-							"packets": networkOutPackets - m.prevCounters.prevNetworkOutPackets,
+						"egress": mapstr.M{
+							"bytes":   totalNetworkOutBytes,
+							"packets": totalNetworkOutPackets,
 						},
 					},
 				},
@@ -136,25 +166,53 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 		})
 	}
 
-	// update prevCounters
-	m.prevCounters.prevNetworkInBytes = networkInBytes
-	m.prevCounters.prevNetworkInPackets = networkInPackets
-	m.prevCounters.prevNetworkOutBytes = networkOutBytes
-	m.prevCounters.prevNetworkOutPackets = networkOutPackets
-
 	return nil
 }
 
-func ioCountersToMapStr(counters net.IOCountersStat) common.MapStr {
-	return common.MapStr{
+// Create a gauged difference between two numbers, taking into account rollover that might happen, and the current number might be lower.
+// The /proc/net/dev interface is defined in net/core/net-procfs.c,
+// where it prints the data from rtnl_link_stats64 defined in uapi/linux/if_link.h.
+// There's an extra bit of logic here: the underlying network device object in the kernel, net_device,
+// can define either ndo_get_stats64() or ndo_get_stats() as a metrics callback, with the latter returning an unsigned long (32 bit) set of metrics.
+// See dev_get_stats() in net/core/dev.c for context. The exact implementation depends upon the network driver.
+// For example, the tg3 network driver used by the broadcom network controller on my dev machine
+// uses 64 bit metrics, defined in the drivers/net/ethernet/broadcom/tg3.h,
+// with the ndo_get_stats64() callback defined in  net/ethernet/broadcom/tg3.c.
+// Long story short, we can't be completely sure if we're rolling over at max_u32 or max_u64.
+// if the previous value was > max_u32, do math assuming we've rolled over at max_u64.
+// On windows: This uses GetIfEntry: https://learn.microsoft.com/en-us/windows/win32/api/netioapi/ns-netioapi-mib_if_row2 which uses ulong64.
+// On Darwin we just call netstat.
+// I'm assuming rollover behavior is similar.
+func createGaugeWithRollover(current uint64, prev uint64) uint64 {
+	// base case: no rollover
+	if current >= prev {
+		return current - prev
+	}
+
+	// case: rollover
+	// case: we rolled over at 64 bits
+	if prev > math.MaxUint32 {
+		debugf("Warning: Rollover 64 bit gauge detected. Current value: %d, previous: %d", current, prev)
+		remaining := math.MaxUint64 - prev
+		return current + remaining + 1 // the +1 counts the actual "rollover" increment.
+	}
+	// case: we rolled over at 32 bits
+	debugf("Warning: Rollover 32 bit gauge detected. Current value: %d, previous: %d", current, prev)
+	remaining := math.MaxUint32 - prev
+	return current + remaining + 1
+
+}
+
+func ioCountersToMapStr(counters net.IOCountersStat) mapstr.M {
+	return mapstr.M{
 		"name": counters.Name,
-		"in": common.MapStr{
+		"in": mapstr.M{
 			"errors":  counters.Errin,
 			"dropped": counters.Dropin,
 			"bytes":   counters.BytesRecv,
 			"packets": counters.PacketsRecv,
 		},
-		"out": common.MapStr{
+		"out": mapstr.M{
 			"errors":  counters.Errout,
 			"dropped": counters.Dropout,
 			"packets": counters.PacketsSent,

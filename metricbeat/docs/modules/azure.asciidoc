@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: azure
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/azure/_meta/docs.asciidoc
+
 
 [[metricbeat-module-azure]]
 [role="xpack"]
@@ -97,6 +99,15 @@ https://login.microsoftonline.us for azure GermanCloud
 https://login.chinacloudapi.cn for azure PublicCloud
 https://login.microsoftonline.de for azure USGovernmentCloud
 
+`resource_manager_audience` ::
+_string_
+Optional, by default we are using the azure public environment, to override, users can provide a specific resource manager audience in order to use a different azure environment.
+Ex:
+https://management.chinacloudapi.cn/ for azure ChinaCloud
+https://management.microsoftazure.de/ for azure GermanCloud
+https://management.azure.com/ for azure PublicCloud
+https://management.usgovcloudapi.net/ for azure USGovernmentCloud
+Users can also use this in case of a Hybrid Cloud model, where one may define their own audiences.
 
 [float]
 == Metricsets
@@ -162,6 +173,8 @@ Costs: Metric queries are charged based on the number of standard API calls. Mor
 
 Authentication: we are handling authentication on our side (creating/renewing the authentication token), so we advise users to use dedicated credentials for metricbeat only.
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -335,3 +348,4 @@ include::azure/monitor.asciidoc[]
 
 include::azure/storage.asciidoc[]
 
+:edit_url!:

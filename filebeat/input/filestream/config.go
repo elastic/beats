@@ -23,26 +23,28 @@ import (
 
 	"github.com/dustin/go-humanize"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/match"
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
+	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
 // Config stores the options of a file stream.
 type config struct {
 	Reader readerConfig `config:",inline"`
 
-	Paths          []string                `config:"paths"`
-	Close          closerConfig            `config:"close"`
-	FileWatcher    *common.ConfigNamespace `config:"prospector"`
-	FileIdentity   *common.ConfigNamespace `config:"file_identity"`
-	CleanInactive  time.Duration           `config:"clean_inactive" validate:"min=0"`
-	CleanRemoved   bool                    `config:"clean_removed"`
-	HarvesterLimit uint32                  `config:"harvester_limit" validate:"min=0"`
-	IgnoreOlder    time.Duration           `config:"ignore_older"`
-	IgnoreInactive ignoreInactiveType      `config:"ignore_inactive"`
-	Rotation       *common.ConfigNamespace `config:"rotation"`
+	ID             string             `config:"id"`
+	Paths          []string           `config:"paths"`
+	Close          closerConfig       `config:"close"`
+	FileWatcher    *conf.Namespace    `config:"prospector"`
+	FileIdentity   *conf.Namespace    `config:"file_identity"`
+	CleanInactive  time.Duration      `config:"clean_inactive" validate:"min=0"`
+	CleanRemoved   bool               `config:"clean_removed"`
+	HarvesterLimit uint32             `config:"harvester_limit" validate:"min=0"`
+	IgnoreOlder    time.Duration      `config:"ignore_older"`
+	IgnoreInactive ignoreInactiveType `config:"ignore_inactive"`
+	Rotation       *conf.Namespace    `config:"rotation"`
+	TakeOver       bool               `config:"take_over"`
 }
 
 type closerConfig struct {
@@ -81,7 +83,7 @@ type backoffConfig struct {
 }
 
 type rotationConfig struct {
-	Strategy *common.ConfigNamespace `config:"strategy" validate:"required"`
+	Strategy *conf.Namespace `config:"strategy" validate:"required"`
 }
 
 type commonRotationConfig struct {
@@ -108,7 +110,7 @@ func defaultCloserConfig() closerConfig {
 		OnStateChange: stateChangeCloserConfig{
 			CheckInterval: 5 * time.Second,
 			Removed:       true, // TODO check clean_removed option
-			Inactive:      0 * time.Second,
+			Inactive:      5 * time.Minute,
 			Renamed:       false,
 		},
 		Reader: readerCloserConfig{
@@ -121,7 +123,7 @@ func defaultCloserConfig() closerConfig {
 func defaultReaderConfig() readerConfig {
 	return readerConfig{
 		Backoff: backoffConfig{
-			Init: 1 * time.Second,
+			Init: 2 * time.Second,
 			Max:  10 * time.Second,
 		},
 		BufferSize:     16 * humanize.KiByte,

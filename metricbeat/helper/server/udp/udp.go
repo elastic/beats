@@ -21,12 +21,10 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type UdpServer struct {
@@ -38,11 +36,11 @@ type UdpServer struct {
 }
 
 type UdpEvent struct {
-	event common.MapStr
+	event mapstr.M
 	meta  server.Meta
 }
 
-func (u *UdpEvent) GetEvent() common.MapStr {
+func (u *UdpEvent) GetEvent() mapstr.M {
 	return u.event
 }
 
@@ -78,7 +76,7 @@ func (g *UdpServer) GetHost() string {
 func (g *UdpServer) Start() error {
 	listener, err := net.ListenUDP("udp", g.udpaddr)
 	if err != nil {
-		return errors.Wrap(err, "failed to start UDP server")
+		return fmt.Errorf("failed to start UDP server: %w", err)
 	}
 
 	logp.Info("Started listening for UDP on: %s", g.udpaddr.String())
@@ -107,7 +105,7 @@ func (g *UdpServer) watchMetrics() {
 		copy(bufCopy, buffer)
 
 		g.eventQueue <- &UdpEvent{
-			event: common.MapStr{
+			event: mapstr.M{
 				server.EventDataKey: bufCopy,
 			},
 			meta: server.Meta{

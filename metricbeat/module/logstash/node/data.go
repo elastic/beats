@@ -19,8 +19,7 @@ package node
 
 import (
 	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	s "github.com/elastic/beats/v7/libbeat/common/schema"
@@ -28,6 +27,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper/elastic"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/logstash"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -42,8 +42,8 @@ var (
 	}
 )
 
-func commonFieldsMapping(event *mb.Event, fields common.MapStr) error {
-	event.RootFields = common.MapStr{}
+func commonFieldsMapping(event *mb.Event, fields mapstr.M) error {
+	event.RootFields = mapstr.M{}
 	event.RootFields.Put("service.name", logstash.ModuleName)
 
 	// Set service ID
@@ -85,12 +85,7 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 	var data map[string]interface{}
 	err := json.Unmarshal(content, &data)
 	if err != nil {
-		return errors.Wrap(err, "failure parsing Logstash Node API response")
-	}
-
-	fields, err := schema.Apply(data)
-	if err != nil {
-		return errors.Wrap(err, "failure applying node schema")
+		return fmt.Errorf("failure parsing Logstash Node API response: %w", err)
 	}
 
 	pipelines = getUserDefinedPipelines(pipelines)
@@ -98,6 +93,10 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 
 	for clusterUUID, pipelines := range clusterToPipelinesMap {
 		for _, pipeline := range pipelines {
+			fields, err := schema.Apply(data)
+			if err != nil {
+				return fmt.Errorf("failure applying node schema: %w", err)
+			}
 			removeClusterUUIDsFromPipeline(pipeline)
 
 			// Rename key: graph -> representation
@@ -109,11 +108,12 @@ func eventMapping(r mb.ReporterV2, content []byte, pipelines []logstash.Pipeline
 			}
 
 			event := mb.Event{
-				MetricSetFields: common.MapStr{
+				MetricSetFields: mapstr.M{
 					"state": logstashState,
 				},
-				ModuleFields: common.MapStr{},
+				ModuleFields: mapstr.M{},
 			}
+
 			event.MetricSetFields.Update(fields)
 
 			if err = commonFieldsMapping(&event, fields); err != nil {

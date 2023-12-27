@@ -19,13 +19,13 @@ package add_cloud_metadata
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"net/http"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type provider struct {
@@ -36,7 +36,7 @@ type provider struct {
 	Local bool
 
 	// Create returns an actual metadataFetcher
-	Create func(string, *common.Config) (metadataFetcher, error)
+	Create func(string, *conf.C) (metadataFetcher, error)
 }
 
 type metadataFetcher interface {
@@ -45,9 +45,9 @@ type metadataFetcher interface {
 
 // result is the result of a query for a specific hosting provider's metadata.
 type result struct {
-	provider string        // Hosting provider type.
-	err      error         // Error that occurred while fetching (if any).
-	metadata common.MapStr // A specific subset of the metadata received from the hosting provider.
+	provider string   // Hosting provider type.
+	err      error    // Error that occurred while fetching (if any).
+	metadata mapstr.M // A specific subset of the metadata received from the hosting provider.
 }
 
 var cloudMetaProviders = map[string]provider{
@@ -65,6 +65,7 @@ var cloudMetaProviders = map[string]provider{
 	"qcloud":        qcloudMetadataFetcher,
 	"tencent":       qcloudMetadataFetcher,
 	"huawei":        huaweiMetadataFetcher,
+	"hetzner":       hetznerMetadataFetcher,
 }
 
 func selectProviders(configList providerList, providers map[string]provider) map[string]provider {
@@ -96,11 +97,11 @@ func filterMetaProviders(filter func(string) bool, fetchers map[string]provider)
 	return out
 }
 
-func setupFetchers(providers map[string]provider, c *common.Config) ([]metadataFetcher, error) {
+func setupFetchers(providers map[string]provider, c *conf.C) ([]metadataFetcher, error) {
 	mf := make([]metadataFetcher, 0, len(providers))
 	visited := map[string]bool{}
 
-	// Iterate over all providers and create an unique meta-data fetcher per provider type.
+	// Iterate over all providers and create a unique meta-data fetcher per provider type.
 	// Some providers might appear twice in the set of providers to support aliases on provider names.
 	// For example aws and ec2 both use the same provider.
 	// The loop tracks already seen providers in the `visited` set, to ensure that we do not create
@@ -113,7 +114,7 @@ func setupFetchers(providers map[string]provider, c *common.Config) ([]metadataF
 
 		fetcher, err := ff.Create(name, c)
 		if err != nil {
-			return nil, errors.Wrapf(err, "failed to initialize the %v fetcher", name)
+			return nil, fmt.Errorf("failed to initialize the %v fetcher: %w", name, err)
 		}
 
 		mf = append(mf, fetcher)
@@ -122,7 +123,7 @@ func setupFetchers(providers map[string]provider, c *common.Config) ([]metadataF
 }
 
 // fetchMetadata attempts to fetch metadata in parallel from each of the
-// hosting providers supported by this processor. It wait for the results to
+// hosting providers supported by this processor. It will wait for the results to
 // be returned or for a timeout to occur then returns the first result that
 // completed in time.
 func (p *addCloudMetadata) fetchMetadata() *result {
@@ -168,6 +169,8 @@ func (p *addCloudMetadata) fetchMetadata() *result {
 			// Bail out on first success.
 			if result.err == nil && result.metadata != nil {
 				return &result
+			} else if result.err != nil {
+				p.logger.Errorf("add_cloud_metadata: received error %v", result.err)
 			}
 		case <-ctx.Done():
 			p.logger.Debugf("add_cloud_metadata: timed-out waiting for all responses")

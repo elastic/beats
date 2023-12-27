@@ -22,6 +22,7 @@ package compat
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -30,8 +31,8 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 )
 
@@ -69,17 +70,24 @@ func RunnerFactory(
 	return &factory{log: log, info: info, loader: loader}
 }
 
-func (f *factory) CheckConfig(cfg *common.Config) error {
+func (f *factory) CheckConfig(cfg *conf.C) error {
 	_, err := f.loader.Configure(cfg)
 	if err != nil {
-		return err
+		return fmt.Errorf("runner factory could not check config: %w", err)
 	}
+
+	if err = f.loader.Delete(cfg); err != nil {
+		return fmt.Errorf(
+			"runner factory failed to delete an input after config check: %w",
+			err)
+	}
+
 	return nil
 }
 
 func (f *factory) Create(
 	p beat.PipelineConnector,
-	config *common.Config,
+	config *conf.C,
 ) (cfgfile.Runner, error) {
 	input, err := f.loader.Configure(config)
 	if err != nil {
@@ -104,11 +112,13 @@ func (f *factory) Create(
 func (r *runner) String() string { return r.input.Name() }
 
 func (r *runner) Start() {
+	r.wg.Add(1)
 	log := r.log
 	name := r.input.Name()
 
 	go func() {
-		log.Infof("Input %v starting", name)
+		defer r.wg.Done()
+		log.Infof("Input '%s' starting", name)
 		err := r.input.Run(
 			v2.Context{
 				ID:          r.id,
@@ -118,10 +128,10 @@ func (r *runner) Start() {
 			},
 			r.connector,
 		)
-		if err != nil {
-			log.Errorf("Input '%v' failed with: %+v", name, err)
+		if err != nil && !errors.Is(err, context.Canceled) {
+			log.Errorf("Input '%s' failed with: %+v", name, err)
 		} else {
-			log.Infof("Input '%v' stopped", name)
+			log.Infof("Input '%s' stopped (goroutine)", name)
 		}
 	}()
 }
@@ -129,10 +139,10 @@ func (r *runner) Start() {
 func (r *runner) Stop() {
 	r.sig.Cancel()
 	r.wg.Wait()
-	r.log.Infof("Input '%v' stopped", r.input.Name())
+	r.log.Infof("Input '%s' stopped (runner)", r.input.Name())
 }
 
-func configID(config *common.Config) (string, error) {
+func configID(config *conf.C) (string, error) {
 	tmp := struct {
 		ID string `config:"id"`
 	}{}
@@ -144,7 +154,12 @@ func configID(config *common.Config) (string, error) {
 	}
 
 	var h map[string]interface{}
-	config.Unpack(&h)
+	err := config.Unpack(&h)
+	if err != nil {
+		return "", fmt.Errorf("could not unpack config into %T: unpack failed: %w",
+			h, err)
+	}
+
 	id, err := hashstructure.Hash(h, nil)
 	if err != nil {
 		return "", fmt.Errorf("can not compute id from configuration: %w", err)

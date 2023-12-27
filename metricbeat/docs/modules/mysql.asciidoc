@@ -3,6 +3,8 @@ This file is generated! See scripts/mage/docs_collector.go
 ////
 
 :modulename: mysql
+:edit_url: https://github.com/elastic/beats/edit/main/metricbeat/module/mysql/_meta/docs.asciidoc
+
 
 [[metricbeat-module-mysql]]
 == MySQL module
@@ -52,6 +54,8 @@ The mysql module comes with a predefined dashboard. For example:
 
 image::./images/metricbeat-mysql.png[]
 
+
+:edit_url:
 
 [float]
 === Example configuration
@@ -108,3 +112,4 @@ include::mysql/query.asciidoc[]
 
 include::mysql/status.asciidoc[]
 
+:edit_url!:

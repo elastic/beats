@@ -45,6 +45,11 @@ function archProvision () {
     pacman -Sy && pacman -S --noconfirm make gcc python python-pip git
 }
 
+function suseProvision() {
+    zypper refresh
+    zypper install -y make gcc git python3 python3-pip python3-virtualenv git rpm-devel
+}
+
 case "${PROVISION_TYPE}" in
     "gvm")
         gvmProvision $ARCH $OS $GO_VERSION
@@ -60,6 +65,9 @@ case "${PROVISION_TYPE}" in
     ;;
     "debian" | "ubuntu")
         debProvision
+    ;;
+    "opensuse" | "sles")
+        suseProvision
     ;;
     *)
         echo "No Extra provisioning steps for this platform"

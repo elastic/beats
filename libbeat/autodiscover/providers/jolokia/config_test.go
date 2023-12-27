@@ -22,7 +22,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestInterfaceConfigsUnpack(t *testing.T) {
@@ -63,7 +63,7 @@ func TestInterfaceConfigsUnpack(t *testing.T) {
 
 	for _, c := range cases {
 		var ic InterfaceConfig
-		config, err := common.NewConfigFrom(c.Config)
+		config, err := config.NewConfigFrom(c.Config)
 		if !assert.NoError(t, err, c.Description) {
 			continue
 		}
@@ -77,7 +77,7 @@ func TestInterfaceConfigsUnpack(t *testing.T) {
 }
 
 func TestDefaultConfigUnpack(t *testing.T) {
-	rawConfig, err := common.NewConfigFrom(map[string]interface{}{})
+	rawConfig, err := config.NewConfigFrom(map[string]interface{}{})
 	assert.NoError(t, err)
 	config := defaultConfig()
 	err = rawConfig.Unpack(&config)
@@ -87,7 +87,7 @@ func TestDefaultConfigUnpack(t *testing.T) {
 }
 
 func TestConfigUnpackEmptyInterfaces(t *testing.T) {
-	rawConfig, err := common.NewConfigFrom(map[string]interface{}{
+	rawConfig, err := config.NewConfigFrom(map[string]interface{}{
 		"interfaces": []interface{}{},
 	})
 	assert.NoError(t, err)

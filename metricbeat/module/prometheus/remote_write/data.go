@@ -22,8 +22,8 @@ import (
 
 	"github.com/prometheus/common/model"
 
-	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 // DefaultRemoteWriteEventsGeneratorFactory returns the default prometheus events generator
@@ -40,7 +40,7 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 	eventList := map[string]mb.Event{}
 
 	for _, metric := range metrics {
-		labels := common.MapStr{}
+		labels := mapstr.M{}
 
 		if metric == nil {
 			continue
@@ -61,8 +61,8 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 		labelsHash := labels.String() + metric.Timestamp.Time().String()
 		if _, ok := eventList[labelsHash]; !ok {
 			eventList[labelsHash] = mb.Event{
-				ModuleFields: common.MapStr{
-					"metrics": common.MapStr{},
+				ModuleFields: mapstr.M{
+					"metrics": mapstr.M{},
 				},
 				Timestamp: metric.Timestamp.Time(),
 			}
@@ -75,10 +75,10 @@ func (p *remoteWriteEventGenerator) GenerateEvents(metrics model.Samples) map[st
 
 		// Not checking anything here because we create these maps some lines before
 		e := eventList[labelsHash]
-		data := common.MapStr{
+		data := mapstr.M{
 			name: val,
 		}
-		e.ModuleFields["metrics"].(common.MapStr).Update(data)
+		e.ModuleFields["metrics"].(mapstr.M).Update(data)
 	}
 
 	return eventList

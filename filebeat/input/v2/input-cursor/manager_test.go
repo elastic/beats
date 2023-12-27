@@ -31,12 +31,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	"github.com/elastic/beats/v7/libbeat/tests/resources"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -62,11 +62,11 @@ func TestManager_Init(t *testing.T) {
 			DefaultCleanTimeout: 10 * time.Millisecond,
 		}
 
-		err := manager.Init(&grp, v2.ModeRun)
+		err := manager.Init(&grp, input.ModeRun)
 		require.NoError(t, err)
 
 		time.Sleep(200 * time.Millisecond)
-		grp.Stop()
+		_ = grp.Stop()
 
 		// wait for all go-routines to be gone
 
@@ -85,6 +85,7 @@ func TestManager_Init(t *testing.T) {
 		store.GCPeriod = 10 * time.Millisecond
 
 		var grp unison.TaskGroup
+		//nolint:errcheck // We don't need the error from grp.Stop()
 		defer grp.Stop()
 		manager := &InputManager{
 			Logger:              logp.NewLogger("test"),
@@ -93,7 +94,7 @@ func TestManager_Init(t *testing.T) {
 			DefaultCleanTimeout: 10 * time.Millisecond,
 		}
 
-		err := manager.Init(&grp, v2.ModeRun)
+		err := manager.Init(&grp, input.ModeRun)
 		require.NoError(t, err)
 
 		for len(store.snapshot()) > 0 {
@@ -105,41 +106,41 @@ func TestManager_Init(t *testing.T) {
 func TestManager_Create(t *testing.T) {
 	t.Run("fail if no source is configured", func(t *testing.T) {
 		manager := constInput(t, nil, &fakeTestInput{})
-		_, err := manager.Create(common.NewConfig())
+		_, err := manager.Create(conf.NewConfig())
 		require.Error(t, err)
 	})
 
 	t.Run("fail if config error", func(t *testing.T) {
 		manager := failingManager(t, errors.New("oops"))
-		_, err := manager.Create(common.NewConfig())
+		_, err := manager.Create(conf.NewConfig())
 		require.Error(t, err)
 	})
 
 	t.Run("fail if no input runner is returned", func(t *testing.T) {
 		manager := constInput(t, sourceList("test"), nil)
-		_, err := manager.Create(common.NewConfig())
+		_, err := manager.Create(conf.NewConfig())
 		require.Error(t, err)
 	})
 
 	t.Run("configure ok", func(t *testing.T) {
 		manager := constInput(t, sourceList("test"), &fakeTestInput{})
-		_, err := manager.Create(common.NewConfig())
+		_, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 	})
 
 	t.Run("configuring inputs with overlapping sources is allowed", func(t *testing.T) {
-		manager := simpleManagerWithConfigure(t, func(cfg *common.Config) ([]Source, Input, error) {
+		manager := simpleManagerWithConfigure(t, func(cfg *conf.C) ([]Source, Input, error) {
 			config := struct{ Sources []string }{}
 			err := cfg.Unpack(&config)
 			return sourceList(config.Sources...), &fakeTestInput{}, err
 		})
 
-		_, err := manager.Create(common.MustNewConfigFrom(map[string]interface{}{
+		_, err := manager.Create(conf.MustNewConfigFrom(map[string]interface{}{
 			"sources": []string{"a"},
 		}))
 		require.NoError(t, err)
 
-		_, err = manager.Create(common.MustNewConfigFrom(map[string]interface{}{
+		_, err = manager.Create(conf.MustNewConfigFrom(map[string]interface{}{
 			"sources": []string{"a"},
 		}))
 		require.NoError(t, err)
@@ -156,7 +157,7 @@ func TestManager_InputsTest(t *testing.T) {
 		defer resources.NewGoroutinesChecker().Check(t)
 
 		manager := constInput(t, sources, &fakeTestInput{
-			OnTest: func(source Source, _ v2.TestContext) error {
+			OnTest: func(source Source, _ input.TestContext) error {
 				mu.Lock()
 				defer mu.Unlock()
 				seen = append(seen, source.Name())
@@ -164,7 +165,7 @@ func TestManager_InputsTest(t *testing.T) {
 			},
 		})
 
-		inp, err := manager.Create(common.NewConfig())
+		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
 		err = inp.Test(input.TestContext{})
@@ -178,13 +179,13 @@ func TestManager_InputsTest(t *testing.T) {
 		defer resources.NewGoroutinesChecker().Check(t)
 
 		manager := constInput(t, sources, &fakeTestInput{
-			OnTest: func(_ Source, ctx v2.TestContext) error {
+			OnTest: func(_ Source, ctx input.TestContext) error {
 				<-ctx.Cancelation.Done()
 				return nil
 			},
 		})
 
-		inp, err := manager.Create(common.NewConfig())
+		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
 		ctx, cancel := context.WithCancel(context.TODO())
@@ -208,7 +209,7 @@ func TestManager_InputsTest(t *testing.T) {
 		sources := []Source{failing, stringSource("source2")}
 
 		manager := constInput(t, sources, &fakeTestInput{
-			OnTest: func(source Source, _ v2.TestContext) error {
+			OnTest: func(source Source, _ input.TestContext) error {
 				if source == failing {
 					t.Log("return error")
 					return errors.New("oops")
@@ -218,7 +219,7 @@ func TestManager_InputsTest(t *testing.T) {
 			},
 		})
 
-		inp, err := manager.Create(common.NewConfig())
+		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
 		var wg sync.WaitGroup
@@ -237,12 +238,12 @@ func TestManager_InputsTest(t *testing.T) {
 		defer resources.NewGoroutinesChecker().Check(t)
 
 		manager := constInput(t, sources, &fakeTestInput{
-			OnTest: func(source Source, _ v2.TestContext) error {
+			OnTest: func(source Source, _ input.TestContext) error {
 				panic("oops")
 			},
 		})
 
-		inp, err := manager.Create(common.NewConfig())
+		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
 		var wg sync.WaitGroup
@@ -270,14 +271,14 @@ func TestManager_InputsRun(t *testing.T) {
 			},
 		})
 
-		inp, err := manager.Create(common.NewConfig())
+		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
 		cancelCtx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
 		var clientCounters pubtest.ClientCounter
-		err = inp.Run(v2.Context{
+		err = inp.Run(input.Context{
 			Logger:      manager.Logger,
 			Cancelation: cancelCtx,
 		}, clientCounters.BuildConnector())
@@ -294,14 +295,14 @@ func TestManager_InputsRun(t *testing.T) {
 			},
 		})
 
-		inp, err := manager.Create(common.NewConfig())
+		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
 		cancelCtx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
 		var clientCounters pubtest.ClientCounter
-		err = inp.Run(v2.Context{
+		err = inp.Run(input.Context{
 			Logger:      manager.Logger,
 			Cancelation: cancelCtx,
 		}, clientCounters.BuildConnector())
@@ -319,7 +320,7 @@ func TestManager_InputsRun(t *testing.T) {
 			},
 		})
 
-		inp, err := manager.Create(common.NewConfig())
+		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
 		cancelCtx, cancel := context.WithCancel(context.Background())
@@ -330,7 +331,7 @@ func TestManager_InputsRun(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			err = inp.Run(v2.Context{
+			err = inp.Run(input.Context{
 				Logger:      manager.Logger,
 				Cancelation: cancelCtx,
 			}, clientCounters.BuildConnector())
@@ -350,7 +351,7 @@ func TestManager_InputsRun(t *testing.T) {
 		store := testOpenStore(t, "test", createSampleStore(t, nil))
 		defer store.Release()
 
-		manager := simpleManagerWithConfigure(t, func(cfg *common.Config) ([]Source, Input, error) {
+		manager := simpleManagerWithConfigure(t, func(cfg *conf.C) ([]Source, Input, error) {
 			config := runConfig{}
 			if err := cfg.Unpack(&config); err != nil {
 				return nil, nil, err
@@ -366,9 +367,9 @@ func TestManager_InputsRun(t *testing.T) {
 					}
 
 					for i := 0; i < config.Max; i++ {
-						event := beat.Event{Fields: common.MapStr{"n": state.N}}
+						event := beat.Event{Fields: mapstr.M{"n": state.N}}
 						state.N++
-						pub.Publish(event, state)
+						_ = pub.Publish(event, state)
 					}
 					return nil
 				},
@@ -386,7 +387,7 @@ func TestManager_InputsRun(t *testing.T) {
 		})
 
 		// create and run first instance
-		inp, err := manager.Create(common.MustNewConfigFrom(runConfig{Max: 3}))
+		inp, err := manager.Create(conf.MustNewConfigFrom(runConfig{Max: 3}))
 		require.NoError(t, err)
 		require.NoError(t, inp.Run(input.Context{
 			Logger:      log,
@@ -394,9 +395,9 @@ func TestManager_InputsRun(t *testing.T) {
 		}, pipeline))
 
 		// create and run second instance instance
-		inp, err = manager.Create(common.MustNewConfigFrom(runConfig{Max: 3}))
+		inp, err = manager.Create(conf.MustNewConfigFrom(runConfig{Max: 3}))
 		require.NoError(t, err)
-		inp.Run(input.Context{
+		_ = inp.Run(input.Context{
 			Logger:      log,
 			Cancelation: context.Background(),
 		}, pipeline)
@@ -414,33 +415,33 @@ func TestManager_InputsRun(t *testing.T) {
 		manager := constInput(t, sourceList("key"), &fakeTestInput{
 			OnRun: func(ctx input.Context, _ Source, _ Cursor, pub Publisher) error {
 				defer wgSend.Done()
-				fields := common.MapStr{"hello": "world"}
-				pub.Publish(beat.Event{Fields: fields}, "test-cursor-state1")
-				pub.Publish(beat.Event{Fields: fields}, "test-cursor-state2")
-				pub.Publish(beat.Event{Fields: fields}, "test-cursor-state3")
-				pub.Publish(beat.Event{Fields: fields}, nil)
-				pub.Publish(beat.Event{Fields: fields}, "test-cursor-state4")
-				pub.Publish(beat.Event{Fields: fields}, "test-cursor-state5")
-				pub.Publish(beat.Event{Fields: fields}, "test-cursor-state6")
+				fields := mapstr.M{"hello": "world"}
+				_ = pub.Publish(beat.Event{Fields: fields}, "test-cursor-state1")
+				_ = pub.Publish(beat.Event{Fields: fields}, "test-cursor-state2")
+				_ = pub.Publish(beat.Event{Fields: fields}, "test-cursor-state3")
+				_ = pub.Publish(beat.Event{Fields: fields}, nil)
+				_ = pub.Publish(beat.Event{Fields: fields}, "test-cursor-state4")
+				_ = pub.Publish(beat.Event{Fields: fields}, "test-cursor-state5")
+				_ = pub.Publish(beat.Event{Fields: fields}, "test-cursor-state6")
 				return nil
 			},
 		})
 		manager.StateStore = store
 
-		inp, err := manager.Create(common.NewConfig())
+		inp, err := manager.Create(conf.NewConfig())
 		require.NoError(t, err)
 
 		cancelCtx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
 		// setup publishing pipeline and capture ACKer, so we can simulate progress in the Output
-		var acker beat.ACKer
+		var acker beat.EventListener
 		var wgACKer sync.WaitGroup
 		wgACKer.Add(1)
 		pipeline := &pubtest.FakeConnector{
 			ConnectFunc: func(cfg beat.ClientConfig) (beat.Client, error) {
 				defer wgACKer.Done()
-				acker = cfg.ACKHandler
+				acker = cfg.EventListener
 				return &pubtest.FakeClient{
 					PublishFunc: func(event beat.Event) {
 						acker.AddEvent(event, true)
@@ -454,7 +455,7 @@ func TestManager_InputsRun(t *testing.T) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			err = inp.Run(v2.Context{
+			err = inp.Run(input.Context{
 				Logger:      manager.Logger,
 				Cancelation: cancelCtx,
 			}, pipeline)
@@ -552,7 +553,7 @@ func TestLockResource(t *testing.T) {
 
 func (s stringSource) Name() string { return string(s) }
 
-func simpleManagerWithConfigure(t *testing.T, configure func(*common.Config) ([]Source, Input, error)) *InputManager {
+func simpleManagerWithConfigure(t *testing.T, configure func(*conf.C) ([]Source, Input, error)) *InputManager {
 	return &InputManager{
 		Logger:     logp.NewLogger("test"),
 		StateStore: createSampleStore(t, nil),
@@ -562,7 +563,7 @@ func simpleManagerWithConfigure(t *testing.T, configure func(*common.Config) ([]
 }
 
 func constConfigureResult(t *testing.T, sources []Source, inp Input, err error) *InputManager {
-	return simpleManagerWithConfigure(t, func(cfg *common.Config) ([]Source, Input, error) {
+	return simpleManagerWithConfigure(t, func(cfg *conf.C) ([]Source, Input, error) {
 		return sources, inp, err
 	})
 }

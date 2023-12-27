@@ -1,0 +1,162 @@
+{
+    "attributes": {
+        "description": "Metrics about Deployments",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "syncColors": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "0242b61d-de8c-47bd-b438-f0f7a99143ba",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "0242b61d-de8c-47bd-b438-f0f7a99143ba",
+                "panelRefName": "panel_0242b61d-de8c-47bd-b438-f0f7a99143ba",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "88ce869b-b92a-47b7-aa24-169a2d4fe418",
+                    "w": 12,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "88ce869b-b92a-47b7-aa24-169a2d4fe418",
+                "panelRefName": "panel_88ce869b-b92a-47b7-aa24-169a2d4fe418",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "4496c743-585b-4104-abf3-cd2709fec431",
+                    "w": 12,
+                    "x": 12,
+                    "y": 5
+                },
+                "panelIndex": "4496c743-585b-4104-abf3-cd2709fec431",
+                "panelRefName": "panel_4496c743-585b-4104-abf3-cd2709fec431",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "0dff4b23-5451-42c7-89d8-dbb43caed74f",
+                    "w": 12,
+                    "x": 24,
+                    "y": 5
+                },
+                "panelIndex": "0dff4b23-5451-42c7-89d8-dbb43caed74f",
+                "panelRefName": "panel_0dff4b23-5451-42c7-89d8-dbb43caed74f",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 13,
+                    "i": "8703c707-b66a-4643-9496-385d85b652b6",
+                    "w": 12,
+                    "x": 36,
+                    "y": 5
+                },
+                "panelIndex": "8703c707-b66a-4643-9496-385d85b652b6",
+                "panelRefName": "panel_8703c707-b66a-4643-9496-385d85b652b6",
+                "type": "visualization",
+                "version": "8.3.0-SNAPSHOT"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "ff2adb2c-2926-49df-a382-e9f4e3f4111c",
+                    "w": 48,
+                    "x": 0,
+                    "y": 18
+                },
+                "panelIndex": "ff2adb2c-2926-49df-a382-e9f4e3f4111c",
+                "panelRefName": "panel_ff2adb2c-2926-49df-a382-e9f4e3f4111c",
+                "type": "lens",
+                "version": "8.3.0-SNAPSHOT"
+            }
+        ],
+        "timeRestore": false,
+        "title": "[Metricbeat Kubernetes] Deployments",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.3.0",
+    "id": "kubernetes-5be46210-bcb1-11ec-b64f-7dd6e8e82013",
+    "migrationVersion": {
+        "dashboard": "8.3.0"
+    },
+    "references": [
+        {
+            "id": "kubernetes-92a1fc20-bcb3-11ec-b64f-7dd6e8e82013",
+            "name": "0242b61d-de8c-47bd-b438-f0f7a99143ba:panel_0242b61d-de8c-47bd-b438-f0f7a99143ba",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-9b8bc8c0-bcb3-11ec-b64f-7dd6e8e82013",
+            "name": "88ce869b-b92a-47b7-aa24-169a2d4fe418:panel_88ce869b-b92a-47b7-aa24-169a2d4fe418",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-b8555ce0-bcb4-11ec-b64f-7dd6e8e82013",
+            "name": "4496c743-585b-4104-abf3-cd2709fec431:panel_4496c743-585b-4104-abf3-cd2709fec431",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-d5b66b80-bcb4-11ec-b64f-7dd6e8e82013",
+            "name": "0dff4b23-5451-42c7-89d8-dbb43caed74f:panel_0dff4b23-5451-42c7-89d8-dbb43caed74f",
+            "type": "visualization"
+        },
+        {
+            "id": "kubernetes-f6458890-bcb4-11ec-b64f-7dd6e8e82013",
+            "name": "8703c707-b66a-4643-9496-385d85b652b6:panel_8703c707-b66a-4643-9496-385d85b652b6",
+            "type": "visualization"
+        },
+        {
+            "id": "156eb540-db7b-11ec-9a27-6bd4c921c53b",
+            "name": "ff2adb2c-2926-49df-a382-e9f4e3f4111c:panel_ff2adb2c-2926-49df-a382-e9f4e3f4111c",
+            "type": "lens"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2022-05-24T16:22:52.326Z",
+    "version": "WzEwNTIsMV0="
+}

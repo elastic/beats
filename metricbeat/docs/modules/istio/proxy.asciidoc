@@ -1,6 +1,8 @@
 ////
 This file is generated! See scripts/mage/docs_collector.go
 ////
+:edit_url: https://github.com/elastic/beats/edit/main/x-pack/metricbeat/module/istio/proxy/_meta/docs.asciidoc
+
 
 [[metricbeat-metricset-istio-proxy]]
 [role="xpack"]
@@ -11,8 +13,11 @@ beta[]
 include::../../../../x-pack/metricbeat/module/istio/proxy/_meta/docs.asciidoc[]
 
 
+:edit_url:
+
 ==== Fields
 
 For a description of each field in the metricset, see the
 <<exported-fields-istio,exported fields>> section.
 
+:edit_url!:

@@ -18,26 +18,27 @@
 package extract_array
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"sort"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/processors/checks"
 	jsprocessor "github.com/elastic/beats/v7/libbeat/processors/script/javascript/module/processor"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 type config struct {
-	Field         string        `config:"field"`
-	Mappings      common.MapStr `config:"mappings"`
-	IgnoreMissing bool          `config:"ignore_missing"`
-	OmitEmpty     bool          `config:"omit_empty"`
-	OverwriteKeys bool          `config:"overwrite_keys"`
-	FailOnError   bool          `config:"fail_on_error"`
+	Field         string   `config:"field"`
+	Mappings      mapstr.M `config:"mappings"`
+	IgnoreMissing bool     `config:"ignore_missing"`
+	OmitEmpty     bool     `config:"omit_empty"`
+	OverwriteKeys bool     `config:"overwrite_keys"`
+	FailOnError   bool     `config:"fail_on_error"`
 }
 
 type fieldMapping struct {
@@ -67,11 +68,11 @@ func init() {
 }
 
 // Unpack unpacks the processor's configuration.
-func (f *extractArrayProcessor) Unpack(from *common.Config) error {
+func (f *extractArrayProcessor) Unpack(from *conf.C) error {
 	tmp := defaultConfig
 	err := from.Unpack(&tmp)
 	if err != nil {
-		return fmt.Errorf("failed to unpack the extract_array configuration: %s", err)
+		return fmt.Errorf("failed to unpack the extract_array configuration: %w", err)
 	}
 	f.config = tmp
 	for field, column := range f.Mappings.Flatten() {
@@ -88,7 +89,7 @@ func (f *extractArrayProcessor) Unpack(from *common.Config) error {
 }
 
 // New builds a new extract_array processor.
-func New(c *common.Config) (processors.Processor, error) {
+func New(c *conf.C) (beat.Processor, error) {
 	p := &extractArrayProcessor{}
 	err := c.Unpack(p)
 	if err != nil {
@@ -115,10 +116,10 @@ func isEmpty(v reflect.Value) bool {
 func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 	iValue, err := event.GetValue(f.config.Field)
 	if err != nil {
-		if f.config.IgnoreMissing && errors.Cause(err) == common.ErrKeyNotFound {
+		if f.config.IgnoreMissing && errors.Is(err, mapstr.ErrKeyNotFound) {
 			return event, nil
 		}
-		return event, errors.Wrapf(err, "could not fetch value for field %s", f.config.Field)
+		return event, fmt.Errorf("could not fetch value for field %s: %w", f.config.Field, err)
 	}
 
 	array := reflect.ValueOf(iValue)
@@ -126,7 +127,7 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 		if !f.config.FailOnError {
 			return event, nil
 		}
-		return event, errors.Wrapf(err, "unsupported type for field %s: got: %s needed: array", f.config.Field, t.String())
+		return event, fmt.Errorf("unsupported type for field %s: got: %s needed: array", f.config.Field, t.String())
 	}
 
 	saved := event
@@ -140,7 +141,7 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 			if !f.config.FailOnError {
 				continue
 			}
-			return saved, errors.Errorf("index %d exceeds length of %d when processing mapping for field %s", mapping.from, n, mapping.to)
+			return saved, fmt.Errorf("index %d exceeds length of %d when processing mapping for field %s", mapping.from, n, mapping.to)
 		}
 		cell := array.Index(mapping.from)
 		// checking for CanInterface() here is done to prevent .Interface() from
@@ -154,14 +155,14 @@ func (f *extractArrayProcessor) Run(event *beat.Event) (*beat.Event, error) {
 				if !f.config.FailOnError {
 					continue
 				}
-				return saved, errors.Errorf("target field %s already has a value. Set the overwrite_keys flag or drop/rename the field first", mapping.to)
+				return saved, fmt.Errorf("target field %s already has a value. Set the overwrite_keys flag or drop/rename the field first", mapping.to)
 			}
 		}
 		if _, err = event.PutValue(mapping.to, clone(cell.Interface())); err != nil {
 			if !f.config.FailOnError {
 				continue
 			}
-			return saved, errors.Wrapf(err, "failed setting field %s", mapping.to)
+			return saved, fmt.Errorf("failed setting field %s: %w", mapping.to, err)
 		}
 	}
 	return event, nil
@@ -175,10 +176,10 @@ func clone(value interface{}) interface{} {
 	// TODO: This is dangerous but done by most processors.
 	//       Otherwise need to reflect value and deep copy lists / map types.
 	switch v := value.(type) {
-	case common.MapStr:
+	case mapstr.M:
 		return v.Clone()
 	case map[string]interface{}:
-		return common.MapStr(v).Clone()
+		return mapstr.M(v).Clone()
 	case []interface{}:
 		len := len(v)
 		newArr := make([]interface{}, len)

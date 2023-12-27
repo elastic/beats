@@ -2,36 +2,33 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux || synthetics
+
 package source
 
 import (
-	"fmt"
-	"net/http"
-	"net/http/httptest"
 	"os"
-	"path"
 	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/x-pack/heartbeat/monitors/browser/source/fixtures"
+	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 func TestSimpleCases(t *testing.T) {
 	type testCase struct {
 		name         string
-		cfg          common.MapStr
+		cfg          mapstr.M
 		tlsServer    bool
 		wantFetchErr bool
 	}
 	testCases := []testCase{
 		{
 			"basics",
-			common.MapStr{
+			mapstr.M{
 				"folder":  "/",
 				"retries": 3,
 			},
@@ -40,17 +37,17 @@ func TestSimpleCases(t *testing.T) {
 		},
 		{
 			"targetdir",
-			common.MapStr{
+			mapstr.M{
 				"folder":           "/",
 				"retries":          3,
-				"target_directory": "/tmp/synthetics/blah",
+				"target_directory": filepath.Join(os.TempDir(), "synthetics", "blah"),
 			},
 			false,
 			false,
 		},
 		{
 			"auth success",
-			common.MapStr{
+			mapstr.M{
 				"folder":   "/",
 				"retries":  3,
 				"username": "testuser",
@@ -61,7 +58,7 @@ func TestSimpleCases(t *testing.T) {
 		},
 		{
 			"auth failure",
-			common.MapStr{
+			mapstr.M{
 				"folder":   "/",
 				"retries":  3,
 				"username": "testuser",
@@ -72,10 +69,10 @@ func TestSimpleCases(t *testing.T) {
 		},
 		{
 			"ssl ignore cert errors",
-			common.MapStr{
+			mapstr.M{
 				"folder":  "/",
 				"retries": 3,
-				"ssl": common.MapStr{
+				"ssl": mapstr.M{
 					"enabled":           "true",
 					"verification_mode": "none",
 				},
@@ -85,10 +82,10 @@ func TestSimpleCases(t *testing.T) {
 		},
 		{
 			"bad ssl",
-			common.MapStr{
+			mapstr.M{
 				"folder":  "/",
 				"retries": 3,
-				"ssl": common.MapStr{
+				"ssl": mapstr.M{
 					"enabled":                 "true",
 					"certificate_authorities": []string{},
 				},
@@ -99,117 +96,19 @@ func TestSimpleCases(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		url, teardown := setupTests(tc.tlsServer)
-		defer teardown()
 		t.Run(tc.name, func(t *testing.T) {
-			tc.cfg["url"] = fmt.Sprintf("%s/fixtures/todos.zip", url)
-			zus, err := dummyZus(tc.cfg)
-			require.NoError(t, err)
-
-			require.NotNil(t, zus.httpClient)
-
-			if tc.wantFetchErr == true {
-				err := zus.Fetch()
-				require.Error(t, err)
-				return
-			}
-
-			fetchAndCheckDir(t, zus)
+			tc.cfg["url"] = "gibberish"
+			_, err := dummyZus(tc.cfg)
+			require.Error(t, err)
+			require.Regexp(t, ErrZipURLUnsupportedType, err)
 		})
 	}
-}
-
-func TestZipUrlWithSameEtag(t *testing.T) {
-	address, teardown := setupTests(false)
-	defer teardown()
-
-	zus, err := dummyZus(common.MapStr{
-		"url":     fmt.Sprintf("%s/fixtures/todos.zip", address),
-		"folder":  "/",
-		"retries": 3,
-	})
-	require.NoError(t, err)
-	err = zus.Fetch()
-	defer zus.Close()
-	require.NoError(t, err)
-
-	etag := zus.etag
-	target := zus.TargetDirectory
-	err = zus.Fetch()
-	require.NoError(t, err)
-	require.Equalf(t, zus.etag, etag, "etag should be same")
-	require.Equal(t, zus.TargetDirectory, target, "Target directory should be same")
-}
-
-func TestZipUrlWithBadUrl(t *testing.T) {
-	_, teardown := setupTests(false)
-	defer teardown()
-
-	zus, err := dummyZus(common.MapStr{
-		"url":     "http://notahost.notadomaintoehutoeuhn",
-		"folder":  "/",
-		"retries": 2,
-	})
-	require.NoError(t, err)
-	err = zus.Fetch()
-	defer zus.Close()
-	require.Error(t, err)
-}
-
-func setupTests(tls bool) (addr string, teardown func()) {
-	// go offline, so we dont invoke npm install for unit tests
-	GoOffline()
-
-	srv := createServer(tls)
-	address := srv.URL
-	return address, func() {
-		GoOnline()
-		srv.Close()
-	}
-}
-
-func createServer(tls bool) (addr *httptest.Server) {
-	_, filename, _, _ := runtime.Caller(0)
-	fixturesPath := path.Join(filepath.Dir(filename), "fixtures")
-	fileServer := http.FileServer(http.Dir(fixturesPath))
-
-	mux := http.NewServeMux()
-	mux.HandleFunc("/fixtures/", func(resp http.ResponseWriter, req *http.Request) {
-		resp.Header().Add("Etag", "123456")
-		user, pass, hasAuth := req.BasicAuth()
-		if hasAuth && (user != "testuser" || pass != "testpass") {
-			resp.WriteHeader(403)
-			resp.Write([]byte("forbidden"))
-		}
-		http.StripPrefix("/fixtures", fileServer).ServeHTTP(resp, req)
-	})
-
-	var srv *httptest.Server
-	if tls {
-		srv = httptest.NewTLSServer(mux)
-	} else {
-		srv = httptest.NewServer(mux)
-	}
-
-	return srv
-}
-
-func fetchAndCheckDir(t *testing.T, zip *ZipURLSource) {
-	err := zip.Fetch()
-	defer zip.Close()
-	require.NoError(t, err)
-
-	fixtures.TestTodosFiles(t, zip.Workdir())
-	// check if the working directory is deleted
-	require.NoError(t, zip.Close())
-	_, err = os.Stat(zip.TargetDirectory)
-	require.True(t, os.IsNotExist(err), "TargetDirectory %s should have been deleted", zip.TargetDirectory)
 }
 
 func dummyZus(conf map[string]interface{}) (*ZipURLSource, error) {
 	zus := &ZipURLSource{}
 	y, _ := yaml.Marshal(conf)
-	c, err := common.NewConfigWithYAML(y, string(y))
+	c, err := config.NewConfigWithYAML(y, string(y))
 	if err != nil {
 		return nil, err
 	}

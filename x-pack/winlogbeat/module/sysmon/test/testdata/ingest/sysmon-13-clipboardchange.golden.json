@@ -1,0 +1,72 @@
+[
+  {
+    "@timestamp": "2021-02-25T15:04:48.592Z",
+    "ecs": {
+      "version": "1.12.0"
+    },
+    "event": {
+      "code": "24",
+      "kind": "event",
+      "module": "sysmon",
+      "provider": "Microsoft-Windows-Sysmon",
+      "type": [
+        "change"
+      ]
+    },
+    "host": {
+      "name": "DESKTOP-I9CQVAQ"
+    },
+    "log": {
+      "level": "information"
+    },
+    "process": {
+      "entity_id": "{9497d8d9-aa1b-602f-a600-000000001000}",
+      "executable": "C:\\Program Files\\VMware\\VMware Tools\\vmtoolsd.exe",
+      "hash": {
+        "sha256": "7adb1cf1a75973079c055f929573ae92557a8c0e5b0e38a6a5427e412fb73d59"
+      },
+      "name": "vmtoolsd.exe",
+      "pid": 2144
+    },
+    "related": {
+      "hash": [
+        "7adb1cf1a75973079c055f929573ae92557a8c0e5b0e38a6a5427e412fb73d59"
+      ]
+    },
+    "sysmon": {
+      "file": {
+        "archived": true
+      }
+    },
+    "user": {
+      "id": "S-1-5-18"
+    },
+    "winlog": {
+      "api": "wineventlog",
+      "channel": "Microsoft-Windows-Sysmon/Operational",
+      "computer_name": "DESKTOP-I9CQVAQ",
+      "event_data": {
+        "ClientInfo": "user: DESKTOP-I9CQVAQ\\luks",
+        "Session": "1"
+      },
+      "event_id": "24",
+      "opcode": "Info",
+      "process": {
+        "pid": 3800,
+        "thread": {
+          "id": 6444
+        }
+      },
+      "provider_guid": "{5770385f-c22a-43e0-bf4c-06f5698ffbd9}",
+      "provider_name": "Microsoft-Windows-Sysmon",
+      "record_id": "10757412",
+      "user": {
+        "domain": "NT AUTHORITY",
+        "identifier": "S-1-5-18",
+        "name": "SYSTEM",
+        "type": "Well Known Group"
+      },
+      "version": 5
+    }
+  }
+]

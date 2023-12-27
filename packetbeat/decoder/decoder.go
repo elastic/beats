@@ -19,19 +19,19 @@ package decoder
 
 import (
 	"fmt"
+	"sort"
+	"time"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 
-	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/packetbeat/flows"
 	"github.com/elastic/beats/v7/packetbeat/protos"
 	"github.com/elastic/beats/v7/packetbeat/protos/icmp"
 	"github.com/elastic/beats/v7/packetbeat/protos/tcp"
 	"github.com/elastic/beats/v7/packetbeat/protos/udp"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
-
-var debugf = logp.MakeDebug("decoder")
 
 type Decoder struct {
 	decoders         map[gopacket.LayerType]gopacket.DecodingLayer
@@ -50,6 +50,8 @@ type Decoder struct {
 	udp       layers.UDP
 	truncated bool
 
+	fragments fragmentCache
+
 	stD1Q, stIP4, stIP6 multiLayer
 
 	icmp4Proc icmp.ICMPv4Processor
@@ -66,6 +68,8 @@ type Decoder struct {
 	// hold current flow ID
 	flowID              *flows.FlowID // buffer flowID among many calls
 	flowIDBufferBacking [flows.SizeFlowIDMax]byte
+
+	logger *logp.Logger
 }
 
 const (
@@ -76,18 +80,13 @@ const (
 )
 
 // New creates and initializes a new packet decoder.
-func New(
-	f *flows.Flows,
-	datalink layers.LinkType,
-	icmp4 icmp.ICMPv4Processor,
-	icmp6 icmp.ICMPv6Processor,
-	tcp tcp.Processor,
-	udp udp.Processor,
-) (*Decoder, error) {
+func New(f *flows.Flows, datalink layers.LinkType, icmp4 icmp.ICMPv4Processor, icmp6 icmp.ICMPv6Processor, tcp tcp.Processor, udp udp.Processor) (*Decoder, error) {
 	d := Decoder{
 		flows:     f,
 		decoders:  make(map[gopacket.LayerType]gopacket.DecodingLayer),
 		icmp4Proc: icmp4, icmp6Proc: icmp6, tcpProc: tcp, udpProc: udp,
+		fragments: fragmentCache{collected: make(map[uint16]fragments)},
+		logger:    logp.NewLogger("decoder"),
 	}
 	d.stD1Q.init(&d.d1q[0], &d.d1q[1])
 	d.stIP4.init(&d.ip4[0], &d.ip4[1])
@@ -115,7 +114,7 @@ func New(
 		d.flowID = &flows.FlowID{}
 	}
 
-	defaultLayerTypes := []gopacket.DecodingLayer{
+	d.AddLayers([]gopacket.DecodingLayer{
 		&d.sll,             // LinuxSLL
 		&d.eth,             // Ethernet
 		&d.lo,              // loopback on OS X
@@ -123,10 +122,9 @@ func New(
 		&d.stIP4, &d.stIP6, // IP
 		&d.icmp4, &d.icmp6, // ICMP
 		&d.tcp, &d.udp, // TCP/UDP
-	}
-	d.AddLayers(defaultLayerTypes)
+	})
 
-	debugf("Layer type: %s", datalink.String())
+	d.logger.Debugf("Layer type: %s", datalink)
 
 	switch datalink {
 	case layers.LinkTypeLinuxSLL:
@@ -139,7 +137,7 @@ func New(
 		d.linkLayerDecoder = &d.lo
 		d.linkLayerType = layers.LayerTypeLoopback
 	default:
-		return nil, fmt.Errorf("Unsupported link type: %s", datalink.String())
+		return nil, fmt.Errorf("unsupported link type: %s", datalink)
 	}
 
 	return &d, nil
@@ -162,8 +160,6 @@ func (d *Decoder) AddLayers(layers []gopacket.DecodingLayer) {
 }
 
 func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
-	defer logp.Recover("packet decoding failed")
-
 	d.truncated = false
 
 	current := d.linkLayerDecoder
@@ -171,8 +167,7 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 
 	packet := protos.Packet{Ts: ci.Timestamp}
 
-	debugf("decode packet data")
-	processed := false
+	d.logger.Debug("decode packet data")
 
 	if d.flowID != nil {
 		d.flowID.Reset(d.flowIDBufferBacking[:0])
@@ -182,28 +177,64 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 		defer d.flows.Unlock()
 	}
 
-	for len(data) > 0 {
+	d.stD1Q.i = 0
+	d.stIP4.i = 0
+	d.stIP6.i = 0
+	for len(data) != 0 {
 		err := current.DecodeFromBytes(data, d)
 		if err != nil {
-			logp.Info("packet decode failed with: %v", err)
+			d.logger.Infof("packet decode failed with: %v", err)
 			break
 		}
 
 		nextType := current.NextLayerType()
 		data = current.LayerPayload()
-
-		processed, err = d.process(&packet, currentType)
-		if err != nil {
-			logp.Info("Error processing packet: %v", err)
-			break
+		if nextType == gopacket.LayerTypeFragment {
+			ipv4, ok := ipv4Layer(current)
+			if !ok {
+				// This should never happen. Log the issue and attempt to continue.
+				// The process logic below will handle this if it can.
+				d.logger.Warn("no IPv4 layer for fragment")
+			} else {
+				now := time.Now()
+				const offsetMask = 1<<13 - 1 // https://datatracker.ietf.org/doc/html/rfc791#section-3.1
+				f := fragment{
+					id:     ipv4.Id,
+					offset: int(ipv4.FragOffset&offsetMask) * 8,
+					data:   append(data[:0:0], data...), // Ensure that we are not aliasing data.
+					more:   ipv4.Flags&layers.IPv4MoreFragments != 0,
+					expire: now.Add(time.Duration(ipv4.TTL) * time.Second),
+				}
+				var more bool
+				data, more, err = d.fragments.add(now, f)
+				if err != nil {
+					d.logger.Warnf("%v src=%s dst=%s", err, ipv4.SrcIP, ipv4.DstIP)
+					return
+				}
+				if more {
+					return
+				}
+				d.process(&packet, currentType)
+				currentType = ipv4.Protocol.LayerType()
+				current, ok = d.decoders[currentType]
+				if !ok {
+					d.logger.Debugf("no layer decoder for reconstructed fragments: %v (%[1]d)", currentType)
+					break
+				}
+				continue
+			}
 		}
-		if processed {
+
+		done := d.process(&packet, currentType)
+		if done {
+			d.logger.Debugf("processed")
 			break
 		}
 
 		// choose next decoding layer
 		next, ok := d.decoders[nextType]
 		if !ok {
+			d.logger.Debugf("no next type: %v (%[1]d)", nextType)
 			break
 		}
 
@@ -214,7 +245,7 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 
 	// add flow s.tats
 	if d.flowID != nil {
-		debugf("flow id flags: %v", d.flowID.Flags())
+		d.logger.Debugf("flow id flags: %v", d.flowID.Flags())
 	}
 
 	if d.flowID != nil && d.flowID.Flags() != 0 {
@@ -224,10 +255,117 @@ func (d *Decoder) OnPacket(data []byte, ci *gopacket.CaptureInfo) {
 	}
 }
 
-func (d *Decoder) process(
-	packet *protos.Packet,
-	layerType gopacket.LayerType,
-) (bool, error) {
+// fragmentCache is a TTL aware cache of IPv4 fragments to reassemble.
+type fragmentCache struct {
+	// oldest is the expiry time of the oldest fragment.
+	oldest time.Time
+
+	// collected is the collections of fragments keyed on their
+	// IPv4 packet ID field.
+	collected map[uint16]fragments
+}
+
+// maxReassemble is the maximum size that a collection of fragmented
+// packets will be reassembled to.
+const maxReassemble = 1e5
+
+// add adds a new fragment to the cache. The value of now is used to expire fragments
+// and collections of fragments. If the fragment completes a set of fragments for
+// reassembly, the payload of the reassembled packet is returned in data.
+// If more packets are required to complete the reassembly of the packets in the
+// fragments ID set, more is returned true. Expiries and oversize reassemblies are
+// signaled via the returned error.
+// The cache is purged of expired collections before add returns.
+func (c *fragmentCache) add(now time.Time, f fragment) (data []byte, more bool, err error) {
+	defer c.purge(now)
+
+	collected, ok := c.collected[f.id]
+	if ok && !collected.expire.IsZero() && now.After(collected.expire) {
+		delete(c.collected, f.id)
+		return nil, false, fmt.Errorf("fragments expired before reassembly ID=%d", f.id)
+	}
+	if c.oldest.After(f.expire) {
+		c.oldest = f.expire
+	}
+	if collected.expire.IsZero() || collected.expire.After(f.expire) {
+		collected.expire = f.expire
+	}
+	collected.fragments = append(collected.fragments, f)
+
+	// Check whether we have all the fragments we need to do a reassembly.
+	// Do the least amount of work possible
+	if !f.more {
+		collected.haveFinal = true
+	}
+	more = !collected.haveFinal
+	if collected.haveFinal {
+		sort.Slice(collected.fragments, func(i, j int) bool {
+			return collected.fragments[i].offset < collected.fragments[j].offset
+		})
+		more = collected.fragments[0].offset != 0
+		if !more {
+			n := len(collected.fragments[0].data)
+			for _, f := range collected.fragments[1:] {
+				if f.offset != n {
+					more = true
+					break
+				}
+				n += len(f.data)
+			}
+		}
+	}
+	if more {
+		c.collected[f.id] = collected
+		return nil, true, nil
+	}
+
+	// Drop the fragments and do the reassembly.
+	delete(c.collected, f.id)
+	data = collected.fragments[0].data
+	for _, f := range collected.fragments[1:] {
+		if len(data)+len(f.data) > maxReassemble {
+			return nil, false, fmt.Errorf("packet reconstruction would exceed limit ID=%d", f.id)
+		}
+		data = append(data, f.data...)
+	}
+	return data, false, nil
+}
+
+// purge performs a cache expiry purge, removing all collected fragments
+// that expired before now.
+func (c *fragmentCache) purge(now time.Time) {
+	if c.oldest.After(now) {
+		return
+	}
+	c.oldest = now
+	for id, coll := range c.collected {
+		if now.After(coll.expire) {
+			delete(c.collected, id)
+			continue
+		}
+		if c.oldest.After(coll.expire) {
+			c.oldest = coll.expire
+		}
+	}
+}
+
+// fragments holds a collection of fragmented packets sharing an IPv4 packet ID.
+type fragments struct {
+	expire    time.Time
+	fragments []fragment
+	haveFinal bool
+}
+
+// fragment is an IPv4 packet fragment.
+type fragment struct {
+	id     uint16
+	offset int
+	data   []byte
+	more   bool
+	expire time.Time
+}
+
+func (d *Decoder) process(packet *protos.Packet, layerType gopacket.LayerType) (done bool) {
 	withFlow := d.flowID != nil
 
 	switch layerType {
@@ -244,7 +382,7 @@ func (d *Decoder) process(
 		}
 
 	case layers.LayerTypeIPv4:
-		debugf("IPv4 packet")
+		d.logger.Debugf("IPv4 packet")
 		ip4 := &d.ip4[d.stIP4.i]
 		d.stIP4.next()
 
@@ -257,7 +395,7 @@ func (d *Decoder) process(
 		packet.Tuple.IPLength = 4
 
 	case layers.LayerTypeIPv6:
-		debugf("IPv6 packet")
+		d.logger.Debugf("IPv6 packet")
 		ip6 := &d.ip6[d.stIP6.i]
 		d.stIP6.next()
 
@@ -270,27 +408,27 @@ func (d *Decoder) process(
 		packet.Tuple.IPLength = 16
 
 	case layers.LayerTypeICMPv4:
-		debugf("ICMPv4 packet")
+		d.logger.Debugf("ICMPv4 packet")
 		d.onICMPv4(packet)
-		return true, nil
+		return true
 
 	case layers.LayerTypeICMPv6:
-		debugf("ICMPv6 packet")
+		d.logger.Debugf("ICMPv6 packet")
 		d.onICMPv6(packet)
-		return true, nil
+		return true
 
 	case layers.LayerTypeUDP:
-		debugf("UDP packet")
+		d.logger.Debugf("UDP packet")
 		d.onUDP(packet)
-		return true, nil
+		return true
 
 	case layers.LayerTypeTCP:
-		debugf("TCP packet")
+		d.logger.Debugf("TCP packet")
 		d.onTCP(packet)
-		return true, nil
+		return true
 	}
 
-	return false, nil
+	return false
 }
 
 func (d *Decoder) onICMPv4(packet *protos.Packet) {
@@ -356,7 +494,7 @@ func (d *Decoder) onTCP(packet *protos.Packet) {
 
 	if id == nil && len(packet.Payload) == 0 && !d.tcp.FIN {
 		// We have no use for this atm.
-		debugf("Ignore empty non-FIN packet")
+		d.logger.Debugf("Ignore empty non-FIN packet")
 		return
 	}
 	packet.Tuple.ComputeHashables()

@@ -6,8 +6,7 @@ package performance
 
 import (
 	"context"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/oracle"
@@ -28,21 +27,14 @@ func init() {
 // interface methods except for Fetch.
 type MetricSet struct {
 	mb.BaseMetricSet
-	extractor         performanceExtractMethods
-	connectionDetails oracle.ConnectionDetails
+	extractor performanceExtractMethods
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	config := oracle.ConnectionDetails{}
-	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, errors.Wrap(err, "error parsing config file")
-	}
-
 	return &MetricSet{
-		BaseMetricSet:     base,
-		connectionDetails: config,
+		BaseMetricSet: base,
 	}, nil
 }
 
@@ -50,9 +42,9 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // format. It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) error {
-	db, err := oracle.NewConnection(&m.connectionDetails)
+	db, err := oracle.NewConnection(m.HostData().URI)
 	if err != nil {
-		return errors.Wrap(err, "error creating connection to Oracle")
+		return fmt.Errorf("error creating connection to Oracle: %w", err)
 	}
 	defer db.Close()
 

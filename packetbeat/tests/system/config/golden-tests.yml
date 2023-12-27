@@ -36,6 +36,11 @@ test_cases:
     pcap: pcaps/sip_authenticated_register.pcap
     config: {}
 
+  - name: SIP Through TCP
+    pcap: pcaps/sip_tcp.pcap
+    config:
+      transport_protocol: tcp
+
   - name: HTTP Basic Auth
     pcap: pcaps/http_basicauth.pcap
     config:

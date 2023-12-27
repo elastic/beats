@@ -18,7 +18,7 @@
 /*
 Package kafka is a Metricbeat module that contains MetricSets.
 
-Kafka is organised as following
+# Kafka is organised as following
 
 - Topic
 - Partition
@@ -32,6 +32,5 @@ Notes
 - Each partition has an offset
 - Topic can be across brokers
 - Each broker has a list of partitions
-
 */
 package kafka
