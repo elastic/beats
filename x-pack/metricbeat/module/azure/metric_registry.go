@@ -49,56 +49,27 @@ func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) boo
 	// resource ID and metric names.
 	metricKey := m.buildMetricKey(metric)
 
-	//// Get the now time in UTC, only to be used for logging.
-	//// It's interesting to see when the registry evaluate each
-	//// metric in relation to the reference time.
-	//now := time.Now().UTC()
-
 	if lastCollection, exists := m.collectionsInfo[metricKey]; exists {
 		// Turn the time grain into a duration (for example, PT5M -> 5 minutes).
-		timeGrainDuration := convertTimeGrainToDuration(lastCollection.timeGrain)
+		timeGrainDuration := asDuration(lastCollection.timeGrain)
 
-		//// Calculate the start time of the time grain in relation to
-		//// the reference time.
-		//timeGrainStartTime := referenceTime.Add(-timeGrainDuration)
+		// Adjust the last collection time by adding a small jitter to avoid
+		// skipping collections when the collection period is close (usually < 1s).
+		timeSinceLastCollection := time.Since(lastCollection.timestamp) + m.jitter
 
-		//// Only to be used for logging.
-		////
-		//// The time elapsed since the last collection, and the time
-		//// distance between last collection and the start of time
-		//// grain.
-		//elapsed := referenceTime.Sub(lastCollection.timestamp)
-		//distance := lastCollection.timestamp.Sub(timeGrainStartTime)
-
-		// If the last collection time is after the start time of the time grain,
-		// it means that we already have a value for the given time grain.
-		//
-		// In this case, the metricset does not need to collect the metric
-		// values again.
-		//
-		// if time.Since(metricsByGrain.metricsValuesUpdated).Seconds() < float64(timeGrains[compositeKey.timeGrain]) {
-		//if lastCollection.timestamp.After(timeGrainStartTime.Add(m.jitter)) {
-		lastCollectionSeconds := time.Since(lastCollection.timestamp).Seconds()
-		timeGrainSeconds := timeGrainDuration.Seconds()
-
-		if time.Since(lastCollection.timestamp).Seconds() < timeGrainDuration.Seconds() {
+		if timeSinceLastCollection < timeGrainDuration {
 			m.logger.Debugw(
 				"MetricRegistry: Metric does not need an update",
 				"needs_update", false,
 				"reference_time", referenceTime,
-				//"now", now,
-				//"time_grain_start_time", timeGrainStartTime,
 				"last_collection_time", lastCollection.timestamp,
+				"time_since_last_collection_seconds", timeSinceLastCollection.Seconds(),
 				"time_grain", lastCollection.timeGrain,
+				"time_grain_duration_seconds", timeGrainDuration.Seconds(),
 				"resource_id", metric.ResourceId,
 				"namespace", metric.Namespace,
 				"aggregation", metric.Aggregations,
 				"names", strings.Join(metric.Names, ","),
-				//"elapsed", elapsed.String(),
-				//"jitter", m.jitter.String(),
-				//"distance", distance.String(),
-				"last_collection_seconds", lastCollectionSeconds,
-				"time_grain_seconds", timeGrainSeconds,
 			)
 
 			return false
@@ -110,19 +81,14 @@ func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) boo
 			"MetricRegistry: Metric needs an update",
 			"needs_update", true,
 			"reference_time", referenceTime,
-			//"now", now,
-			//"time_grain_start_time", timeGrainStartTime,
 			"last_collection_time", lastCollection.timestamp,
+			"time_since_last_collection_seconds", timeSinceLastCollection.Seconds(),
 			"time_grain", lastCollection.timeGrain,
+			"time_grain_duration_seconds", timeGrainDuration.Seconds(),
 			"resource_id", metric.ResourceId,
 			"namespace", metric.Namespace,
 			"aggregation", metric.Aggregations,
 			"names", strings.Join(metric.Names, ","),
-			//"elapsed", elapsed.String(),
-			//"jitter", m.jitter.String(),
-			//"distance", distance.String(),
-			"last_collection_seconds", lastCollectionSeconds,
-			"time_grain_seconds", timeGrainSeconds,
 		)
 
 		return true
@@ -136,13 +102,10 @@ func (m *MetricRegistry) NeedsUpdate(referenceTime time.Time, metric Metric) boo
 		"MetricRegistry: Metric needs an update (no collection info in the metric registry)",
 		"needs_update", true,
 		"reference_time", referenceTime,
-		//"now", now,
-		"time_grain", metric.TimeGrain,
 		"resource_id", metric.ResourceId,
 		"namespace", metric.Namespace,
 		"aggregation", metric.Aggregations,
 		"names", strings.Join(metric.Names, ","),
-		//"jitter", m.jitter.String(),
 	)
 
 	return true
