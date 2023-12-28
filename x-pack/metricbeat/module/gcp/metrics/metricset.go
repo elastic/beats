@@ -12,6 +12,7 @@ import (
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
+	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/genproto/googleapis/api/metric"
@@ -128,17 +129,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	m.MetricsConfig = metricsConfigs.Metrics
-
-	if m.config.CredentialsFilePath != "" && m.config.CredentialsJSON != "" {
-		return m, fmt.Errorf("both credentials_file_path and credentials_json specified, you must use only one of them")
-	} else if m.config.CredentialsFilePath != "" {
-		m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
-	} else if m.config.CredentialsJSON != "" {
-		m.config.opt = []option.ClientOption{option.WithCredentialsJSON([]byte(m.config.CredentialsJSON))}
-	} else {
-		return m, fmt.Errorf("no credentials_file_path or credentials_json specified")
-	}
-
+	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
 	m.config.period = &durationpb.Duration{
 		Seconds: int64(m.Module().Config().Period.Seconds()),
 	}
@@ -221,7 +212,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 		return nil, errors.Wrap(err, "error trying to group time series data")
 	}
 
-	//Create single events for each group of data that matches some common patterns like labels and timestamp
+	// Create single events for each group of data that matches some common patterns like labels and timestamp
 	events := make([]mb.Event, 0)
 	for _, groupedEvents := range tsGrouped {
 		event := mb.Event{
