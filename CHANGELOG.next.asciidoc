@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Avoid logging fields values when handling Elasticsearch output errors except at the debug log level. The debug log level must now be used to see detailed errors, for example mapping errors and their cause. {pull}37229[37229]
 
 *Auditbeat*
 
@@ -35,7 +34,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
-- Fix documentation regarding socket type selection. {issue}37174[37174] {pull}37175[37175]
 
 *Filebeat*
 
@@ -62,7 +60,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 
-- Upgrade to Go 1.20.11. {pull}37123[37123]
+- Upgrade to Go 1.20.12. {pull}37352[37352]
 
 *Auditbeat*
 
@@ -83,7 +81,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 
 *Winlogbeat*
-
 
 
 *Elastic Log Driver*
@@ -109,6 +106,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
