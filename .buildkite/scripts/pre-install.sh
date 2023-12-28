@@ -13,7 +13,7 @@ with_yq() {
 with_mage() {
     WORKSPACE=${WORKSPACE:-"$(pwd)"}
     mkdir -p "${WORKSPACE}/bin"
-    retry 5 curl -sL -o "${WORKSPACE}/bin/mage.tar.gz" "https://github.com/magefile/mage/releases/download/v${SETUP_MAGE_VERSION}/mage_${SETUP_MAGE_VERSION}_Linux-64bit.tar.gz"
+    retry 5 curl -L -o "${WORKSPACE}/bin/mage.tar.gz" "https://github.com/magefile/mage/releases/download/v${SETUP_MAGE_VERSION}/mage_${SETUP_MAGE_VERSION}_Linux-64bit.tar.gz"
 
     tar -xvf "${WORKSPACE}/bin/mage.tar.gz" -C "${WORKSPACE}/bin"
     chmod +x "${WORKSPACE}/bin/mage"
