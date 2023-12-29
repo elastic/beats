@@ -6,33 +6,43 @@ env:
 steps:
   - label: "Unit Test"
     key: "test-metric-unit-test"
-    command: "mage build unitTest"
+    command: |
+      cd metricbeat
+      mage build unitTest
     agents:
       provider: "gcp"
       image: "family/core-ubuntu-2204"
 
   - label: "Go Intergration Test"
     key: "test-metric-int-test"
-    command: "mage goIntegTest"
+    command: |
+      cd metricbeat
+      mage goIntegTest
     agents:
       provider: "gcp"
       image: "family/core-ubuntu-2204"
 
   - label: "Python Integration Test"
     key: test-python-int-test
-    command: "mage pythonIntegTest"
+    command:
+      cd metricbeat
+      mage pythonIntegTest
     agents:
       provider: "gcp"
       image: "family/core-ubuntu-2204"
 
   - label: "Cross compile"
     key: test-cross-compile
-    command: "make -C metricbeat crosscompile"
+    command:
+      cd metricbeat
+      make -C metricbeat crosscompile
     agents:
       provider: "gcp"
       image: "family/core-ubuntu-2204"
 
   # - label: "MacOS unit test"
-  #   command: "mage build unitTest"
+  #   command:
+  #     cd metricbeat
+  #     mage build unitTest
   # Ignore as long as there are test failures, see https://github.com/elastic/beats/issues/33035
   # - label: "MacOS M1"
