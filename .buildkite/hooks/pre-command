@@ -7,7 +7,7 @@ version=$(cat .go-version)
 export GO_VERSION="${version}"
 echo "${GO_VERSION}"
 
-# TODO remove in final
+# TODO remove in final steps: image will tools for beats
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]] &&  \
     [[ "$BUILDKITE_STEP_KEY" == "test-"* ]]; then
     echo "--- prepare env"

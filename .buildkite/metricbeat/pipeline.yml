@@ -8,6 +8,7 @@ steps:
     key: "test-metric-unit-test"
     command: |
       cd metricbeat
+      chmod go-w ./mb/testdata/lightmodules/unpack/module.yml
       mage build unitTest
     agents:
       provider: "gcp"
@@ -24,7 +25,7 @@ steps:
 
   - label: "Python Integration Test"
     key: test-python-int-test
-    command:
+    command: |
       cd metricbeat
       mage pythonIntegTest
     agents:
@@ -33,7 +34,7 @@ steps:
 
   - label: "Cross compile"
     key: test-cross-compile
-    command:
+    command: |
       cd metricbeat
       make -C metricbeat crosscompile
     agents:
