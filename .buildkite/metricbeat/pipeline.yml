@@ -8,7 +8,7 @@ steps:
     key: "test-metric-unit-test"
     command: |
       cd metricbeat
-      chmod go-w ./mb/testdata/lightmodules/unpack/module.yml
+      chmod -R go-w ./mb/testdata/
       mage build unitTest
     agents:
       provider: "gcp"
@@ -35,7 +35,6 @@ steps:
   - label: "Cross compile"
     key: test-cross-compile
     command: |
-      cd metricbeat
       make -C metricbeat crosscompile
     agents:
       provider: "gcp"
