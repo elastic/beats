@@ -22,23 +22,23 @@ package state_cronjob
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 
 	k "github.com/elastic/beats/v7/metricbeat/helper/kubernetes/ktest"
 	"github.com/elastic/beats/v7/metricbeat/helper/prometheus/ptest"
 )
 
-var files = []string{
-	"../_meta/test/ksm.v2.4.2.plain",
-	"../_meta/test/ksm.v2.5.0.plain",
-	"../_meta/test/ksm.v2.6.0.plain",
-	"../_meta/test/ksm.v2.7.0.plain",
-}
+var filesFolder = "../_meta/test/KSM"
+var expectedFolder = "./_meta/test"
 
 const name = "state_cronjob"
 
 func TestEventMapping(t *testing.T) {
-	ptest.TestMetricSet(t, "kubernetes", name, k.GetTestCases(files))
+	testCases, err := k.GetTestCases(filesFolder, expectedFolder)
+	require.Equal(t, err, nil)
+	ptest.TestMetricSet(t, "kubernetes", name, testCases)
 }
 
 func TestData(t *testing.T) {
@@ -46,5 +46,5 @@ func TestData(t *testing.T) {
 }
 
 func TestMetricsFamily(t *testing.T) {
-	k.TestStateMetricsFamily(t, files, mapping)
+	k.TestMetricsFamilyFromFolder(t, filesFolder, mapping)
 }

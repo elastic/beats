@@ -130,8 +130,8 @@ var objectList = map[string]string{
 			"crc32c": "hHW/Qw==",
 			"etag": "CM7Ww6q73/kCEAE=",
 			"timeCreated": "2022-08-24T12:20:36.713Z",
-			"updated": "2022-08-24T12:20:36.713Z",
-			"timeStorageClassUpdated": "2022-08-24T12:20:36.713Z"
+			"updated": "2022-08-25T12:20:36.713Z",
+			"timeStorageClassUpdated": "2022-08-25T12:20:36.713Z"
 		  },
 		  {
 			"kind": "storage#object",
@@ -192,8 +192,8 @@ var objectList = map[string]string{
 			"crc32c": "hHW/Qw==",
 			"etag": "CM7Ww6q73/kCEAE=",
 			"timeCreated": "2022-08-24T12:20:36.713Z",
-			"updated": "2022-08-24T12:20:36.713Z",
-			"timeStorageClassUpdated": "2022-08-24T12:20:36.713Z"
+			"updated": "2022-08-25T12:20:36.713Z",
+			"timeStorageClassUpdated": "2022-08-25T12:20:36.713Z"
 		  }
 		]
 	  }`,

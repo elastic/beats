@@ -25,8 +25,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/metricbeat/helper/windows/pdh"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -71,7 +69,7 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 			if _, ok := eventMap[eventKey]; !ok {
 				eventMap[eventKey] = &mb.Event{
 					MetricSetFields: mapstr.M{},
-					Error:           errors.Wrapf(val.Err.Error, "failed on query=%v", counterPath),
+					Error:           fmt.Errorf("failed on query=%v: %w", counterPath, val.Err.Error),
 				}
 				if val.Instance != "" {
 					// will ignore instance index

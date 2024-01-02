@@ -6,9 +6,9 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "kube-system",
+        "namespace": "local-path-storage",
         "replicaset": {
-            "name": "kube-state-metrics-548546fc89",
+            "name": "local-path-provisioner-6bc4bddd6b",
             "replicas": {
                 "available": 1,
                 "desired": 1,

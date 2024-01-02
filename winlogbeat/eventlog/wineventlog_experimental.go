@@ -135,6 +135,11 @@ func newWinEventLogExp(options *conf.C) (EventLog, error) {
 	return l, nil
 }
 
+func (l *winEventLogExp) isForwarded() bool {
+	c := l.config
+	return (c.Forwarded != nil && *c.Forwarded) || (c.Forwarded == nil && c.Name == "ForwardedEvents")
+}
+
 // Name returns the name of the event log (i.e. Application, Security, etc.).
 func (l *winEventLogExp) Name() string {
 	return l.id
@@ -182,7 +187,7 @@ func (l *winEventLogExp) open(state checkpoint.EventLogState) (win.EvtHandle, er
 func (l *winEventLogExp) openFile(state checkpoint.EventLogState, bookmark win.Bookmark) (win.EvtHandle, error) {
 	path := l.channelName
 
-	h, err := win.EvtQuery(0, path, "", win.EvtQueryFilePath|win.EvtQueryForwardDirection)
+	h, err := win.EvtQuery(0, path, l.query, win.EvtQueryFilePath|win.EvtQueryForwardDirection)
 	if err != nil {
 		return win.NilHandle, fmt.Errorf("failed to get handle to event log file %v: %w", path, err)
 	}
@@ -227,9 +232,12 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 
 	var flags win.EvtSubscribeFlag
 	if bookmark > 0 {
-		// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
-		// subscribe again from the beginning.
-		flags = win.EvtSubscribeStartAfterBookmark | win.EvtSubscribeStrict
+		flags = win.EvtSubscribeStartAfterBookmark
+		if !l.isForwarded() {
+			// Use EvtSubscribeStrict to detect when the bookmark is missing and be able to
+			// subscribe again from the beginning.
+			flags |= win.EvtSubscribeStrict
+		}
 	} else {
 		flags = win.EvtSubscribeStartAtOldestRecord
 	}
@@ -256,6 +264,7 @@ func (l *winEventLogExp) openChannel(bookmark win.Bookmark) (win.EvtHandle, erro
 }
 
 func (l *winEventLogExp) Read() ([]Record, error) {
+	//nolint:prealloc // Avoid unnecessary preallocation for each reader every second when event log is inactive.
 	var records []Record
 	defer func() {
 		l.metrics.log(records)
@@ -339,9 +348,18 @@ func (l *winEventLogExp) createBookmarkFromEvent(evtHandle win.EvtHandle) (strin
 	return bookmark.XML()
 }
 
+func (l *winEventLogExp) Reset() error {
+	l.log.Debug("Closing event log reader handles for reset.")
+	return l.close()
+}
+
 func (l *winEventLogExp) Close() error {
 	l.log.Debug("Closing event log reader handles.")
 	l.metrics.close()
+	return l.close()
+}
+
+func (l *winEventLogExp) close() error {
 	if l.iterator == nil {
 		return l.renderer.Close()
 	}

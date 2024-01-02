@@ -18,6 +18,7 @@
 package status
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -25,8 +26,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/uwsgi"
@@ -55,8 +54,7 @@ func fetchStatData(URL string) ([]byte, error) {
 
 	u, err := url.Parse(URL)
 	if err != nil {
-
-		return nil, errors.Wrap(err, "parsing uwsgi stats url failed")
+		return nil, fmt.Errorf("parsing uwsgi stats url failed: %w", err)
 	}
 
 	switch u.Scheme {
@@ -93,7 +91,7 @@ func fetchStatData(URL string) ([]byte, error) {
 
 	data, err := ioutil.ReadAll(reader)
 	if err != nil {
-		return nil, errors.Wrap(err, "uwsgi data read failed")
+		return nil, fmt.Errorf("uwsgi data read failed: %w", err)
 	}
 
 	return data, nil

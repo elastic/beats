@@ -8,8 +8,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"net/textproto"
 	"strings"
+
+	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -20,8 +23,9 @@ var crcProviders = map[string]func(string) *crcValidator{
 	"zoom": newZoomCRC,
 }
 
-// Config contains information about httpjson configuration
+// Config contains information about http_endpoint configuration
 type config struct {
+	Method                string                  `config:"method"`
 	TLS                   *tlscommon.ServerConfig `config:"ssl"`
 	BasicAuth             bool                    `config:"basic_auth"`
 	Username              string                  `config:"username"`
@@ -30,7 +34,7 @@ type config struct {
 	ResponseBody          string                  `config:"response_body"`
 	ListenAddress         string                  `config:"listen_address"`
 	ListenPort            string                  `config:"listen_port"`
-	URL                   string                  `config:"url"`
+	URL                   string                  `config:"url" validate:"required"`
 	Prefix                string                  `config:"prefix"`
 	ContentType           string                  `config:"content_type"`
 	SecretHeader          string                  `config:"secret.header"`
@@ -40,15 +44,16 @@ type config struct {
 	HMACType              string                  `config:"hmac.type"`
 	HMACPrefix            string                  `config:"hmac.prefix"`
 	CRCProvider           string                  `config:"crc.provider"`
+	CRCSecret             string                  `config:"crc.secret"`
 	IncludeHeaders        []string                `config:"include_headers"`
 	PreserveOriginalEvent bool                    `config:"preserve_original_event"`
+	Tracer                *lumberjack.Logger      `config:"tracer"`
 }
 
 func defaultConfig() config {
 	return config{
+		Method:        http.MethodPost,
 		BasicAuth:     false,
-		Username:      "",
-		Password:      "",
 		ResponseCode:  200,
 		ResponseBody:  `{"message": "success"}`,
 		ListenAddress: "127.0.0.1",
@@ -56,19 +61,18 @@ func defaultConfig() config {
 		URL:           "/",
 		Prefix:        "json",
 		ContentType:   "application/json",
-		SecretHeader:  "",
-		SecretValue:   "",
-		HMACHeader:    "",
-		HMACKey:       "",
-		HMACType:      "",
-		HMACPrefix:    "",
-		CRCProvider:   "",
 	}
 }
 
 func (c *config) Validate() error {
 	if !json.Valid([]byte(c.ResponseBody)) {
 		return errors.New("response_body must be valid JSON")
+	}
+
+	switch c.Method {
+	case http.MethodPost, http.MethodPut, http.MethodPatch:
+	default:
+		return fmt.Errorf("method must be POST, PUT or PATCH: %s", c.Method)
 	}
 
 	if c.BasicAuth {
@@ -92,9 +96,11 @@ func (c *config) Validate() error {
 	if c.CRCProvider != "" {
 		if !isValidCRCProvider(c.CRCProvider) {
 			return fmt.Errorf("not a valid CRC provider: %q", c.CRCProvider)
-		} else if c.SecretValue == "" {
-			return errors.New("secret.value is required when crc.provider is defined")
+		} else if c.CRCSecret == "" {
+			return errors.New("crc.secret is required when crc.provider is defined")
 		}
+	} else if c.CRCSecret != "" {
+		return errors.New("crc.provider is required when crc.secret is defined")
 	}
 
 	return nil

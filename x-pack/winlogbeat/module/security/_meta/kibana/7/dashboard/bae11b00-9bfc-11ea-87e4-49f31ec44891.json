@@ -269,11 +269,10 @@
         "title": "[Winlogbeat Security] User Logons",
         "version": 1
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:08.430Z",
     "id": "bae11b00-9bfc-11ea-87e4-49f31ec44891",
-    "migrationVersion": {
-        "dashboard": "7.14.0"
-    },
+    "managed": false,
     "references": [
         {
             "id": "804dd400-a248-11e9-a422-d144027429da",
@@ -342,6 +341,7 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2021-08-11T13:18:58.346Z",
-    "version": "WzIyNjQsMl0="
+    "typeMigrationVersion": "8.9.0",
+    "updated_at": "2023-11-10T17:08:08.430Z",
+    "version": "WzI4NSwxXQ=="
 }

@@ -24,7 +24,7 @@ filebeat.inputs:
   # To fetch all ".log" files from a specific level of subdirectories
   # /var/log/*/*.log can be used.
   # For each file found under this path, a harvester is started.
-  # Make sure not file is defined twice as this can lead to unexpected behaviour.
+  # Make sure no file is defined twice as this can lead to unexpected behaviour.
   paths:
     - /var/log/*.log
     #- c:\programdata\elasticsearch\logs\*
@@ -61,7 +61,7 @@ filebeat.inputs:
   #  level: debug
   #  review: 1
 
-  # Set to true to store the additional fields as top level fields instead
+  # Set to true to store the additional fields as top-level fields instead
   # of under the "fields" sub-dictionary. In case of name conflicts with the
   # fields added by Filebeat itself, the custom fields overwrite the default
   # fields.
@@ -75,7 +75,7 @@ filebeat.inputs:
   # false.
   #publisher_pipeline.disable_host: false
 
-  # Ignore files which were modified more then the defined timespan in the past.
+  # Ignore files that were modified more than the defined timespan in the past.
   # ignore_older is disabled by default, so no files are ignored by setting it to 0.
   # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
   #ignore_older: 0
@@ -93,7 +93,7 @@ filebeat.inputs:
   # This is especially useful for multiline log messages which can get large.
   #max_bytes: 10485760
 
-  # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
+  # Characters that separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
   # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator,
   # null_terminator
   #line_terminator: auto
@@ -116,7 +116,7 @@ filebeat.inputs:
   #json.keys_under_root: false
 
   # If keys_under_root and this setting are enabled, then the values from the decoded
-  # JSON object overwrite the fields that Filebeat normally adds (type, source, offset, etc.)
+  # JSON object overwrites the fields that Filebeat normally adds (type, source, offset, etc.)
   # in case of conflicts.
   #json.overwrite_keys: false
 
@@ -125,7 +125,7 @@ filebeat.inputs:
   # For example, `{"a.b.c": 123}` would be expanded into `{"a":{"b":{"c":123}}}`.
   #json.expand_keys: false
 
-  # If this setting is enabled, Filebeat adds a "error.message" and "error.key: json" key in case of JSON
+  # If this setting is enabled, Filebeat adds an "error.message" and "error.key: json" key in case of JSON
   # unmarshaling errors or when a text key is defined in the configuration but cannot
   # be used.
   #json.add_error_key: false
@@ -138,20 +138,20 @@ filebeat.inputs:
   # The regexp Pattern that has to be matched. The example pattern matches all lines starting with [
   #multiline.pattern: ^\[
 
-  # Defines if the pattern set under pattern should be negated or not. Default is false.
+  # Defines if the pattern set under the pattern should be negated or not. Default is false.
   #multiline.negate: false
 
-  # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
+  # Match can be set to "after" or "before". It is used to define if lines should be appended to a pattern
   # that was (not) matched before or after or as long as a pattern is not matched based on negate.
   # Note: After is the equivalent to previous and before is the equivalent to to next in Logstash
   #multiline.match: after
 
-  # The maximum number of lines that are combined to one event.
+  # The maximum number of lines that are combined into one event.
   # In case there are more the max_lines the additional lines are discarded.
   # Default is 500
   #multiline.max_lines: 500
 
-  # After the defined timeout, an multiline event is sent even if no new pattern was found to start a new event
+  # After the defined timeout, a multiline event is sent even if no new pattern was found to start a new event
   # Default is 5s.
   #multiline.timeout: 5s
 
@@ -161,7 +161,7 @@ filebeat.inputs:
   # The number of lines to aggregate into a single event.
   #multiline.count_lines: 3
 
-  # Do not add new line character when concatenating lines.
+  # Do not add new line characters when concatenating lines.
   #multiline.skip_newline: false
 
   # Setting tail_files to true means filebeat starts reading new files at the end
@@ -174,13 +174,13 @@ filebeat.inputs:
   #pipeline:
 
   # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
-  # original for harvesting but will report the symlink name as source.
+  # original for harvesting but will report the symlink name as the source.
   #symlinks: false
 
   # Backoff values define how aggressively filebeat crawls new files for updates
-  # The default values can be used in most cases. Backoff defines how long it is waited
+  # The default values can be used in most cases. Backoff defines how long it has to wait
   # to check a file again after EOF is reached. Default is 1s which means the file
-  # is checked every second if new lines were added. This leads to a near real time crawling.
+  # is checked every second if new lines were added. This leads to a near real-time crawling.
   # Every time a new line appears, backoff is reset to the initial value.
   #backoff: 1s
 
@@ -203,7 +203,7 @@ filebeat.inputs:
 
   # Close inactive closes the file handler after the predefined period.
   # The period starts when the last line of the file was, not the file ModTime.
-  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  # Time strings like 2h (2 hours), and 5m (5 minutes) can be used.
   #close_inactive: 5m
 
   # Close renamed closes a file handler when the file is renamed or rotated.
@@ -215,18 +215,18 @@ filebeat.inputs:
   # after scan_frequency.
   #close_removed: true
 
-  # Closes the file handler as soon as the harvesters reaches the end of the file.
+  # Closes the file handler as soon as the harvesters reach the end of the file.
   # By default this option is disabled.
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close_eof: false
 
   ### State options
 
-  # Files for the modification data is older then clean_inactive the state from the registry is removed
+  # Files for the modification data are older than clean_inactive the state from the registry is removed
   # By default this is disabled.
   #clean_inactive: 0
 
-  # Removes the state for file which cannot be found on disk anymore immediately
+  # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
 
   # Close timeout closes the harvester after the predefined time.
@@ -235,7 +235,7 @@ filebeat.inputs:
   # Note: Potential data loss. Make sure to read and understand the docs for this option.
   #close_timeout: 0
 
-  # Defines if inputs is enabled
+  # Defines if inputs are enabled
   #enabled: true
 
 #--------------------------- Filestream input ----------------------------
@@ -297,8 +297,21 @@ filebeat.inputs:
   #prospector.scanner.recursive_glob: true
 
   # If symlinks is enabled, symlinks are opened and harvested. The harvester is opening the
-  # original for harvesting but will report the symlink name as source.
+  # original for harvesting but will report the symlink name as the source.
   #prospector.scanner.symlinks: false
+
+  # If enabled, instead of relying on the device ID and inode values when comparing files,
+  # compare hashes of the given byte ranges in files. A file becomes an ingest target
+  # when its size grows larger than offset+length (see below). Until then it's ignored.
+  #prospector.scanner.fingerprint.enabled: false
+
+  # If fingerprint mode is enabled, sets the offset from the beginning of the file
+  # for the byte range used for computing the fingerprint value.
+  #prospector.scanner.fingerprint.offset: 0
+
+  # If fingerprint mode is enabled, sets the length of the byte range used for
+  # computing the fingerprint value. Cannot be less than 64 bytes.
+  #prospector.scanner.fingerprint.length: 1024
 
   ### Parsers configuration
 
@@ -355,12 +368,12 @@ filebeat.inputs:
       # Defines if the pattern set under the pattern setting should be negated or not. Default is false.
       #negate: false
 
-      # Match can be set to "after" or "before". It is used to define if lines should be append to a pattern
+      # Match can be set to "after" or "before". It is used to define if lines should be appended to a pattern
       # that was (not) matched before or after or as long as a pattern is not matched based on negate.
       # Note: After is the equivalent to previous and before is the equivalent to next in Logstash
       #match: after
 
-      # The maximum number of lines that are combined to one event.
+      # The maximum number of lines that are combined into one event.
       # In case there are more than max_lines the additional lines are discarded.
       # Default is 500
       #max_lines: 500
@@ -381,16 +394,16 @@ filebeat.inputs:
       # The number of lines to aggregate into a single event.
       #count_lines: 3
 
-      # The maximum number of lines that are combined to one event.
+      # The maximum number of lines that are combined into one event.
       # In case there are more than max_lines the additional lines are discarded.
       # Default is 500
       #max_lines: 500
 
-      # After the defined timeout, an multiline event is sent even if no new pattern was found to start a new event
+      # After the defined timeout, a multiline event is sent even if no new pattern was found to start a new event
       # Default is 5s.
       #timeout: 5s
 
-      # Do not add new line character when concatenating lines.
+      # Do not add new line characters when concatenating lines.
       #skip_newline: false
 
   #### Parsing container events
@@ -417,11 +430,11 @@ filebeat.inputs:
 
   ### State options
 
-  # Files for the modification data is older then clean_inactive the state from the registry is removed
+  # Files for the modification data is older than clean_inactive the state from the registry is removed
   # By default this is disabled.
   #clean_inactive: 0
 
-  # Removes the state for file which cannot be found on disk anymore immediately
+  # Removes the state for files which cannot be found on disk anymore immediately
   #clean_removed: true
 
   # Method to determine if two files are the same or not. By default
@@ -442,9 +455,9 @@ filebeat.inputs:
   # false.
   #publisher_pipeline.disable_host: false
 
-  # Ignore files which were modified more then the defined timespan in the past.
+  # Ignore files that were modified more than the defined timespan in the past.
   # ignore_older is disabled by default, so no files are ignored by setting it to 0.
-  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  # Time strings like 2h (2 hours) and 5m (5 minutes) can be used.
   #ignore_older: 0
 
   # Ignore files that have not been updated since the selected event.
@@ -465,7 +478,7 @@ filebeat.inputs:
   # This is especially useful for multiline log messages which can get large.
   #message_max_bytes: 10485760
 
-  # Characters which separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
+  # Characters that separate the lines. Valid values: auto, line_feed, vertical_tab, form_feed,
   # carriage_return, carriage_return_line_feed, next_line, line_separator, paragraph_separator,
   # null_terminator
   #line_terminator: auto
@@ -475,9 +488,9 @@ filebeat.inputs:
   #pipeline:
 
   # Backoff values define how aggressively filebeat crawls new files for updates
-  # The default values can be used in most cases. Backoff defines how long it is waited
+  # The default values can be used in most cases. Backoff defines how long it has to wait
   # to check a file again after EOF is reached. Default is 1s which means the file
-  # is checked every second if new lines were added. This leads to a near real time crawling.
+  # is checked every second if new lines were added. This leads to a near real-time crawling.
   # Every time a new line appears, backoff is reset to the initial value.
   #backoff.init: 1s
 
@@ -491,7 +504,7 @@ filebeat.inputs:
 
   # Close inactive closes the file handler after the predefined period.
   # The period starts when the last line of the file was, not the file ModTime.
-  # Time strings like 2h (2 hours), 5m (5 minutes) can be used.
+  # Time strings like 2h (2 hours) and 5m (5 minutes) can be used.
   #close.on_state_change.inactive: 5m
 
   # Close renamed closes a file handler when the file is renamed or rotated.

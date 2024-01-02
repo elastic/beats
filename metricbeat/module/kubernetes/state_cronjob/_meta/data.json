@@ -11,18 +11,18 @@
                 "count": 0
             },
             "created": {
-                "sec": 1673949613
+                "sec": 1698751160
             },
             "is_suspended": false,
             "last_schedule": {
-                "sec": 1674035220
+                "sec": 1698751200
             },
-            "name": "hello-cronjob",
+            "name": "hello",
             "next_schedule": {
-                "sec": 1674035280
+                "sec": 1698751260
             }
         },
-        "namespace": "kube-system"
+        "namespace": "default"
     },
     "metricset": {
         "name": "state_cronjob",

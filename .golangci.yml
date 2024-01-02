@@ -2,6 +2,9 @@
 run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 15m
+  build-tags: 
+    - synthetics
+    - integration
 
 issues:
   # Maximum count of issues with the same text.
@@ -27,7 +30,7 @@ issues:
     - text: "imported and not used"
       linters:
         - typecheck
-    # From mage we are priting to the console to ourselves
+    # From mage we are printing to the console to ourselves
     - path: (.*magefile.go|.*dev-tools/mage/.*)
       linters: forbidigo
 
@@ -40,7 +43,7 @@ linters:
   enable:
     - errcheck # checking for unchecked errors in go programs
     - errorlint # errorlint is a linter for that can be used to find code that will cause problems with the error wrapping scheme introduced in Go 1.13.
-    - forbidigo # forbids identifiers	matched by reg exps
+    - forbidigo # forbids identifiers matched by reg exps
     - gosimple # linter for Go source code that specializes in simplifying a code
     - misspell # finds commonly misspelled English words in comments
     - nakedret # finds naked returns in functions greater than a specified function length
@@ -62,6 +65,7 @@ linters:
     - unconvert # Remove unnecessary type conversions
     - wastedassign # wastedassign finds wasted assignment statements.
     - gomodguard # check for blocked dependencies
+    - prealloc # Finds slice declarations that could potentially be pre-allocated
 
 # all available settings of specific linters
 linters-settings:
@@ -75,6 +79,8 @@ linters-settings:
     exclude-functions:
       - (github.com/elastic/elastic-agent-libs/mapstr.M).Delete # Only returns ErrKeyNotFound, can safely be ignored.
       - (github.com/elastic/elastic-agent-libs/mapstr.M).Put # Can only fail on type conversions, usually safe to ignore.
+      - github.com/elastic/elastic-agent-libs/logp.TestingSetup # Cannot return a non-nil error using the provided API.
+      - github.com/elastic/elastic-agent-libs/logp.DevelopmentSetup # Cannot return a non-nil error using the provided API.
 
   errorlint:
     # Check whether fmt.Errorf uses the %w verb for formatting errors. See the readme for caveats
@@ -108,7 +114,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.19.9"
+    go: "1.20.12"
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -126,19 +132,19 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.19.9"
+    go: "1.20.12"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.19.9"
+    go: "1.20.12"
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.19.9"
+    go: "1.20.12"
 
   gosec:
     excludes:
@@ -147,3 +153,17 @@ linters-settings:
     - G401 # Detect the usage of DES, RC4, MD5 or SHA1: Used in non-crypto contexts.
     - G501 # Import blocklist: crypto/md5: Used in non-crypto contexts.
     - G505 # Import blocklist: crypto/sha1: Used in non-crypto contexts.
+
+  prealloc:
+    # IMPORTANT: we don't recommend using this linter before doing performance profiling.
+    # For most programs usage of prealloc will be a premature optimization.
+
+    # Report pre-allocation suggestions only on simple loops that have no returns/breaks/continues/gotos in them.
+    # Default: true
+    simple: false
+    # Report pre-allocation suggestions on range loops.
+    # Default: true
+    range-loops: true
+    # Report pre-allocation suggestions on for loops.
+    # Default: false
+    for-loops: true

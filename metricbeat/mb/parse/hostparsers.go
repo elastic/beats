@@ -18,7 +18,7 @@
 package parse
 
 import (
-	"github.com/pkg/errors"
+	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -35,7 +35,7 @@ func PassThruHostParser(module mb.Module, host string) (mb.HostData, error) {
 // value is empty and returns an error if not.
 func EmptyHostParser(module mb.Module, host string) (mb.HostData, error) {
 	if host != "" {
-		return mb.HostData{}, errors.Errorf("hosts must be empty for %v", module.Name())
+		return mb.HostData{}, fmt.Errorf("hosts must be empty for %v", module.Name())
 	}
 
 	return mb.HostData{}, nil

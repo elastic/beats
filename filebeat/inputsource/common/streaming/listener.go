@@ -21,12 +21,11 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"strings"
 	"sync"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"

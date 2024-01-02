@@ -9,7 +9,6 @@
         "file"
       ],
       "code": "26",
-      "ingested": "2022-06-08T05:43:59.469107800Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",
@@ -90,7 +89,6 @@
         "file"
       ],
       "code": "26",
-      "ingested": "2022-06-08T05:43:59.469128600Z",
       "kind": "event",
       "module": "sysmon",
       "provider": "Microsoft-Windows-Sysmon",

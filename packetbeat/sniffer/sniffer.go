@@ -64,6 +64,10 @@ type sniffer struct {
 	// filter is the bpf filter program used by the sniffer.
 	filter string
 
+	// id and idx identify the sniffer for metric collection.
+	id  string
+	idx int
+
 	decoders Decoders
 
 	log *logp.Logger
@@ -84,18 +88,26 @@ const (
 
 // New create a new Sniffer instance. Settings are validated in a best effort
 // only, but no device is opened yet. Accessing and configuring the actual device
-// is done by the Run method.
-func New(testMode bool, _ string, decoders Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
+// is done by the Run method. The id parameter is used to specify the metric
+// collection ID for AF_PACKET sniffers on Linux.
+func New(id string, testMode bool, _ string, decoders map[string]Decoders, interfaces []config.InterfaceConfig) (*Sniffer, error) {
 	s := &Sniffer{
 		sniffers: make([]sniffer, len(interfaces)),
 		log:      logp.NewLogger("sniffer"),
 	}
 
 	for i, iface := range interfaces {
+		dec, ok := decoders[iface.Device]
+		if !ok {
+			// This should never happen.
+			return nil, fmt.Errorf("no decoder for %s", iface.Device)
+		}
 		child := sniffer{
 			state:         atomic.MakeInt32(snifferInactive),
 			followDefault: iface.PollDefaultRoute > 0 && strings.HasPrefix(iface.Device, "default_route"),
-			decoders:      decoders,
+			id:            id,
+			idx:           i,
+			decoders:      dec,
 			log:           s.log,
 		}
 
@@ -132,6 +144,9 @@ func New(testMode bool, _ string, decoders Decoders, interfaces []config.Interfa
 				}
 				if iface.BufferSizeMb <= 0 {
 					iface.BufferSizeMb = 24
+				}
+				if iface.MetricsInterval <= 0 {
+					iface.MetricsInterval = 5 * time.Second
 				}
 
 				if t := iface.Type; t == "autodetect" || t == "" {
@@ -279,7 +294,7 @@ func (s *sniffer) sniffStatic(ctx context.Context, device string) error {
 	}
 	defer handle.Close()
 
-	dec, cleanup, err := s.decoders(handle.LinkType(), device)
+	dec, cleanup, err := s.decoders(handle.LinkType(), device, s.idx)
 	if err != nil {
 		return err
 	}
@@ -322,7 +337,7 @@ func (s *sniffer) sniffOneDynamic(ctx context.Context, device string, last layer
 	if dec == nil || linkType != last {
 		s.log.Infof("changing link type: %d -> %d", last, linkType)
 		var cleanup func()
-		dec, cleanup, err = s.decoders(linkType, device)
+		dec, cleanup, err = s.decoders(linkType, device, s.idx)
 		if err != nil {
 			return linkType, dec, err
 		}
@@ -456,7 +471,7 @@ func (s *sniffer) open(device string) (snifferHandle, error) {
 	case "pcap":
 		return openPcap(device, s.filter, &s.config)
 	case "af_packet":
-		return openAFPacket(device, s.filter, &s.config)
+		return openAFPacket(fmt.Sprintf("%s_%d", s.id, s.idx), device, s.filter, &s.config)
 	default:
 		return nil, fmt.Errorf("unknown sniffer type for %s: %q", device, s.config.Type)
 	}
@@ -493,7 +508,7 @@ func openPcap(device, filter string, cfg *config.InterfaceConfig) (snifferHandle
 	return h, nil
 }
 
-func openAFPacket(device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
+func openAFPacket(id, device, filter string, cfg *config.InterfaceConfig) (snifferHandle, error) {
 	szFrame, szBlock, numBlocks, err := afpacketComputeSize(cfg.BufferSizeMb, cfg.Snaplen, os.Getpagesize())
 	if err != nil {
 		return nil, err
@@ -501,13 +516,15 @@ func openAFPacket(device, filter string, cfg *config.InterfaceConfig) (snifferHa
 
 	timeout := 500 * time.Millisecond
 	h, err := newAfpacketHandle(afPacketConfig{
-		Device:        device,
-		FrameSize:     szFrame,
-		BlockSize:     szBlock,
-		NumBlocks:     numBlocks,
-		PollTimeout:   timeout,
-		FanoutGroupID: cfg.FanoutGroup,
-		Promiscuous:   cfg.EnableAutoPromiscMode,
+		ID:              id,
+		Device:          device,
+		FrameSize:       szFrame,
+		BlockSize:       szBlock,
+		NumBlocks:       numBlocks,
+		PollTimeout:     timeout,
+		MetricsInterval: cfg.MetricsInterval,
+		FanoutGroupID:   cfg.FanoutGroup,
+		Promiscuous:     cfg.EnableAutoPromiscMode,
 	})
 	if err != nil {
 		return nil, err

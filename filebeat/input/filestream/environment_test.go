@@ -21,9 +21,11 @@ package filestream
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -35,6 +37,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
@@ -64,6 +67,22 @@ type registryEntry struct {
 }
 
 func newInputTestingEnvironment(t *testing.T) *inputTestingEnvironment {
+	logp.DevelopmentSetup(logp.ToObserverOutput())
+
+	t.Cleanup(func() {
+		if t.Failed() {
+			t.Logf("Debug Logs:\n")
+			for _, log := range logp.ObserverLogs().TakeAll() {
+				data, err := json.Marshal(log)
+				if err != nil {
+					t.Errorf("failed encoding log as JSON: %s", err)
+				}
+				t.Logf("%s", string(data))
+			}
+			return
+		}
+	})
+
 	return &inputTestingEnvironment{
 		t:          t,
 		workingDir: t.TempDir(),
@@ -110,8 +129,7 @@ func (e *inputTestingEnvironment) startInput(ctx context.Context, inp v2.Input) 
 	go func(wg *sync.WaitGroup, grp *unison.TaskGroup) {
 		defer wg.Done()
 		defer grp.Stop()
-
-		inputCtx := input.Context{Logger: logp.L(), Cancelation: ctx}
+		inputCtx := input.Context{Logger: logp.L(), Cancelation: ctx, ID: "fake-ID"}
 		inp.Run(inputCtx, e.pipeline)
 	}(&e.wg, &e.grp)
 }
@@ -194,6 +212,8 @@ func (e *inputTestingEnvironment) requireRegistryEntryCount(expectedCount int) {
 // requireOffsetInRegistry checks if the expected offset is set for a file.
 func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID string, expectedOffset int) {
 	e.t.Helper()
+	var offsetStr strings.Builder
+
 	filepath := e.abspath(filename)
 	fi, err := os.Stat(filepath)
 	if err != nil {
@@ -202,16 +222,23 @@ func (e *inputTestingEnvironment) requireOffsetInRegistry(filename, inputID stri
 
 	id := getIDFromPath(filepath, inputID, fi)
 	var entry registryEntry
-	require.Eventually(e.t, func() bool {
+	require.Eventuallyf(e.t, func() bool {
+		offsetStr.Reset()
+
 		entry, err = e.getRegistryState(id)
 		if err != nil {
-			return true
+			e.t.Fatalf("could not get state for '%s' from registry, err: %s", id, err)
 		}
 
+		fmt.Fprint(&offsetStr, entry.Cursor.Offset)
+
 		return expectedOffset == entry.Cursor.Offset
-	}, time.Second, time.Millisecond)
-	require.NoError(e.t, err)
-	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
+	},
+		time.Second,
+		100*time.Millisecond,
+		"expected offset: '%d', cursor offset: '%s'",
+		expectedOffset,
+		&offsetStr)
 }
 
 // requireMetaInRegistry checks if the expected metadata is saved to the registry.
@@ -251,7 +278,16 @@ func requireMetadataEquals(one, other fileMeta) bool {
 }
 
 // waitUntilOffsetInRegistry waits for the expected offset is set for a file.
-func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename, inputID string, expectedOffset int) {
+// If timeout is reached or there is an error getting the state from the
+// registry, the test fails
+func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(
+	filename, inputID string,
+	expectedOffset int,
+	timeout time.Duration) {
+
+	var cursorString strings.Builder
+	var fileSizeString strings.Builder
+
 	filepath := e.abspath(filename)
 	fi, err := os.Stat(filepath)
 	if err != nil {
@@ -259,12 +295,34 @@ func (e *inputTestingEnvironment) waitUntilOffsetInRegistry(filename, inputID st
 	}
 
 	id := getIDFromPath(filepath, inputID, fi)
-	entry, err := e.getRegistryState(id)
-	for err != nil || entry.Cursor.Offset != expectedOffset {
-		entry, err = e.getRegistryState(id)
-	}
 
-	require.Equal(e.t, expectedOffset, entry.Cursor.Offset)
+	require.Eventuallyf(e.t, func() bool {
+		cursorString.Reset()
+		fileSizeString.Reset()
+
+		entry, err := e.getRegistryState(id)
+		if err != nil {
+			e.t.Fatalf(
+				"error getting state for ID '%s' from the registry, err: %s",
+				id, err)
+		}
+
+		fi, err := os.Stat(filepath)
+		if err != nil {
+			e.t.Fatalf("could not stat '%s', err: %s", filepath, err)
+		}
+
+		fileSizeString.WriteString(fmt.Sprint(fi.Size()))
+		cursorString.WriteString(fmt.Sprint(entry.Cursor.Offset))
+
+		return entry.Cursor.Offset == expectedOffset
+	},
+		timeout,
+		100*time.Millisecond,
+		"expected offset: '%d', cursor offset: '%s', file size: '%s'",
+		expectedOffset,
+		&cursorString,
+		&fileSizeString)
 }
 
 func (e *inputTestingEnvironment) requireNoEntryInRegistry(filename, inputID string) {
@@ -315,7 +373,13 @@ func (e *inputTestingEnvironment) getRegistryState(key string) (registryEntry, e
 
 func getIDFromPath(filepath, inputID string, fi os.FileInfo) string {
 	identifier, _ := newINodeDeviceIdentifier(nil)
-	src := identifier.GetSource(loginp.FSEvent{Info: fi, Op: loginp.OpCreate, NewPath: filepath})
+	src := identifier.GetSource(loginp.FSEvent{
+		Descriptor: loginp.FileDescriptor{
+			Info: file.ExtendFileInfo(fi),
+		},
+		Op:      loginp.OpCreate,
+		NewPath: filepath,
+	})
 	return "filestream::" + inputID + "::" + src.Name()
 }
 

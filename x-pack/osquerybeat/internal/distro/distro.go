@@ -36,14 +36,19 @@ const (
 	osqueryCertsDarwinPath  = "private/var/osquery/certs/" + osqueryCertsPEM
 	osqueryCertsWindowsPath = "osquery/certs/" + osqueryCertsPEM
 
-	osqueryVersion = "5.7.0"
+	osqueryLensesLinuxDir  = "opt/osquery/share/osquery/lenses"
+	osqueryLensesDarwinDir = "private/var/osquery/lenses"
+
+	osqueryLensesDir = "lenses"
+
+	osqueryVersion = "5.10.2"
 	osqueryMSIExt  = ".msi"
 	osqueryPkgExt  = ".pkg"
 
-	osqueryDistroDarwinSHA256   = "6147f5632d7ae0bfb5c485f3b2211057179ceed18904b375007f23043408261f"
-	osqueryDistroLinuxSHA256    = "0e34979a795be205b2a1bdf0b85464a34951fe94b462bd7c23bd894e24baceef"
-	osqueryDistroLinuxARMSHA256 = "86826541444fe192b3a5f54d0e7d9f83375fc242c44e741fcd0766c8f933cac0"
-	osqueryDistroWindowsSHA256  = "0e54fec4b8b8a800e3bdd178a2473db9de25e53b8ea800775b7f9cc8c847be1c"
+	osqueryDistroDarwinSHA256   = "a01d1f7da016f1e6bed54955e97982d491b7e55311433ff0fc985269160633af"
+	osqueryDistroLinuxSHA256    = "61ef2351a07dbc36ae9ebff605e8a7ecc4e09a07ac11f540d2aed78c143addbe"
+	osqueryDistroLinuxARMSHA256 = "106ea8a90dff0ccff852f44137848fe47ab9e8cfd27e5cd3a5ef963024b0564b"
+	osqueryDistroWindowsSHA256  = "f5a6955db724559638e43aef181e26eadfe4bfb827907ffd134d9abb0512cc58"
 )
 
 type OSArch struct {
@@ -90,6 +95,10 @@ func OsquerydCertsPath(dir string) string {
 	return filepath.Join(dir, osqueryCertsPath)
 }
 
+func OsquerydLensesDir(dir string) string {
+	return filepath.Join(dir, osqueryLensesDir)
+}
+
 func OsquerydDarwinDistroPath() string {
 	return osqueryDarwinPath
 }
@@ -108,6 +117,14 @@ func OsquerydCertsDarwinDistroPath() string {
 
 func OsquerydCertsWindowsDistroPath() string {
 	return osqueryCertsWindowsPath
+}
+
+func OsquerydLensesLinuxDistroDir() string {
+	return osqueryLensesLinuxDir
+}
+
+func OsquerydLensesDarwinDistroDir() string {
+	return osqueryLensesDarwinDir
 }
 
 func OsquerydDistroFilename() string {

@@ -27,7 +27,6 @@ type setConfig struct {
 }
 
 type set struct {
-	log                 *logp.Logger
 	targetInfo          targetInfo
 	value               *valueTpl
 	defaultValue        *valueTpl
@@ -35,6 +34,8 @@ type set struct {
 	valueType           valueType
 
 	runFunc func(ctx *transformContext, transformable transformable, key string, val interface{}) error
+
+	log *logp.Logger
 }
 
 func (set) transformName() string { return setName }

@@ -39,7 +39,6 @@ type PackageDependency struct {
 }
 
 var (
-	Linux386      = PlatformDescription{Name: "linux/386", Arch: "i386", DefaultTag: "i386"}
 	LinuxAMD64    = PlatformDescription{Name: "linux/amd64", Arch: "", DefaultTag: ""} // builders run on amd64 platform
 	LinuxARM64    = PlatformDescription{Name: "linux/arm64", Arch: "arm64", DefaultTag: "arm64"}
 	LinuxARM5     = PlatformDescription{Name: "linux/arm5", Arch: "armel", DefaultTag: "armel"}

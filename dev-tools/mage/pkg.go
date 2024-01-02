@@ -362,7 +362,7 @@ func TestPackages(options ...TestPackagesOption) error {
 // glibc 2.17.
 func TestLinuxForCentosGLIBC() error {
 	switch Platform.Name {
-	case "linux/amd64", "linux/386":
+	case "linux/amd64":
 		return TestBinaryGLIBCVersion(filepath.Join("build/golang-crossbuild", BeatName+"-linux-"+Platform.GOARCH), "2.17")
 	default:
 		return nil

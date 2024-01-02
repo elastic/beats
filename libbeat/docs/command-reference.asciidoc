@@ -744,6 +744,10 @@ and inputs, and runs each input until the harvesters are closed. If you set the
 `--once` flag, you should also set `close_eof` so the harvester is closed when
 the end of the file is reached. By default harvesters are closed after
 `close_inactive` is reached.
++
+The `--once` option is not currently supported with the
+{filebeat-ref}/filebeat-input-filestream.html[`filestream`] input type.
+
 endif::[]
 
 *`--system.hostfs MOUNT_POINT`*::
@@ -841,6 +845,12 @@ if you want to load all ingest pipelines. Without this option you
 would have to list every module with the <<modules-command,`modules`>>
 command and enable every fileset within the module with a `-M` option,
 to load all of the ingest pipelines.
+
+*`--force-enable-module-filesets`*::
+Enables all filesets in the enabled modules. This is useful with
+`--pipelines` if you want to load ingest pipelines. Without this
+option you enable every fileset within the module with a `-M` option,
+to load the ingest pipelines.
 
 endif::[]
 

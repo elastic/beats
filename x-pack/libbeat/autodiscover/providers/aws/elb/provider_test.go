@@ -5,12 +5,12 @@
 package elb
 
 import (
+	"errors"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/gofrs/uuid"
-	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 

@@ -46,24 +46,24 @@ logging.files:
   # The name of the files where the logs are written to.
   #name: {{.BeatName}}
 
-  # Configure log file size limit. If limit is reached, log file will be
-  # automatically rotated
+  # Configure log file size limit. If the limit is reached, log file will be
+  # automatically rotated.
   #rotateeverybytes: 10485760 # = 10MB
 
-  # Number of rotated log files to keep. Oldest files will be deleted first.
+  # Number of rotated log files to keep. The oldest files will be deleted first.
   #keepfiles: 7
 
   # The permissions mask to apply when rotating log files. The default value is 0600.
   # Must be a valid Unix-style file permissions mask expressed in octal notation.
   #permissions: 0600
 
-  # Enable log file rotation on time intervals in addition to size-based rotation.
+  # Enable log file rotation on time intervals in addition to the size-based rotation.
   # Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
   # are boundary-aligned with minutes, hours, days, weeks, months, and years as
   # reported by the local system clock. All other intervals are calculated from the
   # Unix epoch. Defaults to disabled.
   #interval: 0
 
-  # Rotate existing logs on startup rather than appending to the existing
+  # Rotate existing logs on startup rather than appending them to the existing
   # file. Defaults to true.
   # rotateonstartup: true

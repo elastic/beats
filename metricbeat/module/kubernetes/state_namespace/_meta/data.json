@@ -1,0 +1,28 @@
+{
+    "@timestamp": "2019-03-01T08:05:34.853Z",
+    "event": {
+        "dataset": "kubernetes.state_namespace",
+        "duration": 115000,
+        "module": "kubernetes"
+    },
+    "kubernetes": {
+        "namespace": "kube-public",
+        "state_namespace": {
+            "created": {
+                "sec": 1698675678
+            },
+            "status": {
+                "active": true,
+                "terminating": false
+            }
+        }
+    },
+    "metricset": {
+        "name": "state_namespace",
+        "period": 10000
+    },
+    "service": {
+        "address": "127.0.0.1:55555",
+        "type": "kubernetes"
+    }
+}

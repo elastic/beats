@@ -281,7 +281,7 @@ processors:
           commandLine = commandLine.trim();
 
           if (commandLine != "") {
-            def args = Arrays.asList(/ /.split(commandLine));
+            def args = new ArrayList(Arrays.asList(/ /.split(commandLine)));
             args.removeIf(arg -> arg == "");
 
             ctx['process'] = new HashMap();

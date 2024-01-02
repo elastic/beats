@@ -12,34 +12,44 @@ processes, identified by their process ID (PID).
 -------------------------------------------------------------------------------
 processors:
   - add_process_metadata:
-      match_pids: [system.process.ppid]
-      target: system.process.parent
+      match_pids:
+        - process.pid
 -------------------------------------------------------------------------------
 
 The fields added to the event look as follows:
+
 [source,json]
 -------------------------------------------------------------------------------
-"process": {
-  "name":  "systemd",
-  "title": "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
-  "exe":   "/usr/lib/systemd/systemd",
-  "args":  ["/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"],
-  "pid":   1,
-  "parent": {
-    "pid": 0
+{
+  "container": {
+    "id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"
   },
-  "start_time": "2018-08-22T08:44:50.684Z",
-  "owner": {
-    "name": "root",
-    "id": "0"
+  "process": {
+    "args": [
+      "/usr/lib/systemd/systemd",
+      "--switched-root",
+      "--system",
+      "--deserialize",
+      "22"
+    ],
+    "executable": "/usr/lib/systemd/systemd",
+    "name": "systemd",
+    "owner": {
+      "id": "0",
+      "name": "root"
+    },
+    "parent": {
+      "pid": 0
+    },
+    "pid": 1,
+    "start_time": "2018-08-22T08:44:50.684Z",
+    "title": "/usr/lib/systemd/systemd --switched-root --system --deserialize 22"
   }
-},
-"container": {
-  "id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1"
-},
+}
 -------------------------------------------------------------------------------
 
 Optionally, the process environment can be included, too:
+
 [source,json]
 -------------------------------------------------------------------------------
   ...
@@ -69,7 +79,7 @@ of the fields in match_pids will be discarded and an error will be generated. By
 default, this condition is ignored.
 
 `overwrite_keys`:: (Optional) By default, if a target field already exists, it
-will not be overwritten and an error will be logged. If `overwrite_keys` is
+will not be overwritten, and an error will be logged. If `overwrite_keys` is
 set to `true`, this condition will be ignored.
 
 `restricted_fields`:: (Optional) By default, the `process.env` field is not
@@ -81,21 +91,21 @@ directory of the host `/`. This is the path where `/proc` is mounted. For
 different runtime configurations of Kubernetes or Docker, the `host_path` can
 be set to overwrite the default.
 
-`cgroup_prefixes`:: (Optional) By default, the `cgroup_prefixes` field is set
-to `/kubepods` and `/docker`. This is the prefix where the container ID is
-inside cgroup. For different runtime configurations of Kubernetes or Docker,
-the `cgroup_prefixes` can be set to overwrite the defaults.
+`cgroup_prefixes`:: (Optional) List of prefixes that will be matched against
+cgroup paths. When a cgroup path begins with a prefix in the list, then the
+last element of the path is returned as the container ID. Only one of
+`cgroup_prefixes` and `cgroup_rexex` should be configured. If neither are
+configured then a default `cgroup_regex` value is used that matches cgroup
+paths containing 64-character container IDs (like those from Docker,
+Kubernetes, and Podman).
 
-`cgroup_regex`:: (Optional) By default, the container id is extracted from
-cgroup file based on `cgroup_prefixes`. This can be overwritten by specifying
-regular expression with capture group for capturing container id from cgroup
-path. Examples:
-. `^\/.+\/.+\/.+\/([0-9a-f]{64}).*` will match the container id of a cgroup
-like `/kubepods/besteffort/pod665fb997-575b-11ea-bfce-080027421ddf/b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1`
-. `^\/.+\/.+\/.+\/docker-([0-9a-f]{64}).scope` will match the container id of a cgroup
-like `/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod69349abe_d645_11ea_9c4c_08002709c05c.slice/docker-80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460.scope`
-. `^\/.+\/.+\/.+\/crio-([0-9a-f]{64}).scope` will match the container id of a cgroup
-like `/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod69349abe_d645_11ea_9c4c_08002709c05c.slice/crio-80d85a3a585f1575028ebe468d83093c301eda20d37d1671ff2a0be50fc0e460.scope`
+`cgroup_regex`:: (Optional) A regular expression that will be matched against
+cgroup paths. It must contain one capturing group. When a cgroup path matches
+the regular expression then the value of the capturing group is returned as
+the container ID.  Only one of `cgroup_prefixes` and `cgroup_rexex` should be
+configured. If neither are configured then a default `cgroup_regex` value is
+used that matches cgroup paths containing 64-character container IDs (like those
+from Docker, Kubernetes, and Podman).
 
 `cgroup_cache_expire_time`:: (Optional) By default, the
 `cgroup_cache_expire_time` is set to 30 seconds. This is the length of time

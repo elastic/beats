@@ -26,8 +26,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -175,7 +173,7 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 		}
 		text, err := value.(encoding.TextMarshaler).MarshalText()
 		if err != nil {
-			return nil, []error{errors.Wrapf(err, "key=%v: error converting %T to string", joinKeys(keys...), value)}
+			return nil, []error{fmt.Errorf("key=%v: error converting %T to string: %w", joinKeys(keys...), value, err)}
 		}
 		return string(text), nil
 	case string, []string:
@@ -243,7 +241,7 @@ func (e *GenericEventConverter) normalizeValue(value interface{}, keys ...string
 			var m mapstr.M
 			err := marshalUnmarshal(value, &m)
 			if err != nil {
-				return m, []error{errors.Wrapf(err, "key=%v: error converting %T to mapstr.M", joinKeys(keys...), value)}
+				return m, []error{fmt.Errorf("key=%v: error converting %T to mapstr.M: %w", joinKeys(keys...), value, err)}
 			}
 			return m, nil
 		default:
@@ -262,11 +260,11 @@ func marshalUnmarshal(in interface{}, out interface{}) error {
 	// Decode and encode as JSON to normalized the types.
 	marshaled, err := json.Marshal(in)
 	if err != nil {
-		return errors.Wrap(err, "error marshalling to JSON")
+		return fmt.Errorf("error marshalling to JSON: %w", err)
 	}
 	err = json.Unmarshal(marshaled, out)
 	if err != nil {
-		return errors.Wrap(err, "error unmarshalling from JSON")
+		return fmt.Errorf("error unmarshalling from JSON: %w", err)
 	}
 
 	return nil

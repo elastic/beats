@@ -17,7 +17,6 @@ import (
 // metricset. For example, Compute instance labels.
 type MetadataService interface {
 	MetadataCollector
-	Identity
 }
 
 // MetadataCollector must be implemented by services that has special code needs that aren't fulfilled by the Stackdriver
@@ -64,12 +63,4 @@ type MetadataCollectorInputData struct {
 type MetadataCollectorData struct {
 	Labels mapstr.M
 	ECS    mapstr.M
-}
-
-// Identity must be implemented by GCP services that can add some short of data to group their metrics (like instance
-// id on Compute or topic in PubSub)
-type Identity interface {
-
-	// ID returns a unique identifier to group many metrics into a single event
-	ID(ctx context.Context, in *MetadataCollectorInputData) (string, error)
 }

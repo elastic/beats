@@ -24,8 +24,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/flowhash"
@@ -112,7 +110,7 @@ func GetFields(m mapstr.M) (*Fields, error) {
 
 	fields, ok := v.(*Fields)
 	if !ok {
-		return nil, errors.Errorf("%v must be a *types.Fields, but is %T", FieldsKey, fields)
+		return nil, fmt.Errorf("%v must be a *types.Fields, but is %T", FieldsKey, fields)
 	}
 	return fields, nil
 }

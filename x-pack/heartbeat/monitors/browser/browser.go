@@ -1,7 +1,7 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-//go:build linux || darwin
+//go:build linux || darwin || synthetics
 
 package browser
 
@@ -34,7 +34,7 @@ func create(name string, cfg *config.C) (p plugin.Plugin, err error) {
 		return plugin.Plugin{}, fmt.Errorf("script monitors cannot be run as root")
 	}
 
-	s, err := NewProject(cfg)
+	s, err := NewSourceJob(cfg)
 	if err != nil {
 		return plugin.Plugin{}, err
 	}

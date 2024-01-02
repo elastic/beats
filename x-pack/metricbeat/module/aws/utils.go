@@ -51,13 +51,13 @@ type MetricWithID struct {
 // API call per metric name and set of dimensions. This will increase API cost.
 // IncludeLinkedAccounts is set to true for ListMetrics API to include metrics from source accounts in addition to the
 // monitoring account.
-func GetListMetricsOutput(namespace string, regionName string, period time.Duration, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]MetricWithID, error) {
+func GetListMetricsOutput(namespace string, regionName string, period time.Duration, includeLinkedAccounts bool, monitoringAccountID string, svcCloudwatch cloudwatch.ListMetricsAPIClient) ([]MetricWithID, error) {
 	var metricWithAccountID []MetricWithID
 	var nextToken *string
 
 	listMetricsInput := &cloudwatch.ListMetricsInput{
 		NextToken:             nextToken,
-		IncludeLinkedAccounts: true,
+		IncludeLinkedAccounts: includeLinkedAccounts,
 	}
 
 	// To filter the results to show only metrics that have had data points published
@@ -78,6 +78,14 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 		page, err := paginator.NextPage(context.TODO())
 		if err != nil {
 			return metricWithAccountID, fmt.Errorf("error ListMetrics with Paginator, skipping region %s: %w", regionName, err)
+		}
+
+		// when IncludeLinkedAccounts is set to false, ListMetrics API does not return any OwningAccounts
+		if page.OwningAccounts == nil {
+			for _, metric := range page.Metrics {
+				metricWithAccountID = append(metricWithAccountID, MetricWithID{metric, monitoringAccountID})
+			}
+			return metricWithAccountID, nil
 		}
 
 		for i, metric := range page.Metrics {

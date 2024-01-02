@@ -18,10 +18,10 @@
 package elasticsearch
 
 import (
+	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/metricbeat/helper"
@@ -91,17 +91,27 @@ func NewMetricSet(base mb.BaseMetricSet, servicePath string) (*MetricSet, error)
 		return nil, err
 	}
 
-	http.SetHeaderDefault(productorigin.Header, productorigin.Beats)
-
 	config := struct {
-		Scope        Scope `config:"scope"`
-		XPackEnabled bool  `config:"xpack.enabled"`
+		Scope        Scope  `config:"scope"`
+		XPackEnabled bool   `config:"xpack.enabled"`
+		ApiKey       string `config:"api_key"`
 	}{
 		Scope:        ScopeNode,
 		XPackEnabled: false,
+		ApiKey:       "",
 	}
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
+	}
+
+	http.SetHeaderDefault(productorigin.Header, productorigin.Beats)
+
+	if config.ApiKey != "" {
+		hostData := base.HostData()
+		if hostData.User != "" || hostData.Password != "" {
+			return nil, fmt.Errorf("cannot set both api_key and username/password")
+		}
+		http.SetHeader("Authorization", "ApiKey "+base64.StdEncoding.EncodeToString([]byte(config.ApiKey)))
 	}
 
 	ms := &MetricSet{
@@ -134,7 +144,7 @@ func (m *MetricSet) ShouldSkipFetch() (bool, error) {
 	if m.Scope == ScopeNode {
 		isMaster, err := isMaster(m.HTTP, m.GetServiceURI())
 		if err != nil {
-			return false, errors.Wrap(err, "error determining if connected Elasticsearch node is master")
+			return false, fmt.Errorf("error determining if connected Elasticsearch node is master: %w", err)
 		}
 
 		// Not master, no event sent

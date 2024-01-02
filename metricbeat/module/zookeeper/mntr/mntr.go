@@ -44,11 +44,11 @@ ZooKeeper mntr Command Output
 package mntr
 
 import (
+	"fmt"
+
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/beats/v7/metricbeat/module/zookeeper"
-
-	"github.com/pkg/errors"
 )
 
 func init() {
@@ -75,12 +75,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	outputReader, err := zookeeper.RunCommand("mntr", m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "mntr command failed")
+		return fmt.Errorf("mntr command failed: %w", err)
 	}
 
 	serverID, err := zookeeper.ServerID(m.Host(), m.Module().Config().Timeout)
 	if err != nil {
-		return errors.Wrap(err, "error obtaining server id")
+		return fmt.Errorf("error obtaining server id: %w", err)
 	}
 
 	eventMapping(serverID, outputReader, r, m.Logger())

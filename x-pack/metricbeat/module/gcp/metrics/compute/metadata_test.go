@@ -8,10 +8,10 @@ import (
 	"testing"
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/genproto/googleapis/api/metric"
 	"google.golang.org/genproto/googleapis/api/monitoredres"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var fake = &monitoring.TimeSeries{
@@ -41,10 +41,10 @@ var fake = &monitoring.TimeSeries{
 			Value: &monitoring.TypedValue_DoubleValue{DoubleValue: 0.0041224284852319215},
 		},
 		Interval: &monitoring.TimeInterval{
-			StartTime: &timestamp.Timestamp{
+			StartTime: &timestamppb.Timestamp{
 				Seconds: 1569932700,
 			},
-			EndTime: &timestamp.Timestamp{
+			EndTime: &timestamppb.Timestamp{
 				Seconds: 1569932700,
 			},
 		},
@@ -53,10 +53,10 @@ var fake = &monitoring.TimeSeries{
 			Value: &monitoring.TypedValue_DoubleValue{DoubleValue: 0.004205757571772513},
 		},
 		Interval: &monitoring.TimeInterval{
-			StartTime: &timestamp.Timestamp{
+			StartTime: &timestamppb.Timestamp{
 				Seconds: 1569932640,
 			},
-			EndTime: &timestamp.Timestamp{
+			EndTime: &timestamppb.Timestamp{
 				Seconds: 1569932640,
 			},
 		},

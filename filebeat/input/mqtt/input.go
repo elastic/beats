@@ -18,12 +18,12 @@
 package mqtt
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"time"
 
 	libmqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/pkg/errors"
 
 	"github.com/elastic/beats/v7/filebeat/channel"
 	"github.com/elastic/beats/v7/filebeat/input"
@@ -77,7 +77,7 @@ func newInput(
 ) (input.Input, error) {
 	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
-		return nil, errors.Wrap(err, "reading mqtt input config")
+		return nil, fmt.Errorf("reading mqtt input config: %w", err)
 	}
 
 	out, err := connector.Connect(cfg)

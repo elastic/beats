@@ -57,7 +57,7 @@ func testSetup(t *testing.T) (*pubsub.Client, context.CancelFunc) {
 	}
 
 	once.Do(func() {
-		_ = logp.TestingSetup()
+		logp.TestingSetup()
 
 		// Disable HTTP keep-alives to ensure no extra goroutines hang around.
 		httpClient := http.Client{Transport: &http.Transport{DisableKeepAlives: true}}
@@ -460,6 +460,9 @@ func TestEndToEndACK(t *testing.T) {
 			_, exists := got[id]
 			assert.True(t, exists)
 		}
+
+		assert.EqualValues(t, input.metrics.ackedMessageCount.Get(), len(seen))
+
 		input.Stop()
 		out.Close()
 		if err := group.Wait(); err != nil {

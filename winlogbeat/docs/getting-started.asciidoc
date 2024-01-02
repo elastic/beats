@@ -57,6 +57,8 @@ NOTE: If script execution is disabled on your system, you need to set the
 execution policy for the current session to allow the script to run. For example:
 `PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-winlogbeat.ps1`.
 
+NOTE: To use a local non-Administrator account to run Winlogbeat, follow <<local-user-account-setup,these additional steps>>.
+
 [float]
 [[set-connection]]
 === Step 2: Connect to the {stack}
@@ -189,6 +191,39 @@ PS C:\Program Files\Winlogbeat> Stop-Service winlogbeat
 include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards-intro]
 
 include::{libbeat-dir}/shared/opendashboards.asciidoc[tag=open-dashboards]
+
+[float]
+[[local-user-account-setup]]
+=== Using a local non-Administrator account to run Winlogbeat
+
+By default, the +{beatname_uc}+ service runs as the `Local System` account. 
+If you want to run the +{beatname_uc}+ service as a local user account 
+that is not an Administrator, then follow the steps below. The local user account 
+must be granted `Log on as a service` in the security policy 
+and be made part of the `Builtin\Event Log Readers` group to read the event log. 
+
+. Open the Services Management console with this command:
++
+[source,shell]
+----------------------------------------------------------------------
+PS C:\Program Files\Winlogbeat> services.msc
+----------------------------------------------------------------------
++
+. Right-click on service named +{beatname_lc}+ and select `Properties`
+. Under `Log On` tab, select `This account:` and browse for the local account user 
+that you want to run {beatname_uc} service as.
+. Enter local user account's password and click `Apply`.
+. Search and open `Local Group Policy Editor` in Windows search or 
+run `gpedit.msc` from Powershell.
+. Navigate to path: `Computer Settings → Security Settings → Local Policies` 
+and open `User Rights Assignment` under it.
+. Inside `User Rights Assignment`, add your local user account to the policy named 
+`Log on as a service`. This should allow your local user account log on as a service.
+. Open `Local Users and Group Manager` by running `lusrmgr.msc` in Powershell.
+. Under `Users`, right-click on your local account user and open `Properties`.
+. Select `Member of` tab and click on `Add...`
+. Find and select the group named `Event Log Readers` and click `Apply`. 
+This should allow your local account user to read the event log.
 
 [float]
 === What's next?

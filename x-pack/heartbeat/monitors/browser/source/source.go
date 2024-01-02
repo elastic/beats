@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build linux || darwin
+//go:build linux || darwin || synthetics
 
 package source
 
@@ -18,6 +18,8 @@ type Source struct {
 	Project    *ProjectSource `config:"project" json:"project"`
 	ActiveMemo ISource        // cache for selected source
 }
+
+var ErrUnsupportedSource = fmt.Errorf("browser monitors are now removed! Please use project monitors instead. See the Elastic synthetics docs at https://www.elastic.co/guide/en/observability/current/synthetic-run-tests.html#synthetic-monitor-choose-project")
 
 func (s *Source) Active() ISource {
 	if s.ActiveMemo != nil {

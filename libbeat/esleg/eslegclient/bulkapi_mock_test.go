@@ -37,7 +37,6 @@ import (
 
 func TestOneHostSuccessResp_Bulk(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 	expectedResp := []byte(`{"took":7,"errors":false,"items":[]}`)
 
@@ -74,7 +73,6 @@ func TestOneHostSuccessResp_Bulk(t *testing.T) {
 
 func TestOneHost500Resp_Bulk(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	ops := []map[string]interface{}{
@@ -114,7 +112,6 @@ func TestOneHost500Resp_Bulk(t *testing.T) {
 
 func TestOneHost503Resp_Bulk(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors("elasticsearch"))
-
 	index := fmt.Sprintf("packetbeat-unittest-%d", os.Getpid())
 
 	ops := []map[string]interface{}{

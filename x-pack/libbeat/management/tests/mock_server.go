@@ -103,7 +103,7 @@ func NewMockServer(t *testing.T, canStop func(string) bool, inputConfig *proto.U
 		Meta: map[string]string{
 			"key": "value",
 		},
-	}, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 
 	return MockV2Handler{Srv: srv, Client: client}
 }

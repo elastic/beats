@@ -7,6 +7,7 @@ package cel
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"io"
 	"math/rand"
@@ -22,6 +23,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/icholy/digest"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -31,11 +33,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
+
 var inputTests = []struct {
 	name          string
+	remote        bool
 	server        func(*testing.T, http.HandlerFunc, map[string]interface{})
 	handler       http.HandlerFunc
 	config        map[string]interface{}
+	time          func() time.Time
 	persistCursor map[string]interface{}
 	want          []map[string]interface{}
 	wantCursor    []map[string]interface{}
@@ -56,6 +62,23 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{"message": "Hello, World!"},
 		},
+	},
+	{
+		name: "hello_world_time",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"Hello, World!": now}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]interface{}{{
+			"message": map[string]interface{}{
+				"Hello, World!": "2010-02-08T00:00:00Z",
+			},
+		}},
 	},
 	{
 		name: "bad_events_type",
@@ -321,6 +344,26 @@ var inputTests = []struct {
 			{"message": "third"},
 		},
 	},
+	{
+		name: "optional_types",
+		config: map[string]interface{}{
+			"interval": 1,
+			// Program returns a compilation error if optional types are not enabled.
+			"program": `{"events":[
+				has(state.?field.?does.?not.exist) ?
+					{"message":"Hello, World!"}
+				:
+					{"message":"Hello, Void!"}
+			]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "Hello, Void!"},
+		},
+	},
 
 	// FS-based tests.
 	{
@@ -377,6 +420,111 @@ var inputTests = []struct {
 		},
 		want: []map[string]interface{}{
 			{"file.error": "file: " + missingFileError("testdata/absent.ndjson")},
+		},
+	},
+
+	// Decoder tests.
+	{
+		name: "decode_xml",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				const text = `<?xml version="1.0" encoding="UTF-8"?>
+<order orderid="56733" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="sales.xsd">
+  <sender>Ástríðr Ragnar</sender>
+  <address>
+    <name>Joord Lennart</name>
+    <company>Sydøstlige Gruppe</company>
+    <address>Beekplantsoen 594, 2 hoog, 6849 IG</address>
+    <city>Boekend</city>
+    <country>Netherlands</country>
+  </address>
+  <item>
+    <name>Egil's Saga</name>
+    <note>Free Sample</note>
+    <number>1</number>
+    <cost>99.95</cost>
+    <sent>FALSE</sent>
+  </item>
+</order>
+`
+				io.ReadAll(r.Body)
+				r.Body.Close()
+				w.Write([]byte(text))
+			})
+			server := httptest.NewServer(r)
+			config["resource.url"] = server.URL
+			t.Cleanup(server.Close)
+		},
+		config: map[string]interface{}{
+			"interval": 1,
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_xml("order").doc]
+	})
+	`,
+			"xsd": map[string]string{
+				"order": `<?xml version="1.0" encoding="UTF-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="order">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="sender" type="xs:string"/>
+        <xs:element name="address">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="name" type="xs:string"/>
+              <xs:element name="company" type="xs:string"/>
+              <xs:element name="address" type="xs:string"/>
+              <xs:element name="city" type="xs:string"/>
+              <xs:element name="country" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="item" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="name" type="xs:string"/>
+              <xs:element name="note" type="xs:string" minOccurs="0"/>
+              <xs:element name="number" type="xs:positiveInteger"/>
+              <xs:element name="cost" type="xs:decimal"/>
+              <xs:element name="sent" type="xs:boolean"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="orderid" type="xs:string" use="required"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+`,
+			},
+		},
+		handler: defaultHandler(http.MethodGet, ""),
+		want: []map[string]interface{}{
+			{
+				"order": map[string]interface{}{
+					"address": map[string]interface{}{
+						"address": "Beekplantsoen 594, 2 hoog, 6849 IG",
+						"city":    "Boekend",
+						"company": "Sydøstlige Gruppe",
+						"country": "Netherlands",
+						"name":    "Joord Lennart",
+					},
+					"item": []interface{}{
+						map[string]interface{}{
+							"cost":   99.95,
+							"name":   "Egil's Saga",
+							"note":   "Free Sample",
+							"number": 1.0, // CEL assumes float for number, so on exit from the env this stops being an int.
+							"sent":   false,
+						},
+					},
+					"noNamespaceSchemaLocation": "sales.xsd",
+					"orderid":                   "56733",
+					"sender":                    "Ástríðr Ragnar",
+					"xsi":                       "http://www.w3.org/2001/XMLSchema-instance",
+				},
+			},
 		},
 	},
 
@@ -553,6 +701,37 @@ var inputTests = []struct {
 		handler: retryHandler(),
 		want: []map[string]interface{}{
 			{"hello": "world"},
+		},
+	},
+	{
+		name:   "retry_failure_no_success",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"resource": map[string]interface{}{
+				"retry": map[string]interface{}{
+					"max_attempts": 2,
+				},
+			},
+			"program": `
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [
+			bytes(resp.Body).decode_json(),
+			{"status": resp.StatusCode},
+		],
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusGatewayTimeout)
+			//nolint:errcheck // No point checking errors in test server.
+			w.Write([]byte(`{"error":"we were too slow"}`))
+		},
+		want: []map[string]interface{}{
+			{"error": "we were too slow"},
+			{"status": float64(504)}, // Float because of JSON.
 		},
 	},
 
@@ -933,6 +1112,100 @@ var inputTests = []struct {
 
 	// Authenticated access tests.
 	{
+		name: "digest_accept",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":             1,
+			"auth.digest.user":     "test_client",
+			"auth.digest.password": "secret_password",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: digestAuthHandler(
+			"test_client",
+			"secret_password",
+			"test",
+			"random_string",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "digest_reject",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":             1,
+			"auth.digest.user":     "test_client",
+			"auth.digest.password": "wrong_secret_password",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: digestAuthHandler(
+			"test_client",
+			"secret_password",
+			"test",
+			"random_string",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"error": "not authorized",
+			},
+		},
+	},
+	{
+		// Test case modelled on `curl --digest -u test_user:secret_password https://httpbin.org/digest-auth/auth/test_user/secret_password/md5`.
+		name:   "digest_remote",
+		remote: true,
+		server: func(_ *testing.T, _ http.HandlerFunc, _ map[string]interface{}) {},
+		config: map[string]interface{}{
+			"resource.url":         "https://httpbin.org/digest-auth/auth/test_user/secret_password/md5",
+			"interval":             1,
+			"auth.digest.user":     "test_user",
+			"auth.digest.password": "secret_password",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		want: []map[string]interface{}{
+			{
+				"authenticated": true,
+				"user":          "test_user",
+			},
+		},
+	},
+	{
 		name: "OAuth2",
 		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 			s := httptest.NewServer(h)
@@ -1066,6 +1339,41 @@ var inputTests = []struct {
 		},
 	},
 
+	{
+		name: "debug",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": 1+debug("partial sum", 2+3)}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]interface{}{{
+			"message": map[string]interface{}{
+				"value": 6.0, // float64 due to json encoding.
+			},
+		}},
+	},
+	{
+		name: "debug_error",
+		config: map[string]interface{}{
+			"interval": 1,
+			"program":  `{"events":[{"message":{"value": try(debug("divide by zero", 0/0))}}]}`,
+			"state":    nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		time: func() time.Time { return time.Date(2010, 2, 8, 0, 0, 0, 0, time.UTC) },
+		want: []map[string]interface{}{{
+			"message": map[string]interface{}{
+				"value": "division by zero",
+			},
+		}},
+	},
+
 	// not yet done from httpjson (some are redundant since they are compositional products).
 	//
 	// cursor/pagination (place above auth test block)
@@ -1084,10 +1392,14 @@ func TestInput(t *testing.T) {
 		"ndjson_log_file_simple_file_scheme": "Path handling on Windows is incompatible with url.Parse/url.URL.String. See go.dev/issue/6027.",
 	}
 
+	logp.TestingSetup()
 	for _, test := range inputTests {
 		t.Run(test.name, func(t *testing.T) {
 			if reason, skip := skipOnWindows[test.name]; runtime.GOOS == "windows" && skip {
 				t.Skip(reason)
+			}
+			if test.remote && !*runRemote {
+				t.Skip("skipping remote endpoint test")
 			}
 
 			if test.server != nil {
@@ -1097,6 +1409,7 @@ func TestInput(t *testing.T) {
 			cfg := conf.MustNewConfigFrom(test.config)
 
 			conf := defaultConfig()
+			conf.Redact = &redact{} // Make sure we pass the redact requirement.
 			err := cfg.Unpack(&conf)
 			if err != nil {
 				t.Fatalf("unexpected error unpacking config: %v", err)
@@ -1132,7 +1445,7 @@ func TestInput(t *testing.T) {
 					cancel()
 				}
 			}
-			err = input{}.run(v2Ctx, src, test.persistCursor, &client)
+			err = input{test.time}.run(v2Ctx, src, test.persistCursor, &client)
 			if fmt.Sprint(err) != fmt.Sprint(test.wantErr) {
 				t.Errorf("unexpected error from running input: got:%v want:%v", err, test.wantErr)
 			}
@@ -1147,7 +1460,7 @@ func TestInput(t *testing.T) {
 			client.published = client.published[:len(test.want)]
 			for i, got := range client.published {
 				if !reflect.DeepEqual(got.Fields, mapstr.M(test.want[i])) {
-					t.Errorf("unexpected result for event %d: got:- want:+\n%s", i, cmp.Diff(got.Fields, test.want[i]))
+					t.Errorf("unexpected result for event %d: got:- want:+\n%s", i, cmp.Diff(got.Fields, mapstr.M(test.want[i])))
 				}
 			}
 
@@ -1323,6 +1636,52 @@ func retryHandler() http.HandlerFunc {
 }
 
 //nolint:errcheck // No point checking errors in test server.
+func digestAuthHandler(user, pass, realm, nonce string, handle http.HandlerFunc) http.HandlerFunc {
+	chal := &digest.Challenge{
+		Realm:     realm,
+		Nonce:     nonce,
+		Algorithm: "MD5",
+		QOP:       []string{"auth"},
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		auth := r.Header.Get("Authorization")
+		if auth == "" {
+			w.Header().Add("WWW-Authenticate", chal.String())
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		reqCred, err := digest.ParseCredentials(auth)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		srvCred, err := digest.Digest(chal, digest.Options{
+			Method:   r.Method,
+			URI:      r.URL.RequestURI(),
+			Cnonce:   reqCred.Cnonce,
+			Count:    reqCred.Nc,
+			Username: user,
+			Password: pass,
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if reqCred.Response != srvCred.Response {
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(`{"error":"not authorized"}`))
+			return
+		}
+
+		handle(w, r)
+	}
+}
+
+//nolint:errcheck // No point checking errors in test server.
 func oauth2Handler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/token" {
 		oauth2TokenHandler(w, r)
@@ -1447,14 +1806,26 @@ func paginationArrayHandler() http.HandlerFunc {
 }
 
 var redactorTests = []struct {
-	name   string
-	state  mapstr.M
-	mask   []string
-	delete bool
+	name  string
+	state mapstr.M
+	cfg   *redact
 
 	wantOrig   string
 	wantRedact string
 }{
+	{
+		name: "nil_redact",
+		state: mapstr.M{
+			"auth": mapstr.M{
+				"user": "fred",
+				"pass": "top_secret",
+			},
+			"other": "data",
+		},
+		cfg:        nil,
+		wantOrig:   `{"auth":{"pass":"top_secret","user":"fred"},"other":"data"}`,
+		wantRedact: `{"auth":{"pass":"top_secret","user":"fred"},"other":"data"}`,
+	},
 	{
 		name: "auth_no_delete",
 		state: mapstr.M{
@@ -1464,8 +1835,10 @@ var redactorTests = []struct {
 			},
 			"other": "data",
 		},
-		mask:       []string{"auth"},
-		delete:     false,
+		cfg: &redact{
+			Fields: []string{"auth"},
+			Delete: false,
+		},
 		wantOrig:   `{"auth":{"pass":"top_secret","user":"fred"},"other":"data"}`,
 		wantRedact: `{"auth":"*","other":"data"}`,
 	},
@@ -1478,8 +1851,10 @@ var redactorTests = []struct {
 			},
 			"other": "data",
 		},
-		mask:       []string{"auth"},
-		delete:     true,
+		cfg: &redact{
+			Fields: []string{"auth"},
+			Delete: true,
+		},
 		wantOrig:   `{"auth":{"pass":"top_secret","user":"fred"},"other":"data"}`,
 		wantRedact: `{"other":"data"}`,
 	},
@@ -1492,8 +1867,10 @@ var redactorTests = []struct {
 			},
 			"other": "data",
 		},
-		mask:       []string{"auth.pass"},
-		delete:     false,
+		cfg: &redact{
+			Fields: []string{"auth.pass"},
+			Delete: false,
+		},
 		wantOrig:   `{"auth":{"pass":"top_secret","user":"fred"},"other":"data"}`,
 		wantRedact: `{"auth":{"pass":"*","user":"fred"},"other":"data"}`,
 	},
@@ -1506,8 +1883,10 @@ var redactorTests = []struct {
 			},
 			"other": "data",
 		},
-		mask:       []string{"auth.pass"},
-		delete:     true,
+		cfg: &redact{
+			Fields: []string{"auth.pass"},
+			Delete: true,
+		},
 		wantOrig:   `{"auth":{"pass":"top_secret","user":"fred"},"other":"data"}`,
 		wantRedact: `{"auth":{"user":"fred"},"other":"data"}`,
 	},
@@ -1520,8 +1899,10 @@ var redactorTests = []struct {
 			},
 			"other": "data",
 		},
-		mask:       []string{"cursor.key"},
-		delete:     false,
+		cfg: &redact{
+			Fields: []string{"cursor.key"},
+			Delete: false,
+		},
 		wantOrig:   `{"cursor":[{"key":"val_one","other":"data"},{"key":"val_two","other":"data"}],"other":"data"}`,
 		wantRedact: `{"cursor":[{"key":"*","other":"data"},{"key":"*","other":"data"}],"other":"data"}`,
 	},
@@ -1534,8 +1915,10 @@ var redactorTests = []struct {
 			},
 			"other": "data",
 		},
-		mask:       []string{"cursor.key"},
-		delete:     true,
+		cfg: &redact{
+			Fields: []string{"cursor.key"},
+			Delete: true,
+		},
 		wantOrig:   `{"cursor":[{"key":"val_one","other":"data"},{"key":"val_two","other":"data"}],"other":"data"}`,
 		wantRedact: `{"cursor":[{"other":"data"},{"other":"data"}],"other":"data"}`,
 	},
@@ -1544,7 +1927,7 @@ var redactorTests = []struct {
 func TestRedactor(t *testing.T) {
 	for _, test := range redactorTests {
 		t.Run(test.name, func(t *testing.T) {
-			got := fmt.Sprint(redactor{state: test.state, mask: test.mask, delete: test.delete})
+			got := fmt.Sprint(redactor{state: test.state, cfg: test.cfg})
 			orig := fmt.Sprint(test.state)
 			if orig != test.wantOrig {
 				t.Errorf("unexpected original state after redaction:\n--- got\n--- want\n%s", cmp.Diff(orig, test.wantOrig))

@@ -20,8 +20,6 @@ package config
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -61,7 +59,7 @@ func NewConfigAppender(cfg *conf.C) (autodiscover.Appender, error) {
 	if config.ConditionConfig != nil {
 		cond, err = conditions.NewCondition(config.ConditionConfig)
 		if err != nil {
-			return nil, errors.Wrap(err, "unable to create condition due to error")
+			return nil, fmt.Errorf("unable to create condition due to error: %w", err)
 		}
 	}
 
@@ -69,7 +67,7 @@ func NewConfigAppender(cfg *conf.C) (autodiscover.Appender, error) {
 	cf := mapstr.M{}
 	err = config.Config.Unpack(&cf)
 	if err != nil {
-		return nil, errors.Wrap(err, "unable to unpack config due to error")
+		return nil, fmt.Errorf("unable to unpack config due to error: %w", err)
 	}
 
 	return &configAppender{condition: cond, config: cf}, nil

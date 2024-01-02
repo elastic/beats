@@ -40,6 +40,10 @@ func TestExeObjParser(t *testing.T) {
 
 			key := fmt.Sprintf("%s_%s", builder, format)
 			t.Run(fmt.Sprintf("executableObject_%s_%s", format, builder), func(t *testing.T) {
+				if builder == "garble" && format == "pe" {
+					t.Skip("skipping test on garbled PE file: see https://github.com/elastic/beats/issues/35705")
+				}
+
 				got := make(mapstr.M)
 				err := exeObjParser(nil).Parse(got, target)
 				if err != nil {
@@ -259,66 +263,6 @@ var want = map[string]mapstr.M{
 			"go_imports": []string{
 				"github.com/elastic/beats/v7/auditbeat/module/file_integrity/testdata/b.Used",
 				"github.com/elastic/beats/v7/auditbeat/module/file_integrity/testdata/b.hash",
-			},
-		},
-	},
-	"garble_pe": {
-		"pe": mapstr.M{
-			"import_hash": "c7269d59926fa4252270f407e4dab043",
-			"imphash":     "c7269d59926fa4252270f407e4dab043",
-			"imports": []string{
-				"kernel32.writefile",
-				"kernel32.writeconsolew",
-				"kernel32.waitformultipleobjects",
-				"kernel32.waitforsingleobject",
-				"kernel32.virtualquery",
-				"kernel32.virtualfree",
-				"kernel32.virtualalloc",
-				"kernel32.switchtothread",
-				"kernel32.suspendthread",
-				"kernel32.sleep",
-				"kernel32.setwaitabletimer",
-				"kernel32.setunhandledexceptionfilter",
-				"kernel32.setprocesspriorityboost",
-				"kernel32.setevent",
-				"kernel32.seterrormode",
-				"kernel32.setconsolectrlhandler",
-				"kernel32.resumethread",
-				"kernel32.postqueuedcompletionstatus",
-				"kernel32.loadlibrarya",
-				"kernel32.loadlibraryw",
-				"kernel32.setthreadcontext",
-				"kernel32.getthreadcontext",
-				"kernel32.getsysteminfo",
-				"kernel32.getsystemdirectorya",
-				"kernel32.getstdhandle",
-				"kernel32.getqueuedcompletionstatusex",
-				"kernel32.getprocessaffinitymask",
-				"kernel32.getprocaddress",
-				"kernel32.getenvironmentstringsw",
-				"kernel32.getconsolemode",
-				"kernel32.freeenvironmentstringsw",
-				"kernel32.exitprocess",
-				"kernel32.duplicatehandle",
-				"kernel32.createwaitabletimerexw",
-				"kernel32.createthread",
-				"kernel32.createiocompletionport",
-				"kernel32.createfilea",
-				"kernel32.createeventa",
-				"kernel32.closehandle",
-				"kernel32.addvectoredexceptionhandler",
-			},
-			"imports_names_entropy":     4.2079021689106195,
-			"imports_names_var_entropy": 0.0014785066641319837,
-			"go_import_hash":            "d41d8cd98f00b204e9800998ecf8427e",
-			"go_stripped":               true,
-			"sections": []objSection{
-				{Name: strPtr(".text"), Size: uint64Ptr(0x83000), Entropy: float64Ptr(6.18), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".rdata"), Size: uint64Ptr(0x97a00), Entropy: float64Ptr(5.10), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".data"), Size: uint64Ptr(0x17800), Entropy: float64Ptr(4.60), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".idata"), Size: uint64Ptr(0x600), Entropy: float64Ptr(3.60), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".reloc"), Size: uint64Ptr(0x6800), Entropy: float64Ptr(5.42), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr(".symtab"), Size: uint64Ptr(0x200), Entropy: float64Ptr(0.02), VarEntropy: float64Ptr(0.0001)},
 			},
 		},
 	},

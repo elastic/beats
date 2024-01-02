@@ -39,6 +39,7 @@ var mapping = &prometheus.MetricsMapping{
 		"apiserver_audit_event_total":             prometheus.Metric("audit.event.count"),
 		"apiserver_audit_requests_rejected_total": prometheus.Metric("audit.rejected.count"),
 		"rest_client_requests_total":              prometheus.Metric("client.request.count"),
+		"kubernetes_build_info":                   prometheus.InfoMetric(),
 	},
 
 	Labels: map[string]prometheus.LabelMap{
@@ -58,6 +59,10 @@ var mapping = &prometheus.MetricsMapping{
 		"method":      prometheus.KeyLabel("request.method"),
 		"host":        prometheus.KeyLabel("request.host"),
 		"kind":        prometheus.KeyLabel("watch.events.kind"),
+
+		// from info metric "kubernetes_build_info"
+		"major": prometheus.Label("major.version"),
+		"minor": prometheus.Label("minor.version"),
 	},
 }
 

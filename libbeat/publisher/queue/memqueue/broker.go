@@ -84,7 +84,6 @@ type Settings struct {
 	Events         int
 	FlushMinEvents int
 	FlushTimeout   time.Duration
-	InputQueueSize int
 }
 
 type queueEntry struct {
@@ -123,8 +122,9 @@ func FactoryForSettings(settings Settings) queue.QueueFactory {
 	return func(
 		logger *logp.Logger,
 		ackCallback func(eventCount int),
+		inputQueueSize int,
 	) (queue.Queue, error) {
-		return NewQueue(logger, ackCallback, settings), nil
+		return NewQueue(logger, ackCallback, settings, inputQueueSize), nil
 	}
 }
 
@@ -135,6 +135,7 @@ func NewQueue(
 	logger *logp.Logger,
 	ackCallback func(eventCount int),
 	settings Settings,
+	inputQueueSize int,
 ) *broker {
 	var (
 		sz           = settings.Events
@@ -142,7 +143,7 @@ func NewQueue(
 		flushTimeout = settings.FlushTimeout
 	)
 
-	chanSize := AdjustInputQueueSize(settings.InputQueueSize, sz)
+	chanSize := AdjustInputQueueSize(inputQueueSize, sz)
 
 	if minEvents < 1 {
 		minEvents = 1

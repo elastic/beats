@@ -28,6 +28,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
@@ -329,7 +330,9 @@ func (p *copyTruncateFileProspector) onRotatedFile(
 			hg.Start(ctx, src)
 			return
 		}
-		originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Info: fi})
+		descCopy := fe.Descriptor
+		descCopy.Info = file.ExtendFileInfo(fi)
+		originalSrc := p.identifier.GetSource(loginp.FSEvent{NewPath: originalPath, Descriptor: descCopy})
 		p.rotatedFiles.addOriginalFile(originalPath, originalSrc)
 		p.rotatedFiles.addRotatedFile(originalPath, fe.NewPath, src)
 		hg.Start(ctx, src)

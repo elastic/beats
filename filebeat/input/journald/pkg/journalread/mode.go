@@ -31,12 +31,15 @@ const (
 	SeekTail
 	// SeekCursor option seeks to the position specified in the cursor
 	SeekCursor
+	// SeekSince option seeks to the position specified by the since option
+	SeekSince
 )
 
 var seekModes = map[string]SeekMode{
 	"head":   SeekHead,
 	"tail":   SeekTail,
 	"cursor": SeekCursor,
+	"since":  SeekSince,
 }
 
 // Unpack validates and unpack "seek" config options. It returns an error if

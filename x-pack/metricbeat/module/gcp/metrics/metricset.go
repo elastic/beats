@@ -13,10 +13,10 @@ import (
 
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
-	"github.com/golang/protobuf/ptypes/duration"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/genproto/googleapis/api/metric"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
@@ -107,7 +107,7 @@ type config struct {
 	CredentialsJSON     string   `config:"credentials_json"`
 
 	opt    []option.ClientOption
-	period *duration.Duration
+	period *durationpb.Duration
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -139,7 +139,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return m, fmt.Errorf("no credentials_file_path or credentials_json specified")
 	}
 
-	m.config.period = &duration.Duration{
+	m.config.period = &durationpb.Duration{
 		Seconds: int64(m.Module().Config().Period.Seconds()),
 	}
 
@@ -182,65 +182,50 @@ func (m *MetricSet) Fetch(ctx context.Context, reporter mb.ReporterV2) (err erro
 		for _, v := range sdc.MetricTypes {
 			metricsToCollect[sdc.AddPrefixTo(v)] = m.metricsMeta[sdc.AddPrefixTo(v)]
 		}
-		responses, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, metricsToCollect)
+
+		// Collect time series values from Google Cloud Monitoring API
+		timeSeries, err := m.requester.Metrics(ctx, sdc.ServiceName, sdc.Aligner, metricsToCollect)
 		if err != nil {
 			err = fmt.Errorf("error trying to get metrics for project '%s' and zone '%s' or region '%s': %w", m.config.ProjectID, m.config.Zone, m.config.Region, err)
 			m.Logger().Error(err)
 			return err
 		}
 
-		events, err := m.eventMapping(ctx, responses, sdc)
+		events, err := m.mapToEvents(ctx, timeSeries, sdc)
 		if err != nil {
-			err = fmt.Errorf("eventMapping failed: %w", err)
+			err = fmt.Errorf("mapToEvents failed: %w", err)
 			m.Logger().Error(err)
 			return err
 		}
 
+		// Publish events to Elasticsearch
 		m.Logger().Debugf("Total %d of events are created for service name = %s and metric type = %s.", len(events), sdc.ServiceName, sdc.MetricTypes)
 		for _, event := range events {
 			reporter.Event(event)
 		}
 	}
+
 	return nil
 }
 
-func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
-	e := newIncomingFieldExtractor(m.Logger(), sdc)
+// mapToEvents maps time series data from GCP into events for Elasticsearch.
+func (m *MetricSet) mapToEvents(ctx context.Context, timeSeries []timeSeriesWithAligner, sdc metricsConfig) ([]mb.Event, error) {
+	mapper := newIncomingFieldMapper(m.Logger(), sdc)
 
-	var gcpService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
+	var metadataService = gcp.NewStackdriverMetadataServiceForTimeSeries(nil)
 	var err error
 
 	if !m.config.ExcludeLabels {
-		if gcpService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
+		if metadataService, err = NewMetadataServiceForConfig(m.config, sdc.ServiceName); err != nil {
 			return nil, fmt.Errorf("error trying to create metadata service: %w", err)
 		}
 	}
 
-	tsGrouped := m.timeSeriesGrouped(ctx, gcpService, tss, e)
+	// Group the time series values by common traits.
+	timeSeriesGroups := m.groupTimeSeries(ctx, timeSeries, metadataService, mapper)
 
-	//Create single events for each group of data that matches some common patterns like labels and timestamp
-	events := make([]mb.Event, 0)
-	for _, groupedEvents := range tsGrouped {
-		event := mb.Event{
-			Timestamp: groupedEvents[0].Timestamp,
-			ModuleFields: mapstr.M{
-				"labels": groupedEvents[0].Labels,
-			},
-			MetricSetFields: mapstr.M{},
-		}
-
-		for _, singleEvent := range groupedEvents {
-			_, _ = event.MetricSetFields.Put(singleEvent.Key, singleEvent.Value)
-		}
-
-		if sdc.ServiceName == "compute" {
-			event.RootFields = addHostFields(groupedEvents)
-		} else {
-			event.RootFields = groupedEvents[0].ECS
-		}
-
-		events = append(events, event)
-	}
+	// Create single events for each time series group.
+	events := createEventsFromGroups(sdc.ServiceName, timeSeriesGroups)
 
 	return events, nil
 }

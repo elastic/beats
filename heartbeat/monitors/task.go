@@ -21,8 +21,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
-
 	"github.com/elastic/beats/v7/heartbeat/eventext"
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
@@ -39,7 +37,7 @@ type configuredJob struct {
 	config    jobConfig
 	monitor   *Monitor
 	cancelFn  context.CancelFunc
-	pubClient pipeline.ISyncClient
+	pubClient beat.Client
 }
 
 func newConfiguredJob(job jobs.Job, config jobConfig, monitor *Monitor) *configuredJob {
@@ -76,20 +74,19 @@ func (t *configuredJob) makeSchedulerTaskFunc() scheduler.TaskFunc {
 }
 
 // Start schedules this configuredJob for execution.
-func (t *configuredJob) Start(pubClient pipeline.ISyncClient) {
+func (t *configuredJob) Start(pubClient beat.Client) {
 	var err error
 
 	t.pubClient = pubClient
 
 	if err != nil {
-		logp.L().Info("could not start monitor: %v", err)
+		logp.L().Infof("could not start monitor: %v", err)
 		return
 	}
 
-	tf := t.makeSchedulerTaskFunc()
-	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, tf, t.config.Type, pubClient.Wait)
+	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, t.makeSchedulerTaskFunc(), t.config.Type)
 	if err != nil {
-		logp.L().Info("could not start monitor: %v", err)
+		logp.L().Infof("could not start monitor: %v", err)
 	}
 }
 
@@ -103,14 +100,14 @@ func (t *configuredJob) Stop() {
 	}
 }
 
-func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient) []scheduler.TaskFunc {
+func runPublishJob(job jobs.Job, pubClient beat.Client) []scheduler.TaskFunc {
 	event := &beat.Event{
 		Fields: mapstr.M{},
 	}
 
 	conts, err := job(event)
 	if err != nil {
-		logp.L().Info("Job failed with: %s", err)
+		logp.L().Infof("Job failed with: %s", err)
 	}
 
 	hasContinuations := len(conts) > 0
@@ -125,10 +122,10 @@ func runPublishJob(job jobs.Job, pubClient pipeline.ISyncClient) []scheduler.Tas
 				Meta:      event.Meta.Clone(),
 				Fields:    event.Fields.Clone(),
 			}
-			_ = pubClient.Publish(clone)
+			pubClient.Publish(clone)
 		} else {
 			// no clone needed if no continuations
-			_ = pubClient.Publish(*event)
+			pubClient.Publish(*event)
 		}
 	}
 

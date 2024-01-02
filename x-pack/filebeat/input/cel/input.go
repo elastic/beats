@@ -4,14 +4,12 @@
 
 // Package cel implements an input that uses the Common Expression Language to
 // perform requests and do endpoint processing of events. The cel package exposes
-// the github.com/elastic/mito/lib and github.com/google/cel-go/ext CEL extension
-// libraries.
+// the github.com/elastic/mito/lib CEL extension library.
 package cel
 
 import (
 	"compress/gzip"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -26,6 +24,7 @@ import (
 	"time"
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
+	"github.com/icholy/digest"
 	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
@@ -34,8 +33,6 @@ import (
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
-	"google.golang.org/protobuf/encoding/protojson"
-	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -72,12 +69,22 @@ var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), ver
 func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:      inputName,
-		Stability: feature.Experimental,
+		Stability: feature.Stable,
 		Manager:   NewInputManager(log, store),
 	}
 }
 
-type input struct{}
+type input struct {
+	time func() time.Time
+}
+
+// now is time.Now with a modifiable time source.
+func (i input) now() time.Time {
+	if i.time == nil {
+		return time.Now()
+	}
+	return i.time()
+}
 
 func (input) Name() string { return inputName }
 
@@ -111,7 +118,7 @@ func sanitizeFileName(name string) string {
 	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
-func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
+func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
@@ -125,7 +132,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
-	client, err := newClient(ctx, cfg, log)
+	client, trace, err := newClient(ctx, cfg, log)
 	if err != nil {
 		return err
 	}
@@ -144,7 +151,7 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns)
+	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs, log, trace)
 	if err != nil {
 		return err
 	}
@@ -220,11 +227,14 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 			}
 
 			// Process a set of event requests.
-			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, mask: cfg.Redact.Fields, delete: cfg.Redact.Delete})
+			if trace != nil {
+				log.Debugw("previous transaction", "transaction.id", trace.TxID())
+			}
+			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			metrics.executions.Add(1)
-			start := time.Now()
-			state, err = evalWith(ctx, prg, state)
-			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, mask: cfg.Redact.Fields, delete: cfg.Redact.Delete})
+			start := i.now().In(time.UTC)
+			state, err = evalWith(ctx, prg, state, start)
+			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
 				switch {
 				case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
@@ -233,6 +243,9 @@ func (input) run(env v2.Context, src *source, cursor map[string]interface{}, pub
 				log.Errorw("failed evaluation", "error", err)
 			}
 			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
+			if trace != nil {
+				log.Debugw("final transaction", "transaction.id", trace.TxID())
+			}
 
 			// On exit, state is expected to be in the shape:
 			//
@@ -673,15 +686,29 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 	return limit, true
 }
 
-func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client, error) {
+func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client, *httplog.LoggingRoundTripper, error) {
 	if !wantClient(cfg) {
-		return nil, nil
+		return nil, nil, nil
 	}
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings())...)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
+	if cfg.Auth.Digest.isEnabled() {
+		var noReuse bool
+		if cfg.Auth.Digest.NoReuse != nil {
+			noReuse = *cfg.Auth.Digest.NoReuse
+		}
+		c.Transport = &digest.Transport{
+			Transport: c.Transport,
+			Username:  cfg.Auth.Digest.User,
+			Password:  cfg.Auth.Digest.Password,
+			NoReuse:   noReuse,
+		}
+	}
+
+	var trace *httplog.LoggingRoundTripper
 	if cfg.Resource.Tracer != nil {
 		w := zapcore.AddSync(cfg.Resource.Tracer)
 		go func() {
@@ -696,30 +723,35 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 		)
 		traceLogger := zap.New(core)
 
-		c.Transport = httplog.NewLoggingRoundTripper(c.Transport, traceLogger)
+		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger)
+		c.Transport = trace
 	}
 
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
 
-	client := &retryablehttp.Client{
-		HTTPClient:   c,
-		Logger:       newRetryLog(log),
-		RetryWaitMin: cfg.Resource.Retry.getWaitMin(),
-		RetryWaitMax: cfg.Resource.Retry.getWaitMax(),
-		RetryMax:     cfg.Resource.Retry.getMaxAttempts(),
-		CheckRetry:   retryablehttp.DefaultRetryPolicy,
-		Backoff:      retryablehttp.DefaultBackoff,
+	if cfg.Resource.Retry.getMaxAttempts() > 1 {
+		maxAttempts := cfg.Resource.Retry.getMaxAttempts()
+		c = (&retryablehttp.Client{
+			HTTPClient:   c,
+			Logger:       newRetryLog(log),
+			RetryWaitMin: cfg.Resource.Retry.getWaitMin(),
+			RetryWaitMax: cfg.Resource.Retry.getWaitMax(),
+			RetryMax:     maxAttempts,
+			CheckRetry:   retryablehttp.DefaultRetryPolicy,
+			Backoff:      retryablehttp.DefaultBackoff,
+			ErrorHandler: retryErrorHandler(maxAttempts, log),
+		}).StandardClient()
 	}
 
 	if cfg.Auth.OAuth2.isEnabled() {
-		authClient, err := cfg.Auth.OAuth2.client(ctx, client.StandardClient())
+		authClient, err := cfg.Auth.OAuth2.client(ctx, c)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return authClient, nil
+		return authClient, trace, nil
 	}
 
-	return client.StandardClient(), nil
+	return c, trace, nil
 }
 
 func wantClient(cfg config) bool {
@@ -801,6 +833,17 @@ func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []
 	}
 }
 
+// retryErrorHandler returns a retryablehttp.ErrorHandler that will log retry resignation
+// but return the last retry attempt's response and a nil error so that the CEL code
+// can evaluate the response status itself. Any error passed to the retryablehttp.ErrorHandler
+// is returned unaltered.
+func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
+	return func(resp *http.Response, err error, numTries int) (*http.Response, error) {
+		log.Warnw("giving up retries", "method", resp.Request.Method, "url", resp.Request.URL, "retries", max+1)
+		return resp, err
+	}
+}
+
 func newRateLimiterFromConfig(cfg *ResourceConfig) *rate.Limiter {
 	r := rate.Inf
 	b := 1
@@ -855,15 +898,22 @@ var (
 	}
 )
 
-func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp) (cel.Program, error) {
+func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper) (cel.Program, error) {
+	xml, err := lib.XML(nil, xsd)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build xml type hints: %w", err)
+	}
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
+		cel.OptionalTypes(cel.OptionalTypesVersion(lib.OptionalTypesVersion)),
 		lib.Collections(),
 		lib.Crypto(),
 		lib.JSON(nil),
+		xml,
 		lib.Strings(),
 		lib.Time(),
 		lib.Try(),
+		lib.Debug(debug(log, trace)),
 		lib.File(mimetypes),
 		lib.MIME(mimetypes),
 		lib.Regexp(patterns),
@@ -895,33 +945,70 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 	return prg, nil
 }
 
-func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}) (map[string]interface{}, error) {
-	out, _, err := prg.ContextEval(ctx, map[string]interface{}{root: state})
+func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, any) {
+	log = log.Named("cel_debug")
+	return func(tag string, value any) {
+		level := "DEBUG"
+		if _, ok := value.(error); ok {
+			level = "ERROR"
+		}
+		if trace == nil {
+			log.Debugw(level, "tag", tag, "value", value)
+		} else {
+			log.Debugw(level, "tag", tag, "value", value, "transaction.id", trace.TxID())
+		}
+	}
+}
+
+func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
+	out, _, err := prg.ContextEval(ctx, map[string]interface{}{
+		// Replace global program "now" with current time. This is necessary
+		// as the lib.Time now global is static at program instantiation time
+		// which will persist over multiple evaluations. The lib.Time behaviour
+		// is correct for mito where CEL program instances live for only a
+		// single evaluation. Rather than incurring the cost of creating a new
+		// cel.Program for each evaluation, shadow lib.Time's now with a new
+		// value for each eval. We retain the lib.Time now global for
+		// compatibility between CEL programs developed in mito with programs
+		// run in the input.
+		"now": now,
+		root:  state,
+	})
 	if e := ctx.Err(); e != nil {
 		err = e
 	}
 	if err != nil {
 		state["events"] = errorMessage(fmt.Sprintf("failed eval: %v", err))
+		clearWantMore(state)
 		return state, fmt.Errorf("failed eval: %w", err)
 	}
 
-	v, err := out.ConvertToNative(reflect.TypeOf(&structpb.Value{}))
+	v, err := out.ConvertToNative(reflect.TypeOf((*structpb.Struct)(nil)))
 	if err != nil {
 		state["events"] = errorMessage(fmt.Sprintf("failed proto conversion: %v", err))
+		clearWantMore(state)
 		return state, fmt.Errorf("failed proto conversion: %w", err)
 	}
-	b, err := protojson.MarshalOptions{Indent: ""}.Marshal(v.(proto.Message))
-	if err != nil {
-		state["events"] = errorMessage(fmt.Sprintf("failed native conversion: %v", err))
-		return state, fmt.Errorf("failed native conversion: %w", err)
+	switch v := v.(type) {
+	case *structpb.Struct:
+		return v.AsMap(), nil
+	default:
+		// This should never happen.
+		errMsg := fmt.Sprintf("unexpected native conversion type: %T", v)
+		state["events"] = errorMessage(errMsg)
+		clearWantMore(state)
+		return state, errors.New(errMsg)
 	}
-	var res map[string]interface{}
-	err = json.Unmarshal(b, &res)
-	if err != nil {
-		state["events"] = errorMessage(fmt.Sprintf("failed json conversion: %v", err))
-		return state, fmt.Errorf("failed json conversion: %w", err)
+}
+
+// clearWantMore sets the state to not request additional work in a periodic evaluation.
+// It leaves state intact if there is no "want_more" element, and sets the element to false
+// if there is. This is necessary instead of just doing delete(state, "want_more") as
+// client CEL code may expect the want_more field to be present.
+func clearWantMore(state map[string]interface{}) {
+	if _, ok := state["want_more"]; ok {
+		state["want_more"] = false
 	}
-	return res, nil
 }
 
 func errorMessage(msg string) map[string]interface{} {
@@ -954,7 +1041,7 @@ func test(url *url.URL) error {
 
 	_, err := net.DialTimeout("tcp", net.JoinHostPort(url.Hostname(), port), time.Second)
 	if err != nil {
-		return fmt.Errorf("url %q is unreachable", url)
+		return fmt.Errorf("url %q is unreachable: %w", url, err)
 	}
 
 	return nil
@@ -1001,21 +1088,20 @@ func (m *inputMetrics) Close() {
 
 // redactor implements lazy field redaction of sets of a mapstr.M.
 type redactor struct {
-	state  mapstr.M
-	mask   []string // mask is the set of dotted paths to redact from state.
-	delete bool     // if delete is true, delete redacted fields instead of showing a redaction.
+	state mapstr.M
+	cfg   *redact
 }
 
 // String renders the JSON corresponding to r.state after applying redaction
 // operations.
 func (r redactor) String() string {
-	if len(r.mask) == 0 {
+	if r.cfg == nil || len(r.cfg.Fields) == 0 {
 		return r.state.String()
 	}
 	c := make(mapstr.M, len(r.state))
 	cloneMap(c, r.state)
-	for _, mask := range r.mask {
-		if r.delete {
+	for _, mask := range r.cfg.Fields {
+		if r.cfg.Delete {
 			walkMap(c, mask, func(parent mapstr.M, key string) {
 				delete(parent, key)
 			})

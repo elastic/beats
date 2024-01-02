@@ -20,8 +20,6 @@ package ratelimit
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
-
 	cfg "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -63,7 +61,7 @@ func factory(id string, config algoConfig) (algorithm, error) {
 
 	algorithm, err := ctor(config)
 	if err != nil {
-		return nil, errors.Wrap(err, "could not construct algorithm")
+		return nil, fmt.Errorf("could not construct algorithm: %w", err)
 	}
 
 	return algorithm, nil

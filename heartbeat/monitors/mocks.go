@@ -43,7 +43,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/scheduler"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	beatversion "github.com/elastic/beats/v7/libbeat/version"
 )
 
@@ -80,9 +79,8 @@ func makeMockFactory(pluginsReg *plugin.PluginsReg) (factory *RunnerFactory, sch
 			AddTask:     sched.Add,
 			StateLoader: monitorstate.NilStateLoader,
 			PluginsReg:  pluginsReg,
-			PipelineClientFactory: func(pipeline beat.Pipeline) (pipeline.ISyncClient, error) {
-				c, _ := pipeline.Connect()
-				return SyncPipelineClientAdaptor{C: c}, nil
+			PipelineClientFactory: func(pipeline beat.Pipeline) (beat.Client, error) {
+				return pipeline.Connect()
 			},
 		}),
 		sched,
@@ -164,12 +162,6 @@ func (pc *MockPipeline) ConnectWith(cc beat.ClientConfig) (beat.Client, error) {
 	return c, nil
 }
 
-// Convenience function for tests
-func (pc *MockPipeline) ConnectSync() pipeline.ISyncClient {
-	c, _ := pc.Connect()
-	return SyncPipelineClientAdaptor{C: c}
-}
-
 func (pc *MockPipeline) PublishedEvents() []*beat.Event {
 	pc.mtx.Lock()
 	defer pc.mtx.Unlock()
@@ -203,9 +195,10 @@ func baseMockEventMonitorValidator(id string, name string, status string) valida
 
 func mockEventMonitorValidator(id string, name string) validator.Validator {
 	return lookslike.Strict(lookslike.Compose(
+		hbtestllext.MaybeHasEventType,
 		baseMockEventMonitorValidator(id, name, "up"),
 		hbtestllext.MonitorTimespanValidator,
-		hbtest.SummaryChecks(1, 0),
+		hbtest.SummaryStateChecks(1, 0),
 		lookslike.MustCompile(mockEventCustomFields()),
 	))
 }

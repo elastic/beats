@@ -25,6 +25,7 @@ import (
 
 var serverPoolTests = []struct {
 	name    string
+	method  string
 	cfgs    []*httpEndpoint
 	events  []target
 	want    []mapstr.M
@@ -35,6 +36,60 @@ var serverPoolTests = []struct {
 		cfgs: []*httpEndpoint{{
 			addr: "127.0.0.1:9001",
 			config: config{
+				ResponseCode:  200,
+				ResponseBody:  `{"message": "success"}`,
+				ListenAddress: "127.0.0.1",
+				ListenPort:    "9001",
+				URL:           "/",
+				Prefix:        "json",
+				ContentType:   "application/json",
+			},
+		}},
+		events: []target{
+			{url: "http://127.0.0.1:9001/", event: `{"a":1}`},
+			{url: "http://127.0.0.1:9001/", event: `{"b":2}`},
+			{url: "http://127.0.0.1:9001/", event: `{"c":3}`},
+		},
+		want: []mapstr.M{
+			{"json": mapstr.M{"a": int64(1)}},
+			{"json": mapstr.M{"b": int64(2)}},
+			{"json": mapstr.M{"c": int64(3)}},
+		},
+	},
+	{
+		name:   "put",
+		method: http.MethodPut,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				Method:        http.MethodPut,
+				ResponseCode:  200,
+				ResponseBody:  `{"message": "success"}`,
+				ListenAddress: "127.0.0.1",
+				ListenPort:    "9001",
+				URL:           "/",
+				Prefix:        "json",
+				ContentType:   "application/json",
+			},
+		}},
+		events: []target{
+			{url: "http://127.0.0.1:9001/", event: `{"a":1}`},
+			{url: "http://127.0.0.1:9001/", event: `{"b":2}`},
+			{url: "http://127.0.0.1:9001/", event: `{"c":3}`},
+		},
+		want: []mapstr.M{
+			{"json": mapstr.M{"a": int64(1)}},
+			{"json": mapstr.M{"b": int64(2)}},
+			{"json": mapstr.M{"c": int64(3)}},
+		},
+	},
+	{
+		name:   "patch",
+		method: http.MethodPatch,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				Method:        http.MethodPatch,
 				ResponseCode:  200,
 				ResponseBody:  `{"message": "success"}`,
 				ListenAddress: "127.0.0.1",
@@ -217,13 +272,15 @@ func TestServerPool(t *testing.T) {
 				fails = make(chan error, 1)
 			)
 			ctx, cancel := newCtx("server_pool_test", test.name)
+			metrics := newInputMetrics("")
+			defer metrics.Close()
 			var wg sync.WaitGroup
 			for _, cfg := range test.cfgs {
 				cfg := cfg
 				wg.Add(1)
 				go func() {
 					defer wg.Done()
-					err := servers.serve(ctx, cfg, &pub)
+					err := servers.serve(ctx, cfg, &pub, metrics)
 					if err != http.ErrServerClosed {
 						select {
 						case fails <- err:
@@ -247,13 +304,14 @@ func TestServerPool(t *testing.T) {
 				}
 			}
 			for i, e := range test.events {
-				resp, err := http.Post(e.url, "application/json", strings.NewReader(e.event))
+				resp, err := doRequest(test.method, e.url, "application/json", strings.NewReader(e.event))
 				if err != nil {
 					t.Fatalf("failed to post event #%d: %v", i, err)
 				}
+				body := dump(resp.Body)
 				if resp.StatusCode != http.StatusOK {
 					t.Errorf("unexpected response status code: %s (%d)\nresp: %s",
-						resp.Status, resp.StatusCode, dump(resp.Body))
+						resp.Status, resp.StatusCode, body)
 				}
 			}
 			cancel()
@@ -265,8 +323,36 @@ func TestServerPool(t *testing.T) {
 			if !cmp.Equal(got, test.want) {
 				t.Errorf("unexpected result:\n--- got\n--- want\n%s", cmp.Diff(got, test.want))
 			}
+
+			// Try to re-register the same addresses.
+			ctx, cancel = newCtx("server_pool_test", test.name)
+			for _, cfg := range test.cfgs {
+				cfg := cfg
+				wg.Add(1)
+				go func() {
+					defer wg.Done()
+					err := servers.serve(ctx, cfg, &pub, metrics)
+					if err != nil && err != http.ErrServerClosed && test.wantErr == nil {
+						t.Errorf("failed to re-register %v: %v", cfg.addr, err)
+					}
+				}()
+			}
+			cancel()
+			wg.Wait()
 		})
 	}
+}
+
+func doRequest(method, url, contentType string, body io.Reader) (*http.Response, error) {
+	if method == "" {
+		method = http.MethodPost
+	}
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", contentType)
+	return http.DefaultClient.Do(req)
 }
 
 // Is is included to simplify testing, but is not exposed to avoid unwanted error
@@ -290,9 +376,9 @@ func newCtx(log, id string) (_ v2.Context, cancel func()) {
 	}, cancel
 }
 
-func dump(r io.ReadCloser) string {
+func dump(r io.ReadCloser) []byte {
 	defer r.Close()
 	var buf bytes.Buffer
 	io.Copy(&buf, r)
-	return buf.String()
+	return buf.Bytes()
 }

@@ -39,6 +39,7 @@ type ConfigAWS struct {
 	SharedCredentialFile string            `config:"shared_credential_file"`
 	Endpoint             string            `config:"endpoint"`
 	RoleArn              string            `config:"role_arn"`
+	ExternalID           string            `config:"external_id"`
 	ProxyUrl             string            `config:"proxy_url"`
 	FIPSEnabled          bool              `config:"fips_enabled"`
 	TLS                  *tlscommon.Config `config:"ssl" yaml:"ssl,omitempty" json:"ssl,omitempty"`
@@ -149,14 +150,18 @@ func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config
 	logger := logp.NewLogger("addAssumeRoleProviderToAwsConfig")
 	logger.Debug("Switching credentials provider to AssumeRoleProvider")
 	stsSvc := sts.NewFromConfig(*awsConfig)
-	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
+	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn, func(aro *stscreds.AssumeRoleOptions) {
+		if config.ExternalID != "" {
+			aro.ExternalID = awssdk.String(config.ExternalID)
+		}
+	})
 	awsConfig.Credentials = stsCredProvider
 }
 
 // addStaticCredentialsProviderToAwsConfig adds a static credentials provider to the current AWS config by using the keys stored in Beats config
 func addStaticCredentialsProviderToAwsConfig(beatsConfig ConfigAWS, awsConfig *awssdk.Config) {
 	logger := logp.NewLogger("addStaticCredentialsProviderToAwsConfig")
-	logger.Debug("Switching credentials provider to AssumeRoleProvider")
+	logger.Debug("Switching credentials provider to StaticCredentialsProvider")
 	staticCredentialsProvider := credentials.NewStaticCredentialsProvider(
 		beatsConfig.AccessKeyID,
 		beatsConfig.SecretAccessKey,

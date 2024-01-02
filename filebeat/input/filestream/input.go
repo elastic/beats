@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"time"
 
 	"golang.org/x/text/transform"
 
@@ -58,7 +59,6 @@ type fileMeta struct {
 type filestream struct {
 	readerConfig    readerConfig
 	encodingFactory encoding.EncodingFactory
-	encoding        encoding.Encoding
 	closerConfig    closerConfig
 	parsers         parser.Config
 }
@@ -126,6 +126,7 @@ func (inp *filestream) Run(
 	src loginp.Source,
 	cursor loginp.Cursor,
 	publisher loginp.Publisher,
+	metrics *loginp.Metrics,
 ) error {
 	fs, ok := src.(fileSource)
 	if !ok {
@@ -141,6 +142,11 @@ func (inp *filestream) Run(
 		return err
 	}
 
+	metrics.FilesActive.Inc()
+	metrics.HarvesterRunning.Inc()
+	defer metrics.FilesActive.Dec()
+	defer metrics.HarvesterRunning.Dec()
+
 	_, streamCancel := ctxtool.WithFunc(ctx.Cancelation, func() {
 		log.Debug("Closing reader of filestream")
 		err := r.Close()
@@ -150,7 +156,7 @@ func (inp *filestream) Run(
 	})
 	defer streamCancel()
 
-	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher)
+	return inp.readFromSource(ctx, log, r, fs.newPath, state, publisher, metrics)
 }
 
 func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
@@ -168,7 +174,7 @@ func initState(log *logp.Logger, c loginp.Cursor, s fileSource) state {
 }
 
 func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSource, offset int64) (reader.Reader, error) {
-	f, err := inp.openFile(log, fs.newPath, offset)
+	f, encoding, err := inp.openFile(log, fs.newPath, offset)
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +215,7 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 
 	var r reader.Reader
 	r, err = readfile.NewEncodeReader(dbgReader, readfile.Config{
-		Codec:      inp.encoding,
+		Codec:      encoding,
 		BufferSize: inp.readerConfig.BufferSize,
 		Terminator: inp.readerConfig.LineTerminator,
 		MaxBytes:   encReaderMaxBytes,
@@ -221,7 +227,7 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 
 	r = readfile.NewStripNewline(r, inp.readerConfig.LineTerminator)
 
-	r = readfile.NewFilemeta(r, fs.newPath, offset)
+	r = readfile.NewFilemeta(r, fs.newPath, fs.desc.Info, fs.desc.Fingerprint, offset)
 
 	r = inp.parsers.Create(r)
 
@@ -234,33 +240,33 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 // or the file cannot be opened because for example of failing read permissions, an error
 // is returned and the harvester is closed. The file will be picked up again the next time
 // the file system is scanned
-func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*os.File, error) {
+func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*os.File, encoding.Encoding, error) {
 	fi, err := os.Stat(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to stat source file %s: %w", path, err)
+		return nil, nil, fmt.Errorf("failed to stat source file %s: %w", path, err)
 	}
 
 	// it must be checked if the file is not a named pipe before we try to open it
 	// if it is a named pipe os.OpenFile fails, so there is no need to try opening it.
 	if fi.Mode()&os.ModeNamedPipe != 0 {
-		return nil, fmt.Errorf("failed to open file %s, named pipes are not supported", fi.Name())
+		return nil, nil, fmt.Errorf("failed to open file %s, named pipes are not supported", fi.Name())
 	}
 
 	ok := false
 	f, err := file.ReadOpen(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed opening %s: %w", path, err)
+		return nil, nil, fmt.Errorf("failed opening %s: %w", path, err)
 	}
 	defer cleanup.IfNot(&ok, cleanup.IgnoreError(f.Close))
 
 	fi, err = f.Stat()
 	if err != nil {
-		return nil, fmt.Errorf("failed to stat source file %s: %w", path, err)
+		return nil, nil, fmt.Errorf("failed to stat source file %s: %w", path, err)
 	}
 
 	err = checkFileBeforeOpening(fi)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if fi.Size() < offset {
@@ -269,20 +275,20 @@ func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*o
 	}
 	err = inp.initFileOffset(f, offset)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	inp.encoding, err = inp.encodingFactory(f)
+	encoding, err := inp.encodingFactory(f)
 	if err != nil {
 		f.Close()
 		if errors.Is(err, transform.ErrShortSrc) {
-			return nil, fmt.Errorf("initialising encoding for '%v' failed due to file being too short", f)
+			return nil, nil, fmt.Errorf("initialising encoding for '%v' failed due to file being too short", f)
 		}
-		return nil, fmt.Errorf("initialising encoding for '%v' failed: %w", f, err)
+		return nil, nil, fmt.Errorf("initialising encoding for '%v' failed: %w", f, err)
 	}
 	ok = true
 
-	return f, nil
+	return f, encoding, nil
 }
 
 func checkFileBeforeOpening(fi os.FileInfo) error {
@@ -311,31 +317,48 @@ func (inp *filestream) readFromSource(
 	path string,
 	s state,
 	p loginp.Publisher,
+	metrics *loginp.Metrics,
 ) error {
+	metrics.FilesOpened.Inc()
+	metrics.HarvesterOpenFiles.Inc()
+	metrics.HarvesterStarted.Inc()
+	defer metrics.FilesClosed.Inc()
+	defer metrics.HarvesterOpenFiles.Dec()
+	defer metrics.HarvesterClosed.Inc()
+
 	for ctx.Cancelation.Err() == nil {
 		message, err := r.Next()
 		if err != nil {
 			if errors.Is(err, ErrFileTruncate) {
-				log.Infof("File was truncated. Begin reading file from offset 0. Path=%s", path)
+				log.Infof("File was truncated, nothing to read. Path='%s'", path)
 			} else if errors.Is(err, ErrClosed) {
-				log.Info("Reader was closed. Closing.")
+				log.Infof("Reader was closed. Closing. Path='%s'", path)
 			} else if errors.Is(err, io.EOF) {
-				log.Debugf("EOF has been reached. Closing.")
+				log.Debugf("EOF has been reached. Closing. Path='%s'", path)
 			} else {
 				log.Errorf("Read line error: %v", err)
+				metrics.ProcessingErrors.Inc()
 			}
+
 			return nil
 		}
 
 		s.Offset += int64(message.Bytes)
 
+		metrics.MessagesRead.Inc()
 		if message.IsEmpty() || inp.isDroppedLine(log, string(message.Content)) {
 			continue
 		}
 
+		metrics.BytesProcessed.Add(uint64(message.Bytes))
+
 		if err := p.Publish(message.ToEvent(), s); err != nil {
+			metrics.ProcessingErrors.Inc()
 			return err
 		}
+
+		metrics.EventsProcessed.Inc()
+		metrics.ProcessingTime.Update(time.Since(message.Ts).Nanoseconds())
 	}
 	return nil
 }

@@ -1,7 +1,7 @@
 // Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
-//go:build linux || darwin
+//go:build linux || darwin || synthetics
 
 package synthexec
 
@@ -219,7 +219,7 @@ func runCmd(
 				break
 			}
 			if err != nil {
-				logp.L().Warn("error decoding json for test json results: %w", err)
+				logp.L().Warnf("error decoding json for test json results: %w", err)
 			}
 
 			mpx.writeSynthEvent(&se)

@@ -146,17 +146,30 @@ func (p *azure) runFullSync(inputCtx v2.Context, store *kvstore.Store, client be
 
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
 	p.logger.Debugf("Starting fetch...")
-	if _, err = p.doFetch(ctx, state, true); err != nil {
+	if _, _, err = p.doFetch(ctx, state, true); err != nil {
 		return err
 	}
 
-	if len(state.users) != 0 {
+	wantUsers := p.conf.wantUsers()
+	wantDevices := p.conf.wantDevices()
+	if (len(state.users) != 0 && wantUsers) || (len(state.devices) != 0 && wantDevices) {
 		tracker := kvstore.NewTxTracker(ctx)
 
 		start := time.Now()
 		p.publishMarker(start, start, inputCtx.ID, true, client, tracker)
-		for _, u := range state.users {
-			p.publishUser(u, state, inputCtx.ID, client, tracker)
+
+		if len(state.users) != 0 && wantUsers {
+			p.logger.Debugw("publishing users", "count", len(state.devices))
+			for _, u := range state.users {
+				p.publishUser(u, state, inputCtx.ID, client, tracker)
+			}
+		}
+
+		if len(state.devices) != 0 && wantDevices {
+			p.logger.Debugw("publishing devices", "count", len(state.devices))
+			for _, d := range state.devices {
+				p.publishDevice(d, state, inputCtx.ID, client, tracker)
+			}
 		}
 
 		end := time.Now()
@@ -194,21 +207,35 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 	}()
 
 	ctx := ctxtool.FromCanceller(inputCtx.Cancelation)
-	updatedUsers, err := p.doFetch(ctx, state, false)
+	updatedUsers, updatedDevices, err := p.doFetch(ctx, state, false)
 	if err != nil {
 		return err
 	}
 
-	if updatedUsers.Len() != 0 {
+	if updatedUsers.Len() != 0 || updatedDevices.Len() != 0 {
 		tracker := kvstore.NewTxTracker(ctx)
-		updatedUsers.ForEach(func(id uuid.UUID) {
-			u, ok := state.users[id]
-			if !ok {
-				p.logger.Warnf("Unable to lookup user %q", id, u.ID)
-				return
-			}
-			p.publishUser(u, state, inputCtx.ID, client, tracker)
-		})
+
+		if updatedUsers.Len() != 0 {
+			updatedUsers.ForEach(func(id uuid.UUID) {
+				u, ok := state.users[id]
+				if !ok {
+					p.logger.Warnf("Unable to lookup user %q", id)
+					return
+				}
+				p.publishUser(u, state, inputCtx.ID, client, tracker)
+			})
+		}
+
+		if updatedDevices.Len() != 0 {
+			updatedDevices.ForEach(func(id uuid.UUID) {
+				d, ok := state.devices[id]
+				if !ok {
+					p.logger.Warnf("Unable to lookup device %q", id)
+					return
+				}
+				p.publishDevice(d, state, inputCtx.ID, client, tracker)
+			})
+		}
 
 		tracker.Wait()
 	}
@@ -229,36 +256,65 @@ func (p *azure) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store, 
 // and enriching users with group memberships. If fullSync is true, then any
 // existing deltaLink will be ignored, forcing a full synchronization from
 // Azure Active Directory. Returns a set of modified users by ID.
-func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (collections.UUIDSet, error) {
-	var updatedUsers collections.UUIDSet
-	var usersDeltaLink string
-	var groupsDeltaLink string
+func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (updatedUsers, updatedDevices collections.UUIDSet, err error) {
+	var usersDeltaLink, devicesDeltaLink, groupsDeltaLink string
 
 	// Get user changes.
 	if !fullSync {
 		usersDeltaLink = state.usersLink
+		devicesDeltaLink = state.devicesLink
 		groupsDeltaLink = state.groupsLink
 	}
 
-	changedUsers, userLink, err := p.fetcher.Users(ctx, usersDeltaLink)
-	if err != nil {
-		return updatedUsers, err
+	var (
+		wantUsers    = p.conf.wantUsers()
+		changedUsers []*fetcher.User
+		userLink     string
+	)
+	if wantUsers {
+		changedUsers, userLink, err = p.fetcher.Users(ctx, usersDeltaLink)
+		if err != nil {
+			return updatedUsers, updatedDevices, err
+		}
+		p.logger.Debugf("Received %d users from API", len(changedUsers))
+	} else {
+		p.logger.Debugf("Skipping user collection from API: dataset=%s", p.conf.Dataset)
 	}
-	p.logger.Debugf("Received %d users from API", len(changedUsers))
 
-	// Get group changes.
+	var (
+		wantDevices    = p.conf.wantDevices()
+		changedDevices []*fetcher.Device
+		deviceLink     string
+	)
+	if wantDevices {
+		changedDevices, deviceLink, err = p.fetcher.Devices(ctx, devicesDeltaLink)
+		if err != nil {
+			return updatedUsers, updatedDevices, err
+		}
+		p.logger.Debugf("Received %d devices from API", len(changedDevices))
+	} else {
+		p.logger.Debugf("Skipping device collection from API: dataset=%s", p.conf.Dataset)
+	}
+
+	// Get group changes. Groups are required for both users and devices.
+	// So always collect these.
 	changedGroups, groupLink, err := p.fetcher.Groups(ctx, groupsDeltaLink)
 	if err != nil {
-		return updatedUsers, err
+		return updatedUsers, updatedDevices, err
 	}
 	p.logger.Debugf("Received %d groups from API", len(changedGroups))
 
 	state.usersLink = userLink
+	state.devicesLink = deviceLink
 	state.groupsLink = groupLink
 
 	for _, v := range changedUsers {
 		updatedUsers.Add(v.ID)
 		state.storeUser(v)
+	}
+	for _, v := range changedDevices {
+		updatedDevices.Add(v.ID)
+		state.storeDevice(v)
 	}
 	for _, v := range changedGroups {
 		state.storeGroup(v)
@@ -279,6 +335,9 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 		for _, member := range g.Members {
 			switch member.Type {
 			case fetcher.MemberGroup:
+				if !wantUsers {
+					break
+				}
 				for _, u := range state.users {
 					if u.TransitiveMemberOf.Contains(member.ID) {
 						updatedUsers.Add(u.ID)
@@ -291,6 +350,9 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 				}
 
 			case fetcher.MemberUser:
+				if !wantUsers {
+					break
+				}
 				if u, ok := state.users[member.ID]; ok {
 					updatedUsers.Add(u.ID)
 					if member.Deleted {
@@ -299,29 +361,66 @@ func (p *azure) doFetch(ctx context.Context, state *stateStore, fullSync bool) (
 						u.MemberOf.Add(g.ID)
 					}
 				}
+
+			case fetcher.MemberDevice:
+				if !wantDevices {
+					break
+				}
+				if d, ok := state.devices[member.ID]; ok {
+					updatedDevices.Add(d.ID)
+					if member.Deleted {
+						d.MemberOf.Remove(g.ID)
+					} else {
+						d.MemberOf.Add(g.ID)
+					}
+				}
 			}
 		}
 	}
 
 	// Expand user group memberships.
-	updatedUsers.ForEach(func(userID uuid.UUID) {
-		u, ok := state.users[userID]
-		if !ok {
-			p.logger.Errorf("Unable to find user %q in state", userID)
-			return
-		}
-		u.Modified = true
-		if u.Deleted {
-			return
-		}
+	if wantUsers {
+		updatedUsers.ForEach(func(userID uuid.UUID) {
+			u, ok := state.users[userID]
+			if !ok {
+				p.logger.Errorf("Unable to find user %q in state", userID)
+				return
+			}
+			u.Modified = true
+			if u.Deleted {
+				p.logger.Debugw("not expanding membership for deleted user", "user", userID)
+				return
+			}
 
-		u.TransitiveMemberOf = u.MemberOf
-		state.relationships.ExpandFromSet(u.MemberOf).ForEach(func(elem uuid.UUID) {
-			u.TransitiveMemberOf.Add(elem)
+			u.TransitiveMemberOf = u.MemberOf
+			state.relationships.ExpandFromSet(u.MemberOf).ForEach(func(elem uuid.UUID) {
+				u.TransitiveMemberOf.Add(elem)
+			})
 		})
-	})
+	}
 
-	return updatedUsers, nil
+	// Expand device group memberships.
+	if wantDevices {
+		updatedDevices.ForEach(func(devID uuid.UUID) {
+			d, ok := state.devices[devID]
+			if !ok {
+				p.logger.Errorf("Unable to find device %q in state", devID)
+				return
+			}
+			d.Modified = true
+			if d.Deleted {
+				p.logger.Debugw("not expanding membership for deleted device", "device", devID)
+				return
+			}
+
+			d.TransitiveMemberOf = d.MemberOf
+			state.relationships.ExpandFromSet(d.MemberOf).ForEach(func(elem uuid.UUID) {
+				d.TransitiveMemberOf.Add(elem)
+			})
+		})
+	}
+
+	return updatedUsers, updatedDevices, nil
 }
 
 // publishMarker will publish a write marker document using the given beat.Client.
@@ -390,6 +489,77 @@ func (p *azure) publishUser(u *fetcher.User, state *stateStore, inputID string, 
 	tracker.Add()
 
 	p.logger.Debugf("Publishing user %q", u.ID)
+
+	client.Publish(event)
+}
+
+// publishDevice will publish a device document using the given beat.Client.
+func (p *azure) publishDevice(d *fetcher.Device, state *stateStore, inputID string, client beat.Client, tracker *kvstore.TxTracker) {
+	deviceDoc := mapstr.M{}
+
+	_, _ = deviceDoc.Put("azure_ad", d.Fields)
+	_, _ = deviceDoc.Put("labels.identity_source", inputID)
+	_, _ = deviceDoc.Put("device.id", d.ID.String())
+
+	if d.Deleted {
+		_, _ = deviceDoc.Put("event.action", "device-deleted")
+	} else if d.Discovered {
+		_, _ = deviceDoc.Put("event.action", "device-discovered")
+	} else if d.Modified {
+		_, _ = deviceDoc.Put("event.action", "device-modified")
+	}
+
+	var groups []fetcher.GroupECS
+	d.TransitiveMemberOf.ForEach(func(groupID uuid.UUID) {
+		g, ok := state.groups[groupID]
+		if !ok {
+			p.logger.Warnf("Unable to lookup group %q for device %q", groupID, d.ID)
+			return
+		}
+		groups = append(groups, g.ToECS())
+	})
+	if len(groups) != 0 {
+		_, _ = deviceDoc.Put("device.group", groups)
+	}
+
+	owners := make([]mapstr.M, 0, d.RegisteredOwners.Len())
+	d.RegisteredOwners.ForEach(func(userID uuid.UUID) {
+		u, ok := state.users[userID]
+		if !ok {
+			p.logger.Warnf("Unable to lookup registered owner %q for device %q", userID, d.ID)
+			return
+		}
+		m := u.Fields.Clone()
+		_, _ = m.Put("user.id", u.ID.String())
+		owners = append(owners, m)
+	})
+	if len(owners) != 0 {
+		_, _ = deviceDoc.Put("device.registered_owners", owners)
+	}
+
+	users := make([]mapstr.M, 0, d.RegisteredUsers.Len())
+	d.RegisteredUsers.ForEach(func(userID uuid.UUID) {
+		u, ok := state.users[userID]
+		if !ok {
+			p.logger.Warnf("Unable to lookup registered user %q for device %q", userID, d.ID)
+			return
+		}
+		m := u.Fields.Clone()
+		_, _ = m.Put("user.id", u.ID.String())
+		users = append(users, m)
+	})
+	if len(users) != 0 {
+		_, _ = deviceDoc.Put("device.registered_users", users)
+	}
+
+	event := beat.Event{
+		Timestamp: time.Now(),
+		Fields:    deviceDoc,
+		Private:   tracker,
+	}
+	tracker.Add()
+
+	p.logger.Debugf("Publishing device %q", d.ID)
 
 	client.Publish(event)
 }

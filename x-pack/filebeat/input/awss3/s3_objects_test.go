@@ -53,8 +53,7 @@ func newS3GetObjectResponse(filename string, data []byte, contentType string) *s
 }
 
 func TestS3ObjectProcessor(t *testing.T) {
-	err := logp.TestingSetup()
-	assert.Nil(t, err)
+	logp.TestingSetup()
 
 	t.Run("download text/plain file", func(t *testing.T) {
 		testProcessS3Object(t, "testdata/log.txt", "text/plain", 2)
@@ -111,6 +110,16 @@ func TestS3ObjectProcessor(t *testing.T) {
 	t.Run("split array error missing key", func(t *testing.T) {
 		sel := fileSelectorConfig{ReaderConfig: readerConfig{ExpandEventListFromField: "Records"}}
 		testProcessS3ObjectError(t, "testdata/events-array.json", "application/json", 0, sel)
+	})
+
+	t.Run("split array with expand_event_list_from_field equals .[]", func(t *testing.T) {
+		sel := fileSelectorConfig{ReaderConfig: readerConfig{ExpandEventListFromField: ".[]"}}
+		testProcessS3Object(t, "testdata/array.json", "application/json", 2, sel)
+	})
+
+	t.Run("split array without expand_event_list_from_field", func(t *testing.T) {
+		sel := fileSelectorConfig{ReaderConfig: readerConfig{ExpandEventListFromField: ""}}
+		testProcessS3Object(t, "testdata/array.json", "application/json", 1, sel)
 	})
 
 	t.Run("events have a unique repeatable _id", func(t *testing.T) {

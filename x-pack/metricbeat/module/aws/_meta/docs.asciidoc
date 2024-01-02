@@ -61,7 +61,20 @@ services do not include a region. In `aws` module, `endpoint` config is to set
 the `endpoint-code` part, such as `amazonaws.com`, `amazonaws.com.cn`, `c2s.ic.gov`,
 `sc2s.sgov.gov`.
 
-If endpoint is specified, `regions` config becomes required. For example:
+If endpoint is specified, `regions` config becomes required.
+
+* *include_linked_accounts*
+
+The `include_linked_accounts` parameter is used to enable the inclusion of metrics from different accounts linked to a
+main monitoring account. By setting this parameter to true, users can gather metrics from multiple AWS accounts that are
+linked through the https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account.html[CloudWatch cross-account observability].
+By default, the `include_linked_accounts` parameter is set to true, meaning that only metrics from the main monitoring
+account and all linked accounts are all collected. When set to false, the parameter allows the CloudWatch service to
+only retrieve metrics from the monitoring account.
+
+*_Note_:* Users should ensure that the necessary IAM roles and policies are properly set up in order to link the monitoring
+account and source accounts together.
+Please see https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Unified-Cross-Account-Setup.html#CloudWatch-Unified-Cross-Account-Setup-permissions[Link monitoring accounts with source accounts] for more details.
 
 * *tags_filter*
 

@@ -95,7 +95,7 @@ device IDs. However, on network shares and cloud providers these
 values might change during the lifetime of the file. If this happens
 {beatname_uc} thinks that file is new and resends the whole content
 of the file. To solve this problem you can configure `file_identity` option. Possible
-values besides the default `inode_deviceid` are `path` and `inode_marker`.
+values besides the default `inode_deviceid` are `path`, `inode_marker` and `fingerprint`.
 
 WARNING: Changing `file_identity` methods between runs may result in
 duplicated events in the output.
@@ -115,6 +115,13 @@ UUID of the device or mountpoint where the input is stored. The following
 example oneliner generates a hidden marker file for the selected mountpoint `/logs`:
 Please note that you should not use this option on Windows as file identifiers might be
 more volatile.
+
+Selecting `fingerprint` instructs {beatname_uc} to identify files based on their
+content byte range.
+
+WARNING: In order to use this file identity option, one must enable the <<{beatname_lc}-input-filestream-scan-fingerprint,fingerprint option in the scanner>>. Once this file identity is enabled, changing the fingerprint configuration (offset, length, etc) will lead to a global re-ingestion of all files that match the paths configuration of the input.
+
+Please refer to the <<{beatname_lc}-input-filestream-scan-fingerprint,fingerprint configuration for details>>.
 
 ["source","sh",subs="attributes"]
 ----
@@ -151,6 +158,28 @@ option.
 include::../inputs/input-filestream-file-options.asciidoc[]
 
 include::../inputs/input-filestream-reader-options.asciidoc[]
+
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs` path. They can be used to
+observe the activity of the input.
+
+[options="header"]
+|=======
+| Metric                    | Description
+| `files_opened_total`      | Total number of files opened.
+| `files_closed_total`      | Total number of files closed.
+| `files_active`            | Number of files currently open (gauge).
+| `messages_read_total`     | Total number of messages read.
+| `bytes_processed_total`   | Total number of bytes processed.
+| `events_processed_total`  | Total number of events processed.
+| `processing_errors_total` | Total number of processing errors.
+| `processing_time`         | Histogram of the elapsed time to process messages (expressed in nanoseconds).
+|=======
+
+Note:
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../inputs/input-common-options.asciidoc[]

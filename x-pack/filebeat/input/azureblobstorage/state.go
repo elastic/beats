@@ -25,22 +25,20 @@ type Checkpoint struct {
 	BlobName string
 	// timestamp to denote which is the latest blob
 	LatestEntryTime time.Time
-	// map to contain offset data
-	PartiallyProcessed map[string]int64
 }
 
 func newState() *state {
 	return &state{
-		cp: &Checkpoint{
-			PartiallyProcessed: make(map[string]int64),
-		},
+		cp: &Checkpoint{},
 	}
 }
 
-// Save, saves/updates the current state for cursor checkpoint
-func (s *state) save(name string, lastModifiedOn time.Time) {
+// saveForTx updates and returns the current state checkpoint, locks the state
+// and returns an unlock function done(). The caller must call done when
+// s and cp are no longer needed in a locked state. done may not be called
+// more than once.
+func (s *state) saveForTx(name string, lastModifiedOn time.Time) (cp *Checkpoint, done func()) {
 	s.mu.Lock()
-	delete(s.cp.PartiallyProcessed, name)
 	if len(s.cp.BlobName) == 0 {
 		s.cp.BlobName = name
 	} else if strings.ToLower(name) > strings.ToLower(s.cp.BlobName) {
@@ -51,25 +49,15 @@ func (s *state) save(name string, lastModifiedOn time.Time) {
 	} else if lastModifiedOn.After(s.cp.LatestEntryTime) {
 		s.cp.LatestEntryTime = lastModifiedOn
 	}
-	s.mu.Unlock()
+	return s.cp, func() { s.mu.Unlock() }
 }
 
-// savePartial, partially saves/updates the current state for cursor checkpoint
-func (s *state) savePartial(name string, offset int64, lastModifiedOn *time.Time) {
-	s.mu.Lock()
-	s.cp.PartiallyProcessed[name] = offset
-	s.mu.Unlock()
-}
-
-// setCheckpoint, sets checkpoint from source to current state instance
+// setCheckpoint sets checkpoint from source to current state instance
 func (s *state) setCheckpoint(chkpt *Checkpoint) {
-	if chkpt.PartiallyProcessed == nil {
-		chkpt.PartiallyProcessed = make(map[string]int64)
-	}
 	s.cp = chkpt
 }
 
-// checkpoint, returns the current state checkpoint
+// checkpoint returns the current state checkpoint
 func (s *state) checkpoint() *Checkpoint {
 	return s.cp
 }

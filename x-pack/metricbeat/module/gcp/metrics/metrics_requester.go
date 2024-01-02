@@ -12,12 +12,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/duration"
-
 	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
 	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"google.golang.org/api/iterator"
+	"google.golang.org/protobuf/types/known/durationpb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -79,6 +78,52 @@ func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, alig
 	var wg sync.WaitGroup
 	results := make([]timeSeriesWithAligner, 0)
 
+	// Find the largest delay in the metrics to collect.
+	//
+	// Why do we need find the largest ingest delay in the metrics to collect?
+	// ======================================================================
+	//
+	// We need to share some context first.
+	//
+	// Context
+	// -------
+	//
+	// GCP metrics have different ingestion delays; some metrics have zero delay,
+	// while others have a non-zero delay of up to a few minutes.
+	//
+	// For example,
+	//  - `container/memory.limit.bytes` has no ingest delay.
+	//  - `container/memory/request_bytes` has two minutes ingest delay.
+	//
+	// Since the metricset collects metrics every 60 seconds, it ends up
+	// collecting `container/memory.limit.bytes` and `container/memory/request_bytes`
+	// in different iterations; it stores metrics values in different documents,
+	// even when they are related to the same timestamp.
+	//
+	// Problem
+	// -------
+	//
+	// When TSDB is enabled, two documents cannot have the same timestamp and dimensions.
+	// If they do, the second document is dropped.
+	//
+	// Unfortunately, this is exactly what happens when the metricset collects
+	// `container/memory.limit.bytes` and `container/memory/request_bytes` in different
+	// iterations.
+	//
+	// Solution
+	// --------
+	//
+	// We calculate the largest delay, and then we collect the metrics values only when
+	// they are all available.
+	//
+	largestDelay := 0 * time.Second
+	for _, meta := range metricsToCollect {
+		metricMeta := meta
+		if meta.ingestDelay > largestDelay {
+			largestDelay = metricMeta.ingestDelay
+		}
+	}
+
 	for mt, meta := range metricsToCollect {
 		wg.Add(1)
 
@@ -87,7 +132,7 @@ func (r *metricsRequester) Metrics(ctx context.Context, serviceName string, alig
 			defer wg.Done()
 
 			r.logger.Debugf("For metricType %s, metricMeta = %d,  aligner = %s", mt, metricMeta, aligner)
-			interval, aligner := getTimeIntervalAligner(metricMeta.ingestDelay, metricMeta.samplePeriod, r.config.period, aligner)
+			interval, aligner := getTimeIntervalAligner(largestDelay, metricMeta.samplePeriod, r.config.period, aligner)
 			ts := r.Metric(ctx, serviceName, mt, interval, aligner)
 			lock.Lock()
 			defer lock.Unlock()
@@ -210,7 +255,7 @@ func (r *metricsRequester) getFilterForMetric(serviceName, m string) string {
 }
 
 // Returns a GCP TimeInterval based on the ingestDelay and samplePeriod from ListMetricDescriptor
-func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duration, collectionPeriod *duration.Duration, inputAligner string) (*monitoringpb.TimeInterval, string) {
+func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duration, collectionPeriod *durationpb.Duration, inputAligner string) (*monitoringpb.TimeInterval, string) {
 	var startTime, endTime, currentTime time.Time
 	var needsAggregation bool
 	currentTime = time.Now().UTC()
@@ -234,10 +279,10 @@ func getTimeIntervalAligner(ingestDelay time.Duration, samplePeriod time.Duratio
 	}
 
 	interval := &monitoringpb.TimeInterval{
-		StartTime: &timestamp.Timestamp{
+		StartTime: &timestamppb.Timestamp{
 			Seconds: startTime.Unix(),
 		},
-		EndTime: &timestamp.Timestamp{
+		EndTime: &timestamppb.Timestamp{
 			Seconds: endTime.Unix(),
 		},
 	}

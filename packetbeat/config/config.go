@@ -118,6 +118,7 @@ func (c Config) ICMP() (*conf.C, error) {
 type InterfaceConfig struct {
 	Device                string        `config:"device"`
 	PollDefaultRoute      time.Duration `config:"poll_default_route"`
+	MetricsInterval       time.Duration `config:"metrics_interval"`
 	Type                  string        `config:"type"`
 	File                  string        `config:"file"`
 	WithVlans             bool          `config:"with_vlans"`

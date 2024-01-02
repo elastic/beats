@@ -18,6 +18,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/internal/collections"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/authenticator"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics/provider/azuread/fetcher"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -29,11 +30,13 @@ import (
 const (
 	defaultAPIEndpoint = "https://graph.microsoft.com/v1.0"
 
-	defaultGroupsQuery = "$select=displayName,members"
-	defaultUsersQuery  = "$select=accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones"
+	defaultGroupsQuery  = "$select=displayName,members"
+	defaultUsersQuery   = "$select=accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones"
+	defaultDevicesQuery = "$select=accountEnabled,deviceId,displayName,operatingSystem,operatingSystemVersion,physicalIds,extensionAttributes,alternativeSecurityIds"
 
-	apiGroupType = "#microsoft.graph.group"
-	apiUserType  = "#microsoft.graph.user"
+	apiGroupType  = "#microsoft.graph.group"
+	apiUserType   = "#microsoft.graph.user"
+	apiDeviceType = "#microsoft.graph.device"
 )
 
 // apiUserResponse matches the format of a user response from the Graph API.
@@ -48,6 +51,13 @@ type apiGroupResponse struct {
 	NextLink  string     `json:"@odata.nextLink"`
 	DeltaLink string     `json:"@odata.deltaLink"`
 	Groups    []groupAPI `json:"value"`
+}
+
+// apiDeviceResponse matches the format of a user response from the Graph API.
+type apiDeviceResponse struct {
+	NextLink  string      `json:"@odata.nextLink"`
+	DeltaLink string      `json:"@odata.deltaLink"`
+	Devices   []deviceAPI `json:"value"`
 }
 
 // userAPI matches the format of user data from the API.
@@ -65,6 +75,9 @@ type groupAPI struct {
 func (g *groupAPI) deleted() bool {
 	return g.Removed != nil
 }
+
+// deviceAPI matches the format of device data from the API.
+type deviceAPI mapstr.M
 
 // memberAPI matches the format of group member data from the API.
 type memberAPI struct {
@@ -97,8 +110,10 @@ type graph struct {
 	logger *logp.Logger
 	auth   authenticator.Authenticator
 
-	usersURL  string
-	groupsURL string
+	usersURL           string
+	groupsURL          string
+	devicesURL         string
+	deviceOwnerUserURL string
 }
 
 // SetLogger sets the logger on this fetcher.
@@ -109,7 +124,7 @@ func (f *graph) SetLogger(logger *logp.Logger) {
 // Groups retrieves group identity assets from Azure Active Directory using
 // Microsoft's Graph API. If a delta link is given, it will be used to resume
 // from the last query, and only changed groups will be returned. Otherwise,
-// a full list of known groups wil be returned. In either case, a new delta link
+// a full list of known groups will be returned. In either case, a new delta link
 // will be returned as well.
 func (f *graph) Groups(ctx context.Context, deltaLink string) ([]*fetcher.Group, string, error) {
 	fetchURL := f.groupsURL
@@ -142,12 +157,12 @@ func (f *graph) Groups(ctx context.Context, deltaLink string) ([]*fetcher.Group,
 			return groups, response.DeltaLink, nil
 		}
 		if response.NextLink == fetchURL {
-			return nil, "", fmt.Errorf("error during fetch groups, encountered nextLink fetch infinite loop")
+			return groups, "", nextLinkLoopError{"groups"}
 		}
 		if response.NextLink != "" {
 			fetchURL = response.NextLink
 		} else {
-			return nil, "", fmt.Errorf("error during fetch groups, encountered response without nextLink or deltaLink")
+			return groups, "", missingLinkError{"groups"}
 		}
 	}
 }
@@ -155,7 +170,7 @@ func (f *graph) Groups(ctx context.Context, deltaLink string) ([]*fetcher.Group,
 // Users retrieves user identity assets from Azure Active Directory using
 // Microsoft's Graph API. If a delta link is given, it will be used to resume
 // from the last query, and only changed users will be returned. Otherwise,
-// a full list of known users wil be returned. In either case, a new delta link
+// a full list of known users will be returned. In either case, a new delta link
 // will be returned as well.
 func (f *graph) Users(ctx context.Context, deltaLink string) ([]*fetcher.User, string, error) {
 	var users []*fetcher.User
@@ -194,13 +209,83 @@ func (f *graph) Users(ctx context.Context, deltaLink string) ([]*fetcher.User, s
 			return users, response.DeltaLink, nil
 		}
 		if response.NextLink == fetchURL {
-			return nil, "", fmt.Errorf("error during fetch users, encountered nextLink fetch infinite loop")
+			return users, "", nextLinkLoopError{"users"}
 		}
 		if response.NextLink != "" {
 			fetchURL = response.NextLink
 		} else {
-			return nil, "", fmt.Errorf("error during fetch users, encountered response without nextLink or deltaLink")
+			return users, "", missingLinkError{"users"}
 		}
+	}
+}
+
+// Devices retrieves device identity assets from Azure Active Directory using
+// Microsoft's Graph API. If a delta link is given, it will be used to resume
+// from the last query, and only changed users will be returned. Otherwise,
+// a full list of known users will be returned. In either case, a new delta link
+// will be returned as well.
+func (f *graph) Devices(ctx context.Context, deltaLink string) ([]*fetcher.Device, string, error) {
+	var devices []*fetcher.Device
+
+	fetchURL := f.devicesURL
+	if deltaLink != "" {
+		fetchURL = deltaLink
+	}
+
+	for {
+		var response apiDeviceResponse
+
+		body, err := f.doRequest(ctx, http.MethodGet, fetchURL, nil)
+		if err != nil {
+			return nil, "", fmt.Errorf("unable to fetch devices: %w", err)
+		}
+
+		dec := json.NewDecoder(body)
+		if err = dec.Decode(&response); err != nil {
+			_ = body.Close()
+			return nil, "", fmt.Errorf("unable to decode devices response: %w", err)
+		}
+		_ = body.Close()
+
+		for _, v := range response.Devices {
+			device, err := newDeviceFromAPI(v)
+			if err != nil {
+				f.logger.Errorf("Unable to parse device from API: %w", err)
+				continue
+			}
+			f.logger.Debugf("Got device %q from API", device.ID)
+
+			f.addRegistered(ctx, device, "registeredOwners", &device.RegisteredOwners)
+			f.addRegistered(ctx, device, "registeredUsers", &device.RegisteredUsers)
+
+			devices = append(devices, device)
+		}
+
+		if response.DeltaLink != "" {
+			return devices, response.DeltaLink, nil
+		}
+		if response.NextLink == fetchURL {
+			return devices, "", nextLinkLoopError{"devices"}
+		}
+		if response.NextLink != "" {
+			fetchURL = response.NextLink
+		} else {
+			return devices, "", missingLinkError{"devices"}
+		}
+	}
+}
+
+// addRegistered adds registered owner or user UUIDs to the provided device.
+func (f *graph) addRegistered(ctx context.Context, device *fetcher.Device, typ string, set *collections.UUIDSet) {
+	usersLink := fmt.Sprintf("%s/%s/%s", f.deviceOwnerUserURL, device.ID, typ) // ID here is the object ID.
+	users, _, err := f.Users(ctx, usersLink)
+	switch {
+	case err == nil, errors.Is(err, nextLinkLoopError{"users"}), errors.Is(err, missingLinkError{"users"}):
+	default:
+		f.logger.Errorf("Failed to obtain some registered user data: %w", err)
+	}
+	for _, u := range users {
+		set.Add(u.ID)
 	}
 }
 
@@ -265,10 +350,26 @@ func New(cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (
 
 	usersURL, err := url.Parse(f.conf.APIEndpoint + "/users/delta")
 	if err != nil {
-		return nil, fmt.Errorf("invalid groups URL endpoint: %w", err)
+		return nil, fmt.Errorf("invalid users URL endpoint: %w", err)
 	}
 	usersURL.RawQuery = url.QueryEscape(defaultUsersQuery)
 	f.usersURL = usersURL.String()
+
+	devicesURL, err := url.Parse(f.conf.APIEndpoint + "/devices/delta")
+	if err != nil {
+		return nil, fmt.Errorf("invalid devices URL endpoint: %w", err)
+	}
+	devicesURL.RawQuery = url.QueryEscape(defaultDevicesQuery)
+	f.devicesURL = devicesURL.String()
+
+	// The API takes a departure from the query approach here, so we
+	// need to construct a partial URL for use later when fetching
+	// registered owners and users.
+	ownerUserURL, err := url.Parse(f.conf.APIEndpoint + "/devices/")
+	if err != nil {
+		return nil, fmt.Errorf("invalid device owner/user URL endpoint: %w", err)
+	}
+	f.deviceOwnerUserURL = ownerUserURL.String()
 
 	return &f, nil
 }
@@ -306,20 +407,64 @@ func newGroupFromAPI(g groupAPI) *fetcher.Group {
 		Deleted: g.deleted(),
 	}
 	for _, v := range g.MembersDelta {
-		if v.Type == apiUserType {
-			newGroup.Members = append(newGroup.Members, fetcher.Member{
-				ID:      v.ID,
-				Type:    fetcher.MemberUser,
-				Deleted: v.deleted(),
-			})
-		} else if v.Type == apiGroupType {
-			newGroup.Members = append(newGroup.Members, fetcher.Member{
-				ID:      v.ID,
-				Type:    fetcher.MemberGroup,
-				Deleted: v.deleted(),
-			})
+		var typ fetcher.MemberType
+		switch v.Type {
+		default:
+			continue
+		case apiUserType:
+			typ = fetcher.MemberUser
+		case apiGroupType:
+			typ = fetcher.MemberGroup
+		case apiDeviceType:
+			typ = fetcher.MemberDevice
 		}
+		newGroup.Members = append(newGroup.Members, fetcher.Member{
+			ID:      v.ID,
+			Type:    typ,
+			Deleted: v.deleted(),
+		})
 	}
 
 	return &newGroup
+}
+
+// newDeviceFromAPI translates an API-representation of a device to a fetcher.Device.
+func newDeviceFromAPI(d deviceAPI) (*fetcher.Device, error) {
+	var newDevice fetcher.Device
+	var err error
+
+	newDevice.Fields = mapstr.M(d)
+
+	if idRaw, ok := newDevice.Fields["id"]; ok {
+		idStr, _ := idRaw.(string)
+		if newDevice.ID, err = uuid.Parse(idStr); err != nil {
+			return nil, fmt.Errorf("unable to unmarshal device, invalid ID: %w", err)
+		}
+		delete(newDevice.Fields, "id")
+	} else {
+		return nil, errors.New("device missing required id field")
+	}
+
+	if _, ok := newDevice.Fields["@removed"]; ok {
+		newDevice.Deleted = true
+		delete(newDevice.Fields, "@removed")
+	}
+
+	return &newDevice, nil
+}
+
+type nextLinkLoopError struct {
+	endpoint string
+}
+
+func (e nextLinkLoopError) Error() string {
+	return fmt.Sprintf("error during fetch %s, encountered nextLink fetch infinite loop", e.endpoint)
+}
+
+type missingLinkError struct {
+	endpoint string
+}
+
+func (e missingLinkError) Error() string {
+	return fmt.Sprintf("error during fetch %s, encountered response without nextLink or deltaLink", e.endpoint)
 }

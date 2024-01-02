@@ -23,7 +23,6 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -41,13 +40,6 @@ type console struct {
 	writer   *bufio.Writer
 	codec    codec.Codec
 	index    string
-}
-
-type consoleEvent struct {
-	Timestamp time.Time `json:"@timestamp" struct:"@timestamp"`
-
-	// Note: stdlib json doesn't support inlining :( -> use `codec: 2`, to generate proper event
-	Fields interface{} `struct:",inline"`
 }
 
 func init() {
@@ -82,18 +74,18 @@ func makeConsole(
 	index := beat.Beat
 	c, err := newConsole(index, observer, enc)
 	if err != nil {
-		return outputs.Fail(fmt.Errorf("console output initialization failed with: %v", err))
+		return outputs.Fail(fmt.Errorf("console output initialization failed with: %w", err))
 	}
 
 	// check stdout actually being available
 	if runtime.GOOS != "windows" {
 		if _, err = c.out.Stat(); err != nil {
-			err = fmt.Errorf("console output initialization failed with: %v", err)
+			err = fmt.Errorf("console output initialization failed with: %w", err)
 			return outputs.Fail(err)
 		}
 	}
 
-	return outputs.Success(config.BatchSize, 0, c)
+	return outputs.Success(config.Queue, config.BatchSize, 0, c)
 }
 
 func newConsole(index string, observer outputs.Observer, codec codec.Codec) (*console, error) {
