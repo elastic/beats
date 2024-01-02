@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Add "event.category" and "event.type" to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255 {pull}35193[35193]
+- Add "keystore.path" configuration settings to $workdir\data\{{.BeatName}}.keystore. Issue {issue}12315[12315] {pull}37237[37237]
 
 *Functionbeat*
 
