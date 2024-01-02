@@ -17,11 +17,13 @@ This input supports:
 
 * Auth
 ** OAuth2
-*** Password
-*** JWT
+*** User-Password flow
+*** JWT Bearer flow
 * Event Monitoring
 ** EventLogFile (ELF) using REST API
-** Real-time event monitoring using REST API (objects)
+** REST API for objects (Used for Setup Audit Trail and for monitoring real-time events)
+
+Event Monitoring methods are highly configurable and can be used to monitor any supported object or event log file. The input can be configured to monitor multiple objects or event log files at the same time.
 
 Example configurations:
 
