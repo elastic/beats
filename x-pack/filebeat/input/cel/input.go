@@ -905,6 +905,7 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 	}
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
+		cel.OptionalTypes(cel.OptionalTypesVersion(lib.OptionalTypesVersion)),
 		lib.Collections(),
 		lib.Crypto(),
 		lib.JSON(nil),
@@ -978,12 +979,14 @@ func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}
 	}
 	if err != nil {
 		state["events"] = errorMessage(fmt.Sprintf("failed eval: %v", err))
+		clearWantMore(state)
 		return state, fmt.Errorf("failed eval: %w", err)
 	}
 
 	v, err := out.ConvertToNative(reflect.TypeOf((*structpb.Struct)(nil)))
 	if err != nil {
 		state["events"] = errorMessage(fmt.Sprintf("failed proto conversion: %v", err))
+		clearWantMore(state)
 		return state, fmt.Errorf("failed proto conversion: %w", err)
 	}
 	switch v := v.(type) {
@@ -993,7 +996,18 @@ func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}
 		// This should never happen.
 		errMsg := fmt.Sprintf("unexpected native conversion type: %T", v)
 		state["events"] = errorMessage(errMsg)
+		clearWantMore(state)
 		return state, errors.New(errMsg)
+	}
+}
+
+// clearWantMore sets the state to not request additional work in a periodic evaluation.
+// It leaves state intact if there is no "want_more" element, and sets the element to false
+// if there is. This is necessary instead of just doing delete(state, "want_more") as
+// client CEL code may expect the want_more field to be present.
+func clearWantMore(state map[string]interface{}) {
+	if _, ok := state["want_more"]; ok {
+		state["want_more"] = false
 	}
 }
 

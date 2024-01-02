@@ -344,6 +344,26 @@ var inputTests = []struct {
 			{"message": "third"},
 		},
 	},
+	{
+		name: "optional_types",
+		config: map[string]interface{}{
+			"interval": 1,
+			// Program returns a compilation error if optional types are not enabled.
+			"program": `{"events":[
+				has(state.?field.?does.?not.exist) ?
+					{"message":"Hello, World!"}
+				:
+					{"message":"Hello, Void!"}
+			]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "Hello, Void!"},
+		},
+	},
 
 	// FS-based tests.
 	{
