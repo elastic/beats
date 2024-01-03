@@ -21,6 +21,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -119,6 +120,7 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 	st.NewBatch(len(events))
 
 	dropped := 0
+
 	for i := range events {
 		event := &events[i]
 
@@ -135,6 +137,7 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 			continue
 		}
 
+		begin := time.Now()
 		if _, err = out.rotator.Write(append(serializedEvent, '\n')); err != nil {
 			st.WriteError(err)
 
@@ -149,9 +152,12 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 		}
 
 		st.WriteBytes(len(serializedEvent) + 1)
+		took := time.Since(begin)
+		st.ReportLatency(took)
 	}
 
 	st.Dropped(dropped)
+
 	st.Acked(len(events) - dropped)
 
 	return nil
