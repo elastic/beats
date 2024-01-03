@@ -144,7 +144,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 		if containerName, ok := event["name"]; ok {
 			cName, ok := (containerName).(string)
 			if !ok {
-				m.Logger().Debugf("Error while casting containerImage: %s", ok)
+				m.Logger().Debugf("Error while casting containerName: %s", containerName)
 			} else {
 				kubernetes.ShouldPut(containerFields, "name", cName, m.Logger())
 			}
