@@ -9,7 +9,7 @@
 <titleabbrev>Salesforce</titleabbrev>
 ++++
 
-Use the `salesforce` input to monitor Salesforce events either via the Salesforce ELF API or the Salesforce Real-time event monitoring API. Both uses REST API (to fire SOQL queries) under the hood to query the relevant objects to fetch the events.
+Use the `salesforce` input to monitor Salesforce events either via the Salesforce ELF API or the Salesforce Real-time event monitoring API. Both uses REST API (to execute SOQL queries in the Salesforce instance) under the hood to query the relevant objects to fetch the events.
 
 Here the `input` may cursor state(s) that will be provided to the next execution of event monitoring to fetch the events from the last cursor state. The cursor states may be used to control the behaviour of the program.
 
@@ -70,8 +70,13 @@ filebeat.inputs:
 
 ==== Execution
 
+The `salesforce` input is a long-running program that retrieves events from a Salesforce instance and sends them to the specified output. The program executes in a loop, fetching events from the Salesforce instance at a preconfigured interval. Each event monitoring method can be configured to run separately and at different intervals. To prevent a sudden spike in memory usage, if multiple event monitoring methods are configured, they are scheduled to run one at a time. Even if the intervals overlap, only one method will be executed randomly, and the other will be executed after the first one completes.
 
-==== Input state
+There are two methods to fetch the events from the Salesforce instance:
+
+- event_log_file: https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm[EventLogFile] is a standard object in Salesforce and the event monitoring method uses the REST API under the hood to gather the Salesforce org's operational events from the object. There is a field EventType that helps distinguish between the types of operational events like — Login, Logout, etc. Uses Salesforce's query language SOQL to query the object.
+
+- object: This method is a general way of retrieving events from a Salesforce instance by using the REST API. It can be used for the SetupAuditTrail and for monitoring objects in real-time. In real-time event monitoring, subscribing to the events is a common practice, but the events are also stored in Salesforce org (if configured), specifically in big object tables that are preconfigured for each event type. To query the object, Salesforce's query language SOQL is used.
 
 ==== Configuration options
 
