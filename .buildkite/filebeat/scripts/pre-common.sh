@@ -8,3 +8,13 @@ prepare_win() {
     choco install python --version=3.11.0 -y
   fi
 }
+
+check_filebeat_changes() {
+  changeset=$1
+
+  if git diff --name-only HEAD@{1} HEAD | grep -qE "$changeset"; then
+    export FILEBEAT_CHANGESET=true
+  else
+    export FILEBEAT_CHANGESET=false
+  fi
+}
