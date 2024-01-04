@@ -52,18 +52,19 @@ func (d *dEntryCache) Remove(entry *dEntry) *dEntry {
 	}
 
 	entry.Parent.RemoveChild(entry.Name)
+	entry.Parent = nil
 
 	removeRecursively(d, entry)
 	return entry
 }
 
 // Add adds the given dEntry to the dEntryCache.
-func (d *dEntryCache) Add(entry *dEntry) {
+func (d *dEntryCache) Add(entry *dEntry, parent *dEntry) {
 	if entry == nil {
 		return
 	}
 
-	_ = addRecursive(d, entry, entry.Parent, entry.Parent.Path(), nil)
+	_ = addRecursive(d, entry, parent, parent.Path(), nil)
 }
 
 // addRecursive recursively adds entries to the dEntryCache and calls a function on each entry's path (if specified).
@@ -78,8 +79,7 @@ func addRecursive(d *dEntryCache, entry *dEntry, parent *dEntry, rootPath string
 		}
 	}
 
-	entry.Parent = parent
-	entry.Parent.AddChild(entry)
+	parent.AddChild(entry)
 
 	d.index[dKey{
 		Ino:      entry.Ino,
@@ -100,22 +100,14 @@ func addRecursive(d *dEntryCache, entry *dEntry, parent *dEntry, rootPath string
 // with the caller process TID and returns it. It returns nil if the entry was not found in the dEntryCache.
 // Note, that such as association between the entry and the caller process TID is mandatory as Move{To,From} events
 // for older Linux kernel provide only the Filename of the moved file and only parent info is available.
-func (d *dEntryCache) MoveFrom(tid uint64, parentKey dKey, entryName string) *dEntry {
-
-	parentEntry := d.Get(parentKey)
-	if parentEntry == nil {
-		return nil
-	}
-
-	entry := parentEntry.GetChild(entryName)
+func (d *dEntryCache) MoveFrom(tid uint64, entry *dEntry) {
 	if entry == nil {
-		return nil
+		return
 	}
 
 	d.Remove(entry)
 
 	d.moveCache[tid] = entry
-	return entry
 }
 
 // MoveTo gets the entry associated with the given TID from the moveCache and moves it to the under the new parent

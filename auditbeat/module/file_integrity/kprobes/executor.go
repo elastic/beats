@@ -23,6 +23,10 @@ type fixedExecutor struct {
 
 // Run submits new tasks to run on the executor and waits for them to finish returning any error.
 func (ex *fixedExecutor) Run(f func() error) error {
+	if ctxErr := ex.ctx.Err(); ctxErr != nil {
+		return ctxErr
+	}
+
 	select {
 	case ex.runC <- f:
 	case <-ex.ctx.Done():
@@ -37,28 +41,9 @@ func (ex *fixedExecutor) Run(f func() error) error {
 	}
 }
 
-// RunAsync submits new tasks to run on the executor but doesn't wait for them to finish. It is the
-// responsibility of the caller to call Wait and essentially wait for the tasks to finish. Note that
-// missing doing the former will result in blocking future invocations of RunAsync and Run.
-func (ex *fixedExecutor) RunAsync(f func() error) error {
-	select {
-	case ex.runC <- f:
-	case <-ex.ctx.Done():
-		return ex.ctx.Err()
-	}
-
-	return nil
-}
-
 // GetTID returns the OS identifier for the thread where executor goroutine is locked against.
 func (ex *fixedExecutor) GetTID() int {
 	return ex.tid
-}
-
-// Wait returns the channel to read the results of tasks. This channel is closed
-// when the executor terminates.
-func (ex *fixedExecutor) Wait() <-chan error {
-	return ex.retC
 }
 
 // Close terminates the executor. Pending tasks will still be run.

@@ -13,19 +13,22 @@ type dKey struct {
 
 type dEntryChildren map[string]*dEntry
 
-type Reason struct {
-	tid       uint32
-	timestamp uint64
+type dEntry struct {
+	Parent   *dEntry
+	Depth    uint32
+	Children dEntryChildren
+	Name     string
+	Ino      uint64
+	DevMajor uint32
+	DevMinor uint32
 }
 
-type dEntry struct {
-	Parent        *dEntry
-	Children      dEntryChildren
-	Name          string
-	Ino           uint64
-	DevMajor      uint32
-	DevMinor      uint32
-	MonitorReason *Reason
+func (d *dEntry) GetParent() *dEntry {
+	if d == nil {
+		return nil
+	}
+
+	return d.Parent
 }
 
 func (d *dEntry) Path() string {
@@ -48,9 +51,11 @@ func (d *dEntry) Path() string {
 func releaseRecursive(val *dEntry) {
 	for _, child := range val.Children {
 		releaseRecursive(child)
+		delete(val.Children, child.Name)
 	}
 
 	val.Children = nil
+	val.Parent = nil
 	val = nil
 	return
 }
@@ -83,6 +88,7 @@ func (d *dEntry) AddChild(child *dEntry) {
 	}
 
 	child.Parent = d
+	child.Depth = d.Depth + 1
 
 	d.Children[child.Name] = child
 }

@@ -22,13 +22,13 @@ package file_integrity
 import (
 	"errors"
 	"fmt"
-	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/kprobes"
-	"golang.org/x/sys/unix"
 	"path/filepath"
-	"syscall"
 	"time"
 
+	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/kprobes"
+
 	"github.com/elastic/elastic-agent-libs/logp"
+	"golang.org/x/sys/unix"
 )
 
 type kProbesReader struct {
@@ -50,7 +50,7 @@ func NewKProbesEventReader(c Config) (EventProducer, error) {
 }
 
 func (r kProbesReader) Start(done <-chan struct{}) (<-chan Event, error) {
-	watcher, err := kprobes.New(r.config.Recursive, r.config.IsExcludedPath)
+	watcher, err := kprobes.New(r.config.Recursive)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func (r kProbesReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	// deadlock. Do it on all platforms for simplicity.
 	for _, p := range r.config.Paths {
 		if err := r.watcher.Add(p); err != nil {
-			if errors.Is(err, syscall.EMFILE) {
+			if errors.Is(err, unix.EMFILE) {
 				r.log.Warnw("Failed to add watch (check the max number of "+
 					"open files allowed with 'ulimit -a')",
 					"file_path", p, "error", err)

@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"sort"
 	"strconv"
@@ -167,7 +166,6 @@ func readMountInfo(r io.Reader) (mountPoints, error) {
 		line := scanner.Text()
 		mnt := parseMountInfoLine(line)
 		if mnt == nil {
-			log.Printf("ignoring invalid mountinfo line %q", line)
 			continue
 		}
 
@@ -175,7 +173,6 @@ func readMountInfo(r io.Reader) (mountPoints, error) {
 		if exists {
 			// duplicate mountpoint entries have been observed for
 			// /proc/sys/fs/binfmt_misc
-			log.Printf("ignoring dublicate mountpoint path in line %q", line)
 			continue
 		}
 

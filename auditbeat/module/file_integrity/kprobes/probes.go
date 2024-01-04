@@ -85,7 +85,7 @@ func (fs *probeManager) build(spec *tkbtf.Spec) (map[tracing.Probe]tracing.Alloc
 
 		for _, p := range probesWithAlloc {
 			trProbe := tracing.Probe{
-				Group:     "auditbeat",
+				Group:     "auditbeat_fim",
 				Name:      p.probe.GetID(),
 				Address:   p.probe.GetSymbolName(),
 				Fetchargs: p.probe.GetTracingEventProbe(),

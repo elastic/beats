@@ -1,6 +1,7 @@
 package kprobes
 
 import (
+	"errors"
 	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
@@ -26,46 +27,43 @@ func (d *dEntryCache) Dump(path string) error {
 func Test_DirEntryCache_Add(t *testing.T) {
 	cases := []struct {
 		name     string
-		entry    *dEntry
+		parent   *dEntry
 		children map[string]*dEntry
 	}{
 		{
 			"dentry_no_children",
 			&dEntry{
-				Parent:   nil,
-				Children: nil,
+				Depth:    0,
 				Name:     "test",
 				Ino:      1,
-				DevMajor: 2,
-				DevMinor: 3,
+				DevMajor: 1,
+				DevMinor: 1,
 			},
 			nil,
 		},
 		{
 			"dentry_with_children",
 			&dEntry{
-				Parent:   nil,
+				Depth:    1,
 				Name:     "test",
 				Ino:      1,
-				DevMajor: 2,
-				DevMinor: 3,
+				DevMajor: 1,
+				DevMinor: 1,
 			},
 			map[string]*dEntry{
 				"child1": {
-					Parent:   nil,
-					Children: nil,
+					Depth:    2,
 					Name:     "child1",
-					Ino:      4,
-					DevMajor: 5,
-					DevMinor: 6,
+					Ino:      2,
+					DevMajor: 1,
+					DevMinor: 1,
 				},
 				"child2": {
-					Parent:   nil,
-					Children: nil,
+					Depth:    2,
 					Name:     "child2",
-					Ino:      7,
-					DevMajor: 8,
-					DevMinor: 9,
+					Ino:      3,
+					DevMajor: 1,
+					DevMinor: 1,
 				},
 			},
 		},
@@ -82,26 +80,24 @@ func Test_DirEntryCache_Add(t *testing.T) {
 			cache := newDirEntryCache()
 
 			expectedLen := 0
-			if c.entry != nil {
+			if c.parent != nil {
 				expectedLen++
 				if c.children != nil {
-					c.entry.Children = make(dEntryChildren)
 					for _, child := range c.children {
-						c.entry.Children[child.Name] = child
-						child.Parent = c.entry
+						c.parent.AddChild(child)
 						expectedLen++
 					}
 				}
 			}
 
-			cache.Add(c.entry)
+			cache.Add(c.parent, nil)
 
 			require.Len(t, cache.index, expectedLen)
-			if c.entry != nil {
-				require.Equal(t, c.entry, cache.index[dKey{
-					Ino:      c.entry.Ino,
-					DevMajor: c.entry.DevMajor,
-					DevMinor: c.entry.DevMinor,
+			if c.parent != nil {
+				require.Equal(t, c.parent, cache.index[dKey{
+					Ino:      c.parent.Ino,
+					DevMajor: c.parent.DevMajor,
+					DevMinor: c.parent.DevMinor,
 				}])
 			}
 
@@ -129,16 +125,17 @@ func Test_DirEntryCache_Get(t *testing.T) {
 			"dentry_exists",
 			dKey{
 				Ino:      1,
-				DevMajor: 2,
-				DevMinor: 3,
+				DevMajor: 1,
+				DevMinor: 1,
 			},
 			&dEntry{
+				Depth:    1,
 				Parent:   nil,
 				Children: nil,
 				Name:     "test",
 				Ino:      1,
-				DevMajor: 2,
-				DevMinor: 3,
+				DevMajor: 1,
+				DevMinor: 1,
 			},
 		},
 		{
@@ -155,10 +152,7 @@ func Test_DirEntryCache_Get(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			cache := newDirEntryCache()
-			if c.entry != nil {
-				cache.index = make(dEntriesIndex)
-				cache.index[c.key] = c.entry
-			}
+			cache.Add(c.entry, nil)
 
 			cacheEntry := cache.Get(c.key)
 			require.Equal(t, c.entry, cacheEntry)
@@ -169,7 +163,7 @@ func Test_DirEntryCache_Get(t *testing.T) {
 func Test_DirEntryCache_Remove(t *testing.T) {
 	cases := []struct {
 		name             string
-		entry            *dEntry
+		parent           *dEntry
 		children         dEntryChildren
 		childrenChildren dEntryChildren
 	}{
@@ -179,8 +173,8 @@ func Test_DirEntryCache_Remove(t *testing.T) {
 				Parent:   nil,
 				Name:     "test",
 				Ino:      1,
-				DevMajor: 2,
-				DevMinor: 3,
+				DevMajor: 1,
+				DevMinor: 1,
 			},
 			nil,
 			nil,
@@ -191,23 +185,23 @@ func Test_DirEntryCache_Remove(t *testing.T) {
 				Parent:   nil,
 				Name:     "test",
 				Ino:      1,
-				DevMajor: 2,
-				DevMinor: 3,
+				DevMajor: 1,
+				DevMinor: 1,
 			},
 			dEntryChildren{
 				"child1": {
 					Parent:   nil,
 					Name:     "child1",
 					Ino:      4,
-					DevMajor: 5,
-					DevMinor: 6,
+					DevMajor: 1,
+					DevMinor: 1,
 				},
 				"child2": {
 					Parent:   nil,
 					Name:     "child2",
 					Ino:      7,
-					DevMajor: 8,
-					DevMinor: 9,
+					DevMajor: 1,
+					DevMinor: 1,
 				},
 			},
 			nil,
@@ -218,23 +212,23 @@ func Test_DirEntryCache_Remove(t *testing.T) {
 				Parent:   nil,
 				Name:     "test",
 				Ino:      1,
-				DevMajor: 2,
-				DevMinor: 3,
+				DevMajor: 1,
+				DevMinor: 1,
 			},
 			dEntryChildren{
 				"child1": {
 					Parent:   nil,
 					Name:     "child1",
 					Ino:      4,
-					DevMajor: 5,
-					DevMinor: 6,
+					DevMajor: 1,
+					DevMinor: 1,
 				},
 				"child2": {
 					Parent:   nil,
 					Name:     "child2",
 					Ino:      7,
-					DevMajor: 8,
-					DevMinor: 9,
+					DevMajor: 1,
+					DevMinor: 1,
 				},
 			},
 			dEntryChildren{
@@ -242,8 +236,8 @@ func Test_DirEntryCache_Remove(t *testing.T) {
 					Parent:   nil,
 					Name:     "child_child1",
 					Ino:      10,
-					DevMajor: 11,
-					DevMinor: 12,
+					DevMajor: 1,
+					DevMinor: 1,
 				},
 			},
 		},
@@ -258,32 +252,356 @@ func Test_DirEntryCache_Remove(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			cache := newDirEntryCache()
+			cache.Add(c.parent, nil)
 
-			if c.entry != nil {
+			if c.parent != nil {
 				if c.children != nil {
-					c.entry.Children = c.children
 					for _, child := range c.children {
-						c.entry.Children[child.Name] = child
-						child.Parent = c.entry
+						cache.Add(child, c.parent)
 					}
 				}
 
-				if len(c.entry.Children) > 0 && c.childrenChildren != nil {
-					for key := range c.entry.Children {
-						c.entry.Children[key].Children = c.childrenChildren
+				if len(c.children) > 0 && c.childrenChildren != nil {
+					for _, childrenChildrenParent := range c.children {
 						for _, child := range c.childrenChildren {
-							c.entry.Children[key].Children[child.Name] = child
-							child.Parent = c.entry.Children[key]
+							cache.Add(child, childrenChildrenParent)
 						}
 						break
 					}
 				}
 			}
 
-			cache.Add(c.entry)
-			removedEntry := cache.Remove(c.entry)
+			removedEntry := cache.Remove(c.parent)
 			require.Len(t, cache.index, 0)
-			require.Equal(t, c.entry, removedEntry)
+			require.Equal(t, c.parent, removedEntry)
+
+			removedEntry.Release()
+			if removedEntry != nil {
+				require.Nil(t, removedEntry.Children)
+			}
+		})
+	}
+}
+
+func Test_DirEntryCache_MoveFrom(t *testing.T) {
+	cases := []struct {
+		name     string
+		tid      uint64
+		parent   *dEntry
+		children dEntryChildren
+	}{
+		{
+			"dentry_move",
+			1,
+			&dEntry{
+				Name:     "test",
+				Depth:    0,
+				Ino:      1,
+				DevMajor: 1,
+				DevMinor: 1,
+			},
+			dEntryChildren{
+				"child1": {
+					Name:     "child1",
+					Ino:      4,
+					DevMajor: 1,
+					DevMinor: 1,
+				},
+				"child2": {
+					Name:     "child2",
+					Ino:      7,
+					DevMajor: 1,
+					DevMinor: 1,
+				},
+			},
+		},
+		{
+			"dentry_nil",
+			1,
+			nil,
+			nil,
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			cache := newDirEntryCache()
+			cache.Add(c.parent, nil)
+
+			if c.parent != nil {
+				if c.children != nil {
+					for _, child := range c.children {
+						cache.Add(child, c.parent)
+					}
+				}
+			}
+
+			cache.MoveFrom(c.tid, c.parent)
+
+			require.Empty(t, cache.index)
+
+			if c.parent == nil {
+				require.Len(t, cache.moveCache, 0)
+				return
+			}
+
+			require.Len(t, cache.moveCache, 1)
+
+			moveEntry, exists := cache.moveCache[c.tid]
+			require.True(t, exists)
+			require.Equal(t, c.parent, moveEntry)
+			if c.children != nil {
+				require.NotNil(t, c.parent.Children)
+				for _, child := range moveEntry.Children {
+					require.Equal(t, c.parent.Depth+1, child.Depth)
+				}
+			} else {
+				require.Nil(t, c.parent.Children)
+			}
+		})
+	}
+}
+
+func Test_DirEntryCache_MoveTo(t *testing.T) {
+	cases := []struct {
+		name         string
+		srcTid       uint64
+		dstTid       uint64
+		entry        *dEntry
+		children     dEntryChildren
+		targetParent *dEntry
+		newFileName  string
+		pathsToSee   []string
+		err          error
+	}{
+		{
+			"dentry_move",
+			1,
+			1,
+			&dEntry{
+				Name:     "test",
+				Depth:    0,
+				Ino:      1,
+				DevMajor: 1,
+				DevMinor: 1,
+			},
+			dEntryChildren{
+				"child1": {
+					Name:     "child1",
+					Ino:      4,
+					DevMajor: 1,
+					DevMinor: 1,
+				},
+				"child2": {
+					Name:     "child2",
+					Ino:      7,
+					DevMajor: 1,
+					DevMinor: 1,
+				},
+			},
+			&dEntry{
+				Name:     "test2",
+				Depth:    0,
+				Ino:      10,
+				DevMajor: 1,
+				DevMinor: 1,
+			},
+			"test3",
+			[]string{
+				"test2/test3",
+				"test2/test3/child1",
+				"test2/test3/child2",
+			},
+			nil,
+		},
+		{
+			"dentry_not_found",
+			1,
+			2,
+			&dEntry{
+				Name:     "test",
+				Depth:    0,
+				Ino:      1,
+				DevMajor: 1,
+				DevMinor: 1,
+			},
+			nil,
+			nil,
+			"",
+			nil,
+			nil,
+		},
+		{
+			"callback_err",
+			1,
+			1,
+			&dEntry{
+				Name:     "test",
+				Depth:    0,
+				Ino:      1,
+				DevMajor: 1,
+				DevMinor: 1,
+			},
+			nil,
+			nil,
+			"",
+			nil,
+			errors.New("error"),
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			var movedPaths []string
+
+			cache := newDirEntryCache()
+			if c.entry != nil {
+				if c.children != nil {
+					for _, child := range c.children {
+						c.entry.AddChild(child)
+					}
+				}
+				cache.moveCache[c.srcTid] = c.entry
+			}
+
+			movedEntry, err := cache.MoveTo(c.dstTid, c.targetParent, c.newFileName, func(path string) error {
+				if c.err != nil {
+					return c.err
+				}
+
+				movedPaths = append(movedPaths, path)
+				return nil
+			})
+			if c.err == nil {
+				require.Nil(t, err)
+			} else {
+				require.ErrorIs(t, err, c.err)
+			}
+
+			if c.srcTid == c.dstTid {
+				require.True(t, movedEntry)
+				require.Empty(t, cache.moveCache)
+			} else {
+				require.False(t, movedEntry)
+				require.NotEmpty(t, cache.moveCache)
+			}
+			require.ElementsMatch(t, c.pathsToSee, movedPaths)
+		})
+	}
+}
+
+func Test_DirEntryCache_MoveClear(t *testing.T) {
+	cases := []struct {
+		name   string
+		srcTid uint64
+		dstTid uint64
+		entry  *dEntry
+	}{
+		{
+			"dentry_move",
+			1,
+			1,
+			&dEntry{
+				Name:     "test",
+				Depth:    0,
+				Ino:      1,
+				DevMajor: 1,
+				DevMinor: 1,
+			},
+		},
+		{
+			"dentry_not_found",
+			1,
+			2,
+			&dEntry{
+				Name:     "test",
+				Depth:    0,
+				Ino:      1,
+				DevMajor: 1,
+				DevMinor: 1,
+			},
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			cache := newDirEntryCache()
+			if c.entry != nil {
+				cache.moveCache[c.srcTid] = c.entry
+			}
+
+			cache.MoveClear(c.dstTid)
+
+			if c.srcTid == c.dstTid {
+				require.Empty(t, cache.moveCache)
+			} else {
+				require.NotEmpty(t, cache.moveCache)
+			}
+		})
+	}
+}
+
+func Test_DirEntryCache_GetChild(t *testing.T) {
+	cases := []struct {
+		name      string
+		entry     *dEntry
+		children  dEntryChildren
+		childName string
+	}{
+		{
+			"dentry_with_children",
+			&dEntry{
+				Name:     "test",
+				Depth:    0,
+				Ino:      1,
+				DevMajor: 1,
+				DevMinor: 1,
+			},
+			dEntryChildren{
+				"child1": {
+					Name:     "child1",
+					Ino:      4,
+					DevMajor: 1,
+					DevMinor: 1,
+				},
+				"child2": {
+					Name:     "child2",
+					Ino:      7,
+					DevMajor: 1,
+					DevMinor: 1,
+				},
+			},
+			"child1",
+		},
+		{
+			"dentry_no_children",
+			&dEntry{
+				Name:     "test",
+				Depth:    0,
+				Ino:      1,
+				DevMajor: 1,
+				DevMinor: 1,
+			},
+			nil,
+			"child1",
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+
+			for _, child := range c.children {
+				c.entry.AddChild(child)
+			}
+
+			childEntry := c.entry.GetChild(c.childName)
+
+			if c.children == nil {
+				require.Nil(t, childEntry)
+			} else {
+				require.NotNil(t, childEntry)
+			}
+
 		})
 	}
 }

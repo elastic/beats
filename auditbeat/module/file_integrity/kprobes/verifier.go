@@ -7,7 +7,6 @@ import (
 	"context"
 	"embed"
 	"errors"
-	"fmt"
 	"io/fs"
 	"os"
 	"strings"
@@ -192,7 +191,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 		return err
 	}
 
-	eProc := newEventProcessor(p, verifier)
+	eProc := newEventProcessor(p, verifier, true)
 
 	retC := make(chan error)
 	go func() {
@@ -207,6 +206,10 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 				retC <- err
 				return
 
+			case err := <-p.ErrC():
+				retC <- err
+				return
+
 			case e, ok := <-channel.C():
 				if !ok {
 					err = errors.New("perf channel closed unexpectedly")
@@ -215,7 +218,6 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 
 				switch eWithType := e.(type) {
 				case *ProbeEvent:
-					fmt.Println(eWithType)
 					if err := eProc.process(ctx, eWithType); err != nil {
 						retC <- err
 						return

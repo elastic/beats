@@ -3,6 +3,7 @@ package kprobes
 import (
 	"errors"
 	"golang.org/x/sys/unix"
+	"sync"
 )
 
 type mountID struct {
@@ -17,7 +18,10 @@ type inotifyWatcher interface {
 
 type iWatcher struct {
 	inotifyFD int
-	mounts    map[mountID]int
+	mounts    map[mountID]struct{}
+	uniqueFDs map[uint32]struct{}
+	closed    bool
+	mtx       sync.Mutex
 }
 
 var inotifyAddWatch = unix.InotifyAddWatch
@@ -42,7 +46,8 @@ func newInotifyWatcher() (*iWatcher, error) {
 
 	return &iWatcher{
 		inotifyFD: fd,
-		mounts:    make(map[mountID]int),
+		mounts:    make(map[mountID]struct{}),
+		uniqueFDs: make(map[uint32]struct{}),
 	}, nil
 }
 
@@ -52,6 +57,13 @@ func newInotifyWatcher() (*iWatcher, error) {
 // It returns false if the mount with the same device major number and minor number already
 // has an inotify watch added. Also, it returns an error if there was any error.
 func (w *iWatcher) Add(devMajor uint32, devMinor uint32, mountPath string) (bool, error) {
+	w.mtx.Lock()
+	defer w.mtx.Unlock()
+
+	if w.closed {
+		return false, errors.New("inotify watcher already closed")
+	}
+
 	id := mountID{
 		major: devMajor,
 		minor: devMinor,
@@ -66,7 +78,13 @@ func (w *iWatcher) Add(devMajor uint32, devMinor uint32, mountPath string) (bool
 		return false, err
 	}
 
-	w.mounts[id] = wd
+	_, fdExists := w.uniqueFDs[uint32(wd)]
+	if fdExists {
+		return false, nil
+	}
+
+	w.uniqueFDs[uint32(wd)] = struct{}{}
+	w.mounts[id] = struct{}{}
 	return true, nil
 }
 
@@ -76,20 +94,20 @@ func (w *iWatcher) Add(devMajor uint32, devMinor uint32, mountPath string) (bool
 // during the removal of watches, it will be accumulated and returned as a single
 // error value. After removing all watches, it closes the inotify file descriptor.
 func (w *iWatcher) Close() error {
+	w.mtx.Lock()
+	defer w.mtx.Unlock()
+
 	var allErr error
-	for _, fd := range w.mounts {
-		if _, err := unix.InotifyRmWatch(w.inotifyFD, uint32(fd)); err != nil {
+	for fd := range w.uniqueFDs {
+		if _, err := unix.InotifyRmWatch(w.inotifyFD, fd); err != nil {
 			allErr = errors.Join(allErr, err)
 		}
 	}
+	w.uniqueFDs = nil
 
 	allErr = errors.Join(allErr, unix.Close(w.inotifyFD))
 
-	w.mounts = make(map[mountID]int)
-	var errno error
-	w.inotifyFD, errno = unix.InotifyInit1(unix.IN_CLOEXEC | unix.IN_NONBLOCK)
-	if w.inotifyFD == -1 {
-		allErr = errors.Join(allErr, errno)
-	}
+	w.mounts = nil
+
 	return allErr
 }

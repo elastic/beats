@@ -200,7 +200,7 @@ func (e *eventsVerifier) GenerateEvents() error {
 func (e *eventsVerifier) Verified() error {
 
 	if e.eventsToExpectNr == 0 {
-		return errors.New("no events to expect")
+		return ErrVerifyNoEventsToExpect
 	}
 
 	for _, status := range e.eventsToExpect {
