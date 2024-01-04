@@ -102,12 +102,17 @@ steps:
 
   - group: "Packaging"
     key: "packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("FILEBEAT_CHANGESET") == "true"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
 
     steps:
       - label: ":ubuntu: Packaging Linux X86"
         key: "package-linux-x86"
-        command: "echo Test me"
+        command:
+          - "sudo apt-get update"
+            #          - "sudo apt-get install -y libsystemd-dev"
+            #          - "sudo apt install -y python3-pip"
+          - "sudo apt-get install -y python3-venv"
+          - ".buildkite/filebeat/scripts/package.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"

@@ -2,13 +2,12 @@
 
 set -euo pipefail
 
-source .buildkite/filebeat/scripts/pre-common.sh
+source .buildkite/filebeat/scripts/common.sh
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
   export WORKSPACE="$(pwd)"
 
   prepare_win
-  echo "pre-command test echo"
 
   if [[ -z "${GOLANG_VERSION-""}" ]]; then
     export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
