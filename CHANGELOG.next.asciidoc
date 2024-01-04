@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Add "event.category" and "event.type" to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255 {pull}35193[35193]
+- Add "keystore.path" configuration settings to $workdir\data\{{.BeatName}}.keystore. Issue {issue}12315[12315] {pull}37237[37237]
 
 *Functionbeat*
 
@@ -53,6 +54,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
 - Support build of projects outside of beats directory {pull}36126[36126]
+- Support Elastic Agent control protocol chunking support {pull}37343[37343]
 
 *Auditbeat*
 
@@ -148,7 +150,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 - Upgrade golang/x/net to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
 Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
-- Upgrade to Go 1.20.11. {pull}37123[37123]
+- Upgrade to Go 1.20.12. {pull}37350[37350]
 - The Elasticsearch output can now configure performance presets with the `preset` configuration field. {pull}37259[37259]
 
 *Auditbeat*

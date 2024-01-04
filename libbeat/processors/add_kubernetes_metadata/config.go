@@ -50,15 +50,13 @@ type Enabled struct {
 
 type PluginConfig []map[string]config.C
 
-func defaultKubernetesAnnotatorConfig() kubeAnnotatorConfig {
-	return kubeAnnotatorConfig{
-		SyncPeriod:          10 * time.Minute,
-		CleanupTimeout:      60 * time.Second,
-		DefaultMatchers:     Enabled{true},
-		DefaultIndexers:     Enabled{true},
-		Scope:               "node",
-		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
-	}
+func (k *kubeAnnotatorConfig) InitDefaults() {
+	k.SyncPeriod = 10 * time.Minute
+	k.CleanupTimeout = 60 * time.Second
+	k.DefaultMatchers = Enabled{true}
+	k.DefaultIndexers = Enabled{true}
+	k.Scope = "node"
+	k.AddResourceMetadata = metadata.GetDefaultResourceMetadataConfig()
 }
 
 func (k *kubeAnnotatorConfig) Validate() error {
@@ -83,7 +81,7 @@ func (k *kubeAnnotatorConfig) Validate() error {
 
 				err := matcherCfg.Unpack(&logsPathMatcher)
 				if err != nil {
-					return fmt.Errorf("fail to unpack the `logs_path` matcher configuration: %s", err)
+					return fmt.Errorf("fail to unpack the `logs_path` matcher configuration: %w", err)
 				}
 				if logsPathMatcher.LogsPath == "" {
 					return fmt.Errorf("invalid logs_path matcher configuration: when resource_type is defined, logs_path must be set as well")
