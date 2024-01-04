@@ -31,4 +31,5 @@ with_mage
 
 echo ":: Start Packaging ::"
 cd filebeat
+umask 0022
 mage package

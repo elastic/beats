@@ -37,13 +37,18 @@ function installGoDependencies() {
 }
 
 fixCRLF
-withGolang
-installGoDependencies
 
 $ErrorActionPreference = "Continue" # set +e
 
-#New-Item -ItemType Directory -Force -Path "build"
-Set-Location filebeat
+Set-Location -Path filebeat
+New-Item -ItemType Directory -Force -Path "build"
+withGolang
+installGoDependencies
+
+$oldUmask = $ExecutionContext.SessionState.LanguageMode
+$ExecutionContext.SessionState.LanguageMode = "NoLanguage"
+$ExecutionContext.SessionState.LanguageMode = $oldUmask
+
 mage build unitTest
 
 $EXITCODE=$LASTEXITCODE
