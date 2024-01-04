@@ -1,5 +1,5 @@
 Elastic Agent System Metrics
-Copyright 2022-2023 Elasticsearch BV
+Copyright 2022-2024 Elasticsearch BV
 
 This product includes software developed by The Apache Software
 Foundation (http://www.apache.org/).
@@ -2104,11 +2104,11 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/cyphar/filepath-securejoin
-Version: v0.2.3
+Version: v0.2.4
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/cyphar/filepath-securejoin@v0.2.3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/cyphar/filepath-securejoin@v0.2.4/LICENSE:
 
 Copyright (C) 2014-2015 Docker Inc & Go Authors. All rights reserved.
 Copyright (C) 2017 SUSE LLC. All rights reserved.
