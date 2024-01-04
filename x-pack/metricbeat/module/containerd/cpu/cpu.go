@@ -102,6 +102,10 @@ func createDimensionsKey(containerId, namespace string) string {
 	return fmt.Sprintf("%s-%s", containerId, namespace)
 }
 
+// groupByFields aggregates metrics by their common dimensions into consolidated events.
+// It creates a map where each key represents a unique pairing of container ID and namespace,
+// ensuring that metrics with identical dimensions are grouped into a single event,
+// preventing duplicated documents which would get dropped when TSDB is enabled.
 func (m *metricset) groupByFields(events []mapstr.M) map[string][]mapstr.M {
 	groupedMetrics := make(map[string][]mapstr.M, 0)
 
@@ -145,6 +149,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 		return fmt.Errorf("error getting events: %w", err)
 	}
 
+	// Group the events by their common dimensions
 	grouped := m.groupByFields(events)
 
 	perContainerCpus := make(map[string]int)
@@ -157,12 +162,12 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 		}
 	}
 
+	// Iterate through each group and consolidate them into a single event per group
 	for _, group := range grouped {
 		cID := containerd.GetAndDeleteCid(group[0])
 		for _, event := range events {
 			// setting ECS container.id and module field containerd.namespace
 			containerFields := mapstr.M{}
-
 			if m.calcPct {
 				contCpus, ok := perContainerCpus[cID]
 				if !ok {
