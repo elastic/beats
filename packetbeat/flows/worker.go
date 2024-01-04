@@ -260,14 +260,15 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 			reportFlow := handleReports
 			isOver := lastReport
 			if checkTimeout {
-				if ts.Sub(flow.ts) > fw.timeout {
-					debugf("kill flow")
+				//if ts.Sub(flow.ts) > fw.timeout {
+				debugf("kill flow")
+				logp.Info("kvalliy: killing flows worker loop stopped flowid: %s, flow dir: %v ", string(flow.id.flowID), flow.dir)
 
-					reportFlow = true
-					flow.kill() // mark flow as killed
-					isOver = true
-					table.remove(flow)
-				}
+				reportFlow = true
+				flow.kill() // mark flow as killed
+				isOver = true
+				table.remove(flow)
+				//}
 			}
 
 			if reportFlow {
@@ -306,8 +307,9 @@ func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOve
 	event["type"] = eventType
 
 	flow := mapstr.M{
-		"id":    common.NetString(f.id.Serialize()),
-		"final": isOver,
+		"id":        common.NetString(f.id.Serialize()),
+		"final":     isOver,
+		"direction": f.dir,
 	}
 	fields := mapstr.M{
 		"event": event,

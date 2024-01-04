@@ -54,6 +54,7 @@ type kubernetesAnnotator struct {
 	cache               *cache
 	kubernetesAvailable bool
 	initOnce            sync.Once
+	fieldAdder          fieldAdder
 }
 
 func init() {
@@ -238,6 +239,17 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 			k.jobWatcher = jobWatcher
 		}
 
+		if config.AddFields != nil {
+			fieldAdder, err := newFieldAdder(config.AddFields)
+			if err != nil {
+				k.log.Errorf("Error creating field adder due to error %+v", err)
+			}
+
+			k.fieldAdder = fieldAdder
+		} else {
+			k.log.Infof("No config for addFields %+v", *cfg)
+		}
+
 		// TODO: refactor the above section to a common function to be used by NeWPodEventer too
 		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, metaConf)
 
@@ -342,6 +354,13 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	_ = kubeMeta.Delete("kubernetes.container.runtime")
 	_ = kubeMeta.Delete("kubernetes.container.image")
 	event.Fields.DeepUpdate(kubeMeta)
+
+	if k.fieldAdder.addFieldProcessor != nil {
+		//k.log.Info("kvalliy: adding field %s", k.fieldAdder.addFieldProcessor.String())
+		event, err = k.fieldAdder.addFieldProcessor.Run(event)
+		//k.log.Info("kvalliy: event fields are %v", event.Fields)
+		return event, err
+	}
 
 	return event, nil
 }
