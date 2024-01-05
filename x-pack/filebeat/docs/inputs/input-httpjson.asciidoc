@@ -1413,7 +1413,7 @@ response_json:
 }
 ----
 
-- Second call to collect `file_ids` using collected id from the first call when `response.body.sataus == "completed"`. This call continues until the condition is satisfied or the maximum number of attempts is exhausted.
+- Second call to collect `file_ids` using collected id from the first call when `response.body.status == "completed"`. This call continues until the condition is satisfied or the maximum number of attempts is exhausted.
 
 +
 request_url using id as '9ef0e6a5': \https://example.com/services/data/v1.0/9ef0e6a5/export_ids/status
