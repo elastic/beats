@@ -113,6 +113,7 @@ data:
   filebeat.yml: |-
     filebeat.inputs:
     - type: filestream
+      id: kubernetes-container-logs-${data.kubernetes.pod.name}-${data.kubernetes.container.id}
       paths:
         - /var/log/containers/*.log
       parsers:
