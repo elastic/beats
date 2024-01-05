@@ -15,7 +15,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// inputManager wraps one stateless input manager
+// InputManager wraps one stateless input manager
 // and one cursor input manager. It will create one or the other
 // based on the config that is passed.
 type InputManager struct {
