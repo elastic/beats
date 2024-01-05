@@ -10,13 +10,13 @@ import (
 	"strings"
 	"time"
 
-	monitoring "cloud.google.com/go/monitoring/apiv3"
-	"github.com/golang/protobuf/ptypes/duration"
+	monitoring "cloud.google.com/go/monitoring/apiv3/v2"
+	"cloud.google.com/go/monitoring/apiv3/v2/monitoringpb"
 	"github.com/pkg/errors"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
 	"google.golang.org/genproto/googleapis/api/metric"
-	monitoringpb "google.golang.org/genproto/googleapis/monitoring/v3"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -106,7 +106,7 @@ type config struct {
 	CredentialsFilePath string `config:"credentials_file_path"`
 
 	opt    []option.ClientOption
-	period *duration.Duration
+	period *durationpb.Duration
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -130,7 +130,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	m.MetricsConfig = metricsConfigs.Metrics
 	m.config.opt = []option.ClientOption{option.WithCredentialsFile(m.config.CredentialsFilePath)}
-	m.config.period = &duration.Duration{
+	m.config.period = &durationpb.Duration{
 		Seconds: int64(m.Module().Config().Period.Seconds()),
 	}
 
@@ -212,7 +212,7 @@ func (m *MetricSet) eventMapping(ctx context.Context, tss []timeSeriesWithAligne
 		return nil, errors.Wrap(err, "error trying to group time series data")
 	}
 
-	//Create single events for each group of data that matches some common patterns like labels and timestamp
+	// Create single events for each group of data that matches some common patterns like labels and timestamp
 	events := make([]mb.Event, 0)
 	for _, groupedEvents := range tsGrouped {
 		event := mb.Event{
