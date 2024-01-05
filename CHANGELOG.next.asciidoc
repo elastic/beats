@@ -90,6 +90,18 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix EC2 host.cpu.usage {pull}35717[35717]
 - Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
 - Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
+- Add missing 'TransactionType' dimension for Azure Storage Account. {pull}36413[36413]
+- Add log error when statsd server fails to start {pull}36477[36477]
+- Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
+- Fix event mapping implementation for statsd module {pull}36925[36925]
+- The region and availability_zone ecs fields nested within the cloud field. {pull}37015[37015]
+- Fix CPU and memory metrics collection from privileged process on Windows {issue}17314[17314]{pull}37027[37027]
+- Enhanced Azure Metrics metricset with refined grouping logic and resolved duplication issues for TSDB compatibility {pull}36823[36823]
+- Fix memory leak on Windows {issue}37142[37142] {pull}37171[37171]
+- Fix unintended skip in metric collection on Azure Monitor {issue}37204[37204] {pull}37203[37203]
+- Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
+- Add memory hard limit from container metadata and remove usage percentage in AWS Fargate. {pull}37194[37194]
+- Ignore parser errors from unsupported metrics types on Prometheus client and continue parsing until EOF is reached {pull}37383[37383]
 
 *Osquerybeat*
 
