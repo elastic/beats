@@ -121,7 +121,6 @@ data:
       prospector:
         scanner:
           fingerprint.enabled: true
-          fingerprint.length: 300
           symlinks: true
       file_identity.fingerprint: ~
       processors:
