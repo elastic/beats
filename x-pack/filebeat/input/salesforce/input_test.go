@@ -520,7 +520,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 				},
 			},
 		}
-		objectEventMonitotingConfig = EventMonitoringMethod{
+		objectEventMonitotingConfig = eventMonitoringMethod{
 			Object: EventMonitoringConfig{
 				Enabled:  pointer(true),
 				Interval: time.Second * 5,
@@ -531,7 +531,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 				Cursor: &cursorConfig{Field: "EventDate"},
 			},
 		}
-		objectEventMonitoringWithWrongQuery = EventMonitoringMethod{
+		objectEventMonitoringWithWrongQuery = eventMonitoringMethod{
 			Object: EventMonitoringConfig{
 				Enabled:  pointer(true),
 				Interval: time.Second * 5,
@@ -543,7 +543,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 			},
 		}
 
-		elfEventMonitotingConfig = EventMonitoringMethod{
+		elfEventMonitotingConfig = eventMonitoringMethod{
 			EventLogFile: EventMonitoringConfig{
 				Enabled:  pointer(true),
 				Interval: time.Second * 5,
@@ -554,7 +554,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 				Cursor: &cursorConfig{Field: "EventDate"},
 			},
 		}
-		elfEventMonitotingWithWrongQuery = EventMonitoringMethod{
+		elfEventMonitotingWithWrongQuery = eventMonitoringMethod{
 			EventLogFile: EventMonitoringConfig{
 				Enabled:  pointer(true),
 				Interval: time.Second * 5,

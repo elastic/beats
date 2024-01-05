@@ -12,12 +12,12 @@ import (
 
 type config struct {
 	Auth                  *authConfig            `config:"auth"`
-	EventMonitoringMethod *EventMonitoringMethod `config:"event_monitoring_method"`
+	EventMonitoringMethod *eventMonitoringMethod `config:"event_monitoring_method"`
 	URL                   string                 `config:"url" validate:"required"`
 	Version               int                    `config:"version" validate:"required"`
 }
 
-type EventMonitoringMethod struct {
+type eventMonitoringMethod struct {
 	EventLogFile EventMonitoringConfig `config:"event_log_file"`
 	Object       EventMonitoringConfig `config:"object"`
 }

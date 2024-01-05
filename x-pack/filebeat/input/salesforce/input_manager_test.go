@@ -50,9 +50,7 @@ func TestInputManager(t *testing.T) {
 	inputManager := NewInputManager(logp.NewLogger("salesforce_test"), stateStore{})
 
 	var inputTaskGroup unison.TaskGroup
-	defer inputTaskGroup.Stop() 
-		_ = inputTaskGroup.Stop()
-	}()
+	defer inputTaskGroup.Stop()
 
 	err := inputManager.Init(&inputTaskGroup, v2.ModeRun)
 	assert.NoError(t, err)
@@ -69,7 +67,7 @@ func TestInputManager(t *testing.T) {
 				ClientKeyPath:  "xyz",
 			}},
 		},
-		"event_monitoring_method": &EventMonitoringMethod{
+		"event_monitoring_method": &eventMonitoringMethod{
 			Object: EventMonitoringConfig{Enabled: pointer(true), Interval: 4},
 		},
 	})
