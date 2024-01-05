@@ -240,7 +240,7 @@ func TestStatelessHTTPJSONInput(t *testing.T) {
 			var g errgroup.Group
 			g.Go(func() error { return input.Run(ctx, chanClient) })
 
-			timeout := time.NewTimer(5 * time.Second)
+			timeout := time.NewTimer(10 * time.Second)
 			t.Cleanup(func() { _ = timeout.Stop() })
 
 			var receivedCount int

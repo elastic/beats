@@ -29306,11 +29306,11 @@ Contents of probable licence file $GOMODCACHE/github.com/google/gofuzz@v1.1.0/LI
 
 --------------------------------------------------------------------------------
 Dependency : github.com/google/licenseclassifier
-Version: v0.0.0-20200402202327-879cb1424de0
+Version: v0.0.0-20221004142553-c1ed8fcf4bab
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/google/licenseclassifier@v0.0.0-20200402202327-879cb1424de0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/google/licenseclassifier@v0.0.0-20221004142553-c1ed8fcf4bab/LICENSE:
 
 
                                  Apache License

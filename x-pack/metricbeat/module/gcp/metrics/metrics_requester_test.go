@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/types/known/durationpb"
 
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
@@ -122,7 +122,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 		title            string
 		ingestDelay      time.Duration
 		samplePeriod     time.Duration
-		collectionPeriod *duration.Duration
+		collectionPeriod *durationpb.Duration
 		inputAligner     string
 		expectedAligner  string
 	}{
@@ -130,7 +130,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod equals to samplePeriod",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			&duration.Duration{
+			&durationpb.Duration{
 				Seconds: int64(60),
 			},
 			"",
@@ -140,7 +140,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod larger than samplePeriod",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			&duration.Duration{
+			&durationpb.Duration{
 				Seconds: int64(300),
 			},
 			"ALIGN_MEAN",
@@ -150,7 +150,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod smaller than samplePeriod",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			&duration.Duration{
+			&durationpb.Duration{
 				Seconds: int64(30),
 			},
 			"ALIGN_MAX",
@@ -160,7 +160,7 @@ func TestGetTimeIntervalAligner(t *testing.T) {
 			"test collectionPeriod equals to samplePeriod with given aligner",
 			time.Duration(240) * time.Second,
 			time.Duration(60) * time.Second,
-			&duration.Duration{
+			&durationpb.Duration{
 				Seconds: int64(60),
 			},
 			"ALIGN_MEAN",
