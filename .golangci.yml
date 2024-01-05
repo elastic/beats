@@ -2,6 +2,12 @@
 run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 15m
+<<<<<<< HEAD
+=======
+  build-tags:
+    - synthetics
+    - integration
+>>>>>>> d1b32774ae (Update to Go 1.21.5 (#37550))
 
 issues:
   # Maximum count of issues with the same text.
@@ -102,7 +108,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.20.12"
+    go: "1.21.5"
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -120,19 +126,19 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.20.12"
+    go: "1.21.5"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.20.12"
+    go: "1.21.5"
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.20.12"
+    go: "1.21.5"
 
   gosec:
     excludes:
