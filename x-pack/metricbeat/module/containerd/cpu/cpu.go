@@ -165,7 +165,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 	// Iterate through each group and consolidate them into a single event per group
 	for _, group := range grouped {
 		cID := containerd.GetAndDeleteCid(group[0])
-		for _, event := range events {
+		for _, event := range group {
 			// setting ECS container.id and module field containerd.namespace
 			containerFields := mapstr.M{}
 			if m.calcPct {
