@@ -50,7 +50,7 @@ func TestInputManager(t *testing.T) {
 	inputManager := NewInputManager(logp.NewLogger("salesforce_test"), stateStore{})
 
 	var inputTaskGroup unison.TaskGroup
-	defer inputTaskGroup.Stop()
+	defer inputTaskGroup.Stop() //nolint:errcheck // ignore error in test
 
 	err := inputManager.Init(&inputTaskGroup, v2.ModeRun)
 	assert.NoError(t, err)
