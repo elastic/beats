@@ -50,7 +50,7 @@ func TestInputManager(t *testing.T) {
 	inputManager := NewInputManager(logp.NewLogger("salesforce_test"), stateStore{})
 
 	var inputTaskGroup unison.TaskGroup
-	defer func() {
+	defer inputTaskGroup.Stop() 
 		_ = inputTaskGroup.Stop()
 	}()
 
