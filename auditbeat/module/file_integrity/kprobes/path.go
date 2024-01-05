@@ -53,7 +53,7 @@ type pTraverser struct {
 
 var lstat = os.Lstat // for testing
 
-func newPathMonitor(ctx context.Context, exec executor, timeOut time.Duration, isRecursive bool) (pathTraverser, error) {
+func newPathMonitor(ctx context.Context, exec executor, timeOut time.Duration, isRecursive bool) (*pTraverser, error) {
 	mWatcher, err := newInotifyWatcher()
 	if err != nil {
 		return nil, err
@@ -136,6 +136,10 @@ func (r *pTraverser) ErrC() <-chan error {
 }
 
 func (r *pTraverser) WalkAsync(path string, depth uint32, tid uint32) {
+	if r.ctx.Err() != nil {
+		return
+	}
+
 	go func() {
 		walkErr := r.e.Run(func() error {
 			return r.walk(r.ctx, path, depth, true, tid)
@@ -276,6 +280,14 @@ func (r *pTraverser) walk(ctx context.Context, path string, depth uint32, isFrom
 }
 
 func (r *pTraverser) AddPathToMonitor(ctx context.Context, path string) error {
+	if r.ctx.Err() != nil {
+		return r.ctx.Err()
+	}
+
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+
 	// we care about the existence of the path only in AddPathToMonitor
 	// walk masks out all file existence errors
 	_, err := lstat(path)
