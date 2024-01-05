@@ -117,6 +117,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
 - Add memory hard limit from container metadata and remove usage percentage in AWS Fargate. {pull}37194[37194]
 - Ignore parser errors from unsupported metrics types on Prometheus client and continue parsing until EOF is reached {pull}37383[37383]
+- Fix the reference time rounding on Azure Metrics {issue}37204[37204] {pull}37365[37365]
 
 *Osquerybeat*
 
