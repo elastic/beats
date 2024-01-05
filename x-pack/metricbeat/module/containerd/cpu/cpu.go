@@ -237,7 +237,7 @@ func (m *metricset) Fetch(reporter mb.ReporterV2) error {
 
 		metricsetFields := mapstr.M{}
 
-		for _, event := range events {
+		for _, event := range group {
 			metricsetFields.DeepUpdateNoOverwrite(event)
 		}
 
