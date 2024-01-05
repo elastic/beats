@@ -173,7 +173,7 @@ func TestNetworkFilter(t *testing.T) {
 
 	_, exists := data.GetValue("network.ip.Forwarding")
 	require.NoError(t, exists, "filter did not preserve key")
-	ipMetrics, exists := data.GetValue("network.ip")
+	ipMetrics, _ := data.GetValue("network.ip")
 	require.Equal(t, 1, len(ipMetrics.(map[string]interface{})))
 }
 
@@ -196,7 +196,10 @@ func TestFilter(t *testing.T) {
 
 	procData, _, err := testConfig.Get()
 	assert.NoError(t, err, "GetOne")
-	assert.Equal(t, 2, len(procData))
+	// the total count of processes can either be one or two,
+	// depending on if the highest-mem-usage process and
+	// highest-cpu-usage process are the same.
+	assert.GreaterOrEqual(t, len(procData), 1)
 
 	testZero := Stats{
 		Procs:  []string{".*"},
@@ -581,7 +584,7 @@ func TestIncludeTopProcesses(t *testing.T) {
 //go:generate docker run --rm -v ./testdata:/app --entrypoint g++ docker.elastic.co/beats-dev/golang-crossbuild:1.21.0-main -pthread -std=c++11 -o /app/threads /app/threads.cpp
 //go:generate docker run --rm -v ./testdata:/app --entrypoint o64-clang++ docker.elastic.co/beats-dev/golang-crossbuild:1.21.0-darwin -pthread -std=c++11 -o /app/threads-darwin /app/threads.cpp
 //go:generate docker run --rm -v ./testdata:/app --entrypoint x86_64-w64-mingw32-g++-posix docker.elastic.co/beats-dev/golang-crossbuild:1.21.0-main -pthread -std=c++11 -o /app/threads.exe /app/threads.cpp
-func runThreads(t *testing.T) *exec.Cmd {
+func runThreads(t *testing.T) *exec.Cmd { //nolint: deadcode,structcheck,unused // needed by other platforms
 	t.Helper()
 
 	supportedPlatforms := []string{"linux/amd64", "darwin/amd64", "windows/amd64"}
@@ -654,7 +657,7 @@ func initTestResolver() (Stats, error) {
 	return testConfig, err
 }
 
-func sliceContains(s []string, e string) bool {
+func sliceContains(s []string, e string) bool { //nolint: deadcode,structcheck,unused // needed by other platforms
 	for _, v := range s {
 		if e == v {
 			return true
