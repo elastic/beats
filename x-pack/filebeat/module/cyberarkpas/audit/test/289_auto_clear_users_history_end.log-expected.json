@@ -38,7 +38,7 @@
         ]
     },
     {
-        "@timestamp": "2023-03-08T03:00:20.000-02:00",
+        "@timestamp": "2024-03-08T03:00:20.000-02:00",
         "cyberarkpas.audit.action": "Auto Clear Users History end",
         "cyberarkpas.audit.desc": "Auto Clear Users History end",
         "cyberarkpas.audit.issuer": "Batch",
