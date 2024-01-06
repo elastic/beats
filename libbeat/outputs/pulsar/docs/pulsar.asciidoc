@@ -1,0 +1,75 @@
+[[pulsar-output]]
+=== Configure the Pulsar output
+
+++++
+<titleabbrev>Pulsar</titleabbrev>
+++++
+
+The Pulsar output sends events to Apache Pulsar.
+
+Example configuration:
+
+[source,yaml]
+------------------------------------------------------------------------------
+output.pulsar:
+  endpoint: 'pulsar://localhost:6650'
+  topic: 'persistent://public/default/beats'
+  auth:
+       tls:
+            key_file: 'keyfile.key'
+            ca_file: 'cafile.pem'
+  producer:
+    compression_type: 'lz4'
+    compression_level: 'default'
+    max_pending_messages: 10000
+    disable_batching: false
+    batch_builder_type: 'default'
+    hashing_scheme: 'java_string_hash'
+------------------------------------------------------------------------------
+
+==== Configuration options
+[source,markdown]
+-----------------------------------------------------------------------------
+The following settings can be optionally configured:
+- `endpoint` (default = pulsar://localhost:6650): The url of pulsar cluster.
+- `topic` (default = persistent://public/default/beats): The name of the pulsar topic to send to.
+- `auth`
+    - `tls`
+        - `cert_file`:
+        - `key_file`:
+    - `token`
+        - `token`
+    - `oauth2`
+        - `issuer_url`:
+        - `client_id`:
+        - `audience`:
+    - `athenz`
+        - `provider_domain`:
+        - `tenant_domain`:
+        - `tenant_service`:
+        - `private_key`:
+        - `key_id`:
+        - `principal_header`:
+        - `zts_url`:
+- `producer`
+    - `max_reconnect_broker`: specifies the maximum retry number of reconnectToBroker. (default: ultimate)
+    - `hashing_scheme`: used to define the partition on where to publish a particular message. Can be set to `java_string_hash` (default) or `murmur3_32hash`.
+    - `compression_level`: one of 'default' (default), 'faster', or 'better'.
+    - `compression_type`: one of 'none' (default), 'lz4', 'zlib', or 'zstd'.
+    - `max_pending_messages"`: specifies the max size of the queue holding the messages pending to receive an acknowledgment from the broker.
+    - `batch_builder_type"`: one of 'default' (default) or 'key_based'.
+    - `partitions_auto_discovery_interval"`: the time interval for the background process to discover new partitions
+    - `batching_max_publish_delay"`: specifies the time period within which the messages sent will be batched (default: 10ms)
+    - `batching_max_messages"`: specifies the maximum number of messages permitted in a batch. (default: 1000)
+    - `batching_max_size"`: specifies the maximum number of bytes permitted in a batch. (default 128 KB)
+    - `disable_block_if_queue_full"`: controls whether Send and SendAsync block if producer's message queue is full. Defaults to false.
+    - `disable_batching"`: controls whether automatic batching of messages is enabled for the producer. Defaults to false.
+- `tls_trust_certs_file_path`: path to the CA cert. For a client this verifies the server certificate. Should
+  only be used if `insecure` is set to true.
+- `tls_allow_insecure_connection`: configure whether the Pulsar client accept untrusted TLS certificate from broker (default: false)
+- `timeout`: send pulsar message timeout (default: 5s)
+- `operation_timeout`: sets producer-create, subscribe and unsubscribe operations timeout (default: 30 seconds)
+- `connection_timeout`: timeout for the establishment of a TCP connection (default: 5 seconds)
+- `max_connections_per_broker`: max number of connections to a single broker that will kept in the pool. (default: 1 connection)
+- `bulk_max_size`: maximum number of events to bulk in a single request (default: 1024)
+-----------------------------------------------------------------------------

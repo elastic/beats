@@ -65,11 +65,7 @@ func (c *client) Connect() error {
 	}
 
 	c.client = client
-	po, err := c.config.parseProducerOptions()
-	if err != nil {
-		c.log.Errorf("Failed to parse producer options: %+v", err)
-		return err
-	}
+	po := c.config.parseProducerOptions()
 	producer, err := client.CreateProducer(po)
 	if err != nil {
 		c.log.Errorf("Failed to create producer: %+v", err)

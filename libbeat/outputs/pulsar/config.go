@@ -18,7 +18,6 @@
 package pulsar
 
 import (
-	"encoding"
 	"fmt"
 	"time"
 
@@ -38,7 +37,7 @@ type pulsarConfig struct {
 	Endpoint                   string           `config:"endpoint"`
 	Timeout                    time.Duration    `config:"timeout"`
 	Topic                      string           `config:"topic"`
-	Producer                   producer         `config:"producer"`
+	Producer                   *producer        `config:"producer"`
 	Codec                      codec.Config     `config:"codec"`
 	MaxRetries                 int              `config:"max_retries"         validate:"min=-1,nonzero"`
 	TLSTrustCertsFilePath      string           `config:"tls_trust_certs_file_path"`
@@ -46,7 +45,7 @@ type pulsarConfig struct {
 	Authentication             authentication   `config:"auth"`
 	OperationTimeout           time.Duration    `config:"operation_timeout"`
 	ConnectionTimeout          time.Duration    `config:"connection_timeout"`
-	MaxConnectionsPerBroker    int              `config:"map_connections_per_broker"`
+	MaxConnectionsPerBroker    int              `config:"max_connections_per_broker"`
 	Queue                      config.Namespace `config:"queue"`
 	BulkMaxSize                int              `config:"bulk_max_size"`
 }
@@ -88,28 +87,42 @@ func (c *pulsarConfig) auth() pulsar.Authentication {
 }
 
 // parseConfig parses the pulsar configuration for the PulsarProducer.
-func (c *pulsarConfig) parseProducerOptions() (pulsar.ProducerOptions, error) {
-	producerOptions := pulsar.ProducerOptions{
+func (c *pulsarConfig) parseProducerOptions() pulsar.ProducerOptions {
+	if c.Producer == nil {
+		return pulsar.ProducerOptions{
+			Topic:       c.Topic,
+			SendTimeout: c.Timeout,
+		}
+	}
+
+	return pulsar.ProducerOptions{
 		Topic:                           c.Topic,
 		SendTimeout:                     c.Timeout,
-		BatcherBuilderType:              c.Producer.BatcherBuilderType.ToPulsar(),
+		BatcherBuilderType:              c.Producer.parseBatchBuilderType(),
 		BatchingMaxMessages:             c.Producer.BatchingMaxMessages,
 		BatchingMaxPublishDelay:         c.Producer.BatchingMaxPublishDelay,
 		BatchingMaxSize:                 c.Producer.BatchingMaxSize,
-		CompressionLevel:                c.Producer.CompressionLevel.ToPulsar(),
-		CompressionType:                 c.Producer.CompressionType.ToPulsar(),
+		CompressionLevel:                c.Producer.parseCompressionLevel(),
+		CompressionType:                 c.Producer.parseCompressionType(),
 		DisableBatching:                 c.Producer.DisableBatching,
 		DisableBlockIfQueueFull:         c.Producer.DisableBlockIfQueueFull,
-		HashingScheme:                   c.Producer.HashingScheme.ToPulsar(),
+		HashingScheme:                   c.Producer.parseHashingScheme(),
 		MaxPendingMessages:              c.Producer.MaxPendingMessages,
 		MaxReconnectToBroker:            c.Producer.MaxReconnectToBroker,
 		PartitionsAutoDiscoveryInterval: c.Producer.PartitionsAutoDiscoveryInterval,
 	}
-	return producerOptions, nil
 }
 
 // parseConfig parses the pulsar configuration for the PulsarClient.
 func (c *pulsarConfig) parseClientOptions() (pulsar.ClientOptions, error) {
+	if len(c.Endpoint) == 0 {
+		return pulsar.ClientOptions{}, fmt.Errorf("endpoint is required")
+
+	}
+	if len(c.Topic) == 0 {
+		return pulsar.ClientOptions{}, fmt.Errorf("topic is required")
+	}
+
 	options := pulsar.ClientOptions{
 		URL:                     c.Endpoint,
 		ConnectionTimeout:       c.ConnectionTimeout,
@@ -132,14 +145,15 @@ func defaultConfig() *pulsarConfig {
 	return &pulsarConfig{
 		Endpoint: "pulsar://localhost:6650",
 		// using an empty topic to track when it has not been set by user, default is based on traces or metrics.
-		Topic:                   "pulsar://public/default/beats",
-		Authentication:          authentication{},
-		Codec:                   codec.Config{},
-		MaxRetries:              3,
-		BulkMaxSize:             1024,
-		MaxConnectionsPerBroker: 1,
-		ConnectionTimeout:       5 * time.Second,
-		OperationTimeout:        30 * time.Second,
+		Topic:                      "persistent://public/default/beats",
+		Authentication:             authentication{},
+		Codec:                      codec.Config{},
+		MaxRetries:                 3,
+		BulkMaxSize:                1024,
+		MaxConnectionsPerBroker:    1,
+		ConnectionTimeout:          5 * time.Second,
+		OperationTimeout:           30 * time.Second,
+		TLSAllowInsecureConnection: false,
 	}
 }
 
@@ -190,73 +204,46 @@ type oauth2 struct {
 
 // Producer defines configuration for producer
 type producer struct {
-	MaxReconnectToBroker            *uint            `config:"max_reconnect_broker"`
-	HashingScheme                   HashingScheme    `config:"hashing_scheme"`
-	CompressionLevel                CompressionLevel `config:"compression_level"`
-	CompressionType                 CompressionType  `config:"compression_type"`
-	MaxPendingMessages              int              `config:"max_pending_messages"`
-	BatcherBuilderType              BatchBuilderType `config:"batch_builder_type"`
-	PartitionsAutoDiscoveryInterval time.Duration    `config:"partitions_auto_discovery_interval"`
-	BatchingMaxPublishDelay         time.Duration    `config:"batching_max_publish_delay"`
-	BatchingMaxMessages             uint             `config:"batching_max_messages"`
-	BatchingMaxSize                 uint             `config:"batching_max_size"`
-	DisableBlockIfQueueFull         bool             `config:"disable_block_if_queue_full"`
-	DisableBatching                 bool             `config:"disable_batching"`
+	MaxReconnectToBroker            *uint         `config:"max_reconnect_broker"`
+	HashingScheme                   string        `config:"hashing_scheme"`
+	CompressionLevel                string        `config:"compression_level"`
+	CompressionType                 string        `config:"compression_type"`
+	MaxPendingMessages              int           `config:"max_pending_messages"`
+	BatcherBuilderType              string        `config:"batch_builder_type"`
+	PartitionsAutoDiscoveryInterval time.Duration `config:"partitions_auto_discovery_interval"`
+	BatchingMaxPublishDelay         time.Duration `config:"batching_max_publish_delay"`
+	BatchingMaxMessages             uint          `config:"batching_max_messages"`
+	BatchingMaxSize                 uint          `config:"batching_max_size"`
+	DisableBlockIfQueueFull         bool          `config:"disable_block_if_queue_full"`
+	DisableBatching                 bool          `config:"disable_batching"`
 }
-
-var _ encoding.TextUnmarshaler = (*BatchBuilderType)(nil)
-
-type BatchBuilderType string
 
 const (
-	DefaultBatchBuilder  BatchBuilderType = "default"
-	KeyBasedBatchBuilder BatchBuilderType = "key_based"
+	DefaultBatchBuilder  string = "default"
+	KeyBasedBatchBuilder string = "key_based"
 )
 
-func (c *BatchBuilderType) UnmarshalText(text []byte) error {
-	switch read := BatchBuilderType(text); read {
-	case DefaultBatchBuilder, KeyBasedBatchBuilder:
-		*c = read
-		return nil
-	default:
-		return fmt.Errorf("producer.compressionType should be one of 'none', 'lz4', 'zlib', or 'zstd'. configured value %v", string(read))
-	}
-}
-
-func (c *BatchBuilderType) ToPulsar() pulsar.BatcherBuilderType {
-	switch *c {
+func (c *producer) parseBatchBuilderType() pulsar.BatcherBuilderType {
+	switch c.BatcherBuilderType {
 	case DefaultBatchBuilder:
 		return pulsar.DefaultBatchBuilder
 	case KeyBasedBatchBuilder:
 		return pulsar.KeyBasedBatchBuilder
 	default:
+		fmt.Printf("unsupported batcher builder type: %s", c.BatcherBuilderType)
 		return pulsar.DefaultBatchBuilder
 	}
 }
 
-var _ encoding.TextUnmarshaler = (*CompressionType)(nil)
-
-type CompressionType string
-
 const (
-	None CompressionType = "none"
-	LZ4  CompressionType = "lz4"
-	ZLib CompressionType = "zlib"
-	ZStd CompressionType = "zstd"
+	None string = "none"
+	LZ4  string = "lz4"
+	ZLib string = "zlib"
+	ZStd string = "zstd"
 )
 
-func (c *CompressionType) UnmarshalText(text []byte) error {
-	switch read := CompressionType(text); read {
-	case None, LZ4, ZLib, ZStd:
-		*c = read
-		return nil
-	default:
-		return fmt.Errorf("producer.compressionType should be one of 'none', 'lz4', 'zlib', or 'zstd'. configured value %v", string(read))
-	}
-}
-
-func (c *CompressionType) ToPulsar() pulsar.CompressionType {
-	switch *c {
+func (c *producer) parseCompressionType() pulsar.CompressionType {
+	switch c.CompressionType {
 	case None:
 		return pulsar.NoCompression
 	case LZ4:
@@ -266,32 +253,19 @@ func (c *CompressionType) ToPulsar() pulsar.CompressionType {
 	case ZStd:
 		return pulsar.ZSTD
 	default:
+		fmt.Printf("unsupported compression type: %s", c.CompressionType)
 		return pulsar.NoCompression
 	}
 }
 
-var _ encoding.TextUnmarshaler = (*CompressionLevel)(nil)
-
-type CompressionLevel string
-
 const (
-	Default CompressionLevel = "default"
-	Faster  CompressionLevel = "faster"
-	Better  CompressionLevel = "better"
+	Default string = "default"
+	Faster  string = "faster"
+	Better  string = "better"
 )
 
-func (c *CompressionLevel) UnmarshalText(text []byte) error {
-	switch read := CompressionLevel(text); read {
-	case Default, Faster, Better:
-		*c = read
-		return nil
-	default:
-		return fmt.Errorf("producer.compressionLevel should be one of 'default', 'faster', or 'better'. configured value %v", read)
-	}
-}
-
-func (c *CompressionLevel) ToPulsar() pulsar.CompressionLevel {
-	switch *c {
+func (c *producer) parseCompressionLevel() pulsar.CompressionLevel {
+	switch c.CompressionLevel {
 	case Default:
 		return pulsar.Default
 	case Faster:
@@ -299,36 +273,24 @@ func (c *CompressionLevel) ToPulsar() pulsar.CompressionLevel {
 	case Better:
 		return pulsar.Better
 	default:
+		fmt.Printf("unsupported compression level: %s", c.CompressionLevel)
 		return pulsar.Default
 	}
 }
 
-var _ encoding.TextUnmarshaler = (*HashingScheme)(nil)
-
-type HashingScheme string
-
 const (
-	JavaStringHash HashingScheme = "java_string_hash"
-	Murmur3_32Hash HashingScheme = "murmur3_32hash"
+	JavaStringHash string = "java_string_hash"
+	Murmur3_32Hash string = "murmur3_32hash"
 )
 
-func (c *HashingScheme) UnmarshalText(text []byte) error {
-	switch read := HashingScheme(text); read {
-	case JavaStringHash, Murmur3_32Hash:
-		*c = read
-		return nil
-	default:
-		return fmt.Errorf("producer.hashingScheme should be one of 'java_string_hash' or 'murmur3_32hash'. configured value %v", read)
-	}
-}
-
-func (c *HashingScheme) ToPulsar() pulsar.HashingScheme {
-	switch *c {
+func (c *producer) parseHashingScheme() pulsar.HashingScheme {
+	switch c.HashingScheme {
 	case JavaStringHash:
 		return pulsar.JavaStringHash
 	case Murmur3_32Hash:
 		return pulsar.Murmur3_32Hash
 	default:
+		fmt.Printf("unsupported hashing scheme: %s", c.HashingScheme)
 		return pulsar.JavaStringHash
 	}
 }
