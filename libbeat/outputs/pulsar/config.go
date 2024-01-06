@@ -20,11 +20,13 @@ package pulsar
 import (
 	"encoding"
 	"fmt"
+	"time"
+
 	"github.com/apache/pulsar-client-go/pulsar"
+
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-ucfg"
-	"time"
 )
 
 var (

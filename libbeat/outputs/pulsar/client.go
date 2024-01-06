@@ -20,12 +20,14 @@ package pulsar
 import (
 	"context"
 	"fmt"
+	"sync"
+
 	"github.com/apache/pulsar-client-go/pulsar"
+
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"sync"
 )
 
 var (
