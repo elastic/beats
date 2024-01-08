@@ -82,6 +82,7 @@ func TestFlowsCounting(t *testing.T) {
 		10*time.Millisecond,
 		1,
 		-1,
+		36,
 		0)
 	if err != nil {
 		t.Fatalf("Failed to create flow worker: %v", err)

@@ -34,8 +34,9 @@ import (
 )
 
 var (
-	ErrInvalidTimeout = errors.New("timeout must be >= 1s")
-	ErrInvalidPeriod  = errors.New("report period must be -1 or >= 1s")
+	ErrInvalidTimeout       = errors.New("timeout must be >= 1s")
+	ErrInvalidPeriod        = errors.New("report period must be -1 or >= 1s")
+	ErrInvalidKillFlowAfter = errors.New("Kill flow after must be >= 1s")
 )
 
 // worker is a generic asynchronous function processor.
@@ -127,7 +128,7 @@ func (w *worker) periodically(tick time.Duration, fn func() error) {
 // reporting will be done at flow lifetime end.
 // Flows are published via the pub Reporter after being enriched with process information
 // by watcher.
-func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMetaTable, counters *counterReg, timeout, period time.Duration) (*worker, error) {
+func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMetaTable, counters *counterReg, timeout, period time.Duration, killFlowOnTimeout bool) (*worker, error) {
 	if timeout < time.Second {
 		return nil, ErrInvalidTimeout
 	}
@@ -136,21 +137,23 @@ func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMe
 		return nil, ErrInvalidPeriod
 	}
 
-	tick := timeout
+	// 30s period is 10s and kill flow is 3600s
+	tick := timeout // 30s
 	ticksTimeout := 1
 	ticksPeriod := -1
-	if period > 0 {
-		tick = gcd(timeout, period)
+	killTimeout := 1
+	if period > 0 { // 10s
+		tick = gcd(timeout, period) //10
 		if tick < time.Second {
 			tick = time.Second
 		}
 
-		ticksTimeout = int(timeout / tick)
+		ticksTimeout = int(timeout / tick) // 3
 		if ticksTimeout == 0 {
 			ticksTimeout = 1
 		}
 
-		ticksPeriod = int(period / tick)
+		ticksPeriod = int(period / tick) // 1
 		if ticksPeriod == 0 {
 			ticksPeriod = 1
 		}
@@ -161,14 +164,15 @@ func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMe
 
 	defaultBatchSize := 1024
 	processor := &flowsProcessor{
-		table:    table,
-		watcher:  watcher,
-		counters: counters,
-		timeout:  timeout,
+		table:             table,
+		watcher:           watcher,
+		counters:          counters,
+		timeout:           timeout,
+		killFlowOnTimeout: killFlowOnTimeout,
 	}
 	processor.spool.init(pub, defaultBatchSize)
 
-	return makeWorker(processor, tick, ticksTimeout, ticksPeriod, 10)
+	return makeWorker(processor, tick, ticksTimeout, ticksPeriod, killTimeout, 10)
 }
 
 // gcd returns the greatest common divisor of a and b.
@@ -182,9 +186,15 @@ func gcd(a, b time.Duration) time.Duration {
 // makeWorker returns a worker that runs processor.execute each tick. Each timeout'th tick,
 // the worker will check flow timeouts and each period'th tick, the worker will report flow
 // events to be published.
-func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period int, align int64) (*worker, error) {
+func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period, killFlowAfter int, align int64) (*worker, error) {
 	return newWorker(func(w *worker) {
-		defer processor.execute(w, false, true, true)
+		defer processor.execute(w, false, true, true, false)
+
+		/*
+			tick: 10
+			timeout: 3
+			period: 1
+		*/
 
 		if align > 0 {
 			// Wait until the current time rounded up to nearest align seconds.
@@ -214,21 +224,22 @@ func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period i
 				nPeriod = period
 			}
 
-			processor.execute(w, handleTimeout, handleReports, false)
+			processor.execute(w, handleTimeout, handleReports, false, processor.killFlowOnTimeout)
 			return nil
 		})
 	}), nil
 }
 
 type flowsProcessor struct {
-	spool    spool
-	watcher  *procs.ProcessesWatcher
-	table    *flowMetaTable
-	counters *counterReg
-	timeout  time.Duration
+	spool             spool
+	watcher           *procs.ProcessesWatcher
+	table             *flowMetaTable
+	counters          *counterReg
+	timeout           time.Duration
+	killFlowOnTimeout bool
 }
 
-func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastReport bool) {
+func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastReport bool, killFlow bool) {
 	if !checkTimeout && !handleReports {
 		return
 	}
@@ -260,15 +271,15 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 			reportFlow := handleReports
 			isOver := lastReport
 			if checkTimeout {
-				//if ts.Sub(flow.ts) > fw.timeout {
-				debugf("kill flow")
-				logp.Info("kvalliy: killing flows worker loop stopped flowid: %s, flow dir: %v ", string(flow.id.flowID), flow.dir)
+				if killFlow || ts.Sub(flow.ts) > fw.timeout {
+					debugf("kill flow")
+					logp.Info("kvalliy: killing flows worker loop stopped flowid: %s, flow dir: %v killFlow: %v", string(flow.id.flowID), flow.dir, killFlow)
 
-				reportFlow = true
-				flow.kill() // mark flow as killed
-				isOver = true
-				table.remove(flow)
-				//}
+					reportFlow = true
+					flow.kill() // mark flow as killed
+					isOver = true
+					table.remove(flow)
+				}
 			}
 
 			if reportFlow {

@@ -142,7 +142,8 @@ type Flows struct {
 	Processors    processors.PluginConfig `config:"processors"`
 	KeepNull      bool                    `config:"keep_null"`
 	// Index is used to overwrite the index where flows are published
-	Index string `config:"index"`
+	Index             string `config:"index"`
+	KillFlowOnTimeout bool   `config:"kill_flow_on_timeout"`
 }
 
 type ProtocolCommon struct {

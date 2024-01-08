@@ -32,8 +32,9 @@ type Reporter func([]beat.Event)
 var debugf = logp.MakeDebug("flows")
 
 const (
-	defaultTimeout = 30 * time.Second
-	defaultPeriod  = 10 * time.Second
+	defaultTimeout       = 30 * time.Second
+	defaultPeriod        = 10 * time.Second
+	defaultKillFlowAfter = 3600 * time.Second
 )
 
 // Flows holds and publishes network flow information for running processes.
@@ -71,7 +72,7 @@ func NewFlows(pub Reporter, watcher *procs.ProcessesWatcher, config *config.Flow
 
 	counter := &counterReg{}
 
-	worker, err := newFlowsWorker(pub, watcher, table, counter, timeout, period)
+	worker, err := newFlowsWorker(pub, watcher, table, counter, timeout, period, config.KillFlowOnTimeout)
 	if err != nil {
 		logp.Err("failed to configure flows processing intervals: %v", err)
 		return nil, err
