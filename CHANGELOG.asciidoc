@@ -3,9 +3,76 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.11.3]]
+=== Beats version 8.11.3
+https://github.com/elastic/beats/compare/v8.11.2\...v8.11.3[View commits]
+
+The 8.11.3 patch release contains a fix for a potential security vulnerability. Please see our link:https://discuss.elastic.co/c/announcements/security-announcements/31[security advisory for more details].
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- `queue.mem.events` is changing from `4096` to `3200`.
+- `queue.mem.flush.min_events` is changing from `2048` to `1600`.
+- `queue.mem.flush.timeout` is changing from `1s` to `10s`.
+- `output.elasticsearch.bulk_max_size` is changing from `50` to `1600`.
+- `output.elasticsearch.idle_connection_timeout` is changing from `60s` to `3s`.
+
+
+[[release-notes-8.11.2]]
+=== Beats version 8.11.2
+https://github.com/elastic/beats/compare/v8.11.1\...v8.11.2[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Avoid logging fields values when handling Elasticsearch output errors except at the debug log level. The debug log level must now be used to see detailed errors, for example mapping errors and their cause. {pull}37229[37229]
+
+==== Bugfixes
+
+*Affecting all Beats*
+- Fix memqueue producer blocking indefinitely even after being cancelled. {issue}22813[22813] {pull}37077[37077]
+
+*Auditbeat*
+
+- Fix documentation regarding socket type selection. {issue}37174[37174] {pull}37175[37175]
+- Fix guess trigger for system/socket credentials on newer kernels. {issue}36905[36905] {pull}37136[37136]
+
+*Filebeat*
+
+- Do not error when Okta API returns no data. {pull}37092[37092]
+- Fix request body close behaviour in HTTP_Endpoint when handling GZIP compressed content. {pull}37091[37091]
+- Make CEL input `now` global evaluate to a time in UTC. {pull}37159[37159]
+
+*Heartbeat*
+
+- Fix mapping errors with invalid URLs. {pull}37255[37255]
+
+*Metricbeat*
+
+- Fix memory leak on Windows {issue}37142[37142] {pull}37171[37171]
+- Enhance Azure Metrics metricset with refined grouping logic and resolved duplication issues for TSDB compatibility. {pull}36823[36823]
+- Fix unintended skip in metric collection on Azure Monitor. {issue}37204[37204] {pull}37203[37203]
+- Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
+
+*Winlogbeat*
+
+- Fix dashboards under Kibana 8.x. {issue}37080[37080] {pull}37085[37085]
+
+==== Added
+
+*Affecting all Beats*
+
+- Upgrade to Go 1.20.11. {pull}37123[37123]
+
+
 [[release-notes-8.11.1]]
 === Beats version 8.11.1
 https://github.com/elastic/beats/compare/v8.11.0\...v8.11.1[View commits]
+
+IMPORTANT: Due to a memory leak issue, Windows users running {agent} are recommended to avoid upgrading to this release and instead use the 8.11.2 release in which the issue is resolved. If you've already upgraded to version 8.11.0 or 8.11.1, we recommend upgrading to 8.11.2 as soon as possible.
 
 ==== Added
 
@@ -18,9 +85,13 @@ https://github.com/elastic/beats/compare/v8.11.0\...v8.11.1[View commits]
 === Beats version 8.11.0
 https://github.com/elastic/beats/compare/v8.10.4\...v8.11.0[View commits]
 
+
+IMPORTANT: Due to a memory leak issue, Windows users running {agent} are recommended to avoid upgrading to this release and instead use the 8.11.2 release in which the issue is resolved. If you've already upgraded to version 8.11.0 or 8.11.1, we recommend upgrading to 8.11.2 as soon as possible.
+
 ==== Breaking changes
 
 *Affecting all Beats*
+
 - The Elasticsearch output now enables compression by default. This decreases network data usage by an average of 70-80%, in exchange for 20-25% increased CPU use and ~10% increased ingestion time. The previous default can be restored by setting the flag `compression_level: 0` under `output.elasticsearch`. {pull}36681[36681]
 - The `elastic-agent-autodiscover` library is updated to version 0.6.4, disabling metadata for deployment and cronjob. Pods that will be created from deployments or cronjobs will not have the extra metadata field for `kubernetes.deployment` or `kubernetes.cronjob`, respectively. {pull}36879[36879]
 

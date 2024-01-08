@@ -14,12 +14,13 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/kinesis/types"
+	"google.golang.org/protobuf/runtime/protoimpl"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/awslabs/kinesis-aggregation/go/v2/deaggregator"
 	aggRecProto "github.com/awslabs/kinesis-aggregation/go/v2/records"
-	"github.com/golang/protobuf/proto" //nolint:staticcheck // SA1019 dependency uses deprecated package
 	"github.com/stretchr/testify/assert"
+	"google.golang.org/protobuf/proto"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -33,7 +34,7 @@ func TestCloudwatch(t *testing.T) {
 		SubscriptionFilters: []string{"MyFilter"},
 		MessageType:         "DATA_MESSAGE",
 		LogEvents: []events.CloudwatchLogsLogEvent{
-			events.CloudwatchLogsLogEvent{
+			{
 				ID:        "1234567890123456789",
 				Timestamp: 1566908691193,
 				Message:   "my interesting message",
@@ -393,7 +394,7 @@ func generateKinesisAggregateRecord(numRecords int, valid bool) []byte {
 	}
 
 	aggRec.PartitionKeyTable = partKeyTable
-	data, _ := proto.Marshal(aggRec)
+	data, _ := proto.Marshal(protoimpl.X.ProtoMessageV2Of(aggRec))
 	md5Hash := md5.Sum(data)
 	aggRecBytes = append(aggRecBytes, data...)
 	aggRecBytes = append(aggRecBytes, md5Hash[:]...)

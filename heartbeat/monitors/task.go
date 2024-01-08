@@ -80,13 +80,13 @@ func (t *configuredJob) Start(pubClient beat.Client) {
 	t.pubClient = pubClient
 
 	if err != nil {
-		logp.L().Info("could not start monitor: %v", err)
+		logp.L().Infof("could not start monitor: %v", err)
 		return
 	}
 
 	t.cancelFn, err = t.monitor.addTask(t.config.Schedule, t.monitor.stdFields.ID, t.makeSchedulerTaskFunc(), t.config.Type)
 	if err != nil {
-		logp.L().Info("could not start monitor: %v", err)
+		logp.L().Infof("could not start monitor: %v", err)
 	}
 }
 
@@ -107,7 +107,7 @@ func runPublishJob(job jobs.Job, pubClient beat.Client) []scheduler.TaskFunc {
 
 	conts, err := job(event)
 	if err != nil {
-		logp.L().Info("Job failed with: %s", err)
+		logp.L().Infof("Job failed with: %s", err)
 	}
 
 	hasContinuations := len(conts) > 0

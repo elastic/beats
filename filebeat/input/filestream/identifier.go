@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
-	"github.com/elastic/beats/v7/libbeat/common/file"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -114,7 +113,7 @@ func (i *inodeDeviceIdentifier) GetSource(e loginp.FSEvent) fileSource {
 		oldPath:             e.OldPath,
 		truncated:           e.Op == loginp.OpTruncate,
 		archived:            e.Op == loginp.OpArchived,
-		fileID:              i.name + identitySep + file.GetOSState(e.Descriptor.Info).String(),
+		fileID:              i.name + identitySep + e.Descriptor.Info.GetOSState().String(),
 		identifierGenerator: i.name,
 	}
 }
