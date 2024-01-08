@@ -243,6 +243,8 @@ func startWatcher(
 	return false, nil
 }
 
+// addToWhichAreUsing adds resource identified by usingName to the list of resources using the watcher
+// identified by resourceName
 func addToWhichAreUsing(resourceName string, usingName string, resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
@@ -263,9 +265,9 @@ func addToWhichAreUsing(resourceName string, usingName string, resourceWatchers 
 	}
 }
 
-// removeToWhichAreUsing returns true if element was removed and new size of array.
+// removeFromWhichAreUsing returns true if element was removed and new size of array.
 // The cache should be locked when called.
-func removeToWhichAreUsing(resourceName string, notUsingName string, resourceWatchers *Watchers) (bool, int) {
+func removeFromWhichAreUsing(resourceName string, notUsingName string, resourceWatchers *Watchers) (bool, int) {
 	data, ok := resourceWatchers.watchersMap[resourceName]
 	removed := false
 	if ok {
@@ -793,7 +795,7 @@ func (e *enricher) Stop(resourceWatchers *Watchers) {
 
 	resourceWatcher := resourceWatchers.watchersMap[e.resourceName]
 	if resourceWatcher != nil && resourceWatcher.watcher != nil && resourceWatcher.whichAreUsing != nil && resourceWatcher.started {
-		_, size := removeToWhichAreUsing(e.resourceName, e.resourceName, resourceWatchers)
+		_, size := removeFromWhichAreUsing(e.resourceName, e.resourceName, resourceWatchers)
 		if size == 0 {
 			resourceWatcher.watcher.Stop()
 			resourceWatcher.started = false
@@ -804,7 +806,7 @@ func (e *enricher) Stop(resourceWatchers *Watchers) {
 	for _, extra := range extras {
 		extraWatcher := resourceWatchers.watchersMap[extra]
 		if extraWatcher != nil && extraWatcher.watcher != nil && extraWatcher.whichAreUsing != nil && extraWatcher.started {
-			_, size := removeToWhichAreUsing(extra, e.resourceName, resourceWatchers)
+			_, size := removeFromWhichAreUsing(extra, e.resourceName, resourceWatchers)
 			if size == 0 {
 				extraWatcher.watcher.Stop()
 				extraWatcher.started = false

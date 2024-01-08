@@ -168,15 +168,15 @@ func TestRemoveToWhichAreUsing(t *testing.T) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
 
-	removed, size := removeToWhichAreUsing(DeploymentResource, DeploymentResource, resourceWatchers)
+	removed, size := removeFromWhichAreUsing(DeploymentResource, DeploymentResource, resourceWatchers)
 	require.True(t, removed)
 	require.Equal(t, 1, size)
 
-	removed, size = removeToWhichAreUsing(DeploymentResource, DeploymentResource, resourceWatchers)
+	removed, size = removeFromWhichAreUsing(DeploymentResource, DeploymentResource, resourceWatchers)
 	require.False(t, removed)
 	require.Equal(t, 1, size)
 
-	removed, size = removeToWhichAreUsing(DeploymentResource, PodResource, resourceWatchers)
+	removed, size = removeFromWhichAreUsing(DeploymentResource, PodResource, resourceWatchers)
 	require.True(t, removed)
 	require.Equal(t, 0, size)
 }
