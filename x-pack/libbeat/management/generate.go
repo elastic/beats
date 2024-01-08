@@ -11,6 +11,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -166,7 +167,7 @@ func CreateReloadConfigFromInputs(raw []map[string]interface{}) ([]*reload.Confi
 // config injection
 // ===========
 
-// convinence method for wrapping all the stream transformations needed by the shipper and other inputs
+// convenience method for wrapping all the stream transformations needed by the shipper and other inputs
 func createStreamRules(raw *proto.UnitExpectedConfig, streamSource map[string]interface{}, stream *proto.Stream, defaultDataStreamType string, agentInfo *client.AgentInfo, defaultProcessors ...mapstr.M) (map[string]interface{}, error) {
 
 	streamSource = injectIndexStream(defaultDataStreamType, raw, stream, streamSource)
@@ -208,6 +209,9 @@ func injectAgentInfoRule(inputs map[string]interface{}, agentInfo *client.AgentI
 		return inputs, nil
 	}
 	var processors []interface{}
+
+	logp.NewLogger("anderson").Infow("injectAgentInfoRule agentInfo",
+		"agent_info", *agentInfo)
 
 	processors = append(processors, generateAddFieldsProcessor(
 		mapstr.M{"id": agentInfo.ID, "snapshot": agentInfo.Snapshot, "version": agentInfo.Version},

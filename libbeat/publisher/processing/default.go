@@ -118,7 +118,6 @@ func MakeDefaultSupport(
 		if fleetmode.Enabled() && !beatCfg.HasField("processors") {
 			log.Debugf("In fleet mode with no processors specified, defaulting to global processors")
 			rawProcessors = fleetDefaultProcessors
-
 		} else {
 			rawProcessors = cfg.Processors
 		}

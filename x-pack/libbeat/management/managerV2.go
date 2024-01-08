@@ -161,8 +161,17 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 		}
 	}
 
+	connInfo, err := client.NewV2ConnInfoFromReader(os.Stdin)
+	if err != nil {
+		return nil, fmt.Errorf("faile dreading connection information from stdin: %w", err)
+	}
+
+	ver := version.GetDefaultVersion()
+	if connInfo.PackageVersion != "" {
+		ver = connInfo.PackageVersion
+	}
+
 	var agentClient client.V2
-	var err error
 	if c.InsecureGRPCURLForTesting != "" && c.Enabled {
 		// Insecure for testing Elastic-Agent-Client initialisation
 		logger.Info("Using INSECURE GRPC connection, this should be only used for testing!")
@@ -170,13 +179,13 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 			"", // Insecure connection for test, no token needed
 			client.VersionInfo{
 				Name:    "beat-v2-client-for-testing",
-				Version: version.GetDefaultVersion(),
+				Version: ver,
 			}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 	} else {
 		// Normal Elastic-Agent-Client initialisation
-		agentClient, _, err = client.NewV2FromReader(os.Stdin, client.VersionInfo{
+		agentClient, _, err = client.NewV2FromReader(connInfo, client.VersionInfo{
 			Name:    "beat-v2-client",
-			Version: version.GetDefaultVersion(),
+			Version: ver,
 			Meta: map[string]string{
 				"commit":     version.Commit(),
 				"build_time": version.BuildTime().String(),
@@ -231,6 +240,10 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 // Beats central management interface implementation
 // ================================
 
+func (cm *BeatV2Manager) PackageVersion() string {
+	return cm.client.PackageVersion()
+}
+
 // RegisterDiagnosticHook will register a diagnostic callback function when elastic-agent asks for a diagnostics dump
 func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook) {
 	cm.client.RegisterDiagnosticHook(name, description, filename, contentType, hook)
@@ -273,6 +286,7 @@ func (cm *BeatV2Manager) Start() error {
 	if err != nil {
 		return fmt.Errorf("error starting connection to client")
 	}
+
 	ctx, canceller := context.WithCancel(ctx)
 	cm.errCanceller = canceller
 	go cm.watchErrChan(ctx)

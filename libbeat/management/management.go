@@ -82,8 +82,13 @@ type Manager interface {
 	//
 	// Calls to 'CheckRawConfig()' or 'SetPayload()' will be ignored after calling stop.
 	//
-	// Note: Stop will not call 'UnregisterAction()' automaticallty.
+	// Note: Stop will not call 'UnregisterAction()' automatically.
 	Stop()
+
+	// PackageVersion returns the version of the agent package that should be
+	// presented in user visible fields and messages. If it's empty, the beat
+	// version should be used.
+	PackageVersion() string
 
 	// SetStopCallback accepts a function that need to be called when the manager want to shutdown the
 	// beats. This is needed when you want your beats to be gracefully shutdown remotely by the Elastic Agent
@@ -190,6 +195,7 @@ func (n *fallbackManager) Stop() {
 // but that does not mean the Beat is being managed externally,
 // hence it will always return false.
 func (n *fallbackManager) Enabled() bool                         { return false }
+func (n *fallbackManager) PackageVersion() string                { return "" }
 func (n *fallbackManager) Start() error                          { return nil }
 func (n *fallbackManager) CheckRawConfig(cfg *config.C) error    { return nil }
 func (n *fallbackManager) RegisterAction(action client.Action)   {}

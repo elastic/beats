@@ -224,6 +224,8 @@ func Run(settings Settings, bt beat.Creator) error {
 
 // NewInitializedBeat creates a new beat where all information and initialization is derived from settings
 func NewInitializedBeat(settings Settings) (*Beat, error) {
+	// anderson: could we read os.Stdin here? then we could parse the version
+	// and propagate it
 	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed)
 	if err != nil {
 		return nil, err
@@ -838,6 +840,13 @@ func (b *Beat) configure(settings Settings) error {
 	b.Manager, err = management.NewManager(b.Config.Management, reload.RegisterV2)
 	if err != nil {
 		return err
+	}
+
+	// The manager initialisation reads the package version sent by the agent,
+	// now the manager is initialised, we apply the package version if the agent
+	// sent it.
+	if b.Manager.PackageVersion() != "" {
+		b.Info.Version = b.Manager.PackageVersion()
 	}
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
@@ -1518,13 +1527,13 @@ func (bc *beatConfig) Validate() error {
 		if bc.Pipeline.Queue.IsSet() && outputPC.Queue.IsSet() {
 			return fmt.Errorf("top level queue and output level queue settings defined, only one is allowed")
 		}
-		//elastic-agent doesn't support disk queue yet
+		// elastic-agent doesn't support disk queue yet
 		if bc.Management.Enabled() && outputPC.Queue.Config().Enabled() && outputPC.Queue.Name() == diskqueue.QueueType {
 			return fmt.Errorf("disk queue is not supported when management is enabled")
 		}
 	}
 
-	//elastic-agent doesn't support disk queue yet
+	// elastic-agent doesn't support disk queue yet
 	if bc.Management.Enabled() && bc.Pipeline.Queue.Config().Enabled() && bc.Pipeline.Queue.Name() == diskqueue.QueueType {
 		return fmt.Errorf("disk queue is not supported when management is enabled")
 	}
