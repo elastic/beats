@@ -6,102 +6,6 @@
         "containerd": {
             "cpu": {
                 "usage": {
-                    "cpu": {
-                        "4": {
-                            "ns": 105731762224
-                        }
-                    },
-                    "percpu": {}
-                }
-            },
-            "namespace": "k8s.io"
-        },
-        "event": {
-            "dataset": "containerd.cpu",
-            "duration": 115000,
-            "module": "containerd"
-        },
-        "metricset": {
-            "name": "cpu",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "containerd"
-        }
-    },
-    {
-        "container": {
-            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-        },
-        "containerd": {
-            "cpu": {
-                "usage": {
-                    "cpu": {
-                        "3": {
-                            "ns": 101195506344
-                        }
-                    },
-                    "percpu": {}
-                }
-            },
-            "namespace": "k8s.io"
-        },
-        "event": {
-            "dataset": "containerd.cpu",
-            "duration": 115000,
-            "module": "containerd"
-        },
-        "metricset": {
-            "name": "cpu",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "containerd"
-        }
-    },
-    {
-        "container": {
-            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-        },
-        "containerd": {
-            "cpu": {
-                "usage": {
-                    "cpu": {
-                        "0": {
-                            "ns": 99137817570
-                        }
-                    },
-                    "percpu": {}
-                }
-            },
-            "namespace": "k8s.io"
-        },
-        "event": {
-            "dataset": "containerd.cpu",
-            "duration": 115000,
-            "module": "containerd"
-        },
-        "metricset": {
-            "name": "cpu",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "containerd"
-        }
-    },
-    {
-        "container": {
-            "cpu": {
-                "usage": 0
-            },
-            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-        },
-        "containerd": {
-            "cpu": {
-                "usage": {
                     "kernel": {
                         "ns": 532180000000,
                         "pct": 0
@@ -113,283 +17,43 @@
                     "user": {
                         "ns": 525470000000,
                         "pct": 0
-                    }
-                }
-            },
-            "namespace": "k8s.io"
-        },
-        "event": {
-            "dataset": "containerd.cpu",
-            "duration": 115000,
-            "module": "containerd"
-        },
-        "metricset": {
-            "name": "cpu",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "containerd"
-        }
-    },
-    {
-        "container": {
-            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-        },
-        "containerd": {
-            "cpu": {
-                "usage": {
-                    "cpu": {
-                        "9": {
-                            "ns": 102272190459
-                        }
                     },
-                    "percpu": {}
-                }
-            },
-            "namespace": "k8s.io"
-        },
-        "event": {
-            "dataset": "containerd.cpu",
-            "duration": 115000,
-            "module": "containerd"
-        },
-        "metricset": {
-            "name": "cpu",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "containerd"
-        }
-    },
-    {
-        "container": {
-            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-        },
-        "containerd": {
-            "cpu": {
-                "usage": {
                     "cpu": {
-                        "2": {
-                            "ns": 105305653633
-                        }
-                    },
-                    "percpu": {}
-                }
-            },
-            "namespace": "k8s.io"
-        },
-        "event": {
-            "dataset": "containerd.cpu",
-            "duration": 115000,
-            "module": "containerd"
-        },
-        "metricset": {
-            "name": "cpu",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "containerd"
-        }
-    },
-    {
-        "container": {
-            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-        },
-        "containerd": {
-            "cpu": {
-                "usage": {
-                    "cpu": {
-                        "8": {
-                            "ns": 104266711568
-                        }
-                    },
-                    "percpu": {}
-                }
-            },
-            "namespace": "k8s.io"
-        },
-        "event": {
-            "dataset": "containerd.cpu",
-            "duration": 115000,
-            "module": "containerd"
-        },
-        "metricset": {
-            "name": "cpu",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "containerd"
-        }
-    },
-    {
-        "container": {
-            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-        },
-        "containerd": {
-            "cpu": {
-                "usage": {
-                    "cpu": {
-                        "7": {
-                            "ns": 97134782770
-                        }
-                    },
-                    "percpu": {}
-                }
-            },
-            "namespace": "k8s.io"
-        },
-        "event": {
-            "dataset": "containerd.cpu",
-            "duration": 115000,
-            "module": "containerd"
-        },
-        "metricset": {
-            "name": "cpu",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "containerd"
-        }
-    },
-    {
-        "container": {
-            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-        },
-        "containerd": {
-            "cpu": {
-                "usage": {
-                    "cpu": {
-                        "5": {
-                            "ns": 98155683224
-                        }
-                    },
-                    "percpu": {}
-                }
-            },
-            "namespace": "k8s.io"
-        },
-        "event": {
-            "dataset": "containerd.cpu",
-            "duration": 115000,
-            "module": "containerd"
-        },
-        "metricset": {
-            "name": "cpu",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "containerd"
-        }
-    },
-    {
-        "container": {
-            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-        },
-        "containerd": {
-            "cpu": {
-                "usage": {
-                    "cpu": {
+                        "0": {
+                            "ns": 99137817570
+                        },
                         "1": {
                             "ns": 116475261138
-                        }
-                    },
-                    "percpu": {}
-                }
-            },
-            "namespace": "k8s.io"
-        },
-        "event": {
-            "dataset": "containerd.cpu",
-            "duration": 115000,
-            "module": "containerd"
-        },
-        "metricset": {
-            "name": "cpu",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "containerd"
-        }
-    },
-    {
-        "container": {
-            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-        },
-        "containerd": {
-            "cpu": {
-                "usage": {
-                    "cpu": {
-                        "10": {
-                            "ns": 106709905770
-                        }
-                    },
-                    "percpu": {}
-                }
-            },
-            "namespace": "k8s.io"
-        },
-        "event": {
-            "dataset": "containerd.cpu",
-            "duration": 115000,
-            "module": "containerd"
-        },
-        "metricset": {
-            "name": "cpu",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "containerd"
-        }
-    },
-    {
-        "container": {
-            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-        },
-        "containerd": {
-            "cpu": {
-                "usage": {
-                    "cpu": {
-                        "11": {
-                            "ns": 104878380370
-                        }
-                    },
-                    "percpu": {}
-                }
-            },
-            "namespace": "k8s.io"
-        },
-        "event": {
-            "dataset": "containerd.cpu",
-            "duration": 115000,
-            "module": "containerd"
-        },
-        "metricset": {
-            "name": "cpu",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "containerd"
-        }
-    },
-    {
-        "container": {
-            "id": "7434687dbe3684407afa899582f2909203b9dc5537632b512f76798db5c0787d"
-        },
-        "containerd": {
-            "cpu": {
-                "usage": {
-                    "cpu": {
+                        },
+                        "2": {
+                            "ns": 105305653633
+                        },
+                        "3": {
+                            "ns": 101195506344
+                        },
+                        "4": {
+                            "ns": 105731762224
+                        },
+                        "5": {
+                            "ns": 98155683224
+                        },
                         "6": {
                             "ns": 95075348914
+                        },
+                        "7": {
+                            "ns": 97134782770
+                        },
+                        "8": {
+                            "ns": 104266711568
+                        },
+                        "9": {
+                            "ns": 102272190459
+                        },
+                        "10": {
+                            "ns": 106709905770
+                        },
+                        "11": {
+                            "ns": 104878380370
                         }
                     },
                     "percpu": {}

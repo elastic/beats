@@ -238,6 +238,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add GCP CloudSQL metadata {pull}33066[33066]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
+- Fix containerd metrics grouping for TSDB {pull}37537[37537]
 - Add metrics grouping by dimensions and time to Azure app insights {pull}36634[36634]
 - Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms {pull}36647[36647]
 - Enhance GCP billing with detailed tables identification, additional fields, and optimized data handling. {pull}36902[36902]
