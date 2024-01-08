@@ -2,12 +2,6 @@
 run:
   # timeout for analysis, e.g. 30s, 5m, default is 1m
   timeout: 15m
-<<<<<<< HEAD
-=======
-  build-tags:
-    - synthetics
-    - integration
->>>>>>> d1b32774ae (Update to Go 1.21.5 (#37550))
 
 issues:
   # Maximum count of issues with the same text.
