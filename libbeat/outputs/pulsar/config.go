@@ -230,7 +230,6 @@ func (c *producer) parseBatchBuilderType() pulsar.BatcherBuilderType {
 	case KeyBasedBatchBuilder:
 		return pulsar.KeyBasedBatchBuilder
 	default:
-		fmt.Printf("unsupported batcher builder type: %s", c.BatcherBuilderType)
 		return pulsar.DefaultBatchBuilder
 	}
 }
@@ -253,7 +252,6 @@ func (c *producer) parseCompressionType() pulsar.CompressionType {
 	case ZStd:
 		return pulsar.ZSTD
 	default:
-		fmt.Printf("unsupported compression type: %s", c.CompressionType)
 		return pulsar.NoCompression
 	}
 }
@@ -273,7 +271,6 @@ func (c *producer) parseCompressionLevel() pulsar.CompressionLevel {
 	case Better:
 		return pulsar.Better
 	default:
-		fmt.Printf("unsupported compression level: %s", c.CompressionLevel)
 		return pulsar.Default
 	}
 }
@@ -290,7 +287,6 @@ func (c *producer) parseHashingScheme() pulsar.HashingScheme {
 	case Murmur3_32Hash:
 		return pulsar.Murmur3_32Hash
 	default:
-		fmt.Printf("unsupported hashing scheme: %s", c.HashingScheme)
 		return pulsar.JavaStringHash
 	}
 }
