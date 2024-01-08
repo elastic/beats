@@ -775,11 +775,11 @@ output.elasticsearch:
 ------------------------------------------------------------------------------
 
 Performance presets apply a set of configuration overrides based on a desired performance goal. If set, a performance preset will override other configuration flags to match the recommended settings for that preset. Valid options are:
-* `balanced` (good starting point for general efficiency)
-* `throughput` (good for high data volumes, may increase cpu and memory requirements)
-* `scale` (reduces ambient resource use in large low-throughput deployments)
-* `latency` (minimize the time for fresh data to become visible in Elasticsearch)
-* `custom` (apply user configuration directly with no overrides)
+* `balanced`: good starting point for general efficiency
+* `throughput`: good for high data volumes, may increase cpu and memory requirements
+* `scale`: reduces ambient resource use in large low-throughput deployments
+* `latency`: minimize the time for fresh data to become visible in Elasticsearch
+* `custom`: apply user configuration directly with no overrides
 
 The default if unspecified is `custom`.
 
