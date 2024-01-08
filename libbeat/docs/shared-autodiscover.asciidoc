@@ -203,10 +203,10 @@ Example:
   Different Beats that refer to the same leader lease will be competitors in holding the lease
   and only one will be elected as leader each time.
 
-The configuration of templates and conditions is similar to that of the Docker provider. Configuration templates can
-contain variables from the autodiscover event. They can be accessed under data namespace.
+Configuration templates can contain variables from the autodiscover event. These variables can be accessed under the `data`
+namespace, e.g. to access Pod IP: `${data.kubernetes.pod.ip}`.
 
-These are the fields available within config templating. The `kubernetes.*` fields will be available on each emitted event.
+These are the fields available within config templating. The `kubernetes.*` fields will be available on each emitted event:
 
 [float]
 ====== Generic fields:
@@ -221,18 +221,22 @@ These are the fields available within config templating. The `kubernetes.*` fiel
   * kubernetes.container.image
   * kubernetes.container.name
   * kubernetes.namespace
+  * kubernetes.namespace_uid
   * kubernetes.node.name
   * kubernetes.pod.name
   * kubernetes.pod.uid
+  * kubernetes.pod.ip
 
 [float]
 ====== Node specific:
   * kubernetes.node.name
   * kubernetes.node.uid
+  * kubernetes.node.labels
 
 [float]
 ====== Service specific:
   * kubernetes.namespace
+  * kubernetes.namespace_uid
   * kubernetes.service.name
   * kubernetes.service.uid
   * kubernetes.annotations
