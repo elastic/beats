@@ -356,9 +356,7 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	event.Fields.DeepUpdate(kubeMeta)
 
 	if k.fieldAdder.addFieldProcessor != nil {
-		//k.log.Info("kvalliy: adding field %s", k.fieldAdder.addFieldProcessor.String())
 		event, err = k.fieldAdder.addFieldProcessor.Run(event)
-		//k.log.Info("kvalliy: event fields are %v", event.Fields)
 		return event, err
 	}
 
