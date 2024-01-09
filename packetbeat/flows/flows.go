@@ -32,9 +32,8 @@ type Reporter func([]beat.Event)
 var debugf = logp.MakeDebug("flows")
 
 const (
-	defaultTimeout       = 30 * time.Second
-	defaultPeriod        = 10 * time.Second
-	defaultKillFlowAfter = 3600 * time.Second
+	defaultTimeout = 30 * time.Second
+	defaultPeriod  = 10 * time.Second
 )
 
 // Flows holds and publishes network flow information for running processes.

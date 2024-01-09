@@ -34,9 +34,8 @@ import (
 )
 
 var (
-	ErrInvalidTimeout       = errors.New("timeout must be >= 1s")
-	ErrInvalidPeriod        = errors.New("report period must be -1 or >= 1s")
-	ErrInvalidKillFlowAfter = errors.New("Kill flow after must be >= 1s")
+	ErrInvalidTimeout = errors.New("timeout must be >= 1s")
+	ErrInvalidPeriod  = errors.New("report period must be -1 or >= 1s")
 )
 
 // worker is a generic asynchronous function processor.
@@ -137,23 +136,21 @@ func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMe
 		return nil, ErrInvalidPeriod
 	}
 
-	// 30s period is 10s and kill flow is 3600s
-	tick := timeout // 30s
+	tick := timeout
 	ticksTimeout := 1
 	ticksPeriod := -1
-	killTimeout := 1
-	if period > 0 { // 10s
-		tick = gcd(timeout, period) //10
+	if period > 0 {
+		tick = gcd(timeout, period)
 		if tick < time.Second {
 			tick = time.Second
 		}
 
-		ticksTimeout = int(timeout / tick) // 3
+		ticksTimeout = int(timeout / tick)
 		if ticksTimeout == 0 {
 			ticksTimeout = 1
 		}
 
-		ticksPeriod = int(period / tick) // 1
+		ticksPeriod = int(period / tick)
 		if ticksPeriod == 0 {
 			ticksPeriod = 1
 		}
@@ -172,7 +169,7 @@ func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMe
 	}
 	processor.spool.init(pub, defaultBatchSize)
 
-	return makeWorker(processor, tick, ticksTimeout, ticksPeriod, killTimeout, 10)
+	return makeWorker(processor, tick, ticksTimeout, ticksPeriod, 10)
 }
 
 // gcd returns the greatest common divisor of a and b.
@@ -186,15 +183,9 @@ func gcd(a, b time.Duration) time.Duration {
 // makeWorker returns a worker that runs processor.execute each tick. Each timeout'th tick,
 // the worker will check flow timeouts and each period'th tick, the worker will report flow
 // events to be published.
-func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period, killFlowAfter int, align int64) (*worker, error) {
+func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period int, align int64) (*worker, error) {
 	return newWorker(func(w *worker) {
 		defer processor.execute(w, false, true, true, false)
-
-		/*
-			tick: 10
-			timeout: 3
-			period: 1
-		*/
 
 		if align > 0 {
 			// Wait until the current time rounded up to nearest align seconds.
