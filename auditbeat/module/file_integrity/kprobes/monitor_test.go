@@ -7,6 +7,8 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/sys/unix"
+	"os"
+	"runtime"
 	"testing"
 	"time"
 )
@@ -440,5 +442,29 @@ func (p *monitorTestSuite) TestRunEmitError() {
 		p.Fail("timeout on waiting err from monitor")
 	}
 
+	p.Require().NoError(m.Close())
+}
+
+func (p *monitorTestSuite) TestNew() {
+
+	if runtime.GOARCH != "amd64" && runtime.GOARCH != "arm64" {
+		p.T().Skip("skipping on non-amd64/arm64")
+		return
+	}
+
+	if runtime.GOOS != "linux" {
+		p.T().Skip("skipping on non-linux")
+		return
+	}
+
+	if os.Getuid() != 0 {
+		p.T().Skip("skipping as non-root")
+		return
+	}
+
+	m, err := New(true)
+	p.Require().NoError(err)
+
+	p.Require().NoError(m.Start())
 	p.Require().NoError(m.Close())
 }
