@@ -862,16 +862,19 @@ Then, Metricbeat can be launched.
 The following two types of host configurations are supported:
 
 1. DSN host configuration as URL:
-    a. `hosts: ["user/pass@0.0.0.0:1521/ORCLPDB1.localdomain"]`
-    b. `hosts: ["user/password@0.0.0.0:1521/ORCLPDB1.localdomain as sysdba"]`
+    a. `hosts: ["oracle://user:pass@0.0.0.0:1521/ORCLPDB1.localdomain?sysdba=1"]`
+    b. `hosts: ["user/pass@0.0.0.0:1521/ORCLPDB1.localdomain"]`
+    c. `hosts: ["user/password@0.0.0.0:1521/ORCLPDB1.localdomain as sysdba"]`
 
 2. DSN host configuration:
     a. `hosts: ['user="user" password="pass" connectString="0.0.0.0:1521/ORCLPDB1.localdomain"']`
     b. `hosts: ['user="user" password="password" connectString="host:port/service_name" sysdba=true']`
 
-Note: If the password contains the backslash (`\`) character, it must be escaped with a backslash. For example, if the password is `my\_password`, it should be written as `my\\_password`.
+In a URL any special characters should be URL encoded.
 
-The username and password to connect to the database can be provided as values to `username` and `password` keys of `sql.yml`. 
+In the key/value DSN format, if the password contains the backslash (`\`) character, it must be escaped with a backslash. For example, if the password is `my\_password`, it should be written as `my\\_password`.
+
+The username and password to connect to the database can be provided as values to `username` and `password` keys of `sql.yml`.
 
 [source,yml]
 ----
