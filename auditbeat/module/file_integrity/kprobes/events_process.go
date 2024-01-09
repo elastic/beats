@@ -12,10 +12,6 @@ type Emitter interface {
 	Emit(ePath string, pid uint32, op uint32) error
 }
 
-type eventProcessor interface {
-	process(ctx context.Context, pe *ProbeEvent) error
-}
-
 type eProcessor struct {
 	p           pathTraverser
 	e           Emitter

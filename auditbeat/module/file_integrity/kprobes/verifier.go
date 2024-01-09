@@ -62,6 +62,7 @@ func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.
 		return probes, fExec, nil
 	}
 
+	fExec.Close()
 	return nil, nil, errors.Join(allErr, errors.New("could not validate probes"))
 }
 
@@ -118,11 +119,6 @@ func loadEmbeddedSpecs() ([]*tkbtf.Spec, error) {
 }
 
 func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing.AllocateFn, timeout time.Duration) error {
-	tfs, err := tracing.NewTraceFS()
-	if err != nil {
-		return err
-	}
-
 	basePath, err := os.MkdirTemp("", "verifier")
 	if err != nil {
 		return err
@@ -132,122 +128,85 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 		_ = os.RemoveAll(basePath)
 	}()
 
-	p, err := newPathMonitor(ctx, exec, 0, true)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		_ = p.Close()
-	}()
-
-	// create a perf channel that monitors events only for this tid
-	channel, err := tracing.NewPerfChannel(
-		tracing.WithTimestamp(),
-		tracing.WithRingSizeExponent(4),
-		tracing.WithBufferSize(512),
-		tracing.WithTID(exec.GetTID()),
-		tracing.WithPollTimeout(100*time.Millisecond),
-	)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		_ = channel.Close()
-		for probe := range probes {
-			_ = tfs.RemoveKProbe(probe)
-		}
-	}()
-
-	// install probes through tracefs and add them to the perf channel
-	for tracingProbe, allocFunc := range probes {
-		if err := tfs.AddKProbe(tracingProbe); err != nil {
-			return err
-		}
-
-		desc, err := tfs.LoadProbeFormat(tracingProbe)
-		if err != nil {
-			return err
-		}
-
-		decoder, err := tracing.NewStructDecoder(desc, allocFunc)
-		if err != nil {
-			return err
-		}
-
-		if err := channel.MonitorProbe(desc, decoder); err != nil {
-			return err
-		}
-	}
-
-	// start the perf channel
-	if err := channel.Run(); err != nil {
-		return err
-	}
-
 	verifier, err := newEventsVerifier(basePath)
 	if err != nil {
 		return err
 	}
 
-	eProc := newEventProcessor(p, verifier, true)
+	pChannel, err := newPerfChannel(probes, 4, 512, exec.GetTID())
+	if err != nil {
+		return err
+	}
+
+	m, err := newMonitor(ctx, true, pChannel, exec)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		_ = m.Close()
+	}()
+
+	// start the monitor
+	if err := m.Start(); err != nil {
+		return err
+	}
+
+	// spaw goroutine to send events to verifier to be verified
+	cancel := make(chan struct{})
+	defer close(cancel)
 
 	retC := make(chan error)
+
 	go func() {
 		defer close(retC)
 		for {
 			select {
-			case <-channel.LostC():
-				retC <- errors.New("event loss in perf channel")
+			case runErr := <-m.ErrorChannel():
+				retC <- runErr
 				return
 
-			case err := <-channel.ErrC():
-				retC <- err
-				return
-
-			case err := <-p.ErrC():
-				retC <- err
-				return
-
-			case e, ok := <-channel.C():
+			case ev, ok := <-m.EventChannel():
 				if !ok {
-					err = errors.New("perf channel closed unexpectedly")
+					retC <- errors.New("monitor closed unexpectedly")
 					return
 				}
 
-				switch eWithType := e.(type) {
-				case *ProbeEvent:
-					if err := eProc.process(ctx, eWithType); err != nil {
-						retC <- err
-						return
-					}
-					continue
-				default:
-					retC <- errors.New("unexpected event type")
+				if err := verifier.validateEvent(ev.Path, ev.PID, ev.Op); err != nil {
+					retC <- err
 					return
 				}
+				continue
 			case <-time.After(timeout):
+				return
+			case <-cancel:
 				return
 			}
 		}
 	}()
 
-	if err := p.AddPathToMonitor(ctx, basePath); err != nil {
+	// add verify base path to monitor
+	if err := m.Add(basePath); err != nil {
 		return err
 	}
 
+	// invoke verifier event generation from our executor
 	if err := exec.Run(verifier.GenerateEvents); err != nil {
 		return err
 	}
 
+	// wait for either no new events arriving for timeout duration or
+	// ctx to be cancelled
 	select {
 	case err = <-retC:
 		if err != nil {
 			return err
 		}
+	case <-ctx.Done():
+		return ctx.Err()
 	}
 
+	// check that all events have been verified
 	if err := verifier.Verified(); err != nil {
 		return err
 	}

@@ -190,7 +190,7 @@ func newEventsVerifier(basePath string) (*eventsVerifier, error) {
 	}, nil
 }
 
-func (e *eventsVerifier) Emit(path string, _ uint32, op uint32) error {
+func (e *eventsVerifier) validateEvent(path string, _ uint32, op uint32) error {
 	e.Lock()
 	defer e.Unlock()
 

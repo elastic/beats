@@ -144,7 +144,7 @@ func Test_EventsVerifier(t *testing.T) {
 			}
 
 			for _, ev := range c.emittedEvents {
-				require.ErrorIs(t, e.Emit(ev.path, 0, ev.op), c.emitErr)
+				require.ErrorIs(t, e.validateEvent(ev.path, 0, ev.op), c.emitErr)
 				if c.emitErr != nil {
 					return
 				}

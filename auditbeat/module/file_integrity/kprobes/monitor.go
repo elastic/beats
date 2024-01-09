@@ -4,11 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync/atomic"
 	"time"
 
-	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/kprobes/tracing"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/pkoutsovasilis/go-perf"
+	"github.com/elastic/go-perf"
 )
 
 type MonitorEvent struct {
@@ -17,125 +17,116 @@ type MonitorEvent struct {
 	Op   uint32
 }
 
-type Monitor struct {
-	eventC      chan MonitorEvent
-	pathMonitor pathTraverser
-	perfChannel *tracing.PerfChannel
-	addC        chan string
-	errC        chan error
-	eProc       eventProcessor
-	log         *logp.Logger
-	ctx         context.Context
-	cancelFn    context.CancelFunc
-	isRecursive bool
+type monitorEmitter struct {
+	ctx    context.Context
+	eventC chan<- MonitorEvent
 }
 
-func New(isRecursive bool) (*Monitor, error) {
-
-	tfs, err := tracing.NewTraceFS()
-	if err != nil {
-		return nil, err
+func newMonitorEmitter(ctx context.Context, eventC chan MonitorEvent) *monitorEmitter {
+	return &monitorEmitter{
+		ctx:    ctx,
+		eventC: eventC,
 	}
-
-	if err := tfs.RemoveAllKProbes(); err != nil {
-		return nil, err
-	}
-
-	mCtx, cancelFn := context.WithCancel(context.TODO())
-
-	validatedProbes, exec, err := getVerifiedProbes(mCtx, 5*time.Second)
-	if err != nil {
-		cancelFn()
-		return nil, err
-	}
-
-	p, err := newPathMonitor(mCtx, exec, 0, isRecursive)
-	if err != nil {
-		cancelFn()
-		return nil, err
-	}
-
-	channel, err := tracing.NewPerfChannel(
-		tracing.WithTimestamp(),
-		tracing.WithRingSizeExponent(10),
-		tracing.WithBufferSize(4096),
-		tracing.WithTID(perf.AllThreads),
-		tracing.WithPollTimeout(100*time.Millisecond),
-	)
-	if err != nil {
-		cancelFn()
-		return nil, err
-	}
-
-	for probe, allocFn := range validatedProbes {
-		err := tfs.AddKProbe(probe)
-		if err != nil {
-			cancelFn()
-			return nil, err
-		}
-		desc, err := tfs.LoadProbeFormat(probe)
-		if err != nil {
-			cancelFn()
-			return nil, err
-		}
-
-		decoder, err := tracing.NewStructDecoder(desc, allocFn)
-		if err != nil {
-			cancelFn()
-			return nil, err
-		}
-
-		if err := channel.MonitorProbe(desc, decoder); err != nil {
-			cancelFn()
-			return nil, err
-		}
-	}
-
-	monitor := &Monitor{
-		eventC:      make(chan MonitorEvent, 1),
-		pathMonitor: p,
-		perfChannel: channel,
-		addC:        make(chan string),
-		errC:        make(chan error),
-		log:         logp.NewLogger("file_integrity"),
-		ctx:         mCtx,
-		cancelFn:    cancelFn,
-		isRecursive: isRecursive,
-	}
-
-	monitor.eProc = newEventProcessor(monitor.pathMonitor, monitor, monitor.isRecursive)
-	return monitor, nil
 }
 
-func (w *Monitor) Emit(ePath string, TID uint32, op uint32) error {
+func (m *monitorEmitter) Emit(ePath string, pid uint32, op uint32) error {
 	select {
-	case <-w.ctx.Done():
-		return w.ctx.Err()
+	case <-m.ctx.Done():
+		return m.ctx.Err()
 
-	case w.eventC <- MonitorEvent{
+	case m.eventC <- MonitorEvent{
 		Path: ePath,
-		PID:  TID,
+		PID:  pid,
 		Op:   op,
 	}:
 		return nil
 	}
 }
 
+type Monitor struct {
+	eventC      chan MonitorEvent
+	pathMonitor *pTraverser
+	perfChannel perfChannel
+	errC        chan error
+	eProc       *eProcessor
+	log         *logp.Logger
+	ctx         context.Context
+	cancelFn    context.CancelFunc
+	running     uint32
+	isRecursive bool
+	closeErr    error
+}
+
+func New(isRecursive bool) (*Monitor, error) {
+	ctx := context.TODO()
+
+	validatedProbes, exec, err := getVerifiedProbes(ctx, 5*time.Second)
+	if err != nil {
+		return nil, err
+	}
+
+	pChannel, err := newPerfChannel(validatedProbes, 10, 4096, perf.AllThreads)
+	if err != nil {
+		return nil, err
+	}
+
+	return newMonitor(ctx, isRecursive, pChannel, exec)
+}
+
+func newMonitor(ctx context.Context, isRecursive bool, pChannel perfChannel, exec executor) (*Monitor, error) {
+
+	mCtx, cancelFunc := context.WithCancel(ctx)
+
+	p, err := newPathMonitor(mCtx, exec, 0, isRecursive)
+	if err != nil {
+		cancelFunc()
+		return nil, err
+	}
+
+	eventChannel := make(chan MonitorEvent, 1)
+	eProc := newEventProcessor(p, newMonitorEmitter(mCtx, eventChannel), isRecursive)
+
+	return &Monitor{
+		eventC:      eventChannel,
+		pathMonitor: p,
+		perfChannel: pChannel,
+		errC:        make(chan error, 1),
+		eProc:       eProc,
+		log:         logp.NewLogger("file_integrity"),
+		ctx:         mCtx,
+		cancelFn:    cancelFunc,
+		isRecursive: isRecursive,
+		closeErr:    nil,
+	}, nil
+}
+
 func (w *Monitor) Add(path string) error {
-	if w.ctx.Err() != nil {
-		return w.ctx.Err()
+	switch atomic.LoadUint32(&w.running) {
+	case 0:
+		return errors.New("monitor not started")
+	case 2:
+		return errors.New("monitor is closed")
 	}
 
 	return w.pathMonitor.AddPathToMonitor(w.ctx, path)
 }
 
 func (w *Monitor) Close() error {
-	w.cancelFn()
+	if !atomic.CompareAndSwapUint32(&w.running, 1, 2) {
+		switch atomic.LoadUint32(&w.running) {
+		case 0:
+			// monitor hasn't started yet
+			atomic.StoreUint32(&w.running, 2)
+		default:
+			return nil
+		}
+	}
 
+	w.cancelFn()
 	var allErr error
 	allErr = errors.Join(allErr, w.pathMonitor.Close())
 	allErr = errors.Join(allErr, w.perfChannel.Close())
-	close(w.eventC)
+
 	return allErr
 }
 
@@ -155,6 +146,10 @@ func (w *Monitor) writeErr(err error) {
 }
 
 func (w *Monitor) Start() error {
+	if !atomic.CompareAndSwapUint32(&w.running, 0, 1) {
+		return errors.New("monitor already started")
+	}
+
 	if err := w.perfChannel.Run(); err != nil {
 		if closeErr := w.Close(); closeErr != nil {
 			w.log.Warnf("error at closing watcher: %v", closeErr)
@@ -164,6 +159,7 @@ func (w *Monitor) Start() error {
 
 	go func() {
 		defer func() {
+			close(w.eventC)
 			if closeErr := w.Close(); closeErr != nil {
 				w.log.Warnf("error at closing watcher: %v", closeErr)
 			}
