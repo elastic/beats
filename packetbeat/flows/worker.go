@@ -271,9 +271,9 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 			reportFlow := handleReports
 			isOver := lastReport
 			if checkTimeout {
-				if killFlow || ts.Sub(flow.ts) > fw.timeout {
+				if killFlow && ts.Sub(flow.createTS) > fw.timeout {
 					debugf("kill flow")
-					logp.Info("kvalliy: killing flows worker loop stopped flowid: %s, flow dir: %v killFlow: %v", string(flow.id.flowID), flow.dir, killFlow)
+					logp.Info("kvalliy: killing flows worker loop stopped flowid: %s, flow dir: %v killFlow: %v", common.NetString(flow.id.Serialize()), flow.dir, killFlow)
 
 					reportFlow = true
 					flow.kill() // mark flow as killed
