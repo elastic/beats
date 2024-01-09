@@ -2028,10 +2028,8 @@ func TestNamespacePodUpdater(t *testing.T) {
 						"beta.kubernetes.io/arch": "arm64",
 					},
 				}}
-			var deltaslice []runtime.Object
-			deltaslice = append(deltaslice, namespace)
-			deltaslice = append(deltaslice, namespace1)
-			watcher := &mockUpdaterWatcher{delta: deltaslice}
+
+			watcher := &mockUpdaterWatcher{oldobject: namespace}
 			updater := kubernetes.NewNamespacePodUpdater(handler.OnUpdate, store, watcher, &sync.Mutex{})
 
 			updater.OnUpdate(namespace1)
@@ -2096,10 +2094,7 @@ func TestNodePodUpdater(t *testing.T) {
 					},
 				}}
 
-			var deltaslice []runtime.Object
-			deltaslice = append(deltaslice, node)
-			deltaslice = append(deltaslice, node1)
-			watcher := &mockUpdaterWatcher{delta: deltaslice}
+			watcher := &mockUpdaterWatcher{oldobject: node}
 			updater := kubernetes.NewNodePodUpdater(handler.OnUpdate, store, watcher, &sync.Mutex{})
 
 			//This is when the update happens.
@@ -2123,11 +2118,11 @@ type mockUpdaterStore struct {
 }
 
 type mockUpdaterWatcher struct {
-	delta []runtime.Object
+	oldobject runtime.Object
 }
 
-func (s *mockUpdaterWatcher) Deltaobjects() []runtime.Object {
-	return s.delta
+func (s *mockUpdaterWatcher) Oldobject() runtime.Object {
+	return s.oldobject
 }
 
 func (s *mockUpdaterStore) List() []interface{} {
