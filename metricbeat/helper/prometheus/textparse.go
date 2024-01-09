@@ -18,6 +18,8 @@
 package prometheus
 
 import (
+	"errors"
+	"io"
 	"math"
 	"mime"
 	"net/http"
@@ -30,6 +32,8 @@ import (
 	"github.com/prometheus/prometheus/pkg/labels"
 	"github.com/prometheus/prometheus/pkg/textparse"
 	"github.com/prometheus/prometheus/pkg/timestamp"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -476,7 +480,7 @@ func histogramMetricName(name string, s float64, qv string, lbls string, t *int6
 	return name, metric
 }
 
-func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricFamily, error) {
+func ParseMetricFamilies(b []byte, contentType string, ts time.Time, logger *logp.Logger) ([]*MetricFamily, error) {
 	var (
 		parser               = textparse.New(b, contentType)
 		defTime              = timestamp.FromTime(ts)
@@ -495,8 +499,24 @@ func ParseMetricFamilies(b []byte, contentType string, ts time.Time) ([]*MetricF
 			e  exemplar.Exemplar
 		)
 		if et, err = parser.Next(); err != nil {
-			// TODO: log here
-			// if errors.Is(err, io.EOF) {}
+			if strings.HasPrefix(err.Error(), "invalid metric type") {
+				logger.Debugf("Ignored invalid metric type : %v ", err)
+
+				// NOTE: ignore any errors that are not EOF. This is to avoid breaking the parsing.
+				// if acceptHeader in the prometheus client is `Accept: text/plain; version=0.0.4` (like it is now)
+				// any `info` metrics are not supported, and then there will be ignored here.
+				// if acceptHeader in the prometheus client `Accept: application/openmetrics-text; version=0.0.1`
+				// any `info` metrics are supported, and then there will be parsed here.
+				continue
+			}
+
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			if strings.HasPrefix(err.Error(), "data does not end with # EOF") {
+				break
+			}
+			logger.Debugf("Error while parsing metrics: %v ", err)
 			break
 		}
 		switch et {

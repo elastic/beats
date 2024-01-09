@@ -32,6 +32,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Winlogbeat*
 
 - Add "event.category" and "event.type" to Sysmon module for EventIDs 8, 9, 19, 20, 27, 28, 255 {pull}35193[35193]
+- Add "keystore.path" configuration settings to $workdir\data\{{.BeatName}}.keystore. Issue {issue}12315[12315] {pull}37237[37237]
 
 *Functionbeat*
 
@@ -53,6 +54,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
 - Support build of projects outside of beats directory {pull}36126[36126]
+- Support Elastic Agent control protocol chunking support {pull}37343[37343]
 
 *Auditbeat*
 
@@ -86,6 +88,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Added fix for formatting the logs from stateloader properly. {pull}37369[37369]
+- Remove duplicated syscall from arm seccomp profile. {pull}37440[37440]
 
 *Metricbeat*
 
@@ -112,6 +116,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix unintended skip in metric collection on Azure Monitor {issue}37204[37204] {pull}37203[37203]
 - Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
 - Add memory hard limit from container metadata and remove usage percentage in AWS Fargate. {pull}37194[37194]
+- Ignore parser errors from unsupported metrics types on Prometheus client and continue parsing until EOF is reached {pull}37383[37383]
+- Fix the reference time rounding on Azure Metrics {issue}37204[37204] {pull}37365[37365]
 
 *Osquerybeat*
 
@@ -147,7 +153,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
 - Upgrade to Go 1.20.11. {pull}37123[37123]
 - Make more selective the Pod autodiscovery upon node and namespace update events. {issue}3738[3738] {pull}37431[37431]
+- Upgrade to Go 1.21.5. {pull}37550[37550]
 - The Elasticsearch output can now configure performance presets with the `preset` configuration field. {pull}37259[37259]
+- Upgrade to elastic-agent-libs v0.7.3 and golang.org/x/crypto v0.17.0. {pull}37544[37544]
 
 *Auditbeat*
 
@@ -232,6 +240,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add GCP CloudSQL metadata {pull}33066[33066]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
+- Fix containerd metrics grouping for TSDB {pull}37537[37537]
 - Add metrics grouping by dimensions and time to Azure app insights {pull}36634[36634]
 - Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms {pull}36647[36647]
 - Enhance GCP billing with detailed tables identification, additional fields, and optimized data handling. {pull}36902[36902]
