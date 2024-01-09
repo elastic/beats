@@ -9,7 +9,7 @@
 <titleabbrev>Salesforce</titleabbrev>
 ++++
 
-Use the `salesforce` input to monitor Salesforce events either via the Salesforce ELF API or the Salesforce Real-time event monitoring API. Both uses REST API (to execute SOQL queries in the Salesforce instance) under the hood to query the relevant objects to fetch the events.
+Use the `salesforce` input to monitor Salesforce events either via the Salesforce ELF API or the Salesforce Real-time event monitoring API. Both use REST API (to execute SOQL queries in the Salesforce instance) under the hood to query the relevant objects to fetch the events.
 
 Here the `input` may cursor state(s) that will be provided to the next execution of event monitoring to fetch the events from the last cursor state. The cursor states may be used to control the behaviour of the program.
 
