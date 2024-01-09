@@ -234,7 +234,8 @@ func (s *salesforceInput) RunObject() error {
 
 	totalEvents := 0
 	firstEvent := true
-	for len(res.Records()) != 0 {
+
+	for res.TotalSize() > 0 {
 		for _, rec := range res.Records() {
 			val := rec.Record().Fields()
 
@@ -303,7 +304,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 	}
 
 	totalEvents, firstEvent := 0, true
-	for len(res.Records()) != 0 {
+	for res.TotalSize() > 0 {
 		for _, rec := range res.Records() {
 			req, err := http.NewRequestWithContext(s.ctx, http.MethodGet, s.config.URL+rec.Record().Fields()["LogFile"].(string), nil)
 			if err != nil {
