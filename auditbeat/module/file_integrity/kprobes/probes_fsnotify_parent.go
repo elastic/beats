@@ -13,15 +13,16 @@ type fsNotifyParentSymbol struct {
 
 func loadFsNotifyParentSymbol(s *probeManager) error {
 
-	symbolInfo, err := getSymbolInfoRuntime("__fsnotify_parent")
+	symbolInfo, err := s.getSymbolInfoRuntime("__fsnotify_parent")
 	if err != nil {
-		if errors.Is(err, ErrSymbolNotFound) {
-			symbolInfo, err = getSymbolInfoRuntime("fsnotify_parent")
-			if err != nil {
-				return err
-			}
+		if !errors.Is(err, ErrSymbolNotFound) {
+			return err
 		}
-		return err
+
+		symbolInfo, err = s.getSymbolInfoRuntime("fsnotify_parent")
+		if err != nil {
+			return err
+		}
 	}
 
 	if symbolInfo.isOptimised {

@@ -1,7 +1,6 @@
 package kprobes
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -27,19 +26,57 @@ func Test_fsNotifySymbol_buildProbes(t *testing.T) {
 	}
 }
 
+func Test_fsNotifySymbol_load(t *testing.T) {
+	prbMgr := &probeManager{
+		symbols:              nil,
+		buildChecks:          nil,
+		getSymbolInfoRuntime: nil,
+	}
+
+	prbMgr.getSymbolInfoRuntime = func(symbolName string) (runtimeSymbolInfo, error) {
+		return runtimeSymbolInfo{}, ErrSymbolNotFound
+	}
+	require.ErrorIs(t, loadFsNotifySymbol(prbMgr), ErrSymbolNotFound)
+
+	prbMgr.getSymbolInfoRuntime = func(symbolName string) (runtimeSymbolInfo, error) {
+		if symbolName != "fsnotify" {
+			return runtimeSymbolInfo{}, ErrSymbolNotFound
+		}
+
+		return runtimeSymbolInfo{
+			symbolName:          "fsnotify",
+			isOptimised:         true,
+			optimisedSymbolName: "fsnotify.isra.0",
+		}, nil
+	}
+
+	require.Error(t, loadFsNotifySymbol(prbMgr))
+
+	prbMgr.getSymbolInfoRuntime = func(symbolName string) (runtimeSymbolInfo, error) {
+		return runtimeSymbolInfo{
+			symbolName:          "fsnotify",
+			isOptimised:         false,
+			optimisedSymbolName: "",
+		}, nil
+	}
+
+	require.NoError(t, loadFsNotifySymbol(prbMgr))
+	require.Equal(t, len(prbMgr.symbols), 1)
+	require.Equal(t, len(prbMgr.buildChecks), 1)
+}
+
 func Test_fsNotifySymbol_onErr(t *testing.T) {
 	s := &fsNotifySymbol{
 		symbolName: "fsnotify",
 		lastOnErr:  nil,
 	}
 
-	testErr := fmt.Errorf("test: %w", ErrVerifyOverlappingEvents)
-	require.True(t, s.onErr(testErr))
+	require.True(t, s.onErr(ErrVerifyOverlappingEvents))
 
-	testErr = fmt.Errorf("test: %w", ErrVerifyMissingEvents)
-	require.True(t, s.onErr(testErr))
+	require.True(t, s.onErr(ErrVerifyMissingEvents))
 
-	testErr = fmt.Errorf("test: %w", ErrVerifyUnexpectedEvent)
-	require.False(t, s.onErr(testErr))
+	require.False(t, s.onErr(ErrVerifyMissingEvents))
+
+	require.False(t, s.onErr(ErrVerifyUnexpectedEvent))
 
 }

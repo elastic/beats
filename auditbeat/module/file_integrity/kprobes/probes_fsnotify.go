@@ -17,7 +17,7 @@ type fsNotifySymbol struct {
 
 func loadFsNotifySymbol(s *probeManager) error {
 
-	symbolInfo, err := getSymbolInfoRuntime("fsnotify")
+	symbolInfo, err := s.getSymbolInfoRuntime("fsnotify")
 	if err != nil {
 		return err
 	}
@@ -49,6 +49,7 @@ func (f *fsNotifySymbol) buildProbes(spec *tkbtf.Spec) ([]*probeWithAllocFunc, e
 			f.seenSpecs = make(map[*tkbtf.Spec]struct{})
 		}
 
+		f.lastOnErr = nil
 		// reset probe filters for each new spec
 		// this probes shouldn't cause any ErrVerifyOverlappingEvents or ErrVerifyMissingEvents
 		// for linux kernel versions linux 5.17+, thus we start from here. To see how we handle all
@@ -145,9 +146,10 @@ func (f *fsNotifySymbol) onErr(err error) bool {
 		return false
 	}
 
+	f.lastOnErr = err
+
 	switch {
 	case errors.Is(err, ErrVerifyOverlappingEvents):
-		f.lastOnErr = err
 
 		// on ErrVerifyOverlappingEvents for linux kernel versions < 5.7 the __fsnotify_parent
 		// probe is capturing and sending the modify events as well, thus disable them for
@@ -158,7 +160,6 @@ func (f *fsNotifySymbol) onErr(err error) bool {
 
 		return true
 	case errors.Is(err, ErrVerifyMissingEvents):
-		f.lastOnErr = err
 
 		// on ErrVerifyMissingEvents for linux kernel versions 5.10 - 5.16 the __fsnotify_parent
 		// probe is capturing and sending the modify events as well, thus disable them for

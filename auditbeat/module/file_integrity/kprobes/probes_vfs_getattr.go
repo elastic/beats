@@ -14,14 +14,14 @@ type vfsGetAttrSymbol struct {
 func loadVFSGetAttrSymbol(s *probeManager, e executor) error {
 
 	// get the vfs_getattr_nosec symbol information
-	symbolInfo, err := getSymbolInfoRuntime("vfs_getattr_nosec")
+	symbolInfo, err := s.getSymbolInfoRuntime("vfs_getattr_nosec")
 	if err != nil {
 		if !errors.Is(err, ErrSymbolNotFound) {
 			return err
 		}
 
 		// for older kernel versions use the vfs_getattr symbol
-		symbolInfo, err = getSymbolInfoRuntime("vfs_getattr")
+		symbolInfo, err = s.getSymbolInfoRuntime("vfs_getattr")
 		if err != nil {
 			return err
 		}

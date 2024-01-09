@@ -1,35 +1,42 @@
 package kprobes
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
 
-func Test_fsNotifyParentSymbol_buildProbes(t *testing.T) {
+func Test_vfsGetAttr_buildProbes(t *testing.T) {
 	specs, err := loadEmbeddedSpecs()
 	require.NoError(t, err)
 	require.NotEmpty(t, specs)
 
-	s := &fsNotifyParentSymbol{}
+	s := &vfsGetAttrSymbol{}
 
 	for _, spec := range specs {
 		switch {
-		case spec.ContainsSymbol("__fsnotify_parent"):
-			s.symbolName = "__fsnotify_parent"
-		case spec.ContainsSymbol("fsnotify_parent"):
-			s.symbolName = "fsnotify_parent"
+		case spec.ContainsSymbol("vfs_getattr_nosec"):
+			s.symbolName = "vfs_getattr_nosec"
+		case spec.ContainsSymbol("vfs_getattr"):
+			s.symbolName = "vfs_getattr"
 		default:
 			t.FailNow()
 		}
 
 		_, err := s.buildProbes(spec)
 		require.NoError(t, err)
+
+		if err != nil {
+			t.FailNow()
+		}
 	}
 }
 
-func Test_fsNotifyParentSymbol_load(t *testing.T) {
+func Test_vfsGetAttr_load(t *testing.T) {
+	exec := newFixedThreadExecutor(context.TODO())
+
 	prbMgr := &probeManager{
 		symbols:              nil,
 		buildChecks:          nil,
@@ -39,7 +46,7 @@ func Test_fsNotifyParentSymbol_load(t *testing.T) {
 	prbMgr.getSymbolInfoRuntime = func(symbolName string) (runtimeSymbolInfo, error) {
 		return runtimeSymbolInfo{}, ErrSymbolNotFound
 	}
-	require.ErrorIs(t, loadFsNotifyParentSymbol(prbMgr), ErrSymbolNotFound)
+	require.ErrorIs(t, loadVFSGetAttrSymbol(prbMgr, exec), ErrSymbolNotFound)
 
 	prbMgr = &probeManager{
 		symbols:              nil,
@@ -47,16 +54,16 @@ func Test_fsNotifyParentSymbol_load(t *testing.T) {
 		getSymbolInfoRuntime: nil,
 	}
 	prbMgr.getSymbolInfoRuntime = func(symbolName string) (runtimeSymbolInfo, error) {
-		if symbolName == "fsnotify_parent" {
+		if symbolName == "vfs_getattr_nosec" {
 			return runtimeSymbolInfo{
-				symbolName:          "fsnotify_parent",
+				symbolName:          "vfs_getattr_nosec",
 				isOptimised:         true,
-				optimisedSymbolName: "fsnotify_parent.isra.0",
+				optimisedSymbolName: "vfs_getattr_nosec.isra.0",
 			}, nil
 		}
 		return runtimeSymbolInfo{}, ErrSymbolNotFound
 	}
-	require.Error(t, loadFsNotifyParentSymbol(prbMgr))
+	require.Error(t, loadVFSGetAttrSymbol(prbMgr, exec))
 
 	prbMgr = &probeManager{
 		symbols:              nil,
@@ -64,20 +71,20 @@ func Test_fsNotifyParentSymbol_load(t *testing.T) {
 		getSymbolInfoRuntime: nil,
 	}
 	prbMgr.getSymbolInfoRuntime = func(symbolName string) (runtimeSymbolInfo, error) {
-		if symbolName == "fsnotify_parent" {
+		if symbolName == "vfs_getattr" {
 			return runtimeSymbolInfo{
-				symbolName:          "fsnotify_parent",
+				symbolName:          "vfs_getattr",
 				isOptimised:         false,
 				optimisedSymbolName: "",
 			}, nil
 		}
 		return runtimeSymbolInfo{}, ErrSymbolNotFound
 	}
-	require.NoError(t, loadFsNotifyParentSymbol(prbMgr))
+	require.NoError(t, loadVFSGetAttrSymbol(prbMgr, exec))
 	require.NotEmpty(t, prbMgr.symbols)
 	require.NotEmpty(t, prbMgr.buildChecks)
-	require.IsType(t, &fsNotifyParentSymbol{}, prbMgr.symbols[0])
-	require.Equal(t, prbMgr.symbols[0].(*fsNotifyParentSymbol).symbolName, "fsnotify_parent")
+	require.IsType(t, &vfsGetAttrSymbol{}, prbMgr.symbols[0])
+	require.Equal(t, prbMgr.symbols[0].(*vfsGetAttrSymbol).symbolName, "vfs_getattr")
 
 	prbMgr = &probeManager{
 		symbols:              nil,
@@ -85,20 +92,20 @@ func Test_fsNotifyParentSymbol_load(t *testing.T) {
 		getSymbolInfoRuntime: nil,
 	}
 	prbMgr.getSymbolInfoRuntime = func(symbolName string) (runtimeSymbolInfo, error) {
-		if symbolName == "__fsnotify_parent" {
+		if symbolName == "vfs_getattr_nosec" {
 			return runtimeSymbolInfo{
-				symbolName:          "__fsnotify_parent",
+				symbolName:          "vfs_getattr_nosec",
 				isOptimised:         false,
 				optimisedSymbolName: "",
 			}, nil
 		}
 		return runtimeSymbolInfo{}, ErrSymbolNotFound
 	}
-	require.NoError(t, loadFsNotifyParentSymbol(prbMgr))
+	require.NoError(t, loadVFSGetAttrSymbol(prbMgr, exec))
 	require.NotEmpty(t, prbMgr.symbols)
 	require.NotEmpty(t, prbMgr.buildChecks)
-	require.IsType(t, &fsNotifyParentSymbol{}, prbMgr.symbols[0])
-	require.Equal(t, prbMgr.symbols[0].(*fsNotifyParentSymbol).symbolName, "__fsnotify_parent")
+	require.IsType(t, &vfsGetAttrSymbol{}, prbMgr.symbols[0])
+	require.Equal(t, prbMgr.symbols[0].(*vfsGetAttrSymbol).symbolName, "vfs_getattr_nosec")
 
 	prbMgr = &probeManager{
 		symbols:              nil,
@@ -109,11 +116,11 @@ func Test_fsNotifyParentSymbol_load(t *testing.T) {
 	prbMgr.getSymbolInfoRuntime = func(symbolName string) (runtimeSymbolInfo, error) {
 		return runtimeSymbolInfo{}, unknownErr
 	}
-	require.Error(t, loadFsNotifyParentSymbol(prbMgr))
+	require.Error(t, loadVFSGetAttrSymbol(prbMgr, exec))
 }
 
-func Test_fsNotifyParentSymbol_onErr(t *testing.T) {
-	s := &fsNotifyParentSymbol{}
+func Test_vfsGetAttr_onErr(t *testing.T) {
+	s := &vfsGetAttrSymbol{}
 
 	testErr := fmt.Errorf("test: %w", ErrVerifyOverlappingEvents)
 	repeat := s.onErr(testErr)

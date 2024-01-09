@@ -12,7 +12,7 @@ type fsNotifyNameRemoveSymbol struct {
 
 func loadFsNotifyNameRemoveSymbol(s *probeManager) error {
 
-	symbolInfo, err := getSymbolInfoRuntime("fsnotify_nameremove")
+	symbolInfo, err := s.getSymbolInfoRuntime("fsnotify_nameremove")
 	if err != nil {
 		if errors.Is(err, ErrSymbolNotFound) {
 			s.buildChecks = append(s.buildChecks, func(spec *tkbtf.Spec) bool {

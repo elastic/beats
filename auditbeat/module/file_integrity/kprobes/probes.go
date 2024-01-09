@@ -35,14 +35,16 @@ type symbol interface {
 }
 
 type probeManager struct {
-	symbols     []symbol
-	buildChecks []shouldBuildCheck
+	symbols              []symbol
+	buildChecks          []shouldBuildCheck
+	getSymbolInfoRuntime func(symbolName string) (runtimeSymbolInfo, error)
 }
 
 func newProbeManager(e executor) (*probeManager, error) {
 	fs := &probeManager{
-		symbols:     nil,
-		buildChecks: nil,
+		symbols:              nil,
+		buildChecks:          nil,
+		getSymbolInfoRuntime: getSymbolInfoRuntime,
 	}
 
 	if err := loadFsNotifySymbol(fs); err != nil {
