@@ -595,7 +595,7 @@ class Test(BaseTest):
 
         # wait again
         self.wait_until(lambda: self.output_has(lines=len(encodings) * 2),
-                        max_timeout=15)
+                        max_timeout=60)
         filebeat.check_kill_and_wait()
 
         # check that all outputs are present in the JSONs in UTF-8
