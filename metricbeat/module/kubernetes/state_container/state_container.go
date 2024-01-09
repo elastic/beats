@@ -140,16 +140,6 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	for _, event := range events {
 		containerFields := mapstr.M{}
 
-		// Add container.name field (same as kubernetes.container.name)
-		if containerName, ok := event["name"]; ok {
-			cName, ok := (containerName).(string)
-			if !ok {
-				m.Logger().Debugf("Error while casting containerName: %s", containerName)
-			} else {
-				kubernetes.ShouldPut(containerFields, "name", cName, m.Logger())
-			}
-		}
-
 		// applying ECS to kubernetes.container.id in the form <container.runtime>://<container.id>
 		// copy to ECS fields the kubernetes.container.image, kubernetes.container.name
 		if containerID, ok := event["id"]; ok {
@@ -178,6 +168,15 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 			kubernetes.ShouldPut(containerFields, "image.name", cImage, m.Logger())
 			// remove kubernetes.container.image field as value is the same as ECS container.image.name field
 			kubernetes.ShouldDelete(event, "image", m.Logger())
+		}
+		// Add container.name field (same as kubernetes.container.name)
+		if containerName, ok := event["name"]; ok {
+			cName, ok := (containerName).(string)
+			if !ok {
+				m.Logger().Debugf("Error while casting containerName: %s", containerName)
+			} else {
+				kubernetes.ShouldPut(containerFields, "name", cName, m.Logger())
+			}
 		}
 
 		e, err := util.CreateEvent(event, "kubernetes.container")
