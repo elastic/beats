@@ -81,11 +81,11 @@ func FromPid(flag Flag, pid int) ([]string, error) {
 	var sl []string
 	for i := 0; i < int(cap.MaxBits()); i++ {
 		c := cap.Value(i)
-		v, err := set.GetFlag(flag, c)
+		enabled, err := set.GetFlag(flag, c)
 		if err != nil {
 			return nil, err
 		}
-		if !v {
+		if !enabled {
 			continue
 		}
 		s, err := toECS(i)
