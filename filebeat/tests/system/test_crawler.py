@@ -568,7 +568,8 @@ class Test(BaseTest):
         for _, enc_py, text in encodings:
             with codecs.open(self.working_dir + "/log/test-{}".format(enc_py),
                              "w", enc_py) as f:
-                f.write(text + "\n")
+                f.write(text + "\n")                
+                f.close()
 
         # create the config file
         inputs = []
@@ -592,6 +593,7 @@ class Test(BaseTest):
             with codecs.open(self.working_dir + "/log/test-{}".format(enc_py),
                              "a", enc_py) as f:
                 f.write(text + " 2" + "\n")
+                f.close()                
 
         # wait again
         self.wait_until(lambda: self.output_has(lines=len(encodings) * 2),
