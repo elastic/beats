@@ -161,17 +161,8 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 		}
 	}
 
-	connInfo, err := client.NewV2ConnInfoFromReader(os.Stdin)
-	if err != nil {
-		return nil, fmt.Errorf("faile dreading connection information from stdin: %w", err)
-	}
-
-	ver := version.GetDefaultVersion()
-	if connInfo.PackageVersion != "" {
-		ver = connInfo.PackageVersion
-	}
-
 	var agentClient client.V2
+	var err error
 	if c.InsecureGRPCURLForTesting != "" && c.Enabled {
 		// Insecure for testing Elastic-Agent-Client initialisation
 		logger.Info("Using INSECURE GRPC connection, this should be only used for testing!")
@@ -179,13 +170,13 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 			"", // Insecure connection for test, no token needed
 			client.VersionInfo{
 				Name:    "beat-v2-client-for-testing",
-				Version: ver,
+				Version: version.GetDefaultVersion(),
 			}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 	} else {
 		// Normal Elastic-Agent-Client initialisation
-		agentClient, _, err = client.NewV2FromReader(connInfo, client.VersionInfo{
+		agentClient, _, err = client.NewV2FromReader(os.Stdin, client.VersionInfo{
 			Name:    "beat-v2-client",
-			Version: ver,
+			Version: version.GetDefaultVersion(),
 			Meta: map[string]string{
 				"commit":     version.Commit(),
 				"build_time": version.BuildTime().String(),
