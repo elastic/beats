@@ -262,7 +262,7 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 			reportFlow := handleReports
 			isOver := lastReport
 			if checkTimeout {
-				if killFlow && ts.Sub(flow.createTS) > fw.timeout {
+				if shouldKillFlow(flow, fw, ts, killFlow) {
 					debugf("kill flow")
 					logp.Info("kvalliy: killing flows worker loop stopped flowid: %s, flow dir: %v killFlow: %v", common.NetString(flow.id.Serialize()), flow.dir, killFlow)
 
@@ -281,6 +281,18 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 	}
 
 	fw.spool.flush()
+}
+
+func shouldKillFlow(flow *biFlow, fw *flowsProcessor, ts time.Time, killFlow bool) bool {
+	if ts.Sub(flow.ts) > fw.timeout {
+		return true
+	}
+
+	if !killFlow {
+		return false
+	}
+
+	return ts.Sub(flow.createTS) > fw.timeout
 }
 
 func (fw *flowsProcessor) report(w *worker, ts time.Time, flow *biFlow, isOver bool, intNames, uintNames, floatNames []string) {
