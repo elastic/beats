@@ -108,7 +108,7 @@ func NewPerfChannel(cfg ...PerfChannelConf) (channel *PerfChannel, err error) {
 		mappedPages:  64,
 		wakeUpEvents: 1,
 		pollTimeout:  time.Millisecond * 200,
-		done:         make(chan struct{}, 0),
+		done:         make(chan struct{}),
 		streams:      make(map[uint64]stream),
 		pid:          perf.AllThreads,
 		attr: perf.Attr{
