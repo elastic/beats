@@ -33,14 +33,18 @@ func copyInt(dst unsafe.Pointer, src unsafe.Pointer, len uint8) error {
 	return nil
 }
 
-func readInt(ptr unsafe.Pointer, len uint8, signed bool) (value interface{}, err error) {
+func readInt(ptr unsafe.Pointer, len uint8, signed bool) (any, error) {
+	var (
+		value any
+		err   error
+	)
 	asSlice := (*(*[maxIntSizeBytes]byte)(ptr))[:]
 	switch len {
 	case 1:
 		if signed {
 			value = int8(asSlice[0])
 		} else {
-			value = uint8(asSlice[0])
+			value = asSlice[0]
 		}
 	case 2:
 		if signed {
@@ -66,5 +70,5 @@ func readInt(ptr unsafe.Pointer, len uint8, signed bool) (value interface{}, err
 	default:
 		return nil, errBadSize
 	}
-	return
+	return value, err
 }

@@ -85,13 +85,14 @@ func IsTraceFSAvailableAt(path string) error {
 
 // IsTraceFSAvailable returns nil if a tracefs or debugfs supporting KProbes
 // is available at the well-known paths. Otherwise returns an error.
-func IsTraceFSAvailable() (err error) {
+func IsTraceFSAvailable() error {
+	var err error
 	for _, path := range []string{traceFSPath, debugFSTracingPath} {
 		if err = IsTraceFSAvailableAt(path); err == nil {
-			break
+			return nil
 		}
 	}
-	return
+	return err
 }
 
 // ListKProbes lists the currently installed kprobes / kretprobes

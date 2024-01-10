@@ -521,7 +521,12 @@ func (m *recordMerger) readSampleNonBlock(ev *perf.Event, ctx context.Context) (
 	return nil, true
 }
 
-func pollAll(evs []*perf.Event, timeout time.Duration) (active int, closed int, err error) {
+func pollAll(evs []*perf.Event, timeout time.Duration) (int, int, error) {
+	var (
+		active int
+		closed int
+		err    error
+	)
 	pollfds := make([]unix.PollFd, len(evs))
 	for idx, ev := range evs {
 		fd, err := ev.FD()
@@ -547,5 +552,5 @@ func pollAll(evs []*perf.Event, timeout time.Duration) (active int, closed int, 
 			closed++
 		}
 	}
-	return
+	return active, closed, err
 }
