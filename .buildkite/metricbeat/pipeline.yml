@@ -1,5 +1,48 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+env:
+  SETUP_GVM_VERSION: 'v0.5.1'
+  SETUP_MAGE_VERSION: '1.13.0'
 
 steps:
-  - label: "Example test"
-    command: echo "Hello!"
+  - label: "Unit Test"
+    key: "test-metric-unit-test"
+    command: |
+      cd metricbeat
+      chmod -R go-w ./mb/testdata/
+      mage build unitTest
+    agents:
+      provider: "gcp"
+      image: "family/core-ubuntu-2204"
+
+  - label: "Go Intergration Test"
+    key: "test-metric-int-test"
+    command: |
+      cd metricbeat
+      mage goIntegTest
+    agents:
+      provider: "gcp"
+      image: "family/core-ubuntu-2204"
+
+  - label: "Python Integration Test"
+    key: test-python-int-test
+    command: |
+      cd metricbeat
+      mage pythonIntegTest
+    agents:
+      provider: "gcp"
+      image: "family/core-ubuntu-2204"
+
+  - label: "Cross compile"
+    key: test-cross-compile
+    command: |
+      make -C metricbeat crosscompile
+    agents:
+      provider: "gcp"
+      image: "family/core-ubuntu-2204"
+
+  # - label: "MacOS unit test"
+  #   command:
+  #     cd metricbeat
+  #     mage build unitTest
+  # Ignore as long as there are test failures, see https://github.com/elastic/beats/issues/33035
+  # - label: "MacOS M1"
