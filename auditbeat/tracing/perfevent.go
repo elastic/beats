@@ -491,7 +491,7 @@ func (m *recordMerger) readSampleNonBlock(ev *perf.Event, ctx context.Context) (
 			return nil, false
 		}
 		if err != nil {
-			if err == perf.ErrBadRecord {
+			if errors.Is(err, perf.ErrBadRecord) {
 				m.channel.lostC <- ^uint64(0)
 				continue
 			}
@@ -537,7 +537,7 @@ func pollAll(evs []*perf.Event, timeout time.Duration) (int, int, error) {
 	}
 	ts := unix.NsecToTimespec(timeout.Nanoseconds())
 
-	for err = unix.EINTR; err == unix.EINTR; {
+	for err = unix.EINTR; errors.Is(err, unix.EINTR); {
 		_, err = unix.Ppoll(pollfds, &ts, nil)
 	}
 	if err != nil {
