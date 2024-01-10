@@ -2029,7 +2029,7 @@ func TestNamespacePodUpdater(t *testing.T) {
 					},
 				}}
 
-			watcher := &mockUpdaterWatcher{oldobject: namespace}
+			watcher := &mockUpdaterWatcher{cachedObject: namespace}
 			updater := kubernetes.NewNamespacePodUpdater(handler.OnUpdate, store, watcher, &sync.Mutex{})
 
 			updater.OnUpdate(namespace1)
@@ -2094,7 +2094,7 @@ func TestNodePodUpdater(t *testing.T) {
 					},
 				}}
 
-			watcher := &mockUpdaterWatcher{oldobject: node}
+			watcher := &mockUpdaterWatcher{cachedObject: node}
 			updater := kubernetes.NewNodePodUpdater(handler.OnUpdate, store, watcher, &sync.Mutex{})
 
 			//This is when the update happens.
@@ -2118,11 +2118,11 @@ type mockUpdaterStore struct {
 }
 
 type mockUpdaterWatcher struct {
-	oldobject runtime.Object
+	cachedObject runtime.Object
 }
 
-func (s *mockUpdaterWatcher) Oldobject() runtime.Object {
-	return s.oldobject
+func (s *mockUpdaterWatcher) CachedObject() runtime.Object {
+	return s.cachedObject
 }
 
 func (s *mockUpdaterStore) List() []interface{} {
