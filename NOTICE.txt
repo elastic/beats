@@ -12478,12 +12478,12 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-a
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/elastic-agent-client/v7
-Version: v7.6.0
+Dependency : github.com/AndersonQ/elastic-agent-client/v7
+Version: v7.0.0-20240109062623-907af5c552fb
 Licence type (autodetected): Elastic
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-client/v7@v7.6.0/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!anderson!q/elastic-agent-client/v7@v7.0.0-20240109062623-907af5c552fb/LICENSE.txt:
 
 ELASTIC LICENSE AGREEMENT
 
