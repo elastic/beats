@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 env:
   SETUP_GVM_VERSION: 'v0.5.1'
-  SETUP_MAGE_VERSION: '1.13.0'
+  IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
 
 steps:
   - label: "Unit Test"
@@ -12,7 +12,8 @@ steps:
       mage build unitTest
     agents:
       provider: "gcp"
-      image: "family/core-ubuntu-2204"
+      image: "${IMAGE_UBUNTU_X86_64}"
+      machineType: "c2-standard-16"
 
   - label: "Go Intergration Test"
     key: "test-metric-int-test"
@@ -21,7 +22,7 @@ steps:
       mage goIntegTest
     agents:
       provider: "gcp"
-      image: "family/core-ubuntu-2204"
+      image: "${IMAGE_UBUNTU_X86_64}"
 
   - label: "Python Integration Test"
     key: test-python-int-test
@@ -30,7 +31,7 @@ steps:
       mage pythonIntegTest
     agents:
       provider: "gcp"
-      image: "family/core-ubuntu-2204"
+      image: "${IMAGE_UBUNTU_X86_64}"
 
   - label: "Cross compile"
     key: test-cross-compile
@@ -38,7 +39,7 @@ steps:
       make -C metricbeat crosscompile
     agents:
       provider: "gcp"
-      image: "family/core-ubuntu-2204"
+      image: "${IMAGE_UBUNTU_X86_64}"
 
   # - label: "MacOS unit test"
   #   command:
