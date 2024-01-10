@@ -61,6 +61,7 @@ queue.mem:
 You can specify the following options in the `queue.mem` section of the +{beatname_lc}.yml+ config file:
 
 [float]
+[[queue-mem-events-option]]
 ===== `events`
 
 Number of events the queue can store. This value should be evenly divisible by `flush.min_events` to
@@ -69,6 +70,7 @@ avoid sending partial batches to the output.
 The default value is 3200 events.
 
 [float]
+[[queue-mem-flush-min-events-option]]
 ===== `flush.min_events`
 
 Minimum number of events required for publishing. If this value is set to 0 or 1, events are
@@ -80,6 +82,7 @@ sent by the output.
 The default value is 1600.
 
 [float]
+[[queue-mem-flush-timeout-option]]
 ===== `flush.timeout`
 
 Maximum wait time for `flush.min_events` to be fulfilled. If set to 0s, events are available to the
