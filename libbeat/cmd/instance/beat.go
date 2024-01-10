@@ -834,17 +834,9 @@ func (b *Beat) configure(settings Settings) error {
 		b.Info.FQDN = fqdn
 	}
 
-	// initialize config manager
-	b.Manager, err = management.NewManager(b.Config.Management, reload.RegisterV2)
+	err = b.initConfigManager(false)
 	if err != nil {
 		return err
-	}
-
-	// The manager initialisation reads the package version sent by the agent,
-	// now the manager is initialised, we apply the package version if the agent
-	// sent it.
-	if b.Manager.PackageVersion() != "" {
-		b.Info.Version = b.Manager.PackageVersion()
 	}
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
@@ -882,6 +874,24 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.Manager.RegisterDiagnosticHook("global processors", "a list of currently configured global beat processors",
 		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
+
+	return err
+}
+
+func (b *Beat) initConfigManager(forcePackageVersion bool) error {
+	// initialize config manager
+	m, err := management.NewManager(b.Config.Management, reload.RegisterV2)
+	if err != nil {
+		return err
+	}
+	b.Manager = m
+
+	// The manager initialisation reads the package version sent by the agent,
+	// now the manager is initialised, we apply the package version if the agent
+	// sent it.
+	if forcePackageVersion || b.Manager.PackageVersion() != "" {
+		b.Info.Version = b.Manager.PackageVersion()
+	}
 
 	return err
 }
