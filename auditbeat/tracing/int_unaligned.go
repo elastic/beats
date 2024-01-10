@@ -48,7 +48,9 @@ func copyInt(dst unsafe.Pointer, src unsafe.Pointer, len uint8) error {
 	return nil
 }
 
-func readInt(ptr unsafe.Pointer, len uint8, signed bool) (value interface{}, err error) {
+func readInt(ptr unsafe.Pointer, len uint8, signed bool) (any, error) {
+	var value any
+
 	switch len {
 	case 1:
 		if signed {
@@ -80,5 +82,5 @@ func readInt(ptr unsafe.Pointer, len uint8, signed bool) (value interface{}, err
 	default:
 		return nil, errBadSize
 	}
-	return
+	return value, nil
 }
