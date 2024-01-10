@@ -39,9 +39,9 @@ const (
 var (
 	// p[:[GRP/]EVENT] [MOD:]SYM[+offs]|MEMADDR [FETCHARGS] : Set a probe
 	// r[MAXACTIVE][:[GRP/]EVENT] [MOD:]SYM[+0] [FETCHARGS] : Set a return probe
-	kprobeRegexp *regexp.Regexp = regexp.MustCompile("^([pr])[0-9]*:(?:([^/ ]*)/)?([^/ ]+) ([^ ]+) ?(.*)")
+	kprobeRegexp *regexp.Regexp = regexp.MustCompile(`^([pr])[0-9]*:(?:([^/ ]*)/)?([^/ ]+) ([^ ]+) ?(.*)`)
 
-	formatRegexp *regexp.Regexp = regexp.MustCompile("\\s+([^:]+):([^;]*);")
+	formatRegexp *regexp.Regexp = regexp.MustCompile(`\s+([^:]+):([^;]*);`)
 )
 
 // TraceFS is an accessor to manage event tracing via tracefs or debugfs.
