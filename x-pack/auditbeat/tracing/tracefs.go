@@ -122,7 +122,7 @@ func (dfs *TraceFS) listProbes(filename string) (probes []Probe, err error) {
 }
 
 // AddKProbe installs a new kprobe/kretprobe.
-func (dfs *TraceFS) AddKProbe(probe Probe) (err error) {
+func (dfs *TraceFS) AddKProbe(probe Probe) error {
 	return dfs.appendToFile(kprobeCfgFile, probe.String())
 }
 
