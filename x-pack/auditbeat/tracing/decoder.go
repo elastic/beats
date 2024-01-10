@@ -183,9 +183,13 @@ func NewStructDecoder(desc ProbeFormat, allocFn AllocateFn) (Decoder, error) {
 		}
 
 		var name string
+		var allowUndefined bool
 		var greedy bool
 		for idx, param := range strings.Split(values, ",") {
 			switch param {
+			case "allowundefined":
+				// it is okay not to find it in the desc.Fields
+				allowUndefined = true
 			case "greedy":
 				greedy = true
 			default:
@@ -214,6 +218,9 @@ func NewStructDecoder(desc ProbeFormat, allocFn AllocateFn) (Decoder, error) {
 
 		inField, found := desc.Fields[name]
 		if !found {
+			if allowUndefined {
+				continue
+			}
 			return nil, fmt.Errorf("field '%s' not found in kprobe format description", name)
 		}
 
