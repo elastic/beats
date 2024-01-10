@@ -77,7 +77,6 @@ type PerfChannel struct {
 	sizeSampleC  int
 	sizeErrC     int
 	sizeLostC    int
-	withTime     bool
 	wakeUpEvents uint32
 }
 
