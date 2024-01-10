@@ -9,7 +9,7 @@ package tracing
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -72,7 +72,7 @@ func (s CPUSet) AsList() []int {
 
 // NewCPUSetFromFile creates a new CPUSet from the contents of a file.
 func NewCPUSetFromFile(path string) (cpus CPUSet, err error) {
-	contents, err := ioutil.ReadFile(path)
+	contents, err := os.ReadFile(path)
 	if err != nil {
 		return cpus, err
 	}
