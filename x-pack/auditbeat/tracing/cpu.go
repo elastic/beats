@@ -85,7 +85,7 @@ func NewCPUSetFromFile(path string) (cpus CPUSet, err error) {
 // RANGE := <NUMBER> | <NUMBER>-<NUMBER>
 func NewCPUSetFromExpression(contents string) (CPUSet, error) {
 	var ranges [][]int
-	var max, count int
+	var maximum, count int
 	for _, expr := range strings.Split(contents, ",") {
 		if len(expr) == 0 {
 			continue
@@ -99,16 +99,16 @@ func NewCPUSetFromExpression(contents string) (CPUSet, error) {
 			}
 			num := int(num16)
 			r = append(r, num)
-			if num+1 > max {
-				max = num + 1
+			if num+1 > maximum {
+				maximum = num + 1
 			}
 		}
 		ranges = append(ranges, r)
 	}
-	if max == 0 {
+	if maximum == 0 {
 		return CPUSet{}, nil
 	}
-	mask := make([]bool, max)
+	mask := make([]bool, maximum)
 	for _, r := range ranges {
 		from, to := -1, -1
 		switch len(r) {

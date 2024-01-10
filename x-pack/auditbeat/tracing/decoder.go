@@ -326,14 +326,14 @@ func (d *structDecoder) Decode(raw []byte, meta Metadata) (s interface{}, err er
 
 		case FieldTypeString:
 			offset := uintptr(MachineEndian.Uint16(raw[dec.src:]))
-			len := uintptr(MachineEndian.Uint16(raw[dec.src+2:]))
-			if offset+len > n {
+			length := uintptr(MachineEndian.Uint16(raw[dec.src+2:]))
+			if offset+length > n {
 				return nil, fmt.Errorf("perf event string data for field %s overflows message of size %d", dec.name, n)
 			}
-			if len > 0 && raw[offset+len-1] == 0 {
-				len--
+			if length > 0 && raw[offset+length-1] == 0 {
+				length--
 			}
-			*(*string)(unsafe.Add(destPtr, dec.dst)) = string(raw[offset : offset+len])
+			*(*string)(unsafe.Add(destPtr, dec.dst)) = string(raw[offset : offset+length])
 
 		case FieldTypeMeta:
 			*(*Metadata)(unsafe.Add(destPtr, dec.dst)) = meta
