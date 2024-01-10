@@ -11,7 +11,7 @@ $workdir = Split-Path $MyInvocation.MyCommand.Path
 # Create the new service.
 New-Service -name {{.BeatName}} `
   -displayName {{.BeatName | title}} `
-  -binaryPathName "`"$workdir\{{.BeatName}}.exe`" --environment=windows_service -c `"$workdir\{{.BeatName}}.yml`" --path.home `"$workdir`" --path.data `"$env:PROGRAMDATA\{{.BeatName}}`" --path.logs `"$env:PROGRAMDATA\{{.BeatName}}\logs`" -E logging.files.redirect_stderr=true"
+  -binaryPathName "`"$workdir\{{.BeatName}}.exe`" --environment=windows_service -c `"$workdir\{{.BeatName}}.yml`" --path.home `"$workdir`" --path.data `"$env:PROGRAMDATA\{{.BeatName}}`" --path.logs `"$env:PROGRAMDATA\{{.BeatName}}\logs`" -E keystore.path=`"$workdir\data\{{.BeatName}}.keystore`" -E logging.files.redirect_stderr=true"
 
 # Attempt to set the service to delayed start using sc config.
 Try {
