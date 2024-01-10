@@ -109,7 +109,7 @@ func createRandomParquet(t testing.TB, fname string, numCols int, numRows int) m
 	// defines a map to store the parquet data for validation
 	data := make(map[string]bool)
 	// creates a new Arrow schema
-	var fields []arrow.Field
+	fields := make([]arrow.Field, numCols)
 	for i := 0; i < numCols; i++ {
 		fieldType := arrow.PrimitiveTypes.Int32
 		field := arrow.Field{Name: fmt.Sprintf("col%d", i), Type: fieldType, Nullable: true}
