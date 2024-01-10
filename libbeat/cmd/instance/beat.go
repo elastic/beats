@@ -224,8 +224,6 @@ func Run(settings Settings, bt beat.Creator) error {
 
 // NewInitializedBeat creates a new beat where all information and initialization is derived from settings
 func NewInitializedBeat(settings Settings) (*Beat, error) {
-	// anderson: could we read os.Stdin here? then we could parse the version
-	// and propagate it
 	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed)
 	if err != nil {
 		return nil, err

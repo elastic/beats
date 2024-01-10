@@ -21,9 +21,11 @@ import "time"
 
 // GetDefaultVersion returns the current libbeat version.
 // This method is in a separate file as the version.go file is auto generated
-// TODO(AndersonQ): does it need to be changed? in the agent's code there is still a GetDefaultVersion
-// with the same behaviour as this one and it's used in several place. And there
-// is another function for the package version.
+//
+// TODO(AndersonQ): does it need to be changed? in the agent's code there is
+// still a GetDefaultVersion with the same behaviour as this one and it's used
+// in several places. Also, in the agent code, there is another function for
+// getting the package version.
 func GetDefaultVersion() string {
 	if qualifier == "" {
 		return defaultBeatVersion
