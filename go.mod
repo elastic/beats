@@ -200,6 +200,7 @@ require (
 	github.com/aws/smithy-go v1.13.5
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
+	github.com/elastic/ebpfevents v0.1.0
 	github.com/elastic/elastic-agent-autodiscover v0.6.6
 	github.com/elastic/elastic-agent-libs v0.7.3
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
@@ -214,11 +215,13 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/icholy/digest v0.1.22
 	github.com/lestrrat-go/jwx/v2 v2.0.11
+	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.16
 	github.com/pkg/xattr v0.4.9
 	github.com/sergi/go-diff v1.3.1
 	github.com/shirou/gopsutil/v3 v3.22.10
+	github.com/tklauser/go-sysconf v0.3.10
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.7
 	go.elastic.co/apm/module/apmhttp/v2 v2.4.7
 	go.elastic.co/apm/v2 v2.4.7
@@ -264,6 +267,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.13.5 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
+	github.com/cilium/ebpf v0.12.3 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
@@ -352,7 +356,6 @@ require (
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
