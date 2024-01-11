@@ -186,11 +186,29 @@ var isAll = makeIsAll()
 // so we have to build one. Instead of building it for every call,
 // build it once on startup and don't expose it.
 func makeIsAll() func(Flag, *cap.Set) (bool, error) {
+	var err error
 	all := cap.NewSet()
 	for i := 0; i < int(cap.MaxBits()); i++ {
-		all.SetFlag(cap.Effective, true, cap.Value(i))
-		all.SetFlag(cap.Permitted, true, cap.Value(i))
-		all.SetFlag(cap.Inheritable, true, cap.Value(i))
+		err = all.SetFlag(cap.Effective, true, cap.Value(i))
+		if err != nil {
+			break
+		}
+		err = all.SetFlag(cap.Permitted, true, cap.Value(i))
+		if err != nil {
+			break
+		}
+		err = all.SetFlag(cap.Inheritable, true, cap.Value(i))
+		if err != nil {
+			break
+		}
+	}
+
+	// Building allset only fails with invalid parameters, handle
+	// it nonetheless
+	if err != nil {
+		return func(flag Flag, set *cap.Set) (bool, error) {
+			return false, err
+		}
 	}
 
 	return func(flag Flag, set *cap.Set) (bool, error) {
