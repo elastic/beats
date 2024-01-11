@@ -10,6 +10,7 @@ steps:
     command: |
       cd metricbeat
       chmod -R go-w ./mb/testdata/
+      umask 0022
       mage build unitTest
     agents:
       provider: "gcp"
