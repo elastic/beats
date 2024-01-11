@@ -59,7 +59,7 @@ with_go() {
 get_gvm_link() {
     gvm_version=$1
     platform_type="$(uname)"
-    platform_type_lowercase="${platform_type,,}"
+    platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
     arch_type="$(uname -m)"
     [[ ${arch_type} == "aarch64" ]] && arch_type="arm64" # gvm do not have 'aarch64' name for archetecture type
     [[ ${arch_type} == "x86_64" ]] && arch_type="amd64"

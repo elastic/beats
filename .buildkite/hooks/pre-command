@@ -22,8 +22,8 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" && "$BUILDKITE_STEP_KEY" 
     with_mage
 fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" && "$BUILDKITE_STEP_KEY" =~ ^extended- ]]; then
-    add_bin_path
-    with_go ${GO_VERSION}
-    with_mage
-fi
+# if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" && "$BUILDKITE_STEP_KEY" =~ ^extended- ]]; then
+#     add_bin_path
+#     with_go ${GO_VERSION}
+#     with_mage
+# fi

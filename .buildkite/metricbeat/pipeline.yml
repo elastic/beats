@@ -6,10 +6,10 @@ env:
 
 steps:
 
-#   - group: "Mandatory Tests"
-#     key: "mandatory-tests"
-# #    if: define_condition_if_needed_for_group
-#     steps:
+  - group: "Mandatory Tests"
+    key: "mandatory-tests"
+#    if: define_condition_if_needed_for_group
+    steps:
 #       - label: ":linux: Ubuntu unit tests"
 #         key: "mandatory-linux-unit-test"
 #         command: ".buildkite/metricbeat/scripts/unit-tests.sh"
@@ -38,13 +38,13 @@ steps:
 #           image: "${IMAGE_UBUNTU_X86_64}"
 #           machineType: "c2-standard-16"
 
-#       - label: ":negative_squared_cross_mark: Cross compile"
-#         key: "mandatory-cross-compile"
-#         command: "make -C metricbeat crosscompile"
-#         agents:
-#           provider: "gcp"
-#           image: "${IMAGE_UBUNTU_X86_64}"
-#           machineType: "c2-standard-16"
+      - label: ":negative_squared_cross_mark: Cross compile"
+        key: "mandatory-cross-compile"
+        command: "make -C metricbeat crosscompile"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
 
   - group: "Extended Tests"
     key: "extended-tests"
