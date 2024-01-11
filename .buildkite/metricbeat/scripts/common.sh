@@ -1,6 +1,20 @@
 #!/bin/bash
 set -euo pipefail
 
+WORKSPACE=${WORKSPACE:-"$(pwd)"}
+
+create_workspace() {
+  if [[ ! -d "${WORKSPACE}/bin" ]]; then
+    mkdir -p "${WORKSPACE}/bin"
+  fi
+}
+
+add_bin_path() {
+  echo "Adding PATH to the environment variables..."
+  create_workspace
+  export PATH="${PATH}:${WORKSPACE}/bin"
+}
+
 with_virtualenv() {
     export PATH=$PATH:/root/.local/bin
     python3 -m pip install --user virtualenv
@@ -11,34 +25,30 @@ with_yq() {
 }
 
 with_mage() {
-    WORKSPACE=${WORKSPACE:-"$(pwd)"}
-    mkdir -p "${WORKSPACE}/bin"
+    create_workspace
     retry 5 curl -L -o "${WORKSPACE}/bin/mage.tar.gz" "https://github.com/magefile/mage/releases/download/v${SETUP_MAGE_VERSION}/mage_${SETUP_MAGE_VERSION}_Linux-64bit.tar.gz"
-
     tar -xvf "${WORKSPACE}/bin/mage.tar.gz" -C "${WORKSPACE}/bin"
     chmod +x "${WORKSPACE}/bin/mage"
     mage --version
 }
 
-with_gh() {
-    # GitHub CLI linux amd64
-    curl -L "https://github.com/cli/cli/releases/download/v${GITHUB_CLI}/gh_${GITHUB_CLI}_linux_amd64.tar.gz" --output ./gh.tar.gz
-    mkdir gh
-    tar -xf gh.tar.gz -C ./gh --strip-components=1
-    chmod +x ./gh/bin/gh
-    export PATH=$PATH:$(pwd)/gh/bin/
-    gh --version
-}
+# with_gh() {
+#     # GitHub CLI linux amd64
+#     curl -L "https://github.com/cli/cli/releases/download/v${GITHUB_CLI}/gh_${GITHUB_CLI}_linux_amd64.tar.gz" --output ./gh.tar.gz
+#     mkdir gh
+#     tar -xf gh.tar.gz -C ./gh --strip-components=1
+#     chmod +x ./gh/bin/gh
+#     export PATH=$PATH:$(pwd)/gh/bin/
+#     gh --version
+# }
 
 with_go() {
     go_version=$1
     url=$(get_gvm_link "${SETUP_GVM_VERSION}")
-    WORKSPACE=${WORKSPACE:-"$(pwd)"}
-    mkdir -p "${WORKSPACE}/bin"
-    export PATH="${PATH}:${WORKSPACE}/bin"
+    create_workspace
     retry 5 curl -L -o "${WORKSPACE}/bin/gvm" "${url}"
     chmod +x "${WORKSPACE}/bin/gvm"
-    ls ${WORKSPACE}/bin/ -l
+    ls -l ${WORKSPACE}/bin/
     eval "$(gvm $go_version)"
     go_path="$(go env GOPATH):$(go env GOPATH)/bin"
     export PATH="${PATH}:${go_path}"
@@ -75,7 +85,3 @@ retry() {
     done
     return 0
 }
-
-# Required env variables:
-#   WORKSPACE
-export WORKSPACE=${WORKSPACE:-"$(pwd)"}

@@ -7,11 +7,7 @@ env:
 steps:
   - label: "Unit Test"
     key: "test-metric-unit-test"
-    command: |
-      cd metricbeat
-      chmod -R go-w ./mb/testdata/
-      umask 0022
-      mage build unitTest
+    command: ".buildkite/metricbeat/scripts/unit-tests.sh"
     agents:
       provider: "gcp"
       image: "${IMAGE_UBUNTU_X86_64}"
