@@ -377,8 +377,8 @@ type dumpDecoder struct {
 // - integer of 64bit (u64 / s64).
 // - dump consecutive memory.
 func NewDumpDecoder(format ProbeFormat) (Decoder, error) {
-	fields := make([]Field, len(format.Fields))
-	fieldsIdx := 0
+	fields := make([]Field, 0, len(format.Fields))
+
 	for name, field := range format.Fields {
 		if strings.Index(name, "arg") != 0 {
 			continue
@@ -389,8 +389,7 @@ func NewDumpDecoder(format ProbeFormat) (Decoder, error) {
 		if field.Size != 8 {
 			return nil, fmt.Errorf("field '%s' length is not 8", name)
 		}
-		fields[fieldsIdx] = field
-		fieldsIdx++
+		fields = append(fields, field)
 	}
 	if len(fields) == 0 {
 		return nil, errors.New("no fields to decode")
