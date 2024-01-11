@@ -53,6 +53,7 @@ func main() {
 	log.SetFlags(0)
 	flag.Parse()
 
+	fmt.Println("------------ beatName = ", beatName)
 	if beatName == "" {
 		log.Fatal("You must use -beat to specify the beat name.")
 	}
@@ -68,7 +69,9 @@ func main() {
 	}
 	dir := args[0]
 
+	fmt.Println("------ dir = ", dir)
 	modules, err := fields.GetModules(dir)
+	fmt.Println("------ modules = ", modules)
 	if err != nil {
 		log.Fatalf("Error fetching modules: %v", err)
 	}
@@ -84,6 +87,7 @@ func main() {
 			log.Fatalf("Error fetching files for module %v: %v", module, err)
 		}
 		if len(files) == 0 {
+			fmt.Println("------ module = ", module)
 			// This can happen on moved modules
 			log.Printf("No fields files for module %v", module)
 			continue

@@ -167,7 +167,7 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 		moduleDir,
 	}
 	moduleFieldsCmd := sh.RunCmd("go", cmd...)
-
+	fmt.Println("---- cmd = ", cmd)
 	return moduleFieldsCmd()
 }
 

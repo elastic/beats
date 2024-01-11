@@ -18,6 +18,7 @@
 package fields
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -34,12 +35,15 @@ var indentByModule = map[string]int{
 // GetModules returns a list of modules for the given modules directory
 func GetModules(modulesDir string) ([]string, error) {
 	moduleInfos, err := os.ReadDir(modulesDir)
+	fmt.Println("------------- modulesDir = ", modulesDir)
+	fmt.Println("              moduleInfos = ", moduleInfos)
 	if err != nil {
 		return nil, err
 	}
 
 	var names []string
 	for _, info := range moduleInfos {
+		fmt.Println("          info.name = ", info.Name())
 		if !info.IsDir() {
 			continue
 		}
