@@ -264,7 +264,7 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 			if checkTimeout {
 				if shouldKillFlow(flow, fw, ts, killFlow) {
 					debugf("kill flow")
-					logp.Info("kvalliy: killing flows worker loop stopped flowid: %s, flow dir: %v killFlow: %v", common.NetString(flow.id.Serialize()), flow.dir, killFlow)
+					//logp.Info("kvalliy: killing flows worker loop stopped flowid: %s, flow dir: %v killFlow: %v", common.NetString(flow.id.Serialize()), flow.dir, killFlow)
 
 					reportFlow = true
 					flow.kill() // mark flow as killed
@@ -285,11 +285,16 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 
 func shouldKillFlow(flow *biFlow, fw *flowsProcessor, ts time.Time, killFlow bool) bool {
 	if ts.Sub(flow.ts) > fw.timeout {
+		logp.Info("kvalliy: Killing flow because no traffic was seen since, flowid: %s", common.NetString(flow.id.Serialize()))
 		return true
 	}
 
 	if !killFlow {
 		return false
+	}
+
+	if ts.Sub(flow.createTS) > fw.timeout {
+		logp.Info("kvalliy: KIlling flow because kill flow on timeout was set, flowid: %s", common.NetString(flow.id.Serialize()))
 	}
 
 	return ts.Sub(flow.createTS) > fw.timeout
