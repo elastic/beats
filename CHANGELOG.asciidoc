@@ -3,6 +3,198 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.11.4]]
+=== Beats version 8.11.4
+https://github.com/elastic/beats/compare/v8.11.3\...v8.11.4[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+- Added fix for formatting the logs from stateloader properly. {pull}37369[37369]
+- Remove duplicated syscall from arm seccomp profile. {pull}37440[37440]
+
+*Metricbeat*
+
+- Add log error when statsd server fails to start {pull}36477[36477]
+- Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
+- Fix event mapping implementation for statsd module {pull}36925[36925]
+- The region and availability_zone ecs fields nested within the cloud field. {pull}37015[37015]
+- Fix CPU and memory metrics collection from privileged process on Windows {issue}17314[17314]{pull}37027[37027]
+- Enhanced Azure Metrics metricset with refined grouping logic and resolved duplication issues for TSDB compatibility {pull}36823[36823]
+- Fix unintended skip in metric collection on Azure Monitor {issue}37204[37204] {pull}37203[37203]
+- Add memory hard limit from container metadata and remove usage percentage in AWS Fargate. {pull}37194[37194]
+- Ignore parser errors from unsupported metrics types on Prometheus client and continue parsing until EOF is reached {pull}37383[37383]
+- Fix the reference time rounding on Azure Metrics {issue}37204[37204] {pull}37365[37365]
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Auditbeat*
+
+*Libbeat*
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Packetbeat*
+
+- Bump Windows Npcap version to v1.78. {issue}37300[37300] {pull}37370[37370]
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+
+*Elastic Log Driver*
+*Elastic Logging Plugin*
+
+
+==== Deprecated
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+
+*Metricbeat*
+
+
+*Osquerybeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+
+*Elastic Logging Plugin*
+
+
+==== Known Issues
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [[release-notes-8.11.3]]
 === Beats version 8.11.3
 https://github.com/elastic/beats/compare/v8.11.2\...v8.11.3[View commits]
