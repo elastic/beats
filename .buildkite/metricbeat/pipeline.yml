@@ -5,39 +5,54 @@ env:
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
 
 steps:
-  - label: "Unit Test"
-    key: "test-metric-unit-test"
-    command: ".buildkite/metricbeat/scripts/unit-tests.sh"
-    agents:
-      provider: "gcp"
-      image: "${IMAGE_UBUNTU_X86_64}"
-      machineType: "c2-standard-16"
 
-  - label: "Go Intergration Test"
-    key: "test-metric-int-test"
-    command: |
-      cd metricbeat
-      mage goIntegTest
-    agents:
-      provider: "gcp"
-      image: "${IMAGE_UBUNTU_X86_64}"
+  - group: "Mandatory Tests"
+    key: "mandatory-tests"
+#    if: define_condition_if_needed_for_group
+    steps:
+      - label: "Ubuntu unit tests"
+        key: "test-metric-unit-test"
+        command: ".buildkite/metricbeat/scripts/unit-tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+    #      machineType: "c2-standard-16"
 
-  - label: "Python Integration Test"
-    key: test-python-int-test
-    command: |
-      cd metricbeat
-      mage pythonIntegTest
-    agents:
-      provider: "gcp"
-      image: "${IMAGE_UBUNTU_X86_64}"
+      - label: "Go Intergration Test"
+        key: "test-metric-int-test"
+        command:
+          - "cd metricbeat"
+          - "mage goIntegTest"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
 
-  - label: "Cross compile"
-    key: test-cross-compile
-    command: |
-      make -C metricbeat crosscompile
-    agents:
-      provider: "gcp"
-      image: "${IMAGE_UBUNTU_X86_64}"
+      - label: "Python Integration Test"
+        key: test-python-int-test
+        command:
+          - "cd metricbeat"
+          - "mage pythonIntegTest"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+
+      - label: "Cross compile"
+        key: test-cross-compile
+        command: "make -C metricbeat crosscompile"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+
+      - label: ":mac: MacOS Unit Tests"
+        key: "macos-extended"
+        # if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "/test metricbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/ || build.env("BUILDKITE_TAG") != ""
+        command:
+          - "ulimit -Sn 50000"
+          - ".buildkite/metricbeat/scripts/unit-tests.sh"
+        agents:
+          provider: "orka"
+          imagePrefix: "generic-13-ventura-x64"
+
 
   # - label: "MacOS unit test"
   #   command:
