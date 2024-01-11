@@ -1,4 +1,4 @@
 type: http
 url: "/metrics"
 suffix: plain
-path: "../_meta/test"
+path: "../_meta/test/KSM"

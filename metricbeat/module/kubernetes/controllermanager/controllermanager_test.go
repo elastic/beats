@@ -50,5 +50,5 @@ func TestData(t *testing.T) {
 }
 
 func TestMetricsFamily(t *testing.T) {
-	k.TestMetricsFamily(t, files, mapping)
+	k.TestMetricsFamilyFromFiles(t, files, mapping)
 }
