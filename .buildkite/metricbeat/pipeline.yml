@@ -12,35 +12,31 @@ steps:
     steps:
       - label: ":linux: Ubuntu unit tests"
         key: "mandatory-linux-unit-test"
-        command: ".buildkite/metricbeat/scripts/unit-tests.sh"
+        command: ".buildkite/metricbeat/scripts/unit_tests.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
 
-#       - label: "Go Intergration Test"
-#         key: "mandatory-int-test"
-#         command:
-#           - "cd metricbeat"
-#           - "mage goIntegTest"
-#         agents:
-#           provider: "gcp"
-#           image: "${IMAGE_UBUNTU_X86_64}"
-#           machineType: "c2-standard-16"
+      - label: "Go Intergration Test"
+        key: "mandatory-int-test"
+        command: ".buildkite/metricbeat/scripts/go_int_tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
 
-#       - label: ":python: Python Integration Test"
-#         key: "mandatory-python-int-test"
-#         command:
-#           - "cd metricbeat"
-#           - "mage pythonIntegTest"
-#         agents:
-#           provider: "gcp"
-#           image: "${IMAGE_UBUNTU_X86_64}"
-#           machineType: "c2-standard-16"
+      - label: ":python: Python Integration Test"
+        key: "mandatory-python-int-test"
+        command: ".buildkite/metricbeat/scripts/py_int_tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
-        command: "make -C metricbeat crosscompile"
+        command: ".buildkite/metricbeat/scripts/crosscompile.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -54,15 +50,7 @@ steps:
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
         # if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "/test metricbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/ || build.env("BUILDKITE_TAG") != ""
-        command: ".buildkite/metricbeat/scripts/unit-tests.sh"
+        command: ".buildkite/metricbeat/scripts/unit_tests.sh"
         agents:
           provider: "orka"
           imagePrefix: "generic-13-ventura-x64"
-
-
-  # - label: "MacOS unit test"
-  #   command:
-  #     cd metricbeat
-  #     mage build unitTest
-  # Ignore as long as there are test failures, see https://github.com/elastic/beats/issues/33035
-  # - label: "MacOS M1"
