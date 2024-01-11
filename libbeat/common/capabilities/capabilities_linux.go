@@ -29,13 +29,12 @@ import (
 )
 
 var (
-	// Tried to map an invalid capability ID: x < 0 || x >= 64.
+	// errInvalidCapability expresses an invalid capability ID: x < 0 || x >= 64.
 	errInvalidCapability = errors.New("invalid capability")
 
-	// Capabilities are linux only and this is returned on other
-	// systems for all the public functions. There is a generic
-	// errors.ErrUnsupported present in golang 1.21, but we still
-	// support 1.20.
+	// ErrUnsupported is returned for all public functions on "not
+	// linux". There is a generic errors.ErrUnsupported present in
+	// golang 1.21, but we still support 1.20.
 	ErrUnsupported = errors.New("capabilities are only supported in linux")
 
 	// The mask when all known capabilities are set.

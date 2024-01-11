@@ -21,7 +21,7 @@ package capabilities
 
 import "errors"
 
-// Returned for all public functions on "not linux".
+// ErrUnsupported is returned for all public functions on "not linux".
 var ErrUnsupported = errors.New("capabilities are only supported in linux")
 
 // Dummy value on "not linux".
