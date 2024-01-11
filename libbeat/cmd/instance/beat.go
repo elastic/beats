@@ -834,9 +834,9 @@ func (b *Beat) configure(settings Settings) error {
 		b.Info.FQDN = fqdn
 	}
 
-	err = b.initConfigManager(false)
+	err = b.initConfigManager()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed initializing manager")
 	}
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
@@ -878,7 +878,7 @@ func (b *Beat) configure(settings Settings) error {
 	return err
 }
 
-func (b *Beat) initConfigManager(forcePackageVersion bool) error {
+func (b *Beat) initConfigManager() error {
 	// initialize config manager
 	m, err := management.NewManager(b.Config.Management, reload.RegisterV2)
 	if err != nil {
@@ -886,12 +886,16 @@ func (b *Beat) initConfigManager(forcePackageVersion bool) error {
 	}
 	b.Manager = m
 
-	// The manager initialisation reads the package version sent by the agent,
-	// now the manager is initialised, we apply the package version if the agent
-	// sent it.
-	if forcePackageVersion || b.Manager.PackageVersion() != "" {
-		b.Info.Version = b.Manager.PackageVersion()
-	}
+	// During the manager initialization the client to connect to the agent is
+	// also initialized. That makes the beat to read information sent by the
+	// agent, which includes the AgentInfo with the agent's package version.
+	// Components running under agent should report the agent's package version
+	// as their own version.
+	// In order to do so b.Info.Version needs to be set to the version the agent
+	// sent. As this Beat instance is initialized much before the package
+	// version is received, it's overridden here. So far it's early enough for
+	// the whole beat to report the right version.
+	b.Info.Version = b.Manager.AgentInfo().Version
 
 	return err
 }

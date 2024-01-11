@@ -231,8 +231,8 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 // Beats central management interface implementation
 // ================================
 
-func (cm *BeatV2Manager) PackageVersion() string {
-	return cm.client.PackageVersion()
+func (cm *BeatV2Manager) AgentInfo() client.AgentInfo {
+	return *cm.client.AgentInfo()
 }
 
 // RegisterDiagnosticHook will register a diagnostic callback function when elastic-agent asks for a diagnostics dump

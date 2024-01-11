@@ -436,13 +436,11 @@ output:
 
 func TestBeat_initConfigManager(t *testing.T) {
 	b, err := NewBeat("testbeat", "", "0.9", false)
-	if err != nil {
-		panic(err)
-	}
+	require.NoError(t, err, "could not create a new beat")
 
-	err = b.initConfigManager(true)
+	err = b.initConfigManager()
 	require.NoError(t, err, "failed initialising config manager")
 
 	assert.Empty(t, b.Info.Version, "config manager initialization"+
-		"should have set Info.Version to empty string")
+		"should have set b.Info.Version to empty string")
 }
