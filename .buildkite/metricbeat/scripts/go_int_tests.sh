@@ -11,6 +11,6 @@ with_mage
 
 pushd "metricbeat" > /dev/null
 
-mage mage goIntegTest
+mage goIntegTest
 
 popd > /dev/null
