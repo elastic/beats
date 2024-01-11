@@ -11,40 +11,48 @@ steps:
 #    if: define_condition_if_needed_for_group
     steps:
       - label: "Ubuntu unit tests"
-        key: "test-metric-unit-test"
+        key: "mandatory-linux-unit-test"
         command: ".buildkite/metricbeat/scripts/unit-tests.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-    #      machineType: "c2-standard-16"
+          machineType: "c2-standard-16"
 
       - label: "Go Intergration Test"
-        key: "test-metric-int-test"
+        key: "mandatory-int-test"
         command:
           - "cd metricbeat"
           - "mage goIntegTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
 
       - label: "Python Integration Test"
-        key: test-python-int-test
+        key: "mandatory-python-int-test"
         command:
           - "cd metricbeat"
           - "mage pythonIntegTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
 
       - label: "Cross compile"
-        key: test-cross-compile
+        key: "mandatory-cross-compile"
         command: "make -C metricbeat crosscompile"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+
+  - group: "Extended Tests"
+    key: "extended-tests"
+#    if: define_condition_if_needed_for_group
+    steps:
 
       - label: ":mac: MacOS Unit Tests"
-        key: "macos-extended"
+        key: "extended-macos-unit-tests"
         # if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "/test metricbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/ || build.env("BUILDKITE_TAG") != ""
         command:
           - "ulimit -Sn 50000"
