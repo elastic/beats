@@ -12,15 +12,15 @@ https://github.com/elastic/beats/compare/v8.11.3\...v8.11.4[View commits]
 *Heartbeat*
 
 - Added fix for formatting the logs from stateloader properly. {pull}37369[37369]
-- Remove duplicated syscall from arm seccomp profile. {pull}37440[37440]
+- Remove duplicated syscall from ARM seccomp profile. {pull}37440[37440]
 
 *Metricbeat*
 
-- The region and availability_zone ecs fields nested within the cloud field. {pull}37015[37015]
-- Fix CPU and memory metrics collection from privileged process on Windows {issue}17314[17314]{pull}37027[37027]
+- Nest the `region` and `availability_zone` ECS fields within the cloud field. {pull}37015[37015]
+- Fix CPU and memory metrics collection from privileged process on Windows. {issue}17314[17314]{pull}37027[37027]
 - Add memory hard limit from container metadata and remove usage percentage in AWS Fargate. {pull}37194[37194]
-- Ignore parser errors from unsupported metrics types on Prometheus client and continue parsing until EOF is reached {pull}37383[37383]
-- Fix the reference time rounding on Azure Metrics {issue}37204[37204] {pull}37365[37365]
+- Ignore parser errors from unsupported metrics types on Prometheus client and continue parsing until EOF is reached. {pull}37383[37383]
+- Fix the reference time rounding on Azure Metrics. {issue}37204[37204] {pull}37365[37365]
 
 ==== Added
 
