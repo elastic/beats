@@ -30,6 +30,9 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
 
+	interfaces "k8s.io/client-go/kubernetes"
+	caches "k8s.io/client-go/tools/cache"
+
 	"github.com/elastic/beats/v7/libbeat/autodiscover/template"
 	"github.com/elastic/elastic-agent-autodiscover/bus"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
@@ -2117,12 +2120,34 @@ type mockUpdaterStore struct {
 	objects []interface{}
 }
 
+var store caches.Store
+var client interfaces.Interface
+var err error
+
 type mockUpdaterWatcher struct {
 	cachedObject runtime.Object
 }
 
 func (s *mockUpdaterWatcher) CachedObject() runtime.Object {
 	return s.cachedObject
+}
+
+func (s *mockUpdaterWatcher) Client() interfaces.Interface {
+	return client
+}
+
+func (s *mockUpdaterWatcher) Start() error {
+	return err
+}
+
+func (s *mockUpdaterWatcher) Stop() {
+}
+
+func (s *mockUpdaterWatcher) Store() caches.Store {
+	return store
+}
+
+func (s *mockUpdaterWatcher) AddEventHandler(kubernetes.ResourceEventHandler) {
 }
 
 func (s *mockUpdaterStore) List() []interface{} {
