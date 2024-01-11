@@ -31649,6 +31649,18 @@ format: bytes
 
 --
 
+*`elasticsearch.index.summary.total.store.total_data_set_size.bytes`*::
++
+--
+Total size of the index in bytes including backing data for partially mounted indices.
+
+
+type: long
+
+format: bytes
+
+--
+
 *`elasticsearch.index.summary.total.segments.count`*::
 +
 --
