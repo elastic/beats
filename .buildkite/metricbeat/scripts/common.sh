@@ -24,12 +24,24 @@ with_yq() {
     pip install yq
 }
 
+# with_mage() {
+#     create_workspace
+#     retry 5 curl -L -o "${WORKSPACE}/bin/mage.tar.gz" "https://github.com/magefile/mage/releases/download/v${SETUP_MAGE_VERSION}/mage_${SETUP_MAGE_VERSION}_Linux-64bit.tar.gz"
+#     tar -xvf "${WORKSPACE}/bin/mage.tar.gz" -C "${WORKSPACE}/bin"
+#     chmod +x "${WORKSPACE}/bin/mage"
+#     mage --version
+# }
+
 with_mage() {
+    local install_packages=(
+            "github.com/magefile/mage"
+            "github.com/elastic/go-licenser"
+            "golang.org/x/tools/cmd/goimports"
+    )
     create_workspace
-    retry 5 curl -L -o "${WORKSPACE}/bin/mage.tar.gz" "https://github.com/magefile/mage/releases/download/v${SETUP_MAGE_VERSION}/mage_${SETUP_MAGE_VERSION}_Linux-64bit.tar.gz"
-    tar -xvf "${WORKSPACE}/bin/mage.tar.gz" -C "${WORKSPACE}/bin"
-    chmod +x "${WORKSPACE}/bin/mage"
-    mage --version
+    for pkg in "${install_packages[@]}"; do
+        go install "${pkg}@latest"
+    done
 }
 
 # with_gh() {
