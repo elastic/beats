@@ -136,6 +136,8 @@ func TestCtxAfterDoRequest(t *testing.T) {
 }
 
 func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
+	ctx := context.Background()
+	log := logp.NewLogger("")
 	cfg := defaultChainConfig()
 
 	url, _ := url.Parse("https://example.com")
@@ -153,19 +155,23 @@ func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
 			Password: password,
 		},
 	}
-	cfg.Chain[0].Step.Auth = cfg.Auth
-	cfg.Chain[0].While.Auth = cfg.Auth
 
-	ctx := context.Background()
-	log := logp.NewLogger("")
-
-	requestFactories, err := newRequestFactory(ctx, cfg, log, nil, nil)
-	assert.NoError(t, err)
-	assert.NotNil(t, requestFactories)
-	for _, rf := range requestFactories {
-		assert.Equal(t, rf.user, user)
-		assert.Equal(t, rf.password, password)
+	check := func() {
+		requestFactories, err := newRequestFactory(ctx, cfg, log, nil, nil)
+		assert.NoError(t, err)
+		assert.NotNil(t, requestFactories)
+		for _, rf := range requestFactories {
+			assert.Equal(t, rf.user, user)
+			assert.Equal(t, rf.password, password)
+		}
 	}
+
+	cfg.Chain[0].Step.Auth = cfg.Auth
+	check()
+	cfg.Chain[0].Step = nil
+
+	cfg.Chain[0].While.Auth = cfg.Auth
+	check()
 }
 
 func Test_newChainHTTPClient(t *testing.T) {
