@@ -59,6 +59,9 @@ type Watcher interface {
 
 	// Client returns the kubernetes client object used by the watcher
 	Client() kubernetes.Interface
+
+	// CachedObject returns the old object before change during the last updated event
+	CachedObject() runtime.Object
 }
 
 // WatchOptions controls watch behaviors
@@ -83,14 +86,15 @@ type item struct {
 }
 
 type watcher struct {
-	client   kubernetes.Interface
-	informer cache.SharedInformer
-	store    cache.Store
-	queue    workqueue.Interface
-	ctx      context.Context
-	stop     context.CancelFunc
-	handler  ResourceEventHandler
-	logger   *logp.Logger
+	client       kubernetes.Interface
+	informer     cache.SharedInformer
+	store        cache.Store
+	queue        workqueue.Interface
+	ctx          context.Context
+	stop         context.CancelFunc
+	handler      ResourceEventHandler
+	logger       *logp.Logger
+	cachedObject runtime.Object
 }
 
 // NewWatcher initializes the watcher client to provide a events handler for
@@ -106,7 +110,7 @@ func NewWatcher(client kubernetes.Interface, resource Resource, opts WatchOption
 func NewNamedWatcher(name string, client kubernetes.Interface, resource Resource, opts WatchOptions, indexers cache.Indexers) (Watcher, error) {
 	var store cache.Store
 	var queue workqueue.Interface
-
+	var cachedObject runtime.Object
 	informer, _, err := NewInformer(client, resource, opts, indexers)
 	if err != nil {
 		return nil, err
@@ -127,14 +131,15 @@ func NewNamedWatcher(name string, client kubernetes.Interface, resource Resource
 
 	ctx, cancel := context.WithCancel(context.TODO())
 	w := &watcher{
-		client:   client,
-		informer: informer,
-		store:    store,
-		queue:    queue,
-		ctx:      ctx,
-		stop:     cancel,
-		logger:   logp.NewLogger("kubernetes"),
-		handler:  NoOpEventHandlerFuncs{},
+		client:       client,
+		informer:     informer,
+		store:        store,
+		queue:        queue,
+		ctx:          ctx,
+		cachedObject: cachedObject,
+		stop:         cancel,
+		logger:       logp.NewLogger("kubernetes"),
+		handler:      NoOpEventHandlerFuncs{},
 	}
 
 	w.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -157,6 +162,14 @@ func NewNamedWatcher(name string, client kubernetes.Interface, resource Resource
 				// state should just be deduped by autodiscover and not stop/started periodically as would be the case with an update.
 				w.enqueue(n, add)
 			}
+
+			//We check the type of resource and only if it is namespace or node return the cacheObject
+			switch resource.(type) {
+			case *Namespace:
+				w.cacheObject(o)
+			case *Node:
+				w.cacheObject(o)
+			}
 		},
 	})
 
@@ -176,6 +189,11 @@ func (w *watcher) Store() cache.Store {
 // Client returns the kubernetes client object used by the watcher
 func (w *watcher) Client() kubernetes.Interface {
 	return w.client
+}
+
+// CachedObject returns the old object in cache during the last updated event
+func (w *watcher) CachedObject() runtime.Object {
+	return w.cachedObject
 }
 
 // Start watching pods
@@ -215,6 +233,15 @@ func (w *watcher) enqueue(obj interface{}, state string) {
 		obj = deleted.Obj
 	}
 	w.queue.Add(&item{key, obj, state})
+}
+
+// cacheObject updates watcher with the old version of cache objects before change during update events
+func (w *watcher) cacheObject(o interface{}) {
+	if old, ok := o.(runtime.Object); !ok {
+		utilruntime.HandleError(fmt.Errorf("expected object in cache got %#v", o))
+	} else {
+		w.cachedObject = old
+	}
 }
 
 // process gets the top of the work queue and processes the object that is received.

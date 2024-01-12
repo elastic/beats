@@ -74,6 +74,7 @@ func (p *pod) Generate(obj kubernetes.Resource, opts ...FieldOptions) mapstr.M {
 		"kubernetes": p.GenerateK8s(obj, opts...),
 	}
 	meta.DeepUpdate(ecsFields)
+
 	return meta
 }
 
