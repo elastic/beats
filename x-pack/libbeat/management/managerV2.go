@@ -515,6 +515,10 @@ func (cm *BeatV2Manager) unitListen() {
 				units[k] = u
 			}
 			cm.mx.Unlock()
+
+			// TODO(AndersonQ): decide if it's indeed needed.
+			version.SetPackageVersion(cm.AgentInfo().Version)
+
 			cm.reload(units)
 			if cm.forceReload {
 				// Restart the debounce timer so we try to reload the inputs.
