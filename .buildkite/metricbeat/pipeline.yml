@@ -9,10 +9,10 @@ env:
 
 steps:
 
-#   - group: "Mandatory Tests"
-#     key: "mandatory-tests"
-# #    if: define_condition_if_needed_for_group
-#     steps:
+  - group: "Mandatory Tests"
+    key: "mandatory-tests"
+#    if: define_condition_if_needed_for_group
+    steps:
       # TODO: Ubuntu Unit Tests have some issues, it needs to be compared with the Jenkins pipeline, but it's difficult to find it :)
       # - label: ":linux: Ubuntu Unit Tests"
       #   key: "mandatory-linux-unit-test"
@@ -46,20 +46,20 @@ steps:
       #     image: "${IMAGE_UBUNTU_X86_64}"
       #     machineType: "c2-standard-16"
 
-      # - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-      #   command: ".buildkite/metricbeat/scripts/win_unit_tests.ps1"
-      #   key: "mandatory-win-unit-tests"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "{{matrix.image}}"
-      #     machine_type: "n2-standard-8"
-      #     disk_size: 100
-      #     disk_type: "pd-ssd"
-      #   matrix:
-      #     setup:
-      #       image:
-      #         - "${IMAGE_WIN_2016}"
-      #         - "${IMAGE_WIN_2022}"
+      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+        command: ".buildkite/metricbeat/scripts/win_unit_tests.ps1"
+        key: "mandatory-win-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machine_type: "n2-standard-8"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_2016}"
+              - "${IMAGE_WIN_2022}"
 
 #   - group: "Extended Tests"
 #     key: "extended-tests"
@@ -84,5 +84,5 @@ steps:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
           machine_type: "n2-standard-8"
-          disk_size: 100
+          disk_size: 200
           disk_type: "pd-ssd"
