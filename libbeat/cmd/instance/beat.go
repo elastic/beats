@@ -852,6 +852,7 @@ func (b *Beat) configure(settings Settings) error {
 		// version is received, it's overridden here. So far it's early enough for
 		// the whole beat to report the right version.
 		b.Info.Version = b.Manager.AgentInfo().Version
+		version.SetPackageVersion(b.Info.Version)
 	}
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
