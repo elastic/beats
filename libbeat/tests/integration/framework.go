@@ -90,7 +90,7 @@ type Total struct {
 	Value int `json:"value"`
 }
 
-// NewBeat createa a new Beat process from the system tests binary.
+// NewBeat creates a new Beat process from the system tests binary.
 // It sets some required options like the home path, logging, etc.
 // `tempDir` will be used as home and logs directory for the Beat
 // `args` will be passed as CLI arguments to the Beat
