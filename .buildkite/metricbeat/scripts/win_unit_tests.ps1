@@ -8,14 +8,23 @@ function fixCRLF {
     git rm --quiet --cached -r .
     git reset --quiet --hard
 }
+function withChoco {
+  Write-Host "-- Configure Choco --"
+  $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."
+  Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+}
 function withGolang($version) {
     Write-Host "-- Install golang $version --"
     choco install -y golang --version=$version
-    $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."
-    Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
     refreshenv
-    go version
-    go env
+    go --version
+}
+function withPython($version) {
+  Write-Host "-- Install Python $version --"
+  choco install python --version=$version
+  refreshenv
+  python --version
+  python -m site
 }
 function installGoDependencies {
     $installPackages = @(
@@ -31,8 +40,14 @@ function installGoDependencies {
 }
 
 fixCRLF
+
+withChoco
+
 withGolang $env:GO_VERSION
+
 installGoDependencies
+
+withPython 3.12.0
 
 $ErrorActionPreference = "Continue" # set +e
 

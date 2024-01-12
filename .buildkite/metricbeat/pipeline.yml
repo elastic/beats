@@ -89,8 +89,8 @@ steps:
           disk_type: "pd-ssd"
         artifact_paths: "build/*.*"
 
-  - wait:
-      allow_dependency_failure: true
+  - wait: ~
+    allow_dependency_failure: false
 
   - label: ":junit: Junit annotate"
     plugins:
