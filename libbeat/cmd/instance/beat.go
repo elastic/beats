@@ -834,9 +834,24 @@ func (b *Beat) configure(settings Settings) error {
 		b.Info.FQDN = fqdn
 	}
 
-	err = b.initConfigManager()
+	// initialize config manager
+	m, err := management.NewManager(b.Config.Management, reload.RegisterV2)
 	if err != nil {
-		return fmt.Errorf("failed initializing manager")
+		return err
+	}
+	b.Manager = m
+
+	if b.Manager.AgentInfo().Version != "" {
+		// During the manager initialization the client to connect to the agent is
+		// also initialized. That makes the beat to read information sent by the
+		// agent, which includes the AgentInfo with the agent's package version.
+		// Components running under agent should report the agent's package version
+		// as their own version.
+		// In order to do so b.Info.Version needs to be set to the version the agent
+		// sent. As this Beat instance is initialized much before the package
+		// version is received, it's overridden here. So far it's early enough for
+		// the whole beat to report the right version.
+		b.Info.Version = b.Manager.AgentInfo().Version
 	}
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
@@ -874,28 +889,6 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.Manager.RegisterDiagnosticHook("global processors", "a list of currently configured global beat processors",
 		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
-
-	return err
-}
-
-func (b *Beat) initConfigManager() error {
-	// initialize config manager
-	m, err := management.NewManager(b.Config.Management, reload.RegisterV2)
-	if err != nil {
-		return err
-	}
-	b.Manager = m
-
-	// During the manager initialization the client to connect to the agent is
-	// also initialized. That makes the beat to read information sent by the
-	// agent, which includes the AgentInfo with the agent's package version.
-	// Components running under agent should report the agent's package version
-	// as their own version.
-	// In order to do so b.Info.Version needs to be set to the version the agent
-	// sent. As this Beat instance is initialized much before the package
-	// version is received, it's overridden here. So far it's early enough for
-	// the whole beat to report the right version.
-	b.Info.Version = b.Manager.AgentInfo().Version
 
 	return err
 }

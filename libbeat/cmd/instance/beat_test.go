@@ -433,14 +433,3 @@ output:
 		})
 	}
 }
-
-func TestBeat_initConfigManager(t *testing.T) {
-	b, err := NewBeat("testbeat", "", "0.9", false)
-	require.NoError(t, err, "could not create a new beat")
-
-	err = b.initConfigManager()
-	require.NoError(t, err, "failed initialising config manager")
-
-	assert.Empty(t, b.Info.Version, "config manager initialization"+
-		"should have set b.Info.Version to empty string")
-}
