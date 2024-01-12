@@ -17,14 +17,13 @@ function withGolang($version) {
     Write-Host "-- Install golang $version --"
     choco install -y golang --version=$version
     refreshenv
-    go --version
+    go version
 }
 function withPython($version) {
   Write-Host "-- Install Python $version --"
   choco install python --version=$version
   refreshenv
   python --version
-  python -m site
 }
 function installGoDependencies {
     $installPackages = @(
@@ -47,7 +46,7 @@ withGolang $env:GO_VERSION
 
 installGoDependencies
 
-withPython 3.12.0
+withPython $env:SETUP_PYTHON_VERSION
 
 $ErrorActionPreference = "Continue" # set +e
 
