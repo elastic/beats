@@ -9,10 +9,10 @@ env:
 
 steps:
 
-  - group: "Mandatory Tests"
-    key: "mandatory-tests"
-#    if: define_condition_if_needed_for_group
-    steps:
+#   - group: "Mandatory Tests"
+#     key: "mandatory-tests"
+# #    if: define_condition_if_needed_for_group
+#     steps:
       # TODO: Ubuntu Unit Tests have some issues, it needs to be compared with the Jenkins pipeline, but it's difficult to find it :)
       # - label: ":linux: Ubuntu Unit Tests"
       #   key: "mandatory-linux-unit-test"
