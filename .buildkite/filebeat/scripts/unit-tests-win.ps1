@@ -70,15 +70,8 @@ Set-Location -Path filebeat
 New-Item -ItemType Directory -Force -Path "build"
 withGolang
 installGoDependencies
-#
-#$oldUmask = $ExecutionContext.SessionState.LanguageMode
-#$ExecutionContext.SessionState.LanguageMode = "NoLanguage"
-#$ExecutionContext.SessionState.LanguageMode = $oldUmask
 
 mage build unitTest
-getLogLineEnding -FilePath filebeat\tests\files\logs\docker_corrupted.log
-
-#findLog
 
 $EXITCODE=$LASTEXITCODE
 $ErrorActionPreference = "Stop"
