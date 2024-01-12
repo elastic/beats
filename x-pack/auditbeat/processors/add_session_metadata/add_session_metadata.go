@@ -108,7 +108,6 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	pid, err := pidToUInt32(pidIf)
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse pid field '%s': %w", p.config.PidField, err)
