@@ -74,6 +74,7 @@ var tlsCipherSuites = map[string]CipherSuite{
 var tlsCipherSuitesInverse = make(map[CipherSuite]string, len(tlsCipherSuites))
 var tlsRenegotiationSupportTypesInverse = make(map[TLSRenegotiationSupport]string, len(tlsRenegotiationSupportTypes))
 var tlsVerificationModesInverse = make(map[TLSVerificationMode]string, len(tlsVerificationModes))
+var tlsClientAuthTypesInverse = make(map[TLSClientAuth]string, len(tlsClientAuthTypes))
 
 // Init creates a inverse representation of the values mapping.
 func init() {
@@ -87,6 +88,10 @@ func init() {
 
 	for name, t := range tlsVerificationModes {
 		tlsVerificationModesInverse[t] = name
+	}
+
+	for name, t := range tlsClientAuthTypes {
+		tlsClientAuthTypesInverse[t] = name
 	}
 }
 
@@ -103,20 +108,20 @@ var tlsRenegotiationSupportTypes = map[string]TLSRenegotiationSupport{
 	"freely": TLSRenegotiationSupport(tls.RenegotiateFreelyAsClient),
 }
 
-type tlsClientAuth int
+type TLSClientAuth int
 
 const (
-	tlsClientAuthNone     tlsClientAuth = tlsClientAuth(tls.NoClientCert)
-	tlsClientAuthOptional               = tlsClientAuth(tls.VerifyClientCertIfGiven)
-	tlsClientAuthRequired               = tlsClientAuth(tls.RequireAndVerifyClientCert)
+	TLSClientAuthNone     TLSClientAuth = TLSClientAuth(tls.NoClientCert)
+	TLSClientAuthOptional               = TLSClientAuth(tls.VerifyClientCertIfGiven)
+	TLSClientAuthRequired               = TLSClientAuth(tls.RequireAndVerifyClientCert)
 
 	unknownType = "unknown"
 )
 
-var tlsClientAuthTypes = map[string]tlsClientAuth{
-	"none":     tlsClientAuthNone,
-	"optional": tlsClientAuthOptional,
-	"required": tlsClientAuthRequired,
+var tlsClientAuthTypes = map[string]TLSClientAuth{
+	"none":     TLSClientAuthNone,
+	"optional": TLSClientAuthOptional,
+	"required": TLSClientAuthRequired,
 }
 
 // TLSVerificationMode represents the type of verification to do on the remote host:
@@ -179,10 +184,28 @@ func (m *TLSVerificationMode) Unpack(in interface{}) error {
 	return nil
 }
 
-func (m *tlsClientAuth) Unpack(s string) error {
+func (m TLSClientAuth) String() string {
+	if s, ok := tlsClientAuthTypesInverse[m]; ok {
+		return s
+	}
+	return unknownType
+}
+
+func (m TLSClientAuth) MarshalText() ([]byte, error) {
+	if s, ok := tlsClientAuthTypesInverse[m]; ok {
+		return []byte(s), nil
+	}
+	return nil, fmt.Errorf("could not marshal '%+v' to text", m)
+}
+
+func (m *TLSClientAuth) Unpack(s string) error {
+	if s == "" {
+		*m = TLSClientAuthNone
+		return nil
+	}
 	mode, found := tlsClientAuthTypes[s]
 	if !found {
-		return fmt.Errorf("unknown client authentication mode'%v'", s)
+		return fmt.Errorf("unknown client authentication mode '%v'", s)
 	}
 
 	*m = mode
