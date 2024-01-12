@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop" # set -e
-$WorkFolder = "metricbeats"
+$WorkFolder = "metricbeat"
 # Forcing to checkout again all the files with a correct autocrlf.
 # Doing this here because we cannot set git clone options before.
 # function fixCRLF {
@@ -10,7 +10,7 @@ $WorkFolder = "metricbeats"
 # }
 function withGolang($version) {
     Write-Host "-- Install golang --"
-    choco install -y golang --version $version
+    choco install -y golang --version=$version
     $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."
     Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
     refreshenv
@@ -36,10 +36,12 @@ installGoDependencies
 
 $ErrorActionPreference = "Continue" # set +e
 
-Set-Location -Path $WorkFolder
+Push-Location $WorkFolder
 
 New-Item -ItemType Directory -Force -Path "build"
 mage build unitTest
+
+Pop-Location
 
 $EXITCODE=$LASTEXITCODE
 $ErrorActionPreference = "Stop"
