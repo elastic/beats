@@ -98,6 +98,7 @@ output.elasticsearch:
 In the previous example, the Elasticsearch nodes are available at `https://10.45.3.2:9220/elasticsearch` and
 `https://10.45.3.1:9230/elasticsearch`.
 
+[[compression-level-option]]
 ===== `compression_level`
 
 The gzip compression level. Setting this value to `0` disables compression.
@@ -114,6 +115,7 @@ Configure escaping of HTML in strings. Set to `true` to enable escaping.
 The default value is `false`.
 
 
+[[worker-option]]
 ===== `worker`
 
 The number of workers per configured host publishing events to Elasticsearch. This
@@ -659,6 +661,7 @@ The default is 3.
 endif::[]
 
 
+[[bulk-max-size-option]]
 ===== `bulk_max_size`
 
 The maximum number of events to bulk in a single Elasticsearch bulk API index request. The default is 1600.
@@ -691,6 +694,7 @@ default is `1s`.
 The maximum number of seconds to wait before attempting to connect to
 Elasticsearch after a network error. The default is `60s`.
 
+[[idle-connection-timeout-option]]
 ===== `idle_connection_timeout`
 
 The maximum amount of time an idle connection will remain idle before closing itself.
@@ -701,7 +705,7 @@ The default is 3s.
 
 The http request timeout in seconds for the Elasticsearch request. The default is 90.
 
-==== `allow_older_versions`
+===== `allow_older_versions`
 
 By default, {beatname_uc} expects the Elasticsearch instance to be on the same or newer version to provide
 optimal experience. We suggest you connect to the same version to make sure all features {beatname_uc} is using are
@@ -758,6 +762,75 @@ output.elasticsearch:
   non_indexable_policy.dead_letter_index:
     index: "my-dead-letter-index"
 ------------------------------------------------------------------------------
+
+===== `preset`
+
+The performance preset to apply to the output configuration.
+
+["source","yaml"]
+------------------------------------------------------------------------------
+output.elasticsearch:
+  hosts: ["http://localhost:9200"]
+  preset: balanced
+------------------------------------------------------------------------------
+
+Performance presets apply a set of configuration overrides based on a desired performance goal. If set, a performance preset will override other configuration flags to match the recommended settings for that preset. Valid options are:
+* `balanced`: good starting point for general efficiency
+* `throughput`: good for high data volumes, may increase cpu and memory requirements
+* `scale`: reduces ambient resource use in large low-throughput deployments
+* `latency`: minimize the time for fresh data to become visible in Elasticsearch
+* `custom`: apply user configuration directly with no overrides
+
+The default if unspecified is `custom`.
+
+Presets represent current recommendations based on the intended goal; their effect may change between versions to better suit those goals. Currently the presets have the following effects:
+
+[cols="2,1,1,1,1"]
+|===
+|preset |balanced |throughput |scale |latency
+
+|<<bulk-max-size-option,`bulk_max_size`>>
+|1600
+|1600
+|1600
+|50
+
+|<<worker-option,`worker`>>
+|1
+|4
+|1
+|1
+
+|<<queue-mem-events-option,`queue.mem.events`>>
+|3200
+|12800
+|3200
+|4100
+
+|<<queue-mem-flush-min-events-option,`queue.mem.flush.min_events`>>
+|1600
+|1600
+|1600
+|2050
+
+|<<queue-mem-flush-timeout-option,`queue.mem.flush.timeout`>>
+|`10s`
+|`5s`
+|`20s`
+|`1s`
+
+|<<compression-level-option,`compression_level`>>
+|1
+|1
+|1
+|1
+
+|<<idle-connection-timeout-option,`idle_connection_timeout`>>
+|`3s`
+|`15s`
+|`1s`
+|`60s`
+|===
 
 [[es-apis]]
 ==== Elasticsearch APIs

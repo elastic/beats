@@ -316,13 +316,8 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
 			}
-			if ch.Step.Auth != nil && ch.Step.Auth.Basic.isEnabled() {
-				rf.user = ch.Step.Auth.Basic.User
-				rf.password = ch.Step.Auth.Basic.Password
-			}
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, log)
-
 			rf = &requestFactory{
 				url:                    *ch.Step.Request.URL.URL,
 				method:                 ch.Step.Request.Method,
@@ -336,6 +331,10 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 				chainClient:            client,
 				chainResponseProcessor: responseProcessor,
 			}
+			if ch.Step.Auth != nil && ch.Step.Auth.Basic.isEnabled() {
+				rf.user = ch.Step.Auth.Basic.User
+				rf.password = ch.Step.Auth.Basic.Password
+			}
 		} else if ch.While != nil {
 			ts, _ := newBasicTransformsFromConfig(registeredTransforms, ch.While.Request.Transforms, requestNamespace, log)
 			policy := newHTTPPolicy(evaluateResponse, ch.While.Until, log)
@@ -343,10 +342,6 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 			client, err := newChainHTTPClient(ctx, ch.While.Auth, ch.While.Request, log, reg, policy)
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
-			}
-			if ch.While.Auth != nil && ch.While.Auth.Basic.isEnabled() {
-				rf.user = ch.While.Auth.Basic.User
-				rf.password = ch.While.Auth.Basic.Password
 			}
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, log)
@@ -363,6 +358,10 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 				isChain:                true,
 				chainClient:            client,
 				chainResponseProcessor: responseProcessor,
+			}
+			if ch.While.Auth != nil && ch.While.Auth.Basic.isEnabled() {
+				rf.user = ch.While.Auth.Basic.User
+				rf.password = ch.While.Auth.Basic.Password
 			}
 		}
 		rfs = append(rfs, rf)
