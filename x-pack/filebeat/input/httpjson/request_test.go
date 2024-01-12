@@ -156,22 +156,53 @@ func Test_newRequestFactory_UsesBasicAuthInChainedRequests(t *testing.T) {
 		},
 	}
 
-	check := func() {
-		requestFactories, err := newRequestFactory(ctx, cfg, log, nil, nil)
-		assert.NoError(t, err)
-		assert.NotNil(t, requestFactories)
-		for _, rf := range requestFactories {
-			assert.Equal(t, rf.user, user)
-			assert.Equal(t, rf.password, password)
-		}
+	step := cfg.Chain[0].Step
+	step.Auth = cfg.Auth
+
+	while := cfg.Chain[0].While
+	while.Auth = cfg.Auth
+
+	type args struct {
+		cfg   config
+		step  *stepConfig
+		while *whileConfig
 	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "Step",
+			args: args{
+				cfg:   cfg,
+				step:  step,
+				while: nil,
+			},
+		},
+		{
+			name: "While",
+			args: args{
+				cfg:   cfg,
+				step:  nil,
+				while: while,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
 
-	cfg.Chain[0].Step.Auth = cfg.Auth
-	check()
-	cfg.Chain[0].Step = nil
+			tt.args.cfg.Chain[0].Step = tt.args.step
+			tt.args.cfg.Chain[0].While = tt.args.while
+			requestFactories, err := newRequestFactory(ctx, tt.args.cfg, log, nil, nil)
+			assert.NoError(t, err)
+			assert.NotNil(t, requestFactories)
+			for _, rf := range requestFactories {
+				assert.Equal(t, rf.user, user)
+				assert.Equal(t, rf.password, password)
+			}
 
-	cfg.Chain[0].While.Auth = cfg.Auth
-	check()
+		})
+	}
 }
 
 func Test_newChainHTTPClient(t *testing.T) {
