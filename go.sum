@@ -83,8 +83,8 @@ github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4/go.mod h1:hN
 github.com/99designs/keyring v1.2.1/go.mod h1:fc+wB5KTk9wQ9sDx0kFXB3A0MaeGHM9AwRStKOQ5vOA=
 github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 h1:bvDV9vkmnHYOMsOr4WLk+Vo07yKIzd94sVoIqshQ4bU=
 github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24/go.mod h1:8o94RPi1/7XTJvwPpRSzSUedZrtlirdB3r9Z20bi2f8=
-github.com/AndersonQ/elastic-agent-client/v7 v7.0.0-20240112133008-685433604774 h1:p7ILtV8I+0znzwsxEliudy/4gqU+XDGoq5jqahqX4VE=
-github.com/AndersonQ/elastic-agent-client/v7 v7.0.0-20240112133008-685433604774/go.mod h1:fnLqPl+Fu6BRbJl0+7bOI3KVX9JH6wOOzrKPW/7HqX8=
+github.com/AndersonQ/elastic-agent-client/v7 v7.0.0-20240112140442-427024c0c681 h1:hBp1QifntJ+r1oW3MIGT7yVDjwhqh0cVHEII0Br2So0=
+github.com/AndersonQ/elastic-agent-client/v7 v7.0.0-20240112140442-427024c0c681/go.mod h1:fnLqPl+Fu6BRbJl0+7bOI3KVX9JH6wOOzrKPW/7HqX8=
 github.com/Azure/azure-amqp-common-go/v3 v3.2.1 h1:uQyDk81yn5hTP1pW4Za+zHzy97/f4vDz9o1d/exI4j4=
 github.com/Azure/azure-amqp-common-go/v3 v3.2.1/go.mod h1:O6X1iYHP7s2x7NjUKsXVhkwWrQhxrd+d8/3rRadj4CI=
 github.com/Azure/azure-event-hubs-go/v3 v3.3.15 h1:2yAik9gS5Qjs4Z6EM1B6d0tfZJ506B/0oA08JlRQxb8=
