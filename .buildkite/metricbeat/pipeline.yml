@@ -3,6 +3,9 @@ env:
   SETUP_GVM_VERSION: 'v0.5.1'
   SETUP_MAGE_VERSION: '1.13.0'
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
+  IMAGE_WIN_2016: "family/core-windows-2016"
+  IMAGE_WIN_2019: "family/core-windows-2019"
+  IMAGE_WIN_2022: "family/core-windows-2022"
 
 steps:
 
@@ -10,7 +13,7 @@ steps:
     key: "mandatory-tests"
 #    if: define_condition_if_needed_for_group
     steps:
-      - label: ":linux: Ubuntu unit tests"
+      - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
         command: ".buildkite/metricbeat/scripts/unit_tests.sh"
         agents:
@@ -18,7 +21,7 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
 
-      - label: "Go Intergration Test"
+      - label: ":go: Go Intergration Tests"
         key: "mandatory-int-test"
         command: ".buildkite/metricbeat/scripts/go_int_tests.sh"
         agents:
@@ -26,7 +29,7 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
 
-      - label: ":python: Python Integration Test"
+      - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: ".buildkite/metricbeat/scripts/py_int_tests.sh"
         agents:
@@ -42,6 +45,21 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
 
+      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+        command: ".buildkite/filebeat/scripts/win_unit_tests.ps1"
+        key: "mandatory-win-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machine_type: "n2-standard-8"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_2016}"
+              - "${IMAGE_WIN_2022}"
+
   - group: "Extended Tests"
     key: "extended-tests"
 #    if: define_condition_if_needed_for_group
@@ -54,3 +72,13 @@ steps:
         agents:
           provider: "orka"
           imagePrefix: "generic-13-ventura-x64"
+
+      - label: ":windows: Win 2019 Unit Tests"
+        key: "extended-win2019-unit-tests"
+        command: ".buildkite/filebeat/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machine_type: "n2-standard-8"
+          disk_size: 100
+          disk_type: "pd-ssd"

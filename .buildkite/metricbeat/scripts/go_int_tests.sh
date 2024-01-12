@@ -9,6 +9,7 @@ add_bin_path
 with_go ${GO_VERSION}
 with_mage
 
+echo "--- run intergration tests"
 pushd "metricbeat" > /dev/null
 
 mage goIntegTest

@@ -15,14 +15,14 @@ add_bin_path() {
   export PATH="${PATH}:${WORKSPACE}/bin"
 }
 
-with_virtualenv() {
-  export PATH=$PATH:/root/.local/bin
-  python3 -m pip install --user virtualenv
-}
+# with_virtualenv() {
+#   export PATH=$PATH:/root/.local/bin
+#   python3 -m pip install --user virtualenv
+# }
 
-with_yq() {
-  pip install yq
-}
+# with_yq() {
+#   pip install yq
+# }
 
 with_mage() {
   local install_packages=(
