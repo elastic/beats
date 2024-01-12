@@ -82,12 +82,13 @@ func main() {
 	}
 
 	for _, module := range modules {
+		fmt.Println("------ module = ", module)
 		files, err := fields.CollectFiles(module, dir)
 		if err != nil {
 			log.Fatalf("Error fetching files for module %v: %v", module, err)
 		}
 		if len(files) == 0 {
-			fmt.Println("------ module = ", module)
+			fmt.Println("------ module len(files) is zero = ", module)
 			// This can happen on moved modules
 			log.Printf("No fields files for module %v", module)
 			continue

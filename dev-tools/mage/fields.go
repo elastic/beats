@@ -19,6 +19,7 @@ package mage
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/magefile/mage/sh"
@@ -169,6 +170,9 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 	moduleFieldsCmd := sh.RunCmd("go", cmd...)
 	fmt.Println("------- moduleDir = ", moduleDir)
 	fmt.Println("---- cmd = ", cmd)
+	readDir, err := os.ReadDir(moduleDir)
+	fmt.Println("--------- list modules: ", readDir)
+	fmt.Println("--------- os.ReadDir err = ", err)
 	return moduleFieldsCmd()
 }
 
