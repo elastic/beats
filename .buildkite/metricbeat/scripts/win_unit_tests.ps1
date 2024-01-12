@@ -38,6 +38,7 @@ $ErrorActionPreference = "Continue" # set +e
 
 Push-Location "$WorkFolder"
 
+New-Item -ItemType Directory -Force -Path "build"
 mage build unitTest
 
 Pop-Location
