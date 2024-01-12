@@ -60,6 +60,7 @@ steps:
             image:
               - "${IMAGE_WIN_2016}"
               - "${IMAGE_WIN_2022}"
+        artifact_paths: "build/*.*"
 
 #   - group: "Extended Tests"
 #     key: "extended-tests"
@@ -86,3 +87,18 @@ steps:
           machine_type: "n2-standard-8"
           disk_size: 200
           disk_type: "pd-ssd"
+        artifact_paths: "build/*.*"
+
+  - wait:
+      allow_dependency_failure: true
+
+  - label: ":junit: Junit annotate"
+    plugins:
+      - junit-annotate#v2.4.1:
+          artifacts: "build/*.*"
+          fail-build-on-error: true
+    agents:
+      provider: "gcp"
+    depends_on:
+      - step: "check"
+        allow_failure: true
