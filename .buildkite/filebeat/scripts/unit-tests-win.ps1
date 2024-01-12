@@ -36,32 +36,6 @@ function installGoDependencies() {
     }
 }
 
-function findLog() {
-  $mainDir = Get-Location
-  $logFilename = "docker_corrupted.log"
-  $file = Get-ChildItem -Path $mainDir -Filter $logFilename -Recurse -File | Select-Object -First 1
-
-  Write-Host ":: LOG FILE PATH :: $($file.FullName)"
-#  buildkite-agent meta-data set CORRUPTED_LOG_FILEPATH $($file.FullName)
-}
-
-function getLogLineEnding {
-    [CmdletBinding()]
-    param (
-        [Parameter(Mandatory=$true, Position=0)]
-        [string]$FilePath
-    )
-
-    $fileContent = [IO.File]::ReadAllText($FilePath)
-
-    Write-Host ":: CHECK CRLF ::"
-
-    if ($fileContent.Contains("`r`n")) { Write-Output "CRLF (Windows line endings)" }
-    elseif ($fileContent.Contains("`n")) { Write-Output "LF (Unix line endings)" }
-    else { Write-Output "Unable to determine line ending type." }
-}
-
-
 fixCRLF
 
 $ErrorActionPreference = "Continue" # set +e

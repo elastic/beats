@@ -197,7 +197,10 @@ class Test(BaseTest):
 
         # expecting 6 more events
         self.wait_until(
-            lambda: self.output_has(lines=iterations1 + iterations2), max_timeout=10)
+            lambda: self.output_has(
+                lines=iterations1 +
+                iterations2),
+            max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -247,7 +250,10 @@ class Test(BaseTest):
 
         # Let it read the file
         self.wait_until(
-            lambda: self.output_has(lines=iterations1 + iterations2), max_timeout=10)
+            lambda: self.output_has(
+                lines=iterations1 +
+                iterations2),
+            max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -317,7 +323,10 @@ class Test(BaseTest):
 
         # Let it read the file
         self.wait_until(
-            lambda: self.output_has(lines=iterations1 + iterations2), max_timeout=10)
+            lambda: self.output_has(
+                lines=iterations1 +
+                iterations2),
+            max_timeout=10)
 
         filebeat.check_kill_and_wait()
 
@@ -468,7 +477,8 @@ class Test(BaseTest):
             f.write("hello world 2\n")
             f.flush()
 
-        # Sleep 1 second to make sure the file is persisted on disk and timestamp is in the past
+        # Sleep 1 second to make sure the file is persisted on disk and
+        # timestamp is in the past
         time.sleep(1)
 
         filebeat = self.start_beat()
@@ -568,7 +578,7 @@ class Test(BaseTest):
         for _, enc_py, text in encodings:
             with codecs.open(self.working_dir + "/log/test-{}".format(enc_py),
                              "w", enc_py) as f:
-                f.write(text + "\n")                
+                f.write(text + "\n")
                 f.close()
 
         # create the config file
@@ -593,7 +603,7 @@ class Test(BaseTest):
             with codecs.open(self.working_dir + "/log/test-{}".format(enc_py),
                              "a", enc_py) as f:
                 f.write(text + " 2" + "\n")
-                f.close()                
+                f.close()
 
         # wait again
         self.wait_until(lambda: self.output_has(lines=len(encodings) * 2),
