@@ -2,12 +2,12 @@ $ErrorActionPreference = "Stop" # set -e
 $WorkFolder = "metricbeats"
 # Forcing to checkout again all the files with a correct autocrlf.
 # Doing this here because we cannot set git clone options before.
-function fixCRLF {
-    Write-Host "-- Fixing CRLF in git checkout --"
-    git config core.autocrlf input
-    git rm --quiet --cached -r .
-    git reset --quiet --hard
-}
+# function fixCRLF {
+#     Write-Host "-- Fixing CRLF in git checkout --"
+#     git config core.autocrlf input
+#     git rm --quiet --cached -r .
+#     git reset --quiet --hard
+# }
 function withGolang($version) {
     Write-Host "-- Install golang --"
     choco install -y golang --version $version
@@ -30,18 +30,16 @@ function installGoDependencies {
     }
 }
 
-fixCRLF
+# fixCRLF
 withGolang $env:GO_VERSION
 installGoDependencies
 
 $ErrorActionPreference = "Continue" # set +e
 
-Push-Location "$WorkFolder"
+Set-Location -Path $WorkFolder
 
 New-Item -ItemType Directory -Force -Path "build"
 mage build unitTest
-
-Pop-Location
 
 $EXITCODE=$LASTEXITCODE
 $ErrorActionPreference = "Stop"
