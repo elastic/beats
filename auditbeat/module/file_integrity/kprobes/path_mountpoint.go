@@ -9,8 +9,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-
-	"github.com/pkg/errors"
 )
 
 var (
@@ -206,7 +204,7 @@ func getAllMountPoints() (mountPoints, error) {
 func newDeviceMajorMinorFromString(str string) (uint32, uint32, error) {
 	var major, minor uint32
 	if count, _ := fmt.Sscanf(str, "%d:%d", &major, &minor); count != 2 {
-		return 0, 0, errors.Errorf("invalid device number string %q", str)
+		return 0, 0, fmt.Errorf("invalid device number string %q", str)
 	}
 	return major, minor, nil
 }
