@@ -182,6 +182,6 @@ func (m *mockWatcher) Client() k8s.Interface {
 	return nil
 }
 
-func (s *mockWatcher) CachedObject() runtime.Object {
+func (m *mockWatcher) CachedObject() runtime.Object {
 	return nil
 }
