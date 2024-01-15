@@ -1,6 +1,19 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 //go:build linux
 
@@ -57,14 +70,14 @@ type PerfChannel struct {
 	cpus    CPUSet
 
 	// Settings
-	attr        perf.Attr
-	mappedPages int
-	pid         int
-	pollTimeout time.Duration
-	sizeSampleC int
-	sizeErrC    int
-	sizeLostC   int
-	withTime    bool
+	attr         perf.Attr
+	mappedPages  int
+	pid          int
+	pollTimeout  time.Duration
+	sizeSampleC  int
+	sizeErrC     int
+	sizeLostC    int
+	wakeUpEvents uint32
 }
 
 // PerfChannelConf instances change the configuration of a perf channel.
@@ -89,14 +102,15 @@ func NewPerfChannel(cfg ...PerfChannelConf) (channel *PerfChannel, err error) {
 
 	// Defaults
 	channel = &PerfChannel{
-		sizeSampleC: 1024,
-		sizeErrC:    8,
-		sizeLostC:   64,
-		mappedPages: 64,
-		pollTimeout: time.Millisecond * 200,
-		done:        make(chan struct{}, 0),
-		streams:     make(map[uint64]stream),
-		pid:         perf.AllThreads,
+		sizeSampleC:  1024,
+		sizeErrC:     8,
+		sizeLostC:    64,
+		mappedPages:  64,
+		wakeUpEvents: 1,
+		pollTimeout:  time.Millisecond * 200,
+		done:         make(chan struct{}),
+		streams:      make(map[uint64]stream),
+		pid:          perf.AllThreads,
 		attr: perf.Attr{
 			Type:    perf.TracepointEvent,
 			ClockID: unix.CLOCK_MONOTONIC,
@@ -108,8 +122,6 @@ func NewPerfChannel(cfg ...PerfChannelConf) (channel *PerfChannel, err error) {
 			},
 		},
 	}
-	channel.attr.SetSamplePeriod(1)
-	channel.attr.SetWakeupEvents(1)
 
 	// Load the list of online CPUs from /sys/devices/system/cpu/online.
 	// This is necessary in order to to install each kprobe on all online CPUs.
@@ -130,6 +142,10 @@ func NewPerfChannel(cfg ...PerfChannelConf) (channel *PerfChannel, err error) {
 			return nil, err
 		}
 	}
+
+	channel.attr.SetSamplePeriod(1)
+	channel.attr.SetWakeupEvents(channel.wakeUpEvents)
+
 	return channel, nil
 }
 
@@ -153,6 +169,18 @@ func WithErrBufferSize(size int) PerfChannelConf {
 			return fmt.Errorf("bad size for err channel: %d", size)
 		}
 		channel.sizeErrC = size
+		return nil
+	}
+}
+
+// WithWakeUpEvents configures sets how many samples happen before an overflow
+// notification happens. Setting wakeUpEvents to 0 is equivalent to 1.
+func WithWakeUpEvents(wakeUpEvents uint32) PerfChannelConf {
+	return func(channel *PerfChannel) error {
+		if wakeUpEvents == 0 {
+			wakeUpEvents = 1
+		}
+		channel.wakeUpEvents = wakeUpEvents
 		return nil
 	}
 }
@@ -462,7 +490,7 @@ func (m *recordMerger) readSampleNonBlock(ev *perf.Event, ctx context.Context) (
 			return nil, false
 		}
 		if err != nil {
-			if err == perf.ErrBadRecord {
+			if errors.Is(err, perf.ErrBadRecord) {
 				m.channel.lostC <- ^uint64(0)
 				continue
 			}
@@ -492,7 +520,12 @@ func (m *recordMerger) readSampleNonBlock(ev *perf.Event, ctx context.Context) (
 	return nil, true
 }
 
-func pollAll(evs []*perf.Event, timeout time.Duration) (active int, closed int, err error) {
+func pollAll(evs []*perf.Event, timeout time.Duration) (int, int, error) {
+	var (
+		active int
+		closed int
+		err    error
+	)
 	pollfds := make([]unix.PollFd, len(evs))
 	for idx, ev := range evs {
 		fd, err := ev.FD()
@@ -503,7 +536,7 @@ func pollAll(evs []*perf.Event, timeout time.Duration) (active int, closed int, 
 	}
 	ts := unix.NsecToTimespec(timeout.Nanoseconds())
 
-	for err = unix.EINTR; err == unix.EINTR; {
+	for err = unix.EINTR; errors.Is(err, unix.EINTR); {
 		_, err = unix.Ppoll(pollfds, &ts, nil)
 	}
 	if err != nil {
@@ -518,5 +551,5 @@ func pollAll(evs []*perf.Event, timeout time.Duration) (active int, closed int, 
 			closed++
 		}
 	}
-	return
+	return active, closed, err
 }
