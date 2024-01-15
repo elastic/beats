@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/magefile/mage/sh"
 )
@@ -172,6 +173,11 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 	fmt.Println("---- cmd = ", cmd)
 	readDir, err := os.ReadDir(moduleDir)
 	fmt.Println("--------- list modules: ", readDir)
+	for _, entry := range readDir {
+		if strings.HasSuffix(entry.Name(), "@tmp") {
+			fmt.Printf("Name: %s, Type: %s\n", entry.Name(), entry.Type())
+		}
+	}
 	fmt.Println("--------- os.ReadDir err = ", err)
 	return moduleFieldsCmd()
 }

@@ -89,6 +89,7 @@ func main() {
 		if len(files) == 0 {
 			fmt.Println("------ module len(files) is zero = ", module)
 			// This can happen on moved modules
+			log.Printf("------ module len(files) is zero = %v", module)
 			log.Printf("No fields files for module %v", module)
 			continue
 		}
