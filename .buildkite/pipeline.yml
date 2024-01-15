@@ -3,18 +3,3 @@
 steps:
   - label: "Example test"
     command: echo "Hello!"
-# ToDo: setup execution from UI when specific pipelines are finished
-#  - input: "Build parameters"
-#    if: build.source == "ui"
-#    fields:
-#      - select: "Select build parameters"
-#        key: "PIPELINE_SLUG"
-#        required: false
-#        options:
-#          - label: "Filebeat"
-#            value: "filebeat"
-#          - label: "Metricbeat"
-#            value: "metricbeat"
-#        hint: "Select what should be built"
-#  - wait
-#  - trigger: "${PIPELINE_SLUG}"

@@ -42,7 +42,7 @@ stages:
           - "macos12 && x86_64"
         when:                  ## Override the top-level when.
             comments:
-                  - "/test filebeat for macos"
+                - "/test filebeat for macos"
             labels:
                 - "macOS"
             parameters:
