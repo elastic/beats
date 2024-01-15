@@ -43,7 +43,7 @@ function installGoDependencies {
     }
 }
 
-# fixCRLF
+fixCRLF
 
 withChoco
 
@@ -53,7 +53,7 @@ installGoDependencies
 
 withPython $env:SETUP_PYTHON_VERSION
 
-# withMinGW
+withMinGW
 
 $ErrorActionPreference = "Continue" # set +e
 
