@@ -83,7 +83,7 @@ func newMonitor(ctx context.Context, isRecursive bool, pChannel perfChannel, exe
 		return nil, err
 	}
 
-	eventChannel := make(chan MonitorEvent, 1)
+	eventChannel := make(chan MonitorEvent, 512)
 	eProc := newEventProcessor(p, newMonitorEmitter(mCtx, eventChannel), isRecursive)
 
 	return &Monitor{
