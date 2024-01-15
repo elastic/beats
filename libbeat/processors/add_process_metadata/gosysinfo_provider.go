@@ -21,6 +21,7 @@ import (
 	"os/user"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -52,6 +53,9 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 		}
 	}
 
+	capPermitted, _ := capabilities.FromPid(capabilities.Permitted, pid)
+	capEffective, _ := capabilities.FromPid(capabilities.Effective, pid)
+
 	r := processMetadata{
 		name:      info.Name,
 		args:      info.Args,
@@ -60,6 +64,8 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 		exe:       info.Exe,
 		pid:       info.PID,
 		ppid:      info.PPID,
+		capEffective: capEffective,
+		capPermitted: capPermitted,
 		startTime: info.StartTime,
 		username:  username,
 		userid:    userid,

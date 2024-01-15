@@ -30,6 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -40,6 +41,10 @@ import (
 func TestAddProcessMetadata(t *testing.T) {
 	logp.TestingSetup(logp.WithSelectors(processorName))
 
+	capMock, err := capabilities.FromUint64(0xabacabb)
+	if err != nil {
+		t.Fatal(err)
+	}
 	startTime := time.Now()
 	testProcs := testProvider{
 		1: {
@@ -58,6 +63,8 @@ func TestAddProcessMetadata(t *testing.T) {
 			startTime: startTime,
 			username:  "root",
 			userid:    "0",
+			capEffective: capMock,
+			capPermitted: capMock,
 		},
 		3: {
 			name:  "systemd",
@@ -75,6 +82,8 @@ func TestAddProcessMetadata(t *testing.T) {
 			startTime: startTime,
 			username:  "user",
 			userid:    "1001",
+			capEffective: capMock,
+			capPermitted: capMock,
 		},
 	}
 
@@ -162,6 +171,12 @@ func TestAddProcessMetadata(t *testing.T) {
 						"name": "root",
 						"id":   "0",
 					},
+					"thread": mapstr.M{
+						"capabilities": mapstr.M{
+							"effective": capMock,
+							"permitted": capMock,
+						},
+					},
 				},
 				"container": mapstr.M{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
@@ -247,6 +262,12 @@ func TestAddProcessMetadata(t *testing.T) {
 							"name": "root",
 							"id":   "0",
 						},
+						"thread": mapstr.M{
+							"capabilities": mapstr.M{
+								"effective": capMock,
+								"permitted": capMock,
+							},
+						},
 					},
 					"container": mapstr.M{
 						"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
@@ -286,6 +307,12 @@ func TestAddProcessMetadata(t *testing.T) {
 						"owner": mapstr.M{
 							"name": "root",
 							"id":   "0",
+						},
+						"thread": mapstr.M{
+							"capabilities": mapstr.M{
+								"effective": capMock,
+								"permitted": capMock,
+							},
 						},
 					},
 					"container": mapstr.M{
@@ -327,6 +354,12 @@ func TestAddProcessMetadata(t *testing.T) {
 						"owner": mapstr.M{
 							"name": "root",
 							"id":   "0",
+						},
+						"thread": mapstr.M{
+							"capabilities": mapstr.M{
+								"effective": capMock,
+								"permitted": capMock,
+							},
 						},
 					},
 				},
@@ -520,6 +553,12 @@ func TestAddProcessMetadata(t *testing.T) {
 						"name": "root",
 						"id":   "0",
 					},
+					"thread": mapstr.M{
+						"capabilities": mapstr.M{
+							"effective": capMock,
+							"permitted": capMock,
+						},
+					},
 				},
 				"container": mapstr.M{
 					"id": "b5285682fba7449c86452b89a800609440ecc88a7ba5f2d38bedfb85409b30b1",
@@ -644,6 +683,12 @@ func TestAddProcessMetadata(t *testing.T) {
 					"owner": mapstr.M{
 						"name": "user",
 						"id":   "1001",
+					},
+					"thread": mapstr.M{
+						"capabilities": mapstr.M{
+							"effective": capMock,
+							"permitted": capMock,
+						},
 					},
 				},
 			},
