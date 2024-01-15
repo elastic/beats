@@ -1,11 +1,12 @@
 package kprobes
 
 import (
-	"github.com/stretchr/testify/require"
-	"golang.org/x/sys/unix"
 	"os"
 	"runtime"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+	"golang.org/x/sys/unix"
 )
 
 func Test_EventsVerifier(t *testing.T) {

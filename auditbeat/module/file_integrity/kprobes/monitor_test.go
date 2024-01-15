@@ -3,14 +3,16 @@ package kprobes
 import (
 	"context"
 	"errors"
-	"github.com/elastic/beats/v7/auditbeat/tracing"
-	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/suite"
-	"golang.org/x/sys/unix"
 	"os"
 	"runtime"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/auditbeat/tracing"
+
+	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/suite"
+	"golang.org/x/sys/unix"
 )
 
 type monitorTestSuite struct {

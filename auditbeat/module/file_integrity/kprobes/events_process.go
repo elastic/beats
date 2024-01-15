@@ -3,11 +3,11 @@ package kprobes
 import (
 	"context"
 	"errors"
-	"golang.org/x/sys/unix"
 	"path/filepath"
+
+	"golang.org/x/sys/unix"
 )
 
-// TODO(panosk) finalise the Emitter interface according to our needs
 type Emitter interface {
 	Emit(ePath string, pid uint32, op uint32) error
 }

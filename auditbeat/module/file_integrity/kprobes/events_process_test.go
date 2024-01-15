@@ -2,11 +2,13 @@ package kprobes
 
 import (
 	"context"
+	"testing"
+
 	"github.com/elastic/beats/v7/auditbeat/tracing"
+
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/sys/unix"
-	"testing"
 )
 
 type EmitterMock struct {

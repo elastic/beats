@@ -2,9 +2,10 @@ package kprobes
 
 import (
 	"errors"
-	"github.com/stretchr/testify/require"
 	"os"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func (d *dEntryCache) Dump(path string) error {

@@ -1,9 +1,10 @@
 package kprobes
 
 import (
-	"github.com/stretchr/testify/require"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_readMountInfo(t *testing.T) {

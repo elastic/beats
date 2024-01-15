@@ -1,8 +1,9 @@
 package kprobes
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_fsNotifySymbol_buildProbes(t *testing.T) {

@@ -3,8 +3,9 @@ package kprobes
 import (
 	"errors"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_fsNotifyParentSymbol_buildProbes(t *testing.T) {

@@ -2,8 +2,9 @@ package kprobes
 
 import (
 	"context"
-	"golang.org/x/sys/unix"
 	"runtime"
+
+	"golang.org/x/sys/unix"
 )
 
 type executor interface {

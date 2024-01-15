@@ -3,6 +3,7 @@ package kprobes
 import (
 	"errors"
 	"fmt"
+
 	tkbtf "github.com/elastic/tk-btf"
 )
 

@@ -1,12 +1,13 @@
 package kprobes
 
 import (
-	"github.com/stretchr/testify/require"
-	"golang.org/x/sys/unix"
 	"os"
 	"path/filepath"
 	"runtime"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+	"golang.org/x/sys/unix"
 )
 
 func Test_InotifyWatcher(t *testing.T) {

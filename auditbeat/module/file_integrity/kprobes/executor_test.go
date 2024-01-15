@@ -3,12 +3,13 @@ package kprobes
 import (
 	"context"
 	"errors"
-	"github.com/stretchr/testify/require"
 	"runtime"
 	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_executor(t *testing.T) {
