@@ -61,7 +61,7 @@ steps:
             image:
               - "${IMAGE_WIN_2016}"
               - "${IMAGE_WIN_2022}"
-        artifact_paths: "build/*.*"
+        artifact_paths: "metricbeat/build/*.*"
 
 #   - group: "Extended Tests"
 #     key: "extended-tests"
@@ -96,7 +96,9 @@ steps:
   - label: ":junit: Junit annotate"
     plugins:
       - junit-annotate#v2.4.1:
-          artifacts: "metricbeat/build/*.xml"
+          artifacts:
+            - "metricbeat\\build\\*.xml"
+            - "metricbeat/build/*.xml"
           fail-build-on-error: true
     agents:
       provider: "gcp"
