@@ -407,7 +407,7 @@ func (p *pod) containerPodEvents(flag string, pod *kubernetes.Pod, c *kubernetes
 		ports = []kubernetes.ContainerPort{{ContainerPort: 0}}
 	}
 
-	var events []bus.Event
+	events := []bus.Event{}
 	portsMap := mapstr.M{}
 
 	ShouldPut(meta, "container", cmeta, p.logger)
