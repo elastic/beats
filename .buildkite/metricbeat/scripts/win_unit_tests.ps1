@@ -53,7 +53,7 @@ installGoDependencies
 
 withPython $env:SETUP_PYTHON_VERSION
 
-withMinGW
+# withMinGW
 
 $ErrorActionPreference = "Continue" # set +e
 
@@ -64,7 +64,7 @@ mage build unitTest
 
 Pop-Location
 
-# $EXITCODE=$LASTEXITCODE
+$EXITCODE=$LASTEXITCODE
 $ErrorActionPreference = "Stop"
 
-# Exit $EXITCODE
+Exit $EXITCODE

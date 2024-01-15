@@ -13,6 +13,7 @@ with_python
 
 echo "--- run unit tests"
 pushd "metricbeat" > /dev/null
-chmod -R go-w ./mb/testdata/
+# chmod -R go-w ./mb/testdata/
+# umask 0022
 mage build unitTest
 popd > /dev/null
