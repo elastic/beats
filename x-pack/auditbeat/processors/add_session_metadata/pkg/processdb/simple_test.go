@@ -25,6 +25,82 @@ func newSimpleDBIntf(reader procfs.Reader) DB {
 	return ret
 }
 
+func TestSimpleSingleProcessSessionLeaderEntryTypeTerminal(t *testing.T) {
+	testSingleProcessSessionLeaderEntryTypeTerminal(newSimpleDBIntf)(t)
+}
+
+func TestSimpleSingleProcessSessionLeaderLoginProcess(t *testing.T) {
+	testSingleProcessSessionLeaderLoginProcess(newSimpleDBIntf)(t)
+}
+
+func TestSimpleSingleProcessSessionLeaderChildOfInit(t *testing.T) {
+	testSingleProcessSessionLeaderChildOfInit(newSimpleDBIntf)(t)
+}
+
+func TestSimpleSingleProcessSessionLeaderChildOfSsmSessionWorker(t *testing.T) {
+	testSingleProcessSessionLeaderChildOfSsmSessionWorker(newSimpleDBIntf)(t)
+}
+
+func TestSimpleSingleProcessSessionLeaderChildOfSshd(t *testing.T) {
+	testSingleProcessSessionLeaderChildOfSshd(newSimpleDBIntf)(t)
+}
+
+func TestSimpleSingleProcessSessionLeaderChildOfContainerdShim(t *testing.T) {
+	testSingleProcessSessionLeaderChildOfContainerdShim(newSimpleDBIntf)(t)
+}
+
+func TestSimpleSingleProcessSessionLeaderOfRunc(t *testing.T) {
+	testSingleProcessSessionLeaderChildOfRunc(newSimpleDBIntf)(t)
+}
+
+func TestSimpleSingleProcessEmptyProcess(t *testing.T) {
+	testSingleProcessEmptyProcess(newSimpleDBIntf)(t)
+}
+
+func TestSimpleSingleProcessOverwriteOldEntryLeader(t *testing.T) {
+	testSingleProcessOverwriteOldEntryLeader(newSimpleDBIntf)(t)
+}
+
+func TestSimpleInitSshdBashLs(t *testing.T) {
+	testInitSshdBashLs(newSimpleDBIntf)(t)
+}
+
+func TestSimpleInitSshdSshdBashLs(t *testing.T) {
+	testInitSshdSshdBashLs(newSimpleDBIntf)(t)
+}
+
+func TestSimpleInitSshdSshdSshdBashLs(t *testing.T) {
+	testInitSshdSshdSshdBashLs(newSimpleDBIntf)(t)
+}
+
+func TestSimpleInitContainerdContainerdShim(t *testing.T) {
+	testInitContainerdContainerdShim(newSimpleDBIntf)(t)
+}
+
+func TestSimpleInitContainerdShimBashContainerdShimIsReparentedToInit(t *testing.T) {
+	testInitContainerdShimBashContainerdShimIsReparentedToInit(newSimpleDBIntf)(t)
+}
+
+func TestSimpleInitContainerdShimPauseContainerdShimIsReparentedToInit(t *testing.T) {
+	testInitContainerdShimPauseContainerdShimIsReparentedToInit(newSimpleDBIntf)(t)
+}
+
+func TestSimpleInitSshdBashLsAndGrepGrepOnlyHasGroupLeader(t *testing.T) {
+	testInitSshdBashLsAndGrepGrepOnlyHasGroupLeader(newSimpleDBIntf)(t)
+}
+
+func TestSimpleInitSshdBashLsAndGrepGrepOnlyHasSessionLeader(t *testing.T) {
+	testInitSshdBashLsAndGrepGrepOnlyHasSessionLeader(newSimpleDBIntf)(t)
+}
+
+func TestSimpleGrepInIsolation(t *testing.T) {
+	testGrepInIsolation(newSimpleDBIntf)(t)
+}
+
+func TestSimpleKernelThreads(t *testing.T) {
+	testKernelThreads(newSimpleDBIntf)(t)
+}
+
 func TestCapsFromU64ToECS(t *testing.T) {
 	expected := []string{"CAP_CHOWN"}
 	assert.Equal(t, expected, ecsCapsFromU64(uint64(1<<unix.CAP_CHOWN)))

@@ -188,6 +188,8 @@ type SimpleDB struct {
 	sync.RWMutex
 	logger                   *logp.Logger
 	processes                map[uint32]Process
+	entryLeaders             map[uint32]EntryType
+	entryLeaderRelationships map[uint32]uint32
 	procfs                   procfs.Reader
 }
 
@@ -195,6 +197,8 @@ func NewSimpleDB(reader procfs.Reader, logger logp.Logger) *SimpleDB {
 	ret := &SimpleDB{
 		logger:                   logp.NewLogger("processdb"),
 		processes:                make(map[uint32]Process),
+		entryLeaders:             make(map[uint32]EntryType),
+		entryLeaderRelationships: make(map[uint32]uint32),
 		procfs:                   reader,
 	}
 
@@ -234,6 +238,9 @@ func (db *SimpleDB) InsertFork(fork types.ProcessForkEvent) error {
 		entry.Pids = pidInfoFromProto(fork.ChildPids)
 		entry.Creds = credInfoFromProto(fork.Creds)
 		db.processes[pid] = entry
+		if entryPid, ok := db.entryLeaderRelationships[ppid]; ok {
+			db.entryLeaderRelationships[pid] = entryPid
+		}
 	} else {
 		db.processes[pid] = Process{
 			Pids:  pidInfoFromProto(fork.ChildPids),
@@ -247,6 +254,13 @@ func (db *SimpleDB) InsertFork(fork types.ProcessForkEvent) error {
 func (db *SimpleDB) insertProcess(process Process) {
 	pid := process.Pids.Tgid
 	db.processes[pid] = process
+	entryLeaderPid := db.evaluateEntryLeader(process)
+	if entryLeaderPid != nil {
+		db.entryLeaderRelationships[pid] = *entryLeaderPid
+		db.logger.Debugf("%v name: %s, entry_leader: %d, entry_type: %s", process.Pids, process.Filename, *entryLeaderPid, string(db.entryLeaders[*entryLeaderPid]))
+	} else {
+		db.logger.Debugf("%v name: %s, NO ENTRY LEADER", process.Pids, process.Filename)
+	}
 }
 
 func (db *SimpleDB) InsertExec(exec types.ProcessExecEvent) error {
@@ -264,6 +278,116 @@ func (db *SimpleDB) InsertExec(exec types.ProcessExecEvent) error {
 	}
 
 	db.processes[exec.Pids.Tgid] = proc
+	entryLeaderPid := db.evaluateEntryLeader(proc)
+	if entryLeaderPid != nil {
+		db.entryLeaderRelationships[exec.Pids.Tgid] = *entryLeaderPid
+	}
+
+	return nil
+}
+
+func (db *SimpleDB) createEntryLeader(pid uint32, entryType EntryType) {
+	db.entryLeaders[pid] = entryType
+	db.logger.Debugf("created entry leader %d: %s, name: %s", pid, string(entryType), db.processes[pid].Filename)
+}
+
+// pid returned is a pointer type because its possible for no
+func (db *SimpleDB) evaluateEntryLeader(p Process) *uint32 {
+	pid := p.Pids.Tgid
+
+	// init never has an entry leader or meta type
+	if p.Pids.Tgid == 1 {
+		db.logger.Debugf("entry_eval %d: process is init, no entry type", p.Pids.Tgid)
+		return nil
+	}
+
+	// kernel threads also never have an entry leader or meta type kthreadd
+	// (always pid 2) is the parent of all kernel threads, by filtering pid ==
+	// 2 || ppid == 2, we get rid of all of them
+	if p.Pids.Tgid == 2 || p.Pids.Ppid == 2 {
+		db.logger.Debugf("entry_eval %d: kernel threads never an entry type (parent is pid 2)", p.Pids.Tgid)
+		return nil
+	}
+
+	// could be an entry leader
+	if p.Pids.Tgid == p.Pids.Sid {
+		ttyType := getTtyType(p.CTty.Major, p.CTty.Minor)
+
+		procBasename := basename(p.Filename)
+		if ttyType == Tty {
+			db.createEntryLeader(pid, Terminal)
+			db.logger.Debugf("entry_eval %d: entry type is terminal", p.Pids.Tgid)
+			return &pid
+		} else if ttyType == TtyConsole && procBasename == "login" {
+			db.createEntryLeader(pid, EntryConsole)
+			db.logger.Debugf("entry_eval %d: entry type is console", p.Pids.Tgid)
+			return &pid
+		} else if p.Pids.Ppid == 1 {
+			db.createEntryLeader(pid, Init)
+			db.logger.Debugf("entry_eval %d: entry type is init", p.Pids.Tgid)
+			return &pid
+		} else if !isFilteredExecutable(procBasename) {
+			if parent, ok := db.processes[p.Pids.Ppid]; ok {
+				parentBasename := basename(parent.Filename)
+				if ttyType == Pts && parentBasename == "ssm-session-worker" {
+					db.createEntryLeader(pid, Ssm)
+					db.logger.Debugf("entry_eval %d: entry type is ssm", p.Pids.Tgid)
+					return &pid
+				} else if parentBasename == "sshd" && procBasename != "sshd" {
+					// TODO: get ip from env vars
+					db.createEntryLeader(pid, Sshd)
+					db.logger.Debugf("entry_eval %d: entry type is sshd", p.Pids.Tgid)
+					return &pid
+				} else if isContainerRuntime(parentBasename) {
+					db.createEntryLeader(pid, Container)
+					db.logger.Debugf("entry_eval %d: entry type is container", p.Pids.Tgid)
+					return &pid
+				}
+			}
+		} else {
+			db.logger.Debugf("entry_eval %d: is a filtered executable: %s", p.Pids.Tgid, procBasename)
+		}
+	}
+
+	// if not a session leader or was not determined to be an entry leader, get
+	// it via parent, session leader, group leader (in that order)
+	relations := []struct {
+		pid  uint32
+		name string
+	}{
+		{
+			pid:  p.Pids.Ppid,
+			name: "parent",
+		},
+		{
+			pid:  p.Pids.Sid,
+			name: "session_leader",
+		},
+		{
+			pid:  p.Pids.Pgid,
+			name: "group_leader",
+		},
+	}
+
+	for _, relation := range relations {
+		if entry, ok := db.entryLeaderRelationships[relation.pid]; ok {
+			entryType := db.entryLeaders[entry]
+			db.logger.Debugf("entry_eval %d: got entry_leader: %d (%s), from relative: %d (%s)", p.Pids.Tgid, entry, string(entryType), relation.pid, relation.name)
+			return &entry
+		} else {
+			db.logger.Debugf("entry_eval %d: failed to find relative: %d (%s)", p.Pids.Tgid, relation.pid, relation.name)
+		}
+	}
+
+	// if it's a session leader, then make it its own entry leader with unknown
+	// entry type
+	if p.Pids.Tgid == p.Pids.Sid {
+		db.createEntryLeader(pid, EntryUnknown)
+		db.logger.Debugf("entry_eval %d: this is a session leader and no relative has an entry leader. entry type is unknown", p.Pids.Tgid)
+		return &pid
+	}
+
+	db.logger.Debugf("entry_eval %d: this is not a session leader and no relative has an entry leader, entry_leader will be unset", p.Pids.Tgid)
 	return nil
 }
 
@@ -289,6 +413,8 @@ func (db *SimpleDB) InsertExit(exit types.ProcessExitEvent) error {
 
 	pid := exit.Pids.Tgid
 	delete(db.processes, pid)
+	delete(db.entryLeaders, pid)
+	delete(db.entryLeaderRelationships, pid)
 	return nil
 }
 
@@ -385,6 +511,25 @@ func fillSessionLeader(process *types.Process, sessionLeader Process) {
 	process.SessionLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
 }
 
+func fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Process) {
+	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(entryLeader.Pids.StartTimeNs)
+
+	interactive := interactiveFromTty(entryLeader.CTty)
+	euid := entryLeader.Creds.Euid
+	egid := entryLeader.Creds.Egid
+	process.EntryLeader.PID = entryLeader.Pids.Tgid
+	process.EntryLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
+	process.EntryLeader.Name = basename(entryLeader.Filename)
+	process.EntryLeader.Executable = entryLeader.Filename
+	process.EntryLeader.Args = entryLeader.Argv
+	process.EntryLeader.WorkingDirectory = entryLeader.Cwd
+	process.EntryLeader.Interactive = &interactive
+	process.EntryLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
+	process.EntryLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
+
+	process.EntryLeader.EntryMeta.Type = string(entryType)
+}
+
 func (db *SimpleDB) setEntityID(process *types.Process) {
 	if process.PID != 0 && process.Start != nil {
 		process.EntityID = db.calculateEntityIDv1(process.PID, *process.Start)
@@ -401,6 +546,10 @@ func (db *SimpleDB) setEntityID(process *types.Process) {
 	if process.SessionLeader.PID != 0 && process.SessionLeader.Start != nil {
 		process.SessionLeader.EntityID = db.calculateEntityIDv1(process.SessionLeader.PID, *process.SessionLeader.Start)
 	}
+
+	if process.EntryLeader.PID != 0 && process.EntryLeader.Start != nil {
+		process.EntryLeader.EntityID = db.calculateEntityIDv1(process.EntryLeader.PID, *process.EntryLeader.Start)
+	}
 }
 
 func setSameAsProcess(process *types.Process) {
@@ -412,6 +561,11 @@ func setSameAsProcess(process *types.Process) {
 	if process.SessionLeader.PID != 0 && process.SessionLeader.Start != nil {
 		sameAsProcess := process.PID == process.SessionLeader.PID
 		process.SessionLeader.SameAsProcess = &sameAsProcess
+	}
+
+	if process.EntryLeader.PID != 0 && process.EntryLeader.Start != nil {
+		sameAsProcess := process.PID == process.EntryLeader.PID
+		process.EntryLeader.SameAsProcess = &sameAsProcess
 	}
 }
 
@@ -438,10 +592,31 @@ func (db *SimpleDB) GetProcess(pid uint32) (types.Process, error) {
 		fillSessionLeader(&ret, sessionLeader)
 	}
 
+	if entryLeaderPid, foundEntryLeaderPid := db.entryLeaderRelationships[process.Pids.Tgid]; foundEntryLeaderPid {
+		if entryLeader, foundEntryLeader := db.processes[entryLeaderPid]; foundEntryLeader {
+			// if there is an entry leader then there is a matching member in the entryLeaders table
+			fillEntryLeader(&ret, db.entryLeaders[entryLeaderPid], entryLeader)
+		} else {
+			db.logger.Errorf("failed to find entry leader entry %d for %d (%s)", entryLeaderPid, pid, db.processes[pid].Filename)
+		}
+	} else {
+		db.logger.Errorf("failed to find entry leader for %d (%s)", pid, db.processes[pid].Filename)
+	}
+
 	db.setEntityID(&ret)
 	setSameAsProcess(&ret)
 
 	return ret, nil
+}
+
+func (db *SimpleDB) GetEntryType(pid uint32) (EntryType, error) {
+	db.RLock()
+	defer db.RUnlock()
+
+	if entryType, ok := db.entryLeaders[pid]; ok {
+		return entryType, nil
+	}
+	return EntryUnknown, nil
 }
 
 func (db *SimpleDB) ScrapeProcfs() []uint32 {

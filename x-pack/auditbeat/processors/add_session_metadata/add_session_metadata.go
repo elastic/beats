@@ -13,8 +13,6 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/google/uuid"
-
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/pkg/processdb"
@@ -177,19 +175,18 @@ func (p *addSessionMetadata) replaceFields(ev *beat.Event) error {
 		if err != nil {
 			return err
 		}
-		if syscall == "execve" {
+		switch syscall {
+		case "execveat":
+			fallthrough
+		case "execve":
 			ev.Fields.Put("event.action", []string{"exec", "fork"})
 			ev.Fields.Put("event.type", []string{"start"})
-		}
 
-		// process end
-		if syscall == "exit_group" {
+		case "exit_group":
 			ev.Fields.Put("event.action", []string{"end"})
 			ev.Fields.Put("event.type", []string{"end"})
 			ev.Fields.Put("process.end", time.Now())
 		}
-
-		ev.Fields.Put("event.id", uuid.NewString())
 	}
 	return nil
 }
