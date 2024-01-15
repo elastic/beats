@@ -65,7 +65,6 @@ func releaseRecursive(val *dEntry) {
 	val.Children = nil
 	val.Parent = nil
 	val = nil
-	return
 }
 
 // Release releases the resources associated with the given dEntry and all its children.
