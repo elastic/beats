@@ -25,6 +25,11 @@ function withPython($version) {
   refreshenv
   python --version
 }
+function withMinGW {
+  Write-Host "-- Install MinGW --"
+  choco install mingw -y
+  refreshenv
+}
 function installGoDependencies {
     $installPackages = @(
         "github.com/magefile/mage"
@@ -47,6 +52,8 @@ withGolang $env:GO_VERSION
 installGoDependencies
 
 withPython $env:SETUP_PYTHON_VERSION
+
+withMinGW
 
 $ErrorActionPreference = "Continue" # set +e
 
