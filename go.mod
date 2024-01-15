@@ -420,4 +420,4 @@ replace (
 // Exclude this version because the version has an invalid checksum.
 exclude github.com/docker/distribution v2.8.0+incompatible
 
-replace github.com/elastic/elastic-agent-client/v7 => github.com/AndersonQ/elastic-agent-client/v7 v7.0.0-20240115092813-5903b6761e5a
+replace github.com/elastic/elastic-agent-client/v7 => github.com/AndersonQ/elastic-agent-client/v7 v7.0.0-20240115164330-36e4ce775b87

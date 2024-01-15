@@ -277,7 +277,6 @@ func (cm *BeatV2Manager) Start() error {
 	if err != nil {
 		return fmt.Errorf("error starting connection to client")
 	}
-
 	ctx, canceller := context.WithCancel(ctx)
 	cm.errCanceller = canceller
 	go cm.watchErrChan(ctx)
@@ -515,7 +514,6 @@ func (cm *BeatV2Manager) unitListen() {
 				units[k] = u
 			}
 			cm.mx.Unlock()
-
 			cm.reload(units)
 			if cm.forceReload {
 				// Restart the debounce timer so we try to reload the inputs.
