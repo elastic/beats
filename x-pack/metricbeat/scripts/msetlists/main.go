@@ -22,11 +22,9 @@ func main() {
 
 	path := paths.Resolve(paths.Home, "../x-pack/metricbeat/module")
 	lm := mb.NewLightModulesSource(path)
-	fmt.Println("----- path = ", path)
 	mb.Registry.SetSecondarySource(lm)
 
 	msList := msetlists.DefaultMetricsets()
-	fmt.Println("----- msList = ", msList)
 	raw, err := json.MarshalIndent(msList, "", "  ")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error Marshalling json: %s\n", err)

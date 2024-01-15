@@ -194,14 +194,11 @@ func Fields() {
 }
 
 func moduleFieldsGo() error {
-	fmt.Println("------ moduleFieldsGo in x-pack metricbeat magefile.go")
 	return devtools.GenerateModuleFieldsGo("module")
 }
 
 // fieldsYML generates a fields.yml based on metricbeat + x-pack/metricbeat/modules.
 func fieldsYML() error {
-	fmt.Println("------ fieldsYML in x-pack metricbeat magefile.go")
-	fmt.Println("------ devtools.OSSBeatDir(\"module\") = ", devtools.OSSBeatDir("module"))
 	return devtools.GenerateFieldsYAML(devtools.OSSBeatDir("module"), "module")
 }
 

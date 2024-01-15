@@ -68,9 +68,9 @@ func main() {
 	}
 	dir := args[0]
 
-	fmt.Println("------ dir = ", dir)
+	log.Printf("------ dir = %v", dir)
 	modules, err := fields.GetModules(dir)
-	fmt.Println("------ modules = ", modules)
+	log.Printf("------ modules = %v", modules)
 	if err != nil {
 		log.Fatalf("Error fetching modules: %v", err)
 	}
@@ -81,15 +81,12 @@ func main() {
 	}
 
 	for _, module := range modules {
-		fmt.Println("------ module = ", module)
 		files, err := fields.CollectFiles(module, dir)
 		if err != nil {
 			log.Fatalf("Error fetching files for module %v: %v", module, err)
 		}
 		if len(files) == 0 {
-			fmt.Println("------ module len(files) is zero = ", module)
 			// This can happen on moved modules
-			log.Printf("------ module len(files) is zero = %v", module)
 			log.Printf("No fields files for module %v", module)
 			continue
 		}
