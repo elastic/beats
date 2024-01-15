@@ -1,9 +1,6 @@
 package kprobes
 
-import (
-	"path/filepath"
-	"slices"
-)
+import "strings"
 
 type dKey struct {
 	Ino      uint64
@@ -31,20 +28,31 @@ func (d *dEntry) GetParent() *dEntry {
 	return d.Parent
 }
 
+func pathRecursive(d *dEntry, buffer *strings.Builder, size int) {
+	nameLen := len(d.Name)
+
+	if d.Parent == nil {
+		size += nameLen
+		buffer.Grow(size)
+		buffer.WriteString(d.Name)
+		return
+	}
+
+	size += nameLen + 1
+	pathRecursive(d.Parent, buffer, size)
+	buffer.WriteByte('/')
+	buffer.WriteString(d.Name)
+}
+
 func (d *dEntry) Path() string {
 	if d == nil {
 		return ""
 	}
 
-	var pathTokens []string
-	startEntry := d
-	for startEntry != nil {
-		pathTokens = append(pathTokens, startEntry.Name)
-		startEntry = startEntry.Parent
-	}
-	slices.Reverse(pathTokens)
-	finalPath := filepath.Join(pathTokens...)
-	return finalPath
+	var buffer strings.Builder
+	pathRecursive(d, &buffer, 0)
+	defer buffer.Reset()
+	return buffer.String()
 }
 
 // releaseRecursive recursive func to satisfy the needs of Release.
