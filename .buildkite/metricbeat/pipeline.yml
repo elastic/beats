@@ -111,7 +111,7 @@ steps:
           machineType: "c2-standard-16"
 
       - label: ":linux: Packaging ARM"
-        key: "packaging-linux"
+        key: "packaging-arm"
         command: ".buildkite/metricbeat/scripts/packaging.sh"
         agents:
           provider: "aws"
