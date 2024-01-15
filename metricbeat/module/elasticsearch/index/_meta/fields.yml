@@ -4,8 +4,6 @@
     index
   release: ga
   fields:
-    - name: created
-      type: long
     - name: hidden
       type: boolean
     - name: shards
