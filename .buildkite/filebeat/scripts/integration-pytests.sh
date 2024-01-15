@@ -16,4 +16,4 @@ sudo chmod -R go-w filebeat/
 
 cd filebeat
 umask 0022
-mage goIntegTest
+mage pythonIntegTest

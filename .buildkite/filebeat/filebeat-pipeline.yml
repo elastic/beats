@@ -29,11 +29,11 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
 
-      - label: ":ubuntu: Integration Tests"
+      - label: ":ubuntu: Go Integration Tests"
         command:
           - "sudo apt-get update"
           - "sudo apt-get install -y libsystemd-dev"
-          - ".buildkite/filebeat/scripts/integration-tests.sh"
+          - ".buildkite/filebeat/scripts/integration-gotests.sh"
         notify:
           - github_commit_status:
               context: "Filebeat/Mandatory: Integration Tests"
@@ -45,6 +45,7 @@ steps:
         command:
           - "sudo apt-get update"
           - "sudo apt-get install -y libsystemd-dev"
+          - "sudo apt-get install -y python3-venv"
           - ".buildkite/filebeat/scripts/integration-pytests.sh"
         notify:
           - github_commit_status:
@@ -72,7 +73,7 @@ steps:
 
   - group: "Extended Testing"
     key: "extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat extended tests"
 
     steps:
       - label: ":linux: ARM64 Unit Tests"
@@ -94,7 +95,7 @@ steps:
 
       - label: ":mac: MacOS Unit Tests"
         key: "macos-extended"
-        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+#        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command:
           - "ulimit -Sn 50000"
           - ".buildkite/filebeat/scripts/unit-tests.sh"
@@ -105,6 +106,11 @@ steps:
           provider: "orka"
           imagePrefix: "generic-13-ventura-x64"
 
+  - group: "Windows Extended Testing"
+    key: "extended-tests-win"
+    if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for windows" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
+
+    steps:
       - label: ":windows: Win 2019 Unit Tests"
         key: "win-extended-2019"
         command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
@@ -124,6 +130,7 @@ steps:
     depends_on:
       - "mandatory-tests"
       - "extended-tests"
+      - "extended-tests-win"
 
     steps:
       - label: ":ubuntu: Packaging Linux X86"
