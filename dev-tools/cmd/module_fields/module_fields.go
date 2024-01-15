@@ -53,7 +53,6 @@ func main() {
 	log.SetFlags(0)
 	flag.Parse()
 
-	fmt.Println("------------ beatName = ", beatName)
 	if beatName == "" {
 		log.Fatal("You must use -beat to specify the beat name.")
 	}
