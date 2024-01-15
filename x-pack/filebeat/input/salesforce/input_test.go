@@ -694,11 +694,12 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 	}
 	for _, tt := range tests {
 		config := tt.fields.config
+
 		t.Run(tt.name, func(t *testing.T) {
 			tt.setupServer(t, tt.handler, &config)
 
 			s := &salesforceInput{
-				config:     tt.fields.config,
+				config:     config,
 				ctx:        tt.fields.ctx,
 				cancel:     tt.fields.cancel,
 				publisher:  tt.fields.publisher,
