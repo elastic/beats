@@ -15,10 +15,6 @@ add_bin_path() {
   export PATH="${PATH}:${WORKSPACE}/bin"
 }
 
-# with_virtualenv() {
-#   export PATH=$PATH:/root/.local/bin
-#   python3 -m pip install --user virtualenv
-# }
 
 # with_yq() {
 #   pip install yq
@@ -87,4 +83,14 @@ retry() {
     fi
   done
   return 0
+}
+
+are_files_changed() {
+  changeset=$1
+  if git diff --name-only HEAD@{1} HEAD | grep -qE "$changeset"; then
+    return 0;
+  else
+    echo "WARN! No files changed in $changeset"
+    return 1;
+  fi
 }
