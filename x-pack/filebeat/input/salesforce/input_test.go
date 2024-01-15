@@ -693,9 +693,9 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		config := tt.fields.config
 		t.Run(tt.name, func(t *testing.T) {
-			var err error
-			tt.setupServer(t, tt.handler, &tt.fields.config)
+			tt.setupServer(t, tt.handler, &config)
 
 			s := &salesforceInput{
 				config:     tt.fields.config,
@@ -722,6 +722,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 			s.publisher = &client
 			s.srcConfig = &s.config
 
+			var err error
 			s.sfdcConfig, err = getSFDCConfig(&s.config)
 			if err != nil && !tt.wantErr {
 				t.Errorf("unexpected error from running input: %v", err)
