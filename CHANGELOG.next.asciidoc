@@ -61,6 +61,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix nil pointer dereference in the httpjson input {pull}37591[37591]
 - [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
 - Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
 - Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
@@ -88,8 +89,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
-- Added fix for formatting the logs from stateloader properly. {pull}37369[37369]
-- Remove duplicated syscall from arm seccomp profile. {pull}37440[37440]
 
 *Metricbeat*
 
@@ -105,18 +104,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix EC2 host.cpu.usage {pull}35717[35717]
 - Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
 - Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
-- Add missing 'TransactionType' dimension for Azure Storage Account. {pull}36413[36413]
-- Add log error when statsd server fails to start {pull}36477[36477]
-- Fix CassandraConnectionClosures metric configuration {pull}34742[34742]
-- Fix event mapping implementation for statsd module {pull}36925[36925]
-- The region and availability_zone ecs fields nested within the cloud field. {pull}37015[37015]
-- Fix CPU and memory metrics collection from privileged process on Windows {issue}17314[17314]{pull}37027[37027]
-- Enhanced Azure Metrics metricset with refined grouping logic and resolved duplication issues for TSDB compatibility {pull}36823[36823]
-- Fix memory leak on Windows {issue}37142[37142] {pull}37171[37171]
-- Fix unintended skip in metric collection on Azure Monitor {issue}37204[37204] {pull}37203[37203]
-- Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
-- Add memory hard limit from container metadata and remove usage percentage in AWS Fargate. {pull}37194[37194]
-- Ignore parser errors from unsupported metrics types on Prometheus client and continue parsing until EOF is reached {pull}37383[37383]
 
 *Osquerybeat*
 
@@ -150,9 +137,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 - Upgrade golang/x/net to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
 Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
-- Upgrade to Go 1.20.12. {pull}37350[37350]
+- Upgrade to Go 1.21.6. {pull}37615[37615]
 - The Elasticsearch output can now configure performance presets with the `preset` configuration field. {pull}37259[37259]
 - Upgrade to elastic-agent-libs v0.7.3 and golang.org/x/crypto v0.17.0. {pull}37544[37544]
+- Make more selective the Pod autodiscovery upon node and namespace update events. {issue}37338[37338] {pull}37431[37431]
 
 *Auditbeat*
 
@@ -218,6 +206,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Suppress and log max HTTP request retry errors in CEL input. {pull}37160[37160]
 - Prevent CEL input from re-entering the eval loop when an evaluation failed. {pull}37161[37161]
 - Update CEL extensions library to v1.7.0. {pull}37172[37172]
+- Add support for complete URL replacement in HTTPJSON chain steps. {pull}37486[37486]
 - Add Salesforce input. {pull}37331[37331]
 
 *Auditbeat*
@@ -238,6 +227,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add GCP CloudSQL metadata {pull}33066[33066]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
+- Fix containerd metrics grouping for TSDB {pull}37537[37537]
 - Add metrics grouping by dimensions and time to Azure app insights {pull}36634[36634]
 - Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms {pull}36647[36647]
 - Enhance GCP billing with detailed tables identification, additional fields, and optimized data handling. {pull}36902[36902]
@@ -304,6 +294,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
 
 
 
