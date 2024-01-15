@@ -178,6 +178,10 @@ func (s *salesforceInput) isError(err error) error {
 }
 
 func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
+	if s.sfdcConfig == nil {
+		return nil, errors.New("internal error: salesforce configuration is not set properly")
+	}
+
 	// Open creates a session using the configuration.
 	session, err := session.Open(*s.sfdcConfig)
 	if err != nil {
@@ -301,6 +305,10 @@ func (s *salesforceInput) RunEventLogFile() error {
 	res, err := s.soqlr.Query(query, false)
 	if err != nil {
 		return err
+	}
+
+	if s.sfdcConfig.Client == nil {
+		return errors.New("internal error: salesforce configuration is not set properly")
 	}
 
 	totalEvents, firstEvent := 0, true
@@ -452,10 +460,6 @@ func decodeAsCSV(p []byte) ([]map[string]string, error) {
 	// To share the backing array for performance.
 	r.ReuseRecord = true
 
-	// NOTE:
-	// Read sets `r.FieldsPerRecord` to the number of fields in the first record,
-	// so that future records must have the same field count.
-
 	// Header row is always expected, otherwise we can't map values to keys in
 	// the event.
 	header, err := r.Read()
@@ -471,6 +475,12 @@ func decodeAsCSV(p []byte) ([]map[string]string, error) {
 
 	var results []map[string]string //nolint:prealloc // not sure about the size to prealloc with
 
+	// NOTE:
+	//
+	// Read sets `r.FieldsPerRecord` to the number of fields in the first record,
+	// so that future records must have the same field count.
+	// So, if len(header) != len(event), the Read will return an error and hence
+	// we need not put an explicit check.
 	event, err := r.Read()
 	for ; err == nil; event, err = r.Read() {
 		if err != nil {
