@@ -220,8 +220,6 @@ func (p *monitorTestSuite) TestRunUnknownEventType() {
 func (p *monitorTestSuite) TestRunPerfCloseEventChan() {
 	ctx := context.Background()
 
-	type Unknown struct{}
-
 	perfLost := make(chan uint64)
 	perfEvent := make(chan interface{})
 	perfErr := make(chan error)
