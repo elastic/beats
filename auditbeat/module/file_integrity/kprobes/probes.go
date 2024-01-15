@@ -1,7 +1,7 @@
 package kprobes
 
 import (
-	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/kprobes/tracing"
+	"github.com/elastic/beats/v7/auditbeat/tracing"
 	tkbtf "github.com/elastic/tk-btf"
 	"golang.org/x/sys/unix"
 )

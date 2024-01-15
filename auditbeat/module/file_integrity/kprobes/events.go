@@ -3,7 +3,7 @@ package kprobes
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/kprobes/tracing"
+	"github.com/elastic/beats/v7/auditbeat/tracing"
 )
 
 var probeEventPool = sync.Pool{

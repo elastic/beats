@@ -3,7 +3,7 @@ package kprobes
 import (
 	"context"
 	"errors"
-	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/kprobes/tracing"
+	"github.com/elastic/beats/v7/auditbeat/tracing"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"golang.org/x/sys/unix"

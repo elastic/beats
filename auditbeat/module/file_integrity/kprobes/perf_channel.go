@@ -3,7 +3,7 @@ package kprobes
 import (
 	"time"
 
-	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/kprobes/tracing"
+	"github.com/elastic/beats/v7/auditbeat/tracing"
 )
 
 type perfChannel interface {
@@ -26,6 +26,7 @@ func newPerfChannel(probes map[tracing.Probe]tracing.AllocateFn, ringSizeExponen
 		tracing.WithBufferSize(bufferSize),
 		tracing.WithTID(pid),
 		tracing.WithPollTimeout(200*time.Millisecond),
+		tracing.WithWakeUpEvents(500),
 	)
 	if err != nil {
 		return nil, err
