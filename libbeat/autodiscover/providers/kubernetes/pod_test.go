@@ -2154,26 +2154,6 @@ func (s *mockUpdaterStore) List() []interface{} {
 	return s.objects
 }
 
-type mockNamespaceStore struct {
-	objects interface{}
-	exist   bool
-	err     error
-}
-
-func (s *mockNamespaceStore) GetByKey(string) (interface{}, bool, error) {
-	return s.objects, s.exist, s.err
-}
-
-type mockNodeStore struct {
-	objects interface{}
-	exist   bool
-	err     error
-}
-
-func (s *mockNodeStore) GetByKey(string) (interface{}, bool, error) {
-	return s.objects, s.exist, s.err
-}
-
 func NewMockPodEventerManager(pod *pod) EventManager {
 	em := &eventerManager{}
 	em.eventer = pod
