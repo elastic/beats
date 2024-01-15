@@ -134,5 +134,4 @@ func (d *dEntryCache) MoveClear(tid uint64) {
 
 	delete(d.moveCache, tid)
 	entry.Release()
-	entry = nil
 }

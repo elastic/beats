@@ -208,7 +208,6 @@ func (e *eProcessor) process(ctx context.Context, pe *ProbeEvent) error {
 		}
 
 		entry.Release()
-		entry = nil
 
 		return nil
 	default:
