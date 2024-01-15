@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-source .buildkite/filebeat/scripts/common.sh
+source .buildkite/metricbeat/scripts/common.sh
 
 echo ":: Evaluate Filebeat Changes ::"
 
