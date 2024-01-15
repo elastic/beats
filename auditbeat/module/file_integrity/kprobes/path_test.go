@@ -103,7 +103,7 @@ func (p *pathTestSuite) TestRecursiveWalkAsync() {
 
 	p.Require().Equal(len(createdPathsOrder), len(createdPathsWithDepth))
 
-	var expectedStatQueue []statMatch
+	expectedStatQueue := make([]statMatch, 0, len(createdPathsOrder))
 	for _, path := range createdPathsOrder {
 
 		depth, exists := createdPathsWithDepth[path]
@@ -228,7 +228,7 @@ func (p *pathTestSuite) TestNonRecursiveWalkAsync() {
 
 	p.Require().Equal(len(createdPathsOrder), len(createdPathsWithDepth))
 
-	var expectedStatQueue []statMatch
+	expectedStatQueue := make([]statMatch, 0, len(createdPathsOrder))
 	for _, path := range createdPathsOrder {
 
 		depth, exists := createdPathsWithDepth[path]
@@ -411,7 +411,7 @@ func (p *pathTestSuite) TestRecursiveAdd() {
 
 	p.Require().Equal(len(createdPathsOrder), len(createdPathsWithDepth))
 
-	var expectedStatQueue []statMatch
+	expectedStatQueue := make([]statMatch, 0, len(createdPathsOrder))
 	for _, path := range createdPathsOrder {
 
 		depth, exists := createdPathsWithDepth[path]
@@ -519,7 +519,7 @@ func (p *pathTestSuite) TestNonRecursiveAdd() {
 
 	p.Require().Equal(len(createdPathsOrder), len(createdPathsWithDepth))
 
-	var expectedStatQueue []statMatch
+	expectedStatQueue := make([]statMatch, 0, len(createdPathsOrder))
 	for _, path := range createdPathsOrder {
 
 		depth, exists := createdPathsWithDepth[path]
