@@ -211,12 +211,15 @@ These are the fields available within config templating. The `kubernetes.*` fiel
 [float]
 ====== Generic fields:
   * host
-  * port (if exposed)
 
 [float]
 ====== Pod specific:
 |===
 |Key |Type |Description
+
+|`port`
+|`string`
+|Pod port. If pod has multiple ports exposed should be used `ports.<port-name>` instead
 
 |`kubernetes.namespace`
 |`string`
@@ -226,21 +229,17 @@ These are the fields available within config templating. The `kubernetes.*` fiel
 |`string`
 |UUID of the Namespace, where the Pod is running
 
-|`kubernetes.namespace_labels.*`
-|`object`
-|Labels of the Namespace, where the Pod is running. All namespace labels are available by default, see `add_resource_metadata` configuration setting above.
-
 |`kubernetes.namespace_annotations.*`
 |`object`
-|Annotations of the Namespace, where the Pod is running. Namespace annotations are not available by default, see `add_resource_metadata` configuration setting above.
+|Annotations of the Namespace, where the Pod is running. Annotations should be used in not dedoted format, e.g. `kubernetes.namespace_annotations.app.kubernetes.io/name`
 
 |`kubernetes.pod.name`
 |`string`
 |Name of the Pod
 
-|`kubernetes.pod.uuid`
+|`kubernetes.pod.uid`
 |`string`
-|UUID of the Pod
+|UID of the Pod
 
 |`kubernetes.pod.ip`
 |`string`
@@ -248,11 +247,11 @@ These are the fields available within config templating. The `kubernetes.*` fiel
 
 |`kubernetes.labels.*`
 |`object`
-|Object of the Pod labels. All labels are available by default.
+|Object of the Pod labels. Labels should be used in not dedoted format, e.g. `kubernetes.labels.app.kubernetes.io/name`
 
 |`kubernetes.annotations.*`
 |`object`
-|Object of the Pod annotations. Annotations are not available by default.
+|Object of the Pod annotations. Annotations should be used in not dedoted format, e.g. `kubernetes.annotations.test.io/test`
 
 |`kubernetes.container.name`
 |`string`
@@ -270,14 +269,6 @@ These are the fields available within config templating. The `kubernetes.*` fiel
 |`string`
 |Image of the container
 
-|`kubernetes.container.port`
-|`string`
-|Port of the container (if defined)
-
-|`kubernetes.container.port_name`
-|`string`
-|Port's name for the container (if defined)
-
 |`kubernetes.node.name`
 |`string`
 |Name of the Node
@@ -289,18 +280,6 @@ These are the fields available within config templating. The `kubernetes.*` fiel
 |`kubernetes.node.hostname`
 |`string`
 |Hostname of the Node
-
-|`kubernetes.node.labels.*`
-|`string`
-|Labels of the Node. All node labels are available by default, see `add_resource_metadata` configuration setting above
-
-|`kubernetes.node.annotations.*`
-|`string`
-|Annotations of the Node. Node annotations are not available by default, see `add_resource_metadata` configuration setting above
-
-|`kubernetes.deployment.name.*`
-|`string`
-|Deployment name of the Pod (if exists). Deployment name is not available by default, see `add_resource_metadata` configuration setting above
 |===
 
 [float]
@@ -310,11 +289,11 @@ These are the fields available within config templating. The `kubernetes.*` fiel
 
 |`kubernetes.labels.*`
 |`object`
-|Object of labels of the Node. All labels are available by default
+|Object of labels of the Node
 
 |`kubernetes.annotations.*`
 |`object`
-|Object of labels of the Node. Annotations are not available by default
+|Object of annotations of the Node
 
 |`kubernetes.node.name`
 |`string`
@@ -334,6 +313,10 @@ These are the fields available within config templating. The `kubernetes.*` fiel
 |===
 |Key |Type |Description
 
+|`port`
+|`string`
+|Service port
+
 |`kubernetes.namespace`
 |`string`
 |Namespace of the Service
@@ -342,21 +325,17 @@ These are the fields available within config templating. The `kubernetes.*` fiel
 |`string`
 |UUID of the Namespace of the Service
 
-|`kubernetes.namespace_labels.*`
-|`object`
-|Labels of the Namespace of the Service. All namespace labels are available by default, see `add_resource_metadata` configuration setting above
-
 |`kubernetes.namespace_annotations.*`
 |`object`
-|Annotations of the Namespace of the Service. Namespace annotations are not available by default, see `add_resource_metadata` configuration setting above
+|Annotations of the Namespace of the Service. Annotations should be used in not dedoted format, e.g. `kubernetes.namespace_annotations.app.kubernetes.io/name`
 
 |`kubernetes.labels.*`
 |`object`
-|Object of the Service labels. All labels are available by default
+|Object of the Service labels
 
 |`kubernetes.annotations.*`
 |`object`
-|Object of the Service annotations. Annotations are not available by default
+|Object of the Service annotations
 
 |`kubernetes.service.name`
 |`string`
@@ -365,10 +344,6 @@ These are the fields available within config templating. The `kubernetes.*` fiel
 |`kubernetes.service.uid`
 |`string`
 |UID of the Service
-
-|`kubernetes.selectors.*`
-|`string`
-|Kubernetes selectors
 |===
 
 If the `include_annotations` config is added to the provider config, then the list of annotations present in the config
