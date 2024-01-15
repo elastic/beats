@@ -188,6 +188,7 @@ func (r *pTraverser) walkRecursive(ctx context.Context, path string, mounts moun
 		// maybe this path got deleted/moved in the meantime
 		// return nil
 		r.mtx.Unlock()
+		//lint:ignore nilerr no errors returned for lstat from walkRecursive
 		return nil
 	}
 
@@ -222,12 +223,14 @@ func (r *pTraverser) walkRecursive(ctx context.Context, path string, mounts moun
 	if err != nil {
 		// maybe this dir got deleted/moved in the meantime
 		// return nil
+		//lint:ignore nilerr no errors returned for readDirNames from walkRecursive
 		return nil
 	}
 
 	for _, name := range names {
 		filename := filepath.Join(path, name)
 		if err = r.walkRecursive(ctx, filename, mounts, depth+1, isFromMove, tid); err != nil {
+			//lint:ignore nilerr no errors returned for readDirNames from walkRecursive
 			return nil
 		}
 	}
