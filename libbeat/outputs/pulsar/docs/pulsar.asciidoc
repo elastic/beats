@@ -5,6 +5,8 @@
 <titleabbrev>Pulsar</titleabbrev>
 ++++
 
+experimental[]
+
 The Pulsar output sends events to Apache Pulsar.
 
 Example configuration:
