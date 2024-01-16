@@ -28522,6 +28522,13 @@ Elasticsearch module
 
 
 
+*`cluster_settings.cluster.metadata.display_name`*::
++
+--
+type: keyword
+
+--
+
 
 *`index_recovery.shards.start_time_in_millis`*::
 +
@@ -30662,13 +30669,6 @@ type: long
 index
 
 
-
-*`elasticsearch.index.created`*::
-+
---
-type: long
-
---
 
 *`elasticsearch.index.hidden`*::
 +
