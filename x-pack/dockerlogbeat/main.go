@@ -16,6 +16,7 @@ import (
 	_ "github.com/elastic/beats/v7/libbeat/outputs/fileout"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/kafka"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/logstash"
+	_ "github.com/elastic/beats/v7/libbeat/outputs/pulsar"
 	_ "github.com/elastic/beats/v7/libbeat/outputs/redis"
 	_ "github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemanager"
