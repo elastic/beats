@@ -221,7 +221,7 @@ func tlsSetup(t *testing.T) (clientConfig *tls.Config, serverConfig *tlscommon.S
 		MinVersion:   tls.VersionTLS12,
 	}
 
-	var clientAuth = tlscommon.ClientAuthRequire
+	var clientAuth = tlscommon.TLSClientAuthRequired
 
 	serverConfig = &tlscommon.ServerConfig{
 		// NOTE: VerifyCertificate is ineffective unless ClientAuth is set to RequireAndVerifyClientCert.
