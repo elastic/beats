@@ -52,7 +52,11 @@ func TestManagePropertyName(t *testing.T) {
 func TestMapToKeyValuePoints(t *testing.T) {
 	timestamp := time.Now().UTC()
 	metricName := "test"
-	metricValue := 42.0
+	minValue := 4.0
+	maxValue := 42.0
+	avgValue := 13.0
+	totalValue := 46.0
+	countValue := 2.0
 	namespace := "test"
 	resourceId := "test"
 	resourceSubId := "test"
@@ -64,7 +68,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 			Namespace:     namespace,
 			Names:         []string{"test"},
 			Aggregations:  "min",
-			Values:        []MetricValue{{name: metricName, min: &metricValue, timestamp: timestamp}},
+			Values:        []MetricValue{{name: metricName, min: &minValue, timestamp: timestamp}},
 			TimeGrain:     timeGrain,
 			ResourceId:    resourceId,
 			ResourceSubId: resourceSubId,
@@ -72,7 +76,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 			Namespace:     namespace,
 			Names:         []string{"test"},
 			Aggregations:  "max",
-			Values:        []MetricValue{{name: metricName, max: &metricValue, timestamp: timestamp}},
+			Values:        []MetricValue{{name: metricName, max: &maxValue, timestamp: timestamp}},
 			TimeGrain:     timeGrain,
 			ResourceId:    resourceId,
 			ResourceSubId: resourceSubId,
@@ -80,7 +84,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 			Namespace:     namespace,
 			Names:         []string{"test"},
 			Aggregations:  "avg",
-			Values:        []MetricValue{{name: metricName, avg: &metricValue, timestamp: timestamp}},
+			Values:        []MetricValue{{name: metricName, avg: &avgValue, timestamp: timestamp}},
 			TimeGrain:     timeGrain,
 			ResourceId:    resourceId,
 			ResourceSubId: resourceSubId,
@@ -88,7 +92,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 			Namespace:     namespace,
 			Names:         []string{"test"},
 			Aggregations:  "total",
-			Values:        []MetricValue{{name: metricName, total: &metricValue, timestamp: timestamp}},
+			Values:        []MetricValue{{name: metricName, total: &totalValue, timestamp: timestamp}},
 			TimeGrain:     timeGrain,
 			ResourceId:    resourceId,
 			ResourceSubId: resourceSubId,
@@ -96,7 +100,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 			Namespace:     namespace,
 			Names:         []string{"test"},
 			Aggregations:  "count",
-			Values:        []MetricValue{{name: metricName, count: &metricValue, timestamp: timestamp}},
+			Values:        []MetricValue{{name: metricName, count: &countValue, timestamp: timestamp}},
 			TimeGrain:     timeGrain,
 			ResourceId:    resourceId,
 			ResourceSubId: resourceSubId,
@@ -107,7 +111,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 		expected := []KeyValuePoint{
 			{
 				Key:           fmt.Sprintf("%s.%s", metricName, "min"),
-				Value:         &metricValue,
+				Value:         &minValue,
 				Namespace:     namespace,
 				TimeGrain:     timeGrain,
 				Timestamp:     timestamp,
@@ -116,7 +120,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 				Dimensions:    map[string]interface{}{},
 			}, {
 				Key:           fmt.Sprintf("%s.%s", metricName, "max"),
-				Value:         &metricValue,
+				Value:         &maxValue,
 				Namespace:     namespace,
 				TimeGrain:     timeGrain,
 				Timestamp:     timestamp,
@@ -125,7 +129,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 				Dimensions:    map[string]interface{}{},
 			}, {
 				Key:           fmt.Sprintf("%s.%s", metricName, "avg"),
-				Value:         &metricValue,
+				Value:         &avgValue,
 				Namespace:     namespace,
 				TimeGrain:     timeGrain,
 				Timestamp:     timestamp,
@@ -135,7 +139,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 			},
 			{
 				Key:           fmt.Sprintf("%s.%s", metricName, "total"),
-				Value:         &metricValue,
+				Value:         &totalValue,
 				Namespace:     namespace,
 				TimeGrain:     timeGrain,
 				Timestamp:     timestamp,
@@ -145,7 +149,7 @@ func TestMapToKeyValuePoints(t *testing.T) {
 			},
 			{
 				Key:           fmt.Sprintf("%s.%s", metricName, "count"),
-				Value:         &metricValue,
+				Value:         &countValue,
 				Namespace:     namespace,
 				TimeGrain:     timeGrain,
 				Timestamp:     timestamp,
