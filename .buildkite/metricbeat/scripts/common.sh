@@ -72,7 +72,6 @@ with_python() {
     sudo apt-get install -y python3-venv python3-pip libsystemd-dev
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
-    brew install python3 libsystemd
     pip3 install --upgrade pip
     pip3 install virtualenv
   fi

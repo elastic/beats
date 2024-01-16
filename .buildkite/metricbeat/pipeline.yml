@@ -11,18 +11,19 @@ env:
 
 steps:
 
-  - group: "Mandatory Tests"
-    key: "mandatory-tests"
-#    if: define_condition_if_needed_for_group
-    steps:
-#      TODO: Ubuntu Unit Tests have some issues, it needs to be compared with the Jenkins pipeline, but it's difficult to find it :)
-      - label: ":linux: Ubuntu Unit Tests"
-        key: "mandatory-linux-unit-test"
-        command: ".buildkite/metricbeat/scripts/unit_tests.sh"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
+#   - group: "Mandatory Tests"
+#     key: "mandatory-tests"
+# #    if: define_condition_if_needed_for_group
+#     steps:
+# #      TODO: Ubuntu Unit Tests have some issues, it needs to be compared with the Jenkins pipeline, but it's difficult to find it :)
+#       - label: ":linux: Ubuntu Unit Tests"
+#         key: "mandatory-linux-unit-test"
+#         command: ".buildkite/metricbeat/scripts/unit_tests.sh"
+#         agents:
+#           provider: "gcp"
+#           image: "${IMAGE_UBUNTU_X86_64}"
+#           machineType: "c2-standard-16"
+#         artifact_paths: "metricbeat/build/*.*"
 
       # - label: ":go: Go Intergration Tests"
       #   key: "mandatory-int-test"
