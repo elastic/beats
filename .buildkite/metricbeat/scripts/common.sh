@@ -3,6 +3,7 @@ set -euo pipefail
 
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
 platform_type="$(uname)"
+platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
 
 create_workspace() {
@@ -53,17 +54,15 @@ with_mage() {
 }
 
 with_go() {
-  go_version=$1
   echo "Setting up the Go environment..."
   create_workspace
   check_platform_architeture
-  local platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
-  retry 5 curl -sL -o "${WORKSPACE}/bin/gvm" "https://github.com/andrewkroh/gvm/releases/download/${go_version}/gvm-${platform_type_lowercase}-${arch_type}"
+  retry 5 curl -sL -o "${WORKSPACE}/bin/gvm" "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${platform_type_lowercase}-${arch_type}"
   chmod +x "${WORKSPACE}/bin/gvm"
-  eval "$(gvm $(cat .go-version))"
+  eval "$(gvm $GO_VERSION)"
   go version
   which go
-  go_path="$(go env GOPATH):$(go env GOPATH)/bin"
+  local go_path="$(go env GOPATH):$(go env GOPATH)/bin"
   export PATH="${PATH}:${go_path}"
 }
 
