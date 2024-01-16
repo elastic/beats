@@ -667,6 +667,20 @@ func TestAgentPackageVersion(t *testing.T) {
 
 	filebeat.Start("-E", "management.enabled=true")
 
+	// With those logs it's possible to see the error reading os.Stdin happens
+	// AFTER the file has been written. It seems then the os.Stdin the filebeat.test
+	// is reading isn't the file set when it's run.
+	// I've also changed to integration.NewBeat to use os/exec.Cmd to check if
+	// it could be how the test beat was stated the issue, but it did not change
+	// anything.
+	// There also is TestStartUpInfo which reads the stdin file and prints out a
+	// formatted proto.StartUpInfo.
+	// Another option is to use the command `startupinfo` which does the same as
+	// TestStartUpInfo. To use it compile filebeat:
+	//   - cd x-pack/filebeat
+	//   - go build .
+	//   - ./filebeat help startupinfo
+	//   - ./filebeat startupinfo <build/integration-tests/TestAgentPackageVersionXYZ/stdin
 	t.Logf("[%s] before WriteStartUpInfo", time.Now())
 	WriteStartUpInfo(t, filebeat.Stdin(), startUpInfo)
 	require.NoError(t, filebeat.Stdin().Sync(), "could not sync beat stdin")
