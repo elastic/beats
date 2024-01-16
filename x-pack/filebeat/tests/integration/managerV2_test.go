@@ -681,6 +681,13 @@ func TestAgentPackageVersion(t *testing.T) {
 	//   - go build .
 	//   - ./filebeat help startupinfo
 	//   - ./filebeat startupinfo <build/integration-tests/TestAgentPackageVersionXYZ/stdin
+	//
+	// My best guess is compiling the test binary interferes with how the process
+	// interacts with its stdin. If the test binary is compiled:
+	//   - cd x-pack/filebeat
+	//   - mage -v buildSystemTestBinary
+	//   - ./filebeat.test help
+	// you'll see only the flags, not the normal help from filebeat
 	t.Logf("[%s] before WriteStartUpInfo", time.Now())
 	WriteStartUpInfo(t, filebeat.Stdin(), startUpInfo)
 	require.NoError(t, filebeat.Stdin().Sync(), "could not sync beat stdin")
