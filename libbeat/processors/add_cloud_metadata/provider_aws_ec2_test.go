@@ -153,11 +153,11 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
 					"service":           mapstr.M{"name": "EC2"},
-					"orchestrator": mapstr.M{
-						"cluster": mapstr.M{
-							"name": clusterNameValue,
-							"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
-						},
+				},
+				"orchestrator": mapstr.M{
+					"cluster": mapstr.M{
+						"name": clusterNameValue,
+						"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
 					},
 				},
 			},
@@ -244,11 +244,11 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
 					"service":           mapstr.M{"name": "EC2"},
-					"orchestrator": mapstr.M{
-						"cluster": mapstr.M{
-							"name": clusterNameValue,
-							"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
-						},
+				},
+				"orchestrator": mapstr.M{
+					"cluster": mapstr.M{
+						"name": clusterNameValue,
+						"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
 					},
 				},
 			},
