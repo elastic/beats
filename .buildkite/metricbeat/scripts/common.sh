@@ -18,7 +18,7 @@ add_bin_path() {
 }
 
 check_platform_architeture() {
-  case "${hw_type}" in
+  case "${arch_type}" in
     "x86_64")
       arch_type="amd64"
       ;;
