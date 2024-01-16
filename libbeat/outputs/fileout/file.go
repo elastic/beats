@@ -23,6 +23,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
@@ -30,7 +32,6 @@ import (
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"go.uber.org/zap"
 )
 
 func init() {

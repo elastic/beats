@@ -18,6 +18,8 @@
 package elasticsearch
 
 import (
+	"go.uber.org/zap"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -25,7 +27,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"go.uber.org/zap"
 )
 
 func init() {
