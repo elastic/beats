@@ -18,7 +18,7 @@ if ! are_files_changed "$changeset" ; then
   message="No files changed within Filebeat changeset"
   echo "$message"
   buildkite-agent annotate "$message" --style 'warning' --context 'ctx-warn'
-  # This should return any error but skip the release.
+  # This should return any error but skip the packaging.
   exit 0
 fi
 

@@ -97,7 +97,7 @@ steps:
         key: "macos-extended"
 #        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command:
-          - "ulimit -Sn 50000"
+#          - "ulimit -Sn 10000"
           - ".buildkite/filebeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
@@ -105,6 +105,7 @@ steps:
         agents:
           provider: "orka"
           imagePrefix: "generic-13-ventura-x64"
+        artifact_paths: "filebeat/build/*.xml"
 
   - group: "Windows Extended Testing"
     key: "extended-tests-win"

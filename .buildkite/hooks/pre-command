@@ -12,4 +12,8 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
   if [[ -z "${GOLANG_VERSION-""}" ]]; then
     export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
   fi
+
+  if [[ "$BUILDKITE_STEP_KEY" == macos* ]]; then
+    ulimit -Sn 30000
+  fi
 fi
