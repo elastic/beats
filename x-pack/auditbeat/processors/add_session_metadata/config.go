@@ -4,7 +4,7 @@
 
 package add_session_metadata
 
-// Config for add_host_metadata processor.
+// Config for add_session_metadata processor.
 type Config struct {
 	Backend       string `config:"backend"`
 	ReplaceFields bool   `config:"replace_fields"`
@@ -14,7 +14,7 @@ type Config struct {
 func defaultConfig() Config {
 	return Config{
 		Backend:       "ebpf",
-		ReplaceFields: true,
+		ReplaceFields: false,
 		PidField:      "process.pid",
 	}
 }

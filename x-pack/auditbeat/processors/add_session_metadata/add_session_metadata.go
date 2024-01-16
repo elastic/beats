@@ -157,10 +157,12 @@ func pidToUInt32(value interface{}) (pid uint32, err error) {
 	return pid, nil
 }
 
-//replaceFields replaces event fields with values suitable for session view
+// replaceFields replaces event fields with values suitable user with the session viewer in Kibana
+// The current version of session view in Kibana expects different values than what are used by auditbeat
+// for some fields. This function converts these field to have values that will work with session view.
+//
+// This function is temporary, and can be removed when Kibana is updated to work with the auditbeat field values.
 func (p *addSessionMetadata) replaceFields(ev *beat.Event) error {
-	// This will only work with auditd data, but this is entire func is temporary
-	// It should be removed when session view can work with the original fields.
 	kind, err := ev.Fields.GetValue("event.kind")
 	if err != nil {
 		return err
