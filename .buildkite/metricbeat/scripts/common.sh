@@ -2,6 +2,8 @@
 set -euo pipefail
 
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
+platform_type="$(uname)"
+arch_type="$(uname -m)"
 
 create_workspace() {
   if [[ ! -d "${WORKSPACE}/bin" ]]; then
@@ -15,6 +17,22 @@ add_bin_path() {
   export PATH="${PATH}:${WORKSPACE}/bin"
 }
 
+check_platform_architeture() {
+  case "${hw_type}" in
+    "x86_64")
+      arch_type="amd64"
+      ;;
+    "aarch64")
+      arch_type="arm64"
+      ;;
+    "arm64")
+      arch_type="arm64"
+      ;;
+    *)
+    echo "The current platform/OS type is unsupported yet"
+    ;;
+  esac
+}
 
 # with_yq() {
 #   pip install yq
@@ -36,32 +54,29 @@ with_mage() {
 
 with_go() {
   go_version=$1
-  url=$(get_gvm_link "${SETUP_GVM_VERSION}")
+  echo "Setting up the Go environment..."
   create_workspace
-  retry 5 curl -sL -o "${WORKSPACE}/bin/gvm" "${url}"
+  check_platform_architeture
+  local platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
+  retry 5 curl -sL -o "${WORKSPACE}/bin/gvm" "https://github.com/andrewkroh/gvm/releases/download/${go_version}/gvm-${platform_type_lowercase}-${arch_type}"
   chmod +x "${WORKSPACE}/bin/gvm"
-  ls -l ${WORKSPACE}/bin/
-  eval "$(gvm $go_version)"
+  eval "$(gvm $(cat .go-version))"
+  go version
+  which go
   go_path="$(go env GOPATH):$(go env GOPATH)/bin"
   export PATH="${PATH}:${go_path}"
-  go version
 }
 
 with_python() {
-  if [ "$(uname)" == "Linux" ]; then
+  if [ "${platform_type}" == "Linux" ]; then
     sudo apt-get update
-    sudo apt-get install -y python3 python3-venv python3-pip libsystemd-dev
+    sudo apt-get install -y python3-venv python3-pip libsystemd-dev
+  elif [ "${platform_type}" == "Darwin" ]; then
+    brew update
+    brew install python3 libsystemd
+    pip3 install --upgrade pip
+    pip3 install virtualenv
   fi
-}
-
-get_gvm_link() {
-  gvm_version=$1
-  platform_type="$(uname)"
-  platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
-  arch_type="$(uname -m)"
-  [[ ${arch_type} == "aarch64" ]] && arch_type="arm64"
-  [[ ${arch_type} == "x86_64" ]] && arch_type="amd64"
-  echo "https://github.com/andrewkroh/gvm/releases/download/${gvm_version}/gvm-${platform_type_lowercase}-${arch_type}"
 }
 
 retry() {

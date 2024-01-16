@@ -24,7 +24,5 @@ with_python
 
 echo "--- Packaging"
 pushd "metricbeat" > /dev/null
-# chmod -R go-w ./mb/testdata/
-# umask 0022
 mage package
 popd > /dev/null
