@@ -116,6 +116,7 @@ steps:
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.large"
+          instanceType: "m7g.large"
         env:
+          PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
