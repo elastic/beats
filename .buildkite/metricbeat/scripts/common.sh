@@ -50,9 +50,7 @@ with_go() {
 with_python() {
   if [ "$(uname)" == "Linux" ]; then
     sudo apt-get update
-    sudo apt-get install -y libsystemd-dev
-    sudo apt install -y python3-pip
-    sudo apt-get install -y python3-venv
+    sudo apt-get install -y python3 python3-venv python3-pip libsystemd-dev
   fi
 }
 

@@ -117,3 +117,5 @@ steps:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
           instanceType: "t4g.large"
+        env:
+          PLATFORMS: "linux/arm64"
