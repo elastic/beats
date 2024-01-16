@@ -177,11 +177,34 @@ CHANGELOG*
 /x-pack/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/metricbeat/module/activemq @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/airflow @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/aws @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/awsfargate @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/azure @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/azure/billing @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/cloudfoundry @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/cockroachdb @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/containerd/ @elastic/obs-cloudnative-monitoring
 /x-pack/metricbeat/module/coredns @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/enterprisesearch @elastic/ent-search-application-backend
+/x-pack/metricbeat/module/gcp @elastic/obs-ds-hosted-services @elastic/obs-infraobs-integrations @elastic/security-external-integrations
+/x-pack/metricbeat/module/gcp/billing @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/gcp/cloudrun_metrics @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/gcp/cloudsql_mysql @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/gcp/cloudsql_postgressql @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/gcp/cloudsql_sqlserver @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/gcp/carbon @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/gcp/compute @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/gcp/dataproc @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/gcp/dns @elastic/security-external-integrations
+/x-pack/metricbeat/module/gcp/firestore @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/gcp/firewall @elastic/security-external-integrations
+/x-pack/metricbeat/module/gcp/gke @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/gcp/loadbalancing_logs @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/gcp/loadbalancing_metrics @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/gcp/pubsub @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/gcp/redis @elastic/obs-infraobs-integrations
+/x-pack/metricbeat/module/gcp/storage @elastic/obs-ds-hosted-services
+/x-pack/metricbeat/module/gcp/vpcflow @elastic/security-external-integrations
 /x-pack/metricbeat/module/ibmmq @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/iis @elastic/obs-infraobs-integrations
 /x-pack/metricbeat/module/istio/ @elastic/obs-cloudnative-monitoring
