@@ -221,9 +221,7 @@ func accumulateRemoveFields(remove interface{}, out []string) []string {
 			case string:
 				return append(out, vs)
 			case []string:
-				for _, vv := range vs {
-					out = append(out, vv)
-				}
+				out = append(out, vs...)
 			case []interface{}:
 				for _, vv := range vs {
 					vvs := vv.(string)
