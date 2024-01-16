@@ -23,16 +23,15 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/features"
+	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-
-	"github.com/elastic/beats/v7/libbeat/common/reload"
-	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/version"
 )
 
 // diagnosticHandler is a wrapper type that's a bit of a hack, the compiler won't let us send the raw unit struct,
@@ -169,14 +168,12 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 		agentClient = client.NewV2(c.InsecureGRPCURLForTesting,
 			"", // Insecure connection for test, no token needed
 			client.VersionInfo{
-				Name:    "beat-v2-client-for-testing",
-				Version: version.GetDefaultVersion(),
+				Name: "beat-v2-client-for-testing",
 			}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 	} else {
 		// Normal Elastic-Agent-Client initialisation
 		agentClient, _, err = client.NewV2FromReader(os.Stdin, client.VersionInfo{
-			Name:    "beat-v2-client",
-			Version: version.GetDefaultVersion(),
+			Name: "beat-v2-client",
 			Meta: map[string]string{
 				"commit":     version.Commit(),
 				"build_time": version.BuildTime().String(),

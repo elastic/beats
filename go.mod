@@ -164,7 +164,7 @@ require (
 	google.golang.org/api v0.128.0
 	google.golang.org/genproto v0.0.0-20230920204549-e6e6cdab5c13 // indirect
 	google.golang.org/grpc v1.58.3
-	google.golang.org/protobuf v1.31.0
+	google.golang.org/protobuf v1.32.0
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
 	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
@@ -420,4 +420,4 @@ replace (
 // Exclude this version because the version has an invalid checksum.
 exclude github.com/docker/distribution v2.8.0+incompatible
 
-replace github.com/elastic/elastic-agent-client/v7 => github.com/AndersonQ/elastic-agent-client/v7 v7.0.0-20240115164330-36e4ce775b87
+replace github.com/elastic/elastic-agent-client/v7 => github.com/AndersonQ/elastic-agent-client/v7 v7.0.0-20240116182850-611b234b9e4e

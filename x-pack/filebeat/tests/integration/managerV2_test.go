@@ -7,17 +7,33 @@
 package integration
 
 import (
+	"bytes"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/tls"
+	"crypto/x509"
+	"crypto/x509/pkix"
+	"encoding/json"
+	"encoding/pem"
 	"fmt"
+	"io"
+	"math/big"
 	"os"
 	"path/filepath"
 	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	protobuf "google.golang.org/protobuf/proto"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
@@ -498,6 +514,191 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 	case <-time.After(60 * time.Second):
 		t.Fatal("Output did not recover from a invalid configuration after 60s of waiting")
 	}
+}
+
+func TestAgentPackageVersion(t *testing.T) {
+	want := "8.13.0+build20131123"
+	// 1st: mage buildSystemTestBinary
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat",
+	)
+
+	logFilePath := filepath.Join(filebeat.TempDir(), "logs.ndjson")
+	generateLogFile(t, logFilePath)
+
+	// output.file:
+	//  path: "/tmp/filebeat"
+	//  filename: filebeat
+	var units = []*proto.UnitExpected{
+		{
+			Id:             "output-unit",
+			Type:           proto.UnitType_OUTPUT,
+			ConfigStateIdx: 1,
+			State:          proto.State_HEALTHY,
+			LogLevel:       proto.UnitLogLevel_DEBUG,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "default",
+				Type: "file",
+				Name: "myFile",
+				Source: integration.RequireNewStruct(t,
+					map[string]interface{}{
+						"name": "myLog",
+						"type": "file",
+						"path": "/tmp/filebeat.ingested.log",
+					}),
+			},
+		},
+		{
+			Id:             "input-unit-1",
+			Type:           proto.UnitType_INPUT,
+			ConfigStateIdx: 1,
+			State:          proto.State_HEALTHY,
+			LogLevel:       proto.UnitLogLevel_DEBUG,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "filestream-monitoring-agent",
+				Type: "filestream",
+				Name: "filestream-monitoring-agent",
+				Streams: []*proto.Stream{
+					{
+						Id: "log-input-1",
+						Source: integration.RequireNewStruct(t, map[string]interface{}{
+							"enabled": true,
+							"type":    "log",
+							"paths":   []interface{}{logFilePath},
+						}),
+					},
+				},
+			},
+		},
+	}
+
+	server := &mock.StubServerV2{
+		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			// if management.DoesStateMatch(observed, units[idx], 0) {
+			// 	nextState()
+			// }
+			// for _, unit := range observed.GetUnits() {
+			// 	if state := unit.GetState(); !(state != proto.State_CONFIGURING) {
+			// 		t.Fatalf("Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
+			// 	}
+			// }
+
+			// observed.VersionInfo.BuildHash
+			return &proto.CheckinExpected{
+				Units: units,
+			}
+		},
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+	}
+
+	priv, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+	require.NoError(t, err, "could not create private key")
+
+	notBefore := time.Now()
+	notAfter := notBefore.Add(3 * time.Hour)
+
+	template := x509.Certificate{
+		SerialNumber: big.NewInt(1653),
+		Subject: pkix.Name{
+			Organization: []string{"Gallifrey"},
+		},
+		NotBefore:             notBefore,
+		NotAfter:              notAfter,
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
+		BasicConstraintsValid: true,
+	}
+
+	ca, err := x509.CreateCertificate(rand.Reader, &template, &template, &priv.PublicKey, priv)
+	require.NoError(t, err, "could not create CA")
+
+	privBytes, err := x509.MarshalECPrivateKey(priv)
+	require.NoError(t, err, "could not marshal private key")
+
+	var privBytesOut []byte
+	privKeyOut := bytes.NewBuffer(privBytesOut)
+	err = pem.Encode(privKeyOut, &pem.Block{Type: "EC PRIVATE KEY", Bytes: privBytes})
+	require.NoError(t, err, "could not pem.Encode private key")
+
+	var certBytesOut []byte
+	certOut := bytes.NewBuffer(certBytesOut)
+	err = pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: ca})
+	require.NoError(t, err, "could not pem.Encode certificate")
+
+	caPEM := certOut.Bytes()
+	caTLS, err := tls.X509KeyPair(caPEM, privKeyOut.Bytes())
+	require.NoError(t, err, "could not create key pair")
+
+	certPool := x509.NewCertPool()
+	ok := certPool.AppendCertsFromPEM(caPEM)
+	require.Truef(t, ok, "could not append certs from PEM to cert pool")
+
+	getCert := func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
+		return &caTLS, nil
+	}
+
+	creds := credentials.NewTLS(&tls.Config{
+		ClientAuth:     tls.RequireAndVerifyClientCert,
+		ClientCAs:      certPool,
+		GetCertificate: getCert,
+		MinVersion:     tls.VersionTLS12,
+	})
+
+	startUpInfo := &proto.StartUpInfo{
+		Addr:       fmt.Sprintf("localhost:%d", server.Port),
+		ServerName: "mockAgent",
+		Token:      "token",
+		CaCert:     caPEM,
+		PeerCert:   ca,
+		PeerKey:    privKeyOut.Bytes(),
+		Services:   []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2},
+		AgentInfo: &proto.AgentInfo{
+			Id:       uuid.New().String(),
+			Version:  want,
+			Snapshot: false,
+		},
+	}
+
+	err = server.Start(grpc.Creds(creds))
+	require.NoError(t, err, "failed starting GRPC server")
+	t.Cleanup(server.Stop)
+
+	filebeat.Start("-E", "management.enabled=true")
+
+	t.Logf("[%s] before WriteStartUpInfo", time.Now())
+	WriteStartUpInfo(t, filebeat.Stdin(), startUpInfo)
+	require.NoError(t, filebeat.Stdin().Sync(), "could not sync beat stdin")
+	t.Logf("[%s] after WriteStartUpInfo", time.Now())
+
+	filebeat.WaitForLogs("PublishEvents: ", 10*time.Second, "did not find the logs")
+}
+
+func WriteStartUpInfo(t *testing.T, w io.Writer, info *proto.StartUpInfo) {
+	t.Helper()
+	if len(info.Services) == 0 {
+		info.Services = []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2}
+	}
+
+	infoBytes, err := protobuf.Marshal(info)
+	require.NoError(t, err, "failed to marshal connection information")
+
+	_, err = w.Write(infoBytes)
+	require.NoError(t, err, "failed to write connection information")
+}
+
+func TestStartUpInfo(t *testing.T) {
+	f, err := os.Open("/home/ainsoph/devel/github.com/elastic/beats/x-pack/filebeat/build/integration-tests/TestAgentPackageVersion2952913677/stdin")
+	require.NoError(t, err)
+
+	info, err := client.StartUpInfoFromReader(f)
+	require.NoError(t, err)
+
+	bs, err := json.MarshalIndent(info, "", "  ")
+	require.NoError(t, err)
+
+	t.Logf("%s", bs)
 }
 
 // generateLogFile generates a log file by appending the current

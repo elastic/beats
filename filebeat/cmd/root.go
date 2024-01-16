@@ -18,13 +18,18 @@
 package cmd
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
+	"os"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 
 	// Import processors.
@@ -58,5 +63,32 @@ func Filebeat(inputs beater.PluginFactory, settings instance.Settings) *cmd.Beat
 	command.SetupCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
 	command.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
 	command.AddCommand(genGenerateCmd())
+	command.AddCommand(readSartUpInfoCmd())
 	return command
+}
+
+func readSartUpInfoCmd() *cobra.Command {
+	generateCmd := cobra.Command{
+		Use:   "startupinfo",
+		Short: "reads V2 StartUpInfo from os.Stdin",
+		Long: "Use:\n" +
+			"./filebeat startupinfo <" +
+			"x-pack/filebeat/build/integration-tests/TestAgentPackageVersionXYZ/stdin\n" +
+			"to check if the contents of the stdin file are correct",
+		Run: func(cmd *cobra.Command, args []string) {
+			info, err := client.StartUpInfoFromReader(os.Stdin)
+			if err != nil {
+				panic(fmt.Errorf("failed reading stdoin: %v", err))
+			}
+
+			bs, err := json.MarshalIndent(info, "", "  ")
+			if err != nil {
+				panic(fmt.Errorf("failed MarshalIndent: %v", err))
+			}
+
+			fmt.Printf("%s\n", bs)
+		},
+	}
+
+	return &generateCmd
 }

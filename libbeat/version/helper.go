@@ -37,7 +37,7 @@ var (
 //
 // This method is in a separate file as the version.go file is auto-generated.
 func GetDefaultVersion() string {
-	if v := packageVersion.Load().(string); v != "" {
+	if v, ok := packageVersion.Load().(string); ok && v != "" {
 		return v
 	}
 
