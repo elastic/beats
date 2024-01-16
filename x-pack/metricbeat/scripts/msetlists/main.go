@@ -25,6 +25,7 @@ func main() {
 	mb.Registry.SetSecondarySource(lm)
 
 	msList := msetlists.DefaultMetricsets()
+
 	raw, err := json.MarshalIndent(msList, "", "  ")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error Marshalling json: %s\n", err)

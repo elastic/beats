@@ -68,9 +68,7 @@ func main() {
 	}
 	dir := args[0]
 
-	log.Printf("------ dir = %v", dir)
 	modules, err := fields.GetModules(dir)
-	log.Printf("------ modules = %v", modules)
 	if err != nil {
 		log.Fatalf("Error fetching modules: %v", err)
 	}

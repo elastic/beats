@@ -19,8 +19,9 @@ package mage
 
 import (
 	"fmt"
-	"github.com/magefile/mage/sh"
 	"path/filepath"
+
+	"github.com/magefile/mage/sh"
 )
 
 const (
@@ -166,6 +167,7 @@ func GenerateModuleFieldsGo(moduleDir string) error {
 		moduleDir,
 	}
 	moduleFieldsCmd := sh.RunCmd("go", cmd...)
+
 	return moduleFieldsCmd()
 }
 
