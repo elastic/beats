@@ -52,6 +52,10 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" ]]; then
     git config user.name "$github_username"
     git config user.email "$github_email"
   fi
+
+  if [[ "$BUILDKITE_STEP_KEY" == macos* ]]; then
+    ulimit -Sn 30000
+  fi
 fi
 
 ENABLED_BEATS_PIPELINES_SLUGS=(
