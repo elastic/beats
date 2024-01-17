@@ -49,7 +49,11 @@ event_monitoring_method:
     enabled: true
     interval: {{ .elf_interval }}
     query:
+    {{ if .initial_interval }}
+      default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') AND LogDate > [[ formatTime(parseDuration(-{{ .initial_interval }})), "2006-01-02T15:04:05+0700") ]] ORDER BY LogDate ASC NULLS FIRST"
+    {{ else }}
       default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY LogDate ASC NULLS FIRST"
+    {{ end }}
       value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY LogDate ASC NULLS FIRST"
     cursor:
       field: "CreatedDate"

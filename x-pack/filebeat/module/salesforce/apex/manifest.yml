@@ -18,6 +18,7 @@ var:
   - name: url
   - name: elf_interval
     default: 1h
+  - name: initial_interval
   
 ingest_pipeline:
   - ingest/pipeline.yml

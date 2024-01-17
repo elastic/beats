@@ -22,6 +22,7 @@ var:
   - name: real_time
   - name: real_time_interval
     default: 5m
+  - name: initial_interval
   
 ingest_pipeline:
   - ingest/pipeline.yml
