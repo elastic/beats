@@ -127,6 +127,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
 - Add memory hard limit from container metadata and remove usage percentage in AWS Fargate. {pull}37194[37194]
 - Fix the reference time rounding on Azure Metrics {issue}37204[37204] {pull}37365[37365]
+- Fix Azure Resource Metrics missing metrics (min and max aggregations) after upgrade to 8.11.3 {issue}37642[37642] {pull}37643[37643]
 
 *Osquerybeat*
 
