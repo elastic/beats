@@ -124,7 +124,7 @@ func (r ProcfsReader) getProcessInfo(proc p.Proc) (ProcessInfo, error) {
 	// start time is needed to register the process in the database
 	stat, err := proc.Stat()
 	if err != nil {
-		return ProcessInfo{}, fmt.Errorf("failed to read /proc/%d/stat: %v", pid, err)
+		return ProcessInfo{}, fmt.Errorf("failed to read /proc/%d/stat: %w", pid, err)
 	}
 
 	argv, err := proc.CmdLine()

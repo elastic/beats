@@ -31,7 +31,7 @@ func (r *MockReader) GetProcess(pid uint32) (ProcessInfo, error) {
 }
 
 func (r *MockReader) GetAllProcesses() ([]ProcessInfo, error) {
-	ret := make([]ProcessInfo, 0)
+	ret := make([]ProcessInfo, 0, len(r.entries))
 
 	for _, entry := range r.entries {
 		ret = append(ret, entry)

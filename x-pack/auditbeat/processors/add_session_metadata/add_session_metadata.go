@@ -130,7 +130,7 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 	return result, nil
 }
 
-//pidToUInt32 converts PID value to uint32
+// pidToUInt32 converts PID value to uint32
 func pidToUInt32(value interface{}) (pid uint32, err error) {
 	switch v := value.(type) {
 	case string:

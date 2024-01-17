@@ -78,7 +78,9 @@ func stringStartsWithEntryInList(str string, list []string) bool {
 }
 
 func isContainerRuntime(executable string) bool {
-	return stringStartsWithEntryInList(executable, containerRuntimes[:])
+	return slices.ContainsFunc(containerRuntimes[:], func(s string) bool {
+		return strings.HasPrefix(executable, s)
+	})
 }
 
 func isFilteredExecutable(executable string) bool {
