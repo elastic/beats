@@ -17,8 +17,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/pkg/procfs"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/pkg/timeutils"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/timeutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 )

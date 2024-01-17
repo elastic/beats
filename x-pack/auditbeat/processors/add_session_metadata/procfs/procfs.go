@@ -9,9 +9,9 @@ import (
 	"strconv"
 	"strings"
 
-	p "github.com/prometheus/procfs"
+	"github.com/prometheus/procfs"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/pkg/timeutils"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/timeutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 
@@ -42,7 +42,7 @@ func NewProcfsReader(logger logp.Logger) ProcfsReader {
 	}
 }
 
-type Stat p.ProcStat
+type Stat procfs.ProcStat
 
 type ProcessInfo struct {
 	Pids       types.PidInfo
@@ -55,7 +55,7 @@ type ProcessInfo struct {
 	CGroupPath string
 }
 
-func credsFromProc(proc p.Proc) (types.CredInfo, error) {
+func credsFromProc(proc procfs.Proc) (types.CredInfo, error) {
 	status, err := proc.NewStatus()
 	if err != nil {
 		return types.CredInfo{}, err
@@ -118,7 +118,7 @@ func credsFromProc(proc p.Proc) (types.CredInfo, error) {
 	}, nil
 }
 
-func (r ProcfsReader) getProcessInfo(proc p.Proc) (ProcessInfo, error) {
+func (r ProcfsReader) getProcessInfo(proc procfs.Proc) (ProcessInfo, error) {
 	pid := uint32(proc.PID)
 	// All other info can be best effort, but failing to get pid info and
 	// start time is needed to register the process in the database
@@ -200,7 +200,7 @@ func (r ProcfsReader) getProcessInfo(proc p.Proc) (ProcessInfo, error) {
 }
 
 func (r ProcfsReader) GetProcess(pid uint32) (ProcessInfo, error) {
-	proc, err := p.NewProc(int(pid))
+	proc, err := procfs.NewProc(int(pid))
 	if err != nil {
 		return ProcessInfo{}, err
 	}
@@ -208,7 +208,7 @@ func (r ProcfsReader) GetProcess(pid uint32) (ProcessInfo, error) {
 }
 // returns empty slice on error
 func (r ProcfsReader) GetAllProcesses() ([]ProcessInfo, error) {
-	procs, err := p.AllProcs()
+	procs, err := procfs.AllProcs()
 	if err != nil {
 		return nil, err
 	}
@@ -226,7 +226,7 @@ func (r ProcfsReader) GetAllProcesses() ([]ProcessInfo, error) {
 }
 
 func (r ProcfsReader) getEnviron(pid uint32) (map[string]string, error) {
-	proc, err := p.NewProc(int(pid))
+	proc, err := procfs.NewProc(int(pid))
 	if err != nil {
 		return nil, err
 	}

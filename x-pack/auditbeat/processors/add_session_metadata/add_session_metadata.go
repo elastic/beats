@@ -13,10 +13,8 @@ import (
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/elastic-agent-libs/monitoring"
-
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/pkg/processdb"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/pkg/procfs"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/processdb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider/ebpf_provider"
 
@@ -31,11 +29,8 @@ const (
 	logName       = "processor." + processorName
 )
 
-var reg *monitoring.Registry
-
 func init() {
 	processors.RegisterPlugin(processorName, New)
-	reg = monitoring.Default.NewRegistry(logName, monitoring.DoNotReport)
 }
 
 type addSessionMetadata struct {
