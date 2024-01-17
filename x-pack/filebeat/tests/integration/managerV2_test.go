@@ -31,6 +31,7 @@ import (
 	protobuf "google.golang.org/protobuf/proto"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/x-pack/filebeat/tests/integration/authority"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
@@ -585,17 +586,36 @@ func TestAgentPackageVersion(t *testing.T) {
 		ActionImpl: func(response *proto.ActionResponse) error { return nil },
 	}
 
-	rootKey, rootCACert, rootCertPem := NewRootCA(t)
+	// rootKey, rootCACert, rootCertPem := NewRootCA(t)
+	// rootCertPool := x509.NewCertPool()
+	// ok := rootCertPool.AppendCertsFromPEM(rootCertPem)
+	// require.Truef(t, ok, "could not append certs from PEM to cert pool")
+	//
+	// beatCertPem, beatPrivKeyPem, beatTLSCert := GenerateChildCert(
+	// 	t, "localhost", rootKey, rootCACert)
+	//
+	// getCert := func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
+	// 	// needs to be from the pair
+	// 	return &beatTLSCert, nil
+	// }
+	//
+	// creds := credentials.NewTLS(&tls.Config{
+	// 	ClientAuth:     tls.RequireAndVerifyClientCert,
+	// 	ClientCAs:      rootCertPool,
+	// 	GetCertificate: getCert,
+	// 	MinVersion:     tls.VersionTLS12,
+	// })
+
+	ca, err := authority.NewCA()
+	require.NoError(t, err, "could not generate root CA")
 	rootCertPool := x509.NewCertPool()
-	ok := rootCertPool.AppendCertsFromPEM(rootCertPem)
+	ok := rootCertPool.AppendCertsFromPEM(ca.Crt())
 	require.Truef(t, ok, "could not append certs from PEM to cert pool")
 
-	beatCertPem, beatPrivKeyPem, beatTLSCert := GenerateChildCert(
-		t, "localhost", rootKey, rootCACert)
-
+	beatsCert, err := ca.GeneratePair()
+	require.NoError(t, err, "could not generate beats certs")
 	getCert := func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
-		// needs to be from the pair
-		return &beatTLSCert, nil
+		return beatsCert.Certificate, nil
 	}
 
 	creds := credentials.NewTLS(&tls.Config{
@@ -604,30 +624,41 @@ func TestAgentPackageVersion(t *testing.T) {
 		GetCertificate: getCert,
 		MinVersion:     tls.VersionTLS12,
 	})
-	err := server.Start(grpc.Creds(creds))
+
+	err = server.Start(grpc.Creds(creds))
 	require.NoError(t, err, "failed starting GRPC server")
 	t.Cleanup(server.Stop)
 
+	// startUpInfo := &proto.StartUpInfo{
+	// 	Addr:       fmt.Sprintf("localhost:%d", server.Port),
+	// 	ServerName: "localhost",
+	// 	Token:      "token",
+	// 	CaCert:     rootCertPem,
+	// 	PeerCert:   beatCertPem,
+	// 	PeerKey:    beatPrivKeyPem,
+	// 	Services:   []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2},
+	// 	AgentInfo:  &agentInfo,
+	// }
+
 	startUpInfo := &proto.StartUpInfo{
 		Addr:       fmt.Sprintf("localhost:%d", server.Port),
-		ServerName: "mockAgent",
+		ServerName: "localhost",
 		Token:      "token",
-		CaCert:     rootCertPem,
-		PeerCert:   beatCertPem,
-		PeerKey:    beatPrivKeyPem,
+		CaCert:     ca.Crt(),
+		PeerCert:   beatsCert.Crt,
+		PeerKey:    beatsCert.Key,
 		Services:   []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2},
 		AgentInfo:  &agentInfo,
 	}
-
 	filebeat.Start("-E", "management.enabled=true")
 
 	WriteStartUpInfo(t, filebeat.Stdin(), startUpInfo)
+	require.NoError(t, filebeat.Stdin().Close(), "failed closing stdin pipe")
 
-	filebeat.WaitForLogs("PublishEvents: ", 30*time.Second, "did not find the logs")
+	filebeat.WaitForLogs("PublishEvents: ", 20*time.Second, "did not find the logs")
 }
 
 func NewRootCA(t *testing.T) (*ecdsa.PrivateKey, *x509.Certificate, []byte) {
-
 	rootKey, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
 	require.NoError(t, err, "could not create private key")
 
@@ -635,9 +666,11 @@ func NewRootCA(t *testing.T) (*ecdsa.PrivateKey, *x509.Certificate, []byte) {
 	notAfter := notBefore.Add(3 * time.Hour)
 
 	rootTemplate := x509.Certificate{
+		DNSNames:     []string{"localhost"},
 		SerialNumber: big.NewInt(1653),
 		Subject: pkix.Name{
 			Organization: []string{"Gallifrey"},
+			CommonName:   "localhost",
 		},
 		NotBefore:             notBefore,
 		NotAfter:              notAfter,
@@ -681,8 +714,8 @@ func GenerateChildCert(
 	notAfter := notBefore.Add(3 * time.Hour)
 
 	certTemplate := &x509.Certificate{
-		SerialNumber: big.NewInt(1658),
 		DNSNames:     []string{name},
+		SerialNumber: big.NewInt(1658),
 		Subject: pkix.Name{
 			Organization: []string{"Gallifrey"},
 			CommonName:   name,
