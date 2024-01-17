@@ -142,10 +142,10 @@ func mapToKeyValuePoints(metrics []Metric) []KeyValuePoint {
 			switch {
 			case value.min != nil:
 				point.Key = fmt.Sprintf("%s.%s", metricName, "min")
-				point.Value = value.avg
+				point.Value = value.min
 			case value.max != nil:
 				point.Key = fmt.Sprintf("%s.%s", metricName, "max")
-				point.Value = value.avg
+				point.Value = value.max
 			case value.avg != nil:
 				point.Key = fmt.Sprintf("%s.%s", metricName, "avg")
 				point.Value = value.avg
