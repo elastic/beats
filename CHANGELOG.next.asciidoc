@@ -99,6 +99,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
 - Fix mapping errors with invalid urls. {pull}37255[37255]
+- Added fix for formatting the logs from stateloader properly. {pull}37369[37369]
 
 *Metricbeat*
 
@@ -125,6 +126,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix unintended skip in metric collection on Azure Monitor {issue}37204[37204] {pull}37203[37203]
 - Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
 - Add memory hard limit from container metadata and remove usage percentage in AWS Fargate. {pull}37194[37194]
+- Fix the reference time rounding on Azure Metrics {issue}37204[37204] {pull}37365[37365]
 
 *Osquerybeat*
 
@@ -159,8 +161,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 - Upgrade golang/x/net to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
 Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
-- Upgrade to Go 1.20.11. {pull}37123[37123]
+- Upgrade to Go 1.20.12. {pull}37350[37350]
 - The Elasticsearch output can now configure performance presets with the `preset` configuration field. {pull}37259[37259]
+- Upgrade elastic-agent-system-metrics to v0.9.1. See https://github.com/elastic/elastic-agent-system-metrics/releases/tag/v0.9.1. {pull}37353[pull]
+- Upgrade to elastic-agent-libs v0.7.3 and golang.org/x/crypto v0.17.0. {pull}37544[37544]
 
 *Auditbeat*
 
@@ -266,6 +270,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 - Make ingest pipeline routing robust to letter case of channel names for forwarded events. {issue}36670[36670] {pull}36899[36899]
 - Document minimum permissions required for local user account. {issue}15773[15773] {pull}37176[37176]
+- Bump Windows Npcap version to v1.78. {issue}37300[37300] {pull}37370[37370]
 
 *Functionbeat*
 
@@ -310,6 +315,15 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
+
+
+
+
+
+
 
 
 
