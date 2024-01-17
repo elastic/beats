@@ -83,7 +83,7 @@ func TestEventsLoggerESOutput(t *testing.T) {
 		t.Fatalf("could not create file '%s': %s", logFilePath, err)
 	}
 
-	logFile.WriteString(`
+	_, _ = logFile.WriteString(`
 {"message":"foo bar","int":10,"string":"str"}
 {"message":"another message","int":20,"string":"str2"}
 {"message":"index failure","int":"not a number","string":10}

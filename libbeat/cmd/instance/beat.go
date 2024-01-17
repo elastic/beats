@@ -386,7 +386,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	eventsLoggerCfg := logp.DefaultConfig(configure.GetEnvironment())
 
 	// merge eventsLoggerCfg with b.Config.Logging, so logging.events.* only
-	// overwrites logging.*
+	// overwrites the files block.
 	if err := b.Config.EventLogging.Unpack(&eventsLoggerCfg); err != nil {
 		return nil, fmt.Errorf("error initialising events logger: %w", err)
 	}
@@ -807,9 +807,12 @@ func (b *Beat) configure(settings Settings) error {
 	if b.Config.EventLogging == nil {
 		b.Config.EventLogging = config.NewConfig()
 	}
-	b.Config.EventLogging.Merge(b.Config.Logging)
-	if _, err := b.Config.EventLogging.Remove("events", -1); err != nil {
+	if err := b.Config.EventLogging.Merge(b.Config.Logging); err != nil {
 		return fmt.Errorf("cannot merge logging and logging.events configuration: %w", err)
+	}
+
+	if _, err := b.Config.EventLogging.Remove("events", -1); err != nil {
+		return fmt.Errorf("cannot update logging.events configuration: %w", err)
 	}
 
 	if err := promoteOutputQueueSettings(&b.Config); err != nil {
