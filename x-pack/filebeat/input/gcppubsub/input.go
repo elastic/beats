@@ -26,6 +26,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/version"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -80,6 +81,8 @@ type pubsubInput struct {
 	outlet   channel.Outleter // Output of received pubsub messages.
 	inputCtx context.Context  // Wraps the Done channel from parent input.Context.
 
+	workerSem *awscommon.Sem
+
 	workerCtx    context.Context    // Worker goroutine context. It's cancelled when the input stops or the worker exits.
 	workerCancel context.CancelFunc // Used to signal that the worker should stop.
 	workerOnce   sync.Once          // Guarantees that the worker goroutine is only started once.
@@ -130,6 +133,7 @@ func NewInput(cfg *conf.C, connector channel.Connector, inputContext input.Conte
 	in := &pubsubInput{
 		config:       conf,
 		log:          logger,
+		workerSem:    awscommon.NewSem(conf.Subscription.NumGoroutines),
 		inputCtx:     inputCtx,
 		workerCtx:    workerCtx,
 		workerCancel: workerCancel,
@@ -209,30 +213,67 @@ func (in *pubsubInput) run() error {
 	ctx, cancel := context.WithCancel(in.workerCtx)
 	defer cancel()
 
-	client, err := in.newPubsubClient(ctx)
-	if err != nil {
-		return err
-	}
-	defer client.Close()
+	numGoRoutines := in.Subscription.NumGoroutines
+	var workerWg sync.WaitGroup
 
-	// Setup our subscription to the topic.
-	sub, err := in.getOrCreateSubscription(ctx, client)
-	if err != nil {
-		return fmt.Errorf("failed to subscribe to pub/sub topic: %w", err)
-	}
-	sub.ReceiveSettings.NumGoroutines = in.Subscription.NumGoroutines
-	sub.ReceiveSettings.MaxOutstandingMessages = in.Subscription.MaxOutstandingMessages
+	for ctx.Err() == nil {
 
-	// Start receiving messages.
-	topicID := makeTopicID(in.ProjectID, in.Topic)
-	return sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
-		if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); !ok {
-			msg.Nack()
-			in.metrics.nackedMessageCount.Inc()
-			in.log.Debug("OnEvent returned false. Stopping input worker.")
-			cancel()
+		workers, err := in.workerSem.AcquireContext(numGoRoutines, ctx)
+		if err != nil {
+			break
 		}
-	})
+
+		if workers == 0 {
+			continue
+		}
+		workerWg.Add(workers)
+		for i := 0; i < workers; i++ {
+			go func() {
+				client, err := in.newPubsubClient(ctx)
+				if err != nil {
+					in.log.Error("failed to create to pubsub client: ", err)
+					// return err
+				}
+				defer func() {
+					workerWg.Done()
+					in.workerSem.Release(1)
+					client.Close()
+				}()
+
+				// Setup our subscription to the topic.
+				sub, err := in.getOrCreateSubscription(ctx, client)
+				if err != nil {
+					in.log.Error("failed to subscribe to pub/sub topic: ", err)
+					// return fmt.Errorf("failed to subscribe to pub/sub topic: %w", err)
+				}
+				sub.ReceiveSettings.NumGoroutines = in.Subscription.NumGoroutines
+				sub.ReceiveSettings.MaxOutstandingMessages = in.Subscription.MaxOutstandingMessages
+
+				// Start receiving messages.
+				topicID := makeTopicID(in.ProjectID, in.Topic)
+				receiveErr := sub.Receive(ctx, func(ctx context.Context, msg *pubsub.Message) {
+					if ok := in.outlet.OnEvent(makeEvent(topicID, msg)); !ok {
+						msg.Nack()
+						in.metrics.nackedMessageCount.Inc()
+						in.log.Debug("OnEvent returned false. Stopping input worker.")
+						cancel()
+					}
+				})
+				if receiveErr != nil {
+					in.log.Error("Failed receiving pub/sub event.", "error", receiveErr)
+				}
+			}()
+		}
+	}
+
+	// Wait for all workers to finish.
+	workerWg.Wait()
+
+	if errors.Is(ctx.Err(), context.Canceled) {
+		// A canceled context is a normal shutdown.
+		return nil
+	}
+	return ctx.Err()
 }
 
 // Stop stops the pubsub input and waits for it to fully stop.
