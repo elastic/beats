@@ -217,12 +217,12 @@ func (b *BeatProc) Start(args ...string) {
 func (b *BeatProc) startBeat() {
 	b.cmdMutex.Lock()
 	defer b.cmdMutex.Unlock()
+
 	_, _ = b.stdout.Seek(0, 0)
 	_ = b.stdout.Truncate(0)
 	_, _ = b.stderr.Seek(0, 0)
 	_ = b.stderr.Truncate(0)
 
-	os.Pipe()
 	cmd := exec.Cmd{
 		Path:   b.fullPath,
 		Args:   b.Args,
@@ -233,11 +233,6 @@ func (b *BeatProc) startBeat() {
 	var err error
 	b.stdin, err = cmd.StdinPipe()
 	require.NoError(b.t, err, "could not get cmd StdinPipe")
-
-	// var procAttr os.ProcAttr
-	// procAttr.Files = []*os.File{b.stdin, b.stdout, b.stderr}
-	//
-	// process, err := os.StartProcess(b.fullPath, b.Args, &procAttr)
 
 	err = cmd.Start()
 	require.NoError(b.t, err, "error starting beat process")
