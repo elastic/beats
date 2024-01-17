@@ -1,4 +1,5 @@
 $ErrorActionPreference = "Stop" # set -e
+$GoVersion = $env:GOLANG_VERSION # If Choco doesn't have the version specified in .go-version file, should be changed manually
 
 # Forcing to checkout again all the files with a correct autocrlf.
 # Doing this here because we cannot set git clone options before.
@@ -10,11 +11,8 @@ function fixCRLF() {
 }
 
 function withGolang() {
-    #    Write-Host "-- Install golang $env:GOLANG_VERSION --"
-    #    choco install golang -y --version $env:GOLANG_VERSION
-
-    Write-Host "-- Install golang 1.20.7 --"
-    choco install golang -y --version 1.20.7
+    Write-Host "-- Install golang $GoVersion --"
+    choco install golang -y --version $GoVersion
 
     $choco = Convert-Path "$((Get-Command choco).Path)\..\.."
     Import-Module "$choco\helpers\chocolateyProfile.psm1"
