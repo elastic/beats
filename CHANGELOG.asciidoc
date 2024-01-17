@@ -9,66 +9,19 @@ https://github.com/elastic/beats/compare/v8.11.4\...v8.12.0[View commits]
 
 ==== Breaking changes
 
-*Affecting all Beats*
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
 *Heartbeat*
 - Decreases the ES default timeout to 10 for the load monitor state requests
-
-*Metricbeat*
-
 
 *Osquerybeat*
 
 - Upgrade to osquery 5.10.2. {pull}37115[37115]
 
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Bugfixes
-
-*Affecting all Beats*
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Add validation to http_endpoint config for empty URL {pull}36816[36816] {issue}36772[36772]
 - Fix merging of array fields(processors, paths, parsers) in configurations generated from hints and default config. {issue}36838[36838] {pull}36857[36857]
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Logging Plugin*
-
 
 ==== Added
 
@@ -110,11 +63,8 @@ https://github.com/elastic/beats/compare/v8.11.4\...v8.12.0[View commits]
 - Upgrade go-libaudit to v2.4.0. {issue}36776[36776] {pull}36964[36964]
 - Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each dataset instance. {pull}36971[36971]
 
-*Libbeat*
-
 *Heartbeat*
 - Capture and log the individual connection metrics for all the lightweight monitors
-
 
 *Metricbeat*
 
@@ -125,104 +75,20 @@ https://github.com/elastic/beats/compare/v8.11.4\...v8.12.0[View commits]
 - Add linux IO metrics to system/process {pull}37213[37213]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 
-*Osquerybeat*
-
-
 *Packetbeat*
 
 - Add metrics for TCP flags. {issue}36992[36992] {pull}36975[36975]
-
-*Packetbeat*
-
 
 *Winlogbeat*
 
 - Make ingest pipeline routing robust to letter case of channel names for forwarded events. {issue}36670[36670] {pull}36899[36899]
 - Document minimum permissions required for local user account. {issue}15773[15773] {pull}37176[37176]
 
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
 ==== Deprecated
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Deprecate rsa2elk Filebeat modules. {issue}36125[36125] {pull}36887[36887]
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 [[release-notes-8.11.4]]
