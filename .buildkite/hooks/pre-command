@@ -3,20 +3,14 @@
 set -euo pipefail
 
 source .buildkite/env-scripts/env.sh
-source .buildkite/filebeat/scripts/common.sh
+source .buildkite/env-scripts/util.sh
 source .buildkite/env-scripts/win-env.sh
 
-#SETUP_GVM_VERSION="v0.5.1"
-#WORKSPACE="$(pwd)"
-#
-#export SETUP_GVM_VERSION
-#export WORKSPACE
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
   if [[ ${PLATFORM_TYPE} = MINGW* ]]; then
     install_python_win
   fi
-  #  prepare_win
 
   if [[ -z "${GOLANG_VERSION-""}" ]]; then
     export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")

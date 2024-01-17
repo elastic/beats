@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-source .buildkite/filebeat/scripts/common.sh
+source .buildkite/env-scripts/util.sh
 
 changeset="^filebeat/
     ^go.mod
@@ -14,20 +14,10 @@ changeset="^filebeat/
 
 if are_files_changed "$changeset"; then
   cat <<-EOF
-  - group: "Packaging"
-    key: "packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-    depends_on:
-      - "mandatory-tests"
-      - "extended-tests"
-      - "extended-tests-win"
-
     steps:
       - label: ":ubuntu: Packaging Linux X86"
         key: "package-linux-x86"
         command:
-          - "sudo apt-get update"
-          - "sudo apt-get install -y python3-venv"
           - ".buildkite/filebeat/scripts/package.sh"
         notify:
           - github_commit_status:
@@ -42,8 +32,6 @@ if are_files_changed "$changeset"; then
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
         command:
-          - "sudo apt-get update"
-          - "sudo apt-get install -y python3-venv"
           - ".buildkite/filebeat/scripts/package.sh"
         notify:
           - github_commit_status:

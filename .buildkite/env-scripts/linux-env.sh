@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source .buildkite/filebeat/scripts/common.sh
+source .buildkite/env-scripts/util.sh
 
 DEBIAN_FRONTEND="noninteractive"
 

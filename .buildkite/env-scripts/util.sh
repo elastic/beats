@@ -2,11 +2,6 @@
 
 set -euo pipefail
 
-#WORKSPACE="$(pwd)"
-#BIN="${WORKSPACE}/bin"
-#HW_TYPE="$(uname -m)"
-#PLATFORM_TYPE="$(uname)"
-
 add_bin_path() {
     echo "Adding PATH to the environment variables..."
     create_bin
@@ -94,12 +89,3 @@ are_files_changed() {
     return 1;
   fi
 }
-
-#prepare_win() {
-##  local os
-##  os="$(uname)"
-#  if [[ ${PLATFORM_TYPE} = MINGW* ]]; then
-#    choco install mingw -y
-#    choco install python --version=3.11.0 -y
-#  fi
-#}
