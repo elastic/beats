@@ -31,7 +31,6 @@ import (
 	protobuf "google.golang.org/protobuf/proto"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
-	"github.com/elastic/beats/v7/x-pack/filebeat/tests/integration/authority"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
@@ -543,7 +542,7 @@ func TestAgentPackageVersion(t *testing.T) {
 					map[string]interface{}{
 						"name": "events-to-file",
 						"type": "file",
-						"path": filepath.Join(filebeat.TempDir(), "events.ndjson"),
+						"path": filepath.Join(filebeat.TempDir(), "ingested-events"),
 					}),
 			},
 		},
@@ -586,36 +585,17 @@ func TestAgentPackageVersion(t *testing.T) {
 		ActionImpl: func(response *proto.ActionResponse) error { return nil },
 	}
 
-	// rootKey, rootCACert, rootCertPem := NewRootCA(t)
-	// rootCertPool := x509.NewCertPool()
-	// ok := rootCertPool.AppendCertsFromPEM(rootCertPem)
-	// require.Truef(t, ok, "could not append certs from PEM to cert pool")
-	//
-	// beatCertPem, beatPrivKeyPem, beatTLSCert := GenerateChildCert(
-	// 	t, "localhost", rootKey, rootCACert)
-	//
-	// getCert := func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
-	// 	// needs to be from the pair
-	// 	return &beatTLSCert, nil
-	// }
-	//
-	// creds := credentials.NewTLS(&tls.Config{
-	// 	ClientAuth:     tls.RequireAndVerifyClientCert,
-	// 	ClientCAs:      rootCertPool,
-	// 	GetCertificate: getCert,
-	// 	MinVersion:     tls.VersionTLS12,
-	// })
-
-	ca, err := authority.NewCA()
-	require.NoError(t, err, "could not generate root CA")
+	rootKey, rootCACert, rootCertPem := NewRootCA(t)
 	rootCertPool := x509.NewCertPool()
-	ok := rootCertPool.AppendCertsFromPEM(ca.Crt())
+	ok := rootCertPool.AppendCertsFromPEM(rootCertPem)
 	require.Truef(t, ok, "could not append certs from PEM to cert pool")
 
-	beatsCert, err := ca.GeneratePair()
-	require.NoError(t, err, "could not generate beats certs")
+	beatCertPem, beatPrivKeyPem, beatTLSCert := GenerateChildCert(
+		t, "localhost", rootKey, rootCACert)
+
 	getCert := func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
-		return beatsCert.Certificate, nil
+		// needs to be from the pair
+		return &beatTLSCert, nil
 	}
 
 	creds := credentials.NewTLS(&tls.Config{
@@ -625,37 +605,72 @@ func TestAgentPackageVersion(t *testing.T) {
 		MinVersion:     tls.VersionTLS12,
 	})
 
-	err = server.Start(grpc.Creds(creds))
+	// ca, err := authority.NewCA()
+	// require.NoError(t, err, "could not generate root CA")
+	// rootCertPool := x509.NewCertPool()
+	// ok := rootCertPool.AppendCertsFromPEM(ca.Crt())
+	// require.Truef(t, ok, "could not append certs from PEM to cert pool")
+	//
+	// beatsCert, err := ca.GeneratePair()
+	// require.NoError(t, err, "could not generate beats certs")
+	// getCert := func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
+	// 	return beatsCert.Certificate, nil
+	// }
+	//
+	// creds := credentials.NewTLS(&tls.Config{
+	// 	ClientAuth:     tls.RequireAndVerifyClientCert,
+	// 	ClientCAs:      rootCertPool,
+	// 	GetCertificate: getCert,
+	// 	MinVersion:     tls.VersionTLS12,
+	// })
+
+	err := server.Start(grpc.Creds(creds))
 	require.NoError(t, err, "failed starting GRPC server")
 	t.Cleanup(server.Stop)
-
-	// startUpInfo := &proto.StartUpInfo{
-	// 	Addr:       fmt.Sprintf("localhost:%d", server.Port),
-	// 	ServerName: "localhost",
-	// 	Token:      "token",
-	// 	CaCert:     rootCertPem,
-	// 	PeerCert:   beatCertPem,
-	// 	PeerKey:    beatPrivKeyPem,
-	// 	Services:   []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2},
-	// 	AgentInfo:  &agentInfo,
-	// }
 
 	startUpInfo := &proto.StartUpInfo{
 		Addr:       fmt.Sprintf("localhost:%d", server.Port),
 		ServerName: "localhost",
 		Token:      "token",
-		CaCert:     ca.Crt(),
-		PeerCert:   beatsCert.Crt,
-		PeerKey:    beatsCert.Key,
+		CaCert:     rootCertPem,
+		PeerCert:   beatCertPem,
+		PeerKey:    beatPrivKeyPem,
 		Services:   []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2},
 		AgentInfo:  &agentInfo,
 	}
+
+	// startUpInfo := &proto.StartUpInfo{
+	// 	Addr:       fmt.Sprintf("localhost:%d", server.Port),
+	// 	ServerName: "localhost",
+	// 	Token:      "token",
+	// 	CaCert:     ca.Crt(),
+	// 	PeerCert:   beatsCert.Crt,
+	// 	PeerKey:    beatsCert.Key,
+	// 	Services:   []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2},
+	// 	AgentInfo:  &agentInfo,
+	// }
+
 	filebeat.Start("-E", "management.enabled=true")
 
 	WriteStartUpInfo(t, filebeat.Stdin(), startUpInfo)
 	require.NoError(t, filebeat.Stdin().Close(), "failed closing stdin pipe")
 
 	filebeat.WaitForLogs("PublishEvents: ", 20*time.Second, "did not find the logs")
+}
+
+type Event struct {
+	Metadata struct {
+		Version string `json:"version"`
+	} `json:"@metadata"`
+	ElasticAgent struct {
+		Snapshot bool   `json:"snapshot"`
+		Version  string `json:"version"`
+		Id       string `json:"id"`
+	} `json:"elastic_agent"`
+	Agent struct {
+		Version string `json:"version"`
+		Id      string `json:"id"`
+	} `json:"agent"`
 }
 
 func NewRootCA(t *testing.T) (*ecdsa.PrivateKey, *x509.Certificate, []byte) {
@@ -674,9 +689,24 @@ func NewRootCA(t *testing.T) (*ecdsa.PrivateKey, *x509.Certificate, []byte) {
 		},
 		NotBefore:             notBefore,
 		NotAfter:              notAfter,
-		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
+		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
+		IsCA:                  true,
+
+		// DNSNames:     []string{"localhost"},
+		// SerialNumber: big.NewInt(1653),
+		// Subject: pkix.Name{
+		// 	Organization: []string{"elastic-fleet"},
+		// 	CommonName:   "localhost",
+		// },
+		// NotBefore:             time.Now(),
+		// NotAfter:              time.Now().AddDate(10, 0, 0),
+		// KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		// ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth,
+		// 	x509.ExtKeyUsageServerAuth},
+		// BasicConstraintsValid: true,
+		// IsCA:                  true,
 	}
 
 	rootCertRawBytes, err := x509.CreateCertificate(rand.Reader, &rootTemplate, &rootTemplate, &rootKey.PublicKey, rootKey)
