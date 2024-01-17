@@ -25,7 +25,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -522,18 +521,15 @@ func TestAgentPackageVersion(t *testing.T) {
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
-		"../../filebeat",
+		"../../filebeat.test",
 	)
 
 	logFilePath := filepath.Join(filebeat.TempDir(), "logs.ndjson")
 	generateLogFile(t, logFilePath)
 
-	// output.file:
-	//  path: "/tmp/filebeat"
-	//  filename: filebeat
-	var units = []*proto.UnitExpected{
+	units := []*proto.UnitExpected{
 		{
-			Id:             "output-unit",
+			Id:             "output-file-unit",
 			Type:           proto.UnitType_OUTPUT,
 			ConfigStateIdx: 1,
 			State:          proto.State_HEALTHY,
@@ -541,12 +537,12 @@ func TestAgentPackageVersion(t *testing.T) {
 			Config: &proto.UnitExpectedConfig{
 				Id:   "default",
 				Type: "file",
-				Name: "myFile",
+				Name: "events-to-file",
 				Source: integration.RequireNewStruct(t,
 					map[string]interface{}{
-						"name": "myLog",
+						"name": "events-to-file",
 						"type": "file",
-						"path": "/tmp/filebeat.ingested.log",
+						"path": filepath.Join(filebeat.TempDir(), "events.ndjson"),
 					}),
 			},
 		},
@@ -573,33 +569,72 @@ func TestAgentPackageVersion(t *testing.T) {
 			},
 		},
 	}
+	agentInfo := proto.AgentInfo{
+		Id:       "agent-id",
+		Version:  want,
+		Snapshot: false,
+	}
 
 	server := &mock.StubServerV2{
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
-			// if management.DoesStateMatch(observed, units[idx], 0) {
-			// 	nextState()
-			// }
-			// for _, unit := range observed.GetUnits() {
-			// 	if state := unit.GetState(); !(state != proto.State_CONFIGURING) {
-			// 		t.Fatalf("Unit '%s' is not healthy, state: %s", unit.GetId(), unit.GetState().String())
-			// 	}
-			// }
-
-			// observed.VersionInfo.BuildHash
 			return &proto.CheckinExpected{
-				Units: units,
+				AgentInfo: &agentInfo,
+				Units:     units,
 			}
 		},
 		ActionImpl: func(response *proto.ActionResponse) error { return nil },
 	}
 
-	priv, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+	rootKey, rootCACert, rootCertPem := NewRootCA(t)
+	rootCertPool := x509.NewCertPool()
+	ok := rootCertPool.AppendCertsFromPEM(rootCertPem)
+	require.Truef(t, ok, "could not append certs from PEM to cert pool")
+
+	beatCertPem, beatPrivKeyPem, beatTLSCert := GenerateChildCert(
+		t, "localhost", rootKey, rootCACert)
+
+	getCert := func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
+		// needs to be from the pair
+		return &beatTLSCert, nil
+	}
+
+	creds := credentials.NewTLS(&tls.Config{
+		ClientAuth:     tls.RequireAndVerifyClientCert,
+		ClientCAs:      rootCertPool,
+		GetCertificate: getCert,
+		MinVersion:     tls.VersionTLS12,
+	})
+	err := server.Start(grpc.Creds(creds))
+	require.NoError(t, err, "failed starting GRPC server")
+	t.Cleanup(server.Stop)
+
+	startUpInfo := &proto.StartUpInfo{
+		Addr:       fmt.Sprintf("localhost:%d", server.Port),
+		ServerName: "mockAgent",
+		Token:      "token",
+		CaCert:     rootCertPem,
+		PeerCert:   beatCertPem,
+		PeerKey:    beatPrivKeyPem,
+		Services:   []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2},
+		AgentInfo:  &agentInfo,
+	}
+
+	filebeat.Start("-E", "management.enabled=true")
+
+	WriteStartUpInfo(t, filebeat.Stdin(), startUpInfo)
+
+	filebeat.WaitForLogs("PublishEvents: ", 30*time.Second, "did not find the logs")
+}
+
+func NewRootCA(t *testing.T) (*ecdsa.PrivateKey, *x509.Certificate, []byte) {
+
+	rootKey, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
 	require.NoError(t, err, "could not create private key")
 
 	notBefore := time.Now()
 	notAfter := notBefore.Add(3 * time.Hour)
 
-	template := x509.Certificate{
+	rootTemplate := x509.Certificate{
 		SerialNumber: big.NewInt(1653),
 		Subject: pkix.Name{
 			Organization: []string{"Gallifrey"},
@@ -611,89 +646,84 @@ func TestAgentPackageVersion(t *testing.T) {
 		BasicConstraintsValid: true,
 	}
 
-	ca, err := x509.CreateCertificate(rand.Reader, &template, &template, &priv.PublicKey, priv)
+	rootCertRawBytes, err := x509.CreateCertificate(rand.Reader, &rootTemplate, &rootTemplate, &rootKey.PublicKey, rootKey)
 	require.NoError(t, err, "could not create CA")
 
-	privBytes, err := x509.MarshalECPrivateKey(priv)
+	rootPrivKeyDER, err := x509.MarshalECPrivateKey(rootKey)
 	require.NoError(t, err, "could not marshal private key")
 
-	var privBytesOut []byte
-	privKeyOut := bytes.NewBuffer(privBytesOut)
-	err = pem.Encode(privKeyOut, &pem.Block{Type: "EC PRIVATE KEY", Bytes: privBytes})
+	var rootPrivBytesOut []byte
+	rootPrivateKeyBuff := bytes.NewBuffer(rootPrivBytesOut)
+	err = pem.Encode(rootPrivateKeyBuff, &pem.Block{Type: "EC PRIVATE KEY", Bytes: rootPrivKeyDER})
 	require.NoError(t, err, "could not pem.Encode private key")
 
-	var certBytesOut []byte
-	certOut := bytes.NewBuffer(certBytesOut)
-	err = pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: ca})
+	var rootCertBytesOut []byte
+	rootCertPemBuff := bytes.NewBuffer(rootCertBytesOut)
+	err = pem.Encode(rootCertPemBuff, &pem.Block{Type: "CERTIFICATE", Bytes: rootCertRawBytes})
 	require.NoError(t, err, "could not pem.Encode certificate")
 
-	caPEM := certOut.Bytes()
-	caTLS, err := tls.X509KeyPair(caPEM, privKeyOut.Bytes())
+	rootTLSCert, err := tls.X509KeyPair(rootCertPemBuff.Bytes(), rootPrivateKeyBuff.Bytes())
 	require.NoError(t, err, "could not create key pair")
 
-	certPool := x509.NewCertPool()
-	ok := certPool.AppendCertsFromPEM(caPEM)
-	require.Truef(t, ok, "could not append certs from PEM to cert pool")
+	rootCACert, err := x509.ParseCertificate(rootTLSCert.Certificate[0])
+	require.NoError(t, err, "could not parse certificate")
 
-	getCert := func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
-		return &caTLS, nil
-	}
+	return rootKey, rootCACert, rootCertPemBuff.Bytes()
+}
 
-	creds := credentials.NewTLS(&tls.Config{
-		ClientAuth:     tls.RequireAndVerifyClientCert,
-		ClientCAs:      certPool,
-		GetCertificate: getCert,
-		MinVersion:     tls.VersionTLS12,
-	})
+func GenerateChildCert(
+	t *testing.T,
+	name string,
+	caPrivKey *ecdsa.PrivateKey,
+	caCert *x509.Certificate) ([]byte, []byte, tls.Certificate) {
+	// Prepare certificate
+	notBefore := time.Now()
+	notAfter := notBefore.Add(3 * time.Hour)
 
-	startUpInfo := &proto.StartUpInfo{
-		Addr:       fmt.Sprintf("localhost:%d", server.Port),
-		ServerName: "mockAgent",
-		Token:      "token",
-		CaCert:     caPEM,
-		PeerCert:   ca,
-		PeerKey:    privKeyOut.Bytes(),
-		Services:   []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2},
-		AgentInfo: &proto.AgentInfo{
-			Id:       uuid.New().String(),
-			Version:  want,
-			Snapshot: false,
+	certTemplate := &x509.Certificate{
+		SerialNumber: big.NewInt(1658),
+		DNSNames:     []string{name},
+		Subject: pkix.Name{
+			Organization: []string{"Gallifrey"},
+			CommonName:   name,
 		},
+		NotBefore:   notBefore,
+		NotAfter:    notAfter,
+		KeyUsage:    x509.KeyUsageDigitalSignature,
+		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 	}
 
-	err = server.Start(grpc.Creds(creds))
-	require.NoError(t, err, "failed starting GRPC server")
-	t.Cleanup(server.Stop)
+	privateKey, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
+	require.NoError(t, err, "could not create private key")
 
-	filebeat.Start("-E", "management.enabled=true")
+	certRawBytes, err := x509.CreateCertificate(
+		rand.Reader, certTemplate, caCert, &privateKey.PublicKey, caPrivKey)
+	require.NoError(t, err, "could not create CA")
 
-	// With those logs it's possible to see the error reading os.Stdin happens
-	// AFTER the file has been written. It seems then the os.Stdin the filebeat.test
-	// is reading isn't the file set when it's run.
-	// I've also changed to integration.NewBeat to use os/exec.Cmd to check if
-	// it could be how the test beat was stated the issue, but it did not change
-	// anything.
-	// There also is TestStartUpInfo which reads the stdin file and prints out a
-	// formatted proto.StartUpInfo.
-	// Another option is to use the command `startupinfo` which does the same as
-	// TestStartUpInfo. To use it compile filebeat:
-	//   - cd x-pack/filebeat
-	//   - go build .
-	//   - ./filebeat help startupinfo
-	//   - ./filebeat startupinfo <build/integration-tests/TestAgentPackageVersionXYZ/stdin
-	//
-	// My best guess is compiling the test binary interferes with how the process
-	// interacts with its stdin. If the test binary is compiled:
-	//   - cd x-pack/filebeat
-	//   - mage -v buildSystemTestBinary
-	//   - ./filebeat.test help
-	// you'll see only the flags, not the normal help from filebeat
-	t.Logf("[%s] before WriteStartUpInfo", time.Now())
-	WriteStartUpInfo(t, filebeat.Stdin(), startUpInfo)
-	require.NoError(t, filebeat.Stdin().Sync(), "could not sync beat stdin")
-	t.Logf("[%s] after WriteStartUpInfo", time.Now())
+	privateKeyDER, err := x509.MarshalECPrivateKey(privateKey)
+	require.NoError(t, err, "could not marshal private key")
 
-	filebeat.WaitForLogs("PublishEvents: ", 10*time.Second, "did not find the logs")
+	// PEM private key
+	var privBytesOut []byte
+	privateKeyBuff := bytes.NewBuffer(privBytesOut)
+	err = pem.Encode(privateKeyBuff, &pem.Block{
+		Type: "EC PRIVATE KEY", Bytes: privateKeyDER})
+	require.NoError(t, err, "could not pem.Encode private key")
+	privateKeyPemBytes := privateKeyBuff.Bytes()
+
+	// PEM certificate
+	var certBytesOut []byte
+	certBuff := bytes.NewBuffer(certBytesOut)
+	err = pem.Encode(certBuff, &pem.Block{
+		Type: "CERTIFICATE", Bytes: certRawBytes})
+	require.NoError(t, err, "could not pem.Encode certificate")
+	certPemBytes := certBuff.Bytes()
+
+	// TLS Certificate
+	tlsCert, err := tls.X509KeyPair(certPemBytes, privateKeyPemBytes)
+	require.NoError(t, err, "could not create key pair")
+
+	return certPemBytes, privateKeyPemBytes, tlsCert
 }
 
 func WriteStartUpInfo(t *testing.T, w io.Writer, info *proto.StartUpInfo) {

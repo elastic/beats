@@ -56,7 +56,7 @@ type BeatProc struct {
 	logFileOffset       int64
 	t                   *testing.T
 	tempDir             string
-	stdin               *os.File
+	stdin               io.WriteCloser
 	stdout              *os.File
 	stderr              *os.File
 	Process             *os.Process
@@ -101,8 +101,6 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	tempDir := createTempDir(t)
 	configFile := filepath.Join(tempDir, beatName+".yml")
 
-	stdinFile, err := os.Create(filepath.Join(tempDir, "stdin"))
-	require.NoError(t, err, "error creating stdin file")
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
 	require.NoError(t, err, "error creating stdout file")
 	stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
@@ -122,7 +120,6 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 		beatName:   beatName,
 		configFile: configFile,
 		t:          t,
-		stdin:      stdinFile,
 		stdout:     stdoutFile,
 		stderr:     stderrFile,
 	}
@@ -225,20 +222,24 @@ func (b *BeatProc) startBeat() {
 	_, _ = b.stderr.Seek(0, 0)
 	_ = b.stderr.Truncate(0)
 
+	os.Pipe()
 	cmd := exec.Cmd{
 		Path:   b.fullPath,
 		Args:   b.Args,
-		Stdin:  b.stdin,
 		Stdout: b.stdout,
 		Stderr: b.stderr,
 	}
+
+	var err error
+	b.stdin, err = cmd.StdinPipe()
+	require.NoError(b.t, err, "could not get cmd StdinPipe")
 
 	// var procAttr os.ProcAttr
 	// procAttr.Files = []*os.File{b.stdin, b.stdout, b.stderr}
 	//
 	// process, err := os.StartProcess(b.fullPath, b.Args, &procAttr)
 
-	err := cmd.Start()
+	err = cmd.Start()
 	require.NoError(b.t, err, "error starting beat process")
 
 	b.Process = cmd.Process
@@ -535,7 +536,7 @@ func (b *BeatProc) LoadMeta() (Meta, error) {
 	return m, nil
 }
 
-func (b *BeatProc) Stdin() *os.File {
+func (b *BeatProc) Stdin() io.WriteCloser {
 	return b.stdin
 }
 
