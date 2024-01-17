@@ -223,8 +223,8 @@ require (
 	github.com/shirou/gopsutil/v3 v3.22.10
 	github.com/tklauser/go-sysconf v0.3.10
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.7
-	go.elastic.co/apm/module/apmhttp/v2 v2.4.7
-	go.elastic.co/apm/v2 v2.4.7
+	go.elastic.co/apm/module/apmhttp/v2 v2.4.8
+	go.elastic.co/apm/v2 v2.4.8
 	go.mongodb.org/mongo-driver v1.5.1
 	golang.org/x/tools/go/vcs v0.1.0-deprecated
 	google.golang.org/genproto/googleapis/api v0.0.0-20230913181813-007df8e322eb
