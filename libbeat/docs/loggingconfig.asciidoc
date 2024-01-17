@@ -304,6 +304,9 @@ log messages, a different log file, only for log entries containing raw events,
 is used. It will use the same level, selectors and all other configurations
 from the default logger, but it will have it's own file configuration.
 
+IMPORTANT: No matter the default logger output configuration, raw events
+will **always** be logged to a file configured by `logging.events.files`.
+
 [float]
 ==== `logging.events.files.path`
 
