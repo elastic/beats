@@ -156,7 +156,7 @@ var (
 func TestEnrich(t *testing.T) {
 	for _, tt := range enrichTests {
 		reader := procfs.NewMockReader()
-		db := processdb.NewSimpleDB(reader, *logger)
+		db := processdb.NewDB(reader, *logger)
 
 		for _, ev := range tt.mockProcesses {
 			err := db.InsertExec(ev)

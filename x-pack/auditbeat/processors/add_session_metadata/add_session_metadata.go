@@ -36,7 +36,7 @@ func init() {
 type addSessionMetadata struct {
 	config   Config
 	logger   *logp.Logger
-	db       processdb.DB
+	db       *processdb.DB
 	provider provider.Provider
 }
 
@@ -50,14 +50,14 @@ func New(cfg *config.C) (beat.Processor, error) {
 
 	ctx := context.TODO()
 	reader := procfs.NewProcfsReader(*logger)
-	db := processdb.NewSimpleDB(reader, *logger)
+	db := processdb.NewDB(reader, *logger)
 
 	backfilledPIDs := db.ScrapeProcfs()
 	logger.Debugf("backfilled %d processes", len(backfilledPIDs))
 
 	switch c.Backend {
 	case "ebpf":
-		p, err := ebpf_provider.NewProvider(ctx, *logger, db)
+		p, err := ebpf_provider.NewProvider(ctx, logger, db)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create ebpf provider: %w", err)
 		}

@@ -22,11 +22,11 @@ import (
 
 type prvdr struct {
 	ctx                context.Context
-	logger             logp.Logger
-	db                 processdb.DB
+	logger             *logp.Logger
+	db                 *processdb.DB
 }
 
-func NewProvider(ctx context.Context, logger logp.Logger, db processdb.DB) (provider.Provider, error) {
+func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (provider.Provider, error) {
 	p := prvdr{
 		ctx:    ctx,
 		logger: logger,
@@ -148,7 +148,7 @@ func NewProvider(ctx context.Context, logger logp.Logger, db processdb.DB) (prov
 				continue
 			}
 		}
-	}(p.logger)
+	}(*p.logger)
 
 	return &p, nil
 }
