@@ -129,6 +129,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - The Elasticsearch output can now configure performance presets with the `preset` configuration field. {pull}37259[37259]
 - Upgrade to elastic-agent-libs v0.7.3 and golang.org/x/crypto v0.17.0. {pull}37544[37544]
 - Make more selective the Pod autodiscovery upon node and namespace update events. {issue}37338[37338] {pull}37431[37431]
+- Raw event data logged by outputs on error is now logged to a different log file {pull}37475[37475]
 
 *Auditbeat*
 
