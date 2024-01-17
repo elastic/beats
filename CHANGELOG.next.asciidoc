@@ -89,6 +89,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
 - Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
 - Add log error when statsd server fails to start {pull}36477[36477]
+- Fix Azure Resource Metrics missing metrics (min and max aggregations) after upgrade to 8.11.3 {issue}37642[37642] {pull}37643[37643]
 
 *Osquerybeat*
 
