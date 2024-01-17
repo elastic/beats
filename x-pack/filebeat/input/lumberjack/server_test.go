@@ -52,8 +52,8 @@ func TestServer(t *testing.T) {
 		c := makeTestConfig()
 		c.TLS = serverConf
 		// Disable mTLS requirements in the server.
-		var clientAuth = tlscommon.TLSClientAuthNone
-		c.TLS.ClientAuth = &clientAuth
+		clientAuth := tlscommon.TLSClientAuthNone
+		c.TLS.ClientAuth = &clientAuth // tls.NoClientCert
 		c.TLS.VerificationMode = tlscommon.VerifyNone
 
 		testSendReceive(t, c, 10, clientConf)
@@ -221,12 +221,12 @@ func tlsSetup(t *testing.T) (clientConfig *tls.Config, serverConfig *tlscommon.S
 		MinVersion:   tls.VersionTLS12,
 	}
 
-	var clientAuth = tlscommon.TLSClientAuthRequired
-
+	clientAuth := tlscommon.TLSClientAuthRequired
 	serverConfig = &tlscommon.ServerConfig{
 		// NOTE: VerifyCertificate is ineffective unless ClientAuth is set to RequireAndVerifyClientCert.
 		VerificationMode: tlscommon.VerifyCertificate,
-		ClientAuth:       &clientAuth, // tls.RequireAndVerifyClientCert
+		// Unfortunately ServerConfig uses an unexported type in an exported field.
+		ClientAuth: &clientAuth, // tls.RequireAndVerifyClientCert
 		CAs: []string{
 			string(certData.ca.CertPEM(t)),
 		},
