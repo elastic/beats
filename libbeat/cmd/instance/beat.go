@@ -804,8 +804,14 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
+	// If either b.Config.EventLoggingor b.Config.Logging are nil
+	// merging them will fail, so in case any of them is nil,
+	// we set them to an empty config.C
 	if b.Config.EventLogging == nil {
 		b.Config.EventLogging = config.NewConfig()
+	}
+	if b.Config.Logging == nil {
+		b.Config.Logging = config.NewConfig()
 	}
 	if err := b.Config.EventLogging.Merge(b.Config.Logging); err != nil {
 		return fmt.Errorf("cannot merge logging and logging.events configuration: %w", err)
