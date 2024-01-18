@@ -283,7 +283,6 @@ class Test(metricbeat.BaseTest):
         self.assertGreater(len(output), 0)
 
         for evt in output:
-            print("Current evt: ", evt)
             self.assert_fields_are_documented(evt)
             filesystem = evt["system"]["filesystem"]
             self.assert_fields_for_platform(SYSTEM_FILESYSTEM, filesystem)
