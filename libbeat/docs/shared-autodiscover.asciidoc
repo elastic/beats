@@ -190,7 +190,7 @@ Example:
         node:
           include_labels: ["nodelabel2"]
           include_annotations: ["nodeannotation1"]
-        deployment: true
+        # deployment: false
         cronjob: true
 -------------------------------------------------------------------------------------
 
