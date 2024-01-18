@@ -15,6 +15,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// compile-time check if querier implements InputManager
+var _ v2.InputManager = InputManager{}
+
 // InputManager wraps one stateless input manager
 // and one cursor input manager. It will create one or the other
 // based on the config that is passed.

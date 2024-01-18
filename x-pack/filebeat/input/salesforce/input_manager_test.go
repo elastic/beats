@@ -19,9 +19,6 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-// compile-time check if querier implements InputManager
-var _ v2.InputManager = InputManager{}
-
 func makeTestStore(data map[string]interface{}) *statestore.Store {
 	memstore := &storetest.MapStore{Table: data}
 	reg := statestore.NewRegistry(&storetest.MemoryStore{
