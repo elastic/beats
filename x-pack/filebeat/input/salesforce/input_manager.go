@@ -39,7 +39,7 @@ func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManage
 
 // cursorConfigure configures the cursor input manager.
 func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
-	config := defaultConfig()
+	config := config{Version: 58}
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, fmt.Errorf("reading config: %w", err)
 	}
@@ -58,12 +58,9 @@ func (m InputManager) Init(grp unison.Group, mode v2.Mode) error {
 
 // Create creates a cursor input manager.
 func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
-	config := defaultConfig()
+	config := config{Version: 58}
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 	return m.cursor.Create(cfg)
 }
-
-// defaultConfig returns the default configuration.
-func defaultConfig() config { return config{Version: 58} }

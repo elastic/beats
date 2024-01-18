@@ -324,7 +324,7 @@ func TestInput(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setupServer(t, tc.handler, tc.baseConfig)
 
-			cfg := defaultConfig()
+			cfg := config{Version: 58}
 			err := conf.MustNewConfigFrom(tc.baseConfig).Unpack(&cfg)
 			assert.NoError(t, err)
 			timeout := 5 * time.Second
