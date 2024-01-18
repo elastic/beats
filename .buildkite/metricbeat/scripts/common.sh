@@ -87,7 +87,6 @@ with_python() {
     brew install pyenv xz
     pyenv install "${version}"
     pyenv global "${version}"
-    python --version
     pip3 install --upgrade pip
     pip3 install virtualenv
     ulimit -Sn 10000
