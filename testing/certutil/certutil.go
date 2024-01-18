@@ -14,6 +14,13 @@ import (
 	"time"
 )
 
+// TODO: move it to a more generic place. Probably elastic-agent-client.
+// Moving it to the agent-client would allow to have a mock.StubServerV2 with
+// TLS out of the box. With that, we could also remove the
+// `management.insecure_grpc_url_for_testing` flag from the beats.
+// This can also be expanded to save the certificates and keys to disk, making
+// an tool for us to generate certificates whenever we need.
+
 // NewRootCA generates a new x509 Certificate and returns:
 // - the private key
 // - the certificate
@@ -56,6 +63,7 @@ func NewRootCA() (*ecdsa.PrivateKey, *x509.Certificate, []byte, error) {
 		return nil, nil, nil, fmt.Errorf("could not marshal private key: %w", err)
 	}
 
+	// PEM private key
 	var rootPrivBytesOut []byte
 	rootPrivateKeyBuff := bytes.NewBuffer(rootPrivBytesOut)
 	err = pem.Encode(rootPrivateKeyBuff, &pem.Block{
@@ -64,6 +72,7 @@ func NewRootCA() (*ecdsa.PrivateKey, *x509.Certificate, []byte, error) {
 		return nil, nil, nil, fmt.Errorf("could not pem.Encode private key: %w", err)
 	}
 
+	// PEM certificate
 	var rootCertBytesOut []byte
 	rootCertPemBuff := bytes.NewBuffer(rootCertBytesOut)
 	err = pem.Encode(rootCertPemBuff, &pem.Block{
@@ -72,6 +81,7 @@ func NewRootCA() (*ecdsa.PrivateKey, *x509.Certificate, []byte, error) {
 		return nil, nil, nil, fmt.Errorf("could not pem.Encode certificate: %w", err)
 	}
 
+	// tls.Certificate
 	rootTLSCert, err := tls.X509KeyPair(
 		rootCertPemBuff.Bytes(), rootPrivateKeyBuff.Bytes())
 	if err != nil {
@@ -86,7 +96,7 @@ func NewRootCA() (*ecdsa.PrivateKey, *x509.Certificate, []byte, error) {
 	return rootKey, rootCACert, rootCertPemBuff.Bytes(), nil
 }
 
-// GenerateChildCert generates an x509 Certificate as a child of caCert and
+// GenerateChildCert generates a x509 Certificate as a child of caCert and
 // returns the following:
 // - the certificate in PEM format as a byte slice
 // - the private key in PEM format as a byte slice

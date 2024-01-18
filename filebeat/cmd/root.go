@@ -23,7 +23,8 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
-	"github.com/elastic/beats/v7/libbeat/cmd"
+
+	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 
 	// Import processors.

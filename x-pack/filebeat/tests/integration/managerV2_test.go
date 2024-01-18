@@ -520,11 +520,11 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		"../../filebeat.test",
 	)
 
-	logFilePath := filepath.Join(filebeat.TempDir(), "logs.log")
+	logFilePath := filepath.Join(filebeat.TempDir(), "logs-to-ingest.log")
 	generateLogFile(t, logFilePath)
 
 	eventsDir := filepath.Join(filebeat.TempDir(), "ingested-events")
-	logLevel := proto.UnitLogLevel_TRACE
+	logLevel := proto.UnitLogLevel_INFO
 	units := []*proto.UnitExpected{
 		{
 			Id:             "output-file-unit",
@@ -605,10 +605,11 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		GetCertificate: getCert,
 		MinVersion:     tls.VersionTLS12,
 	})
-
 	err = server.Start(grpc.Creds(creds))
 	require.NoError(t, err, "failed starting GRPC server")
 	t.Cleanup(server.Stop)
+
+	filebeat.Start("-E", "management.enabled=true")
 
 	startUpInfo := &proto.StartUpInfo{
 		Addr:       fmt.Sprintf("localhost:%d", server.Port),
@@ -620,10 +621,7 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		Services:   []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2},
 		AgentInfo:  &agentInfo,
 	}
-
-	filebeat.Start("-E", "management.enabled=true")
-
-	WriteStartUpInfo(t, filebeat.Stdin(), startUpInfo)
+	writeStartUpInfo(t, filebeat.Stdin(), startUpInfo)
 	// for some reason the pipe needs to be closed for filebeat to read it.
 	require.NoError(t, filebeat.Stdin().Close(), "failed closing stdin pipe")
 
@@ -651,7 +649,7 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		return true
 	}, 30*time.Second, time.Second, "no event was produced: %s", &msg)
 
-	evs := GetFileOutputEvents[Event](t, eventsDir, 100)
+	evs := getEventsFromFileOutput[Event](t, eventsDir, 100)
 	for _, e := range evs {
 		require.Equal(t, wantVersion, e.Metadata.Version)
 
@@ -677,55 +675,6 @@ type Event struct {
 		Version string `json:"version"`
 		Id      string `json:"id"`
 	} `json:"agent"`
-}
-
-// GetFileOutputEvents reads all events from all the files on dir. If n > 0,
-// then it reads up to n events. It considers all files are ndjson, and it skips
-// any directory within dir.
-func GetFileOutputEvents[E any](t *testing.T, dir string, n int) []E {
-	t.Helper()
-
-	if n < 1 {
-		n = math.MaxInt
-	}
-
-	var events []E
-	entries, err := os.ReadDir(dir)
-	require.NoError(t, err, "could not read events directory")
-	for _, e := range entries {
-		if e.IsDir() {
-			continue
-		}
-		f, err := os.Open(filepath.Join(dir, e.Name()))
-		require.NoErrorf(t, err, "could not open file %q", e.Name())
-
-		scanner := bufio.NewScanner(f)
-		for scanner.Scan() {
-			var ev E
-			err := json.Unmarshal(scanner.Bytes(), &ev)
-			require.NoError(t, err, "failed to read event")
-			events = append(events, ev)
-
-			if len(events) >= n {
-				return events
-			}
-		}
-	}
-
-	return events
-}
-
-func WriteStartUpInfo(t *testing.T, w io.Writer, info *proto.StartUpInfo) {
-	t.Helper()
-	if len(info.Services) == 0 {
-		info.Services = []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2}
-	}
-
-	infoBytes, err := protobuf.Marshal(info)
-	require.NoError(t, err, "failed to marshal connection information")
-
-	_, err = w.Write(infoBytes)
-	require.NoError(t, err, "failed to write connection information")
 }
 
 // generateLogFile generates a log file by appending the current
@@ -770,4 +719,53 @@ func generateLogFile(t *testing.T, fullPath string) {
 			}
 		}
 	}()
+}
+
+// getEventsFromFileOutput reads all events from all the files on dir. If n > 0,
+// then it reads up to n events. It considers all files are ndjson, and it skips
+// any directory within dir.
+func getEventsFromFileOutput[E any](t *testing.T, dir string, n int) []E {
+	t.Helper()
+
+	if n < 1 {
+		n = math.MaxInt
+	}
+
+	var events []E
+	entries, err := os.ReadDir(dir)
+	require.NoError(t, err, "could not read events directory")
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		f, err := os.Open(filepath.Join(dir, e.Name()))
+		require.NoErrorf(t, err, "could not open file %q", e.Name())
+
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			var ev E
+			err := json.Unmarshal(scanner.Bytes(), &ev)
+			require.NoError(t, err, "failed to read event")
+			events = append(events, ev)
+
+			if len(events) >= n {
+				return events
+			}
+		}
+	}
+
+	return events
+}
+
+func writeStartUpInfo(t *testing.T, w io.Writer, info *proto.StartUpInfo) {
+	t.Helper()
+	if len(info.Services) == 0 {
+		info.Services = []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2}
+	}
+
+	infoBytes, err := protobuf.Marshal(info)
+	require.NoError(t, err, "failed to marshal connection information")
+
+	_, err = w.Write(infoBytes)
+	require.NoError(t, err, "failed to write connection information")
 }
