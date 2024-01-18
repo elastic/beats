@@ -28,8 +28,13 @@ to only send events for new or modified files.
 
 The operating system features that power this feature are as follows.
 
-* Linux - `inotify` is used, and therefore the kernel must have inotify support.
+* Linux - As of now, two kernel backends are supported: `kprobes` and `fsnotify`.
+By default, `fsnotify` is used, and therefore the kernel must have inotify support.
 Inotify was initially merged into the 2.6.13 Linux kernel.
+The kprobes backend uses kernel tracing features to enable capturing user and process
+information associated with file integrity monitoring events. It hooks the same kernel
+functionality used in fsnotify, so it supports the same kernel versions.
+The preferred backend can be selected by specifying the `force_backend` config option.
 * macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API
 coalesces multiple changes to a file into a single event. {beatname_uc} translates
 this coalesced changes into a meaningful sequence of actions. However,
@@ -143,6 +148,9 @@ usually only involve reading a small number of bytes.
 of this directories are watched. If `recursive` is set to `true`, the
 `file_integrity` module will watch for changes on this directories and all
 their subdirectories.
+
+*`force_backend`*:: (*Linux only*) Select the backend which will be used to
+source events. Valid values: `kprobes`, `fsnotify`. Default: `fsnotify`.
 
 include::{docdir}/auditbeat-options.asciidoc[]
 
