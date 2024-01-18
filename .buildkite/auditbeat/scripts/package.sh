@@ -4,9 +4,10 @@ set -euo pipefail
 
 source .buildkite/env-scripts/unix-env.sh
 
-echo ":: Evaluate Filebeat Changes ::"
+echo ":: Evaluate Auditbeat Changes ::"
 
 echo ":: Start Packaging ::"
-cd filebeat
+cd auditbeat
 umask 0022
 mage package
+
