@@ -66,4 +66,4 @@ func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
 }
 
 // defaultConfig returns the default configuration.
-func defaultConfig() config { return config{} }
+func defaultConfig() config { return config{Version: 58} }
