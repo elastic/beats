@@ -3,6 +3,7 @@
   apex:
     enabled: false
     var.initial_interval: 1d
+    var.log_file_interval: Hourly
     var.api_version: 56
 
     var.jwt_enabled: true
@@ -23,6 +24,7 @@
   login:
     enabled: false
     var.initial_interval: 1d
+    var.log_file_interval: Hourly
     var.api_version: 56
 
     var.jwt_enabled: true
@@ -47,6 +49,7 @@
   logout:
     enabled: false
     var.initial_interval: 1d
+    var.log_file_interval: Hourly
     var.api_version: 56
 
     var.jwt_enabled: true

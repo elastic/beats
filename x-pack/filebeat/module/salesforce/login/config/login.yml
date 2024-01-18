@@ -53,12 +53,8 @@ event_monitoring_method:
   {{ end }}
     interval: {{ .elf_interval }}
     query:
-    {{ if .initial_interval }}
-      default: "SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Login' AND LogDate > [[ formatTime(parseDuration(-{{ .initial_interval }})), "2006-01-02T15:04:05+0700") ]] ORDER BY LogDate ASC NULLS FIRST"
-    {{ else }}
-      default: "SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Login' ORDER BY LogDate ASC NULLS FIRST"
-    {{ end }}
-      value: "SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = 'Hourly' AND EventType = 'Login' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY LogDate ASC NULLS FIRST"
+      default: "SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE {{ if .initial_interval }}LogDate > [[ formatTime(parseDuration(-{{ .initial_interval }})), "2006-01-02T15:04:05+0700") ]] AND{{ end }} Interval = '{{ .log_file_interval }}' AND EventType = 'Login' ORDER BY LogDate ASC NULLS FIRST"
+      value: "SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = '{{ .log_file_interval }}' AND EventType = 'Login' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY LogDate ASC NULLS FIRST"
     cursor:
       field: "CreatedDate"
   object:
@@ -69,11 +65,7 @@ event_monitoring_method:
   {{ end }}
     interval: {{ .real_time_interval }}
     query:
-    {{ if .initial_interval }}
-      default: "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ formatTime(parseDuration(-{{ .initial_interval }})), "2006-01-02T15:04:05+0700") ]]"
-    {{ else }}
-      default: "SELECT FIELDS(STANDARD) FROM LoginEvent"
-    {{ end }}
+      default: "SELECT FIELDS(STANDARD) FROM LoginEvent{{ if .initial_interval }} WHERE EventDate > [[ formatTime(parseDuration(-{{ .initial_interval }})), "2006-01-02T15:04:05+0700") ]]{{ end }}"
       value: "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.object.first_event_time ]]"
     cursor:
       field: "EventDate"

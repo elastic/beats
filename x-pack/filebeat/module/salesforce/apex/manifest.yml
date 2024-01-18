@@ -19,6 +19,8 @@ var:
   - name: elf_interval
     default: 1h
   - name: initial_interval
+  - name: log_file_interval
+    default: Hourly
   
 ingest_pipeline:
   - ingest/pipeline.yml

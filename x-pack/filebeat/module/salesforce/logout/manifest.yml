@@ -23,6 +23,8 @@ var:
   - name: real_time_interval
     default: 5m
   - name: initial_interval
+  - name: log_file_interval
+    default: Hourly
 
 ingest_pipeline: ingest/pipeline.yml
 input: config/logout.yml
