@@ -8,19 +8,12 @@ package integration
 
 import (
 	"bufio"
-	"bytes"
-	"crypto/ecdsa"
-	"crypto/elliptic"
-	"crypto/rand"
 	"crypto/tls"
 	"crypto/x509"
-	"crypto/x509/pkix"
 	"encoding/json"
-	"encoding/pem"
 	"fmt"
 	"io"
 	"math"
-	"math/big"
 	"os"
 	"path/filepath"
 	"strings"
@@ -34,8 +27,8 @@ import (
 	protobuf "google.golang.org/protobuf/proto"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/testing/certutil"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
@@ -590,17 +583,20 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		ActionImpl: func(response *proto.ActionResponse) error { return nil },
 	}
 
-	rootKey, rootCACert, rootCertPem := NewRootCA(t)
+	rootKey, rootCACert, rootCertPem, err := certutil.NewRootCA()
+	require.NoError(t, err, "could not generate root CA")
+
 	rootCertPool := x509.NewCertPool()
 	ok := rootCertPool.AppendCertsFromPEM(rootCertPem)
 	require.Truef(t, ok, "could not append certs from PEM to cert pool")
 
-	beatCertPem, beatPrivKeyPem, beatTLSCert := GenerateChildCert(
-		t, "localhost", rootKey, rootCACert)
+	beatCertPem, beatPrivKeyPem, beatTLSCert, err :=
+		certutil.GenerateChildCert("localhost", rootKey, rootCACert)
+	require.NoError(t, err, "could not generate child TLS certificate")
 
 	getCert := func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
 		// it's one of the child certificates. As there is only one, return it
-		return &beatTLSCert, nil
+		return beatTLSCert, nil
 	}
 
 	creds := credentials.NewTLS(&tls.Config{
@@ -610,7 +606,7 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		MinVersion:     tls.VersionTLS12,
 	})
 
-	err := server.Start(grpc.Creds(creds))
+	err = server.Start(grpc.Creds(creds))
 	require.NoError(t, err, "failed starting GRPC server")
 	t.Cleanup(server.Stop)
 
@@ -719,108 +715,6 @@ func GetFileOutputEvents[E any](t *testing.T, dir string, n int) []E {
 	return events
 }
 
-func NewRootCA(t *testing.T) (*ecdsa.PrivateKey, *x509.Certificate, []byte) {
-	rootKey, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
-	require.NoError(t, err, "could not create private key")
-
-	notBefore := time.Now()
-	notAfter := notBefore.Add(3 * time.Hour)
-
-	rootTemplate := x509.Certificate{
-		DNSNames:     []string{"localhost"},
-		SerialNumber: big.NewInt(1653),
-		Subject: pkix.Name{
-			Organization: []string{"Gallifrey"},
-			CommonName:   "localhost",
-		},
-		NotBefore:             notBefore,
-		NotAfter:              notAfter,
-		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
-		IsCA:                  true,
-	}
-
-	rootCertRawBytes, err := x509.CreateCertificate(rand.Reader, &rootTemplate, &rootTemplate, &rootKey.PublicKey, rootKey)
-	require.NoError(t, err, "could not create CA")
-
-	rootPrivKeyDER, err := x509.MarshalECPrivateKey(rootKey)
-	require.NoError(t, err, "could not marshal private key")
-
-	var rootPrivBytesOut []byte
-	rootPrivateKeyBuff := bytes.NewBuffer(rootPrivBytesOut)
-	err = pem.Encode(rootPrivateKeyBuff, &pem.Block{Type: "EC PRIVATE KEY", Bytes: rootPrivKeyDER})
-	require.NoError(t, err, "could not pem.Encode private key")
-
-	var rootCertBytesOut []byte
-	rootCertPemBuff := bytes.NewBuffer(rootCertBytesOut)
-	err = pem.Encode(rootCertPemBuff, &pem.Block{Type: "CERTIFICATE", Bytes: rootCertRawBytes})
-	require.NoError(t, err, "could not pem.Encode certificate")
-
-	rootTLSCert, err := tls.X509KeyPair(rootCertPemBuff.Bytes(), rootPrivateKeyBuff.Bytes())
-	require.NoError(t, err, "could not create key pair")
-
-	rootCACert, err := x509.ParseCertificate(rootTLSCert.Certificate[0])
-	require.NoError(t, err, "could not parse certificate")
-
-	return rootKey, rootCACert, rootCertPemBuff.Bytes()
-}
-
-func GenerateChildCert(
-	t *testing.T,
-	name string,
-	caPrivKey *ecdsa.PrivateKey,
-	caCert *x509.Certificate) ([]byte, []byte, tls.Certificate) {
-	// Prepare certificate
-	notBefore := time.Now()
-	notAfter := notBefore.Add(3 * time.Hour)
-
-	certTemplate := &x509.Certificate{
-		DNSNames:     []string{name},
-		SerialNumber: big.NewInt(1658),
-		Subject: pkix.Name{
-			Organization: []string{"Gallifrey"},
-			CommonName:   name,
-		},
-		NotBefore:   notBefore,
-		NotAfter:    notAfter,
-		KeyUsage:    x509.KeyUsageDigitalSignature,
-		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
-	}
-
-	privateKey, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
-	require.NoError(t, err, "could not create private key")
-
-	certRawBytes, err := x509.CreateCertificate(
-		rand.Reader, certTemplate, caCert, &privateKey.PublicKey, caPrivKey)
-	require.NoError(t, err, "could not create CA")
-
-	privateKeyDER, err := x509.MarshalECPrivateKey(privateKey)
-	require.NoError(t, err, "could not marshal private key")
-
-	// PEM private key
-	var privBytesOut []byte
-	privateKeyBuff := bytes.NewBuffer(privBytesOut)
-	err = pem.Encode(privateKeyBuff, &pem.Block{
-		Type: "EC PRIVATE KEY", Bytes: privateKeyDER})
-	require.NoError(t, err, "could not pem.Encode private key")
-	privateKeyPemBytes := privateKeyBuff.Bytes()
-
-	// PEM certificate
-	var certBytesOut []byte
-	certBuff := bytes.NewBuffer(certBytesOut)
-	err = pem.Encode(certBuff, &pem.Block{
-		Type: "CERTIFICATE", Bytes: certRawBytes})
-	require.NoError(t, err, "could not pem.Encode certificate")
-	certPemBytes := certBuff.Bytes()
-
-	// TLS Certificate
-	tlsCert, err := tls.X509KeyPair(certPemBytes, privateKeyPemBytes)
-	require.NoError(t, err, "could not create key pair")
-
-	return certPemBytes, privateKeyPemBytes, tlsCert
-}
-
 func WriteStartUpInfo(t *testing.T, w io.Writer, info *proto.StartUpInfo) {
 	t.Helper()
 	if len(info.Services) == 0 {
@@ -832,19 +726,6 @@ func WriteStartUpInfo(t *testing.T, w io.Writer, info *proto.StartUpInfo) {
 
 	_, err = w.Write(infoBytes)
 	require.NoError(t, err, "failed to write connection information")
-}
-
-func TestStartUpInfo(t *testing.T) {
-	f, err := os.Open("/home/ainsoph/devel/github.com/elastic/beats/x-pack/filebeat/build/integration-tests/TestAgentPackageVersion2952913677/stdin")
-	require.NoError(t, err)
-
-	info, err := client.StartUpInfoFromReader(f)
-	require.NoError(t, err)
-
-	bs, err := json.MarshalIndent(info, "", "  ")
-	require.NoError(t, err)
-
-	t.Logf("%s", bs)
 }
 
 // generateLogFile generates a log file by appending the current
