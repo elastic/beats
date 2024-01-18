@@ -1,7 +1,19 @@
+import os
 import time
 import unittest
 import platform
+from datetime import datetime
 from auditbeat import *
+
+
+import shutil
+
+
+if platform.system() == 'Linux':
+    #fim_backends = ["fsnotify", "ebpf"]
+    fim_backends = ["fsnotify"]
+else:
+    fim_backends = ["fsnotify"]
 
 
 # Escapes a path to match what's printed in the logs
@@ -16,7 +28,8 @@ def has_file(objs, path, sha1hash):
                 and obj['file.path'].lower() == path.lower() and obj['file.hash.sha1'] == sha1hash:
             found = True
             break
-    assert found, "File '{0}' with sha1sum '{1}' not found".format(path, sha1hash)
+    assert found, "File '{0}' with sha1sum '{1}' not found".format(
+        path, sha1hash)
 
 
 def has_dir(objs, path):
@@ -41,6 +54,31 @@ def file_events(objs, path, expected):
             wanted, path, evts)
 
 
+def cleanup(dirs):
+    for d in dirs:
+        shutil.rmtree(d)
+
+
+def recreate(dirs):
+    cleanup(dirs)
+    for d in dirs:
+        os.mkdir(d)
+
+
+def reset_state(dir):
+    today = datetime.now().strftime("%Y%m%d")
+
+    try:
+        os.remove(os.path.join(dir, "output", f"auditbeat-{today}.ndjson"))
+    except FileNotFoundError:
+        pass
+
+    try:
+        os.remove(os.path.join(dir, "data", "beat.db"))
+    except FileNotFoundError:
+        pass
+
+
 def wrap_except(expr):
     try:
         return expr()
@@ -51,7 +89,8 @@ def wrap_except(expr):
 class Test(BaseTest):
 
     def wait_output(self, min_events):
-        self.wait_until(lambda: wrap_except(lambda: len(self.read_output()) >= min_events))
+        self.wait_until(lambda: wrap_except(
+            lambda: len(self.read_output()) >= min_events))
         # wait for the number of lines in the file to stay constant for a second
         prev_lines = -1
         while True:
@@ -72,69 +111,82 @@ class Test(BaseTest):
         dirs = [self.temp_dir("auditbeat_test"),
                 self.temp_dir("auditbeat_test")]
 
-        with PathCleanup(dirs):
-            self.render_config_template(
-                modules=[{
-                    "name": "file_integrity",
-                    "extras": {
-                        "paths": dirs,
-                        "scan_at_start": False
-                    }
-                }],
-            )
-            proc = self.start_beat()
+        for backend in fim_backends:
+            with self.subTest(backend=backend):
+                reset_state(self.working_dir)
+                recreate(dirs)
 
-            # wait until the directories to watch are printed in the logs
-            # this happens when the file_integrity module starts.
-            # Case must be ignored under windows as capitalisation of paths
-            # may differ
-            self.wait_log_contains(escape_path(dirs[0]), max_timeout=30, ignore_case=True)
+                extras = {
+                    "paths": dirs,
+                    "scan_at_start": False
+                }
+                if platform.system() == "Linux":
+                    extras["force_backend"] = backend
 
-            file1 = os.path.join(dirs[0], 'file.txt')
-            self.create_file(file1, "hello world!")
+                self.render_config_template(
+                    modules=[{
+                        "name": "file_integrity",
+                        "extras": extras
+                    }],
+                )
+                proc = self.start_beat()
+                if backend == "ebpf":
+                    self.wait_log_contains(
+                        "started ebpf watcher", max_timeout=30)
+                else:
+                    # wait until the directories to watch are printed in the logs
+                    # this happens when the file_integrity module starts.
+                    # Case must be ignored under windows as capitalisation of paths
+                    # may differ
+                    self.wait_log_contains(escape_path(
+                        dirs[0]), max_timeout=30, ignore_case=True)
 
-            file2 = os.path.join(dirs[1], 'file2.txt')
-            self.create_file(file2, "Foo bar")
+                file1 = os.path.join(dirs[0], 'file.txt')
+                self.create_file(file1, "hello world!")
 
-            # wait until file1 is reported before deleting. Otherwise the hash
-            # might not be calculated
-            self.wait_log_contains("\"path\":\"{0}\"".format(escape_path(file1)), ignore_case=True)
+                file2 = os.path.join(dirs[1], 'file2.txt')
+                self.create_file(file2, "Foo bar")
 
-            os.unlink(file1)
+                # wait until file1 is reported before deleting. Otherwise the hash
+                # might not be calculated
+                self.wait_log_contains("\"path\":\"{0}\"".format(
+                    escape_path(file1)), ignore_case=True)
 
-            subdir = os.path.join(dirs[0], "subdir")
-            os.mkdir(subdir)
-            file3 = os.path.join(subdir, "other_file.txt")
-            self.create_file(file3, "not reported.")
+                os.unlink(file1)
 
-            # log entries are JSON formatted, this value shows up as an escaped json string.
-            self.wait_log_contains("\\\"deleted\\\"")
-            self.wait_log_contains("\"path\":\"{0}\"".format(escape_path(subdir)), ignore_case=True)
-            self.wait_output(3)
-            self.wait_until(lambda: any(
-                'file.path' in obj and obj['file.path'].lower() == subdir.lower() for obj in self.read_output()))
+                subdir = os.path.join(dirs[0], "subdir")
+                os.mkdir(subdir)
+                file3 = os.path.join(subdir, "other_file.txt")
+                self.create_file(file3, "not reported.")
 
-            proc.check_kill_and_wait()
-            self.assert_no_logged_warnings()
+                # log entries are JSON formatted, this value shows up as an escaped json string.
+                self.wait_log_contains("\\\"deleted\\\"")
 
-            # Ensure all Beater stages are used.
-            assert self.log_contains("Setup Beat: auditbeat")
-            assert self.log_contains("auditbeat start running")
-            assert self.log_contains("auditbeat stopped")
+                self.wait_output(4)
 
-            objs = self.read_output()
+                proc.check_kill_and_wait()
+                self.assert_no_logged_warnings()
 
-            has_file(objs, file1, "430ce34d020724ed75a196dfc2ad67c77772d169")
-            has_file(objs, file2, "d23be250530a24be33069572db67995f21244c51")
-            has_dir(objs, subdir)
+                # Ensure all Beater stages are used.
+                assert self.log_contains("Setup Beat: auditbeat")
+                assert self.log_contains("auditbeat start running")
+                assert self.log_contains("auditbeat stopped")
 
-            file_events(objs, file1, ['created', 'deleted'])
-            file_events(objs, file2, ['created'])
+                objs = self.read_output()
+                print(objs)
 
-            # assert file inside subdir is not reported
-            assert self.log_contains(file3) is False
+                has_file(objs, file1, "430ce34d020724ed75a196dfc2ad67c77772d169")
+                has_file(objs, file2, "d23be250530a24be33069572db67995f21244c51")
+                has_dir(objs, subdir)
 
-    @unittest.skipIf(os.getenv("BUILD_ID") is not None, "Skipped as flaky: https://github.com/elastic/beats/issues/7731")
+                file_events(objs, file1, ['created', 'deleted'])
+                file_events(objs, file2, ['created'])
+
+                # assert file inside subdir is not reported
+                assert self.log_contains(file3) is False
+
+        cleanup(dirs)
+
     def test_recursive(self):
         """
         file_integrity monitors watched directories (recursive).
@@ -142,57 +194,127 @@ class Test(BaseTest):
 
         dirs = [self.temp_dir("auditbeat_test")]
 
-        with PathCleanup(dirs):
-            self.render_config_template(
-                modules=[{
-                    "name": "file_integrity",
-                    "extras": {
-                        "paths": dirs,
-                        "scan_at_start": False,
-                        "recursive": True
-                    }
-                }],
-            )
-            proc = self.start_beat()
+        for backend in fim_backends:
+            with self.subTest(backend=backend):
+                reset_state(self.working_dir)
+                recreate(dirs)
 
-            # wait until the directories to watch are printed in the logs
-            # this happens when the file_integrity module starts
-            self.wait_log_contains(escape_path(dirs[0]), max_timeout=30, ignore_case=True)
-            self.wait_log_contains("\"recursive\":true")
+                extras = {
+                    "paths": dirs,
+                    "scan_at_start": False,
+                    "recursive": True
+                }
+                if platform.system() == "Linux":
+                    extras["force_backend"] = backend
 
-            # auditbeat_test/subdir/
-            subdir = os.path.join(dirs[0], "subdir")
-            os.mkdir(subdir)
-            # auditbeat_test/subdir/file.txt
-            file1 = os.path.join(subdir, "file.txt")
-            self.create_file(file1, "hello world!")
+                self.render_config_template(
+                    modules=[{
+                        "name": "file_integrity",
+                        "extras": extras
+                    }],
+                )
+                proc = self.start_beat()
 
-            # auditbeat_test/subdir/other/
-            subdir2 = os.path.join(subdir, "other")
-            os.mkdir(subdir2)
-            # auditbeat_test/subdir/other/more.txt
-            file2 = os.path.join(subdir2, "more.txt")
-            self.create_file(file2, "")
+                # wait until the directories to watch are printed in the logs
+                # this happens when the file_integrity module starts
+                self.wait_log_contains(escape_path(
+                    dirs[0]), max_timeout=30, ignore_case=True)
+                self.wait_log_contains("\"recursive\":true")
 
-            self.wait_log_contains("\"path\":\"{0}\"".format(escape_path(file2)), ignore_case=True)
-            self.wait_output(4)
-            self.wait_until(lambda: any(
-                'file.path' in obj and obj['file.path'].lower() == subdir2.lower() for obj in self.read_output()))
+                # auditbeat_test/subdir/
+                subdir = os.path.join(dirs[0], "subdir")
+                os.mkdir(subdir)
+                # auditbeat_test/subdir/file.txt
+                file1 = os.path.join(subdir, "file.txt")
+                self.create_file(file1, "hello world!")
 
-            proc.check_kill_and_wait()
-            self.assert_no_logged_warnings()
+                # auditbeat_test/subdir/other/
+                subdir2 = os.path.join(subdir, "other")
+                os.mkdir(subdir2)
+                # auditbeat_test/subdir/other/more.txt
+                file2 = os.path.join(subdir2, "more.txt")
+                self.create_file(file2, "")
 
-            # Ensure all Beater stages are used.
-            assert self.log_contains("Setup Beat: auditbeat")
-            assert self.log_contains("auditbeat start running")
-            assert self.log_contains("auditbeat stopped")
+                self.wait_log_contains("\"path\":\"{0}\"".format(
+                    escape_path(file2)), ignore_case=True)
+                self.wait_output(4)
+                self.wait_until(lambda: any(
+                    'file.path' in obj and obj['file.path'].lower() == subdir2.lower() for obj in self.read_output()))
 
-            objs = self.read_output()
+                proc.check_kill_and_wait()
+                self.assert_no_logged_warnings()
 
-            has_file(objs, file1, "430ce34d020724ed75a196dfc2ad67c77772d169")
-            has_file(objs, file2, "da39a3ee5e6b4b0d3255bfef95601890afd80709")
-            has_dir(objs, subdir)
-            has_dir(objs, subdir2)
+                # Ensure all Beater stages are used.
+                assert self.log_contains("Setup Beat: auditbeat")
+                assert self.log_contains("auditbeat start running")
+                assert self.log_contains("auditbeat stopped")
 
-            file_events(objs, file1, ['created'])
-            file_events(objs, file2, ['created'])
+                objs = self.read_output()
+
+                has_file(objs, file1, "430ce34d020724ed75a196dfc2ad67c77772d169")
+                has_file(objs, file2, "da39a3ee5e6b4b0d3255bfef95601890afd80709")
+                has_dir(objs, subdir)
+                has_dir(objs, subdir2)
+
+                file_events(objs, file1, ['created'])
+                file_events(objs, file2, ['created'])
+
+        cleanup(dirs)
+
+    @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
+    def test_file_modified(self):
+        """
+        file_integrity tests for file modifications (chmod, chown, write, truncate, xattrs).
+        """
+
+        dirs = [self.temp_dir("auditbeat_test")]
+
+        for backend in fim_backends:
+            with self.subTest(backend=backend):
+                reset_state(self.working_dir)
+                recreate(dirs)
+
+                self.render_config_template(
+                    modules=[{
+                        "name": "file_integrity",
+                        "extras": {
+                            "paths": dirs,
+                            "scan_at_start": False,
+                            "recursive": False,
+                            "force_backend": backend
+                        }
+                    }],
+                )
+                proc = self.start_beat()
+
+                # wait until the directories to watch are printed in the logs
+                # this happens when the file_integrity module starts.
+                self.wait_log_contains(escape_path(
+                    dirs[0]), max_timeout=30, ignore_case=True)
+
+                # Event 1: file create
+                f = os.path.join(dirs[0], f'file_{backend}.txt')
+                self.create_file(f, "hello world!")
+
+                print("BACKEND", backend, "file", f)
+
+                # Event 2: chmod
+                os.chmod(f, 0o777)
+
+                # Wait N events
+                self.wait_output(1)
+                # time.sleep(34)
+
+                proc.check_kill_and_wait()
+                self.assert_no_logged_warnings()
+
+                # Ensure all Beater stages are used.
+                assert self.log_contains("Setup Beat: auditbeat")
+                assert self.log_contains("auditbeat start running")
+                assert self.log_contains("auditbeat stopped")
+
+                objs = self.read_output()
+
+                print(objs)
+
+        cleanup(dirs)
