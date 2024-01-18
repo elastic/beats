@@ -16,11 +16,11 @@ if ! are_files_changed "$changeset" ; then
   exit 0
 fi
 
-echo "--- prepare env"
-add_bin_path
-with_go ${GO_VERSION}
-with_mage
-with_python
+# echo "--- prepare env"
+# add_bin_path
+# with_go ${GO_VERSION}
+# with_mage
+# with_python
 
 echo "--- Packaging"
 pushd "metricbeat" > /dev/null

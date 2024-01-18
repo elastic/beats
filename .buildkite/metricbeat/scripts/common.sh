@@ -8,24 +8,6 @@ platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
 pipeline_name="metricbeat"
 
-echo "--- Get vendor dependency patterns"
-.buildkite/metricbeat/scripts/get-vendor-dependencies.sh "${pipeline_name}"
-
-echo "--- Env preparation"
-
-if [ command -v docker-compose ]; then
-  set +e
-  echo "Found docker-compose. Checking version.."
-  FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version|awk '{print $3}'|sed s/\,//)
-  if [ $FOUND_DOCKER_COMPOSE_VERSION == $DOCKER_COMPOSE_VERSION ]; then
-    echo "Versions match. No need to install docker-compose. Exiting."
-  else
-    echo "Versions don't match. Need to install the correct version of docker-compose."
-    with_docker_compose "${DOCKER_COMPOSE_VERSION}"
-  fi
-  set -e
-fi
-
 with_docker_compose() {
   local version=$1
   echo "Setting up the Docker-compose environment..."
@@ -96,13 +78,19 @@ with_go() {
 }
 
 with_python() {
+  local version=$1
   if [ "${platform_type}" == "Linux" ]; then
     sudo apt-get update
     sudo apt-get install -y python3-venv python3-pip libsystemd-dev pytest pluggy
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
+    brew install pyenv
+    pyenv install "${version}"
+    pyenv global "${version}"
+    python --version
     pip3 install --upgrade pip
     pip3 install virtualenv
+    ulimit -Sn 10000
   fi
 }
 
@@ -134,3 +122,23 @@ are_files_changed() {
     return 1;
   fi
 }
+
+echo "--- Env preparation"
+
+if [ command -v docker-compose ]; then
+  set +e
+  echo "Found docker-compose. Checking version.."
+  FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version|awk '{print $3}'|sed s/\,//)
+  if [ $FOUND_DOCKER_COMPOSE_VERSION == $DOCKER_COMPOSE_VERSION ]; then
+    echo "Versions match. No need to install docker-compose. Exiting."
+  else
+    echo "Versions don't match. Need to install the correct version of docker-compose."
+    with_docker_compose "${DOCKER_COMPOSE_VERSION}"
+  fi
+  set -e
+fi
+
+add_bin_path
+with_go ${GO_VERSION}
+with_mage
+with_python "${SETUP_PYTHON_VERSION}"
