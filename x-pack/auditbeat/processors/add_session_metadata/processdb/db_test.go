@@ -19,10 +19,10 @@ var logger = logp.NewLogger("processdb")
 var reader = procfs.NewMockReader()
 
 // glue function to fit the return type required by these tests
-func newDBIntf(reader procfs.Reader) DB {
+func newDBIntf(reader procfs.Reader) *DB {
 	ret := NewDB(reader, *logger)
 	_ = ret.ScrapeProcfs()
-	return *ret
+	return ret
 }
 
 

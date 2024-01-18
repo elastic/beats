@@ -12,11 +12,10 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/types"
-	// "github.com/elastic/elastic-agent-libs/logp"
 )
 
 type (
-	createDBFn func(procfs.Reader) DB
+	createDBFn func(procfs.Reader) *DB
 	testFn     func(*testing.T)
 )
 
@@ -69,7 +68,8 @@ const (
 // These tests should effectively serve as the spec for how we assign entry
 // leaders. When further entry meta types or cases are added, tests should be
 
-func requireProcess(t *testing.T, db DB, pid uint32, processPath string) {
+func requireProcess(t *testing.T, db *DB, pid uint32, processPath string) {
+	t.Helper()
 	process, err := db.GetProcess(pid)
 	require.Nil(t, err)
 	require.Equal(t, pid, process.PID)
@@ -81,19 +81,22 @@ func requireProcess(t *testing.T, db DB, pid uint32, processPath string) {
 	}
 }
 
-func requireParent(t *testing.T, db DB, pid uint32, ppid uint32) {
+func requireParent(t *testing.T, db *DB, pid uint32, ppid uint32) {
+	t.Helper()
 	process, err := db.GetProcess(pid)
 	require.Nil(t, err)
 	require.Equal(t, ppid, process.Parent.PID)
 }
 
 func requireParentUnset(t *testing.T, process types.Process) {
+	t.Helper()
 	require.Equal(t, "", process.Parent.EntityID)
 	require.Equal(t, uint32(0), process.Parent.PID)
 	require.Nil(t, process.Parent.Start)
 }
 
-func requireSessionLeader(t *testing.T, db DB, pid uint32, sid uint32) {
+func requireSessionLeader(t *testing.T, db *DB, pid uint32, sid uint32) {
+	t.Helper()
 	process, err := db.GetProcess(pid)
 	require.Nil(t, err)
 	require.Equal(t, sid, process.SessionLeader.PID)
@@ -102,12 +105,14 @@ func requireSessionLeader(t *testing.T, db DB, pid uint32, sid uint32) {
 }
 
 func requireSessionLeaderUnset(t *testing.T, process types.Process) {
+	t.Helper()
 	require.Equal(t, "", process.SessionLeader.EntityID)
 	require.Equal(t, uint32(0), process.SessionLeader.PID)
 	require.Nil(t, process.SessionLeader.Start)
 }
 
-func requireGroupLeader(t *testing.T, db DB, pid uint32, pgid uint32) {
+func requireGroupLeader(t *testing.T, db *DB, pid uint32, pgid uint32) {
+	t.Helper()
 	process, err := db.GetProcess(pid)
 	require.Nil(t, err)
 	require.Equal(t, pgid, process.GroupLeader.PID)
@@ -115,7 +120,8 @@ func requireGroupLeader(t *testing.T, db DB, pid uint32, pgid uint32) {
 	require.Equal(t, pid == pgid, *process.GroupLeader.SameAsProcess)
 }
 
-func requireEntryLeader(t *testing.T, db DB, pid uint32, entryPid uint32, expectedEntryType EntryType) {
+func requireEntryLeader(t *testing.T, db *DB, pid uint32, entryPid uint32, expectedEntryType EntryType) {
+	t.Helper()
 	process, err := db.GetProcess(pid)
 	require.Nil(t, err)
 	require.Equal(t, entryPid, process.EntryLeader.PID)
@@ -128,13 +134,15 @@ func requireEntryLeader(t *testing.T, db DB, pid uint32, entryPid uint32, expect
 }
 
 func requireEntryLeaderUnset(t *testing.T, process types.Process) {
+	t.Helper()
 	require.Equal(t, "", process.EntryLeader.EntityID)
 	require.Equal(t, uint32(0), process.EntryLeader.PID)
 	require.Nil(t, process.EntryLeader.Start)
 }
 
 // tries to construct fork event from what's in the db
-func insertForkAndExec(t *testing.T, db DB, exec types.ProcessExecEvent) {
+func insertForkAndExec(t *testing.T, db *DB, exec types.ProcessExecEvent) {
+	t.Helper()
 	var fork types.ProcessForkEvent
 	fork.ChildPids = exec.Pids
 	parent, err := db.GetProcess(exec.Pids.Ppid)
