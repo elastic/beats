@@ -206,6 +206,7 @@ func (r ProcfsReader) GetProcess(pid uint32) (ProcessInfo, error) {
 	}
 	return r.getProcessInfo(proc)
 }
+
 // returns empty slice on error
 func (r ProcfsReader) GetAllProcesses() ([]ProcessInfo, error) {
 	procs, err := procfs.AllProcs()

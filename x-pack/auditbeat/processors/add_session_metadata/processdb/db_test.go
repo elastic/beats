@@ -7,8 +7,9 @@ package processdb
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 

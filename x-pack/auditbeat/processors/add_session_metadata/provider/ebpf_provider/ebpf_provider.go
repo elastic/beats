@@ -21,9 +21,9 @@ import (
 )
 
 type prvdr struct {
-	ctx                context.Context
-	logger             *logp.Logger
-	db                 *processdb.DB
+	ctx    context.Context
+	logger *logp.Logger
+	db     *processdb.DB
 }
 
 func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (provider.Provider, error) {
@@ -120,10 +120,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 							Major: body.CTTY.Major,
 							Minor: body.CTTY.Minor,
 						},
-						Cwd:              body.Cwd,
-						Argv:             deepcopy.Copy(body.Argv).([]string),
-						Env:              deepcopy.Copy(body.Env).(map[string]string),
-						Filename:         body.Filename,
+						Cwd:      body.Cwd,
+						Argv:     deepcopy.Copy(body.Argv).([]string),
+						Env:      deepcopy.Copy(body.Env).(map[string]string),
+						Filename: body.Filename,
 					}
 					p.db.InsertExec(pe)
 				case ebpfevents.EventTypeProcessExit:
@@ -141,7 +141,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 							Sid:         body.Pids.Sid,
 							StartTimeNs: body.Pids.StartTimeNs,
 						},
-						ExitCode:         body.ExitCode,
+						ExitCode: body.ExitCode,
 					}
 					p.db.InsertExit(pe)
 				}

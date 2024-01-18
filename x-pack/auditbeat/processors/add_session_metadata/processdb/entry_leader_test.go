@@ -177,10 +177,10 @@ var systemdPath = "/sbin/systemd"
 func populateProcfsWithInit(reader *procfs.MockReader) {
 	reader.AddEntry(1, procfs.ProcessInfo{
 		Pids: types.PidInfo{
-			Tid: 1,
+			Tid:  1,
 			Tgid: 1,
 			Pgid: 0,
-			Sid: 1,
+			Sid:  1,
 		},
 		Filename: systemdPath,
 	})

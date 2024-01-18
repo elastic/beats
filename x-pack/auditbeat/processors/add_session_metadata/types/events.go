@@ -16,7 +16,7 @@ const (
 )
 
 type (
-	Field     uint32
+	Field uint32
 )
 
 const (
@@ -78,10 +78,10 @@ type ProcessExecEvent struct {
 	CTty  TtyDev
 
 	// varlen fields
-	Cwd              string
-	Argv             []string
-	Env              map[string]string
-	Filename         string
+	Cwd      string
+	Argv     []string
+	Env      map[string]string
+	Filename string
 }
 
 type ProcessExitEvent struct {

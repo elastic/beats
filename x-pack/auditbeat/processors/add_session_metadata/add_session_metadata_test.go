@@ -8,57 +8,58 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/types"
-	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
-	enrichTests = []struct{
-		testName string
+	enrichTests = []struct {
+		testName      string
 		mockProcesses []types.ProcessExecEvent
-		config Config
-		input beat.Event
-		expected beat.Event
-		expect_error bool
+		config        Config
+		input         beat.Event
+		expected      beat.Event
+		expect_error  bool
 	}{
 		{
 			testName: "Enrich Process",
 			config: Config{
 				ReplaceFields: false,
-				PidField: "process.pid",
+				PidField:      "process.pid",
 			},
 			mockProcesses: []types.ProcessExecEvent{
 				{
 					Pids: types.PidInfo{
-						Tid: uint32(100),
+						Tid:  uint32(100),
 						Tgid: uint32(100),
 						Ppid: uint32(50),
 						Pgid: uint32(100),
-						Sid: uint32(40),
+						Sid:  uint32(40),
 					},
-					Cwd: "/",
+					Cwd:      "/",
 					Filename: "/bin/ls",
 				},
 				{
 					Pids: types.PidInfo{
-						Tid: uint32(50),
+						Tid:  uint32(50),
 						Tgid: uint32(50),
 						Ppid: uint32(40),
-						Sid: uint32(40),
+						Sid:  uint32(40),
 					},
 				},
 				{
 					Pids: types.PidInfo{
-						Tid: uint32(40),
+						Tid:  uint32(40),
 						Tgid: uint32(40),
 						Ppid: uint32(1),
-						Sid: uint32(1),
+						Sid:  uint32(1),
 					},
 				},
 			},
@@ -72,9 +73,9 @@ var (
 			expected: beat.Event{
 				Fields: mapstr.M{
 					"process": mapstr.M{
-						"executable": "/bin/ls",
+						"executable":        "/bin/ls",
 						"working_directory": "/",
-						"pid": uint32(100),
+						"pid":               uint32(100),
 						"parent": mapstr.M{
 							"pid": uint32(50),
 						},
@@ -93,12 +94,12 @@ var (
 			testName: "No Pid Field in Event",
 			config: Config{
 				ReplaceFields: false,
-				PidField: "process.pid",
+				PidField:      "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
 					"process": mapstr.M{
-						"executable": "ls",
+						"executable":        "ls",
 						"working_directory": "/",
 						"parent": mapstr.M{
 							"pid": uint32(100),
@@ -112,13 +113,13 @@ var (
 			testName: "Pid Not Number",
 			config: Config{
 				ReplaceFields: false,
-				PidField: "process.pid",
+				PidField:      "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
 					"process": mapstr.M{
-						"pid": "xyz",
-						"executable": "ls",
+						"pid":               "xyz",
+						"executable":        "ls",
 						"working_directory": "/",
 						"parent": mapstr.M{
 							"pid": uint32(50),
@@ -132,13 +133,13 @@ var (
 			testName: "PID not in DB",
 			config: Config{
 				ReplaceFields: false,
-				PidField: "process.pid",
+				PidField:      "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
 					"process": mapstr.M{
-						"pid": "100",
-						"executable": "ls",
+						"pid":               "100",
+						"executable":        "ls",
 						"working_directory": "/",
 						"parent": mapstr.M{
 							"pid": uint32(100),
@@ -164,7 +165,7 @@ func TestEnrich(t *testing.T) {
 		}
 		s := addSessionMetadata{
 			logger: logger,
-			db: db,
+			db:     db,
 			config: tt.config,
 		}
 

@@ -76,8 +76,8 @@ func New(cfg *config.C) (beat.Processor, error) {
 }
 
 func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
-	 _, err := ev.GetValue(p.config.PidField)
-	 if err != nil {
+	_, err := ev.GetValue(p.config.PidField)
+	if err != nil {
 		// Do not attempt to enrich events without PID; it's not a supported event
 		return ev, nil
 	}

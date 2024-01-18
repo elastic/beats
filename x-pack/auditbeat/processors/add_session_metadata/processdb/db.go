@@ -72,13 +72,13 @@ const (
 )
 
 type Process struct {
-	Pids             types.PidInfo
-	Creds            types.CredInfo
-	CTty             types.TtyDev
-	Argv             []string
-	Cwd              string
-	Env              map[string]string
-	Filename         string
+	Pids     types.PidInfo
+	Creds    types.CredInfo
+	CTty     types.TtyDev
+	Argv     []string
+	Cwd      string
+	Env      map[string]string
+	Filename string
 }
 
 var (
@@ -314,13 +314,13 @@ func (db *DB) InsertExec(exec types.ProcessExecEvent) error {
 	defer db.Unlock()
 
 	proc := Process{
-		Pids:             pidInfoFromProto(exec.Pids),
-		Creds:            credInfoFromProto(exec.Creds),
-		CTty:             ttyDevFromProto(exec.CTty),
-		Argv:             exec.Argv,
-		Cwd:              exec.Cwd,
-		Env:              exec.Env,
-		Filename:         exec.Filename,
+		Pids:     pidInfoFromProto(exec.Pids),
+		Creds:    credInfoFromProto(exec.Creds),
+		CTty:     ttyDevFromProto(exec.CTty),
+		Argv:     exec.Argv,
+		Cwd:      exec.Cwd,
+		Env:      exec.Env,
+		Filename: exec.Filename,
 	}
 
 	db.processes[exec.Pids.Tgid] = proc
@@ -686,13 +686,13 @@ func (db *DB) ScrapeProcfs() []uint32 {
 	pids := make([]uint32, 0)
 	for _, procInfo := range procs {
 		process := Process{
-			Pids:             pidInfoFromProto(procInfo.Pids),
-			Creds:            credInfoFromProto(procInfo.Creds),
-			CTty:             ttyDevFromProto(procInfo.CTty),
-			Argv:             procInfo.Argv,
-			Cwd:              procInfo.Cwd,
-			Env:              procInfo.Env,
-			Filename:         procInfo.Filename,
+			Pids:     pidInfoFromProto(procInfo.Pids),
+			Creds:    credInfoFromProto(procInfo.Creds),
+			CTty:     ttyDevFromProto(procInfo.CTty),
+			Argv:     procInfo.Argv,
+			Cwd:      procInfo.Cwd,
+			Env:      procInfo.Env,
+			Filename: procInfo.Filename,
 		}
 
 		db.insertProcess(process)
