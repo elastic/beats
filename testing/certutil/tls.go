@@ -18,6 +18,8 @@ import (
 // - the private key
 // - the certificate
 // - the certificate in PEM format as a byte slice.
+//
+// If any error occurs during the generation process, a non-nil error is returned.
 func NewRootCA() (*ecdsa.PrivateKey, *x509.Certificate, []byte, error) {
 	rootKey, err := ecdsa.GenerateKey(elliptic.P384(), rand.Reader)
 	if err != nil {
@@ -84,13 +86,14 @@ func NewRootCA() (*ecdsa.PrivateKey, *x509.Certificate, []byte, error) {
 	return rootKey, rootCACert, rootCertPemBuff.Bytes(), nil
 }
 
-// GenerateChildCert generates a x509 Certificate child of caCert and returns:
+// GenerateChildCert generates an x509 Certificate as a child of caCert and
+// returns the following:
 // - the certificate in PEM format as a byte slice
-// - the certificate in PEM format as a byte slice
-// -
-// certPemBytes, privateKeyPemBytes, &tlsCert
-func GenerateChildCert(
-	name string, caPrivKey *ecdsa.PrivateKey, caCert *x509.Certificate) (
+// - the private key in PEM format as a byte slice
+// - the certificate and private key as a tls.Certificate
+//
+// If any error occurs during the generation process, a non-nil error is returned.
+func GenerateChildCert(name string, caPrivKey *ecdsa.PrivateKey, caCert *x509.Certificate) (
 	[]byte, []byte, *tls.Certificate, error) {
 
 	notBefore := time.Now()
@@ -152,5 +155,5 @@ func GenerateChildCert(
 		return nil, nil, nil, fmt.Errorf("could not create key pair: %w", err)
 	}
 
-	return certPemBytes, privateKeyPemBytes, &tlsCert, nil
+	return privateKeyPemBytes, certPemBytes, &tlsCert, nil
 }

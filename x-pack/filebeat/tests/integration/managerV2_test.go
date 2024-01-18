@@ -590,7 +590,7 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 	ok := rootCertPool.AppendCertsFromPEM(rootCertPem)
 	require.Truef(t, ok, "could not append certs from PEM to cert pool")
 
-	beatCertPem, beatPrivKeyPem, beatTLSCert, err :=
+	beatPrivKeyPem, beatCertPem, beatTLSCert, err :=
 		certutil.GenerateChildCert("localhost", rootKey, rootCACert)
 	require.NoError(t, err, "could not generate child TLS certificate")
 
