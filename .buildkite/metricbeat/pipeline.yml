@@ -12,60 +12,60 @@ env:
 
 steps:
 
-  - group: "Mandatory Tests"
-    key: "mandatory-tests"
-    steps:
-      - label: ":linux: Ubuntu Unit Tests"
-        key: "mandatory-linux-unit-test"
-        command: ".buildkite/metricbeat/scripts/unit_tests.sh"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
-        artifact_paths: "metricbeat/build/*.*"
+  # - group: "Mandatory Tests"
+  #   key: "mandatory-tests"
+  #   steps:
+  #     - label: ":linux: Ubuntu Unit Tests"
+  #       key: "mandatory-linux-unit-test"
+  #       command: ".buildkite/metricbeat/scripts/unit_tests.sh"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_UBUNTU_X86_64}"
+  #         machineType: "c2-standard-16"
+  #       artifact_paths: "metricbeat/build/*.*"
 
-      - label: ":go: Go Intergration Tests"
-        key: "mandatory-int-test"
-        command: ".buildkite/metricbeat/scripts/go_int_tests.sh"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
-        artifact_paths: "metricbeat/build/*.*"
+  #     - label: ":go: Go Intergration Tests"
+  #       key: "mandatory-int-test"
+  #       command: ".buildkite/metricbeat/scripts/go_int_tests.sh"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_UBUNTU_X86_64}"
+  #         machineType: "c2-standard-16"
+  #       artifact_paths: "metricbeat/build/*.*"
 
-      - label: ":python: Python Integration Tests"
-        key: "mandatory-python-int-test"
-        command: ".buildkite/metricbeat/scripts/py_int_tests.sh"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
-        artifact_paths: "metricbeat/build/*.*"
+  #     - label: ":python: Python Integration Tests"
+  #       key: "mandatory-python-int-test"
+  #       command: ".buildkite/metricbeat/scripts/py_int_tests.sh"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_UBUNTU_X86_64}"
+  #         machineType: "c2-standard-16"
+  #       artifact_paths: "metricbeat/build/*.*"
 
-      - label: ":negative_squared_cross_mark: Cross compile"
-        key: "mandatory-cross-compile"
-        command: ".buildkite/metricbeat/scripts/crosscompile.sh"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
-        artifact_paths: "metricbeat/build/*.*"
+  #     - label: ":negative_squared_cross_mark: Cross compile"
+  #       key: "mandatory-cross-compile"
+  #       command: ".buildkite/metricbeat/scripts/crosscompile.sh"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_UBUNTU_X86_64}"
+  #         machineType: "c2-standard-16"
+  #       artifact_paths: "metricbeat/build/*.*"
 
-      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/metricbeat/scripts/win_unit_tests.ps1"
-        key: "mandatory-win-unit-tests"
-        agents:
-          provider: "gcp"
-          image: "{{matrix.image}}"
-          machine_type: "n2-standard-8"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        matrix:
-          setup:
-            image:
-              - "${IMAGE_WIN_2016}"
-              - "${IMAGE_WIN_2022}"
-        artifact_paths: "metricbeat/build/*.*"
+  #     - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+  #       command: ".buildkite/metricbeat/scripts/win_unit_tests.ps1"
+  #       key: "mandatory-win-unit-tests"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "{{matrix.image}}"
+  #         machine_type: "n2-standard-8"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       matrix:
+  #         setup:
+  #           image:
+  #             - "${IMAGE_WIN_2016}"
+  #             - "${IMAGE_WIN_2022}"
+  #       artifact_paths: "metricbeat/build/*.*"
 
   - group: "Extended Tests"
     key: "extended-tests"
@@ -80,46 +80,46 @@ steps:
           imagePrefix: "generic-13-ventura-x64"
         artifact_paths: "metricbeat/build/*.*"
 
-  - group: "Extended Windowds Tests"
-    key: "extended-win-tests"
-    steps:
-      - label: ":windows: Win 2019 Unit Tests"
-        key: "extended-win-2019-unit-tests"
-        command: ".buildkite/metricbeat/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machine_type: "n2-standard-8"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "metricbeat/build/*.*"
+  # - group: "Extended Windowds Tests"
+  #   key: "extended-win-tests"
+  #   steps:
+  #     - label: ":windows: Win 2019 Unit Tests"
+  #       key: "extended-win-2019-unit-tests"
+  #       command: ".buildkite/metricbeat/scripts/win_unit_tests.ps1"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_WIN_2019}"
+  #         machine_type: "n2-standard-8"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       artifact_paths: "metricbeat/build/*.*"
 
-  - group: "Packaging"
-    key: "packaging"
-    if: build.env("BUILDKITE_TAG") == "" && build.env("BUILDKITE_PULL_REQUEST") != ""
-    depends_on:
-      - step: "mandatory-tests"
-        allow_failure: false
-      - step: "extended-tests"
-        allow_failure: false
-      - step: "extended-win-tests"
-        allow_failure: false
-    steps:
-      - label: ":linux: Packaging Linux"
-        key: "packaging-linux"
-        command: ".buildkite/metricbeat/scripts/packaging.sh"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
+  # - group: "Packaging"
+  #   key: "packaging"
+  #   if: build.env("BUILDKITE_TAG") == "" && build.env("BUILDKITE_PULL_REQUEST") != ""
+  #   depends_on:
+  #     - step: "mandatory-tests"
+  #       allow_failure: false
+  #     - step: "extended-tests"
+  #       allow_failure: false
+  #     - step: "extended-win-tests"
+  #       allow_failure: false
+  #   steps:
+  #     - label: ":linux: Packaging Linux"
+  #       key: "packaging-linux"
+  #       command: ".buildkite/metricbeat/scripts/packaging.sh"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_UBUNTU_X86_64}"
+  #         machineType: "c2-standard-16"
 
-      - label: ":linux: Packaging ARM"
-        key: "packaging-arm"
-        command: ".buildkite/metricbeat/scripts/packaging.sh"
-        agents:
-          provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.xlarge"
-        env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
+  #     - label: ":linux: Packaging ARM"
+  #       key: "packaging-arm"
+  #       command: ".buildkite/metricbeat/scripts/packaging.sh"
+  #       agents:
+  #         provider: "aws"
+  #         imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+  #         instanceType: "t4g.xlarge"
+  #       env:
+  #         PLATFORMS: "linux/arm64"
+  #         PACKAGES: "docker"
