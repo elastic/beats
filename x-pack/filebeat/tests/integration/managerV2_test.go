@@ -7,6 +7,7 @@
 package integration
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/ecdsa"
 	"crypto/elliptic"
@@ -18,9 +19,11 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io"
+	"math"
 	"math/big"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -373,7 +376,7 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 	logFilePath := filepath.Join(filebeat.TempDir(), "flog.log")
 	generateLogFile(t, logFilePath)
 
-	logLevel := proto.UnitLogLevel_INFO
+	logLevel := proto.UnitLogLevel_DEBUG
 	filestreamInputHealthy := proto.UnitExpected{
 		Id:             "input-unit-healthy",
 		Type:           proto.UnitType_INPUT,
@@ -516,7 +519,7 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 }
 
 func TestAgentPackageVersion(t *testing.T) {
-	want := "8.13.0+build20131123"
+	wantVersion := "8.13.0+build20131123"
 	// 1st: mage buildSystemTestBinary
 	filebeat := integration.NewBeat(
 		t,
@@ -524,16 +527,18 @@ func TestAgentPackageVersion(t *testing.T) {
 		"../../filebeat.test",
 	)
 
-	logFilePath := filepath.Join(filebeat.TempDir(), "logs.ndjson")
+	logFilePath := filepath.Join(filebeat.TempDir(), "logs.log")
 	generateLogFile(t, logFilePath)
 
+	eventsDir := filepath.Join(filebeat.TempDir(), "ingested-events")
+	logLevel := proto.UnitLogLevel_TRACE
 	units := []*proto.UnitExpected{
 		{
 			Id:             "output-file-unit",
 			Type:           proto.UnitType_OUTPUT,
 			ConfigStateIdx: 1,
 			State:          proto.State_HEALTHY,
-			LogLevel:       proto.UnitLogLevel_DEBUG,
+			LogLevel:       logLevel,
 			Config: &proto.UnitExpectedConfig{
 				Id:   "default",
 				Type: "file",
@@ -542,7 +547,7 @@ func TestAgentPackageVersion(t *testing.T) {
 					map[string]interface{}{
 						"name": "events-to-file",
 						"type": "file",
-						"path": filepath.Join(filebeat.TempDir(), "ingested-events"),
+						"path": eventsDir,
 					}),
 			},
 		},
@@ -551,7 +556,7 @@ func TestAgentPackageVersion(t *testing.T) {
 			Type:           proto.UnitType_INPUT,
 			ConfigStateIdx: 1,
 			State:          proto.State_HEALTHY,
-			LogLevel:       proto.UnitLogLevel_DEBUG,
+			LogLevel:       logLevel,
 			Config: &proto.UnitExpectedConfig{
 				Id:   "filestream-monitoring-agent",
 				Type: "filestream",
@@ -571,8 +576,8 @@ func TestAgentPackageVersion(t *testing.T) {
 	}
 	agentInfo := proto.AgentInfo{
 		Id:       "agent-id",
-		Version:  want,
-		Snapshot: false,
+		Version:  wantVersion,
+		Snapshot: true,
 	}
 
 	server := &mock.StubServerV2{
@@ -653,9 +658,53 @@ func TestAgentPackageVersion(t *testing.T) {
 	filebeat.Start("-E", "management.enabled=true")
 
 	WriteStartUpInfo(t, filebeat.Stdin(), startUpInfo)
+	// for some reason the pipe needs to be closed for filebeat to read it.
 	require.NoError(t, filebeat.Stdin().Close(), "failed closing stdin pipe")
 
-	filebeat.WaitForLogs("PublishEvents: ", 20*time.Second, "did not find the logs")
+	// filebeat.WaitForLogs(
+	// 	"Harvester started for paths:",
+	// 	20*time.Second,
+	// 	"timeout after %s waiting for harvester to start")
+	// // Give it some time to harvester the file
+	// <-time.After(30 * time.Second)
+	// filebeat.WaitForLogs("Publish event: ", 20*time.Second)
+	// filebeat.Stop()
+
+	msg := strings.Builder{}
+	require.Eventuallyf(t, func() bool {
+		msg.Reset()
+
+		_, err = os.Stat(eventsDir)
+		if err != nil {
+			fmt.Fprintf(&msg, "could not verify output directory exists: %v", err)
+			return false
+		}
+
+		entries, err := os.ReadDir(eventsDir)
+		if err != nil {
+			fmt.Fprintf(&msg, "failed checking output directory for files: %v", err)
+			return false
+		}
+
+		if len(entries) == 0 {
+			fmt.Fprintf(&msg, "no file found on %s", eventsDir)
+			return false
+		}
+
+		return true
+	}, 30*time.Second, time.Second, "no event was produced: %s", &msg)
+
+	evs := GetFileOutputEvents[Event](t, eventsDir, 100)
+	for _, e := range evs {
+		require.Equal(t, wantVersion, e.Metadata.Version)
+
+		require.Equal(t, agentInfo.Id, e.ElasticAgent.Id)
+		require.Equal(t, agentInfo.Version, e.ElasticAgent.Version)
+		require.Equal(t, agentInfo.Snapshot, e.ElasticAgent.Snapshot)
+
+		require.Equal(t, agentInfo.Id, e.Agent.Id)
+		require.Equal(t, wantVersion, e.Agent.Version)
+	}
 }
 
 type Event struct {
@@ -671,6 +720,42 @@ type Event struct {
 		Version string `json:"version"`
 		Id      string `json:"id"`
 	} `json:"agent"`
+}
+
+// GetFileOutputEvents reads all events from all the files on dir. If n > 0,
+// then it reads up to n events. It considers all files are ndjson, and it skips
+// any directory within dir.
+func GetFileOutputEvents[E any](t *testing.T, dir string, n int) []E {
+	t.Helper()
+
+	if n < 1 {
+		n = math.MaxInt
+	}
+
+	var events []E
+	entries, err := os.ReadDir(dir)
+	require.NoError(t, err, "could not read events directory")
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		f, err := os.Open(filepath.Join(dir, e.Name()))
+		require.NoErrorf(t, err, "could not open file %q", e.Name())
+
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			var ev E
+			err := json.Unmarshal(scanner.Bytes(), &ev)
+			require.NoError(t, err, "failed to read event")
+			events = append(events, ev)
+
+			if len(events) >= n {
+				return events
+			}
+		}
+	}
+
+	return events
 }
 
 func NewRootCA(t *testing.T) (*ecdsa.PrivateKey, *x509.Certificate, []byte) {
