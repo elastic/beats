@@ -10,6 +10,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Upgrade to Go 1.21.6. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}37615[37615]
+
 *Auditbeat*
 
 
@@ -121,7 +123,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 - Upgrade golang/x/net to v0.17.0. Updates the publicsuffix table used by the registered_domain processor. {pull}36969[36969]
 Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
-- Upgrade to Go 1.21.6. {pull}37615[37615]
 - The Elasticsearch output can now configure performance presets with the `preset` configuration field. {pull}37259[37259]
 - Upgrade to elastic-agent-libs v0.7.3 and golang.org/x/crypto v0.17.0. {pull}37544[37544]
 - Make more selective the Pod autodiscovery upon node and namespace update events. {issue}37338[37338] {pull}37431[37431]
@@ -165,6 +166,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Prevent CEL input from re-entering the eval loop when an evaluation failed. {pull}37161[37161]
 - Update CEL extensions library to v1.7.0. {pull}37172[37172]
 - Add support for complete URL replacement in HTTPJSON chain steps. {pull}37486[37486]
+- Add support for user-defined query selection in EntraID entity analytics provider. {pull}37653[37653]
 
 *Auditbeat*
 
