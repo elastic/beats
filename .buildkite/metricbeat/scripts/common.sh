@@ -2,20 +2,49 @@
 set -euo pipefail
 
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
+BIN="${WORKSPACE}/bin"
 platform_type="$(uname)"
 platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
+pipeline_name="metricbeat"
+
+echo "--- Get vendor dependency patterns"
+.buildkite/metricbeat/scripts/get-vendor-dependencies.sh "${pipeline_name}"
+
+echo "--- Env preparation"
+
+if [ command -v docker-compose ]; then
+  set +e
+  echo "Found docker-compose. Checking version.."
+  FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version|awk '{print $3}'|sed s/\,//)
+  if [ $FOUND_DOCKER_COMPOSE_VERSION == $DOCKER_COMPOSE_VERSION ]; then
+    echo "Versions match. No need to install docker-compose. Exiting."
+  else
+    echo "Versions don't match. Need to install the correct version of docker-compose."
+    with_docker_compose "${DOCKER_COMPOSE_VERSION}"
+  fi
+  set -e
+fi
+
+with_docker_compose() {
+  local version=$1
+  echo "Setting up the Docker-compose environment..."
+  create_workspace
+  retry 5 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type_lowercase}-${arch_type}"
+  chmod +x ${BIN}/docker-compose
+  docker-compose version
+}
 
 create_workspace() {
-  if [[ ! -d "${WORKSPACE}/bin" ]]; then
-    mkdir -p "${WORKSPACE}/bin"
+  if [[ ! -d "${BIN}" ]]; then
+    mkdir -p "${BIN}"
   fi
 }
 
 add_bin_path() {
   echo "Adding PATH to the environment variables..."
   create_workspace
-  export PATH="${PATH}:${WORKSPACE}/bin"
+  export PATH="${PATH}:${BIN}"
 }
 
 check_platform_architeture() {
@@ -57,8 +86,8 @@ with_go() {
   echo "Setting up the Go environment..."
   create_workspace
   check_platform_architeture
-  retry 5 curl -sL -o "${WORKSPACE}/bin/gvm" "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${platform_type_lowercase}-${arch_type}"
-  chmod +x "${WORKSPACE}/bin/gvm"
+  retry 5 curl -sL -o "${BIN}/gvm" "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${platform_type_lowercase}-${arch_type}"
+  chmod +x "${BIN}/gvm"
   eval "$(gvm $GO_VERSION)"
   go version
   which go
@@ -69,7 +98,7 @@ with_go() {
 with_python() {
   if [ "${platform_type}" == "Linux" ]; then
     sudo apt-get update
-    sudo apt-get install -y python3-venv python3-pip libsystemd-dev
+    sudo apt-get install -y python3-venv python3-pip libsystemd-dev pytest pluggy
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
     pip3 install --upgrade pip

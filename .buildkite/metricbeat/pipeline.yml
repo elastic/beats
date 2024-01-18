@@ -2,28 +2,29 @@
 env:
   SETUP_GVM_VERSION: "v0.5.1"
   SETUP_MAGE_VERSION: "1.13.0"
-  SETUP_PYTHON_VERSION: "3.11.0"
+  SETUP_PYTHON_VERSION: "3.10.12"
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
   IMAGE_WIN_2016: "family/core-windows-2016"
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
+  DOCKER_COMPOSE_VERSION: "1.21.0"
 
 steps:
 
-#   - group: "Mandatory Tests"
-#     key: "mandatory-tests"
-# #    if: define_condition_if_needed_for_group
-#     steps:
-# #      TODO: Ubuntu Unit Tests have some issues, it needs to be compared with the Jenkins pipeline, but it's difficult to find it :)
-#       - label: ":linux: Ubuntu Unit Tests"
-#         key: "mandatory-linux-unit-test"
-#         command: ".buildkite/metricbeat/scripts/unit_tests.sh"
-#         agents:
-#           provider: "gcp"
-#           image: "${IMAGE_UBUNTU_X86_64}"
-#           machineType: "c2-standard-16"
-#         artifact_paths: "metricbeat/build/*.*"
+  - group: "Mandatory Tests"
+    key: "mandatory-tests"
+#    if: define_condition_if_needed_for_group
+    steps:
+#      TODO: Ubuntu Unit Tests have some issues, it needs to be compared with the Jenkins pipeline, but it's difficult to find it :)
+      - label: ":linux: Ubuntu Unit Tests"
+        key: "mandatory-linux-unit-test"
+        command: ".buildkite/metricbeat/scripts/unit_tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths: "metricbeat/build/*.*"
 
       # - label: ":go: Go Intergration Tests"
       #   key: "mandatory-int-test"
