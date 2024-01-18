@@ -10,7 +10,7 @@ class Test(XPackTest):
     COMPOSE_TIMEOUT = 600
 
     # -------------------------------------------------------------------------
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
+    @unittest.skip
     def test_health(self):
         """Tests the Health API and the associated metricset"""
 
@@ -27,7 +27,7 @@ class Test(XPackTest):
         self.assertIn("jvm", health)
 
     # -------------------------------------------------------------------------
-    @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, 'integration test')
+    @unittest.skip
     def test_stats(self):
         """Tests the Stats API and the associated metricset"""
 

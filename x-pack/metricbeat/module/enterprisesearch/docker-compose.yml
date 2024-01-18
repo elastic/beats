@@ -21,7 +21,7 @@ services:
       # Make it possible to run against slightly older ES versions
       - "elasticsearch.ignore_version_mismatch=true"
     ports:
-      - 3002:3002
+      - 3003:3002
 
   elasticsearch:
     image: docker.elastic.co/integrations-ci/beats-elasticsearch:${ELASTICSEARCH_VERSION:-8.0.0-SNAPSHOT}-1
