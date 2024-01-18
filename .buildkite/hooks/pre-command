@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-source .buildkite/metricbeat/scripts/common.sh
-
 echo "Golang version:"
 GO_VERSION=$(cat .go-version)
 export GO_VERSION

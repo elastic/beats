@@ -125,7 +125,8 @@ are_files_changed() {
 
 echo "--- Env preparation"
 
-if [ command -v docker-compose ]; then
+if command -v docker-compose &> /dev/null
+then
   set +e
   echo "Found docker-compose. Checking version.."
   FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version|awk '{print $3}'|sed s/\,//)
@@ -139,6 +140,6 @@ if [ command -v docker-compose ]; then
 fi
 
 add_bin_path
-with_go ${GO_VERSION}
+with_go "${GO_VERSION}"
 with_mage
 with_python "${SETUP_PYTHON_VERSION}"
