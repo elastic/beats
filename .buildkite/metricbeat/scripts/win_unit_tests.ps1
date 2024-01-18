@@ -51,7 +51,7 @@ withGolang $env:GO_VERSION
 
 installGoDependencies
 
-withPython $env:SETUP_PYTHON_VERSION
+withPython $env:SETUP_WIN_PYTHON_VERSION
 
 # withMinGW
 

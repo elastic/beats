@@ -2,7 +2,7 @@
 env:
   SETUP_GVM_VERSION: "v0.5.1"
   SETUP_MAGE_VERSION: "1.13.0"
-  SETUP_PYTHON_VERSION: "3.10.12"
+  SETUP_WIN_PYTHON_VERSION: "3.11.0"
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
   IMAGE_WIN_2016: "family/core-windows-2016"
@@ -31,6 +31,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
+        artifact_paths: "metricbeat/build/*.*"
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
@@ -39,6 +40,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
+        artifact_paths: "metricbeat/build/*.*"
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
@@ -47,6 +49,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
+        artifact_paths: "metricbeat/build/*.*"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command: ".buildkite/metricbeat/scripts/win_unit_tests.ps1"
@@ -75,6 +78,7 @@ steps:
         agents:
           provider: "orka"
           imagePrefix: "generic-13-ventura-x64"
+        artifact_paths: "metricbeat/build/*.*"
 
   - group: "Extended Windowds Tests"
     key: "extended-win-tests"
