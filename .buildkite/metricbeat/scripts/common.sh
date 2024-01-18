@@ -78,16 +78,16 @@ with_go() {
 }
 
 with_python() {
-  local version=$1
+  # local version=$1
   if [ "${platform_type}" == "Linux" ]; then
     sudo apt-get update
-    sudo apt-get install -y python3-venv python3-pip libsystemd-dev
+    sudo apt-get install -y python3-pip python3-venv libsystemd-dev
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
-    brew install pyenv xz
-    pyenv install "${version}"
-    pyenv global "${version}"
-    pip3 install --upgrade pip
+    # brew install pyenv xz
+    # pyenv install "${version}"
+    # pyenv global "${version}"
+    # pip3 install --upgrade pip
     pip3 install virtualenv
     ulimit -Sn 10000
   fi
@@ -141,4 +141,5 @@ fi
 add_bin_path
 with_go "${GO_VERSION}"
 with_mage
-with_python "${SETUP_PYTHON_VERSION}"
+# with_python "${SETUP_PYTHON_VERSION}"
+with_python
