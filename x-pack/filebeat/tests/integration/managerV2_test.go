@@ -518,9 +518,9 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 	}
 }
 
-func TestAgentPackageVersion(t *testing.T) {
+func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 	wantVersion := "8.13.0+build20131123"
-	// 1st: mage buildSystemTestBinary
+
 	filebeat := integration.NewBeat(
 		t,
 		"filebeat",
@@ -599,7 +599,7 @@ func TestAgentPackageVersion(t *testing.T) {
 		t, "localhost", rootKey, rootCACert)
 
 	getCert := func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
-		// needs to be from the pair
+		// it's one of the child certificates. As there is only one, return it
 		return &beatTLSCert, nil
 	}
 
@@ -609,25 +609,6 @@ func TestAgentPackageVersion(t *testing.T) {
 		GetCertificate: getCert,
 		MinVersion:     tls.VersionTLS12,
 	})
-
-	// ca, err := authority.NewCA()
-	// require.NoError(t, err, "could not generate root CA")
-	// rootCertPool := x509.NewCertPool()
-	// ok := rootCertPool.AppendCertsFromPEM(ca.Crt())
-	// require.Truef(t, ok, "could not append certs from PEM to cert pool")
-	//
-	// beatsCert, err := ca.GeneratePair()
-	// require.NoError(t, err, "could not generate beats certs")
-	// getCert := func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
-	// 	return beatsCert.Certificate, nil
-	// }
-	//
-	// creds := credentials.NewTLS(&tls.Config{
-	// 	ClientAuth:     tls.RequireAndVerifyClientCert,
-	// 	ClientCAs:      rootCertPool,
-	// 	GetCertificate: getCert,
-	// 	MinVersion:     tls.VersionTLS12,
-	// })
 
 	err := server.Start(grpc.Creds(creds))
 	require.NoError(t, err, "failed starting GRPC server")
@@ -644,31 +625,11 @@ func TestAgentPackageVersion(t *testing.T) {
 		AgentInfo:  &agentInfo,
 	}
 
-	// startUpInfo := &proto.StartUpInfo{
-	// 	Addr:       fmt.Sprintf("localhost:%d", server.Port),
-	// 	ServerName: "localhost",
-	// 	Token:      "token",
-	// 	CaCert:     ca.Crt(),
-	// 	PeerCert:   beatsCert.Crt,
-	// 	PeerKey:    beatsCert.Key,
-	// 	Services:   []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2},
-	// 	AgentInfo:  &agentInfo,
-	// }
-
 	filebeat.Start("-E", "management.enabled=true")
 
 	WriteStartUpInfo(t, filebeat.Stdin(), startUpInfo)
 	// for some reason the pipe needs to be closed for filebeat to read it.
 	require.NoError(t, filebeat.Stdin().Close(), "failed closing stdin pipe")
-
-	// filebeat.WaitForLogs(
-	// 	"Harvester started for paths:",
-	// 	20*time.Second,
-	// 	"timeout after %s waiting for harvester to start")
-	// // Give it some time to harvester the file
-	// <-time.After(30 * time.Second)
-	// filebeat.WaitForLogs("Publish event: ", 20*time.Second)
-	// filebeat.Stop()
 
 	msg := strings.Builder{}
 	require.Eventuallyf(t, func() bool {
@@ -778,20 +739,6 @@ func NewRootCA(t *testing.T) (*ecdsa.PrivateKey, *x509.Certificate, []byte) {
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth, x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
 		IsCA:                  true,
-
-		// DNSNames:     []string{"localhost"},
-		// SerialNumber: big.NewInt(1653),
-		// Subject: pkix.Name{
-		// 	Organization: []string{"elastic-fleet"},
-		// 	CommonName:   "localhost",
-		// },
-		// NotBefore:             time.Now(),
-		// NotAfter:              time.Now().AddDate(10, 0, 0),
-		// KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
-		// ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth,
-		// 	x509.ExtKeyUsageServerAuth},
-		// BasicConstraintsValid: true,
-		// IsCA:                  true,
 	}
 
 	rootCertRawBytes, err := x509.CreateCertificate(rand.Reader, &rootTemplate, &rootTemplate, &rootKey.PublicKey, rootKey)

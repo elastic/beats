@@ -52,6 +52,8 @@ A note about tags: the `--data` flag is a custom flag added by Metricbeat and Pa
 
 ==== Running System (integration) Tests (Python and Go)
 
+TODO(AndersonQ): check and improve it
+
 Python system tests are defined in the `tests/system` directory. They require a testing binary to be available and the python environment to be set up.
 
 To create the testing binary run `mage buildSystemTestBinary`. This will create the test binary in the beat directory. To setup the testing environment run `mage pythonVirtualEnv` which will create a virtual environment with all test dependencies and print its location. To activate it, the instructions depend on your operating system. See the https://packaging.python.org/en/latest/guides/installing-using-pip-and-virtual-environments/#activating-a-virtual-environment[virtualenv documentation].
