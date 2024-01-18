@@ -73,7 +73,8 @@ type primaries struct {
 		FixedBitSetMemoryInBytes  int `json:"fixed_bit_set_memory_in_bytes"`
 	} `json:"segments"`
 	Store struct {
-		SizeInBytes int `json:"size_in_bytes"`
+		SizeInBytes             int `json:"size_in_bytes"`
+		TotalDataSetSizeInBytes int `json:"total_data_set_size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
 		TotalTimeInMillis         int `json:"total_time_in_millis"`
@@ -132,7 +133,8 @@ type total struct {
 		FixedBitSetMemoryInBytes  int `json:"fixed_bit_set_memory_in_bytes"`
 	} `json:"segments"`
 	Store struct {
-		SizeInBytes int `json:"size_in_bytes"`
+		SizeInBytes             int `json:"size_in_bytes"`
+		TotalDataSetSizeInBytes int `json:"total_data_set_size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
 		TotalTimeInMillis         int `json:"total_time_in_millis"`
