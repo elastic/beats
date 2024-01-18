@@ -81,10 +81,10 @@ with_python() {
   local version=$1
   if [ "${platform_type}" == "Linux" ]; then
     sudo apt-get update
-    sudo apt-get install -y python3-venv python3-pip libsystemd-dev pytest pluggy
+    sudo apt-get install -y python3-venv python3-pip libsystemd-dev
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
-    brew install pyenv
+    brew install pyenv xz
     pyenv install "${version}"
     pyenv global "${version}"
     python --version
