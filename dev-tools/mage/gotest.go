@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -169,15 +168,16 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 // Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
 	module := EnvOr("MODULE", "")
-	modulesFileInfo, err := ioutil.ReadDir("./module")
+	modulesFileInfo, err := os.ReadDir("./module")
 	if err != nil {
 		return err
 	}
 
 	foundModule := false
-	failedModules := []string{}
+	failedModules := make([]string, 0, len(modulesFileInfo))
 	for _, fi := range modulesFileInfo {
-		if !fi.IsDir() {
+		// skip the ones that are not directories or with suffix @tmp, which are created by Jenkins build job
+		if !fi.IsDir() || strings.HasSuffix(fi.Name(), "@tmp") {
 			continue
 		}
 		if module != "" && module != fi.Name() {
@@ -289,7 +289,7 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	}
 
 	if params.OutputFile != "" {
-		fileOutput, err := os.Create(createDir(params.OutputFile))
+		fileOutput, err := os.Create(CreateDir(params.OutputFile))
 		if err != nil {
 			return fmt.Errorf("failed to create go test output file: %w", err)
 		}
@@ -356,7 +356,7 @@ func makeCommand(ctx context.Context, env map[string]string, cmd string, args ..
 	for k, v := range env {
 		c.Env = append(c.Env, k+"="+v)
 	}
-	c.Stdout = ioutil.Discard
+	c.Stdout = io.Discard
 	if mg.Verbose() {
 		c.Stdout = os.Stdout
 	}
