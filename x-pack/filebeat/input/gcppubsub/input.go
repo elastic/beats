@@ -231,7 +231,7 @@ func (in *pubsubInput) run() error {
 			go func() {
 				client, err := in.newPubsubClient(ctx)
 				if err != nil {
-					in.log.Error("failed to create to pubsub client: ", err)
+					in.log.Error("failed to create pub/sub client: ", err)
 					// return err
 				}
 				defer func() {
