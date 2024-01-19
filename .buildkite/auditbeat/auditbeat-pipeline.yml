@@ -63,6 +63,8 @@ steps:
       - label: ":linux: Crosscompile"
         command:
           - ".buildkite/auditbeat/scripts/crosscompile.sh"
+        env:
+          GOX_FLAGS: "-arch amd64"
         notify:
           - github_commit_status:
               context: "auditbeat: Unit Tests"
@@ -96,6 +98,7 @@ steps:
         key: "macos-extended"
 #        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command:
+          - "chgrp staff /tmp"
           - ".buildkite/auditbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
