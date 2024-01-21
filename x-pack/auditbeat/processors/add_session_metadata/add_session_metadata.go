@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider/ebpf_provider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider/procfs_provider"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -60,6 +61,17 @@ func New(cfg *config.C) (beat.Processor, error) {
 	switch c.Backend {
 	case "ebpf":
 		p, err := ebpf_provider.NewProvider(ctx, logger, db)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create ebpf provider: %w", err)
+		}
+		return &addSessionMetadata{
+			config:   c,
+			logger:   logger,
+			db:       db,
+			provider: p,
+		}, nil
+	case "procfs":
+		p, err := procfs_provider.NewProvider(ctx, logger, db, reader, c.PidField)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create ebpf provider: %w", err)
 		}
