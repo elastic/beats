@@ -20,10 +20,14 @@ package instance_test
 import (
 	"encoding/json"
 	"flag"
+	"fmt"
 	"net/http"
+	"os"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
@@ -77,9 +81,10 @@ func (mb mockbeat) Stop() {
 }
 
 func TestMonitoringNameFromConfig(t *testing.T) {
+	initDone := make(chan struct{})
 	mockBeat := mockbeat{
 		done:     make(chan struct{}),
-		initDone: make(chan struct{}),
+		initDone: initDone,
 	}
 	var wg sync.WaitGroup
 	wg.Add(1)
@@ -87,19 +92,40 @@ func TestMonitoringNameFromConfig(t *testing.T) {
 	// Make sure the beat has stopped before finishing the test
 	t.Cleanup(wg.Wait)
 
+	errCh := make(chan error)
 	go func() {
 		defer wg.Done()
 
 		// Set the configuration file path flag so the beat can read it
-		flag.Set("c", "testdata/mockbeat.yml")
-		instance.Run(mock.Settings, func(_ *beat.Beat, _ *config.C) (beat.Beater, error) {
+		cfgFile := "testdata/mockbeat.yml"
+		if err := os.Chmod(cfgFile, 0o644); err != nil {
+			panic(fmt.Errorf("could not set config file permissions"))
+		}
+		err := flag.Set("c", cfgFile)
+		if err != nil {
+			panic(fmt.Errorf("failed setting beat -c flag: %w", err))
+		}
+		err = instance.Run(mock.Settings, func(_ *beat.Beat, _ *config.C) (beat.Beater, error) {
 			return &mockBeat, nil
 		})
+		if err != nil {
+			panic(fmt.Errorf("failed starting beat: %w", err))
+		}
 	}()
 
 	t.Cleanup(func() {
 		mockBeat.Stop()
 	})
+
+	timeout := 1 * time.Minute
+	select {
+	case <-initDone:
+		break
+	case err := <-errCh:
+		require.NoErrorf(t, err, "failed to run beat")
+	case <-time.After(timeout):
+		t.Fatalf("timed out waiting beat to start running after %s", timeout)
+	}
 
 	// Make sure the beat is running
 	mockBeat.waitUntilRunning()
