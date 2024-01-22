@@ -21,9 +21,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -71,14 +71,9 @@ func getReplicationInfo(client *mongo.Client) (*oplogInfo, error) {
 	}
 
 	// get first and last items in the oplog
-	firstTs, err := getOpTimestamp(collection, "$natural")
+	firstTs, lastTs, err := getOpTimestamp(collection)
 	if err != nil {
-		return nil, fmt.Errorf("could not get first operation timestamp in op log: %w", err)
-	}
-
-	lastTs, err := getOpTimestamp(collection, "-$natural")
-	if err != nil {
-		return nil, fmt.Errorf("could not get last operation timestamp in op log: %w", err)
+		return nil, fmt.Errorf("could not get operation timestamp in op log: %w", err)
 	}
 
 	diff := lastTs - firstTs
@@ -92,28 +87,29 @@ func getReplicationInfo(client *mongo.Client) (*oplogInfo, error) {
 	}, nil
 }
 
-func getOpTimestamp(collection *mongo.Collection, sort string) (uint32, error) {
-	opt := options.Find().SetSort(bson.D{{Key: sort, Value: 1}})
-	cursor, err := collection.Find(context.Background(), bson.D{}, opt)
-	if err != nil {
-		return 0, fmt.Errorf("could not get cursor on collection '%s': %w", collection.Name(), err)
+func getOpTimestamp(collection *mongo.Collection) (uint32, uint32, error) {
+
+	// Find both first and last timestamps using $min and $max in a single query
+	tsResult := collection.FindOne(context.Background(), bson.M{},
+		options.FindOne().SetProjection(bson.M{"minTS": bson.M{"$min": "$ts"}, "maxTS": bson.M{"$max": "$ts"}}),
+	)
+	if tsResult.Err() != nil {
+		return 0, 0, fmt.Errorf("could not get operation timestamps in op log: %w", tsResult.Err())
 	}
 
-	if !cursor.Next(context.Background()) {
-		return 0, errors.New("objects not found in local.oplog.rs")
+	var timestamps struct {
+		MinTS time.Time `bson:"minTS"`
+		MaxTS time.Time `bson:"maxTS"`
 	}
 
-	var opTime map[string]interface{}
-	if err = cursor.Decode(&opTime); err != nil {
-		return 0, fmt.Errorf("error decoding response: %w", err)
+	if err := tsResult.Decode(&timestamps); err != nil {
+		return 0, 0, fmt.Errorf("error decoding response for timestamps: %w", err)
 	}
 
-	ts, ok := opTime["ts"].(primitive.Timestamp)
-	if !ok {
-		return 0, errors.New("an expected timestamp was not found")
-	}
+	minTS := uint32(timestamps.MinTS.Unix())
+	maxTS := uint32(timestamps.MaxTS.Unix())
 
-	return ts.T, nil
+	return minTS, maxTS, nil
 }
 
 func contains(s []string, x string) bool {
