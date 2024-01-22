@@ -326,13 +326,13 @@ The name of the file that logs are written to. The default is '{beatname_lc}'.
 ==== `logging.events.files.rotateeverybytes`
 
 The maximum size of a log file. If the limit is reached, a new log file is
-generated. The default size limit is 10485760 (10 MB).
+generated. The default size limit is 5242880 (5 MB).
 
 [float]
 ==== `logging.events.files.keepfiles`
 
 The number of most recent rotated log files to keep on disk. Older files are
-deleted during log rotation. The default value is 7. The `keepfiles` options has
+deleted during log rotation. The default value is 5. The `keepfiles` options has
 to be in the range of 2 to 1024 files.
 
 [float]

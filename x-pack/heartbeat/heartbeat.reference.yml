@@ -1656,10 +1656,10 @@ logging.files:
 
     # Configure log file size limit. If the limit is reached, log file will be
     # automatically rotated.
-    #rotateeverybytes: 10485760 # = 10MB
+    #rotateeverybytes: 5242880 # = 5MB
 
     # Number of rotated log files to keep. The oldest files will be deleted first.
-    #keepfiles: 7
+    #keepfiles: 5
 
     # The permissions mask to apply when rotating log files. The default value is 0600.
     # Must be a valid Unix-style file permissions mask expressed in octal notation.

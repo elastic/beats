@@ -384,8 +384,11 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 
 	// Get the default/current logging configuration
 	// we need some defaults to be populates otherwise Unpack will
-	// fail
+	// fail. We also overwrite some defaults that are specific to the
+	// events logger.
 	eventsLoggerCfg := logp.DefaultConfig(configure.GetEnvironment())
+	eventsLoggerCfg.Files.MaxSize = 5242880 // 5MB
+	eventsLoggerCfg.Files.MaxBackups = 5
 
 	// merge eventsLoggerCfg with b.Config.Logging, so logging.events.* only
 	// overwrites the files block.
