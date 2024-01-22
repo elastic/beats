@@ -14,11 +14,11 @@ import (
 )
 
 func TestReduceTimestampPrecision(t *testing.T) {
-	oneSecond := uint64(time.Second.Nanoseconds())
-	result1 := ReduceTimestampPrecision(oneSecond)
-	require.Equal(t, oneSecond, result1)
+	oneSecond := time.Second.Nanoseconds()
+	result1 := ReduceTimestampPrecision(uint64(oneSecond))
+	require.Equal(t, time.Duration(oneSecond), result1)
 
 	oneSecondWithDelay := oneSecond + 10
-	result2 := ReduceTimestampPrecision(oneSecondWithDelay)
-	require.Equal(t, oneSecond, result2)
+	result2 := ReduceTimestampPrecision(uint64(oneSecondWithDelay))
+	require.Equal(t, time.Duration(oneSecond), result2)
 }

@@ -362,19 +362,20 @@ func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 		ttyType := getTtyType(p.CTty.Major, p.CTty.Minor)
 
 		procBasename := basename(p.Filename)
-		if ttyType == Tty {
+		switch {
+		case ttyType == Tty:
 			db.createEntryLeader(pid, Terminal)
 			db.logger.Debugf("entry_eval %d: entry type is terminal", p.Pids.Tgid)
 			return &pid
-		} else if ttyType == TtyConsole && procBasename == "login" {
+		case ttyType == TtyConsole && procBasename == "login":
 			db.createEntryLeader(pid, EntryConsole)
 			db.logger.Debugf("entry_eval %d: entry type is console", p.Pids.Tgid)
 			return &pid
-		} else if p.Pids.Ppid == 1 {
+		case p.Pids.Ppid == 1:
 			db.createEntryLeader(pid, Init)
 			db.logger.Debugf("entry_eval %d: entry type is init", p.Pids.Tgid)
 			return &pid
-		} else if !isFilteredExecutable(procBasename) {
+		case !isFilteredExecutable(procBasename):
 			if parent, ok := db.processes[p.Pids.Ppid]; ok {
 				parentBasename := basename(parent.Filename)
 				if ttyType == Pts && parentBasename == "ssm-session-worker" {
@@ -392,7 +393,7 @@ func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 					return &pid
 				}
 			}
-		} else {
+		default:
 			db.logger.Debugf("entry_eval %d: is a filtered executable: %s", p.Pids.Tgid, procBasename)
 		}
 	}
