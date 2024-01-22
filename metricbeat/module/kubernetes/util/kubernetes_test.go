@@ -28,6 +28,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
@@ -178,5 +179,9 @@ func (m *mockWatcher) Store() cache.Store {
 }
 
 func (m *mockWatcher) Client() k8s.Interface {
+	return nil
+}
+
+func (m *mockWatcher) CachedObject() runtime.Object {
 	return nil
 }
