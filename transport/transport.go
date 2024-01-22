@@ -18,6 +18,7 @@
 package transport
 
 import (
+	"context"
 	"errors"
 	"net"
 
@@ -26,24 +27,29 @@ import (
 
 type Dialer interface {
 	Dial(network, address string) (net.Conn, error)
+	DialContext(ctx context.Context, network, address string) (net.Conn, error)
 }
 
-type DialerFunc func(network, address string) (net.Conn, error)
+type DialerFunc func(ctx context.Context, network, address string) (net.Conn, error)
 
 var (
 	ErrNotConnected = errors.New("client is not connected")
 )
 
 func (d DialerFunc) Dial(network, address string) (net.Conn, error) {
-	return d(network, address)
+	return d(context.Background(), network, address)
 }
 
-func Dial(c Config, network, address string) (net.Conn, error) {
+func (d DialerFunc) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
+	return d(ctx, network, address)
+}
+
+func DialContext(ctx context.Context, c Config, network, address string) (net.Conn, error) {
 	d, err := MakeDialer(c)
 	if err != nil {
 		return nil, err
 	}
-	return d.Dial(network, address)
+	return d.DialContext(ctx, network, address)
 }
 
 func MakeDialer(c Config) (Dialer, error) {

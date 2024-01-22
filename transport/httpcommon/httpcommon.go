@@ -257,10 +257,8 @@ func (settings *HTTPTransportSettings) httpRoundTripper(
 	opts ...TransportOption,
 ) *http.Transport {
 	t := http.DefaultTransport.(*http.Transport).Clone()
-	t.DialContext = nil
-	t.DialTLSContext = nil
-	t.Dial = dialer.Dial       //nolint:staticcheck // use deprecated function to preserve functionality
-	t.DialTLS = tlsDialer.Dial //nolint:staticcheck // use deprecated function to preserve functionality
+	t.DialContext = dialer.DialContext
+	t.DialTLSContext = tlsDialer.DialContext
 	t.TLSClientConfig = tls.ToConfig()
 	t.ForceAttemptHTTP2 = false
 	t.Proxy = settings.Proxy.ProxyFunc()

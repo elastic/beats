@@ -18,6 +18,7 @@
 package transport
 
 import (
+	"context"
 	"fmt"
 	"net"
 	"strings"
@@ -32,7 +33,7 @@ func NetDialer(timeout time.Duration) Dialer {
 }
 
 func TestNetDialer(d testing.Driver, timeout time.Duration) Dialer {
-	return DialerFunc(func(network, address string) (net.Conn, error) {
+	return DialerFunc(func(ctx context.Context, network, address string) (net.Conn, error) {
 		switch network {
 		case "tcp", "tcp4", "tcp6", "udp", "udp4", "udp6":
 		default:
@@ -55,7 +56,7 @@ func TestNetDialer(d testing.Driver, timeout time.Duration) Dialer {
 
 		// dial via host IP by randomized iteration of known IPs
 		dialer := &net.Dialer{Timeout: timeout}
-		return DialWith(dialer, network, host, addresses, port)
+		return DialWith(ctx, dialer, network, host, addresses, port)
 	})
 }
 
@@ -66,7 +67,7 @@ func UnixDialer(timeout time.Duration, sockFile string) Dialer {
 
 // TestUnixDialer creates a Test Unix Dialer when using domain socket.
 func TestUnixDialer(d testing.Driver, timeout time.Duration, sockFile string) Dialer {
-	return DialerFunc(func(network, address string) (net.Conn, error) {
+	return DialerFunc(func(ctx context.Context, network, address string) (net.Conn, error) {
 		d.Info("connecting using unix domain socket", sockFile)
 		return net.DialTimeout("unix", sockFile, timeout)
 	})

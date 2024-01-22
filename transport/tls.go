@@ -18,6 +18,7 @@
 package transport
 
 import (
+	"context"
 	"crypto/tls"
 	"errors"
 	"fmt"
@@ -44,7 +45,7 @@ func TestTLSDialer(
 	var lastAddress string
 	var m sync.Mutex
 
-	return DialerFunc(func(network, address string) (net.Conn, error) {
+	return DialerFunc(func(ctx context.Context, network, address string) (net.Conn, error) {
 		switch network {
 		case "tcp", "tcp4", "tcp6":
 		default:
@@ -69,18 +70,18 @@ func TestTLSDialer(
 		}
 		m.Unlock()
 
-		return tlsDialWith(d, forward, network, address, timeout, tlsConfig, config)
+		return tlsDialWith(ctx, d, forward, network, address, timeout, tlsConfig, config)
 	})
 }
 
 type DialerH2 interface {
-	Dial(network, address string, cfg *tls.Config) (net.Conn, error)
+	DialContext(ctx context.Context, network, address string, cfg *tls.Config) (net.Conn, error)
 }
 
-type DialerFuncH2 func(network, address string, cfg *tls.Config) (net.Conn, error)
+type DialerFuncH2 func(ctx context.Context, network, address string, cfg *tls.Config) (net.Conn, error)
 
-func (d DialerFuncH2) Dial(network, address string, cfg *tls.Config) (net.Conn, error) {
-	return d(network, address, cfg)
+func (d DialerFuncH2) DialContext(ctx context.Context, network, address string, cfg *tls.Config) (net.Conn, error) {
+	return d(ctx, network, address, cfg)
 }
 
 func TLSDialerH2(forward Dialer, config *tlscommon.TLSConfig, timeout time.Duration) (DialerH2, error) {
@@ -98,7 +99,7 @@ func TestTLSDialerH2(
 	var lastAddress string
 	var m sync.Mutex
 
-	return DialerFuncH2(func(network, address string, cfg *tls.Config) (net.Conn, error) {
+	return DialerFuncH2(func(ctx context.Context, network, address string, cfg *tls.Config) (net.Conn, error) {
 		switch network {
 		case "tcp", "tcp4", "tcp6":
 		default:
@@ -126,11 +127,12 @@ func TestTLSDialerH2(
 		// NextProtos must be set from the passed h2 connection or it will fail
 		tlsConfig.NextProtos = cfg.NextProtos
 
-		return tlsDialWith(d, forward, network, address, timeout, tlsConfig, config)
+		return tlsDialWith(ctx, d, forward, network, address, timeout, tlsConfig, config)
 	}), nil
 }
 
 func tlsDialWith(
+	ctx context.Context,
 	d testing.Driver,
 	dialer Dialer,
 	network, address string,
@@ -138,7 +140,7 @@ func tlsDialWith(
 	tlsConfig *tls.Config,
 	config *tlscommon.TLSConfig,
 ) (net.Conn, error) {
-	socket, err := dialer.Dial(network, address)
+	socket, err := dialer.DialContext(ctx, network, address)
 	if err != nil {
 		return nil, err
 	}

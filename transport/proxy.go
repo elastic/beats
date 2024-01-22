@@ -18,6 +18,7 @@
 package transport
 
 import (
+	"context"
 	"net"
 	"net/url"
 
@@ -68,7 +69,7 @@ func ProxyDialer(log *logp.Logger, config *ProxyConfig, forward Dialer) (Dialer,
 	}
 
 	log.Infof("proxy host: '%s'", url.Host)
-	return DialerFunc(func(network, address string) (net.Conn, error) {
+	return DialerFunc(func(ctx context.Context, network, address string) (net.Conn, error) {
 		var err error
 		var addresses []string
 
@@ -94,6 +95,17 @@ func ProxyDialer(log *logp.Logger, config *ProxyConfig, forward Dialer) (Dialer,
 		if err != nil {
 			return nil, err
 		}
-		return DialWith(dialer, network, host, addresses, port)
+
+		contextDialer, ok := dialer.(Dialer)
+		// This will never be executed because the proxy package always returns
+		// a ContextDialer but they didn't break the interface for backward compatibility.
+		// See golang/go#58376
+		if !ok {
+			contextDialer = DialerFunc(func(ctx context.Context, network, address string) (net.Conn, error) {
+				return dialer.Dial(network, address)
+			})
+		}
+
+		return DialWith(ctx, contextDialer, network, host, addresses, port)
 	}), nil
 }

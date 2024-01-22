@@ -20,6 +20,7 @@
 package dialer
 
 import (
+	"context"
 	"errors"
 	"net"
 	"strings"
@@ -60,10 +61,12 @@ func (t *NpipeDialerBuilder) String() string {
 func (t *NpipeDialerBuilder) Make(timeout time.Duration) (transport.Dialer, error) {
 	to := timeout
 	return transport.DialerFunc(
-		func(_, _ string) (net.Conn, error) {
-			return winio.DialPipe(
+		func(ctx context.Context, _, _ string) (net.Conn, error) {
+			ctx, cancel := context.WithTimeout(ctx, to)
+			defer cancel()
+			return winio.DialPipeContext(
+				ctx,
 				strings.TrimSuffix(npipe.TransformString(t.Path), "/"),
-				&to,
 			)
 		},
 	), nil

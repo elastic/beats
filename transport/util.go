@@ -18,6 +18,7 @@
 package transport
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"net"
@@ -43,6 +44,7 @@ func fullAddress(host string, defaultPort int) string {
 //
 // Use this to select and dial one IP being known for one host name.
 func DialWith(
+	ctx context.Context,
 	dialer Dialer,
 	network, host string,
 	addresses []string,
@@ -52,7 +54,7 @@ func DialWith(
 	case 0:
 		return nil, fmt.Errorf("no route to host %v", host)
 	case 1:
-		return dialer.Dial(network, net.JoinHostPort(addresses[0], port))
+		return dialer.DialContext(ctx, network, net.JoinHostPort(addresses[0], port))
 	}
 
 	// Use randomization on DNS reported addresses combined with timeout and ACKs
@@ -69,7 +71,7 @@ func DialWith(
 	// > "Clients, of course, may reorder this information" - with respect to
 	// > handling order of dns records in a response.forwarded. Really required?
 	for _, i := range rand.Perm(len(addresses)) {
-		c, err = dialer.Dial(network, net.JoinHostPort(addresses[i], port))
+		c, err = dialer.DialContext(ctx, network, net.JoinHostPort(addresses[i], port))
 		if err == nil && c != nil {
 			return c, err
 		}

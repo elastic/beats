@@ -18,12 +18,13 @@
 package transport
 
 import (
+	"context"
 	"net"
 )
 
 func ConnWrapper(d Dialer, w func(net.Conn) net.Conn) Dialer {
-	return DialerFunc(func(network, addr string) (net.Conn, error) {
-		c, err := d.Dial(network, addr)
+	return DialerFunc(func(ctx context.Context, network, addr string) (net.Conn, error) {
+		c, err := d.DialContext(ctx, network, addr)
 		if err != nil {
 			return nil, err
 		}

@@ -18,6 +18,7 @@
 package transport
 
 import (
+	"context"
 	"errors"
 	"io"
 	"net"
@@ -31,9 +32,9 @@ type loggingConn struct {
 }
 
 func LoggingDialer(d Dialer, logger *logp.Logger) Dialer {
-	return DialerFunc(func(network, addr string) (net.Conn, error) {
+	return DialerFunc(func(ctx context.Context, network, addr string) (net.Conn, error) {
 		logger := logger.With("network", network, "address", addr)
-		c, err := d.Dial(network, addr)
+		c, err := d.DialContext(ctx, network, addr)
 		if err != nil {
 			logger.Errorf("Error dialing %v", err)
 			return nil, err
