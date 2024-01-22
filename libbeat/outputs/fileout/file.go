@@ -67,7 +67,9 @@ func makeFileout(
 	logSelector := "file"
 	eventsLogger := logp.NewLogger(logSelector)
 	// Set a new Output so it writes to a different file than `log`
-	eventsLogger = eventsLogger.WithOptions(zap.WrapCore(logp.WithFileOutput(eventsLoggerCfg)))
+	eventsLogger = eventsLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(eventsLoggerCfg)))
+	eventsLogger = eventsLogger.With("logger.type", "sensitive")
+
 	fo := &fileOutput{
 		log:          logp.NewLogger(logSelector),
 		eventsLogger: eventsLogger,
