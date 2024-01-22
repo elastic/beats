@@ -29,6 +29,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/libbeat/processors/actions"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -54,6 +55,7 @@ type kubernetesAnnotator struct {
 	cache               *cache
 	kubernetesAvailable bool
 	initOnce            sync.Once
+	addFieldProcessor   beat.Processor
 }
 
 func init() {
@@ -240,6 +242,16 @@ func (k *kubernetesAnnotator) init(config kubeAnnotatorConfig, cfg *config.C) {
 		// TODO: refactor the above section to a common function to be used by NeWPodEventer too
 		metaGen := metadata.GetPodMetaGen(cfg, watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher, jobWatcher, metaConf)
 
+		if config.AddFields != nil {
+			k.addFieldProcessor, err = actions.CreateAddFields(config.AddFields)
+			if err != nil {
+				k.log.Errorf("Error Initializing add field processor as part of add_kubernetes_metadata processor due to error %+v", err)
+			}
+		} else {
+			//TODO: for debugging, remove or change to Debug
+			k.log.Infof("No config for addFields %+v", *cfg)
+		}
+
 		k.indexers = NewIndexers(config.Indexers, metaGen)
 		k.watcher = watcher
 		k.kubernetesAvailable = true
@@ -341,6 +353,11 @@ func (k *kubernetesAnnotator) Run(event *beat.Event) (*beat.Event, error) {
 	_ = kubeMeta.Delete("kubernetes.container.runtime")
 	_ = kubeMeta.Delete("kubernetes.container.image")
 	event.Fields.DeepUpdate(kubeMeta)
+
+	if k.addFieldProcessor != nil {
+		event, err = k.addFieldProcessor.Run(event)
+		return event, err
+	}
 
 	return event, nil
 }
