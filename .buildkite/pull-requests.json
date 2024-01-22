@@ -105,12 +105,12 @@
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
-            "trigger_comment_regex": "^(?:(?:buildkite\\W+)?(?:test)\\W+(?:libbeat))|^/test libbeat$",
-            "always_trigger_comment_regex": "^(?:(?:buildkite\\W+)?(?:test)\\W+(?:libbeat))|^/test libbeat$",
+            "trigger_comment_regex": "^/test libbeat$|^/test filebeat",
+            "always_trigger_comment_regex": "^/test libbeat$",
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": [  ]
+            "always_require_ci_on_changed": ["^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         },
         {
             "enabled": true,
@@ -121,12 +121,12 @@
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
-            "trigger_comment_regex": "^(?:(?:buildkite\\W+)?(?:test)\\W+(?:packetbeat))|^/test packetbeat$",
-            "always_trigger_comment_regex": "^(?:(?:buildkite\\W+)?(?:test)\\W+(?:packetbeat))|^/test packetbeat$",
+            "trigger_comment_regex": "^/test packetbeat$",
+            "always_trigger_comment_regex": "^/test packetbeat$",
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": [ "^packetbeat/.*", ".buildkite/packetbeat/.*"]
+            "always_require_ci_on_changed": ["^packetbeat/.*", ".buildkite/packetbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         }
     ]
 }
