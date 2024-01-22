@@ -53,7 +53,7 @@ installGoDependencies
 
 withPython $env:SETUP_WIN_PYTHON_VERSION
 
-# withMinGW
+withMinGW
 
 $ErrorActionPreference = "Continue" # set +e
 

@@ -141,5 +141,4 @@ fi
 add_bin_path
 with_go "${GO_VERSION}"
 with_mage
-# with_python "${SETUP_PYTHON_VERSION}"
 with_python

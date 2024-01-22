@@ -4,10 +4,5 @@ source .buildkite/metricbeat/scripts/common.sh
 
 set -euo pipefail
 
-# echo "--- prepare env"
-# add_bin_path
-# with_go ${GO_VERSION}
-# with_mage
-
-echo "--- run crosscompile"
+echo "--- Run Crosscompile"
 make -C metricbeat crosscompile
