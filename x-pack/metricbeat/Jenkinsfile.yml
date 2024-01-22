@@ -36,7 +36,11 @@ stages:
                 - "/test x-pack/metricbeat for aws cloud"
             labels:
                 - "aws"
+<<<<<<< HEAD
         stage: extended
+=======
+   #     stage: extended
+>>>>>>> c23411acc0 (Ignore @tmp directories in test (#37677))
     # Skip test until fixed https://github.com/elastic/beats/issues/36425
     #cloudAWS:
     #    cloud: "mage build test goIntegTest"
