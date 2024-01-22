@@ -178,8 +178,8 @@ Configuration parameters:
  * `node` or `namespace`: Specify labels and annotations filters for the extra metadata coming from node and namespace. By default all labels are included while annotations are not. To change default behaviour `include_labels`, `exclude_labels` and `include_annotations` can be defined. Those settings are useful when storing labels and annotations that require special handling to avoid overloading the storage output.
  Note: wildcards are not supported for those settings.
  The enrichment of `node` or `namespace` metadata can be individually disabled by setting `enabled: false`.
- * `deployment`: If resource is `pod` and it is created from a `deployment`, by default the deployment name is added, this can be disabled by setting `deployment: false`.
- * `cronjob`: If resource is `pod` and it is created from a `cronjob`, by default the cronjob name is added, this can be disabled by setting `cronjob: false`.
+ * `deployment`: If resource is `pod` and it is created from a `deployment`, by default the deployment name isn't added, this can be enabled by setting `deployment: true`.
+ * `cronjob`: If resource is `pod` and it is created from a `cronjob`, by default the cronjob name isn't added, this can be enabled by setting `cronjob: true`.
 +
 Example:
 ["source","yaml",subs="attributes"]
@@ -190,8 +190,8 @@ Example:
         node:
           include_labels: ["nodelabel2"]
           include_annotations: ["nodeannotation1"]
-        deployment: false
-        cronjob: false
+        # deployment: false
+        # cronjob: false
 -------------------------------------------------------------------------------------
 
 `unique`:: (Optional) Defaults to `false`. Marking an autodiscover provider as unique results into
@@ -203,39 +203,148 @@ Example:
   Different Beats that refer to the same leader lease will be competitors in holding the lease
   and only one will be elected as leader each time.
 
-The configuration of templates and conditions is similar to that of the Docker provider. Configuration templates can
-contain variables from the autodiscover event. They can be accessed under data namespace.
+Configuration templates can contain variables from the autodiscover event. These variables can be accessed under the `data`
+namespace, e.g. to access Pod IP: `${data.kubernetes.pod.ip}`.
 
-These are the fields available within config templating. The `kubernetes.*` fields will be available on each emitted event.
+These are the fields available within config templating. The `kubernetes.*` fields will be available on each emitted event:
 
 [float]
 ====== Generic fields:
   * host
-  * port (if exposed)
-  * kubernetes.labels
-  * kubernetes.annotations
 
 [float]
 ====== Pod specific:
-  * kubernetes.container.id
-  * kubernetes.container.image
-  * kubernetes.container.name
-  * kubernetes.namespace
-  * kubernetes.node.name
-  * kubernetes.pod.name
-  * kubernetes.pod.uid
+|===
+|Key |Type |Description
+
+|`port`
+|`string`
+|Pod port. If pod has multiple ports exposed should be used `ports.<port-name>` instead
+
+|`kubernetes.namespace`
+|`string`
+|Namespace, where the Pod is running
+
+|`kubernetes.namespace_uuid`
+|`string`
+|UUID of the Namespace, where the Pod is running
+
+|`kubernetes.namespace_annotations.*`
+|`object`
+|Annotations of the Namespace, where the Pod is running. Annotations should be used in not dedoted format, e.g. `kubernetes.namespace_annotations.app.kubernetes.io/name`
+
+|`kubernetes.pod.name`
+|`string`
+|Name of the Pod
+
+|`kubernetes.pod.uid`
+|`string`
+|UID of the Pod
+
+|`kubernetes.pod.ip`
+|`string`
+|IP of the Pod
+
+|`kubernetes.labels.*`
+|`object`
+|Object of the Pod labels. Labels should be used in not dedoted format, e.g. `kubernetes.labels.app.kubernetes.io/name`
+
+|`kubernetes.annotations.*`
+|`object`
+|Object of the Pod annotations. Annotations should be used in not dedoted format, e.g. `kubernetes.annotations.test.io/test`
+
+|`kubernetes.container.name`
+|`string`
+|Name of the container
+
+|`kubernetes.container.runtime`
+|`string`
+|Runtime of the container
+
+|`kubernetes.container.id`
+|`string`
+|ID of the container
+
+|`kubernetes.container.image`
+|`string`
+|Image of the container
+
+|`kubernetes.node.name`
+|`string`
+|Name of the Node
+
+|`kubernetes.node.uid`
+|`string`
+|UID of the Node
+
+|`kubernetes.node.hostname`
+|`string`
+|Hostname of the Node
+|===
 
 [float]
 ====== Node specific:
-  * kubernetes.node.name
-  * kubernetes.node.uid
+|===
+|Key |Type |Description
+
+|`kubernetes.labels.*`
+|`object`
+|Object of labels of the Node
+
+|`kubernetes.annotations.*`
+|`object`
+|Object of annotations of the Node
+
+|`kubernetes.node.name`
+|`string`
+|Name of the Node
+
+|`kubernetes.node.uid`
+|`string`
+|UID of the Node
+
+|`kubernetes.node.hostname`
+|`string`
+|Hostname of the Node
+|===
 
 [float]
 ====== Service specific:
-  * kubernetes.namespace
-  * kubernetes.service.name
-  * kubernetes.service.uid
-  * kubernetes.annotations
+|===
+|Key |Type |Description
+
+|`port`
+|`string`
+|Service port
+
+|`kubernetes.namespace`
+|`string`
+|Namespace of the Service
+
+|`kubernetes.namespace_uuid`
+|`string`
+|UUID of the Namespace of the Service
+
+|`kubernetes.namespace_annotations.*`
+|`object`
+|Annotations of the Namespace of the Service. Annotations should be used in not dedoted format, e.g. `kubernetes.namespace_annotations.app.kubernetes.io/name`
+
+|`kubernetes.labels.*`
+|`object`
+|Object of the Service labels
+
+|`kubernetes.annotations.*`
+|`object`
+|Object of the Service annotations
+
+|`kubernetes.service.name`
+|`string`
+|Name of the Service
+
+|`kubernetes.service.uid`
+|`string`
+|UID of the Service
+|===
 
 If the `include_annotations` config is added to the provider config, then the list of annotations present in the config
 are added to the event.
