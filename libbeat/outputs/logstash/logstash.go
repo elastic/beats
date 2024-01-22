@@ -41,7 +41,7 @@ func makeLogstash(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *conf.C,
-	eventsLoggerCfg logp.Config,
+	sensitiveLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 	lsConfig, err := readConfig(cfg, beat)
 	if err != nil {

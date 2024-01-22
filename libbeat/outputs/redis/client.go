@@ -49,7 +49,7 @@ type publishFn func(
 
 type client struct {
 	log          *logp.Logger
-	eventsLogger *logp.Logger
+	sensitiveLogger *logp.Logger
 	*transport.Client
 	observer outputs.Observer
 	index    string
@@ -76,17 +76,17 @@ func newClient(
 	pass string,
 	db int, key outil.Selector, dt redisDataType,
 	index string, codec codec.Codec,
-	eventsLoggerCfg logp.Config,
+	sensitiveLoggerCfg logp.Config,
 ) *client {
 	logSelector := "redis"
-	eventsLogger := logp.NewLogger(logSelector)
+	sensitiveLogger := logp.NewLogger(logSelector)
 	// Set a new Output so it writes to a different file than `log`
-	eventsLogger = eventsLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(eventsLoggerCfg)))
-	eventsLogger = eventsLogger.With("logger.type", "sensitive")
+	sensitiveLogger = sensitiveLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(sensitiveLoggerCfg)))
+	sensitiveLogger = sensitiveLogger.With("logger.type", "sensitive")
 
 	return &client{
 		log:          logp.NewLogger(logSelector),
-		eventsLogger: eventsLogger,
+		sensitiveLogger: sensitiveLogger,
 		Client:       tc,
 		observer:     observer,
 		timeout:      timeout,
@@ -237,7 +237,7 @@ func (c *client) publishEventsBulk(conn redis.Conn, command string) publishFn {
 		args := make([]interface{}, 1, len(data)+1)
 		args[0] = dest
 
-		okEvents, args := serializeEvents(c.log, c.eventsLogger, args, 1, data, c.index, c.codec)
+		okEvents, args := serializeEvents(c.log, c.sensitiveLogger, args, 1, data, c.index, c.codec)
 		c.observer.Dropped(len(data) - len(okEvents))
 		if (len(args) - 1) == 0 {
 			return nil, nil
@@ -263,7 +263,7 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 	return func(key outil.Selector, data []publisher.Event) ([]publisher.Event, error) {
 		var okEvents []publisher.Event
 		serialized := make([]interface{}, 0, len(data))
-		okEvents, serialized = serializeEvents(c.log, c.eventsLogger, serialized, 0, data, c.index, c.codec)
+		okEvents, serialized = serializeEvents(c.log, c.sensitiveLogger, serialized, 0, data, c.index, c.codec)
 		c.observer.Dropped(len(data) - len(okEvents))
 		if len(serialized) == 0 {
 			return nil, nil
@@ -318,7 +318,7 @@ func (c *client) publishEventsPipeline(conn redis.Conn, command string) publishF
 
 func serializeEvents(
 	log *logp.Logger,
-	eventsLogger *logp.Logger,
+	sensitiveLogger *logp.Logger,
 	to []interface{},
 	i int,
 	data []publisher.Event,
@@ -331,7 +331,7 @@ func serializeEvents(
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
 			log.Errorf("Encoding event failed with error: %+v. Look for events-data log file to view the event", err)
-			eventsLogger.Debugf("Failed event: %v", d.Content)
+			sensitiveLogger.Debugf("Failed event: %v", d.Content)
 			goto failLoop
 		}
 
@@ -349,7 +349,7 @@ failLoop:
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
 			log.Errorf("Encoding event failed with error: %+v. Look for events-data log file to view the event", err)
-			eventsLogger.Debugf("Failed event: %v", d.Content)
+			sensitiveLogger.Debugf("Failed event: %v", d.Content)
 			i++
 			continue
 		}

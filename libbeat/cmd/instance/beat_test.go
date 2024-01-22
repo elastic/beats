@@ -267,8 +267,8 @@ type outputReloaderMock struct {
 
 func (r *outputReloaderMock) Reload(
 	cfg *reload.ConfigWithMeta,
-	eventsLoggerCfg logp.Config,
-	factory func(o outputs.Observer, cfg config.Namespace, eventsLoggerCfg logp.Config) (outputs.Group, error),
+	sensitiveLoggerCfg logp.Config,
+	factory func(o outputs.Observer, cfg config.Namespace, sensitiveLoggerCfg logp.Config) (outputs.Group, error),
 ) error {
 	r.cfg = cfg
 	return nil

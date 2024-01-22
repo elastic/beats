@@ -201,14 +201,14 @@ processors:
 # log messages, a different log file, only for log entries containing raw events,
 # is used. It will use the same level, selectors and all other configurations
 # from the default logger, but it will have it's own file configuration.
-#logging.events:
+#logging.sensitive:
   #files:
     # Configure the path where the logs are written. The default is the logs directory
     # under the home path (the binary location).
     #path: /var/log/auditbeat
 
     # The name of the files where the logs are written to.
-    #name: auditbeat-events-data
+    #name: auditbeat-sensitive
 
 # ============================= X-Pack Monitoring ==============================
 # Auditbeat can export internal metrics to a central Elasticsearch monitoring

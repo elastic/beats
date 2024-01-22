@@ -42,7 +42,7 @@ import (
 
 type client struct {
 	log          *logp.Logger
-	eventsLogger *logp.Logger
+	sensitiveLogger *logp.Logger
 	observer     outputs.Observer
 	hosts        []string
 	topic        outil.Selector
@@ -83,16 +83,16 @@ func newKafkaClient(
 	headers []header,
 	writer codec.Codec,
 	cfg *sarama.Config,
-	eventsLoggerCfg logp.Config,
+	sensitiveLoggerCfg logp.Config,
 ) (*client, error) {
-	eventsLogger := logp.NewLogger(logSelector)
+	sensitiveLogger := logp.NewLogger(logSelector)
 	// Set a new Output so it writes to a different file than `log`
-	eventsLogger = eventsLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(eventsLoggerCfg)))
-	eventsLogger = eventsLogger.With("logger.type", "sensitive")
+	sensitiveLogger = sensitiveLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(sensitiveLoggerCfg)))
+	sensitiveLogger = sensitiveLogger.With("logger.type", "sensitive")
 
 	c := &client{
 		log:          logp.NewLogger(logSelector),
-		eventsLogger: eventsLogger,
+		sensitiveLogger: sensitiveLogger,
 		observer:     observer,
 		hosts:        hosts,
 		topic:        topic,
@@ -238,7 +238,7 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 	if err != nil {
 		if c.log.IsDebug() {
 			c.log.Debug("failed event logged to events logger file")
-			c.eventsLogger.Debugf("failed event: %v", event)
+			c.sensitiveLogger.Debugf("failed event: %v", event)
 		}
 		return nil, err
 	}

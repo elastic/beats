@@ -1645,14 +1645,14 @@ logging.files:
 
 # Having a different log file for raw events also prevents event data
 # from drowning out the regular log files.
-#logging.events:
+#logging.sensitive:
   #files:
     # Configure the path where the logs are written. The default is the logs directory
     # under the home path (the binary location).
     #path: /var/log/heartbeat
 
     # The name of the files where the logs are written to.
-    #name: heartbeat-events-data
+    #name: heartbeat-sensitive
 
     # Configure log file size limit. If the limit is reached, log file will be
     # automatically rotated.

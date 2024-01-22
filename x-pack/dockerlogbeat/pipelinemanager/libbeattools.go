@@ -70,11 +70,11 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 	// Get the default/current logging configuration
 	// we need some defaults to be populates otherwise Unpack will
 	// fail
-	eventsLoggerCfg := logp.DefaultConfig(configure.GetEnvironment())
+	sensitiveLoggerCfg := logp.DefaultConfig(configure.GetEnvironment())
 
 	// Ensure the default filename is set
-	if eventsLoggerCfg.Files.Name == "" {
-		eventsLoggerCfg.Files.Name = "dockerlogbeat-events-data"
+	if sensitiveLoggerCfg.Files.Name == "" {
+		sensitiveLoggerCfg.Files.Name = "dockerlogbeat-events-data"
 	}
 
 	pipeline, err := pipeline.LoadWithSettings(
@@ -87,7 +87,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 		pipelineCfg,
 		func(stat outputs.Observer) (string, outputs.Group, error) {
 			cfg := config.Output
-			out, err := outputs.Load(idxMgr, info, stat, cfg.Name(), cfg.Config(), eventsLoggerCfg)
+			out, err := outputs.Load(idxMgr, info, stat, cfg.Name(), cfg.Config(), sensitiveLoggerCfg)
 			return cfg.Name(), out, err
 		},
 		settings,

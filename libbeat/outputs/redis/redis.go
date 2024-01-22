@@ -52,7 +52,7 @@ func makeRedis(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
-	eventsLoggerCfg logp.Config,
+	sensitiveLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 
 	if !cfg.HasField("index") {
@@ -163,7 +163,7 @@ func makeRedis(
 		}
 
 		client := newClient(conn, observer, rConfig.Timeout,
-			pass, rConfig.Db, key, dataType, rConfig.Index, enc, eventsLoggerCfg)
+			pass, rConfig.Db, key, dataType, rConfig.Index, enc, sensitiveLoggerCfg)
 		clients[i] = newBackoffClient(client, rConfig.Backoff.Init, rConfig.Backoff.Max)
 	}
 

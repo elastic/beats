@@ -51,7 +51,7 @@ func makeConsole(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
-	eventsLoggerCfg logp.Config,
+	sensitiveLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 	config := defaultConfig
 	err := cfg.Unpack(&config)

@@ -296,7 +296,7 @@ Below are some samples:
 
 ifndef::serverless[]
 [float]
-=== Configuration options for events logger
+=== Configuration options for sensitive logger
 
 Some outputs will log raw events on errors like indexing errors in the
 Elasticsearch output, to prevent logging raw events (that may contain
@@ -309,34 +309,34 @@ Having a different log file for raw events also prevents event data
 from drowning out the regular log files.
 
 IMPORTANT: No matter the default logger output configuration, raw events
-will **always** be logged to a file configured by `logging.events.files`.
+will **always** be logged to a file configured by `logging.sensitive.files`.
 
 [float]
-==== `logging.events.files.path`
+==== `logging.sensitive.files.path`
 
 The directory that log files are written to. The default is the logs path. See
 the <<directory-layout>> section for details.
 
 [float]
-==== `logging.events.files.name`
+==== `logging.sensitive.files.name`
 
-The name of the file that logs are written to. The default is '{beatname_lc}'.
+The name of the file that logs are written to. The default is '{beatname_lc}'-sensitive.
 
 [float]
-==== `logging.events.files.rotateeverybytes`
+==== `logging.sensitive.files.rotateeverybytes`
 
 The maximum size of a log file. If the limit is reached, a new log file is
 generated. The default size limit is 5242880 (5 MB).
 
 [float]
-==== `logging.events.files.keepfiles`
+==== `logging.sensitive.files.keepfiles`
 
 The number of most recent rotated log files to keep on disk. Older files are
 deleted during log rotation. The default value is 5. The `keepfiles` options has
 to be in the range of 2 to 1024 files.
 
 [float]
-==== `logging.events.files.permissions`
+==== `logging.sensitive.files.permissions`
 
 The permissions mask to apply when rotating log files. The default value is
 0600. The `permissions` option must be a valid Unix-style file permissions mask
@@ -354,7 +354,7 @@ Examples:
 * 0600: give read and write access to the file owner, and no access to all others.
 
 [float]
-==== `logging.events.files.interval`
+==== `logging.sensitive.files.interval`
 
 Enable log file rotation on time intervals in addition to size-based rotation.
 Intervals must be at least 1s. Values of 1m, 1h, 24h, 7*24h, 30*24h, and 365*24h
@@ -363,7 +363,7 @@ reported by the local system clock. All other intervals are calculated from the
 unix epoch. Defaults to disabled.
 
 [float]
-==== `logging.events.files.rotateonstartup`
+==== `logging.sensitive.files.rotateonstartup`
 
 If the log file already exists on startup, immediately rotate it and start
 writing to a new file instead of appending to the existing one. Defaults to

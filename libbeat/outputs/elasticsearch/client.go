@@ -56,7 +56,7 @@ type Client struct {
 	NonIndexableAction string
 
 	log          *logp.Logger
-	eventsLogger *logp.Logger
+	sensitiveLogger *logp.Logger
 }
 
 // ClientSettings contains the settings for a client.
@@ -83,7 +83,7 @@ const (
 // NewClient instantiates a new client.
 func NewClient(
 	logger *logp.Logger,
-	eventsLogger *logp.Logger,
+	sensitiveLogger *logp.Logger,
 	s ClientSettings,
 	onConnect *callbacksRegistry,
 ) (*Client, error) {
@@ -144,7 +144,7 @@ func NewClient(
 		NonIndexableAction: s.NonIndexableAction,
 
 		log:          logger,
-		eventsLogger: eventsLogger,
+		sensitiveLogger: sensitiveLogger,
 	}
 
 	return client, nil
@@ -179,7 +179,7 @@ func (client *Client) Clone() *Client {
 
 	c, _ := NewClient(
 		client.log,
-		client.eventsLogger,
+		client.sensitiveLogger,
 		ClientSettings{
 			ConnectionSettings: connection,
 			Index:              client.index,
@@ -438,11 +438,11 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 				if result {
 					stats.nonIndexable++
 					client.log.Errorf("Can't deliver to dead letter index event (status=%v). Look for events-data log file to view the event and cause.", status)
-					client.eventsLogger.Errorf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
+					client.sensitiveLogger.Errorf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
 					// poison pill - this will clog the pipeline if the underlying failure is non transient.
 				} else if client.NonIndexableAction == dead_letter_index {
 					client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Look for events-data log file to view the event and cause.", status)
-					client.eventsLogger.Warnf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
+					client.sensitiveLogger.Warnf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
 					if data[i].Content.Meta == nil {
 						data[i].Content.Meta = mapstr.M{
 							dead_letter_marker_field: true,
@@ -458,7 +458,7 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 				} else { // drop
 					stats.nonIndexable++
 					client.log.Warnf("Cannot index event (status=%v): dropping event! Look for events-data log file to view the event and cause.", status)
-					client.eventsLogger.Warnf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
+					client.sensitiveLogger.Warnf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
 					continue
 				}
 			}

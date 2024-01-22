@@ -40,13 +40,13 @@ func makeES(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
-	eventsLoggerCfg logp.Config,
+	sensitiveLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 	log := logp.NewLogger(logSelector)
-	eventsLogger := logp.NewLogger(logSelector)
+	sensitiveLogger := logp.NewLogger(logSelector)
 	// Set a new Output so it writes to a different file than `log`
-	eventsLogger = eventsLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(eventsLoggerCfg)))
-	eventsLogger = eventsLogger.With("logger.type", "sensitive")
+	sensitiveLogger = sensitiveLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(sensitiveLoggerCfg)))
+	sensitiveLogger = sensitiveLogger.With("logger.type", "sensitive")
 
 	if !cfg.HasField("bulk_max_size") {
 		if err := cfg.SetInt("bulk_max_size", -1, defaultBulkSize); err != nil {
@@ -120,7 +120,7 @@ func makeES(
 		var client outputs.NetworkClient
 		client, err = NewClient(
 			log,
-			eventsLogger,
+			sensitiveLogger,
 			ClientSettings{
 				ConnectionSettings: eslegclient.ConnectionSettings{
 					URL:              esURL,

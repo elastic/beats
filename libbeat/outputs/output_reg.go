@@ -34,7 +34,7 @@ type Factory func(
 	beat beat.Info,
 	stats Observer,
 	cfg *config.C,
-	eventsLogger logp.Config) (Group, error)
+	sensitiveLoggerCfg logp.Config) (Group, error)
 
 // IndexManager provides additional index related services to the outputs.
 type IndexManager interface {
@@ -83,7 +83,7 @@ func Load(
 	stats Observer,
 	name string,
 	config *config.C,
-	eventsLoggerCfg logp.Config,
+	sensitiveLoggerCfg logp.Config,
 ) (Group, error) {
 	factory := FindFactory(name)
 	if factory == nil {
@@ -93,5 +93,5 @@ func Load(
 	if stats == nil {
 		stats = NewNilObserver()
 	}
-	return factory(im, info, stats, config, eventsLoggerCfg)
+	return factory(im, info, stats, config, sensitiveLoggerCfg)
 }

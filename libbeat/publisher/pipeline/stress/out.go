@@ -56,7 +56,7 @@ func init() {
 	outputs.RegisterType("test", makeTestOutput)
 }
 
-func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *conf.C, eventsLoggerCfg logp.Config) (outputs.Group, error) {
+func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Observer, cfg *conf.C, sensitiveLoggerCfg logp.Config) (outputs.Group, error) {
 	config := defaultTestOutputConfig
 	if err := cfg.Unpack(&config); err != nil {
 		return outputs.Fail(err)

@@ -40,7 +40,7 @@ func init() {
 
 type fileOutput struct {
 	log          *logp.Logger
-	eventsLogger *logp.Logger
+	sensitiveLogger *logp.Logger
 	filePath     string
 	beat         beat.Info
 	observer     outputs.Observer
@@ -54,7 +54,7 @@ func makeFileout(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *c.C,
-	eventsLoggerCfg logp.Config,
+	sensitiveLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 	foConfig := defaultConfig()
 	if err := cfg.Unpack(&foConfig); err != nil {
@@ -65,14 +65,14 @@ func makeFileout(
 	_ = cfg.SetInt("bulk_max_size", -1, -1)
 
 	logSelector := "file"
-	eventsLogger := logp.NewLogger(logSelector)
+	sensitiveLogger := logp.NewLogger(logSelector)
 	// Set a new Output so it writes to a different file than `log`
-	eventsLogger = eventsLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(eventsLoggerCfg)))
-	eventsLogger = eventsLogger.With("logger.type", "sensitive")
+	sensitiveLogger = sensitiveLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(sensitiveLoggerCfg)))
+	sensitiveLogger = sensitiveLogger.With("logger.type", "sensitive")
 
 	fo := &fileOutput{
 		log:          logp.NewLogger(logSelector),
-		eventsLogger: eventsLogger,
+		sensitiveLogger: sensitiveLogger,
 		beat:         beat,
 		observer:     observer,
 	}
@@ -143,7 +143,7 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 				out.log.Warnf("Failed to serialize the event: %+v", err)
 			}
 			out.log.Debug("Event logged to events-data log file")
-			out.eventsLogger.Debugf("Failed event: %v", event)
+			out.sensitiveLogger.Debugf("Failed event: %v", event)
 
 			dropped++
 			continue

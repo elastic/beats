@@ -426,12 +426,12 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 	// Creates the events logger configuration for testing,
 	// it uses the default one but logs to stderr instead of a file.
 	// This prevents the test to leave log files behind.
-	eventsLoggerCfg := logp.DefaultConfig(logp.DefaultEnvironment)
-	eventsLoggerCfg.Level = logp.DebugLevel
-	eventsLoggerCfg.ToStderr = true
-	eventsLoggerCfg.ToFiles = false
+	sensitiveLoggerCfg := logp.DefaultConfig(logp.DefaultEnvironment)
+	sensitiveLoggerCfg.Level = logp.DebugLevel
+	sensitiveLoggerCfg.ToStderr = true
+	sensitiveLoggerCfg.ToFiles = false
 
-	output, err := makeES(im, info, stats, config, eventsLoggerCfg)
+	output, err := makeES(im, info, stats, config, sensitiveLoggerCfg)
 	if err != nil {
 		t.Fatal(err)
 	}

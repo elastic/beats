@@ -92,7 +92,7 @@ func makeShipper(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *conf.C,
-	eventsLoggerCfg logp.Config,
+	sensitiveLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 
 	config := defaultConfig()
