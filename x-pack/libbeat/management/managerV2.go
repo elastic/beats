@@ -229,6 +229,10 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 // ================================
 
 func (cm *BeatV2Manager) AgentInfo() client.AgentInfo {
+	if cm.client.AgentInfo() == nil {
+		return client.AgentInfo{}
+	}
+
 	return *cm.client.AgentInfo()
 }
 
