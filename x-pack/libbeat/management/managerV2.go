@@ -229,6 +229,8 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 // ================================
 
 func (cm *BeatV2Manager) AgentInfo() client.AgentInfo {
+	// on normal/production flow this should not happen. However, it was panicking
+	// on some integration tests.
 	if cm.client.AgentInfo() == nil {
 		return client.AgentInfo{}
 	}
