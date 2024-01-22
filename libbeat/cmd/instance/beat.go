@@ -18,7 +18,6 @@
 package instance
 
 import (
-	"bytes"
 	"context"
 	cryptRand "crypto/rand"
 	"encoding/json"
@@ -32,7 +31,6 @@ import (
 	"net"
 	"os"
 	"os/user"
-	"path/filepath"
 	"runtime"
 	"runtime/debug"
 	"strconv"
@@ -404,11 +402,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		sensitiveLoggerCfg.Files.Name = sensitiveLoggerCfg.Files.Name + "-events-data"
 	}
 
-	// Now that the events logger is configured, we can register it's diagnostic
-	// hook
-	b.Manager.RegisterDiagnosticHook("events log",
-		"log files containing raw events", "events_log.ndjson",
-		"application/x-ndjson", b.eventsLogDiagnosticsHook(sensitiveLoggerCfg))
 	outputFactory := b.makeOutputFactory(b.Config.Output, sensitiveLoggerCfg)
 	settings := pipeline.Settings{
 		Processors:     b.processors,
@@ -432,44 +425,6 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	}
 
 	return beater, nil
-}
-
-func (b *Beat) eventsLogDiagnosticsHook(logCfg logp.Config) func() []byte {
-	// Setup a no-op function to return in case of an error
-	data := []byte{}
-	fn := func() []byte {
-		return data
-	}
-
-	glob := fmt.Sprintf("%s*.ndjson",
-		paths.Resolve(
-			paths.Logs,
-			filepath.Join(
-				logCfg.Files.Path,
-				logCfg.LogFilename(),
-			)))
-
-	files, err := filepath.Glob(glob)
-	if err != nil {
-		logp.Warn("could not get 'event log' files: %s", err)
-		return fn
-	}
-
-	filesData := [][]byte{}
-	fn = func() []byte {
-		return bytes.Join(filesData, []byte{})
-	}
-
-	for _, f := range files {
-		logData, err := os.ReadFile(f)
-		if err != nil {
-			logp.Warn("could not read event log file '%s': %s", f, err)
-			return fn
-		}
-		filesData = append(filesData, logData)
-	}
-
-	return fn
 }
 
 func (b *Beat) launch(settings Settings, bt beat.Creator) error {
