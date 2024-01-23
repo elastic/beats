@@ -356,7 +356,7 @@ spec:
       description: "Beats packetbeat pipeline"
     spec:
 #      branch_configuration: "main 7.17 8.* v7.17 v8.*" TODO: temporarily commented to build PRs from forks
-      pipeline_file: ".buildkite/libbeat/pipeline.packetbeat.yml"
+      pipeline_file: ".buildkite/libbeat/pipeline.libbeat.yml"
 #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
         build_pull_request_forks: false
