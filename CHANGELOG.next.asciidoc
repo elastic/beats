@@ -60,7 +60,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Affecting all Beats*
 
 
-- Upgrade to Go 1.20.12. {pull}37352[37352]
 
 *Auditbeat*
 
@@ -106,6 +105,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
