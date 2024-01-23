@@ -21,6 +21,8 @@ Each event is annotated with:
 
 In addition, the node and namespace metadata are added to the pod metadata.
 
+A custom field can also be annotated to the event using `add_fields`. This field works same as the `add_fields` processor. Refer to <<add-fields>> for additional information.
+
 The `add_kubernetes_metadata` processor has two basic building blocks:
 
 * Indexers
@@ -126,6 +128,17 @@ level. Possible values are `node` and `cluster`. Scope is `node` by default.
 `namespace`:: (Optional) Select the namespace from which to collect the
 metadata. If it is not set, the processor collects metadata from all namespaces.
 It is unset by default.
+`add_fields`:: (Optional) Specify additional fields that will be added to the event. Refer to  <<add-fields>> for configuration parameters.
++
+Example:
+[source,yaml]
+------------------------------------------------------------------------------
+  add_fields:
+    target: project
+    fields:
+      name: myproject
+      id: '574734885120952459'
+------------------------------------------------------------------------------
 `add_resource_metadata`:: (Optional) Specify filters and configuration for the extra metadata, that will be added to the event. Configuration parameters:
  - `node` or `namespace`: Specify labels and annotations filters for the extra metadata coming from node and namespace. By default all labels are included while annotations are not. To change default behaviour `include_labels`, `exclude_labels` and `include_annotations` can be defined. Those settings are useful when storing labels and annotations that require special handling to avoid overloading the storage output.
  Note: wildcards are not supported for those settings.
