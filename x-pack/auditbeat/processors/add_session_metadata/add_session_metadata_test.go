@@ -241,7 +241,9 @@ func TestEnrich(t *testing.T) {
 			config: tt.config,
 		}
 
-		actual, err := s.enrich(&tt.input)
+		// avoid taking address of loop variable
+		i := tt.input
+		actual, err := s.enrich(&i)
 		if tt.expect_error {
 			assert.Error(t, err, "%s: error unexpectedly nil", tt.testName)
 		} else {

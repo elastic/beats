@@ -78,7 +78,7 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 	_, err := ev.GetValue(p.config.PidField)
 	if err != nil {
 		// Do not attempt to enrich events without PID; it's not a supported event
-		return ev, nil
+		return ev, nil //nolint:nilerr // Running on events without PID is expected
 	}
 
 	err = p.provider.UpdateDB(ev)
@@ -117,7 +117,10 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 
 	processMap := fullProcess.ToMap()
 
-	mapstr.MergeFieldsDeep(result.Fields["process"].(mapstr.M), processMap, true)
+	err = mapstr.MergeFieldsDeep(result.Fields["process"].(mapstr.M), processMap, true)
+	if err != nil {
+		return nil, fmt.Errorf("merging enriched fields with event: %w", err)
+	}
 
 	if p.config.ReplaceFields {
 		if err := p.replaceFields(result); err != nil {

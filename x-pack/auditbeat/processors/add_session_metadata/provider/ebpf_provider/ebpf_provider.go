@@ -92,7 +92,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 							CapEffective: body.Creds.CapEffective,
 						},
 					}
-					p.db.InsertFork(pe)
+					if err := p.db.InsertFork(pe); err != nil {
+						p.logger.Errorf("insert fork: %w", err)
+						continue
+					}
 				case ebpfevents.EventTypeProcessExec:
 					body, ok := ev.Body.(*ebpfevents.ProcessExec)
 					if !ok {
@@ -127,7 +130,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 						Env:      deepcopy.Copy(body.Env).(map[string]string),
 						Filename: body.Filename,
 					}
-					p.db.InsertExec(pe)
+					if err := p.db.InsertExec(pe); err != nil {
+						p.logger.Errorf("insert exec: %w", err)
+						continue
+					}
 				case ebpfevents.EventTypeProcessExit:
 					body, ok := ev.Body.(*ebpfevents.ProcessExit)
 					if !ok {
@@ -145,7 +151,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 						},
 						ExitCode: body.ExitCode,
 					}
-					p.db.InsertExit(pe)
+					if err := p.db.InsertExit(pe); err != nil {
+						p.logger.Errorf("insert exit: %w", err)
+						continue
+					}
 				}
 				continue
 			}
