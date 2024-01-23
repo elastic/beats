@@ -95,7 +95,7 @@ steps:
         key: "macos-extended"
 #        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command:
-          - "chgrp staff /tmp"
+#          - "chgrp staff /tmp"
           - ".buildkite/auditbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
@@ -126,14 +126,14 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
 
-#  - group: "Packaging"
-#    key: "packaging"
-#    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-#    depends_on:
-#      - "mandatory-tests"
-#      - "extended-tests"
-#      - "extended-tests-win"
-#
-#    steps:
-#      - label: Package pipeline
-#        commands: ".buildkite/auditbeat/scripts/package-step.sh | buildkite-agent pipeline upload"
+  - group: "Packaging"
+    key: "packaging"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on:
+      - "mandatory-tests"
+      - "extended-tests"
+      - "extended-tests-win"
+
+    steps:
+      - label: Package pipeline
+        commands: ".buildkite/auditbeat/scripts/package-step.sh | buildkite-agent pipeline upload"

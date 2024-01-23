@@ -17,6 +17,8 @@ if are_files_changed "$changeset"; then
         key: "package-linux-x86"
         command:
           - ".buildkite/auditbeat/scripts/package.sh"
+        env:
+          PLATFORMS: "linux/amd64, linux/arm64, windows/amd64, darwin/amd64, darwin/arm64"
         notify:
           - github_commit_status:
               context: "auditbeat/Packaging: Linux X86"
