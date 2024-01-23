@@ -169,6 +169,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add support for user-defined query selection in EntraID entity analytics provider. {pull}37653[37653]
 - Update CEL extensions library to v1.8.0 to provide runtime error location reporting. {issue}37304[37304] {pull}37718[37718]
 - Add request trace logging for chained API requests. {issue}37551[36551] {pull}37682[37682]
+- Relax TCP/UDP metric polling expectations to improve metric collection. {pull}37714[37714]
 
 *Auditbeat*
 

@@ -231,33 +231,52 @@ func (m *inputMetrics) poll(addr, addr6 []string, each time.Duration, log *logp.
 	// base level for the rx_queue and drops values and ensures that
 	// if the constructed address values are malformed we panic early
 	// within the period of system testing.
+	want4 := true
 	rx, drops, err := procNetUDP("/proc/net/udp", addr, hasUnspecified, addrIsUnspecified)
 	if err != nil {
-		log.Warnf("failed to get initial udp stats from /proc: %v", err)
+		want4 = false
+		log.Infof("did not get initial udp stats from /proc: %v", err)
 	}
+	want6 := true
 	rx6, drops6, err := procNetUDP("/proc/net/udp6", addr6, hasUnspecified6, addrIsUnspecified6)
 	if err != nil {
-		log.Warnf("failed to get initial udp6 stats from /proc: %v", err)
+		want6 = false
+		log.Infof("did not get initial udp6 stats from /proc: %v", err)
 	}
-	m.rxQueue.Set(uint64(rx + rx6))
-	m.drops.Set(uint64(drops + drops6))
+	if !want4 && !want6 {
+		log.Warnf("failed to get initial udp or udp6 stats from /proc: %v", err)
+	} else {
+		m.rxQueue.Set(uint64(rx + rx6))
+		m.drops.Set(uint64(drops + drops6))
+	}
 
 	t := time.NewTicker(each)
 	for {
 		select {
 		case <-t.C:
+			var found bool
 			rx, drops, err := procNetUDP("/proc/net/udp", addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
-				log.Warnf("failed to get udp stats from /proc: %v", err)
-				continue
+				if want4 {
+					log.Warnf("failed to get udp stats from /proc: %v", err)
+				}
+			} else {
+				found = true
+				want4 = true
 			}
 			rx6, drops6, err := procNetUDP("/proc/net/udp6", addr6, hasUnspecified6, addrIsUnspecified6)
 			if err != nil {
-				log.Warnf("failed to get udp6 stats from /proc: %v", err)
-				continue
+				if want6 {
+					log.Warnf("failed to get udp6 stats from /proc: %v", err)
+				}
+			} else {
+				found = true
+				want6 = true
 			}
-			m.rxQueue.Set(uint64(rx + rx6))
-			m.drops.Set(uint64(drops + drops6))
+			if found {
+				m.rxQueue.Set(uint64(rx + rx6))
+				m.drops.Set(uint64(drops + drops6))
+			}
 		case <-m.done:
 			t.Stop()
 			return
