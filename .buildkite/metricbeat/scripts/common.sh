@@ -7,6 +7,9 @@ platform_type="$(uname)"
 platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
 pipeline_name="metricbeat"
+DEBIAN_FRONTEND="noninteractive"
+sudo mkdir -p /etc/needrestart
+echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
 
 with_docker_compose() {
   local version=$1
