@@ -28,7 +28,7 @@ func (s *InlineSource) Validate() error {
 }
 
 func (s *InlineSource) Fetch() (err error) {
-	// backwards compatability, skip decoding if the script is already decoded
+	// backwards compatibility, skip decoding if the script is already decoded
 	if strings.Contains(s.Script, "step(") {
 		return nil
 	}
