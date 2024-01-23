@@ -21,6 +21,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
 	"time"
 
 	"github.com/magefile/mage/mg"
@@ -94,6 +96,8 @@ func AssembleDarwinUniversal() error {
 func Package() {
 	start := time.Now()
 	defer func() { fmt.Println("package ran for", time.Since(start)) }()
+
+	log.SetOutput(os.Stdout)
 
 	devtools.UseElasticBeatOSSPackaging()
 	devtools.PackageKibanaDashboardsFromBuildDir()
