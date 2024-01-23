@@ -637,15 +637,16 @@ type TestObserver struct {
 	errTooMany int
 }
 
-func (to *TestObserver) NewBatch(batch int)      { to.batch += batch }
-func (to *TestObserver) Acked(acked int)         { to.acked += acked }
-func (to *TestObserver) Duplicate(duplicate int) { to.duplicate += duplicate }
-func (to *TestObserver) Failed(failed int)       { to.failed += failed }
-func (to *TestObserver) Dropped(dropped int)     { to.dropped += dropped }
-func (to *TestObserver) Cancelled(cancelled int) { to.cancelled += cancelled }
-func (to *TestObserver) Split()                  { to.split++ }
-func (to *TestObserver) WriteError(we error)     { to.writeError = we }
-func (to *TestObserver) WriteBytes(wb int)       { to.writeBytes += wb }
-func (to *TestObserver) ReadError(re error)      { to.readError = re }
-func (to *TestObserver) ReadBytes(rb int)        { to.readBytes += rb }
-func (to *TestObserver) ErrTooMany(err int)      { to.errTooMany = +err }
+func (to *TestObserver) NewBatch(batch int)            { to.batch += batch }
+func (to *TestObserver) Acked(acked int)               { to.acked += acked }
+func (to *TestObserver) ReportLatency(_ time.Duration) {}
+func (to *TestObserver) Duplicate(duplicate int)       { to.duplicate += duplicate }
+func (to *TestObserver) Failed(failed int)             { to.failed += failed }
+func (to *TestObserver) Dropped(dropped int)           { to.dropped += dropped }
+func (to *TestObserver) Cancelled(cancelled int)       { to.cancelled += cancelled }
+func (to *TestObserver) Split()                        { to.split++ }
+func (to *TestObserver) WriteError(we error)           { to.writeError = we }
+func (to *TestObserver) WriteBytes(wb int)             { to.writeBytes += wb }
+func (to *TestObserver) ReadError(re error)            { to.readError = re }
+func (to *TestObserver) ReadBytes(rb int)              { to.readBytes += rb }
+func (to *TestObserver) ErrTooMany(err int)            { to.errTooMany = +err }
