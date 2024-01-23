@@ -6,3 +6,7 @@ echo "Golang version:"
 GO_VERSION=$(cat .go-version)
 export GO_VERSION
 echo "GO_VERSION: ${GO_VERSION}"
+
+export DEBIAN_FRONTEND="noninteractive"
+sudo mkdir -p /etc/needrestart
+echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
