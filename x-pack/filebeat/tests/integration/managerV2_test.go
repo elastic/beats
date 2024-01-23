@@ -369,7 +369,7 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 	logFilePath := filepath.Join(filebeat.TempDir(), "flog.log")
 	generateLogFile(t, logFilePath)
 
-	logLevel := proto.UnitLogLevel_DEBUG
+	logLevel := proto.UnitLogLevel_INFO
 	filestreamInputHealthy := proto.UnitExpected{
 		Id:             "input-unit-healthy",
 		Type:           proto.UnitType_INPUT,
