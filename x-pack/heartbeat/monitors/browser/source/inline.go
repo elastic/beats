@@ -28,7 +28,9 @@ func (s *InlineSource) Validate() error {
 }
 
 func (s *InlineSource) Fetch() (err error) {
-	// backwards compatibility, skip decoding if the script is already decoded
+	// "step(" is a good indicator that the script is already decoded since `(` is
+	// not a valid base64 character. This ensures backwards compatibility with
+	// older inline scripts that are not encoded.
 	if strings.Contains(s.Script, "step(") {
 		return nil
 	}
