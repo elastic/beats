@@ -78,6 +78,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Add support for running encoded synthetics inline journeys which fixes the parsing issue in Heartbeat when JavaScript template literals are used on the journey script. {pull}37699[37699]
 
 *Metricbeat*
 
