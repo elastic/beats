@@ -33,6 +33,23 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
+// Event is the common part of a beats event, the beats and Elastic Agent
+// metadata.
+type Event struct {
+	Metadata struct {
+		Version string `json:"version"`
+	} `json:"@metadata"`
+	ElasticAgent struct {
+		Snapshot bool   `json:"snapshot"`
+		Version  string `json:"version"`
+		Id       string `json:"id"`
+	} `json:"elastic_agent"`
+	Agent struct {
+		Version string `json:"version"`
+		Id      string `json:"id"`
+	} `json:"agent"`
+}
+
 // TestInputReloadUnderElasticAgent will start a Filebeat and cause the input
 // reload issue described on https://github.com/elastic/beats/issues/33653.
 // In short, a new input for a file needs to be started while there are still
@@ -660,21 +677,6 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		require.Equal(t, agentInfo.Id, e.Agent.Id)
 		require.Equal(t, wantVersion, e.Agent.Version)
 	}
-}
-
-type Event struct {
-	Metadata struct {
-		Version string `json:"version"`
-	} `json:"@metadata"`
-	ElasticAgent struct {
-		Snapshot bool   `json:"snapshot"`
-		Version  string `json:"version"`
-		Id       string `json:"id"`
-	} `json:"elastic_agent"`
-	Agent struct {
-		Version string `json:"version"`
-		Id      string `json:"id"`
-	} `json:"agent"`
 }
 
 // generateLogFile generates a log file by appending the current
