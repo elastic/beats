@@ -42,7 +42,7 @@ func TestNewClient(t *testing.T) {
 
 	// This test only works on newer Docker versions (any supported one really)
 	switch c.ClientVersion() {
-	case "1.22":
+	case "1.24":
 		t.Skip("Docker version is too old for this test")
 	case api.DefaultVersion:
 		t.Logf("Using default API version: %s", api.DefaultVersion)
@@ -51,12 +51,12 @@ func TestNewClient(t *testing.T) {
 	}
 
 	// Test we can hardcode version
-	os.Setenv("DOCKER_API_VERSION", "1.22")
+	os.Setenv("DOCKER_API_VERSION", "1.24")
 
 	c, err = NewClient(client.DefaultDockerHost, nil, nil)
 	assert.NoError(t, err)
 	assert.NotNil(t, c)
-	assert.Equal(t, "1.22", c.ClientVersion())
+	assert.Equal(t, "1.24", c.ClientVersion())
 
 	_, err = c.ContainerList(context.Background(), types.ContainerListOptions{})
 	assert.NoError(t, err)
