@@ -89,3 +89,17 @@ are_files_changed() {
     return 1;
   fi
 }
+
+cleanup() {
+  echo "Deleting temporary files..."
+  rm -rf ${BIN}/${TMP_FOLDER}.*
+  echo "Done."
+}
+
+unset_secrets () {
+  for var in $(printenv | sed 's;=.*;;' | sort); do
+    if [[ "$var" == *_SECRET || "$var" == *_TOKEN ]]; then
+      unset "$var"
+    fi
+  done
+}

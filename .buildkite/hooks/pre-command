@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
+
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
   source .buildkite/env-scripts/env.sh
   source .buildkite/env-scripts/util.sh
@@ -26,4 +28,9 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
     echo "Skipped pre-command when running the Upload pipeline"
     exit 0
   fi
+fi
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" && "$BUILDKITE_STEP_KEY" == package* ]]; then
+  export DOCKER_USERNAME_SECRET=$(retry 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
+  export DOCKER_PASSWORD_SECRET=$(retry 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
 fi
