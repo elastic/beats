@@ -23,6 +23,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
@@ -36,6 +37,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
@@ -49,6 +51,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"

@@ -6,6 +6,9 @@ DEBIAN_FRONTEND="noninteractive"
 
 export DEBIAN_FRONTEND
 
+sudo mkdir -p /etc/needrestart
+echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
+
 # Remove this code once beats specific agent is set up
 if [[ $PLATFORM_TYPE == "Linux" ]]; then
   echo ":: Installing libs ::"

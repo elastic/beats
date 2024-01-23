@@ -17,6 +17,8 @@ if are_files_changed "$changeset"; then
     steps:
       - label: ":ubuntu: Packaging Linux X86"
         key: "package-linux-x86"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command:
           - ".buildkite/filebeat/scripts/package.sh"
         notify:
