@@ -25,7 +25,6 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type oplogInfo struct {
@@ -89,25 +88,32 @@ func getReplicationInfo(client *mongo.Client) (*oplogInfo, error) {
 
 func getOpTimestamp(collection *mongo.Collection) (uint32, uint32, error) {
 
-	// Find both first and last timestamps using $min and $max in a single query
-	tsResult := collection.FindOne(context.Background(), bson.M{},
-		options.FindOne().SetProjection(bson.M{"minTS": bson.M{"$min": "$ts"}, "maxTS": bson.M{"$max": "$ts"}}),
-	)
-	if tsResult.Err() != nil {
-		return 0, 0, fmt.Errorf("could not get operation timestamps in op log: %w", tsResult.Err())
+	// Find both first and last timestamps using $min and $max
+	pipeline := bson.A{
+		bson.M{"$group": bson.M{"_id": 1, "minTS": bson.M{"$min": "$ts"}, "maxTS": bson.M{"$max": "$ts"}}},
 	}
 
-	var timestamps struct {
+	cursor, err := collection.Aggregate(context.Background(), pipeline)
+	if err != nil {
+		return 0, 0, fmt.Errorf("could not get operation timestamps in op log: %w", err)
+	}
+	defer cursor.Close(context.Background())
+
+	var result struct {
 		MinTS time.Time `bson:"minTS"`
 		MaxTS time.Time `bson:"maxTS"`
 	}
 
-	if err := tsResult.Decode(&timestamps); err != nil {
-		return 0, 0, fmt.Errorf("error decoding response for timestamps: %w", err)
+	if cursor.Next(context.Background()) {
+		if err := cursor.Decode(&result); err != nil {
+			return 0, 0, fmt.Errorf("error decoding response for timestamps: %w", err)
+		}
+	} else {
+		return 0, 0, errors.New("no documents found in op log")
 	}
 
-	minTS := uint32(timestamps.MinTS.Unix())
-	maxTS := uint32(timestamps.MaxTS.Unix())
+	minTS := uint32(result.MinTS.Unix())
+	maxTS := uint32(result.MaxTS.Unix())
 
 	return minTS, maxTS, nil
 }
