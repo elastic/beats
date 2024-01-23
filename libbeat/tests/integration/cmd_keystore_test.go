@@ -193,7 +193,8 @@ func TestKeystoreAddSecretFromStdin(t *testing.T) {
 	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
 
 	mockbeat.Start("keystore", "add", "key1", "--stdin")
-	fmt.Fprintf(os.Stdin, "pass1")
+	fmt.Fprintf(mockbeat.stdin, "pass1")
+	require.NoError(t, mockbeat.stdin.Close(), "could not close mockbeat stdin")
 	procState, err = mockbeat.Process.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
@@ -209,13 +210,15 @@ func TestKeystoreUpdateForce(t *testing.T) {
 	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
 
 	mockbeat.Start("keystore", "add", "key1", "--stdin")
-	fmt.Fprintf(os.Stdin, "pass1")
+	fmt.Fprintf(mockbeat.stdin, "pass1")
+	require.NoError(t, mockbeat.stdin.Close(), "could not close mockbeat stdin")
 	procState, err = mockbeat.Process.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
 
 	mockbeat.Start("keystore", "add", "key1", "--force", "--stdin")
-	fmt.Fprintf(os.Stdin, "pass2")
+	fmt.Fprintf(mockbeat.stdin, "pass2")
+	require.NoError(t, mockbeat.stdin.Close(), "could not close mockbeat stdin")
 	procState, err = mockbeat.Process.Wait()
 	require.NoError(t, err)
 	require.Equal(t, 0, procState.ExitCode(), "incorrect exit code")
