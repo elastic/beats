@@ -226,8 +226,7 @@ func tlsSetup(t *testing.T) (clientConfig *tls.Config, serverConfig *tlscommon.S
 	serverConfig = &tlscommon.ServerConfig{
 		// NOTE: VerifyCertificate is ineffective unless ClientAuth is set to RequireAndVerifyClientCert.
 		VerificationMode: tlscommon.VerifyCertificate,
-		// Unfortunately ServerConfig uses an unexported type in an exported field.
-		ClientAuth: &clientAuth, // tls.RequireAndVerifyClientCert
+		ClientAuth:       &clientAuth, // tls.RequireAndVerifyClientCert
 		CAs: []string{
 			string(certData.ca.CertPEM(t)),
 		},
