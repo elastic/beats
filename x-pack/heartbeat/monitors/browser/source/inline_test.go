@@ -41,3 +41,39 @@ func TestInlineSourceValidation(t *testing.T) {
 		})
 	}
 }
+
+func TestInlineSourceFetch(t *testing.T) {
+	type testCase struct {
+		name    string
+		source  *InlineSource
+		wantErr bool
+	}
+	testCases := []testCase{
+		{
+			"script w/o encoding",
+			&InlineSource{Script: "step('step', () => {})"},
+			false,
+		},
+		{
+			"encoded script",
+			&InlineSource{Script: "c3RlcChzdGVwLCAoKSA9PiB7fSkK"},
+			false,
+		},
+		{
+			"encoded script error",
+			&InlineSource{Script: "c3RlcChzdwLCAoKSA9PiB7fSkK"},
+			true,
+		},
+	}
+
+	for _, tt := range testCases {
+		t.Run(tt.name, func(t *testing.T) {
+			err := tt.source.Fetch()
+			if tt.wantErr {
+				require.Error(t, err)
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
+}

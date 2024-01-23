@@ -167,22 +167,22 @@ func (sj *SourceJob) jobs() []jobs.Job {
 	ctx := context.WithValue(sj.ctx, synthexec.SynthexecTimeout, sj.browserCfg.Timeout+30*time.Second)
 	sFields := sj.StdFields()
 
-	if isScript {
-		src := sj.browserCfg.Source.Inline.Script
-		j = synthexec.InlineJourneyJob(ctx, src, sj.Params(), sFields, sj.extraArgs(sFields.Origin != "")...)
-	} else {
-		j = func(event *beat.Event) ([]jobs.Job, error) {
-			err := sj.Fetch()
-			if err != nil {
-				return nil, fmt.Errorf("could not fetch for browser source job: %w", err)
-			}
-
-			sj, err := synthexec.ProjectJob(ctx, sj.Workdir(), sj.Params(), sj.FilterJourneys(), sFields, sj.extraArgs(sFields.Origin != "")...)
-			if err != nil {
-				return nil, err
-			}
-			return sj(event)
+	j = func(event *beat.Event) ([]jobs.Job, error) {
+		err := sj.Fetch()
+		if err != nil {
+			return nil, fmt.Errorf("could not fetch for browser source job: %w", err)
 		}
+
+		if isScript {
+			ij := synthexec.InlineJourneyJob(ctx, sj.browserCfg.Source.Inline.Script, sj.Params(), sFields, sj.extraArgs(sFields.Origin != "")...)
+			return ij(event)
+		}
+
+		sj, err := synthexec.ProjectJob(ctx, sj.Workdir(), sj.Params(), sj.FilterJourneys(), sFields, sj.extraArgs(sFields.Origin != "")...)
+		if err != nil {
+			return nil, err
+		}
+		return sj(event)
 	}
 	return []jobs.Job{j}
 }

@@ -6,8 +6,10 @@
 package source
 
 import (
+	"encoding/base64"
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 type InlineSource struct {
@@ -26,6 +28,16 @@ func (s *InlineSource) Validate() error {
 }
 
 func (s *InlineSource) Fetch() (err error) {
+	// backwards compatability, skip decoding if the script is already decoded
+	if strings.Contains(s.Script, "step(") {
+		return nil
+	}
+	// decode the base64 encoded script and replace the original script
+	decodedBytes, err := base64.StdEncoding.DecodeString(s.Script)
+	if err != nil {
+		return fmt.Errorf("could not decode inline script: %w", err)
+	}
+	s.Script = string(decodedBytes)
 	return nil
 }
 
