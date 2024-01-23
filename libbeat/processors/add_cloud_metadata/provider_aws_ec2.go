@@ -59,7 +59,7 @@ var ec2MetadataFetcher = provider{
 
 	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
 		ec2Schema := func(m map[string]interface{}) mapstr.M {
-			cloud := mapstr.M{
+			meta := mapstr.M{
 				"cloud": mapstr.M{
 					"service": mapstr.M{
 						"name": "EC2",
@@ -67,8 +67,8 @@ var ec2MetadataFetcher = provider{
 				},
 			}
 
-			cloud.DeepUpdate(m)
-			return cloud
+			meta.DeepUpdate(m)
+			return meta
 		}
 
 		fetcher, err := newGenericMetadataFetcher(config, "aws", ec2Schema, fetchRawProviderMetadata)

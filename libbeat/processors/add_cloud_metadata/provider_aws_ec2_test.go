@@ -198,6 +198,12 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 				"cloud": mapstr.M{
 					"instance": mapstr.M{"id": instanceIDDoc2},
 				},
+				"orchestrator": mapstr.M{
+					"cluster": mapstr.M{
+						"name": clusterNameValue,
+						"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
+					},
+				},
 			},
 		},
 		{
