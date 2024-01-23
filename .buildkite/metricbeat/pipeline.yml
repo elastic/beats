@@ -8,6 +8,7 @@ env:
   IMAGE_WIN_2016: "family/core-windows-2016"
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
+  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   DOCKER_COMPOSE_VERSION: "1.21.0"
 
 steps:
@@ -75,7 +76,7 @@ steps:
         command: ".buildkite/metricbeat/scripts/unit_tests.sh"
         agents:
           provider: "orka"
-          imagePrefix: "generic-13-ventura-x64"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths: "metricbeat/build/*.*"
 
   - group: "Extended Windowds Tests"
