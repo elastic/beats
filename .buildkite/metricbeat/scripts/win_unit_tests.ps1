@@ -9,9 +9,9 @@ function fixCRLF {
     git reset --quiet --hard
 }
 function withChoco {
-  Write-Host "-- Configure Choco --"
-  $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."
-  Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+    Write-Host "-- Configure Choco --"
+    $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."
+    Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 }
 function withGolang($version) {
     Write-Host "-- Install golang $version --"
@@ -20,15 +20,15 @@ function withGolang($version) {
     go version
 }
 function withPython($version) {
-  Write-Host "-- Install Python $version --"
-  choco install python --version=$version
-  refreshenv
-  python --version
+    Write-Host "-- Install Python $version --"
+    choco install python --version=$version
+    refreshenv
+    python --version
 }
 function withMinGW {
-  Write-Host "-- Install MinGW --"
-  choco install mingw -y
-  refreshenv
+    Write-Host "-- Install MinGW --"
+    choco install mingw -y
+    refreshenv
 }
 function installGoDependencies {
     $installPackages = @(
