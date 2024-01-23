@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+source .buildkite/env-scripts/util.sh
+
 changeset="^auditbeat/
     ^go.mod
     ^pytest.ini
@@ -17,8 +19,6 @@ if are_files_changed "$changeset"; then
         key: "package-linux-x86"
         command:
           - ".buildkite/auditbeat/scripts/package.sh"
-        env:
-          PLATFORMS: "linux/amd64, linux/arm64, windows/amd64, darwin/amd64, darwin/arm64"
         notify:
           - github_commit_status:
               context: "auditbeat/Packaging: Linux X86"
@@ -35,7 +35,7 @@ if are_files_changed "$changeset"; then
           - ".buildkite/auditbeat/scripts/package.sh"
         notify:
           - github_commit_status:
-              context: "auditbeat/Packaging: ARM"
+              context: "auditbeat/Packaging: Linux ARM"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
