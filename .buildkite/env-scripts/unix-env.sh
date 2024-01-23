@@ -6,6 +6,9 @@ source .buildkite/env-scripts/util.sh
 
 DEBIAN_FRONTEND="noninteractive"
 
+sudo mkdir -p /etc/needrestart
+echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
+
 echo ":: PLATFORM TYPE $PLATFORM_TYPE ::"
 
 if [[ $PLATFORM_TYPE == "Linux" ]]; then
