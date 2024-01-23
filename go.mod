@@ -219,7 +219,7 @@ require (
 	github.com/pkg/xattr v0.4.9
 	github.com/sergi/go-diff v1.3.1
 	github.com/shirou/gopsutil/v3 v3.22.10
-	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.7
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.8
 	go.elastic.co/apm/module/apmhttp/v2 v2.4.8
 	go.elastic.co/apm/v2 v2.4.8
 	go.mongodb.org/mongo-driver v1.5.1
