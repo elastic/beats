@@ -160,6 +160,13 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 		}
 	}
 
+	versionInfo := client.VersionInfo{
+		Name:      "beat-v2-client",
+		BuildHash: version.Commit(),
+		Meta: map[string]string{
+			"commit":     version.Commit(),
+			"build_time": version.BuildTime().String(),
+		}}
 	var agentClient client.V2
 	var err error
 	if c.InsecureGRPCURLForTesting != "" && c.Enabled {
@@ -167,18 +174,11 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 		logger.Info("Using INSECURE GRPC connection, this should be only used for testing!")
 		agentClient = client.NewV2(c.InsecureGRPCURLForTesting,
 			"", // Insecure connection for test, no token needed
-			client.VersionInfo{
-				Name: "beat-v2-client-for-testing",
-			}, client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
+			versionInfo,
+			client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 	} else {
 		// Normal Elastic-Agent-Client initialisation
-		agentClient, _, err = client.NewV2FromReader(os.Stdin, client.VersionInfo{
-			Name: "beat-v2-client",
-			Meta: map[string]string{
-				"commit":     version.Commit(),
-				"build_time": version.BuildTime().String(),
-			},
-		})
+		agentClient, _, err = client.NewV2FromReader(os.Stdin, versionInfo)
 		if err != nil {
 			return nil, fmt.Errorf("error reading control config from agent: %w", err)
 		}
