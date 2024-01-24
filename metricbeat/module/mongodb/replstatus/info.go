@@ -110,7 +110,6 @@ func getOpTimestamp(collection *mongo.Collection) (uint32, uint32, error) {
 	if err := cursor.Decode(&result); err != nil {
 	       return 0, 0, fmt.Errorf("error decoding response for timestamps: %w", err)
 	}
-	}
 
 	minTS := uint32(result.MinTS.Unix())
 	maxTS := uint32(result.MaxTS.Unix())
