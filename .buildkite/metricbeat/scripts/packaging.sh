@@ -71,7 +71,7 @@ steps:
 
 YAML
 
-elif
+else
   echo "Nothing has changed or it's not a pull request. Skipping packaging..."
   exit 0
 fi
