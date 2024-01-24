@@ -17,11 +17,13 @@ if are_files_changed "$changeset"; then
     steps:
       - label: ":ubuntu: Packaging Linux X86"
         key: "package-linux-x86"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command:
           - ".buildkite/auditbeat/scripts/package.sh"
         notify:
           - github_commit_status:
-              context: "auditbeat/Packaging: Linux X86"
+              context: "Auditbeat/Packaging: Linux X86"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -35,11 +37,10 @@ if are_files_changed "$changeset"; then
           - ".buildkite/auditbeat/scripts/package.sh"
         notify:
           - github_commit_status:
-              context: "auditbeat/Packaging: Linux ARM"
+              context: "Auditbeat/Packaging: ARM"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
           instanceType: "t4g.large"
 EOF
 fi
-

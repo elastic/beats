@@ -2,9 +2,10 @@
 
 set -euo pipefail
 
-source .buildkite/env-scripts/unix-env.sh
+source .buildkite/env-scripts/linux-env.sh
 
-echo ":: Evaluate Auditbeat Changes ::"
+echo ":: Docker Version ::"
+docker --version
 
 echo ":: Start Packaging ::"
 cd auditbeat
