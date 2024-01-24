@@ -342,10 +342,10 @@ func procNetTCP(path string, addr []string, hasUnspecified bool, addrIsUnspecifi
 			}
 			found = true
 
-			// queue lengths are decimal, e.g.:
+			// queue lengths are hex, e.g.:
 			// - https://elixir.bootlin.com/linux/v6.2.11/source/net/ipv4/tcp_ipv4.c#L2643
 			// - https://elixir.bootlin.com/linux/v6.2.11/source/net/ipv6/tcp_ipv6.c#L1987
-			v, err := strconv.ParseInt(string(r), 10, 64)
+			v, err := strconv.ParseInt(string(r), 16, 64)
 			if err != nil {
 				return 0, fmt.Errorf("failed to parse rx_queue: %w", err)
 			}

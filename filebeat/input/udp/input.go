@@ -340,10 +340,10 @@ func procNetUDP(path string, addr []string, hasUnspecified bool, addrIsUnspecifi
 			}
 			found = true
 
-			// queue lengths and drops are decimal, e.g.:
+			// queue lengths and drops are hex, e.g.:
 			// - https://elixir.bootlin.com/linux/v6.2.11/source/net/ipv4/udp.c#L3110
 			// - https://elixir.bootlin.com/linux/v6.2.11/source/net/ipv6/datagram.c#L1048
-			v, err := strconv.ParseInt(string(r), 10, 64)
+			v, err := strconv.ParseInt(string(r), 16, 64)
 			if err != nil {
 				return 0, 0, fmt.Errorf("failed to parse rx_queue: %w", err)
 			}
