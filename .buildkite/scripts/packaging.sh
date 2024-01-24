@@ -36,7 +36,7 @@ are_paths_changed() {
   fi
 }
 
-if are_paths_changed "${changeset[@]}" && [ "$BUILDKITE_TAG" == "" ] && [ "$BUILDKITE_PULL_REQUEST" != "" ]; then
+if are_paths_changed "${changeset[@]}" ; then
   cat <<- YAML | buildkite-agent pipeline upload
 
 env:

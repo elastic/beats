@@ -55,7 +55,7 @@ steps:
         artifact_paths: "metricbeat/build/*.*"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/metricbeat/scripts/win_unit_tests.ps1"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -97,6 +97,7 @@ steps:
 
   - group: "Packaging"
     key: "packaging"
+    if: build.env("BUILDKITE_TAG") == "" && build.env("BUILDKITE_PULL_REQUEST") != ""
     depends_on:
       - step: "mandatory-tests"
         allow_failure: false
@@ -108,5 +109,6 @@ steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
         command: ".buildkite/scripts/packaging.sh"
+
         agents:
           image: "${GO_AGENT_IMAGE}"
