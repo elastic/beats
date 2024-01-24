@@ -219,7 +219,49 @@ func TestParseAndCreateEvent3164(t *testing.T) {
 				},
 			},
 		},
-
+		"cisco": {
+			data: []byte("<190>589265: Feb 8 18:55:31.306: %SEC-11-IPACCESSLOGP: list 177 denied udp 10.0.0.1(53640) -> 10.100.0.1(15600), 1 packet"),
+			expected: mapstr.M{
+				"event": mapstr.M{
+					"severity": 6,
+				},
+				"event.sequence": 589265,
+				"log": mapstr.M{
+					"source": mapstr.M{
+						"address": "127.0.0.1",
+					},
+				},
+				"message": "%SEC-11-IPACCESSLOGP: list 177 denied udp 10.0.0.1(53640) -> 10.100.0.1(15600), 1 packet",
+				"syslog": mapstr.M{
+					"facility":       23,
+					"facility_label": "local7",
+					"priority":       190,
+					"severity_label": "Informational",
+				},
+			},
+		},
+		"cisco with hostname": {
+			data: []byte("<190>589265: TESTHOST1234: Feb 8 18:55:31.306: %SEC-11-IPACCESSLOGP: list 177 denied udp 10.0.0.1(53640) -> 10.100.0.1(15600), 1 packet"),
+			expected: mapstr.M{
+				"event": mapstr.M{
+					"severity": 6,
+				},
+				"event.sequence": 589265,
+				"log": mapstr.M{
+					"source": mapstr.M{
+						"address": "127.0.0.1",
+					},
+				},
+				"hostname": "TESTHOST1234",
+				"message":  "%SEC-11-IPACCESSLOGP: list 177 denied udp 10.0.0.1(53640) -> 10.100.0.1(15600), 1 packet",
+				"syslog": mapstr.M{
+					"facility":       23,
+					"facility_label": "local7",
+					"priority":       190,
+					"severity_label": "Informational",
+				},
+			},
+		},
 		"invalid data": {
 			data: []byte("invalid"),
 			expected: mapstr.M{

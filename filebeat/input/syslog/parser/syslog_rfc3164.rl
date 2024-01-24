@@ -56,9 +56,13 @@
   syslogprog = program ("[" pid "]")? ":" space;
   message = any+>tok %message;
   msg = syslogprog? message>tok %message;
-  sequence = digit+ ":" space>tok %sequence;
 
-  main := (prio)?(sequence)? (header msg | timestamp space message | message);
+  # Cisco fields.
+  sequence = digit+ >tok %sequence;
+  ciscohostname = [\.\-0-9a-zA-Z]+ >tok %hostname;
+  ciscofields = (sequence ":" space) (ciscohostname ":" space)?;
+
+  main := (prio)?(ciscofields)? (header msg | timestamp space message | message);
   catch_all := message;
 
 }%%

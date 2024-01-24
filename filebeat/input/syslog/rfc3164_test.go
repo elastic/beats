@@ -51,6 +51,25 @@ func TestParserRFC3164Syslog(t *testing.T) {
 			},
 		},
 		{
+			title: "Cisco's syslog with hostname",
+			log:   []byte("<190>589265: TESTHOST1234: Feb 8 18:55:31.306: %SEC-11-IPACCESSLOGP: list 177 denied udp 10.0.0.1(53640) -> 10.100.0.1(15600), 1 packet"),
+			syslog: event{
+				priority:   190,
+				message:    "%SEC-11-IPACCESSLOGP: list 177 denied udp 10.0.0.1(53640) -> 10.100.0.1(15600), 1 packet",
+				hostname:   "TESTHOST1234",
+				program:    "",
+				pid:        -1,
+				month:      2,
+				day:        8,
+				year:       2018,
+				hour:       18,
+				minute:     55,
+				second:     31,
+				nanosecond: 306000000,
+				sequence:   589265,
+			},
+		},
+		{
 			title: "no timezone in date",
 			log:   []byte("<190>2018-06-19 02:13:38 super mon message"),
 			syslog: event{

@@ -294,10 +294,132 @@ func ParserRFC3164(data []byte, event *event) {
 			goto st_case_120
 		case 121:
 			goto st_case_121
-		case 1:
-			goto st_case_1
 		case 122:
 			goto st_case_122
+		case 123:
+			goto st_case_123
+		case 124:
+			goto st_case_124
+		case 125:
+			goto st_case_125
+		case 126:
+			goto st_case_126
+		case 127:
+			goto st_case_127
+		case 128:
+			goto st_case_128
+		case 129:
+			goto st_case_129
+		case 130:
+			goto st_case_130
+		case 131:
+			goto st_case_131
+		case 132:
+			goto st_case_132
+		case 133:
+			goto st_case_133
+		case 134:
+			goto st_case_134
+		case 135:
+			goto st_case_135
+		case 136:
+			goto st_case_136
+		case 137:
+			goto st_case_137
+		case 138:
+			goto st_case_138
+		case 139:
+			goto st_case_139
+		case 140:
+			goto st_case_140
+		case 141:
+			goto st_case_141
+		case 142:
+			goto st_case_142
+		case 143:
+			goto st_case_143
+		case 144:
+			goto st_case_144
+		case 145:
+			goto st_case_145
+		case 146:
+			goto st_case_146
+		case 147:
+			goto st_case_147
+		case 148:
+			goto st_case_148
+		case 149:
+			goto st_case_149
+		case 150:
+			goto st_case_150
+		case 151:
+			goto st_case_151
+		case 152:
+			goto st_case_152
+		case 153:
+			goto st_case_153
+		case 154:
+			goto st_case_154
+		case 155:
+			goto st_case_155
+		case 156:
+			goto st_case_156
+		case 157:
+			goto st_case_157
+		case 158:
+			goto st_case_158
+		case 159:
+			goto st_case_159
+		case 160:
+			goto st_case_160
+		case 161:
+			goto st_case_161
+		case 162:
+			goto st_case_162
+		case 163:
+			goto st_case_163
+		case 164:
+			goto st_case_164
+		case 165:
+			goto st_case_165
+		case 166:
+			goto st_case_166
+		case 167:
+			goto st_case_167
+		case 168:
+			goto st_case_168
+		case 169:
+			goto st_case_169
+		case 170:
+			goto st_case_170
+		case 171:
+			goto st_case_171
+		case 172:
+			goto st_case_172
+		case 173:
+			goto st_case_173
+		case 174:
+			goto st_case_174
+		case 175:
+			goto st_case_175
+		case 176:
+			goto st_case_176
+		case 177:
+			goto st_case_177
+		case 178:
+			goto st_case_178
+		case 179:
+			goto st_case_179
+		case 180:
+			goto st_case_180
+		case 181:
+			goto st_case_181
+		case 182:
+			goto st_case_182
+		case 1:
+			goto st_case_1
+		case 183:
+			goto st_case_183
 		}
 		goto st_out
 	st_case_0:
@@ -337,34 +459,14 @@ func ParserRFC3164(data []byte, event *event) {
 		tok = p
 
 		goto st2
-	tr134:
-		// line-disable-directive parser/common.rl:107
-
-		event.SetSequence(data[tok:p])
-
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st2
 	st2:
 		if (p)++; (p) == (pe) {
 			goto _test_eof2
 		}
 	st_case_2:
-//line rfc3164_parser.go:342
+//line rfc3164_parser.go:454
 		goto st2
 	tr1:
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st3
-	tr135:
-		// line-disable-directive parser/common.rl:107
-
-		event.SetSequence(data[tok:p])
-
 		// line-disable-directive parser/common.rl:3
 
 		tok = p
@@ -375,7 +477,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof3
 		}
 	st_case_3:
-//line rfc3164_parser.go:365
+//line rfc3164_parser.go:467
 		switch data[(p)] {
 		case 65:
 			goto tr4
@@ -404,22 +506,12 @@ func ParserRFC3164(data []byte, event *event) {
 		tok = p
 
 		goto st4
-	tr136:
-		// line-disable-directive parser/common.rl:107
-
-		event.SetSequence(data[tok:p])
-
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st4
 	st4:
 		if (p)++; (p) == (pe) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line rfc3164_parser.go:409
+//line rfc3164_parser.go:501
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st5
 		}
@@ -462,7 +554,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof8
 		}
 	st_case_8:
-//line rfc3164_parser.go:452
+//line rfc3164_parser.go:544
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto tr19
 		}
@@ -478,7 +570,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof9
 		}
 	st_case_9:
-//line rfc3164_parser.go:468
+//line rfc3164_parser.go:560
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st10
 		}
@@ -503,7 +595,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof11
 		}
 	st_case_11:
-//line rfc3164_parser.go:493
+//line rfc3164_parser.go:585
 		if 48 <= data[(p)] && data[(p)] <= 51 {
 			goto tr22
 		}
@@ -519,7 +611,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof12
 		}
 	st_case_12:
-//line rfc3164_parser.go:509
+//line rfc3164_parser.go:601
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st13
 		}
@@ -552,7 +644,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof14
 		}
 	st_case_14:
-//line rfc3164_parser.go:542
+//line rfc3164_parser.go:634
 		if data[(p)] == 50 {
 			goto tr26
 		}
@@ -571,7 +663,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof15
 		}
 	st_case_15:
-//line rfc3164_parser.go:561
+//line rfc3164_parser.go:653
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st16
 		}
@@ -596,7 +688,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof17
 		}
 	st_case_17:
-//line rfc3164_parser.go:586
+//line rfc3164_parser.go:678
 		if 48 <= data[(p)] && data[(p)] <= 53 {
 			goto tr29
 		}
@@ -612,7 +704,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof18
 		}
 	st_case_18:
-//line rfc3164_parser.go:602
+//line rfc3164_parser.go:694
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st19
 		}
@@ -637,7 +729,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof20
 		}
 	st_case_20:
-//line rfc3164_parser.go:627
+//line rfc3164_parser.go:719
 		if 48 <= data[(p)] && data[(p)] <= 53 {
 			goto tr32
 		}
@@ -653,7 +745,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof21
 		}
 	st_case_21:
-//line rfc3164_parser.go:643
+//line rfc3164_parser.go:735
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st22
 		}
@@ -706,7 +798,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof23
 		}
 	st_case_23:
-//line rfc3164_parser.go:696
+//line rfc3164_parser.go:788
 		switch data[(p)] {
 		case 58:
 			goto tr41
@@ -770,7 +862,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof24
 		}
 	st_case_24:
-//line rfc3164_parser.go:756
+//line rfc3164_parser.go:848
 		switch data[(p)] {
 		case 58:
 			goto tr44
@@ -834,7 +926,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof25
 		}
 	st_case_25:
-//line rfc3164_parser.go:816
+//line rfc3164_parser.go:908
 		switch data[(p)] {
 		case 32:
 			goto tr45
@@ -877,7 +969,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof26
 		}
 	st_case_26:
-//line rfc3164_parser.go:859
+//line rfc3164_parser.go:951
 		switch data[(p)] {
 		case 32:
 			goto tr0
@@ -901,7 +993,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof27
 		}
 	st_case_27:
-//line rfc3164_parser.go:883
+//line rfc3164_parser.go:975
 		switch data[(p)] {
 		case 32:
 			goto st2
@@ -927,7 +1019,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof28
 		}
 	st_case_28:
-//line rfc3164_parser.go:909
+//line rfc3164_parser.go:1001
 		switch data[(p)] {
 		case 32:
 			goto st29
@@ -959,7 +1051,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof30
 		}
 	st_case_30:
-//line rfc3164_parser.go:941
+//line rfc3164_parser.go:1033
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto tr52
 		}
@@ -975,7 +1067,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof31
 		}
 	st_case_31:
-//line rfc3164_parser.go:957
+//line rfc3164_parser.go:1049
 		if data[(p)] == 93 {
 			goto tr54
 		}
@@ -994,7 +1086,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof32
 		}
 	st_case_32:
-//line rfc3164_parser.go:976
+//line rfc3164_parser.go:1068
 		if data[(p)] == 58 {
 			goto st33
 		}
@@ -1035,7 +1127,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof34
 		}
 	st_case_34:
-//line rfc3164_parser.go:1015
+//line rfc3164_parser.go:1107
 		switch data[(p)] {
 		case 32:
 			goto st26
@@ -1106,7 +1198,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof35
 		}
 	st_case_35:
-//line rfc3164_parser.go:1082
+//line rfc3164_parser.go:1174
 		switch data[(p)] {
 		case 32:
 			goto tr45
@@ -1177,7 +1269,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof36
 		}
 	st_case_36:
-//line rfc3164_parser.go:1149
+//line rfc3164_parser.go:1241
 		switch data[(p)] {
 		case 58:
 			goto tr57
@@ -1227,7 +1319,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof37
 		}
 	st_case_37:
-//line rfc3164_parser.go:1199
+//line rfc3164_parser.go:1291
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st38
 		}
@@ -1308,7 +1400,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof42
 		}
 	st_case_42:
-//line rfc3164_parser.go:1280
+//line rfc3164_parser.go:1372
 		if data[(p)] == 32 {
 			goto st23
 		}
@@ -1327,7 +1419,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof43
 		}
 	st_case_43:
-//line rfc3164_parser.go:1299
+//line rfc3164_parser.go:1391
 		if data[(p)] == 32 {
 			goto st23
 		}
@@ -1351,7 +1443,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof44
 		}
 	st_case_44:
-//line rfc3164_parser.go:1323
+//line rfc3164_parser.go:1415
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto tr67
 		}
@@ -1367,7 +1459,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof45
 		}
 	st_case_45:
-//line rfc3164_parser.go:1339
+//line rfc3164_parser.go:1431
 		switch data[(p)] {
 		case 32:
 			goto tr68
@@ -1416,7 +1508,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof46
 		}
 	st_case_46:
-//line rfc3164_parser.go:1388
+//line rfc3164_parser.go:1480
 		switch data[(p)] {
 		case 32:
 			goto tr61
@@ -1442,7 +1534,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof47
 		}
 	st_case_47:
-//line rfc3164_parser.go:1414
+//line rfc3164_parser.go:1506
 		if 48 <= data[(p)] && data[(p)] <= 51 {
 			goto st16
 		}
@@ -1453,22 +1545,12 @@ func ParserRFC3164(data []byte, event *event) {
 		tok = p
 
 		goto st48
-	tr137:
-		// line-disable-directive parser/common.rl:107
-
-		event.SetSequence(data[tok:p])
-
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st48
 	st48:
 		if (p)++; (p) == (pe) {
 			goto _test_eof48
 		}
 	st_case_48:
-//line rfc3164_parser.go:1440
+//line rfc3164_parser.go:1522
 		switch data[(p)] {
 		case 112:
 			goto st49
@@ -1511,7 +1593,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof51
 		}
 	st_case_51:
-//line rfc3164_parser.go:1483
+//line rfc3164_parser.go:1565
 		switch data[(p)] {
 		case 32:
 			goto st52
@@ -1553,7 +1635,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof53
 		}
 	st_case_53:
-//line rfc3164_parser.go:1525
+//line rfc3164_parser.go:1607
 		if data[(p)] == 32 {
 			goto tr84
 		}
@@ -1572,7 +1654,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof54
 		}
 	st_case_54:
-//line rfc3164_parser.go:1544
+//line rfc3164_parser.go:1626
 		if data[(p)] == 50 {
 			goto tr86
 		}
@@ -1591,7 +1673,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof55
 		}
 	st_case_55:
-//line rfc3164_parser.go:1563
+//line rfc3164_parser.go:1645
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st56
 		}
@@ -1616,7 +1698,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof57
 		}
 	st_case_57:
-//line rfc3164_parser.go:1588
+//line rfc3164_parser.go:1670
 		if 48 <= data[(p)] && data[(p)] <= 53 {
 			goto tr89
 		}
@@ -1632,7 +1714,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof58
 		}
 	st_case_58:
-//line rfc3164_parser.go:1604
+//line rfc3164_parser.go:1686
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st59
 		}
@@ -1657,7 +1739,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof60
 		}
 	st_case_60:
-//line rfc3164_parser.go:1629
+//line rfc3164_parser.go:1711
 		if 48 <= data[(p)] && data[(p)] <= 53 {
 			goto tr92
 		}
@@ -1673,7 +1755,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof61
 		}
 	st_case_61:
-//line rfc3164_parser.go:1645
+//line rfc3164_parser.go:1727
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st62
 		}
@@ -1706,7 +1788,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof63
 		}
 	st_case_63:
-//line rfc3164_parser.go:1678
+//line rfc3164_parser.go:1760
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto tr95
 		}
@@ -1722,7 +1804,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof64
 		}
 	st_case_64:
-//line rfc3164_parser.go:1694
+//line rfc3164_parser.go:1776
 		switch data[(p)] {
 		case 32:
 			goto tr68
@@ -1749,7 +1831,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof65
 		}
 	st_case_65:
-//line rfc3164_parser.go:1721
+//line rfc3164_parser.go:1803
 		if 48 <= data[(p)] && data[(p)] <= 51 {
 			goto st56
 		}
@@ -1765,7 +1847,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof66
 		}
 	st_case_66:
-//line rfc3164_parser.go:1737
+//line rfc3164_parser.go:1819
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st53
 		}
@@ -1781,7 +1863,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof67
 		}
 	st_case_67:
-//line rfc3164_parser.go:1753
+//line rfc3164_parser.go:1835
 		if data[(p)] == 32 {
 			goto tr84
 		}
@@ -1805,7 +1887,7 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof68
 		}
 	st_case_68:
-//line rfc3164_parser.go:1777
+//line rfc3164_parser.go:1859
 		if data[(p)] == 32 {
 			goto tr84
 		}
@@ -1887,22 +1969,12 @@ func ParserRFC3164(data []byte, event *event) {
 		tok = p
 
 		goto st75
-	tr138:
-		// line-disable-directive parser/common.rl:107
-
-		event.SetSequence(data[tok:p])
-
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st75
 	st75:
 		if (p)++; (p) == (pe) {
 			goto _test_eof75
 		}
 	st_case_75:
-//line rfc3164_parser.go:1874
+//line rfc3164_parser.go:1946
 		if data[(p)] == 101 {
 			goto st76
 		}
@@ -1973,22 +2045,12 @@ func ParserRFC3164(data []byte, event *event) {
 		tok = p
 
 		goto st82
-	tr139:
-		// line-disable-directive parser/common.rl:107
-
-		event.SetSequence(data[tok:p])
-
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st82
 	st82:
 		if (p)++; (p) == (pe) {
 			goto _test_eof82
 		}
 	st_case_82:
-//line rfc3164_parser.go:1960
+//line rfc3164_parser.go:2022
 		if data[(p)] == 101 {
 			goto st83
 		}
@@ -2059,22 +2121,12 @@ func ParserRFC3164(data []byte, event *event) {
 		tok = p
 
 		goto st89
-	tr140:
-		// line-disable-directive parser/common.rl:107
-
-		event.SetSequence(data[tok:p])
-
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st89
 	st89:
 		if (p)++; (p) == (pe) {
 			goto _test_eof89
 		}
 	st_case_89:
-//line rfc3164_parser.go:2046
+//line rfc3164_parser.go:2098
 		switch data[(p)] {
 		case 97:
 			goto st90
@@ -2154,22 +2206,12 @@ func ParserRFC3164(data []byte, event *event) {
 		tok = p
 
 		goto st95
-	tr141:
-		// line-disable-directive parser/common.rl:107
-
-		event.SetSequence(data[tok:p])
-
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st95
 	st95:
 		if (p)++; (p) == (pe) {
 			goto _test_eof95
 		}
 	st_case_95:
-//line rfc3164_parser.go:2141
+//line rfc3164_parser.go:2183
 		if data[(p)] == 97 {
 			goto st96
 		}
@@ -2221,22 +2263,12 @@ func ParserRFC3164(data []byte, event *event) {
 		tok = p
 
 		goto st99
-	tr142:
-		// line-disable-directive parser/common.rl:107
-
-		event.SetSequence(data[tok:p])
-
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st99
 	st99:
 		if (p)++; (p) == (pe) {
 			goto _test_eof99
 		}
 	st_case_99:
-//line rfc3164_parser.go:2208
+//line rfc3164_parser.go:2240
 		if data[(p)] == 111 {
 			goto st100
 		}
@@ -2256,22 +2288,12 @@ func ParserRFC3164(data []byte, event *event) {
 		tok = p
 
 		goto st101
-	tr143:
-		// line-disable-directive parser/common.rl:107
-
-		event.SetSequence(data[tok:p])
-
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st101
 	st101:
 		if (p)++; (p) == (pe) {
 			goto _test_eof101
 		}
 	st_case_101:
-//line rfc3164_parser.go:2243
+//line rfc3164_parser.go:2265
 		if data[(p)] == 99 {
 			goto st102
 		}
@@ -2306,22 +2328,12 @@ func ParserRFC3164(data []byte, event *event) {
 		tok = p
 
 		goto st104
-	tr144:
-		// line-disable-directive parser/common.rl:107
-
-		event.SetSequence(data[tok:p])
-
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st104
 	st104:
 		if (p)++; (p) == (pe) {
 			goto _test_eof104
 		}
 	st_case_104:
-//line rfc3164_parser.go:2293
+//line rfc3164_parser.go:2305
 		if data[(p)] == 101 {
 			goto st105
 		}
@@ -2370,9 +2382,9 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof108
 		}
 	st_case_108:
-//line rfc3164_parser.go:2342
+//line rfc3164_parser.go:2354
 		if data[(p)] == 58 {
-			goto st113
+			goto tr129
 		}
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st109
@@ -2384,7 +2396,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 	st_case_109:
 		if data[(p)] == 58 {
-			goto st113
+			goto tr129
 		}
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st110
@@ -2396,7 +2408,7 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 	st_case_110:
 		if data[(p)] == 58 {
-			goto st113
+			goto tr129
 		}
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st111
@@ -2411,7 +2423,7 @@ func ParserRFC3164(data []byte, event *event) {
 		case 45:
 			goto tr18
 		case 58:
-			goto st113
+			goto tr129
 		}
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st112
@@ -2423,41 +2435,43 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 	st_case_112:
 		if data[(p)] == 58 {
-			goto st113
+			goto tr129
 		}
 		if 48 <= data[(p)] && data[(p)] <= 57 {
 			goto st112
 		}
 		goto st2
+	tr129:
+		// line-disable-directive parser/common.rl:107
+
+		event.SetSequence(data[tok:p])
+
+		goto st113
 	st113:
 		if (p)++; (p) == (pe) {
 			goto _test_eof113
 		}
 	st_case_113:
+//line rfc3164_parser.go:2424
 		if data[(p)] == 32 {
-			goto tr133
+			goto st114
 		}
 		if 9 <= data[(p)] && data[(p)] <= 13 {
-			goto tr133
+			goto st114
 		}
 		goto st2
-	tr133:
-		// line-disable-directive parser/common.rl:3
-
-		tok = p
-
-		goto st114
 	st114:
 		if (p)++; (p) == (pe) {
 			goto _test_eof114
 		}
 	st_case_114:
-//line rfc3164_parser.go:2424
 		switch data[(p)] {
 		case 32:
-			goto tr135
+			goto tr1
 		case 42:
-			goto tr135
+			goto tr1
+		case 45:
+			goto tr134
 		case 46:
 			goto tr135
 		case 65:
@@ -2477,11 +2491,20 @@ func ParserRFC3164(data []byte, event *event) {
 		case 83:
 			goto tr144
 		}
-		if 48 <= data[(p)] && data[(p)] <= 57 {
-			goto tr136
+		switch {
+		case data[(p)] < 66:
+			if 48 <= data[(p)] && data[(p)] <= 57 {
+				goto tr136
+			}
+		case data[(p)] > 90:
+			if 97 <= data[(p)] && data[(p)] <= 122 {
+				goto tr134
+			}
+		default:
+			goto tr134
 		}
-		goto tr134
-	tr3:
+		goto tr0
+	tr134:
 		// line-disable-directive parser/common.rl:3
 
 		tok = p
@@ -2492,15 +2515,32 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof115
 		}
 	st_case_115:
-//line rfc3164_parser.go:2464
-		if 48 <= data[(p)] && data[(p)] <= 57 {
-			goto tr145
+//line rfc3164_parser.go:2487
+		if data[(p)] == 58 {
+			goto tr146
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
 		}
 		goto st2
-	tr145:
-		// line-disable-directive parser/common.rl:3
+	tr146:
+		// line-disable-directive parser/common.rl:91
 
-		tok = p
+		event.SetHostname(data[tok:p])
 
 		goto st116
 	st116:
@@ -2508,11 +2548,11 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof116
 		}
 	st_case_116:
-//line rfc3164_parser.go:2480
-		if data[(p)] == 62 {
-			goto tr147
+//line rfc3164_parser.go:2520
+		if data[(p)] == 32 {
+			goto st117
 		}
-		if 48 <= data[(p)] && data[(p)] <= 57 {
+		if 9 <= data[(p)] && data[(p)] <= 13 {
 			goto st117
 		}
 		goto st2
@@ -2521,34 +2561,114 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof117
 		}
 	st_case_117:
-		if data[(p)] == 62 {
-			goto tr147
+		switch data[(p)] {
+		case 32:
+			goto tr1
+		case 42:
+			goto tr1
+		case 46:
+			goto tr1
+		case 65:
+			goto tr4
+		case 68:
+			goto tr5
+		case 70:
+			goto tr6
+		case 74:
+			goto tr7
+		case 77:
+			goto tr8
+		case 78:
+			goto tr9
+		case 79:
+			goto tr10
+		case 83:
+			goto tr11
 		}
 		if 48 <= data[(p)] && data[(p)] <= 57 {
-			goto st118
+			goto tr14
 		}
-		goto st2
+		goto tr0
+	tr135:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st118
 	st118:
 		if (p)++; (p) == (pe) {
 			goto _test_eof118
 		}
 	st_case_118:
-		if data[(p)] == 62 {
-			goto tr147
+//line rfc3164_parser.go:2572
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 65:
+			goto tr137
+		case 68:
+			goto tr138
+		case 70:
+			goto tr139
+		case 74:
+			goto tr140
+		case 77:
+			goto tr141
+		case 78:
+			goto tr142
+		case 79:
+			goto tr143
+		case 83:
+			goto tr144
 		}
-		if 48 <= data[(p)] && data[(p)] <= 57 {
-			goto st119
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 66:
+				goto st115
+			}
+		default:
+			goto tr136
 		}
 		goto st2
+	tr136:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st119
 	st119:
 		if (p)++; (p) == (pe) {
 			goto _test_eof119
 		}
 	st_case_119:
-		if data[(p)] == 62 {
-			goto tr147
+//line rfc3164_parser.go:2622
+		if data[(p)] == 58 {
+			goto tr146
 		}
-		if 48 <= data[(p)] && data[(p)] <= 57 {
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
 			goto st120
 		}
 		goto st2
@@ -2557,22 +2677,1902 @@ func ParserRFC3164(data []byte, event *event) {
 			goto _test_eof120
 		}
 	st_case_120:
-		if data[(p)] == 62 {
-			goto tr147
+		if data[(p)] == 58 {
+			goto tr146
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st121
 		}
 		goto st2
-	tr147:
-		// line-disable-directive parser/common.rl:7
-
-		event.SetPriority(data[tok:p])
-
-		goto st121
 	st121:
 		if (p)++; (p) == (pe) {
 			goto _test_eof121
 		}
 	st_case_121:
-//line rfc3164_parser.go:2544
+		if data[(p)] == 58 {
+			goto tr146
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st122
+		}
+		goto st2
+	st122:
+		if (p)++; (p) == (pe) {
+			goto _test_eof122
+		}
+	st_case_122:
+		switch data[(p)] {
+		case 45:
+			goto tr151
+		case 46:
+			goto st115
+		case 58:
+			goto tr146
+		}
+		switch {
+		case data[(p)] < 65:
+			if 48 <= data[(p)] && data[(p)] <= 57 {
+				goto st115
+			}
+		case data[(p)] > 90:
+			if 97 <= data[(p)] && data[(p)] <= 122 {
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr151:
+		// line-disable-directive parser/common.rl:19
+
+		event.SetYear(data[tok:p])
+
+		goto st123
+	st123:
+		if (p)++; (p) == (pe) {
+			goto _test_eof123
+		}
+	st_case_123:
+//line rfc3164_parser.go:2733
+		if data[(p)] == 58 {
+			goto tr146
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto tr152
+		}
+		goto st2
+	tr152:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st124
+	st124:
+		if (p)++; (p) == (pe) {
+			goto _test_eof124
+		}
+	st_case_124:
+//line rfc3164_parser.go:2766
+		if data[(p)] == 58 {
+			goto tr146
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st125
+		}
+		goto st2
+	st125:
+		if (p)++; (p) == (pe) {
+			goto _test_eof125
+		}
+	st_case_125:
+		switch data[(p)] {
+		case 45:
+			goto tr154
+		case 46:
+			goto st115
+		case 58:
+			goto tr146
+		}
+		switch {
+		case data[(p)] < 65:
+			if 48 <= data[(p)] && data[(p)] <= 57 {
+				goto st115
+			}
+		case data[(p)] > 90:
+			if 97 <= data[(p)] && data[(p)] <= 122 {
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr154:
+		// line-disable-directive parser/common.rl:23
+
+		event.SetMonthNumeric(data[tok:p])
+
+		goto st126
+	st126:
+		if (p)++; (p) == (pe) {
+			goto _test_eof126
+		}
+	st_case_126:
+//line rfc3164_parser.go:2825
+		if data[(p)] == 58 {
+			goto tr146
+		}
+		switch {
+		case data[(p)] < 52:
+			switch {
+			case data[(p)] > 46:
+				if 48 <= data[(p)] && data[(p)] <= 51 {
+					goto tr155
+				}
+			case data[(p)] >= 45:
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr155:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st127
+	st127:
+		if (p)++; (p) == (pe) {
+			goto _test_eof127
+		}
+	st_case_127:
+//line rfc3164_parser.go:2863
+		if data[(p)] == 58 {
+			goto tr146
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st128
+		}
+		goto st2
+	st128:
+		if (p)++; (p) == (pe) {
+			goto _test_eof128
+		}
+	st_case_128:
+		switch data[(p)] {
+		case 32:
+			goto tr24
+		case 58:
+			goto tr146
+		case 84:
+			goto tr157
+		case 116:
+			goto tr157
+		}
+		switch {
+		case data[(p)] < 48:
+			switch {
+			case data[(p)] > 13:
+				if 45 <= data[(p)] && data[(p)] <= 46 {
+					goto st115
+				}
+			case data[(p)] >= 9:
+				goto tr24
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr157:
+		// line-disable-directive parser/common.rl:27
+
+		event.SetDay(data[tok:p])
+
+		goto st129
+	st129:
+		if (p)++; (p) == (pe) {
+			goto _test_eof129
+		}
+	st_case_129:
+//line rfc3164_parser.go:2934
+		switch data[(p)] {
+		case 50:
+			goto tr159
+		case 58:
+			goto tr146
+		}
+		switch {
+		case data[(p)] < 51:
+			switch {
+			case data[(p)] > 46:
+				if 48 <= data[(p)] && data[(p)] <= 49 {
+					goto tr158
+				}
+			case data[(p)] >= 45:
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr158:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st130
+	st130:
+		if (p)++; (p) == (pe) {
+			goto _test_eof130
+		}
+	st_case_130:
+//line rfc3164_parser.go:2975
+		if data[(p)] == 58 {
+			goto tr146
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st131
+		}
+		goto st2
+	st131:
+		if (p)++; (p) == (pe) {
+			goto _test_eof131
+		}
+	st_case_131:
+		if data[(p)] == 58 {
+			goto tr161
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr161:
+		// line-disable-directive parser/common.rl:91
+
+		event.SetHostname(data[tok:p])
+
+		// line-disable-directive parser/common.rl:31
+
+		event.SetHour(data[tok:p])
+
+		goto st132
+	st132:
+		if (p)++; (p) == (pe) {
+			goto _test_eof132
+		}
+	st_case_132:
+//line rfc3164_parser.go:3038
+		if data[(p)] == 32 {
+			goto st117
+		}
+		switch {
+		case data[(p)] > 13:
+			if 48 <= data[(p)] && data[(p)] <= 53 {
+				goto tr29
+			}
+		case data[(p)] >= 9:
+			goto st117
+		}
+		goto st2
+	tr159:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st133
+	st133:
+		if (p)++; (p) == (pe) {
+			goto _test_eof133
+		}
+	st_case_133:
+//line rfc3164_parser.go:3062
+		if data[(p)] == 58 {
+			goto tr146
+		}
+		switch {
+		case data[(p)] < 52:
+			switch {
+			case data[(p)] > 46:
+				if 48 <= data[(p)] && data[(p)] <= 51 {
+					goto st131
+				}
+			case data[(p)] >= 45:
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr137:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st134
+	st134:
+		if (p)++; (p) == (pe) {
+			goto _test_eof134
+		}
+	st_case_134:
+//line rfc3164_parser.go:3100
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 112:
+			goto st135
+		case 117:
+			goto st139
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st135:
+		if (p)++; (p) == (pe) {
+			goto _test_eof135
+		}
+	st_case_135:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 114:
+			goto st136
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st136:
+		if (p)++; (p) == (pe) {
+			goto _test_eof136
+		}
+	st_case_136:
+		switch data[(p)] {
+		case 32:
+			goto tr77
+		case 58:
+			goto tr146
+		case 105:
+			goto st137
+		}
+		switch {
+		case data[(p)] < 48:
+			switch {
+			case data[(p)] > 13:
+				if 45 <= data[(p)] && data[(p)] <= 46 {
+					goto st115
+				}
+			case data[(p)] >= 9:
+				goto tr77
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st137:
+		if (p)++; (p) == (pe) {
+			goto _test_eof137
+		}
+	st_case_137:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 108:
+			goto st138
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st138:
+		if (p)++; (p) == (pe) {
+			goto _test_eof138
+		}
+	st_case_138:
+		switch data[(p)] {
+		case 32:
+			goto tr77
+		case 58:
+			goto tr146
+		}
+		switch {
+		case data[(p)] < 48:
+			switch {
+			case data[(p)] > 13:
+				if 45 <= data[(p)] && data[(p)] <= 46 {
+					goto st115
+				}
+			case data[(p)] >= 9:
+				goto tr77
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st139:
+		if (p)++; (p) == (pe) {
+			goto _test_eof139
+		}
+	st_case_139:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 103:
+			goto st140
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st140:
+		if (p)++; (p) == (pe) {
+			goto _test_eof140
+		}
+	st_case_140:
+		switch data[(p)] {
+		case 32:
+			goto tr77
+		case 58:
+			goto tr146
+		case 117:
+			goto st141
+		}
+		switch {
+		case data[(p)] < 48:
+			switch {
+			case data[(p)] > 13:
+				if 45 <= data[(p)] && data[(p)] <= 46 {
+					goto st115
+				}
+			case data[(p)] >= 9:
+				goto tr77
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st141:
+		if (p)++; (p) == (pe) {
+			goto _test_eof141
+		}
+	st_case_141:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 115:
+			goto st142
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st142:
+		if (p)++; (p) == (pe) {
+			goto _test_eof142
+		}
+	st_case_142:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 116:
+			goto st138
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr138:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st143
+	st143:
+		if (p)++; (p) == (pe) {
+			goto _test_eof143
+		}
+	st_case_143:
+//line rfc3164_parser.go:3389
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 101:
+			goto st144
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st144:
+		if (p)++; (p) == (pe) {
+			goto _test_eof144
+		}
+	st_case_144:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 99:
+			goto st145
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st145:
+		if (p)++; (p) == (pe) {
+			goto _test_eof145
+		}
+	st_case_145:
+		switch data[(p)] {
+		case 32:
+			goto tr77
+		case 58:
+			goto tr146
+		case 101:
+			goto st146
+		}
+		switch {
+		case data[(p)] < 48:
+			switch {
+			case data[(p)] > 13:
+				if 45 <= data[(p)] && data[(p)] <= 46 {
+					goto st115
+				}
+			case data[(p)] >= 9:
+				goto tr77
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st146:
+		if (p)++; (p) == (pe) {
+			goto _test_eof146
+		}
+	st_case_146:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 109:
+			goto st147
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st147:
+		if (p)++; (p) == (pe) {
+			goto _test_eof147
+		}
+	st_case_147:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 98:
+			goto st148
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st148:
+		if (p)++; (p) == (pe) {
+			goto _test_eof148
+		}
+	st_case_148:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 101:
+			goto st149
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st149:
+		if (p)++; (p) == (pe) {
+			goto _test_eof149
+		}
+	st_case_149:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 114:
+			goto st138
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr139:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st150
+	st150:
+		if (p)++; (p) == (pe) {
+			goto _test_eof150
+		}
+	st_case_150:
+//line rfc3164_parser.go:3606
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 101:
+			goto st151
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st151:
+		if (p)++; (p) == (pe) {
+			goto _test_eof151
+		}
+	st_case_151:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 98:
+			goto st152
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st152:
+		if (p)++; (p) == (pe) {
+			goto _test_eof152
+		}
+	st_case_152:
+		switch data[(p)] {
+		case 32:
+			goto tr77
+		case 58:
+			goto tr146
+		case 114:
+			goto st153
+		}
+		switch {
+		case data[(p)] < 48:
+			switch {
+			case data[(p)] > 13:
+				if 45 <= data[(p)] && data[(p)] <= 46 {
+					goto st115
+				}
+			case data[(p)] >= 9:
+				goto tr77
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st153:
+		if (p)++; (p) == (pe) {
+			goto _test_eof153
+		}
+	st_case_153:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 117:
+			goto st154
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st154:
+		if (p)++; (p) == (pe) {
+			goto _test_eof154
+		}
+	st_case_154:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 97:
+			goto st155
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 98 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st155:
+		if (p)++; (p) == (pe) {
+			goto _test_eof155
+		}
+	st_case_155:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 114:
+			goto st156
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st156:
+		if (p)++; (p) == (pe) {
+			goto _test_eof156
+		}
+	st_case_156:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 121:
+			goto st138
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr140:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st157
+	st157:
+		if (p)++; (p) == (pe) {
+			goto _test_eof157
+		}
+	st_case_157:
+//line rfc3164_parser.go:3823
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 97:
+			goto st158
+		case 117:
+			goto st160
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 98 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st158:
+		if (p)++; (p) == (pe) {
+			goto _test_eof158
+		}
+	st_case_158:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 110:
+			goto st159
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st159:
+		if (p)++; (p) == (pe) {
+			goto _test_eof159
+		}
+	st_case_159:
+		switch data[(p)] {
+		case 32:
+			goto tr77
+		case 58:
+			goto tr146
+		case 117:
+			goto st154
+		}
+		switch {
+		case data[(p)] < 48:
+			switch {
+			case data[(p)] > 13:
+				if 45 <= data[(p)] && data[(p)] <= 46 {
+					goto st115
+				}
+			case data[(p)] >= 9:
+				goto tr77
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st160:
+		if (p)++; (p) == (pe) {
+			goto _test_eof160
+		}
+	st_case_160:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 108:
+			goto st161
+		case 110:
+			goto st162
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st161:
+		if (p)++; (p) == (pe) {
+			goto _test_eof161
+		}
+	st_case_161:
+		switch data[(p)] {
+		case 32:
+			goto tr77
+		case 58:
+			goto tr146
+		case 121:
+			goto st138
+		}
+		switch {
+		case data[(p)] < 48:
+			switch {
+			case data[(p)] > 13:
+				if 45 <= data[(p)] && data[(p)] <= 46 {
+					goto st115
+				}
+			case data[(p)] >= 9:
+				goto tr77
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st162:
+		if (p)++; (p) == (pe) {
+			goto _test_eof162
+		}
+	st_case_162:
+		switch data[(p)] {
+		case 32:
+			goto tr77
+		case 58:
+			goto tr146
+		case 101:
+			goto st138
+		}
+		switch {
+		case data[(p)] < 48:
+			switch {
+			case data[(p)] > 13:
+				if 45 <= data[(p)] && data[(p)] <= 46 {
+					goto st115
+				}
+			case data[(p)] >= 9:
+				goto tr77
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr141:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st163
+	st163:
+		if (p)++; (p) == (pe) {
+			goto _test_eof163
+		}
+	st_case_163:
+//line rfc3164_parser.go:4029
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 97:
+			goto st164
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 98 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st164:
+		if (p)++; (p) == (pe) {
+			goto _test_eof164
+		}
+	st_case_164:
+		switch data[(p)] {
+		case 32:
+			goto tr77
+		case 58:
+			goto tr146
+		case 114:
+			goto st165
+		case 121:
+			goto st138
+		}
+		switch {
+		case data[(p)] < 48:
+			switch {
+			case data[(p)] > 13:
+				if 45 <= data[(p)] && data[(p)] <= 46 {
+					goto st115
+				}
+			case data[(p)] >= 9:
+				goto tr77
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st165:
+		if (p)++; (p) == (pe) {
+			goto _test_eof165
+		}
+	st_case_165:
+		switch data[(p)] {
+		case 32:
+			goto tr77
+		case 58:
+			goto tr146
+		case 99:
+			goto st166
+		}
+		switch {
+		case data[(p)] < 48:
+			switch {
+			case data[(p)] > 13:
+				if 45 <= data[(p)] && data[(p)] <= 46 {
+					goto st115
+				}
+			case data[(p)] >= 9:
+				goto tr77
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st166:
+		if (p)++; (p) == (pe) {
+			goto _test_eof166
+		}
+	st_case_166:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 104:
+			goto st138
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr142:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st167
+	st167:
+		if (p)++; (p) == (pe) {
+			goto _test_eof167
+		}
+	st_case_167:
+//line rfc3164_parser.go:4168
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 111:
+			goto st168
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st168:
+		if (p)++; (p) == (pe) {
+			goto _test_eof168
+		}
+	st_case_168:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 118:
+			goto st145
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr143:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st169
+	st169:
+		if (p)++; (p) == (pe) {
+			goto _test_eof169
+		}
+	st_case_169:
+//line rfc3164_parser.go:4233
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 99:
+			goto st170
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st170:
+		if (p)++; (p) == (pe) {
+			goto _test_eof170
+		}
+	st_case_170:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 116:
+			goto st171
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st171:
+		if (p)++; (p) == (pe) {
+			goto _test_eof171
+		}
+	st_case_171:
+		switch data[(p)] {
+		case 32:
+			goto tr77
+		case 58:
+			goto tr146
+		case 111:
+			goto st147
+		}
+		switch {
+		case data[(p)] < 48:
+			switch {
+			case data[(p)] > 13:
+				if 45 <= data[(p)] && data[(p)] <= 46 {
+					goto st115
+				}
+			case data[(p)] >= 9:
+				goto tr77
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr144:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st172
+	st172:
+		if (p)++; (p) == (pe) {
+			goto _test_eof172
+		}
+	st_case_172:
+//line rfc3164_parser.go:4334
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 101:
+			goto st173
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st173:
+		if (p)++; (p) == (pe) {
+			goto _test_eof173
+		}
+	st_case_173:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 112:
+			goto st174
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st174:
+		if (p)++; (p) == (pe) {
+			goto _test_eof174
+		}
+	st_case_174:
+		switch data[(p)] {
+		case 32:
+			goto tr77
+		case 58:
+			goto tr146
+		case 116:
+			goto st175
+		}
+		switch {
+		case data[(p)] < 48:
+			switch {
+			case data[(p)] > 13:
+				if 45 <= data[(p)] && data[(p)] <= 46 {
+					goto st115
+				}
+			case data[(p)] >= 9:
+				goto tr77
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	st175:
+		if (p)++; (p) == (pe) {
+			goto _test_eof175
+		}
+	st_case_175:
+		switch data[(p)] {
+		case 58:
+			goto tr146
+		case 101:
+			goto st146
+		}
+		switch {
+		case data[(p)] < 48:
+			if 45 <= data[(p)] && data[(p)] <= 46 {
+				goto st115
+			}
+		case data[(p)] > 57:
+			switch {
+			case data[(p)] > 90:
+				if 97 <= data[(p)] && data[(p)] <= 122 {
+					goto st115
+				}
+			case data[(p)] >= 65:
+				goto st115
+			}
+		default:
+			goto st115
+		}
+		goto st2
+	tr3:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st176
+	st176:
+		if (p)++; (p) == (pe) {
+			goto _test_eof176
+		}
+	st_case_176:
+//line rfc3164_parser.go:4464
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto tr196
+		}
+		goto st2
+	tr196:
+		// line-disable-directive parser/common.rl:3
+
+		tok = p
+
+		goto st177
+	st177:
+		if (p)++; (p) == (pe) {
+			goto _test_eof177
+		}
+	st_case_177:
+//line rfc3164_parser.go:4480
+		if data[(p)] == 62 {
+			goto tr198
+		}
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st178
+		}
+		goto st2
+	st178:
+		if (p)++; (p) == (pe) {
+			goto _test_eof178
+		}
+	st_case_178:
+		if data[(p)] == 62 {
+			goto tr198
+		}
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st179
+		}
+		goto st2
+	st179:
+		if (p)++; (p) == (pe) {
+			goto _test_eof179
+		}
+	st_case_179:
+		if data[(p)] == 62 {
+			goto tr198
+		}
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st180
+		}
+		goto st2
+	st180:
+		if (p)++; (p) == (pe) {
+			goto _test_eof180
+		}
+	st_case_180:
+		if data[(p)] == 62 {
+			goto tr198
+		}
+		if 48 <= data[(p)] && data[(p)] <= 57 {
+			goto st181
+		}
+		goto st2
+	st181:
+		if (p)++; (p) == (pe) {
+			goto _test_eof181
+		}
+	st_case_181:
+		if data[(p)] == 62 {
+			goto tr198
+		}
+		goto st2
+	tr198:
+		// line-disable-directive parser/common.rl:7
+
+		event.SetPriority(data[tok:p])
+
+		goto st182
+	st182:
+		if (p)++; (p) == (pe) {
+			goto _test_eof182
+		}
+	st_case_182:
+//line rfc3164_parser.go:4544
 		switch data[(p)] {
 		case 32:
 			goto tr1
@@ -2612,14 +4612,14 @@ func ParserRFC3164(data []byte, event *event) {
 
 		tok = p
 
-		goto st122
-	st122:
+		goto st183
+	st183:
 		if (p)++; (p) == (pe) {
-			goto _test_eof122
+			goto _test_eof183
 		}
-	st_case_122:
-//line rfc3164_parser.go:2590
-		goto st122
+	st_case_183:
+//line rfc3164_parser.go:4590
+		goto st183
 	st_out:
 	_test_eof2:
 		cs = 2
@@ -2981,11 +4981,194 @@ func ParserRFC3164(data []byte, event *event) {
 	_test_eof121:
 		cs = 121
 		goto _test_eof
+	_test_eof122:
+		cs = 122
+		goto _test_eof
+	_test_eof123:
+		cs = 123
+		goto _test_eof
+	_test_eof124:
+		cs = 124
+		goto _test_eof
+	_test_eof125:
+		cs = 125
+		goto _test_eof
+	_test_eof126:
+		cs = 126
+		goto _test_eof
+	_test_eof127:
+		cs = 127
+		goto _test_eof
+	_test_eof128:
+		cs = 128
+		goto _test_eof
+	_test_eof129:
+		cs = 129
+		goto _test_eof
+	_test_eof130:
+		cs = 130
+		goto _test_eof
+	_test_eof131:
+		cs = 131
+		goto _test_eof
+	_test_eof132:
+		cs = 132
+		goto _test_eof
+	_test_eof133:
+		cs = 133
+		goto _test_eof
+	_test_eof134:
+		cs = 134
+		goto _test_eof
+	_test_eof135:
+		cs = 135
+		goto _test_eof
+	_test_eof136:
+		cs = 136
+		goto _test_eof
+	_test_eof137:
+		cs = 137
+		goto _test_eof
+	_test_eof138:
+		cs = 138
+		goto _test_eof
+	_test_eof139:
+		cs = 139
+		goto _test_eof
+	_test_eof140:
+		cs = 140
+		goto _test_eof
+	_test_eof141:
+		cs = 141
+		goto _test_eof
+	_test_eof142:
+		cs = 142
+		goto _test_eof
+	_test_eof143:
+		cs = 143
+		goto _test_eof
+	_test_eof144:
+		cs = 144
+		goto _test_eof
+	_test_eof145:
+		cs = 145
+		goto _test_eof
+	_test_eof146:
+		cs = 146
+		goto _test_eof
+	_test_eof147:
+		cs = 147
+		goto _test_eof
+	_test_eof148:
+		cs = 148
+		goto _test_eof
+	_test_eof149:
+		cs = 149
+		goto _test_eof
+	_test_eof150:
+		cs = 150
+		goto _test_eof
+	_test_eof151:
+		cs = 151
+		goto _test_eof
+	_test_eof152:
+		cs = 152
+		goto _test_eof
+	_test_eof153:
+		cs = 153
+		goto _test_eof
+	_test_eof154:
+		cs = 154
+		goto _test_eof
+	_test_eof155:
+		cs = 155
+		goto _test_eof
+	_test_eof156:
+		cs = 156
+		goto _test_eof
+	_test_eof157:
+		cs = 157
+		goto _test_eof
+	_test_eof158:
+		cs = 158
+		goto _test_eof
+	_test_eof159:
+		cs = 159
+		goto _test_eof
+	_test_eof160:
+		cs = 160
+		goto _test_eof
+	_test_eof161:
+		cs = 161
+		goto _test_eof
+	_test_eof162:
+		cs = 162
+		goto _test_eof
+	_test_eof163:
+		cs = 163
+		goto _test_eof
+	_test_eof164:
+		cs = 164
+		goto _test_eof
+	_test_eof165:
+		cs = 165
+		goto _test_eof
+	_test_eof166:
+		cs = 166
+		goto _test_eof
+	_test_eof167:
+		cs = 167
+		goto _test_eof
+	_test_eof168:
+		cs = 168
+		goto _test_eof
+	_test_eof169:
+		cs = 169
+		goto _test_eof
+	_test_eof170:
+		cs = 170
+		goto _test_eof
+	_test_eof171:
+		cs = 171
+		goto _test_eof
+	_test_eof172:
+		cs = 172
+		goto _test_eof
+	_test_eof173:
+		cs = 173
+		goto _test_eof
+	_test_eof174:
+		cs = 174
+		goto _test_eof
+	_test_eof175:
+		cs = 175
+		goto _test_eof
+	_test_eof176:
+		cs = 176
+		goto _test_eof
+	_test_eof177:
+		cs = 177
+		goto _test_eof
+	_test_eof178:
+		cs = 178
+		goto _test_eof
+	_test_eof179:
+		cs = 179
+		goto _test_eof
+	_test_eof180:
+		cs = 180
+		goto _test_eof
+	_test_eof181:
+		cs = 181
+		goto _test_eof
+	_test_eof182:
+		cs = 182
+		goto _test_eof
 	_test_eof1:
 		cs = 1
 		goto _test_eof
-	_test_eof122:
-		cs = 122
+	_test_eof183:
+		cs = 183
 		goto _test_eof
 
 	_test_eof:
@@ -2993,12 +5176,12 @@ func ParserRFC3164(data []byte, event *event) {
 		}
 		if (p) == eof {
 			switch cs {
-			case 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122:
+			case 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183:
 				// line-disable-directive parser/common.rl:11
 
 				event.SetMessage(data[tok:p])
 
-//line rfc3164_parser.go:2724
+//line rfc3164_parser.go:4785
 			}
 		}
 
