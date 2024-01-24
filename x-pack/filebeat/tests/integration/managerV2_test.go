@@ -21,12 +21,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	protobuf "google.golang.org/protobuf/proto"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/testing/certutil"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
@@ -584,16 +586,18 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 			},
 		},
 	}
-	agentInfo := proto.AgentInfo{
+	wantAgentInfo := proto.AgentInfo{
 		Id:       "agent-id",
 		Version:  wantVersion,
 		Snapshot: true,
 	}
 
+	observedCh := make(chan *proto.CheckinObserved, 5)
 	server := &mock.StubServerV2{
 		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			observedCh <- observed
 			return &proto.CheckinExpected{
-				AgentInfo: &agentInfo,
+				AgentInfo: &wantAgentInfo,
 				Units:     units,
 			}
 		},
@@ -636,11 +640,20 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		PeerCert:   beatCertPem,
 		PeerKey:    beatPrivKeyPem,
 		Services:   []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2},
-		AgentInfo:  &agentInfo,
+		AgentInfo:  &wantAgentInfo,
 	}
 	writeStartUpInfo(t, filebeat.Stdin(), startUpInfo)
 	// for some reason the pipe needs to be closed for filebeat to read it.
 	require.NoError(t, filebeat.Stdin().Close(), "failed closing stdin pipe")
+
+	// get 1st observed
+	observed := <-observedCh
+	// drain observedCh so server won't block
+	go func() {
+		for {
+			<-observedCh
+		}
+	}()
 
 	msg := strings.Builder{}
 	require.Eventuallyf(t, func() bool {
@@ -679,16 +692,18 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		return true
 	}, 30*time.Second, time.Second, "no event was produced: %s", &msg)
 
+	assert.Equal(t, version.Commit(), observed.VersionInfo.BuildHash)
+
 	evs := getEventsFromFileOutput[Event](t, eventsDir, 100)
-	for _, e := range evs {
-		require.Equal(t, wantVersion, e.Metadata.Version)
+	for _, got := range evs {
+		assert.Equal(t, wantVersion, got.Metadata.Version)
 
-		require.Equal(t, agentInfo.Id, e.ElasticAgent.Id)
-		require.Equal(t, agentInfo.Version, e.ElasticAgent.Version)
-		require.Equal(t, agentInfo.Snapshot, e.ElasticAgent.Snapshot)
+		assert.Equal(t, wantAgentInfo.Id, got.ElasticAgent.Id)
+		assert.Equal(t, wantAgentInfo.Version, got.ElasticAgent.Version)
+		assert.Equal(t, wantAgentInfo.Snapshot, got.ElasticAgent.Snapshot)
 
-		require.Equal(t, agentInfo.Id, e.Agent.Id)
-		require.Equal(t, wantVersion, e.Agent.Version)
+		assert.Equal(t, wantAgentInfo.Id, got.Agent.Id)
+		assert.Equal(t, wantVersion, got.Agent.Version)
 	}
 }
 
