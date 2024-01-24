@@ -140,7 +140,7 @@ processors:
     #path: /var/log/osquerybeat
 
     # The name of the files where the logs are written to.
-    #name: osquerybeat-sensitive
+    #name: osquerybeat-sensitive-data
 
 # ============================= X-Pack Monitoring ==============================
 # Osquerybeat can export internal metrics to a central Elasticsearch monitoring

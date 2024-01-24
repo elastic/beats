@@ -377,7 +377,7 @@ processors:
     #path: /var/log/functionbeat
 
     # The name of the files where the logs are written to.
-    #name: functionbeat-sensitive
+    #name: functionbeat-sensitive-data
 
 # ============================= X-Pack Monitoring ==============================
 # Functionbeat can export internal metrics to a central Elasticsearch monitoring

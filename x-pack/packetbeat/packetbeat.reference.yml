@@ -2026,7 +2026,7 @@ logging.files:
     #path: /var/log/packetbeat
 
     # The name of the files where the logs are written to.
-    #name: packetbeat-sensitive
+    #name: packetbeat-sensitive-data
 
     # Configure log file size limit. If the limit is reached, log file will be
     # automatically rotated.

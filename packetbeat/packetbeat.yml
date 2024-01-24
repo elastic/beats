@@ -282,7 +282,7 @@ processors:
     #path: /var/log/packetbeat
 
     # The name of the files where the logs are written to.
-    #name: packetbeat-sensitive
+    #name: packetbeat-sensitive-data
 
 # ============================= X-Pack Monitoring ==============================
 # Packetbeat can export internal metrics to a central Elasticsearch monitoring

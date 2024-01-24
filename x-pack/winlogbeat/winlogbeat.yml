@@ -168,7 +168,7 @@ processors:
     #path: /var/log/winlogbeat
 
     # The name of the files where the logs are written to.
-    #name: winlogbeat-sensitive
+    #name: winlogbeat-sensitive-data
 
 # ============================= X-Pack Monitoring ==============================
 # Winlogbeat can export internal metrics to a central Elasticsearch monitoring

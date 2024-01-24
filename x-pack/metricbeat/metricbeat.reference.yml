@@ -2971,7 +2971,7 @@ logging.files:
     #path: /var/log/metricbeat
 
     # The name of the files where the logs are written to.
-    #name: metricbeat-sensitive
+    #name: metricbeat-sensitive-data
 
     # Configure log file size limit. If the limit is reached, log file will be
     # automatically rotated.

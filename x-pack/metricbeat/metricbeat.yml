@@ -154,7 +154,7 @@ processors:
     #path: /var/log/metricbeat
 
     # The name of the files where the logs are written to.
-    #name: metricbeat-sensitive
+    #name: metricbeat-sensitive-data
 
 # ============================= X-Pack Monitoring ==============================
 # Metricbeat can export internal metrics to a central Elasticsearch monitoring

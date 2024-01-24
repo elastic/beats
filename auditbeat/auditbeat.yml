@@ -181,7 +181,7 @@ processors:
     #path: /var/log/auditbeat
 
     # The name of the files where the logs are written to.
-    #name: auditbeat-sensitive
+    #name: auditbeat-sensitive-data
 
 # ============================= X-Pack Monitoring ==============================
 # Auditbeat can export internal metrics to a central Elasticsearch monitoring

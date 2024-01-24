@@ -164,7 +164,7 @@ processors:
     #path: /var/log/heartbeat
 
     # The name of the files where the logs are written to.
-    #name: heartbeat-sensitive
+    #name: heartbeat-sensitive-data
 
 # ============================= X-Pack Monitoring ==============================
 # Heartbeat can export internal metrics to a central Elasticsearch monitoring
