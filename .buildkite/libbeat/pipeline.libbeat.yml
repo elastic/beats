@@ -11,7 +11,7 @@ env:
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   GO_AGENT_IMAGE: "golang:${GO_VERSION}"
   DOCKER_COMPOSE_VERSION: "1.21.0"
-  PIPELINE_NAME: "metricbeat"
+  PIPELINE_NAME: "libbeat"
 
 steps:
 
