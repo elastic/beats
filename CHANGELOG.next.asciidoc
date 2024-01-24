@@ -115,6 +115,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix unintended skip in metric collection on Azure Monitor {issue}37204[37204] {pull}37203[37203]
 - Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
 - Add memory hard limit from container metadata and remove usage percentage in AWS Fargate. {pull}37194[37194]
+- Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
 
 *Osquerybeat*
 
