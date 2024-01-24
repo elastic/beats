@@ -22,13 +22,28 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4"
+	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4/fake"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
+	azfake "github.com/Azure/azure-sdk-for-go/sdk/azcore/fake"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+var cluster1Name = "testcluster1Name"
+var cluster1Id = "testcluster1Id"
+
+var cluster1 = armcontainerservice.ManagedCluster{
+	ID:         to.Ptr(cluster1Id),
+	Name:       to.Ptr(cluster1Name),
+	Properties: &armcontainerservice.ManagedClusterProperties{NodeResourceGroup: to.Ptr("MC_myname_group_myname_eastus")},
+}
 
 const azInstanceIdentityDocument = `{
 	"azEnvironment": "AzurePublicCloud",
@@ -88,6 +103,29 @@ func initAzureTestServer() *httptest.Server {
 }
 
 func TestRetrieveAzureMetadata(t *testing.T) {
+
+	fakeMCServer := fake.ManagedClustersServer{
+		NewListPager: func(options *armcontainerservice.ManagedClustersClientListOptions) (resp azfake.PagerResponder[armcontainerservice.ManagedClustersClientListResponse]) {
+
+			page := armcontainerservice.ManagedClustersClientListResponse{
+				ManagedClusterListResult: armcontainerservice.ManagedClusterListResult{
+					Value: []*armcontainerservice.ManagedCluster{
+						&cluster1,
+					},
+				},
+			}
+			resp.AddPage(http.StatusOK, page, nil)
+			return
+		},
+	}
+	logger := logp.NewLogger("test_add_cloud_metadata")
+	cred, _ := getAzureCredentials(logger)
+	clusterClient, _ := armcontainerservice.NewManagedClustersClient("subscriptionID", cred, &arm.ClientOptions{
+		ClientOptions: azcore.ClientOptions{
+			Transport: fake.NewManagedClustersServerTransport(&fakeMCServer),
+		},
+	})
+
 	logp.TestingSetup()
 
 	server := initAzureTestServer()
@@ -104,6 +142,15 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	NewClusterClient = func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient {
+		return clusterClient
+	}
+	defer func() {
+		NewClusterClient = func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient {
+			return clientFactory.NewManagedClustersClient()
+		}
+	}()
 
 	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
@@ -126,7 +173,16 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 			"service": mapstr.M{
 				"name": "Virtual Machines",
 			},
+			"resourceGroup": mapstr.M{
+				"name": "MC_myname_group_myname_eastus",
+			},
 			"region": "eastus",
+		},
+		"orchestrator": mapstr.M{
+			"cluster": mapstr.M{
+				"id":   "testcluster1Id",
+				"name": "testcluster1Name",
+			},
 		},
 	}
 	assert.Equal(t, expected, actual.Fields)

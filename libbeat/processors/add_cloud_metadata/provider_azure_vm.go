@@ -33,6 +33,30 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+type azureMetadataFetcher struct {
+	provider               string
+	httpMetadataFetcher    *httpMetadataFetcher
+	genericMetadataFetcher *genericFetcher
+	httpMeta               mapstr.M
+}
+
+func newAzureMetadataFetcher(
+	provider string,
+	httpMetadataFetcher *httpMetadataFetcher,
+) (*azureMetadataFetcher, error) {
+
+	azFetcher := &azureMetadataFetcher{
+		provider:            provider,
+		httpMetadataFetcher: httpMetadataFetcher,
+	}
+	return azFetcher, nil
+}
+
+// NewClusterClient returns a NewManagedClustersClient
+var NewClusterClient func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient = func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient {
+	return clientFactory.NewManagedClustersClient()
+}
+
 // Azure VM Metadata Service
 var azureVMMetadataFetcher = provider{
 	Name: "azure-compute",
@@ -77,29 +101,10 @@ var azureVMMetadataFetcher = provider{
 
 		hfetcher, err := newMetadataFetcher(config, "azure", azHeaders, metadataHost, azHttpSchema, azMetadataURI)
 		fetcher, err := newAzureMetadataFetcher("azure", hfetcher)
-		gfetcher, err := newGenericMetadataFetcher(config, "azure", azGenSchema, fetcher.fetchAzureMetadata)
+		gfetcher, err := newGenericMetadataFetcher(config, "azure", azGenSchema, fetcher.fetchAzureClusterMeta)
 		fetcher.genericMetadataFetcher = gfetcher
 		return fetcher, err
 	},
-}
-
-type azureMetadataFetcher struct {
-	provider               string
-	httpMetadataFetcher    *httpMetadataFetcher
-	genericMetadataFetcher *genericFetcher
-	meta                   mapstr.M
-}
-
-func newAzureMetadataFetcher(
-	provider string,
-	httpMetadataFetcher *httpMetadataFetcher,
-) (*azureMetadataFetcher, error) {
-
-	azFetcher := &azureMetadataFetcher{
-		provider:            provider,
-		httpMetadataFetcher: httpMetadataFetcher,
-	}
-	return azFetcher, nil
 }
 
 func (az *azureMetadataFetcher) fetchMetadata(ctx context.Context, client http.Client) result {
@@ -110,18 +115,21 @@ func (az *azureMetadataFetcher) fetchMetadata(ctx context.Context, client http.C
 		res.err = httpRes.err
 		return res
 	}
-	az.meta = httpRes.metadata
+	res.metadata = httpRes.metadata
+	az.httpMeta = httpRes.metadata
 	gRes := az.genericMetadataFetcher.fetchMetadata(ctx, client)
 	if gRes.err != nil {
-		res.err = gRes.err
+		logger.Warnf("Failed to get additional AKS Cluster meta: %+v", gRes.err)
 		return res
 	}
-	res.metadata = httpRes.metadata
+
 	res.metadata.DeepUpdate(gRes.metadata)
-	logger.Infof("Full result: %+v", res)
 	return res
 }
 
+// getAzureCredentials returns credentials to connect to Azure
+// env vars TENANT_ID, CLIENT_ID and CLIENT_SECRET are required
+// if not set, NewDefaultAzureCredential method will be used
 func getAzureCredentials(logger *logp.Logger) (azcore.TokenCredential, error) {
 	if os.Getenv("TENANT_ID") != "" && os.Getenv("CLIENT_ID") != "" && os.Getenv("CLIENT_SECRET") != "" {
 		return azidentity.NewClientSecretCredential(os.Getenv("TENANT_ID"), os.Getenv("CLIENT_ID"), os.Getenv("CLIENT_SECRET"), nil)
@@ -131,28 +139,9 @@ func getAzureCredentials(logger *logp.Logger) (azcore.TokenCredential, error) {
 	}
 }
 
-func getAKSClusterNameId(logger *logp.Logger, subscriptionId, resourceGroupName string) (string, string, error) {
-	if subscriptionId == "" {
-		subscriptionId = os.Getenv("SUBSCRIPTION_ID")
-		if subscriptionId == "" {
-			return "", "", fmt.Errorf("subscriptionId is required to create a new azure client")
-		}
-	}
-
-	if resourceGroupName == "" {
-		return "", "", fmt.Errorf("resourceGroupName is required to fetch cluster name and cluster Id")
-	}
-	cred, err := getAzureCredentials(logger)
-	if err != nil {
-		logger.Errorf("failed to obtain a credential: %v", err)
-		return "", "", fmt.Errorf("failed to obtain a credential: %v", err)
-	}
-	ctx := context.Background()
-	clientFactory, err := armcontainerservice.NewClientFactory(subscriptionId, cred, nil)
-	if err != nil {
-		return "", "", fmt.Errorf("failed to create client: %v", err)
-	}
-	pager := clientFactory.NewManagedClustersClient().NewListPager(nil)
+// getAKSClusterNameId returns the AKS cluster name and Id for a given resourceGroup
+func getAKSClusterNameId(ctx context.Context, logger *logp.Logger, clusterClient *armcontainerservice.ManagedClustersClient, resourceGroupName string) (string, string, error) {
+	pager := clusterClient.NewListPager(nil)
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
@@ -168,28 +157,55 @@ func getAKSClusterNameId(logger *logp.Logger, subscriptionId, resourceGroupName 
 	return "", "", nil
 }
 
-// fetchAzureMetadata queries raw metadata from a hosting provider's metadata service.
-func (az *azureMetadataFetcher) fetchAzureMetadata(
+// fetchAzureClusterMeta fetches metadata of Azure Managed Clusters using azure sdk.
+func (az *azureMetadataFetcher) fetchAzureClusterMeta(
 	ctx context.Context,
 	client http.Client,
 	result *result,
 ) {
 	logger := logp.NewLogger("add_cloud_metadata")
-	subscriptionId, _ := az.meta.GetValue("cloud.account.id")
-	resourceGroupName, _ := az.meta.GetValue("cloud.resourceGroup.name")
+	subscriptionId, _ := az.httpMeta.GetValue("cloud.account.id")
+	resourceGroupName, _ := az.httpMeta.GetValue("cloud.resourceGroup.name")
 	strResourceGroupName := ""
 	if val, ok := resourceGroupName.(string); ok {
-		strResourceGroupName = fmt.Sprintf("%s", val)
+		strResourceGroupName = val
 	}
 	strSubscriptionId := ""
 	if val, ok := subscriptionId.(string); ok {
-		strSubscriptionId = fmt.Sprintf("%s", val)
+		strSubscriptionId = val
 	}
-	clusterName, clusterId, err := getAKSClusterNameId(logger, strSubscriptionId, strResourceGroupName)
+	// if subscriptionId cannot be retrieved from metadata endpoint, try with env var
+	if strSubscriptionId == "" {
+		logger.Debugf("subscriptionId cannot be retrieved from metadata endpoint. Trying with SUBSCRIPTION_ID env var")
+		strSubscriptionId = os.Getenv("SUBSCRIPTION_ID")
+		if strSubscriptionId == "" {
+			logger.Debugf("subscriptionId canot be retrieved from SUBSCRIPTION_ID env var")
+			result.err = fmt.Errorf("subscriptionId is required to create a new azure client")
+			return
+		}
+	}
+
+	if strResourceGroupName == "" {
+		result.err = fmt.Errorf("resourceGroupName is required to fetch AKS cluster name and cluster Id")
+		return
+	}
+	cred, err := getAzureCredentials(logger)
+	if err != nil {
+		result.err = fmt.Errorf("failed to obtain azure credentials: %v", err)
+		return
+	}
+	clientFactory, err := armcontainerservice.NewClientFactory(strSubscriptionId, cred, nil)
+	if err != nil {
+		result.err = fmt.Errorf("failed to create new armcontainerservice client factory: %v", err)
+		return
+	}
+
+	clusterClient := NewClusterClient(clientFactory)
+	clusterName, clusterId, err := getAKSClusterNameId(ctx, logger, clusterClient, strResourceGroupName)
 	if err == nil {
 		_, _ = result.metadata.Put("orchestrator.cluster.id", clusterId)
 		_, _ = result.metadata.Put("orchestrator.cluster.name", clusterName)
 	} else {
-		logger.Debugf(fmt.Sprintf("failed to getAKSClusterNameId: %v", err))
+		result.err = fmt.Errorf("failed to get AKS cluster name and Id: %v", err)
 	}
 }
