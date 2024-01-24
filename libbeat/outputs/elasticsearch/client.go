@@ -437,11 +437,11 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 				result, _ := data[i].Content.Meta.HasKey(dead_letter_marker_field)
 				if result {
 					stats.nonIndexable++
-					client.log.Errorf("Can't deliver to dead letter index event (status=%v). Look for events-data log file to view the event and cause.", status)
+					client.log.Errorf("Can't deliver to dead letter index event (status=%v). Look for sensitive-data log file to view the event and cause.", status)
 					client.sensitiveLogger.Errorf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
 					// poison pill - this will clog the pipeline if the underlying failure is non transient.
 				} else if client.NonIndexableAction == dead_letter_index {
-					client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Look for events-data log file to view the event and cause.", status)
+					client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Look for sensitive-data log file to view the event and cause.", status)
 					client.sensitiveLogger.Warnf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
 					if data[i].Content.Meta == nil {
 						data[i].Content.Meta = mapstr.M{
@@ -457,7 +457,7 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 					}
 				} else { // drop
 					stats.nonIndexable++
-					client.log.Warnf("Cannot index event (status=%v): dropping event! Look for events-data log file to view the event and cause.", status)
+					client.log.Warnf("Cannot index event (status=%v): dropping event! Look for sensitive-data log file to view the event and cause.", status)
 					client.sensitiveLogger.Warnf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
 					continue
 				}

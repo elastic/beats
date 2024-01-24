@@ -68,7 +68,7 @@ func makeFileout(
 	sensitiveLogger := logp.NewLogger(logSelector)
 	// Set a new Output so it writes to a different file than `log`
 	sensitiveLogger = sensitiveLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(sensitiveLoggerCfg)))
-	sensitiveLogger = sensitiveLogger.With("logger.type", "sensitive")
+	sensitiveLogger = sensitiveLogger.With("log.type", "sensitive")
 
 	fo := &fileOutput{
 		log:          logp.NewLogger(logSelector),
@@ -142,7 +142,7 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 			} else {
 				out.log.Warnf("Failed to serialize the event: %+v", err)
 			}
-			out.log.Debug("Event logged to events-data log file")
+			out.log.Debug("Event logged to sensitive-data log file")
 			out.sensitiveLogger.Debugf("Failed event: %v", event)
 
 			dropped++

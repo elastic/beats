@@ -88,7 +88,7 @@ func newKafkaClient(
 	sensitiveLogger := logp.NewLogger(logSelector)
 	// Set a new Output so it writes to a different file than `log`
 	sensitiveLogger = sensitiveLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(sensitiveLoggerCfg)))
-	sensitiveLogger = sensitiveLogger.With("logger.type", "sensitive")
+	sensitiveLogger = sensitiveLogger.With("log.type", "sensitive")
 
 	c := &client{
 		log:          logp.NewLogger(logSelector),

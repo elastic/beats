@@ -60,7 +60,7 @@ logging:
   files:
     events:
       files:
-        name: filebeat-events-data
+        name: filebeat-sensitive-data
 `
 
 func TestEventsLoggerESOutput(t *testing.T) {
@@ -106,7 +106,7 @@ func TestEventsLoggerESOutput(t *testing.T) {
 	}, time.Minute, 100*time.Millisecond,
 		fmt.Sprintf("String '%s' not found on Filebeat logs", msg))
 
-	glob := filepath.Join(filebeat.TempDir(), "filebeat-events-data*.ndjson")
+	glob := filepath.Join(filebeat.TempDir(), "filebeat-sensitive-data*.ndjson")
 	files, err := filepath.Glob(glob)
 	if err != nil {
 		t.Fatalf("could not read files matching glob '%s': %s", glob, err)

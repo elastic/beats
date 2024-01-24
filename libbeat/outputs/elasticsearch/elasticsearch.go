@@ -46,7 +46,7 @@ func makeES(
 	sensitiveLogger := logp.NewLogger(logSelector)
 	// Set a new Output so it writes to a different file than `log`
 	sensitiveLogger = sensitiveLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(sensitiveLoggerCfg)))
-	sensitiveLogger = sensitiveLogger.With("logger.type", "sensitive")
+	sensitiveLogger = sensitiveLogger.With("log.type", "sensitive")
 
 	if !cfg.HasField("bulk_max_size") {
 		if err := cfg.SetInt("bulk_max_size", -1, defaultBulkSize); err != nil {

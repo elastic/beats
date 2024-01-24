@@ -399,7 +399,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 	if sensitiveLoggerCfg.Files.Name == "" {
 		sensitiveLoggerCfg.Files.Name = b.Info.Beat
 		// Append the name so the files do not overwrite themselves.
-		sensitiveLoggerCfg.Files.Name = sensitiveLoggerCfg.Files.Name + "-events-data"
+		sensitiveLoggerCfg.Files.Name = sensitiveLoggerCfg.Files.Name + "-sensitive-data"
 	}
 
 	outputFactory := b.makeOutputFactory(b.Config.Output, sensitiveLoggerCfg)

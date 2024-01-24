@@ -82,7 +82,7 @@ func newClient(
 	sensitiveLogger := logp.NewLogger(logSelector)
 	// Set a new Output so it writes to a different file than `log`
 	sensitiveLogger = sensitiveLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(sensitiveLoggerCfg)))
-	sensitiveLogger = sensitiveLogger.With("logger.type", "sensitive")
+	sensitiveLogger = sensitiveLogger.With("log.type", "sensitive")
 
 	return &client{
 		log:          logp.NewLogger(logSelector),
@@ -330,7 +330,7 @@ func serializeEvents(
 	for _, d := range data {
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
-			log.Errorf("Encoding event failed with error: %+v. Look for events-data log file to view the event", err)
+			log.Errorf("Encoding event failed with error: %+v. Look for sensitive-data log file to view the event", err)
 			sensitiveLogger.Debugf("Failed event: %v", d.Content)
 			goto failLoop
 		}
@@ -348,7 +348,7 @@ failLoop:
 	for _, d := range rest {
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
-			log.Errorf("Encoding event failed with error: %+v. Look for events-data log file to view the event", err)
+			log.Errorf("Encoding event failed with error: %+v. Look for sensitive-data log file to view the event", err)
 			sensitiveLogger.Debugf("Failed event: %v", d.Content)
 			i++
 			continue

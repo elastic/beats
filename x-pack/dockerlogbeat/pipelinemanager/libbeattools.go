@@ -74,7 +74,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 
 	// Ensure the default filename is set
 	if sensitiveLoggerCfg.Files.Name == "" {
-		sensitiveLoggerCfg.Files.Name = "dockerlogbeat-events-data"
+		sensitiveLoggerCfg.Files.Name = "dockerlogbeat-sensitive-data"
 	}
 
 	pipeline, err := pipeline.LoadWithSettings(
