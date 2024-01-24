@@ -16,64 +16,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// NewMetricRegistry instantiates a new metric registry.
-func NewMetricRegistry() *MetricRegistry {
-	return &MetricRegistry{
-		collectionsInfo: make(map[string]MetricCollectionInfo),
-	}
-}
-
-// MetricRegistry keeps track of the last time a metric was collected and
-// the time grain used.
-//
-// This is used to avoid collecting the same metric values over and over again
-// when the time grain is larger than the collection interval.
-type MetricRegistry struct {
-	collectionsInfo map[string]MetricCollectionInfo
-}
-
-// Update updates the metric registry with the latest timestamp and
-// time grain for the given metric.
-func (m *MetricRegistry) Update(metric Metric, info MetricCollectionInfo) {
-	m.collectionsInfo[m.buildMetricKey(metric)] = info
-}
-
-// NeedsUpdate returns true if the metric needs to be updated.
-func (m *MetricRegistry) NeedsUpdate(metric Metric) bool {
-	// The key is a combination of the namespace,
-	// resource ID and metric names.
-	metricKey := m.buildMetricKey(metric)
-
-	if info, exists := m.collectionsInfo[metricKey]; exists {
-		duration := convertTimeGrainToDuration(info.timeGrain)
-
-		// Check if the metric has been collected within a
-		// time period defined by the time grain.
-		if info.timestamp.After(time.Now().Add(duration * (-1))) {
-			return false
-		}
-	}
-
-	// If the metric is not in the registry, it means that it has never
-	// been collected before.
-	//
-	// In this case, we need to collect the metric.
-	return true
-}
-
-// buildMetricKey builds a key for the metric registry.
-//
-// The key is a combination of the namespace, resource ID and metric names.
-func (m *MetricRegistry) buildMetricKey(metric Metric) string {
-	keyComponents := []string{
-		metric.Namespace,
-		metric.ResourceId,
-	}
-	keyComponents = append(keyComponents, metric.Names...)
-
-	return strings.Join(keyComponents, ",")
-}
-
 // MetricCollectionInfo contains information about the last time
 // a metric was collected and the time grain used.
 type MetricCollectionInfo struct {
@@ -101,11 +43,13 @@ func NewClient(config Config) (*Client, error) {
 		return nil, err
 	}
 
+	logger := logp.NewLogger("azure monitor client")
+
 	client := &Client{
 		AzureMonitorService: azureMonitorService,
 		Config:              config,
-		Log:                 logp.NewLogger("azure monitor client"),
-		MetricRegistry:      NewMetricRegistry(),
+		Log:                 logger,
+		MetricRegistry:      NewMetricRegistry(logger),
 	}
 
 	client.ResourceConfigurations.RefreshInterval = config.RefreshListInterval
@@ -176,11 +120,10 @@ func (client *Client) InitResources(fn mapResourceMetrics) error {
 }
 
 // GetMetricValues returns the metric values for the given cloud resources.
-func (client *Client) GetMetricValues(metrics []Metric, reporter mb.ReporterV2) []Metric {
+func (client *Client) GetMetricValues(referenceTime time.Time, metrics []Metric, reporter mb.ReporterV2) []Metric {
 	var result []Metric
 
 	// Same end time for all metrics in the same batch.
-	referenceTime := time.Now().UTC()
 	interval := client.Config.Period
 
 	// Fetch in the range [{-2 x INTERVAL},{-1 x INTERVAL}) with a delay of {INTERVAL}.
@@ -208,7 +151,7 @@ func (client *Client) GetMetricValues(metrics []Metric, reporter mb.ReporterV2) 
 		// the time grain of the metric, we can determine if the metric needs
 		// to be collected again, or if we can skip it.
 		//
-		if !client.MetricRegistry.NeedsUpdate(metric) {
+		if !client.MetricRegistry.NeedsUpdate(referenceTime, metric) {
 			continue
 		}
 
@@ -413,11 +356,12 @@ func (client *Client) AddVmToResource(resourceId string, vm VmResource) {
 // NewMockClient instantiates a new client with the mock azure service
 func NewMockClient() *Client {
 	azureMockService := new(MockService)
+	logger := logp.NewLogger("test azure monitor")
 	client := &Client{
 		AzureMonitorService: azureMockService,
 		Config:              Config{},
-		Log:                 logp.NewLogger("test azure monitor"),
-		MetricRegistry:      NewMetricRegistry(),
+		Log:                 logger,
+		MetricRegistry:      NewMetricRegistry(logger),
 	}
 	return client
 }

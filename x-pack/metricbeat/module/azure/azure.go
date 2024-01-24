@@ -6,6 +6,7 @@ package azure
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
@@ -87,6 +88,23 @@ func NewMetricSet(base mb.BaseMetricSet) (*MetricSet, error) {
 // It publishes the event which is then forwarded to the output. In case
 // of an error set the Error field of mb.Event or simply call report.Error().
 func (m *MetricSet) Fetch(report mb.ReporterV2) error {
+	// Set the reference time for the current fetch.
+	//
+	// The reference time is used to calculate time intervals
+	// and compare with collection info in the metric
+	// registry to decide whether to collect metrics or not,
+	// depending on metric time grain (check `MetricRegistry`
+	// for more information).
+	//
+	// We round the reference time to the nearest second to avoid
+	// millisecond variations in the collection period causing
+	// skipped collections.
+	//
+	// See "Round outer limits" and "Round inner limits" tests in
+	// the metric_registry_test.go for more information.
+	//referenceTime := time.Now().UTC().Round(time.Second)
+	referenceTime := time.Now().UTC()
+
 	// Initialize cloud resources and monitor metrics
 	// information.
 	//
@@ -116,7 +134,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 	for _, metricsDefinition := range metricsByResourceId {
 		// Fetch metric values for each resource.
-		metricValues := m.Client.GetMetricValues(metricsDefinition, report)
+		metricValues := m.Client.GetMetricValues(referenceTime, metricsDefinition, report)
 
 		// Turns metric values into events and sends them to Elasticsearch.
 		if err := mapToEvents(metricValues, m.Client, report); err != nil {
