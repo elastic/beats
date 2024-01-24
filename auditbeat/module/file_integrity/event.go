@@ -62,14 +62,19 @@ func (s Source) MarshalText() ([]byte, error) { return []byte(s.String()), nil }
 const (
 	// SourceScan identifies events triggered by a file system scan.
 	SourceScan Source = iota
-	// SourceFSNotify identifies events triggered by a notification from the
-	// file system.
+	// SourceFSNotify identifies file integrity events triggered by fsnotify backend.
 	SourceFSNotify
+	// SourceEBPF identifies file integrity events triggered by eBPF backend.
+	SourceEBPF
+	// SourceKProbes identifies file integrity events triggered by KProbes backend.
+	SourceKProbes
 )
 
 var sourceNames = map[Source]string{
 	SourceScan:     "scan",
 	SourceFSNotify: "fsnotify",
+	SourceEBPF:     "ebpf",
+	SourceKProbes:  "kprobes",
 }
 
 // Type identifies the file type (e.g. dir, file, symlink).

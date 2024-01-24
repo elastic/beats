@@ -12,6 +12,8 @@ enum Action : ubyte (bit_flags) {
 enum Source : ubyte {
   Scan,
   FSNotify,
+  EBPF,
+  KProbes
 }
 
 enum Type : ubyte {
