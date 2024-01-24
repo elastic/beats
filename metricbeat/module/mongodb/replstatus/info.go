@@ -104,12 +104,12 @@ func getOpTimestamp(collection *mongo.Collection) (uint32, uint32, error) {
 		MaxTS time.Time `bson:"maxTS"`
 	}
 
-	if cursor.Next(context.Background()) {
-		if err := cursor.Decode(&result); err != nil {
-			return 0, 0, fmt.Errorf("error decoding response for timestamps: %w", err)
-		}
-	} else {
-		return 0, 0, errors.New("no documents found in op log")
+	if !cursor.Next(context.Background()) {
+	        return 0, 0, errors.New("no documents found in op log")
+	} 
+	if err := cursor.Decode(&result); err != nil {
+	       return 0, 0, fmt.Errorf("error decoding response for timestamps: %w", err)
+	}
 	}
 
 	minTS := uint32(result.MinTS.Unix())
