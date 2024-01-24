@@ -1,5 +1,76 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+env:
+  SETUP_GVM_VERSION: "v0.5.1"
+  SETUP_MAGE_VERSION: "1.13.0"
+  SETUP_WIN_PYTHON_VERSION: "3.11.0"
+  IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
+  IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
+  IMAGE_WIN_2016: "family/core-windows-2016"
+  IMAGE_WIN_2019: "family/core-windows-2019"
+  IMAGE_WIN_2022: "family/core-windows-2022"
+  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  GO_AGENT_IMAGE: "golang:${GO_VERSION}"
+  DOCKER_COMPOSE_VERSION: "1.21.0"
+  PIPELINE_NAME: "metricbeat"
 
 steps:
-  - label: "Example test"
-    command: echo "Hello!"
+
+  - group: "Mandatory Tests"
+    key: "mandatory-tests"
+    steps:
+      - label: ":linux: Ubuntu Unit Tests"
+        key: "mandatory-linux-unit-test"
+        command: ".buildkite/scripts/unit_tests.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths: "metricbeat/build/*.*"
+
+      - label: ":go: Go Intergration Tests"
+        key: "mandatory-int-test"
+        command: ".buildkite/scripts/go_int_tests.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths: "metricbeat/build/*.*"
+
+      - label: ":python: Python Integration Tests"
+        key: "mandatory-python-int-test"
+        command: ".buildkite/scripts/py_int_tests.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths: "metricbeat/build/*.*"
+
+      - label: ":negative_squared_cross_mark: Cross compile"
+        key: "mandatory-cross-compile"
+        command: ".buildkite/scripts/crosscompile.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths: "metricbeat/build/*.*"
+
+      - label: ":negative_squared_cross_mark: Cross compile"
+        key: "mandatory-stress-test"
+        command: ".buildkite/scripts/stress_tests.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths: "metricbeat/build/*.*"
+
+  - group: "Extended Tests"
+    key: "extended-tests"
+    steps:
+      - label: ":mac: Arm64 Unit Tests"
+        key: "extended-arm64-unit-tests"
+        command: ".buildkite/scripts/unit_tests.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "t4g.xlarge"
+        artifact_paths: "metricbeat/build/*.*"
