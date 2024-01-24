@@ -23,6 +23,7 @@ var (
 	ErrVerifyOverlappingEvents = errors.New("probe overlapping events")
 	ErrVerifyMissingEvents     = errors.New("probe missing events")
 	ErrVerifyUnexpectedEvent   = errors.New("received an event that was not expected")
+	ErrVerifyNoEventsToExpect  = errors.New("no probe events to expect")
 	ErrSymbolNotFound          = errors.New("symbol not found")
 	ErrAckTimeout              = errors.New("timeout")
 )
