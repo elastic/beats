@@ -20,5 +20,8 @@ package kprobes
 import "errors"
 
 var (
-	ErrSymbolNotFound = errors.New("symbol not found")
+	ErrVerifyOverlappingEvents = errors.New("probe overlapping events")
+	ErrVerifyMissingEvents     = errors.New("probe missing events")
+	ErrVerifyUnexpectedEvent   = errors.New("received an event that was not expected")
+	ErrSymbolNotFound          = errors.New("symbol not found")
 )

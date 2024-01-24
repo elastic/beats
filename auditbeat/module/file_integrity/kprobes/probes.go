@@ -21,6 +21,23 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/tracing"
 
 	tkbtf "github.com/elastic/tk-btf"
+
+	"golang.org/x/sys/unix"
+)
+
+const (
+	fsEventModify    = uint32(unix.IN_MODIFY)
+	fsEventAttrib    = uint32(unix.IN_ATTRIB)
+	fsEventMovedFrom = uint32(unix.IN_MOVED_FROM)
+	fsEventMovedTo   = uint32(unix.IN_MOVED_TO)
+	fsEventCreate    = uint32(unix.IN_CREATE)
+	fsEventDelete    = uint32(unix.IN_DELETE)
+	fsEventIsDir     = uint32(unix.IN_ISDIR)
+)
+
+const (
+	devMajor = uint32(0xFFF00000)
+	devMinor = uint32(0x3FF)
 )
 
 type probeWithAllocFunc struct {
@@ -47,6 +64,22 @@ func newProbeManager(e executor) (*probeManager, error) {
 		symbols:              nil,
 		buildChecks:          nil,
 		getSymbolInfoRuntime: getSymbolInfoRuntime,
+	}
+
+	if err := loadFsNotifySymbol(fs); err != nil {
+		return nil, err
+	}
+
+	if err := loadFsNotifyParentSymbol(fs); err != nil {
+		return nil, err
+	}
+
+	if err := loadFsNotifyNameRemoveSymbol(fs); err != nil {
+		return nil, err
+	}
+
+	if err := loadVFSGetAttrSymbol(fs, e); err != nil {
+		return nil, err
 	}
 
 	return fs, nil
