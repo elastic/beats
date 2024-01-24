@@ -79,10 +79,10 @@ with_go() {
 with_python() {
   if [ "${platform_type}" == "Linux" ]; then
     sudo apt-get update
-    sudo apt-get install -y python3-pip python3-venv libsystemd-dev
+    sudo apt-get install -y python3-pip python3-venv libsystemd-dev libpcap-dev
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
-    pip3 install virtualenv
+    pip3 install virtualenv libpcap
     ulimit -Sn 10000
   fi
 }
