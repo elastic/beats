@@ -25,7 +25,7 @@ pipeline {
     TERRAFORM_VERSION = "1.0.2"
     XPACK_MODULE_PATTERN = '^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*'
     KIND_VERSION = 'v0.20.0'
-    K8S_VERSION = 'v1.28.0'
+    K8S_VERSION = 'v1.29.0'
   }
   options {
     timeout(time: 6, unit: 'HOURS')
