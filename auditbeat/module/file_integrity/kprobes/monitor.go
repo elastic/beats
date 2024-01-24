@@ -21,8 +21,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"sync/atomic"
+	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/go-perf"
 )
 
 type MonitorEvent struct {
@@ -69,6 +72,22 @@ type Monitor struct {
 	running     uint32
 	isRecursive bool
 	closeErr    error
+}
+
+func New(isRecursive bool) (*Monitor, error) {
+	ctx := context.TODO()
+
+	validatedProbes, exec, err := getVerifiedProbes(ctx, 5*time.Second)
+	if err != nil {
+		return nil, err
+	}
+
+	pChannel, err := newPerfChannel(validatedProbes, 10, 4096, perf.AllThreads)
+	if err != nil {
+		return nil, err
+	}
+
+	return newMonitor(ctx, isRecursive, pChannel, exec)
 }
 
 func newMonitor(ctx context.Context, isRecursive bool, pChannel perfChannel, exec executor) (*Monitor, error) {

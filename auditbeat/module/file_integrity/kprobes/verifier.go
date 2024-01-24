@@ -21,16 +21,67 @@ package kprobes
 
 import (
 	"bytes"
+	"context"
 	"embed"
 	"errors"
 	"io/fs"
+	"os"
 	"strings"
+	"time"
+
+	"github.com/elastic/beats/v7/auditbeat/tracing"
 
 	tkbtf "github.com/elastic/tk-btf"
 )
 
 //go:embed embed
 var embedBTFFolder embed.FS
+
+func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.Probe]tracing.AllocateFn, executor, error) {
+
+	fExec := newFixedThreadExecutor(ctx)
+
+	probeMgr, err := newProbeManager(fExec)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	specs, err := loadAllSpecs()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var allErr error
+	for len(specs) > 0 {
+
+		s := specs[0]
+		if !probeMgr.shouldBuild(s) {
+			specs = specs[1:]
+			continue
+		}
+
+		probes, err := probeMgr.build(s)
+		if err != nil {
+			allErr = errors.Join(allErr, err)
+			specs = specs[1:]
+			continue
+		}
+
+		if err := verify(ctx, fExec, probes, timeout); err != nil {
+			if probeMgr.onErr(err) {
+				continue
+			}
+			allErr = errors.Join(allErr, err)
+			specs = specs[1:]
+			continue
+		}
+
+		return probes, fExec, nil
+	}
+
+	fExec.Close()
+	return nil, nil, errors.Join(allErr, errors.New("could not validate probes"))
+}
 
 func loadAllSpecs() ([]*tkbtf.Spec, error) {
 	var specs []*tkbtf.Spec
@@ -82,4 +133,100 @@ func loadEmbeddedSpecs() ([]*tkbtf.Spec, error) {
 	}
 
 	return specs, nil
+}
+
+func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing.AllocateFn, timeout time.Duration) error {
+	basePath, err := os.MkdirTemp("", "verifier")
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		_ = os.RemoveAll(basePath)
+	}()
+
+	verifier, err := newEventsVerifier(basePath)
+	if err != nil {
+		return err
+	}
+
+	pChannel, err := newPerfChannel(probes, 4, 512, exec.GetTID())
+	if err != nil {
+		return err
+	}
+
+	m, err := newMonitor(ctx, true, pChannel, exec)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		_ = m.Close()
+	}()
+
+	// start the monitor
+	if err := m.Start(); err != nil {
+		return err
+	}
+
+	// spaw goroutine to send events to verifier to be verified
+	cancel := make(chan struct{})
+	defer close(cancel)
+
+	retC := make(chan error)
+
+	go func() {
+		defer close(retC)
+		for {
+			select {
+			case runErr := <-m.ErrorChannel():
+				retC <- runErr
+				return
+
+			case ev, ok := <-m.EventChannel():
+				if !ok {
+					retC <- errors.New("monitor closed unexpectedly")
+					return
+				}
+
+				if err := verifier.validateEvent(ev.Path, ev.PID, ev.Op); err != nil {
+					retC <- err
+					return
+				}
+				continue
+			case <-time.After(timeout):
+				return
+			case <-cancel:
+				return
+			}
+		}
+	}()
+
+	// add verify base path to monitor
+	if err := m.Add(basePath); err != nil {
+		return err
+	}
+
+	// invoke verifier event generation from our executor
+	if err := exec.Run(verifier.GenerateEvents); err != nil {
+		return err
+	}
+
+	// wait for either no new events arriving for timeout duration or
+	// ctx to be cancelled
+	select {
+	case err = <-retC:
+		if err != nil {
+			return err
+		}
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+
+	// check that all events have been verified
+	if err := verifier.Verified(); err != nil {
+		return err
+	}
+
+	return nil
 }
