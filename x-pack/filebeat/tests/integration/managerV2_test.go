@@ -663,6 +663,19 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 			return false
 		}
 
+		for _, e := range entries {
+			i, err := e.Info()
+			if err != nil {
+				fmt.Fprintf(&msg, "could not read info of %q", e.Name())
+				return false
+			}
+			if i.Size() == 0 {
+				fmt.Fprintf(&msg, "file %q was created, but it's still empty",
+					e.Name())
+				return false
+			}
+		}
+
 		return true
 	}, 30*time.Second, time.Second, "no event was produced: %s", &msg)
 
