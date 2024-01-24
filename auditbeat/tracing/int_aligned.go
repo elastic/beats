@@ -29,13 +29,13 @@ import (
 var errBadSize = errors.New("bad size for integer")
 
 func copyInt(dst unsafe.Pointer, src unsafe.Pointer, len uint8) error {
-	copy((*(*[maxIntSizeBytes]byte)(dst))[:len], (*(*[maxIntSizeBytes]byte)(src))[:len])
+	copy(unsafe.Slice((*byte)(dst), len), unsafe.Slice((*byte)(src), len))
 	return nil
 }
 
 func readInt(ptr unsafe.Pointer, len uint8, signed bool) (any, error) {
 	var value any
-	asSlice := (*(*[maxIntSizeBytes]byte)(ptr))[:]
+	asSlice := unsafe.Slice((*byte)(ptr), len)
 	switch len {
 	case 1:
 		if signed {
