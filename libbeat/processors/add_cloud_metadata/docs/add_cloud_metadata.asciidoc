@@ -50,6 +50,10 @@ List of names the `providers` setting supports:
 
 - "alibaba", or "ecs" for the Alibaba Cloud provider (disabled by default).
 - "azure" for Azure Virtual Machine (enabled by default).
+   If the Virtual Machine is part of an AKS managed cluster, the fields
+   `orchestrator.cluster.name` and `orchestrator.cluster.id` can only be
+   retrieved if "TENANT_ID", "CLIENT_ID" and "CLIENT_SECRET" environment
+   variables are set.
 - "digitalocean" for Digital Ocean (enabled by default).
 - "aws", or "ec2" for Amazon Web Services (enabled by default).
 - "gcp" for Google Copmute Enging (enabled by default).
@@ -169,7 +173,8 @@ _Azure Virtual Machine_
     "instance.id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
     "instance.name": "test-az-vm",
     "machine.type": "Standard_D3_v2",
-    "region": "eastus2"
+    "region": "eastus2",
+    "resourceGroup.name": "/subscriptions/641ebacb-7743-41e7-b4fa-af1167351a61/resourcegroups/testgroup/providers/Microsoft.ContainerService/managedClusters/testcluster"
   }
 }
 -------------------------------------------------------------------------------
