@@ -206,6 +206,23 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
+			name: "single_event_without_content_type_header",
+			conf: defaultConfig(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				return req
+			}(),
+			events: []mapstr.M{
+				{
+					"json": mapstr.M{
+						"id": int64(0),
+					},
+				},
+			},
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
 			name: "single_event_gzip",
 			conf: defaultConfig(),
 			request: func() *http.Request {

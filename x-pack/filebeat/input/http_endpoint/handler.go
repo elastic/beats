@@ -52,6 +52,11 @@ type handler struct {
 }
 
 func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Few webhook servers don't send in the Content-Type , hence defaulting to application/json if not present
+	if r.Header.Get("Content-Type") == "" {
+		r.Header.Set("Content-Type", "application/json")
+	}
+
 	status, err := h.validator.validateRequest(r)
 	if err != nil {
 		h.sendAPIErrorResponse(w, r, h.log, status, err)
