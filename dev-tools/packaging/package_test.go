@@ -806,6 +806,7 @@ func getDockerManifest(file string) (*dockerManifest, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer f.Close()
 
 	gzipReader, err := gzip.NewReader(f)
 	if err != nil {
