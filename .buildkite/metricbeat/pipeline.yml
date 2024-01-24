@@ -11,6 +11,7 @@ env:
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   GO_AGENT_IMAGE: "golang:${GO_VERSION}"
   DOCKER_COMPOSE_VERSION: "1.21.0"
+  PIPELINE_NAME: "metricbeat"
 
 steps:
 
@@ -19,7 +20,7 @@ steps:
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh metricbeat"
+        command: ".buildkite/scripts/unit_tests.sh ${PIPELINE_NAME}"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -28,7 +29,7 @@ steps:
 
       - label: ":go: Go Intergration Tests"
         key: "mandatory-int-test"
-        command: ".buildkite/scripts/go_int_tests.sh metricbeat"
+        command: ".buildkite/scripts/go_int_tests.sh ${PIPELINE_NAME}"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -37,7 +38,7 @@ steps:
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
-        command: ".buildkite/scripts/py_int_tests.sh metricbeat"
+        command: ".buildkite/scripts/py_int_tests.sh ${PIPELINE_NAME}"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -46,7 +47,7 @@ steps:
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
-        command: ".buildkite/scripts/crosscompile.sh metricbeat"
+        command: ".buildkite/scripts/crosscompile.sh ${PIPELINE_NAME}"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -74,7 +75,7 @@ steps:
     steps:
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh metricbeat"
+        command: ".buildkite/scripts/unit_tests.sh ${PIPELINE_NAME}"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -85,7 +86,7 @@ steps:
     steps:
       - label: ":windows: Win 2019 Unit Tests"
         key: "extended-win-2019-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1 metricbeat"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
