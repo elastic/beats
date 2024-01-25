@@ -13,14 +13,9 @@ import (
 	"unsafe"
 )
 
-// UTF16PtrToString transforms a *uint16 to a Go string
-func UTF16PtrToString(utf16 *uint16) string {
-	return UTF16AtOffsetToString(uintptr(unsafe.Pointer(utf16)), 0)
-}
-
-// UTF16AtOffsetToString converts a UTF-16 encoded string
+// utf16AtOffsetToString converts a UTF-16 encoded string
 // at a specific offset in a struct to a Go string.
-func UTF16AtOffsetToString(pstruct uintptr, offset uintptr) string {
+func utf16AtOffsetToString(pstruct uintptr, offset uintptr) string {
 	// Initialize a slice to store UTF-16 characters.
 	out := make([]uint16, 0, 64)
 
@@ -37,8 +32,8 @@ func UTF16AtOffsetToString(pstruct uintptr, offset uintptr) string {
 	return syscall.UTF16ToString(out)
 }
 
-// GUIDFromProviderName searches for a provider by name and returns its GUID.
-func GUIDFromProviderName(providerName string) (GUID, error) {
+// guidFromProviderName searches for a provider by name and returns its GUID.
+func guidFromProviderName(providerName string) (GUID, error) {
 	// Returns if the provider name is empty.
 	if providerName == "" {
 		return GUID{}, fmt.Errorf("empty provider name")
@@ -51,7 +46,7 @@ func GUIDFromProviderName(providerName string) (GUID, error) {
 	for {
 		tmp := make([]byte, size)
 		buf = (*ProviderEnumerationInfo)(unsafe.Pointer(&tmp[0]))
-		if err := EnumerateProvidersFunc(buf, &size); !errors.Is(err, ERROR_INSUFFICIENT_BUFFER) {
+		if err := enumerateProvidersFunc(buf, &size); !errors.Is(err, ERROR_INSUFFICIENT_BUFFER) {
 			break
 		}
 	}
@@ -65,7 +60,7 @@ func GUIDFromProviderName(providerName string) (GUID, error) {
 	it := uintptr(unsafe.Pointer(&buf.TraceProviderInfoArray[0]))
 	for i := uintptr(0); i < uintptr(buf.NumberOfProviders); i++ {
 		pInfo := (*TraceProviderInfo)(unsafe.Pointer(it + i*unsafe.Sizeof(buf.TraceProviderInfoArray[0])))
-		name := UTF16AtOffsetToString(startProvEnumInfo, uintptr(pInfo.ProviderNameOffset))
+		name := utf16AtOffsetToString(startProvEnumInfo, uintptr(pInfo.ProviderNameOffset))
 
 		// If a match is found, return the corresponding GUID.
 		if name == providerName {

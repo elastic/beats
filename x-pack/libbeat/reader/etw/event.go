@@ -31,8 +31,8 @@ func DefaultBufferCallback(etl *EventTraceLogfile) uintptr {
 
 // DefaultCallback is a default handler for processing ETW events.
 // By default this callback is replaced by the one defined in the Filebeat input
-func DefaultCallback(er *EventRecord) uintptr {
-	if er == nil {
+func DefaultCallback(r *EventRecord) uintptr {
+	if r == nil {
 		return 1
 	}
 
@@ -40,9 +40,9 @@ func DefaultCallback(er *EventRecord) uintptr {
 	var event map[string]interface{}
 
 	// Retrieve and store additional event properties, if available.
-	if data, err := GetEventProperties(er); err == nil {
+	if data, err := GetEventProperties(r); err == nil {
 		event = map[string]interface{}{
-			"Header":          er.EventHeader,
+			"Header":          r.EventHeader,
 			"EventProperties": data,
 		}
 	} else {
@@ -65,24 +65,24 @@ func DefaultCallback(er *EventRecord) uintptr {
 
 // propertyParser is used for parsing properties from raw EVENT_RECORD structures.
 type propertyParser struct {
-	er      *EventRecord
+	r       *EventRecord
 	info    *TraceEventInfo
 	data    []byte
 	ptrSize uint32
 }
 
 // GetEventProperties extracts and returns properties from an ETW event record.
-func GetEventProperties(er *EventRecord) (map[string]interface{}, error) {
+func GetEventProperties(r *EventRecord) (map[string]interface{}, error) {
 	// Handle the case where the event only contains a string.
-	if er.EventHeader.Flags == EVENT_HEADER_FLAG_STRING_ONLY {
-		userDataPtr := (*uint16)(unsafe.Pointer(er.UserData))
+	if r.EventHeader.Flags == EVENT_HEADER_FLAG_STRING_ONLY {
+		userDataPtr := (*uint16)(unsafe.Pointer(r.UserData))
 		return map[string]interface{}{
-			"_": UTF16PtrToString(userDataPtr), // Convert the user data from UTF16 to string.
+			"_": utf16AtOffsetToString(uintptr(unsafe.Pointer(userDataPtr)), 0), // Convert the user data from UTF16 to string.
 		}, nil
 	}
 
 	// Initialize a new property parser for the event record.
-	p, err := newPropertyParser(er)
+	p, err := newPropertyParser(r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse event properties: %w", err)
 	}
@@ -102,31 +102,31 @@ func GetEventProperties(er *EventRecord) (map[string]interface{}, error) {
 }
 
 // newPropertyParser initializes a new property parser for a given event record.
-func newPropertyParser(er *EventRecord) (*propertyParser, error) {
-	info, err := getEventInformation(er)
+func newPropertyParser(r *EventRecord) (*propertyParser, error) {
+	info, err := getEventInformation(r)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get event information: %w", err)
 	}
-	ptrSize := er.PointerSize()
+	ptrSize := r.pointerSize()
 	// Return a new propertyParser instance initialized with event record data and metadata.
 	return &propertyParser{
-		er:      er,
+		r:       r,
 		info:    info,
 		ptrSize: ptrSize,
-		data:    unsafe.Slice((*uint8)(unsafe.Pointer(er.UserData)), er.UserDataLength),
+		data:    unsafe.Slice((*uint8)(unsafe.Pointer(r.UserData)), r.UserDataLength),
 	}, nil
 }
 
 // getEventInformation retrieves detailed metadata about an event record.
-func getEventInformation(er *EventRecord) (info *TraceEventInfo, err error) {
+func getEventInformation(r *EventRecord) (info *TraceEventInfo, err error) {
 	// Initially call TdhGetEventInformation to get the required buffer size.
 	var bufSize uint32
-	if err = _TdhGetEventInformation(er, 0, nil, nil, &bufSize); errors.Is(err, ERROR_INSUFFICIENT_BUFFER) {
+	if err = _TdhGetEventInformation(r, 0, nil, nil, &bufSize); errors.Is(err, ERROR_INSUFFICIENT_BUFFER) {
 		// Allocate enough memory for TRACE_EVENT_INFO based on the required size.
 		buff := make([]byte, bufSize)
 		info = ((*TraceEventInfo)(unsafe.Pointer(&buff[0])))
 		// Retrieve the event information into the allocated buffer.
-		err = _TdhGetEventInformation(er, 0, nil, info, &bufSize)
+		err = _TdhGetEventInformation(r, 0, nil, info, &bufSize)
 	}
 
 	// Check for errors in retrieving the event information.
@@ -214,7 +214,7 @@ func (p *propertyParser) getPropertyValue(i int) (interface{}, error) {
 
 	// Return the entire result set or the single value, based on the property count.
 	if ((propertyInfo.Flags & PropertyParamCount) == PropertyParamCount) ||
-		(propertyInfo.Count() > 1) {
+		(propertyInfo.count() > 1) {
 		return result, nil
 	}
 	return result[0], nil
@@ -226,22 +226,22 @@ func (p *propertyParser) getArraySize(propertyInfo EventPropertyInfo) (uint32, e
 	if (propertyInfo.Flags & PropertyParamCount) == PropertyParamCount {
 		var dataDescriptor PropertyDataDescriptor
 		// Locate the property containing the array size using the countPropertyIndex.
-		dataDescriptor.PropertyName = readPropertyName(p, int(propertyInfo.Count()))
+		dataDescriptor.PropertyName = readPropertyName(p, int(propertyInfo.count()))
 		dataDescriptor.ArrayIndex = 0xFFFFFFFF
 		// Retrieve the length of the array from the specified property.
-		return getLengthFromProperty(p.er, &dataDescriptor)
+		return getLengthFromProperty(p.r, &dataDescriptor)
 	} else {
 		// If the array size is directly specified, return it.
-		return uint32(propertyInfo.Count()), nil
+		return uint32(propertyInfo.count()), nil
 	}
 }
 
 // getLengthFromProperty retrieves the length of a property from an event record.
-func getLengthFromProperty(er *EventRecord, dataDescriptor *PropertyDataDescriptor) (uint32, error) {
+func getLengthFromProperty(r *EventRecord, dataDescriptor *PropertyDataDescriptor) (uint32, error) {
 	var length uint32
 	// Call TdhGetProperty to get the length of the property specified by the dataDescriptor.
 	err := _TdhGetProperty(
-		er,
+		r,
 		0,
 		nil,
 		1,
@@ -258,8 +258,8 @@ func getLengthFromProperty(er *EventRecord, dataDescriptor *PropertyDataDescript
 // parseStruct extracts and returns the fields from an embedded structure within a property.
 func (p *propertyParser) parseStruct(propertyInfo EventPropertyInfo) (map[string]interface{}, error) {
 	// Determine the start and end indexes of the structure members within the property info.
-	startIndex := propertyInfo.StructStartIndex()
-	lastIndex := startIndex + propertyInfo.NumOfStructMembers()
+	startIndex := propertyInfo.structStartIndex()
+	lastIndex := startIndex + propertyInfo.numOfStructMembers()
 
 	// Initialize a map to hold the structure's fields.
 	structure := make(map[string]interface{}, (lastIndex - startIndex))
@@ -279,7 +279,7 @@ func (p *propertyParser) parseStruct(propertyInfo EventPropertyInfo) (map[string
 // parseSimpleType parses a simple property type using TdhFormatProperty.
 func (p *propertyParser) parseSimpleType(propertyInfo EventPropertyInfo) (string, error) {
 	var mapInfo *EventMapInfo
-	if propertyInfo.MapNameOffset() > 0 {
+	if propertyInfo.mapNameOffset() > 0 {
 		// If failed retrieving the map information, returns on error
 		var err error
 		mapInfo, err = p.getMapInfo(propertyInfo)
@@ -311,8 +311,8 @@ retryLoop:
 			p.info,
 			mapInfo,
 			p.ptrSize,
-			propertyInfo.InType(),
-			propertyInfo.OutType(),
+			propertyInfo.inType(),
+			propertyInfo.outType(),
 			uint16(propertyLength),
 			uint16(len(p.data)),
 			dataPtr,
@@ -353,10 +353,10 @@ retryLoop:
 func (p *propertyParser) getMapInfo(propertyInfo EventPropertyInfo) (*EventMapInfo, error) {
 	var mapSize uint32
 	// Get the name of the map from the property info.
-	mapName := (*uint16)(unsafe.Add(unsafe.Pointer(p.info), propertyInfo.MapNameOffset()))
+	mapName := (*uint16)(unsafe.Add(unsafe.Pointer(p.info), propertyInfo.mapNameOffset()))
 
 	// First call to get the required size of the map info.
-	err := _TdhGetEventMapInformation(p.er, mapName, nil, &mapSize)
+	err := _TdhGetEventMapInformation(p.r, mapName, nil, &mapSize)
 	switch {
 	case errors.Is(err, ERROR_NOT_FOUND):
 		// No mapping information available. This is not an error.
@@ -370,7 +370,7 @@ func (p *propertyParser) getMapInfo(propertyInfo EventPropertyInfo) (*EventMapIn
 	// Allocate buffer and retrieve the actual map information.
 	buff := make([]byte, int(mapSize))
 	mapInfo := ((*EventMapInfo)(unsafe.Pointer(&buff[0])))
-	err = _TdhGetEventMapInformation(p.er, mapName, mapInfo, &mapSize)
+	err = _TdhGetEventMapInformation(p.r, mapName, mapInfo, &mapSize)
 	if err != nil {
 		return nil, fmt.Errorf("TdhGetEventMapInformation failed: %w", err)
 	}
@@ -388,14 +388,14 @@ func (p *propertyParser) getPropertyLength(propertyInfo EventPropertyInfo) (uint
 	if (propertyInfo.Flags & PropertyParamLength) == PropertyParamLength {
 		var dataDescriptor PropertyDataDescriptor
 		// Read the property name that contains the length information.
-		dataDescriptor.PropertyName = readPropertyName(p, int(propertyInfo.Length()))
+		dataDescriptor.PropertyName = readPropertyName(p, int(propertyInfo.length()))
 		dataDescriptor.ArrayIndex = 0xFFFFFFFF
 		// Retrieve the length from the specified property.
-		return getLengthFromProperty(p.er, &dataDescriptor)
+		return getLengthFromProperty(p.r, &dataDescriptor)
 	}
 
-	inType := propertyInfo.InType()
-	outType := propertyInfo.OutType()
+	inType := propertyInfo.inType()
+	outType := propertyInfo.outType()
 	// Special handling for properties representing IPv6 addresses.
 	// https://docs.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhformatproperty#remarks
 	if TdhIntypeBinary == inType && TdhOuttypeIpv6 == outType {
@@ -405,5 +405,5 @@ func (p *propertyParser) getPropertyLength(propertyInfo EventPropertyInfo) (uint
 
 	// Default case: return the length as defined in the property info.
 	// Note: A length of 0 can indicate a variable-length field (e.g., structure, string).
-	return uint32(propertyInfo.Length()), nil
+	return uint32(propertyInfo.length()), nil
 }

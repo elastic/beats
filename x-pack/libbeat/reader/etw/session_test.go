@@ -66,13 +66,13 @@ func mockGUIDFromProviderName(providerName string) (GUID, error) {
 
 func TestSetSessionGUID_ProviderName(t *testing.T) {
 	// Backup original function and defer restoration
-	originalFunc := GUIDFromProviderNameFunc
+	originalFunc := guidFromProviderNameFunc
 	t.Cleanup(func() {
-		GUIDFromProviderNameFunc = originalFunc
+		guidFromProviderNameFunc = originalFunc
 	})
 
 	// Replace with mock function
-	GUIDFromProviderNameFunc = mockGUIDFromProviderName
+	guidFromProviderNameFunc = mockGUIDFromProviderName
 
 	conf := Config{ProviderName: "Provider1"}
 	expectedGUID := GUID{Data1: 0x12345678, Data2: 0x1234, Data3: 0x5678, Data4: [8]byte{0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78}}
@@ -149,13 +149,13 @@ func TestNewSessionProperties(t *testing.T) {
 
 func TestNewSession_ProviderName(t *testing.T) {
 	// Backup original function and defer restoration
-	originalSetSessionGUID := SetSessionGUIDFunc
+	originalSetSessionGUID := setSessionGUIDFunc
 	t.Cleanup(func() {
-		SetSessionGUIDFunc = originalSetSessionGUID
+		setSessionGUIDFunc = originalSetSessionGUID
 	})
 
-	// Override SetSessionGUIDFunc with mock
-	SetSessionGUIDFunc = func(conf Config) (GUID, error) {
+	// Override setSessionGUIDFunc with mock
+	setSessionGUIDFunc = func(conf Config) (GUID, error) {
 		return GUID{
 			Data1: 0x12345678,
 			Data2: 0x1234,
@@ -194,13 +194,13 @@ func TestNewSession_ProviderName(t *testing.T) {
 
 func TestNewSession_GUIDError(t *testing.T) {
 	// Backup original function and defer restoration
-	originalSetSessionGUID := SetSessionGUIDFunc
+	originalSetSessionGUID := setSessionGUIDFunc
 	t.Cleanup(func() {
-		SetSessionGUIDFunc = originalSetSessionGUID
+		setSessionGUIDFunc = originalSetSessionGUID
 	})
 
-	// Override SetSessionGUIDFunc with mock
-	SetSessionGUIDFunc = func(conf Config) (GUID, error) {
+	// Override setSessionGUIDFunc with mock
+	setSessionGUIDFunc = func(conf Config) (GUID, error) {
 		// Return an empty GUID and an error
 		return GUID{}, fmt.Errorf("mock error")
 	}

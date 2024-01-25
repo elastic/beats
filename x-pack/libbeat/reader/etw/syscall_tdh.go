@@ -72,7 +72,7 @@ type EventHeader struct {
 	ActivityId      GUID
 }
 
-func (e *EventRecord) PointerSize() uint32 {
+func (e *EventRecord) pointerSize() uint32 {
 	if e.EventHeader.Flags&EVENT_HEADER_FLAG_32_BIT_HEADER == EVENT_HEADER_FLAG_32_BIT_HEADER {
 		return 4
 	}
@@ -150,31 +150,31 @@ type EventPropertyInfo struct {
 	ResTagUnion uint32
 }
 
-func (i *EventPropertyInfo) Count() uint16 {
+func (i *EventPropertyInfo) count() uint16 {
 	return i.CountUnion
 }
 
-func (i *EventPropertyInfo) Length() uint16 {
+func (i *EventPropertyInfo) length() uint16 {
 	return i.LengthUnion
 }
 
-func (i *EventPropertyInfo) InType() uint16 {
+func (i *EventPropertyInfo) inType() uint16 {
 	return i.TypeUnion.u1
 }
 
-func (i *EventPropertyInfo) OutType() uint16 {
+func (i *EventPropertyInfo) outType() uint16 {
 	return i.TypeUnion.u2
 }
 
-func (i *EventPropertyInfo) StructStartIndex() uint16 {
-	return i.InType()
+func (i *EventPropertyInfo) structStartIndex() uint16 {
+	return i.inType()
 }
 
-func (i *EventPropertyInfo) NumOfStructMembers() uint16 {
-	return i.OutType()
+func (i *EventPropertyInfo) numOfStructMembers() uint16 {
+	return i.outType()
 }
 
-func (i *EventPropertyInfo) MapNameOffset() uint32 {
+func (i *EventPropertyInfo) mapNameOffset() uint32 {
 	return i.TypeUnion.u3
 }
 
@@ -219,8 +219,8 @@ type PropertyDataDescriptor struct {
 	Reserved     uint32
 }
 
-// EnumerateProvidersFunc is used to replace the pointer to the function in unit tests
-var EnumerateProvidersFunc = _TdhEnumerateProviders
+// enumerateProvidersFunc is used to replace the pointer to the function in unit tests
+var enumerateProvidersFunc = _TdhEnumerateProviders
 
 // https://learn.microsoft.com/en-us/windows/win32/api/tdh/nf-tdh-tdhenumerateproviders
 func _TdhEnumerateProviders(

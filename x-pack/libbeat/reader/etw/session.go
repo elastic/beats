@@ -18,8 +18,8 @@ import (
 // For testing purposes we create a variable to store the function to call
 // When running tests, these variables point to a mock function
 var (
-	GUIDFromProviderNameFunc = GUIDFromProviderName
-	SetSessionGUIDFunc       = setSessionGUID
+	guidFromProviderNameFunc = guidFromProviderName
+	setSessionGUIDFunc       = setSessionGUID
 )
 
 type Session struct {
@@ -90,7 +90,7 @@ func setSessionGUID(conf Config) (GUID, error) {
 
 	// If ProviderGUID is not set in the configuration, attempt to resolve it using the provider name.
 	if conf.ProviderGUID == "" {
-		guid, err = GUIDFromProviderNameFunc(conf.ProviderName)
+		guid, err = guidFromProviderNameFunc(conf.ProviderName)
 		if err != nil {
 			return GUID{}, fmt.Errorf("error resolving GUID: %w", err)
 		}
@@ -200,7 +200,7 @@ func NewSession(conf Config) (Session, error) {
 
 	session.NewSession = true // Indicate this is a new session
 
-	session.GUID, err = SetSessionGUIDFunc(conf)
+	session.GUID, err = setSessionGUIDFunc(conf)
 	if err != nil {
 		return Session{}, err
 	}
@@ -224,14 +224,14 @@ func (s *Session) StartConsumer() error {
 		elf.LogFileMode = PROCESS_TRACE_MODE_EVENT_RECORD
 		logfilePtr, err := syscall.UTF16PtrFromString(s.Name)
 		if err != nil {
-			return fmt.Errorf("failed to convert logfile name")
+			return fmt.Errorf("failed to convert logfile name: %w", err)
 		}
 		elf.LogFileName = logfilePtr
 	} else {
 		elf.LogFileMode = PROCESS_TRACE_MODE_EVENT_RECORD | PROCESS_TRACE_MODE_REAL_TIME
 		sessionPtr, err := syscall.UTF16PtrFromString(s.Name)
 		if err != nil {
-			return fmt.Errorf("failed to convert session name")
+			return fmt.Errorf("failed to convert session name: %w", err)
 		}
 		elf.LoggerName = sessionPtr
 	}

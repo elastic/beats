@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"syscall"
-	"unsafe"
 )
 
 // GetHandler queries the status of an existing ETW session to get its handler and properties.
@@ -18,7 +17,7 @@ func (s *Session) GetHandler() error {
 	// Convert the session name to UTF16 for Windows API compatibility.
 	sessionNamePtr, err := syscall.UTF16PtrFromString(s.Name)
 	if err != nil {
-		return fmt.Errorf("failed to convert session name")
+		return fmt.Errorf("failed to convert session name: %w", err)
 	}
 
 	// Query the current state of the ETW session.
@@ -32,7 +31,7 @@ func (s *Session) GetHandler() error {
 	case errors.Is(err, ERROR_INVALID_PARAMETER):
 		return fmt.Errorf("invalid parameters when querying handler: %w", err)
 	case errors.Is(err, ERROR_WMI_INSTANCE_NOT_FOUND):
-		return fmt.Errorf("session is not running")
+		return fmt.Errorf("session is not running: %w", err)
 	default:
 		return fmt.Errorf("failed to get handler: %w", err)
 	}
@@ -48,7 +47,7 @@ func (s *Session) CreateRealtimeSession() error {
 	// Convert the session name to UTF16 format for Windows API compatibility.
 	sessionPtr, err := syscall.UTF16PtrFromString(s.Name)
 	if err != nil {
-		return fmt.Errorf("failed to convert session name")
+		return fmt.Errorf("failed to convert session name: %w", err)
 	}
 
 	// Start the ETW trace session.
@@ -75,7 +74,7 @@ func (s *Session) CreateRealtimeSession() error {
 	const timeout = 0
 
 	// Enable the trace session with extended options.
-	err = s.enableTrace(s.Handler, (*GUID)(unsafe.Pointer(&s.GUID)), EVENT_CONTROL_CODE_ENABLE_PROVIDER, s.TraceLevel, s.MatchAnyKeyword, s.MatchAllKeyword, timeout, &params)
+	err = s.enableTrace(s.Handler, &s.GUID, EVENT_CONTROL_CODE_ENABLE_PROVIDER, s.TraceLevel, s.MatchAnyKeyword, s.MatchAllKeyword, timeout, &params)
 	switch {
 	case err == nil:
 
