@@ -120,8 +120,8 @@ echo "--- Env preparation"
 if command -v docker-compose &> /dev/null
 then
   set +e
-  echo "Found docker-compose. Checking version.."
   FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version|awk '{print $3}'|sed s/\,//)
+  echo "Found docker-compose version:$FOUND_DOCKER_COMPOSE_VERSION"
   if [ $FOUND_DOCKER_COMPOSE_VERSION == $DOCKER_COMPOSE_VERSION ]; then
     echo "Versions match. No need to install docker-compose. Exiting."
   else
@@ -137,4 +137,4 @@ with_mage
 with_python
 config_git
 
-mage dumpVariables
+# mage dumpVariables
