@@ -135,6 +135,8 @@ then
     with_docker_compose "${DOCKER_COMPOSE_VERSION}"
   fi
   set -e
+else
+  with_docker_compose "${DOCKER_COMPOSE_VERSION}"
 fi
 
 add_bin_path
