@@ -20,6 +20,7 @@
 package tracing
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"reflect"
@@ -79,8 +80,8 @@ func (f mapDecoder) Decode(raw []byte, meta Metadata) (mapIf interface{}, err er
 			}
 
 		case FieldTypeString:
-			offset := int(MachineEndian.Uint16(raw[field.Offset:]))
-			len := int(MachineEndian.Uint16(raw[field.Offset+2:]))
+			offset := int(binary.NativeEndian.Uint16(raw[field.Offset:]))
+			len := int(binary.NativeEndian.Uint16(raw[field.Offset+2:]))
 			if offset+len > n {
 				return nil, fmt.Errorf("perf event string data for field %s overflows message of size %d", field.Name, n)
 			}
@@ -345,8 +346,8 @@ func (d *structDecoder) Decode(raw []byte, meta Metadata) (s interface{}, err er
 			}
 
 		case FieldTypeString:
-			offset := uintptr(MachineEndian.Uint16(raw[dec.src:]))
-			length := uintptr(MachineEndian.Uint16(raw[dec.src+2:]))
+			offset := uintptr(binary.NativeEndian.Uint16(raw[dec.src:]))
+			length := uintptr(binary.NativeEndian.Uint16(raw[dec.src+2:]))
 			if offset+length > n {
 				return nil, fmt.Errorf("perf event string data for field %s overflows message of size %d", dec.name, n)
 			}
