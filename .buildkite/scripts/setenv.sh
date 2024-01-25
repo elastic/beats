@@ -13,7 +13,6 @@ case "$os_name" in
     export DOCKER_COMPOSE_VERSION
     export SETUP_GVM_VERSION
     export GO_VERSION
-    mage dumpVariables
     ;;
   MINGW* | MSYS* | CYGWIN* | Windows_NT)
     # TODO: Add environment variables from other pipelines, at least from metricbeat

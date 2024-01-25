@@ -136,3 +136,4 @@ with_go "${GO_VERSION}"
 with_mage
 with_python
 config_git
+mage dumpVariables
