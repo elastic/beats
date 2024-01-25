@@ -115,7 +115,7 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 				},
 			}
 			resp.AddPage(http.StatusOK, page, nil)
-			return
+			return resp
 		},
 	}
 	logger := logp.NewLogger("test_add_cloud_metadata")

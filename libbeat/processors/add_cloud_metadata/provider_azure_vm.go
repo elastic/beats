@@ -100,8 +100,17 @@ var azureVMMetadataFetcher = provider{
 		}
 
 		hfetcher, err := newMetadataFetcher(config, "azure", azHeaders, metadataHost, azHttpSchema, azMetadataURI)
+		if err != nil {
+			return hfetcher, err
+		}
 		fetcher, err := newAzureMetadataFetcher("azure", hfetcher)
+		if err != nil {
+			return fetcher, err
+		}
 		gfetcher, err := newGenericMetadataFetcher(config, "azure", azGenSchema, fetcher.fetchAzureClusterMeta)
+		if err != nil {
+			return fetcher, err
+		}
 		fetcher.genericMetadataFetcher = gfetcher
 		return fetcher, err
 	},
@@ -145,7 +154,7 @@ func getAKSClusterNameId(ctx context.Context, logger *logp.Logger, clusterClient
 	for pager.More() {
 		page, err := pager.NextPage(ctx)
 		if err != nil {
-			return "", "", fmt.Errorf("failed to advance page: %v", err)
+			return "", "", fmt.Errorf("failed to advance page: %w", err)
 		}
 		for _, v := range page.Value {
 			if *v.Properties.NodeResourceGroup == resourceGroupName {
@@ -191,12 +200,12 @@ func (az *azureMetadataFetcher) fetchAzureClusterMeta(
 	}
 	cred, err := getAzureCredentials(logger)
 	if err != nil {
-		result.err = fmt.Errorf("failed to obtain azure credentials: %v", err)
+		result.err = fmt.Errorf("failed to obtain azure credentials: %w", err)
 		return
 	}
 	clientFactory, err := armcontainerservice.NewClientFactory(strSubscriptionId, cred, nil)
 	if err != nil {
-		result.err = fmt.Errorf("failed to create new armcontainerservice client factory: %v", err)
+		result.err = fmt.Errorf("failed to create new armcontainerservice client factory: %w", err)
 		return
 	}
 
@@ -206,6 +215,6 @@ func (az *azureMetadataFetcher) fetchAzureClusterMeta(
 		_, _ = result.metadata.Put("orchestrator.cluster.id", clusterId)
 		_, _ = result.metadata.Put("orchestrator.cluster.name", clusterName)
 	} else {
-		result.err = fmt.Errorf("failed to get AKS cluster name and Id: %v", err)
+		result.err = fmt.Errorf("failed to get AKS cluster name and Id: %w", err)
 	}
 }
