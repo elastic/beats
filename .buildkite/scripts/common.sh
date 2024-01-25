@@ -17,6 +17,8 @@ with_docker_compose() {
   create_workspace
   retry 5 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type_lowercase}-${arch_type}"
   chmod +x ${BIN}/docker-compose
+  ls -la ${BIN}
+  ${BIN}/docker-compose version
   docker-compose version
 }
 
@@ -74,7 +76,7 @@ with_go() {
   which go
   local go_path="$(go env GOPATH):$(go env GOPATH)/bin"
   export PATH="${PATH}:${go_path}"
-  # go mod download
+  go mod download
 }
 
 with_python() {
@@ -121,7 +123,7 @@ if command -v docker-compose &> /dev/null
 then
   set +e
   FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version|awk '{print $3}'|sed s/\,//)
-  echo "Found docker-compose version:$FOUND_DOCKER_COMPOSE_VERSION"
+  echo "Found docker-compose version: $FOUND_DOCKER_COMPOSE_VERSION"
   if [ $FOUND_DOCKER_COMPOSE_VERSION == $DOCKER_COMPOSE_VERSION ]; then
     echo "Versions match. No need to install docker-compose. Exiting."
   else
@@ -132,7 +134,7 @@ then
 fi
 
 add_bin_path
-with_go "${GO_VERSION}"
+# with_go "${GO_VERSION}"
 with_mage
 with_python
 config_git

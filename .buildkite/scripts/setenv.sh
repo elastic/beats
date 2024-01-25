@@ -5,10 +5,9 @@ SETUP_GVM_VERSION="v0.5.1"
 DOCKER_COMPOSE_VERSION="1.21.0"
 GO_VERSION=$(cat .go-version)
 echo "GO_VERSION: ${GO_VERSION}"
+os_type=$(uname)
 
-os_name=$(uname)
-
-case "$os_name" in
+case "$os_type" in
   Darwin | Linux)
     export DOCKER_COMPOSE_VERSION
     export SETUP_GVM_VERSION
