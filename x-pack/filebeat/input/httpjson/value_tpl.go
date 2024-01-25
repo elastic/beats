@@ -191,7 +191,17 @@ func parseDate(date string, layout ...string) time.Time {
 		return time.Time{}
 	}
 
-	return t.UTC()
+	loc, err := time.LoadLocation(t.Location().String())
+	if err != nil {
+		return t.UTC()
+	}
+
+	tInLoc, err := time.ParseInLocation(ly, date, loc)
+	if err != nil {
+		return t.UTC()
+	}
+
+	return tInLoc.UTC()
 }
 
 func formatDate(date time.Time, layouttz ...string) string {
