@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
 - Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
+- Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
 
 *Heartbeat*
 
@@ -167,6 +168,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Update CEL extensions library to v1.7.0. {pull}37172[37172]
 - Add support for complete URL replacement in HTTPJSON chain steps. {pull}37486[37486]
 - Add support for user-defined query selection in EntraID entity analytics provider. {pull}37653[37653]
+- Update CEL extensions library to v1.8.0 to provide runtime error location reporting. {issue}37304[37304] {pull}37718[37718]
+- Add request trace logging for chained API requests. {issue}37551[36551] {pull}37682[37682]
+- Relax TCP/UDP metric polling expectations to improve metric collection. {pull}37714[37714]
 
 *Auditbeat*
 
@@ -190,6 +194,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each metricset instance. {pull}36971[36971]
 - Add linux IO metrics to system/process {pull}37213[37213]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
+- Update `getOpTimestamp` in `replstatus` to fix sort and temp files generation issue in mongodb. {pull}37688[37688]
 
 *Osquerybeat*
 
