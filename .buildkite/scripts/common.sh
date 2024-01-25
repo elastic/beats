@@ -19,8 +19,7 @@ with_docker_compose() {
   create_workspace
   retry 5 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type_lowercase}-${arch_type}"
   chmod +x ${BIN}/docker-compose
-  ls -la ${BIN}
-  ${BIN}/docker-compose version
+  export PATH="${PATH}:${BIN}"
   docker-compose version
 }
 
@@ -139,7 +138,7 @@ else
   with_docker_compose "${DOCKER_COMPOSE_VERSION}"
 fi
 
-add_bin_path
+# add_bin_path
 # with_go "${GO_VERSION}"
 with_mage
 with_python
