@@ -18,6 +18,7 @@
 package add_host_metadata
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -178,7 +179,10 @@ func (p *addHostMetadata) loadData(checkCache bool, useFQDN bool) error {
 
 	hostname := h.Info().Hostname
 	if useFQDN {
-		fqdn, err := h.FQDN()
+		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+		defer cancel()
+
+		fqdn, err := h.FQDN(ctx)
 		if err != nil {
 			// FQDN lookup is "best effort". If it fails, we monitor the failure, fallback to
 			// the OS-reported hostname, and move on.

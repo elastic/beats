@@ -824,7 +824,10 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("failed to get host information: %w", err)
 	}
 
-	fqdn, err := h.FQDN()
+	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	fqdn, err := h.FQDN(fqdnLookupCtx)
 	if err != nil {
 		// FQDN lookup is "best effort".  We log the error, fallback to
 		// the OS-reported hostname, and move on.
