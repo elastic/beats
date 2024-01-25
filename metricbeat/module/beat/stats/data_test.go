@@ -20,7 +20,7 @@
 package stats
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -44,7 +44,7 @@ func TestEventMapping(t *testing.T) {
 	clusterUUID := "foo"
 
 	for _, f := range files {
-		input, err := ioutil.ReadFile(f)
+		input, err := os.ReadFile(f)
 		require.NoError(t, err)
 
 		reporter := &mbtest.CapturingReporterV2{}

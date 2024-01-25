@@ -22,7 +22,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -207,7 +206,7 @@ func getPipelinePath(path, modulesPath string) ([]string, error) {
 	}
 
 	if stat.IsDir() {
-		files, err := ioutil.ReadDir(path)
+		files, err := os.ReadDir(path)
 		if err != nil {
 			return nil, err
 		}
@@ -258,7 +257,7 @@ func testPipeline(esURL, path string, logs []string, verbose, simulateVerbose bo
 }
 
 func readPipeline(path string) (map[string]interface{}, error) {
-	d, err := ioutil.ReadFile(path)
+	d, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}

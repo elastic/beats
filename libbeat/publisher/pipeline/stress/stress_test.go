@@ -22,7 +22,6 @@ package stress_test
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -82,7 +81,7 @@ func TestPipeline(t *testing.T) {
 				name = strings.Replace(name, "/", "-", -1)
 				name = strings.Replace(name, "\\", "-", -1)
 
-				dir, err := ioutil.TempDir("", "")
+				dir, err := os.MkdirTemp("", "")
 				if err != nil {
 					t.Fatal(err)
 				}

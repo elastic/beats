@@ -6,7 +6,6 @@ package persistentcache
 
 import (
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -408,7 +407,7 @@ func BenchmarkGet(b *testing.B) {
 func testOptions(t testing.TB) Options {
 	t.Helper()
 
-	tempDir, err := ioutil.TempDir("", "beat-data-dir-")
+	tempDir, err := os.MkdirTemp("", "beat-data-dir-")
 	require.NoError(t, err)
 
 	t.Cleanup(func() { os.RemoveAll(tempDir) })

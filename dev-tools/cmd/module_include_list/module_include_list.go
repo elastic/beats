@@ -22,7 +22,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -155,7 +154,7 @@ func main() {
 	}
 
 	// Write the output file.
-	if err = ioutil.WriteFile(outFile, buf.Bytes(), 0644); err != nil {
+	if err = os.WriteFile(outFile, buf.Bytes(), 0644); err != nil {
 		log.Fatalf("Failed writing output file: %v", err)
 	}
 }

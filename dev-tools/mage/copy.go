@@ -20,7 +20,7 @@ package mage
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -144,11 +144,18 @@ func (t *CopyTask) dirCopy(src, dest string, info os.FileInfo) error {
 		return fmt.Errorf("failed creating dirs: %w", err)
 	}
 
-	contents, err := ioutil.ReadDir(src)
+	contentEntries, err := os.ReadDir(src)
 	if err != nil {
 		return fmt.Errorf("failed to read dir %v: %w", src, err)
 	}
-
+	contents := make([]fs.FileInfo, 0, len(contentEntries))
+	for _, entry := range contentEntries {
+		content, err := entry.Info()
+		if err != nil {
+			return fmt.Errorf("failed to stat %v: %w", entry.Name(), err)
+		}
+		contents = append(contents, content)
+	}
 	for _, info := range contents {
 		srcFile := filepath.Join(src, info.Name())
 		destFile := filepath.Join(dest, info.Name())

@@ -21,7 +21,7 @@ package entropy
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 
@@ -85,7 +85,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 
 func getEntropyData(path string) (int, error) {
 	//This will be a number in the range 0 to 4096.
-	raw, err := ioutil.ReadFile(path)
+	raw, err := os.ReadFile(path)
 	if err != nil {
 		return 0, fmt.Errorf("error reading from random: %w", err)
 	}

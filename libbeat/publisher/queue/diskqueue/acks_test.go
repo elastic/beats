@@ -19,7 +19,6 @@ package diskqueue
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -238,7 +237,7 @@ func TestAddFrames(t *testing.T) {
 }
 
 func runAddFramesTest(t *testing.T, name string, test addFramesTest) {
-	dir, err := ioutil.TempDir("", "diskqueue_acks_test")
+	dir, err := os.MkdirTemp("", "diskqueue_acks_test")
 	if err != nil {
 		t.Fatal(err)
 	}

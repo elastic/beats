@@ -10,7 +10,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -129,7 +128,7 @@ type MemoryFile struct {
 // Open the reader for the raw byte slice.
 func (m *MemoryFile) Open() (io.ReadCloser, error) {
 	reader := bytes.NewReader(m.Raw)
-	return ioutil.NopCloser(reader), nil
+	return io.NopCloser(reader), nil
 }
 
 // Name returns the path to use in the zip.

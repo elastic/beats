@@ -21,7 +21,7 @@ import (
 	"bytes"
 	"compress/zlib"
 	"encoding/base64"
-	"io/ioutil"
+	"io"
 	"sort"
 )
 
@@ -119,5 +119,5 @@ func DecodeData(data string) ([]byte, error) {
 	}
 	defer r.Close()
 
-	return ioutil.ReadAll(r)
+	return io.ReadAll(r)
 }

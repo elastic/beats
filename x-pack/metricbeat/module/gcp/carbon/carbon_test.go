@@ -6,7 +6,7 @@ package carbon
 
 import (
 	"errors"
-	"io/ioutil"
+	"io"
 	"log"
 	"testing"
 	"time"
@@ -78,7 +78,7 @@ func TestGetReportMonth(t *testing.T) {
 }
 
 func TestGenerateQuery(t *testing.T) {
-	log.SetOutput(ioutil.Discard)
+	log.SetOutput(io.Discard)
 
 	query := generateQuery("my-table", "jan")
 

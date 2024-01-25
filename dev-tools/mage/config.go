@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -196,7 +195,7 @@ func makeConfigTemplate(destination string, mode os.FileMode, confParams ConfigF
 		}
 	}
 
-	data, err := ioutil.ReadFile(confFile.Template)
+	data, err := os.ReadFile(confFile.Template)
 	if err != nil {
 		return fmt.Errorf("failed to read config template %q: %w", confFile.Template, err)
 	}
@@ -265,7 +264,7 @@ type moduleFieldsYmlData []struct {
 }
 
 func readModuleFieldsYml(path string) (title string, useShort bool, err error) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", false, err
 	}
@@ -302,7 +301,7 @@ func moduleDashes(name string) string {
 func GenerateModuleReferenceConfig(out string, moduleDirs ...string) error {
 	var moduleConfigs []moduleConfigTemplateData
 	for _, dir := range moduleDirs {
-		modules, err := ioutil.ReadDir(dir)
+		modules, err := os.ReadDir(dir)
 		if err != nil {
 			return err
 		}
@@ -327,7 +326,7 @@ func GenerateModuleReferenceConfig(out string, moduleDirs ...string) error {
 
 			var data []byte
 			for _, f := range files {
-				data, err = ioutil.ReadFile(f)
+				data, err = os.ReadFile(f)
 				if err != nil {
 					if os.IsNotExist(err) {
 						continue
@@ -365,5 +364,5 @@ func GenerateModuleReferenceConfig(out string, moduleDirs ...string) error {
 		"Modules": moduleConfigs,
 	})
 
-	return ioutil.WriteFile(createDir(out), []byte(config), 0644)
+	return os.WriteFile(createDir(out), []byte(config), 0644)
 }

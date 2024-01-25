@@ -27,10 +27,10 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -622,7 +622,7 @@ func podDone(event watch.Event) (bool, error) {
 func createTempFile(content []byte) (string, error) {
 	randBytes := make([]byte, 16)
 	rand.Read(randBytes)
-	tmpfile, err := ioutil.TempFile("", hex.EncodeToString(randBytes))
+	tmpfile, err := os.CreateTemp("", hex.EncodeToString(randBytes))
 	if err != nil {
 		return "", err
 	}

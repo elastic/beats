@@ -8,7 +8,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"sort"
 	"strconv"
@@ -107,7 +107,7 @@ func (f *fakePoll) deliverResult(t testing.TB, pl poll.Transaction, msg interfac
 	}
 	response := &http.Response{
 		StatusCode:    200,
-		Body:          ioutil.NopCloser(bytes.NewReader(js)),
+		Body:          io.NopCloser(bytes.NewReader(js)),
 		ContentLength: int64(len(js)),
 	}
 	if nextUrl != "" {
@@ -163,7 +163,7 @@ func (f *fakePoll) subscriptionError(t testing.TB, lb listBlob) (subscribe, list
 	t.Log(string(js))
 	resp := &http.Response{
 		StatusCode: 400,
-		Body:       ioutil.NopCloser(bytes.NewReader(js)),
+		Body:       io.NopCloser(bytes.NewReader(js)),
 	}
 	for _, a := range lb.OnResponse(resp) {
 		if err := a(f); !assert.NoError(t, err) {

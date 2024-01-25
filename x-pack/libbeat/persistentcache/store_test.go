@@ -5,7 +5,6 @@
 package persistentcache
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -23,7 +22,7 @@ func TestStandaloneStore(t *testing.T) {
 	var key = []byte("somekey")
 	var value = []byte("somevalue")
 
-	tempDir, err := ioutil.TempDir("", "beat-data-dir-")
+	tempDir, err := os.MkdirTemp("", "beat-data-dir-")
 	require.NoError(t, err)
 	t.Cleanup(func() { os.RemoveAll(tempDir) })
 

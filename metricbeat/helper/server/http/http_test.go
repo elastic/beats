@@ -24,7 +24,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"strconv"
@@ -230,7 +230,7 @@ func writeToServer(t *testing.T, message, host string, port int, connectionMetho
 
 	if connectionMethod == "GET" {
 		if resp.StatusCode == http.StatusOK {
-			bodyBytes, err2 := ioutil.ReadAll(resp.Body)
+			bodyBytes, err2 := io.ReadAll(resp.Body)
 			if err2 != nil {
 				t.Error(err)
 				t.FailNow()

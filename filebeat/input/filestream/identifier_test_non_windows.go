@@ -20,7 +20,6 @@
 package filestream
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -34,7 +33,7 @@ import (
 func TestFileIdentifierInodeMarker(t *testing.T) {
 	t.Run("inode_marker file identifier", func(t *testing.T) {
 		const markerContents = "unique_marker"
-		markerFile, err := ioutil.TempFile("", "test_file_identifier_inode_marker_identifier")
+		markerFile, err := os.CreateTemp("", "test_file_identifier_inode_marker_identifier")
 		if err != nil {
 			t.Fatalf("cannot create marker file for test: %v", err)
 		}
@@ -61,7 +60,7 @@ func TestFileIdentifierInodeMarker(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, inodeMarkerName, identifier.Name())
 
-		tmpFile, err := ioutil.TempFile("", "test_file_identifier_inode_marker")
+		tmpFile, err := os.CreateTemp("", "test_file_identifier_inode_marker")
 		if err != nil {
 			t.Fatalf("cannot create temporary file for test: %v", err)
 		}

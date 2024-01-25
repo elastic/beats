@@ -19,7 +19,7 @@ package http
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -122,7 +122,7 @@ func TestCheckJsonExpression(t *testing.T) {
 			)
 
 			require.NoError(t, err)
-			body, err := ioutil.ReadAll(res.Body)
+			body, err := io.ReadAll(res.Body)
 			require.NoError(t, err)
 			checkRes := checker(res, string(body))
 
@@ -218,7 +218,7 @@ func TestCheckJsonCondition(t *testing.T) {
 
 			checker, err := checkJson([]*jsonResponseCheck{{Description: test.condDesc, Condition: test.condConf}})
 			require.NoError(t, err)
-			body, err := ioutil.ReadAll(res.Body)
+			body, err := io.ReadAll(res.Body)
 			require.NoError(t, err)
 			checkRes := checker(res, string(body))
 

@@ -21,7 +21,7 @@ package encoding
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -95,7 +95,7 @@ func TestUtf16BOMEncodings(t *testing.T) {
 		assert.Equal(t, test.expectedOffset, contentOffset)
 		if err == nil {
 			reader := transform.NewReader(rawReader, encoding.NewDecoder())
-			content, _ := ioutil.ReadAll(reader)
+			content, _ := io.ReadAll(reader)
 			assert.Equal(t, text, content)
 		}
 	}

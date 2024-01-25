@@ -22,7 +22,7 @@ package elasticsearch
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -493,7 +493,7 @@ func startTestProxy(t *testing.T, redirectURL string) *httptest.Server {
 		require.NoError(t, err)
 		defer resp.Body.Close()
 
-		body, err := ioutil.ReadAll(resp.Body)
+		body, err := io.ReadAll(resp.Body)
 		require.NoError(t, err)
 
 		for _, header := range []string{"Content-Encoding", "Content-Type"} {

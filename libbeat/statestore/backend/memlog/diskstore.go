@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -438,7 +437,7 @@ func updateActiveMarker(log *logp.Logger, homePath, checkpointFilePath string) e
 		log.Errorf("Failed to remove old temporary active.dat.tmp file: %v", err)
 		return err
 	}
-	if err := ioutil.WriteFile(tmpLink, []byte(checkpointFilePath), 0600); err != nil {
+	if err := os.WriteFile(tmpLink, []byte(checkpointFilePath), 0600); err != nil {
 		log.Errorf("Failed to write temporary pointer file: %v", err)
 		return err
 	}

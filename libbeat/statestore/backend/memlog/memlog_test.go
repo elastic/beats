@@ -20,7 +20,6 @@ package memlog
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 	"math"
 	"os"
 	"path/filepath"
@@ -59,7 +58,7 @@ func TestCompliance_AlwaysCheckpoint(t *testing.T) {
 func TestLoadVersion1(t *testing.T) {
 	dataHome := "testdata/1"
 
-	list, err := ioutil.ReadDir(dataHome)
+	list, err := os.ReadDir(dataHome)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +79,7 @@ func TestLoadVersion1(t *testing.T) {
 }
 
 func testLoadVersion1Case(t *testing.T, dataPath string) {
-	path, err := ioutil.TempDir("", "")
+	path, err := os.MkdirTemp("", "")
 	if err != nil {
 		t.Fatalf("Failed to create temporary test directory: %v", err)
 	}
@@ -93,7 +92,7 @@ func testLoadVersion1Case(t *testing.T, dataPath string) {
 	}
 
 	// load expected test results
-	raw, err := ioutil.ReadFile(filepath.Join(path, "expected.json"))
+	raw, err := os.ReadFile(filepath.Join(path, "expected.json"))
 	if err != nil {
 		t.Fatalf("Failed to load expected.json: %v", err)
 	}
@@ -210,7 +209,7 @@ func copyDir(to, from string) error {
 		}
 	}
 
-	list, err := ioutil.ReadDir(from)
+	list, err := os.ReadDir(from)
 	if err != nil {
 		return err
 	}

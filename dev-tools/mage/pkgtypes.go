@@ -24,7 +24,6 @@ import (
 	"compress/gzip"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -425,7 +424,7 @@ func (s PackageSpec) Evaluate(args ...map[string]interface{}) PackageSpec {
 			}
 
 			f.Source = filepath.Join(s.packageDir, filepath.Base(f.Target))
-			if err = ioutil.WriteFile(CreateDir(f.Source), []byte(content), 0644); err != nil {
+			if err = os.WriteFile(CreateDir(f.Source), []byte(content), 0644); err != nil {
 				panic(fmt.Errorf("failed to write file containing content for target=%v: %w", target, err))
 			}
 		case f.Template != "":
@@ -568,7 +567,7 @@ func PackageZip(spec PackageSpec) error {
 	spec.OutputFile = Zip.AddFileExtension(spec.OutputFile)
 
 	// Write the zip file.
-	if err := ioutil.WriteFile(CreateDir(spec.OutputFile), buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(CreateDir(spec.OutputFile), buf.Bytes(), 0644); err != nil {
 		return fmt.Errorf("failed to write zip file: %w", err)
 	}
 
@@ -631,7 +630,7 @@ func PackageTarGz(spec PackageSpec) error {
 			continue
 		}
 
-		tmpdir, err := ioutil.TempDir("", "TmpSymlinkDropPath")
+		tmpdir, err := os.MkdirTemp("", "TmpSymlinkDropPath")
 		if err != nil {
 			return err
 		}

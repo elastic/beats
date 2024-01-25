@@ -22,7 +22,6 @@ package filestream
 import (
 	"context"
 	"errors"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -37,7 +36,7 @@ import (
 )
 
 func TestFileScannerSymlinks(t *testing.T) {
-	tmpDir, err := ioutil.TempDir("", "fswatch_test_file_scanner")
+	tmpDir, err := os.MkdirTemp("", "fswatch_test_file_scanner")
 	if err != nil {
 		t.Fatalf("cannot create temporary test dir: %v", err)
 	}

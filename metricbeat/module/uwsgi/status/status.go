@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"net/url"
@@ -89,7 +88,7 @@ func fetchStatData(URL string) ([]byte, error) {
 		return nil, errors.New("unknown scheme")
 	}
 
-	data, err := ioutil.ReadAll(reader)
+	data, err := io.ReadAll(reader)
 	if err != nil {
 		return nil, fmt.Errorf("uwsgi data read failed: %w", err)
 	}

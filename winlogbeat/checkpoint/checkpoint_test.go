@@ -20,7 +20,6 @@
 package checkpoint
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -58,7 +57,7 @@ func eventually(t *testing.T, predicate func() (bool, error), timeout time.Durat
 // Test that a write is triggered when the maximum time period since the last
 // write is reached.
 func TestWriteTimedFlush(t *testing.T) {
-	dir, err := ioutil.TempDir("", "wlb-checkpoint-test")
+	dir, err := os.MkdirTemp("", "wlb-checkpoint-test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,7 +102,7 @@ func TestWriteTimedFlush(t *testing.T) {
 
 // Test that createDir creates the directory with 0750 permissions.
 func TestCreateDir(t *testing.T) {
-	dir, err := ioutil.TempDir("", "wlb-checkpoint-test")
+	dir, err := os.MkdirTemp("", "wlb-checkpoint-test")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -142,7 +141,7 @@ func TestCreateDir(t *testing.T) {
 // Test createDir when the directory already exists to verify that no error is
 // returned.
 func TestCreateDirAlreadyExists(t *testing.T) {
-	dir, err := ioutil.TempDir("", "wlb-checkpoint-test")
+	dir, err := os.MkdirTemp("", "wlb-checkpoint-test")
 	if err != nil {
 		t.Fatal(err)
 	}

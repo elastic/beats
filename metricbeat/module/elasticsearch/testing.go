@@ -20,7 +20,7 @@
 package elasticsearch
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -41,7 +41,7 @@ func TestMapper(t *testing.T, glob string, mapper func(mb.ReporterV2, []byte) er
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			input, err := ioutil.ReadFile(f)
+			input, err := os.ReadFile(f)
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}
@@ -67,7 +67,7 @@ func TestMapperWithInfo(t *testing.T, glob string, mapper func(mb.ReporterV2, In
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			input, err := ioutil.ReadFile(f)
+			input, err := os.ReadFile(f)
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}
@@ -93,7 +93,7 @@ func TestMapperWithMetricSetAndInfo(t *testing.T, glob string, ms MetricSetAPI, 
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			input, err := ioutil.ReadFile(f)
+			input, err := os.ReadFile(f)
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}
@@ -125,7 +125,7 @@ func TestMapperWithHttpHelper(t *testing.T, glob string, httpClient *helper.HTTP
 
 	for _, f := range files {
 		t.Run(f, func(t *testing.T) {
-			input, err := ioutil.ReadFile(f)
+			input, err := os.ReadFile(f)
 			require.NoError(t, err)
 
 			reporter := &mbtest.CapturingReporterV2{}

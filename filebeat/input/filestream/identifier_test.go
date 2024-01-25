@@ -18,7 +18,6 @@
 package filestream
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -40,7 +39,7 @@ func TestFileIdentifier(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, DefaultIdentifierName, identifier.Name())
 
-		tmpFile, err := ioutil.TempFile("", "test_file_identifier_native")
+		tmpFile, err := os.CreateTemp("", "test_file_identifier_native")
 		if err != nil {
 			t.Fatalf("cannot create temporary file for test: %v", err)
 		}
@@ -64,7 +63,7 @@ func TestFileIdentifier(t *testing.T) {
 		require.NoError(t, err)
 		assert.Equal(t, DefaultIdentifierName, identifier.Name())
 
-		tmpFile, err := ioutil.TempFile("", "test_file_identifier_native")
+		tmpFile, err := os.CreateTemp("", "test_file_identifier_native")
 		if err != nil {
 			t.Fatalf("cannot create temporary file for test: %v", err)
 		}

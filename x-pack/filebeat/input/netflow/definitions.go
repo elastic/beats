@@ -7,7 +7,7 @@ package netflow
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math"
 	"os"
 	"strconv"
@@ -95,7 +95,7 @@ func LoadFieldDefinitionsFromFile(path string) (defs fields.FieldDict, err error
 		return nil, err
 	}
 	defer file.Close()
-	contents, err := ioutil.ReadAll(file)
+	contents, err := io.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}

@@ -20,9 +20,9 @@
 package index_recovery
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
@@ -46,7 +46,7 @@ func createEsMuxer(license string) *http.ServeMux {
 			http.NotFound(w, r)
 		}
 
-		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		input, _ := os.ReadFile("./_meta/test/root.710.json")
 		w.Write(input)
 	}
 	licenseHandler := func(w http.ResponseWriter, r *http.Request) {
@@ -60,7 +60,7 @@ func createEsMuxer(license string) *http.ServeMux {
 	mux.Handle("/_xpack/license", http.HandlerFunc(licenseHandler)) // for before 7.0
 	mux.Handle("/", http.HandlerFunc(rootHandler))
 	mux.Handle("/_recovery", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		content, _ := ioutil.ReadFile("./_meta/test/recovery.710.json")
+		content, _ := os.ReadFile("./_meta/test/recovery.710.json")
 		w.Write(content)
 	}))
 

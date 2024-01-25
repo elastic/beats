@@ -19,7 +19,7 @@ package linux
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -28,7 +28,7 @@ import (
 // /sysfs contains a number of metrics broken out by values in individual files, so this is a useful helper function to have
 func ReadIntFromFile(path string, base int) (int64, error) {
 
-	raw, err := ioutil.ReadFile(path)
+	raw, err := os.ReadFile(path)
 	if err != nil {
 		return 0, fmt.Errorf("error reading file %s: %w", path, err)
 	}

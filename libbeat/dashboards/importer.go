@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -197,7 +196,7 @@ func (imp Importer) unzip(archive, target string) error {
 func (imp Importer) ImportArchive() error {
 	var archive string
 
-	target, err := ioutil.TempDir("", "tmp")
+	target, err := os.MkdirTemp("", "tmp")
 	if err != nil {
 		return fmt.Errorf("Failed to generate a temporary directory name: %v", err)
 	}
@@ -252,7 +251,7 @@ func (imp Importer) ImportArchive() error {
 }
 
 func getDirectories(target string) ([]string, error) {
-	files, err := ioutil.ReadDir(target)
+	files, err := os.ReadDir(target)
 	if err != nil {
 		return nil, err
 	}

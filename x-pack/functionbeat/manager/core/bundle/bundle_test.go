@@ -7,7 +7,7 @@ package bundle
 import (
 	"archive/zip"
 	"bytes"
-	"io/ioutil"
+	"io"
 	"os"
 	"testing"
 
@@ -89,7 +89,7 @@ func testArtifact(maxSizeUncompressed, maxSizeCompressed int64) func(t *testing.
 			}
 			defer reader.Close()
 
-			raw, err := ioutil.ReadAll(reader)
+			raw, err := io.ReadAll(reader)
 			if !assert.NoError(t, err) {
 				return
 			}
@@ -115,12 +115,12 @@ func TestLocalFile(t *testing.T) {
 		assert.NoError(t, err)
 	}()
 
-	content, err := ioutil.ReadAll(reader)
+	content, err := io.ReadAll(reader)
 	if !assert.NoError(t, err) {
 		return
 	}
 
-	raw, _ := ioutil.ReadFile("testdata/lipsum.txt")
+	raw, _ := os.ReadFile("testdata/lipsum.txt")
 	assert.Equal(t, raw, content)
 }
 
@@ -141,7 +141,7 @@ func TestMemoryFile(t *testing.T) {
 		assert.NoError(t, err)
 	}()
 
-	content, err := ioutil.ReadAll(reader)
+	content, err := io.ReadAll(reader)
 	if !assert.NoError(t, err) {
 		return
 	}

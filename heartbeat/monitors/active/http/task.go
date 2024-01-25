@@ -23,7 +23,7 @@ import (
 	"crypto/x509"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -311,7 +311,7 @@ func execPing(
 func attachRequestBody(ctx *context.Context, req *http.Request, body []byte) *http.Request {
 	req = req.WithContext(*ctx)
 	if len(body) > 0 {
-		req.Body = ioutil.NopCloser(bytes.NewBuffer(body))
+		req.Body = io.NopCloser(bytes.NewBuffer(body))
 		req.ContentLength = int64(len(body))
 	}
 

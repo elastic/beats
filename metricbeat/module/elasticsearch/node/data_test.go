@@ -20,7 +20,7 @@
 package node
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -42,7 +42,7 @@ func TestGetMappings(t *testing.T) {
 func TestInvalid(t *testing.T) {
 	file := "./_meta/test/invalid.json"
 
-	content, err := ioutil.ReadFile(file)
+	content, err := os.ReadFile(file)
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}

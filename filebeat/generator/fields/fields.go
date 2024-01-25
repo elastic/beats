@@ -20,7 +20,7 @@ package fields
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -100,7 +100,7 @@ func Generate(beatsPath, module, fileset string, noDoc bool) error {
 
 func readPipeline(filesetPath string) (*pipeline, error) {
 	pipelinePath := filepath.Join(filesetPath, "ingest/pipeline.json")
-	r, err := ioutil.ReadFile(pipelinePath)
+	r, err := os.ReadFile(pipelinePath)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func readPipeline(filesetPath string) (*pipeline, error) {
 
 func writeFieldsYml(filesetPath string, fieldsBytes []byte) error {
 	output := filepath.Join(filesetPath, "_meta/fields.yml")
-	return ioutil.WriteFile(output, fieldsBytes, 0o644)
+	return os.WriteFile(output, fieldsBytes, 0o644)
 }
 
 func newFieldYml(name, typeName string, noDoc bool) *fieldYml {

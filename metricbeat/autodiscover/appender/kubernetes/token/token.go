@@ -19,7 +19,7 @@ package token
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -127,7 +127,7 @@ func (t *tokenAppender) getAuthHeaderFromToken() string {
 	var token string
 
 	if t.TokenPath != "" {
-		b, err := ioutil.ReadFile(t.TokenPath)
+		b, err := os.ReadFile(t.TokenPath)
 		if err != nil {
 			logp.Err("Reading token file failed with err: %v", err)
 		}

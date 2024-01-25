@@ -24,7 +24,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -348,7 +347,7 @@ func (fs *Fileset) getInputConfig() (*conf.C, error) {
 	if err != nil {
 		return nil, fmt.Errorf("Error expanding vars on the input path: %w", err)
 	}
-	contents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
+	contents, err := os.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
 	if err != nil {
 		return nil, fmt.Errorf("Error reading input file %s: %w", path, err)
 	}
@@ -434,7 +433,7 @@ func (fs *Fileset) GetPipelines(esVersion version.V) (pipelines []pipeline, err 
 			return nil, fmt.Errorf("Error expanding vars on the ingest pipeline path: %w", err)
 		}
 
-		strContents, err := ioutil.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
+		strContents, err := os.ReadFile(filepath.Join(fs.modulePath, fs.name, path))
 		if err != nil {
 			return nil, fmt.Errorf("Error reading pipeline file %s: %w", path, err)
 		}

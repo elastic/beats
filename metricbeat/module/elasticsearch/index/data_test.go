@@ -20,9 +20,9 @@
 package index
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -72,7 +72,7 @@ func TestEmpty(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	input, err := ioutil.ReadFile("./_meta/test/empty.512.json")
+	input, err := os.ReadFile("./_meta/test/empty.512.json")
 	require.NoError(t, err)
 
 	reporter := &mbtest.CapturingReporterV2{}
@@ -89,16 +89,16 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 	}
 	rootHandler := func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.URL.Path, "_stats") {
-			input, _ := ioutil.ReadFile("./_meta/test/stats.800.snapshot.20201118.json")
+			input, _ := os.ReadFile("./_meta/test/stats.800.snapshot.20201118.json")
 			w.Write(input)
 			return
 		} else if r.URL.Path != "/" {
-			input, _ := ioutil.ReadFile("./_meta/test/settings.json")
+			input, _ := os.ReadFile("./_meta/test/settings.json")
 			w.Write(input)
 			return
 		}
 
-		input, _ := ioutil.ReadFile("./_meta/test/root.710.json")
+		input, _ := os.ReadFile("./_meta/test/root.710.json")
 		w.Write(input)
 
 	}
@@ -114,13 +114,13 @@ func createEsMuxer(esVersion, license string, ccrEnabled bool) *http.ServeMux {
 
 	mux.Handle("/_xpack/usage", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/xpack-usage.710.json")
+			input, _ := os.ReadFile("./_meta/test/xpack-usage.710.json")
 			w.Write(input)
 		}))
 
 	mux.Handle("/_cluster/state/metadata,routing_table", http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			input, _ := ioutil.ReadFile("./_meta/test/cluster_state.710.json")
+			input, _ := os.ReadFile("./_meta/test/cluster_state.710.json")
 			w.Write(input)
 		}))
 

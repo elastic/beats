@@ -18,7 +18,6 @@
 package token
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -101,7 +100,7 @@ token_path: "test"
 }
 
 func writeFile(name, message string) {
-	ioutil.WriteFile(name, []byte(message), os.ModePerm)
+	os.WriteFile(name, []byte(message), os.ModePerm)
 }
 
 func deleteFile(name string) {

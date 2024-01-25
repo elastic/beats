@@ -9,7 +9,6 @@ package login
 import (
 	"encoding/binary"
 	"io"
-	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
@@ -276,7 +275,7 @@ func getBaseConfig() map[string]interface{} {
 // setupTestDir creates a temporary directory, copies the test files into it,
 // and returns the path.
 func setupTestDir(t *testing.T) string {
-	tmp, err := ioutil.TempDir("", "auditbeat-login-test-dir")
+	tmp, err := os.MkdirTemp("", "auditbeat-login-test-dir")
 	if err != nil {
 		t.Fatal("failed to create temp dir")
 	}
@@ -287,7 +286,7 @@ func setupTestDir(t *testing.T) string {
 }
 
 func copyDir(t *testing.T, src, dst string) {
-	files, err := ioutil.ReadDir(src)
+	files, err := os.ReadDir(src)
 	if err != nil {
 		t.Fatalf("failed to read %v", src)
 	}

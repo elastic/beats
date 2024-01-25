@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -142,7 +141,7 @@ func (r *bulkRequest) reset(body BodyEncoder) {
 
 	rc, ok := bdy.(io.ReadCloser)
 	if !ok && body != nil {
-		rc = ioutil.NopCloser(bdy)
+		rc = io.NopCloser(bdy)
 	}
 
 	switch v := bdy.(type) {

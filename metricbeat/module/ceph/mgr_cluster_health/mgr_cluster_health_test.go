@@ -19,9 +19,9 @@ package mgr_cluster_health
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -41,9 +41,9 @@ func TestFetchEventContents(t *testing.T) {
 	absPath, err := filepath.Abs("./_meta/testdata/")
 	assert.NoError(t, err)
 
-	statusResponse, err := ioutil.ReadFile(absPath + "/status.json")
+	statusResponse, err := os.ReadFile(absPath + "/status.json")
 	assert.NoError(t, err)
-	timeSyncStatusResponse, err := ioutil.ReadFile(absPath + "/time_sync_status.json")
+	timeSyncStatusResponse, err := os.ReadFile(absPath + "/time_sync_status.json")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -93,7 +93,7 @@ func TestFetchEventContents_Failed(t *testing.T) {
 	absPath, err := filepath.Abs("./_meta/testdata/")
 	assert.NoError(t, err)
 
-	response, err := ioutil.ReadFile(absPath + "/failed.json")
+	response, err := os.ReadFile(absPath + "/failed.json")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -19,7 +19,6 @@ package mage
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -89,5 +88,5 @@ func moduleDocs() error {
 	}
 
 	fmt.Printf(">> update:moduleDocs: Collecting module documentation for %v.\n", strings.Join(names, ", "))
-	return ioutil.WriteFile(mage.OSSBeatDir("docs/modules_list.asciidoc"), []byte(content), 0o644)
+	return os.WriteFile(mage.OSSBeatDir("docs/modules_list.asciidoc"), []byte(content), 0o644)
 }

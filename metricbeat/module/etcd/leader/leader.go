@@ -20,7 +20,7 @@ package leader
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -93,7 +93,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	}
 	defer res.Body.Close()
 
-	content, err := ioutil.ReadAll(res.Body)
+	content, err := io.ReadAll(res.Body)
 	if err != nil {
 		return fmt.Errorf("error reading body response: %w", err)
 	}

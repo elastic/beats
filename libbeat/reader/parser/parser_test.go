@@ -19,7 +19,6 @@ package parser
 
 import (
 	"io"
-	"io/ioutil"
 	"strings"
 	"testing"
 
@@ -779,7 +778,7 @@ func testReader(lines string) reader.Reader {
 	if err != nil {
 		panic(err)
 	}
-	r, err := readfile.NewEncodeReader(ioutil.NopCloser(reader), readfile.Config{
+	r, err := readfile.NewEncodeReader(io.NopCloser(reader), readfile.Config{
 		Codec:      enc,
 		BufferSize: 1024,
 		Terminator: readfile.AutoLineTerminator,

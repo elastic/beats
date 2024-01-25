@@ -21,7 +21,6 @@ package cfgfile
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 	"time"
@@ -34,7 +33,7 @@ import (
 
 func TestReloader(t *testing.T) {
 	// Create random temp directory
-	dir, err := ioutil.TempDir("", "libbeat-reloader")
+	dir, err := os.MkdirTemp("", "libbeat-reloader")
 	defer os.RemoveAll(dir)
 	if err != nil {
 		t.Fatal(err)
@@ -74,7 +73,7 @@ func TestReloader(t *testing.T) {
 
 	// Write a file to the reloader path to trigger a real reload
 	content := []byte("test\n")
-	err = ioutil.WriteFile(dir+"/config1.yml", content, 0644)
+	err = os.WriteFile(dir+"/config1.yml", content, 0644)
 	assert.NoError(t, err)
 
 	// Wait for the number of scans to increase at least twice. This is somewhat
