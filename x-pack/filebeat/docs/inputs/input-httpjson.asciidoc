@@ -399,8 +399,12 @@ NOTE: Only one of the credentials settings can be set at once. For more informat
 
 The RSA JWK Private Key JSON for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
 
-NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
+[float]
+==== `auth.oauth2.okta.jwk_pem`
 
+The RSA JWK Private Key PEM block for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
+
+NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
 
 [float]
 ==== `auth.oauth2.google.delegated_account`
