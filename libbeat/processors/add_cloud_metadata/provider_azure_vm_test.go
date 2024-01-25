@@ -18,9 +18,12 @@
 package add_cloud_metadata
 
 import (
+	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4/fake"
@@ -29,6 +32,7 @@ import (
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/arm"
 	azfake "github.com/Azure/azure-sdk-for-go/sdk/azcore/fake"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/policy"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -103,6 +107,30 @@ func initAzureTestServer() *httptest.Server {
 	}))
 }
 
+// NewTokenCredential creates an instance of the TokenCredential type.
+func newTokenCredential() *TokenCredential {
+	return &TokenCredential{}
+}
+
+// TokenCredential is a fake credential that implements the azcore.TokenCredential interface.
+type TokenCredential struct {
+	err error
+}
+
+// SetError sets the specified error to be returned from GetToken().
+// Use this to simulate an error during authentication.
+func (t *TokenCredential) SetError(err error) {
+	t.err = fmt.Errorf("Token cannot be created")
+}
+
+// GetToken implements the azcore.TokenCredential for the TokenCredential type.
+func (t *TokenCredential) GetToken(ctx context.Context, opts policy.TokenRequestOptions) (azcore.AccessToken, error) {
+	if t.err != nil {
+		return azcore.AccessToken{}, t.err
+	}
+	return azcore.AccessToken{Token: "fake_token", ExpiresOn: time.Now().Add(24 * time.Hour)}, nil
+}
+
 func TestRetrieveAzureMetadata(t *testing.T) {
 
 	fakeMCServer := fake.ManagedClustersServer{
@@ -120,8 +148,7 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 		},
 	}
 	logger := logp.NewLogger("test_add_cloud_metadata")
-	logger.Info("lala5")
-	cred, _ := getAzureCredentials(logger)
+	cred := newTokenCredential()
 	clusterClient, _ := armcontainerservice.NewManagedClustersClient("subscriptionID", cred, &arm.ClientOptions{
 		ClientOptions: azcore.ClientOptions{
 			Transport: fake.NewManagedClustersServerTransport(&fakeMCServer),
