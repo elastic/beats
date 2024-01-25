@@ -546,5 +546,5 @@ func pollAll(evs []*perf.Event, timeout time.Duration) (active int, closed int, 
 			closed++
 		}
 	}
-	return
+	return active, closed, err
 }
