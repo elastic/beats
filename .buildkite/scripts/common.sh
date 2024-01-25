@@ -8,10 +8,8 @@ platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
 
 DEBIAN_FRONTEND="noninteractive"
-# sudo mkdir -p /etc/needrestart
-# echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
-mkdir -p /etc/needrestart
-echo "\$nrconf{restart} = 'a';" | tee -a /etc/needrestart/needrestart.conf > /dev/null
+sudo mkdir -p /etc/needrestart
+echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
 
 with_docker_compose() {
   local version=$1
@@ -82,10 +80,8 @@ with_go() {
 
 with_python() {
   if [ "${platform_type}" == "Linux" ]; then
-    apt-get update
-    apt-get install -y python3-pip python3-venv libsystemd-dev libpcap-dev
-    # sudo apt-get update
-    # sudo apt-get install -y python3-pip python3-venv libsystemd-dev libpcap-dev
+    sudo apt-get update
+    sudo apt-get install -y python3-pip python3-venv libsystemd-dev libpcap-dev
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
     pip3 install virtualenv libpcap
@@ -125,7 +121,7 @@ echo "--- Env preparation"
 if command -v docker-compose &> /dev/null
 then
   set +e
-  FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version|awk '{print $3}'|sed s/\,//)
+  FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version | awk '{print $3}' | sed s/\,//)
   echo "Found docker-compose version: $FOUND_DOCKER_COMPOSE_VERSION"
   if [ $FOUND_DOCKER_COMPOSE_VERSION == $DOCKER_COMPOSE_VERSION ]; then
     echo "Versions match. No need to install docker-compose. Exiting."
@@ -138,8 +134,8 @@ else
   with_docker_compose "${DOCKER_COMPOSE_VERSION}"
 fi
 
-# add_bin_path
-# with_go "${GO_VERSION}"
+add_bin_path
+with_go "${GO_VERSION}"
 with_mage
 with_python
 config_git

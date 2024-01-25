@@ -3,7 +3,6 @@
 env:
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
-  GO_AGENT_IMAGE: "golang:${GO_VERSION}"
   PIPELINE_NAME: "libbeat"
 
 steps:
@@ -25,9 +24,9 @@ steps:
         key: "mandatory-int-test"
         command: ".buildkite/scripts/go_int_tests.sh ${PIPELINE_NAME}"
         agents:
-          # provider: "gcp"
-          image: "${GO_AGENT_IMAGE}"
-          # machineType: "c2-standard-16"
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
         artifact_paths: "libbeat/build/*.*"
 
   #     - label: ":python: Python Integration Tests"
