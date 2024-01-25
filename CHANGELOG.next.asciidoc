@@ -181,7 +181,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Heartbeat*
 - Added status to monitor run log report.
-
+- Upgrade github.com/elastic/go-elasticsearch/v8 to v8.12.0. {pull}37673[37673]
 
 *Metricbeat*
 
