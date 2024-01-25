@@ -13,17 +13,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider/ebpf_provider"
-
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (

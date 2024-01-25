@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"time"
 
-	p "github.com/prometheus/procfs"
+	"github.com/prometheus/procfs"
 	"github.com/tklauser/go-sysconf"
 )
 
@@ -20,7 +20,7 @@ var (
 )
 
 func mustGetBootTime() time.Time {
-	fs, err := p.NewDefaultFS()
+	fs, err := procfs.NewDefaultFS()
 	if err != nil {
 		panic(fmt.Sprintf("could not get procfs: %v", err))
 	}

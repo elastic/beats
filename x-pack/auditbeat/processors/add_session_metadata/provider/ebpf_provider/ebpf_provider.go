@@ -8,18 +8,22 @@ package ebpf_provider
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/mohae/deepcopy"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-
+	"github.com/elastic/beats/v7/x-pack/auditbeat/internal/ebpf"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/types"
-
-	"github.com/elastic/elastic-agent-libs/logp"
-
 	"github.com/elastic/ebpfevents"
+	"github.com/elastic/elastic-agent-libs/logp"
+)
+
+const (
+	name      = "add_session_metadata"
+	allEvents = ebpf.EventMask(ebpfevents.EventTypeProcessFork & ebpfevents.EventTypeProcessExec & ebpfevents.EventTypeProcessExit)
 )
 
 type prvdr struct {
@@ -35,15 +39,12 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 		db:     db,
 	}
 
-	l, err := ebpfevents.NewLoader()
+	w, err := ebpf.GetWatcher()
 	if err != nil {
-		p.logger.Errorf("loading ebpf: %w", err)
-		return prvdr{}, err
+		return nil, fmt.Errorf("get ebpf watcher: %w", err)
 	}
 
-	records := make(chan ebpfevents.Record)
-
-	go l.EventLoop(p.ctx, records)
+	records := w.Subscribe(name, allEvents)
 
 	go func(logger logp.Logger) {
 		for {

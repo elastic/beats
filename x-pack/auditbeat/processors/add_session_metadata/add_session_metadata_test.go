@@ -16,7 +16,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/types"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

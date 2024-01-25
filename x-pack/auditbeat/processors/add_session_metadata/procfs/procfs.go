@@ -12,12 +12,11 @@ import (
 	"strings"
 
 	"github.com/prometheus/procfs"
+	"golang.org/x/sys/unix"
 
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/timeutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/types"
 	"github.com/elastic/elastic-agent-libs/logp"
-
-	"golang.org/x/sys/unix"
 )
 
 func MajorTty(ttyNr uint32) uint16 {

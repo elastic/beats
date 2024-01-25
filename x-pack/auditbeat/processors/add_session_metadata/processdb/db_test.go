@@ -10,10 +10,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/unix"
 
 	"github.com/elastic/elastic-agent-libs/logp"
-
-	"golang.org/x/sys/unix"
 )
 
 var logger = logp.NewLogger("processdb")
