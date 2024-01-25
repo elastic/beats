@@ -143,6 +143,27 @@ func TestValueTpl(t *testing.T) {
 			expectedVal: "2020-11-05 12:25:32 +0000 UTC",
 		},
 		{
+			name:        "func parseDate MST default layout",
+			value:       `[[ parseDate "Mon, 02 Jan 2006 15:04:05 MST" "Mon, 02 Jan 2006 15:04:05 MST" ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2006-01-02 22:04:05 +0000 UTC",
+		},
+		{
+			name:        "func parseDate MST RFC1123",
+			value:       `[[ parseDate "Mon, 02 Jan 2006 15:04:05 MST" "RFC1123" ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2006-01-02 22:04:05 +0000 UTC",
+		},
+		{
+			name:        "func parseDate EST unix date",
+			value:       `[[ parseDate "Mon Jan 2 15:04:05 EST 2006" "UnixDate" ]]`,
+			paramCtx:    emptyTransformContext(),
+			paramTr:     transformable{},
+			expectedVal: "2006-01-02 20:04:05 +0000 UTC",
+		},
+		{
 			name:        "func formatDate",
 			setup:       func() { timeNow = func() time.Time { return time.Unix(1604582732, 0).UTC() } },
 			teardown:    func() { timeNow = time.Now },
