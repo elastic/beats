@@ -164,6 +164,14 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 - Add GCP CloudSQL metadata {pull}33066[33066]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
 - Add event loop utilization metric to Kibana module {pull}35020[35020]
+- Fix containerd metrics grouping for TSDB {pull}37537[37537]
+- Add metrics grouping by dimensions and time to Azure app insights {pull}36634[36634]
+- Align on the algorithm used to transform Prometheus histograms into Elasticsearch histograms {pull}36647[36647]
+- Enhance GCP billing with detailed tables identification, additional fields, and optimized data handling. {pull}36902[36902]
+- Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each metricset instance. {pull}36971[36971]
+- Add linux IO metrics to system/process {pull}37213[37213]
+- Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
+- Update `getOpTimestamp` in `replstatus` to fix sort and temp files generation issue in mongodb. {pull}37688[37688]
 
 *Osquerybeat*
 
