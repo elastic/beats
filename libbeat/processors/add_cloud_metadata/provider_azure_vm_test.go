@@ -147,7 +147,6 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 			return resp
 		},
 	}
-	logger := logp.NewLogger("test_add_cloud_metadata")
 	cred := newTokenCredential()
 	clusterClient, _ := armcontainerservice.NewManagedClustersClient("subscriptionID", cred, &arm.ClientOptions{
 		ClientOptions: azcore.ClientOptions{
