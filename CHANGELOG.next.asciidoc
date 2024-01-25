@@ -70,6 +70,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
 - Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
+- Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
 
 *Heartbeat*
 
@@ -135,6 +136,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added support for Okta OAuth2 provider in the CEL input. {issue}36336[36336] {pull}36521[36521]
 - Added support for new features & removed partial save mechanism in the Azure Blob Storage input. {issue}35126[35126] {pull}36690[36690]
 - Added support for new features and removed partial save mechanism in the GCS input. {issue}35847[35847] {pull}36713[36713]
+- Relax TCP/UDP metric polling expectations to improve metric collection. {pull}37714[37714]
 
 *Auditbeat*
 
