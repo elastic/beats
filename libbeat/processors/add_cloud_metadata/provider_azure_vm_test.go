@@ -120,12 +120,22 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 		},
 	}
 	logger := logp.NewLogger("test_add_cloud_metadata")
+	logger.Info("lala5")
 	cred, _ := getAzureCredentials(logger)
 	clusterClient, _ := armcontainerservice.NewManagedClustersClient("subscriptionID", cred, &arm.ClientOptions{
 		ClientOptions: azcore.ClientOptions{
 			Transport: fake.NewManagedClustersServerTransport(&fakeMCServer),
 		},
 	})
+
+	NewClusterClient = func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient {
+		return clusterClient
+	}
+	defer func() {
+		NewClusterClient = func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient {
+			return clientFactory.NewManagedClustersClient()
+		}
+	}()
 
 	logp.TestingSetup()
 
@@ -143,15 +153,6 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	NewClusterClient = func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient {
-		return clusterClient
-	}
-	defer func() {
-		NewClusterClient = func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient {
-			return clientFactory.NewManagedClustersClient()
-		}
-	}()
 
 	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
