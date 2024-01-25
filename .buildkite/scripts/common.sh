@@ -85,7 +85,7 @@ with_python() {
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
     pip3 install virtualenv libpcap
-    ulimit -Sn 10000
+    ulimit -Sn 50000
   fi
 }
 
