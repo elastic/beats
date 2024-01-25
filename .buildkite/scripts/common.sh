@@ -74,6 +74,7 @@ with_go() {
   which go
   local go_path="$(go env GOPATH):$(go env GOPATH)/bin"
   export PATH="${PATH}:${go_path}"
+  go mod download
 }
 
 with_python() {
@@ -106,15 +107,13 @@ retry() {
   return 0
 }
 
-are_files_changed() {
-  changeset=$1
-  if git diff --name-only HEAD@{1} HEAD | grep -qE "$changeset"; then
-    return 0;
-  else
-    echo "WARN! No files changed in $changeset"
-    return 1;
+config_git() {
+  if [ -z "$(git config --get user.email)" ]; then
+    git config --global user.email "beatsmachine@users.noreply.github.com"
+    git config --global user.name "beatsmachine"
   fi
 }
+
 
 echo "--- Env preparation"
 
@@ -136,3 +135,6 @@ add_bin_path
 with_go "${GO_VERSION}"
 with_mage
 with_python
+config_git
+
+mage dumpVariables
