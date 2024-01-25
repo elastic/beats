@@ -4,11 +4,12 @@ source .buildkite/scripts/common.sh
 
 set -euo pipefail
 
-beats_subfilder=$1
+beats_subfolder=$1
 
-echo "--- Run Crosscompile for $beats_subfilder"
-pushd "${beats_subfilder}" > /dev/null
+echo "--- Run Crosscompile for $beats_subfolder"
 
-make -C $beats_subfilder crosscompile
+pushd "${beats_subfolder}" > /dev/null
+
+make crosscompile
 
 popd > /dev/null

@@ -4,11 +4,11 @@ source .buildkite/scripts/common.sh
 
 set -euo pipefail
 
-beats_subfilder=$1
+beats_subfolder=$1
 
-echo "--- Run Go Intergration Tests for $beats_subfilder"
-sudo chmod -R go-w ${beats_subfilder}/
-pushd "${beats_subfilder}" > /dev/null
+echo "--- Run Go Intergration Tests for $beats_subfolder"
+sudo chmod -R go-w ${beats_subfolder}/
+pushd "${beats_subfolder}" > /dev/null
 
 umask 0022
 mage goIntegTest
