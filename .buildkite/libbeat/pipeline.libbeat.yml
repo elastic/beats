@@ -1,16 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+
 env:
-  SETUP_GVM_VERSION: "v0.5.1"
-  SETUP_MAGE_VERSION: "1.13.0"
-  SETUP_WIN_PYTHON_VERSION: "3.11.0"
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
-  IMAGE_WIN_2016: "family/core-windows-2016"
-  IMAGE_WIN_2019: "family/core-windows-2019"
-  IMAGE_WIN_2022: "family/core-windows-2022"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  GO_AGENT_IMAGE: "golang:${GO_VERSION}"
-  DOCKER_COMPOSE_VERSION: "1.21.0"
   PIPELINE_NAME: "libbeat"
 
 steps:

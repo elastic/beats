@@ -2,7 +2,4 @@
 
 set -euo pipefail
 
-echo "Golang version:"
-GO_VERSION=$(cat .go-version)
-export GO_VERSION
-echo "GO_VERSION: ${GO_VERSION}"
+source .buildkite/scripts/setenv.sh

@@ -6,7 +6,7 @@ BIN="${WORKSPACE}/bin"
 platform_type="$(uname)"
 platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
-pipeline_name="metricbeat"
+
 DEBIAN_FRONTEND="noninteractive"
 sudo mkdir -p /etc/needrestart
 echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
@@ -74,7 +74,7 @@ with_go() {
   which go
   local go_path="$(go env GOPATH):$(go env GOPATH)/bin"
   export PATH="${PATH}:${go_path}"
-  go mod download
+  # go mod download
 }
 
 with_python() {
@@ -136,5 +136,3 @@ with_go "${GO_VERSION}"
 with_mage
 with_python
 config_git
-
-# mage dumpVariables
