@@ -417,5 +417,8 @@ replace (
 	k8s.io/kubernetes v1.13.0 => k8s.io/kubernetes v1.24.15
 )
 
+// TODO: remove once https://github.com/elastic/go-sysinfo/pull/199 and new version of library is released.
+replace github.com/elastic/go-sysinfo => github.com/ycombinator/go-sysinfo v0.0.0-20240125195429-01b75c6787f0
+
 // Exclude this version because the version has an invalid checksum.
 exclude github.com/docker/distribution v2.8.0+incompatible
