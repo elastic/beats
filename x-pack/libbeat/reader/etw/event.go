@@ -91,7 +91,7 @@ func getEventInformation(r *EventRecord) (info *TraceEventInfo, err error) {
 func (p *propertyParser) getPropertyName(i int) string {
 	// Convert the UTF16 property name to a Go string.
 	namePtr := readPropertyName(p, i)
-	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(namePtr)))
+	return windows.UTF16PtrToString((*uint16)(namePtr))
 }
 
 // readPropertyName gets the pointer to the property name in the event information structure.

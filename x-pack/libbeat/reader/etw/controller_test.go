@@ -30,7 +30,7 @@ func TestGetHandler_Error(t *testing.T) {
 	}
 
 	err := session.GetHandler()
-	assert.EqualError(t, err, "session is not running")
+	assert.EqualError(t, err, "session is not running: The instance name passed was not recognized as valid by a WMI data provider.")
 }
 
 func TestGetHandler_Success(t *testing.T) {
