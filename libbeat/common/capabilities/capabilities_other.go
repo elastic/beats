@@ -21,9 +21,6 @@ package capabilities
 
 import "errors"
 
-// ErrUnsupported is returned for all public functions on "not linux".
-var ErrUnsupported = errors.New("capabilities are only supported in linux")
-
 // Dummy value on "not linux".
 type Flag = uint
 
@@ -34,17 +31,17 @@ const (
 	Permitted = Flag(1)
 )
 
-// ErrUnsupported on "not linux".
+// Returns errors.ErrUnsupported on "not linux".
 func FromPid(flag Flag, pid int) ([]string, error) {
-	return nil, ErrUnsupported
+	return nil, errors.ErrUnsupported
 }
 
-// ErrUnsupported on "not linux".
+// Returns errors.ErrUnsupported on "not linux".
 func FromUint64(w uint64) ([]string, error) {
-	return nil, ErrUnsupported
+	return nil, errors.ErrUnsupported
 }
 
-// ErrUnsupported on "not linux".
+// Returns errors.ErrUnsupported on "not linux".
 func FromString(s string, base int) ([]string, error) {
-	return nil, ErrUnsupported
+	return nil, errors.ErrUnsupported
 }

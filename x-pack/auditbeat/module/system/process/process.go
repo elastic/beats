@@ -500,11 +500,11 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 		}
 
 		process.CapEffective, err = capabilities.FromPid(capabilities.Effective, pInfo.PID)
-		if err != nil && !errors.Is(err, capabilities.ErrUnsupported) && process.Error == nil {
+		if err != nil && !errors.Is(err, errors.ErrUnsupported) && process.Error == nil {
 			process.Error = err
 		}
 		process.CapPermitted, err = capabilities.FromPid(capabilities.Permitted, pInfo.PID)
-		if err != nil && !errors.Is(err, capabilities.ErrUnsupported) && process.Error == nil {
+		if err != nil && !errors.Is(err, errors.ErrUnsupported) && process.Error == nil {
 			process.Error = err
 		}
 		// Exclude Linux kernel processes, they are not very interesting.

@@ -31,11 +31,6 @@ import (
 var (
 	// errInvalidCapability expresses an invalid capability ID: x < 0 || x >= 64.
 	errInvalidCapability = errors.New("invalid capability")
-
-	// ErrUnsupported is returned for all public functions on "not
-	// linux". There is a generic errors.ErrUnsupported present in
-	// golang 1.21, but we still support 1.20.
-	ErrUnsupported = errors.New("capabilities are only supported in linux")
 )
 
 // The capability set flag/vector, re-exported from
@@ -53,7 +48,7 @@ const (
 // Fetch the capabilities of pid for a given flag/vector and convert
 // it to the representation used in ECS. cap.GetPID() fetches it with
 // SYS_CAPGET.
-// Returns ErrUnsupported on "not linux".
+// Returns errors.ErrUnsupported on "not linux".
 func FromPid(flag Flag, pid int) ([]string, error) {
 	set, err := cap.GetPID(pid)
 	if err != nil {
@@ -89,7 +84,7 @@ func FromPid(flag Flag, pid int) ([]string, error) {
 }
 
 // Convert a uint64 to the capabilities representation used in ECS.
-// Returns ErrUnsupported on "not linux".
+// Returns errors.ErrUnsupported on "not linux".
 func FromUint64(w uint64) ([]string, error) {
 	sl := make([]string, 0, bits.OnesCount64(w))
 	for i := 0; w != 0; i++ {
@@ -109,7 +104,7 @@ func FromUint64(w uint64) ([]string, error) {
 
 // Convert a string to the capabilities representation used in
 // ECS. Example input: "1ffffffffff", 16.
-// Returns ErrUnsupported on "not linux".
+// Returns errors.ErrUnsupported on "not linux".
 func FromString(s string, base int) ([]string, error) {
 	w, err := strconv.ParseUint(s, 16, 64)
 	if err != nil {
