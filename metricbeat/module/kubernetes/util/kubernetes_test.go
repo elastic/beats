@@ -29,6 +29,7 @@ import (
 	"testing"
 	"time"
 
+
 	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/stretchr/testify/require"
@@ -601,5 +602,9 @@ func (m *mockWatcher) Store() cache.Store {
 }
 
 func (m *mockWatcher) Client() k8s.Interface {
+	return nil
+}
+
+func (m *mockWatcher) CachedObject() runtime.Object {
 	return nil
 }

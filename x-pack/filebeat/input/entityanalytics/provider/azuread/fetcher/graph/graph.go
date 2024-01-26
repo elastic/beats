@@ -15,6 +15,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/google/uuid"
 
@@ -98,9 +99,16 @@ type removed struct {
 
 // conf contains parameters needed to configure the fetcher.
 type graphConf struct {
-	APIEndpoint string `config:"api_endpoint"`
+	APIEndpoint string    `config:"api_endpoint"`
+	Select      selection `config:"select"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+}
+
+type selection struct {
+	UserQuery   []string `config:"users"`
+	GroupQuery  []string `config:"groups"`
+	DeviceQuery []string `config:"devices"`
 }
 
 // graph implements the fetcher.Fetcher interface.
@@ -345,21 +353,21 @@ func New(cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (
 	if err != nil {
 		return nil, fmt.Errorf("invalid groups URL endpoint: %w", err)
 	}
-	groupsURL.RawQuery = url.QueryEscape(defaultGroupsQuery)
+	groupsURL.RawQuery = url.QueryEscape(formatQuery(c.Select.GroupQuery, defaultGroupsQuery))
 	f.groupsURL = groupsURL.String()
 
 	usersURL, err := url.Parse(f.conf.APIEndpoint + "/users/delta")
 	if err != nil {
 		return nil, fmt.Errorf("invalid users URL endpoint: %w", err)
 	}
-	usersURL.RawQuery = url.QueryEscape(defaultUsersQuery)
+	usersURL.RawQuery = url.QueryEscape(formatQuery(c.Select.UserQuery, defaultUsersQuery))
 	f.usersURL = usersURL.String()
 
 	devicesURL, err := url.Parse(f.conf.APIEndpoint + "/devices/delta")
 	if err != nil {
 		return nil, fmt.Errorf("invalid devices URL endpoint: %w", err)
 	}
-	devicesURL.RawQuery = url.QueryEscape(defaultDevicesQuery)
+	devicesURL.RawQuery = url.QueryEscape(formatQuery(c.Select.DeviceQuery, defaultDevicesQuery))
 	f.devicesURL = devicesURL.String()
 
 	// The API takes a departure from the query approach here, so we
@@ -372,6 +380,13 @@ func New(cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (
 	f.deviceOwnerUserURL = ownerUserURL.String()
 
 	return &f, nil
+}
+
+func formatQuery(query []string, dflt string) string {
+	if len(query) == 0 {
+		return dflt
+	}
+	return "$select=" + strings.Join(query, ",")
 }
 
 // newUserFromAPI translates an API-representation of a user to a fetcher.User.
