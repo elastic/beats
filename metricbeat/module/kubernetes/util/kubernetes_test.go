@@ -62,7 +62,7 @@ func TestWatchOptions(t *testing.T) {
 	require.Equal(t, options.Node, config.Node)
 }
 
-func TestStartWatcher(t *testing.T) {
+func TestCreateWatcher(t *testing.T) {
 	resourceWatchers := NewWatchers()
 
 	client := k8sfake.NewSimpleClientset()
@@ -76,7 +76,7 @@ func TestStartWatcher(t *testing.T) {
 	options, err := getWatchOptions(config, false, client, log)
 	require.NoError(t, err)
 
-	created, err := startWatcher(NamespaceResource, &kubernetes.Node{}, *options, client, resourceWatchers)
+	created, err := createWatcher(NamespaceResource, &kubernetes.Node{}, *options, client, resourceWatchers)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -86,7 +86,7 @@ func TestStartWatcher(t *testing.T) {
 	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
 
-	created, err = startWatcher(NamespaceResource, &kubernetes.Namespace{}, *options, client, resourceWatchers)
+	created, err = createWatcher(NamespaceResource, &kubernetes.Namespace{}, *options, client, resourceWatchers)
 	require.False(t, created)
 	require.NoError(t, err)
 
@@ -96,7 +96,7 @@ func TestStartWatcher(t *testing.T) {
 	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
 
-	created, err = startWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers)
+	created, err = createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -122,24 +122,24 @@ func TestAddToWhichAreUsing(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create the new entry with watcher and nil string array first
-	created, err := startWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers)
+	created, err := createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers)
 	require.True(t, created)
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
 	require.NotNil(t, resourceWatchers.watchersMap[DeploymentResource].watcher)
-	require.Nil(t, resourceWatchers.watchersMap[DeploymentResource].whichAreUsing)
+	require.Nil(t, resourceWatchers.watchersMap[DeploymentResource].resourcesUsing)
 	resourceWatchers.lock.Unlock()
 
-	addToWhichAreUsing(DeploymentResource, DeploymentResource, resourceWatchers)
+	addToResourcesUsing(DeploymentResource, DeploymentResource, resourceWatchers)
 	resourceWatchers.lock.Lock()
-	require.NotNil(t, resourceWatchers.watchersMap[DeploymentResource].whichAreUsing)
-	require.Equal(t, []string{DeploymentResource}, resourceWatchers.watchersMap[DeploymentResource].whichAreUsing)
+	require.NotNil(t, resourceWatchers.watchersMap[DeploymentResource].resourcesUsing)
+	require.Equal(t, []string{DeploymentResource}, resourceWatchers.watchersMap[DeploymentResource].resourcesUsing)
 	resourceWatchers.lock.Unlock()
 
-	addToWhichAreUsing(DeploymentResource, PodResource, resourceWatchers)
+	addToResourcesUsing(DeploymentResource, PodResource, resourceWatchers)
 	resourceWatchers.lock.Lock()
-	require.Equal(t, []string{DeploymentResource, PodResource}, resourceWatchers.watchersMap[DeploymentResource].whichAreUsing)
+	require.Equal(t, []string{DeploymentResource, PodResource}, resourceWatchers.watchersMap[DeploymentResource].resourcesUsing)
 	resourceWatchers.lock.Unlock()
 }
 
@@ -158,30 +158,30 @@ func TestRemoveToWhichAreUsing(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create the new entry with watcher and nil string array first
-	created, err := startWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers)
+	created, err := createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers)
 	require.True(t, created)
 	require.NoError(t, err)
 
-	addToWhichAreUsing(DeploymentResource, DeploymentResource, resourceWatchers)
-	addToWhichAreUsing(DeploymentResource, PodResource, resourceWatchers)
+	addToResourcesUsing(DeploymentResource, DeploymentResource, resourceWatchers)
+	addToResourcesUsing(DeploymentResource, PodResource, resourceWatchers)
 
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
 
-	removed, size := removeFromWhichAreUsing(DeploymentResource, DeploymentResource, resourceWatchers)
+	removed, size := removeFromResourcesUsing(DeploymentResource, DeploymentResource, resourceWatchers)
 	require.True(t, removed)
 	require.Equal(t, 1, size)
 
-	removed, size = removeFromWhichAreUsing(DeploymentResource, DeploymentResource, resourceWatchers)
+	removed, size = removeFromResourcesUsing(DeploymentResource, DeploymentResource, resourceWatchers)
 	require.False(t, removed)
 	require.Equal(t, 1, size)
 
-	removed, size = removeFromWhichAreUsing(DeploymentResource, PodResource, resourceWatchers)
+	removed, size = removeFromResourcesUsing(DeploymentResource, PodResource, resourceWatchers)
 	require.True(t, removed)
 	require.Equal(t, 0, size)
 }
 
-func TestStartAllWatchers(t *testing.T) {
+func TestCreateAllWatchers(t *testing.T) {
 	resourceWatchers := NewWatchers()
 
 	client := k8sfake.NewSimpleClientset()
@@ -197,7 +197,7 @@ func TestStartAllWatchers(t *testing.T) {
 	log := logp.NewLogger("test")
 
 	// Start watchers based on a resource that does not exist should cause an error
-	err := startAllWatchers(client, "does-not-exist", false, config, log, resourceWatchers)
+	err := createAllWatchers(client, "does-not-exist", false, config, log, resourceWatchers)
 	require.Error(t, err)
 	resourceWatchers.lock.Lock()
 	require.Equal(t, 0, len(resourceWatchers.watchersMap))
@@ -205,7 +205,7 @@ func TestStartAllWatchers(t *testing.T) {
 
 	// Start watcher for a resource that requires other resources, should start all the watchers
 	extras := getExtraWatchers(PodResource, config)
-	err = startAllWatchers(client, PodResource, false, config, log, resourceWatchers)
+	err = createAllWatchers(client, PodResource, false, config, log, resourceWatchers)
 	require.NoError(t, err)
 
 	// Check that all the required watchers are in the map
@@ -242,7 +242,7 @@ func TestCreateMetaGen(t *testing.T) {
 	require.Error(t, err)
 
 	// Create the watchers necessary for the metadata generator
-	err = startAllWatchers(client, DeploymentResource, false, config, log, resourceWatchers)
+	err = createAllWatchers(client, DeploymentResource, false, config, log, resourceWatchers)
 	require.NoError(t, err)
 
 	// Create the generators, this time without error
@@ -276,7 +276,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	require.Error(t, err)
 
 	// Create the pod resource + the extras
-	err = startAllWatchers(client, PodResource, false, config, log, resourceWatchers)
+	err = createAllWatchers(client, PodResource, false, config, log, resourceWatchers)
 	require.NoError(t, err)
 
 	_, err = createMetadataGenSpecific(client, commonConfig, config, PodResource, resourceWatchers)
@@ -289,7 +289,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	require.Error(t, err)
 
 	// Create the service resource + the extras
-	err = startAllWatchers(client, ServiceResource, false, config, log, resourceWatchers)
+	err = createAllWatchers(client, ServiceResource, false, config, log, resourceWatchers)
 	require.NoError(t, err)
 
 	_, err = createMetadataGenSpecific(client, commonConfig, config, ServiceResource, resourceWatchers)
@@ -302,14 +302,14 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 
 	resourceWatchers.lock.Lock()
 	resourceWatchers.watchersMap[NamespaceResource] = &watcherData{
-		watcher:       &mockWatcher{},
-		started:       true,
-		whichAreUsing: []string{NamespaceResource, DeploymentResource},
+		watcher:        &mockWatcher{},
+		started:        true,
+		resourcesUsing: []string{NamespaceResource, DeploymentResource},
 	}
 	resourceWatchers.watchersMap[DeploymentResource] = &watcherData{
-		watcher:       &mockWatcher{},
-		started:       true,
-		whichAreUsing: []string{DeploymentResource},
+		watcher:        &mockWatcher{},
+		started:        true,
+		resourcesUsing: []string{DeploymentResource},
 	}
 	resourceWatchers.lock.Unlock()
 
@@ -343,7 +343,7 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 	resourceWatchers.lock.Lock()
 	watcher = resourceWatchers.watchersMap[NamespaceResource]
 	require.True(t, watcher.started)
-	require.Equal(t, []string{DeploymentResource}, watcher.whichAreUsing)
+	require.Equal(t, []string{DeploymentResource}, watcher.resourcesUsing)
 	resourceWatchers.lock.Unlock()
 
 	// Stopping the deployment watcher should stop now both watchers
@@ -354,11 +354,11 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 	watcher = resourceWatchers.watchersMap[NamespaceResource]
 
 	require.False(t, watcher.started)
-	require.Equal(t, []string{}, watcher.whichAreUsing)
+	require.Equal(t, []string{}, watcher.resourcesUsing)
 
 	watcher = resourceWatchers.watchersMap[DeploymentResource]
 	require.False(t, watcher.started)
-	require.Equal(t, []string{}, watcher.whichAreUsing)
+	require.Equal(t, []string{}, watcher.resourcesUsing)
 
 	resourceWatchers.lock.Unlock()
 
@@ -369,9 +369,9 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 
 	resourceWatchers.lock.Lock()
 	resourceWatchers.watchersMap[PodResource] = &watcherData{
-		watcher:       &mockWatcher{},
-		started:       false,
-		whichAreUsing: []string{PodResource},
+		watcher:        &mockWatcher{},
+		started:        false,
+		resourcesUsing: []string{PodResource},
 	}
 	resourceWatchers.lock.Unlock()
 
