@@ -238,31 +238,50 @@ func (m *inputMetrics) poll(addr, addr6 []string, each time.Duration, log *logp.
 	// base level for the rx_queue values and ensures that if the
 	// constructed address values are malformed we panic early
 	// within the period of system testing.
+	want4 := true
 	rx, err := procNetTCP("/proc/net/tcp", addr, hasUnspecified, addrIsUnspecified)
 	if err != nil {
-		log.Warnf("failed to get initial tcp stats from /proc: %v", err)
+		want4 = false
+		log.Infof("did not get initial tcp stats from /proc: %v", err)
 	}
+	want6 := true
 	rx6, err := procNetTCP("/proc/net/tcp6", addr6, hasUnspecified6, addrIsUnspecified6)
 	if err != nil {
-		log.Warnf("failed to get initial tcp6 stats from /proc: %v", err)
+		want6 = false
+		log.Infof("did not get initial tcp6 stats from /proc: %v", err)
 	}
-	m.rxQueue.Set(uint64(rx + rx6))
+	if !want4 && !want6 {
+		log.Warnf("failed to get initial tcp or tcp6 stats from /proc: %v", err)
+	} else {
+		m.rxQueue.Set(uint64(rx + rx6))
+	}
 
 	t := time.NewTicker(each)
 	for {
 		select {
 		case <-t.C:
+			var found bool
 			rx, err := procNetTCP("/proc/net/tcp", addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
-				log.Warnf("failed to get tcp stats from /proc: %v", err)
-				continue
+				if want4 {
+					log.Warnf("failed to get tcp stats from /proc: %v", err)
+				}
+			} else {
+				found = true
+				want4 = true
 			}
 			rx6, err := procNetTCP("/proc/net/tcp6", addr6, hasUnspecified6, addrIsUnspecified6)
 			if err != nil {
-				log.Warnf("failed to get tcp6 stats from /proc: %v", err)
-				continue
+				if want6 {
+					log.Warnf("failed to get tcp6 stats from /proc: %v", err)
+				}
+			} else {
+				found = true
+				want6 = true
 			}
-			m.rxQueue.Set(uint64(rx + rx6))
+			if found {
+				m.rxQueue.Set(uint64(rx + rx6))
+			}
 		case <-m.done:
 			t.Stop()
 			return
@@ -323,10 +342,10 @@ func procNetTCP(path string, addr []string, hasUnspecified bool, addrIsUnspecifi
 			}
 			found = true
 
-			// queue lengths are decimal, e.g.:
+			// queue lengths are hex, e.g.:
 			// - https://elixir.bootlin.com/linux/v6.2.11/source/net/ipv4/tcp_ipv4.c#L2643
 			// - https://elixir.bootlin.com/linux/v6.2.11/source/net/ipv6/tcp_ipv6.c#L1987
-			v, err := strconv.ParseInt(string(r), 10, 64)
+			v, err := strconv.ParseInt(string(r), 16, 64)
 			if err != nil {
 				return 0, fmt.Errorf("failed to parse rx_queue: %w", err)
 			}
