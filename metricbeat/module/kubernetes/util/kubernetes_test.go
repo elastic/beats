@@ -22,19 +22,21 @@ import (
 	"testing"
 	"time"
 
-	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
-	conf "github.com/elastic/elastic-agent-libs/config"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 	k8s "k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/cache"
 
-	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
-	"github.com/elastic/elastic-agent-libs/logp"
+	kubernetes2 "github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes/metadata"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/stretchr/testify/require"
 	k8sfake "k8s.io/client-go/kubernetes/fake"
+
+	"github.com/elastic/elastic-agent-autodiscover/kubernetes"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestWatchOptions(t *testing.T) {
