@@ -99,7 +99,7 @@ func startLocked() {
 	gWatcher.loader = loader
 	gWatcher.clients = make(map[string]client)
 
-	records := make(chan ebpfevents.Record)
+	records := make(chan ebpfevents.Record, loader.BufferLen())
 	gWatcher.ctx, gWatcher.cancel = context.WithCancel(context.Background())
 
 	go gWatcher.loader.EventLoop(gWatcher.ctx, records)
