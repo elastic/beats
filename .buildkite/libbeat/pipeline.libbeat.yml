@@ -10,32 +10,32 @@ steps:
   - group: "Mandatory Tests"
     key: "mandatory-tests"
     steps:
-      # - label: ":linux: Ubuntu Unit Tests"
-      #   key: "mandatory-linux-unit-test"
-      #   command: ".buildkite/scripts/unit_tests.sh ${PIPELINE_NAME}"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_UBUNTU_X86_64}"
-      #     machineType: "c2-standard-16"
-      #   artifact_paths: "libbeat/build/*.*"
+      - label: ":linux: Ubuntu Unit Tests"
+        key: "mandatory-linux-unit-test"
+        command: ".buildkite/scripts/unit_tests.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths: "libbeat/build/*.*"
 
-      # - label: ":go: Go Intergration Tests"
-      #   key: "mandatory-int-test"
-      #   command: ".buildkite/scripts/go_int_tests.sh ${PIPELINE_NAME}"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_UBUNTU_X86_64}"
-      #     machineType: "c2-standard-16"
-      #   artifact_paths: "libbeat/build/*.*"
+      - label: ":go: Go Intergration Tests"
+        key: "mandatory-int-test"
+        command: ".buildkite/scripts/go_int_tests.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths: "libbeat/build/*.*"
 
-      # - label: ":python: Python Integration Tests"
-      #   key: "mandatory-python-int-test"
-      #   command: ".buildkite/scripts/py_int_tests.sh ${PIPELINE_NAME}"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_UBUNTU_X86_64}"
-      #     machineType: "c2-standard-16"
-      #   artifact_paths: "libbeat/build/*.*"
+      - label: ":python: Python Integration Tests"
+        key: "mandatory-python-int-test"
+        command: ".buildkite/scripts/py_int_tests.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths: "libbeat/build/*.*"
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
@@ -46,23 +46,23 @@ steps:
           machineType: "c2-standard-16"
         artifact_paths: "libbeat/build/*.*"
 
-      # - label: ":testengine: Stress Tests"
-      #   key: "mandatory-stress-test"
-      #   command: ".buildkite/scripts/stress_tests.sh ${PIPELINE_NAME}"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_UBUNTU_X86_64}"
-      #     machineType: "c2-standard-16"
-      #   artifact_paths: "libbeat/build/*.*"
+      - label: ":testengine: Stress Tests"
+        key: "mandatory-stress-test"
+        command: ".buildkite/scripts/stress_tests.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths: "libbeat/build/*.*"
 
-  # - group: "Extended Tests"
-  #   key: "extended-tests"
-  #   steps:
-  #     - label: ":linux: Arm64 Unit Tests"
-  #       key: "extended-arm64-unit-tests"
-  #       command: ".buildkite/scripts/unit_tests.sh ${PIPELINE_NAME}"
-  #       agents:
-  #         provider: "aws"
-  #         imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-  #         instanceType: "t4g.xlarge"
-  #       artifact_paths: "libbeat/build/*.*"
+  - group: "Extended Tests"
+    key: "extended-tests"
+    steps:
+      - label: ":linux: Arm64 Unit Tests"
+        key: "extended-arm64-unit-tests"
+        command: ".buildkite/scripts/unit_tests.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "t4g.xlarge"
+        artifact_paths: "libbeat/build/*.*"
