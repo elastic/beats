@@ -19,32 +19,32 @@ steps:
           machineType: "c2-standard-16"
         artifact_paths: "libbeat/build/*.*"
 
-      # - label: ":go: Go Intergration Tests"
-      #   key: "mandatory-int-test"
-      #   command: ".buildkite/scripts/go_int_tests.sh ${PIPELINE_NAME}"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_UBUNTU_X86_64}"
-      #     machineType: "c2-standard-16"
-      #   artifact_paths: "libbeat/build/*.*"
+      - label: ":go: Go Intergration Tests"
+        key: "mandatory-int-test"
+        command: ".buildkite/scripts/go_int_tests.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths: "libbeat/build/*.*"
 
-      # - label: ":python: Python Integration Tests"
-      #   key: "mandatory-python-int-test"
-      #   command: ".buildkite/scripts/py_int_tests.sh ${PIPELINE_NAME}"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_UBUNTU_X86_64}"
-      #     machineType: "c2-standard-16"
-      #   artifact_paths: "libbeat/build/*.*"
+      - label: ":python: Python Integration Tests"
+        key: "mandatory-python-int-test"
+        command: ".buildkite/scripts/py_int_tests.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths: "libbeat/build/*.*"
 
-      # - label: ":negative_squared_cross_mark: Cross compile"
-      #   key: "mandatory-cross-compile"
-      #   command: ".buildkite/scripts/crosscompile.sh ${PIPELINE_NAME}"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_UBUNTU_X86_64}"
-      #     machineType: "c2-standard-16"
-      #   artifact_paths: "libbeat/build/*.*"
+      - label: ":negative_squared_cross_mark: Cross compile"
+        key: "mandatory-cross-compile"
+        command: ".buildkite/scripts/crosscompile.sh ${PIPELINE_NAME}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths: "libbeat/build/*.*"
 
       - label: ":testengine: Stress Tests"
         key: "mandatory-stress-test"
