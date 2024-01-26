@@ -18,7 +18,6 @@
 package capabilities
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -45,17 +44,6 @@ func TestEmpty(t *testing.T) {
 		assert.False(t, d.Has(cap.Permitted))
 		assert.False(t, d.Has(cap.Inheritable))
 	}
-}
-
-func TestAll(t *testing.T) {
-	all, err := FromString(fmt.Sprintf("%x", allMask), 16)
-	assert.Nil(t, err)
-	assert.Equal(t, all[0], "CAP_ALL")
-
-	all, err = FromUint64(allMask)
-	assert.Nil(t, err)
-	assert.Equal(t, len(all), 1)
-	assert.Equal(t, all[0], "CAP_ALL")
 }
 
 func TestOverflow(t *testing.T) {

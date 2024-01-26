@@ -36,9 +36,6 @@ var (
 	// linux". There is a generic errors.ErrUnsupported present in
 	// golang 1.21, but we still support 1.20.
 	ErrUnsupported = errors.New("capabilities are only supported in linux")
-
-	// The mask when all known capabilities are set.
-	allMask = (uint64(1) << uint64(cap.MaxBits())) - 1
 )
 
 // The capability set flag/vector, re-exported from
@@ -55,8 +52,8 @@ const (
 
 // Fetch the capabilities of pid for a given flag/vector and convert
 // it to the representation used in ECS. cap.GetPID() fetches it with
-// SYS_CAPGET. Check FromUint64 for a definition of []{"CAP_ALL"}.
-// May return ErrUnsupported on "not linux".
+// SYS_CAPGET.
+// Returns ErrUnsupported on "not linux".
 func FromPid(flag Flag, pid int) ([]string, error) {
 	set, err := cap.GetPID(pid)
 	if err != nil {
@@ -69,15 +66,8 @@ func FromPid(flag Flag, pid int) ([]string, error) {
 	if empty {
 		return []string{}, nil
 	}
-	all, err := isAll(flag, set)
-	if err != nil {
-		return nil, err
-	}
-	if all {
-		return []string{"CAP_ALL"}, nil
-	}
 
-	var sl []string
+	sl := make([]string, 0, cap.MaxBits())
 	for i := 0; i < int(cap.MaxBits()); i++ {
 		c := cap.Value(i)
 		enabled, err := set.GetFlag(flag, c)
@@ -98,16 +88,9 @@ func FromPid(flag Flag, pid int) ([]string, error) {
 	return sl, err
 }
 
-// Convert a uint64 to the capabilities representation used in ECS. If
-// all bits are set, []{"CAP_ALL"} is returned. The definition of what
-// CAP_ALL is depends on the host as libcap(3) will probe the maximum
-// number of capabilities on startup via cap.MaxBits().
-// May return ErrUnsupported on "not linux".
+// Convert a uint64 to the capabilities representation used in ECS.
+// Returns ErrUnsupported on "not linux".
 func FromUint64(w uint64) ([]string, error) {
-	if w == allMask {
-		return []string{"CAP_ALL"}, nil
-	}
-
 	sl := make([]string, 0, bits.OnesCount64(w))
 	for i := 0; w != 0; i++ {
 		if w&1 != 0 {
@@ -125,9 +108,8 @@ func FromUint64(w uint64) ([]string, error) {
 }
 
 // Convert a string to the capabilities representation used in
-// ECS. Example input: "1ffffffffff", 16. See FromUint64 for details
-// about CAP_ALL.
-// May return ErrUnsupported on "not linux".
+// ECS. Example input: "1ffffffffff", 16.
+// Returns ErrUnsupported on "not linux".
 func FromString(s string, base int) ([]string, error) {
 	w, err := strconv.ParseUint(s, 16, 64)
 	if err != nil {
@@ -178,52 +160,7 @@ func makeToECS() func(int) (string, error) {
 	}
 }
 
-// True if the set has all the capabilities set for the given
-// flag/vector, see FromUint64 for a CAP_ALL explanation.
-var isAll = makeIsAll()
-
-// Make isAll(), there is no direct way to get a full capability set,
-// so we have to build one. Instead of building it for every call,
-// build it once on startup and don't expose it.
-func makeIsAll() func(Flag, *cap.Set) (bool, error) {
-	var err error
-	all := cap.NewSet()
-	for i := 0; i < int(cap.MaxBits()); i++ {
-		err = all.SetFlag(cap.Effective, true, cap.Value(i))
-		if err != nil {
-			break
-		}
-		err = all.SetFlag(cap.Permitted, true, cap.Value(i))
-		if err != nil {
-			break
-		}
-		err = all.SetFlag(cap.Inheritable, true, cap.Value(i))
-		if err != nil {
-			break
-		}
-	}
-
-	// Building allset only fails with invalid parameters, handle
-	// it nonetheless
-	if err != nil {
-		return func(flag Flag, set *cap.Set) (bool, error) {
-			return false, err
-		}
-	}
-
-	return func(flag Flag, set *cap.Set) (bool, error) {
-		return isEqual(flag, set, all)
-	}
-}
-
 // Like isAll(), but for the empty set, here for symmetry.
-var isEmpty = makeIsEmpty()
-
-// Make isEmpty(), the corollary to makeIsFull.
-func makeIsEmpty() func(Flag, *cap.Set) (bool, error) {
-	empty := cap.NewSet()
-
-	return func(flag Flag, set *cap.Set) (bool, error) {
-		return isEqual(flag, set, empty)
-	}
+func isEmpty(flag Flag, set *cap.Set) (bool, error) {
+	return isEqual(flag, set, cap.NewSet())
 }
