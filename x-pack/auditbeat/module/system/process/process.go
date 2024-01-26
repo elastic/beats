@@ -6,7 +6,6 @@ package process
 
 import (
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"os"
 	"os/user"
@@ -499,17 +498,21 @@ func (ms *MetricSet) getProcesses() ([]*Process, error) {
 			process.UserInfo = &userInfo
 		}
 
-		process.CapEffective, err = capabilities.FromPid(capabilities.Effective, pInfo.PID)
-		if err != nil && !errors.Is(err, errors.ErrUnsupported) && process.Error == nil {
-			process.Error = err
-		}
-		process.CapPermitted, err = capabilities.FromPid(capabilities.Permitted, pInfo.PID)
-		if err != nil && !errors.Is(err, errors.ErrUnsupported) && process.Error == nil {
-			process.Error = err
-		}
 		// Exclude Linux kernel processes, they are not very interesting.
-		if runtime.GOOS == "linux" && userInfo.UID == "0" && process.Info.Exe == "" {
-			continue
+		if runtime.GOOS == "linux" {
+			if userInfo.UID == "0" && process.Info.Exe == "" {
+				continue
+			}
+
+			// Fetch Effective and Permitted capabilities
+			process.CapEffective, err = capabilities.FromPid(capabilities.Effective, pInfo.PID)
+			if err != nil && process.Error == nil {
+				process.Error = err
+			}
+			process.CapPermitted, err = capabilities.FromPid(capabilities.Permitted, pInfo.PID)
+			if err != nil && process.Error == nil {
+				process.Error = err
+			}
 		}
 
 		processes = append(processes, process)
