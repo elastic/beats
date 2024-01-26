@@ -7,61 +7,12 @@
 package etw
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
-	"unicode/utf16"
 	"unsafe"
+
+	"golang.org/x/sys/windows"
 )
-
-// DefaultBufferCallback receives stats from the buffer
-func DefaultBufferCallback(etl *EventTraceLogfile) uintptr {
-	// Not reading data from this callback so far.
-	// It retrieves very specific data about internal buffers
-	// that could be pushed to the publish queue or logfile.
-	// Requires further discussion.
-
-	// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-etw_buffer_callback_information
-
-	// return True (1) to continue the processing
-	// return False (0) to stop processing events
-	return 1
-}
-
-// DefaultCallback is a default handler for processing ETW events.
-// By default this callback is replaced by the one defined in the Filebeat input
-func DefaultCallback(r *EventRecord) uintptr {
-	if r == nil {
-		return 1
-	}
-
-	// Initialize a map to hold event data.
-	var event map[string]interface{}
-
-	// Retrieve and store additional event properties, if available.
-	if data, err := GetEventProperties(r); err == nil {
-		event = map[string]interface{}{
-			"Header":          r.EventHeader,
-			"EventProperties": data,
-		}
-	} else {
-		// If properties cannot be retrieved, exit the callback.
-		return 1
-	}
-
-	// Marshal the event data to JSON and output it.
-	jsonData, err := json.Marshal(event)
-	if err != nil {
-		return 1
-	}
-
-	// This is just an example of how the event could be handled.
-	// This log is not really written as this callback is overwritten.
-	log.Println(string(jsonData))
-
-	return 0
-}
 
 // propertyParser is used for parsing properties from raw EVENT_RECORD structures.
 type propertyParser struct {
@@ -139,48 +90,14 @@ func getEventInformation(r *EventRecord) (info *TraceEventInfo, err error) {
 // getPropertyName retrieves the name of the i-th event property in the event record.
 func (p *propertyParser) getPropertyName(i int) string {
 	// Convert the UTF16 property name to a Go string.
-	return createUTF16String(readPropertyName(p, i), ANYSIZE_ARRAY)
+	namePtr := readPropertyName(p, i)
+	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(namePtr)))
 }
 
 // readPropertyName gets the pointer to the property name in the event information structure.
 func readPropertyName(p *propertyParser, i int) unsafe.Pointer {
 	// Calculate the pointer to the property name using its offset in the event property array.
 	return unsafe.Add(unsafe.Pointer(p.info), p.info.EventPropertyInfoArray[i].NameOffset)
-}
-
-// createUTF16String constructs a Go string from a UTF-16 encoded string pointer and its length.
-func createUTF16String(ptr unsafe.Pointer, length int) string {
-	if length == 0 {
-		return ""
-	}
-	// Convert the pointer to a slice of uint16.
-	chars := (*[ANYSIZE_ARRAY]uint16)(ptr)[:length:length]
-
-	// Detect the actual length of the UTF-16 zero-terminated string and check if fast encoding is possible.
-	var fastEncode = true
-	for i, v := range chars {
-		if v == 0 {
-			chars = chars[0:i]
-			break
-		}
-		if v >= 0x800 {
-			fastEncode = false
-		}
-	}
-	if fastEncode {
-		var bytes = make([]byte, 0, len(chars)*2)
-		for _, v := range chars {
-			// Encode each character into UTF-8.
-			if v < 0x80 {
-				bytes = append(bytes, uint8(v))
-			} else {
-				bytes = append(bytes, 0b11000000&uint8(v>>6), 0b10000000&uint8(v))
-			}
-		}
-		return *(*string)(unsafe.Pointer(&bytes))
-	}
-	// Use standard UTF-16 decoding for more complex texts.
-	return string(utf16.Decode(chars))
 }
 
 // getPropertyValue retrieves the value of a specified event property.
@@ -345,8 +262,8 @@ retryLoop:
 	// Update the data slice to account for consumed data.
 	p.data = p.data[userDataConsumed:]
 
-	// Convert the formatted data to a UTF16 string and return.
-	return createUTF16String(unsafe.Pointer(&formattedData[0]), int(formattedDataSize)), nil
+	// Convert the formatted data to string and return.
+	return windows.UTF16PtrToString((*uint16)(unsafe.Pointer(&formattedData[0]))), nil
 }
 
 // getMapInfo retrieves mapping information for a given property.

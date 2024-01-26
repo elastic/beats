@@ -11,6 +11,8 @@ import (
 	"fmt"
 	"syscall"
 	"unsafe"
+
+	"golang.org/x/sys/windows"
 )
 
 // utf16AtOffsetToString converts a UTF-16 encoded string
@@ -33,10 +35,10 @@ func utf16AtOffsetToString(pstruct uintptr, offset uintptr) string {
 }
 
 // guidFromProviderName searches for a provider by name and returns its GUID.
-func guidFromProviderName(providerName string) (GUID, error) {
+func guidFromProviderName(providerName string) (windows.GUID, error) {
 	// Returns if the provider name is empty.
 	if providerName == "" {
-		return GUID{}, fmt.Errorf("empty provider name")
+		return windows.GUID{}, fmt.Errorf("empty provider name")
 	}
 
 	var buf *ProviderEnumerationInfo
@@ -52,7 +54,7 @@ func guidFromProviderName(providerName string) (GUID, error) {
 	}
 
 	if buf.NumberOfProviders == 0 {
-		return GUID{}, fmt.Errorf("no providers found")
+		return windows.GUID{}, fmt.Errorf("no providers found")
 	}
 
 	// Iterate through the list of providers to find a match by name.
@@ -69,28 +71,11 @@ func guidFromProviderName(providerName string) (GUID, error) {
 	}
 
 	// No matching provider is found.
-	return GUID{}, fmt.Errorf("unable to find GUID from provider name")
-}
-
-// GUIDToString convert a GUID to a string.
-func GUIDToString(guid GUID) string {
-	return fmt.Sprintf("{%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x}",
-		guid.Data1,
-		guid.Data2,
-		guid.Data3,
-		guid.Data4[0],
-		guid.Data4[1],
-		guid.Data4[2],
-		guid.Data4[3],
-		guid.Data4[4],
-		guid.Data4[5],
-		guid.Data4[6],
-		guid.Data4[7],
-	)
+	return windows.GUID{}, fmt.Errorf("unable to find GUID from provider name")
 }
 
 // IsGUIDValid checks if GUID contains valid data
 // (any of the fields in the GUID are non-zero)
-func IsGUIDValid(guid GUID) bool {
+func IsGUIDValid(guid windows.GUID) bool {
 	return guid.Data1 != 0 || guid.Data2 != 0 || guid.Data3 != 0 || guid.Data4 != [8]byte{}
 }

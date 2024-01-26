@@ -27,7 +27,7 @@ type Session struct {
 	// It is used to identify the session in logs and also for Windows processes.
 	Name string
 	// GUID is the provider GUID to configure the session.
-	GUID GUID
+	GUID windows.GUID
 	// Properties of the session that are initialized in newSessionProperties()
 	// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_properties for more information
 	Properties *EventTraceProperties
@@ -54,14 +54,14 @@ type Session struct {
 	TraceHandler uint64
 	// Callback is the pointer to EventRecordCallback which receives and processes event trace events.
 	Callback uintptr
-	// BufferCallback is the pointer to BufferCallback which processes retrieved metadata about the ETW buffers.
+	// BufferCallback is the pointer to BufferCallback which processes retrieved metadata about the ETW buffers (optional).
 	BufferCallback uintptr
 
 	// Pointers to functions that make calls to the Windows API.
 	// In tests, these pointers can be replaced with mock functions to simulate API behavior without making actual calls to the Windows API.
 	startTrace   func(*uintptr, *uint16, *EventTraceProperties) error
 	controlTrace func(traceHandle uintptr, instanceName *uint16, properties *EventTraceProperties, controlCode uint32) error
-	enableTrace  func(traceHandle uintptr, providerId *GUID, isEnabled uint32, level uint8, matchAnyKeyword uint64, matchAllKeyword uint64, enableProperty uint32, enableParameters *EnableTraceParameters) error
+	enableTrace  func(traceHandle uintptr, providerId *windows.GUID, isEnabled uint32, level uint8, matchAnyKeyword uint64, matchAllKeyword uint64, enableProperty uint32, enableParameters *EnableTraceParameters) error
 	closeTrace   func(traceHandle uint64) error
 	openTrace    func(elf *EventTraceLogfile) (uint64, error)
 	processTrace func(handleArray *uint64, handleCount uint32, startTime *FileTime, endTime *FileTime) error
@@ -84,36 +84,25 @@ func setSessionName(conf Config) string {
 }
 
 // setSessionGUID determines the session GUID based on the provided configuration.
-func setSessionGUID(conf Config) (GUID, error) {
-	var guid GUID
+func setSessionGUID(conf Config) (windows.GUID, error) {
+	var guid windows.GUID
 	var err error
 
 	// If ProviderGUID is not set in the configuration, attempt to resolve it using the provider name.
 	if conf.ProviderGUID == "" {
 		guid, err = guidFromProviderNameFunc(conf.ProviderName)
 		if err != nil {
-			return GUID{}, fmt.Errorf("error resolving GUID: %w", err)
+			return windows.GUID{}, fmt.Errorf("error resolving GUID: %w", err)
 		}
 	} else {
 		// If ProviderGUID is set, parse it into a GUID structure.
-		winGUID, err := windows.GUIDFromString(conf.ProviderGUID)
+		guid, err = windows.GUIDFromString(conf.ProviderGUID)
 		if err != nil {
-			return GUID{}, fmt.Errorf("error parsing Windows GUID: %w", err)
+			return windows.GUID{}, fmt.Errorf("error parsing Windows GUID: %w", err)
 		}
-		guid = convertWindowsGUID(winGUID)
 	}
 
 	return guid, nil
-}
-
-// convertWindowsGUID converts a Windows GUID structure to a custom GUID structure.
-func convertWindowsGUID(windowsGUID windows.GUID) GUID {
-	return GUID{
-		Data1: windowsGUID.Data1,
-		Data2: windowsGUID.Data2,
-		Data3: windowsGUID.Data3,
-		Data4: windowsGUID.Data4,
-	}
 }
 
 // getTraceLevel converts a string representation of a trace level
@@ -150,7 +139,7 @@ func newSessionProperties(sessionName string) *EventTraceProperties {
 	// Initialize mandatory fields of the EventTraceProperties struct.
 	// Filled based on https://learn.microsoft.com/en-us/windows/win32/etw/wnode-header
 	sessionProperties.Wnode.BufferSize = uint32(bufSize)
-	sessionProperties.Wnode.Guid = GUID{} // GUID not required for non-private/kernel sessions
+	sessionProperties.Wnode.Guid = windows.GUID{} // GUID not required for non-private/kernel sessions
 	// ClientContext is used for timestamp resolution
 	// Not used unless adding PROCESS_TRACE_MODE_RAW_TIMESTAMP flag to EVENT_TRACE_LOGFILE struct
 	// See https://learn.microsoft.com/en-us/windows/win32/etw/wnode-header
@@ -181,12 +170,6 @@ func NewSession(conf Config) (Session, error) {
 
 	session.Name = setSessionName(conf)
 	session.Realtime = true
-
-	// Set default callbacks if not already specified.
-	if session.Callback == 0 {
-		session.Callback = syscall.NewCallback(DefaultCallback)
-	}
-	session.BufferCallback = syscall.NewCallback(DefaultBufferCallback)
 
 	// If a current session is configured, set up the session properties and return.
 	if conf.Session != "" {
@@ -236,8 +219,10 @@ func (s *Session) StartConsumer() error {
 		elf.LoggerName = sessionPtr
 	}
 
-	// Set callbacks and context for the session.
-	elf.BufferCallback = s.BufferCallback
+	// Set callback and context for the session.
+	if s.Callback == 0 {
+		return fmt.Errorf("error loading callback")
+	}
 	elf.Callback = s.Callback
 	elf.Context = 0
 

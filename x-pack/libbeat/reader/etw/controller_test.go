@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/windows"
 )
 
 func TestGetHandler_Error(t *testing.T) {
@@ -85,7 +86,7 @@ func TestCreateRealtimeSession_EnableTraceError(t *testing.T) {
 	}
 
 	enableTrace := func(traceHandle uintptr,
-		providerId *GUID,
+		providerId *windows.GUID,
 		isEnabled uint32,
 		level uint8,
 		matchAnyKeyword uint64,
@@ -117,7 +118,7 @@ func TestCreateRealtimeSession_Success(t *testing.T) {
 	}
 
 	enableTrace := func(traceHandle uintptr,
-		providerId *GUID,
+		providerId *windows.GUID,
 		isEnabled uint32,
 		level uint8,
 		matchAnyKeyword uint64,

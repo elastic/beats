@@ -12,6 +12,7 @@ import (
 	"unsafe"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/windows"
 )
 
 // TestSetSessionName tests the setSessionName function with various configurations.
@@ -59,9 +60,9 @@ func TestSetSessionName(t *testing.T) {
 	}
 }
 
-func mockGUIDFromProviderName(providerName string) (GUID, error) {
+func mockGUIDFromProviderName(providerName string) (windows.GUID, error) {
 	// Return a mock GUID regardless of the input
-	return GUID{Data1: 0x12345678, Data2: 0x1234, Data3: 0x5678, Data4: [8]byte{0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78}}, nil
+	return windows.GUID{Data1: 0x12345678, Data2: 0x1234, Data3: 0x5678, Data4: [8]byte{0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78}}, nil
 }
 
 func TestSetSessionGUID_ProviderName(t *testing.T) {
@@ -75,7 +76,7 @@ func TestSetSessionGUID_ProviderName(t *testing.T) {
 	guidFromProviderNameFunc = mockGUIDFromProviderName
 
 	conf := Config{ProviderName: "Provider1"}
-	expectedGUID := GUID{Data1: 0x12345678, Data2: 0x1234, Data3: 0x5678, Data4: [8]byte{0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78}}
+	expectedGUID := windows.GUID{Data1: 0x12345678, Data2: 0x1234, Data3: 0x5678, Data4: [8]byte{0x9A, 0xBC, 0xDE, 0xF0, 0x12, 0x34, 0x56, 0x78}}
 
 	guid, err := setSessionGUID(conf)
 	assert.NoError(t, err)
@@ -90,7 +91,7 @@ func TestSetSessionGUID_ProviderGUID(t *testing.T) {
 	conf := Config{ProviderGUID: guidString}
 
 	// Expected GUID based on the GUID string
-	expectedGUID := GUID{Data1: 0x12345678, Data2: 0x1234, Data3: 0x5678, Data4: [8]byte{0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78}}
+	expectedGUID := windows.GUID{Data1: 0x12345678, Data2: 0x1234, Data3: 0x5678, Data4: [8]byte{0x12, 0x34, 0x56, 0x78, 0x12, 0x34, 0x56, 0x78}}
 
 	guid, err := setSessionGUID(conf)
 
@@ -136,7 +137,7 @@ func TestNewSessionProperties(t *testing.T) {
 			props := newSessionProperties(tc.sessionName)
 
 			assert.Equal(t, tc.expectedSize, props.Wnode.BufferSize, "BufferSize should match expected value")
-			assert.Equal(t, GUID{}, props.Wnode.Guid, "GUID should be empty")
+			assert.Equal(t, windows.GUID{}, props.Wnode.Guid, "GUID should be empty")
 			assert.Equal(t, uint32(1), props.Wnode.ClientContext, "ClientContext should be 1")
 			assert.Equal(t, uint32(WNODE_FLAG_TRACED_GUID), props.Wnode.Flags, "Flags should match WNODE_FLAG_TRACED_GUID")
 			assert.Equal(t, uint32(EVENT_TRACE_REAL_TIME_MODE), props.LogFileMode, "LogFileMode should be set to real-time")
@@ -155,8 +156,8 @@ func TestNewSession_ProviderName(t *testing.T) {
 	})
 
 	// Override setSessionGUIDFunc with mock
-	setSessionGUIDFunc = func(conf Config) (GUID, error) {
-		return GUID{
+	setSessionGUIDFunc = func(conf Config) (windows.GUID, error) {
+		return windows.GUID{
 			Data1: 0x12345678,
 			Data2: 0x1234,
 			Data3: 0x5678,
@@ -164,7 +165,7 @@ func TestNewSession_ProviderName(t *testing.T) {
 		}, nil
 	}
 
-	expectedGUID := GUID{
+	expectedGUID := windows.GUID{
 		Data1: 0x12345678,
 		Data2: 0x1234,
 		Data3: 0x5678,
@@ -187,9 +188,6 @@ func TestNewSession_ProviderName(t *testing.T) {
 	assert.Equal(t, true, session.NewSession)
 	assert.Equal(t, true, session.Realtime)
 	assert.NotNil(t, session.Properties)
-	assert.NotNil(t, session.Callback)
-	assert.NotNil(t, session.BufferCallback)
-
 }
 
 func TestNewSession_GUIDError(t *testing.T) {
@@ -200,9 +198,9 @@ func TestNewSession_GUIDError(t *testing.T) {
 	})
 
 	// Override setSessionGUIDFunc with mock
-	setSessionGUIDFunc = func(conf Config) (GUID, error) {
+	setSessionGUIDFunc = func(conf Config) (windows.GUID, error) {
 		// Return an empty GUID and an error
-		return GUID{}, fmt.Errorf("mock error")
+		return windows.GUID{}, fmt.Errorf("mock error")
 	}
 
 	conf := Config{
@@ -236,8 +234,6 @@ func TestNewSession_AttachSession(t *testing.T) {
 	assert.Equal(t, false, session.NewSession)
 	assert.Equal(t, true, session.Realtime)
 	assert.NotNil(t, session.Properties)
-	assert.NotNil(t, session.Callback)
-	assert.NotNil(t, session.BufferCallback)
 }
 
 func TestNewSession_Logfile(t *testing.T) {
@@ -255,8 +251,19 @@ func TestNewSession_Logfile(t *testing.T) {
 	assert.Equal(t, false, session.NewSession)
 	assert.Equal(t, false, session.Realtime)
 	assert.Nil(t, session.Properties)
-	assert.NotNil(t, session.Callback)
-	assert.NotNil(t, session.BufferCallback)
+}
+
+func TestStartConsumer_CallbackNull(t *testing.T) {
+	// Create a Session instance
+	session := &Session{
+		Name:           "TestSession",
+		Realtime:       false,
+		BufferCallback: uintptr(0),
+		Callback:       uintptr(0),
+	}
+
+	err := session.StartConsumer()
+	assert.EqualError(t, err, "error loading callback")
 }
 
 func TestStartConsumer_OpenTraceError(t *testing.T) {
@@ -270,7 +277,7 @@ func TestStartConsumer_OpenTraceError(t *testing.T) {
 		Name:           "TestSession",
 		Realtime:       false,
 		BufferCallback: uintptr(0),
-		Callback:       uintptr(0),
+		Callback:       uintptr(1),
 		openTrace:      openTrace,
 	}
 
@@ -293,7 +300,7 @@ func TestStartConsumer_ProcessTraceError(t *testing.T) {
 		Name:           "TestSession",
 		Realtime:       true,
 		BufferCallback: uintptr(0),
-		Callback:       uintptr(0),
+		Callback:       uintptr(1),
 		openTrace:      openTrace,
 		processTrace:   processTrace,
 	}
@@ -317,7 +324,7 @@ func TestStartConsumer_Success(t *testing.T) {
 		Name:           "TestSession",
 		Realtime:       true,
 		BufferCallback: uintptr(0),
-		Callback:       uintptr(0),
+		Callback:       uintptr(1),
 		openTrace:      openTrace,
 		processTrace:   processTrace,
 	}

@@ -31,7 +31,7 @@ type EventTrace struct {
 	Header           EventTraceHeader
 	InstanceId       uint32
 	ParentInstanceId uint32
-	ParentGuid       GUID
+	ParentGuid       windows.GUID
 	MofData          uintptr
 	MofLength        uint32
 	UnionCtx         uint32
@@ -77,7 +77,7 @@ type WnodeHeader struct {
 	ProviderId    uint32
 	Union1        uint64
 	Union2        int64
-	Guid          GUID
+	Guid          windows.GUID
 	ClientContext uint32
 	Flags         uint32
 }
@@ -88,7 +88,7 @@ type EnableTraceParameters struct {
 	Version          uint32
 	EnableProperty   uint32
 	ControlFlags     uint32
-	SourceId         GUID
+	SourceId         windows.GUID
 	EnableFilterDesc *EventFilterDescriptor
 	FilterDescrCount uint32
 }
@@ -138,23 +138,12 @@ type TraceLogfileHeader struct {
 	Union1             [16]byte
 	LoggerName         *uint16
 	LogFileName        *uint16
-	TimeZone           TimeZoneInformation
+	TimeZone           windows.Timezoneinformation
 	BootTime           int64
 	PerfFreq           int64
 	StartTime          int64
 	ReservedFlags      uint32
 	BuffersLost        uint32
-}
-
-// https://learn.microsoft.com/en-us/windows/win32/api/timezoneapi/ns-timezoneapi-time_zone_information
-type TimeZoneInformation struct {
-	Bias         int32
-	StandardName [32]uint16
-	StandardDate SystemTime
-	StandardBias int32
-	DaylightName [32]uint16
-	DaylightDate SystemTime
-	DaylighBias  int32
 }
 
 // https://learn.microsoft.com/en-us/windows/win32/api/minwinbase/ns-minwinbase-filetime
@@ -235,13 +224,6 @@ const (
 	EVENT_TRACE_REAL_TIME_MODE = 0x00000100
 )
 
-type GUID struct {
-	Data1 uint32
-	Data2 uint16
-	Data3 uint16
-	Data4 [8]byte
-}
-
 // Wrappers
 
 // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-starttracew
@@ -260,7 +242,7 @@ func _StartTrace(traceHandle *uintptr,
 
 // https://learn.microsoft.com/en-us/windows/win32/api/evntrace/nf-evntrace-enabletraceex2
 func _EnableTraceEx2(traceHandle uintptr,
-	providerId *GUID,
+	providerId *windows.GUID,
 	isEnabled uint32,
 	level uint8,
 	matchAnyKeyword uint64,

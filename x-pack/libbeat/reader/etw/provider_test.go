@@ -13,6 +13,7 @@ import (
 	"unsafe"
 
 	"github.com/stretchr/testify/assert"
+	"golang.org/x/sys/windows"
 )
 
 func TestUTF16AtOffsetToString(t *testing.T) {
@@ -36,7 +37,7 @@ func TestUTF16AtOffsetToString(t *testing.T) {
 func TestGUIDFromProviderName_EmptyName(t *testing.T) {
 	guid, err := guidFromProviderName("")
 	assert.EqualError(t, err, "empty provider name")
-	assert.Equal(t, GUID{}, guid, "GUID should be empty for an empty provider name")
+	assert.Equal(t, windows.GUID{}, guid, "GUID should be empty for an empty provider name")
 }
 
 func TestGUIDFromProviderName_EmptyProviderList(t *testing.T) {
@@ -68,7 +69,7 @@ func TestGUIDFromProviderName_EmptyProviderList(t *testing.T) {
 
 	guid, err := guidFromProviderName(mockProviderName)
 	assert.EqualError(t, err, "no providers found")
-	assert.Equal(t, GUID{}, guid, "GUID should be empty when the provider is not found")
+	assert.Equal(t, windows.GUID{}, guid, "GUID should be empty when the provider is not found")
 }
 
 func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
@@ -81,7 +82,7 @@ func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 	// Define a mock provider name and GUID for testing.
 	mockProviderName := "NonExistentProvider"
 	realProviderName := "ExistentProvider"
-	mockGUID := GUID{Data1: 1234, Data2: 5678}
+	mockGUID := windows.GUID{Data1: 1234, Data2: 5678}
 
 	enumerateProvidersFunc = func(pBuffer *ProviderEnumerationInfo, pBufferSize *uint32) error {
 		// Convert provider name to UTF-16
@@ -122,7 +123,7 @@ func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 
 	guid, err := guidFromProviderName(mockProviderName)
 	assert.EqualError(t, err, "unable to find GUID from provider name")
-	assert.Equal(t, GUID{}, guid, "GUID should be empty when the provider is not found")
+	assert.Equal(t, windows.GUID{}, guid, "GUID should be empty when the provider is not found")
 }
 
 func TestGUIDFromProviderName_Success(t *testing.T) {
@@ -134,7 +135,7 @@ func TestGUIDFromProviderName_Success(t *testing.T) {
 
 	// Define a mock provider name and GUID for testing.
 	mockProviderName := "MockProvider"
-	mockGUID := GUID{Data1: 1234, Data2: 5678}
+	mockGUID := windows.GUID{Data1: 1234, Data2: 5678}
 
 	enumerateProvidersFunc = func(pBuffer *ProviderEnumerationInfo, pBufferSize *uint32) error {
 		// Convert provider name to UTF-16
@@ -179,25 +180,9 @@ func TestGUIDFromProviderName_Success(t *testing.T) {
 	assert.Equal(t, mockGUID, guid, "GUID should match the mock GUID")
 }
 
-func TestGUIDToString(t *testing.T) {
-	// Example GUID
-	testGUID := GUID{
-		Data1: 0xeb79061a,
-		Data2: 0xa566,
-		Data3: 0x4698,
-		Data4: [8]byte{0x12, 0x34, 0x3e, 0xd2, 0x80, 0x70, 0x33, 0xa0},
-	}
-
-	// Expected string representation of the GUID
-	expected := "{eb79061a-a566-4698-1234-3ed2807033a0}"
-
-	result := GUIDToString(testGUID)
-	assert.Equal(t, expected, result, "GUIDToString should convert a GUID to its string representation correctly")
-}
-
 func TestIsGUIDValid_True(t *testing.T) {
 	// Valid GUID
-	validGUID := GUID{
+	validGUID := windows.GUID{
 		Data1: 0xeb79061a,
 		Data2: 0xa566,
 		Data3: 0x4698,
@@ -210,7 +195,7 @@ func TestIsGUIDValid_True(t *testing.T) {
 
 func TestIsGUIDValid_False(t *testing.T) {
 	// Invalid GUID (all zeros)
-	invalidGUID := GUID{}
+	invalidGUID := windows.GUID{}
 
 	valid := IsGUIDValid(invalidGUID)
 	assert.False(t, valid, "IsGUIDValid should return false for an invalid GUID")

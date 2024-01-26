@@ -34,7 +34,7 @@ type ProviderEnumerationInfo struct {
 
 // https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-trace_provider_info
 type TraceProviderInfo struct {
-	ProviderGuid       GUID
+	ProviderGuid       windows.GUID
 	SchemaSource       uint32
 	ProviderNameOffset uint32
 }
@@ -66,10 +66,10 @@ type EventHeader struct {
 	ThreadId        uint32
 	ProcessId       uint32
 	TimeStamp       int64
-	ProviderId      GUID
+	ProviderId      windows.GUID
 	EventDescriptor EventDescriptor
 	Time            int64
-	ActivityId      GUID
+	ActivityId      windows.GUID
 }
 
 func (e *EventRecord) pointerSize() uint32 {
@@ -114,8 +114,8 @@ type TdhContext struct {
 
 // https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-trace_event_info
 type TraceEventInfo struct {
-	ProviderGUID                GUID
-	EventGUID                   GUID
+	ProviderGUID                windows.GUID
+	EventGUID                   windows.GUID
 	EventDescriptor             EventDescriptor
 	DecodingSource              DecodingSource
 	ProviderNameOffset          uint32
