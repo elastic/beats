@@ -67,11 +67,12 @@ type Enricher interface {
 
 type enricher struct {
 	sync.RWMutex
-	metadata     map[string]mapstr.M
-	index        func(mapstr.M) string
-	resourceName string
-	isPod        bool
-	config       *kubernetesConfig
+	metadata      map[string]mapstr.M
+	index         func(mapstr.M) string
+	metricsetName string
+	resourceName  string
+	isPod         bool
+	config        *kubernetesConfig
 }
 
 type nilEnricher struct{}
@@ -81,9 +82,12 @@ func (*nilEnricher) Stop(*Watchers)    {}
 func (*nilEnricher) Enrich([]mapstr.M) {}
 
 type watcherData struct {
-	resourcesUsing []string // list of resources using this watcher
-	watcher        kubernetes.Watcher
-	started        bool // true if watcher has started, false otherwise
+	// list of metricsets using this watcher
+	// metricsets are used instead of resource names to avoid conflicts between
+	// state_pod / pod, state_node / node, state_container / container
+	metricsetsUsing []string
+	watcher         kubernetes.Watcher
+	started         bool // true if watcher has started, false otherwise
 }
 
 type Watchers struct {
@@ -92,6 +96,8 @@ type Watchers struct {
 }
 
 const selector = "kubernetes"
+
+const StateMetricsetPrefix = "state_"
 
 const (
 	PodResource                   = "pod"
@@ -195,6 +201,17 @@ func getExtraWatchers(resourceName string, config *kubernetesConfig) []string {
 	}
 }
 
+// getResourceName returns the name of the resource for a metricset
+// Example: state_pod metricset uses pod resource
+// Exception is state_namespace
+func getResourceName(metricsetName string) string {
+	resourceName := metricsetName
+	if resourceName != NamespaceResource {
+		resourceName = strings.ReplaceAll(resourceName, StateMetricsetPrefix, "")
+	}
+	return resourceName
+}
+
 // getWatchOptions builds the kubernetes.WatchOptions{} needed for the watcher based on the config and nodeScope
 func getWatchOptions(config *kubernetesConfig, nodeScope bool, client k8sclient.Interface, log *logp.Logger) (*kubernetes.WatchOptions, error) {
 	var err error
@@ -243,52 +260,53 @@ func createWatcher(
 	return false, nil
 }
 
-// addToResourcesUsing adds resource identified by usingName to the list of resources using the watcher
+// addToMetricsetsUsing adds metricset identified by metricsetUsing to the list of resources using the watcher
 // identified by resourceName
-func addToResourcesUsing(resourceName string, usingName string, resourceWatchers *Watchers) {
+func addToMetricsetsUsing(resourceName string, metricsetUsing string, resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
 
 	data, ok := resourceWatchers.watchersMap[resourceName]
 	if ok {
 		contains := false
-		for _, which := range data.resourcesUsing {
-			if which == usingName {
+		for _, which := range data.metricsetsUsing {
+			if which == metricsetUsing {
 				contains = true
 				break
 			}
 		}
 		// add this resource to the list of resources using it
 		if !contains {
-			data.resourcesUsing = append(data.resourcesUsing, usingName)
+			data.metricsetsUsing = append(data.metricsetsUsing, metricsetUsing)
 		}
 	}
 }
 
-// removeFromResourcesUsing returns true if element was removed and new size of array.
+// removeFromMetricsetsUsing returns true if element was removed and new size of array.
 // The cache should be locked when called.
-func removeFromResourcesUsing(resourceName string, notUsingName string, resourceWatchers *Watchers) (bool, int) {
+func removeFromMetricsetsUsing(resourceName string, notUsingName string, resourceWatchers *Watchers) (bool, int) {
 	data, ok := resourceWatchers.watchersMap[resourceName]
 	removed := false
 	if ok {
 		newIndex := 0
-		for i, which := range data.resourcesUsing {
+		for i, which := range data.metricsetsUsing {
 			if which == notUsingName {
 				removed = true
 			} else {
-				data.resourcesUsing[newIndex] = data.resourcesUsing[i]
+				data.metricsetsUsing[newIndex] = data.metricsetsUsing[i]
 				newIndex++
 			}
 		}
-		data.resourcesUsing = data.resourcesUsing[:newIndex]
-		return removed, len(data.resourcesUsing)
+		data.metricsetsUsing = data.metricsetsUsing[:newIndex]
+		return removed, len(data.metricsetsUsing)
 	}
 	return removed, 0
 }
 
-// createAllWatchers creates all the watchers required by a specific resource
+// createAllWatchers creates all the watchers required by a metricset
 func createAllWatchers(
 	client k8sclient.Interface,
+	metricsetName string,
 	resourceName string,
 	nodeScope bool,
 	config *kubernetesConfig,
@@ -309,11 +327,11 @@ func createAllWatchers(
 	// If it fails, we return an error, so we can stop the extra watchers from creating.
 	created, err := createWatcher(resourceName, res, *options, client, resourceWatchers)
 	if err != nil {
-		return fmt.Errorf("error initializing Kubernetes watcher %s, required by %s: %w", resourceName, resourceName, err)
+		return fmt.Errorf("error initializing Kubernetes watcher %s, required by %s: %w", resourceName, metricsetName, err)
 	} else if created {
-		log.Debugf("Created watcher %s successfully, created by %s.", resourceName, resourceName)
+		log.Debugf("Created watcher %s successfully, created by %s.", resourceName, metricsetName)
 	}
-	addToResourcesUsing(resourceName, resourceName, resourceWatchers)
+	addToMetricsetsUsing(resourceName, metricsetName, resourceWatchers)
 
 	// Create the extra watchers required by this resource
 	extraWatchers := getExtraWatchers(resourceName, config)
@@ -322,13 +340,13 @@ func createAllWatchers(
 		if extraRes != nil {
 			created, err = createWatcher(extra, extraRes, *options, client, resourceWatchers)
 			if err != nil {
-				log.Errorf("Error initializing Kubernetes watcher %s, required by %s: %s", extra, resourceName, err)
+				log.Errorf("Error initializing Kubernetes watcher %s, required by %s: %s", extra, metricsetName, err)
 			} else {
 				if created {
-					log.Debugf("Created watcher %s successfully, created by %s.", extra, resourceName)
+					log.Debugf("Created watcher %s successfully, created by %s.", extra, metricsetName)
 				}
-				// add this resource to the ones using the extra resource
-				addToResourcesUsing(extra, resourceName, resourceWatchers)
+				// add this metricset to the ones using the extra resource
+				addToMetricsetsUsing(extra, metricsetName, resourceWatchers)
 			}
 		} else {
 			log.Errorf("Resource for name %s does not exist. Watcher cannot be created.", extra)
@@ -432,11 +450,9 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
-	resourceName string,
 	metricsRepo *MetricsRepo,
 	resourceWatchers *Watchers,
 	nodeScope bool) Enricher {
-
 	log := logp.NewLogger(selector)
 
 	config, err := GetValidatedConfig(base)
@@ -459,7 +475,10 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	err = createAllWatchers(client, resourceName, nodeScope, config, log, resourceWatchers)
+	metricsetName := base.Name()
+	resourceName := getResourceName(metricsetName)
+
+	err = createAllWatchers(client, metricsetName, resourceName, nodeScope, config, log, resourceWatchers)
 	if err != nil {
 		log.Errorf("Error starting the watchers: %s", err)
 		return &nilEnricher{}
@@ -547,7 +566,7 @@ func NewResourceMetadataEnricher(
 		return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, "name"))
 	}
 
-	enricher := buildMetadataEnricher(resourceName, resourceWatchers, config, updateFunc, deleteFunc, indexFunc)
+	enricher := buildMetadataEnricher(metricsetName, resourceName, resourceWatchers, config, updateFunc, deleteFunc, indexFunc)
 	if resourceName == PodResource {
 		enricher.isPod = true
 	}
@@ -584,7 +603,9 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	err = createAllWatchers(client, PodResource, nodeScope, config, log, resourceWatchers)
+	metricsetName := base.Name()
+
+	err = createAllWatchers(client, metricsetName, PodResource, nodeScope, config, log, resourceWatchers)
 	if err != nil {
 		log.Errorf("Error starting the watchers: %s", err)
 		return &nilEnricher{}
@@ -670,7 +691,7 @@ func NewContainerMetadataEnricher(
 		return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, mb.ModuleDataKey+".pod.name"), getString(e, "name"))
 	}
 
-	enricher := buildMetadataEnricher(PodResource, resourceWatchers, config, updateFunc, deleteFunc, indexFunc)
+	enricher := buildMetadataEnricher(metricsetName, PodResource, resourceWatchers, config, updateFunc, deleteFunc, indexFunc)
 
 	return enricher
 }
@@ -726,6 +747,7 @@ func join(fields ...string) string {
 }
 
 func buildMetadataEnricher(
+	metricsetName string,
 	resourceName string,
 	resourceWatchers *Watchers,
 	config *kubernetesConfig,
@@ -734,10 +756,11 @@ func buildMetadataEnricher(
 	index func(e mapstr.M) string) *enricher {
 
 	enricher := enricher{
-		metadata:     map[string]mapstr.M{},
-		index:        index,
-		resourceName: resourceName,
-		config:       config,
+		metadata:      map[string]mapstr.M{},
+		index:         index,
+		resourceName:  resourceName,
+		metricsetName: metricsetName,
+		config:        config,
 	}
 
 	resourceWatchers.lock.Lock()
@@ -799,7 +822,7 @@ func (e *enricher) Stop(resourceWatchers *Watchers) {
 
 	resourceWatcher := resourceWatchers.watchersMap[e.resourceName]
 	if resourceWatcher != nil && resourceWatcher.started {
-		_, size := removeFromResourcesUsing(e.resourceName, e.resourceName, resourceWatchers)
+		_, size := removeFromMetricsetsUsing(e.resourceName, e.metricsetName, resourceWatchers)
 		if size == 0 {
 			resourceWatcher.watcher.Stop()
 			resourceWatcher.started = false
@@ -810,7 +833,7 @@ func (e *enricher) Stop(resourceWatchers *Watchers) {
 	for _, extra := range extras {
 		extraWatcher := resourceWatchers.watchersMap[extra]
 		if extraWatcher != nil && extraWatcher.started {
-			_, size := removeFromResourcesUsing(extra, e.resourceName, resourceWatchers)
+			_, size := removeFromMetricsetsUsing(extra, e.metricsetName, resourceWatchers)
 			if size == 0 {
 				extraWatcher.watcher.Stop()
 				extraWatcher.started = false

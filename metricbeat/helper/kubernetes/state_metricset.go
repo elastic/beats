@@ -29,8 +29,6 @@ import (
 	k8smod "github.com/elastic/beats/v7/metricbeat/module/kubernetes"
 )
 
-const prefix = "state_"
-
 /*
 mappings stores the metrics for each metricset. The key of the map is the name of the metricset
 and the values are the mapping of the metricset metrics.
@@ -45,7 +43,7 @@ var lock sync.RWMutex
 // The New method will be called after the setup of the module and before starting to fetch data
 func Init(name string, mapping *prometheus.MetricsMapping) {
 	if name != util.NamespaceResource {
-		name = prefix + name
+		name = util.StateMetricsetPrefix + name
 	}
 	lock.Lock()
 	mappings[name] = mapping
@@ -79,16 +77,16 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	mapping := mappings[base.Name()]
 	lock.Unlock()
 
-	resourceName := base.Name()
-	if resourceName != util.NamespaceResource {
-		resourceName = strings.ReplaceAll(resourceName, prefix, "")
-	}
+	//resourceName := base.Name()
+	//if resourceName != util.NamespaceResource {
+	//	resourceName = strings.ReplaceAll(resourceName, prefix, "")
+	//}
 
 	return &MetricSet{
 		BaseMetricSet:     base,
 		prometheusClient:  prometheusClient,
 		prometheusMapping: mapping,
-		enricher:          util.NewResourceMetadataEnricher(base, resourceName, mod.GetMetricsRepo(), mod.GetResourceWatchers(), false),
+		enricher:          util.NewResourceMetadataEnricher(base, mod.GetMetricsRepo(), mod.GetResourceWatchers(), false),
 		mod:               mod,
 	}, nil
 }
@@ -103,7 +101,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) {
 	// for the state_namespace metricset.
 	resourceName := m.BaseMetricSet.Name()
 	if resourceName != util.NamespaceResource {
-		resourceName = strings.ReplaceAll(resourceName, prefix, "")
+		resourceName = strings.ReplaceAll(resourceName, util.StateMetricsetPrefix, "")
 	} else {
 		resourceName = "state_namespace"
 	}

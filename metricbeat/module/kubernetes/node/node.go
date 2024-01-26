@@ -75,7 +75,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	return &MetricSet{
 		BaseMetricSet: base,
 		http:          http,
-		enricher:      util.NewResourceMetadataEnricher(base, util.NodeResource, mod.GetMetricsRepo(), mod.GetResourceWatchers(), false),
+		enricher:      util.NewResourceMetadataEnricher(base, mod.GetMetricsRepo(), mod.GetResourceWatchers(), false),
 		mod:           mod,
 	}, nil
 }
