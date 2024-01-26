@@ -23,7 +23,7 @@ import (
 
 const (
 	name      = "add_session_metadata"
-	allEvents = ebpf.EventMask(ebpfevents.EventTypeProcessFork & ebpfevents.EventTypeProcessExec & ebpfevents.EventTypeProcessExit)
+	eventMask = ebpf.EventMask(ebpfevents.EventTypeProcessFork | ebpfevents.EventTypeProcessExec | ebpfevents.EventTypeProcessExit)
 )
 
 type prvdr struct {
@@ -44,7 +44,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 		return nil, fmt.Errorf("get ebpf watcher: %w", err)
 	}
 
-	records := w.Subscribe(name, allEvents)
+	records := w.Subscribe(name, eventMask)
 
 	go func(logger logp.Logger) {
 		for {
