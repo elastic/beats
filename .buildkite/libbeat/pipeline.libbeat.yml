@@ -53,7 +53,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
-        artifact_paths: "libbeat/build/*.*"
+        artifact_paths: "libbeat/*.*"
 
   - group: "Extended Tests"
     key: "extended-tests"

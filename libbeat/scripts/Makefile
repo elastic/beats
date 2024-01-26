@@ -87,8 +87,9 @@ SYSTEM_TESTS?=false ## @testing if true, "make test" and "make testsuite" run un
 STRESS_TESTS?=false ## @testing if true, "make test" and "make testsuite" run also run the stress tests
 STRESS_TEST_OPTIONS?=-timeout=20m -race -v
 GOX_OS?=linux darwin windows freebsd netbsd openbsd ## @Building List of all OS to be supported by "make crosscompile".
-GOX_OSARCH?=!darwin/386 !linux/386 !windows/386 !freebsd/386 !netbsd/386 !openbsd/386 ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
+GOX_OSARCH?=!darwin/arm !darwin/386 !linux/386 !windows/386 !freebsd/386 !netbsd/386 !openbsd/386 ## @building Space separated list of GOOS/GOARCH pairs to build by "make crosscompile".
 GOX_FLAGS?= ## @building Additional flags to append to the gox command used by "make crosscompile".
+GOTEST_OUTPUT_OPTIONS?=
 # XXX: Should be switched back to `snapshot` once the Elasticsearch
 # snapshots are working. https://github.com/elastic/beats/pull/6416
 TESTING_ENVIRONMENT?=snapshot## @testing The name of the environment under test
@@ -255,7 +256,7 @@ fast-system-tests: ${BEAT_NAME}.test python-env
 stress-tests: ## @testing Runs the stress tests with race detector enabled
 stress-tests:
 	if [ -n '${GOPACKAGES_STRESSTESTS}' ]; then \
-		go test --tags=stresstest ${STRESS_TEST_OPTIONS} ${GOPACKAGES_STRESSTESTS}; \
+		go test --tags=stresstest ${STRESS_TEST_OPTIONS} ${GOPACKAGES_STRESSTESTS} ${GOTEST_OUTPUT_OPTIONS}; \
 	fi
 
 # Run benchmark tests
