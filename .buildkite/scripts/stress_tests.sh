@@ -6,5 +6,12 @@ set -euo pipefail
 
 beats_subfolder=$1
 
+sudo chmod -R go-w ${beats_subfolder}/
+
 echo "--- Run Stress Tests for $beats_subfolder"
-make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' -C $beats_subfolder stress-tests
+pushd "${beats_subfolder}" > /dev/null
+
+umask 0022
+make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' stress-tests
+
+popd > /dev/null
