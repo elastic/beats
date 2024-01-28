@@ -23,6 +23,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
@@ -136,7 +137,18 @@ func exportContainerStats(ctx context.Context, client *client.Client, container 
 	var event Stat
 	event.Container = container
 
-	containerStats, err := client.ContainerStats(ctx, container.ID, false)
+	// stream defaults to false -
+	// force container stats stream to receive also precpu_stats when using podman
+	// docker returns precpu_stats with or without streaming, podman does only return precpu_stats when streaming
+	// this can be done using the label co.elastic.metricbeat.docker.forceContainerStatsStream
+	var stream bool
+	if container.Labels != nil {
+		if labelValue, ok := container.Labels["co.elastic.metricbeat.docker.forceContainerStatsStream"]; ok {
+			stream, _ = strconv.ParseBool(labelValue)
+		}
+	}
+
+	containerStats, err := client.ContainerStats(ctx, container.ID, stream)
 	if err != nil {
 		return event
 	}
