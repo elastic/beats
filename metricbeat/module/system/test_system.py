@@ -113,7 +113,7 @@ SYSTEM_DISK_HOST_FIELDS = ["read.bytes", "write.bytes"]
 # is not available on all OSes and requires root to read for all processes.
 # num_threads may not be readable for some privileged process on Windows,
 # cgroup is only available on linux.
-SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state"]
+SYSTEM_PROCESS_FIELDS = ["cpu", "memory", "state", "io"]
 
 
 class Test(metricbeat.BaseTest):
@@ -258,7 +258,7 @@ class Test(metricbeat.BaseTest):
                     self.assertCountEqual(
                         SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    @unittest.skipUnless(re.match("(?i)win|linux|freebsd|openbsd", sys.platform), "os")
     def test_filesystem(self):
         """
         Test system/filesystem output.

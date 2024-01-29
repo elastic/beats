@@ -36,7 +36,7 @@ stages:
                 - "/test x-pack/metricbeat for aws cloud"
             labels:
                 - "aws"
-        stage: extended
+   #     stage: extended
     # Skip test until fixed https://github.com/elastic/beats/issues/36425
     #cloudAWS:
     #    cloud: "mage build test goIntegTest"
