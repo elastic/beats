@@ -1,16 +1,10 @@
 #!/bin/bash
 
 source .buildkite/scripts/setenv.sh
+
 source .buildkite/scripts/common.sh
 
 set -euo pipefail
-
-ONLY_DOCS="$(buildkite-agent meta-data get ONLY_DOCS --default ${ONLY_DOCS:-"true"})"
-runAllStages="$(buildkite-agent meta-data get runAllStages --default ${runAllStages:-"false"})"
-GO_MOD_CHANGES="$(buildkite-agent meta-data get GO_MOD_CHANGES --default ${GO_MOD_CHANGES:-"false"})"
-PACKAGING_CHANGES="$(buildkite-agent meta-data get PACKAGING_CHANGES --default ${PACKAGING_CHANGES:-"false"})"
-UI_MACOS_TESTS="$(buildkite-agent meta-data get UI_MACOS_TESTS --default ${UI_MACOS_TESTS:-"false"})"
-GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 
 export metricbeat_changeset=(
   "^metricbeat/.*"
@@ -47,7 +41,6 @@ packaging_changeset=(
   "^dev-tools/packaging/.*"
   ".go-version"
   )
-
 
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then
   export ONLY_DOCS="false"

@@ -8,6 +8,18 @@ GO_VERSION=$(cat .go-version)
 echo "GO_VERSION: ${GO_VERSION}"
 os_type=$(uname)
 
+ALLOW_EXTENDED_TESTS=${ALLOW_EXTENDED_TESTS:-"false"}
+ALLOW_MANDATORY_TESTS=${ALLOW_MANDATORY_TESTS:-"false"}
+ALLOW_MACOS_TESTS=${ALLOW_MACOS_TESTS:-"false"}
+ALLOW_EXTENDED_WIN_TESTS=${ALLOW_EXTENDED_WIN_TESTS:-"false"}
+ALLOW_PACKAGING=${ALLOW_PACKAGING:-"false"}
+GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
+ONLY_DOCS=${ONLY_DOCS:-"true"}
+GO_MOD_CHANGES=${GO_MOD_CHANGES:-"false"}
+PACKAGING_CHANGES=${PACKAGING_CHANGES:-"false"}
+UI_MACOS_TESTS="$(buildkite-agent meta-data get UI_MACOS_TESTS --default ${UI_MACOS_TESTS:-"false"})"
+runAllStages="$(buildkite-agent meta-data get runAllStages --default ${runAllStages:-"false"})"
+
 case "$os_type" in
   Darwin | Linux)
     export DOCKER_COMPOSE_VERSION
