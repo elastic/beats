@@ -19,15 +19,18 @@ docs_changeset=(
 #   )
 
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then
-  export ONLY_DOCS="false"
+  ONLY_DOCS="false"
+  echo "Changes include files outside the docs_changeset vairiabe. ONLY_DOCS=$ONLY_DOCS."
+else
+  echo "All changes are related to DOCS. ONLY_DOCS=$ONLY_DOCS."
 fi
 
 # if are_paths_changed "${go_mod_changeset[@]}" ; then
-#   export GO_MOD_CHANGES="true"
+#   GO_MOD_CHANGES="true"
 # fi
 
 # if are_paths_changed "${packaging_changeset[@]}" ; then
-#   export PACKAGING_CHANGES="true"
+#   PACKAGING_CHANGES="true"
 # fi
 
 # Define step conditions

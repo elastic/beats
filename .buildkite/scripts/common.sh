@@ -3,15 +3,14 @@ set -euo pipefail
 
 source .buildkite/scripts/setenv.sh
 
-WORKSPACE=${WORKSPACE:-"$(pwd)"}
-BIN="${WORKSPACE}/bin"
-
 with_docker_compose() {
   local version=$1
   echo "Setting up the Docker-compose environment..."
   create_workspace
   retry 5 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type_lowercase}-${arch_type}"
+  ls -la ${BIN}
   chmod +x ${BIN}/docker-compose
+  ${BIN}/docker-compose version
   export PATH="${BIN}:${PATH}"
   docker-compose version
 }
@@ -69,7 +68,7 @@ with_go() {
   go version
   which go
   local go_path="$(go env GOPATH):$(go env GOPATH)/bin"
-  export PATH="${PATH}:${go_path}"
+  export PATH="${go_path}:${PATH}"
 }
 
 with_python() {
@@ -126,10 +125,8 @@ are_changed_only_paths() {
   local changelist=()
   local changed_files=$(git diff --name-only HEAD@{1} HEAD)
   if [ -z "$changed_files" ] || grep -qE "$(IFS=\|; echo "${patterns[*]}")" <<< "$changed_files"; then
-    echo "All changes are within the specified patterns or there are no changes at all."
     return 0
   else
-    echo "Changes include files outside the specified patterns."
     return 1
   fi
 }

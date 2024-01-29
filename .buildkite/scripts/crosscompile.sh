@@ -17,7 +17,6 @@ with_python
 
 if command -v docker-compose &> /dev/null
 then
-  set +e
   echo "Found docker-compose. Checking version.."
   FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version|awk '{print $3}'|sed s/\,//)
   if [ $FOUND_DOCKER_COMPOSE_VERSION == $DOCKER_COMPOSE_VERSION ]; then
@@ -26,7 +25,8 @@ then
     echo "Versions don't match. Need to install the correct version of docker-compose."
     with_docker_compose "${DOCKER_COMPOSE_VERSION}"
   fi
-  set -e
+else
+  with_docker_compose "${DOCKER_COMPOSE_VERSION}"
 fi
 
 echo "--- Run Crosscompile for $beats_subfilder"
