@@ -1,12 +1,13 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 steps:
-  - label: "Deploy Kubernetes"
+  - label: "Checks"
     command: echo "Hello!"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") = "kubernetes"
     notify:
       - github_commit_status:
-          context: "Deploy: K8S"
+          context: "Deploy K8S/Checks"
     agents:
       provider: "gcp"
-      image: "family/core-ubuntu-2204"
+      image: "family/platform-ingest-beats-ubuntu-2204"
+#    "K8S_VERSION=${v}"
