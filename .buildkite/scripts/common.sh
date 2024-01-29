@@ -19,6 +19,7 @@ with_docker_compose() {
   create_workspace
   retry 5 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type_lowercase}-${arch_type}"
   chmod +x ${BIN}/docker-compose
+  export PATH="${BIN}:${PATH}"
   docker-compose version
 }
 
@@ -31,7 +32,7 @@ create_workspace() {
 add_bin_path() {
   echo "Adding PATH to the environment variables..."
   create_workspace
-  export PATH="${PATH}:${BIN}"
+  export PATH="${BIN}:${PATH}"
 }
 
 check_platform_architeture() {
