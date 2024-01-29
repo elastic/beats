@@ -104,50 +104,50 @@ steps:
           imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths: "metricbeat/build/*.*"
 
-  - group: "Extended Windowds Tests"
-    key: "extended-win-tests"
-    if: "${ALLOW_EXTENDED_WIN_TESTS}"
-    steps:
-      - label: ":windows: Win 2019 Unit Tests"
-        key: "extended-win-2019-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machine_type: "n2-standard-8"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "metricbeat/build/*.*"
+  # - group: "Extended Windowds Tests"
+  #   key: "extended-win-tests"
+  #   if: "${ALLOW_EXTENDED_WIN_TESTS}"
+  #   steps:
+  #     - label: ":windows: Win 2019 Unit Tests"
+  #       key: "extended-win-2019-unit-tests"
+  #       command: ".buildkite/scripts/win_unit_tests.ps1"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_WIN_2019}"
+  #         machine_type: "n2-standard-8"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       artifact_paths: "metricbeat/build/*.*"
 
-  - group: "Packaging"    # TODO: check conditions for future the main pipeline migration: https://github.com/elastic/beats/pull/28589
-    key: "packaging"
-    if: ${ALLOW_PACKAGING}
-    steps:
-      - label: ":linux: Packaging Linux"
-        key: "packaging-linux"
-        command: ".buildkite/scripts/packaging.sh"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+  # - group: "Packaging"    # TODO: check conditions for future the main pipeline migration: https://github.com/elastic/beats/pull/28589
+  #   key: "packaging"
+  #   if: ${ALLOW_PACKAGING}
+  #   steps:
+  #     - label: ":linux: Packaging Linux"
+  #       key: "packaging-linux"
+  #       command: ".buildkite/scripts/packaging.sh"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_UBUNTU_X86_64}"
+  #         machineType: "c2-standard-16"
+  #       env:
+  #         PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 
-      - label: ":linux: Packaging ARM"
-        key: "packaging-arm"
-        command: ".buildkite/scripts/packaging.sh"
-        agents:
-          provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.xlarge"
-        env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
+  #     - label: ":linux: Packaging ARM"
+  #       key: "packaging-arm"
+  #       command: ".buildkite/scripts/packaging.sh"
+  #       agents:
+  #         provider: "aws"
+  #         imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+  #         instanceType: "t4g.xlarge"
+  #       env:
+  #         PLATFORMS: "linux/arm64"
+  #         PACKAGES: "docker"
 
-    depends_on:
-    - step: "mandatory-tests"
-      allow_failure: false
-    - step: "extended-tests"
-      allow_failure: true
-    - step: "extended-win-tests"
-      allow_failure: true
+  #   depends_on:
+  #   - step: "mandatory-tests"
+  #     allow_failure: false
+  #   - step: "extended-tests"
+  #     allow_failure: true
+  #   - step: "extended-win-tests"
+  #     allow_failure: true

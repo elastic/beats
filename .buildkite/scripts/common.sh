@@ -108,13 +108,15 @@ retry() {
 are_paths_changed() {
   local patterns=("${@}")
   local changelist=()
+
   for pattern in "${patterns[@]}"; do
-    changed_files=$(git diff --name-only HEAD@{1} HEAD | grep -E "$pattern")
-    if [ -n "$changed_files" ]; then
-      changelist+=("${changed_files}")
+    changed_files=($(git diff --name-only HEAD@{1} HEAD | grep -P "$pattern"))
+    if [ "${#changed_files[@]}" -gt 0 ]; then
+      changelist+=("${changed_files[@]}")
     fi
   done
-  if [[ -n "${changelist[@]}" ]]; then
+
+  if [ "${#changelist[@]}" -gt 0 ]; then
     echo "Files changed:"
     echo "${changelist[*]}"
     return 0
