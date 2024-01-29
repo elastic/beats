@@ -217,7 +217,6 @@ func getWatchOptions(config *kubernetesConfig, nodeScope bool, client k8sclient.
 	var err error
 	options := kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
-		Namespace:   config.Namespace,
 	}
 
 	// Watch objects in the node only
@@ -236,13 +235,22 @@ func getWatchOptions(config *kubernetesConfig, nodeScope bool, client k8sclient.
 	return &options, err
 }
 
+func isNamespaced(resourceName string) bool {
+	if resourceName == NodeResource || resourceName == PersistentVolumeResource || resourceName == StorageClassResource ||
+		resourceName == NamespaceResource {
+		return false
+	}
+	return true
+}
+
 // createWatcher creates a watcher for a specific resource
 func createWatcher(
 	resourceName string,
 	resource kubernetes.Resource,
 	options kubernetes.WatchOptions,
 	client k8sclient.Interface,
-	resourceWatchers *Watchers) (bool, error) {
+	resourceWatchers *Watchers,
+	namespace string) (bool, error) {
 
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
@@ -250,6 +258,10 @@ func createWatcher(
 	_, ok := resourceWatchers.watchersMap[resourceName]
 	// if it does not exist, create the watcher
 	if !ok {
+		// check if we need to add namespace to the options
+		if isNamespaced(resourceName) {
+			options.Namespace = namespace
+		}
 		watcher, err := kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil)
 		if err != nil {
 			return false, err
@@ -325,7 +337,7 @@ func createAllWatchers(
 
 	// Create a watcher for the given resource.
 	// If it fails, we return an error, so we can stop the extra watchers from creating.
-	created, err := createWatcher(resourceName, res, *options, client, resourceWatchers)
+	created, err := createWatcher(resourceName, res, *options, client, resourceWatchers, config.Namespace)
 	if err != nil {
 		return fmt.Errorf("error initializing Kubernetes watcher %s, required by %s: %w", resourceName, metricsetName, err)
 	} else if created {
@@ -338,7 +350,7 @@ func createAllWatchers(
 	for _, extra := range extraWatchers {
 		extraRes := getResource(extra)
 		if extraRes != nil {
-			created, err = createWatcher(extra, extraRes, *options, client, resourceWatchers)
+			created, err = createWatcher(extra, extraRes, *options, client, resourceWatchers, config.Namespace)
 			if err != nil {
 				log.Errorf("Error initializing Kubernetes watcher %s, required by %s: %s", extra, metricsetName, err)
 			} else {
@@ -360,20 +372,6 @@ func createAllWatchers(
 func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
 	resourceName string, resourceWatchers *Watchers) (*metadata.Resource, error) {
 
-	// check if the resource is namespace aware
-	namespaceAware := false
-	if resourceName == NamespaceResource {
-		namespaceAware = true
-	} else {
-		extras := getExtraWatchers(resourceName, addResourceMetadata)
-		for _, extra := range extras {
-			if extra == NamespaceResource {
-				namespaceAware = true
-				break
-			}
-		}
-	}
-
 	resourceWatchers.lock.RLock()
 	defer resourceWatchers.lock.RUnlock()
 
@@ -383,20 +381,7 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addReso
 		return nil, fmt.Errorf("could not create the metadata generator, as the watcher for %s does not exist", resourceName)
 	}
 
-	var metaGen *metadata.Resource
-	if namespaceAware {
-		namespaceWatcher := resourceWatchers.watchersMap[NamespaceResource]
-
-		if namespaceWatcher == nil {
-			return nil, fmt.Errorf("could not create the metadata generator, as the watcher for namespace does not exist")
-		}
-
-		n := metadata.NewNamespaceMetadataGenerator(addResourceMetadata.Namespace,
-			(*namespaceWatcher).watcher.Store(), client)
-		metaGen = metadata.NewNamespaceAwareResourceMetadataGenerator(commonConfig, client, n)
-	} else {
-		metaGen = metadata.NewResourceMetadataGenerator(commonConfig, client)
-	}
+	metaGen := metadata.NewResourceMetadataGenerator(commonConfig, client)
 
 	return metaGen, nil
 }

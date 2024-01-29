@@ -52,13 +52,11 @@ func TestWatchOptions(t *testing.T) {
 	options, err := getWatchOptions(config, false, client, log)
 	require.NoError(t, err)
 	require.Equal(t, options.SyncTimeout, config.SyncPeriod)
-	require.Equal(t, options.Namespace, config.Namespace)
 	require.NotEqual(t, options.Node, config.Node)
 
 	options, err = getWatchOptions(config, true, client, log)
 	require.NoError(t, err)
 	require.Equal(t, options.SyncTimeout, config.SyncPeriod)
-	require.Equal(t, options.Namespace, config.Namespace)
 	require.Equal(t, options.Node, config.Node)
 }
 
@@ -76,7 +74,7 @@ func TestCreateWatcher(t *testing.T) {
 	options, err := getWatchOptions(config, false, client, log)
 	require.NoError(t, err)
 
-	created, err := createWatcher(NamespaceResource, &kubernetes.Node{}, *options, client, resourceWatchers)
+	created, err := createWatcher(NamespaceResource, &kubernetes.Node{}, *options, client, resourceWatchers, config.Namespace)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -86,7 +84,7 @@ func TestCreateWatcher(t *testing.T) {
 	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
 
-	created, err = createWatcher(NamespaceResource, &kubernetes.Namespace{}, *options, client, resourceWatchers)
+	created, err = createWatcher(NamespaceResource, &kubernetes.Namespace{}, *options, client, resourceWatchers, config.Namespace)
 	require.False(t, created)
 	require.NoError(t, err)
 
@@ -96,7 +94,7 @@ func TestCreateWatcher(t *testing.T) {
 	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
 
-	created, err = createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers)
+	created, err = createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers, config.Namespace)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -122,7 +120,7 @@ func TestAddToMetricsetsUsing(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create the new entry with watcher and nil string array first
-	created, err := createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers)
+	created, err := createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers, config.Namespace)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -160,7 +158,7 @@ func TestRemoveFromMetricsetsUsing(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create the new entry with watcher and nil string array first
-	created, err := createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers)
+	created, err := createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers, config.Namespace)
 	require.True(t, created)
 	require.NoError(t, err)
 
