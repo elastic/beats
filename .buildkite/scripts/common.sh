@@ -125,9 +125,7 @@ are_paths_changed() {
     echo "${changelist[*]}"
     return 0
   else
-    local message="No files changed within Metricbeat changeset"
-    echo "$message"
-    buildkite-agent annotate "$message" --style "info" --context "$BUILDKITE_STEP_KEY"
+    echo "No files changed within Metricbeat changeset"
     return 1
   fi
 }
@@ -144,24 +142,3 @@ are_changed_only_paths() {
     return 1
   fi
 }
-
-echo "--- Env preparation"
-
-if command -v docker-compose &> /dev/null
-then
-  set +e
-  echo "Found docker-compose. Checking version.."
-  FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version|awk '{print $3}'|sed s/\,//)
-  if [ $FOUND_DOCKER_COMPOSE_VERSION == $DOCKER_COMPOSE_VERSION ]; then
-    echo "Versions match. No need to install docker-compose. Exiting."
-  else
-    echo "Versions don't match. Need to install the correct version of docker-compose."
-    with_docker_compose "${DOCKER_COMPOSE_VERSION}"
-  fi
-  set -e
-fi
-
-add_bin_path
-with_go "${GO_VERSION}"
-with_mage
-with_python
