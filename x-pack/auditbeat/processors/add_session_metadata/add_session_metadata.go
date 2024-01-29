@@ -13,18 +13,16 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider/ebpf_provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider/procfs_provider"
-
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 const (
@@ -59,6 +57,9 @@ func New(cfg *config.C) (beat.Processor, error) {
 	logger.Debugf("backfilled %d processes", len(backfilledPIDs))
 
 	switch c.Backend {
+	case "auto":
+		// "auto" always uses ebpf, as it's currently the only backend
+		fallthrough
 	case "ebpf":
 		p, err := ebpf_provider.NewProvider(ctx, logger, db)
 		if err != nil {
@@ -90,7 +91,7 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 	_, err := ev.GetValue(p.config.PidField)
 	if err != nil {
 		// Do not attempt to enrich events without PID; it's not a supported event
-		return ev, nil
+		return ev, nil //nolint:nilerr // Running on events without PID is expected
 	}
 
 	err = p.provider.UpdateDB(ev)
@@ -106,7 +107,7 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 }
 
 func (p *addSessionMetadata) String() string {
-	return fmt.Sprintf("%v=[backend=%s, pid_field=%s, override_fields=%t]",
+	return fmt.Sprintf("%v=[backend=%s, pid_field=%s, replace_fields=%t]",
 		processorName, p.config.Backend, p.config.PidField, p.config.ReplaceFields)
 }
 
@@ -129,7 +130,10 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 
 	processMap := fullProcess.ToMap()
 
-	mapstr.MergeFieldsDeep(result.Fields["process"].(mapstr.M), processMap, true)
+	err = mapstr.MergeFieldsDeep(result.Fields["process"].(mapstr.M), processMap, true)
+	if err != nil {
+		return nil, fmt.Errorf("merging enriched fields with event: %w", err)
+	}
 
 	if p.config.ReplaceFields {
 		if err := p.replaceFields(result); err != nil {
@@ -184,7 +188,7 @@ func (p *addSessionMetadata) replaceFields(ev *beat.Event) error {
 		// process start
 		syscall, err := ev.Fields.GetValue("auditd.data.syscall")
 		if err != nil {
-			return err
+			return nil //nolint:nilerr // processor can be called on unsupported events; not an error
 		}
 		switch syscall {
 		case "execveat":

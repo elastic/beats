@@ -10,16 +10,12 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
+	"golang.org/x/sys/unix"
 
 	"github.com/elastic/elastic-agent-libs/logp"
-
-	"golang.org/x/sys/unix"
 )
 
 var logger = logp.NewLogger("processdb")
-var reader = procfs.NewMockReader()
 
 func TestGetTtyType(t *testing.T) {
 	assert.Equal(t, TtyConsole, getTtyType(4, 0))

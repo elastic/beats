@@ -24,19 +24,18 @@ stages:
         mage: "mage pythonIntegTest"
         withModule: true
         stage: mandatory
-    # Skip test until fixed https://github.com/elastic/beats/issues/37498
-    #cloud:
-    #    cloud: "mage build test"
-    #    withModule: true       ## run the ITs only if the changeset affects a specific module.
-    #    dirs:                  ## run the cloud tests for the given modules.
-    #        - "x-pack/metricbeat/module/aws"
-    #    when:                  ## Override the top-level when.
-    #        parameters:
-    #            - "awsCloudTests"
-    #        comments:
-    #            - "/test x-pack/metricbeat for aws cloud"
-    #        labels:
-    #            - "aws"
+    cloud:
+        cloud: "mage build test"
+        withModule: true       ## run the ITs only if the changeset affects a specific module.
+        dirs:                  ## run the cloud tests for the given modules.
+            - "x-pack/metricbeat/module/aws"
+        when:                  ## Override the top-level when.
+            parameters:
+                - "awsCloudTests"
+            comments:
+                - "/test x-pack/metricbeat for aws cloud"
+            labels:
+                - "aws"
    #     stage: extended
     # Skip test until fixed https://github.com/elastic/beats/issues/36425
     #cloudAWS:

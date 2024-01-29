@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"time"
 
-	p "github.com/prometheus/procfs"
+	"github.com/prometheus/procfs"
 	"github.com/tklauser/go-sysconf"
 )
 
@@ -20,7 +20,7 @@ var (
 )
 
 func mustGetBootTime() time.Time {
-	fs, err := p.NewDefaultFS()
+	fs, err := procfs.NewDefaultFS()
 	if err != nil {
 		panic(fmt.Sprintf("could not get procfs: %v", err))
 	}
@@ -44,8 +44,8 @@ func TicksToNs(ticks uint64) uint64 {
 	return ticks * uint64(time.Second.Nanoseconds()) / ticksPerSecond
 }
 
-func TimeFromNsSinceBoot(ns uint64) *time.Time {
-	timestamp := bootTime.Add(time.Duration(ns))
+func TimeFromNsSinceBoot(t time.Duration) *time.Time {
+	timestamp := bootTime.Add(t)
 	return &timestamp
 }
 
@@ -59,6 +59,6 @@ func TimeFromNsSinceBoot(ns uint64) *time.Time {
 //     get this precision from `sysconf()`
 //   - We store timestamps as nanoseconds, but reduce the precision to 1/100th
 //     second
-func ReduceTimestampPrecision(timeNs uint64) uint64 {
-	return timeNs - (timeNs % (uint64(time.Second.Nanoseconds()) / ticksPerSecond))
+func ReduceTimestampPrecision(timeNs uint64) time.Duration {
+	return time.Duration(timeNs).Truncate(time.Second / time.Duration(ticksPerSecond))
 }
