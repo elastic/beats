@@ -32,13 +32,13 @@ CHANGELOG*
 /filebeat/input/winlog/ @elastic/sec-windows-platform
 /filebeat/module/apache @elastic/obs-infraobs-integrations
 /filebeat/module/auditd @elastic/sec-linux-platform
-/filebeat/module/elasticsearch/ @elastic/infra-monitoring-ui @elastic/stack-monitoring
+/filebeat/module/elasticsearch/ @elastic/stack-monitoring
 /filebeat/module/haproxy @elastic/obs-infraobs-integrations
 /filebeat/module/icinga # TODO: find right team
 /filebeat/module/iis @elastic/obs-infraobs-integrations
 /filebeat/module/kafka @elastic/obs-infraobs-integrations
-/filebeat/module/kibana/ @elastic/infra-monitoring-ui @elastic/stack-monitoring
-/filebeat/module/logstash/ @elastic/infra-monitoring-ui @elastic/stack-monitoring
+/filebeat/module/kibana/ @elastic/stack-monitoring
+/filebeat/module/logstash/ @elastic/stack-monitoring
 /filebeat/module/mongodb @elastic/obs-infraobs-integrations
 /filebeat/module/mysql @elastic/obs-infraobs-integrations
 /filebeat/module/nats @elastic/obs-infraobs-integrations
@@ -69,20 +69,20 @@ CHANGELOG*
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /metricbeat/helper/kubernetes @elastic/obs-cloudnative-monitoring
 /metricbeat/module/apache @elastic/obs-infraobs-integrations
-/metricbeat/module/beat/ @elastic/infra-monitoring-ui @elastic/stack-monitoring
+/metricbeat/module/beat/ @elastic/stack-monitoring
 /metricbeat/module/ceph @elastic/obs-infraobs-integrations
 /metricbeat/module/couchbase @elastic/obs-infraobs-integrations
 /metricbeat/module/couchdb @elastic/obs-infraobs-integrations
-/metricbeat/module/elasticsearch/ @elastic/infra-monitoring-ui @elastic/stack-monitoring
+/metricbeat/module/elasticsearch/ @elastic/stack-monitoring
 /metricbeat/module/etcd @elastic/obs-infraobs-integrations
 /metricbeat/module/golang @elastic/obs-infraobs-integrations
 /metricbeat/module/haproxy @elastic/obs-infraobs-integrations
 /metricbeat/module/http @elastic/obs-infraobs-integrations
 /metricbeat/module/jolokia @elastic/obs-infraobs-integrations
 /metricbeat/module/kafka @elastic/obs-infraobs-integrations
-/metricbeat/module/kibana/ @elastic/infra-monitoring-ui @elastic/stack-monitoring
+/metricbeat/module/kibana/ @elastic/stack-monitoring
 /metricbeat/module/kubernetes/ @elastic/obs-cloudnative-monitoring
-/metricbeat/module/logstash/ @elastic/infra-monitoring-ui @elastic/stack-monitoring
+/metricbeat/module/logstash/ @elastic/stack-monitoring
 /metricbeat/module/memcached @elastic/obs-infraobs-integrations
 /metricbeat/module/mongodb @elastic/obs-infraobs-integrations
 /metricbeat/module/mysql @elastic/obs-infraobs-integrations
