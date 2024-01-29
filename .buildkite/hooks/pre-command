@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source .buildkite/scripts/common.sh
-
 set -euo pipefail
 
 echo "Golang version:"
@@ -13,6 +11,8 @@ runAllStages="$(buildkite-agent meta-data get runAllStages --default ${runAllSta
 GO_MOD_CHANGES="$(buildkite-agent meta-data get GO_MOD_CHANGES --default ${GO_MOD_CHANGES:-"false"})"
 PACKAGING_CHANGES="$(buildkite-agent meta-data get PACKAGING_CHANGES --default ${PACKAGING_CHANGES:-"false"})"
 UI_MACOS_TESTS="$(buildkite-agent meta-data get UI_MACOS_TESTS --default ${UI_MACOS_TESTS:-"false"})"
+
+source .buildkite/scripts/common.sh
 
 export metricbeat_changeset=(
   "^metricbeat/.*"
