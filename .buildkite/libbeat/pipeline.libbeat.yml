@@ -17,7 +17,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
-        artifact_paths: "libbeat/build/*.*"
+        artifact_paths: "libbeat/build/*.xml"
 
       - label: ":go: Go Intergration Tests"
         key: "mandatory-int-test"
@@ -26,7 +26,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
-        artifact_paths: "libbeat/build/*.*"
+        artifact_paths: "libbeat/build/*.xml"
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
@@ -35,7 +35,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
-        artifact_paths: "libbeat/build/*.*"
+        artifact_paths: "libbeat/build/*.xml"
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
@@ -44,7 +44,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
-        artifact_paths: "libbeat/build/*.*"
+        artifact_paths: "libbeat/build/*.xml"
 
       - label: ":testengine: Stress Tests"
         key: "mandatory-stress-test"
@@ -65,4 +65,4 @@ steps:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
           instanceType: "t4g.xlarge"
-        artifact_paths: "libbeat/build/*.*"
+        artifact_paths: "libbeat/build/*.xml"
