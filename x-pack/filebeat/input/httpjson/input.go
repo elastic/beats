@@ -122,6 +122,16 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	if cfg.Request.Tracer != nil {
 		id := sanitizeFileName(ctx.ID)
 		cfg.Request.Tracer.Filename = strings.ReplaceAll(cfg.Request.Tracer.Filename, "*", id)
+
+		// Propagate tracer behaviour to all chain children.
+		for i, c := range cfg.Chain {
+			if c.Step != nil { // Request is validated as required.
+				cfg.Chain[i].Step.Request.Tracer = cfg.Request.Tracer
+			}
+			if c.While != nil { // Request is validated as required.
+				cfg.Chain[i].While.Request.Tracer = cfg.Request.Tracer
+			}
+		}
 	}
 
 	metrics := newInputMetrics(reg)
