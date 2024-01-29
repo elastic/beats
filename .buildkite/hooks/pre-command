@@ -1,58 +1,34 @@
 #!/bin/bash
 
-source .buildkite/scripts/setenv.sh
-
 source .buildkite/scripts/common.sh
 
 set -euo pipefail
 
-export metricbeat_changeset=(
-  "^metricbeat/.*"
-  "^go.mod"
-  "^pytest.ini"
-  "^dev-tools/.*"
-  "^libbeat/.*"
-  "^testing/.*"
-  )
+# docs_changeset=(
+#   "^go.mod"
+#   )
 
-export oss_changeset=(
-  "^go.mod"
-  "^pytest.ini"
-  "^dev-tools/.*"
-  "^libbeat/.*"
-  "^testing/.*"
-)
+# go_mod_changeset=(
+#   ".*\\.(asciidoc|md)"
+#   "deploy/kubernetes/.*-kubernetes\\.yaml"
+#   )
 
-export ci_changeset=(
-  "^.buildkite/.*"
-)
+# packaging_changeset=(
+#   "^dev-tools/packaging/.*"
+#   ".go-version"
+#   )
 
+# if ! are_changed_only_paths "${docs_changeset[@]}" ; then
+#   export ONLY_DOCS="false"
+# fi
 
-docs_changeset=(
-  "^go.mod"
-  )
+# if are_paths_changed "${go_mod_changeset[@]}" ; then
+#   export GO_MOD_CHANGES="true"
+# fi
 
-go_mod_changeset=(
-  ".*\\.(asciidoc|md)"
-  "deploy/kubernetes/.*-kubernetes\\.yaml"
-  )
-
-packaging_changeset=(
-  "^dev-tools/packaging/.*"
-  ".go-version"
-  )
-
-if ! are_changed_only_paths "${docs_changeset[@]}" ; then
-  export ONLY_DOCS="false"
-fi
-
-if are_paths_changed "${go_mod_changeset[@]}" ; then
-  export GO_MOD_CHANGES="true"
-fi
-
-if are_paths_changed "${packaging_changeset[@]}" ; then
-  export PACKAGING_CHANGES="true"
-fi
+# if are_paths_changed "${packaging_changeset[@]}" ; then
+#   export PACKAGING_CHANGES="true"
+# fi
 
 # Define step conditions
 

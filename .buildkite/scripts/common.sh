@@ -1,17 +1,10 @@
 #!/bin/bash
 set -euo pipefail
 
+source .buildkite/scripts/setenv.sh
+
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
 BIN="${WORKSPACE}/bin"
-platform_type="$(uname)"
-platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
-arch_type="$(uname -m)"
-pipeline_name="metricbeat"
-DEBIAN_FRONTEND="noninteractive"
-# sudo mkdir -p /etc/needrestart
-# echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
-mkdir -p /etc/needrestart
-echo "\$nrconf{restart} = 'a';" | tee -a /etc/needrestart/needrestart.conf > /dev/null
 
 with_docker_compose() {
   local version=$1
