@@ -110,7 +110,7 @@ are_paths_changed() {
   local changelist=()
 
   for pattern in "${patterns[@]}"; do
-    changed_files=($(git diff --name-only HEAD@{1} HEAD | grep -P "$pattern"))
+    changed_files=($(git diff --name-only HEAD@{1} HEAD | grep -E "$pattern"))
     if [ "${#changed_files[@]}" -gt 0 ]; then
       changelist+=("${changed_files[@]}")
     fi
