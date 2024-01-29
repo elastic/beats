@@ -11,9 +11,6 @@ sudo mkdir -p /etc/needrestart
 echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
 
 add_bin_path
-with_go "${GO_VERSION}"
-with_mage
-with_python
 
 if command -v docker-compose &> /dev/null
 then
@@ -28,3 +25,7 @@ then
 else
   with_docker_compose "${DOCKER_COMPOSE_VERSION}"
 fi
+
+with_go "${GO_VERSION}"
+with_mage
+with_python
