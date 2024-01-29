@@ -7,6 +7,7 @@ env:
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
   IMAGE_RHEL9: "family/core-rhel-9"
+  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
 
 steps:
   - group: "Auditbeat Mandatory Testing"
@@ -74,7 +75,7 @@ steps:
 
   - group: "Extended Testing"
     key: "extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat extended tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for extended support"
 
     steps:
       - label: ":linux: ARM64 Unit Tests"
@@ -101,7 +102,7 @@ steps:
               context: "auditbeat/Extended: MacOS Unit Tests"
         agents:
           provider: "orka"
-          imagePrefix: "generic-13-ventura-x64"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths: "auditbeat/build/*.xml"
 
   - group: "Windows Extended Testing"
@@ -130,39 +131,7 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
       - "mandatory-tests"
-      - "extended-tests"
-      - "extended-tests-win"
 
     steps:
       - label: Package pipeline
         commands: ".buildkite/auditbeat/scripts/package-step.sh | buildkite-agent pipeline upload"
-
-      - label: ":ubuntu: Packaging Linux X86"
-        key: "package-linux-x86"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-        command:
-          - ".buildkite/auditbeat/scripts/package.sh"
-        notify:
-          - github_commit_status:
-              context: "auditbeat/Packaging: Linux X86"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-
-      - label: ":linux: Packaging Linux ARM"
-        key: "package-linux-arm"
-        env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
-        command:
-          - ".buildkite/auditbeat/scripts/package.sh"
-        notify:
-          - github_commit_status:
-              context: "auditbeat/Packaging: Linux ARM"
-        agents:
-          provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.large"
-        artifact_paths:
-          - "auditbeat/build/distributions/*.tar.gz"
