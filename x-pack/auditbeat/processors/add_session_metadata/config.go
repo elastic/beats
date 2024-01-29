@@ -15,7 +15,7 @@ type Config struct {
 
 func defaultConfig() Config {
 	return Config{
-		Backend:       "ebpf",
+		Backend:       "auto",
 		ReplaceFields: false,
 		PidField:      "process.pid",
 	}

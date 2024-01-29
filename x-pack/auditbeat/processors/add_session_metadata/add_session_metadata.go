@@ -56,6 +56,9 @@ func New(cfg *config.C) (beat.Processor, error) {
 	logger.Debugf("backfilled %d processes", len(backfilledPIDs))
 
 	switch c.Backend {
+	case "auto":
+		// "auto" always uses ebpf, as it's currently the only backend
+		fallthrough
 	case "ebpf":
 		p, err := ebpf_provider.NewProvider(ctx, logger, db)
 		if err != nil {
@@ -92,7 +95,7 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 }
 
 func (p *addSessionMetadata) String() string {
-	return fmt.Sprintf("%v=[backend=%s, pid_field=%s, override_fields=%t]",
+	return fmt.Sprintf("%v=[backend=%s, pid_field=%s, replace_fields=%t]",
 		processorName, p.config.Backend, p.config.PidField, p.config.ReplaceFields)
 }
 
@@ -173,7 +176,7 @@ func (p *addSessionMetadata) replaceFields(ev *beat.Event) error {
 		// process start
 		syscall, err := ev.Fields.GetValue("auditd.data.syscall")
 		if err != nil {
-			return err
+			return nil //nolint:nilerr // processor can be called on unsupported events; not an error
 		}
 		switch syscall {
 		case "execveat":
