@@ -1,6 +1,19 @@
-// Copyright Elasticsearch B.V. and/or licensed to Elasticsearch B.V. under one
-// or more contributor license agreements. Licensed under the Elastic License;
-// you may not use this file except in compliance with the Elastic License.
+// Licensed to Elasticsearch B.V. under one or more contributor
+// license agreements. See the NOTICE file distributed with
+// this work for additional information regarding copyright
+// ownership. Elasticsearch B.V. licenses this file to you under
+// the Apache License, Version 2.0 (the "License"); you may
+// not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing,
+// software distributed under the License is distributed on an
+// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+// KIND, either express or implied.  See the License for the
+// specific language governing permissions and limitations
+// under the License.
 
 //go:build linux
 
@@ -183,9 +196,13 @@ func NewStructDecoder(desc ProbeFormat, allocFn AllocateFn) (Decoder, error) {
 		}
 
 		var name string
+		var allowUndefined bool
 		var greedy bool
 		for idx, param := range strings.Split(values, ",") {
 			switch param {
+			case "allowundefined":
+				// it is okay not to find it in the desc.Fields
+				allowUndefined = true
 			case "greedy":
 				greedy = true
 			default:
@@ -214,6 +231,9 @@ func NewStructDecoder(desc ProbeFormat, allocFn AllocateFn) (Decoder, error) {
 
 		inField, found := desc.Fields[name]
 		if !found {
+			if allowUndefined {
+				continue
+			}
 			return nil, fmt.Errorf("field '%s' not found in kprobe format description", name)
 		}
 
@@ -326,14 +346,14 @@ func (d *structDecoder) Decode(raw []byte, meta Metadata) (s interface{}, err er
 
 		case FieldTypeString:
 			offset := uintptr(MachineEndian.Uint16(raw[dec.src:]))
-			len := uintptr(MachineEndian.Uint16(raw[dec.src+2:]))
-			if offset+len > n {
+			length := uintptr(MachineEndian.Uint16(raw[dec.src+2:]))
+			if offset+length > n {
 				return nil, fmt.Errorf("perf event string data for field %s overflows message of size %d", dec.name, n)
 			}
-			if len > 0 && raw[offset+len-1] == 0 {
-				len--
+			if length > 0 && raw[offset+length-1] == 0 {
+				length--
 			}
-			*(*string)(unsafe.Add(destPtr, dec.dst)) = string(raw[offset : offset+len])
+			*(*string)(unsafe.Add(destPtr, dec.dst)) = string(raw[offset : offset+length])
 
 		case FieldTypeMeta:
 			*(*Metadata)(unsafe.Add(destPtr, dec.dst)) = meta
@@ -357,7 +377,8 @@ type dumpDecoder struct {
 // - integer of 64bit (u64 / s64).
 // - dump consecutive memory.
 func NewDumpDecoder(format ProbeFormat) (Decoder, error) {
-	var fields []Field
+	fields := make([]Field, 0, len(format.Fields))
+
 	for name, field := range format.Fields {
 		if strings.Index(name, "arg") != 0 {
 			continue
