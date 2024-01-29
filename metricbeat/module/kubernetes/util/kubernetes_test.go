@@ -209,7 +209,7 @@ func TestCreateAllWatchers(t *testing.T) {
 
 	// Start watcher for a resource that requires other resources, should start all the watchers
 	metricsetPod := "pod"
-	extras := getExtraWatchers(PodResource, config)
+	extras := getExtraWatchers(PodResource, config.AddResourceMetadata)
 	err = createAllWatchers(client, metricsetPod, PodResource, false, config, log, resourceWatchers)
 	require.NoError(t, err)
 
@@ -242,7 +242,7 @@ func TestCreateMetaGen(t *testing.T) {
 	}
 	client := k8sfake.NewSimpleClientset()
 
-	_, err = createMetadataGen(client, commonConfig, config, DeploymentResource, resourceWatchers)
+	_, err = createMetadataGen(client, commonConfig, config.AddResourceMetadata, DeploymentResource, resourceWatchers)
 	// At this point, no watchers were created
 	require.Error(t, err)
 
@@ -252,7 +252,7 @@ func TestCreateMetaGen(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create the generators, this time without error
-	_, err = createMetadataGen(client, commonConfig, config, DeploymentResource, resourceWatchers)
+	_, err = createMetadataGen(client, commonConfig, config.AddResourceMetadata, DeploymentResource, resourceWatchers)
 	require.NoError(t, err)
 }
 
@@ -278,7 +278,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	// For pod:
 	metricsetPod := "pod"
 
-	_, err = createMetadataGenSpecific(client, commonConfig, config, PodResource, resourceWatchers)
+	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)
 	// At this point, no watchers were created
 	require.Error(t, err)
 
@@ -286,11 +286,11 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	err = createAllWatchers(client, metricsetPod, PodResource, false, config, log, resourceWatchers)
 	require.NoError(t, err)
 
-	_, err = createMetadataGenSpecific(client, commonConfig, config, PodResource, resourceWatchers)
+	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)
 	require.NoError(t, err)
 
 	// For service:
-	_, err = createMetadataGenSpecific(client, commonConfig, config, ServiceResource, resourceWatchers)
+	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, ServiceResource, resourceWatchers)
 	// At this point, no watchers were created
 	require.Error(t, err)
 
@@ -299,7 +299,7 @@ func TestCreateMetaGenSpecific(t *testing.T) {
 	err = createAllWatchers(client, metricsetService, ServiceResource, false, config, log, resourceWatchers)
 	require.NoError(t, err)
 
-	_, err = createMetadataGenSpecific(client, commonConfig, config, ServiceResource, resourceWatchers)
+	_, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, ServiceResource, resourceWatchers)
 	require.NoError(t, err)
 }
 

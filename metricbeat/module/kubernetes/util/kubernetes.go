@@ -157,7 +157,7 @@ func getResource(resourceName string) kubernetes.Resource {
 
 // getExtraWatchers returns a list of the extra resources to watch based on some resource.
 // The full list can be seen in https://github.com/elastic/beats/issues/37243, at Expected Watchers section.
-func getExtraWatchers(resourceName string, config *kubernetesConfig) []string {
+func getExtraWatchers(resourceName string, addResourceMetadata *metadata.AddResourceMetadataConfig) []string {
 	switch resourceName {
 	case PodResource:
 		extra := []string{NamespaceResource, NodeResource}
@@ -165,10 +165,10 @@ func getExtraWatchers(resourceName string, config *kubernetesConfig) []string {
 		// in order to be able to retrieve 2nd layer Owner metadata like in case of:
 		// Deployment -> Replicaset -> Pod
 		// CronJob -> job -> Pod
-		if config.AddResourceMetadata != nil && config.AddResourceMetadata.Deployment {
+		if addResourceMetadata != nil && addResourceMetadata.Deployment {
 			extra = append(extra, ReplicaSetResource)
 		}
-		if config.AddResourceMetadata != nil && config.AddResourceMetadata.CronJob {
+		if addResourceMetadata != nil && addResourceMetadata.CronJob {
 			extra = append(extra, JobResource)
 		}
 		return extra
@@ -334,7 +334,7 @@ func createAllWatchers(
 	addToMetricsetsUsing(resourceName, metricsetName, resourceWatchers)
 
 	// Create the extra watchers required by this resource
-	extraWatchers := getExtraWatchers(resourceName, config)
+	extraWatchers := getExtraWatchers(resourceName, config.AddResourceMetadata)
 	for _, extra := range extraWatchers {
 		extraRes := getResource(extra)
 		if extraRes != nil {
@@ -357,13 +357,15 @@ func createAllWatchers(
 }
 
 // createMetadataGen creates the metadata generator for resources in general
-func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, config *kubernetesConfig, resourceName string, resourceWatchers *Watchers) (*metadata.Resource, error) {
+func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
+	resourceName string, resourceWatchers *Watchers) (*metadata.Resource, error) {
+
 	// check if the resource is namespace aware
 	namespaceAware := false
 	if resourceName == NamespaceResource {
 		namespaceAware = true
 	} else {
-		extras := getExtraWatchers(resourceName, config)
+		extras := getExtraWatchers(resourceName, addResourceMetadata)
 		for _, extra := range extras {
 			if extra == NamespaceResource {
 				namespaceAware = true
@@ -389,7 +391,7 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, config 
 			return nil, fmt.Errorf("could not create the metadata generator, as the watcher for namespace does not exist")
 		}
 
-		n := metadata.NewNamespaceMetadataGenerator(config.AddResourceMetadata.Namespace,
+		n := metadata.NewNamespaceMetadataGenerator(addResourceMetadata.Namespace,
 			(*namespaceWatcher).watcher.Store(), client)
 		metaGen = metadata.NewNamespaceAwareResourceMetadataGenerator(commonConfig, client, n)
 	} else {
@@ -400,7 +402,9 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, config 
 }
 
 // createMetadataGenSpecific creates the metadata generator for a specific resource - pod or service
-func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C, config *kubernetesConfig, resourceName string, resourceWatchers *Watchers) (metadata.MetaGen, error) {
+func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
+	resourceName string, resourceWatchers *Watchers) (metadata.MetaGen, error) {
+
 	resourceWatchers.lock.RLock()
 	defer resourceWatchers.lock.RUnlock()
 
@@ -430,14 +434,14 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 		}
 
 		metaGen = metadata.GetPodMetaGen(commonConfig, (*resWatcher).watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher,
-			jobWatcher, config.AddResourceMetadata)
+			jobWatcher, addResourceMetadata)
 		return metaGen, nil
 	} else if resourceName == ServiceResource {
 		namespaceWatcher := resourceWatchers.watchersMap[NamespaceResource]
 		if namespaceWatcher == nil {
 			return nil, fmt.Errorf("could not create the metadata generator, as the watcher for namespace does not exist")
 		}
-		namespaceMeta := metadata.NewNamespaceMetadataGenerator(config.AddResourceMetadata.Namespace,
+		namespaceMeta := metadata.NewNamespaceMetadataGenerator(addResourceMetadata.Namespace,
 			(*namespaceWatcher).watcher.Store(), client)
 		metaGen = metadata.NewServiceMetadataGenerator(commonConfig, (*resWatcher).watcher.Store(),
 			namespaceMeta, client)
@@ -487,9 +491,9 @@ func NewResourceMetadataEnricher(
 	var specificMetaGen metadata.MetaGen
 	var generalMetaGen *metadata.Resource
 	if resourceName == ServiceResource || resourceName == PodResource {
-		specificMetaGen, err = createMetadataGenSpecific(client, commonConfig, config, resourceName, resourceWatchers)
+		specificMetaGen, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, resourceName, resourceWatchers)
 	} else {
-		generalMetaGen, err = createMetadataGen(client, commonConfig, config, resourceName, resourceWatchers)
+		generalMetaGen, err = createMetadataGen(client, commonConfig, config.AddResourceMetadata, resourceName, resourceWatchers)
 	}
 	if err != nil {
 		log.Errorf("Error trying to create the metadata generators: %s", err)
@@ -611,7 +615,7 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	metaGen, err := createMetadataGenSpecific(client, commonConfig, config, PodResource, resourceWatchers)
+	metaGen, err := createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, PodResource, resourceWatchers)
 	if err != nil {
 		log.Errorf("Error trying to create the metadata generators: %s", err)
 		return &nilEnricher{}
@@ -803,7 +807,7 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 		}
 	}
 
-	extras := getExtraWatchers(e.resourceName, e.config)
+	extras := getExtraWatchers(e.resourceName, e.config.AddResourceMetadata)
 	for _, extra := range extras {
 		extraWatcher := resourceWatchers.watchersMap[extra]
 		if extraWatcher != nil && !extraWatcher.started {
@@ -829,7 +833,7 @@ func (e *enricher) Stop(resourceWatchers *Watchers) {
 		}
 	}
 
-	extras := getExtraWatchers(e.resourceName, e.config)
+	extras := getExtraWatchers(e.resourceName, e.config.AddResourceMetadata)
 	for _, extra := range extras {
 		extraWatcher := resourceWatchers.watchersMap[extra]
 		if extraWatcher != nil && extraWatcher.started {
