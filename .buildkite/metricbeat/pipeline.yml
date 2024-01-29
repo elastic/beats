@@ -120,20 +120,13 @@ steps:
           disk_type: "pd-ssd"
         artifact_paths: "metricbeat/build/*.*"
 
-  - group: "Packaging"    # run conditions: https://github.com/elastic/beats/pull/28589
+  - group: "Packaging"    # TODO: check conditions for future the main pipeline migration: https://github.com/elastic/beats/pull/28589
     key: "packaging"
     if: ${ALLOW_PACKAGING} == "true"
-    depends_on:
-      - step: "mandatory-tests"
-        allow_failure: false
-      - step: "extended-tests"
-        allow_failure: true
-      - step: "extended-win-tests"
-        allow_failure: true
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: "pushd "metricbeat" > /dev/null && mage package"
+        command: ".buildkite/scripts/packaging.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -143,7 +136,7 @@ steps:
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
-        command: "pushd "metricbeat" > /dev/null && mage package"
+        command: ".buildkite/scripts/packaging.sh"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
@@ -151,3 +144,11 @@ steps:
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
+
+    depends_on:
+    - step: "mandatory-tests"
+      allow_failure: false
+    - step: "extended-tests"
+      allow_failure: true
+    - step: "extended-win-tests"
+      allow_failure: true
