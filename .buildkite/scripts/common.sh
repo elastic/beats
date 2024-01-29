@@ -106,13 +106,37 @@ retry() {
   return 0
 }
 
-are_files_changed() {
-  changeset=$1
-  if git diff --name-only HEAD@{1} HEAD | grep -qE "$changeset"; then
-    return 0;
+are_paths_changed() {
+  local patterns=("${@}")
+  local changelist=()
+  for pattern in "${patterns[@]}"; do
+    changed_files=$(git diff --name-only HEAD@{1} HEAD | grep -E "$pattern")
+    if [ -n "$changed_files" ]; then
+      changelist+=("${changed_files}")
+    fi
+  done
+  if [[ -n "${changelist[@]}" ]]; then
+    echo "Files changed:"
+    echo "${changelist[*]}"
+    return 0
   else
-    echo "WARN! No files changed in $changeset"
-    return 1;
+    local message="No files changed within Metricbeat changeset"
+    echo "$message"
+    buildkite-agent annotate "$message" --style "info" --context "$BUILDKITE_STEP_KEY"
+    return 1
+  fi
+}
+
+are_changed_only_paths() {
+  local patterns=("${@}")
+  local changelist=()
+  local changed_files=$(git diff --name-only HEAD@{1} HEAD)
+  if [ -z "$changed_files" ] || grep -qE "$(IFS=\|; echo "${patterns[*]}")" <<< "$changed_files"; then
+    echo "All changes are within the specified patterns or there are no changes at all."
+    return 0
+  else
+    echo "Changes include files outside the specified patterns."
+    return 1
   fi
 }
 

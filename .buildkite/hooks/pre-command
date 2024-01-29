@@ -1,8 +1,85 @@
 #!/bin/bash
 
+source .buildkite/scripts/common.sh
+
 set -euo pipefail
 
 echo "Golang version:"
 GO_VERSION=$(cat .go-version)
 export GO_VERSION
 echo "GO_VERSION: ${GO_VERSION}"
+ONLY_DOCS="$(buildkite-agent meta-data get ONLY_DOCS --default ${ONLY_DOCS:-"true"})"
+runAllStages="$(buildkite-agent meta-data get runAllStages --default ${runAllStages:-"false"})"
+GO_MOD_CHANGES="$(buildkite-agent meta-data get GO_MOD_CHANGES --default ${GO_MOD_CHANGES:-"false"})"
+PACKAGING_CHANGES="$(buildkite-agent meta-data get PACKAGING_CHANGES --default ${PACKAGING_CHANGES:-"false"})"
+UI_MACOS_TESTS="$(buildkite-agent meta-data get UI_MACOS_TESTS --default ${UI_MACOS_TESTS:-"false"})"
+
+export metricbeat_changeset=(
+  "^metricbeat/.*"
+  "^go.mod"
+  "^pytest.ini"
+  "^dev-tools/.*"
+  "^libbeat/.*"
+  "^testing/.*"
+  )
+
+export oss_changeset=(
+  "^go.mod"
+  "^pytest.ini"
+  "^dev-tools/.*"
+  "^libbeat/.*"
+  "^testing/.*"
+)
+
+export ci_changeset=(
+  "^.buildkite/.*"
+)
+
+
+docs_changeset=(
+  "^go.mod"
+  )
+
+go_mod_changeset=(
+  ".*\\.(asciidoc|md)"
+  "deploy/kubernetes/.*-kubernetes\\.yaml"
+  )
+
+packaging_changeset=(
+  "^dev-tools/packaging/.*"
+  ".go-version"
+  )
+
+
+if ! are_changed_only_paths "${docs_changeset[@]}" ; then
+  export ONLY_DOCS="false"
+fi
+
+if are_paths_changed "${go_mod_changeset[@]}" ; then
+  export GO_MOD_CHANGES="true"
+fi
+
+if are_paths_changed "${packaging_changeset[@]}" ; then
+  export PACKAGING_CHANGES="true"
+fi
+
+# Define step conditions
+
+if [[ "${BUILDKITE_PULL_REQUEST}" == "" ]] || [[ "${ONLY_DOCS}" == "false" && "${BUILDKITE_PULL_REQUEST}" != "" ]] || [[ "${runAllStages}" == "true" ]]; then     # from https://github.com/elastic/beats/blob/0dc012db7247246a1439311686e7a7cb8515efdb/Jenkinsfile#L105-L138
+  if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" ]] || [[ "${GITHUB_PR_LABELS}" == "metricbeat" ]]; then   # from https://github.com/elastic/beats/blob/0dc012db7247246a1439311686e7a7cb8515efdb/metricbeat/Jenkinsfile.yml#L3-L12
+    export ALLOW_EXTENDED_TESTS="true"
+    export ALLOW_MANDATORY_TESTS="true"
+    if [[ "${UI_MACOS_TESTS}" == "true" ]] || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat for macos" ]] || [[ "${GITHUB_PR_LABELS}" == "macOS" ]]; then   # from https://github.com/elastic/beats/blob/0dc012db7247246a1439311686e7a7cb8515efdb/metricbeat/Jenkinsfile.yml#L3-L12
+      export ALLOW_MACOS_TESTS="true"
+    fi
+  fi
+fi
+
+if [[ "${ONLY_DOCS}" == "false" && "${BUILDKITE_PULL_REQUEST}" != "" ]] || [[ "${runAllStages}" == "true" ]]; then    #from https://github.com/elastic/beats/blob/0dc012db7247246a1439311686e7a7cb8515efdb/Jenkinsfile#L145-L171
+  if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" ]] || [[ "${GITHUB_PR_LABELS}" == "metricbeat" ]]; then   # from https://github.com/elastic/beats/blob/0dc012db7247246a1439311686e7a7cb8515efdb/metricbeat/Jenkinsfile.yml#L3-L12
+    export ALLOW_EXTENDED_WIN_TESTS="true"
+    if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || [[ "${BUILDKITE_TAG}" == "" ]] || [[ "${BUILDKITE_PULL_REQUEST}" != "" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L101-L103
+      export ALLOW_PACKAGING="true"
+    fi
+  fi
+fi

@@ -15,8 +15,34 @@ env:
 
 steps:
 
+  - input: "Input Parameters"
+    key: "input-run-all-stages"
+    fields:
+    - select: "Metricbeat - runAllStages"
+      key: "runAllStages"
+      options:
+        - label: "True"
+          value: "true"
+        - label: "False"
+          value: "false"
+      default: "false"
+    - select: "Metricbeat - runMacOsTests"
+      key: "UI_MACOS_TESTS"
+      options:
+        - label: "True"
+          value: "true"
+        - label: "False"
+          value: "false"
+      default: "false"
+    if: "build.source == 'ui'"
+
+  - wait: ~
+    if: "build.source == 'ui'"
+    allow_dependency_failure: false
+
   - group: "Mandatory Tests"
     key: "mandatory-tests"
+    if: ${ALLOW_MANDATORY_TESTS} == "true"
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
@@ -72,9 +98,11 @@ steps:
 
   - group: "Extended Tests"
     key: "extended-tests"
+    if: ${ALLOW_EXTENDED_TESTS} == "true"
     steps:
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
+        if: ${ALLOW_MACOS_TESTS} == "true"
         command: ".buildkite/scripts/unit_tests.sh ${PIPELINE_NAME}"
         agents:
           provider: "orka"
@@ -83,6 +111,7 @@ steps:
 
   - group: "Extended Windowds Tests"
     key: "extended-win-tests"
+    if: ${ALLOW_EXTENDED_WIN_TESTS} == "true"
     steps:
       - label: ":windows: Win 2019 Unit Tests"
         key: "extended-win-2019-unit-tests"
@@ -95,20 +124,34 @@ steps:
           disk_type: "pd-ssd"
         artifact_paths: "metricbeat/build/*.*"
 
-  - group: "Packaging"
+  - group: "Packaging"    # run conditions: https://github.com/elastic/beats/pull/28589
     key: "packaging"
-    if: build.env("BUILDKITE_TAG") == "" && build.env("BUILDKITE_PULL_REQUEST") != ""
+    if: ${ALLOW_PACKAGING} == "true"
     depends_on:
       - step: "mandatory-tests"
         allow_failure: false
       - step: "extended-tests"
-        allow_failure: false
+        allow_failure: true
       - step: "extended-win-tests"
-        allow_failure: false
+        allow_failure: true
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: ".buildkite/scripts/packaging.sh"
-
+        command: "pushd "metricbeat" > /dev/null && mage package"
         agents:
-          image: "${GO_AGENT_IMAGE}"
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+
+      - label: ":linux: Packaging ARM"
+        key: "packaging-arm"
+        command: "pushd "metricbeat" > /dev/null && mage package"
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "t4g.xlarge"
+        env:
+          PLATFORMS: "linux/arm64"
+          PACKAGES: "docker"
