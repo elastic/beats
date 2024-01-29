@@ -372,6 +372,8 @@ func createAllWatchers(
 func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
 	resourceName string, resourceWatchers *Watchers) (*metadata.Resource, error) {
 
+	namespaceAware := isNamespaced(resourceName)
+
 	resourceWatchers.lock.RLock()
 	defer resourceWatchers.lock.RUnlock()
 
@@ -381,7 +383,20 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addReso
 		return nil, fmt.Errorf("could not create the metadata generator, as the watcher for %s does not exist", resourceName)
 	}
 
-	metaGen := metadata.NewResourceMetadataGenerator(commonConfig, client)
+	var metaGen *metadata.Resource
+	if namespaceAware {
+		namespaceWatcher := resourceWatchers.watchersMap[NamespaceResource]
+
+		if namespaceWatcher == nil {
+			return nil, fmt.Errorf("could not create the metadata generator, as the watcher for namespace does not exist")
+		}
+
+		n := metadata.NewNamespaceMetadataGenerator(addResourceMetadata.Namespace,
+			(*namespaceWatcher).watcher.Store(), client)
+		metaGen = metadata.NewNamespaceAwareResourceMetadataGenerator(commonConfig, client, n)
+	} else {
+		metaGen = metadata.NewResourceMetadataGenerator(commonConfig, client)
+	}
 
 	return metaGen, nil
 }
