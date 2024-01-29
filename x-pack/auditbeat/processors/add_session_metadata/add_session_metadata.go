@@ -56,35 +56,38 @@ func New(cfg *config.C) (beat.Processor, error) {
 	backfilledPIDs := db.ScrapeProcfs()
 	logger.Debugf("backfilled %d processes", len(backfilledPIDs))
 
+	var p provider.Provider
+	var err error
+
 	switch c.Backend {
 	case "auto":
-		// "auto" always uses ebpf, as it's currently the only backend
-		fallthrough
+		p, err = ebpf_provider.NewProvider(ctx, logger, db)
+		if err != nil {
+			// Most likely cause of error is not supporting ebpf on system, try procfs
+			p, err = procfs_provider.NewProvider(ctx, logger, db, reader, c.PidField)
+			if err != nil {
+				return nil, fmt.Errorf("failed to create provider: %w", err)
+			}
+		}
 	case "ebpf":
-		p, err := ebpf_provider.NewProvider(ctx, logger, db)
+		p, err = ebpf_provider.NewProvider(ctx, logger, db)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create ebpf provider: %w", err)
 		}
-		return &addSessionMetadata{
-			config:   c,
-			logger:   logger,
-			db:       db,
-			provider: p,
-		}, nil
 	case "procfs":
-		p, err := procfs_provider.NewProvider(ctx, logger, db, reader, c.PidField)
+		p, err = procfs_provider.NewProvider(ctx, logger, db, reader, c.PidField)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create ebpf provider: %w", err)
 		}
-		return &addSessionMetadata{
-			config:   c,
-			logger:   logger,
-			db:       db,
-			provider: p,
-		}, nil
 	default:
 		return nil, fmt.Errorf("unknown backend configuration")
 	}
+	return &addSessionMetadata{
+		config:   c,
+		logger:   logger,
+		db:       db,
+		provider: p,
+	}, nil
 }
 
 func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {

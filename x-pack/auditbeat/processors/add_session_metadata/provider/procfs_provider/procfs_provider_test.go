@@ -9,19 +9,16 @@ package procfs_provider
 import (
 	"context"
 	"testing"
-
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/types"
-
-	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
