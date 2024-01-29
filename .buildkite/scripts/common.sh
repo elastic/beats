@@ -14,10 +14,7 @@ with_docker_compose() {
   echo "Setting up the Docker-compose environment..."
   create_workspace
   retry 3 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type}-${arch_type}"
-  ls -la ${BIN}
   chmod +x ${BIN}/docker-compose
-  ls -la ${BIN}
-  ${BIN}/docker-compose version
   export PATH="${BIN}:${PATH}"
   docker-compose version
 }

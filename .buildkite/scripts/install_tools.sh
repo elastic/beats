@@ -2,7 +2,7 @@
 
 source .buildkite/scripts/common.sh
 
-set -euox pipefail
+set -euo pipefail
 
 echo "--- Env preparation"
 
@@ -15,7 +15,7 @@ add_bin_path
 if command -v docker-compose &> /dev/null
 then
   echo "Found docker-compose. Checking version.."
-  FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version | awk '{print $3}'|sed s/\,//)
+  FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version | awk '{print $4}'|sed s/\,//)
   if [ $FOUND_DOCKER_COMPOSE_VERSION == $DOCKER_COMPOSE_VERSION ]; then
     echo "Versions match. No need to install docker-compose. Exiting."
   else
