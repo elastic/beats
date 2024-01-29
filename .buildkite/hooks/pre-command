@@ -2,15 +2,14 @@
 
 source .buildkite/scripts/common.sh
 
-set -euox pipefail
+set -euo pipefail
 
 # go_mod_changeset=(
 #   "^go.mod"
 #   )
 
 docs_changeset=(
-  "*.asciidoc"
-  "*.md"
+  ".*\\.(asciidoc|md)"
   "deploy/kubernetes/.*-kubernetes\\.yaml"
   )
 
