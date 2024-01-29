@@ -3,13 +3,20 @@ set -euo pipefail
 
 source .buildkite/scripts/setenv.sh
 
+WORKSPACE=${WORKSPACE:-"$(pwd)"}
+BIN="${WORKSPACE}/bin"
+platform_type="$(uname)"
+platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
+arch_type="$(uname -m)"
+
 with_docker_compose() {
   local version=$1
   echo "Setting up the Docker-compose environment..."
   create_workspace
-  retry 5 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type_lowercase}-${arch_type}"
+  retry 3 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type}-${arch_type}"
   ls -la ${BIN}
   chmod +x ${BIN}/docker-compose
+  ls -la ${BIN}
   ${BIN}/docker-compose version
   export PATH="${BIN}:${PATH}"
   docker-compose version
@@ -115,7 +122,8 @@ are_paths_changed() {
     echo "${changelist[*]}"
     return 0
   else
-    echo "No files changed within Metricbeat changeset"
+    echo "No files changed within specified changeset:"
+    echo "${patterns[*]}"
     return 1
   fi
 }

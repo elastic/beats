@@ -2,15 +2,10 @@
 
 set -euo pipefail
 
-WORKSPACE=${WORKSPACE:-"$(pwd)"}
-BIN="${WORKSPACE}/bin"
 SETUP_GVM_VERSION="v0.5.1"
 DOCKER_COMPOSE_VERSION="1.21.0"
 SETUP_WIN_PYTHON_VERSION="3.11.0"
 GO_VERSION=$(cat .go-version)
-platform_type="$(uname)"
-platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
-arch_type="$(uname -m)"
 ALLOW_EXTENDED_TESTS=${ALLOW_EXTENDED_TESTS:-false}
 ALLOW_MANDATORY_TESTS=${ALLOW_MANDATORY_TESTS:-false}
 ALLOW_MACOS_TESTS=${ALLOW_MACOS_TESTS:-false}
@@ -42,7 +37,7 @@ ci_changeset=(
 )
 pipeline_name="metricbeat"
 
-# case "$arch_type" in
+# case "$platform_type" in
 #   Darwin | Linux)
 #     export DOCKER_COMPOSE_VERSION
 #     export SETUP_GVM_VERSION

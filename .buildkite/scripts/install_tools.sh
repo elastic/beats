@@ -2,7 +2,7 @@
 
 source .buildkite/scripts/common.sh
 
-set -euo pipefail
+set -euox pipefail
 
 echo "--- Env preparation"
 
