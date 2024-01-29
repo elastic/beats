@@ -7,7 +7,9 @@ set -euo pipefail
 beats_subfilder=$1
 
 echo "--- Env preparation"
-
+DEBIAN_FRONTEND="noninteractive"
+sudo mkdir -p /etc/needrestart
+echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
 add_bin_path
 with_go "${GO_VERSION}"
 with_mage

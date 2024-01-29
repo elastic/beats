@@ -16,8 +16,8 @@ ALLOW_EXTENDED_WIN_TESTS=${ALLOW_EXTENDED_WIN_TESTS:-false}
 ALLOW_PACKAGING=${ALLOW_PACKAGING:-false}
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
-GO_MOD_CHANGES=${GO_MOD_CHANGES:-"false"}
-PACKAGING_CHANGES=${PACKAGING_CHANGES:-"false"}
+# GO_MOD_CHANGES=${GO_MOD_CHANGES:-"false"}
+# PACKAGING_CHANGES=${PACKAGING_CHANGES:-"false"}
 UI_MACOS_TESTS="$(buildkite-agent meta-data get UI_MACOS_TESTS --default ${UI_MACOS_TESTS:-"false"})"
 runAllStages="$(buildkite-agent meta-data get runAllStages --default ${runAllStages:-"false"})"
 metricbeat_changeset=(
@@ -39,11 +39,6 @@ ci_changeset=(
   "^.buildkite/.*"
 )
 pipeline_name="metricbeat"
-DEBIAN_FRONTEND="noninteractive"
-# sudo mkdir -p /etc/needrestart
-# echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
-mkdir -p /etc/needrestart
-echo "\$nrconf{restart} = 'a';" | tee -a /etc/needrestart/needrestart.conf > /dev/null
 
 # case "$arch_type" in
 #   Darwin | Linux)
