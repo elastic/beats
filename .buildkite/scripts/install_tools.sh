@@ -6,9 +6,11 @@ set -euo pipefail
 
 echo "--- Env preparation"
 
-DEBIAN_FRONTEND="noninteractive"
-sudo mkdir -p /etc/needrestart
-echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
+if [ "${platform_type}" == "Linux" ]; then
+  DEBIAN_FRONTEND="noninteractive"
+  sudo mkdir -p /etc/needrestart
+  echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
+fi
 
 add_bin_path
 

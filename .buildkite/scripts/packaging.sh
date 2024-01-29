@@ -4,7 +4,7 @@ source .buildkite/scripts/install_tools.sh
 
 set -euo pipefail
 
-echo "--- Run Packaging for $beats_subfilder"
+echo "--- Run Packaging for $beats_subfolder"
 pushd "${beats_subfilder}" > /dev/null
 
 mage package

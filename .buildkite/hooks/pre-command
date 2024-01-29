@@ -2,20 +2,20 @@
 
 source .buildkite/scripts/common.sh
 
-set -euo pipefail
+set -euox pipefail
 
 # go_mod_changeset=(
-#   "^go.mod"
+#   ^go.mod
 #   )
 
 docs_changeset=(
-  ".*\\.(asciidoc|md)"
-  "deploy/kubernetes/.*-kubernetes\\.yaml"
+  .*\\.(asciidoc|md)
+  deploy/kubernetes/.*-kubernetes\\.yaml
   )
 
 # packaging_changeset=(
-#   "^dev-tools/packaging/.*"
-#   ".go-version"
+#   ^dev-tools/packaging/.*
+#   .go-version
 #   )
 
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then
