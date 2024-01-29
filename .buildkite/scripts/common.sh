@@ -74,10 +74,8 @@ with_go() {
 
 with_python() {
   if [ "${platform_type}" == "Linux" ]; then
-    # sudo apt-get update
-    # sudo apt-get install -y python3-pip python3-venv libsystemd-dev
-    apt-get update
-    apt-get install -y python3-pip python3-venv libsystemd-dev
+    sudo apt-get update
+    sudo apt-get install -y python3-pip python3-venv libsystemd-dev
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
     pip3 install virtualenv
