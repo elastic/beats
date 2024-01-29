@@ -72,7 +72,7 @@ func (w *watcher) Subscribe(name string, events EventMask) <-chan ebpfevents.Rec
 	w.clients[name] = client{
 		name:    name,
 		mask:    events,
-		records: make(chan ebpfevents.Record),
+		records: make(chan ebpfevents.Record, w.loader.BufferLen()),
 	}
 
 	return w.clients[name].records
