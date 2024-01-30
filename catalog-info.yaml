@@ -400,7 +400,7 @@ spec:
       name: xpack-elastic-agent
       description: "Beats xpack elastic agent pipeline"
     spec:
-      branch_configuration: "7.17"
+      # branch_configuration: "7.17"
       pipeline_file: ".buildkite/xpack/elastic-agent/pipeline.xpack.elastic-agent.yml"
       provider_settings:
         build_pull_request_forks: false
