@@ -45,6 +45,10 @@ type broker struct {
 
 	done chan struct{}
 
+	// The ring buffer backing the queue. All buffer positions should be taken
+	// modulo the size of this array.
+	buf []queueEntry
+
 	// wait group for queue workers (runLoop and ackLoop)
 	wg sync.WaitGroup
 
@@ -60,6 +64,10 @@ type broker struct {
 	// Producers send requests to cancelChan to cancel events they've
 	// sent so far that have not yet reached a consumer.
 	cancelChan chan producerCancelRequest
+
+	// Metrics() sends requests to metricChan to expose internal queue
+	// metrics to external callers.
+	metricChan chan metricsRequest
 
 	///////////////////////////
 	// internal channels
@@ -80,54 +88,14 @@ type broker struct {
 	// acknowledged event count to this channel.
 	deleteChan chan int
 
-	// This channel is used to request/return metrics where such metrics require insight into
-	// the actual eventloop itself. This seems like it might be overkill, but it seems that
-	// all communication between the broker and the eventloops
-	// happens via channels, so we're doing it this way.
-	metricChan chan metricsRequest
+	///////////////////////////////
+	// internal goroutine state
 
-	////////////////////////////////////////////////////////////////////////
-	// runLoop internal state
-	//
-	// These fields could mostly be local variables in runLoop, but they're
-	// exposed here to facilitate testing. In a live queue, only the runLoop
-	// should read/write these values.
+	// The goroutine that manages the queue's core run state
+	runLoop *runLoop
 
-	// The ring buffer backing the queue. All buffer positions should be taken
-	// modulo the size of this array.
-	buf []queueEntry
-
-	// The index of the beginning of the current ring buffer within its backing
-	// array. If the queue isn't empty, bufPos points to the oldest remaining
-	// event.
-	bufPos int
-
-	// The total number of events in the queue.
-	eventCount int
-
-	// The number of consumed events waiting for acknowledgment. The next Get
-	// request will return events starting at position
-	// (bufPos + consumedCount) % len(buf).
-	consumedCount int
-
-	// The list of batches that have been consumed and are waiting to be sent
-	// to ackLoop for acknowledgment handling. (This list doesn't contain all
-	// outstanding batches, only the ones not yet forwarded to ackLoop.)
-	consumedBatches batchList
-
-	// If there aren't enough events ready to fill an incoming get request,
-	// the queue may block based on its flush settings. When this happens,
-	// pendingGetRequest stores the request until we're ready to handle it.
-	pendingGetRequest *getRequest
-
-	// This timer tracks the configured flush timeout when we will respond
-	// to a pending getRequest even if we can't fill the requested event count.
-	// It is active if and only if pendingGetRequest is non-nil.
-	getTimer *time.Timer
-
-	// TODO: entry IDs were a workaround for an external project that no longer
-	// exists. At this point they just complicate the API and should be removed.
-	nextEntryID queue.EntryID
+	// The goroutine that manages ack notifications and callbacks
+	ackLoop *ackLoop
 }
 
 type Settings struct {
@@ -163,16 +131,6 @@ type batch struct {
 	// acknowledgment / cleanup.
 	doneChan chan batchDoneMsg
 }
-
-// batchACKState stores the metadata associated with a batch of events sent to
-// a consumer. When the consumer ACKs that batch, a batchAckMsg is sent on
-// ackChan and received by
-/*type batchACKState struct {
-	next         *batchACKState
-	doneChan     chan batchDoneMsg
-	start, count int // number of events waiting for ACK
-	entries      []queueEntry
-}*/
 
 type batchList struct {
 	head *batch
@@ -241,27 +199,17 @@ func NewQueue(
 		ackCallback: ackCallback,
 	}
 
-	// Create the timer we'll use for get requests, but stop it until a
-	// get request is active.
-	if settings.FlushTimeout > 0 {
-		b.getTimer = time.NewTimer(settings.FlushTimeout)
-		if !b.getTimer.Stop() {
-			<-b.getTimer.C
-		}
-	}
-
-	ackLoop := &ackLoop{
-		broker: b,
-	}
+	b.runLoop = newRunLoop(b)
+	b.ackLoop = newACKLoop(b)
 
 	b.wg.Add(2)
 	go func() {
 		defer b.wg.Done()
-		b.runLoop()
+		b.runLoop.run()
 	}()
 	go func() {
 		defer b.wg.Done()
-		ackLoop.run()
+		b.ackLoop.run()
 	}()
 
 	return b
@@ -298,11 +246,6 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 	// if request has been sent, we have to wait for a response
 	resp := <-responseChan
 	return resp, nil
-	/*return &batch{
-		queue:    b,
-		entries:  resp.entries,
-		doneChan: resp.ackChan,
-	}, nil*/
 }
 
 func (b *broker) Metrics() (queue.Metrics, error) {

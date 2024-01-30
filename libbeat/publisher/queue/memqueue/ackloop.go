@@ -28,8 +28,10 @@ type ackLoop struct {
 	// A list of ACK channels given to queue consumers,
 	// used to maintain sequencing of event acknowledgements.
 	ackChans batchList
+}
 
-	//processACK func(batchList, int)
+func newACKLoop(broker *broker) *ackLoop {
+	return &ackLoop{broker: broker}
 }
 
 func (l *ackLoop) run() {
@@ -70,10 +72,11 @@ func (l *ackLoop) handleBatchSig() int {
 		}
 
 		// report acks to waiting clients
-		l.broker.processACK(ackedBatches, count)
+		l.processACK(ackedBatches, count)
 	}
 
 	for !ackedBatches.empty() {
+		// Release finished batch structs into the shared memory pool
 		releaseBatch(ackedBatches.pop())
 	}
 
@@ -103,4 +106,44 @@ func (l *ackLoop) collectAcked() batchList {
 	}
 
 	return ackedBatches
+}
+
+// Called by ackLoop. This function exists to decouple the work of collecting
+// and running producer callbacks from logical deletion of the events, so
+// input callbacks can't block the queue by occupying the runLoop goroutine.
+func (l *ackLoop) processACK(lst batchList, N int) {
+	ackCallbacks := []func(){}
+	// First we traverse the entries we're about to remove, collecting any callbacks
+	// we need to run.
+	lst.reverse()
+	for !lst.empty() {
+		batch := lst.pop()
+
+		// Traverse entries from last to first, so we can acknowledge the most recent
+		// ones first and skip subsequent producer callbacks.
+		for i := batch.count - 1; i >= 0; i-- {
+			entry := batch.rawEntry(i)
+			if entry.producer == nil {
+				continue
+			}
+
+			if entry.producerID <= entry.producer.state.lastACK {
+				// This index was already acknowledged on a previous iteration, skip.
+				entry.producer = nil
+				continue
+			}
+			producerState := entry.producer.state
+			count := int(entry.producerID - producerState.lastACK)
+			ackCallbacks = append(ackCallbacks, func() { producerState.cb(count) })
+			entry.producer.state.lastACK = entry.producerID
+			entry.producer = nil
+		}
+	}
+	// Signal runLoop to delete the events
+	l.broker.deleteChan <- N
+
+	// The events have been removed; notify their listeners.
+	for _, f := range ackCallbacks {
+		f()
+	}
 }

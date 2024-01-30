@@ -50,14 +50,6 @@ type getRequest struct {
 	responseChan chan *batch // channel to send response to
 }
 
-/*
-	type getResponse struct {
-		ackChan chan batchDoneMsg
-		batch   *batch
-	}
-*/
-//type getResponse *batch
-
 type batchDoneMsg struct{}
 
 // Metrics API
