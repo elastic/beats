@@ -331,8 +331,10 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 		},
 	}
 
+	log := logp.NewLogger(selector)
+
 	enricherNamespace := buildMetadataEnricher(metricsetNamespace, NamespaceResource, resourceWatchers, config,
-		funcs.update, funcs.delete, funcs.index)
+		funcs.update, funcs.delete, funcs.index, log)
 	resourceWatchers.lock.Lock()
 	watcher := resourceWatchers.watchersMap[NamespaceResource]
 	require.False(t, watcher.started)
@@ -354,7 +356,7 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 
 	// Stopping the deployment watcher should stop now both watchers
 	enricherDeployment := buildMetadataEnricher(metricsetDeployment, DeploymentResource, resourceWatchers, config,
-		funcs.update, funcs.delete, funcs.index)
+		funcs.update, funcs.delete, funcs.index, log)
 	enricherDeployment.Stop(resourceWatchers)
 
 	resourceWatchers.lock.Lock()
@@ -396,8 +398,9 @@ func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
 		},
 	}
 
+	log := logp.NewLogger(selector)
 	enricherPod := buildMetadataEnricher(metricsetPod, PodResource, resourceWatchers, config,
-		funcs.update, funcs.delete, funcs.index)
+		funcs.update, funcs.delete, funcs.index, log)
 	resourceWatchers.lock.Lock()
 	watcher := resourceWatchers.watchersMap[PodResource]
 	require.False(t, watcher.started)
@@ -419,7 +422,7 @@ func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
 
 	// Stopping the state_pod watcher should stop pod watcher
 	enricherStatePod := buildMetadataEnricher(metricsetStatePod, PodResource, resourceWatchers, config,
-		funcs.update, funcs.delete, funcs.index)
+		funcs.update, funcs.delete, funcs.index, log)
 	enricherStatePod.Stop(resourceWatchers)
 
 	resourceWatchers.lock.Lock()

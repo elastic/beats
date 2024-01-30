@@ -24,7 +24,6 @@ import (
 	"sync"
 	"time"
 
-	"gotest.tools/gotestsum/log"
 	k8sclient "k8s.io/client-go/kubernetes"
 
 	"k8s.io/apimachinery/pkg/api/meta"
@@ -73,6 +72,7 @@ type enricher struct {
 	resourceName  string
 	isPod         bool
 	config        *kubernetesConfig
+	log           *logp.Logger
 }
 
 type nilEnricher struct{}
@@ -564,7 +564,7 @@ func NewResourceMetadataEnricher(
 		return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, "name"))
 	}
 
-	enricher := buildMetadataEnricher(metricsetName, resourceName, resourceWatchers, config, updateFunc, deleteFunc, indexFunc)
+	enricher := buildMetadataEnricher(metricsetName, resourceName, resourceWatchers, config, updateFunc, deleteFunc, indexFunc, log)
 	if resourceName == PodResource {
 		enricher.isPod = true
 	}
@@ -689,7 +689,7 @@ func NewContainerMetadataEnricher(
 		return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, mb.ModuleDataKey+".pod.name"), getString(e, "name"))
 	}
 
-	enricher := buildMetadataEnricher(metricsetName, PodResource, resourceWatchers, config, updateFunc, deleteFunc, indexFunc)
+	enricher := buildMetadataEnricher(metricsetName, PodResource, resourceWatchers, config, updateFunc, deleteFunc, indexFunc, log)
 
 	return enricher
 }
@@ -751,7 +751,8 @@ func buildMetadataEnricher(
 	config *kubernetesConfig,
 	update func(map[string]mapstr.M, kubernetes.Resource),
 	delete func(map[string]mapstr.M, kubernetes.Resource),
-	index func(e mapstr.M) string) *enricher {
+	index func(e mapstr.M) string,
+	log *logp.Logger) *enricher {
 
 	enricher := enricher{
 		metadata:      map[string]mapstr.M{},
@@ -759,6 +760,7 @@ func buildMetadataEnricher(
 		resourceName:  resourceName,
 		metricsetName: metricsetName,
 		config:        config,
+		log:           log,
 	}
 
 	resourceWatchers.lock.Lock()
@@ -795,7 +797,7 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 	resourceWatcher := resourceWatchers.watchersMap[e.resourceName]
 	if resourceWatcher != nil && !resourceWatcher.started {
 		if err := resourceWatcher.watcher.Start(); err != nil {
-			log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
+			e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
 		} else {
 			resourceWatcher.started = true
 		}
@@ -806,7 +808,7 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 		extraWatcher := resourceWatchers.watchersMap[extra]
 		if extraWatcher != nil && !extraWatcher.started {
 			if err := extraWatcher.watcher.Start(); err != nil {
-				log.Warnf("Error starting %s watcher: %s", extra, err)
+				e.log.Warnf("Error starting %s watcher: %s", extra, err)
 			} else {
 				extraWatcher.started = true
 			}
