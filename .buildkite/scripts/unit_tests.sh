@@ -4,11 +4,11 @@ source .buildkite/scripts/install_tools.sh
 
 set -euo pipefail
 
-beats_project=$1
-
 echo "--- Run Unit Tests"
-sudo chmod -R go-w "${beats_project}/"
-pushd "${beats_project}" > /dev/null
+sudo chmod -R go-w "${BEATS_PROJECT_NAME}/"
+pushd "${BEATS_PROJECT_NAME}" > /dev/null
+
 umask 0022
 mage build unitTest
+
 popd > /dev/null

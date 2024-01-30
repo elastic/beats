@@ -4,10 +4,8 @@ source .buildkite/scripts/install_tools.sh
 
 set -euo pipefail
 
-beats_project=$1
-
-echo "--- Run Python Intergration Tests for $beats_project"
-pushd "${beats_project}" > /dev/null
+echo "--- Run Python Intergration Tests for $BEATS_PROJECT_NAME"
+pushd "${BEATS_PROJECT_NAME}" > /dev/null
 
 mage pythonIntegTest
 

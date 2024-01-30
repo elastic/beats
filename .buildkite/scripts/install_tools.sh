@@ -20,8 +20,9 @@ then
   FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version | awk '{print $4}'|sed s/\,//)
   if [ $FOUND_DOCKER_COMPOSE_VERSION == $DOCKER_COMPOSE_VERSION ]; then
     echo "Versions match. No need to install docker-compose. Exiting."
-  else
-    echo "Versions don't match. Need to install the correct version of docker-compose."
+  elif [ "${platform_type}" == "Linux" && "${arch_type}" == "aarch64" ]; then
+    with_docker_compose "${DOCKER_COMPOSE_VERSION_AARCH64}"
+  elif [ "${platform_type}" == "Linux" && "${arch_type}" == "x86_64" ]; then
     with_docker_compose "${DOCKER_COMPOSE_VERSION}"
   fi
 else

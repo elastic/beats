@@ -13,7 +13,7 @@ with_docker_compose() {
   local version=$1
   echo "Setting up the Docker-compose environment..."
   create_workspace
-  retry 3 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type}-${arch_type}"
+  retry 3 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type_lowercase}-${arch_type}"
   chmod +x ${BIN}/docker-compose
   export PATH="${BIN}:${PATH}"
   docker-compose version
@@ -34,13 +34,13 @@ add_bin_path() {
 check_platform_architeture() {
   case "${arch_type}" in
     "x86_64")
-      arch_type="amd64"
+      go_arch_type="amd64"
       ;;
     "aarch64")
-      arch_type="arm64"
+      go_arch_type="arm64"
       ;;
     "arm64")
-      arch_type="arm64"
+      go_arch_type="arm64"
       ;;
     *)
     echo "The current platform/OS type is unsupported yet"
@@ -66,7 +66,7 @@ with_go() {
   echo "Setting up the Go environment..."
   create_workspace
   check_platform_architeture
-  retry 5 curl -sL -o "${BIN}/gvm" "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${platform_type_lowercase}-${arch_type}"
+  retry 5 curl -sL -o "${BIN}/gvm" "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${platform_type_lowercase}-${go_arch_type}"
   chmod +x "${BIN}/gvm"
   eval "$(gvm $GO_VERSION)"
   go version

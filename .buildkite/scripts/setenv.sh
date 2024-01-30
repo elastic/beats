@@ -4,6 +4,7 @@ set -euo pipefail
 
 SETUP_GVM_VERSION="v0.5.1"
 DOCKER_COMPOSE_VERSION="1.21.0"
+DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
 SETUP_WIN_PYTHON_VERSION="3.11.0"
 GO_VERSION=$(cat .go-version)
 ALLOW_EXTENDED_TESTS=${ALLOW_EXTENDED_TESTS:-false}
@@ -13,8 +14,7 @@ ALLOW_EXTENDED_WIN_TESTS=${ALLOW_EXTENDED_WIN_TESTS:-false}
 ALLOW_PACKAGING=${ALLOW_PACKAGING:-false}
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
-# GO_MOD_CHANGES=${GO_MOD_CHANGES:-"false"}
-# PACKAGING_CHANGES=${PACKAGING_CHANGES:-"false"}
+BEATS_PROJECT_NAME="metricbeat"
 UI_MACOS_TESTS="$(buildkite-agent meta-data get UI_MACOS_TESTS --default ${UI_MACOS_TESTS:-"false"})"
 runAllStages="$(buildkite-agent meta-data get runAllStages --default ${runAllStages:-"false"})"
 metricbeat_changeset=(
@@ -35,19 +35,3 @@ oss_changeset=(
 ci_changeset=(
   "^.buildkite/.*"
 )
-pipeline_name="metricbeat"
-
-# case "$platform_type" in
-#   Darwin | Linux)
-#     export DOCKER_COMPOSE_VERSION
-#     export SETUP_GVM_VERSION
-#     export GO_VERSION
-#     ;;
-#   MINGW* | MSYS* | CYGWIN* | Windows_NT)
-#     export SETUP_WIN_PYTHON_VERSION
-#     ;;
-#   *)
-#     echo "Unsupported operating system"
-#     exit 1
-#     ;;
-# esac

@@ -4,7 +4,5 @@ source .buildkite/scripts/install_tools.sh
 
 set -euo pipefail
 
-beats_project=$1
-
-echo "--- Run Crosscompile for $beats_project"
-make -C "${beats_project}" crosscompile
+echo "--- Run Crosscompile for $BEATS_PROJECT_NAME"
+make -C "${BEATS_PROJECT_NAME}" crosscompile
