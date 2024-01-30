@@ -125,7 +125,7 @@ steps:
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: ".buildkite/scripts/packaging.sh"
+        command: ".buildkite/scripts/packaging.sh ${PIPELINE_NAME}"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -135,7 +135,7 @@ steps:
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
-        command: ".buildkite/scripts/packaging.sh"
+        command: ".buildkite/scripts/packaging.sh ${PIPELINE_NAME}"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
