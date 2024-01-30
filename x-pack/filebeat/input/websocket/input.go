@@ -18,6 +18,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/mito/lib"
+
 	"github.com/google/cel-go/cel"
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -55,7 +57,7 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 	return nil
 }
 
-// Run starts the input and blocks until it ends completes. It will return on
+// Run starts the input and blocks as long as websocket connections are alive. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
 	var cursor map[string]interface{}
@@ -76,10 +78,19 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	metrics := newInputMetrics(env.ID)
 	defer metrics.Close()
 	metrics.resource.Set(cfg.Resource.URL.String())
+	metrics.errorsTotal.Set(0)
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
-	prg, err := newProgram(ctx, cfg.Program, root, log)
+
+	patterns, err := regexpsFromConfig(cfg)
 	if err != nil {
+		metrics.errorsTotal.Inc()
+		return err
+	}
+
+	prg, ast, err := newProgram(ctx, cfg.Program, root, patterns, log)
+	if err != nil {
+		metrics.errorsTotal.Inc()
 		return err
 	}
 	var state map[string]interface{}
@@ -97,6 +108,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	url := cfg.Resource.URL.String()
 	c, _, err := websocket.DefaultDialer.Dial(url, headers)
 	if err != nil {
+		metrics.errorsTotal.Inc()
 		log.Errorw("failed to establish websocket connection", "error", err)
 		return err
 	}
@@ -108,35 +120,52 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		for {
 			_, message, err := c.ReadMessage()
 			if err != nil {
+				metrics.errorsTotal.Inc()
+				if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
+					log.Debugw("websocket connection closed", "error", err)
+				}
 				log.Errorw("failed to read websocket data", "error", err)
+
 				return
 			}
+			metrics.receivedBytesTotal.Add(uint64(len(message)))
 			state["response"] = message
 			log.Debugw("received websocket message", logp.Namespace("websocket"), string(message))
-			err = i.processAndPublishData(ctx, metrics, prg, state, cursor, pub, log)
+			err = i.processAndPublishData(ctx, metrics, prg, ast, state, cursor, pub, log)
 			if err != nil {
+				metrics.errorsTotal.Inc()
 				log.Errorw("failed to process and publish data", "error", err)
 				return
 			}
 		}
 	}()
-	<-done
 
-	return nil
+	// blocks until done is closed or context is cancelled
+	for {
+		select {
+		case <-done:
+			return nil
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
 }
 
 // processAndPublishData processes the data in state, updates the cursor and publishes it to the publisher.
 // the CEL program here only executes a single time, since the websocket connection is persistent and events are received and processed in real time.
-func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics, prg cel.Program,
+func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics, prg cel.Program, ast *cel.Ast,
 	state map[string]interface{}, cursor map[string]interface{}, pub inputcursor.Publisher, log *logp.Logger) error {
 	goodCursor := cursor
 	start := i.now().In(time.UTC)
-	state, err := evalWith(ctx, prg, state, start)
+	state, err := evalWith(ctx, prg, ast, state, start)
 	log.Debugw("response state", logp.Namespace("websocket"), "state")
 	if err != nil {
+		metrics.celEvalErrors.Add(1)
 		switch {
 		case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
 			return err
+		default:
+			metrics.errorsTotal.Inc()
 		}
 		log.Errorw("failed evaluation", "error", err)
 	}
@@ -231,6 +260,7 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 		}, pubCursor)
 		if err != nil {
 			hadPublicationError = true
+			metrics.errorsTotal.Inc()
 			log.Errorw("error publishing event", "error", err)
 			cursors = nil // We are lost, so retry with this event's cursor,
 			continue      // but continue with the events that we have without
@@ -257,13 +287,14 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 
 	switch {
 	case errors.Is(err, context.Canceled), errors.Is(err, context.DeadlineExceeded):
+		metrics.errorsTotal.Inc()
 		log.Infof("input stopped because context was cancelled with: %v", err)
 		err = nil
 	}
 	return err
 }
 
-func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
+func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
 	out, _, err := prg.ContextEval(ctx, map[string]interface{}{
 		// Replace global program "now" with current time. This is necessary
 		// as the lib.Time now global is static at program instantiation time
@@ -277,6 +308,9 @@ func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}
 		"now": now,
 		root:  state,
 	})
+	if err != nil {
+		err = lib.DecoratedError{AST: ast, Err: err}
+	}
 	if e := ctx.Err(); e != nil {
 		err = e
 	}

@@ -14,27 +14,23 @@ import (
 
 // inputMetrics handles the input's metric reporting.
 type inputMetrics struct {
-	unregister        func()
-	resource          *monitoring.String // URL-ish of input resource
-	errorsTotal       *monitoring.Uint   // number of errors encountered
-	decodeErrorsTotal *monitoring.Uint   // number of decode errors encountered
-	//sourceLagTime     *monitoring.Uint   // time between the event's timestamp and the time it was received
-	//executions         *monitoring.Uint   // times the CEL program has been executed
-	receivedBytesTotal *monitoring.Uint // number of bytes received
-	eventsReceived     *monitoring.Uint // number of events received
-	eventsPublished    *monitoring.Uint // number of events published
-	celProcessingTime  metrics.Sample   // histogram of the elapsed successful cel program processing times in nanoseconds
+	unregister         func()
+	resource           *monitoring.String // URL-ish of input resource
+	celEvalErrors      *monitoring.Uint   // number of errors encountered during cel program evaluation
+	errorsTotal        *monitoring.Uint   // number of errors encountered
+	receivedBytesTotal *monitoring.Uint   // number of bytes received
+	eventsReceived     *monitoring.Uint   // number of events received
+	eventsPublished    *monitoring.Uint   // number of events published
+	celProcessingTime  metrics.Sample     // histogram of the elapsed successful cel program processing times in nanoseconds
 }
 
 func newInputMetrics(id string) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
 	out := &inputMetrics{
-		unregister:        unreg,
-		resource:          monitoring.NewString(reg, "resource"),
-		errorsTotal:       monitoring.NewUint(reg, "errors_total"),
-		decodeErrorsTotal: monitoring.NewUint(reg, "decode_errors_total"),
-		//sourceLagTime:     monitoring.NewUint(reg, "source_lag_time"),
-		//executions:         monitoring.NewUint(reg, "cel_executions"),
+		unregister:         unreg,
+		resource:           monitoring.NewString(reg, "resource"),
+		celEvalErrors:      monitoring.NewUint(reg, "cel_eval_errors"),
+		errorsTotal:        monitoring.NewUint(reg, "errors_total"),
 		receivedBytesTotal: monitoring.NewUint(reg, "received_bytes_total"),
 		eventsReceived:     monitoring.NewUint(reg, "events_received_total"),
 		eventsPublished:    monitoring.NewUint(reg, "events_published_total"),

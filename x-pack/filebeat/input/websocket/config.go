@@ -5,25 +5,21 @@
 package websocket
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"net/url"
+	"regexp"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-const defaultMaxExecutions = 1000
-
 type config struct {
 	// Program is the CEL program to be run for each polling.
-	Program string `config:"program"`
-	// MaxExecutions is the maximum number of times a single
-	// periodic CEL execution loop may repeat due to a true
-	// "want_more" field. If it is nil a sensible default is
-	// used.
-	MaxExecutions *int `config:"max_executions"`
-	// Regexps is the set of regular expression to be made
-	// available to the program.
+	Program string            `config:"program"`
 	Regexps map[string]string `config:"regexp"`
 	// State is the initial state to be provided to the
 	// program. If it has a cursor field, that field will
@@ -69,6 +65,23 @@ func (u *urlConfig) Unpack(in string) error {
 	return nil
 }
 
+func (c config) Validate() error {
+	_, err := regexpsFromConfig(c)
+	if err != nil {
+		return fmt.Errorf("failed to check regular expressions: %w", err)
+	}
+
+	var patterns map[string]*regexp.Regexp
+	if len(c.Regexps) != 0 {
+		patterns = map[string]*regexp.Regexp{".": nil}
+	}
+	_, _, err = newProgram(context.Background(), c.Program, root, patterns, logp.L().Named("input.cel"))
+	if err != nil {
+		return fmt.Errorf("failed to check program: %w", err)
+	}
+	return nil
+}
+
 type retryConfig struct {
 	MaxAttempts *int           `config:"max_attempts"`
 	WaitMin     *time.Duration `config:"wait_min"`
@@ -88,14 +101,11 @@ func (c retryConfig) Validate() error {
 }
 
 func defaultConfig() config {
-	maxExecutions := defaultMaxExecutions
 	maxAttempts := 5
 	waitMin := time.Second
 	waitMax := time.Minute
 
 	return config{
-		MaxExecutions: &maxExecutions,
-
 		Resource: &ResourceConfig{
 			Retry: retryConfig{
 				MaxAttempts: &maxAttempts,

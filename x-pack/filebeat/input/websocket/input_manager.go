@@ -45,25 +45,6 @@ func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, erro
 		bytes(state.response).decode_json().as(inner_body,{
 			"events": {
 				"message":  inner_body.encode_json(),
-			},
-			"cursor": {
-				"last_event_ts": (
-				  	inner_body.size() > 0 ?
-					(
-					  has(state.cursor) && has(state.cursor.last_event_ts) &&
-					  inner_body.ts < state.cursor.last_event_ts ?
-						state.cursor.last_event_ts
-					  :
-						inner_body.ts
-					)
-				  :
-					(
-					  has(state.cursor) && has(state.cursor.last_event_ts) ?
-						state.cursor.last_event_ts
-					  :
-						null
-					)
-				)
 			}
 		})
 		`
