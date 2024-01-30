@@ -397,7 +397,7 @@ spec:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
     metadata:
-      name: beats-xpack-elastic-agent
+      name: xpack-elastic-agent
       description: "Beats xpack elastic agent pipeline"
     spec:
       branch_configuration: "7.17"
