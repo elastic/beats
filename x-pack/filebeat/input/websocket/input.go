@@ -26,8 +26,7 @@ import (
 )
 
 type input struct {
-	time   func() time.Time
-	config config
+	time func() time.Time
 }
 
 const (
@@ -252,7 +251,6 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 				pubCursor = cursor
 			}
 		}
-		fmt.Printf("PUBLISH CURSOR: %v\n", pubCursor)
 		// Publish the event.
 		err = pub.Publish(beat.Event{
 			Timestamp: time.Now(),
