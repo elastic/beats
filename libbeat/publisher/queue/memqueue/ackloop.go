@@ -25,9 +25,9 @@ package memqueue
 type ackLoop struct {
 	broker *broker
 
-	// A list of ACK channels given to queue consumers,
+	// A list of batches given to queue consumers,
 	// used to maintain sequencing of event acknowledgements.
-	ackChans batchList
+	pendingBatches batchList
 }
 
 func newACKLoop(broker *broker) *ackLoop {
@@ -37,7 +37,7 @@ func newACKLoop(broker *broker) *ackLoop {
 func (l *ackLoop) run() {
 	b := l.broker
 	for {
-		nextBatchChan := l.ackChans.nextBatchChannel()
+		nextBatchChan := l.pendingBatches.nextBatchChannel()
 
 		select {
 		case <-b.done:
@@ -46,7 +46,7 @@ func (l *ackLoop) run() {
 
 		case chanList := <-b.consumedChan:
 			// New batches have been generated, add them to the pending list
-			l.ackChans.concat(&chanList)
+			l.pendingBatches.concat(&chanList)
 
 		case <-nextBatchChan:
 			// The oldest outstanding batch has been acknowledged, advance our
@@ -90,15 +90,15 @@ func (l *ackLoop) handleBatchSig() int {
 func (l *ackLoop) collectAcked() batchList {
 	ackedBatches := batchList{}
 
-	acks := l.ackChans.pop()
+	acks := l.pendingBatches.pop()
 	ackedBatches.append(acks)
 
 	done := false
-	for !l.ackChans.empty() && !done {
-		acks := l.ackChans.front()
+	for !l.pendingBatches.empty() && !done {
+		acks := l.pendingBatches.front()
 		select {
 		case <-acks.doneChan:
-			ackedBatches.append(l.ackChans.pop())
+			ackedBatches.append(l.pendingBatches.pop())
 
 		default:
 			done = true
