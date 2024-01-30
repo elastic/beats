@@ -27,23 +27,23 @@ type ackLoop struct {
 
 	// A list of ACK channels given to queue consumers,
 	// used to maintain sequencing of event acknowledgements.
-	ackChans chanList
+	ackChans batchList
 
-	processACK func(chanList, int)
+	//processACK func(batchList, int)
 }
 
 func (l *ackLoop) run() {
+	b := l.broker
 	for {
 		nextBatchChan := l.ackChans.nextBatchChannel()
 
 		select {
-		case <-l.broker.done:
+		case <-b.done:
 			// The queue is shutting down.
 			return
 
-		case chanList := <-l.broker.scheduledACKs:
-			// A new batch has been generated, add its ACK channel to the end of
-			// the pending list.
+		case chanList := <-b.consumedChan:
+			// New batches have been generated, add them to the pending list
 			l.ackChans.concat(&chanList)
 
 		case <-nextBatchChan:
@@ -57,11 +57,11 @@ func (l *ackLoop) run() {
 // handleBatchSig collects and handles a batch ACK/Cancel signal. handleBatchSig
 // is run by the ackLoop.
 func (l *ackLoop) handleBatchSig() int {
-	lst := l.collectAcked()
+	ackedBatches := l.collectAcked()
 
 	count := 0
-	for current := lst.front(); current != nil; current = current.next {
-		count += current.count
+	for batch := ackedBatches.front(); batch != nil; batch = batch.next {
+		count += batch.count
 	}
 
 	if count > 0 {
@@ -70,11 +70,11 @@ func (l *ackLoop) handleBatchSig() int {
 		}
 
 		// report acks to waiting clients
-		l.processACK(lst, count)
+		l.broker.processACK(ackedBatches, count)
 	}
 
-	for !lst.empty() {
-		releaseACKChan(lst.pop())
+	for !ackedBatches.empty() {
+		releaseBatch(ackedBatches.pop())
 	}
 
 	// return final ACK to EventLoop, in order to clean up internal buffer
@@ -84,23 +84,23 @@ func (l *ackLoop) handleBatchSig() int {
 	return count
 }
 
-func (l *ackLoop) collectAcked() chanList {
-	lst := chanList{}
+func (l *ackLoop) collectAcked() batchList {
+	ackedBatches := batchList{}
 
 	acks := l.ackChans.pop()
-	lst.append(acks)
+	ackedBatches.append(acks)
 
 	done := false
 	for !l.ackChans.empty() && !done {
 		acks := l.ackChans.front()
 		select {
 		case <-acks.doneChan:
-			lst.append(l.ackChans.pop())
+			ackedBatches.append(l.ackChans.pop())
 
 		default:
 			done = true
 		}
 	}
 
-	return lst
+	return ackedBatches
 }

@@ -35,12 +35,18 @@ const (
 	maxInputQueueSizeRatio = 0.1
 )
 
+// The main implementation type for the memory queue. An active queue consists
+// of two goroutines: runLoop, which handles all public API requests and owns
+// the buffer state, and ackLoop, which listens for acknowledgments of consumed
+// events and runs any appropriate completion handlers.
 type broker struct {
+	settings Settings
+	logger   *logp.Logger
+
 	done chan struct{}
 
-	logger *logp.Logger
-
-	bufSize int
+	// wait group for queue workers (runLoop and ackLoop)
+	wg sync.WaitGroup
 
 	///////////////////////////
 	// api channels
@@ -58,17 +64,21 @@ type broker struct {
 	///////////////////////////
 	// internal channels
 
-	// When events are sent to consumers, the ACK channels for their batches
-	// are collected into chanLists and sent to scheduledACKs.
-	// These are then read by ackLoop and concatenated to its internal
-	// chanList of all outstanding ACK channels.
-	scheduledACKs chan chanList
+	// Batches sent to consumers are also collected and forwarded to ackLoop
+	// through this channel so ackLoop can monitor them for acknowledgments.
+	consumedChan chan batchList
 
-	// A callback that should be invoked when ACKs are processed.
+	// ackCallback is a configurable callback to invoke when ACKs are processed.
 	// ackLoop calls this function when it advances the consumer ACK position.
 	// Right now this forwards the notification to queueACKed() in
 	// the pipeline observer, which updates the beats registry if needed.
 	ackCallback func(eventCount int)
+
+	// When batches are acknowledged, ackLoop saves any metadata needed
+	// for producer callbacks and such, then notifies runLoop that it's
+	// safe to free these events and advance the queue by sending the
+	// acknowledged event count to this channel.
+	deleteChan chan int
 
 	// This channel is used to request/return metrics where such metrics require insight into
 	// the actual eventloop itself. This seems like it might be overkill, but it seems that
@@ -76,14 +86,60 @@ type broker struct {
 	// happens via channels, so we're doing it this way.
 	metricChan chan metricsRequest
 
-	// wait group for worker shutdown
-	wg sync.WaitGroup
+	////////////////////////////////////////////////////////////////////////
+	// runLoop internal state
+	//
+	// These fields could mostly be local variables in runLoop, but they're
+	// exposed here to facilitate testing. In a live queue, only the runLoop
+	// should read/write these values.
+
+	// The ring buffer backing the queue. All buffer positions should be taken
+	// modulo the size of this array.
+	buf []queueEntry
+
+	// The index of the beginning of the current ring buffer within its backing
+	// array. If the queue isn't empty, bufPos points to the oldest remaining
+	// event.
+	bufPos int
+
+	// The total number of events in the queue.
+	eventCount int
+
+	// The number of consumed events waiting for acknowledgment. The next Get
+	// request will return events starting at position
+	// (bufPos + consumedCount) % len(buf).
+	consumedCount int
+
+	// The list of batches that have been consumed and are waiting to be sent
+	// to ackLoop for acknowledgment handling. (This list doesn't contain all
+	// outstanding batches, only the ones not yet forwarded to ackLoop.)
+	consumedBatches batchList
+
+	// If there aren't enough events ready to fill an incoming get request,
+	// the queue may block based on its flush settings. When this happens,
+	// pendingGetRequest stores the request until we're ready to handle it.
+	pendingGetRequest *getRequest
+
+	// This timer tracks the configured flush timeout when we will respond
+	// to a pending getRequest even if we can't fill the requested event count.
+	// It is active if and only if pendingGetRequest is non-nil.
+	getTimer *time.Timer
+
+	// TODO: entry IDs were a workaround for an external project that no longer
+	// exists. At this point they just complicate the API and should be removed.
+	nextEntryID queue.EntryID
 }
 
 type Settings struct {
-	Events         int
-	FlushMinEvents int
-	FlushTimeout   time.Duration
+	// The number of events the queue can hold.
+	Events int
+
+	// The most events that will ever be returned from one Get request.
+	MaxGetRequest int
+
+	// If positive, the amount of time the queue will wait to fill up
+	// a batch if a Get request asks for more events than we have.
+	FlushTimeout time.Duration
 }
 
 type queueEntry struct {
@@ -95,24 +151,32 @@ type queueEntry struct {
 }
 
 type batch struct {
-	queue    *broker
-	entries  []queueEntry
+	queue *broker
+
+	// Next batch in the containing batchList
+	next *batch
+
+	// Position and length of the events within the queue buffer
+	start, count int
+
+	// batch.Done() sends to doneChan, where ackLoop reads it and handles
+	// acknowledgment / cleanup.
 	doneChan chan batchDoneMsg
 }
 
 // batchACKState stores the metadata associated with a batch of events sent to
 // a consumer. When the consumer ACKs that batch, a batchAckMsg is sent on
 // ackChan and received by
-type batchACKState struct {
+/*type batchACKState struct {
 	next         *batchACKState
 	doneChan     chan batchDoneMsg
 	start, count int // number of events waiting for ACK
 	entries      []queueEntry
-}
+}*/
 
-type chanList struct {
-	head *batchACKState
-	tail *batchACKState
+type batchList struct {
+	head *batch
+	tail *batch
 }
 
 // FactoryForSettings is a simple wrapper around NewQueue so a concrete
@@ -137,23 +201,20 @@ func NewQueue(
 	settings Settings,
 	inputQueueSize int,
 ) *broker {
-	var (
-		sz           = settings.Events
-		minEvents    = settings.FlushMinEvents
-		flushTimeout = settings.FlushTimeout
-	)
+	chanSize := AdjustInputQueueSize(inputQueueSize, settings.Events)
 
-	chanSize := AdjustInputQueueSize(inputQueueSize, sz)
+	// Backwards compatibility: an old way to select synchronous queue
+	// behavior was to set "flush.min_events" to 0 or 1, in which case the
+	// timeout was disabled and the max get request was half the queue.
+	// (Otherwise, it would make sense to leave FlushTimeout unchanged here.)
+	if settings.MaxGetRequest <= 1 {
+		settings.FlushTimeout = 0
+		settings.MaxGetRequest = settings.Events / 2
+	}
 
-	if minEvents < 1 {
-		minEvents = 1
-	}
-	if minEvents > 1 && flushTimeout <= 0 {
-		minEvents = 1
-		flushTimeout = 0
-	}
-	if minEvents > sz {
-		minEvents = sz
+	// Can't request more than the full queue
+	if settings.MaxGetRequest > settings.Events {
+		settings.MaxGetRequest = settings.Events
 	}
 
 	if logger == nil {
@@ -161,41 +222,42 @@ func NewQueue(
 	}
 
 	b := &broker{
-		done:   make(chan struct{}),
-		logger: logger,
+		settings: settings,
+		done:     make(chan struct{}),
+		logger:   logger,
+
+		buf: make([]queueEntry, settings.Events),
 
 		// broker API channels
 		pushChan:   make(chan pushRequest, chanSize),
 		getChan:    make(chan getRequest),
 		cancelChan: make(chan producerCancelRequest, 5),
+		metricChan: make(chan metricsRequest),
 
-		// internal broker and ACK handler channels
-		scheduledACKs: make(chan chanList),
+		// internal runLoop and ackLoop channels
+		consumedChan: make(chan batchList),
+		deleteChan:   make(chan int),
 
 		ackCallback: ackCallback,
-		metricChan:  make(chan metricsRequest),
 	}
 
-	var eventLoop interface {
-		run()
-		processACK(chanList, int)
+	// Create the timer we'll use for get requests, but stop it until a
+	// get request is active.
+	if settings.FlushTimeout > 0 {
+		b.getTimer = time.NewTimer(settings.FlushTimeout)
+		if !b.getTimer.Stop() {
+			<-b.getTimer.C
+		}
 	}
 
-	if minEvents > 1 {
-		eventLoop = newBufferingEventLoop(b, sz, minEvents, flushTimeout)
-	} else {
-		eventLoop = newDirectEventLoop(b, sz)
-	}
-
-	b.bufSize = sz
 	ackLoop := &ackLoop{
-		broker:     b,
-		processACK: eventLoop.processACK}
+		broker: b,
+	}
 
 	b.wg.Add(2)
 	go func() {
 		defer b.wg.Done()
-		eventLoop.run()
+		b.runLoop()
 	}()
 	go func() {
 		defer b.wg.Done()
@@ -216,7 +278,7 @@ func (b *broker) QueueType() string {
 
 func (b *broker) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{
-		MaxEvents: b.bufSize,
+		MaxEvents: len(b.buf),
 	}
 }
 
@@ -225,7 +287,7 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 }
 
 func (b *broker) Get(count int) (queue.Batch, error) {
-	responseChan := make(chan getResponse, 1)
+	responseChan := make(chan *batch, 1)
 	select {
 	case <-b.done:
 		return nil, io.EOF
@@ -235,11 +297,12 @@ func (b *broker) Get(count int) (queue.Batch, error) {
 
 	// if request has been sent, we have to wait for a response
 	resp := <-responseChan
-	return &batch{
+	return resp, nil
+	/*return &batch{
 		queue:    b,
 		entries:  resp.entries,
 		doneChan: resp.ackChan,
-	}, nil
+	}, nil*/
 }
 
 func (b *broker) Metrics() (queue.Metrics, error) {
@@ -255,43 +318,43 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 
 	return queue.Metrics{
 		EventCount:            opt.UintWith(uint64(resp.currentQueueSize)),
-		EventLimit:            opt.UintWith(uint64(b.bufSize)),
+		EventLimit:            opt.UintWith(uint64(len(b.buf))),
 		UnackedConsumedEvents: opt.UintWith(uint64(resp.occupiedRead)),
 		OldestEntryID:         resp.oldestEntryID,
 	}, nil
 }
 
-var ackChanPool = sync.Pool{
+var batchPool = sync.Pool{
 	New: func() interface{} {
-		return &batchACKState{
+		return &batch{
 			doneChan: make(chan batchDoneMsg, 1),
 		}
 	},
 }
 
-func newBatchACKState(start, count int, entries []queueEntry) *batchACKState {
-	ch := ackChanPool.Get().(*batchACKState)
-	ch.next = nil
-	ch.start = start
-	ch.count = count
-	ch.entries = entries
-	return ch
+func newBatch(queue *broker, start, count int) *batch {
+	batch := batchPool.Get().(*batch)
+	batch.next = nil
+	batch.queue = queue
+	batch.start = start
+	batch.count = count
+	return batch
 }
 
-func releaseACKChan(c *batchACKState) {
-	c.next = nil
-	ackChanPool.Put(c)
+func releaseBatch(b *batch) {
+	b.next = nil
+	batchPool.Put(b)
 }
 
-func (l *chanList) prepend(ch *batchACKState) {
-	ch.next = l.head
-	l.head = ch
+func (l *batchList) prepend(b *batch) {
+	b.next = l.head
+	l.head = b
 	if l.tail == nil {
-		l.tail = ch
+		l.tail = b
 	}
 }
 
-func (l *chanList) concat(other *chanList) {
+func (l *batchList) concat(other *batchList) {
 	if other.head == nil {
 		return
 	}
@@ -305,31 +368,31 @@ func (l *chanList) concat(other *chanList) {
 	l.tail = other.tail
 }
 
-func (l *chanList) append(ch *batchACKState) {
+func (l *batchList) append(b *batch) {
 	if l.head == nil {
-		l.head = ch
+		l.head = b
 	} else {
-		l.tail.next = ch
+		l.tail.next = b
 	}
-	l.tail = ch
+	l.tail = b
 }
 
-func (l *chanList) empty() bool {
+func (l *batchList) empty() bool {
 	return l.head == nil
 }
 
-func (l *chanList) front() *batchACKState {
+func (l *batchList) front() *batch {
 	return l.head
 }
 
-func (l *chanList) nextBatchChannel() chan batchDoneMsg {
+func (l *batchList) nextBatchChannel() chan batchDoneMsg {
 	if l.head == nil {
 		return nil
 	}
 	return l.head.doneChan
 }
 
-func (l *chanList) pop() *batchACKState {
+func (l *batchList) pop() *batch {
 	ch := l.head
 	if ch != nil {
 		l.head = ch.next
@@ -342,9 +405,9 @@ func (l *chanList) pop() *batchACKState {
 	return ch
 }
 
-func (l *chanList) reverse() {
+func (l *batchList) reverse() {
 	tmp := *l
-	*l = chanList{}
+	*l = batchList{}
 
 	for !tmp.empty() {
 		l.prepend(tmp.pop())
@@ -364,11 +427,18 @@ func AdjustInputQueueSize(requested, mainQueueSize int) (actual int) {
 }
 
 func (b *batch) Count() int {
-	return len(b.entries)
+	return b.count
 }
 
+// Return a pointer to the queueEntry for the i-th element of this batch
+func (b *batch) rawEntry(i int) *queueEntry {
+	// Indexes wrap around the end of the queue buffer
+	return &b.queue.buf[(b.start+i)%len(b.queue.buf)]
+}
+
+// Return the event referenced by the i-th element of this batch
 func (b *batch) Entry(i int) interface{} {
-	return b.entries[i].event
+	return b.rawEntry(i).event
 }
 
 func (b *batch) FreeEntries() {
