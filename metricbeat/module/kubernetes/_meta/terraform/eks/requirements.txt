@@ -10,4 +10,4 @@ rsa==4.7.2
 s3transfer==0.3.3
 six==1.14.0
 urllib3==1.26.5
-protobuf==3.19.4 #Temporary change because of protobuf new version bug: https://github.com/protocolbuffers/protobuf/issues/10051
+protobuf==3.19.5 #Temporary change because of protobuf new version bug: https://github.com/protocolbuffers/protobuf/issues/10051
