@@ -13,13 +13,13 @@ import (
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
-
-	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 type config struct {
 	// Program is the CEL program to be run for each polling.
-	Program string            `config:"program"`
+	Program string `config:"program"`
+	// Regexps is the set of regular expression to be made
+	// available to the program.
 	Regexps map[string]string `config:"regexp"`
 	// State is the initial state to be provided to the
 	// program. If it has a cursor field, that field will
@@ -30,12 +30,22 @@ type config struct {
 	Auth authConfig `config:"auth"`
 	// Resource
 	Resource *ResourceConfig `config:"resource" validate:"required"`
+	// Redact is the debug log state redaction configuration.
+	Redact *redact `config:"redact"`
 }
 
 type ResourceConfig struct {
-	URL    *urlConfig         `config:"url" validate:"required"`
-	Retry  retryConfig        `config:"retry"`
-	Tracer *lumberjack.Logger `config:"tracer"`
+	URL   *urlConfig  `config:"url" validate:"required"`
+	Retry retryConfig `config:"retry"`
+}
+
+type redact struct {
+	// Fields indicates which fields to apply redaction to prior
+	// to logging.
+	Fields []string `config:"fields"`
+	// Delete indicates that fields should be completely deleted
+	// before logging rather than redaction with a "*".
+	Delete bool `config:"delete"`
 }
 
 type authConfig struct {
@@ -66,6 +76,10 @@ func (u *urlConfig) Unpack(in string) error {
 }
 
 func (c config) Validate() error {
+	if c.Redact == nil {
+		logp.L().Named("input.websocket").Warn("missing recommended 'redact' configuration: " +
+			"see documentation for details: https://www.elastic.co/guide/en/beats/filebeat/current/filebeat-input-websocket.html#_redact")
+	}
 	_, err := regexpsFromConfig(c)
 	if err != nil {
 		return fmt.Errorf("failed to check regular expressions: %w", err)

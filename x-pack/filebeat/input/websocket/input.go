@@ -27,6 +27,7 @@ import (
 
 type input struct {
 	time func() time.Time
+	cfg  config
 }
 
 const (
@@ -72,6 +73,7 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
 	cfg := src.cfg
+	i.cfg = cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
 	metrics := newInputMetrics(env.ID)
@@ -157,7 +159,7 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 	goodCursor := cursor
 	start := i.now().In(time.UTC)
 	state, err := evalWith(ctx, prg, ast, state, start)
-	log.Debugw("response state", logp.Namespace("websocket"), "state")
+	log.Debugw("cel engine eval state", logp.Namespace("websocket"), "state", redactor{state: state, cfg: i.cfg.Redact})
 	if err != nil {
 		metrics.celEvalErrors.Add(1)
 		switch {
@@ -169,7 +171,6 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 		log.Errorw("failed evaluation", "error", err)
 	}
 	metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
-	log.Debugw("cel state", logp.Namespace("websocket"), "state")
 
 	e, ok := state["events"]
 	if !ok {
