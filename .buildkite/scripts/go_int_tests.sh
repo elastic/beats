@@ -4,10 +4,10 @@ source .buildkite/scripts/install_tools.sh
 
 set -euo pipefail
 
-beats_subfilder=$1
+beats_project=$1
 
-echo "--- Run Go Intergration Tests for $beats_subfilder"
-pushd "${beats_subfilder}" > /dev/null
+echo "--- Run Go Intergration Tests for $beats_project"
+pushd "${beats_project}" > /dev/null
 
 mage goIntegTest
 

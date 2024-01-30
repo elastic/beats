@@ -4,8 +4,10 @@ source .buildkite/scripts/install_tools.sh
 
 set -euo pipefail
 
-echo "--- Run Packaging for $beats_subfolder"
-pushd "${beats_subfolder}" > /dev/null
+beats_project=$1
+
+echo "--- Run Packaging for $beats_project"
+pushd "${beats_project}" > /dev/null
 
 mage package
 
