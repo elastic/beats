@@ -96,7 +96,7 @@ func (p *pathTestSuite) TestRecursiveWalkAsync() {
 	createdPathsOrder = append(createdPathsOrder, tmpDir)
 
 	testDir := filepath.Join(tmpDir, "test_dir")
-	err = os.Mkdir(testDir, 0o644)
+	err = os.Mkdir(testDir, 0o744)
 	p.Require().NoError(err)
 	createdPathsWithDepth[testDir] = 2
 	createdPathsOrder = append(createdPathsOrder, testDir)
@@ -227,7 +227,7 @@ func (p *pathTestSuite) TestNonRecursiveWalkAsync() {
 	createdPathsOrder = append(createdPathsOrder, tmpDir)
 
 	testDir := filepath.Join(tmpDir, "test_dir")
-	err = os.Mkdir(testDir, 0o644)
+	err = os.Mkdir(testDir, 0o744)
 	p.Require().NoError(err)
 
 	testDirTestFile := filepath.Join(tmpDir, "test_dir", "test_file")
@@ -404,7 +404,7 @@ func (p *pathTestSuite) TestRecursiveAdd() {
 	createdPathsOrder = append(createdPathsOrder, tmpDir)
 
 	testDir := filepath.Join(tmpDir, "test_dir")
-	err = os.Mkdir(testDir, 0o644)
+	err = os.Mkdir(testDir, 0o744)
 	p.Require().NoError(err)
 	createdPathsWithDepth[testDir] = 1
 	createdPathsOrder = append(createdPathsOrder, testDir)
@@ -514,7 +514,7 @@ func (p *pathTestSuite) TestNonRecursiveAdd() {
 	createdPathsOrder = append(createdPathsOrder, tmpDir)
 
 	testDir := filepath.Join(tmpDir, "test_dir")
-	err = os.Mkdir(testDir, 0o644)
+	err = os.Mkdir(testDir, 0o744)
 	p.Require().NoError(err)
 	createdPathsWithDepth[testDir] = 1
 	createdPathsOrder = append(createdPathsOrder, testDir)
@@ -638,7 +638,7 @@ func (p *pathTestSuite) TestStatErrAtWalk() {
 	}()
 
 	testDir := filepath.Join(tmpDir, "test_dir")
-	err = os.Mkdir(testDir, 0o644)
+	err = os.Mkdir(testDir, 0o744)
 	p.Require().NoError(err)
 
 	testDirTestFile := filepath.Join(tmpDir, "test_dir", "test_file")
