@@ -37,10 +37,11 @@ steps:
 
   - group: "Mandatory Tests"
     key: "mandatory-tests"
+    # if: ${ALLOW_MANDATORY_TESTS}
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: "cd ${BEATS_PROJECT_NAME} && mage build unitTest"
+        command: ".buildkite/scripts/unit_tests.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -49,7 +50,7 @@ steps:
 
       - label: ":go: Go Intergration Tests"
         key: "mandatory-int-test"
-        command: "cd ${BEATS_PROJECT_NAME} && mage goIntegTest"
+        command: ".buildkite/scripts/go_int_tests.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -58,7 +59,7 @@ steps:
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
-        command: "cd ${BEATS_PROJECT_NAME} && mage pythonIntegTest"
+        command: ".buildkite/scripts/py_int_tests.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -92,10 +93,12 @@ steps:
 
   - group: "Extended Tests"
     key: "extended-tests"
+    # if: ${ALLOW_EXTENDED_TESTS}
     steps:
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
-        command: "cd ${BEATS_PROJECT_NAME} && mage build unitTest"
+        # if: ${ALLOW_MACOS_TESTS}
+        command: ".buildkite/scripts/unit_tests.sh"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -103,6 +106,7 @@ steps:
 
   - group: "Extended Windowds Tests"
     key: "extended-win-tests"
+    # if: "${ALLOW_EXTENDED_WIN_TESTS}"
     steps:
       - label: ":windows: Win 2019 Unit Tests"
         key: "extended-win-2019-unit-tests"
@@ -117,10 +121,11 @@ steps:
 
   - group: "Packaging"    # TODO: check conditions for future the main pipeline migration: https://github.com/elastic/beats/pull/28589
     key: "packaging"
+    # if: ${ALLOW_PACKAGING}
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: "cd ${BEATS_PROJECT_NAME} && mage package"
+        command: ".buildkite/scripts/packaging.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -130,7 +135,7 @@ steps:
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
-        command: "cd ${BEATS_PROJECT_NAME} && mage package"
+        command: ".buildkite/scripts/packaging.sh"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"

@@ -77,11 +77,9 @@ with_go() {
 
 with_python() {
   if [ "${platform_type}" == "Linux" ]; then
-    #sudo command doesn't work at the "pre-command" hook
-    # sudo apt-get update
-    # sudo apt-get install -y python3-pip python3-venv libsystemd-dev
-    apt-get update
-    apt-get install -y python3-pip python3-venv libsystemd-dev
+    #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
+    sudo apt-get update
+    sudo apt-get install -y python3-pip python3-venv libsystemd-dev
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
     pip3 install virtualenv

@@ -10,11 +10,9 @@ echo "--- Env preparation"
 # It could be removed when we use our own image for the BK agent.
 if [ "${platform_type}" == "Linux" ]; then
   DEBIAN_FRONTEND="noninteractive"
-  #sudo command doesn't work at the "pre-command" hook
-  # sudo mkdir -p /etc/needrestart
-  # echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
-  mkdir -p /etc/needrestart
-  echo "\$nrconf{restart} = 'a';" | tee -a /etc/needrestart/needrestart.conf > /dev/null
+  #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
+  sudo mkdir -p /etc/needrestart
+  echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
 fi
 
 add_bin_path
@@ -38,10 +36,10 @@ with_go "${GO_VERSION}"
 with_mage
 with_python
 
-#sudo command doesn't work at the "pre-command" hook
+#sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
 #sudo chmod -R go-w "${BEATS_PROJECT_NAME}/"     #fix the fulesystem permissions issue like this:https://buildkite.com/elastic/beats-metricbeat/builds/1154#018d12db-dc0c-4bcd-b9b4-d5dece0b42c6/272-1267
 
-chmod -R go-w "${BEATS_PROJECT_NAME}/"     #fix the fulesystem permissions issue like this:https://buildkite.com/elastic/beats-metricbeat/builds/1154#018d12db-dc0c-4bcd-b9b4-d5dece0b42c6/272-1267
+sudo chmod -R go-w "${BEATS_PROJECT_NAME}/"     #fix the fulesystem permissions issue like this:https://buildkite.com/elastic/beats-metricbeat/builds/1154#018d12db-dc0c-4bcd-b9b4-d5dece0b42c6/272-1267
 
 pushd "${BEATS_PROJECT_NAME}" > /dev/null
 
