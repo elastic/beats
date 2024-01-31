@@ -138,3 +138,58 @@ are_changed_only_paths() {
     return 1
   fi
 }
+
+are_conditions_met_mandatory_tests() {
+  if [[ "${BUILDKITE_PULL_REQUEST}" == "" ]] || [[ "${runAllStages}" == "true" ]] || [[ "${ONLY_DOCS}" == "false" && "${BUILDKITE_PULL_REQUEST}" != "" ]]; then     # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L107-L137
+    if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" ]] || [[ "${GITHUB_PR_LABELS}" =~ Metricbeat ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+      return 0
+    else
+      return 1
+    fi
+  else
+    return 1
+  fi
+}
+
+are_conditions_met_extended_tests() {
+  if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
+    return 0
+  else
+    return 1
+  fi
+}
+
+are_conditions_met_macos_tests() {
+  if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
+    if [[ "${UI_MACOS_TESTS}" == true ]] || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat for macos" ]] || [[ "${GITHUB_PR_LABELS}" =~ macOS ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+      return 0
+    else
+      return 1
+    fi
+  else
+    return 1
+  fi
+}
+
+are_conditions_met_extended_windows_tests() {
+  if [[ "${ONLY_DOCS}" == "false" && "${BUILDKITE_PULL_REQUEST}" != "" ]] || [[ "${runAllStages}" == "true" ]]; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
+    if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" ]] || [[ "${GITHUB_PR_LABELS}" =~ Metricbeat ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+      return 0
+    else
+      return 1
+  else
+    return 1
+  fi
+}
+
+are_conditions_met_packaging() {
+  if are_conditions_met_extended_windows_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
+    if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || [[ "${BUILDKITE_TAG}" == "" ]] || [[ "${BUILDKITE_PULL_REQUEST}" != "" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L101-L103
+      return 0
+    else
+      return 1
+    fi
+  else
+    return 1
+  fi
+}

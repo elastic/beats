@@ -1,63 +1,10 @@
 #!/bin/bash
 
-source .buildkite/scripts/common.sh
+source .buildkite/scripts/setenv.sh
 
 set -euo pipefail
 
-go_mod_changeset=(
-  "^go.mod"
-  )
 
-docs_changeset=(
-  ".*\\.(asciidoc|md)"
-  "deploy/kubernetes/.*-kubernetes\\.yaml"
-  )
+# if [[ "$BUILDKITE_STEP_KEY" =~ ^mandatory- || "$BUILDKITE_STEP_KEY" =~ ^extended-macos || "$BUILDKITE_STEP_KEY" =~ ^packaging ]]; then
 
-packaging_changeset=(
-  "^dev-tools/packaging/.*"
-  ".go-version"
-  )
-
-if ! are_changed_only_paths "${docs_changeset[@]}" ; then
-  ONLY_DOCS="false"
-  echo "Changes include files outside the docs_changeset vairiabe. ONLY_DOCS=$ONLY_DOCS."
-else
-  echo "All changes are related to DOCS. ONLY_DOCS=$ONLY_DOCS."
-fi
-
-if are_paths_changed "${go_mod_changeset[@]}" ; then
-  GO_MOD_CHANGES="true"
-fi
-
-if are_paths_changed "${packaging_changeset[@]}" ; then
-  PACKAGING_CHANGES="true"
-fi
-
-# Define step conditions
-
-# The commented out conditions will be implemented during the main pipeline migration
-# if [[ "${BUILDKITE_PULL_REQUEST}" == "" ]] || [[ "${runAllStages}" == "true" ]] || [[ "${ONLY_DOCS}" == "false" && "${BUILDKITE_PULL_REQUEST}" != "" ]]; then     # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L107-L137
 # fi
-
-if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" ]] || [[ "${GITHUB_PR_LABELS}" =~ Metricbeat ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
-  export ALLOW_EXTENDED_TESTS=true
-  export ALLOW_MANDATORY_TESTS=true
-  if [[ "${UI_MACOS_TESTS}" == true ]] || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat for macos" ]] || [[ "${GITHUB_PR_LABELS}" =~ macOS ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
-    export ALLOW_MACOS_TESTS=true
-  fi
-fi
-
-# The commented out conditions will be implemented during the main pipeline migration
-# if [[ "${ONLY_DOCS}" == "false" && "${BUILDKITE_PULL_REQUEST}" != "" ]] || [[ "${runAllStages}" == "true" ]]; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-# fi
-
-if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" ]] || [[ "${GITHUB_PR_LABELS}" =~ Metricbeat ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
-  export ALLOW_EXTENDED_WIN_TESTS=true
-  if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || [[ "${BUILDKITE_TAG}" == "" ]] || [[ "${BUILDKITE_PULL_REQUEST}" != "" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L101-L103
-    export ALLOW_PACKAGING=true
-  fi
-fi
-
-if [[ "$BUILDKITE_STEP_KEY" =~ ^mandatory- || "$BUILDKITE_STEP_KEY" =~ ^extended-macos || "$BUILDKITE_STEP_KEY" =~ ^packaging ]]; then
-  source .buildkite/scripts/install_tools.sh
-fi

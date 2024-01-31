@@ -34,3 +34,29 @@ oss_changeset=(
 ci_changeset=(
   "^.buildkite/.*"
 )
+go_mod_changeset=(
+  "^go.mod"
+  )
+docs_changeset=(
+  ".*\\.(asciidoc|md)"
+  "deploy/kubernetes/.*-kubernetes\\.yaml"
+  )
+packaging_changeset=(
+  "^dev-tools/packaging/.*"
+  ".go-version"
+  )
+
+if ! are_changed_only_paths "${docs_changeset[@]}" ; then
+  ONLY_DOCS="false"
+  echo "Changes include files outside the docs_changeset vairiabe. ONLY_DOCS=$ONLY_DOCS."
+else
+  echo "All changes are related to DOCS. ONLY_DOCS=$ONLY_DOCS."
+fi
+
+if are_paths_changed "${go_mod_changeset[@]}" ; then
+  GO_MOD_CHANGES="true"
+fi
+
+if are_paths_changed "${packaging_changeset[@]}" ; then
+  PACKAGING_CHANGES="true"
+fi
