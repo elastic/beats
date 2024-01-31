@@ -1,8 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-source .buildkite/scripts/setenv.sh
-
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
 BIN="${WORKSPACE}/bin"
 platform_type="$(uname)"

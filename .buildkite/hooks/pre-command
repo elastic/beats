@@ -3,8 +3,3 @@
 source .buildkite/scripts/setenv.sh
 
 set -euo pipefail
-
-
-# if [[ "$BUILDKITE_STEP_KEY" =~ ^mandatory- || "$BUILDKITE_STEP_KEY" =~ ^extended-macos || "$BUILDKITE_STEP_KEY" =~ ^packaging ]]; then
-
-# fi
