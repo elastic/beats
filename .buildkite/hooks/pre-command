@@ -33,6 +33,8 @@ if are_paths_changed "${packaging_changeset[@]}" ; then
   PACKAGING_CHANGES="true"
 fi
 
+source .buildkite/scripts/install_tools.sh
+
 # Define step conditions
 
 # The commented out conditions will be implemented during the main pipeline migration

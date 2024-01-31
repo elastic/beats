@@ -6,10 +6,15 @@ set -euo pipefail
 
 echo "--- Env preparation"
 
+# Temporary solution to fix the issues with "sudo apt get...." https://elastic.slack.com/archives/C0522G6FBNE/p1706003603442859?thread_ts=1706003209.424539&cid=C0522G6FBNE
+# It could be removed when we use our own image for the BK agent.
 if [ "${platform_type}" == "Linux" ]; then
   DEBIAN_FRONTEND="noninteractive"
-  sudo mkdir -p /etc/needrestart
-  echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
+  #sudo command doesn't work at the "pre-command" hook
+  # sudo mkdir -p /etc/needrestart
+  # echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
+  mkdir -p /etc/needrestart
+  echo "\$nrconf{restart} = 'a';" | tee -a /etc/needrestart/needrestart.conf > /dev/null
 fi
 
 add_bin_path
@@ -32,3 +37,14 @@ fi
 with_go "${GO_VERSION}"
 with_mage
 with_python
+
+#sudo command doesn't work at the "pre-command" hook
+#sudo chmod -R go-w "${BEATS_PROJECT_NAME}/"     #fix the fulesystem permissions issue like this:https://buildkite.com/elastic/beats-metricbeat/builds/1154#018d12db-dc0c-4bcd-b9b4-d5dece0b42c6/272-1267
+
+chmod -R go-w "${BEATS_PROJECT_NAME}/"     #fix the fulesystem permissions issue like this:https://buildkite.com/elastic/beats-metricbeat/builds/1154#018d12db-dc0c-4bcd-b9b4-d5dece0b42c6/272-1267
+
+pushd "${BEATS_PROJECT_NAME}" > /dev/null
+
+umask 0022    # fix the filesystem permissions issue like this: https://buildkite.com/elastic/beats-metricbeat/builds/1329#018d3179-25a9-475b-a2c8-64329dfe092b/320-1696
+
+popd > /dev/null
