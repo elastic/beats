@@ -11,6 +11,8 @@
 
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
+If you are starting development of a new custom HTTP API input, we recommend that you use the <<filebeat-input-cel,Common Expression Language input>> which provides greater flexibility and an improved developer experience.
+
 This input supports:
 
 * Auth
