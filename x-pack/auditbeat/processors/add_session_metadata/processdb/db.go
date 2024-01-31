@@ -282,6 +282,8 @@ func (db *DB) InsertFork(fork types.ProcessForkEvent) error {
 
 	pid := fork.ChildPids.Tgid
 	ppid := fork.ParentPids.Tgid
+
+	db.scrapeAncestors(db.processes[pid])
 	if entry, ok := db.processes[ppid]; ok {
 		entry.Pids = pidInfoFromProto(fork.ChildPids)
 		entry.Creds = credInfoFromProto(fork.Creds)
@@ -326,6 +328,7 @@ func (db *DB) InsertExec(exec types.ProcessExecEvent) error {
 	}
 
 	db.processes[exec.Pids.Tgid] = proc
+	db.scrapeAncestors(proc)
 	entryLeaderPid := db.evaluateEntryLeader(proc)
 	if entryLeaderPid != nil {
 		db.entryLeaderRelationships[exec.Pids.Tgid] = *entryLeaderPid
@@ -739,4 +742,27 @@ func getTtyType(major uint16, minor uint16) TtyType {
 	}
 
 	return TtyUnknown
+}
+
+func (db *DB) scrapeAncestors(proc Process) {
+	for _, pid := range []uint32{proc.Pids.Pgid, proc.Pids.Ppid, proc.Pids.Sid} {
+		if _, exists := db.processes[pid]; pid == 0 || exists {
+			continue
+		}
+		procInfo, err := db.procfs.GetProcess(pid)
+		if err != nil {
+			db.logger.Debugf("couldn't get %v from procfs: %w", pid, err)
+			continue
+		}
+		p := Process{
+			Pids:     pidInfoFromProto(procInfo.Pids),
+			Creds:    credInfoFromProto(procInfo.Creds),
+			CTty:     ttyDevFromProto(procInfo.CTty),
+			Argv:     procInfo.Argv,
+			Cwd:      procInfo.Cwd,
+			Env:      procInfo.Env,
+			Filename: procInfo.Filename,
+		}
+		db.insertProcess(p)
+	}
 }
