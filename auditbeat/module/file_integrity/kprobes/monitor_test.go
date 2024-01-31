@@ -486,11 +486,98 @@ func (p *monitorTestSuite) TestNew() {
 		return
 	}
 
+	runtime.LockOSThread()
+	defer runtime.UnlockOSThread()
+
 	m, err := New(true)
 	p.Require().NoError(err)
 
+	tmpDir, err := os.MkdirTemp("", "kprobe_bench_test")
+	p.Require().NoError(err)
+	defer os.RemoveAll(tmpDir)
+
+	errChan := make(chan error)
+	cancelChan := make(chan struct{})
+
+	targetFile := filepath.Join(tmpDir, "file_kprobes.txt")
+	tid := uint32(unix.Gettid())
+
+	expectedEvents := []MonitorEvent{
+		{
+			Op:   uint32(unix.IN_CREATE),
+			Path: targetFile,
+			PID:  tid,
+		},
+		{
+			Op:   uint32(unix.IN_MODIFY),
+			Path: targetFile,
+			PID:  tid,
+		},
+		{
+			Op:   uint32(unix.IN_ATTRIB),
+			Path: targetFile,
+			PID:  tid,
+		},
+		{
+			Op:   uint32(unix.IN_MODIFY),
+			Path: targetFile,
+			PID:  tid,
+		},
+		{
+			Op:   uint32(unix.IN_MODIFY),
+			Path: targetFile,
+			PID:  tid,
+		},
+		{
+			Op:   uint32(unix.IN_MODIFY),
+			Path: targetFile,
+			PID:  tid,
+		},
+	}
+
+	var seenEvents []MonitorEvent
+	go func() {
+		defer close(errChan)
+		for {
+			select {
+			case mErr := <-m.ErrorChannel():
+				select {
+				case errChan <- mErr:
+				case <-cancelChan:
+					return
+				}
+			case e, ok := <-m.EventChannel():
+				if !ok {
+					select {
+					case errChan <- errors.New("closed event channel"):
+					case <-cancelChan:
+						return
+					}
+				}
+				seenEvents = append(seenEvents, e)
+				continue
+			case <-cancelChan:
+				return
+			}
+		}
+	}()
+
 	p.Require().NoError(m.Start())
-	p.Require().NoError(m.Close())
+	p.Require().NoError(m.Add(tmpDir))
+
+	p.Require().NoError(os.WriteFile(targetFile, []byte("hello world!"), 0o644))
+	p.Require().NoError(os.Chmod(targetFile, 0o777))
+	p.Require().NoError(os.WriteFile(targetFile, []byte("data"), 0o644))
+	p.Require().NoError(os.Truncate(targetFile, 0))
+
+	time.Sleep(5 * time.Second)
+	close(cancelChan)
+	err = <-errChan
+	if err != nil {
+		p.Require().Fail(err.Error())
+	}
+
+	p.Require().Equal(expectedEvents, seenEvents)
 }
 
 const kernelURL string = "https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-6.6.7.tar.xz"
