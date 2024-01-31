@@ -77,6 +77,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
 - Fix m365_defender cursor value and query building. {pull}37116[37116]
 - Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
+- Update github.com/lestrrat-go/jwx dependendy. {pull}37799[37799]
 
 *Heartbeat*
 
