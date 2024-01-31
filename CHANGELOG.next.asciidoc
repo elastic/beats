@@ -60,6 +60,7 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 - Support build of projects outside of beats directory {pull}36126[36126]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Upgrade elastic-agent-libs to v0.7.5. Removes obsolete "Treating the CommonName field on X.509 certificates as a host name..." deprecation warning for 8.0. {pull}37755[37755]
+- aws: Add credential caching for `AssumeRole` session tokens. {issue}37787[37787]
 
 *Auditbeat*
 
@@ -85,6 +86,7 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Fix setuid root when running under cgroups v2. {pull}37794[37794]
 
 *Metricbeat*
 
@@ -209,6 +211,8 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 *Packetbeat*
 
 - Bump Windows Npcap version to v1.79. {pull}37733[37733]
+- Add metrics for TCP flags. {issue}36992[36992] {pull}36975[36975]
+- Add support for pipeline loading. {pull}37291[37291]
 
 *Packetbeat*
 
