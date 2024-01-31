@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"runtime"
 	"syscall"
 	"time"
 
@@ -43,6 +44,18 @@ type reader struct {
 
 // NewEventReader creates a new EventProducer backed by fsnotify.
 func NewEventReader(c Config) (EventProducer, error) {
+
+	if runtime.GOOS == "linux" {
+		switch c.ForceBackend {
+		case BackendKProbes:
+			return &kProbesReader{
+				config:  c,
+				log:     logp.NewLogger(moduleName),
+				parsers: FileParsers(c),
+			}, nil
+		}
+	}
+
 	return &reader{
 		config:  c,
 		log:     logp.NewLogger(moduleName),
@@ -109,7 +122,7 @@ func (r *reader) enqueueEvents(done <-chan struct{}) (events []*Event) {
 	for {
 		ev := r.nextEvent(done)
 		if ev == nil {
-			return
+			return events
 		}
 		events = append(events, ev)
 	}
