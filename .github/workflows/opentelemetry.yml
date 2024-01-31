@@ -1,45 +1,15 @@
+---
+# Look up results at https://ela.st/oblt-ci-cd-stats.
+# There will be one service per GitHub repository, including the org name, and one Transaction per Workflow.
 name: OpenTelemetry Export Trace
 
 on:
   workflow_run:
-    workflows:
-      - bump-elastic-stack-snapshot
-      - bump-golang
-      - check-auditbeat
-      - check-default
-      - check-dev-tools
-      - check-docs
-      - check-filebeat
-      - check-heartbeat
-      - check-libbeat
-      - check-metricbeat
-      - check-packetbeat
-      - check-winlogbeat
-      - check-x-pack-auditbeat
-      - check-x-pack-dockerlogbeat
-      - check-x-pack-filebeat
-      - check-x-pack-functionbeat
-      - check-x-pack-heartbeat
-      - check-x-pack-libbeat
-      - check-x-pack-metricbeat
-      - check-x-pack-osquerybeat
-      - check-x-pack-packetbeat
-      - check-x-pack-winlogbeat
-      - golangci-lint
-      - notify-stalled-snapshots
-      - auditbeat
-      - filebeat
-      - heartbeat
-      - metricbeat
-      - packetbeat
-      - x-pack-auditbeat
-      - x-pack-filebeat
-      - x-pack-functionbeat
-      - x-pack-heartbeat
-      - x-pack-metricbeat
-      - x-pack-osquerybeat
-      - x-pack-packetbeat
+    workflows: [ "*" ]
     types: [completed]
+
+permissions:
+  contents: read
 
 jobs:
   otel-export-trace:
