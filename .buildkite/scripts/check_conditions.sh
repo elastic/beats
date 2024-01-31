@@ -20,6 +20,7 @@ env:
 steps:
 
 YAML
+
 if are_conditions_met_mandatory_tests; then
   cat >> $pipelineName <<- YAML
 
@@ -77,7 +78,9 @@ if are_conditions_met_mandatory_tests; then
               - "${IMAGE_WIN_2016}"
               - "${IMAGE_WIN_2022}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+
 YAML
+fi
 
 if are_conditions_met_extended_tests && are_conditions_met_macos_tests; then
   cat >> $pipelineName <<- YAML
@@ -94,6 +97,7 @@ if are_conditions_met_extended_tests && are_conditions_met_macos_tests; then
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
+fi
 
 if are_conditions_met_extended_windows_tests; then
   cat >> $pipelineName <<- YAML
@@ -113,6 +117,7 @@ if are_conditions_met_extended_windows_tests; then
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
+fi
 
 if are_conditions_met_extended_windows_tests; then
   cat >> $pipelineName <<- YAML
@@ -150,6 +155,7 @@ if are_conditions_met_extended_windows_tests; then
       allow_failure: true
 
 YAML
+fi
 
 cat $pipelineName       #remove after tests
 
