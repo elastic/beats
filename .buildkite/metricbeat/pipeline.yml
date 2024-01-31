@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 env:
-  GO_AGENT_IMAGE: "golang:${GO_VERSION}"
+  IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
 
 steps:
 
@@ -33,4 +33,6 @@ steps:
     key: "check-steps-conditions"
     command: ".buildkite/scripts/check_conditions.sh"
     agents:
-      image: "${GO_AGENT_IMAGE}"
+      provider: "gcp"
+      image: "${IMAGE_UBUNTU_X86_64}"
+      machineType: "c2-standard-16"
