@@ -128,7 +128,7 @@ func switchToAssumeRoleProvider(config ConfigAWS, awsConfig awssdk.Config) awssd
 	logger.Debug("Switching credentials provider to AssumeRoleProvider")
 	stsSvc := sts.New(awsConfig)
 	stsCredProvider := stscreds.NewAssumeRoleProvider(stsSvc, config.RoleArn)
-	awsConfig.Credentials = stsCredProvider
+	awsConfig.Credentials = awssdk.NewCredentialsCache(stsCredProvider)
 	return awsConfig
 }
 
