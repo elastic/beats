@@ -33,8 +33,6 @@ if are_paths_changed "${packaging_changeset[@]}" ; then
   PACKAGING_CHANGES="true"
 fi
 
-source .buildkite/scripts/install_tools.sh
-
 # Define step conditions
 
 # The commented out conditions will be implemented during the main pipeline migration
@@ -58,4 +56,8 @@ if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_ch
   if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || [[ "${BUILDKITE_TAG}" == "" ]] || [[ "${BUILDKITE_PULL_REQUEST}" != "" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L101-L103
     export ALLOW_PACKAGING=true
   fi
+fi
+
+if [[ "$BUILDKITE_STEP_KEY" =~ ^mandatory- || "$BUILDKITE_STEP_KEY" =~ ^extended-macos || "$BUILDKITE_STEP_KEY" =~ ^packaging ]]; then
+  source .buildkite/scripts/install_tools.sh
 fi
