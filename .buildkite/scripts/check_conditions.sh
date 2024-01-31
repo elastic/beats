@@ -15,7 +15,7 @@ env:
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  BEATS_PROJECT_NAME: "metricbeat"
+  BEATS_PROJECT_NAME: "${BEATS_PROJECT_NAME}"
 
 steps:
 
