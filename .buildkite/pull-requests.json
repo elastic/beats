@@ -130,7 +130,7 @@
         },
         {
             "enabled": true,
-            "pipelineSlug": "xpack-elastic-agent",
+            "pipelineSlug": "beats-xpack-elastic-agent",
             "allow_org_users": true,
             "allowed_repo_permissions": ["admin", "write"],
             "allowed_list": [ ],
