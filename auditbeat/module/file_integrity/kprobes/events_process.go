@@ -185,6 +185,11 @@ func (e *eProcessor) process(ctx context.Context, pe *ProbeEvent) error {
 			return nil
 		}
 
+		if existingChild := parentEntry.GetChild(pe.FileName); existingChild != nil {
+			e.d.Remove(existingChild)
+			existingChild.Release()
+		}
+
 		moved, err := e.d.MoveTo(uint64(pe.Meta.TID), parentEntry, pe.FileName, func(path string) error {
 			return e.e.Emit(path, pe.Meta.TID, unix.IN_MOVED_TO)
 		})
