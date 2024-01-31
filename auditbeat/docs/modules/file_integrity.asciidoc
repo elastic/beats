@@ -28,8 +28,12 @@ to only send events for new or modified files.
 
 The operating system features that power this feature are as follows.
 
-* Linux - `inotify` is used, and therefore the kernel must have inotify support.
-Inotify was initially merged into the 2.6.13 Linux kernel.
+* Linux - As of now, three kernel backends are supported: `ebpf`, `kprobes` and `fsnotify`.
+By default, `fsnotify` is used, and therefore the kernel must have inotify support.
+`Inotify` was initially merged into the 2.6.13 Linux kernel.
+The `Kprobes` backend uses tracefs and supports 3.10+ kernels.
+The `eBPF` backend uses modern eBPF features and supports 5.10.16+ kernels.
+The preferred backend can be selected by specifying the `force_backend` config option.
 * macOS (Darwin) - Uses the `FSEvents` API, present since macOS 10.5. This API
 coalesces multiple changes to a file into a single event. {beatname_uc} translates
 this coalesced changes into a meaningful sequence of actions. However,

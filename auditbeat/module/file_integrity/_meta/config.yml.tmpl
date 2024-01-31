@@ -55,6 +55,13 @@
   #- '/\.ssh($|/)'
   {{- end }}
 
+  {{- if eq .GOOS "linux" }}
+  # Select the backend which will be used to source events.
+  # Valid values: ebpf, kprobes, fsnotify.
+  # Default: fsnotify.
+  force_backend: fsnotify
+  {{- end }}
+
   # Scan over the configured file paths at startup and send events for new or
   # modified files since the last time Auditbeat was running.
   scan_at_start: true

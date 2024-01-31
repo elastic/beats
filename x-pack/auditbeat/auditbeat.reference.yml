@@ -92,6 +92,10 @@ auditbeat.modules:
   # Auditbeat will ignore files unless they match a pattern.
   #include_files:
   #- '/\.ssh($|/)'
+  # Select the backend which will be used to source events.
+  # Valid values: ebpf, kprobes, fsnotify.
+  # Default: fsnotify.
+  force_backend: fsnotify
 
   # Scan over the configured file paths at startup and send events for new or
   # modified files since the last time Auditbeat was running.
