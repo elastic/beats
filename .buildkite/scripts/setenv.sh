@@ -14,7 +14,6 @@ ALLOW_EXTENDED_WIN_TESTS=${ALLOW_EXTENDED_WIN_TESTS:-false}
 ALLOW_PACKAGING=${ALLOW_PACKAGING:-false}
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
-BEATS_PROJECT_NAME="metricbeat"
 UI_MACOS_TESTS="$(buildkite-agent meta-data get UI_MACOS_TESTS --default ${UI_MACOS_TESTS:-"false"})"
 runAllStages="$(buildkite-agent meta-data get runAllStages --default ${runAllStages:-"false"})"
 metricbeat_changeset=(
