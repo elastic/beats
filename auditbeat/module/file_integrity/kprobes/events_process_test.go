@@ -343,6 +343,250 @@ func Test_EventProcessor_process(t *testing.T) {
 			},
 			true,
 		},
+		{
+			"nonrecursive_processor",
+			[]statMatch{
+				{
+					ino:        10,
+					major:      1,
+					minor:      1,
+					depth:      0,
+					fileName:   "target_dir",
+					isFromMove: false,
+					tid:        0,
+					fullPath:   "/target_dir",
+				},
+				{
+					ino:        11,
+					major:      1,
+					minor:      1,
+					depth:      1,
+					fileName:   "track_me",
+					isFromMove: false,
+					tid:        0,
+					fullPath:   "/target_dir/track_me",
+				},
+				{
+					ino:        100,
+					major:      1,
+					minor:      1,
+					depth:      1,
+					fileName:   "nested",
+					isFromMove: false,
+					tid:        0,
+					fullPath:   "/target_dir/nested",
+				},
+				{
+					ino:        1000,
+					major:      1,
+					minor:      1,
+					depth:      2,
+					fileName:   "deeper",
+					isFromMove: false,
+					tid:        0,
+					fullPath:   "/target_dir/nested/deeper",
+				},
+			},
+			[]*ProbeEvent{
+				{
+					// shouldn't add to cache
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskMonitor:  1,
+					FileName:     "target_dir",
+					FileIno:      1,
+					FileDevMajor: 100,
+					FileDevMinor: 100,
+				},
+				{
+					// should add to cache but no event
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskMonitor:  1,
+					FileName:     "target_dir",
+					FileIno:      10,
+					FileDevMajor: 1,
+					FileDevMinor: 1,
+				},
+				{
+					// should add to cache but no event
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskMonitor:  1,
+					FileName:     "track_me",
+					FileIno:      11,
+					FileDevMajor: 1,
+					FileDevMinor: 1,
+				},
+				{
+					// should add to cache but no event
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskMonitor:  1,
+					FileName:     "nested",
+					FileIno:      100,
+					FileDevMajor: 1,
+					FileDevMinor: 1,
+				},
+				{
+					// shouldn't add to cache and no event
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskMonitor:  1,
+					FileName:     "deeper",
+					FileIno:      1000,
+					FileDevMajor: 1,
+					FileDevMinor: 1,
+				},
+				{
+					// should emit create event
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskCreate:     1,
+					ParentDevMinor: 1,
+					ParentIno:      10,
+					ParentDevMajor: 1,
+					FileName:       "test_create",
+					FileIno:        12,
+					FileDevMajor:   1,
+					FileDevMinor:   1,
+				},
+				{
+					// should not emit create event
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskCreate:     1,
+					ParentDevMinor: 1,
+					ParentIno:      100,
+					ParentDevMajor: 1,
+					FileName:       "test_create",
+					FileIno:        101,
+					FileDevMajor:   1,
+					FileDevMinor:   1,
+				},
+				{
+					// should not emit modify event
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskModify:   1,
+					FileIno:      101,
+					FileDevMajor: 1,
+					FileDevMinor: 1,
+				},
+				{
+					// should emit modify event
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskModify:   1,
+					FileIno:      12,
+					FileDevMajor: 1,
+					FileDevMinor: 1,
+				},
+				{
+					// should emit modify event
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskModify:   1,
+					FileIno:      11,
+					FileDevMajor: 1,
+					FileDevMinor: 1,
+				},
+				{
+					// should not emit attrib event
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskAttrib:   1,
+					FileIno:      101,
+					FileDevMajor: 1,
+					FileDevMinor: 1,
+				},
+				{
+					// should emit attrib event
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskAttrib:   1,
+					FileIno:      11,
+					FileDevMajor: 1,
+					FileDevMinor: 1,
+				},
+				{
+					// should emit delete event
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskDelete:     1,
+					ParentDevMinor: 1,
+					ParentIno:      10,
+					ParentDevMajor: 1,
+					FileName:       "test_create",
+				},
+				{
+					// should not emit delete event
+					Meta: tracing.Metadata{
+						PID: 1,
+						TID: 1,
+					},
+					MaskDelete:     1,
+					ParentDevMinor: 1,
+					ParentIno:      100,
+					ParentDevMajor: 1,
+					FileName:       "test_create",
+				},
+			},
+			[]emitted{
+				{
+					path: "/target_dir/test_create",
+					pid:  1,
+					op:   unix.IN_CREATE,
+				},
+				{
+					path: "/target_dir/test_create",
+					pid:  1,
+					op:   unix.IN_MODIFY,
+				},
+				{
+					path: "/target_dir/track_me",
+					pid:  1,
+					op:   unix.IN_MODIFY,
+				},
+				{
+					path: "/target_dir/track_me",
+					pid:  1,
+					op:   unix.IN_ATTRIB,
+				},
+				{
+					path: "/target_dir/test_create",
+					pid:  1,
+					op:   unix.IN_DELETE,
+				},
+			},
+			false,
+		},
 	}
 
 	for _, c := range cases {
@@ -391,7 +635,6 @@ func Test_EventProcessor_process(t *testing.T) {
 			})
 
 			mockPathTraverser.On("WalkAsync", mock.Anything, mock.Anything, mock.Anything).Run(func(args mock.Arguments) {
-
 				pid := args.Get(2).(uint32)
 
 				c.statMatches = append(c.statMatches, statMatch{
