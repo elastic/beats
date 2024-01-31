@@ -205,6 +205,8 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 *Packetbeat*
 
 - Bump Windows Npcap version to v1.79. {pull}37733[37733]
+- Add metrics for TCP flags. {issue}36992[36992] {pull}36975[36975]
+- Add support for pipeline loading. {pull}37291[37291]
 
 *Packetbeat*
 
