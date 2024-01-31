@@ -1,11 +1,46 @@
 #!/bin/bash
 set -euo pipefail
 
+source .buildkite/scripts/setenv.sh
+
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
 BIN="${WORKSPACE}/bin"
 platform_type="$(uname)"
 platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
+GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
+ONLY_DOCS=${ONLY_DOCS:-"true"}
+UI_MACOS_TESTS="$(buildkite-agent meta-data get UI_MACOS_TESTS --default ${UI_MACOS_TESTS:-"false"})"
+runAllStages="$(buildkite-agent meta-data get runAllStages --default ${runAllStages:-"false"})"
+metricbeat_changeset=(
+  "^metricbeat/.*"
+  "^go.mod"
+  "^pytest.ini"
+  "^dev-tools/.*"
+  "^libbeat/.*"
+  "^testing/.*"
+  )
+oss_changeset=(
+  "^go.mod"
+  "^pytest.ini"
+  "^dev-tools/.*"
+  "^libbeat/.*"
+  "^testing/.*"
+)
+ci_changeset=(
+  "^.buildkite/.*"
+)
+go_mod_changeset=(
+  "^go.mod"
+  )
+docs_changeset=(
+  ".*\\.(asciidoc|md)"
+  "deploy/kubernetes/.*-kubernetes\\.yaml"
+  )
+packaging_changeset=(
+  "^dev-tools/packaging/.*"
+  ".go-version"
+  )
 
 with_docker_compose() {
   local version=$1
@@ -192,3 +227,18 @@ are_conditions_met_packaging() {
     return 1
   fi
 }
+
+if ! are_changed_only_paths "${docs_changeset[@]}" ; then
+  ONLY_DOCS="false"
+  echo "Changes include files outside the docs_changeset vairiabe. ONLY_DOCS=$ONLY_DOCS."
+else
+  echo "All changes are related to DOCS. ONLY_DOCS=$ONLY_DOCS."
+fi
+
+if are_paths_changed "${go_mod_changeset[@]}" ; then
+  GO_MOD_CHANGES="true"
+fi
+
+if are_paths_changed "${packaging_changeset[@]}" ; then
+  PACKAGING_CHANGES="true"
+fi
