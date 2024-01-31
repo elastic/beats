@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"runtime"
 	"syscall"
 	"time"
 
@@ -33,7 +32,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type reader struct {
+type fsNotifyReader struct {
 	watcher monitor.Watcher
 	config  Config
 	eventC  chan Event
@@ -42,28 +41,7 @@ type reader struct {
 	parsers []FileParser
 }
 
-// NewEventReader creates a new EventProducer backed by fsnotify.
-func NewEventReader(c Config) (EventProducer, error) {
-
-	if runtime.GOOS == "linux" {
-		switch c.ForceBackend {
-		case BackendKProbes:
-			return &kProbesReader{
-				config:  c,
-				log:     logp.NewLogger(moduleName),
-				parsers: FileParsers(c),
-			}, nil
-		}
-	}
-
-	return &reader{
-		config:  c,
-		log:     logp.NewLogger(moduleName),
-		parsers: FileParsers(c),
-	}, nil
-}
-
-func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
+func (r *fsNotifyReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	watcher, err := monitor.New(r.config.Recursive, r.config.IsExcludedPath)
 	if err != nil {
 		return nil, err
@@ -118,7 +96,7 @@ func (r *reader) Start(done <-chan struct{}) (<-chan Event, error) {
 	return r.eventC, nil
 }
 
-func (r *reader) enqueueEvents(done <-chan struct{}) (events []*Event) {
+func (r *fsNotifyReader) enqueueEvents(done <-chan struct{}) (events []*Event) {
 	for {
 		ev := r.nextEvent(done)
 		if ev == nil {
@@ -128,7 +106,7 @@ func (r *reader) enqueueEvents(done <-chan struct{}) (events []*Event) {
 	}
 }
 
-func (r *reader) consumeEvents(done <-chan struct{}) {
+func (r *fsNotifyReader) consumeEvents(done <-chan struct{}) {
 	defer close(r.eventC)
 	defer r.watcher.Close()
 
@@ -142,7 +120,7 @@ func (r *reader) consumeEvents(done <-chan struct{}) {
 	}
 }
 
-func (r *reader) nextEvent(done <-chan struct{}) *Event {
+func (r *fsNotifyReader) nextEvent(done <-chan struct{}) *Event {
 	for {
 		select {
 		case <-done:
