@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source .buildkite/scripts/common.sh
+
 set -euo pipefail
 
 SETUP_GVM_VERSION="v0.5.1"
