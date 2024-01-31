@@ -46,10 +46,10 @@ func TestProduceConsumer(t *testing.T) {
 	maxEvents := 1024
 	minEvents := 32
 
-	rand.Seed(seed)
-	events := rand.Intn(maxEvents-minEvents) + minEvents
-	batchSize := rand.Intn(events-8) + 4
-	bufferSize := rand.Intn(batchSize*2) + 4
+	randGen := rand.New(rand.NewSource(seed))
+	events := randGen.Intn(maxEvents-minEvents) + minEvents
+	batchSize := randGen.Intn(events-8) + 4
+	bufferSize := randGen.Intn(batchSize*2) + 4
 
 	// events := 4
 	// batchSize := 1
