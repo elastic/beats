@@ -1650,3 +1650,12 @@ Example configuration:
 -------------------------------------------------------------------------------------
 packetbeat.shutdown_timeout: 5s
 -------------------------------------------------------------------------------------
+
+[float]
+==== `overwrite_pipelines`
+
+By default Ingest pipelines are not updated if a pipeline with the same ID
+already exists. If this option is enabled {beatname_uc} overwrites pipelines
+every time a new Elasticsearch connection is established.
+
+The default value is `false`.

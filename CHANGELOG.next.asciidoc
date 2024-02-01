@@ -56,6 +56,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Support build of projects outside of beats directory {pull}36126[36126]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Upgrade elastic-agent-libs to v0.7.5. Removes obsolete "Treating the CommonName field on X.509 certificates as a host name..." deprecation warning for 8.0. {pull}37755[37755]
+- aws: Add credential caching for `AssumeRole` session tokens. {issue}37787[37787]
 
 *Auditbeat*
 
@@ -77,10 +78,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
 - Fix m365_defender cursor value and query building. {pull}37116[37116]
 - Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
+- Update github.com/lestrrat-go/jwx dependency. {pull}37799[37799]
 
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Fix setuid root when running under cgroups v2. {pull}37794[37794]
 
 *Metricbeat*
 
@@ -174,6 +177,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Update CEL extensions library to v1.8.0 to provide runtime error location reporting. {issue}37304[37304] {pull}37718[37718]
 - Add request trace logging for chained API requests. {issue}37551[36551] {pull}37682[37682]
 - Relax TCP/UDP metric polling expectations to improve metric collection. {pull}37714[37714]
+- Add support for PEM-based Okta auth in HTTPJSON. {pull}37772[37772]
 
 *Auditbeat*
 
@@ -205,6 +209,8 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 *Packetbeat*
 
 - Bump Windows Npcap version to v1.79. {pull}37733[37733]
+- Add metrics for TCP flags. {issue}36992[36992] {pull}36975[36975]
+- Add support for pipeline loading. {pull}37291[37291]
 
 *Packetbeat*
 
