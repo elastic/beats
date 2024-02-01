@@ -89,47 +89,47 @@ var (
 	bootID     = mustReadBootID()
 	pidNsInode = mustReadPidNsInode()
 	capNames   = []string{
-		"CAP_CHOWN",              // 0
-		"CAP_DAC_OVERRIDE",       // 1
-		"CAP_DAC_READ_SEARCH",    // 2
-		"CAP_FOWNER",             // 3
-		"CAP_FSETID",             // 4
-		"CAP_KILL",               // 5
-		"CAP_SETGID",             // 6
-		"CAP_SETUID",             // 7
-		"CAP_SETPCAP",            // 8
-		"CAP_LINUX_IMMUTABLE",    // 9
-		"CAP_NET_BIND_SERVICE",   // 10
-		"CAP_NET_BROADCAST",      // 11
-		"CAP_NET_ADMIN",          // 12
-		"CAP_NET_RAW",            // 13
-		"CAP_IPC_LOCK",           // 14
-		"CAP_IPC_OWNER",          // 15
-		"CAP_SYS_MODULE",         // 16
-		"CAP_SYS_RAWIO",          // 17
-		"CAP_SYS_CHROOT",         // 18
-		"CAP_SYS_PTRACE",         // 19
-		"CAP_SYS_PACCT",          // 20
-		"CAP_SYS_ADMIN",          // 21
-		"CAP_SYS_BOOT",           // 22
-		"CAP_SYS_NICE",           // 23
-		"CAP_SYS_RESOURCE",       // 24
-		"CAP_SYS_TIME",           // 25
-		"CAP_SYS_TTY_CONFIG",     // 26
-		"CAP_MKNOD",              // 27
-		"CAP_LEASE",              // 28
-		"CAP_AUDIT_WRITE",        // 29
-		"CAP_AUDIT_CONTROL",      // 30
-		"CAP_SETFCAP",            // 31
-		"CAP_MAC_OVERRIDE",       // 32
-		"CAP_MAC_ADMIN",          // 33
-		"CAP_SYSLOG",             // 34
-		"CAP_WAKE_ALARM",         // 35
-		"CAP_BLOCK_SUSPEND",      // 36
-		"CAP_AUDIT_READ",         // 37
-		"CAP_PERFMON",            // 38
-		"CAP_BPF",                // 39
-		"CAP_CHECKPOINT_RESTORE", // 40
+		0:  "CAP_CHOWN",
+		1:  "CAP_DAC_OVERRIDE",
+		2:  "CAP_DAC_READ_SEARCH",
+		3:  "CAP_FOWNER",
+		4:  "CAP_FSETID",
+		5:  "CAP_KILL",
+		6:  "CAP_SETGID",
+		7:  "CAP_SETUID",
+		8:  "CAP_SETPCAP",
+		9:  "CAP_LINUX_IMMUTABLE",
+		10: "CAP_NET_BIND_SERVICE",
+		11: "CAP_NET_BROADCAST",
+		12: "CAP_NET_ADMIN",
+		13: "CAP_NET_RAW",
+		14: "CAP_IPC_LOCK",
+		15: "CAP_IPC_OWNER",
+		16: "CAP_SYS_MODULE",
+		17: "CAP_SYS_RAWIO",
+		18: "CAP_SYS_CHROOT",
+		19: "CAP_SYS_PTRACE",
+		20: "CAP_SYS_PACCT",
+		21: "CAP_SYS_ADMIN",
+		22: "CAP_SYS_BOOT",
+		23: "CAP_SYS_NICE",
+		24: "CAP_SYS_RESOURCE",
+		25: "CAP_SYS_TIME",
+		26: "CAP_SYS_TTY_CONFIG",
+		27: "CAP_MKNOD",
+		28: "CAP_LEASE",
+		29: "CAP_AUDIT_WRITE",
+		30: "CAP_AUDIT_CONTROL",
+		31: "CAP_SETFCAP",
+		32: "CAP_MAC_OVERRIDE",
+		33: "CAP_MAC_ADMIN",
+		34: "CAP_SYSLOG",
+		35: "CAP_WAKE_ALARM",
+		36: "CAP_BLOCK_SUSPEND",
+		37: "CAP_AUDIT_READ",
+		38: "CAP_PERFMON",
+		39: "CAP_BPF",
+		40: "CAP_CHECKPOINT_RESTORE",
 		// The ECS spec allows for numerical string representation.
 		// The following capability values are not assigned as of Dec 28, 2023.
 		// If they are added in a future kernel, and this slice has not been
@@ -276,7 +276,7 @@ func basename(pathStr string) string {
 	return path.Base(pathStr)
 }
 
-func (db *DB) InsertFork(fork types.ProcessForkEvent) error {
+func (db *DB) InsertFork(fork types.ProcessForkEvent) {
 	db.Lock()
 	defer db.Unlock()
 
@@ -295,8 +295,6 @@ func (db *DB) InsertFork(fork types.ProcessForkEvent) error {
 			Creds: credInfoFromProto(fork.Creds),
 		}
 	}
-
-	return nil
 }
 
 func (db *DB) insertProcess(process Process) {
@@ -311,7 +309,7 @@ func (db *DB) insertProcess(process Process) {
 	}
 }
 
-func (db *DB) InsertExec(exec types.ProcessExecEvent) error {
+func (db *DB) InsertExec(exec types.ProcessExecEvent) {
 	db.Lock()
 	defer db.Unlock()
 
@@ -330,8 +328,6 @@ func (db *DB) InsertExec(exec types.ProcessExecEvent) error {
 	if entryLeaderPid != nil {
 		db.entryLeaderRelationships[exec.Pids.Tgid] = *entryLeaderPid
 	}
-
-	return nil
 }
 
 func (db *DB) createEntryLeader(pid uint32, entryType EntryType) {
@@ -440,7 +436,7 @@ func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 	return nil
 }
 
-func (db *DB) InsertSetsid(setsid types.ProcessSetsidEvent) error {
+func (db *DB) InsertSetsid(setsid types.ProcessSetsidEvent) {
 	db.Lock()
 	defer db.Unlock()
 
@@ -452,11 +448,9 @@ func (db *DB) InsertSetsid(setsid types.ProcessSetsidEvent) error {
 			Pids: pidInfoFromProto(setsid.Pids),
 		}
 	}
-
-	return nil
 }
 
-func (db *DB) InsertExit(exit types.ProcessExitEvent) error {
+func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	db.Lock()
 	defer db.Unlock()
 
@@ -464,7 +458,6 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) error {
 	delete(db.processes, pid)
 	delete(db.entryLeaders, pid)
 	delete(db.entryLeaderRelationships, pid)
-	return nil
 }
 
 // TODO: is this the correct definition? I looked in endpoint and I swear it looks too simple/generalized
