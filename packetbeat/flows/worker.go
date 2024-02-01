@@ -348,7 +348,7 @@ func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOve
 		"id":    common.NetString(f.id.Serialize()),
 		"final": isOver,
 	}
-	if killReason != -1 {
+	if killReason != NoKill {
 		flow["kill_reason"] = killReason.String()
 	}
 	fields := mapstr.M{
