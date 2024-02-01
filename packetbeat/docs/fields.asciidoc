@@ -17295,6 +17295,15 @@ type: boolean
 --
 Internal flow ID based on connection meta data and address.
 
+--
+
+*`flow.kill_reason`*::
++
+--
+Indicates why a flow was killed, when a flow is killed. This field is not added for intermediate flow events.
+IdleTimeout: The Flow was terminated because it was considered to be idle.
+ActiveTimeout: The Flow was terminated for reporting purposes while it was still active.
+
 
 --
 
