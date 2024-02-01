@@ -61,6 +61,7 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Upgrade elastic-agent-libs to v0.7.5. Removes obsolete "Treating the CommonName field on X.509 certificates as a host name..." deprecation warning for 8.0. {pull}37755[37755]
 - aws: Add credential caching for `AssumeRole` session tokens. {issue}37787[37787]
+- Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 
 *Auditbeat*
 
