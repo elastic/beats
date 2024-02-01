@@ -35,6 +35,7 @@ fi
 with_go "${GO_VERSION}"
 with_mage
 with_python
+with_dependencies
 
 #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
 #sudo chmod -R go-w "${BEATS_PROJECT_NAME}/"     #fix the fulesystem permissions issue like this:https://buildkite.com/elastic/beats-metricbeat/builds/1154#018d12db-dc0c-4bcd-b9b4-d5dece0b42c6/272-1267
