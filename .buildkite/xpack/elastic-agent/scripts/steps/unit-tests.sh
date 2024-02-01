@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-source "$PIPELINE_DIR/scripts/steps/common.sh"
+source ".buildkite/xpack/elastic-agent/scripts/steps/common.sh"
 
-PIPELINE_DIR="$WORKSPACE/.buildkite/xpack/elastic-agent"
 SOURCE_DIR="$WORKSPACE/xpack/elastic-agent"
 
 echo "--- Unit tests"
