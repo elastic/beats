@@ -6,7 +6,7 @@ env:
   IMAGE_WIN_2016: "family/core-windows-2016"
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
-  IMAGE_MACOS_13: "generic-13-ventura-x64"
+  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
 
 steps:
   - group: "Filebeat Mandatory Testing"
@@ -105,7 +105,7 @@ steps:
               context: "Filebeat/Extended: MacOS Unit Tests"
         agents:
           provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_13}"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths: "filebeat/build/*.xml"
 
   - group: "Windows Extended Testing"

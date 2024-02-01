@@ -8,6 +8,5 @@ source .buildkite/env-scripts/macos-env.sh
 echo ":: Execute Unit Tests ::"
 sudo chmod -R go-w filebeat/
 
-cd filebeat
 umask 0022
-mage build unitTest
+mage -d filebeat unitTest
