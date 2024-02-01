@@ -8,7 +8,7 @@ git reset --quiet --hard
 $env:GOTMPDIR = "$env:BUILDKITE_BUILD_CHECKOUT_PATH"
 
 Write-Host "--- Build"
-mage -d "$env:SOURCE_DIR" build
+mage -d "x-pack\\elastic-agent" build
 
 if ($LASTEXITCODE -ne 0) {
   exit 1 
