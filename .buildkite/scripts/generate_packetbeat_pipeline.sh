@@ -64,9 +64,9 @@ steps:
         key: "extended-arm64-unit-test"
         command: ".buildkite/scripts/unit_tests.sh"
         agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_ARM_64}"
-          machineType: "c2-standard-16"
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "t4g.xlarge"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 # YAML

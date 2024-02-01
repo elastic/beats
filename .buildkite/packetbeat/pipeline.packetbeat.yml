@@ -30,7 +30,7 @@ steps:
     #     - label: "False"
     #       value: "false"
     #   default: "false"
-    # if: "build.source == 'ui'"
+    if: "build.source == 'ui'"
 
   - wait: ~
     if: "build.source == 'ui'"
