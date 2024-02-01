@@ -78,7 +78,7 @@ require (
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.4.0
 	github.com/elastic/go-structform v0.0.10
-	github.com/elastic/go-sysinfo v1.11.2
+	github.com/elastic/go-sysinfo v1.12.0
 	github.com/elastic/go-ucfg v0.8.6
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.15.0
@@ -416,9 +416,6 @@ replace (
 	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 	k8s.io/kubernetes v1.13.0 => k8s.io/kubernetes v1.24.15
 )
-
-// TODO: remove once https://github.com/elastic/go-sysinfo/pull/199 and new version of library is released.
-replace github.com/elastic/go-sysinfo => github.com/ycombinator/go-sysinfo v0.0.0-20240125195429-01b75c6787f0
 
 // Exclude this version because the version has an invalid checksum.
 exclude github.com/docker/distribution v2.8.0+incompatible
