@@ -198,12 +198,13 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 	// don't require 'complicated' logic.
 	logReader, err := newFileReader(log, canceler, f, inp.readerConfig, closerCfg)
 	if err != nil {
+		_ = f.Close()
 		return nil, err
 	}
 
 	dbgReader, err := debug.AppendReaders(logReader)
 	if err != nil {
-		f.Close()
+		_ = f.Close()
 		return nil, err
 	}
 
@@ -221,7 +222,7 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 		MaxBytes:   encReaderMaxBytes,
 	})
 	if err != nil {
-		f.Close()
+		_ = f.Close()
 		return nil, err
 	}
 
@@ -261,11 +262,13 @@ func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*o
 
 	fi, err = f.Stat()
 	if err != nil {
+		_ = f.Close()
 		return nil, nil, fmt.Errorf("failed to stat source file %s: %w", path, err)
 	}
 
 	err = checkFileBeforeOpening(fi)
 	if err != nil {
+		_ = f.Close()
 		return nil, nil, err
 	}
 
@@ -275,12 +278,13 @@ func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*o
 	}
 	err = inp.initFileOffset(f, offset)
 	if err != nil {
+		_ = f.Close()
 		return nil, nil, err
 	}
 
 	encoding, err := inp.encodingFactory(f)
 	if err != nil {
-		f.Close()
+		_ = f.Close()
 		if errors.Is(err, transform.ErrShortSrc) {
 			return nil, nil, fmt.Errorf("initialising encoding for '%v' failed due to file being too short", f)
 		}
