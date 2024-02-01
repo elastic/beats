@@ -39,7 +39,6 @@
   apex:
     enabled: false
     var.initial_interval: 1d
-    var.log_file_interval: Hourly
     var.api_version: 56
 
     var.jwt_authentication_enabled: true
@@ -56,12 +55,14 @@
     var.password: "P@$$W0₹D"
 
     var.url: "https://instance_id.my.salesforce.com"
+    
+    var.event_log_file: true
     var.elf_interval: 1h
+    var.log_file_interval: Hourly
       
   login:
     enabled: false
     var.initial_interval: 1d
-    var.log_file_interval: Hourly
     var.api_version: 56
 
     var.jwt_authentication_enabled: true
@@ -81,13 +82,14 @@
 
     var.event_log_file: true
     var.elf_interval: 1h
+    var.log_file_interval: Hourly
+
     var.real_time: true
     var.real_time_interval: 5m
 
   logout:
     enabled: false
     var.initial_interval: 1d
-    var.log_file_interval: Hourly
     var.api_version: 56
 
     var.jwt_authentication_enabled: true
@@ -107,6 +109,8 @@
 
     var.event_log_file: true
     var.elf_interval: 1h
+    var.log_file_interval: Hourly
+    
     var.real_time: true
     var.real_time_interval: 5m
 
