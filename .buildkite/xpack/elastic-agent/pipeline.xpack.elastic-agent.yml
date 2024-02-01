@@ -78,3 +78,66 @@ steps:
         retry:
           manual:
             allowed: true
+
+      - label: "Unit tests - Windows 2019"
+        key: "unit-tests-win2016"
+        command: |
+          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "build/diagnostics/*"
+          - "coverage.out"
+        agents:
+          provider: "gcp"
+          image: "family/core-windows-2019"
+          machine_type: "n2-standard-8"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        retry:
+          manual:
+            allowed: true
+
+  - group: "Desktop Windows tests"
+    key: "extended-windows"
+    steps:
+      - label: "Unit tests - Windows 10"
+        key: "unit-tests-win2016"
+        command: |
+          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "build/diagnostics/*"
+          - "coverage.out"
+        agents:
+          provider: "gcp"
+          image: "family/general-windows-10"
+          machine_type: "n2-standard-8"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        retry:
+          manual:
+            allowed: true
+
+      - label: "Unit tests - Windows 11"
+        key: "unit-tests-win2016"
+        command: |
+          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "build/diagnostics/*"
+          - "coverage.out"
+        agents:
+          provider: "gcp"
+          image: "family/general-windows-11"
+          machine_type: "n2-standard-8"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        retry:
+          manual:
+            allowed: true
