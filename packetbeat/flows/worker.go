@@ -270,7 +270,7 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 		for flow := table.flows.head; flow != nil; flow = next {
 			next = flow.next
 			killReason := NoKill
-			killFlow := false
+			var killFlow bool
 
 			debugf("handle flow: %v, %v", flow.id.flowIDMeta, flow.id.flowID)
 
