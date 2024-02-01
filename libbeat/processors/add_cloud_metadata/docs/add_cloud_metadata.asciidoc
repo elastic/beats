@@ -58,11 +58,6 @@ List of names the `providers` setting supports:
 - "openstack", "nova", or "huawei" for Openstack Nova (enabled by default).
 - "openstack-ssl", or "nova-ssl" for Openstack Nova when SSL metadata APIs are enabled (enabled by default).
 - "tencent", or "qcloud" for Tencent Cloud (disabled by default).
-<<<<<<< HEAD
-- "huawei" for Huawei Cloud (enabled by default).
-=======
-- "hetzner" for Hetzner Cloud (enabled by default).
->>>>>>> 07c559b703 (Remove huaweicloud - revert #27607 (#35184))
 
 The third optional configuration setting is `overwrite`. When `overwrite` is
 `true`, `add_cloud_metadata` overwrites existing `cloud.*` fields (`false` by
