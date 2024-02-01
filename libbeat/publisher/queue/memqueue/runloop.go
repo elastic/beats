@@ -278,6 +278,9 @@ func (l *runLoop) handleCancel(req *producerCancelRequest) {
 		buf[index].event = nil
 	}
 
+	// Subtract removed events from the internal event count
+	l.eventCount -= removedCount
+
 	// signal cancel request being finished
 	if req.resp != nil {
 		req.resp <- producerCancelResponse{removed: removedCount}
