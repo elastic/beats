@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+REPO="beats"
 SETUP_GVM_VERSION="v0.5.1"
 WORKSPACE="$(pwd)"
 BIN="${WORKSPACE}/bin"

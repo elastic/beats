@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source .buildkite/env-scripts/util.sh
+
+unset_secrets
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" && "$BUILDKITE_STEP_KEY" == package* ]]; then
+    google_cloud_logout_active_account
+    docker logout "${DOCKER_REGISTRY}"
+fi
+
+# Ensure that any temporal files created during any step are removed
+cleanup

@@ -1,12 +1,14 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 env:
-  IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-eng-prod-base-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
   IMAGE_WIN_2016: "family/core-windows-2016"
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  SETUP_MAGE_VERSION: "1.14.0"
+  ASDF_MAGE_VERSION: "1.14.0"
 
 steps:
   - group: "Filebeat Mandatory Testing"
@@ -23,7 +25,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
@@ -37,7 +38,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
@@ -49,9 +49,9 @@ steps:
           - github_commit_status:
               context: "Filebeat: Python Integration Tests"
         agents:
-          provider: "gcp"
+          provider: gcp
+          imageProject: elastic-images-qa
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
