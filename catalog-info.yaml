@@ -23,7 +23,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
   name: buildkite-pipeline-beats
-  description: "Beats Main pipeline"
+  description: 'Beats Main pipeline'
   links:
     - title: Pipeline
       url: https://buildkite.com/elastic/beats
@@ -37,7 +37,7 @@ spec:
     kind: Pipeline
     metadata:
       name: beats
-      description: "Beats Main pipeline"
+      description: 'Beats Main pipeline'
     spec:
       branch_configuration: "main 7.* 8.* v7.* v8.*"
       pipeline_file: ".buildkite/pipeline.yml"
@@ -50,9 +50,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: '!main !7.* !8.*'
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: '!main !7.* !8.*'
       # TODO uncomment this environment variable when pipeline definition is updated
       # env:
       #   ELASTIC_PR_COMMENTS_ENABLED: 'true'
@@ -68,7 +68,7 @@ apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
   name: buildkite-pipeline-metricbeat
-  description: "Beats: Metricbeat pipeline"
+  description: 'Beats: Metricbeat pipeline'
   links:
     - title: Pipeline
       url: https://buildkite.com/elastic/beats-metricbeat
@@ -82,7 +82,7 @@ spec:
     kind: Pipeline
     metadata:
       name: beats-metricbeat
-      description: "Beats Metricbeat pipeline"
+      description: 'Beats Metricbeat pipeline'
     spec:
       branch_configuration: "main 7.* 8.* v7.* v8.*"
       pipeline_file: ".buildkite/metricbeat/pipeline.yml"
@@ -96,9 +96,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: '!main !7.* !8.*'
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: '!main !7.* !8.*'
       # TODO uncomment this environment variable when pipeline definition is updated
       # env:
       #   ELASTIC_PR_COMMENTS_ENABLED: 'true'
@@ -130,9 +130,9 @@ spec:
       name: filebeat
       description: "Filebeat pipeline"
     spec:
-      #      branch_configuration: "main 7.* 8.* v7.* v8.*" TODO: temporarily commented to build PRs from forks
+#      branch_configuration: "main 7.* 8.* v7.* v8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/filebeat/filebeat-pipeline.yml"
-      #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
+#      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
@@ -310,9 +310,9 @@ spec:
       name: beats-libbeat
       description: "Beats libbeat pipeline"
     spec:
-      #      branch_configuration: "main 7.17 8.* v7.17 v8.*" TODO: temporarily commented to build PRs from forks
+#      branch_configuration: "main 7.17 8.* v7.17 v8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/libbeat/pipeline.libbeat.yml"
-      #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
+#      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
@@ -355,9 +355,9 @@ spec:
       name: beats-packetbeat
       description: "Beats packetbeat pipeline"
     spec:
-      #      branch_configuration: "main 7.17 8.* v7.17 v8.*" TODO: temporarily commented to build PRs from forks
+#      branch_configuration: "main 7.17 8.* v7.17 v8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/packetbeat/pipeline.packetbeat.yml"
-      #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
+#      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
@@ -413,7 +413,7 @@ spec:
       cancel_intermediate_builds: true
       cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"      
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
