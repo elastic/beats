@@ -14,6 +14,10 @@ if [[ -z "${SETUP_GVM_VERSION-""}" ]]; then
     SETUP_GVM_VERSION="1.14.0"
 fi
 
+if [[ -z "${GO_VERSION-""}" ]]; then
+    export GO_VERSION=$(cat "${WORKSPACE}/.go-version")
+fi
+
 getOSOptions() {
   case $(uname | tr '[:upper:]' '[:lower:]') in
     linux*)

@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -uo pipefail
+SOURCE_DIR="xpack/elastic-agent"
+PIPELINE_DIR=".buildkite/xpack/elastic-agent"
 
-source .buildkite/xpack/elastic-agent/scripts/steps/common.sh
+source "$PIPELINE_DIR/scripts/steps/common.sh"
 
 echo "--- Unit tests"
-RACE_DETECTOR=true TEST_COVERAGE=true mage build unitTest
+RACE_DETECTOR=true TEST_COVERAGE=true mage -d "$SOURCE_DIR" build unitTest
 TESTS_EXIT_STATUS=$?
 
 exit $TESTS_EXIT_STATUS
