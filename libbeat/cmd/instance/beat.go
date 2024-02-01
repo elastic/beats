@@ -827,7 +827,7 @@ func (b *Beat) configure(settings Settings) error {
 	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 	defer cancel()
 
-	fqdn, err := h.FQDN(fqdnLookupCtx)
+	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
 	if err != nil {
 		// FQDN lookup is "best effort".  We log the error, fallback to
 		// the OS-reported hostname, and move on.

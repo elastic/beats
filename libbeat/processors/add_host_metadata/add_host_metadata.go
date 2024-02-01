@@ -26,6 +26,7 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/go-sysinfo"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
@@ -36,7 +37,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
-	"github.com/elastic/go-sysinfo"
 )
 
 const processorName = "add_host_metadata"
@@ -182,7 +182,7 @@ func (p *addHostMetadata) loadData(checkCache bool, useFQDN bool) error {
 		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
 		defer cancel()
 
-		fqdn, err := h.FQDN(ctx)
+		fqdn, err := h.FQDNWithContext(ctx)
 		if err != nil {
 			// FQDN lookup is "best effort". If it fails, we monitor the failure, fallback to
 			// the OS-reported hostname, and move on.
