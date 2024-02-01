@@ -97,7 +97,7 @@ func (r kProbesReader) Start(done <-chan struct{}) (<-chan Event, error) {
 }
 
 func (r kProbesReader) enqueueEvents(done <-chan struct{}) []*Event {
-	var events []*Event
+	var events []*Event //nolint:prealloc //can't be preallocated as the number of events is unknown
 	for {
 		ev := r.nextEvent(done)
 		if ev == nil {

@@ -176,7 +176,7 @@ func parseMountInfoLine(line string) *mount {
 // struct containing information about the mount.
 func readMountInfo(r io.Reader) (mountPoints, error) {
 	seenMountsByPath := make(map[string]*mount)
-	var mPoints mountPoints
+	var mPoints mountPoints //nolint:prealloc //can't be preallocated as the number of lines is unknown before scan
 
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
