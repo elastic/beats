@@ -51,7 +51,7 @@ func (input) Name() string { return inputName }
 func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 	cfg := src.(*source).cfg
 	if !wantClient(cfg) {
-		return nil
+		return fmt.Errorf("unsupported scheme: %s", cfg.Resource.URL.Scheme)
 	}
 	// return test(cfg.Resource.URL.URL)
 	return nil
@@ -67,7 +67,6 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 			return err
 		}
 	}
-	//return nil
 	return input{}.run(env, src.(*source), cursor, pub)
 }
 
@@ -193,6 +192,8 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 		return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 	}
 
+	// We have a non-empty batch of events to process.
+	metrics.batchesReceived.Add(1)
 	metrics.eventsReceived.Add(uint64(len(events)))
 
 	// Drop events from state. If we fail during the publication,
@@ -223,7 +224,7 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 	// the current cursor object below; it is an array now.
 	delete(state, "cursor")
 
-	//start = time.Now()
+	start = time.Now()
 	var hadPublicationError bool
 	for i, e := range events {
 		event, ok := e.(map[string]interface{})
@@ -267,6 +268,9 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 			// events we have now, with a fallback to the last guaranteed
 			// correctly published cursor.
 		}
+		if i == 0 {
+			metrics.batchesPublished.Add(1)
+		}
 		metrics.eventsPublished.Add(1)
 
 		err = ctx.Err()
@@ -274,6 +278,8 @@ func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics
 			return err
 		}
 	}
+	// calculate batch processing time
+	metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
 
 	// Advance the cursor to the final state if there was no error during
 	// publications. This is needed to transition to the next set of events.
@@ -370,11 +376,12 @@ func wantClient(cfg config) bool {
 
 func formHeader(cfg config) map[string][]string {
 	header := make(map[string][]string)
-	if cfg.Auth.ApiKey != nil {
+	switch {
+	case cfg.Auth.ApiKey != nil:
 		header[cfg.Auth.ApiKey.Header] = []string{cfg.Auth.ApiKey.Value}
-	} else if cfg.Auth.BearerToken != "" {
+	case cfg.Auth.BearerToken != "":
 		header["Authorization"] = []string{"Bearer " + cfg.Auth.BearerToken}
-	} else if cfg.Auth.BasicToken != "" {
+	case cfg.Auth.BasicToken != "":
 		header["Authorization"] = []string{"Basic " + cfg.Auth.BasicToken}
 	}
 	return header
