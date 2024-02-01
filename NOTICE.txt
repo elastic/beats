@@ -20363,11 +20363,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/lestrrat-go/jwx/v2
-Version: v2.0.11
+Version: v2.0.19
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/lestrrat-go/jwx/v2@v2.0.11/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/lestrrat-go/jwx/v2@v2.0.19/LICENSE:
 
 The MIT License (MIT)
 
@@ -45913,11 +45913,11 @@ Contents of probable licence file $GOMODCACHE/github.com/kylelemons/godebug@v1.1
 
 --------------------------------------------------------------------------------
 Dependency : github.com/lestrrat-go/blackmagic
-Version: v1.0.1
+Version: v1.0.2
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/lestrrat-go/blackmagic@v1.0.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/lestrrat-go/blackmagic@v1.0.2/LICENSE:
 
 MIT License
 
