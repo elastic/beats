@@ -13,7 +13,8 @@
 # Authentication Configurations:
 # JWT Authentication:
 # - jwt_enabled: Set to true if JWT authentication is enabled, if false, user-password authentication will be used
-# - client_id: Client ID for JWT and user-password authentication
+# - client_id: Client ID for JWT authentication
+
 # - client_username: Username for JWT authentication
 # - client_key_path: Path to client key for JWT authentication
 # - jwt_url: Audience URL for JWT authentication
