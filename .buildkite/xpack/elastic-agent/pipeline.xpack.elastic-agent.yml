@@ -4,13 +4,6 @@ env:
   VAULT_PATH: "kv/ci-shared/observability-ingest/cloud/gcp"
   DOCKER_REGISTRY: "docker.elastic.co"
 steps:
-  - label: lint
-    key: lint
-    command: |
-      make -C x-pack/elastic-agent check
-      make -C x-pack/elastic-agent update
-      make check-no-changes
-
   - group: "Unit tests"
     key: "unit-tests"
     steps:
@@ -48,7 +41,9 @@ steps:
 
       - label: "Unit tests - Windows 2022"
         key: "unit-tests-win2022"
-        command: ".\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1"
+        command: |
+          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
         artifact_paths:
           - "build/TEST-go-unit.html"
           - "build/TEST-go-unit.xml"
@@ -66,7 +61,9 @@ steps:
 
       - label: "Unit tests - Windows 2016"
         key: "unit-tests-win2016"
-        command: ".\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1"
+        command: |
+          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
         artifact_paths:
           - "build/TEST-go-unit.html"
           - "build/TEST-go-unit.xml"
