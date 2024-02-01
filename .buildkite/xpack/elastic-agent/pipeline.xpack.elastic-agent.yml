@@ -80,7 +80,7 @@ steps:
             allowed: true
 
       - label: "Unit tests - Windows 2019"
-        key: "unit-tests-win2016"
+        key: "unit-tests-win2019"
         command: |
           .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\install_mage.ps1
           .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
@@ -103,7 +103,7 @@ steps:
     key: "extended-windows"
     steps:
       - label: "Unit tests - Windows 10"
-        key: "unit-tests-win2016"
+        key: "unit-tests-win10"
         command: |
           .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\install_mage.ps1
           .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
@@ -123,7 +123,7 @@ steps:
             allowed: true
 
       - label: "Unit tests - Windows 11"
-        key: "unit-tests-win2016"
+        key: "unit-tests-win11"
         command: |
           .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\install_mage.ps1
           .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
