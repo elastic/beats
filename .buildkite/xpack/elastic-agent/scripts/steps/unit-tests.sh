@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -uo pipefail
-SOURCE_DIR="xpack/elastic-agent"
-PIPELINE_DIR=".buildkite/xpack/elastic-agent"
+SOURCE_DIR="$WORKSPACE/xpack/elastic-agent"
+PIPELINE_DIR="$WORKSPACE/.buildkite/xpack/elastic-agent"
 
 source "$PIPELINE_DIR/scripts/steps/common.sh"
 

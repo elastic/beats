@@ -8,10 +8,10 @@ if [[ -z "${WORKSPACE-""}" ]]; then
 fi
 
 if [[ -z "${SETUP_MAGE_VERSION-""}" ]]; then
-    SETUP_MAGE_VERSION="v0.5.0"
+    SETUP_MAGE_VERSION="1.14.0"
 fi
 if [[ -z "${SETUP_GVM_VERSION-""}" ]]; then
-    SETUP_GVM_VERSION="1.14.0"
+    SETUP_GVM_VERSION="v0.5.2"
 fi
 
 if [[ -z "${GO_VERSION-""}" ]]; then

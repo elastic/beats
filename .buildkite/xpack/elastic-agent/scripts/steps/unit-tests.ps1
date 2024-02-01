@@ -6,8 +6,8 @@ git rm --quiet --cached -r .
 git reset --quiet --hard
 
 $env:GOTMPDIR = "$env:BUILDKITE_BUILD_CHECKOUT_PATH"
-$env:SOURCE_DIR=".\\xpack\\elastic-agent"
-$env:PIPELINE_DIR=".\\.buildkite\\xpack\\elastic-agent"
+$env:SOURCE_DIR="$env:BUILDKITE_BUILD_CHECKOUT_PATH\\xpack\\elastic-agent"
+$env:PIPELINE_DIR="$env:BUILDKITE_BUILD_CHECKOUT_PATH\\.buildkite\\xpack\\elastic-agent"
 
 Write-Host "--- Build"
 mage -d "$env:SOURCE_DIR" build
