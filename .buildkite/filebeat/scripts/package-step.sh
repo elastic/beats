@@ -25,8 +25,9 @@ if are_files_changed "$changeset"; then
           - github_commit_status:
               context: "Filebeat/Packaging: Linux X86"
         agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          provider: gcp
+          imageProject: elastic-images-qa
+          image: family/platform-ingest-eng-prod-base-ubuntu-2204
 
       - label: ":linux: Packaging Linux ARM"
         key: "package-linux-arm"
