@@ -57,6 +57,11 @@ var ec2MetadataFetcher = provider{
 
 	Local: true,
 
+	ServiceExists: func() bool {
+		// TODO: implement actual logic
+		return true
+	},
+
 	Create: func(_ string, config *conf.C) (metadataFetcher, error) {
 		ec2Schema := func(m map[string]interface{}) mapstr.M {
 			m["service"] = mapstr.M{

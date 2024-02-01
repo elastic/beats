@@ -69,8 +69,10 @@ func New(c *cfg.C) (beat.Processor, error) {
 		return nil, fmt.Errorf("TLS configuration load: %w", err)
 	}
 
+	logger := logp.NewLogger("add_cloud_metadata")
+
 	initProviders := selectProviders(config.Providers, cloudMetaProviders)
-	fetchers, err := setupFetchers(initProviders, c)
+	fetchers, err := setupFetchers(initProviders, c, logger)
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +83,7 @@ func New(c *cfg.C) (beat.Processor, error) {
 			tlsConfig: tlsConfig,
 			overwrite: config.Overwrite,
 		},
-		logger: logp.NewLogger("add_cloud_metadata"),
+		logger: logger,
 	}
 
 	go p.init()

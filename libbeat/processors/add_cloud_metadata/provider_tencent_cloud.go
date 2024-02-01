@@ -29,6 +29,11 @@ var qcloudMetadataFetcher = provider{
 
 	Local: false,
 
+	ServiceExists: func() bool {
+		// TODO: implement actual logic
+		return true
+	},
+
 	Create: func(_ string, c *conf.C) (metadataFetcher, error) {
 		qcloudMetadataHost := "metadata.tencentyun.com"
 		qcloudMetadataInstanceIDURI := "/meta-data/instance-id"
