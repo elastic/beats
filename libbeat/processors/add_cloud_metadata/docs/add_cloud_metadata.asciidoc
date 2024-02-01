@@ -21,7 +21,7 @@ The following cloud providers are supported:
 - Openstack Nova
 - Hetzner Cloud
 
-NOTE: `Huawei` is an alias for `OpenStack`. Huawei cloud runs on OpenStack platform, and when
+NOTE: `huawei` is an alias for `openstack`. Huawei cloud runs on OpenStack platform, and when
 viewed from a metadata API standpoint, it is impossible to differentiate it from OpenStack. If you know that your
 deployments run on Huawei Cloud exclusively, and you wish to have `cloud.provider` value as `huawei`, you can achieve
 this by overwriting the value using an `add_fields` processor.
