@@ -143,6 +143,8 @@ type Flows struct {
 	KeepNull      bool                    `config:"keep_null"`
 	// Index is used to overwrite the index where flows are published
 	Index string `config:"index"`
+	// Enabling Active Flow Timeout will kill flow once the TImeout is reached irrespective of when traffic was last seen on the flow
+	EnableActiveFlowTimeout bool `config:"enable_active_flow_timeout`
 }
 
 type ProtocolCommon struct {

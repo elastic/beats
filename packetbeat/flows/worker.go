@@ -45,6 +45,21 @@ type worker struct {
 	run  func(*worker)
 }
 
+type flowKillReason int
+
+const (
+	// Flow was not killed
+	NoKill flowKillReason = iota
+	// The Flow was terminated because it was considered to be idle.
+	IdleTimeout
+	// The Flow was terminated for reporting purposes while it was still active.
+	ActiveTimeout
+)
+
+func (f flowKillReason) String() string {
+	return [...]string{"NoKill", "IdleTimeout", "ActiveTimeout"}[f]
+}
+
 // newWorker returns a handle to a worker to run fn.
 func newWorker(fn func(w *worker)) *worker {
 	return &worker{
@@ -127,7 +142,7 @@ func (w *worker) periodically(tick time.Duration, fn func() error) {
 // reporting will be done at flow lifetime end.
 // Flows are published via the pub Reporter after being enriched with process information
 // by watcher.
-func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMetaTable, counters *counterReg, timeout, period time.Duration) (*worker, error) {
+func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMetaTable, counters *counterReg, timeout, period time.Duration, enableActiveFlowTimeout bool) (*worker, error) {
 	if timeout < time.Second {
 		return nil, ErrInvalidTimeout
 	}
@@ -168,7 +183,7 @@ func newFlowsWorker(pub Reporter, watcher *procs.ProcessesWatcher, table *flowMe
 	}
 	processor.spool.init(pub, defaultBatchSize)
 
-	return makeWorker(processor, tick, ticksTimeout, ticksPeriod, 10)
+	return makeWorker(processor, tick, ticksTimeout, ticksPeriod, 10, enableActiveFlowTimeout)
 }
 
 // gcd returns the greatest common divisor of a and b.
@@ -182,9 +197,9 @@ func gcd(a, b time.Duration) time.Duration {
 // makeWorker returns a worker that runs processor.execute each tick. Each timeout'th tick,
 // the worker will check flow timeouts and each period'th tick, the worker will report flow
 // events to be published.
-func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period int, align int64) (*worker, error) {
+func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period int, align int64, enableActiveFlowTimeout bool) (*worker, error) {
 	return newWorker(func(w *worker) {
-		defer processor.execute(w, false, true, true)
+		defer processor.execute(w, false, true, true, false)
 
 		if align > 0 {
 			// Wait until the current time rounded up to nearest align seconds.
@@ -214,7 +229,7 @@ func makeWorker(processor *flowsProcessor, tick time.Duration, timeout, period i
 				nPeriod = period
 			}
 
-			processor.execute(w, handleTimeout, handleReports, false)
+			processor.execute(w, handleTimeout, handleReports, false, enableActiveFlowTimeout)
 			return nil
 		})
 	}), nil
@@ -228,7 +243,7 @@ type flowsProcessor struct {
 	timeout  time.Duration
 }
 
-func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastReport bool) {
+func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastReport, enableActiveFlowTimeout bool) {
 	if !checkTimeout && !handleReports {
 		return
 	}
@@ -254,13 +269,16 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 		var next *biFlow
 		for flow := table.flows.head; flow != nil; flow = next {
 			next = flow.next
+			killReason := NoKill
+			killFlow := false
 
 			debugf("handle flow: %v, %v", flow.id.flowIDMeta, flow.id.flowID)
 
 			reportFlow := handleReports
 			isOver := lastReport
 			if checkTimeout {
-				if ts.Sub(flow.ts) > fw.timeout {
+				killReason, killFlow = shouldKillFlow(flow, fw, ts, enableActiveFlowTimeout)
+				if killFlow {
 					debugf("kill flow")
 
 					reportFlow = true
@@ -272,7 +290,7 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 
 			if reportFlow {
 				debugf("report flow")
-				fw.report(w, ts, flow, isOver, intNames, uintNames, floatNames)
+				fw.report(w, ts, flow, isOver, intNames, uintNames, floatNames, killReason)
 			}
 		}
 	}
@@ -280,14 +298,35 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 	fw.spool.flush()
 }
 
-func (fw *flowsProcessor) report(w *worker, ts time.Time, flow *biFlow, isOver bool, intNames, uintNames, floatNames []string) {
-	event := createEvent(fw.watcher, ts, flow, isOver, intNames, uintNames, floatNames)
+func shouldKillFlow(flow *biFlow, fw *flowsProcessor, ts time.Time, activeFlowTimeout bool) (flowKillReason, bool) {
+	if ts.Sub(flow.ts) > fw.timeout {
+		debugf("Killing flow because no traffic was seen since %v, flowid: %s", flow.ts, common.NetString(flow.id.Serialize()))
+		return IdleTimeout, true
+	}
+
+	if !activeFlowTimeout {
+		// Return NoKill because we do not kill the flow in this case
+		return NoKill, false
+	}
+
+	/*
+		// TODO: need to check if we need this condition to prevent flows of very small durations
+			if ts.Sub(flow.createTS) > fw.timeout {
+				debugf("Killing flow because active flow timeout is enabled, flowid: %s", common.NetString(flow.id.Serialize()))
+				return ActiveTimeout, true
+			}
+	*/
+	return ActiveTimeout, true
+}
+
+func (fw *flowsProcessor) report(w *worker, ts time.Time, flow *biFlow, isOver bool, intNames, uintNames, floatNames []string, killReason flowKillReason) {
+	event := createEvent(fw.watcher, ts, flow, isOver, intNames, uintNames, floatNames, killReason)
 
 	debugf("add event: %v", event)
 	fw.spool.publish(event)
 }
 
-func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOver bool, intNames, uintNames, floatNames []string) beat.Event {
+func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOver bool, intNames, uintNames, floatNames []string, killReason flowKillReason) beat.Event {
 	timestamp := ts
 
 	event := mapstr.M{
@@ -308,6 +347,9 @@ func createEvent(watcher *procs.ProcessesWatcher, ts time.Time, f *biFlow, isOve
 	flow := mapstr.M{
 		"id":    common.NetString(f.id.Serialize()),
 		"final": isOver,
+	}
+	if killReason != -1 {
+		flow["kill_reason"] = killReason.String()
 	}
 	fields := mapstr.M{
 		"event": event,

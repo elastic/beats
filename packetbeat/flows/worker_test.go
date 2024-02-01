@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/elastic/go-lookslike/isdef"
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/go-lookslike"
 
@@ -65,7 +66,7 @@ func TestCreateEvent(t *testing.T) {
 	}
 	bif.stats[0] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{10, 1}}
 	bif.stats[1] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{460, 2}}
-	event := createEvent(&procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil)
+	event := createEvent(&procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil, NoKill)
 
 	// Validate the contents of the event.
 	validate := lookslike.MustCompile(map[string]interface{}{
@@ -125,5 +126,99 @@ func TestCreateEvent(t *testing.T) {
 		if err := os.WriteFile("../_meta/sample_outputs/flow.json", output, 0o644); err != nil {
 			t.Fatal(err)
 		}
+	}
+}
+
+func Test_shouldKillFlow(t *testing.T) {
+	logp.TestingSetup()
+
+	// Build biflow event.
+	vlan := uint16(171)
+	mac1 := []byte{1, 2, 3, 4, 5, 6}
+	mac2 := []byte{6, 5, 4, 3, 2, 1}
+	ip1 := []byte{203, 0, 113, 3}
+	ip2 := []byte{198, 51, 100, 2}
+	port1 := uint16(38901)
+	port2 := uint16(80)
+
+	id := newFlowID()
+	id.AddEth(mac1, mac2)
+	id.AddVLan(vlan)
+	id.AddIPv4(ip1, ip2)
+	id.AddTCP(port1, port2)
+	processor := &flowsProcessor{}
+
+	type args struct {
+		flow                 *biFlow
+		flowProcessorTimeout time.Duration
+		currentTime          time.Time
+		activeTimeoutEnabled bool
+	}
+	tests := []struct {
+		name       string
+		args       args
+		want       flowKillReason
+		flowKilled bool
+	}{
+		{
+			name: "Test active timeout",
+			args: args{
+				flow: &biFlow{
+					id:       id.rawFlowID,
+					killed:   1,
+					dir:      flowDirForward,
+					createTS: time.Now(),
+					ts:       time.Now().Add(40 * time.Second),
+				},
+				flowProcessorTimeout: 30 * time.Second,
+				currentTime:          time.Now().Add(50 * time.Second),
+				activeTimeoutEnabled: true,
+			},
+			want:       ActiveTimeout,
+			flowKilled: true,
+		},
+		{
+			name: "Test idle timeout",
+			args: args{
+				flow: &biFlow{
+					id:       id.rawFlowID,
+					killed:   1,
+					dir:      flowDirForward,
+					createTS: time.Now(),
+					ts:       time.Now(),
+				},
+				flowProcessorTimeout: 30 * time.Second,
+				currentTime:          time.Now().Add(30 * time.Second),
+				activeTimeoutEnabled: false,
+			},
+			want:       IdleTimeout,
+			flowKilled: true,
+		},
+		{
+			name: "Test flow should not be killed",
+			args: args{
+				flow: &biFlow{
+					id:       id.rawFlowID,
+					killed:   1,
+					dir:      flowDirForward,
+					createTS: time.Now(),
+					ts:       time.Now().Add(40 * time.Second),
+				},
+				flowProcessorTimeout: 30 * time.Second,
+				currentTime:          time.Now().Add(50 * time.Second),
+				activeTimeoutEnabled: false,
+			},
+			want:       NoKill,
+			flowKilled: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			processor.timeout = tt.args.flowProcessorTimeout
+			killReason, killFlow := shouldKillFlow(tt.args.flow, processor, tt.args.currentTime, tt.args.activeTimeoutEnabled)
+
+			assert.Equal(t, tt.flowKilled, killFlow)
+			assert.Equal(t, tt.want, killReason)
+		})
 	}
 }
