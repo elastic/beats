@@ -212,7 +212,7 @@ func (l *runLoop) maybeUnblockGetRequest() {
 		available := l.eventCount - l.consumedCount
 		if available >= getRequest.entryCount {
 			l.pendingGetRequest = nil
-			if l.getTimer.Stop() {
+			if !l.getTimer.Stop() {
 				<-l.getTimer.C
 			}
 			l.handleGetReply(getRequest)
