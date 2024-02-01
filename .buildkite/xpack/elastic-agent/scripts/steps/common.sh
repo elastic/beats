@@ -8,12 +8,11 @@ if [[ -z "${WORKSPACE-""}" ]]; then
 fi
 
 if [[ -z "${SETUP_MAGE_VERSION-""}" ]]; then
-    SETUP_MAGE_VERSION=$(grep -oe "SETUP_MAGE_VERSION\: [\"'].*[\"']" "$PIPELINE" | awk '{print $2}' | sed "s/'//g" )
+    SETUP_MAGE_VERSION="v0.5.0"
 fi
 if [[ -z "${SETUP_GVM_VERSION-""}" ]]; then
-    SETUP_GVM_VERSION=$(grep -oe "SETUP_GVM_VERSION\: [\"'].*[\"']" "$PIPELINE" | awk '{print $2}' | sed "s/'//g" )
+    SETUP_GVM_VERSION="1.14.0"
 fi
-
 
 getOSOptions() {
   case $(uname | tr '[:upper:]' '[:lower:]') in
