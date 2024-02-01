@@ -39,6 +39,37 @@ steps:
           manual:
             allowed: true
 
+      - label: "Unit tests - MacOS 13"
+        key: "unit-tests-macos-13"
+        command: ".buildkite/xpack/elastic-agent/scripts/steps/unit-tests.sh"
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "coverage.out"
+        agents:
+          provider: orka
+          imagePrefix: generic-13-ventura-x64
+        retry:
+          manual:
+            allowed: true
+
+      # Runs inly on the 7.17 branch
+      - label: "Unit tests - MacOS 13 ARM"
+        key: "unit-tests-macos-13-arm"
+        command: ".buildkite/xpack/elastic-agent/scripts/steps/unit-tests.sh"
+        branches: main
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "build/diagnostics/*"
+          - "coverage.out"
+        agents:
+          provider: orka
+          imagePrefix: generic-13-ventura-arm
+        retry:
+          manual:
+            allowed: true
+
       - label: "Unit tests - Windows 2022"
         key: "unit-tests-win2022"
         command: |
