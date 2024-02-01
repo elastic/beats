@@ -661,13 +661,15 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 
 		_, err = os.Stat(eventsDir)
 		if err != nil {
-			fmt.Fprintf(&msg, "could not verify output directory exists: %v", err)
+			fmt.Fprintf(&msg, "could not verify output directory exists: %v",
+				err)
 			return false
 		}
 
 		entries, err := os.ReadDir(eventsDir)
 		if err != nil {
-			fmt.Fprintf(&msg, "failed checking output directory for files: %v", err)
+			fmt.Fprintf(&msg, "failed checking output directory for files: %v",
+				err)
 			return false
 		}
 
@@ -677,6 +679,10 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 		}
 
 		for _, e := range entries {
+			if e.IsDir() {
+				continue
+			}
+
 			i, err := e.Info()
 			if err != nil {
 				fmt.Fprintf(&msg, "could not read info of %q", e.Name())
@@ -686,6 +692,23 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 				fmt.Fprintf(&msg, "file %q was created, but it's still empty",
 					e.Name())
 				return false
+			}
+
+			// read one line to make sure it isn't a 1/2 written JSON
+			f, err := os.Open(e.Name())
+			if err != nil {
+				fmt.Fprintf(&msg, "could not open file %q", e.Name())
+				return false
+			}
+
+			scanner := bufio.NewScanner(f)
+			for scanner.Scan() {
+				var ev Event
+				err := json.Unmarshal(scanner.Bytes(), &ev)
+				if err != nil {
+					fmt.Fprintf(&msg, "failed to read event from file: %v", err)
+					return false
+				}
 			}
 		}
 
