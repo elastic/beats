@@ -3,19 +3,18 @@
 # Common Configurations:
 # - enabled: Set to true to enable ingestion of Salesforce module fileset
 # - initial_interval: Initial interval for log collection. This setting determines the time period for which the logs will be initially collected when the ingestion process starts, i.e. 1d/h/m/s
-# - log_file_interval: Interval type for log file collection, either Hourly or Daily
 # - api_version: API version for Salesforce, version should be grater than 46.0
 
 # Authentication Configurations:
 # JWT Authentication:
-# - jwt_enabled: Set to true if JWT authentication is enabled, if false, user-password authentication will be used
+# - jwt_authentication_enabled: Set to true if JWT authentication is enabled
 # - client_id: Client ID for JWT and user-password authentication
 # - client_username: Username for JWT authentication
 # - client_key_path: Path to client key for JWT authentication
 # - jwt_url: Audience URL for JWT authentication
 
 # User-Password Authentication:
-# - jwt_enabled: Set to false if user-password authentication is enabled
+# - user_pass_authentication_enabled: Set to false if user-password authentication is enabled
 # - client_id: Client ID for JWT and user-password authentication
 # - client_secret: Client secret for user-password authentication
 # - token_url: Token URL for user-password authentication
@@ -23,13 +22,14 @@
 # - password: Password for user-password authentication
 # - url: URL for user-password authentication
 
-# Real-time Logging:
+# Event Monitoring:
 # - real_time: Set to true to enable real-time logging
 # - real_time_interval: Interval for real-time logging
 
 # Event Log File:
 # - event_log_file: Set to true to enable event log file
 # - elf_interval: Interval for event log file
+# - log_file_interval: Interval type for log file collection, either Hourly or Daily
 
 - module: salesforce
 
@@ -39,13 +39,14 @@
     var.log_file_interval: Hourly
     var.api_version: 56
 
-    var.jwt_enabled: true
+    var.jwt_authentication_enabled: true
 
     var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     var.client_username: "abc.xyz@mail.com"
     var.client_key_path: client_key.pem
     var.jwt_url: https://login.salesforce.com
 
+    var.user_pass_authentication_enabled: true
     var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     var.token_url: "https://login.salesforce.com"
     var.user: "abc.xyz@mail.com"
@@ -60,13 +61,14 @@
     var.log_file_interval: Hourly
     var.api_version: 56
 
-    var.jwt_enabled: true
+    var.jwt_authentication_enabled: true
 
     var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     var.client_username: "abc.xyz@mail.com"
     var.client_key_path: client_key.pem
     var.jwt_url: https://login.salesforce.com
 
+    var.user_pass_authentication_enabled: true
     var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     var.token_url: "https://login.salesforce.com"
     var.user: "abc.xyz@mail.com"
@@ -85,13 +87,14 @@
     var.log_file_interval: Hourly
     var.api_version: 56
 
-    var.jwt_enabled: true
+    var.jwt_authentication_enabled: true
 
     var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     var.client_username: "abc.xyz@mail.com"
     var.client_key_path: client_key.pem
     var.jwt_url: https://login.salesforce.com
 
+    var.user_pass_authentication_enabled: true
     var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     var.token_url: "https://login.salesforce.com"
     var.user: "abc.xyz@mail.com"
@@ -109,13 +112,14 @@
     var.initial_interval: 1d
     var.api_version: 56
 
-    var.jwt_enabled: true
+    var.jwt_authentication_enabled: true
 
     var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     var.client_username: "abc.xyz@mail.com"
     var.client_key_path: client_key.pem
     var.jwt_url: https://login.salesforce.com
 
+    var.user_pass_authentication_enabled: true
     var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     var.token_url: "https://login.salesforce.com"
     var.user: "abc.xyz@mail.com"

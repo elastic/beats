@@ -6,7 +6,7 @@ enabled: true
 version: {{ .api_version }}
 {{ end }}
 auth.oauth2:
-{{ if .jwt_enabled }}
+{{ if .jwt_authentication_enabled }}
   jwt_bearer_flow:
     enabled: true
     {{ if .client_id }}
@@ -21,7 +21,7 @@ auth.oauth2:
     {{ if .jwt_url }}
     url: {{ .jwt_url }}
     {{ end }}
-{{ else }}
+{{ else if .user_pass_authentication_enabled }}
   user_password_flow:
     enabled: true
     {{ if .client_id }}
