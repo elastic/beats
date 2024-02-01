@@ -1,5 +1,5 @@
 #!/bin/bash
 
-source .buildkite/scripts/setenv.sh
-
 set -euo pipefail
+
+source .buildkite/scripts/setenv.sh

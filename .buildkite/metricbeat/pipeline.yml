@@ -6,6 +6,7 @@ env:
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  GO_AGENT_IMAGE: "golang:${GO_VERSION}"
   BEATS_PROJECT_NAME: "metricbeat"
 
 steps:
@@ -39,6 +40,4 @@ steps:
     key: "metricbeat-pipeline"
     command: ".buildkite/scripts/generate_metricbeat_pipeline.sh"
     agents:
-      provider: "gcp"
-      image: "${IMAGE_UBUNTU_X86_64}"
-      machineType: "c2-standard-16"
+      image: "${GO_AGENT_IMAGE}"
