@@ -35,9 +35,9 @@ steps:
     if: "build.source == 'ui'"
     allow_dependency_failure: false
 
-  - label: ":linux: Check steps conditions"
-    key: "check-steps-conditions"
-    command: ".buildkite/scripts/check_conditions.sh"
+  - label: ":linux: Load dynamic metricbeat pipeline"
+    key: "metricbeat-pipeline"
+    command: ".buildkite/scripts/generate_metricbeat_pipeline.sh"
     agents:
       provider: "gcp"
       image: "${IMAGE_UBUNTU_X86_64}"
