@@ -702,13 +702,14 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 			}
 
 			scanner := bufio.NewScanner(f)
-			for scanner.Scan() {
+			if scanner.Scan() {
 				var ev Event
 				err := json.Unmarshal(scanner.Bytes(), &ev)
 				if err != nil {
 					fmt.Fprintf(&msg, "failed to read event from file: %v", err)
 					return false
 				}
+				return true
 			}
 		}
 
