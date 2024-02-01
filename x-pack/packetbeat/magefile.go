@@ -36,7 +36,7 @@ import (
 // the packetbeat executable. It is used to specify which npcap builder crossbuild
 // image to use and the installer to obtain from the cloud store for testing.
 const (
-	NpcapVersion = "1.78"
+	NpcapVersion = "1.79"
 	installer    = "npcap-" + NpcapVersion + "-oem.exe"
 )
 
@@ -47,6 +47,7 @@ func init() {
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
+	packetbeat.SelectLogic = devtools.XPackProject
 }
 
 // Update updates the generated files.

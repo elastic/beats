@@ -11,6 +11,8 @@
 
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
+If you are starting development of a new custom HTTP API input, we recommend that you use the <<filebeat-input-cel,Common Expression Language input>> which provides greater flexibility and an improved developer experience.
+
 This input supports:
 
 * Auth
@@ -399,8 +401,12 @@ NOTE: Only one of the credentials settings can be set at once. For more informat
 
 The RSA JWK Private Key JSON for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
 
-NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
+[float]
+==== `auth.oauth2.okta.jwk_pem`
 
+The RSA JWK private key PEM block for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
+
+NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
 
 [float]
 ==== `auth.oauth2.google.delegated_account`
@@ -1227,6 +1233,30 @@ request_url using file_name as 'file_2': \https://example.com/services/data/v1.0
 Collect and make events from response in any format supported by httpjson for all calls.
 
 +
+Note that since `request.url` must be a valid URL, if an API returns complete URLs in place of an identifier as in the example above, it would not be possible to use the JSON Path syntax. To achieve the desired result in this case an opaque URI syntax can be used. An opaque URI has an arbitrary scheme and opaque text separated by a colon. When the replacement is done, the scheme and colon are stripped from the URI prior to the replacement and the remaining opaque text is used as the replacement target. In the following example, the scheme is "placeholder".
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  request.url: https://example.com/services/data/v1.0/records
+  interval: 1h
+  chain:
+    # second call
+    - step:
+        request.url: placeholder:$.records[:]
+        request.method: GET
+        replace: $.records[:]
+    # third call
+    - step:
+        request.url: placeholder:$.file_name
+        request.method: GET
+        replace: $.file_name
+----
+
++
 [[chain-step-replace_with]]
 [float]
 ==== `chain[].step.replace_with`
@@ -1477,6 +1507,34 @@ response_json using id as '2':
 
 +
 Collect and make events from response in any format supported by httpjson for all calls.
+
++
+Note that since `request.url` must be a valid URL, if an API returns complete URLs in place of an identifier as in the example above, it would not be possible to use the JSON Path syntax. To achieve the desired result in this case an opaque URI syntax can be used. An opaque URI has an arbitrary scheme and opaque text separated by a colon. When the replacement is done, the scheme and colon are stripped from the URI prior to the replacement and the remaining opaque text is used as the replacement target. In the following example, the scheme is "placeholder".
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: httpjson
+  enabled: true
+  # first call
+  id: my-httpjson-id
+  request.url: http://example.com/services/data/v1.0/exports
+  interval: 1h
+  chain:
+    # second call
+    - while:
+        request.url: placeholder:$.exportId
+        request.method: GET
+        replace: $.exportId
+        until: '[[ eq .last_response.body.status "completed" ]]'
+        request.retry.max_attempts: 5
+        request.retry.wait_min: 5s
+    # third call
+    - step:
+        request.url: placeholder:$.files[:]
+        request.method: GET
+        replace: $.files[:]
+----
 
 NOTE: httpjson chain will only create and ingest events from last call on chained configurations. Also, the current chain only supports the following: all <<request-parameters, request parameters>>, <<response-transforms, response.transforms>> and <<response-split, response.split>>.
 
