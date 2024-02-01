@@ -20,7 +20,8 @@
 
 # User-Password Authentication:
 # - jwt_enabled: Set to false if user-password authentication is enabled
-# - client_id: Client ID for JWT and user-password authentication
+# - client_id: Client ID for user-password authentication
+
 # - client_secret: Client secret for user-password authentication
 # - token_url: Token URL for user-password authentication
 # - user: Username for user-password authentication
