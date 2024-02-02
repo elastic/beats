@@ -714,9 +714,11 @@ func readZip(t *testing.T, zipFile string, inspectors ...inspector) (*packageFil
 }
 
 func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
-	// Read the manifest file first so that the config file and layer
-	// names are known in advance.
-	manifest, err := getDockerManifest(dockerFile)
+	var manifest *dockerManifest
+	var info *dockerInfo
+	layers := make(map[string]*packageFile)
+
+	manifest, err := readManifest(dockerFile)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -726,9 +728,6 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 		return nil, nil, err
 	}
 	defer file.Close()
-
-	var info *dockerInfo
-	layers := make(map[string]*packageFile)
 
 	gzipReader, err := gzip.NewReader(file)
 	if err != nil {
@@ -770,11 +769,7 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 
 	// Read layers in order and for each file keep only the entry seen in the later layer
 	p := &packageFile{Name: filepath.Base(dockerFile), Contents: map[string]packageEntry{}}
-	for _, layer := range manifest.Layers {
-		layerFile, found := layers[layer]
-		if !found {
-			return nil, nil, fmt.Errorf("layer not found: %s", layer)
-		}
+	for _, layerFile := range layers {
 		for name, entry := range layerFile.Contents {
 			// Check only files in working dir and entrypoint
 			if strings.HasPrefix("/"+name, workingDir) || "/"+name == entrypoint {
@@ -799,22 +794,21 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 	return p, info, nil
 }
 
-// getDockerManifest opens a gzipped tar file to read the Docker manifest.json
-// that it is expected to contain.
-func getDockerManifest(file string) (*dockerManifest, error) {
-	f, err := os.Open(file)
+func readManifest(dockerFile string) (*dockerManifest, error) {
+	var manifest *dockerManifest
+
+	file, err := os.Open(dockerFile)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer file.Close()
 
-	gzipReader, err := gzip.NewReader(f)
+	gzipReader, err := gzip.NewReader(file)
 	if err != nil {
 		return nil, err
 	}
 	defer gzipReader.Close()
 
-	var manifest *dockerManifest
 	tarReader := tar.NewReader(gzipReader)
 	for {
 		header, err := tarReader.Next()
@@ -833,8 +827,7 @@ func getDockerManifest(file string) (*dockerManifest, error) {
 			break
 		}
 	}
-
-	return manifest, nil
+	return manifest, err
 }
 
 type dockerManifest struct {
