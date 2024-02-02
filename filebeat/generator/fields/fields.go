@@ -179,15 +179,12 @@ func addNewField(fs []field, f field) []field {
 	return append(fs, f)
 }
 
-func getSemanticElementsFromPatterns(patterns []string) ([]field, error) {
-	r, err := regexp.Compile("{[\\.\\w\\:]*}")
-	if err != nil {
-		return nil, err
-	}
+var semanticElementsRegex = regexp.MustCompile(`{[\.\w\:]*}`)
 
+func getSemanticElementsFromPatterns(patterns []string) ([]field, error) {
 	var fs []field
 	for _, lp := range patterns {
-		pp := r.FindAllString(lp, -1)
+		pp := semanticElementsRegex.FindAllString(lp, -1)
 		for _, p := range pp {
 			f := newField(p)
 			if f.SemanticElements == nil {
@@ -221,9 +218,7 @@ func accumulateRemoveFields(remove interface{}, out []string) []string {
 			case string:
 				return append(out, vs)
 			case []string:
-				for _, vv := range vs {
-					out = append(out, vv)
-				}
+				out = append(out, vs...)
 			case []interface{}:
 				for _, vv := range vs {
 					vvs := vv.(string)

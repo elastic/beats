@@ -7,6 +7,18 @@
 === Beats version 8.12.0
 https://github.com/elastic/beats/compare/v8.11.4\...v8.12.0[View commits]
 
+==== Known Issues
+
+*Affecting all Beats*
+
+Performance regression in AWS S3 inputs using SQS notification.
+
+In 8.12 the default memory queue flush interval was raised from 1 second to 10 seconds. In many configurations this improves performance because it allows the output to batch more events per round trip, which improves efficiency. However, the SQS input has an extra bottleneck that interacts badly with the new value. For more details see {issue}37754[37754].
+
+If you are using the Elasticsearch output, and your output configuration uses a performance preset, switch it to `preset: latency`. If you use no preset or use `preset: custom`, then set `queue.mem.flush.timeout: 1s` in your queue or output configuration.
+
+If you are not using the Elasticsearch output, set `queue.mem.flush.timeout: 1s` in your queue or output configuration.
+
 ==== Breaking changes
 
 *Heartbeat*

@@ -1,5 +1,24 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
-source .buildkite/scripts/setenv.sh
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
+  if [[ "$BUILDKITE_COMMAND" =~ .*"upload".* ]]; then
+    source .buildkite/env-scripts/env.sh
+  else
+    if [[ "${PLATFORM_TYPE}" = "Linux" || "${PLATFORM_TYPE}" = "Darwin" ]]; then
+      source .buildkite/env-scripts/util.sh
+    elif [[ ${PLATFORM_TYPE} = MINGW* ]]; then
+      source .buildkite/env-scripts/win-env.sh
+      install_python_win
+    fi
+  fi
+fi
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
+  if [[ "$BUILDKITE_COMMAND" =~ .*"upload".* ]]; then
+    source .buildkite/scripts/setenv.sh
+  elif [[ "${PLATFORM_TYPE}" = "Linux" || "${PLATFORM_TYPE}" = "Darwin" ]]; then
+    source .buildkite/scripts/install_tools.sh
+  fi
+fi
