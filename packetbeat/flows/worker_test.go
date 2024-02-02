@@ -24,14 +24,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/elastic/go-lookslike/isdef"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/go-lookslike"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/go-lookslike"
+	"github.com/elastic/go-lookslike/isdef"
 )
 
 // Use `go test -data` to update sample event files.
@@ -176,6 +175,23 @@ func Test_shouldKillFlow(t *testing.T) {
 			},
 			want:       ActiveTimeout,
 			flowKilled: true,
+		},
+		{
+			name: "Test active timeout when flow duration is less than timeout",
+			args: args{
+				flow: &biFlow{
+					id:       id.rawFlowID,
+					killed:   1,
+					dir:      flowDirForward,
+					createTS: time.Now(),
+					ts:       time.Now().Add(10 * time.Second),
+				},
+				flowProcessorTimeout: 30 * time.Second,
+				currentTime:          time.Now().Add(20 * time.Second),
+				activeTimeoutEnabled: true,
+			},
+			want:       NoKill,
+			flowKilled: false,
 		},
 		{
 			name: "Test idle timeout",

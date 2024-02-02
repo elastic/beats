@@ -309,14 +309,13 @@ func shouldKillFlow(flow *biFlow, fw *flowsProcessor, ts time.Time, activeFlowTi
 		return NoKill, false
 	}
 
-	/*
-		// TODO: need to check if we need this condition to prevent flows of very small durations
-			if ts.Sub(flow.createTS) > fw.timeout {
-				debugf("Killing flow because active flow timeout is enabled, flowid: %s", common.NetString(flow.id.Serialize()))
-				return ActiveTimeout, true
-			}
-	*/
-	return ActiveTimeout, true
+	// Kill flow only when the flow duration is atleast timeout seconds. This prevents having very small flows.
+	if ts.Sub(flow.createTS) >= fw.timeout {
+		debugf("Killing flow because active flow timeout is enabled, flowid: %s", common.NetString(flow.id.Serialize()))
+		return ActiveTimeout, true
+	}
+
+	return NoKill, false
 }
 
 func (fw *flowsProcessor) report(w *worker, ts time.Time, flow *biFlow, isOver bool, intNames, uintNames, floatNames []string, killReason flowKillReason) {
