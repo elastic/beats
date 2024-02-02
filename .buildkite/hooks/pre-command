@@ -5,8 +5,10 @@ set -euo pipefail
 PLATFORM_TYPE="$(uname)"
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
+  source .buildkite/env-scripts/env.sh
   if [[ "$BUILDKITE_COMMAND" =~ .*"upload".* ]]; then
-    source .buildkite/env-scripts/env.sh
+    echo "Skipped pre-command when running the Upload pipeline"
+    exit 0
   else
     if [[ "${PLATFORM_TYPE}" = "Linux" || "${PLATFORM_TYPE}" = "Darwin" ]]; then
       source .buildkite/env-scripts/util.sh
