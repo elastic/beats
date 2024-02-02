@@ -22,6 +22,10 @@ import (
 	"testing"
 	"time"
 
+	v1 "k8s.io/api/core/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/runtime"
 	k8s "k8s.io/client-go/kubernetes"
@@ -432,7 +436,6 @@ func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
 	resourceWatchers.lock.Unlock()
 }
 
-/*
 func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	resourceWatchers := NewWatchers()
 
@@ -466,7 +469,10 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 		},
 	}
 
-	enricher := buildMetadataEnricher(PodResource, resourceWatchers, config, funcs.update, funcs.delete, funcs.index)
+	metricset := "pod"
+	log := logp.NewLogger(selector)
+
+	enricher := buildMetadataEnricher(metricset, PodResource, resourceWatchers, config, funcs.update, funcs.delete, funcs.index, log)
 	resourceWatchers.lock.Lock()
 	wData := resourceWatchers.watchersMap[PodResource]
 	mockW := wData.watcher.(*mockWatcher)
@@ -547,7 +553,6 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	require.False(t, watcher.started)
 	resourceWatchers.lock.Unlock()
 }
-*/
 
 type mockFuncs struct {
 	updated kubernetes.Resource

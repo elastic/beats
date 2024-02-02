@@ -77,11 +77,6 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	mapping := mappings[base.Name()]
 	lock.Unlock()
 
-	//resourceName := base.Name()
-	//if resourceName != util.NamespaceResource {
-	//	resourceName = strings.ReplaceAll(resourceName, prefix, "")
-	//}
-
 	return &MetricSet{
 		BaseMetricSet:     base,
 		prometheusClient:  prometheusClient,

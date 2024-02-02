@@ -86,8 +86,11 @@ type watcherData struct {
 	// metricsets are used instead of resource names to avoid conflicts between
 	// state_pod / pod, state_node / node, state_container / container
 	metricsetsUsing []string
-	watcher         kubernetes.Watcher
-	started         bool // true if watcher has started, false otherwise
+
+	watcher kubernetes.Watcher
+	started bool // true if watcher has started, false otherwise
+
+	enrichers []*enricher // list of enrichers using this watcher
 }
 
 type Watchers struct {
@@ -519,7 +522,6 @@ func NewResourceMetadataEnricher(
 			nodeStore.SetNodeMetrics(metrics)
 
 			m[id] = generalMetaGen.Generate(NodeResource, r)
-
 		case *kubernetes.Deployment:
 			m[id] = generalMetaGen.Generate(DeploymentResource, r)
 		case *kubernetes.Job:
@@ -754,7 +756,7 @@ func buildMetadataEnricher(
 	index func(e mapstr.M) string,
 	log *logp.Logger) *enricher {
 
-	enricher := enricher{
+	enricher := &enricher{
 		metadata:      map[string]mapstr.M{},
 		index:         index,
 		resourceName:  resourceName,
@@ -768,26 +770,33 @@ func buildMetadataEnricher(
 
 	watcher := resourceWatchers.watchersMap[resourceName]
 	if watcher != nil {
+		watcher.enrichers = append(watcher.enrichers, enricher)
 		watcher.watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				enricher.Lock()
-				defer enricher.Unlock()
-				update(enricher.metadata, obj.(kubernetes.Resource))
+				for _, enricher := range watcher.enrichers {
+					enricher.Lock()
+					update(enricher.metadata, obj.(kubernetes.Resource))
+					enricher.Unlock()
+				}
 			},
 			UpdateFunc: func(obj interface{}) {
-				enricher.Lock()
-				defer enricher.Unlock()
-				update(enricher.metadata, obj.(kubernetes.Resource))
+				for _, enricher := range watcher.enrichers {
+					enricher.Lock()
+					update(enricher.metadata, obj.(kubernetes.Resource))
+					enricher.Unlock()
+				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				enricher.Lock()
-				defer enricher.Unlock()
-				delete(enricher.metadata, obj.(kubernetes.Resource))
+				for _, enricher := range watcher.enrichers {
+					enricher.Lock()
+					delete(enricher.metadata, obj.(kubernetes.Resource))
+					enricher.Unlock()
+				}
 			},
 		})
 	}
 
-	return &enricher
+	return enricher
 }
 
 func (e *enricher) Start(resourceWatchers *Watchers) {
