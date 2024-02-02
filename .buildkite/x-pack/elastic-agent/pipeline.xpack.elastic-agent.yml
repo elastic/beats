@@ -73,8 +73,8 @@ steps:
       - label: "Unit tests - Windows 2022"
         key: "unit-tests-win2022"
         command: |
-          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\install_mage.ps1
-          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
         artifact_paths:
           - "build/TEST-go-unit.html"
           - "build/TEST-go-unit.xml"
@@ -93,8 +93,8 @@ steps:
       - label: "Unit tests - Windows 2016"
         key: "unit-tests-win2016"
         command: |
-          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\install_mage.ps1
-          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
         artifact_paths:
           - "build/TEST-go-unit.html"
           - "build/TEST-go-unit.xml"
@@ -113,8 +113,8 @@ steps:
       - label: "Unit tests - Windows 2019"
         key: "unit-tests-win2019"
         command: |
-          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\install_mage.ps1
-          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
         artifact_paths:
           - "build/TEST-go-unit.html"
           - "build/TEST-go-unit.xml"
@@ -136,8 +136,8 @@ steps:
       - label: "Unit tests - Windows 10"
         key: "unit-tests-win10"
         command: |
-          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\install_mage.ps1
-          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
         artifact_paths:
           - "build/TEST-go-unit.html"
           - "build/TEST-go-unit.xml"
@@ -156,8 +156,8 @@ steps:
       - label: "Unit tests - Windows 11"
         key: "unit-tests-win11"
         command: |
-          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\install_mage.ps1
-          .\\.buildkite\\xpack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
         artifact_paths:
           - "build/TEST-go-unit.html"
           - "build/TEST-go-unit.xml"
