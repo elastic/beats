@@ -197,7 +197,7 @@ func initRand() {
 	} else {
 		seed = n.Int64()
 	}
-	rand.Seed(seed)
+	rand.Seed(seed) //nolint:staticcheck // need seed from cryptographically strong PRNG.
 }
 
 // Run initializes and runs a Beater implementation. name is the name of the
