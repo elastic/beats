@@ -29,8 +29,7 @@ import (
 
 var (
 	gWatcherOnce sync.Once
-	gWatcherErr  error
-	gWatcher     watcher
+	gWatcher     Watcher
 )
 
 type client struct {
@@ -39,13 +38,21 @@ type client struct {
 	records chan ebpfevents.Record
 }
 
-type watcher struct {
+// EventMask is a mask of ebpfevents.EventType which is used to control which event types clients will receive.
+type EventMask uint64
+
+// Watcher observes kernel events, using ebpf probes from the ebpfevents library, and sends the
+// events to subscribing clients.
+//
+// A single global watcher can exist, and can deliver events to multiple clients. Clients subscribe
+// to the watcher, and all ebpf events that match their mask will be sent to their channel.
+type Watcher struct {
 	sync.Mutex
-	ctx     context.Context
 	cancel  context.CancelFunc
 	loader  *ebpfevents.Loader
 	clients map[string]client
 	status  status
+	err     error
 }
 
 type status int
@@ -55,7 +62,8 @@ const (
 	started
 )
 
-func GetWatcher() (Watcher, error) {
+// GetWatcher creates the watcher, if required, and returns a reference to the global Watcher.
+func GetWatcher() (*Watcher, error) {
 	gWatcher.Lock()
 	defer gWatcher.Unlock()
 
@@ -64,93 +72,103 @@ func GetWatcher() (Watcher, error) {
 		if gWatcher.status == stopped {
 			l, err := ebpfevents.NewLoader()
 			if err != nil {
-				gWatcherErr = fmt.Errorf("init ebpf loader: %w", err)
+				gWatcher.err = fmt.Errorf("init ebpf loader: %w", err)
 				return
 			}
 			_ = l.Close()
 		}
 	})
 
-	return &gWatcher, gWatcherErr
+	return &gWatcher, gWatcher.err
 }
 
-func (w *watcher) Subscribe(name string, events EventMask) <-chan ebpfevents.Record {
+// Subscribe to receive events from the watcher.
+func (w *Watcher) Subscribe(clientName string, events EventMask) <-chan ebpfevents.Record {
 	w.Lock()
 	defer w.Unlock()
 
 	if w.status == stopped {
-		startLocked()
+		w.startLocked()
 	}
 
-	w.clients[name] = client{
-		name:    name,
+	w.clients[clientName] = client{
+		name:    clientName,
 		mask:    events,
 		records: make(chan ebpfevents.Record, w.loader.BufferLen()),
 	}
 
-	return w.clients[name].records
+	return w.clients[clientName].records
 }
 
-func (w *watcher) Unsubscribe(name string) {
+// Unsubscribe the client with the given name.
+func (w *Watcher) Unsubscribe(clientName string) {
 	w.Lock()
 	defer w.Unlock()
 
-	delete(w.clients, name)
+	delete(w.clients, clientName)
 
 	if w.nclients() == 0 {
-		stopLocked()
+		w.stopLocked()
 	}
 }
 
-func startLocked() {
-	loader, err := ebpfevents.NewLoader()
-	if err != nil {
-		gWatcherErr = fmt.Errorf("start ebpf loader: %w", err)
+func (w *Watcher) startLocked() {
+	if w.status == started {
 		return
 	}
 
-	gWatcher.loader = loader
-	gWatcher.clients = make(map[string]client)
+	loader, err := ebpfevents.NewLoader()
+	if err != nil {
+		w.err = fmt.Errorf("start ebpf loader: %w", err)
+		return
+	}
+
+	w.loader = loader
+	w.clients = make(map[string]client)
 
 	records := make(chan ebpfevents.Record, loader.BufferLen())
-	gWatcher.ctx, gWatcher.cancel = context.WithCancel(context.Background())
+	var ctx context.Context
+	ctx, w.cancel = context.WithCancel(context.Background())
 
-	go gWatcher.loader.EventLoop(gWatcher.ctx, records)
-	go func() {
+	go w.loader.EventLoop(ctx, records)
+	go func(ctx context.Context) {
 		for {
 			select {
 			case record := <-records:
 				if record.Error != nil {
-					for _, client := range gWatcher.clients {
+					for _, client := range w.clients {
 						client.records <- record
 					}
 					continue
 				}
-				for _, client := range gWatcher.clients {
+				for _, client := range w.clients {
 					if client.mask&EventMask(record.Event.Type) != 0 {
 						client.records <- record
 					}
 				}
 				continue
-			case <-gWatcher.ctx.Done():
+			case <-ctx.Done():
 				return
 			}
 		}
-	}()
+	}(ctx)
 
-	gWatcher.status = started
+	w.status = started
 }
 
-func stopLocked() {
-	_ = gWatcher.close()
-	gWatcher.status = stopped
+func (w *Watcher) stopLocked() {
+	if w.status == stopped {
+		return
+	}
+	w.close()
+	w.status = stopped
 }
 
-func (w *watcher) nclients() int {
+func (w *Watcher) nclients() int {
 	return len(w.clients)
 }
 
-func (w *watcher) close() error {
+func (w *Watcher) close() {
 	if w.cancel != nil {
 		w.cancel()
 	}
@@ -162,6 +180,4 @@ func (w *watcher) close() error {
 	for _, cl := range w.clients {
 		close(cl.records)
 	}
-
-	return nil
 }

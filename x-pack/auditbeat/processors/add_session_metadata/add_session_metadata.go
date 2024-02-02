@@ -49,7 +49,7 @@ func New(cfg *config.C) (beat.Processor, error) {
 
 	logger := logp.NewLogger(logName)
 
-	ctx := context.TODO()
+	ctx := context.Background()
 	reader := procfs.NewProcfsReader(*logger)
 	db := processdb.NewDB(reader, *logger)
 

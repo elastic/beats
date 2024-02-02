@@ -166,12 +166,10 @@ func insertForkAndExec(t *testing.T, db *DB, exec types.ProcessExecEvent) {
 	}
 
 	if fork.ParentPids.Tgid != 0 {
-		err = db.InsertFork(fork)
-		require.Nil(t, err)
+		db.InsertFork(fork)
 	}
 
-	err = db.InsertExec(exec)
-	require.Nil(t, err)
+	db.InsertExec(exec)
 }
 
 var systemdPath = "/sbin/systemd"
@@ -195,7 +193,7 @@ func TestSingleProcessSessionLeaderEntryTypeTerminal(t *testing.T) {
 
 	pid := uint32(1234)
 	procPath := "/bin/noproc"
-	err := db.InsertExec(types.ProcessExecEvent{
+	db.InsertExec(types.ProcessExecEvent{
 		Filename: procPath,
 		Pids: types.PidInfo{
 			Tgid: pid,
@@ -206,7 +204,6 @@ func TestSingleProcessSessionLeaderEntryTypeTerminal(t *testing.T) {
 			Minor: 64,
 		},
 	})
-	require.Nil(t, err)
 
 	requireProcess(t, db, 1234, procPath)
 	requireEntryLeader(t, db, 1234, 1234, Terminal)
@@ -478,7 +475,7 @@ func TestSingleProcessOverwriteOldEntryLeader(t *testing.T) {
 	requireEntryLeader(t, db, bashPid, ssmPid, Init)
 
 	// skiping setsid event and assuming the pids will be updated in this exec
-	err := db.InsertExec(types.ProcessExecEvent{
+	db.InsertExec(types.ProcessExecEvent{
 		Filename: bashPath,
 		Pids: types.PidInfo{
 			Tgid: bashPid,
@@ -490,7 +487,6 @@ func TestSingleProcessOverwriteOldEntryLeader(t *testing.T) {
 			Minor: 62,
 		},
 	})
-	require.Nil(t, err)
 
 	requireProcess(t, db, bashPid, bashPath)
 	requireParent(t, db, bashPid, ssmPid)
@@ -1156,7 +1152,7 @@ func TestGrepInIsolation(t *testing.T) {
 
 	grepPid := uint32(1001)
 
-	err := db.InsertExec(types.ProcessExecEvent{
+	db.InsertExec(types.ProcessExecEvent{
 		Filename: grepPath,
 		Pids: types.PidInfo{
 			Tgid: grepPid,
@@ -1164,7 +1160,6 @@ func TestGrepInIsolation(t *testing.T) {
 			Sid:  grepPid,
 		},
 	})
-	require.Nil(t, err)
 
 	process, err := db.GetProcess(grepPid)
 	require.Nil(t, err)
@@ -1192,7 +1187,7 @@ func TestKernelThreads(t *testing.T) {
 	kthreaddPath := "kthreadd"
 	rcuGpPath := "rcu_gp"
 
-	err := db.InsertExec(types.ProcessExecEvent{
+	db.InsertExec(types.ProcessExecEvent{
 		Filename: kthreaddPath,
 		Pids: types.PidInfo{
 			Tgid: kthreaddPid,
@@ -1200,9 +1195,8 @@ func TestKernelThreads(t *testing.T) {
 			Sid:  0,
 		},
 	})
-	require.Nil(t, err)
 
-	err = db.InsertExec(types.ProcessExecEvent{
+	db.InsertExec(types.ProcessExecEvent{
 		Filename: rcuGpPath,
 		Pids: types.PidInfo{
 			Tgid: rcuGpPid,
@@ -1210,7 +1204,6 @@ func TestKernelThreads(t *testing.T) {
 			Sid:  0,
 		},
 	})
-	require.Nil(t, err)
 
 	// kthreadd
 	kthreadd, err := db.GetProcess(kthreaddPid)

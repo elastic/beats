@@ -231,8 +231,7 @@ func TestEnrich(t *testing.T) {
 		db := processdb.NewDB(reader, *logger)
 
 		for _, ev := range tt.mockProcesses {
-			err := db.InsertExec(ev)
-			assert.NoError(t, err, "%s: inserting exec to db: %w", tt.testName, err)
+			db.InsertExec(ev)
 		}
 		s := addSessionMetadata{
 			logger: logger,
