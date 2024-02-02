@@ -24,7 +24,7 @@ to load the ingest pipelines with the `setup` command or manually.
 === setup command
 
 On a machine that has {beatname_uc} installed and has {es} configured
-as the outup, run the `setup` command with the `--pipelines` option
+as the output, run the `setup` command with the `--pipelines` option
 specified.  For example, the following command loads the ingest
 pipelines:
 
