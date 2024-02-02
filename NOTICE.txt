@@ -14966,19 +14966,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-structform@v
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/go-sysinfo
-<<<<<<< HEAD
-Version: v1.11.1
-Licence type (autodetected): Apache-2.0
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.11.1/LICENSE.txt:
-=======
 Version: v1.12.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
 Contents of probable licence file $GOMODCACHE/github.com/elastic/go-sysinfo@v1.12.0/LICENSE.txt:
->>>>>>> e4b448f0d1 (Pass context with timeout to FQDN lookup (#37756))
 
 
                                  Apache License
