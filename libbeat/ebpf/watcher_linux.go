@@ -29,7 +29,6 @@ import (
 
 var (
 	gWatcherOnce sync.Once
-	gWatcherErr  error
 	gWatcher     Watcher
 )
 
@@ -39,7 +38,7 @@ type client struct {
 	records chan ebpfevents.Record
 }
 
-// EventMask is a mask of epbevents.EventType which is used to control which event types clients will receive.
+// EventMask is a mask of ebpfevents.EventType which is used to control which event types clients will receive.
 type EventMask uint64
 
 // Watcher observes kernel events, using ebpf probes from the ebpfevents library, and sends the
@@ -53,6 +52,7 @@ type Watcher struct {
 	loader  *ebpfevents.Loader
 	clients map[string]client
 	status  status
+	err     error
 }
 
 type status int
@@ -72,14 +72,14 @@ func GetWatcher() (*Watcher, error) {
 		if gWatcher.status == stopped {
 			l, err := ebpfevents.NewLoader()
 			if err != nil {
-				gWatcherErr = fmt.Errorf("init ebpf loader: %w", err)
+				gWatcher.err = fmt.Errorf("init ebpf loader: %w", err)
 				return
 			}
 			_ = l.Close()
 		}
 	})
 
-	return &gWatcher, gWatcherErr
+	return &gWatcher, gWatcher.err
 }
 
 // Subscribe to receive events from the watcher.
@@ -88,7 +88,7 @@ func (w *Watcher) Subscribe(clientName string, events EventMask) <-chan ebpfeven
 	defer w.Unlock()
 
 	if w.status == stopped {
-		startLocked()
+		w.startLocked()
 	}
 
 	w.clients[clientName] = client{
@@ -108,40 +108,40 @@ func (w *Watcher) Unsubscribe(clientName string) {
 	delete(w.clients, clientName)
 
 	if w.nclients() == 0 {
-		stopLocked()
+		w.stopLocked()
 	}
 }
 
-func startLocked() {
-	if gWatcher.status == started {
+func (w *Watcher) startLocked() {
+	if w.status == started {
 		return
 	}
 
 	loader, err := ebpfevents.NewLoader()
 	if err != nil {
-		gWatcherErr = fmt.Errorf("start ebpf loader: %w", err)
+		w.err = fmt.Errorf("start ebpf loader: %w", err)
 		return
 	}
 
-	gWatcher.loader = loader
-	gWatcher.clients = make(map[string]client)
+	w.loader = loader
+	w.clients = make(map[string]client)
 
 	records := make(chan ebpfevents.Record, loader.BufferLen())
 	var ctx context.Context
-	ctx, gWatcher.cancel = context.WithCancel(context.Background())
+	ctx, w.cancel = context.WithCancel(context.Background())
 
-	go gWatcher.loader.EventLoop(ctx, records)
+	go w.loader.EventLoop(ctx, records)
 	go func(ctx context.Context) {
 		for {
 			select {
 			case record := <-records:
 				if record.Error != nil {
-					for _, client := range gWatcher.clients {
+					for _, client := range w.clients {
 						client.records <- record
 					}
 					continue
 				}
-				for _, client := range gWatcher.clients {
+				for _, client := range w.clients {
 					if client.mask&EventMask(record.Event.Type) != 0 {
 						client.records <- record
 					}
@@ -153,15 +153,15 @@ func startLocked() {
 		}
 	}(ctx)
 
-	gWatcher.status = started
+	w.status = started
 }
 
-func stopLocked() {
-	if gWatcher.status == stopped {
+func (w *Watcher) stopLocked() {
+	if w.status == stopped {
 		return
 	}
-	gWatcher.close()
-	gWatcher.status = stopped
+	w.close()
+	w.status = stopped
 }
 
 func (w *Watcher) nclients() int {
