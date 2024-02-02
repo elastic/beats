@@ -9,7 +9,7 @@ steps:
     steps:
       - label: "Unit tests - Ubuntu 22.04"
         key: "unit-tests-2204"
-        command: ".buildkite/xpack/elastic-agent/scripts/steps/unit-tests.sh"
+        command: ".buildkite/x-pack/elastic-agent/scripts/steps/unit-tests.sh"
         artifact_paths:
           - "build/TEST-go-unit.html"
           - "build/TEST-go-unit.xml"
@@ -24,7 +24,7 @@ steps:
 
       - label: "Unit tests - Ubuntu 22.04 ARM64"
         key: "unit-tests-2204-arm64"
-        command: ".buildkite/xpack/elastic-agent/scripts/steps/unit-tests.sh"
+        command: ".buildkite/x-pack/elastic-agent/scripts/steps/unit-tests.sh"
         artifact_paths:
           - "build/TEST-go-unit.html"
           - "build/TEST-go-unit.xml"
@@ -41,7 +41,7 @@ steps:
 
       - label: "Unit tests - MacOS 13"
         key: "unit-tests-macos-13"
-        command: ".buildkite/xpack/elastic-agent/scripts/steps/unit-tests.sh"
+        command: ".buildkite/x-pack/elastic-agent/scripts/steps/unit-tests.sh"
         artifact_paths:
           - "build/TEST-go-unit.html"
           - "build/TEST-go-unit.xml"
@@ -56,7 +56,7 @@ steps:
       # Runs inly on the 7.17 branch
       - label: "Unit tests - MacOS 13 ARM"
         key: "unit-tests-macos-13-arm"
-        command: ".buildkite/xpack/elastic-agent/scripts/steps/unit-tests.sh"
+        command: ".buildkite/x-pack/elastic-agent/scripts/steps/unit-tests.sh"
         branches: main
         artifact_paths:
           - "build/TEST-go-unit.html"
