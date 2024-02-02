@@ -253,7 +253,12 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 		)
 		traceLogger := zap.New(core)
 
-		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger)
+		const margin = 1e3 // 1OkB ought to be enough room for all the remainder of the trace details.
+		maxSize := cfg.Tracer.MaxSize*1e6 - margin
+		if maxSize < 0 {
+			maxSize = 0
+		}
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxSize)
 	}
 
 	if reg != nil {
