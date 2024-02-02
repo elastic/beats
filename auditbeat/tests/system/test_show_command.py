@@ -98,6 +98,7 @@ class Test(BaseTest):
             'lost',
             'backlog',
             'backlog_wait_time',
+            'backlog_wait_time_actual',
             'features',
         ]
 

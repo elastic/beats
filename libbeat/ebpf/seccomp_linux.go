@@ -27,13 +27,11 @@ import (
 
 func init() {
 	switch runtime.GOARCH {
-	case "amd64", "arm64":
+	case "amd64":
 		syscalls := []string{
 			"bpf",
 			"eventfd2",        // needed by ringbuf
 			"perf_event_open", // needed by tracepoints
-			"openat",          // needed to create map
-			"newfstatat",      // needed for BTF
 		}
 		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, syscalls...); err != nil {
 			panic(err)
