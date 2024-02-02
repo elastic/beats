@@ -88,7 +88,7 @@ var (
 	// Fail fast on startup if we can't read them.
 	bootID     = mustReadBootID()
 	pidNsInode = mustReadPidNsInode()
-	capNames   = []string{
+	capNames   = [...]string{
 		0:  "CAP_CHOWN",
 		1:  "CAP_DAC_OVERRIDE",
 		2:  "CAP_DAC_READ_SEARCH",
@@ -134,29 +134,29 @@ var (
 		// The following capability values are not assigned as of Dec 28, 2023.
 		// If they are added in a future kernel, and this slice has not been
 		// updated, the numerical string will used.
-		"41",
-		"42",
-		"43",
-		"44",
-		"45",
-		"46",
-		"47",
-		"48",
-		"49",
-		"50",
-		"51",
-		"52",
-		"53",
-		"54",
-		"55",
-		"56",
-		"57",
-		"58",
-		"59",
-		"60",
-		"61",
-		"62",
-		"63",
+		41: "41",
+		42: "42",
+		43: "43",
+		44: "44",
+		45: "45",
+		46: "46",
+		47: "47",
+		48: "48",
+		49: "49",
+		50: "50",
+		51: "51",
+		52: "52",
+		53: "53",
+		54: "54",
+		55: "55",
+		56: "56",
+		57: "57",
+		58: "58",
+		59: "59",
+		60: "60",
+		61: "61",
+		62: "62",
+		63: "63",
 	}
 )
 
