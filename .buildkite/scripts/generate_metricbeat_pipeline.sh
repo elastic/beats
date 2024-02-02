@@ -148,6 +148,8 @@ if are_conditions_met_extended_windows_tests; then
 YAML
 fi
 
-cat $pipelineName       #remove after tests
+echo "--- Printing dynamic steps"     #TODO: remove if the pipeline is public
+cat $pipelineName
 
+echo "--- Loading dynamic steps"
 buildkite-agent pipeline upload $pipelineName
