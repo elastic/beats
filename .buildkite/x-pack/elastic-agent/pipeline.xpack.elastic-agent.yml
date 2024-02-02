@@ -1,0 +1,174 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+
+env:
+  VAULT_PATH: "kv/ci-shared/observability-ingest/cloud/gcp"
+  DOCKER_REGISTRY: "docker.elastic.co"
+steps:
+  - group: "Unit tests"
+    key: "unit-tests"
+    steps:
+      - label: "Unit tests - Ubuntu 22.04"
+        key: "unit-tests-2204"
+        command: ".buildkite/x-pack/elastic-agent/scripts/steps/unit-tests.sh"
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "build/diagnostics/*"
+          - "coverage.out"
+        agents:
+          provider: "gcp"
+          image: "family/core-ubuntu-2204"
+        retry:
+          manual:
+            allowed: true
+
+      - label: "Unit tests - Ubuntu 22.04 ARM64"
+        key: "unit-tests-2204-arm64"
+        command: ".buildkite/x-pack/elastic-agent/scripts/steps/unit-tests.sh"
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "build/diagnostics/*"
+          - "coverage.out"
+        agents:
+          provider: "aws"
+          imagePrefix: "core-ubuntu-2204-aarch64"
+          diskSizeGb: 200
+          instanceType: "m6g.xlarge"
+        retry:
+          manual:
+            allowed: true
+
+      - label: "Unit tests - MacOS 13"
+        key: "unit-tests-macos-13"
+        command: ".buildkite/x-pack/elastic-agent/scripts/steps/unit-tests.sh"
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "coverage.out"
+        agents:
+          provider: orka
+          imagePrefix: generic-13-ventura-x64
+        retry:
+          manual:
+            allowed: true
+
+      # Runs inly on the 7.17 branch
+      - label: "Unit tests - MacOS 13 ARM"
+        key: "unit-tests-macos-13-arm"
+        command: ".buildkite/x-pack/elastic-agent/scripts/steps/unit-tests.sh"
+        branches: main
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "build/diagnostics/*"
+          - "coverage.out"
+        agents:
+          provider: orka
+          imagePrefix: generic-13-ventura-arm
+        retry:
+          manual:
+            allowed: true
+
+      - label: "Unit tests - Windows 2022"
+        key: "unit-tests-win2022"
+        command: |
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "build/diagnostics/*"
+          - "coverage.out"
+        agents:
+          provider: "gcp"
+          image: "family/core-windows-2022"
+          machine_type: "n2-standard-8"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        retry:
+          manual:
+            allowed: true
+
+      - label: "Unit tests - Windows 2016"
+        key: "unit-tests-win2016"
+        command: |
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "build/diagnostics/*"
+          - "coverage.out"
+        agents:
+          provider: "gcp"
+          image: "family/core-windows-2016"
+          machine_type: "n2-standard-8"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        retry:
+          manual:
+            allowed: true
+
+      - label: "Unit tests - Windows 2019"
+        key: "unit-tests-win2019"
+        command: |
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "build/diagnostics/*"
+          - "coverage.out"
+        agents:
+          provider: "gcp"
+          image: "family/core-windows-2019"
+          machine_type: "n2-standard-8"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        retry:
+          manual:
+            allowed: true
+
+  - group: "Desktop Windows tests"
+    key: "extended-windows"
+    steps:
+      - label: "Unit tests - Windows 10"
+        key: "unit-tests-win10"
+        command: |
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "build/diagnostics/*"
+          - "coverage.out"
+        agents:
+          provider: "gcp"
+          image: "family/general-windows-10"
+          machine_type: "n2-standard-8"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        retry:
+          manual:
+            allowed: true
+
+      - label: "Unit tests - Windows 11"
+        key: "unit-tests-win11"
+        command: |
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\install_mage.ps1
+          .\\.buildkite\\x-pack\\elastic-agent\\scripts\\steps\\unit-tests.ps1
+        artifact_paths:
+          - "build/TEST-go-unit.html"
+          - "build/TEST-go-unit.xml"
+          - "build/diagnostics/*"
+          - "coverage.out"
+        agents:
+          provider: "gcp"
+          image: "family/general-windows-11"
+          machine_type: "n2-standard-8"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        retry:
+          manual:
+            allowed: true
