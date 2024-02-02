@@ -695,9 +695,10 @@ func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
 			}
 
 			// read one line to make sure it isn't a 1/2 written JSON
-			f, err := os.Open(e.Name())
+			eventsFile := filepath.Join(eventsDir, e.Name())
+			f, err := os.Open(eventsFile)
 			if err != nil {
-				fmt.Fprintf(&msg, "could not open file %q", e.Name())
+				fmt.Fprintf(&msg, "could not open file %q", eventsFile)
 				return false
 			}
 
