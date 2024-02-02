@@ -107,16 +107,17 @@ if are_conditions_met_extended_windows_tests; then
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      - label: ":windows: Windows 10 Unit Tests"
-        key: "extended-win-10-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_10}"
-          machine_type: "n2-standard-8"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      # Temporary disabled https://github.com/elastic/beats/issues/37841
+      # - label: ":windows: Windows 10 Unit Tests"
+      #   key: "extended-win-10-unit-tests"
+      #   command: ".buildkite/scripts/win_unit_tests.ps1"
+      #   agents:
+      #     provider: "gcp"
+      #     image: "${IMAGE_WIN_10}"
+      #     machine_type: "n2-standard-8"
+      #     disk_size: 100
+      #     disk_type: "pd-ssd"
+      #   artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Windows 11 Unit Tests"
         key: "extended-win-11-unit-tests"
