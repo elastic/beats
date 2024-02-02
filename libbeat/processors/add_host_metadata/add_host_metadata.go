@@ -97,7 +97,7 @@ func New(cfg *config.C) (beat.Processor, error) {
 	}
 
 	// create a unique ID for this instance of the processor
-	cbIDStr := ""
+	var cbIDStr string
 	cbID, err := uuid.NewV4()
 	// if we fail, fall back to the processor name, hope for the best.
 	if err != nil {
