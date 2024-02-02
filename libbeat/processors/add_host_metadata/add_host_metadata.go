@@ -18,6 +18,7 @@
 package add_host_metadata
 
 import (
+	"context"
 	"fmt"
 	"sync"
 	"time"
@@ -25,6 +26,7 @@ import (
 	"github.com/gofrs/uuid"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/go-sysinfo"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/features"
@@ -35,7 +37,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/host"
-	"github.com/elastic/go-sysinfo"
 )
 
 const processorName = "add_host_metadata"
@@ -96,7 +97,7 @@ func New(cfg *config.C) (beat.Processor, error) {
 	}
 
 	// create a unique ID for this instance of the processor
-	cbIDStr := ""
+	var cbIDStr string
 	cbID, err := uuid.NewV4()
 	// if we fail, fall back to the processor name, hope for the best.
 	if err != nil {
@@ -178,7 +179,10 @@ func (p *addHostMetadata) loadData(checkCache bool, useFQDN bool) error {
 
 	hostname := h.Info().Hostname
 	if useFQDN {
-		fqdn, err := h.FQDN()
+		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+		defer cancel()
+
+		fqdn, err := h.FQDNWithContext(ctx)
 		if err != nil {
 			// FQDN lookup is "best effort". If it fails, we monitor the failure, fallback to
 			// the OS-reported hostname, and move on.
