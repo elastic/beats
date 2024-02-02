@@ -401,7 +401,7 @@ spec:
       description: "Beats xpack elastic agent pipeline"
     spec:
       branch_configuration: "7.17"
-      pipeline_file: ".buildkite/xpack/elastic-agent/pipeline.xpack.elastic-agent.yml"
+      pipeline_file: ".buildkite/x-pack/elastic-agent/pipeline.xpack.elastic-agent.yml"
       provider_settings:
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
