@@ -467,10 +467,10 @@ func TestProcessorStringer(t *testing.T) {
 		"encoding": "hex",
 		"method":   "md5",
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 	p, err := New(testConfig)
-	assert.NoError(t, err)
-	assert.Equal(t, `fingerprint={"Method":"md5","Encoding":"hex","Fields":["field1"],"TargetField":"fingerprint","IgnoreMissing":false}`, fmt.Sprint(p))
+	require.NoError(t, err)
+	require.Equal(t, `fingerprint={"Method":"md5","Encoding":"hex","Fields":["field1"],"TargetField":"fingerprint","IgnoreMissing":false}`, fmt.Sprint(p))
 }
 
 func BenchmarkHashMethods(b *testing.B) {
