@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+PLATFORM_TYPE="$(uname)"
+
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
   if [[ "$BUILDKITE_COMMAND" =~ .*"upload".* ]]; then
     source .buildkite/env-scripts/env.sh
