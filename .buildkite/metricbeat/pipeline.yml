@@ -42,4 +42,5 @@ steps:
     key: "metricbeat-pipeline"
     command: ".buildkite/scripts/generate_metricbeat_pipeline.sh"
     agents:
-      image: "${GO_AGENT_IMAGE}"
+      provider: "gcp"
+      image: "${IMAGE_UBUNTU_X86_64}"

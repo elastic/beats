@@ -6,6 +6,9 @@ PLATFORM_TYPE="$(uname)"
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
   source .buildkite/env-scripts/env.sh
+  if [[ -z "${GOLANG_VERSION-""}" ]]; then
+    export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
+  fi
   if [[ "$BUILDKITE_COMMAND" =~ .*"upload".* ]]; then
     echo "Skipped pre-command when running the Upload pipeline"
     exit 0
