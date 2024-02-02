@@ -18,8 +18,10 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
 fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
+  source .buildkite/scripts/setenv.sh
   if [[ "$BUILDKITE_COMMAND" =~ .*"upload".* ]]; then
-    source .buildkite/scripts/setenv.sh
+    echo "Skipped pre-command when running the Upload pipeline"
+    exit 0
   elif [[ "${PLATFORM_TYPE}" = "Linux" || "${PLATFORM_TYPE}" = "Darwin" ]]; then
     source .buildkite/scripts/install_tools.sh
   fi
