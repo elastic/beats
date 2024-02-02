@@ -2,32 +2,24 @@
 
 set -euo pipefail
 
-PLATFORM_TYPE="$(uname)"
-
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
   source .buildkite/env-scripts/env.sh
+  source .buildkite/env-scripts/util.sh
+  source .buildkite/env-scripts/win-env.sh
+
+  if [[ ${PLATFORM_TYPE} = MINGW* ]]; then
+    install_python_win
+  fi
+
   if [[ -z "${GOLANG_VERSION-""}" ]]; then
     export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
-  fi
-  if [[ "$BUILDKITE_COMMAND" =~ .*"upload".* ]]; then
-    echo "Skipped pre-command when running the Upload pipeline"
-    exit 0
-  else
-    if [[ "${PLATFORM_TYPE}" = "Linux" || "${PLATFORM_TYPE}" = "Darwin" ]]; then
-      source .buildkite/env-scripts/util.sh
-    elif [[ ${PLATFORM_TYPE} = MINGW* ]]; then
-      source .buildkite/env-scripts/win-env.sh
-      install_python_win
-    fi
   fi
 fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
   source .buildkite/scripts/setenv.sh
-  if [[ "$BUILDKITE_COMMAND" =~ .*"upload".* ]]; then
+  if [[ "${BUILDKITE_COMMAND}" =~ ^buildkite-agent ]]; then
     echo "Skipped pre-command when running the Upload pipeline"
     exit 0
-  elif [[ "${PLATFORM_TYPE}" = "Linux" || "${PLATFORM_TYPE}" = "Darwin" ]]; then
-    source .buildkite/scripts/install_tools.sh
   fi
 fi

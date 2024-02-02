@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+source .buildkite/scripts/install_tools.sh
+
 set -euo pipefail
 
 echo "--- Run Python Intergration Tests for $BEATS_PROJECT_NAME"
