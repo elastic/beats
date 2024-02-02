@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source .buildkite/scripts/install_tools.sh
-
 set -euo pipefail
 
 echo "--- Run Go Intergration Tests for $BEATS_PROJECT_NAME"

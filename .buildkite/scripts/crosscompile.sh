@@ -1,6 +1,4 @@
-#!/bin/bash
-
-source .buildkite/scripts/install_tools.sh
+#!/usr/bin/env bash
 
 set -euo pipefail
 

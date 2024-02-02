@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 source .buildkite/scripts/common.sh
 
@@ -54,7 +54,7 @@ if are_conditions_met_mandatory_tests; then
           machineType: "c2-standard-16"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+      - label: ":windows: Windows 2016/2022 Unit Tests - {{matrix.image}}"
         command: ".buildkite/scripts/win_unit_tests.ps1"
         key: "mandatory-win-unit-tests"
         agents:
@@ -96,12 +96,34 @@ if are_conditions_met_extended_windows_tests; then
   - group: "Extended Windowds Tests"
     key: "extended-win-tests"
     steps:
-      - label: ":windows: Win 2019 Unit Tests"
+      - label: ":windows: Windows 2019 Unit Tests"
         key: "extended-win-2019-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
+          machine_type: "n2-standard-8"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+
+      - label: ":windows: Windows 10 Unit Tests"
+        key: "extended-win-10-unit-tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
+          machine_type: "n2-standard-8"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+
+      - label: ":windows: Windows 11 Unit Tests"
+        key: "extended-win-11-unit-tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
           machine_type: "n2-standard-8"
           disk_size: 100
           disk_type: "pd-ssd"
