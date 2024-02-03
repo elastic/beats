@@ -1,17 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-source .buildkite/scripts/common.sh
+source .buildkite/scripts/install_tools.sh
 
 set -euo pipefail
 
-beats_subfolder=$1
+echo "--- Run Go Intergration Tests for $BEATS_PROJECT_NAME"
+pushd "${BEATS_PROJECT_NAME}" > /dev/null
 
-sudo chmod -R go-w ${beats_subfolder}/
-
-echo "--- Run Go Intergration Tests for $beats_subfolder"
-pushd "${beats_subfolder}" > /dev/null
-
-umask 0022
 mage goIntegTest
 
 popd > /dev/null

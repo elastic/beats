@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
@@ -6,16 +6,45 @@ BIN="${WORKSPACE}/bin"
 platform_type="$(uname)"
 platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
-
-DEBIAN_FRONTEND="noninteractive"
-sudo mkdir -p /etc/needrestart
-echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
+GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
+ONLY_DOCS=${ONLY_DOCS:-"true"}
+UI_MACOS_TESTS="$(buildkite-agent meta-data get UI_MACOS_TESTS --default ${UI_MACOS_TESTS:-"false"})"
+runAllStages="$(buildkite-agent meta-data get runAllStages --default ${runAllStages:-"false"})"
+metricbeat_changeset=(
+  "^metricbeat/.*"
+  "^go.mod"
+  "^pytest.ini"
+  "^dev-tools/.*"
+  "^libbeat/.*"
+  "^testing/.*"
+  )
+oss_changeset=(
+  "^go.mod"
+  "^pytest.ini"
+  "^dev-tools/.*"
+  "^libbeat/.*"
+  "^testing/.*"
+)
+ci_changeset=(
+  "^.buildkite/.*"
+)
+go_mod_changeset=(
+  "^go.mod"
+  )
+docs_changeset=(
+  ".*\\.(asciidoc|md)"
+  "deploy/kubernetes/.*-kubernetes\\.yaml"
+  )
+packaging_changeset=(
+  "^dev-tools/packaging/.*"
+  ".go-version"
+  )
 
 with_docker_compose() {
   local version=$1
   echo "Setting up the Docker-compose environment..."
   create_workspace
-  retry 5 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type_lowercase}-${arch_type}"
+  retry 3 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type_lowercase}-${arch_type}"
   chmod +x ${BIN}/docker-compose
   export PATH="${BIN}:${PATH}"
   docker-compose version
@@ -36,13 +65,13 @@ add_bin_path() {
 check_platform_architeture() {
   case "${arch_type}" in
     "x86_64")
-      arch_type="amd64"
+      go_arch_type="amd64"
       ;;
     "aarch64")
-      arch_type="arm64"
+      go_arch_type="arm64"
       ;;
     "arm64")
-      arch_type="arm64"
+      go_arch_type="arm64"
       ;;
     *)
     echo "The current platform/OS type is unsupported yet"
@@ -68,24 +97,34 @@ with_go() {
   echo "Setting up the Go environment..."
   create_workspace
   check_platform_architeture
-  retry 5 curl -sL -o "${BIN}/gvm" "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${platform_type_lowercase}-${arch_type}"
+  retry 5 curl -sL -o "${BIN}/gvm" "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${platform_type_lowercase}-${go_arch_type}"
   chmod +x "${BIN}/gvm"
   eval "$(gvm $GO_VERSION)"
   go version
   which go
   local go_path="$(go env GOPATH):$(go env GOPATH)/bin"
-  export PATH="${PATH}:${go_path}"
-  go mod download
+  export PATH="${go_path}:${PATH}"
 }
 
 with_python() {
   if [ "${platform_type}" == "Linux" ]; then
+    #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
     sudo apt-get update
-    sudo apt-get install -y python3-pip python3-venv libsystemd-dev libpcap-dev
+    sudo apt-get install -y python3-pip python3-venv
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
-    pip3 install virtualenv libpcap
-    ulimit -Sn 50000
+    pip3 install virtualenv
+    ulimit -Sn 10000
+  fi
+}
+
+with_dependencies() {
+  if [ "${platform_type}" == "Linux" ]; then
+    #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
+    sudo apt-get update
+    sudo apt-get install -y libsystemd-dev libpcap-dev
+  elif [ "${platform_type}" == "Darwin" ]; then
+    pip3 install libpcap
   fi
 }
 
@@ -108,6 +147,95 @@ retry() {
   return 0
 }
 
+are_paths_changed() {
+  local patterns=("${@}")
+  local changelist=()
+
+  for pattern in "${patterns[@]}"; do
+    changed_files=($(git diff --name-only HEAD@{1} HEAD | grep -E "$pattern"))
+    if [ "${#changed_files[@]}" -gt 0 ]; then
+      changelist+=("${changed_files[@]}")
+    fi
+  done
+
+  if [ "${#changelist[@]}" -gt 0 ]; then
+    echo "Files changed:"
+    echo "${changelist[*]}"
+    return 0
+  else
+    echo "No files changed within specified changeset:"
+    echo "${patterns[*]}"
+    return 1
+  fi
+}
+
+are_changed_only_paths() {
+  local patterns=("${@}")
+  local changelist=()
+  local changed_files=$(git diff --name-only HEAD@{1} HEAD)
+  if [ -z "$changed_files" ] || grep -qE "$(IFS=\|; echo "${patterns[*]}")" <<< "$changed_files"; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+are_conditions_met_mandatory_tests() {
+  if [[ "${BUILDKITE_PULL_REQUEST}" == "" ]] || [[ "${runAllStages}" == "true" ]] || [[ "${ONLY_DOCS}" == "false" && "${BUILDKITE_PULL_REQUEST}" != "" ]]; then     # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L107-L137
+    if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" ]] || [[ "${GITHUB_PR_LABELS}" =~ Metricbeat ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+      return 0
+    else
+      return 1
+    fi
+  else
+    return 1
+  fi
+}
+
+are_conditions_met_extended_tests() {
+  if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
+    return 0
+  else
+    return 1
+  fi
+}
+
+are_conditions_met_macos_tests() {
+  if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
+    if [[ "${UI_MACOS_TESTS}" == true ]] || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat for macos" ]] || [[ "${GITHUB_PR_LABELS}" =~ macOS ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+      return 0
+    else
+      return 1
+    fi
+  else
+    return 1
+  fi
+}
+
+are_conditions_met_extended_windows_tests() {
+  if [[ "${ONLY_DOCS}" == "false" && "${BUILDKITE_PULL_REQUEST}" != "" ]] || [[ "${runAllStages}" == "true" ]]; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
+    if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" ]] || [[ "${GITHUB_PR_LABELS}" =~ Metricbeat ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+      return 0
+    else
+      return 1
+    fi
+  else
+    return 1
+  fi
+}
+
+are_conditions_met_packaging() {
+  if are_conditions_met_extended_windows_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
+    if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || [[ "${BUILDKITE_TAG}" == "" ]] || [[ "${BUILDKITE_PULL_REQUEST}" != "" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L101-L103
+      return 0
+    else
+      return 1
+    fi
+  else
+    return 1
+  fi
+}
+
 config_git() {
   if [ -z "$(git config --get user.email)" ]; then
     git config --global user.email "beatsmachine@users.noreply.github.com"
@@ -115,28 +243,17 @@ config_git() {
   fi
 }
 
-
-echo "--- Env preparation"
-
-if command -v docker-compose &> /dev/null
-then
-  set +e
-  FOUND_DOCKER_COMPOSE_VERSION=$(docker-compose --version | awk '{print $3}' | sed s/\,//)
-  echo "Found docker-compose version: $FOUND_DOCKER_COMPOSE_VERSION"
-  if [ $FOUND_DOCKER_COMPOSE_VERSION == $DOCKER_COMPOSE_VERSION ]; then
-    echo "Versions match. No need to install docker-compose. Exiting."
-  else
-    echo "Versions don't match. Need to install the correct version of docker-compose."
-    with_docker_compose "${DOCKER_COMPOSE_VERSION}"
-  fi
-  set -e
+if ! are_changed_only_paths "${docs_changeset[@]}" ; then
+  ONLY_DOCS="false"
+  echo "Changes include files outside the docs_changeset vairiabe. ONLY_DOCS=$ONLY_DOCS."
 else
-  with_docker_compose "${DOCKER_COMPOSE_VERSION}"
+  echo "All changes are related to DOCS. ONLY_DOCS=$ONLY_DOCS."
 fi
 
-add_bin_path
-with_go "${GO_VERSION}"
-with_mage
-with_python
-config_git
-mage dumpVariables
+if are_paths_changed "${go_mod_changeset[@]}" ; then
+  GO_MOD_CHANGES="true"
+fi
+
+if are_paths_changed "${packaging_changeset[@]}" ; then
+  PACKAGING_CHANGES="true"
+fi

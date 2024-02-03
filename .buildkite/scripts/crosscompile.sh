@@ -1,17 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-source .buildkite/scripts/common.sh
+source .buildkite/scripts/install_tools.sh
 
 set -euo pipefail
 
-beats_subfolder=$1
-
-sudo chmod -R go-w ${beats_subfolder}/
-
-echo "--- Run Crosscompile for $beats_subfolder"
-pushd "${beats_subfolder}" > /dev/null
-
-umask 0022
-make crosscompile
-
-popd > /dev/null
+echo "--- Run Crosscompile for $BEATS_PROJECT_NAME"
+make -C "${BEATS_PROJECT_NAME}" crosscompile

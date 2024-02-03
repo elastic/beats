@@ -1,17 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-source .buildkite/scripts/common.sh
+source .buildkite/scripts/install_tools.sh
 
 set -euo pipefail
 
-beats_subfolder=$1
-
-sudo chmod -R go-w ${beats_subfolder}/
-
 echo "--- Run Unit Tests"
-pushd "${beats_subfolder}" > /dev/null
+pushd "${BEATS_PROJECT_NAME}" > /dev/null
 
-umask 0022
 mage build unitTest
 
 popd > /dev/null

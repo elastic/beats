@@ -1,23 +1,16 @@
-#!/bin/bash
+
+#!/usr/bin/env bash
+
 set -euo pipefail
 
 SETUP_GVM_VERSION="v0.5.1"
 DOCKER_COMPOSE_VERSION="1.21.0"
+DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
+SETUP_WIN_PYTHON_VERSION="3.11.0"
 GO_VERSION=$(cat .go-version)
-echo "GO_VERSION: ${GO_VERSION}"
-os_type=$(uname)
 
-case "$os_type" in
-  Darwin | Linux)
-    export DOCKER_COMPOSE_VERSION
-    export SETUP_GVM_VERSION
-    export GO_VERSION
-    ;;
-  MINGW* | MSYS* | CYGWIN* | Windows_NT)
-    # TODO: Add environment variables from other pipelines, at least from metricbeat
-    ;;
-  *)
-    echo "Unsupported operating system"
-    exit 1
-    ;;
-esac
+export SETUP_GVM_VERSION
+export DOCKER_COMPOSE_VERSION
+export DOCKER_COMPOSE_VERSION_AARCH64
+export SETUP_WIN_PYTHON_VERSION
+export GO_VERSION
