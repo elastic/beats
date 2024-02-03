@@ -66,10 +66,9 @@ func mockGUIDFromProviderName(providerName string) (windows.GUID, error) {
 }
 
 func TestSetSessionGUID_ProviderName(t *testing.T) {
-	// Backup original function and defer restoration
-	originalFunc := guidFromProviderNameFunc
+	// Defer restoration of original function
 	t.Cleanup(func() {
-		guidFromProviderNameFunc = originalFunc
+		guidFromProviderNameFunc = guidFromProviderName
 	})
 
 	// Replace with mock function
@@ -149,10 +148,9 @@ func TestNewSessionProperties(t *testing.T) {
 }
 
 func TestNewSession_ProviderName(t *testing.T) {
-	// Backup original function and defer restoration
-	originalSetSessionGUID := setSessionGUIDFunc
+	// Defer restoration of original function
 	t.Cleanup(func() {
-		setSessionGUIDFunc = originalSetSessionGUID
+		setSessionGUIDFunc = setSessionGUID
 	})
 
 	// Override setSessionGUIDFunc with mock
@@ -191,10 +189,9 @@ func TestNewSession_ProviderName(t *testing.T) {
 }
 
 func TestNewSession_GUIDError(t *testing.T) {
-	// Backup original function and defer restoration
-	originalSetSessionGUID := setSessionGUIDFunc
+	// Defer restoration of original function
 	t.Cleanup(func() {
-		setSessionGUIDFunc = originalSetSessionGUID
+		setSessionGUIDFunc = setSessionGUID
 	})
 
 	// Override setSessionGUIDFunc with mock
@@ -258,8 +255,8 @@ func TestStartConsumer_CallbackNull(t *testing.T) {
 	session := &Session{
 		Name:           "TestSession",
 		Realtime:       false,
-		BufferCallback: uintptr(0),
-		Callback:       uintptr(0),
+		BufferCallback: nil,
+		Callback:       nil,
 	}
 
 	err := session.StartConsumer()
@@ -276,9 +273,11 @@ func TestStartConsumer_OpenTraceError(t *testing.T) {
 	session := &Session{
 		Name:           "TestSession",
 		Realtime:       false,
-		BufferCallback: uintptr(0),
-		Callback:       uintptr(1),
-		openTrace:      openTrace,
+		BufferCallback: nil,
+		Callback: func(*EventRecord) uintptr {
+			return 1
+		},
+		openTrace: openTrace,
 	}
 
 	err := session.StartConsumer()
@@ -299,10 +298,12 @@ func TestStartConsumer_ProcessTraceError(t *testing.T) {
 	session := &Session{
 		Name:           "TestSession",
 		Realtime:       true,
-		BufferCallback: uintptr(0),
-		Callback:       uintptr(1),
-		openTrace:      openTrace,
-		processTrace:   processTrace,
+		BufferCallback: nil,
+		Callback: func(*EventRecord) uintptr {
+			return 1
+		},
+		openTrace:    openTrace,
+		processTrace: processTrace,
 	}
 
 	err := session.StartConsumer()
@@ -323,10 +324,12 @@ func TestStartConsumer_Success(t *testing.T) {
 	session := &Session{
 		Name:           "TestSession",
 		Realtime:       true,
-		BufferCallback: uintptr(0),
-		Callback:       uintptr(1),
-		openTrace:      openTrace,
-		processTrace:   processTrace,
+		BufferCallback: nil,
+		Callback: func(*EventRecord) uintptr {
+			return 1
+		},
+		openTrace:    openTrace,
+		processTrace: processTrace,
 	}
 
 	err := session.StartConsumer()

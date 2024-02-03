@@ -24,6 +24,10 @@ func (s *Session) GetHandler() error {
 	err = s.controlTrace(0, sessionNamePtr, s.Properties, EVENT_TRACE_CONTROL_QUERY)
 	switch {
 	case err == nil:
+		// Get the session handler from the properties struct.
+		s.Handler = uintptr(s.Properties.Wnode.Union1)
+
+		return nil
 
 	// Handle specific errors related to the query operation.
 	case errors.Is(err, ERROR_BAD_LENGTH):
@@ -35,11 +39,6 @@ func (s *Session) GetHandler() error {
 	default:
 		return fmt.Errorf("failed to get handler: %w", err)
 	}
-
-	// Get the session handler from the properties struct.
-	s.Handler = uintptr(s.Properties.Wnode.Union1)
-
-	return nil
 }
 
 // CreateRealtimeSession initializes and starts a new real-time ETW session.
@@ -77,7 +76,7 @@ func (s *Session) CreateRealtimeSession() error {
 	err = s.enableTrace(s.Handler, &s.GUID, EVENT_CONTROL_CODE_ENABLE_PROVIDER, s.TraceLevel, s.MatchAnyKeyword, s.MatchAllKeyword, timeout, &params)
 	switch {
 	case err == nil:
-
+		return nil
 	// Handle specific errors related to enabling the trace session.
 	case errors.Is(err, ERROR_INVALID_PARAMETER):
 		return fmt.Errorf("invalid parameters when enabling session trace: %w", err)
@@ -88,8 +87,6 @@ func (s *Session) CreateRealtimeSession() error {
 	default:
 		return fmt.Errorf("failed to enable trace: %w", err)
 	}
-
-	return nil
 }
 
 // StopSession closes the ETW session and associated handles if they were created.

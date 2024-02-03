@@ -41,10 +41,9 @@ func TestGUIDFromProviderName_EmptyName(t *testing.T) {
 }
 
 func TestGUIDFromProviderName_EmptyProviderList(t *testing.T) {
-	// Backup and defer restoration of the original function
-	originalFunc := enumerateProvidersFunc
+	// Defer restoration of the original function
 	t.Cleanup(func() {
-		enumerateProvidersFunc = originalFunc
+		enumerateProvidersFunc = _TdhEnumerateProviders
 	})
 
 	// Define a mock provider name and GUID for testing.
@@ -62,7 +61,7 @@ func TestGUIDFromProviderName_EmptyProviderList(t *testing.T) {
 		// Empty list of providers
 		*pBuffer = ProviderEnumerationInfo{
 			NumberOfProviders:      0,
-			TraceProviderInfoArray: [ANYSIZE_ARRAY]TraceProviderInfo{},
+			TraceProviderInfoArray: [anysizeArray]TraceProviderInfo{},
 		}
 		return nil
 	}
@@ -73,10 +72,9 @@ func TestGUIDFromProviderName_EmptyProviderList(t *testing.T) {
 }
 
 func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
-	// Backup and defer restoration of the original function
-	originalFunc := enumerateProvidersFunc
+	// Defer restoration of the original function
 	t.Cleanup(func() {
-		enumerateProvidersFunc = originalFunc
+		enumerateProvidersFunc = _TdhEnumerateProviders
 	})
 
 	// Define a mock provider name and GUID for testing.
@@ -111,7 +109,7 @@ func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 		// Create and populate the ProviderEnumerationInfo struct
 		*pBuffer = ProviderEnumerationInfo{
 			NumberOfProviders: 1,
-			TraceProviderInfoArray: [ANYSIZE_ARRAY]TraceProviderInfo{
+			TraceProviderInfoArray: [anysizeArray]TraceProviderInfo{
 				{
 					ProviderGuid:       mockGUID,
 					ProviderNameOffset: uint32(nameOffset),
@@ -127,10 +125,9 @@ func TestGUIDFromProviderName_GUIDNotFound(t *testing.T) {
 }
 
 func TestGUIDFromProviderName_Success(t *testing.T) {
-	// Backup and defer restoration of the original function
-	originalFunc := enumerateProvidersFunc
+	// Defer restoration of the original function
 	t.Cleanup(func() {
-		enumerateProvidersFunc = originalFunc
+		enumerateProvidersFunc = _TdhEnumerateProviders
 	})
 
 	// Define a mock provider name and GUID for testing.
@@ -164,7 +161,7 @@ func TestGUIDFromProviderName_Success(t *testing.T) {
 		// Create and populate the ProviderEnumerationInfo struct
 		*pBuffer = ProviderEnumerationInfo{
 			NumberOfProviders: 1,
-			TraceProviderInfoArray: [ANYSIZE_ARRAY]TraceProviderInfo{
+			TraceProviderInfoArray: [anysizeArray]TraceProviderInfo{
 				{
 					ProviderGuid:       mockGUID,
 					ProviderNameOffset: uint32(nameOffset),

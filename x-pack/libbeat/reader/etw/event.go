@@ -68,6 +68,19 @@ func newPropertyParser(r *EventRecord) (*propertyParser, error) {
 	}, nil
 }
 
+// getEventPropertyInfoAtIndex looks for the EventPropertyInfo object at a specified index.
+func (info *TraceEventInfo) getEventPropertyInfoAtIndex(i uint32) *EventPropertyInfo {
+	if i < info.PropertyCount {
+		// Calculate the address of the first element in EventPropertyInfoArray.
+		eventPropertyInfoPtr := uintptr(unsafe.Pointer(&info.EventPropertyInfoArray[0]))
+		// Adjust the pointer to point to the i-th EventPropertyInfo element.
+		eventPropertyInfoPtr += uintptr(i) * unsafe.Sizeof(EventPropertyInfo{})
+
+		return ((*EventPropertyInfo)(unsafe.Pointer(eventPropertyInfoPtr)))
+	}
+	return nil
+}
+
 // getEventInformation retrieves detailed metadata about an event record.
 func getEventInformation(r *EventRecord) (info *TraceEventInfo, err error) {
 	// Initially call TdhGetEventInformation to get the required buffer size.
@@ -84,6 +97,7 @@ func getEventInformation(r *EventRecord) (info *TraceEventInfo, err error) {
 	if err != nil {
 		return nil, fmt.Errorf("TdhGetEventInformation failed: %w", err)
 	}
+
 	return info, nil
 }
 
@@ -97,15 +111,15 @@ func (p *propertyParser) getPropertyName(i int) string {
 // readPropertyName gets the pointer to the property name in the event information structure.
 func readPropertyName(p *propertyParser, i int) unsafe.Pointer {
 	// Calculate the pointer to the property name using its offset in the event property array.
-	return unsafe.Add(unsafe.Pointer(p.info), p.info.EventPropertyInfoArray[i].NameOffset)
+	return unsafe.Add(unsafe.Pointer(p.info), p.info.getEventPropertyInfoAtIndex(uint32(i)).NameOffset)
 }
 
 // getPropertyValue retrieves the value of a specified event property.
 func (p *propertyParser) getPropertyValue(i int) (interface{}, error) {
-	propertyInfo := p.info.EventPropertyInfoArray[i]
+	propertyInfo := p.info.getEventPropertyInfoAtIndex(uint32(i))
 
 	// Determine the size of the property array.
-	arraySize, err := p.getArraySize(propertyInfo)
+	arraySize, err := p.getArraySize(*propertyInfo)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get array size: %w", err)
 	}
@@ -119,9 +133,9 @@ func (p *propertyParser) getPropertyValue(i int) (interface{}, error) {
 		)
 		// Parse the property value based on its type (simple or structured).
 		if (propertyInfo.Flags & PropertyStruct) == PropertyStruct {
-			value, err = p.parseStruct(propertyInfo)
+			value, err = p.parseStruct(*propertyInfo)
 		} else {
-			value, err = p.parseSimpleType(propertyInfo)
+			value, err = p.parseSimpleType(*propertyInfo)
 		}
 		if err != nil {
 			return nil, err

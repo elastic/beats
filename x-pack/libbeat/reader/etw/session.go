@@ -53,9 +53,9 @@ type Session struct {
 	// It is used to control the trace that receives and processes events.
 	TraceHandler uint64
 	// Callback is the pointer to EventRecordCallback which receives and processes event trace events.
-	Callback uintptr
+	Callback func(*EventRecord) uintptr
 	// BufferCallback is the pointer to BufferCallback which processes retrieved metadata about the ETW buffers (optional).
-	BufferCallback uintptr
+	BufferCallback func(*EventTraceLogfile) uintptr
 
 	// Pointers to functions that make calls to the Windows API.
 	// In tests, these pointers can be replaced with mock functions to simulate API behavior without making actual calls to the Windows API.
@@ -220,10 +220,10 @@ func (s *Session) StartConsumer() error {
 	}
 
 	// Set callback and context for the session.
-	if s.Callback == 0 {
+	if s.Callback == nil {
 		return fmt.Errorf("error loading callback")
 	}
-	elf.Callback = s.Callback
+	elf.Callback = syscall.NewCallback(s.Callback)
 	elf.Context = 0
 
 	// Open an ETW trace processing handle for consuming events

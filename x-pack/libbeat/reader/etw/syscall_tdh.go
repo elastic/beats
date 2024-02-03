@@ -22,14 +22,14 @@ var (
 	tdhGetProperty            = tdh.NewProc("TdhGetProperty")
 )
 
-const ANYSIZE_ARRAY = 1 << 16
+const anysizeArray = 1
 const DEFAULT_PROPERTY_BUFFER_SIZE = 256
 
 // https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-provider_enumeration_info
 type ProviderEnumerationInfo struct {
 	NumberOfProviders      uint32
 	Reserved               uint32
-	TraceProviderInfoArray [ANYSIZE_ARRAY]TraceProviderInfo
+	TraceProviderInfoArray [anysizeArray]TraceProviderInfo
 }
 
 // https://learn.microsoft.com/en-us/windows/win32/api/tdh/ns-tdh-trace_provider_info
@@ -133,7 +133,7 @@ type TraceEventInfo struct {
 	PropertyCount               uint32
 	TopLevelPropertyCount       uint32
 	Flags                       TemplateFlags
-	EventPropertyInfoArray      [ANYSIZE_ARRAY]EventPropertyInfo
+	EventPropertyInfoArray      [anysizeArray]EventPropertyInfo
 }
 
 // https://learn.microsoft.com/en-us/windows/desktop/api/tdh/ns-tdh-event_property_info
@@ -201,7 +201,7 @@ type EventMapInfo struct {
 	Flag          MapFlags
 	EntryCount    uint32
 	Union         uint32
-	MapEntryArray [ANYSIZE_ARRAY]EventMapEntry
+	MapEntryArray [anysizeArray]EventMapEntry
 }
 
 type MapFlags int32
