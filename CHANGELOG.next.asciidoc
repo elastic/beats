@@ -58,6 +58,7 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 - Support build of projects outside of beats directory {pull}36126[36126]
 - aws: Add credential caching for `AssumeRole` session tokens. {issue}37787[37787]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
+- Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 
 *Auditbeat*
 
