@@ -30,6 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -51,6 +52,7 @@ func makeRedis(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
+	sensitiveLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 
 	if !cfg.HasField("index") {
@@ -161,7 +163,7 @@ func makeRedis(
 		}
 
 		client := newClient(conn, observer, rConfig.Timeout,
-			pass, rConfig.Db, key, dataType, rConfig.Index, enc)
+			pass, rConfig.Db, key, dataType, rConfig.Index, enc, sensitiveLoggerCfg)
 		clients[i] = newBackoffClient(client, rConfig.Backoff.Init, rConfig.Backoff.Max)
 	}
 

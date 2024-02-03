@@ -23,6 +23,8 @@ import (
 	"path/filepath"
 	"time"
 
+	"go.uber.org/zap"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
@@ -37,12 +39,13 @@ func init() {
 }
 
 type fileOutput struct {
-	log      *logp.Logger
-	filePath string
-	beat     beat.Info
-	observer outputs.Observer
-	rotator  *file.Rotator
-	codec    codec.Codec
+	log          *logp.Logger
+	sensitiveLogger *logp.Logger
+	filePath     string
+	beat         beat.Info
+	observer     outputs.Observer
+	rotator      *file.Rotator
+	codec        codec.Codec
 }
 
 // makeFileout instantiates a new file output instance.
@@ -51,6 +54,7 @@ func makeFileout(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *c.C,
+	sensitiveLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 	foConfig := defaultConfig()
 	if err := cfg.Unpack(&foConfig); err != nil {
@@ -60,10 +64,17 @@ func makeFileout(
 	// disable bulk support in publisher pipeline
 	_ = cfg.SetInt("bulk_max_size", -1, -1)
 
+	logSelector := "file"
+	sensitiveLogger := logp.NewLogger(logSelector)
+	// Set a new Output so it writes to a different file than `log`
+	sensitiveLogger = sensitiveLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(sensitiveLoggerCfg)))
+	sensitiveLogger = sensitiveLogger.With("log.type", "sensitive")
+
 	fo := &fileOutput{
-		log:      logp.NewLogger("file"),
-		beat:     beat,
-		observer: observer,
+		log:          logp.NewLogger(logSelector),
+		sensitiveLogger: sensitiveLogger,
+		beat:         beat,
+		observer:     observer,
 	}
 	if err := fo.init(beat, foConfig); err != nil {
 		return outputs.Fail(err)
@@ -131,7 +142,8 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 			} else {
 				out.log.Warnf("Failed to serialize the event: %+v", err)
 			}
-			out.log.Debugf("Failed event: %v", event)
+			out.log.Debug("Event logged to sensitive-data log file")
+			out.sensitiveLogger.Debugf("Failed event: %v", event)
 
 			dropped++
 			continue

@@ -43,6 +43,7 @@ func makeKafka(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
+	sensitiveLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 	log := logp.NewLogger(logSelector)
 	log.Debug("initialize kafka output")
@@ -72,7 +73,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, kConfig.Key, topic, kConfig.Headers, codec, libCfg)
+	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, kConfig.Key, topic, kConfig.Headers, codec, libCfg, sensitiveLoggerCfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}

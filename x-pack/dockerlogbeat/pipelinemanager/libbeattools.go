@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/file"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/logp/configure"
 )
 
 // load pipeline starts up a new pipeline with the given config
@@ -66,6 +67,16 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 		Processors:    processing,
 	}
 
+	// Get the default/current logging configuration
+	// we need some defaults to be populates otherwise Unpack will
+	// fail
+	sensitiveLoggerCfg := logp.DefaultConfig(configure.GetEnvironment())
+
+	// Ensure the default filename is set
+	if sensitiveLoggerCfg.Files.Name == "" {
+		sensitiveLoggerCfg.Files.Name = "dockerlogbeat-sensitive-data"
+	}
+
 	pipeline, err := pipeline.LoadWithSettings(
 		info,
 		pipeline.Monitors{
@@ -76,7 +87,7 @@ func loadNewPipeline(logOptsConfig ContainerOutputConfig, hostname string, log *
 		pipelineCfg,
 		func(stat outputs.Observer) (string, outputs.Group, error) {
 			cfg := config.Output
-			out, err := outputs.Load(idxMgr, info, stat, cfg.Name(), cfg.Config())
+			out, err := outputs.Load(idxMgr, info, stat, cfg.Name(), cfg.Config(), sensitiveLoggerCfg)
 			return cfg.Name(), out, err
 		},
 		settings,

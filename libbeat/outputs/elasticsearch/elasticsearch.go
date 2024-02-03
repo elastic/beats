@@ -18,6 +18,8 @@
 package elasticsearch
 
 import (
+	"go.uber.org/zap"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -38,8 +40,14 @@ func makeES(
 	beat beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
+	sensitiveLoggerCfg logp.Config,
 ) (outputs.Group, error) {
 	log := logp.NewLogger(logSelector)
+	sensitiveLogger := logp.NewLogger(logSelector)
+	// Set a new Output so it writes to a different file than `log`
+	sensitiveLogger = sensitiveLogger.WithOptions(zap.WrapCore(logp.WithFileOrStderrOutput(sensitiveLoggerCfg)))
+	sensitiveLogger = sensitiveLogger.With("log.type", "sensitive")
+
 	if !cfg.HasField("bulk_max_size") {
 		if err := cfg.SetInt("bulk_max_size", -1, defaultBulkSize); err != nil {
 			return outputs.Fail(err)
@@ -110,27 +118,30 @@ func makeES(
 		}
 
 		var client outputs.NetworkClient
-		client, err = NewClient(ClientSettings{
-			ConnectionSettings: eslegclient.ConnectionSettings{
-				URL:              esURL,
-				Beatname:         beat.Beat,
-				Kerberos:         esConfig.Kerberos,
-				Username:         esConfig.Username,
-				Password:         esConfig.Password,
-				APIKey:           esConfig.APIKey,
-				Parameters:       params,
-				Headers:          esConfig.Headers,
-				CompressionLevel: esConfig.CompressionLevel,
-				Observer:         observer,
-				EscapeHTML:       esConfig.EscapeHTML,
-				Transport:        esConfig.Transport,
-				IdleConnTimeout:  esConfig.Transport.IdleConnTimeout,
-			},
-			Index:              index,
-			Pipeline:           pipeline,
-			Observer:           observer,
-			NonIndexableAction: policy.action(),
-		}, &connectCallbackRegistry)
+		client, err = NewClient(
+			log,
+			sensitiveLogger,
+			ClientSettings{
+				ConnectionSettings: eslegclient.ConnectionSettings{
+					URL:              esURL,
+					Beatname:         beat.Beat,
+					Kerberos:         esConfig.Kerberos,
+					Username:         esConfig.Username,
+					Password:         esConfig.Password,
+					APIKey:           esConfig.APIKey,
+					Parameters:       params,
+					Headers:          esConfig.Headers,
+					CompressionLevel: esConfig.CompressionLevel,
+					Observer:         observer,
+					EscapeHTML:       esConfig.EscapeHTML,
+					Transport:        esConfig.Transport,
+					IdleConnTimeout:  esConfig.Transport.IdleConnTimeout,
+				},
+				Index:              index,
+				Pipeline:           pipeline,
+				Observer:           observer,
+				NonIndexableAction: policy.action(),
+			}, &connectCallbackRegistry)
 		if err != nil {
 			return outputs.Fail(err)
 		}

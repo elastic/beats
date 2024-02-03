@@ -366,7 +366,11 @@ func (b *BeatProc) WriteConfigFile(cfg string) {
 // when the test ends.
 func (b *BeatProc) openLogFile() *os.File {
 	t := b.t
-	glob := fmt.Sprintf("%s-*.ndjson", filepath.Join(b.tempDir, b.beatName))
+	// Beats can produce two different log files, to make sure we're
+	// reading the normal one we add the year to the glob. The default
+	// log file name looks like: filebeat-20240116.ndjson
+	year := time.Now().Year()
+	glob := fmt.Sprintf("%s-%d*.ndjson", filepath.Join(b.tempDir, b.beatName), year)
 	files, err := filepath.Glob(glob)
 	if err != nil {
 		t.Fatalf("could not expand log file glob: %s", err)

@@ -422,7 +422,16 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 	info := beat.Info{Beat: "libbeat"}
 	// disable ILM if using specified index name
 	im, _ := idxmgmt.DefaultSupport(nil, info, conf.MustNewConfigFrom(map[string]interface{}{"setup.ilm.enabled": "false"}))
-	output, err := makeES(im, info, stats, config)
+
+	// Creates the events logger configuration for testing,
+	// it uses the default one but logs to stderr instead of a file.
+	// This prevents the test to leave log files behind.
+	sensitiveLoggerCfg := logp.DefaultConfig(logp.DefaultEnvironment)
+	sensitiveLoggerCfg.Level = logp.DebugLevel
+	sensitiveLoggerCfg.ToStderr = true
+	sensitiveLoggerCfg.ToFiles = false
+
+	output, err := makeES(im, info, stats, config, sensitiveLoggerCfg)
 	if err != nil {
 		t.Fatal(err)
 	}

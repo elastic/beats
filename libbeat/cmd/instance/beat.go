@@ -120,14 +120,15 @@ type beatConfig struct {
 	Features *config.C `config:"features"`
 
 	// beat internal components configurations
-	HTTP            *config.C              `config:"http"`
-	HTTPPprof       *pprof.Config          `config:"http.pprof"`
-	BufferConfig    *config.C              `config:"http.buffer"`
-	Path            paths.Path             `config:"path"`
-	Logging         *config.C              `config:"logging"`
-	MetricLogging   *config.C              `config:"logging.metrics"`
-	Keystore        *config.C              `config:"keystore"`
-	Instrumentation instrumentation.Config `config:"instrumentation"`
+	HTTP             *config.C              `config:"http"`
+	HTTPPprof        *pprof.Config          `config:"http.pprof"`
+	BufferConfig     *config.C              `config:"http.buffer"`
+	Path             paths.Path             `config:"path"`
+	Logging          *config.C              `config:"logging"`
+	SensitiveLogging *config.C              `config:"logging.sensitive"`
+	MetricLogging    *config.C              `config:"logging.metrics"`
+	Keystore         *config.C              `config:"keystore"`
+	Instrumentation  instrumentation.Config `config:"instrumentation"`
 
 	// output/publishing related configurations
 	Pipeline pipeline.Config `config:",inline"`
@@ -378,7 +379,30 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		Logger:    logp.L().Named("publisher"),
 		Tracer:    b.Instrumentation.Tracer(),
 	}
-	outputFactory := b.makeOutputFactory(b.Config.Output)
+
+	// Get the default/current logging configuration
+	// we need some defaults to be populates otherwise Unpack will
+	// fail. We also overwrite some defaults that are specific to the
+	// events logger.
+	sensitiveLoggerCfg := logp.DefaultConfig(configure.GetEnvironment())
+	sensitiveLoggerCfg.ToFiles = true          // make the default explicit
+	sensitiveLoggerCfg.Files.MaxSize = 5242880 // 5MB
+	sensitiveLoggerCfg.Files.MaxBackups = 5
+
+	// merge sensitiveLoggerCfg with b.Config.Logging, so logging.sensitive.* only
+	// overwrites the files block.
+	if err := b.Config.SensitiveLogging.Unpack(&sensitiveLoggerCfg); err != nil {
+		return nil, fmt.Errorf("error initialising events logger: %w", err)
+	}
+
+	// Ensure the default filename is set
+	if sensitiveLoggerCfg.Files.Name == "" {
+		sensitiveLoggerCfg.Files.Name = b.Info.Beat
+		// Append the name so the files do not overwrite themselves.
+		sensitiveLoggerCfg.Files.Name = sensitiveLoggerCfg.Files.Name + "-sensitive-data"
+	}
+
+	outputFactory := b.makeOutputFactory(b.Config.Output, sensitiveLoggerCfg)
 	settings := pipeline.Settings{
 		Processors:     b.processors,
 		InputQueueSize: b.InputQueueSize,
@@ -388,7 +412,7 @@ func (b *Beat) createBeater(bt beat.Creator) (beat.Beater, error) {
 		return nil, fmt.Errorf("error initializing publisher: %w", err)
 	}
 
-	reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader()))
+	reload.RegisterV2.MustRegisterOutput(b.makeOutputReloader(publisher.OutputReloader(), sensitiveLoggerCfg))
 
 	// TODO: some beats race on shutdown with publisher.Stop -> do not call Stop yet,
 	//       but refine publisher to disconnect clients on stop automatically
@@ -784,6 +808,23 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
+	// If either b.Config.EventLoggingor b.Config.Logging are nil
+	// merging them will fail, so in case any of them is nil,
+	// we set them to an empty config.C
+	if b.Config.SensitiveLogging == nil {
+		b.Config.SensitiveLogging = config.NewConfig()
+	}
+	if b.Config.Logging == nil {
+		b.Config.Logging = config.NewConfig()
+	}
+	if err := b.Config.SensitiveLogging.Merge(b.Config.Logging); err != nil {
+		return fmt.Errorf("cannot merge logging and logging.sensitive configuration: %w", err)
+	}
+
+	if _, err := b.Config.SensitiveLogging.Remove("events", -1); err != nil {
+		return fmt.Errorf("cannot update logging.sensitive configuration: %w", err)
+	}
+
 	if err := promoteOutputQueueSettings(&b.Config); err != nil {
 		return fmt.Errorf("could not promote output queue settings: %w", err)
 	}
@@ -1094,7 +1135,7 @@ func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	}
 }
 
-func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Reloadable {
+func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader, sensitiveLoggerCfg logp.Config) reload.Reloadable {
 	return reload.ReloadableFunc(func(update *reload.ConfigWithMeta) error {
 		if update == nil {
 			return nil
@@ -1116,15 +1157,16 @@ func (b *Beat) makeOutputReloader(outReloader pipeline.OutputReloader) reload.Re
 			}
 		}
 
-		return outReloader.Reload(update, b.createOutput)
+		return outReloader.Reload(update, sensitiveLoggerCfg, b.createOutput)
 	})
 }
 
 func (b *Beat) makeOutputFactory(
 	cfg config.Namespace,
+	eventLoggerCfg logp.Config,
 ) func(outputs.Observer) (string, outputs.Group, error) {
 	return func(outStats outputs.Observer) (string, outputs.Group, error) {
-		out, err := b.createOutput(outStats, cfg)
+		out, err := b.createOutput(outStats, cfg, eventLoggerCfg)
 		return cfg.Name(), out, err
 	}
 }
@@ -1220,7 +1262,7 @@ func (b *Beat) reloadOutputOnCertChange(cfg config.Namespace) error {
 	return nil
 }
 
-func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outputs.Group, error) {
+func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace, sensitiveLoggerCfg logp.Config) (outputs.Group, error) {
 	if !cfg.IsSet() {
 		return outputs.Group{}, nil
 	}
@@ -1229,7 +1271,7 @@ func (b *Beat) createOutput(stats outputs.Observer, cfg config.Namespace) (outpu
 		return outputs.Group{}, fmt.Errorf("could not setup output certificates reloader: %w", err)
 	}
 
-	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config())
+	return outputs.Load(b.IdxSupporter, b.Info, stats, cfg.Name(), cfg.Config(), sensitiveLoggerCfg)
 }
 
 func (b *Beat) registerClusterUUIDFetching() {
