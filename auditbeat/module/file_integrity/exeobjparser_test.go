@@ -40,8 +40,12 @@ func TestExeObjParser(t *testing.T) {
 
 			key := fmt.Sprintf("%s_%s", builder, format)
 			t.Run(fmt.Sprintf("executableObject_%s_%s", format, builder), func(t *testing.T) {
-				if builder == "garble" && format == "pe" {
-					t.Skip("skipping test on garbled PE file: see https://github.com/elastic/beats/issues/35705")
+				if builder == "garble" {
+					if format == "pe" {
+						t.Skip("skipping test on garbled PE file: see https://github.com/elastic/beats/issues/35705")
+					} else if format == "macho" {
+						t.Skip("skipping test: garble_macho_executable is detected as malicious by Elastic endpoint")
+					}
 				}
 
 				got := make(mapstr.M)
@@ -407,87 +411,6 @@ var want = map[string]mapstr.M{
 			"go_imports_names_entropy":     4.156563879566413,
 			"go_imports_names_var_entropy": 0.0073028693197579415,
 			"go_stripped":                  false,
-		},
-	},
-	"garble_macho": {
-		"macho": mapstr.M{
-			"sections": []objSection{
-				{Name: strPtr("__text"), Size: uint64Ptr(0x80e52), Entropy: float64Ptr(6.17), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("__symbol_stub1"), Size: uint64Ptr(0x102), Entropy: float64Ptr(3.62), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("__rodata"), Size: uint64Ptr(0x367b3), Entropy: float64Ptr(4.28), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("__typelink"), Size: uint64Ptr(0x554), Entropy: float64Ptr(3.85), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("__itablink"), Size: uint64Ptr(0x78), Entropy: float64Ptr(2.61), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("__gosymtab"), Size: uint64Ptr(0x0), Entropy: float64Ptr(0.0), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("__gopclntab"), Size: uint64Ptr(0x5cf68), Entropy: float64Ptr(5.41), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("__go_buildinfo"), Size: uint64Ptr(0x20), Entropy: float64Ptr(3.85), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("__nl_symbol_ptr"), Size: uint64Ptr(0x158), Entropy: float64Ptr(0.0), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("__noptrdata"), Size: uint64Ptr(0x10780), Entropy: float64Ptr(5.59), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("__data"), Size: uint64Ptr(0x71f0), Entropy: float64Ptr(1.72), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("__bss"), Size: uint64Ptr(0x2f088), Entropy: float64Ptr(6.13), VarEntropy: float64Ptr(0.0001)},
-				{Name: strPtr("__noptrbss"), Size: uint64Ptr(0x51a0), Entropy: float64Ptr(5.55), VarEntropy: float64Ptr(0.0001)},
-			},
-			"import_hash": "d3ccf195b62a9279c3c19af1080497ec",
-			"imports": []string{
-				"___error",
-				"__exit",
-				"_clock_gettime",
-				"_close",
-				"_closedir",
-				"_execve",
-				"_fcntl",
-				"_fstat64",
-				"_getcwd",
-				"_getpid",
-				"_kevent",
-				"_kill",
-				"_kqueue",
-				"_lseek",
-				"_mach_absolute_time",
-				"_mach_timebase_info",
-				"_madvise",
-				"_mmap",
-				"_munmap",
-				"_open",
-				"_pipe",
-				"_pthread_attr_getstacksize",
-				"_pthread_attr_init",
-				"_pthread_attr_setdetachstate",
-				"_pthread_cond_init",
-				"_pthread_cond_signal",
-				"_pthread_cond_timedwait_relative_np",
-				"_pthread_cond_wait",
-				"_pthread_create",
-				"_pthread_kill",
-				"_pthread_mutex_init",
-				"_pthread_mutex_lock",
-				"_pthread_mutex_unlock",
-				"_pthread_self",
-				"_pthread_sigmask",
-				"_raise",
-				"_read",
-				"_sigaction",
-				"_sigaltstack",
-				"_stat64",
-				"_sysctl",
-				"_usleep",
-				"_write",
-			},
-			"imports_names_entropy":     4.132925542571368,
-			"imports_names_var_entropy": 0.002702653338037826,
-			"go_imports": []string{
-				"evnQ6ZcH.NEfVFrsU",
-				"evnQ6ZcH.NEfVFrsU.func1",
-				"evnQ6ZcH.obErrEr2",
-				"evnQ6ZcH.obErrEr2.func1",
-				"evnQ6ZcH.obErrEr2.func1.1",
-				"main.main",
-				"main.main.func1",
-			},
-			"symhash":                      "d3ccf195b62a9279c3c19af1080497ec",
-			"go_import_hash":               "ea0346ba1d3c7c7e762864b7abd53399",
-			"go_imports_names_entropy":     4.527763863520965,
-			"go_imports_names_var_entropy": 0.004284997488747353,
-			"go_stripped":                  true,
 		},
 	},
 }
