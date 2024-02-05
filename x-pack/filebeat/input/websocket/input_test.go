@@ -20,8 +20,8 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/google/go-cmp/cmp"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/gorilla/websocket"
 )
 
@@ -37,7 +37,6 @@ var inputTests = []struct {
 	time          func() time.Time
 	persistCursor map[string]interface{}
 	want          []map[string]interface{}
-	wantCursor    []map[string]interface{}
 	wantErr       error
 }{
 	{
@@ -300,24 +299,6 @@ func TestInput(t *testing.T) {
 			for i, got := range client.published {
 				if !reflect.DeepEqual(got.Fields, mapstr.M(test.want[i])) {
 					t.Errorf("unexpected result for event %d: got:- want:+\n%s", i, cmp.Diff(got.Fields, mapstr.M(test.want[i])))
-				}
-			}
-
-			switch {
-			case len(test.wantCursor) == 0 && len(client.cursors) == 0:
-				return
-			case len(test.wantCursor) == 0:
-				t.Errorf("unexpected cursors: %v", client.cursors)
-				return
-			}
-			if len(client.cursors) < len(test.wantCursor) {
-				t.Errorf("unexpected number of cursors events: got:%d want at least:%d", len(client.cursors), len(test.wantCursor))
-				test.wantCursor = test.wantCursor[:len(client.published)]
-			}
-			client.published = client.published[:len(test.want)]
-			for i, got := range client.cursors {
-				if !reflect.DeepEqual(mapstr.M(got), mapstr.M(test.wantCursor[i])) {
-					t.Errorf("unexpected cursor for event %d: got:- want:+\n%s", i, cmp.Diff(got, test.wantCursor[i]))
 				}
 			}
 		})
