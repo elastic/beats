@@ -68,27 +68,8 @@ steps:
 
 YAML
 
-if are_conditions_met_metricbeat_macos_tests; then
-  cat >> $pipelineName <<- YAML
-
-  - group: "Extended Tests"
-    key: "extended-tests"
-    steps:
-      - label: ":mac: MacOS Unit Tests"
-        key: "extended-macos-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh"
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-YAML
-fi
-
-echo "Adding the additional tests into the pipeline"
+echo "Adding the extended windows tests into the pipeline"
 #TODO: ADD conditions from the main pipeline
-
-# if are_conditions_met_extended_windows_tests; then
 cat >> $pipelineName <<- YAML
 
   - group: "Extended Windowds Tests"
@@ -127,12 +108,32 @@ cat >> $pipelineName <<- YAML
           disk_size: 100
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
 YAML
-# fi
+
+if are_conditions_met_metricbeat_macos_tests; then
+  cat >> $pipelineName <<- YAML
+
+  - group: "Extended Tests"
+    key: "extended-tests"
+    steps:
+      - label: ":mac: MacOS Unit Tests"
+        key: "extended-macos-unit-tests"
+        command: ".buildkite/scripts/unit_tests.sh"
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+YAML
+
+fi
 
 if are_conditions_met_packaging; then
   cat >> $pipelineName <<- YAML
+
+  - wait: ~
+    depends_on:
+      - step: "mandatory-tests"
+        allow_failure: false
 
   - group: "Packaging"    # TODO: check conditions for future the main pipeline migration: https://github.com/elastic/beats/pull/28589
     key: "packaging"
@@ -157,14 +158,6 @@ if are_conditions_met_packaging; then
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
-
-    depends_on:
-    - step: "mandatory-tests"
-      allow_failure: false
-    - step: "extended-tests"
-      allow_failure: true
-    - step: "extended-win-tests"
-      allow_failure: true
 
 YAML
 fi

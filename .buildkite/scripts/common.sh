@@ -181,7 +181,6 @@ are_changed_only_paths() {
   return 1
 }
 
-
 # are_conditions_met_mandatory_tests() {
 #   if [[ "${BUILDKITE_PULL_REQUEST}" == "" ]] || [[ "${runAllStages}" == "true" ]] || [[ "${ONLY_DOCS}" == "false" && "${BUILDKITE_PULL_REQUEST}" != "" ]]; then     # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L107-L137
 #     if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
