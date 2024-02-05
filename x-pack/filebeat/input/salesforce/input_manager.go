@@ -15,7 +15,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// inputManager wraps one stateless input manager
+// compile-time check if querier implements InputManager
+var _ v2.InputManager = InputManager{}
+
+// InputManager wraps one stateless input manager
 // and one cursor input manager. It will create one or the other
 // based on the config that is passed.
 type InputManager struct {
@@ -36,7 +39,7 @@ func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManage
 
 // cursorConfigure configures the cursor input manager.
 func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
-	config := defaultConfig()
+	config := config{Version: 58}
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, fmt.Errorf("reading config: %w", err)
 	}
@@ -55,12 +58,9 @@ func (m InputManager) Init(grp unison.Group, mode v2.Mode) error {
 
 // Create creates a cursor input manager.
 func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
-	config := defaultConfig()
+	config := config{Version: 58}
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}
 	return m.cursor.Create(cfg)
 }
-
-// defaultConfig returns the default configuration.
-func defaultConfig() config { return config{} }

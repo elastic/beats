@@ -19,9 +19,6 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-// compile-time check if querier implements InputManager
-var _ v2.InputManager = InputManager{}
-
 func makeTestStore(data map[string]interface{}) *statestore.Store {
 	memstore := &storetest.MapStore{Table: data}
 	reg := statestore.NewRegistry(&storetest.MemoryStore{
@@ -50,9 +47,7 @@ func TestInputManager(t *testing.T) {
 	inputManager := NewInputManager(logp.NewLogger("salesforce_test"), stateStore{})
 
 	var inputTaskGroup unison.TaskGroup
-	defer func() {
-		_ = inputTaskGroup.Stop()
-	}()
+	defer inputTaskGroup.Stop() //nolint:errcheck // ignore error in test
 
 	err := inputManager.Init(&inputTaskGroup, v2.ModeRun)
 	assert.NoError(t, err)
@@ -69,7 +64,7 @@ func TestInputManager(t *testing.T) {
 				ClientKeyPath:  "xyz",
 			}},
 		},
-		"event_monitoring_method": &EventMonitoringMethod{
+		"event_monitoring_method": &eventMonitoringMethod{
 			Object: EventMonitoringConfig{Enabled: pointer(true), Interval: 4},
 		},
 	})

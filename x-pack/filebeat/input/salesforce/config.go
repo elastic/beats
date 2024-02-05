@@ -12,12 +12,12 @@ import (
 
 type config struct {
 	Auth                  *authConfig            `config:"auth"`
-	EventMonitoringMethod *EventMonitoringMethod `config:"event_monitoring_method"`
+	EventMonitoringMethod *eventMonitoringMethod `config:"event_monitoring_method"`
 	URL                   string                 `config:"url" validate:"required"`
 	Version               int                    `config:"version" validate:"required"`
 }
 
-type EventMonitoringMethod struct {
+type eventMonitoringMethod struct {
 	EventLogFile EventMonitoringConfig `config:"event_log_file"`
 	Object       EventMonitoringConfig `config:"object"`
 }
@@ -54,9 +54,9 @@ func (c *config) Validate() error {
 		return fmt.Errorf("not a valid interval %d", c.EventMonitoringMethod.Object.Interval)
 
 	case c.Version < 46:
-		// * EventLogFile object is available in API version 32.0 or later
-		// * SetupAuditTrail object is available in API version 15.0 or later
-		// * Real-Time Event monitoring objects that were introduced as part of
+		// - EventLogFile object is available in API version 32.0 or later
+		// - SetupAuditTrail object is available in API version 15.0 or later
+		// - Real-Time Event monitoring objects that were introduced as part of
 		// the beta release in API version 46.0
 		//
 		// To keep things simple, only one version is entertained i.e., the

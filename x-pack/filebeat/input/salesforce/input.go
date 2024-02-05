@@ -178,6 +178,10 @@ func (s *salesforceInput) isError(err error) error {
 }
 
 func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
+	if s.sfdcConfig == nil {
+		return nil, errors.New("internal error: salesforce configuration is not set properly")
+	}
+
 	// Open creates a session using the configuration.
 	session, err := session.Open(*s.sfdcConfig)
 	if err != nil {
@@ -234,7 +238,8 @@ func (s *salesforceInput) RunObject() error {
 
 	totalEvents := 0
 	firstEvent := true
-	for res.Done() {
+
+	for res.TotalSize() > 0 {
 		for _, rec := range res.Records() {
 			val := rec.Record().Fields()
 
@@ -253,7 +258,7 @@ func (s *salesforceInput) RunObject() error {
 				s.cursor.Object.LastEventTime = timstamp
 			}
 
-			err = publishEvent(s.publisher, s.cursor, jsonStrEvent)
+			err = publishEvent(s.publisher, s.cursor, jsonStrEvent, "Object")
 			if err != nil {
 				return err
 			}
@@ -302,8 +307,12 @@ func (s *salesforceInput) RunEventLogFile() error {
 		return err
 	}
 
+	if s.sfdcConfig.Client == nil {
+		return errors.New("internal error: salesforce configuration is not set properly")
+	}
+
 	totalEvents, firstEvent := 0, true
-	for res.Done() {
+	for res.TotalSize() > 0 {
 		for _, rec := range res.Records() {
 			req, err := http.NewRequestWithContext(s.ctx, http.MethodGet, s.config.URL+rec.Record().Fields()["LogFile"].(string), nil)
 			if err != nil {
@@ -347,7 +356,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 					return err
 				}
 
-				err = publishEvent(s.publisher, s.cursor, jsonStrEvent)
+				err = publishEvent(s.publisher, s.cursor, jsonStrEvent, "EventLogFile")
 				if err != nil {
 					return err
 				}
@@ -428,11 +437,14 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 }
 
 // publishEvent publishes an event using the configured publisher pub.
-func publishEvent(pub inputcursor.Publisher, cursor *state, jsonStrEvent []byte) error {
+func publishEvent(pub inputcursor.Publisher, cursor *state, jsonStrEvent []byte, dataCollectionMethod string) error {
 	event := beat.Event{
 		Timestamp: timeNow(),
 		Fields: mapstr.M{
 			"message": string(jsonStrEvent),
+			"event": mapstr.M{
+				"provider": dataCollectionMethod,
+			},
 		},
 	}
 
@@ -451,10 +463,6 @@ func decodeAsCSV(p []byte) ([]map[string]string, error) {
 	// To share the backing array for performance.
 	r.ReuseRecord = true
 
-	// NOTE:
-	// Read sets `r.FieldsPerRecord` to the number of fields in the first record,
-	// so that future records must have the same field count.
-
 	// Header row is always expected, otherwise we can't map values to keys in
 	// the event.
 	header, err := r.Read()
@@ -470,6 +478,12 @@ func decodeAsCSV(p []byte) ([]map[string]string, error) {
 
 	var results []map[string]string //nolint:prealloc // not sure about the size to prealloc with
 
+	// NOTE:
+	//
+	// Read sets `r.FieldsPerRecord` to the number of fields in the first record,
+	// so that future records must have the same field count.
+	// So, if len(header) != len(event), the Read will return an error and hence
+	// we need not put an explicit check.
 	event, err := r.Read()
 	for ; err == nil; event, err = r.Read() {
 		if err != nil {

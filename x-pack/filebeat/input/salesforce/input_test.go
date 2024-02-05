@@ -324,7 +324,7 @@ func TestInput(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setupServer(t, tc.handler, tc.baseConfig)
 
-			cfg := defaultConfig()
+			cfg := config{Version: 58}
 			err := conf.MustNewConfigFrom(tc.baseConfig).Unpack(&cfg)
 			assert.NoError(t, err)
 			timeout := 5 * time.Second
@@ -520,7 +520,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 				},
 			},
 		}
-		objectEventMonitotingConfig = EventMonitoringMethod{
+		objectEventMonitotingConfig = eventMonitoringMethod{
 			Object: EventMonitoringConfig{
 				Enabled:  pointer(true),
 				Interval: time.Second * 5,
@@ -531,7 +531,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 				Cursor: &cursorConfig{Field: "EventDate"},
 			},
 		}
-		objectEventMonitoringWithWrongQuery = EventMonitoringMethod{
+		objectEventMonitoringWithWrongQuery = eventMonitoringMethod{
 			Object: EventMonitoringConfig{
 				Enabled:  pointer(true),
 				Interval: time.Second * 5,
@@ -543,7 +543,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 			},
 		}
 
-		elfEventMonitotingConfig = EventMonitoringMethod{
+		elfEventMonitotingConfig = eventMonitoringMethod{
 			EventLogFile: EventMonitoringConfig{
 				Enabled:  pointer(true),
 				Interval: time.Second * 5,
@@ -554,7 +554,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 				Cursor: &cursorConfig{Field: "EventDate"},
 			},
 		}
-		elfEventMonitotingWithWrongQuery = EventMonitoringMethod{
+		elfEventMonitotingWithWrongQuery = eventMonitoringMethod{
 			EventLogFile: EventMonitoringConfig{
 				Enabled:  pointer(true),
 				Interval: time.Second * 5,
@@ -693,12 +693,13 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
+		config := tt.fields.config
+
 		t.Run(tt.name, func(t *testing.T) {
-			var err error
-			tt.setupServer(t, tt.handler, &tt.fields.config)
+			tt.setupServer(t, tt.handler, &config)
 
 			s := &salesforceInput{
-				config:     tt.fields.config,
+				config:     config,
 				ctx:        tt.fields.ctx,
 				cancel:     tt.fields.cancel,
 				publisher:  tt.fields.publisher,
@@ -722,6 +723,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 			s.publisher = &client
 			s.srcConfig = &s.config
 
+			var err error
 			s.sfdcConfig, err = getSFDCConfig(&s.config)
 			if err != nil && !tt.wantErr {
 				t.Errorf("unexpected error from running input: %v", err)
@@ -765,7 +767,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 
 func getValueTpl(in string) *valueTpl {
 	vp := &valueTpl{}
-	vp.Unpack(in)
+	vp.Unpack(in) //nolint:errcheck // ignore error in test
 
 	return vp
 }

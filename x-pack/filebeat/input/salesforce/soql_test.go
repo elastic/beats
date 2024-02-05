@@ -8,12 +8,8 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/g8rswimmer/go-sfdc/soql"
 	"github.com/stretchr/testify/assert"
 )
-
-// compile-time check if querier implements soql.QueryFormatter
-var _ soql.QueryFormatter = (*querier)(nil)
 
 func TestFormat(t *testing.T) {
 	tests := map[string]struct {
