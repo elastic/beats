@@ -258,7 +258,7 @@ func (s *salesforceInput) RunObject() error {
 				s.cursor.Object.LastEventTime = timstamp
 			}
 
-			err = publishEvent(s.publisher, s.cursor, jsonStrEvent)
+			err = publishEvent(s.publisher, s.cursor, jsonStrEvent, "Object")
 			if err != nil {
 				return err
 			}
@@ -356,7 +356,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 					return err
 				}
 
-				err = publishEvent(s.publisher, s.cursor, jsonStrEvent)
+				err = publishEvent(s.publisher, s.cursor, jsonStrEvent, "EventLogFile")
 				if err != nil {
 					return err
 				}
@@ -437,11 +437,14 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 }
 
 // publishEvent publishes an event using the configured publisher pub.
-func publishEvent(pub inputcursor.Publisher, cursor *state, jsonStrEvent []byte) error {
+func publishEvent(pub inputcursor.Publisher, cursor *state, jsonStrEvent []byte, dataCollectionMethod string) error {
 	event := beat.Event{
 		Timestamp: timeNow(),
 		Fields: mapstr.M{
 			"message": string(jsonStrEvent),
+			"event": mapstr.M{
+				"provider": dataCollectionMethod,
+			},
 		},
 	}
 
