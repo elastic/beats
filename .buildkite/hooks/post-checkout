@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -51,21 +51,3 @@ git --no-pager log --format=%B -n 1
 
 # Ensure buildkite groups are rendered
 echo ""
-#!/usr/bin/env bash
-
-set -euo pipefail
-
-source .buildkite/filebeat/scripts/pre-common.sh
-
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
-  changeset="^filebeat/
-    ^go.mod
-    ^pytest.ini
-    ^dev-tools/
-    ^libbeat/
-    ^testing/
-    ^\.buildkite/filebeat/"
-
-  check_filebeat_changes "$changeset"
-  echo ":: FILEBEAT_CHANGESET=$FILEBEAT_CHANGESET ::"
-fi

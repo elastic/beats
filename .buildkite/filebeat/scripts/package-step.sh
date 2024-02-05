@@ -5,12 +5,12 @@ set -euo pipefail
 source .buildkite/env-scripts/util.sh
 
 changeset="^filebeat/
-    ^go.mod
-    ^pytest.ini
-    ^dev-tools/
-    ^libbeat/
-    ^testing/
-    ^\.buildkite/filebeat/"
+^go.mod
+^pytest.ini
+^dev-tools/
+^libbeat/
+^testing/
+^\.buildkite/filebeat/"
 
 if are_files_changed "$changeset"; then
   cat <<-EOF
