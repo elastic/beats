@@ -13,11 +13,6 @@ processors:
       - message
     ignore_missing: true
 
-- set:
-    field: salesforce.access_mode
-    value: rest
-    ignore_failure: true
-
 - date:
     field: json.CreatedDate
     target_field: "@timestamp"
