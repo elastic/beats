@@ -30,6 +30,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -55,6 +56,7 @@ type BeatProc struct {
 	logFileOffset       int64
 	t                   *testing.T
 	tempDir             string
+	stdin               io.WriteCloser
 	stdout              *os.File
 	stderr              *os.File
 	Process             *os.Process
@@ -90,7 +92,7 @@ type Total struct {
 	Value int `json:"value"`
 }
 
-// NewBeat createa a new Beat process from the system tests binary.
+// NewBeat creates a new Beat process from the system tests binary.
 // It sets some required options like the home path, logging, etc.
 // `tempDir` will be used as home and logs directory for the Beat
 // `args` will be passed as CLI arguments to the Beat
@@ -98,10 +100,12 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "beat binary must exists")
 	tempDir := createTempDir(t)
 	configFile := filepath.Join(tempDir, beatName+".yml")
+
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
 	require.NoError(t, err, "error creating stdout file")
 	stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
 	require.NoError(t, err, "error creating stderr file")
+
 	p := BeatProc{
 		Binary: binary,
 		baseArgs: append([]string{
@@ -213,15 +217,27 @@ func (b *BeatProc) Start(args ...string) {
 func (b *BeatProc) startBeat() {
 	b.cmdMutex.Lock()
 	defer b.cmdMutex.Unlock()
+
 	_, _ = b.stdout.Seek(0, 0)
 	_ = b.stdout.Truncate(0)
 	_, _ = b.stderr.Seek(0, 0)
 	_ = b.stderr.Truncate(0)
-	var procAttr os.ProcAttr
-	procAttr.Files = []*os.File{os.Stdin, b.stdout, b.stderr}
-	process, err := os.StartProcess(b.fullPath, b.Args, &procAttr)
+
+	cmd := exec.Cmd{
+		Path:   b.fullPath,
+		Args:   b.Args,
+		Stdout: b.stdout,
+		Stderr: b.stderr,
+	}
+
+	var err error
+	b.stdin, err = cmd.StdinPipe()
+	require.NoError(b.t, err, "could not get cmd StdinPipe")
+
+	err = cmd.Start()
 	require.NoError(b.t, err, "error starting beat process")
-	b.Process = process
+
+	b.Process = cmd.Process
 }
 
 // waitBeatToExit blocks until the Beat exits, it returns
@@ -513,6 +529,10 @@ func (b *BeatProc) LoadMeta() (Meta, error) {
 	err = json.Unmarshal(metaBytes, &m)
 	require.NoError(b.t, err, "error unmarshalling meta data")
 	return m, nil
+}
+
+func (b *BeatProc) Stdin() io.WriteCloser {
+	return b.stdin
 }
 
 func GetESURL(t *testing.T, scheme string) url.URL {
