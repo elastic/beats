@@ -197,7 +197,7 @@ func initRand() {
 	} else {
 		seed = n.Int64()
 	}
-	rand.Seed(seed)
+	rand.Seed(seed) //nolint:staticcheck // need seed from cryptographically strong PRNG.
 }
 
 // Run initializes and runs a Beater implementation. name is the name of the
@@ -824,7 +824,10 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("failed to get host information: %w", err)
 	}
 
-	fqdn, err := h.FQDN()
+	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
 	if err != nil {
 		// FQDN lookup is "best effort".  We log the error, fallback to
 		// the OS-reported hostname, and move on.
