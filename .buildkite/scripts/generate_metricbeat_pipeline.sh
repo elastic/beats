@@ -6,14 +6,10 @@ set -euo pipefail
 
 pipelineName="pipeline.metricbeat-dynamic.yml"
 
+echo "Adding the mandatory tests into the pipeline"
 cat > $pipelineName <<- YAML
 
 steps:
-
-YAML
-
-if are_conditions_met_mandatory_tests; then
-  cat >> $pipelineName <<- YAML
 
   - group: "Mandatory Tests"
     key: "mandatory-tests"
@@ -71,9 +67,8 @@ if are_conditions_met_mandatory_tests; then
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
-fi
 
-if are_conditions_met_extended_tests && are_conditions_met_macos_tests; then
+if are_conditions_met_metricbeat_macos_tests; then
   cat >> $pipelineName <<- YAML
 
   - group: "Extended Tests"
@@ -90,8 +85,11 @@ if are_conditions_met_extended_tests && are_conditions_met_macos_tests; then
 YAML
 fi
 
-if are_conditions_met_extended_windows_tests; then
-  cat >> $pipelineName <<- YAML
+echo "Adding the additional tests into the pipeline"
+#TODO: ADD conditions from the main pipeline
+
+# if are_conditions_met_extended_windows_tests; then
+cat >> $pipelineName <<- YAML
 
   - group: "Extended Windowds Tests"
     key: "extended-win-tests"
@@ -131,9 +129,9 @@ if are_conditions_met_extended_windows_tests; then
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
-fi
+# fi
 
-if are_conditions_met_extended_windows_tests; then
+if are_conditions_met_packaging; then
   cat >> $pipelineName <<- YAML
 
   - group: "Packaging"    # TODO: check conditions for future the main pipeline migration: https://github.com/elastic/beats/pull/28589

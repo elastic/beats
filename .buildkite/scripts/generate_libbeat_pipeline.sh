@@ -6,14 +6,10 @@ set -euo pipefail
 
 pipelineName="pipeline.libbeat-dynamic.yml"
 
+echo "Adding the mandatory tests into the pipeline"
 cat > $pipelineName <<- YAML
 
 steps:
-
-YAML
-
-if are_conditions_met_mandatory_tests; then
-  cat >> $pipelineName <<- YAML
 
   - group: "Mandatory Tests"
     key: "mandatory-tests"
@@ -64,9 +60,9 @@ if are_conditions_met_mandatory_tests; then
         artifact_paths: "${BEATS_PROJECT_NAME}/libbeat-stress-test.xml"
 
 YAML
-fi
 
-if are_conditions_met_extended_tests && are_conditions_met_arm_tests; then
+echo "Adding the additional tests into the pipeline"
+if are_conditions_met_libbeat_arm_tests; then
   cat >> $pipelineName <<- YAML
 
   - group: "Extended Tests"
