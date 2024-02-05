@@ -53,7 +53,6 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 	if !wantClient(cfg) {
 		return fmt.Errorf("unsupported scheme: %s", cfg.Resource.URL.Scheme)
 	}
-	// return test(cfg.Resource.URL.URL)
 	return nil
 }
 
@@ -115,6 +114,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	defer c.Close()
 
 	done := make(chan struct{})
+	errChan := make(chan error)
+
 	go func() {
 		defer close(done)
 		for {
@@ -125,7 +126,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					log.Debugw("websocket connection closed", "error", err)
 				}
 				log.Errorw("failed to read websocket data", "error", err)
-
+				errChan <- err
 				return
 			}
 			metrics.receivedBytesTotal.Add(uint64(len(message)))
@@ -135,14 +136,17 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			if err != nil {
 				metrics.errorsTotal.Inc()
 				log.Errorw("failed to process and publish data", "error", err)
+				errChan <- err
 				return
 			}
 		}
 	}()
 
-	// blocks until done is closed or context is cancelled
+	// blocks until done is closed , context is cancelled or an error is received
 	for {
 		select {
+		case err := <-errChan:
+			return err
 		case <-done:
 			return nil
 		case <-ctx.Done():
