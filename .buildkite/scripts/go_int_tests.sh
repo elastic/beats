@@ -4,9 +4,9 @@ source .buildkite/scripts/install_tools.sh
 
 set -euo pipefail
 
-echo "--- Run Unit Tests"
+echo "--- Run Go Intergration Tests for $BEATS_PROJECT_NAME"
 pushd "${BEATS_PROJECT_NAME}" > /dev/null
 
-mage build unitTest
+mage goIntegTest
 
 popd > /dev/null
