@@ -91,6 +91,8 @@ type watcherData struct {
 	started bool // true if watcher has started, false otherwise
 
 	enrichers []*enricher // list of enrichers using this watcher
+
+	metadataEvents map[string]mapstr.M // resulted metadata events from the resource event handler
 }
 
 type Watchers struct {
@@ -269,7 +271,11 @@ func createWatcher(
 		if err != nil {
 			return false, err
 		}
-		resourceWatchers.watchersMap[resourceName] = &watcherData{watcher: watcher, started: false}
+		resourceWatchers.watchersMap[resourceName] = &watcherData{
+			watcher:        watcher,
+			started:        false,
+			metadataEvents: make(map[string]mapstr.M),
+		}
 		return true, nil
 	}
 	return false, nil
@@ -497,13 +503,13 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	updateFunc := func(m map[string]mapstr.M, r kubernetes.Resource) {
+	updateFunc := func(r kubernetes.Resource) map[string]mapstr.M {
 		accessor, _ := meta.Accessor(r)
 		id := join(accessor.GetNamespace(), accessor.GetName())
 
 		switch r := r.(type) {
 		case *kubernetes.Pod:
-			m[id] = specificMetaGen.Generate(r)
+			return map[string]mapstr.M{id: specificMetaGen.Generate(r)}
 
 		case *kubernetes.Node:
 			nodeName := r.GetObjectMeta().GetName()
@@ -521,35 +527,35 @@ func NewResourceMetadataEnricher(
 			nodeStore, _ := metricsRepo.AddNodeStore(nodeName)
 			nodeStore.SetNodeMetrics(metrics)
 
-			m[id] = generalMetaGen.Generate(NodeResource, r)
+			return map[string]mapstr.M{id: generalMetaGen.Generate(NodeResource, r)}
 		case *kubernetes.Deployment:
-			m[id] = generalMetaGen.Generate(DeploymentResource, r)
+			return map[string]mapstr.M{id: generalMetaGen.Generate(DeploymentResource, r)}
 		case *kubernetes.Job:
-			m[id] = generalMetaGen.Generate(JobResource, r)
+			return map[string]mapstr.M{id: generalMetaGen.Generate(JobResource, r)}
 		case *kubernetes.CronJob:
-			m[id] = generalMetaGen.Generate(CronJobResource, r)
+			return map[string]mapstr.M{id: generalMetaGen.Generate(CronJobResource, r)}
 		case *kubernetes.Service:
-			m[id] = specificMetaGen.Generate(r)
+			return map[string]mapstr.M{id: specificMetaGen.Generate(r)}
 		case *kubernetes.StatefulSet:
-			m[id] = generalMetaGen.Generate(StatefulSetResource, r)
+			return map[string]mapstr.M{id: generalMetaGen.Generate(StatefulSetResource, r)}
 		case *kubernetes.Namespace:
-			m[id] = generalMetaGen.Generate(NamespaceResource, r)
+			return map[string]mapstr.M{id: generalMetaGen.Generate(NamespaceResource, r)}
 		case *kubernetes.ReplicaSet:
-			m[id] = generalMetaGen.Generate(ReplicaSetResource, r)
+			return map[string]mapstr.M{id: generalMetaGen.Generate(ReplicaSetResource, r)}
 		case *kubernetes.DaemonSet:
-			m[id] = generalMetaGen.Generate(DaemonSetResource, r)
+			return map[string]mapstr.M{id: generalMetaGen.Generate(DaemonSetResource, r)}
 		case *kubernetes.PersistentVolume:
-			m[id] = generalMetaGen.Generate(PersistentVolumeResource, r)
+			return map[string]mapstr.M{id: generalMetaGen.Generate(PersistentVolumeResource, r)}
 		case *kubernetes.PersistentVolumeClaim:
-			m[id] = generalMetaGen.Generate(PersistentVolumeClaimResource, r)
+			return map[string]mapstr.M{id: generalMetaGen.Generate(PersistentVolumeClaimResource, r)}
 		case *kubernetes.StorageClass:
-			m[id] = generalMetaGen.Generate(StorageClassResource, r)
+			return map[string]mapstr.M{id: generalMetaGen.Generate(StorageClassResource, r)}
 		default:
-			m[id] = generalMetaGen.Generate(r.GetObjectKind().GroupVersionKind().Kind, r)
+			return map[string]mapstr.M{id: generalMetaGen.Generate(r.GetObjectKind().GroupVersionKind().Kind, r)}
 		}
 	}
 
-	deleteFunc := func(m map[string]mapstr.M, r kubernetes.Resource) {
+	deleteFunc := func(r kubernetes.Resource) []string {
 		accessor, _ := meta.Accessor(r)
 
 		switch r := r.(type) {
@@ -559,7 +565,7 @@ func NewResourceMetadataEnricher(
 		}
 
 		id := join(accessor.GetNamespace(), accessor.GetName())
-		delete(m, id)
+		return []string{id}
 	}
 
 	indexFunc := func(e mapstr.M) string {
@@ -617,7 +623,9 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	updateFunc := func(m map[string]mapstr.M, r kubernetes.Resource) {
+	updateFunc := func(r kubernetes.Resource) map[string]mapstr.M {
+		metadataEvents := make(map[string]mapstr.M)
+
 		pod, ok := r.(*kubernetes.Pod)
 		if !ok {
 			base.Logger().Debugf("Error while casting event: %s", ok)
@@ -668,11 +676,14 @@ func NewContainerMetadataEnricher(
 
 			id := join(pod.GetObjectMeta().GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
 			cmeta.DeepUpdate(pmeta)
-			m[id] = cmeta
+
+			metadataEvents[id] = cmeta
 		}
+		return metadataEvents
 	}
 
-	deleteFunc := func(m map[string]mapstr.M, r kubernetes.Resource) {
+	deleteFunc := func(r kubernetes.Resource) []string {
+		ids := make([]string, 0)
 		pod, ok := r.(*kubernetes.Pod)
 		if !ok {
 			base.Logger().Debugf("Error while casting event: %s", ok)
@@ -683,8 +694,10 @@ func NewContainerMetadataEnricher(
 
 		for _, container := range append(pod.Spec.Containers, pod.Spec.InitContainers...) {
 			id := join(pod.ObjectMeta.GetNamespace(), pod.GetObjectMeta().GetName(), container.Name)
-			delete(m, id)
+			ids = append(ids, id)
 		}
+
+		return ids
 	}
 
 	indexFunc := func(e mapstr.M) string {
@@ -751,14 +764,14 @@ func buildMetadataEnricher(
 	resourceName string,
 	resourceWatchers *Watchers,
 	config *kubernetesConfig,
-	update func(map[string]mapstr.M, kubernetes.Resource),
-	delete func(map[string]mapstr.M, kubernetes.Resource),
-	index func(e mapstr.M) string,
+	updateFunc func(kubernetes.Resource) map[string]mapstr.M,
+	deleteFunc func(kubernetes.Resource) []string,
+	indexFunc func(e mapstr.M) string,
 	log *logp.Logger) *enricher {
 
 	enricher := &enricher{
 		metadata:      map[string]mapstr.M{},
-		index:         index,
+		index:         indexFunc,
 		resourceName:  resourceName,
 		metricsetName: metricsetName,
 		config:        config,
@@ -771,25 +784,61 @@ func buildMetadataEnricher(
 	watcher := resourceWatchers.watchersMap[resourceName]
 	if watcher != nil {
 		watcher.enrichers = append(watcher.enrichers, enricher)
+
+		// Check if there are past events for this resource and update metadata if there is
+		for id, metadata := range watcher.metadataEvents {
+			enricher.metadata[id] = metadata
+		}
+
 		watcher.watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				for _, enricher := range watcher.enrichers {
+				var newMetadataEvents map[string]mapstr.M
+				for i, enricher := range watcher.enrichers {
 					enricher.Lock()
-					update(enricher.metadata, obj.(kubernetes.Resource))
+					if i == 0 {
+						newMetadataEvents = updateFunc(obj.(kubernetes.Resource))
+						// add the new metadata to the watcher received metadata
+						for id, metadata := range newMetadataEvents {
+							watcher.metadataEvents[id] = metadata
+						}
+					}
+					for id, metadata := range newMetadataEvents {
+						enricher.metadata[id] = metadata
+					}
 					enricher.Unlock()
 				}
 			},
 			UpdateFunc: func(obj interface{}) {
-				for _, enricher := range watcher.enrichers {
+				var updatedMetadataEvents map[string]mapstr.M
+				for i, enricher := range watcher.enrichers {
 					enricher.Lock()
-					update(enricher.metadata, obj.(kubernetes.Resource))
+					if i == 0 {
+						updatedMetadataEvents = updateFunc(obj.(kubernetes.Resource))
+						// update the watcher metadata
+						for id, metadata := range updatedMetadataEvents {
+							watcher.metadataEvents[id] = metadata
+						}
+					}
+					for id, metadata := range updatedMetadataEvents {
+						enricher.metadata[id] = metadata
+					}
 					enricher.Unlock()
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				for _, enricher := range watcher.enrichers {
+				var ids []string
+				for i, enricher := range watcher.enrichers {
 					enricher.Lock()
-					delete(enricher.metadata, obj.(kubernetes.Resource))
+					if i == 0 {
+						ids = deleteFunc(obj.(kubernetes.Resource))
+						// update this watcher events by removing all the metadata[id]
+						for _, id := range ids {
+							delete(watcher.metadataEvents, id)
+						}
+					}
+					for _, id := range ids {
+						delete(enricher.metadata, id)
+					}
 					enricher.Unlock()
 				}
 			},

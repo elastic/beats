@@ -444,6 +444,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 		watcher:         &mockWatcher{},
 		started:         false,
 		metricsetsUsing: []string{PodResource},
+		metadataEvents:  make(map[string]mapstr.M),
 	}
 	resourceWatchers.lock.Unlock()
 
@@ -456,6 +457,24 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 				"label": "value",
 			},
 			Namespace: "default",
+		},
+	}
+
+	// check update function for the resulting add event
+	addEvent := map[string]mapstr.M{
+		"enrich": {
+			"kubernetes": mapstr.M{
+				"label": "value",
+				"pod": mapstr.M{
+					"name": "enrich",
+					"uid":  "mockuid",
+				},
+			},
+			"orchestrator": mapstr.M{
+				"cluster": mapstr.M{
+					"name": "gke-4242",
+				},
+			},
 		},
 	}
 
@@ -483,12 +502,10 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	resourceWatchers.lock.Lock()
 	watcher := resourceWatchers.watchersMap[PodResource]
 	require.True(t, watcher.started)
-	resourceWatchers.lock.Unlock()
 
-	resourceWatchers.lock.Lock()
-	wData = resourceWatchers.watchersMap[PodResource]
-	mockW = wData.watcher.(*mockWatcher)
+	mockW = watcher.watcher.(*mockWatcher)
 	mockW.handler.OnAdd(resource)
+	require.Equal(t, addEvent, watcher.metadataEvents)
 	resourceWatchers.lock.Unlock()
 
 	require.Equal(t, resource, funcs.updated)
@@ -532,6 +549,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	wData = resourceWatchers.watchersMap[PodResource]
 	mockW = wData.watcher.(*mockWatcher)
 	mockW.handler.OnDelete(resource)
+	require.Equal(t, map[string]mapstr.M{}, watcher.metadataEvents)
 	resourceWatchers.lock.Unlock()
 
 	require.Equal(t, resource, funcs.deleted)
@@ -560,7 +578,7 @@ type mockFuncs struct {
 	indexed mapstr.M
 }
 
-func (f *mockFuncs) update(m map[string]mapstr.M, obj kubernetes.Resource) {
+func (f *mockFuncs) update(obj kubernetes.Resource) map[string]mapstr.M {
 	accessor, _ := meta.Accessor(obj)
 	f.updated = obj
 	meta := mapstr.M{
@@ -576,13 +594,14 @@ func (f *mockFuncs) update(m map[string]mapstr.M, obj kubernetes.Resource) {
 		kubernetes2.ShouldPut(meta, fmt.Sprintf("kubernetes.%v", k), v, logger)
 	}
 	kubernetes2.ShouldPut(meta, "orchestrator.cluster.name", "gke-4242", logger)
-	m[accessor.GetName()] = meta
+	id := accessor.GetName()
+	return map[string]mapstr.M{id: meta}
 }
 
-func (f *mockFuncs) delete(m map[string]mapstr.M, obj kubernetes.Resource) {
+func (f *mockFuncs) delete(obj kubernetes.Resource) []string {
 	accessor, _ := meta.Accessor(obj)
 	f.deleted = obj
-	delete(m, accessor.GetName())
+	return []string{accessor.GetName()}
 }
 
 func (f *mockFuncs) index(m mapstr.M) string {
