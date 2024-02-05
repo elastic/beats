@@ -838,9 +838,24 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// initialize config manager
-	b.Manager, err = management.NewManager(b.Config.Management, reload.RegisterV2)
+	m, err := management.NewManager(b.Config.Management, reload.RegisterV2)
 	if err != nil {
 		return err
+	}
+	b.Manager = m
+
+	if b.Manager.AgentInfo().Version != "" {
+		// During the manager initialization the client to connect to the agent is
+		// also initialized. That makes the beat to read information sent by the
+		// agent, which includes the AgentInfo with the agent's package version.
+		// Components running under agent should report the agent's package version
+		// as their own version.
+		// In order to do so b.Info.Version needs to be set to the version the agent
+		// sent. As this Beat instance is initialized much before the package
+		// version is received, it's overridden here. So far it's early enough for
+		// the whole beat to report the right version.
+		b.Info.Version = b.Manager.AgentInfo().Version
+		version.SetPackageVersion(b.Info.Version)
 	}
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
@@ -1521,13 +1536,13 @@ func (bc *beatConfig) Validate() error {
 		if bc.Pipeline.Queue.IsSet() && outputPC.Queue.IsSet() {
 			return fmt.Errorf("top level queue and output level queue settings defined, only one is allowed")
 		}
-		//elastic-agent doesn't support disk queue yet
+		// elastic-agent doesn't support disk queue yet
 		if bc.Management.Enabled() && outputPC.Queue.Config().Enabled() && outputPC.Queue.Name() == diskqueue.QueueType {
 			return fmt.Errorf("disk queue is not supported when management is enabled")
 		}
 	}
 
-	//elastic-agent doesn't support disk queue yet
+	// elastic-agent doesn't support disk queue yet
 	if bc.Management.Enabled() && bc.Pipeline.Queue.Config().Enabled() && bc.Pipeline.Queue.Name() == diskqueue.QueueType {
 		return fmt.Errorf("disk queue is not supported when management is enabled")
 	}
