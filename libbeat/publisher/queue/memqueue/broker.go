@@ -167,7 +167,7 @@ func NewQueue(
 	// (Otherwise, it would make sense to leave FlushTimeout unchanged here.)
 	if settings.MaxGetRequest <= 1 {
 		settings.FlushTimeout = 0
-		settings.MaxGetRequest = settings.Events / 2
+		settings.MaxGetRequest = (settings.Events + 1) / 2
 	}
 
 	// Can't request more than the full queue
