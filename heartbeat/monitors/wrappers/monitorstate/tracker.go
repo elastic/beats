@@ -98,6 +98,10 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields) (state *State) 
 			}
 			break
 		}
+		var loaderError LoaderError
+		if errors.As(err, &loaderError) && !loaderError.Retry {
+			break
+		}
 
 		sleepFor := (time.Duration(i*i) * time.Second) + (time.Duration(rand.Intn(500)) * time.Millisecond)
 		logp.L().Warnf("could not load last externally recorded state, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)

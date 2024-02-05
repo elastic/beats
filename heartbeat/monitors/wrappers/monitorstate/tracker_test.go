@@ -131,3 +131,37 @@ func TestDeferredStateLoader(t *testing.T) {
 	resState, _ = dsl(stdfields.StdMonitorFields{})
 	require.Equal(t, stateA, resState)
 }
+
+func TestStateLoaderRetry(t *testing.T) {
+	tests := []struct {
+		name          string
+		retryable     bool
+		expectedCalls int
+	}{
+		{
+			"should retry 3 times when fails with retryable error",
+			true,
+			3,
+		},
+		{
+			"should not retry when fails with non-retryable error",
+			false,
+			1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			calls := 0
+			errorStateLoader := func(_ stdfields.StdMonitorFields) (*State, error) {
+				calls += 1
+				return nil, LoaderError{Message: "test error", Retry: tt.retryable}
+			}
+
+			mst := NewTracker(errorStateLoader, true)
+			mst.GetCurrentState(stdfields.StdMonitorFields{})
+
+			require.Equal(t, calls, tt.expectedCalls)
+		})
+	}
+}

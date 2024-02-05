@@ -21,6 +21,9 @@ package monitorstate
 
 import (
 	"fmt"
+	"io"
+	"net/http"
+	"strings"
 	"testing"
 	"time"
 
@@ -33,6 +36,7 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/config"
 	"github.com/elastic/beats/v7/heartbeat/esutil"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
+	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/processors/util"
 )
 
@@ -89,8 +93,59 @@ func TestStatesESLoader(t *testing.T) {
 	}
 }
 
+func TestMakeESLoaderError(t *testing.T) {
+	tests := []struct {
+		name       string
+		statusCode int
+		expected   bool
+	}{
+		{
+			name:       "should return a retryable error",
+			statusCode: http.StatusInternalServerError,
+			expected:   true,
+		},
+		{
+			name:       "should not return a retryable error",
+			statusCode: http.StatusNotFound,
+			expected:   false,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// Arrange
+			etc := newESTestContext(t)
+			etc.ec.HTTP = fakeHTTPClient{respStatus: test.statusCode}
+			loader := MakeESLoader(etc.ec, "fakeIndexPattern", etc.location)
+
+			// Act
+			_, err := loader(stdfields.StdMonitorFields{})
+
+			// Assert
+			var loaderError LoaderError
+			require.ErrorAs(t, err, &loaderError)
+			require.Equal(t, loaderError.Retry, test.expected)
+		})
+	}
+}
+
+type fakeHTTPClient struct {
+	respStatus int
+}
+
+func (fc fakeHTTPClient) Do(req *http.Request) (resp *http.Response, err error) {
+	return &http.Response{
+		StatusCode: fc.respStatus,
+		Body:       io.NopCloser(strings.NewReader("test response")),
+	}, nil
+}
+
+func (fc fakeHTTPClient) CloseIdleConnections() {
+	// noop
+}
+
 type esTestContext struct {
 	namespace string
+	ec        *eslegclient.Connection
 	esc       *elasticsearch.Client
 	loader    StateLoader
 	tracker   *Tracker
@@ -106,10 +161,12 @@ func newESTestContext(t *testing.T) *esTestContext {
 	}
 	namespace, _ := uuid.NewV4()
 	esc := IntegApiClient(t)
+	ec := IntegES(t)
 	etc := &esTestContext{
 		namespace: namespace.String(),
 		esc:       esc,
-		loader:    IntegESLoader(t, fmt.Sprintf("synthetics-*-%s", namespace.String()), location),
+		ec:        ec,
+		loader:    IntegESLoader(t, ec, fmt.Sprintf("synthetics-*-%s", namespace.String()), location),
 		location:  location,
 	}
 
