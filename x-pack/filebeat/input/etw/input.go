@@ -8,8 +8,8 @@ package etw
 
 import (
 	"fmt"
+	"math"
 	"sync"
-	"syscall"
 	"time"
 
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -20,6 +20,8 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"golang.org/x/sys/windows"
 )
 
 const (
@@ -30,7 +32,7 @@ const (
 type etwInput struct {
 	log        *logp.Logger
 	config     config
-	etwSession etw.Session
+	etwSession *etw.Session
 }
 
 func Plugin() input.Plugin {
@@ -66,15 +68,12 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	// Initialize a new ETW session with the provided configuration.
 	e.etwSession, err = etw.NewSession(convertConfig(e.config))
 	if err != nil {
-		return fmt.Errorf("error when initializing '%s' session: %w", e.etwSession.Name, err)
+		return fmt.Errorf("error initializing ETW session: %w", err)
 	}
 
 	// Set up logger with session information.
 	e.log = ctx.Logger.With("session", e.etwSession.Name)
 	e.log.Info("Starting " + inputName + " input")
-
-	var wg sync.WaitGroup
-	var once sync.Once
 
 	// Handle realtime session creation or attachment.
 	if e.etwSession.Realtime {
@@ -95,6 +94,9 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 		}
 	}
 	// Defer the cleanup and closing of resources.
+	var wg sync.WaitGroup
+	var once sync.Once
+
 	defer func() {
 		wg.Wait() // Ensure all goroutines have finished before closing.
 		once.Do(e.Close)
@@ -102,23 +104,16 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	}()
 
 	// eventReceivedCallback processes each ETW event.
-	eventReceivedCallback := func(er *etw.EventRecord) uintptr {
-		if er == nil {
+	eventReceivedCallback := func(record *etw.EventRecord) uintptr {
+		if record == nil {
 			e.log.Error("received null event record")
 			return 1
 		}
 
-		e.log.Debugf("received event %d with length %d", er.EventHeader.EventDescriptor.Id, er.UserDataLength)
+		e.log.Debugf("received event %d with length %d", record.EventHeader.EventDescriptor.Id, record.UserDataLength)
 
-		var event map[string]interface{}
-
-		if data, err := etw.GetEventProperties(er); err == nil {
-			event = map[string]interface{}{
-				"Header":          er.EventHeader,
-				"EventProperties": data,
-				"Metadata":        fillEventMetadata(er, e.etwSession, e.config),
-			}
-		} else {
+		data, err := etw.GetEventProperties(record)
+		if err != nil {
 			e.log.Errorf("failed to read event properties: %w", err)
 			return 1
 		}
@@ -126,18 +121,19 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 		evt := beat.Event{
 			Timestamp: time.Now(),
 			Fields: mapstr.M{
-				"metadata": event["Metadata"],
-				"header":   event["Header"],
-				"winlog":   event["EventProperties"],
+				"metadata": fillEventMetadata(record, e.etwSession, e.config),
+				"header":   fillEventHeader(record.EventHeader),
+				"winlog":   data,
 			},
 		}
+
 		publisher.Publish(evt)
 
 		return 0
 	}
 
 	// Set the callback function for the ETW session.
-	e.etwSession.Callback = syscall.NewCallback(eventReceivedCallback)
+	e.etwSession.Callback = eventReceivedCallback
 
 	// Start a goroutine to consume ETW events.
 	wg.Add(1)
@@ -159,8 +155,8 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	return nil
 }
 
-// fillEventMetadata constructs a metadata map for an event record.
-func fillEventMetadata(er *etw.EventRecord, session etw.Session, cfg config) map[string]interface{} {
+// fillEventHeader constructs a header map for an event record header.
+func fillEventHeader(h etw.EventHeader) map[string]interface{} {
 	// Mapping from Level to Severity
 	levelToSeverity := map[uint8]string{
 		1: "critical",
@@ -170,37 +166,71 @@ func fillEventMetadata(er *etw.EventRecord, session etw.Session, cfg config) map
 		5: "verbose",
 	}
 
-	metadata := make(map[string]interface{})
+	header := make(map[string]interface{})
 
+	header["size"] = h.Size
+	header["type"] = h.HeaderType
+	header["flags"] = h.Flags
+	header["event_property"] = h.EventProperty
+	header["thread_id"] = h.ThreadId
+	header["process_id"] = h.ProcessId
+	header["timestamp"] = convertFileTimeToGoTime(uint64(h.TimeStamp))
+	header["provider_guid"] = h.ProviderId.String()
+	header["event_id"] = h.EventDescriptor.Id
+	header["event_version"] = h.EventDescriptor.Version
+	header["channel"] = h.EventDescriptor.Channel
+	header["level"] = h.EventDescriptor.Level
 	// Get the severity level, with a default value if not found
-	severity, ok := levelToSeverity[er.EventHeader.EventDescriptor.Level]
+	severity, ok := levelToSeverity[h.EventDescriptor.Level]
 	if !ok {
 		severity = "unknown" // Default severity level
 	}
-	metadata["Severity"] = severity
+	header["severity"] = severity
+	header["opcode"] = h.EventDescriptor.Opcode
+	header["task"] = h.EventDescriptor.Task
+	header["keyword"] = h.EventDescriptor.Keyword
+	header["time"] = h.Time
+	header["activity_guid"] = h.ActivityId.String()
+
+	return header
+}
+
+// convertFileTimeToGoTime converts a Windows FileTime to a Go time.Time structure.
+func convertFileTimeToGoTime(fileTime64 uint64) time.Time {
+	fileTime := windows.Filetime{
+		HighDateTime: uint32(fileTime64 >> 32),
+		LowDateTime:  uint32(fileTime64 & math.MaxUint32),
+	}
+
+	return time.Unix(0, fileTime.Nanoseconds())
+}
+
+// fillEventMetadata constructs a metadata map for an event record.
+func fillEventMetadata(record *etw.EventRecord, session *etw.Session, cfg config) map[string]interface{} {
+	metadata := make(map[string]interface{})
 
 	// Include provider name and GUID in metadata if available
 	if cfg.ProviderName != "" {
-		metadata["ProviderName"] = cfg.ProviderName
+		metadata["provider_name"] = cfg.ProviderName
 	}
 	if cfg.ProviderGUID != "" {
-		metadata["ProviderGUID"] = cfg.ProviderGUID
+		metadata["provider_guid"] = cfg.ProviderGUID
 	} else if etw.IsGUIDValid(session.GUID) {
-		metadata["ProviderGUID"] = etw.GUIDToString(session.GUID)
+		metadata["provider_guid"] = session.GUID.String()
 	}
 
 	// Include logfile path if available
 	if cfg.Logfile != "" {
-		metadata["Logfile"] = cfg.Logfile
+		metadata["logfile"] = cfg.Logfile
 	}
 
 	// Include session name if available
 	if cfg.Session != "" {
-		metadata["Session"] = cfg.Session
+		metadata["session"] = cfg.Session
 	} else if cfg.SessionName != "" {
-		metadata["Session"] = cfg.SessionName
+		metadata["session"] = cfg.SessionName
 	} else if cfg.ProviderGUID != "" || cfg.ProviderName != "" {
-		metadata["Session"] = session.Name
+		metadata["session"] = session.Name
 	}
 
 	return metadata
