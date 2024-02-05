@@ -11,6 +11,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 - Upgrade to Go 1.21.6. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}37615[37615]
+- add_cloud_metadata processor: `huawei` provider is now treated as `openstack`. Huawei cloud runs on OpenStack
+platform, and when viewed from a metadata API standpoint, it is impossible to differentiate it from OpenStack. If you
+know that your deployments run on Huawei Cloud exclusively, and you wish to have `cloud.provider` value as `huawei`,
+you can achieve this by overwriting the value using an `add_fields` processor. {pull}35184[35184]
+ - In managed mode, Beats running under Elastic Agent will report the package
+version of Elastic Agent as their own version. This includes all additional
+fields added to events containing the Beats version. {pull}37553[37553]
 
 *Auditbeat*
 
@@ -56,6 +63,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Support build of projects outside of beats directory {pull}36126[36126]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
 - Upgrade elastic-agent-libs to v0.7.5. Removes obsolete "Treating the CommonName field on X.509 certificates as a host name..." deprecation warning for 8.0. {pull}37755[37755]
+- aws: Add credential caching for `AssumeRole` session tokens. {issue}37787[37787]
+- Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
+- Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 
 *Auditbeat*
 
@@ -77,10 +87,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
 - Fix m365_defender cursor value and query building. {pull}37116[37116]
 - Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
+- Update github.com/lestrrat-go/jwx dependency. {pull}37799[37799]
 
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Fix setuid root when running under cgroups v2. {pull}37794[37794]
 
 *Metricbeat*
 
@@ -174,11 +186,14 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Update CEL extensions library to v1.8.0 to provide runtime error location reporting. {issue}37304[37304] {pull}37718[37718]
 - Add request trace logging for chained API requests. {issue}37551[36551] {pull}37682[37682]
 - Relax TCP/UDP metric polling expectations to improve metric collection. {pull}37714[37714]
+- Add support for PEM-based Okta auth in HTTPJSON. {pull}37772[37772]
+- Prevent complete loss of long request trace data. {issue}37826[37826] {pull}37836[37836]
 
 *Auditbeat*
 
 
 *Libbeat*
+- Add watcher that can be used to monitor Linux kernel events. {pull}37833[37833]
 
 *Heartbeat*
 - Added status to monitor run log report.
@@ -205,6 +220,8 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 *Packetbeat*
 
 - Bump Windows Npcap version to v1.79. {pull}37733[37733]
+- Add metrics for TCP flags. {issue}36992[36992] {pull}36975[36975]
+- Add support for pipeline loading. {pull}37291[37291]
 
 *Packetbeat*
 
