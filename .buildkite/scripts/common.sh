@@ -108,9 +108,14 @@ with_go() {
 
 with_python() {
   if [ "${platform_type}" == "Linux" ]; then
-    #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
-    sudo apt-get update
-    sudo apt-get install -y python3-pip python3-venv
+    if grep -q "ID=ubuntu" /etc/*release; then
+      #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
+      sudo apt-get update
+      sudo apt-get install -y python3-pip python3-venv
+    elif grep grep -qE "ID=centos|ID=rhel" /etc/*release; then
+      sudo dnf update
+      sudo dnf install -y python3-pip python3-venv
+    fi
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
     pip3 install virtualenv
