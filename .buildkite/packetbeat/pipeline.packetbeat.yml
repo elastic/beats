@@ -2,11 +2,13 @@
 env:
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
+  IMAGE_RHEL9_X86_64: "family/core-rhel-9"
+  IMAGE_WIN_10: "family/general-windows-10"
+  IMAGE_WIN_11: "family/general-windows-11"
   IMAGE_WIN_2016: "family/core-windows-2016"
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  GO_AGENT_IMAGE: "golang:${GO_VERSION}"
   BEATS_PROJECT_NAME: "packetbeat"
 
 steps:
@@ -40,4 +42,5 @@ steps:
     key: "packetbeat-pipeline"
     command: ".buildkite/scripts/generate_packetbeat_pipeline.sh"
     agents:
-      image: "${GO_AGENT_IMAGE}"
+      provider: "gcp"
+      image: "${IMAGE_UBUNTU_X86_64}"

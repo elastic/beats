@@ -128,6 +128,13 @@ with_dependencies() {
   fi
 }
 
+config_git() {
+  if [ -z "$(git config --get user.email)" ]; then
+    git config --global user.email "beatsmachine@users.noreply.github.com"
+    git config --global user.name "beatsmachine"
+  fi
+}
+
 retry() {
   local retries=$1
   shift
