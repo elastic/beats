@@ -9,10 +9,9 @@ processors:
       - message
     ignore_missing: true
 
-- set:
-    field: salesforce.access_mode
-    value: rest
-    ignore_failure: true
+##########################
+## Common Field Mapping ##
+##########################
 
 - date:
     field: json.TIMESTAMP_DERIVED
@@ -20,62 +19,103 @@ processors:
     formats:
     - ISO8601
     ignore_failure: true
+- date:
+    field: json.EventDate
+    target_field: "@timestamp"
+    formats:
+    - ISO8601
+    ignore_failure: true
 
-- rename: 
-    field: json.SESSION_TYPE
-    target_field: salesforce.logout.session_type
-    ignore_missing: true
-- rename: 
-    field: json.EVENT_TYPE
-    target_field: salesforce.logout.event_type
-    ignore_missing: true
-- rename: 
+- rename:
     field: json.SESSION_LEVEL
     target_field: salesforce.logout.session_level
     ignore_missing: true
-- rename: 
-    field: json.BROWSER_TYPE
-    target_field: salesforce.logout.browser_type
+- rename:
+    field: json.SessionLevel
+    target_field: salesforce.logout.session_level
     ignore_missing: true
-- rename: 
-    field: json.PLATFORM_TYPE
-    target_field: salesforce.logout.platform_type
-    ignore_missing: true
-- rename: 
-    field: json.RESOLUTION_TYPE
-    target_field: salesforce.logout.resolution_type
-    ignore_missing: true
-- rename: 
-    field: json.APP_TYPE
-    target_field: salesforce.logout.app_type
-    ignore_missing: true
-- rename: 
-    field: json.CLIENT_VERSION
-    target_field: salesforce.logout.client_version
-    ignore_missing: true
-- rename: 
-    field: json.API_TYPE
-    target_field: salesforce.logout.api_type
-    ignore_missing: true
-- rename: 
-    field: json.API_VERSION
-    target_field: salesforce.logout.api_version
-    ignore_missing: true
-- rename: 
-    field: json.USER_INITIATED_LOGOUT
-    target_field: salesforce.logout.user_initiated_logout
-    ignore_missing: true
-- rename: 
+
+- rename:
     field: json.LOGIN_KEY
     target_field: salesforce.logout.login_key
     ignore_missing: true
-- rename: 
+- rename:
+    field: json.LoginKey
+    target_field: salesforce.logout.login_key
+    ignore_missing: true
+
+################################
+## Extra EventLogFile Mapping ##
+################################
+
+- rename:
+    field: json.SESSION_TYPE
+    target_field: salesforce.logout.session_type
+    ignore_missing: true
+- rename:
+    field: json.EVENT_TYPE
+    target_field: salesforce.logout.event_type
+    ignore_missing: true
+- rename:
+    field: json.BROWSER_TYPE
+    target_field: salesforce.logout.browser_type
+    ignore_missing: true
+- rename:
+    field: json.PLATFORM_TYPE
+    target_field: salesforce.logout.platform_type
+    ignore_missing: true
+- rename:
+    field: json.RESOLUTION_TYPE
+    target_field: salesforce.logout.resolution_type
+    ignore_missing: true
+- rename:
+    field: json.APP_TYPE
+    target_field: salesforce.logout.app_type
+    ignore_missing: true
+- rename:
+    field: json.CLIENT_VERSION
+    target_field: salesforce.logout.client_version
+    ignore_missing: true
+- rename:
+    field: json.API_TYPE
+    target_field: salesforce.logout.api_type
+    ignore_missing: true
+- rename:
+    field: json.API_VERSION
+    target_field: salesforce.logout.api_version
+    ignore_missing: true
+- rename:
+    field: json.USER_INITIATED_LOGOUT
+    target_field: salesforce.logout.user_initiated_logout
+    ignore_missing: true
+- rename:
     field: json.USER_ID_DERIVED
     target_field: salesforce.logout.user_id_derived
     ignore_missing: true
-- rename: 
+- rename:
     field: json.ORGANIZATION_ID
     target_field: salesforce.logout.organization_by_id
+    ignore_missing: true
+
+##########################
+## Extra Object Mapping ##
+##########################
+
+- rename:
+    field: json.schema
+    target_field: salesforce.logout.schema
+    ignore_missing: true
+- rename:
+    field: json.CreatedById
+    target_field: salesforce.logout.created_by_id
+    ignore_missing: true
+- rename:
+    field: json.RelatedEventIdentifier
+    target_field: salesforce.logout.related_event_identifier
+    ignore_missing: true
+- rename:
+    field: json.replayId
+    target_field: salesforce.logout.replay_id
     ignore_missing: true
 
 #######################
@@ -105,17 +145,33 @@ processors:
     target_field: event.code
     ignore_missing: true
 
+- date:
+    field: json.CreatedDate
+    target_field: event.created
+    formats: ["yyyy-MM-ddTHH:mm:ssZ"]
+    ignore_failure: true
+
 ######################
 ## ECS User Mapping ##
 ######################
 
-- rename: 
+- rename:
+    field: json.USER_ID
+    target_field: user.id
+    ignore_missing: true
+- rename:
+    field: json.UserId
+    target_field: user.id
+    ignore_missing: true
+
+- rename:
     field: json.USER_TYPE
     target_field: user.roles
     ignore_missing: true
-- rename: 
-    field: json.USER_ID
-    target_field: user.id
+
+- rename:
+    field: json.Username
+    target_field: user.email
     ignore_missing: true
 
 ########################
@@ -128,6 +184,10 @@ processors:
     target_field: source.ip
     ignore_missing: true
     if: 'ctx?.json?.CLIENT_IP != "Salesforce.com IP" && ctx?.json?.CLIENT_IP != ""'
+- rename:
+    field: json.SourceIp
+    target_field: source.ip
+    ignore_missing: true
 
 ############################
 ## ECS Source.Geo Mapping ##
