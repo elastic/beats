@@ -21,7 +21,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
+          # machineType: "c2-standard-16"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":go: Go Intergration Tests"
@@ -30,7 +30,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
+          # machineType: "c2-standard-16"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":python: Python Integration Tests"
@@ -39,7 +39,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
+          # machineType: "c2-standard-16"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":negative_squared_cross_mark: Cross compile"
@@ -48,7 +48,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
+          # machineType: "c2-standard-16"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Windows 2016/2022 Unit Tests - {{matrix.image}}"
@@ -70,7 +70,7 @@ steps:
 # echo "Add the extended windows tests into the pipeline"
 # TODO: ADD conditions from the main pipeline
 
-  - group: "Extended Windowds Tests"
+  - group: "Extended Windows Tests"
     key: "extended-win-tests"
     steps:
       - label: ":windows: Windows 2019 Unit Tests"
@@ -145,7 +145,7 @@ if are_conditions_met_mandatory_tests && are_conditions_met_packaging; then
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
+          # machineType: "c2-standard-16"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 

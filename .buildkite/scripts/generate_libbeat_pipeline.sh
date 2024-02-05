@@ -21,16 +21,16 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
+          # machineType: "c2-standard-16"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
-      - label: ":go: Go Intergration Tests"
+      - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
         command: ".buildkite/scripts/go_int_tests.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
+          # machineType: "c2-standard-16"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":python: Python Integration Tests"
@@ -39,7 +39,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
+          # machineType: "c2-standard-16"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":negative_squared_cross_mark: Cross compile"
@@ -48,7 +48,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
+          # machineType: "c2-standard-16"
         artifact_paths: " ${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":testengine: Stress Tests"
@@ -57,7 +57,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
+          # machineType: "c2-standard-16"
         artifact_paths: "${BEATS_PROJECT_NAME}/libbeat-stress-test.xml"
 
 YAML
