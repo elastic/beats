@@ -16,7 +16,7 @@ steps:
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh ${PIPELINE_NAME}"
+        command: ".buildkite/scripts/unit_tests.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -25,7 +25,7 @@ steps:
 
       - label: ":go: Go Intergration Tests"
         key: "mandatory-int-test"
-        command: ".buildkite/scripts/go_int_tests.sh ${PIPELINE_NAME}"
+        command: ".buildkite/scripts/go_int_tests.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -34,7 +34,7 @@ steps:
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
-        command: ".buildkite/scripts/py_int_tests.sh ${PIPELINE_NAME}"
+        command: ".buildkite/scripts/py_int_tests.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -43,7 +43,7 @@ steps:
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
-        command: ".buildkite/scripts/crosscompile.sh ${PIPELINE_NAME}"
+        command: ".buildkite/scripts/crosscompile.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -52,7 +52,7 @@ steps:
 
       - label: ":testengine: Stress Tests"
         key: "mandatory-stress-test"
-        command: ".buildkite/scripts/stress_tests.sh ${PIPELINE_NAME}"
+        command: ".buildkite/scripts/stress_tests.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -70,7 +70,7 @@ if are_conditions_met_libbeat_arm_tests; then
     steps:
       - label: ":linux: Arm64 Unit Tests"
         key: "extended-arm64-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh ${PIPELINE_NAME}"
+        command: ".buildkite/scripts/unit_tests.sh"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
