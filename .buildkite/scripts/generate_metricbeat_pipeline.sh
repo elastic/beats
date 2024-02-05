@@ -128,7 +128,7 @@ YAML
 fi
 
 echo "Check and add the Packaging into the pipeline"
-if are_conditions_met_packaging; then
+if are_conditions_met_mandatory_tests && are_conditions_met_packaging; then
   cat >> $pipelineName <<- YAML
 
   - wait: ~
