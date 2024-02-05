@@ -8,10 +8,11 @@ platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
-UI_MACOS_TESTS="$(buildkite-agent meta-data get UI_MACOS_TESTS --default ${UI_MACOS_TESTS:-"false"})"
-runAllStages="$(buildkite-agent meta-data get runAllStages --default ${runAllStages:-"false"})"
 runLibbeat="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
+runMetricbeat="$(buildkite-agent meta-data get runMetricbeat --default ${runMetricbeat:-"false"})"
 runLibBeatArmTest="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
+runMetricbeatMacOsTests="$(buildkite-agent meta-data get runMetricbeatMacOsTests --default ${runMetricbeatMacOsTests:-"false"})"
+
 metricbeat_changeset=(
   "^metricbeat/.*"
   "^go.mod"
@@ -208,7 +209,7 @@ are_conditions_met_libbeat_arm_tests() {
 }
 
 are_conditions_met_metricbeat_macos_tests() {
-  if [[ "${UI_MACOS_TESTS}" == true ]] || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat for macos" ]] || [[ "${GITHUB_PR_LABELS}" =~ macOS ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+  if [[ "${runMetricbeatMacOsTests}" == true ]] || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat for macos" ]] || [[ "${GITHUB_PR_LABELS}" =~ macOS ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
     return 0
   fi
   return 1

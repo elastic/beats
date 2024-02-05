@@ -24,8 +24,8 @@ steps:
         - label: "False"
           value: "false"
       default: "false"
-    - select: "Metricbeat - runMacOsTests"
-      key: "UI_MACOS_TESTS"
+    - select: "Metricbeat - runMetricbeatMacOsTests"
+      key: "runMetricbeatMacOsTests"
       options:
         - label: "True"
           value: "true"
