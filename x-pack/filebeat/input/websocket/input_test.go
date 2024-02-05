@@ -269,7 +269,7 @@ func TestInput(t *testing.T) {
 				t.Fatalf("unexpected error running test: %v", err)
 			}
 
-			ctx, cancel := context.WithTimeout(context.Background(), 10000*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 
 			v2Ctx := v2.Context{

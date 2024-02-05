@@ -8,6 +8,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math"
+	"math/rand"
 	"reflect"
 	"strings"
 	"time"
@@ -123,7 +125,15 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			if err != nil {
 				metrics.errorsTotal.Inc()
 				if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
-					log.Debugw("websocket connection closed", "error", err)
+					log.Debugw("websocket connection closed, attempting to reconnect", "error", err)
+					c, err = connectWebSocketWithRetry(log, url, cfg.Resource.Retry)
+					if err != nil {
+						log.Errorw("failed to reconnect websocket", "error", err)
+						errChan <- err
+						return
+					}
+					log.Debugw("reconnected to websocket")
+					continue
 				}
 				log.Errorw("failed to read websocket data", "error", err)
 				errChan <- err
@@ -389,4 +399,40 @@ func formHeader(cfg config) map[string][]string {
 		header["Authorization"] = []string{"Basic " + cfg.Auth.BasicToken}
 	}
 	return header
+}
+
+func connectWebSocketWithRetry(log *logp.Logger, url string, config retryConfig) (*websocket.Conn, error) {
+	var conn *websocket.Conn
+	var err error
+
+	for attempt := 1; attempt <= *config.MaxAttempts; attempt++ {
+		conn, _, err = websocket.DefaultDialer.Dial(url, nil)
+		if err == nil {
+			return conn, nil
+		}
+
+		log.Debugw("Attempt %d: WebSocket connection failed. Retrying...\n", attempt)
+
+		waitTime := calculateWaitTime(config.WaitMin, config.WaitMax, attempt)
+		time.Sleep(waitTime)
+	}
+
+	return nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts", *config.MaxAttempts)
+}
+
+func calculateWaitTime(waitMin, waitMax *time.Duration, attempt int) time.Duration {
+	if waitMin == nil || waitMax == nil {
+		return 0
+	}
+
+	// calculate exponential backoff with jitter
+	base := float64(*waitMin)
+	maxJitter := float64(*waitMax - *waitMin)
+
+	backoff := base * math.Pow(2, float64(attempt-1))
+	jitter := rand.Float64() * maxJitter
+
+	waitTime := time.Duration(backoff + jitter)
+
+	return waitTime
 }
