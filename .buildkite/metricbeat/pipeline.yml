@@ -14,10 +14,10 @@ env:
 steps:
 
   - input: "Input Parameters"
-    key: "input-run-all-stages"
+    key: "runMetricbeat"
     fields:
-    - select: "Metricbeat - runAllStages"
-      key: "runAllStages"
+    - select: "Metricbeat - runMetricbeat"
+      key: "runMetricbeat"
       options:
         - label: "True"
           value: "true"

@@ -6,8 +6,9 @@ set -euo pipefail
 
 pipelineName="pipeline.metricbeat-dynamic.yml"
 
-echo "Adding the mandatory tests into the pipeline"
-cat > $pipelineName <<- YAML
+echo "Add the mandatory and extended tests without additional conditions into the pipeline"
+if are_conditions_met_mandatory_tests; then
+  cat > $pipelineName <<- YAML
 
 steps:
 
@@ -66,11 +67,8 @@ steps:
               - "${IMAGE_WIN_2022}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-YAML
-
-echo "Adding the extended windows tests into the pipeline"
-#TODO: ADD conditions from the main pipeline
-cat >> $pipelineName <<- YAML
+# echo "Add the extended windows tests into the pipeline"
+# TODO: ADD conditions from the main pipeline
 
   - group: "Extended Windowds Tests"
     key: "extended-win-tests"
@@ -109,7 +107,9 @@ cat >> $pipelineName <<- YAML
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 YAML
+fi
 
+echo "Check and add the Extended Tests into the pipeline"
 if are_conditions_met_metricbeat_macos_tests; then
   cat >> $pipelineName <<- YAML
 
@@ -127,6 +127,7 @@ YAML
 
 fi
 
+echo "Check and add the Packaging into the pipeline"
 if are_conditions_met_packaging; then
   cat >> $pipelineName <<- YAML
 
