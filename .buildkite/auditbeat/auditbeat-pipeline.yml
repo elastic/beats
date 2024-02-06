@@ -105,6 +105,26 @@ steps:
           imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths: "auditbeat/build/*.xml"
 
+      - label: ":linux:-{{matrix.image}} Integration Tests"
+        key: "linux-integration"
+        command: ".buildkite/auditbeat/scripts/integ-tests.sh"
+        notify:
+          - github_commit_status:
+              context: "auditbeat/Extended: Linux Integration Tests"
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machine_type: "c3-standard-4"
+          disk_size: 100
+          disk_type: "pd_ssd"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_UBUNTU_X86_64}"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
+
   - group: "Windows Extended Testing"
     key: "extended-tests-win"
     if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for windows" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
