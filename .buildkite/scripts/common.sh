@@ -128,8 +128,8 @@ with_python() {
       sudo apt-get update
       sudo apt-get install -y python3-pip python3-venv
     elif [ "${linuxType}" = "rhel" ]; then
-      sudo yum update -y
-      sudo yum install -y python3 python3-pip
+      sudo dnf update -y
+      sudo dnf install -y python3 python3-pip
       pip3 install virtualenv
     fi
   elif [ "${platform_type}" == "Darwin" ]; then
@@ -147,9 +147,9 @@ with_dependencies() {
       sudo apt-get update
       sudo apt-get install -y libsystemd-dev libpcap-dev
     elif [ "${linuxType}" = "rhel" ]; then
-      sudo yum update -y
-      sudo yum install -y epel-release
-      sudo yum install -y systemd-devel libpcap-devel
+      sudo dnf update -y
+      sudo dnf --enablerepo=crb install -y libpcap-devel
+      sudo dnf install -y systemd-devel
     fi
   elif [ "${platform_type}" == "Darwin" ]; then
     pip3 install libpcap
