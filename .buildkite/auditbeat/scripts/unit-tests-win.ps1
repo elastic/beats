@@ -4,14 +4,14 @@ $GoVersion = $env:GOLANG_VERSION # If Choco doesn't have the version specified i
 # Forcing to checkout again all the files with a correct autocrlf.
 # Doing this here because we cannot set git clone options before.
 function fixCRLF() {
-    Write-Host "-- Fixing CRLF in git checkout --"
+    Write-Host "--- Fixing CRLF in git checkout --"
     git config core.autocrlf false
     git rm --quiet --cached -r .
     git reset --quiet --hard
 }
 
 function withGolang() {
-    Write-Host "-- Install golang $GoVersion --"
+    Write-Host "--- Install golang $GoVersion --"
     choco install golang -y --version $GoVersion
 
     $choco = Convert-Path "$((Get-Command choco).Path)\..\.."
