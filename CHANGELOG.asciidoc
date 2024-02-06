@@ -29,6 +29,7 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 ==== Bugfixes
 
 *Affecting all Beats*
+
 - aws: Add credential caching for `AssumeRole` session tokens. {issue}37787[37787]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments. {pull}[37816][37816]
 
