@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-source .buildkite/env-scripts/util.sh
+source .buildkite/hooks/scripts/util.sh
 
 unset_secrets
 
