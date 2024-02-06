@@ -20,17 +20,22 @@
 package socket
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common"
+	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
-
-var requiredCapabilities = []string{"sys_ptrace", "dac_read_search"}
 
 // isPrivileged checks if this process has privileges to read sockets
 // of all users
 func isPrivileged() (bool, error) {
-	capabilities, err := common.GetCapabilities()
+	set := cap.GetProc()
+
+	ptrace, err := set.GetFlag(cap.Effective, cap.SYS_PTRACE)
 	if err != nil {
 		return false, err
 	}
-	return capabilities.Check(requiredCapabilities), nil
+	dac_read_search, err := set.GetFlag(cap.Effective, cap.DAC_READ_SEARCH)
+	if err != nil {
+		return false, err
+	}
+
+	return ptrace && dac_read_search, nil
 }

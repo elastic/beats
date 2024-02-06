@@ -177,7 +177,9 @@ func (h *handler) logRequest(r *http.Request, status int, respBody []byte) {
 			zap.ByteString("http.response.body.content", respBody),
 		)
 	}
-	httplog.LogRequest(h.reqLogger, r, extra...)
+	// Limit request logging body size to 10kiB.
+	const maxBodyLen = 10 * (1 << 10)
+	httplog.LogRequest(h.reqLogger, r, maxBodyLen, extra...)
 	if scheme != "" {
 		r.URL.Scheme = scheme
 	}

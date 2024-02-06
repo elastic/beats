@@ -17,3 +17,4 @@
 {"name": "github.com/awslabs/kinesis-aggregation/go/v2", "licenceType": "Apache-2.0", "url": "https://github.com/awslabs/kinesis-aggregation/blob/master/LICENSE.txt"}
 {"name": "github.com/dnaeon/go-vcr", "licenceType": "BSD-2-Clause"}
 {"name": "github.com/JohnCGriffin/overflow", "licenceType": "MIT"}
+{"name": "github.com/elastic/ebpfevents", "licenceType": "Apache-2.0"}
