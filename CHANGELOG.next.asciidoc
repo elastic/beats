@@ -175,6 +175,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add support for PEM-based Okta auth in HTTPJSON. {pull}37772[37772]
 - Prevent complete loss of long request trace data. {issue}37826[37826] {pull}37836[37836]
 - Add support for PEM-based Okta auth in CEL. {pull}37813[37813]
+- Add ETW input. {pull}36915[36915]
 
 *Auditbeat*
 
