@@ -2,9 +2,14 @@
 
 set -euo pipefail
 
+DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
+PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/private_ci_artifacts_gcs_credentials"
+GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
+
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" ]]; then
   source .buildkite/env-scripts/env.sh
   source .buildkite/env-scripts/win-env.sh
+  source .buildkite/env-scripts/util.sh
 
   if [[ -z "${GOLANG_VERSION-""}" ]]; then
     export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
@@ -15,7 +20,20 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == 
   fi
 
   if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
+    echo "--- Exporting secrets"
     source .buildkite/filebeat/scripts/packaging/packaging-env.sh
+
+    export PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry 5 vault kv get -field=data -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
+    export DOCKER_USERNAME_SECRET=$(retry 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
+    export DOCKER_PASSWORD_SECRET=$(retry 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
+    export GITHUB_TOKEN_SECRET=$(retry 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
+    export GITHUB_USERNAME_SECRET=$(retry 5 vault kv get -field username ${GITHUB_TOKEN_VAULT_PATH})
+    export GITHUB_EMAIL_SECRET=$(retry 5 vault kv get -field email ${GITHUB_TOKEN_VAULT_PATH})
+
+    docker login -u "${DOCKER_USERNAME_SECRET}" -p "${DOCKER_PASSWORD_SECRET}" "${DOCKER_REGISTRY}" 2>/dev/null
+
+    git config user.name "${GITHUB_USERNAME_SECRET}"
+    git config user.email "${GITHUB_EMAIL_SECRET}"
   fi
 fi
 

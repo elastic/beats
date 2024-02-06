@@ -27,3 +27,10 @@ calculate_tags() {
 }
 
 #buildkite-agent annotate "Tag '$TAG' has been created." --style 'success' --context 'ctx-success'
+
+#set_git_config() {
+#  git config user.name "${GITHUB_USERNAME_SECRET}"
+#  git config user.email "${GITHUB_EMAIL_SECRET}"
+#}
+#
+#set_git_config

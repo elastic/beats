@@ -24,10 +24,3 @@ export SNAPSHOT
 export VERSION
 export REPO
 export IMG_POSTFIX
-
-set_git_config() {
-  git config user.name "${GITHUB_USERNAME_SECRET}"
-  git config user.email "${GITHUB_EMAIL_SECRET}"
-}
-
-set_git_config
