@@ -16,6 +16,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/gorilla/websocket"
+	"github.com/stretchr/testify/assert"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -237,6 +238,18 @@ var inputTests = []struct {
 			}`},
 		wantErr: fmt.Errorf("unexpected type returned for evaluation cursor element: %T", "What's next?"),
 	},
+	{
+		name:    "invalid_url_scheme",
+		server:  invalidWebSocketTestServer(httptest.NewServer),
+		handler: defaultHandler,
+		config: map[string]interface{}{
+			"program": `
+					bytes(state.response).decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+		},
+		wantErr: fmt.Errorf("unsupported scheme: http accessing config"),
+	},
 }
 
 func TestInput(t *testing.T) {
@@ -251,10 +264,14 @@ func TestInput(t *testing.T) {
 
 			cfg := conf.MustNewConfigFrom(test.config)
 
-			conf := defaultConfig()
+			conf := config{}
 			conf.Redact = &redact{} // Make sure we pass the redact requirement.
 			err := cfg.Unpack(&conf)
 			if err != nil {
+				if test.wantErr != nil {
+					assert.EqualError(t, err, test.wantErr.Error())
+					return
+				}
 				t.Fatalf("unexpected error unpacking config: %v", err)
 			}
 
@@ -346,8 +363,33 @@ func newWebSocketTestServer(serve func(http.Handler) *httptest.Server) func(*tes
 
 			handler(t, conn, response)
 		}))
+		// only set the resource URL if it is not already set
+		if config["resource.url"] == nil {
+			config["resource.url"] = "ws" + server.URL[4:]
+		}
+		t.Cleanup(server.Close)
+	}
+}
 
-		config["resource.url"] = "ws" + server.URL[4:]
+// invalidWebSocketTestServer returns a function that creates a WebSocket server with an invalid URL scheme.
+func invalidWebSocketTestServer(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {
+	return func(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) {
+		server := serve(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			upgrader := websocket.Upgrader{
+				CheckOrigin: func(r *http.Request) bool {
+					return true
+				},
+			}
+
+			conn, err := upgrader.Upgrade(w, r, nil)
+			if err != nil {
+				t.Fatalf("error upgrading connection to WebSocket: %v", err)
+				return
+			}
+
+			handler(t, conn, response)
+		}))
+		config["resource.url"] = server.URL
 		t.Cleanup(server.Close)
 	}
 }

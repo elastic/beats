@@ -87,9 +87,11 @@ func (c config) Validate() error {
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, _, err = newProgram(context.Background(), c.Program, root, patterns, logp.L().Named("input.websocket"))
-	if err != nil {
-		return fmt.Errorf("failed to check program: %w", err)
+	if c.Program != "" {
+		_, _, err = newProgram(context.Background(), c.Program, root, patterns, logp.L().Named("input.websocket"))
+		if err != nil {
+			return fmt.Errorf("failed to check program: %w", err)
+		}
 	}
 	err = checkURLScheme(c.Resource.URL)
 	if err != nil {
@@ -105,8 +107,4 @@ func checkURLScheme(url *urlConfig) error {
 	default:
 		return fmt.Errorf("unsupported scheme: %s", url.Scheme)
 	}
-}
-
-func defaultConfig() config {
-	return config{}
 }
