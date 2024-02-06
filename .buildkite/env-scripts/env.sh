@@ -6,9 +6,10 @@ WORKSPACE="$(pwd)"
 BIN="${WORKSPACE}/bin"
 HW_TYPE="$(uname -m)"
 PLATFORM_TYPE="$(uname)"
-REPO="beats"
 TMP_FOLDER="tmp.${REPO}"
-DOCKER_REGISTRY="docker.elastic.co"
+ASDF_MAGE_VERSION="1.14.0"
+SETUP_MAGE_VERSION="1.14.0"
+DEBIAN_FRONTEND="noninteractive"
 
 export SETUP_GVM_VERSION
 export WORKSPACE
@@ -17,4 +18,9 @@ export HW_TYPE
 export PLATFORM_TYPE
 export REPO
 export TMP_FOLDER
-export DOCKER_REGISTRY
+export ASDF_MAGE_VERSION
+export SETUP_MAGE_VERSION
+
+if grep -q 'Ubuntu' /etc/*release; then
+  export DEBIAN_FRONTEND
+fi

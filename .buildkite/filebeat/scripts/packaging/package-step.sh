@@ -19,23 +19,20 @@ if are_files_changed "$changeset"; then
         key: "package-linux-x86"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-        command:
-          - ".buildkite/filebeat/scripts/package.sh"
+        command: ".buildkite/filebeat/scripts/package.sh"
         notify:
           - github_commit_status:
               context: "Filebeat/Packaging: Linux X86"
         agents:
           provider: gcp
-          imageProject: elastic-images-qa
-          image: family/platform-ingest-eng-prod-base-ubuntu-2204
+          image: "${IMAGE_UBUNTU_X86_64}"
 
       - label: ":linux: Packaging Linux ARM"
         key: "package-linux-arm"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
-        command:
-          - ".buildkite/filebeat/scripts/package.sh"
+        command: ".buildkite/filebeat/scripts/package.sh"
         notify:
           - github_commit_status:
               context: "Filebeat/Packaging: ARM"
