@@ -6,7 +6,7 @@
 
 [id="{beatname_lc}-input-{type}"]
 === Websocket Input
-beta[]
+experimental[]
 
 The `websocket` input reads messages from a websocket server or api endpoint. This input uses the `CEL engine` and the `mito` library interally to parse and process the messages. Having support for `CEL` allows you to parse and process the messages in a more flexible way. It has many similarities with the `cel` input as to how the `CEL` programs are written but deviates in the way the messages are read and processed. The `websocket` input is a `streaming` input and can only be used to read messages from a websocket server or api endpoint. 
 
@@ -260,6 +260,6 @@ A stand-alone CEL environment that implements the majority of the websocket inpu
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
-NOTE: The `websocket` input is currently in beta and might have bugs and other issues. Please report any issues on the https://github.com/elastic/beats[Github] repository.
+NOTE: The `websocket` input is currently tagged as experimental and might have bugs and other issues. Please report any issues on the https://github.com/elastic/beats[Github] repository.
 
 :type!:
