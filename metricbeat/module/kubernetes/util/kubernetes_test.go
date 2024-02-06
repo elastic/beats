@@ -443,8 +443,8 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	resourceWatchers.watchersMap[PodResource] = &watcherData{
 		watcher:         &mockWatcher{},
 		started:         false,
-		metricsetsUsing: []string{PodResource},
-		metadataEvents:  make(map[string]mapstr.M),
+		metricsetsUsing: []string{"pod"},
+		metadataObjects: make(map[string]kubernetes.Resource),
 	}
 	resourceWatchers.lock.Unlock()
 
@@ -459,24 +459,8 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 			Namespace: "default",
 		},
 	}
-
-	// check update function for the resulting add event
-	addEvent := map[string]mapstr.M{
-		"enrich": {
-			"kubernetes": mapstr.M{
-				"label": "value",
-				"pod": mapstr.M{
-					"name": "enrich",
-					"uid":  "mockuid",
-				},
-			},
-			"orchestrator": mapstr.M{
-				"cluster": mapstr.M{
-					"name": "gke-4242",
-				},
-			},
-		},
-	}
+	id := "default:enrich"
+	metadataObjects := map[string]kubernetes.Resource{id: resource}
 
 	config := &kubernetesConfig{
 		Namespace:  "test-ns",
@@ -505,7 +489,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 
 	mockW = watcher.watcher.(*mockWatcher)
 	mockW.handler.OnAdd(resource)
-	require.Equal(t, addEvent, watcher.metadataEvents)
+	require.Equal(t, metadataObjects, watcher.metadataObjects)
 	resourceWatchers.lock.Unlock()
 
 	require.Equal(t, resource, funcs.updated)
@@ -549,7 +533,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	wData = resourceWatchers.watchersMap[PodResource]
 	mockW = wData.watcher.(*mockWatcher)
 	mockW.handler.OnDelete(resource)
-	require.Equal(t, map[string]mapstr.M{}, watcher.metadataEvents)
+	require.Equal(t, map[string]kubernetes.Resource{}, watcher.metadataObjects)
 	resourceWatchers.lock.Unlock()
 
 	require.Equal(t, resource, funcs.deleted)
@@ -570,6 +554,80 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	watcher = resourceWatchers.watchersMap[PodResource]
 	require.False(t, watcher.started)
 	resourceWatchers.lock.Unlock()
+}
+
+// Test if we can add metadata from past events to an enricher that is associated
+// with a resource that had already triggered the handler functions
+func TestBuildMetadataEnricher_EventHandler_PastObjects(t *testing.T) {
+	resourceWatchers := NewWatchers()
+
+	resourceWatchers.lock.Lock()
+	resourceWatchers.watchersMap[PodResource] = &watcherData{
+		watcher:         &mockWatcher{},
+		started:         false,
+		metricsetsUsing: []string{"pod", "state_pod"},
+		metadataObjects: make(map[string]kubernetes.Resource),
+	}
+	resourceWatchers.lock.Unlock()
+
+	funcs := mockFuncs{}
+	resource1 := &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			UID:  types.UID("mockuid"),
+			Name: "enrich",
+			Labels: map[string]string{
+				"label": "value",
+			},
+			Namespace: "default",
+		},
+	}
+	id1 := "default:enrich"
+	resource2 := &v1.Pod{
+		ObjectMeta: metav1.ObjectMeta{
+			UID:  types.UID("mockuid2"),
+			Name: "enrich-2",
+			Labels: map[string]string{
+				"label": "value",
+			},
+			Namespace: "default-2",
+		},
+	}
+	id2 := "default-2:enrich-2"
+
+	config := &kubernetesConfig{
+		Namespace:  "test-ns",
+		SyncPeriod: time.Minute,
+		Node:       "test-node",
+		AddResourceMetadata: &metadata.AddResourceMetadataConfig{
+			CronJob:    false,
+			Deployment: false,
+		},
+	}
+
+	log := logp.NewLogger(selector)
+
+	enricher := buildMetadataEnricher("pod", PodResource, resourceWatchers, config, funcs.update, funcs.delete, funcs.index, log)
+	enricher.Start(resourceWatchers)
+
+	resourceWatchers.lock.Lock()
+
+	watcher := resourceWatchers.watchersMap[PodResource]
+	mockW := watcher.watcher.(*mockWatcher)
+
+	mockW.handler.OnAdd(resource1)
+	metadataObjects := map[string]kubernetes.Resource{id1: resource1}
+	require.Equal(t, metadataObjects, watcher.metadataObjects)
+
+	mockW.handler.OnUpdate(resource2)
+	metadataObjects[id2] = resource2
+	require.Equal(t, metadataObjects, watcher.metadataObjects)
+
+	mockW.handler.OnDelete(resource1)
+	delete(metadataObjects, id1)
+	require.Equal(t, metadataObjects, watcher.metadataObjects)
+
+	resourceWatchers.lock.Unlock()
+
 }
 
 type mockFuncs struct {
