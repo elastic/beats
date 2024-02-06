@@ -7,6 +7,16 @@
 === Beats version 8.12.1
 https://github.com/elastic/beats/compare/v8.12.0\...v8.12.1[View commits]
 
+==== Known Issues
+
+*Affecting all Beats*
+
+Performance regression in AWS S3 inputs using SQS notification.
+
+In 8.12 the default memory queue flush interval was raised from 1 second to 10 seconds. In many configurations this improves performance because it allows the output to batch more events per round trip, which improves efficiency. However, the SQS input has an extra bottleneck that interacts badly with the new value. For more details see {issue}37754[37754].
+
+If you are using the Elasticsearch output, and your output configuration uses a performance preset, switch it to `preset: latency`. If you use no preset or use `preset: custom`, then set `queue.mem.flush.timeout: 1s` in your queue or output configuration.
+
 ==== Breaking changes
 
 *Affecting all Beats*
@@ -16,44 +26,15 @@ platform, and when viewed from a metadata API standpoint, it is impossible to di
 know that your deployments run on Huawei Cloud exclusively, and you wish to have `cloud.provider` value as `huawei`,
 you can achieve this by overwriting the value using an `add_fields` processor. {pull}35184[35184]
 
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
 ==== Bugfixes
 
 *Affecting all Beats*
 - aws: Add credential caching for `AssumeRole` session tokens. {issue}37787[37787]
-- Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
-
-*Auditbeat*
-
+- Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments. {pull}[37816][37816]
 
 *Filebeat*
 
-- Fix nil pointer dereference in the httpjson input {pull}37591[37591]
+- Fix nil pointer dereference in the httpjson input. {pull}37591[37591]
 - Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
 - Fix m365_defender cursor value and query building. {pull}37116[37116]
 - Update github.com/lestrrat-go/jwx dependency. {pull}37799[37799]
@@ -64,142 +45,13 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 
 *Metricbeat*
 
-- Fix Azure Resource Metrics missing metrics (min and max aggregations) after upgrade to 8.11.3 {issue}37642[37642] {pull}37643[37643]
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Logging Plugin*
-
+- Fix Azure Resource Metrics missing metrics (min and max aggregations) after upgrade to 8.11.3. {issue}37642[37642] {pull}37643[37643]
 
 ==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
 
 *Filebeat*
 
 - Relax TCP/UDP metric polling expectations to improve metric collection. {pull}37714[37714]
-
-*Auditbeat*
-
-
-*Libbeat*
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-
-*Elastic Log Driver*
-*Elastic Logging Plugin*
-
-
-==== Deprecated
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-
-*Metricbeat*
-
-
-*Osquerybeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-
-*Elastic Logging Plugin*
-
-
-==== Known Issues
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 [[release-notes-8.12.0]]
 === Beats version 8.12.0
