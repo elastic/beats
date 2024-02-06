@@ -148,7 +148,7 @@ with_dependencies() {
       sudo apt-get install -y libsystemd-dev libpcap-dev
     elif [ "${linuxType}" = "rhel" ]; then
       sudo yum update -y
-      sudo yum install -y systemd-devel libpcap-dev
+      sudo yum install -y systemd-devel
     fi
   elif [ "${platform_type}" == "Darwin" ]; then
     pip3 install libpcap
