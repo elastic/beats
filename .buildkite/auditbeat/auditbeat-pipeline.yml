@@ -109,7 +109,7 @@ steps:
           imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths: "auditbeat/build/*.xml"
 
-      - label: ":linux:-{{matrix.image}} Integration Tests"
+      - label: ":linux: {{matrix.image}} Integration Tests"
         key: "linux-integration"
         command: ".buildkite/auditbeat/scripts/integ-tests.sh"
         notify:
@@ -125,12 +125,29 @@ steps:
           setup:
             image:
               - "${IMAGE_UBUNTU_X86_64}"
-              - "${IMAGE_UBUNTU_ARM_64}"
               - "${IMAGE_DEBIAN_10}"
               - "${IMAGE_DEBIAN_12}"
               - "${IMAGE_CENTOS7}"
               - "${IMAGE_SUSE15}"
               - "${IMAGE_RHEL9}"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
+
+      - label: ":linux: ARM {{matrix.image}} Integration Tests"
+        key: "linux-arm-integration"
+        command: ".buildkite/auditbeat/scripts/integ-tests.sh"
+        notify:
+          - github_commit_status:
+              context: "auditbeat/Extended: Linux Integration Tests"
+        agents:
+          provider: "aws"
+          imagePrefix: "{{matrix.image}}"
+          instanceType: "t4g.large"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_UBUNTU_ARM_64}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
