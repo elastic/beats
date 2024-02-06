@@ -37,7 +37,7 @@ const (
 func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
-		Stability:  feature.Experimental,
+		Stability:  feature.Beta,
 		Deprecated: false,
 		Info:       "Websocket Input",
 		Doc:        "Collect data from websocket api endpoints",

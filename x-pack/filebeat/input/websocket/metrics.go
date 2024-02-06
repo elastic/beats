@@ -33,7 +33,7 @@ func newInputMetrics(id string) *inputMetrics {
 		unregister:          unreg,
 		resource:            monitoring.NewString(reg, "resource"),
 		celEvalErrors:       monitoring.NewUint(reg, "cel_eval_errors"),
-		batchesReceived:     monitoring.NewUint(reg, "batches_received"),
+		batchesReceived:     monitoring.NewUint(reg, "batches_received_total"),
 		errorsTotal:         monitoring.NewUint(reg, "errors_total"),
 		receivedBytesTotal:  monitoring.NewUint(reg, "received_bytes_total"),
 		eventsReceived:      monitoring.NewUint(reg, "events_received_total"),
