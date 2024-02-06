@@ -106,13 +106,29 @@ with_go() {
   export PATH="${go_path}:${PATH}"
 }
 
-with_python() {
+checkLinuxType() {
   if [ "${platform_type}" == "Linux" ]; then
     if grep -q "ID=ubuntu" /etc/*release; then
-      #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
+      echo "ubuntu"
+    elif grep grep -q "ID=rhel" /etc/*release; then
+      echo "rhel"
+    elif grep grep -q "ID=centos" /etc/*release; then
+      echo "centos"
+    else
+      echo "Unsupported Linux"
+    fi
+  else
+      echo "This is not a Linux"
+  fi
+}
+
+with_python() {
+  local linuxType="$(checkLinuxType)"
+  if [ "${platform_type}" == "Linux" ]; then
+    if [ "${linuxType}" = "ubuntu" ]; then
       sudo apt-get update
       sudo apt-get install -y python3-pip python3-venv
-    elif grep grep -q "ID=rhel" /etc/*release; then
+    elif [ "${linuxType}" = "rhel" ]; then
       sudo dnf update
       sudo dnf install -y python3-pip python3-venv
     fi
@@ -124,10 +140,15 @@ with_python() {
 }
 
 with_dependencies() {
+  local linuxType="$(checkLinuxType)"
   if [ "${platform_type}" == "Linux" ]; then
-    #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
-    sudo apt-get update
-    sudo apt-get install -y libsystemd-dev libpcap-dev
+    if [ "${linuxType}" = "ubuntu" ]; then
+      sudo apt-get update
+      sudo apt-get install -y libsystemd-dev libpcap-dev
+    elif [ "${linuxType}" = "rhel" ]; then
+      sudo dnf update
+      sudo dnf install -y libsystemd-dev libpcap-dev
+    fi
   elif [ "${platform_type}" == "Darwin" ]; then
     pip3 install libpcap
   fi
