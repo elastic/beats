@@ -35,10 +35,10 @@ const (
 	maxInputQueueSizeRatio = 0.1
 )
 
-// The main implementation type for the memory queue. An active queue consists
-// of two goroutines: runLoop, which handles all public API requests and owns
-// the buffer state, and ackLoop, which listens for acknowledgments of consumed
-// events and runs any appropriate completion handlers.
+// broker is the main implementation type for the memory queue. An active queue
+// consists of two goroutines: runLoop, which handles all public API requests
+// and owns the buffer state, and ackLoop, which listens for acknowledgments of
+// consumed events and runs any appropriate completion handlers.
 type broker struct {
 	settings Settings
 	logger   *logp.Logger

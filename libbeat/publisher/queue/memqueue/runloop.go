@@ -21,7 +21,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 // runLoop internal state. These fields could mostly be local variables
@@ -58,8 +57,9 @@ type runLoop struct {
 	// It is active if and only if pendingGetRequest is non-nil.
 	getTimer *time.Timer
 
-	// TODO: entry IDs were a workaround for an external project that no longer
-	// exists. At this point they just complicate the API and should be removed.
+	// TODO (https://github.com/elastic/beats/issues/37893): entry IDs were a
+	// workaround for an external project that no longer exists. At this point
+	// they just complicate the API and should be removed.
 	nextEntryID queue.EntryID
 }
 
@@ -122,6 +122,8 @@ func (l *runLoop) run() {
 			l.handleGetRequest(&req)
 
 		case consumedChan <- l.consumedBatches:
+			// We've sent all the pending batches to the ackLoop for processing,
+			// clear the pending list.
 			l.consumedBatches = batchList{}
 
 		case count := <-l.broker.deleteChan:
@@ -220,9 +222,10 @@ func (l *runLoop) maybeUnblockGetRequest() {
 	}
 }
 
+// Returns true if the event was inserted, false if insertion was cancelled.
 func (l *runLoop) insert(req *pushRequest, id queue.EntryID) bool {
 	if req.producer != nil && req.producer.state.cancelled {
-		reportCancelledState(l.broker.logger, req)
+		reportCancelledState(req)
 		return false
 	}
 
@@ -254,7 +257,8 @@ func (l *runLoop) handleCancel(req *producerCancelRequest) {
 	var removedCount int
 
 	// Traverse all unconsumed events in the buffer, removing any with
-	// the specified producer.
+	// the specified producer. As we go we condense all the remaining
+	// events to be sequential.
 	buf := l.broker.buf
 	startIndex := l.bufPos + l.consumedCount
 	unconsumedEventCount := l.eventCount - l.consumedCount
@@ -264,8 +268,10 @@ func (l *runLoop) handleCancel(req *producerCancelRequest) {
 			// The producer matches, skip this event
 			removedCount++
 		} else {
-			// (not readIndex - removedCount since then we'd have sign issues when
-			// the buffer wraps.)
+			// Move the event to its final position after accounting for any
+			// earlier indices that were removed.
+			// (Count backwards from (startIndex + i), not from readIndex, to avoid
+			// sign issues when the buffer wraps.)
 			writeIndex := (startIndex + i - removedCount) % len(buf)
 			buf[writeIndex] = buf[readIndex]
 		}
@@ -287,7 +293,7 @@ func (l *runLoop) handleCancel(req *producerCancelRequest) {
 	}
 }
 
-func reportCancelledState(log *logp.Logger, req *pushRequest) {
+func reportCancelledState(req *pushRequest) {
 	// do not add waiting events if producer did send cancel signal
 	if cb := req.producer.state.dropCB; cb != nil {
 		cb(req.event)
