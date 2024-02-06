@@ -27,8 +27,9 @@ import (
 
 type config struct {
 	Events int `config:"events" validate:"min=32"`
-	// This field is named MaxGetRequst because that's its logical effect, but
-	// the user-exposed name is "flush.min_events" for backwards compatibility,
+	// This field is named MaxGetRequest because its logical effect is to give
+	// a maximum on the number of events a Get request can return, but the
+	// user-exposed name is "flush.min_events" for backwards compatibility,
 	// since it used to control buffer size in the internal buffer chain.
 	MaxGetRequest int           `config:"flush.min_events" validate:"min=0"`
 	FlushTimeout  time.Duration `config:"flush.timeout"`
