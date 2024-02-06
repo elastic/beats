@@ -15,27 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build linux
+//go:build !linux
 
-package socket
+package capabilities
 
-import (
-	"kernel.org/pub/linux/libs/security/libcap/cap"
+import "errors"
+
+// Dummy value on "not linux".
+type Flag = uint
+
+const (
+	// Meaningless on "not linux".
+	Effective = Flag(0)
+	// Meaningless on "not linux".
+	Permitted = Flag(1)
 )
 
-// isPrivileged checks if this process has privileges to read sockets
-// of all users
-func isPrivileged() (bool, error) {
-	set := cap.GetProc()
+// Returns errors.ErrUnsupported on "not linux".
+func FromPid(flag Flag, pid int) ([]string, error) {
+	return nil, errors.ErrUnsupported
+}
 
-	ptrace, err := set.GetFlag(cap.Effective, cap.SYS_PTRACE)
-	if err != nil {
-		return false, err
-	}
-	dac_read_search, err := set.GetFlag(cap.Effective, cap.DAC_READ_SEARCH)
-	if err != nil {
-		return false, err
-	}
+// Returns errors.ErrUnsupported on "not linux".
+func FromUint64(w uint64) ([]string, error) {
+	return nil, errors.ErrUnsupported
+}
 
-	return ptrace && dac_read_search, nil
+// Returns errors.ErrUnsupported on "not linux".
+func FromString(s string, base int) ([]string, error) {
+	return nil, errors.ErrUnsupported
 }
