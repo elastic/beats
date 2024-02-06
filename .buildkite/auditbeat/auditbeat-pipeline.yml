@@ -1,8 +1,10 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 env:
-  IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
-  IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
+  IMAGE_UBUNTU_2004_X86_64: "family/core-ubuntu-2004"
+  IMAGE_UBUNTU_2204_X86_64: "family/core-ubuntu-2204"
+  IMAGE_UBUNTU_2004_ARM_64: "core-ubuntu-2004-aarch64"
+  IMAGE_UBUNTU_2204_ARM_64: "core-ubuntu-2204-aarch64"
   IMAGE_DEBIAN_10: "family/core-debian-10"
   IMAGE_DEBIAN_12: "family/core-debian-12"
   IMAGE_CENTOS7: "family/core-centos-7"
@@ -27,7 +29,7 @@ steps:
               context: "auditbeat: Unit Tests"
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "${IMAGE_UBUNTU_2204_X86_64}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
@@ -75,7 +77,7 @@ steps:
               context: "auditbeat: Unit Tests"
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "${IMAGE_UBUNTU_2204_X86_64}"
 
   - group: "Extended Testing"
     key: "extended-tests"
@@ -92,7 +94,7 @@ steps:
               context: "auditbeat/Extended: Unit Tests ARM"
         agents:
           provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "${IMAGE_UBUNTU_2004_ARM_64}"
           instanceType: "t4g.large"
         artifact_paths: "auditbeat/build/*.xml"
 
@@ -124,7 +126,8 @@ steps:
         matrix:
           setup:
             image:
-              - "${IMAGE_UBUNTU_X86_64}"
+              - "${IMAGE_UBUNTU_2004_X86_64}"
+              - "${IMAGE_UBUNTU_2204_X86_64}"
               - "${IMAGE_DEBIAN_10}"
               - "${IMAGE_DEBIAN_12}"
               - "${IMAGE_CENTOS7}"
@@ -147,7 +150,8 @@ steps:
         matrix:
           setup:
             image:
-              - "${IMAGE_UBUNTU_ARM_64}"
+              - "${IMAGE_UBUNTU_2004_ARM_64}"
+              - "${IMAGE_UBUNTU_2204_ARM_64}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"

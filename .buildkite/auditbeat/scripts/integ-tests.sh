@@ -5,8 +5,8 @@ set -euo pipefail
 source .buildkite/env-scripts/linux-env.sh
 
 echo "--- Running Integration Tests"
+echo "using kernel $(uname -r)"
 sudo chmod -R go-w auditbeat/
 
 cd auditbeat
-umask 0022
 mage build integTest
