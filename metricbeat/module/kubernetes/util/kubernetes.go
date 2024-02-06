@@ -73,6 +73,11 @@ type enricher struct {
 	isPod         bool
 	config        *kubernetesConfig
 	log           *logp.Logger
+
+	// needed for the metadata enricher
+	// One of these two is always nil
+	specificMetaGen metadata.MetaGen
+	generalMetaGen  *metadata.Resource
 }
 
 type nilEnricher struct{}
@@ -503,7 +508,7 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	updateFunc := func(r kubernetes.Resource) map[string]mapstr.M {
+	updateFunc := func(r kubernetes.Resource, specificMetaGen metadata.MetaGen, generalMetaGen *metadata.Resource) map[string]mapstr.M {
 		accessor, _ := meta.Accessor(r)
 		id := join(accessor.GetNamespace(), accessor.GetName())
 
@@ -572,7 +577,17 @@ func NewResourceMetadataEnricher(
 		return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, "name"))
 	}
 
-	enricher := buildMetadataEnricher(metricsetName, resourceName, resourceWatchers, config, updateFunc, deleteFunc, indexFunc, log)
+	enricher := buildMetadataEnricher(
+		metricsetName,
+		resourceName,
+		resourceWatchers,
+		config,
+		specificMetaGen,
+		generalMetaGen,
+		updateFunc,
+		deleteFunc,
+		indexFunc,
+		log)
 	if resourceName == PodResource {
 		enricher.isPod = true
 	}
@@ -623,7 +638,7 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	updateFunc := func(r kubernetes.Resource) map[string]mapstr.M {
+	updateFunc := func(r kubernetes.Resource, metaGen metadata.MetaGen, generalMetaGen *metadata.Resource) map[string]mapstr.M {
 		metadataEvents := make(map[string]mapstr.M)
 
 		pod, ok := r.(*kubernetes.Pod)
@@ -704,7 +719,18 @@ func NewContainerMetadataEnricher(
 		return join(getString(e, mb.ModuleDataKey+".namespace"), getString(e, mb.ModuleDataKey+".pod.name"), getString(e, "name"))
 	}
 
-	enricher := buildMetadataEnricher(metricsetName, PodResource, resourceWatchers, config, updateFunc, deleteFunc, indexFunc, log)
+	enricher := buildMetadataEnricher(
+		metricsetName,
+		PodResource,
+		resourceWatchers,
+		config,
+		metaGen,
+		nil,
+		updateFunc,
+		deleteFunc,
+		indexFunc,
+		log,
+	)
 
 	return enricher
 }
@@ -764,18 +790,22 @@ func buildMetadataEnricher(
 	resourceName string,
 	resourceWatchers *Watchers,
 	config *kubernetesConfig,
-	updateFunc func(kubernetes.Resource) map[string]mapstr.M,
+	specificMetaGen metadata.MetaGen,
+	generalMetaGen *metadata.Resource,
+	updateFunc func(kubernetes.Resource, metadata.MetaGen, *metadata.Resource) map[string]mapstr.M,
 	deleteFunc func(kubernetes.Resource) []string,
 	indexFunc func(e mapstr.M) string,
 	log *logp.Logger) *enricher {
 
 	enricher := &enricher{
-		metadata:      map[string]mapstr.M{},
-		index:         indexFunc,
-		resourceName:  resourceName,
-		metricsetName: metricsetName,
-		config:        config,
-		log:           log,
+		metadata:        map[string]mapstr.M{},
+		index:           indexFunc,
+		resourceName:    resourceName,
+		metricsetName:   metricsetName,
+		specificMetaGen: specificMetaGen,
+		generalMetaGen:  generalMetaGen,
+		config:          config,
+		log:             log,
 	}
 
 	resourceWatchers.lock.Lock()
@@ -792,7 +822,7 @@ func buildMetadataEnricher(
 				log.Errorf("Error trying to get the object from the store: %s", err)
 			} else {
 				if exists {
-					newMetadataEvents := updateFunc(obj.(kubernetes.Resource))
+					newMetadataEvents := updateFunc(obj.(kubernetes.Resource), enricher.specificMetaGen, enricher.generalMetaGen)
 					// add the new metadata to the watcher received metadata
 					for id, metadata := range newMetadataEvents {
 						enricher.metadata[id] = metadata
@@ -810,7 +840,7 @@ func buildMetadataEnricher(
 
 				for _, enricher := range watcher.enrichers {
 					enricher.Lock()
-					newMetadataEvents := updateFunc(obj.(kubernetes.Resource))
+					newMetadataEvents := updateFunc(obj.(kubernetes.Resource), enricher.specificMetaGen, enricher.generalMetaGen)
 					// add the new metadata to the watcher received metadata
 					for id, metadata := range newMetadataEvents {
 						enricher.metadata[id] = metadata
@@ -826,7 +856,7 @@ func buildMetadataEnricher(
 
 				for _, enricher := range watcher.enrichers {
 					enricher.Lock()
-					updatedMetadataEvents := updateFunc(obj.(kubernetes.Resource))
+					updatedMetadataEvents := updateFunc(obj.(kubernetes.Resource), enricher.specificMetaGen, enricher.generalMetaGen)
 					// update the watcher metadata
 					for id, metadata := range updatedMetadataEvents {
 						enricher.metadata[id] = metadata
