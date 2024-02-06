@@ -121,6 +121,8 @@ steps:
           setup:
             image:
               - "${IMAGE_UBUNTU_X86_64}"
+              - "${IMAGE_UBUNTU_ARM_64}"
+              - "${IMAGE_RHEL9}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
