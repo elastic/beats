@@ -144,6 +144,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Auditbeat*
 
+- Add linux capabilities to processes in the system/process. {pull}37453[37453]
 
 *Filebeat*
 
