@@ -142,9 +142,6 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": ["^x-pack/elastic-agent/README.md", "^x-pack/elastic-agent/docs/.*", "^x-pack/elastic-agent/devtools/.*" ],
-<<<<<<< HEAD
-            "always_require_ci_on_changed": ["^x-pack/elastic-agent/.*", ".buildkite/xpack/elastic-agent/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
-=======
             "always_require_ci_on_changed": ["^x-pack/elastic-agent/.*", ".buildkite/x-pack/elastic-agent/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         },
         {
@@ -162,7 +159,6 @@
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
             "always_require_ci_on_changed": ["^winlogbeat/.*", ".buildkite/winlogbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
->>>>>>> df9694e1b6 (winlogbeat BK pipeline init (#37859))
         }
     ]
 }
