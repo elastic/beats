@@ -11,6 +11,10 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/google/cel-go/cel"
+	"github.com/gorilla/websocket"
+	"google.golang.org/protobuf/types/known/structpb"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -18,10 +22,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/mito/lib"
-
-	"github.com/google/cel-go/cel"
-	"github.com/gorilla/websocket"
-	"google.golang.org/protobuf/types/known/structpb"
 )
 
 type input struct {
