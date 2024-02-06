@@ -129,7 +129,8 @@ with_python() {
       sudo apt-get install -y python3-pip python3-venv
     elif [ "${linuxType}" = "rhel" ]; then
       sudo yum update -y
-      sudo yum install -y python3-pip python3-venv
+      sudo yum install -y python3 python3-pip
+      pip3 install virtualenv
     fi
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
