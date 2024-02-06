@@ -127,8 +127,6 @@
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
             "always_require_ci_on_changed": ["^packetbeat/.*", ".buildkite/packetbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
-<<<<<<< HEAD
-=======
         },
         {
             "enabled": true,
@@ -161,7 +159,6 @@
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
             "always_require_ci_on_changed": ["^winlogbeat/.*", ".buildkite/winlogbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
->>>>>>> df9694e1b6 (winlogbeat BK pipeline init (#37859))
         }
     ]
 }
