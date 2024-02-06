@@ -79,7 +79,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	if e.etwSession.Realtime {
 		if !e.etwSession.NewSession {
 			// Attach to an existing session.
-			err = e.etwSession.GetHandler()
+			err = e.etwSession.AttachToExistingSession()
 			if err != nil {
 				return fmt.Errorf("unable to retrieve handler: %w", err)
 			}
