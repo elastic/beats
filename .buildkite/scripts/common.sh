@@ -124,13 +124,14 @@ checkLinuxType() {
 
 with_python() {
   local linuxType="$(checkLinuxType)"
+  echo "${linuxType}"
   if [ "${platform_type}" == "Linux" ]; then
     if [ "${linuxType}" = "ubuntu" ]; then
       sudo apt-get update
       sudo apt-get install -y python3-pip python3-venv
     elif [ "${linuxType}" = "rhel" ]; then
-      sudo dnf update
-      sudo dnf install -y python3-pip python3-venv
+      sudo yum update -y
+      sudo yum install -y python3-pip python3-venv
     fi
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
@@ -141,13 +142,14 @@ with_python() {
 
 with_dependencies() {
   local linuxType="$(checkLinuxType)"
+  echo "${linuxType}"
   if [ "${platform_type}" == "Linux" ]; then
     if [ "${linuxType}" = "ubuntu" ]; then
       sudo apt-get update
       sudo apt-get install -y libsystemd-dev libpcap-dev
     elif [ "${linuxType}" = "rhel" ]; then
-      sudo dnf update
-      sudo dnf install -y libsystemd-dev libpcap-dev
+      sudo yum update -y
+      sudo yum install -y libsystemd-dev libpcap-dev
     fi
   elif [ "${platform_type}" == "Darwin" ]; then
     pip3 install libpcap
