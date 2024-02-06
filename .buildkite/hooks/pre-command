@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+# Secrets must be redacted
+# https://buildkite.com/docs/pipelines/managing-log-output#redacted-environment-variables
 AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_account_auth"
 PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
 DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
