@@ -110,9 +110,9 @@ checkLinuxType() {
   if [ "${platform_type}" == "Linux" ]; then
     if grep -q "ID=ubuntu" /etc/*release; then
       echo "ubuntu"
-    elif grep grep -q "ID=rhel" /etc/*release; then
+    elif grep -q "ID=rhel" /etc/*release; then
       echo "rhel"
-    elif grep grep -q "ID=centos" /etc/*release; then
+    elif grep -q "ID=centos" /etc/*release; then
       echo "centos"
     else
       echo "Unsupported Linux"
