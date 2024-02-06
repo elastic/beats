@@ -15,42 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package fingerprint
+//go:build !linux
 
-import (
-	"encoding/base32"
-	"encoding/base64"
-	"encoding/hex"
-	"strings"
+package capabilities
+
+import "errors"
+
+// Dummy value on "not linux".
+type Flag = uint
+
+const (
+	// Meaningless on "not linux".
+	Effective = Flag(0)
+	// Meaningless on "not linux".
+	Permitted = Flag(1)
 )
 
-type namedEncodingMethod struct {
-	Name   string
-	Encode encodingMethod
-}
-type encodingMethod func([]byte) string
-
-var encodings = map[string]namedEncodingMethod{}
-
-func init() {
-	for _, e := range []namedEncodingMethod{
-		{Name: "hex", Encode: hex.EncodeToString},
-		{Name: "base32", Encode: base32.StdEncoding.EncodeToString},
-		{Name: "base64", Encode: base64.StdEncoding.EncodeToString},
-	} {
-		encodings[e.Name] = e
-	}
+// Returns errors.ErrUnsupported on "not linux".
+func FromPid(flag Flag, pid int) ([]string, error) {
+	return nil, errors.ErrUnsupported
 }
 
-// Unpack creates the encodingMethod from the given string
-func (e *namedEncodingMethod) Unpack(str string) error {
-	str = strings.ToLower(str)
+// Returns errors.ErrUnsupported on "not linux".
+func FromUint64(w uint64) ([]string, error) {
+	return nil, errors.ErrUnsupported
+}
 
-	m, found := encodings[str]
-	if !found {
-		return makeErrUnknownEncoding(str)
-	}
-
-	*e = m
-	return nil
+// Returns errors.ErrUnsupported on "not linux".
+func FromString(s string, base int) ([]string, error) {
+	return nil, errors.ErrUnsupported
 }
