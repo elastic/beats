@@ -21,6 +21,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":go: Go Integration Tests"
@@ -29,7 +30,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2d-highcpu-16"
+          machineType: "${GCP_HI_PERF_MASHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":python: Python Integration Tests"
@@ -38,7 +39,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2d-highcpu-16"
+          machineType: "${GCP_HI_PERF_MASHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":negative_squared_cross_mark: Cross compile"
@@ -47,7 +48,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2d-highcpu-16"
+          machineType: "${GCP_HI_PERF_MASHINE_TYPE}"
         artifact_paths: " ${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":testengine: Stress Tests"
@@ -56,6 +57,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/libbeat-stress-test.xml"
 
 YAML
@@ -74,7 +76,7 @@ if are_conditions_met_libbeat_arm_tests; then
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.xlarge"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
 YAML
