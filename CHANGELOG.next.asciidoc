@@ -10,10 +10,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- add_cloud_metadata processor: `huawei` provider is now treated as `openstack`. Huawei cloud runs on OpenStack
-platform, and when viewed from a metadata API standpoint, it is impossible to differentiate it from OpenStack. If you
-know that your deployments run on Huawei Cloud exclusively, and you wish to have `cloud.provider` value as `huawei`,
-you can achieve this by overwriting the value using an `add_fields` processor. {pull}35184[35184]
 
 *Auditbeat*
 
@@ -56,8 +52,6 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
 - Support build of projects outside of beats directory {pull}36126[36126]
-- aws: Add credential caching for `AssumeRole` session tokens. {issue}37787[37787]
-- Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 
 *Auditbeat*
@@ -65,7 +59,6 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 
 *Filebeat*
 
-- Fix nil pointer dereference in the httpjson input {pull}37591[37591]
 - [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
 - Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
 - Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
@@ -78,14 +71,10 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 - Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
 - Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
-- Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
-- Fix m365_defender cursor value and query building. {pull}37116[37116]
-- Update github.com/lestrrat-go/jwx dependency. {pull}37799[37799]
 
 *Heartbeat*
 
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
-- Fix setuid root when running under cgroups v2. {pull}37794[37794]
 
 *Metricbeat*
 
@@ -102,7 +91,6 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 - Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
 - Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
 - Add log error when statsd server fails to start {pull}36477[36477]
-- Fix Azure Resource Metrics missing metrics (min and max aggregations) after upgrade to 8.11.3 {issue}37642[37642] {pull}37643[37643]
 
 *Osquerybeat*
 
@@ -147,7 +135,6 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 - Added support for Okta OAuth2 provider in the CEL input. {issue}36336[36336] {pull}36521[36521]
 - Added support for new features & removed partial save mechanism in the Azure Blob Storage input. {issue}35126[35126] {pull}36690[36690]
 - Added support for new features and removed partial save mechanism in the GCS input. {issue}35847[35847] {pull}36713[36713]
-- Relax TCP/UDP metric polling expectations to improve metric collection. {pull}37714[37714]
 
 *Auditbeat*
 
@@ -220,6 +207,9 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 
 
 ==== Known Issues
+
+
+
 
 
 
