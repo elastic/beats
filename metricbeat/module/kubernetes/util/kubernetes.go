@@ -92,7 +92,7 @@ type watcherData struct {
 
 	enrichers []*enricher // list of enrichers using this watcher
 
-	metadataObjects map[string]kubernetes.Resource // resulted metadata events from the resource event handler
+	metadataObjects map[string]bool // map of ids of each object received by the handler functions
 }
 
 type Watchers struct {
@@ -274,7 +274,7 @@ func createWatcher(
 		resourceWatchers.watchersMap[resourceName] = &watcherData{
 			watcher:         watcher,
 			started:         false,
-			metadataObjects: make(map[string]kubernetes.Resource),
+			metadataObjects: make(map[string]bool),
 		}
 		return true, nil
 	}
@@ -786,21 +786,27 @@ func buildMetadataEnricher(
 		watcher.enrichers = append(watcher.enrichers, enricher)
 
 		// Check if there are past events for this resource and update metadata if there are
-		for _, obj := range watcher.metadataObjects {
-			newMetadataEvents := updateFunc(obj.(kubernetes.Resource))
-			// add the new metadata to the watcher received metadata
-			for id, metadata := range newMetadataEvents {
-				enricher.metadata[id] = metadata
+		for key, _ := range watcher.metadataObjects {
+			obj, exists, err := watcher.watcher.Store().GetByKey(key)
+			if err != nil {
+				log.Errorf("Error trying to get the object from the store: %s", err)
+			} else {
+				if exists {
+					newMetadataEvents := updateFunc(obj.(kubernetes.Resource))
+					// add the new metadata to the watcher received metadata
+					for id, metadata := range newMetadataEvents {
+						enricher.metadata[id] = metadata
+					}
+				}
 			}
 		}
 
 		watcher.watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
-				// we need to calculate the id again in case it is a pod with multiple containers
-				r := obj.(kubernetes.Resource)
-				accessor, _ := meta.Accessor(r)
-				id := join(accessor.GetNamespace(), accessor.GetName())
-				watcher.metadataObjects[id] = r
+				// Add object to the list of metadata objects of this watcher
+				accessor, _ := meta.Accessor(obj.(kubernetes.Resource))
+				id := accessor.GetNamespace() + "/" + accessor.GetName()
+				watcher.metadataObjects[id] = true
 
 				for _, enricher := range watcher.enrichers {
 					enricher.Lock()
@@ -813,11 +819,10 @@ func buildMetadataEnricher(
 				}
 			},
 			UpdateFunc: func(obj interface{}) {
-				// we need to calculate the id again in case it is a pod with multiple containers
-				r := obj.(kubernetes.Resource)
-				accessor, _ := meta.Accessor(r)
-				id := join(accessor.GetNamespace(), accessor.GetName())
-				watcher.metadataObjects[id] = r
+				// Add object to the list of metadata objects of this watcher
+				accessor, _ := meta.Accessor(obj.(kubernetes.Resource))
+				id := accessor.GetNamespace() + "/" + accessor.GetName()
+				watcher.metadataObjects[id] = true
 
 				for _, enricher := range watcher.enrichers {
 					enricher.Lock()
@@ -830,10 +835,9 @@ func buildMetadataEnricher(
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
-				// we need to calculate the id again in case it is a pod with multiple containers
-				r := obj.(kubernetes.Resource)
-				accessor, _ := meta.Accessor(r)
-				id := join(accessor.GetNamespace(), accessor.GetName())
+				// Remove object from the list of metadata objects of this watcher
+				accessor, _ := meta.Accessor(obj.(kubernetes.Resource))
+				id := accessor.GetNamespace() + "/" + accessor.GetName()
 				delete(watcher.metadataObjects, id)
 
 				for _, enricher := range watcher.enrichers {
