@@ -442,7 +442,7 @@ spec:
       name: beats-winlogbeat
       description: "Beats winlogbeat pipeline"
     spec:
-#      branch_configuration: "main 7.17 8.* v7.17 v8.*" TODO: temporarily commented to build PRs from forks
+#      branch_configuration: "main 7.17 8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/winlogbeat/pipeline.winlogbeat.yml"
 #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
