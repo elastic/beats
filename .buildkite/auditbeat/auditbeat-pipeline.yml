@@ -116,7 +116,7 @@ steps:
         command: ".buildkite/auditbeat/scripts/integ-tests.sh"
         notify:
           - github_commit_status:
-              context: "auditbeat/Extended: Linux Integration Tests"
+              context: "auditbeat: Integration Tests"
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
@@ -142,7 +142,7 @@ steps:
         command: ".buildkite/auditbeat/scripts/integ-tests.sh"
         notify:
           - github_commit_status:
-              context: "auditbeat/Extended: Linux Integration Tests"
+              context: "auditbeat: Integration Tests"
         agents:
           provider: "aws"
           imagePrefix: "{{matrix.image}}"
