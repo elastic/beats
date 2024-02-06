@@ -28,30 +28,30 @@ type Session struct {
 	Name string
 	// GUID is the provider GUID to configure the session.
 	GUID windows.GUID
-	// Properties of the session that are initialized in newSessionProperties()
+	// properties of the session that are initialized in newSessionProperties()
 	// See https://learn.microsoft.com/en-us/windows/win32/api/evntrace/ns-evntrace-event_trace_properties for more information
-	Properties *EventTraceProperties
-	// Handler of the event tracing session for which the provider is being configured.
+	properties *EventTraceProperties
+	// handler of the event tracing session for which the provider is being configured.
 	// It is obtained from StartTrace when a new trace is started.
 	// This handler is needed to enable, query or stop the trace.
-	Handler uintptr
+	handler uintptr
 	// Realtime is a flag to know if the consumer reads from a logfile or real-time session.
 	Realtime bool // Real-time flag
 	// NewSession is a flag to indicate whether a new session has been created or attached to an existing one.
 	NewSession bool
 	// TraceLevel sets the maximum level of events that we want the provider to write.
-	TraceLevel uint8
-	// MatchAnyKeyword is a 64-bit bitmask of keywords that determine the categories of events that we want the provider to write.
+	traceLevel uint8
+	// matchAnyKeyword is a 64-bit bitmask of keywords that determine the categories of events that we want the provider to write.
 	// The provider writes an event if the event's keyword bits match any of the bits set in this value
-	// or if the event has no keyword bits set, in addition to meeting the Level and MatchAllKeyword criteria.
-	MatchAnyKeyword uint64
-	// MatchAllKeyword is a 64-bit bitmask of keywords that restricts the events that we want the provider to write.
+	// or if the event has no keyword bits set, in addition to meeting the level and matchAllKeyword criteria.
+	matchAnyKeyword uint64
+	// matchAllKeyword is a 64-bit bitmask of keywords that restricts the events that we want the provider to write.
 	// The provider typically writes an event if the event's keyword bits match all of the bits set in this value
-	// or if the event has no keyword bits set, in addition to meeting the Level and MatchAnyKeyword criteria.
-	MatchAllKeyword uint64
-	// TraceHandler is the trace processing handle.
+	// or if the event has no keyword bits set, in addition to meeting the level and matchAnyKeyword criteria.
+	matchAllKeyword uint64
+	// traceHandler is the trace processing handle.
 	// It is used to control the trace that receives and processes events.
-	TraceHandler uint64
+	traceHandler uint64
 	// Callback is the pointer to EventRecordCallback which receives and processes event trace events.
 	Callback func(*EventRecord) uintptr
 	// BufferCallback is the pointer to BufferCallback which processes retrieved metadata about the ETW buffers (optional).
@@ -173,7 +173,7 @@ func NewSession(conf Config) (Session, error) {
 
 	// If a current session is configured, set up the session properties and return.
 	if conf.Session != "" {
-		session.Properties = newSessionProperties(session.Name)
+		session.properties = newSessionProperties(session.Name)
 		return session, nil
 	} else if conf.Logfile != "" {
 		// If a logfile is specified, set up for non-realtime session.
@@ -189,10 +189,10 @@ func NewSession(conf Config) (Session, error) {
 	}
 
 	// Initialize additional session properties.
-	session.Properties = newSessionProperties(session.Name)
-	session.TraceLevel = getTraceLevel(conf.TraceLevel)
-	session.MatchAnyKeyword = conf.MatchAnyKeyword
-	session.MatchAllKeyword = conf.MatchAllKeyword
+	session.properties = newSessionProperties(session.Name)
+	session.traceLevel = getTraceLevel(conf.TraceLevel)
+	session.matchAnyKeyword = conf.MatchAnyKeyword
+	session.matchAllKeyword = conf.MatchAllKeyword
 
 	return session, nil
 }
@@ -228,7 +228,7 @@ func (s *Session) StartConsumer() error {
 
 	// Open an ETW trace processing handle for consuming events
 	// from an ETW real-time trace session or an ETW log file.
-	s.TraceHandler, err = s.openTrace(&elf)
+	s.traceHandler, err = s.openTrace(&elf)
 
 	switch {
 	case err == nil:
@@ -242,7 +242,7 @@ func (s *Session) StartConsumer() error {
 		return fmt.Errorf("failed to open trace: %w", err)
 	}
 	// Process the trace. This function blocks until processing ends.
-	if err := s.processTrace(&s.TraceHandler, 1, nil, nil); err != nil {
+	if err := s.processTrace(&s.traceHandler, 1, nil, nil); err != nil {
 		return fmt.Errorf("failed to process trace: %w", err)
 	}
 

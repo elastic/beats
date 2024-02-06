@@ -182,10 +182,10 @@ func TestNewSession_ProviderName(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "Session1", session.Name, "SessionName should match expected value")
 	assert.Equal(t, expectedGUID, session.GUID, "The GUID in the session should match the expected GUID")
-	assert.Equal(t, uint8(3), session.TraceLevel, "TraceLevel should be 3 (warning)")
+	assert.Equal(t, uint8(3), session.traceLevel, "TraceLevel should be 3 (warning)")
 	assert.Equal(t, true, session.NewSession)
 	assert.Equal(t, true, session.Realtime)
-	assert.NotNil(t, session.Properties)
+	assert.NotNil(t, session.properties)
 }
 
 func TestNewSession_GUIDError(t *testing.T) {
@@ -230,7 +230,7 @@ func TestNewSession_AttachSession(t *testing.T) {
 	assert.Equal(t, "Session1", session.Name, "SessionName should match expected value")
 	assert.Equal(t, false, session.NewSession)
 	assert.Equal(t, true, session.Realtime)
-	assert.NotNil(t, session.Properties)
+	assert.NotNil(t, session.properties)
 }
 
 func TestNewSession_Logfile(t *testing.T) {
@@ -247,7 +247,7 @@ func TestNewSession_Logfile(t *testing.T) {
 	assert.Equal(t, "LogFile1.etl", session.Name, "SessionName should match expected value")
 	assert.Equal(t, false, session.NewSession)
 	assert.Equal(t, false, session.Realtime)
-	assert.Nil(t, session.Properties)
+	assert.Nil(t, session.properties)
 }
 
 func TestStartConsumer_CallbackNull(t *testing.T) {
@@ -334,5 +334,5 @@ func TestStartConsumer_Success(t *testing.T) {
 
 	err := session.StartConsumer()
 	assert.NoError(t, err)
-	assert.Equal(t, uint64(12345), session.TraceHandler, "TraceHandler should be set to the mock value")
+	assert.Equal(t, uint64(12345), session.traceHandler, "traceHandler should be set to the mock value")
 }

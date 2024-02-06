@@ -13,7 +13,7 @@ import (
 	"golang.org/x/sys/windows"
 )
 
-func TestGetHandler_Error(t *testing.T) {
+func TestAttachToExistingSession_Error(t *testing.T) {
 	// Mock implementation of controlTrace
 	controlTrace := func(traceHandle uintptr,
 		instanceName *uint16,
@@ -25,15 +25,15 @@ func TestGetHandler_Error(t *testing.T) {
 	// Create a Session instance
 	session := &Session{
 		Name:         "TestSession",
-		Properties:   &EventTraceProperties{},
+		properties:   &EventTraceProperties{},
 		controlTrace: controlTrace,
 	}
 
-	err := session.GetHandler()
+	err := session.AttachToExistingSession()
 	assert.EqualError(t, err, "session is not running: The instance name passed was not recognized as valid by a WMI data provider.")
 }
 
-func TestGetHandler_Success(t *testing.T) {
+func TestAttachToExistingSession_Success(t *testing.T) {
 	// Mock implementation of controlTrace
 	controlTrace := func(traceHandle uintptr,
 		instanceName *uint16,
@@ -47,14 +47,14 @@ func TestGetHandler_Success(t *testing.T) {
 	// Create a Session instance with initialized Properties
 	session := &Session{
 		Name:         "TestSession",
-		Properties:   &EventTraceProperties{},
+		properties:   &EventTraceProperties{},
 		controlTrace: controlTrace,
 	}
 
-	err := session.GetHandler()
+	err := session.AttachToExistingSession()
 
 	assert.NoError(t, err)
-	assert.Equal(t, uintptr(12345), session.Handler, "Handler should be set to the mock value")
+	assert.Equal(t, uintptr(12345), session.handler, "Handler should be set to the mock value")
 }
 
 func TestCreateRealtimeSession_StartTraceError(t *testing.T) {
@@ -68,7 +68,7 @@ func TestCreateRealtimeSession_StartTraceError(t *testing.T) {
 	// Create a Session instance
 	session := &Session{
 		Name:       "TestSession",
-		Properties: &EventTraceProperties{},
+		properties: &EventTraceProperties{},
 		startTrace: startTrace,
 	}
 
@@ -99,7 +99,7 @@ func TestCreateRealtimeSession_EnableTraceError(t *testing.T) {
 	// Create a Session instance
 	session := &Session{
 		Name:        "TestSession",
-		Properties:  &EventTraceProperties{},
+		properties:  &EventTraceProperties{},
 		startTrace:  startTrace,
 		enableTrace: enableTrace,
 	}
@@ -131,7 +131,7 @@ func TestCreateRealtimeSession_Success(t *testing.T) {
 	// Create a Session instance
 	session := &Session{
 		Name:        "TestSession",
-		Properties:  &EventTraceProperties{},
+		properties:  &EventTraceProperties{},
 		startTrace:  startTrace,
 		enableTrace: enableTrace,
 	}
@@ -139,7 +139,7 @@ func TestCreateRealtimeSession_Success(t *testing.T) {
 	err := session.CreateRealtimeSession()
 
 	assert.NoError(t, err)
-	assert.Equal(t, uintptr(12345), session.Handler, "Handler should be set to the mock value")
+	assert.Equal(t, uintptr(12345), session.handler, "Handler should be set to the mock value")
 }
 
 func TestStopSession_Error(t *testing.T) {
@@ -152,8 +152,8 @@ func TestStopSession_Error(t *testing.T) {
 	session := &Session{
 		Realtime:     true,
 		NewSession:   true,
-		TraceHandler: 12345, // Example handler value
-		Properties:   &EventTraceProperties{},
+		traceHandler: 12345, // Example handler value
+		properties:   &EventTraceProperties{},
 		closeTrace:   closeTrace,
 	}
 
@@ -179,8 +179,8 @@ func TestStopSession_Success(t *testing.T) {
 	session := &Session{
 		Realtime:     true,
 		NewSession:   true,
-		TraceHandler: 12345, // Example handler value
-		Properties:   &EventTraceProperties{},
+		traceHandler: 12345, // Example handler value
+		properties:   &EventTraceProperties{},
 		closeTrace:   closeTrace,
 		controlTrace: controlTrace,
 	}

@@ -12,8 +12,9 @@ import (
 	"syscall"
 )
 
-// GetHandler queries the status of an existing ETW session to get its handler and properties.
-func (s *Session) GetHandler() error {
+// AttachToExistingSession queries the status of an existing ETW session.
+// On success, it updates the Session's handler with the queried information.
+func (s *Session) AttachToExistingSession() error {
 	// Convert the session name to UTF16 for Windows API compatibility.
 	sessionNamePtr, err := syscall.UTF16PtrFromString(s.Name)
 	if err != nil {
@@ -21,11 +22,11 @@ func (s *Session) GetHandler() error {
 	}
 
 	// Query the current state of the ETW session.
-	err = s.controlTrace(0, sessionNamePtr, s.Properties, EVENT_TRACE_CONTROL_QUERY)
+	err = s.controlTrace(0, sessionNamePtr, s.properties, EVENT_TRACE_CONTROL_QUERY)
 	switch {
 	case err == nil:
 		// Get the session handler from the properties struct.
-		s.Handler = uintptr(s.Properties.Wnode.Union1)
+		s.handler = uintptr(s.properties.Wnode.Union1)
 
 		return nil
 
@@ -50,7 +51,7 @@ func (s *Session) CreateRealtimeSession() error {
 	}
 
 	// Start the ETW trace session.
-	err = s.startTrace(&s.Handler, sessionPtr, s.Properties)
+	err = s.startTrace(&s.handler, sessionPtr, s.properties)
 	switch {
 	case err == nil:
 
@@ -73,7 +74,7 @@ func (s *Session) CreateRealtimeSession() error {
 	const timeout = 0
 
 	// Enable the trace session with extended options.
-	err = s.enableTrace(s.Handler, &s.GUID, EVENT_CONTROL_CODE_ENABLE_PROVIDER, s.TraceLevel, s.MatchAnyKeyword, s.MatchAllKeyword, timeout, &params)
+	err = s.enableTrace(s.handler, &s.GUID, EVENT_CONTROL_CODE_ENABLE_PROVIDER, s.traceLevel, s.matchAnyKeyword, s.matchAllKeyword, timeout, &params)
 	switch {
 	case err == nil:
 		return nil
@@ -95,9 +96,9 @@ func (s *Session) StopSession() error {
 		return nil
 	}
 
-	if isValidHandler(s.TraceHandler) {
+	if isValidHandler(s.traceHandler) {
 		// Attempt to close the trace and handle potential errors.
-		if err := s.closeTrace(s.TraceHandler); err != nil && !errors.Is(err, ERROR_CTX_CLOSE_PENDING) {
+		if err := s.closeTrace(s.traceHandler); err != nil && !errors.Is(err, ERROR_CTX_CLOSE_PENDING) {
 			return fmt.Errorf("failed to close trace: %w", err)
 		}
 	}
@@ -105,9 +106,9 @@ func (s *Session) StopSession() error {
 	if s.NewSession {
 		// If we created the session, send a control command to stop it.
 		return s.controlTrace(
-			s.Handler,
+			s.handler,
 			nil,
-			s.Properties,
+			s.properties,
 			EVENT_TRACE_CONTROL_STOP,
 		)
 	}
