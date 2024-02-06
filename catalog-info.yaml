@@ -323,7 +323,7 @@ spec:
       cancel_intermediate_builds: true
       cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
       env:
         ELASTIC_PR_COMMENTS_ENABLED: "true"
       teams:
