@@ -26,7 +26,6 @@ retry() {
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" ]]; then
   source .buildkite/env-scripts/env.sh
-  source .buildkite/env-scripts/util.sh
   source .buildkite/env-scripts/win-env.sh
 
   if [[ -z "${GOLANG_VERSION-""}" ]]; then
@@ -35,6 +34,10 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == 
 
   if [[ "$BUILDKITE_STEP_KEY" == macos* ]]; then
     ulimit -Sn 30000
+  fi
+
+  if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
+    source .buildkite/filebeat/scripts/packaging/packaging-env.sh
   fi
 fi
 
