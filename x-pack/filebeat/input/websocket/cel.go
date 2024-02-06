@@ -11,13 +11,13 @@ import (
 	"io"
 	"regexp"
 
+	"github.com/google/cel-go/cel"
+	"github.com/google/cel-go/checker/decls"
+
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/useragent"
 	"github.com/elastic/mito/lib"
-
-	"github.com/google/cel-go/cel"
-	"github.com/google/cel-go/checker/decls"
 )
 
 var (

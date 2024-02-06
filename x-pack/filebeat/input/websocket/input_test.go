@@ -14,15 +14,15 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/gorilla/websocket"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/google/go-cmp/cmp"
-	"github.com/gorilla/websocket"
 )
 
 // WebSocketHandler is a type for handling WebSocket messages.
@@ -327,15 +327,6 @@ func (p *publisher) Publish(e beat.Event, cursor interface{}) error {
 	p.done()
 	p.mu.Unlock()
 	return nil
-}
-
-func newV2Context() (v2.Context, func()) {
-	ctx, cancel := context.WithCancel(context.Background())
-	return v2.Context{
-		Logger:      logp.NewLogger("websocket_test"),
-		ID:          "test_id:",
-		Cancelation: ctx,
-	}, cancel
 }
 
 func newWebSocketTestServer(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {

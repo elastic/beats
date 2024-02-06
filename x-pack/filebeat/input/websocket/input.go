@@ -8,10 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math"
-	"math/rand"
 	"reflect"
-	"strings"
 	"time"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -51,10 +48,6 @@ func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
 func (input) Name() string { return inputName }
 
 func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
-	cfg := src.(*source).cfg
-	if !wantClient(cfg) {
-		return fmt.Errorf("unsupported scheme: %s", cfg.Resource.URL.Scheme)
-	}
 	return nil
 }
 
@@ -107,7 +100,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// websocket client
 	headers := formHeader(cfg)
 	url := cfg.Resource.URL.String()
-	c, _, err := websocket.DefaultDialer.Dial(url, headers)
+	c, resp, err := websocket.DefaultDialer.Dial(url, headers)
+	if resp != nil && resp.Body != nil {
+		log.Debugw("websocket connection response", "body", resp.Body)
+		resp.Body.Close()
+	}
 	if err != nil {
 		metrics.errorsTotal.Inc()
 		log.Errorw("failed to establish websocket connection", "error", err)
@@ -115,8 +112,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	}
 	defer c.Close()
 
-	done := make(chan struct{})
-	errChan := make(chan error)
+	done := make(chan error)
 
 	go func() {
 		defer close(done)
@@ -125,18 +121,11 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			if err != nil {
 				metrics.errorsTotal.Inc()
 				if websocket.IsCloseError(err, websocket.CloseNormalClosure, websocket.CloseGoingAway) {
-					log.Debugw("websocket connection closed, attempting to reconnect", "error", err)
-					c, err = connectWebSocketWithRetry(log, url, cfg.Resource.Retry)
-					if err != nil {
-						log.Errorw("failed to reconnect websocket", "error", err)
-						errChan <- err
-						return
-					}
-					log.Debugw("reconnected to websocket")
-					continue
+					log.Errorw("websocket connection closed", "error", err)
+				} else {
+					log.Errorw("failed to read websocket data", "error", err)
 				}
-				log.Errorw("failed to read websocket data", "error", err)
-				errChan <- err
+				done <- err
 				return
 			}
 			metrics.receivedBytesTotal.Add(uint64(len(message)))
@@ -146,22 +135,18 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			if err != nil {
 				metrics.errorsTotal.Inc()
 				log.Errorw("failed to process and publish data", "error", err)
-				errChan <- err
+				done <- err
 				return
 			}
 		}
 	}()
 
-	// blocks until done is closed , context is cancelled or an error is received
-	for {
-		select {
-		case err := <-errChan:
-			return err
-		case <-done:
-			return nil
-		case <-ctx.Done():
-			return ctx.Err()
-		}
+	// blocks until done is closed, context is cancelled or an error is received
+	select {
+	case err := <-done:
+		return err
+	case <-ctx.Done():
+		return ctx.Err()
 	}
 }
 
@@ -379,15 +364,6 @@ func errorMessage(msg string) map[string]interface{} {
 	return map[string]interface{}{"error": map[string]interface{}{"message": msg}}
 }
 
-func wantClient(cfg config) bool {
-	switch scheme, _, _ := strings.Cut(cfg.Resource.URL.Scheme, "+"); scheme {
-	case "ws", "wss":
-		return true
-	default:
-		return false
-	}
-}
-
 func formHeader(cfg config) map[string][]string {
 	header := make(map[string][]string)
 	switch {
@@ -399,40 +375,4 @@ func formHeader(cfg config) map[string][]string {
 		header["Authorization"] = []string{"Basic " + cfg.Auth.BasicToken}
 	}
 	return header
-}
-
-func connectWebSocketWithRetry(log *logp.Logger, url string, config retryConfig) (*websocket.Conn, error) {
-	var conn *websocket.Conn
-	var err error
-
-	for attempt := 1; attempt <= *config.MaxAttempts; attempt++ {
-		conn, _, err = websocket.DefaultDialer.Dial(url, nil)
-		if err == nil {
-			return conn, nil
-		}
-
-		log.Debugw("Attempt %d: WebSocket connection failed. Retrying...\n", attempt)
-
-		waitTime := calculateWaitTime(config.WaitMin, config.WaitMax, attempt)
-		time.Sleep(waitTime)
-	}
-
-	return nil, fmt.Errorf("failed to establish WebSocket connection after %d attempts", *config.MaxAttempts)
-}
-
-func calculateWaitTime(waitMin, waitMax *time.Duration, attempt int) time.Duration {
-	if waitMin == nil || waitMax == nil {
-		return 0
-	}
-
-	// calculate exponential backoff with jitter
-	base := float64(*waitMin)
-	maxJitter := float64(*waitMax - *waitMin)
-
-	backoff := base * math.Pow(2, float64(attempt-1))
-	jitter := rand.Float64() * maxJitter
-
-	waitTime := time.Duration(backoff + jitter)
-
-	return waitTime
 }

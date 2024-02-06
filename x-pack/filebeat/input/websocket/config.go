@@ -6,11 +6,10 @@ package websocket
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/url"
 	"regexp"
-	"time"
+	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -35,8 +34,7 @@ type config struct {
 }
 
 type ResourceConfig struct {
-	URL   *urlConfig  `config:"url" validate:"required"`
-	Retry retryConfig `config:"retry"`
+	URL *urlConfig `config:"url" validate:"required"`
 }
 
 type redact struct {
@@ -93,60 +91,22 @@ func (c config) Validate() error {
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}
-	return nil
-}
-
-type retryConfig struct {
-	MaxAttempts *int           `config:"max_attempts"`
-	WaitMin     *time.Duration `config:"wait_min"`
-	WaitMax     *time.Duration `config:"wait_max"`
-}
-
-func (c retryConfig) Validate() error {
-	switch {
-	case c.MaxAttempts != nil && *c.MaxAttempts <= 0:
-		return errors.New("max_attempts must be greater than zero")
-	case c.WaitMin != nil && *c.WaitMin <= 0:
-		return errors.New("wait_min must be greater than zero")
-	case c.WaitMax != nil && *c.WaitMax <= 0:
-		return errors.New("wait_max must be greater than zero")
+	err = checkURLScheme(c.Resource.URL)
+	if err != nil {
+		return err
 	}
 	return nil
+}
+
+func checkURLScheme(url *urlConfig) error {
+	switch scheme, _, _ := strings.Cut(url.Scheme, "+"); scheme {
+	case "ws", "wss":
+		return nil
+	default:
+		return fmt.Errorf("unsupported scheme: %s", url.Scheme)
+	}
 }
 
 func defaultConfig() config {
-	maxAttempts := 5
-	waitMin := time.Second
-	waitMax := time.Minute
-
-	return config{
-		Resource: &ResourceConfig{
-			Retry: retryConfig{
-				MaxAttempts: &maxAttempts,
-				WaitMin:     &waitMin,
-				WaitMax:     &waitMax,
-			},
-		},
-	}
-}
-
-func (c retryConfig) getMaxAttempts() int {
-	if c.MaxAttempts == nil {
-		return 0
-	}
-	return *c.MaxAttempts
-}
-
-func (c retryConfig) getWaitMin() time.Duration {
-	if c.WaitMin == nil {
-		return 0
-	}
-	return *c.WaitMin
-}
-
-func (c retryConfig) getWaitMax() time.Duration {
-	if c.WaitMax == nil {
-		return 0
-	}
-	return *c.WaitMax
+	return config{}
 }
