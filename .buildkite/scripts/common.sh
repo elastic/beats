@@ -112,7 +112,7 @@ with_python() {
       #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
       sudo apt-get update
       sudo apt-get install -y python3-pip python3-venv
-    elif grep grep -qE "ID=centos|ID=rhel" /etc/*release; then
+    elif grep grep -q "ID=rhel" /etc/*release; then
       sudo dnf update
       sudo dnf install -y python3-pip python3-venv
     fi
