@@ -64,7 +64,7 @@ YAML
 fi
 
 echo "Check and add the Extended Tests into the pipeline"
-if are_conditions_met_libbeat_arm_tests; then
+if are_conditions_met_arm_tests; then
   cat >> $pipelineName <<- YAML
 
   - group: "Extended Tests"

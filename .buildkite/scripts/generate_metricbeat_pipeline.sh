@@ -110,7 +110,7 @@ YAML
 fi
 
 echo "Check and add the Extended Tests into the pipeline"
-if are_conditions_met_metricbeat_macos_tests; then
+if are_conditions_met_macos_tests; then
   cat >> $pipelineName <<- YAML
 
   - group: "Extended Tests"
@@ -128,7 +128,7 @@ YAML
 fi
 
 echo "Check and add the Packaging into the pipeline"
-if are_conditions_met_mandatory_tests && are_conditions_met_packaging; then
+if are_conditions_met_packaging; then
   cat >> $pipelineName <<- YAML
 
   - wait: ~

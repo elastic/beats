@@ -16,22 +16,30 @@ steps:
   - input: "Input Parameters"
     key: "input-run-all-stages"
     fields:
-    - select: "Packetbeat - runAllStages"
-      key: "runAllStages"
+    - select: "Packetbeat - runPacketbeat"
+      key: "runPacketbeat"
       options:
         - label: "True"
           value: "true"
         - label: "False"
           value: "false"
       default: "false"
-    # - select: "Packetbeat - runMacOsTests"
-    #   key: "UI_MACOS_TESTS"
-    #   options:
-    #     - label: "True"
-    #       value: "true"
-    #     - label: "False"
-    #       value: "false"
-    #   default: "false"
+    - select: "Packetbeat - runPacketbeatArmTest"
+      key: "runPacketbeatArmTest"
+      options:
+        - label: "True"
+          value: "true"
+        - label: "False"
+          value: "false"
+      default: "false"
+    - select: "Packetbeat - runPacketbeatMacOsTests"
+      key: "runPacketbeatMacOsTests"
+      options:
+        - label: "True"
+          value: "true"
+        - label: "False"
+          value: "false"
+      default: "false"
     if: "build.source == 'ui'"
 
   - wait: ~

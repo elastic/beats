@@ -10,10 +10,10 @@ cat > $pipelineName <<- YAML
 
 steps:
 
-# YAML
+YAML
 
-# if are_conditions_met_mandatory_tests; then
-#   cat >> $pipelineName <<- YAML
+if are_conditions_met_mandatory_tests; then
+  cat >> $pipelineName <<- YAML
 
   - group: "Mandatory Tests"
     key: "mandatory-tests"
@@ -51,38 +51,6 @@ steps:
               - "${IMAGE_WIN_2022}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-# YAML
-# fi
-
-# if are_conditions_met_extended_tests && are_conditions_met_macos_tests; then
-#   cat >> $pipelineName <<- YAML
-
-  - group: "Extended Tests"
-    key: "extended-tests"
-    steps:
-      - label: ":mac: MacOS Unit Tests"
-        key: "extended-macos-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh"
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-      - label: ":linux: ARM Ubuntu Unit Tests"
-        key: "extended-arm64-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh"
-        agents:
-          provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.xlarge"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-# YAML
-# fi
-
-# if are_conditions_met_extended_windows_tests; then
-#   cat >> $pipelineName <<- YAML
-
   - group: "Extended Windowds Tests"
     key: "extended-win-tests"
     steps:
@@ -97,7 +65,6 @@ steps:
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      # Temporary disabled https://github.com/elastic/beats/issues/37841
       - label: ":windows: Windows 10 Unit Tests"
         key: "extended-win-10-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
@@ -120,11 +87,50 @@ steps:
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-# YAML
-# fi
+YAML
+fi
 
-# if are_conditions_met_extended_windows_tests; then
-#   cat >> $pipelineName <<- YAML
+if are_conditions_met_arm_tests && are_conditions_met_macos_tests; then
+  cat >> $pipelineName <<- YAML
+
+  - group: "Extended Tests"
+    key: "extended-tests"
+    steps:
+
+YAML
+fi
+
+if  are_conditions_met_macos_tests; then
+  cat >> $pipelineName <<- YAML
+
+      - label: ":mac: MacOS Unit Tests"
+        key: "extended-macos-unit-tests"
+        command: ".buildkite/scripts/unit_tests.sh"
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+
+YAML
+fi
+
+if  are_conditions_met_arm_tests; then
+  cat >> $pipelineName <<- YAML
+      - label: ":linux: ARM Ubuntu Unit Tests"
+        key: "extended-arm64-unit-test"
+        command: ".buildkite/scripts/unit_tests.sh"
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "t4g.xlarge"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+
+YAML
+fi
+
+
+if are_conditions_met_packaging; then
+  cat >> $pipelineName <<- YAML
 
   - wait: ~
     depends_on:
@@ -156,7 +162,7 @@ steps:
           PACKAGES: "docker"
 
 YAML
-# fi
+fi
 
 echo "--- Printing dynamic steps"     #TODO: remove if the pipeline is public
 cat $pipelineName
