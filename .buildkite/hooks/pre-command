@@ -2,14 +2,10 @@
 
 set -euo pipefail
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" ]]; then
   source .buildkite/env-scripts/env.sh
   source .buildkite/env-scripts/util.sh
   source .buildkite/env-scripts/win-env.sh
-
-  if [[ ${PLATFORM_TYPE} = MINGW* ]]; then
-    install_python_win
-  fi
 
   if [[ -z "${GOLANG_VERSION-""}" ]]; then
     export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
