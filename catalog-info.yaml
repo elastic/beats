@@ -98,16 +98,12 @@ spec:
       cancel_intermediate_builds: true
       cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
       skip_intermediate_builds: true
-<<<<<<< HEAD
       skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
       # TODO uncomment this environment variable when pipeline definition is updated
       # env:
       #   ELASTIC_PR_COMMENTS_ENABLED: 'true'
-=======
-      skip_intermediate_builds_branch_filter: '!main !7.* !8.*'
       env:
         ELASTIC_PR_COMMENTS_ENABLED: 'true'
->>>>>>> 625ba402b8 (migrate libbeat pipeline (#37725))
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
@@ -136,15 +132,10 @@ spec:
       name: filebeat
       description: "Filebeat pipeline"
     spec:
-<<<<<<< HEAD
-      #      branch_configuration: "main 7.* 8.* v7.* v8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/filebeat/filebeat-pipeline.yml"
-      #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
-=======
       branch_configuration: "main 7.* 8.* v7.* v8.*"
       pipeline_file: ".buildkite/filebeat/filebeat-pipeline.yml"
       maximum_timeout_in_minutes: 120
->>>>>>> 730dc87d0e (Filebeat pipeline migration to Buildkite (#37283))
       provider_settings:
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
@@ -322,15 +313,10 @@ spec:
       name: beats-libbeat
       description: "Beats libbeat pipeline"
     spec:
-<<<<<<< HEAD
-      #      branch_configuration: "main 7.17 8.* v7.17 v8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/libbeat/pipeline.libbeat.yml"
-      #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
-=======
       branch_configuration: "main 7.17 8.*
       pipeline_file: ".buildkite/libbeat/pipeline.libbeat.yml"
       maximum_timeout_in_minutes: 120
->>>>>>> 625ba402b8 (migrate libbeat pipeline (#37725))
       provider_settings:
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
