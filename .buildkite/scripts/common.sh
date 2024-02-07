@@ -239,7 +239,7 @@ are_conditions_met_mandatory_tests() {
         return 0
       fi
     elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
-      if are_paths_changed "${packetbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat" || "${GITHUB_PR_LABELS}" =~ packetbeat || "${runPacketbeat}" == "true" ]]; then
+      if are_paths_changed "${packetbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat" || "${GITHUB_PR_LABELS}" =~ Packetbeat || "${runPacketbeat}" == "true" ]]; then
         return 0
       fi
     fi

@@ -61,6 +61,9 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/libbeat-stress-test.xml"
 
 YAML
+else
+  echo "The conditions don't match to requirements for generating pipeline steps."
+  exit 1
 fi
 
 echo "Check and add the Extended Tests into the pipeline"

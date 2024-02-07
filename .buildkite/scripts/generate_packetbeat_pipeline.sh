@@ -6,14 +6,11 @@ set -euo pipefail
 
 pipelineName="pipeline.packetbeat-dynamic.yml"
 
+echo "Add the mandatory and extended tests without additional conditions into the pipeline"
+if are_conditions_met_mandatory_tests; then
 cat > $pipelineName <<- YAML
 
 steps:
-
-YAML
-
-if are_conditions_met_mandatory_tests; then
-  cat >> $pipelineName <<- YAML
 
   - group: "Mandatory Tests"
     key: "mandatory-tests"
@@ -88,6 +85,9 @@ if are_conditions_met_mandatory_tests; then
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
+else
+  echo "The conditions don't match to requirements for generating pipeline steps."
+  exit 1
 fi
 
 if are_conditions_met_arm_tests && are_conditions_met_macos_tests; then
