@@ -60,7 +60,8 @@ func TestRetrieveHetznerMetadata(t *testing.T) {
 	defer server.Close()
 
 	config, err := conf.NewConfigFrom(map[string]interface{}{
-		"host": server.Listener.Addr().String(),
+		"providers": []string{"hetzner"},
+		"host":      server.Listener.Addr().String(),
 	})
 
 	if err != nil {

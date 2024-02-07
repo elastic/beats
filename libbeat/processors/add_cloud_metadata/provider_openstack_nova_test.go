@@ -77,6 +77,7 @@ func TestRetrieveOpenstackNovaMetadataWithHTTPS(t *testing.T) {
 	defer server.Close()
 
 	config, err := conf.NewConfigFrom(map[string]interface{}{
+		"providers":             []string{"openstack"},
 		"host":                  server.Listener.Addr().String(),
 		"ssl.verification_mode": "none",
 	})
