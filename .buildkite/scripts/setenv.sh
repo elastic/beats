@@ -7,9 +7,7 @@ DOCKER_COMPOSE_VERSION="1.21.0"
 DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
 SETUP_WIN_PYTHON_VERSION="3.11.0"
 GO_VERSION=$(cat .go-version)
-platform_type="$(uname)"
-platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
-arch_type="$(uname -m)"
+
 
 export SETUP_GVM_VERSION
 export DOCKER_COMPOSE_VERSION
@@ -18,6 +16,8 @@ export SETUP_WIN_PYTHON_VERSION
 export GO_VERSION
 
 exportVars() {
+  local platform_type="$(uname)"
+  local arch_type="$(uname -m)"
   if [ "${arch_type}" == "x86_64" ]; then
     case "${platform_type}" in
       Linux|Darwin)

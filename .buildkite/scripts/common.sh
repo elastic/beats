@@ -3,6 +3,9 @@ set -euo pipefail
 
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
 BIN="${WORKSPACE}/bin"
+platform_type="$(uname)"
+platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
+arch_type="$(uname -m)"
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
 runLibbeat="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
