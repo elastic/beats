@@ -8,7 +8,7 @@ pipelineName="pipeline.packetbeat-dynamic.yml"
 
 echo "Add the mandatory and extended tests without additional conditions into the pipeline"
 if are_conditions_met_mandatory_tests; then
-cat > $pipelineName <<- YAML
+  cat > $pipelineName <<- YAML
 
 steps:
 
