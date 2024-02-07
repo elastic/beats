@@ -149,8 +149,8 @@ with_dependencies() {
     elif [ "${linuxType}" = "rhel" ]; then
       # sudo dnf update -y
       sudo dnf install -y systemd-devel
-      wget https://mirror.stream.centos.org/9-stream/CRB/${arch_type}/os/Packages/libpcap-devel-1.10.0-4.el9.${arch_type}.rpm
-      sudo dnf install -y libpcap-devel-1.10.0-4.el9.${arch_type}.rpm
+      wget https://mirror.stream.centos.org/9-stream/CRB/${arch_type}/os/Packages/libpcap-devel-1.10.0-4.el9.${arch_type}.rpm     #TODO: move this step to our own image
+      sudo dnf install -y libpcap-devel-1.10.0-4.el9.${arch_type}.rpm     #TODO: move this step to our own image
     fi
   elif [ "${platform_type}" == "Darwin" ]; then
     pip3 install libpcap
