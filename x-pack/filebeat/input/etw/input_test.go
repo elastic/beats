@@ -24,7 +24,7 @@ func Test_fillEventHeader(t *testing.T) {
 		expected map[string]interface{}
 	}{
 		{
-			name: "Test with Level 1 (Critical)",
+			name: "TestStandardHeader",
 			header: etw.EventHeader{
 				Size:          100,
 				HeaderType:    10,
@@ -57,23 +57,23 @@ func Test_fillEventHeader(t *testing.T) {
 				},
 			},
 			expected: map[string]interface{}{
-				"size":           100,
-				"type":           10,
-				"flags":          20,
-				"event_property": 30,
-				"thread_id":      40,
-				"process_id":     50,
+				"size":           uint16(100),
+				"type":           uint16(10),
+				"flags":          uint16(20),
+				"event_property": uint16(30),
+				"thread_id":      uint32(40),
+				"process_id":     uint32(50),
 				"timestamp":      "2024-02-05T22:03:09.035Z",
 				"provider_guid":  "{12345678-1234-1234-1234-123456789ABC}",
-				"event_id":       60,
-				"event_version":  70,
-				"channel":        80,
-				"level":          1,
+				"event_id":       uint16(60),
+				"event_version":  uint8(70),
+				"channel":        uint8(80),
+				"level":          uint8(1),
 				"severity":       "critical",
-				"opcode":         90,
-				"task":           100,
-				"keyword":        110,
-				"time":           120,
+				"opcode":         uint8(90),
+				"task":           uint16(100),
+				"keyword":        uint64(110),
+				"time":           uint64(120),
 				"activity_guid":  "{12345678-1234-1234-1234-123456789ABC}",
 			},
 		},
@@ -83,7 +83,22 @@ func Test_fillEventHeader(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			header := fillEventHeader(tt.header)
 			assert.Equal(t, tt.expected["size"], header["size"])
-
+			assert.Equal(t, tt.expected["type"], header["type"])
+			assert.Equal(t, tt.expected["flags"], header["flags"])
+			assert.Equal(t, tt.expected["event_property"], header["event_property"])
+			assert.Equal(t, tt.expected["thread_id"], header["thread_id"])
+			assert.Equal(t, tt.expected["process_id"], header["process_id"])
+			assert.Equal(t, tt.expected["provider_guid"], header["provider_guid"])
+			assert.Equal(t, tt.expected["event_id"], header["event_id"])
+			assert.Equal(t, tt.expected["event_version"], header["event_version"])
+			assert.Equal(t, tt.expected["channel"], header["channel"])
+			assert.Equal(t, tt.expected["level"], header["level"])
+			assert.Equal(t, tt.expected["severity"], header["severity"])
+			assert.Equal(t, tt.expected["opcode"], header["opcode"])
+			assert.Equal(t, tt.expected["task"], header["task"])
+			assert.Equal(t, tt.expected["keyword"], header["keyword"])
+			assert.Equal(t, tt.expected["time"], header["time"])
+			assert.Equal(t, tt.expected["activity_guid"], header["activity_guid"])
 		})
 	}
 }
@@ -95,19 +110,19 @@ func Test_convertFileTimeToGoTime(t *testing.T) {
 		want     time.Time
 	}{
 		{
-			name:     "Windows epoch",
-			fileTime: 0, // January 1, 1601 (Windows epoch)
-			want:     time.Date(1601, 01, 01, 0, 0, 0, 0, time.UTC),
+			name:     "TestZeroValue",
+			fileTime: 0,
+			want:     time.Time{},
 		},
 		{
-			name:     "Unix epoch",
+			name:     "TestUnixEpoch",
 			fileTime: 116444736000000000, // January 1, 1970 (Unix epoch)
 			want:     time.Unix(0, 0),
 		},
 		{
-			name:     "Actual date",
-			fileTime: 133515900000000000, // February 05, 2023, 7:00:00 AM
-			want:     time.Date(2023, 02, 05, 7, 0, 0, 0, time.UTC),
+			name:     "TestActualDate",
+			fileTime: 133515900000000000, // February 05, 2024, 7:00:00 AM
+			want:     time.Date(2024, 02, 05, 7, 0, 0, 0, time.UTC),
 		},
 	}
 
@@ -124,32 +139,29 @@ func Test_convertFileTimeToGoTime(t *testing.T) {
 func Test_fillEventMetadata(t *testing.T) {
 	tests := []struct {
 		name     string
-		record   *etw.EventRecord
 		session  *etw.Session
 		cfg      config
 		expected map[string]interface{}
 	}{
 		// Test Provider Name and GUID from config
 		{
-			name:   "TestProviderNameAndGUIDFromConfig",
-			record: &etw.EventRecord{},
+			name: "TestProviderNameAndGUIDFromConfig",
 			session: &etw.Session{
 				GUID: windows.GUID{},
 				Name: "SessionName",
 			},
 			cfg: config{
 				ProviderName: "TestProvider",
-				ProviderGUID: "{12345678-1234-1234-1234-123456789abc}",
+				ProviderGUID: "{12345678-1234-1234-1234-123456789ABC}",
 			},
 			expected: map[string]interface{}{
-				"ProviderName": "TestProvider",
-				"ProviderGUID": "{12345678-1234-1234-1234-123456789abc}",
+				"provider_name": "TestProvider",
+				"provider_guid": "{12345678-1234-1234-1234-123456789ABC}",
 			},
 		},
 		// Test Provider GUID from session if not available in config
 		{
-			name:   "TestProviderGUIDFromSession",
-			record: &etw.EventRecord{},
+			name: "TestProviderGUIDFromSession",
 			session: &etw.Session{
 				GUID: windows.GUID{
 					Data1: 0x12345678,
@@ -162,14 +174,13 @@ func Test_fillEventMetadata(t *testing.T) {
 				ProviderName: "TestProvider",
 			},
 			expected: map[string]interface{}{
-				"ProviderName": "TestProvider",
-				"ProviderGUID": "{12345678-1234-1234-1234-123456789abc}",
+				"provider_name": "TestProvider",
+				"provider_guid": "{12345678-1234-1234-1234-123456789ABC}",
 			},
 		},
 		// Test Logfile and Session Information
 		{
-			name:   "TestLogfileAndSessionInfo",
-			record: &etw.EventRecord{},
+			name: "TestLogfileAndSessionInfo",
 			session: &etw.Session{
 				GUID: windows.GUID{},
 				Name: "SessionName",
@@ -180,23 +191,15 @@ func Test_fillEventMetadata(t *testing.T) {
 				SessionName: "DifferentSessionName",
 			},
 			expected: map[string]interface{}{
-				"Logfile": "C:\\Logs\\test.log",
-				"Session": "TestSession",
+				"logfile": "C:\\Logs\\test.log",
+				"session": "TestSession",
 			},
-		},
-		// Test with nil EventRecord
-		{
-			name:     "TestWithNilEventRecord",
-			record:   nil,
-			session:  nil,
-			cfg:      config{},
-			expected: map[string]interface{}{},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := fillEventMetadata(tt.record, tt.session, tt.cfg)
+			result := fillEventMetadata(tt.session, tt.cfg)
 			assert.Equal(t, tt.expected, result, "fillEventMetadata() should match the expected output")
 		})
 	}

@@ -121,7 +121,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 		evt := beat.Event{
 			Timestamp: time.Now(),
 			Fields: mapstr.M{
-				"metadata": fillEventMetadata(record, e.etwSession, e.config),
+				"metadata": fillEventMetadata(e.etwSession, e.config),
 				"header":   fillEventHeader(record.EventHeader),
 				"winlog":   data,
 			},
@@ -197,6 +197,13 @@ func fillEventHeader(h etw.EventHeader) map[string]interface{} {
 
 // convertFileTimeToGoTime converts a Windows FileTime to a Go time.Time structure.
 func convertFileTimeToGoTime(fileTime64 uint64) time.Time {
+	// Define the offset between Windows epoch (1601) and Unix epoch (1970)
+	const epochDifference = 116444736000000000
+	if fileTime64 < epochDifference {
+		// Time is before the Unix epoch, adjust accordingly
+		return time.Time{}
+	}
+
 	fileTime := windows.Filetime{
 		HighDateTime: uint32(fileTime64 >> 32),
 		LowDateTime:  uint32(fileTime64 & math.MaxUint32),
@@ -205,8 +212,8 @@ func convertFileTimeToGoTime(fileTime64 uint64) time.Time {
 	return time.Unix(0, fileTime.Nanoseconds())
 }
 
-// fillEventMetadata constructs a metadata map for an event record.
-func fillEventMetadata(record *etw.EventRecord, session *etw.Session, cfg config) map[string]interface{} {
+// fillEventMetadata constructs a metadata map with session information.
+func fillEventMetadata(session *etw.Session, cfg config) map[string]interface{} {
 	metadata := make(map[string]interface{})
 
 	// Include provider name and GUID in metadata if available
