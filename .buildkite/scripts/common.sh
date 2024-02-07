@@ -139,13 +139,6 @@ with_python() {
   fi
 }
 
-with_rhel_epel() {
-  if [ "${linuxType}" = "rhel" ]; then
-    sudo dnf update -y
-    sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
-  fi
-}
-
 with_dependencies() {
   local linuxType="$(checkLinuxType)"
   echo "${linuxType}"
@@ -154,9 +147,10 @@ with_dependencies() {
       sudo apt-get update
       sudo apt-get install -y libsystemd-dev libpcap-dev
     elif [ "${linuxType}" = "rhel" ]; then
-      with_rhel_epel
       sudo dnf update -y
-      sudo dnf install -y systemd-devel libpcap-devel
+      sudo dnf install -y systemd-devel
+      wget http://mirror.centos.org/centos/9/BaseOS/${arch_type}/os/Packages/libpcap-devel-1.10.1-10.el9.${arch_type}.rpm
+      sudo dnf install -y libpcap-devel-1.10.1-10.el9.x86_64.rpm
     fi
   elif [ "${platform_type}" == "Darwin" ]; then
     pip3 install libpcap
