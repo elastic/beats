@@ -1,15 +1,19 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 env:
+  IMAGE_UBUNTU_1804_X86_64: "family/core-ubuntu-1804"
   IMAGE_UBUNTU_2004_X86_64: "family/core-ubuntu-2004"
   IMAGE_UBUNTU_2204_X86_64: "family/core-ubuntu-2204"
   IMAGE_UBUNTU_2004_ARM_64: "core-ubuntu-2004-aarch64"
   IMAGE_UBUNTU_2204_ARM_64: "core-ubuntu-2204-aarch64"
   IMAGE_DEBIAN_10: "family/core-debian-10"
   IMAGE_DEBIAN_12: "family/core-debian-12"
-  IMAGE_CENTOS7: "family/core-centos-7"
-  IMAGE_SUSE15: "family/core-sles-15"
-  IMAGE_RHEL9: "family/core-rhel-9"
+  IMAGE_CENTOS_7: "family/core-centos-7"
+  IMAGE_RHEL_8: "family/core-rhel-8"
+  IMAGE_RHEL_9: "family/core-rhel-9"
+  IMAGE_SLES_12: "family/core-sles-12"
+  IMAGE_SLES_15: "family/core-sles-15"
+  IMAGE_AMZN_2_ARM_64: "core-amazonlinux-2-aarch64"
   IMAGE_WIN_2016: "family/core-windows-2016"
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
@@ -42,7 +46,7 @@ steps:
               context: "auditbeat: Unit Tests"
         agents:
           provider: "gcp"
-          image: "${IMAGE_RHEL9}"
+          image: "${IMAGE_RHEL_9}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
@@ -126,13 +130,16 @@ steps:
         matrix:
           setup:
             image:
+              - "${IMAGE_UBUNTU_1804_X86_64}"
               - "${IMAGE_UBUNTU_2004_X86_64}"
               - "${IMAGE_UBUNTU_2204_X86_64}"
               - "${IMAGE_DEBIAN_10}"
               - "${IMAGE_DEBIAN_12}"
-              - "${IMAGE_CENTOS7}"
-              - "${IMAGE_SUSE15}"
-              - "${IMAGE_RHEL9}"
+              - "${IMAGE_CENTOS_7}"
+              - "${IMAGE_RHEL_9}"
+              - "${IMAGE_RHEL_8}"
+              - "${IMAGE_SLES_12}"
+              - "${IMAGE_SLES_15}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
@@ -152,6 +159,7 @@ steps:
             image:
               - "${IMAGE_UBUNTU_2004_ARM_64}"
               - "${IMAGE_UBUNTU_2204_ARM_64}"
+              - "${IMAGE_AMZN_2_ARM_64}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
