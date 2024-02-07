@@ -10,7 +10,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Upgrade to Go 1.21.6. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}37615[37615]
+- Upgrade to Go 1.21.7. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}37913[37913]
 
 *Auditbeat*
 
