@@ -10,8 +10,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
-	"gotest.tools/assert"
 
 	"golang.org/x/sys/windows"
 )
