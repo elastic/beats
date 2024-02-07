@@ -148,8 +148,8 @@ with_dependencies() {
       sudo apt-get install -y libsystemd-dev libpcap-dev
     elif [ "${linuxType}" = "rhel" ]; then
       sudo dnf update -y
-      sudo dnf --enablerepo=crb install -y libpcap-devel
-      sudo dnf install -y systemd-devel
+      sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+      sudo dnf install -y systemd-devel libpcap-devel
     fi
   elif [ "${platform_type}" == "Darwin" ]; then
     pip3 install libpcap
