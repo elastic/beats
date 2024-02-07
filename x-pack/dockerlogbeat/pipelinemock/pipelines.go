@@ -85,3 +85,10 @@ func (pc *MockPipelineConnector) ConnectWith(beat.ClientConfig) (beat.Client, er
 
 	return c, nil
 }
+
+func (pc *MockPipelineConnector) GetConnectedClients() []*MockBeatClient {
+	pc.mtx.Lock()
+	defer pc.mtx.Unlock()
+
+	return pc.clients
+}

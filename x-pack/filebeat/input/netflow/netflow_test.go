@@ -6,6 +6,7 @@ package netflow
 
 import (
 	"bytes"
+	"context"
 	"encoding/binary"
 	"encoding/json"
 	"flag"
@@ -15,17 +16,24 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v2"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/dockerlogbeat/pipelinemock"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/protocol"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/record"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
 var (
@@ -58,6 +66,131 @@ type TestResult struct {
 	Name  string       `json:"test_name"`
 	Error string       `json:"error,omitempty"`
 	Flows []beat.Event `json:"events,omitempty"`
+}
+
+func newV2Context() (v2.Context, func()) {
+	ctx, cancel := context.WithCancel(context.Background())
+	return v2.Context{
+		Logger:      logp.NewLogger("netflow_test"),
+		ID:          "test_id",
+		Cancelation: ctx,
+	}, cancel
+}
+
+func TestNetFlow(t *testing.T) {
+	pcaps, err := filepath.Glob(filepath.Join(pcapDir, "*.pcap"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, file := range pcaps {
+		testName := strings.TrimSuffix(filepath.Base(file), ".pcap")
+
+		t.Run(testName, func(t *testing.T) {
+
+			configMap := conf.MustNewConfigFrom(mapstr.M{})
+			pluginCfg, err := conf.NewConfigFrom(configMap)
+			require.NoError(t, err)
+
+			netflowPlugin, err := Plugin(logp.NewLogger("netflow_test")).Manager.Create(pluginCfg)
+			require.NoError(t, err)
+
+			mockPipeline := &pipelinemock.MockPipelineConnector{}
+
+			ctx, cancelFn := newV2Context()
+			errChan := make(chan error)
+			go func() {
+				defer close(errChan)
+				errChan <- netflowPlugin.Run(ctx, mockPipeline)
+			}()
+
+			defer cancelFn()
+
+			clientSeenTries := 0
+			for clientSeenTries < 5 {
+				if len(mockPipeline.GetConnectedClients()) > 0 {
+					break
+				}
+				time.Sleep(1 * time.Second)
+				clientSeenTries++
+				continue
+			}
+
+			if clientSeenTries == 5 {
+				t.Fatal("client did not connect to pipeline")
+				return
+			}
+
+			udpAddr, err := net.ResolveUDPAddr("udp", defaultConfig.Config.Host)
+			require.NoError(t, err)
+
+			conn, err := net.DialUDP("udp", nil, udpAddr)
+			require.NoError(t, err)
+
+			f, err := pcap.OpenOffline(file)
+			require.NoError(t, err)
+			defer f.Close()
+
+			goldenData := readGoldenFile(t, filepath.Join(goldenDir, testName+".pcap.golden.json"))
+
+			// Process packets in PCAP and get flow records.
+			var totalBytes, totalPackets int
+			packetSource := gopacket.NewPacketSource(f, f.LinkType())
+			for pkt := range packetSource.Packets() {
+				payloadData := pkt.TransportLayer().LayerPayload()
+
+				n, err := conn.Write(payloadData)
+				require.NoError(t, err)
+				totalBytes += n
+				totalPackets++
+			}
+
+			publishedEventsTries := 0
+			for publishedEventsTries < 10 {
+				if len(mockPipeline.GetAllEvents()) == len(goldenData.Flows) {
+					break
+				}
+				time.Sleep(1 * time.Second)
+				publishedEventsTries++
+				continue
+			}
+
+			if publishedEventsTries == 10 {
+				t.Fatal("did not see expected events published in pipeline")
+				return
+			}
+
+			for _, event := range goldenData.Flows {
+				// fields that cannot be matched at runtime
+				_ = event.Delete("netflow.exporter.address")
+				_ = event.Delete("event.created")
+				_ = event.Delete("observer.ip")
+			}
+
+			publishedEvents := mockPipeline.GetAllEvents()
+			for _, event := range publishedEvents {
+				// fields that cannot be matched at runtime
+				_ = event.Delete("netflow.exporter.address")
+				_ = event.Delete("event.created")
+				_ = event.Delete("observer.ip")
+			}
+
+			require.EqualValues(t, goldenData, normalize(t, TestResult{
+				Name:  goldenData.Name,
+				Error: "",
+				Flows: publishedEvents,
+			}))
+
+			cancelFn()
+			select {
+			case err := <-errChan:
+				require.NoError(t, err)
+			case <-time.After(5 * time.Second):
+				t.Fatal("netflow plugin did not stop")
+			}
+
+		})
+	}
 }
 
 func TestPCAPFiles(t *testing.T) {
