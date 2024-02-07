@@ -29,7 +29,7 @@ updates:
       - dependency-name: go.elastic.co/go-licence-detector
       # Team:Service-Integrations
       - dependency-name: github.com/elastic/bayeux
-      # Team:Security-External Integrations
+      # Team:Security-Linux Platform
       - dependency-name: github.com/elastic/go-libaudit/*
       - dependency-name: github.com/elastic/go-perf
       - dependency-name: github.com/elastic/go-seccomp-bpf
