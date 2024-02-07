@@ -5,31 +5,12 @@
 package azure
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/elastic-agent-libs/mapstr"
 )
-
-func TestReturnAllDimensions(t *testing.T) {
-	dimensionList := []Dimension{
-		{
-			Value: "vm1",
-			Name:  "VMName",
-		},
-		{
-			Value: "*",
-			Name:  "SlotID",
-		},
-	}
-	result, dims := returnAllDimensions(dimensionList)
-	assert.True(t, result)
-	assert.Equal(t, len(dims), 1)
-	assert.Equal(t, dims[0].Name, "SlotID")
-	assert.Equal(t, dims[0].Value, "*")
-}
 
 func TestGetDimensionValue(t *testing.T) {
 	dimensionList := []Dimension{
@@ -68,59 +49,116 @@ func TestManagePropertyName(t *testing.T) {
 	assert.Equal(t, result, "percentage_cpu")
 }
 
-func TestCreateEvent(t *testing.T) {
-	createTime, err := time.Parse(time.RFC3339, "2020-02-28T20:53:03Z")
-	if !assert.NoError(t, err) {
-		t.Fatal(err)
-	}
-	resource := Resource{
-		Id:           "resId",
-		Name:         "res",
-		Location:     "west_europe",
-		Type:         "resType",
-		Group:        "resGroup",
-		Tags:         nil,
-		Subscription: "subId",
-	}
-	metric := Metric{
-		ResourceId:   "resId",
-		Namespace:    "namespace1",
-		Names:        []string{"Percentage CPU"},
-		Aggregations: "",
-		Dimensions:   nil,
-		Values:       nil,
-		TimeGrain:    "",
-	}
-	var total float64 = 23
-	metricValues := []MetricValue{
-		{
-			name:       "Percentage CPU",
-			avg:        nil,
-			min:        nil,
-			max:        nil,
-			total:      &total,
-			count:      nil,
-			timestamp:  time.Time{},
-			dimensions: nil,
-		},
-	}
-	event, list := createEvent(createTime, metric, resource, metricValues)
-	assert.NotNil(t, event)
-	assert.NotNil(t, list)
-	assert.Equal(t, event.Timestamp, createTime)
-	sub, err := event.ModuleFields.GetValue("subscription_id")
-	if !assert.NoError(t, err) {
-		t.Fatal(err)
-	}
-	assert.Equal(t, sub, resource.Subscription)
-	namespace, err := event.ModuleFields.GetValue("namespace")
-	if !assert.NoError(t, err) {
-		t.Fatal(err)
-	}
-	assert.Equal(t, namespace, metric.Namespace)
-	val, err := list.GetValue("percentage_cpu")
-	if !assert.NoError(t, err) {
-		t.Fatal(err)
-	}
-	assert.Equal(t, val.(mapstr.M), mapstr.M{"total": total})
+func TestMapToKeyValuePoints(t *testing.T) {
+	timestamp := time.Now().UTC()
+	metricName := "test"
+	minValue := 4.0
+	maxValue := 42.0
+	avgValue := 13.0
+	totalValue := 46.0
+	countValue := 2.0
+	namespace := "test"
+	resourceId := "test"
+	resourceSubId := "test"
+	timeGrain := "PT1M"
+
+	t.Run("test aggregation types", func(t *testing.T) {
+
+		metrics := []Metric{{
+			Namespace:     namespace,
+			Names:         []string{"test"},
+			Aggregations:  "min",
+			Values:        []MetricValue{{name: metricName, min: &minValue, timestamp: timestamp}},
+			TimeGrain:     timeGrain,
+			ResourceId:    resourceId,
+			ResourceSubId: resourceSubId,
+		}, {
+			Namespace:     namespace,
+			Names:         []string{"test"},
+			Aggregations:  "max",
+			Values:        []MetricValue{{name: metricName, max: &maxValue, timestamp: timestamp}},
+			TimeGrain:     timeGrain,
+			ResourceId:    resourceId,
+			ResourceSubId: resourceSubId,
+		}, {
+			Namespace:     namespace,
+			Names:         []string{"test"},
+			Aggregations:  "avg",
+			Values:        []MetricValue{{name: metricName, avg: &avgValue, timestamp: timestamp}},
+			TimeGrain:     timeGrain,
+			ResourceId:    resourceId,
+			ResourceSubId: resourceSubId,
+		}, {
+			Namespace:     namespace,
+			Names:         []string{"test"},
+			Aggregations:  "total",
+			Values:        []MetricValue{{name: metricName, total: &totalValue, timestamp: timestamp}},
+			TimeGrain:     timeGrain,
+			ResourceId:    resourceId,
+			ResourceSubId: resourceSubId,
+		}, {
+			Namespace:     namespace,
+			Names:         []string{"test"},
+			Aggregations:  "count",
+			Values:        []MetricValue{{name: metricName, count: &countValue, timestamp: timestamp}},
+			TimeGrain:     timeGrain,
+			ResourceId:    resourceId,
+			ResourceSubId: resourceSubId,
+		}}
+
+		actual := mapToKeyValuePoints(metrics)
+
+		expected := []KeyValuePoint{
+			{
+				Key:           fmt.Sprintf("%s.%s", metricName, "min"),
+				Value:         &minValue,
+				Namespace:     namespace,
+				TimeGrain:     timeGrain,
+				Timestamp:     timestamp,
+				ResourceId:    resourceId,
+				ResourceSubId: resourceSubId,
+				Dimensions:    map[string]interface{}{},
+			}, {
+				Key:           fmt.Sprintf("%s.%s", metricName, "max"),
+				Value:         &maxValue,
+				Namespace:     namespace,
+				TimeGrain:     timeGrain,
+				Timestamp:     timestamp,
+				ResourceId:    resourceId,
+				ResourceSubId: resourceSubId,
+				Dimensions:    map[string]interface{}{},
+			}, {
+				Key:           fmt.Sprintf("%s.%s", metricName, "avg"),
+				Value:         &avgValue,
+				Namespace:     namespace,
+				TimeGrain:     timeGrain,
+				Timestamp:     timestamp,
+				ResourceId:    resourceId,
+				ResourceSubId: resourceSubId,
+				Dimensions:    map[string]interface{}{},
+			},
+			{
+				Key:           fmt.Sprintf("%s.%s", metricName, "total"),
+				Value:         &totalValue,
+				Namespace:     namespace,
+				TimeGrain:     timeGrain,
+				Timestamp:     timestamp,
+				ResourceId:    resourceId,
+				ResourceSubId: resourceSubId,
+				Dimensions:    map[string]interface{}{},
+			},
+			{
+				Key:           fmt.Sprintf("%s.%s", metricName, "count"),
+				Value:         &countValue,
+				Namespace:     namespace,
+				TimeGrain:     timeGrain,
+				Timestamp:     timestamp,
+				ResourceId:    resourceId,
+				ResourceSubId: resourceSubId,
+				Dimensions:    map[string]interface{}{},
+			},
+		}
+
+		assert.Equal(t, expected, actual)
+	})
 }

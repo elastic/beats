@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+checkout_merge() {
+    local target_branch=$1
+    local pr_commit=$2
+    local merge_branch=$3
+
+    if [[ -z "${target_branch}" ]]; then
+        echo "No pull request target branch"
+        exit 1
+    fi
+
+    git fetch -v origin "${target_branch}"
+    git checkout FETCH_HEAD
+    echo "Current branch: $(git rev-parse --abbrev-ref HEAD)"
+
+    # create temporal branch to merge the PR with the target branch
+    git checkout -b ${merge_branch}
+    echo "New branch created: $(git rev-parse --abbrev-ref HEAD)"
+
+    # set author identity so it can be run git merge
+    git config user.name "github-merged-pr-post-checkout"
+    git config user.email "auto-merge@buildkite"
+
+    git merge --no-edit "${BUILDKITE_COMMIT}" || {
+        local merge_result=$?
+        echo "Merge failed: ${merge_result}"
+        git merge --abort
+        exit ${merge_result}
+    }
+}
+
+pull_request="${BUILDKITE_PULL_REQUEST:-false}"
+
+if [[ "${pull_request}" == "false" ]]; then
+    echo "Not a pull request, skipping"
+    exit 0
+fi
+
+TARGET_BRANCH="${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-master}"
+PR_COMMIT="${BUILDKITE_COMMIT}"
+PR_ID=${BUILDKITE_PULL_REQUEST}
+MERGE_BRANCH="pr_merge_${PR_ID}"
+
+checkout_merge "${TARGET_BRANCH}" "${PR_COMMIT}" "${MERGE_BRANCH}"
+
+echo "Commit information"
+git --no-pager log --format=%B -n 1
+
+# Ensure buildkite groups are rendered
+echo ""

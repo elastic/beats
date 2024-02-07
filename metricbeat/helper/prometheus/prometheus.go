@@ -105,7 +105,7 @@ func (p *prometheus) GetFamilies() ([]*MetricFamily, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to read response: %w", err)
 	}
-	families, err := ParseMetricFamilies(b, contentType, appendTime)
+	families, err := ParseMetricFamilies(b, contentType, appendTime, p.logger)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse families: %w", err)
 	}

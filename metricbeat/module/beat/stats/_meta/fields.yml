@@ -366,6 +366,8 @@
               type: long
             - name: queue.acked
               type: long
+            - name: queue.max_events
+              type: long
             - name: events
               type: group
               fields:

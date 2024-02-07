@@ -151,13 +151,17 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	defer cleanupFn()
 
 	// Create osqueryd runner
-	osq := osqd.New(
+	osq, err := osqd.New(
 		socketPath,
 		osqd.WithLogger(bt.log),
 		osqd.WithConfigRefresh(configurationRefreshIntervalSecs),
 		osqd.WithConfigPlugin(configPluginName),
 		osqd.WithLoggerPlugin(loggerPluginName),
 	)
+
+	if err != nil {
+		return err
+	}
 
 	// Check that osqueryd exists and runnable
 	err = osq.Check(ctx)

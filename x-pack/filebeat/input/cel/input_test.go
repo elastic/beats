@@ -344,6 +344,26 @@ var inputTests = []struct {
 			{"message": "third"},
 		},
 	},
+	{
+		name: "optional_types",
+		config: map[string]interface{}{
+			"interval": 1,
+			// Program returns a compilation error if optional types are not enabled.
+			"program": `{"events":[
+				has(state.?field.?does.?not.exist) ?
+					{"message":"Hello, World!"}
+				:
+					{"message":"Hello, Void!"}
+			]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "Hello, Void!"},
+		},
+	},
 
 	// FS-based tests.
 	{
@@ -681,6 +701,37 @@ var inputTests = []struct {
 		handler: retryHandler(),
 		want: []map[string]interface{}{
 			{"hello": "world"},
+		},
+	},
+	{
+		name:   "retry_failure_no_success",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"resource": map[string]interface{}{
+				"retry": map[string]interface{}{
+					"max_attempts": 2,
+				},
+			},
+			"program": `
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [
+			bytes(resp.Body).decode_json(),
+			{"status": resp.StatusCode},
+		],
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusGatewayTimeout)
+			//nolint:errcheck // No point checking errors in test server.
+			w.Write([]byte(`{"error":"we were too slow"}`))
+		},
+		want: []map[string]interface{}{
+			{"error": "we were too slow"},
+			{"status": float64(504)}, // Float because of JSON.
 		},
 	},
 
@@ -1282,7 +1333,10 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
-					"message": "failed eval: no such overload", // This is the best we get for some errors from CEL.
+					// This is the best we get for some errors from CEL.
+					"message": `failed eval: ERROR: <input>:3:56: no such overload
+ |   bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
+ | .......................................................^`,
 				},
 			},
 		},

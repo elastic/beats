@@ -32,6 +32,7 @@ import (
 
 	loginp "github.com/elastic/beats/v7/filebeat/input/filestream/internal/input-logfile"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/common/transform/typeconv"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
@@ -139,7 +140,7 @@ func TestProspector_InitUpdateIdentifiers(t *testing.T) {
 				},
 			},
 			filesOnDisk: map[string]loginp.FileDescriptor{
-				tmpFileName: {Info: fi},
+				tmpFileName: {Info: file.ExtendFileInfo(fi)},
 			},
 			expectedUpdatedKeys: map[string]string{"not_path::key1": "path::" + tmpFileName},
 		},
@@ -205,12 +206,12 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 				{
 					Op:         loginp.OpCreate,
 					NewPath:    "/path/to/file",
-					Descriptor: createTestFileDescriptorWithInfo(testFileInfo{"/path/to/file", 5, minuteAgo, nil}),
+					Descriptor: createTestFileDescriptorWithInfo(&testFileInfo{"/path/to/file", 5, minuteAgo, nil}),
 				},
 				{
 					Op:         loginp.OpWrite,
 					NewPath:    "/path/to/other/file",
-					Descriptor: createTestFileDescriptorWithInfo(testFileInfo{"/path/to/other/file", 5, minuteAgo, nil}),
+					Descriptor: createTestFileDescriptorWithInfo(&testFileInfo{"/path/to/other/file", 5, minuteAgo, nil}),
 				},
 			},
 			ignoreOlder: 10 * time.Second,
@@ -223,12 +224,12 @@ func TestProspectorNewAndUpdatedFiles(t *testing.T) {
 				{
 					Op:         loginp.OpCreate,
 					NewPath:    "/path/to/file",
-					Descriptor: createTestFileDescriptorWithInfo(testFileInfo{"/path/to/file", 5, minuteAgo, nil}),
+					Descriptor: createTestFileDescriptorWithInfo(&testFileInfo{"/path/to/file", 5, minuteAgo, nil}),
 				},
 				{
 					Op:         loginp.OpWrite,
 					NewPath:    "/path/to/other/file",
-					Descriptor: createTestFileDescriptorWithInfo(testFileInfo{"/path/to/other/file", 5, minuteAgo, nil}),
+					Descriptor: createTestFileDescriptorWithInfo(&testFileInfo{"/path/to/other/file", 5, minuteAgo, nil}),
 				},
 			},
 			ignoreOlder: 5 * time.Minute,
@@ -268,12 +269,12 @@ func TestProspectorHarvesterUpdateIgnoredFiles(t *testing.T) {
 	eventCreate := loginp.FSEvent{
 		Op:         loginp.OpCreate,
 		NewPath:    "/path/to/file",
-		Descriptor: createTestFileDescriptorWithInfo(testFileInfo{"/path/to/file", 5, minuteAgo, nil}),
+		Descriptor: createTestFileDescriptorWithInfo(&testFileInfo{"/path/to/file", 5, minuteAgo, nil}),
 	}
 	eventUpdated := loginp.FSEvent{
 		Op:         loginp.OpWrite,
 		NewPath:    "/path/to/file",
-		Descriptor: createTestFileDescriptorWithInfo(testFileInfo{"/path/to/file", 10, time.Now(), nil}),
+		Descriptor: createTestFileDescriptorWithInfo(&testFileInfo{"/path/to/file", 10, time.Now(), nil}),
 	}
 	expectedEvents := []harvesterEvent{
 		harvesterStart("path::/path/to/file"),
@@ -730,20 +731,20 @@ type testFileInfo struct {
 	sys  interface{}
 }
 
-func (t testFileInfo) Name() string       { return t.name }
-func (t testFileInfo) Size() int64        { return t.size }
-func (t testFileInfo) Mode() os.FileMode  { return 0 }
-func (t testFileInfo) ModTime() time.Time { return t.time }
-func (t testFileInfo) IsDir() bool        { return false }
-func (t testFileInfo) Sys() interface{}   { return t.sys }
+func (t *testFileInfo) Name() string       { return t.name }
+func (t *testFileInfo) Size() int64        { return t.size }
+func (t *testFileInfo) Mode() os.FileMode  { return 0 }
+func (t *testFileInfo) ModTime() time.Time { return t.time }
+func (t *testFileInfo) IsDir() bool        { return false }
+func (t *testFileInfo) Sys() interface{}   { return t.sys }
 
 func createTestFileDescriptor() loginp.FileDescriptor {
-	return createTestFileDescriptorWithInfo(testFileInfo{})
+	return createTestFileDescriptorWithInfo(&testFileInfo{})
 }
 
 func createTestFileDescriptorWithInfo(fi fs.FileInfo) loginp.FileDescriptor {
 	return loginp.FileDescriptor{
-		Info:        fi,
+		Info:        file.ExtendFileInfo(fi),
 		Fingerprint: "fingerprint",
 		Filename:    "filename",
 	}
