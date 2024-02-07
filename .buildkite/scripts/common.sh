@@ -141,8 +141,8 @@ with_python() {
 
 with_rhel_epel() {
   if [ "${linuxType}" = "rhel" ]; then
-    sudo subscription-manager repos --enable codeready-builder-for-rhel-9-${arch_type}-rpms
-    sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
+    sudo dnf update -y
+    sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm
   fi
 }
 
@@ -154,8 +154,8 @@ with_dependencies() {
       sudo apt-get update
       sudo apt-get install -y libsystemd-dev libpcap-dev
     elif [ "${linuxType}" = "rhel" ]; then
-      sudo dnf update -y
       with_rhel_epel
+      sudo dnf update -y
       sudo dnf install -y systemd-devel libpcap-devel
     fi
   elif [ "${platform_type}" == "Darwin" ]; then
@@ -192,7 +192,6 @@ retry() {
 are_paths_changed() {
   local patterns=("${@}")
   local changelist=()
-
   for pattern in "${patterns[@]}"; do
     changed_files=($(git diff --name-only HEAD@{1} HEAD | grep -E "$pattern"))
     if [ "${#changed_files[@]}" -gt 0 ]; then
