@@ -130,13 +130,12 @@ func TestAddToMetricsetsUsing(t *testing.T) {
 
 	resourceWatchers.lock.Lock()
 	require.NotNil(t, resourceWatchers.watchersMap[DeploymentResource].watcher)
-	require.Nil(t, resourceWatchers.watchersMap[DeploymentResource].metricsetsUsing)
+	require.Equal(t, []string{}, resourceWatchers.watchersMap[DeploymentResource].metricsetsUsing)
 	resourceWatchers.lock.Unlock()
 
 	metricsetDeployment := "state_deployment"
 	addToMetricsetsUsing(DeploymentResource, metricsetDeployment, resourceWatchers)
 	resourceWatchers.lock.Lock()
-	require.NotNil(t, resourceWatchers.watchersMap[DeploymentResource].metricsetsUsing)
 	require.Equal(t, []string{metricsetDeployment}, resourceWatchers.watchersMap[DeploymentResource].metricsetsUsing)
 	resourceWatchers.lock.Unlock()
 
@@ -316,11 +315,13 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 		watcher:         &mockWatcher{},
 		started:         false,
 		metricsetsUsing: []string{metricsetNamespace, metricsetDeployment},
+		enrichers:       make(map[string]*enricher),
 	}
 	resourceWatchers.watchersMap[DeploymentResource] = &watcherData{
 		watcher:         &mockWatcher{},
 		started:         true,
 		metricsetsUsing: []string{metricsetDeployment},
+		enrichers:       make(map[string]*enricher),
 	}
 	resourceWatchers.lock.Unlock()
 
@@ -342,8 +343,6 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 		NamespaceResource,
 		resourceWatchers,
 		config,
-		nil,
-		nil,
 		funcs.update,
 		funcs.delete,
 		funcs.index,
@@ -374,8 +373,6 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 		DeploymentResource,
 		resourceWatchers,
 		config,
-		nil,
-		nil,
 		funcs.update,
 		funcs.delete,
 		funcs.index,
@@ -394,7 +391,6 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 	require.Equal(t, []string{}, watcher.metricsetsUsing)
 
 	resourceWatchers.lock.Unlock()
-
 }
 
 func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
@@ -408,6 +404,7 @@ func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
 		watcher:         &mockWatcher{},
 		started:         false,
 		metricsetsUsing: []string{metricsetStatePod, metricsetPod},
+		enrichers:       make(map[string]*enricher),
 	}
 	resourceWatchers.lock.Unlock()
 
@@ -423,7 +420,7 @@ func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
 	}
 
 	log := logp.NewLogger(selector)
-	enricherPod := buildMetadataEnricher(metricsetPod, PodResource, resourceWatchers, config, nil, nil,
+	enricherPod := buildMetadataEnricher(metricsetPod, PodResource, resourceWatchers, config,
 		funcs.update, funcs.delete, funcs.index, log)
 	resourceWatchers.lock.Lock()
 	watcher := resourceWatchers.watchersMap[PodResource]
@@ -445,7 +442,7 @@ func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
 	resourceWatchers.lock.Unlock()
 
 	// Stopping the state_pod watcher should stop pod watcher
-	enricherStatePod := buildMetadataEnricher(metricsetStatePod, PodResource, resourceWatchers, config, nil, nil,
+	enricherStatePod := buildMetadataEnricher(metricsetStatePod, PodResource, resourceWatchers, config,
 		funcs.update, funcs.delete, funcs.index, log)
 	enricherStatePod.Stop(resourceWatchers)
 
@@ -465,6 +462,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 		started:         false,
 		metricsetsUsing: []string{"pod"},
 		metadataObjects: make(map[string]bool),
+		enrichers:       make(map[string]*enricher),
 	}
 	resourceWatchers.lock.Unlock()
 
@@ -495,7 +493,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	metricset := "pod"
 	log := logp.NewLogger(selector)
 
-	enricher := buildMetadataEnricher(metricset, PodResource, resourceWatchers, config, nil, nil,
+	enricher := buildMetadataEnricher(metricset, PodResource, resourceWatchers, config,
 		funcs.update, funcs.delete, funcs.index, log)
 	resourceWatchers.lock.Lock()
 	wData := resourceWatchers.watchersMap[PodResource]
@@ -590,6 +588,7 @@ func TestBuildMetadataEnricher_EventHandler_PastObjects(t *testing.T) {
 		started:         false,
 		metricsetsUsing: []string{"pod", "state_pod"},
 		metadataObjects: make(map[string]bool),
+		enrichers:       make(map[string]*enricher),
 	}
 	resourceWatchers.lock.Unlock()
 
@@ -628,7 +627,7 @@ func TestBuildMetadataEnricher_EventHandler_PastObjects(t *testing.T) {
 	}
 
 	enricher := buildMetadataEnricher("pod", PodResource, resourceWatchers, config,
-		nil, nil, funcs.update, funcs.delete, funcs.index, log)
+		funcs.update, funcs.delete, funcs.index, log)
 	enricher.Start(resourceWatchers)
 
 	resourceWatchers.lock.Lock()
@@ -658,7 +657,7 @@ type mockFuncs struct {
 	indexed mapstr.M
 }
 
-func (f *mockFuncs) update(obj kubernetes.Resource, specificMetaGen metadata.MetaGen, generalMetaGen *metadata.Resource) map[string]mapstr.M {
+func (f *mockFuncs) update(obj kubernetes.Resource) map[string]mapstr.M {
 	accessor, _ := meta.Accessor(obj)
 	f.updated = obj
 	meta := mapstr.M{
@@ -691,7 +690,6 @@ func (f *mockFuncs) index(m mapstr.M) string {
 
 type mockWatcher struct {
 	handler kubernetes.ResourceEventHandler
-	store   cache.Store
 }
 
 func (m *mockWatcher) Start() error {
@@ -707,7 +705,7 @@ func (m *mockWatcher) AddEventHandler(r kubernetes.ResourceEventHandler) {
 }
 
 func (m *mockWatcher) Store() cache.Store {
-	return m.store
+	return nil
 }
 
 func (m *mockWatcher) Client() k8s.Interface {

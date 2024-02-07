@@ -68,16 +68,13 @@ type enricher struct {
 	sync.RWMutex
 	metadata      map[string]mapstr.M
 	index         func(mapstr.M) string
+	updateFunc    func(kubernetes.Resource) map[string]mapstr.M
+	deleteFunc    func(kubernetes.Resource) []string
 	metricsetName string
 	resourceName  string
 	isPod         bool
 	config        *kubernetesConfig
 	log           *logp.Logger
-
-	// needed for the metadata enricher
-	// One of these two is always nil
-	specificMetaGen metadata.MetaGen
-	generalMetaGen  *metadata.Resource
 }
 
 type nilEnricher struct{}
@@ -87,15 +84,12 @@ func (*nilEnricher) Stop(*Watchers)    {}
 func (*nilEnricher) Enrich([]mapstr.M) {}
 
 type watcherData struct {
-	// list of metricsets using this watcher
-	// metricsets are used instead of resource names to avoid conflicts between
-	// state_pod / pod, state_node / node, state_container / container
-	metricsetsUsing []string
+	metricsetsUsing []string // list of metricsets using this watcher
 
 	watcher kubernetes.Watcher
 	started bool // true if watcher has started, false otherwise
 
-	enrichers []*enricher // list of enrichers using this watcher
+	enrichers map[string]*enricher // map of enrichers using this watcher. The key is the metricset name
 
 	metadataObjects map[string]bool // map of ids of each object received by the handler functions
 }
@@ -280,6 +274,8 @@ func createWatcher(
 			watcher:         watcher,
 			started:         false,
 			metadataObjects: make(map[string]bool),
+			enrichers:       make(map[string]*enricher),
+			metricsetsUsing: make([]string, 0),
 		}
 		return true, nil
 	}
@@ -508,7 +504,7 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	updateFunc := func(r kubernetes.Resource, specificMetaGen metadata.MetaGen, generalMetaGen *metadata.Resource) map[string]mapstr.M {
+	updateFunc := func(r kubernetes.Resource) map[string]mapstr.M {
 		accessor, _ := meta.Accessor(r)
 		id := join(accessor.GetNamespace(), accessor.GetName())
 
@@ -582,8 +578,6 @@ func NewResourceMetadataEnricher(
 		resourceName,
 		resourceWatchers,
 		config,
-		specificMetaGen,
-		generalMetaGen,
 		updateFunc,
 		deleteFunc,
 		indexFunc,
@@ -638,7 +632,7 @@ func NewContainerMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-	updateFunc := func(r kubernetes.Resource, metaGen metadata.MetaGen, generalMetaGen *metadata.Resource) map[string]mapstr.M {
+	updateFunc := func(r kubernetes.Resource) map[string]mapstr.M {
 		metadataEvents := make(map[string]mapstr.M)
 
 		pod, ok := r.(*kubernetes.Pod)
@@ -724,8 +718,6 @@ func NewContainerMetadataEnricher(
 		PodResource,
 		resourceWatchers,
 		config,
-		metaGen,
-		nil,
 		updateFunc,
 		deleteFunc,
 		indexFunc,
@@ -790,22 +782,20 @@ func buildMetadataEnricher(
 	resourceName string,
 	resourceWatchers *Watchers,
 	config *kubernetesConfig,
-	specificMetaGen metadata.MetaGen,
-	generalMetaGen *metadata.Resource,
-	updateFunc func(kubernetes.Resource, metadata.MetaGen, *metadata.Resource) map[string]mapstr.M,
+	updateFunc func(kubernetes.Resource) map[string]mapstr.M,
 	deleteFunc func(kubernetes.Resource) []string,
 	indexFunc func(e mapstr.M) string,
 	log *logp.Logger) *enricher {
 
 	enricher := &enricher{
-		metadata:        map[string]mapstr.M{},
-		index:           indexFunc,
-		resourceName:    resourceName,
-		metricsetName:   metricsetName,
-		specificMetaGen: specificMetaGen,
-		generalMetaGen:  generalMetaGen,
-		config:          config,
-		log:             log,
+		metadata:      map[string]mapstr.M{},
+		index:         indexFunc,
+		updateFunc:    updateFunc,
+		deleteFunc:    deleteFunc,
+		resourceName:  resourceName,
+		metricsetName: metricsetName,
+		config:        config,
+		log:           log,
 	}
 
 	resourceWatchers.lock.Lock()
@@ -813,7 +803,7 @@ func buildMetadataEnricher(
 
 	watcher := resourceWatchers.watchersMap[resourceName]
 	if watcher != nil {
-		watcher.enrichers = append(watcher.enrichers, enricher)
+		watcher.enrichers[metricsetName] = enricher
 
 		// Check if there are past events for this resource and update metadata if there are
 		for key, _ := range watcher.metadataObjects {
@@ -822,7 +812,7 @@ func buildMetadataEnricher(
 				log.Errorf("Error trying to get the object from the store: %s", err)
 			} else {
 				if exists {
-					newMetadataEvents := updateFunc(obj.(kubernetes.Resource), enricher.specificMetaGen, enricher.generalMetaGen)
+					newMetadataEvents := enricher.updateFunc(obj.(kubernetes.Resource))
 					// add the new metadata to the watcher received metadata
 					for id, metadata := range newMetadataEvents {
 						enricher.metadata[id] = metadata
@@ -840,7 +830,7 @@ func buildMetadataEnricher(
 
 				for _, enricher := range watcher.enrichers {
 					enricher.Lock()
-					newMetadataEvents := updateFunc(obj.(kubernetes.Resource), enricher.specificMetaGen, enricher.generalMetaGen)
+					newMetadataEvents := enricher.updateFunc(obj.(kubernetes.Resource))
 					// add the new metadata to the watcher received metadata
 					for id, metadata := range newMetadataEvents {
 						enricher.metadata[id] = metadata
@@ -856,7 +846,7 @@ func buildMetadataEnricher(
 
 				for _, enricher := range watcher.enrichers {
 					enricher.Lock()
-					updatedMetadataEvents := updateFunc(obj.(kubernetes.Resource), enricher.specificMetaGen, enricher.generalMetaGen)
+					updatedMetadataEvents := enricher.updateFunc(obj.(kubernetes.Resource))
 					// update the watcher metadata
 					for id, metadata := range updatedMetadataEvents {
 						enricher.metadata[id] = metadata
@@ -872,10 +862,9 @@ func buildMetadataEnricher(
 
 				for _, enricher := range watcher.enrichers {
 					enricher.Lock()
-					ids := deleteFunc(obj.(kubernetes.Resource))
+					ids := enricher.deleteFunc(obj.(kubernetes.Resource))
 					// update this watcher events by removing all the metadata[id]
 					for _, id := range ids {
-						delete(watcher.metadataObjects, id)
 						delete(enricher.metadata, id)
 					}
 					enricher.Unlock()
@@ -891,15 +880,7 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
 
-	resourceWatcher := resourceWatchers.watchersMap[e.resourceName]
-	if resourceWatcher != nil && !resourceWatcher.started {
-		if err := resourceWatcher.watcher.Start(); err != nil {
-			e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
-		} else {
-			resourceWatcher.started = true
-		}
-	}
-
+	// we first need to start the dependencies
 	extras := getExtraWatchers(e.resourceName, e.config.AddResourceMetadata)
 	for _, extra := range extras {
 		extraWatcher := resourceWatchers.watchersMap[extra]
@@ -909,6 +890,15 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 			} else {
 				extraWatcher.started = true
 			}
+		}
+	}
+
+	resourceWatcher := resourceWatchers.watchersMap[e.resourceName]
+	if resourceWatcher != nil && !resourceWatcher.started {
+		if err := resourceWatcher.watcher.Start(); err != nil {
+			e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
+		} else {
+			resourceWatcher.started = true
 		}
 	}
 }
