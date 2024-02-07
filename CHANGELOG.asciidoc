@@ -3,6 +3,20 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.18]]
+=== Beats version 7.17.18
+https://github.com/elastic/beats/compare/v7.17.17\...v7.17.18[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- add_cloud_metadata processor: `huawei` provider is now treated as `openstack`. Huawei cloud runs on OpenStack
+platform, and when viewed from a metadata API standpoint, it is impossible to differentiate it from OpenStack. If you
+know that your deployments run on Huawei Cloud exclusively, and you wish to have `cloud.provider` value as `huawei`,
+you can achieve this by overwriting the value using an `add_fields` processor. {pull}35184[35184]
+
+
 [[release-notes-7.17.17]]
 === Beats version 7.17.17
 https://github.com/elastic/beats/compare/v7.17.16\...v7.17.17[View commits]
