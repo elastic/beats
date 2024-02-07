@@ -32,6 +32,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"testing"
 
@@ -692,7 +693,7 @@ func readDocker(dockerFile string) (*packageFile, *dockerInfo, error) {
 			if err != nil {
 				return nil, nil, err
 			}
-		case sliceContains(manifest.Layers, header.Name):
+		case slices.Contains(manifest.Layers, header.Name):
 			layer, err := readTarContents(header.Name, tarReader)
 			if err != nil {
 				return nil, nil, err
@@ -819,13 +820,4 @@ func readDockerInfo(r io.Reader) (*dockerInfo, error) {
 	}
 
 	return &info, nil
-}
-
-func sliceContains(s []string, e string) bool {
-	for _, v := range s {
-		if e == v {
-			return true
-		}
-	}
-	return false
 }
