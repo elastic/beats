@@ -507,8 +507,9 @@ func NewResourceMetadataEnricher(
 	updateFunc := func(r kubernetes.Resource) map[string]mapstr.M {
 		accessor, _ := meta.Accessor(r)
 		id := accessor.GetName()
-		if accessor.GetNamespace() != "" {
-			id = join(accessor.GetNamespace(), accessor.GetName())
+		namespace := accessor.GetNamespace()
+		if namespace != "" {
+			id = join(namespace, id)
 		}
 
 		switch r := r.(type) {
@@ -569,8 +570,9 @@ func NewResourceMetadataEnricher(
 		}
 
 		id := accessor.GetName()
-		if accessor.GetNamespace() != "" {
-			id = join(accessor.GetNamespace(), accessor.GetName())
+		namespace := accessor.GetNamespace()
+		if namespace != "" {
+			id = join(namespace, id)
 		}
 		return []string{id}
 	}
@@ -842,8 +844,9 @@ func buildMetadataEnricher(
 				// Add object to the list of metadata objects of this watcher
 				accessor, _ := meta.Accessor(obj.(kubernetes.Resource))
 				id := accessor.GetName()
-				if accessor.GetNamespace() != "" {
-					id = accessor.GetNamespace() + "/" + id
+				namespace := accessor.GetNamespace()
+				if namespace != "" {
+					id = namespace + "/" + id
 				}
 				watcher.metadataObjects[id] = true
 
@@ -861,8 +864,9 @@ func buildMetadataEnricher(
 				// Add object to the list of metadata objects of this watcher
 				accessor, _ := meta.Accessor(obj.(kubernetes.Resource))
 				id := accessor.GetName()
-				if accessor.GetNamespace() != "" {
-					id = accessor.GetNamespace() + "/" + id
+				namespace := accessor.GetNamespace()
+				if namespace != "" {
+					id = namespace + "/" + id
 				}
 				watcher.metadataObjects[id] = true
 
@@ -879,8 +883,9 @@ func buildMetadataEnricher(
 				// Remove object from the list of metadata objects of this watcher
 				accessor, _ := meta.Accessor(obj.(kubernetes.Resource))
 				id := accessor.GetName()
-				if accessor.GetNamespace() != "" {
-					id = accessor.GetNamespace() + "/" + id
+				namespace := accessor.GetNamespace()
+				if namespace != "" {
+					id = namespace + "/" + id
 				}
 				delete(watcher.metadataObjects, id)
 
