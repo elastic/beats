@@ -136,9 +136,9 @@ steps:
               - "${IMAGE_DEBIAN_10}"
               - "${IMAGE_DEBIAN_12}"
               - "${IMAGE_CENTOS_7}"
+                # - "${IMAGE_RHEL_8}" ## TODO: enable after updating image, currently cannot run tests; cannot run python3
               - "${IMAGE_RHEL_9}"
-              - "${IMAGE_RHEL_8}"
-              - "${IMAGE_SLES_12}"
+                # - "${IMAGE_SLES_12}" ## TODO: enable after updating image, currently cannot run tests; needs gcc in base image
               - "${IMAGE_SLES_15}"
         artifact_paths:
           - "auditbeat/build/*.xml"
