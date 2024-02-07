@@ -15,7 +15,7 @@ steps:
     if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat" || build.env("BUILDKITE_PULL_REQUEST") != "false"
 
     steps:
-      - label: ":linux: Unit Tests"
+      - label: ":linux: Unit Tests / {{matrix.image}}"
         command:
           - ".buildkite/heartbeat/scripts/unit-tests.sh"
         notify:
@@ -33,7 +33,7 @@ steps:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
-      - label: ":windows: Unit Tests"
+      - label: ":windows: Unit Tests / {{matrix.image}}"
         command:
           - ".buildkite/heartbeat/scripts/unit-tests-win.ps1"
         notify:
