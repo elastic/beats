@@ -10,7 +10,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"flag"
-	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
@@ -216,7 +215,7 @@ func TestPCAPFiles(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				err = ioutil.WriteFile(goldenName, data, 0o644)
+				err = os.WriteFile(goldenName, data, 0o644)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -248,7 +247,7 @@ func TestDatFiles(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				err = ioutil.WriteFile(goldenName, data, 0o644)
+				err = os.WriteFile(goldenName, data, 0o644)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -274,7 +273,7 @@ func TestDatFiles(t *testing.T) {
 }
 
 func readDatTests(t testing.TB) *DatTests {
-	data, err := ioutil.ReadFile("testdata/dat_tests.yaml")
+	data, err := os.ReadFile("testdata/dat_tests.yaml")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -312,7 +311,7 @@ func getFlowsFromDat(t testing.TB, name string, testCase TestCase) TestResult {
 	source := test.MakeAddress(t, datSourceIP+":4444")
 	var events []beat.Event
 	for _, f := range testCase.Files {
-		dat, err := ioutil.ReadFile(filepath.Join(datDir, f))
+		dat, err := os.ReadFile(filepath.Join(datDir, f))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -401,7 +400,7 @@ func normalize(t testing.TB, result TestResult) TestResult {
 }
 
 func readGoldenFile(t testing.TB, file string) TestResult {
-	data, err := ioutil.ReadFile(file)
+	data, err := os.ReadFile(file)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -476,7 +475,7 @@ func TestReverseFlows(t *testing.T) {
 		},
 	}
 
-	var evs []beat.Event
+	evs := make([]beat.Event, 0, len(flows))
 	for _, f := range flows {
 		evs = append(evs, toBeatEvent(f, []string{"private"}))
 	}
