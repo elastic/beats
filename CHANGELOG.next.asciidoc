@@ -89,6 +89,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - Fix m365_defender cursor value and query building. {pull}37116[37116]
 - Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
 - Update github.com/lestrrat-go/jwx dependency. {pull}37799[37799]
+- [threatintel] MISP pagination fixes {pull}37898[37898]
 
 *Heartbeat*
 
