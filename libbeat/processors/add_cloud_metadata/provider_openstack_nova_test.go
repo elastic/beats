@@ -33,19 +33,19 @@ import (
 func openstackNovaMetadataHandler() http.HandlerFunc {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.RequestURI == osMetadataInstanceIDURI {
-			w.Write([]byte("i-0000ffac"))
+			_, _ = w.Write([]byte("i-0000ffac"))
 			return
 		}
 		if r.RequestURI == osMetadataInstanceTypeURI {
-			w.Write([]byte("m1.xlarge"))
+			_, _ = w.Write([]byte("m1.xlarge"))
 			return
 		}
 		if r.RequestURI == osMetadataHostnameURI {
-			w.Write([]byte("testvm01.stack.cloud"))
+			_, _ = w.Write([]byte("testvm01.stack.cloud"))
 			return
 		}
 		if r.RequestURI == osMetadataZoneURI {
-			w.Write([]byte("az-test-2"))
+			_, _ = w.Write([]byte("az-test-2"))
 			return
 		}
 
