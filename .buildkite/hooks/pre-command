@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" ]]; then
   source .buildkite/env-scripts/env.sh
   source .buildkite/env-scripts/util.sh
   source .buildkite/env-scripts/win-env.sh
