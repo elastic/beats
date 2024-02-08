@@ -937,7 +937,10 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
 
-	// we first need to start the dependencies
+	// Each resource may require multiple watchers. We firstly start the
+	// extra watchers as they are a dependency for the main resource watcher
+	// For example a pod watcher requires namespace and node watcher to be started
+	// first.
 	extras := getExtraWatchers(e.resourceName, e.config.AddResourceMetadata)
 	for _, extra := range extras {
 		extraWatcher := resourceWatchers.watchersMap[extra]
