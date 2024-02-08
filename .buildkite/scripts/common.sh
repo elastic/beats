@@ -9,13 +9,13 @@ arch_type="$(uname -m)"
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
 
-[ -z "$runLibbeat" ] && runLibbeat="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
-[ -z "$runMetricbeat" ] && runMetricbeat="$(buildkite-agent meta-data get runMetricbeat --default ${runMetricbeat:-"false"})"
-[ -z "$runPacketbeat" ] && runPacketbeat="$(buildkite-agent meta-data get runPacketbeat --default ${runPacketbeat:-"false"})"
-[ -z "$runLibBeatArmTest" ] && runLibBeatArmTest="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
-[ -z "$runPacketbeatArmTest" ] && runPacketbeatArmTest="$(buildkite-agent meta-data get runPacketbeatArmTest --default ${runPacketbeatArmTest:-"false"})"
-[ -z "$runMetricbeatMacOsTests" ] && runMetricbeatMacOsTests="$(buildkite-agent meta-data get runMetricbeatMacOsTests --default ${runMetricbeatMacOsTests:-"false"})"
-[ -z "$runPacketbeatMacOsTests" ] && runPacketbeatMacOsTests="$(buildkite-agent meta-data get runPacketbeatMacOsTests --default ${runPacketbeatMacOsTests:-"false"})"
+[ -z "${runLibbeat+x}" ] && runLibbeat="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
+[ -z "${runMetricbeat+x}" ] && runMetricbeat="$(buildkite-agent meta-data get runMetricbeat --default ${runMetricbeat:-"false"})"
+[ -z "${runPacketbeat+x}" ] && runPacketbeat="$(buildkite-agent meta-data get runPacketbeat --default ${runPacketbeat:-"false"})"
+[ -z "${runLibBeatArmTest+x}" ] && runLibBeatArmTest="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
+[ -z "${runPacketbeatArmTest+x}" ] && runPacketbeatArmTest="$(buildkite-agent meta-data get runPacketbeatArmTest --default ${runPacketbeatArmTest:-"false"})"
+[ -z "${runMetricbeatMacOsTests+x}" ] && runMetricbeatMacOsTests="$(buildkite-agent meta-data get runMetricbeatMacOsTests --default ${runMetricbeatMacOsTests:-"false"})"
+[ -z "${runPacketbeatMacOsTests+x}" ] && runPacketbeatMacOsTests="$(buildkite-agent meta-data get runPacketbeatMacOsTests --default ${runPacketbeatMacOsTests:-"false"})"
 
 metricbeat_changeset=(
   "^metricbeat/.*"
