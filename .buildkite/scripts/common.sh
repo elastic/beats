@@ -8,13 +8,14 @@ platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
-runLibbeat="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
-runMetricbeat="$(buildkite-agent meta-data get runMetricbeat --default ${runMetricbeat:-"false"})"
-runPacketbeat="$(buildkite-agent meta-data get runPacketbeat --default ${runPacketbeat:-"false"})"
-runLibBeatArmTest="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
-runPacketbeatArmTest="$(buildkite-agent meta-data get runPacketbeatArmTest --default ${runPacketbeatArmTest:-"false"})"
-runMetricbeatMacOsTests="$(buildkite-agent meta-data get runMetricbeatMacOsTests --default ${runMetricbeatMacOsTests:-"false"})"
-runPacketbeatMacOsTests="$(buildkite-agent meta-data get runPacketbeatMacOsTests --default ${runPacketbeatMacOsTests:-"false"})"
+
+[ -z "$runLibbeat" ] && runLibbeat="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
+[ -z "$runMetricbeat" ] && runMetricbeat="$(buildkite-agent meta-data get runMetricbeat --default ${runMetricbeat:-"false"})"
+[ -z "$runPacketbeat" ] && runPacketbeat="$(buildkite-agent meta-data get runPacketbeat --default ${runPacketbeat:-"false"})"
+[ -z "$runLibBeatArmTest" ] && runLibBeatArmTest="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
+[ -z "$runPacketbeatArmTest" ] && runPacketbeatArmTest="$(buildkite-agent meta-data get runPacketbeatArmTest --default ${runPacketbeatArmTest:-"false"})"
+[ -z "$runMetricbeatMacOsTests" ] && runMetricbeatMacOsTests="$(buildkite-agent meta-data get runMetricbeatMacOsTests --default ${runMetricbeatMacOsTests:-"false"})"
+[ -z "$runPacketbeatMacOsTests" ] && runPacketbeatMacOsTests="$(buildkite-agent meta-data get runPacketbeatMacOsTests --default ${runPacketbeatMacOsTests:-"false"})"
 
 metricbeat_changeset=(
   "^metricbeat/.*"
