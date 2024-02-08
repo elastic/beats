@@ -31,7 +31,7 @@ import (
 )
 
 func openstackNovaMetadataHandler() http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		if r.RequestURI == osMetadataInstanceIDURI {
 			_, _ = w.Write([]byte("i-0000ffac"))
 			return
@@ -50,7 +50,7 @@ func openstackNovaMetadataHandler() http.HandlerFunc {
 		}
 
 		http.Error(w, "not found", http.StatusNotFound)
-	})
+	}
 }
 
 func TestRetrieveOpenstackNovaMetadata(t *testing.T) {
@@ -60,7 +60,8 @@ func TestRetrieveOpenstackNovaMetadata(t *testing.T) {
 	defer server.Close()
 
 	config, err := conf.NewConfigFrom(map[string]interface{}{
-		"host": server.Listener.Addr().String(),
+		"providers": []string{"openstack"},
+		"host":      server.Listener.Addr().String(),
 	})
 
 	if err != nil {
@@ -77,7 +78,7 @@ func TestRetrieveOpenstackNovaMetadataWithHTTPS(t *testing.T) {
 	defer server.Close()
 
 	config, err := conf.NewConfigFrom(map[string]interface{}{
-		"providers":             []string{"openstack"},
+		"providers":             []string{"openstack-ssl"},
 		"host":                  server.Listener.Addr().String(),
 		"ssl.verification_mode": "none",
 	})
