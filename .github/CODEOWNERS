@@ -173,6 +173,8 @@ CHANGELOG*
 /x-pack/filebeat/modules.d/zoom.yml.disabled @elastic/security-service-integrations
 /x-pack/filebeat/processors/decode_cef/ @elastic/sec-deployment-and-devices
 /x-pack/heartbeat/ @elastic/obs-ds-hosted-services
+/x-pack/libbeat/reader/parquet/ @elastic/security-service-integrations
+/x-pack/libbeat/reader/etw/ @elastic/sec-windows-platform
 /x-pack/metricbeat/ @elastic/elastic-agent-data-plane
 /x-pack/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/metricbeat/module/activemq @elastic/obs-infraobs-integrations
@@ -219,4 +221,3 @@ CHANGELOG*
 /x-pack/osquerybeat/ @elastic/sec-deployment-and-devices
 /x-pack/packetbeat/ @elastic/sec-linux-platform
 /x-pack/winlogbeat/ @elastic/sec-windows-platform
-/x-pack/libbeat/reader/parquet/ @elastic/security-service-integrations
