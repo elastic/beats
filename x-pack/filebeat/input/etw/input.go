@@ -28,11 +28,44 @@ const (
 	inputName = "etw"
 )
 
+// It abstracts the underlying operations needed to work with ETW, allowing for easier
+// testing and decoupling from the Windows-specific ETW API.
+type ETWSessionOperator interface {
+	NewSession(config config) (*etw.Session, error)
+	AttachToExistingSession(session *etw.Session) error
+	CreateRealtimeSession(session *etw.Session) error
+	StartConsumer(session *etw.Session) error
+	StopSession(session *etw.Session) error
+}
+
+type RealETWSessionOperator struct{}
+
+func (op *RealETWSessionOperator) NewSession(config config) (*etw.Session, error) {
+	return etw.NewSession(convertConfig(config))
+}
+
+func (op *RealETWSessionOperator) AttachToExistingSession(session *etw.Session) error {
+	return session.AttachToExistingSession()
+}
+
+func (op *RealETWSessionOperator) CreateRealtimeSession(session *etw.Session) error {
+	return session.CreateRealtimeSession()
+}
+
+func (op *RealETWSessionOperator) StartConsumer(session *etw.Session) error {
+	return session.StartConsumer()
+}
+
+func (op *RealETWSessionOperator) StopSession(session *etw.Session) error {
+	return session.StopSession()
+}
+
 // etwInput struct holds the configuration and state for the ETW input
 type etwInput struct {
 	log        *logp.Logger
 	config     config
 	etwSession *etw.Session
+	operator   ETWSessionOperator
 }
 
 func Plugin() input.Plugin {
@@ -51,59 +84,62 @@ func configure(cfg *conf.C) (stateless.Input, error) {
 	}
 
 	return &etwInput{
-		config: conf,
+		config:   conf,
+		operator: &RealETWSessionOperator{},
 	}, nil
 }
 
 func (e *etwInput) Name() string { return inputName }
 
 func (e *etwInput) Test(_ input.TestContext) error {
-	// ToDo
 	return nil
 }
 
 // Run starts the ETW session and processes incoming events.
 func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	var err error
-	// Initialize a new ETW session with the provided configuration.
-	e.etwSession, err = etw.NewSession(convertConfig(e.config))
+
+	// Initialize a new ETW session with the provided configuration
+	e.etwSession, err = e.operator.NewSession(e.config)
 	if err != nil {
 		return fmt.Errorf("error initializing ETW session: %w", err)
 	}
 
-	// Set up logger with session information.
+	// Set up logger with session information
 	e.log = ctx.Logger.With("session", e.etwSession.Name)
 	e.log.Info("Starting " + inputName + " input")
 
-	// Handle realtime session creation or attachment.
+	// Handle realtime session creation or attachment
 	if e.etwSession.Realtime {
 		if !e.etwSession.NewSession {
-			// Attach to an existing session.
-			err = e.etwSession.AttachToExistingSession()
+			// Attach to an existing session
+			err = e.operator.AttachToExistingSession(e.etwSession)
 			if err != nil {
 				return fmt.Errorf("unable to retrieve handler: %w", err)
 			}
 			e.log.Debug("attached to existing session")
 		} else {
-			// Create a new realtime session.
-			err = e.etwSession.CreateRealtimeSession()
+			// Create a new realtime session
+			err = e.operator.CreateRealtimeSession(e.etwSession)
 			if err != nil {
 				return fmt.Errorf("realtime session could not be created: %w", err)
 			}
 			e.log.Debug("created session")
 		}
 	}
-	// Defer the cleanup and closing of resources.
+	// Defer the cleanup and closing of resources
 	var wg sync.WaitGroup
 	var once sync.Once
 
+	// Create an error channel to communicate errors from the goroutine
+	errChan := make(chan error, 1)
+
 	defer func() {
-		wg.Wait() // Ensure all goroutines have finished before closing.
 		once.Do(e.Close)
 		e.log.Info(inputName + " input stopped")
 	}()
 
-	// eventReceivedCallback processes each ETW event.
+	// eventReceivedCallback processes each ETW event
 	eventReceivedCallback := func(record *etw.EventRecord) uintptr {
 		if record == nil {
 			e.log.Error("received null event record")
@@ -132,18 +168,20 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 		return 0
 	}
 
-	// Set the callback function for the ETW session.
+	// Set the callback function for the ETW session
 	e.etwSession.Callback = eventReceivedCallback
 
-	// Start a goroutine to consume ETW events.
+	// Start a goroutine to consume ETW events
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		e.log.Debug("starting to listen ETW events")
-		if err = e.etwSession.StartConsumer(); err != nil {
-			e.log.Warnf("events could not be read from session: %w", err)
+		if err = e.operator.StartConsumer(e.etwSession); err != nil {
+			errChan <- fmt.Errorf("failed to start consumer: %w", err) // Send error to channel
+			return
 		}
 		e.log.Debug("stopped to read ETW events from session")
+		errChan <- nil
 	}()
 
 	// We ensure resources are closed when receiving a cancelation signal
@@ -151,6 +189,12 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 		<-ctx.Cancelation.Done()
 		once.Do(e.Close)
 	}()
+
+	wg.Wait() // Ensure all goroutines have finished before closing
+	close(errChan)
+	if err, ok := <-errChan; ok && err != nil {
+		return err
+	}
 
 	return nil
 }

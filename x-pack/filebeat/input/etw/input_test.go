@@ -7,15 +7,286 @@
 package etw
 
 import (
+	"context"
+	"fmt"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
+	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"golang.org/x/sys/windows"
 )
+
+type MockETWSessionOperator struct {
+	// Fields to store function implementations that tests can customize
+	NewSessionFunc              func(config config) (*etw.Session, error)
+	AttachToExistingSessionFunc func(session *etw.Session) error
+	CreateRealtimeSessionFunc   func(session *etw.Session) error
+	StartConsumerFunc           func(session *etw.Session) error
+	StopSessionFunc             func(session *etw.Session) error
+}
+
+func (m *MockETWSessionOperator) NewSession(config config) (*etw.Session, error) {
+	if m.NewSessionFunc != nil {
+		return m.NewSessionFunc(config)
+	}
+	return nil, nil
+}
+
+func (m *MockETWSessionOperator) AttachToExistingSession(session *etw.Session) error {
+	if m.AttachToExistingSessionFunc != nil {
+		return m.AttachToExistingSessionFunc(session)
+	}
+	return nil
+}
+
+func (m *MockETWSessionOperator) CreateRealtimeSession(session *etw.Session) error {
+	if m.CreateRealtimeSessionFunc != nil {
+		return m.CreateRealtimeSessionFunc(session)
+	}
+	return nil
+}
+
+func (m *MockETWSessionOperator) StartConsumer(session *etw.Session) error {
+	if m.StartConsumerFunc != nil {
+		return m.StartConsumerFunc(session)
+	}
+	return nil
+}
+
+func (m *MockETWSessionOperator) StopSession(session *etw.Session) error {
+	if m.StopSessionFunc != nil {
+		return m.StopSessionFunc(session)
+	}
+	return nil
+}
+
+func Test_RunEtwInput_NewSessionError(t *testing.T) {
+	// Mocks
+	mockOperator := &MockETWSessionOperator{}
+
+	// Setup the mock behavior for NewSession
+	mockOperator.NewSessionFunc = func(config config) (*etw.Session, error) {
+		return nil, fmt.Errorf("failed creating session '%s'", config.SessionName)
+	}
+
+	// Setup input
+	inputCtx := input.Context{
+		Cancelation: nil,
+		Logger:      logp.NewLogger("test"),
+	}
+
+	etwInput := &etwInput{
+		config: config{
+			ProviderName:    "Microsoft-Windows-Provider",
+			SessionName:     "MySession",
+			TraceLevel:      "verbose",
+			MatchAnyKeyword: 0xffffffffffffffff,
+			MatchAllKeyword: 0,
+		},
+		operator: mockOperator,
+	}
+
+	// Run test
+	err := etwInput.Run(inputCtx, nil)
+	assert.EqualError(t, err, "error initializing ETW session: failed creating session 'MySession'")
+}
+
+func Test_RunEtwInput_AttachToExistingSessionError(t *testing.T) {
+	// Mocks
+	mockOperator := &MockETWSessionOperator{}
+
+	// Setup the mock behavior for NewSession
+	mockOperator.NewSessionFunc = func(config config) (*etw.Session, error) {
+		mockSession := &etw.Session{
+			Name:       "MySession",
+			Realtime:   true,
+			NewSession: false}
+		return mockSession, nil
+	}
+	// Setup the mock behavior for AttachToExistingSession
+	mockOperator.AttachToExistingSessionFunc = func(session *etw.Session) error {
+		return fmt.Errorf("mock error")
+	}
+
+	// Setup input
+	inputCtx := input.Context{
+		Cancelation: nil,
+		Logger:      logp.NewLogger("test"),
+	}
+
+	etwInput := &etwInput{
+		config: config{
+			ProviderName:    "Microsoft-Windows-Provider",
+			SessionName:     "MySession",
+			TraceLevel:      "verbose",
+			MatchAnyKeyword: 0xffffffffffffffff,
+			MatchAllKeyword: 0,
+		},
+		operator: mockOperator,
+	}
+
+	// Run test
+	err := etwInput.Run(inputCtx, nil)
+	assert.EqualError(t, err, "unable to retrieve handler: mock error")
+}
+
+func Test_RunEtwInput_CreateRealtimeSessionError(t *testing.T) {
+	// Mocks
+	mockOperator := &MockETWSessionOperator{}
+
+	// Setup the mock behavior for NewSession
+	mockOperator.NewSessionFunc = func(config config) (*etw.Session, error) {
+		mockSession := &etw.Session{
+			Name:       "MySession",
+			Realtime:   true,
+			NewSession: true}
+		return mockSession, nil
+	}
+	// Setup the mock behavior for AttachToExistingSession
+	mockOperator.AttachToExistingSessionFunc = func(session *etw.Session) error {
+		return nil
+	}
+	// Setup the mock behavior for CreateRealtimeSession
+	mockOperator.CreateRealtimeSessionFunc = func(session *etw.Session) error {
+		return fmt.Errorf("mock error")
+	}
+
+	// Setup input
+	inputCtx := input.Context{
+		Cancelation: nil,
+		Logger:      logp.NewLogger("test"),
+	}
+
+	etwInput := &etwInput{
+		config: config{
+			ProviderName:    "Microsoft-Windows-Provider",
+			SessionName:     "MySession",
+			TraceLevel:      "verbose",
+			MatchAnyKeyword: 0xffffffffffffffff,
+			MatchAllKeyword: 0,
+		},
+		operator: mockOperator,
+	}
+
+	// Run test
+	err := etwInput.Run(inputCtx, nil)
+	assert.EqualError(t, err, "realtime session could not be created: mock error")
+}
+
+func Test_RunEtwInput_StartConsumerError(t *testing.T) {
+	// Mocks
+	mockOperator := &MockETWSessionOperator{}
+
+	// Setup the mock behavior for NewSession
+	mockOperator.NewSessionFunc = func(config config) (*etw.Session, error) {
+		mockSession := &etw.Session{
+			Name:       "MySession",
+			Realtime:   true,
+			NewSession: true}
+		return mockSession, nil
+	}
+	// Setup the mock behavior for AttachToExistingSession
+	mockOperator.AttachToExistingSessionFunc = func(session *etw.Session) error {
+		return nil
+	}
+	// Setup the mock behavior for CreateRealtimeSession
+	mockOperator.CreateRealtimeSessionFunc = func(session *etw.Session) error {
+		return nil
+	}
+	// Setup the mock behavior for StartConsumer
+	mockOperator.StartConsumerFunc = func(session *etw.Session) error {
+		return fmt.Errorf("mock error")
+	}
+
+	// Setup cancellation
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
+
+	// Setup input
+	inputCtx := input.Context{
+		Cancelation: ctx,
+		Logger:      logp.NewLogger("test"),
+	}
+
+	etwInput := &etwInput{
+		config: config{
+			ProviderName:    "Microsoft-Windows-Provider",
+			SessionName:     "MySession",
+			TraceLevel:      "verbose",
+			MatchAnyKeyword: 0xffffffffffffffff,
+			MatchAllKeyword: 0,
+		},
+		operator: mockOperator,
+	}
+
+	// Run test
+	err := etwInput.Run(inputCtx, nil)
+	assert.EqualError(t, err, "failed to start consumer: mock error")
+}
+
+func Test_RunEtwInput_Success(t *testing.T) {
+	// Mocks
+	mockOperator := &MockETWSessionOperator{}
+
+	// Setup the mock behavior for NewSession
+	mockOperator.NewSessionFunc = func(config config) (*etw.Session, error) {
+		mockSession := &etw.Session{
+			Name:       "MySession",
+			Realtime:   true,
+			NewSession: true}
+		return mockSession, nil
+	}
+	// Setup the mock behavior for AttachToExistingSession
+	mockOperator.AttachToExistingSessionFunc = func(session *etw.Session) error {
+		return nil
+	}
+	// Setup the mock behavior for CreateRealtimeSession
+	mockOperator.CreateRealtimeSessionFunc = func(session *etw.Session) error {
+		return nil
+	}
+	// Setup the mock behavior for StartConsumer
+	mockOperator.StartConsumerFunc = func(session *etw.Session) error {
+		return nil
+	}
+
+	// Setup cancellation
+	ctx, cancelFunc := context.WithCancel(context.Background())
+	defer cancelFunc()
+
+	// Setup input
+	inputCtx := input.Context{
+		Cancelation: ctx,
+		Logger:      logp.NewLogger("test"),
+	}
+
+	etwInput := &etwInput{
+		config: config{
+			ProviderName:    "Microsoft-Windows-Provider",
+			SessionName:     "MySession",
+			TraceLevel:      "verbose",
+			MatchAnyKeyword: 0xffffffffffffffff,
+			MatchAllKeyword: 0,
+		},
+		operator: mockOperator,
+	}
+
+	// Run test
+	go func() {
+		err := etwInput.Run(inputCtx, nil)
+		if err != nil {
+			t.Errorf("Run() error = %v, wantErr %v", err, false)
+		}
+	}()
+
+	// Simulate waiting for a condition
+	time.Sleep(time.Millisecond * 100)
+	cancelFunc() // Trigger cancellation to test cleanup and goroutine exit
+}
 
 func Test_fillEventHeader(t *testing.T) {
 	tests := []struct {
@@ -73,7 +344,7 @@ func Test_fillEventHeader(t *testing.T) {
 				"opcode":         uint8(90),
 				"task":           uint16(100),
 				"keyword":        uint64(110),
-				"time":           uint64(120),
+				"time":           int64(120),
 				"activity_guid":  "{12345678-1234-1234-1234-123456789ABC}",
 			},
 		},
@@ -157,6 +428,7 @@ func Test_fillEventMetadata(t *testing.T) {
 			expected: map[string]interface{}{
 				"provider_name": "TestProvider",
 				"provider_guid": "{12345678-1234-1234-1234-123456789ABC}",
+				"session":       "SessionName",
 			},
 		},
 		// Test Provider GUID from session if not available in config
@@ -169,6 +441,7 @@ func Test_fillEventMetadata(t *testing.T) {
 					Data3: 0x1234,
 					Data4: [8]byte{0x12, 0x34, 0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc},
 				},
+				Name: "Elastic-TestProvider",
 			},
 			cfg: config{
 				ProviderName: "TestProvider",
@@ -176,6 +449,7 @@ func Test_fillEventMetadata(t *testing.T) {
 			expected: map[string]interface{}{
 				"provider_name": "TestProvider",
 				"provider_guid": "{12345678-1234-1234-1234-123456789ABC}",
+				"session":       "Elastic-TestProvider",
 			},
 		},
 		// Test Logfile and Session Information
