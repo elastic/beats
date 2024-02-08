@@ -30,33 +30,33 @@ const (
 
 // It abstracts the underlying operations needed to work with ETW, allowing for easier
 // testing and decoupling from the Windows-specific ETW API.
-type ETWSessionOperator interface {
-	NewSession(config config) (*etw.Session, error)
-	AttachToExistingSession(session *etw.Session) error
-	CreateRealtimeSession(session *etw.Session) error
-	StartConsumer(session *etw.Session) error
-	StopSession(session *etw.Session) error
+type sessionOperator interface {
+	newSession(config config) (*etw.Session, error)
+	attachToExistingSession(session *etw.Session) error
+	createRealtimeSession(session *etw.Session) error
+	startConsumer(session *etw.Session) error
+	stopSession(session *etw.Session) error
 }
 
-type RealETWSessionOperator struct{}
+type realSessionOperator struct{}
 
-func (op *RealETWSessionOperator) NewSession(config config) (*etw.Session, error) {
+func (op *realSessionOperator) newSession(config config) (*etw.Session, error) {
 	return etw.NewSession(convertConfig(config))
 }
 
-func (op *RealETWSessionOperator) AttachToExistingSession(session *etw.Session) error {
+func (op *realSessionOperator) attachToExistingSession(session *etw.Session) error {
 	return session.AttachToExistingSession()
 }
 
-func (op *RealETWSessionOperator) CreateRealtimeSession(session *etw.Session) error {
+func (op *realSessionOperator) createRealtimeSession(session *etw.Session) error {
 	return session.CreateRealtimeSession()
 }
 
-func (op *RealETWSessionOperator) StartConsumer(session *etw.Session) error {
+func (op *realSessionOperator) startConsumer(session *etw.Session) error {
 	return session.StartConsumer()
 }
 
-func (op *RealETWSessionOperator) StopSession(session *etw.Session) error {
+func (op *realSessionOperator) stopSession(session *etw.Session) error {
 	return session.StopSession()
 }
 
@@ -65,7 +65,7 @@ type etwInput struct {
 	log        *logp.Logger
 	config     config
 	etwSession *etw.Session
-	operator   ETWSessionOperator
+	operator   sessionOperator
 }
 
 func Plugin() input.Plugin {
@@ -85,7 +85,7 @@ func configure(cfg *conf.C) (stateless.Input, error) {
 
 	return &etwInput{
 		config:   conf,
-		operator: &RealETWSessionOperator{},
+		operator: &realSessionOperator{},
 	}, nil
 }
 
@@ -100,7 +100,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	var err error
 
 	// Initialize a new ETW session with the provided configuration
-	e.etwSession, err = e.operator.NewSession(e.config)
+	e.etwSession, err = e.operator.newSession(e.config)
 	if err != nil {
 		return fmt.Errorf("error initializing ETW session: %w", err)
 	}
@@ -113,14 +113,14 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	if e.etwSession.Realtime {
 		if !e.etwSession.NewSession {
 			// Attach to an existing session
-			err = e.operator.AttachToExistingSession(e.etwSession)
+			err = e.operator.attachToExistingSession(e.etwSession)
 			if err != nil {
 				return fmt.Errorf("unable to retrieve handler: %w", err)
 			}
 			e.log.Debug("attached to existing session")
 		} else {
 			// Create a new realtime session
-			err = e.operator.CreateRealtimeSession(e.etwSession)
+			err = e.operator.createRealtimeSession(e.etwSession)
 			if err != nil {
 				return fmt.Errorf("realtime session could not be created: %w", err)
 			}
@@ -157,9 +157,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 		evt := beat.Event{
 			Timestamp: time.Now(),
 			Fields: mapstr.M{
-				"metadata": fillEventMetadata(e.etwSession, e.config),
-				"header":   fillEventHeader(record.EventHeader),
-				"winlog":   data,
+				"winlog": buildEvent(data, record.EventHeader, e.etwSession, e.config),
 			},
 		}
 
@@ -176,7 +174,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	go func() {
 		defer wg.Done()
 		e.log.Debug("starting to listen ETW events")
-		if err = e.operator.StartConsumer(e.etwSession); err != nil {
+		if err = e.operator.startConsumer(e.etwSession); err != nil {
 			errChan <- fmt.Errorf("failed to start consumer: %w", err) // Send error to channel
 			return
 		}
@@ -199,8 +197,8 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	return nil
 }
 
-// fillEventHeader constructs a header map for an event record header.
-func fillEventHeader(h etw.EventHeader) map[string]interface{} {
+// buildEvent builds the winlog object.
+func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cfg config) map[string]any {
 	// Mapping from Level to Severity
 	levelToSeverity := map[uint8]string{
 		1: "critical",
@@ -210,33 +208,45 @@ func fillEventHeader(h etw.EventHeader) map[string]interface{} {
 		5: "verbose",
 	}
 
-	header := make(map[string]interface{})
-
-	header["size"] = h.Size
-	header["type"] = h.HeaderType
-	header["flags"] = h.Flags
-	header["event_property"] = h.EventProperty
-	header["thread_id"] = h.ThreadId
-	header["process_id"] = h.ProcessId
-	header["timestamp"] = convertFileTimeToGoTime(uint64(h.TimeStamp))
-	header["provider_guid"] = h.ProviderId.String()
-	header["event_id"] = h.EventDescriptor.Id
-	header["event_version"] = h.EventDescriptor.Version
-	header["channel"] = h.EventDescriptor.Channel
-	header["level"] = h.EventDescriptor.Level
 	// Get the severity level, with a default value if not found
 	severity, ok := levelToSeverity[h.EventDescriptor.Level]
 	if !ok {
 		severity = "unknown" // Default severity level
 	}
-	header["severity"] = severity
-	header["opcode"] = h.EventDescriptor.Opcode
-	header["task"] = h.EventDescriptor.Task
-	header["keyword"] = h.EventDescriptor.Keyword
-	header["time"] = h.Time
-	header["activity_guid"] = h.ActivityId.String()
 
-	return header
+	winlog := map[string]any{
+		"activity_guid": h.ActivityId.String(),
+		"channel":       h.EventDescriptor.Channel,
+		"event_data":    data,
+		"event_id":      h.EventDescriptor.Id,
+		"flags":         h.Flags,
+		"keywords":      h.EventDescriptor.Keyword,
+		"level":         h.EventDescriptor.Level,
+		"opcode":        h.EventDescriptor.Opcode,
+		"process_id":    h.ProcessId,
+		"provider_guid": h.ProviderId.String(),
+		"session":       session.Name,
+		"severity":      severity,
+		"task":          h.EventDescriptor.Task,
+		"thread_id":     h.ThreadId,
+		"timestamp":     convertFileTimeToGoTime(uint64(h.TimeStamp)),
+		"version":       h.EventDescriptor.Version,
+	}
+
+	// Include provider name and GUID if available
+	if cfg.ProviderName != "" {
+		winlog["provider_name"] = cfg.ProviderName
+	}
+	if winlog["provider_guid"] == "" && etw.IsGUIDValid(session.GUID) {
+		winlog["provider_guid"] = session.GUID.String()
+	}
+
+	// Include logfile path if available
+	if cfg.Logfile != "" {
+		winlog["logfile"] = cfg.Logfile
+	}
+
+	return winlog
 }
 
 // convertFileTimeToGoTime converts a Windows FileTime to a Go time.Time structure.
@@ -256,40 +266,9 @@ func convertFileTimeToGoTime(fileTime64 uint64) time.Time {
 	return time.Unix(0, fileTime.Nanoseconds())
 }
 
-// fillEventMetadata constructs a metadata map with session information.
-func fillEventMetadata(session *etw.Session, cfg config) map[string]interface{} {
-	metadata := make(map[string]interface{})
-
-	// Include provider name and GUID in metadata if available
-	if cfg.ProviderName != "" {
-		metadata["provider_name"] = cfg.ProviderName
-	}
-	if cfg.ProviderGUID != "" {
-		metadata["provider_guid"] = cfg.ProviderGUID
-	} else if etw.IsGUIDValid(session.GUID) {
-		metadata["provider_guid"] = session.GUID.String()
-	}
-
-	// Include logfile path if available
-	if cfg.Logfile != "" {
-		metadata["logfile"] = cfg.Logfile
-	}
-
-	// Include session name if available
-	if cfg.Session != "" {
-		metadata["session"] = cfg.Session
-	} else if cfg.SessionName != "" {
-		metadata["session"] = cfg.SessionName
-	} else if cfg.ProviderGUID != "" || cfg.ProviderName != "" {
-		metadata["session"] = session.Name
-	}
-
-	return metadata
-}
-
 // close stops the ETW session and logs the outcome.
 func (e *etwInput) Close() {
-	if err := e.operator.StopSession(e.etwSession); err != nil {
+	if err := e.operator.stopSession(e.etwSession); err != nil {
 		e.log.Error("failed to shutdown ETW session")
 	}
 	e.log.Info("successfully shutdown")
