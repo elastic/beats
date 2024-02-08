@@ -21,6 +21,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":rhel: RHEL-9 Unit Tests"
@@ -29,6 +30,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 
@@ -38,7 +40,7 @@ steps:
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
-          machine_type: "n2-standard-8"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
         matrix:
@@ -57,7 +59,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
-          machine_type: "n2-standard-8"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
@@ -68,7 +70,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
-          machine_type: "n2-standard-8"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
@@ -79,7 +81,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
-          machine_type: "n2-standard-8"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
@@ -122,7 +124,7 @@ if  are_conditions_met_arm_tests; then
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.xlarge"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
@@ -146,7 +148,7 @@ if are_conditions_met_packaging; then
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2d-highcpu-16"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 
@@ -156,7 +158,7 @@ if are_conditions_met_packaging; then
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.xlarge"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
