@@ -122,9 +122,9 @@ with_go() {
 
 checkLinuxType() {
   if [ "${platform_type}" == "Linux" ]; then
-    if grep -q 'ubuntu' /etc/*release; then
+    if grep -q 'ubuntu' /etc/os-release; then
       echo "ubuntu"
-    elif grep -q 'rhel' /etc/*release; then
+    elif grep -q 'rhel' /etc/os-release; then
       echo "rhel"
     else
       echo "Unsupported Linux"
