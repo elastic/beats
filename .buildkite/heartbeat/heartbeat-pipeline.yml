@@ -142,8 +142,7 @@ steps:
         commands: ".buildkite/heartbeat/scripts/package-step.sh | buildkite-agent pipeline upload"
 
       - label: "No changeset test"
-        command:
-          - "buildkite-agent annotate "No required files changed" --style 'warning' --context 'ctx-warning'"
+        commands: "buildkite-agent annotate "No required files changed" --style 'warning' --context 'ctx-warning'"
         notify:
           - github_commit_status:
               context: "Auditbeat/Packaging: Linux X86"
