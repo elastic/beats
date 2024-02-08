@@ -513,6 +513,8 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
+        // updateFunc to be used as the resource watcher's add and update handler.
+	// It is responsible of generating the metadata for a detected resource
 	updateFunc := func(r kubernetes.Resource) map[string]mapstr.M {
 		accessor, _ := meta.Accessor(r)
 		id := accessor.GetName()
