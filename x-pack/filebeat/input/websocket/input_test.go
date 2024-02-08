@@ -250,6 +250,47 @@ var inputTests = []struct {
 		},
 		wantErr: fmt.Errorf("unsupported scheme: http accessing config"),
 	},
+	{
+		name:    "cursor_condition_check",
+		server:  newWebSocketTestServer(httptest.NewServer),
+		handler: defaultHandler,
+		config: map[string]interface{}{
+			"program": `
+                bytes(state.response).decode_json().as(inner_body,{
+					"events": has(state.cursor) && inner_body.ts > state.cursor.last_updated ?  [inner_body] : [], 
+            })`,
+			"state": map[string]interface{}{
+				"cursor": map[string]int{
+					"last_updated": 1502908200,
+				},
+			},
+		},
+		response: []string{`
+         {
+            "pps": {
+                "agent": "example.proofpoint.com",
+                "cid": "mmeng_uivm071"
+            },
+            "ts": 1502908200
+        }`,
+			`{
+            "pps": {
+                "agent": "example.proofpoint-1.com",
+                "cid": "mmeng_vxciml"
+            },
+            "ts": 1503081000
+        }`,
+		},
+		want: []map[string]interface{}{
+			{
+				"pps": map[string]interface{}{
+					"agent": "example.proofpoint-1.com",
+					"cid":   "mmeng_vxciml",
+				},
+				"ts": float64(1503081000),
+			},
+		},
+	},
 }
 
 func TestInput(t *testing.T) {
