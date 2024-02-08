@@ -950,6 +950,7 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 		}
 	}
 
+        // Start the main watcher if not already started.
 	resourceWatcher := resourceWatchers.watchersMap[e.resourceName]
 	if resourceWatcher != nil && !resourceWatcher.started {
 		if err := resourceWatcher.watcher.Start(); err != nil {
