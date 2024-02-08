@@ -590,6 +590,7 @@ func NewResourceMetadataEnricher(
 		return []string{id}
 	}
 
+        // indexFunc retrieves the resource id from a given event
 	indexFunc := func(e mapstr.M) string {
 		name := getString(e, "name")
 		namespace := getString(e, mb.ModuleDataKey+".namespace")
