@@ -841,6 +841,9 @@ func buildMetadataEnricher(
 
 		watcher.watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
+				resourceWatchers.lock.Lock()
+				defer resourceWatchers.lock.Unlock()
+
 				// Add object to the list of metadata objects of this watcher
 				accessor, _ := meta.Accessor(obj.(kubernetes.Resource))
 				id := accessor.GetName()
@@ -861,6 +864,9 @@ func buildMetadataEnricher(
 				}
 			},
 			UpdateFunc: func(obj interface{}) {
+				resourceWatchers.lock.Lock()
+				defer resourceWatchers.lock.Unlock()
+
 				// Add object to the list of metadata objects of this watcher
 				accessor, _ := meta.Accessor(obj.(kubernetes.Resource))
 				id := accessor.GetName()
@@ -880,6 +886,9 @@ func buildMetadataEnricher(
 				}
 			},
 			DeleteFunc: func(obj interface{}) {
+				resourceWatchers.lock.Lock()
+				defer resourceWatchers.lock.Unlock()
+
 				// Remove object from the list of metadata objects of this watcher
 				accessor, _ := meta.Accessor(obj.(kubernetes.Resource))
 				id := accessor.GetName()

@@ -505,9 +505,12 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	resourceWatchers.lock.Lock()
 	watcher := resourceWatchers.watchersMap[PodResource]
 	require.True(t, watcher.started)
-
 	mockW = watcher.watcher.(*mockWatcher)
+	resourceWatchers.lock.Unlock()
+
 	mockW.handler.OnAdd(resource)
+
+	resourceWatchers.lock.Lock()
 	require.Equal(t, metadataObjects, watcher.metadataObjects)
 	resourceWatchers.lock.Unlock()
 
@@ -551,7 +554,11 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	resourceWatchers.lock.Lock()
 	wData = resourceWatchers.watchersMap[PodResource]
 	mockW = wData.watcher.(*mockWatcher)
+	resourceWatchers.lock.Unlock()
+
 	mockW.handler.OnDelete(resource)
+
+	resourceWatchers.lock.Lock()
 	require.Equal(t, map[string]bool{}, watcher.metadataObjects)
 	resourceWatchers.lock.Unlock()
 
@@ -634,21 +641,28 @@ func TestBuildMetadataEnricher_EventHandler_PastObjects(t *testing.T) {
 
 	watcher := resourceWatchers.watchersMap[PodResource]
 	mockW := watcher.watcher.(*mockWatcher)
-
-	mockW.handler.OnAdd(resource1)
-	metadataObjects := map[string]bool{id1: true}
-	require.Equal(t, metadataObjects, watcher.metadataObjects)
-
-	mockW.handler.OnUpdate(resource2)
-	metadataObjects[id2] = true
-	require.Equal(t, metadataObjects, watcher.metadataObjects)
-
-	mockW.handler.OnDelete(resource1)
-	delete(metadataObjects, id1)
-	require.Equal(t, metadataObjects, watcher.metadataObjects)
-
 	resourceWatchers.lock.Unlock()
 
+	mockW.handler.OnAdd(resource1)
+
+	resourceWatchers.lock.Lock()
+	metadataObjects := map[string]bool{id1: true}
+	require.Equal(t, metadataObjects, watcher.metadataObjects)
+	resourceWatchers.lock.Unlock()
+
+	mockW.handler.OnUpdate(resource2)
+
+	resourceWatchers.lock.Lock()
+	metadataObjects[id2] = true
+	require.Equal(t, metadataObjects, watcher.metadataObjects)
+	resourceWatchers.lock.Unlock()
+
+	mockW.handler.OnDelete(resource1)
+
+	resourceWatchers.lock.Lock()
+	delete(metadataObjects, id1)
+	require.Equal(t, metadataObjects, watcher.metadataObjects)
+	resourceWatchers.lock.Unlock()
 }
 
 type mockFuncs struct {
