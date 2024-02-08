@@ -52,5 +52,10 @@ func UnderAgent() bool {
 // It always returns true when not running under Elastic Agent.
 // Otherwise it returns true when the trace level is enabled
 func TraceLevelEnabled() bool {
-	return underAgentTrace.Load()
+	if underAgent.Load() {
+		return underAgentTrace.Load()
+	}
+
+	// Always true when not running under the Elastic Agent.
+	return true
 }
