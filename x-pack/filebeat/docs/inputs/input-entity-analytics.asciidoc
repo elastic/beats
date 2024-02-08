@@ -16,6 +16,7 @@ external identity providers.
 
 The following identity providers are supported:
 
+- <<provider-activedirectory>>
 - <<provider-azure-ad>>
 - <<provider-okta>>
 
@@ -27,13 +28,185 @@ the <<{beatname_lc}-input-{type}-common-options>> described later.
 [float]
 ==== `provider`
 
-The identity provider. Must be one of: `azure-ad` or `okta`.
+The identity provider. Must be one of: `activedirectory`, `azure-ad` or `okta`.
 
 [id="{beatname_lc}-input-{type}-common-options"]
 include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
 [float]
 === Providers
+
+[id="provider-activedirectory"]
+==== Active Directory (`activedirectory`)
+
+The `activedirectory` provider allows the input to retrieve users, with group
+memberships, from Active Directory.
+
+[float]
+==== Setup
+
+A user with appropriate permissions must be set up in the Active Directory
+Server Manages in order for the provider to function properly.
+
+[float]
+==== How It Works
+
+[float]
+===== Overview
+
+The Active Directory provider periodically queries the Active Directory server,
+retrieving updates for users and groups, updates its internal cache of user and
+group metadata and group membership information, and ships updated user metadata
+to Elasticsearch.
+
+Fetching and shipping updates occurs in one of two processes: *full
+synchronizations* and *incremental updates*. Full synchronizations will send the
+entire list of users and group membership in state, along with write markers to indicate
+the start and end of the synchronization event. Incremental updates will only
+send data for changed users during that event. Changes on a user can come in many
+forms, whether it be a change to the user metadata, a user was added or modified,
+or group membership was changed.
+
+[float]
+===== Sending User and Device Metadata to Elasticsearch
+
+During a full synchronization, all users and groups stored in state will be sent
+to the output, while incremental updates will only send users and group that have been
+updated. Full synchronizations will be bounded on either side by write marker
+documents, which will look something like this:
+
+["source","json",subs="attributes"]
+----
+{
+    "@timestamp": "2022-11-04T09:57:19.786056-05:00",
+    "event": {
+        "action": "started",
+        "start": "2022-11-04T09:57:19.786056-05:00"
+    },
+    "labels": {
+        "identity_source": "activedirectory-1"
+    }
+}
+----
+
+User documents will show the current state of the user.
+
+Example user document:
+
+["source","json",subs="attributes"]
+----
+{
+    "@timestamp": "2024-02-05T06:37:40.876026-05:00",
+    "event": {
+        "action": "user-discovered",
+    },
+    "activedirectory": {
+        "id": "CN=Guest,CN=Users,DC=testserver,DC=local",
+        "user": {
+            "accountExpires": "2185-07-21T23:34:33.709551516Z",
+            "badPasswordTime": "0",
+            "badPwdCount": "0",
+            "cn": "Guest",
+            "codePage": "0",
+            "countryCode": "0",
+            "dSCorePropagationData": [
+                "2024-01-22T06:37:40Z",
+                "1601-01-01T00:00:01Z"
+            ],
+            "description": "Built-in account for guest access to the computer/domain",
+            "distinguishedName": "CN=Guest,CN=Users,DC=testserver,DC=local",
+            "instanceType": "4",
+            "isCriticalSystemObject": true,
+            "lastLogoff": "0",
+            "lastLogon": "2185-07-21T23:34:33.709551616Z",
+            "logonCount": "0",
+            "memberOf": "CN=Guests,CN=Builtin,DC=testserver,DC=local",
+            "name": "Guest",
+            "objectCategory": "CN=Person,CN=Schema,CN=Configuration,DC=testserver,DC=local",
+            "objectClass": [
+                "top",
+                "person",
+                "organizationalPerson",
+                "user"
+            ],
+            "objectGUID": "hSt/40XJQU6cf+J2XoYMHw==",
+            "objectSid": "AQUAAAAAAAUVAAAA0JU2Fq1k30YZ7UPx9QEAAA==",
+            "primaryGroupID": "514",
+            "pwdLastSet": "2185-07-21T23:34:33.709551616Z",
+            "sAMAccountName": "Guest",
+            "sAMAccountType": "805306368",
+            "uSNChanged": "8197",
+            "uSNCreated": "8197",
+            "userAccountControl": "66082",
+            "whenChanged": "2024-01-22T06:36:59Z",
+            "whenCreated": "2024-01-22T06:36:59Z"
+        },
+        "whenChanged": "2024-01-22T06:36:59Z"
+    },
+    "user": {
+        "id": "CN=Guest,CN=Users,DC=testserver,DC=local"
+    },
+    "labels": {
+        "identity_source": "activedirectory-1"
+    }
+}
+----
+
+[float]
+==== Configuration
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: entity-analytics
+  enabled: true
+  id: activedirectory-1
+  provider: activedirectory
+  sync_interval: "12h"
+  update_interval: "30m"
+  ad_url: "ldaps://host.domain.tld"
+  ad_base_dn: "CN=Users,DC=SERVER,DC=DOMAIN"
+  ad_user: "USERNAME"
+  ad_password: "PASSWORD"
+----
+
+The `azure-ad` provider supports the following configuration:
+
+[float]
+===== `ad_url`
+
+The Active Directory server URL. Field is required.
+
+[float]
+===== `ad_base_dn`
+
+The Active Directory Base Distinguished Name. Field is required.
+
+[float]
+===== `ad_user`
+
+The client user name. Used for authentication. Field is required.
+
+[float]
+===== `ad_password`
+
+The client's password, used for authentication. Field is required.
+
+[float]
+===== `sync_interval`
+
+The interval in which full synchronizations should occur. The interval must be
+longer than the update interval (`update_interval`) Expressed as a duration
+string (e.g., 1m, 3h, 24h). Defaults to `24h` (24 hours).
+
+[float]
+===== `update_interval`
+
+The interval in which incremental updates should occur. The interval must be
+shorter than the full synchronization interval (`sync_interval`). Expressed as a
+duration string (e.g., 1m, 3h, 24h). Defaults to `15m` (15 minutes).
 
 [id="provider-azure-ad"]
 ==== Azure Active Directory (`azure-ad`)
