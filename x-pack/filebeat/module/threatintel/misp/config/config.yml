@@ -32,8 +32,20 @@ request.transforms:
     value: json
 - set:
     target: body.timestamp
-    value: '[[.cursor.timestamp]]'
-    default: '[[ formatDate (now (parseDuration "-{{ .first_interval }}")) "UnixDate" ]]'
+    value: >-
+      [[- if index .cursor "timestamp" -]]
+        [[- .cursor.timestamp -]]
+      [[- else -]]
+        [[- .last_response.url.params.Get "timestamp" -]]
+      [[- end -]]
+    default: '[[ (now (parseDuration "-{{ .first_interval }}")).Unix ]]'
+- set:
+    target: body.order
+    value: timestamp
+- set:
+    # Ignored by MISP, set as a workaround to make it available in response.pagination.
+    target: url.params.timestamp
+    value: '[[.body.timestamp]]'
 
 response.split:
   target: body.response
@@ -51,8 +63,15 @@ response.request_body_on_pagination: true
 response.pagination:
 - set:
     target: body.page
-    value: '[[if (ne (len .last_response.body.response) 0)]][[add .last_response.page 1]][[end]]'
+    # Add 2 because the httpjson page counter is zero-based while the MISP page parameter starts at 1.
+    value: '[[if (ne (len .last_response.body.response) 0)]][[add .last_response.page 2]][[end]]'
     fail_on_template_error: true
+- set:
+    target: body.timestamp
+    value: '[[.last_response.url.params.Get "timestamp"]]'
+- set:
+    target: url.params.timestamp
+    value: '[[.last_response.url.params.Get "timestamp"]]'
 cursor:
   timestamp:
     value: '[[.last_event.Event.timestamp]]'
