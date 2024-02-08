@@ -605,6 +605,7 @@ func NewResourceMetadataEnricher(
 		return id
 	}
 
+        // create a metadata enricher for this metricset
 	enricher := buildMetadataEnricher(
 		metricsetName,
 		resourceName,
