@@ -85,7 +85,6 @@ are_files_changed() {
   if git diff --name-only HEAD@{1} HEAD | grep -qE "$changeset"; then
     return 0;
   else
-    echo "WARN! No files changed in $changeset"
     return 1;
   fi
 }
