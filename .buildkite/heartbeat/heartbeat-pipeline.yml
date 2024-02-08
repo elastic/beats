@@ -20,7 +20,7 @@ steps:
           - ".buildkite/heartbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "heartbeat/ linux/Unit Tests"
+              context: "Heartbeat: linux/Unit Tests"
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
@@ -38,7 +38,7 @@ steps:
           - ".buildkite/heartbeat/scripts/unit-tests-win.ps1"
         notify:
           - github_commit_status:
-              context: "heartbeat/ windows/Unit Tests"
+              context: "Heartbeat: windows/Unit Tests"
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
@@ -58,7 +58,7 @@ steps:
           - ".buildkite/heartbeat/scripts/integration-gotests.sh"
         notify:
           - github_commit_status:
-              context: "heartbeat: Go Integration Tests"
+              context: "Heartbeat: Go Integration Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -71,7 +71,7 @@ steps:
           - ".buildkite/heartbeat/scripts/integration-pytests.sh"
         notify:
           - github_commit_status:
-              context: "heartbeat: Python Integration Tests"
+              context: "Heartbeat: Python Integration Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -91,7 +91,7 @@ steps:
           - ".buildkite/heartbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "heartbeat/Extended: Unit Tests ARM"
+              context: "Heartbeat/Extended: Unit Tests ARM"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
@@ -105,7 +105,7 @@ steps:
           - ".buildkite/heartbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "heartbeat/Extended: MacOS Unit Tests"
+              context: "Heartbeat/Extended: MacOS Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -121,7 +121,7 @@ steps:
         command: ".buildkite/heartbeat/scripts/unit-tests-win.ps1"
         notify:
           - github_commit_status:
-              context: "heartbeat/Extended: Win-2019 Unit Tests"
+              context: "Heartbeat/Extended: Win-2019 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
