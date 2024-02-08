@@ -228,7 +228,7 @@ func (s *salesforceInput) RunObject() error {
 	}
 	query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.Object.Query, cursor)
 	if err != nil {
-		return fmt.Errorf("error forming based on cursor: %w", err)
+		return fmt.Errorf("error forming query based on cursor: %w", err)
 	}
 
 	res, err := s.soqlr.Query(query, false)
@@ -248,13 +248,10 @@ func (s *salesforceInput) RunObject() error {
 				return err
 			}
 
-			if firstEvent {
-				if timstamp, ok := val[s.config.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
+			if timstamp, ok := val[s.config.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
+				if firstEvent {
 					s.cursor.Object.FirstEventTime = timstamp
 				}
-			}
-
-			if timstamp, ok := val[s.config.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
 				s.cursor.Object.LastEventTime = timstamp
 			}
 
@@ -266,13 +263,13 @@ func (s *salesforceInput) RunObject() error {
 			totalEvents++
 		}
 
-		if res.MoreRecords() { // returns true if there are more records.
-			res, err = res.Next()
-			if err != nil {
-				return err
-			}
-		} else {
+		if !res.MoreRecords() { // returns true if there are more records.
 			break
+		}
+
+		res, err = res.Next()
+		if err != nil {
+			return err
 		}
 	}
 	s.log.Debugf("Total events: %d", totalEvents)
@@ -299,7 +296,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 
 	query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.EventLogFile.Query, cursor)
 	if err != nil {
-		return fmt.Errorf("error forming based on cursor: %w", err)
+		return fmt.Errorf("error forming query based on cursor: %w", err)
 	}
 
 	res, err := s.soqlr.Query(query, false)
@@ -321,6 +318,9 @@ func (s *salesforceInput) RunEventLogFile() error {
 
 			s.clientSession.AuthorizationHeader(req)
 
+			// NOTE: X-PrettyPrint:1 is for formatted response and ideally we do
+			// not need it. But see:
+			// https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/dome_event_log_file_download.htm?q=X-PrettyPrint%3A1
 			req.Header.Add("X-PrettyPrint", "1")
 
 			resp, err := s.sfdcConfig.Client.Do(req)
@@ -340,13 +340,10 @@ func (s *salesforceInput) RunEventLogFile() error {
 				return err
 			}
 
-			if firstEvent {
-				if timstamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
+			if timstamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
+				if firstEvent {
 					s.cursor.EventLogFile.FirstEventTime = timstamp
 				}
-			}
-
-			if timstamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
 				s.cursor.EventLogFile.LastEventTime = timstamp
 			}
 
@@ -366,12 +363,12 @@ func (s *salesforceInput) RunEventLogFile() error {
 		}
 
 		if res.MoreRecords() {
-			res, err = res.Next()
-			if err != nil {
-				return err
-			}
-		} else {
 			break
+		}
+
+		res, err = res.Next()
+		if err != nil {
+			return err
 		}
 	}
 	s.log.Debugf("Total events: %d", totalEvents)
