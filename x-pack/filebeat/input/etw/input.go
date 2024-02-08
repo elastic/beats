@@ -289,7 +289,7 @@ func fillEventMetadata(session *etw.Session, cfg config) map[string]interface{} 
 
 // close stops the ETW session and logs the outcome.
 func (e *etwInput) Close() {
-	if err := e.etwSession.StopSession(); err != nil {
+	if err := e.operator.StopSession(e.etwSession); err != nil {
 		e.log.Error("failed to shutdown ETW session")
 	}
 	e.log.Info("successfully shutdown")

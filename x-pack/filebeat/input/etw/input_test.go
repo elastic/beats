@@ -202,6 +202,10 @@ func Test_RunEtwInput_StartConsumerError(t *testing.T) {
 	mockOperator.StartConsumerFunc = func(session *etw.Session) error {
 		return fmt.Errorf("mock error")
 	}
+	// Setup the mock behavior for StopSession
+	mockOperator.StopSessionFunc = func(session *etw.Session) error {
+		return nil
+	}
 
 	// Setup cancellation
 	ctx, cancelFunc := context.WithCancel(context.Background())
@@ -251,6 +255,10 @@ func Test_RunEtwInput_Success(t *testing.T) {
 	}
 	// Setup the mock behavior for StartConsumer
 	mockOperator.StartConsumerFunc = func(session *etw.Session) error {
+		return nil
+	}
+	// Setup the mock behavior for StopSession
+	mockOperator.StopSessionFunc = func(session *etw.Session) error {
 		return nil
 	}
 
