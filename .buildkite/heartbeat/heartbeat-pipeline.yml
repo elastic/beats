@@ -134,9 +134,16 @@ steps:
   - group: "Packaging"
     key: "packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-#    depends_on:
-#      - "mandatory-tests"
+    depends_on:
+      - "mandatory-tests"
 
     steps:
       - label: Package pipeline
         commands: ".buildkite/heartbeat/scripts/package-step.sh | buildkite-agent pipeline upload"
+
+      - label: "No changeset test"
+        command:
+          - "buildkite-agent annotate "No required files changed" --style 'warning' --context 'ctx-warning'"
+        notify:
+          - github_commit_status:
+              context: "Auditbeat/Packaging: Linux X86"
