@@ -810,6 +810,10 @@ func join(fields ...string) string {
 	return strings.Join(fields, ":")
 }
 
+// buildMetadataEnricher builds and returns a metadata enricher for a given metricset.
+// It appends the new enricher to the watcher.enrichers map for the given resource watcher.
+// It also updates the add, update and delete event handlers of the watcher in order to retrieve
+// the metadata of all enrichers associated to that watcher.
 func buildMetadataEnricher(
 	metricsetName string,
 	resourceName string,
