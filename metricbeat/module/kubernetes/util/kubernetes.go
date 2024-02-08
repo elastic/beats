@@ -282,7 +282,7 @@ func createWatcher(
 	return false, nil
 }
 
-// addToMetricsetsUsing adds metricset identified by metricsetUsing to the list of resources using the watcher
+// addToMetricsetsUsing adds metricset identified by metricsetUsing to the list of resources using the shared watcher
 // identified by resourceName
 func addToMetricsetsUsing(resourceName string, metricsetUsing string, resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
