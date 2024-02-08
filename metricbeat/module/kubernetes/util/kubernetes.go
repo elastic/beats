@@ -960,6 +960,8 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 	}
 }
 
+// Stop removes the enricher's metricset as a user of the associated watchers.
+// If no metricset is using the watchers anymore it stops them.
 func (e *enricher) Stop(resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
