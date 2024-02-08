@@ -146,3 +146,10 @@ steps:
         notify:
           - github_commit_status:
               context: "Auditbeat/Packaging: TEST"
+        env:
+          GO_AGENT_IMAGE: "golang:${GOLANG_VERSION}"
+          TERRAFORM_VERSION: "1.6.3"
+        agents:
+          image: "${GO_AGENT_IMAGE}"
+          cpu: "8"
+          memory: "4G"
