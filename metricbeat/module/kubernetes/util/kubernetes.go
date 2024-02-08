@@ -262,7 +262,7 @@ func createWatcher(
 	_, ok := resourceWatchers.watchersMap[resourceName]
 	// if it does not exist, create the watcher
 	if !ok {
-		// check if we need to add namespace to the options
+		// check if we need to add namespace to the watcher options
 		if isNamespaced(resourceName) {
 			options.Namespace = namespace
 		}
@@ -513,8 +513,8 @@ func NewResourceMetadataEnricher(
 		return &nilEnricher{}
 	}
 
-        // updateFunc to be used as the resource watcher's add and update handler.
-	// It is responsible of generating the metadata for a detected resource
+	// updateFunc to be used as the resource watcher's add and update handler.
+	// It is responsible for generating the metadata for a detected resource
 	updateFunc := func(r kubernetes.Resource) map[string]mapstr.M {
 		accessor, _ := meta.Accessor(r)
 		id := accessor.GetName()
@@ -571,7 +571,7 @@ func NewResourceMetadataEnricher(
 		}
 	}
 
-        // deleteFunc to be used as the resource watcher's delete handler
+	// deleteFunc to be used as the resource watcher's delete handler
 	// If a resource deletion is detected it returns the id of the resource
 	deleteFunc := func(r kubernetes.Resource) []string {
 		accessor, _ := meta.Accessor(r)
@@ -590,7 +590,7 @@ func NewResourceMetadataEnricher(
 		return []string{id}
 	}
 
-        // indexFunc retrieves the resource id from a given event
+	// indexFunc retrieves the resource id from a given event
 	indexFunc := func(e mapstr.M) string {
 		name := getString(e, "name")
 		namespace := getString(e, mb.ModuleDataKey+".namespace")
@@ -605,7 +605,7 @@ func NewResourceMetadataEnricher(
 		return id
 	}
 
-        // create a metadata enricher for this metricset
+	// create a metadata enricher for this metricset
 	enricher := buildMetadataEnricher(
 		metricsetName,
 		resourceName,
@@ -846,7 +846,7 @@ func buildMetadataEnricher(
 		// In that case, for each resource, call the updateFunc of the current enricher to
 		// update its metadata. This is needed in cases where the watcher has already been
 		// notified for new/updated resources while the enricher for current metricset has not
-		// built yet(example is pod, state_pod metricsets).
+		// built yet (example is pod, state_pod metricsets).
 		for key, _ := range watcher.metadataObjects {
 			obj, exists, err := watcher.watcher.Store().GetByKey(key)
 			if err != nil {
@@ -862,7 +862,7 @@ func buildMetadataEnricher(
 			}
 		}
 
-                // AddEventHandler sets add, update and delete methods of watcher.
+		// AddEventHandler sets add, update and delete methods of watcher.
 		// Those methods are triggered when an event is detected for a
 		// resource creation, update or deletion.
 		watcher.watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
@@ -870,7 +870,7 @@ func buildMetadataEnricher(
 				resourceWatchers.lock.Lock()
 				defer resourceWatchers.lock.Unlock()
 
-				// Add object to the list of metadata objects of this watcher
+				// Add object to the list of metadata objects of this watcher,
 				// so it can be used by enrichers created after the event is
 				// triggered
 				accessor, _ := meta.Accessor(obj.(kubernetes.Resource))
@@ -963,7 +963,7 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 		}
 	}
 
-        // Start the main watcher if not already started.
+	// Start the main watcher if not already started.
 	resourceWatcher := resourceWatchers.watchersMap[e.resourceName]
 	if resourceWatcher != nil && !resourceWatcher.started {
 		if err := resourceWatcher.watcher.Start(); err != nil {
