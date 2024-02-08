@@ -842,7 +842,11 @@ func buildMetadataEnricher(
 	if watcher != nil {
 		watcher.enrichers[metricsetName] = enricher
 
-		// Check if there are past events for this resource and update metadata if there are
+		// Check if this shared watcher has already detected resources from a previous enricher.
+		// In that case, for each resource, call the updateFunc of the current enricher to
+		// update its metadata. This is needed in cases where the watcher has already been
+		// notified for new/updated resources while the enricher for current metricset has not
+		// built yet(example is pod, state_pod metricsets).
 		for key, _ := range watcher.metadataObjects {
 			obj, exists, err := watcher.watcher.Store().GetByKey(key)
 			if err != nil {
