@@ -46,15 +46,12 @@ EOF
 else
   cat <<-EOF
     steps:
-      - label: ":ubuntu: Packaging Linux X86"
-        key: "package-linux-x86"
+      - label: "Skipping packaging"
+        key: "package-skip"
         command:
-          - "buildkite-agent annotate "No required files changed" --style 'warning' --context 'ctx-warning'"
+          - "buildkite-agent annotate "No required files changed. Skipped packaging" --style 'warning' --context 'ctx-warning'"
         notify:
           - github_commit_status:
-              context: "Auditbeat/Packaging: Linux X86"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+              context: "Filebeat/package-skip"
 EOF
 fi
