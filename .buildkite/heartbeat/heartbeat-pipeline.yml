@@ -136,3 +136,7 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
       - "mandatory-tests"
+
+    steps:
+      - label: Package pipeline
+        commands: ".buildkite/heartbeat/scripts/package-step.sh | buildkite-agent pipeline upload"
