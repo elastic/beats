@@ -304,7 +304,8 @@ func addToMetricsetsUsing(resourceName string, metricsetUsing string, resourceWa
 	}
 }
 
-// removeFromMetricsetsUsing returns true if element was removed and new size of array.
+// removeFromMetricsetsUsing removes the metricset from the list of resources using the shared watcher.
+// It returns true if element was removed and new size of array.
 // The cache should be locked when called.
 func removeFromMetricsetsUsing(resourceName string, notUsingName string, resourceWatchers *Watchers) (bool, int) {
 	data, ok := resourceWatchers.watchersMap[resourceName]
