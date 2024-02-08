@@ -858,6 +858,9 @@ func buildMetadataEnricher(
 			}
 		}
 
+                // AddEventHandler sets add, update and delete methods of watcher.
+		// Those methods are triggered when an event is detected for a
+		// resource creation, update or deletion.
 		watcher.watcher.AddEventHandler(kubernetes.ResourceEventHandlerFuncs{
 			AddFunc: func(obj interface{}) {
 				resourceWatchers.lock.Lock()
