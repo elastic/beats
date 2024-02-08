@@ -237,7 +237,9 @@ func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cf
 	if cfg.ProviderName != "" {
 		winlog["provider_name"] = cfg.ProviderName
 	}
-	if winlog["provider_guid"] == "" && etw.IsGUIDValid(session.GUID) {
+
+	zeroGUID := "{00000000-0000-0000-0000-000000000000}"
+	if winlog["provider_guid"] == zeroGUID {
 		winlog["provider_guid"] = session.GUID.String()
 	}
 

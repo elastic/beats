@@ -364,7 +364,7 @@ func Test_buildEvent(t *testing.T) {
 				"flags":         uint16(30),
 				"keywords":      uint64(40),
 				"level":         uint8(1),
-				"logfile":       "",
+				"logfile":       nil,
 				"opcode":        uint8(50),
 				"process_id":    uint32(60),
 				"provider_guid": "{12345678-1234-1234-1234-123456789ABC}",
@@ -391,7 +391,6 @@ func Test_buildEvent(t *testing.T) {
 				ThreadId:      80,
 				ProcessId:     60,
 				TimeStamp:     133516441890350000,
-				ProviderId:    windows.GUID{},
 				EventDescriptor: etw.EventDescriptor{
 					Id:      20,
 					Version: 90,
@@ -452,6 +451,17 @@ func Test_buildEvent(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			winlog := buildEvent(tt.data, tt.header, tt.session, tt.cfg)
 
+			// Parse the expected time string to time.Time
+			expectedTime, err := time.Parse(time.RFC3339, tt.expected["timestamp"].(string))
+			if err != nil {
+				t.Fatalf("Failed to parse expected time string: %v", err)
+			}
+
+			winlogTime := winlog["timestamp"].(time.Time)
+
+			// Convert the expected time to the same time zone before comparison
+			expectedTime = expectedTime.In(winlogTime.Location())
+
 			assert.Equal(t, tt.expected["activity_guid"], winlog["activity_guid"])
 			assert.Equal(t, tt.expected["channel"], winlog["channel"])
 			assert.Equal(t, tt.expected["event_data"], winlog["event_data"])
@@ -468,7 +478,7 @@ func Test_buildEvent(t *testing.T) {
 			assert.Equal(t, tt.expected["severity"], winlog["severity"])
 			assert.Equal(t, tt.expected["task"], winlog["task"])
 			assert.Equal(t, tt.expected["thread_id"], winlog["thread_id"])
-			assert.Equal(t, tt.expected["timestamp"], winlog["timestamp"])
+			assert.Equal(t, expectedTime, winlogTime)
 			assert.Equal(t, tt.expected["version"], winlog["version"])
 
 		})
