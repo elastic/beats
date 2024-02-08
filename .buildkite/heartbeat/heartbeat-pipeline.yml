@@ -20,7 +20,7 @@ steps:
           - ".buildkite/heartbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "heartbeat/Unit Tests {{matrix.image}}"
+              context: "heartbeat/ linux/Unit Tests"
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
@@ -38,7 +38,7 @@ steps:
           - ".buildkite/heartbeat/scripts/unit-tests-win.ps1"
         notify:
           - github_commit_status:
-              context: "heartbeat/windows/Unit Tests {{matrix.image}}"
+              context: "heartbeat/ windows/Unit Tests"
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
