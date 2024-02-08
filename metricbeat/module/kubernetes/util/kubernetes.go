@@ -986,6 +986,7 @@ func (e *enricher) Stop(resourceWatchers *Watchers) {
 	}
 }
 
+// Enrich enriches events with metadata saved in the enricher.metadata map
 func (e *enricher) Enrich(events []mapstr.M) {
 	e.RLock()
 	defer e.RUnlock()
