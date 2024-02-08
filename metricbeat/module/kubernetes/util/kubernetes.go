@@ -933,6 +933,7 @@ func buildMetadataEnricher(
 	return enricher
 }
 
+// Start starts all the watchers associated with a given enricher resource
 func (e *enricher) Start(resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
