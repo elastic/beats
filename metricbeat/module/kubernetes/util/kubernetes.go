@@ -478,6 +478,7 @@ func NewResourceMetadataEnricher(
 	}
 
 	// This type of config is needed for the metadata generator
+	// and includes detailed settings for metadata enrichment
 	commonMetaConfig := metadata.Config{}
 	if err := base.Module().UnpackConfig(&commonMetaConfig); err != nil {
 		log.Errorf("Error initializing Kubernetes metadata enricher: %s", err)
