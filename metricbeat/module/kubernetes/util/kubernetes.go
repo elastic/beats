@@ -458,6 +458,12 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 	return metaGen, fmt.Errorf("failed to create a metadata generator for resource %s", resourceName)
 }
 
+// NewResourceMetadataEnricher returns a metadata enricher for a given resource
+// For the metadata enrichment, resource watchers are used which are shared between
+// the different metricsets. For example for pod metricset, a pod watcher, a namespace and
+// node watcher are by default needed in addition to job and replicaset watcher according
+// to configuration. These watchers will be also used by other metricsets that require them
+// like state_pod, state_container, node etc.
 func NewResourceMetadataEnricher(
 	base mb.BaseMetricSet,
 	metricsRepo *MetricsRepo,
