@@ -357,6 +357,7 @@ func createAllWatchers(
 	addToMetricsetsUsing(resourceName, metricsetName, resourceWatchers)
 
 	// Create the extra watchers required by this resource
+	// For example pod requires also namespace and node watcher and possibly replicaset and job watcher.
 	extraWatchers := getExtraWatchers(resourceName, config.AddResourceMetadata)
 	for _, extra := range extraWatchers {
 		extraRes := getResource(extra)
