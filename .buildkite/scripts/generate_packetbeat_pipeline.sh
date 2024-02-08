@@ -87,7 +87,7 @@ steps:
 YAML
 else
   echo "The conditions don't match to requirements for generating pipeline steps."
-  exit 1
+  exit 0
 fi
 
 if are_conditions_met_arm_tests && are_conditions_met_macos_tests; then

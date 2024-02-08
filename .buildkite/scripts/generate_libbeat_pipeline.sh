@@ -63,7 +63,7 @@ steps:
 YAML
 else
   echo "The conditions don't match to requirements for generating pipeline steps."
-  exit 1
+  exit 0
 fi
 
 echo "Check and add the Extended Tests into the pipeline"
