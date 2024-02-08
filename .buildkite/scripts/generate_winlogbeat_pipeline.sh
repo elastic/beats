@@ -94,7 +94,7 @@ if are_conditions_met_packaging; then
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MASHINE_TYPE}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 
