@@ -571,6 +571,8 @@ func NewResourceMetadataEnricher(
 		}
 	}
 
+        // deleteFunc to be used as the resource watcher's delete handler
+	// If a resource deletion is detected it returns the id of the resource
 	deleteFunc := func(r kubernetes.Resource) []string {
 		accessor, _ := meta.Accessor(r)
 
