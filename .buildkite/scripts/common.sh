@@ -8,14 +8,14 @@ platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
-runLibbeat="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
-runMetricbeat="$(buildkite-agent meta-data get runMetricbeat --default ${runMetricbeat:-"false"})"
-runPacketbeat="$(buildkite-agent meta-data get runPacketbeat --default ${runPacketbeat:-"false"})"
-runWinlogbeat="$(buildkite-agent meta-data get runWinlogbeat --default ${runWinlogbeat:-"false"})"
-runLibBeatArmTest="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
-runPacketbeatArmTest="$(buildkite-agent meta-data get runPacketbeatArmTest --default ${runPacketbeatArmTest:-"false"})"
-runMetricbeatMacOsTests="$(buildkite-agent meta-data get runMetricbeatMacOsTests --default ${runMetricbeatMacOsTests:-"false"})"
-runPacketbeatMacOsTests="$(buildkite-agent meta-data get runPacketbeatMacOsTests --default ${runPacketbeatMacOsTests:-"false"})"
+[ -z "${runLibbeat+x}" ] && runLibbeat="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
+[ -z "${runMetricbeat+x}" ] && runMetricbeat="$(buildkite-agent meta-data get runMetricbeat --default ${runMetricbeat:-"false"})"
+[ -z "${runPacketbeat+x}" ] && runPacketbeat="$(buildkite-agent meta-data get runPacketbeat --default ${runPacketbeat:-"false"})"
+[ -z "${runWinlogbeat+x}" ] && runWinlogbeat="$(buildkite-agent meta-data get runWinlogbeat --default ${runWinlogbeat:-"false"})"
+[ -z "${runLibBeatArmTest+x}" ] && runLibBeatArmTest="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
+[ -z "${runPacketbeatArmTest+x}" ] && runPacketbeatArmTest="$(buildkite-agent meta-data get runPacketbeatArmTest --default ${runPacketbeatArmTest:-"false"})"
+[ -z "${runMetricbeatMacOsTests+x}" ] && runMetricbeatMacOsTests="$(buildkite-agent meta-data get runMetricbeatMacOsTests --default ${runMetricbeatMacOsTests:-"false"})"
+[ -z "${runPacketbeatMacOsTests+x}" ] && runPacketbeatMacOsTests="$(buildkite-agent meta-data get runPacketbeatMacOsTests --default ${runPacketbeatMacOsTests:-"false"})"
 
 metricbeat_changeset=(
   "^metricbeat/.*"
@@ -127,9 +127,9 @@ with_go() {
 
 checkLinuxType() {
   if [ "${platform_type}" == "Linux" ]; then
-    if grep -q 'ubuntu' /etc/*release; then
+    if grep -q 'ubuntu' /etc/os-release; then
       echo "ubuntu"
-    elif grep -q 'rhel' /etc/*release; then
+    elif grep -q 'rhel' /etc/os-release; then
       echo "rhel"
     else
       echo "Unsupported Linux"

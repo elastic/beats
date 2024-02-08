@@ -4,13 +4,13 @@ set -euo pipefail
 
 source .buildkite/env-scripts/util.sh
 
-changeset="^auditbeat/
+changeset="^heartbeat/
 ^go.mod
 ^pytest.ini
 ^dev-tools/
 ^libbeat/
 ^testing/
-^\.buildkite/auditbeat/"
+^\.buildkite/heartbeat/"
 
 if are_files_changed "$changeset"; then
   cat <<-YAML
@@ -20,10 +20,10 @@ if are_files_changed "$changeset"; then
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         command:
-          - ".buildkite/auditbeat/scripts/package.sh"
+          - ".buildkite/heartbeat/scripts/package.sh"
         notify:
           - github_commit_status:
-              context: "Auditbeat/Packaging: Linux X86"
+              context: "heartbeat/Packaging: Linux X86"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -34,10 +34,10 @@ if are_files_changed "$changeset"; then
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
         command:
-          - ".buildkite/auditbeat/scripts/package.sh"
+          - ".buildkite/heartbeat/scripts/package.sh"
         notify:
           - github_commit_status:
-              context: "Auditbeat/Packaging: ARM"
+              context: "heartbeat/Packaging: ARM"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
