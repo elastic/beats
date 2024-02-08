@@ -47,16 +47,16 @@ type redact struct {
 }
 
 type authConfig struct {
-	// Api-Key to use for authentication.
-	ApiKey *apiKeyConfig `config:"api_key"`
+	// Custom auth config to use for authentication.
+	CustomAuth *customAuthConfig `config:"custom"`
 	// Baerer token to use for authentication.
 	BearerToken string `config:"bearer_token"`
 	// Basic auth token to use for authentication.
 	BasicToken string `config:"basic_token"`
 }
 
-type apiKeyConfig struct {
-	// Api-Key to use for authentication.
+type customAuthConfig struct {
+	// Custom auth config to use for authentication.
 	Header string `config:"header"`
 	Value  string `config:"value"`
 }

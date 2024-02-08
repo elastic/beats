@@ -15,7 +15,7 @@ This input supports:
 * Auth
 ** Basic
 ** Bearer 
-** API Key
+** Custom
 
 NOTE: The `websocket` input as of now does not support XML messages. Auto-reconnects are also not supported at the moment so reconnection will occur on input restart.
 
@@ -24,7 +24,7 @@ NOTE: The `websocket` input as of now does not support XML messages. Auto-reconn
 The execution environment provided for the input includes includes the functions, macros, and global variables provided by the mito library.
 A single JSON object is provided as an input accessible through a `state` variable. `state` contains a `response` map field and may contain arbitrary other fields configured via the input's `state` configuration. If the CEL program saves cursor states between executions of the program, the configured `state.cursor` value will be replaced by the saved cursor prior to execution.
 
-On start the `state` is will be something like this:
+On start the `state` will be something like this:
 
 ["source","json",subs="attributes"]
 ----
@@ -85,7 +85,7 @@ The Websocket input will log the complete state after evaluation when logging at
 This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object. See <<websocket-state-redact,`redact`>> configuration parameters for settings to exclude sensitive fields from DEBUG logs.
 
 ==== Authentication
-The Websocket input supports authentication via Basic token authentication, Bearer token authentication and authentication via Api-Key. Unlike REST inputs Basic Authentication contains a basic auth token, Bearer Authentication contains a bearer token and Api-Key contains an api key. These token/key values are are added to the request headers and are not exposed to the `state` object. For the Api-Key authentication, the header and value are both configurable since different servers might have different api-key header conventions.
+The Websocket input supports authentication via Basic token authentication, Bearer token authentication and authentication via a custom auth config. Unlike REST inputs Basic Authentication contains a basic auth token, Bearer Authentication contains a bearer token and custom auth contains any combination of custom header and value. These token/key values are are added to the request headers and are not exposed to the `state` object. The custom auth configuration is useful for constructing requests that require custom headers and values for authentication. The basic and bearer token configurations will always use the `Authorization` header and prepend the token with `Basic` or `Bearer` respectively.
 
 Example configurations with authentication:
 
@@ -109,9 +109,19 @@ filebeat.inputs:
 ----
 filebeat.inputs:
 - type: websocket
-  auth.api_key:
+  auth.custom:
     header: "x-api-key"
     value: "dXNlcjpwYXNzd29yZA=="   
+  resource.url: wss://localhost:443/_stream
+----
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: websocket
+  auth.custom:
+    header: "Auth"
+    value: "Bearer dXNlcjpwYXNzd29yZA=="   
   resource.url: wss://localhost:443/_stream
 ----
 

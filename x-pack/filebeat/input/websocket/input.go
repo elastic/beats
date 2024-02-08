@@ -100,7 +100,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// websocket client
 	headers := formHeader(cfg)
 	url := cfg.Resource.URL.String()
-	c, resp, err := websocket.DefaultDialer.Dial(url, headers)
+	c, resp, err := websocket.DefaultDialer.DialContext(ctx, url, headers)
 	if resp != nil && resp.Body != nil {
 		log.Debugw("websocket connection response", "body", resp.Body)
 		resp.Body.Close()
@@ -367,8 +367,8 @@ func errorMessage(msg string) map[string]interface{} {
 func formHeader(cfg config) map[string][]string {
 	header := make(map[string][]string)
 	switch {
-	case cfg.Auth.ApiKey != nil:
-		header[cfg.Auth.ApiKey.Header] = []string{cfg.Auth.ApiKey.Value}
+	case cfg.Auth.CustomAuth != nil:
+		header[cfg.Auth.CustomAuth.Header] = []string{cfg.Auth.CustomAuth.Value}
 	case cfg.Auth.BearerToken != "":
 		header["Authorization"] = []string{"Bearer " + cfg.Auth.BearerToken}
 	case cfg.Auth.BasicToken != "":

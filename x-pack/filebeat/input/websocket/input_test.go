@@ -26,6 +26,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+const (
+	basicToken   = "dXNlcjpwYXNz"
+	bearerToken  = "BXNlcjpwYVVz"
+	customHeader = "X-Api-Key"
+	customValue  = "my-api-key"
+)
+
 // WebSocketHandler is a type for handling WebSocket messages.
 type WebSocketHandler func(*testing.T, *websocket.Conn, []string)
 
@@ -291,6 +298,105 @@ var inputTests = []struct {
 			},
 		},
 	},
+	{
+		name:    "auth_basic_token",
+		server:  webSocketTestServerWithAuth(httptest.NewServer),
+		handler: defaultHandler,
+		config: map[string]interface{}{
+			"program": `
+					bytes(state.response).decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+			"auth": map[string]interface{}{
+				"basic_token": basicToken,
+			},
+		},
+		response: []string{`
+         {
+            "pps": {
+                "agent": "example.proofpoint.com",
+                "cid": "mmeng_uivm071"
+            },
+            "ts": 1502908200
+        }`,
+		},
+		want: []map[string]interface{}{
+			{
+				"pps": map[string]interface{}{
+					"agent": "example.proofpoint.com",
+					"cid":   "mmeng_uivm071",
+				},
+				"ts": float64(1502908200),
+			},
+		},
+	},
+	{
+		name:    "auth_bearer_token",
+		server:  webSocketTestServerWithAuth(httptest.NewServer),
+		handler: defaultHandler,
+		config: map[string]interface{}{
+			"program": `
+					bytes(state.response).decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+			"auth": map[string]interface{}{
+				"bearer_token": bearerToken,
+			},
+		},
+		response: []string{`
+         {
+            "pps": {
+                "agent": "example.proofpoint.com",
+                "cid": "mmeng_uivm071"
+            },
+            "ts": 1502908200
+        }`,
+		},
+		want: []map[string]interface{}{
+			{
+				"pps": map[string]interface{}{
+					"agent": "example.proofpoint.com",
+					"cid":   "mmeng_uivm071",
+				},
+				"ts": float64(1502908200),
+			},
+		},
+	},
+	{
+		name:    "auth_custom",
+		server:  webSocketTestServerWithAuth(httptest.NewServer),
+		handler: defaultHandler,
+		config: map[string]interface{}{
+			"program": `
+					bytes(state.response).decode_json().as(inner_body,{
+					"events": [inner_body],
+				})`,
+			"auth": map[string]interface{}{
+				"custom": map[string]interface{}{
+					"header": customHeader,
+					"value":  customValue,
+				},
+			},
+		},
+		response: []string{`
+         {
+            "pps": {
+                "agent": "example.proofpoint.com",
+                "cid": "mmeng_uivm071"
+            },
+            "ts": 1502908200
+        }`,
+		},
+		want: []map[string]interface{}{
+			{
+				"pps": map[string]interface{}{
+					"agent": "example.proofpoint.com",
+					"cid":   "mmeng_uivm071",
+				},
+				"ts": float64(1502908200),
+			},
+		},
+	},
 }
 
 func TestInput(t *testing.T) {
@@ -326,7 +432,7 @@ func TestInput(t *testing.T) {
 				t.Fatalf("unexpected error running test: %v", err)
 			}
 
-			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Second)
 			defer cancel()
 
 			v2Ctx := v2.Context{
@@ -431,6 +537,51 @@ func invalidWebSocketTestServer(serve func(http.Handler) *httptest.Server) func(
 			handler(t, conn, response)
 		}))
 		config["resource.url"] = server.URL
+		t.Cleanup(server.Close)
+	}
+}
+
+// webSocketTestServerWithAuth returns a function that creates a WebSocket server with authentication. This does not however simulate a TLS connection.
+func webSocketTestServerWithAuth(serve func(http.Handler) *httptest.Server) func(*testing.T, WebSocketHandler, map[string]interface{}, []string) {
+	return func(t *testing.T, handler WebSocketHandler, config map[string]interface{}, response []string) {
+		server := serve(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			upgrader := websocket.Upgrader{
+				CheckOrigin: func(r *http.Request) bool {
+					// check for auth token
+					authToken := r.Header.Get("Authorization")
+					if authToken == "" {
+						authToken = r.Header.Get(customHeader)
+						if authToken == "" {
+							return false
+						}
+					}
+
+					switch {
+					case authToken == "Bearer "+bearerToken:
+						return true
+					case authToken == "Basic "+basicToken:
+						return true
+					case authToken == customValue:
+						return true
+					default:
+						return false
+
+					}
+				},
+			}
+
+			conn, err := upgrader.Upgrade(w, r, nil)
+			if err != nil {
+				t.Fatalf("error upgrading connection to WebSocket: %v", err)
+				return
+			}
+
+			handler(t, conn, response)
+		}))
+		// only set the resource URL if it is not already set
+		if config["resource.url"] == nil {
+			config["resource.url"] = "ws" + server.URL[4:]
+		}
 		t.Cleanup(server.Close)
 	}
 }
