@@ -53,8 +53,8 @@ else
         notify:
           - github_commit_status:
               context: "Auditbeat/Packaging: Linux X86"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+#        agents:
+#          provider: "gcp"
+#          image: "${IMAGE_UBUNTU_X86_64}"
 EOF
 fi
