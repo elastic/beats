@@ -10,7 +10,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Upgrade to Go 1.21.6. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}37615[37615]
+- Upgrade to Go 1.21.7. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}37913[37913]
 - add_cloud_metadata processor: `huawei` provider is now treated as `openstack`. Huawei cloud runs on OpenStack
 platform, and when viewed from a metadata API standpoint, it is impossible to differentiate it from OpenStack. If you
 know that your deployments run on Huawei Cloud exclusively, and you wish to have `cloud.provider` value as `huawei`,
@@ -89,6 +89,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - Fix m365_defender cursor value and query building. {pull}37116[37116]
 - Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
 - Update github.com/lestrrat-go/jwx dependency. {pull}37799[37799]
+- [threatintel] MISP pagination fixes {pull}37898[37898]
 
 *Heartbeat*
 
@@ -180,6 +181,8 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Libbeat*
 - Add watcher that can be used to monitor Linux kernel events. {pull}37833[37833]
+
+- Added support for ETW reader. {pull}36914[36914]
 
 *Heartbeat*
 - Added status to monitor run log report.
