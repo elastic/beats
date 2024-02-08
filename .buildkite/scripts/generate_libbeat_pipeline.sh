@@ -30,7 +30,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MASHINE_TYPE}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":python: Python Integration Tests"
@@ -39,7 +39,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MASHINE_TYPE}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":negative_squared_cross_mark: Cross compile"
@@ -48,7 +48,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MASHINE_TYPE}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths: " ${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":testengine: Stress Tests"
