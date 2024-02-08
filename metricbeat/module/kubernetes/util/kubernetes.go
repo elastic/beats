@@ -864,6 +864,8 @@ func buildMetadataEnricher(
 				defer resourceWatchers.lock.Unlock()
 
 				// Add object to the list of metadata objects of this watcher
+				// so it can be used by enrichers created after the event is
+				// triggered
 				accessor, _ := meta.Accessor(obj.(kubernetes.Resource))
 				id := accessor.GetName()
 				namespace := accessor.GetNamespace()
