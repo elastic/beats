@@ -380,7 +380,7 @@ func createAllWatchers(
 	return nil
 }
 
-// createMetadataGen creates the metadata generator for resources in general
+// createMetadataGen creates the metadata generator for resources other than pod and service
 func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
 	resourceName string, resourceWatchers *Watchers) (*metadata.Resource, error) {
 
