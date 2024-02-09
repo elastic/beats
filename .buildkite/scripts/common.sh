@@ -236,22 +236,23 @@ are_changed_only_paths() {
 
 are_conditions_met_mandatory_tests() {
   if are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
-      if are_paths_changed "${metricbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" || "${GITHUB_PR_LABELS}" =~ Metricbeat || "${runMetricbeat}" == "true" ]]; then
-        return 0
-      fi
-    elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" ]]; then
-      if are_paths_changed "${libbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test libbeat" || "${GITHUB_PR_LABELS}" =~ libbeat || "${runLibbeat}" == "true" ]]; then
-        return 0
-      fi
-    elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
-      if are_paths_changed "${packetbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat" || "${GITHUB_PR_LABELS}" =~ Packetbeat || "${runPacketbeat}" == "true" ]]; then
-        return 0
-      fi
-    elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" ]]; then
-      if are_paths_changed "${winlogbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test winlogbeat" || "${GITHUB_PR_LABELS}" =~ Winlogbeat || "${runWinlogbeat}" == "true" ]]; then
-        return 0
-      fi
+    return 0
+  fi
+  if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
+    if are_paths_changed "${metricbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" || "${GITHUB_PR_LABELS}" =~ Metricbeat || "${runMetricbeat}" == "true" ]]; then
+      return 0
+    fi
+  elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" ]]; then
+    if are_paths_changed "${libbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test libbeat" || "${GITHUB_PR_LABELS}" =~ libbeat || "${runLibbeat}" == "true" ]]; then
+      return 0
+    fi
+  elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
+    if are_paths_changed "${packetbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat" || "${GITHUB_PR_LABELS}" =~ Packetbeat || "${runPacketbeat}" == "true" ]]; then
+      return 0
+    fi
+  elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" ]]; then
+    if are_paths_changed "${winlogbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test winlogbeat" || "${GITHUB_PR_LABELS}" =~ Winlogbeat || "${runWinlogbeat}" == "true" ]]; then
+      return 0
     fi
   fi
   return 1

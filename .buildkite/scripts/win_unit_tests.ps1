@@ -21,10 +21,6 @@ function withGolang($version) {
     $goBinPath = "${env:ProgramFiles}\Go\bin"
     $env:Path += ";$goBinPath"
     go version
-    # Write-Host "-- Install golang $version --"
-    # choco install -y golang --version=$version
-    # refreshenv
-    # go version
 }
 function withPython($version) {
     Write-Host "-- Install Python $version --"
