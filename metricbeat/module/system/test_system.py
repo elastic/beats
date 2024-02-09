@@ -281,7 +281,6 @@ class Test(metricbeat.BaseTest):
                     self.assertCountEqual(
                         SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
-<<<<<<< HEAD
     @ unittest.skipUnless(re.match("(?i)linux", sys.platform), "os")
     def test_diskio_linux(self):
         """
@@ -311,10 +310,7 @@ class Test(metricbeat.BaseTest):
                 self.assertCountEqual(
                     SYSTEM_DISK_HOST_FIELDS, host_disk.keys())
 
-    @ unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
-=======
     @unittest.skipUnless(re.match("(?i)win|linux|freebsd|openbsd", sys.platform), "os")
->>>>>>> 3bf2a825e9 (temporary desable filesystem check for MacOS unit-tests (#37687))
     def test_filesystem(self):
         """
         Test system/filesystem output.
