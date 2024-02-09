@@ -27,7 +27,6 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - Convert netflow input to API v2 and disable event normalisation {pull}37901[37901]
 
 
-
 *Heartbeat*
 
 *Metricbeat*
