@@ -6,6 +6,7 @@ package netflow
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net"
 	"sync"
@@ -23,6 +24,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -176,7 +178,7 @@ func (n *netflowInput) Run(context v2.Context, connector beat.PipelineConnector)
 	}
 
 	if aliveInputs.Inc() == 1 && n.logger.IsDebug() {
-		go n.statsLoop(context.Cancelation.Done())
+		go n.statsLoop(ctxtool.FromCanceller(context.Cancelation))
 	}
 	defer aliveInputs.Dec()
 
@@ -257,7 +259,7 @@ func (n *netflowInput) stop() {
 	n.started = false
 }
 
-func (n *netflowInput) statsLoop(done <-chan struct{}) {
+func (n *netflowInput) statsLoop(ctx context.Context) {
 	prevPackets := numPackets.Get()
 	prevFlows := numFlows.Get()
 	prevDropped := numDropped.Get()
@@ -289,7 +291,7 @@ func (n *netflowInput) statsLoop(done <-chan struct{}) {
 				return
 			}
 
-		case <-done:
+		case <-ctx.Done():
 			return
 		}
 	}
