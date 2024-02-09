@@ -158,7 +158,7 @@ func (r kProbesReader) nextEvent(done <-chan struct{}) *Event {
 
 		case err := <-r.watcher.ErrorChannel():
 			if err != nil {
-				r.log.Warnw("kprobes watcher error", "error", err)
+				r.log.Errorw("kprobes watcher error", "error", err)
 			}
 		}
 	}
