@@ -169,10 +169,10 @@ func (n *netflowInput) Run(context v2.Context, connector beat.PipelineConnector)
 
 	n.queueC = make(chan packet, n.queueSize)
 
-	n.logger.Info("Starting udp")
+	n.logger.Info("Starting udp server")
 	err = n.udp.Start()
 	if err != nil {
-		n.logger.Errorf("Failed to start udp: %v", err)
+		n.logger.Errorf("Failed to start udp server: %v", err)
 		n.stop()
 		return err
 	}
