@@ -42,8 +42,6 @@ batch size will be the smaller of `bulk_max_size` and `flush.min_events`.
 batch size with `bulk_max_size`. As of 8.13, there is never a performance advantage to
 limiting batch size with `flush.min_events` instead of `bulk_max_size`.
 
-==== Synchronous mode
-
 In synchronous mode, an event request is always filled as soon as events are available,
 even if there are not enough events to fill the requested batch. This is useful when
 latency must be minimized. To use synchronous mode, set `flush.timeout` to 0.
@@ -51,14 +49,10 @@ latency must be minimized. To use synchronous mode, set `flush.timeout` to 0.
 For backwards compatibility, synchronous mode can also be activated by setting `flush.min_events`
 to 0 or 1. In this case, batch size will be capped at 1/2 the queue capacity.
 
-==== Asynchronous (buffered) mode
-
 In asynchronous mode, an event request will wait up to the specified timeout to try
 and fill the requested batch completely. If the timeout expires, the queue returns a
 partial batch with all available events. To use asynchronous mode, set `flush.timeout`
 to a positive duration, e.g. `5s`.
-
-==== Example
 
 This sample configuration forwards events to the output when there are enough events
 to fill the output's request (usually controlled by `bulk_max_size`, and limited to at
