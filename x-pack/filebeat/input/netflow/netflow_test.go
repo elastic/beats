@@ -87,8 +87,7 @@ func TestNetFlow(t *testing.T) {
 
 		t.Run(testName, func(t *testing.T) {
 
-			configMap := conf.MustNewConfigFrom(mapstr.M{})
-			pluginCfg, err := conf.NewConfigFrom(configMap)
+			pluginCfg, err := conf.NewConfigFrom(mapstr.M{})
 			require.NoError(t, err)
 
 			netflowPlugin, err := Plugin(logp.NewLogger("netflow_test")).Manager.Create(pluginCfg)

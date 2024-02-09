@@ -19,12 +19,11 @@ import (
 )
 
 func TestNewInputDone(t *testing.T) {
-	configMap := conf.MustNewConfigFrom(mapstr.M{})
 
 	goroutines := resources.NewGoroutinesChecker()
 	defer goroutines.Check(t)
 
-	config, err := conf.NewConfigFrom(configMap)
+	config, err := conf.NewConfigFrom(mapstr.M{})
 	require.NoError(t, err)
 
 	_, err = Plugin(logp.NewLogger("netflow_test")).Manager.Create(config)
