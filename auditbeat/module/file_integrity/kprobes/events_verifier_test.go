@@ -21,7 +21,6 @@ package kprobes
 
 import (
 	"os"
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -176,9 +175,6 @@ func Test_EventsVerifier(t *testing.T) {
 }
 
 func Test_EventsVerifier_GenerateEvents(t *testing.T) {
-	if runtime.GOOS != "linux" {
-		t.Skip("skipping on non-linux")
-	}
 
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	require.NoError(t, err)

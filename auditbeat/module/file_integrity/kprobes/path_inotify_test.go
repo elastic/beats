@@ -22,7 +22,6 @@ package kprobes
 import (
 	"os"
 	"path/filepath"
-	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -30,9 +29,6 @@ import (
 )
 
 func Test_InotifyWatcher(t *testing.T) {
-	if runtime.GOOS != "linux" {
-		t.Skip("skipping on non-linux")
-	}
 
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	require.NoError(t, err)
@@ -68,9 +64,6 @@ func Test_InotifyWatcher(t *testing.T) {
 }
 
 func Test_InotifyWatcher_Add_Err(t *testing.T) {
-	if runtime.GOOS != "linux" {
-		t.Skip("skipping on non-linux")
-	}
 
 	watcher, err := newInotifyWatcher()
 	require.NoError(t, err)
@@ -89,9 +82,6 @@ func Test_InotifyWatcher_Add_Err(t *testing.T) {
 }
 
 func Test_InotifyWatcher_Close_Err(t *testing.T) {
-	if runtime.GOOS != "linux" {
-		t.Skip("skipping on non-linux")
-	}
 
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	require.NoError(t, err)

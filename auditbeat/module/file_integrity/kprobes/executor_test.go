@@ -22,7 +22,6 @@ package kprobes
 import (
 	"context"
 	"errors"
-	"runtime"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -32,10 +31,6 @@ import (
 )
 
 func Test_executor(t *testing.T) {
-
-	if runtime.GOOS != "linux" {
-		t.Skip("skipping on non-linux")
-	}
 
 	// parent context is cancelled at creation
 	ctx, cancel := context.WithCancel(context.Background())

@@ -476,11 +476,6 @@ func (p *monitorTestSuite) TestNew() {
 		return
 	}
 
-	if runtime.GOOS != "linux" {
-		p.T().Skip("skipping on non-linux")
-		return
-	}
-
 	if os.Getuid() != 0 {
 		p.T().Skip("skipping as non-root")
 		return
@@ -610,11 +605,6 @@ func downloadKernel(filepath string) error {
 func BenchmarkMonitor(b *testing.B) {
 	if runtime.GOARCH != "amd64" && runtime.GOARCH != "arm64" {
 		b.Skip("skipping on non-amd64/arm64")
-		return
-	}
-
-	if runtime.GOOS != "linux" {
-		b.Skip("skipping on non-linux")
 		return
 	}
 
