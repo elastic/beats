@@ -213,9 +213,7 @@ func getAllMountPoints() (mountPoints, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer func() {
-		_ = file.Close()
-	}()
+	defer file.Close()
 	return readMountInfo(file)
 }
 

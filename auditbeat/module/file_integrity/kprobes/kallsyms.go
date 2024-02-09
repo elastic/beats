@@ -44,9 +44,7 @@ func getSymbolInfoRuntime(symbolName string) (runtimeSymbolInfo, error) {
 		return runtimeSymbolInfo{}, err
 	}
 
-	defer func() {
-		_ = kAllSymsFile.Close()
-	}()
+	defer kAllSymsFile.Close()
 
 	return getSymbolInfoFromReader(kAllSymsFile, symbolName)
 }

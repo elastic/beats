@@ -91,9 +91,7 @@ func (p *pathTestSuite) TestRecursiveWalkAsync() {
 	createdPathsWithDepth := make(map[string]uint32)
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	p.Require().NoError(err)
-	defer func() {
-		_ = os.RemoveAll(tmpDir)
-	}()
+	defer os.RemoveAll(tmpDir)
 	createdPathsWithDepth[tmpDir] = 1
 	createdPathsOrder = append(createdPathsOrder, tmpDir)
 
@@ -195,9 +193,7 @@ func (p *pathTestSuite) TestWalkAsyncTimeoutErr() {
 
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	p.Require().NoError(err)
-	defer func() {
-		_ = os.RemoveAll(tmpDir)
-	}()
+	defer os.RemoveAll(tmpDir)
 
 	ctx := context.Background()
 	pTrav, err := newPathMonitor(ctx, newFixedThreadExecutor(ctx), 0, true)
@@ -222,9 +218,8 @@ func (p *pathTestSuite) TestNonRecursiveWalkAsync() {
 	createdPathsWithDepth := make(map[string]uint32)
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	p.Require().NoError(err)
-	defer func() {
-		_ = os.RemoveAll(tmpDir)
-	}()
+	defer os.RemoveAll(tmpDir)
+
 	createdPathsWithDepth[tmpDir] = 1
 	createdPathsOrder = append(createdPathsOrder, tmpDir)
 
@@ -319,9 +314,7 @@ func (p *pathTestSuite) TestNonRecursiveWalkAsync() {
 func (p *pathTestSuite) TestAddTraverserContextCancel() {
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	p.Require().NoError(err)
-	defer func() {
-		_ = os.RemoveAll(tmpDir)
-	}()
+	defer os.RemoveAll(tmpDir)
 
 	ctx := context.Background()
 	pTrav, err := newPathMonitor(ctx, newFixedThreadExecutor(ctx), 10*time.Second, true)
@@ -363,9 +356,7 @@ func (p *pathTestSuite) TestAddTraverserContextCancel() {
 func (p *pathTestSuite) TestAddTimeout() {
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	p.Require().NoError(err)
-	defer func() {
-		_ = os.RemoveAll(tmpDir)
-	}()
+	defer os.RemoveAll(tmpDir)
 
 	ctx := context.Background()
 	pTrav, err := newPathMonitor(ctx, newFixedThreadExecutor(ctx), 5*time.Second, true)
@@ -399,9 +390,8 @@ func (p *pathTestSuite) TestRecursiveAdd() {
 	createdPathsWithDepth := make(map[string]uint32)
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	p.Require().NoError(err)
-	defer func() {
-		_ = os.RemoveAll(tmpDir)
-	}()
+	defer os.RemoveAll(tmpDir)
+
 	createdPathsWithDepth[tmpDir] = 0
 	createdPathsOrder = append(createdPathsOrder, tmpDir)
 
@@ -509,9 +499,8 @@ func (p *pathTestSuite) TestNonRecursiveAdd() {
 	createdPathsWithDepth := make(map[string]uint32)
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	p.Require().NoError(err)
-	defer func() {
-		_ = os.RemoveAll(tmpDir)
-	}()
+	defer os.RemoveAll(tmpDir)
+
 	createdPathsWithDepth[tmpDir] = 0
 	createdPathsOrder = append(createdPathsOrder, tmpDir)
 
@@ -635,9 +624,7 @@ func (p *pathTestSuite) TestStatErrAtWalk() {
 
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	p.Require().NoError(err)
-	defer func() {
-		_ = os.RemoveAll(tmpDir)
-	}()
+	defer os.RemoveAll(tmpDir)
 
 	testDir := filepath.Join(tmpDir, "test_dir")
 	err = os.Mkdir(testDir, 0o744)

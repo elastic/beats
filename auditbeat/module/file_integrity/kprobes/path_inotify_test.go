@@ -36,9 +36,7 @@ func Test_InotifyWatcher(t *testing.T) {
 
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	require.NoError(t, err)
-	defer func() {
-		_ = os.RemoveAll(tmpDir)
-	}()
+	defer os.RemoveAll(tmpDir)
 
 	watcher, err := newInotifyWatcher()
 	require.NoError(t, err)
@@ -57,9 +55,8 @@ func Test_InotifyWatcher(t *testing.T) {
 
 	tmpDir2, err := os.MkdirTemp("", "kprobe_unit_test")
 	require.NoError(t, err)
-	defer func() {
-		_ = os.RemoveAll(tmpDir2)
-	}()
+	defer os.RemoveAll(tmpDir2)
+
 	added, err = watcher.Add(2, 2, tmpDir2)
 	require.NoError(t, err)
 	require.True(t, added)
@@ -98,9 +95,7 @@ func Test_InotifyWatcher_Close_Err(t *testing.T) {
 
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	require.NoError(t, err)
-	defer func() {
-		_ = os.RemoveAll(tmpDir)
-	}()
+	defer os.RemoveAll(tmpDir)
 
 	watcher, err := newInotifyWatcher()
 	require.NoError(t, err)

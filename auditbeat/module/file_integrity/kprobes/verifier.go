@@ -141,9 +141,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 		return err
 	}
 
-	defer func() {
-		_ = os.RemoveAll(basePath)
-	}()
+	defer os.RemoveAll(basePath)
 
 	verifier, err := newEventsVerifier(basePath)
 	if err != nil {
@@ -160,9 +158,7 @@ func verify(ctx context.Context, exec executor, probes map[tracing.Probe]tracing
 		return err
 	}
 
-	defer func() {
-		_ = m.Close()
-	}()
+	defer m.Close()
 
 	// start the monitor
 	if err := m.Start(); err != nil {
