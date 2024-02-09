@@ -26,6 +26,9 @@ import (
 type dEntriesIndex map[dKey]*dEntry
 type dEntriesMoveIndex map[uint64]*dEntry
 
+// dEntryCache is a cache of directory entries (dEntries) that exposes appropriate methods to add, get, remove and
+// handle move operations. Note that dEntryCache is designed to be utilised by a single goroutine at a time and thus
+// is not thread safe.
 type dEntryCache struct {
 	index     dEntriesIndex
 	moveCache dEntriesMoveIndex
