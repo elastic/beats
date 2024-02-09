@@ -137,4 +137,4 @@ steps:
 
     steps:
       - label: Package pipeline
-        commands: ".buildkite/filebeat/scripts/package-step.sh | buildkite-agent pipeline upload"
+        commands: ".buildkite/filebeat/scripts/package-step.sh"
