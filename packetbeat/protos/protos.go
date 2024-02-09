@@ -174,13 +174,15 @@ func (s ProtocolsStruct) configureProtocol(test bool, device string, pub reporte
 	if device != "" {
 		// This could happen earlier, but let any errors be found first.
 		var protocol struct {
-			Device string `config:"interface"`
+			Interface struct {
+				Device string `config:"device"`
+			} `config:"interface"`
 		}
 		err := config.Unpack(&protocol)
 		if err != nil {
 			return err
 		}
-		if protocol.Device != "" && protocol.Device != device {
+		if protocol.Interface.Device != "" && protocol.Interface.Device != device {
 			return nil
 		}
 	}
