@@ -105,20 +105,8 @@ func TestNetFlow(t *testing.T) {
 
 			defer cancelFn()
 
-			clientSeenTries := 0
-			for clientSeenTries < 5 {
-				if len(mockPipeline.GetConnectedClients()) > 0 {
-					break
-				}
-				time.Sleep(1 * time.Second)
-				clientSeenTries++
-				continue
-			}
-
-			if clientSeenTries == 5 {
-				t.Fatal("client did not connect to pipeline")
-				return
-			}
+			require.Eventually(t, mockPipeline.HasConnectedClients, 5*time.Second, 100*time.Millisecond,
+				"client connects to pipeline")
 
 			udpAddr, err := net.ResolveUDPAddr("udp", defaultConfig.Config.Host)
 			require.NoError(t, err)
@@ -144,20 +132,10 @@ func TestNetFlow(t *testing.T) {
 				totalPackets++
 			}
 
-			publishedEventsTries := 0
-			for publishedEventsTries < 10 {
-				if len(mockPipeline.GetAllEvents()) == len(goldenData.Flows) {
-					break
-				}
-				time.Sleep(1 * time.Second)
-				publishedEventsTries++
-				continue
-			}
-
-			if publishedEventsTries == 10 {
-				t.Fatal("did not see expected events published in pipeline")
-				return
-			}
+			require.Eventually(t, func() bool {
+				return len(mockPipeline.GetAllEvents()) == len(goldenData.Flows)
+			}, 5*time.Second, 100*time.Millisecond,
+				"see all expected events in pipeline")
 
 			for _, event := range goldenData.Flows {
 				// fields that cannot be matched at runtime
