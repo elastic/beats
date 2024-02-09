@@ -20,7 +20,7 @@ steps:
           - ".buildkite/auditbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "auditbeat: Unit Tests"
+              context: "Auditbeat: linux/Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -33,7 +33,7 @@ steps:
           - ".buildkite/auditbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "auditbeat: Unit Tests"
+              context: "Auditbeat: rhel/Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -45,7 +45,7 @@ steps:
         command: ".buildkite/auditbeat/scripts/unit-tests-win.ps1"
         notify:
           - github_commit_status:
-              context: "auditbeat: Unit Tests"
+              context: "Auditbeat: windows/Unit Tests"
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
@@ -68,7 +68,7 @@ steps:
           GOX_FLAGS: "-arch amd64"
         notify:
           - github_commit_status:
-              context: "auditbeat: Unit Tests"
+              context: "Auditbeat: Crosscompile"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -85,7 +85,7 @@ steps:
           - ".buildkite/auditbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "auditbeat/Extended: Unit Tests ARM"
+              context: "Auditbeat/Extended: Unit Tests ARM"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
@@ -99,7 +99,7 @@ steps:
           - ".buildkite/auditbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "auditbeat/Extended: MacOS Unit Tests"
+              context: "Auditbeat/Extended: MacOS Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -115,7 +115,7 @@ steps:
         command: ".buildkite/auditbeat/scripts/unit-tests-win.ps1"
         notify:
           - github_commit_status:
-              context: "auditbeat/Extended: Win-2019 Unit Tests"
+              context: "Auditbeat/Extended: Win-2019 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -134,4 +134,4 @@ steps:
 
     steps:
       - label: Package pipeline
-        commands: ".buildkite/auditbeat/scripts/package-step.sh | buildkite-agent pipeline upload"
+        commands: ".buildkite/auditbeat/scripts/package-step.sh"

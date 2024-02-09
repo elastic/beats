@@ -219,9 +219,9 @@ spec:
       name: heartbeat
       description: "Heartbeat pipeline"
     spec:
-      #      branch_configuration: "main 7.* 8.* v7.* v8.*" TODO: temporarily commented to build PRs from forks
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/heartbeat/heartbeat-pipeline.yml"
-      #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
+      maximum_timeout_in_minutes: 120
       provider_settings:
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
@@ -234,8 +234,8 @@ spec:
       cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
-      # env:
-      #   ELASTIC_PR_COMMENTS_ENABLED: "true" TODO: uncomment when pipeline is ready
+      env:
+        ELASTIC_PR_COMMENTS_ENABLED: "true"
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
@@ -309,7 +309,7 @@ spec:
       name: beats-libbeat
       description: "Beats libbeat pipeline"
     spec:
-      branch_configuration: "main 7.17 8.*
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/libbeat/pipeline.libbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -321,7 +321,7 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
+      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
       env:
@@ -354,9 +354,9 @@ spec:
       name: beats-packetbeat
       description: "Beats packetbeat pipeline"
     spec:
-#      branch_configuration: "main 7.17 8.* v7.17 v8.*" TODO: temporarily commented to build PRs from forks
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/packetbeat/pipeline.packetbeat.yml"
-#      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
+      maximum_timeout_in_minutes: 120
       provider_settings:
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
@@ -369,8 +369,8 @@ spec:
       cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
-      # env:
-      #   ELASTIC_PR_COMMENTS_ENABLED: "true" TODO: uncomment when pipeline is ready
+      env:
+        ELASTIC_PR_COMMENTS_ENABLED: "true"
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
@@ -443,9 +443,9 @@ spec:
       name: beats-winlogbeat
       description: "Beats winlogbeat pipeline"
     spec:
-#      branch_configuration: "main 7.17 8.*" TODO: temporarily commented to build PRs from forks
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/winlogbeat/pipeline.winlogbeat.yml"
-#      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
+      maximum_timeout_in_minutes: 120
       provider_settings:
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
@@ -458,8 +458,8 @@ spec:
       cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
-      # env:
-      #   ELASTIC_PR_COMMENTS_ENABLED: "true" TODO: uncomment when pipeline is ready
+      env:
+        ELASTIC_PR_COMMENTS_ENABLED: "true"
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ

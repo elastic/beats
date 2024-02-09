@@ -4,7 +4,7 @@ source .buildkite/scripts/common.sh
 
 set -euo pipefail
 
-pipelineName="pipeline.metricbeat-dynamic.yml"
+pipelineName="pipeline.winlogbeat-dynamic.yml"
 
 echo "Add the mandatory and extended tests without additional conditions into the pipeline"
 if are_conditions_met_mandatory_tests; then
@@ -15,32 +15,6 @@ steps:
   - group: "Mandatory Tests"
     key: "mandatory-tests"
     steps:
-      - label: ":linux: Ubuntu Unit Tests"
-        key: "mandatory-linux-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-      - label: ":go: Go Intergration Tests"
-        key: "mandatory-int-test"
-        command: ".buildkite/scripts/go_int_tests.sh"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-      - label: ":python: Python Integration Tests"
-        key: "mandatory-python-int-test"
-        command: ".buildkite/scripts/py_int_tests.sh"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
@@ -51,7 +25,7 @@ steps:
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      - label: ":windows: Windows 2016/2022 Unit Tests - {{matrix.image}}"
+      - label: ":windows: Windows 2016/2019/2022 Unit Tests - {{matrix.image}}"
         command: ".buildkite/scripts/win_unit_tests.ps1"
         key: "mandatory-win-unit-tests"
         agents:
@@ -64,6 +38,7 @@ steps:
           setup:
             image:
               - "${IMAGE_WIN_2016}"
+              - "${IMAGE_WIN_2019}"
               - "${IMAGE_WIN_2022}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
@@ -73,18 +48,7 @@ steps:
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
     steps:
-      - label: ":windows: Windows 2019 Unit Tests"
-        key: "extended-win-2019-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      # Temporary disabled https://github.com/elastic/beats/issues/37841
       - label: ":windows: Windows 10 Unit Tests"
         key: "extended-win-10-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
@@ -112,24 +76,6 @@ else
   exit 0
 fi
 
-echo "Check and add the Extended Tests into the pipeline"
-if are_conditions_met_macos_tests; then
-  cat >> $pipelineName <<- YAML
-
-  - group: "Extended Tests"
-    key: "extended-tests"
-    steps:
-      - label: ":mac: MacOS Unit Tests"
-        key: "extended-macos-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh"
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-YAML
-
-fi
-
 echo "Check and add the Packaging into the pipeline"
 if are_conditions_met_packaging; then
   cat >> $pipelineName <<- YAML
@@ -152,16 +98,6 @@ if are_conditions_met_packaging; then
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 
-      - label: ":linux: Packaging ARM"
-        key: "packaging-arm"
-        command: ".buildkite/scripts/packaging.sh"
-        agents:
-          provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
 
 YAML
 fi
