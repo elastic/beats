@@ -362,7 +362,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 			firstEvent = false
 		}
 
-		if res.MoreRecords() {
+		if !res.MoreRecords() {
 			break
 		}
 
