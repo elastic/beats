@@ -89,5 +89,9 @@ func getSymbolInfoFromReader(reader io.Reader, symbolName string) (runtimeSymbol
 		}
 	}
 
+	if fileScanner.Err() != nil {
+		return runtimeSymbolInfo{}, err
+	}
+
 	return runtimeSymbolInfo{}, ErrSymbolNotFound
 }
