@@ -11,6 +11,8 @@ ASDF_MAGE_VERSION="1.14.0"
 SETUP_MAGE_VERSION="1.14.0"
 DEBIAN_FRONTEND="noninteractive"
 
+DOCKER_REGISTRY="docker.elastic.co"
+
 export SETUP_GVM_VERSION
 export WORKSPACE
 export BIN
@@ -20,6 +22,8 @@ export REPO
 export TMP_FOLDER
 export ASDF_MAGE_VERSION
 export SETUP_MAGE_VERSION
+
+export DOCKER_REGISTRY
 
 if grep -q 'Ubuntu' /etc/*release; then
   export DEBIAN_FRONTEND

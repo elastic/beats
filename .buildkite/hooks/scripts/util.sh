@@ -26,6 +26,8 @@ google_cloud_logout_active_account() {
 
 cleanup() {
   echo "Deleting temporary files..."
-  rm -rf ${BIN}/${TMP_FOLDER}.*
+  if [[ -e "${BIN}/${TMP_FOLDER}" ]]; then
+    rm -rf "${BIN}/${TMP_FOLDER}.*"
+  fi
   echo "Done."
 }

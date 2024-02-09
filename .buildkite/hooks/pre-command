@@ -9,22 +9,17 @@ GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
 # Secrets must be redacted
 # https://buildkite.com/docs/pipelines/managing-log-output#redacted-environment-variables
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
   source .buildkite/env-scripts/env.sh
   source .buildkite/env-scripts/win-env.sh
-  source .buildkite/env-scripts/util.sh
+#  source .buildkite/env-scripts/util.sh
 
   if [[ -z "${GOLANG_VERSION-""}" ]]; then
     export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
   fi
 
-  if [[ "$BUILDKITE_STEP_KEY" == macos* ]]; then
-    ulimit -Sn 30000
-  fi
-
   if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
-    echo "--- Exporting secrets"
-    source .buildkite/filebeat/scripts/packaging/packaging-env.sh
+    #    source .buildkite/filebeat/scripts/packaging/packaging-env.sh
 
     export PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry 5 vault kv get -field=data -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
     export DOCKER_USERNAME_SECRET=$(retry 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")

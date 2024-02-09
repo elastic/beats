@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 env:
-  IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
   IMAGE_WIN_2016: "family/core-windows-2016"
   IMAGE_WIN_2019: "family/core-windows-2019"
