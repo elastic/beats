@@ -33,6 +33,8 @@ stages:
     pythonIntegTest:
         mage: "mage pythonIntegTest"
         stage: mandatory
+        platforms:                         ## override default label in this specific stage.
+          - "immutable && ubuntu-22 && gobld/machineType:c2d-highcpu-16"
     crosscompile:
         make: "make -C libbeat crosscompile"
         stage: mandatory

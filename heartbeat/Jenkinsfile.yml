@@ -38,6 +38,8 @@ stages:
         mage: "mage pythonIntegTest"
         withModule: true
         stage: mandatory
+        platforms:                         ## override default label in this specific stage.
+          - "immutable && ubuntu-22 && gobld/machineType:c2d-highcpu-16"
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.

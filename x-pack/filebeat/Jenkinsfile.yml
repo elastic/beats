@@ -36,6 +36,8 @@ stages:
     pythonIntegTest:
         mage: "mage pythonIntegTest"       ## run the ITs only if the changeset affects a specific module.
         stage: mandatory
+        platforms:                         ## override default label in this specific stage.
+          - "immutable && ubuntu-22 && gobld/machineType:c2d-highcpu-16"
     macos:
         mage: "mage build unitTest"
         platforms:             ## override default label in this specific stage.

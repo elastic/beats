@@ -24,6 +24,8 @@ stages:
         mage: "mage pythonIntegTest"
         withModule: true
         stage: mandatory
+        platforms:                         ## override default label in this specific stage.
+          - "immutable && ubuntu-22 && gobld/machineType:c2d-highcpu-16"
     cloud:
         cloud: "mage build test"
         withModule: true       ## run the ITs only if the changeset affects a specific module.
