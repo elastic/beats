@@ -86,7 +86,12 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	if err := base.Module().UnpackConfig(&config); err != nil {
 		return nil, err
 	}
-	logger := base.Logger()
+
+	logger := logp.NewLogger(moduleName)
+	id := base.Module().Config().ID
+	if id != "" {
+		logger = logger.With("id", id)
+	}
 
 	r, err := NewEventReader(config, logger)
 	if err != nil {
