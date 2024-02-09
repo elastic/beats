@@ -135,10 +135,10 @@ func unescapeString(str string) string {
 //	[n+3] super options
 //
 // For more details, see https://www.kernel.org/doc/Documentation/filesystems/proc.txt
-func parseMountInfoLine(line string) *mount {
+func parseMountInfoLine(line string) (*mount, error) {
 	fields := strings.Split(line, " ")
 	if len(fields) < 10 {
-		return nil
+		return nil, nil
 	}
 
 	// Count the optional fields.  In case new fields are appended later,
@@ -147,18 +147,18 @@ func parseMountInfoLine(line string) *mount {
 	for fields[n] != "-" {
 		n++
 		if n >= len(fields) {
-			return nil
+			return nil, nil
 		}
 	}
 	if n+3 >= len(fields) {
-		return nil
+		return nil, nil
 	}
 
 	mnt := &mount{}
 	var err error
 	mnt.DeviceMajor, mnt.DeviceMinor, err = newDeviceMajorMinorFromString(fields[2])
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	mnt.Subtree = unescapeString(fields[3])
 	mnt.Path = unescapeString(fields[4])
@@ -168,7 +168,7 @@ func parseMountInfoLine(line string) *mount {
 		}
 	}
 	mnt.FilesystemType = unescapeString(fields[n+1])
-	return mnt
+	return mnt, nil
 }
 
 // readMountInfo reads mount information from the given input reader and returns
@@ -181,7 +181,11 @@ func readMountInfo(r io.Reader) (mountPoints, error) {
 	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
 		line := scanner.Text()
-		mnt := parseMountInfoLine(line)
+		mnt, err := parseMountInfoLine(line)
+		if err != nil {
+			return nil, err
+		}
+
 		if mnt == nil {
 			continue
 		}
@@ -199,6 +203,11 @@ func readMountInfo(r io.Reader) (mountPoints, error) {
 		// mountpoints are listed in mount order.
 		seenMountsByPath[mnt.Path] = mnt
 	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
 	sort.Sort(mPoints)
 
 	return mPoints, nil
