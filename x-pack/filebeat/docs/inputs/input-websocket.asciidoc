@@ -34,10 +34,9 @@ On start the `state` will be something like this:
     ...
 }
 ----
-The `websocket` input creates a `response` field in the state map and attaches the websocket message to this field. All `CEL` programs written should act on this `response` field. Additional fields may be present at the root of the object and if the program tolerates it, the cursor value may be absent.Only the cursor is persisted over restarts, but all fields in state are retained between iterations of the processing loop except for the produced events array, see below.
+The `websocket` input creates a `response` field in the state map and attaches the websocket message to this field. All `CEL` programs written should act on this `response` field. Additional fields may be present at the root of the object and if the program tolerates it, the cursor value may be absent. Only the cursor is persisted over restarts, but all fields in state are retained between iterations of the processing loop except for the produced events array, see below.
 
-If the cursor is present the program should perform and process requests based on its value.
-If cursor is not present the program must have alternative logic to determine what requests to make.
+If the cursor is present the program should process or filter out responses based on its value. If cursor is not present all responses should be processed as per the program's logic.
 
 After completion of a program's execution it should return a single object with a structure looking like this:
 
@@ -51,8 +50,7 @@ After completion of a program's execution it should return a single object with 
     "cursor": [ <2>
         {...},
         ...
-    ],
-    "want_more": false <3>
+    ]
 }
 ----
 
@@ -61,7 +59,6 @@ The field could be an array or a single object that will be treated as an array 
 
 <2> If `cursor` is present it must be either be a single object or an array with the same length as events; each element _i_ of the `cursor` will be the details for obtaining the events at and beyond event _i_ in the `events` array. If the `cursor` is a single object, it will be the details for obtaining events after the last event in the `events` array and will only be retained on successful publication of all the events in the `events` array.
 
-<3> Unlike in the `cel` input, the `want_more` field is always false. This is because the `websocket` input is a streaming input and will always be ready to receive more messages from the websocket server or api endpoint, however the `CEL` program will only be executed once for each message received.
 
 Example configuration:
 
@@ -70,18 +67,18 @@ Example configuration:
 filebeat.inputs:
 # Read and process simple websocket messages from a local websocket server
 - type: websocket
-  resource.url: ws://localhost:443/v1/stream
+  url: ws://localhost:443/v1/stream
   program: |
-    bytes(state.response).decode_json().as(inner_body,{
-			"events": {
-				"message":  inner_body.encode_json(),
-			}
-		})
+  bytes(state.response).decode_json().as(inner_body,{
+	"events": {
+	  "message":  inner_body.encode_json(),
+	}
+})
 ----
 
 ==== Debug state logging
 
-The Websocket input will log the complete state after evaluation when logging at the DEBUG level.
+The Websocket input will log the complete state when logging at the DEBUG level.
 This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object. See <<websocket-state-redact,`redact`>> configuration parameters for settings to exclude sensitive fields from DEBUG logs.
 
 ==== Authentication
@@ -94,7 +91,7 @@ Example configurations with authentication:
 filebeat.inputs:
 - type: websocket
   auth.basic_token: "dXNlcjpwYXNzd29yZA=="
-  resource.url: wss://localhost:443/_stream
+  url: wss://localhost:443/_stream
 ----
 
 ["source","yaml",subs="attributes"]
@@ -102,7 +99,7 @@ filebeat.inputs:
 filebeat.inputs:
 - type: websocket
   auth.bearer_token: "dXNlcjpwYXNzd29yZA=="
-  resource.url: wss://localhost:443/_stream
+  url: wss://localhost:443/_stream
 ----
 
 ["source","yaml",subs="attributes"]
@@ -112,7 +109,7 @@ filebeat.inputs:
   auth.custom:
     header: "x-api-key"
     value: "dXNlcjpwYXNzd29yZA=="   
-  resource.url: wss://localhost:443/_stream
+  url: wss://localhost:443/_stream
 ----
 
 ["source","yaml",subs="attributes"]
@@ -122,7 +119,7 @@ filebeat.inputs:
   auth.custom:
     header: "Auth"
     value: "Bearer dXNlcjpwYXNzd29yZA=="   
-  resource.url: wss://localhost:443/_stream
+  url: wss://localhost:443/_stream
 ----
 
 [[input-state-websocket]]
@@ -144,12 +141,12 @@ The CEL program that is executed on each message received. This field should ide
 
 ["source","yaml",subs="attributes"]
 ----
-  program: |
-    bytes(state.response).decode_json().as(inner_body,{
-			"events": {
-				"message":  inner_body.encode_json(),
-			}
-	})
+program: |
+ bytes(state.response).decode_json().as(inner_body,{
+ "events": {
+   "message":  inner_body.encode_json(),
+  }
+})
 ----
 
 [[state-websocket]]
@@ -162,24 +159,24 @@ The CEL program that is executed on each message received. This field should ide
 [float]
 ==== `state.cursor`
 
-The cursor is an object available as `state.cursor` where arbitrary values may be stored. Cursor state is kept between input restarts and updated after each event of a request has been published. When a cursor is used the CEL program must either create a cursor state for each event that is returned by the program, or a single cursor that reflect the cursor for completion of the full set of events.
+The cursor is an object available as `state.cursor` where arbitrary values may be stored. Cursor state is kept between input restarts and updated after each event of a request has been published. When a cursor is used the CEL program must either create a cursor state for each event that is returned by the program, or a single cursor that reflects the cursor for completion of the full set of events.
 
 ["source","yaml",subs="attributes"]
 ----
 filebeat.inputs:
 # Read and process simple websocket messages from a local websocket server
 - type: websocket
-  resource.url: ws://localhost:443/v1/stream
+  url: ws://localhost:443/v1/stream
   program: |
-    bytes(state.response).as(body, {
-        "events": [body.decode_json().with({
-            "last_requested_at": has(state.cursor) && has(state.cursor.last_requested_at) ?
-                state.cursor.last_requested_at
-            :
-                now
-        })],
-        "cursor": {"last_requested_at": now}
-    })
+  bytes(state.response).as(body, {
+  "events": [body.decode_json().with({
+   "last_requested_at": has(state.cursor) && has(state.cursor.last_requested_at) ?
+    state.cursor.last_requested_at
+    :
+    now
+  })],
+  "cursor": {"last_requested_at": now}
+})
 ----
 
 [[regexp-websocket]]
@@ -219,7 +216,7 @@ As an example, if a user-constructed Basic Authentication request is used in a C
 ----
 filebeat.inputs:
 - type: websocket
-  resource.url: ws://localhost:443/_stream
+  url: ws://localhost:443/_stream
   state:
     user: user@domain.tld
     password: P@$$W0₹D
@@ -251,7 +248,7 @@ observe the activity of the input.
 [options="header"]
 |=======
 | Metric                    | Description
-| `resource`                | URL or path of the input resource.
+| `url`                     | URL of the input resource.
 | `cel_eval_errors`         | Number of errors encountered during cel program evaluation.
 | `errors_total`            | Number of errors encountered over the life cycle of the input.
 | `batches_received_total`  | Number of event arrays received.

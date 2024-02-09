@@ -62,7 +62,6 @@ func newProgram(ctx context.Context, src, root string, patterns map[string]*rege
 		lib.Time(),
 		lib.Try(),
 		lib.Debug(debug(log)),
-		lib.File(mimetypes),
 		lib.MIME(mimetypes),
 		lib.Regexp(patterns),
 		lib.Globals(map[string]interface{}{

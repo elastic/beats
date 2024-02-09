@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"net/url"
 	"regexp"
-	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -28,13 +27,9 @@ type config struct {
 	// Auth is the authentication config for connection
 	Auth authConfig `config:"auth"`
 	// Resource
-	Resource *ResourceConfig `config:"resource" validate:"required"`
+	URL *urlConfig `config:"url" validate:"required"`
 	// Redact is the debug log state redaction configuration.
 	Redact *redact `config:"redact"`
-}
-
-type ResourceConfig struct {
-	URL *urlConfig `config:"url" validate:"required"`
 }
 
 type redact struct {
@@ -93,7 +88,7 @@ func (c config) Validate() error {
 			return fmt.Errorf("failed to check program: %w", err)
 		}
 	}
-	err = checkURLScheme(c.Resource.URL)
+	err = checkURLScheme(c.URL)
 	if err != nil {
 		return err
 	}
@@ -101,7 +96,7 @@ func (c config) Validate() error {
 }
 
 func checkURLScheme(url *urlConfig) error {
-	switch scheme, _, _ := strings.Cut(url.Scheme, "+"); scheme {
+	switch url.Scheme {
 	case "ws", "wss":
 		return nil
 	default:

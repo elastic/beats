@@ -67,11 +67,11 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
 	cfg := src.cfg
 	i.cfg = cfg
-	log := env.Logger.With("input_url", cfg.Resource.URL)
+	log := env.Logger.With("input_url", cfg.URL)
 
 	metrics := newInputMetrics(env.ID)
 	defer metrics.Close()
-	metrics.resource.Set(cfg.Resource.URL.String())
+	metrics.url.Set(cfg.URL.String())
 	metrics.errorsTotal.Set(0)
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
@@ -99,7 +99,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 
 	// websocket client
 	headers := formHeader(cfg)
-	url := cfg.Resource.URL.String()
+	url := cfg.URL.String()
 	c, resp, err := websocket.DefaultDialer.DialContext(ctx, url, headers)
 	if resp != nil && resp.Body != nil {
 		log.Debugw("websocket connection response", "body", resp.Body)

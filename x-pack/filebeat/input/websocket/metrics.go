@@ -5,17 +5,17 @@
 package websocket
 
 import (
+	"github.com/rcrowley/go-metrics"
+
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
-
-	"github.com/rcrowley/go-metrics"
 )
 
 // inputMetrics handles the input's metric reporting.
 type inputMetrics struct {
 	unregister          func()
-	resource            *monitoring.String // URL-ish of input resource
+	url                 *monitoring.String // URL of the input resource
 	celEvalErrors       *monitoring.Uint   // number of errors encountered during cel program evaluation
 	batchesReceived     *monitoring.Uint   // number of event arrays received
 	errorsTotal         *monitoring.Uint   // number of errors encountered
@@ -31,7 +31,7 @@ func newInputMetrics(id string) *inputMetrics {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
 	out := &inputMetrics{
 		unregister:          unreg,
-		resource:            monitoring.NewString(reg, "resource"),
+		url:                 monitoring.NewString(reg, "url"),
 		celEvalErrors:       monitoring.NewUint(reg, "cel_eval_errors"),
 		batchesReceived:     monitoring.NewUint(reg, "batches_received_total"),
 		errorsTotal:         monitoring.NewUint(reg, "errors_total"),

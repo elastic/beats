@@ -511,8 +511,8 @@ func newWebSocketTestServer(serve func(http.Handler) *httptest.Server) func(*tes
 			handler(t, conn, response)
 		}))
 		// only set the resource URL if it is not already set
-		if config["resource.url"] == nil {
-			config["resource.url"] = "ws" + server.URL[4:]
+		if config["url"] == nil {
+			config["url"] = "ws" + server.URL[4:]
 		}
 		t.Cleanup(server.Close)
 	}
@@ -536,7 +536,7 @@ func invalidWebSocketTestServer(serve func(http.Handler) *httptest.Server) func(
 
 			handler(t, conn, response)
 		}))
-		config["resource.url"] = server.URL
+		config["url"] = server.URL
 		t.Cleanup(server.Close)
 	}
 }
@@ -579,8 +579,8 @@ func webSocketTestServerWithAuth(serve func(http.Handler) *httptest.Server) func
 			handler(t, conn, response)
 		}))
 		// only set the resource URL if it is not already set
-		if config["resource.url"] == nil {
-			config["resource.url"] = "ws" + server.URL[4:]
+		if config["url"] == nil {
+			config["url"] = "ws" + server.URL[4:]
 		}
 		t.Cleanup(server.Close)
 	}
