@@ -242,13 +242,13 @@ func (n *netflowInput) stop() {
 
 	if n.decoder != nil {
 		if err := n.decoder.Stop(); err != nil {
-			n.logger.Info("Error stopping decoder", "error", err)
+			n.logger.Errorw("Error stopping decoder", "error", err)
 		}
 	}
 
 	if n.client != nil {
 		if err := n.client.Close(); err != nil {
-			n.logger.Info("Error closing beat client", "error", err)
+			n.logger.Errorw("Error closing beat client", "error", err)
 		}
 	}
 
