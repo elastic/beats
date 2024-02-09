@@ -34,7 +34,7 @@ type Config struct {
 	policyRaw *Policy
 
 	// CheckExists can disable the check for an existing policy. This check
-	// requires read_ilm privileges. If CheckExists is disabled the policy
+	// requires read_ilm privileges. If CheckExists is set to false, the policy
 	// will not be installed, even if Overwrite is enabled.
 	CheckExists bool `config:"check_exists"`
 
