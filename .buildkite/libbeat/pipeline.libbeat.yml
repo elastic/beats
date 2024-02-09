@@ -39,7 +39,3 @@ steps:
   - label: ":linux: Load dynamic Libbeat pipeline"
     key: "libbeat-pipeline"
     command: ".buildkite/scripts/generate_libbeat_pipeline.sh"
-    agents:
-      provider: "gcp"
-      image: "${IMAGE_UBUNTU_X86_64}"
-      machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
