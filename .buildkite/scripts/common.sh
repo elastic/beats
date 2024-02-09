@@ -7,6 +7,7 @@ platform_type="$(uname)"
 platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
+GITHUB_PR_LABELS=${GITHUB_PR_LABELS:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
 [ -z "${runLibbeat+x}" ] && runLibbeat="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
 [ -z "${runMetricbeat+x}" ] && runMetricbeat="$(buildkite-agent meta-data get runMetricbeat --default ${runMetricbeat:-"false"})"
@@ -30,7 +31,7 @@ packetbeat_changeset=(
   )
 
 winlogbeat_changeset=(
-  "^metricbeat/.*"
+  "^winlogbeat/.*"
   )
 
 oss_changeset=(

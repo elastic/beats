@@ -33,7 +33,3 @@ steps:
   - label: ":linux: Load dynamic winlogbeat pipeline"
     key: "winlogbeat-pipeline"
     command: ".buildkite/scripts/generate_winlogbeat_pipeline.sh"
-    agents:
-      provider: "gcp"
-      image: "${IMAGE_UBUNTU_X86_64}"
-      machineType: "${GCP_DEFAULT_MACHINE_TYPE}"

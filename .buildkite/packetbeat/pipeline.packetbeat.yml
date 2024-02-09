@@ -53,6 +53,3 @@ steps:
   - label: ":linux: Load dynamic packetbeat pipeline"
     key: "packetbeat-pipeline"
     command: ".buildkite/scripts/generate_packetbeat_pipeline.sh"
-    agents:
-      provider: "gcp"
-      image: "${IMAGE_UBUNTU_X86_64}"
