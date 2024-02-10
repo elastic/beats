@@ -158993,7 +158993,7 @@ required: False
 Used to enable special event processing. Channel values below 16 are reserved for use by Microsoft to enable special treatment by the ETW runtime. Channel values 16 and above will be ignored by the ETW runtime (treated the same as channel 0) and can be given user-defined semantics.
 
 
-type: short
+type: keyword
 
 required: False
 
@@ -159011,25 +159011,13 @@ required: False
 
 --
 
-*`winlog.event_id`*::
-+
---
-The event identifier. The value is specific to the source of the event.
-
-
-type: short
-
-required: True
-
---
-
 *`winlog.flags`*::
 +
 --
 Flags that provide information about the event such as the type of session it was logged to and if the event contains extended data.
 
 
-type: short
+type: keyword
 
 required: False
 
@@ -159041,7 +159029,7 @@ required: False
 The keywords are used to indicate an event's membership in a set of event categories.
 
 
-type: long
+type: keyword
 
 required: False
 
@@ -159051,18 +159039,6 @@ required: False
 +
 --
 Level of severity. Level values 0 through 5 are defined by Microsoft. Level values 6 through 15 are reserved. Level values 16 through 255 can be defined by the event provider.
-
-
-type: short
-
-required: False
-
---
-
-*`winlog.logfile`*::
-+
---
-The source file from which events are logged. Only available for non real-time sessions.
 
 
 type: keyword
@@ -159077,7 +159053,7 @@ required: False
 The opcode defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged.
 
 
-type: short
+type: keyword
 
 required: False
 
@@ -159089,7 +159065,7 @@ required: False
 Identifies the process that generated the event.
 
 
-type: integer
+type: keyword
 
 required: False
 
@@ -159149,7 +159125,7 @@ required: False
 The task defined in the event. Task and opcode are typically used to identify the location in the application from where the event was logged.
 
 
-type: short
+type: keyword
 
 required: False
 
@@ -159161,19 +159137,7 @@ required: False
 Identifies the thread that generated the event.
 
 
-type: integer
-
-required: False
-
---
-
-*`winlog.timestamp`*::
-+
---
-Contains the time that the event occurred.
-
-
-type: date
+type: keyword
 
 required: False
 
@@ -159185,7 +159149,7 @@ required: False
 Specify the version of a manifest-based event.
 
 
-type: short
+type: keyword
 
 required: False
 
