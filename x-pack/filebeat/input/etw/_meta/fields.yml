@@ -19,7 +19,7 @@
             activity.
 
         - name: channel
-          type: short
+          type: keyword
           required: false
           description: >
             Used to enable special event processing. Channel values below 16 are reserved for use by Microsoft to enable special treatment by the ETW runtime. Channel values 16 and above will be ignored by the ETW runtime (treated the same as channel 0) and can be given user-defined semantics.
@@ -32,38 +32,26 @@
             The event-specific data. The content of this object is specific to
             any provider and event.
 
-        - name: event_id
-          type: short
-          required: true
-          description: >
-            The event identifier. The value is specific to the source of the event.
-
         - name: flags
-          type: short
+          type: keyword
           required: false
           description: >
             Flags that provide information about the event such as the type of session it was logged to and if the event contains extended data.
 
         - name: keywords
-          type: long
+          type: keyword
           required: false
           description: >
             The keywords are used to indicate an event's membership in a set of event categories.
 
         - name: level
-          type: short
+          type: keyword
           required: false
           description: >
             Level of severity. Level values 0 through 5 are defined by Microsoft. Level values 6 through 15 are reserved. Level values 16 through 255 can be defined by the event provider.
 
-        - name: logfile
-          type: keyword
-          required: false
-          description: >
-            The source file from which events are logged. Only available for non real-time sessions.
-
         - name: opcode
-          type: short
+          type: keyword
           required: false
           description: >
             The opcode defined in the event. Task and opcode are typically used to
@@ -71,7 +59,7 @@
             logged.
 
         - name: process_id
-          type: integer
+          type: keyword
           required: false
           description: >
             Identifies the process that generated the event.
@@ -103,7 +91,7 @@
             Human-readable level of severity.
 
         - name: task
-          type: short
+          type: keyword
           required: false
           description: >
             The task defined in the event. Task and opcode are typically used to
@@ -111,19 +99,13 @@
             logged.
 
         - name: thread_id
-          type: integer
+          type: keyword
           required: false
           description: >
             Identifies the thread that generated the event.
 
-        - name: timestamp
-          type: date
-          required: false
-          description: >
-            Contains the time that the event occurred.
-
         - name: version
-          type: short
+          type: keyword
           required: false
           description: >
             Specify the version of a manifest-based event.

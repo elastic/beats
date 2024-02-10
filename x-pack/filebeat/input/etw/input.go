@@ -154,13 +154,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 			return 1
 		}
 
-		evt := beat.Event{
-			Timestamp: time.Now(),
-			Fields: mapstr.M{
-				"winlog": buildEvent(data, record.EventHeader, e.etwSession, e.config),
-			},
-		}
-
+		evt := buildEvent(data, record.EventHeader, e.etwSession, e.config)
 		publisher.Publish(evt)
 
 		return 0
@@ -198,7 +192,38 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 }
 
 // buildEvent builds the winlog object.
-func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cfg config) map[string]any {
+func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cfg config) beat.Event {
+
+	winlog := map[string]any{
+		"activity_guid": h.ActivityId.String(),
+		"channel":       fmt.Sprintf("%d", h.EventDescriptor.Channel),
+		"event_data":    data,
+		"flags":         fmt.Sprintf("%d", h.Flags),
+		"keywords":      fmt.Sprintf("%d", h.EventDescriptor.Keyword),
+		"opcode":        fmt.Sprintf("%d", h.EventDescriptor.Opcode),
+		"process_id":    fmt.Sprintf("%d", h.ProcessId),
+		"provider_guid": h.ProviderId.String(),
+		"session":       session.Name,
+		"task":          fmt.Sprintf("%d", h.EventDescriptor.Task),
+		"thread_id":     fmt.Sprintf("%d", h.ThreadId),
+		"version":       fmt.Sprintf("%d", h.EventDescriptor.Version),
+	}
+
+	// Include provider GUID if not available in event header
+	zeroGUID := "{00000000-0000-0000-0000-000000000000}"
+	if winlog["provider_guid"] == zeroGUID {
+		winlog["provider_guid"] = session.GUID.String()
+	}
+
+	// Define fields map with Windows data and ECS mapping
+	fields := mapstr.M{
+		"winlog":         winlog,
+		"event.code":     fmt.Sprintf("%d", h.EventDescriptor.Id),
+		"event.created":  time.Now(),
+		"event.kind":     "event",
+		"event.severity": h.EventDescriptor.Level,
+	}
+
 	// Mapping from Level to Severity
 	levelToSeverity := map[uint8]string{
 		1: "critical",
@@ -209,46 +234,25 @@ func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cf
 	}
 
 	// Get the severity level, with a default value if not found
-	severity, ok := levelToSeverity[h.EventDescriptor.Level]
-	if !ok {
-		severity = "unknown" // Default severity level
+	_, ok := levelToSeverity[h.EventDescriptor.Level]
+	if ok {
+		fields["log.level"] = levelToSeverity[h.EventDescriptor.Level]
 	}
 
-	winlog := map[string]any{
-		"activity_guid": h.ActivityId.String(),
-		"channel":       h.EventDescriptor.Channel,
-		"event_data":    data,
-		"event_id":      h.EventDescriptor.Id,
-		"flags":         h.Flags,
-		"keywords":      h.EventDescriptor.Keyword,
-		"level":         h.EventDescriptor.Level,
-		"opcode":        h.EventDescriptor.Opcode,
-		"process_id":    h.ProcessId,
-		"provider_guid": h.ProviderId.String(),
-		"session":       session.Name,
-		"severity":      severity,
-		"task":          h.EventDescriptor.Task,
-		"thread_id":     h.ThreadId,
-		"timestamp":     convertFileTimeToGoTime(uint64(h.TimeStamp)),
-		"version":       h.EventDescriptor.Version,
-	}
-
-	// Include provider name and GUID if available
+	// Include provider name if available
 	if cfg.ProviderName != "" {
-		winlog["provider_name"] = cfg.ProviderName
-	}
-
-	zeroGUID := "{00000000-0000-0000-0000-000000000000}"
-	if winlog["provider_guid"] == zeroGUID {
-		winlog["provider_guid"] = session.GUID.String()
+		fields["event.provider"] = cfg.ProviderName
 	}
 
 	// Include logfile path if available
 	if cfg.Logfile != "" {
-		winlog["logfile"] = cfg.Logfile
+		fields["log.file.path"] = cfg.Logfile
 	}
 
-	return winlog
+	return beat.Event{
+		Timestamp: convertFileTimeToGoTime(uint64(h.TimeStamp)),
+		Fields:    fields,
+	}
 }
 
 // convertFileTimeToGoTime converts a Windows FileTime to a Go time.Time structure.

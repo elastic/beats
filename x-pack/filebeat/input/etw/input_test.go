@@ -17,6 +17,7 @@ import (
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	"golang.org/x/sys/windows"
 )
@@ -303,7 +304,7 @@ func Test_buildEvent(t *testing.T) {
 		header   etw.EventHeader
 		session  *etw.Session
 		cfg      config
-		expected map[string]any
+		expected mapstr.M
 	}{
 		{
 			name: "TestStandardData",
@@ -354,27 +355,27 @@ func Test_buildEvent(t *testing.T) {
 				ProviderName: "TestProvider",
 			},
 
-			expected: map[string]any{
-				"activity_guid": "{12345678-1234-1234-1234-123456789ABC}",
-				"channel":       uint8(10),
-				"event_data": map[string]any{
-					"key": "value",
+			expected: mapstr.M{
+				"winlog": map[string]any{
+					"activity_guid": "{12345678-1234-1234-1234-123456789ABC}",
+					"channel":       "10",
+					"event_data": map[string]any{
+						"key": "value",
+					},
+					"flags":         "30",
+					"keywords":      "40",
+					"opcode":        "50",
+					"process_id":    "60",
+					"provider_guid": "{12345678-1234-1234-1234-123456789ABC}",
+					"session":       "Elastic-TestProvider",
+					"task":          "70",
+					"thread_id":     "80",
+					"version":       "90",
 				},
-				"event_id":      uint16(20),
-				"flags":         uint16(30),
-				"keywords":      uint64(40),
-				"level":         uint8(1),
-				"logfile":       nil,
-				"opcode":        uint8(50),
-				"process_id":    uint32(60),
-				"provider_guid": "{12345678-1234-1234-1234-123456789ABC}",
-				"provider_name": "TestProvider",
-				"session":       "Elastic-TestProvider",
-				"severity":      "critical",
-				"task":          uint16(70),
-				"thread_id":     uint32(80),
-				"timestamp":     "2024-02-05T22:03:09.035Z",
-				"version":       uint8(90),
+				"event.code":     "20",
+				"event.provider": "TestProvider",
+				"event.severity": uint8(1),
+				"log.level":      "critical",
 			},
 		},
 		{
@@ -422,64 +423,53 @@ func Test_buildEvent(t *testing.T) {
 				Logfile:      "C:\\TestFile",
 			},
 
-			expected: map[string]any{
-				"activity_guid": "{12345678-1234-1234-1234-123456789ABC}",
-				"channel":       uint8(10),
-				"event_data": map[string]any{
-					"key": "value",
+			expected: mapstr.M{
+				"winlog": map[string]any{
+					"activity_guid": "{12345678-1234-1234-1234-123456789ABC}",
+					"channel":       "10",
+					"event_data": map[string]any{
+						"key": "value",
+					},
+					"flags":         "30",
+					"keywords":      "40",
+					"opcode":        "50",
+					"process_id":    "60",
+					"provider_guid": "{12345678-1234-1234-1234-123456789ABC}",
+					"session":       "Elastic-TestProvider",
+					"task":          "70",
+					"thread_id":     "80",
+					"version":       "90",
 				},
-				"event_id":      uint16(20),
-				"flags":         uint16(30),
-				"keywords":      uint64(40),
-				"level":         uint8(17),
-				"logfile":       "C:\\TestFile",
-				"opcode":        uint8(50),
-				"process_id":    uint32(60),
-				"provider_guid": "{12345678-1234-1234-1234-123456789ABC}",
-				"provider_name": "TestProvider",
-				"session":       "Elastic-TestProvider",
-				"severity":      "unknown",
-				"task":          uint16(70),
-				"thread_id":     uint32(80),
-				"timestamp":     "2024-02-05T22:03:09.035Z",
-				"version":       uint8(90),
+				"event.code":     "20",
+				"event.provider": "TestProvider",
+				"event.severity": uint8(17),
+				"log.file.path":  "C:\\TestFile",
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			winlog := buildEvent(tt.data, tt.header, tt.session, tt.cfg)
+			evt := buildEvent(tt.data, tt.header, tt.session, tt.cfg)
 
-			// Parse the expected time string to time.Time
-			expectedTime, err := time.Parse(time.RFC3339, tt.expected["timestamp"].(string))
-			if err != nil {
-				t.Fatalf("Failed to parse expected time string: %v", err)
-			}
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["activity_guid"], evt.Fields["winlog"].(map[string]any)["activity_guid"])
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["channel"], evt.Fields["winlog"].(map[string]any)["channel"])
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["event_data"], evt.Fields["winlog"].(map[string]any)["event_data"])
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["flags"], evt.Fields["winlog"].(map[string]any)["flags"])
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["keywords"], evt.Fields["winlog"].(map[string]any)["keywords"])
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["opcode"], evt.Fields["winlog"].(map[string]any)["opcode"])
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["process_id"], evt.Fields["winlog"].(map[string]any)["process_id"])
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["provider_guid"], evt.Fields["winlog"].(map[string]any)["provider_guid"])
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["session"], evt.Fields["winlog"].(map[string]any)["session"])
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["task"], evt.Fields["winlog"].(map[string]any)["task"])
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["thread_id"], evt.Fields["winlog"].(map[string]any)["thread_id"])
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["version"], evt.Fields["winlog"].(map[string]any)["version"])
 
-			winlogTime := winlog["timestamp"].(time.Time)
-
-			// Convert the expected time to the same time zone before comparison
-			expectedTime = expectedTime.In(winlogTime.Location())
-
-			assert.Equal(t, tt.expected["activity_guid"], winlog["activity_guid"])
-			assert.Equal(t, tt.expected["channel"], winlog["channel"])
-			assert.Equal(t, tt.expected["event_data"], winlog["event_data"])
-			assert.Equal(t, tt.expected["event_id"], winlog["event_id"])
-			assert.Equal(t, tt.expected["flags"], winlog["flags"])
-			assert.Equal(t, tt.expected["keywords"], winlog["keywords"])
-			assert.Equal(t, tt.expected["level"], winlog["level"])
-			assert.Equal(t, tt.expected["logfile"], winlog["logfile"])
-			assert.Equal(t, tt.expected["opcode"], winlog["opcode"])
-			assert.Equal(t, tt.expected["process_id"], winlog["process_id"])
-			assert.Equal(t, tt.expected["provider_guid"], winlog["provider_guid"])
-			assert.Equal(t, tt.expected["provider_name"], winlog["provider_name"])
-			assert.Equal(t, tt.expected["session"], winlog["session"])
-			assert.Equal(t, tt.expected["severity"], winlog["severity"])
-			assert.Equal(t, tt.expected["task"], winlog["task"])
-			assert.Equal(t, tt.expected["thread_id"], winlog["thread_id"])
-			assert.Equal(t, expectedTime, winlogTime)
-			assert.Equal(t, tt.expected["version"], winlog["version"])
+			assert.Equal(t, tt.expected["event.code"], evt.Fields["event.code"])
+			assert.Equal(t, tt.expected["event.provider"], evt.Fields["event.provider"])
+			assert.Equal(t, tt.expected["event.severity"], evt.Fields["event.severity"])
+			assert.Equal(t, tt.expected["log.file.path"], evt.Fields["log.file.path"])
+			assert.Equal(t, tt.expected["log.level"], evt.Fields["log.level"])
 
 		})
 	}
