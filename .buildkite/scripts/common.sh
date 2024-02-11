@@ -7,11 +7,12 @@ platform_type="$(uname)"
 platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
+GITHUB_PR_LABELS=${GITHUB_PR_LABELS:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
-
 [ -z "${runLibbeat+x}" ] && runLibbeat="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
 [ -z "${runMetricbeat+x}" ] && runMetricbeat="$(buildkite-agent meta-data get runMetricbeat --default ${runMetricbeat:-"false"})"
 [ -z "${runPacketbeat+x}" ] && runPacketbeat="$(buildkite-agent meta-data get runPacketbeat --default ${runPacketbeat:-"false"})"
+[ -z "${runWinlogbeat+x}" ] && runWinlogbeat="$(buildkite-agent meta-data get runWinlogbeat --default ${runWinlogbeat:-"false"})"
 [ -z "${runLibBeatArmTest+x}" ] && runLibBeatArmTest="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
 [ -z "${runPacketbeatArmTest+x}" ] && runPacketbeatArmTest="$(buildkite-agent meta-data get runPacketbeatArmTest --default ${runPacketbeatArmTest:-"false"})"
 [ -z "${runMetricbeatMacOsTests+x}" ] && runMetricbeatMacOsTests="$(buildkite-agent meta-data get runMetricbeatMacOsTests --default ${runMetricbeatMacOsTests:-"false"})"
@@ -27,6 +28,10 @@ libbeat_changeset=(
 
 packetbeat_changeset=(
   "^packetbeat/.*"
+  )
+
+winlogbeat_changeset=(
+  "^winlogbeat/.*"
   )
 
 oss_changeset=(
@@ -231,18 +236,23 @@ are_changed_only_paths() {
 
 are_conditions_met_mandatory_tests() {
   if are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
-      if are_paths_changed "${metricbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" || "${GITHUB_PR_LABELS}" =~ Metricbeat || "${runMetricbeat}" == "true" ]]; then
-        return 0
-      fi
-    elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" ]]; then
-      if are_paths_changed "${libbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test libbeat" || "${GITHUB_PR_LABELS}" =~ libbeat || "${runLibbeat}" == "true" ]]; then
-        return 0
-      fi
-    elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
-      if are_paths_changed "${packetbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat" || "${GITHUB_PR_LABELS}" =~ Packetbeat || "${runPacketbeat}" == "true" ]]; then
-        return 0
-      fi
+    return 0
+  fi
+  if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
+    if are_paths_changed "${metricbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" || "${GITHUB_PR_LABELS}" =~ Metricbeat || "${runMetricbeat}" == "true" ]]; then
+      return 0
+    fi
+  elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" ]]; then
+    if are_paths_changed "${libbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test libbeat" || "${GITHUB_PR_LABELS}" =~ libbeat || "${runLibbeat}" == "true" ]]; then
+      return 0
+    fi
+  elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
+    if are_paths_changed "${packetbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat" || "${GITHUB_PR_LABELS}" =~ Packetbeat || "${runPacketbeat}" == "true" ]]; then
+      return 0
+    fi
+  elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" ]]; then
+    if are_paths_changed "${winlogbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test winlogbeat" || "${GITHUB_PR_LABELS}" =~ Winlogbeat || "${runWinlogbeat}" == "true" ]]; then
+      return 0
     fi
   fi
   return 1
@@ -280,14 +290,8 @@ are_conditions_met_macos_tests() {
 
 are_conditions_met_packaging() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
-      if [[ "${BUILDKITE_TAG}" == "" || "${BUILDKITE_PULL_REQUEST}" != "" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L101-L103
-        return 0
-      fi
-    elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
-      if [[ "${BUILDKITE_TAG}" == "" || "${BUILDKITE_PULL_REQUEST}" != "" ]]; then
-        return 0
-      fi
+    if [[ "${BUILDKITE_TAG}" == "" || "${BUILDKITE_PULL_REQUEST}" != "" ]]; then
+      return 0
     fi
   fi
   return 1
