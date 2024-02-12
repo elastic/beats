@@ -18,6 +18,7 @@
 package memqueue
 
 import (
+	"context"
 	"io"
 	"sync"
 	"time"
@@ -43,7 +44,8 @@ type broker struct {
 	settings Settings
 	logger   *logp.Logger
 
-	done chan struct{}
+	ctx       context.Context
+	ctxCancel context.CancelFunc
 
 	// The ring buffer backing the queue. All buffer positions should be taken
 	// modulo the size of this array.
@@ -159,6 +161,32 @@ func NewQueue(
 	settings Settings,
 	inputQueueSize int,
 ) *broker {
+	b := newQueue(logger, ackCallback, settings, inputQueueSize)
+
+	// Start the queue workers
+	b.wg.Add(2)
+	go func() {
+		defer b.wg.Done()
+		b.runLoop.run()
+	}()
+	go func() {
+		defer b.wg.Done()
+		b.ackLoop.run()
+	}()
+
+	return b
+}
+
+// newQueue does most of the work of creating a queue from the given
+// parameters, but doesn't start the runLoop or ackLoop workers. This
+// lets us perform more granular / deterministic tests by controlling
+// when the workers are active.
+func newQueue(
+	logger *logp.Logger,
+	ackCallback func(eventCount int),
+	settings Settings,
+	inputQueueSize int,
+) *broker {
 	chanSize := AdjustInputQueueSize(inputQueueSize, settings.Events)
 
 	// Backwards compatibility: an old way to select synchronous queue
@@ -181,7 +209,6 @@ func NewQueue(
 
 	b := &broker{
 		settings: settings,
-		done:     make(chan struct{}),
 		logger:   logger,
 
 		buf: make([]queueEntry, settings.Events),
@@ -198,25 +225,16 @@ func NewQueue(
 
 		ackCallback: ackCallback,
 	}
+	b.ctx, b.ctxCancel = context.WithCancel(context.Background())
 
 	b.runLoop = newRunLoop(b)
 	b.ackLoop = newACKLoop(b)
-
-	b.wg.Add(2)
-	go func() {
-		defer b.wg.Done()
-		b.runLoop.run()
-	}()
-	go func() {
-		defer b.wg.Done()
-		b.ackLoop.run()
-	}()
 
 	return b
 }
 
 func (b *broker) Close() error {
-	close(b.done)
+	b.ctxCancel()
 	return nil
 }
 
@@ -237,7 +255,7 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 func (b *broker) Get(count int) (queue.Batch, error) {
 	responseChan := make(chan *batch, 1)
 	select {
-	case <-b.done:
+	case <-b.ctx.Done():
 		return nil, io.EOF
 	case b.getChan <- getRequest{
 		entryCount: count, responseChan: responseChan}:
@@ -252,7 +270,7 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 
 	responseChan := make(chan memQueueMetrics, 1)
 	select {
-	case <-b.done:
+	case <-b.ctx.Done():
 		return queue.Metrics{}, io.EOF
 	case b.metricChan <- metricsRequest{
 		responseChan: responseChan}:

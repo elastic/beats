@@ -40,7 +40,7 @@ func (l *ackLoop) run() {
 		nextBatchChan := l.pendingBatches.nextBatchChannel()
 
 		select {
-		case <-b.done:
+		case <-b.ctx.Done():
 			// The queue is shutting down.
 			return
 

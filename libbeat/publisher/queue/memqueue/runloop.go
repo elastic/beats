@@ -81,63 +81,69 @@ func newRunLoop(broker *broker) *runLoop {
 }
 
 func (l *runLoop) run() {
-	for {
-		var pushChan chan pushRequest
-		// Push requests are enabled if the queue isn't yet full.
-		if l.eventCount < len(l.broker.buf) {
-			pushChan = l.broker.pushChan
-		}
+	for l.broker.ctx.Err() == nil {
+		l.runIteration()
+	}
+}
 
-		var getChan chan getRequest
-		// Get requests are enabled if the queue has events that weren't yet sent
-		// to consumers, and no existing request is active.
-		if l.pendingGetRequest == nil && l.eventCount > l.consumedCount {
-			getChan = l.broker.getChan
-		}
+// Perform one iteration of the queue's main run loop. Broken out into a
+// standalone helper function to allow testing of loop invariants.
+func (l *runLoop) runIteration() {
+	var pushChan chan pushRequest
+	// Push requests are enabled if the queue isn't yet full.
+	if l.eventCount < len(l.broker.buf) {
+		pushChan = l.broker.pushChan
+	}
 
-		var consumedChan chan batchList
-		// Enable sending to the scheduled ACKs channel if we have
-		// something to send.
-		if !l.consumedBatches.empty() {
-			consumedChan = l.broker.consumedChan
-		}
+	var getChan chan getRequest
+	// Get requests are enabled if the queue has events that weren't yet sent
+	// to consumers, and no existing request is active.
+	if l.pendingGetRequest == nil && l.eventCount > l.consumedCount {
+		getChan = l.broker.getChan
+	}
 
-		var timeoutChan <-chan time.Time
-		// Enable the timeout channel if a get request is waiting for events
-		if l.pendingGetRequest != nil {
-			timeoutChan = l.getTimer.C
-		}
+	var consumedChan chan batchList
+	// Enable sending to the scheduled ACKs channel if we have
+	// something to send.
+	if !l.consumedBatches.empty() {
+		consumedChan = l.broker.consumedChan
+	}
 
-		select {
-		case <-l.broker.done:
-			return
+	var timeoutChan <-chan time.Time
+	// Enable the timeout channel if a get request is waiting for events
+	if l.pendingGetRequest != nil {
+		timeoutChan = l.getTimer.C
+	}
 
-		case req := <-pushChan: // producer pushing new event
-			l.handleInsert(&req)
+	select {
+	case <-l.broker.ctx.Done():
+		return
 
-		case req := <-l.broker.cancelChan: // producer cancelling active events
-			l.handleCancel(&req)
+	case req := <-pushChan: // producer pushing new event
+		l.handleInsert(&req)
 
-		case req := <-getChan: // consumer asking for next batch
-			l.handleGetRequest(&req)
+	case req := <-l.broker.cancelChan: // producer cancelling active events
+		l.handleCancel(&req)
 
-		case consumedChan <- l.consumedBatches:
-			// We've sent all the pending batches to the ackLoop for processing,
-			// clear the pending list.
-			l.consumedBatches = batchList{}
+	case req := <-getChan: // consumer asking for next batch
+		l.handleGetRequest(&req)
 
-		case count := <-l.broker.deleteChan:
-			l.handleDelete(count)
+	case consumedChan <- l.consumedBatches:
+		// We've sent all the pending batches to the ackLoop for processing,
+		// clear the pending list.
+		l.consumedBatches = batchList{}
 
-		case req := <-l.broker.metricChan: // asking broker for queue metrics
-			l.handleMetricsRequest(&req)
+	case count := <-l.broker.deleteChan:
+		l.handleDelete(count)
 
-		case <-timeoutChan:
-			// The get timer has expired, handle the blocked request
-			l.getTimer.Stop()
-			l.handleGetReply(l.pendingGetRequest)
-			l.pendingGetRequest = nil
-		}
+	case req := <-l.broker.metricChan: // asking broker for queue metrics
+		l.handleMetricsRequest(&req)
+
+	case <-timeoutChan:
+		// The get timer has expired, handle the blocked request
+		l.getTimer.Stop()
+		l.handleGetReply(l.pendingGetRequest)
+		l.pendingGetRequest = nil
 	}
 }
 
