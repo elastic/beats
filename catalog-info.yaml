@@ -88,6 +88,7 @@ spec:
       pipeline_file: ".buildkite/metricbeat/pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -140,6 +141,7 @@ spec:
       pipeline_file: ".buildkite/filebeat/filebeat-pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -185,6 +187,7 @@ spec:
       pipeline_file: ".buildkite/auditbeat/auditbeat-pipeline.yml"
       #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -234,6 +237,7 @@ spec:
       pipeline_file: ".buildkite/heartbeat/heartbeat-pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -279,6 +283,7 @@ spec:
       pipeline_file: ".buildkite/deploy/kubernetes/deploy-k8s-pipeline.yml"
       #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -330,6 +335,7 @@ spec:
       maximum_timeout_in_minutes: 120
 >>>>>>> 51745a0a756bde03d4ef7de39bc3fda770b7ac87
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -381,6 +387,7 @@ spec:
       maximum_timeout_in_minutes: 120
 >>>>>>> 51745a0a756bde03d4ef7de39bc3fda770b7ac87
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -425,6 +432,7 @@ spec:
       branch_configuration: "7.17"
       pipeline_file: ".buildkite/x-pack/elastic-agent/pipeline.xpack.elastic-agent.yml"
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -473,6 +481,7 @@ spec:
       pipeline_file: ".buildkite/winlogbeat/pipeline.winlogbeat.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -518,6 +527,7 @@ spec:
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.winlogbeat.yml"
       # maximum_timeout_in_minutes: 120         #TODO: uncomment after tests
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -563,6 +573,7 @@ spec:
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.packetbeat.yml"
       # maximum_timeout_in_minutes: 120         #TODO: uncomment after tests
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -608,6 +619,7 @@ spec:
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.libbeat.yml"
       # maximum_timeout_in_minutes: 120         #TODO: uncomment after tests
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
@@ -653,6 +665,7 @@ spec:
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.metricbeat.yml"
       # maximum_timeout_in_minutes: 120         #TODO: uncomment after tests
       provider_settings:
+        trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
         build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
         build_tags: true
