@@ -24,9 +24,9 @@ type config struct {
 	// be overwritten by any stored cursor, but will be
 	// available if no stored cursor exists.
 	State map[string]interface{} `config:"state"`
-	// Auth is the authentication config for connection
+	// Auth is the authentication config for connection.
 	Auth authConfig `config:"auth"`
-	// Resource
+	// URL is the websocket url to connect to.
 	URL *urlConfig `config:"url" validate:"required"`
 	// Redact is the debug log state redaction configuration.
 	Redact *redact `config:"redact"`
