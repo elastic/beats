@@ -20,7 +20,6 @@ package add_cloud_metadata
 import (
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,14 +29,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
-
-func init() {
-	// Disable IMDS when the real AWS SDK IMDS client is used,
-	// so tests are isolated from the environment. Otherwise,
-	// tests for non-EC2 providers may fail when the tests are
-	// run within an EC2 VM.
-	os.Setenv("AWS_EC2_METADATA_DISABLED", "true")
-}
 
 func hetznerMetadataHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -69,7 +60,6 @@ func TestRetrieveHetznerMetadata(t *testing.T) {
 	defer server.Close()
 
 	config, err := conf.NewConfigFrom(map[string]interface{}{
-		// "providers": []string{"hetzner"},
 		"host": server.Listener.Addr().String(),
 	})
 
