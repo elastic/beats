@@ -97,8 +97,6 @@ values might change during the lifetime of the file. If this happens
 of the file. To solve this problem you can configure the `file_identity` option. Possible
 values besides the default `inode_deviceid` are `path`, `inode_marker` and `fingerprint`.
 
-For example, when using the Linux link:https://en.wikipedia.org/wiki/Logical_Volume_Manager_%28Linux%29[LVM] (Logical Volume Manager), device numbers are allocated dynamically at module load (refer to link:https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/logical_volume_manager_administration/lv#persistent_numbers[Persistent Device Numbers] in the Red Hat Enterprise Linux documentation). To avoid the possibility of data duplication in this case, you can set `file_identity` to `path`.
-
 WARNING: Changing `file_identity` methods between runs may result in
 duplicated events in the output.
 

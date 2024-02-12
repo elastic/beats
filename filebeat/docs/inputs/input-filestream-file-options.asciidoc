@@ -527,6 +527,9 @@ duplicated events in the output.
 
 *`native`*:: The default behaviour of {beatname_uc} is to differentiate
 between files using their inodes and device ids.
++
+In some cases these values can change during the lifetime of a file. 
+For example, when using the Linux link:https://en.wikipedia.org/wiki/Logical_Volume_Manager_%28Linux%29[LVM] (Logical Volume Manager), device numbers are allocated dynamically at module load (refer to link:https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/logical_volume_manager_administration/lv#persistent_numbers[Persistent Device Numbers] in the Red Hat Enterprise Linux documentation). To avoid the possibility of data duplication in this case, you can set `file_identity` to `path` rather than `native`.
 
 [source,yaml]
 ----
