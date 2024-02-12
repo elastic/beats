@@ -102,7 +102,7 @@ func (p *group) Close() error {
 }
 
 func (p *group) String() string {
-	s := make([]string, len(p.list))
+	s := make([]string, 0, len(p.list))
 	for _, p := range p.list {
 		s = append(s, p.String())
 	}
