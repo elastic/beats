@@ -155,9 +155,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 func (i *input) processAndPublishData(ctx context.Context, metrics *inputMetrics, prg cel.Program, ast *cel.Ast,
 	state map[string]interface{}, cursor map[string]interface{}, pub inputcursor.Publisher, log *logp.Logger) error {
 	goodCursor := cursor
+	log.Debugw("cel engine state before eval", logp.Namespace("websocket"), "state", redactor{state: state, cfg: i.cfg.Redact})
 	start := i.now().In(time.UTC)
 	state, err := evalWith(ctx, prg, ast, state, start)
-	log.Debugw("cel engine eval state", logp.Namespace("websocket"), "state", redactor{state: state, cfg: i.cfg.Redact})
+	log.Debugw("cel engine state after eval", logp.Namespace("websocket"), "state", redactor{state: state, cfg: i.cfg.Redact})
 	if err != nil {
 		metrics.celEvalErrors.Add(1)
 		switch {

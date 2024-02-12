@@ -78,7 +78,7 @@ filebeat.inputs:
 
 ==== Debug state logging
 
-The Websocket input will log the complete state when logging at the DEBUG level.
+The Websocket input will log the complete state when logging at the DEBUG level before and after CEL evaluation.
 This will include any sensitive or secret information kept in the `state` object, and so DEBUG level logging should not be used in production when sensitive information is retained in the `state` object. See <<websocket-state-redact,`redact`>> configuration parameters for settings to exclude sensitive fields from DEBUG logs.
 
 ==== Authentication
