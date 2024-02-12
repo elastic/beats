@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/features"
 	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
@@ -187,7 +186,7 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 	// officially running under the elastic-agent; we set the publisher pipeline
 	// to inform it that we are running under elastic-agent (used to ensure "Publish event: "
 	// debug log messages are only outputted when running in trace mode
-	publisher.SetUnderAgent(true)
+	lbmanagement.SetUnderAgent(true)
 
 	return NewV2AgentManagerWithClient(c, registry, agentClient)
 }
@@ -611,7 +610,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	// set the new log level (if nothing has changed is a noop)
 	ll, trace := getZapcoreLevel(lowestLevel)
 	logp.SetLevel(ll)
-	publisher.SetUnderAgentTrace(trace)
+	lbmanagement.SetUnderAgentTrace(trace)
 
 	// reload the output configuration
 	restartBeat, err := cm.reloadOutput(outputUnit)
