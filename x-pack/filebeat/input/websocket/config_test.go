@@ -55,6 +55,17 @@ var configTests = []struct {
 		wantErr: fmt.Errorf("failed to check program: failed compilation: ERROR: <input>:3:79: found no matching overload for '_?_:_' applied to '(bool, list(dyn), null)'\n |      \"events\": has(state.cursor) && inner_body.ts > state.cursor.last_updated ? \n | ..............................................................................^ accessing config"),
 	},
 	{
+		name: "invalid_regexps",
+		config: map[string]interface{}{
+			"regexp": map[string]interface{}{
+				"products":  "(?i)(xq>)d+)",
+				"solutions": "(?i)(Search|Observability|Security)",
+			},
+			"url": "wss://localhost:443/v1/stream",
+		},
+		wantErr: fmt.Errorf("failed to check regular expressions: error parsing regexp: unexpected ): `(?i)(xq>)d+)` accessing config"),
+	},
+	{
 		name: "valid_regexps",
 		config: map[string]interface{}{
 			"regexp": map[string]interface{}{
