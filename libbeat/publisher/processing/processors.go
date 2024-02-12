@@ -27,9 +27,9 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -102,7 +102,7 @@ func (p *group) Close() error {
 }
 
 func (p *group) String() string {
-	var s []string
+	s := make([]string, 0, len(p.list))
 	for _, p := range p.list {
 		s = append(s, p.String())
 	}
@@ -200,7 +200,7 @@ func debugPrintProcessor(info beat.Info, log *logp.Logger) *processorFn {
 		EscapeHTML: false,
 	})
 	return newProcessor("debugPrint", func(event *beat.Event) (*beat.Event, error) {
-		if publisher.LogWithTrace() {
+		if management.TraceLevelEnabled() {
 			mux.Lock()
 			defer mux.Unlock()
 
