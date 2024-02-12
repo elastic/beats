@@ -168,15 +168,15 @@ filebeat.inputs:
 - type: websocket
   url: ws://localhost:443/v1/stream
   program: |
-  bytes(state.response).as(body, {
-  "events": [body.decode_json().with({
-   "last_requested_at": has(state.cursor) && has(state.cursor.last_requested_at) ?
-    state.cursor.last_requested_at
-    :
-    now
-  })],
-  "cursor": {"last_requested_at": now}
-})
+    bytes(state.response).as(body, {
+      "events": [body.decode_json().with({
+        "last_requested_at": has(state.cursor) && has(state.cursor.last_requested_at) ?
+          state.cursor.last_requested_at
+        :
+          now
+      })],
+      "cursor": {"last_requested_at": now}
+    })
 ----
 
 [[regexp-websocket]]
