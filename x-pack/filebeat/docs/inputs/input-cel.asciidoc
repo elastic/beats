@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.8.0
+:mito_version: v1.9.0
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
@@ -160,8 +160,10 @@ As noted above the `cel` input provides functions, macros, and global variables 
 ** {mito_docs}/lib#hdr-Drop[Drop]
 ** {mito_docs}/lib#hdr-Drop_Empty[Drop Empty]
 ** {mito_docs}/lib#hdr-Flatten[Flatten]
+** {mito_docs}/lib#hdr-Keys[Keys]
 ** {mito_docs}/lib#hdr-Max[Max]
 ** {mito_docs}/lib#hdr-Min[Min]
+** {mito_docs}/lib#hdr-Values[Values]
 ** {mito_docs}/lib#hdr-With[With]
 ** {mito_docs}/lib#hdr-With_Replace[With Replace]
 ** {mito_docs}/lib#hdr-With_Update[With Update]
@@ -577,6 +579,13 @@ NOTE: Only one of the credentials settings can be set at once. For more informat
 ==== `auth.oauth2.okta.jwk_json`
 
 The RSA JWK Private Key JSON for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
+
+NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
+
+[float]
+==== `auth.oauth2.okta.jwk_pem`
+
+The RSA JWK private key PEM block for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
 
 NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
 

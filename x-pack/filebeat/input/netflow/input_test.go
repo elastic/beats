@@ -9,11 +9,23 @@ package netflow
 import (
 	"testing"
 
-	"github.com/elastic/beats/v7/filebeat/input/inputtest"
+	"github.com/elastic/beats/v7/libbeat/tests/resources"
+
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewInputDone(t *testing.T) {
-	config := mapstr.M{}
-	inputtest.AssertNotStartedInputCanBeDone(t, NewInput, &config)
+
+	goroutines := resources.NewGoroutinesChecker()
+	defer goroutines.Check(t)
+
+	config, err := conf.NewConfigFrom(mapstr.M{})
+	require.NoError(t, err)
+
+	_, err = Plugin(logp.NewLogger("netflow_test")).Manager.Create(config)
+	require.NoError(t, err)
 }
