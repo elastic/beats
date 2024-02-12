@@ -39,7 +39,7 @@ spec:
       name: beats
       description: "Beats Main pipeline"
     spec:
-      branch_configuration: "main 7.* 8.* v7.* v8.*"
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/pipeline.yml"
       provider_settings:
         build_pull_request_forks: false
@@ -84,7 +84,7 @@ spec:
       name: beats-metricbeat
       description: "Beats Metricbeat pipeline"
     spec:
-      branch_configuration: "main 7.* 8.* v7.* v8.*"
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/metricbeat/pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -130,7 +130,7 @@ spec:
       name: filebeat
       description: "Filebeat pipeline"
     spec:
-      branch_configuration: "main 7.* 8.* v7.* v8.*"
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/filebeat/filebeat-pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
@@ -175,7 +175,7 @@ spec:
       name: auditbeat
       description: "Auditbeat pipeline"
     spec:
-      #      branch_configuration: "main 7.* 8.* v7.* v8.*" TODO: temporarily commented to build PRs from forks
+      #      branch_configuration: "main 7.17 8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/auditbeat/auditbeat-pipeline.yml"
       #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
@@ -220,7 +220,7 @@ spec:
       name: heartbeat
       description: "Heartbeat pipeline"
     spec:
-      #      branch_configuration: "main 7.* 8.* v7.* v8.*" TODO: temporarily commented to build PRs from forks
+      #      branch_configuration: "main 7.17 8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/heartbeat/heartbeat-pipeline.yml"
       #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
@@ -265,7 +265,7 @@ spec:
       name: deploy-k8s
       description: "Deploy K8S pipeline"
     spec:
-      #      branch_configuration: "main 7.* 8.* v7.* v8.*" TODO: temporarily commented to build PRs from forks
+      #      branch_configuration: "main 7.17 8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/deploy/kubernetes/deploy-k8s-pipeline.yml"
       #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
@@ -310,7 +310,7 @@ spec:
       name: beats-libbeat
       description: "Beats libbeat pipeline"
     spec:
-      #      branch_configuration: "main 7.17 8.* v7.17 v8.*" TODO: temporarily commented to build PRs from forks
+      #      branch_configuration: "main 7.17 8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/libbeat/pipeline.libbeat.yml"
       #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
@@ -355,7 +355,7 @@ spec:
       name: beats-packetbeat
       description: "Beats packetbeat pipeline"
     spec:
-      #      branch_configuration: "main 7.17 8.* v7.17 v8.*" TODO: temporarily commented to build PRs from forks
+      #      branch_configuration: "main 7.17 8.*" TODO: temporarily commented to build PRs from forks
       pipeline_file: ".buildkite/packetbeat/pipeline.packetbeat.yml"
       #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
       provider_settings:
@@ -438,7 +438,7 @@ spec:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
     metadata:
-      name: elastic-agent-package-7-17
+      name: elastic-agent-package-717
       description: Buildkite pipeline for packaging Elastic Agent package
     spec:
       repository: elastic/elastic-agent
