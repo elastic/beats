@@ -2,61 +2,54 @@
 
 set -euo pipefail
 
-#source .buildkite/env-scripts/linux-env.sh
-source .buildkite/env-scripts/util.sh
+source .buildkite/env-scripts/linux-env.sh
+source .buildkite/filebeat/scripts/packaging/package-util.sh
 
-IMG_POSTFIX="-BK-SNAPSHOT"
+IMG_POSTFIX="-SNAPSHOT"
 VARIANTS=("" "-ubi" "-oss")
 VERSION="$(make get-version)"
 SOURCE_TAG+="${VERSION}${IMG_POSTFIX}"
 BEAT_NAME="filebeat"
 TARGET="observability-ci/${BEAT_NAME}"
+# Remove following once beats fully migrated
+BK_IMG_POSTFIX="-BK-SNAPSHOT"
+BK_SOURCE_TAG+="${VERSION}${BK_IMG_POSTFIX}"
 
-define_tags() {
-  aliasVersion="${VERSION%.*}${IMG_POSTFIX}"
-  tags=("${BUILDKITE_COMMIT}")
+echo "--- Creating package"
+mage -d filebeat package
 
-  if is_pr; then
-    tags+=("pr-${GITHUB_PR_NUMBER}")
-  else
-    tags+=("${SOURCE_TAG}" "${aliasVersion}")
-  fi
-}
+echo "--- Distribution list"
+ls -la filebeat/build/distributions
 
-check_is_arm() {
-  if [[ ${HW_TYPE} == "aarch64" || ${HW_TYPE} == "arm64" ]]; then
-    is_arm="-arm"
-  else
-    is_arm=""
-  fi
-}
+echo "--- Docker image list"
+docker images
 
 define_tags
+check_is_arm
 
 for variant in "${VARIANTS[@]}"; do
-  echo "--- PARAMS for variant: $variant"
 
-  check_is_arm
-  registry=${DOCKER_REGISTRY}
-  sourceTag=$SOURCE_TAG
   source="beats/${BEAT_NAME}${variant}"
-  target=$TARGET
-
-  echo "Registry: $registry"
-  echo "Source: $source"
-  echo "Source tag: $sourceTag"
-  echo "Target: $target"
 
   for tag in "${tags[@]}"; do
-    targetTag=$tag${is_arm}
-    echo "Target tag: $targetTag"
+  targetTag=$tag${is_arm}
+
+  sourceName="${DOCKER_REGISTRY}/${source}:${SOURCE_TAG}"
+  targetName="${DOCKER_REGISTRY}/${TARGET}:${targetTag}"
+
+  if docker image inspect "${sourceName}" &>/dev/null; then
+    echo "--- Tag & Push"
+    echo "Source name: $sourceName"
+    echo "Target name: $targetName"
+
+    # Remove following lines once beats fully migrated
+    bkSourceName="${DOCKER_REGISTRY}/${source}:${BK_SOURCE_TAG}"
+    docker tag "$sourceName" "$bkSourceName"
+    # Replace bkSourceName to sourceName once beats fully migrated
+    docker tag "${bkSourceName}" "${targetName}"
+#    docker push "${targetName}"
+  else
+    echo "Docker image ${sourceName} does not exist"
+  fi
   done
 done
-
-#echo "--- Creating package"
-#mage -d filebeat package
-
-#echo "--- Setting git config"
-#set_git_config
-
-#buildkite-agent annotate "Tag '$TAG' has been created." --style 'success' --context 'ctx-success'

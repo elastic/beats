@@ -98,14 +98,6 @@ changeset_applies() {
   fi
 }
 
-is_pr() {
-  if [[ $BUILDKITE_PULL_REQUEST != false ]]; then
-    return 0
-  else
-    return 1
-  fi
-}
-
 set_git_config() {
   git config user.name "${GITHUB_USERNAME_SECRET}"
   git config user.email "${GITHUB_EMAIL_SECRET}"
