@@ -5,15 +5,15 @@ set -euo pipefail
 source .buildkite/env-scripts/util.sh
 
 changeset="^filebeat/
-    ^go.mod
-    ^pytest.ini
-    ^dev-tools/
-    ^libbeat/
-    ^testing/
-    ^\.buildkite/filebeat/"
+^go.mod
+^pytest.ini
+^dev-tools/
+^libbeat/
+^testing/
+^\.buildkite/filebeat/"
 
 if are_files_changed "$changeset"; then
-  cat <<-EOF
+  bk_pipeline=$(cat <<-YAML
     steps:
       - label: ":ubuntu: Packaging Linux X86"
         key: "package-linux-x86"
@@ -42,5 +42,10 @@ if are_files_changed "$changeset"; then
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
           instanceType: "t4g.large"
-EOF
+YAML
+)
+  echo "${bk_pipeline}" | buildkite-agent pipeline upload
+else
+  buildkite-agent annotate "No required files changed. Skipped packaging" --style 'warning' --context 'ctx-warning'
+  exit 0
 fi

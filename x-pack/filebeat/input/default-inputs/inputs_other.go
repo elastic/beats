@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/shipper"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/websocket"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -40,6 +41,7 @@ func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2
 		awscloudwatch.Plugin(),
 		lumberjack.Plugin(),
 		shipper.Plugin(log, store),
+		websocket.Plugin(log, store),
 		netflow.Plugin(log),
 	}
 }
