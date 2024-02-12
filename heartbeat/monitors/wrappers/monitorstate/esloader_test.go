@@ -112,15 +112,12 @@ func TestMakeESLoaderError(t *testing.T) {
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			// Arrange
 			etc := newESTestContext(t)
 			etc.ec.HTTP = fakeHTTPClient{respStatus: test.statusCode}
 			loader := MakeESLoader(etc.ec, "fakeIndexPattern", etc.location)
 
-			// Act
 			_, err := loader(stdfields.StdMonitorFields{})
 
-			// Assert
 			var loaderError LoaderError
 			require.ErrorAs(t, err, &loaderError)
 			require.Equal(t, loaderError.Retry, test.expected)
