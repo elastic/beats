@@ -159149,7 +159149,7 @@ required: False
 Specify the version of a manifest-based event.
 
 
-type: keyword
+type: long
 
 required: False
 
