@@ -179,7 +179,8 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add initial infrastructure for a caching enrichment processor. {pull}36619[36619]
 - Add file-backed cache for cache enrichment processor. {pull}36686[36686] {pull}36696[36696]
 - Elide retryable HTTP client construction in Filebeat HTTPJSON and CEL inputs if not needed. {pull}36916[36916]
-- Allow assignment of packetbeat protocols to interfaces. {issue}36574[36564] {pull}[]
+- Allow assignment of packetbeat protocols to interfaces. {issue}36574[36564] {pull}36852[36852]
+- Add Active Directory entity collector for Filebeat entity analytics. {pull}37854[37854]
 
 ==== Deprecated
 
