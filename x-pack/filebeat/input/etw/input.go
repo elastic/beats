@@ -9,6 +9,7 @@ package etw
 import (
 	"fmt"
 	"math"
+	"strconv"
 	"sync"
 	"time"
 
@@ -150,7 +151,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 
 		data, err := etw.GetEventProperties(record)
 		if err != nil {
-			e.log.Errorf("failed to read event properties: %w", err)
+			e.log.Errorw("failed to read event properties", "error", err)
 			return 1
 		}
 
@@ -176,7 +177,7 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 		errChan <- nil
 	}()
 
-	// We ensure resources are closed when receiving a cancelation signal
+	// We ensure resources are closed when receiving a cancellation signal
 	go func() {
 		<-ctx.Cancelation.Done()
 		once.Do(e.Close)
@@ -191,62 +192,60 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	return nil
 }
 
-// buildEvent builds the winlog object.
-func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cfg config) beat.Event {
-
-	winlog := map[string]any{
-		"activity_guid": h.ActivityId.String(),
-		"channel":       fmt.Sprintf("%d", h.EventDescriptor.Channel),
-		"event_data":    data,
-		"flags":         fmt.Sprintf("%d", h.Flags),
-		"keywords":      fmt.Sprintf("%d", h.EventDescriptor.Keyword),
-		"opcode":        fmt.Sprintf("%d", h.EventDescriptor.Opcode),
-		"process_id":    fmt.Sprintf("%d", h.ProcessId),
-		"provider_guid": h.ProviderId.String(),
-		"session":       session.Name,
-		"task":          fmt.Sprintf("%d", h.EventDescriptor.Task),
-		"thread_id":     fmt.Sprintf("%d", h.ThreadId),
-		"version":       fmt.Sprintf("%d", h.EventDescriptor.Version),
+var (
+	// levelToSeverity maps ETW trace levels to names for use in ECS log.level.
+	levelToSeverity = map[uint8]string{
+		1: "critical",    // Abnormal exit or termination events
+		2: "error",       // Severe error events
+		3: "warning",     // Warning events such as allocation failures
+		4: "information", // Non-error events such as entry or exit events
+		5: "verbose",     // Detailed trace events
 	}
 
-	// Include provider GUID if not available in event header
-	zeroGUID := "{00000000-0000-0000-0000-000000000000}"
-	if winlog["provider_guid"] == zeroGUID {
+	// zeroGUID is the zero-value for a windows.GUID.
+	zeroGUID = windows.GUID{}
+)
+
+// buildEvent builds the final beat.Event emitted by this input.
+func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cfg config) beat.Event {
+	winlog := map[string]any{
+		"activity_guid": h.ActivityId.String(),
+		"channel":       strconv.FormatUint(uint64(h.EventDescriptor.Channel), 10),
+		"event_data":    data,
+		"flags":         strconv.FormatUint(uint64(h.Flags), 10),
+		"keywords":      strconv.FormatUint(h.EventDescriptor.Keyword, 10),
+		"opcode":        strconv.FormatUint(uint64(h.EventDescriptor.Opcode), 10),
+		"process_id":    strconv.FormatUint(uint64(h.ProcessId), 10),
+		"provider_guid": h.ProviderId.String(),
+		"session":       session.Name,
+		"task":          strconv.FormatUint(uint64(h.EventDescriptor.Task), 10),
+		"thread_id":     strconv.FormatUint(uint64(h.ThreadId), 10),
+		"version":       h.EventDescriptor.Version,
+	}
+	// Fallback to the session GUID if there is no provider GUID.
+	if h.ProviderId == zeroGUID {
 		winlog["provider_guid"] = session.GUID.String()
 	}
 
-	// Define fields map with Windows data and ECS mapping
-	fields := mapstr.M{
-		"winlog":         winlog,
-		"event.code":     fmt.Sprintf("%d", h.EventDescriptor.Id),
-		"event.created":  time.Now(),
-		"event.kind":     "event",
-		"event.severity": h.EventDescriptor.Level,
+	event := mapstr.M{
+		"code":     strconv.FormatUint(uint64(h.EventDescriptor.Id), 10),
+		"created":  time.Now().UTC(),
+		"kind":     "event",
+		"severity": h.EventDescriptor.Level,
 	}
-
-	// Mapping from Level to Severity
-	levelToSeverity := map[uint8]string{
-		1: "critical",
-		2: "error",
-		3: "warning",
-		4: "information",
-		5: "verbose",
-	}
-
-	// Get the severity level, with a default value if not found
-	_, ok := levelToSeverity[h.EventDescriptor.Level]
-	if ok {
-		fields["log.level"] = levelToSeverity[h.EventDescriptor.Level]
-	}
-
-	// Include provider name if available
 	if cfg.ProviderName != "" {
-		fields["event.provider"] = cfg.ProviderName
+		event["provider"] = cfg.ProviderName
 	}
 
-	// Include logfile path if available
+	fields := mapstr.M{
+		"event":  event,
+		"winlog": winlog,
+	}
+	if level, found := levelToSeverity[h.EventDescriptor.Level]; found {
+		fields.Put("log.level", level)
+	}
 	if cfg.Logfile != "" {
-		fields["log.file.path"] = cfg.Logfile
+		fields.Put("log.file.path", cfg.Logfile)
 	}
 
 	return beat.Event{
@@ -269,13 +268,14 @@ func convertFileTimeToGoTime(fileTime64 uint64) time.Time {
 		LowDateTime:  uint32(fileTime64 & math.MaxUint32),
 	}
 
-	return time.Unix(0, fileTime.Nanoseconds())
+	return time.Unix(0, fileTime.Nanoseconds()).UTC()
 }
 
-// close stops the ETW session and logs the outcome.
+// Close stops the ETW session and logs the outcome.
 func (e *etwInput) Close() {
 	if err := e.operator.stopSession(e.etwSession); err != nil {
 		e.log.Error("failed to shutdown ETW session")
+		return
 	}
 	e.log.Info("successfully shutdown")
 }

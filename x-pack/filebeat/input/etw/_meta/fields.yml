@@ -105,7 +105,7 @@
             Identifies the thread that generated the event.
 
         - name: version
-          type: keyword
+          type: long
           required: false
           description: >
             Specify the version of a manifest-based event.
