@@ -59,13 +59,12 @@ func newGeneralizeProcessor(keepNull bool) *processorFn {
 			event.Timestamp = time.Now()
 		}
 
-		fields := g.Convert(event.Fields)
-		if fields == nil {
+		errs := g.Convert(event.Fields)
+		if len(errs) > 0 {
 			logger.Error("fail to convert to generic event")
 			return nil, nil
 		}
 
-		event.Fields = fields
 		return event, nil
 	})
 }
@@ -102,9 +101,9 @@ func (p *group) Close() error {
 }
 
 func (p *group) String() string {
-	var s []string
-	for _, p := range p.list {
-		s = append(s, p.String())
+	s := make([]string, len(p.list))
+	for i, p := range p.list {
+		s[i] = p.String()
 	}
 
 	str := strings.Join(s, ", ")

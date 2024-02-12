@@ -33,8 +33,9 @@ func TestConvertNestedMapStr(t *testing.T) {
 	logp.TestingSetup()
 
 	type io struct {
-		Input  mapstr.M
-		Output mapstr.M
+		Input       mapstr.M
+		Output      mapstr.M
+		ShouldError bool
 	}
 
 	type String string
@@ -102,7 +103,8 @@ func TestConvertNestedMapStr(t *testing.T) {
 				"key2": uintptr(88),
 				"key3": func() { t.Log("hello") },
 			},
-			Output: mapstr.M{},
+			Output:      mapstr.M{},
+			ShouldError: true,
 		},
 		{
 			Input: mapstr.M{
@@ -129,14 +131,22 @@ func TestConvertNestedMapStr(t *testing.T) {
 			},
 		},
 		{
-			mapstr.M{"k": map[string]int{"hits": 1}},
-			mapstr.M{"k": mapstr.M{"hits": float64(1)}},
+			Input: mapstr.M{
+				"k": map[string]int{"hits": 1},
+			},
+			Output: mapstr.M{
+				"k": mapstr.M{"hits": float64(1)},
+			},
 		},
 	}
 
 	g := NewGenericEventConverter(false)
 	for i, test := range tests {
-		assert.Equal(t, test.Output, g.Convert(test.Input), "Test case %d", i)
+		errs := g.Convert(test.Input)
+		if !test.ShouldError {
+			assert.Empty(t, errs)
+		}
+		assert.Equal(t, test.Output, test.Input, "Test case %d", i)
 	}
 }
 
@@ -194,7 +204,9 @@ func TestConvertNestedStruct(t *testing.T) {
 
 	g := NewGenericEventConverter(false)
 	for i, test := range tests {
-		assert.EqualValues(t, test.Output, g.Convert(test.Input), "Test case %v", i)
+		errs := g.Convert(test.Input)
+		assert.Empty(t, errs)
+		assert.EqualValues(t, test.Output, test.Input, "Test case %v", i)
 	}
 }
 
@@ -206,7 +218,6 @@ func TestConvertWithNullEmission(t *testing.T) {
 		Output mapstr.M
 	}
 
-	type String string
 	type TestStruct struct {
 		A interface{}
 	}
@@ -239,7 +250,9 @@ func TestConvertWithNullEmission(t *testing.T) {
 
 	g := NewGenericEventConverter(true)
 	for i, test := range tests {
-		assert.EqualValues(t, test.Output, g.Convert(test.Input), "Test case %v", i)
+		errs := g.Convert(test.Input)
+		assert.Empty(t, errs)
+		assert.EqualValues(t, test.Output, test.Input, "Test case %v", i)
 	}
 }
 
@@ -342,7 +355,7 @@ func TestNormalizeMapError(t *testing.T) {
 
 	g := NewGenericEventConverter(false)
 	for i, in := range badInputs {
-		_, errs := g.normalizeMap(in, "bad.type")
+		errs := g.normalizeMap(in, "bad.type")
 		if assert.Len(t, errs, 1) {
 			t.Log(errs[0])
 			assert.Contains(t, errs[0].Error(), "key=bad.type", "Test case %v", i)
@@ -423,7 +436,8 @@ func TestNormalizeTime(t *testing.T) {
 func BenchmarkConvertToGenericEventNetString(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": NetString("hola")})
+		errs := g.Convert(mapstr.M{"key": NetString("hola")})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -431,7 +445,8 @@ func BenchmarkConvertToGenericEventNetString(b *testing.B) {
 func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": map[string]string{"greeting": "hola"}})
+		errs := g.Convert(mapstr.M{"key": map[string]string{"greeting": "hola"}})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -439,7 +454,8 @@ func BenchmarkConvertToGenericEventMapStringString(b *testing.B) {
 func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": map[string]interface{}{"greeting": "hola"}})
+		errs := g.Convert(mapstr.M{"key": map[string]interface{}{"greeting": "hola"}})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -447,7 +463,8 @@ func BenchmarkConvertToGenericEventMapStr(b *testing.B) {
 func BenchmarkConvertToGenericEventStringSlice(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": []string{"foo", "bar"}})
+		errs := g.Convert(mapstr.M{"key": []string{"foo", "bar"}})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -456,7 +473,8 @@ func BenchmarkConvertToGenericEventCustomStringSlice(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	type myString string
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": []myString{"foo", "bar"}})
+		errs := g.Convert(mapstr.M{"key": []myString{"foo", "bar"}})
+		assert.Empty(b, errs)
 	}
 }
 
@@ -465,7 +483,8 @@ func BenchmarkConvertToGenericEventStringPointer(b *testing.B) {
 	g := NewGenericEventConverter(false)
 	val := "foo"
 	for i := 0; i < b.N; i++ {
-		g.Convert(mapstr.M{"key": &val})
+		errs := g.Convert(mapstr.M{"key": &val})
+		assert.Empty(b, errs)
 	}
 }
 func TestDeDotJSON(t *testing.T) {
