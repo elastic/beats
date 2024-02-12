@@ -69,11 +69,11 @@ filebeat.inputs:
 - type: websocket
   url: ws://localhost:443/v1/stream
   program: |
-  bytes(state.response).decode_json().as(inner_body,{
-	"events": {
-	  "message":  inner_body.encode_json(),
-	}
-})
+    bytes(state.response).decode_json().as(inner_body,{
+      "events": {
+        "message":  inner_body.encode_json(),
+      }
+    })
 ----
 
 ==== Debug state logging
