@@ -32,6 +32,8 @@ fields added to events containing the Beats version. {pull}37553[37553]
 
 *Heartbeat*
 
+- Adjust State loader to only retry for failed requests and not for 4xx. {pull}37981[37981]
+
 *Metricbeat*
 
 
