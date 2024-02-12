@@ -282,7 +282,6 @@ func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*o
 
 	encoding, err := inp.encodingFactory(f)
 	if err != nil {
-		f.Close()
 		if errors.Is(err, transform.ErrShortSrc) {
 			return nil, nil, fmt.Errorf("initialising encoding for '%v' failed due to file being too short", f)
 		}
