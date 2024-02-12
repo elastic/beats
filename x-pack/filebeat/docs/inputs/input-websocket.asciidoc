@@ -142,11 +142,11 @@ The CEL program that is executed on each message received. This field should ide
 ["source","yaml",subs="attributes"]
 ----
 program: |
- bytes(state.response).decode_json().as(inner_body,{
- "events": {
-   "message":  inner_body.encode_json(),
-  }
-})
+  bytes(state.response).decode_json().as(inner_body,{
+    "events": {
+      "message":  inner_body.encode_json(),
+    }
+  })
 ----
 
 [[state-websocket]]
