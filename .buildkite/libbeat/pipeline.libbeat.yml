@@ -14,16 +14,16 @@ steps:
   - input: "Input Parameters"
     key: "input-run-all-stages"
     fields:
-    - select: "Libbeat - runLibbeat"
-      key: "runLibbeat"
+    - select: "Libbeat - run_libbeat"
+      key: "run_libbeat"
       options:
         - label: "True"
           value: "true"
         - label: "False"
           value: "false"
       default: "false"
-    - select: "Libbeat - runLibBeatArmTest"
-      key: "runLibBeatArmTest"
+    - select: "Libbeat - run_libbeat_arm_test"
+      key: "run_libbeat_arm_test"
       options:
         - label: "True"
           value: "true"
