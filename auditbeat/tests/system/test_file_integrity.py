@@ -78,13 +78,13 @@ def wrap_except(expr):
 class Test(BaseTest):
     def wait_output(self, min_events):
         self.wait_until(lambda: wrap_except(lambda: len(self.read_output()) >= min_events))
-        # wait for the number of lines in the file to stay constant for a second
+        # wait for the number of lines in the file to stay constant for 10 seconds
         prev_lines = -1
         while True:
             num_lines = self.output_lines()
             if prev_lines < num_lines:
                 prev_lines = num_lines
-                time.sleep(1)
+                time.sleep(10)
             else:
                 break
 
