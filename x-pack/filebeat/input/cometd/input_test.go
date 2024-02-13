@@ -117,6 +117,8 @@ func TestSingleInput(t *testing.T) {
 }
 
 func TestInputStop_Wait(t *testing.T) {
+	t.Skip("Flaky test https://github.com/elastic/beats/issues/37987")
+
 	expectedHTTPEventCount = 1
 	defer atomic.StoreUint64(&called, 0)
 	eventsCh := make(chan beat.Event)
