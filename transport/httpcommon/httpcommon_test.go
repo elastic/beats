@@ -18,6 +18,10 @@
 package httpcommon
 
 import (
+	"bytes"
+	"fmt"
+	"io"
+	"net/http"
 	"testing"
 	"time"
 
@@ -89,6 +93,117 @@ ssl:
 			require.NoError(t, err)
 
 			require.Equal(t, tc.expected, settings)
+		})
+	}
+}
+
+func TestReadAll(t *testing.T) {
+	size := 100
+	body := bytes.Repeat([]byte{'a'}, size)
+	cases := []struct {
+		name    string
+		resp    *http.Response
+		expBody []byte
+	}{
+		{
+			name: "reads known size",
+			resp: &http.Response{
+				ContentLength: int64(size),
+				Body:          io.NopCloser(bytes.NewBuffer(body)),
+			},
+			expBody: body,
+		},
+		{
+			name: "reads unknown size",
+			resp: &http.Response{
+				ContentLength: -1,
+				Body:          io.NopCloser(bytes.NewBuffer(body)),
+			},
+			expBody: body,
+		},
+		{
+			name: "supports empty with size=0",
+			resp: &http.Response{
+				ContentLength: 0,
+				Body:          io.NopCloser(bytes.NewBuffer(nil)),
+			},
+			expBody: []byte{},
+		},
+		{
+			name: "supports empty with unknown size",
+			resp: &http.Response{
+				ContentLength: -1,
+				Body:          io.NopCloser(bytes.NewBuffer(nil)),
+			},
+			expBody: []byte{},
+		},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			actBody, err := ReadAll(tc.resp)
+			require.NoError(t, err)
+			require.Equal(t, tc.expBody, actBody)
+		})
+	}
+}
+
+func BenchmarkReadAll(b *testing.B) {
+	sizes := []int{
+		100,         // 100 bytes
+		100 * 1024,  // 100KB
+		1024 * 1024, // 1MB
+	}
+	for _, size := range sizes {
+		b.Run(fmt.Sprintf("size: %d", size), func(b *testing.B) {
+
+			// emulate a file or an HTTP response
+			generated := bytes.Repeat([]byte{'a'}, size)
+			content := bytes.NewReader(generated)
+			cases := []struct {
+				name string
+				resp *http.Response
+			}{
+				{
+					name: "unknown length",
+					resp: &http.Response{
+						ContentLength: -1,
+						Body:          io.NopCloser(content),
+					},
+				},
+				{
+					name: "known length",
+					resp: &http.Response{
+						ContentLength: int64(size),
+						Body:          io.NopCloser(content),
+					},
+				},
+			}
+
+			b.ResetTimer()
+
+			for _, tc := range cases {
+				b.Run(tc.name, func(b *testing.B) {
+					b.Run("io.ReadAll", func(b *testing.B) {
+						for i := 0; i < b.N; i++ {
+							_, err := content.Seek(0, io.SeekStart) // reset
+							require.NoError(b, err)
+							data, err := io.ReadAll(tc.resp.Body)
+							require.NoError(b, err)
+							require.Equalf(b, size, len(data), "size does not match, expected %d, actual %d", size, len(data))
+						}
+					})
+					b.Run("bytes.Buffer+io.Copy", func(b *testing.B) {
+						for i := 0; i < b.N; i++ {
+							_, err := content.Seek(0, io.SeekStart) // reset
+							require.NoError(b, err)
+							data, err := ReadAll(tc.resp)
+							require.NoError(b, err)
+							require.Equalf(b, size, len(data), "size does not match, expected %d, actual %d", size, len(data))
+						}
+					})
+				})
+			}
 		})
 	}
 }
