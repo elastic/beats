@@ -664,7 +664,7 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
-  name: buildkite-pipeline-elastic-agent-package-7-17
+  name: beats-xpack-elastic-agent-package-7-17
   description: Buildkite pipeline for packaging Elastic Agent v7.17 package
   links:
     - title: Pipeline
@@ -683,14 +683,7 @@ spec:
       repository: elastic/elastic-agent
       pipeline_file: ".buildkite/x-pack/elastic-agent/pipeline.xpack.elastic-agent.package.yml"
       provider_settings:
-        build_pull_request_forks: false
-        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
-        publish_commit_status: false # do not update status of commits for this pipeline
-        build_tags: false
-        build_branches: false
-        filter_enabled: true
-        filter_condition: >-
-          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
+        trigger_mode: none # this pipeline is only triggered remotely
       cancel_intermediate_builds: true
       cancel_intermediate_builds_branch_filter: "!7.17"
       skip_intermediate_builds: true
