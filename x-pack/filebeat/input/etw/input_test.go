@@ -9,6 +9,7 @@ package etw
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 
@@ -451,7 +452,6 @@ func Test_buildEvent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			evt := buildEvent(tt.data, tt.header, tt.session, tt.cfg)
-
 			assert.Equal(t, tt.expected["winlog"].(map[string]any)["activity_guid"], evt.Fields["winlog"].(map[string]any)["activity_guid"])
 			assert.Equal(t, tt.expected["winlog"].(map[string]any)["channel"], evt.Fields["winlog"].(map[string]any)["channel"])
 			assert.Equal(t, tt.expected["winlog"].(map[string]any)["event_data"], evt.Fields["winlog"].(map[string]any)["event_data"])
@@ -463,13 +463,14 @@ func Test_buildEvent(t *testing.T) {
 			assert.Equal(t, tt.expected["winlog"].(map[string]any)["session"], evt.Fields["winlog"].(map[string]any)["session"])
 			assert.Equal(t, tt.expected["winlog"].(map[string]any)["task"], evt.Fields["winlog"].(map[string]any)["task"])
 			assert.Equal(t, tt.expected["winlog"].(map[string]any)["thread_id"], evt.Fields["winlog"].(map[string]any)["thread_id"])
-			assert.Equal(t, tt.expected["winlog"].(map[string]any)["version"], evt.Fields["winlog"].(map[string]any)["version"])
+			mapEv := evt.Fields.Flatten()
 
-			assert.Equal(t, tt.expected["event.code"], evt.Fields["event.code"])
-			assert.Equal(t, tt.expected["event.provider"], evt.Fields["event.provider"])
-			assert.Equal(t, tt.expected["event.severity"], evt.Fields["event.severity"])
-			assert.Equal(t, tt.expected["log.file.path"], evt.Fields["log.file.path"])
-			assert.Equal(t, tt.expected["log.level"], evt.Fields["log.level"])
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["version"], strconv.Itoa(int(mapEv["winlog.version"].(uint8))))
+			assert.Equal(t, tt.expected["event.code"], mapEv["event.code"])
+			assert.Equal(t, tt.expected["event.provider"], mapEv["event.provider"])
+			assert.Equal(t, tt.expected["event.severity"], mapEv["event.severity"])
+			assert.Equal(t, tt.expected["log.file.path"], mapEv["log.file.path"])
+			assert.Equal(t, tt.expected["log.level"], mapEv["log.level"])
 
 		})
 	}
