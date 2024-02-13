@@ -211,13 +211,6 @@ func TestValidateProtocolDevice(t *testing.T) {
 		expectedErr      string
 	}{
 		{
-			"NoDeviceIsValid",
-			"",
-			nil,
-			true,
-			"",
-		},
-		{
 			"DeviceIsIncorrect",
 			"eth0",
 			map[string]interface{}{

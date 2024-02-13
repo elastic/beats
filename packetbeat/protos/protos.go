@@ -171,8 +171,11 @@ func (s ProtocolsStruct) configureProtocol(test bool, device string, pub reporte
 		return nil
 	}
 
-	if isValid, err := validateProtocolDevice(device, config); !isValid {
-		return err
+	if device != "" {
+		// This could happen earlier, but let any errors be found first.
+		if isValid, err := validateProtocolDevice(device, config); !isValid {
+			return err
+		}
 	}
 
 	var client beat.Client
@@ -196,11 +199,6 @@ func (s ProtocolsStruct) configureProtocol(test bool, device string, pub reporte
 }
 
 func validateProtocolDevice(device string, config *conf.C) (bool, error) {
-	if device == "" {
-		return true, nil
-	}
-
-	// This could happen earlier, but let any errors be found first.
 	var protocol struct {
 		Interface struct {
 			Device string `config:"device"`
