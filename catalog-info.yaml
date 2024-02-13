@@ -664,11 +664,11 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
-  name: beats-xpack-elastic-agent-package
+  name: beats-xpack-elastic-agent-package-7-17
   description: Buildkite pipeline for packaging Elastic Agent v7.17 package
   links:
     - title: Pipeline
-      url: https://buildkite.com/elastic/beats-xpack-elastic-agent-package
+      url: https://buildkite.com/elastic/beats-xpack-elastic-agent-package-7-17
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
@@ -677,7 +677,7 @@ spec:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
     metadata:
-      name: beats-xpack-elastic-agent-package
+      name: beats-xpack-elastic-agent-package-7-17
       description: Buildkite pipeline for packaging Elastic Agent package
     spec:
       repository: elastic/elastic-agent
