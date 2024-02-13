@@ -10,22 +10,17 @@ GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 GITHUB_PR_LABELS=${GITHUB_PR_LABELS:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
 
+[ -z "${run_libbeat+x}" ] && run_libbeat="$(buildkite-agent meta-data get run_libbeat --default "false")"
+[ -z "${run_metricbeat+x}" ] && run_metricbeat="$(buildkite-agent meta-data get run_metricbeat --default "false")"
+[ -z "${run_packetbeat+x}" ] && run_packetbeat="$(buildkite-agent meta-data get run_packetbeat --default "false")"
+[ -z "${run_winlogbeat+x}" ] && run_winlogbeat="$(buildkite-agent meta-data get run_winlogbeat --default "false")"
+[ -z "${run_libbeat_arm_test+x}" ] && run_libbeat_arm_test="$(buildkite-agent meta-data get run_libbeat_arm_test --default "false")"
+[ -z "${run_packetbeat_arm_test+x}" ] && run_packetbeat_arm_test="$(buildkite-agent meta-data get run_packetbeat_arm_test --default "false")"
+[ -z "${run_metricbeat_macos_tests+x}" ] && run_metricbeat_macos_tests="$(buildkite-agent meta-data get run_metricbeat_macos_tests --default "false")"
+[ -z "${run_packetbeat_macos_tests+x}" ] && run_packetbeat_macos_tests="$(buildkite-agent meta-data get run_packetbeat_macos_tests --default "false")"
 trigger_specific_beat="run_${BEATS_PROJECT_NAME}"
 trigger_specific_arm_tests="run_${BEATS_PROJECT_NAME}_arm_tests"
 trigger_specific_macos_tests="run_${BEATS_PROJECT_NAME}_macos_tests"
-[ -z "${!trigger_specific_beat+x}" ] && trigger_specific_beat="$(buildkite-agent meta-data get "${!trigger_specific_beat}" --default "false")"
-[ -z "${!trigger_specific_arm_tests+x}" ] && trigger_specific_arm_tests="$(buildkite-agent meta-data get "${!trigger_specific_arm_tests}" --default "false")"
-[ -z "${!trigger_specific_macos_tests+x}" ] && trigger_specific_macos_tests="$(buildkite-agent meta-data get "${!trigger_specific_macos_tests}" --default "false")"
-
-#TODO remove commented-out after tests a new approach
-# [ -z "${run_libbeat+x}" ] && run_libbeat="$(buildkite-agent meta-data get run_libbeat --default ${run_libbeat:-"false"})"
-# [ -z "${run_metricbeat+x}" ] && run_metricbeat="$(buildkite-agent meta-data get run_metricbeat --default ${run_metricbeat:-"false"})"
-# [ -z "${run_packetbeat+x}" ] && run_packetbeat="$(buildkite-agent meta-data get run_packetbeat --default ${run_packetbeat:-"false"})"
-# [ -z "${run_winlogbeat+x}" ] && run_winlogbeat="$(buildkite-agent meta-data get run_winlogbeat --default ${run_winlogbeat:-"false"})"
-# [ -z "${run_libbeat_arm_test+x}" ] && run_libbeat_arm_test="$(buildkite-agent meta-data get run_libbeat_arm_test --default ${run_libbeat_arm_test:-"false"})"
-# [ -z "${run_packetbeat_arm_test+x}" ] && run_packetbeat_arm_test="$(buildkite-agent meta-data get run_packetbeat_arm_test --default ${run_packetbeat_arm_test:-"false"})"
-# [ -z "${run_metricbeat_macos_tests+x}" ] && run_metricbeat_macos_tests="$(buildkite-agent meta-data get run_metricbeat_macos_tests --default ${run_metricbeat_macos_tests:-"false"})"
-# [ -z "${run_packetbeat_macos_tests+x}" ] && run_packetbeat_macos_tests="$(buildkite-agent meta-data get run_packetbeat_macos_tests --default ${run_packetbeat_macos_tests:-"false"})"
 
 metricbeat_changeset=(
   "^metricbeat/.*"
