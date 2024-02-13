@@ -38,7 +38,6 @@ import (
 var embedBTFFolder embed.FS
 
 func getVerifiedProbes(ctx context.Context, timeout time.Duration) (map[tracing.Probe]tracing.AllocateFn, executor, error) {
-
 	fExec := newFixedThreadExecutor(ctx)
 
 	probeMgr, err := newProbeManager(fExec)
@@ -127,7 +126,6 @@ func loadEmbeddedSpecs() ([]*tkbtf.Spec, error) {
 		specs = append(specs, embedSpec)
 		return nil
 	})
-
 	if err != nil {
 		return nil, err
 	}

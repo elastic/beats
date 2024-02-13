@@ -32,7 +32,6 @@ type fsNotifyParentSymbol struct {
 }
 
 func loadFsNotifyParentSymbol(s *probeManager) error {
-
 	symbolInfo, err := s.getSymbolInfoRuntime("__fsnotify_parent")
 	if err != nil {
 		if !errors.Is(err, ErrSymbolNotFound) {

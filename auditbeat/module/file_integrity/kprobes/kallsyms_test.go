@@ -27,7 +27,6 @@ import (
 )
 
 func Test_getSymbolInfoFromReader(t *testing.T) {
-
 	content := `0000000000000000 t fsnotify_move
 0000000000000000 T fsnotify
 0000000000000000 T fsnotifyy

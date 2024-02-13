@@ -31,7 +31,6 @@ import (
 )
 
 func Test_executor(t *testing.T) {
-
 	// parent context is cancelled at creation
 	ctx, cancel := context.WithCancel(context.Background())
 	cancel()

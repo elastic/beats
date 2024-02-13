@@ -37,7 +37,7 @@ type eventID struct {
 var eventGenerators = []func(*eventsVerifier, string, string) error{
 	// create file - generates 1 event
 	func(e *eventsVerifier, targetFilePath string, targetMovedFilePath string) error {
-		file, err := os.OpenFile(targetFilePath, os.O_RDWR|os.O_CREATE, 0644)
+		file, err := os.OpenFile(targetFilePath, os.O_RDWR|os.O_CREATE, 0o644)
 		if err != nil {
 			return err
 		}
@@ -55,7 +55,7 @@ var eventGenerators = []func(*eventsVerifier, string, string) error{
 	},
 	// write to file - generates 1 event
 	func(e *eventsVerifier, targetFilePath string, targetMovedFilePath string) error {
-		file, err := os.OpenFile(targetFilePath, os.O_WRONLY, 0644)
+		file, err := os.OpenFile(targetFilePath, os.O_WRONLY, 0o644)
 		if err != nil {
 			return err
 		}
@@ -76,7 +76,7 @@ var eventGenerators = []func(*eventsVerifier, string, string) error{
 	},
 	// change mode of file - generates 1 event
 	func(e *eventsVerifier, targetFilePath string, targetMovedFilePath string) error {
-		if err := os.Chmod(targetFilePath, 0700); err != nil {
+		if err := os.Chmod(targetFilePath, 0o700); err != nil {
 			return err
 		}
 		e.addEventToExpect(targetFilePath, unix.IN_ATTRIB)
@@ -127,7 +127,7 @@ var eventGenerators = []func(*eventsVerifier, string, string) error{
 	},
 	// create a directory - generates 1 event
 	func(e *eventsVerifier, targetFilePath string, targetMovedFilePath string) error {
-		if err := os.Mkdir(targetFilePath, 0600); err != nil {
+		if err := os.Mkdir(targetFilePath, 0o600); err != nil {
 			return err
 		}
 		e.addEventToExpect(targetFilePath, unix.IN_CREATE)
@@ -135,7 +135,7 @@ var eventGenerators = []func(*eventsVerifier, string, string) error{
 	},
 	// change mode of directory - generates 1 event
 	func(e *eventsVerifier, targetFilePath string, targetMovedFilePath string) error {
-		if err := os.Chmod(targetFilePath, 0644); err != nil {
+		if err := os.Chmod(targetFilePath, 0o644); err != nil {
 			return err
 		}
 		e.addEventToExpect(targetFilePath, unix.IN_ATTRIB)
@@ -178,7 +178,6 @@ var eventGenerators = []func(*eventsVerifier, string, string) error{
 	// move directory - generates 2 events
 	func(e *eventsVerifier, targetFilePath string, targetMovedFilePath string) error {
 		if err := os.Rename(targetFilePath, targetMovedFilePath); err != nil {
-
 			return err
 		}
 		e.addEventToExpect(targetFilePath, unix.IN_MOVED_FROM)
@@ -264,7 +263,6 @@ func (e *eventsVerifier) GenerateEvents() error {
 // Verified checks that all expected events filled during GenerateEvents() are present without any missing
 // or duplicated.
 func (e *eventsVerifier) Verified() error {
-
 	if e.eventsToExpectNr == 0 {
 		return ErrVerifyNoEventsToExpect
 	}

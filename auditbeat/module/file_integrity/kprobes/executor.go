@@ -74,7 +74,6 @@ func (ex *fixedExecutor) Close() {
 
 // newFixedThreadExecutor returns a new fixedExecutor.
 func newFixedThreadExecutor(ctx context.Context) *fixedExecutor {
-
 	mCtx, cancelFn := context.WithCancel(ctx)
 
 	ex := &fixedExecutor{

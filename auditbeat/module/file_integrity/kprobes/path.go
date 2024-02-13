@@ -172,12 +172,10 @@ func (r *pTraverser) WalkAsync(path string, depth uint32, tid uint32) {
 		case r.errC <- walkErr:
 		case <-r.ctx.Done():
 		}
-
 	}()
 }
 
 func (r *pTraverser) walkRecursive(ctx context.Context, path string, mounts mountPoints, depth uint32, isFromMove bool, tid uint32) error {
-
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
@@ -285,7 +283,6 @@ func (r *pTraverser) waitForWalk(ctx context.Context) error {
 }
 
 func (r *pTraverser) walk(ctx context.Context, path string, depth uint32, isFromMove bool, tid uint32) error {
-
 	// get a snapshot of all mountpoints
 	mounts, err := getAllMountPoints()
 	if err != nil {

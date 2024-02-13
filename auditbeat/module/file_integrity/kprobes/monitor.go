@@ -93,7 +93,6 @@ func New(isRecursive bool) (*Monitor, error) {
 }
 
 func newMonitor(ctx context.Context, isRecursive bool, pChannel perfChannel, exec executor) (*Monitor, error) {
-
 	mCtx, cancelFunc := context.WithCancel(ctx)
 
 	p, err := newPathMonitor(mCtx, exec, 0, isRecursive)

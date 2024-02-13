@@ -190,7 +190,6 @@ func (p *pathTestSuite) TestRecursiveWalkAsync() {
 }
 
 func (p *pathTestSuite) TestWalkAsyncTimeoutErr() {
-
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	p.Require().NoError(err)
 	defer os.RemoveAll(tmpDir)

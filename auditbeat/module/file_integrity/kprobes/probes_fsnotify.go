@@ -36,7 +36,6 @@ type fsNotifySymbol struct {
 }
 
 func loadFsNotifySymbol(s *probeManager) error {
-
 	symbolInfo, err := s.getSymbolInfoRuntime("fsnotify")
 	if err != nil {
 		return err

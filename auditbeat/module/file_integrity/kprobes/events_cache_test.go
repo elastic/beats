@@ -28,7 +28,7 @@ import (
 )
 
 func (d *dEntryCache) Dump(path string) error {
-	fileDump, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
+	fileDump, err := os.OpenFile(path, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0o644)
 	if err != nil {
 		return err
 	}
@@ -135,7 +135,6 @@ func Test_DirEntryCache_Add(t *testing.T) {
 }
 
 func Test_DirEntryCache_Get(t *testing.T) {
-
 	cases := []struct {
 		name  string
 		key   dKey
@@ -609,7 +608,6 @@ func Test_DirEntryCache_GetChild(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-
 			for _, child := range c.children {
 				c.entry.AddChild(child)
 			}
@@ -621,7 +619,6 @@ func Test_DirEntryCache_GetChild(t *testing.T) {
 			} else {
 				require.NotNil(t, childEntry)
 			}
-
 		})
 	}
 }

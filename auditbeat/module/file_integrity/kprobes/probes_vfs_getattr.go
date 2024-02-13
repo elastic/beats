@@ -32,7 +32,6 @@ type vfsGetAttrSymbol struct {
 }
 
 func loadVFSGetAttrSymbol(s *probeManager, e executor) error {
-
 	// get the vfs_getattr_nosec symbol information
 	symbolInfo, err := s.getSymbolInfoRuntime("vfs_getattr_nosec")
 	if err != nil {

@@ -28,7 +28,6 @@ import (
 )
 
 func Test_EventsVerifier(t *testing.T) {
-
 	type verifierEvents struct {
 		path string
 		op   uint32
@@ -175,7 +174,6 @@ func Test_EventsVerifier(t *testing.T) {
 }
 
 func Test_EventsVerifier_GenerateEvents(t *testing.T) {
-
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	require.NoError(t, err)
 

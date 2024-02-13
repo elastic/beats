@@ -30,10 +30,8 @@ import (
 	"sync"
 )
 
-var (
-	// Used to make the mount functions thread safe
-	mountMutex sync.Mutex
-)
+// Used to make the mount functions thread safe
+var mountMutex sync.Mutex
 
 // mount contains information for a specific mounted filesystem.
 //

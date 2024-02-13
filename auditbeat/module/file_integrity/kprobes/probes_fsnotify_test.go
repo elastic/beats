@@ -98,5 +98,4 @@ func Test_fsNotifySymbol_onErr(t *testing.T) {
 	require.False(t, s.onErr(ErrVerifyMissingEvents))
 
 	require.False(t, s.onErr(ErrVerifyUnexpectedEvent))
-
 }

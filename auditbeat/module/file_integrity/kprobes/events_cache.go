@@ -23,8 +23,10 @@ import (
 	"path/filepath"
 )
 
-type dEntriesIndex map[dKey]*dEntry
-type dEntriesMoveIndex map[uint64]*dEntry
+type (
+	dEntriesIndex     map[dKey]*dEntry
+	dEntriesMoveIndex map[uint64]*dEntry
+)
 
 // dEntryCache is a cache of directory entries (dEntries) that exposes appropriate methods to add, get, remove and
 // handle move operations. Note that dEntryCache is designed to be utilised by a single goroutine at a time and thus

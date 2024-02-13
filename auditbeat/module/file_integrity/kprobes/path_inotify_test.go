@@ -29,7 +29,6 @@ import (
 )
 
 func Test_InotifyWatcher(t *testing.T) {
-
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	require.NoError(t, err)
 	defer os.RemoveAll(tmpDir)
@@ -64,7 +63,6 @@ func Test_InotifyWatcher(t *testing.T) {
 }
 
 func Test_InotifyWatcher_Add_Err(t *testing.T) {
-
 	watcher, err := newInotifyWatcher()
 	require.NoError(t, err)
 
@@ -82,7 +80,6 @@ func Test_InotifyWatcher_Add_Err(t *testing.T) {
 }
 
 func Test_InotifyWatcher_Close_Err(t *testing.T) {
-
 	tmpDir, err := os.MkdirTemp("", "kprobe_unit_test")
 	require.NoError(t, err)
 	defer os.RemoveAll(tmpDir)

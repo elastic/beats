@@ -470,7 +470,6 @@ func (p *monitorTestSuite) TestRunEmitError() {
 }
 
 func (p *monitorTestSuite) TestNew() {
-
 	if runtime.GOARCH != "amd64" && runtime.GOARCH != "arm64" {
 		p.T().Skip("skipping on non-amd64/arm64")
 		return

@@ -145,5 +145,4 @@ func Test_vfsGetAttr_onErr(t *testing.T) {
 	testErr := fmt.Errorf("test: %w", ErrVerifyOverlappingEvents)
 	repeat := s.onErr(testErr)
 	require.False(t, repeat)
-
 }
