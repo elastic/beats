@@ -31,7 +31,7 @@ import (
 func TestNewDB(t *testing.T) {
 	service := compose.EnsureUp(t, "mysql")
 
-	db, err := NewDB(GetMySQLEnvDSN(service.Host()))
+	db, err := NewDB(GetMySQLEnvDSN(service.Host()), nil)
 	assert.NoError(t, err)
 
 	err = db.Ping()
