@@ -32,12 +32,6 @@ def is_platform_supported():
     return {'aarch64', 'arm64', 'x86_64', 'amd64'}.intersection(p)
 
 
-if platform.system() == 'Linux':
-    fim_backends = ["fsnotify", "kprobes"]
-else:
-    fim_backends = ["fsnotify"]
-
-
 # Escapes a path to match what's printed in the logs
 def escape_path(path):
     return path.replace('\\', '\\\\')
@@ -86,13 +80,13 @@ class Test(BaseTest):
 
     def wait_output(self, min_events):
         self.wait_until(lambda: wrap_except(lambda: len(self.read_output()) >= min_events))
-        # wait for the number of lines in the file to stay constant for 10 seconds
+        # wait for the number of lines in the file to stay constant for a second
         prev_lines = -1
         while True:
             num_lines = self.output_lines()
             if prev_lines < num_lines:
                 prev_lines = num_lines
-                time.sleep(10)
+                time.sleep(1)
             else:
                 break
 
