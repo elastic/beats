@@ -84,14 +84,16 @@ func (*nilEnricher) Stop(*Watchers)    {}
 func (*nilEnricher) Enrich([]mapstr.M) {}
 
 type watcherData struct {
-	metricsetsUsing []string // list of metricsets using this watcher
-
 	watcher kubernetes.Watcher
 	started bool // true if watcher has started, false otherwise
 
-	enrichers map[string]*enricher // map of enrichers using this watcher. The key is the metricset name
+	metricsetsUsing []string // list of metricsets using this watcher
 
-	metadataObjects map[string]bool // map of ids of each object received by the handler functions
+	enrichers       map[string]*enricher // map of enrichers using this watcher. The key is the metricset name
+	metadataObjects map[string]bool      // map of ids of each object received by the handler functions
+
+	nodeScope    bool // whether this watcher is only for current node
+	needsRestart bool // whether this watcher needs a restart
 }
 
 type Watchers struct {
@@ -254,12 +256,13 @@ func createWatcher(
 	options kubernetes.WatchOptions,
 	client k8sclient.Interface,
 	resourceWatchers *Watchers,
-	namespace string) (bool, error) {
+	namespace string,
+	nodeScope bool) (bool, error) {
 
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
 
-	_, ok := resourceWatchers.watchersMap[resourceName]
+	watcher, ok := resourceWatchers.watchersMap[resourceName]
 	// if it does not exist, create the watcher
 	if !ok {
 		// check if we need to add namespace to the watcher options
@@ -276,8 +279,16 @@ func createWatcher(
 			metadataObjects: make(map[string]bool),
 			enrichers:       make(map[string]*enricher),
 			metricsetsUsing: make([]string, 0),
+			needsRestart:    false,
+			nodeScope:       nodeScope,
 		}
 		return true, nil
+	} else if watcher.nodeScope != nodeScope && watcher.nodeScope {
+		// It might happen that the watcher already exists, but is only being used to monitor the resources
+		// of a single node. In that case, we need to check if we are trying to create a new watcher that will track
+		// the resources of multiple nodes. If it is the case, then we need to update the watcher.
+		watcher.nodeScope = nodeScope
+		watcher.needsRestart = true
 	}
 	return false, nil
 }
@@ -348,7 +359,7 @@ func createAllWatchers(
 
 	// Create a watcher for the given resource.
 	// If it fails, we return an error, so we can stop the extra watchers from creating.
-	created, err := createWatcher(resourceName, res, *options, client, resourceWatchers, config.Namespace)
+	created, err := createWatcher(resourceName, res, *options, client, resourceWatchers, config.Namespace, nodeScope)
 	if err != nil {
 		return fmt.Errorf("error initializing Kubernetes watcher %s, required by %s: %w", resourceName, metricsetName, err)
 	} else if created {
@@ -362,7 +373,7 @@ func createAllWatchers(
 	for _, extra := range extraWatchers {
 		extraRes := getResource(extra)
 		if extraRes != nil {
-			created, err = createWatcher(extra, extraRes, *options, client, resourceWatchers, config.Namespace)
+			created, err = createWatcher(extra, extraRes, *options, client, resourceWatchers, config.Namespace, false)
 			if err != nil {
 				log.Errorf("Error initializing Kubernetes watcher %s, required by %s: %s", extra, metricsetName, err)
 			} else {
@@ -963,14 +974,24 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 		}
 	}
 
-	// Start the main watcher if not already started.
+	// Start the main watcher if not already started or if a restart is needed
 	resourceWatcher := resourceWatchers.watchersMap[e.resourceName]
-	if resourceWatcher != nil && !resourceWatcher.started {
-		if err := resourceWatcher.watcher.Start(); err != nil {
-			e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
-		} else {
-			resourceWatcher.started = true
+	if resourceWatcher != nil {
+		if !resourceWatcher.started {
+			if err := resourceWatcher.watcher.Start(); err != nil {
+				e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
+			} else {
+				resourceWatcher.started = true
+			}
+		} else if resourceWatcher.needsRestart {
+			resourceWatcher.watcher.Stop()
+			if err := resourceWatcher.watcher.Start(); err != nil {
+				e.log.Warnf("Error restarting %s watcher: %s", e.resourceName, err)
+			} else {
+				resourceWatcher.needsRestart = false
+			}
 		}
+
 	}
 }
 
