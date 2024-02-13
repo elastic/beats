@@ -635,9 +635,9 @@ spec:
       name: beats-xpack-metricbeat
       description: "Beats x-pack metricbeat pipeline"
     spec:
-      # branch_configuration: "main 7.17 8.*"         #TODO: uncomment after tests
+      # branch_configuration: "7.17"         #TODO: uncomment after tests
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.metricbeat.yml"
-      # maximum_timeout_in_minutes: 120         #TODO: uncomment after tests
+      maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
@@ -648,9 +648,9 @@ spec:
           build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
       repository: elastic/beats
       cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      cancel_intermediate_builds_branch_filter: "!7.17"
       skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.17 !8.*"
+      skip_intermediate_builds_branch_filter: "!7.17"
       # env:
       #   ELASTIC_PR_COMMENTS_ENABLED: "true"            #TODO: uncomment after tests
       teams:
@@ -677,7 +677,7 @@ spec:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
     metadata:
-      name: elastic-agent-package-717
+      name: elastic-agent-package-7-17
       description: Buildkite pipeline for packaging Elastic Agent package
     spec:
       repository: elastic/elastic-agent
