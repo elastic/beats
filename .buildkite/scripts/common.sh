@@ -247,22 +247,16 @@ are_conditions_met_mandatory_tests() {
   if are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
     return 0
   fi
-  if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
-    if are_paths_changed "${beat_changeset_reference[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test ${BEATS_PROJECT_NAME}" || "${GITHUB_PR_LABELS}" =~ /(?i)${BEATS_PROJECT_NAME}/ || "${!trigger_specific_beat}" == "true" ]]; then
-      return 0
-    fi
+  if are_paths_changed "${beat_changeset_reference[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test ${BEATS_PROJECT_NAME}" || "${GITHUB_PR_LABELS}" =~ /(?i)${BEATS_PROJECT_NAME}/ || "${!trigger_specific_beat}" == "true" ]]; then
+    return 0
   fi
   return 1
 }
 
 are_conditions_met_arm_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" ]]; then
-      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test libbeat for arm" || "${GITHUB_PR_LABELS}" =~ arm || "${run_libbeat_arm_test}" == "true" ]]; then
-        return 0
-      fi
-    elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
-      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat for arm" || "${GITHUB_PR_LABELS}" =~ arm || "${run_packetbeat_arm_test}" == "true" ]]; then
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test ${BEATS_PROJECT_NAME} for arm" || "${GITHUB_PR_LABELS}" =~ arm || "${!trigger_specific_arm_tests}" == "true" ]]; then
         return 0
       fi
     fi
@@ -272,12 +266,8 @@ are_conditions_met_arm_tests() {
 
 are_conditions_met_macos_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
-      if [[ "${run_metricbeat_macos_tests}" == true ]] || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat for macos" ]] || [[ "${GITHUB_PR_LABELS}" =~ macOS ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
-        return 0
-      fi
-    elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
-      if [[ "${run_packetbeat_macos_tests}" == true ]] || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat for macos" ]] || [[ "${GITHUB_PR_LABELS}" =~ macOS ]]; then
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test ${BEATS_PROJECT_NAME} for macos" || "${GITHUB_PR_LABELS}" =~ macOS || "${!trigger_specific_macos_tests}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
         return 0
       fi
     fi
