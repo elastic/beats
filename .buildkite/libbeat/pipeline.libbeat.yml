@@ -23,8 +23,8 @@ steps:
         - label: "False"
           value: "false"
       default: "false"
-    - select: "Libbeat - run_libbeat_arm_test"
-      key: "run_libbeat_arm_test"
+    - select: "Libbeat - run_libbeat_arm_tests"
+      key: "run_libbeat_arm_tests"
       options:
         - label: "True"
           value: "true"

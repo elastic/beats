@@ -30,8 +30,8 @@ steps:
         - label: "False"
           value: "false"
       default: "false"
-    - select: "Packetbeat - run_packetbeat_arm_test"
-      key: "run_packetbeat_arm_test"
+    - select: "Packetbeat - run_packetbeat_arm_tests"
+      key: "run_packetbeat_arm_tests"
       options:
         - label: "True"
           value: "true"
