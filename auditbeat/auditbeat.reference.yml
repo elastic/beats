@@ -174,7 +174,7 @@ auditbeat.modules:
   # - file.pe.go_imports_names_entropy
   # - file.pe.go_imports_names_var_entropy
   # - file.pe.go_stripped
-
+ 
 
 
 # ================================== General ===================================
@@ -1189,7 +1189,7 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-
+  
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
 
@@ -1366,7 +1366,7 @@ setup.template.settings:
 
 # ======================== Data Stream Lifecycle (DSL) =========================
 
-# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch.
+# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch. 
 # These settings are mutually exclusive with ILM settings which are not supported in Serverless projects.
 
 # Enable DSL support. Valid values are true, or false.
@@ -1374,7 +1374,7 @@ setup.template.settings:
 
 # Set the lifecycle policy name or pattern. For DSL, this name must match the data stream that the lifecycle is for.
 # The default data stream pattern is auditbeat-%{[agent.version]}"
-# The template string `%{[agent.version]}` will resolve to the current stack version.
+# The template string `%{[agent.version]}` will resolve to the current stack version. 
 # The other possible template value is `%{[beat.name]}`.
 #setup.dsl.data_stream_pattern: "auditbeat-%{[agent.version]}"
 
