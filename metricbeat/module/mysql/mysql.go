@@ -80,7 +80,11 @@ func NewMetricset(base mb.BaseMetricSet) (*Metricset, error) {
 //	Format:  [username[:password]@][protocol[(address)]]/
 //	Example: root:test@tcp(127.0.0.1:3306)/
 func ParseDSN(mod mb.Module, host string) (mb.HostData, error) {
-	var c Config
+	c := struct {
+		Username string            `config:"username"`
+		Password string            `config:"password"`
+		TLS      *tlscommon.Config `config:"ssl"`
+	}{}
 
 	if err := mod.UnpackConfig(&c); err != nil {
 		return mb.HostData{}, err
