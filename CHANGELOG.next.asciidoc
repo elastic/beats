@@ -92,6 +92,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
 - Update github.com/lestrrat-go/jwx dependency. {pull}37799[37799]
 - [threatintel] MISP pagination fixes {pull}37898[37898]
+- Fix file handle leak when handling errors in filestream {pull}37973[37973]
 
 *Heartbeat*
 
@@ -178,6 +179,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Prevent complete loss of long request trace data. {issue}37826[37826] {pull}37836[37836]
 - Added experimental version of the Websocket Input. {pull}37774[37774]
 - Add support for PEM-based Okta auth in CEL. {pull}37813[37813]
+- Add ETW input. {pull}36915[36915]
 - Update CEL mito extensions to v1.9.0 to add keys/values helper. {pull}37971[37971]
 
 *Auditbeat*
