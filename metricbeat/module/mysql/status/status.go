@@ -40,20 +40,25 @@ func init() {
 
 // MetricSet for fetching MySQL server status.
 type MetricSet struct {
-	mb.BaseMetricSet
+	*mysql.Metricset
 	db *sql.DB
 }
 
 // New creates and returns a new MetricSet instance.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return &MetricSet{BaseMetricSet: base}, nil
+	ms, err := mysql.NewMetricset(base)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MetricSet{Metricset: ms, db: nil}, nil
 }
 
 // Fetch fetches status messages from a mysql host.
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if m.db == nil {
 		var err error
-		m.db, err = mysql.NewDB(m.HostData().URI)
+		m.db, err = mysql.NewDB(m.HostData().URI, m.Metricset.Config.TLSConfig)
 		if err != nil {
 			return fmt.Errorf("mysql-status fetch failed: %w", err)
 		}
