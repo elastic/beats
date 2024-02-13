@@ -48,6 +48,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Filebeat*
 
 - [threatintel] MISP pagination fixes {pull}37898[37898]
+- Fix file handle leak when handling errors in filestream {pull}37973[37973]
 
 *Heartbeat*
 
