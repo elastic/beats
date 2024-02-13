@@ -18,6 +18,9 @@ steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
         command: ".buildkite/scripts/unit_tests.sh"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Ubuntu Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -27,6 +30,9 @@ steps:
       - label: ":go: Go Intergration Tests"
         key: "mandatory-int-test"
         command: ".buildkite/scripts/go_int_tests.sh"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Go Intergration Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -36,6 +42,9 @@ steps:
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: ".buildkite/scripts/py_int_tests.sh"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Python Integration Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -45,6 +54,9 @@ steps:
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
         command: ".buildkite/scripts/crosscompile.sh"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Cross compile"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -53,6 +65,9 @@ steps:
 
       - label: ":windows: Windows 2016/2022 Unit Tests - {{matrix.image}}"
         command: ".buildkite/scripts/win_unit_tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Windows 2016/2022 Unit Tests"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -76,6 +91,9 @@ steps:
       - label: ":windows: Windows 2019 Unit Tests"
         key: "extended-win-2019-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Windows 2019 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -84,10 +102,12 @@ steps:
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      # Temporary disabled https://github.com/elastic/beats/issues/37841
       - label: ":windows: Windows 10 Unit Tests"
         key: "extended-win-10-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Windows 10 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -99,6 +119,9 @@ steps:
       - label: ":windows: Windows 11 Unit Tests"
         key: "extended-win-11-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Windows 11 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -122,6 +145,9 @@ if are_conditions_met_macos_tests; then
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
         command: ".buildkite/scripts/unit_tests.sh"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: MacOS Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -145,6 +171,9 @@ if are_conditions_met_packaging; then
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
         command: ".buildkite/scripts/packaging.sh"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Packaging Linux"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -155,6 +184,9 @@ if are_conditions_met_packaging; then
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
         command: ".buildkite/scripts/packaging.sh"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Packaging ARM"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"

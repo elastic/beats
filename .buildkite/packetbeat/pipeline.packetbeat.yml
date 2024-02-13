@@ -1,4 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+name: "beats-packetbeat"
+
 env:
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
@@ -53,3 +55,6 @@ steps:
   - label: ":linux: Load dynamic packetbeat pipeline"
     key: "packetbeat-pipeline"
     command: ".buildkite/scripts/generate_packetbeat_pipeline.sh"
+    notify:
+      - github_commit_status:
+          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline"

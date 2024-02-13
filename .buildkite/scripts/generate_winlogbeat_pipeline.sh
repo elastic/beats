@@ -19,6 +19,9 @@ steps:
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
         command: ".buildkite/scripts/crosscompile.sh"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Cross compile"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -27,6 +30,9 @@ steps:
 
       - label: ":windows: Windows 2016/2019/2022 Unit Tests - {{matrix.image}}"
         command: ".buildkite/scripts/win_unit_tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Windows 2016/2019/2022 Unit Tests"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -52,6 +58,9 @@ steps:
       - label: ":windows: Windows 10 Unit Tests"
         key: "extended-win-10-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Windows 10 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -63,6 +72,9 @@ steps:
       - label: ":windows: Windows 11 Unit Tests"
         key: "extended-win-11-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Windows 11 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -91,6 +103,9 @@ if are_conditions_met_packaging; then
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
         command: ".buildkite/scripts/packaging.sh"
+        notify:
+          - github_commit_status:
+              context: "${BEATS_PROJECT_NAME}: Packaging Linux"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"

@@ -1,4 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+name: "beats-libbeat"
 
 env:
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
@@ -39,3 +40,6 @@ steps:
   - label: ":linux: Load dynamic Libbeat pipeline"
     key: "libbeat-pipeline"
     command: ".buildkite/scripts/generate_libbeat_pipeline.sh"
+    notify:
+      - github_commit_status:
+          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline"
