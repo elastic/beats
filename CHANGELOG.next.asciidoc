@@ -92,6 +92,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
 - Update github.com/lestrrat-go/jwx dependency. {pull}37799[37799]
 - [threatintel] MISP pagination fixes {pull}37898[37898]
+- Fix file handle leak when handling errors in filestream {pull}37973[37973]
 
 *Heartbeat*
 
