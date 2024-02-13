@@ -15,6 +15,8 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux && cgo
+
 package journalfield
 
 import (
@@ -228,8 +230,8 @@ var expandCapabilitiesTests = []struct {
 							"CAP_PERFMON",
 							"CAP_BPF",
 							"CAP_CHECKPOINT_RESTORE",
-							"41",
-							"42",
+							"CAP_41",
+							"CAP_42",
 						},
 					},
 				},

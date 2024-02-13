@@ -33,14 +33,14 @@ const (
 var EnumNamesSource = map[Source]string{
 	SourceScan:     "Scan",
 	SourceFSNotify: "FSNotify",
-	SourceEBPF:     "EBPF",
+	SourceEBPF:     "eBPF",
 	SourceKProbes:  "KProbes",
 }
 
 var EnumValuesSource = map[string]Source{
 	"Scan":     SourceScan,
 	"FSNotify": SourceFSNotify,
-	"EBPF":     SourceEBPF,
+	"eBPF":     SourceEBPF,
 	"KProbes":  SourceKProbes,
 }
 

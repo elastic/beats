@@ -20,25 +20,51 @@
 package file_integrity
 
 import (
+	"errors"
+
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// NewEventReader creates a new EventProducer backed by fsnotify.
-func NewEventReader(c Config) (EventProducer, error) {
-	switch c.ForceBackend {
-	case BackendKProbes:
-		return &kProbesReader{
-			config:  c,
-			log:     logp.NewLogger(moduleName),
-			parsers: FileParsers(c),
-		}, nil
-	case BackendFSNotify:
-		fallthrough
-	default:
+func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
+	if c.Backend == BackendAuto || c.Backend == BackendFSNotify || c.Backend == "" {
+		// Auto and unset defaults to fsnotify
+		l := logger.Named("fsnotify")
+		l.Info("selected backend: fsnotify")
 		return &fsNotifyReader{
 			config:  c,
-			log:     logp.NewLogger(moduleName),
+			log:     l,
 			parsers: FileParsers(c),
 		}, nil
 	}
+
+	if c.Backend == BackendEBPF {
+		l := logger.Named("ebpf")
+		l.Info("selected backend: ebpf")
+
+		paths := make(map[string]struct{})
+		for _, p := range c.Paths {
+			paths[p] = struct{}{}
+		}
+
+		return &ebpfReader{
+			config:  c,
+			log:     l,
+			parsers: FileParsers(c),
+			paths:   paths,
+			eventC:  make(chan Event),
+		}, nil
+	}
+
+	if c.Backend == BackendKprobes {
+		l := logger.Named("kprobes")
+		l.Info("selected backend: kprobes")
+		return &kProbesReader{
+			config:  c,
+			log:     l,
+			parsers: FileParsers(c),
+		}, nil
+	}
+
+	// unimplemented
+	return nil, errors.ErrUnsupported
 }

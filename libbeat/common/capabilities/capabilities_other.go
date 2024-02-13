@@ -15,39 +15,33 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package memqueue
+//go:build !linux
 
-type batchBuffer struct {
-	next    *batchBuffer
-	flushed bool
-	entries []queueEntry
+package capabilities
+
+import "errors"
+
+// Dummy value on "not linux".
+type Flag = uint
+
+const (
+	// Meaningless on "not linux".
+	Effective = Flag(0)
+	// Meaningless on "not linux".
+	Permitted = Flag(1)
+)
+
+// Returns errors.ErrUnsupported on "not linux".
+func FromPid(flag Flag, pid int) ([]string, error) {
+	return nil, errors.ErrUnsupported
 }
 
-func newBatchBuffer(sz int) *batchBuffer {
-	b := &batchBuffer{}
-	b.entries = make([]queueEntry, 0, sz)
-	return b
+// Returns errors.ErrUnsupported on "not linux".
+func FromUint64(w uint64) ([]string, error) {
+	return nil, errors.ErrUnsupported
 }
 
-func (b *batchBuffer) add(entry queueEntry) {
-	b.entries = append(b.entries, entry)
-}
-
-func (b *batchBuffer) length() int {
-	return len(b.entries)
-}
-
-func (b *batchBuffer) cancel(producer *ackProducer) int {
-	entries := b.entries[:0]
-
-	removedCount := 0
-	for _, entry := range b.entries {
-		if entry.producer == producer {
-			removedCount++
-			continue
-		}
-		entries = append(entries, entry)
-	}
-	b.entries = entries
-	return removedCount
+// Returns errors.ErrUnsupported on "not linux".
+func FromString(s string, base int) ([]string, error) {
+	return nil, errors.ErrUnsupported
 }

@@ -8,8 +8,7 @@ from auditbeat import *
 def is_root():
     if 'geteuid' not in dir(os):
         return False
-    euid = os.geteuid()
-    return euid == 0
+    return os.geteuid() == 0
 
 
 def is_version_below(version, target):
@@ -77,7 +76,6 @@ def wrap_except(expr):
 
 
 class Test(BaseTest):
-
     def wait_output(self, min_events):
         self.wait_until(lambda: wrap_except(lambda: len(self.read_output()) >= min_events))
         # wait for the number of lines in the file to stay constant for a second
@@ -91,6 +89,8 @@ class Test(BaseTest):
                 break
 
     def wait_startup(self, backend, dir):
+        if backend == "ebpf":
+            self.wait_log_contains("started ebpf watcher", max_timeout=30, ignore_case=True)
         if backend == "kprobes":
             self.wait_log_contains("Started kprobes watcher", max_timeout=30, ignore_case=True)
         else:
@@ -114,7 +114,7 @@ class Test(BaseTest):
                 "scan_at_start": False
             }
             if platform.system() == "Linux":
-                extras["force_backend"] = backend
+                extras["backend"] = backend
 
             self.render_config_template(
                 modules=[{
@@ -174,12 +174,16 @@ class Test(BaseTest):
 
     @unittest.skipIf(os.getenv("CI") is not None and platform.system() == 'Darwin',
                      'Flaky test: https://github.com/elastic/beats/issues/24678')
-    def test_non_recursive_fsnotify(self):
+    def test_non_recursive__fsnotify(self):
         self._test_non_recursive("fsnotify")
+
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_non_recursive__ebpf(self):
+        self._test_non_recursive("ebpf")
 
     @unittest.skipUnless(is_platform_supported(), "Requires Linux 3.10.0+ and arm64/amd64 arch")
     @unittest.skipUnless(is_root(), "Requires root")
-    def test_non_recursive_kprobes(self):
+    def test_non_recursive__kprobes(self):
         self._test_non_recursive("kprobes")
 
     def _test_recursive(self, backend):
@@ -195,9 +199,8 @@ class Test(BaseTest):
                 "scan_at_start": False,
                 "recursive": True
             }
-
             if platform.system() == "Linux":
-                extras["force_backend"] = backend
+                extras["backend"] = backend
 
             self.render_config_template(
                 modules=[{
@@ -249,14 +252,19 @@ class Test(BaseTest):
             file_events(objs, file1, ['created'])
             file_events(objs, file2, ['created'])
 
-    def test_recursive_fsnotify(self):
+    def test_recursive__fsnotify(self):
         self._test_recursive("fsnotify")
+
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_recursive__ebpf(self):
+        self._test_recursive("ebpf")
 
     @unittest.skipUnless(is_platform_supported(), "Requires Linux 3.10.0+ and arm64/amd64 arch")
     @unittest.skipUnless(is_root(), "Requires root")
-    def test_recursive_kprobes(self):
+    def test_recursive__kprobes(self):
         self._test_recursive("kprobes")
 
+    @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
     def _test_file_modified(self, backend):
         """
         file_integrity tests for file modifications (chmod, chown, write, truncate, xattrs).
@@ -265,7 +273,6 @@ class Test(BaseTest):
         dirs = [self.temp_dir("auditbeat_test")]
 
         with PathCleanup(dirs):
-
             self.render_config_template(
                 modules=[{
                     "name": "file_integrity",
@@ -273,7 +280,7 @@ class Test(BaseTest):
                         "paths": dirs,
                         "scan_at_start": False,
                         "recursive": False,
-                        "force_backend": backend
+                        "backend": backend
                     }
                 }],
             )
@@ -284,31 +291,24 @@ class Test(BaseTest):
             f = os.path.join(dirs[0], f'file_{backend}.txt')
             self.create_file(f, "hello world!")
 
-            if backend == "fsnotify" or backend == "kprobes":
-                # FSNotify can't catch the events if operations happens too fast
-                time.sleep(1)
+            # FSNotify can't catch the events if operations happens too fast
+            time.sleep(1)
 
             # Event 2: chmod
             os.chmod(f, 0o777)
-
-            if backend == "fsnotify" or backend == "kprobes":
-                # FSNotify can't catch the events if operations happens too fast
-                time.sleep(1)
+            # FSNotify can't catch the events if operations happens too fast
+            time.sleep(1)
 
             with open(f, "w") as fd:
                 # Event 3: write
                 fd.write("data")
-
-                if backend == "fsnotify" or backend == "kprobes":
-                    # FSNotify can't catch the events if operations happens too fast
-                    time.sleep(1)
+                # FSNotify can't catch the events if operations happens too fast
+                time.sleep(1)
 
                 # Event 4: truncate
                 fd.truncate(0)
-
-                if backend == "fsnotify" or backend == "kprobes":
-                    # FSNotify can't catch the events if operations happens too fast
-                    time.sleep(1)
+                # FSNotify can't catch the events if operations happens too fast
+                time.sleep(1)
 
             # Wait N events
             self.wait_output(4)
@@ -322,10 +322,15 @@ class Test(BaseTest):
             assert self.log_contains("auditbeat stopped")
 
     @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
-    def test_file_modified_fsnotify(self):
+    def test_file_modified__fsnotify(self):
         self._test_file_modified("fsnotify")
+
+    @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_file_modified__ebpf(self):
+        self._test_file_modified("ebpf")
 
     @unittest.skipUnless(is_platform_supported(), "Requires Linux 3.10.0+ and arm64/amd64 arch")
     @unittest.skipUnless(is_root(), "Requires root")
-    def test_file_modified_kprobes(self):
+    def test_file_modified__kprobes(self):
         self._test_file_modified("kprobes")

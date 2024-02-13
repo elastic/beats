@@ -93,9 +93,10 @@ auditbeat.modules:
   #include_files:
   #- '/\.ssh($|/)'
   # Select the backend which will be used to source events.
-  # Valid values: ebpf, kprobes, fsnotify.
+  # "fsnotify" doesn't have the ability to associate user data to file events.
+  # Valid values: auto, fsnotify, kprobes, ebpf.
   # Default: fsnotify.
-  force_backend: fsnotify
+  backend: fsnotify
 
   # Scan over the configured file paths at startup and send events for new or
   # modified files since the last time Auditbeat was running.
@@ -173,7 +174,7 @@ auditbeat.modules:
   # - file.pe.go_imports_names_entropy
   # - file.pe.go_imports_names_var_entropy
   # - file.pe.go_stripped
- 
+
 
 
 # ================================== General ===================================
@@ -1188,7 +1189,7 @@ output.elasticsearch:
 
   # Permissions to use for file creation. The default is 0600.
   #permissions: 0600
-  
+
   # Configure automatic file rotation on every startup. The default is true.
   #rotate_on_startup: true
 
@@ -1355,9 +1356,9 @@ setup.template.settings:
 # to load your own lifecycle policy.
 #setup.ilm.policy_file:
 
-# Disable the check for an existing lifecycle policy. The default is true. If
-# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
-# can be installed.
+# Disable the check for an existing lifecycle policy. The default is true.
+# If you set this option to false, lifecycle policy will not be installed,
+# even if setup.ilm.overwrite is set to true.
 #setup.ilm.check_exists: true
 
 # Overwrite the lifecycle policy at startup. The default is false.
@@ -1365,7 +1366,7 @@ setup.template.settings:
 
 # ======================== Data Stream Lifecycle (DSL) =========================
 
-# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch. 
+# Configure Data Stream Lifecycle to manage data streams while connected to Serverless elasticsearch.
 # These settings are mutually exclusive with ILM settings which are not supported in Serverless projects.
 
 # Enable DSL support. Valid values are true, or false.
@@ -1373,7 +1374,7 @@ setup.template.settings:
 
 # Set the lifecycle policy name or pattern. For DSL, this name must match the data stream that the lifecycle is for.
 # The default data stream pattern is auditbeat-%{[agent.version]}"
-# The template string `%{[agent.version]}` will resolve to the current stack version. 
+# The template string `%{[agent.version]}` will resolve to the current stack version.
 # The other possible template value is `%{[beat.name]}`.
 #setup.dsl.data_stream_pattern: "auditbeat-%{[agent.version]}"
 

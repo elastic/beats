@@ -14,9 +14,12 @@ function withChoco {
     Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 }
 function withGolang($version) {
-    Write-Host "-- Install golang $version --"
-    choco install -y golang --version=$version
-    refreshenv
+    $downloadPath = Join-Path $env:TEMP "go_installer.msi"
+    $goInstallerUrl = "https://golang.org/dl/go$version.windows-amd64.msi"
+    Invoke-WebRequest -Uri $goInstallerUrl -OutFile $downloadPath
+    Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $downloadPath /quiet" -Wait
+    $goBinPath = "${env:ProgramFiles}\Go\bin"
+    $env:Path += ";$goBinPath"
     go version
 }
 function withPython($version) {

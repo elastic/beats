@@ -7,20 +7,50 @@
 package integration
 
 import (
+	"bufio"
+	"crypto/tls"
+	"crypto/x509"
+	"encoding/json"
 	"fmt"
+	"io"
+	"math"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync/atomic"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	protobuf "google.golang.org/protobuf/proto"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
+	"github.com/elastic/beats/v7/libbeat/version"
+	"github.com/elastic/beats/v7/testing/certutil"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
+
+// Event is the common part of a beats event, the beats and Elastic Agent
+// metadata.
+type Event struct {
+	Metadata struct {
+		Version string `json:"version"`
+	} `json:"@metadata"`
+	ElasticAgent struct {
+		Snapshot bool   `json:"snapshot"`
+		Version  string `json:"version"`
+		Id       string `json:"id"`
+	} `json:"elastic_agent"`
+	Agent struct {
+		Version string `json:"version"`
+		Id      string `json:"id"`
+	} `json:"agent"`
+}
 
 // TestInputReloadUnderElasticAgent will start a Filebeat and cause the input
 // reload issue described on https://github.com/elastic/beats/issues/33653.
@@ -500,6 +530,208 @@ func TestRecoverFromInvalidOutputConfiguration(t *testing.T) {
 	}
 }
 
+func TestAgentPackageVersionOnStartUpInfo(t *testing.T) {
+	wantVersion := "8.13.0+build20131123"
+
+	filebeat := integration.NewBeat(
+		t,
+		"filebeat",
+		"../../filebeat.test",
+	)
+
+	logFilePath := filepath.Join(filebeat.TempDir(), "logs-to-ingest.log")
+	generateLogFile(t, logFilePath)
+
+	eventsDir := filepath.Join(filebeat.TempDir(), "ingested-events")
+	logLevel := proto.UnitLogLevel_INFO
+	units := []*proto.UnitExpected{
+		{
+			Id:             "output-file-unit",
+			Type:           proto.UnitType_OUTPUT,
+			ConfigStateIdx: 1,
+			State:          proto.State_HEALTHY,
+			LogLevel:       logLevel,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "default",
+				Type: "file",
+				Name: "events-to-file",
+				Source: integration.RequireNewStruct(t,
+					map[string]interface{}{
+						"name": "events-to-file",
+						"type": "file",
+						"path": eventsDir,
+					}),
+			},
+		},
+		{
+			Id:             "input-unit-1",
+			Type:           proto.UnitType_INPUT,
+			ConfigStateIdx: 1,
+			State:          proto.State_HEALTHY,
+			LogLevel:       logLevel,
+			Config: &proto.UnitExpectedConfig{
+				Id:   "filestream-monitoring-agent",
+				Type: "filestream",
+				Name: "filestream-monitoring-agent",
+				Streams: []*proto.Stream{
+					{
+						Id: "log-input-1",
+						Source: integration.RequireNewStruct(t, map[string]interface{}{
+							"enabled": true,
+							"type":    "log",
+							"paths":   []interface{}{logFilePath},
+						}),
+					},
+				},
+			},
+		},
+	}
+	wantAgentInfo := proto.AgentInfo{
+		Id:       "agent-id",
+		Version:  wantVersion,
+		Snapshot: true,
+	}
+
+	observedCh := make(chan *proto.CheckinObserved, 5)
+	server := &mock.StubServerV2{
+		CheckinV2Impl: func(observed *proto.CheckinObserved) *proto.CheckinExpected {
+			observedCh <- observed
+			return &proto.CheckinExpected{
+				AgentInfo: &wantAgentInfo,
+				Units:     units,
+			}
+		},
+		ActionImpl: func(response *proto.ActionResponse) error { return nil },
+	}
+
+	rootKey, rootCACert, rootCertPem, err := certutil.NewRootCA()
+	require.NoError(t, err, "could not generate root CA")
+
+	rootCertPool := x509.NewCertPool()
+	ok := rootCertPool.AppendCertsFromPEM(rootCertPem)
+	require.Truef(t, ok, "could not append certs from PEM to cert pool")
+
+	beatPrivKeyPem, beatCertPem, beatTLSCert, err :=
+		certutil.GenerateChildCert("localhost", rootKey, rootCACert)
+	require.NoError(t, err, "could not generate child TLS certificate")
+
+	getCert := func(info *tls.ClientHelloInfo) (*tls.Certificate, error) {
+		// it's one of the child certificates. As there is only one, return it
+		return beatTLSCert, nil
+	}
+
+	creds := credentials.NewTLS(&tls.Config{
+		ClientAuth:     tls.RequireAndVerifyClientCert,
+		ClientCAs:      rootCertPool,
+		GetCertificate: getCert,
+		MinVersion:     tls.VersionTLS12,
+	})
+	err = server.Start(grpc.Creds(creds))
+	require.NoError(t, err, "failed starting GRPC server")
+	t.Cleanup(server.Stop)
+
+	filebeat.Start("-E", "management.enabled=true")
+
+	startUpInfo := &proto.StartUpInfo{
+		Addr:       fmt.Sprintf("localhost:%d", server.Port),
+		ServerName: "localhost",
+		Token:      "token",
+		CaCert:     rootCertPem,
+		PeerCert:   beatCertPem,
+		PeerKey:    beatPrivKeyPem,
+		Services:   []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2},
+		AgentInfo:  &wantAgentInfo,
+	}
+	writeStartUpInfo(t, filebeat.Stdin(), startUpInfo)
+	// for some reason the pipe needs to be closed for filebeat to read it.
+	require.NoError(t, filebeat.Stdin().Close(), "failed closing stdin pipe")
+
+	// get 1st observed
+	observed := <-observedCh
+	// drain observedCh so server won't block
+	go func() {
+		for {
+			<-observedCh
+		}
+	}()
+
+	msg := strings.Builder{}
+	require.Eventuallyf(t, func() bool {
+		msg.Reset()
+
+		_, err = os.Stat(eventsDir)
+		if err != nil {
+			fmt.Fprintf(&msg, "could not verify output directory exists: %v",
+				err)
+			return false
+		}
+
+		entries, err := os.ReadDir(eventsDir)
+		if err != nil {
+			fmt.Fprintf(&msg, "failed checking output directory for files: %v",
+				err)
+			return false
+		}
+
+		if len(entries) == 0 {
+			fmt.Fprintf(&msg, "no file found on %s", eventsDir)
+			return false
+		}
+
+		for _, e := range entries {
+			if e.IsDir() {
+				continue
+			}
+
+			i, err := e.Info()
+			if err != nil {
+				fmt.Fprintf(&msg, "could not read info of %q", e.Name())
+				return false
+			}
+			if i.Size() == 0 {
+				fmt.Fprintf(&msg, "file %q was created, but it's still empty",
+					e.Name())
+				return false
+			}
+
+			// read one line to make sure it isn't a 1/2 written JSON
+			eventsFile := filepath.Join(eventsDir, e.Name())
+			f, err := os.Open(eventsFile)
+			if err != nil {
+				fmt.Fprintf(&msg, "could not open file %q", eventsFile)
+				return false
+			}
+
+			scanner := bufio.NewScanner(f)
+			if scanner.Scan() {
+				var ev Event
+				err := json.Unmarshal(scanner.Bytes(), &ev)
+				if err != nil {
+					fmt.Fprintf(&msg, "failed to read event from file: %v", err)
+					return false
+				}
+				return true
+			}
+		}
+
+		return true
+	}, 30*time.Second, time.Second, "no event was produced: %s", &msg)
+
+	assert.Equal(t, version.Commit(), observed.VersionInfo.BuildHash)
+
+	evs := getEventsFromFileOutput[Event](t, eventsDir, 100)
+	for _, got := range evs {
+		assert.Equal(t, wantVersion, got.Metadata.Version)
+
+		assert.Equal(t, wantAgentInfo.Id, got.ElasticAgent.Id)
+		assert.Equal(t, wantAgentInfo.Version, got.ElasticAgent.Version)
+		assert.Equal(t, wantAgentInfo.Snapshot, got.ElasticAgent.Snapshot)
+
+		assert.Equal(t, wantAgentInfo.Id, got.Agent.Id)
+		assert.Equal(t, wantVersion, got.Agent.Version)
+	}
+}
+
 // generateLogFile generates a log file by appending the current
 // time to it every second.
 func generateLogFile(t *testing.T, fullPath string) {
@@ -542,4 +774,53 @@ func generateLogFile(t *testing.T, fullPath string) {
 			}
 		}
 	}()
+}
+
+// getEventsFromFileOutput reads all events from all the files on dir. If n > 0,
+// then it reads up to n events. It considers all files are ndjson, and it skips
+// any directory within dir.
+func getEventsFromFileOutput[E any](t *testing.T, dir string, n int) []E {
+	t.Helper()
+
+	if n < 1 {
+		n = math.MaxInt
+	}
+
+	var events []E
+	entries, err := os.ReadDir(dir)
+	require.NoError(t, err, "could not read events directory")
+	for _, e := range entries {
+		if e.IsDir() {
+			continue
+		}
+		f, err := os.Open(filepath.Join(dir, e.Name()))
+		require.NoErrorf(t, err, "could not open file %q", e.Name())
+
+		scanner := bufio.NewScanner(f)
+		for scanner.Scan() {
+			var ev E
+			err := json.Unmarshal(scanner.Bytes(), &ev)
+			require.NoError(t, err, "failed to read event")
+			events = append(events, ev)
+
+			if len(events) >= n {
+				return events
+			}
+		}
+	}
+
+	return events
+}
+
+func writeStartUpInfo(t *testing.T, w io.Writer, info *proto.StartUpInfo) {
+	t.Helper()
+	if len(info.Services) == 0 {
+		info.Services = []proto.ConnInfoServices{proto.ConnInfoServices_CheckinV2}
+	}
+
+	infoBytes, err := protobuf.Marshal(info)
+	require.NoError(t, err, "failed to marshal connection information")
+
+	_, err = w.Write(infoBytes)
+	require.NoError(t, err, "failed to write connection information")
 }

@@ -96,7 +96,8 @@ func (r *fsNotifyReader) Start(done <-chan struct{}) (<-chan Event, error) {
 	return r.eventC, nil
 }
 
-func (r *fsNotifyReader) enqueueEvents(done <-chan struct{}) (events []*Event) {
+func (r *fsNotifyReader) enqueueEvents(done <-chan struct{}) []*Event {
+	events := make([]*Event, 0)
 	for {
 		ev := r.nextEvent(done)
 		if ev == nil {

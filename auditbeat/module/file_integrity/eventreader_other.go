@@ -23,11 +23,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// NewEventReader creates a new EventProducer backed by fsnotify.
-func NewEventReader(c Config) (EventProducer, error) {
+func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
 	return &fsNotifyReader{
 		config:  c,
-		log:     logp.NewLogger(moduleName),
+		log:     logger.Named("fsnotify"),
 		parsers: FileParsers(c),
 	}, nil
 }

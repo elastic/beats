@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
@@ -7,17 +7,33 @@ platform_type="$(uname)"
 platform_type_lowercase=$(echo "$platform_type" | tr '[:upper:]' '[:lower:]')
 arch_type="$(uname -m)"
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
+GITHUB_PR_LABELS=${GITHUB_PR_LABELS:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
-UI_MACOS_TESTS="$(buildkite-agent meta-data get UI_MACOS_TESTS --default ${UI_MACOS_TESTS:-"false"})"
-runAllStages="$(buildkite-agent meta-data get runAllStages --default ${runAllStages:-"false"})"
+[ -z "${runLibbeat+x}" ] && runLibbeat="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
+[ -z "${runMetricbeat+x}" ] && runMetricbeat="$(buildkite-agent meta-data get runMetricbeat --default ${runMetricbeat:-"false"})"
+[ -z "${runPacketbeat+x}" ] && runPacketbeat="$(buildkite-agent meta-data get runPacketbeat --default ${runPacketbeat:-"false"})"
+[ -z "${runWinlogbeat+x}" ] && runWinlogbeat="$(buildkite-agent meta-data get runWinlogbeat --default ${runWinlogbeat:-"false"})"
+[ -z "${runLibBeatArmTest+x}" ] && runLibBeatArmTest="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
+[ -z "${runPacketbeatArmTest+x}" ] && runPacketbeatArmTest="$(buildkite-agent meta-data get runPacketbeatArmTest --default ${runPacketbeatArmTest:-"false"})"
+[ -z "${runMetricbeatMacOsTests+x}" ] && runMetricbeatMacOsTests="$(buildkite-agent meta-data get runMetricbeatMacOsTests --default ${runMetricbeatMacOsTests:-"false"})"
+[ -z "${runPacketbeatMacOsTests+x}" ] && runPacketbeatMacOsTests="$(buildkite-agent meta-data get runPacketbeatMacOsTests --default ${runPacketbeatMacOsTests:-"false"})"
+
 metricbeat_changeset=(
   "^metricbeat/.*"
-  "^go.mod"
-  "^pytest.ini"
-  "^dev-tools/.*"
-  "^libbeat/.*"
-  "^testing/.*"
   )
+
+libbeat_changeset=(
+  "^libbeat/.*"
+  )
+
+packetbeat_changeset=(
+  "^packetbeat/.*"
+  )
+
+winlogbeat_changeset=(
+  "^winlogbeat/.*"
+  )
+
 oss_changeset=(
   "^go.mod"
   "^pytest.ini"
@@ -25,16 +41,20 @@ oss_changeset=(
   "^libbeat/.*"
   "^testing/.*"
 )
+
 ci_changeset=(
   "^.buildkite/.*"
 )
+
 go_mod_changeset=(
   "^go.mod"
   )
+
 docs_changeset=(
   ".*\\.(asciidoc|md)"
   "deploy/kubernetes/.*-kubernetes\\.yaml"
   )
+
 packaging_changeset=(
   "^dev-tools/packaging/.*"
   ".go-version"
@@ -74,7 +94,7 @@ check_platform_architeture() {
       go_arch_type="arm64"
       ;;
     *)
-    echo "The current platform/OS type is unsupported yet"
+    echo "The current platform or OS type is unsupported yet"
     ;;
   esac
 }
@@ -106,11 +126,32 @@ with_go() {
   export PATH="${go_path}:${PATH}"
 }
 
-with_python() {
+checkLinuxType() {
   if [ "${platform_type}" == "Linux" ]; then
-    #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
-    sudo apt-get update
-    sudo apt-get install -y python3-pip python3-venv
+    if grep -q 'ubuntu' /etc/os-release; then
+      echo "ubuntu"
+    elif grep -q 'rhel' /etc/os-release; then
+      echo "rhel"
+    else
+      echo "Unsupported Linux"
+    fi
+  else
+      echo "This is not a Linux"
+  fi
+}
+
+with_python() {
+  local linuxType="$(checkLinuxType)"
+  echo "${linuxType}"
+  if [ "${platform_type}" == "Linux" ]; then
+    if [ "${linuxType}" = "ubuntu" ]; then
+      sudo apt-get update
+      sudo apt-get install -y python3-pip python3-venv
+    elif [ "${linuxType}" = "rhel" ]; then
+      sudo dnf update -y
+      sudo dnf install -y python3 python3-pip
+      pip3 install virtualenv
+    fi
   elif [ "${platform_type}" == "Darwin" ]; then
     brew update
     pip3 install virtualenv
@@ -119,12 +160,27 @@ with_python() {
 }
 
 with_dependencies() {
+  local linuxType="$(checkLinuxType)"
+  echo "${linuxType}"
   if [ "${platform_type}" == "Linux" ]; then
-    #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
-    sudo apt-get update
-    sudo apt-get install -y libsystemd-dev libpcap-dev
+    if [ "${linuxType}" = "ubuntu" ]; then
+      sudo apt-get update
+      sudo apt-get install -y libsystemd-dev libpcap-dev
+    elif [ "${linuxType}" = "rhel" ]; then
+      # sudo dnf update -y
+      sudo dnf install -y systemd-devel
+      wget https://mirror.stream.centos.org/9-stream/CRB/${arch_type}/os/Packages/libpcap-devel-1.10.0-4.el9.${arch_type}.rpm     #TODO: move this step to our own image
+      sudo dnf install -y libpcap-devel-1.10.0-4.el9.${arch_type}.rpm     #TODO: move this step to our own image
+    fi
   elif [ "${platform_type}" == "Darwin" ]; then
     pip3 install libpcap
+  fi
+}
+
+config_git() {
+  if [ -z "$(git config --get user.email)" ]; then
+    git config --global user.email "beatsmachine@users.noreply.github.com"
+    git config --global user.name "beatsmachine"
   fi
 }
 
@@ -150,7 +206,6 @@ retry() {
 are_paths_changed() {
   local patterns=("${@}")
   local changelist=()
-
   for pattern in "${patterns[@]}"; do
     changed_files=($(git diff --name-only HEAD@{1} HEAD | grep -E "$pattern"))
     if [ "${#changed_files[@]}" -gt 0 ]; then
@@ -175,64 +230,77 @@ are_changed_only_paths() {
   local changed_files=$(git diff --name-only HEAD@{1} HEAD)
   if [ -z "$changed_files" ] || grep -qE "$(IFS=\|; echo "${patterns[*]}")" <<< "$changed_files"; then
     return 0
-  else
-    return 1
   fi
+  return 1
 }
 
 are_conditions_met_mandatory_tests() {
-  if [[ "${BUILDKITE_PULL_REQUEST}" == "" ]] || [[ "${runAllStages}" == "true" ]] || [[ "${ONLY_DOCS}" == "false" && "${BUILDKITE_PULL_REQUEST}" != "" ]]; then     # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L107-L137
-    if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" ]] || [[ "${GITHUB_PR_LABELS}" =~ Metricbeat ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
-      return 0
-    else
-      return 1
-    fi
-  else
-    return 1
+  if are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+    return 0
   fi
+  if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
+    if are_paths_changed "${metricbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" || "${GITHUB_PR_LABELS}" =~ Metricbeat || "${runMetricbeat}" == "true" ]]; then
+      return 0
+    fi
+  elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" ]]; then
+    if are_paths_changed "${libbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test libbeat" || "${GITHUB_PR_LABELS}" =~ libbeat || "${runLibbeat}" == "true" ]]; then
+      return 0
+    fi
+  elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
+    if are_paths_changed "${packetbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat" || "${GITHUB_PR_LABELS}" =~ Packetbeat || "${runPacketbeat}" == "true" ]]; then
+      return 0
+    fi
+  elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" ]]; then
+    if are_paths_changed "${winlogbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test winlogbeat" || "${GITHUB_PR_LABELS}" =~ Winlogbeat || "${runWinlogbeat}" == "true" ]]; then
+      return 0
+    fi
+  fi
+  return 1
 }
 
-are_conditions_met_extended_tests() {
+are_conditions_met_arm_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    return 0
-  else
-    return 1
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test libbeat for arm" || "${GITHUB_PR_LABELS}" =~ arm || "${runLibBeatArmTest}" == "true" ]]; then
+        return 0
+      fi
+    elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat for arm" || "${GITHUB_PR_LABELS}" =~ arm || "${runPacketbeatArmTest}" == "true" ]]; then
+        return 0
+      fi
+    fi
   fi
+  return 1
 }
 
 are_conditions_met_macos_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "${UI_MACOS_TESTS}" == true ]] || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat for macos" ]] || [[ "${GITHUB_PR_LABELS}" =~ macOS ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
-      return 0
-    else
-      return 1
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
+      if [[ "${runMetricbeatMacOsTests}" == true ]] || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat for macos" ]] || [[ "${GITHUB_PR_LABELS}" =~ macOS ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+        return 0
+      fi
+    elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
+      if [[ "${runPacketbeatMacOsTests}" == true ]] || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat for macos" ]] || [[ "${GITHUB_PR_LABELS}" =~ macOS ]]; then
+        return 0
+      fi
     fi
-  else
-    return 1
   fi
-}
-
-are_conditions_met_extended_windows_tests() {
-  if [[ "${ONLY_DOCS}" == "false" && "${BUILDKITE_PULL_REQUEST}" != "" ]] || [[ "${runAllStages}" == "true" ]]; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" ]] || [[ "${GITHUB_PR_LABELS}" =~ Metricbeat ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
-      return 0
-    else
-      return 1
-    fi
-  else
-    return 1
-  fi
+  return 1
 }
 
 are_conditions_met_packaging() {
-  if are_conditions_met_extended_windows_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset[@]}" || [[ "${BUILDKITE_TAG}" == "" ]] || [[ "${BUILDKITE_PULL_REQUEST}" != "" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L101-L103
+  if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
+    if [[ "${BUILDKITE_TAG}" == "" || "${BUILDKITE_PULL_REQUEST}" != "" ]]; then
       return 0
-    else
-      return 1
     fi
-  else
-    return 1
+  fi
+  return 1
+}
+
+config_git() {
+  if [ -z "$(git config --get user.email)" ]; then
+    git config --global user.email "beatsmachine@users.noreply.github.com"
+    git config --global user.name "beatsmachine"
   fi
 }
 

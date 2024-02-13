@@ -78,13 +78,19 @@ type Backend string
 
 const (
 	BackendFSNotify Backend = "fsnotify"
+	BackendKprobes  Backend = "kprobes"
 	BackendEBPF     Backend = "ebpf"
-	BackendKProbes  Backend = "kprobes"
+	BackendAuto     Backend = "auto"
 )
 
 func (b *Backend) Unpack(v string) error {
 	*b = Backend(v)
-	return nil
+	switch *b {
+	case BackendFSNotify, BackendKprobes, BackendEBPF, BackendAuto:
+		return nil
+	default:
+		return fmt.Errorf("invalid backend: %q", v)
+	}
 }
 
 // Config contains the configuration parameters for the file integrity
@@ -101,7 +107,7 @@ type Config struct {
 	Recursive           bool            `config:"recursive"` // Recursive enables recursive monitoring of directories.
 	ExcludeFiles        []match.Matcher `config:"exclude_files"`
 	IncludeFiles        []match.Matcher `config:"include_files"`
-	ForceBackend        Backend         `config:"force_backend"`
+	Backend             Backend         `config:"backend"`
 }
 
 // Validate validates the config data and return an error explaining all the
@@ -177,16 +183,8 @@ nextHash:
 		errs = append(errs, fmt.Errorf("invalid scan_rate_per_sec value: %w", err))
 	}
 
-	if len(c.ForceBackend) > 0 {
-		if runtime.GOOS != "linux" {
-			errs = append(errs, errors.New("force_backend can only be specified on linux"))
-		}
-
-		switch c.ForceBackend {
-		case BackendEBPF, BackendKProbes, BackendFSNotify:
-		default:
-			errs = append(errs, errors.New("force_backend can only be 'ebpf', 'kprobes' or 'fsnotify'"))
-		}
+	if c.Backend != "" && c.Backend != BackendAuto && runtime.GOOS != "linux" {
+		errs = append(errs, errors.New("backend can only be specified on linux"))
 	}
 
 	return errs.Err()

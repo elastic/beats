@@ -19,7 +19,7 @@ steps:
           - ".buildkite/filebeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "Filebeat: Unit Tests"
+              context: "Filebeat: linux/Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -33,7 +33,7 @@ steps:
           - ".buildkite/filebeat/scripts/integration-gotests.sh"
         notify:
           - github_commit_status:
-              context: "Filebeat: Integration Tests"
+              context: "Filebeat: Go Integration Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -60,7 +60,7 @@ steps:
         command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
         notify:
           - github_commit_status:
-              context: "Filebeat: Unit Tests"
+              context: "Filebeat: windows/Unit Tests"
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
@@ -134,9 +134,7 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
       - "mandatory-tests"
-      - "extended-tests"
-      - "extended-tests-win"
 
     steps:
       - label: Package pipeline
-        commands: ".buildkite/filebeat/scripts/package-step.sh | buildkite-agent pipeline upload"
+        commands: ".buildkite/filebeat/scripts/package-step.sh"

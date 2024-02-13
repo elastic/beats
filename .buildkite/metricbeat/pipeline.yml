@@ -8,24 +8,28 @@ env:
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  GO_AGENT_IMAGE: "golang:${GO_VERSION}"
   BEATS_PROJECT_NAME: "metricbeat"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
+
 
 steps:
 
   - input: "Input Parameters"
-    key: "input-run-all-stages"
+    key: "runMetricbeat"
     fields:
-    - select: "Metricbeat - runAllStages"
-      key: "runAllStages"
+    - select: "Metricbeat - runMetricbeat"
+      key: "runMetricbeat"
       options:
         - label: "True"
           value: "true"
         - label: "False"
           value: "false"
       default: "false"
-    - select: "Metricbeat - runMacOsTests"
-      key: "UI_MACOS_TESTS"
+    - select: "Metricbeat - runMetricbeatMacOsTests"
+      key: "runMetricbeatMacOsTests"
       options:
         - label: "True"
           value: "true"
@@ -41,6 +45,3 @@ steps:
   - label: ":linux: Load dynamic metricbeat pipeline"
     key: "metricbeat-pipeline"
     command: ".buildkite/scripts/generate_metricbeat_pipeline.sh"
-    agents:
-      provider: "gcp"
-      image: "${IMAGE_UBUNTU_X86_64}"

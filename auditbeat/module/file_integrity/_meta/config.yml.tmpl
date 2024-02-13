@@ -57,9 +57,10 @@
 
   {{- if eq .GOOS "linux" }}
   # Select the backend which will be used to source events.
-  # Valid values: ebpf, kprobes, fsnotify.
+  # "fsnotify" doesn't have the ability to associate user data to file events.
+  # Valid values: auto, fsnotify, kprobes, ebpf.
   # Default: fsnotify.
-  force_backend: fsnotify
+  backend: fsnotify
   {{- end }}
 
   # Scan over the configured file paths at startup and send events for new or
