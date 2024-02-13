@@ -2496,6 +2496,16 @@ example: ami-abcd1234
 
 --
 
+*`cloud.resourceGroup.name`*::
++
+--
+Name of resourceGroup the cloud instance belongs to.
+
+
+type: keyword
+
+--
+
 *`meta.cloud.provider`*::
 +
 --

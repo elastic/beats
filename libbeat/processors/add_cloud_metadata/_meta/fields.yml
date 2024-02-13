@@ -9,7 +9,11 @@
       example: ami-abcd1234
       description: >
         Image ID for the cloud instance.
-
+    - name: cloud.resourceGroup.name
+      default_field: true
+      type: keyword
+      description: >
+        Name of resourceGroup the cloud instance belongs to.
     # Alias for old fields
     - name: meta.cloud.provider
       default_field: true
