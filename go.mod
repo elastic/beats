@@ -78,7 +78,7 @@ require (
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.4.0
 	github.com/elastic/go-structform v0.0.10
-	github.com/elastic/go-sysinfo v1.12.0
+	github.com/elastic/go-sysinfo v1.13.1
 	github.com/elastic/go-ucfg v0.8.6
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.15.0
