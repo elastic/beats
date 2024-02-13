@@ -18,18 +18,18 @@ env:
 steps:
 
   - input: "Input Parameters"
-    key: "runMetricbeat"
+    key: "run_metricbeat"
     fields:
-    - select: "Metricbeat - runMetricbeat"
-      key: "runMetricbeat"
+    - select: "Metricbeat - run_metricbeat"
+      key: "run_metricbeat"
       options:
         - label: "True"
           value: "true"
         - label: "False"
           value: "false"
       default: "false"
-    - select: "Metricbeat - runMetricbeatMacOsTests"
-      key: "runMetricbeatMacOsTests"
+    - select: "Metricbeat - run_metricbeat_macos_tests"
+      key: "run_metricbeat_macos_tests"
       options:
         - label: "True"
           value: "true"
