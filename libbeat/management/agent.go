@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package publisher
+package management
 
 import (
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -47,14 +47,15 @@ func UnderAgent() bool {
 	return underAgent.Load()
 }
 
-// LogWithTrace returns true when not running under Elastic Agent always or
-// only true if running under Elastic Agent with trace logging enabled.
-func LogWithTrace() bool {
-	agent := underAgent.Load()
-	if agent {
-		trace := underAgentTrace.Load()
-		return trace
+// TraceLevelEnabled returns true when the "trace log level" is enabled.
+//
+// It always returns true when not running under Elastic Agent.
+// Otherwise it returns true when the trace level is enabled
+func TraceLevelEnabled() bool {
+	if underAgent.Load() {
+		return underAgentTrace.Load()
 	}
+
 	// Always true when not running under the Elastic Agent.
 	return true
 }
