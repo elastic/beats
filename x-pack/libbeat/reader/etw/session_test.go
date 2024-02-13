@@ -209,9 +209,8 @@ func TestNewSession_GUIDError(t *testing.T) {
 	}
 	session, err := NewSession(conf)
 
-	assert.EqualError(t, err, "mock error")
-	expectedSession := Session{}
-	assert.Equal(t, expectedSession, session, "Session should be its zero value when an error occurs")
+	assert.EqualError(t, err, "error when initializing session 'Session1': mock error")
+	assert.Nil(t, session)
 
 }
 

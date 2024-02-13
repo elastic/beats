@@ -112,6 +112,7 @@ CHANGELOG*
 /x-pack/filebeat/input/cel/ @elastic/security-service-integrations
 /x-pack/filebeat/input/cometd/ @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/entityanalytics/ @elastic/security-service-integrations
+/x-pack/filebeat/input/etw/ @elastic/sec-windows-platform
 /x-pack/filebeat/input/gcppubsub/ @elastic/security-service-integrations
 /x-pack/filebeat/input/gcs/ @elastic/security-service-integrations
 /x-pack/filebeat/input/http_endpoint/ @elastic/security-service-integrations
