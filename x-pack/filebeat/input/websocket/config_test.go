@@ -59,7 +59,7 @@ var configTests = []struct {
 		config: map[string]interface{}{
 			"regexp": map[string]interface{}{
 				"products":  "(?i)(xq>)d+)",
-				"solutions": "(?)(Sws>(d+)",
+				"solutions": "(?i)(Search|Observability|Security)",
 			},
 			"url": "wss://localhost:443/v1/stream",
 		},
