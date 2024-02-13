@@ -47,7 +47,7 @@ func newEventProcessor(p pathTraverser, e Emitter, isRecursive bool) *eProcessor
 	}
 }
 
-func (e *eProcessor) process(ctx context.Context, pe *ProbeEvent) error {
+func (e *eProcessor) process(_ context.Context, pe *ProbeEvent) error {
 	// after processing return the probe event to the pool
 	defer releaseProbeEvent(pe)
 
