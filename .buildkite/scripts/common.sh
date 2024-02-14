@@ -19,16 +19,36 @@ ONLY_DOCS=${ONLY_DOCS:-"true"}
 [ -z "${run_metricbeat_macos_tests+x}" ] && run_metricbeat_macos_tests="$(buildkite-agent meta-data get run_metricbeat_macos_tests --default "false")"
 [ -z "${run_packetbeat_macos_tests+x}" ] && run_packetbeat_macos_tests="$(buildkite-agent meta-data get run_packetbeat_macos_tests --default "false")"
 
-metricbeat_changeset=("^metricbeat/.*")
-libbeat_changeset=("^libbeat/.*")
-packetbeat_changeset=("^packetbeat/.*")
-winlogbeat_changeset=("^winlogbeat/.*")
-x-pack_libbeat_changeset=("^x-pack/libbeat/.*")
-x-pack_metricbeat_changeset=("^x-pack/metricbeat/.*")
-x-pack_packetbeat_changeset=("^x-pack/packetbeat/.*")
-x-pack_winlogbeat_changeset=("^x-pack/winlogbeat/.*")
-ci_changeset=("^.buildkite/.*")
-go_mod_changeset=("^go.mod")
+metricbeat_changeset=(
+  "^metricbeat/.*"
+  )
+libbeat_changeset=(
+  "^libbeat/.*"
+  )
+packetbeat_changeset=(
+  "^packetbeat/.*"
+  )
+winlogbeat_changeset=(
+  "^winlogbeat/.*"
+  )
+x-pack_libbeat_changeset=(
+  "^x-pack/libbeat/.*"
+  )
+x-pack_metricbeat_changeset=(
+  "^x-pack/metricbeat/.*"
+  )
+x-pack_packetbeat_changeset=(
+  "^x-pack/packetbeat/.*"
+  )
+x-pack_winlogbeat_changeset=(
+  "^x-pack/winlogbeat/.*"
+  )
+ci_changeset=(
+  "^.buildkite/.*"
+  )
+go_mod_changeset=(
+  "^go.mod"
+  )
 
 oss_changeset=(
   "^go.mod"
