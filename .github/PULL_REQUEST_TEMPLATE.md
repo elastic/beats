@@ -31,7 +31,6 @@ List here all the items you have verified BEFORE sending this PR. Please DO NOT 
 - [ ] My code follows the style guidelines of this project
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have added tests that prove my fix is effective or that my feature works
-- [ ] I have added an entry in `CHANGELOG.md`
 
 ## Author's Checklist
 
