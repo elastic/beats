@@ -19,8 +19,11 @@ package fileout
 
 import (
 	"context"
+	"github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg/parse"
 	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -35,6 +38,8 @@ import (
 func init() {
 	outputs.RegisterType("file", makeFileout)
 }
+
+const timeNowVar = "TIME_NOW"
 
 type fileOutput struct {
 	log      *logp.Logger
@@ -52,6 +57,18 @@ func makeFileout(
 	observer outputs.Observer,
 	cfg *c.C,
 ) (outputs.Group, error) {
+	opts := []ucfg.Option{
+		ucfg.PathSep("."),
+		ucfg.ResolveEnv,
+		ucfg.VarExp,
+		ucfg.Resolve(func(name string) (string, parse.Config, error) {
+			if name != timeNowVar {
+				return "", parse.Config{}, ucfg.ErrMissing
+			}
+			return strconv.FormatInt(time.Now().UnixMilli(), 10), parse.DefaultConfig, nil
+		}),
+	}
+	c.OverwriteConfigOpts(opts)
 	foConfig := defaultConfig()
 	if err := cfg.Unpack(&foConfig); err != nil {
 		return outputs.Fail(err)
