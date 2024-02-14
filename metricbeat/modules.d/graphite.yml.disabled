@@ -1,5 +1,5 @@
 # Module: graphite
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.13/metricbeat-module-graphite.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-graphite.html
 
 - module: graphite
   #metricsets:

@@ -1,5 +1,5 @@
 # Module: aws
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.13/metricbeat-module-aws.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-aws.html
 
 - module: aws
   period: 1m

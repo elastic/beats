@@ -1,5 +1,5 @@
 # Module: radware
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.13/filebeat-module-radware.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-radware.html
 
 - module: radware
   defensepro:

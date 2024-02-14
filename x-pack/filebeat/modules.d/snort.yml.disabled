@@ -1,5 +1,5 @@
 # Module: snort
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.13/filebeat-module-snort.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-snort.html
 
 - module: snort
   log:

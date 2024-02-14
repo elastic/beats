@@ -1,5 +1,5 @@
 # Module: haproxy
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.13/metricbeat-module-haproxy.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-haproxy.html
 
 - module: haproxy
   #metricsets:

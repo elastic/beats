@@ -1,5 +1,5 @@
 # Module: snyk
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.13/filebeat-module-snyk.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-snyk.html
 
 - module: snyk
   audit:

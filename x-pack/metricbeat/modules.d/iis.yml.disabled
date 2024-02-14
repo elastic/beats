@@ -1,5 +1,5 @@
 # Module: iis
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.13/metricbeat-module-iis.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-iis.html
 
 - module: iis
   metricsets:
