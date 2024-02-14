@@ -107,7 +107,8 @@ func Test_RunEtwInput_AttachToExistingSessionError(t *testing.T) {
 		mockSession := &etw.Session{
 			Name:       "MySession",
 			Realtime:   true,
-			NewSession: false}
+			NewSession: false,
+		}
 		return mockSession, nil
 	}
 	// Setup the mock behavior for AttachToExistingSession
@@ -146,7 +147,8 @@ func Test_RunEtwInput_CreateRealtimeSessionError(t *testing.T) {
 		mockSession := &etw.Session{
 			Name:       "MySession",
 			Realtime:   true,
-			NewSession: true}
+			NewSession: true,
+		}
 		return mockSession, nil
 	}
 	// Setup the mock behavior for AttachToExistingSession
@@ -189,7 +191,8 @@ func Test_RunEtwInput_StartConsumerError(t *testing.T) {
 		mockSession := &etw.Session{
 			Name:       "MySession",
 			Realtime:   true,
-			NewSession: true}
+			NewSession: true,
+		}
 		return mockSession, nil
 	}
 	// Setup the mock behavior for AttachToExistingSession
@@ -244,7 +247,8 @@ func Test_RunEtwInput_Success(t *testing.T) {
 		mockSession := &etw.Session{
 			Name:       "MySession",
 			Realtime:   true,
-			NewSession: true}
+			NewSession: true,
+		}
 		return mockSession, nil
 	}
 	// Setup the mock behavior for AttachToExistingSession
@@ -471,7 +475,6 @@ func Test_buildEvent(t *testing.T) {
 			assert.Equal(t, tt.expected["event.severity"], mapEv["event.severity"])
 			assert.Equal(t, tt.expected["log.file.path"], mapEv["log.file.path"])
 			assert.Equal(t, tt.expected["log.level"], mapEv["log.level"])
-
 		})
 	}
 }
@@ -495,7 +498,7 @@ func Test_convertFileTimeToGoTime(t *testing.T) {
 		{
 			name:     "TestActualDate",
 			fileTime: 133515900000000000, // February 05, 2024, 7:00:00 AM
-			want:     time.Date(2024, 02, 05, 7, 0, 0, 0, time.UTC),
+			want:     time.Date(2024, 0o2, 0o5, 7, 0, 0, 0, time.UTC),
 		},
 	}
 
