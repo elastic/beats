@@ -172,4 +172,27 @@ for a specific provider.
 Names an existing ETW session to read from. Existing sessions can be listed
 using `logman query -ets`.
 
+[float]
+=== Metrics
+
+This input exposes metrics under the <<http-endpoint, HTTP monitoring endpoint>>.
+These metrics are exposed under the `/inputs/` path. They can be used to
+observe the activity of the input.
+
+You must assign a unique `id` to the input to expose metrics.
+
+[options="header"]
+|=======
+| Metric                   | Description
+| `session`                | Name of the ETW session.
+| `received_events_total`  | Total number of events received.
+| `discarded_events_total` | Total number of discarded events.
+| `errors_total`           | Total number of errors.
+| `source_lag_time`        | Histogram of the difference between timestamped event's creation and reading.
+| `arrival_period`         | Histogram of the elapsed time between event notification callbacks.
+| `processing_time`        | Histogram of the elapsed time between event notification callback and publication to the internal queue.
+|=======
+
+Histogram metrics are aggregated over the previous 1024 events.
+
 :type!:
