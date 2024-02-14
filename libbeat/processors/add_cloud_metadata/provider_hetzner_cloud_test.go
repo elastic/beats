@@ -25,64 +25,73 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/logp"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func initQCloudTestServer() *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.RequestURI == "/meta-data/instance-id" {
-			_, _ = w.Write([]byte("ins-qcloudv5"))
+func hetznerMetadataHandler() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.RequestURI == hetznerMetadataInstanceIDURI {
+			_, _ = w.Write([]byte("111111"))
 			return
 		}
-		if r.RequestURI == "/meta-data/placement/region" {
-			_, _ = w.Write([]byte("china-south-gz"))
+		if r.RequestURI == hetznerMetadataHostnameURI {
+			_, _ = w.Write([]byte("my-hetzner-instance"))
 			return
 		}
-		if r.RequestURI == "/meta-data/placement/zone" {
-			_, _ = w.Write([]byte("gz-azone2"))
+		if r.RequestURI == hetznerMetadataAvailabilityZoneURI {
+			_, _ = w.Write([]byte("hel1-dc2"))
+			return
+		}
+		if r.RequestURI == hetznerMetadataRegionURI {
+			_, _ = w.Write([]byte("eu-central"))
 			return
 		}
 
 		http.Error(w, "not found", http.StatusNotFound)
-	}))
+	}
 }
 
-func TestRetrieveQCloudMetadata(t *testing.T) {
+func TestRetrieveHetznerMetadata(t *testing.T) {
 	logp.TestingSetup()
 
-	server := initQCloudTestServer()
+	server := httptest.NewServer(hetznerMetadataHandler())
 	defer server.Close()
 
-	config, err := common.NewConfigFrom(map[string]interface{}{
-		"providers": []string{"tencent"},
-		"host":      server.Listener.Addr().String(),
+	config, err := conf.NewConfigFrom(map[string]interface{}{
+		"host": server.Listener.Addr().String(),
 	})
 
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	assertHetzner(t, config)
+}
+
+func assertHetzner(t *testing.T, config *conf.C) {
 	p, err := New(config)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := p.Run(&beat.Event{Fields: common.MapStr{}})
+	actual, err := p.Run(&beat.Event{Fields: mapstr.M{}})
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	expected := common.MapStr{
-		"cloud": common.MapStr{
-			"provider": "qcloud",
-			"instance": common.MapStr{
-				"id": "ins-qcloudv5",
+	expected := mapstr.M{
+		"cloud": mapstr.M{
+			"provider": "hetzner",
+			"instance": mapstr.M{"" +
+				"id": "111111",
+				"name": "my-hetzner-instance",
 			},
-			"region":            "china-south-gz",
-			"availability_zone": "gz-azone2",
-			"service": common.MapStr{
-				"name": "CVM",
+			"availability_zone": "hel1-dc2",
+			"region":            "eu-central",
+			"service": mapstr.M{
+				"name": "Cloud",
 			},
 		},
 	}

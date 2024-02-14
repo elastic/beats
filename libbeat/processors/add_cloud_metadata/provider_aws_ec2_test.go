@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/logp"
 )
 
+<<<<<<< HEAD
 func createEC2MockAPI(responseMap map[string]string) *httptest.Server {
 	h := func(w http.ResponseWriter, r *http.Request) {
 		if res, ok := responseMap[r.RequestURI]; ok {
@@ -40,6 +41,30 @@ func createEC2MockAPI(responseMap map[string]string) *httptest.Server {
 		http.Error(w, "not found", http.StatusNotFound)
 	}
 	return httptest.NewServer(http.HandlerFunc(h))
+=======
+func init() {
+	// Disable IMDS when the real AWS SDK IMDS client is used,
+	// so tests are isolated from the environment. Otherwise,
+	// tests for non-EC2 providers may fail when the tests are
+	// run within an EC2 VM.
+	os.Setenv("AWS_EC2_METADATA_DISABLED", "true")
+}
+
+type MockIMDSClient struct {
+	GetInstanceIdentityDocumentFunc func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error)
+}
+
+func (m *MockIMDSClient) GetInstanceIdentityDocument(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error) {
+	return m.GetInstanceIdentityDocumentFunc(ctx, params, optFns...)
+}
+
+type MockEC2Client struct {
+	DescribeTagsFunc func(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error)
+}
+
+func (e *MockEC2Client) DescribeTags(ctx context.Context, params *ec2.DescribeTagsInput, optFns ...func(*ec2.Options)) (*ec2.DescribeTagsOutput, error) {
+	return e.DescribeTagsFunc(ctx, params, optFns...)
+>>>>>>> 38e7d6f071 (Fix hetzner and openstack tests by adding AWS_EC2_METADATA_DISABLED=true in ec2 (#37907))
 }
 
 func TestMain(m *testing.M) {
