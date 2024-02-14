@@ -21,6 +21,9 @@ import (
 
 	// This registers the Npcap installer on Windows.
 	_ "github.com/elastic/beats/v7/x-pack/packetbeat/npcap"
+
+	// Enable pipelines.
+	_ "github.com/elastic/beats/v7/x-pack/packetbeat/module"
 )
 
 // Name of this beat.

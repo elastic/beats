@@ -10,12 +10,23 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Upgrade to Go 1.21.6. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}37615[37615]
+- Upgrade to Go 1.21.7. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}37913[37913]
+- add_cloud_metadata processor: `huawei` provider is now treated as `openstack`. Huawei cloud runs on OpenStack
+platform, and when viewed from a metadata API standpoint, it is impossible to differentiate it from OpenStack. If you
+know that your deployments run on Huawei Cloud exclusively, and you wish to have `cloud.provider` value as `huawei`,
+you can achieve this by overwriting the value using an `add_fields` processor. {pull}35184[35184]
+- In managed mode, Beats running under Elastic Agent will report the package
+version of Elastic Agent as their own version. This includes all additional
+fields added to events containing the Beats version. {pull}37553[37553]
+- The behavior of `queue.mem.flush.min_events` has been simplified. It now serves as a simple maximum on the size of all event batches. There are no longer performance implications in its relationship to `bulk_max_size`. {pull}37795[37795]
 
 *Auditbeat*
 
+- Add opt-in `KProbes` backend for file_integrity module. {pull}37796[37796]
 
 *Filebeat*
+
+- Convert netflow input to API v2 and disable event normalisation {pull}37901[37901]
 
 
 *Heartbeat*
@@ -55,6 +66,11 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
 - Support build of projects outside of beats directory {pull}36126[36126]
 - Support Elastic Agent control protocol chunking support {pull}37343[37343]
+- Upgrade elastic-agent-libs to v0.7.5. Removes obsolete "Treating the CommonName field on X.509 certificates as a host name..." deprecation warning for 8.0. {pull}37755[37755]
+- aws: Add credential caching for `AssumeRole` session tokens. {issue}37787[37787]
+- Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
+- Set timeout of 1 minute for FQDN requests {pull}37756[37756]
+- Fix the paths in the .cmd script added to the path by the Windows MSI to point to the new C:\Program Files installation location. https://github.com/elastic/elastic-stack-installers/pull/238
 
 *Auditbeat*
 
@@ -76,27 +92,15 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
 - Fix m365_defender cursor value and query building. {pull}37116[37116]
 - Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
+- Update github.com/lestrrat-go/jwx dependency. {pull}37799[37799]
+- [threatintel] MISP pagination fixes {pull}37898[37898]
+- Fix file handle leak when handling errors in filestream {pull}37973[37973]
 
 *Heartbeat*
 
-- Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
 
 *Metricbeat*
 
-- in module/windows/perfmon, changed collection method of the second counter value required to create a displayable value {pull}32305[32305]
-- Fix and improve AWS metric period calculation to avoid zero-length intervals {pull}32724[32724]
-- Add missing cluster metadata to k8s module metricsets {pull}32979[32979] {pull}33032[33032]
-- Add GCP CloudSQL region filter {pull}32943[32943]
-- Fix logstash cgroup mappings {pull}33131[33131]
-- Remove unused `elasticsearch.node_stats.indices.bulk.avg_time.bytes` mapping {pull}33263[33263]
-- Make generic SQL GA {pull}34637[34637]
-- Collect missing remote_cluster in elasticsearch ccr metricset {pull}34957[34957]
-- Add context with timeout in AWS API calls {pull}35425[35425]
-- Fix EC2 host.cpu.usage {pull}35717[35717]
-- Add option in SQL module to execute queries for all dbs. {pull}35688[35688]
-- Add remaining dimensions for azure storage account to make them available for tsdb enablement. {pull}36331[36331]
-- Add log error when statsd server fails to start {pull}36477[36477]
-- Fix Azure Resource Metrics missing metrics (min and max aggregations) after upgrade to 8.11.3 {issue}37642[37642] {pull}37643[37643]
 
 *Osquerybeat*
 
@@ -105,7 +109,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Winlogbeat*
-
 
 
 *Elastic Logging Plugin*
@@ -132,9 +135,12 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Auditbeat*
 
+- Add linux capabilities to processes in the system/process. {pull}37453[37453]
+- Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
 
 *Filebeat*
 
+- Update SQL input documentation regarding Oracle DSNs {pull}37590[37590]
 - add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
 - httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]
 - Add cloudflare R2 to provider list in AWS S3 input. {pull}32620[32620]
@@ -173,15 +179,24 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Update CEL extensions library to v1.8.0 to provide runtime error location reporting. {issue}37304[37304] {pull}37718[37718]
 - Add request trace logging for chained API requests. {issue}37551[36551] {pull}37682[37682]
 - Relax TCP/UDP metric polling expectations to improve metric collection. {pull}37714[37714]
+- Add support for PEM-based Okta auth in HTTPJSON. {pull}37772[37772]
+- Prevent complete loss of long request trace data. {issue}37826[37826] {pull}37836[37836]
+- Added experimental version of the Websocket Input. {pull}37774[37774]
+- Add support for PEM-based Okta auth in CEL. {pull}37813[37813]
+- Add ETW input. {pull}36915[36915]
+- Update CEL mito extensions to v1.9.0 to add keys/values helper. {pull}37971[37971]
 
 *Auditbeat*
 
 
 *Libbeat*
+- Add watcher that can be used to monitor Linux kernel events. {pull}37833[37833]
+
+- Added support for ETW reader. {pull}36914[36914]
 
 *Heartbeat*
 - Added status to monitor run log report.
-
+- Upgrade github.com/elastic/go-elasticsearch/v8 to v8.12.0. {pull}37673[37673]
 
 *Metricbeat*
 
@@ -196,6 +211,10 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each metricset instance. {pull}36971[36971]
 - Add linux IO metrics to system/process {pull}37213[37213]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
+
+
+*Metricbeat*
+
 - Update `getOpTimestamp` in `replstatus` to fix sort and temp files generation issue in mongodb. {pull}37688[37688]
 
 *Osquerybeat*
@@ -203,6 +222,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Packetbeat*
 
+- Bump Windows Npcap version to v1.79. {pull}37733[37733]
+- Add metrics for TCP flags. {issue}36992[36992] {pull}36975[36975]
+- Add support for pipeline loading. {pull}37291[37291]
 
 *Packetbeat*
 
@@ -252,6 +274,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
 
 
 

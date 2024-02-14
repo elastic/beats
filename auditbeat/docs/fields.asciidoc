@@ -18936,6 +18936,28 @@ type: keyword
 --
 
 
+*`process.thread.capabilities.effective`*::
++
+--
+This is the set of capabilities used by the kernel to perform permission checks for the thread.
+
+type: keyword
+
+example: ["CAP_BPF", "CAP_SYS_ADMIN"]
+
+--
+
+*`process.thread.capabilities.permitted`*::
++
+--
+This is a limiting superset for the effective capabilities that the thread may assume.
+
+type: keyword
+
+example: ["CAP_BPF", "CAP_SYS_ADMIN"]
+
+--
+
 [float]
 === hash
 

@@ -32,9 +32,10 @@ type contextKey string
 
 // NewLoggingRoundTripper returns a LoggingRoundTripper that logs requests and
 // responses to the provided logger.
-func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger) *LoggingRoundTripper {
+func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger, maxBodyLen int) *LoggingRoundTripper {
 	return &LoggingRoundTripper{
 		transport:   next,
+		maxBodyLen:  maxBodyLen,
 		logger:      logger,
 		txBaseID:    newID(),
 		txIDCounter: atomic.NewUint64(0),
@@ -44,6 +45,7 @@ func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger) *Logging
 // LoggingRoundTripper is an http.RoundTripper that logs requests and responses.
 type LoggingRoundTripper struct {
 	transport   http.RoundTripper
+	maxBodyLen  int            // The maximum length of a body. Longer bodies will be truncated.
 	logger      *zap.Logger    // Destination logger.
 	txBaseID    string         // Random value to make transaction IDs unique.
 	txIDCounter *atomic.Uint64 // Transaction ID counter that is incremented for each request.
@@ -63,6 +65,7 @@ type LoggingRoundTripper struct {
 //	http.request
 //	user_agent.original
 //	http.request.body.content
+//	http.request.body.truncated
 //	http.request.body.bytes
 //	http.request.mime_type
 //	event.original (the request without body from httputil.DumpRequestOut)
@@ -71,6 +74,7 @@ type LoggingRoundTripper struct {
 //
 //	http.response.status_code
 //	http.response.body.content
+//	http.response.body.truncated
 //	http.response.body.bytes
 //	http.response.mime_type
 //	event.original (the response without body from httputil.DumpResponse)
@@ -86,7 +90,7 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		}
 	}
 
-	req, respParts, errorsMessages := logRequest(log, req)
+	req, respParts, errorsMessages := logRequest(log, req, rt.maxBodyLen)
 
 	resp, err := rt.transport.RoundTrip(req)
 	if err != nil {
@@ -107,7 +111,8 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to read response body: %s", err))
 	} else {
 		respParts = append(respParts,
-			zap.ByteString("http.response.body.content", body),
+			zap.ByteString("http.response.body.content", body[:min(len(body), rt.maxBodyLen)]),
+			zap.Bool("http.response.body.truncated", rt.maxBodyLen < len(body)),
 			zap.Int("http.response.body.bytes", len(body)),
 			zap.String("http.response.mime_type", resp.Header.Get("Content-Type")),
 		)
@@ -143,17 +148,18 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 //	http.request
 //	user_agent.original
 //	http.request.body.content
+//	http.request.body.truncated
 //	http.request.body.bytes
 //	http.request.mime_type
 //	event.original (the request without body from httputil.DumpRequestOut)
 //
 // Additional fields in extra will also be logged.
-func LogRequest(log *zap.Logger, req *http.Request, extra ...zapcore.Field) *http.Request {
-	req, _, _ = logRequest(log, req, extra...)
+func LogRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zapcore.Field) *http.Request {
+	req, _, _ = logRequest(log, req, maxBodyLen, extra...)
 	return req
 }
 
-func logRequest(log *zap.Logger, req *http.Request, extra ...zapcore.Field) (_ *http.Request, parts []zapcore.Field, errorsMessages []string) {
+func logRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zapcore.Field) (_ *http.Request, parts []zapcore.Field, errorsMessages []string) {
 	reqParts := append([]zapcore.Field{
 		zap.String("url.original", req.URL.String()),
 		zap.String("url.scheme", req.URL.Scheme),
@@ -174,7 +180,8 @@ func logRequest(log *zap.Logger, req *http.Request, extra ...zapcore.Field) (_ *
 		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to read request body: %s", err))
 	} else {
 		reqParts = append(reqParts,
-			zap.ByteString("http.request.body.content", body),
+			zap.ByteString("http.request.body.content", body[:min(len(body), maxBodyLen)]),
+			zap.Bool("http.request.body.truncated", maxBodyLen < len(body)),
 			zap.Int("http.request.body.bytes", len(body)),
 			zap.String("http.request.mime_type", req.Header.Get("Content-Type")),
 		)

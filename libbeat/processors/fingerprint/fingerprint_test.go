@@ -18,6 +18,7 @@
 package fingerprint
 
 import (
+	"fmt"
 	"math/rand"
 	"strconv"
 	"testing"
@@ -77,6 +78,7 @@ func TestWithConfig(t *testing.T) {
 				Fields:    test.input.Clone(),
 			}
 			newEvent, err := p.Run(testEvent)
+			assert.NoError(t, err)
 			v, err := newEvent.GetValue("fingerprint")
 			assert.NoError(t, err)
 			assert.Equal(t, test.want, v)
@@ -459,6 +461,18 @@ func TestIgnoreMissing(t *testing.T) {
 	}
 }
 
+func TestProcessorStringer(t *testing.T) {
+	testConfig, err := config.NewConfigFrom(mapstr.M{
+		"fields":   []string{"field1"},
+		"encoding": "hex",
+		"method":   "md5",
+	})
+	require.NoError(t, err)
+	p, err := New(testConfig)
+	require.NoError(t, err)
+	require.Equal(t, `fingerprint={"Method":"md5","Encoding":"hex","Fields":["field1"],"TargetField":"fingerprint","IgnoreMissing":false}`, fmt.Sprint(p))
+}
+
 func BenchmarkHashMethods(b *testing.B) {
 	events := nRandomEvents(100000)
 
@@ -472,8 +486,8 @@ func BenchmarkHashMethods(b *testing.B) {
 
 		b.Run(method, func(b *testing.B) {
 			b.ResetTimer()
-			for _, e := range events {
-				_, err := p.Run(&e)
+			for i := range events {
+				_, err := p.Run(&events[i])
 				if err != nil {
 					b.Fatal(err)
 				}
@@ -491,7 +505,7 @@ func nRandomEvents(num int) []beat.Event {
 	charsetLen := len(charset)
 	b := make([]byte, 200)
 
-	var events []beat.Event
+	events := make([]beat.Event, num)
 	for i := 0; i < num; i++ {
 		for j := range b {
 			b[j] = charset[prng.Intn(charsetLen)]

@@ -489,8 +489,8 @@ var oAuth2ValidationTests = []struct {
 		},
 	},
 	{
-		name:    "okta requires token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file to be provided",
-		wantErr: errors.New("okta validation error: token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file must be provided accessing 'auth.oauth2'"),
+		name:    "unique_okta_jwk_token",
+		wantErr: errors.New("okta validation error: one of okta.jwk_json, okta.jwk_file or okta.jwk_pem must be provided accessing 'auth.oauth2'"),
 		input: map[string]interface{}{
 			"auth.oauth2": map[string]interface{}{
 				"provider":  "okta",
@@ -501,7 +501,7 @@ var oAuth2ValidationTests = []struct {
 		},
 	},
 	{
-		name:    "okta oauth2 validation fails if jwk_json is not a valid JSON",
+		name:    "invalid_okta_jwk_json",
 		wantErr: errors.New("the field can't be converted to valid JSON accessing 'auth.oauth2.okta.jwk_json'"),
 		input: map[string]interface{}{
 			"auth.oauth2": map[string]interface{}{
@@ -514,7 +514,7 @@ var oAuth2ValidationTests = []struct {
 		},
 	},
 	{
-		name: "okta successful oauth2 validation",
+		name: "okta_successful_oauth2_validation",
 		input: map[string]interface{}{
 			"auth.oauth2": map[string]interface{}{
 				"provider":      "okta",

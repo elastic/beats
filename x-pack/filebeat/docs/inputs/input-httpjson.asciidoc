@@ -11,6 +11,8 @@
 
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
+If you are starting development of a new custom HTTP API input, we recommend that you use the <<filebeat-input-cel,Common Expression Language input>> which provides greater flexibility and an improved developer experience.
+
 This input supports:
 
 * Auth
@@ -399,8 +401,12 @@ NOTE: Only one of the credentials settings can be set at once. For more informat
 
 The RSA JWK Private Key JSON for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
 
-NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
+[float]
+==== `auth.oauth2.okta.jwk_pem`
 
+The RSA JWK private key PEM block for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
+
+NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
 
 [float]
 ==== `auth.oauth2.google.delegated_account`
