@@ -45,11 +45,11 @@ getGitMatchingGroup() {
 
 defineModule() {
   cd "${BEAT_PATH}"
-  module=$(getGitMatchingGroup "$pattern" "$exclude")
+  NEW_MODULE=$(getGitMatchingGroup "$pattern" "$exclude")
   if [ ! -f "$BEAT_PATH/module/${module}" ]; then
-    module=''
+    NEW_MODULE=''
   fi
   cd - >/dev/null
 
-  echo "${module}"
+  export NEW_MODULE
 }
