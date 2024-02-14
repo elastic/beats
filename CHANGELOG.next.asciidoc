@@ -22,6 +22,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 
 *Auditbeat*
 
+- Add opt-in `KProbes` backend for file_integrity module. {pull}37796[37796]
 
 *Filebeat*
 

@@ -13,6 +13,7 @@ enum Source : ubyte {
   Scan,
   FSNotify,
   eBPF,
+  KProbes
 }
 
 enum Type : ubyte {

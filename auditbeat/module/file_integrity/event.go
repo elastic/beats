@@ -67,12 +67,15 @@ const (
 	SourceFSNotify
 	// SourceEBPF identifies events triggered by an eBPF program.
 	SourceEBPF
+	// SourceKProbes identifies events triggered by KProbes.
+	SourceKProbes
 )
 
 var sourceNames = map[Source]string{
 	SourceScan:     "scan",
 	SourceFSNotify: "fsnotify",
 	SourceEBPF:     "ebpf",
+	SourceKProbes:  "kprobes",
 }
 
 // Type identifies the file type (e.g. dir, file, symlink).
