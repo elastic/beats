@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+
+steps:
+  - label: "Package elastic-agent"
+    env:
+      AGENT_DROP_PATH: "build/distributions/elastic-agent-drop"
+    key: "package-full"
+    command: ".buildkite/x-pack/elastic-agent/scripts/steps/package.sh"
+    artifact_paths:
+      - "build/distributions/elastic-agent-drop/**/*"
+    agents:
+      # TODO: use a container
+      provider: "gcp"
+      image: "family/core-ubuntu-2204"
+    retry:
+      manual:
+        allowed: true
