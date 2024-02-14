@@ -20,16 +20,16 @@ steps:
   - input: "Input Parameters"
     key: "input-run-all-stages"
     fields:
-    - select: "Packetbeat - run_x-pack_libbeat"
-      key: "run_x-pack_libbeat"
+    - select: "Packetbeat - run_xpack_libbeat"
+      key: "run_xpack_libbeat"
       options:
         - label: "True"
           value: "true"
         - label: "False"
           value: "false"
       default: "false"
-    - select: "Packetbeat - run_x-pack_libbeat_arm_tests"
-      key: "run_x-pack_libbeat_arm_tests"
+    - select: "Packetbeat - run_xpack_libbeat_arm_tests"
+      key: "run_xpack_libbeat_arm_tests"
       options:
         - label: "True"
           value: "true"

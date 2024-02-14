@@ -22,30 +22,39 @@ ONLY_DOCS=${ONLY_DOCS:-"true"}
 metricbeat_changeset=(
   "^metricbeat/.*"
   )
+
 libbeat_changeset=(
   "^libbeat/.*"
   )
+
 packetbeat_changeset=(
   "^packetbeat/.*"
   )
+
 winlogbeat_changeset=(
   "^winlogbeat/.*"
   )
-x-pack_libbeat_changeset=(
+
+xpack_libbeat_changeset=(
   "^x-pack/libbeat/.*"
   )
-x-pack_metricbeat_changeset=(
+
+xpack_metricbeat_changeset=(
   "^x-pack/metricbeat/.*"
   )
-x-pack_packetbeat_changeset=(
+
+xpack_packetbeat_changeset=(
   "^x-pack/packetbeat/.*"
   )
-x-pack_winlogbeat_changeset=(
+
+xpack_winlogbeat_changeset=(
   "^x-pack/winlogbeat/.*"
   )
+
 ci_changeset=(
   "^.buildkite/.*"
   )
+
 go_mod_changeset=(
   "^go.mod"
   )
@@ -75,7 +84,8 @@ packaging_changeset=(
 
 check_and_set_beat_vars() {
   if [[ -n "$BEATS_PROJECT_NAME" && "$BEATS_PROJECT_NAME" == *"x-pack/"* ]]; then
-    BEATS_XPACK_PROJECT_NAME=${BEATS_PROJECT_NAME//\//_}      #replace / to _
+    BEATS_XPACK_PROJECT_NAME=${BEATS_PROJECT_NAME//-/}              #remove -
+    BEATS_XPACK_PROJECT_NAME=${BEATS_XPACK_PROJECT_NAME//\//_}      #replace / to _
     BEATS_XPACK_LABEL_PROJECT_NAME=${BEATS_PROJECT_NAME//\//-}      #replace / to - for labels
     BEATS_GH_LABEL=${BEATS_XPACK_LABEL_PROJECT_NAME}
     declare -n TRIGGER_SPECIFIC_BEAT="run_${BEATS_XPACK_PROJECT_NAME}"
