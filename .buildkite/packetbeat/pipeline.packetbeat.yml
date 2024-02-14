@@ -57,4 +57,4 @@ steps:
     command: ".buildkite/scripts/generate_packetbeat_pipeline.sh"
     notify:
       - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline"
+          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"

@@ -18,9 +18,6 @@ steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
         command: ".buildkite/scripts/unit_tests.sh"
-        notify:
-          - github_commit_status:
-              context: "${BEATS_PROJECT_NAME}: Ubuntu Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -30,9 +27,6 @@ steps:
       - label: ":rhel: RHEL-9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
         command: ".buildkite/scripts/unit_tests.sh"
-        notify:
-          - github_commit_status:
-              context: "${BEATS_PROJECT_NAME}: RHEL-9 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9_X86_64}"
@@ -43,9 +37,6 @@ steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command: ".buildkite/scripts/win_unit_tests.ps1"
         key: "mandatory-win-unit-tests"
-        notify:
-          - github_commit_status:
-              context: "${BEATS_PROJECT_NAME}: Windows Unit Tests"
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
@@ -65,9 +56,6 @@ steps:
       - label: ":windows: Win 2019 Unit Tests"
         key: "extended-win-2019-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
-        notify:
-          - github_commit_status:
-              context: "${BEATS_PROJECT_NAME}: Win 2019 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -79,9 +67,6 @@ steps:
       - label: ":windows: Windows 10 Unit Tests"
         key: "extended-win-10-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
-        notify:
-          - github_commit_status:
-              context: "${BEATS_PROJECT_NAME}: Windows 10 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -93,9 +78,6 @@ steps:
       - label: ":windows: Windows 11 Unit Tests"
         key: "extended-win-11-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
-        notify:
-          - github_commit_status:
-              context: "${BEATS_PROJECT_NAME}: Windows 11 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -126,9 +108,6 @@ if  are_conditions_met_macos_tests; then
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
         command: ".buildkite/scripts/unit_tests.sh"
-        notify:
-          - github_commit_status:
-              context: "${BEATS_PROJECT_NAME}: MacOS Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -142,9 +121,6 @@ if  are_conditions_met_arm_tests; then
       - label: ":linux: ARM Ubuntu Unit Tests"
         key: "extended-arm64-unit-test"
         command: ".buildkite/scripts/unit_tests.sh"
-        notify:
-          - github_commit_status:
-              context: "${BEATS_PROJECT_NAME}: ARM Ubuntu Unit Tests"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
@@ -169,9 +145,6 @@ if are_conditions_met_packaging; then
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
         command: ".buildkite/scripts/packaging.sh"
-        notify:
-          - github_commit_status:
-              context: "${BEATS_PROJECT_NAME}: Packaging Linux"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -182,9 +155,6 @@ if are_conditions_met_packaging; then
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
         command: ".buildkite/scripts/packaging.sh"
-        notify:
-          - github_commit_status:
-              context: "${BEATS_PROJECT_NAME}: Packaging ARM"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
