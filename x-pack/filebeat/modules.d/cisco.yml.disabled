@@ -1,5 +1,5 @@
 # Module: cisco
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-cisco.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.13/filebeat-module-cisco.html
 
 - module: cisco
   asa:

@@ -1,5 +1,5 @@
 # Module: sonicwall
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-sonicwall.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.13/filebeat-module-sonicwall.html
 
 - module: sonicwall
   firewall:

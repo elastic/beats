@@ -1,5 +1,5 @@
 # Module: vsphere
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-vsphere.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.13/metricbeat-module-vsphere.html
 
 - module: vsphere
   #metricsets:

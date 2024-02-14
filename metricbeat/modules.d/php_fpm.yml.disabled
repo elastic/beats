@@ -1,5 +1,5 @@
 # Module: php_fpm
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-php_fpm.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.13/metricbeat-module-php_fpm.html
 
 - module: php_fpm
   #metricsets:
