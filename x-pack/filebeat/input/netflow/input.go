@@ -6,23 +6,26 @@ package netflow
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"net"
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/filebeat/channel"
-	"github.com/elastic/beats/v7/filebeat/harvester"
-	"github.com/elastic/beats/v7/filebeat/input"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
+
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/go-concert/ctxtool"
+	"github.com/elastic/go-concert/unison"
 )
 
 const (
@@ -34,9 +37,65 @@ var (
 	numDropped  = monitoring.NewUint(nil, "filebeat.input.netflow.packets.dropped")
 	numFlows    = monitoring.NewUint(nil, "filebeat.input.netflow.flows")
 	aliveInputs atomic.Int
-	logger      *logp.Logger
-	initLogger  sync.Once
 )
+
+func Plugin(log *logp.Logger) v2.Plugin {
+	return v2.Plugin{
+		Name:       inputName,
+		Stability:  feature.Stable,
+		Deprecated: false,
+		Info:       "collect and decode packets of netflow protocol",
+		Manager: &netflowInputManager{
+			log: log.Named(inputName),
+		},
+	}
+}
+
+type netflowInputManager struct {
+	log *logp.Logger
+}
+
+func (im *netflowInputManager) Init(_ unison.Group, _ v2.Mode) error {
+	return nil
+}
+
+func (im *netflowInputManager) Create(cfg *conf.C) (v2.Input, error) {
+	inputCfg := defaultConfig
+	if err := cfg.Unpack(&inputCfg); err != nil {
+		return nil, err
+	}
+
+	customFields := make([]fields.FieldDict, len(inputCfg.CustomDefinitions))
+	for idx, yamlPath := range inputCfg.CustomDefinitions {
+		f, err := LoadFieldDefinitionsFromFile(yamlPath)
+		if err != nil {
+			return nil, fmt.Errorf("failed parsing custom field definitions from file '%s': %w", yamlPath, err)
+		}
+		customFields[idx] = f
+	}
+
+	dec, err := decoder.NewDecoder(decoder.NewConfig().
+		WithProtocols(inputCfg.Protocols...).
+		WithExpiration(inputCfg.ExpirationTimeout).
+		WithLogOutput(&logDebugWrapper{Logger: im.log}).
+		WithCustomFields(customFields...).
+		WithSequenceResetEnabled(inputCfg.DetectSequenceReset).
+		WithSharedTemplates(inputCfg.ShareTemplates))
+	if err != nil {
+		return nil, fmt.Errorf("error initializing netflow decoder: %w", err)
+	}
+
+	input := &netflowInput{
+		decoder:          dec,
+		internalNetworks: inputCfg.InternalNetworks,
+		logger:           im.log,
+		queueSize:        inputCfg.PacketQueueSize,
+	}
+
+	input.udp = udp.New(&inputCfg.Config, input.packetDispatch)
+
+	return input, nil
+}
 
 type packet struct {
 	data   []byte
@@ -44,11 +103,10 @@ type packet struct {
 }
 
 type netflowInput struct {
-	mutex            sync.Mutex
+	mtx              sync.Mutex
 	udp              *udp.Server
 	decoder          *decoder.Decoder
-	outlet           channel.Outleter
-	forwarder        *harvester.Forwarder
+	client           beat.Client
 	internalNetworks []string
 	logger           *logp.Logger
 	queueC           chan packet
@@ -56,11 +114,99 @@ type netflowInput struct {
 	started          bool
 }
 
-func init() {
-	err := input.Register(inputName, NewInput)
-	if err != nil {
-		panic(err)
+func (n *netflowInput) Name() string {
+	return inputName
+}
+
+func (n *netflowInput) Test(_ v2.TestContext) error {
+	return nil
+}
+
+func (n *netflowInput) packetDispatch(data []byte, metadata inputsource.NetworkMetadata) {
+	select {
+	case n.queueC <- packet{data, metadata.RemoteAddr}:
+		numPackets.Inc()
+	default:
+		numDropped.Inc()
 	}
+}
+
+func (n *netflowInput) Run(context v2.Context, connector beat.PipelineConnector) error {
+	n.mtx.Lock()
+	if n.started {
+		n.mtx.Unlock()
+		return nil
+	}
+
+	n.started = true
+	n.mtx.Unlock()
+
+	n.logger.Info("Starting netflow input")
+
+	n.logger.Info("Connecting to beat event publishing")
+	client, err := connector.ConnectWith(beat.ClientConfig{
+		PublishMode: beat.DefaultGuarantees,
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: boolPtr(false),
+		},
+		CloseRef:      context.Cancelation,
+		EventListener: nil,
+	})
+	if err != nil {
+		n.logger.Errorw("Failed connecting to beat event publishing", "error", err)
+		n.stop()
+		return err
+	}
+
+	n.logger.Info("Starting netflow decoder")
+	if err := n.decoder.Start(); err != nil {
+		n.logger.Errorw("Failed to start netflow decoder", "error", err)
+		n.stop()
+		return err
+	}
+
+	n.queueC = make(chan packet, n.queueSize)
+
+	n.logger.Info("Starting udp server")
+	err = n.udp.Start()
+	if err != nil {
+		n.logger.Errorf("Failed to start udp server: %v", err)
+		n.stop()
+		return err
+	}
+
+	if aliveInputs.Inc() == 1 && n.logger.IsDebug() {
+		go n.statsLoop(ctxtool.FromCanceller(context.Cancelation))
+	}
+	defer aliveInputs.Dec()
+
+	go func() {
+		<-context.Cancelation.Done()
+		n.stop()
+	}()
+
+	for packet := range n.queueC {
+		flows, err := n.decoder.Read(bytes.NewBuffer(packet.data), packet.source)
+		if err != nil {
+			n.logger.Warnf("Error parsing NetFlow packet of length %d from %s: %v", len(packet.data), packet.source, err)
+			continue
+		}
+
+		fLen := len(flows)
+		if fLen == 0 {
+			continue
+		}
+		evs := make([]beat.Event, fLen)
+		numFlows.Add(uint64(fLen))
+		for i, flow := range flows {
+			evs[i] = toBeatEvent(flow, n.internalNetworks)
+		}
+		client.PublishAll(evs)
+	}
+
+	return nil
 }
 
 // An adapter so that logp.Logger can be used as a log.Logger.
@@ -83,171 +229,72 @@ func (w *logDebugWrapper) Write(p []byte) (n int, err error) {
 	return n, nil
 }
 
-// NewInput creates a new Netflow input
-func NewInput(
-	cfg *conf.C,
-	connector channel.Connector,
-	context input.Context,
-) (input.Input, error) {
-	initLogger.Do(func() {
-		logger = logp.NewLogger(inputName)
-	})
-	out, err := connector.Connect(cfg)
-	if err != nil {
-		return nil, err
+// stop stops the netflow input
+func (n *netflowInput) stop() {
+	n.mtx.Lock()
+	defer n.mtx.Unlock()
+
+	if !n.started {
+		return
 	}
 
-	config := defaultConfig
-	if err = cfg.Unpack(&config); err != nil {
-		out.Close()
-		return nil, err
+	if n.udp != nil {
+		n.udp.Stop()
 	}
 
-	var customFields []fields.FieldDict
-	for _, yamlPath := range config.CustomDefinitions {
-		f, err := LoadFieldDefinitionsFromFile(yamlPath)
-		if err != nil {
-			return nil, fmt.Errorf("failed parsing custom field definitions from file '%s': %w", yamlPath, err)
+	if n.decoder != nil {
+		if err := n.decoder.Stop(); err != nil {
+			n.logger.Errorw("Error stopping decoder", "error", err)
 		}
-		customFields = append(customFields, f)
-	}
-	decoder, err := decoder.NewDecoder(decoder.NewConfig().
-		WithProtocols(config.Protocols...).
-		WithExpiration(config.ExpirationTimeout).
-		WithLogOutput(&logDebugWrapper{Logger: logger}).
-		WithCustomFields(customFields...).
-		WithSequenceResetEnabled(config.DetectSequenceReset).
-		WithSharedTemplates(config.ShareTemplates))
-	if err != nil {
-		return nil, fmt.Errorf("error initializing netflow decoder: %w", err)
 	}
 
-	input := &netflowInput{
-		outlet:           out,
-		internalNetworks: config.InternalNetworks,
-		forwarder:        harvester.NewForwarder(out),
-		decoder:          decoder,
-		logger:           logger,
-		queueSize:        config.PacketQueueSize,
-	}
-
-	input.udp = udp.New(&config.Config, input.packetDispatch)
-	return input, nil
-}
-
-func (p *netflowInput) Publish(events []beat.Event) error {
-	for _, evt := range events {
-		p.forwarder.Send(evt)
-	}
-	return nil
-}
-
-// Run starts listening for NetFlow events over the network.
-func (p *netflowInput) Run() {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
-	if !p.started {
-		logger.Info("Starting UDP input")
-
-		if err := p.decoder.Start(); err != nil {
-			logger.Errorw("Failed to start netflow decoder", "error", err)
-			p.outlet.Close()
-			return
+	if n.client != nil {
+		if err := n.client.Close(); err != nil {
+			n.logger.Errorw("Error closing beat client", "error", err)
 		}
-
-		p.queueC = make(chan packet, p.queueSize)
-		err := p.udp.Start()
-		if err != nil {
-			logger.Errorf("Error running harvester: %v", err)
-			p.outlet.Close()
-			p.decoder.Stop()
-			close(p.queueC)
-			return
-		}
-
-		go p.recvRoutine()
-		// Only the first active input launches the stats thread
-		if aliveInputs.Inc() == 1 && logger.IsDebug() {
-			go p.statsLoop()
-		}
-		p.started = true
 	}
+
+	close(n.queueC)
+
+	n.started = false
 }
 
-// Stop stops the UDP input
-func (p *netflowInput) Stop() {
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-	if p.started {
-		aliveInputs.Dec()
-		defer p.outlet.Close()
-		defer close(p.queueC)
-
-		logger.Info("Stopping UDP input")
-		p.udp.Stop()
-		p.started = false
-	}
-}
-
-// Wait suspends the UDP input
-func (p *netflowInput) Wait() {
-	p.Stop()
-}
-
-func (p *netflowInput) statsLoop() {
+func (n *netflowInput) statsLoop(ctx context.Context) {
 	prevPackets := numPackets.Get()
 	prevFlows := numFlows.Get()
 	prevDropped := numDropped.Get()
 	// The stats thread only monitors queue length for the first input
-	prevQueue := len(p.queueC)
+	prevQueue := len(n.queueC)
 	t := time.NewTicker(time.Second)
 	defer t.Stop()
-	for range t.C {
-		packets := numPackets.Get()
-		flows := numFlows.Get()
-		dropped := numDropped.Get()
-		queue := len(p.queueC)
-		if packets > prevPackets || flows > prevFlows || dropped > prevDropped || queue > prevQueue {
-			logger.Debugf("Stats total:[ packets=%d dropped=%d flows=%d queue_len=%d ] delta:[ packets/s=%d dropped/s=%d flows/s=%d queue_len/s=%+d ]",
-				packets, dropped, flows, queue, packets-prevPackets, dropped-prevDropped, flows-prevFlows, queue-prevQueue)
-			prevFlows = flows
-			prevPackets = packets
-			prevQueue = queue
-			prevDropped = dropped
-		} else {
-			p.mutex.Lock()
+	for {
+		select {
+		case <-t.C:
+			packets := numPackets.Get()
+			flows := numFlows.Get()
+			dropped := numDropped.Get()
+			queue := len(n.queueC)
+			if packets > prevPackets || flows > prevFlows || dropped > prevDropped || queue > prevQueue {
+				n.logger.Debugf("Stats total:[ packets=%d dropped=%d flows=%d queue_len=%d ] delta:[ packets/s=%d dropped/s=%d flows/s=%d queue_len/s=%+d ]",
+					packets, dropped, flows, queue, packets-prevPackets, dropped-prevDropped, flows-prevFlows, queue-prevQueue)
+				prevFlows = flows
+				prevPackets = packets
+				prevQueue = queue
+				prevDropped = dropped
+				continue
+			}
+
+			n.mtx.Lock()
 			count := aliveInputs.Load()
-			p.mutex.Unlock()
+			n.mtx.Unlock()
 			if count == 0 {
-				break
+				return
 			}
+
+		case <-ctx.Done():
+			return
 		}
 	}
 }
 
-func (p *netflowInput) packetDispatch(data []byte, metadata inputsource.NetworkMetadata) {
-	select {
-	case p.queueC <- packet{data, metadata.RemoteAddr}:
-		numPackets.Inc()
-	default:
-		numDropped.Inc()
-	}
-}
-
-func (p *netflowInput) recvRoutine() {
-	for packet := range p.queueC {
-		flows, err := p.decoder.Read(bytes.NewBuffer(packet.data), packet.source)
-		if err != nil {
-			p.logger.Warnf("Error parsing NetFlow packet of length %d from %s: %v", len(packet.data), packet.source, err)
-		}
-		if n := len(flows); n > 0 {
-			evs := make([]beat.Event, n)
-			numFlows.Add(uint64(n))
-			for i, flow := range flows {
-				evs[i] = toBeatEvent(flow, p.internalNetworks)
-			}
-			p.Publish(evs)
-		}
-	}
-}
+func boolPtr(b bool) *bool { return &b }

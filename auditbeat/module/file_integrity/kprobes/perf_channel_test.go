@@ -15,39 +15,37 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package memqueue
+//go:build linux
 
-type batchBuffer struct {
-	next    *batchBuffer
-	flushed bool
-	entries []queueEntry
+package kprobes
+
+import "github.com/stretchr/testify/mock"
+
+type perfChannelMock struct {
+	mock.Mock
 }
 
-func newBatchBuffer(sz int) *batchBuffer {
-	b := &batchBuffer{}
-	b.entries = make([]queueEntry, 0, sz)
-	return b
+func (p *perfChannelMock) C() <-chan interface{} {
+	args := p.Called()
+	return args.Get(0).(chan interface{})
 }
 
-func (b *batchBuffer) add(entry queueEntry) {
-	b.entries = append(b.entries, entry)
+func (p *perfChannelMock) ErrC() <-chan error {
+	args := p.Called()
+	return args.Get(0).(chan error)
 }
 
-func (b *batchBuffer) length() int {
-	return len(b.entries)
+func (p *perfChannelMock) LostC() <-chan uint64 {
+	args := p.Called()
+	return args.Get(0).(chan uint64)
 }
 
-func (b *batchBuffer) cancel(producer *ackProducer) int {
-	entries := b.entries[:0]
+func (p *perfChannelMock) Run() error {
+	args := p.Called()
+	return args.Error(0)
+}
 
-	removedCount := 0
-	for _, entry := range b.entries {
-		if entry.producer == producer {
-			removedCount++
-			continue
-		}
-		entries = append(entries, entry)
-	}
-	b.entries = entries
-	return removedCount
+func (p *perfChannelMock) Close() error {
+	args := p.Called()
+	return args.Error(0)
 }

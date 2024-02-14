@@ -20,7 +20,7 @@ package outputs
 import (
 	"fmt"
 
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
@@ -46,7 +46,7 @@ func Success(cfg config.Namespace, batchSize, retry int, clients ...Client) (Gro
 			}
 			q = memqueue.FactoryForSettings(settings)
 		case diskqueue.QueueType:
-			if publisher.UnderAgent() {
+			if management.UnderAgent() {
 				return Group{}, fmt.Errorf("disk queue not supported under agent")
 			}
 			settings, err := diskqueue.SettingsForUserConfig(cfg.Config())
