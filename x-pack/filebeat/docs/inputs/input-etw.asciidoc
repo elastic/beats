@@ -11,13 +11,29 @@
 
 beta[]
 
-https://learn.microsoft.com/en-us/windows/win32/etw/event-tracing-portal[Event Tracing for Windows] is a powerful logging and tracing mechanism built into the Windows operating system. It provides a detailed view of application and system behavior, performance issues, and runtime diagnostics. Trace events contain an event header and provider-defined data that describes the current state of an application or operation. You can use the events to debug an application and perform capacity and performance analysis.
+https://learn.microsoft.com/en-us/windows/win32/etw/event-tracing-portal[Event
+Tracing for Windows] is a powerful logging and tracing mechanism built into the
+Windows operating system. It provides a detailed view of application and system
+behavior, performance issues, and runtime diagnostics. Trace events contain an
+event header and provider-defined data that describes the current state of an
+application or operation. You can use the events to debug an application and
+perform capacity and performance analysis.
 
-The ETW input can interact with ETW in three distinct ways: it can create a new session to capture events from user-mode providers, attach to an already existing session to collect ongoing event data, or read events from a pre-recorded .etl file. This functionality enables the module to adapt to different scenarios, such as real-time event monitoring or analyzing historical data.
+The ETW input can interact with ETW in three distinct ways: it can create a new
+session to capture events from user-mode providers, attach to an already
+existing session to collect ongoing event data, or read events from a
+pre-recorded .etl file. This functionality enables the module to adapt to
+different scenarios, such as real-time event monitoring or analyzing historical
+data.
 
-This input currently supports manifest-based, MOF (classic) and TraceLogging providers while WPP providers are not supported. https://learn.microsoft.com/en-us/windows/win32/etw/about-event-tracing#types-of-providers[Here] you can find more information about the available types of providers.
+This input currently supports manifest-based, MOF (classic) and TraceLogging
+providers while WPP providers are not supported.
+https://learn.microsoft.com/en-us/windows/win32/etw/about-event-tracing#types-of-providers[Here]
+you can find more information about the available types of providers.
 
-It has been tested in every Windows versions supported by Filebeat, starting from Windows 8.1 and Windows Server 2016. In addition, administrative privileges are required in order to control event tracing sessions.
+It has been tested in every Windows versions supported by Filebeat, starting
+from Windows 10 and Windows Server 2016. In addition, administrative privileges
+are required in order to control event tracing sessions.
 
 Example configurations:
 
@@ -69,7 +85,9 @@ Read from a .etl file:
   file: "C\Windows\System32\Winevt\Logs\Logfile.etl"
 ----
 
-NOTE: Examples shown above are mutually exclusive, since the options `provider.name`, `provider.guid`, `session` and `file` cannot be present at the same time. Nevertheless, it is a requirement that one of them appears.
+NOTE: Examples shown above are mutually exclusive, since the options
+`provider.name`, `provider.guid`, `session` and `file` cannot be present at the
+same time. Nevertheless, it is a requirement that one of them appears.
 
 Multiple providers example:
 ["source","yaml",subs="attributes"]
@@ -100,45 +118,58 @@ The `ETW` input supports the following configuration options.
 [float]
 ==== `file`
 
-Specifies the path to an .etl file for reading ETW events. This file format is commonly used for storing ETW event logs.
+Specifies the path to an .etl file for reading ETW events. This file format is
+commonly used for storing ETW event logs.
 
 [float]
 ==== `provider.guid`
 
-Identifies the GUID of an ETW provider. To see available providers, use the command `logman query providers`.
+Identifies the GUID of an ETW provider. To see available providers, use the
+command `logman query providers`.
 
 [float]
 ==== `provider.name`
 
-Specifies the name of the ETW provider. Available providers can be listed using `logman query providers`.
+Specifies the name of the ETW provider. Available providers can be listed using
+`logman query providers`.
 
 [float]
 ==== `session_name`
 
-When specified a provider, a new session is created. It sets the name for a new ETW session associated with the provider. If not provided, the default is the provider ID prefixed with 'Elastic-'.
+When specified a provider, a new session is created. It sets the name for a new
+ETW session associated with the provider. If not provided, the default is the
+provider ID prefixed with 'Elastic-'.
 
 [float]
 ==== `trace_level`
 
-Defines the filtering level for events based on severity. Valid options include critical, error, warning, informational, and verbose.
+Defines the filtering level for events based on severity. Valid options include
+critical, error, warning, informational, and verbose.
 
 [float]
 ==== `match_any_keyword`
 
-An 8-byte bitmask used for filtering events from specific provider subcomponents based on keyword matching. Any matching keyword will enable the event to be written. Default value is `0xfffffffffffffffff` so it matches every available keyword.
+An 8-byte bitmask used for filtering events from specific provider subcomponents
+based on keyword matching. Any matching keyword will enable the event to be
+written. Default value is `0xfffffffffffffffff` so it matches every available
+keyword.
 
-Run `logman query providers "<provider.name>"` to list the available keywords for a specific provider.
+Run `logman query providers "<provider.name>"` to list the available keywords
+for a specific provider.
 
 [float]
 ==== `match_all_keyword`
 
-Similar to MatchAnyKeyword, this 8-byte bitmask filters events that match all specified keyword bits. Default value is `0` to let every event pass.
+Similar to MatchAnyKeyword, this 8-byte bitmask filters events that match all
+specified keyword bits. Default value is `0` to let every event pass.
 
-Run `logman query providers "<provider.name>"` to list the available keywords for a specific provider.
+Run `logman query providers "<provider.name>"` to list the available keywords
+for a specific provider.
 
 [float]
 ==== `session`
 
-Names an existing ETW session to read from. Existing sessions can be listed using `logman query -ets`.
+Names an existing ETW session to read from. Existing sessions can be listed
+using `logman query -ets`.
 
 :type!:
