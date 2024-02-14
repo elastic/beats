@@ -78,34 +78,34 @@ func TestCreateWatcher(t *testing.T) {
 	options, err := getWatchOptions(config, false, client, log)
 	require.NoError(t, err)
 
-	created, err := createWatcher(NamespaceResource, &kubernetes.Node{}, *options, client, resourceWatchers, config.Namespace, false)
+	created, err := createWatcher(NamespaceResource, &kubernetes.Node{}, *options, client, resourceWatchers, config.Namespace)
 	require.True(t, created)
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 1, len(resourceWatchers.watchersMap))
-	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource])
-	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource].watcher)
+	require.Equal(t, 1, len(resourceWatchers.metaWatchersMap))
+	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource])
+	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
 
-	created, err = createWatcher(NamespaceResource, &kubernetes.Namespace{}, *options, client, resourceWatchers, config.Namespace, false)
+	created, err = createWatcher(NamespaceResource, &kubernetes.Namespace{}, *options, client, resourceWatchers, config.Namespace)
 	require.False(t, created)
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 1, len(resourceWatchers.watchersMap))
-	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource])
-	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource].watcher)
+	require.Equal(t, 1, len(resourceWatchers.metaWatchersMap))
+	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource])
+	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource].watcher)
 	resourceWatchers.lock.Unlock()
 
-	created, err = createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers, config.Namespace, false)
+	created, err = createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers, config.Namespace)
 	require.True(t, created)
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 2, len(resourceWatchers.watchersMap))
-	require.NotNil(t, resourceWatchers.watchersMap[DeploymentResource])
-	require.NotNil(t, resourceWatchers.watchersMap[NamespaceResource])
+	require.Equal(t, 2, len(resourceWatchers.metaWatchersMap))
+	require.NotNil(t, resourceWatchers.metaWatchersMap[DeploymentResource])
+	require.NotNil(t, resourceWatchers.metaWatchersMap[NamespaceResource])
 	resourceWatchers.lock.Unlock()
 }
 
@@ -124,25 +124,25 @@ func TestAddToMetricsetsUsing(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create the new entry with watcher and nil string array first
-	created, err := createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers, config.Namespace, false)
+	created, err := createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers, config.Namespace)
 	require.True(t, created)
 	require.NoError(t, err)
 
 	resourceWatchers.lock.Lock()
-	require.NotNil(t, resourceWatchers.watchersMap[DeploymentResource].watcher)
-	require.Equal(t, []string{}, resourceWatchers.watchersMap[DeploymentResource].metricsetsUsing)
+	require.NotNil(t, resourceWatchers.metaWatchersMap[DeploymentResource].watcher)
+	require.Equal(t, []string{}, resourceWatchers.metaWatchersMap[DeploymentResource].metricsetsUsing)
 	resourceWatchers.lock.Unlock()
 
 	metricsetDeployment := "state_deployment"
 	addToMetricsetsUsing(DeploymentResource, metricsetDeployment, resourceWatchers)
 	resourceWatchers.lock.Lock()
-	require.Equal(t, []string{metricsetDeployment}, resourceWatchers.watchersMap[DeploymentResource].metricsetsUsing)
+	require.Equal(t, []string{metricsetDeployment}, resourceWatchers.metaWatchersMap[DeploymentResource].metricsetsUsing)
 	resourceWatchers.lock.Unlock()
 
 	metricsetContainer := "container"
 	addToMetricsetsUsing(DeploymentResource, metricsetContainer, resourceWatchers)
 	resourceWatchers.lock.Lock()
-	require.Equal(t, []string{metricsetDeployment, metricsetContainer}, resourceWatchers.watchersMap[DeploymentResource].metricsetsUsing)
+	require.Equal(t, []string{metricsetDeployment, metricsetContainer}, resourceWatchers.metaWatchersMap[DeploymentResource].metricsetsUsing)
 	resourceWatchers.lock.Unlock()
 }
 
@@ -161,7 +161,7 @@ func TestRemoveFromMetricsetsUsing(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create the new entry with watcher and nil string array first
-	created, err := createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers, config.Namespace, false)
+	created, err := createWatcher(DeploymentResource, &kubernetes.Deployment{}, *options, client, resourceWatchers, config.Namespace)
 	require.True(t, created)
 	require.NoError(t, err)
 
@@ -205,7 +205,7 @@ func TestCreateAllWatchers(t *testing.T) {
 	err := createAllWatchers(client, "does-not-exist", "does-not-exist", false, config, log, resourceWatchers)
 	require.Error(t, err)
 	resourceWatchers.lock.Lock()
-	require.Equal(t, 0, len(resourceWatchers.watchersMap))
+	require.Equal(t, 0, len(resourceWatchers.metaWatchersMap))
 	resourceWatchers.lock.Unlock()
 
 	// Start watcher for a resource that requires other resources, should start all the watchers
@@ -217,9 +217,9 @@ func TestCreateAllWatchers(t *testing.T) {
 	// Check that all the required watchers are in the map
 	resourceWatchers.lock.Lock()
 	// we add 1 to the expected result to represent the resource itself
-	require.Equal(t, len(extras)+1, len(resourceWatchers.watchersMap))
+	require.Equal(t, len(extras)+1, len(resourceWatchers.metaWatchersMap))
 	for _, extra := range extras {
-		require.NotNil(t, resourceWatchers.watchersMap[extra])
+		require.NotNil(t, resourceWatchers.metaWatchersMap[extra])
 	}
 	resourceWatchers.lock.Unlock()
 }
@@ -311,13 +311,13 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 	metricsetDeployment := "state_deployment"
 
 	resourceWatchers.lock.Lock()
-	resourceWatchers.watchersMap[NamespaceResource] = &watcherData{
+	resourceWatchers.metaWatchersMap[NamespaceResource] = &metaWatcher{
 		watcher:         &mockWatcher{},
 		started:         false,
 		metricsetsUsing: []string{metricsetNamespace, metricsetDeployment},
 		enrichers:       make(map[string]*enricher),
 	}
-	resourceWatchers.watchersMap[DeploymentResource] = &watcherData{
+	resourceWatchers.metaWatchersMap[DeploymentResource] = &metaWatcher{
 		watcher:         &mockWatcher{},
 		started:         true,
 		metricsetsUsing: []string{metricsetDeployment},
@@ -349,20 +349,20 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 		log,
 	)
 	resourceWatchers.lock.Lock()
-	watcher := resourceWatchers.watchersMap[NamespaceResource]
+	watcher := resourceWatchers.metaWatchersMap[NamespaceResource]
 	require.False(t, watcher.started)
 	resourceWatchers.lock.Unlock()
 
 	enricherNamespace.Start(resourceWatchers)
 	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.watchersMap[NamespaceResource]
+	watcher = resourceWatchers.metaWatchersMap[NamespaceResource]
 	require.True(t, watcher.started)
 	resourceWatchers.lock.Unlock()
 
 	// Stopping should not stop the watcher because it is still being used by deployment metricset
 	enricherNamespace.Stop(resourceWatchers)
 	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.watchersMap[NamespaceResource]
+	watcher = resourceWatchers.metaWatchersMap[NamespaceResource]
 	require.True(t, watcher.started)
 	require.Equal(t, []string{metricsetDeployment}, watcher.metricsetsUsing)
 	resourceWatchers.lock.Unlock()
@@ -381,12 +381,12 @@ func TestBuildMetadataEnricher_Start_Stop(t *testing.T) {
 	enricherDeployment.Stop(resourceWatchers)
 
 	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.watchersMap[NamespaceResource]
+	watcher = resourceWatchers.metaWatchersMap[NamespaceResource]
 
 	require.False(t, watcher.started)
 	require.Equal(t, []string{}, watcher.metricsetsUsing)
 
-	watcher = resourceWatchers.watchersMap[DeploymentResource]
+	watcher = resourceWatchers.metaWatchersMap[DeploymentResource]
 	require.False(t, watcher.started)
 	require.Equal(t, []string{}, watcher.metricsetsUsing)
 
@@ -400,7 +400,7 @@ func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
 	metricsetStatePod := "state_pod"
 
 	resourceWatchers.lock.Lock()
-	resourceWatchers.watchersMap[PodResource] = &watcherData{
+	resourceWatchers.metaWatchersMap[PodResource] = &metaWatcher{
 		watcher:         &mockWatcher{},
 		started:         false,
 		metricsetsUsing: []string{metricsetStatePod, metricsetPod},
@@ -423,20 +423,20 @@ func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
 	enricherPod := buildMetadataEnricher(metricsetPod, PodResource, resourceWatchers, config,
 		funcs.update, funcs.delete, funcs.index, log)
 	resourceWatchers.lock.Lock()
-	watcher := resourceWatchers.watchersMap[PodResource]
+	watcher := resourceWatchers.metaWatchersMap[PodResource]
 	require.False(t, watcher.started)
 	resourceWatchers.lock.Unlock()
 
 	enricherPod.Start(resourceWatchers)
 	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.watchersMap[PodResource]
+	watcher = resourceWatchers.metaWatchersMap[PodResource]
 	require.True(t, watcher.started)
 	resourceWatchers.lock.Unlock()
 
 	// Stopping should not stop the watcher because it is still being used by state_pod metricset
 	enricherPod.Stop(resourceWatchers)
 	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.watchersMap[PodResource]
+	watcher = resourceWatchers.metaWatchersMap[PodResource]
 	require.True(t, watcher.started)
 	require.Equal(t, []string{metricsetStatePod}, watcher.metricsetsUsing)
 	resourceWatchers.lock.Unlock()
@@ -447,7 +447,7 @@ func TestBuildMetadataEnricher_Start_Stop_SameResources(t *testing.T) {
 	enricherStatePod.Stop(resourceWatchers)
 
 	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.watchersMap[PodResource]
+	watcher = resourceWatchers.metaWatchersMap[PodResource]
 	require.False(t, watcher.started)
 	require.Equal(t, []string{}, watcher.metricsetsUsing)
 	resourceWatchers.lock.Unlock()
@@ -457,7 +457,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	resourceWatchers := NewWatchers()
 
 	resourceWatchers.lock.Lock()
-	resourceWatchers.watchersMap[PodResource] = &watcherData{
+	resourceWatchers.metaWatchersMap[PodResource] = &metaWatcher{
 		watcher:         &mockWatcher{},
 		started:         false,
 		metricsetsUsing: []string{"pod"},
@@ -496,14 +496,14 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 	enricher := buildMetadataEnricher(metricset, PodResource, resourceWatchers, config,
 		funcs.update, funcs.delete, funcs.index, log)
 	resourceWatchers.lock.Lock()
-	wData := resourceWatchers.watchersMap[PodResource]
+	wData := resourceWatchers.metaWatchersMap[PodResource]
 	mockW := wData.watcher.(*mockWatcher)
 	require.NotNil(t, mockW.handler)
 	resourceWatchers.lock.Unlock()
 
 	enricher.Start(resourceWatchers)
 	resourceWatchers.lock.Lock()
-	watcher := resourceWatchers.watchersMap[PodResource]
+	watcher := resourceWatchers.metaWatchersMap[PodResource]
 	require.True(t, watcher.started)
 	mockW = watcher.watcher.(*mockWatcher)
 	resourceWatchers.lock.Unlock()
@@ -552,7 +552,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 
 	// Emit delete event
 	resourceWatchers.lock.Lock()
-	wData = resourceWatchers.watchersMap[PodResource]
+	wData = resourceWatchers.metaWatchersMap[PodResource]
 	mockW = wData.watcher.(*mockWatcher)
 	resourceWatchers.lock.Unlock()
 
@@ -577,7 +577,7 @@ func TestBuildMetadataEnricher_EventHandler(t *testing.T) {
 
 	enricher.Stop(resourceWatchers)
 	resourceWatchers.lock.Lock()
-	watcher = resourceWatchers.watchersMap[PodResource]
+	watcher = resourceWatchers.metaWatchersMap[PodResource]
 	require.False(t, watcher.started)
 	resourceWatchers.lock.Unlock()
 }
@@ -590,7 +590,7 @@ func TestBuildMetadataEnricher_EventHandler_PastObjects(t *testing.T) {
 	resourceWatchers := NewWatchers()
 
 	resourceWatchers.lock.Lock()
-	resourceWatchers.watchersMap[PodResource] = &watcherData{
+	resourceWatchers.metaWatchersMap[PodResource] = &metaWatcher{
 		watcher:         &mockWatcher{},
 		started:         false,
 		metricsetsUsing: []string{"pod", "state_pod"},
@@ -639,7 +639,7 @@ func TestBuildMetadataEnricher_EventHandler_PastObjects(t *testing.T) {
 
 	resourceWatchers.lock.Lock()
 
-	watcher := resourceWatchers.watchersMap[PodResource]
+	watcher := resourceWatchers.metaWatchersMap[PodResource]
 	mockW := watcher.watcher.(*mockWatcher)
 	resourceWatchers.lock.Unlock()
 
@@ -716,6 +716,10 @@ func (m *mockWatcher) Stop() {
 
 func (m *mockWatcher) AddEventHandler(r kubernetes.ResourceEventHandler) {
 	m.handler = r
+}
+
+func (m *mockWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
+	return m.handler
 }
 
 func (m *mockWatcher) Store() cache.Store {
