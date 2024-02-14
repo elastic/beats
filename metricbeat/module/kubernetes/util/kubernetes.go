@@ -92,8 +92,8 @@ type watcherData struct {
 	enrichers       map[string]*enricher // map of enrichers using this watcher. The key is the metricset name
 	metadataObjects map[string]bool      // map of ids of each object received by the handler functions
 
-	nodeScope    bool // whether this watcher is only for current node
-	needsRestart bool // whether this watcher needs a restart
+	nodeScope      bool               // whether this watcher is only for current node
+	restartWatcher kubernetes.Watcher // whether this watcher needs a restart
 }
 
 type Watchers struct {
@@ -279,7 +279,7 @@ func createWatcher(
 			metadataObjects: make(map[string]bool),
 			enrichers:       make(map[string]*enricher),
 			metricsetsUsing: make([]string, 0),
-			needsRestart:    false,
+			restartWatcher:  nil,
 			nodeScope:       nodeScope,
 		}
 		return true, nil
@@ -287,8 +287,17 @@ func createWatcher(
 		// It might happen that the watcher already exists, but is only being used to monitor the resources
 		// of a single node. In that case, we need to check if we are trying to create a new watcher that will track
 		// the resources of multiple nodes. If it is the case, then we need to update the watcher.
+		// check if we need to add namespace to the watcher options
+
+		if isNamespaced(resourceName) {
+			options.Namespace = namespace
+		}
+		restartWatcher, err := kubernetes.NewNamedWatcher(resourceName, client, resource, options, nil)
+		if err != nil {
+			return false, err
+		}
+		watcher.restartWatcher = restartWatcher
 		watcher.nodeScope = nodeScope
-		watcher.needsRestart = true
 	}
 	return false, nil
 }
@@ -983,12 +992,13 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 			} else {
 				resourceWatcher.started = true
 			}
-		} else if resourceWatcher.needsRestart {
+		} else if resourceWatcher.restartWatcher != nil {
 			resourceWatcher.watcher.Stop()
-			if err := resourceWatcher.watcher.Start(); err != nil {
+			if err := resourceWatcher.restartWatcher.Start(); err != nil {
 				e.log.Warnf("Error restarting %s watcher: %s", e.resourceName, err)
 			} else {
-				resourceWatcher.needsRestart = false
+				resourceWatcher.watcher = resourceWatcher.restartWatcher
+				resourceWatcher.restartWatcher = nil
 			}
 		}
 
