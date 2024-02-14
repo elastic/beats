@@ -11,15 +11,13 @@ VERSION="$(make get-version)"
 SOURCE_TAG+="${VERSION}${IMG_POSTFIX}"
 BEAT_NAME="filebeat"
 TARGET="observability-ci/${BEAT_NAME}"
-# Remove following once beats fully migrated
-BK_IMG_POSTFIX="-BK-SNAPSHOT"
-BK_SOURCE_TAG+="${VERSION}${BK_IMG_POSTFIX}"
 
 echo "--- Creating package"
 mage -d filebeat package
 
 echo "--- Distribution list"
-ls -la filebeat/build/distributions
+dir="filebeat/build/distributions"
+buildkite-agent artifact upload "$dir/*.tar.gz;$dir/*.tar.gz.sha512"
 
 echo "--- Docker image list"
 docker images
@@ -27,8 +25,8 @@ docker images
 define_tags
 check_is_arm
 
+echo "--- Tag & Push"
 for variant in "${VARIANTS[@]}"; do
-
   source="beats/${BEAT_NAME}${variant}"
 
   for tag in "${tags[@]}"; do
@@ -36,20 +34,16 @@ for variant in "${VARIANTS[@]}"; do
 
   sourceName="${DOCKER_REGISTRY}/${source}:${SOURCE_TAG}"
   targetName="${DOCKER_REGISTRY}/${TARGET}:${targetTag}"
+  # Remove following lines once beats fully migrated
+  targetName="${targetName}-buildkite"
 
   if docker image inspect "${sourceName}" &>/dev/null; then
-    echo "--- Tag & Push"
-    echo "Source name: $sourceName"
-    echo "Target name: $targetName"
+    echo "Source name: $sourceName Target name: $targetName"
+    docker tag "$sourceName" "$targetName"
+#    docker push "$targetName"
 
-    # Remove following lines once beats fully migrated
-    bkSourceName="${DOCKER_REGISTRY}/${source}:${BK_SOURCE_TAG}"
-    docker tag "$sourceName" "$bkSourceName"
-    # Replace bkSourceName to sourceName once beats fully migrated
-    docker tag "${bkSourceName}" "${targetName}"
-#    docker push "${targetName}"
   else
     echo "Docker image ${sourceName} does not exist"
   fi
-  done
+done
 done
