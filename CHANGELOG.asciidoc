@@ -232,6 +232,7 @@ https://github.com/elastic/beats/compare/v8.11.1\...v8.11.2[View commits]
 - Enhance Azure Metrics metricset with refined grouping logic and resolved duplication issues for TSDB compatibility. {pull}36823[36823]
 - Fix unintended skip in metric collection on Azure Monitor. {issue}37204[37204] {pull}37203[37203]
 - Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
+- add_cloud_metadata: fix the `orchestrator` metadata for the aws cloud provider
 
 *Winlogbeat*
 
