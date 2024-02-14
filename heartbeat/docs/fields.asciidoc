@@ -258,7 +258,8 @@ example: ami-abcd1234
 
 --
 
-*`cloud.resourceGroup.name`*::
+
+*`cloud.resource_group.name`*::
 +
 --
 Name of resourceGroup the cloud instance belongs to.

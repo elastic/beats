@@ -201,7 +201,7 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 			"service": mapstr.M{
 				"name": "Virtual Machines",
 			},
-			"resourceGroup": mapstr.M{
+			"resource_group": mapstr.M{
 				"name": "MC_myname_group_myname_eastus",
 			},
 			"region": "eastus",

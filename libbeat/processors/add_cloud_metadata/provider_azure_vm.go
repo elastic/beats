@@ -84,7 +84,7 @@ var azureVMMetadataFetcher = provider{
 					"name": c.Str("serviceName"),
 				},
 				"region": c.Str("location"),
-				"resourceGroup": s.Object{
+				"resource_group": s.Object{
 					"name": c.Str("resourceGroupName"),
 				},
 			}.Apply(m)
@@ -186,7 +186,7 @@ func (az *azureMetadataFetcher) fetchAzureClusterMeta(
 ) {
 	logger := logp.NewLogger("add_cloud_metadata")
 	subscriptionId, _ := az.httpMeta.GetValue("cloud.account.id")
-	resourceGroupName, _ := az.httpMeta.GetValue("cloud.resourceGroup.name")
+	resourceGroupName, _ := az.httpMeta.GetValue("cloud.resource_group.name")
 	strResourceGroupName := ""
 	if val, ok := resourceGroupName.(string); ok {
 		strResourceGroupName = val
