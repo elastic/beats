@@ -18,25 +18,17 @@ ONLY_DOCS=${ONLY_DOCS:-"true"}
 [ -z "${run_packetbeat_arm_tests+x}" ] && run_packetbeat_arm_tests="$(buildkite-agent meta-data get run_packetbeat_arm_tests --default "false")"
 [ -z "${run_metricbeat_macos_tests+x}" ] && run_metricbeat_macos_tests="$(buildkite-agent meta-data get run_metricbeat_macos_tests --default "false")"
 [ -z "${run_packetbeat_macos_tests+x}" ] && run_packetbeat_macos_tests="$(buildkite-agent meta-data get run_packetbeat_macos_tests --default "false")"
-trigger_specific_beat="run_${BEATS_PROJECT_NAME}"
-trigger_specific_arm_tests="run_${BEATS_PROJECT_NAME}_arm_tests"
-trigger_specific_macos_tests="run_${BEATS_PROJECT_NAME}_macos_tests"
 
-metricbeat_changeset=(
-  "^metricbeat/.*"
-  )
-
-libbeat_changeset=(
-  "^libbeat/.*"
-  )
-
-packetbeat_changeset=(
-  "^packetbeat/.*"
-  )
-
-winlogbeat_changeset=(
-  "^winlogbeat/.*"
-  )
+metricbeat_changeset=("^metricbeat/.*")
+libbeat_changeset=("^libbeat/.*")
+packetbeat_changeset=("^packetbeat/.*")
+winlogbeat_changeset=("^winlogbeat/.*")
+x-pack_libbeat_changeset=("^x-pack/libbeat/.*")
+x-pack_metricbeat_changeset=("^x-pack/metricbeat/.*")
+x-pack_packetbeat_changeset=("^x-pack/packetbeat/.*")
+x-pack_winlogbeat_changeset=("^x-pack/winlogbeat/.*")
+ci_changeset=("^.buildkite/.*")
+go_mod_changeset=("^go.mod")
 
 oss_changeset=(
   "^go.mod"
@@ -46,13 +38,10 @@ oss_changeset=(
   "^testing/.*"
 )
 
-ci_changeset=(
-  "^.buildkite/.*"
+xpack_changeset=(
+  "${x-pack_libbeat_changeset[@]}"
+  "${oss_changeset[@]}"
 )
-
-go_mod_changeset=(
-  "^go.mod"
-  )
 
 docs_changeset=(
   ".*\\.(asciidoc|md)"
@@ -63,6 +52,41 @@ packaging_changeset=(
   "^dev-tools/packaging/.*"
   ".go-version"
   )
+
+check_and_set_beat_vars() {
+  if [[ -n "$BEATS_PROJECT_NAME" && "$BEATS_PROJECT_NAME" == *"x-pack/"* ]]; then
+    BEATS_XPACK_PROJECT_NAME=${BEATS_PROJECT_NAME//\//_}      #replace / to _
+    BEATS_XPACK_LABEL_PROJECT_NAME=${BEATS_PROJECT_NAME//\//-}      #replace / to - for labels
+    BEATS_GH_LABEL=${BEATS_XPACK_LABEL_PROJECT_NAME}
+    declare -n TRIGGER_SPECIFIC_BEAT="run_${BEATS_XPACK_PROJECT_NAME}"
+    declare -n TRIGGER_SPECIFIC_ARM_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_arm_tests"
+    declare -n TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_macos_tests"
+    declare -n BEAT_CHANGESET_REFERENCE="${BEATS_XPACK_PROJECT_NAME}_changeset"
+    echo "Beats project name is $BEATS_XPACK_PROJECT_NAME"
+    mandatory_changeset=(
+      "${BEAT_CHANGESET_REFERENCE[@]}"
+      "${xpack_changeset[@]}"
+      "${ci_changeset[@]}"
+    )
+  else
+    BEATS_GH_LABEL=${BEATS_PROJECT_NAME}
+    declare -n TRIGGER_SPECIFIC_BEAT="run_${BEATS_PROJECT_NAME}"
+    declare -n TRIGGER_SPECIFIC_ARM_TESTS="run_${BEATS_PROJECT_NAME}_arm_tests"
+    declare -n TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_PROJECT_NAME}_macos_tests"
+    declare -n BEAT_CHANGESET_REFERENCE="${BEATS_PROJECT_NAME}_changeset"
+    echo "Beats project name is $BEATS_PROJECT_NAME"
+    mandatory_changeset=(
+      "${BEAT_CHANGESET_REFERENCE[@]}"
+      "${oss_changeset[@]}"
+      "${ci_changeset[@]}"
+    )
+  fi
+  BEATS_GH_COMMENT="/test ${BEATS_PROJECT_NAME}"
+  BEATS_GH_MACOS_COMMENT="${BEATS_GH_COMMENT} for macos"
+  BEATS_GH_ARM_COMMENT="${BEATS_GH_COMMENT} for arm"
+  BAETS_GH_MACOS_LABEL="macOS"
+  BAETS_GH_ARM_LABEL="arm"
+}
 
 
 with_docker_compose() {
@@ -240,11 +264,7 @@ are_changed_only_paths() {
 }
 
 are_conditions_met_mandatory_tests() {
-  declare -n beat_changeset_reference="${BEATS_PROJECT_NAME}_changeset"
-  if are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
-    return 0
-  fi
-  if are_paths_changed "${beat_changeset_reference[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test ${BEATS_PROJECT_NAME}" || "${GITHUB_PR_LABELS}" =~ /(?i)${BEATS_PROJECT_NAME}/ || "${!trigger_specific_beat}" == "true" ]]; then
+  if are_paths_changed "${mandatory_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_COMMENT}" || "${GITHUB_PR_LABELS}" =~ /(?i)${BEATS_GH_LABEL}/ || "${TRIGGER_SPECIFIC_BEAT}" == "true" ]]; then
     return 0
   fi
   return 1
@@ -253,7 +273,7 @@ are_conditions_met_mandatory_tests() {
 are_conditions_met_arm_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
     if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
-      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test ${BEATS_PROJECT_NAME} for arm" || "${GITHUB_PR_LABELS}" =~ arm || "${!trigger_specific_arm_tests}" == "true" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_ARM_COMMENT}" || "${GITHUB_PR_LABELS}" =~ "${BAETS_GH_ARM_LABEL}" || "${TRIGGER_SPECIFIC_ARM_TESTS}" == "true" ]]; then
         return 0
       fi
     fi
@@ -264,7 +284,7 @@ are_conditions_met_arm_tests() {
 are_conditions_met_macos_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
     if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
-      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test ${BEATS_PROJECT_NAME} for macos" || "${GITHUB_PR_LABELS}" =~ macOS || "${!trigger_specific_macos_tests}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_MACOS_COMMENT}" || "${GITHUB_PR_LABELS}" =~ "${BAETS_GH_MACOS_LABEL}" || "${TRIGGER_SPECIFIC_MACOS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
         return 0
       fi
     fi
@@ -302,3 +322,5 @@ fi
 if are_paths_changed "${packaging_changeset[@]}" ; then
   PACKAGING_CHANGES="true"
 fi
+
+check_and_set_beat_vars

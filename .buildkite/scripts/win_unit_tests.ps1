@@ -1,5 +1,5 @@
 $ErrorActionPreference = "Stop" # set -e
-$WorkFolder = "metricbeat"
+$BEATS_PROJECT_NAME = $env:BEATS_PROJECT_NAME
 # Forcing to checkout again all the files with a correct autocrlf.
 # Doing this here because we cannot set git clone options before.
 function fixCRLF {
@@ -60,10 +60,21 @@ withMinGW
 
 $ErrorActionPreference = "Continue" # set +e
 
-Push-Location $WorkFolder
 
-New-Item -ItemType Directory -Force -Path "build"
-mage build unitTest
+if ($env:BEATS_PROJECT_NAME) {
+    if ($env:BEATS_PROJECT_NAME -like "*x-pack/*") {
+        $BEATS_PROJECT_NAME = $env:BEATS_PROJECT_NAME -replace "/", "\"
+        Push-Location $BEATS_PROJECT_NAME
+        New-Item -ItemType Directory -Force -Path "build"
+        mage -w reader/etw build goUnitTest
+    } else {
+        Push-Location $BEATS_PROJECT_NAME
+        New-Item -ItemType Directory -Force -Path "build"
+        mage build unitTest
+    }
+} else {
+    Write-Host "The variable BEATS_PROJECT_NAME isn't defined"
+}
 
 Pop-Location
 
