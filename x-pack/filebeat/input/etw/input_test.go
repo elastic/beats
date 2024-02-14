@@ -235,7 +235,7 @@ func Test_RunEtwInput_StartConsumerError(t *testing.T) {
 
 	// Run test
 	err := etwInput.Run(inputCtx, nil)
-	assert.EqualError(t, err, "failed to start consumer: mock error")
+	assert.EqualError(t, err, "failed running ETW consumer: mock error")
 }
 
 func Test_RunEtwInput_Success(t *testing.T) {
