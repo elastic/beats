@@ -33,6 +33,11 @@ function withMinGW {
     choco install mingw -y
     refreshenv
 }
+
+function withWinPcap {
+    Invoke-WebRequest -Uri "https://www.winpcap.org/install/bin/WinPcap_4_1_3.exe" -OutFile "C:\temp\WinPcap_4_1_3.exe"
+    Start-Process -FilePath "C:\temp\WinPcap_4_1_3.exe" -ArgumentList "/S" -Wait
+}
 function installGoDependencies {
     $installPackages = @(
         "github.com/magefile/mage"
@@ -56,6 +61,8 @@ installGoDependencies
 
 withPython $env:SETUP_WIN_PYTHON_VERSION
 
+withWinPcap
+
 withMinGW
 
 $ErrorActionPreference = "Continue" # set +e
@@ -65,16 +72,15 @@ if ($env:BEATS_PROJECT_NAME) {
     if ($env:BEATS_PROJECT_NAME -like "*x-pack/*") {
         $BEATS_PROJECT_NAME = $env:BEATS_PROJECT_NAME -replace "/", "\"
         Push-Location $BEATS_PROJECT_NAME
-        New-Item -ItemType Directory -Force -Path "build"
-        mage -w reader/etw build goUnitTest
     } else {
         Push-Location $BEATS_PROJECT_NAME
-        New-Item -ItemType Directory -Force -Path "build"
-        mage build unitTest
     }
 } else {
     Write-Host "The variable BEATS_PROJECT_NAME isn't defined"
 }
+
+New-Item -ItemType Directory -Force -Path "build"
+mage build unitTest
 
 Pop-Location
 
