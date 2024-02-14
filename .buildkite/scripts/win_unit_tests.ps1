@@ -34,8 +34,10 @@ function withMinGW {
     refreshenv
 }
 
-function withWinPcap {
-    Invoke-WebRequest -Uri "https://www.winpcap.org/install/bin/WinPcap_4_1_3.exe" -OutFile "C:\temp\WinPcap_4_1_3.exe"
+function withNpcap {
+    $npcapDownloadPath = Join-Path $env:TEMP "npcap-1.79.exe"
+    $npcapInstallerUrl = "https://npcap.com/dist/npcap-1.79.exe"
+    Invoke-WebRequest -Uri $npcapInstallerUrl -OutFile $npcapDownloadPath
     Start-Process -FilePath "C:\temp\WinPcap_4_1_3.exe" -ArgumentList "/S" -Wait
 }
 function installGoDependencies {
@@ -61,7 +63,7 @@ installGoDependencies
 
 withPython $env:SETUP_WIN_PYTHON_VERSION
 
-withWinPcap
+withNpcap
 
 withMinGW
 
