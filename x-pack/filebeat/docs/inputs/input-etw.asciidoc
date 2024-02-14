@@ -113,7 +113,8 @@ Multiple providers example:
 
 ==== Configuration options
 
-The `etw` input supports the following configuration options.
+The `etw` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
 
 [float]
 ==== `file`
@@ -171,6 +172,9 @@ for a specific provider.
 
 Names an existing ETW session to read from. Existing sessions can be listed
 using `logman query -ets`.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
 [float]
 === Metrics
