@@ -282,12 +282,8 @@ func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*o
 		return nil, fmt.Errorf("initialising encoding for '%v' failed: %w", f, err)
 	}
 
-<<<<<<< HEAD
-	return f, nil
-=======
 	ok = true // no need to close the file
-	return f, encoding, nil
->>>>>>> f7e5b4c41f (Fix file handle leak when handling errors in filestream (#37973))
+	return f, nil
 }
 
 func checkFileBeforeOpening(fi os.FileInfo) error {
