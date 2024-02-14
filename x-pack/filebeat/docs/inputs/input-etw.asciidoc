@@ -31,9 +31,9 @@ providers while WPP providers are not supported.
 https://learn.microsoft.com/en-us/windows/win32/etw/about-event-tracing#types-of-providers[Here]
 you can find more information about the available types of providers.
 
-It has been tested in every Windows versions supported by Filebeat, starting
+It has been tested in the Windows versions supported by {beatname_uc}, starting
 from Windows 10 and Windows Server 2016. In addition, administrative privileges
-are required in order to control event tracing sessions.
+are required to control event tracing sessions.
 
 Example configurations:
 
@@ -51,7 +51,7 @@ Read from a provider by name:
   match_all_keyword: 0
 ----
 
-Same provider can be defined by its GUID:
+Read from a provider by its GUID:
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
@@ -65,7 +65,7 @@ Same provider can be defined by its GUID:
   match_all_keyword: 0
 ----
 
-Read from a current session:
+Read from an existing session:
 ["source","yaml",subs="attributes"]
 ----
 {beatname_lc}.inputs:
@@ -85,9 +85,9 @@ Read from a .etl file:
   file: "C\Windows\System32\Winevt\Logs\Logfile.etl"
 ----
 
-NOTE: Examples shown above are mutually exclusive, since the options
+NOTE: Examples shown above are mutually exclusive, the options
 `provider.name`, `provider.guid`, `session` and `file` cannot be present at the
-same time. Nevertheless, it is a requirement that one of them appears.
+same time. Nevertheless, it is a requirement that one of them is present.
 
 Multiple providers example:
 ["source","yaml",subs="attributes"]
@@ -113,7 +113,7 @@ Multiple providers example:
 
 ==== Configuration options
 
-The `ETW` input supports the following configuration options.
+The `etw` input supports the following configuration options.
 
 [float]
 ==== `file`
@@ -136,9 +136,9 @@ Specifies the name of the ETW provider. Available providers can be listed using
 [float]
 ==== `session_name`
 
-When specified a provider, a new session is created. It sets the name for a new
-ETW session associated with the provider. If not provided, the default is the
-provider ID prefixed with 'Elastic-'.
+When specifying a provider, a new session is created. This controls the name for
+the new ETW session it will create. If not specified, the session will be named
+using the provider ID prefixed by 'Elastic-'.
 
 [float]
 ==== `trace_level`
