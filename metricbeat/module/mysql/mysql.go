@@ -56,7 +56,6 @@ type Metricset struct {
 }
 
 func NewMetricset(base mb.BaseMetricSet) (*Metricset, error) {
-	// Validate that at least one host has been specified.
 	var c Config
 	if err := base.Module().UnpackConfig(&c); err != nil {
 		return nil, fmt.Errorf("could not read config: %w", err)
