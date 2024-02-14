@@ -24,7 +24,7 @@ import (
 )
 
 type Config struct {
-	Hosts     []string          `config:"hosts"    validate:"required"`
+	Hosts     []string          `config:"hosts" validate:"required"`
 	Username  string            `config:"username"`
 	Password  string            `config:"password"`
 	TLS       *tlscommon.Config `config:"ssl"`
