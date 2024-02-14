@@ -11,6 +11,26 @@ def is_root():
     return os.geteuid() == 0
 
 
+def is_version_below(version, target):
+    t = list(map(int, target.split('.')))
+    v = list(map(int, version.split('.')))
+    v += [0] * (len(t) - len(v))
+    for i in range(len(t)):
+        if v[i] != t[i]:
+            return v[i] < t[i]
+    return False
+
+
+# Require Linux greater or equal than 3.10.0 and arm64/amd64 arch
+def is_platform_supported():
+    p = platform.platform().split('-')
+    if p[0] != 'Linux':
+        return False
+    if is_version_below(p[1], '3.10.0'):
+        return False
+    return {'aarch64', 'arm64', 'x86_64', 'amd64'}.intersection(p)
+
+
 # Escapes a path to match what's printed in the logs
 def escape_path(path):
     return path.replace('\\', '\\\\')
@@ -58,19 +78,21 @@ def wrap_except(expr):
 class Test(BaseTest):
     def wait_output(self, min_events):
         self.wait_until(lambda: wrap_except(lambda: len(self.read_output()) >= min_events))
-        # wait for the number of lines in the file to stay constant for a second
+        # wait for the number of lines in the file to stay constant for 10 seconds
         prev_lines = -1
         while True:
             num_lines = self.output_lines()
             if prev_lines < num_lines:
                 prev_lines = num_lines
-                time.sleep(1)
+                time.sleep(10)
             else:
                 break
 
     def wait_startup(self, backend, dir):
         if backend == "ebpf":
             self.wait_log_contains("started ebpf watcher", max_timeout=30, ignore_case=True)
+        if backend == "kprobes":
+            self.wait_log_contains("Started kprobes watcher", max_timeout=30, ignore_case=True)
         else:
             # wait until the directories to watch are printed in the logs
             # this happens when the file_integrity module starts.
@@ -123,7 +145,7 @@ class Test(BaseTest):
             # log entries are JSON formatted, this value shows up as an escaped json string.
             self.wait_log_contains("\\\"deleted\\\"")
 
-            if backend == "fsnotify":
+            if backend == "fsnotify" or backend == "kprobes":
                 self.wait_output(4)
             else:
                 # ebpf backend doesn't catch directory creation
@@ -141,7 +163,7 @@ class Test(BaseTest):
 
             has_file(objs, file1, "430ce34d020724ed75a196dfc2ad67c77772d169")
             has_file(objs, file2, "d23be250530a24be33069572db67995f21244c51")
-            if backend == "fsnotify":
+            if backend == "fsnotify" or backend == "kprobes":
                 has_dir(objs, subdir)
 
             file_events(objs, file1, ['created', 'deleted'])
@@ -158,6 +180,11 @@ class Test(BaseTest):
     @unittest.skipUnless(is_root(), "Requires root")
     def test_non_recursive__ebpf(self):
         self._test_non_recursive("ebpf")
+
+    @unittest.skipUnless(is_platform_supported(), "Requires Linux 3.10.0+ and arm64/amd64 arch")
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_non_recursive__kprobes(self):
+        self._test_non_recursive("kprobes")
 
     def _test_recursive(self, backend):
         """
@@ -198,7 +225,7 @@ class Test(BaseTest):
             file2 = os.path.join(subdir2, "more.txt")
             self.create_file(file2, "")
 
-            if backend == "fsnotify":
+            if backend == "fsnotify" or backend == "kprobes":
                 self.wait_output(4)
                 self.wait_until(lambda: any(
                     'file.path' in obj and obj['file.path'].lower() == subdir2.lower() for obj in self.read_output()))
@@ -218,7 +245,7 @@ class Test(BaseTest):
 
             has_file(objs, file1, "430ce34d020724ed75a196dfc2ad67c77772d169")
             has_file(objs, file2, "da39a3ee5e6b4b0d3255bfef95601890afd80709")
-            if backend == "fsnotify":
+            if backend == "fsnotify" or backend == "kprobes":
                 has_dir(objs, subdir)
                 has_dir(objs, subdir2)
 
@@ -231,6 +258,11 @@ class Test(BaseTest):
     @unittest.skipUnless(is_root(), "Requires root")
     def test_recursive__ebpf(self):
         self._test_recursive("ebpf")
+
+    @unittest.skipUnless(is_platform_supported(), "Requires Linux 3.10.0+ and arm64/amd64 arch")
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_recursive__kprobes(self):
+        self._test_recursive("kprobes")
 
     @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
     def _test_file_modified(self, backend):
@@ -297,3 +329,8 @@ class Test(BaseTest):
     @unittest.skipUnless(is_root(), "Requires root")
     def test_file_modified__ebpf(self):
         self._test_file_modified("ebpf")
+
+    @unittest.skipUnless(is_platform_supported(), "Requires Linux 3.10.0+ and arm64/amd64 arch")
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_file_modified__kprobes(self):
+        self._test_file_modified("kprobes")

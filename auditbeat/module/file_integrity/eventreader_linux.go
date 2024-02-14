@@ -55,6 +55,16 @@ func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
 		}, nil
 	}
 
+	if c.Backend == BackendKprobes {
+		l := logger.Named("kprobes")
+		l.Info("selected backend: kprobes")
+		return &kProbesReader{
+			config:  c,
+			log:     l,
+			parsers: FileParsers(c),
+		}, nil
+	}
+
 	// unimplemented
 	return nil, errors.ErrUnsupported
 }
