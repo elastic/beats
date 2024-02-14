@@ -680,7 +680,7 @@ spec:
       name: beats-xpack-elastic-agent-package-7-17
       description: Buildkite pipeline for packaging Elastic Agent package
     spec:
-      repository: elastic/elastic-agent
+      repository: elastic/beats
       pipeline_file: ".buildkite/x-pack/elastic-agent/pipeline.xpack.elastic-agent.package.yml"
       provider_settings:
         trigger_mode: none # this pipeline is only triggered remotely
