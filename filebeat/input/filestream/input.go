@@ -173,6 +173,9 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 		return nil, err
 	}
 
+	ok := false // used for cleanup
+	defer cleanup.IfNot(&ok, cleanup.IgnoreError(f.Close))
+
 	log.Debug("newLogFileReader with config.MaxBytes:", inp.readerConfig.MaxBytes)
 
 	// if the file is archived, it means that it is not going to be updated in the future
@@ -197,7 +200,6 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 
 	dbgReader, err := debug.AppendReaders(logReader)
 	if err != nil {
-		f.Close()
 		return nil, err
 	}
 
@@ -215,7 +217,6 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 		MaxBytes:   encReaderMaxBytes,
 	})
 	if err != nil {
-		f.Close()
 		return nil, err
 	}
 
@@ -227,6 +228,7 @@ func (inp *filestream) open(log *logp.Logger, canceler input.Canceler, fs fileSo
 
 	r = readfile.NewLimitReader(r, inp.readerConfig.MaxBytes)
 
+	ok = true // no need to close the file
 	return r, nil
 }
 
@@ -246,11 +248,11 @@ func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*o
 		return nil, fmt.Errorf("failed to open file %s, named pipes are not supported", fi.Name())
 	}
 
-	ok := false
 	f, err := file.ReadOpen(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed opening %s: %w", path, err)
 	}
+	ok := false
 	defer cleanup.IfNot(&ok, cleanup.IgnoreError(f.Close))
 
 	fi, err = f.Stat()
@@ -274,14 +276,13 @@ func (inp *filestream) openFile(log *logp.Logger, path string, offset int64) (*o
 
 	inp.encoding, err = inp.encodingFactory(f)
 	if err != nil {
-		f.Close()
 		if errors.Is(err, transform.ErrShortSrc) {
 			return nil, fmt.Errorf("initialising encoding for '%v' failed due to file being too short", f)
 		}
 		return nil, fmt.Errorf("initialising encoding for '%v' failed: %w", f, err)
 	}
-	ok = true
 
+	ok = true // no need to close the file
 	return f, nil
 }
 
