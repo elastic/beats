@@ -173,7 +173,7 @@ func (s ProtocolsStruct) configureProtocol(test bool, device string, pub reporte
 
 	if device != "" {
 		// This could happen earlier, but let any errors be found first.
-		if isValid, err := validateProtocolDevice(device, config); !isValid {
+		if isValid, err := validateProtocolDevice(device, config); !isValid || err != nil {
 			return err
 		}
 	}
