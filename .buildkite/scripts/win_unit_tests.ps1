@@ -1,11 +1,11 @@
 $ErrorActionPreference = "Stop" # set -e
 if ($env:BEATS_PROJECT_NAME) {
     if ($env:BEATS_PROJECT_NAME -like "*x-pack/*") {
-        $BEATS_PROJECT_NAME = $env:BEATS_PROJECT_NAME -replace "/", "\"
-    }
+        $WorkFolder = $env:BEATS_PROJECT_NAME -replace "/", "\"
+    } else {
+        $WorkFolder = $env:BEATS_PROJECT_NAME
 }
 
-$WorkFolder = $BEATS_PROJECT_NAME
 # Forcing to checkout again all the files with a correct autocrlf.
 # Doing this here because we cannot set git clone options before.
 function fixCRLF {
