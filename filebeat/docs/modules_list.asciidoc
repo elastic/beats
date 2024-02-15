@@ -50,7 +50,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-salesforce>>
   * <<filebeat-module-santa>>
   * <<filebeat-module-snyk>>
-  * <<filebeat-module-sonicwall>>
   * <<filebeat-module-sophos>>
   * <<filebeat-module-squid>>
   * <<filebeat-module-suricata>>
@@ -114,7 +113,6 @@ include::modules/redis.asciidoc[]
 include::modules/salesforce.asciidoc[]
 include::modules/santa.asciidoc[]
 include::modules/snyk.asciidoc[]
-include::modules/sonicwall.asciidoc[]
 include::modules/sophos.asciidoc[]
 include::modules/squid.asciidoc[]
 include::modules/suricata.asciidoc[]
