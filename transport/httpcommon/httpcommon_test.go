@@ -97,36 +97,66 @@ ssl:
 	}
 }
 
-func TestReadAll(t *testing.T) {
+func TestReadAllWithLimit(t *testing.T) {
 	size := 100
 	body := bytes.Repeat([]byte{'a'}, size)
 	cases := []struct {
 		name    string
 		resp    *http.Response
+		limit   int64
 		expBody []byte
+		expErr  error
 	}{
 		{
-			name: "reads known size",
+			name: "reads known size without limit",
 			resp: &http.Response{
 				ContentLength: int64(size),
 				Body:          io.NopCloser(bytes.NewBuffer(body)),
 			},
+			limit:   -1,
 			expBody: body,
 		},
 		{
-			name: "reads unknown size",
+			name: "does not read known size if exceeds limit",
+			resp: &http.Response{
+				ContentLength: int64(size),
+				Body:          io.NopCloser(bytes.NewBuffer(body)),
+			},
+			limit:  10,
+			expErr: ErrResponseLimit,
+		},
+		{
+			name: "reads unknown size without limit",
 			resp: &http.Response{
 				ContentLength: -1,
 				Body:          io.NopCloser(bytes.NewBuffer(body)),
 			},
+			limit:   -1,
 			expBody: body,
+		},
+		{
+			name: "partially reads unknown size with limit",
+			resp: &http.Response{
+				ContentLength: -1,
+				Body:          io.NopCloser(bytes.NewBuffer(body)),
+			},
+			limit:   10,
+			expBody: body[:10],
 		},
 		{
 			name: "supports empty with size=0",
 			resp: &http.Response{
 				ContentLength: 0,
-				Body:          io.NopCloser(bytes.NewBuffer(nil)),
 			},
+			limit:   -1,
+			expBody: []byte{},
+		},
+		{
+			name: "does not read the body if `No Content` status",
+			resp: &http.Response{
+				StatusCode: http.StatusNoContent,
+			},
+			limit:   -1,
 			expBody: []byte{},
 		},
 		{
@@ -135,13 +165,19 @@ func TestReadAll(t *testing.T) {
 				ContentLength: -1,
 				Body:          io.NopCloser(bytes.NewBuffer(nil)),
 			},
+			limit:   -1,
 			expBody: []byte{},
 		},
 	}
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			actBody, err := ReadAll(tc.resp)
+			actBody, err := ReadAllWithLimit(tc.resp, tc.limit)
+			if tc.expErr != nil {
+				require.ErrorIs(t, err, tc.expErr)
+				require.Nil(t, actBody)
+				return
+			}
 			require.NoError(t, err)
 			require.Equal(t, tc.expBody, actBody)
 		})
@@ -150,7 +186,7 @@ func TestReadAll(t *testing.T) {
 
 func BenchmarkReadAll(b *testing.B) {
 	sizes := []int{
-		100,         // 100 bytes
+		1024,        // 1KB
 		100 * 1024,  // 100KB
 		1024 * 1024, // 1MB
 	}

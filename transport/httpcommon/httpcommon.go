@@ -34,6 +34,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
+var (
+	ErrResponseLimit = errors.New("HTTP response length limit was reached")
+)
+
 // HTTPTransportSettings provides common HTTP settings for HTTP clients.
 type HTTPTransportSettings struct {
 	// TLS provides ssl/tls setup settings
@@ -417,14 +421,40 @@ func WithLogger(logger *logp.Logger) TransportOption {
 
 // ReadAll returns the whole response body as bytes.
 // This is an optimized version of `io.ReadAll`.
+//
+// Use `ReadAllWithLimit` with a reasonable limit when possible! Avoid reading HTTP responses without a limit!
+// A malicious server might serve a `Content-Length` header with a value too high to handle
+// or the server might serve a response body that is too long and can crash the client with OOM.
 func ReadAll(resp *http.Response) ([]byte, error) {
+	return ReadAllWithLimit(resp, -1)
+}
+
+// ReadAllWithLimit returns the whole response body as bytes respecting the given limit.
+// This is an optimized version of `io.ReadAll`.
+//
+// If the `limit` is 0, an empty byte slice is returned.
+// If the `limit` is a negative value, e.g `-1`, the limit is ignored and the entire response body is returned.
+// If the `Content-Length` header was served and its value exceeds the limit, the `ErrResponseLimit` error is returned.
+// If the body length is not known in advance, it reads from the body up to the set limit and returns a partial response without an error.
+//
+// Avoid reading HTTP responses without a limit and use a reasonable limit instead!
+// A malicious server might serve a `Content-Length` header with a value too high to handle
+// or the server might serve a response body that is too long and can crash the client with OOM.
+func ReadAllWithLimit(resp *http.Response, limit int64) ([]byte, error) {
 	if resp == nil {
 		return nil, errors.New("response cannot be nil")
 	}
 	switch {
-	case resp.ContentLength == 0:
+	// nothing to read according to the server or limit
+	case resp.ContentLength == 0 || limit == 0 || resp.StatusCode == http.StatusNoContent:
 		return []byte{}, nil
-	// if we know the body length we can allocate the buffer only once
+
+	// here if the limit is negative, e.g. `-1` it's ignored,
+	// limit == 0 is handled above
+	case limit > 0 && resp.ContentLength > limit:
+		return nil, fmt.Errorf("received Content-Length %d exceeds the set limit %d: %w", resp.ContentLength, limit, ErrResponseLimit)
+
+	// if we know the body length, we can allocate the buffer only once for the most efficient read
 	case resp.ContentLength >= 0:
 		body := make([]byte, resp.ContentLength)
 		_, err := io.ReadFull(resp.Body, body)
@@ -437,7 +467,12 @@ func ReadAll(resp *http.Response) ([]byte, error) {
 		// using `bytes.NewBuffer` + `io.Copy` is much faster than `io.ReadAll`
 		// see https://github.com/elastic/beats/issues/36151#issuecomment-1931696767
 		buf := bytes.NewBuffer(nil)
-		_, err := io.Copy(buf, resp.Body)
+		var err error
+		if limit > 0 {
+			_, err = io.Copy(buf, io.LimitReader(resp.Body, limit))
+		} else {
+			_, err = io.Copy(buf, resp.Body)
+		}
 		if err != nil {
 			return nil, fmt.Errorf("failed to read the response body with unknown length: %w", err)
 		}
