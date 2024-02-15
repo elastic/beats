@@ -13,13 +13,16 @@ set_env() {
   with_mage
 }
 
-sudo mkdir -p /etc/needrestart
-echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf >/dev/null
-
 if [[ $PLATFORM_TYPE == "Linux" ]]; then
+  check_platform_architecture
+  echo "ARCH: ${arch_type}"
+
   # Remove this code once beats specific agent is set up
-  if grep -q 'Ubuntu' /etc/*release; then
+  if grep -q 'Ubuntu' /etc/*release && [ "${arch_type}" == "arm64" ]; then
     export DEBIAN_FRONTEND
+
+    sudo mkdir -p /etc/needrestart
+    echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf >/dev/null
 
     echo "--- Ubuntu - Installing libs"
     sudo apt-get update

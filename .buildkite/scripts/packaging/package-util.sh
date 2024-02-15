@@ -23,7 +23,7 @@ define_tags() {
 
 check_is_arm() {
   if [[ ${HW_TYPE} == "aarch64" || ${HW_TYPE} == "arm64" ]]; then
-    is_arm="-arm"
+    is_arm="-arm64"
   else
     is_arm=""
   fi
