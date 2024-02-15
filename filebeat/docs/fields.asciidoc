@@ -42,7 +42,6 @@ grouped in the following categories:
 * <<exported-fields-ibmmq>>
 * <<exported-fields-icinga>>
 * <<exported-fields-iis>>
-* <<exported-fields-infoblox>>
 * <<exported-fields-iptables>>
 * <<exported-fields-jolokia-autodiscover>>
 * <<exported-fields-juniper>>
