@@ -24,7 +24,6 @@ docker images
 define_tags
 check_is_arm
 
-echo "--- Tag & Push"
 for variant in "${VARIANTS[@]}"; do
   source="beats/${BEATS_PROJECT_NAME}${variant}"
 
@@ -37,7 +36,8 @@ for variant in "${VARIANTS[@]}"; do
     targetName="${targetName}-buildkite"
 
     if docker image inspect "${sourceName}" &>/dev/null; then
-      echo "Source name: $sourceName Target name: $targetName"
+      echo "--- Tag & Push with target: $targetName"
+      echo "Source name: $sourceName"
       docker tag "$sourceName" "$targetName"
       docker push "$targetName"
     else
