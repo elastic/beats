@@ -38,7 +38,6 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/mssql"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/mysqlenterprise"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/netflow"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/netscout"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/o365"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/okta"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/oracle"
