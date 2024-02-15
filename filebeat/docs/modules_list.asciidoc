@@ -17,7 +17,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-cyberarkpas>>
   * <<filebeat-module-elasticsearch>>
   * <<filebeat-module-envoyproxy>>
-  * <<filebeat-module-f5>>
   * <<filebeat-module-fortinet>>
   * <<filebeat-module-gcp>>
   * <<filebeat-module-google_workspace>>
@@ -88,7 +87,6 @@ include::modules/crowdstrike.asciidoc[]
 include::modules/cyberarkpas.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
-include::modules/f5.asciidoc[]
 include::modules/fortinet.asciidoc[]
 include::modules/gcp.asciidoc[]
 include::modules/google_workspace.asciidoc[]
