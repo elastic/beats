@@ -46,10 +46,10 @@ func TestProduceConsumer(t *testing.T) {
 	maxEvents := 1024
 	minEvents := 32
 
-	rand.Seed(seed)
-	events := rand.Intn(maxEvents-minEvents) + minEvents
-	batchSize := rand.Intn(events-8) + 4
-	bufferSize := rand.Intn(batchSize*2) + 4
+	randGen := rand.New(rand.NewSource(seed))
+	events := randGen.Intn(maxEvents-minEvents) + minEvents
+	batchSize := randGen.Intn(events-8) + 4
+	bufferSize := randGen.Intn(batchSize*2) + 4
 
 	// events := 4
 	// batchSize := 1
@@ -90,9 +90,9 @@ func TestProduceConsumer(t *testing.T) {
 func TestProducerDoesNotBlockWhenCancelled(t *testing.T) {
 	q := NewQueue(nil, nil,
 		Settings{
-			Events:         2, // Queue size
-			FlushMinEvents: 1, // make sure the queue won't buffer events
-			FlushTimeout:   time.Millisecond,
+			Events:        2, // Queue size
+			MaxGetRequest: 1, // make sure the queue won't buffer events
+			FlushTimeout:  time.Millisecond,
 		}, 0)
 
 	p := q.Producer(queue.ProducerConfig{
@@ -155,9 +155,9 @@ func TestQueueMetricsDirect(t *testing.T) {
 
 	// Test the directEventLoop
 	directSettings := Settings{
-		Events:         maxEvents,
-		FlushMinEvents: 1,
-		FlushTimeout:   0,
+		Events:        maxEvents,
+		MaxGetRequest: 1,
+		FlushTimeout:  0,
 	}
 	t.Logf("Testing directEventLoop")
 	queueTestWithSettings(t, directSettings, eventsToTest, "directEventLoop")
@@ -169,9 +169,9 @@ func TestQueueMetricsBuffer(t *testing.T) {
 	maxEvents := 10
 	// Test Buffered Event Loop
 	bufferedSettings := Settings{
-		Events:         maxEvents,
-		FlushMinEvents: eventsToTest, // The buffered event loop can only return FlushMinEvents per Get()
-		FlushTimeout:   time.Millisecond,
+		Events:        maxEvents,
+		MaxGetRequest: eventsToTest, // The buffered event loop can only return FlushMinEvents per Get()
+		FlushTimeout:  time.Millisecond,
 	}
 	t.Logf("Testing bufferedEventLoop")
 	queueTestWithSettings(t, bufferedSettings, eventsToTest, "bufferedEventLoop")
@@ -219,9 +219,9 @@ func TestProducerCancelRemovesEvents(t *testing.T) {
 func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.QueueFactory {
 	return func(_ *testing.T) queue.Queue {
 		return NewQueue(nil, nil, Settings{
-			Events:         sz,
-			FlushMinEvents: minEvents,
-			FlushTimeout:   flushTimeout,
+			Events:        sz,
+			MaxGetRequest: minEvents,
+			FlushTimeout:  flushTimeout,
 		}, 0)
 	}
 }
@@ -343,12 +343,12 @@ func TestEntryIDs(t *testing.T) {
 	})
 
 	t.Run("acking in forward order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000, FlushMinEvents: 2, FlushTimeout: time.Microsecond}, 0)
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000, MaxGetRequest: 2, FlushTimeout: time.Microsecond}, 0)
 		testForward(testQueue)
 	})
 
 	t.Run("acking in reverse order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000, FlushMinEvents: 2, FlushTimeout: time.Microsecond}, 0)
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000, MaxGetRequest: 2, FlushTimeout: time.Microsecond}, 0)
 		testBackward(testQueue)
 	})
 }
