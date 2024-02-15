@@ -54,11 +54,10 @@ function installGoDependencies {
     }
 }
 
-function withNpcap($version) {
-    $npcapDownloadPath = Join-Path $env:TEMP "npcap-$version.exe"
-    $npcapInstallerUrl = "https://npcap.com/dist/npcap-$version.exe"
-    Invoke-WebRequest -Uri $npcapInstallerUrl -OutFile $npcapDownloadPath
-    Start-Process -FilePath "$env:TEMP\npcap-$version.exe" -ArgumentList "/S" -Wait
+function withWinPcap {
+    Write-Host "-- Install WinPcap --"
+    choco install winpcap
+    refreshenv
 }
 
 fixCRLF
@@ -74,7 +73,7 @@ withPython $env:SETUP_WIN_PYTHON_VERSION
 withMinGW
 
 if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-packetbeat") {
-    withNpcap $npcapVersion
+    withWinPcap
 }
 
 $ErrorActionPreference = "Continue" # set +e
@@ -83,7 +82,11 @@ Push-Location $WorkFolder
 
 New-Item -ItemType Directory -Force -Path "build"
 
-mage build unitTest
+if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
+    mage -w reader\etw build goUnitTest
+} else {
+    mage build unitTest
+}
 
 Pop-Location
 
