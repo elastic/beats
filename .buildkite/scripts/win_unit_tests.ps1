@@ -6,7 +6,6 @@ if ($env:BEATS_PROJECT_NAME) {
         $WorkFolder = $env:BEATS_PROJECT_NAME
     }
 }
-
 # Forcing to checkout again all the files with a correct autocrlf.
 # Doing this here because we cannot set git clone options before.
 function fixCRLF {
@@ -53,6 +52,13 @@ function installGoDependencies {
     }
 }
 
+function withNpcap($version) {
+    $npcapDownloadPath = Join-Path $env:TEMP "npcap-$version.exe"
+    $npcapInstallerUrl = "https://npcap.com/dist/npcap-$version.exe"
+    Invoke-WebRequest -Uri $npcapInstallerUrl -OutFile $npcapDownloadPath
+    Start-Process -FilePath "$env:TEMP\npcap-$version.exe" -ArgumentList "/S" -Wait
+}
+
 fixCRLF
 
 withChoco
@@ -65,12 +71,21 @@ withPython $env:SETUP_WIN_PYTHON_VERSION
 
 withMinGW
 
+if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-packetbeat") {
+    withNpcap
+}
+
 $ErrorActionPreference = "Continue" # set +e
 
 Push-Location $WorkFolder
 
 New-Item -ItemType Directory -Force -Path "build"
-mage build unitTest
+
+if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
+    mage -w reader/etw build goUnitTest
+} else {
+    mage build unitTest
+}
 
 Pop-Location
 
