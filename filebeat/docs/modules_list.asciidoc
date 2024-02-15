@@ -24,7 +24,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-ibmmq>>
   * <<filebeat-module-icinga>>
   * <<filebeat-module-iis>>
-  * <<filebeat-module-imperva>>
   * <<filebeat-module-infoblox>>
   * <<filebeat-module-iptables>>
   * <<filebeat-module-juniper>>
@@ -94,7 +93,6 @@ include::modules/haproxy.asciidoc[]
 include::modules/ibmmq.asciidoc[]
 include::modules/icinga.asciidoc[]
 include::modules/iis.asciidoc[]
-include::modules/imperva.asciidoc[]
 include::modules/infoblox.asciidoc[]
 include::modules/iptables.asciidoc[]
 include::modules/juniper.asciidoc[]

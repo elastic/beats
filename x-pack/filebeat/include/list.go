@@ -31,7 +31,6 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/gcp"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/google_workspace"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/ibmmq"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/imperva"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/infoblox"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/iptables"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/juniper"
