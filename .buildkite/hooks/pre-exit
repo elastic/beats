@@ -6,7 +6,6 @@ source .buildkite/hooks/scripts/util.sh
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
   if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
-    google_cloud_logout_active_account
     docker logout "${DOCKER_REGISTRY}"
   fi
 
