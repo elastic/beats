@@ -26,7 +26,6 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/coredns"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/crowdstrike"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/cyberarkpas"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/cylance"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/envoyproxy"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/f5"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/fortinet"

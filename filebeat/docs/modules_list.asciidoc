@@ -15,7 +15,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-coredns>>
   * <<filebeat-module-crowdstrike>>
   * <<filebeat-module-cyberarkpas>>
-  * <<filebeat-module-cylance>>
   * <<filebeat-module-elasticsearch>>
   * <<filebeat-module-envoyproxy>>
   * <<filebeat-module-f5>>
@@ -87,7 +86,6 @@ include::modules/cisco.asciidoc[]
 include::modules/coredns.asciidoc[]
 include::modules/crowdstrike.asciidoc[]
 include::modules/cyberarkpas.asciidoc[]
-include::modules/cylance.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
 include::modules/f5.asciidoc[]
