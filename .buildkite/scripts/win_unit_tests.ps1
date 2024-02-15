@@ -1,3 +1,5 @@
+$npcapVersion = "1.79"
+
 $ErrorActionPreference = "Stop" # set -e
 if ($env:BEATS_PROJECT_NAME) {
     if ($env:BEATS_PROJECT_NAME -like "*x-pack/*") {
@@ -72,7 +74,7 @@ withPython $env:SETUP_WIN_PYTHON_VERSION
 withMinGW
 
 if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-packetbeat") {
-    withNpcap
+    withNpcap $npcapVersion
 }
 
 $ErrorActionPreference = "Continue" # set +e
@@ -81,11 +83,7 @@ Push-Location $WorkFolder
 
 New-Item -ItemType Directory -Force -Path "build"
 
-if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
-    mage -w reader/etw build goUnitTest
-} else {
-    mage build unitTest
-}
+mage build unitTest
 
 Pop-Location
 
