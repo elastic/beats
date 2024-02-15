@@ -58,7 +58,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-zeek>>
   * <<filebeat-module-zookeeper>>
   * <<filebeat-module-zoom>>
-  * <<filebeat-module-zscaler>>
 
 
 --
@@ -119,4 +118,3 @@ include::modules/traefik.asciidoc[]
 include::modules/zeek.asciidoc[]
 include::modules/zookeeper.asciidoc[]
 include::modules/zoom.asciidoc[]
-include::modules/zscaler.asciidoc[]
