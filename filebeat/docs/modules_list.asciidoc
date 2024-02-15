@@ -46,7 +46,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-pensando>>
   * <<filebeat-module-postgresql>>
   * <<filebeat-module-rabbitmq>>
-  * <<filebeat-module-radware>>
   * <<filebeat-module-redis>>
   * <<filebeat-module-salesforce>>
   * <<filebeat-module-santa>>
@@ -112,7 +111,6 @@ include::modules/panw.asciidoc[]
 include::modules/pensando.asciidoc[]
 include::modules/postgresql.asciidoc[]
 include::modules/rabbitmq.asciidoc[]
-include::modules/radware.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/salesforce.asciidoc[]
 include::modules/santa.asciidoc[]
