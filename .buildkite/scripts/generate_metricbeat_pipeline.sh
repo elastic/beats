@@ -84,7 +84,6 @@ steps:
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      # Temporary disabled https://github.com/elastic/beats/issues/37841
       - label: ":windows: Windows 10 Unit Tests"
         key: "extended-win-10-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
