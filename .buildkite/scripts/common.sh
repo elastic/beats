@@ -9,15 +9,14 @@ arch_type="$(uname -m)"
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 GITHUB_PR_LABELS=${GITHUB_PR_LABELS:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
-
-[ -z "${run_libbeat+x}" ] && run_libbeat="$(buildkite-agent meta-data get run_libbeat --default "false")"
-[ -z "${run_metricbeat+x}" ] && run_metricbeat="$(buildkite-agent meta-data get run_metricbeat --default "false")"
-[ -z "${run_packetbeat+x}" ] && run_packetbeat="$(buildkite-agent meta-data get run_packetbeat --default "false")"
-[ -z "${run_winlogbeat+x}" ] && run_winlogbeat="$(buildkite-agent meta-data get run_winlogbeat --default "false")"
-[ -z "${run_libbeat_arm_tests+x}" ] && run_libbeat_arm_tests="$(buildkite-agent meta-data get run_libbeat_arm_tests --default "false")"
-[ -z "${run_packetbeat_arm_tests+x}" ] && run_packetbeat_arm_tests="$(buildkite-agent meta-data get run_packetbeat_arm_tests --default "false")"
-[ -z "${run_metricbeat_macos_tests+x}" ] && run_metricbeat_macos_tests="$(buildkite-agent meta-data get run_metricbeat_macos_tests --default "false")"
-[ -z "${run_packetbeat_macos_tests+x}" ] && run_packetbeat_macos_tests="$(buildkite-agent meta-data get run_packetbeat_macos_tests --default "false")"
+[ -z "${runLibbeat+x}" ] && runLibbeat="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
+[ -z "${runMetricbeat+x}" ] && runMetricbeat="$(buildkite-agent meta-data get runMetricbeat --default ${runMetricbeat:-"false"})"
+[ -z "${runPacketbeat+x}" ] && runPacketbeat="$(buildkite-agent meta-data get runPacketbeat --default ${runPacketbeat:-"false"})"
+[ -z "${runWinlogbeat+x}" ] && runWinlogbeat="$(buildkite-agent meta-data get runWinlogbeat --default ${runWinlogbeat:-"false"})"
+[ -z "${runLibBeatArmTest+x}" ] && runLibBeatArmTest="$(buildkite-agent meta-data get runLibbeat --default ${runLibbeat:-"false"})"
+[ -z "${runPacketbeatArmTest+x}" ] && runPacketbeatArmTest="$(buildkite-agent meta-data get runPacketbeatArmTest --default ${runPacketbeatArmTest:-"false"})"
+[ -z "${runMetricbeatMacOsTests+x}" ] && runMetricbeatMacOsTests="$(buildkite-agent meta-data get runMetricbeatMacOsTests --default ${runMetricbeatMacOsTests:-"false"})"
+[ -z "${runPacketbeatMacOsTests+x}" ] && runPacketbeatMacOsTests="$(buildkite-agent meta-data get runPacketbeatMacOsTests --default ${runPacketbeatMacOsTests:-"false"})"
 
 metricbeat_changeset=(
   "^metricbeat/.*"
@@ -81,43 +80,6 @@ packaging_changeset=(
   "^dev-tools/packaging/.*"
   ".go-version"
   )
-
-check_and_set_beat_vars() {
-  if [[ -n "$BEATS_PROJECT_NAME" && "$BEATS_PROJECT_NAME" == *"x-pack/"* ]]; then
-    BEATS_XPACK_PROJECT_NAME=${BEATS_PROJECT_NAME//-/}              #remove -
-    BEATS_XPACK_PROJECT_NAME=${BEATS_XPACK_PROJECT_NAME//\//_}      #replace / to _
-    BEATS_XPACK_LABEL_PROJECT_NAME=${BEATS_PROJECT_NAME//\//-}      #replace / to - for labels
-    BEATS_GH_LABEL=${BEATS_XPACK_LABEL_PROJECT_NAME}
-    TRIGGER_SPECIFIC_BEAT="run_${BEATS_XPACK_PROJECT_NAME}"
-    TRIGGER_SPECIFIC_ARM_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_arm_tests"
-    TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_macos_tests"
-    declare -n BEAT_CHANGESET_REFERENCE="${BEATS_XPACK_PROJECT_NAME}_changeset"
-    echo "Beats project name is $BEATS_XPACK_PROJECT_NAME"
-    mandatory_changeset=(
-      "${BEAT_CHANGESET_REFERENCE[@]}"
-      "${xpack_changeset[@]}"
-      "${ci_changeset[@]}"
-    )
-  else
-    BEATS_GH_LABEL=${BEATS_PROJECT_NAME}
-    TRIGGER_SPECIFIC_BEAT="run_${BEATS_PROJECT_NAME}"
-    TRIGGER_SPECIFIC_ARM_TESTS="run_${BEATS_PROJECT_NAME}_arm_tests"
-    TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_PROJECT_NAME}_macos_tests"
-    declare -n BEAT_CHANGESET_REFERENCE="${BEATS_PROJECT_NAME}_changeset"
-    echo "Beats project name is $BEATS_PROJECT_NAME"
-    mandatory_changeset=(
-      "${BEAT_CHANGESET_REFERENCE[@]}"
-      "${oss_changeset[@]}"
-      "${ci_changeset[@]}"
-    )
-  fi
-  BEATS_GH_COMMENT="/test ${BEATS_PROJECT_NAME}"
-  BEATS_GH_MACOS_COMMENT="${BEATS_GH_COMMENT} for macos"
-  BEATS_GH_ARM_COMMENT="${BEATS_GH_COMMENT} for arm"
-  BAETS_GH_MACOS_LABEL="macOS"
-  BAETS_GH_ARM_LABEL="arm"
-}
-
 
 with_docker_compose() {
   local version=$1
@@ -294,16 +256,37 @@ are_changed_only_paths() {
 }
 
 are_conditions_met_mandatory_tests() {
-  if are_paths_changed "${mandatory_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_COMMENT}" || "${GITHUB_PR_LABELS}" =~ /(?i)${BEATS_GH_LABEL}/ || "${!TRIGGER_SPECIFIC_BEAT}" == "true" ]]; then
+  if are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
     return 0
+  fi
+  if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
+    if are_paths_changed "${metricbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat" || "${GITHUB_PR_LABELS}" =~ Metricbeat || "${runMetricbeat}" == "true" ]]; then
+      return 0
+    fi
+  elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" ]]; then
+    if are_paths_changed "${libbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test libbeat" || "${GITHUB_PR_LABELS}" =~ libbeat || "${runLibbeat}" == "true" ]]; then
+      return 0
+    fi
+  elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
+    if are_paths_changed "${packetbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat" || "${GITHUB_PR_LABELS}" =~ Packetbeat || "${runPacketbeat}" == "true" ]]; then
+      return 0
+    fi
+  elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" ]]; then
+    if are_paths_changed "${winlogbeat_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test winlogbeat" || "${GITHUB_PR_LABELS}" =~ Winlogbeat || "${runWinlogbeat}" == "true" ]]; then
+      return 0
+    fi
   fi
   return 1
 }
 
 are_conditions_met_arm_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
-      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_ARM_COMMENT}" || "${GITHUB_PR_LABELS}" =~ "${BAETS_GH_ARM_LABEL}" || "${!TRIGGER_SPECIFIC_ARM_TESTS}" == "true" ]]; then
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test libbeat for arm" || "${GITHUB_PR_LABELS}" =~ arm || "${runLibBeatArmTest}" == "true" ]]; then
+        return 0
+      fi
+    elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat for arm" || "${GITHUB_PR_LABELS}" =~ arm || "${runPacketbeatArmTest}" == "true" ]]; then
         return 0
       fi
     fi
@@ -313,8 +296,12 @@ are_conditions_met_arm_tests() {
 
 are_conditions_met_macos_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
-      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_MACOS_COMMENT}" || "${GITHUB_PR_LABELS}" =~ "${BAETS_GH_MACOS_LABEL}" || "${!TRIGGER_SPECIFIC_MACOS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
+      if [[ "${runMetricbeatMacOsTests}" == true ]] || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test metricbeat for macos" ]] || [[ "${GITHUB_PR_LABELS}" =~ macOS ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+        return 0
+      fi
+    elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
+      if [[ "${runPacketbeatMacOsTests}" == true ]] || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test packetbeat for macos" ]] || [[ "${GITHUB_PR_LABELS}" =~ macOS ]]; then
         return 0
       fi
     fi
@@ -352,5 +339,3 @@ fi
 if are_paths_changed "${packaging_changeset[@]}" ; then
   PACKAGING_CHANGES="true"
 fi
-
-check_and_set_beat_vars

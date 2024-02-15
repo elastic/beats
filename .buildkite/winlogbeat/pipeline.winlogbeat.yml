@@ -18,7 +18,7 @@ steps:
   - input: "Input Parameters"
     key: "input-run-all-stages"
     fields:
-    - select: "Packetbeat - run_winlogbeat"
+    - select: "Winlogbeat - run_winlogbeat"
       key: "run_winlogbeat"
       options:
         - label: "True"

@@ -73,9 +73,3 @@ func guidFromProviderName(providerName string) (windows.GUID, error) {
 	// No matching provider is found.
 	return windows.GUID{}, fmt.Errorf("unable to find GUID from provider name")
 }
-
-// IsGUIDValid checks if GUID contains valid data
-// (any of the fields in the GUID are non-zero)
-func IsGUIDValid(guid windows.GUID) bool {
-	return guid.Data1 != 0 || guid.Data2 != 0 || guid.Data3 != 0 || guid.Data4 != [8]byte{}
-}
