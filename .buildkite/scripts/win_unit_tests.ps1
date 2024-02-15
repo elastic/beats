@@ -1,5 +1,11 @@
 $ErrorActionPreference = "Stop" # set -e
-$BEATS_PROJECT_NAME = $env:BEATS_PROJECT_NAME
+if ($env:BEATS_PROJECT_NAME) {
+    if ($env:BEATS_PROJECT_NAME -like "*x-pack/*") {
+        $BEATS_PROJECT_NAME = $env:BEATS_PROJECT_NAME -replace "/", "\"
+    }
+}
+
+$WorkFolder = $BEATS_PROJECT_NAME
 # Forcing to checkout again all the files with a correct autocrlf.
 # Doing this here because we cannot set git clone options before.
 function fixCRLF {
@@ -33,13 +39,6 @@ function withMinGW {
     choco install mingw -y
     refreshenv
 }
-
-function withNpcap {
-    $npcapDownloadPath = Join-Path $env:TEMP "npcap-1.79.exe"
-    $npcapInstallerUrl = "https://npcap.com/dist/npcap-1.79.exe"
-    Invoke-WebRequest -Uri $npcapInstallerUrl -OutFile $npcapDownloadPath
-    Start-Process -FilePath "C:\temp\WinPcap_4_1_3.exe" -ArgumentList "/S" -Wait
-}
 function installGoDependencies {
     $installPackages = @(
         "github.com/magefile/mage"
@@ -63,23 +62,11 @@ installGoDependencies
 
 withPython $env:SETUP_WIN_PYTHON_VERSION
 
-withNpcap
-
 withMinGW
 
 $ErrorActionPreference = "Continue" # set +e
 
-
-if ($env:BEATS_PROJECT_NAME) {
-    if ($env:BEATS_PROJECT_NAME -like "*x-pack/*") {
-        $BEATS_PROJECT_NAME = $env:BEATS_PROJECT_NAME -replace "/", "\"
-        Push-Location $BEATS_PROJECT_NAME
-    } else {
-        Push-Location $BEATS_PROJECT_NAME
-    }
-} else {
-    Write-Host "The variable BEATS_PROJECT_NAME isn't defined"
-}
+Push-Location $WorkFolder
 
 New-Item -ItemType Directory -Force -Path "build"
 mage build unitTest
