@@ -8,133 +8,131 @@ env:
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  SETUP_MAGE_VERSION: "1.14.0"
-  ASDF_MAGE_VERSION: "1.14.0"
 
 steps:
-#  - group: "Filebeat Mandatory Testing"
-#    key: "mandatory-tests"
-#    if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat" || build.env("BUILDKITE_PULL_REQUEST") != "false"
-#
-#    steps:
-#      - label: ":ubuntu: Unit Tests"
-#        command:
-#          - ".buildkite/filebeat/scripts/unit-tests.sh"
-#        notify:
-#          - github_commit_status:
-#              context: "Filebeat: linux/Unit Tests"
-#        agents:
-#          provider: "gcp"
-#          image: "${IMAGE_UBUNTU_X86_64}"
-#        artifact_paths:
-#          - "filebeat/build/*.xml"
-#          - "filebeat/build/*.json"
-#
-#      - label: ":ubuntu: Go Integration Tests"
-#        command:
-#          - ".buildkite/filebeat/scripts/integration-gotests.sh"
-#        notify:
-#          - github_commit_status:
-#              context: "Filebeat: Go Integration Tests"
-#        agents:
-#          provider: "gcp"
-#          image: "${IMAGE_UBUNTU_X86_64}"
-#        artifact_paths:
-#          - "filebeat/build/*.xml"
-#          - "filebeat/build/*.json"
-#
-#      - label: ":ubuntu: Python Integration Tests"
-#        command:
-#          - ".buildkite/filebeat/scripts/integration-pytests.sh"
-#        notify:
-#          - github_commit_status:
-#              context: "Filebeat: Python Integration Tests"
-#        agents:
-#          provider: gcp
-#          imageProject: elastic-images-qa
-#          image: "${IMAGE_UBUNTU_X86_64}"
-#        artifact_paths:
-#          - "filebeat/build/*.xml"
-#          - "filebeat/build/*.json"
-#
-#      - label: ":windows:-{{matrix.image}} Unit Tests"
-#        command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
-#        notify:
-#          - github_commit_status:
-#              context: "Filebeat: windows/Unit Tests"
-#        agents:
-#          provider: "gcp"
-#          image: "{{matrix.image}}"
-#          machine_type: "n2-standard-8"
-#          disk_size: 200
-#          disk_type: "pd-ssd"
-#        matrix:
-#          setup:
-#            image:
-#              - "${IMAGE_WIN_2016}"
-#              - "${IMAGE_WIN_2022}"
-#        artifact_paths:
-#          - "filebeat/build/*.xml"
-#          - "filebeat/build/*.json"
-#
-#  - group: "Extended Testing"
-#    key: "extended-tests"
-#    if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for extended support"
-#
-#    steps:
-#      - label: ":linux: ARM64 Unit Tests"
-#        key: "arm-extended"
-#        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for arm" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-#        command:
-#          - ".buildkite/filebeat/scripts/unit-tests.sh"
-#        notify:
-#          - github_commit_status:
-#              context: "Filebeat/Extended: Unit Tests ARM"
-#        agents:
-#          provider: "aws"
-#          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-#          instanceType: "t4g.large"
-#        artifact_paths: "filebeat/build/*.xml"
-#
-#      - label: ":mac: MacOS Unit Tests"
-#        key: "macos-extended"
-#        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-#        command:
-#          - ".buildkite/filebeat/scripts/unit-tests.sh"
-#        notify:
-#          - github_commit_status:
-#              context: "Filebeat/Extended: MacOS Unit Tests"
-#        agents:
-#          provider: "orka"
-#          imagePrefix: "${IMAGE_MACOS_X86_64}"
-#        artifact_paths: "filebeat/build/*.xml"
-#
-#  - group: "Windows Extended Testing"
-#    key: "extended-tests-win"
-#    if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for windows" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
-#
-#    steps:
-#      - label: ":windows: Win 2019 Unit Tests"
-#        key: "win-extended-2019"
-#        command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
-#        notify:
-#          - github_commit_status:
-#              context: "Filebeat/Extended: Win-2019 Unit Tests"
-#        agents:
-#          provider: "gcp"
-#          image: "${IMAGE_WIN_2019}"
-#          machine_type: "n2-standard-8"
-#          disk_size: 200
-#          disk_type: "pd-ssd"
-#        artifact_paths:
-#          - "filebeat/build/*.xml"
-#          - "filebeat/build/*.json"
+  - group: "Filebeat Mandatory Testing"
+    key: "mandatory-tests"
+    if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat" || build.env("BUILDKITE_PULL_REQUEST") != "false"
+
+    steps:
+      - label: ":ubuntu: Unit Tests"
+        command:
+          - ".buildkite/filebeat/scripts/unit-tests.sh"
+        notify:
+          - github_commit_status:
+              context: "Filebeat: linux/Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+      - label: ":ubuntu: Go Integration Tests"
+        command:
+          - ".buildkite/filebeat/scripts/integration-gotests.sh"
+        notify:
+          - github_commit_status:
+              context: "Filebeat: Go Integration Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+      - label: ":ubuntu: Python Integration Tests"
+        command:
+          - ".buildkite/filebeat/scripts/integration-pytests.sh"
+        notify:
+          - github_commit_status:
+              context: "Filebeat: Python Integration Tests"
+        agents:
+          provider: gcp
+          imageProject: elastic-images-qa
+          image: "${IMAGE_UBUNTU_X86_64}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+      - label: ":windows:-{{matrix.image}} Unit Tests"
+        command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
+        notify:
+          - github_commit_status:
+              context: "Filebeat: windows/Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machine_type: "n2-standard-8"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_2016}"
+              - "${IMAGE_WIN_2022}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+  - group: "Extended Testing"
+    key: "extended-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for extended support"
+
+    steps:
+      - label: ":linux: ARM64 Unit Tests"
+        key: "arm-extended"
+        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for arm" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+        command:
+          - ".buildkite/filebeat/scripts/unit-tests.sh"
+        notify:
+          - github_commit_status:
+              context: "Filebeat/Extended: Unit Tests ARM"
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "t4g.large"
+        artifact_paths: "filebeat/build/*.xml"
+
+      - label: ":mac: MacOS Unit Tests"
+        key: "macos-extended"
+        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        command:
+          - ".buildkite/filebeat/scripts/unit-tests.sh"
+        notify:
+          - github_commit_status:
+              context: "Filebeat/Extended: MacOS Unit Tests"
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
+        artifact_paths: "filebeat/build/*.xml"
+
+  - group: "Windows Extended Testing"
+    key: "extended-tests-win"
+    if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for windows" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
+
+    steps:
+      - label: ":windows: Win 2019 Unit Tests"
+        key: "win-extended-2019"
+        command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
+        notify:
+          - github_commit_status:
+              context: "Filebeat/Extended: Win-2019 Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machine_type: "n2-standard-8"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
 
   - group: "Packaging"
     key: "packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-#    depends_on:
-#      - "mandatory-tests"
+    depends_on:
+      - "mandatory-tests"
 
     steps:
       - label: Package pipeline
