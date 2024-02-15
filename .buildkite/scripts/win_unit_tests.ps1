@@ -1,7 +1,7 @@
 $ErrorActionPreference = "Stop" # set -e
 if ($env:BEATS_PROJECT_NAME) {
     if ($env:BEATS_PROJECT_NAME -like "*x-pack/*") {
-        $WorkFolder = $env:BEATS_PROJECT_NAME -replace "/", "\"
+        $WorkFolder = $env:BEATS_PROJECT_NAME -replace "/", "\\"
     } else {
         $WorkFolder = $env:BEATS_PROJECT_NAME
     }
