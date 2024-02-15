@@ -4,6 +4,7 @@ if ($env:BEATS_PROJECT_NAME) {
         $WorkFolder = $env:BEATS_PROJECT_NAME -replace "/", "\"
     } else {
         $WorkFolder = $env:BEATS_PROJECT_NAME
+    }
 }
 
 # Forcing to checkout again all the files with a correct autocrlf.
