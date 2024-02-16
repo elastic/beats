@@ -20,6 +20,17 @@ import (
 )
 
 /*
+struct mq_attr {
+	long mq_flags;
+	long mq_maxmsg;
+	long mq_msgsize;
+	long mq_curmsgs;
+	long __reserved[4];
+};
+*/
+import "C"
+
+/*
 	creds guess discovers the offsets of (E)UID/(E)GID fields within a
     struct cred (defined in {linux}/include/linux.cred.h):
 		struct cred {
@@ -79,20 +90,20 @@ func (g *guessStructCreds) Provides() []string {
 // Requires declares the variables required to run this guess.
 func (g *guessStructCreds) Requires() []string {
 	return []string{
-		"RET",
+		"P3",
 	}
 }
 
-// Probes returns a kretprobe on prepare_creds that dumps the first bytes
-// pointed to by the return value, which is a struct cred.
+// Probes returns a kprobe on dentry_open that dumps the first bytes
+// pointed to by the third parameter value, which is a struct cred.
 func (g *guessStructCreds) Probes() ([]helper.ProbeDef, error) {
 	return []helper.ProbeDef{
 		{
 			Probe: tracing.Probe{
-				Type:      tracing.TypeKRetProbe,
+				Type:      tracing.TypeKProbe,
 				Name:      "guess_struct_creds",
-				Address:   "prepare_creds",
-				Fetchargs: helper.MakeMemoryDump("{{.RET}}", 0, credDumpBytes),
+				Address:   "dentry_open",
+				Fetchargs: helper.MakeMemoryDump("{{.P3}}", 0, credDumpBytes),
 			},
 			Decoder: tracing.NewDumpDecoder,
 		},
@@ -140,13 +151,26 @@ func (g *guessStructCreds) Extract(ev interface{}) (common.MapStr, bool) {
 	}, true
 }
 
-// Trigger invokes the SYS_ACCESS syscall:
+// Trigger invokes the SYS_MQ_OPEN syscall:
 //
-//	int access(const char *pathname, int mode);
-//
-// The function call will return an error due to path being NULL, but it will
-// have invoked prepare_creds before argument validation.
+//	int mq_open(const char *name, int oflag, mode_t mode, struct mq_attr *attr);
 func (g *guessStructCreds) Trigger() error {
-	syscall.Syscall(unix.SYS_ACCESS, 0, 0, 0)
-	return nil
+	name, err := unix.BytePtrFromString("__guess_creds")
+	if err != nil {
+		return err
+	}
+	attr := C.struct_mq_attr{
+		mq_maxmsg:  1,
+		mq_msgsize: 8,
+	}
+	mqd, _, errno := syscall.Syscall6(unix.SYS_MQ_OPEN,
+		uintptr(unsafe.Pointer(name)),
+		uintptr(os.O_CREATE|os.O_RDWR),
+		0o644,
+		uintptr(unsafe.Pointer(&attr)),
+		0, 0)
+	if errno != 0 {
+		return errno
+	}
+	return unix.Close(int(mqd))
 }
