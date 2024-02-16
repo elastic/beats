@@ -35,6 +35,7 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
+- Fix guess trigger for system/socket creds on newer kernels. {issue}36905[36905] {pull}37136[37136]
 
 *Filebeat*
 
