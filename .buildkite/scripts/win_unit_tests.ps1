@@ -21,7 +21,7 @@ function fixCRLF {
 #     Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 # }
 function withGolang($version) {
-    Write-Host "-- Install Go $version --"
+    Write-Host "-- Installing Go $version --"
     $goDownloadPath = Join-Path $env:TEMP "go_installer.msi"
     $goInstallerUrl = "https://golang.org/dl/go$version.windows-amd64.msi"
     Invoke-WebRequest -Uri $goInstallerUrl -OutFile $goDownloadPath
@@ -34,7 +34,8 @@ function withGolang($version) {
 }
 
 function withPython($version) {
-    Write-Host "-- Install Python $version --"
+    Write-Host "-- Installing Python $version --"
+    [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
     $pyDownloadPath = Join-Path $env:TEMP "python-$version-amd64.exe"
     $pyInstallerUrl = "https://www.python.org/ftp/python/$version/python-$version-amd64.exe"
     Invoke-WebRequest -UseBasicParsing -Uri $pyInstallerUrl -OutFile $pyDownloadPath
@@ -45,7 +46,7 @@ function withPython($version) {
 }
 
 function withMinGW {
-    Write-Host "-- Install MinGW --"
+    Write-Host "-- Installing MinGW --"
     $gwInstallerUrl = "https://github.com/brechtsanders/winlibs_mingw/releases/download/12.1.0-14.0.6-10.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-12.1.0-llvm-14.0.6-mingw-w64ucrt-10.0.0-r3.zip"
     $gwDownloadPath = "$env:TEMP\winlibs-x86_64.zip"
     Invoke-WebRequest -Uri $gwInstallerUrl -OutFile $gwDownloadPath
@@ -95,7 +96,8 @@ Set-Location -Path $WorkFolder
 New-Item -ItemType Directory -Force -Path "build"
 
 if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
-    mage -w reader/etw build goUnitTest
+    mage build
+    mage -w reader/etw goUnitTest
 } else {
     mage build unitTest
 }
