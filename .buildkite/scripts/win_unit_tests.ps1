@@ -15,11 +15,11 @@ function fixCRLF {
     git rm --quiet --cached -r .
     git reset --quiet --hard
 }
-function withChoco {
-    Write-Host "-- Configure Choco --"
-    $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."
-    Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-}
+# function withChoco {
+#     Write-Host "-- Configure Choco --"
+#     $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."
+#     Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+# }
 function withGolang($version) {
     $downloadPath = Join-Path $env:TEMP "go_installer.msi"
     $goInstallerUrl = "https://golang.org/dl/go$version.windows-amd64.msi"
@@ -29,17 +29,38 @@ function withGolang($version) {
     $env:Path += ";$goBinPath"
     go version
 }
+
 function withPython($version) {
     Write-Host "-- Install Python $version --"
-    choco install python --version=$version
-    refreshenv
+    $url = "https://www.python.org/ftp/python/$version/python-$version.exe"
+    $installerPath = Join-Path $env:TEMP "python-$version.exe"
+    Invoke-WebRequest -Uri $url -OutFile $installerPath
+    Start-Process -FilePath $installerPath -ArgumentList "/quiet", "InstallAllUsers=1", "PrependPath=1" -Wait
+    Remove-Item $installerPath
     python --version
 }
+
 function withMinGW {
     Write-Host "-- Install MinGW --"
-    choco install mingw -y
-    refreshenv
+    $url = "https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download"
+    $installerPath = Join-Path $env:TEMP "mingw-w64-install.exe"
+    Invoke-WebRequest -Uri $url -OutFile $installerPath
+    Start-Process -FilePath $installerPath -ArgumentList "--option,add-win32-64,--prefix=C:\MinGW64" -Wait
+    Remove-Item $installerPath
+    $env:Path += ";C:\MinGW64\bin"
 }
+
+# function withPython($version) {
+#     Write-Host "-- Install Python $version --"
+#     choco install python --version=$version
+#     refreshenv
+#     python --version
+# }
+# function withMinGW {
+#     Write-Host "-- Install MinGW --"
+#     choco install mingw -y
+#     refreshenv
+# }
 function installGoDependencies {
     $installPackages = @(
         "github.com/magefile/mage"
@@ -55,7 +76,7 @@ function installGoDependencies {
 
 fixCRLF
 
-withChoco
+# withChoco
 
 withGolang $env:GO_VERSION
 
