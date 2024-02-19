@@ -1,13 +1,12 @@
-$npcapVersion = "1.79"
-
 $ErrorActionPreference = "Stop" # set -e
-if ($env:BEATS_PROJECT_NAME) {
-    if ($env:BEATS_PROJECT_NAME -like "*x-pack/*") {
-        $WorkFolder = $env:BEATS_PROJECT_NAME -replace "/", "\\"
-    } else {
-        $WorkFolder = $env:BEATS_PROJECT_NAME
-    }
-}
+$WorkFolder = $env:BEATS_PROJECT_NAME
+# if ($env:BEATS_PROJECT_NAME) {
+#     if ($env:BEATS_PROJECT_NAME -like "*x-pack/*") {
+#         $WorkFolder = $env:BEATS_PROJECT_NAME -replace "/", "\\"
+#     } else {
+#         $WorkFolder = $env:BEATS_PROJECT_NAME
+#     }
+# }
 # Forcing to checkout again all the files with a correct autocrlf.
 # Doing this here because we cannot set git clone options before.
 function fixCRLF {
@@ -54,12 +53,6 @@ function installGoDependencies {
     }
 }
 
-function withWinPcap {
-    Write-Host "-- Install WinPcap --"
-    choco install winpcap
-    refreshenv
-}
-
 fixCRLF
 
 withChoco
@@ -72,23 +65,17 @@ withPython $env:SETUP_WIN_PYTHON_VERSION
 
 withMinGW
 
-if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-packetbeat") {
-    withWinPcap
-}
-
 $ErrorActionPreference = "Continue" # set +e
 
-Push-Location $WorkFolder
+Set-Location -Path $WorkFolder
 
 New-Item -ItemType Directory -Force -Path "build"
 
 if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
-    mage -w reader\etw build goUnitTest
+    mage -w reader/etw build goUnitTest
 } else {
     mage build unitTest
 }
-
-Pop-Location
 
 $EXITCODE=$LASTEXITCODE
 $ErrorActionPreference = "Stop"
