@@ -107,6 +107,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 
 *Packetbeat*
 
+- Fix interface device parsing for packetbeat protocols. {pull}37946[37946]
 
 *Winlogbeat*
 
