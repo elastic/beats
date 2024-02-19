@@ -44,7 +44,7 @@ func (d DecoderV9) GetLogger() *log.Logger {
 	return d.Logger
 }
 
-func (_ DecoderV9) ReadPacketHeader(buf *bytes.Buffer) (header PacketHeader, newBuf *bytes.Buffer, numFlowSets int, err error) {
+func (DecoderV9) ReadPacketHeader(buf *bytes.Buffer) (header PacketHeader, newBuf *bytes.Buffer, numFlowSets int, err error) {
 	var data [20]byte
 	n, err := buf.Read(data[:])
 	if n != len(data) || err != nil {
@@ -61,7 +61,7 @@ func (_ DecoderV9) ReadPacketHeader(buf *bytes.Buffer) (header PacketHeader, new
 	return header, buf, int(header.Count), nil
 }
 
-func (_ DecoderV9) ReadSetHeader(buf *bytes.Buffer) (SetHeader, error) {
+func (DecoderV9) ReadSetHeader(buf *bytes.Buffer) (SetHeader, error) {
 	var data [4]byte
 	n, err := buf.Read(data[:])
 	if n != len(data) || err != nil {
