@@ -114,7 +114,7 @@ func (s *SessionState) CheckReset(seqNum uint32) (prev uint32, reset bool) {
 		s.Templates = make(map[TemplateKey]*TemplateWrapper)
 	}
 	s.lastSequence = seqNum
-	return
+	return prev, reset
 }
 
 func isValidSequence(current, next uint32) bool {
