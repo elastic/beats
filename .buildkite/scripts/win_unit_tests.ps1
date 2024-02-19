@@ -37,7 +37,7 @@ function withPython($version) {
     Write-Host "-- Install Python $version --"
     $pyDownloadPath = Join-Path $env:TEMP "python-$version-amd64.exe"
     $pyInstallerUrl = "https://www.python.org/ftp/python/$version/python-$version-amd64.exe"
-    Invoke-WebRequest -UseBasicParsing -SkipCertificateCheck -Uri $pyInstallerUrl -OutFile $pyDownloadPath
+    Invoke-WebRequest -UseBasicParsing -Uri $pyInstallerUrl -OutFile $pyDownloadPath
     Start-Process -FilePath $pyDownloadPath -ArgumentList "/quiet", "InstallAllUsers=1", "PrependPath=1", "Include_test=0" -Wait
     $pyBinPath = "${env:ProgramFiles}\Python311"
     $env:Path += ";$pyBinPath"
