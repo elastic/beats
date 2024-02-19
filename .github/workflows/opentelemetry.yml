@@ -1,11 +1,15 @@
 ---
+# Look up results at https://ela.st/oblt-ci-cd-stats
+# There will be one service per GitHub repository, including the org name, and one Transaction per Workflow.
 name: OpenTelemetry Export Trace
 
 on:
   workflow_run:
-    workflows:
-      - golangci-lint
+    workflows: [ "*" ]
     types: [completed]
+
+permissions:
+  contents: read
 
 jobs:
   otel-export-trace:
