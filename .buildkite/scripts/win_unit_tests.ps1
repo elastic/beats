@@ -44,11 +44,11 @@ function withPython($version) {
 
 function withMinGW {
     Write-Host "-- Install MinGW --"
-    $gwInstallerUrl = "https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download"
-    $gwDownloadPath = Join-Path $env:TEMP "mingw-w64-install.exe"
+    $gwInstallerUrl = "https://github.com/brechtsanders/winlibs_mingw/releases/download/12.1.0-14.0.6-10.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-12.1.0-llvm-14.0.6-mingw-w64ucrt-10.0.0-r3.zip"
+    $gwDownloadPath = "$env:TEMP\winlibs-x86_64.zip"
     Invoke-WebRequest -Uri $gwInstallerUrl -OutFile $gwDownloadPath
-    Start-Process -FilePath $gwDownloadPath -ArgumentList "--option,add-win32-64,--prefix=C:\MinGW64" -Wait
-    $gwBinPath = "C:\MinGW64\bin"
+    Expand-Archive -Path $gwDownloadPath -DestinationPath "$env:TEMP"
+    $gwBinPath = "$env:TEMP\mingw64\bin"
     $env:Path += ";$gwBinPath"
 }
 
