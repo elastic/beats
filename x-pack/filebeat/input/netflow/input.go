@@ -6,7 +6,6 @@ package netflow
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"net"
 	"sync"
@@ -17,7 +16,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
@@ -25,20 +23,11 @@ import (
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
-	"github.com/elastic/go-concert/ctxtool"
 	"github.com/elastic/go-concert/unison"
 )
 
 const (
 	inputName = "netflow"
-)
-
-var (
-	numPackets  = monitoring.NewUint(nil, "filebeat.input.netflow.packets.received")
-	numDropped  = monitoring.NewUint(nil, "filebeat.input.netflow.packets.dropped")
-	numFlows    = monitoring.NewUint(nil, "filebeat.input.netflow.flows")
-	aliveInputs atomic.Int
 )
 
 func Plugin(log *logp.Logger) v2.Plugin {
@@ -123,15 +112,6 @@ func (n *netflowInput) Test(_ v2.TestContext) error {
 	return nil
 }
 
-func (n *netflowInput) packetDispatch(data []byte, metadata inputsource.NetworkMetadata) {
-	select {
-	case n.queueC <- packet{data, metadata.RemoteAddr}:
-		numPackets.Inc()
-	default:
-		numDropped.Inc()
-	}
-}
-
 func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) error {
 	n.mtx.Lock()
 	if n.started {
@@ -179,7 +159,15 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 	udpMetrics := netmetrics.NewUDPMetrics(reg, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
 	defer udpMetrics.Close()
 
-	udpServer := udp.New(&n.cfg.Config, n.packetDispatch)
+	flowMetrics := newMetrics(reg)
+
+	udpServer := udp.New(&n.cfg.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
+		select {
+		case n.queueC <- packet{data, metadata.RemoteAddr}:
+		default:
+			flowMetrics.discardedEvents.Inc()
+		}
+	})
 	err = udpServer.Start()
 	if err != nil {
 		n.logger.Errorf("Failed to start udp server: %v", err)
@@ -187,11 +175,6 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 		return err
 	}
 	defer udpServer.Stop()
-
-	if aliveInputs.Inc() == 1 && n.logger.IsDebug() {
-		go n.statsLoop(ctxtool.FromCanceller(ctx.Cancelation))
-	}
-	defer aliveInputs.Dec()
 
 	go func() {
 		<-ctx.Cancelation.Done()
@@ -202,6 +185,7 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 		flows, err := n.decoder.Read(bytes.NewBuffer(packet.data), packet.source)
 		if err != nil {
 			n.logger.Warnf("Error parsing NetFlow packet of length %d from %s: %v", len(packet.data), packet.source, err)
+			flowMetrics.decodeErrors.Inc()
 			continue
 		}
 
@@ -210,7 +194,7 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 			continue
 		}
 		evs := make([]beat.Event, fLen)
-		numFlows.Add(uint64(fLen))
+		flowMetrics.flows.Add(uint64(fLen))
 		for i, flow := range flows {
 			evs[i] = toBeatEvent(flow, n.internalNetworks)
 		}
@@ -270,44 +254,6 @@ func (n *netflowInput) stop() {
 	close(n.queueC)
 
 	n.started = false
-}
-
-func (n *netflowInput) statsLoop(ctx context.Context) {
-	prevPackets := numPackets.Get()
-	prevFlows := numFlows.Get()
-	prevDropped := numDropped.Get()
-	// The stats thread only monitors queue length for the first input
-	prevQueue := len(n.queueC)
-	t := time.NewTicker(time.Second)
-	defer t.Stop()
-	for {
-		select {
-		case <-t.C:
-			packets := numPackets.Get()
-			flows := numFlows.Get()
-			dropped := numDropped.Get()
-			queue := len(n.queueC)
-			if packets > prevPackets || flows > prevFlows || dropped > prevDropped || queue > prevQueue {
-				n.logger.Debugf("Stats total:[ packets=%d dropped=%d flows=%d queue_len=%d ] delta:[ packets/s=%d dropped/s=%d flows/s=%d queue_len/s=%+d ]",
-					packets, dropped, flows, queue, packets-prevPackets, dropped-prevDropped, flows-prevFlows, queue-prevQueue)
-				prevFlows = flows
-				prevPackets = packets
-				prevQueue = queue
-				prevDropped = dropped
-				continue
-			}
-
-			n.mtx.Lock()
-			count := aliveInputs.Load()
-			n.mtx.Unlock()
-			if count == 0 {
-				return
-			}
-
-		case <-ctx.Done():
-			return
-		}
-	}
 }
 
 func boolPtr(b bool) *bool { return &b }
