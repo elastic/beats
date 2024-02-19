@@ -128,7 +128,7 @@ func TestSessionState(t *testing.T) {
 
 		t1c = s.GetTemplate(1)
 		assert.False(t, t1 == t1c)
-		assert.True(t, t1b == t1b)
+		assert.True(t, t1b == t1c)
 	})
 }
 
