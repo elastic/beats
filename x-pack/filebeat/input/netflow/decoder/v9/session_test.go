@@ -5,7 +5,7 @@
 package v9
 
 import (
-	"io/ioutil"
+	"io"
 	"log"
 	"math"
 	"sync"
@@ -18,7 +18,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/test"
 )
 
-var logger = log.New(ioutil.Discard, "", 0)
+var logger = log.New(io.Discard, "", 0)
 
 func makeSessionKey(t testing.TB, ipPortPair string, domain uint32) SessionKey {
 	return MakeSessionKey(test.MakeAddress(t, ipPortPair), domain, false)
@@ -101,7 +101,7 @@ func testTemplate(id uint16) *template.Template {
 }
 
 func TestSessionState(t *testing.T) {
-	logger := log.New(ioutil.Discard, "", 0)
+	logger := log.New(io.Discard, "", 0)
 	t.Run("create and get", func(t *testing.T) {
 		s := NewSession(logger)
 		t1 := testTemplate(1)
@@ -180,7 +180,7 @@ func TestSessionMap_Cleanup(t *testing.T) {
 
 func TestSessionMap_CleanupLoop(t *testing.T) {
 	timeout := time.Millisecond * 100
-	sm := NewSessionMap(log.New(ioutil.Discard, "", 0), nil)
+	sm := NewSessionMap(log.New(io.Discard, "", 0), nil)
 	key := makeSessionKey(t, "127.0.0.1:1", 42)
 	s := sm.GetOrCreate(key)
 
