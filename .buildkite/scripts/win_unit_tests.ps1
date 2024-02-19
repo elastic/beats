@@ -1,6 +1,6 @@
 $ErrorActionPreference = "Stop" # set -e
 $WorkFolder = $env:BEATS_PROJECT_NAME
-
+$WORKSPACE = Get-Location
 # Forcing to checkout again all the files with a correct autocrlf.
 # Doing this here because we cannot set git clone options before.
 function fixCRLF {
@@ -9,16 +9,34 @@ function fixCRLF {
     git rm --quiet --cached -r .
     git reset --quiet --hard
 }
-# function withChoco {
-#     Write-Host "-- Configure Choco --"
-#     $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."
-#     Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
-# }
+
+function retry {
+    param(
+        [int]$retries,
+        [ScriptBlock]$scriptBlock
+    )
+    $count = 0
+    while ($count -lt $retries) {
+        $count++
+        try {
+            & $scriptBlock
+            return
+        } catch {
+            $exitCode = $_.Exception.ErrorCode
+            Write-Host "Retry $count/$retries exited $exitCode, retrying..."
+            Start-Sleep -Seconds ([Math]::Pow(2, $count))
+        }
+    }
+    Write-Host "Retry $count/$retries exited, no more retries left."
+}
+
 function withGolang($version) {
     Write-Host "-- Installing Go $version --"
     $goDownloadPath = Join-Path $env:TEMP "go_installer.msi"
     $goInstallerUrl = "https://golang.org/dl/go$version.windows-amd64.msi"
-    Invoke-WebRequest -Uri $goInstallerUrl -OutFile $goDownloadPath
+    retry -retries 5 -scriptBlock {
+        Invoke-WebRequest -Uri $goInstallerUrl -OutFile $goDownloadPath
+    }
     Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $goDownloadPath /quiet" -Wait
     $env:GOPATH = "${env:ProgramFiles}\Go"
     $env:GOBIN = "${env:GOPATH}\bin"
@@ -32,7 +50,9 @@ function withPython($version) {
     [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
     $pyDownloadPath = Join-Path $env:TEMP "python-$version-amd64.exe"
     $pyInstallerUrl = "https://www.python.org/ftp/python/$version/python-$version-amd64.exe"
-    Invoke-WebRequest -UseBasicParsing -Uri $pyInstallerUrl -OutFile $pyDownloadPath
+    retry -retries 5 -scriptBlock {
+        Invoke-WebRequest -UseBasicParsing -Uri $pyInstallerUrl -OutFile $pyDownloadPath
+    }
     Start-Process -FilePath $pyDownloadPath -ArgumentList "/quiet", "InstallAllUsers=1", "PrependPath=1", "Include_test=0" -Wait
     $pyBinPath = "${env:ProgramFiles}\Python311"
     $env:Path += ";$pyBinPath"
@@ -41,9 +61,12 @@ function withPython($version) {
 
 function withMinGW {
     Write-Host "-- Installing MinGW --"
+    [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
     $gwInstallerUrl = "https://github.com/brechtsanders/winlibs_mingw/releases/download/12.1.0-14.0.6-10.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-12.1.0-llvm-14.0.6-mingw-w64ucrt-10.0.0-r3.zip"
     $gwDownloadPath = "$env:TEMP\winlibs-x86_64.zip"
-    Invoke-WebRequest -Uri $gwInstallerUrl -OutFile $gwDownloadPath
+    retry -retries 5 -scriptBlock {
+        Invoke-WebRequest -Uri $gwInstallerUrl -OutFile $gwDownloadPath
+    }
     Expand-Archive -Path $gwDownloadPath -DestinationPath "$env:TEMP"
     $gwBinPath = "$env:TEMP\mingw64\bin"
     $env:Path += ";$gwBinPath"
@@ -63,15 +86,16 @@ function installGoDependencies {
 
 function withNmap($version) {
     Write-Host "-- Installing Nmap $version --"
+    [Net.ServicePointManager]::SecurityProtocol = "tls, tls11, tls12, ssl3"
     $nmapInstallerUrl = "https://nmap.org/dist/nmap-$version-setup.exe"
     $nmapDownloadPath = "$env:TEMP\nmap-$version-setup.exe"
-    Invoke-WebRequest -UseBasicParsing -Uri $nmapInstallerUrl -OutFile $nmapDownloadPath
+    retry -retries 5 -scriptBlock {
+        Invoke-WebRequest -UseBasicParsing -Uri $nmapInstallerUrl -OutFile $nmapDownloadPath
+    }
     Start-Process -FilePath $nmapDownloadPath -ArgumentList "/S" -Wait
 }
 
 fixCRLF
-
-# withChoco
 
 withGolang $env:GO_VERSION
 
@@ -79,13 +103,15 @@ withPython $env:SETUP_WIN_PYTHON_VERSION
 
 withMinGW
 
-withNmap $env:NMAP_WIN_VERSION
+if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-packetbeat") {
+    withNmap $env:NMAP_WIN_VERSION
+}
 
 $ErrorActionPreference = "Continue" # set +e
 
 Set-Location -Path $WorkFolder
 
-$magefile = ".magefile"
+$magefile = "$WORKSPACE\$WorkFolder\.magefile"
 $env:MAGEFILE_CACHE = $magefile
 
 New-Item -ItemType Directory -Force -Path "build"
