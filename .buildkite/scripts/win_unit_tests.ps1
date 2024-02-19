@@ -1,12 +1,6 @@
 $ErrorActionPreference = "Stop" # set -e
 $WorkFolder = $env:BEATS_PROJECT_NAME
-# if ($env:BEATS_PROJECT_NAME) {
-#     if ($env:BEATS_PROJECT_NAME -like "*x-pack/*") {
-#         $WorkFolder = $env:BEATS_PROJECT_NAME -replace "/", "\\"
-#     } else {
-#         $WorkFolder = $env:BEATS_PROJECT_NAME
-#     }
-# }
+
 # Forcing to checkout again all the files with a correct autocrlf.
 # Doing this here because we cannot set git clone options before.
 function fixCRLF {
@@ -54,18 +48,6 @@ function withMinGW {
     $gwBinPath = "$env:TEMP\mingw64\bin"
     $env:Path += ";$gwBinPath"
 }
-
-# function withPython($version) {
-#     Write-Host "-- Install Python $version --"
-#     choco install python --version=$version
-#     refreshenv
-#     python --version
-# }
-# function withMinGW {
-#     Write-Host "-- Install MinGW --"
-#     choco install mingw -y
-#     refreshenv
-# }
 function installGoDependencies {
     $installPackages = @(
         "github.com/magefile/mage"
@@ -79,6 +61,14 @@ function installGoDependencies {
     }
 }
 
+function withNmap($version) {
+    Write-Host "-- Installing Nmap $version --"
+    $nmapInstallerUrl = "https://nmap.org/dist/nmap-$version-setup.exe"
+    $nmapDownloadPath = "$env:TEMP\nmap-$version-setup.exe"
+    Invoke-WebRequest -UseBasicParsing -Uri $nmapInstallerUrl -OutFile $nmapDownloadPath
+    Start-Process -FilePath $nmapDownloadPath -ArgumentList "/S" -Wait
+}
+
 fixCRLF
 
 # withChoco
@@ -89,15 +79,19 @@ withPython $env:SETUP_WIN_PYTHON_VERSION
 
 withMinGW
 
+withNmap $env:NMAP_WIN_VERSION
+
 $ErrorActionPreference = "Continue" # set +e
 
 Set-Location -Path $WorkFolder
 
+$magefile = ".magefile"
+$env:MAGEFILE_CACHE = $magefile
+
 New-Item -ItemType Directory -Force -Path "build"
 
 if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
-    mage build
-    mage -w reader/etw goUnitTest
+    mage -w reader/etw build goUnitTest
 } else {
     mage build unitTest
 }
