@@ -26,16 +26,18 @@ function withGolang($version) {
     $goInstallerUrl = "https://golang.org/dl/go$version.windows-amd64.msi"
     Invoke-WebRequest -Uri $goInstallerUrl -OutFile $goDownloadPath
     Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $goDownloadPath /quiet" -Wait
-    $goBinPath = "${env:ProgramFiles}\Go\bin"
-    $env:Path += ";$goBinPath"
+    $env:GOPATH = "${env:ProgramFiles}\Go"
+    $env:GOBIN = "${env:GOPATH}\bin"
+    $env:Path += ";$env:GOPATH;$env:GOBIN"
     go version
+    installGoDependencies
 }
 
 function withPython($version) {
     Write-Host "-- Install Python $version --"
     $pyDownloadPath = Join-Path $env:TEMP "python-$version-amd64.exe"
     $pyInstallerUrl = "https://www.python.org/ftp/python/$version/python-$version-amd64.exe"
-    Invoke-WebRequest -UseBasicParsing -Uri $pyInstallerUrl -OutFile $pyDownloadPath
+    Invoke-WebRequest -UseBasicParsing -SkipCertificateCheck -Uri $pyInstallerUrl -OutFile $pyDownloadPath
     Start-Process -FilePath $pyDownloadPath -ArgumentList "/quiet", "InstallAllUsers=1", "PrependPath=1", "Include_test=0" -Wait
     $pyBinPath = "${env:ProgramFiles}\Python311"
     $env:Path += ";$pyBinPath"
@@ -81,8 +83,6 @@ fixCRLF
 # withChoco
 
 withGolang $env:GO_VERSION
-
-installGoDependencies
 
 withPython $env:SETUP_WIN_PYTHON_VERSION
 
