@@ -185,6 +185,7 @@ func (c *fileStore) readState() {
 	// through all the elements. If any survive the filter, we
 	// were alive, otherwise delete the file.
 
+	c.log.Infow("reading state from file", "id", c.id, "path", c.path)
 	dec := json.NewDecoder(f)
 	for {
 		var e CacheEntry
@@ -209,6 +210,7 @@ func (c *fileStore) readState() {
 		heap.Push(&c.expiries, &e)
 	}
 
+	c.log.Infow("got state from file", "id", c.id, "entries", len(c.cache))
 	if len(c.cache) != 0 {
 		return
 	}
@@ -243,6 +245,7 @@ func (c *fileStore) writeState(final bool) {
 	if !c.dirty {
 		return
 	}
+	c.log.Infow("write state to file", "id", c.id, "path", c.path)
 	if len(c.cache) == 0 && final {
 		err := os.Remove(c.path)
 		if err != nil {
@@ -278,6 +281,7 @@ func (c *fileStore) writeState(final bool) {
 		if err != nil {
 			c.log.Errorw("failed to finalize writing state", "error", err)
 		}
+		c.log.Infow("write state to file sync and replace succeeded", "id", c.id, "path", c.path)
 	}()
 
 	enc := json.NewEncoder(f)
@@ -297,4 +301,5 @@ func (c *fileStore) writeState(final bool) {
 	}
 	// Only mark as not dirty if we succeeded in the write.
 	c.dirty = false
+	c.log.Infow("write state to file succeeded", "id", c.id, "path", c.path)
 }
