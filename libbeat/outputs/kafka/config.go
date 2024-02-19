@@ -31,6 +31,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -77,6 +78,11 @@ type kafkaConfig struct {
 	Sasl               kafka.SaslConfig          `config:"sasl"`
 	EnableFAST         bool                      `config:"enable_krb5_fast"`
 	Queue              config.Namespace          `config:"queue"`
+
+	// Currently only used for validation. Those values are later
+	// unpacked into temporary structs whenever they're necessary.
+	Topic  string   `config:"topic"`
+	Topics []string `config:"topics"`
 }
 
 type metaConfig struct {
@@ -169,6 +175,20 @@ func (c *kafkaConfig) Validate() error {
 			return fmt.Errorf("compression_level must be between 0 and 9")
 		}
 	}
+
+	if c.Topic == "" && len(c.Topics) == 0 {
+		return errors.New("either 'topic' or 'topics' must be defined")
+	}
+
+	// When running under Elastic-Agent we do not support dynamic topic
+	// selection, so `topics` is not supported and `topic` is treated as an
+	// plain string
+	if management.UnderAgent() {
+		if len(c.Topics) != 0 {
+			return errors.New("'topics' is not supported when running under Elastic-Agent")
+		}
+	}
+
 	return nil
 }
 

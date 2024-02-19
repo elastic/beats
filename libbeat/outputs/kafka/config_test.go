@@ -25,6 +25,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/internal/testutil"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -32,16 +33,18 @@ import (
 
 func TestConfigAcceptValid(t *testing.T) {
 	tests := map[string]mapstr.M{
-		"default config is valid": mapstr.M{},
 		"lz4 with 0.11": mapstr.M{
 			"compression": "lz4",
 			"version":     "0.11",
+			"topic":       "foo",
 		},
 		"lz4 with 1.0": mapstr.M{
 			"compression": "lz4",
 			"version":     "1.0.0",
+			"topic":       "foo",
 		},
 		"Kerberos with keytab": mapstr.M{
+			"topic": "foo",
 			"kerberos": mapstr.M{
 				"auth_type":    "keytab",
 				"username":     "elastic",
@@ -52,6 +55,7 @@ func TestConfigAcceptValid(t *testing.T) {
 			},
 		},
 		"Kerberos with user and password pair": mapstr.M{
+			"topic": "foo",
 			"kerberos": mapstr.M{
 				"auth_type":    "password",
 				"username":     "elastic",
@@ -89,6 +93,8 @@ func TestConfigInvalid(t *testing.T) {
 				"realm":        "ELASTIC",
 			},
 		},
+		// The default config does not set `topic` nor `topics`.
+		"No topics or topic provided": mapstr.M{},
 	}
 
 	for name, test := range tests {
@@ -102,6 +108,36 @@ func TestConfigInvalid(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestInvalidConfigUnderElasticAgent(t *testing.T) {
+	oldUnderAgent := management.UnderAgent()
+	t.Cleanup(func() {
+		// Restore the previous value
+		management.SetUnderAgent(oldUnderAgent)
+	})
+
+	management.SetUnderAgent(true)
+	tests := map[string]mapstr.M{
+		"topics is provided": mapstr.M{
+			"topics": []string{"foo", "bar"},
+		},
+		// The default config does not set `topic` not `topics`.
+		"No topics or topic provided": mapstr.M{},
+	}
+
+	for name, test := range tests {
+		test := test
+		t.Run(name, func(t *testing.T) {
+			c := config.MustNewConfigFrom(test)
+			c.SetString("hosts", 0, "localhost")
+			_, err := readConfig(c)
+			if err == nil {
+				t.Fatalf("Can create test configuration from invalid input")
+			}
+		})
+	}
+
 }
 
 func TestBackoffFunc(t *testing.T) {
