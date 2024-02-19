@@ -35,6 +35,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+func init() {
+	// Disable IMDS when the real AWS SDK IMDS client is used,
+	// so tests are isolated from the environment. Otherwise,
+	// tests for non-EC2 providers may fail when the tests are
+	// run within an EC2 VM.
+	os.Setenv("AWS_EC2_METADATA_DISABLED", "true")
+}
+
 type MockIMDSClient struct {
 	GetInstanceIdentityDocumentFunc func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error)
 }

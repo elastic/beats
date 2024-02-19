@@ -1,4 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+name: "beats-winlogbeat"
+
 env:
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
   IMAGE_WIN_10: "family/general-windows-10"
@@ -16,8 +18,8 @@ steps:
   - input: "Input Parameters"
     key: "input-run-all-stages"
     fields:
-    - select: "Packetbeat - runWinlogbeat"
-      key: "runWinlogbeat"
+    - select: "Winlogbeat - run_winlogbeat"
+      key: "run_winlogbeat"
       options:
         - label: "True"
           value: "true"
@@ -33,3 +35,6 @@ steps:
   - label: ":linux: Load dynamic winlogbeat pipeline"
     key: "winlogbeat-pipeline"
     command: ".buildkite/scripts/generate_winlogbeat_pipeline.sh"
+    notify:
+      - github_commit_status:
+          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
