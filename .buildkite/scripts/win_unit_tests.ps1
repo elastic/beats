@@ -21,10 +21,11 @@ function fixCRLF {
 #     Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 # }
 function withGolang($version) {
-    $downloadPath = Join-Path $env:TEMP "go_installer.msi"
+    Write-Host "-- Install Go $version --"
+    $goDownloadPath = Join-Path $env:TEMP "go_installer.msi"
     $goInstallerUrl = "https://golang.org/dl/go$version.windows-amd64.msi"
-    Invoke-WebRequest -Uri $goInstallerUrl -OutFile $downloadPath
-    Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $downloadPath /quiet" -Wait
+    Invoke-WebRequest -Uri $goInstallerUrl -OutFile $goDownloadPath
+    Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $goDownloadPath /quiet" -Wait
     $goBinPath = "${env:ProgramFiles}\Go\bin"
     $env:Path += ";$goBinPath"
     go version
@@ -32,21 +33,21 @@ function withGolang($version) {
 
 function withPython($version) {
     Write-Host "-- Install Python $version --"
-    $url = "https://www.python.org/ftp/python/$version/python-$version.exe"
-    $installerPath = Join-Path $env:TEMP "python-$version.exe"
-    Invoke-WebRequest -Uri $url -OutFile $installerPath
-    Start-Process -FilePath $installerPath -ArgumentList "/quiet", "InstallAllUsers=1", "PrependPath=1" -Wait
-    Remove-Item $installerPath
+    $pyDownloadPath = Join-Path $env:TEMP "python-$version-amd64.exe"
+    $pyInstallerUrl = "https://www.python.org/ftp/python/$version/python-$version-amd64.exe"
+    Invoke-WebRequest -Uri $pyInstallerUrl -OutFile $pyDownloadPath
+    Start-Process -FilePath $pyDownloadPath -ArgumentList "/quiet", "InstallAllUsers=1", "PrependPath=1", "Include_test=0" -Wait
+    refreshenv
     python --version
 }
 
 function withMinGW {
     Write-Host "-- Install MinGW --"
-    $url = "https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download"
-    $installerPath = Join-Path $env:TEMP "mingw-w64-install.exe"
-    Invoke-WebRequest -Uri $url -OutFile $installerPath
-    Start-Process -FilePath $installerPath -ArgumentList "--option,add-win32-64,--prefix=C:\MinGW64" -Wait
-    Remove-Item $installerPath
+    $gwInstallerUrl = "https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win32/Personal%20Builds/mingw-builds/installer/mingw-w64-install.exe/download"
+    $gwDownloadPath = Join-Path $env:TEMP "mingw-w64-install.exe"
+    Invoke-WebRequest -Uri $gwInstallerUrl -OutFile $gwDownloadPath
+    Start-Process -FilePath $gwDownloadPath -ArgumentList "--option,add-win32-64,--prefix=C:\MinGW64" -Wait
+    refreshenv
     $env:Path += ";C:\MinGW64\bin"
 }
 
