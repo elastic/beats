@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/atomic"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/config"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/template"
 )
 
@@ -125,14 +126,32 @@ type SessionMap struct {
 	mutex    sync.RWMutex
 	Sessions map[SessionKey]*SessionState
 	logger   *log.Logger
+	metric   config.ActiveSessionsMetric
 }
 
 // NewSessionMap returns a new SessionMap.
-func NewSessionMap(logger *log.Logger) SessionMap {
+func NewSessionMap(logger *log.Logger, metric config.ActiveSessionsMetric) SessionMap {
 	return SessionMap{
 		logger:   logger,
 		Sessions: make(map[SessionKey]*SessionState),
+		metric:   metric,
 	}
+}
+
+func (m *SessionMap) decreaseActiveSessions() {
+	if m.metric == nil {
+		return
+	}
+
+	m.metric.Dec()
+}
+
+func (m *SessionMap) increaseActiveSessions() {
+	if m.metric == nil {
+		return
+	}
+
+	m.metric.Inc()
 }
 
 // GetOrCreate looks up the given session key and returns an existing session
@@ -149,6 +168,7 @@ func (m *SessionMap) GetOrCreate(key SessionKey) *SessionState {
 		if session, found = m.Sessions[key]; !found {
 			session = NewSession(m.logger)
 			m.Sessions[key] = session
+			m.increaseActiveSessions()
 		}
 		m.mutex.Unlock()
 	}
@@ -175,6 +195,7 @@ func (m *SessionMap) cleanup() (aliveSession int, removedSession int, aliveTempl
 			if session, found := m.Sessions[key]; found && session.Delete.Load() {
 				delete(m.Sessions, key)
 				removedSession++
+				m.decreaseActiveSessions()
 			}
 		}
 		m.mutex.Unlock()

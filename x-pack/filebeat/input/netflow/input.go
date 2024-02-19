@@ -65,20 +65,8 @@ func (im *netflowInputManager) Create(cfg *conf.C) (v2.Input, error) {
 		customFields[idx] = f
 	}
 
-	dec, err := decoder.NewDecoder(decoder.NewConfig().
-		WithProtocols(inputCfg.Protocols...).
-		WithExpiration(inputCfg.ExpirationTimeout).
-		WithLogOutput(&logDebugWrapper{Logger: im.log}).
-		WithCustomFields(customFields...).
-		WithSequenceResetEnabled(inputCfg.DetectSequenceReset).
-		WithSharedTemplates(inputCfg.ShareTemplates))
-	if err != nil {
-		return nil, fmt.Errorf("error initializing netflow decoder: %w", err)
-	}
-
 	input := &netflowInput{
 		cfg:              inputCfg,
-		decoder:          dec,
 		internalNetworks: inputCfg.InternalNetworks,
 		logger:           im.log,
 		queueSize:        inputCfg.PacketQueueSize,
@@ -97,6 +85,7 @@ type netflowInput struct {
 	cfg              config
 	decoder          *decoder.Decoder
 	client           beat.Client
+	customFields     []fields.FieldDict
 	internalNetworks []string
 	logger           *logp.Logger
 	queueC           chan packet
@@ -141,6 +130,23 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 		return err
 	}
 
+	reg, unreg := inputmon.NewInputRegistry("netflow", ctx.ID, nil)
+	defer unreg()
+
+	flowMetrics := newMetrics(reg)
+
+	n.decoder, err = decoder.NewDecoder(decoder.NewConfig().
+		WithProtocols(n.cfg.Protocols...).
+		WithExpiration(n.cfg.ExpirationTimeout).
+		WithLogOutput(&logDebugWrapper{Logger: n.logger}).
+		WithCustomFields(n.customFields...).
+		WithSequenceResetEnabled(n.cfg.DetectSequenceReset).
+		WithSharedTemplates(n.cfg.ShareTemplates).
+		WithActiveSessionsMetric(flowMetrics.activeSessions))
+	if err != nil {
+		return fmt.Errorf("error initializing netflow decoder: %w", err)
+	}
+
 	n.logger.Info("Starting netflow decoder")
 	if err := n.decoder.Start(); err != nil {
 		n.logger.Errorw("Failed to start netflow decoder", "error", err)
@@ -152,14 +158,9 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 
 	n.logger.Info("Starting udp server")
 
-	reg, unreg := inputmon.NewInputRegistry("netflow", ctx.ID, nil)
-	defer unreg()
-
 	const pollInterval = time.Minute
 	udpMetrics := netmetrics.NewUDPMetrics(reg, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
 	defer udpMetrics.Close()
-
-	flowMetrics := newMetrics(reg)
 
 	udpServer := udp.New(&n.cfg.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
 		select {
@@ -243,12 +244,14 @@ func (n *netflowInput) stop() {
 		if err := n.decoder.Stop(); err != nil {
 			n.logger.Errorw("Error stopping decoder", "error", err)
 		}
+		n.decoder = nil
 	}
 
 	if n.client != nil {
 		if err := n.client.Close(); err != nil {
 			n.logger.Errorw("Error closing beat client", "error", err)
 		}
+		n.client = nil
 	}
 
 	close(n.queueC)

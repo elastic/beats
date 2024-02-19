@@ -26,7 +26,7 @@ func makeSessionKey(t testing.TB, ipPortPair string, domain uint32) SessionKey {
 
 func TestSessionMap_GetOrCreate(t *testing.T) {
 	t.Run("consistent behavior", func(t *testing.T) {
-		sm := NewSessionMap(logger)
+		sm := NewSessionMap(logger, nil)
 
 		// Session is created
 		s1 := sm.GetOrCreate(makeSessionKey(t, "127.0.0.1:1234", 42))
@@ -59,7 +59,7 @@ func TestSessionMap_GetOrCreate(t *testing.T) {
 	})
 	t.Run("parallel", func(t *testing.T) {
 		// Goroutines should observe the same session when created in parallel
-		sm := NewSessionMap(logger)
+		sm := NewSessionMap(logger, nil)
 		key := makeSessionKey(t, "127.0.0.1:9995", 42)
 		const N = 8
 		const Iters = 200
@@ -133,7 +133,7 @@ func TestSessionState(t *testing.T) {
 }
 
 func TestSessionMap_Cleanup(t *testing.T) {
-	sm := NewSessionMap(logger)
+	sm := NewSessionMap(logger, nil)
 
 	// Session is created
 	k1 := makeSessionKey(t, "127.0.0.1:1234", 1)
@@ -180,7 +180,7 @@ func TestSessionMap_Cleanup(t *testing.T) {
 
 func TestSessionMap_CleanupLoop(t *testing.T) {
 	timeout := time.Millisecond * 100
-	sm := NewSessionMap(log.New(ioutil.Discard, "", 0))
+	sm := NewSessionMap(log.New(ioutil.Discard, "", 0), nil)
 	key := makeSessionKey(t, "127.0.0.1:1", 42)
 	s := sm.GetOrCreate(key)
 

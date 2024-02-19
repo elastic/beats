@@ -10,6 +10,7 @@ type netflowMetrics struct {
 	discardedEvents *monitoring.Uint
 	decodeErrors    *monitoring.Uint
 	flows           *monitoring.Uint
+	activeSessions  *monitoring.Uint
 }
 
 func newMetrics(reg *monitoring.Registry) *netflowMetrics {
@@ -17,5 +18,6 @@ func newMetrics(reg *monitoring.Registry) *netflowMetrics {
 		discardedEvents: monitoring.NewUint(reg, "discarded_events_total"),
 		flows:           monitoring.NewUint(reg, "flows_total"),
 		decodeErrors:    monitoring.NewUint(reg, "decode_errors_total"),
+		activeSessions:  monitoring.NewUint(reg, "open_connections"),
 	}
 }
