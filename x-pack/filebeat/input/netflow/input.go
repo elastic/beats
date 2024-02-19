@@ -12,12 +12,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/filebeat/input/netmetrics"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 
@@ -86,13 +88,12 @@ func (im *netflowInputManager) Create(cfg *conf.C) (v2.Input, error) {
 	}
 
 	input := &netflowInput{
+		cfg:              inputCfg,
 		decoder:          dec,
 		internalNetworks: inputCfg.InternalNetworks,
 		logger:           im.log,
 		queueSize:        inputCfg.PacketQueueSize,
 	}
-
-	input.udp = udp.New(&inputCfg.Config, input.packetDispatch)
 
 	return input, nil
 }
@@ -104,7 +105,7 @@ type packet struct {
 
 type netflowInput struct {
 	mtx              sync.Mutex
-	udp              *udp.Server
+	cfg              config
 	decoder          *decoder.Decoder
 	client           beat.Client
 	internalNetworks []string
@@ -131,7 +132,7 @@ func (n *netflowInput) packetDispatch(data []byte, metadata inputsource.NetworkM
 	}
 }
 
-func (n *netflowInput) Run(context v2.Context, connector beat.PipelineConnector) error {
+func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) error {
 	n.mtx.Lock()
 	if n.started {
 		n.mtx.Unlock()
@@ -151,7 +152,7 @@ func (n *netflowInput) Run(context v2.Context, connector beat.PipelineConnector)
 			// is not required.
 			EventNormalization: boolPtr(false),
 		},
-		CloseRef:      context.Cancelation,
+		CloseRef:      ctx.Cancelation,
 		EventListener: nil,
 	})
 	if err != nil {
@@ -170,20 +171,30 @@ func (n *netflowInput) Run(context v2.Context, connector beat.PipelineConnector)
 	n.queueC = make(chan packet, n.queueSize)
 
 	n.logger.Info("Starting udp server")
-	err = n.udp.Start()
+
+	reg, unreg := inputmon.NewInputRegistry("netflow", ctx.ID, nil)
+	defer unreg()
+
+	const pollInterval = time.Minute
+	udpMetrics := netmetrics.NewUDPMetrics(reg, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
+	defer udpMetrics.Close()
+
+	udpServer := udp.New(&n.cfg.Config, n.packetDispatch)
+	err = udpServer.Start()
 	if err != nil {
 		n.logger.Errorf("Failed to start udp server: %v", err)
 		n.stop()
 		return err
 	}
+	defer udpServer.Stop()
 
 	if aliveInputs.Inc() == 1 && n.logger.IsDebug() {
-		go n.statsLoop(ctxtool.FromCanceller(context.Cancelation))
+		go n.statsLoop(ctxtool.FromCanceller(ctx.Cancelation))
 	}
 	defer aliveInputs.Dec()
 
 	go func() {
-		<-context.Cancelation.Done()
+		<-ctx.Cancelation.Done()
 		n.stop()
 	}()
 
@@ -204,6 +215,12 @@ func (n *netflowInput) Run(context v2.Context, connector beat.PipelineConnector)
 			evs[i] = toBeatEvent(flow, n.internalNetworks)
 		}
 		client.PublishAll(evs)
+
+		// This must be called after publisher.PublishAll to measure
+		// the processing time metric. also we pass time.Now() as we have
+		// multiple flows resulting in multiple events of which the timestamp
+		// is obtained from the NetFlow header
+		udpMetrics.Log(packet.data, time.Now())
 	}
 
 	return nil
@@ -236,10 +253,6 @@ func (n *netflowInput) stop() {
 
 	if !n.started {
 		return
-	}
-
-	if n.udp != nil {
-		n.udp.Stop()
 	}
 
 	if n.decoder != nil {
