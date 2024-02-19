@@ -181,7 +181,7 @@ func (d DecoderV9) ReadOptionsTemplateFlowSet(buf *bytes.Buffer) (templates []*t
 		scopeLen := int(binary.BigEndian.Uint16(header[2:4]))
 		optsLen := int(binary.BigEndian.Uint16(header[4:]))
 		length := optsLen + scopeLen
-		if buf.Len() < int(length) {
+		if buf.Len() < length {
 			return nil, io.EOF
 		}
 		if (scopeLen+optsLen) == 0 || scopeLen&3 != 0 || optsLen&3 != 0 {
