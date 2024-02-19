@@ -54,6 +54,9 @@ type Watcher interface {
 	// AddEventHandler add event handlers for corresponding event type watched
 	AddEventHandler(ResourceEventHandler)
 
+	// GetEventHandler returns the event handlers for corresponding event type watched
+	GetEventHandler() ResourceEventHandler
+
 	// Store returns the store object for the watcher
 	Store() cache.Store
 
@@ -179,6 +182,11 @@ func NewNamedWatcher(name string, client kubernetes.Interface, resource Resource
 // AddEventHandler adds a resource handler to process each request that is coming into the watcher
 func (w *watcher) AddEventHandler(h ResourceEventHandler) {
 	w.handler = h
+}
+
+// GetEventHandler returns the watcher's event handler
+func (w *watcher) GetEventHandler() ResourceEventHandler {
+	return w.handler
 }
 
 // Store returns the store object for the resource that is being watched
