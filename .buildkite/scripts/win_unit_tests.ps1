@@ -30,16 +30,19 @@ function retry {
     Write-Host "Retry $count/$retries exited, no more retries left."
 }
 
-function Verify-FileChecksum {
+function verifyFileChecksum {
     param (
         [string]$filePath,
         [string]$checksumFilePath
     )
     $actualHash = (Get-FileHash -Algorithm SHA256 -Path $filePath).Hash
-    $expectedHash = Get-Content -Path $checksumFilePath
+    $checksumData = Get-Content -Path $checksumFilePath
+    $expectedHash = ($checksumData -split "\s+")[0]
     if ($actualHash -eq $expectedHash) {
+        Write-Host "CheckSum is checked. File is correct. Original checkSum is: $expectedHash "
         return $true
     } else {
+        Write-Host "CheckSum is wrong. File can be corrupted or modified. Current checksum is: $actualHash, the original checksum is: $expectedHash"
         return $false
     }
 }
@@ -84,14 +87,13 @@ function withMinGW {
         Invoke-WebRequest -Uri $gwInstallerUrl -OutFile $gwDownloadPath
         Invoke-WebRequest -Uri $gwInstallerCheckSumUrl -OutFile $gwDownloadCheckSumPath
     }
-    $comparingResult = Verify-FileChecksum -filePath $gwDownloadPath -checksumFilePath $gwDownloadCheckSumPath
+    $comparingResult = verifyFileChecksum -filePath $gwDownloadPath -checksumFilePath $gwDownloadCheckSumPath
     if ($comparingResult) {
-        Write-Host "CheckSum is checked. File is correct."
-        Expand-Archive -Path $gwDownloadPath -DestinationPath "$env:TEMP"
+                Expand-Archive -Path $gwDownloadPath -DestinationPath "$env:TEMP"
         $gwBinPath = "$env:TEMP\mingw64\bin"
         $env:Path += ";$gwBinPath"
     } else {
-        Write-Host "CheckSum is wrong. File can be corrupted"
+        exit 1
     }
 
 }
