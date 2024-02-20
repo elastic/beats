@@ -30,6 +30,20 @@ function retry {
     Write-Host "Retry $count/$retries exited, no more retries left."
 }
 
+function Verify-FileChecksum {
+    param (
+        [string]$filePath,
+        [string]$checksumFilePath
+    )
+    $actualHash = (Get-FileHash -Algorithm SHA256 -Path $filePath).Hash
+    $expectedHash = Get-Content -Path $checksumFilePath
+    if ($actualHash -eq $expectedHash) {
+        return $true
+    } else {
+        return $false
+    }
+}
+
 function withGolang($version) {
     Write-Host "-- Installing Go $version --"
     $goDownloadPath = Join-Path $env:TEMP "go_installer.msi"
@@ -63,13 +77,23 @@ function withMinGW {
     Write-Host "-- Installing MinGW --"
     [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
     $gwInstallerUrl = "https://github.com/brechtsanders/winlibs_mingw/releases/download/12.1.0-14.0.6-10.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-12.1.0-llvm-14.0.6-mingw-w64ucrt-10.0.0-r3.zip"
+    $gwInstallerCheckSumUrl = "$gwInstallerUrl.sha256"
     $gwDownloadPath = "$env:TEMP\winlibs-x86_64.zip"
+    $gwDownloadCheckSumPath = "$env:TEMP\winlibs-x86_64.zip.sha256"
     retry -retries 5 -scriptBlock {
         Invoke-WebRequest -Uri $gwInstallerUrl -OutFile $gwDownloadPath
+        Invoke-WebRequest -Uri $gwInstallerCheckSumUrl -OutFile $gwDownloadCheckSumPath
     }
-    Expand-Archive -Path $gwDownloadPath -DestinationPath "$env:TEMP"
-    $gwBinPath = "$env:TEMP\mingw64\bin"
-    $env:Path += ";$gwBinPath"
+    $comparingResult = Verify-FileChecksum -filePath $gwDownloadPath -checksumFilePath $gwDownloadCheckSumPath
+    if ($comparingResult) {
+        Write-Host "CheckSum is checked. File is correct."
+        Expand-Archive -Path $gwDownloadPath -DestinationPath "$env:TEMP"
+        $gwBinPath = "$env:TEMP\mingw64\bin"
+        $env:Path += ";$gwBinPath"
+    } else {
+        Write-Host "CheckSum is wrong. File can be corrupted"
+    }
+
 }
 function installGoDependencies {
     $installPackages = @(
