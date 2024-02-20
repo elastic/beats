@@ -67,7 +67,7 @@ oss_changeset=(
 )
 
 xpack_changeset=(
-  "${x-pack_libbeat_changeset[@]}"
+  "${xpack_libbeat_changeset[@]}"
   "${oss_changeset[@]}"
 )
 
