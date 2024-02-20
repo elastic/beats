@@ -4,7 +4,7 @@
 
 //go:build linux
 
-package add_session_metadata
+package sessionmd
 
 import (
 	"testing"
@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/processdb"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/types"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )

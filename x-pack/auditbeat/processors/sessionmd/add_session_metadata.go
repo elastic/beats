@@ -4,7 +4,7 @@
 
 //go:build linux
 
-package add_session_metadata
+package sessionmd
 
 import (
 	"context"
@@ -15,10 +15,10 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/processdb"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider/ebpf_provider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/ebpf_provider"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -179,9 +179,7 @@ func (p *addSessionMetadata) replaceFields(ev *beat.Event) error {
 			return nil //nolint:nilerr // processor can be called on unsupported events; not an error
 		}
 		switch syscall {
-		case "execveat":
-			fallthrough
-		case "execve":
+		case "execveat", "execve":
 			ev.Fields.Put("event.action", []string{"exec", "fork"})
 			ev.Fields.Put("event.type", []string{"start"})
 

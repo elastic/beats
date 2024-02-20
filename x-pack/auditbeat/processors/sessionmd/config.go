@@ -4,7 +4,7 @@
 
 //go:build linux
 
-package add_session_metadata
+package sessionmd
 
 // Config for add_session_metadata processor.
 type Config struct {

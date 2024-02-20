@@ -12,8 +12,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/types"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 )
 
 const (

@@ -10,13 +10,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/mohae/deepcopy"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/ebpf"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/processdb"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/types"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/ebpfevents"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -50,7 +48,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 		for {
 			r := <-records
 			if r.Error != nil {
-				logger.Errorf("recv'd error: %w", err)
+				logger.Warnw("received error from the ebpf subscription", "error", err)
 				continue
 			}
 			if r.Event == nil {
@@ -61,7 +59,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 			case ebpfevents.EventTypeProcessFork:
 				body, ok := ev.Body.(*ebpfevents.ProcessFork)
 				if !ok {
-					logger.Errorf("unexpected event body")
+					logger.Errorf("unexpected event body, got %T", ev.Body)
 					continue
 				}
 				pe := types.ProcessForkEvent{
@@ -123,8 +121,8 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 						Minor: body.CTTY.Minor,
 					},
 					Cwd:      body.Cwd,
-					Argv:     deepcopy.Copy(body.Argv).([]string),
-					Env:      deepcopy.Copy(body.Env).(map[string]string),
+					Argv:     body.Argv,
+					Env:      body.Env,
 					Filename: body.Filename,
 				}
 				p.db.InsertExec(pe)
