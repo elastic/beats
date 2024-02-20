@@ -1,10 +1,11 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+name: "beats-libbeat"
 
 env:
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
-  GCP_HI_PERF_MASHINE_TYPE: "c2d-highcpu-16"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
   BEATS_PROJECT_NAME: "libbeat"
@@ -14,16 +15,16 @@ steps:
   - input: "Input Parameters"
     key: "input-run-all-stages"
     fields:
-    - select: "Libbeat - runLibbeat"
-      key: "runLibbeat"
+    - select: "Libbeat - run_libbeat"
+      key: "run_libbeat"
       options:
         - label: "True"
           value: "true"
         - label: "False"
           value: "false"
       default: "false"
-    - select: "Libbeat - runLibBeatArmTest"
-      key: "runLibBeatArmTest"
+    - select: "Libbeat - run_libbeat_arm_tests"
+      key: "run_libbeat_arm_tests"
       options:
         - label: "True"
           value: "true"
@@ -39,7 +40,6 @@ steps:
   - label: ":linux: Load dynamic Libbeat pipeline"
     key: "libbeat-pipeline"
     command: ".buildkite/scripts/generate_libbeat_pipeline.sh"
-    agents:
-      provider: "gcp"
-      image: "${IMAGE_UBUNTU_X86_64}"
-      machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+    notify:
+      - github_commit_status:
+          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"

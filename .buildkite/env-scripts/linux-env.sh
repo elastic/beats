@@ -9,8 +9,6 @@ DEBIAN_FRONTEND="noninteractive"
 sudo mkdir -p /etc/needrestart
 echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
 
-echo "--- PLATFORM TYPE $PLATFORM_TYPE"
-
 if [[ $PLATFORM_TYPE == "Linux" ]]; then
   # Remove this code once beats specific agent is set up
   if grep -q 'Ubuntu' /etc/*release; then
