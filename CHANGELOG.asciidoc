@@ -22,7 +22,7 @@ https://github.com/elastic/beats/compare/v8.12.1\...v8.12.2[View commits]
 
 *Metricbeat*
 
-- Update `getOpTimestamp` in `replstatus` to fix sort and temp files generation issue in mongodb. {pull}37688[37688]
+- Update `getOpTimestamp` in `replstatus` to fix sort and temp files generation issue in MongoDB. {pull}37688[37688]
 
 
 [[release-notes-8.12.1]]
