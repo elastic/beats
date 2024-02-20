@@ -128,9 +128,9 @@ func TestClient(t *testing.T) {
 
 		// a small in-memory queue with a very short flush interval
 		q := memqueue.NewQueue(l, nil, memqueue.Settings{
-			Events:         5,
-			FlushMinEvents: 1,
-			FlushTimeout:   time.Millisecond,
+			Events:        5,
+			MaxGetRequest: 1,
+			FlushTimeout:  time.Millisecond,
 		}, 5)
 
 		// model a processor that we're going to make produce errors after

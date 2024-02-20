@@ -112,6 +112,7 @@ CHANGELOG*
 /x-pack/filebeat/input/cel/ @elastic/security-service-integrations
 /x-pack/filebeat/input/cometd/ @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/entityanalytics/ @elastic/security-service-integrations
+/x-pack/filebeat/input/etw/ @elastic/sec-windows-platform
 /x-pack/filebeat/input/gcppubsub/ @elastic/security-service-integrations
 /x-pack/filebeat/input/gcs/ @elastic/security-service-integrations
 /x-pack/filebeat/input/http_endpoint/ @elastic/security-service-integrations
@@ -121,6 +122,7 @@ CHANGELOG*
 /x-pack/filebeat/input/lumberjack/ @elastic/security-service-integrations
 /x-pack/filebeat/input/netflow/ @elastic/sec-deployment-and-devices
 /x-pack/filebeat/input/o365audit/ @elastic/security-service-integrations
+/x-pack/filebeat/input/websocket/ @elastic/security-service-integrations
 /x-pack/filebeat/module/activemq @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/aws @elastic/obs-cloud-monitoring
 /x-pack/filebeat/module/awsfargate @elastic/obs-cloud-monitoring
