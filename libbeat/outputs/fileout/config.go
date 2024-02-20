@@ -19,6 +19,11 @@ package fileout
 
 import (
 	"fmt"
+	"strconv"
+	"time"
+
+	"github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg/parse"
 
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -43,6 +48,30 @@ func defaultConfig() fileOutConfig {
 		Permissions:     0600,
 		RotateOnStartup: true,
 	}
+}
+
+func readConfig(cfg *config.C) (*fileOutConfig, error) {
+	opts := []ucfg.Option{
+		ucfg.PathSep("."),
+		ucfg.ResolveEnv,
+		ucfg.VarExp,
+		ucfg.Resolve(func(name string) (string, parse.Config, error) {
+			if name != timeNowVar {
+				return "", parse.Config{}, ucfg.ErrMissing
+			}
+			return strconv.FormatInt(time.Now().UnixMilli(), 10), parse.DefaultConfig, nil
+		}),
+	}
+	config.OverwriteConfigOpts(opts)
+	foConfig := defaultConfig()
+	if err := cfg.Unpack(&foConfig); err != nil {
+		return nil, err
+	}
+
+	// disable bulk support in publisher pipeline
+	_ = cfg.SetInt("bulk_max_size", -1, -1)
+
+	return &foConfig, nil
 }
 
 func (c *fileOutConfig) Validate() error {

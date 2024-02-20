@@ -21,11 +21,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
-	"strconv"
 	"time"
-
-	"github.com/elastic/go-ucfg"
-	"github.com/elastic/go-ucfg/parse"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -58,32 +54,17 @@ func makeFileout(
 	observer outputs.Observer,
 	cfg *c.C,
 ) (outputs.Group, error) {
-	opts := []ucfg.Option{
-		ucfg.PathSep("."),
-		ucfg.ResolveEnv,
-		ucfg.VarExp,
-		ucfg.Resolve(func(name string) (string, parse.Config, error) {
-			if name != timeNowVar {
-				return "", parse.Config{}, ucfg.ErrMissing
-			}
-			return strconv.FormatInt(time.Now().UnixMilli(), 10), parse.DefaultConfig, nil
-		}),
-	}
-	c.OverwriteConfigOpts(opts)
-	foConfig := defaultConfig()
-	if err := cfg.Unpack(&foConfig); err != nil {
+	foConfig, err := readConfig(cfg)
+	if err != nil {
 		return outputs.Fail(err)
 	}
-
-	// disable bulk support in publisher pipeline
-	_ = cfg.SetInt("bulk_max_size", -1, -1)
 
 	fo := &fileOutput{
 		log:      logp.NewLogger("file"),
 		beat:     beat,
 		observer: observer,
 	}
-	if err := fo.init(beat, foConfig); err != nil {
+	if err = fo.init(beat, *foConfig); err != nil {
 		return outputs.Fail(err)
 	}
 
