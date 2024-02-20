@@ -19,12 +19,13 @@ package fileout
 
 import (
 	"context"
-	"github.com/elastic/go-ucfg"
-	"github.com/elastic/go-ucfg/parse"
 	"os"
 	"path/filepath"
 	"strconv"
 	"time"
+
+	"github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg/parse"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
