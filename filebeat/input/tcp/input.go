@@ -31,7 +31,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/tcp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -99,11 +98,8 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log.Info("starting tcp socket input")
 	defer log.Info("tcp input stopped")
 
-	reg, unreg := inputmon.NewInputRegistry("tcp", ctx.ID, nil)
-	defer unreg()
-
 	const pollInterval = time.Minute
-	metrics := netmetrics.NewTCPMetrics(reg, s.config.Host, pollInterval, log)
+	metrics := netmetrics.NewTCP("tcp", ctx.ID, s.config.Host, pollInterval, log)
 	defer metrics.Close()
 
 	split, err := streaming.SplitFunc(s.config.Framing, []byte(s.config.LineDelimiter))

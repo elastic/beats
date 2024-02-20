@@ -17,7 +17,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 
@@ -130,10 +129,11 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 		return err
 	}
 
-	reg, unreg := inputmon.NewInputRegistry("netflow", ctx.ID, nil)
-	defer unreg()
+	const pollInterval = time.Minute
+	udpMetrics := netmetrics.NewUDP("netflow", ctx.ID, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
+	defer udpMetrics.Close()
 
-	flowMetrics := newMetrics(reg)
+	flowMetrics := newInputMetrics(udpMetrics.GetRegistry())
 
 	n.decoder, err = decoder.NewDecoder(decoder.NewConfig().
 		WithProtocols(n.cfg.Protocols...).
@@ -142,7 +142,7 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 		WithCustomFields(n.customFields...).
 		WithSequenceResetEnabled(n.cfg.DetectSequenceReset).
 		WithSharedTemplates(n.cfg.ShareTemplates).
-		WithActiveSessionsMetric(flowMetrics.activeSessions))
+		WithActiveSessionsMetric(flowMetrics.ActiveSessions()))
 	if err != nil {
 		return fmt.Errorf("error initializing netflow decoder: %w", err)
 	}
@@ -158,15 +158,13 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 
 	n.logger.Info("Starting udp server")
 
-	const pollInterval = time.Minute
-	udpMetrics := netmetrics.NewUDPMetrics(reg, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
-	defer udpMetrics.Close()
-
 	udpServer := udp.New(&n.cfg.Config, func(data []byte, metadata inputsource.NetworkMetadata) {
 		select {
 		case n.queueC <- packet{data, metadata.RemoteAddr}:
 		default:
-			flowMetrics.discardedEvents.Inc()
+			if discardedEvents := flowMetrics.DiscardedEvents(); discardedEvents != nil {
+				discardedEvents.Inc()
+			}
 		}
 	})
 	err = udpServer.Start()
@@ -186,7 +184,9 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 		flows, err := n.decoder.Read(bytes.NewBuffer(packet.data), packet.source)
 		if err != nil {
 			n.logger.Warnf("Error parsing NetFlow packet of length %d from %s: %v", len(packet.data), packet.source, err)
-			flowMetrics.decodeErrors.Inc()
+			if decodeErrors := flowMetrics.DecodeErrors(); decodeErrors != nil {
+				decodeErrors.Inc()
+			}
 			continue
 		}
 
@@ -195,7 +195,9 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 			continue
 		}
 		evs := make([]beat.Event, fLen)
-		flowMetrics.flows.Add(uint64(fLen))
+		if flowsTotal := flowMetrics.Flows(); flowsTotal != nil {
+			flowsTotal.Add(uint64(fLen))
+		}
 		for i, flow := range flows {
 			evs[i] = toBeatEvent(flow, n.internalNetworks)
 		}

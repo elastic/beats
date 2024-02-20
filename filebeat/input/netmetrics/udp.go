@@ -28,6 +28,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -35,7 +36,10 @@ import (
 
 // UDP captures UDP related metrics.
 type UDP struct {
-	done chan struct{}
+	unregister func()
+	done       chan struct{}
+
+	monitorRegistry *monitoring.Registry
 
 	lastPacket time.Time
 
@@ -49,16 +53,23 @@ type UDP struct {
 	processingTime metrics.Sample     // histogram of the elapsed time between packet receipt and publication
 }
 
-func NewUDPMetrics(reg *monitoring.Registry, device string, buflen uint64, poll time.Duration, log *logp.Logger) *UDP {
+// NewUDP returns a new UDP input metricset. Note that if the id is empty then a nil UDP metricset is returned.
+func NewUDP(inputName string, id string, device string, buflen uint64, poll time.Duration, log *logp.Logger) *UDP {
+	if id == "" {
+		return nil
+	}
+	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
 	out := &UDP{
-		bufferLen:      monitoring.NewUint(reg, "udp_read_buffer_length_gauge"),
-		device:         monitoring.NewString(reg, "device"),
-		packets:        monitoring.NewUint(reg, "received_events_total"),
-		bytes:          monitoring.NewUint(reg, "received_bytes_total"),
-		rxQueue:        monitoring.NewUint(reg, "receive_queue_length"),
-		drops:          monitoring.NewUint(reg, "system_packet_drops"),
-		arrivalPeriod:  metrics.NewUniformSample(1024),
-		processingTime: metrics.NewUniformSample(1024),
+		unregister:      unreg,
+		monitorRegistry: reg,
+		bufferLen:       monitoring.NewUint(reg, "udp_read_buffer_length_gauge"),
+		device:          monitoring.NewString(reg, "device"),
+		packets:         monitoring.NewUint(reg, "received_events_total"),
+		bytes:           monitoring.NewUint(reg, "received_bytes_total"),
+		rxQueue:         monitoring.NewUint(reg, "receive_queue_length"),
+		drops:           monitoring.NewUint(reg, "system_packet_drops"),
+		arrivalPeriod:   metrics.NewUniformSample(1024),
+		processingTime:  metrics.NewUniformSample(1024),
 	}
 	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
@@ -164,6 +175,15 @@ func (m *UDP) poll(addr, addr6 []string, each time.Duration, log *logp.Logger) {
 	}
 }
 
+// GetRegistry returns the monitoring registry of the UDP metricset.
+func (m *UDP) GetRegistry() *monitoring.Registry {
+	if m == nil {
+		return nil
+	}
+
+	return m.monitorRegistry
+}
+
 // procNetUDP returns the rx_queue and drops field of the UDP socket table
 // for the socket on the provided address formatted in hex, xxxxxxxx:xxxx or
 // the IPv6 equivalent.
@@ -228,6 +248,7 @@ func procNetUDP(path string, addr []string, hasUnspecified bool, addrIsUnspecifi
 	return 0, 0, fmt.Errorf("%s entry not found for %s", path, addr)
 }
 
+// Close closes the UDP metricset and unregister the metrics.
 func (m *UDP) Close() {
 	if m == nil {
 		return
@@ -236,4 +257,11 @@ func (m *UDP) Close() {
 		// Shut down poller and wait until done before unregistering metrics.
 		m.done <- struct{}{}
 	}
+
+	if m.unregister != nil {
+		m.unregister()
+		m.unregister = nil
+	}
+
+	m.monitorRegistry = nil
 }

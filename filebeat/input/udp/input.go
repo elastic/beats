@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/beats/v7/filebeat/inputsource/udp"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -95,11 +94,8 @@ func (s *server) Run(ctx input.Context, publisher stateless.Publisher) error {
 	log.Info("starting udp socket input")
 	defer log.Info("udp input stopped")
 
-	reg, unreg := inputmon.NewInputRegistry("udp", ctx.ID, nil)
-	defer unreg()
-
 	const pollInterval = time.Minute
-	metrics := netmetrics.NewUDPMetrics(reg, s.config.Host, uint64(s.config.ReadBuffer), pollInterval, log)
+	metrics := netmetrics.NewUDP("udp", ctx.ID, s.config.Host, uint64(s.config.ReadBuffer), pollInterval, log)
 	defer metrics.Close()
 
 	server := udp.New(&s.config.Config, func(data []byte, metadata inputsource.NetworkMetadata) {

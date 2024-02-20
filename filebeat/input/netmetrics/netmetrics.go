@@ -16,7 +16,7 @@
 // under the License.
 
 // Package netmetrics provides different metricsets for capturing network-related metrics,
-// such as UDP and TCP metrics through NewUDPMetrics and NewTCPMetrics, respectively.
+// such as UDP and TCP metrics through NewUDP and NewTCP, respectively.
 package netmetrics
 
 import (

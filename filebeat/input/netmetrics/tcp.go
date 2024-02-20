@@ -28,6 +28,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
 	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
@@ -35,7 +36,10 @@ import (
 
 // TCP handles the TCP metric reporting.
 type TCP struct {
-	done chan struct{}
+	unregister func()
+	done       chan struct{}
+
+	monitorRegistry *monitoring.Registry
 
 	lastPacket time.Time
 
@@ -47,15 +51,21 @@ type TCP struct {
 	processingTime metrics.Sample     // histogram of the elapsed time between packet receipt and publication
 }
 
-// NewTCPMetrics returns an input metric for the TCP processor.
-func NewTCPMetrics(reg *monitoring.Registry, device string, poll time.Duration, log *logp.Logger) *TCP {
+// NewTCP returns a new TCP input metricset. Note that if the id is empty then a nil TCP metricset is returned.
+func NewTCP(inputName string, id string, device string, poll time.Duration, log *logp.Logger) *TCP {
+	if id == "" {
+		return nil
+	}
+	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
 	out := &TCP{
-		device:         monitoring.NewString(reg, "device"),
-		packets:        monitoring.NewUint(reg, "received_events_total"),
-		bytes:          monitoring.NewUint(reg, "received_bytes_total"),
-		rxQueue:        monitoring.NewUint(reg, "receive_queue_length"),
-		arrivalPeriod:  metrics.NewUniformSample(1024),
-		processingTime: metrics.NewUniformSample(1024),
+		unregister:      unreg,
+		monitorRegistry: reg,
+		device:          monitoring.NewString(reg, "device"),
+		packets:         monitoring.NewUint(reg, "received_events_total"),
+		bytes:           monitoring.NewUint(reg, "received_bytes_total"),
+		rxQueue:         monitoring.NewUint(reg, "receive_queue_length"),
+		arrivalPeriod:   metrics.NewUniformSample(1024),
+		processingTime:  metrics.NewUniformSample(1024),
 	}
 	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
@@ -158,6 +168,15 @@ func (m *TCP) poll(addr, addr6 []string, each time.Duration, log *logp.Logger) {
 	}
 }
 
+// GetRegistry returns the monitoring registry of the TCP metricset.
+func (m *TCP) GetRegistry() *monitoring.Registry {
+	if m == nil {
+		return nil
+	}
+
+	return m.monitorRegistry
+}
+
 // procNetTCP returns the rx_queue field of the TCP socket table for the
 // socket on the provided address formatted in hex, xxxxxxxx:xxxx or the IPv6
 // equivalent.
@@ -213,6 +232,7 @@ func procNetTCP(path string, addr []string, hasUnspecified bool, addrIsUnspecifi
 	return 0, fmt.Errorf("%s entry not found for %s", path, addr)
 }
 
+// Close closes the TCP metricset and unregister the metrics.
 func (m *TCP) Close() {
 	if m == nil {
 		return
@@ -221,4 +241,11 @@ func (m *TCP) Close() {
 		// Shut down poller and wait until done before unregistering metrics.
 		m.done <- struct{}{}
 	}
+
+	if m.unregister != nil {
+		m.unregister()
+		m.unregister = nil
+	}
+
+	m.monitorRegistry = nil
 }
