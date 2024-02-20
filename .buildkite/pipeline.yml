@@ -1,47 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 steps:
-  - trigger: "beats-packetbeat"
-    label: ":esbuild: Downstream - beats-packetbeat"
-    key: "downstream-beats-packetbeat"
-    async: true
-    build:
-      env:
-        BUILDKITE_REFSPEC: "refs/pull/${BUILDKITE_PULL_REQUEST}/head"
-        BUILDKITE_COMMIT: "${BUILDKITE_COMMIT}"
-
-  - trigger: "beats-libbeat"
-    label: ":esbuild: Downstream - beats-libbeat"
-    key: "downstream-beats-libbeat"
-    async: true
-    build:
-      env:
-        BUILDKITE_REFSPEC: "refs/pull/${BUILDKITE_PULL_REQUEST}/head"
-        BUILDKITE_COMMIT: "${BUILDKITE_COMMIT}"
-
-  - trigger: "beats-metricbeat"
-    label: ":esbuild: Downstream - beats-metricbeat"
-    key: "downstream-beats-metricbeat"
-    async: true
-    build:
-      env:
-        BUILDKITE_REFSPEC: "refs/pull/${BUILDKITE_PULL_REQUEST}/head"
-        BUILDKITE_COMMIT: "${BUILDKITE_COMMIT}"
-
-  - trigger: "beats-winlogbeat"
-    label: ":esbuild: Downstream - beats-winlogbeat"
-    key: "downstream-beats-winlogbeat"
-    async: true
-    build:
-      env:
-        BUILDKITE_REFSPEC: "refs/pull/${BUILDKITE_PULL_REQUEST}/head"
-        BUILDKITE_COMMIT: "${BUILDKITE_COMMIT}"
-
-  - trigger: "beats-xpack-libbeat"
-    label: ":esbuild: Downstream - beats-xpack-libbeat"
-    key: "downstream-beats-xpack-libbeat"
-    async: true
-    build:
-      env:
-        BUILDKITE_REFSPEC: "refs/pull/${BUILDKITE_PULL_REQUEST}/head"
-        BUILDKITE_COMMIT: "${BUILDKITE_COMMIT}"
+  - label: "Example test"
+    command: echo "Hello!"
