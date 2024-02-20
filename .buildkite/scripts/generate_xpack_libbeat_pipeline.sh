@@ -58,6 +58,7 @@ steps:
               - "${IMAGE_WIN_2022}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
+### TODO: this condition will be changed in the issue XYZ
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
     steps:
