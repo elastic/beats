@@ -58,7 +58,7 @@ steps:
               - "${IMAGE_WIN_2022}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-  - group: "Extended Windowds Tests"
+  - group: "Extended Windows Tests"
     key: "extended-win-tests"
     steps:
       - label: ":windows: Win 2019 Unit Tests"
