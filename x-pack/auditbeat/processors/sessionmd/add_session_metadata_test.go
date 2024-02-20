@@ -33,22 +33,22 @@ var (
 			testName: "Enrich Process",
 			config: Config{
 				ReplaceFields: false,
-				PidField:      "process.pid",
+				PIDField:      "process.pid",
 			},
 			mockProcesses: []types.ProcessExecEvent{
 				{
-					Pids: types.PidInfo{
+					PIDs: types.PIDInfo{
 						Tid:  uint32(100),
 						Tgid: uint32(100),
 						Ppid: uint32(50),
 						Pgid: uint32(100),
 						Sid:  uint32(40),
 					},
-					Cwd:      "/",
+					CWD:      "/",
 					Filename: "/bin/ls",
 				},
 				{
-					Pids: types.PidInfo{
+					PIDs: types.PIDInfo{
 						Tid:  uint32(50),
 						Tgid: uint32(50),
 						Ppid: uint32(40),
@@ -56,7 +56,7 @@ var (
 					},
 				},
 				{
-					Pids: types.PidInfo{
+					PIDs: types.PIDInfo{
 						Tid:  uint32(40),
 						Tgid: uint32(40),
 						Ppid: uint32(1),
@@ -92,10 +92,10 @@ var (
 			expect_error: false,
 		},
 		{
-			testName: "No Pid Field in Event",
+			testName: "No PID Field in Event",
 			config: Config{
 				ReplaceFields: false,
-				PidField:      "process.pid",
+				PIDField:      "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -111,10 +111,10 @@ var (
 			expect_error: true,
 		},
 		{
-			testName: "Pid Not Number",
+			testName: "PID Not Number",
 			config: Config{
 				ReplaceFields: false,
-				PidField:      "process.pid",
+				PIDField:      "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -134,7 +134,7 @@ var (
 			testName: "PID not in DB",
 			config: Config{
 				ReplaceFields: false,
-				PidField:      "process.pid",
+				PIDField:      "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{

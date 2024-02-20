@@ -117,15 +117,15 @@ func requireGroupLeader(t *testing.T, db *DB, pid uint32, pgid uint32) {
 	require.Equal(t, pid == pgid, *process.GroupLeader.SameAsProcess)
 }
 
-func requireEntryLeader(t *testing.T, db *DB, pid uint32, entryPid uint32, expectedEntryType EntryType) {
+func requireEntryLeader(t *testing.T, db *DB, pid uint32, entryPID uint32, expectedEntryType EntryType) {
 	t.Helper()
 	process, err := db.GetProcess(pid)
 	require.Nil(t, err)
-	require.Equal(t, entryPid, process.EntryLeader.PID)
+	require.Equal(t, entryPID, process.EntryLeader.PID)
 	require.NotNil(t, process.EntryLeader.SameAsProcess)
-	require.Equal(t, pid == entryPid, *process.EntryLeader.SameAsProcess)
+	require.Equal(t, pid == entryPID, *process.EntryLeader.SameAsProcess)
 
-	entryType, err := db.GetEntryType(entryPid)
+	entryType, err := db.GetEntryType(entryPID)
 	require.Nil(t, err)
 	require.Equal(t, expectedEntryType, entryType)
 }
@@ -141,31 +141,31 @@ func requireEntryLeaderUnset(t *testing.T, process types.Process) {
 func insertForkAndExec(t *testing.T, db *DB, exec types.ProcessExecEvent) {
 	t.Helper()
 	var fork types.ProcessForkEvent
-	fork.ChildPids = exec.Pids
-	parent, err := db.GetProcess(exec.Pids.Ppid)
+	fork.ChildPIDs = exec.PIDs
+	parent, err := db.GetProcess(exec.PIDs.Ppid)
 	if err != nil {
-		fork.ParentPids = exec.Pids
-		fork.ParentPids.Tgid = exec.Pids.Ppid
-		fork.ParentPids.Ppid = 0
-		fork.ParentPids.Pgid = 0
+		fork.ParentPIDs = exec.PIDs
+		fork.ParentPIDs.Tgid = exec.PIDs.Ppid
+		fork.ParentPIDs.Ppid = 0
+		fork.ParentPIDs.Pgid = 0
 
-		fork.ChildPids.Pgid = exec.Pids.Ppid
+		fork.ChildPIDs.Pgid = exec.PIDs.Ppid
 
 		// if the exec makes itself a session and the parent is no where to be
 		// found we'll make the parent its own session
-		if exec.Pids.Tgid == exec.Pids.Sid {
-			fork.ParentPids.Sid = exec.Pids.Ppid
+		if exec.PIDs.Tgid == exec.PIDs.Sid {
+			fork.ParentPIDs.Sid = exec.PIDs.Ppid
 		}
 	} else {
-		fork.ParentPids.Tgid = parent.PID
-		fork.ParentPids.Ppid = parent.Parent.PID
-		fork.ParentPids.Sid = parent.SessionLeader.PID
+		fork.ParentPIDs.Tgid = parent.PID
+		fork.ParentPIDs.Ppid = parent.Parent.PID
+		fork.ParentPIDs.Sid = parent.SessionLeader.PID
 
 		// keep group leader the same for now
-		fork.ParentPids.Pgid = exec.Pids.Pgid
+		fork.ParentPIDs.Pgid = exec.PIDs.Pgid
 	}
 
-	if fork.ParentPids.Tgid != 0 {
+	if fork.ParentPIDs.Tgid != 0 {
 		db.InsertFork(fork)
 	}
 
@@ -176,7 +176,7 @@ var systemdPath = "/sbin/systemd"
 
 func populateProcfsWithInit(reader *procfs.MockReader) {
 	reader.AddEntry(1, procfs.ProcessInfo{
-		Pids: types.PidInfo{
+		PIDs: types.PIDInfo{
 			Tid:  1,
 			Tgid: 1,
 			Pgid: 0,
@@ -195,11 +195,11 @@ func TestSingleProcessSessionLeaderEntryTypeTerminal(t *testing.T) {
 	procPath := "/bin/noproc"
 	db.InsertExec(types.ProcessExecEvent{
 		Filename: procPath,
-		Pids: types.PidInfo{
+		PIDs: types.PIDInfo{
 			Tgid: pid,
 			Sid:  pid,
 		},
-		CTty: types.TtyDev{
+		CTTY: types.TTYDev{
 			Major: 4,
 			Minor: 64,
 		},
@@ -218,11 +218,11 @@ func TestSingleProcessSessionLeaderLoginProcess(t *testing.T) {
 	loginPath := "/bin/login"
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: loginPath,
-		Pids: types.PidInfo{
+		PIDs: types.PIDInfo{
 			Tgid: pid,
 			Sid:  pid,
 		},
-		CTty: types.TtyDev{
+		CTTY: types.TTYDev{
 			Major: 4,
 			Minor: 62,
 		},
@@ -246,12 +246,12 @@ func TestSingleProcessSessionLeaderChildOfInit(t *testing.T) {
 	rsyslogdPath := "/bin/rsyslogd"
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: rsyslogdPath,
-		Pids: types.PidInfo{
+		PIDs: types.PIDInfo{
 			Tgid: pid,
 			Sid:  pid,
 			Ppid: 1,
 		},
-		CTty: types.TtyDev{
+		CTTY: types.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
@@ -271,34 +271,34 @@ func TestSingleProcessSessionLeaderChildOfSsmSessionWorker(t *testing.T) {
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	ssmPid := uint32(999)
-	bashPid := uint32(1000)
+	ssmPID := uint32(999)
+	bashPID := uint32(1000)
 	ssmPath := "/usr/bin/ssm-session-worker"
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: ssmPath,
-		Pids: types.PidInfo{
-			Tgid: ssmPid,
+		PIDs: types.PIDInfo{
+			Tgid: ssmPID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: bashPath,
-		Pids: types.PidInfo{
-			Tgid: bashPid,
-			Sid:  bashPid,
-			Ppid: ssmPid,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: ssmPID,
 		},
-		CTty: types.TtyDev{
+		CTTY: types.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
 	})
 
-	requireProcess(t, db, bashPid, bashPath)
-	requireParent(t, db, bashPid, ssmPid)
-	requireSessionLeader(t, db, bashPid, bashPid)
-	requireEntryLeader(t, db, bashPid, bashPid, Ssm)
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, ssmPID)
+	requireSessionLeader(t, db, bashPID, bashPID)
+	requireEntryLeader(t, db, bashPID, bashPID, Ssm)
 }
 
 func TestSingleProcessSessionLeaderChildOfSshd(t *testing.T) {
@@ -306,33 +306,33 @@ func TestSingleProcessSessionLeaderChildOfSshd(t *testing.T) {
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	sshdPid := uint32(999)
-	bashPid := uint32(1000)
+	sshdPID := uint32(999)
+	bashPID := uint32(1000)
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: sshdPath,
-		Pids: types.PidInfo{
-			Tgid: sshdPid,
+		PIDs: types.PIDInfo{
+			Tgid: sshdPID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: bashPath,
-		Pids: types.PidInfo{
-			Tgid: bashPid,
-			Sid:  bashPid,
-			Ppid: sshdPid,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: sshdPID,
 		},
-		CTty: types.TtyDev{
+		CTTY: types.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
 	})
 
-	requireProcess(t, db, bashPid, bashPath)
-	requireParent(t, db, bashPid, sshdPid)
-	requireSessionLeader(t, db, bashPid, bashPid)
-	requireEntryLeader(t, db, bashPid, bashPid, Sshd)
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, sshdPID)
+	requireSessionLeader(t, db, bashPID, bashPID)
+	requireEntryLeader(t, db, bashPID, bashPID, Sshd)
 }
 
 func TestSingleProcessSessionLeaderChildOfContainerdShim(t *testing.T) {
@@ -340,33 +340,33 @@ func TestSingleProcessSessionLeaderChildOfContainerdShim(t *testing.T) {
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	containerdShimPid := uint32(999)
-	bashPid := uint32(1000)
+	containerdShimPID := uint32(999)
+	bashPID := uint32(1000)
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: containerdShimPath,
-		Pids: types.PidInfo{
-			Tgid: containerdShimPid,
+		PIDs: types.PIDInfo{
+			Tgid: containerdShimPID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: bashPath,
-		Pids: types.PidInfo{
-			Tgid: bashPid,
-			Sid:  bashPid,
-			Ppid: containerdShimPid,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: containerdShimPID,
 		},
-		CTty: types.TtyDev{
+		CTTY: types.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
 	})
 
-	requireProcess(t, db, bashPid, bashPath)
-	requireParent(t, db, bashPid, containerdShimPid)
-	requireSessionLeader(t, db, bashPid, bashPid)
-	requireEntryLeader(t, db, bashPid, bashPid, Container)
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, containerdShimPID)
+	requireSessionLeader(t, db, bashPID, bashPID)
+	requireEntryLeader(t, db, bashPID, bashPID, Container)
 }
 
 func TestSingleProcessSessionLeaderChildOfRunc(t *testing.T) {
@@ -374,34 +374,34 @@ func TestSingleProcessSessionLeaderChildOfRunc(t *testing.T) {
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	runcPid := uint32(999)
-	bashPid := uint32(1000)
+	runcPID := uint32(999)
+	bashPID := uint32(1000)
 	runcPath := "/bin/runc"
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: runcPath,
-		Pids: types.PidInfo{
-			Tgid: runcPid,
+		PIDs: types.PIDInfo{
+			Tgid: runcPID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: bashPath,
-		Pids: types.PidInfo{
-			Tgid: bashPid,
-			Sid:  bashPid,
-			Ppid: runcPid,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: runcPID,
 		},
-		CTty: types.TtyDev{
+		CTTY: types.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
 	})
 
-	requireProcess(t, db, bashPid, bashPath)
-	requireParent(t, db, bashPid, runcPid)
-	requireSessionLeader(t, db, bashPid, bashPid)
-	requireEntryLeader(t, db, bashPid, bashPid, Container)
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, runcPID)
+	requireSessionLeader(t, db, bashPID, bashPID)
+	requireEntryLeader(t, db, bashPID, bashPID, Container)
 }
 
 func TestSingleProcessEmptyProcess(t *testing.T) {
@@ -415,11 +415,11 @@ func TestSingleProcessEmptyProcess(t *testing.T) {
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: bashPath,
-		Pids: types.PidInfo{
+		PIDs: types.PIDInfo{
 			Tgid: pid,
 			Sid:  pid,
 		},
-		CTty: types.TtyDev{
+		CTTY: types.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
@@ -434,34 +434,34 @@ func TestSingleProcessEmptyProcess(t *testing.T) {
 	requireEntryLeader(t, db, pid, pid, EntryUnknown)
 }
 
-// Entry evaluation code should overwrite an old EntryLeaderPid and
+// Entry evaluation code should overwrite an old EntryLeaderPID and
 // EntryLeaderEntryMetaType
 func TestSingleProcessOverwriteOldEntryLeader(t *testing.T) {
 	reader := procfs.NewMockReader()
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	ssmPid := uint32(999)
-	bashPid := uint32(1000)
+	ssmPID := uint32(999)
+	bashPID := uint32(1000)
 	ssmPath := "/usr/bin/ssm-session-worker"
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: ssmPath,
-		Pids: types.PidInfo{
-			Tgid: ssmPid,
-			Sid:  ssmPid,
+		PIDs: types.PIDInfo{
+			Tgid: ssmPID,
+			Sid:  ssmPID,
 			Ppid: 1,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: bashPath,
-		Pids: types.PidInfo{
-			Tgid: bashPid,
-			Sid:  ssmPid,
-			Ppid: ssmPid,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  ssmPID,
+			Ppid: ssmPID,
 		},
-		CTty: types.TtyDev{
+		CTTY: types.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
@@ -469,29 +469,29 @@ func TestSingleProcessOverwriteOldEntryLeader(t *testing.T) {
 
 	// bash is not a session leader so it shouldn't be an entry leader. Its
 	// entry leader should be ssm, which is an init entry leader
-	requireProcess(t, db, bashPid, bashPath)
-	requireParent(t, db, bashPid, ssmPid)
-	requireSessionLeader(t, db, bashPid, ssmPid)
-	requireEntryLeader(t, db, bashPid, ssmPid, Init)
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, ssmPID)
+	requireSessionLeader(t, db, bashPID, ssmPID)
+	requireEntryLeader(t, db, bashPID, ssmPID, Init)
 
 	// skiping setsid event and assuming the pids will be updated in this exec
 	db.InsertExec(types.ProcessExecEvent{
 		Filename: bashPath,
-		Pids: types.PidInfo{
-			Tgid: bashPid,
-			Sid:  bashPid,
-			Ppid: ssmPid,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: ssmPID,
 		},
-		CTty: types.TtyDev{
+		CTTY: types.TTYDev{
 			Major: 136,
 			Minor: 62,
 		},
 	})
 
-	requireProcess(t, db, bashPid, bashPath)
-	requireParent(t, db, bashPid, ssmPid)
-	requireSessionLeader(t, db, bashPid, bashPid)
-	requireEntryLeader(t, db, bashPid, bashPid, Ssm)
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, ssmPID)
+	requireSessionLeader(t, db, bashPID, bashPID)
+	requireEntryLeader(t, db, bashPID, bashPID, Ssm)
 }
 
 // /	                 (pid, sid, entry meta, entry leader)
@@ -511,36 +511,36 @@ func TestInitSshdBashLs(t *testing.T) {
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	sshdPid := uint32(100)
-	bashPid := uint32(1000)
-	lsPid := uint32(1001)
+	sshdPID := uint32(100)
+	bashPID := uint32(1000)
+	lsPID := uint32(1001)
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: sshdPath,
-		Pids: types.PidInfo{
-			Tgid: sshdPid,
-			Sid:  sshdPid,
+		PIDs: types.PIDInfo{
+			Tgid: sshdPID,
+			Sid:  sshdPID,
 			Ppid: 1,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: bashPath,
-		Pids: types.PidInfo{
-			Tgid: bashPid,
-			Sid:  bashPid,
-			Ppid: sshdPid,
-			Pgid: bashPid,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: sshdPID,
+			Pgid: bashPID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: lsPath,
-		Pids: types.PidInfo{
-			Tgid: lsPid,
-			Sid:  bashPid,
-			Ppid: bashPid,
-			Pgid: lsPid,
+		PIDs: types.PIDInfo{
+			Tgid: lsPID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: lsPID,
 		},
 	})
 
@@ -554,24 +554,24 @@ func TestInitSshdBashLs(t *testing.T) {
 	requireSessionLeader(t, db, 1, 1)
 
 	// sshd
-	requireProcess(t, db, sshdPid, sshdPath)
-	requireParent(t, db, sshdPid, 1)
-	requireSessionLeader(t, db, sshdPid, sshdPid)
-	requireEntryLeader(t, db, sshdPid, sshdPid, Init)
+	requireProcess(t, db, sshdPID, sshdPath)
+	requireParent(t, db, sshdPID, 1)
+	requireSessionLeader(t, db, sshdPID, sshdPID)
+	requireEntryLeader(t, db, sshdPID, sshdPID, Init)
 
 	// bash
-	requireProcess(t, db, bashPid, bashPath)
-	requireParent(t, db, bashPid, sshdPid)
-	requireSessionLeader(t, db, bashPid, bashPid)
-	requireEntryLeader(t, db, bashPid, bashPid, Sshd)
-	requireGroupLeader(t, db, bashPid, bashPid)
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, sshdPID)
+	requireSessionLeader(t, db, bashPID, bashPID)
+	requireEntryLeader(t, db, bashPID, bashPID, Sshd)
+	requireGroupLeader(t, db, bashPID, bashPID)
 
 	// ls
-	requireProcess(t, db, lsPid, lsPath)
-	requireParent(t, db, lsPid, bashPid)
-	requireSessionLeader(t, db, lsPid, bashPid)
-	requireEntryLeader(t, db, lsPid, bashPid, Sshd)
-	requireGroupLeader(t, db, lsPid, lsPid)
+	requireProcess(t, db, lsPID, lsPath)
+	requireParent(t, db, lsPID, bashPID)
+	requireSessionLeader(t, db, lsPID, bashPID)
+	requireEntryLeader(t, db, lsPID, bashPID, Sshd)
+	requireGroupLeader(t, db, lsPID, lsPID)
 }
 
 // /                           (pid, sid, entry meta, entry leader)
@@ -593,46 +593,46 @@ func TestInitSshdSshdBashLs(t *testing.T) {
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	sshd0Pid := uint32(100)
-	sshd1Pid := uint32(101)
-	bashPid := uint32(1000)
-	lsPid := uint32(1001)
+	sshd0PID := uint32(100)
+	sshd1PID := uint32(101)
+	bashPID := uint32(1000)
+	lsPID := uint32(1001)
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: sshdPath,
-		Pids: types.PidInfo{
-			Tgid: sshd0Pid,
-			Sid:  sshd0Pid,
+		PIDs: types.PIDInfo{
+			Tgid: sshd0PID,
+			Sid:  sshd0PID,
 			Ppid: 1,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: sshdPath,
-		Pids: types.PidInfo{
-			Tgid: sshd1Pid,
-			Sid:  sshd1Pid,
-			Ppid: sshd0Pid,
+		PIDs: types.PIDInfo{
+			Tgid: sshd1PID,
+			Sid:  sshd1PID,
+			Ppid: sshd0PID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: bashPath,
-		Pids: types.PidInfo{
-			Tgid: bashPid,
-			Sid:  bashPid,
-			Ppid: sshd1Pid,
-			Pgid: bashPid,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: sshd1PID,
+			Pgid: bashPID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: lsPath,
-		Pids: types.PidInfo{
-			Tgid: lsPid,
-			Sid:  bashPid,
-			Ppid: bashPid,
-			Pgid: lsPid,
+		PIDs: types.PIDInfo{
+			Tgid: lsPID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: lsPID,
 		},
 	})
 
@@ -646,28 +646,28 @@ func TestInitSshdSshdBashLs(t *testing.T) {
 	requireSessionLeader(t, db, 1, 1)
 
 	// sshd0
-	requireProcess(t, db, sshd0Pid, sshdPath)
-	requireParent(t, db, sshd0Pid, 1)
-	requireSessionLeader(t, db, sshd0Pid, sshd0Pid)
-	requireEntryLeader(t, db, sshd0Pid, sshd0Pid, Init)
+	requireProcess(t, db, sshd0PID, sshdPath)
+	requireParent(t, db, sshd0PID, 1)
+	requireSessionLeader(t, db, sshd0PID, sshd0PID)
+	requireEntryLeader(t, db, sshd0PID, sshd0PID, Init)
 
 	// sshd1
-	requireProcess(t, db, sshd1Pid, sshdPath)
-	requireParent(t, db, sshd1Pid, sshd0Pid)
-	requireSessionLeader(t, db, sshd1Pid, sshd1Pid)
-	requireEntryLeader(t, db, sshd1Pid, sshd0Pid, Init)
+	requireProcess(t, db, sshd1PID, sshdPath)
+	requireParent(t, db, sshd1PID, sshd0PID)
+	requireSessionLeader(t, db, sshd1PID, sshd1PID)
+	requireEntryLeader(t, db, sshd1PID, sshd0PID, Init)
 
 	// bash
-	requireProcess(t, db, bashPid, bashPath)
-	requireParent(t, db, bashPid, sshd1Pid)
-	requireSessionLeader(t, db, bashPid, bashPid)
-	requireEntryLeader(t, db, bashPid, bashPid, Sshd)
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, sshd1PID)
+	requireSessionLeader(t, db, bashPID, bashPID)
+	requireEntryLeader(t, db, bashPID, bashPID, Sshd)
 
 	// ls
-	requireProcess(t, db, lsPid, lsPath)
-	requireParent(t, db, lsPid, bashPid)
-	requireSessionLeader(t, db, lsPid, bashPid)
-	requireEntryLeader(t, db, lsPid, bashPid, Sshd)
+	requireProcess(t, db, lsPID, lsPath)
+	requireParent(t, db, lsPID, bashPID)
+	requireSessionLeader(t, db, lsPID, bashPID)
+	requireEntryLeader(t, db, lsPID, bashPID, Sshd)
 }
 
 // /	                             (pid, sid, entry meta, entry leader)
@@ -684,56 +684,56 @@ func TestInitSshdSshdSshdBashLs(t *testing.T) {
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	sshd0Pid := uint32(100)
-	sshd1Pid := uint32(101)
-	sshd2Pid := uint32(102)
-	bashPid := uint32(1000)
-	lsPid := uint32(1001)
+	sshd0PID := uint32(100)
+	sshd1PID := uint32(101)
+	sshd2PID := uint32(102)
+	bashPID := uint32(1000)
+	lsPID := uint32(1001)
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: sshdPath,
-		Pids: types.PidInfo{
-			Tgid: sshd0Pid,
-			Sid:  sshd0Pid,
+		PIDs: types.PIDInfo{
+			Tgid: sshd0PID,
+			Sid:  sshd0PID,
 			Ppid: 1,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: sshdPath,
-		Pids: types.PidInfo{
-			Tgid: sshd1Pid,
-			Sid:  sshd1Pid,
-			Ppid: sshd0Pid,
+		PIDs: types.PIDInfo{
+			Tgid: sshd1PID,
+			Sid:  sshd1PID,
+			Ppid: sshd0PID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: sshdPath,
-		Pids: types.PidInfo{
-			Tgid: sshd2Pid,
-			Sid:  sshd1Pid,
-			Ppid: sshd1Pid,
+		PIDs: types.PIDInfo{
+			Tgid: sshd2PID,
+			Sid:  sshd1PID,
+			Ppid: sshd1PID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: bashPath,
-		Pids: types.PidInfo{
-			Tgid: bashPid,
-			Sid:  bashPid,
-			Ppid: sshd2Pid,
-			Pgid: bashPid,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: sshd2PID,
+			Pgid: bashPID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: lsPath,
-		Pids: types.PidInfo{
-			Tgid: lsPid,
-			Sid:  bashPid,
-			Ppid: bashPid,
-			Pgid: lsPid,
+		PIDs: types.PIDInfo{
+			Tgid: lsPID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: lsPID,
 		},
 	})
 
@@ -747,34 +747,34 @@ func TestInitSshdSshdSshdBashLs(t *testing.T) {
 	requireSessionLeader(t, db, 1, 1)
 
 	// sshd0
-	requireProcess(t, db, sshd0Pid, sshdPath)
-	requireParent(t, db, sshd0Pid, 1)
-	requireSessionLeader(t, db, sshd0Pid, sshd0Pid)
-	requireEntryLeader(t, db, sshd0Pid, sshd0Pid, Init)
+	requireProcess(t, db, sshd0PID, sshdPath)
+	requireParent(t, db, sshd0PID, 1)
+	requireSessionLeader(t, db, sshd0PID, sshd0PID)
+	requireEntryLeader(t, db, sshd0PID, sshd0PID, Init)
 
 	// sshd1
-	requireProcess(t, db, sshd1Pid, sshdPath)
-	requireParent(t, db, sshd1Pid, sshd0Pid)
-	requireSessionLeader(t, db, sshd1Pid, sshd1Pid)
-	requireEntryLeader(t, db, sshd1Pid, sshd0Pid, Init)
+	requireProcess(t, db, sshd1PID, sshdPath)
+	requireParent(t, db, sshd1PID, sshd0PID)
+	requireSessionLeader(t, db, sshd1PID, sshd1PID)
+	requireEntryLeader(t, db, sshd1PID, sshd0PID, Init)
 
 	// sshd2
-	requireProcess(t, db, sshd2Pid, sshdPath)
-	requireParent(t, db, sshd2Pid, sshd1Pid)
-	requireSessionLeader(t, db, sshd2Pid, sshd1Pid)
-	requireEntryLeader(t, db, sshd2Pid, sshd0Pid, Init)
+	requireProcess(t, db, sshd2PID, sshdPath)
+	requireParent(t, db, sshd2PID, sshd1PID)
+	requireSessionLeader(t, db, sshd2PID, sshd1PID)
+	requireEntryLeader(t, db, sshd2PID, sshd0PID, Init)
 
 	// bash
-	requireProcess(t, db, bashPid, bashPath)
-	requireParent(t, db, bashPid, sshd2Pid)
-	requireSessionLeader(t, db, bashPid, bashPid)
-	requireEntryLeader(t, db, bashPid, bashPid, Sshd)
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, sshd2PID)
+	requireSessionLeader(t, db, bashPID, bashPID)
+	requireEntryLeader(t, db, bashPID, bashPID, Sshd)
 
 	// ls
-	requireProcess(t, db, lsPid, lsPath)
-	requireParent(t, db, lsPid, bashPid)
-	requireSessionLeader(t, db, lsPid, bashPid)
-	requireEntryLeader(t, db, lsPid, bashPid, Sshd)
+	requireProcess(t, db, lsPID, lsPath)
+	requireParent(t, db, lsPID, bashPID)
+	requireSessionLeader(t, db, lsPID, bashPID)
+	requireEntryLeader(t, db, lsPID, bashPID, Sshd)
 }
 
 // /                                   (pid, sid, entry meta, entry leader)
@@ -792,38 +792,38 @@ func TestInitContainerdContainerdShim(t *testing.T) {
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	containerdPid := uint32(100)
-	containerdShimPid := uint32(1000)
+	containerdPID := uint32(100)
+	containerdShimPID := uint32(1000)
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: containerdPath,
-		Pids: types.PidInfo{
-			Tgid: containerdPid,
-			Sid:  containerdPid,
+		PIDs: types.PIDInfo{
+			Tgid: containerdPID,
+			Sid:  containerdPID,
 			Ppid: 1,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: containerdShimPath,
-		Pids: types.PidInfo{
-			Tgid: containerdShimPid,
-			Sid:  containerdPid,
-			Ppid: containerdPid,
+		PIDs: types.PIDInfo{
+			Tgid: containerdShimPID,
+			Sid:  containerdPID,
+			Ppid: containerdPID,
 		},
 	})
 
 	// containerd
-	requireProcess(t, db, containerdPid, containerdPath)
-	requireParent(t, db, containerdPid, 1)
-	requireSessionLeader(t, db, containerdPid, containerdPid)
-	requireEntryLeader(t, db, containerdPid, containerdPid, Init)
+	requireProcess(t, db, containerdPID, containerdPath)
+	requireParent(t, db, containerdPID, 1)
+	requireSessionLeader(t, db, containerdPID, containerdPID)
+	requireEntryLeader(t, db, containerdPID, containerdPID, Init)
 
 	// containerd-shim-runc-v2
-	requireProcess(t, db, containerdShimPid, containerdShimPath)
-	requireParent(t, db, containerdShimPid, containerdPid)
-	requireSessionLeader(t, db, containerdShimPid, containerdPid)
-	requireEntryLeader(t, db, containerdShimPid, containerdPid, Init)
+	requireProcess(t, db, containerdShimPID, containerdShimPath)
+	requireParent(t, db, containerdShimPID, containerdPID)
+	requireSessionLeader(t, db, containerdShimPID, containerdPID)
+	requireEntryLeader(t, db, containerdShimPID, containerdPID, Init)
 }
 
 //	/                             (pid, sid, entry meta, entry leader)
@@ -844,54 +844,54 @@ func TestInitContainerdShimBashContainerdShimIsReparentedToInit(t *testing.T) {
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	containerdPid := uint32(100)
-	containerdShimPid := uint32(1000)
-	bashPid := uint32(1001)
+	containerdPID := uint32(100)
+	containerdShimPID := uint32(1000)
+	bashPID := uint32(1001)
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: containerdPath,
-		Pids: types.PidInfo{
-			Tgid: containerdPid,
-			Sid:  containerdPid,
+		PIDs: types.PIDInfo{
+			Tgid: containerdPID,
+			Sid:  containerdPID,
 			Ppid: 1,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: containerdShimPath,
-		Pids: types.PidInfo{
-			Tgid: containerdShimPid,
-			Sid:  containerdPid,
+		PIDs: types.PIDInfo{
+			Tgid: containerdShimPID,
+			Sid:  containerdPID,
 			Ppid: 1,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: bashPath,
-		Pids: types.PidInfo{
-			Tgid: bashPid,
-			Sid:  bashPid,
-			Ppid: containerdShimPid,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: containerdShimPID,
 		},
 	})
 
 	// containerd
-	requireProcess(t, db, containerdPid, containerdPath)
-	requireParent(t, db, containerdPid, 1)
-	requireSessionLeader(t, db, containerdPid, containerdPid)
-	requireEntryLeader(t, db, containerdPid, containerdPid, Init)
+	requireProcess(t, db, containerdPID, containerdPath)
+	requireParent(t, db, containerdPID, 1)
+	requireSessionLeader(t, db, containerdPID, containerdPID)
+	requireEntryLeader(t, db, containerdPID, containerdPID, Init)
 
 	// containerd-shim-runc-v2
-	requireProcess(t, db, containerdShimPid, containerdShimPath)
-	requireParent(t, db, containerdShimPid, 1)
-	requireSessionLeader(t, db, containerdShimPid, containerdPid)
-	requireEntryLeader(t, db, containerdShimPid, containerdPid, Init)
+	requireProcess(t, db, containerdShimPID, containerdShimPath)
+	requireParent(t, db, containerdShimPID, 1)
+	requireSessionLeader(t, db, containerdShimPID, containerdPID)
+	requireEntryLeader(t, db, containerdShimPID, containerdPID, Init)
 
 	// bash
-	requireProcess(t, db, bashPid, bashPath)
-	requireParent(t, db, bashPid, containerdShimPid)
-	requireSessionLeader(t, db, bashPid, bashPid)
-	requireEntryLeader(t, db, bashPid, bashPid, Container)
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, containerdShimPID)
+	requireSessionLeader(t, db, bashPID, bashPID)
+	requireEntryLeader(t, db, bashPID, bashPID, Container)
 }
 
 // /                               (pid, sid, entry meta, entry leader)
@@ -912,24 +912,24 @@ func TestInitContainerdShimPauseContainerdShimIsReparentedToInit(t *testing.T) {
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	containerdPid := uint32(100)
-	containerdShimPid := uint32(1000)
-	pausePid := uint32(1001)
+	containerdPID := uint32(100)
+	containerdShimPID := uint32(1000)
+	pausePID := uint32(1001)
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: containerdPath,
-		Pids: types.PidInfo{
-			Tgid: containerdPid,
-			Sid:  containerdPid,
+		PIDs: types.PIDInfo{
+			Tgid: containerdPID,
+			Sid:  containerdPID,
 			Ppid: 1,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: containerdShimPath,
-		Pids: types.PidInfo{
-			Tgid: containerdShimPid,
-			Sid:  containerdPid,
+		PIDs: types.PIDInfo{
+			Tgid: containerdShimPID,
+			Sid:  containerdPID,
 			Ppid: 1,
 		},
 	})
@@ -938,30 +938,30 @@ func TestInitContainerdShimPauseContainerdShimIsReparentedToInit(t *testing.T) {
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: pausePath,
-		Pids: types.PidInfo{
-			Tgid: pausePid,
-			Sid:  pausePid,
-			Ppid: containerdShimPid,
+		PIDs: types.PIDInfo{
+			Tgid: pausePID,
+			Sid:  pausePID,
+			Ppid: containerdShimPID,
 		},
 	})
 
 	// containerd
-	requireProcess(t, db, containerdPid, containerdPath)
-	requireParent(t, db, containerdPid, 1)
-	requireSessionLeader(t, db, containerdPid, containerdPid)
-	requireEntryLeader(t, db, containerdPid, containerdPid, Init)
+	requireProcess(t, db, containerdPID, containerdPath)
+	requireParent(t, db, containerdPID, 1)
+	requireSessionLeader(t, db, containerdPID, containerdPID)
+	requireEntryLeader(t, db, containerdPID, containerdPID, Init)
 
 	// containerd-shim-runc-v2
-	requireProcess(t, db, containerdShimPid, containerdShimPath)
-	requireParent(t, db, containerdShimPid, 1)
-	requireSessionLeader(t, db, containerdShimPid, containerdPid)
-	requireEntryLeader(t, db, containerdShimPid, containerdPid, Init)
+	requireProcess(t, db, containerdShimPID, containerdShimPath)
+	requireParent(t, db, containerdShimPID, 1)
+	requireSessionLeader(t, db, containerdShimPID, containerdPID)
+	requireEntryLeader(t, db, containerdShimPID, containerdPID, Init)
 
 	// pause
-	requireProcess(t, db, pausePid, pausePath)
-	requireParent(t, db, pausePid, containerdShimPid)
-	requireSessionLeader(t, db, pausePid, pausePid)
-	requireEntryLeader(t, db, pausePid, pausePid, Container)
+	requireProcess(t, db, pausePID, pausePath)
+	requireParent(t, db, pausePID, containerdShimPID)
+	requireSessionLeader(t, db, pausePID, pausePID)
+	requireEntryLeader(t, db, pausePID, pausePID, Container)
 }
 
 // /                       (pid, sid, entry meta, entry leader)
@@ -983,72 +983,72 @@ func TestInitSshdBashLsAndGrepGrepOnlyHasGroupLeader(t *testing.T) {
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	sshdPid := uint32(100)
-	bashPid := uint32(1000)
-	lsPid := uint32(1001)
-	grepPid := uint32(1002)
+	sshdPID := uint32(100)
+	bashPID := uint32(1000)
+	lsPID := uint32(1001)
+	grepPID := uint32(1002)
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: sshdPath,
-		Pids: types.PidInfo{
-			Tgid: sshdPid,
-			Sid:  sshdPid,
+		PIDs: types.PIDInfo{
+			Tgid: sshdPID,
+			Sid:  sshdPID,
 			Ppid: 1,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: bashPath,
-		Pids: types.PidInfo{
-			Tgid: bashPid,
-			Sid:  bashPid,
-			Ppid: sshdPid,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: sshdPID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: lsPath,
-		Pids: types.PidInfo{
-			Tgid: lsPid,
-			Sid:  bashPid,
-			Ppid: bashPid,
-			Pgid: lsPid,
+		PIDs: types.PIDInfo{
+			Tgid: lsPID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: lsPID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: grepPath,
-		Pids: types.PidInfo{
-			Tgid: grepPid,
-			Pgid: lsPid,
+		PIDs: types.PIDInfo{
+			Tgid: grepPID,
+			Pgid: lsPID,
 		},
 	})
 
 	// sshd
-	requireProcess(t, db, sshdPid, sshdPath)
-	requireParent(t, db, sshdPid, 1)
-	requireSessionLeader(t, db, sshdPid, sshdPid)
-	requireEntryLeader(t, db, sshdPid, sshdPid, Init)
+	requireProcess(t, db, sshdPID, sshdPath)
+	requireParent(t, db, sshdPID, 1)
+	requireSessionLeader(t, db, sshdPID, sshdPID)
+	requireEntryLeader(t, db, sshdPID, sshdPID, Init)
 
 	// bash
-	requireProcess(t, db, bashPid, bashPath)
-	requireParent(t, db, bashPid, sshdPid)
-	requireSessionLeader(t, db, bashPid, bashPid)
-	requireEntryLeader(t, db, bashPid, bashPid, Sshd)
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, sshdPID)
+	requireSessionLeader(t, db, bashPID, bashPID)
+	requireEntryLeader(t, db, bashPID, bashPID, Sshd)
 
 	// ls
-	requireProcess(t, db, lsPid, lsPath)
-	requireParent(t, db, lsPid, bashPid)
-	requireSessionLeader(t, db, lsPid, bashPid)
-	requireEntryLeader(t, db, lsPid, bashPid, Sshd)
+	requireProcess(t, db, lsPID, lsPath)
+	requireParent(t, db, lsPID, bashPID)
+	requireSessionLeader(t, db, lsPID, bashPID)
+	requireEntryLeader(t, db, lsPID, bashPID, Sshd)
 
 	// grep
-	grep, err := db.GetProcess(grepPid)
+	grep, err := db.GetProcess(grepPID)
 	require.Nil(t, err)
 	requireParentUnset(t, grep)
 
-	requireProcess(t, db, grepPid, grepPath)
-	requireEntryLeader(t, db, grepPid, bashPid, Sshd)
+	requireProcess(t, db, grepPID, grepPath)
+	requireEntryLeader(t, db, grepPID, bashPID, Sshd)
 }
 
 // /                       (pid, sid, entry meta, entry leader)
@@ -1069,73 +1069,73 @@ func TestInitSshdBashLsAndGrepGrepOnlyHasSessionLeader(t *testing.T) {
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	sshdPid := uint32(100)
-	bashPid := uint32(1000)
-	lsPid := uint32(1001)
-	grepPid := uint32(1002)
+	sshdPID := uint32(100)
+	bashPID := uint32(1000)
+	lsPID := uint32(1001)
+	grepPID := uint32(1002)
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: sshdPath,
-		Pids: types.PidInfo{
-			Tgid: sshdPid,
-			Sid:  sshdPid,
+		PIDs: types.PIDInfo{
+			Tgid: sshdPID,
+			Sid:  sshdPID,
 			Ppid: 1,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: bashPath,
-		Pids: types.PidInfo{
-			Tgid: bashPid,
-			Sid:  bashPid,
-			Ppid: sshdPid,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: sshdPID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: lsPath,
-		Pids: types.PidInfo{
-			Tgid: lsPid,
-			Sid:  bashPid,
-			Ppid: bashPid,
-			Pgid: lsPid,
+		PIDs: types.PIDInfo{
+			Tgid: lsPID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: lsPID,
 		},
 	})
 
 	insertForkAndExec(t, db, types.ProcessExecEvent{
 		Filename: grepPath,
-		Pids: types.PidInfo{
-			Tgid: grepPid,
-			Sid:  bashPid,
+		PIDs: types.PIDInfo{
+			Tgid: grepPID,
+			Sid:  bashPID,
 		},
 	})
 
 	// sshd
-	requireProcess(t, db, sshdPid, sshdPath)
-	requireParent(t, db, sshdPid, 1)
-	requireSessionLeader(t, db, sshdPid, sshdPid)
-	requireEntryLeader(t, db, sshdPid, sshdPid, Init)
+	requireProcess(t, db, sshdPID, sshdPath)
+	requireParent(t, db, sshdPID, 1)
+	requireSessionLeader(t, db, sshdPID, sshdPID)
+	requireEntryLeader(t, db, sshdPID, sshdPID, Init)
 
 	// bash
-	requireProcess(t, db, bashPid, bashPath)
-	requireParent(t, db, bashPid, sshdPid)
-	requireSessionLeader(t, db, bashPid, bashPid)
-	requireEntryLeader(t, db, bashPid, bashPid, Sshd)
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, sshdPID)
+	requireSessionLeader(t, db, bashPID, bashPID)
+	requireEntryLeader(t, db, bashPID, bashPID, Sshd)
 
 	// ls
-	requireProcess(t, db, lsPid, lsPath)
-	requireParent(t, db, lsPid, bashPid)
-	requireSessionLeader(t, db, lsPid, bashPid)
-	requireEntryLeader(t, db, lsPid, bashPid, Sshd)
+	requireProcess(t, db, lsPID, lsPath)
+	requireParent(t, db, lsPID, bashPID)
+	requireSessionLeader(t, db, lsPID, bashPID)
+	requireEntryLeader(t, db, lsPID, bashPID, Sshd)
 
 	// grep
-	grep, err := db.GetProcess(grepPid)
+	grep, err := db.GetProcess(grepPID)
 	require.Nil(t, err)
 	requireParentUnset(t, grep)
 
-	requireProcess(t, db, grepPid, grepPath)
-	requireSessionLeader(t, db, grepPid, bashPid)
-	requireEntryLeader(t, db, grepPid, bashPid, Sshd)
+	requireProcess(t, db, grepPID, grepPath)
+	requireSessionLeader(t, db, grepPID, bashPID)
+	requireEntryLeader(t, db, grepPID, bashPID, Sshd)
 }
 
 // /     (pid, sid, entry meta, entry leader)
@@ -1150,24 +1150,24 @@ func TestGrepInIsolation(t *testing.T) {
 	db := NewDB(reader, *logger)
 	db.ScrapeProcfs()
 
-	grepPid := uint32(1001)
+	grepPID := uint32(1001)
 
 	db.InsertExec(types.ProcessExecEvent{
 		Filename: grepPath,
-		Pids: types.PidInfo{
-			Tgid: grepPid,
+		PIDs: types.PIDInfo{
+			Tgid: grepPID,
 			Ppid: 1000,
-			Sid:  grepPid,
+			Sid:  grepPID,
 		},
 	})
 
-	process, err := db.GetProcess(grepPid)
+	process, err := db.GetProcess(grepPID)
 	require.Nil(t, err)
 	requireParentUnset(t, process)
 
-	requireProcess(t, db, grepPid, grepPath)
-	requireSessionLeader(t, db, grepPid, grepPid)
-	requireEntryLeader(t, db, grepPid, grepPid, EntryUnknown)
+	requireProcess(t, db, grepPID, grepPath)
+	requireSessionLeader(t, db, grepPID, grepPID)
+	requireEntryLeader(t, db, grepPID, grepPID, EntryUnknown)
 }
 
 // /                              (pid, sid, entry meta, entry leader)
@@ -1181,16 +1181,16 @@ func TestKernelThreads(t *testing.T) {
 	reader := procfs.NewMockReader()
 	db := NewDB(reader, *logger)
 
-	kthreaddPid := uint32(2)
-	rcuGpPid := uint32(3)
+	kthreaddPID := uint32(2)
+	rcuGpPID := uint32(3)
 
 	kthreaddPath := "kthreadd"
 	rcuGpPath := "rcu_gp"
 
 	db.InsertExec(types.ProcessExecEvent{
 		Filename: kthreaddPath,
-		Pids: types.PidInfo{
-			Tgid: kthreaddPid,
+		PIDs: types.PIDInfo{
+			Tgid: kthreaddPID,
 			Ppid: 1,
 			Sid:  0,
 		},
@@ -1198,28 +1198,28 @@ func TestKernelThreads(t *testing.T) {
 
 	db.InsertExec(types.ProcessExecEvent{
 		Filename: rcuGpPath,
-		Pids: types.PidInfo{
-			Tgid: rcuGpPid,
-			Ppid: kthreaddPid,
+		PIDs: types.PIDInfo{
+			Tgid: rcuGpPID,
+			Ppid: kthreaddPID,
 			Sid:  0,
 		},
 	})
 
 	// kthreadd
-	kthreadd, err := db.GetProcess(kthreaddPid)
+	kthreadd, err := db.GetProcess(kthreaddPID)
 	require.Nil(t, err)
 	requireParentUnset(t, kthreadd)
 	requireSessionLeaderUnset(t, kthreadd)
 	requireEntryLeaderUnset(t, kthreadd)
 
-	requireProcess(t, db, kthreaddPid, kthreaddPath)
+	requireProcess(t, db, kthreaddPID, kthreaddPath)
 
 	// rcu_gp
-	rcuGp, err := db.GetProcess(rcuGpPid)
+	rcuGp, err := db.GetProcess(rcuGpPID)
 	require.Nil(t, err)
 	requireSessionLeaderUnset(t, rcuGp)
 	requireEntryLeaderUnset(t, rcuGp)
 
-	requireProcess(t, db, rcuGpPid, rcuGpPath)
-	requireParent(t, db, rcuGpPid, kthreaddPid)
+	requireProcess(t, db, rcuGpPID, rcuGpPath)
+	requireParent(t, db, rcuGpPID, kthreaddPID)
 }

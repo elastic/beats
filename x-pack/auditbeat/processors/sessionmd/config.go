@@ -10,13 +10,13 @@ package sessionmd
 type Config struct {
 	Backend       string `config:"backend"`
 	ReplaceFields bool   `config:"replace_fields"`
-	PidField      string `config:"pid_field"`
+	PIDField      string `config:"pid_field"`
 }
 
 func defaultConfig() Config {
 	return Config{
 		Backend:       "auto",
 		ReplaceFields: false,
-		PidField:      "process.pid",
+		PIDField:      "process.pid",
 	}
 }

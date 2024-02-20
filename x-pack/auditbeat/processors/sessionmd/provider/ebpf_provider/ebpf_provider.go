@@ -63,21 +63,21 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 					continue
 				}
 				pe := types.ProcessForkEvent{
-					ParentPids: types.PidInfo{
+					ParentPIDs: types.PIDInfo{
 						Tid:         body.ParentPids.Tid,
 						Tgid:        body.ParentPids.Tgid,
 						Ppid:        body.ParentPids.Ppid,
 						Pgid:        body.ParentPids.Pgid,
 						Sid:         body.ParentPids.Sid,
-						StartTimeNs: body.ParentPids.StartTimeNs,
+						StartTimeNS: body.ParentPids.StartTimeNs,
 					},
-					ChildPids: types.PidInfo{
+					ChildPIDs: types.PIDInfo{
 						Tid:         body.ChildPids.Tid,
 						Tgid:        body.ChildPids.Tgid,
 						Ppid:        body.ChildPids.Ppid,
 						Pgid:        body.ChildPids.Pgid,
 						Sid:         body.ChildPids.Sid,
-						StartTimeNs: body.ChildPids.StartTimeNs,
+						StartTimeNS: body.ChildPids.StartTimeNs,
 					},
 					Creds: types.CredInfo{
 						Ruid:         body.Creds.Ruid,
@@ -98,13 +98,13 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 					continue
 				}
 				pe := types.ProcessExecEvent{
-					Pids: types.PidInfo{
+					PIDs: types.PIDInfo{
 						Tid:         body.Pids.Tid,
 						Tgid:        body.Pids.Tgid,
 						Ppid:        body.Pids.Ppid,
 						Pgid:        body.Pids.Pgid,
 						Sid:         body.Pids.Sid,
-						StartTimeNs: body.Pids.StartTimeNs,
+						StartTimeNS: body.Pids.StartTimeNs,
 					},
 					Creds: types.CredInfo{
 						Ruid:         body.Creds.Ruid,
@@ -116,11 +116,11 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 						CapPermitted: body.Creds.CapPermitted,
 						CapEffective: body.Creds.CapEffective,
 					},
-					CTty: types.TtyDev{
+					CTTY: types.TTYDev{
 						Major: body.CTTY.Major,
 						Minor: body.CTTY.Minor,
 					},
-					Cwd:      body.Cwd,
+					CWD:      body.Cwd,
 					Argv:     body.Argv,
 					Env:      body.Env,
 					Filename: body.Filename,
@@ -133,13 +133,13 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 					continue
 				}
 				pe := types.ProcessExitEvent{
-					Pids: types.PidInfo{
+					PIDs: types.PIDInfo{
 						Tid:         body.Pids.Tid,
 						Tgid:        body.Pids.Tgid,
 						Ppid:        body.Pids.Ppid,
 						Pgid:        body.Pids.Pgid,
 						Sid:         body.Pids.Sid,
-						StartTimeNs: body.Pids.StartTimeNs,
+						StartTimeNS: body.Pids.StartTimeNs,
 					},
 					ExitCode: body.ExitCode,
 				}

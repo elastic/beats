@@ -19,11 +19,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func MajorTty(ttyNr uint32) uint16 {
+func MajorTTY(ttyNr uint32) uint16 {
 	return uint16((ttyNr >> 8) & 0xf)
 }
 
-func MinorTty(ttyNr uint32) uint16 {
+func MinorTTY(ttyNr uint32) uint16 {
 	return uint16(((ttyNr & 0xfff00000) >> 20) | (ttyNr & 0xff))
 }
 
@@ -46,9 +46,9 @@ func NewProcfsReader(logger logp.Logger) ProcfsReader {
 type Stat procfs.ProcStat
 
 type ProcessInfo struct {
-	Pids       types.PidInfo
+	PIDs       types.PIDInfo
 	Creds      types.CredInfo
-	CTty       types.TtyDev
+	CTTY       types.TTYDev
 	Argv       []string
 	Cwd        string
 	Env        map[string]string
@@ -179,8 +179,8 @@ func (r ProcfsReader) getProcessInfo(proc procfs.Proc) (ProcessInfo, error) {
 
 	startTimeNs := timeutils.TicksToNs(stat.Starttime)
 	return ProcessInfo{
-		Pids: types.PidInfo{
-			StartTimeNs: startTimeNs,
+		PIDs: types.PIDInfo{
+			StartTimeNS: startTimeNs,
 			Tid:         pid,
 			Tgid:        pid,
 			Ppid:        uint32(stat.PPID),
@@ -188,9 +188,9 @@ func (r ProcfsReader) getProcessInfo(proc procfs.Proc) (ProcessInfo, error) {
 			Sid:         uint32(stat.Session),
 		},
 		Creds: creds,
-		CTty: types.TtyDev{
-			Major: MajorTty(uint32(stat.TTY)),
-			Minor: MinorTty(uint32(stat.TTY)),
+		CTTY: types.TTYDev{
+			Major: MajorTTY(uint32(stat.TTY)),
+			Minor: MinorTTY(uint32(stat.TTY)),
 		},
 		Cwd:        cwd,
 		Argv:       argv,

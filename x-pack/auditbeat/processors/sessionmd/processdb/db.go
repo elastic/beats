@@ -10,7 +10,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
-	"math/bits"
 	"os"
 	"path"
 	"slices"
@@ -20,19 +19,20 @@ import (
 	"sync"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/timeutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-type TtyType int
+type TTYType int
 
 const (
-	TtyUnknown TtyType = iota
+	TTYUnknown TTYType = iota
 	Pts
-	Tty
-	TtyConsole
+	TTY
+	TTYConsole
 )
 
 type EntryType string
@@ -74,9 +74,9 @@ const (
 )
 
 type Process struct {
-	Pids     types.PidInfo
+	PIDs     types.PIDInfo
 	Creds    types.CredInfo
-	CTty     types.TtyDev
+	CTTY     types.TTYDev
 	Argv     []string
 	Cwd      string
 	Env      map[string]string
@@ -87,77 +87,7 @@ var (
 	// The contents of these two files are needed to calculate entity IDs.
 	// Fail fast on startup if we can't read them.
 	bootID     = mustReadBootID()
-	pidNsInode = mustReadPidNsInode()
-	capNames   = [...]string{
-		0:  "CAP_CHOWN",
-		1:  "CAP_DAC_OVERRIDE",
-		2:  "CAP_DAC_READ_SEARCH",
-		3:  "CAP_FOWNER",
-		4:  "CAP_FSETID",
-		5:  "CAP_KILL",
-		6:  "CAP_SETGID",
-		7:  "CAP_SETUID",
-		8:  "CAP_SETPCAP",
-		9:  "CAP_LINUX_IMMUTABLE",
-		10: "CAP_NET_BIND_SERVICE",
-		11: "CAP_NET_BROADCAST",
-		12: "CAP_NET_ADMIN",
-		13: "CAP_NET_RAW",
-		14: "CAP_IPC_LOCK",
-		15: "CAP_IPC_OWNER",
-		16: "CAP_SYS_MODULE",
-		17: "CAP_SYS_RAWIO",
-		18: "CAP_SYS_CHROOT",
-		19: "CAP_SYS_PTRACE",
-		20: "CAP_SYS_PACCT",
-		21: "CAP_SYS_ADMIN",
-		22: "CAP_SYS_BOOT",
-		23: "CAP_SYS_NICE",
-		24: "CAP_SYS_RESOURCE",
-		25: "CAP_SYS_TIME",
-		26: "CAP_SYS_TTY_CONFIG",
-		27: "CAP_MKNOD",
-		28: "CAP_LEASE",
-		29: "CAP_AUDIT_WRITE",
-		30: "CAP_AUDIT_CONTROL",
-		31: "CAP_SETFCAP",
-		32: "CAP_MAC_OVERRIDE",
-		33: "CAP_MAC_ADMIN",
-		34: "CAP_SYSLOG",
-		35: "CAP_WAKE_ALARM",
-		36: "CAP_BLOCK_SUSPEND",
-		37: "CAP_AUDIT_READ",
-		38: "CAP_PERFMON",
-		39: "CAP_BPF",
-		40: "CAP_CHECKPOINT_RESTORE",
-		// The ECS spec allows for numerical string representation.
-		// The following capability values are not assigned as of Dec 28, 2023.
-		// If they are added in a future kernel, and this slice has not been
-		// updated, the numerical string will used.
-		41: "41",
-		42: "42",
-		43: "43",
-		44: "44",
-		45: "45",
-		46: "46",
-		47: "47",
-		48: "48",
-		49: "49",
-		50: "50",
-		51: "51",
-		52: "52",
-		53: "53",
-		54: "54",
-		55: "55",
-		56: "56",
-		57: "57",
-		58: "58",
-		59: "59",
-		60: "60",
-		61: "61",
-		62: "62",
-		63: "63",
-	}
+	pidNsInode = mustReadPIDNsInode()
 )
 
 func mustReadBootID() string {
@@ -169,7 +99,7 @@ func mustReadBootID() string {
 	return strings.TrimRight(string(bootID), "\n")
 }
 
-func mustReadPidNsInode() uint64 {
+func mustReadPIDNsInode() uint64 {
 	var ret uint64
 
 	pidNsInodeRaw, err := os.Readlink("/proc/self/ns/pid")
@@ -184,9 +114,9 @@ func mustReadPidNsInode() uint64 {
 	return ret
 }
 
-func pidInfoFromProto(p types.PidInfo) types.PidInfo {
-	return types.PidInfo{
-		StartTimeNs: p.StartTimeNs,
+func pidInfoFromProto(p types.PIDInfo) types.PIDInfo {
+	return types.PIDInfo{
+		StartTimeNS: p.StartTimeNS,
 		Tid:         p.Tid,
 		Tgid:        p.Tgid,
 		Vpid:        p.Vpid,
@@ -209,8 +139,8 @@ func credInfoFromProto(p types.CredInfo) types.CredInfo {
 	}
 }
 
-func ttyTermiosFromProto(p types.TtyTermios) types.TtyTermios {
-	return types.TtyTermios{
+func ttyTermiosFromProto(p types.TTYTermios) types.TTYTermios {
+	return types.TTYTermios{
 		CIflag: p.CIflag,
 		COflag: p.COflag,
 		CLflag: p.CLflag,
@@ -218,15 +148,15 @@ func ttyTermiosFromProto(p types.TtyTermios) types.TtyTermios {
 	}
 }
 
-func ttyWinsizeFromProto(p types.TtyWinsize) types.TtyWinsize {
-	return types.TtyWinsize{
+func ttyWinsizeFromProto(p types.TTYWinsize) types.TTYWinsize {
+	return types.TTYWinsize{
 		Rows: p.Rows,
 		Cols: p.Cols,
 	}
 }
 
-func ttyDevFromProto(p types.TtyDev) types.TtyDev {
-	return types.TtyDev{
+func ttyDevFromProto(p types.TTYDev) types.TTYDev {
+	return types.TTYDev{
 		Major:   p.Major,
 		Minor:   p.Minor,
 		Winsize: ttyWinsizeFromProto(p.Winsize),
@@ -280,32 +210,32 @@ func (db *DB) InsertFork(fork types.ProcessForkEvent) {
 	db.Lock()
 	defer db.Unlock()
 
-	pid := fork.ChildPids.Tgid
-	ppid := fork.ParentPids.Tgid
+	pid := fork.ChildPIDs.Tgid
+	ppid := fork.ParentPIDs.Tgid
 	if entry, ok := db.processes[ppid]; ok {
-		entry.Pids = pidInfoFromProto(fork.ChildPids)
+		entry.PIDs = pidInfoFromProto(fork.ChildPIDs)
 		entry.Creds = credInfoFromProto(fork.Creds)
 		db.processes[pid] = entry
-		if entryPid, ok := db.entryLeaderRelationships[ppid]; ok {
-			db.entryLeaderRelationships[pid] = entryPid
+		if entryPID, ok := db.entryLeaderRelationships[ppid]; ok {
+			db.entryLeaderRelationships[pid] = entryPID
 		}
 	} else {
 		db.processes[pid] = Process{
-			Pids:  pidInfoFromProto(fork.ChildPids),
+			PIDs:  pidInfoFromProto(fork.ChildPIDs),
 			Creds: credInfoFromProto(fork.Creds),
 		}
 	}
 }
 
 func (db *DB) insertProcess(process Process) {
-	pid := process.Pids.Tgid
+	pid := process.PIDs.Tgid
 	db.processes[pid] = process
-	entryLeaderPid := db.evaluateEntryLeader(process)
-	if entryLeaderPid != nil {
-		db.entryLeaderRelationships[pid] = *entryLeaderPid
-		db.logger.Debugf("%v name: %s, entry_leader: %d, entry_type: %s", process.Pids, process.Filename, *entryLeaderPid, string(db.entryLeaders[*entryLeaderPid]))
+	entryLeaderPID := db.evaluateEntryLeader(process)
+	if entryLeaderPID != nil {
+		db.entryLeaderRelationships[pid] = *entryLeaderPID
+		db.logger.Debugf("%v name: %s, entry_leader: %d, entry_type: %s", process.PIDs, process.Filename, *entryLeaderPID, string(db.entryLeaders[*entryLeaderPID]))
 	} else {
-		db.logger.Debugf("%v name: %s, NO ENTRY LEADER", process.Pids, process.Filename)
+		db.logger.Debugf("%v name: %s, NO ENTRY LEADER", process.PIDs, process.Filename)
 	}
 }
 
@@ -314,19 +244,19 @@ func (db *DB) InsertExec(exec types.ProcessExecEvent) {
 	defer db.Unlock()
 
 	proc := Process{
-		Pids:     pidInfoFromProto(exec.Pids),
+		PIDs:     pidInfoFromProto(exec.PIDs),
 		Creds:    credInfoFromProto(exec.Creds),
-		CTty:     ttyDevFromProto(exec.CTty),
+		CTTY:     ttyDevFromProto(exec.CTTY),
 		Argv:     exec.Argv,
-		Cwd:      exec.Cwd,
+		Cwd:      exec.CWD,
 		Env:      exec.Env,
 		Filename: exec.Filename,
 	}
 
-	db.processes[exec.Pids.Tgid] = proc
-	entryLeaderPid := db.evaluateEntryLeader(proc)
-	if entryLeaderPid != nil {
-		db.entryLeaderRelationships[exec.Pids.Tgid] = *entryLeaderPid
+	db.processes[exec.PIDs.Tgid] = proc
+	entryLeaderPID := db.evaluateEntryLeader(proc)
+	if entryLeaderPID != nil {
+		db.entryLeaderRelationships[exec.PIDs.Tgid] = *entryLeaderPID
 	}
 }
 
@@ -337,60 +267,60 @@ func (db *DB) createEntryLeader(pid uint32, entryType EntryType) {
 
 // pid returned is a pointer type because its possible for no
 func (db *DB) evaluateEntryLeader(p Process) *uint32 {
-	pid := p.Pids.Tgid
+	pid := p.PIDs.Tgid
 
 	// init never has an entry leader or meta type
-	if p.Pids.Tgid == 1 {
-		db.logger.Debugf("entry_eval %d: process is init, no entry type", p.Pids.Tgid)
+	if p.PIDs.Tgid == 1 {
+		db.logger.Debugf("entry_eval %d: process is init, no entry type", p.PIDs.Tgid)
 		return nil
 	}
 
 	// kernel threads also never have an entry leader or meta type kthreadd
 	// (always pid 2) is the parent of all kernel threads, by filtering pid ==
 	// 2 || ppid == 2, we get rid of all of them
-	if p.Pids.Tgid == 2 || p.Pids.Ppid == 2 {
-		db.logger.Debugf("entry_eval %d: kernel threads never an entry type (parent is pid 2)", p.Pids.Tgid)
+	if p.PIDs.Tgid == 2 || p.PIDs.Ppid == 2 {
+		db.logger.Debugf("entry_eval %d: kernel threads never an entry type (parent is pid 2)", p.PIDs.Tgid)
 		return nil
 	}
 
 	// could be an entry leader
-	if p.Pids.Tgid == p.Pids.Sid {
-		ttyType := getTtyType(p.CTty.Major, p.CTty.Minor)
+	if p.PIDs.Tgid == p.PIDs.Sid {
+		ttyType := getTTYType(p.CTTY.Major, p.CTTY.Minor)
 
 		procBasename := basename(p.Filename)
 		switch {
-		case ttyType == Tty:
+		case ttyType == TTY:
 			db.createEntryLeader(pid, Terminal)
-			db.logger.Debugf("entry_eval %d: entry type is terminal", p.Pids.Tgid)
+			db.logger.Debugf("entry_eval %d: entry type is terminal", p.PIDs.Tgid)
 			return &pid
-		case ttyType == TtyConsole && procBasename == "login":
+		case ttyType == TTYConsole && procBasename == "login":
 			db.createEntryLeader(pid, EntryConsole)
-			db.logger.Debugf("entry_eval %d: entry type is console", p.Pids.Tgid)
+			db.logger.Debugf("entry_eval %d: entry type is console", p.PIDs.Tgid)
 			return &pid
-		case p.Pids.Ppid == 1:
+		case p.PIDs.Ppid == 1:
 			db.createEntryLeader(pid, Init)
-			db.logger.Debugf("entry_eval %d: entry type is init", p.Pids.Tgid)
+			db.logger.Debugf("entry_eval %d: entry type is init", p.PIDs.Tgid)
 			return &pid
 		case !isFilteredExecutable(procBasename):
-			if parent, ok := db.processes[p.Pids.Ppid]; ok {
+			if parent, ok := db.processes[p.PIDs.Ppid]; ok {
 				parentBasename := basename(parent.Filename)
 				if ttyType == Pts && parentBasename == "ssm-session-worker" {
 					db.createEntryLeader(pid, Ssm)
-					db.logger.Debugf("entry_eval %d: entry type is ssm", p.Pids.Tgid)
+					db.logger.Debugf("entry_eval %d: entry type is ssm", p.PIDs.Tgid)
 					return &pid
 				} else if parentBasename == "sshd" && procBasename != "sshd" {
 					// TODO: get ip from env vars
 					db.createEntryLeader(pid, Sshd)
-					db.logger.Debugf("entry_eval %d: entry type is sshd", p.Pids.Tgid)
+					db.logger.Debugf("entry_eval %d: entry type is sshd", p.PIDs.Tgid)
 					return &pid
 				} else if isContainerRuntime(parentBasename) {
 					db.createEntryLeader(pid, Container)
-					db.logger.Debugf("entry_eval %d: entry type is container", p.Pids.Tgid)
+					db.logger.Debugf("entry_eval %d: entry type is container", p.PIDs.Tgid)
 					return &pid
 				}
 			}
 		default:
-			db.logger.Debugf("entry_eval %d: is a filtered executable: %s", p.Pids.Tgid, procBasename)
+			db.logger.Debugf("entry_eval %d: is a filtered executable: %s", p.PIDs.Tgid, procBasename)
 		}
 	}
 
@@ -401,15 +331,15 @@ func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 		name string
 	}{
 		{
-			pid:  p.Pids.Ppid,
+			pid:  p.PIDs.Ppid,
 			name: "parent",
 		},
 		{
-			pid:  p.Pids.Sid,
+			pid:  p.PIDs.Sid,
 			name: "session_leader",
 		},
 		{
-			pid:  p.Pids.Pgid,
+			pid:  p.PIDs.Pgid,
 			name: "group_leader",
 		},
 	}
@@ -417,22 +347,22 @@ func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 	for _, relation := range relations {
 		if entry, ok := db.entryLeaderRelationships[relation.pid]; ok {
 			entryType := db.entryLeaders[entry]
-			db.logger.Debugf("entry_eval %d: got entry_leader: %d (%s), from relative: %d (%s)", p.Pids.Tgid, entry, string(entryType), relation.pid, relation.name)
+			db.logger.Debugf("entry_eval %d: got entry_leader: %d (%s), from relative: %d (%s)", p.PIDs.Tgid, entry, string(entryType), relation.pid, relation.name)
 			return &entry
 		} else {
-			db.logger.Debugf("entry_eval %d: failed to find relative: %d (%s)", p.Pids.Tgid, relation.pid, relation.name)
+			db.logger.Debugf("entry_eval %d: failed to find relative: %d (%s)", p.PIDs.Tgid, relation.pid, relation.name)
 		}
 	}
 
 	// if it's a session leader, then make it its own entry leader with unknown
 	// entry type
-	if p.Pids.Tgid == p.Pids.Sid {
+	if p.PIDs.Tgid == p.PIDs.Sid {
 		db.createEntryLeader(pid, EntryUnknown)
-		db.logger.Debugf("entry_eval %d: this is a session leader and no relative has an entry leader. entry type is unknown", p.Pids.Tgid)
+		db.logger.Debugf("entry_eval %d: this is a session leader and no relative has an entry leader. entry type is unknown", p.PIDs.Tgid)
 		return &pid
 	}
 
-	db.logger.Debugf("entry_eval %d: this is not a session leader and no relative has an entry leader, entry_leader will be unset", p.Pids.Tgid)
+	db.logger.Debugf("entry_eval %d: this is not a session leader and no relative has an entry leader, entry_leader will be unset", p.PIDs.Tgid)
 	return nil
 }
 
@@ -440,12 +370,12 @@ func (db *DB) InsertSetsid(setsid types.ProcessSetsidEvent) {
 	db.Lock()
 	defer db.Unlock()
 
-	if entry, ok := db.processes[setsid.Pids.Tgid]; ok {
-		entry.Pids = pidInfoFromProto(setsid.Pids)
-		db.processes[setsid.Pids.Tgid] = entry
+	if entry, ok := db.processes[setsid.PIDs.Tgid]; ok {
+		entry.PIDs = pidInfoFromProto(setsid.PIDs)
+		db.processes[setsid.PIDs.Tgid] = entry
 	} else {
-		db.processes[setsid.Pids.Tgid] = Process{
-			Pids: pidInfoFromProto(setsid.Pids),
+		db.processes[setsid.PIDs.Tgid] = Process{
+			PIDs: pidInfoFromProto(setsid.PIDs),
 		}
 	}
 }
@@ -454,36 +384,22 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	db.Lock()
 	defer db.Unlock()
 
-	pid := exit.Pids.Tgid
+	pid := exit.PIDs.Tgid
 	delete(db.processes, pid)
 	delete(db.entryLeaders, pid)
 	delete(db.entryLeaderRelationships, pid)
 }
 
-// TODO: is this the correct definition? I looked in endpoint and I swear it looks too simple/generalized
-func interactiveFromTty(tty types.TtyDev) bool {
-	return TtyUnknown != getTtyType(tty.Major, tty.Minor)
-}
-
-func ecsCapsFromU64(capabilities uint64) []string {
-	var ecsCaps []string
-	if c := bits.OnesCount64(capabilities); c > 0 {
-		ecsCaps = make([]string, 0, c)
-	}
-	for bitnum := 0; bitnum < 64; bitnum++ {
-		if (capabilities & (1 << bitnum)) > 0 {
-			ecsCaps = append(ecsCaps, capNames[bitnum])
-		}
-	}
-	return ecsCaps
+func interactiveFromTTY(tty types.TTYDev) bool {
+	return TTYUnknown != getTTYType(tty.Major, tty.Minor)
 }
 
 func fullProcessFromDBProcess(p Process) types.Process {
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(p.Pids.StartTimeNs)
-	interactive := interactiveFromTty(p.CTty)
+	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(p.PIDs.StartTimeNS)
+	interactive := interactiveFromTTY(p.CTTY)
 
 	ret := types.Process{
-		PID:              p.Pids.Tgid,
+		PID:              p.PIDs.Tgid,
 		Start:            timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime),
 		Name:             basename(p.Filename),
 		Executable:       p.Filename,
@@ -496,19 +412,19 @@ func fullProcessFromDBProcess(p Process) types.Process {
 	egid := p.Creds.Egid
 	ret.User.ID = strconv.FormatUint(uint64(euid), 10)
 	ret.Group.ID = strconv.FormatUint(uint64(egid), 10)
-	ret.Thread.Capabilities.Permitted = ecsCapsFromU64(p.Creds.CapPermitted)
-	ret.Thread.Capabilities.Effective = ecsCapsFromU64(p.Creds.CapEffective)
+	ret.Thread.Capabilities.Permitted, _ = capabilities.FromUint64(p.Creds.CapPermitted)
+	ret.Thread.Capabilities.Effective, _ = capabilities.FromUint64(p.Creds.CapEffective)
 
 	return ret
 }
 
 func fillParent(process *types.Process, parent Process) {
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(parent.Pids.StartTimeNs)
+	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(parent.PIDs.StartTimeNS)
 
-	interactive := interactiveFromTty(parent.CTty)
+	interactive := interactiveFromTTY(parent.CTTY)
 	euid := parent.Creds.Euid
 	egid := parent.Creds.Egid
-	process.Parent.PID = parent.Pids.Tgid
+	process.Parent.PID = parent.PIDs.Tgid
 	process.Parent.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
 	process.Parent.Name = basename(parent.Filename)
 	process.Parent.Executable = parent.Filename
@@ -520,12 +436,12 @@ func fillParent(process *types.Process, parent Process) {
 }
 
 func fillGroupLeader(process *types.Process, groupLeader Process) {
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(groupLeader.Pids.StartTimeNs)
+	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(groupLeader.PIDs.StartTimeNS)
 
-	interactive := interactiveFromTty(groupLeader.CTty)
+	interactive := interactiveFromTTY(groupLeader.CTTY)
 	euid := groupLeader.Creds.Euid
 	egid := groupLeader.Creds.Egid
-	process.GroupLeader.PID = groupLeader.Pids.Tgid
+	process.GroupLeader.PID = groupLeader.PIDs.Tgid
 	process.GroupLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
 	process.GroupLeader.Name = basename(groupLeader.Filename)
 	process.GroupLeader.Executable = groupLeader.Filename
@@ -537,12 +453,12 @@ func fillGroupLeader(process *types.Process, groupLeader Process) {
 }
 
 func fillSessionLeader(process *types.Process, sessionLeader Process) {
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(sessionLeader.Pids.StartTimeNs)
+	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(sessionLeader.PIDs.StartTimeNS)
 
-	interactive := interactiveFromTty(sessionLeader.CTty)
+	interactive := interactiveFromTTY(sessionLeader.CTTY)
 	euid := sessionLeader.Creds.Euid
 	egid := sessionLeader.Creds.Egid
-	process.SessionLeader.PID = sessionLeader.Pids.Tgid
+	process.SessionLeader.PID = sessionLeader.PIDs.Tgid
 	process.SessionLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
 	process.SessionLeader.Name = basename(sessionLeader.Filename)
 	process.SessionLeader.Executable = sessionLeader.Filename
@@ -554,12 +470,12 @@ func fillSessionLeader(process *types.Process, sessionLeader Process) {
 }
 
 func fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Process) {
-	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(entryLeader.Pids.StartTimeNs)
+	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(entryLeader.PIDs.StartTimeNS)
 
-	interactive := interactiveFromTty(entryLeader.CTty)
+	interactive := interactiveFromTTY(entryLeader.CTTY)
 	euid := entryLeader.Creds.Euid
 	egid := entryLeader.Creds.Egid
-	process.EntryLeader.PID = entryLeader.Pids.Tgid
+	process.EntryLeader.PID = entryLeader.PIDs.Tgid
 	process.EntryLeader.Start = timeutils.TimeFromNsSinceBoot(reducedPrecisionStartTime)
 	process.EntryLeader.Name = basename(entryLeader.Filename)
 	process.EntryLeader.Executable = entryLeader.Filename
@@ -622,24 +538,24 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 
 	ret := fullProcessFromDBProcess(process)
 
-	if parent, ok := db.processes[process.Pids.Ppid]; ok {
+	if parent, ok := db.processes[process.PIDs.Ppid]; ok {
 		fillParent(&ret, parent)
 	}
 
-	if groupLeader, ok := db.processes[process.Pids.Pgid]; ok {
+	if groupLeader, ok := db.processes[process.PIDs.Pgid]; ok {
 		fillGroupLeader(&ret, groupLeader)
 	}
 
-	if sessionLeader, ok := db.processes[process.Pids.Sid]; ok {
+	if sessionLeader, ok := db.processes[process.PIDs.Sid]; ok {
 		fillSessionLeader(&ret, sessionLeader)
 	}
 
-	if entryLeaderPid, foundEntryLeaderPid := db.entryLeaderRelationships[process.Pids.Tgid]; foundEntryLeaderPid {
-		if entryLeader, foundEntryLeader := db.processes[entryLeaderPid]; foundEntryLeader {
+	if entryLeaderPID, foundEntryLeaderPID := db.entryLeaderRelationships[process.PIDs.Tgid]; foundEntryLeaderPID {
+		if entryLeader, foundEntryLeader := db.processes[entryLeaderPID]; foundEntryLeader {
 			// if there is an entry leader then there is a matching member in the entryLeaders table
-			fillEntryLeader(&ret, db.entryLeaders[entryLeaderPid], entryLeader)
+			fillEntryLeader(&ret, db.entryLeaders[entryLeaderPID], entryLeader)
 		} else {
-			db.logger.Errorf("failed to find entry leader entry %d for %d (%s)", entryLeaderPid, pid, db.processes[pid].Filename)
+			db.logger.Errorf("failed to find entry leader entry %d for %d (%s)", entryLeaderPID, pid, db.processes[pid].Filename)
 		}
 	} else {
 		db.logger.Errorf("failed to find entry leader for %d (%s)", pid, db.processes[pid].Filename)
@@ -674,17 +590,17 @@ func (db *DB) ScrapeProcfs() []uint32 {
 	// sorting the slice to make sure that parents, session leaders, group
 	// leaders come first in the queue
 	sort.Slice(procs, func(i, j int) bool {
-		return procs[i].Pids.Tgid == procs[j].Pids.Ppid ||
-			procs[i].Pids.Tgid == procs[j].Pids.Sid ||
-			procs[i].Pids.Tgid == procs[j].Pids.Pgid
+		return procs[i].PIDs.Tgid == procs[j].PIDs.Ppid ||
+			procs[i].PIDs.Tgid == procs[j].PIDs.Sid ||
+			procs[i].PIDs.Tgid == procs[j].PIDs.Pgid
 	})
 
 	pids := make([]uint32, 0)
 	for _, procInfo := range procs {
 		process := Process{
-			Pids:     pidInfoFromProto(procInfo.Pids),
+			PIDs:     pidInfoFromProto(procInfo.PIDs),
 			Creds:    credInfoFromProto(procInfo.Creds),
-			CTty:     ttyDevFromProto(procInfo.CTty),
+			CTTY:     ttyDevFromProto(procInfo.CTTY),
 			Argv:     procInfo.Argv,
 			Cwd:      procInfo.Cwd,
 			Env:      procInfo.Env,
@@ -692,7 +608,7 @@ func (db *DB) ScrapeProcfs() []uint32 {
 		}
 
 		db.insertProcess(process)
-		pids = append(pids, process.Pids.Tgid)
+		pids = append(pids, process.PIDs.Tgid)
 	}
 
 	return pids
@@ -718,18 +634,18 @@ func isFilteredExecutable(executable string) bool {
 	return stringStartsWithEntryInList(executable, filteredExecutables[:])
 }
 
-func getTtyType(major uint16, minor uint16) TtyType {
+func getTTYType(major uint16, minor uint16) TTYType {
 	if major >= ptsMinMajor && major <= ptsMaxMajor {
 		return Pts
 	}
 
 	if ttyMajor == major {
 		if minor <= consoleMaxMinor {
-			return TtyConsole
+			return TTYConsole
 		} else if minor > consoleMaxMinor && minor <= ttyMaxMinor {
-			return Tty
+			return TTY
 		}
 	}
 
-	return TtyUnknown
+	return TTYUnknown
 }

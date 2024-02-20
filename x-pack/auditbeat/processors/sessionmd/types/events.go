@@ -20,14 +20,14 @@ type (
 )
 
 const (
-	Cwd Field = iota + 1
+	CWD Field = iota + 1
 	Argv
 	Env
 	Filename
 )
 
-type PidInfo struct {
-	StartTimeNs uint64
+type PIDInfo struct {
+	StartTimeNS uint64
 	Tid         uint32
 	Tgid        uint32
 	Vpid        uint32
@@ -47,48 +47,48 @@ type CredInfo struct {
 	CapEffective uint64
 }
 
-type TtyWinsize struct {
+type TTYWinsize struct {
 	Rows uint16
 	Cols uint16
 }
 
-type TtyTermios struct {
+type TTYTermios struct {
 	CIflag uint32
 	COflag uint32
 	CLflag uint32
 	CCflag uint32
 }
 
-type TtyDev struct {
+type TTYDev struct {
 	Minor   uint16
 	Major   uint16
-	Winsize TtyWinsize
-	Termios TtyTermios
+	Winsize TTYWinsize
+	Termios TTYTermios
 }
 
 type ProcessForkEvent struct {
-	ParentPids PidInfo
-	ChildPids  PidInfo
+	ParentPIDs PIDInfo
+	ChildPIDs  PIDInfo
 	Creds      CredInfo
 }
 
 type ProcessExecEvent struct {
-	Pids  PidInfo
+	PIDs  PIDInfo
 	Creds CredInfo
-	CTty  TtyDev
+	CTTY  TTYDev
 
 	// varlen fields
-	Cwd      string
+	CWD      string
 	Argv     []string
 	Env      map[string]string
 	Filename string
 }
 
 type ProcessExitEvent struct {
-	Pids     PidInfo
+	PIDs     PIDInfo
 	ExitCode int32
 }
 
 type ProcessSetsidEvent struct {
-	Pids PidInfo
+	PIDs PIDInfo
 }
