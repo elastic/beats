@@ -11,8 +11,8 @@ https://github.com/elastic/beats/compare/v8.12.1\...v8.12.2[View commits]
 
 *Filebeat*
 
-- [threatintel] MISP pagination fixes {pull}37898[37898]
-- Fix file handle leak when handling errors in filestream {pull}37973[37973]
+- [threatintel] MISP pagination fixes. {pull}37898[37898]
+- Fix file handle leak when handling errors in filestream. {pull}37973[37973]
 
 *Packetbeat*
 
