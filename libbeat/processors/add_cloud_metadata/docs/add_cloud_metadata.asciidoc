@@ -165,7 +165,7 @@ _Azure Virtual Machine_
     "instance.name": "test-az-vm",
     "machine.type": "Standard_D3_v2",
     "region": "eastus2",
-    "resourceGroup.name": "/subscriptions/641ebacb-7743-41e7-b4fa-af1167351a61/resourcegroups/testgroup/providers/Microsoft.ContainerService/managedClusters/testcluster"
+    "resource_group.name": "/subscriptions/641ebacb-7743-41e7-b4fa-af1167351a61/resourcegroups/testgroup/providers/Microsoft.ContainerService/managedClusters/testcluster"
   }
 }
 -------------------------------------------------------------------------------
