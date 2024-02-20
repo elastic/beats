@@ -72,7 +72,12 @@ If you are not using the Elasticsearch output, set `queue.mem.flush.timeout: 1s`
 
 ==== Breaking changes
 
+*Affecting all Beats*
+
+- Windows MSI installers now store configuration in C:\Program Files instead of C:\ProgramData. https://github.com/elastic/elastic-stack-installers/pull/209
+
 *Heartbeat*
+
 - Decrease the ES default timeout to 10 for the load monitor state requests.
 - Windows MSI installers now store configuration in C:\Program Files instead of C:\ProgramData. https://github.com/elastic/elastic-stack-installers/pull/209
 
