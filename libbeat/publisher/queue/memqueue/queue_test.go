@@ -138,8 +138,8 @@ func TestProducerDoesNotBlockWhenCancelled(t *testing.T) {
 		time.Millisecond,
 		"the first two events were not successfully published")
 
-	// Cancel the producer, this should unblock its Publish method
-	p.Cancel()
+	// Close the queue, this should unblock the pending Publish call
+	q.Close()
 
 	require.Eventually(
 		t,
