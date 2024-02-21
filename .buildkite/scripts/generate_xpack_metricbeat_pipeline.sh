@@ -17,7 +17,7 @@ steps:
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: "mage $MAGE_VERSION && cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -26,7 +26,7 @@ steps:
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
+        command: "mage $MAGE_VERSION && cd $BEATS_PROJECT_NAME && mage goIntegTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -35,7 +35,7 @@ steps:
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
+        command: "mage $MAGE_VERSION && cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -116,7 +116,7 @@ if  are_conditions_met_macos_tests; then
 
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "mage $MAGE_VERSION && cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -129,7 +129,7 @@ if  are_conditions_met_cloud_tests; then
   cat >> $pipelineName <<- YAML
       - label: ":linux: Cloud Tests"
         key: "extended-cloud-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build test"
+        command: "mage $MAGE_VERSION && cd $BEATS_PROJECT_NAME && mage build test"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -153,7 +153,7 @@ if are_conditions_met_packaging; then
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: "cd $BEATS_PROJECT_NAME && mage package"
+        command: "mage $MAGE_VERSION && cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -163,7 +163,7 @@ if are_conditions_met_packaging; then
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
-        command: "cd $BEATS_PROJECT_NAME && mage package"
+        command: "mage $MAGE_VERSION && cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
