@@ -82,7 +82,7 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 				},
 			},
 		}
-		status, body, err := esc.Request("POST", strings.Join([]string{"/", indexPattern, "/", "search", "?size=1"}, ""), "", nil, reqBody)
+		status, body, err := esc.Request("POST", strings.Join([]string{"/", indexPattern, "/", "_search", "?size=1"}, ""), "", nil, reqBody)
 		if err != nil || status > 299 {
 			errMsg := fmt.Errorf("error executing state search for %s in loc=%s: %w", sf.ID, runFromID, err).Error()
 			retry := shouldRetry(status)
