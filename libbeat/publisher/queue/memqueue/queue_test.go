@@ -77,17 +77,17 @@ func TestProduceConsumer(t *testing.T) {
 	t.Run("flush", testWith(makeTestQueue(bufferSize, batchSize/2, 100*time.Millisecond)))
 }
 
-// TestProducerDoesNotBlockWhenCancelled ensures the producer Publish
-// does not block indefinitely.
+// TestProducerDoesNotBlockWhenQueueClosed ensures the producer Publish
+// does not block indefinitely during queue shutdown.
 //
-// Once we get a producer `p` from the queue we want to ensure
+// Once we get a producer `p` from the queue `q` we want to ensure
 // that if p.Publish is called and blocks it will unblock once
-// p.Cancel is called.
+// `q.Close` is called.
 //
 // For this test we start a queue with size 2 and try to add more
-// than 2 events to it, p.Publish will block, once we call p.Cancel,
+// than 2 events to it, p.Publish will block, once we call q.Close,
 // we ensure the 3rd event was not successfully published.
-func TestProducerDoesNotBlockWhenCancelled(t *testing.T) {
+func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
 	q := NewQueue(nil, nil,
 		Settings{
 			Events:        2, // Queue size
