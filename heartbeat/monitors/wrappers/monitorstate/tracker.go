@@ -100,6 +100,7 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields) (state *State) 
 		}
 		var loaderError LoaderError
 		if errors.As(err, &loaderError) && !loaderError.Retry {
+			logp.L().Warnf("could not load last externally recorded state: %w", err)
 			break
 		}
 

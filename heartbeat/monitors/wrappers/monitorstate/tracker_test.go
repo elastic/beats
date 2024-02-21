@@ -18,6 +18,7 @@
 package monitorstate
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -155,7 +156,7 @@ func TestStateLoaderRetry(t *testing.T) {
 			calls := 0
 			errorStateLoader := func(_ stdfields.StdMonitorFields) (*State, error) {
 				calls += 1
-				return nil, LoaderError{Message: "test error", Retry: tt.retryable}
+				return nil, LoaderError{err: errors.New("test error"), Retry: tt.retryable}
 			}
 
 			mst := NewTracker(errorStateLoader, true)
