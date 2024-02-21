@@ -51,7 +51,7 @@ steps:
     if: "build.source == 'ui'"
     allow_dependency_failure: false
 
-  - label: ":linux: Load dynamic **x-pack metricbeat** pipeline"
+  - label: ":linux: Load dynamic x-pack metricbeat pipeline"
     key: "metricbeat-pipeline"
     command: ".buildkite/scripts/generate_xpack_metricbeat_pipeline.sh"
     notify:
