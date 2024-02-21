@@ -1,5 +1,59 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+name: "beats-xpack-metricbeat"
+
+env:
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch6"
+  IMAGE_WIN_10: "family/general-windows-10"
+  IMAGE_WIN_11: "family/general-windows-11"
+  IMAGE_WIN_2016: "family/core-windows-2016"
+  IMAGE_WIN_2019: "family/core-windows-2019"
+  IMAGE_WIN_2022: "family/core-windows-2022"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
+  BEATS_PROJECT_NAME: "x-pack/metricbeat"
 
 steps:
-  - label: "Example test"
-    command: echo "Hello!"
+
+  - input: "Input Parameters"
+    key: "input-run-all-stages"
+    fields:
+    - select: "Metricbeat - run_xpack_metricbeat"
+      key: "run_xpack_metricbeat"
+      options:
+        - label: "True"
+          value: "true"
+        - label: "False"
+          value: "false"
+      default: "false"
+    - select: "Metricbeat - run_xpack_metricbeat_macos_tests"
+      key: "run_xpack_metricbeat_macos_tests"
+      options:
+        - label: "True"
+          value: "true"
+        - label: "False"
+          value: "false"
+      default: "false"
+    - select: "Metricbeat - run_xpack_metricbeat_aws_tests"
+      key: "run_xpack_metricbeat_aws_tests"
+      options:
+        - label: "True"
+          value: "true"
+        - label: "False"
+          value: "false"
+      default: "false"
+
+    if: "build.source == 'ui'"
+
+  - wait: ~
+    if: "build.source == 'ui'"
+    allow_dependency_failure: false
+
+  - label: ":linux: Load dynamic metricbeat pipeline"
+    key: "metricbeat-pipeline"
+    command: ".buildkite/scripts/generate_xpack_metricbeat_pipeline.sh"
+    notify:
+      - github_commit_status:
+          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"

@@ -17,6 +17,9 @@ ONLY_DOCS=${ONLY_DOCS:-"true"}
 [ -z "${run_packetbeat_arm_tests+x}" ] && run_packetbeat_arm_tests="$(buildkite-agent meta-data get run_packetbeat_arm_tests --default "false")"
 [ -z "${run_metricbeat_macos_tests+x}" ] && run_metricbeat_macos_tests="$(buildkite-agent meta-data get run_metricbeat_macos_tests --default "false")"
 [ -z "${run_packetbeat_macos_tests+x}" ] && run_packetbeat_macos_tests="$(buildkite-agent meta-data get run_packetbeat_macos_tests --default "false")"
+[ -z "${run_xpack_libbeat_arm_tests+x}" ] && run_xpack_libbeat_arm_tests="$(buildkite-agent meta-data get run_xpack_libbeat_arm_tests --default "false")"
+[ -z "${run_xpack_metricbeat_aws_tests+x}" ] && run_xpack_metricbeat_aws_tests="$(buildkite-agent meta-data get run_xpack_metricbeat_aws_tests --default "false")"
+[ -z "${run_xpack_metricbeat_macos_tests+x}" ] && run_xpack_metricbeat_macos_tests="$(buildkite-agent meta-data get run_xpack_metricbeat_macos_tests --default "false")"
 
 metricbeat_changeset=(
   "^metricbeat/.*"
@@ -89,6 +92,7 @@ check_and_set_beat_vars() {
     BEATS_GH_LABEL=${BEATS_XPACK_LABEL_PROJECT_NAME}
     TRIGGER_SPECIFIC_BEAT="run_${BEATS_XPACK_PROJECT_NAME}"
     TRIGGER_SPECIFIC_ARM_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_arm_tests"
+    TRIGGER_SPECIFIC_AWS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_aws_tests"
     TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_macos_tests"
     declare -n BEAT_CHANGESET_REFERENCE="${BEATS_XPACK_PROJECT_NAME}_changeset"
     echo "Beats project name is $BEATS_XPACK_PROJECT_NAME"
@@ -101,6 +105,7 @@ check_and_set_beat_vars() {
     BEATS_GH_LABEL=${BEATS_PROJECT_NAME}
     TRIGGER_SPECIFIC_BEAT="run_${BEATS_PROJECT_NAME}"
     TRIGGER_SPECIFIC_ARM_TESTS="run_${BEATS_PROJECT_NAME}_arm_tests"
+    TRIGGER_SPECIFIC_AWS_TESTS="run_${BEATS_PROJECT_NAME}_aws_tests"
     TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_PROJECT_NAME}_macos_tests"
     declare -n BEAT_CHANGESET_REFERENCE="${BEATS_PROJECT_NAME}_changeset"
     echo "Beats project name is $BEATS_PROJECT_NAME"
@@ -113,8 +118,10 @@ check_and_set_beat_vars() {
   BEATS_GH_COMMENT="/test ${BEATS_PROJECT_NAME}"
   BEATS_GH_MACOS_COMMENT="${BEATS_GH_COMMENT} for macos"
   BEATS_GH_ARM_COMMENT="${BEATS_GH_COMMENT} for arm"
+  BEATS_GH_AWS_COMMENT="${BEATS_GH_COMMENT} for aws cloud"
   BAETS_GH_MACOS_LABEL="macOS"
   BAETS_GH_ARM_LABEL="arm"
+  BAETS_GH_AWS_LABEL="aws"
 }
 
 with_docker_compose() {
@@ -313,6 +320,17 @@ are_conditions_met_macos_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
     if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
       if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_MACOS_COMMENT}" || "${GITHUB_PR_LABELS}" =~ "${BAETS_GH_MACOS_LABEL}" || "${!TRIGGER_SPECIFIC_MACOS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+        return 0
+      fi
+    fi
+  fi
+  return 1
+}
+
+re_conditions_met_aws_tests() {
+  if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_AWS_COMMENT}" || "${GITHUB_PR_LABELS}" =~ "${BAETS_GH_AWS_LABEL}" || "${!TRIGGER_SPECIFIC_AWS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
         return 0
       fi
     fi

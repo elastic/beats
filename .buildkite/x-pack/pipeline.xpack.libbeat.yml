@@ -20,7 +20,7 @@ steps:
   - input: "Input Parameters"
     key: "input-run-all-stages"
     fields:
-    - select: "Packetbeat - run_xpack_libbeat"
+    - select: "Libbeat - run_xpack_libbeat"
       key: "run_xpack_libbeat"
       options:
         - label: "True"
@@ -28,7 +28,7 @@ steps:
         - label: "False"
           value: "false"
       default: "false"
-    - select: "Packetbeat - run_xpack_libbeat_arm_tests"
+    - select: "Libbeat - run_xpack_libbeat_arm_tests"
       key: "run_xpack_libbeat_arm_tests"
       options:
         - label: "True"
@@ -42,8 +42,8 @@ steps:
     if: "build.source == 'ui'"
     allow_dependency_failure: false
 
-  - label: ":linux: Load dynamic packetbeat pipeline"
-    key: "packetbeat-pipeline"
+  - label: ":linux: Load dynamic libbeat pipeline"
+    key: "libbeat-pipeline"
     command: ".buildkite/scripts/generate_xpack_libbeat_pipeline.sh"
     notify:
       - github_commit_status:
