@@ -81,8 +81,8 @@ type kafkaConfig struct {
 
 	// Currently only used for validation. Those values are later
 	// unpacked into temporary structs whenever they're necessary.
-	Topic  string   `config:"topic"`
-	Topics []string `config:"topics"`
+	Topic  string `config:"topic"`
+	Topics []any  `config:"topics"`
 }
 
 type metaConfig struct {
