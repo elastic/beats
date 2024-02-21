@@ -322,3 +322,6 @@ replace (
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 )
+
+// Exclude this version because the version has an invalid checksum. Exclusion was introduced in 8.3
+exclude github.com/docker/distribution v2.8.0+incompatible
