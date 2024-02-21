@@ -74,7 +74,7 @@ func TestConfig(t *testing.T) {
 				"path":     "/tmp/${TIME_NOW}",
 				"filename": "pb-${TIME_NOW}",
 			}),
-			assertion: func(t *testing.T, actual *fileOutConfig, err error) {
+			assertion: func(t *testing.T, actual *fileOutConfig, _ error) {
 				assert.Equal(t, uint(7), actual.NumberOfFiles)
 				assert.Equal(t, uint(10*1024), actual.RotateEveryKb)
 				assert.Equal(t, true, actual.RotateOnStartup)
