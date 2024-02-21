@@ -27380,11 +27380,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/docker/distribution
-Version: v2.8.0+incompatible
+Version: v2.7.1+incompatible
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/docker/distribution@v2.8.0+incompatible/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/docker/distribution@v2.7.1+incompatible/LICENSE:
 
 Apache License
                            Version 2.0, January 2004
