@@ -16,6 +16,7 @@ export DOCKER_COMPOSE_VERSION_AARCH64
 export SETUP_WIN_PYTHON_VERSION
 export NMAP_WIN_VERSION
 export GO_VERSION
+export MAGE_VERSION
 
 exportVars() {
   local platform_type="$(uname)"

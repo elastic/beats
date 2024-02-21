@@ -42,7 +42,7 @@ steps:
     if: "build.source == 'ui'"
     allow_dependency_failure: false
 
-  - label: ":linux: Load dynamic libbeat pipeline"
+  - label: ":linux: Load dynamic **x-pack libbeat** pipeline"
     key: "libbeat-pipeline"
     command: ".buildkite/scripts/generate_xpack_libbeat_pipeline.sh"
     notify:
