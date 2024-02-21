@@ -36,8 +36,6 @@ func init() {
 	outputs.RegisterType("file", makeFileout)
 }
 
-const timeNowVar = "TIME_NOW"
-
 type fileOutput struct {
 	log      *logp.Logger
 	filePath string
