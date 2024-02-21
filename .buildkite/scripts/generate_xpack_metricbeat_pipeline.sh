@@ -116,7 +116,7 @@ if  are_conditions_met_macos_tests; then
 
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: ".buildkite/scripts/unit_tests.sh"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
