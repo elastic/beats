@@ -73,10 +73,14 @@ func makeFileout(
 
 func (out *fileOutput) init(beat beat.Info, c fileOutConfig) error {
 	var path string
+	configPath, runErr := c.Path.Run(time.Now())
+	if runErr != nil {
+		return runErr
+	}
 	if c.Filename != "" {
-		path = filepath.Join(c.Path, c.Filename)
+		path = filepath.Join(configPath, c.Filename)
 	} else {
-		path = filepath.Join(c.Path, out.beat.Beat)
+		path = filepath.Join(configPath, out.beat.Beat)
 	}
 
 	out.filePath = path

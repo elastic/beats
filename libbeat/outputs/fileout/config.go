@@ -19,26 +19,21 @@ package fileout
 
 import (
 	"fmt"
-	"strconv"
-	"time"
-
-	"github.com/elastic/go-ucfg"
-	"github.com/elastic/go-ucfg/parse"
-
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
 )
 
 type fileOutConfig struct {
-	Path            string           `config:"path"`
-	Filename        string           `config:"filename"`
-	RotateEveryKb   uint             `config:"rotate_every_kb" validate:"min=1"`
-	NumberOfFiles   uint             `config:"number_of_files"`
-	Codec           codec.Config     `config:"codec"`
-	Permissions     uint32           `config:"permissions"`
-	RotateOnStartup bool             `config:"rotate_on_startup"`
-	Queue           config.Namespace `config:"queue"`
+	Path            *fmtstr.TimestampFormatString `config:"path"`
+	Filename        string                        `config:"filename"`
+	RotateEveryKb   uint                          `config:"rotate_every_kb" validate:"min=1"`
+	NumberOfFiles   uint                          `config:"number_of_files"`
+	Codec           codec.Config                  `config:"codec"`
+	Permissions     uint32                        `config:"permissions"`
+	RotateOnStartup bool                          `config:"rotate_on_startup"`
+	Queue           config.Namespace              `config:"queue"`
 }
 
 func defaultConfig() fileOutConfig {
@@ -51,18 +46,6 @@ func defaultConfig() fileOutConfig {
 }
 
 func readConfig(cfg *config.C) (*fileOutConfig, error) {
-	opts := []ucfg.Option{
-		ucfg.PathSep("."),
-		ucfg.ResolveEnv,
-		ucfg.VarExp,
-		ucfg.Resolve(func(name string) (string, parse.Config, error) {
-			if name != timeNowVar {
-				return "", parse.Config{}, ucfg.ErrMissing
-			}
-			return strconv.FormatInt(time.Now().UnixMilli(), 10), parse.DefaultConfig, nil
-		}),
-	}
-	config.OverwriteConfigOpts(opts)
 	foConfig := defaultConfig()
 	if err := cfg.Unpack(&foConfig); err != nil {
 		return nil, err

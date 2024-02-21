@@ -18,8 +18,6 @@
 package fileout
 
 import (
-	"regexp"
-	"strconv"
 	"testing"
 	"time"
 
@@ -52,57 +50,21 @@ func TestConfig(t *testing.T) {
 			config: config.MustNewConfigFrom(mapstr.M{
 				"number_of_files": 10,
 				"rotate_every_kb": 5 * 1024,
-				"path":            "/tmp/packetbeat",
+				"path":            "/tmp/packetbeat/%{+yyyy-MM-dd-mm-ss-SSSSSS}",
 				"filename":        "pb",
 			}),
 			assertion: func(t *testing.T, actual *fileOutConfig, err error) {
-				expectedConfig := &fileOutConfig{
-					NumberOfFiles:   10,
-					RotateEveryKb:   5 * 1024,
-					Permissions:     0600,
-					RotateOnStartup: true,
-					Path:            "/tmp/packetbeat",
-					Filename:        "pb",
-				}
-
-				assert.Equal(t, expectedConfig, actual)
-				assert.Nil(t, err)
-			},
-		},
-		"use TIME_NOW": {
-			config: config.MustNewConfigFrom(mapstr.M{
-				"path":     "/tmp/${TIME_NOW}",
-				"filename": "pb-${TIME_NOW}",
-			}),
-			assertion: func(t *testing.T, actual *fileOutConfig, _ error) {
-				assert.Equal(t, uint(7), actual.NumberOfFiles)
-				assert.Equal(t, uint(10*1024), actual.RotateEveryKb)
+				assert.Equal(t, uint(10), actual.NumberOfFiles)
+				assert.Equal(t, uint(5*1024), actual.RotateEveryKb)
 				assert.Equal(t, true, actual.RotateOnStartup)
 				assert.Equal(t, uint32(0600), actual.Permissions)
+				assert.Equal(t, "pb", actual.Filename)
 
-				timeNow := time.Now().UnixMilli()
+				path, runErr := actual.Path.Run(time.Date(2024, 1, 2, 3, 4, 5, 67890, time.UTC))
+				assert.Nil(t, runErr)
 
-				pathRegex := `\/tmp\/(\d{13})$`
-				re := regexp.MustCompile(pathRegex)
-				matchesPath := re.FindStringSubmatch(actual.Path)
-
-				assert.NotNil(t, matchesPath)
-				assert.Equal(t, 2, len(matchesPath))
-
-				timeNowPath, err := strconv.ParseInt(matchesPath[1], 10, 64)
+				assert.Equal(t, "/tmp/packetbeat/2024-01-02-04-05-000067", path)
 				assert.Nil(t, err)
-				assert.LessOrEqual(t, timeNow, timeNowPath)
-
-				fileRegex := `pb\-(\d{13})$`
-				re = regexp.MustCompile(fileRegex)
-				matchesFile := re.FindStringSubmatch(actual.Filename)
-
-				assert.NotNil(t, matchesFile)
-				assert.Equal(t, 2, len(matchesFile))
-
-				timeNowFile, err := strconv.ParseInt(matchesFile[1], 10, 64)
-				assert.Nil(t, err)
-				assert.Equal(t, timeNowFile, timeNowPath)
 			},
 		},
 	} {
