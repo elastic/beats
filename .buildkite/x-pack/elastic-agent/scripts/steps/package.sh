@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -uo pipefail
+source ".buildkite/x-pack/elastic-agent/scripts/steps/setenv.sh"
 source ".buildkite/x-pack/elastic-agent/scripts/steps/common.sh"
 
 if test -z "${ManifestURL=:""}"; then
