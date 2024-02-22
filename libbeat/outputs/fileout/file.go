@@ -71,7 +71,7 @@ func makeFileout(
 
 func (out *fileOutput) init(beat beat.Info, c fileOutConfig) error {
 	var path string
-	configPath, runErr := c.Path.Run(time.Now())
+	configPath, runErr := c.Path.Run(time.Now().UTC())
 	if runErr != nil {
 		return runErr
 	}
