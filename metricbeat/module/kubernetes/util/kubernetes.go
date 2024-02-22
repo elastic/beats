@@ -1009,6 +1009,7 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 			} else {
 				resourceMetaWatcher.watcher = resourceMetaWatcher.restartWatcher
 				resourceMetaWatcher.restartWatcher = nil
+				resourceMetaWatcher.started = true
 			}
 		} else {
 			if !resourceMetaWatcher.started {
