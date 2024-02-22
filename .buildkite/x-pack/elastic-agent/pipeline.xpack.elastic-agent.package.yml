@@ -46,20 +46,18 @@ steps:
     if: build.env("ManifestURL") == null
 
   - label: "Package elastic-agent"
-    env:
-      AGENT_DROP_PATH: "build/distributions/elastic-agent-drop"
     key: "package-full"
     command: |
       if [[ -z "${ManifestURL}" ]]; then
-            export ManifestURL=$(buildkite-agent meta-data get ManifestURL --default "")
-            if [[ -z "${ManifestURL}" ]]; then
-              echo ":broken_heart: Missing ManifestURL variable or empty string provided"
-              exit 1
-            fi
-          fi
-          if [[ -z "${MAGEFILE_VERBOSE}" ]]; then
-            export MAGEFILE_VERBOSE=$(buildkite-agent meta-data get MAGEFILE_VERBOSE --default "0")
-          fi
+        export ManifestURL=$(buildkite-agent meta-data get ManifestURL --default "")
+        if [[ -z "${ManifestURL}" ]]; then
+          echo ":broken_heart: Missing ManifestURL variable or empty string provided"
+          exit 1
+        fi
+      fi
+      if [[ -z "${MAGEFILE_VERBOSE}" ]]; then
+        export MAGEFILE_VERBOSE=$(buildkite-agent meta-data get MAGEFILE_VERBOSE --default "0")
+      fi
       .buildkite/x-pack/elastic-agent/scripts/steps/package.sh
     artifact_paths:
       - "build/distributions/**/*"
