@@ -12,6 +12,8 @@ fi
 VERSION="$(make get-version)"
 echo "--- Packaging Elastic Agent"
 
+echo $ManifestURL
+
 export AGENT_DROP_PATH=build/elastic-agent-drop
 mkdir -p $AGENT_DROP_PATH
 
