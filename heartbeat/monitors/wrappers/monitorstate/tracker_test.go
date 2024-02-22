@@ -134,20 +134,34 @@ func TestDeferredStateLoader(t *testing.T) {
 }
 
 func TestStateLoaderRetry(t *testing.T) {
+	// While testing the sleep time between retries should be negligible
+	waitFn := func() time.Duration {
+		return time.Microsecond
+	}
+
 	tests := []struct {
 		name          string
 		retryable     bool
+		rc            RetryConfig
 		expectedCalls int
 	}{
 		{
 			"should retry 3 times when fails with retryable error",
 			true,
+			RetryConfig{waitFn: waitFn},
 			3,
 		},
 		{
 			"should not retry when fails with non-retryable error",
 			false,
+			RetryConfig{waitFn: waitFn},
 			1,
+		},
+		{
+			"should honour the configured number of attempts when fails with retryable error",
+			true,
+			RetryConfig{attempts: 5, waitFn: waitFn},
+			5,
 		},
 	}
 
@@ -160,7 +174,7 @@ func TestStateLoaderRetry(t *testing.T) {
 			}
 
 			mst := NewTracker(errorStateLoader, true)
-			mst.GetCurrentState(stdfields.StdMonitorFields{})
+			mst.GetCurrentState(stdfields.StdMonitorFields{}, tt.rc)
 
 			require.Equal(t, calls, tt.expectedCalls)
 		})

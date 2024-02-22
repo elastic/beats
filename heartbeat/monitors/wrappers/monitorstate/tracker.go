@@ -62,7 +62,7 @@ func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateSta
 	t.mtx.Lock()
 	defer t.mtx.Unlock()
 
-	state := t.GetCurrentState(sf)
+	state := t.GetCurrentState(sf, RetryConfig{})
 	if state == nil {
 		state = newMonitorState(sf, newStatus, 0, t.flappingEnabled)
 		logp.L().Infof("initializing new state for monitor %s: %s", sf.ID, state.String())
@@ -75,22 +75,32 @@ func (t *Tracker) RecordStatus(sf stdfields.StdMonitorFields, newStatus StateSta
 }
 
 func (t *Tracker) GetCurrentStatus(sf stdfields.StdMonitorFields) StateStatus {
-	s := t.GetCurrentState(sf)
+	s := t.GetCurrentState(sf, RetryConfig{})
 	if s == nil {
 		return StatusEmpty
 	}
 	return s.Status
 }
 
-func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields) (state *State) {
+type RetryConfig struct {
+	attempts int
+	waitFn   func() time.Duration
+}
+
+func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields, rc RetryConfig) (state *State) {
 	if state, ok := t.states[sf.ID]; ok {
 		return state
 	}
 
-	tries := 3
+	// Default number of attempts
+	attempts := 3
+	if rc.attempts != 0 {
+		attempts = rc.attempts
+	}
+
 	var loadedState *State
 	var err error
-	for i := 0; i < tries; i++ {
+	for i := 0; i < attempts; i++ {
 		loadedState, err = t.stateLoader(sf)
 		if err == nil {
 			if loadedState != nil {
@@ -104,12 +114,16 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields) (state *State) 
 			break
 		}
 
+		// Default sleep time
 		sleepFor := (time.Duration(i*i) * time.Second) + (time.Duration(rand.Intn(500)) * time.Millisecond)
+		if rc.waitFn != nil {
+			sleepFor = rc.waitFn()
+		}
 		logp.L().Warnf("could not load last externally recorded state, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)
 		time.Sleep(sleepFor)
 	}
 	if err != nil {
-		logp.L().Warnf("could not load prior state from elasticsearch after %d attempts, will create new state for monitor: %s", tries, sf.ID)
+		logp.L().Warnf("could not load prior state from elasticsearch after %d attempts, will create new state for monitor: %s", attempts, sf.ID)
 	}
 
 	if loadedState != nil {
