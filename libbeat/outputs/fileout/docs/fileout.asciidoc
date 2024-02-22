@@ -50,7 +50,7 @@ The path to the directory where the generated files will be saved. This option i
 mandatory.
 
 The path may include the timestamp when the file output is initialized using the `+FORMAT` syntax where `FORMAT` is a
-valid https://godoc.org/github.com/elastic/beats/libbeat/common/dtfmt[time format],
+valid https://github.com/elastic/beats/blob/{doc-branch}/libbeat/common/dtfmt/doc.go[time format],
 and enclosed with expansion braces: `%{+FORMAT}`. For example:
 
 ```
