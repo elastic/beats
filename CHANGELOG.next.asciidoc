@@ -47,8 +47,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Filebeat*
 
-- [threatintel] MISP pagination fixes {pull}37898[37898]
-- Fix file handle leak when handling errors in filestream {pull}37973[37973]
 
 *Heartbeat*
 
@@ -61,7 +59,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Packetbeat*
 
-- Fix interface device parsing for packetbeat protocols. {pull}37946[37946]
 
 *Winlogbeat*
 
@@ -90,7 +87,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Update `getOpTimestamp` in `replstatus` to fix sort and temp files generation issue in mongodb. {pull}37688[37688]
 
 *Osquerybeat*
 
@@ -146,6 +142,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
