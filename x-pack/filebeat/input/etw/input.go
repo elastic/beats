@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"golang.org/x/sync/errgroup"
 	"golang.org/x/sys/windows"
 )
 
@@ -66,6 +67,7 @@ type etwInput struct {
 	log        *logp.Logger
 	config     config
 	etwSession *etw.Session
+	publisher  stateless.Publisher
 	operator   sessionOperator
 }
 
@@ -105,10 +107,13 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	if err != nil {
 		return fmt.Errorf("error initializing ETW session: %w", err)
 	}
+	e.etwSession.Callback = e.consumeEvent
+	e.publisher = publisher
 
 	// Set up logger with session information
 	e.log = ctx.Logger.With("session", e.etwSession.Name)
 	e.log.Info("Starting " + inputName + " input")
+	defer e.log.Info(inputName + " input stopped")
 
 	// Handle realtime session creation or attachment
 	if e.etwSession.Realtime {
@@ -125,71 +130,31 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 			if err != nil {
 				return fmt.Errorf("realtime session could not be created: %w", err)
 			}
-			e.log.Debug("created session")
+			e.log.Debug("created new session")
 		}
 	}
-	// Defer the cleanup and closing of resources
-	var wg sync.WaitGroup
-	var once sync.Once
 
-	// Create an error channel to communicate errors from the goroutine
-	errChan := make(chan error, 1)
+	stopConsumer := sync.OnceFunc(e.Close)
+	defer stopConsumer()
 
-	defer func() {
-		once.Do(e.Close)
-		e.log.Info(inputName + " input stopped")
-	}()
-
-	// eventReceivedCallback processes each ETW event
-	eventReceivedCallback := func(record *etw.EventRecord) uintptr {
-		if record == nil {
-			e.log.Error("received null event record")
-			return 1
-		}
-
-		e.log.Debugf("received event %d with length %d", record.EventHeader.EventDescriptor.Id, record.UserDataLength)
-
-		data, err := etw.GetEventProperties(record)
-		if err != nil {
-			e.log.Errorw("failed to read event properties", "error", err)
-			return 1
-		}
-
-		evt := buildEvent(data, record.EventHeader, e.etwSession, e.config)
-		publisher.Publish(evt)
-
-		return 0
-	}
-
-	// Set the callback function for the ETW session
-	e.etwSession.Callback = eventReceivedCallback
-
-	// Start a goroutine to consume ETW events
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		e.log.Debug("starting to listen ETW events")
-		if err = e.operator.startConsumer(e.etwSession); err != nil {
-			errChan <- fmt.Errorf("failed to start consumer: %w", err) // Send error to channel
-			return
-		}
-		e.log.Debug("stopped to read ETW events from session")
-		errChan <- nil
-	}()
-
-	// We ensure resources are closed when receiving a cancellation signal
+	// Stop the consumer upon input cancellation (shutdown).
 	go func() {
 		<-ctx.Cancelation.Done()
-		once.Do(e.Close)
+		stopConsumer()
 	}()
 
-	wg.Wait() // Ensure all goroutines have finished before closing
-	close(errChan)
-	if err, ok := <-errChan; ok && err != nil {
-		return err
-	}
+	// Start a goroutine to consume ETW events
+	g := new(errgroup.Group)
+	g.Go(func() error {
+		e.log.Debug("starting ETW consumer")
+		defer e.log.Debug("stopped ETW consumer")
+		if err = e.operator.startConsumer(e.etwSession); err != nil {
+			return fmt.Errorf("failed running ETW consumer: %w", err)
+		}
+		return nil
+	})
 
-	return nil
+	return g.Wait()
 }
 
 var (
@@ -269,6 +234,26 @@ func convertFileTimeToGoTime(fileTime64 uint64) time.Time {
 	}
 
 	return time.Unix(0, fileTime.Nanoseconds()).UTC()
+}
+
+func (e *etwInput) consumeEvent(record *etw.EventRecord) uintptr {
+	if record == nil {
+		e.log.Error("received null event record")
+		return 1
+	}
+
+	e.log.Debugf("received event with ID %d and user-data length %d", record.EventHeader.EventDescriptor.Id, record.UserDataLength)
+
+	data, err := etw.GetEventProperties(record)
+	if err != nil {
+		e.log.Errorw("failed to read event properties", "error", err)
+		return 1
+	}
+
+	evt := buildEvent(data, record.EventHeader, e.etwSession, e.config)
+	e.publisher.Publish(evt)
+
+	return 0
 }
 
 // Close stops the ETW session and logs the outcome.

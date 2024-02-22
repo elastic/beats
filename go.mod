@@ -78,7 +78,7 @@ require (
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.4.0
 	github.com/elastic/go-structform v0.0.10
-	github.com/elastic/go-sysinfo v1.12.0
+	github.com/elastic/go-sysinfo v1.13.1
 	github.com/elastic/go-ucfg v0.8.6
 	github.com/elastic/gosigar v0.14.2
 	github.com/fatih/color v1.15.0
@@ -207,6 +207,7 @@ require (
 	github.com/elastic/elastic-agent-system-metrics v0.9.1
 	github.com/elastic/go-elasticsearch/v8 v8.12.0
 	github.com/elastic/mito v1.9.0
+	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
 	github.com/go-ldap/ldap/v3 v3.4.6

@@ -27,18 +27,21 @@ const (
 	SourceScan     Source = 0
 	SourceFSNotify Source = 1
 	SourceEBPF     Source = 2
+	SourceKProbes  Source = 3
 )
 
 var EnumNamesSource = map[Source]string{
 	SourceScan:     "Scan",
 	SourceFSNotify: "FSNotify",
 	SourceEBPF:     "eBPF",
+	SourceKProbes:  "KProbes",
 }
 
 var EnumValuesSource = map[string]Source{
 	"Scan":     SourceScan,
 	"FSNotify": SourceFSNotify,
 	"eBPF":     SourceEBPF,
+	"KProbes":  SourceKProbes,
 }
 
 func (v Source) String() string {

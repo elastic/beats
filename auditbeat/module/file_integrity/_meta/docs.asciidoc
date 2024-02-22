@@ -25,6 +25,7 @@ The operating system features that power this feature are as follows.
 By default, `fsnotify` is used, and therefore the kernel must have inotify support.
 Inotify was initially merged into the 2.6.13 Linux kernel.
 The eBPF backend uses modern eBPF features and supports 5.10.16+ kernels.
+The `Kprobes` backend uses tracefs and supports 3.10+ kernels.
 FSNotify doesn't have the ability to associate user data to file events.
 The preferred backend can be selected by specifying the `backend` config option.
 Since eBPF and Kprobes are in technical preview, `auto` will default to `fsnotify`.
