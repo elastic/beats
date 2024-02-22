@@ -19,22 +19,20 @@ package fileout
 
 import (
 	"fmt"
-
-	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
 )
 
 type fileOutConfig struct {
-	Path            *fmtstr.TimestampFormatString `config:"path"`
-	Filename        string                        `config:"filename"`
-	RotateEveryKb   uint                          `config:"rotate_every_kb" validate:"min=1"`
-	NumberOfFiles   uint                          `config:"number_of_files"`
-	Codec           codec.Config                  `config:"codec"`
-	Permissions     uint32                        `config:"permissions"`
-	RotateOnStartup bool                          `config:"rotate_on_startup"`
-	Queue           config.Namespace              `config:"queue"`
+	Path            *PathFormatString `config:"path"`
+	Filename        string            `config:"filename"`
+	RotateEveryKb   uint              `config:"rotate_every_kb" validate:"min=1"`
+	NumberOfFiles   uint              `config:"number_of_files"`
+	Codec           codec.Config      `config:"codec"`
+	Permissions     uint32            `config:"permissions"`
+	RotateOnStartup bool              `config:"rotate_on_startup"`
+	Queue           config.Namespace  `config:"queue"`
 }
 
 func defaultConfig() fileOutConfig {
