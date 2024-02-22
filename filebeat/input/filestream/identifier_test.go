@@ -18,6 +18,7 @@
 package filestream
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -179,6 +180,48 @@ func TestFileIdentifier(t *testing.T) {
 				Descriptor: test.desc,
 			})
 			assert.Equal(t, test.expectedSrc, src.Name())
+		}
+	})
+}
+
+func FuzzFileIdentifier(f *testing.F) {
+	identifierFmtWithSuffix := "%s::%s-%s"
+	// The last %s is to not break the fmt.Sprintf call
+	identifierFmtWithoutSuffix := "%s::%s%s"
+
+	f.Add("foo")
+	f.Add("bar")
+	f.Add("世界")
+	f.Fuzz(func(t *testing.T, suffix string) {
+		identifierFmtStr := identifierFmtWithSuffix
+		if suffix == "" {
+			identifierFmtStr = identifierFmtWithoutSuffix
+		}
+
+		identifier, err := newFileIdentifier(nil, suffix)
+		require.NoError(t, err)
+		assert.Equal(t, DefaultIdentifierName, identifier.Name(), "identifier has got invalid name")
+
+		tmpFile, err := os.CreateTemp("", "fuzz_file_identifier_native")
+		if err != nil {
+			t.Fatalf("cannot create temporary file for test: %v", err)
+		}
+		t.Cleanup(func() { os.Remove(tmpFile.Name()) })
+
+		fi, err := tmpFile.Stat()
+		if err != nil {
+			t.Fatalf("cannot stat temporary file for test: %v", err)
+		}
+
+		src := identifier.GetSource(loginp.FSEvent{
+			NewPath: tmpFile.Name(),
+			Info:    fi,
+		})
+
+		got := src.Name()
+		want := fmt.Sprintf(identifierFmtStr, identifier.Name(), file.GetOSState(fi).String(), suffix)
+		if want != got {
+			t.Fatalf("expecting file identifier to be %q, got %q instead", want, got)
 		}
 	})
 }

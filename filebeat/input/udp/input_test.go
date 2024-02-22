@@ -151,3 +151,21 @@ func TestProcNetUDP(t *testing.T) {
 		})
 	})
 }
+
+func FuzzProcNetUDP(f *testing.F) {
+	path := "testdata/proc_net_udp.txt"
+	f.Add("2508640A:17AC")
+	f.Fuzz(func(t *testing.T, addr string) {
+		rx, drops, err := procNetUDP(path, []string{addr}, false, []bool{false})
+		if err == nil {
+			// If err is nil, we hit one of the IPs on testdata/proc_net_tcp.txt
+			// so we can check the value of rx and drops.
+			if rx != 1 {
+				t.Errorf("expecting 'rx' to be 1, got: %d", rx)
+			}
+			if drops != 2 {
+				t.Errorf("expecting 'drops' to be 2, got: %d", drops)
+			}
+		}
+	})
+}

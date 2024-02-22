@@ -145,3 +145,19 @@ func TestProcNetTCP(t *testing.T) {
 		})
 	})
 }
+
+func FuzzProcNetTCP(f *testing.F) {
+	path := "testdata/proc_net_tcp.txt"
+
+	f.Add("0100007f:17AC")
+	f.Fuzz(func(t *testing.T, addr string) {
+		rx, err := procNetTCP(path, []string{addr}, false, []bool{false})
+		if err == nil {
+			// If err is nil, we hit one of the IPs on testdata/proc_net_tcp.txt
+			// so we can check the value of rx.
+			if rx != 1 {
+				t.Errorf("expecting rx to be 1, got: %d", rx)
+			}
+		}
+	})
+}
