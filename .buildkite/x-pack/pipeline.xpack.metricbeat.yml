@@ -18,7 +18,7 @@ env:
 steps:
 
   - input: "Input Parameters"
-    key: "input-run-all-stages"
+    key: "force-run-stages"
     fields:
     - select: "Metricbeat - run_xpack_metricbeat"
       key: "run_xpack_metricbeat"

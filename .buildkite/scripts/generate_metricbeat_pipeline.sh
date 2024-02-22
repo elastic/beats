@@ -111,6 +111,10 @@ else
   exit 0
 fi
 
+#---------------debug---------------
+echo "${GITHUB_PR_LABELS}"
+#------------end of debug-----------
+
 echo "Check and add the Extended Tests into the pipeline"
 if are_conditions_met_macos_tests; then
   cat >> $pipelineName <<- YAML
@@ -149,7 +153,7 @@ if are_conditions_met_packaging; then
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "${PACKAGING_PLATFORMS}"
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
@@ -159,7 +163,7 @@ if are_conditions_met_packaging; then
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         env:
-          PLATFORMS: "linux/arm64"
+          PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
           PACKAGES: "docker"
 
 YAML
