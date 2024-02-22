@@ -165,7 +165,7 @@ func ttyDevFromProto(p types.TTYDev) types.TTYDev {
 }
 
 type DB struct {
-	sync.RWMutex
+	mutex                    sync.RWMutex
 	logger                   *logp.Logger
 	processes                map[uint32]Process
 	entryLeaders             map[uint32]EntryType
@@ -207,8 +207,8 @@ func basename(pathStr string) string {
 }
 
 func (db *DB) InsertFork(fork types.ProcessForkEvent) {
-	db.Lock()
-	defer db.Unlock()
+	db.mutex.Lock()
+	defer db.mutex.Unlock()
 
 	pid := fork.ChildPIDs.Tgid
 	ppid := fork.ParentPIDs.Tgid
@@ -240,8 +240,8 @@ func (db *DB) insertProcess(process Process) {
 }
 
 func (db *DB) InsertExec(exec types.ProcessExecEvent) {
-	db.Lock()
-	defer db.Unlock()
+	db.mutex.Lock()
+	defer db.mutex.Unlock()
 
 	proc := Process{
 		PIDs:     pidInfoFromProto(exec.PIDs),
@@ -367,8 +367,8 @@ func (db *DB) evaluateEntryLeader(p Process) *uint32 {
 }
 
 func (db *DB) InsertSetsid(setsid types.ProcessSetsidEvent) {
-	db.Lock()
-	defer db.Unlock()
+	db.mutex.Lock()
+	defer db.mutex.Unlock()
 
 	if entry, ok := db.processes[setsid.PIDs.Tgid]; ok {
 		entry.PIDs = pidInfoFromProto(setsid.PIDs)
@@ -381,8 +381,8 @@ func (db *DB) InsertSetsid(setsid types.ProcessSetsidEvent) {
 }
 
 func (db *DB) InsertExit(exit types.ProcessExitEvent) {
-	db.Lock()
-	defer db.Unlock()
+	db.mutex.Lock()
+	defer db.mutex.Unlock()
 
 	pid := exit.PIDs.Tgid
 	delete(db.processes, pid)
@@ -528,8 +528,8 @@ func setSameAsProcess(process *types.Process) {
 }
 
 func (db *DB) GetProcess(pid uint32) (types.Process, error) {
-	db.RLock()
-	defer db.RUnlock()
+	db.mutex.RLock()
+	defer db.mutex.RUnlock()
 
 	process, ok := db.processes[pid]
 	if !ok {
@@ -568,8 +568,8 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 }
 
 func (db *DB) GetEntryType(pid uint32) (EntryType, error) {
-	db.RLock()
-	defer db.RUnlock()
+	db.mutex.RLock()
+	defer db.mutex.RUnlock()
 
 	if entryType, ok := db.entryLeaders[pid]; ok {
 		return entryType, nil
@@ -578,8 +578,8 @@ func (db *DB) GetEntryType(pid uint32) (EntryType, error) {
 }
 
 func (db *DB) ScrapeProcfs() []uint32 {
-	db.Lock()
-	defer db.Unlock()
+	db.mutex.Lock()
+	defer db.mutex.Unlock()
 
 	procs, err := db.procfs.GetAllProcesses()
 	if err != nil {

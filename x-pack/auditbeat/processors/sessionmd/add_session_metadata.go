@@ -19,7 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/ebpf_provider"
-	"github.com/elastic/elastic-agent-libs/config"
+	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -34,13 +34,13 @@ func init() {
 }
 
 type addSessionMetadata struct {
-	config   Config
+	config   config
 	logger   *logp.Logger
 	db       *processdb.DB
 	provider provider.Provider
 }
 
-func New(cfg *config.C) (beat.Processor, error) {
+func New(cfg *cfg.C) (beat.Processor, error) {
 	c := defaultConfig()
 	if err := cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)

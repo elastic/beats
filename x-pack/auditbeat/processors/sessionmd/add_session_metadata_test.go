@@ -24,14 +24,14 @@ var (
 	enrichTests = []struct {
 		testName      string
 		mockProcesses []types.ProcessExecEvent
-		config        Config
+		config        config
 		input         beat.Event
 		expected      beat.Event
 		expect_error  bool
 	}{
 		{
 			testName: "Enrich Process",
-			config: Config{
+			config: config{
 				ReplaceFields: false,
 				PIDField:      "process.pid",
 			},
@@ -93,7 +93,7 @@ var (
 		},
 		{
 			testName: "No PID Field in Event",
-			config: Config{
+			config: config{
 				ReplaceFields: false,
 				PIDField:      "process.pid",
 			},
@@ -112,7 +112,7 @@ var (
 		},
 		{
 			testName: "PID Not Number",
-			config: Config{
+			config: config{
 				ReplaceFields: false,
 				PIDField:      "process.pid",
 			},
@@ -132,7 +132,7 @@ var (
 		},
 		{
 			testName: "PID not in DB",
-			config: Config{
+			config: config{
 				ReplaceFields: false,
 				PIDField:      "process.pid",
 			},

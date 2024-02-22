@@ -7,14 +7,14 @@
 package sessionmd
 
 // Config for add_session_metadata processor.
-type Config struct {
+type config struct {
 	Backend       string `config:"backend"`
 	ReplaceFields bool   `config:"replace_fields"`
 	PIDField      string `config:"pid_field"`
 }
 
-func defaultConfig() Config {
-	return Config{
+func defaultConfig() config {
+	return config{
 		Backend:       "auto",
 		ReplaceFields: false,
 		PIDField:      "process.pid",
