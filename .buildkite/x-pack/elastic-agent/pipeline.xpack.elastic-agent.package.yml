@@ -1,17 +1,57 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 steps:
+  - input: "Build parameters"
+    if: build.env("ManifestURL") == null
+    fields:
+      - text: "ManifestURL"
+        key: "ManifestURL"
+        default: ""
+        required: true
+        hint: "Link to the build manifest URL."
+      - select: "Mage verbose"
+        key: "MAGEFILE_VERBOSE"
+        required: false
+        options:
+          - label: "True"
+            value: "1"
+          - label: "False"
+            value: "0"
+        hint: "Increase verbosity of the mage commands, defaults to 0"
+      - select: "DRA Workflow"
+        key: "DRA_WORKFLOW"
+        required: true
+        options:
+          - label: "snapshot"
+            value: "snapshot"
+          - label: "staging"
+            value: "staging"
+        hint: "What workflow of the DRA release process this build is going to be triggered for"
+      - text: "DRA Version"
+        key: "DRA_VERSION"
+        required: true
+        default: ""
+        hint: "The packaging version to use"
+      - select: "DRA DRY-RUN"
+        key: "DRA_DRY_RUN"
+        required: false
+        options:
+          - label: "True"
+            value: "--dry-run"
+          - label: "False"
+            value: ""
+        hint: "If the DRA release manager script would actually publish anything or just print"
+
   - label: "Package elastic-agent"
     env:
       AGENT_DROP_PATH: "build/distributions/elastic-agent-drop"
     key: "package-full"
     command: ".buildkite/x-pack/elastic-agent/scripts/steps/package.sh"
     artifact_paths:
-      - "build/elastic-agent-drop/**/*"
+      - "build/distributions/**/*"
     agents:
-      # TODO: use a container
       provider: "gcp"
-      image: "family/core-ubuntu-2204"
+      image: "family/platform-ingest-beats-ubuntu-2204"
     retry:
       manual:
         allowed: true
