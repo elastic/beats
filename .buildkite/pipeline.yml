@@ -37,20 +37,20 @@ steps:
   #       BUILDKITE_REFSPEC: "refs/pull/${BUILDKITE_PULL_REQUEST}/head"
   #       BUILDKITE_COMMIT: "${BUILDKITE_COMMIT}"
 
-  - trigger: "beats-xpack-libbeat"
-    label: ":esbuild: Downstream - beats-xpack-libbeat"
-    key: "downstream-beats-xpack-libbeat"
-    async: true
-    build:
-      env:
-        BUILDKITE_REFSPEC: "refs/pull/${BUILDKITE_PULL_REQUEST}/head"
-        BUILDKITE_COMMIT: "${BUILDKITE_COMMIT}"
+  # - trigger: "beats-xpack-libbeat"
+  #   label: ":esbuild: Downstream - beats-xpack-libbeat"
+  #   key: "downstream-beats-xpack-libbeat"
+  #   async: true
+  #   build:
+  #     env:
+  #       BUILDKITE_REFSPEC: "refs/pull/${BUILDKITE_PULL_REQUEST}/head"
+  #       BUILDKITE_COMMIT: "${BUILDKITE_COMMIT}"
 
-  - trigger: "beats-xpack-metricbeat"
-    label: ":esbuild: Downstream - beats-xpack-metricbeat"
-    key: "downstream-beats-xpack-metricbeat"
-    async: true
-    build:
-      env:
-        BUILDKITE_REFSPEC: "refs/pull/${BUILDKITE_PULL_REQUEST}/head"
-        BUILDKITE_COMMIT: "${BUILDKITE_COMMIT}"
+  # - trigger: "beats-xpack-metricbeat"
+  #   label: ":esbuild: Downstream - beats-xpack-metricbeat"
+  #   key: "downstream-beats-xpack-metricbeat"
+  #   async: true
+  #   build:
+  #     env:
+  #       BUILDKITE_REFSPEC: "refs/pull/${BUILDKITE_PULL_REQUEST}/head"
+  #       BUILDKITE_COMMIT: "${BUILDKITE_COMMIT}"
