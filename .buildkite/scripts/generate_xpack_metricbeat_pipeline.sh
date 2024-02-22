@@ -159,7 +159,7 @@ if are_conditions_met_packaging; then
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
