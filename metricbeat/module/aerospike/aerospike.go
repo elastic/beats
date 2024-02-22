@@ -22,8 +22,19 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+
 	as "github.com/aerospike/aerospike-client-go"
 )
+
+type Config struct {
+	TLS *tlscommon.Config `config:"ssl"`
+}
+
+// DefaultConfig return default config for the redis module.
+func DefaultConfig() Config {
+	return Config{}
+}
 
 func ParseHost(host string) (*as.Host, error) {
 	pieces := strings.Split(host, ":")
