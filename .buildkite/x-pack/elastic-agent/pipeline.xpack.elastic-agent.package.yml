@@ -42,6 +42,9 @@ steps:
             value: ""
         hint: "If the DRA release manager script would actually publish anything or just print"
 
+  - wait: ~
+    if: build.env("ManifestURL") == null
+
   - label: "Package elastic-agent"
     env:
       AGENT_DROP_PATH: "build/distributions/elastic-agent-drop"
