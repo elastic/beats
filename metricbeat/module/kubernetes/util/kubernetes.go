@@ -256,21 +256,28 @@ func createWatcher(
 	options kubernetes.WatchOptions,
 	client k8sclient.Interface,
 	resourceWatchers *Watchers,
-	namespace string) (bool, error) {
+	namespace string,
+	extraWatcher bool) (bool, error) {
 
 	// We need to check the node scope to decide on whether a watcher should be updated or not
 	nodeScope := false
 	if options.Node != "" {
 		nodeScope = true
 	}
+	// The nodescope for extra watchers node, namespace, replicaset and job should be always false
+	if extraWatcher {
+		nodeScope = false
+		options.Node = ""
+	}
 
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
 
-	resourceMetaWatchers, ok := resourceWatchers.metaWatchersMap[resourceName]
-	// if it does not exist, create the resourceMetaWatchers
+	resourceMetaWatcher, ok := resourceWatchers.metaWatchersMap[resourceName]
+
+	// if it does not exist, create the resourceMetaWatcher
 	if !ok {
-		// check if we need to add namespace to the resourceMetaWatchers options
+		// check if we need to add namespace to the resourceMetaWatcher options
 		if isNamespaced(resourceName) {
 			options.Namespace = namespace
 		}
@@ -288,11 +295,11 @@ func createWatcher(
 			nodeScope:       nodeScope,
 		}
 		return true, nil
-	} else if resourceMetaWatchers.nodeScope != nodeScope && resourceMetaWatchers.nodeScope {
-		// It might happen that the resourceMetaWatchers already exists, but is only being used to monitor the resources
-		// of a single node. In that case, we need to check if we are trying to create a new resourceMetaWatchers that will track
-		// the resources of multiple nodes. If it is the case, then we need to update the resourceMetaWatchers.
-		// check if we need to add namespace to the resourceMetaWatchers options
+	} else if resourceMetaWatcher.nodeScope != nodeScope && resourceMetaWatcher.nodeScope {
+		// It might happen that the resourceMetaWatcher already exists, but is only being used to monitor the resources
+		// of a single node. In that case, we need to check if we are trying to create a new resourceMetaWatcher that will track
+		// the resources of multiple nodes. If it is the case, then we need to update the resourceMetaWatcher.
+		// check if we need to add namespace to the resourceMetaWatcher options
 		if isNamespaced(resourceName) {
 			options.Namespace = namespace
 		}
@@ -301,9 +308,9 @@ func createWatcher(
 			return false, err
 		}
 		// update the handler of the restart resourceMetaWatchers to match the current resourceMetaWatchers handler
-		restartWatcher.AddEventHandler(resourceMetaWatchers.watcher.GetEventHandler())
-		resourceMetaWatchers.restartWatcher = restartWatcher
-		resourceMetaWatchers.nodeScope = nodeScope
+		restartWatcher.AddEventHandler(resourceMetaWatcher.watcher.GetEventHandler())
+		resourceMetaWatcher.restartWatcher = restartWatcher
+		resourceMetaWatcher.nodeScope = nodeScope
 	}
 	return false, nil
 }
@@ -371,10 +378,9 @@ func createAllWatchers(
 	if err != nil {
 		return err
 	}
-
 	// Create a watcher for the given resource.
 	// If it fails, we return an error, so we can stop the extra watchers from creating.
-	created, err := createWatcher(resourceName, res, *options, client, resourceWatchers, config.Namespace)
+	created, err := createWatcher(resourceName, res, *options, client, resourceWatchers, config.Namespace, false)
 	if err != nil {
 		return fmt.Errorf("error initializing Kubernetes watcher %s, required by %s: %w", resourceName, metricsetName, err)
 	} else if created {
@@ -388,7 +394,7 @@ func createAllWatchers(
 	for _, extra := range extraWatchers {
 		extraRes := getResource(extra)
 		if extraRes != nil {
-			created, err = createWatcher(extra, extraRes, *options, client, resourceWatchers, config.Namespace)
+			created, err = createWatcher(extra, extraRes, *options, client, resourceWatchers, config.Namespace, true)
 			if err != nil {
 				log.Errorf("Error initializing Kubernetes watcher %s, required by %s: %s", extra, metricsetName, err)
 			} else {
@@ -439,11 +445,14 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 
 	resourceWatchers.lock.RLock()
 	defer resourceWatchers.lock.RUnlock()
-
 	// The watcher for the resource needs to exist
 	resourceMetaWatcher := resourceWatchers.metaWatchersMap[resourceName]
 	if resourceMetaWatcher == nil {
 		return nil, fmt.Errorf("could not create the metadata generator, as the watcher for %s does not exist", resourceName)
+	}
+	mainWatcher := (*resourceMetaWatcher).watcher
+	if (*resourceMetaWatcher).restartWatcher != nil {
+		mainWatcher = (*resourceMetaWatcher).restartWatcher
 	}
 
 	var metaGen metadata.MetaGen
@@ -464,8 +473,7 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 		if jobMetaWatcher := resourceWatchers.metaWatchersMap[JobResource]; jobMetaWatcher != nil {
 			jobWatcher = (*jobMetaWatcher).watcher
 		}
-
-		metaGen = metadata.GetPodMetaGen(commonConfig, (*resourceMetaWatcher).watcher, nodeWatcher, namespaceWatcher, replicaSetWatcher,
+		metaGen = metadata.GetPodMetaGen(commonConfig, mainWatcher, nodeWatcher, namespaceWatcher, replicaSetWatcher,
 			jobWatcher, addResourceMetadata)
 		return metaGen, nil
 	} else if resourceName == ServiceResource {
@@ -520,7 +528,6 @@ func NewResourceMetadataEnricher(
 
 	metricsetName := base.Name()
 	resourceName := getResourceName(metricsetName)
-
 	err = createAllWatchers(client, metricsetName, resourceName, nodeScope, config, log, resourceWatchers)
 	if err != nil {
 		log.Errorf("Error starting the watchers: %s", err)
@@ -989,25 +996,29 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 		}
 	}
 
-	// Start the main watcher if not already started or if a restart is needed
+	// Start the main watcher if not already started
+	// If there is a restart watcher, stop the old watcher if started and start the restart watcher
 	resourceMetaWatcher := resourceWatchers.metaWatchersMap[e.resourceName]
 	if resourceMetaWatcher != nil {
-		if !resourceMetaWatcher.started {
-			if err := resourceMetaWatcher.watcher.Start(); err != nil {
-				e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
-			} else {
-				resourceMetaWatcher.started = true
+		if resourceMetaWatcher.restartWatcher != nil {
+			if resourceMetaWatcher.started {
+				resourceMetaWatcher.watcher.Stop()
 			}
-		} else if resourceMetaWatcher.restartWatcher != nil {
-			resourceMetaWatcher.watcher.Stop()
 			if err := resourceMetaWatcher.restartWatcher.Start(); err != nil {
 				e.log.Warnf("Error restarting %s watcher: %s", e.resourceName, err)
 			} else {
 				resourceMetaWatcher.watcher = resourceMetaWatcher.restartWatcher
 				resourceMetaWatcher.restartWatcher = nil
 			}
+		} else {
+			if !resourceMetaWatcher.started {
+				if err := resourceMetaWatcher.watcher.Start(); err != nil {
+					e.log.Warnf("Error starting %s watcher: %s", e.resourceName, err)
+				} else {
+					resourceMetaWatcher.started = true
+				}
+			}
 		}
-
 	}
 }
 
