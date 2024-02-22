@@ -84,6 +84,32 @@ packaging_changeset=(
   ".go-version"
   )
 
+case "${BUILDKITE_PIPELINE_SLUG}" in
+  "beats-metricbeat")
+    BEAT_CHANGESET_REFERENCE=${metricbeat_changeset[@]}
+    ;;
+  "beats-libbeat")
+    BEAT_CHANGESET_REFERENCE=${libbeat_changeset[@]}
+    ;;
+  "beats-packetbeat")
+    BEAT_CHANGESET_REFERENCE=${packetbeat_changeset[@]}
+    ;;
+  "beats-winlogbeat")
+    BEAT_CHANGESET_REFERENCE=${winlogbeat_changeset[@]}
+    ;;
+  "beats-xpack-libbeat")
+    BEAT_CHANGESET_REFERENCE=${xpack_libbeat_changeset[@]}
+    ;;
+  "beats-xpack-metricbeat")
+    BEAT_CHANGESET_REFERENCE=${xpack_metricbeat_changeset[@]}
+    ;;
+  *)
+  echo "The changeset for the ${BUILDKITE_PIPELINE_SLUG} pipeline hasn't been defined yet."
+  ;;
+esac
+
+
+
 check_and_set_beat_vars() {
   if [[ -n "$BEATS_PROJECT_NAME" && "$BEATS_PROJECT_NAME" == *"x-pack/"* ]]; then
     BEATS_XPACK_PROJECT_NAME=${BEATS_PROJECT_NAME//-/}              #remove -
@@ -94,7 +120,6 @@ check_and_set_beat_vars() {
     TRIGGER_SPECIFIC_ARM_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_arm_tests"
     TRIGGER_SPECIFIC_AWS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_aws_tests"
     TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_macos_tests"
-    declare -n BEAT_CHANGESET_REFERENCE="${BEATS_XPACK_PROJECT_NAME}_changeset"
     echo "Beats project name is $BEATS_XPACK_PROJECT_NAME"
     mandatory_changeset=(
       "${BEAT_CHANGESET_REFERENCE[@]}"
@@ -107,7 +132,6 @@ check_and_set_beat_vars() {
     TRIGGER_SPECIFIC_ARM_TESTS="run_${BEATS_PROJECT_NAME}_arm_tests"
     TRIGGER_SPECIFIC_AWS_TESTS="run_${BEATS_PROJECT_NAME}_aws_tests"
     TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_PROJECT_NAME}_macos_tests"
-    declare -n BEAT_CHANGESET_REFERENCE="${BEATS_PROJECT_NAME}_changeset"
     echo "Beats project name is $BEATS_PROJECT_NAME"
     mandatory_changeset=(
       "${BEAT_CHANGESET_REFERENCE[@]}"
