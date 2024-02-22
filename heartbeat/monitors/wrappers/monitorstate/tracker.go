@@ -100,7 +100,8 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields, rc RetryConfig)
 
 	var loadedState *State
 	var err error
-	for i := 0; i < attempts; i++ {
+	var i int
+	for i = 0; i < attempts; i++ {
 		loadedState, err = t.stateLoader(sf)
 		if err == nil {
 			if loadedState != nil {
@@ -123,7 +124,7 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields, rc RetryConfig)
 		time.Sleep(sleepFor)
 	}
 	if err != nil {
-		logp.L().Warnf("could not load prior state from elasticsearch after %d attempts, will create new state for monitor: %s", attempts, sf.ID)
+		logp.L().Warnf("could not load prior state from elasticsearch after %d attempts, will create new state for monitor: %s", i+1, sf.ID)
 	}
 
 	if loadedState != nil {
