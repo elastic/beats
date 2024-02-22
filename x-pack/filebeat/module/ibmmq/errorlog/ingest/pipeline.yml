@@ -28,7 +28,7 @@ processors:
 - grok:
     field: message
     patterns:
-    - 'Process\(%{DATA:process.pid}\) User\(%{WORD:user.name}\) Program\(%{DATA:process.title}\)
+    - 'Process\(%{DATA:process.pid}\) (User\(%{WORD:user.name}\) )?Program\(%{DATA:process.title}\)
       Host\(%{DATA:host.hostname}\) Installation\(%{WORD:ibmmq.errorlog.installation}\)
       VRMF\(%{DATA:service.version}\)( QMgr\(%{DATA:ibmmq.errorlog.qmgr}\))?( Time\(%{TIMESTAMP_ISO8601:log_timestamp}\))?(
       RemoteHost\(%{DATA:destination.address}\))?( ArithInsert1\(%{DATA:ibmmq.errorlog.arithinsert1}\))?(
