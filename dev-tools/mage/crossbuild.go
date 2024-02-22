@@ -136,6 +136,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 
 	// Docker is required for this target.
 	if err := HaveDocker(); err != nil {
+		fmt.Printf("No docker found: %v\n", err)
 		return err
 	}
 

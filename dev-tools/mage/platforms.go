@@ -202,6 +202,15 @@ func (p PlatformAttributes) String() string {
 // BuildPlatformList is a list of BuildPlatforms that supports filtering.
 type BuildPlatformList []BuildPlatform
 
+// Returns all BuildPlatform names
+func (list BuildPlatformList) Names() []string {
+	platforms := make([]string, len(list))
+	for i, bp := range list {
+		platforms[i] = bp.Name
+	}
+	return platforms
+}
+
 // Get returns the BuildPlatform matching the given name.
 func (list BuildPlatformList) Get(name string) (BuildPlatform, bool) {
 	for _, bp := range list {

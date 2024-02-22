@@ -7,7 +7,7 @@ steps:
     key: "package-full"
     command: ".buildkite/x-pack/elastic-agent/scripts/steps/package.sh"
     artifact_paths:
-      - "build/distributions/elastic-agent-drop/**/*"
+      - "build/elastic-agent-drop/**/*"
     agents:
       # TODO: use a container
       provider: "gcp"

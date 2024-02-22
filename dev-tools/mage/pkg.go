@@ -22,6 +22,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime"
 	"strconv"
 	"strings"
@@ -385,5 +386,54 @@ func TestBinaryGLIBCVersion(elfPath, maxGlibcVersion string) error {
 			elfPath, requiredGlibc, upperBound)
 	}
 	fmt.Printf(">> testBinaryGLIBCVersion: %q requires glibc %v or greater\n", elfPath, requiredGlibc)
+	return nil
+}
+
+// FixDRADockerArtifacts is a workaround for the DRA artifacts produced by the package target. We had to do
+// because the initial unified release manager DSL code required specific names that the package does not produce,
+// we wanted to keep backwards compatibility with the artifacts of the unified release and the DRA.
+// this follows the same logic as https://github.com/elastic/beats/blob/2fdefcfbc783eb4710acef07d0ff63863fa00974/.ci/scripts/prepare-release-manager.sh
+func FixDRADockerArtifacts() error {
+	fmt.Println("--- Fixing Docker DRA artifacts")
+	distributionsPath := filepath.Join("build", "distributions")
+	// Find all the files with the given name
+	matches, err := filepath.Glob(filepath.Join(distributionsPath, "*docker.tar.gz*"))
+	if err != nil {
+		return err
+	}
+	if mg.Verbose() {
+		log.Printf("--- Found artifacts to rename %s %d", distributionsPath, len(matches))
+	}
+	// Match the artifact name and break down into groups so that we can reconstruct the names as its expected by the DRA DSL
+	// As SNAPSHOT keyword or BUILDID are optional, capturing the separator - or + with the value.
+	artifactRegexp, err := regexp.Compile(`([\w+-]+)-(([0-9]+)\.([0-9]+)\.([0-9]+))([-|\+][\w]+)?-([\w]+)-([\w]+)\.([\w]+)\.([\w.]+)`)
+	if err != nil {
+		return err
+	}
+	for _, m := range matches {
+		artifactFile, err := os.Stat(m)
+		if err != nil {
+			return fmt.Errorf("failed stating file: %w", err)
+		}
+		if artifactFile.IsDir() {
+			continue
+		}
+		match := artifactRegexp.FindAllStringSubmatch(artifactFile.Name(), -1)
+		// The groups here is tightly coupled with the regexp above.
+		// match[0][6] already contains the separator so no need to add before the variable
+		targetName := fmt.Sprintf("%s-%s%s-%s-image-%s-%s.%s", match[0][1], match[0][2], match[0][6], match[0][9], match[0][7], match[0][8], match[0][10])
+		if mg.Verbose() {
+			fmt.Printf("%#v\n", match)
+			fmt.Printf("Artifact: %s \n", artifactFile.Name())
+			fmt.Printf("Renamed:  %s \n", targetName)
+		}
+		renameErr := os.Rename(filepath.Join(distributionsPath, artifactFile.Name()), filepath.Join(distributionsPath, targetName))
+		if renameErr != nil {
+			return renameErr
+		}
+		if mg.Verbose() {
+			fmt.Println("Renamed artifact")
+		}
+	}
 	return nil
 }
