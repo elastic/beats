@@ -109,6 +109,11 @@ func TestMakeESLoaderError(t *testing.T) {
 			statusCode: http.StatusNotFound,
 			expected:   false,
 		},
+		{
+			name:       "should not return a retryable error when handling malformed data",
+			statusCode: http.StatusOK,
+			expected:   false,
+		},
 	}
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {

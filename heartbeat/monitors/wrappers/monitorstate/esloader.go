@@ -104,7 +104,7 @@ func MakeESLoader(esc *eslegclient.Connection, indexPattern string, beatLocation
 		err = json.Unmarshal(body, &sh)
 		if err != nil {
 			sErr := fmt.Errorf("could not unmarshal state hits for %s: %w", sf.ID, err)
-			return nil, LoaderError{err: sErr, Retry: true}
+			return nil, LoaderError{err: sErr, Retry: false}
 		}
 
 		if len(sh.Hits.Hits) == 0 {
