@@ -3,6 +3,7 @@ set -uo pipefail
 source ".buildkite/x-pack/elastic-agent/scripts/steps/setenv.sh"
 source ".buildkite/x-pack/elastic-agent/scripts/steps/common.sh"
 
+set -x
 if test -z "${ManifestURL=:""}"; then
   echo "Missing variable ManifestURL, export it before use."
   exit 2
