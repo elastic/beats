@@ -133,7 +133,7 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 	udpMetrics := netmetrics.NewUDP("netflow", ctx.ID, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)
 	defer udpMetrics.Close()
 
-	flowMetrics := newInputMetrics(udpMetrics.GetRegistry())
+	flowMetrics := newInputMetrics(udpMetrics.Registry())
 
 	n.decoder, err = decoder.NewDecoder(decoder.NewConfig().
 		WithProtocols(n.cfg.Protocols...).

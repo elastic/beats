@@ -175,8 +175,8 @@ func (m *UDP) poll(addr, addr6 []string, each time.Duration, log *logp.Logger) {
 	}
 }
 
-// GetRegistry returns the monitoring registry of the UDP metricset.
-func (m *UDP) GetRegistry() *monitoring.Registry {
+// Registry returns the monitoring registry of the UDP metricset.
+func (m *UDP) Registry() *monitoring.Registry {
 	if m == nil {
 		return nil
 	}

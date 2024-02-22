@@ -168,8 +168,8 @@ func (m *TCP) poll(addr, addr6 []string, each time.Duration, log *logp.Logger) {
 	}
 }
 
-// GetRegistry returns the monitoring registry of the TCP metricset.
-func (m *TCP) GetRegistry() *monitoring.Registry {
+// Registry returns the monitoring registry of the TCP metricset.
+func (m *TCP) Registry() *monitoring.Registry {
 	if m == nil {
 		return nil
 	}
