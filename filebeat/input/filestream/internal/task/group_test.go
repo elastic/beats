@@ -241,12 +241,14 @@ func TestGroup_Go(t *testing.T) {
 		want := uint64(2)
 		g := NewGroup(want, time.Second, logger, "errorPrefix")
 
-		wg.Add(2)
+		wg.Add(1)
 		err := g.Go(workload(1))
 		require.NoError(t, err)
+		wg.Wait()
+
+		wg.Add(1)
 		err = g.Go(workload(2))
 		require.NoError(t, err)
-
 		wg.Wait()
 
 		err = g.Stop()

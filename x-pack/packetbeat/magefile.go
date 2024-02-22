@@ -47,6 +47,7 @@ func init() {
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
+	packetbeat.SelectLogic = devtools.XPackProject
 }
 
 // Update updates the generated files.

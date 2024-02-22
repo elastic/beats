@@ -11,6 +11,8 @@
 
 Use the `httpjson` input to read messages from an HTTP API with JSON payloads.
 
+If you are starting development of a new custom HTTP API input, we recommend that you use the <<filebeat-input-cel,Common Expression Language input>> which provides greater flexibility and an improved developer experience.
+
 This input supports:
 
 * Auth
@@ -218,7 +220,8 @@ Some built-in helper functions are provided to work with the input state inside 
 - `min`: returns the minimum of two values.
 - `mul`: multiplies two integers.
 - `now`: returns the current `time.Time` object in UTC. Optionally, it can receive a `time.Duration` as a parameter. Example: `[[now (parseDuration "-1h")]]` returns the time at 1 hour before now.
-- `parseDate`: parses a date string and returns a `time.Time` in UTC. By default the expected layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. Example: `[[ parseDate "2020-11-05T12:25:32Z" ]]`, `[[ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" ]]`, `[[ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC ]]`.
+- `parseDate`: parses a date string and returns a `time.Time` in UTC. By default the expected layout is `RFC3339` but optionally can accept any of the Golang predefined layouts or a custom one. Note: Parsing timezone abbreviations may cause ambiguities. Prefer `parseDateInTZ` for explicit timezone handling. Example: `[[ parseDate "2020-11-05T12:25:32Z" ]]`, `[[ parseDate "2020-11-05T12:25:32.1234567Z" "RFC3339Nano" ]]`, `[[ (parseDate "Thu Nov  5 12:25:32 +0000 2020" "Mon Jan _2 15:04:05 -0700 2006").UTC ]]`.
+- `parseDateInTZ`: parses a date string within a specified timezone (TZ), returning a `time.Time` in UTC. Specified timezone overwrites implicit timezone from the input date. Accepts timezone offsets ("-07:00", "-0700", "-07") or IANA Time Zone names ("America/New_York"). If TZ is invalid, defaults to UTC. Optional layout argument as in parseDate. Example: `[[ parseDateInTZ "2020-11-05T12:25:32" "America/New_York" ]]`, `[[ parseDateInTZ "2020-11-05T12:25:32" "-07:00" "RFC3339" ]]`.
 - `parseDuration`: parses duration strings and returns `time.Duration`. Example: `[[parseDuration "1h"]]`.
 - `parseTimestampMilli`: parses a timestamp in milliseconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732000]]` returns `2020-11-05 13:25:32 +0000 UTC`.
 - `parseTimestampNano`: parses a timestamp in nanoseconds and returns a `time.Time` in UTC. Example: `[[parseTimestamp 1604582732000000000]]` returns `2020-11-05 13:25:32 +0000 UTC`.
@@ -399,8 +402,12 @@ NOTE: Only one of the credentials settings can be set at once. For more informat
 
 The RSA JWK Private Key JSON for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
 
-NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
+[float]
+==== `auth.oauth2.okta.jwk_pem`
 
+The RSA JWK private key PEM block for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
+
+NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
 
 [float]
 ==== `auth.oauth2.google.delegated_account`
