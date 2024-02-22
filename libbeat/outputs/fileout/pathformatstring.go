@@ -18,10 +18,11 @@
 package fileout
 
 import (
-	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
