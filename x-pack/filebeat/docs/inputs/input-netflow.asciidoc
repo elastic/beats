@@ -142,6 +142,9 @@ value or one of the named ranges supported by the
 <<condition-network, `network`>> condition. The default value is `[private]`
 which classifies RFC 1918 (IPv4) and RFC 4193 (IPv6) addresses as internal.
 
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
 [float]
 === Metrics
 
@@ -169,8 +172,5 @@ You must assign a unique `id` to the input to expose metrics.
 |=======
 
 Histogram metrics are aggregated over the previous 1024 events.
-
-[id="{beatname_lc}-input-{type}-common-options"]
-include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
 
 :type!:
