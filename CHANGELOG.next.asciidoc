@@ -107,7 +107,6 @@ fields added to events containing the Beats version. {pull}37553[37553]
 
 *Packetbeat*
 
-- Fix interface device parsing for packetbeat protocols. {pull}37946[37946]
 
 *Winlogbeat*
 
@@ -218,7 +217,6 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Metricbeat*
 
-- Update `getOpTimestamp` in `replstatus` to fix sort and temp files generation issue in mongodb. {pull}37688[37688]
 
 *Osquerybeat*
 
@@ -277,6 +275,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
 
 
 
