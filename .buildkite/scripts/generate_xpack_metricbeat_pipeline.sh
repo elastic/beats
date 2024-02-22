@@ -128,7 +128,7 @@ if  are_conditions_met_macos_tests; then
 YAML
 fi
 
-if  are_conditions_met_cloud_tests; then
+if  are_conditions_met_aws_tests; then
   cat >> $pipelineName <<- YAML
       - label: ":linux: Cloud Tests"
         key: "extended-cloud-test"
