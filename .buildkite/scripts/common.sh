@@ -379,18 +379,30 @@ config_git() {
 }
 
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then
-  ONLY_DOCS="false"
+  export ONLY_DOCS="false"
   echo "Changes include files outside the docs_changeset vairiabe. ONLY_DOCS=$ONLY_DOCS."
 else
   echo "All changes are related to DOCS. ONLY_DOCS=$ONLY_DOCS."
 fi
 
 if are_paths_changed "${go_mod_changeset[@]}" ; then
-  GO_MOD_CHANGES="true"
+  export GO_MOD_CHANGES="true"
 fi
 
 if are_paths_changed "${packaging_changeset[@]}" ; then
-  PACKAGING_CHANGES="true"
+  export PACKAGING_CHANGES="true"
+fi
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+  AWS_MODULE_PATH=("x-pack/metricbeat/module/aws")
+  AWS_MODULE_PATH_EXCLUDE=("^(${AWS_MODULE_PATH}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
+  if are_paths_changed "${AWS_MODULE_PATH[@]}" && ! are_changed_only_paths "${AWS_MODULE_PATH_EXCLUDE[@]}"; then
+    export MODULE="true"
+  else
+    export MODULE="false"
+  fi
+
+
 fi
 
 check_and_set_beat_vars

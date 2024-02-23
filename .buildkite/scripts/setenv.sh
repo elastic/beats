@@ -11,6 +11,8 @@ GO_VERSION=$(cat .go-version)
 ASDF_MAGE_VERSION="1.15.0"
 PACKAGING_PLATFORMS="+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 PACKAGING_ARM_PLATFORMS="linux/arm64"
+OSS_MODULE_PATTERN="^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
+XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 
 export SETUP_GVM_VERSION
 export DOCKER_COMPOSE_VERSION
@@ -47,8 +49,14 @@ exportVars() {
   fi
 }
 
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+  exportVars
+  export RACE_DETECTOR="true"
+  export TEST_COVERAGE="true"
+  export DOCKER_PULL="0"
+fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
   exportVars
   export RACE_DETECTOR="true"
   export TEST_COVERAGE="true"

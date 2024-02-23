@@ -111,10 +111,6 @@ else
   exit 0
 fi
 
-#---------------debug---------------
-echo "${GITHUB_PR_LABELS}"
-#------------end of debug-----------
-
 echo "Check and add the Extended Tests into the pipeline"
 if are_conditions_met_macos_tests; then
   cat >> $pipelineName <<- YAML

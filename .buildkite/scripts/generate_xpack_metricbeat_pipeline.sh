@@ -110,9 +110,6 @@ if [[ are_conditions_met_aws_tests || are_conditions_met_macos_tests ]]; then
 
 YAML
 fi
-#---------------debug---------------
-echo "${GITHUB_PR_LABELS}"
-#------------end of debug-----------
 
 if  are_conditions_met_macos_tests; then
   cat >> $pipelineName <<- YAML
