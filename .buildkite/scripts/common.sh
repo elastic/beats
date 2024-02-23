@@ -395,7 +395,7 @@ fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
   AWS_MODULE_PATH=("x-pack/metricbeat/module/aws")
-  AWS_MODULE_PATH_TRNSFORMED=$(echo "$directory" | sed 's/\//\\\//g')
+  AWS_MODULE_PATH_TRNSFORMED=$(echo "$AWS_MODULE_PATH" | sed 's/\//\\\//g')
   AWS_MODULE_PATH_EXCLUDE=("^(${AWS_MODULE_PATH_TRNSFORMED}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
   if are_paths_changed "${AWS_MODULE_PATH[@]}" && ! are_changed_only_paths "${AWS_MODULE_PATH_EXCLUDE[@]}"; then
     MODULE="aws"
