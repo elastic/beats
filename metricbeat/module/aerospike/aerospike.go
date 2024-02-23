@@ -28,9 +28,10 @@ import (
 )
 
 type Config struct {
-	User     *string           `config:"username"`
-	Password *string           `config:"password"`
-	TLS      *tlscommon.Config `config:"ssl"`
+	ClusterName *string           `config:"cluster_name"`
+	User        *string           `config:"username"`
+	Password    *string           `config:"password"`
+	TLS         *tlscommon.Config `config:"ssl"`
 }
 
 // DefaultConfig return default config for the aerospike module.
@@ -54,6 +55,10 @@ func ParseClientPolicy(config Config) (*as.ClientPolicy, error) {
 		return nil, fmt.Errorf("if username is set, password should be set too")
 	} else if config.User == nil && config.Password != nil {
 		return nil, fmt.Errorf("if password is set, username should be set too")
+	}
+
+	if config.ClusterName != nil {
+		clientPolicy.ClusterName = *config.ClusterName
 	}
 	return clientPolicy, nil
 }
