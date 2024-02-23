@@ -136,16 +136,16 @@ type InterfaceConfig struct {
 }
 
 type Flows struct {
-	Enabled       *bool                   `config:"enabled"`
-	Timeout       string                  `config:"timeout"`
+	Enabled *bool  `config:"enabled"`
+	Timeout string `config:"timeout"`
+	// Active Timeout kills flow after set time out period even if there traffic on the flow
+	ActiveTimeout string                  `config:"active_timeout"`
 	Period        string                  `config:"period"`
 	EventMetadata mapstr.EventMetadata    `config:",inline"`
 	Processors    processors.PluginConfig `config:"processors"`
 	KeepNull      bool                    `config:"keep_null"`
 	// Index is used to overwrite the index where flows are published
 	Index string `config:"index"`
-	// Enabling Active Flow Timeout will kill flow once the Timeout is reached irrespective of when traffic was last seen on the flow
-	EnableActiveFlowTimeout bool `config:"enable_active_flow_timeout"`
 }
 
 type ProtocolCommon struct {

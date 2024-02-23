@@ -65,7 +65,7 @@ func TestCreateEvent(t *testing.T) {
 	}
 	bif.stats[0] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{10, 1}}
 	bif.stats[1] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{460, 2}}
-	event := createEvent(&procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil, NoKill)
+	event := createEvent(&procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil, FlowActive)
 
 	// Validate the contents of the event.
 	validate := lookslike.MustCompile(map[string]interface{}{
@@ -156,7 +156,7 @@ func Test_shouldKillFlow(t *testing.T) {
 	tests := []struct {
 		name       string
 		args       args
-		want       flowKillReason
+		want       flowEndReason
 		flowKilled bool
 	}{
 		{
@@ -190,7 +190,7 @@ func Test_shouldKillFlow(t *testing.T) {
 				currentTime:          time.Now().Add(20 * time.Second),
 				activeTimeoutEnabled: true,
 			},
-			want:       NoKill,
+			want:       FlowActive,
 			flowKilled: false,
 		},
 		{
@@ -241,17 +241,93 @@ func Test_shouldKillFlow(t *testing.T) {
 				currentTime:          time.Now().Add(50 * time.Second),
 				activeTimeoutEnabled: false,
 			},
-			want:       NoKill,
+			want:       FlowActive,
 			flowKilled: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			processor.timeout = tt.args.flowProcessorTimeout
-			killReason, killFlow := shouldKillFlow(tt.args.flow, processor, tt.args.currentTime, tt.args.activeTimeoutEnabled)
+			killReason, killFlow := shouldEndFlow(tt.args.flow, processor, tt.args.currentTime, tt.args.activeTimeoutEnabled)
 
 			assert.Equal(t, tt.flowKilled, killFlow)
 			assert.Equal(t, tt.want, killReason)
 		})
 	}
+}
+
+func Test_getTicksAndTimeouts(t *testing.T) {
+	type args struct {
+		timeout       time.Duration
+		period        time.Duration
+		activeTimeout time.Duration
+	}
+	tests := []struct {
+		name                     string
+		args                     args
+		wantedTicks              time.Duration
+		wantedTicksTimeout       int
+		wantedTicksPeriod        int
+		wantedTicksActiveTimeout int
+	}{
+		{
+			name: "With active timeout and period set",
+			args: args{
+				timeout:       30 * time.Second,
+				period:        10 * time.Second,
+				activeTimeout: 60 * time.Second,
+			},
+			wantedTicks:              10 * time.Second,
+			wantedTicksTimeout:       3,
+			wantedTicksPeriod:        1,
+			wantedTicksActiveTimeout: 6,
+		},
+		{
+			name: "With active timeout not set and period set",
+			args: args{
+				timeout:       30 * time.Second,
+				period:        10 * time.Second,
+				activeTimeout: -1,
+			},
+			wantedTicks:              10 * time.Second,
+			wantedTicksTimeout:       3,
+			wantedTicksPeriod:        1,
+			wantedTicksActiveTimeout: -1,
+		},
+		{
+			name: "With active timeout set and period not set",
+			args: args{
+				timeout:       30 * time.Second,
+				period:        -1,
+				activeTimeout: 60 * time.Second,
+			},
+			wantedTicks:              30 * time.Second,
+			wantedTicksTimeout:       1,
+			wantedTicksPeriod:        -1,
+			wantedTicksActiveTimeout: 2,
+		},
+		{
+			name: "With active timeout not set and period not set",
+			args: args{
+				timeout:       30 * time.Second,
+				period:        -1,
+				activeTimeout: -1,
+			},
+			wantedTicks:              30 * time.Second,
+			wantedTicksTimeout:       1,
+			wantedTicksPeriod:        -1,
+			wantedTicksActiveTimeout: -1,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotTicks, gotTicksTimeout, gotTicksPeriod, gotTicksActiveTimeout := getTicksAndTimeouts(tt.args.timeout, tt.args.period, tt.args.activeTimeout)
+			assert.Equal(t, tt.wantedTicks, gotTicks)
+			assert.Equal(t, tt.wantedTicksTimeout, gotTicksTimeout)
+			assert.Equal(t, tt.wantedTicksPeriod, gotTicksPeriod)
+			assert.Equal(t, tt.wantedTicksActiveTimeout, gotTicksActiveTimeout)
+		})
+	}
+
 }

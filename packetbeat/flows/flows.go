@@ -34,6 +34,8 @@ var debugf = logp.MakeDebug("flows")
 const (
 	defaultTimeout = 30 * time.Second
 	defaultPeriod  = 10 * time.Second
+	// By default we don't set any active timeout
+	defaultActiveTimeout = 0 * time.Second
 )
 
 // Flows holds and publishes network flow information for running processes.
@@ -59,6 +61,12 @@ func NewFlows(pub Reporter, watcher *procs.ProcessesWatcher, config *config.Flow
 		return nil, err
 	}
 
+	activeTimeout, err := duration(config.ActiveTimeout, defaultActiveTimeout)
+	if err != nil {
+		logp.Err("failed to parse active flow timeout: %v", err)
+		return nil, err
+	}
+
 	period, err := duration(config.Period, defaultPeriod)
 	if err != nil {
 		logp.Err("failed to parse period: %v", err)
@@ -71,7 +79,7 @@ func NewFlows(pub Reporter, watcher *procs.ProcessesWatcher, config *config.Flow
 
 	counter := &counterReg{}
 
-	worker, err := newFlowsWorker(pub, watcher, table, counter, timeout, period, config.EnableActiveFlowTimeout)
+	worker, err := newFlowsWorker(pub, watcher, table, counter, timeout, period, activeTimeout)
 	if err != nil {
 		logp.Err("failed to configure flows processing intervals: %v", err)
 		return nil, err
