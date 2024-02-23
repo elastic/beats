@@ -109,12 +109,19 @@ func getBoolPointer(value bool) *bool {
 }
 
 func TestParseClientPolicy(t *testing.T) {
+	sampleUser := "Test"
+	samplePassword := "MySecretPassword"
+	sampleClusterName := "TestCluster"
+
 	UserPasswordClientPolicy := as.NewClientPolicy()
-	UserPasswordClientPolicy.User = "Test"
-	UserPasswordClientPolicy.Password = "MySecretPassword"
+	UserPasswordClientPolicy.User = sampleUser
+	UserPasswordClientPolicy.Password = samplePassword
 
 	TLSPolicy := as.NewClientPolicy()
 	TLSPolicy.TlsConfig = &tls.Config{}
+
+	ClusterNamePolicy := as.NewClientPolicy()
+	ClusterNamePolicy.ClusterName = sampleClusterName
 
 	tests := []struct {
 		Name                 string
@@ -140,7 +147,7 @@ func TestParseClientPolicy(t *testing.T) {
 		{
 			Name: "Username is set but Password is not",
 			Config: Config{
-				User: getStringPointer("Test"),
+				User: getStringPointer(sampleUser),
 			},
 			expectedClientPolicy: UserPasswordClientPolicy,
 			expectedErr:          fmt.Errorf("if username is set, password should be set too"),
@@ -148,7 +155,7 @@ func TestParseClientPolicy(t *testing.T) {
 		{
 			Name: "Password is set but Username is not",
 			Config: Config{
-				Password: getStringPointer("MySecretPassword"),
+				Password: getStringPointer(samplePassword),
 			},
 			expectedClientPolicy: UserPasswordClientPolicy,
 			expectedErr:          fmt.Errorf("if password is set, username should be set too"),
@@ -165,13 +172,11 @@ func TestParseClientPolicy(t *testing.T) {
 			expectedErr:          nil,
 		},
 		{
-			Name: "TLS Declaration",
+			Name: "Cluster Name Setting",
 			Config: Config{
-				TLS: &tlscommon.Config{
-					Enabled: getBoolPointer(true),
-				},
+				ClusterName: getStringPointer(sampleClusterName),
 			},
-			expectedClientPolicy: TLSPolicy,
+			expectedClientPolicy: ClusterNamePolicy,
 			expectedErr:          nil,
 		},
 	}
