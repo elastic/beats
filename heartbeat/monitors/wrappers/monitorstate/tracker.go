@@ -111,7 +111,7 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields, rc RetryConfig)
 		}
 		var loaderError LoaderError
 		if errors.As(err, &loaderError) && !loaderError.Retry {
-			logp.L().Warnf("could not load last externally recorded state: %w", err)
+			logp.L().Warnf("could not load last externally recorded state: %v", loaderError)
 			break
 		}
 
@@ -120,7 +120,7 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields, rc RetryConfig)
 		if rc.waitFn != nil {
 			sleepFor = rc.waitFn()
 		}
-		logp.L().Warnf("could not load last externally recorded state, will retry again in %d milliseconds: %w", sleepFor.Milliseconds(), err)
+		logp.L().Warnf("could not load last externally recorded state, will retry again in %d milliseconds: %v", sleepFor.Milliseconds(), err)
 		time.Sleep(sleepFor)
 	}
 	if err != nil {
