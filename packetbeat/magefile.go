@@ -29,19 +29,20 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
 
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	// mage:import
+	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/notests"
-	// mage:import
+	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/test"
 )
 
 func init() {
 	common.RegisterCheckDeps(Update)
 	unittest.RegisterPythonTestDeps(packetbeat.FieldsYML, Dashboards)
+	packetbeat.SelectLogic = devtools.OSSProject
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 }

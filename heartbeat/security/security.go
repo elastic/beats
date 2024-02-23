@@ -26,8 +26,6 @@ import (
 	"strconv"
 	"syscall"
 
-	sysinfo "github.com/elastic/go-sysinfo"
-
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
 
@@ -36,13 +34,7 @@ func init() {
 	// In the context of a container, where users frequently run as root, we follow BEAT_SETUID_AS to setuid/gid
 	// and add capabilities to make this actually run as a regular user. This also helps Node.js in synthetics, which
 	// does not want to run as root. It's also just generally more secure.
-	sysInfo, err := sysinfo.Host()
-	isContainer := false
-	if err == nil && sysInfo.Info().Containerized != nil {
-		isContainer = *sysInfo.Info().Containerized
-	}
-
-	if localUserName := os.Getenv("BEAT_SETUID_AS"); isContainer && localUserName != "" && syscall.Geteuid() == 0 {
+	if localUserName := os.Getenv("BEAT_SETUID_AS"); localUserName != "" && syscall.Geteuid() == 0 {
 		err := setNodeProcAttr(localUserName)
 		if err != nil {
 			panic(err)

@@ -464,7 +464,7 @@ func TestConfigOauth2Validation(t *testing.T) {
 		},
 		{
 			name:        "okta requires token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file to be provided",
-			expectedErr: "okta validation error: token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file must be provided accessing 'auth.oauth2'",
+			expectedErr: "okta validation error: one of okta.jwk_json, okta.jwk_file or okta.jwk_pem must be provided accessing 'auth.oauth2'",
 			input: map[string]interface{}{
 				"auth.oauth2": map[string]interface{}{
 					"provider":  "okta",

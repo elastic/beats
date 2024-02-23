@@ -19,8 +19,12 @@
 
 package file_integrity
 
-import "errors"
+import (
+	"errors"
 
-func NewEventReader(c Config) (EventProducer, error) {
+	"github.com/elastic/elastic-agent-libs/logp"
+)
+
+func NewEventReader(c Config, logger *logp.Logger) (EventProducer, error) {
 	return errors.New("file auditing metricset is not implemented on this system")
 }

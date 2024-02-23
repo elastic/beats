@@ -3579,6 +3579,47 @@ filebeat.inputs:
   # collect logs when there is a delay in CloudWatch.
   #latency: 1m
 
+#------------------------------ ETW input --------------------------------
+# Beta: Config options for ETW (Event Trace for Windows) input (Only available for Windows)
+#- type: etw
+  #enabled: false
+  #id: etw-dnsserver
+
+  # Path to an .etl file to read from.
+  #file: "C:\Windows\System32\Winevt\Logs\Logfile.etl"
+
+  # GUID of an ETW provider.
+  # Run 'logman query providers' to list the available providers.
+  #provider.guid: {EB79061A-A566-4698-9119-3ED2807060E7}
+
+  # Name of an ETW provider.
+  # Run 'logman query providers' to list the available providers.
+  #provider.name: Microsoft-Windows-DNSServer
+
+  # Tag to identify created sessions.
+  # If missing, its default value is the provider ID prefixed by 'Elastic-'.
+  #session_name: DNSServer-Analytical-Trace
+
+  # Filter collected events with a level value that is less than or equal to this level.
+  # Allowed values are critical, error, warning, informational, and verbose.
+  #trace_level: verbose
+
+  # 8-byte bitmask that enables the filtering of events from specific provider subcomponents.
+  # The provider will write a particular event if the event's keyword bits match any of the bits
+  # in this bitmask.
+  # Run 'logman query providers "<provider.name>"' to list available keywords.
+  #match_any_keyword: 0x8000000000000000
+
+  # 8-byte bitmask that enables the filtering of events from
+  # specific provider subcomponents. The provider will write a particular
+  # event if the event's keyword bits match all of the bits in this bitmask.
+  # Run 'logman query providers "<provider.name>"' to list available keywords.
+  #match_all_keyword: 0
+
+  # An existing session to read from.
+  # Run 'logman query -ets' to list existing sessions.
+  #session: UAL_Usermode_Provider
+
 # =========================== Filebeat autodiscover ============================
 
 # Autodiscover allows you to detect changes in the system and spawn new modules
@@ -4823,9 +4864,9 @@ setup.template.settings:
 # to load your own lifecycle policy.
 #setup.ilm.policy_file:
 
-# Disable the check for an existing lifecycle policy. The default is true. If
-# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
-# can be installed.
+# Disable the check for an existing lifecycle policy. The default is true.
+# If you set this option to false, lifecycle policy will not be installed,
+# even if setup.ilm.overwrite is set to true.
 #setup.ilm.check_exists: true
 
 # Overwrite the lifecycle policy at startup. The default is false.
