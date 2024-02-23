@@ -15,63 +15,58 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package udp
+package netmetrics
 
 import (
 	"net"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/filebeat/input/internal/procnet"
 )
 
-func TestProcNetUDP(t *testing.T) {
+func TestProcNetTCP(t *testing.T) {
 	t.Run("IPv4", func(t *testing.T) {
-		path := "testdata/proc_net_udp.txt"
+		path := "testdata/proc_net_tcp.txt"
 		t.Run("with_match", func(t *testing.T) {
-			addr := []string{procnet.IPv4(net.IP{0x0a, 0x64, 0x08, 0x25}, 0x1bbe)}
+			addr := []string{ipV4(net.IP{0x7f, 0x00, 0x00, 0x01}, 0x17ac)}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-			rx, drops, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
+			rx, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
 				t.Fatal(err)
 			}
 			assert.Nil(t, bad)
 			assert.EqualValues(t, 1, rx)
-			assert.EqualValues(t, 2, drops)
 		})
 
 		t.Run("leading_zero", func(t *testing.T) {
-			addr := []string{procnet.IPv4(net.IP{0x00, 0x7f, 0x01, 0x00}, 0x1eef)}
+			addr := []string{ipV4(net.IP{0x00, 0x7f, 0x01, 0x00}, 0x17af)}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-			rx, drops, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
+			rx, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
 				t.Fatal(err)
 			}
 			assert.Nil(t, bad)
 			assert.EqualValues(t, 1, rx)
-			assert.EqualValues(t, 2, drops)
 		})
 
 		t.Run("unspecified", func(t *testing.T) {
-			addr := []string{procnet.IPv4(net.ParseIP("0.0.0.0"), 0x1bbe)}
+			addr := []string{ipV4(net.ParseIP("0.0.0.0"), 0x17ac)}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-			rx, drops, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
+			rx, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
 				t.Fatal(err)
 			}
 			assert.Nil(t, bad)
 			assert.EqualValues(t, 2, rx)
-			assert.EqualValues(t, 4, drops)
 		})
 
 		t.Run("without_match", func(t *testing.T) {
 			addr := []string{
-				procnet.IPv4(net.IP{0xde, 0xad, 0xbe, 0xef}, 0xf00d),
-				procnet.IPv4(net.IP{0xba, 0x1d, 0xfa, 0xce}, 0x1135),
+				ipV4(net.IP{0xde, 0xad, 0xbe, 0xef}, 0xf00d),
+				ipV4(net.IP{0xba, 0x1d, 0xfa, 0xce}, 0x1135),
 			}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-			_, _, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
+			_, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
 			assert.Nil(t, bad)
 			if assert.Error(t, err) {
 				assert.Contains(t, err.Error(), "entry not found")
@@ -81,7 +76,7 @@ func TestProcNetUDP(t *testing.T) {
 		t.Run("bad_addrs", func(t *testing.T) {
 			addr := []string{"FOO:BAR", "BAR:BAZ"}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-			_, _, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
+			_, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
 			assert.EqualValues(t, addr, bad)
 			if assert.Error(t, err) {
 				assert.Contains(t, err.Error(), "entry not found")
@@ -90,50 +85,47 @@ func TestProcNetUDP(t *testing.T) {
 	})
 
 	t.Run("IPv6", func(t *testing.T) {
-		path := "testdata/proc_net_udp6.txt"
+		path := "testdata/proc_net_tcp6.txt"
 		t.Run("with_match", func(t *testing.T) {
-			addr := []string{procnet.IPv6(net.IP{0: 0x7f, 3: 0x01, 15: 0}, 0x1bbd)}
+			addr := []string{ipV6(net.IP{0: 0x7f, 3: 0x01, 15: 0}, 0x17ac)}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-			rx, drops, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
+			rx, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
 				t.Fatal(err)
 			}
 			assert.Nil(t, bad)
 			assert.EqualValues(t, 1, rx)
-			assert.EqualValues(t, 475174, drops)
 		})
 
 		t.Run("leading_zero", func(t *testing.T) {
-			addr := []string{procnet.IPv6(net.IP{1: 0x7f, 2: 0x81, 15: 0}, 0x1eef)}
+			addr := []string{ipV6(net.IP{1: 0x7f, 2: 0x01, 15: 0}, 0x17af)}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-			rx, drops, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
+			rx, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
 				t.Fatal(err)
 			}
 			assert.Nil(t, bad)
 			assert.EqualValues(t, 1, rx)
-			assert.EqualValues(t, 475174, drops)
 		})
 
 		t.Run("unspecified", func(t *testing.T) {
-			addr := []string{procnet.IPv6(net.ParseIP("[::]"), 0x1bbd)}
+			addr := []string{ipV6(net.ParseIP("[::]"), 0x17ac)}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-			rx, drops, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
+			rx, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
 			if err != nil {
 				t.Fatal(err)
 			}
 			assert.Nil(t, bad)
 			assert.EqualValues(t, 2, rx)
-			assert.EqualValues(t, 2*475174, drops)
 		})
 
 		t.Run("without_match", func(t *testing.T) {
 			addr := []string{
-				procnet.IPv6(net.IP{0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef}, 0xf00d),
-				procnet.IPv6(net.IP{0xba, 0x1d, 0xfa, 0xce, 0xba, 0x1d, 0xfa, 0xce, 0xba, 0x1d, 0xfa, 0xce, 0xba, 0x1d, 0xfa, 0xce}, 0x1135),
+				ipV6(net.IP{0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef, 0xde, 0xad, 0xbe, 0xef}, 0xf00d),
+				ipV6(net.IP{0xba, 0x1d, 0xfa, 0xce, 0xba, 0x1d, 0xfa, 0xce, 0xba, 0x1d, 0xfa, 0xce, 0xba, 0x1d, 0xfa, 0xce}, 0x1135),
 			}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-			_, _, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
+			_, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
 			assert.Nil(t, bad)
 			if assert.Error(t, err) {
 				assert.Contains(t, err.Error(), "entry not found")
@@ -143,7 +135,7 @@ func TestProcNetUDP(t *testing.T) {
 		t.Run("bad_addrs", func(t *testing.T) {
 			addr := []string{"FOO:BAR", "BAR:BAZ"}
 			hasUnspecified, addrIsUnspecified, bad := containsUnspecifiedAddr(addr)
-			_, _, err := procNetUDP(path, addr, hasUnspecified, addrIsUnspecified)
+			_, err := procNetTCP(path, addr, hasUnspecified, addrIsUnspecified)
 			assert.EqualValues(t, addr, bad)
 			if assert.Error(t, err) {
 				assert.Contains(t, err.Error(), "entry not found")
