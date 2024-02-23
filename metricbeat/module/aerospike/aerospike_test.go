@@ -18,9 +18,12 @@
 package aerospike
 
 import (
+	"crypto/tls"
 	"errors"
+	"fmt"
 	"testing"
 
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/stretchr/testify/assert"
 
 	as "github.com/aerospike/aerospike-client-go"
@@ -94,5 +97,99 @@ func TestParseInfo(t *testing.T) {
 	for _, test := range tests {
 		result := ParseInfo(test.info)
 		assert.Equal(t, test.expected, result, test.Name)
+	}
+}
+
+func getStringPointer(value string) *string {
+	return &value
+}
+
+func getBoolPointer(value bool) *bool {
+	return &value
+}
+
+func TestParseClientPolicy(t *testing.T) {
+	UserPasswordClientPolicy := as.NewClientPolicy()
+	UserPasswordClientPolicy.User = "Test"
+	UserPasswordClientPolicy.Password = "MySecretPassword"
+
+	TLSPolicy := as.NewClientPolicy()
+	TLSPolicy.TlsConfig = &tls.Config{}
+
+	tests := []struct {
+		Name                 string
+		Config               Config
+		expectedClientPolicy *as.ClientPolicy
+		expectedErr          error
+	}{
+		{
+			Name:                 "No configurations lead to default policy",
+			Config:               Config{},
+			expectedClientPolicy: as.NewClientPolicy(),
+			expectedErr:          nil,
+		},
+		{
+			Name: "Username and password are honored",
+			Config: Config{
+				User:     getStringPointer("Test"),
+				Password: getStringPointer("MySecretPassword"),
+			},
+			expectedClientPolicy: UserPasswordClientPolicy,
+			expectedErr:          nil,
+		},
+		{
+			Name: "Username is set but Password is not",
+			Config: Config{
+				User: getStringPointer("Test"),
+			},
+			expectedClientPolicy: UserPasswordClientPolicy,
+			expectedErr:          fmt.Errorf("if username is set, password should be set too"),
+		},
+		{
+			Name: "Password is set but Username is not",
+			Config: Config{
+				Password: getStringPointer("MySecretPassword"),
+			},
+			expectedClientPolicy: UserPasswordClientPolicy,
+			expectedErr:          fmt.Errorf("if password is set, username should be set too"),
+		},
+		{
+			Name: "TLS Declaration",
+			Config: Config{
+				TLS: &tlscommon.Config{
+					Enabled: getBoolPointer(true),
+				},
+			},
+
+			expectedClientPolicy: TLSPolicy,
+			expectedErr:          nil,
+		},
+		{
+			Name: "TLS Declaration",
+			Config: Config{
+				TLS: &tlscommon.Config{
+					Enabled: getBoolPointer(true),
+				},
+			},
+			expectedClientPolicy: TLSPolicy,
+			expectedErr:          nil,
+		},
+	}
+
+	for _, test := range tests {
+		result, err := ParseClientPolicy(test.Config)
+		if err != nil {
+			if test.expectedErr != nil {
+				assert.Equal(t, test.expectedErr.Error(), err.Error())
+				continue
+			}
+			t.Error(err)
+			continue
+		}
+		assert.Equal(t, test.expectedClientPolicy.User, result.User, test.Name)
+		assert.Equal(t, test.expectedClientPolicy.Password, result.Password, test.Name)
+		if test.Config.TLS.IsEnabled() {
+			assert.NotNil(t, test.expectedClientPolicy.TlsConfig)
+		}
 	}
 }
