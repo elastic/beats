@@ -115,6 +115,7 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 			"--path.logs", tempDir,
 			"-E", "logging.to_files=true",
 			"-E", "logging.files.rotateeverybytes=104857600", // About 100MB
+			"-E", "logging.files.rotateonstartup=false",
 		}, args...),
 		tempDir:    tempDir,
 		beatName:   beatName,
