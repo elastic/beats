@@ -47,6 +47,25 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Fix nil pointer dereference in the httpjson input {pull}37591[37591]
+- [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
+- Fix the ignore_inactive option being ignored in Filebeat's filestream input {pull}34770[34770]
+- Fix TestMultiEventForEOFRetryHandlerInput unit test of CometD input {pull}34903[34903]
+- Add input instance id to request trace filename for httpjson and cel inputs {pull}35024[35024]
+- Fixes "Can only start an input when all related states are finished" error when running under Elastic-Agent {pull}35250[35250] {issue}33653[33653]
+- [system] sync system/auth dataset with system integration 1.29.0. {pull}35581[35581]
+- [GCS Input] - Fixed an issue where bucket_timeout was being applied to the entire bucket poll interval and not individual bucket object read operations. Fixed a map write concurrency issue arising from data races when using a high number of workers. Fixed the flaky tests that were present in the GCS test suit. {pull}35605[35605]
+- Fixed concurrency and flakey tests issue in azure blob storage input. {issue}35983[35983] {pull}36124[36124]
+- Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
+- Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
+- Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
+- Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
+- Fix m365_defender cursor value and query building. {pull}37116[37116]
+- Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
+- Update github.com/lestrrat-go/jwx dependency. {pull}37799[37799]
+- [threatintel] MISP pagination fixes {pull}37898[37898]
+- Fix file handle leak when handling errors in filestream {pull}37973[37973]
+- Prevent HTTPJSON holding response bodies between executions. {issue}35219[35219] {pull}38116[38116]
 
 *Heartbeat*
 
