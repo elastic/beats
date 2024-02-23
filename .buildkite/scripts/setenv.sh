@@ -47,6 +47,57 @@ exportVars() {
   fi
 }
 
+are_paths_changed() {
+  local patterns=("${@}")
+  local changelist=()
+  for pattern in "${patterns[@]}"; do
+    changed_files=($(git diff --name-only HEAD@{1} HEAD | grep -E "$pattern"))
+    if [ "${#changed_files[@]}" -gt 0 ]; then
+      changelist+=("${changed_files[@]}")
+    fi
+  done
+
+  if [ "${#changelist[@]}" -gt 0 ]; then
+    echo "Files changed:"
+    echo "${changelist[*]}"
+    return 0
+  else
+    echo "No files changed within specified changeset:"
+    echo "${patterns[*]}"
+    return 1
+  fi
+}
+
+are_changed_only_paths() {
+  local patterns=("${@}")
+  local changelist=()
+  local changed_files=$(git diff --name-only HEAD@{1} HEAD)
+  if [ -z "$changed_files" ] || grep -qE "$(IFS=\|; echo "${patterns[*]}")" <<< "$changed_files"; then
+    return 0
+  fi
+  return 1
+}
+
+withModule() {
+  local module_path=$1
+  if [[ "$module_path" == *"x-pack/"* ]]; then
+    local pattern=("$XPACK_MODULE_PATTERN")
+  else
+    local pattern=("$OSS_MODULE_PATTERN")
+  fi
+  local module_name="${module_path#*module/}"
+  local module_path_transformed=$(echo "$module_path" | sed 's/\//\\\//g')
+  local module_path_exclussion="((?!^${module_path_transformed}\\/).)*\$"
+  local exclude=("^(${module_path_transformed}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
+  if are_paths_changed "${pattern[@]}" && ! are_changed_only_paths "${exclude[@]}"; then
+    MODULE="${module_name}"
+  else
+    MODULE=""
+  fi
+  echo "MODULE=$MODULE"
+  export MODULE
+}
+
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
   exportVars
   export RACE_DETECTOR="true"
@@ -59,4 +110,8 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
   export RACE_DETECTOR="true"
   export TEST_COVERAGE="true"
   export DOCKER_PULL="0"
+fi
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+  withModule "x-pack/metricbeat/module/aws"
 fi
