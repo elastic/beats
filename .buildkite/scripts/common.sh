@@ -9,6 +9,8 @@ arch_type="$(uname -m)"
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 GITHUB_PR_LABELS=${GITHUB_PR_LABELS:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
+OSS_MODULE_PATTERN="^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
+XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_libbeat+x}" ] && run_libbeat="$(buildkite-agent meta-data get run_libbeat --default "false")"
 [ -z "${run_metricbeat+x}" ] && run_metricbeat="$(buildkite-agent meta-data get run_metricbeat --default "false")"
 [ -z "${run_packetbeat+x}" ] && run_packetbeat="$(buildkite-agent meta-data get run_packetbeat --default "false")"
@@ -291,6 +293,37 @@ retry() {
   return 0
 }
 
+are_paths_changed() {
+  local patterns=("${@}")
+  local changelist=()
+  for pattern in "${patterns[@]}"; do
+    changed_files=($(git diff --name-only HEAD@{1} HEAD | grep -E "$pattern"))
+    if [ "${#changed_files[@]}" -gt 0 ]; then
+      changelist+=("${changed_files[@]}")
+    fi
+  done
+
+  if [ "${#changelist[@]}" -gt 0 ]; then
+    echo "Files changed:"
+    echo "${changelist[*]}"
+    return 0
+  else
+    echo "No files changed within specified changeset:"
+    echo "${patterns[*]}"
+    return 1
+  fi
+}
+
+are_changed_only_paths() {
+  local patterns=("${@}")
+  local changelist=()
+  local changed_files=$(git diff --name-only HEAD@{1} HEAD)
+  if [ -z "$changed_files" ] || grep -qE "$(IFS=\|; echo "${patterns[*]}")" <<< "$changed_files"; then
+    return 0
+  fi
+  return 1
+}
+
 are_conditions_met_mandatory_tests() {
   if are_paths_changed "${mandatory_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_COMMENT}" || "${GITHUB_PR_LABELS}" =~ /(?i)${BEATS_GH_LABEL}/ || "${!TRIGGER_SPECIFIC_BEAT}" == "true" ]]; then
     return 0
@@ -347,6 +380,26 @@ config_git() {
   fi
 }
 
+withModule() {
+  local module_path=$1
+  if [[ "$module_path" == *"x-pack/"* ]]; then
+    local pattern=("$XPACK_MODULE_PATTERN")
+  else
+    local pattern=("$OSS_MODULE_PATTERN")
+  fi
+  local module_name="${module_path#*module/}"
+  local module_path_transformed=$(echo "$module_path" | sed 's/\//\\\//g')
+  local module_path_exclussion="((?!^${module_path_transformed}\\/).)*\$"
+  local exclude=("^(${module_path_transformed}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
+  if are_paths_changed "${pattern[@]}" && ! are_changed_only_paths "${exclude[@]}"; then
+    MODULE="${module_name}"
+  else
+    MODULE=""
+  fi
+  echo "MODULE=$MODULE"
+  export MODULE
+}
+
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then
   export ONLY_DOCS="false"
   echo "Changes include files outside the docs_changeset vairiabe. ONLY_DOCS=$ONLY_DOCS."
@@ -360,6 +413,10 @@ fi
 
 if are_paths_changed "${packaging_changeset[@]}" ; then
   export PACKAGING_CHANGES="true"
+fi
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+  withModule "x-pack/metricbeat/module/aws"
 fi
 
 check_and_set_beat_vars
