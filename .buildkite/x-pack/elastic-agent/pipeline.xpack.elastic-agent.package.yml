@@ -63,6 +63,7 @@ steps:
             export MAGEFILE_VERBOSE=$(buildkite-agent meta-data get MAGEFILE_VERBOSE --default "0")
           fi
           .buildkite/x-pack/elastic-agent/scripts/steps/package.sh
+          ls -lah build/distributions/
         artifact_paths:
           - "build/distributions/**/*"
         agents:
