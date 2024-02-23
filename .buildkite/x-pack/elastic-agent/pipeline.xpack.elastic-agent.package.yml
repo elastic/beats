@@ -84,7 +84,7 @@ steps:
       DRA_PROJECT_ARTIFACT_ID: "agent-package"
     command: |
       echo "+++ Restoring Artifacts"
-      buildkite-agent artifact download "pack/elastic-agent/build/**/*" ./build/
+      buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" ./build/
       echo "+++ Changing permissions for the release manager"
       sudo chown -R :1000 build/distributions/
       echo "+++ Running DRA publish step"
