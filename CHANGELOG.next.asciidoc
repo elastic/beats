@@ -97,6 +97,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - [threatintel] MISP pagination fixes {pull}37898[37898]
 - Fix file handle leak when handling errors in filestream {pull}37973[37973]
 - Prevent HTTPJSON holding response bodies between executions. {issue}35219[35219] {pull}38116[38116]
+- Fix "failed processing S3 event for object key" error on aws-s3 input when key contains the "+" character {issue}38012[38012] {pull}38125[38125]
 
 *Heartbeat*
 
