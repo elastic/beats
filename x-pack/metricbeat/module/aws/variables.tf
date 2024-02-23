@@ -20,3 +20,7 @@ variable "ENVIRONMENT" {
 variable "REPO" {
   default = "unknown-repo-name"
 }
+
+variable "TESTVAR" {
+  default = "unknown-repo-name"
+}
