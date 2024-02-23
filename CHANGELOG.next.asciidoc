@@ -47,6 +47,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Filebeat*
 
+- Prevent HTTPJSON holding response bodies between executions. {issue}35219[35219] {pull}38116[38116]
 
 *Heartbeat*
 
