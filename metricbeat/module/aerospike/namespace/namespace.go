@@ -26,7 +26,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/module/aerospike"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
 // init registers the MetricSet with the central registry.
@@ -43,9 +42,9 @@ func init() {
 // multiple fetch calls.
 type MetricSet struct {
 	mb.BaseMetricSet
-	host   *as.Host
-	config aerospike.Config
-	client *as.Client
+	host         *as.Host
+	clientPolicy *as.ClientPolicy
+	client       *as.Client
 }
 
 // New create a new instance of the MetricSet
@@ -62,10 +61,15 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("Invalid host format, expected hostname:port: %w", err)
 	}
 
+	clientPolicy, err := aerospike.ParseClientPolicy(config)
+	if err != nil {
+		return nil, fmt.Errorf("could not initialize aerospike client policy: %w", err)
+	}
+
 	return &MetricSet{
 		BaseMetricSet: base,
 		host:          host,
-		config:        config,
+		clientPolicy:  clientPolicy,
 	}, nil
 }
 
@@ -108,19 +112,7 @@ func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 // create an aerospike client if it doesn't exist yet
 func (m *MetricSet) connect() error {
 	if m.client == nil {
-		clientPolicy := as.NewClientPolicy()
-		if m.config.TLS.IsEnabled() {
-			tlsconfig, err := tlscommon.LoadTLSConfig(m.config.TLS)
-			if err != nil {
-				return fmt.Errorf("could not initialize TLS configurations %w", err)
-			}
-			clientPolicy.TlsConfig = tlsconfig.ToConfig()
-		}
-		if m.config.User != nil && m.config.Password != nil {
-			clientPolicy.User = *m.config.User
-			clientPolicy.Password = *m.config.Password
-		}
-		client, err := as.NewClientWithPolicyAndHost(clientPolicy, m.host)
+		client, err := as.NewClientWithPolicyAndHost(m.clientPolicy, m.host)
 		if err != nil {
 			return err
 		}

@@ -33,9 +33,29 @@ type Config struct {
 	TLS      *tlscommon.Config `config:"ssl"`
 }
 
-// DefaultConfig return default config for the redis module.
+// DefaultConfig return default config for the aerospike module.
 func DefaultConfig() Config {
 	return Config{}
+}
+
+func ParseClientPolicy(config Config) (*as.ClientPolicy, error) {
+	clientPolicy := as.NewClientPolicy()
+	if config.TLS.IsEnabled() {
+		tlsconfig, err := tlscommon.LoadTLSConfig(config.TLS)
+		if err != nil {
+			return nil, fmt.Errorf("could not initialize TLS configurations %w", err)
+		}
+		clientPolicy.TlsConfig = tlsconfig.ToConfig()
+	}
+	if config.User != nil && config.Password != nil {
+		clientPolicy.User = *config.User
+		clientPolicy.Password = *config.Password
+	} else if config.User != nil && config.Password == nil {
+		return nil, fmt.Errorf("if username is set, password should be set too")
+	} else if config.User == nil && config.Password != nil {
+		return nil, fmt.Errorf("if password is set, username should be set too")
+	}
+	return clientPolicy, nil
 }
 
 func ParseHost(host string) (*as.Host, error) {
