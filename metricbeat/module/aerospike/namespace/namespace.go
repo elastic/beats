@@ -116,6 +116,10 @@ func (m *MetricSet) connect() error {
 			}
 			clientPolicy.TlsConfig = tlsconfig.ToConfig()
 		}
+		if m.config.User != nil && m.config.Password != nil {
+			clientPolicy.User = *m.config.User
+			clientPolicy.Password = *m.config.Password
+		}
 		client, err := as.NewClientWithPolicyAndHost(clientPolicy, m.host)
 		if err != nil {
 			return err

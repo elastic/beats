@@ -28,7 +28,9 @@ import (
 )
 
 type Config struct {
-	TLS *tlscommon.Config `config:"ssl"`
+	User     *string           `config:"username"`
+	Password *string           `config:"password"`
+	TLS      *tlscommon.Config `config:"ssl"`
 }
 
 // DefaultConfig return default config for the redis module.
