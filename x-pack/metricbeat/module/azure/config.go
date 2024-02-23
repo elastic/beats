@@ -6,6 +6,7 @@ package azure
 
 import (
 	"fmt"
+	"golang.org/x/time/rate"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -41,6 +42,8 @@ type Config struct {
 	RefreshListInterval time.Duration    `config:"refresh_list_interval"`
 	DefaultResourceType string           `config:"default_resource_type"`
 	AddCloudMetadata    bool             `config:"add_cloud_metadata"`
+	RateLimit           rate.Limit       `config:"rate_limit"`
+	RateBurst           int              `config:"rate_burst"`
 	// specific to billing
 	BillingScopeDepartment string `config:"billing_scope_department"` // retrieve usage details from department scope
 	BillingScopeAccountId  string `config:"billing_scope_account_id"` // retrieve usage details from billing account ID scope

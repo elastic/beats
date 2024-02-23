@@ -7,6 +7,7 @@ package azure
 import (
 	"context"
 	"fmt"
+	"golang.org/x/time/rate"
 	"strings"
 
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -27,6 +28,7 @@ type MonitorService struct {
 	resourceClient         *armresources.Client
 	context                context.Context
 	log                    *logp.Logger
+	limiter                *rate.Limiter
 }
 
 const (
@@ -91,6 +93,20 @@ func NewService(config Config) (*MonitorService, error) {
 		return nil, fmt.Errorf("couldn't create metric namespaces client: %w", err)
 	}
 
+	// Rate limiter to avoid hitting the Azure Monitoring API rate limits.
+	// According to https://learn.microsoft.com/en-us/azure/azure-monitor/service-limits
+	// the maximum number of queries is 200 per 30 seconds.
+	rateLimit := rate.Limit(6)
+	rateBurst := 1
+
+	if config.RateLimit >= 0 {
+		rateLimit = config.RateLimit
+	}
+	if config.RateBurst > 0 {
+		rateBurst = config.RateBurst
+	}
+	limiter := rate.NewLimiter(rateLimit, rateBurst) // 6 requests per second (200/30 = 6.67, rounded down to 6 requests per second
+
 	service := &MonitorService{
 		metricDefinitionClient: metricsDefinitionClient,
 		metricsClient:          metricsClient,
@@ -98,6 +114,7 @@ func NewService(config Config) (*MonitorService, error) {
 		resourceClient:         resourceClient,
 		context:                context.Background(),
 		log:                    logp.NewLogger("azure monitor service"),
+		limiter:                limiter,
 	}
 
 	return service, nil
@@ -118,6 +135,13 @@ func (service MonitorService) GetResourceDefinitions(id []string, group []string
 			})
 
 			for pager.More() {
+				// Wait for the rate limiter to allow the request to be made to
+				// the Azure Monitoring API before making the request.
+				err := service.limiter.Wait(service.context)
+				if err != nil {
+					return nil, err
+				}
+
 				nextResult, err := pager.NextPage(service.context)
 				if err != nil {
 					return nil, err
@@ -169,6 +193,13 @@ func (service MonitorService) GetResourceDefinitions(id []string, group []string
 
 // GetResourceDefinitionById will retrieve the azure resource based on the resource Id
 func (service MonitorService) GetResourceDefinitionById(id string) (armresources.GenericResource, error) {
+	// Wait for the rate limiter to allow the request to be made to
+	// the Azure Monitoring API before making the request.
+	err := service.limiter.Wait(service.context)
+	if err != nil {
+		return armresources.GenericResource{}, err
+	}
+
 	resp, err := service.resourceClient.GetByID(service.context, id, ApiVersion, nil)
 	if err != nil {
 		return armresources.GenericResource{}, err
@@ -184,6 +215,13 @@ func (service *MonitorService) GetMetricNamespaces(resourceId string) (armmonito
 	metricNamespaceCollection := armmonitor.MetricNamespaceCollection{}
 
 	for pager.More() {
+		// Wait for the rate limiter to allow the request to be made to
+		// the Azure Monitoring API before making the request.
+		err := service.limiter.Wait(service.context)
+		if err != nil {
+			return armmonitor.MetricNamespaceCollection{}, err
+		}
+
 		nextPage, err := pager.NextPage(service.context)
 		if err != nil {
 			return armmonitor.MetricNamespaceCollection{}, err
@@ -208,6 +246,13 @@ func (service *MonitorService) GetMetricDefinitions(resourceId string, namespace
 	metricDefinitionCollection := armmonitor.MetricDefinitionCollection{}
 
 	for pager.More() {
+		// Wait for the rate limiter to allow the request to be made to
+		// the Azure Monitoring API before making the request.
+		err := service.limiter.Wait(service.context)
+		if err != nil {
+			return armmonitor.MetricDefinitionCollection{}, err
+		}
+
 		nextPage, err := pager.NextPage(service.context)
 		if err != nil {
 			return armmonitor.MetricDefinitionCollection{}, err
@@ -257,12 +302,19 @@ func (service *MonitorService) GetMetricValues(resourceId string, namespace stri
 			Metricnames: &metricNames,
 			Timespan:    &timespan,
 			Top:         nil,
-			// Orderby:         &orderBy,
-			ResultType: &resultTypeData,
+			ResultType:  &resultTypeData,
 		}
 
 		if namespace != "" {
 			opts.Metricnamespace = &namespace
+		}
+
+		// Wait for the rate limiter to allow the request to be made to
+		// the Azure Monitoring API before making the request.
+		err := service.limiter.Wait(service.context)
+		if err != nil {
+			// TODO: should we check if the context is cancelled?
+			return metrics, "", err
 		}
 
 		resp, err := service.metricsClient.List(service.context, resourceId, opts)
