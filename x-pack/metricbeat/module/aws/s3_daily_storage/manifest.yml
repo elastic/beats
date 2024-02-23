@@ -9,6 +9,7 @@ input:
         name:
           - BucketSizeBytes
           - NumberOfObjects
+          - TestName
 
 processors:
   - rename:

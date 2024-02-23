@@ -139,7 +139,7 @@ if  are_conditions_met_aws_tests; then
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML

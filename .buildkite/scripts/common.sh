@@ -393,7 +393,7 @@ withModule() {
   local exclude=("^(${module_path_transformed}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
   if are_paths_changed "${pattern[@]}" && ! are_changed_only_paths "${exclude[@]}"; then
     MODULE="${module_name}"
-  else
+  elif [ -d "${module_path}" ]; then
     MODULE=""
   fi
   echo "MODULE=$MODULE"
