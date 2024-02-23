@@ -6,3 +6,15 @@
   #  - namespace
   period: 10s
   hosts: ["localhost:3000"]
+  
+  # Username of hosts. Empty by default.
+  # username: root
+  
+  # Password of hosts. Empty by default.
+  # password: secret
+  
+  # Aerospike Cluster Name
+  # cluster_name: myclustername 
+
+  # Read more about SSL Configurations https://www.elastic.co/guide/en/beats/metricbeat/current/configuration-ssl.html
+  # ssl.enabled: false  
