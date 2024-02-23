@@ -9,6 +9,8 @@ arch_type="$(uname -m)"
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 GITHUB_PR_LABELS=${GITHUB_PR_LABELS:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
+OSS_MODULE_PATTERN="^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
+XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_libbeat+x}" ] && run_libbeat="$(buildkite-agent meta-data get run_libbeat --default "false")"
 [ -z "${run_metricbeat+x}" ] && run_metricbeat="$(buildkite-agent meta-data get run_metricbeat --default "false")"
 [ -z "${run_packetbeat+x}" ] && run_packetbeat="$(buildkite-agent meta-data get run_packetbeat --default "false")"
@@ -378,6 +380,26 @@ config_git() {
   fi
 }
 
+withModule() {
+  local module_path=$1
+  if [[ "$module_path" == *"x-pack/"* ]]; then
+    local pattern=("$XPACK_MODULE_PATTERN")
+  else
+    local pattern=("$OSS_MODULE_PATTERN")
+  fi
+  local module_name="${module_path#*module/}"
+  local module_path_transformed=$(echo "$module_path" | sed 's/\//\\\//g')
+  local module_path_exclussion="((?!^${module_path_transformed}\\/).)*\$"
+  local exclude=("^(${module_path_transformed}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
+  if are_paths_changed "${pattern[@]}" && ! are_changed_only_paths "${exclude[@]}"; then
+    MODULE="${module_name}"
+  else
+    MODULE=""
+  fi
+  echo "MODULE=$MODULE"
+  export MODULE
+}
+
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then
   export ONLY_DOCS="false"
   echo "Changes include files outside the docs_changeset vairiabe. ONLY_DOCS=$ONLY_DOCS."
@@ -394,16 +416,7 @@ if are_paths_changed "${packaging_changeset[@]}" ; then
 fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
-  AWS_MODULE_PATH=("x-pack/metricbeat/module/aws")
-  AWS_MODULE_PATH_TRNSFORMED=$(echo "$AWS_MODULE_PATH" | sed 's/\//\\\//g')
-  AWS_MODULE_PATH_EXCLUDE=("^(${AWS_MODULE_PATH_TRNSFORMED}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
-  if are_paths_changed "${AWS_MODULE_PATH[@]}" && ! are_changed_only_paths "${AWS_MODULE_PATH_EXCLUDE[@]}"; then
-    MODULE="aws"
-  else
-    MODULE=""
-  fi
-  export MODULE
-
+  withModule "x-pack/metricbeat/module/aws"
 fi
 
 check_and_set_beat_vars
