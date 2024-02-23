@@ -27,6 +27,8 @@ steps:
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
         command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
+        env:
+          MODULE: "$MODULE"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -36,6 +38,8 @@ steps:
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
+        env:
+          MODULE: "$MODULE"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -130,6 +134,8 @@ if  are_conditions_met_aws_tests; then
       - label: ":linux: Cloud Tests"
         key: "extended-cloud-test"
         command: "cd $BEATS_PROJECT_NAME && mage build test"
+        env:
+          MODULE: "$MODULE"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"

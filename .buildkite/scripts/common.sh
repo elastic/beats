@@ -397,7 +397,6 @@ withModule() {
     MODULE=""
   fi
   echo "MODULE=$MODULE"
-  export MODULE
 }
 
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then

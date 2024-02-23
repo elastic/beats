@@ -60,7 +60,3 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
   export TEST_COVERAGE="true"
   export DOCKER_PULL="0"
 fi
-
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
-  withModule "x-pack/metricbeat/module/aws"
-fi
