@@ -30,8 +30,10 @@ import (
 var isWindowsPath = os.PathSeparator == '\\'
 
 // PathFormatString is a wrapper around EventFormatString for the
-// common special case where the format expression should only have access to
-// shared static fields (typically agent / version) and the event timestamp.
+// handling paths with a format expression that has access to the timestamp format.
+// It has special handling for paths, specifically for windows path separator
+// which would be interpreted as an escape character. This formatter double escapes
+// the path separator so it is properly interpreted by the fmtstr processor
 type PathFormatString struct {
 	efs *fmtstr.EventFormatString
 }
