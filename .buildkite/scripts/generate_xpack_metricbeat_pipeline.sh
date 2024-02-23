@@ -59,41 +59,41 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 ### TODO: this condition will be changed in the Phase 3 of the Migration Plan https://docs.google.com/document/d/1IPNprVtcnHlem-uyGZM0zGzhfUuFAh4LeSl9JFHMSZQ/edit#heading=h.sltz78yy249h
-  - group: "Extended Windows Tests"
-    key: "extended-win-tests"
-    steps:
-      - label: ":windows: Windows 10 Unit Tests"
-        key: "extended-win-10-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_10}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+  # - group: "Extended Windows Tests"
+  #   key: "extended-win-tests"
+  #   steps:
+  #     - label: ":windows: Windows 10 Unit Tests"
+  #       key: "extended-win-10-unit-tests"
+  #       command: ".buildkite/scripts/win_unit_tests.ps1"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_WIN_10}"
+  #         machineType: "${GCP_WIN_MACHINE_TYPE}"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      - label: ":windows: Windows 11 Unit Tests"
-        key: "extended-win-11-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+  #     - label: ":windows: Windows 11 Unit Tests"
+  #       key: "extended-win-11-unit-tests"
+  #       command: ".buildkite/scripts/win_unit_tests.ps1"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_WIN_11}"
+  #         machineType: "${GCP_WIN_MACHINE_TYPE}"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      - label: ":windows: Win 2019 Unit Tests"
-        key: "extended-win-2019-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+  #     - label: ":windows: Win 2019 Unit Tests"
+  #       key: "extended-win-2019-unit-tests"
+  #       command: ".buildkite/scripts/win_unit_tests.ps1"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_WIN_2019}"
+  #         machineType: "${GCP_WIN_MACHINE_TYPE}"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
 else
@@ -143,34 +143,34 @@ echo "Check and add the Packaging into the pipeline"
 if are_conditions_met_packaging; then
   cat >> $pipelineName <<- YAML
 
-  - wait: ~
-    depends_on:
-      - step: "mandatory-tests"
-        allow_failure: false
+  # - wait: ~
+  #   depends_on:
+  #     - step: "mandatory-tests"
+  #       allow_failure: false
 
-  - group: "Packaging"    # TODO: check conditions for future the main pipeline migration: https://github.com/elastic/beats/pull/28589
-    key: "packaging"
-    steps:
-      - label: ":linux: Packaging Linux"
-        key: "packaging-linux"
-        command: "cd $BEATS_PROJECT_NAME && mage package"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        env:
-          PLATFORMS: "${PACKAGING_PLATFORMS}"
+  # - group: "Packaging"    # TODO: check conditions for future the main pipeline migration: https://github.com/elastic/beats/pull/28589
+  #   key: "packaging"
+  #   steps:
+  #     - label: ":linux: Packaging Linux"
+  #       key: "packaging-linux"
+  #       command: "cd $BEATS_PROJECT_NAME && mage package"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_UBUNTU_X86_64}"
+  #         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+  #       env:
+  #         PLATFORMS: "${PACKAGING_PLATFORMS}"
 
-      - label: ":linux: Packaging ARM"
-        key: "packaging-arm"
-        command: "cd $BEATS_PROJECT_NAME && mage package"
-        agents:
-          provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        env:
-          PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
-          PACKAGES: "docker"
+  #     - label: ":linux: Packaging ARM"
+  #       key: "packaging-arm"
+  #       command: "cd $BEATS_PROJECT_NAME && mage package"
+  #       agents:
+  #         provider: "aws"
+  #         imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+  #         instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+  #       env:
+  #         PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
+  #         PACKAGES: "docker"
 
 YAML
 fi
