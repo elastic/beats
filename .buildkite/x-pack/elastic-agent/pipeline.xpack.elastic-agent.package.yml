@@ -73,3 +73,30 @@ steps:
         retry:
           manual:
             allowed: true
+
+  - label: ":elastic-stack: Publishing to DRA"
+    key: dra-publish
+    depends_on: package
+    agents:
+      provider: "gcp"
+    env:
+      DRA_PROJECT_ID: "elastic-agent-package"
+      DRA_PROJECT_ARTIFACT_ID: "agent-package"
+    command: |
+      echo "+++ Restoring Artifacts"
+      buildkite-agent artifact download "build/**/*" .
+      echo "+++ Changing permissions for the release manager"
+      sudo chown -R :1000 x-pack/elastic-agent/build/distributions/
+      echo "+++ Running DRA publish step"
+      if [[ -z "${MAGEFILE_VERBOSE}" ]]; then
+        export MAGEFILE_VERBOSE=$(buildkite-agent meta-data get MAGEFILE_VERBOSE --default "0")
+      fi
+      if [[ -z "${DRA_DRY_RUN}" ]]; then
+        DRA_DRY_RUN=$(buildkite-agent meta-data get DRA_DRY_RUN --default "")
+        export DRA_DRY_RUN
+      fi
+      if [[ -z "${DRA_VERSION}" ]]; then
+        DRA_VERSION=$(buildkite-agent meta-data get DRA_VERSION --default "")
+        export DRA_VERSION
+      fi
+      .buildkite/scripts/steps/dra-publish.sh
