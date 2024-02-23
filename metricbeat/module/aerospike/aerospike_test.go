@@ -18,7 +18,6 @@
 package aerospike
 
 import (
-	"crypto/tls"
 	"errors"
 	"fmt"
 	"testing"
@@ -118,7 +117,8 @@ func TestParseClientPolicy(t *testing.T) {
 	UserPasswordClientPolicy.Password = samplePassword
 
 	TLSPolicy := as.NewClientPolicy()
-	TLSPolicy.TlsConfig = &tls.Config{}
+	tlsconfig, _ := tlscommon.LoadTLSConfig(&tlscommon.Config{Enabled: getBoolPointer(true)})
+	TLSPolicy.TlsConfig = tlsconfig.ToConfig()
 
 	ClusterNamePolicy := as.NewClientPolicy()
 	ClusterNamePolicy.ClusterName = sampleClusterName
@@ -167,7 +167,6 @@ func TestParseClientPolicy(t *testing.T) {
 					Enabled: getBoolPointer(true),
 				},
 			},
-
 			expectedClientPolicy: TLSPolicy,
 			expectedErr:          nil,
 		},
@@ -193,8 +192,9 @@ func TestParseClientPolicy(t *testing.T) {
 		}
 		assert.Equal(t, test.expectedClientPolicy.User, result.User, test.Name)
 		assert.Equal(t, test.expectedClientPolicy.Password, result.Password, test.Name)
+		assert.Equal(t, test.expectedClientPolicy.ClusterName, result.ClusterName, test.Name)
 		if test.Config.TLS.IsEnabled() {
-			assert.NotNil(t, test.expectedClientPolicy.TlsConfig)
+			assert.NotNil(t, result.TlsConfig)
 		}
 	}
 }
