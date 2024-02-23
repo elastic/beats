@@ -37,9 +37,6 @@ queue.mem:
 filebeat.registry.flush: 1s
 path.home: %s
 logging:
-  files:
-    rotateeverybytes: 104857600
-    rotateonstartup: false
   level: debug
   selectors:
 #    - file_watcher
@@ -58,28 +55,17 @@ func TestFilestreamFileTruncation(t *testing.T) {
 
 	tempDir := filebeat.TempDir()
 	logFile := path.Join(tempDir, "log.log")
+	registryLogFile := filepath.Join(tempDir, "data/registry/filebeat/log.json")
 	filebeat.WriteConfigFile(fmt.Sprintf(truncationCfg, logFile, tempDir, tempDir))
 
 	writeLogFile(t, logFile, 10, false)
-	fi, err := os.Stat(logFile)
-	if err != nil {
-		t.Fatal(err)
-	}
 
-	if fi.Size() != 500 {
-		t.Fatalf("[%s] file size is wrong: %d", logFile, fi.Size())
-	}
 	filebeat.Start()
 	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.Stop()
 
-	registryLogFile := filepath.Join(tempDir, "data/registry/filebeat/log.json")
-	entries := readFilestreamRegistryLog(t, registryLogFile)
-	lastEntry := entries[len(entries)-1]
-	if lastEntry.Offset != 500 {
-		t.Fatalf("expecting offset 500 got %d instead", lastEntry.Offset)
-	}
+	assertLastOffset(t, registryLogFile, 500)
 
 	if err := os.Truncate(logFile, 0); err != nil {
 		t.Fatalf("could not truncate log file: %s", err)
@@ -87,38 +73,34 @@ func TestFilestreamFileTruncation(t *testing.T) {
 
 	writeLogFile(t, logFile, 5, true)
 
-	fi, err = os.Stat(logFile)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if fi.Size() != 250 {
-		t.Fatalf("[%s] file size is wrong: %d", logFile, fi.Size())
-	}
-
 	filebeat.Start()
 	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.Stop()
 
-	entries = readFilestreamRegistryLog(t, registryLogFile)
-	lastEntry = entries[len(entries)-1]
-	if lastEntry.Offset != 250 {
-		t.Errorf("expecting offset 250 got %d instead", lastEntry.Offset)
+	assertLastOffset(t, registryLogFile, 250)
+}
+
+func assertLastOffset(t *testing.T, path string, offset int) {
+	entries := readFilestreamRegistryLog(t, path)
+	lastEntry := entries[len(entries)-1]
+	if lastEntry.Offset != offset {
+		t.Errorf("expecting offset %d got %d instead", offset, lastEntry.Offset)
+		t.Log("last registry entries:")
+
 		max := len(entries)
 		if max > 10 {
 			max = 10
 		}
-
-		t.Log("last registry entries")
 		for _, e := range entries[:max] {
 			t.Logf("%+v\n", e)
 		}
+
 		t.FailNow()
 	}
 }
 
-// writeLogFile each line is 50 bytes
+// writeLogFile writes count lines to path, each line is 50 bytes
 func writeLogFile(t *testing.T, path string, count int, append bool) {
 	var file *os.File
 	var err error
@@ -130,6 +112,7 @@ func writeLogFile(t *testing.T, path string, count int, append bool) {
 	} else {
 		file, err = os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	}
+	defer assertFileSize(t, path, int64(count*50))
 	defer file.Close()
 	defer file.Sync()
 
@@ -138,6 +121,18 @@ func writeLogFile(t *testing.T, path string, count int, append bool) {
 		if _, err := fmt.Fprintf(file, "%s %13d\n", now, i); err != nil {
 			t.Fatalf("could not write line %d to file: %s", count+1, err)
 		}
+	}
+}
+
+func assertFileSize(t *testing.T, path string, size int64) {
+	t.Helper()
+	fi, err := os.Stat(path)
+	if err != nil {
+		t.Fatalf("could not call Stat on '%s': %s", path, err)
+	}
+
+	if fi.Size() != size {
+		t.Fatalf("[%s] expecting size %d, got: %d", path, size, fi.Size())
 	}
 }
 
