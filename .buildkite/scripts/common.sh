@@ -316,9 +316,15 @@ are_paths_changed() {
 
 are_changed_only_paths() {
   local patterns=("${@}")
-  local changelist=()
-  local changed_files=$(git diff --name-only HEAD@{1} HEAD)
-  if [ -z "$changed_files" ] || grep -qE "$(IFS=\|; echo "${patterns[*]}")" <<< "$changed_files"; then
+  local changed_files=($(git diff --name-only HEAD@{1} HEAD))
+  local matched_files=()
+  for pattern in "${patterns[@]}"; do
+    local matched=($(grep -E "${pattern}" <<< "${changed_files[@]}"))
+    if [ "${#matched[@]}" -gt 0 ]; then
+      matched_files+=("${matched[@]}")
+    fi
+  done
+  if [ "${#matched_files[@]}" -eq "${#changed_files[@]}" ] || [ "${#changed_files[@]}" -eq 0 ]; then
     return 0
   fi
   return 1
