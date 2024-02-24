@@ -131,7 +131,7 @@ fi
 
 if  are_conditions_met_aws_tests; then
   cat >> $pipelineName <<- YAML
-      - label: ":linux: Cloud Tests"
+      - label: ":linux: ${MODULE^^} Cloud Tests"
         key: "extended-cloud-test"
         command: "cd $BEATS_PROJECT_NAME && mage build test"
         env:
