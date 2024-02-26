@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-@Library('apm@current') _
+// @Library('apm@current') _
 
 pipeline {
   agent { label 'ubuntu-22 && immutable' }
@@ -54,6 +54,31 @@ pipeline {
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
+        sh 'ulimit -n 50000'
+        deleteDir()
+        // Here we do a checkout into a temporary directory in order to have the
+        // side-effect of setting up the git environment correctly.
+        gitCheckout(basedir: "${pwd(tmp: true)}", githubNotifyFirstTimeContributor: true)
+        pipelineManager([ cancelPreviousRunningBuilds: [ when: 'PR' ] ])
+        dir("${BASE_DIR}") {
+            // We use a raw checkout to avoid the many extra objects which are brought in
+            // with a `git fetch` as would happen if we used the `gitCheckout` step.
+            checkout scm
+        }
+        stashV2(name: 'source', bucket: "${JOB_GCS_BUCKET}", credentialsId: "${JOB_GCS_CREDENTIALS}")
+        dir("${BASE_DIR}"){
+          // Skip all the stages except docs for PR's with asciidoc, md or deploy k8s templates changes only
+          setEnvVar('ONLY_DOCS', isGitRegionMatch(patterns: [ '(.*\\.(asciidoc|md)|deploy/kubernetes/.*-kubernetes\\.yaml)' ], shouldMatchAll: true).toString())
+          setEnvVar('GO_MOD_CHANGES', isGitRegionMatch(patterns: [ '^go.mod' ], shouldMatchAll: false).toString())
+          setEnvVar('PACKAGING_CHANGES', isGitRegionMatch(patterns: [ '(^dev-tools/packaging/.*|.go-version)' ], shouldMatchAll: false).toString())
+          setEnvVar('GO_VERSION', readFile(".go-version").trim())
+          withEnv(["HOME=${env.WORKSPACE}"]) {
+            retryWithSleep(retries: 2, seconds: 5){ sh(label: "Install Go ${env.GO_VERSION}", script: '.ci/scripts/install-go.sh') }
+          }
+        }
+        dir("${BASE_DIR}"){
+          setEnvVar('VERSION', sh(label: 'Get beat version', script: 'make get-version', returnStdout: true)?.trim())
+        }
       }
     }
     stage('Checks'){
