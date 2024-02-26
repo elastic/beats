@@ -54,6 +54,7 @@ pipeline {
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
+        sh 'lsof -n -u $USER'
         sh 'ulimit -n 50000'
         deleteDir()
         // Here we do a checkout into a temporary directory in order to have the
