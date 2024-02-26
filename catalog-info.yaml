@@ -637,7 +637,7 @@ spec:
     spec:
       # branch_configuration: "7.17"         #TODO: uncomment after tests
       pipeline_file: ".buildkite/x-pack/pipeline.xpack.metricbeat.yml"
-      maximum_timeout_in_minutes: 120
+      maximum_timeout_in_minutes: 240
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
         build_pull_request_forks: false
