@@ -54,7 +54,6 @@ pipeline {
     stage('Checkout') {
       options { skipDefaultCheckout() }
       steps {
-        sh 'ulimit -n 50000'
         deleteDir()
         // Here we do a checkout into a temporary directory in order to have the
         // side-effect of setting up the git environment correctly.
