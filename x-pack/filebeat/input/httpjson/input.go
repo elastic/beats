@@ -163,6 +163,12 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	trCtx.cursor.load(crsr)
 
 	doFunc := func() error {
+		defer func() {
+			// Clear response bodies between evaluations.
+			trCtx.firstResponse.body = nil
+			trCtx.lastResponse.body = nil
+		}()
+
 		log.Info("Process another repeated request.")
 
 		startTime := time.Now()
