@@ -229,10 +229,8 @@ func (s *Session) StartConsumer() error {
 	// Open an ETW trace processing handle for consuming events
 	// from an ETW real-time trace session or an ETW log file.
 	s.traceHandler, err = s.openTrace(&elf)
-
 	switch {
 	case err == nil:
-
 	// Handle specific errors for trace opening.
 	case errors.Is(err, ERROR_BAD_PATHNAME):
 		return fmt.Errorf("invalid log source when opening trace: %w", err)
@@ -241,10 +239,10 @@ func (s *Session) StartConsumer() error {
 	default:
 		return fmt.Errorf("failed to open trace: %w", err)
 	}
+
 	// Process the trace. This function blocks until processing ends.
 	if err := s.processTrace(&s.traceHandler, 1, nil, nil); err != nil {
 		return fmt.Errorf("failed to process trace: %w", err)
 	}
-
 	return nil
 }
