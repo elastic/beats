@@ -1,4 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+name: "beats-packetbeat"
+
 env:
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
@@ -20,24 +22,24 @@ steps:
   - input: "Input Parameters"
     key: "input-run-all-stages"
     fields:
-    - select: "Packetbeat - runPacketbeat"
-      key: "runPacketbeat"
+    - select: "Packetbeat - run_packetbeat"
+      key: "run_packetbeat"
       options:
         - label: "True"
           value: "true"
         - label: "False"
           value: "false"
       default: "false"
-    - select: "Packetbeat - runPacketbeatArmTest"
-      key: "runPacketbeatArmTest"
+    - select: "Packetbeat - run_packetbeat_arm_tests"
+      key: "run_packetbeat_arm_tests"
       options:
         - label: "True"
           value: "true"
         - label: "False"
           value: "false"
       default: "false"
-    - select: "Packetbeat - runPacketbeatMacOsTests"
-      key: "runPacketbeatMacOsTests"
+    - select: "Packetbeat - run_packetbeat_macos_tests"
+      key: "run_packetbeat_macos_tests"
       options:
         - label: "True"
           value: "true"
@@ -53,3 +55,6 @@ steps:
   - label: ":linux: Load dynamic packetbeat pipeline"
     key: "packetbeat-pipeline"
     command: ".buildkite/scripts/generate_packetbeat_pipeline.sh"
+    notify:
+      - github_commit_status:
+          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"

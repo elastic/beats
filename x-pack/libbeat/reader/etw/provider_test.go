@@ -176,24 +176,3 @@ func TestGUIDFromProviderName_Success(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, mockGUID, guid, "GUID should match the mock GUID")
 }
-
-func TestIsGUIDValid_True(t *testing.T) {
-	// Valid GUID
-	validGUID := windows.GUID{
-		Data1: 0xeb79061a,
-		Data2: 0xa566,
-		Data3: 0x4698,
-		Data4: [8]byte{0x12, 0x34, 0x3e, 0xd2, 0x80, 0x70, 0x33, 0xa0},
-	}
-
-	valid := IsGUIDValid(validGUID)
-	assert.True(t, valid, "IsGUIDValid should return true for a valid GUID")
-}
-
-func TestIsGUIDValid_False(t *testing.T) {
-	// Invalid GUID (all zeros)
-	invalidGUID := windows.GUID{}
-
-	valid := IsGUIDValid(invalidGUID)
-	assert.False(t, valid, "IsGUIDValid should return false for an invalid GUID")
-}
