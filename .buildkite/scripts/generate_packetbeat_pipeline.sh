@@ -35,7 +35,7 @@ steps:
 
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: ".buildkite/scripts/win_unit_tests.ps1 unittests"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -55,7 +55,7 @@ steps:
     steps:
       - label: ":windows: Win 2019 Unit Tests"
         key: "extended-win-2019-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: ".buildkite/scripts/win_unit_tests.ps1 unittests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -66,7 +66,7 @@ steps:
 
       - label: ":windows: Windows 10 Unit Tests"
         key: "extended-win-10-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: ".buildkite/scripts/win_unit_tests.ps1 unittests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -77,7 +77,7 @@ steps:
 
       - label: ":windows: Windows 11 Unit Tests"
         key: "extended-win-11-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: ".buildkite/scripts/win_unit_tests.ps1 unittests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"

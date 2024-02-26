@@ -41,9 +41,10 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_S
   fi
 fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
-  # Set GCP credentials
-  GOOGLE_APPLICATION_GCP_SECRET=$(retry 5 vault kv get -format=json -field=data ${CI_GCP_OBS_PATH})
-  echo "${GOOGLE_APPLICATION_GCP_SECRET}" > ./gcp.json
-  export GOOGLE_APPLICATION_CREDENTIALS=$(realpath ./gcp.json)
-fi
+# uncomement when PR is merged https://github.com/elastic/ci/pull/2704
+# if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
+#   # Set GCP credentials
+#   GOOGLE_APPLICATION_GCP_SECRET=$(retry 5 vault kv get -format=json -field=data ${CI_GCP_OBS_PATH})
+#   echo "${GOOGLE_APPLICATION_GCP_SECRET}" > ./gcp.json
+#   export GOOGLE_APPLICATION_CREDENTIALS=$(realpath ./gcp.json)
+# fi
