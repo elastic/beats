@@ -110,8 +110,6 @@ case "${BUILDKITE_PIPELINE_SLUG}" in
   ;;
 esac
 
-
-
 check_and_set_beat_vars() {
   if [[ -n "$BEATS_PROJECT_NAME" && "$BEATS_PROJECT_NAME" == *"x-pack/"* ]]; then
     BEATS_XPACK_PROJECT_NAME=${BEATS_PROJECT_NAME//-/}              #remove -
