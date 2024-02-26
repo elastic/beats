@@ -27,6 +27,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 *Filebeat*
 
 - Convert netflow input to API v2 and disable event normalisation {pull}37901[37901]
+- Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
 
 
 *Heartbeat*
@@ -96,6 +97,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - [threatintel] MISP pagination fixes {pull}37898[37898]
 - Fix file handle leak when handling errors in filestream {pull}37973[37973]
 - Fix a race condition that could crash Filebeat with a "negative WaitGroup counter" error {pull}38094[38094]
+- Prevent HTTPJSON holding response bodies between executions. {issue}35219[35219] {pull}38116[38116]
 
 *Heartbeat*
 
@@ -108,7 +110,6 @@ fields added to events containing the Beats version. {pull}37553[37553]
 
 *Packetbeat*
 
-- Fix interface device parsing for packetbeat protocols. {pull}37946[37946]
 
 *Winlogbeat*
 
@@ -134,6 +135,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Upgrade to elastic-agent-libs v0.7.3 and golang.org/x/crypto v0.17.0. {pull}37544[37544]
 - Make more selective the Pod autodiscovery upon node and namespace update events. {issue}37338[37338] {pull}37431[37431]
 - Upgrade go-sysinfo from 1.12.0 to 1.13.1. {pull}37996[37996]
+- Make `range` condition work with numeric values as strings. {pull}38080[38080]
 
 *Auditbeat*
 
@@ -219,7 +221,6 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Metricbeat*
 
-- Update `getOpTimestamp` in `replstatus` to fix sort and temp files generation issue in mongodb. {pull}37688[37688]
 
 *Osquerybeat*
 
@@ -278,6 +279,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
 
 
 
