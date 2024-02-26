@@ -108,6 +108,9 @@ case "${BUILDKITE_PIPELINE_SLUG}" in
   "beats-xpack-metricbeat")
     BEAT_CHANGESET_REFERENCE=${xpack_metricbeat_changeset[@]}
     ;;
+  "beats-xpack-packetbeat")
+    BEAT_CHANGESET_REFERENCE=${xpack_packetbeat_changeset[@]}
+    ;;
   *)
   echo "The changeset for the ${BUILDKITE_PIPELINE_SLUG} pipeline hasn't been defined yet."
   ;;
