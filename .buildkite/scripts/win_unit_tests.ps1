@@ -1,3 +1,7 @@
+param(
+    [string]$testType
+)
+
 $ErrorActionPreference = "Stop" # set -e
 $WorkFolder = $env:BEATS_PROJECT_NAME
 $WORKSPACE = Get-Location
@@ -142,10 +146,18 @@ $env:MAGEFILE_CACHE = $magefile
 
 New-Item -ItemType Directory -Force -Path "build"
 
-if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
-    mage -w reader/etw build goUnitTest
-} else {
-    mage build unitTest
+if ($testType -eq "unittests") {
+    if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
+        mage -w reader/etw build goUnitTest
+    } else {
+        mage build unitTest
+    }
+}
+elseif ($testType -eq "systemtests") {
+    mage systemTest
+}
+else {
+    Write-Host "Unknown test type. Please specify 'unittests' or 'systemtests'."
 }
 
 $EXITCODE=$LASTEXITCODE

@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+CI_GCP_OBS_PATH="kv/ci-shared/observability-ingest/cloud/gcp"
+
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" ]]; then
   source .buildkite/env-scripts/env.sh
   source .buildkite/env-scripts/util.sh
@@ -12,10 +14,17 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == 
   fi
 fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
   source .buildkite/scripts/setenv.sh
   if [[ "${BUILDKITE_COMMAND}" =~ ^buildkite-agent ]]; then
     echo "Skipped pre-command when running the Upload pipeline"
     exit 0
   fi
+fi
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
+  # Set GCP credentials
+  GOOGLE_APPLICATION_GCP_SECRET=$(retry 5 vault kv get -format=json -field=data ${CI_GCP_OBS_PATH})
+  echo "${GOOGLE_APPLICATION_GCP_SECRET}" > ./gcp.json
+  export GOOGLE_APPLICATION_CREDENTIALS=$(realpath ./gcp.json)
 fi
