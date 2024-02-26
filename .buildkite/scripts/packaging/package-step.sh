@@ -41,7 +41,7 @@ if are_files_changed "$changeset"; then
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.large"
+          instanceType: "t4g.xlarge"
 YAML
 )
   echo "${bk_pipeline}" | buildkite-agent pipeline upload
