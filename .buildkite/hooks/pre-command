@@ -4,6 +4,16 @@ set -euo pipefail
 
 # CI_GCP_OBS_PATH="kv/ci-shared/observability-ingest/cloud/gcp"
 PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
+TMP_FOLDER_TEMPLATE_BASE="tmp.beats"
+WORKSPACE="$(pwd)"
+
+google_cloud_auth() {
+  local secretFileLocation
+  secretFileLocation=$(mktemp -d -p "${WORKSPACE}" -t "${TMP_FOLDER_TEMPLATE_BASE}.XXXXXXXXX")/google-cloud-credentials.json
+  echo "${PRIVATE_CI_GCS_CREDENTIALS_SECRET}" > ${secretFileLocation}
+  gcloud auth activate-service-account --key-file ${secretFileLocation} 2> /dev/null
+  export GOOGLE_APPLICATION_CREDENTIALS=${secretFileLocation}
+}
 
 retry() {
   local retries=$1
@@ -53,6 +63,5 @@ fi
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
   # Set GCP credentials
   PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry 5 vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
-  echo "${PRIVATE_CI_GCS_CREDENTIALS_SECRET}" > ./gcp.json
-  export GOOGLE_APPLICATION_CREDENTIALS=$(realpath ./gcp.json)
+  google_cloud_auth
 fi
