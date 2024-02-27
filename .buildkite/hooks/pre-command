@@ -60,7 +60,6 @@ fi
 
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
-  if [[ "$BUILDKITE_STEP_KEY" == "kibana-discover" || "$BUILDKITE_STEP_KEY" == "refresh-k8s-tmpls" || "$BUILDKITE_STEP_KEY" =~ ^sync-bundled-packages ]]; then
   # Set GCP credentials
   PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry 5 vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
   export PRIVATE_CI_GCS_CREDENTIALS_SECRET
