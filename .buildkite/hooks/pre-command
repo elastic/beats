@@ -4,14 +4,13 @@ set -euo pipefail
 
 # CI_GCP_OBS_PATH="kv/ci-shared/observability-ingest/cloud/gcp"
 PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
-TMP_FOLDER_TEMPLATE_BASE="tmp.beats"
 WORKSPACE="$(pwd)"
 
 google_cloud_auth() {
   local secretFileLocation
-  secretFileLocation=$(mktemp -d -p "${WORKSPACE}" -t "${TMP_FOLDER_TEMPLATE_BASE}.XXXXXXXXX")/google-cloud-credentials.json
+  secretFileLocation=$(mktemp -d -p "${WORKSPACE}" -t "tmp.beats.XXXXXXXXX")/google-cloud-credentials.json
   echo "${PRIVATE_CI_GCS_CREDENTIALS_SECRET}" > ${secretFileLocation}
-  gcloud auth activate-service-account --key-file ${secretFileLocation} 2> /dev/null
+  #gcloud auth activate-service-account --key-file ${secretFileLocation} 2> /dev/null
   export GOOGLE_APPLICATION_CREDENTIALS=${secretFileLocation}
 }
 
@@ -61,7 +60,9 @@ fi
 
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
+  if [[ "$BUILDKITE_STEP_KEY" == "kibana-discover" || "$BUILDKITE_STEP_KEY" == "refresh-k8s-tmpls" || "$BUILDKITE_STEP_KEY" =~ ^sync-bundled-packages ]]; then
   # Set GCP credentials
   PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry 5 vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
+  export PRIVATE_CI_GCS_CREDENTIALS_SECRET
   google_cloud_auth
 fi
