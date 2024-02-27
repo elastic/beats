@@ -450,7 +450,7 @@ value is true.
 ==== `timeout`
 
 Timeout configures the lifetime of a flow. If no packets have been received for
-a flow within the timeout time window or if `enable_active_flow_timeout` , the flow is killed and reported. The
+a flow within the timeout time window, the flow is killed and reported. The
 default value is 30s.
 
 [float]
@@ -462,10 +462,9 @@ disabled, flows are still reported once being timed out. The default value is
 10s.
 
 [float]
-==== `enable_active_flow_timeout`
+==== `active_timeout`
 
-When `enable_active_flow_timeout` is set to true, flow is killed and reported every time the timeout period is hit. For eg. if the `timeout` is set
-to 30s, the flow will be killed and reported every 30s.
+ActiveTimeout configures the lifetime of a flow. When we hit the active timeout seconds after the flow was created, the flow is killed and reported. The default value is -1. If set to -1, the active timeout is disabled.
 
 [float]
 [[packetbeat-configuration-flows-fields]]

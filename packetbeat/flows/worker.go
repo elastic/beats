@@ -174,7 +174,12 @@ func getTicksAndTimeouts(timeout, period, activeTimeout time.Duration) (time.Dur
 	ticksActiveTimeout := -1
 	ticksPeriod := -1
 
-	// If activeTimeout is set, we need to calculate the tick for the worker
+	// If ActiveTimeout is set, we need to calculate the tick for the worker
+	// The tick will be gcd of timeout and activeTimeout
+	// example timeout is 30 and activeTimeout is 60, then tick will be 30
+	// so the worker is going to try to run process every 30seconds
+	// ticksTimeout will be 1 and ticksActiveTimeout will be 2
+	// so we will checkTimeout at every tick and checkActiveTimeout at every 2 ticks
 	// TODO: I think these two if conditions can maybe be represented in a better way
 	if activeTimeout > 0 {
 		tick = gcd(timeout, activeTimeout)
@@ -193,6 +198,10 @@ func getTicksAndTimeouts(timeout, period, activeTimeout time.Duration) (time.Dur
 		}
 	}
 
+	// If period is set, we need to calculate the tick for the worker based on the period as well
+	// If period is 10, timeout is 30 and ative timeout is 60, then tick will be 10 (gcd of all 3)
+	// ticksTimeout will be 3, ticksPeriod will be 1 and ticksActiveTimeout will be 6
+	// So we will report flow at every tick, check for timeout every 3 ticks and check for active timeout every 6 ticks
 	if period > 0 {
 		tick = gcd(tick, period)
 		if tick < time.Second {
@@ -209,6 +218,7 @@ func getTicksAndTimeouts(timeout, period, activeTimeout time.Duration) (time.Dur
 			ticksPeriod = 1
 		}
 
+		// If activeTImeout is set, we need to calculate the tick for the worker based on the activeTimeout as well
 		if activeTimeout > 0 {
 			ticksActiveTimeout = int(activeTimeout / tick)
 			if ticksActiveTimeout == 0 {
@@ -309,16 +319,16 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 		var next *biFlow
 		for flow := table.flows.head; flow != nil; flow = next {
 			next = flow.next
-			killReason := FlowActive
-			var killFlow bool
+			endReason := FlowActive
+			var endFlow bool
 
 			debugf("handle flow: %v, %v", flow.id.flowIDMeta, flow.id.flowID)
 
 			reportFlow := handleReports
 			isOver := lastReport
-			if checkTimeout {
-				killReason, killFlow = shouldEndFlow(flow, fw, ts, handleActiveTimeout)
-				if killFlow {
+			if checkTimeout || handleActiveTimeout {
+				endReason, endFlow = shouldEndFlow(flow, fw, ts, handleActiveTimeout)
+				if endFlow {
 					debugf("kill flow")
 
 					reportFlow = true
@@ -330,7 +340,7 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 
 			if reportFlow {
 				debugf("report flow")
-				fw.report(w, ts, flow, isOver, intNames, uintNames, floatNames, killReason)
+				fw.report(w, ts, flow, isOver, intNames, uintNames, floatNames, endReason)
 			}
 		}
 	}
