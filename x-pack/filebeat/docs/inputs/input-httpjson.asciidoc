@@ -117,7 +117,7 @@ The state has the following elements:
 - `body`: A map containing the body. References the next request body when used in <<request-transforms-headers>> or <<response-pagination>> configuration sections, and to the last response body when used in <<response-transforms>> or <<response-split>> configuration sections.
 - `cursor`: A map containing any data the user configured to be stored between restarts (See <<cursor>>).
 
-All of the mentioned objects are only stored at runtime, except `cursor`, which has values that are persisted between restarts.
+All of the mentioned objects are only stored at runtime during the execution of the periodic request, except `cursor`, which has values that are persisted between periodic request and restarts.
 
 [[transforms]]
 ==== Transforms
