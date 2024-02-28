@@ -26,7 +26,7 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Windows 2016/2019/2022 Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1 unittests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -51,7 +51,7 @@ steps:
 
       - label: ":windows: Windows 10 Unit Tests"
         key: "extended-win-10-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1 unittests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -62,7 +62,7 @@ steps:
 
       - label: ":windows: Windows 11 Unit Tests"
         key: "extended-win-11-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1 unittests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"

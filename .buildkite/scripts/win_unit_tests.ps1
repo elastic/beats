@@ -1,5 +1,5 @@
 param(
-    [string]$testType
+    [string]$testType = "unittest"
 )
 
 $ErrorActionPreference = "Stop" # set -e
@@ -154,19 +154,19 @@ $env:MAGEFILE_CACHE = $magefile
 
 New-Item -ItemType Directory -Force -Path "build"
 
-if ($testType -eq "unittests") {
+if ($testType -eq "unittest") {
     if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
         mage -w reader/etw build goUnitTest
     } else {
         mage build unitTest
     }
 }
-elseif ($testType -eq "systemtests") {
+elseif ($testType -eq "systemtest") {
     google_cloud_auth
     mage systemTest
 }
 else {
-    Write-Host "Unknown test type. Please specify 'unittests' or 'systemtests'."
+    Write-Host "Unknown test type. Please specify 'unittest' or 'systemtest'."
 }
 
 $EXITCODE=$LASTEXITCODE

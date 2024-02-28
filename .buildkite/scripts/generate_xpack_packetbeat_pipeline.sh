@@ -44,7 +44,7 @@ steps:
 
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1 unittests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -62,7 +62,7 @@ steps:
       ##  TODO: uncomment when the issue https://github.com/elastic/beats/issues/38142 is solved
       # - label: ":windows: Windows 2022 System Tests"
       #   key: "mandatory-win-2022-system-tests"
-      #   command: ".buildkite/scripts/win_unit_tests.ps1 systemtests"
+      #   command: ".buildkite/scripts/win_unit_tests.ps1 systemtest"
       #   agents:
       #     provider: "gcp"
       #     image: "${IMAGE_WIN_2022}"
@@ -78,7 +78,7 @@ steps:
     steps:
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1 unittests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
@@ -97,7 +97,7 @@ steps:
       ##  TODO: uncomment when the issue https://github.com/elastic/beats/issues/38142 is solved
       # - label: ":windows: Windows 10 System Tests"
       #   key: "extended-win-10-system-tests"
-      #   command: ".buildkite/scripts/win_unit_tests.ps1 systemtests"
+      #   command: ".buildkite/scripts/win_unit_tests.ps1 systemtest"
       #   agents:
       #     provider: "gcp"
       #     image: "${IMAGE_WIN_10}"
