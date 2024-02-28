@@ -148,7 +148,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		// Poll metrics periodically in the background
 		go pollSqsWaitingMetric(ctx, receiver)
 
-		if err := receiver.Receive(ctx); err != nil {
+		if err := receiver.Receive(ctx, pipeline); err != nil {
 			return err
 		}
 	}

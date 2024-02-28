@@ -233,7 +233,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 
 		b.ResetTimer()
 		start := time.Now()
-		if err := sqsReader.Receive(ctx); err != nil {
+		if err := sqsReader.Receive(ctx, pipeline); err != nil {
 			if !errors.Is(err, context.DeadlineExceeded) {
 				t.Fatal(err)
 			}

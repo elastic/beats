@@ -44,14 +44,20 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		mockBeatPipeline := NewMockBeatPipeline(ctrl)
 
 		gomock.InOrder(
-			mockBeatPipeline.EXPECT().ConnectWith(gomock.Any()).Return(mockClient, nil),
 			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil),
-			mockClient.EXPECT().Close(),
-			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
 		)
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
-		require.NoError(t, p.ProcessSQS(ctx, &msg))
+
+		acker := awscommon.NewEventACKTracker(ctx)
+		receiveCount, handles, _, _, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker)
+		require.NoError(t, processingErr)
+
+		gomock.InOrder(
+			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
+		)
+
+		require.NoError(t, p.DeleteSQS(ctx, &msg, receiveCount, processingErr, handles))
 	})
 
 	t.Run("invalid SQS JSON body does not retry", func(t *testing.T) {
@@ -69,14 +75,19 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		body = body[10:]
 		invalidBodyMsg.Body = &body
 
+		mockClient := NewMockBeatClient(ctrl)
+		acker := awscommon.NewEventACKTracker(ctx)
+
+		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
+		receiveCount, handles, _, _, processingErr := p.ProcessSQS(ctx, &invalidBodyMsg, mockClient, acker)
+		t.Log(processingErr)
+		require.Error(t, processingErr)
+
 		gomock.InOrder(
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&invalidBodyMsg)).Return(nil),
 		)
 
-		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
-		err := p.ProcessSQS(ctx, &invalidBodyMsg)
-		require.Error(t, err)
-		t.Log(err)
+		require.Error(t, p.DeleteSQS(ctx, &invalidBodyMsg, receiveCount, processingErr, handles))
 	})
 
 	t.Run("zero S3 events in body", func(t *testing.T) {
@@ -91,12 +102,18 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		emptyRecordsMsg := newSQSMessage([]s3EventV2{}...)
 
+		mockClient := NewMockBeatClient(ctrl)
+		acker := awscommon.NewEventACKTracker(ctx)
+
+		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
+		receiveCount, handles, _, _, processingErr := p.ProcessSQS(ctx, &emptyRecordsMsg, mockClient, acker)
+		require.NoError(t, processingErr)
+
 		gomock.InOrder(
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&emptyRecordsMsg)).Return(nil),
 		)
 
-		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
-		require.NoError(t, p.ProcessSQS(ctx, &emptyRecordsMsg))
+		require.NoError(t, p.DeleteSQS(ctx, &emptyRecordsMsg, receiveCount, processingErr, handles))
 	})
 
 	t.Run("visibility is extended after half expires", func(t *testing.T) {
@@ -116,19 +133,25 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		mockAPI.EXPECT().ChangeMessageVisibility(gomock.Any(), gomock.Eq(&msg), gomock.Eq(visibilityTimeout)).AnyTimes().Return(nil)
 
 		gomock.InOrder(
-			mockBeatPipeline.EXPECT().ConnectWith(gomock.Any()).Return(mockClient, nil),
 			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 				Do(func(ctx context.Context, _ *logp.Logger, _ beat.Client, _ *awscommon.EventACKTracker, _ s3EventV2) {
 					require.NoError(t, timed.Wait(ctx, 5*visibilityTimeout))
 				}).Return(mockS3Handler),
 			mockS3Handler.EXPECT().ProcessS3Object().Return(nil),
-			mockClient.EXPECT().Close(),
+		)
+
+		acker := awscommon.NewEventACKTracker(ctx)
+
+		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, visibilityTimeout, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
+		receiveCount, handles, _, _, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker)
+		require.NoError(t, processingErr)
+
+		gomock.InOrder(
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
 			mockS3Handler.EXPECT().FinalizeS3Object().Return(nil),
 		)
 
-		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, visibilityTimeout, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
-		require.NoError(t, p.ProcessSQS(ctx, &msg))
+		require.NoError(t, p.DeleteSQS(ctx, &msg, receiveCount, processingErr, handles))
 	})
 
 	t.Run("message returns to queue on error", func(t *testing.T) {
@@ -144,16 +167,18 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		mockBeatPipeline := NewMockBeatPipeline(ctrl)
 
 		gomock.InOrder(
-			mockBeatPipeline.EXPECT().ConnectWith(gomock.Any()).Return(mockClient, nil),
 			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(mockS3Handler),
 			mockS3Handler.EXPECT().ProcessS3Object().Return(errors.New("fake connectivity problem")),
-			mockClient.EXPECT().Close(),
 		)
 
+		acker := awscommon.NewEventACKTracker(ctx)
+
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
-		err := p.ProcessSQS(ctx, &msg)
-		t.Log(err)
-		require.Error(t, err)
+		receiveCount, handles, _, _, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker)
+		t.Log(processingErr)
+		require.Error(t, processingErr)
+
+		require.Error(t, p.DeleteSQS(ctx, &msg, receiveCount, processingErr, handles))
 	})
 
 	t.Run("message is deleted after multiple receives", func(t *testing.T) {
@@ -174,17 +199,22 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		}
 
 		gomock.InOrder(
-			mockBeatPipeline.EXPECT().ConnectWith(gomock.Any()).Return(mockClient, nil),
 			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(mockS3Handler),
 			mockS3Handler.EXPECT().ProcessS3Object().Return(errors.New("fake connectivity problem")),
-			mockClient.EXPECT().Close(),
+		)
+
+		acker := awscommon.NewEventACKTracker(ctx)
+
+		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
+		receiveCount, handles, _, _, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker)
+		t.Log(processingErr)
+		require.Error(t, processingErr)
+
+		gomock.InOrder(
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
 		)
 
-		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
-		err := p.ProcessSQS(ctx, &msg)
-		t.Log(err)
-		require.Error(t, err)
+		require.Error(t, p.DeleteSQS(ctx, &msg, receiveCount, processingErr, handles))
 	})
 }
 

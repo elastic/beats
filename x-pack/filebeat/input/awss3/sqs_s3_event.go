@@ -122,47 +122,19 @@ func newSQSS3EventProcessor(
 	}
 }
 
-func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message) error {
-	log := p.log.With(
-		"message_id", *msg.MessageId,
-		"message_receipt_time", time.Now().UTC())
-
-	keepaliveCtx, keepaliveCancel := context.WithCancel(ctx)
-	defer keepaliveCancel()
-
-	// Start SQS keepalive worker.
-	var keepaliveWg sync.WaitGroup
-	keepaliveWg.Add(1)
-	go p.keepalive(keepaliveCtx, log, &keepaliveWg, msg)
-
-	receiveCount := getSQSReceiveCount(msg.Attributes)
-	if receiveCount == 1 {
-		// Only contribute to the sqs_lag_time histogram on the first message
-		// to avoid skewing the metric when processing retries.
-		if s, found := msg.Attributes[sqsSentTimestampAttribute]; found {
-			if sentTimeMillis, err := strconv.ParseInt(s, 10, 64); err == nil {
-				sentTime := time.UnixMilli(sentTimeMillis)
-				p.metrics.sqsLagTime.Update(time.Since(sentTime).Nanoseconds())
-			}
-		}
-	}
-
-	handles, processingErr := p.processS3Events(ctx, log, *msg.Body)
-
-	// Stop keepalive routine before changing visibility.
-	keepaliveCancel()
-	keepaliveWg.Wait()
-
+func (p *sqsS3EventProcessor) DeleteSQS(ctx context.Context, msg *types.Message, receiveCount int, processingErr error, handles []s3ObjectHandler) error {
 	// No error. Delete SQS.
 	if processingErr == nil {
-		if msgDelErr := p.sqs.DeleteMessage(context.Background(), msg); msgDelErr != nil {
+		if msgDelErr := p.sqs.DeleteMessage(ctx, msg); msgDelErr != nil {
 			return fmt.Errorf("failed deleting message from SQS queue (it may be reprocessed): %w", msgDelErr)
 		}
+
 		p.metrics.sqsMessagesDeletedTotal.Inc()
 		// SQS message finished and deleted, finalize s3 objects
 		if finalizeErr := p.finalizeS3Objects(handles); finalizeErr != nil {
 			return fmt.Errorf("failed finalizing message from SQS queue (manual cleanup is required): %w", finalizeErr)
 		}
+
 		return nil
 	}
 
@@ -180,12 +152,12 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 	if errors.Is(processingErr, &nonRetryableError{}) {
 		if msgDelErr := p.sqs.DeleteMessage(context.Background(), msg); msgDelErr != nil {
 			return multierr.Combine(
-				fmt.Errorf("failed processing SQS message (attempted to delete message): %w", processingErr),
+				fmt.Errorf("failed deleting SQS message (attempted to delete message): %w", processingErr),
 				fmt.Errorf("failed deleting message from SQS queue (it may be reprocessed): %w", msgDelErr),
 			)
 		}
 		p.metrics.sqsMessagesDeletedTotal.Inc()
-		return fmt.Errorf("failed processing SQS message (message was deleted): %w", processingErr)
+		return fmt.Errorf("failed deleting SQS message (message was deleted): %w", processingErr)
 	}
 
 	// An error that may be resolved by letting the visibility timeout
@@ -193,7 +165,37 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 	// queue is enabled then the message will eventually placed on the DLQ
 	// after maximum receives is reached.
 	p.metrics.sqsMessagesReturnedTotal.Inc()
-	return fmt.Errorf("failed processing SQS message (it will return to queue after visibility timeout): %w", processingErr)
+	return fmt.Errorf("failed deleting SQS message (it will return to queue after visibility timeout): %w", processingErr)
+
+}
+func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *awscommon.EventACKTracker) (int, []s3ObjectHandler, context.CancelFunc, *sync.WaitGroup, error) {
+	keepaliveCtx, keepaliveCancel := context.WithCancel(ctx)
+
+	// Start SQS keepalive worker.
+	var keepaliveWg sync.WaitGroup
+	keepaliveWg.Add(1)
+
+	log := p.log.With(
+		"message_id", *msg.MessageId,
+		"message_receipt_time", time.Now().UTC())
+
+	go p.keepalive(keepaliveCtx, log, &keepaliveWg, msg)
+
+	receiveCount := getSQSReceiveCount(msg.Attributes)
+	if receiveCount == 1 {
+		// Only contribute to the sqs_lag_time histogram on the first message
+		// to avoid skewing the metric when processing retries.
+		if s, found := msg.Attributes[sqsSentTimestampAttribute]; found {
+			if sentTimeMillis, err := strconv.ParseInt(s, 10, 64); err == nil {
+				sentTime := time.UnixMilli(sentTimeMillis)
+				p.metrics.sqsLagTime.Update(time.Since(sentTime).Nanoseconds())
+			}
+		}
+	}
+
+	handles, processingErr := p.processS3Events(ctx, log, *msg.Body, client, acker)
+
+	return receiveCount, handles, keepaliveCancel, &keepaliveWg, processingErr
 }
 
 func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, wg *sync.WaitGroup, msg *types.Message) {
@@ -291,7 +293,7 @@ func (*sqsS3EventProcessor) isObjectCreatedEvents(event s3EventV2) bool {
 	return event.EventSource == "aws:s3" && strings.HasPrefix(event.EventName, "ObjectCreated:")
 }
 
-func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Logger, body string) ([]s3ObjectHandler, error) {
+func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Logger, body string, client beat.Client, acker *awscommon.EventACKTracker) ([]s3ObjectHandler, error) {
 	s3Events, err := p.getS3Notifications(body)
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
@@ -306,24 +308,6 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 	if len(s3Events) == 0 {
 		return nil, nil
 	}
-
-	// Create a pipeline client scoped to this goroutine.
-	client, err := p.pipeline.ConnectWith(beat.ClientConfig{
-		EventListener: awscommon.NewEventACKHandler(),
-		Processing: beat.ProcessingConfig{
-			// This input only produces events with basic types so normalization
-			// is not required.
-			EventNormalization: boolPtr(false),
-		},
-	})
-	if err != nil {
-		return nil, err
-	}
-	defer client.Close()
-
-	// Wait for all events to be ACKed before proceeding.
-	acker := awscommon.NewEventACKTracker(ctx)
-	defer acker.Wait()
 
 	var errs []error
 	var handles []s3ObjectHandler

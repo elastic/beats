@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
+	"sync"
 	"time"
 
 	smithyhttp "github.com/aws/smithy-go/transport/http"
@@ -65,7 +66,8 @@ type sqsProcessor interface {
 	// given message and is responsible for updating the message's visibility
 	// timeout while it is being processed and for deleting it when processing
 	// completes successfully.
-	ProcessSQS(ctx context.Context, msg *types.Message) error
+	ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *awscommon.EventACKTracker) (int, []s3ObjectHandler, context.CancelFunc, *sync.WaitGroup, error)
+	DeleteSQS(ctx context.Context, msg *types.Message, receiveCount int, processingErr error, handles []s3ObjectHandler) error
 }
 
 // ------

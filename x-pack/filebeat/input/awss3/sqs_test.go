@@ -9,6 +9,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
+	"sync"
 	"testing"
 	"time"
 
@@ -65,15 +66,34 @@ func TestSQSReceiver(t *testing.T) {
 				}),
 		)
 
-		// Expect the one message returned to have been processed.
+		mockClient := NewMockBeatClient(ctrl)
+		mockBeatPipeline := NewMockBeatPipeline(ctrl)
+		_, keepaliveCancel := context.WithCancel(ctx)
+
+		// Start SQS keepalive worker.
+		var keepaliveWg sync.WaitGroup
+
+		gomock.InOrder(
+			mockBeatPipeline.EXPECT().ConnectWith(gomock.Any()).Return(mockClient, nil),
+			// Expect the one message returned to have been processed.
+			mockMsgHandler.EXPECT().
+				ProcessSQS(gomock.Any(), gomock.Eq(&msg), gomock.Any(), gomock.Any()).
+				Times(1).
+				Return(0, nil, keepaliveCancel, &keepaliveWg, nil),
+		)
+
+		// The two expected calls happen in different goroutines, we cannot enforce an oder
+		// Expect the client to be closed
+		mockClient.EXPECT().Close()
+		// Expect the one message returned to have been deleted.
 		mockMsgHandler.EXPECT().
-			ProcessSQS(gomock.Any(), gomock.Eq(&msg)).
+			DeleteSQS(gomock.Any(), gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any()).
 			Times(1).
 			Return(nil)
 
 		// Execute sqsReader and verify calls/state.
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		require.NoError(t, receiver.Receive(ctx))
+		require.NoError(t, receiver.Receive(ctx, mockBeatPipeline))
 		assert.Equal(t, maxMessages, receiver.workerSem.Available())
 	})
 
@@ -104,9 +124,10 @@ func TestSQSReceiver(t *testing.T) {
 				}),
 		)
 
+		mockBeatPipeline := NewMockBeatPipeline(ctrl)
 		// Execute SQSReceiver and verify calls/state.
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		require.NoError(t, receiver.Receive(ctx))
+		require.NoError(t, receiver.Receive(ctx, mockBeatPipeline))
 		assert.Equal(t, maxMessages, receiver.workerSem.Available())
 	})
 }
