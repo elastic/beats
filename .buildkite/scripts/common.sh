@@ -158,6 +158,19 @@ with_docker_compose() {
   docker-compose version
 }
 
+with_Terraform() {
+    echo "Setting up the Terraform environment..."
+    local path_to_file="${WORKSPACE}/terraform.zip"
+    create_workspace
+    check_platform_architeture
+    retry 5 curl -sSL -o ${path_to_file} "https://releases.hashicorp.com/terraform/${ASDF_TERRAFORM_VERSION}/terraform_${ASDF_TERRAFORM_VERSION}_${platform_type_lowercase}_${go_arch_type}.zip"
+    unzip -q ${path_to_file} -d ${BIN}/
+    rm ${path_to_file}
+    chmod +x ${BIN}/terraform
+    export PATH="${BIN}:${PATH}"
+    terraform version
+}
+
 create_workspace() {
   if [[ ! -d "${BIN}" ]]; then
     mkdir -p "${BIN}"
@@ -403,6 +416,37 @@ withModule() {
   echo "MODULE=$MODULE"
 }
 
+terraformInit() {
+  local dir=$1
+  echo "Terraform Init on $BEATS_PROJECT_NAME"
+  pushd "${BEATS_PROJECT_NAME}" > /dev/null
+  terraform init
+  popd > /dev/null
+}
+
+startCloudTestEnv() {
+  local dir=$1
+  withAWS
+  echo "--- Run docker-compose services for emulated cloud env"
+  docker-compose -f .ci/jobs/docker-compose.yml up -d                     #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+  with_Terraform
+  terraformInit "$dir"
+  export TF_VAR_BRANCH=$(echo "${BUILDKITE_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
+  export TF_VAR_BUILD_ID="${BUILDKITE_BUILD_ID}"
+  export TF_VAR_CREATED_DATE=$(date +%s)
+  export TF_VAR_ENVIRONMENT="ci"
+  export TF_VAR_REPO="${REPO}"
+  pushd "${dir}" > /dev/null
+  terraform apply -auto-approve
+  popd > /dev/null
+}
+
+withAWS() {
+  export AWS_ACCESS_KEY_ID=$BEATS_AWS_ACCESS_KEY
+  export AWS_SECRET_ACCESS_KEY=$BEATS_AWS_SECRET_KEY
+  export TEST_TAGS="${TEST_TAGS},aws"
+}
+
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then
   export ONLY_DOCS="false"
   echo "Changes include files outside the docs_changeset vairiabe. ONLY_DOCS=$ONLY_DOCS."
@@ -419,7 +463,8 @@ if are_paths_changed "${packaging_changeset[@]}" ; then
 fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
-  withModule "x-pack/metricbeat/module/aws"
+  startCloudTestEnv "${MODULE_DIR}"
+  withModule "${MODULE_DIR}"
 fi
 
 check_and_set_beat_vars

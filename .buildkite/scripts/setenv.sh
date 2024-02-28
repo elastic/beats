@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-
+REPO="beats"
 SETUP_GVM_VERSION="v0.5.1"
 DOCKER_COMPOSE_VERSION="1.21.0"
 DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
@@ -9,8 +9,10 @@ SETUP_WIN_PYTHON_VERSION="3.11.0"
 NMAP_WIN_VERSION="7.12"           # Earlier versions of NMap provide WinPcap (the winpcap packages don't install nicely because they pop-up a UI)
 GO_VERSION=$(cat .go-version)
 ASDF_MAGE_VERSION="1.15.0"
+ASDF_TERRAFORM_VERSION="1.0.2"
 PACKAGING_PLATFORMS="+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 PACKAGING_ARM_PLATFORMS="linux/arm64"
+AWS_REGION="eu-central-1"
 
 export SETUP_GVM_VERSION
 export DOCKER_COMPOSE_VERSION
@@ -21,6 +23,9 @@ export GO_VERSION
 export ASDF_MAGE_VERSION
 export PACKAGING_PLATFORMS
 export PACKAGING_ARM_PLATFORMS
+export REPO
+export ASDF_TERRAFORM_VERSION
+export AWS_REGION
 
 exportVars() {
   local platform_type="$(uname)"
@@ -52,6 +57,7 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_S
   export RACE_DETECTOR="true"
   export TEST_COVERAGE="true"
   export DOCKER_PULL="0"
+  export TEST_TAGS="oracle"
 fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
@@ -59,4 +65,5 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
   export RACE_DETECTOR="true"
   export TEST_COVERAGE="true"
   export DOCKER_PULL="0"
+  export MODULE_DIR="x-pack/metricbeat/module/aws"
 fi
