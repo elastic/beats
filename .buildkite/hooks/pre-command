@@ -32,25 +32,27 @@ retry() {
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
   source .buildkite/env-scripts/env.sh
   source .buildkite/env-scripts/win-env.sh
-#  source .buildkite/env-scripts/util.sh
+  source .buildkite/env-scripts/util.sh
 
   if [[ -z "${GOLANG_VERSION-""}" ]]; then
     export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
   fi
 
-    if [[ "$BUILDKITE_STEP_KEY" == macos* ]]; then
+  if [[ "$BUILDKITE_STEP_KEY" == macos* ]]; then
     ulimit -Sn 30000
+
+    echo "--- Setting up environment"
+    add_bin_path
+    with_go
+    with_mage
   fi
 
   if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
-    source .buildkite/filebeat/scripts/packaging/packaging-env.sh
-
-    export PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry 5 vault kv get -field=data -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
-    export DOCKER_USERNAME_SECRET=$(retry 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
-    export DOCKER_PASSWORD_SECRET=$(retry 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
-    export GITHUB_TOKEN_SECRET=$(retry 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
-    export GITHUB_USERNAME_SECRET=$(retry 5 vault kv get -field username ${GITHUB_TOKEN_VAULT_PATH})
-    export GITHUB_EMAIL_SECRET=$(retry 5 vault kv get -field email ${GITHUB_TOKEN_VAULT_PATH})
+    export DOCKER_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
+    export DOCKER_PASSWORD_SECRET=$(retry_with_count 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
+    export GITHUB_TOKEN_SECRET=$(retry_with_count 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
+    export GITHUB_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field username ${GITHUB_TOKEN_VAULT_PATH})
+    export GITHUB_EMAIL_SECRET=$(retry_with_count 5 vault kv get -field email ${GITHUB_TOKEN_VAULT_PATH})
 
     docker login -u "${DOCKER_USERNAME_SECRET}" -p "${DOCKER_PASSWORD_SECRET}" "${DOCKER_REGISTRY}" 2>/dev/null
 

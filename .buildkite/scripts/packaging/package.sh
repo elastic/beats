@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-source .buildkite/env-scripts/linux-env.sh
 source .buildkite/scripts/packaging/package-util.sh
 
 IMG_POSTFIX="-SNAPSHOT"
