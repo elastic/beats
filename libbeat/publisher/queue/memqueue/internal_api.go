@@ -17,8 +17,6 @@
 
 package memqueue
 
-import "github.com/elastic/beats/v7/libbeat/publisher/queue"
-
 // producer -> broker API
 
 type pushRequest struct {
@@ -63,6 +61,4 @@ type memQueueMetrics struct {
 	currentQueueSize int
 	// the number of items that have been read by a consumer but not yet ack'ed
 	occupiedRead int
-
-	oldestEntryID queue.EntryID
 }

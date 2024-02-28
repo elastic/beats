@@ -121,9 +121,9 @@ func (c *client) publish(e beat.Event) {
 
 	var published bool
 	if c.canDrop {
-		_, published = c.producer.TryPublish(pubEvent)
+		published = c.producer.TryPublish(pubEvent)
 	} else {
-		_, published = c.producer.Publish(pubEvent)
+		published = c.producer.Publish(pubEvent)
 	}
 
 	if published {
@@ -202,7 +202,7 @@ func (c *client) onPublished() {
 	}
 }
 
-func (c *client) onFilteredOut(e beat.Event) {
+func (c *client) onFilteredOut(_ beat.Event) {
 	c.observer.filteredEvent()
 }
 

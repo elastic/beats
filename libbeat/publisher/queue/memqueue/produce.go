@@ -18,6 +18,8 @@
 package memqueue
 
 import (
+	"sync/atomic"
+
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -50,7 +52,7 @@ type producerID uint64
 type produceState struct {
 	cb        ackHandler
 	dropCB    func(interface{})
-	cancelled bool
+	cancelled atomic.Bool
 	lastACK   producerID
 }
 
@@ -76,11 +78,11 @@ func (p *forgetfulProducer) makePushRequest(event interface{}) pushRequest {
 	return pushRequest{event: event}
 }
 
-func (p *forgetfulProducer) Publish(event interface{}) (queue.EntryID, bool) {
+func (p *forgetfulProducer) Publish(event interface{}) bool {
 	return p.openState.publish(p.makePushRequest(event))
 }
 
-func (p *forgetfulProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
+func (p *forgetfulProducer) TryPublish(event interface{}) bool {
 	return p.openState.tryPublish(p.makePushRequest(event))
 }
 
@@ -98,23 +100,24 @@ func (p *ackProducer) makePushRequest(event interface{}) pushRequest {
 		producerID: producerID(p.producedCount + 1)}
 }
 
-func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
-	id, published := p.openState.publish(p.makePushRequest(event))
+func (p *ackProducer) Publish(event interface{}) bool {
+	published := p.openState.publish(p.makePushRequest(event))
 	if published {
 		p.producedCount++
 	}
-	return id, published
+	return published
 }
 
-func (p *ackProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
-	id, published := p.openState.tryPublish(p.makePushRequest(event))
+func (p *ackProducer) TryPublish(event interface{}) bool {
+	published := p.openState.tryPublish(p.makePushRequest(event))
 	if published {
 		p.producedCount++
 	}
-	return id, published
+	return published
 }
 
 func (p *ackProducer) Cancel() int {
+	p.state.cancelled.Store(true)
 	p.openState.Close()
 
 	if p.dropOnCancel {
@@ -135,27 +138,27 @@ func (st *openState) Close() {
 	close(st.done)
 }
 
-func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
+func (st *openState) publish(req pushRequest) bool {
 	select {
 	case st.events <- req:
-		return 0, true
+		return true
 	case <-st.done:
 		// set events channel to nil so we can't accidentally write to
 		// it if the select statement lands the other way next time.
 		st.events = nil
-		return 0, false
+		return false
 	}
 }
 
-func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
+func (st *openState) tryPublish(req pushRequest) bool {
 	select {
 	case st.events <- req:
-		return 0, true
+		return true
 	case <-st.done:
 		st.events = nil
-		return 0, false
+		return false
 	default:
 		st.log.Debugf("Dropping event, queue is blocked")
-		return 0, false
+		return false
 	}
 }

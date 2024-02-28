@@ -132,9 +132,11 @@ func (l *ackLoop) processACK(lst batchList, N int) {
 				entry.producer = nil
 				continue
 			}
-			producerState := entry.producer.state
-			count := int(entry.producerID - producerState.lastACK)
-			ackCallbacks = append(ackCallbacks, func() { producerState.cb(count) })
+			//producerState := entry.producer.state
+			oldLastACK := entry.producer.state.lastACK
+			cb := entry.producer.state.cb
+			count := int(entry.producerID - oldLastACK)
+			ackCallbacks = append(ackCallbacks, func() { cb(count) })
 			entry.producer.state.lastACK = entry.producerID
 			entry.producer = nil
 		}

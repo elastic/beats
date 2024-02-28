@@ -114,7 +114,6 @@ type Settings struct {
 
 type queueEntry struct {
 	event interface{}
-	id    queue.EntryID
 
 	producer   *ackProducer
 	producerID producerID // The order of this entry within its producer
@@ -214,7 +213,7 @@ func newQueue(
 		buf: make([]queueEntry, settings.Events),
 
 		// broker API channels
-		pushChan:   make(chan pushRequest),
+		pushChan:   make(chan pushRequest, inputQueueSize),
 		getChan:    make(chan getRequest),
 		cancelChan: make(chan producerCancelRequest, 5),
 		metricChan: make(chan metricsRequest),
@@ -281,7 +280,6 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 		EventCount:            opt.UintWith(uint64(resp.currentQueueSize)),
 		EventLimit:            opt.UintWith(uint64(len(b.buf))),
 		UnackedConsumedEvents: opt.UintWith(uint64(resp.occupiedRead)),
-		OldestEntryID:         resp.oldestEntryID,
 	}, nil
 }
 

@@ -124,7 +124,7 @@ func publishEvents(p queue.Producer, num int, protobuf bool) {
 		} else {
 			e = makePublisherEvent()
 		}
-		_, ok := p.Publish(e)
+		ok := p.Publish(e)
 		if !ok {
 			panic("didn't publish")
 		}

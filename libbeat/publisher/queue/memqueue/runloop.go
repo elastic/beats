@@ -19,8 +19,6 @@ package memqueue
 
 import (
 	"time"
-
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // runLoop internal state. These fields could mostly be local variables
@@ -56,11 +54,6 @@ type runLoop struct {
 	// to a pending getRequest even if we can't fill the requested event count.
 	// It is active if and only if pendingGetRequest is non-nil.
 	getTimer *time.Timer
-
-	// TODO (https://github.com/elastic/beats/issues/37893): entry IDs were a
-	// workaround for an external project that no longer exists. At this point
-	// they just complicate the API and should be removed.
-	nextEntryID queue.EntryID
 }
 
 func newRunLoop(broker *broker) *runLoop {
@@ -200,7 +193,7 @@ func (l *runLoop) handleDelete(count int) {
 }
 
 func (l *runLoop) handleInsert(req *pushRequest) {
-	if l.insert(req, l.nextEntryID) {
+	if l.insert(req) {
 		l.eventCount++
 
 		// See if this gave us enough for a new batch
@@ -225,8 +218,8 @@ func (l *runLoop) maybeUnblockGetRequest() {
 }
 
 // Returns true if the event was inserted, false if insertion was cancelled.
-func (l *runLoop) insert(req *pushRequest, id queue.EntryID) bool {
-	if req.producer != nil && req.producer.state.cancelled {
+func (l *runLoop) insert(req *pushRequest) bool {
+	if req.producer != nil && req.producer.state.cancelled.Load() {
 		reportCancelledState(req)
 		return false
 	}
@@ -234,7 +227,6 @@ func (l *runLoop) insert(req *pushRequest, id queue.EntryID) bool {
 	index := (l.bufPos + l.eventCount) % len(l.broker.buf)
 	l.broker.buf[index] = queueEntry{
 		event:      req.event,
-		id:         id,
 		producer:   req.producer,
 		producerID: req.producerID,
 	}
@@ -242,16 +234,9 @@ func (l *runLoop) insert(req *pushRequest, id queue.EntryID) bool {
 }
 
 func (l *runLoop) handleMetricsRequest(req *metricsRequest) {
-	oldestEntryID := l.nextEntryID
-	if l.eventCount > 0 {
-		index := l.bufPos % len(l.broker.buf)
-		oldestEntryID = l.broker.buf[index].id
-	}
-
 	req.responseChan <- memQueueMetrics{
 		currentQueueSize: l.eventCount,
 		occupiedRead:     l.consumedCount,
-		oldestEntryID:    oldestEntryID,
 	}
 }
 
