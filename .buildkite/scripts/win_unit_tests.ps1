@@ -126,7 +126,7 @@ function withNmap($version) {
 }
 
 function google_cloud_auth {
-    $secretFileLocation = New-TemporaryFile -Path $env:WORKSPACE -Name "google-cloud-credentials.json"
+    $secretFileLocation = New-TemporaryFile -Name "google-cloud-credentials.json" -Directory $env:WORKSPACE
     Set-Content -Path $secretFileLocation.FullName -Value $env:PRIVATE_CI_GCS_CREDENTIALS_SECRET
     gcloud auth activate-service-account --key-file $secretFileLocation.FullName > $null 2>&1
     $env:GOOGLE_APPLICATION_CREDENTIALS = $secretFileLocation.FullName
