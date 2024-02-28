@@ -124,12 +124,13 @@ function withNmap($version) {
     }
     Start-Process -FilePath $nmapDownloadPath -ArgumentList "/S" -Wait
 }
-
 function google_cloud_auth {
-    $secretFileLocation = New-TemporaryFile -Name "google-cloud-credentials.json" -Directory $env:WORKSPACE
-    Set-Content -Path $secretFileLocation.FullName -Value $env:PRIVATE_CI_GCS_CREDENTIALS_SECRET
-    gcloud auth activate-service-account --key-file $secretFileLocation.FullName > $null 2>&1
-    $env:GOOGLE_APPLICATION_CREDENTIALS = $secretFileLocation.FullName
+    $tempFileName = "google-cloud-credentials.json"
+    $secretFileLocation = Join-Path $env:TEMP $tempFileName
+    $null = New-Item -ItemType File -Path $secretFileLocation
+    Set-Content -Path $secretFileLocation -Value $env:PRIVATE_CI_GCS_CREDENTIALS_SECRET
+    gcloud auth activate-service-account --key-file $secretFileLocation > $null 2>&1
+    $env:GOOGLE_APPLICATION_CREDENTIALS = $secretFileLocation
 }
 
 fixCRLF
