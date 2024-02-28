@@ -138,8 +138,8 @@ func TestParseClientPolicy(t *testing.T) {
 		{
 			Name: "Username and password are honored",
 			Config: Config{
-				User:     getStringPointer("Test"),
-				Password: getStringPointer("MySecretPassword"),
+				User:     getStringPointer(sampleUser),
+				Password: getStringPointer(samplePassword),
 			},
 			expectedClientPolicy: UserPasswordClientPolicy,
 			expectedErr:          nil,
