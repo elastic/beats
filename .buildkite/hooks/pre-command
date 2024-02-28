@@ -2,11 +2,10 @@
 
 set -euo pipefail
 
-DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
-GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
-
 # Secrets must be redacted
 # https://buildkite.com/docs/pipelines/managing-log-output#redacted-environment-variables
+DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
+GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
   source .buildkite/env-scripts/env.sh
@@ -17,12 +16,21 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == 
     export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
   fi
 
+  if [[ "$BUILDKITE_STEP_KEY" == macos* ]]; then
+    ulimit -Sn 30000
+
+    echo "--- Setting up environment"
+    add_bin_path
+    with_go
+    with_mage
+  fi
+
   if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
-    export DOCKER_USERNAME_SECRET=$(retry 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
-    export DOCKER_PASSWORD_SECRET=$(retry 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
-    export GITHUB_TOKEN_SECRET=$(retry 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
-    export GITHUB_USERNAME_SECRET=$(retry 5 vault kv get -field username ${GITHUB_TOKEN_VAULT_PATH})
-    export GITHUB_EMAIL_SECRET=$(retry 5 vault kv get -field email ${GITHUB_TOKEN_VAULT_PATH})
+    export DOCKER_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
+    export DOCKER_PASSWORD_SECRET=$(retry_with_count 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
+    export GITHUB_TOKEN_SECRET=$(retry_with_count 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
+    export GITHUB_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field username ${GITHUB_TOKEN_VAULT_PATH})
+    export GITHUB_EMAIL_SECRET=$(retry_with_count 5 vault kv get -field email ${GITHUB_TOKEN_VAULT_PATH})
 
     docker login -u "${DOCKER_USERNAME_SECRET}" -p "${DOCKER_PASSWORD_SECRET}" "${DOCKER_REGISTRY}" 2>/dev/null
 

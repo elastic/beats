@@ -3,7 +3,7 @@
 env:
   BEATS_PROJECT_NAME: "heartbeat"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
   IMAGE_WIN_2016: "family/core-windows-2016"
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
@@ -95,7 +95,7 @@ steps:
               context: "Heartbeat/Extended: Unit Tests ARM"
         agents:
           provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "t4g.large"
         artifact_paths: "heartbeat/build/*.xml"
 

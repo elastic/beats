@@ -40,7 +40,7 @@ if are_files_changed "$changeset"; then
               context: "${BEATS_PROJECT_NAME}/Packaging: ARM"
         agents:
           provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "t4g.xlarge"
 YAML
 )
