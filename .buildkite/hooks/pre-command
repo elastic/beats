@@ -41,17 +41,8 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_S
   fi
 fi
 
-# if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
-#   # Set GCP credentials
-#   GOOGLE_APPLICATION_GCP_SECRET=$(retry 5 vault kv get -format=json -field=data ${CI_GCP_OBS_PATH})
-#   echo "${GOOGLE_APPLICATION_GCP_SECRET}" > ./gcp.json
-#   export GOOGLE_APPLICATION_CREDENTIALS=$(realpath ./gcp.json)
-# fi
-
-
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
   if [[ "$BUILDKITE_STEP_KEY" == "extended-win-10-system-tests" || "$BUILDKITE_STEP_KEY" == "mandatory-win-2022-system-tests" ]]; then
-    # Set GCP credentials
     PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry 5 vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
     export PRIVATE_CI_GCS_CREDENTIALS_SECRET
   fi
