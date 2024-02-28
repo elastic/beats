@@ -73,10 +73,7 @@ func newProducer(b *broker, cb ackHandler, dropCB func(interface{}), dropOnCance
 }
 
 func (p *forgetfulProducer) makePushRequest(event interface{}) pushRequest {
-	resp := make(chan queue.EntryID, 1)
-	return pushRequest{
-		event: event,
-		resp:  resp}
+	return pushRequest{event: event}
 }
 
 func (p *forgetfulProducer) Publish(event interface{}) (queue.EntryID, bool) {
@@ -93,14 +90,12 @@ func (p *forgetfulProducer) Cancel() int {
 }
 
 func (p *ackProducer) makePushRequest(event interface{}) pushRequest {
-	resp := make(chan queue.EntryID, 1)
 	return pushRequest{
 		event:    event,
 		producer: p,
 		// We add 1 to the id so the default lastACK of 0 is a
 		// valid initial state and 1 is the first real id.
-		producerID: producerID(p.producedCount + 1),
-		resp:       resp}
+		producerID: producerID(p.producedCount + 1)}
 }
 
 func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
@@ -143,18 +138,10 @@ func (st *openState) Close() {
 func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	select {
 	case st.events <- req:
-		// If the output is blocked and the queue is full, `req` is written
-		// to `st.events`, however the queue never writes back to `req.resp`,
-		// which effectively blocks for ever. So we also need to select on the
-		// done channel to ensure we don't miss the shutdown signal.
-		select {
-		case resp := <-req.resp:
-			return resp, true
-		case <-st.done:
-			st.events = nil
-			return 0, false
-		}
+		return 0, true
 	case <-st.done:
+		// set events channel to nil so we can't accidentally write to
+		// it if the select statement lands the other way next time.
 		st.events = nil
 		return 0, false
 	}
@@ -163,7 +150,7 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	select {
 	case st.events <- req:
-		return <-req.resp, true
+		return 0, true
 	case <-st.done:
 		st.events = nil
 		return 0, false

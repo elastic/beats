@@ -201,10 +201,6 @@ func (l *runLoop) handleDelete(count int) {
 
 func (l *runLoop) handleInsert(req *pushRequest) {
 	if l.insert(req, l.nextEntryID) {
-		// Send back the new event id.
-		req.resp <- l.nextEntryID
-
-		l.nextEntryID++
 		l.eventCount++
 
 		// See if this gave us enough for a new batch

@@ -187,7 +187,7 @@ func newQueue(
 	settings Settings,
 	inputQueueSize int,
 ) *broker {
-	chanSize := AdjustInputQueueSize(inputQueueSize, settings.Events)
+	//chanSize := AdjustInputQueueSize(inputQueueSize, settings.Events)
 
 	// Backwards compatibility: an old way to select synchronous queue
 	// behavior was to set "flush.min_events" to 0 or 1, in which case the
@@ -214,7 +214,7 @@ func newQueue(
 		buf: make([]queueEntry, settings.Events),
 
 		// broker API channels
-		pushChan:   make(chan pushRequest, chanSize),
+		pushChan:   make(chan pushRequest),
 		getChan:    make(chan getRequest),
 		cancelChan: make(chan producerCancelRequest, 5),
 		metricChan: make(chan metricsRequest),

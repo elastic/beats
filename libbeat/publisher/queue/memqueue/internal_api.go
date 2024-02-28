@@ -31,7 +31,6 @@ type pushRequest struct {
 	// The index of the event in this producer only. Used to condense
 	// multiple acknowledgments for a producer to a single callback call.
 	producerID producerID
-	resp       chan queue.EntryID
 }
 
 type producerCancelRequest struct {
