@@ -125,6 +125,13 @@ function withNmap($version) {
     Start-Process -FilePath $nmapDownloadPath -ArgumentList "/S" -Wait
 }
 
+function google_cloud_auth {
+    $secretFileLocation = New-TemporaryFile -Path $env:WORKSPACE -Name "google-cloud-credentials.json"
+    Set-Content -Path $secretFileLocation.FullName -Value $env:PRIVATE_CI_GCS_CREDENTIALS_SECRET
+    gcloud auth activate-service-account --key-file $secretFileLocation.FullName > $null 2>&1
+    $env:GOOGLE_APPLICATION_CREDENTIALS = $secretFileLocation.FullName
+}
+
 fixCRLF
 
 withGolang $env:GO_VERSION
@@ -154,6 +161,7 @@ if ($testType -eq "unittests") {
     }
 }
 elseif ($testType -eq "systemtests") {
+    google_cloud_auth
     mage systemTest
 }
 else {
