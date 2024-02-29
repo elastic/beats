@@ -95,6 +95,16 @@ func (l *runLoop) runIteration() {
 		getChan = l.broker.getChan
 	}
 
+EAGERDELETE:
+	for {
+		select {
+		case count := <-l.broker.deleteChan:
+			l.handleDelete(count)
+		default:
+			break EAGERDELETE
+		}
+	}
+
 	var consumedChan chan batchList
 	// Enable sending to the scheduled ACKs channel if we have
 	// something to send.

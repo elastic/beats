@@ -220,7 +220,7 @@ func newQueue(
 
 		// internal runLoop and ackLoop channels
 		consumedChan: make(chan batchList, 5),
-		deleteChan:   make(chan int),
+		deleteChan:   make(chan int, 5),
 
 		ackCallback: ackCallback,
 	}
