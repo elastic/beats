@@ -38,7 +38,6 @@ fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
   startCloudTestEnv "${MODULE_DIR}"
-  withModule "${MODULE_DIR}"
 fi
 
 with_go "${GO_VERSION}"
