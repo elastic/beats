@@ -418,8 +418,8 @@ withModule() {
 
 terraformInit() {
   local dir=$1
-  echo "Terraform Init on $BEATS_PROJECT_NAME"
-  pushd "${BEATS_PROJECT_NAME}" > /dev/null
+  echo "Terraform Init on $dir"
+  pushd "${dir}" > /dev/null
   terraform init
   popd > /dev/null
 }
