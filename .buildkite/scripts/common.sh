@@ -427,6 +427,7 @@ terraformInit() {
 startCloudTestEnv() {
   local dir=$1
   withAWS
+  withDocker
   echo "--- Run docker-compose services for emulated cloud env"
   docker-compose -f .ci/jobs/docker-compose.yml up -d                     #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
   with_Terraform
@@ -445,6 +446,11 @@ withAWS() {
   export AWS_ACCESS_KEY_ID=$BEATS_AWS_ACCESS_KEY
   export AWS_SECRET_ACCESS_KEY=$BEATS_AWS_SECRET_KEY
   export TEST_TAGS="${TEST_TAGS},aws"
+}
+
+withDocker() {
+  echo "Setting up the Docker environment..."
+  sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 }
 
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then
