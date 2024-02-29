@@ -91,15 +91,20 @@ func (r *sqsReader) Receive(ctx context.Context, pipeline beat.Pipeline) error {
 					processOutcome.keepaliveCancel()
 					processOutcome.keepaliveWg.Wait()
 
-					err := r.msgHandler.DeleteSQS(ctx, processOutcome.msg, processOutcome.receiveCount, processOutcome.processingErr, processOutcome.handles)
+					err := r.msgHandler.DeleteSQS(processOutcome.msg, processOutcome.receiveCount, processOutcome.processingErr, processOutcome.handles)
 					if err != nil {
 						r.log.Warnw("Failed deleting SQS message.",
 							"error", err,
 							"message_id", *processOutcome.msg.MessageId,
 							"elapsed_time_ns", time.Since(processOutcome.start))
+					} else {
+						r.log.Warnw("Success deleting SQS message.",
+							"message_id", *processOutcome.msg.MessageId,
+							"elapsed_time_ns", time.Since(processOutcome.start))
 					}
 				}(processOutcome)
 			default:
+				time.Sleep(500 * time.Microsecond)
 			}
 		}
 	}(ctx)

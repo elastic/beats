@@ -57,7 +57,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
 		)
 
-		require.NoError(t, p.DeleteSQS(ctx, &msg, receiveCount, processingErr, handles))
+		require.NoError(t, p.DeleteSQS(&msg, receiveCount, processingErr, handles))
 	})
 
 	t.Run("invalid SQS JSON body does not retry", func(t *testing.T) {
@@ -87,7 +87,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&invalidBodyMsg)).Return(nil),
 		)
 
-		require.Error(t, p.DeleteSQS(ctx, &invalidBodyMsg, receiveCount, processingErr, handles))
+		require.Error(t, p.DeleteSQS(&invalidBodyMsg, receiveCount, processingErr, handles))
 	})
 
 	t.Run("zero S3 events in body", func(t *testing.T) {
@@ -113,7 +113,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&emptyRecordsMsg)).Return(nil),
 		)
 
-		require.NoError(t, p.DeleteSQS(ctx, &emptyRecordsMsg, receiveCount, processingErr, handles))
+		require.NoError(t, p.DeleteSQS(&emptyRecordsMsg, receiveCount, processingErr, handles))
 	})
 
 	t.Run("visibility is extended after half expires", func(t *testing.T) {
@@ -151,7 +151,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockS3Handler.EXPECT().FinalizeS3Object().Return(nil),
 		)
 
-		require.NoError(t, p.DeleteSQS(ctx, &msg, receiveCount, processingErr, handles))
+		require.NoError(t, p.DeleteSQS(&msg, receiveCount, processingErr, handles))
 	})
 
 	t.Run("message returns to queue on error", func(t *testing.T) {
@@ -178,7 +178,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		t.Log(processingErr)
 		require.Error(t, processingErr)
 
-		require.Error(t, p.DeleteSQS(ctx, &msg, receiveCount, processingErr, handles))
+		require.Error(t, p.DeleteSQS(&msg, receiveCount, processingErr, handles))
 	})
 
 	t.Run("message is deleted after multiple receives", func(t *testing.T) {
@@ -214,7 +214,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
 		)
 
-		require.Error(t, p.DeleteSQS(ctx, &msg, receiveCount, processingErr, handles))
+		require.Error(t, p.DeleteSQS(&msg, receiveCount, processingErr, handles))
 	})
 }
 

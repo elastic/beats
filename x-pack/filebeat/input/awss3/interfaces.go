@@ -67,7 +67,7 @@ type sqsProcessor interface {
 	// timeout while it is being processed and for deleting it when processing
 	// completes successfully.
 	ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *awscommon.EventACKTracker) (int, []s3ObjectHandler, context.CancelFunc, *sync.WaitGroup, error)
-	DeleteSQS(ctx context.Context, msg *types.Message, receiveCount int, processingErr error, handles []s3ObjectHandler) error
+	DeleteSQS(msg *types.Message, receiveCount int, processingErr error, handles []s3ObjectHandler) error
 }
 
 // ------

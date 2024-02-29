@@ -44,7 +44,7 @@ func (e *nonRetryableError) Error() string {
 }
 
 func (e *nonRetryableError) Is(err error) bool {
-	_, ok := err.(*nonRetryableError) //nolint:errorlint // This is not used directly to detected wrapped errors (errors.Is handles unwrapping).
+	_, ok := err.(*nonRetryableError)
 	return ok
 }
 
@@ -122,10 +122,10 @@ func newSQSS3EventProcessor(
 	}
 }
 
-func (p *sqsS3EventProcessor) DeleteSQS(ctx context.Context, msg *types.Message, receiveCount int, processingErr error, handles []s3ObjectHandler) error {
+func (p *sqsS3EventProcessor) DeleteSQS(msg *types.Message, receiveCount int, processingErr error, handles []s3ObjectHandler) error {
 	// No error. Delete SQS.
 	if processingErr == nil {
-		if msgDelErr := p.sqs.DeleteMessage(ctx, msg); msgDelErr != nil {
+		if msgDelErr := p.sqs.DeleteMessage(context.Background(), msg); msgDelErr != nil {
 			return fmt.Errorf("failed deleting message from SQS queue (it may be reprocessed): %w", msgDelErr)
 		}
 

@@ -87,7 +87,7 @@ func TestSQSReceiver(t *testing.T) {
 		mockClient.EXPECT().Close()
 		// Expect the one message returned to have been deleted.
 		mockMsgHandler.EXPECT().
-			DeleteSQS(gomock.Any(), gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any()).
+			DeleteSQS(gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any()).
 			Times(1).
 			Return(nil)
 

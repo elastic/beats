@@ -8,7 +8,8 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"io/ioutil"
+	"io"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -27,7 +28,7 @@ import (
 )
 
 func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.GetObjectOutput) {
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,7 +40,7 @@ func newS3GetObjectResponse(filename string, data []byte, contentType string) *s
 	r := bytes.NewReader(data)
 	getObjectOutput := s3.GetObjectOutput{}
 	getObjectOutput.ContentLength = int64(r.Len())
-	getObjectOutput.Body = ioutil.NopCloser(r)
+	getObjectOutput.Body = io.NopCloser(r)
 	if contentType != "" {
 		getObjectOutput.ContentType = &contentType
 	}
