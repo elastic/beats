@@ -36,6 +36,11 @@ else
   with_docker_compose "${DOCKER_COMPOSE_VERSION}"
 fi
 
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+  startCloudTestEnv "${MODULE_DIR}"
+  withModule "${MODULE_DIR}"
+fi
+
 with_go "${GO_VERSION}"
 with_mage
 with_python

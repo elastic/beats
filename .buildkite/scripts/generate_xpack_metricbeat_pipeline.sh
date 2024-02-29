@@ -26,12 +26,12 @@ steps:
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
+        command: ".buildkite/scripts/go_int_tests.sh"
         env:
           MODULE: "$MODULE"
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "family/core-ubuntu-2204"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
@@ -139,12 +139,12 @@ if  are_conditions_met_aws_tests; then
   cat >> $pipelineName <<- YAML
       - label: ":linux: ${MODULE^^} Cloud Tests"
         key: "extended-cloud-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build test"
+        command: ".buildkite/scripts/cloud_tests.sh"
         env:
           MODULE: "$MODULE"
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "family/core-ubuntu-2204"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
