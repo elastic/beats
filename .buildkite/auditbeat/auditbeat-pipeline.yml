@@ -9,6 +9,10 @@ env:
   IMAGE_WIN_2022: "family/core-windows-2022"
   IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
 
 steps:
   - group: "Auditbeat Mandatory Testing"
@@ -25,6 +29,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
@@ -38,6 +43,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
@@ -50,7 +56,7 @@ steps:
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
-          machine_type: "n2-standard-8"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
           disk_type: "pd-ssd"
         matrix:
@@ -73,6 +79,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
 
   - group: "Extended Testing"
     key: "extended-tests"
@@ -90,7 +97,7 @@ steps:
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.large"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "auditbeat/build/*.xml"
 
       - label: ":mac: MacOS Unit Tests"
@@ -120,7 +127,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
-          machine_type: "n2-standard-8"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
           disk_type: "pd-ssd"
         artifact_paths:

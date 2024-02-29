@@ -20,6 +20,7 @@ if are_files_changed "$changeset"; then
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
+          GOFLAGS: “-buildvcs=false”
         command: ".buildkite/scripts/packaging/package.sh"
         notify:
           - github_commit_status:
@@ -27,6 +28,7 @@ if are_files_changed "$changeset"; then
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
 
       - label: ":linux: ${BEATS_PROJECT_NAME}/Packaging Linux ARM"
         key: "package-linux-arm"
@@ -34,6 +36,7 @@ if are_files_changed "$changeset"; then
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
           SNAPSHOT: true
+          GOFLAGS: “-buildvcs=false”
         command: ".buildkite/scripts/packaging/package.sh"
         notify:
           - github_commit_status:
@@ -41,7 +44,7 @@ if are_files_changed "$changeset"; then
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.xlarge"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
 YAML
 )
   echo "${bk_pipeline}" | buildkite-agent pipeline upload

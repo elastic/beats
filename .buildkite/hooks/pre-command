@@ -51,13 +51,14 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == 
     export DOCKER_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
     export DOCKER_PASSWORD_SECRET=$(retry_with_count 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
     export GITHUB_TOKEN_SECRET=$(retry_with_count 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
-    export GITHUB_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field username ${GITHUB_TOKEN_VAULT_PATH})
-    export GITHUB_EMAIL_SECRET=$(retry_with_count 5 vault kv get -field email ${GITHUB_TOKEN_VAULT_PATH})
 
     docker login -u "${DOCKER_USERNAME_SECRET}" -p "${DOCKER_PASSWORD_SECRET}" "${DOCKER_REGISTRY}" 2>/dev/null
 
-    git config user.name "${GITHUB_USERNAME_SECRET}"
-    git config user.email "${GITHUB_EMAIL_SECRET}"
+    github_username=$(retry_with_count 5 vault kv get -field username ${GITHUB_TOKEN_VAULT_PATH})
+    github_email=$(retry_with_count 5 vault kv get -field email ${GITHUB_TOKEN_VAULT_PATH})
+
+    git config user.name "$github_username"
+    git config user.email "$github_email"
   fi
 fi
 
