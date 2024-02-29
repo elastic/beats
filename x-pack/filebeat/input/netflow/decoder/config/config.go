@@ -6,25 +6,30 @@ package config
 
 import (
 	"io"
-	"io/ioutil"
 	"time"
 
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow/decoder/fields"
 )
 
+type ActiveSessionsMetric interface {
+	Inc()
+	Dec()
+}
+
 // Config stores the configuration used by the NetFlow Collector.
 type Config struct {
-	protocols       []string
-	logOutput       io.Writer
-	expiration      time.Duration
-	detectReset     bool
-	fields          fields.FieldDict
-	sharedTemplates bool
+	protocols            []string
+	logOutput            io.Writer
+	expiration           time.Duration
+	detectReset          bool
+	fields               fields.FieldDict
+	sharedTemplates      bool
+	activeSessionsMetric ActiveSessionsMetric
 }
 
 var defaultCfg = Config{
 	protocols:       []string{},
-	logOutput:       ioutil.Discard,
+	logOutput:       io.Discard,
 	expiration:      time.Hour,
 	detectReset:     true,
 	sharedTemplates: false,
@@ -91,6 +96,12 @@ func (c *Config) WithSharedTemplates(enabled bool) *Config {
 	return c
 }
 
+// WithActiveSessionsMetric configures the metric used to report active sessions.
+func (c *Config) WithActiveSessionsMetric(metric ActiveSessionsMetric) *Config {
+	c.activeSessionsMetric = metric
+	return c
+}
+
 // Protocols returns a list of the protocols enabled.
 func (c *Config) Protocols() []string {
 	return c.protocols
@@ -118,4 +129,13 @@ func (c *Config) Fields() fields.FieldDict {
 		return fields.GlobalFields
 	}
 	return c.fields
+}
+
+// ActiveSessionsMetric returns the configured metric to track active sessions.
+func (c *Config) ActiveSessionsMetric() ActiveSessionsMetric {
+	if c == nil {
+		return nil
+	}
+
+	return c.activeSessionsMetric
 }
