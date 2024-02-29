@@ -82,6 +82,16 @@ func (l *runLoop) run() {
 // Perform one iteration of the queue's main run loop. Broken out into a
 // standalone helper function to allow testing of loop invariants.
 func (l *runLoop) runIteration() {
+EAGERDELETE:
+	for {
+		select {
+		case count := <-l.broker.deleteChan:
+			l.handleDelete(count)
+		default:
+			break EAGERDELETE
+		}
+	}
+
 	var pushChan chan pushRequest
 	// Push requests are enabled if the queue isn't yet full.
 	if l.eventCount < len(l.broker.buf) {
@@ -93,16 +103,6 @@ func (l *runLoop) runIteration() {
 	// to consumers, and no existing request is active.
 	if l.pendingGetRequest == nil && l.eventCount > l.consumedCount {
 		getChan = l.broker.getChan
-	}
-
-EAGERDELETE:
-	for {
-		select {
-		case count := <-l.broker.deleteChan:
-			l.handleDelete(count)
-		default:
-			break EAGERDELETE
-		}
 	}
 
 	var consumedChan chan batchList
