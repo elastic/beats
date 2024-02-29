@@ -99,7 +99,13 @@ func (l *runLoop) runIteration() {
 	// Enable sending to the scheduled ACKs channel if we have
 	// something to send.
 	if !l.consumedBatches.empty() {
-		consumedChan = l.broker.consumedChan
+		// be a little greedy
+		select {
+		case l.broker.consumedChan <- l.consumedBatches:
+			l.consumedBatches = batchList{}
+		default:
+			consumedChan = l.broker.consumedChan
+		}
 	}
 
 	var timeoutChan <-chan time.Time
