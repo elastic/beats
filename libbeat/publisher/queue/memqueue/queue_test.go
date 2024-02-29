@@ -157,7 +157,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 
 	q := NewQueue(nil, nil,
 		Settings{
-			Events:        4, // Queue size
+			Events:        3, // Queue size
 			MaxGetRequest: 2,
 			FlushTimeout:  10 * time.Millisecond,
 		}, 1)
@@ -200,7 +200,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	// However, the test is written to produce false negatives only:
 	// - If this test fails, it _always_ indicates a bug.
 	// - If there is a bug, this test will _often_ fail.
-	time.Sleep(10 * time.Millisecond)
+	time.Sleep(20 * time.Millisecond)
 
 	// Cancel the producer, then read and acknowledge two batches. If the
 	// Publish calls and the queue code are working, activeEvents should
