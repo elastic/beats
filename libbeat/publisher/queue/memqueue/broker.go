@@ -219,7 +219,7 @@ func newQueue(
 		metricChan: make(chan metricsRequest),
 
 		// internal runLoop and ackLoop channels
-		consumedChan: make(chan batchList),
+		consumedChan: make(chan batchList, 5),
 		deleteChan:   make(chan int),
 
 		ackCallback: ackCallback,

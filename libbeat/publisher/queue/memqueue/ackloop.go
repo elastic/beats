@@ -28,13 +28,66 @@ type ackLoop struct {
 	// A list of batches given to queue consumers,
 	// used to maintain sequencing of event acknowledgements.
 	pendingBatches batchList
+
+	callbackWorker callbackWorker
+}
+
+type callbackWorker struct {
+	callbackChan  chan []func()
+	callbacksDone chan struct{}
 }
 
 func newACKLoop(broker *broker) *ackLoop {
-	return &ackLoop{broker: broker}
+	return &ackLoop{
+		broker: broker,
+		callbackWorker: callbackWorker{
+			callbackChan:  make(chan []func(), 5),
+			callbacksDone: make(chan struct{}),
+		},
+	}
+}
+
+func (cw *callbackWorker) run() {
+	pendingCallbacks := [][]func(){}
+	callbackInProgress := false
+	for {
+		select {
+		case newCallbacks, ok := <-cw.callbackChan:
+			if !ok {
+				// channel has been closed, shutting down
+				return
+			}
+			if !callbackInProgress {
+				callbackInProgress = true
+				go func() {
+					for _, cb := range newCallbacks {
+						cb()
+					}
+					cw.callbacksDone <- struct{}{}
+				}()
+			} else {
+				pendingCallbacks = append(pendingCallbacks, newCallbacks)
+			}
+		case <-cw.callbacksDone:
+			if len(pendingCallbacks) > 0 {
+				nextCallbacks := pendingCallbacks[0]
+				copy(pendingCallbacks, pendingCallbacks[1:])
+				pendingCallbacks = pendingCallbacks[:len(pendingCallbacks)-1]
+				go func() {
+					for _, cb := range nextCallbacks {
+						cb()
+					}
+					cw.callbacksDone <- struct{}{}
+				}()
+			} else {
+				callbackInProgress = false
+			}
+		}
+	}
 }
 
 func (l *ackLoop) run() {
+	go l.callbackWorker.run()
 	b := l.broker
 	for {
 		nextBatchChan := l.pendingBatches.nextBatchChannel()
@@ -42,6 +95,7 @@ func (l *ackLoop) run() {
 		select {
 		case <-b.ctx.Done():
 			// The queue is shutting down.
+			close(l.callbackWorker.callbackChan)
 			return
 
 		case chanList := <-b.consumedChan:
@@ -145,7 +199,5 @@ func (l *ackLoop) processACK(lst batchList, N int) {
 	l.broker.deleteChan <- N
 
 	// The events have been removed; notify their listeners.
-	for _, f := range ackCallbacks {
-		f()
-	}
+	l.callbackWorker.callbackChan <- ackCallbacks
 }
