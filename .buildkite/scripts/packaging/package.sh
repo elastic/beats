@@ -21,13 +21,17 @@ echo "--- Docker image list"
 docker images
 
 define_tags
-check_is_arm
+
+targetSuffix=""
+if [[ ${HW_TYPE} == "aarch64" || ${HW_TYPE} == "arm64" ]]; then
+  targetSuffix="-arm64"
+fi
 
 for variant in "${VARIANTS[@]}"; do
   source="beats/${BEATS_PROJECT_NAME}${variant}"
 
   for tag in "${tags[@]}"; do
-    targetTag=$tag${is_arm}
+    targetTag=$tag${targetSuffix}
 
     sourceName="${DOCKER_REGISTRY}/${source}:${SOURCE_TAG}"
     targetName="${DOCKER_REGISTRY}/${TARGET}:${targetTag}"
