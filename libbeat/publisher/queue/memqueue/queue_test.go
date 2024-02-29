@@ -137,7 +137,11 @@ func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
 		time.Millisecond,
 		"the first two events were not successfully published")
 
-	// Close the queue, this should unblock the pending Publish call
+	// Close the queue, this should unblock the pending Publish call.
+	// It's not enough to just cancel the producer: once the producer
+	// has successfully sent a request to the queue, it must wait for
+	// the response unless the queue shuts down, otherwise the pipeline
+	// event totals will be wrong.
 	q.Close()
 
 	require.Eventually(
