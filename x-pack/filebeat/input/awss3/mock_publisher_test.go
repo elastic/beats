@@ -11,8 +11,9 @@ package awss3
 import (
 	reflect "reflect"
 
-	beat "github.com/elastic/beats/v7/libbeat/beat"
 	gomock "github.com/golang/mock/gomock"
+
+	beat "github.com/elastic/beats/v7/libbeat/beat"
 )
 
 // MockBeatClient is a mock of Client interface.

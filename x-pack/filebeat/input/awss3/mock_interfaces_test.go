@@ -16,10 +16,11 @@ import (
 
 	s3 "github.com/aws/aws-sdk-go-v2/service/s3"
 	types "github.com/aws/aws-sdk-go-v2/service/sqs/types"
+	gomock "github.com/golang/mock/gomock"
+
 	beat "github.com/elastic/beats/v7/libbeat/beat"
 	aws "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	logp "github.com/elastic/elastic-agent-libs/logp"
-	gomock "github.com/golang/mock/gomock"
 )
 
 // MockSQSAPI is a mock of sqsAPI interface.
