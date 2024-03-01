@@ -31,7 +31,7 @@ type DecoderIPFIX struct {
 
 var _ v9.Decoder = (*DecoderIPFIX)(nil)
 
-func (_ DecoderIPFIX) ReadPacketHeader(buf *bytes.Buffer) (header v9.PacketHeader, newBuf *bytes.Buffer, countRecords int, err error) {
+func (DecoderIPFIX) ReadPacketHeader(buf *bytes.Buffer) (header v9.PacketHeader, newBuf *bytes.Buffer, countRecords int, err error) {
 	var data [SizeOfIPFIXHeader]byte
 	n, err := buf.Read(data[:])
 	if n != len(data) || err != nil {
