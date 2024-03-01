@@ -1,0 +1,49 @@
+when:
+    changeset:                 ## when PR contains any of those entries in the changeset
+        - "^filebeat/.*"
+        - "@ci"                ## special token regarding the changeset for the ci
+        - "@oss"               ## special token regarding the changeset for the oss
+stages:
+    # default stage - it runs always for:
+    #   - branches/tags
+    #   - on PRs
+    #   - GitHub comment /test filebeat
+    #   - GitHub label filebeat
+    mandatory:
+        # NOTE: stage name should be unique!
+        unitTest:
+            command: "mage build unitTest"
+            platform: "family/core-ubuntu-2204"
+        crosscompile:
+            command: "make -C filebeat crosscompile"
+            platform: "family/core-ubuntu-2204"
+        goIntegTest:
+            command: "mage goIntegTest"
+            platform: "family/core-ubuntu-2204"
+        pythonIntegTest:
+            command: "mage pythonIntegTest"
+            platform: "family/core-ubuntu-2204"
+        rhel-9:
+            command: "mage build unitTest"
+            platform: "family/core-rhel-9"
+        unitTest-windows-2022:
+            command: "mage build unitTest"
+            platform: "windows-2022"
+        unitTest-windows-2016:
+            command: "mage build unitTest"
+            platform: "family/core-windows-2016"
+    # optional stage - it runs on:
+    #   - branches/tags
+    #   - on PRs if:
+    #       - GitHub comment /test filebeat <sub-stage-name> . i.e: /test filebeat integTest
+    #       - GitHub label <sub-stage-name> . i.e: integTest or unitTest-arm or unitTest-macos ...
+    extended:
+        unitTest-arm:
+            command: "mage build unitTest"
+            platform: "core-ubuntu-2004-aarch64"
+        unitTest-macos:
+            command: "mage build unitTest"
+            platform: "generic-13-ventura-x64"
+        unitTest-windows-2019:
+            command: "mage build unitTest"
+            platform: "family/core-windows-2019"
