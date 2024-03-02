@@ -51,18 +51,18 @@ func (p *producer) makePushRequest(event interface{}, canBlock bool) *pushReques
 	return req
 }
 
-func (p *producer) Publish(event interface{}) bool {
+func (p *producer) Publish(event interface{}) (queue.EntryID, bool) {
 	if p.cancelled {
-		return false
+		return 0, false
 	}
-	return p.publish(p.makePushRequest(event, true))
+	return 0, p.publish(p.makePushRequest(event, true))
 }
 
-func (p *producer) TryPublish(event interface{}) bool {
+func (p *producer) TryPublish(event interface{}) (queue.EntryID, bool) {
 	if p.cancelled {
-		return false
+		return 0, false
 	}
-	return p.publish(p.makePushRequest(event, false))
+	return 0, p.publish(p.makePushRequest(event, false))
 }
 
 func (p *producer) Cancel() int {

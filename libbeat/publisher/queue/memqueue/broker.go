@@ -114,6 +114,7 @@ type Settings struct {
 
 type queueEntry struct {
 	event interface{}
+	id    queue.EntryID
 
 	producer   *ackProducer
 	producerID producerID // The order of this entry within its producer
@@ -186,7 +187,7 @@ func newQueue(
 	settings Settings,
 	inputQueueSize int,
 ) *broker {
-	//chanSize := AdjustInputQueueSize(inputQueueSize, settings.Events)
+	chanSize := AdjustInputQueueSize(inputQueueSize, settings.Events)
 
 	// Backwards compatibility: an old way to select synchronous queue
 	// behavior was to set "flush.min_events" to 0 or 1, in which case the
@@ -213,14 +214,14 @@ func newQueue(
 		buf: make([]queueEntry, settings.Events),
 
 		// broker API channels
-		pushChan:   make(chan pushRequest, inputQueueSize),
+		pushChan:   make(chan pushRequest, chanSize),
 		getChan:    make(chan getRequest),
 		cancelChan: make(chan producerCancelRequest, 5),
 		metricChan: make(chan metricsRequest),
 
 		// internal runLoop and ackLoop channels
-		consumedChan: make(chan batchList, 5),
-		deleteChan:   make(chan int, 5),
+		consumedChan: make(chan batchList),
+		deleteChan:   make(chan int),
 
 		ackCallback: ackCallback,
 	}
@@ -280,6 +281,7 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 		EventCount:            opt.UintWith(uint64(resp.currentQueueSize)),
 		EventLimit:            opt.UintWith(uint64(len(b.buf))),
 		UnackedConsumedEvents: opt.UintWith(uint64(resp.occupiedRead)),
+		OldestEntryID:         resp.oldestEntryID,
 	}, nil
 }
 

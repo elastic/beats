@@ -295,12 +295,12 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 // a producer for a nonexistent queue.
 type emptyProducer struct{}
 
-func (emptyProducer) Publish(_ interface{}) bool {
-	return false
+func (emptyProducer) Publish(_ interface{}) (queue.EntryID, bool) {
+	return 0, false
 }
 
-func (emptyProducer) TryPublish(_ interface{}) bool {
-	return false
+func (emptyProducer) TryPublish(_ interface{}) (queue.EntryID, bool) {
+	return 0, false
 }
 
 func (emptyProducer) Cancel() int {

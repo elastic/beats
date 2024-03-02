@@ -18,8 +18,6 @@
 package memqueue
 
 import (
-	"sync/atomic"
-
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -52,7 +50,7 @@ type producerID uint64
 type produceState struct {
 	cb        ackHandler
 	dropCB    func(interface{})
-	cancelled atomic.Bool
+	cancelled bool
 	lastACK   producerID
 }
 
@@ -75,14 +73,17 @@ func newProducer(b *broker, cb ackHandler, dropCB func(interface{}), dropOnCance
 }
 
 func (p *forgetfulProducer) makePushRequest(event interface{}) pushRequest {
-	return pushRequest{event: event}
+	resp := make(chan queue.EntryID, 1)
+	return pushRequest{
+		event: event,
+		resp:  resp}
 }
 
-func (p *forgetfulProducer) Publish(event interface{}) bool {
+func (p *forgetfulProducer) Publish(event interface{}) (queue.EntryID, bool) {
 	return p.openState.publish(p.makePushRequest(event))
 }
 
-func (p *forgetfulProducer) TryPublish(event interface{}) bool {
+func (p *forgetfulProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
 	return p.openState.tryPublish(p.makePushRequest(event))
 }
 
@@ -92,32 +93,33 @@ func (p *forgetfulProducer) Cancel() int {
 }
 
 func (p *ackProducer) makePushRequest(event interface{}) pushRequest {
+	resp := make(chan queue.EntryID, 1)
 	return pushRequest{
 		event:    event,
 		producer: p,
 		// We add 1 to the id so the default lastACK of 0 is a
 		// valid initial state and 1 is the first real id.
-		producerID: producerID(p.producedCount + 1)}
+		producerID: producerID(p.producedCount + 1),
+		resp:       resp}
 }
 
-func (p *ackProducer) Publish(event interface{}) bool {
-	published := p.openState.publish(p.makePushRequest(event))
+func (p *ackProducer) Publish(event interface{}) (queue.EntryID, bool) {
+	id, published := p.openState.publish(p.makePushRequest(event))
 	if published {
 		p.producedCount++
 	}
-	return published
+	return id, published
 }
 
-func (p *ackProducer) TryPublish(event interface{}) bool {
-	published := p.openState.tryPublish(p.makePushRequest(event))
+func (p *ackProducer) TryPublish(event interface{}) (queue.EntryID, bool) {
+	id, published := p.openState.tryPublish(p.makePushRequest(event))
 	if published {
 		p.producedCount++
 	}
-	return published
+	return id, published
 }
 
 func (p *ackProducer) Cancel() int {
-	p.state.cancelled.Store(true)
 	p.openState.Close()
 
 	if p.dropOnCancel {
@@ -138,27 +140,35 @@ func (st *openState) Close() {
 	close(st.done)
 }
 
-func (st *openState) publish(req pushRequest) bool {
+func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	select {
 	case st.events <- req:
-		return true
+		// If the output is blocked and the queue is full, `req` is written
+		// to `st.events`, however the queue never writes back to `req.resp`,
+		// which effectively blocks for ever. So we also need to select on the
+		// done channel to ensure we don't miss the shutdown signal.
+		select {
+		case resp := <-req.resp:
+			return resp, true
+		case <-st.done:
+			st.events = nil
+			return 0, false
+		}
 	case <-st.done:
-		// set events channel to nil so we can't accidentally write to
-		// it if the select statement lands the other way next time.
 		st.events = nil
-		return false
+		return 0, false
 	}
 }
 
-func (st *openState) tryPublish(req pushRequest) bool {
+func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	select {
 	case st.events <- req:
-		return true
+		return <-req.resp, true
 	case <-st.done:
 		st.events = nil
-		return false
+		return 0, false
 	default:
 		st.log.Debugf("Dropping event, queue is blocked")
-		return false
+		return 0, false
 	}
 }

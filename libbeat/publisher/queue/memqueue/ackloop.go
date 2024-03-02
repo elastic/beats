@@ -31,9 +31,7 @@ type ackLoop struct {
 }
 
 func newACKLoop(broker *broker) *ackLoop {
-	return &ackLoop{
-		broker: broker,
-	}
+	return &ackLoop{broker: broker}
 }
 
 func (l *ackLoop) run() {
@@ -134,11 +132,9 @@ func (l *ackLoop) processACK(lst batchList, N int) {
 				entry.producer = nil
 				continue
 			}
-			//producerState := entry.producer.state
-			oldLastACK := entry.producer.state.lastACK
-			cb := entry.producer.state.cb
-			count := int(entry.producerID - oldLastACK)
-			ackCallbacks = append(ackCallbacks, func() { cb(count) })
+			producerState := entry.producer.state
+			count := int(entry.producerID - producerState.lastACK)
+			ackCallbacks = append(ackCallbacks, func() { producerState.cb(count) })
 			entry.producer.state.lastACK = entry.producerID
 			entry.producer = nil
 		}
@@ -147,7 +143,7 @@ func (l *ackLoop) processACK(lst batchList, N int) {
 	l.broker.deleteChan <- N
 
 	// The events have been removed; notify their listeners.
-	for _, cb := range ackCallbacks {
-		cb()
+	for _, f := range ackCallbacks {
+		f()
 	}
 }

@@ -62,11 +62,11 @@ func TestBasicEventFlow(t *testing.T) {
 		ACK: listener.ACK,
 	})
 	// Try to publish 3 events, only the first two should succeed until we read a batch
-	success := producer.TryPublish(1)
+	_, success := producer.TryPublish(1)
 	assert.True(t, success)
-	success = producer.TryPublish(2)
+	_, success = producer.TryPublish(2)
 	assert.True(t, success)
-	success = producer.TryPublish(3)
+	_, success = producer.TryPublish(3)
 	assert.False(t, success, "Current batch should only fit two events")
 
 	batch, err := testQueue.Get(0)
@@ -76,7 +76,7 @@ func TestBasicEventFlow(t *testing.T) {
 	assert.NoError(t, listener.waitForTotalACKs(2, time.Second))
 
 	// Make sure that reading an event unblocked the queue
-	success = producer.TryPublish(4)
+	_, success = producer.TryPublish(4)
 	assert.True(t, success, "Queue should accept incoming event")
 }
 
@@ -137,9 +137,9 @@ func TestOutOfOrderACK(t *testing.T) {
 	batches := []queue.Batch{}
 	for i := 0; i < BATCH_COUNT; i++ {
 		// Publish two events
-		success := producer.Publish(0)
+		_, success := producer.Publish(0)
 		assert.True(t, success, "Publish should succeed")
-		success = producer.Publish(0)
+		_, success = producer.Publish(0)
 		assert.True(t, success, "Publish should succeed")
 
 		// Consume a batch, which should contain the events we just published
@@ -172,7 +172,7 @@ func TestWriteAfterClose(t *testing.T) {
 	testQueue.Close()
 
 	// Make sure Publish fails instead of blocking
-	success := producer.Publish(1)
+	_, success := producer.Publish(1)
 	assert.False(t, success, "Publish should fail since queue is closed")
 }
 

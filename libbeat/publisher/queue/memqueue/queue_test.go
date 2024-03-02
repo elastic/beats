@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -107,14 +108,14 @@ func TestProducerDoesNotBlockWhenCancelled(t *testing.T) {
 		// Publish 2 events, this will make the queue full, but
 		// both will be accepted
 		for i := 0; i < 2; i++ {
-			ok := p.Publish(fmt.Sprintf("Event %d", i))
+			id, ok := p.Publish(fmt.Sprintf("Event %d", i))
 			if !ok {
-				t.Errorf("failed to publish to the queue")
+				t.Errorf("failed to publish to the queue, event ID: %v", id)
 				return
 			}
 			publishCount.Add(1)
 		}
-		ok := p.Publish("Event 3")
+		_, ok := p.Publish("Event 3")
 		if ok {
 			t.Errorf("publishing the 3rd event must fail")
 			return
@@ -249,4 +250,164 @@ func TestAdjustInputQueueSize(t *testing.T) {
 		mainQueue := 4096
 		assert.Equal(t, int(float64(mainQueue)*maxInputQueueSizeRatio), AdjustInputQueueSize(mainQueue, mainQueue))
 	})
+}
+
+func TestEntryIDs(t *testing.T) {
+	entryCount := 100
+
+	testForward := func(q queue.Queue) {
+		waiter := &producerACKWaiter{}
+		producer := q.Producer(queue.ProducerConfig{ACK: waiter.ack})
+		for i := 0; i < entryCount; i++ {
+			id, success := producer.Publish(nil)
+			assert.Equal(t, success, true, "Queue publish should succeed")
+			assert.Equal(t, id, queue.EntryID(i), "Entry ID should match publication order")
+		}
+
+		for i := 0; i < entryCount; i++ {
+			batch, err := q.Get(1)
+			assert.NilError(t, err, "Queue read should succeed")
+			assert.Equal(t, batch.Count(), 1, "Returned batch should have 1 entry")
+
+			metrics, err := q.Metrics()
+			assert.NilError(t, err, "Queue metrics call should succeed")
+			assert.Equal(t, metrics.OldestEntryID, queue.EntryID(i),
+				fmt.Sprintf("Oldest entry ID before ACKing event %v should be %v", i, i))
+
+			batch.Done()
+			waiter.waitForEvents(1)
+			metrics, err = q.Metrics()
+			assert.NilError(t, err, "Queue metrics call should succeed")
+			assert.Equal(t, metrics.OldestEntryID, queue.EntryID(i+1),
+				fmt.Sprintf("Oldest entry ID after ACKing event %v should be %v", i, i+1))
+
+		}
+	}
+
+	testBackward := func(q queue.Queue) {
+		waiter := &producerACKWaiter{}
+		producer := q.Producer(queue.ProducerConfig{ACK: waiter.ack})
+		for i := 0; i < entryCount; i++ {
+			id, success := producer.Publish(nil)
+			assert.Equal(t, success, true, "Queue publish should succeed")
+			assert.Equal(t, id, queue.EntryID(i), "Entry ID should match publication order")
+		}
+
+		batches := []queue.Batch{}
+
+		for i := 0; i < entryCount; i++ {
+			batch, err := q.Get(1)
+			assert.NilError(t, err, "Queue read should succeed")
+			assert.Equal(t, batch.Count(), 1, "Returned batch should have 1 entry")
+			batches = append(batches, batch)
+		}
+
+		for i := entryCount - 1; i > 0; i-- {
+			batches[i].Done()
+
+			// It's hard to remove this delay since the Done signal is propagated
+			// asynchronously to the queue, and since this test is ensuring that the
+			// queue _doesn't_ advance we can't use a callback to gate the comparison
+			// like we do in testForward. However:
+			// - While this race condition could sometimes let a buggy implementation
+			//   pass, it will not produce a false failure (so it won't contribute
+			//   to general test flakiness)
+			// - That notwithstanding, when the ACK _does_ cause an incorrect
+			//   metrics update, this delay is enough to recognize it approximately
+			//   100% of the time, so this test is still a good signal despite
+			//   the slight nondeterminism.
+			time.Sleep(1 * time.Millisecond)
+			metrics, err := q.Metrics()
+			assert.NilError(t, err, "Queue metrics call should succeed")
+			assert.Equal(t, metrics.OldestEntryID, queue.EntryID(0),
+				fmt.Sprintf("Oldest entry ID after ACKing event %v should be 0", i))
+		}
+		// ACK the first batch, which should unblock all the later ones
+		batches[0].Done()
+		waiter.waitForEvents(100)
+		metrics, err := q.Metrics()
+		assert.NilError(t, err, "Queue metrics call should succeed")
+		assert.Equal(t, metrics.OldestEntryID, queue.EntryID(100),
+			fmt.Sprintf("Oldest entry ID after ACKing event 0 should be %v", queue.EntryID(entryCount)))
+
+	}
+
+	t.Run("acking in forward order with directEventLoop reports the right event IDs", func(t *testing.T) {
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000}, 0)
+		testForward(testQueue)
+	})
+
+	t.Run("acking in reverse order with directEventLoop reports the right event IDs", func(t *testing.T) {
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000}, 0)
+		testBackward(testQueue)
+	})
+
+	t.Run("acking in forward order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000, MaxGetRequest: 2, FlushTimeout: time.Microsecond}, 0)
+		testForward(testQueue)
+	})
+
+	t.Run("acking in reverse order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000, MaxGetRequest: 2, FlushTimeout: time.Microsecond}, 0)
+		testBackward(testQueue)
+	})
+}
+
+// producerACKWaiter is a helper that can listen to queue producer callbacks
+// and wait on them from the test thread, so we can test the queue's asynchronous
+// behavior without relying on time.Sleep.
+type producerACKWaiter struct {
+	sync.Mutex
+
+	// The number of acks received from a producer callback.
+	acked int
+
+	// The number of acks that callers have waited for in waitForEvents.
+	waited int
+
+	// When non-nil, this channel is being listened to by a test thread
+	// blocking on ACKs, and incoming producer callbacks are forwarded
+	// to it.
+	ackChan chan int
+}
+
+func (w *producerACKWaiter) ack(count int) {
+	w.Lock()
+	defer w.Unlock()
+	w.acked += count
+	if w.ackChan != nil {
+		w.ackChan <- count
+	}
+}
+
+func (w *producerACKWaiter) waitForEvents(count int) {
+	w.Lock()
+	defer w.Unlock()
+	if w.ackChan != nil {
+		panic("don't call producerACKWaiter.waitForEvents from multiple goroutines")
+	}
+
+	avail := w.acked - w.waited
+	if count <= avail {
+		w.waited += count
+		return
+	}
+	w.waited = w.acked
+	count -= avail
+	// We have advanced as far as we can, we have to wait for
+	// more incoming ACKs.
+	// Set a listener and unlock, so ACKs can come in on another
+	// goroutine.
+	w.ackChan = make(chan int)
+	w.Unlock()
+
+	newAcked := 0
+	for newAcked < count {
+		newAcked += <-w.ackChan
+	}
+	// When we're done, turn off the listener channel and update
+	// the number of events waited on.
+	w.Lock()
+	w.ackChan = nil
+	w.waited += count
 }

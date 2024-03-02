@@ -42,7 +42,7 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 			MaxGetRequest: 500,
 			FlushTimeout:  10 * time.Second,
 		},
-		0)
+		10)
 
 	producer := newProducer(broker, nil, nil, false)
 	rl := broker.runLoop
@@ -50,7 +50,7 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 		// Pair each publish call with an iteration of the run loop so we
 		// get a response.
 		go rl.runIteration()
-		ok := producer.Publish(i)
+		_, ok := producer.Publish(i)
 		require.True(t, ok, "Queue publish call must succeed")
 	}
 
@@ -81,7 +81,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 			MaxGetRequest: 500,
 			FlushTimeout:  10 * time.Second,
 		},
-		0)
+		10)
 
 	producer := newProducer(broker, nil, nil, false)
 	rl := broker.runLoop
@@ -89,7 +89,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 		// Pair each publish call with an iteration of the run loop so we
 		// get a response.
 		go rl.runIteration()
-		ok := producer.Publish("some event")
+		_, ok := producer.Publish("some event")
 		require.True(t, ok, "Queue publish call must succeed")
 	}
 
@@ -106,7 +106,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 
 	// Now confirm that adding one more event unblocks the request
 	go func() {
-		_ = producer.Publish("some event")
+		_, _ = producer.Publish("some event")
 	}()
 	rl.runIteration()
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since adding an event should unblock the previous one")
