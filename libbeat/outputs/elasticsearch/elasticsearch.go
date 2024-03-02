@@ -18,6 +18,8 @@
 package elasticsearch
 
 import (
+	"bytes"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -72,6 +74,8 @@ func makeES(
 	if err := cfg.Unpack(&esConfig); err != nil {
 		return outputs.Fail(err)
 	}
+
+	preEncoder := newPreEncoder(esConfig.EscapeHTML)
 
 	policy, err := newNonIndexablePolicy(esConfig.NonIndexablePolicy)
 	if err != nil {
@@ -139,7 +143,7 @@ func makeES(
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, clients)
+	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, preEncoder, clients)
 }
 
 func buildSelectors(
@@ -172,4 +176,23 @@ func buildPipelineSelector(cfg *config.C) (outil.Selector, error) {
 		FailEmpty:        false,
 		Case:             outil.SelectorLowerCase,
 	})
+}
+
+type preEncoder struct {
+	buf *bytes.Buffer
+	enc eslegclient.BodyEncoder
+}
+
+func newPreEncoder(escapeHTML bool) outputs.PreEncoder {
+	buf := bytes.NewBuffer(nil)
+	enc := eslegclient.NewJSONEncoder(buf, escapeHTML)
+	return &preEncoder{buf: buf, enc: enc}
+}
+
+func (pe *preEncoder) EncodeEvent(e *beat.Event) []byte {
+	pe.enc.Marshal(e)
+	bufBytes := pe.buf.Bytes()
+	bytes := make([]byte, len(bufBytes))
+	copy(bytes, bufBytes)
+	return bytes
 }

@@ -20,6 +20,7 @@ package outputs
 import (
 	"fmt"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
@@ -35,7 +36,7 @@ func Fail(err error) (Group, error) { return Group{}, err }
 // instances.  The first argument is expected to contain a queue
 // config.Namespace.  The queue config is passed to assign the queue
 // factory when elastic-agent reloads the output.
-func Success(cfg config.Namespace, batchSize, retry int, clients ...Client) (Group, error) {
+func Success(cfg config.Namespace, batchSize, retry int, preEncoder PreEncoder, clients ...Client) (Group, error) {
 	var q queue.QueueFactory
 	if cfg.IsSet() && cfg.Config().Enabled() {
 		switch cfg.Name() {
@@ -63,6 +64,7 @@ func Success(cfg config.Namespace, batchSize, retry int, clients ...Client) (Gro
 		BatchSize:    batchSize,
 		Retry:        retry,
 		QueueFactory: q,
+		PreEncoder:   preEncoder,
 	}, nil
 }
 
@@ -75,16 +77,20 @@ func NetworkClients(netclients []NetworkClient) []Client {
 	return clients
 }
 
+type PreEncoder interface {
+	EncodeEvent(*beat.Event) []byte
+}
+
 // SuccessNet create a valid output Group and creates client instances
 // The first argument is expected to contain a queue config.Namespace.
 // The queue config is passed to assign the queue factory when
 // elastic-agent reloads the output.
-func SuccessNet(cfg config.Namespace, loadbalance bool, batchSize, retry int, netclients []NetworkClient) (Group, error) {
+func SuccessNet(cfg config.Namespace, loadbalance bool, batchSize, retry int, preEncoder PreEncoder, netclients []NetworkClient) (Group, error) {
 
 	if !loadbalance {
-		return Success(cfg, batchSize, retry, NewFailoverClient(netclients))
+		return Success(cfg, batchSize, retry, preEncoder, NewFailoverClient(netclients))
 	}
 
 	clients := NetworkClients(netclients)
-	return Success(cfg, batchSize, retry, clients...)
+	return Success(cfg, batchSize, retry, preEncoder, clients...)
 }

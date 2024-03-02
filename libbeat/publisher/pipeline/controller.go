@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -58,7 +57,7 @@ type outputController struct {
 	// is called.
 	queueFactory queue.QueueFactory
 
-	workerChan chan publisher.Batch
+	workerChan chan batchRequest
 
 	consumer *eventConsumer
 	workers  []outputWorker
@@ -96,7 +95,7 @@ func newOutputController(
 		observer:       observer,
 		eventWaitGroup: eventWaitGroup,
 		queueFactory:   queueFactory,
-		workerChan:     make(chan publisher.Batch),
+		workerChan:     make(chan batchRequest),
 		consumer:       newEventConsumer(monitors.Logger, observer),
 		inputQueueSize: inputQueueSize,
 	}
@@ -174,6 +173,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 			ch:         targetChan,
 			batchSize:  outGrp.BatchSize,
 			timeToLive: outGrp.Retry + 1,
+			preEncoder: outGrp.PreEncoder,
 		})
 }
 

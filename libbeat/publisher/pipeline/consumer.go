@@ -20,7 +20,7 @@ package pipeline
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -59,9 +59,10 @@ type eventConsumer struct {
 // to generate a batch, and the output channel to send batches to.
 type consumerTarget struct {
 	queue      queue.Queue
-	ch         chan publisher.Batch
+	ch         chan batchRequest
 	timeToLive int
 	batchSize  int
+	preEncoder outputs.PreEncoder
 }
 
 // retryRequest is used by ttlBatch to add itself back to the eventConsumer
@@ -152,14 +153,15 @@ outerLoop:
 		// and try to send to it. Otherwise, it will remain nil, and sends
 		// to it will always block, so the output case of the select below
 		// will be ignored.
-		var outputChan chan publisher.Batch
+		var batchRequestChan chan batchRequest
 		if active != nil {
-			outputChan = target.ch
+			batchRequestChan = target.ch
 		}
 
 		// Now we can block until the next state change.
 		select {
-		case outputChan <- active:
+		case req := <-batchRequestChan:
+			req.responseChan <- active
 			// Successfully sent a batch to the output workers
 			if len(retryBatches) > 0 {
 				// This was a retry, report it to the observer
@@ -174,6 +176,14 @@ outerLoop:
 		case target = <-c.targetChan:
 
 		case queueBatch = <-c.queueReader.resp:
+			// New batch is ready, precompute all its encodings
+			if target.preEncoder != nil {
+				for i := range queueBatch.events {
+					e := &queueBatch.events[i].Content
+					encoding := target.preEncoder.EncodeEvent(e)
+					queueBatch.events[i].CachedEncoding = encoding
+				}
+			}
 			pendingRead = false
 
 		case req := <-c.retryChan:

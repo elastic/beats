@@ -59,6 +59,7 @@ type Group struct {
 	BatchSize    int
 	Retry        int
 	QueueFactory queue.QueueFactory
+	PreEncoder   PreEncoder
 }
 
 // RegisterType registers a new output type.

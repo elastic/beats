@@ -319,6 +319,9 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 		if opType := events.GetOpType(*event); opType == events.OpTypeDelete {
 			// We don't include the event source in a bulk DELETE
 			bulkItems = append(bulkItems, meta)
+		} else if data[i].CachedEncoding != nil {
+			// If the event has already been encoded, use that
+			bulkItems = append(bulkItems, meta, eslegclient.EncodingCache{data[i].CachedEncoding})
 		} else {
 			bulkItems = append(bulkItems, meta, event)
 		}
