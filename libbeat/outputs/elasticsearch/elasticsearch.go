@@ -190,7 +190,10 @@ func newPreEncoder(escapeHTML bool) outputs.PreEncoder {
 }
 
 func (pe *preEncoder) EncodeEvent(e *beat.Event) []byte {
-	pe.enc.Marshal(e)
+	err := pe.enc.Marshal(e)
+	if err != nil {
+		return nil
+	}
 	bufBytes := pe.buf.Bytes()
 	bytes := make([]byte, len(bufBytes))
 	copy(bytes, bufBytes)
