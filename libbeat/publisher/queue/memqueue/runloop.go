@@ -82,16 +82,6 @@ func (l *runLoop) run() {
 // Perform one iteration of the queue's main run loop. Broken out into a
 // standalone helper function to allow testing of loop invariants.
 func (l *runLoop) runIteration() {
-EAGERDELETE:
-	for {
-		select {
-		case count := <-l.broker.deleteChan:
-			l.handleDelete(count)
-		default:
-			break EAGERDELETE
-		}
-	}
-
 	var pushChan chan pushRequest
 	// Push requests are enabled if the queue isn't yet full.
 	if l.eventCount < len(l.broker.buf) {
@@ -109,13 +99,7 @@ EAGERDELETE:
 	// Enable sending to the scheduled ACKs channel if we have
 	// something to send.
 	if !l.consumedBatches.empty() {
-		// be a little greedy
-		select {
-		case l.broker.consumedChan <- l.consumedBatches:
-			l.consumedBatches = batchList{}
-		default:
-			consumedChan = l.broker.consumedChan
-		}
+		consumedChan = l.broker.consumedChan
 	}
 
 	var timeoutChan <-chan time.Time
