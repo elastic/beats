@@ -178,11 +178,18 @@ outerLoop:
 		case queueBatch = <-c.queueReader.resp:
 			// New batch is ready, precompute all its encodings
 			if target.preEncoder != nil {
+				var wg sync.WaitGroup
 				for i := range queueBatch.events {
-					e := &queueBatch.events[i].Content
-					encoding := target.preEncoder.EncodeEvent(e)
-					queueBatch.events[i].CachedEncoding = encoding
+					wg.Add(1)
+					index := i
+					go func() {
+						e := &queueBatch.events[index].Content
+						encoding := target.preEncoder.EncodeEvent(e)
+						queueBatch.events[index].CachedEncoding = encoding
+						wg.Done()
+					}()
 				}
+				wg.Wait()
 			}
 			pendingRead = false
 
