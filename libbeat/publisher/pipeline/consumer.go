@@ -21,6 +21,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -58,11 +59,11 @@ type eventConsumer struct {
 // consumerTarget specifies the queue to read from, the parameters needed
 // to generate a batch, and the output channel to send batches to.
 type consumerTarget struct {
-	queue      queue.Queue
-	ch         chan batchRequest
-	timeToLive int
-	batchSize  int
-	preEncoder outputs.PreEncoder
+	queue          queue.Queue
+	ch             chan batchRequest
+	timeToLive     int
+	batchSize      int
+	encoderFactory outputs.PreEncoderFactory
 }
 
 // retryRequest is used by ttlBatch to add itself back to the eventConsumer
@@ -123,6 +124,8 @@ func (c *eventConsumer) run() {
 		// The output channel (and associated parameters) that will receive
 		// the batches we're loading.
 		target consumerTarget
+
+		encoders []outputs.PreEncoder
 	)
 
 outerLoop:
@@ -174,20 +177,34 @@ outerLoop:
 			}
 
 		case target = <-c.targetChan:
+			if target.encoderFactory != nil {
+				encoders = []outputs.PreEncoder{
+					target.encoderFactory(),
+					target.encoderFactory(),
+					target.encoderFactory(),
+					target.encoderFactory(),
+				}
+			} else {
+				encoders = nil
+			}
 
 		case queueBatch = <-c.queueReader.resp:
 			// New batch is ready, precompute all its encodings
-			if target.preEncoder != nil {
+			if encoders != nil {
+				eventChan := make(chan *publisher.Event, len(encoders))
 				var wg sync.WaitGroup
-				for i := range queueBatch.events {
+				for _, e := range encoders {
+					enc := e
 					wg.Add(1)
-					index := i
 					go func() {
-						e := &queueBatch.events[index].Content
-						encoding := target.preEncoder.EncodeEvent(e)
-						queueBatch.events[index].CachedEncoding = encoding
+						for event := range eventChan {
+							event.CachedEncoding = enc.EncodeEvent(&event.Content)
+						}
 						wg.Done()
 					}()
+				}
+				for i := range queueBatch.events {
+					eventChan <- &queueBatch.events[i]
 				}
 				wg.Wait()
 			}

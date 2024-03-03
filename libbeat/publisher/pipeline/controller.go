@@ -169,11 +169,11 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	// Resume consumer targeting the new work queue
 	c.consumer.setTarget(
 		consumerTarget{
-			queue:      c.queue,
-			ch:         targetChan,
-			batchSize:  outGrp.BatchSize,
-			timeToLive: outGrp.Retry + 1,
-			preEncoder: outGrp.PreEncoder,
+			queue:          c.queue,
+			ch:             targetChan,
+			batchSize:      outGrp.BatchSize,
+			timeToLive:     outGrp.Retry + 1,
+			encoderFactory: outGrp.EncoderFactory,
 		})
 }
 

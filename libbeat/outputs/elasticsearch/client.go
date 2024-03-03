@@ -321,7 +321,8 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 			bulkItems = append(bulkItems, meta)
 		} else if data[i].CachedEncoding != nil {
 			// If the event has already been encoded, use that
-			bulkItems = append(bulkItems, meta, eslegclient.EncodingCache{data[i].CachedEncoding})
+			bulkItems = append(bulkItems, meta,
+				eslegclient.EncodingCache{Encoding: data[i].CachedEncoding})
 		} else {
 			bulkItems = append(bulkItems, meta, event)
 		}

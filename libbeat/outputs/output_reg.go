@@ -55,11 +55,11 @@ type IndexSelector interface {
 // output, but it also provides a natural migration path for moving queue
 // configuration into the outputs.
 type Group struct {
-	Clients      []Client
-	BatchSize    int
-	Retry        int
-	QueueFactory queue.QueueFactory
-	PreEncoder   PreEncoder
+	Clients        []Client
+	BatchSize      int
+	Retry          int
+	QueueFactory   queue.QueueFactory
+	EncoderFactory PreEncoderFactory
 }
 
 // RegisterType registers a new output type.

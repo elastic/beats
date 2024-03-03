@@ -75,7 +75,9 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
-	preEncoder := newPreEncoder(esConfig.EscapeHTML)
+	encoderFactory := func() outputs.PreEncoder {
+		return newPreEncoder(esConfig.EscapeHTML)
+	}
 
 	policy, err := newNonIndexablePolicy(esConfig.NonIndexablePolicy)
 	if err != nil {
@@ -143,7 +145,7 @@ func makeES(
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, preEncoder, clients)
+	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, encoderFactory, clients)
 }
 
 func buildSelectors(
