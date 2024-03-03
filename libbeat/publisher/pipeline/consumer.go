@@ -206,6 +206,7 @@ outerLoop:
 				for i := range queueBatch.events {
 					eventChan <- &queueBatch.events[i]
 				}
+				close(eventChan)
 				wg.Wait()
 			}
 			pendingRead = false
