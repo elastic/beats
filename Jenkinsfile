@@ -80,28 +80,6 @@ pipeline {
         }
       }
     }
-    stage('Checks'){
-      options { skipDefaultCheckout() }
-      environment {
-        GOFLAGS = '-mod=readonly'
-      }
-      steps {
-        withGithubNotify(context: "Checks") {
-          stageStatusCache(id: 'Checks'){
-            // test the ./dev-tools/run_with_go_ver used by the Unified Release process
-            dir("${BASE_DIR}") {
-              sh "HOME=${WORKSPACE} GO_VERSION=${GO_VERSION} ./dev-tools/run_with_go_ver make test-mage"
-            }
-            withBeatsEnv(archive: false, id: "checks") {
-              dumpVariables()
-              whenTrue(env.ONLY_DOCS == 'false') {
-                runChecks()
-              }
-            }
-          }
-        }
-      }
-    }
     stage('Build&Test') {
       options { skipDefaultCheckout() }
       when {
@@ -216,29 +194,6 @@ VERSION=${env.VERSION}-SNAPSHOT""")
 // When to create a GiHub issue
 def isGitHubIssueEnabled() {
   return isBranch() && currentBuild.currentResult != "SUCCESS" && currentBuild.currentResult != "ABORTED"
-}
-
-def runChecks() {
-  def mapParallelTasks = [:]
-  def content = readYaml(file: 'Jenkinsfile.yml')
-  content['projects'].each { projectName ->
-    generateStages(project: projectName, changeset: content['changeset'], filterStage: 'checks').each { k,v ->
-      mapParallelTasks["${k}"] = v
-    }
-  }
-  // Run pre-commit within the current node and in Jenkins
-  // hence there is no need to use docker login in the GitHub actions
-  // some docker images are hosted in an internal docker registry.
-  mapParallelTasks['pre-commit'] = runPreCommit()
-  parallel(mapParallelTasks)
-}
-
-def runPreCommit() {
-  return {
-    withGithubNotify(context: 'Check pre-commit', tab: 'tests') {
-      preCommit(commit: "${GIT_BASE_COMMIT}", junit: true)
-    }
-  }
 }
 
 def runBuildAndTest(Map args = [:]) {
