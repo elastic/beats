@@ -69,7 +69,7 @@ var azureVMMetadataFetcher = provider{
 		azHeaders := map[string]string{"Metadata": "true"}
 		azHttpSchema := func(m map[string]interface{}) mapstr.M {
 			m["serviceName"] = "Virtual Machines"
-			out, _ := s.Schema{
+			cloud, _ := s.Schema{
 				"account": s.Object{
 					"id": c.Str("subscriptionId"),
 				},
@@ -84,11 +84,14 @@ var azureVMMetadataFetcher = provider{
 					"name": c.Str("serviceName"),
 				},
 				"region": c.Str("location"),
-				"resource_group": s.Object{
+			}.Apply(m)
+
+			azure, _ := s.Schema{
+				"resourcegroup": s.Object{
 					"name": c.Str("resourceGroupName"),
 				},
 			}.Apply(m)
-			return mapstr.M{"cloud": out}
+			return mapstr.M{"cloud": cloud, "azure": azure}
 		}
 
 		azGenSchema := func(m map[string]interface{}) mapstr.M {
@@ -186,7 +189,7 @@ func (az *azureMetadataFetcher) fetchAzureClusterMeta(
 ) {
 	logger := logp.NewLogger("add_cloud_metadata")
 	subscriptionId, _ := az.httpMeta.GetValue("cloud.account.id")
-	resourceGroupName, _ := az.httpMeta.GetValue("cloud.resource_group.name")
+	resourceGroupName, _ := az.httpMeta.GetValue("azure.resourcegroup.name")
 	strResourceGroupName := ""
 	if val, ok := resourceGroupName.(string); ok {
 		strResourceGroupName = val

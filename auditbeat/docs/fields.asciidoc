@@ -15,6 +15,7 @@ This document describes the fields that are exported by Auditbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-auditd>>
+* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cloud>>
 * <<exported-fields-common>>
@@ -2414,6 +2415,24 @@ type: geo_point
 
 --
 
+[[exported-fields-azure]]
+== Azure Cloud provider metadata fields
+
+Metadata from azure cloud providers added by the add_cloud_metadata processor.
+
+
+
+
+*`azure.resourcegroup.name`*::
++
+--
+Name of resourceGroup the azure cloud instance belongs to.
+
+
+type: keyword
+
+--
+
 [[exported-fields-beat-common]]
 == Beat fields
 
@@ -2493,17 +2512,6 @@ Image ID for the cloud instance.
 
 
 example: ami-abcd1234
-
---
-
-
-*`cloud.resource_group.name`*::
-+
---
-Name of resourceGroup the cloud instance belongs to.
-
-
-type: keyword
 
 --
 

@@ -21,6 +21,7 @@ grouped in the following categories:
 * <<exported-fields-aws>>
 * <<exported-fields-awsfargate>>
 * <<exported-fields-azure>>
+* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
@@ -5610,6 +5611,24 @@ type: long
 --
 
 [[exported-fields-azure]]
+== Azure Cloud provider metadata fields
+
+Metadata from azure cloud providers added by the add_cloud_metadata processor.
+
+
+
+
+*`azure.resourcegroup.name`*::
++
+--
+Name of resourceGroup the azure cloud instance belongs to.
+
+
+type: keyword
+
+--
+
+[[exported-fields-azure]]
 == Azure fields
 
 azure module
@@ -10092,17 +10111,6 @@ Image ID for the cloud instance.
 
 
 example: ami-abcd1234
-
---
-
-
-*`cloud.resource_group.name`*::
-+
---
-Name of resourceGroup the cloud instance belongs to.
-
-
-type: keyword
 
 --
 

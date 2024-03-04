@@ -9,14 +9,6 @@
       example: ami-abcd1234
       description: >
         Image ID for the cloud instance.
-    - name: cloud.resource_group
-      default_field: true
-      type: group
-      fields:
-        - name: name
-          type: keyword
-          description: >
-            Name of resourceGroup the cloud instance belongs to.
     # Alias for old fields
     - name: meta.cloud.provider
       default_field: true
@@ -59,5 +51,17 @@
       type: alias
       path: cloud.region
       migration: true
-
+- key: azure
+  title: Azure Cloud provider metadata
+  description: >
+    Metadata from azure cloud providers added by the add_cloud_metadata processor.
+  fields:
+    - name: azure.resourcegroup
+      default_field: true
+      type: group
+      fields:
+        - name: name
+          type: keyword
+          description: >
+            Name of resourceGroup the azure cloud instance belongs to.
     

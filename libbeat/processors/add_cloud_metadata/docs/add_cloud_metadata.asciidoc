@@ -159,13 +159,15 @@ _Azure Virtual Machine_
 [source,json]
 -------------------------------------------------------------------------------
 {
+  "azure": {
+    "resourcegroup.name": "/subscriptions/641ebacb-7743-41e7-b4fa-af1167351a61/resourcegroups/testgroup/providers/Microsoft.ContainerService/managedClusters/testcluster"
+  },
   "cloud": {
     "provider": "azure",
     "instance.id": "04ab04c3-63de-4709-a9f9-9ab8c0411d5e",
     "instance.name": "test-az-vm",
     "machine.type": "Standard_D3_v2",
-    "region": "eastus2",
-    "resource_group.name": "/subscriptions/641ebacb-7743-41e7-b4fa-af1167351a61/resourcegroups/testgroup/providers/Microsoft.ContainerService/managedClusters/testcluster"
+    "region": "eastus2"
   }
 }
 -------------------------------------------------------------------------------
