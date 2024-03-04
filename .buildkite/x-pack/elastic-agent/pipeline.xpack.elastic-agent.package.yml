@@ -47,6 +47,8 @@ steps:
 
   - group: ":Packaging Artefacts"
     key: "package"
+    # todo: remove
+    if: "false"
     steps:
       - label: "Package elastic-agent"
         key: "package-full"
@@ -82,10 +84,11 @@ steps:
     env:
       DRA_PROJECT_ID: "elastic-agent-package"
       DRA_PROJECT_ARTIFACT_ID: "agent-package"
+      # TODO: remove --build
     command: |
       echo "+++ Restoring Artifacts"
-      mkdir build 
-      buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" .
+      mkdir build       
+      buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" --build 018e09fc-f390-4b59-9bda-afbdc7602bcc .
       echo "+++ Changing permissions for the release manager"
       sudo chown -R :1000 x-pack/elastic-agent/build/distributions/
       echo "+++ Running DRA publish step"
