@@ -1,7 +1,6 @@
 name: pre-commit
 
 on:
-  # TODO: skip if doc changes only (.*\\.(asciidoc|md)|deploy/kubernetes/.*-kubernetes\\.yaml)
   pull_request:
   push:
     branches:
