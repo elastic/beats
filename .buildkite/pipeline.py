@@ -160,6 +160,29 @@ def fetch_stage(name: str, stage, project: str, category: str) -> Step:
             project=project,
             provider="gcp")
 
+
+def fetch_group(stages, project: str, category: str, conditions) -> Group:
+    """Create a group given the yaml object."""
+
+    steps = []
+
+    for stage in stages:
+        step = fetch_stage(
+                category=category,
+                name=stage,
+                project=project,
+                stage=stages[stage])
+
+        if is_step_enabled(step, conditions):
+            steps.append(step)
+
+    return Group(
+                project=project,
+                category=category,
+                steps=steps
+            )
+
+
 # TODO: validate unique stages!
 
 def main() -> None:
@@ -179,47 +202,18 @@ def main() -> None:
                 steps = []
                 project_obj = yaml.load(file, yaml.FullLoader)
 
-                # Given the mandatory list first
-                mandatory = project_obj["stages"]["mandatory"]
-                for stage in mandatory:
-                    step = fetch_stage(
-                            category="mandatory",
-                            name=stage,
-                            project=project,
-                            stage=mandatory[stage])
-
-                    if is_step_enabled(step, conditions):
-                        steps.append(step)
-
-                group = Group(
-                            project=project,
-                            category="mandatory",
-                            steps=steps
-                        )
+                group = fetch_group(stages=project_obj["stages"]["mandatory"],
+                                    project=project,
+                                    category="mandatory",
+                                    conditions=conditions)
 
                 if is_group_enabled(group, conditions):
-                    extended_groups.append(group)
+                    groups.append(group)
 
-                # Given the extended list if needed
-                # TODO: Validate if included
-                extended_steps = []
-
-                extended = project_obj["stages"]["extended"]
-                for stage in extended:
-                    step = fetch_stage(
-                            category="extended",
-                            name=stage,
-                            project=project,
-                            stage=extended[stage])
-
-                    if is_step_enabled(step, conditions):
-                        extended_steps.append(step)
-
-                group = Group(
-                            project=project,
-                            category="extended",
-                            steps=extended_steps
-                        )
+                group = fetch_group(stages=project_obj["stages"]["extended"],
+                                    project=project,
+                                    category="extended",
+                                    conditions=conditions)
 
                 if is_group_enabled(group, conditions):
                     extended_groups.append(group)
