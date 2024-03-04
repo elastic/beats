@@ -60,6 +60,7 @@ class Step:
     runner: str
     project: str
     provider: str
+    category: str
     label: str = field(init=False)
     comment: str = field(init=False)
 
@@ -101,9 +102,12 @@ def is_step_enabled(step: Step, conditions) -> bool:
     if comment:
         # the comment should be a subset of the values in .buildkite/pull-requests.json
         # TODO: change /test
-        comment_prefix = "buildkite test"
-        # i.e: test filebeat unitTest
-        return comment_prefix + " " + step.project + " " + step.name in comment
+        comment_prefix = "buildkite test " + step.project
+        # i.e: /test filebeat should run all the mandatory stages
+        if step.category == "mandatory" and comment_prefix == comment:
+            return True
+        # i.e: /test filebeat unitTest
+        return comment_prefix + " " + step.name in comment
 
     labels_env = os.getenv('GITHUB_PR_LABELS')
     if labels_env:
@@ -130,8 +134,8 @@ def is_group_enabled(group: Group, conditions) -> bool:
         # the comment should be a subset of the values in .buildkite/pull-requests.json
         # TODO: change /test
         comment_prefix = "buildkite test"
-        if group.category.startswith("mandatory"):
-            # i.e: test filebeat
+        if group.category == "mandatory":
+            # i.e: /test filebeat
             return comment_prefix + " " + group.project in comment
         else:
             # i.e: test filebeat extended
@@ -140,13 +144,14 @@ def is_group_enabled(group: Group, conditions) -> bool:
     return group.category.startswith("mandatory")
 
 
-def fetch_stage(name: str, stage, project: str) -> Step:
+def fetch_stage(name: str, stage, project: str, category: str) -> Step:
     """Create a step given the yaml object."""
 
     # TODO: need to accomodate the provider type.
     # maybe in the buildkite.yml or some dynamic analysis based on the
     # name of the runners.
     return Step(
+            category=category,
             command=stage["command"],
             name=name,
             runner=stage["platform"],
@@ -176,6 +181,7 @@ def main() -> None:
                 mandatory = project_obj["stages"]["mandatory"]
                 for stage in mandatory:
                     step = fetch_stage(
+                            category="mandatory",
                             name=stage,
                             project=project,
                             stage=mandatory[stage])
@@ -199,6 +205,7 @@ def main() -> None:
                 extended = project_obj["stages"]["extended"]
                 for stage in extended:
                     step = fetch_stage(
+                            category="extended",
                             name=stage,
                             project=project,
                             stage=extended[stage])
