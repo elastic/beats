@@ -98,6 +98,9 @@ fields added to events containing the Beats version. {pull}37553[37553]
 
 *Heartbeat*
 
+- Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Fix setuid root when running under cgroups v2. {pull}37794[37794]
+- Adjust State loader to only retry when response code status is 5xx {pull}37981[37981]
 
 *Metricbeat*
 
