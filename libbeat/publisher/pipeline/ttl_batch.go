@@ -93,11 +93,13 @@ func (b *ttlBatch) Events() []publisher.Event {
 }
 
 func (b *ttlBatch) ACK() {
+	// Help the garbage collector clean up the event data a little faster
 	b.events = nil
 	b.done()
 }
 
 func (b *ttlBatch) Drop() {
+	// Help the garbage collector clean up the event data a little faster
 	b.events = nil
 	b.done()
 }

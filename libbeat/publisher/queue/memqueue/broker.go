@@ -403,6 +403,8 @@ func (b *batch) Entry(i int) interface{} {
 }
 
 func (b *batch) FreeEntries() {
+	// This signals that the event data has been copied out of the batch, and is
+	// safe to free from the queue buffer, so set all the event pointers to nil.
 	for i := 0; i < b.count; i++ {
 		index := (b.start + i) % len(b.queue.buf)
 		b.queue.buf[index].event = nil
