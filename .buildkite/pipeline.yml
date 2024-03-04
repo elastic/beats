@@ -2,4 +2,4 @@
 
 steps:
   - label: "Example test"
-    command: echo "Hello!"
+    command: "python3 .buildkite/pipeline.py | buildkite-agent pipeline upload"
