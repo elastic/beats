@@ -8,9 +8,9 @@ package login
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 )
 
 const (
