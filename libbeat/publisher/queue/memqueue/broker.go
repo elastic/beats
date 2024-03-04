@@ -403,8 +403,10 @@ func (b *batch) Entry(i int) interface{} {
 }
 
 func (b *batch) FreeEntries() {
-	// Memory queue can't release event references until they're fully acknowledged,
-	// so do nothing.
+	for i := 0; i < b.count; i++ {
+		index := (b.start + i) % len(b.queue.buf)
+		b.queue.buf[index].event = nil
+	}
 }
 
 func (b *batch) Done() {
