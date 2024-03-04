@@ -78,62 +78,59 @@ func (r *sqsReader) Receive(ctx context.Context, pipeline beat.Pipeline) error {
 
 	go func() {
 		for {
-			select {
-			case outcome, ok := <-processingChan:
-				// processingChang is closed, no more outcomes to process, we can exit.
-				if !ok {
-					return
-				}
-
-				// A ProcessSQS goroutine has sent an outcome, let's process it asynchronously in order to handle SQS message deletion.
-				go func(outcome processingOutcome) {
-					// Mark deletion wait group as done when the goroutine is done.
-					defer deletionWg.Done()
-
-					r.log.Debugw("Waiting worker when deleting SQS message.",
-						"message_id", *outcome.msg.MessageId,
-						"elapsed_time_ns", time.Since(outcome.start))
-
-					// We don't want to cap processingChan, since it will prevent workers ProcessSQS goroutines to return
-					// and in flight message would be capped as well.
-					// We want to cap number of goroutines for DeleteSQS
-					// deletionChan <- struct{}{}
-
-					r.log.Debugw("Waited worker when deleting SQS message.",
-						"message_id", *outcome.msg.MessageId,
-						"elapsed_time_ns", time.Since(outcome.start))
-
-					r.log.Debugw("Waiting acker when deleting SQS message.",
-						"message_id", *outcome.msg.MessageId,
-						"elapsed_time_ns", time.Since(outcome.start))
-
-					// Wait for all events to be ACKed before proceeding.
-					outcome.acker.Wait()
-
-					r.log.Debugw("Waited acker when deleting SQS message.",
-						"message_id", *outcome.msg.MessageId,
-						"elapsed_time_ns", time.Since(outcome.start))
-
-					// Stop keepalive visibility routine before deleting.
-					outcome.keepaliveCancel()
-					outcome.keepaliveWg.Wait()
-
-					err := r.msgHandler.DeleteSQS(outcome.msg, outcome.receiveCount, outcome.processingErr, outcome.handles)
-					if err != nil {
-						r.log.Warnw("Failed deleting SQS message.",
-							"error", err,
-							"message_id", *outcome.msg.MessageId,
-							"elapsed_time_ns", time.Since(outcome.start))
-					} else {
-						r.log.Debugw("Success deleting SQS message.",
-							"message_id", *outcome.msg.MessageId,
-							"elapsed_time_ns", time.Since(outcome.start))
-					}
-
-					// <-deletionChan
-				}(outcome)
+			outcome, ok := <-processingChan
+			// processingChang is closed, no more outcomes to process, we can exit.
+			if !ok {
+				return
 			}
 
+			// A ProcessSQS goroutine has sent an outcome, let's process it asynchronously in order to handle SQS message deletion.
+			go func(outcome processingOutcome) {
+				// Mark deletion wait group as done when the goroutine is done.
+				defer deletionWg.Done()
+
+				r.log.Debugw("Waiting worker when deleting SQS message.",
+					"message_id", *outcome.msg.MessageId,
+					"elapsed_time_ns", time.Since(outcome.start))
+
+				// We don't want to cap processingChan, since it will prevent workers ProcessSQS goroutines to return
+				// and in flight message would be capped as well.
+				// We want to cap number of goroutines for DeleteSQS
+				// deletionChan <- struct{}{}
+
+				r.log.Debugw("Waited worker when deleting SQS message.",
+					"message_id", *outcome.msg.MessageId,
+					"elapsed_time_ns", time.Since(outcome.start))
+
+				r.log.Debugw("Waiting acker when deleting SQS message.",
+					"message_id", *outcome.msg.MessageId,
+					"elapsed_time_ns", time.Since(outcome.start))
+
+				// Wait for all events to be ACKed before proceeding.
+				outcome.acker.Wait()
+
+				r.log.Debugw("Waited acker when deleting SQS message.",
+					"message_id", *outcome.msg.MessageId,
+					"elapsed_time_ns", time.Since(outcome.start))
+
+				// Stop keepalive visibility routine before deleting.
+				outcome.keepaliveCancel()
+				outcome.keepaliveWg.Wait()
+
+				err := r.msgHandler.DeleteSQS(outcome.msg, outcome.receiveCount, outcome.processingErr, outcome.handles)
+				if err != nil {
+					r.log.Warnw("Failed deleting SQS message.",
+						"error", err,
+						"message_id", *outcome.msg.MessageId,
+						"elapsed_time_ns", time.Since(outcome.start))
+				} else {
+					r.log.Debugw("Success deleting SQS message.",
+						"message_id", *outcome.msg.MessageId,
+						"elapsed_time_ns", time.Since(outcome.start))
+				}
+
+				// <-deletionChan
+			}(outcome)
 		}
 	}()
 
