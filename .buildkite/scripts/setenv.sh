@@ -61,9 +61,5 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_S
 fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
-  exportVars
-  export RACE_DETECTOR="true"
-  export TEST_COVERAGE="true"
-  export DOCKER_PULL="0"
   export MODULE_DIR="x-pack/metricbeat/module/aws"
 fi
