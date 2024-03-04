@@ -70,15 +70,6 @@ const (
 	memoryStat  = "memory"
 )
 
-//nolint: deadcode,structcheck,unused // needed by other platforms
-type mount struct {
-	subsystem  string // Subsystem name (e.g. cpuacct).
-	mountpoint string // Mountpoint of the subsystem (e.g. /cgroup/cpuacct).
-	path       string // Relative path to the cgroup (e.g. /docker/<id>).
-	id         string // ID of the cgroup.
-	fullPath   string // Absolute path to the cgroup. It's the mountpoint joined with the path.
-}
-
 // pathListWithTime combines PathList with a timestamp.
 type pathListWithTime struct {
 	added    time.Time
@@ -133,6 +124,11 @@ func NewReader(rootfsMountpoint resolve.Resolver, ignoreRootCgroups bool) (*Read
 
 // NewReaderOptions creates and returns a new Reader with the given options.
 func NewReaderOptions(opts ReaderOptions) (*Reader, error) {
+	// we don't want a nil pointer deref if someone forgets to set this
+	if opts.RootfsMountpoint == nil {
+		opts.RootfsMountpoint = resolve.NewTestResolver("/")
+	}
+
 	// Determine what subsystems are supported by the kernel.
 	subsystems, err := SupportedSubsystems(opts.RootfsMountpoint)
 	// We can return a not-quite-an-error ErrCgroupsMissing here, so return the bare error.

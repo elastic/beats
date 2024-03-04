@@ -39,6 +39,15 @@ const (
 	idv2   = "docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope"
 )
 
+func TestReaderOptsWithoutResolve(t *testing.T) {
+	reader, err := NewReaderOptions(ReaderOptions{})
+	require.NoError(t, err)
+
+	// actual value doesn't matter, the point is that we don't set RootfsMountpoint and we __don't__ get a nil pointer deref panic.
+	_, err = reader.CgroupsVersion(345)
+	require.Error(t, err)
+}
+
 func TestV1EventDifferentPaths(t *testing.T) {
 	pid := 3757
 	reader, err := NewReader(resolve.NewTestResolver("testdata/ubuntu1804"), true)
