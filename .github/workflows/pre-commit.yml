@@ -1,0 +1,19 @@
+name: pre-commit
+
+on:
+  # TODO: skip if doc changes only (.*\\.(asciidoc|md)|deploy/kubernetes/.*-kubernetes\\.yaml)
+  pull_request:
+  push:
+    branches:
+      - main
+      - 7.1*
+      - 8.*
+
+permissions:
+  contents: read
+
+jobs:
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: elastic/apm-pipeline-library/.github/actions/pre-commit@current
