@@ -24,3 +24,13 @@ jobs:
       run: |
         go install github.com/magefile/mage
         make check-default
+
+  unified-release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Run check/update
+      run: |
+        GO_VERSION=$(cat .go-version) ./dev-tools/run_with_go_ver make test-mage
+      env:
+        GOFLAGS: '-mod=readonly'

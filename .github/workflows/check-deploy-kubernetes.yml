@@ -1,0 +1,28 @@
+name: check-deploy-kubernetes
+
+on:
+  pull_request:
+    paths:
+      - "^deploy/kubernetes/.*"
+      - "^libbeat/docs/version.asciidoc"
+  push:
+    branches:
+      - main
+      - 7.1*
+      - 8.*
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v4
+      with:
+        go-version-file: .go-version
+    - name: Run deploy/kubernetes all
+      run: make -C deploy/kubernetes all
+    - name: Run check-no-changes
+      run: make check-no-changes
