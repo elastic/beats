@@ -44,18 +44,21 @@ func Check() error {
 }
 
 func Build() error {
-	params := devtools.DefaultBuildArgs()
-
 	// Building osquerybeat
-	err := devtools.Build(params)
+	err := devtools.Build(devtools.DefaultBuildArgs())
 	if err != nil {
 		return err
 	}
+	return BuildExt()
+}
 
+// BuildExt builds the osquery-extension.
+func BuildExt() error {
+	params := devtools.DefaultBuildArgs()
 	params.InputFiles = []string{"./ext/osquery-extension/."}
 	params.Name = "osquery-extension"
 	params.CGO = false
-	err = devtools.Build(params)
+	err := devtools.Build(params)
 	if err != nil {
 		return err
 	}
@@ -67,7 +70,6 @@ func Build() error {
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -182,12 +184,12 @@ func CrossBuild() error {
 	if err != nil {
 		return err
 	}
+	return CrossBuildExt()
+}
 
-	err = devtools.CrossBuild(devtools.InDir("x-pack", "osquerybeat", "ext", "osquery-extension"))
-	if err != nil {
-		return err
-	}
-	return nil
+// CrossBuildExt cross-builds the osquery-extension.
+func CrossBuildExt() error {
+	return devtools.CrossBuild(devtools.InDir("x-pack", "osquerybeat", "ext", "osquery-extension"))
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.

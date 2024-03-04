@@ -32,11 +32,6 @@ var (
 	moduleList *monitoring.UniqueList
 )
 
-func init() {
-	moduleList = monitoring.NewUniqueList()
-	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
-}
-
 // Runner is a facade for a Wrapper that provides a simple interface
 // for starting and stopping a Module.
 type Runner interface {

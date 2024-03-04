@@ -1,0 +1,132 @@
+---
+
+# This file contains the package specifications for Agentbeat.
+
+shared:
+  - &common
+    name: '{{.BeatName}}'
+    service_name: '{{.BeatServiceName}}'
+    os: '{{.GOOS}}'
+    arch: '{{.PackageArch}}'
+    vendor: '{{.BeatVendor}}'
+    version: '{{ beat_version }}'
+    license: '{{.BeatLicense}}'
+    url: '{{.BeatURL}}'
+    description: '{{.BeatDescription}}'
+
+  - &binary_files
+    '{{.BeatName}}{{.BinaryExt}}':
+      source: build/golang-crossbuild/{{.BeatName}}-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}
+      mode: 0755
+    LICENSE.txt:
+      source: '{{ repo.RootDir }}/licenses/ELASTIC-LICENSE.txt'
+      mode: 0644
+    NOTICE.txt:
+      source: '{{ repo.RootDir }}/NOTICE.txt'
+      mode: 0644
+    README.md:
+      template: '{{ elastic_beats_dir }}/dev-tools/packaging/templates/common/README.md.tmpl'
+      mode: 0644
+    .build_hash.txt:
+      content: >
+        {{ commit }}
+      mode: 0644
+
+  - &config_files
+    'auditbeat.yml':
+      source: '{{ repo.RootDir }}/x-pack/auditbeat/auditbeat.yml'
+      mode: 0600
+      config: true
+    'filebeat.yml':
+      source: '{{ repo.RootDir }}/x-pack/filebeat/filebeat.yml'
+      mode: 0600
+      config: true
+    'heartbeat.yml':
+      source: '{{ repo.RootDir }}/x-pack/heartbeat/heartbeat.yml'
+      mode: 0600
+      config: true
+    'metricbeat.yml':
+      source: '{{ repo.RootDir }}/x-pack/metricbeat/metricbeat.yml'
+      mode: 0600
+      config: true
+    'osquerybeat.yml':
+      source: '{{ repo.RootDir }}/x-pack/osquerybeat/osquerybeat.yml'
+      mode: 0600
+      config: true
+    'packetbeat.yml':
+      source: '{{ repo.RootDir }}/x-pack/packetbeat/packetbeat.yml'
+      mode: 0600
+      config: true
+
+  - &unix_osquery_files
+    'osquery-extension.ext':
+      source: '{{ repo.RootDir }}/x-pack/osquerybeat/ext/osquery-extension/build/golang-crossbuild/osquery-extension-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}'
+      mode: 0755
+
+  - &windows_osquery_files
+    'osquery-extension{{.BinaryExt}}':
+      source: '{{ repo.RootDir }}/x-pack/osquerybeat/ext/osquery-extension/build/golang-crossbuild/osquery-extension-{{.GOOS}}-{{.Platform.Arch}}{{.BinaryExt}}'
+      mode: 0755
+
+  # Binary package spec (tar.gz for linux/darwin)
+  - &unix_binary_spec
+    <<: *common
+    files:
+      <<: *binary_files
+      <<: *config_files
+      <<: *unix_osquery_files
+
+  - &windows_binary_spec
+    <<: *common
+    files:
+      <<: *binary_files
+      <<: *config_files
+      <<: *windows_osquery_files
+
+  # License modifiers for the Elastic License
+  - &elastic_license_for_binaries
+    license: "Elastic License"
+    files:
+      LICENSE.txt:
+        source: '{{ repo.RootDir }}/licenses/ELASTIC-LICENSE.txt'
+        mode: 0644
+
+# specs is a list of named packaging "flavors".
+specs:
+  agentbeat:
+    ###
+    # Elastic Licensed Packages
+    ###
+    - os: windows
+      types: [zip]
+      spec:
+        <<: *windows_binary_spec
+        <<: *elastic_license_for_binaries
+
+    - os: darwin
+      arch: amd64
+      types: [tgz]
+      spec:
+        <<: *unix_binary_spec
+        <<: *elastic_license_for_binaries
+
+    - os: darwin
+      arch: arm64
+      types: [tgz]
+      spec:
+        <<: *unix_binary_spec
+        <<: *elastic_license_for_binaries
+
+    - os: linux
+      arch: amd64
+      types: [tgz]
+      spec:
+        <<: *unix_binary_spec
+        <<: *elastic_license_for_binaries
+
+    - os: linux
+      arch: arm64
+      types: [tgz]
+      spec:
+        <<: *unix_binary_spec
+        <<: *elastic_license_for_binaries

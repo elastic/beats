@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
 	"sync"
 	"time"
 
@@ -128,6 +129,12 @@ func (bt *osquerybeat) close() {
 
 // Run starts osquerybeat.
 func (bt *osquerybeat) Run(b *beat.Beat) error {
+	pj, err := proc.CreateJobObject()
+	if err != nil {
+		return fmt.Errorf("failed to create process JobObject: %w", err)
+	}
+	defer pj.Close()
+
 	ctx, err := bt.init()
 	if err != nil {
 		return err

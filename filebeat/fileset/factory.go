@@ -34,10 +34,6 @@ import (
 
 var moduleList = monitoring.NewUniqueList()
 
-func init() {
-	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
-}
-
 // Factory for modules
 type Factory struct {
 	beatInfo              beat.Info

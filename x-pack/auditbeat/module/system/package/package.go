@@ -35,7 +35,6 @@ import (
 )
 
 const (
-	moduleName    = "system"
 	metricsetName = "package"
 	namespace     = "system.audit.package"
 
@@ -93,7 +92,7 @@ func (action eventAction) Type() string {
 }
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	mb.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)
@@ -203,7 +202,7 @@ func (pkg Package) entityID(hostID string) string {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
+		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
 	}
 
 	if err := datastore.Update(migrateDatastoreSchema); err != nil {
