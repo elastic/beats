@@ -131,17 +131,17 @@ func TestEventMapping(t *testing.T) {
 }
 
 func TestEventMapping_InvalidJSON(t *testing.T) {
-	// Geçersiz JSON verisi oluşturun
+	// Generate invalid JSON data
 	invalidJSON := []byte(`{"data": { "metrics": [1, 2, 3] } }`)
 
-	// eventMapping'i çağırın ve bir hata bekleyin
+	// call eventMapping and wait for an error
 	_, err := eventMapping(invalidJSON)
 
-	// Hatanın beklenen bir hata türü olup olmadığını kontrol edin
+	// Check if the error is an expected error type
 	if err == nil {
-		t.Errorf("Hata bekleniyor, ancak hata alınmadı.")
+		t.Errorf("Error expected, but no error received.")
 	} else if err.Error() != "JSON unmarshall fail: json: cannot unmarshal object into Go struct field Data.data of type []k6metricset.Metric" {
-		t.Errorf("Beklenen hata metni alınmadı. Beklenen: 'json: cannot unmarshal object into Go struct field Data.data of type []k6metricset.Metric', Alınan: %v", err)
+		t.Errorf("The expected error text was not received. Expected: 'json: cannot unmarshal object into Go struct field Data.data of type []k6metricset.Metric', Received: %v", err)
 	}
 
 }
