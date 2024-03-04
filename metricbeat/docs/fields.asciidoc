@@ -52,6 +52,7 @@ grouped in the following categories:
 * <<exported-fields-istio>>
 * <<exported-fields-jolokia>>
 * <<exported-fields-jolokia-autodiscover>>
+* <<exported-fields-k6>>
 * <<exported-fields-kafka>>
 * <<exported-fields-kibana>>
 * <<exported-fields-kubernetes-processor>>
@@ -41451,6 +41452,448 @@ Whether the agent was configured for authentication or not.
 
 
 type: boolean
+
+--
+
+[[exported-fields-k6]]
+== k6 fields
+
+k6 module
+
+
+
+[float]
+=== k6
+
+
+
+
+[float]
+=== k6metricset
+
+k6metricset
+
+
+
+[float]
+=== data
+
+Example field
+
+
+
+
+[float]
+=== vus
+
+Active virtual users
+
+
+*`k6.k6metricset.data.metrics.vus.value`*::
++
+--
+Value of current number of active virtual users
+
+type: integer
+
+--
+
+[float]
+=== vus_max
+
+Max possible number of virtual users
+
+
+*`k6.k6metricset.data.metrics.vus_max.value`*::
++
+--
+Value of max possible number of virtual users
+
+type: integer
+
+--
+
+[float]
+=== http_reqs
+
+Total number of HTTP requests
+
+
+*`k6.k6metricset.data.metrics.http_reqs.rate`*::
++
+--
+Total number of HTTP requests
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_reqs.count`*::
++
+--
+Total number of HTTP requests
+
+type: integer
+
+--
+
+[float]
+=== http_req_duration
+
+Request time
+
+
+*`k6.k6metricset.data.metrics.http_req_duration.avg`*::
++
+--
+Average request time
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_duration.max`*::
++
+--
+Max request time
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_duration.med`*::
++
+--
+Median request time
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_duration.p(90)`*::
++
+--
+90th request time
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_duration.p(95)`*::
++
+--
+95th request time
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_duration.rate`*::
++
+--
+The number of http_req_duration values submitted during the interval
+
+type: float
+
+--
+
+[float]
+=== http_req_connecting
+
+Time spent establishing TCP connection
+
+
+*`k6.k6metricset.data.metrics.http_req_connecting.avg`*::
++
+--
+Average time spent establishing TCP connection
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_connecting.max`*::
++
+--
+Max time spent establishing TCP connection
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_connecting.med`*::
++
+--
+Median time spent establishing TCP connection
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_connecting.p(90)`*::
++
+--
+90th time spent blocked before initiating the request
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_connecting.p(95)`*::
++
+--
+95th time spent blocked before initiating the request
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_connecting.count`*::
++
+--
+The number of httpreqconnecting values submitted during the interval
+
+type: integer
+
+--
+
+[float]
+=== http_req_receiving
+
+Time spent receiving response data
+
+
+*`k6.k6metricset.data.metrics.http_req_receiving.avg`*::
++
+--
+Average time spent receiving response data
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_receiving.max`*::
++
+--
+Max time spent receiving response data
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_receiving.med`*::
++
+--
+Median time spent receiving response data
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_receiving.p(90)`*::
++
+--
+90th time spent receiving response data
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_receiving.p(95)`*::
++
+--
+95th time spent receiving response data
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_receiving.count`*::
++
+--
+The number of http_req_receiving values submitted during the interval
+
+type: integer
+
+--
+
+[float]
+=== http_req_sending
+
+Time spent sending data
+
+
+*`k6.k6metricset.data.metrics.http_req_sending.avg`*::
++
+--
+Average time spent sending data
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_sending.max`*::
++
+--
+Max time spent sending data
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_sending.med`*::
++
+--
+Median time spent sending data
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_sending.p(90)`*::
++
+--
+90th time spent sending data
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_sending.p(95)`*::
++
+--
+95th time spent sending data
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_sending.count`*::
++
+--
+The number of httpreqsending values submitted during the interval
+
+type: integer
+
+--
+
+[float]
+=== http_req_tls_handshaking
+
+Time spent handshaking TLS session
+
+
+*`k6.k6metricset.data.metrics.http_req_tls_handshaking.avg`*::
++
+--
+Average time spent handshaking TLS session
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_tls_handshaking.max`*::
++
+--
+Max time spent handshaking TLS session
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_tls_handshaking.med`*::
++
+--
+Median time spent handshaking TLS session
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_tls_handshaking.p(90)`*::
++
+--
+90th time spent handshaking TLS session
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_tls_handshaking.p(95)`*::
++
+--
+95th time spent handshaking TLS session
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_tls_handshaking.count`*::
++
+--
+The number of httpreqtls_handshaking values submitted during the interval
+
+type: integer
+
+--
+
+[float]
+=== http_req_waiting
+
+Time spent waiting for response (TTFB)
+
+
+*`k6.k6metricset.data.metrics.http_req_waiting.avg`*::
++
+--
+Average time spent waiting for response (TTFB)
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_waiting.max`*::
++
+--
+Max time spent waiting for response (TTFB)
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_waiting.med`*::
++
+--
+Median time spent waiting for response (TTFB)
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_waiting.p(90)`*::
++
+--
+90th time spent waiting for response (TTFB)
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_waiting.p(95)`*::
++
+--
+95th time spent waiting for response (TTFB)
+
+type: float
+
+--
+
+*`k6.k6metricset.data.metrics.http_req_waiting.count`*::
++
+--
+The number of http_req_waiting values submitted during the interval
+
+type: integer
 
 --
 

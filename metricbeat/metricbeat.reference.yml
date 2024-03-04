@@ -413,6 +413,13 @@ metricbeat.modules:
   jmx.application:
   jmx.instance:
 
+#---------------------------------- K6 Module ----------------------------------
+- module: k6
+  metricsets:
+    - k6metricset
+  setup.ilm.overwrite: true
+  period: 10s
+  hosts: ["localhost:6565"]
 #-------------------------------- Kafka Module --------------------------------
 # Kafka metrics collected using the Kafka protocol
 - module: kafka
