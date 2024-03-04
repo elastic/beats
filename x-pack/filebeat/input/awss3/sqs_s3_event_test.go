@@ -49,7 +49,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
 
-		acker := awscommon.NewEventACKTracker(ctx)
+		acker := awscommon.NewEventACKTracker()
 		receiveCount, handles, _, _, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker)
 		require.NoError(t, processingErr)
 
@@ -76,7 +76,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		invalidBodyMsg.Body = &body
 
 		mockClient := NewMockBeatClient(ctrl)
-		acker := awscommon.NewEventACKTracker(ctx)
+		acker := awscommon.NewEventACKTracker()
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
 		receiveCount, handles, _, _, processingErr := p.ProcessSQS(ctx, &invalidBodyMsg, mockClient, acker)
@@ -103,7 +103,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		emptyRecordsMsg := newSQSMessage([]s3EventV2{}...)
 
 		mockClient := NewMockBeatClient(ctrl)
-		acker := awscommon.NewEventACKTracker(ctx)
+		acker := awscommon.NewEventACKTracker()
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
 		receiveCount, handles, _, _, processingErr := p.ProcessSQS(ctx, &emptyRecordsMsg, mockClient, acker)
@@ -140,7 +140,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockS3Handler.EXPECT().ProcessS3Object().Return(nil),
 		)
 
-		acker := awscommon.NewEventACKTracker(ctx)
+		acker := awscommon.NewEventACKTracker()
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, visibilityTimeout, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
 		receiveCount, handles, _, _, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker)
@@ -171,7 +171,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockS3Handler.EXPECT().ProcessS3Object().Return(errors.New("fake connectivity problem")),
 		)
 
-		acker := awscommon.NewEventACKTracker(ctx)
+		acker := awscommon.NewEventACKTracker()
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
 		receiveCount, handles, _, _, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker)
@@ -203,7 +203,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 			mockS3Handler.EXPECT().ProcessS3Object().Return(errors.New("fake connectivity problem")),
 		)
 
-		acker := awscommon.NewEventACKTracker(ctx)
+		acker := awscommon.NewEventACKTracker()
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockBeatPipeline, mockS3HandlerFactory, 5)
 		receiveCount, handles, _, _, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker)

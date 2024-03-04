@@ -128,7 +128,7 @@ func (p *s3Poller) createS3ObjectProcessor(ctx context.Context, state state) (s3
 	event.S3.Bucket.ARN = p.bucket
 	event.S3.Object.Key = state.Key
 
-	acker := awscommon.NewEventACKTracker(ctx)
+	acker := awscommon.NewEventACKTracker()
 
 	return p.s3ObjectHandler.Create(ctx, p.log, p.client, acker, event), event
 }

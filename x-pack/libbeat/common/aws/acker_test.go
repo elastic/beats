@@ -5,7 +5,6 @@
 package aws
 
 import (
-	"context"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -14,34 +13,23 @@ import (
 )
 
 func TestEventACKTracker(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
-	acker := NewEventACKTracker(ctx)
+	acker := NewEventACKTracker()
 	acker.Add()
 	acker.ACK()
 
 	assert.EqualValues(t, 0, acker.PendingACKs.Load())
-	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
 func TestEventACKTrackerNoACKs(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
-	acker := NewEventACKTracker(ctx)
+	acker := NewEventACKTracker()
 	acker.Wait()
 
 	assert.EqualValues(t, 0, acker.PendingACKs.Load())
-	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
 func TestEventACKHandler(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
 	// Create acker. Add one pending ACK.
-	acker := NewEventACKTracker(ctx)
+	acker := NewEventACKTracker()
 	acker.Add()
 
 	// Create an ACK handler and simulate one ACKed event.
@@ -50,20 +38,15 @@ func TestEventACKHandler(t *testing.T) {
 	ackHandler.ACKEvents(1)
 
 	assert.EqualValues(t, 0, acker.PendingACKs.Load())
-	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
 func TestEventACKHandlerWait(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
-	t.Cleanup(cancel)
-
 	// Create acker. Add one pending ACK.
-	acker := NewEventACKTracker(ctx)
+	acker := NewEventACKTracker()
 	acker.Add()
 	acker.ACK()
 	acker.Wait()
 	acker.Add()
 
 	assert.EqualValues(t, 1, acker.PendingACKs.Load())
-	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }

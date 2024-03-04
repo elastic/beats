@@ -200,7 +200,7 @@ func (r *sqsReader) Receive(ctx context.Context, pipeline beat.Pipeline) error {
 					"message_id", *msg.MessageId,
 					"elapsed_time_ns", time.Since(start))
 
-				acker := awscommon.NewEventACKTracker(ctx)
+				acker := awscommon.NewEventACKTracker()
 
 				receiveCount, handles, keepaliveCancel, keepaliveWg, processingErr := r.msgHandler.ProcessSQS(ctx, &msg, client, acker)
 

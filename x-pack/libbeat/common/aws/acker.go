@@ -5,7 +5,6 @@
 package aws
 
 import (
-	"context"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -20,13 +19,10 @@ import (
 type EventACKTracker struct {
 	sync.Mutex
 	PendingACKs *atomic.Uint64
-	ctx         context.Context
-	cancel      context.CancelFunc
 }
 
-func NewEventACKTracker(ctx context.Context) *EventACKTracker {
-	ctx, cancel := context.WithCancel(ctx)
-	return &EventACKTracker{ctx: ctx, cancel: cancel, PendingACKs: atomic.NewUint64(0)}
+func NewEventACKTracker() *EventACKTracker {
+	return &EventACKTracker{PendingACKs: atomic.NewUint64(0)}
 }
 
 // Add increments the number of pending ACKs.
