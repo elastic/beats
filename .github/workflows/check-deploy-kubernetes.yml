@@ -3,9 +3,9 @@ name: check-deploy-kubernetes
 on:
   pull_request:
     paths:
-      - "^deploy/kubernetes/.*"
-      - "^libbeat/docs/version.asciidoc"
-      - "^.github/workflows/check-deploy-kubernetes.yml"
+      - "deploy/kubernetes/.*"
+      - "libbeat/docs/version.asciidoc"
+      - ".github/workflows/check-deploy-kubernetes.yml"
   push:
     branches:
       - main
