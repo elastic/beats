@@ -1,0 +1,10 @@
+- key: k6
+  title: "k6"
+  release: beta
+  description: >
+    k6 module
+  fields:
+    - name: k6
+      type: group
+      description: >
+      fields:
