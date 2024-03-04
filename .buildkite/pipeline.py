@@ -74,13 +74,13 @@ class Step:
         data = """
       - label: "{{ stage.project }} {{ stage.name }}"
         command:
-          - {{ stage.command }}
+          - "{{ stage.command }}"
         notify:
           - github_commit_status:
               context: "{{ stage.project }}: {{ stage.name }}"
         agents:
-          provider: {{ stage.provider }}
-          image:{{ stage.runner }}
+          provider: "{{ stage.provider }}"
+          image: "{{ stage.runner }}"
 """
 
         tm = Template(data)
