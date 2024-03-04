@@ -58,26 +58,31 @@ func TestFilestreamFileTruncation(t *testing.T) {
 	registryLogFile := filepath.Join(tempDir, "data/registry/filebeat/log.json")
 	filebeat.WriteConfigFile(fmt.Sprintf(truncationCfg, logFile, tempDir, tempDir))
 
+	// 1. Create a log file with some lines
 	writeLogFile(t, logFile, 10, false)
 
+	// 2. Ingest the file and stop Filebeat
 	filebeat.Start()
 	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.Stop()
 
+	// 3. Assert the offset is correctly set in the registry
 	assertLastOffset(t, registryLogFile, 500)
 
+	// 4. Truncate the file and write some data (less than before)
 	if err := os.Truncate(logFile, 0); err != nil {
 		t.Fatalf("could not truncate log file: %s", err)
 	}
-
 	writeLogFile(t, logFile, 5, true)
 
+	// 5. Read the file again and stop Filebeat
 	filebeat.Start()
 	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.Stop()
 
+	// 6. Assert the registry offset is new, smaller file size.
 	assertLastOffset(t, registryLogFile, 250)
 }
 
