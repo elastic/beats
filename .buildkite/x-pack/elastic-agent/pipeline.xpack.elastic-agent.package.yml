@@ -103,4 +103,8 @@ steps:
         DRA_VERSION=$(buildkite-agent meta-data get DRA_VERSION --default "")
         export DRA_VERSION
       fi
+      if [[ -z "${DRA_WORKFLOW}" ]]; then
+        DRA_WORKFLOW=$(buildkite-agent meta-data get DRA_WORKFLOW --default "")
+        export DRA_VERSION
+      fi      
       .buildkite/x-pack/elastic-agent/scripts/steps/dra-publish.sh
