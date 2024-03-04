@@ -54,10 +54,12 @@ const (
 	IdleTimeout
 	// The Flow was terminated for reporting purposes while it was still active.
 	ActiveTimeout
+	// The Flow was terminated because the Metering Process detected signals indicating the end of the Flow, for example, the TCP FIN flag.
+	EndOfFlowDetected
 )
 
 func (f flowEndReason) String() string {
-	return [...]string{"FlowActive", "IdleTimeout", "ActiveTimeout"}[f]
+	return [...]string{"FlowActive", "IdleTimeout", "ActiveTimeout", "EndOfFlowDetected"}[f]
 }
 
 // newWorker returns a handle to a worker to run fn.
@@ -340,6 +342,9 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 				flow.kill() // mark flow as killed
 				isOver = true
 				table.remove(flow)
+			} else if lastReport {
+				// End of flow was detected
+				endReason = EndOfFlowDetected
 			}
 
 			if reportFlow {
@@ -350,27 +355,6 @@ func (fw *flowsProcessor) execute(w *worker, checkTimeout, handleReports, lastRe
 	}
 
 	fw.spool.flush()
-}
-
-func shouldEndFlow(flow *biFlow, fw *flowsProcessor, ts time.Time, activeFlowTimeout bool) (flowEndReason, bool) {
-	if ts.Sub(flow.ts) > fw.timeout {
-		debugf("Ending flow because no traffic was seen since %v, flowid: %s", flow.ts, common.NetString(flow.id.Serialize()))
-		return IdleTimeout, true
-	}
-
-	if !activeFlowTimeout {
-		// Return FlowActive because we do not end the flow in this case
-		return FlowActive, false
-	}
-
-	// End flow only when the flow duration is at least timeout seconds. This prevents having very small flows.
-	// TDOO: Does this still apply ?
-	if ts.Sub(flow.createTS) >= fw.timeout {
-		debugf("Ending flow because active flow timeout is enabled, flowid: %s", common.NetString(flow.id.Serialize()))
-		return ActiveTimeout, true
-	}
-
-	return FlowActive, false
 }
 
 func (fw *flowsProcessor) report(w *worker, ts time.Time, flow *biFlow, isOver bool, intNames, uintNames, floatNames []string, endReason flowEndReason) {
