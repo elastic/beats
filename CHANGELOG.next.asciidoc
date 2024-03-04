@@ -70,6 +70,15 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
 - Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
 - Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
+- Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
+- Fix m365_defender cursor value and query building. {pull}37116[37116]
+- Fix TCP/UDP metric queue length parsing base. {pull}37714[37714]
+- Update github.com/lestrrat-go/jwx dependency. {pull}37799[37799]
+- [threatintel] MISP pagination fixes {pull}37898[37898]
+- Fix file handle leak when handling errors in filestream {pull}37973[37973]
+- Fix a race condition that could crash Filebeat with a "negative WaitGroup counter" error {pull}38094[38094]
+- Prevent HTTPJSON holding response bodies between executions. {issue}35219[35219] {pull}38116[38116]
+- Fix "failed processing S3 event for object key" error on aws-s3 input when key contains the "+" character {issue}38012[38012] {pull}38125[38125]
 
 *Heartbeat*
 
