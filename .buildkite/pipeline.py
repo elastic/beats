@@ -90,22 +90,54 @@ class Step:
 
 def is_step_enabled(step: Step, conditions) -> bool:
     # TODO:
-    # If branch
     # If PR then
-    #   If GitHub label matches project name
-    #   If GitHub comment
     #   If Changeset
-    return True
+
+    pull_request = os.getenv('BUILDKITE_PULL_REQUEST')
+    if pull_request and pull_request == "false":
+        return True
+
+    comment = os.getenv('GITHUB_PR_TRIGGER_COMMENT')
+    if comment:
+        # the comment should be a subset of the values in .buildkite/pull-requests.json
+        # TODO: change /test
+        comment_prefix = "buildkite test"
+        # i.e: test filebeat unitTest
+        return comment_prefix + " " + step.project + " " + step.name in comment
+
+    labels_env = os.getenv('GITHUB_PR_LABELS')
+    if labels_env:
+        labels = labels_env.split()
+        # i.e: filebeat-unitTest
+        if step.project + '-' + step.name in labels:
+            return True
+
+    return False
 
 
 def is_group_enabled(group: Group, conditions) -> bool:
     # TODO:
-    # If branch
     # If PR then
-    #   If GitHub label matches project name + category
-    #   If GitHub comment
+    #   If GitHub label matches project name + category (I'm not sure we wanna use this approach since GH comments support it)
     #   If Changeset
-    return True
+
+    pull_request = os.getenv('BUILDKITE_PULL_REQUEST')
+    if pull_request and pull_request == "false":
+        return True
+
+    comment = os.getenv('GITHUB_PR_TRIGGER_COMMENT')
+    if comment:
+        # the comment should be a subset of the values in .buildkite/pull-requests.json
+        # TODO: change /test
+        comment_prefix = "buildkite test"
+        if group.category.startswith("mandatory"):
+            # i.e: test filebeat
+            return comment_prefix + " " + group.project in comment
+        else:
+            # i.e: test filebeat extended
+            return comment_prefix + " " + group.project + " " + group.category in comment
+
+    return group.category.startswith("mandatory")
 
 
 def fetch_stage(name: str, stage, project: str) -> Step:
