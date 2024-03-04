@@ -10,6 +10,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 // EventACKTracker tracks the publishing state of S3 objects. Specifically
@@ -18,54 +19,43 @@ import (
 // more S3 objects.
 type EventACKTracker struct {
 	sync.Mutex
-	PendingACKs int64
+	PendingACKs *atomic.Uint64
 	ctx         context.Context
 	cancel      context.CancelFunc
 }
 
 func NewEventACKTracker(ctx context.Context) *EventACKTracker {
 	ctx, cancel := context.WithCancel(ctx)
-	return &EventACKTracker{ctx: ctx, cancel: cancel}
+	return &EventACKTracker{ctx: ctx, cancel: cancel, PendingACKs: atomic.NewUint64(0)}
 }
 
 // Add increments the number of pending ACKs.
 func (a *EventACKTracker) Add() {
-	a.Lock()
-	a.PendingACKs++
-	a.Unlock()
+	a.PendingACKs.Inc()
 }
 
 // ACK decrements the number of pending ACKs.
 func (a *EventACKTracker) ACK() {
-	a.Lock()
-	defer a.Unlock()
-
-	if a.PendingACKs <= 0 {
+	if a.PendingACKs.Load() <= 0 {
 		panic("misuse detected: negative ACK counter")
 	}
 
-	a.PendingACKs--
-	if a.PendingACKs == 0 {
-		a.cancel()
-	}
+	a.PendingACKs.Dec()
 }
 
 // Wait waits for the number of pending ACKs to be zero.
-// Wait must be called sequentially only after every expected
+// Wait must be called only after every expected
 // `Add` calls are made. Failing to do so could reset the pendingACKs
 // property to 0 and would results in Wait returning after additional
 // calls to `Add` are made without a corresponding `ACK` call.
 func (a *EventACKTracker) Wait() {
-	// If there were never any pending ACKs then cancel the context. (This can
-	// happen when a document contains no events or cannot be read due to an error).
-	a.Lock()
-	if a.PendingACKs == 0 {
-		a.cancel()
-	}
-	a.Unlock()
 
-	// Wait.
-	<-a.ctx.Done()
+	// If there were no any pending ACKs returns.
+	for {
+		if a.PendingACKs.Load() == 0 {
+			return
+		}
+	}
 }
 
 // NewEventACKHandler returns a beat ACKer that can receive callbacks when

@@ -194,7 +194,7 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 	}
 
 	handles, processingErr := p.processS3Events(ctx, log, *msg.Body, client, acker)
-
+	p.metrics.sqsMessagesProcessedTotal.Inc()
 	return receiveCount, handles, keepaliveCancel, &keepaliveWg, processingErr
 }
 

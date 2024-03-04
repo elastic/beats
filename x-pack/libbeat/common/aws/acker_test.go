@@ -21,7 +21,7 @@ func TestEventACKTracker(t *testing.T) {
 	acker.Add()
 	acker.ACK()
 
-	assert.EqualValues(t, 0, acker.PendingACKs)
+	assert.EqualValues(t, 0, acker.PendingACKs.Load())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
@@ -32,7 +32,7 @@ func TestEventACKTrackerNoACKs(t *testing.T) {
 	acker := NewEventACKTracker(ctx)
 	acker.Wait()
 
-	assert.EqualValues(t, 0, acker.PendingACKs)
+	assert.EqualValues(t, 0, acker.PendingACKs.Load())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
@@ -49,7 +49,7 @@ func TestEventACKHandler(t *testing.T) {
 	ackHandler.AddEvent(beat.Event{Private: acker}, true)
 	ackHandler.ACKEvents(1)
 
-	assert.EqualValues(t, 0, acker.PendingACKs)
+	assert.EqualValues(t, 0, acker.PendingACKs.Load())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
@@ -64,6 +64,6 @@ func TestEventACKHandlerWait(t *testing.T) {
 	acker.Wait()
 	acker.Add()
 
-	assert.EqualValues(t, 1, acker.PendingACKs)
+	assert.EqualValues(t, 1, acker.PendingACKs.Load())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }

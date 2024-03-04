@@ -54,6 +54,7 @@ type inputMetrics struct {
 	sqsWorkerStartTimes               map[uint64]time.Time // Map of SQS worker ID to the time at which the worker started.
 
 	sqsMessagesReceivedTotal            *monitoring.Uint  // Number of SQS messages received (not necessarily processed fully).
+	sqsMessagesProcessedTotal           *monitoring.Uint  // Number of SQS messages processed fully.
 	sqsVisibilityTimeoutExtensionsTotal *monitoring.Uint  // Number of SQS visibility timeout extensions.
 	sqsMessagesInflight                 *monitoring.Uint  // Number of SQS messages inflight (gauge).
 	sqsMessagesReturnedTotal            *monitoring.Uint  // Number of SQS message returned to queue (happens on errors implicitly after visibility timeout passes).
@@ -158,6 +159,7 @@ func newInputMetrics(id string, optionalParent *monitoring.Registry, maxWorkers 
 		sqsWorkerStartTimes:                 map[uint64]time.Time{},
 		sqsWorkerUtilizationLastUpdate:      currentTime(),
 		sqsMessagesReceivedTotal:            monitoring.NewUint(reg, "sqs_messages_received_total"),
+		sqsMessagesProcessedTotal:           monitoring.NewUint(reg, "sqs_messages_processed_total"),
 		sqsVisibilityTimeoutExtensionsTotal: monitoring.NewUint(reg, "sqs_visibility_timeout_extensions_total"),
 		sqsMessagesInflight:                 monitoring.NewUint(reg, "sqs_messages_inflight_gauge"),
 		sqsMessagesReturnedTotal:            monitoring.NewUint(reg, "sqs_messages_returned_total"),

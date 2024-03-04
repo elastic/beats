@@ -233,7 +233,8 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
 
-	for dec.More() && p.ctx.Err() == nil {
+	// why we check ctx.Err() here?
+	for dec.More() && (errors.Is(p.ctx.Err(), context.Canceled) || p.ctx.Err() == nil) {
 		offset := dec.InputOffset()
 
 		var item json.RawMessage
@@ -270,7 +271,8 @@ func (p *s3ObjectProcessor) readJSONSlice(r io.Reader, evtOffset int64) (int64, 
 	}
 
 	// we track each event offset separately since we are reading a slice.
-	for dec.More() && p.ctx.Err() == nil {
+	// why we check ctx.Err() here?
+	for dec.More() && (errors.Is(p.ctx.Err(), context.Canceled) || p.ctx.Err() == nil) {
 		var item json.RawMessage
 		if err := dec.Decode(&item); err != nil {
 			return -1, fmt.Errorf("failed to decode json: %w", err)
