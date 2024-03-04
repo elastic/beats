@@ -21,7 +21,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/outputs"
-	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -124,8 +123,6 @@ func (c *eventConsumer) run() {
 		// The output channel (and associated parameters) that will receive
 		// the batches we're loading.
 		target consumerTarget
-
-		encoders []outputs.PreEncoder
 	)
 
 outerLoop:
@@ -177,38 +174,8 @@ outerLoop:
 			}
 
 		case target = <-c.targetChan:
-			if target.encoderFactory != nil {
-				encoders = []outputs.PreEncoder{
-					target.encoderFactory(),
-					target.encoderFactory(),
-					target.encoderFactory(),
-					target.encoderFactory(),
-				}
-			} else {
-				encoders = nil
-			}
 
 		case queueBatch = <-c.queueReader.resp:
-			// New batch is ready, precompute all its encodings
-			if encoders != nil {
-				eventChan := make(chan *publisher.Event, len(encoders))
-				var wg sync.WaitGroup
-				for _, e := range encoders {
-					enc := e
-					wg.Add(1)
-					go func() {
-						for event := range eventChan {
-							event.CachedEncoding = enc.EncodeEvent(&event.Content)
-						}
-						wg.Done()
-					}()
-				}
-				for i := range queueBatch.events {
-					eventChan <- &queueBatch.events[i]
-				}
-				close(eventChan)
-				wg.Wait()
-			}
 			pendingRead = false
 
 		case req := <-c.retryChan:

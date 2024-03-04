@@ -68,6 +68,8 @@ type outputController struct {
 	// configuration reloading which doesn't have access to this
 	// setting.
 	inputQueueSize int
+
+	encoderFactory outputs.PreEncoderFactory
 }
 
 type producerRequest struct {
@@ -177,6 +179,13 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		})
 }
 
+func (c *outputController) encoder() outputs.PreEncoder {
+	if c.encoderFactory != nil {
+		return c.encoderFactory()
+	}
+	return nil
+}
+
 // Reload the output
 func (c *outputController) Reload(
 	cfg *reload.ConfigWithMeta,
@@ -274,6 +283,7 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 		queue = memqueue.NewQueue(logger, c.onACK, s, c.inputQueueSize)
 	}
 	c.queue = queue
+	c.encoderFactory = outGrp.EncoderFactory
 
 	if c.monitors.Telemetry != nil {
 		queueReg := c.monitors.Telemetry.NewRegistry("queue")

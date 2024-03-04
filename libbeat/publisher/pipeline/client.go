@@ -23,6 +23,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
@@ -50,6 +51,8 @@ type client struct {
 	observer       observer
 	eventListener  beat.EventListener
 	clientListener beat.ClientListener
+
+	encoder outputs.PreEncoder
 }
 
 type clientCloseWaiter struct {
@@ -117,6 +120,12 @@ func (c *client) publish(e beat.Event) {
 	pubEvent := publisher.Event{
 		Content: e,
 		Flags:   c.eventFlags,
+	}
+	if c.encoder != nil {
+		encoded := c.encoder.EncodeEvent(&pubEvent.Content)
+		if encoded != nil {
+			pubEvent.CachedEncoding = encoded
+		}
 	}
 
 	var published bool
