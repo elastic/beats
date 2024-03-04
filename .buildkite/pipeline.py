@@ -38,12 +38,14 @@ class Group:
 
     def create_entity(self):
         data = """
+{% if group.steps|length > 0 %}
   - group: "{{ group.project }} {{ group.category }}"
     key: "{{ group.project }}-{{ group.category }}"
     steps:
       {% for step in group.steps|sort -%}
         {{ step.create_entity() }}
       {% endfor -%}
+{% endif -%}
 """
 
         tm = Template(data)
