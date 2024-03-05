@@ -109,7 +109,8 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (bool, int64, error) {
 
 	remaining, _ := r.remaining.Execute(ctx, tr, "rate-limit_remaining", nil, r.log)
 	if remaining == "" {
-		return false, 0, errors.New("remaining value is empty")
+		r.log.Infow("get rate limit", "error", errors.New("remaining value is empty"))
+		return false, 0, nil
 	}
 	m, err := strconv.ParseInt(remaining, 10, 64)
 	if err != nil {
@@ -134,7 +135,7 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (bool, int64, error) {
 		}
 	}
 
-	r.log.Debugf("Rate Limit: Using active Early Limit: %f", minRemaining)
+	r.log.Debugf("Rate Limit: Using active Early Limit: %d", minRemaining)
 	if m > minRemaining {
 		return false, 0, nil
 	}
@@ -146,7 +147,8 @@ func (r *rateLimiter) getRateLimit(resp *http.Response) (bool, int64, error) {
 
 	reset, _ := r.reset.Execute(ctx, tr, "rate-limit_reset", nil, r.log)
 	if reset == "" {
-		return false, 0, errors.New("reset value is empty")
+		r.log.Infow("get rate limit", "error", errors.New("reset value is empty"))
+		return false, 0, nil
 	}
 
 	resumeAt, err := strconv.ParseInt(reset, 10, 64)
