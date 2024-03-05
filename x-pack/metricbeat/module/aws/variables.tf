@@ -20,8 +20,3 @@ variable "ENVIRONMENT" {
 variable "REPO" {
   default = "unknown-repo-name"
 }
-
-variable "TEST_VAR" {
-  description = "test variable for test aws module changeset"
-  default = "unknown-var"
-}
