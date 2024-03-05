@@ -5,7 +5,6 @@
 package awss3
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -92,7 +91,6 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			got, err := getRegionFromQueueURL(test.queueURL, test.endpoint, test.deflt)
-			fmt.Println("--- got = ", got)
 			if !sameError(err, test.wantErr) {
 				t.Errorf("unexpected error: got:%v want:%v", err, test.wantErr)
 			}
