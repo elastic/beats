@@ -21,7 +21,6 @@ grouped in the following categories:
 * <<exported-fields-aws>>
 * <<exported-fields-awsfargate>>
 * <<exported-fields-azure>>
-* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-beat>>
 * <<exported-fields-ceph>>
@@ -5611,24 +5610,6 @@ type: long
 --
 
 [[exported-fields-azure]]
-== Azure Cloud provider metadata fields
-
-Metadata from azure cloud providers added by the add_cloud_metadata processor.
-
-
-
-
-*`azure.resourcegroup.name`*::
-+
---
-Name of resourceGroup the azure cloud instance belongs to.
-
-
-type: keyword
-
---
-
-[[exported-fields-azure]]
 == Azure fields
 
 azure module
@@ -10174,6 +10155,17 @@ alias to: cloud.project.id
 type: alias
 
 alias to: cloud.region
+
+--
+
+
+*`azure.resourcegroup.name`*::
++
+--
+Name of resourceGroup the azure cloud instance belongs to.
+
+
+type: keyword
 
 --
 

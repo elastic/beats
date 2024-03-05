@@ -15,7 +15,6 @@ This document describes the fields that are exported by Packetbeat. They are
 grouped in the following categories:
 
 * <<exported-fields-amqp>>
-* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cassandra>>
 * <<exported-fields-cloud>>
@@ -440,24 +439,6 @@ type: keyword
 +
 --
 Creating application id.
-
-
-type: keyword
-
---
-
-[[exported-fields-azure]]
-== Azure Cloud provider metadata fields
-
-Metadata from azure cloud providers added by the add_cloud_metadata processor.
-
-
-
-
-*`azure.resourcegroup.name`*::
-+
---
-Name of resourceGroup the azure cloud instance belongs to.
 
 
 type: keyword
@@ -1363,6 +1344,17 @@ alias to: cloud.project.id
 type: alias
 
 alias to: cloud.region
+
+--
+
+
+*`azure.resourcegroup.name`*::
++
+--
+Name of resourceGroup the azure cloud instance belongs to.
+
+
+type: keyword
 
 --
 

@@ -51,11 +51,7 @@
       type: alias
       path: cloud.region
       migration: true
-- key: azure
-  title: Azure Cloud provider metadata
-  description: >
-    Metadata from azure cloud providers added by the add_cloud_metadata processor.
-  fields:
+
     - name: azure.resourcegroup
       default_field: true
       type: group

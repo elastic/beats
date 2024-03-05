@@ -14,7 +14,6 @@ This file is generated! See _meta/fields.yml and scripts/generate_fields_docs.py
 This document describes the fields that are exported by Winlogbeat. They are
 grouped in the following categories:
 
-* <<exported-fields-azure>>
 * <<exported-fields-beat-common>>
 * <<exported-fields-cloud>>
 * <<exported-fields-docker-processor>>
@@ -30,24 +29,6 @@ grouped in the following categories:
 * <<exported-fields-winlog>>
 
 --
-[[exported-fields-azure]]
-== Azure Cloud provider metadata fields
-
-Metadata from azure cloud providers added by the add_cloud_metadata processor.
-
-
-
-
-*`azure.resourcegroup.name`*::
-+
---
-Name of resourceGroup the azure cloud instance belongs to.
-
-
-type: keyword
-
---
-
 [[exported-fields-beat-common]]
 == Beat fields
 
@@ -190,6 +171,17 @@ alias to: cloud.project.id
 type: alias
 
 alias to: cloud.region
+
+--
+
+
+*`azure.resourcegroup.name`*::
++
+--
+Name of resourceGroup the azure cloud instance belongs to.
+
+
+type: keyword
 
 --
 
