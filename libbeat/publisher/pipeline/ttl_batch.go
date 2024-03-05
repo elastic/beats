@@ -93,10 +93,12 @@ func (b *ttlBatch) Events() []publisher.Event {
 }
 
 func (b *ttlBatch) ACK() {
+	b.events = nil
 	b.done()
 }
 
 func (b *ttlBatch) Drop() {
+	b.events = nil
 	b.done()
 }
 
