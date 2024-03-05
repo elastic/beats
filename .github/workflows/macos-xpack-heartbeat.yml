@@ -27,7 +27,7 @@ jobs:
     - name: Install dependencies
       run:  |
         go install github.com/magefile/mage
-        cd ${{ env.BEAT_MODULE }} && npm install @elastic/synthetics
+        cd ${{ env.BEAT_MODULE }} && npm install -g @elastic/synthetics
     - name: Run build
       run: cd ${{ env.BEAT_MODULE }} && mage build
     - name: Run test
