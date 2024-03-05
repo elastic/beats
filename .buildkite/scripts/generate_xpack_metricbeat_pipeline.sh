@@ -29,6 +29,7 @@ steps:
         command: ".buildkite/scripts/go_int_tests.sh"
         env:
           MODULE: "$MODULE"
+          withModule: "true"
         agents:
           provider: "gcp"
           image: "family/core-ubuntu-2204"
@@ -142,6 +143,7 @@ if  are_conditions_met_aws_tests; then
         command: ".buildkite/scripts/cloud_tests.sh"
         env:
           MODULE: "$MODULE"
+          withModule: "true"
         agents:
           provider: "gcp"
           image: "family/core-ubuntu-2204"
