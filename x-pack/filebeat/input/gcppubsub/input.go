@@ -230,20 +230,23 @@ func (in *pubsubInput) run() error {
 		for i := 0; i < workers; i++ {
 			go func() {
 				client, err := in.newPubsubClient(ctx)
-				if err != nil {
-					in.log.Error("failed to create pub/sub client: ", err)
-					// return err
-				}
 				defer func() {
 					workerWg.Done()
 					in.workerSem.Release(1)
-					client.Close()
 				}()
+				if err != nil {
+					in.log.Error("failed to create pub/sub client: ", err)
+					cancel()
+					// return err
+				} else {
+					defer client.Close()
+				}
 
 				// Setup our subscription to the topic.
 				sub, err := in.getOrCreateSubscription(ctx, client)
 				if err != nil {
 					in.log.Error("failed to subscribe to pub/sub topic: ", err)
+					cancel()
 					// return fmt.Errorf("failed to subscribe to pub/sub topic: %w", err)
 				}
 				sub.ReceiveSettings.NumGoroutines = in.Subscription.NumGoroutines
