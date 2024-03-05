@@ -11,8 +11,8 @@ mage build test
 
 popd > /dev/null
 
-echo "Terraform Cleanup"
+echo "---Terraform Cleanup"
 .ci/scripts/terraform-cleanup.sh "${MODULE_DIR}"              #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
 
-echo "Docker Compose Cleanup"
-.ci/scripts/docker-services-cleanup.sh
+echo "---Docker Compose Cleanup"
+docker-compose -f .ci/jobs/docker-compose.yml down -v         #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
