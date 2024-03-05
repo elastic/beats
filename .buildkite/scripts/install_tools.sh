@@ -36,7 +36,7 @@ else
   with_docker_compose "${DOCKER_COMPOSE_VERSION}"
 fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" && "${platform_type}" == "Linux" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" && "${BUILDKITE_STEP_KEY}" == "extended-cloud-test" ]]; then
   startCloudTestEnv "${MODULE_DIR}"
 fi
 
