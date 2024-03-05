@@ -69,7 +69,7 @@ type outputController struct {
 	// setting.
 	inputQueueSize int
 
-	encoderFactory outputs.PreEncoderFactory
+	encoderFactory beat.PreEncoderFactory
 }
 
 type producerRequest struct {
@@ -179,7 +179,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 		})
 }
 
-func (c *outputController) encoder() outputs.PreEncoder {
+func (c *outputController) encoder() beat.PreEncoder {
 	if c.encoderFactory != nil {
 		return c.encoderFactory()
 	}

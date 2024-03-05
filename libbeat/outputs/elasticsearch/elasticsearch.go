@@ -19,8 +19,10 @@ package elasticsearch
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/outputs"
@@ -37,7 +39,7 @@ const logSelector = "elasticsearch"
 
 func makeES(
 	im outputs.IndexManager,
-	beat beat.Info,
+	beatInfo beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
 ) (outputs.Group, error) {
@@ -48,7 +50,7 @@ func makeES(
 		}
 	}
 
-	index, pipeline, err := buildSelectors(im, beat, cfg)
+	index, pipeline, err := buildSelectors(im, beatInfo, cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -73,10 +75,6 @@ func makeES(
 	// into the config struct.
 	if err := cfg.Unpack(&esConfig); err != nil {
 		return outputs.Fail(err)
-	}
-
-	encoderFactory := func() outputs.PreEncoder {
-		return newPreEncoder(esConfig.EscapeHTML)
 	}
 
 	policy, err := newNonIndexablePolicy(esConfig.NonIndexablePolicy)
@@ -107,6 +105,14 @@ func makeES(
 		}
 	}
 
+	encoderFactory := func() beat.PreEncoder {
+		return newPreEncoder(
+			esConfig.EscapeHTML,
+			index,
+			pipeline,
+		)
+	}
+
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, host := range hosts {
 		esURL, err := common.MakeURL(esConfig.Protocol, esConfig.Path, host, 9200)
@@ -119,7 +125,7 @@ func makeES(
 		client, err = NewClient(ClientSettings{
 			ConnectionSettings: eslegclient.ConnectionSettings{
 				URL:              esURL,
-				Beatname:         beat.Beat,
+				Beatname:         beatInfo.Beat,
 				Kerberos:         esConfig.Kerberos,
 				Username:         esConfig.Username,
 				Password:         esConfig.Password,
@@ -180,24 +186,64 @@ func buildPipelineSelector(cfg *config.C) (outil.Selector, error) {
 	})
 }
 
-type preEncoder struct {
-	buf *bytes.Buffer
-	enc eslegclient.BodyEncoder
+type eventEncoder struct {
+	buf              *bytes.Buffer
+	enc              eslegclient.BodyEncoder
+	pipelineSelector *outil.Selector
+	indexSelector    outputs.IndexSelector
 }
 
-func newPreEncoder(escapeHTML bool) outputs.PreEncoder {
+type encodedEvent struct {
+	// If err is set, the event couldn't be encoded, and other fields should
+	// not be relied on.
+	err error
+
+	id       string
+	opType   events.OpType
+	pipeline string
+	index    string
+	encoding []byte
+}
+
+func newPreEncoder(escapeHTML bool,
+	indexSelector outputs.IndexSelector,
+	pipelineSelector *outil.Selector,
+) beat.PreEncoder {
 	buf := bytes.NewBuffer(nil)
 	enc := eslegclient.NewJSONEncoder(buf, escapeHTML)
-	return &preEncoder{buf: buf, enc: enc}
+	return &eventEncoder{
+		buf:              buf,
+		enc:              enc,
+		pipelineSelector: pipelineSelector,
+		indexSelector:    indexSelector,
+	}
 }
 
-func (pe *preEncoder) EncodeEvent(e *beat.Event) []byte {
-	err := pe.enc.Marshal(e)
+func (pe *eventEncoder) EncodeEvent(e *beat.Event) interface{} {
+	opType := events.GetOpType(*e)
+	pipeline, err := getPipeline(e, pe.pipelineSelector)
 	if err != nil {
-		return nil
+		return &encodedEvent{err: fmt.Errorf("failed to select event pipeline: %w", err)}
+	}
+	index, err := pe.indexSelector.Select(e)
+	if err != nil {
+		return &encodedEvent{err: fmt.Errorf("failed to select event index: %w", err)}
+	}
+
+	id, _ := events.GetMetaStringValue(*e, events.FieldMetaID)
+
+	err = pe.enc.Marshal(e)
+	if err != nil {
+		return &encodedEvent{err: fmt.Errorf("failed to encode event for output: %w", err)}
 	}
 	bufBytes := pe.buf.Bytes()
 	bytes := make([]byte, len(bufBytes))
 	copy(bytes, bufBytes)
-	return bytes
+	return &encodedEvent{
+		id:       id,
+		opType:   opType,
+		encoding: bytes,
+		pipeline: pipeline,
+		index:    index,
+	}
 }

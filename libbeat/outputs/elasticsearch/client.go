@@ -310,64 +310,49 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 	okEvents := data[:0]
 	bulkItems := []interface{}{}
 	for i := range data {
-		event := &data[i].Content
+		event := data[i].CachedEncoding.(*encodedEvent)
+		if event.err != nil {
+			client.log.Error(event.err)
+			continue
+		}
 		meta, err := client.createEventBulkMeta(version, event)
 		if err != nil {
 			client.log.Errorf("Failed to encode event meta data: %+v", err)
 			continue
 		}
-		if opType := events.GetOpType(*event); opType == events.OpTypeDelete {
+		if event.opType == events.OpTypeDelete {
 			// We don't include the event source in a bulk DELETE
 			bulkItems = append(bulkItems, meta)
-		} else if data[i].CachedEncoding != nil {
-			// If the event has already been encoded, use that
-			bulkItems = append(bulkItems, meta,
-				eslegclient.EncodingCache{Encoding: data[i].CachedEncoding})
 		} else {
-			bulkItems = append(bulkItems, meta, event)
+			bulkItems = append(bulkItems, meta, event.encoding)
 		}
 		okEvents = append(okEvents, data[i])
 	}
 	return okEvents, bulkItems
 }
 
-func (client *Client) createEventBulkMeta(version version.V, event *beat.Event) (interface{}, error) {
+func (client *Client) createEventBulkMeta(version version.V, event *encodedEvent) (interface{}, error) {
 	eventType := ""
 	if version.Major < 7 {
 		eventType = defaultEventType
 	}
 
-	pipeline, err := client.getPipeline(event)
-	if err != nil {
-		err := fmt.Errorf("failed to select pipeline: %w", err)
-		return nil, err
-	}
-
-	index, err := client.index.Select(event)
-	if err != nil {
-		err := fmt.Errorf("failed to select event index: %w", err)
-		return nil, err
-	}
-
-	id, _ := events.GetMetaStringValue(*event, events.FieldMetaID)
-	opType := events.GetOpType(*event)
-
 	meta := eslegclient.BulkMeta{
-		Index:    index,
+		Index:    event.index,
 		DocType:  eventType,
-		Pipeline: pipeline,
-		ID:       id,
+		Pipeline: event.pipeline,
+		ID:       event.id,
 	}
 
-	if opType == events.OpTypeDelete {
-		if id != "" {
+	if event.opType == events.OpTypeDelete {
+		if event.id != "" {
 			return eslegclient.BulkDeleteAction{Delete: meta}, nil
 		} else {
 			return nil, fmt.Errorf("%s %s requires _id", events.FieldMetaOpType, events.OpTypeDelete)
 		}
 	}
-	if id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
-		if opType == events.OpTypeIndex {
+	if event.id != "" || version.Major > 7 || (version.Major == 7 && version.Minor >= 5) {
+		if event.opType == events.OpTypeIndex {
 			return eslegclient.BulkIndexAction{Index: meta}, nil
 		}
 		return eslegclient.BulkCreateAction{Create: meta}, nil
@@ -375,7 +360,7 @@ func (client *Client) createEventBulkMeta(version version.V, event *beat.Event) 
 	return eslegclient.BulkIndexAction{Index: meta}, nil
 }
 
-func (client *Client) getPipeline(event *beat.Event) (string, error) {
+func getPipeline(event *beat.Event, defaultSelector *outil.Selector) (string, error) {
 	if event.Meta != nil {
 		pipeline, err := events.GetMetaStringValue(*event, events.FieldMetaPipeline)
 		if errors.Is(err, mapstr.ErrKeyNotFound) {
@@ -388,8 +373,8 @@ func (client *Client) getPipeline(event *beat.Event) (string, error) {
 		return strings.ToLower(pipeline), nil
 	}
 
-	if client.pipeline != nil {
-		return client.pipeline.Select(event)
+	if defaultSelector != nil {
+		return defaultSelector.Select(event)
 	}
 	return "", nil
 }

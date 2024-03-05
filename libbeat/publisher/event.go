@@ -68,7 +68,7 @@ type Event struct {
 	Content        beat.Event
 	Flags          EventFlags
 	Cache          EventCache
-	CachedEncoding []byte
+	CachedEncoding interface{}
 }
 
 // EventFlags provides additional flags/option types  for used with the outputs.
