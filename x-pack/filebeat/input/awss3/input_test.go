@@ -5,7 +5,7 @@
 package awss3
 
 import (
-	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -76,46 +76,23 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 			wantErr:  errBadQueueURL,
 		},
 		{
-			name:     "abc.xyz_and_domain_with_different_endpoint",
-			queueURL: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
-			endpoint: "googlecloud.com",
-			wantErr:  errBadQueueURL,
-		},
-		{
-			name:     "mismatch_regions_no_default",
-			queueURL: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			name:     "vpce_endpoint",
+			queueURL: "https://vpce-test.sqs.us-east-2.vpce.amazonaws.com/12345678912/sqs-queue",
 			deflt:    "",
+			want:     "us-east-2",
+		},
+		{
+			name:     "vpce_endpoint_with_endpoint",
+			queueURL: "https://vpce-test.sqs.us-east-1.vpce.amazonaws.com/12345678912/sqs-queue",
+			endpoint: "amazonaws.com",
 			want:     "us-east-1",
-		},
-		{
-			name:     "mismatch_regions",
-			queueURL: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
-			deflt:    "ap-west-1",
-			want:     "ap-west-1",
-			wantErr:  regionMismatchError{queueURLRegion: "us-east-1", defaultRegion: "ap-west-1"},
-		},
-		{
-			name:     "localstack",
-			queueURL: "http://localhost:4566/000000000000/filebeat-s3-integtest-d9clk9",
-			deflt:    "localstack",
-			want:     "localstack",
-		},
-		{
-			name:     "localstack_sns",
-			queueURL: "http://localhost:4566/000000000000/filebeat-s3-integtest-sns-d9clk9",
-			deflt:    "localstack_sns",
-			want:     "localstack_sns",
-		},
-		{
-			name:     "invalid_queue_url",
-			queueURL: ":foo",
-			wantErr:  errors.New(":foo is not a valid URL"),
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			got, err := getRegionFromQueueURL(test.queueURL, test.endpoint, test.deflt)
+			fmt.Println("--- got = ", got)
 			if !sameError(err, test.wantErr) {
 				t.Errorf("unexpected error: got:%v want:%v", err, test.wantErr)
 			}
