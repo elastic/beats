@@ -28,8 +28,7 @@ steps:
         key: "mandatory-int-test"
         command: ".buildkite/scripts/go_int_tests.sh"
         env:
-          MODULE: "$MODULE"
-          withModule: "true"
+          MODULE: "aws"
         agents:
           provider: "gcp"
           image: "family/core-ubuntu-2204"
@@ -142,8 +141,7 @@ if  are_conditions_met_aws_tests; then
         key: "extended-cloud-test"
         command: ".buildkite/scripts/cloud_tests.sh"
         env:
-          MODULE: "$MODULE"
-          withModule: "true"
+          MODULE: "aws"
         agents:
           provider: "gcp"
           image: "family/core-ubuntu-2204"
