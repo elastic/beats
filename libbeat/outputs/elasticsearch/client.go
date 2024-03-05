@@ -324,7 +324,7 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 			// We don't include the event source in a bulk DELETE
 			bulkItems = append(bulkItems, meta)
 		} else {
-			bulkItems = append(bulkItems, meta, event.encoding)
+			bulkItems = append(bulkItems, meta, eslegclient.RawEncoding{Encoding: event.encoding})
 		}
 		okEvents = append(okEvents, data[i])
 	}
