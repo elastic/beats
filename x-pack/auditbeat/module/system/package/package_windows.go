@@ -25,5 +25,5 @@ func init() {
 
 // New returns an error.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return nil, fmt.Errorf("the %v/%v dataset is not supported on Windows", moduleName, metricsetName)
+	return nil, fmt.Errorf("the %v/%v dataset is not supported on Windows", system.ModuleName, metricsetName)
 }
