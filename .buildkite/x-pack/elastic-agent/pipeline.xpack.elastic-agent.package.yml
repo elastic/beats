@@ -47,11 +47,9 @@ steps:
 
   - group: ":Packaging Artefacts"
     key: "package"
-    # todo: remove
-    if: "false"
     steps:
       - label: "Package elastic-agent"
-        key: "package-full"
+        key: package_elastic-agent
         command: |
           if [[ -z "$${ManifestURL}" ]]; then
             export ManifestURL=$(buildkite-agent meta-data get ManifestURL --default "")
@@ -65,17 +63,32 @@ steps:
             export MAGEFILE_VERBOSE=$(buildkite-agent meta-data get MAGEFILE_VERBOSE --default "0")
           fi
           .buildkite/x-pack/elastic-agent/scripts/steps/package.sh
-          ls -lah build/distributions/ || echo "not found"
-          ls -lah x-pack/elastic-agent/build/distributions/ || echo "not found"
         artifact_paths:
           - "x-pack/elastic-agent/build/distributions/**/*"
         agents:
           provider: "gcp"
           image: "family/platform-ingest-beats-ubuntu-2204"
-        retry:
-          manual:
-            allowed: true
-
+      - label: "Package ARM elastic-agent"
+        key: package_elastic-agent-arm
+        command: |
+          if [[ -z "$${ManifestURL}" ]]; then
+            export ManifestURL=$(buildkite-agent meta-data get ManifestURL --default "")
+            if [[ -z "$${ManifestURL}" ]]; then
+              echo ":broken_heart: Missing ManifestURL variable or empty string provided"
+              echo "Provided ManifestURL: ${ManifestURL}"
+              exit 1
+            fi
+          fi
+          if [[ -z "$${MAGEFILE_VERBOSE}" ]]; then
+            export MAGEFILE_VERBOSE=$(buildkite-agent meta-data get MAGEFILE_VERBOSE --default "0")
+          fi
+          .buildkite/x-pack/elastic-agent/scripts/steps/package.sh
+        artifact_paths:
+          - "x-pack/elastic-agent/build/distributions/**/*"
+        agents:
+          provider: "gcp"
+          image: "family/platform-ingest-beats-ubuntu-2004-aarch64"
+  #
   - label: ":elastic-stack: Publishing to DRA"
     key: dra-publish
     depends_on: package
@@ -84,11 +97,11 @@ steps:
     env:
       DRA_PROJECT_ID: "elastic-agent-package"
       DRA_PROJECT_ARTIFACT_ID: "agent-package"
-      # TODO: remove --build
+      # TODO: remove --build 018e09fc-f390-4b59-9bda-afbdc7602bcc
     command: |
       echo "+++ Restoring Artifacts"
       mkdir build       
-      buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" --build 018e09fc-f390-4b59-9bda-afbdc7602bcc .
+      buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" .
       echo "+++ Changing permissions for the release manager"
       sudo chown -R :1000 x-pack/elastic-agent/build/distributions/
       echo "+++ Running DRA publish step"
