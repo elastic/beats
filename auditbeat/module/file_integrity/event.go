@@ -134,11 +134,40 @@ type Event struct {
 	Action        Action              `json:"action"`                // Action (like created, updated).
 	Hashes        map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
 	ParserResults mapstr.M            `json:"file,omitempty"`        // Results from running file parsers.
+	Process       *Process            `json:"process,omitempty"`     // Process data. Available only on Linux when using the eBPF backend.
+	// TODO(matt): ContainerID string `json:"container_id,omitempty"` // Unique container ID. Available only on Linux when using the eBPF backend.
 
 	// Metadata
 	rtt        time.Duration // Time taken to collect the info.
 	errors     []error       // Errors that occurred while collecting the info.
 	hashFailed bool          // Set when hashing the file failed.
+}
+
+// Process contain information about a process.
+// These fields can help you correlate metrics information with a process id/name from a log message.  The `process.pid` often stays in the metric itself and is copied to the global field for correlation.
+type Process struct {
+	// Unique identifier for the process.
+	// The implementation of this is specified by the data source, but some examples of what could be used here are a process-generated UUID, Sysmon Process GUIDs, or a hash of some uniquely identifying components of a process.
+	// Constructing a globally unique identifier is a common practice to mitigate PID reuse as well as to identify a specific process over time, across multiple monitored hosts.
+	EntityID string `json:"entity_id,omitempty"`
+	// Process name. Sometimes called program name or similar.
+	Name string `json:"name,omitempty"`
+	// The effective user (euid).
+	User struct {
+		// Unique identifier of the user.
+		ID string `json:"id,omitempty"`
+		// Short name or login of the user.
+		Name string `json:"name,omitempty"`
+	} `json:"user,omitempty"`
+	// The effective group (egid).
+	Group struct {
+		// Unique identifier for the group on the system/platform.
+		ID string `json:"id,omitempty"`
+		// Name of the group.
+		Name string `json:"name,omitempty"`
+	} `json:"group,omitempty"`
+	// Process id.
+	PID uint32 `json:"pid,omitempty"`
 }
 
 // Metadata contains file metadata.
@@ -352,6 +381,16 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 				file["posix_acl_access"] = a
 			}
 		}
+	}
+
+	if e.Process != nil {
+		file["process.entity_id"] = e.Process.EntityID
+		file["process.executable"] = e.Process.Name
+		file["process.pid"] = e.Process.PID
+		file["process.user.id"] = e.Process.User.ID
+		file["process.user.name"] = e.Process.User.Name
+		file["process.group.id"] = e.Process.Group.ID
+		file["process.group.name"] = e.Process.Group.Name
 	}
 
 	if len(e.Hashes) > 0 {

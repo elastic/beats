@@ -2659,6 +2659,76 @@ example: s0
 --
 
 [float]
+=== process
+
+These fields contains process and user information. Available only on Linux when using the eBPF backend.
+
+
+
+*`file.process.entity_id`*::
++
+--
+Globally unique identifier for a process.
+
+type: keyword
+
+--
+
+*`file.process.executable`*::
++
+--
+Process command.
+
+type: keyword
+
+--
+
+*`file.process.pid`*::
++
+--
+PID.
+
+type: integer
+
+--
+
+*`file.process.user.id`*::
++
+--
+User ID (euid).
+
+type: integer
+
+--
+
+*`file.process.user.name`*::
++
+--
+User name.
+
+type: keyword
+
+--
+
+*`file.process.group.id`*::
++
+--
+Group ID (egid).
+
+type: integer
+
+--
+
+*`file.process.group.name`*::
++
+--
+Group name.
+
+type: keyword
+
+--
+
+[float]
 === user
 
 User information.

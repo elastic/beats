@@ -21,7 +21,6 @@ package file_integrity
 
 import (
 	"os"
-	"os/user"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -40,13 +39,25 @@ func TestNewEventFromEbpfEvent(t *testing.T) {
 				Inode: 1234,
 				Mode:  os.FileMode(0o644),
 				Size:  2345,
-				Uid:   3456,
-				Gid:   4567,
+				Uid:   uint32(os.Geteuid()),
+				Gid:   uint32(os.Getegid()),
 			},
 			Path:              "/foo",
 			SymlinkTargetPath: "/bar",
+			Creds: ebpfevents.CredInfo{
+				Ruid: 1,
+				Rgid: 2,
+				Euid: uint32(os.Geteuid()),
+				Egid: uint32(os.Getegid()),
+				Suid: 5,
+				Sgid: 6,
+			},
 		},
 	}
+	event, ok := NewEventFromEbpfEvent(
+		ebpfEvent, 0, []HashType{}, []FileParser{}, func(path string) bool { return false })
+	assert.True(t, ok)
+
 	expectedEvent := Event{
 		Action:     Created,
 		Path:       "/foo",
@@ -54,21 +65,22 @@ func TestNewEventFromEbpfEvent(t *testing.T) {
 		Info: &Metadata{
 			Type:  FileType,
 			Inode: 1234,
-			UID:   3456,
-			GID:   4567,
+			UID:   uint32(os.Geteuid()),
+			GID:   uint32(os.Getegid()),
 			Size:  2345,
-			Owner: "n/a",
-			Group: "n/a",
+			Owner: event.Info.Owner,
+			Group: event.Info.Group,
 			Mode:  os.FileMode(0o644),
 		},
-		Source: SourceEBPF,
-		errors: []error{user.UnknownUserIdError(3456)},
+		Process: event.Process, // 1:1 copy this as it changes on every machine
+		Source:  SourceEBPF,
+		errors:  []error{},
 	}
-
-	event, ok := NewEventFromEbpfEvent(
-		ebpfEvent, 0, []HashType{}, []FileParser{}, func(path string) bool { return false })
-	assert.True(t, ok)
 	event.Timestamp = expectedEvent.Timestamp
 
 	assert.Equal(t, expectedEvent, event)
+	assert.NotEqual(t, "", event.Process.EntityID)
+	assert.NotEqual(t, 0, event.Process.PID)
+	assert.NotEqual(t, 0, event.Process.User.ID)
+	assert.NotEqual(t, "", event.Process.User.Name)
 }

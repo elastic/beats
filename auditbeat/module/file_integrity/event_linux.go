@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/ebpf/sys"
 	"github.com/elastic/ebpfevents"
 )
 
@@ -41,7 +42,9 @@ func NewEventFromEbpfEvent(
 		path, target string
 		action       Action
 		metadata     Metadata
+		process      Process
 		err          error
+		errors       = make([]error, 0)
 	)
 	switch ee.Type {
 	case ebpfevents.EventTypeFileCreate:
@@ -54,7 +57,16 @@ func NewEventFromEbpfEvent(
 			return event, false
 		}
 		target = fileCreateEvent.SymlinkTargetPath
+
 		metadata, err = metadataFromFileCreate(fileCreateEvent)
+		if err != nil {
+			errors = append(errors, err)
+		}
+
+		process, err = processFromFileCreate(fileCreateEvent)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	case ebpfevents.EventTypeFileRename:
 		action = Moved
 
@@ -65,7 +77,16 @@ func NewEventFromEbpfEvent(
 			return event, false
 		}
 		target = fileRenameEvent.SymlinkTargetPath
+
 		metadata, err = metadataFromFileRename(fileRenameEvent)
+		if err != nil {
+			errors = append(errors, err)
+		}
+
+		process, err = processFromFileRename(fileRenameEvent)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	case ebpfevents.EventTypeFileDelete:
 		action = Deleted
 
@@ -76,6 +97,11 @@ func NewEventFromEbpfEvent(
 			return event, false
 		}
 		target = fileDeleteEvent.SymlinkTargetPath
+
+		process, err = processFromFileDelete(fileDeleteEvent)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	case ebpfevents.EventTypeFileModify:
 		fileModifyEvent := ee.Body.(*ebpfevents.FileModify)
 
@@ -92,7 +118,16 @@ func NewEventFromEbpfEvent(
 			return event, false
 		}
 		target = fileModifyEvent.SymlinkTargetPath
+
 		metadata, err = metadataFromFileModify(fileModifyEvent)
+		if err != nil {
+			errors = append(errors, err)
+		}
+
+		process, err = processFromFileModify(fileModifyEvent)
+		if err != nil {
+			errors = append(errors, err)
+		}
 	}
 
 	event := Event{
@@ -102,10 +137,8 @@ func NewEventFromEbpfEvent(
 		Info:       &metadata,
 		Source:     SourceEBPF,
 		Action:     action,
-		errors:     make([]error, 0),
-	}
-	if err != nil {
-		event.errors = append(event.errors, err)
+		Process:    &process,
+		errors:     errors,
 	}
 
 	if event.Action == Deleted {
@@ -115,7 +148,6 @@ func NewEventFromEbpfEvent(
 		case FileType:
 			fillHashes(&event, path, maxFileSize, hashTypes, fileParsers)
 		case SymlinkType:
-			var err error
 			event.TargetPath, err = filepath.EvalSymlinks(event.Path)
 			if err != nil {
 				event.errors = append(event.errors, err)
@@ -145,6 +177,59 @@ func metadataFromFileModify(evt *ebpfevents.FileModify) (Metadata, error) {
 	fillExtendedAttributes(&md, evt.Path)
 	err := fillFileInfo(&md, evt.Finfo)
 	return md, err
+}
+
+func newProcess(pid uint32, start uint64, comm string, euid, egid uint32) (Process, error) {
+	var (
+		p   Process
+		err error
+	)
+
+	t, err := sys.TimeFromNsSinceBoot(start)
+	if err != nil {
+		return p, err
+	}
+
+	p.EntityID, err = sys.EntityID(pid, t)
+	if err != nil {
+		return p, err
+	}
+	p.Name = comm
+	p.PID = pid
+
+	p.User.ID = strconv.FormatUint(uint64(euid), 10)
+	u, err := user.LookupId(p.User.ID)
+	if err == nil {
+		p.User.Name = u.Username
+	} else {
+		p.User.Name = "n/a"
+	}
+
+	p.Group.ID = strconv.FormatUint(uint64(egid), 10)
+	g, err := user.LookupGroupId(p.Group.ID)
+	if err == nil {
+		p.Group.Name = g.Name
+	} else {
+		p.Group.Name = "n/a"
+	}
+
+	return p, nil
+}
+
+func processFromFileCreate(evt *ebpfevents.FileCreate) (Process, error) {
+	return newProcess(evt.Pids.Tgid, evt.Pids.StartTimeNs, evt.Comm, evt.Creds.Euid, evt.Creds.Egid)
+}
+
+func processFromFileRename(evt *ebpfevents.FileRename) (Process, error) {
+	return newProcess(evt.Pids.Tgid, evt.Pids.StartTimeNs, evt.Comm, evt.Creds.Euid, evt.Creds.Egid)
+}
+
+func processFromFileModify(evt *ebpfevents.FileModify) (Process, error) {
+	return newProcess(evt.Pids.Tgid, evt.Pids.StartTimeNs, evt.Comm, evt.Creds.Euid, evt.Creds.Egid)
+}
+
+func processFromFileDelete(evt *ebpfevents.FileDelete) (Process, error) {
+	return newProcess(evt.Pids.Tgid, evt.Pids.StartTimeNs, evt.Comm, evt.Creds.Euid, evt.Creds.Egid)
 }
 
 func fillFileInfo(md *Metadata, finfo ebpfevents.FileInfo) error {
