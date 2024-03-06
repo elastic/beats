@@ -98,8 +98,6 @@ func (r *sqsReader) Receive(ctx context.Context, pipeline beat.Pipeline) error {
 					r.workerSem.Release(1)
 				}()
 
-				acker := NewEventACKTracker(ctx, deletionWg)
-
 				// Create a pipeline client scoped to this goroutine.
 				client, err := pipeline.ConnectWith(beat.ClientConfig{
 					EventListener: NewEventACKHandler(),
@@ -107,7 +105,6 @@ func (r *sqsReader) Receive(ctx context.Context, pipeline beat.Pipeline) error {
 						// This input only produces events with basic types so normalization
 						// is not required.
 						EventNormalization: boolPtr(false),
-						Private:            acker,
 					},
 				})
 
@@ -125,6 +122,8 @@ func (r *sqsReader) Receive(ctx context.Context, pipeline beat.Pipeline) error {
 				r.log.Debugw("Going to process SQS message.",
 					"message_id", *msg.MessageId,
 					"elapsed_time_ns", time.Since(start))
+
+				acker := NewEventACKTracker(ctx, deletionWg)
 
 				err = r.msgHandler.ProcessSQS(ctx, &msg, client, acker, start)
 				if err != nil {
