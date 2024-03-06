@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -73,7 +72,7 @@ func (f *s3ObjectProcessorFactory) findReaderConfig(key string) *readerConfig {
 
 // Create returns a new s3ObjectProcessor. It returns nil when no file selectors
 // match the S3 object key.
-func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, client beat.Client, ack *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
+func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger, client beat.Client, ack *EventACKTracker, obj s3EventV2) s3ObjectHandler {
 	log = log.With(
 		"bucket_arn", obj.S3.Bucket.Name,
 		"object_key", obj.S3.Object.Key)
@@ -102,22 +101,27 @@ type s3ObjectProcessor struct {
 	log          *logp.Logger
 	ctx          context.Context
 	publisher    beat.Client
-	acker        *awscommon.EventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
-	readerConfig *readerConfig              // Config about how to process the object.
-	s3Obj        s3EventV2                  // S3 object information.
+	acker        *EventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
+	readerConfig *readerConfig    // Config about how to process the object.
+	s3Obj        s3EventV2        // S3 object information.
 	s3ObjHash    string
 	s3RequestURL string
 
 	s3Metadata map[string]interface{} // S3 object metadata.
+
+	s3EventsCreatedTotal uint64
 }
 
+func (p *s3ObjectProcessor) SyncEventsToBeAcked(s3EventsCreatedTotal uint64) {
+	p.acker.TotalEventsAcked.Add(s3EventsCreatedTotal)
+}
 func (p *s3ObjectProcessor) Wait() {
-	p.acker.Wait()
+	p.acker.WaitForS3()
 }
 
-func (p *s3ObjectProcessor) ProcessS3Object() error {
+func (p *s3ObjectProcessor) ProcessS3Object() (uint64, error) {
 	if p == nil {
-		return nil
+		return 0, nil
 	}
 
 	// Metrics and Logging
@@ -135,7 +139,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	// Request object (download).
 	contentType, meta, body, err := p.download()
 	if err != nil {
-		return fmt.Errorf("failed to get s3 object (elapsed_time_ns=%d): %w",
+		return 0, fmt.Errorf("failed to get s3 object (elapsed_time_ns=%d): %w",
 			time.Since(start).Nanoseconds(), err)
 	}
 	defer body.Close()
@@ -143,7 +147,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 
 	reader, err := p.addGzipDecoderIfNeeded(newMonitoredReader(body, p.metrics.s3BytesProcessedTotal))
 	if err != nil {
-		return fmt.Errorf("failed checking for gzip content: %w", err)
+		return 0, fmt.Errorf("failed checking for gzip content: %w", err)
 	}
 
 	// Overwrite with user configured Content-Type.
@@ -154,7 +158,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	// try to create a decoder from the using the codec config
 	decoder, err := newDecoder(p.readerConfig.Decoding, reader)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if decoder != nil {
 		defer decoder.close()
@@ -164,7 +168,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 			data, err := decoder.decode()
 			if err != nil {
 				if errors.Is(err, io.EOF) {
-					return nil
+					return p.s3EventsCreatedTotal, nil
 				}
 				break
 			}
@@ -184,11 +188,11 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 		}
 	}
 	if err != nil {
-		return fmt.Errorf("failed reading s3 object (elapsed_time_ns=%d): %w",
+		return 0, fmt.Errorf("failed reading s3 object (elapsed_time_ns=%d): %w",
 			time.Since(start).Nanoseconds(), err)
 	}
 
-	return nil
+	return p.s3EventsCreatedTotal, nil
 }
 
 // download requests the S3 object from AWS and returns the object's
@@ -387,9 +391,9 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	return nil
 }
 
-func (p *s3ObjectProcessor) publish(ack *awscommon.EventACKTracker, event *beat.Event) {
-	ack.Add()
+func (p *s3ObjectProcessor) publish(ack *EventACKTracker, event *beat.Event) {
 	event.Private = ack
+	p.s3EventsCreatedTotal++
 	p.metrics.s3EventsCreatedTotal.Inc()
 	p.publisher.Publish(*event)
 }

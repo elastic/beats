@@ -9,20 +9,17 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"sync"
 	"time"
 
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 
 	"github.com/aws/smithy-go/middleware"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
+	"github.com/elastic/beats/v7/libbeat/beat"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -66,7 +63,7 @@ type sqsProcessor interface {
 	// given message and is responsible for updating the message's visibility
 	// timeout while it is being processed and for deleting it when processing
 	// completes successfully.
-	ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *awscommon.EventACKTracker) (int, []s3ObjectHandler, context.CancelFunc, *sync.WaitGroup, error)
+	ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *EventACKTracker, start time.Time) error
 	DeleteSQS(msg *types.Message, receiveCount int, processingErr error, handles []s3ObjectHandler) error
 }
 
@@ -102,16 +99,16 @@ type s3ObjectHandlerFactory interface {
 	// Create returns a new s3ObjectHandler that can be used to process the
 	// specified S3 object. If the handler is not configured to process the
 	// given S3 object (based on key name) then it will return nil.
-	Create(ctx context.Context, log *logp.Logger, client beat.Client, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler
+	Create(ctx context.Context, log *logp.Logger, client beat.Client, acker *EventACKTracker, obj s3EventV2) s3ObjectHandler
 }
 
 type s3ObjectHandler interface {
 	// ProcessS3Object downloads the S3 object, parses it, creates events, and
 	// publishes them. It returns when processing finishes or when it encounters
 	// an unrecoverable error. It does not wait for the events to be ACKed by
-	// the publisher before returning (use eventACKTracker's Wait() method to
+	// the publisher before returning (use eventACKTracker's WaitForS3() method to
 	// determine this).
-	ProcessS3Object() error
+	ProcessS3Object() (uint64, error)
 
 	// FinalizeS3Object finalizes processing of an S3 object after the current
 	// batch is finished.
@@ -119,8 +116,11 @@ type s3ObjectHandler interface {
 
 	// Wait waits for every event published by ProcessS3Object() to be ACKed
 	// by the publisher before returning. Internally it uses the
-	// s3ObjectHandler eventACKTracker's Wait() method
+	// s3ObjectHandler eventACKTracker's WaitForS3() method
 	Wait()
+
+	// SyncEventsToBeAcked sync the number of event published with the eventACKTracker
+	SyncEventsToBeAcked(s3EventsCreatedTotal uint64)
 }
 
 // ------

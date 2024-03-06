@@ -20,7 +20,6 @@ import (
 	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -104,7 +103,6 @@ func newSQSS3EventProcessor(
 	maxReceiveCount int,
 	pipeline beat.Pipeline,
 	s3 s3ObjectHandlerFactory,
-	maxWorkers int,
 ) *sqsS3EventProcessor {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
@@ -166,9 +164,9 @@ func (p *sqsS3EventProcessor) DeleteSQS(msg *types.Message, receiveCount int, pr
 	// after maximum receives is reached.
 	p.metrics.sqsMessagesReturnedTotal.Inc()
 	return fmt.Errorf("failed deleting SQS message (it will return to queue after visibility timeout): %w", processingErr)
-
 }
-func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *awscommon.EventACKTracker) (int, []s3ObjectHandler, context.CancelFunc, *sync.WaitGroup, error) {
+
+func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *EventACKTracker, start time.Time) error {
 	keepaliveCtx, keepaliveCancel := context.WithCancel(ctx)
 
 	// Start SQS keepalive worker.
@@ -193,9 +191,11 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 		}
 	}
 
-	handles, processingErr := p.processS3Events(ctx, log, *msg.Body, client, acker)
+	s3EventsCreatedTotal, handles, processingErr := p.processS3Events(ctx, log, *msg.Body, client, acker)
 	p.metrics.sqsMessagesProcessedTotal.Inc()
-	return receiveCount, handles, keepaliveCancel, &keepaliveWg, processingErr
+	acker.AddSQSDeletionData(msg, s3EventsCreatedTotal, receiveCount, start, processingErr, handles, keepaliveCancel, &keepaliveWg, p, p.log)
+
+	return processingErr
 }
 
 func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, wg *sync.WaitGroup, msg *types.Message) {
@@ -293,24 +293,25 @@ func (*sqsS3EventProcessor) isObjectCreatedEvents(event s3EventV2) bool {
 	return event.EventSource == "aws:s3" && strings.HasPrefix(event.EventName, "ObjectCreated:")
 }
 
-func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Logger, body string, client beat.Client, acker *awscommon.EventACKTracker) ([]s3ObjectHandler, error) {
+func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Logger, body string, client beat.Client, acker *EventACKTracker) (uint64, []s3ObjectHandler, error) {
 	s3Events, err := p.getS3Notifications(body)
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
 			// Messages that are in-flight at shutdown should be returned to SQS.
-			return nil, err
+			return 0, nil, err
 		}
-		return nil, &nonRetryableError{err}
+		return 0, nil, &nonRetryableError{err}
 	}
 	log.Debugf("SQS message contained %d S3 event notifications.", len(s3Events))
 	defer log.Debug("End processing SQS S3 event notifications.")
 
 	if len(s3Events) == 0 {
-		return nil, nil
+		return 0, nil, nil
 	}
 
 	var errs []error
 	var handles []s3ObjectHandler
+	var s3EventsCreatedTotal uint64
 	for i, event := range s3Events {
 		s3Processor := p.s3ObjectHandler.Create(ctx, log, client, acker, event)
 		if s3Processor == nil {
@@ -318,21 +319,22 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 		}
 
 		// Process S3 object (download, parse, create events).
-		if err := s3Processor.ProcessS3Object(); err != nil {
+		if s3EventsCreatedTotalByProcessor, err := s3Processor.ProcessS3Object(); err != nil {
 			errs = append(errs, fmt.Errorf(
 				"failed processing S3 event for object key %q in bucket %q (object record %d of %d in SQS notification): %w",
 				event.S3.Object.Key, event.S3.Bucket.Name, i+1, len(s3Events), err))
 		} else {
+			s3EventsCreatedTotal += s3EventsCreatedTotalByProcessor
 			handles = append(handles, s3Processor)
 		}
 	}
 
 	// Make sure all s3 events were processed successfully
 	if len(handles) == len(s3Events) {
-		return handles, multierr.Combine(errs...)
+		return s3EventsCreatedTotal, handles, multierr.Combine(errs...)
 	}
 
-	return nil, multierr.Combine(errs...)
+	return 0, nil, multierr.Combine(errs...)
 }
 
 func (p *sqsS3EventProcessor) finalizeS3Objects(handles []s3ObjectHandler) error {
