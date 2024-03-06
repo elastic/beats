@@ -87,7 +87,6 @@ type sqsS3EventProcessor struct {
 	sqsVisibilityTimeout time.Duration
 	maxReceiveCount      int
 	sqs                  sqsAPI
-	pipeline             beat.Pipeline // Pipeline creates clients for publishing events.
 	log                  *logp.Logger
 	warnOnce             sync.Once
 	metrics              *inputMetrics
@@ -101,7 +100,6 @@ func newSQSS3EventProcessor(
 	script *script,
 	sqsVisibilityTimeout time.Duration,
 	maxReceiveCount int,
-	pipeline beat.Pipeline,
 	s3 s3ObjectHandlerFactory,
 ) *sqsS3EventProcessor {
 	if metrics == nil {
@@ -113,7 +111,6 @@ func newSQSS3EventProcessor(
 		sqsVisibilityTimeout: sqsVisibilityTimeout,
 		maxReceiveCount:      maxReceiveCount,
 		sqs:                  sqs,
-		pipeline:             pipeline,
 		log:                  log,
 		metrics:              metrics,
 		script:               script,

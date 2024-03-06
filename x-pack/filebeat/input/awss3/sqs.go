@@ -28,12 +28,13 @@ type sqsReader struct {
 	maxMessagesInflight int
 	workerSem           *awscommon.Sem
 	sqs                 sqsAPI
+	pipeline            beat.Pipeline
 	msgHandler          sqsProcessor
 	log                 *logp.Logger
 	metrics             *inputMetrics
 }
 
-func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, msgHandler sqsProcessor) *sqsReader {
+func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, msgHandler sqsProcessor, pipeline beat.Pipeline) *sqsReader {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
 		metrics = newInputMetrics("", nil, 0)
@@ -42,13 +43,14 @@ func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessag
 		maxMessagesInflight: maxMessagesInflight,
 		workerSem:           awscommon.NewSem(maxMessagesInflight),
 		sqs:                 sqs,
+		pipeline:            pipeline,
 		msgHandler:          msgHandler,
 		log:                 log,
 		metrics:             metrics,
 	}
 }
 
-func (r *sqsReader) Receive(ctx context.Context, pipeline beat.Pipeline) error {
+func (r *sqsReader) Receive(ctx context.Context) error {
 	// The loop tries to keep the ProcessSQS workers busy as much as possible while
 	// honoring the max message cap as opposed to a simpler loop that receives
 	// N messages, waits for them all to finish sending events to the queue, then requests N more messages.
@@ -99,7 +101,7 @@ func (r *sqsReader) Receive(ctx context.Context, pipeline beat.Pipeline) error {
 				}()
 
 				// Create a pipeline client scoped to this goroutine.
-				client, err := pipeline.ConnectWith(beat.ClientConfig{
+				client, err := r.pipeline.ConnectWith(beat.ClientConfig{
 					EventListener: NewEventACKHandler(),
 					Processing: beat.ProcessingConfig{
 						// This input only produces events with basic types so normalization
@@ -132,6 +134,7 @@ func (r *sqsReader) Receive(ctx context.Context, pipeline beat.Pipeline) error {
 						"message_id", *msg.MessageId,
 						"elapsed_time_ns", time.Since(start))
 
+					return
 				}
 
 				r.log.Debugw("Success processing SQS message.",
