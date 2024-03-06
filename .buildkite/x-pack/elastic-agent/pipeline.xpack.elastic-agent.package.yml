@@ -87,6 +87,7 @@ steps:
           - "x-pack/elastic-agent/build/distributions/**/*"
         agents:
           provider: "aws"
+          instanceType: "t4g.2xlarge"
           imagePrefix: "platform-ingest-beats-ubuntu-2004-aarch64"
   #
   - label: ":elastic-stack: Publishing to DRA"
