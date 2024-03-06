@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -85,6 +86,8 @@ var (
 		"local6",
 		"local7",
 	}
+
+	deprecatedNotificationOnce sync.Once
 )
 
 func init() {
@@ -111,6 +114,10 @@ func NewInput(
 	context input.Context,
 ) (input.Input, error) {
 	log := logp.NewLogger("syslog")
+
+	deprecatedNotificationOnce.Do(func() {
+		cfgwarn.Deprecate("8.14.0", "Syslog input. Use Syslog processor instead.")
+	})
 
 	out, err := outlet.Connect(cfg)
 	if err != nil {
