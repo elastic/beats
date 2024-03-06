@@ -378,8 +378,8 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		conf := makeBenchmarkConfig(t)
 
 		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, conf.FileSelectors, backupConfig{}, maxMessagesInflight)
-		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, pipeline, s3EventHandlerFactory)
-		sqsReader := newSQSReader(logSqs, metrics, sqsAPI, maxMessagesInflight, sqsMessageHandler)
+		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, s3EventHandlerFactory)
+		sqsReader := newSQSReader(logSqs, metrics, sqsAPI, maxMessagesInflight, sqsMessageHandler, pipeline)
 
 		ctx, cancel := context.WithCancel(context.Background())
 		b.Cleanup(cancel)
@@ -399,7 +399,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		}()
 
 		b.ResetTimer()
-		if err := sqsReader.Receive(ctx, pipeline); err != nil {
+		if err := sqsReader.Receive(ctx); err != nil {
 			if !errors.Is(err, context.DeadlineExceeded) {
 				t.Fatal(err)
 			}

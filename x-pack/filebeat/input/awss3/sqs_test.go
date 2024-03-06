@@ -100,8 +100,8 @@ func TestSQSReceiver(t *testing.T) {
 			Return(nil)
 
 		// Execute sqsReader and verify calls/state.
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		require.NoError(t, receiver.Receive(ctx, mockBeatPipeline))
+		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler, mockBeatPipeline)
+		require.NoError(t, receiver.Receive(ctx))
 		assert.Equal(t, maxMessages, receiver.workerSem.Available())
 	})
 
@@ -134,8 +134,8 @@ func TestSQSReceiver(t *testing.T) {
 
 		mockBeatPipeline := NewMockBeatPipeline(ctrl)
 		// Execute SQSReceiver and verify calls/state.
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		require.NoError(t, receiver.Receive(ctx, mockBeatPipeline))
+		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler, mockBeatPipeline)
+		require.NoError(t, receiver.Receive(ctx))
 		assert.Equal(t, maxMessages, receiver.workerSem.Available())
 	})
 }
@@ -156,6 +156,7 @@ func TestGetApproximateMessageCount(t *testing.T) {
 		defer ctrl.Finish()
 		mockAPI := NewMockSQSAPI(ctrl)
 		mockMsgHandler := NewMockSQSProcessor(ctrl)
+		mockBeatPipeline := NewMockBeatPipeline(ctrl)
 
 		gomock.InOrder(
 			mockAPI.EXPECT().
@@ -166,7 +167,7 @@ func TestGetApproximateMessageCount(t *testing.T) {
 				}),
 		)
 
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
+		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler, mockBeatPipeline)
 		receivedCount, err := receiver.GetApproximateMessageCount(ctx)
 		assert.Equal(t, count, receivedCount)
 		assert.Nil(t, err)
@@ -181,6 +182,7 @@ func TestGetApproximateMessageCount(t *testing.T) {
 
 		mockAPI := NewMockSQSAPI(ctrl)
 		mockMsgHandler := NewMockSQSProcessor(ctrl)
+		mockBeatPipeline := NewMockBeatPipeline(ctrl)
 
 		gomock.InOrder(
 			mockAPI.EXPECT().
@@ -191,7 +193,7 @@ func TestGetApproximateMessageCount(t *testing.T) {
 				}),
 		)
 
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
+		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler, mockBeatPipeline)
 		receivedCount, err := receiver.GetApproximateMessageCount(ctx)
 		assert.Equal(t, -1, receivedCount)
 		assert.NotNil(t, err)
