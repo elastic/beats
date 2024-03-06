@@ -106,14 +106,14 @@ var azureVMMetadataFetcher = provider{
 		// hfetcher represents an http fetcher to retrieve metadata from azure metadata endpoint
 		hfetcher, err := newMetadataFetcher(config, "azure", azHeaders, metadataHost, azHttpSchema, azMetadataURI)
 		if err != nil {
-			return hfetcher, err
+			return hfetcher, fmt.Errorf("failed to create new http metadata fetcher: %w", err)
 		}
 		// fetcher represents an azure metadata fetcher. The struct includes two type of fetchers.
 		// 1. An http fetcher(hfetcher) which retrieves metadata from azure metadata endpoint and
 		// 2. A generic fetcher(gfetcher) which uses azure sdk to retrieve metadata of azure managed clusters.
 		fetcher, err := newAzureMetadataFetcher("azure", hfetcher)
 		if err != nil {
-			return fetcher, err
+			return fetcher, fmt.Errorf("failed to create new azure metadata fetcher: %w", err)
 		}
 		// gfetcher is created and assinged to fetcher after the fetcher is created in order the
 		// fetchAzureClusterMeta to be a method of fetcher. This is needed so that the generic fetcher
@@ -121,10 +121,10 @@ var azureVMMetadataFetcher = provider{
 		// resourceGroupName are then used to filter azure managed clusters results.
 		gfetcher, err := newGenericMetadataFetcher(config, "azure", azGenSchema, fetcher.fetchAzureClusterMeta)
 		if err != nil {
-			return fetcher, err
+			return fetcher, fmt.Errorf("failed to create new generic metadata fetcher: %w", err)
 		}
 		fetcher.genericMetadataFetcher = gfetcher
-		return fetcher, err
+		return fetcher, nil
 	},
 }
 
