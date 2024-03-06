@@ -109,6 +109,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 
 *Metricbeat*
 
+- Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
 
 *Osquerybeat*
 
