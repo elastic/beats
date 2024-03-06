@@ -9,10 +9,11 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/beat"
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/gofrs/uuid"

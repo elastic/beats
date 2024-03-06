@@ -6,10 +6,12 @@ package awss3
 
 import (
 	"context"
-	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"sync"
 	"time"
+
+	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
