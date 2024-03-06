@@ -36,16 +36,16 @@ else
   with_docker_compose "${DOCKER_COMPOSE_VERSION}"
 fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" && "${BUILDKITE_STEP_KEY}" == "extended-cloud-test" ]]; then
-  startCloudTestEnv "${MODULE_DIR}"
-fi
-
 with_go "${GO_VERSION}"
 with_mage
 with_python
 with_dependencies
 config_git
 mage dumpVariables
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" && "${BUILDKITE_STEP_KEY}" == "extended-cloud-test" ]]; then
+  startCloudTestEnv "${MODULE_DIR}"
+fi
 
 #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
 sudo chmod -R go-w "${BEATS_PROJECT_NAME}/"     #TODO: Remove when the issue is solved https://github.com/elastic/beats/issues/37838
