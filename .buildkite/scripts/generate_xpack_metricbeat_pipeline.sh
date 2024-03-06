@@ -26,7 +26,7 @@ steps:
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: ".buildkite/scripts/py_int_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
         env:
           MODULE: "$MODULE"
         agents:
