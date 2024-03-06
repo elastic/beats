@@ -86,7 +86,7 @@ steps:
         artifact_paths:
           - "x-pack/elastic-agent/build/distributions/**/*"
         agents:
-          provider: "gcp"
+          provider: "aws"
           image: "family/platform-ingest-beats-ubuntu-2004-aarch64"
   #
   - label: ":elastic-stack: Publishing to DRA"
