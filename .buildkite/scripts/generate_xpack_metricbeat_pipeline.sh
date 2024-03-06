@@ -26,7 +26,7 @@ steps:
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
+        command: ".buildkite/scripts/py_int_tests.sh"
         env:
           MODULE: "$MODULE"
         agents:
@@ -145,9 +145,9 @@ if  are_conditions_met_aws_tests; then
         agents:
           provider: "gcp"
           image: "family/core-ubuntu-2204"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          # disk_size: 100
+          # disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
