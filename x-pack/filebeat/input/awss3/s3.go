@@ -8,7 +8,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"net/url"
 	"sync"
 	"time"
 
@@ -209,14 +208,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 		// Metrics
 		p.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
-			// Unescape s3 key name. For example, convert "%3D" back to "=".
-			filename, err := url.QueryUnescape(*object.Key)
-			if err != nil {
-				p.log.Errorw("Error when unescaping object key, skipping.", "error", err, "s3_object", *object.Key)
-				continue
-			}
-
-			state := newState(bucketName, filename, *object.ETag, p.listPrefix, *object.LastModified)
+			state := newState(bucketName, *object.Key, *object.ETag, p.listPrefix, *object.LastModified)
 			if p.states.MustSkip(state, p.store) {
 				p.log.Debugw("skipping state.", "state", state)
 				continue
@@ -241,7 +233,7 @@ func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- 
 				s3ObjectHandler: s3Processor,
 				s3ObjectInfo: s3ObjectInfo{
 					name:         bucketName,
-					key:          filename,
+					key:          *object.Key,
 					etag:         *object.ETag,
 					lastModified: *object.LastModified,
 					listingID:    listingID.String(),
