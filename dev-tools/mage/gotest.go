@@ -167,34 +167,33 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 // Use RACE_DETECTOR=true to enable the race detector.
 // Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
-	modulesFileInfo := []string{"aws", "gcp", "oracle", "sql"}
 	module := EnvOr("MODULE", "")
-	// modulesFileInfo, err := os.ReadDir("./module")
-	// if err != nil {
-	// 	return err
-	// }
+	modulesFileInfo, err := os.ReadDir("./module")
+	if err != nil {
+		return err
+	}
 
 	foundModule := false
 	failedModules := make([]string, 0, len(modulesFileInfo))
 	for _, fi := range modulesFileInfo {
 		// skip the ones that are not directories or with suffix @tmp, which are created by Jenkins build job
-		// if !fi.IsDir() || strings.HasSuffix(fi, "@tmp") {
-		// 	continue
-		// }
-		if module != "" && module != fi {
+		if !fi.IsDir() || strings.HasSuffix(fi.Name(), "@tmp") {
+			continue
+		}
+		if module != "" && module != fi.Name() {
 			continue
 		}
 		foundModule = true
 
 		// Set MODULE because only want that modules tests to run inside the testing environment.
-		env := map[string]string{"MODULE": fi}
+		env := map[string]string{"MODULE": fi.Name()}
 		passThroughEnvs(env, IntegrationTestEnvVars()...)
-		runners, err := NewIntegrationRunners(path.Join("./module", fi), env)
+		runners, err := NewIntegrationRunners(path.Join("./module", fi.Name()), env)
 		if err != nil {
-			return fmt.Errorf("test setup failed for module %s: %w", fi, err)
+			return fmt.Errorf("test setup failed for module %s: %w", fi.Name(), err)
 		}
 		err = runners.Test("goIntegTest", func() error {
-			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi))
+			err := GoTest(ctx, GoTestIntegrationArgsForModule(fi.Name()))
 			if err != nil {
 				return err
 			}
@@ -202,7 +201,7 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 		})
 		if err != nil {
 			// err will already be report to stdout, collect failed module to report at end
-			failedModules = append(failedModules, fi)
+			failedModules = append(failedModules, fi.Name())
 		}
 	}
 	if module != "" && !foundModule {

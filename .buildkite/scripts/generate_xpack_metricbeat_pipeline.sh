@@ -28,7 +28,7 @@ steps:
         key: "mandatory-int-test"
         command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
         env:
-          MODULE: "$MODULE"
+          MODULE: "aws"         #TODO: replace with "$MODULE" when the issue is solved
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -141,7 +141,7 @@ if  are_conditions_met_aws_tests; then
         key: "extended-cloud-test"
         command: ".buildkite/scripts/cloud_tests.sh"
         env:
-          MODULE: $MODULE
+          MODULE: "aws"         #TODO: replace with "$MODULE" when the issue is solved
         agents:
           provider: "gcp"
           image: "family/core-ubuntu-2204"
