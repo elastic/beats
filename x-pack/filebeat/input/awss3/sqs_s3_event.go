@@ -190,7 +190,7 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 
 	s3EventsCreatedTotal, handles, processingErr := p.processS3Events(ctx, log, *msg.Body, client, acker)
 	p.metrics.sqsMessagesProcessedTotal.Inc()
-	acker.AddSQSDeletionData(msg, s3EventsCreatedTotal, receiveCount, start, processingErr, handles, keepaliveCancel, &keepaliveWg, p, p.log)
+	acker.AddSQSDeletionData(msg, s3EventsCreatedTotal, receiveCount, start, processingErr, handles, keepaliveCancel, &keepaliveWg, p, client, p.log)
 
 	return processingErr
 }

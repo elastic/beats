@@ -44,6 +44,7 @@ type EventACKTracker struct {
 	keepaliveWg     *sync.WaitGroup
 	msgHandler      sqsProcessor
 	log             *logp.Logger
+	client          beat.Client
 }
 
 func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventACKTracker {
@@ -75,7 +76,7 @@ func (a *EventACKTracker) SyncEventsToBeAcked(s3EventsCreatedTotal uint64) {
 	a.ackMutexLockedOnInit.Store(false)
 }
 
-func (a *EventACKTracker) AddSQSDeletionData(msg *types.Message, publishedEvent uint64, receiveCount int, start time.Time, processingErr error, handles []s3ObjectHandler, keepaliveCancel context.CancelFunc, keepaliveWg *sync.WaitGroup, msgHandler sqsProcessor, log *logp.Logger) {
+func (a *EventACKTracker) AddSQSDeletionData(msg *types.Message, publishedEvent uint64, receiveCount int, start time.Time, processingErr error, handles []s3ObjectHandler, keepaliveCancel context.CancelFunc, keepaliveWg *sync.WaitGroup, msgHandler sqsProcessor, client beat.Client, log *logp.Logger) {
 	// We want to execute the logic of this call only once, when the ack mutex was locked on init
 	if !a.ackMutexLockedOnInit.Load() {
 		return
@@ -93,6 +94,7 @@ func (a *EventACKTracker) AddSQSDeletionData(msg *types.Message, publishedEvent 
 	a.keepaliveWg = keepaliveWg
 	a.msgHandler = msgHandler
 	a.log = log
+	a.client = client
 
 	a.ackMutex.Unlock()
 	a.ackMutexLockedOnInit.Store(false)
@@ -116,6 +118,9 @@ func (a *EventACKTracker) WaitForS3() {
 
 // FlushForSQS delete related SQS message
 func (a *EventACKTracker) FlushForSQS() {
+	// This is moved here because clientOnlyACKer.ClientClosed() reset the acker listener (libbeat/common/acker/acker.go:333)
+	defer a.client.Close()
+
 	if !a.isSQSAcker {
 		return
 	}

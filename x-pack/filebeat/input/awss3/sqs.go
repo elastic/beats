@@ -119,8 +119,6 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 					return
 				}
 
-				defer client.Close()
-
 				r.log.Debugw("Going to process SQS message.",
 					"message_id", *msg.MessageId,
 					"elapsed_time_ns", time.Since(start))
