@@ -124,9 +124,10 @@ func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState, filter fu
 		return state, fmt.Errorf("error creating username for pid %d: %w", pid, err)
 	}
 
+	// the /proc/[pid]/io metrics require SYS_PTRACE when run from inside docker
 	state.IO, err = getIOData(hostfs, pid)
 	if err != nil {
-		return state, fmt.Errorf("error fetching IO metrics for pid %d: %w", pid, err)
+		return state, NonFatalErr{Err: fmt.Errorf("/io unavailable; if running inside a container, use SYS_PTRACE: %w", err)}
 	}
 
 	return state, nil

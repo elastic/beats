@@ -237,7 +237,10 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	// If we've passed the filter, continue to fill out the rest of the metrics
 	status, err = FillPidMetrics(procStats.Hostfs, pid, status, procStats.isWhitelistedEnvVar)
 	if err != nil {
-		return status, true, fmt.Errorf("FillPidMetrics: %w", err)
+		if !errors.Is(err, NonFatalErr{}) {
+			return status, true, fmt.Errorf("FillPidMetrics: %w", err)
+		}
+		procStats.logger.Debugf("Non-fatal error fetching PID metrics for %d, metrics are valid, but partial: %s", pid, err)
 	}
 
 	if status.CPU.Total.Ticks.Exists() {

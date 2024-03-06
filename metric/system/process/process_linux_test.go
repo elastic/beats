@@ -20,24 +20,124 @@
 package process
 
 import (
+	"errors"
+	"fmt"
 	"os"
+	"os/exec"
 	"os/user"
 	"strconv"
+	"strings"
+	"syscall"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
+// CreateUser creates a user on the machine.
+func CreateUser(name string, gid int) (int, error) {
+	args := []string{
+		"--gid", strconv.Itoa(gid),
+		"--system",
+		"--no-user-group",
+		"--shell", "/usr/bin/false",
+		name,
+	}
+	cmd := exec.Command("useradd", args...)
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		command := fmt.Sprintf("useradd %s", strings.Join(args, " "))
+		return -1, fmt.Errorf("%s failed: %w (output: %s)", command, err, output)
+	}
+	return FindUID(name)
+}
+
+// FindUID returns the user's UID on the machine.
+func FindUID(name string) (int, error) {
+	id, err := getentGetID("passwd", name)
+	if e := (&exec.ExitError{}); errors.As(err, &e) {
+		if e.ExitCode() == 2 {
+			// exit code 2 is the key doesn't exist in the database
+			return -1, fmt.Errorf("User not found")
+		}
+	}
+	return id, err
+}
+
+// helper to get a passwd entry for a user
+func getentGetID(database string, key string) (int, error) {
+	cmd := exec.Command("getent", database, key)
+	output, err := cmd.Output()
+	if err != nil {
+		return -1, fmt.Errorf("getent %s %s failed: %w (output: %s)", database, key, err, output)
+	}
+	split := strings.Split(string(output), ":")
+	if len(split) < 3 {
+		return -1, fmt.Errorf("unexpected format: %s", output)
+	}
+	val, err := strconv.Atoi(split[2])
+	if err != nil {
+		return -1, fmt.Errorf("failed to convert %s to int: %w", split[2], err)
+	}
+	return val, nil
+}
+
+func TestRunningProcessFromOtherUser(t *testing.T) {
+	// test for permission errors by creating a new user, then running a process as that user
+	testUsername := "test"
+	uid, err := CreateUser(testUsername, 0)
+	require.NoError(t, err)
+	t.Logf("uid: %v", uid)
+
+	t.Cleanup(func() {
+		// not sure how ephemeral the CI environment is, but delete the user anyway
+		cmd := exec.Command("userdel", "-f", testUsername)
+		output, err := cmd.CombinedOutput()
+		require.NoError(t, err, "got error deleting user: %s", string(output))
+	})
+
+	cmdHandler := exec.Command("sleep", "60")
+	cmdHandler.SysProcAttr = &syscall.SysProcAttr{Credential: &syscall.Credential{Uid: uint32(uid), Gid: 0}}
+
+	err = cmdHandler.Start()
+	require.NoError(t, err)
+	runPid := cmdHandler.Process.Pid
+
+	testStats := Stats{CPUTicks: true,
+		EnableCgroups: true,
+		EnableNetwork: true,
+		Hostfs:        resolve.NewTestResolver("/"),
+		Procs:         []string{".*"},
+		CgroupOpts:    cgroup.ReaderOptions{RootfsMountpoint: resolve.NewTestResolver("/")},
+	}
+	err = testStats.Init()
+	require.NoError(t, err)
+
+	uname, err := user.Current()
+	require.NoError(t, err)
+
+	result, err := testStats.GetOne(runPid)
+	require.NoError(t, err)
+	// check to make sure we still got valid results
+	require.Equal(t, "sleep 60", result["cmdline"])
+	require.NotEqual(t, uname.Name, result["username"])
+	require.NotZero(t, result["memory"].(map[string]interface{})["size"])
+	t.Logf("got result: %s", result["username"])
+
+}
+
 func TestFetchProcessFromOtherUser(t *testing.T) {
+
 	// If we just used Get() or FetchPids() to get a list of processes on the system, this would produce a bootstrapping problem
 	// where if the code wasn't working (and we were skipping over PIDs not owned by us) this test would pass.
 	// re-implement part of the core pid-fetch logic
 	// All this does is find a pid that's not owned by us.
+	_ = logp.DevelopmentSetup()
 	dir, err := os.Open("/proc/")
 	require.NoError(t, err, "error opening /proc")
 
