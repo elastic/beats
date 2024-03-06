@@ -10,10 +10,9 @@
         "event.timezone": "-02:00",
         "event.type": "admin",
         "event.url": "/services/data/v52.0/sobjects/SetupAuditTrail/0Ym5j12345BJKvZCAX",
-        "fileset.name": "setupaudittrail-rest",
+        "fileset.name": "setupaudittrail",
         "input.type": "log",
         "log.offset": 0,
-        "salesforce.access_mode": "rest",
         "salesforce.setup_audit_trail.created_by_id": "1234j000000q9s7ABC",
         "salesforce.setup_audit_trail.display": "For user abc.def@mail.com, the User Verified Email status changed to verified",
         "salesforce.setup_audit_trail.event_type": "SetupAuditTrail",
@@ -21,7 +20,7 @@
         "service.type": "salesforce",
         "tags": [
             "forwarded",
-            "salesforce-setupaudittrail-rest"
+            "salesforce-setupaudittrail"
         ],
         "user.id": "1234j000000q9s7ABC",
         "user.name": "abc.def@mail.com"

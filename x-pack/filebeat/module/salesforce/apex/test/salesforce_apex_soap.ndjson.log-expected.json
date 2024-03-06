@@ -10,13 +10,12 @@
         "event.timezone": "-02:00",
         "event.type": "connection",
         "event.url": "APEXSOAP",
-        "fileset.name": "apex-rest",
+        "fileset.name": "apex",
         "input.type": "log",
         "log.offset": 0,
         "related.ip": [
             "43.224.11.237"
         ],
-        "salesforce.access_mode": "rest",
         "salesforce.apex.cpu_time": 17,
         "salesforce.apex.db_total_time": 14928037,
         "salesforce.apex.event_type": "ApexSoap",
@@ -30,7 +29,7 @@
         "source.ip": "43.224.11.237",
         "tags": [
             "forwarded",
-            "salesforce-apex-rest"
+            "salesforce-apex"
         ],
         "user.id": "0055j000000utlP",
         "user.roles": "Standard"

@@ -60,3 +60,11 @@
       type: keyword
       description: >
         The value is 1 if the user intentionally logged out of the organization by clicking the Logout button. If the user’s session timed out due to inactivity or another implicit logout action, the value is 0.
+    - name: created_by_id
+      type: keyword
+      description: >
+        Unavailable
+    - name: event_identifier
+      type: keyword
+      description: >
+        This field is populated only when the activity that this event monitors requires extra authentication, such as multi-factor authentication. In this case, Salesforce generates more events and sets the RelatedEventIdentifier field of the new events to the value of the EventIdentifier field of the original event. Use this field with the EventIdentifier field to correlate all the related events. If no extra authentication is required, this field is blank.

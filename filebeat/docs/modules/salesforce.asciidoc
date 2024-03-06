@@ -15,294 +15,420 @@ This file is generated! See scripts/docs_collector.py
 This is a module for Salesforce logs. 
 It collects the logs using the following two different types of inputs:
 
-- `httpjson` input: collects historical data from Salesforce REST API.
-- `cometd` input: collects real-time data from Salesforce Streaming API.
+- `salesforce` input: collects real-time and historical data using Salesforce REST API.
 
 It includes the following filesets for receiving logs:
 
-- `login-rest` fileset: supports Salesforce Login logs received from the REST API.
-- `login-stream` fileset: supports Salesforce Login logs received from the Streaming API.
-- `logout-rest` fileset: supports Salesforce Logout logs received from the REST API.
-- `logout-stream` fileset: supports Salesforce Logout logs received from the Streaming API.
-- `apex-rest` fileset: supports Salesforce Apex logs received from the REST API.
-- `setupaudittrail-rest` fileset: supports logs generated when admins make in your org’s Setup area.
+- `login` fileset: supports Salesforce Login logs received from the EventLogFile and Event Monitoring using Salesforce REST API.
+- `logout` fileset: supports Salesforce Logout logs received from the EventLogFile and Event Monitoring using Salesforce REST API.
+- `apex` fileset: supports Salesforce Apex logs received from the the EventLogFile using Salesforce REST API.
+- `setupaudittrail` fileset: supports logs generated when admins make in your org’s Setup area, collected using Salesforce REST API.
 
-Note: We can leverage the inputs provided above to collect the rest of the events from the Salesforce REST or Streaming API.
+Note: 
+- We can leverage the inputs provided above to collect the rest of the events from the Salesforce REST API.
+- The default value of `var.real_time_interval` or `var.elf_interval` is 5m/1h. It is important to exercise caution when reducing the interval, as it directly affects the API rate limit of the Salesforce instance. Salesforce API rate limit is ~1000 API calls per hour. Hence if user goes with lower limit of `var.real_time_interval` or `var.elf_interval`, the Salesforce API rate limit will exceed and any additional API requests beyond the limit will result in an error response from the Salesforce API. The error message will typically indicate that the rate limit has been exceeded. Please refer to the following link for the https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_api.htm[Salesforce API Rate Limit].
 
 include::../include/what-happens.asciidoc[]
 
 include::../include/gs-link.asciidoc[]
 
 [float]
-==== `login-rest` fileset settings
+==== `login` fileset settings
 
 Example config:
 
 [source,yaml]
 ----
 - module: salesforce
-  login-rest:
+  login:
     enabled: true
+    var.initial_interval: 1d
+    var.api_version: 56
+
+    var.jwt_authentication_enabled: true
+
     var.client_id: "my-client-id"
+    var.client_username: "my.email@here.com"
+    var.client_key_path: client_key.pem
+    var.jwt_url: https://login.salesforce.com
+
+    var.user_pass_authentication_enabled: true
     var.client_secret: "my-client-secret"
-    var.token_url: "https://login.salesforce.com/services/oauth2/token"
+    var.token_url: "https://login.salesforce.com"
     var.user: "my.email@here.com"
     var.password: "password"
+
     var.url: "https://instance-url.salesforce.com"
+
+    var.event_log_file: true
+    var.elf_interval: 1h
+    var.log_file_interval: Hourly
+
+    var.real_time: true
+    var.real_time_interval: 5m
 ----
 
 include::../include/var-paths.asciidoc[]
 
-*`var.client_id`*::
+*`var.initial_interval`*::
 
-Oauth client ID.
+The initial interval for the `login` fileset. It defines the time window in which the `login` fileset collects logs of historical data.
+
+*`var.api_version`*::
+
+The API version of the Salesforce instance.
+
+*`var.jwt_authentication_enabled`*::
+
+Set to true if JWT authentication is enabled.
+
+*`var.client_username`*::
+
+The username used for JWT authentication.
+
+*`var.client_key_path`*::
+
+Path to the client key for JWT authentication.
+
+*`var.jwt_url`*::
+
+The audience URL for JWT authentication.
+
+*`var.user_pass_authentication_enabled`*::
+
+Set to false if user-password authentication is enabled.
 
 *`var.client_secret`*::
 
-Oauth client secret.
+The client secret for user-password authentication.
 
 *`var.token_url`*::
 
-Oauth token URL.
+The token URL for user-password authentication.
 
 *`var.user`*::
 
-The user used as part of the authentication flow. It is required for authentication - grant type password.
+The user used for user-password authentication.
 
 *`var.password`*::
 
-The password used as part of the authentication flow. It is required for authentication - grant type password.
+The password used for user-password authentication.
 
 *`var.url`*::
 
 The URL of the Saleforce instance.
+
+*`var.event_log_file`*::
+
+Set to true to enable event log file data collection. Module will use EventLogFile data collection method.
+
+*`var.elf_interval`*::
+
+The Period for fetching event log file data, i.e. 1s/1m/1h.
+
+*`var.log_file_interval`*::
+
+The interval type of EventLogFile data collection. Either Hourly or Daily.
+
+*`var.real_time`*::
+
+Set to true to enable real-time data collection.
+
+*`var.real_time_interval`*::
+
+The Period for fetching real-time data, i.e. 1s/1m/1h.
 
 [float]
-==== `login-stream` fileset settings
+==== `logout` fileset settings
 
 Example config:
 
 [source,yaml]
 ----
 - module: salesforce
-  login-stream:
+  logout:
     enabled: true
+    var.initial_interval: 1d
+    var.api_version: 56
+
+    var.jwt_authentication_enabled: true
+
     var.client_id: "my-client-id"
+    var.client_username: "my.email@here.com"
+    var.client_key_path: client_key.pem
+    var.jwt_url: https://login.salesforce.com
+
+    var.user_pass_authentication_enabled: true
     var.client_secret: "my-client-secret"
-    var.token_url: "https://login.salesforce.com/services/oauth2/token"
+    var.token_url: "https://login.salesforce.com"
     var.user: "my.email@here.com"
     var.password: "password"
+
     var.url: "https://instance-url.salesforce.com"
+
+    var.event_log_file: true
+    var.elf_interval: 1h
+    var.log_file_interval: Hourly
+
+    var.real_time: true
+    var.real_time_interval: 5m
 ----
 
 include::../include/var-paths.asciidoc[]
 
-*`var.client_id`*::
+*`var.initial_interval`*::
 
-Oauth client ID.
+The initial interval for the `logout` fileset. It defines the time window in which the `logout` fileset collects logs of historical data.
+
+*`var.api_version`*::
+
+The API version of the Salesforce instance.
+
+*`var.jwt_authentication_enabled`*::
+
+Set to true if JWT authentication is enabled.
+
+*`var.client_username`*::
+
+The username used for JWT authentication.
+
+*`var.client_key_path`*::
+
+Path to the client key for JWT authentication.
+
+*`var.jwt_url`*::
+
+The audience URL for JWT authentication.
+
+*`var.user_pass_authentication_enabled`*::
+
+Set to false if user-password authentication is enabled.
 
 *`var.client_secret`*::
 
-Oauth client secret.
+The client secret for user-password authentication.
 
 *`var.token_url`*::
 
-Oauth token URL.
+The token URL for user-password authentication.
 
 *`var.user`*::
 
-The user used as part of the authentication flow. It is required for authentication - grant type password.
+The user used for user-password authentication.
 
 *`var.password`*::
 
-The password used as part of the authentication flow. It is required for authentication - grant type password.
+The password used for user-password authentication.
 
 *`var.url`*::
 
 The URL of the Saleforce instance.
+
+*`var.event_log_file`*::
+
+Set to true to enable event log file data collection. Module will use EventLogFile data collection method.
+
+*`var.elf_interval`*::
+
+The Period for fetching event log file data, i.e. 1s/1m/1h.
+
+*`var.log_file_interval`*::
+
+The interval type of EventLogFile data collection. Either Hourly or Daily.
+
+*`var.real_time`*::
+
+Set to true to enable real-time data collection.
+
+*`var.real_time_interval`*::
+
+The Period for fetching real-time data, i.e. 1s/1m/1h.
 
 [float]
-==== `logout-rest` fileset settings
+==== `setupaudittrail` fileset settings
 
 Example config:
 
 [source,yaml]
 ----
 - module: salesforce
-  logout-rest:
+  setupaudittrail:
     enabled: true
+    var.initial_interval: 1d
+    var.api_version: 56
+
+    var.jwt_authentication_enabled: true
+
     var.client_id: "my-client-id"
+    var.client_username: "my.email@here.com"
+    var.client_key_path: client_key.pem
+    var.jwt_url: https://login.salesforce.com
+
+    var.user_pass_authentication_enabled: true
     var.client_secret: "my-client-secret"
-    var.token_url: "https://login.salesforce.com/services/oauth2/token"
+    var.token_url: "https://login.salesforce.com"
     var.user: "my.email@here.com"
     var.password: "password"
+
     var.url: "https://instance-url.salesforce.com"
+
+    var.real_time: true
+    var.real_time_interval: 5m
 ----
 
 include::../include/var-paths.asciidoc[]
 
-*`var.client_id`*::
+*`var.initial_interval`*::
 
-Oauth client ID.
+The initial interval for the `logout` fileset. It defines the time window in which the `logout` fileset collects logs of historical data.
+
+*`var.api_version`*::
+
+The API version of the Salesforce instance.
+
+*`var.jwt_authentication_enabled`*::
+
+Set to true if JWT authentication is enabled.
+
+*`var.client_username`*::
+
+The username used for JWT authentication.
+
+*`var.client_key_path`*::
+
+Path to the client key for JWT authentication.
+
+*`var.jwt_url`*::
+
+The audience URL for JWT authentication.
+
+*`var.user_pass_authentication_enabled`*::
+
+Set to false if user-password authentication is enabled.
 
 *`var.client_secret`*::
 
-Oauth client secret.
+The client secret for user-password authentication.
 
 *`var.token_url`*::
 
-Oauth token URL.
+The token URL for user-password authentication.
 
 *`var.user`*::
 
-The user used as part of the authentication flow. It is required for authentication - grant type password.
+The user used for user-password authentication.
 
 *`var.password`*::
 
-The password used as part of the authentication flow. It is required for authentication - grant type password.
+The password used for user-password authentication.
 
 *`var.url`*::
 
 The URL of the Saleforce instance.
+
+*`var.real_time`*::
+
+Set to true to enable real-time data collection.
+
+*`var.real_time_interval`*::
+
+The Period for fetching real-time data, i.e. 1s/1m/1h.
 
 [float]
-==== `logout-stream` fileset settings
+==== `apex` fileset settings
 
 Example config:
 
 [source,yaml]
 ----
 - module: salesforce
-  logout-stream:
+  apex:
     enabled: true
+    var.initial_interval: 1d
+    var.log_file_interval: Hourly
+    var.api_version: 56
+
+    var.jwt_authentication_enabled: true
+
     var.client_id: "my-client-id"
+    var.client_username: "my.email@here.com"
+    var.client_key_path: client_key.pem
+    var.jwt_url: https://login.salesforce.com
+
+    var.user_pass_authentication_enabled: true
     var.client_secret: "my-client-secret"
-    var.token_url: "https://login.salesforce.com/services/oauth2/token"
+    var.token_url: "https://login.salesforce.com"
     var.user: "my.email@here.com"
     var.password: "password"
+
     var.url: "https://instance-url.salesforce.com"
+
+    var.event_log_file: true
+    var.elf_interval: 1h
+    var.log_file_interval: Hourly
 ----
 
 include::../include/var-paths.asciidoc[]
 
-*`var.client_id`*::
+*`var.initial_interval`*::
 
-Oauth client ID.
+The initial interval for the `logout` fileset. It defines the time window in which the `logout` fileset collects logs of historical data.
+
+*`var.api_version`*::
+
+The API version of the Salesforce instance.
+
+*`var.jwt_authentication_enabled`*::
+
+Set to true if JWT authentication is enabled.
+
+*`var.client_username`*::
+
+The username used for JWT authentication.
+
+*`var.client_key_path`*::
+
+Path to the client key for JWT authentication.
+
+*`var.jwt_url`*::
+
+The audience URL for JWT authentication.
+
+*`var.user_pass_authentication_enabled`*::
+
+Set to false if user-password authentication is enabled.
 
 *`var.client_secret`*::
 
-Oauth client secret.
+The client secret for user-password authentication.
 
 *`var.token_url`*::
 
-Oauth token URL.
+The token URL for user-password authentication.
 
 *`var.user`*::
 
-The user used as part of the authentication flow. It is required for authentication - grant type password.
+The user used for user-password authentication.
 
 *`var.password`*::
 
-The password used as part of the authentication flow. It is required for authentication - grant type password.
+The password used for user-password authentication.
 
 *`var.url`*::
 
 The URL of the Saleforce instance.
 
-[float]
-==== `setupaudittrail-rest` fileset settings
+*`var.event_log_file`*::
 
-Example config:
+Set to true to enable event log file data collection. Module will use EventLogFile data collection method.
 
-[source,yaml]
-----
-- module: salesforce
-  setupaudittrail-rest:
-    enabled: true
-    var.client_id: "my-client-id"
-    var.client_secret: "my-client-secret"
-    var.token_url: "https://login.salesforce.com/services/oauth2/token"
-    var.user: "my.email@here.com"
-    var.password: "password"
-    var.url: "https://instance-url.salesforce.com"
-    var.interval: 1h
-----
+*`var.elf_interval`*::
 
-include::../include/var-paths.asciidoc[]
+The Period for fetching event log file data, i.e. 1s/1m/1h.
 
-*`var.client_id`*::
+*`var.log_file_interval`*::
 
-Oauth client ID.
-
-*`var.client_secret`*::
-
-Oauth client secret.
-
-*`var.token_url`*::
-
-Oauth token URL.
-
-*`var.user`*::
-
-The user used as part of the authentication flow. It is required for authentication - grant type password.
-
-*`var.password`*::
-
-The password used as part of the authentication flow. It is required for authentication - grant type password.
-
-*`var.url`*::
-
-The URL of the Saleforce instance.
-
-*`var.interval`*::
-
-Period of fetching logs, i.e. 1s/1m/1h. 
-
-Note: The default value of `var.interval` is 1h. It is important to exercise caution when reducing the interval, as it directly affects the API rate limit of the Salesforce instance. Salesforce API rate limit is ~1000 API calls per hour. Hence if user goes with lower limit of var.interval, the Salesforce API rate limit will exceed and any additional API requests beyond the limit will result in an error response from the Salesforce API. The error message will typically indicate that the rate limit has been exceeded. Please refer to the following link for the https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_api.htm[Salesforce API Rate Limit].
-
-[float]
-==== `apex-rest` fileset settings
-
-Example config:
-
-[source,yaml]
-----
-- module: salesforce
-  apex-rest:
-    enabled: true
-    var.client_id: "my-client-id"
-    var.client_secret: "my-client-secret"
-    var.token_url: "https://login.salesforce.com/services/oauth2/token"
-    var.user: "my.email@here.com"
-    var.password: "password"
-    var.url: "https://instance-url.salesforce.com"
-----
-
-include::../include/var-paths.asciidoc[]
-
-*`var.client_id`*::
-
-Oauth client ID.
-
-*`var.client_secret`*::
-
-Oauth client secret.
-
-*`var.token_url`*::
-
-Oauth token URL.
-
-*`var.user`*::
-
-The user used as part of the authentication flow. It is required for authentication - grant type password.
-
-*`var.password`*::
-
-The password used as part of the authentication flow. It is required for authentication - grant type password.
-
-*`var.url`*::
-
-The URL of the Saleforce instance.
+The interval type of EventLogFile data collection. Either Hourly or Daily.
 
 [float]
 === Example dashboard

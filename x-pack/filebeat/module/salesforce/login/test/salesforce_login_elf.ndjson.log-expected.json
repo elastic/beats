@@ -10,13 +10,12 @@
         "event.timezone": "-02:00",
         "event.type": "info",
         "event.url": "/index.jsp",
-        "fileset.name": "login-rest",
+        "fileset.name": "login",
         "input.type": "log",
         "log.offset": 0,
         "related.ip": [
             "43.224.11.237"
         ],
-        "salesforce.access_mode": "rest",
         "salesforce.login.api_version": 9998,
         "salesforce.login.client_ip": "43.224.11.237",
         "salesforce.login.cpu_time": 54,
@@ -31,7 +30,7 @@
         "source.ip": "43.224.11.237",
         "tags": [
             "forwarded",
-            "salesforce-login-rest"
+            "salesforce-login"
         ],
         "tls.cipher": "ECDHE-RSA-AES256-GCM-SHA384",
         "tls.version": "1.2",

@@ -110,8 +110,8 @@ processors:
     target_field: salesforce.logout.created_by_id
     ignore_missing: true
 - rename:
-    field: json.RelatedEventIdentifier
-    target_field: salesforce.logout.related_event_identifier
+    field: json.EventIdentifier
+    target_field: salesforce.logout.event_identifier
     ignore_missing: true
 - rename:
     field: json.replayId

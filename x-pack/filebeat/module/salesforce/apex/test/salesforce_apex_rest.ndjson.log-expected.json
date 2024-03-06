@@ -9,7 +9,7 @@
         "event.timezone": "-02:00",
         "event.type": "connection",
         "event.url": "/Account/",
-        "fileset.name": "apex-rest",
+        "fileset.name": "apex",
         "http.request.method": "POST",
         "http.response.status_code": 200,
         "input.type": "log",
@@ -17,7 +17,6 @@
         "related.ip": [
             "43.224.11.237"
         ],
-        "salesforce.access_mode": "rest",
         "salesforce.apex.cpu_time": 94,
         "salesforce.apex.db_blocks": 4401,
         "salesforce.apex.db_cpu_time": 130,
@@ -34,7 +33,7 @@
         "source.ip": "43.224.11.237",
         "tags": [
             "forwarded",
-            "salesforce-apex-rest"
+            "salesforce-apex"
         ],
         "user.id": "0055j000000utlP",
         "user.roles": "Standard"

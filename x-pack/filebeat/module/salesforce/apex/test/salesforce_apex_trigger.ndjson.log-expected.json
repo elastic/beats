@@ -8,10 +8,9 @@
         "event.module": "salesforce",
         "event.timezone": "-02:00",
         "event.type": "connection",
-        "fileset.name": "apex-rest",
+        "fileset.name": "apex",
         "input.type": "log",
         "log.offset": 0,
-        "salesforce.access_mode": "rest",
         "salesforce.apex.cpu_time": 3,
         "salesforce.apex.entity_name": "Book__c",
         "salesforce.apex.event_type": "ApexTrigger",
@@ -24,7 +23,7 @@
         "service.type": "salesforce",
         "tags": [
             "forwarded",
-            "salesforce-apex-rest"
+            "salesforce-apex"
         ],
         "user.id": "0055j000000utlP"
     }

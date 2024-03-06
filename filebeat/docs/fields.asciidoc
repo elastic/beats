@@ -125514,134 +125514,144 @@ type: keyword
 [float]
 === salesforce.login
 
-Fileset for ingesting Salesforce Login (Streaming) logs.
+Fileset for ingesting Salesforce Login (REST) logs.
 
 
 
-*`salesforce.login.application`*::
+*`salesforce.login.api_type`*::
 +
 --
-The application used to access the org. Possible values include: AppExchange, Browser, Salesforce for iOS, Salesforce Developers API Explorer, N/A
+The type of API request.
 
 
 type: keyword
 
 --
 
-*`salesforce.login.auth_method_reference`*::
+*`salesforce.login.api_version`*::
 +
 --
-The authentication method used by a third-party identification provider for an OpenID Connect single sign-on protocol.
+The version of the API that’s being used.
 
 
 type: keyword
 
 --
 
-*`salesforce.login.auth_service_id`*::
+*`salesforce.login.login_key`*::
 +
 --
-The 18-character ID for an authentication service for a login event.
+The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
 
 
 type: keyword
 
 --
 
-*`salesforce.login.client_version`*::
+*`salesforce.login.authentication_method_reference`*::
 +
 --
-The version number of the login client. If no version number is available, “Unknown” is returned.
+The authentication method used by a third-party identification provider for an OpenID Connect single sign-on protocol. This field is available in API version 51.0 and later.
 
 
 type: keyword
 
 --
 
-*`salesforce.login.created_by_id`*::
+*`salesforce.login.client_ip`*::
 +
 --
-Unavailable
+The IP address of the client that’s using Salesforce services. A Salesforce internal IP (such as a login from Salesforce Workbench or AppExchange) is shown as “Salesforce.com IP”.
 
 
 type: keyword
 
 --
 
-*`salesforce.login.evaluation_time`*::
+*`salesforce.login.cpu_time`*::
 +
 --
-The amount of time it took to evaluate the transaction security policy, in milliseconds.
+The CPU time in milliseconds used to complete the request. This field indicates the amount of activity taking place in the app server layer.
 
 
 type: keyword
 
 --
 
-*`salesforce.login.login_geo_id`*::
+*`salesforce.login.db_total_time`*::
 +
 --
-The Salesforce ID of the LoginGeo object associated with the login user’s IP address.
+The time in nanoseconds for a database round trip. Includes time spent in the JDBC driver, network to the database, and DB_CPU_TIME. Compare this field to CPU_TIME to determine whether performance issues are occurring in the database layer or in your own code.
 
 
 type: keyword
 
 --
 
-*`salesforce.login.login_history_id`*::
+*`salesforce.login.event_type`*::
 +
 --
-Tracks a user session so you can correlate user activity with a particular login instance. This field is also available on the LoginHistory, AuthSession, and LoginHistory objects, making it easier to trace events back to a user’s original authentication.
+The type of event. The value is always Login.
 
 
 type: keyword
 
 --
 
-*`salesforce.login.login_type`*::
+*`salesforce.login.organization_id`*::
 +
 --
-The type of login used to access the session.
+The 15-character ID of the organization.
 
 
 type: keyword
 
 --
 
-*`salesforce.login.policy_id`*::
+*`salesforce.login.request_id`*::
 +
 --
-The ID of the transaction security policy associated with this event.
+The unique ID of a single transaction. A transaction can contain one or more events. Each event in a given transaction has the same REQUEST_ID.
 
 
 type: keyword
 
 --
 
-*`salesforce.login.policy_outcome`*::
+*`salesforce.login.request_status`*::
 +
 --
-The result of the transaction policy.
+The status of the request for a page view or user interface action.
 
 
 type: keyword
 
 --
 
-*`salesforce.login.related_event_identifier`*::
+*`salesforce.login.run_time`*::
 +
 --
-This field is populated only when the activity that this event monitors requires extra authentication, such as multi-factor authentication. In this case, Salesforce generates more events and sets the RelatedEventIdentifier field of the new events to the value of the EventIdentifier field of the original event. Use this field with the EventIdentifier field to correlate all the related events. If no extra authentication is required, this field is blank.
+The amount of time that the request took in milliseconds.
 
 
 type: keyword
 
 --
 
-*`salesforce.login.session_level`*::
+*`salesforce.login.uri_id_derived`*::
 +
 --
-Session-level security controls user access to features that support it, such as connected apps and reporting. Possible values are: HIGH_ASSURANCE, LOW, STANDARD
+The 18-character case insensitive ID of the URI of the page that’s receiving the request.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.user_id_derived`*::
++
+--
+The 18-character case insensitive ID of the user who’s using Salesforce services through the UI or the API.
 
 
 type: keyword
@@ -125651,44 +125661,144 @@ type: keyword
 [float]
 === salesforce.logout
 
-Fileset for parsing Salesforce Logout (Streaming) logs.
+Fileset for parsing Salesforce Logout (REST) logs.
 
 
 
-*`salesforce.logout.created_by_id`*::
+*`salesforce.logout.session_level`*::
 +
 --
-Unavailable
+Indicates the session-level security of the session that the user is logging out of for this event. Session-level security controls user access to features that support it, such as connected apps and reporting. Possible values are: HIGH_ASSURANCE, LOW, STANDARD
 
 
 type: keyword
 
 --
 
-*`salesforce.logout.related_event_identifier`*::
+*`salesforce.logout.login_key`*::
 +
 --
-This field is populated only when the activity that this event monitors requires extra authentication, such as multi-factor authentication. In this case, Salesforce generates more events and sets the RelatedEventIdentifier field of the new events to the value of the EventIdentifier field of the original event. Use this field with the EventIdentifier field to correlate all the related events. If no extra authentication is required, this field is blank.
+The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
 
 
 type: keyword
 
 --
 
-*`salesforce.logout.replay_id`*::
+*`salesforce.logout.api_type`*::
 +
 --
-Represents an ID value that is populated by the system and refers to the position of the event in the event stream. Replay ID values aren’t guaranteed to be contiguous for consecutive events. A subscriber can store a replay ID value and use it on resubscription to retrieve missed events that are within the retention window.
+The type of API request.
 
 
 type: keyword
 
 --
 
-*`salesforce.logout.schema`*::
+*`salesforce.logout.api_version`*::
 +
 --
-Unavailable
+The version of the API that’s being used.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.app_type`*::
++
+--
+The application type that was in use upon logging out.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.browser_type`*::
++
+--
+The identifier string returned by the browser used at login.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.client_version`*::
++
+--
+The version of the client that was in use upon logging out.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.event_type`*::
++
+--
+The type of event. The value is always Logout.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.organization_by_id`*::
++
+--
+The 15-character ID of the organization.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.platform_type`*::
++
+--
+The code for the client platform. If a timeout caused the logout, this field is null.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.resolution_type`*::
++
+--
+The screen resolution of the client. If a timeout caused the logout, this field is null.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.session_type`*::
++
+--
+The session type that was used when logging out.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.user_id_derived`*::
++
+--
+The 18-character case-safe ID of the user who’s using Salesforce services through the UI or the API.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.user_initiated_logout`*::
++
+--
+The value is 1 if the user intentionally logged out of the organization by clicking the Logout button. If the user’s session timed out due to inactivity or another implicit logout action, the value is 0.
 
 
 type: keyword
