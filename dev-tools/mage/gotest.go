@@ -178,9 +178,9 @@ func GoTestIntegrationForModule(ctx context.Context) error {
 	failedModules := make([]string, 0, len(modulesFileInfo))
 	for _, fi := range modulesFileInfo {
 		// skip the ones that are not directories or with suffix @tmp, which are created by Jenkins build job
-		if !fi.IsDir() || strings.HasSuffix(fi, "@tmp") {
-			continue
-		}
+		// if !fi.IsDir() || strings.HasSuffix(fi, "@tmp") {
+		// 	continue
+		// }
 		if module != "" && module != fi {
 			continue
 		}
