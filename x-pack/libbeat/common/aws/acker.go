@@ -5,11 +5,11 @@
 package aws
 
 import (
+	"context"
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/acker"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
 // EventACKTracker tracks the publishing state of S3 objects. Specifically
@@ -18,40 +18,54 @@ import (
 // more S3 objects.
 type EventACKTracker struct {
 	sync.Mutex
-	PendingACKs *atomic.Uint64
+	PendingACKs int64
+	ctx         context.Context
+	cancel      context.CancelFunc
 }
 
-func NewEventACKTracker() *EventACKTracker {
-	return &EventACKTracker{PendingACKs: atomic.NewUint64(0)}
+func NewEventACKTracker(ctx context.Context) *EventACKTracker {
+	ctx, cancel := context.WithCancel(ctx)
+	return &EventACKTracker{ctx: ctx, cancel: cancel}
 }
 
 // Add increments the number of pending ACKs.
 func (a *EventACKTracker) Add() {
-	a.PendingACKs.Inc()
+	a.Lock()
+	a.PendingACKs++
+	a.Unlock()
 }
 
 // ACK decrements the number of pending ACKs.
 func (a *EventACKTracker) ACK() {
-	if a.PendingACKs.Load() <= 0 {
+	a.Lock()
+	defer a.Unlock()
+
+	if a.PendingACKs <= 0 {
 		panic("misuse detected: negative ACK counter")
 	}
 
-	a.PendingACKs.Dec()
+	a.PendingACKs--
+	if a.PendingACKs == 0 {
+		a.cancel()
+	}
 }
 
 // Wait waits for the number of pending ACKs to be zero.
-// Wait must be called only after every expected
+// Wait must be called sequentially only after every expected
 // `Add` calls are made. Failing to do so could reset the pendingACKs
 // property to 0 and would results in Wait returning after additional
 // calls to `Add` are made without a corresponding `ACK` call.
 func (a *EventACKTracker) Wait() {
-
-	// If there were no any pending ACKs returns.
-	for {
-		if a.PendingACKs.Load() == 0 {
-			return
-		}
+	// If there were never any pending ACKs then cancel the context. (This can
+	// happen when a document contains no events or cannot be read due to an error).
+	a.Lock()
+	if a.PendingACKs == 0 {
+		a.cancel()
 	}
+	a.Unlock()
+
+	// Wait.
+	<-a.ctx.Done()
 }
 
 // NewEventACKHandler returns a beat ACKer that can receive callbacks when

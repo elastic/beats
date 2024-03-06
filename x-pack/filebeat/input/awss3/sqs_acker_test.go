@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-package aws
+package awss3
 
 import (
 	"context"
@@ -17,11 +17,12 @@ func TestEventACKTracker(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
-	acker := NewEventACKTracker(ctx)
-	acker.Add()
+	acker := NewEventACKTracker(ctx, nil)
+	acker.EventsToBeAcked.Add(1)
 	acker.ACK()
 
-	assert.EqualValues(t, 0, acker.PendingACKs)
+	assert.EqualValues(t, 1, acker.TotalEventsAcked.Load())
+	assert.EqualValues(t, true, acker.FullyAcked())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
@@ -29,10 +30,11 @@ func TestEventACKTrackerNoACKs(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
-	acker := NewEventACKTracker(ctx)
-	acker.Wait()
+	acker := NewEventACKTracker(ctx, nil)
+	acker.WaitForS3()
 
-	assert.EqualValues(t, 0, acker.PendingACKs)
+	assert.EqualValues(t, 0, acker.EventsToBeAcked.Load())
+	assert.EqualValues(t, true, acker.FullyAcked())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
@@ -41,29 +43,31 @@ func TestEventACKHandler(t *testing.T) {
 	t.Cleanup(cancel)
 
 	// Create acker. Add one pending ACK.
-	acker := NewEventACKTracker(ctx)
-	acker.Add()
+	acker := NewEventACKTracker(ctx, nil)
+	acker.EventsToBeAcked.Add(1)
 
 	// Create an ACK handler and simulate one ACKed event.
 	ackHandler := NewEventACKHandler()
 	ackHandler.AddEvent(beat.Event{Private: acker}, true)
 	ackHandler.ACKEvents(1)
 
-	assert.EqualValues(t, 0, acker.PendingACKs)
+	assert.EqualValues(t, 1, acker.TotalEventsAcked.Load())
+	assert.EqualValues(t, true, acker.FullyAcked())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
-func TestEventACKHandlerWait(t *testing.T) {
+func TestEventACKHandlerWaitForS3(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
 	// Create acker. Add one pending ACK.
-	acker := NewEventACKTracker(ctx)
-	acker.Add()
+	acker := NewEventACKTracker(ctx, nil)
+	acker.EventsToBeAcked.Inc()
 	acker.ACK()
-	acker.Wait()
-	acker.Add()
+	acker.WaitForS3()
+	acker.EventsToBeAcked.Inc()
 
-	assert.EqualValues(t, 1, acker.PendingACKs)
+	assert.EqualValues(t, 1, acker.TotalEventsAcked.Load())
+	assert.EqualValues(t, false, acker.FullyAcked())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }

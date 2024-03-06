@@ -31,7 +31,7 @@ func newLogProcessor(log *logp.Logger, metrics *inputMetrics, publisher beat.Cli
 		log:       log,
 		metrics:   metrics,
 		publisher: publisher,
-		ack:       awscommon.NewEventACKTracker(),
+		ack:       awscommon.NewEventACKTracker(ctx),
 	}
 }
 
