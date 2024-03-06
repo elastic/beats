@@ -121,7 +121,7 @@ func readJSONFromFile(t *testing.T, filepath string) []string {
 	var rawMessages []json.RawMessage
 	err = json.Unmarshal(fileBytes, &rawMessages)
 	assert.NoError(t, err)
-	var data []string
+	data := make([]string, 0, len(rawMessages))
 
 	for _, rawMsg := range rawMessages {
 		data = append(data, string(rawMsg))

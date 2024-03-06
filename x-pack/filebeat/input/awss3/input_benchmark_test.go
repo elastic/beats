@@ -259,12 +259,10 @@ func newFakePipeline() *fakePipeline {
 
 	go func() {
 		for {
-			select {
-			case <-fp.flush.C:
-				fp.mutex.Lock()
-				fp.ackEvents()
-				fp.mutex.Unlock()
-			}
+			<-fp.flush.C
+			fp.mutex.Lock()
+			fp.ackEvents()
+			fp.mutex.Unlock()
 		}
 	}()
 

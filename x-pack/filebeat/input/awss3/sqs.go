@@ -33,17 +33,6 @@ type sqsReader struct {
 	metrics             *inputMetrics
 }
 
-type processingOutcome struct {
-	start           time.Time
-	keepaliveWg     *sync.WaitGroup
-	keepaliveCancel context.CancelFunc
-	acker           *EventACKTracker
-	msg             *types.Message
-	receiveCount    int
-	handles         []s3ObjectHandler
-	processingErr   error
-}
-
 func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, msgHandler sqsProcessor) *sqsReader {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
