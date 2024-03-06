@@ -682,8 +682,8 @@ github.com/elastic/fsevents v0.0.0-20181029231046-e1d381a4d270/go.mod h1:Msl1pdb
 github.com/elastic/glog v1.0.1-0.20210831205241-7d8b5c89dfc4/go.mod h1:EWib/APOK0SL3dFbYqvxE3UYd8E6s1ouQ7iEp/0LWV4=
 github.com/elastic/go-concert v0.2.0 h1:GAQrhRVXprnNjtvTP9pWJ1d4ToEA4cU5ci7TwTa20xg=
 github.com/elastic/go-concert v0.2.0/go.mod h1:HWjpO3IAEJUxOeaJOWXWEp7imKd27foxz9V5vegC/38=
-github.com/elastic/go-elasticsearch/v8 v8.12.0 h1:krkiCf4peJa7bZwGegy01b5xWWaYpik78wvisTeRO1U=
-github.com/elastic/go-elasticsearch/v8 v8.12.0/go.mod h1:wSzJYrrKPZQ8qPuqAqc6KMR4HrBfHnZORvyL+FMFqq0=
+github.com/elastic/go-elasticsearch/v8 v8.12.1 h1:QcuFK5LaZS0pSIj/eAEsxmJWmMo7tUs1aVBbzdIgtnE=
+github.com/elastic/go-elasticsearch/v8 v8.12.1/go.mod h1:wSzJYrrKPZQ8qPuqAqc6KMR4HrBfHnZORvyL+FMFqq0=
 github.com/elastic/go-libaudit/v2 v2.5.0 h1:5OK919QRnGtcjVBz3n/cs5F42im1mPlVTA9TyIn2K54=
 github.com/elastic/go-libaudit/v2 v2.5.0/go.mod h1:AjlnhinP+kKQuUJoXLVrqxBM8uyhQmkzoV6jjsCFP4Q=
 github.com/elastic/go-licenser v0.4.1 h1:1xDURsc8pL5zYT9R29425J3vkHdt4RT5TNEMeRN48x4=
