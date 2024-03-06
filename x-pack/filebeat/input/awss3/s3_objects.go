@@ -113,7 +113,7 @@ type s3ObjectProcessor struct {
 }
 
 func (p *s3ObjectProcessor) SyncEventsToBeAcked(s3EventsCreatedTotal uint64) {
-	p.acker.TotalEventsAcked.Add(s3EventsCreatedTotal)
+	p.acker.SyncEventsToBeAcked(s3EventsCreatedTotal)
 }
 func (p *s3ObjectProcessor) Wait() {
 	p.acker.WaitForS3()

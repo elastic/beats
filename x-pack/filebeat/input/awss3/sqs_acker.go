@@ -18,12 +18,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
-var totMessageDeleted *atomic.Uint64
-
-func init() {
-	totMessageDeleted = atomic.NewUint64(0)
-}
-
 // EventACKTracker tracks the publishing state of S3 objects. Specifically
 // it tracks the number of message acknowledgements that are pending from the
 // output. It can be used to wait until all ACKs have been received for one or
@@ -34,7 +28,9 @@ type EventACKTracker struct {
 	EventsToBeAcked  *atomic.Uint64
 	TotalEventsAcked *atomic.Uint64
 
-	isSQSAcker bool
+	ackMutex             *sync.RWMutex
+	ackMutexLockedOnInit *atomic.Bool
+	isSQSAcker           bool
 
 	ctx    context.Context
 	cancel context.CancelFunc
@@ -52,16 +48,39 @@ type EventACKTracker struct {
 
 func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventACKTracker {
 	ctx, cancel := context.WithCancel(ctx)
+	ackMutex := new(sync.RWMutex)
+	// We need to lock on ack mutex, in order to know that we have passed the info to the acker about the total to be acked
+	// Lock it as soon as we create the acker. It will be unlocked and in either SyncEventsToBeAcked or AddSQSDeletionData
+	ackMutex.Lock()
 	return &EventACKTracker{
-		ctx:              ctx,
-		cancel:           cancel,
-		DeletionWg:       deletionWg,
-		TotalEventsAcked: atomic.NewUint64(0),
-		EventsToBeAcked:  atomic.NewUint64(0),
+		ctx:                  ctx,
+		cancel:               cancel,
+		ackMutex:             ackMutex,
+		ackMutexLockedOnInit: atomic.NewBool(true),
+		DeletionWg:           deletionWg,
+		TotalEventsAcked:     atomic.NewUint64(0),
+		EventsToBeAcked:      atomic.NewUint64(0),
 	}
 }
 
+func (a *EventACKTracker) SyncEventsToBeAcked(s3EventsCreatedTotal uint64) {
+	// We want to execute the logic of this call only once, when the ack mutex was locked on init
+	if !a.ackMutexLockedOnInit.Load() {
+		return
+	}
+
+	a.EventsToBeAcked.Add(s3EventsCreatedTotal)
+
+	a.ackMutex.Unlock()
+	a.ackMutexLockedOnInit.Store(false)
+}
+
 func (a *EventACKTracker) AddSQSDeletionData(msg *types.Message, publishedEvent uint64, receiveCount int, start time.Time, processingErr error, handles []s3ObjectHandler, keepaliveCancel context.CancelFunc, keepaliveWg *sync.WaitGroup, msgHandler sqsProcessor, log *logp.Logger) {
+	// We want to execute the logic of this call only once, when the ack mutex was locked on init
+	if !a.ackMutexLockedOnInit.Load() {
+		return
+	}
+
 	a.isSQSAcker = true
 
 	a.msg = msg
@@ -74,12 +93,17 @@ func (a *EventACKTracker) AddSQSDeletionData(msg *types.Message, publishedEvent 
 	a.keepaliveWg = keepaliveWg
 	a.msgHandler = msgHandler
 	a.log = log
+
+	a.ackMutex.Unlock()
+	a.ackMutexLockedOnInit.Store(false)
 }
 
 func (a *EventACKTracker) FullyAcked() bool {
 	return a.TotalEventsAcked.Load() == a.EventsToBeAcked.Load()
 
 }
+
+// WaitForS3 must be called after SyncEventsToBeAcked
 func (a *EventACKTracker) WaitForS3() {
 	// If it's fully acked then cancel the context.
 	if a.FullyAcked() {
@@ -102,7 +126,6 @@ func (a *EventACKTracker) FlushForSQS() {
 
 	err := a.msgHandler.DeleteSQS(a.msg, a.ReceiveCount, a.processingErr, a.Handles)
 	a.DeletionWg.Done()
-	totMessageDeleted.Inc()
 
 	if err != nil {
 		a.log.Warnw("Failed deleting SQS message.",
@@ -118,6 +141,13 @@ func (a *EventACKTracker) FlushForSQS() {
 
 // ACK decrements the number of total Events ACKed.
 func (a *EventACKTracker) ACK() {
+	// We need to lock on ack mutex, in order to know that we have passed the info to the acker about the total to be acked
+	// But we want to do it only before the info have been passed, once they did, no need anymore to lock on the ack mutext
+	if a.ackMutexLockedOnInit.Load() {
+		a.ackMutex.Lock()
+		defer a.ackMutex.Unlock()
+	}
+
 	if a.FullyAcked() {
 		panic("misuse detected: ACK call on fully acked")
 	}
