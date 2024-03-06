@@ -21,7 +21,7 @@ func TestParquetDecoding(t *testing.T) {
 		name          string
 		file          string
 		contentType   string
-		numEvents     int
+		numEvents     uint64
 		assertAgainst string
 		config        *readerConfig
 	}{

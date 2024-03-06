@@ -9,6 +9,7 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"errors"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"sync"
 	"testing"
 	"time"
@@ -68,24 +69,30 @@ func TestSQSReceiver(t *testing.T) {
 
 		mockClient := NewMockBeatClient(ctrl)
 		mockBeatPipeline := NewMockBeatPipeline(ctrl)
-		_, keepaliveCancel := context.WithCancel(ctx)
-
-		// Start SQS keepalive worker.
-		var keepaliveWg sync.WaitGroup
 
 		gomock.InOrder(
 			mockBeatPipeline.EXPECT().ConnectWith(gomock.Any()).Return(mockClient, nil),
 			// Expect the one message returned to have been processed.
 			mockMsgHandler.EXPECT().
-				ProcessSQS(gomock.Any(), gomock.Eq(&msg), gomock.Any(), gomock.Any()).
+				ProcessSQS(gomock.Any(), gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any()).
 				Times(1).
-				Return(0, nil, keepaliveCancel, &keepaliveWg, nil),
+				DoAndReturn(
+					func(ctx context.Context, msg *types.Message, _ beat.Client, acker *EventACKTracker, _ time.Time) error {
+						_, keepaliveCancel := context.WithCancel(ctx)
+						log := log.Named("sqs_s3_event")
+						acker.AddSQSDeletionData(msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
+						acker.ACK()
+						acker.FlushForSQS()
+
+						return nil
+					}),
 		)
 
 		// The two expected calls happen in different goroutines, we cannot enforce an oder
 		// Expect the client to be closed
 		mockClient.EXPECT().Close()
 		// Expect the one message returned to have been deleted.
+		// We
 		mockMsgHandler.EXPECT().
 			DeleteSQS(gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any()).
 			Times(1).

@@ -34,7 +34,6 @@ import (
 	"github.com/olekukonko/tablewriter"
 
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -251,20 +250,21 @@ func (c *constantS3) ListObjectsPaginator(bucket, prefix string) s3Pager {
 var _ beat.Pipeline = (*fakePipeline)(nil)
 
 func newFakePipeline() *fakePipeline {
-	fp := &fakePipeline{flush: time.NewTicker(10 * time.Second), log: log, mutex: new(sync.Mutex)}
+	fp := &fakePipeline{
+		mutex:         new(sync.Mutex),
+		flush:         time.NewTicker(10 * time.Second),
+		pendingEvents: atomic.NewUint64(0),
+		clients:       make([]beat.Client, 0),
+	}
+
 	go func() {
 		for {
-			fp.mutex.Lock()
 			select {
 			case <-fp.flush.C:
-				fp.ackPendings()
-			default:
-				if fp.pendingEvents > 3200 {
-					fp.ackPendings()
-				}
+				fp.mutex.Lock()
+				fp.ackEvents()
+				fp.mutex.Unlock()
 			}
-
-			fp.mutex.Unlock()
 		}
 	}()
 
@@ -273,34 +273,43 @@ func newFakePipeline() *fakePipeline {
 
 // fakePipeline returns new ackClients.
 type fakePipeline struct {
-	flush           *time.Ticker
-	mutex           *sync.Mutex
-	pendingEvents   int
-	publishedEvents int
-	events          []*beat.Event
-	log             *logp.Logger
+	flush         *time.Ticker
+	mutex         *sync.Mutex
+	pendingEvents *atomic.Uint64
+	clients       []beat.Client
 }
 
-func (fp *fakePipeline) ackPendings() {
-	for _, eventToACK := range fp.events {
-		if eventToACK.Private.(*awscommon.EventACKTracker).PendingACKs.Load() > 0 {
-			fp.pendingEvents--
-			eventToACK.Private.(*awscommon.EventACKTracker).ACK()
+func (fp *fakePipeline) ackEvents() {
+	for _, client := range fp.clients {
+		acker := client.(*ackClient).acker
+
+		if acker == nil || !acker.isSQSAcker {
+			continue
+		}
+
+		if acker.FullyAcked() {
+			continue
+		}
+
+		ackHandler := NewEventACKHandler()
+		currentEvents := acker.EventsToBeAcked.Load() - acker.TotalEventsAcked.Load()
+		for i := currentEvents; i > 0; i-- {
+			fp.pendingEvents.Dec()
+			ackHandler.AddEvent(beat.Event{Private: acker}, true)
+		}
+
+		if currentEvents > 0 {
+			ackHandler.ACKEvents(int(currentEvents))
 		}
 	}
-
-	events := make([]*beat.Event, 0, len(fp.events))
-	for _, eventToACK := range fp.events {
-		if eventToACK.Private.(*awscommon.EventACKTracker).PendingACKs.Load() > 0 {
-			events = append(events, eventToACK)
-		}
-	}
-
-	fp.events = events
 }
 
 func (fp *fakePipeline) ConnectWith(clientConfig beat.ClientConfig) (beat.Client, error) {
-	return &ackClient{fp: fp}, nil
+	fp.mutex.Lock()
+	client := &ackClient{fp: fp}
+	fp.clients = append(fp.clients, client)
+	fp.mutex.Unlock()
+	return client, nil
 }
 
 func (fp *fakePipeline) Connect() (beat.Client, error) {
@@ -311,16 +320,23 @@ var _ beat.Client = (*ackClient)(nil)
 
 // ackClient is a fake beat.Client that ACKs the published messages.
 type ackClient struct {
-	fp *fakePipeline
+	fp    *fakePipeline
+	acker *EventACKTracker
 }
 
 func (c *ackClient) Close() error { return nil }
 
 func (c *ackClient) Publish(event beat.Event) {
 	c.fp.mutex.Lock()
-	c.fp.pendingEvents++
-	c.fp.publishedEvents++
-	c.fp.events = append(c.fp.events, &event)
+	c.fp.pendingEvents.Inc()
+	if c.acker == nil {
+		c.acker = event.Private.(*EventACKTracker)
+	}
+
+	if c.fp.pendingEvents.Load() > 3200 {
+		c.fp.ackEvents()
+	}
+
 	c.fp.mutex.Unlock()
 }
 
@@ -364,7 +380,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		conf := makeBenchmarkConfig(t)
 
 		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, conf.FileSelectors, backupConfig{}, maxMessagesInflight)
-		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, pipeline, s3EventHandlerFactory, maxMessagesInflight)
+		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, pipeline, s3EventHandlerFactory)
 		sqsReader := newSQSReader(logSqs, metrics, sqsAPI, maxMessagesInflight, sqsMessageHandler)
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -431,7 +447,6 @@ func TestBenchmarkInputSQS(t *testing.T) {
 		benchmarkInputSQS(t, 512),
 		benchmarkInputSQS(t, 1024),
 	}
-
 	headers := []string{
 		"Max Msgs Inflight",
 		"Events total",
@@ -483,7 +498,8 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		metrics := newInputMetrics("test_id", metricRegistry, numberOfWorkers)
 
 		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
-			event.Private.(*awscommon.EventACKTracker).ACK()
+			event.Private.(*EventACKTracker).EventsToBeAcked.Inc()
+			event.Private.(*EventACKTracker).ACK()
 		})
 
 		defer func() {

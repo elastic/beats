@@ -22,7 +22,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -155,8 +154,8 @@ func TestS3ObjectProcessor(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupConfig{}, 1)
-		ack := awscommon.NewEventACKTracker()
-		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
+		ack := NewEventACKTracker(ctx, nil)
+		_, err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
 		require.Error(t, err)
 		assert.True(t, errors.Is(err, errFakeConnectivityFailure), "expected errFakeConnectivityFailure error")
 	})
@@ -177,8 +176,8 @@ func TestS3ObjectProcessor(t *testing.T) {
 			Return(nil, nil)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupConfig{}, 1)
-		ack := awscommon.NewEventACKTracker()
-		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
+		ack := NewEventACKTracker(ctx, nil)
+		_, err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
 		require.Error(t, err)
 	})
 
@@ -204,8 +203,8 @@ func TestS3ObjectProcessor(t *testing.T) {
 		)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupConfig{}, 1)
-		ack := awscommon.NewEventACKTracker()
-		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
+		ack := NewEventACKTracker(ctx, nil)
+		_, err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
 		require.NoError(t, err)
 	})
 
@@ -230,7 +229,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 		)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupCfg, 1)
-		ack := awscommon.NewEventACKTracker()
+		ack := NewEventACKTracker(ctx, nil)
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).FinalizeS3Object()
 		require.NoError(t, err)
 	})
@@ -260,7 +259,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 		)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupCfg, 1)
-		ack := awscommon.NewEventACKTracker()
+		ack := NewEventACKTracker(ctx, nil)
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).FinalizeS3Object()
 		require.NoError(t, err)
 	})
@@ -287,7 +286,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 		)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, nil, backupCfg, 1)
-		ack := awscommon.NewEventACKTracker()
+		ack := NewEventACKTracker(ctx, nil)
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).FinalizeS3Object()
 		require.NoError(t, err)
 	})
@@ -301,15 +300,15 @@ func TestS3ObjectProcessor(t *testing.T) {
 	})
 }
 
-func testProcessS3Object(t testing.TB, file, contentType string, numEvents int, selectors ...fileSelectorConfig) []beat.Event {
+func testProcessS3Object(t testing.TB, file, contentType string, numEvents uint64, selectors ...fileSelectorConfig) []beat.Event {
 	return _testProcessS3Object(t, file, contentType, numEvents, false, selectors)
 }
 
-func testProcessS3ObjectError(t testing.TB, file, contentType string, numEvents int, selectors ...fileSelectorConfig) []beat.Event {
+func testProcessS3ObjectError(t testing.TB, file, contentType string, numEvents uint64, selectors ...fileSelectorConfig) []beat.Event {
 	return _testProcessS3Object(t, file, contentType, numEvents, true, selectors)
 }
 
-func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int, expectErr bool, selectors []fileSelectorConfig) []beat.Event {
+func _testProcessS3Object(t testing.TB, file, contentType string, numEvents uint64, expectErr bool, selectors []fileSelectorConfig) []beat.Event {
 	t.Helper()
 
 	ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
@@ -321,6 +320,7 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 	mockPublisher := NewMockBeatClient(ctrl)
 
 	s3Event, s3Resp := newS3Object(t, file, contentType)
+	ack := NewEventACKTracker(ctx, nil)
 	var events []beat.Event
 	gomock.InOrder(
 		mockS3API.EXPECT().
@@ -328,18 +328,22 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents int,
 			Return(s3Resp, nil),
 		mockPublisher.EXPECT().
 			Publish(gomock.Any()).
-			Do(func(event beat.Event) { events = append(events, event) }).
-			Times(numEvents),
+			Do(func(event beat.Event) {
+				events = append(events, event)
+				ack.EventsToBeAcked.Inc()
+				ack.ACK()
+			}).
+			Times(int(numEvents)),
 	)
 
 	s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, selectors, backupConfig{}, 1)
-	ack := awscommon.NewEventACKTracker()
-	err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
+	s3EventsCreatedTotal, err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
 
 	if !expectErr {
 		require.NoError(t, err)
-		assert.Equal(t, numEvents, len(events))
-		assert.EqualValues(t, numEvents, ack.PendingACKs.Load())
+		assert.EqualValues(t, numEvents, len(events))
+		assert.EqualValues(t, numEvents, ack.TotalEventsAcked.Load())
+		assert.EqualValues(t, numEvents, s3EventsCreatedTotal)
 	} else {
 		require.Error(t, err)
 	}
