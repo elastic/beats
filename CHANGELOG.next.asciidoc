@@ -67,6 +67,7 @@ https://github.com/elastic/beats/compare/v8.2.0\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
 
 *Packetbeat*
 
