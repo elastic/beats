@@ -411,9 +411,9 @@ withModule() {
   local module_path_exclussion="((?!^${module_path_transformed}\\/).)*\$"
   local exclude=("^(${module_path_transformed}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
   if are_paths_changed "${pattern[@]}" && ! are_changed_only_paths "${exclude[@]}"; then
-    MODULE="${module_name}"
+    MODULE=${module_name}
   elif [ -d "${module_path}" ]; then
-    MODULE=""
+    MODULE=''
   fi
   echo "MODULE=$MODULE"
 }
@@ -446,7 +446,7 @@ startCloudTestEnv() {
 withAWS() {
   export AWS_ACCESS_KEY_ID=$BEATS_AWS_ACCESS_KEY
   export AWS_SECRET_ACCESS_KEY=$BEATS_AWS_SECRET_KEY
-  export TEST_TAGS="${TEST_TAGS},aws"
+  export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}aws"
 }
 
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then

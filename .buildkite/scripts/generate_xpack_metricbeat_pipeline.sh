@@ -41,7 +41,7 @@ steps:
       #   key: "mandatory-python-int-test"
       #   command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
       #   env:
-      #     MODULE: "$MODULE"
+      #     MODULE: $MODULE
       #   agents:
       #     provider: "gcp"
       #     image: "${IMAGE_UBUNTU_X86_64}"
@@ -141,7 +141,7 @@ if  are_conditions_met_aws_tests; then
         key: "extended-cloud-test"
         command: ".buildkite/scripts/cloud_tests.sh"
         env:
-          MODULE: "$MODULE"
+          MODULE: $MODULE
         agents:
           provider: "gcp"
           image: "family/core-ubuntu-2204"
