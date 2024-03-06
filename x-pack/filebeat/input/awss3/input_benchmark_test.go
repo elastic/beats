@@ -496,7 +496,11 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		metrics := newInputMetrics("test_id", metricRegistry, numberOfWorkers)
 
 		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
-			event.Private.(*EventACKTracker).EventsToBeAcked.Inc()
+			go func(acker *EventACKTracker) {
+				// 63 is the total number of events in a single S3 object
+				acker.SyncEventsToBeAcked(63)
+			}(event.Private.(*EventACKTracker))
+
 			event.Private.(*EventACKTracker).ACK()
 		})
 

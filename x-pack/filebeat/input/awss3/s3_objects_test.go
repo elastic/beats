@@ -321,6 +321,7 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents uint
 
 	s3Event, s3Resp := newS3Object(t, file, contentType)
 	ack := NewEventACKTracker(ctx, nil)
+	ack.SyncEventsToBeAcked(numEvents)
 	var events []beat.Event
 	gomock.InOrder(
 		mockS3API.EXPECT().
@@ -330,7 +331,6 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents uint
 			Publish(gomock.Any()).
 			Do(func(event beat.Event) {
 				events = append(events, event)
-				ack.EventsToBeAcked.Inc()
 				ack.ACK()
 			}).
 			Times(int(numEvents)),

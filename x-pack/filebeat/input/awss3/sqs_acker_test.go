@@ -18,7 +18,7 @@ func TestEventACKTracker(t *testing.T) {
 	t.Cleanup(cancel)
 
 	acker := NewEventACKTracker(ctx, nil)
-	acker.EventsToBeAcked.Add(1)
+	acker.SyncEventsToBeAcked(1)
 	acker.ACK()
 
 	assert.EqualValues(t, 1, acker.TotalEventsAcked.Load())
@@ -44,7 +44,7 @@ func TestEventACKHandler(t *testing.T) {
 
 	// Create acker. Add one pending ACK.
 	acker := NewEventACKTracker(ctx, nil)
-	acker.EventsToBeAcked.Add(1)
+	acker.SyncEventsToBeAcked(1)
 
 	// Create an ACK handler and simulate one ACKed event.
 	ackHandler := NewEventACKHandler()
@@ -62,12 +62,30 @@ func TestEventACKHandlerWaitForS3(t *testing.T) {
 
 	// Create acker. Add one pending ACK.
 	acker := NewEventACKTracker(ctx, nil)
-	acker.EventsToBeAcked.Inc()
+	acker.SyncEventsToBeAcked(1)
 	acker.ACK()
 	acker.WaitForS3()
+	assert.EqualValues(t, 1, acker.TotalEventsAcked.Load())
+	assert.EqualValues(t, true, acker.FullyAcked())
+
+	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
+}
+
+func TestEventACKHandlerFullyAcked(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	// Create acker. Add one pending ACK.
+	acker := NewEventACKTracker(ctx, nil)
+	acker.SyncEventsToBeAcked(1)
+	acker.ACK()
+	assert.EqualValues(t, 1, acker.TotalEventsAcked.Load())
+	assert.EqualValues(t, true, acker.FullyAcked())
+
+	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
+
 	acker.EventsToBeAcked.Inc()
 
 	assert.EqualValues(t, 1, acker.TotalEventsAcked.Load())
 	assert.EqualValues(t, false, acker.FullyAcked())
-	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
