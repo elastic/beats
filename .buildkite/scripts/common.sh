@@ -450,6 +450,22 @@ startCloudTestEnv() {
   popd > /dev/null
 }
 
+cleanup() {
+  echo "---Terraform Cleanup"
+  .ci/scripts/terraform-cleanup.sh "${MODULE_DIR}"              #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+
+  echo "---Docker Compose Cleanup"
+  docker-compose -f .ci/jobs/docker-compose.yml down -v         #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+}
+
+unset_secrets () {
+  for var in $(printenv | sed 's;=.*;;' | sort); do
+    if [[ "$var" == AWS_* || "$var" == BEATS_AWS_* ]]; then
+      unset "$var"
+    fi
+  done
+}
+
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then
   export ONLY_DOCS="false"
   echo "Changes include files outside the docs_changeset vairiabe. ONLY_DOCS=$ONLY_DOCS."

@@ -31,8 +31,8 @@ steps:
           MODULE: $MODULE
         agents:
           provider: "gcp"
-          image: "family/core-ubuntu-2204"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
@@ -44,8 +44,8 @@ steps:
           MODULE: $MODULE
         agents:
           provider: "gcp"
-          image: "family/core-ubuntu-2204"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
@@ -144,8 +144,8 @@ if  are_conditions_met_aws_tests; then
           MODULE: $MODULE
         agents:
           provider: "gcp"
-          image: "family/core-ubuntu-2204"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
