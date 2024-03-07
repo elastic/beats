@@ -321,7 +321,7 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents uint
 
 	s3Event, s3Resp := newS3Object(t, file, contentType)
 	ack := NewEventACKTracker(ctx, nil)
-	ack.SyncEventsToBeAcked(numEvents)
+	ack.MarkS3FromListingProcessedWithData(numEvents)
 	var events []beat.Event
 	gomock.InOrder(
 		mockS3API.EXPECT().
