@@ -30,6 +30,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+var AllSupportedHints = []string{"enabled", "module", "metricsets", "host", "period", "timeout", "metricspath", "username", "password", "stream", "processors", "multiline", "json", "disable", "ssl", "metrics_filters", "raw", "include_lines", "exclude_lines", "fileset", "pipeline"}
+
 // Config for kubernetes autodiscover provider
 type Config struct {
 	KubeConfig        string                       `config:"kube_config"`

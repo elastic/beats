@@ -155,7 +155,13 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 		e["port"] = port
 	}
 
-	hints := utils.GenerateHints(annotations, "", s.config.Prefix)
+	hints, incorrecthints := utils.GenerateHints(annotations, "", s.config.Prefix, AllSupportedHints)
+	//We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+	if len(incorrecthints) > 0 {
+		for _, value := range incorrecthints {
+			s.logger.Warnf("provided hint: %s/%s is not in the supported list", s.config.Prefix, value)
+		}
+	}
 	s.logger.Debugf("Generated hints %+v", hints)
 
 	if len(hints) != 0 {

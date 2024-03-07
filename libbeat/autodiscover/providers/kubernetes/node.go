@@ -153,7 +153,13 @@ func (n *node) GenerateHints(event bus.Event) bus.Event {
 		e["port"] = port
 	}
 
-	hints := utils.GenerateHints(annotations, "", n.config.Prefix)
+	hints, incorrecthints := utils.GenerateHints(annotations, "", n.config.Prefix, AllSupportedHints)
+	//We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+	if len(incorrecthints) > 0 {
+		for _, value := range incorrecthints {
+			n.logger.Warnf("provided hint: %s/%s is not in the supported list", n.config.Prefix, value)
+		}
+	}
 	n.logger.Debugf("Generated hints %+v", hints)
 	if len(hints) != 0 {
 		e["hints"] = hints
