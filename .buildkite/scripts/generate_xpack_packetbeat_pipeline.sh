@@ -56,8 +56,8 @@ steps:
         matrix:
           setup:
             image:
-              - "platform-ingest-beats-windows-2016-1709815915"
-              - "platform-ingest-beats-windows-2022-1709811171"
+              - "${IMAGE_WIN_2016}"
+              - "${IMAGE_WIN_2022}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       ##  TODO: uncomment when the issue https://github.com/elastic/beats/issues/38142 is solved
@@ -91,9 +91,9 @@ steps:
         matrix:
           setup:
             image:
-              - "platform-ingest-beats-windows-10-1709818219"
+              - "${IMAGE_WIN_10}"
               - "platform-ingest-beats-windows-11-1709821555"
-              - "platform-ingest-beats-windows-2019-1709818219"
+              - "${IMAGE_WIN_2019}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       ##  TODO: uncomment when the issue https://github.com/elastic/beats/issues/38142 is solved
