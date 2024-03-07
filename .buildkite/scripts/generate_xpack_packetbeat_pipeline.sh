@@ -49,6 +49,7 @@ steps:
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
+          imageProject: "elastic-images-qa"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
@@ -83,6 +84,7 @@ steps:
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
+          imageProject: "elastic-images-qa"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
@@ -90,7 +92,6 @@ steps:
           setup:
             image:
               - "platform-ingest-beats-windows-10-1709818219"
-              - "${IMAGE_WIN_11}"
               - "platform-ingest-beats-windows-2019-1709818219"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
