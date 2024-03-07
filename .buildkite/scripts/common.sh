@@ -411,9 +411,10 @@ withModule() {
   local module_path_exclussion="((?!^${module_path_transformed}\\/).)*\$"
   local exclude=("^(${module_path_transformed}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
   if are_paths_changed "${pattern[@]}" && ! are_changed_only_paths "${exclude[@]}"; then
-    MODULE=${module_name}
+    export MODULE="aws"                 # TODO: remove this line and uncomment the line below when the issue with the loop (cycle) is solved
+    # export MODULE=${module_name}
   elif [ -d "${module_path}" ]; then
-    MODULE=''
+    export MODULE=''
   fi
   echo "MODULE=$MODULE"
 }

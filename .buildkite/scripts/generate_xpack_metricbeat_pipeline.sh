@@ -28,7 +28,7 @@ steps:
         key: "mandatory-int-test"
         command: ".buildkite/scripts/go_int_tests.sh"
         env:
-          MODULE: "aws"         #TODO: it has to be replaced with "$MODULE" when the issue with the loop (cycle) is solved
+          MODULE: $MODULE
         agents:
           provider: "gcp"
           image: "family/core-ubuntu-2204"
@@ -41,7 +41,7 @@ steps:
         key: "mandatory-python-int-test"
         command: ".buildkite/scripts/py_int_tests.sh"
         env:
-          MODULE: "aws"         #TODO: it has to be replaced with "$MODULE" when the issue with the loop (cycle) is solved
+          MODULE: $MODULE
         agents:
           provider: "gcp"
           image: "family/core-ubuntu-2204"
@@ -143,7 +143,7 @@ if  are_conditions_met_aws_tests; then
         key: "extended-cloud-test"
         command: ".buildkite/scripts/cloud_tests.sh"
         env:
-          MODULE: "aws"         #TODO: it has to be replaced with "$MODULE" when the issue with the loop (cycle) is solved
+          MODULE: $MODULE
         agents:
           provider: "gcp"
           image: "family/core-ubuntu-2204"
