@@ -555,7 +555,7 @@ func encodeStats(stats *flowStats, ints, uints, floats []string, enableDeltaFlow
 				report[uints[i]] = stats.uints[i]
 				if enableDeltaFlowReporting && (uints[i] == "bytes" || uints[i] == "packets") {
 					// If Delta Flow Reporting is enabled, reset bytes and packets at each period.
-					// Only the bytes and packets recieved during the flow period will be reported.
+					// Only the bytes and packets received during the flow period will be reported.
 					// This should be thread safe as it is called under the flowmetadatatable lock.
 					stats.uints[i] = 0
 				}

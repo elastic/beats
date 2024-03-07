@@ -25,6 +25,7 @@ import (
 	"time"
 
 	"github.com/elastic/go-lookslike/isdef"
+	"gotest.tools/assert"
 
 	"github.com/elastic/go-lookslike"
 
@@ -126,4 +127,27 @@ func TestCreateEvent(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+
+	// when enableDeltaFlowReporting is true, the flow stats should be reset
+	expectbiFlow := &biFlow{
+		id:       id.rawFlowID,
+		killed:   1,
+		createTS: start,
+		ts:       end,
+		dir:      flowDirForward,
+	}
+	expectbiFlow.stats[0] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{0, 0}}
+	expectbiFlow.stats[1] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{0, 0}}
+	event = createEvent(&procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil, true)
+	result = validate(event.Fields)
+	if errs := result.Errors(); len(errs) > 0 {
+		for _, err := range errs {
+			t.Error(err)
+		}
+		t.FailNow()
+	}
+	assert.DeepEqual(t, expectbiFlow.stats[0].uintFlags, bif.stats[0].uintFlags)
+	assert.DeepEqual(t, expectbiFlow.stats[0].uints, bif.stats[0].uints)
+	assert.DeepEqual(t, expectbiFlow.stats[1].uintFlags, bif.stats[1].uintFlags)
+	assert.DeepEqual(t, expectbiFlow.stats[1].uints, bif.stats[1].uints)
 }

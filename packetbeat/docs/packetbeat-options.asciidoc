@@ -462,6 +462,12 @@ disabled, flows are still reported once being timed out. The default value is
 10s.
 
 [float]
+==== `enable_delta_flow_reports`
+
+Configure network.bytes and network.packets to be a delta
+value instead of a cummlative sum for each flow period. The default value is false.
+
+[float]
 [[packetbeat-configuration-flows-fields]]
 ==== `fields`
 
