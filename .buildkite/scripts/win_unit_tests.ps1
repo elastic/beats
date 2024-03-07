@@ -52,6 +52,19 @@ function verifyFileChecksum {
 }
 
 function withGolang($version) {
+    Write-Host "+++ Debug statements"
+    Write-Host "Content of .go"
+    dir c:\users\buildkite\.go
+    Write-Host "User:"
+    whoami
+    Write-Host "Path: $env:PATH"
+    Write-Host "GOPATH: $env:GOPATH"
+    Write-Host "Current directory:"
+    dir
+
+    Write-Host "Pre-command:"
+    dir c:\buildkite-agent\hooks
+
     Write-Host "-- Active go version is: $(go version)"
     installGoDependencies
 }
