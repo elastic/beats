@@ -51,7 +51,7 @@ func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventA
 	ctx, cancel := context.WithCancel(ctx)
 	ackMutex := new(sync.RWMutex)
 	// We need to lock on ack mutex, in order to know that we have passed the info to the acker about the total to be acked
-	// Lock it as soon as we create the acker. It will be unlocked and in either SyncEventsToBeAcked or AddSQSDeletionData
+	// Lock it as soon as we create the acker. It will be unlocked and in either MarkS3FromListingProcessedWithData or MarkSQSProcessedWithData
 	ackMutex.Lock()
 	return &EventACKTracker{
 		ctx:                  ctx,
@@ -64,9 +64,11 @@ func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventA
 	}
 }
 
-func (a *EventACKTracker) SyncEventsToBeAcked(s3EventsCreatedTotal uint64) {
+// MarkS3FromListingProcessedWithData has to be used when the acker is used when the input is in s3 direct listing mode, instead of MarkSQSProcessedWithData
+// Specifically we both Swap the value of EventACKTracker.ackMutexLockedOnInit initialised in NewEventACKTracker
+func (a *EventACKTracker) MarkS3FromListingProcessedWithData(s3EventsCreatedTotal uint64) {
 	// We want to execute the logic of this call only once, when the ack mutex was locked on init
-	if !a.ackMutexLockedOnInit.Load() {
+	if !a.ackMutexLockedOnInit.Swap(false) {
 		return
 	}
 
@@ -76,9 +78,11 @@ func (a *EventACKTracker) SyncEventsToBeAcked(s3EventsCreatedTotal uint64) {
 	a.ackMutexLockedOnInit.Store(false)
 }
 
-func (a *EventACKTracker) AddSQSDeletionData(msg *types.Message, publishedEvent uint64, receiveCount int, start time.Time, processingErr error, handles []s3ObjectHandler, keepaliveCancel context.CancelFunc, keepaliveWg *sync.WaitGroup, msgHandler sqsProcessor, client beat.Client, log *logp.Logger) {
+// MarkSQSProcessedWithData has to be used when the acker is used when the input is in sqs-s3 mode, instead of MarkS3FromListingProcessedWithData
+// Specifically we both Swap the value of EventACKTracker.ackMutexLockedOnInit initialised in NewEventACKTracker
+func (a *EventACKTracker) MarkSQSProcessedWithData(msg *types.Message, publishedEvent uint64, receiveCount int, start time.Time, processingErr error, handles []s3ObjectHandler, keepaliveCancel context.CancelFunc, keepaliveWg *sync.WaitGroup, msgHandler sqsProcessor, client beat.Client, log *logp.Logger) {
 	// We want to execute the logic of this call only once, when the ack mutex was locked on init
-	if !a.ackMutexLockedOnInit.Load() {
+	if !a.ackMutexLockedOnInit.Swap(false) {
 		return
 	}
 
@@ -105,7 +109,7 @@ func (a *EventACKTracker) FullyAcked() bool {
 
 }
 
-// WaitForS3 must be called after SyncEventsToBeAcked
+// WaitForS3 must be called after MarkS3FromListingProcessedWithData
 func (a *EventACKTracker) WaitForS3() {
 	// If it's fully acked then cancel the context.
 	if a.FullyAcked() {
@@ -119,7 +123,9 @@ func (a *EventACKTracker) WaitForS3() {
 // FlushForSQS delete related SQS message
 func (a *EventACKTracker) FlushForSQS() {
 	// This is moved here because clientOnlyACKer.ClientClosed() reset the acker listener (libbeat/common/acker/acker.go:333)
-	defer a.client.Close()
+	if a.client != nil {
+		defer a.client.Close()
+	}
 
 	if !a.isSQSAcker {
 		return

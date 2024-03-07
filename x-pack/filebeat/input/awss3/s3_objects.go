@@ -113,7 +113,7 @@ type s3ObjectProcessor struct {
 }
 
 func (p *s3ObjectProcessor) SyncEventsToBeAcked(s3EventsCreatedTotal uint64) {
-	p.acker.SyncEventsToBeAcked(s3EventsCreatedTotal)
+	p.acker.MarkS3FromListingProcessedWithData(s3EventsCreatedTotal)
 }
 func (p *s3ObjectProcessor) Wait() {
 	p.acker.WaitForS3()
@@ -156,8 +156,8 @@ func (p *s3ObjectProcessor) ProcessS3Object() (uint64, error) {
 	}
 
 	// try to create a decoder from the using the codec config
-	decoder, err := newDecoder(p.readerConfig.Decoding, reader)
-	if err != nil {
+	decoder, decoderErr := newDecoder(p.readerConfig.Decoding, reader)
+	if decoderErr != nil {
 		return 0, err
 	}
 	if decoder != nil {
@@ -165,8 +165,8 @@ func (p *s3ObjectProcessor) ProcessS3Object() (uint64, error) {
 
 		var evtOffset int64
 		for decoder.next() {
-			data, err := decoder.decode()
-			if err != nil {
+			data, decoderErr := decoder.decode()
+			if decoderErr != nil {
 				if errors.Is(err, io.EOF) {
 					return p.s3EventsCreatedTotal, nil
 				}
@@ -237,8 +237,7 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 	dec := json.NewDecoder(r)
 	dec.UseNumber()
 
-	// why we check ctx.Err() here?
-	for dec.More() && (errors.Is(p.ctx.Err(), context.Canceled) || p.ctx.Err() == nil) {
+	for dec.More() && p.ctx.Err() == nil {
 		offset := dec.InputOffset()
 
 		var item json.RawMessage
@@ -275,8 +274,7 @@ func (p *s3ObjectProcessor) readJSONSlice(r io.Reader, evtOffset int64) (int64, 
 	}
 
 	// we track each event offset separately since we are reading a slice.
-	// why we check ctx.Err() here?
-	for dec.More() && (errors.Is(p.ctx.Err(), context.Canceled) || p.ctx.Err() == nil) {
+	for dec.More() && p.ctx.Err() == nil {
 		var item json.RawMessage
 		if err := dec.Decode(&item); err != nil {
 			return -1, fmt.Errorf("failed to decode json: %w", err)
@@ -295,7 +293,7 @@ func (p *s3ObjectProcessor) readJSONSlice(r io.Reader, evtOffset int64) (int64, 
 		evtOffset++
 	}
 
-	return evtOffset, nil
+	return evtOffset, p.ctx.Err()
 }
 
 func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offset int64, objHash string) error {
