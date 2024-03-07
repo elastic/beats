@@ -101,7 +101,7 @@ steps:
     agents:
       provider: "gcp"
     env:
-      DRA_PROJECT_ID: "elastic-agent-package"
+      DRA_PROJECT_ID: "elastic_agent_package"
       DRA_PROJECT_ARTIFACT_ID: "agent-package"
       # TODO: remove --build 018e118c-7f65-478b-a519-608df4a59479
     command: |
