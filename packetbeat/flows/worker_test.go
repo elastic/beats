@@ -65,7 +65,7 @@ func TestCreateEvent(t *testing.T) {
 	}
 	bif.stats[0] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{10, 1}}
 	bif.stats[1] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{460, 2}}
-	event := createEvent(&procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil)
+	event := createEvent(&procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil, false)
 
 	// Validate the contents of the event.
 	validate := lookslike.MustCompile(map[string]interface{}{
