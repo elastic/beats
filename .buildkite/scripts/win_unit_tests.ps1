@@ -65,7 +65,8 @@ function withGolang($version) {
     # Write-Host "Pre-command:"
     # dir c:\buildkite-agent\hooks
 
-    Write-Host "-- Active go version is: $(go version)"
+    Write-Host "-- Active go version is: $(go version), under:"
+    Get-Command go.exe
     installGoDependencies
 }
 
