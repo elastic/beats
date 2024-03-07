@@ -51,6 +51,7 @@ steps:
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
+          imageProject: "elastic-images-qa"
           image: "{{matrix.image}}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
@@ -59,7 +60,7 @@ steps:
           setup:
             image:
               - "${IMAGE_WIN_2016}"
-              - "${IMAGE_WIN_2022}"
+              - "platform-ingest-beats-windows-2022-1709811171"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 ## TODO: this condition will be changed in the Phase 3 of the Migration Plan https://docs.google.com/document/d/1IPNprVtcnHlem-uyGZM0zGzhfUuFAh4LeSl9JFHMSZQ/edit#heading=h.sltz78yy249h

@@ -52,17 +52,7 @@ function verifyFileChecksum {
 }
 
 function withGolang($version) {
-    Write-Host "-- Installing Go $version --"
-    $goDownloadPath = Join-Path $env:TEMP "go_installer.msi"
-    $goInstallerUrl = "https://golang.org/dl/go$version.windows-amd64.msi"
-    retry -retries 5 -scriptBlock {
-        Invoke-WebRequest -Uri $goInstallerUrl -OutFile $goDownloadPath
-    }
-    Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $goDownloadPath /quiet" -Wait
-    $env:GOPATH = "${env:ProgramFiles}\Go"
-    $env:GOBIN = "${env:GOPATH}\bin"
-    $env:Path += ";$env:GOPATH;$env:GOBIN"
-    go version
+    Write-Host "-- Active go version is: $(go version)"
     installGoDependencies
 }
 
@@ -103,7 +93,6 @@ function withMinGW {
 }
 function installGoDependencies {
     $installPackages = @(
-        "github.com/magefile/mage"
         "github.com/elastic/go-licenser"
         "golang.org/x/tools/cmd/goimports"
         "github.com/jstemmer/go-junit-report/v2"
