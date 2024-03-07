@@ -716,6 +716,12 @@ spec:
       description: Buildkite pipeline for packaging Elastic Agent core binary and publish it to DRA
     spec:
       pipeline_file: ".buildkite/x-pack/elastic-agent/.buildkite/pipeline.xpack.elastic-agent-binary-dra.yml"
+      provider_settings:
+        build_branches: true
+        build_pull_requests: true
+        cancel_deleted_branch_builds: true
+        filter_condition: 'build.branch == "7.17" || build.pull_request.base_branch == "7.17"'
+        filter_enabled: true
       repository: elastic/beats
       teams:
         ingest-fp:
