@@ -50,6 +50,7 @@ steps:
     steps:
       - label: "Package elastic-agent"
         key: package_elastic-agent
+        if: "false"
         command: |
           if [[ -z "$${ManifestURL}" ]]; then
             export ManifestURL=$(buildkite-agent meta-data get ManifestURL --default "")
@@ -69,6 +70,7 @@ steps:
           provider: "gcp"
           image: "family/platform-ingest-beats-ubuntu-2204"
       - label: "Package ARM elastic-agent"
+        if: "false"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
@@ -101,11 +103,11 @@ steps:
     env:
       DRA_PROJECT_ID: "elastic-agent-package"
       DRA_PROJECT_ARTIFACT_ID: "agent-package"
-      # TODO: remove --build 018e09fc-f390-4b59-9bda-afbdc7602bcc
+      # TODO: remove --build 018e118c-7f65-478b-a519-608df4a59479
     command: |
       echo "+++ Restoring Artifacts"
       mkdir build       
-      buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" .
+      buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" --build 018e118c-7f65-478b-a519-608df4a59479 .
       echo "+++ Changing permissions for the release manager"
       sudo chown -R :1000 x-pack/elastic-agent/build/distributions/
       echo "+++ Running DRA publish step"
