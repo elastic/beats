@@ -24,10 +24,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/elastic/go-lookslike"
 	"github.com/elastic/go-lookslike/isdef"
 	"gotest.tools/assert"
-
-	"github.com/elastic/go-lookslike"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/packetbeat/procs"
@@ -117,7 +116,7 @@ func TestCreateEvent(t *testing.T) {
 
 	// Write the event to disk if -data is used.
 	if *dataFlag {
-		event.Fields.Put("@timestamp", common.Time(end)) //nolint:errcheck // Never fails.
+		event.Fields.Put("@timestamp", common.Time(end))
 		output, err := json.MarshalIndent(&event.Fields, "", "  ")
 		if err != nil {
 			t.Fatal(err)
