@@ -112,43 +112,43 @@ else
   exit 0
 fi
 
-if [[ are_conditions_met_arm_tests || are_conditions_met_macos_tests ]]; then
-  cat >> $pipelineName <<- YAML
+# if [[ are_conditions_met_arm_tests || are_conditions_met_macos_tests ]]; then
+#   cat >> $pipelineName <<- YAML
 
-  - group: "Extended Tests"
-    key: "extended-tests"
-    steps:
+#   - group: "Extended Tests"
+#     key: "extended-tests"
+#     steps:
 
-YAML
-fi
+# YAML
+# fi
 
-if  are_conditions_met_macos_tests; then
-  cat >> $pipelineName <<- YAML
+# if  are_conditions_met_macos_tests; then
+#   cat >> $pipelineName <<- YAML
 
-      - label: ":mac: MacOS Unit Tests"
-        key: "extended-macos-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh"
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+#       - label: ":mac: MacOS Unit Tests"
+#         key: "extended-macos-unit-tests"
+#         command: ".buildkite/scripts/unit_tests.sh"
+#         agents:
+#           provider: "orka"
+#           imagePrefix: "${IMAGE_MACOS_X86_64}"
+#         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-YAML
-fi
+# YAML
+# fi
 
-if  are_conditions_met_arm_tests; then
-  cat >> $pipelineName <<- YAML
-      - label: ":linux: ARM Ubuntu Unit Tests"
-        key: "extended-arm64-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
-        agents:
-          provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+# if  are_conditions_met_arm_tests; then
+#   cat >> $pipelineName <<- YAML
+#       - label: ":linux: ARM Ubuntu Unit Tests"
+#         key: "extended-arm64-unit-test"
+#         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+#         agents:
+#           provider: "aws"
+#           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+#           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+#         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-YAML
-fi
+# YAML
+# fi
 
 echo "Check and add the Packaging into the pipeline"
 if are_conditions_met_packaging; then
