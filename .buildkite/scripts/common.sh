@@ -426,6 +426,12 @@ terraformInit() {
   popd > /dev/null
 }
 
+withAWS() {
+  export AWS_ACCESS_KEY_ID=$BEATS_AWS_ACCESS_KEY
+  export AWS_SECRET_ACCESS_KEY=$BEATS_AWS_SECRET_KEY
+  export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}aws"
+}
+
 startCloudTestEnv() {
   local dir=$1
   withAWS
@@ -441,12 +447,6 @@ startCloudTestEnv() {
   pushd "${dir}" > /dev/null
   terraform apply -auto-approve
   popd > /dev/null
-}
-
-withAWS() {
-  export AWS_ACCESS_KEY_ID=$BEATS_AWS_ACCESS_KEY
-  export AWS_SECRET_ACCESS_KEY=$BEATS_AWS_SECRET_KEY
-  export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}aws"
 }
 
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then

@@ -26,27 +26,29 @@ steps:
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
-        # env:
-        #   MODULE: "aws"         #TODO: replace with "$MODULE" when the issue is solved
+        command: ".buildkite/scripts/go_int_tests.sh"
+        env:
+          MODULE: $MODULE         #TODO: uncomment when the issue is solved
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-          # disk_size: 100
-          # disk_type: "pd-ssd"
+          image: "family/core-ubuntu-2204"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
-      # - label: ":python: Python Integration Tests"
-      #   key: "mandatory-python-int-test"
-      #   command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
-      #   env:
-      #     MODULE: $MODULE
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_UBUNTU_X86_64}"
-      #     machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-      #   artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
+      - label: ":python: Python Integration Tests"
+        key: "mandatory-python-int-test"
+        command: ".buildkite/scripts/py_int_tests.sh"
+        env:
+          MODULE: $MODULE
+        agents:
+          provider: "gcp"
+          image: "family/core-ubuntu-2204"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       # - label: ":windows: Windows Unit Tests - {{matrix.image}}"
       #   command: ".buildkite/scripts/win_unit_tests.ps1"
@@ -141,13 +143,13 @@ if  are_conditions_met_aws_tests; then
         key: "extended-cloud-test"
         command: ".buildkite/scripts/cloud_tests.sh"
         # env:
-        #   MODULE: "aws"         #TODO: replace with "$MODULE" when the issue is solved
+        #   MODULE: $MODULE         #TODO: uncomment when the issue is solved
         agents:
           provider: "gcp"
           image: "family/core-ubuntu-2204"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-          # disk_size: 100
-          # disk_type: "pd-ssd"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
