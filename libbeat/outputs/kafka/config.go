@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"regexp"
 	"strings"
 	"time"
 
@@ -108,6 +109,11 @@ var compressionModes = map[string]sarama.CompressionCodec{
 	"snappy": sarama.CompressionSnappy,
 }
 
+// validTopicRegExp is used to validate the topic contains only valid characters
+// when running under Elastic-Agent. The regexp is taken from:
+// https://github.com/apache/kafka/blob/a126e3a622f2b7142f3543b9dbee54b6412ba9d8/clients/src/main/java/org/apache/kafka/common/internals/Topic.java#L33
+var validTopicRegExp = regexp.MustCompile("^[a-zA-Z0-9._-]+$")
+
 func defaultConfig() kafkaConfig {
 	return kafkaConfig{
 		Hosts:              nil,
@@ -186,6 +192,10 @@ func (c *kafkaConfig) Validate() error {
 	if management.UnderAgent() {
 		if len(c.Topics) != 0 {
 			return errors.New("'topics' is not supported when running under Elastic-Agent")
+		}
+
+		if !validTopicRegExp.MatchString(c.Topic) {
+			return fmt.Errorf("topic '%s' is invalid, it must match '[a-zA-Z0-9._-]'", c.Topic)
 		}
 	}
 

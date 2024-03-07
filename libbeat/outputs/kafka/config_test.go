@@ -114,7 +114,7 @@ func TestConfigInvalid(t *testing.T) {
 	}
 }
 
-func TestInvalidConfigUnderElasticAgent(t *testing.T) {
+func TestConfigUnderElasticAgent(t *testing.T) {
 	oldUnderAgent := management.UnderAgent()
 	t.Cleanup(func() {
 		// Restore the previous value
@@ -122,28 +122,66 @@ func TestInvalidConfigUnderElasticAgent(t *testing.T) {
 	})
 
 	management.SetUnderAgent(true)
-	tests := map[string]mapstr.M{
-		"topics is provided": mapstr.M{
-			"topics": []string{"foo", "bar"},
+
+	tests := []struct {
+		name        string
+		cfg         mapstr.M
+		expectError bool
+	}{
+		{
+			name: "topic with all valid characters",
+			cfg: mapstr.M{
+				"topic": "abcdefghijklmnopqrstuvxz-ABCDEFGHIJKLMNOPQRSTUVXZ_01234567890.",
+			},
+		},
+		{
+			name: "topics is provided",
+			cfg: mapstr.M{
+				"topics": []string{"foo", "bar"},
+			},
+			expectError: true,
+		},
+		{
+			name: "topic cannot contain invalid characters",
+			cfg: mapstr.M{
+				"topic": "foo bar",
+			},
+			expectError: true,
+		},
+		{
+			name: "topic with invalid characters",
+			cfg: mapstr.M{
+				"topic": "foo + bar",
+			},
+			expectError: true,
 		},
 		// The default config does not set `topic` not `topics`.
-		"No topics or topic provided": mapstr.M{},
+		{
+			name:        "empty config is invalid",
+			cfg:         mapstr.M{},
+			expectError: true,
+		},
 	}
 
-	for name, test := range tests {
+	for _, test := range tests {
 		test := test
-		t.Run(name, func(t *testing.T) {
-			c := config.MustNewConfigFrom(test)
+		t.Run(test.name, func(t *testing.T) {
+			c := config.MustNewConfigFrom(test.cfg)
 			if err := c.SetString("hosts", 0, "localhost"); err != nil {
 				t.Fatalf("could not set 'hosts' on config: %s", err)
 			}
+
 			_, err := readConfig(c)
-			if err == nil {
-				t.Fatalf("Can create test configuration from invalid input")
+
+			if test.expectError && err == nil {
+				t.Fatalf("invalid configuration must not be created")
+			}
+
+			if !test.expectError && err != nil {
+				t.Fatalf("could not create config: %s", err)
 			}
 		})
 	}
-
 }
 
 func TestBackoffFunc(t *testing.T) {
