@@ -22,8 +22,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 
 	as "github.com/aerospike/aerospike-client-go"
 )
