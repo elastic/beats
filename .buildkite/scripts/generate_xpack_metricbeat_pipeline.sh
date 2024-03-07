@@ -142,8 +142,8 @@ if  are_conditions_met_aws_tests; then
       - label: ":linux: ${MODULE^^} Cloud Tests"
         key: "extended-cloud-test"
         command: ".buildkite/scripts/cloud_tests.sh"
-        # env:
-        #   MODULE: $MODULE         #TODO: uncomment when the issue is solved
+        env:
+          MODULE: $MODULE         #TODO: uncomment when the issue is solved
         agents:
           provider: "gcp"
           image: "family/core-ubuntu-2204"
