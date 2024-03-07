@@ -413,8 +413,8 @@ withModule() {
   if are_paths_changed "${pattern[@]}" && ! are_changed_only_paths "${exclude[@]}"; then
     export MODULE=${module_name}
   elif [ -d "${module_path}" ]; then
-    export MODULE="aws"                 # TODO: remove this line and uncomment the line below when the issue with the loop (cycle) is solved
-    # export MODULE=''
+    export MODULE="aws"                 # TODO: remove this line and uncomment the line below when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
+    # export MODULE=''                  # TODO: uncomment the line when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
   fi
   echo "MODULE=$MODULE"
 }
