@@ -11,6 +11,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Affecting all Beats*
 
 - Upgrade to Go 1.22.1. {pull}37913[37913]
+- Upgrade to Go 1.21.8. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}38209[38209]
 - add_cloud_metadata processor: `huawei` provider is now treated as `openstack`. Huawei cloud runs on OpenStack
 platform, and when viewed from a metadata API standpoint, it is impossible to differentiate it from OpenStack. If you
 know that your deployments run on Huawei Cloud exclusively, and you wish to have `cloud.provider` value as `huawei`,
