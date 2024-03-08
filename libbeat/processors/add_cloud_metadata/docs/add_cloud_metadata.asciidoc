@@ -55,7 +55,7 @@ List of names the `providers` setting supports:
 
 - "alibaba", or "ecs" for the Alibaba Cloud provider (disabled by default).
 - "azure" for Azure Virtual Machine (enabled by default).
-   If the Virtual Machine is part of an AKS managed cluster, the fields
+   If the virtual machine is part of an AKS managed cluster, the fields
    `orchestrator.cluster.name` and `orchestrator.cluster.id` can also be
    retrieved. "TENANT_ID", "CLIENT_ID" and "CLIENT_SECRET" environment
    variables need to be set for authentication purposes. If not set we
