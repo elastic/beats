@@ -2140,6 +2140,10 @@ func (s *mockUpdaterWatcher) Start() error {
 	return err
 }
 
+func (s *mockUpdaterWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
+	return nil
+}
+
 func (s *mockUpdaterWatcher) Stop() {
 }
 
