@@ -254,7 +254,7 @@ func newFakePipeline() *fakePipeline {
 		mutex:         new(sync.Mutex),
 		flush:         time.NewTicker(10 * time.Second),
 		pendingEvents: atomic.NewUint64(0),
-		clients:       make([]beat.Client, 0),
+		clients:       make([]*ackClient, 0),
 	}
 
 	go func() {
@@ -274,37 +274,33 @@ type fakePipeline struct {
 	flush         *time.Ticker
 	mutex         *sync.Mutex
 	pendingEvents *atomic.Uint64
-	clients       []beat.Client
+	clients       []*ackClient
 }
 
 func (fp *fakePipeline) ackEvents() {
 	for _, client := range fp.clients {
-		acker := client.(*ackClient).acker
+		for _, acker := range client.ackers {
+			if acker.FullyAcked() {
+				continue
+			}
 
-		if acker == nil || !acker.isSQSAcker {
-			continue
-		}
+			addedEvents := 0
+			for acker.EventsToBeAcked.Load() > 0 && uint64(addedEvents) < acker.EventsToBeAcked.Load() {
+				addedEvents++
+				fp.pendingEvents.Dec()
+				client.eventListener.AddEvent(beat.Event{Private: acker}, true)
+			}
 
-		if acker.FullyAcked() {
-			continue
-		}
-
-		ackHandler := NewEventACKHandler()
-		currentEvents := acker.EventsToBeAcked.Load() - acker.TotalEventsAcked.Load()
-		for i := currentEvents; i > 0; i-- {
-			fp.pendingEvents.Dec()
-			ackHandler.AddEvent(beat.Event{Private: acker}, true)
-		}
-
-		if currentEvents > 0 {
-			ackHandler.ACKEvents(int(currentEvents))
+			if addedEvents > 0 {
+				client.eventListener.ACKEvents(addedEvents)
+			}
 		}
 	}
 }
 
 func (fp *fakePipeline) ConnectWith(clientConfig beat.ClientConfig) (beat.Client, error) {
 	fp.mutex.Lock()
-	client := &ackClient{fp: fp}
+	client := &ackClient{fp: fp, ackers: make(map[uint64]*EventACKTracker), eventListener: NewEventACKHandler()}
 	fp.clients = append(fp.clients, client)
 	fp.mutex.Unlock()
 	return client, nil
@@ -318,8 +314,9 @@ var _ beat.Client = (*ackClient)(nil)
 
 // ackClient is a fake beat.Client that ACKs the published messages.
 type ackClient struct {
-	fp    *fakePipeline
-	acker *EventACKTracker
+	fp            *fakePipeline
+	ackers        map[uint64]*EventACKTracker
+	eventListener beat.EventListener
 }
 
 func (c *ackClient) Close() error { return nil }
@@ -327,10 +324,8 @@ func (c *ackClient) Close() error { return nil }
 func (c *ackClient) Publish(event beat.Event) {
 	c.fp.mutex.Lock()
 	c.fp.pendingEvents.Inc()
-	if c.acker == nil {
-		c.acker = event.Private.(*EventACKTracker)
-	}
-
+	acker := event.Private.(*EventACKTracker)
+	c.ackers[acker.ID] = acker
 	if c.fp.pendingEvents.Load() > 3200 {
 		c.fp.ackEvents()
 	}

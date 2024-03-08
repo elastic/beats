@@ -342,8 +342,8 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents uint
 	if !expectErr {
 		require.NoError(t, err)
 		assert.EqualValues(t, numEvents, len(events))
-		assert.EqualValues(t, numEvents, ack.TotalEventsAcked.Load())
 		assert.EqualValues(t, numEvents, s3EventsCreatedTotal)
+		assert.EqualValues(t, 0, ack.EventsToBeAcked.Load())
 	} else {
 		require.Error(t, err)
 	}

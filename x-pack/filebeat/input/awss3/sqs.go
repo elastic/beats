@@ -158,10 +158,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 		r.metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
 
 		for _, msg := range msgs {
-			// Send each SQS message to a channel where a fixed amount of goroutines will process all of them asynchronously.
-			go func(msg types.Message, start time.Time) {
-				workersChan <- processingData{msg: msg, start: start}
-			}(msg, time.Now())
+			workersChan <- processingData{msg: msg, start: time.Now()}
 		}
 	}
 
@@ -172,8 +169,10 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 	workersWg.Wait()
 
 	// Wait for all deletion to happen.
-	for deletionWaiter.Load() {
-		_ = timed.Wait(ctx, 500*time.Millisecond)
+	if r.metrics.sqsMessagesReceivedTotal.Get() > 0 {
+		for deletionWaiter.Load() {
+			_ = timed.Wait(ctx, 500*time.Millisecond)
+		}
 	}
 
 	deletionWg.Wait()

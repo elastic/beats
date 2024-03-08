@@ -71,29 +71,27 @@ func TestSQSReceiver(t *testing.T) {
 		mockClient := NewMockBeatClient(ctrl)
 		mockBeatPipeline := NewMockBeatPipeline(ctrl)
 
-		gomock.InOrder(
-			mockBeatPipeline.EXPECT().ConnectWith(gomock.Any()).Return(mockClient, nil),
-			// Expect the one message returned to have been processed.
-			mockMsgHandler.EXPECT().
-				ProcessSQS(gomock.Any(), gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any()).
-				Times(1).
-				DoAndReturn(
-					func(ctx context.Context, msg *types.Message, _ beat.Client, acker *EventACKTracker, _ time.Time) error {
-						_, keepaliveCancel := context.WithCancel(ctx)
-						log := log.Named("sqs_s3_event")
-						acker.MarkSQSProcessedWithData(msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, mockClient, log)
-						acker.ACK()
-						acker.FlushForSQS()
+		mockBeatPipeline.EXPECT().ConnectWith(gomock.Any()).Return(mockClient, nil).Times(maxMessages)
 
-						return nil
-					}),
-		)
+		// Expect the one message returned to have been processed.
+		mockMsgHandler.EXPECT().
+			ProcessSQS(gomock.Any(), gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any()).
+			Times(1).
+			DoAndReturn(
+				func(ctx context.Context, msg *types.Message, _ beat.Client, acker *EventACKTracker, _ time.Time) error {
+					_, keepaliveCancel := context.WithCancel(ctx)
+					log := log.Named("sqs_s3_event")
+					acker.MarkSQSProcessedWithData(msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
+					acker.ACK()
+					acker.FlushForSQS()
 
-		// The two expected calls happen in different goroutines, we cannot enforce an oder
+					return nil
+				})
+
 		// Expect the client to be closed
-		mockClient.EXPECT().Close()
+		mockClient.EXPECT().Close().Times(maxMessages)
+
 		// Expect the one message returned to have been deleted.
-		// We
 		mockMsgHandler.EXPECT().
 			DeleteSQS(gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any()).
 			Times(1).
@@ -114,6 +112,11 @@ func TestSQSReceiver(t *testing.T) {
 		mockAPI := NewMockSQSAPI(ctrl)
 		mockMsgHandler := NewMockSQSProcessor(ctrl)
 
+		mockClient := NewMockBeatClient(ctrl)
+		mockBeatPipeline := NewMockBeatPipeline(ctrl)
+
+		mockBeatPipeline.EXPECT().ConnectWith(gomock.Any()).Return(mockClient, nil).Times(maxMessages)
+
 		gomock.InOrder(
 			// Initial ReceiveMessage gets an error.
 			mockAPI.EXPECT().
@@ -132,7 +135,9 @@ func TestSQSReceiver(t *testing.T) {
 				}),
 		)
 
-		mockBeatPipeline := NewMockBeatPipeline(ctrl)
+		// Expect the client to be closed
+		mockClient.EXPECT().Close().Times(maxMessages)
+
 		// Execute SQSReceiver and verify calls/state.
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler, mockBeatPipeline)
 		require.NoError(t, receiver.Receive(ctx))

@@ -21,7 +21,6 @@ func TestEventACKTracker(t *testing.T) {
 	acker.MarkS3FromListingProcessedWithData(1)
 	acker.ACK()
 
-	assert.EqualValues(t, 1, acker.TotalEventsAcked.Load())
 	assert.EqualValues(t, true, acker.FullyAcked())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
@@ -51,7 +50,6 @@ func TestEventACKHandler(t *testing.T) {
 	ackHandler.AddEvent(beat.Event{Private: acker}, true)
 	ackHandler.ACKEvents(1)
 
-	assert.EqualValues(t, 1, acker.TotalEventsAcked.Load())
 	assert.EqualValues(t, true, acker.FullyAcked())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
@@ -65,7 +63,6 @@ func TestEventACKHandlerWaitForS3(t *testing.T) {
 	acker.MarkS3FromListingProcessedWithData(1)
 	acker.ACK()
 	acker.WaitForS3()
-	assert.EqualValues(t, 1, acker.TotalEventsAcked.Load())
 	assert.EqualValues(t, true, acker.FullyAcked())
 
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
@@ -79,13 +76,11 @@ func TestEventACKHandlerFullyAcked(t *testing.T) {
 	acker := NewEventACKTracker(ctx, nil)
 	acker.MarkS3FromListingProcessedWithData(1)
 	acker.ACK()
-	assert.EqualValues(t, 1, acker.TotalEventsAcked.Load())
 	assert.EqualValues(t, true, acker.FullyAcked())
 
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 
 	acker.EventsToBeAcked.Inc()
 
-	assert.EqualValues(t, 1, acker.TotalEventsAcked.Load())
 	assert.EqualValues(t, false, acker.FullyAcked())
 }
