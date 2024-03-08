@@ -54,7 +54,7 @@ func newAzureMetadataFetcher(
 }
 
 // NewClusterClient returns a NewManagedClustersClient
-var NewClusterClient func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient = func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient {
+var NewClusterClient = func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient {
 	return clientFactory.NewManagedClustersClient()
 }
 
