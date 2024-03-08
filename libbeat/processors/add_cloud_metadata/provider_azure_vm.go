@@ -104,7 +104,7 @@ var azureVMMetadataFetcher = provider{
 		if err != nil {
 			return hfetcher, fmt.Errorf("failed to create new http metadata fetcher: %w", err)
 		}
-		// fetcher represents an azure metadata fetcher. The struct includes two type of fetchers.
+		// fetcher represents an azure metadata fetcher. The struct includes two types of fetchers.
 		// 1. An http fetcher(hfetcher) which retrieves metadata from azure metadata endpoint and
 		// 2. A generic fetcher(gfetcher) which uses azure sdk to retrieve metadata of azure managed clusters.
 		fetcher, err := newAzureMetadataFetcher("azure", hfetcher)
