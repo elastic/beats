@@ -125,8 +125,8 @@ var azureVMMetadataFetcher = provider{
 }
 
 // fetchMetadata fetches azure vm metadata from
-// 1. Azure metadata endpoint with httpMetadataFetcher
-// 2. Azure Managed Clusters using azure sdk  with genericMetadataFetcher
+//   1. Azure metadata endpoint with httpMetadataFetcher
+//   2. Azure Managed Clusters using azure sdk  with genericMetadataFetcher
 func (az *azureMetadataFetcher) fetchMetadata(ctx context.Context, client http.Client) result {
 	res := result{provider: az.provider, metadata: mapstr.M{}, err: nil}
 	logger := logp.NewLogger("add_cloud_metadata")
