@@ -106,15 +106,15 @@ function withMinGW {
 
 }
 function installGoDependencies {
-    $installPackages = @(
-        "github.com/elastic/go-licenser"
-        "golang.org/x/tools/cmd/goimports"
-        "github.com/jstemmer/go-junit-report/v2"
-        "gotest.tools/gotestsum"
-    )
-    foreach ($pkg in $installPackages) {
-        go install "$pkg@latest"
-    }
+    # $installPackages = @(
+    #     "github.com/elastic/go-licenser"
+    #     "golang.org/x/tools/cmd/goimports"
+    #     "github.com/jstemmer/go-junit-report/v2"
+    #     "gotest.tools/gotestsum"
+    # )
+    # foreach ($pkg in $installPackages) {
+    #     go install "$pkg@latest"
+    # }
 }
 
 function withNmap($version) {

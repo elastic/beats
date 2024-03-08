@@ -92,7 +92,7 @@ steps:
           setup:
             image:
               - "${IMAGE_WIN_10}"
-              - "platform-ingest-beats-windows-11-1709821555"
+              - "${IMAGE_WIN_11}"
               - "${IMAGE_WIN_2019}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
