@@ -71,6 +71,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - Fix the paths in the .cmd script added to the path by the Windows MSI to point to the new C:\Program Files installation location. https://github.com/elastic/elastic-stack-installers/pull/238
+- Upgrade elastic-agent-system-metrics to v0.9.2. Skips permissions errors when reading /proc/pid/io. {pull}38234[38234].
 
 *Auditbeat*
 
