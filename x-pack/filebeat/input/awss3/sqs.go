@@ -7,6 +7,8 @@ package awss3
 import (
 	"context"
 	"errors"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/go-concert/timed"
 	"strconv"
 	"sync"
 	"time"
@@ -16,7 +18,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/timed"
 )
 
 const (
@@ -50,26 +51,100 @@ func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessag
 	}
 }
 
+type processingData struct {
+	msg   types.Message
+	start time.Time
+}
+
 func (r *sqsReader) Receive(ctx context.Context) error {
-	// The loop tries to keep the ProcessSQS workers busy as much as possible while
-	// honoring the max message cap as opposed to a simpler loop that receives
-	// N messages, waits for them all to finish sending events to the queue, then requests N more messages.
-	var processingWg sync.WaitGroup
+	workersWg := new(sync.WaitGroup)
+	workersWg.Add(r.maxMessagesInflight)
+	workersChan := make(chan processingData, r.maxMessagesInflight)
 
 	deletionWg := new(sync.WaitGroup)
+	deletionWaiter := atomic.NewBool(true)
 
-	for ctx.Err() == nil {
-		// Determine how many SQS workers are available.
-		workers, err := r.workerSem.AcquireContext(r.maxMessagesInflight, ctx)
+	var clientsMutex sync.Mutex
+	clients := make(map[uint64]beat.Client, r.maxMessagesInflight)
+
+	// Start a fixed amount of goroutines that will process all the SQS messages sent to the workersChan asynchronously.
+	for i := 0; i < r.maxMessagesInflight; i++ {
+		id := r.metrics.beginSQSWorker()
+
+		// Create a pipeline client scoped to this goroutine.
+		client, err := r.pipeline.ConnectWith(beat.ClientConfig{
+			EventListener: NewEventACKHandler(),
+			Processing: beat.ProcessingConfig{
+				// This input only produces events with basic types so normalization
+				// is not required.
+				EventNormalization: boolPtr(false),
+			},
+		})
+
+		clientsMutex.Lock()
+		clients[id] = client
+		clientsMutex.Unlock()
+
 		if err != nil {
-			break
+			r.log.Warnw("Failed setting up worker.",
+				"worker_id", id,
+				"error", err)
+
+			r.metrics.endSQSWorker(id)
+			workersWg.Done()
 		}
 
-		// Receive (at most) as many SQS messages as there are workers.
-		msgs, err := r.sqs.ReceiveMessage(ctx, workers)
-		if err != nil {
-			r.workerSem.Release(workers)
+		go func(id uint64, client beat.Client) {
+			defer func() {
+				// Mark processing wait group as done.
+				r.metrics.endSQSWorker(id)
+				workersWg.Done()
+			}()
+			for {
+				incomingData, ok := <-workersChan
+				if !ok {
+					return
+				}
 
+				deletionWg.Add(1)
+				deletionWaiter.Swap(false)
+
+				msg := incomingData.msg
+				start := incomingData.start
+
+				r.log.Debugw("Going to process SQS message.",
+					"worker_id", id,
+					"message_id", *msg.MessageId,
+					"elapsed_time_ns", time.Since(start))
+
+				acker := NewEventACKTracker(ctx, deletionWg)
+
+				err = r.msgHandler.ProcessSQS(ctx, &msg, client, acker, start)
+				if err != nil {
+					r.log.Warnw("Failed processing SQS message.",
+						"worker_id", id,
+						"error", err,
+						"message_id", *msg.MessageId,
+						"elapsed_time_ns", time.Since(start))
+
+					return
+				}
+
+				r.log.Debugw("Success processing SQS message.",
+					"worker_id", id,
+					"message_id", msg.MessageId,
+					"elapsed_time_ns", time.Since(start))
+			}
+		}(id, client)
+	}
+
+	// The loop tries to keep a fixed amount of goroutines that process SQS message busy as much as possible while
+	// honoring the max message cap as opposed to a simpler loop that receives N messages, waits for them all to finish
+	// sending events to the queue, then requests N more messages.
+	for ctx.Err() == nil {
+		// Receive (at most) as many SQS messages as there are workers.
+		msgs, err := r.sqs.ReceiveMessage(ctx, r.maxMessagesInflight)
+		if err != nil {
 			if ctx.Err() == nil {
 				r.log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
 
@@ -79,74 +154,31 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 			continue
 		}
 
-		// Release unused workers.
-		r.workerSem.Release(workers - len(msgs))
-
 		r.log.Debugf("Received %v SQS messages.", len(msgs))
 		r.metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
 
-		// Add to processing wait group to wait for all messages to be processed.
-		processingWg.Add(len(msgs))
-		deletionWg.Add(len(msgs))
-
 		for _, msg := range msgs {
-			// Process each SQS message asynchronously with a goroutine.
+			// Send each SQS message to a channel where a fixed amount of goroutines will process all of them asynchronously.
 			go func(msg types.Message, start time.Time) {
-				id := r.metrics.beginSQSWorker()
-				defer func() {
-					// Mark processing wait group as done.
-					r.metrics.endSQSWorker(id)
-					processingWg.Done()
-					r.workerSem.Release(1)
-				}()
-
-				// Create a pipeline client scoped to this goroutine.
-				client, err := r.pipeline.ConnectWith(beat.ClientConfig{
-					EventListener: NewEventACKHandler(),
-					Processing: beat.ProcessingConfig{
-						// This input only produces events with basic types so normalization
-						// is not required.
-						EventNormalization: boolPtr(false),
-					},
-				})
-
-				if err != nil {
-					r.log.Warnw("Failed processing SQS message.",
-						"error", err,
-						"message_id", *msg.MessageId,
-						"elapsed_time_ns", time.Since(start))
-
-					return
-				}
-
-				r.log.Debugw("Going to process SQS message.",
-					"message_id", *msg.MessageId,
-					"elapsed_time_ns", time.Since(start))
-
-				acker := NewEventACKTracker(ctx, deletionWg)
-
-				err = r.msgHandler.ProcessSQS(ctx, &msg, client, acker, start)
-				if err != nil {
-					r.log.Warnw("Failed processing SQS message.",
-						"error", err,
-						"message_id", *msg.MessageId,
-						"elapsed_time_ns", time.Since(start))
-
-					return
-				}
-
-				r.log.Debugw("Success processing SQS message.",
-					"message_id", *msg.MessageId,
-					"elapsed_time_ns", time.Since(start))
+				workersChan <- processingData{msg: msg, start: start}
 			}(msg, time.Now())
 		}
 	}
 
-	// Wait for all processing goroutines to finish.
-	processingWg.Wait()
+	// Let's stop the workers
+	close(workersChan)
+
+	// Wait for all processing to happen.
+	workersWg.Wait()
 
 	// Wait for all deletion to happen.
+	for deletionWaiter.Load() {
+		_ = timed.Wait(ctx, 500*time.Millisecond)
+	}
+
 	deletionWg.Wait()
+
+	closeClients(clients)
 
 	if errors.Is(ctx.Err(), context.Canceled) {
 		// A canceled context is a normal shutdown.
@@ -154,6 +186,12 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 	}
 
 	return ctx.Err()
+}
+
+func closeClients(clients map[uint64]beat.Client) {
+	for _, client := range clients {
+		client.Close()
+	}
 }
 
 func (r *sqsReader) GetApproximateMessageCount(ctx context.Context) (int, error) {

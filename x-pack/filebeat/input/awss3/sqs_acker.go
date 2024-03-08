@@ -18,23 +18,29 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 )
 
+var ackerIDCounter *atomic.Uint64
+
+func init() {
+	ackerIDCounter = atomic.NewUint64(0)
+}
+
 // EventACKTracker tracks the publishing state of S3 objects. Specifically
 // it tracks the number of message acknowledgements that are pending from the
 // output. It can be used to wait until all ACKs have been received for one or
 // more S3 objects.
 type EventACKTracker struct {
-	DeletionWg *sync.WaitGroup
+	ID uint64
 
-	EventsToBeAcked  *atomic.Uint64
-	TotalEventsAcked *atomic.Uint64
+	EventsToBeAcked *atomic.Uint64
+
+	ctx        context.Context
+	cancel     context.CancelFunc
+	deletionWg *sync.WaitGroup
 
 	ackMutex             *sync.RWMutex
 	ackMutexLockedOnInit *atomic.Bool
-	isSQSAcker           bool
 
-	ctx    context.Context
-	cancel context.CancelFunc
-
+	isSQSAcker      bool
 	msg             *types.Message
 	ReceiveCount    int
 	start           time.Time
@@ -44,7 +50,6 @@ type EventACKTracker struct {
 	keepaliveWg     *sync.WaitGroup
 	msgHandler      sqsProcessor
 	log             *logp.Logger
-	client          beat.Client
 }
 
 func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventACKTracker {
@@ -54,12 +59,12 @@ func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventA
 	// Lock it as soon as we create the acker. It will be unlocked and in either MarkS3FromListingProcessedWithData or MarkSQSProcessedWithData
 	ackMutex.Lock()
 	return &EventACKTracker{
+		ID:                   ackerIDCounter.Inc(),
 		ctx:                  ctx,
 		cancel:               cancel,
+		deletionWg:           deletionWg,
 		ackMutex:             ackMutex,
 		ackMutexLockedOnInit: atomic.NewBool(true),
-		DeletionWg:           deletionWg,
-		TotalEventsAcked:     atomic.NewUint64(0),
 		EventsToBeAcked:      atomic.NewUint64(0),
 	}
 }
@@ -75,12 +80,11 @@ func (a *EventACKTracker) MarkS3FromListingProcessedWithData(s3EventsCreatedTota
 	a.EventsToBeAcked.Add(s3EventsCreatedTotal)
 
 	a.ackMutex.Unlock()
-	a.ackMutexLockedOnInit.Store(false)
 }
 
 // MarkSQSProcessedWithData has to be used when the acker is used when the input is in sqs-s3 mode, instead of MarkS3FromListingProcessedWithData
 // Specifically we both Swap the value of EventACKTracker.ackMutexLockedOnInit initialised in NewEventACKTracker
-func (a *EventACKTracker) MarkSQSProcessedWithData(msg *types.Message, publishedEvent uint64, receiveCount int, start time.Time, processingErr error, handles []s3ObjectHandler, keepaliveCancel context.CancelFunc, keepaliveWg *sync.WaitGroup, msgHandler sqsProcessor, client beat.Client, log *logp.Logger) {
+func (a *EventACKTracker) MarkSQSProcessedWithData(msg *types.Message, publishedEvent uint64, receiveCount int, start time.Time, processingErr error, handles []s3ObjectHandler, keepaliveCancel context.CancelFunc, keepaliveWg *sync.WaitGroup, msgHandler sqsProcessor, log *logp.Logger) {
 	// We want to execute the logic of this call only once, when the ack mutex was locked on init
 	if !a.ackMutexLockedOnInit.Swap(false) {
 		return
@@ -98,14 +102,12 @@ func (a *EventACKTracker) MarkSQSProcessedWithData(msg *types.Message, published
 	a.keepaliveWg = keepaliveWg
 	a.msgHandler = msgHandler
 	a.log = log
-	a.client = client
 
 	a.ackMutex.Unlock()
-	a.ackMutexLockedOnInit.Store(false)
 }
 
 func (a *EventACKTracker) FullyAcked() bool {
-	return a.TotalEventsAcked.Load() == a.EventsToBeAcked.Load()
+	return a.EventsToBeAcked.Load() == 0
 
 }
 
@@ -122,11 +124,6 @@ func (a *EventACKTracker) WaitForS3() {
 
 // FlushForSQS delete related SQS message
 func (a *EventACKTracker) FlushForSQS() {
-	// This is moved here because clientOnlyACKer.ClientClosed() reset the acker listener (libbeat/common/acker/acker.go:333)
-	if a.client != nil {
-		defer a.client.Close()
-	}
-
 	if !a.isSQSAcker {
 		return
 	}
@@ -136,7 +133,7 @@ func (a *EventACKTracker) FlushForSQS() {
 	a.keepaliveWg.Wait()
 
 	err := a.msgHandler.DeleteSQS(a.msg, a.ReceiveCount, a.processingErr, a.Handles)
-	a.DeletionWg.Done()
+	a.deletionWg.Done()
 
 	if err != nil {
 		a.log.Warnw("Failed deleting SQS message.",
@@ -163,7 +160,7 @@ func (a *EventACKTracker) ACK() {
 		panic("misuse detected: ACK call on fully acked")
 	}
 
-	a.TotalEventsAcked.Inc()
+	a.EventsToBeAcked.Dec()
 
 	if a.FullyAcked() {
 		a.cancel()
