@@ -108,6 +108,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.logs/multiline.pattern":    "^test",
 						"co.elastic.logs/json.keys_under_root": "true",
 						"co.elastic.metrics/module":            "prometheus",
+						"co.elastic.metrics/timeouts":          "5s", //On purpose we added this annotation with typo
 						"co.elastic.metrics/period":            "10s",
 						"co.elastic.metrics.foobar/period":     "15s",
 						"not.to.include":                       "true",
@@ -125,6 +126,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.logs/multiline.pattern":    "^test",
 						"co.elastic.logs/json.keys_under_root": "true",
 						"co.elastic.metrics/module":            "prometheus",
+						"co.elastic.metrics/timeouts":          "5s",
 						"not.to.include":                       "true",
 						"co.elastic.metrics/period":            "10s",
 						"co.elastic.metrics.foobar/period":     "15s",
@@ -145,8 +147,9 @@ func TestGenerateHints(t *testing.T) {
 						},
 					},
 					"metrics": mapstr.M{
-						"module": "prometheus",
-						"period": "15s",
+						"module":   "prometheus",
+						"period":   "15s",
+						"timeouts": "5s",
 					},
 				},
 				"container": mapstr.M{
