@@ -51,13 +51,3 @@
       type: alias
       path: cloud.region
       migration: true
-
-    - name: azure.resourcegroup
-      default_field: true
-      type: group
-      fields:
-        - name: name
-          type: keyword
-          description: >
-            Name of resourceGroup the azure cloud instance belongs to.
-    

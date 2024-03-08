@@ -186,11 +186,6 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 	}
 
 	expected := mapstr.M{
-		"azure": mapstr.M{
-			"resourcegroup": mapstr.M{
-				"name": "MC_myname_group_myname_eastus",
-			},
-		},
 		"cloud": mapstr.M{
 			"provider": "azure",
 			"instance": mapstr.M{

@@ -83,15 +83,11 @@ var azureVMMetadataFetcher = provider{
 				"service": s.Object{
 					"name": c.Str("serviceName"),
 				},
-				"region": c.Str("location"),
+				"region":        c.Str("location"),
+				"resourcegroup": c.Str("resourceGroupName"),
 			}.Apply(m)
 
-			azure, _ := s.Schema{
-				"resourcegroup": s.Object{
-					"name": c.Str("resourceGroupName"),
-				},
-			}.Apply(m)
-			return mapstr.M{"cloud": cloud, "azure": azure}
+			return mapstr.M{"cloud": cloud}
 		}
 
 		azGenSchema := func(m map[string]interface{}) mapstr.M {
@@ -189,11 +185,14 @@ func (az *azureMetadataFetcher) fetchAzureClusterMeta(
 ) {
 	logger := logp.NewLogger("add_cloud_metadata")
 	subscriptionId, _ := az.httpMeta.GetValue("cloud.account.id")
-	resourceGroupName, _ := az.httpMeta.GetValue("azure.resourcegroup.name")
+	resourceGroupName, _ := az.httpMeta.GetValue("cloud.resourcegroup")
 	strResourceGroupName := ""
 	if val, ok := resourceGroupName.(string); ok {
 		strResourceGroupName = val
 	}
+	// Drop cloud.resourcegroup field as we do not want the cloud provider to populate this field
+	az.httpMeta.Delete("cloud.resourcegroup")
+
 	strSubscriptionId := ""
 	if val, ok := subscriptionId.(string); ok {
 		strSubscriptionId = val

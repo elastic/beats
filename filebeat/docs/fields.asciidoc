@@ -27762,17 +27762,6 @@ alias to: cloud.region
 
 --
 
-
-*`azure.resourcegroup.name`*::
-+
---
-Name of resourceGroup the azure cloud instance belongs to.
-
-
-type: keyword
-
---
-
 [[exported-fields-coredns]]
 == Coredns fields
 
