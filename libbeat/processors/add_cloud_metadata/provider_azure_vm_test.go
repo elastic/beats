@@ -42,10 +42,10 @@ import (
 )
 
 var cluster1Name = "testcluster1Name"
-var cluster1Id = "testcluster1Id"
+var cluster1ID = "testcluster1ID"
 
 var cluster1 = armcontainerservice.ManagedCluster{
-	ID:         to.Ptr(cluster1Id),
+	ID:         to.Ptr(cluster1ID),
 	Name:       to.Ptr(cluster1Name),
 	Properties: &armcontainerservice.ManagedClusterProperties{NodeResourceGroup: to.Ptr("MC_myname_group_myname_eastus")},
 }
@@ -205,7 +205,7 @@ func TestRetrieveAzureMetadata(t *testing.T) {
 		},
 		"orchestrator": mapstr.M{
 			"cluster": mapstr.M{
-				"id":   "testcluster1Id",
+				"id":   "testcluster1ID",
 				"name": "testcluster1Name",
 			},
 		},
