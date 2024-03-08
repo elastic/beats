@@ -7,11 +7,12 @@ package awss3
 import (
 	"context"
 	"errors"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
-	"github.com/elastic/go-concert/timed"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
+	"github.com/elastic/go-concert/timed"
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 
