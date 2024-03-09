@@ -67,8 +67,7 @@ filebeat.config.modules:
   #reload.period: 10s
 
 # ======================= Elasticsearch template setting =======================
-setup.ilm.enabled: true
-setup.ilm.overwrite: true
+
 setup.template.settings:
   index.number_of_shards: 1
   #index.codec: best_compression
