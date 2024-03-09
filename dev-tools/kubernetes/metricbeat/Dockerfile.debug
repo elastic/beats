@@ -1,4 +1,4 @@
-FROM golang:1.20.12 as builder
+FROM golang:1.21.8 as builder
 
 ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin:/usr/local/go/bin
 

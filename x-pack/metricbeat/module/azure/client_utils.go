@@ -135,14 +135,14 @@ func compareMetricValues(metVal *float64, metricVal *float64) bool {
 	return false
 }
 
-// convertTimeGrainToDuration converts the Azure time grain options to the equivalent
+// asDuration converts the Azure time grain options to the equivalent
 // `time.Duration` value.
 //
 // For example, converts "PT1M" to `time.Minute`.
 //
 // See https://docs.microsoft.com/en-us/azure/azure-monitor/platform/metrics-supported#time-grain
 // for more information.
-func convertTimeGrainToDuration(timeGrain string) time.Duration {
+func asDuration(timeGrain string) time.Duration {
 	var duration time.Duration
 	switch timeGrain {
 	case "PT1M":

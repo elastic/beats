@@ -173,15 +173,8 @@ func (s ProtocolsStruct) configureProtocol(test bool, device string, pub reporte
 
 	if device != "" {
 		// This could happen earlier, but let any errors be found first.
-		var protocol struct {
-			Device string `config:"interface"`
-		}
-		err := config.Unpack(&protocol)
-		if err != nil {
+		if isValid, err := validateProtocolDevice(device, config); !isValid || err != nil {
 			return err
-		}
-		if protocol.Device != "" && protocol.Device != device {
-			return nil
 		}
 	}
 
@@ -203,6 +196,24 @@ func (s ProtocolsStruct) configureProtocol(test bool, device string, pub reporte
 
 	s.register(proto, client, inst)
 	return nil
+}
+
+func validateProtocolDevice(device string, config *conf.C) (bool, error) {
+	var protocol struct {
+		Interface struct {
+			Device string `config:"device"`
+		} `config:"interface"`
+	}
+
+	if err := config.Unpack(&protocol); err != nil {
+		return false, err
+	}
+
+	if protocol.Interface.Device != "" && protocol.Interface.Device != device {
+		return false, nil
+	}
+
+	return true, nil
 }
 
 func (s ProtocolsStruct) register(proto Protocol, client beat.Client, plugin Plugin) {

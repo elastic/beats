@@ -236,18 +236,16 @@ func (rf *requestFactory) collectResponse(ctx context.Context, trCtx *transformC
 
 func (c *httpClient) do(ctx context.Context, req *http.Request) (*http.Response, error) {
 	resp, err := c.limiter.execute(ctx, func() (*http.Response, error) {
-		return c.client.Do(req)
+		resp, err := c.client.Do(req)
+		if err == nil {
+			// Read the whole resp.Body so we can release the connection.
+			// This implementation is inspired by httputil.DumpResponse
+			resp.Body, err = drainBody(resp.Body)
+		}
+		return resp, err
 	})
 	if err != nil {
 		return nil, err
-	}
-	defer resp.Body.Close()
-
-	// Read the whole resp.Body so we can release the connection.
-	// This implementation is inspired by httputil.DumpResponse
-	resp.Body, err = drainBody(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	if resp.StatusCode >= http.StatusBadRequest {
@@ -316,13 +314,8 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
 			}
-			if ch.Step.Auth != nil && ch.Step.Auth.Basic.isEnabled() {
-				rf.user = ch.Step.Auth.Basic.User
-				rf.password = ch.Step.Auth.Basic.Password
-			}
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, log)
-
 			rf = &requestFactory{
 				url:                    *ch.Step.Request.URL.URL,
 				method:                 ch.Step.Request.Method,
@@ -336,6 +329,10 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 				chainClient:            client,
 				chainResponseProcessor: responseProcessor,
 			}
+			if ch.Step.Auth != nil && ch.Step.Auth.Basic.isEnabled() {
+				rf.user = ch.Step.Auth.Basic.User
+				rf.password = ch.Step.Auth.Basic.Password
+			}
 		} else if ch.While != nil {
 			ts, _ := newBasicTransformsFromConfig(registeredTransforms, ch.While.Request.Transforms, requestNamespace, log)
 			policy := newHTTPPolicy(evaluateResponse, ch.While.Until, log)
@@ -343,10 +340,6 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 			client, err := newChainHTTPClient(ctx, ch.While.Auth, ch.While.Request, log, reg, policy)
 			if err != nil {
 				return nil, fmt.Errorf("failed in creating chain http client with error: %w", err)
-			}
-			if ch.While.Auth != nil && ch.While.Auth.Basic.isEnabled() {
-				rf.user = ch.While.Auth.Basic.User
-				rf.password = ch.While.Auth.Basic.Password
 			}
 
 			responseProcessor := newChainResponseProcessor(ch, client, xmlDetails, metrics, log)
@@ -363,6 +356,10 @@ func newRequestFactory(ctx context.Context, config config, log *logp.Logger, met
 				isChain:                true,
 				chainClient:            client,
 				chainResponseProcessor: responseProcessor,
+			}
+			if ch.While.Auth != nil && ch.While.Auth.Basic.isEnabled() {
+				rf.user = ch.While.Auth.Basic.User
+				rf.password = ch.While.Auth.Basic.Password
 			}
 		}
 		rfs = append(rfs, rf)
@@ -714,8 +711,25 @@ func (r *requester) processChainPaginationEvents(ctx context.Context, trCtx *tra
 	return n, nil
 }
 
-// generateNewUrl returns new url value using replacement from oldUrl with ids
+// generateNewUrl returns new url value using replacement from oldUrl with ids.
+// If oldUrl is an opaque URL, the scheme: is dropped and the remaining string
+// is used as the replacement target. For example
+//
+//	placeholder:$.result[:]
+//
+// becomes
+//
+//	$.result[:]
+//
+// which is now the replacement target.
 func generateNewUrl(replacement, oldUrl, id string) (url.URL, error) {
+	u, err := url.Parse(oldUrl)
+	if err != nil {
+		return url.URL{}, err
+	}
+	if u.Opaque != "" {
+		oldUrl = u.Opaque
+	}
 	newUrl, err := url.Parse(strings.Replace(oldUrl, replacement, id, 1))
 	if err != nil {
 		return url.URL{}, fmt.Errorf("failed to replace value in url: %w", err)
@@ -923,6 +937,8 @@ func cloneResponse(source *http.Response) (*http.Response, error) {
 //
 // This function is a modified version of drainBody from the http/httputil package.
 func drainBody(b io.ReadCloser) (r1 io.ReadCloser, err error) {
+	defer b.Close()
+
 	if b == nil || b == http.NoBody {
 		// No copying needed. Preserve the magic sentinel meaning of NoBody.
 		return http.NoBody, nil
@@ -930,10 +946,10 @@ func drainBody(b io.ReadCloser) (r1 io.ReadCloser, err error) {
 
 	var buf bytes.Buffer
 	if _, err = buf.ReadFrom(b); err != nil {
-		return b, err
+		return b, fmt.Errorf("failed to read http.response.body: %w", err)
 	}
 	if err = b.Close(); err != nil {
-		return b, err
+		return b, fmt.Errorf("failed to close http.response.body: %w", err)
 	}
 
 	return io.NopCloser(&buf), nil

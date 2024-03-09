@@ -314,6 +314,27 @@ so. Altering this value will also require a change to `login_scopes`.
 
 Override the default authentication scopes. Only change if directed to do so.
 
+[float]
+===== `select.users`
+
+Override the default https://learn.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http#optional-query-parameters[user query selections].
+This is a list of optional query parameters. The default is `["accountEnabled", "userPrincipalName",
+"mail", "displayName", "givenName", "surname", "jobTitle", "officeLocation", "mobilePhone",
+"businessPhones"]`.
+
+[float]
+===== `select.groups`
+
+Override the default https://learn.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http#optional-query-parameters[group query selections].
+This is a list of optional query parameters. The default is `["displayName", "members"]`.
+
+[float]
+===== `select.devices`
+
+Override the default https://learn.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http#optional-query-parameters[device query selections].
+This is a list of optional query parameters. The default is `["accountEnabled", "deviceId",
+"displayName", "operatingSystem", "operatingSystemVersion", "physicalIds", "extensionAttributes",
+"alternativeSecurityIds"]`.
 
 [id="provider-okta"]
 ==== Okta User Identities (`okta`)

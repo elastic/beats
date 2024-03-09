@@ -122,6 +122,16 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	if cfg.Request.Tracer != nil {
 		id := sanitizeFileName(ctx.ID)
 		cfg.Request.Tracer.Filename = strings.ReplaceAll(cfg.Request.Tracer.Filename, "*", id)
+
+		// Propagate tracer behaviour to all chain children.
+		for i, c := range cfg.Chain {
+			if c.Step != nil { // Request is validated as required.
+				cfg.Chain[i].Step.Request.Tracer = cfg.Request.Tracer
+			}
+			if c.While != nil { // Request is validated as required.
+				cfg.Chain[i].While.Request.Tracer = cfg.Request.Tracer
+			}
+		}
 	}
 
 	metrics := newInputMetrics(reg)
@@ -153,6 +163,12 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	trCtx.cursor.load(crsr)
 
 	doFunc := func() error {
+		defer func() {
+			// Clear response bodies between evaluations.
+			trCtx.firstResponse.body = nil
+			trCtx.lastResponse.body = nil
+		}()
+
 		log.Info("Process another repeated request.")
 
 		startTime := time.Now()
@@ -243,7 +259,12 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 		)
 		traceLogger := zap.New(core)
 
-		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger)
+		const margin = 1e3 // 1OkB ought to be enough room for all the remainder of the trace details.
+		maxSize := cfg.Tracer.MaxSize*1e6 - margin
+		if maxSize < 0 {
+			maxSize = 0
+		}
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxSize)
 	}
 
 	if reg != nil {

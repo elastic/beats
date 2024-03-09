@@ -25,3 +25,5 @@ order they are defined in the {beatname_uc} configuration file.
 -------
 event -> processor 1 -> event1 -> processor 2 -> event2 ...
 -------
+
+IMPORTANT: It's recommended to do all drop and renaming of existing fields as the last step in a processor configuration. This is because dropping or renaming fields can remove data necessary for the next processor in the chain, for example dropping the `source.ip` field would remove one of the fields necessary for the `community_id` processor to function. If it's necessary to remove, rename or overwrite an existing event field, please make sure it's done by a corresponding processor (<<drop-fields,`drop_fields`>>, <<rename-fields,`rename`>> or <<add-fields, `add_fields`>>) placed at the end of the processor list defined in the input configuration.
