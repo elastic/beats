@@ -89,16 +89,16 @@ are_files_changed() {
   fi
 }
 
-cleanup() {
-  echo "Deleting temporary files..."
-  rm -rf ${BIN}/${TMP_FOLDER}.*
-  echo "Done."
+changeset_applies() {
+  local changeset=$1
+  if are_files_changed "$changeset"; then
+    echo true
+  else
+    echo false
+  fi
 }
 
-unset_secrets () {
-  for var in $(printenv | sed 's;=.*;;' | sort); do
-    if [[ "$var" == *_SECRET || "$var" == *_TOKEN ]]; then
-      unset "$var"
-    fi
-  done
+set_git_config() {
+  git config user.name "${GITHUB_USERNAME_SECRET}"
+  git config user.email "${GITHUB_EMAIL_SECRET}"
 }
