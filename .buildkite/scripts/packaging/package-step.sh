@@ -20,7 +20,6 @@ if are_files_changed "$changeset"; then
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
-          GOFLAGS: -buildvcs=false
         command: ".buildkite/scripts/packaging/package.sh"
         notify:
           - github_commit_status:
@@ -36,7 +35,6 @@ if are_files_changed "$changeset"; then
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
           SNAPSHOT: true
-          GOFLAGS: -buildvcs=false
         command: ".buildkite/scripts/packaging/package.sh"
         notify:
           - github_commit_status:
