@@ -38,18 +38,23 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		ctrl, ctx := gomock.WithContext(ctx, t)
 		defer ctrl.Finish()
 		mockAPI := NewMockSQSAPI(ctrl)
+		mockS3Handler := NewMockS3ObjectHandler(ctrl)
 		mockS3HandlerFactory := NewMockS3ObjectHandlerFactory(ctrl)
 		mockClient := NewMockBeatClient(ctrl)
 
+		expectedEventsPublishedTotal := uint64(10)
 		gomock.InOrder(
-			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(nil),
+			mockS3HandlerFactory.EXPECT().Create(gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).Return(mockS3Handler),
+			mockS3Handler.EXPECT().ProcessS3Object().Return(expectedEventsPublishedTotal, nil),
+			mockS3Handler.EXPECT().FinalizeS3Object().Return(nil),
 		)
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 
 		acker := NewEventACKTracker(ctx, new(sync.WaitGroup))
-		processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now())
+		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now())
 		require.NoError(t, processingErr)
+		require.Equal(t, expectedEventsPublishedTotal, eventsPublishedTotal)
 
 		gomock.InOrder(
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
@@ -76,9 +81,10 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		acker := NewEventACKTracker(ctx, new(sync.WaitGroup))
-		processingErr := p.ProcessSQS(ctx, &invalidBodyMsg, mockClient, acker, time.Now())
+		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &invalidBodyMsg, mockClient, acker, time.Now())
 		t.Log(processingErr)
 		require.Error(t, processingErr)
+		require.Equal(t, uint64(0), eventsPublishedTotal)
 
 		gomock.InOrder(
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&invalidBodyMsg)).Return(nil),
@@ -102,8 +108,9 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		acker := NewEventACKTracker(ctx, new(sync.WaitGroup))
-		processingErr := p.ProcessSQS(ctx, &emptyRecordsMsg, mockClient, acker, time.Now())
+		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &emptyRecordsMsg, mockClient, acker, time.Now())
 		require.NoError(t, processingErr)
+		require.Equal(t, uint64(0), eventsPublishedTotal)
 
 		gomock.InOrder(
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&emptyRecordsMsg)).Return(nil),
@@ -137,8 +144,9 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, visibilityTimeout, 5, mockS3HandlerFactory)
 		acker := NewEventACKTracker(ctx, new(sync.WaitGroup))
-		processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now())
+		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now())
 		require.NoError(t, processingErr)
+		require.Equal(t, uint64(1), eventsPublishedTotal)
 
 		gomock.InOrder(
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
@@ -166,9 +174,10 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		acker := NewEventACKTracker(ctx, new(sync.WaitGroup))
-		processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now())
+		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now())
 		t.Log(processingErr)
 		require.Error(t, processingErr)
+		require.Equal(t, uint64(0), eventsPublishedTotal)
 
 		require.Error(t, p.DeleteSQS(&msg, acker.ReceiveCount, processingErr, acker.Handles))
 	})
@@ -196,9 +205,10 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		acker := NewEventACKTracker(ctx, new(sync.WaitGroup))
-		processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now())
+		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now())
 		t.Log(processingErr)
 		require.Error(t, processingErr)
+		require.Equal(t, uint64(0), eventsPublishedTotal)
 
 		gomock.InOrder(
 			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),

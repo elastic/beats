@@ -279,6 +279,7 @@ type fakePipeline struct {
 
 func (fp *fakePipeline) ackEvents() {
 	for _, client := range fp.clients {
+		addedEventsForAllAcker := 0
 		for _, acker := range client.ackers {
 			if acker.FullyAcked() {
 				continue
@@ -291,9 +292,11 @@ func (fp *fakePipeline) ackEvents() {
 				client.eventListener.AddEvent(beat.Event{Private: acker}, true)
 			}
 
-			if addedEvents > 0 {
-				client.eventListener.ACKEvents(addedEvents)
-			}
+			addedEventsForAllAcker += addedEvents
+		}
+
+		if addedEventsForAllAcker > 0 {
+			client.eventListener.ACKEvents(addedEventsForAllAcker)
 		}
 	}
 }

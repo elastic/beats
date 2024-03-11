@@ -78,14 +78,14 @@ func TestSQSReceiver(t *testing.T) {
 			ProcessSQS(gomock.Any(), gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any()).
 			Times(1).
 			DoAndReturn(
-				func(ctx context.Context, msg *types.Message, _ beat.Client, acker *EventACKTracker, _ time.Time) error {
+				func(ctx context.Context, msg *types.Message, _ beat.Client, acker *EventACKTracker, _ time.Time) (uint64, error) {
 					_, keepaliveCancel := context.WithCancel(ctx)
 					log := log.Named("sqs_s3_event")
 					acker.MarkSQSProcessedWithData(msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
 					acker.ACK()
 					acker.FlushForSQS()
 
-					return nil
+					return 1, nil
 				})
 
 		// Expect the client to be closed
