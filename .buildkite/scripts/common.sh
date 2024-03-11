@@ -413,10 +413,10 @@ getModuleNameFromTheChangeSet() {
   local module_path_exclussion="((?!^${module_path_transformed}\\/).)*\$"
   local exclude=("^(${module_path_transformed}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
   if are_paths_changed "${pattern[@]}" && ! are_changed_only_paths "${exclude[@]}"; then
-    echo "${module_name}"
+    export MODULE=${module_name}
   elif [ -d "${module_path}" ]; then
-    echo "aws"                 # TODO: remove this line and uncomment the line below when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
-    # return ''                  # TODO: uncomment the line when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
+    export MODULE="aws"                 # TODO: remove this line and uncomment the line below when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
+    # export MODULE=''                  # TODO: uncomment the line when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
   fi
 }
 
@@ -484,8 +484,7 @@ if are_paths_changed "${packaging_changeset[@]}" ; then
 fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
-  MODULE=$(getModuleNameFromTheChangeSet "${MODULE_DIR}")
-  export MODULE
+  getModuleNameFromTheChangeSet "${MODULE_DIR}"
 fi
 
 check_and_set_beat_vars
