@@ -55,7 +55,7 @@ function run_release_manager_list() {
         -e VAULT_SECRET_ID="${VAULT_SECRET}" \
         --mount type=bind,readonly=false,src="${PWD}/x-pack/elastic-agent/build/distributions/",target=/artifacts \
         docker.elastic.co/infra/release-manager:latest \
-        cli list \
+        ls -lah /artifacts || cli list \
         --project "${_project_id}" \
         --branch "${_branch}" \
         --commit "${_commit}" \
