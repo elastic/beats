@@ -9,11 +9,10 @@ GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
   source .buildkite/env-scripts/env.sh
-  source .buildkite/env-scripts/win-env.sh
   source .buildkite/env-scripts/util.sh
 
-  if [[ -z "${GOLANG_VERSION-""}" ]]; then
-    export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
+  if [[ -z "${GO_VERSION-""}" ]]; then
+    export GO_VERSION=$(cat "${WORKSPACE}/.go-version")
   fi
 
   if [[ "$BUILDKITE_STEP_KEY" == macos* ]]; then

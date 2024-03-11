@@ -8,7 +8,7 @@ checkout_merge() {
     local merge_branch=$3
 
     if [[ -z "${target_branch}" ]]; then
-        echo "No pull request target branch"
+        echo "--- No pull request target branch"
         exit 1
     fi
 
@@ -24,18 +24,20 @@ checkout_merge() {
     git config user.name "github-merged-pr-post-checkout"
     git config user.email "auto-merge@buildkite"
 
-    git merge --no-edit "${BUILDKITE_COMMIT}" || {
+    git merge --no-edit "${pr_commit}" || {
         local merge_result=$?
-        echo "Merge failed: ${merge_result}"
+        echo "--- Merge failed: ${merge_result}"
         git merge --abort
         exit ${merge_result}
     }
+
+    git reset --hard "${pr_commit}"
 }
 
 pull_request="${BUILDKITE_PULL_REQUEST:-false}"
 
 if [[ "${pull_request}" == "false" ]]; then
-    echo "Not a pull request, skipping"
+    echo "--- Not a pull request, skipping"
     exit 0
 fi
 
@@ -46,7 +48,7 @@ MERGE_BRANCH="pr_merge_${PR_ID}"
 
 checkout_merge "${TARGET_BRANCH}" "${PR_COMMIT}" "${MERGE_BRANCH}"
 
-echo "Commit information"
+echo "--- Commit information"
 git --no-pager log --format=%B -n 1
 
 # Ensure buildkite groups are rendered

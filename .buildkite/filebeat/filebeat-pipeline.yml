@@ -62,7 +62,7 @@ steps:
           - "filebeat/build/*.json"
 
       - label: ":windows:-{{matrix.image}} Unit Tests"
-        command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         notify:
           - github_commit_status:
               context: "Filebeat: windows/Unit Tests"
@@ -120,7 +120,7 @@ steps:
     steps:
       - label: ":windows: Win 2019 Unit Tests"
         key: "win-extended-2019"
-        command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         notify:
           - github_commit_status:
               context: "Filebeat/Extended: Win-2019 Unit Tests"
