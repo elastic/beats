@@ -399,9 +399,10 @@ config_git() {
   fi
 }
 
-getModuleNameFromTheChangeSet() {
+defineModuleFromTheChangeSet() {
   # This method gathers the module name, if required, in order to run the ITs only if the changeset affects a specific module.
   # For such, it's required to look for changes under the module folder and exclude anything else such as asciidoc and png files.
+  # This method defines and exports the MODULE variable with a particular module name or '' if changeset doesn't affect a specific module
   local module_path=$1
   if [[ "$module_path" == *"x-pack/"* ]]; then
     local pattern=("$XPACK_MODULE_PATTERN")
@@ -484,7 +485,7 @@ if are_paths_changed "${packaging_changeset[@]}" ; then
 fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
-  getModuleNameFromTheChangeSet "${MODULE_DIR}"
+  defineModuleFromTheChangeSet "${MODULE_DIR}"
 fi
 
 check_and_set_beat_vars
