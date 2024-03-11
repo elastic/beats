@@ -893,6 +893,16 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.Manager.RegisterDiagnosticHook("global processors", "a list of currently configured global beat processors",
 		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
+	b.Manager.RegisterDiagnosticHook("beat_metrics", "Metrics from the default monitoring namespace and expvar.",
+		"beat_metrics.json", "application/json", func() []byte {
+			m := monitoring.CollectStructSnapshot(monitoring.Default, monitoring.Full, true)
+			data, err := json.MarshalIndent(m, "", "  ")
+			if err != nil {
+				logp.L().Warnw("Failed to collect beat metric snapshot for Agent diagnostics.", "error", err)
+				return []byte(err.Error())
+			}
+			return data
+		})
 
 	return err
 }

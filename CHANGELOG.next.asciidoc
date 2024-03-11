@@ -10,7 +10,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-- Upgrade to Go 1.21.7. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}37913[37913]
+- Upgrade to Go 1.21.8. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}38209[38209]
 - add_cloud_metadata processor: `huawei` provider is now treated as `openstack`. Huawei cloud runs on OpenStack
 platform, and when viewed from a metadata API standpoint, it is impossible to differentiate it from OpenStack. If you
 know that your deployments run on Huawei Cloud exclusively, and you wish to have `cloud.provider` value as `huawei`,
@@ -27,6 +27,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 *Filebeat*
 
 - Convert netflow input to API v2 and disable event normalisation {pull}37901[37901]
+- Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
 
 
 *Heartbeat*
@@ -95,19 +96,26 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - Update github.com/lestrrat-go/jwx dependency. {pull}37799[37799]
 - [threatintel] MISP pagination fixes {pull}37898[37898]
 - Fix file handle leak when handling errors in filestream {pull}37973[37973]
+- Fix a race condition that could crash Filebeat with a "negative WaitGroup counter" error {pull}38094[38094]
+- Prevent HTTPJSON holding response bodies between executions. {issue}35219[35219] {pull}38116[38116]
+- Fix "failed processing S3 event for object key" error on aws-s3 input when key contains the "+" character {issue}38012[38012] {pull}38125[38125]
+- Fix duplicated addition of regexp extension in CEL input. {pull}38181[38181]
 
 *Heartbeat*
 
+- Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Fix setuid root when running under cgroups v2. {pull}37794[37794]
+- Adjust State loader to only retry when response code status is 5xx {pull}37981[37981]
 
 *Metricbeat*
 
+- Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
 
 *Osquerybeat*
 
 
 *Packetbeat*
 
-- Fix interface device parsing for packetbeat protocols. {pull}37946[37946]
 
 *Winlogbeat*
 
@@ -134,6 +142,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Make more selective the Pod autodiscovery upon node and namespace update events. {issue}37338[37338] {pull}37431[37431]
 - Enhance add_cloud_metadata processor with `orchestrator.cluster.name`, `orchestrator.cluster.id` and `azure.resourcegroup.name` when running inside an AKS cluster. {issue}33081[33081] {pull}37685[37685]
 - Upgrade go-sysinfo from 1.12.0 to 1.13.1. {pull}37996[37996]
+- Make `range` condition work with numeric values as strings. {pull}38080[38080]
 
 *Auditbeat*
 
@@ -188,6 +197,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add ETW input. {pull}36915[36915]
 - Update CEL mito extensions to v1.9.0 to add keys/values helper. {pull}37971[37971]
 - Add logging for cache processor file reads and writes. {pull}38052[38052]
+- Add parseDateInTZ value template for the HTTPJSON input {pull}37738[37738]
 
 *Auditbeat*
 
@@ -218,7 +228,6 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Metricbeat*
 
-- Update `getOpTimestamp` in `replstatus` to fix sort and temp files generation issue in mongodb. {pull}37688[37688]
 
 *Osquerybeat*
 
@@ -277,6 +286,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
 
 
 

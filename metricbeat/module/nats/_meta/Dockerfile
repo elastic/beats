@@ -2,7 +2,7 @@ ARG NATS_VERSION=2.0.4
 FROM nats:$NATS_VERSION
 
 # build stage
-FROM golang:1.21.7 AS build-env
+FROM golang:1.21.8 AS build-env
 RUN apt-get install git mercurial gcc
 RUN git clone https://github.com/nats-io/nats.go.git /nats-go
 RUN cd /nats-go/examples/nats-bench && git checkout tags/v1.10.0 && go build .
