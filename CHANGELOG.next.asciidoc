@@ -203,8 +203,8 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Libbeat*
 - Add watcher that can be used to monitor Linux kernel events. {pull}37833[37833]
-
 - Added support for ETW reader. {pull}36914[36914]
+- Add support for linux capabilities in add_process_metadata. {pull}38252[38252]
 
 *Heartbeat*
 - Added status to monitor run log report.
