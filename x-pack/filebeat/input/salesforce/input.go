@@ -248,11 +248,11 @@ func (s *salesforceInput) RunObject() error {
 				return err
 			}
 
-			if timstamp, ok := val[s.config.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
+			if timestamp, ok := val[s.config.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
 				if firstEvent {
-					s.cursor.Object.FirstEventTime = timstamp
+					s.cursor.Object.FirstEventTime = timestamp
 				}
-				s.cursor.Object.LastEventTime = timstamp
+				s.cursor.Object.LastEventTime = timestamp
 			}
 
 			err = publishEvent(s.publisher, s.cursor, jsonStrEvent, "Object")
@@ -340,11 +340,11 @@ func (s *salesforceInput) RunEventLogFile() error {
 				return err
 			}
 
-			if timstamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
+			if timestamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
 				if firstEvent {
-					s.cursor.EventLogFile.FirstEventTime = timstamp
+					s.cursor.EventLogFile.FirstEventTime = timestamp
 				}
-				s.cursor.EventLogFile.LastEventTime = timstamp
+				s.cursor.EventLogFile.LastEventTime = timestamp
 			}
 
 			for _, val := range recs {
