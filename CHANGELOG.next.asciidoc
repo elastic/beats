@@ -141,6 +141,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - The Elasticsearch output can now configure performance presets with the `preset` configuration field. {pull}37259[37259]
 - Upgrade to elastic-agent-libs v0.7.3 and golang.org/x/crypto v0.17.0. {pull}37544[37544]
 - Make more selective the Pod autodiscovery upon node and namespace update events. {issue}37338[37338] {pull}37431[37431]
+- Enhance add_cloud_metadata processor with `orchestrator.cluster.name`, `orchestrator.cluster.id` and `azure.resourcegroup.name` when running inside an AKS cluster. {issue}33081[33081] {pull}37685[37685]
 - Upgrade go-sysinfo from 1.12.0 to 1.13.1. {pull}37996[37996]
 - Make `range` condition work with numeric values as strings. {pull}38080[38080]
 
