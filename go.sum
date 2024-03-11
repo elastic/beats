@@ -702,8 +702,8 @@ github.com/elastic/go-structform v0.0.10 h1:oy08o/Ih2hHTkNcRY/1HhaYvIp5z6t8si8gn
 github.com/elastic/go-structform v0.0.10/go.mod h1:CZWf9aIRYY5SuKSmOhtXScE5uQiLZNqAFnwKR4OrIM4=
 github.com/elastic/go-sysinfo v1.13.1 h1:U5Jlx6c/rLkR72O8wXXXo1abnGlWGJU/wbzNJ2AfQa4=
 github.com/elastic/go-sysinfo v1.13.1/go.mod h1:GKqR8bbMK/1ITnez9NIsIfXQr25aLhRJa7AfT8HpBFQ=
-github.com/elastic/go-ucfg v0.8.6 h1:stUeyh2goTgGX+/wb9gzKvTv0YB0231LTpKUgCKj4U0=
-github.com/elastic/go-ucfg v0.8.6/go.mod h1:4E8mPOLSUV9hQ7sgLEJ4bvt0KhMuDJa8joDT2QGAEKA=
+github.com/elastic/go-ucfg v0.8.7 h1:/bKaN553LY3MsfEIz2XOEEs+tRw03TzJCARrnVPpOyc=
+github.com/elastic/go-ucfg v0.8.7/go.mod h1:4E8mPOLSUV9hQ7sgLEJ4bvt0KhMuDJa8joDT2QGAEKA=
 github.com/elastic/go-windows v1.0.1 h1:AlYZOldA+UJ0/2nBuqWdo90GFCgG9xuyw9SYzGUtJm0=
 github.com/elastic/go-windows v1.0.1/go.mod h1:FoVvqWSun28vaDQPbj2Elfc0JahhPB7WQEGa3c814Ss=
 github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a h1:8WfL/X6fK11iyX5t3Dd9dDMMNqPfEZNc//JsWGIhEgQ=
