@@ -53,7 +53,7 @@ func newAzureMetadataFetcher(
 	return azFetcher, nil
 }
 
-// NewClusterClient variable is assigned an anonymous function that returns a NewManagedClustersClient
+// NewClusterClient variable is assigned an anonymous function that returns a new ManagedClustersClient.
 var NewClusterClient func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient = func(clientFactory *armcontainerservice.ClientFactory) *armcontainerservice.ManagedClustersClient {
 	return clientFactory.NewManagedClustersClient()
 }
