@@ -163,7 +163,7 @@ func (p *sqsS3EventProcessor) DeleteSQS(msg *types.Message, receiveCount int, pr
 	return fmt.Errorf("failed deleting SQS message (it will return to queue after visibility timeout): %w", processingErr)
 }
 
-func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *EventACKTracker, start time.Time) error {
+func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *EventACKTracker, start time.Time) (uint64, error) {
 	keepaliveCtx, keepaliveCancel := context.WithCancel(ctx)
 
 	// Start SQS keepalive worker.
@@ -188,11 +188,11 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 		}
 	}
 
-	s3EventsCreatedTotal, handles, processingErr := p.processS3Events(ctx, log, *msg.Body, client, acker)
+	eventsPublishedTotal, handles, processingErr := p.processS3Events(ctx, log, *msg.Body, client, acker)
 	p.metrics.sqsMessagesProcessedTotal.Inc()
-	acker.MarkSQSProcessedWithData(msg, s3EventsCreatedTotal, receiveCount, start, processingErr, handles, keepaliveCancel, &keepaliveWg, p, p.log)
+	acker.MarkSQSProcessedWithData(msg, eventsPublishedTotal, receiveCount, start, processingErr, handles, keepaliveCancel, &keepaliveWg, p, p.log)
 
-	return processingErr
+	return eventsPublishedTotal, processingErr
 }
 
 func (p *sqsS3EventProcessor) keepalive(ctx context.Context, log *logp.Logger, wg *sync.WaitGroup, msg *types.Message) {
@@ -308,7 +308,7 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 
 	var errs []error
 	var handles []s3ObjectHandler
-	var s3EventsCreatedTotal uint64
+	var eventsPublishedTotal uint64
 	for i, event := range s3Events {
 		s3Processor := p.s3ObjectHandler.Create(ctx, log, client, acker, event)
 		if s3Processor == nil {
@@ -316,19 +316,19 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 		}
 
 		// Process S3 object (download, parse, create events).
-		if s3EventsCreatedTotalByProcessor, err := s3Processor.ProcessS3Object(); err != nil {
+		if eventsPublished, err := s3Processor.ProcessS3Object(); err != nil {
 			errs = append(errs, fmt.Errorf(
 				"failed processing S3 event for object key %q in bucket %q (object record %d of %d in SQS notification): %w",
 				event.S3.Object.Key, event.S3.Bucket.Name, i+1, len(s3Events), err))
 		} else {
-			s3EventsCreatedTotal += s3EventsCreatedTotalByProcessor
+			eventsPublishedTotal += eventsPublished
 			handles = append(handles, s3Processor)
 		}
 	}
 
 	// Make sure all s3 events were processed successfully
 	if len(handles) == len(s3Events) {
-		return s3EventsCreatedTotal, handles, multierr.Combine(errs...)
+		return eventsPublishedTotal, handles, multierr.Combine(errs...)
 	}
 
 	return 0, nil, multierr.Combine(errs...)

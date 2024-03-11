@@ -71,13 +71,13 @@ func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventA
 
 // MarkS3FromListingProcessedWithData has to be used when the acker is used when the input is in s3 direct listing mode, instead of MarkSQSProcessedWithData
 // Specifically we both Swap the value of EventACKTracker.ackMutexLockedOnInit initialised in NewEventACKTracker
-func (a *EventACKTracker) MarkS3FromListingProcessedWithData(s3EventsCreatedTotal uint64) {
+func (a *EventACKTracker) MarkS3FromListingProcessedWithData(eventsPublished uint64) {
 	// We want to execute the logic of this call only once, when the ack mutex was locked on init
 	if !a.ackMutexLockedOnInit.Swap(false) {
 		return
 	}
 
-	a.EventsToBeAcked.Add(s3EventsCreatedTotal)
+	a.EventsToBeAcked.Add(eventsPublished)
 
 	a.ackMutex.Unlock()
 }

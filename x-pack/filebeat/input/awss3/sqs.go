@@ -11,7 +11,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/go-concert/timed"
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
@@ -63,7 +62,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 	workersChan := make(chan processingData, r.maxMessagesInflight)
 
 	deletionWg := new(sync.WaitGroup)
-	deletionWaiter := atomic.NewBool(true)
+	deletionWaiter := make(chan struct{})
 
 	var clientsMutex sync.Mutex
 	clients := make(map[uint64]beat.Client, r.maxMessagesInflight)
@@ -107,9 +106,6 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 					return
 				}
 
-				deletionWg.Add(1)
-				deletionWaiter.Swap(false)
-
 				msg := incomingData.msg
 				start := incomingData.start
 
@@ -120,7 +116,15 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 
 				acker := NewEventACKTracker(ctx, deletionWg)
 
-				err = r.msgHandler.ProcessSQS(ctx, &msg, client, acker, start)
+				deletionWg.Add(1)
+				deletionWaiter <- struct{}{}
+
+				eventsCreatedTotal, err := r.msgHandler.ProcessSQS(ctx, &msg, client, acker, start)
+				// No ACK will be invoked by the client event listener, deletionWg.Done() has to be called here
+				if eventsCreatedTotal == 0 {
+					deletionWg.Done()
+				}
+
 				if err != nil {
 					r.log.Warnw("Failed processing SQS message.",
 						"worker_id", id,
@@ -171,9 +175,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 
 	// Wait for all deletion to happen.
 	if r.metrics.sqsMessagesReceivedTotal.Get() > 0 {
-		for deletionWaiter.Load() {
-			_ = timed.Wait(ctx, 500*time.Millisecond)
-		}
+		<-deletionWaiter
 	}
 
 	deletionWg.Wait()

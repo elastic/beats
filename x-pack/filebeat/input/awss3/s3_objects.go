@@ -109,11 +109,11 @@ type s3ObjectProcessor struct {
 
 	s3Metadata map[string]interface{} // S3 object metadata.
 
-	s3EventsCreatedTotal uint64
+	eventsPublishedTotal uint64
 }
 
-func (p *s3ObjectProcessor) SyncEventsToBeAcked(s3EventsCreatedTotal uint64) {
-	p.acker.MarkS3FromListingProcessedWithData(s3EventsCreatedTotal)
+func (p *s3ObjectProcessor) SyncEventsToBeAcked(eventsPublished uint64) {
+	p.acker.MarkS3FromListingProcessedWithData(eventsPublished)
 }
 func (p *s3ObjectProcessor) Wait() {
 	p.acker.WaitForS3()
@@ -168,7 +168,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() (uint64, error) {
 			data, decoderErr := decoder.decode()
 			if decoderErr != nil {
 				if errors.Is(err, io.EOF) {
-					return p.s3EventsCreatedTotal, nil
+					return p.eventsPublishedTotal, nil
 				}
 				break
 			}
@@ -192,7 +192,7 @@ func (p *s3ObjectProcessor) ProcessS3Object() (uint64, error) {
 			time.Since(start).Nanoseconds(), err)
 	}
 
-	return p.s3EventsCreatedTotal, nil
+	return p.eventsPublishedTotal, nil
 }
 
 // download requests the S3 object from AWS and returns the object's
@@ -391,7 +391,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 
 func (p *s3ObjectProcessor) publish(ack *EventACKTracker, event *beat.Event) {
 	event.Private = ack
-	p.s3EventsCreatedTotal++
+	p.eventsPublishedTotal++
 	p.metrics.s3EventsCreatedTotal.Inc()
 	p.publisher.Publish(*event)
 }

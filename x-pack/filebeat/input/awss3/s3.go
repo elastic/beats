@@ -137,9 +137,9 @@ func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) er
 
 	for s3ObjectPayload := range s3ObjectPayloadChan {
 		// Process S3 object (download, parse, create events).
-		s3EventsCreated, err := s3ObjectPayload.s3ObjectHandler.ProcessS3Object()
+		eventsPublished, err := s3ObjectPayload.s3ObjectHandler.ProcessS3Object()
 
-		s3ObjectPayload.s3ObjectHandler.SyncEventsToBeAcked(s3EventsCreated)
+		s3ObjectPayload.s3ObjectHandler.SyncEventsToBeAcked(eventsPublished)
 		// Wait for all events to be ACKed before proceeding.
 		s3ObjectPayload.s3ObjectHandler.Wait()
 
