@@ -15,7 +15,7 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package procnet
+package netmetrics
 
 import (
 	"testing"
@@ -25,7 +25,7 @@ import (
 
 func TestAddrs(t *testing.T) {
 	t.Run("ipv4", func(t *testing.T) {
-		addr4, addr6, err := Addrs("0.0.0.0:9001", logp.L())
+		addr4, addr6, err := addrs("0.0.0.0:9001", logp.L())
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -38,7 +38,7 @@ func TestAddrs(t *testing.T) {
 	})
 
 	t.Run("ipv6", func(t *testing.T) {
-		addr4, addr6, err := Addrs("[::]:9001", logp.L())
+		addr4, addr6, err := addrs("[::]:9001", logp.L())
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
