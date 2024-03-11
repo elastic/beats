@@ -195,7 +195,7 @@ processors:
 - set:
     field: event.outcome
     value: failure
-    if: 'ctx?.json?.LOGIN_STATUS != "LOGIN_NO_ERROR" && ctx?.json?.LOGIN_STATUS != null'
+    if: 'ctx?.json?.Status != "Success" && ctx?.json?.LOGIN_STATUS != "LOGIN_NO_ERROR" && ctx?.json?.LOGIN_STATUS != null'
     ignore_failure: true
 - set:
     field: event.type
