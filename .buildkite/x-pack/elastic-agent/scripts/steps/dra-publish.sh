@@ -53,7 +53,7 @@ function run_release_manager_list() {
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
         -e VAULT_ROLE_ID="${VAULT_ROLE_ID_SECRET}" \
         -e VAULT_SECRET_ID="${VAULT_SECRET}" \
-        --mount type=bind,readonly=false,src="${PWD}/x-pack/elastic-agent/build/distributions/",target=/artifacts \
+        --mount type=bind,readonly=false,src="${PWD}",target=/artifacts \
         docker.elastic.co/infra/release-manager:latest \
         cli list \
         --project "${_project_id}" \
@@ -73,7 +73,7 @@ function run_release_manager_collect() {
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
         -e VAULT_ROLE_ID="${VAULT_ROLE_ID_SECRET}" \
         -e VAULT_SECRET_ID="${VAULT_SECRET}" \
-        --mount type=bind,readonly=false,src="${PWD}/x-pack/elastic-agent/build/distributions/",target=/artifacts \
+        --mount type=bind,readonly=false,src="${PWD}",target=/artifacts \
         docker.elastic.co/infra/release-manager:latest \
         cli collect \
         --project "${_project_id}" \
