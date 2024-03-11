@@ -53,7 +53,7 @@
     - name: process
       type: group
       description: >
-        These fields contains process and user information.
+        These fields contain process and user information.
         Available only on Linux when using the eBPF backend.
 
       fields:
@@ -61,7 +61,7 @@
         type: keyword
         description: Globally unique identifier for a process.
 
-      - name: executable
+      - name: name
         type: keyword
         description: Process command.
 
@@ -70,7 +70,7 @@
         description: PID.
 
       - name: user.id
-        type: integer
+        type: keyword
         description: User ID (euid).
 
       - name: user.name
@@ -78,7 +78,7 @@
         description: User name.
 
       - name: group.id
-        type: integer
+        type: keyword
         description: Group ID (egid).
 
       - name: group.name

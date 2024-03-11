@@ -385,7 +385,7 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 
 	if e.Process != nil {
 		file["process.entity_id"] = e.Process.EntityID
-		file["process.executable"] = e.Process.Name
+		file["process.name"] = e.Process.Name
 		file["process.pid"] = e.Process.PID
 		file["process.user.id"] = e.Process.User.ID
 		file["process.user.name"] = e.Process.User.Name

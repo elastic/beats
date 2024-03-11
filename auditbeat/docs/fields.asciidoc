@@ -2661,7 +2661,7 @@ example: s0
 [float]
 === process
 
-These fields contains process and user information. Available only on Linux when using the eBPF backend.
+These fields contain process and user information. Available only on Linux when using the eBPF backend.
 
 
 
@@ -2674,7 +2674,7 @@ type: keyword
 
 --
 
-*`file.process.executable`*::
+*`file.process.name`*::
 +
 --
 Process command.
@@ -2697,7 +2697,7 @@ type: integer
 --
 User ID (euid).
 
-type: integer
+type: keyword
 
 --
 
@@ -2715,7 +2715,7 @@ type: keyword
 --
 Group ID (egid).
 
-type: integer
+type: keyword
 
 --
 
