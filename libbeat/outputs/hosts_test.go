@@ -18,9 +18,11 @@
 package outputs
 
 import (
-	"github.com/elastic/elastic-agent-libs/config"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestHostsNumWorkers(t *testing.T) {
