@@ -61,9 +61,10 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_S
   export RACE_DETECTOR="true"
   export TEST_COVERAGE="true"
   export DOCKER_PULL="0"
-  export TEST_TAGS="oracle"
+  export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}oracle"
 fi
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+  # run the cloud tests for the given modules.
   export MODULE_DIR="x-pack/metricbeat/module/aws"
 fi
