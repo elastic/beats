@@ -484,4 +484,8 @@ if are_paths_changed "${packaging_changeset[@]}" ; then
   export PACKAGING_CHANGES="true"
 fi
 
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+  defineModuleFromTheChangeSet "${MODULE_DIR}"
+fi
+
 check_and_set_beat_vars
