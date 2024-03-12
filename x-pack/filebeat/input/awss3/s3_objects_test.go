@@ -8,18 +8,19 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"io"
-	"os"
-	"path/filepath"
-	"strings"
-	"testing"
-
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"io"
+	"os"
+	"path/filepath"
+	"strings"
+	"sync"
+	"testing"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -320,8 +321,14 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents uint
 	mockPublisher := NewMockBeatClient(ctrl)
 
 	s3Event, s3Resp := newS3Object(t, file, contentType)
-	ack := NewEventACKTracker(ctx, nil)
-	ack.MarkS3FromListingProcessedWithData(numEvents)
+	acker := NewEventACKTracker(ctx, nil)
+	_, keepaliveCancel := context.WithCancel(ctx)
+	log := log.Named("sqs_s3_event")
+	mockMsgHandler := NewMockSQSProcessor(ctrl)
+	msg := newSQSMessage(newS3Event("log.json"))
+	acker.MarkSQSProcessedWithData(&msg, numEvents, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
+	acker.EventsToBeTracked.Add(numEvents)
+
 	var events []beat.Event
 	gomock.InOrder(
 		mockS3API.EXPECT().
@@ -331,19 +338,18 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents uint
 			Publish(gomock.Any()).
 			Do(func(event beat.Event) {
 				events = append(events, event)
-				ack.ACK()
+				acker.Track(0, 1)
 			}).
 			Times(int(numEvents)),
 	)
 
 	s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3API, selectors, backupConfig{}, 1)
-	s3EventsCreatedTotal, err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
+	s3EventsCreatedTotal, err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, acker, s3Event).ProcessS3Object()
 
 	if !expectErr {
 		require.NoError(t, err)
 		assert.EqualValues(t, numEvents, len(events))
 		assert.EqualValues(t, numEvents, s3EventsCreatedTotal)
-		assert.EqualValues(t, 0, ack.EventsToBeAcked.Load())
 	} else {
 		require.Error(t, err)
 	}

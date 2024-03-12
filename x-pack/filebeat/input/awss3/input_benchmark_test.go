@@ -9,6 +9,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"math"
 	"math/rand"
 	"os"
@@ -33,7 +35,6 @@ import (
 	"github.com/dustin/go-humanize"
 	"github.com/olekukonko/tablewriter"
 
-	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -133,6 +134,7 @@ func (c *constantSQS) GetQueueAttributes(ctx context.Context, attr []sqsTypes.Qu
 }
 
 type s3PagerConstant struct {
+	listPrefix   string
 	mutex        *sync.Mutex
 	objects      []s3Types.Object
 	currentIndex int
@@ -161,13 +163,13 @@ func (c *s3PagerConstant) NextPage(ctx context.Context, optFns ...func(*s3.Optio
 
 	ret.Contents = c.objects[c.currentIndex : c.currentIndex+pageSize]
 	c.currentIndex = c.currentIndex + pageSize
-
 	return ret, nil
 }
 
 func newS3PagerConstant(listPrefix string) *s3PagerConstant {
 	lastModified := time.Now()
 	ret := &s3PagerConstant{
+		listPrefix:   listPrefix,
 		mutex:        new(sync.Mutex),
 		currentIndex: 0,
 	}
@@ -279,24 +281,12 @@ type fakePipeline struct {
 
 func (fp *fakePipeline) ackEvents() {
 	for _, client := range fp.clients {
-		addedEventsForAllAcker := 0
 		for _, acker := range client.ackers {
-			if acker.FullyAcked() {
-				continue
-			}
-
-			addedEvents := 0
-			for acker.EventsToBeAcked.Load() > 0 && uint64(addedEvents) < acker.EventsToBeAcked.Load() {
-				addedEvents++
+			addedEvents := acker.EventsToBeTracked.Load()
+			for addedEvents > 0 && acker.EventsTracked.Load() != addedEvents {
 				fp.pendingEvents.Dec()
 				client.eventListener.AddEvent(beat.Event{Private: acker}, true)
 			}
-
-			addedEventsForAllAcker += addedEvents
-		}
-
-		if addedEventsForAllAcker > 0 {
-			client.eventListener.ACKEvents(addedEventsForAllAcker)
 		}
 	}
 }
@@ -494,12 +484,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		metrics := newInputMetrics("test_id", metricRegistry, numberOfWorkers)
 
 		client := pubtest.NewChanClientWithCallback(100, func(event beat.Event) {
-			go func(acker *EventACKTracker) {
-				// 63 is the total number of events in a single S3 object
-				acker.MarkS3FromListingProcessedWithData(63)
-			}(event.Private.(*EventACKTracker))
-
-			event.Private.(*EventACKTracker).ACK()
+			event.Private.(*awscommon.EventACKTracker).ACK()
 		})
 
 		defer func() {

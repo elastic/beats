@@ -82,8 +82,8 @@ func TestSQSReceiver(t *testing.T) {
 					_, keepaliveCancel := context.WithCancel(ctx)
 					log := log.Named("sqs_s3_event")
 					acker.MarkSQSProcessedWithData(msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
-					acker.ACK()
-					acker.FlushForSQS()
+					acker.Track(0, 1)
+					acker.checkForCancel()
 
 					return 1, nil
 				})

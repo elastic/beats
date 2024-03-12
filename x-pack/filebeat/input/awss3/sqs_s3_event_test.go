@@ -56,9 +56,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		require.NoError(t, processingErr)
 		require.Equal(t, expectedEventsPublishedTotal, eventsPublishedTotal)
 
-		gomock.InOrder(
-			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
-		)
+		mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil)
 
 		require.NoError(t, p.DeleteSQS(&msg, acker.ReceiveCount, processingErr, acker.Handles))
 	})
@@ -86,9 +84,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		require.Error(t, processingErr)
 		require.Equal(t, uint64(0), eventsPublishedTotal)
 
-		gomock.InOrder(
-			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&invalidBodyMsg)).Return(nil),
-		)
+		mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&invalidBodyMsg)).Return(nil)
 
 		require.Error(t, p.DeleteSQS(&invalidBodyMsg, acker.ReceiveCount, processingErr, acker.Handles))
 	})
@@ -112,9 +108,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		require.NoError(t, processingErr)
 		require.Equal(t, uint64(0), eventsPublishedTotal)
 
-		gomock.InOrder(
-			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&emptyRecordsMsg)).Return(nil),
-		)
+		mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&emptyRecordsMsg)).Return(nil)
 
 		require.NoError(t, p.DeleteSQS(&emptyRecordsMsg, acker.ReceiveCount, processingErr, acker.Handles))
 	})
@@ -210,9 +204,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		require.Error(t, processingErr)
 		require.Equal(t, uint64(0), eventsPublishedTotal)
 
-		gomock.InOrder(
-			mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil),
-		)
+		mockAPI.EXPECT().DeleteMessage(gomock.Any(), gomock.Eq(&msg)).Return(nil)
 
 		require.Error(t, p.DeleteSQS(&msg, acker.ReceiveCount, processingErr, acker.Handles))
 	})
