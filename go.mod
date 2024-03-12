@@ -185,11 +185,12 @@ require (
 	cloud.google.com/go/compute v1.23.0
 	cloud.google.com/go/redis v1.13.1
 	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.9.0
-	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.2.2
+	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.4.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.6.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor v0.8.0
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.0.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.1.1
 	github.com/Azure/azure-sdk-for-go/sdk/storage/azblob v1.0.0
 	github.com/Azure/go-autorest/autorest/adal v0.9.14
 	github.com/apache/arrow/go/v14 v14.0.2
@@ -204,7 +205,7 @@ require (
 	github.com/elastic/elastic-agent-autodiscover v0.6.7
 	github.com/elastic/elastic-agent-libs v0.7.5
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
-	github.com/elastic/elastic-agent-system-metrics v0.9.1
+	github.com/elastic/elastic-agent-system-metrics v0.9.2
 	github.com/elastic/go-elasticsearch/v8 v8.12.0
 	github.com/elastic/mito v1.9.0
 	github.com/elastic/tk-btf v0.1.0
@@ -249,7 +250,7 @@ require (
 	github.com/Azure/go-autorest/logger v0.2.1 // indirect
 	github.com/Azure/go-autorest/tracing v0.6.0 // indirect
 	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
-	github.com/AzureAD/microsoft-authentication-library-for-go v0.9.0 // indirect
+	github.com/AzureAD/microsoft-authentication-library-for-go v1.1.1 // indirect
 	github.com/JohnCGriffin/overflow v0.0.0-20211019200055-46fa312c352c // indirect
 	github.com/andybalholm/brotli v1.0.5 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.0 // indirect
@@ -294,7 +295,7 @@ require (
 	github.com/gobuffalo/here v0.6.7 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/godror/knownpb v0.1.0 // indirect
-	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
+	github.com/golang-jwt/jwt/v5 v5.0.0 // indirect
 	github.com/golang-sql/civil v0.0.0-20190719163853-cb61b32ac6fe // indirect
 	github.com/golang-sql/sqlexp v0.1.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
