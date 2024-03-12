@@ -31,12 +31,15 @@ func init() {
 type EventACKTracker struct {
 	ID uint64
 
-	EventsToBeTracked *atomic.Uint64
+	EventsAcked       *atomic.Uint64
 	EventsTracked     *atomic.Uint64
+	EventsToBeTracked *atomic.Uint64
 
 	ctx        context.Context
 	cancel     context.CancelFunc
 	deletionWg *sync.WaitGroup
+
+	mutex *sync.Mutex
 
 	msg             *types.Message
 	ReceiveCount    int
@@ -56,8 +59,10 @@ func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventA
 		ctx:               ctx,
 		cancel:            cancel,
 		deletionWg:        deletionWg,
-		EventsToBeTracked: atomic.NewUint64(0),
+		mutex:             new(sync.Mutex),
+		EventsAcked:       atomic.NewUint64(0),
 		EventsTracked:     atomic.NewUint64(0),
+		EventsToBeTracked: atomic.NewUint64(0),
 	}
 
 	go func() {
@@ -66,7 +71,7 @@ func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventA
 
 		for {
 			<-t.C
-			if !acker.FullyAcked() {
+			if !acker.FullyTracked() {
 				continue
 			}
 
@@ -102,7 +107,7 @@ func (a *EventACKTracker) MarkSQSProcessedWithData(msg *types.Message, published
 	a.log = log
 }
 
-func (a *EventACKTracker) FullyAcked() bool {
+func (a *EventACKTracker) FullyTracked() bool {
 	eventsToBeTracked := a.EventsToBeTracked.Load()
 	if eventsToBeTracked == 0 {
 		return false
@@ -117,23 +122,34 @@ func (a *EventACKTracker) FlushForSQS() {
 	a.keepaliveCancel()
 	a.keepaliveWg.Wait()
 
-	err := a.msgHandler.DeleteSQS(a.msg, a.ReceiveCount, a.processingErr, a.Handles)
+	if a.EventsAcked.Load() == a.EventsTracked.Load() {
+		err := a.msgHandler.DeleteSQS(a.msg, a.ReceiveCount, a.processingErr, a.Handles)
+		if err != nil {
+			a.log.Warnw("Failed deleting SQS message.",
+				"error", err,
+				"message_id", *a.msg.MessageId,
+				"elapsed_time_ns", time.Since(a.start))
+		} else {
+			a.log.Debugw("Success deleting SQS message.",
+				"message_id", *a.msg.MessageId,
+				"elapsed_time_ns", time.Since(a.start))
+		}
+	} else {
+		a.log.Infow("Skipping deleting SQS message, not all events acked.",
+			"events_published", a.EventsTracked.Load(),
+			"events_acked", a.EventsAcked.Load(),
+			"message_id", *a.msg.MessageId,
+			"elapsed_time_ns", time.Since(a.start))
+
+	}
+
 	a.deletionWg.Done()
 
-	if err != nil {
-		a.log.Warnw("Failed deleting SQS message.",
-			"error", err,
-			"message_id", *a.msg.MessageId,
-			"elapsed_time_ns", time.Since(a.start))
-	} else {
-		a.log.Debugw("Success deleting SQS message.",
-			"message_id", *a.msg.MessageId,
-			"elapsed_time_ns", time.Since(a.start))
-	}
 }
 
 // Track decrements the number of total Events.
-func (a *EventACKTracker) Track(_ int, total int) {
+func (a *EventACKTracker) Track(acked int, total int) {
+	a.EventsAcked.Add(uint64(acked))
 	a.EventsTracked.Add(uint64(total))
 }
 
@@ -161,5 +177,9 @@ func (a *eventListener) AddEvent(event beat.Event, published bool) {
 		return
 	}
 
-	acker.Track(0, 1)
+	var acked int
+	if published {
+		acked = 1
+	}
+	acker.Track(acked, 1)
 }
