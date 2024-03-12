@@ -7,7 +7,7 @@ source .buildkite/scripts/install_tools.sh
 
 set -euo pipefail
 
-trap 'teardown; unset_secrets' EXIT
+trap 'teardown || true; unset_secrets' EXIT
 
 # Set the MODULE env variable if possible
 defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
