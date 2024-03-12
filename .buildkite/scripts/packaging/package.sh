@@ -16,7 +16,7 @@ git --no-pager log -n2 || true
 git --no-pager diff || true
 
 echo "--- Tree"
-tree bin || true
+ls -l bin/ || true
 
 echo "--- Creating package"
 mage -d "${BEATS_PROJECT_NAME}" package
