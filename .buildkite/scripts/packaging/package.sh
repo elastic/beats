@@ -10,6 +10,14 @@ VERSION="$(make get-version)"
 SOURCE_TAG+="${VERSION}${IMG_POSTFIX}"
 TARGET="observability-ci/${BEATS_PROJECT_NAME}"
 
+echo "--- Git status"
+git --no-pager status || true
+git --no-pager log -n2 || true
+git --no-pager diff || true
+
+echo "--- Tree"
+tree bin || true
+
 echo "--- Creating package"
 mage -d "${BEATS_PROJECT_NAME}" package
 
