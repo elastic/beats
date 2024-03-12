@@ -27,8 +27,6 @@ steps:
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
         command: ".buildkite/scripts/go_int_tests.sh"
-        env:
-          MODULE: $MODULE
         agents:
           provider: "gcp"
           image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
@@ -40,8 +38,6 @@ steps:
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: ".buildkite/scripts/py_int_tests.sh"
-        env:
-          MODULE: $MODULE
         agents:
           provider: "gcp"
           image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
@@ -140,8 +136,6 @@ if  are_conditions_met_aws_tests; then
       - label: ":linux: ${MODULE^^} Cloud Tests"
         key: "extended-cloud-test"
         command: ".buildkite/scripts/cloud_tests.sh"
-        env:
-          MODULE: $MODULE
         agents:
           provider: "gcp"
           image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"

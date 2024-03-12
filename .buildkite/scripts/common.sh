@@ -453,7 +453,8 @@ startCloudTestEnv() {
   popd > /dev/null
 }
 
-cleanup() {
+teardown() {
+  # Teardown resources after using them
   echo "---Terraform Cleanup"
   .ci/scripts/terraform-cleanup.sh "${MODULE_DIR}"              #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
 
@@ -482,10 +483,6 @@ fi
 
 if are_paths_changed "${packaging_changeset[@]}" ; then
   export PACKAGING_CHANGES="true"
-fi
-
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
-  defineModuleFromTheChangeSet "${MODULE_DIR}"
 fi
 
 check_and_set_beat_vars
