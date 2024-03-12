@@ -33,7 +33,8 @@ func TestEventACKTrackerWithDelete(t *testing.T) {
 	msg := newSQSMessage(newS3Event("log.json"))
 	mockMsgHandler.EXPECT().DeleteSQS(gomock.Eq(&msg), gomock.Eq(-1), gomock.Nil(), gomock.Nil()).Return(nil)
 	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
-	acker.Track(1, 1)
+	acker.Published()
+	acker.ACK()
 	<-acker.ctx.Done()
 
 	assert.EqualValues(t, true, acker.FullyTracked())
@@ -55,14 +56,14 @@ func TestEventACKTrackerNoDelete(t *testing.T) {
 	mockMsgHandler := NewMockSQSProcessor(ctrl)
 	msg := newSQSMessage(newS3Event("log.json"))
 	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
-	acker.Track(0, 1)
+	acker.Drop()
 	<-acker.ctx.Done()
 
 	assert.EqualValues(t, true, acker.FullyTracked())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
-func TestEventACKTrackerNoTrack(t *testing.T) {
+func TestEventACKTrackerCancel(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
@@ -94,7 +95,6 @@ func TestEventACKHandlerNoDelete(t *testing.T) {
 	// Create an ACK handler and simulate one ACKed event.
 	ackHandler := NewEventACKHandler()
 	ackHandler.AddEvent(beat.Event{Private: acker}, false)
-	ackHandler.ACKEvents(1)
 	<-acker.ctx.Done()
 
 	assert.EqualValues(t, true, acker.FullyTracked())
@@ -145,7 +145,8 @@ func TestEventACKHandlerFullyTrackedWithDelete(t *testing.T) {
 	msg := newSQSMessage(newS3Event("log.json"))
 	mockMsgHandler.EXPECT().DeleteSQS(gomock.Eq(&msg), gomock.Eq(-1), gomock.Nil(), gomock.Nil()).Return(nil)
 	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
-	acker.Track(1, 1)
+	acker.Published()
+	acker.ACK()
 	<-acker.ctx.Done()
 	assert.EqualValues(t, true, acker.FullyTracked())
 
@@ -171,7 +172,7 @@ func TestEventACKHandlerFullyTrackedNoDelete(t *testing.T) {
 	mockMsgHandler := NewMockSQSProcessor(ctrl)
 	msg := newSQSMessage(newS3Event("log.json"))
 	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
-	acker.Track(0, 1)
+	acker.Drop()
 	<-acker.ctx.Done()
 	assert.EqualValues(t, true, acker.FullyTracked())
 

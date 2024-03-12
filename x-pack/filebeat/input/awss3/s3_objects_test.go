@@ -339,7 +339,7 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents uint
 			Publish(gomock.Any()).
 			Do(func(event beat.Event) {
 				events = append(events, event)
-				acker.Track(1, 1)
+				acker.ACK()
 			}).
 			Times(int(numEvents)),
 	)
