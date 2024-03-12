@@ -164,7 +164,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 			Events:         3, // Queue size
 			FlushMinEvents: 2,
 			FlushTimeout:   10 * time.Millisecond,
-		}, 1)
+		})
 
 	p := q.Producer(queue.ProducerConfig{
 		ACK: func(count int) {
