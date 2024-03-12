@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+source .buildkite/env-scripts/util.sh
+
+GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
+
 checkout_merge() {
     local target_branch=$1
     local pr_commit=$2
@@ -20,9 +24,11 @@ checkout_merge() {
     git checkout -b ${merge_branch}
     echo "New branch created: $(git rev-parse --abbrev-ref HEAD)"
 
-    # set author identity so it can be run git merge
-    git config user.name "github-merged-pr-post-checkout"
-    git config user.email "auto-merge@buildkite"
+    github_username=$(retry_with_count 5 vault kv get -field username ${GITHUB_TOKEN_VAULT_PATH})
+    github_email=$(retry_with_count 5 vault kv get -field email ${GITHUB_TOKEN_VAULT_PATH})
+
+    git config user.name "$github_username"
+    git config user.email "$github_email"
 
     git merge --no-edit "${BUILDKITE_COMMIT}" || {
         local merge_result=$?

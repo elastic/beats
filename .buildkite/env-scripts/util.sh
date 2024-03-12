@@ -13,7 +13,7 @@ with_go() {
     echo "Setting up the Go environment..."
     create_bin
     check_platform_architecture
-    retry 5 curl -sL -o ${BIN}/gvm "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${PLATFORM_TYPE}-${arch_type}"
+    retry_with_count 5 curl -sL -o ${BIN}/gvm "https://github.com/andrewkroh/gvm/releases/download/${SETUP_GVM_VERSION}/gvm-${PLATFORM_TYPE}-${arch_type}"
     export PATH="${PATH}:${BIN}"
     chmod +x ${BIN}/gvm
     eval "$(gvm "$go_version")"
@@ -60,7 +60,7 @@ check_platform_architecture() {
   esac
 }
 
-retry() {
+retry_with_count() {
     local retries=$1
     shift
     local count=0
@@ -89,16 +89,11 @@ are_files_changed() {
   fi
 }
 
-cleanup() {
-  echo "Deleting temporary files..."
-  rm -rf ${BIN}/${TMP_FOLDER}.*
-  echo "Done."
-}
-
-unset_secrets () {
-  for var in $(printenv | sed 's;=.*;;' | sort); do
-    if [[ "$var" == *_SECRET || "$var" == *_TOKEN ]]; then
-      unset "$var"
-    fi
-  done
+changeset_applies() {
+  local changeset=$1
+  if are_files_changed "$changeset"; then
+    echo true
+  else
+    echo false
+  fi
 }
