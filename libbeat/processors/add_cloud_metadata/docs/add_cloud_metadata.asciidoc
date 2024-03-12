@@ -55,6 +55,11 @@ List of names the `providers` setting supports:
 
 - "alibaba", or "ecs" for the Alibaba Cloud provider (disabled by default).
 - "azure" for Azure Virtual Machine (enabled by default).
+   If the virtual machine is part of an AKS managed cluster, the fields
+   `orchestrator.cluster.name` and `orchestrator.cluster.id` can also be
+   retrieved. "TENANT_ID", "CLIENT_ID" and "CLIENT_SECRET" environment
+   variables need to be set for authentication purposes. If not set we
+   fallback to https://learn.microsoft.com/en-us/azure/developer/go/azure-sdk-authentication?tabs=bash#2-authenticate-with-azure[DefaultAzureCredential] and user can choose different authentication methods (e.g. workload identity).
 - "digitalocean" for Digital Ocean (enabled by default).
 - "aws", or "ec2" for Amazon Web Services (enabled by default).
 - "gcp" for Google Copmute Enging (enabled by default).
