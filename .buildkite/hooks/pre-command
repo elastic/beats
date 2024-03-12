@@ -2,6 +2,27 @@
 
 set -euo pipefail
 
+AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_account_auth"
+
+retry() {
+  local retries=$1
+  shift
+  local count=0
+  until "$@"; do
+    exit=$?
+    wait=$((2 ** count))
+    count=$((count + 1))
+    if [ $count -lt "$retries" ]; then
+      >&2 echo "Retry $count/$retries exited $exit, retrying in $wait seconds..."
+      sleep $wait
+    else
+      >&2 echo "Retry $count/$retries exited $exit, no more retries left."
+      return $exit
+    fi
+  done
+  return 0
+}
+
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" ]]; then
   source .buildkite/env-scripts/env.sh
   source .buildkite/env-scripts/util.sh
@@ -12,10 +33,17 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == 
   fi
 fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-libbeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
   source .buildkite/scripts/setenv.sh
   if [[ "${BUILDKITE_COMMAND}" =~ ^buildkite-agent ]]; then
     echo "Skipped pre-command when running the Upload pipeline"
     exit 0
   fi
+fi
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" && "$BUILDKITE_STEP_KEY" == "extended-cloud-test" ]]; then
+  BEATS_AWS_SECRET_KEY=$(retry 5 vault kv get -field secret_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
+  export BEATS_AWS_SECRET_KEY
+  BEATS_AWS_ACCESS_KEY=$(retry 5 vault kv get -field access_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
+  export BEATS_AWS_ACCESS_KEY
 fi
