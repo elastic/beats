@@ -403,19 +403,19 @@ defineModuleFromTheChangeSet() {
   # This method gathers the module name, if required, in order to run the ITs only if the changeset affects a specific module.
   # For such, it's required to look for changes under the module folder and exclude anything else such as asciidoc and png files.
   # This method defines and exports the MODULE variable with a particular module name or '' if changeset doesn't affect a specific module
-  local module_path=$1
-  if [[ "$module_path" == *"x-pack/"* ]]; then
+  local project_path=$1
+  if [[ "$project_path" == *"x-pack/"* ]]; then
     local pattern=("$XPACK_MODULE_PATTERN")
   else
     local pattern=("$OSS_MODULE_PATTERN")
   fi
-  local module_name="${module_path#*module/}"
-  local module_path_transformed=$(echo "$module_path" | sed 's/\//\\\//g')
-  local module_path_exclussion="((?!^${module_path_transformed}\\/).)*\$"
-  local exclude=("^(${module_path_transformed}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
+  local module_name="${project_path#*module/}"
+  local project_path_transformed=$(echo "$project_path" | sed 's/\//\\\//g')
+  local project_path_exclussion="((?!^${project_path_transformed}\\/).)*\$"
+  local exclude=("^(${project_path_transformed}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
   if are_paths_changed "${pattern[@]}" && ! are_changed_only_paths "${exclude[@]}"; then
     export MODULE=${module_name}
-  elif [ -d "${module_path}" ]; then
+  elif [ -d "${project_path}" ]; then
     export MODULE="aws"                 # TODO: remove this line and uncomment the line below when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
     # export MODULE=''                  # TODO: uncomment the line when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
   fi
