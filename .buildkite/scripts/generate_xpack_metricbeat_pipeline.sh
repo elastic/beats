@@ -133,7 +133,7 @@ fi
 
 if  are_conditions_met_aws_tests; then
   cat >> $pipelineName <<- YAML
-      - label: ":linux: ${MODULE^^} Cloud Tests"
+      - label: ":linux: Cloud Tests"
         key: "extended-cloud-test"
         command: ".buildkite/scripts/cloud_tests.sh"
         agents:
