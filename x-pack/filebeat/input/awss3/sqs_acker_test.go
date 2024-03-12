@@ -34,7 +34,7 @@ func TestEventACKTracker(t *testing.T) {
 	mockMsgHandler.EXPECT().DeleteSQS(gomock.Eq(&msg), gomock.Eq(-1), gomock.Nil(), gomock.Nil()).Return(nil)
 	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
 	acker.Track(0, 1)
-	acker.checkForCancel()
+	acker.cancelAndFlush()
 
 	assert.EqualValues(t, true, acker.FullyAcked())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
@@ -74,7 +74,7 @@ func TestEventACKHandler(t *testing.T) {
 	ackHandler := NewEventACKHandler()
 	ackHandler.AddEvent(beat.Event{Private: acker}, true)
 	ackHandler.ACKEvents(1)
-	acker.checkForCancel()
+	acker.cancelAndFlush()
 
 	assert.EqualValues(t, true, acker.FullyAcked())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
@@ -98,7 +98,7 @@ func TestEventACKHandlerFullyAcked(t *testing.T) {
 	mockMsgHandler.EXPECT().DeleteSQS(gomock.Eq(&msg), gomock.Eq(-1), gomock.Nil(), gomock.Nil()).Return(nil)
 	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
 	acker.Track(0, 1)
-	acker.checkForCancel()
+	acker.cancelAndFlush()
 	assert.EqualValues(t, true, acker.FullyAcked())
 
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)

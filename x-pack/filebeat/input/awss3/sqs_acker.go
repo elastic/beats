@@ -66,24 +66,21 @@ func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventA
 
 		for {
 			<-t.C
-			if acker.checkForCancel() {
-				return
+			if !acker.FullyAcked() {
+				continue
 			}
+
+			acker.cancelAndFlush()
+			return
 		}
 	}()
 
 	return acker
 }
 
-func (a *EventACKTracker) checkForCancel() bool {
-	if !a.FullyAcked() {
-		return false
-	}
-
+func (a *EventACKTracker) cancelAndFlush() {
 	a.cancel()
 	a.FlushForSQS()
-
-	return true
 }
 
 // MarkSQSProcessedWithData Every call after the first one is a no-op
