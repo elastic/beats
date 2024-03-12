@@ -17,7 +17,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
-func TestEventACKTracker(t *testing.T) {
+func TestEventACKTrackerWithDelete(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
@@ -33,10 +33,32 @@ func TestEventACKTracker(t *testing.T) {
 	msg := newSQSMessage(newS3Event("log.json"))
 	mockMsgHandler.EXPECT().DeleteSQS(gomock.Eq(&msg), gomock.Eq(-1), gomock.Nil(), gomock.Nil()).Return(nil)
 	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
-	acker.Track(0, 1)
-	acker.cancelAndFlush()
+	acker.Track(1, 1)
+	<-acker.ctx.Done()
 
-	assert.EqualValues(t, true, acker.FullyAcked())
+	assert.EqualValues(t, true, acker.FullyTracked())
+	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
+}
+
+func TestEventACKTrackerNoDelete(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	deletionWg := new(sync.WaitGroup)
+	deletionWg.Add(1)
+
+	acker := NewEventACKTracker(ctx, deletionWg)
+	_, keepaliveCancel := context.WithCancel(ctx)
+	log := log.Named("sqs_s3_event")
+	ctrl, _ := gomock.WithContext(ctx, t)
+	defer ctrl.Finish()
+	mockMsgHandler := NewMockSQSProcessor(ctrl)
+	msg := newSQSMessage(newS3Event("log.json"))
+	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
+	acker.Track(0, 1)
+	<-acker.ctx.Done()
+
+	assert.EqualValues(t, true, acker.FullyTracked())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
@@ -49,11 +71,37 @@ func TestEventACKTrackerNoTrack(t *testing.T) {
 	cancel()
 	<-acker.ctx.Done()
 
-	assert.EqualValues(t, false, acker.FullyAcked())
+	assert.EqualValues(t, false, acker.FullyTracked())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
-func TestEventACKHandler(t *testing.T) {
+func TestEventACKHandlerNoDelete(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	// Create acker. Add one ACK to event listener.
+	deletionWg := new(sync.WaitGroup)
+	deletionWg.Add(1)
+	acker := NewEventACKTracker(ctx, deletionWg)
+	_, keepaliveCancel := context.WithCancel(ctx)
+	log := log.Named("sqs_s3_event")
+	ctrl, _ := gomock.WithContext(ctx, t)
+	defer ctrl.Finish()
+	mockMsgHandler := NewMockSQSProcessor(ctrl)
+	msg := newSQSMessage(newS3Event("log.json"))
+	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
+
+	// Create an ACK handler and simulate one ACKed event.
+	ackHandler := NewEventACKHandler()
+	ackHandler.AddEvent(beat.Event{Private: acker}, false)
+	ackHandler.ACKEvents(1)
+	<-acker.ctx.Done()
+
+	assert.EqualValues(t, true, acker.FullyTracked())
+	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
+}
+
+func TestEventACKHandlerWithDelete(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
@@ -74,13 +122,13 @@ func TestEventACKHandler(t *testing.T) {
 	ackHandler := NewEventACKHandler()
 	ackHandler.AddEvent(beat.Event{Private: acker}, true)
 	ackHandler.ACKEvents(1)
-	acker.cancelAndFlush()
+	<-acker.ctx.Done()
 
-	assert.EqualValues(t, true, acker.FullyAcked())
+	assert.EqualValues(t, true, acker.FullyTracked())
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 }
 
-func TestEventACKHandlerFullyAcked(t *testing.T) {
+func TestEventACKHandlerFullyTrackedWithDelete(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	t.Cleanup(cancel)
 
@@ -97,13 +145,39 @@ func TestEventACKHandlerFullyAcked(t *testing.T) {
 	msg := newSQSMessage(newS3Event("log.json"))
 	mockMsgHandler.EXPECT().DeleteSQS(gomock.Eq(&msg), gomock.Eq(-1), gomock.Nil(), gomock.Nil()).Return(nil)
 	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
-	acker.Track(0, 1)
-	acker.cancelAndFlush()
-	assert.EqualValues(t, true, acker.FullyAcked())
+	acker.Track(1, 1)
+	<-acker.ctx.Done()
+	assert.EqualValues(t, true, acker.FullyTracked())
 
 	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
 
 	acker.EventsToBeTracked.Inc()
 
-	assert.EqualValues(t, false, acker.FullyAcked())
+	assert.EqualValues(t, false, acker.FullyTracked())
+}
+func TestEventACKHandlerFullyTrackedNoDelete(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
+	// Create acker. Add one Track.
+	deletionWg := new(sync.WaitGroup)
+	deletionWg.Add(1)
+
+	acker := NewEventACKTracker(ctx, deletionWg)
+	_, keepaliveCancel := context.WithCancel(ctx)
+	log := log.Named("sqs_s3_event")
+	ctrl, _ := gomock.WithContext(ctx, t)
+	defer ctrl.Finish()
+	mockMsgHandler := NewMockSQSProcessor(ctrl)
+	msg := newSQSMessage(newS3Event("log.json"))
+	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
+	acker.Track(0, 1)
+	<-acker.ctx.Done()
+	assert.EqualValues(t, true, acker.FullyTracked())
+
+	assert.ErrorIs(t, acker.ctx.Err(), context.Canceled)
+
+	acker.EventsToBeTracked.Inc()
+
+	assert.EqualValues(t, false, acker.FullyTracked())
 }

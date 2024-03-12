@@ -36,7 +36,74 @@ func TestSQSReceiver(t *testing.T) {
 
 	const maxMessages = 5
 
-	t.Run("ReceiveMessage success", func(t *testing.T) {
+	t.Run("ReceiveMessage success with delete", func(t *testing.T) {
+		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
+		defer cancel()
+
+		ctrl, ctx := gomock.WithContext(ctx, t)
+		defer ctrl.Finish()
+		mockAPI := NewMockSQSAPI(ctrl)
+		mockMsgHandler := NewMockSQSProcessor(ctrl)
+		msg := newSQSMessage(newS3Event("log.json"))
+
+		gomock.InOrder(
+			// Initial ReceiveMessage for maxMessages.
+			mockAPI.EXPECT().
+				ReceiveMessage(gomock.Any(), gomock.Eq(maxMessages)).
+				Times(1).
+				DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
+					// Return single message.
+					return []types.Message{msg}, nil
+				}),
+
+			// Follow up ReceiveMessages for either maxMessages-1 or maxMessages
+			// depending on how long processing of previous message takes.
+			mockAPI.EXPECT().
+				ReceiveMessage(gomock.Any(), gomock.Any()).
+				Times(1).
+				DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
+					// Stop the test.
+					cancel()
+					return nil, nil
+				}),
+		)
+
+		mockClient := NewMockBeatClient(ctrl)
+		mockBeatPipeline := NewMockBeatPipeline(ctrl)
+
+		mockBeatPipeline.EXPECT().ConnectWith(gomock.Any()).Return(mockClient, nil).Times(maxMessages)
+
+		// Expect the one message returned to have been processed.
+		mockMsgHandler.EXPECT().
+			ProcessSQS(gomock.Any(), gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any()).
+			Times(1).
+			DoAndReturn(
+				func(ctx context.Context, msg *types.Message, _ beat.Client, acker *EventACKTracker, _ time.Time) (uint64, error) {
+					_, keepaliveCancel := context.WithCancel(ctx)
+					log := log.Named("sqs_s3_event")
+					acker.MarkSQSProcessedWithData(msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
+					acker.Track(1, 1)
+					<-acker.ctx.Done()
+
+					return 1, nil
+				})
+
+		// Expect the client to be closed
+		mockClient.EXPECT().Close().Times(maxMessages)
+
+		// Expect the one message returned to have been deleted.
+		mockMsgHandler.EXPECT().
+			DeleteSQS(gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any()).
+			Times(1).
+			Return(nil)
+
+		// Execute sqsReader and verify calls/state.
+		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler, mockBeatPipeline)
+		require.NoError(t, receiver.Receive(ctx))
+		assert.Equal(t, maxMessages, receiver.workerSem.Available())
+	})
+
+	t.Run("ReceiveMessage success no delete", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 		defer cancel()
 
@@ -83,19 +150,13 @@ func TestSQSReceiver(t *testing.T) {
 					log := log.Named("sqs_s3_event")
 					acker.MarkSQSProcessedWithData(msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
 					acker.Track(0, 1)
-					acker.cancelAndFlush()
+					<-acker.ctx.Done()
 
 					return 1, nil
 				})
 
 		// Expect the client to be closed
 		mockClient.EXPECT().Close().Times(maxMessages)
-
-		// Expect the one message returned to have been deleted.
-		mockMsgHandler.EXPECT().
-			DeleteSQS(gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any()).
-			Times(1).
-			Return(nil)
 
 		// Execute sqsReader and verify calls/state.
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler, mockBeatPipeline)
