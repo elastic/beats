@@ -70,6 +70,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix panic when sqs input metrics getter is invoked {pull}36101[36101] {issue}36077[36077]
 - Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
 - Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
+- Fix a race condition that could crash Filebeat with a "negative WaitGroup counter" error {pull}38094[38094]
 
 *Heartbeat*
 

@@ -36,9 +36,10 @@ type ackProducer struct {
 }
 
 type openState struct {
-	log    *logp.Logger
-	done   chan struct{}
-	events chan pushRequest
+	log       *logp.Logger
+	done      chan struct{}
+	queueDone <-chan struct{}
+	events    chan pushRequest
 }
 
 // producerID stores the order of events within a single producer, so multiple
@@ -58,9 +59,10 @@ type ackHandler func(count int)
 
 func newProducer(b *broker, cb ackHandler, dropCB func(interface{}), dropOnCancel bool) queue.Producer {
 	openState := openState{
-		log:    b.logger,
-		done:   make(chan struct{}),
-		events: b.pushChan,
+		log:       b.logger,
+		done:      make(chan struct{}),
+		queueDone: b.done,
+		events:    b.pushChan,
 	}
 
 	if cb != nil {
@@ -143,18 +145,21 @@ func (st *openState) Close() {
 func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	select {
 	case st.events <- req:
-		// If the output is blocked and the queue is full, `req` is written
-		// to `st.events`, however the queue never writes back to `req.resp`,
-		// which effectively blocks for ever. So we also need to select on the
-		// done channel to ensure we don't miss the shutdown signal.
+		// The events channel is buffered, which means we may successfully
+		// write to it even if the queue is shutting down. To avoid blocking
+		// forever during shutdown, we also have to wait on the queue's
+		// shutdown channel.
 		select {
 		case resp := <-req.resp:
 			return resp, true
-		case <-st.done:
+		case <-st.queueDone:
 			st.events = nil
 			return 0, false
 		}
 	case <-st.done:
+		st.events = nil
+		return 0, false
+	case <-st.queueDone:
 		st.events = nil
 		return 0, false
 	}
@@ -163,7 +168,17 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	select {
 	case st.events <- req:
-		return <-req.resp, true
+		// The events channel is buffered, which means we may successfully
+		// write to it even if the queue is shutting down. To avoid blocking
+		// forever during shutdown, we also have to wait on the queue's
+		// shutdown channel.
+		select {
+		case resp := <-req.resp:
+			return resp, true
+		case <-st.queueDone:
+			st.events = nil
+			return 0, false
+		}
 	case <-st.done:
 		st.events = nil
 		return 0, false
