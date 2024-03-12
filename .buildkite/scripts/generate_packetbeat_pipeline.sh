@@ -150,11 +150,7 @@ if are_conditions_met_packaging; then
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         env:
-<<<<<<< HEAD
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
-=======
           PLATFORMS: "${PACKAGING_PLATFORMS}"
->>>>>>> 843010c1cb (migrate xpack-metricbeat (#38081))
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
