@@ -27,14 +27,14 @@ if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
 # https://buildkite.com/docs/pipelines/managing-log-output#redacted-environment-variables
 DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
 GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
-export DOCKER_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
-export DOCKER_PASSWORD_SECRET=$(retry_with_count 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
-export GITHUB_TOKEN_SECRET=$(retry_with_count 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
+export DOCKER_USERNAME_SECRET=$(retry 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
+export DOCKER_PASSWORD_SECRET=$(retry 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
+export GITHUB_TOKEN_SECRET=$(retry 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
 
 docker login -u "${DOCKER_USERNAME_SECRET}" -p "${DOCKER_PASSWORD_SECRET}" "${DOCKER_REGISTRY}" 2>/dev/null
 
-github_username=$(retry_with_count 5 vault kv get -field username ${GITHUB_TOKEN_VAULT_PATH})
-github_email=$(retry_with_count 5 vault kv get -field email ${GITHUB_TOKEN_VAULT_PATH})
+github_username=$(retry 5 vault kv get -field username ${GITHUB_TOKEN_VAULT_PATH})
+github_email=$(retry 5 vault kv get -field email ${GITHUB_TOKEN_VAULT_PATH})
 
 git config user.name "$github_username"
 git config user.email "$github_email"
