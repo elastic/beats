@@ -7,6 +7,7 @@ package awss3
 import (
 	"context"
 	"errors"
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"strconv"
 	"sync"
 	"time"
@@ -62,7 +63,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 	workersChan := make(chan processingData, r.maxMessagesInflight)
 
 	deletionWg := new(sync.WaitGroup)
-	deletionWaiter := make(chan struct{})
+	deletionWaiter := new(atomic.Bool)
 
 	var clientsMutex sync.Mutex
 	clients := make(map[uint64]beat.Client, r.maxMessagesInflight)
@@ -117,10 +118,10 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 				acker := NewEventACKTracker(ctx, deletionWg)
 
 				deletionWg.Add(1)
-				deletionWaiter <- struct{}{}
+				deletionWaiter.Swap(false)
 
 				eventsCreatedTotal, err := r.msgHandler.ProcessSQS(ctx, &msg, client, acker, start)
-				// No ACK will be invoked by the client event listener, deletionWg.Done() has to be called here
+				// No Track will be invoked by the client event listener, deletionWg.Done() has to be called here
 				if eventsCreatedTotal == 0 {
 					deletionWg.Done()
 				}
@@ -175,7 +176,9 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 
 	// Wait for all deletion to happen.
 	if r.metrics.sqsMessagesReceivedTotal.Get() > 0 {
-		<-deletionWaiter
+		for deletionWaiter.Load() {
+			time.Sleep(500 * time.Millisecond)
+		}
 	}
 
 	deletionWg.Wait()
