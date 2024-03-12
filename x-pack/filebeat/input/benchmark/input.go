@@ -89,7 +89,7 @@ func runThread(ctx v2.Context, publisher stateless.Publisher, thread uint8, cfg 
 			default:
 				publishEvt(publisher, cfg.Message, line, name, thread, metrics)
 				line++
-				if (line % cfg.Count) == 0 {
+				if line == cfg.Count {
 					return
 				}
 			}

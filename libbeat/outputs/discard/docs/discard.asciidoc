@@ -8,10 +8,10 @@
 The Discard output throws away data.
 
 WARNING: The Discard output should be used only for development or
-debugging issues.  Data is lost.
+debugging issues. Data is lost.
 
 This can be useful if you want to work on your input configuration
-without needing to configure an output.  It can also be useful to test
+without needing to configure an output. It can also be useful to test
 how changes in input and processor configuration affect performance.
 
 Example configuration:

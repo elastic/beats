@@ -70,9 +70,6 @@ func (out *discardOutput) Publish(_ context.Context, batch publisher.Batch) erro
 	st := out.observer
 	events := batch.Events()
 	st.NewBatch(len(events))
-	for range events {
-		st.WriteError(nil)
-	}
 	st.Acked(len(events))
 	return nil
 }

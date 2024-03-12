@@ -11,7 +11,7 @@
 
 beta[]
 
-The Benchmark input generates generic events and sends them to the output.  This can be useful when you want to benchmark the difference between outputs or output settings.
+The Benchmark input generates generic events and sends them to the output. This can be useful when you want to benchmark the difference between outputs or output settings.
 
 Example configurations:
 
@@ -60,17 +60,17 @@ This is the value that will be in the `message` field of the json document.
 [float]
 ==== `threads`
 
-This is the number of go routines that will be started generating messages.  Normally 1 thread can saturate an output but if necessary this can be increased.
+This is the number of goroutines that will be started generating messages. Normally 1 thread can saturate an output but if necessary this can be increased.
 
 [float]
 ==== `count`
 
-This is the number of messages to send.  0 represents sending infinite messages.  This is mutually exclusive with the `eps` option.
+This is the number of messages to send. 0 represents sending infinite messages. This is mutually exclusive with the `eps` option.
 
 [float]
 ==== `eps`
 
-This is the number of events per second to send. 0 represents sending as quickly as possible.  This is mutually exclusive with the `count` option.
+This is the number of events per second to send. 0 represents sending as quickly as possible. This is mutually exclusive with the `count` option.
 
 
 [float]
