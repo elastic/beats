@@ -127,9 +127,9 @@ func (p *s3Poller) createS3ObjectProcessor(ctx context.Context, state state) (s3
 	event.S3.Bucket.ARN = p.bucket
 	event.S3.Object.Key = state.Key
 
-	acker := NewEventACKTracker(ctx, nil)
+	acker := awscommon.NewEventACKTracker(ctx)
 
-	return p.s3ObjectHandler.Create(ctx, p.log, p.client, acker, event), event
+	return p.s3ObjectHandler.CreateForS3Polling(ctx, p.log, p.client, acker, event), event
 }
 
 func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) error {
@@ -137,9 +137,8 @@ func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) er
 
 	for s3ObjectPayload := range s3ObjectPayloadChan {
 		// Process S3 object (download, parse, create events).
-		eventsPublished, err := s3ObjectPayload.s3ObjectHandler.ProcessS3Object()
+		_, err := s3ObjectPayload.s3ObjectHandler.ProcessS3Object()
 
-		s3ObjectPayload.s3ObjectHandler.SyncEventsToBeAcked(eventsPublished)
 		// Wait for all events to be ACKed before proceeding.
 		s3ObjectPayload.s3ObjectHandler.Wait()
 

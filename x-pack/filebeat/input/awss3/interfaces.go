@@ -8,6 +8,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"net/url"
 	"time"
 
@@ -101,14 +102,14 @@ type s3ObjectHandlerFactory interface {
 	// specified S3 object. If the handler is not configured to process the
 	// given S3 object (based on key name) then it will return nil.
 	Create(ctx context.Context, log *logp.Logger, client beat.Client, acker *EventACKTracker, obj s3EventV2) s3ObjectHandler
+	CreateForS3Polling(ctx context.Context, log *logp.Logger, client beat.Client, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler
 }
 
 type s3ObjectHandler interface {
 	// ProcessS3Object downloads the S3 object, parses it, creates events, and
 	// publishes them. It returns when processing finishes or when it encounters
 	// an unrecoverable error. It does not wait for the events to be ACKed by
-	// the publisher before returning (use eventACKTracker's WaitForS3() method to
-	// determine this).
+	// the publisher before returning.
 	ProcessS3Object() (uint64, error)
 
 	// FinalizeS3Object finalizes processing of an S3 object after the current
@@ -117,11 +118,8 @@ type s3ObjectHandler interface {
 
 	// Wait waits for every event published by ProcessS3Object() to be ACKed
 	// by the publisher before returning. Internally it uses the
-	// s3ObjectHandler eventACKTracker's WaitForS3() method
+	// s3ObjectHandler ackerForPolling's Wait() method
 	Wait()
-
-	// SyncEventsToBeAcked sync the number of event published with the eventACKTracker
-	SyncEventsToBeAcked(s3EventsCreatedTotal uint64)
 }
 
 // ------

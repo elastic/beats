@@ -14,6 +14,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"io"
 	"reflect"
 	"strings"
@@ -95,28 +96,51 @@ func (f *s3ObjectProcessorFactory) Create(ctx context.Context, log *logp.Logger,
 	}
 }
 
+// CreateForS3Polling returns a new s3ObjectProcessor. It returns nil when no file selectors
+// match the S3 object key.
+func (f *s3ObjectProcessorFactory) CreateForS3Polling(ctx context.Context, log *logp.Logger, client beat.Client, ack *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
+	log = log.With(
+		"bucket_arn", obj.S3.Bucket.Name,
+		"object_key", obj.S3.Object.Key)
+
+	readerConfig := f.findReaderConfig(obj.S3.Object.Key)
+	if readerConfig == nil {
+		log.Debug("Skipping S3 object processing. No file_selectors are a match.")
+		return nil
+	}
+
+	return &s3ObjectProcessor{
+		s3ObjectProcessorFactory: f,
+		log:                      log,
+		ctx:                      ctx,
+		publisher:                client,
+		ackerForPolling:          ack,
+		readerConfig:             readerConfig,
+		s3Obj:                    obj,
+		s3ObjHash:                s3ObjectHash(obj),
+	}
+}
+
 type s3ObjectProcessor struct {
 	*s3ObjectProcessorFactory
 
-	log          *logp.Logger
-	ctx          context.Context
-	publisher    beat.Client
-	acker        *EventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
-	readerConfig *readerConfig    // Config about how to process the object.
-	s3Obj        s3EventV2        // S3 object information.
-	s3ObjHash    string
-	s3RequestURL string
+	log             *logp.Logger
+	ctx             context.Context
+	publisher       beat.Client
+	acker           *EventACKTracker           // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
+	ackerForPolling *awscommon.EventACKTracker // ACKer tied to the S3 object (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
+	readerConfig    *readerConfig              // Config about how to process the object.
+	s3Obj           s3EventV2                  // S3 object information.
+	s3ObjHash       string
+	s3RequestURL    string
 
 	s3Metadata map[string]interface{} // S3 object metadata.
 
 	eventsPublishedTotal uint64
 }
 
-func (p *s3ObjectProcessor) SyncEventsToBeAcked(eventsPublished uint64) {
-	p.acker.MarkS3FromListingProcessedWithData(eventsPublished)
-}
 func (p *s3ObjectProcessor) Wait() {
-	p.acker.WaitForS3()
+	p.ackerForPolling.Wait()
 }
 
 func (p *s3ObjectProcessor) ProcessS3Object() (uint64, error) {
@@ -254,7 +278,7 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 
 		data, _ := item.MarshalJSON()
 		evt := p.createEvent(string(data), offset)
-		p.publish(p.acker, &evt)
+		p.publish(&evt)
 	}
 
 	return nil
@@ -289,7 +313,7 @@ func (p *s3ObjectProcessor) readJSONSlice(r io.Reader, evtOffset int64) (int64, 
 
 		data, _ := item.MarshalJSON()
 		evt := p.createEvent(string(data), evtOffset)
-		p.publish(p.acker, &evt)
+		p.publish(&evt)
 		evtOffset++
 	}
 
@@ -334,7 +358,7 @@ func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offs
 		data, _ := item.MarshalJSON()
 		p.s3ObjHash = objHash
 		evt := p.createEvent(string(data), offset+arrayOffset)
-		p.publish(p.acker, &evt)
+		p.publish(&evt)
 	}
 
 	return nil
@@ -374,7 +398,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 			event := p.createEvent(string(message.Content), offset)
 			event.Fields.DeepUpdate(message.Fields)
 			offset += int64(message.Bytes)
-			p.publish(p.acker, &event)
+			p.publish(&event)
 		}
 
 		if errors.Is(err, io.EOF) {
@@ -389,8 +413,14 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 	return nil
 }
 
-func (p *s3ObjectProcessor) publish(ack *EventACKTracker, event *beat.Event) {
-	event.Private = ack
+func (p *s3ObjectProcessor) publish(event *beat.Event) {
+	if p.acker != nil {
+		event.Private = p.acker
+	} else if p.ackerForPolling != nil {
+		p.ackerForPolling.Add()
+		event.Private = p.ackerForPolling
+	}
+
 	p.eventsPublishedTotal++
 	p.metrics.s3EventsCreatedTotal.Inc()
 	p.publisher.Publish(*event)
