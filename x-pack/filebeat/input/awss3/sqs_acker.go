@@ -31,16 +31,13 @@ func init() {
 type EventACKTracker struct {
 	ID uint64
 
-	EventsToBeAcked *atomic.Uint64
+	EventsToBeTracked *atomic.Uint64
+	EventsTracked     *atomic.Uint64
 
 	ctx        context.Context
 	cancel     context.CancelFunc
 	deletionWg *sync.WaitGroup
 
-	ackMutex             *sync.RWMutex
-	ackMutexLockedOnInit *atomic.Bool
-
-	isSQSAcker      bool
 	msg             *types.Message
 	ReceiveCount    int
 	start           time.Time
@@ -54,46 +51,50 @@ type EventACKTracker struct {
 
 func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventACKTracker {
 	ctx, cancel := context.WithCancel(ctx)
-	ackMutex := new(sync.RWMutex)
-	// We need to lock on ack mutex, in order to know that we have passed the info to the acker about the total to be acked
-	// Lock it as soon as we create the acker. It will be unlocked and in either MarkS3FromListingProcessedWithData or MarkSQSProcessedWithData
-	ackMutex.Lock()
-	return &EventACKTracker{
-		ID:                   ackerIDCounter.Inc(),
-		ctx:                  ctx,
-		cancel:               cancel,
-		deletionWg:           deletionWg,
-		ackMutex:             ackMutex,
-		ackMutexLockedOnInit: atomic.NewBool(true),
-		EventsToBeAcked:      atomic.NewUint64(0),
-	}
-}
-
-// MarkS3FromListingProcessedWithData has to be used when the acker is used when the input is in s3 direct listing mode, instead of MarkSQSProcessedWithData
-// Specifically we both Swap the value of EventACKTracker.ackMutexLockedOnInit initialised in NewEventACKTracker
-func (a *EventACKTracker) MarkS3FromListingProcessedWithData(eventsPublished uint64) {
-	// We want to execute the logic of this call only once, when the ack mutex was locked on init
-	if !a.ackMutexLockedOnInit.Swap(false) {
-		return
+	acker := &EventACKTracker{
+		ID:                ackerIDCounter.Inc(),
+		ctx:               ctx,
+		cancel:            cancel,
+		deletionWg:        deletionWg,
+		EventsToBeTracked: atomic.NewUint64(0),
+		EventsTracked:     atomic.NewUint64(0),
 	}
 
-	a.EventsToBeAcked.Add(eventsPublished)
+	go func() {
+		t := time.NewTicker(500 * time.Microsecond)
+		defer t.Stop()
 
-	a.ackMutex.Unlock()
+		for {
+			<-t.C
+			if acker.checkForCancel() {
+				return
+			}
+		}
+	}()
+
+	return acker
 }
 
-// MarkSQSProcessedWithData has to be used when the acker is used when the input is in sqs-s3 mode, instead of MarkS3FromListingProcessedWithData
-// Specifically we both Swap the value of EventACKTracker.ackMutexLockedOnInit initialised in NewEventACKTracker
+func (a *EventACKTracker) checkForCancel() bool {
+	if !a.FullyAcked() {
+		return false
+	}
+
+	a.cancel()
+	a.FlushForSQS()
+
+	return true
+}
+
+// MarkSQSProcessedWithData Every call after the first one is a no-op
 func (a *EventACKTracker) MarkSQSProcessedWithData(msg *types.Message, publishedEvent uint64, receiveCount int, start time.Time, processingErr error, handles []s3ObjectHandler, keepaliveCancel context.CancelFunc, keepaliveWg *sync.WaitGroup, msgHandler sqsProcessor, log *logp.Logger) {
 	// We want to execute the logic of this call only once, when the ack mutex was locked on init
-	if !a.ackMutexLockedOnInit.Swap(false) {
+	if a.EventsToBeTracked.Load() > 0 {
 		return
 	}
 
-	a.isSQSAcker = true
-
 	a.msg = msg
-	a.EventsToBeAcked = atomic.NewUint64(publishedEvent)
+	a.EventsToBeTracked = atomic.NewUint64(publishedEvent)
 	a.ReceiveCount = receiveCount
 	a.start = start
 	a.processingErr = processingErr
@@ -102,32 +103,19 @@ func (a *EventACKTracker) MarkSQSProcessedWithData(msg *types.Message, published
 	a.keepaliveWg = keepaliveWg
 	a.msgHandler = msgHandler
 	a.log = log
-
-	a.ackMutex.Unlock()
 }
 
 func (a *EventACKTracker) FullyAcked() bool {
-	return a.EventsToBeAcked.Load() == 0
-
-}
-
-// WaitForS3 must be called after MarkS3FromListingProcessedWithData
-func (a *EventACKTracker) WaitForS3() {
-	// If it's fully acked then cancel the context.
-	if a.FullyAcked() {
-		a.cancel()
+	eventsToBeTracked := a.EventsToBeTracked.Load()
+	if eventsToBeTracked == 0 {
+		return false
 	}
 
-	// Wait.
-	<-a.ctx.Done()
+	return a.EventsTracked.Load() == eventsToBeTracked
 }
 
 // FlushForSQS delete related SQS message
 func (a *EventACKTracker) FlushForSQS() {
-	if !a.isSQSAcker {
-		return
-	}
-
 	// Stop keepalive visibility routine before deleting.
 	a.keepaliveCancel()
 	a.keepaliveWg.Wait()
@@ -147,24 +135,9 @@ func (a *EventACKTracker) FlushForSQS() {
 	}
 }
 
-// ACK decrements the number of total Events ACKed.
-func (a *EventACKTracker) ACK() {
-	// We need to lock on ack mutex, in order to know that we have passed the info to the acker about the total to be acked
-	// But we want to do it only before the info have been passed, once they did, no need anymore to lock on the ack mutext
-	if a.ackMutexLockedOnInit.Load() {
-		a.ackMutex.Lock()
-		defer a.ackMutex.Unlock()
-	}
-
-	if a.FullyAcked() {
-		panic("misuse detected: ACK call on fully acked")
-	}
-
-	a.EventsToBeAcked.Dec()
-
-	if a.FullyAcked() {
-		a.cancel()
-	}
+// Track decrements the number of total Events.
+func (a *EventACKTracker) Track(_ int, total int) {
+	a.EventsTracked.Add(uint64(total))
 }
 
 // NewEventACKHandler returns a beat ACKer that can receive callbacks when
@@ -172,17 +145,24 @@ func (a *EventACKTracker) ACK() {
 // pointing to an eventACKTracker then it will invoke the trackers ACK() method
 // to decrement the number of pending ACKs.
 func NewEventACKHandler() beat.EventListener {
-	return acker.ConnectionOnly(
-		acker.EventPrivateReporter(func(_ int, privates []interface{}) {
-			for _, current := range privates {
-				if ackTracker, ok := current.(*EventACKTracker); ok {
-					ackTracker.ACK()
+	return acker.ConnectionOnly(newEventListener())
+}
 
-					if ackTracker.FullyAcked() {
-						ackTracker.FlushForSQS()
-					}
-				}
-			}
-		}),
-	)
+func newEventListener() *eventListener {
+	return &eventListener{}
+}
+
+type eventListener struct{}
+
+func (a *eventListener) ACKEvents(n int) {}
+
+func (a *eventListener) ClientClosed() {}
+
+func (a *eventListener) AddEvent(event beat.Event, published bool) {
+	acker, ok := event.Private.(*EventACKTracker)
+	if !ok {
+		return
+	}
+
+	acker.Track(0, 1)
 }
