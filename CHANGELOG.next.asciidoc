@@ -144,6 +144,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Enhance add_cloud_metadata processor with `orchestrator.cluster.name`, `orchestrator.cluster.id` and `azure.resourcegroup.name` when running inside an AKS cluster. {issue}33081[33081] {pull}37685[37685]
 - Upgrade go-sysinfo from 1.12.0 to 1.13.1. {pull}37996[37996]
 - Make `range` condition work with numeric values as strings. {pull}38080[38080]
+- Allow users to configure number of output workers (for outputs that support workers) with either `worker` or `workers`. {pull}38257[38257]
 
 *Auditbeat*
 
