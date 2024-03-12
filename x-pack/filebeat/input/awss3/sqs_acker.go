@@ -32,7 +32,8 @@ type EventACKTracker struct {
 	ID uint64
 
 	EventsAcked       *atomic.Uint64
-	EventsTracked     *atomic.Uint64
+	EventsDropped     *atomic.Uint64
+	EventsPublished   *atomic.Uint64
 	EventsToBeTracked *atomic.Uint64
 
 	ctx        context.Context
@@ -61,7 +62,8 @@ func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventA
 		deletionWg:        deletionWg,
 		mutex:             new(sync.Mutex),
 		EventsAcked:       atomic.NewUint64(0),
-		EventsTracked:     atomic.NewUint64(0),
+		EventsDropped:     atomic.NewUint64(0),
+		EventsPublished:   atomic.NewUint64(0),
 		EventsToBeTracked: atomic.NewUint64(0),
 	}
 
@@ -113,7 +115,7 @@ func (a *EventACKTracker) FullyTracked() bool {
 		return false
 	}
 
-	return a.EventsTracked.Load() == eventsToBeTracked
+	return a.EventsDropped.Load()+a.EventsPublished.Load() == eventsToBeTracked
 }
 
 // FlushForSQS delete related SQS message
@@ -122,7 +124,8 @@ func (a *EventACKTracker) FlushForSQS() {
 	a.keepaliveCancel()
 	a.keepaliveWg.Wait()
 
-	if a.EventsAcked.Load() == a.EventsTracked.Load() {
+	eventsPublished := a.EventsPublished.Load()
+	if eventsPublished > 0 && eventsPublished == a.EventsAcked.Load() {
 		err := a.msgHandler.DeleteSQS(a.msg, a.ReceiveCount, a.processingErr, a.Handles)
 		if err != nil {
 			a.log.Warnw("Failed deleting SQS message.",
@@ -136,8 +139,10 @@ func (a *EventACKTracker) FlushForSQS() {
 		}
 	} else {
 		a.log.Infow("Skipping deleting SQS message, not all events acked.",
-			"events_published", a.EventsTracked.Load(),
 			"events_acked", a.EventsAcked.Load(),
+			"events_dropped", a.EventsDropped.Load(),
+			"events_published", a.EventsPublished.Load(),
+			"events_tracked", a.EventsToBeTracked.Load(),
 			"message_id", *a.msg.MessageId,
 			"elapsed_time_ns", time.Since(a.start))
 
@@ -147,10 +152,19 @@ func (a *EventACKTracker) FlushForSQS() {
 
 }
 
-// Track decrements the number of total Events.
-func (a *EventACKTracker) Track(acked int, total int) {
-	a.EventsAcked.Add(uint64(acked))
-	a.EventsTracked.Add(uint64(total))
+// ACK increments the number of EventsAcked.
+func (a *EventACKTracker) ACK() {
+	a.EventsAcked.Inc()
+}
+
+// Drop increments the number of EventsDropped.
+func (a *EventACKTracker) Drop() {
+	a.EventsDropped.Inc()
+}
+
+// Published increments the number of EventsPublished.
+func (a *EventACKTracker) Published() {
+	a.EventsPublished.Inc()
 }
 
 // NewEventACKHandler returns a beat ACKer that can receive callbacks when
@@ -158,7 +172,17 @@ func (a *EventACKTracker) Track(acked int, total int) {
 // pointing to an eventACKTracker then it will invoke the trackers ACK() method
 // to decrement the number of pending ACKs.
 func NewEventACKHandler() beat.EventListener {
-	return acker.ConnectionOnly(newEventListener())
+	return acker.ConnectionOnly(
+		acker.Combine(
+			newEventListener(),
+			acker.EventPrivateReporter(func(_ int, privates []interface{}) {
+				for _, private := range privates {
+					if acker, ok := private.(*EventACKTracker); ok {
+						acker.ACK()
+					}
+				}
+			}),
+		))
 }
 
 func newEventListener() *eventListener {
@@ -177,9 +201,10 @@ func (a *eventListener) AddEvent(event beat.Event, published bool) {
 		return
 	}
 
-	var acked int
-	if published {
-		acked = 1
+	if !published {
+		acker.Drop()
+	} else {
+		acker.Published()
 	}
-	acker.Track(acked, 1)
+
 }
