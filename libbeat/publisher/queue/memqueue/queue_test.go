@@ -161,9 +161,9 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 
 	q := NewQueue(nil, nil,
 		Settings{
-			Events:        3, // Queue size
-			MaxGetRequest: 2,
-			FlushTimeout:  10 * time.Millisecond,
+			Events:         3, // Queue size
+			FlushMinEvents: 2,
+			FlushTimeout:   10 * time.Millisecond,
 		}, 1)
 
 	p := q.Producer(queue.ProducerConfig{

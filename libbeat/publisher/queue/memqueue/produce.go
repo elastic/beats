@@ -61,7 +61,7 @@ func newProducer(b *broker, cb ackHandler, dropCB func(interface{}), dropOnCance
 	openState := openState{
 		log:       b.logger,
 		done:      make(chan struct{}),
-		queueDone: b.ctx.Done(),
+		queueDone: b.done,
 		events:    b.pushChan,
 	}
 
