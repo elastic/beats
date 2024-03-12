@@ -21,6 +21,8 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_S
 fi
 
 
+if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
+## TEST THIS OUT - maybe golangcrossbuid fails for ARM because of this...
 # Secrets must be redacted
 # https://buildkite.com/docs/pipelines/managing-log-output#redacted-environment-variables
 DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
@@ -36,3 +38,5 @@ github_email=$(retry_with_count 5 vault kv get -field email ${GITHUB_TOKEN_VAULT
 
 git config user.name "$github_username"
 git config user.email "$github_email"
+echo "CONFIGURED"
+fi
