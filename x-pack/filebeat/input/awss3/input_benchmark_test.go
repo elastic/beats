@@ -9,8 +9,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"math"
 	"math/rand"
 	"os"
@@ -21,6 +19,9 @@ import (
 	"sync"
 	"testing"
 	"time"
+
+	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/beats/v7/libbeat/statestore"

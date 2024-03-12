@@ -6,10 +6,11 @@ package awss3
 
 import (
 	"context"
-	"github.com/golang/mock/gomock"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/golang/mock/gomock"
 
 	"github.com/stretchr/testify/assert"
 

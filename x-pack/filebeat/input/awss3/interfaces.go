@@ -8,9 +8,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"net/url"
 	"time"
+
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 

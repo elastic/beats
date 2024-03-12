@@ -14,11 +14,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"io"
 	"reflect"
 	"strings"
 	"time"
+
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 

@@ -7,10 +7,11 @@ package awss3
 import (
 	"context"
 	"errors"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/elastic/beats/v7/libbeat/common/atomic"
 
 	"github.com/elastic/go-concert/timed"
 
