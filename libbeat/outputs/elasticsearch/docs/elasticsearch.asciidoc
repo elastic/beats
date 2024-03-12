@@ -116,7 +116,7 @@ The default value is `false`.
 
 
 [[worker-option]]
-===== `worker`
+===== `worker` or `workers`
 
 The number of workers per configured host publishing events to Elasticsearch. This
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
