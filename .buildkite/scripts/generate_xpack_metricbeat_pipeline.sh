@@ -26,24 +26,24 @@ steps:
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
-        env:
-          MODULE: "$MODULE"
+        command: ".buildkite/scripts/go_int_tests.sh"
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
-        env:
-          MODULE: "$MODULE"
+        command: ".buildkite/scripts/py_int_tests.sh"
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
@@ -106,8 +106,7 @@ else
 fi
 
 #TODO: replace by commented-out below condition when issues mentioned in the PR https://github.com/elastic/beats/pull/38081 are resolved
-# if [[ are_conditions_met_aws_tests || are_conditions_met_macos_tests ]]; then
-if [[ are_conditions_met_macos_tests ]]; then
+if [[ are_conditions_met_aws_tests || are_conditions_met_macos_tests ]]; then
   cat >> $pipelineName <<- YAML
 
   - group: "Extended Tests"
@@ -131,23 +130,21 @@ if  are_conditions_met_macos_tests; then
 YAML
 fi
 
-#TODO: uncomment the commented-out below step when issues mentioned in the PR https://github.com/elastic/beats/pull/38081 are resolved
+if  are_conditions_met_aws_tests; then
+  cat >> $pipelineName <<- YAML
+      - label: ":linux: Cloud Tests"
+        key: "extended-cloud-test"
+        command: ".buildkite/scripts/cloud_tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-# if  are_conditions_met_aws_tests; then
-#   cat >> $pipelineName <<- YAML
-#       - label: ":linux: ${MODULE^^} Cloud Tests"
-#         key: "extended-cloud-test"
-#         command: "cd $BEATS_PROJECT_NAME && mage build test"
-#         env:
-#           MODULE: "$MODULE"
-#         agents:
-#           provider: "gcp"
-#           image: "${IMAGE_UBUNTU_X86_64}"
-#           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-#         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-# YAML
-# fi
+YAML
+fi
 
 echo "Check and add the Packaging into the pipeline"
 if are_conditions_met_packaging; then

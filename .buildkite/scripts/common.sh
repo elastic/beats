@@ -25,7 +25,6 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_xpack_packetbeat_arm_tests+x}" ] && run_xpack_packetbeat_arm_tests="$(buildkite-agent meta-data get run_xpack_packetbeat_arm_tests --default "false")"
 [ -z "${run_xpack_packetbeat_macos_tests+x}" ] && run_xpack_packetbeat_macos_tests="$(buildkite-agent meta-data get run_xpack_packetbeat_macos_tests --default "false")"
 
-
 metricbeat_changeset=(
   "^metricbeat/.*"
   )
@@ -149,9 +148,9 @@ check_and_set_beat_vars() {
   BEATS_GH_MACOS_COMMENT="${BEATS_GH_COMMENT} for macos"
   BEATS_GH_ARM_COMMENT="${BEATS_GH_COMMENT} for arm"
   BEATS_GH_AWS_COMMENT="${BEATS_GH_COMMENT} for aws cloud"
-  BAETS_GH_MACOS_LABEL="macOS"
-  BAETS_GH_ARM_LABEL="arm"
-  BAETS_GH_AWS_LABEL="aws"
+  BEATS_GH_MACOS_LABEL="macOS"
+  BEATS_GH_ARM_LABEL="arm"
+  BEATS_GH_AWS_LABEL="aws"
 }
 
 with_docker_compose() {
@@ -162,6 +161,19 @@ with_docker_compose() {
   chmod +x ${BIN}/docker-compose
   export PATH="${BIN}:${PATH}"
   docker-compose version
+}
+
+with_Terraform() {
+    echo "Setting up the Terraform environment..."
+    local path_to_file="${WORKSPACE}/terraform.zip"
+    create_workspace
+    check_platform_architeture
+    retry 5 curl -sSL -o ${path_to_file} "https://releases.hashicorp.com/terraform/${ASDF_TERRAFORM_VERSION}/terraform_${ASDF_TERRAFORM_VERSION}_${platform_type_lowercase}_${go_arch_type}.zip"
+    unzip -q ${path_to_file} -d ${BIN}/
+    rm ${path_to_file}
+    chmod +x ${BIN}/terraform
+    export PATH="${BIN}:${PATH}"
+    terraform version
 }
 
 create_workspace() {
@@ -205,6 +217,8 @@ with_mage() {
   for pkg in "${install_packages[@]}"; do
     go install "${pkg}@latest"
   done
+  echo "Download modules to local cache"
+  retry 3 go mod download
 }
 
 with_go() {
@@ -343,8 +357,8 @@ are_conditions_met_mandatory_tests() {
 
 are_conditions_met_arm_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
-      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_ARM_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BAETS_GH_ARM_LABEL} || "${!TRIGGER_SPECIFIC_ARM_TESTS}" == "true" ]]; then
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_ARM_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_ARM_LABEL} || "${!TRIGGER_SPECIFIC_ARM_TESTS}" == "true" ]]; then
         return 0
       fi
     fi
@@ -354,8 +368,8 @@ are_conditions_met_arm_tests() {
 
 are_conditions_met_macos_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
-      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_MACOS_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BAETS_GH_MACOS_LABEL} || "${!TRIGGER_SPECIFIC_MACOS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_MACOS_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_MACOS_LABEL} || "${!TRIGGER_SPECIFIC_MACOS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
         return 0
       fi
     fi
@@ -366,7 +380,7 @@ are_conditions_met_macos_tests() {
 are_conditions_met_aws_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
     if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
-      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_AWS_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BAETS_GH_AWS_LABEL} || "${!TRIGGER_SPECIFIC_AWS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_AWS_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_AWS_LABEL} || "${!TRIGGER_SPECIFIC_AWS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
         return 0
       fi
     fi
@@ -390,23 +404,86 @@ config_git() {
   fi
 }
 
-withModule() {
-  local module_path=$1
-  if [[ "$module_path" == *"x-pack/"* ]]; then
+defineModuleFromTheChangeSet() {
+  # This method gathers the module name, if required, in order to run the ITs only if the changeset affects a specific module.
+  # For such, it's required to look for changes under the module folder and exclude anything else such as asciidoc and png files.
+  # This method defines and exports the MODULE variable with a particular module name or '' if changeset doesn't affect a specific module
+  local project_path=$1
+  local project_path_transformed=$(echo "$project_path" | sed 's/\//\\\//g')
+  local project_path_exclussion="((?!^${project_path_transformed}\\/).)*\$"
+  local exclude=("^(${project_path_exclussion}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
+
+  if [[ "$project_path" == *"x-pack/"* ]]; then
     local pattern=("$XPACK_MODULE_PATTERN")
   else
     local pattern=("$OSS_MODULE_PATTERN")
   fi
-  local module_name="${module_path#*module/}"
-  local module_path_transformed=$(echo "$module_path" | sed 's/\//\\\//g')
-  local module_path_exclussion="((?!^${module_path_transformed}\\/).)*\$"
-  local exclude=("^(${module_path_transformed}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
-  if are_paths_changed "${pattern[@]}" && ! are_changed_only_paths "${exclude[@]}"; then
-    MODULE="${module_name}"
-  elif [ -d "${module_path}" ]; then
-    MODULE=""
+  local changed_modules=""
+  local module_dirs=$(find "$project_path/module" -mindepth 1 -maxdepth 1 -type d)
+  for module_dir in $module_dirs; do
+    if are_paths_changed $module_dir && ! are_changed_only_paths "${exclude[@]}"; then
+      if [[ -z "$changed_modules" ]]; then
+        changed_modules=$(basename "$module_dir")
+      else
+        changed_modules+=",$(basename "$module_dir")"
+      fi
+    fi
+  done
+  if [[ -z "$changed_modules" ]]; then # TODO: remove this condition and uncomment the line below when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
+    export MODULE="aws"
+  else
+    export MODULE="${changed_modules}"  # TODO: remove this line and uncomment the line below when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
+  # export MODULE="${changed_modules}"     # TODO: uncomment the line when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
   fi
-  echo "MODULE=$MODULE"
+}
+
+terraformInit() {
+  local dir=$1
+  echo "Terraform Init on $dir"
+  pushd "${dir}" > /dev/null
+  terraform init
+  popd > /dev/null
+}
+
+withAWS() {
+  # This method gathers the masked AWS credentials from pre-command hook and sets the right AWS variable names.
+  export AWS_ACCESS_KEY_ID=$BEATS_AWS_ACCESS_KEY
+  export AWS_SECRET_ACCESS_KEY=$BEATS_AWS_SECRET_KEY
+  export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}aws"
+}
+
+startCloudTestEnv() {
+  local dir=$1
+  withAWS
+  echo "--- Run docker-compose services for emulated cloud env"
+  docker-compose -f .ci/jobs/docker-compose.yml up -d                     #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+  with_Terraform
+  terraformInit "$dir"
+  export TF_VAR_BRANCH=$(echo "${BUILDKITE_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
+  export TF_VAR_BUILD_ID="${BUILDKITE_BUILD_ID}"
+  export TF_VAR_CREATED_DATE=$(date +%s)
+  export TF_VAR_ENVIRONMENT="ci"
+  export TF_VAR_REPO="${REPO}"
+  pushd "${dir}" > /dev/null
+  terraform apply -auto-approve
+  popd > /dev/null
+}
+
+teardown() {
+  # Teardown resources after using them
+  echo "---Terraform Cleanup"
+  .ci/scripts/terraform-cleanup.sh "${MODULE_DIR}"              #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+
+  echo "---Docker Compose Cleanup"
+  docker-compose -f .ci/jobs/docker-compose.yml down -v         #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+}
+
+unset_secrets () {
+  for var in $(printenv | sed 's;=.*;;' | sort); do
+    if [[ "$var" == AWS_* || "$var" == BEATS_AWS_* ]]; then
+      unset "$var"
+    fi
+  done
 }
 
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then
@@ -422,10 +499,6 @@ fi
 
 if are_paths_changed "${packaging_changeset[@]}" ; then
   export PACKAGING_CHANGES="true"
-fi
-
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
-  withModule "x-pack/metricbeat/module/aws"
 fi
 
 check_and_set_beat_vars
