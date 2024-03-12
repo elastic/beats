@@ -311,7 +311,7 @@ func NewInput(
 		}
 		d = syslogFormatter(d)
 		filterAccess := true
-		if config.Delimiter != "" {
+		if config.Delimiter != "" && config.SyslogFilters != nil {
 			filterAccess = Filter(d, &config)
 		}
 		if filterAccess {
