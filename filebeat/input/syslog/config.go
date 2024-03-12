@@ -21,8 +21,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dustin/go-humanize"
-
 	"github.com/elastic/beats/filebeat/harvester"
 	"github.com/elastic/beats/filebeat/inputsource"
 	"github.com/elastic/beats/filebeat/inputsource/tcp"
@@ -30,9 +28,22 @@ import (
 	"github.com/elastic/beats/libbeat/common"
 )
 
+// ConditionConfig : 用于条件表达式，目前支持=、!=、eq、neq、include、exclude、regex、nregex
+type ConditionConfig struct {
+	Key   string `config:"key"`
+	Op    string `config:"op"`
+	Value string `config:"value"`
+}
+
+type FilterConfig struct {
+	Conditions []ConditionConfig `config:"conditions"`
+}
+
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
 	Protocol                  common.ConfigNamespace `config:"protocol"`
+	Delimiter                 string                 `config:"delimiter"`
+	SyslogFilters             []FilterConfig         `config:"syslog_filters"`
 }
 
 var defaultConfig = config{
