@@ -59,7 +59,6 @@ exportVars() {
 }
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
-
   exportVars
   export RACE_DETECTOR="true"
   export TEST_COVERAGE="true"
