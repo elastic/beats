@@ -26,6 +26,7 @@ import (
 	"strconv"
 	"syscall"
 
+	"golang.org/x/sys/unix"
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
 
@@ -95,6 +96,11 @@ func setCapabilities() error {
 	err = newcaps.SetProc()
 	if err != nil {
 		return fmt.Errorf("error setting new process capabilities via setcap: %w", err)
+	}
+
+	_, err = cap.Prctl(unix.PR_SET_DUMPABLE, 1)
+	if err != nil {
+		return fmt.Errorf("error setting dumpable flag via prctl: %w", err)
 	}
 
 	return nil
