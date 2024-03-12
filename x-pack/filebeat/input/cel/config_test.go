@@ -12,6 +12,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/oauth2/google"
@@ -35,6 +36,19 @@ func TestGetProviderIsCanonical(t *testing.T) {
 	got := oAuth2Config{Provider: "GOogle"}.getProvider()
 	if got != want {
 		t.Errorf("unexpected provider from getProvider: got:%s want:%s", got, want)
+	}
+}
+
+func TestRegexpConfig(t *testing.T) {
+	cfg := config{
+		Interval: time.Minute,
+		Program:  `{}`,
+		Resource: &ResourceConfig{URL: &urlConfig{URL: &url.URL{}}},
+		Regexps:  map[string]string{"regex_cve": `[Cc][Vv][Ee]-[0-9]{4}-[0-9]{4,7}`},
+	}
+	err := cfg.Validate()
+	if err != nil {
+		t.Errorf("failed to validate config with regexps: %v", err)
 	}
 }
 
