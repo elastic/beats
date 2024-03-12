@@ -187,7 +187,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 	case syslogFormatRFC5424:
 		return func(data []byte, metadata inputsource.NetworkMetadata) {
 			ev := parseAndCreateEvent5424(data, metadata, cfg.Timezone.Location(), log)
-			forwarder.Send(ev)
+			_ = forwarder.Send(ev)
 		}
 
 	case syslogFormatAuto:
@@ -198,7 +198,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 			} else {
 				ev = parseAndCreateEvent3164(data, metadata, cfg.Timezone.Location(), log)
 			}
-			forwarder.Send(ev)
+			_ = forwarder.Send(ev)
 		}
 	case syslogFormatRFC3164:
 		break
@@ -206,7 +206,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 
 	return func(data []byte, metadata inputsource.NetworkMetadata) {
 		ev := parseAndCreateEvent3164(data, metadata, cfg.Timezone.Location(), log)
-		forwarder.Send(ev)
+		_ = forwarder.Send(ev)
 	}
 }
 
