@@ -135,7 +135,6 @@ type Event struct {
 	Hashes        map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
 	ParserResults mapstr.M            `json:"file,omitempty"`        // Results from running file parsers.
 	Process       *Process            `json:"process,omitempty"`     // Process data. Available only on Linux when using the eBPF backend.
-	// TODO(matt): ContainerID string `json:"container_id,omitempty"` // Unique container ID. Available only on Linux when using the eBPF backend.
 
 	// Metadata
 	rtt        time.Duration // Time taken to collect the info.

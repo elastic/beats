@@ -2688,7 +2688,7 @@ type: keyword
 --
 PID.
 
-type: integer
+type: long
 
 --
 
