@@ -298,7 +298,7 @@ func newProgram(src string) (*program, error) {
 
 	registry, err := types.NewRegistry()
 	if err != nil {
-		return nil, fmt.Errorf("failed to create env: %v", err)
+		return nil, fmt.Errorf("failed to create env: %w", err)
 	}
 	env, err := cel.NewEnv(
 		cel.Declarations(decls.NewVar("obj", decls.Dyn)),
@@ -307,17 +307,17 @@ func newProgram(src string) (*program, error) {
 		cel.CustomTypeProvider(registry),
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create env: %v", err)
+		return nil, fmt.Errorf("failed to create env: %w", err)
 	}
 
 	ast, iss := env.Compile(src)
 	if iss.Err() != nil {
-		return nil, fmt.Errorf("failed compilation: %v", iss.Err())
+		return nil, fmt.Errorf("failed compilation: %w", iss.Err())
 	}
 
 	prg, err := env.Program(ast)
 	if err != nil {
-		return nil, fmt.Errorf("failed program instantiation: %v", err)
+		return nil, fmt.Errorf("failed program instantiation: %w", err)
 	}
 	return &program{prg: prg, ast: ast}, nil
 }
@@ -364,10 +364,6 @@ func (p *program) eval(obj interface{}) (interface{}, error) {
 		// This should never happen.
 		return nil, fmt.Errorf("unexpected native conversion type: %T", v)
 	}
-}
-
-func errorMessage(msg string) map[string]interface{} {
-	return map[string]interface{}{"error": map[string]interface{}{"message": msg}}
 }
 
 func decodeJSONArray(raw *bytes.Reader) (objs []mapstr.M, rawMessages []json.RawMessage, err error) {
