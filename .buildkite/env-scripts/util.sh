@@ -60,7 +60,7 @@ check_platform_architecture() {
   esac
 }
 
-retry() {
+retry_with_count() {
     local retries=$1
     shift
     local count=0
