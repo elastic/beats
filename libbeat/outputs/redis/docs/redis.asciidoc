@@ -158,7 +158,7 @@ Output codec configuration. If the `codec` section is missing, events will be js
 
 See <<configuration-output-codec>> for more information.
 
-===== `worker`
+===== `worker` or `workers`
 
 The number of workers to use for each host configured to publish events to Redis. Use this setting along with the
 `loadbalance` option. For example, if you have 2 hosts and 3 workers, in total 6 workers are started (3 for each host).
