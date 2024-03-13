@@ -44,3 +44,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 [0.6.7]: https://github.com/elastic/elastic-agent-autodiscover/compare/v0.6.2...v0.6.7
+
+## [0.6.9]
+
+### Changed
+
+- Update GenerateHints function to check supported list of hints
+
+
+[0.6.9]: https://github.com/elastic/elastic-agent-autodiscover/compare/v0.6.8...v0.6.9

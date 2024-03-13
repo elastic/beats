@@ -202,16 +202,22 @@ func IsDisabled(hints mapstr.M, key string) bool {
 }
 
 // GenerateHints parses annotations based on a prefix and sets up hints that can be picked up by individual Beats.
-func GenerateHints(annotations mapstr.M, container, prefix string) mapstr.M {
+func GenerateHints(annotations mapstr.M, container, prefix string, allSupportedHints []string) (mapstr.M, []string) {
 	hints := mapstr.M{}
+	var incorrecthints []string
+	found := false
 	if rawEntries, err := annotations.GetValue(prefix); err == nil {
 		if entries, ok := rawEntries.(mapstr.M); ok {
 			for key, rawValue := range entries {
+
 				// If there are top level hints like co.elastic.logs/ then just add the values after the /
 				// Only consider namespaced annotations
 				parts := strings.Split(key, "/")
 				if len(parts) == 2 {
 					hintKey := fmt.Sprintf("%s.%s", parts[0], parts[1])
+					//We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+					found = checkSupportedHints(parts[1], allSupportedHints)
+
 					// Insert only if there is no entry already. container level annotations take
 					// higher priority.
 					if _, err := hints.GetValue(hintKey); err != nil {
@@ -233,6 +239,8 @@ func GenerateHints(annotations mapstr.M, container, prefix string) mapstr.M {
 						if strings.HasPrefix(hintKey, container) {
 							// Split the key to get part[1] to be the hint
 							parts := strings.Split(hintKey, "/")
+							//We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+							found = checkSupportedHints(parts[1], allSupportedHints)
 							if len(parts) == 2 {
 								// key will be the hint type
 								hintKey := fmt.Sprintf("%s.%s", key, parts[1])
@@ -244,11 +252,14 @@ func GenerateHints(annotations mapstr.M, container, prefix string) mapstr.M {
 						}
 					}
 				}
+				if !found {
+					incorrecthints = append(incorrecthints, key)
+				}
 			}
 		}
 	}
 
-	return hints
+	return hints, incorrecthints
 }
 
 // GetHintsAsList gets a set of hints and tries to convert them into a list of hints
@@ -288,4 +299,16 @@ func GetHintsAsList(hints mapstr.M, key string) []mapstr.M {
 		configs = append(configs, defaultMap)
 	}
 	return configs
+}
+
+// checkSupportedHints gets a specific hint annotation and compares it with the supported list of hints
+func checkSupportedHints(actualannotation string, allSupportedHints []string) bool {
+	found := false
+	for _, checksupported := range allSupportedHints {
+		if actualannotation == checksupported {
+			found = true
+			break
+		}
+	}
+	return found
 }

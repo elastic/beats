@@ -50,14 +50,21 @@ func TestGetProcessors(t *testing.T) {
 }
 
 func TestGenerateHints(t *testing.T) {
+
+	var allSupportedHints = []string{"enabled", "module", "integration", "datas_treams", "host", "period", "timeout", "metrics_path", "username", "password", "stream", "processors", "multiline", "json", "disable"}
+
 	tests := []struct {
-		annotations map[string]string
-		result      mapstr.M
+		name                   string
+		annotations            map[string]string
+		result                 mapstr.M
+		expectedIncorrectHints int // We set the number of hints that will be marked as incorrect and wont be included in the acceptable supported list
 	}{
-		// Empty annotations should return empty hints
+		//Empty annotations should return empty hints
 		{
-			annotations: map[string]string{},
-			result:      mapstr.M{},
+			name:                   "Empty_Annotations",
+			annotations:            map[string]string{},
+			result:                 mapstr.M{},
+			expectedIncorrectHints: 0,
 		},
 
 		// Scenarios being tested:
@@ -68,6 +75,7 @@ func TestGenerateHints(t *testing.T) {
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
+			name: "Logs_multiline_and_metrics",
 			annotations: map[string]string{
 				"co.elastic.logs/multiline.pattern":    "^test",
 				"co.elastic.logs/json.keys_under_root": "true",
@@ -91,6 +99,7 @@ func TestGenerateHints(t *testing.T) {
 					"period": "15s",
 				},
 			},
+			expectedIncorrectHints: 0,
 		},
 		// Scenarios being tested:
 		// logs/multiline.pattern must be a nested mapstr.M under hints.logs
@@ -98,6 +107,7 @@ func TestGenerateHints(t *testing.T) {
 		// not.to.include must not be part of hints
 		// metrics/metrics_path must be found in hints.metrics
 		{
+			name: "Logs_multiline_and_metrics_with_metrics_path",
 			annotations: map[string]string{
 				"co.elastic.logs/multiline.pattern": "^test",
 				"co.elastic.metrics/module":         "prometheus",
@@ -107,6 +117,7 @@ func TestGenerateHints(t *testing.T) {
 				"co.elastic.metrics/password":       "pass",
 				"co.elastic.metrics.foobar/period":  "15s",
 				"co.elastic.metrics.foobar1/period": "15s",
+				"co.elastic.hints/steam":            "stdout", // On purpose this added with typo
 				"not.to.include":                    "true",
 			},
 			result: mapstr.M{
@@ -115,6 +126,7 @@ func TestGenerateHints(t *testing.T) {
 						"pattern": "^test",
 					},
 				},
+				"hints": mapstr.M{"steam": "stdout"},
 				"metrics": mapstr.M{
 					"module":       "prometheus",
 					"period":       "15s",
@@ -123,14 +135,15 @@ func TestGenerateHints(t *testing.T) {
 					"password":     "pass",
 				},
 			},
+			expectedIncorrectHints: 1, // Due to co.elastic.hints/steam and not co.elastic.hints/stream
 		},
 		// Scenarios being tested:
-		// have co.elastic.logs/disable set to false.
 		// logs/multiline.pattern must be a nested mapstr.M under hints.logs
 		// metrics/module must be found in hints.metrics
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
+			name: "Logs_multiline_and_metrics",
 			annotations: map[string]string{
 				"co.elastic.logs/multiline.pattern": "^test",
 				"co.elastic.metrics/module":         "prometheus",
@@ -150,6 +163,7 @@ func TestGenerateHints(t *testing.T) {
 					"period": "15s",
 				},
 			},
+			expectedIncorrectHints: 0,
 		},
 		// Scenarios being tested:
 		// have co.elastic.logs/disable set to false.
@@ -158,6 +172,7 @@ func TestGenerateHints(t *testing.T) {
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
+			name: "Logs_disabled_false_and_metrics",
 			annotations: map[string]string{
 				"co.elastic.logs/disable":           "false",
 				"co.elastic.logs/multiline.pattern": "^test",
@@ -179,6 +194,7 @@ func TestGenerateHints(t *testing.T) {
 					"period": "15s",
 				},
 			},
+			expectedIncorrectHints: 0,
 		},
 		// Scenarios being tested:
 		// have co.elastic.logs/disable set to true.
@@ -187,6 +203,7 @@ func TestGenerateHints(t *testing.T) {
 		// not.to.include must not be part of hints
 		// period is annotated at both container and pod level. Container level value must be in hints
 		{
+			name: "Logs_disabled_true_and_metrics",
 			annotations: map[string]string{
 				"co.elastic.logs/disable":           "true",
 				"co.elastic.logs/multiline.pattern": "^test",
@@ -208,6 +225,7 @@ func TestGenerateHints(t *testing.T) {
 					"period": "15s",
 				},
 			},
+			expectedIncorrectHints: 0,
 		},
 	}
 
@@ -219,7 +237,9 @@ func TestGenerateHints(t *testing.T) {
 				continue
 			}
 		}
-		assert.Equal(t, test.result, GenerateHints(annMap, "foobar", "co.elastic"))
+		generateHints, incorrectHints := GenerateHints(annMap, "foobar", "co.elastic", allSupportedHints)
+		assert.Equal(t, test.expectedIncorrectHints, len(incorrectHints)) // We validate how many incorrect hints are provided per test case.
+		assert.Equal(t, test.result, generateHints)
 	}
 }
 func TestGetHintsAsList(t *testing.T) {
