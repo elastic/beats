@@ -1,8 +1,8 @@
 when:
-    changeset:                 ## when PR contains any of those entries in the changeset
-        - "^auditbeat/.*"
-        - "@ci"                ## special token regarding the changeset for the ci
-        - "@oss"               ## special token regarding the changeset for the oss
+    changeset: ## when PR contains any of those entries in the changeset
+        - "auditbeat/**"
+        - "@ci" ## special token regarding the changeset for the ci
+        - "@oss" ## special token regarding the changeset for the oss
 stages:
     # mandatory stage - it runs always for:
     #   - branches/tags

@@ -2,6 +2,8 @@
 import yaml
 import os
 from dataclasses import dataclass, field
+import subprocess
+import fnmatch
 
 from jinja2 import Template
 from pathlib import Path
@@ -23,7 +25,6 @@ steps:
         tm = Template(data)
         msg = tm.render(pipeline=self)
         return msg
-
 
 @dataclass(unsafe_hash=True)
 class Group:
@@ -92,8 +93,9 @@ class Step:
 
 # Conditions:
 
-def is_pr(value) -> bool:
-    return os.getenv('BUILDKITE_PULL_REQUEST') == value
+def is_pr() -> bool:
+    pr = os.getenv('BUILDKITE_PULL_REQUEST')
+    return pr and os.getenv('BUILDKITE_PULL_REQUEST') != "false"
 
 def step_comment(step: Step) -> bool:
     comment = os.getenv('GITHUB_PR_TRIGGER_COMMENT')
@@ -106,17 +108,48 @@ def step_comment(step: Step) -> bool:
             return True
         # i.e: /test filebeat unitTest
         return comment_prefix + " " + step.name in comment
+    else:
+        return True
+    
+def group_comment(group: Group) -> bool:
+    comment = os.getenv('GITHUB_PR_TRIGGER_COMMENT')
+    if comment:
+        # the comment should be a subset of the values in .buildkite/pull-requests.json
+        # TODO: change /test
+        comment_prefix = "buildkite test"
+        if group.category == "mandatory":
+            # i.e: /test filebeat
+            return comment_prefix + " " + group.project in comment
+        else:
+            # i.e: test filebeat extended
+            return comment_prefix + " " + group.project + " " + group.category in comment    
 
-def is_in_changeset() -> bool:
-    # TODO
-    return True
+changed_files = None
 
-def is_step_enabled(step: Step, conditions) -> bool:
-    # TODO:
-    # If PR then
-    #   If Changeset
+def get_pr_changeset():
+    if not changed_files:
+        base_branch = os.getenv('BUILDKITE_PULL_REQUEST_BASE_BRANCH')
+        diff_command = ["git", "diff", "--name-only", "{}...HEAD".format(base_branch)]
+        result = subprocess.run(diff_command, stdout=subprocess.PIPE)
+        changed_files = result.stdout.decode().splitlines()
+        print("Changed files: {}".format(changed_files))
+        
+    return changed_files
 
-    if is_pr("false"):
+def filter_files_by_glob(files, patterns: list[str]):
+    for pattern in patterns:
+        ## TODO: Support glob extended patterns: ^ and etc.
+        ## Now it supports only linux glob patterns
+        if fnmatch.filter(files, pattern):
+            return True
+    return False
+
+def is_in_pr_changeset(project_changeset_filters: list[str]) -> bool:
+    changeset = get_pr_changeset()
+    return filter_files_by_glob(changeset, project_changeset_filters)
+
+def is_step_enabled(step: Step) -> bool:    
+    if not is_pr():
         return True
     
     if step_comment(step):
@@ -130,31 +163,15 @@ def is_step_enabled(step: Step, conditions) -> bool:
             return True
 
     return False
+   
+def is_group_enabled(group: Group, changeset_filters: list[str]) -> bool:
+    if not is_pr():
+        return True    
 
-
-def is_group_enabled(group: Group, conditions) -> bool:
-    # TODO:
-    # If PR then
-    #   If GitHub label matches project name + category (I'm not sure we wanna use this approach since GH comments support it)
-    #   If Changeset
-
-    pull_request = os.getenv('BUILDKITE_PULL_REQUEST')
-    if pull_request and pull_request == "false":
-        return True
-
-    comment = os.getenv('GITHUB_PR_TRIGGER_COMMENT')
-    if comment:
-        # the comment should be a subset of the values in .buildkite/pull-requests.json
-        # TODO: change /test
-        comment_prefix = "buildkite test"
-        if group.category == "mandatory":
-            # i.e: /test filebeat
-            return comment_prefix + " " + group.project in comment
-        else:
-            # i.e: test filebeat extended
-            return comment_prefix + " " + group.project + " " + group.category in comment
-
-    return group.category.startswith("mandatory")
+    if is_pr() and is_in_pr_changeset(changeset_filters) and group.category.startswith("mandatory"):
+        return True        
+    
+    return group_comment(group)
 
 def fetch_stage(name: str, stage, project: str, category: str) -> Step:
     """Create a step given the yaml object."""
@@ -171,7 +188,7 @@ def fetch_stage(name: str, stage, project: str, category: str) -> Step:
             provider="gcp")
 
 
-def fetch_group(stages, project: str, category: str, conditions) -> Group:
+def fetch_group(stages, project: str, category: str) -> Group:
     """Create a group given the yaml object."""
 
     steps = []
@@ -183,14 +200,13 @@ def fetch_group(stages, project: str, category: str, conditions) -> Group:
                 project=project,
                 stage=stages[stage])
 
-        if is_step_enabled(step, conditions):
+        if is_step_enabled(step):
             steps.append(step)
 
     return Group(
                 project=project,
                 category=category,
-                steps=steps
-            )
+                steps=steps)
 
 
 # TODO: validate unique stages!
@@ -214,18 +230,16 @@ def main() -> None:
 
                 group = fetch_group(stages=project_obj["stages"]["mandatory"],
                                     project=project,
-                                    category="mandatory",
-                                    conditions=conditions)
+                                    category="mandatory")
 
-                if is_group_enabled(group, conditions):
+                if is_group_enabled(group, project_obj["when"]["changeset"]):
                     groups.append(group)
 
                 group = fetch_group(stages=project_obj["stages"]["extended"],
                                     project=project,
-                                    category="extended",
-                                    conditions=conditions)
+                                    category="extended")
 
-                if is_group_enabled(group, conditions):
+                if is_group_enabled(group, project_obj["when"]["changeset"]):
                     extended_groups.append(group)
 
     # TODO: improve this merging lists
