@@ -129,6 +129,162 @@ func syslogFormatter(event *util.Data) *util.Data {
 	return event
 }
 
+type SyslogFields struct {
+	Data          interface{}
+	Address       interface{}
+	Port          interface{}
+	Facility      interface{}
+	FacilityLabel interface{}
+	Priority      interface{}
+	Severity      interface{}
+	SeverityLabel interface{}
+	Program       interface{}
+	Pid           interface{}
+}
+
+func (s *SyslogFields) GetSyslogFieldValue(key string) interface{} {
+	key = strings.ToLower(key)
+	switch key {
+	case "data", "":
+		return s.Data
+	case "address":
+		return s.Address
+	case "port":
+		return s.Port
+	case "facility":
+		return s.Facility
+	case "facility_label":
+		return s.FacilityLabel
+	case "priority":
+		return s.Priority
+	case "severity":
+		return s.Severity
+	case "severity_label":
+		return s.SeverityLabel
+	case "program":
+		return s.Program
+	case "pid":
+		return s.Pid
+	default:
+		return ""
+	}
+}
+
+func flattenMap(original common.MapStr, flatMap common.MapStr) {
+	for key, value := range original {
+		fullKey := key
+		if subMap, ok := value.(common.MapStr); ok {
+			flattenMap(subMap, flatMap)
+		} else {
+			flatMap[fullKey] = value
+		}
+	}
+}
+
+func parseSyslogField(data *util.Data) *SyslogFields {
+
+	flatMap := make(common.MapStr)
+
+	flattenMap(data.Event.Fields, flatMap)
+
+	// 解析 syslog 字段值
+	syslogFields := &SyslogFields{
+		Data:          flatMap["data"],
+		Address:       flatMap["address"],
+		Port:          flatMap["port"],
+		Facility:      flatMap["facility"],
+		FacilityLabel: flatMap["facility_label"],
+		Priority:      flatMap["priority"],
+		Severity:      flatMap["severity"],
+		SeverityLabel: flatMap["severity_label"],
+		Program:       flatMap["program"],
+		Pid:           flatMap["pid"],
+	}
+	return syslogFields
+}
+
+// Filter Syslog filter
+func Filter(data *util.Data, config *config) bool {
+
+	var text string
+	var ok bool
+
+	event := &data.Event
+	text, ok = event.Fields["data"].(string)
+
+	if !ok {
+		return false
+	}
+	log := logp.NewLogger("syslog")
+
+	syslogFields := parseSyslogField(data)
+
+	for _, filterConfig := range config.SyslogFilters {
+		access := true
+		for _, condition := range filterConfig.Conditions {
+
+			matcher := condition.GetMatcher()
+			if matcher == nil {
+				access = false
+				break
+			}
+
+			// syslog field value match
+			fieldValue := syslogFields.GetSyslogFieldValue(condition.Key)
+			switch v := fieldValue.(type) {
+			case string:
+				text = v
+			case int:
+				text = strconv.Itoa(v)
+			default:
+				text = ""
+			}
+
+			if text == "" {
+				access = false
+				break
+			}
+
+			if !matcher(text) {
+				access = false
+				break
+			} else {
+				continue
+			}
+		}
+		if access {
+			return true
+		}
+	}
+	return false
+}
+
+func InitFilterMatcher(config *config) (*config, error) {
+	if config.SyslogFilters == nil {
+		return config, nil
+	}
+	for _, f := range config.SyslogFilters {
+		for i, condition := range f.Conditions {
+			// 去除字符串首尾空白字符
+			condition.Key = strings.TrimSpace(condition.Key)
+			condition.Value = strings.TrimSpace(condition.Value)
+
+			// 初始化条件匹配方法 Matcher
+			matcher, err := getOperationFunc(condition.Op, condition.Value)
+
+			if err != nil {
+				return nil, err
+			}
+
+			condition.matcher = matcher
+
+			// 重新赋值 condition
+			f.Conditions[i] = condition
+		}
+	}
+	return config, nil
+}
+
 // Input define a syslog input
 type Input struct {
 	sync.Mutex
@@ -159,6 +315,12 @@ func NewInput(
 		return nil, err
 	}
 
+	conf, err := InitFilterMatcher(&config)
+	if err != nil {
+		return nil, err
+	}
+	config = *conf
+
 	forwarder := harvester.NewForwarder(out)
 	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
 		ev := newEvent()
@@ -184,7 +346,13 @@ func NewInput(
 			d = &util.Data{Event: *event}
 		}
 		d = syslogFormatter(d)
-		forwarder.Send(d)
+		filterAccess := true
+		if config.SyslogFilters != nil {
+			filterAccess = Filter(d, &config)
+		}
+		if filterAccess {
+			forwarder.Send(d)
+		}
 	}
 
 	server, err := factory(cb, config.Protocol)
