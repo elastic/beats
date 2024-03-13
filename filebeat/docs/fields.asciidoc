@@ -50365,7 +50365,7 @@ type: float
 *`elasticsearch.gc.phase.cpu_time.sys_sec`*::
 +
 --
-CPU time spent inside the kernel.
+CPU time spent inside the kernel. 
 
 
 type: float
@@ -50535,7 +50535,7 @@ Young GC
 
 type: long
 
-example:
+example: 
 
 --
 
@@ -50546,7 +50546,7 @@ example:
 
 type: long
 
-example:
+example: 
 
 --
 
@@ -50618,7 +50618,7 @@ Types
 
 type: keyword
 
-example:
+example: 
 
 --
 
@@ -50662,7 +50662,7 @@ Extra source information
 
 type: keyword
 
-example:
+example: 
 
 --
 
@@ -50706,7 +50706,7 @@ Id
 
 type: keyword
 
-example:
+example: 
 
 --
 
@@ -66190,14 +66190,14 @@ type: keyword
 [float]
 === authentication_info
 
-Authentication information.
+Authentication information. 
 
 
 
 *`gcp.audit.authentication_info.principal_email`*::
 +
 --
-The email address of the authenticated user making the request.
+The email address of the authenticated user making the request. 
 
 
 type: keyword
@@ -66207,7 +66207,7 @@ type: keyword
 *`gcp.audit.authentication_info.authority_selector`*::
 +
 --
-The authority selector specified by the requestor, if any. It is not guaranteed  that the principal was allowed to use this authority.
+The authority selector specified by the requestor, if any. It is not guaranteed  that the principal was allowed to use this authority. 
 
 
 type: keyword
@@ -66274,7 +66274,7 @@ type: keyword
 *`gcp.audit.request.name`*::
 +
 --
-Name of the request.
+Name of the request. 
 
 
 type: keyword
@@ -66284,7 +66284,7 @@ type: keyword
 *`gcp.audit.request.resource_name`*::
 +
 --
-Name of the request resource.
+Name of the request resource. 
 
 
 type: keyword
@@ -66301,7 +66301,7 @@ Metadata about the request.
 *`gcp.audit.request_metadata.caller_ip`*::
 +
 --
-The IP address of the caller.
+The IP address of the caller. 
 
 
 type: ip
@@ -66385,7 +66385,7 @@ type: keyword
 *`gcp.audit.response.status`*::
 +
 --
-Status of the response.
+Status of the response. 
 
 
 type: keyword
@@ -66432,14 +66432,14 @@ type: keyword
 [float]
 === status
 
-The status of the overall operation.
+The status of the overall operation. 
 
 
 
 *`gcp.audit.status.code`*::
 +
 --
-The status code, which should be an enum value of google.rpc.Code.
+The status code, which should be an enum value of google.rpc.Code. 
 
 
 type: integer
@@ -66449,7 +66449,7 @@ type: integer
 *`gcp.audit.status.message`*::
 +
 --
-A developer-facing error message, which should be in English. Any user-facing  error message should be localized and sent in the google.rpc.Status.details  field, or localized by the client.
+A developer-facing error message, which should be in English. Any user-facing  error message should be localized and sent in the google.rpc.Status.details  field, or localized by the client. 
 
 
 type: keyword
@@ -93875,7 +93875,7 @@ type: text
 *`misp.identity.identity_class`*::
 +
 --
-The type of entity that this Identity describes, e.g., an individual or organization. Open Vocab - identity-class-ov
+The type of entity that this Identity describes, e.g., an individual or organization. Open Vocab - identity-class-ov 
 
 
 type: keyword
@@ -93885,7 +93885,7 @@ type: keyword
 *`misp.identity.labels`*::
 +
 --
-The list of roles that this Identity performs.
+The list of roles that this Identity performs.  
 
 
 type: keyword
@@ -93898,7 +93898,7 @@ example: CEO
 *`misp.identity.sectors`*::
 +
 --
-The list of sectors that this Identity belongs to. Open Vocab - industry-sector-ov
+The list of sectors that this Identity belongs to. Open Vocab - industry-sector-ov 
 
 
 type: keyword
@@ -94148,7 +94148,7 @@ Fields provide support for specifying information about threat indicators, and r
 *`misp.threat_indicator.labels`*::
 +
 --
-list of type open-vocab that specifies the type of indicator.
+list of type open-vocab that specifies the type of indicator.  
 
 
 type: keyword
@@ -94297,7 +94297,7 @@ format: string
 *`misp.threat_indicator.attack_pattern`*::
 +
 --
-The attack_pattern for this indicator is a STIX Pattern as specified in STIX Version 2.0 Part 5 - STIX Patterning.
+The attack_pattern for this indicator is a STIX Pattern as specified in STIX Version 2.0 Part 5 - STIX Patterning. 
 
 
 type: keyword
@@ -94310,7 +94310,7 @@ example: [destination:ip = '91.219.29.188/32']
 *`misp.threat_indicator.attack_pattern_kql`*::
 +
 --
-The attack_pattern for this indicator is KQL query that matches the attack_pattern specified in the STIX Pattern format.
+The attack_pattern for this indicator is KQL query that matches the attack_pattern specified in the STIX Pattern format. 
 
 
 type: keyword
@@ -95137,7 +95137,7 @@ type: long
 *`mysql.slowlog.sort_range_count`*::
 +
 --
-Number of sorts that were done using ranges.
+Number of sorts that were done using ranges. 
 
 
 type: long
@@ -95237,7 +95237,7 @@ type: long
 *`mysql.slowlog.read_rnd`*::
 +
 --
-The number of requests to read a row based on a fixed position.
+The number of requests to read a row based on a fixed position. 
 
 
 type: long
@@ -113496,7 +113496,7 @@ Fields for Pensando DFW
 *`pensando.dfw.action`*::
 +
 --
-Action on the flow.
+Action on the flow. 
 
 
 type: keyword
@@ -113506,7 +113506,7 @@ type: keyword
 *`pensando.dfw.app_id`*::
 +
 --
-Application ID
+Application ID 
 
 
 type: integer
@@ -113516,7 +113516,7 @@ type: integer
 *`pensando.dfw.destination_address`*::
 +
 --
-Address of destination.
+Address of destination. 
 
 
 type: keyword
@@ -113526,7 +113526,7 @@ type: keyword
 *`pensando.dfw.destination_port`*::
 +
 --
-Port of destination.
+Port of destination. 
 
 
 type: integer
@@ -113536,7 +113536,7 @@ type: integer
 *`pensando.dfw.direction`*::
 +
 --
-Direction of the flow
+Direction of the flow 
 
 
 type: keyword
@@ -113546,7 +113546,7 @@ type: keyword
 *`pensando.dfw.protocol`*::
 +
 --
-Protocol of the flow
+Protocol of the flow 
 
 
 type: keyword
@@ -113556,7 +113556,7 @@ type: keyword
 *`pensando.dfw.rule_id`*::
 +
 --
-Rule ID that was matched.
+Rule ID that was matched. 
 
 
 type: keyword
@@ -113566,7 +113566,7 @@ type: keyword
 *`pensando.dfw.session_id`*::
 +
 --
-Session ID of the flow
+Session ID of the flow 
 
 
 type: integer
@@ -113576,7 +113576,7 @@ type: integer
 *`pensando.dfw.session_state`*::
 +
 --
-Session state of the flow.
+Session state of the flow. 
 
 
 type: keyword
@@ -113586,7 +113586,7 @@ type: keyword
 *`pensando.dfw.source_address`*::
 +
 --
-Source address of the flow.
+Source address of the flow. 
 
 
 type: keyword
@@ -113596,7 +113596,7 @@ type: keyword
 *`pensando.dfw.source_port`*::
 +
 --
-Source port of the flow.
+Source port of the flow. 
 
 
 type: integer
@@ -113606,7 +113606,7 @@ type: integer
 *`pensando.dfw.timestamp`*::
 +
 --
-Timestamp of the log.
+Timestamp of the log. 
 
 
 type: date
