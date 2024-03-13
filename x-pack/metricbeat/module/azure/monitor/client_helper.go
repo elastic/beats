@@ -7,6 +7,7 @@ package monitor
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
 	"time"
 
@@ -31,6 +32,10 @@ func getMetricsDefinitionsWithRetry(client *azure.Client, resource *armresources
 			var respError *azcore.ResponseError
 			ok := errors.As(err, &respError)
 			if !ok {
+				return metricDefinitions, fmt.Errorf("%s, failed to cast error to azcore.ResponseError", errorMsg)
+			}
+			// Check for TooManyRequests error and retry if it is the case
+			if respError.StatusCode != http.StatusTooManyRequests {
 				return metricDefinitions, fmt.Errorf("%s, %w", errorMsg, err)
 			}
 
@@ -38,7 +43,7 @@ func getMetricsDefinitionsWithRetry(client *azure.Client, resource *armresources
 			// If it is present, then we should try to make this request again.
 			retryAfter := respError.RawResponse.Header.Get("Retry-After")
 			if retryAfter == "" {
-				return metricDefinitions, fmt.Errorf("%s %w", errorMsg, err)
+				return metricDefinitions, fmt.Errorf("%s %w, failed to find Retry-After header", errorMsg, err)
 			}
 
 			duration, errD := time.ParseDuration(retryAfter + "s")
