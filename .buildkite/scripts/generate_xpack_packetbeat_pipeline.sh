@@ -169,6 +169,8 @@ if are_conditions_met_packaging; then
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         env:
           PLATFORMS: "${PACKAGING_PLATFORMS}"
 

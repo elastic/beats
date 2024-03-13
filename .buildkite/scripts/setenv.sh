@@ -14,8 +14,6 @@ ASDF_MAGE_VERSION="1.15.0"
 PACKAGING_PLATFORMS="+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 PACKAGING_ARM_PLATFORMS="linux/arm64"
 ASDF_TERRAFORM_VERSION="1.0.2"
-PACKAGING_PLATFORMS="+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-PACKAGING_ARM_PLATFORMS="linux/arm64"
 AWS_REGION="eu-central-1"
 
 export SETUP_GVM_VERSION

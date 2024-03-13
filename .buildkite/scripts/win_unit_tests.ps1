@@ -133,6 +133,17 @@ function google_cloud_auth {
     $env:GOOGLE_APPLICATION_CREDENTIALS = $secretFileLocation
 }
 
+function google_cloud_auth_cleanup {
+    if (Test-Path $env:GOOGLE_APPLICATION_CREDENTIALS) {
+        Write-Host "$env:GOOGLE_APPLICATION_CREDENTIALS"    # debug
+        Remove-Item $env:GOOGLE_APPLICATION_CREDENTIALS -Force
+        Remove-Item Env:\GOOGLE_APPLICATION_CREDENTIALS
+        Write-Host "$env:GOOGLE_APPLICATION_CREDENTIALS"    # debug
+    } else {
+        Write-Host "No GCP credentials were added"
+    }
+}
+
 fixCRLF
 
 withGolang $env:GO_VERSION
@@ -162,8 +173,12 @@ if ($testType -eq "unittest") {
     }
 }
 elseif ($testType -eq "systemtest") {
-    google_cloud_auth
-    mage systemTest
+    try {
+        google_cloud_auth
+        mage systemTest
+    } finally {
+        google_cloud_auth_cleanup
+    }
 }
 else {
     Write-Host "Unknown test type. Please specify 'unittest' or 'systemtest'."
