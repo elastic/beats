@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+# Secrets must be redacted
+# https://buildkite.com/docs/pipelines/managing-log-output#redacted-environment-variables
+DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
+GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
 AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_account_auth"
 
 retry() {
@@ -30,6 +34,21 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == 
 
   if [[ -z "${GOLANG_VERSION-""}" ]]; then
     export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
+  fi
+
+  if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
+    export DOCKER_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
+    export DOCKER_PASSWORD_SECRET=$(retry_with_count 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
+    export GITHUB_TOKEN_SECRET=$(retry_with_count 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
+
+    docker login -u "${DOCKER_USERNAME_SECRET}" -p "${DOCKER_PASSWORD_SECRET}" "${DOCKER_REGISTRY}" 2>/dev/null
+
+    github_username=$(retry_with_count 5 vault kv get -field username ${GITHUB_TOKEN_VAULT_PATH})
+    github_email=$(retry_with_count 5 vault kv get -field email ${GITHUB_TOKEN_VAULT_PATH})
+
+#    git config --global --add safe.directory "*"
+    git config user.name "$github_username"
+    git config user.email "$github_email"
   fi
 fi
 

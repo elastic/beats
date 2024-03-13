@@ -8,6 +8,7 @@ PLATFORM_TYPE="$(uname)"
 REPO="beats"
 TMP_FOLDER="tmp.${REPO}"
 DOCKER_REGISTRY="docker.elastic.co"
+ASDF_MAGE_VERSION="1.14.0"
 
 export SETUP_GVM_VERSION
 export WORKSPACE
@@ -17,3 +18,4 @@ export PLATFORM_TYPE
 export REPO
 export TMP_FOLDER
 export DOCKER_REGISTRY
+export ASDF_MAGE_VERSION
