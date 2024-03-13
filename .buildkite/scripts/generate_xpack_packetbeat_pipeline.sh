@@ -112,7 +112,7 @@ else
   exit 0
 fi
 
-if [[ are_conditions_met_arm_tests || are_conditions_met_macos_tests ]]; then
+if are_conditions_met_arm_tests || are_conditions_met_macos_tests ; then
   cat >> $pipelineName <<- YAML
 
   - group: "Extended Tests"

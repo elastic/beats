@@ -106,7 +106,7 @@ else
 fi
 
 #TODO: replace by commented-out below condition when issues mentioned in the PR https://github.com/elastic/beats/pull/38081 are resolved
-if [[ are_conditions_met_aws_tests || are_conditions_met_macos_tests ]]; then
+if are_conditions_met_aws_tests || are_conditions_met_macos_tests ; then
   cat >> $pipelineName <<- YAML
 
   - group: "Extended Tests"
