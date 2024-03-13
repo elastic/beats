@@ -90,16 +90,12 @@ class Step:
         msg = tm.render(stage=self)
         return msg
 
+# Conditions:
 
-def is_step_enabled(step: Step, conditions) -> bool:
-    # TODO:
-    # If PR then
-    #   If Changeset
+def is_pr(value) -> bool:
+    return os.getenv('BUILDKITE_PULL_REQUEST') == value
 
-    pull_request = os.getenv('BUILDKITE_PULL_REQUEST')
-    if pull_request and pull_request == "false":
-        return True
-
+def step_comment(step: Step) -> bool:
     comment = os.getenv('GITHUB_PR_TRIGGER_COMMENT')
     if comment:
         # the comment should be a subset of the values in .buildkite/pull-requests.json
@@ -110,6 +106,21 @@ def is_step_enabled(step: Step, conditions) -> bool:
             return True
         # i.e: /test filebeat unitTest
         return comment_prefix + " " + step.name in comment
+
+def is_in_changeset() -> bool:
+    # TODO
+    return True
+
+def is_step_enabled(step: Step, conditions) -> bool:
+    # TODO:
+    # If PR then
+    #   If Changeset
+
+    if is_pr("false"):
+        return True
+    
+    if step_comment(step):
+        return True
 
     labels_env = os.getenv('GITHUB_PR_LABELS')
     if labels_env:
@@ -144,7 +155,6 @@ def is_group_enabled(group: Group, conditions) -> bool:
             return comment_prefix + " " + group.project + " " + group.category in comment
 
     return group.category.startswith("mandatory")
-
 
 def fetch_stage(name: str, stage, project: str, category: str) -> Step:
     """Create a step given the yaml object."""
