@@ -47,6 +47,9 @@ func init() {
 	// The beat should use `getcap` at a later point to examine available capabilities
 	// rather than relying on errors from `setcap`
 	_ = setCapabilities()
+
+	// Make heartbeat dumpable so elastic-agent can access process metrics.
+	_ = setDumpable()
 }
 
 func setNodeProcAttr(localUserName string) error {
@@ -98,7 +101,12 @@ func setCapabilities() error {
 		return fmt.Errorf("error setting new process capabilities via setcap: %w", err)
 	}
 
-	_, err = cap.Prctl(unix.PR_SET_DUMPABLE, 1)
+	return nil
+}
+
+// Enforce PR_SET_DUMPABLE=true to allow user-level access to /proc/<pid>/io.
+func setDumpable() error {
+	_, err := cap.Prctl(unix.PR_SET_DUMPABLE, 1)
 	if err != nil {
 		return fmt.Errorf("error setting dumpable flag via prctl: %w", err)
 	}
