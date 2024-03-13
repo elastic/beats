@@ -6,28 +6,27 @@
 # - api_version: API version for Salesforce, version should be grater than 46.0
 
 # Authentication Configurations:
-# JWT Authentication:
-# - jwt_authentication_enabled: Set to true if JWT authentication is enabled
-# - client_id: Client ID for JWT and user-password authentication
-# - client_username: Username for JWT authentication
-# - client_key_path: Path to client key for JWT authentication
-# - jwt_url: Audience URL for JWT authentication
-
 # User-Password Authentication:
-# - user_pass_authentication_enabled: Set to false if user-password authentication is enabled
-# - client_id: Client ID for JWT and user-password authentication
-# - client_secret: Client secret for user-password authentication
+# - enabled: Set to false if user-password authentication is enabled
+# - client.id: Client ID for JWT and user-password authentication
+# - client.secret: Client secret for user-password authentication
 # - token_url: Token URL for user-password authentication
 # - user: Username for user-password authentication
 # - password: Password for user-password authentication
-# - url: URL for user-password authentication
+
+# JWT Authentication:
+# - enabled: Set to true if JWT authentication is enabled
+# - client.id: Client ID for JWT and user-password authentication
+# - client.username: Username for JWT authentication
+# - client.key_path: Path to client key for JWT authentication
+# - url: Audience URL for JWT authentication
 
 # Event Monitoring:
-# - real_time: Set to true to enable real-time logging
+# - real_time: Set to true to enable real-time logging using object type data collection
 # - real_time_interval: Interval for real-time logging
 
 # Event Log File:
-# - event_log_file: Set to true to enable event log file
+# - event_log_file: Set to true to enable event log file type data collection
 # - elf_interval: Interval for event log file
 # - log_file_interval: Interval type for log file collection, either Hourly or Daily
 
@@ -38,18 +37,20 @@
     var.initial_interval: 1d
     var.api_version: 56
 
-    var.jwt_authentication_enabled: true
-
-    var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    var.client_username: "abc.xyz@mail.com"
-    var.client_key_path: client_key.pem
-    var.jwt_url: https://login.salesforce.com
-
-    var.user_pass_authentication_enabled: true
-    var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    var.token_url: "https://login.salesforce.com"
-    var.user: "abc.xyz@mail.com"
-    var.password: "P@$$W0₹D"
+    var.authentication:
+      user_password_flow:
+        enabled: true
+        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        client.secret: client-secret
+        token_url: "https://login.salesforce.com"
+        user: "abc.xyz@mail.com"
+        password: "P@$$W0₹D"
+      jwt_bearer_flow:
+        enabled: true
+        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        client.username: "abc.xyz@mail.com"
+        client.key_path: client_key.pem
+        url: https://login.salesforce.com
 
     var.url: "https://instance_id.my.salesforce.com"
     
@@ -62,18 +63,20 @@
     var.initial_interval: 1d
     var.api_version: 56
 
-    var.jwt_authentication_enabled: true
-
-    var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    var.client_username: "abc.xyz@mail.com"
-    var.client_key_path: client_key.pem
-    var.jwt_url: https://login.salesforce.com
-
-    var.user_pass_authentication_enabled: true
-    var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    var.token_url: "https://login.salesforce.com"
-    var.user: "abc.xyz@mail.com"
-    var.password: "P@$$W0₹D"
+    var.authentication:
+      user_password_flow:
+        enabled: true
+        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        client.secret: client-secret
+        token_url: "https://login.salesforce.com"
+        user: "abc.xyz@mail.com"
+        password: "P@$$W0₹D"
+      jwt_bearer_flow:
+        enabled: true
+        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        client.username: "abc.xyz@mail.com"
+        client.key_path: client_key.pem
+        url: https://login.salesforce.com
 
     var.url: "https://instance_id.my.salesforce.com"
 
@@ -89,18 +92,20 @@
     var.initial_interval: 1d
     var.api_version: 56
 
-    var.jwt_authentication_enabled: true
-
-    var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    var.client_username: "abc.xyz@mail.com"
-    var.client_key_path: client_key.pem
-    var.jwt_url: https://login.salesforce.com
-
-    var.user_pass_authentication_enabled: true
-    var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    var.token_url: "https://login.salesforce.com"
-    var.user: "abc.xyz@mail.com"
-    var.password: "P@$$W0₹D"
+    var.authentication:
+      user_password_flow:
+        enabled: true
+        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        client.secret: client-secret
+        token_url: "https://login.salesforce.com"
+        user: "abc.xyz@mail.com"
+        password: "P@$$W0₹D"
+      jwt_bearer_flow:
+        enabled: true
+        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        client.username: "abc.xyz@mail.com"
+        client.key_path: client_key.pem
+        url: https://login.salesforce.com
 
     var.url: "https://instance_id.my.salesforce.com"
 
@@ -116,18 +121,20 @@
     var.initial_interval: 1d
     var.api_version: 56
 
-    var.jwt_authentication_enabled: true
-
-    var.client_id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    var.client_username: "abc.xyz@mail.com"
-    var.client_key_path: client_key.pem
-    var.jwt_url: https://login.salesforce.com
-
-    var.user_pass_authentication_enabled: true
-    var.client_secret: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-    var.token_url: "https://login.salesforce.com"
-    var.user: "abc.xyz@mail.com"
-    var.password: "P@$$W0₹D"
+    var.authentication:
+      user_password_flow:
+        enabled: true
+        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        client.secret: client-secret
+        token_url: "https://login.salesforce.com"
+        user: "abc.xyz@mail.com"
+        password: "P@$$W0₹D"
+      jwt_bearer_flow:
+        enabled: true
+        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        client.username: "abc.xyz@mail.com"
+        client.key_path: client_key.pem
+        url: https://login.salesforce.com
 
     var.url: "https://instance_id.my.salesforce.com"
 

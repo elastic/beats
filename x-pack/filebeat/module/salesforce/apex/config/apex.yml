@@ -1,53 +1,20 @@
 {{ if eq .input "salesforce" }}
 
+id: apex
 type: salesforce
 enabled: true
 {{ if .api_version }}
 version: {{ .api_version }}
 {{ end }}
-auth.oauth2:
-{{ if .jwt_authentication_enabled }}
-  jwt_bearer_flow:
-    enabled: true
-    {{ if .client_id }}
-    client.id: {{ .client_id }}
-    {{ end }}
-    {{ if .client_username }}
-    client.username: {{ .client_username }}
-    {{ end }}
-    {{ if .client_key_path }}
-    client.key_path: {{ .client_key_path }}
-    {{ end }}
-    {{ if .jwt_url }}
-    url: {{ .jwt_url }}
-    {{ end }}
-{{ else if .user_pass_authentication_enabled }}
-  user_password_flow:
-    enabled: true
-    {{ if .client_id }}
-    client.id: {{ .client_id }}
-    {{ end }}
-    {{ if .client_secret }}
-    client.secret: {{ .client_secret }}
-    {{ end }}
-    {{ if .token_url }}
-    token_url: {{ .token_url }}
-    {{ end }}
-    {{ if .username }}
-    username: {{ .username }}
-    {{ end }}
-    {{ if .password }}
-    password: {{ .password }}
-    {{ end }}
-{{ end }}
+auth.oauth2: {{ .authentication | tojson }}
 url: {{ .url }}
 event_monitoring_method:
   event_log_file:
     enabled: true
     interval: {{ .elf_interval }}
     query:
-      default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE {{ if .initial_interval }}LogDate > [[ formatTime(parseDuration(-{{ .initial_interval }})), "2006-01-02T15:04:05+0700") ]] AND{{ end }} Interval = '{{ .log_file_interval }}' AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY LogDate ASC NULLS FIRST"
-      value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = '{{ .log_file_interval }}' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY LogDate ASC NULLS FIRST"
+      default: SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE {{ if .initial_interval }}LogDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05+0700") ]] AND{{ end }} Interval = '{{ .log_file_interval }}' AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY LogDate ASC NULLS FIRST
+      value: SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = '{{ .log_file_interval }}' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] AND (EventType = 'ApexCallout' OR EventType = 'ApexExecution' OR EventType = 'ApexRestApi' OR EventType = 'ApexSoap' OR EventType = 'ApexTrigger' OR EventType = 'ExternalCustomApexCallout') ORDER BY LogDate ASC NULLS FIRST
     cursor:
       field: "CreatedDate"
 
@@ -73,4 +40,8 @@ processors:
       target: ''
       fields:
         ecs.version: 1.12.0
+  - add_fields:
+      target: salesforce
+      fields:
+        instance_url: {{ .url }}
   - add_locale: ~

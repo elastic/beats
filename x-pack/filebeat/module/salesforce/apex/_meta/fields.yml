@@ -4,6 +4,9 @@
   description: >
     Fileset for ingesting Salesforce Apex logs.
   fields:
+    - name: instance_url
+      type: keyword
+      description: The Instance URL of the Salesforce instance.
     - name: access_mode
       type: keyword
       description: >

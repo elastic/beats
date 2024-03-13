@@ -6,16 +6,7 @@ var:
   - name: tags
     default: [salesforce-login, forwarded]
   - name: api_version
-  - name: jwt_authentication_enabled
-  - name: user_pass_authentication_enabled
-  - name: client_id
-  - name: client_username
-  - name: client_key_path
-  - name: jwt_url
-  - name: client_secret
-  - name: token_url
-  - name: user
-  - name: password
+  - name: authentication
   - name: url
   - name: event_log_file
   - name: elf_interval

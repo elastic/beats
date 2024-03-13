@@ -1,69 +1,28 @@
 {{ if eq .input "salesforce" }}
 
+id: logout
 type: salesforce
 enabled: true
 {{ if .api_version }}
 version: {{ .api_version }}
 {{ end }}
-auth.oauth2:
-{{ if .jwt_authentication_enabled }}
-  jwt_bearer_flow:
-    enabled: true
-    {{ if .client_id }}
-    client.id: {{ .client_id }}
-    {{ end }}
-    {{ if .client_username }}
-    client.username: {{ .client_username }}
-    {{ end }}
-    {{ if .client_key_path }}
-    client.key_path: {{ .client_key_path }}
-    {{ end }}
-    {{ if .jwt_url }}
-    url: {{ .jwt_url }}
-    {{ end }}
-{{ else if .user_pass_authentication_enabled }}
-  user_password_flow:
-    enabled: true
-    {{ if .client_id }}
-    client.id: {{ .client_id }}
-    {{ end }}
-    {{ if .client_secret }}
-    client.secret: {{ .client_secret }}
-    {{ end }}
-    {{ if .token_url }}
-    token_url: {{ .token_url }}
-    {{ end }}
-    {{ if .username }}
-    username: {{ .username }}
-    {{ end }}
-    {{ if .password }}
-    password: {{ .password }}
-    {{ end }}
-{{ end }}
+auth.oauth2: {{ .authentication | tojson }}
 url: {{ .url }}
 event_monitoring_method:
   event_log_file:
-  {{ if .event_log_file }}
-    enabled: true
-  {{ else }}
-    enabled: false
-  {{ end }}
+    enabled: {{ if .event_log_file }}true{{ else }}false{{ end }}
     interval: {{ .elf_interval }}
     query:
-      default: "SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE {{ if .initial_interval }}LogDate > [[ formatTime(parseDuration(-{{ .initial_interval }})), "2006-01-02T15:04:05+0700") ]] AND{{ end }} Interval = '{{ .log_file_interval }}' AND EventType = 'Logout' ORDER BY LogDate ASC NULLS FIRST"
-      value: "SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = '{{ .log_file_interval }}' AND EventType = 'Logout' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY LogDate ASC NULLS FIRST"
+      default: SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE {{ if .initial_interval }}LogDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05+0700") ]] AND{{ end }} Interval = '{{ .log_file_interval }}' AND EventType = 'Logout' ORDER BY LogDate ASC NULLS FIRST
+      value: SELECT CreatedDate,LogDate,LogFile FROM EventLogFile WHERE Interval = '{{ .log_file_interval }}' AND EventType = 'Logout' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY LogDate ASC NULLS FIRST
     cursor:
       field: "CreatedDate"
   object:
-  {{ if .object }}
-    enabled: true
-  {{ else }}
-    enabled: false
-  {{ end }}
+    enabled: {{ if .real_time }}true{{ else }}false{{ end }}
     interval: {{ .real_time_interval }}
     query:
-      default: "SELECT FIELDS(STANDARD) FROM LogoutEvent{{ if .initial_interval }} WHERE EventDate > [[ formatTime(parseDuration(-{{ .initial_interval }})), "2006-01-02T15:04:05+0700") ]]{{ end }}"
-      value: "SELECT FIELDS(STANDARD) FROM LogoutEvent WHERE EventDate > [[ .cursor.object.first_event_time ]]"
+      default: SELECT FIELDS(STANDARD) FROM LogoutEvent{{ if .initial_interval }} WHERE EventDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05+0700") ]]{{ end }}
+      value: SELECT FIELDS(STANDARD) FROM LogoutEvent WHERE EventDate > [[ .cursor.object.first_event_time ]]
     cursor:
       field: "EventDate"
 
@@ -89,4 +48,8 @@ processors:
       target: ''
       fields:
         ecs.version: 1.12.0
+  - add_fields:
+      target: salesforce
+      fields:
+        instance_url: {{ .url }}
   - add_locale: ~
