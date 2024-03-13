@@ -36,8 +36,7 @@ if are_files_changed "$changeset"; then
           PACKAGES: "docker"
           SNAPSHOT: true
           GOX_FLAGS: "-arch arm"
-        command: "mage -d ${BEATS_PROJECT_NAME} package"
-#        command: ".buildkite/scripts/packaging/package.sh"
+        command: ".buildkite/scripts/packaging/package.sh"
         notify:
           - github_commit_status:
               context: "${BEATS_PROJECT_NAME}/Packaging: ARM"
