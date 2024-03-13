@@ -262,7 +262,7 @@ Configure escaping of HTML in strings. Set to `true` to enable escaping.
 
 The default value is `false`.
 
-===== `worker`
+===== `worker` or `workers`
 
 The number of workers per configured host publishing events to {ls}. This
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
