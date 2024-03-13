@@ -21,43 +21,60 @@ import (
 
 const missingNamespace = "no metric definitions were found for resource %s and namespace %s. Verify if the namespace is spelled correctly or if it is supported by the resource in case."
 
+func getMetricsDefinitionsWithRetry(client *azure.Client, resource *armresources.GenericResourceExpanded, namespace string) (armmonitor.MetricDefinitionCollection, error) {
+	for {
+
+		metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(*resource.ID, namespace)
+		if err != nil {
+			errorMsg := "no metric definitions were found for resource " + *resource.ID + " and namespace " + namespace
+
+			var respError *azcore.ResponseError
+			ok := errors.As(err, &respError)
+			if !ok {
+				return metricDefinitions, fmt.Errorf("%s, %w", errorMsg, err)
+			}
+
+			// Check if the error has the header Retry After.
+			// If it is present, then we should try to make this request again.
+			retryAfter := respError.RawResponse.Header.Get("Retry-After")
+			if retryAfter == "" {
+				return metricDefinitions, fmt.Errorf("%s %w", errorMsg, err)
+			}
+
+			duration, errD := time.ParseDuration(retryAfter + "s")
+			if errD != nil {
+				return metricDefinitions, fmt.Errorf("%s, failed to parse duration %s from header retry after", errorMsg, retryAfter)
+			}
+
+			client.Log.Infof("%s, metricbeat will try again after %s seconds", errorMsg, retryAfter)
+			time.Sleep(duration)
+		} else {
+			return metricDefinitions, err
+		}
+	}
+}
+
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
 func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 	var metrics []azure.Metric
+
 	for _, resource := range resources {
+
+		// We use this map to avoid calling the metrics definition function for the same namespace and same resource
+		// multiple times.
+		namespaceMetrics := make(map[string]armmonitor.MetricDefinitionCollection)
+
 		for _, metric := range resourceConfig.Metrics {
-			// get all metrics supported by the namespace provided
-			var metricDefinitions armmonitor.MetricDefinitionCollection
+
 			var err error
 
-			for {
-				metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitions(*resource.ID, metric.Namespace)
+			metricDefinitions, ok := namespaceMetrics[metric.Namespace]
+			if !ok {
+				metricDefinitions, err = getMetricsDefinitionsWithRetry(client, resource, metric.Namespace)
 				if err != nil {
-					errorMsg := "no metric definitions were found for resource " + *resource.ID + " and namespace " + metric.Namespace
-
-					var respError *azcore.ResponseError
-					ok := errors.As(err, &respError)
-					if !ok {
-						return nil, fmt.Errorf("%s, %w", errorMsg, err)
-					}
-
-					// Check if the error has the header Retry After.
-					// If it is present, then we should try to make this request again.
-					retryAfter := respError.RawResponse.Header.Get("Retry-After")
-					if retryAfter == "" {
-						return nil, fmt.Errorf("%s %w", errorMsg, err)
-					}
-
-					duration, errD := time.ParseDuration(retryAfter + "s")
-					if errD != nil {
-						return nil, fmt.Errorf("%s, failed to parse duration %s from header retry after", errorMsg, retryAfter)
-					}
-
-					client.Log.Infof("%s, metricbeat will try again after %s seconds", errorMsg, retryAfter)
-					time.Sleep(duration)
-				} else {
-					break
+					return nil, err
 				}
+				namespaceMetrics[metric.Namespace] = metricDefinitions
 			}
 
 			if len(metricDefinitions.Value) == 0 {
