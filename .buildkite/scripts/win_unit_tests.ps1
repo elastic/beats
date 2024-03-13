@@ -135,10 +135,8 @@ function google_cloud_auth {
 
 function google_cloud_auth_cleanup {
     if (Test-Path $env:GOOGLE_APPLICATION_CREDENTIALS) {
-        Write-Host $env:GOOGLE_APPLICATION_CREDENTIALS    # debug
         Remove-Item $env:GOOGLE_APPLICATION_CREDENTIALS -Force
         Remove-Item Env:\GOOGLE_APPLICATION_CREDENTIALS
-        Write-Host $env:GOOGLE_APPLICATION_CREDENTIALS    # debug
     } else {
         Write-Host "No GCP credentials were added"
     }
