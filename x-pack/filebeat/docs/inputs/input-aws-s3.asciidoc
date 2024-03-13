@@ -199,11 +199,6 @@ into separate events.
 ]
 ----
 
-Note: When `expand_event_list_from_field` parameter is given in the config,
-aws-s3 input will assume the logs are in JSON format and decode them as JSON.
-Content type will not be checked. If a file has "application/json" content-type,
-`expand_event_list_from_field` becomes required to read the JSON file.
-
 [float]
 ==== `file_selectors`
 
