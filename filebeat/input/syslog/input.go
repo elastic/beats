@@ -130,6 +130,7 @@ func syslogFormatter(event *util.Data) *util.Data {
 }
 
 type SyslogFields struct {
+	Data          interface{}
 	Address       interface{}
 	Port          interface{}
 	Facility      interface{}
@@ -144,6 +145,8 @@ type SyslogFields struct {
 func (s *SyslogFields) GetSyslogFieldValue(key string) interface{} {
 	key = strings.ToLower(key)
 	switch key {
+	case "data", "":
+		return s.Data
 	case "address":
 		return s.Address
 	case "port":
@@ -186,6 +189,7 @@ func parseSyslogField(data *util.Data) *SyslogFields {
 
 	// 解析 syslog 字段值
 	syslogFields := &SyslogFields{
+		Data:          flatMap["data"],
 		Address:       flatMap["address"],
 		Port:          flatMap["port"],
 		Facility:      flatMap["facility"],
@@ -199,7 +203,7 @@ func parseSyslogField(data *util.Data) *SyslogFields {
 	return syslogFields
 }
 
-// Filter Syslog field filter
+// Filter Syslog filter
 func Filter(data *util.Data, config *config) bool {
 
 	var text string
@@ -218,29 +222,29 @@ func Filter(data *util.Data, config *config) bool {
 	for _, filterConfig := range config.SyslogFilters {
 		access := true
 		for _, condition := range filterConfig.Conditions {
-			// 初始化条件匹配方法 Matcher
-			matcher, err := getOperationFunc(condition.Op, condition.Value)
-			if err != nil {
-				log.Errorf("Filter error=(%s)", err.Error())
+
+			matcher := condition.GetMatcher()
+			if matcher == nil {
 				access = false
 				break
 			}
-			if condition.Key != "" {
-				// syslog field value match
-				fieldValue := syslogFields.GetSyslogFieldValue(condition.Key)
-				switch v := fieldValue.(type) {
-				case string:
-					text = v
-				case int:
-					text = strconv.Itoa(v)
-				default:
-					text = ""
-				}
-				if text == "" {
-					access = false
-					break
-				}
+
+			// syslog field value match
+			fieldValue := syslogFields.GetSyslogFieldValue(condition.Key)
+			switch v := fieldValue.(type) {
+			case string:
+				text = v
+			case int:
+				text = strconv.Itoa(v)
+			default:
+				text = ""
 			}
+
+			if text == "" {
+				access = false
+				break
+			}
+
 			if !matcher(text) {
 				access = false
 				break
@@ -253,6 +257,32 @@ func Filter(data *util.Data, config *config) bool {
 		}
 	}
 	return false
+}
+
+func InitFilterMatcher(config *config) (*config, error) {
+	if config.SyslogFilters == nil {
+		return config, nil
+	}
+	for _, f := range config.SyslogFilters {
+		for i, condition := range f.Conditions {
+			// 去除字符串首尾空白字符
+			condition.Key = strings.TrimSpace(condition.Key)
+			condition.Value = strings.TrimSpace(condition.Value)
+
+			// 初始化条件匹配方法 Matcher
+			matcher, err := getOperationFunc(condition.Op, condition.Value)
+
+			if err != nil {
+				return nil, err
+			}
+
+			condition.matcher = matcher
+
+			// 重新赋值 condition
+			f.Conditions[i] = condition
+		}
+	}
+	return config, nil
 }
 
 // Input define a syslog input
@@ -285,6 +315,12 @@ func NewInput(
 		return nil, err
 	}
 
+	conf, err := InitFilterMatcher(&config)
+	if err != nil {
+		return nil, err
+	}
+	config = *conf
+
 	forwarder := harvester.NewForwarder(out)
 	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
 		ev := newEvent()
@@ -311,7 +347,7 @@ func NewInput(
 		}
 		d = syslogFormatter(d)
 		filterAccess := true
-		if config.Delimiter != "" && config.SyslogFilters != nil {
+		if config.SyslogFilters != nil {
 			filterAccess = Filter(d, &config)
 		}
 		if filterAccess {

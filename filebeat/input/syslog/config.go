@@ -30,9 +30,14 @@ import (
 
 // ConditionConfig : 用于条件表达式，目前支持=、!=、eq、neq、include、exclude、regex、nregex
 type ConditionConfig struct {
-	Key   string `config:"key"`
-	Op    string `config:"op"`
-	Value string `config:"value"`
+	Key     string `config:"key"`
+	Op      string `config:"op"`
+	Value   string `config:"value"`
+	matcher MatchFunc
+}
+
+func (c *ConditionConfig) GetMatcher() MatchFunc {
+	return c.matcher
 }
 
 type FilterConfig struct {
@@ -42,7 +47,6 @@ type FilterConfig struct {
 type config struct {
 	harvester.ForwarderConfig `config:",inline"`
 	Protocol                  common.ConfigNamespace `config:"protocol"`
-	Delimiter                 string                 `config:"delimiter"`
 	SyslogFilters             []FilterConfig         `config:"syslog_filters"`
 }
 
