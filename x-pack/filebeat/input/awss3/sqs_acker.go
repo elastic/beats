@@ -115,7 +115,9 @@ func (a *EventACKTracker) FullyTracked() bool {
 		return false
 	}
 
-	return a.EventsDropped.Load()+a.EventsPublished.Load() == eventsToBeTracked
+	// This is eating its own tail: we should check for dropped+published, but then we won't wait for acked.
+	// Acked might not be equal to published?
+	return a.EventsDropped.Load()+a.EventsAcked.Load() == eventsToBeTracked
 }
 
 // FlushForSQS delete related SQS message
