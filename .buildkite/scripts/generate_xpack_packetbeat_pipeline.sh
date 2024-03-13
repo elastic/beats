@@ -4,7 +4,7 @@ source .buildkite/scripts/common.sh
 
 set -euo pipefail
 
-pipelineName="pipeline.xpack-metricbeat-dynamic.yml"
+pipelineName="pipeline.xpack-packetbeat-dynamic.yml"
 
 echo "Add the mandatory and extended tests without additional conditions into the pipeline"
 if are_conditions_met_mandatory_tests; then
