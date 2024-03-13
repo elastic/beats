@@ -153,6 +153,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Filebeat*
 
+- Adding Saved Object name field to Kibana audit logs {pull}
 - Update SQL input documentation regarding Oracle DSNs {pull}37590[37590]
 - add documentation for decode_xml_wineventlog processor field mappings.  {pull}32456[32456]
 - httpjson input: Add request tracing logger. {issue}32402[32402] {pull}32412[32412]

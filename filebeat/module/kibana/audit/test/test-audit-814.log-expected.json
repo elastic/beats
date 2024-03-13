@@ -1,0 +1,171 @@
+[
+    {
+        "@timestamp": "2023-06-19T15:18:47.298+00:00",
+        "event.action": "saved_object_create",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "kibana.audit",
+        "event.kind": "event",
+        "event.module": "kibana",
+        "event.outcome": "unknown",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "kibana.saved_object.id": "fleet-default-settings",
+        "kibana.saved_object.type": "ingest_manager_settings",
+        "labels.application": "elastic/fleet",
+        "log.level": "INFO",
+        "log.logger": "plugins.security.audit.ecs",
+        "log.offset": 0,
+        "message": "User is accessing ingest_manager_settings [id=fleet-default-settings]",
+        "process.pid": 7,
+        "service.node.roles": [
+            "background_tasks",
+            "ui"
+        ],
+        "service.type": "kibana",
+        "trace.id": "809d3449277aba205a3ac539d23dbf7e",
+        "transaction.id": "49a38064b0f1dc1e"
+    },
+    {
+        "@timestamp": "2023-06-19T15:18:48.987+00:00",
+        "event.action": "saved_object_create",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "kibana.audit",
+        "event.kind": "event",
+        "event.module": "kibana",
+        "event.outcome": "unknown",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "kibana.saved_object.id": "a09a5397-7b9a-5a73-a622-e29f4c635658",
+        "kibana.saved_object.type": "ingest-outputs",
+        "labels.application": "elastic/fleet",
+        "log.level": "INFO",
+        "log.logger": "plugins.security.audit.ecs",
+        "log.offset": 616,
+        "message": "User is accessing ingest-outputs [id=a09a5397-7b9a-5a73-a622-e29f4c635658]",
+        "process.pid": 7,
+        "service.node.roles": [
+            "background_tasks",
+            "ui"
+        ],
+        "service.type": "kibana",
+        "trace.id": "809d3449277aba205a3ac539d23dbf7e",
+        "transaction.id": "49a38064b0f1dc1e"
+    },
+    {
+        "@timestamp": "2023-06-19T15:18:53.426+00:00",
+        "event.action": "saved_object_create",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "kibana.audit",
+        "event.kind": "event",
+        "event.module": "kibana",
+        "event.outcome": "unknown",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "kibana.saved_object.id": "synthetics",
+        "kibana.saved_object.type": "epm-packages",
+        "labels.application": "elastic/fleet",
+        "log.level": "INFO",
+        "log.logger": "plugins.security.audit.ecs",
+        "log.offset": 1242,
+        "message": "User is accessing epm-packages [id=synthetics]",
+        "process.pid": 7,
+        "service.node.roles": [
+            "background_tasks",
+            "ui"
+        ],
+        "service.type": "kibana",
+        "trace.id": "809d3449277aba205a3ac539d23dbf7e",
+        "transaction.id": "49a38064b0f1dc1e"
+    },
+    {
+        "@timestamp": "2023-06-19T15:19:18.882+00:00",
+        "client.ip": "172.22.0.2",
+        "event.action": "http_request",
+        "event.category": [
+            "web"
+        ],
+        "event.dataset": "kibana.audit",
+        "event.kind": "event",
+        "event.module": "kibana",
+        "event.outcome": "unknown",
+        "event.timezone": "-02:00",
+        "fileset.name": "audit",
+        "http.request.method": "get",
+        "input.type": "log",
+        "kibana.space_id": "default",
+        "log.level": "INFO",
+        "log.logger": "plugins.security.audit.ecs",
+        "log.offset": 1812,
+        "message": "User is requesting [/api/features] endpoint",
+        "process.pid": 7,
+        "related.user": [
+            "elastic"
+        ],
+        "service.node.roles": [
+            "background_tasks",
+            "ui"
+        ],
+        "service.type": "kibana",
+        "trace.id": "e2792f3f-4cf1-4f6d-b4eb-5b491724c295",
+        "transaction.id": "cf44f52888b9ec5a",
+        "url.domain": "kibana",
+        "url.path": "/api/features",
+        "url.port": 5601,
+        "url.scheme": "http",
+        "user.name": "elastic",
+        "user.roles": [
+            "superuser"
+        ]
+    },
+    {
+        "@timestamp": "2023-06-19T15:18:47.298+00:00",
+        "event.action": "saved_object_create",
+        "event.category": [
+            "database"
+        ],
+        "event.dataset": "kibana.audit",
+        "event.kind": "event",
+        "event.module": "kibana",
+        "event.outcome": "unknown",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "access"
+        ],
+        "fileset.name": "audit",
+        "input.type": "log",
+        "kibana.saved_object.id": "fleet-default-settings",
+        "kibana.saved_object.type": "ingest_manager_settings",
+        "kibana.saved_object.name": "fleet-object-name",
+        "labels.application": "elastic/fleet",
+        "log.level": "INFO",
+        "log.logger": "plugins.security.audit.ecs",
+        "log.offset": 0,
+        "message": "User is accessing ingest_manager_settings [id=fleet-default-settings]",
+        "process.pid": 7,
+        "service.node.roles": [
+            "background_tasks",
+            "ui"
+        ],
+        "service.type": "kibana",
+        "trace.id": "809d3449277aba205a3ac539d23dbf7e",
+        "transaction.id": "49a38064b0f1dc1e"
+    }
+]
