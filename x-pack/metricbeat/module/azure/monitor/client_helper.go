@@ -40,6 +40,8 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 						return nil, fmt.Errorf("%s, %w", errorMsg, err)
 					}
 
+					// Check if the error has the header Retry After.
+					// If it is present, then we should try to make this request again.
 					retryAfter := respError.RawResponse.Header.Get("Retry-After")
 					if retryAfter == "" {
 						return nil, fmt.Errorf("%s %w", errorMsg, err)
