@@ -5,8 +5,11 @@
 package monitor
 
 import (
+	"errors"
 	"fmt"
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore"
 	"strings"
+	"time"
 
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 
@@ -23,9 +26,35 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 	for _, resource := range resources {
 		for _, metric := range resourceConfig.Metrics {
 			// get all metrics supported by the namespace provided
-			metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(*resource.ID, metric.Namespace)
-			if err != nil {
-				return nil, fmt.Errorf("no metric definitions were found for resource %s and namespace %s %w", *resource.ID, metric.Namespace, err)
+			var metricDefinitions armmonitor.MetricDefinitionCollection
+			var err error
+
+			for {
+				metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitions(*resource.ID, metric.Namespace)
+				if err != nil {
+					errorMsg := "no metric definitions were found for resource " + *resource.ID + " and namespace " + metric.Namespace
+
+					var respError *azcore.ResponseError
+					ok := errors.As(err, &respError)
+					if !ok {
+						return nil, fmt.Errorf("%s, %w", errorMsg, err)
+					}
+
+					retryAfter := respError.RawResponse.Header.Get("Retry-After")
+					if retryAfter == "" {
+						return nil, fmt.Errorf("%s %w", errorMsg, err)
+					}
+
+					duration, errD := time.ParseDuration(retryAfter + "s")
+					if errD != nil {
+						return nil, fmt.Errorf("%s, failed to parse duration %s from header retry after", errorMsg, retryAfter)
+					}
+
+					client.Log.Infof("%s, metricbeat will try again after %s seconds", errorMsg, retryAfter)
+					time.Sleep(duration)
+				} else {
+					break
+				}
 			}
 
 			if len(metricDefinitions.Value) == 0 {
