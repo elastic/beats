@@ -36,6 +36,7 @@ if are_files_changed "$changeset"; then
           PACKAGES: "docker"
           SNAPSHOT: true
           GOX_FLAGS: "-arch arm"
+          GOFLAGS: "-x -v"
         command: ".buildkite/scripts/packaging/package.sh"
         notify:
           - github_commit_status:
