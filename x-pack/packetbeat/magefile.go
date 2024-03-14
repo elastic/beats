@@ -110,8 +110,6 @@ func Ironbank() error {
 func TestPackages() error {
 	return devtools.TestPackages()
 }
-<<<<<<< HEAD
-=======
 
 func SystemTest(ctx context.Context) error {
 	mg.SerialDeps(getNpcapInstaller, devtools.BuildSystemTestBinary)
@@ -159,4 +157,3 @@ func getNpcapInstaller() error {
 	fmt.Printf("getting %s from private cache\n", installer)
 	return sh.RunV("gsutil", "cp", "gs://"+ciBucketName+"/private/"+installer, dstPath)
 }
->>>>>>> e0d5fe5fef (Migrate xpack packetbeat (#38135))
