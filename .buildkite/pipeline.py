@@ -127,13 +127,13 @@ def group_comment(group: Group) -> bool:
 changed_files = None
 
 def get_pr_changeset():
+    global changed_files
     if not changed_files:
         base_branch = os.getenv('BUILDKITE_PULL_REQUEST_BASE_BRANCH')
         diff_command = ["git", "diff", "--name-only", "{}...HEAD".format(base_branch)]
         result = subprocess.run(diff_command, stdout=subprocess.PIPE)
         changed_files = result.stdout.decode().splitlines()
-        print("Changed files: {}".format(changed_files))
-        
+        print("Changed files: {}".format(changed_files))        
     return changed_files
 
 def filter_files_by_glob(files, patterns: list[str]):
