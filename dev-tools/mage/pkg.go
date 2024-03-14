@@ -18,6 +18,7 @@
 package mage
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -29,7 +30,6 @@ import (
 
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
-	"github.com/pkg/errors"
 )
 
 // Package packages the Beat for distribution. It generates packages based on
@@ -222,7 +222,12 @@ func saveIronbank() error {
 		return fmt.Errorf("cannot compress the tar.gz file: %+v", err)
 	}
 
-	return errors.Wrap(CreateSHA512File(tarGzFile), "failed to create .sha512 file")
+	err = CreateSHA512File(tarGzFile)
+	if err != nil {
+		return fmt.Errorf("failed to create the sha512 file: %+v", err)
+	}
+
+	return nil
 }
 
 // isPackageTypeSelected returns true if SelectedPackageTypes is empty or if
@@ -249,8 +254,11 @@ type packageBuilder struct {
 func (b packageBuilder) Build() error {
 	fmt.Printf(">> package: Building %v type=%v for platform=%v\n", b.Spec.Name, b.Type, b.Platform.Name)
 	log.Printf("Package spec: %+v", b.Spec)
-	return errors.Wrapf(b.Type.Build(b.Spec), "failed building %v type=%v for platform=%v",
-		b.Spec.Name, b.Type, b.Platform.Name)
+	err := b.Type.Build(b.Spec)
+	if err != nil {
+		return fmt.Errorf("failed building %v type=%v for platform=%v: %w", err)
+	}
+	return nil
 }
 
 type testPackagesParams struct {

@@ -150,10 +150,10 @@ func (aac ArtifactAPIClient) GetVersions(ctx context.Context) (list *VersionList
 	}
 
 	resp, err := aac.createAndPerformRequest(ctx, joinedURL)
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, fmt.Errorf("getting versions: %w", err)
 	}
+	defer resp.Body.Close()
 
 	return checkResponseAndUnmarshal[VersionList](resp)
 }
@@ -168,10 +168,10 @@ func (aac ArtifactAPIClient) GetBuildsForVersion(ctx context.Context, version st
 	}
 
 	resp, err := aac.createAndPerformRequest(ctx, joinedURL)
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, fmt.Errorf("getting builds for version %s: %w", version, err)
 	}
+	defer resp.Body.Close()
 
 	return checkResponseAndUnmarshal[VersionBuilds](resp)
 }
@@ -186,10 +186,10 @@ func (aac ArtifactAPIClient) GetBuildDetails(ctx context.Context, version string
 	}
 
 	resp, err := aac.createAndPerformRequest(ctx, joinedURL)
-	defer resp.Body.Close()
 	if err != nil {
 		return nil, fmt.Errorf("getting build details for version %s buildID %s: %w", version, buildID, err)
 	}
+	defer resp.Body.Close()
 
 	return checkResponseAndUnmarshal[BuildDetails](resp)
 }
