@@ -2,8 +2,8 @@
 
 set -euo pipefail
 
-source .buildkite/scripts/packaging/package-util.sh
-source .buildkite/env-scripts/util.sh
+#source .buildkite/scripts/packaging/package-util.sh
+#source .buildkite/env-scripts/util.sh
 
 IMG_POSTFIX="-SNAPSHOT"
 VARIANTS=("" "-ubi" "-oss")
@@ -11,17 +11,21 @@ VERSION="$(make get-version)"
 SOURCE_TAG+="${VERSION}${IMG_POSTFIX}"
 TARGET="observability-ci/${BEATS_PROJECT_NAME}"
 
-echo "--- Git version: $(git --version)"
-echo "--- Mage version: $(mage -version)"
-echo "--- Go version: $(go version)"
-echo "--- Make version: $(make get-version)"
-echo "--- Go modules: $(go list -m all)"
-echo "--- GCC version: $(gcc --version)"
-echo "--- G++ version: $(g++ --version)"
+#echo "--- Git version: $(git --version)"
+#echo "--- Mage version: $(mage -version)"
+#echo "--- Go version: $(go version)"
+#echo "--- Make version: $(make get-version)"
+#echo "--- Go modules: $(go list -m all)"
+#echo "--- GCC version: $(gcc --version)"
+#echo "--- G++ version: $(g++ --version)"
+#
+#echo "--- Adding bin path"
+#add_bin_path
 
-echo "--- Adding bin path: $(add_bin_path)"
-#echo "--- With GO: $(with_go)"
-echo "--- With Mage: $(with_mage)"
+#echo "--- With GO"
+#with_go
+
+#echo "--- With Mage: $(with_mage)"
 
 echo "--- Creating package"
 mage -d "${BEATS_PROJECT_NAME}" package
