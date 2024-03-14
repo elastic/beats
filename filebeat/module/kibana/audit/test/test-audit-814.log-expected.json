@@ -157,7 +157,7 @@
         "labels.application": "elastic/fleet",
         "log.level": "INFO",
         "log.logger": "plugins.security.audit.ecs",
-        "log.offset": 0,
+        "log.offset": 2466,
         "message": "User is accessing ingest_manager_settings [id=fleet-default-settings]",
         "process.pid": 7,
         "service.node.roles": [
