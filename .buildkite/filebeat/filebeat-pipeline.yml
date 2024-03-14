@@ -11,7 +11,7 @@ env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
 
 steps:
   - group: "Filebeat Mandatory Testing"

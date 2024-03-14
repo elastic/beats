@@ -30,8 +30,6 @@ checkout_merge() {
         git merge --abort
         exit ${merge_result}
     }
-
-    git reset --hard "${pr_commit}"
 }
 
 pull_request="${BUILDKITE_PULL_REQUEST:-false}"
