@@ -14,9 +14,7 @@
             "skip_ci_labels": [ ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": [ ],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": [ ]
         },
         {
             "enabled": true,
@@ -32,9 +30,7 @@
             "skip_ci_labels": [ ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": ["^filebeat/.*", ".buildkite/filebeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*" ],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": ["^filebeat/.*", ".buildkite/filebeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*" ]
         },
         {
             "enabled": true,
@@ -50,9 +46,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": [ "^metricbeat/.*", ".buildkite/metricbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": [ "^metricbeat/.*", ".buildkite/metricbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         },
         {
             "enabled": true,
@@ -68,9 +62,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": [ "^auditbeat/.*", ".buildkite/auditbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": [ "^auditbeat/.*", ".buildkite/auditbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         },
         {
             "enabled": true,
@@ -86,9 +78,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": [ "^heartbeat/.*", ".buildkite/heartbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": [ "^heartbeat/.*", ".buildkite/heartbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         },
         {
             "enabled": true,
@@ -104,9 +94,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": [ "^deploy/kubernetes/.*", ".buildkite/deploy/kubernetes/.*", "^libbeat/docs/version.asciidoc"],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": [ "^deploy/kubernetes/.*", ".buildkite/deploy/kubernetes/.*", "^libbeat/docs/version.asciidoc"]
         },
         {
             "enabled": true,
@@ -122,9 +110,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": ["^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": ["^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         },
         {
             "enabled": true,
@@ -140,9 +126,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": ["^packetbeat/.*", ".buildkite/packetbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": ["^packetbeat/.*", ".buildkite/packetbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         },
         {
             "enabled": true,
@@ -158,9 +142,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": ["^x-pack/elastic-agent/README.md", "^x-pack/elastic-agent/docs/.*", "^x-pack/elastic-agent/devtools/.*" ],
-            "always_require_ci_on_changed": ["^x-pack/elastic-agent/.*", ".buildkite/x-pack/elastic-agent/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": ["^x-pack/elastic-agent/.*", ".buildkite/x-pack/elastic-agent/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         },
         {
             "enabled": true,
@@ -176,9 +158,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": ["^winlogbeat/.*", ".buildkite/winlogbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": ["^winlogbeat/.*", ".buildkite/winlogbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         },
         {
             "enabled": true,
@@ -194,9 +174,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": ["^x-pack/winlogbeat/.*", ".buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": ["^x-pack/winlogbeat/.*", ".buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         },
         {
             "enabled": true,
@@ -212,9 +190,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": ["^x-pack/packetbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": ["^x-pack/packetbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         },
         {
             "enabled": true,
@@ -230,9 +206,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": ["^x-pack/libbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": ["^x-pack/libbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         },
         {
             "enabled": true,
@@ -248,9 +222,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": ["^x-pack/metricbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"],
-            "use_merge_commit": true,
-            "fail_on_not_mergeable": true
+            "always_require_ci_on_changed": ["^x-pack/metricbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         }
     ]
 }
