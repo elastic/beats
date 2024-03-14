@@ -31,16 +31,12 @@ func init() {
 type EventACKTracker struct {
 	ID uint64
 
-	EventsAcked       *atomic.Uint64
-	EventsDropped     *atomic.Uint64
-	EventsPublished   *atomic.Uint64
-	EventsToBeTracked *atomic.Uint64
+	eventsAcked     atomic.Uint64
+	eventsToBeAcked atomic.Uint64
 
 	ctx        context.Context
 	cancel     context.CancelFunc
 	deletionWg *sync.WaitGroup
-
-	mutex *sync.Mutex
 
 	msg             *types.Message
 	ReceiveCount    int
@@ -56,15 +52,10 @@ type EventACKTracker struct {
 func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventACKTracker {
 	ctx, cancel := context.WithCancel(ctx)
 	acker := &EventACKTracker{
-		ID:                ackerIDCounter.Inc(),
-		ctx:               ctx,
-		cancel:            cancel,
-		deletionWg:        deletionWg,
-		mutex:             new(sync.Mutex),
-		EventsAcked:       atomic.NewUint64(0),
-		EventsDropped:     atomic.NewUint64(0),
-		EventsPublished:   atomic.NewUint64(0),
-		EventsToBeTracked: atomic.NewUint64(0),
+		ID:         ackerIDCounter.Inc(),
+		ctx:        ctx,
+		cancel:     cancel,
+		deletionWg: deletionWg,
 	}
 
 	go func() {
@@ -86,19 +77,19 @@ func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventA
 }
 
 func (a *EventACKTracker) cancelAndFlush() {
+	a.deleteSQS()
 	a.cancel()
-	a.FlushForSQS()
 }
 
 // MarkSQSProcessedWithData Every call after the first one is a no-op
 func (a *EventACKTracker) MarkSQSProcessedWithData(msg *types.Message, publishedEvent uint64, receiveCount int, start time.Time, processingErr error, handles []s3ObjectHandler, keepaliveCancel context.CancelFunc, keepaliveWg *sync.WaitGroup, msgHandler sqsProcessor, log *logp.Logger) {
 	// We want to execute the logic of this call only once, when the ack mutex was locked on init
-	if a.EventsToBeTracked.Load() > 0 {
+	if a.eventsToBeAcked.Load() > 0 {
 		return
 	}
 
 	a.msg = msg
-	a.EventsToBeTracked = atomic.NewUint64(publishedEvent)
+	a.eventsToBeAcked.Store(publishedEvent)
 	a.ReceiveCount = receiveCount
 	a.start = start
 	a.processingErr = processingErr
@@ -110,63 +101,41 @@ func (a *EventACKTracker) MarkSQSProcessedWithData(msg *types.Message, published
 }
 
 func (a *EventACKTracker) FullyTracked() bool {
-	eventsToBeTracked := a.EventsToBeTracked.Load()
+	eventsToBeTracked := a.eventsToBeAcked.Load()
 	if eventsToBeTracked == 0 {
 		return false
 	}
 
 	// This is eating its own tail: we should check for dropped+published, but then we won't wait for acked.
 	// Acked might not be equal to published?
-	return a.EventsDropped.Load()+a.EventsAcked.Load() == eventsToBeTracked
+	return a.eventsAcked.Load() == eventsToBeTracked
 }
 
-// FlushForSQS delete related SQS message
-func (a *EventACKTracker) FlushForSQS() {
+// deleteSQS delete related SQS message
+func (a *EventACKTracker) deleteSQS() {
 	// Stop keepalive visibility routine before deleting.
 	a.keepaliveCancel()
 	a.keepaliveWg.Wait()
 
-	eventsPublished := a.EventsPublished.Load()
-	if eventsPublished > 0 && eventsPublished == a.EventsAcked.Load() {
-		err := a.msgHandler.DeleteSQS(a.msg, a.ReceiveCount, a.processingErr, a.Handles)
-		if err != nil {
-			a.log.Warnw("Failed deleting SQS message.",
-				"error", err,
-				"message_id", *a.msg.MessageId,
-				"elapsed_time_ns", time.Since(a.start))
-		} else {
-			a.log.Debugw("Success deleting SQS message.",
-				"message_id", *a.msg.MessageId,
-				"elapsed_time_ns", time.Since(a.start))
-		}
-	} else {
-		a.log.Infow("Skipping deleting SQS message, not all events acked.",
-			"events_acked", a.EventsAcked.Load(),
-			"events_dropped", a.EventsDropped.Load(),
-			"events_published", a.EventsPublished.Load(),
-			"events_tracked", a.EventsToBeTracked.Load(),
+	err := a.msgHandler.DeleteSQS(a.msg, a.ReceiveCount, a.processingErr, a.Handles)
+	if err != nil {
+		a.log.Warnw("Failed deleting SQS message.",
+			"error", err,
 			"message_id", *a.msg.MessageId,
 			"elapsed_time_ns", time.Since(a.start))
-
+	} else {
+		a.log.Debugw("Success deleting SQS message.",
+			"message_id", *a.msg.MessageId,
+			"elapsed_time_ns", time.Since(a.start))
 	}
 
 	a.deletionWg.Done()
 
 }
 
-// ACK increments the number of EventsAcked.
+// ACK increments the number of eventsAcked.
 func (a *EventACKTracker) ACK() {
-	a.EventsAcked.Inc()
-}
-
-// Drop increments the number of EventsDropped.
-func (a *EventACKTracker) Drop() {
-	a.EventsDropped.Inc()
-}
-
-// Published increments the number of EventsPublished.
-func (a *EventACKTracker) Published() {
-	a.EventsPublished.Inc()
+	a.eventsAcked.Inc()
 }
 
 // NewEventACKHandler returns a beat ACKer that can receive callbacks when
@@ -175,38 +144,11 @@ func (a *EventACKTracker) Published() {
 // to decrement the number of pending ACKs.
 func NewEventACKHandler() beat.EventListener {
 	return acker.ConnectionOnly(
-		acker.Combine(
-			newEventListener(),
-			acker.EventPrivateReporter(func(_ int, privates []interface{}) {
-				for _, private := range privates {
-					if acker, ok := private.(*EventACKTracker); ok {
-						acker.ACK()
-					}
+		acker.EventPrivateReporter(func(_ int, privates []interface{}) {
+			for _, private := range privates {
+				if acker, ok := private.(*EventACKTracker); ok {
+					acker.ACK()
 				}
-			}),
-		))
-}
-
-func newEventListener() *eventListener {
-	return &eventListener{}
-}
-
-type eventListener struct{}
-
-func (a *eventListener) ACKEvents(n int) {}
-
-func (a *eventListener) ClientClosed() {}
-
-func (a *eventListener) AddEvent(event beat.Event, published bool) {
-	acker, ok := event.Private.(*EventACKTracker)
-	if !ok {
-		return
-	}
-
-	if !published {
-		acker.Drop()
-	} else {
-		acker.Published()
-	}
-
+			}
+		}))
 }
