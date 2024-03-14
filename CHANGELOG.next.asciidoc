@@ -202,6 +202,8 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add logging for cache processor file reads and writes. {pull}38052[38052]
 - Add parseDateInTZ value template for the HTTPJSON input {pull}37738[37738]
 - Improve rate limit handling by HTTPJSON {issue}36207[36207] {pull}38161[38161] {pull}38237[38237]
+- Add parseDateInTZ value template for the HTTPJSON input. {pull}37738[37738]
+- Add support for complex event objects in the HTTP Endpoint input. {issue}37910[37910] {pull}38193[38193]
 
 *Auditbeat*
 
