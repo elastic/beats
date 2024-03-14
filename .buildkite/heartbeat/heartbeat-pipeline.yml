@@ -139,4 +139,4 @@ steps:
 
     steps:
       - label: Package pipeline
-        commands: ".buildkite/heartbeat/scripts/package-step.sh | buildkite-agent pipeline upload"
+        commands: ".buildkite/heartbeat/scripts/package-step.sh"

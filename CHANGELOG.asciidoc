@@ -3,6 +3,28 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.12.2]]
+=== Beats version 8.12.2
+https://github.com/elastic/beats/compare/v8.12.1\...v8.12.2[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- [threatintel] MISP pagination fixes. {pull}37898[37898]
+- Fix file handle leak when handling errors in filestream. {pull}37973[37973]
+
+*Packetbeat*
+
+- Fix interface device parsing for packetbeat protocols. {pull}37946[37946]
+
+==== Added
+
+*Metricbeat*
+
+- Update `getOpTimestamp` in `replstatus` to fix sort and temp files generation issue in MongoDB. {pull}37688[37688]
+
+
 [[release-notes-8.12.1]]
 === Beats version 8.12.1
 https://github.com/elastic/beats/compare/v8.12.0\...v8.12.1[View commits]
@@ -72,7 +94,12 @@ If you are not using the Elasticsearch output, set `queue.mem.flush.timeout: 1s`
 
 ==== Breaking changes
 
+*Affecting all Beats*
+
+- Windows MSI installers now store configuration in C:\Program Files instead of C:\ProgramData. https://github.com/elastic/elastic-stack-installers/pull/209
+
 *Heartbeat*
+
 - Decrease the ES default timeout to 10 for the load monitor state requests.
 - Windows MSI installers now store configuration in C:\Program Files instead of C:\ProgramData. https://github.com/elastic/elastic-stack-installers/pull/209
 
@@ -232,6 +259,7 @@ https://github.com/elastic/beats/compare/v8.11.1\...v8.11.2[View commits]
 - Enhance Azure Metrics metricset with refined grouping logic and resolved duplication issues for TSDB compatibility. {pull}36823[36823]
 - Fix unintended skip in metric collection on Azure Monitor. {issue}37204[37204] {pull}37203[37203]
 - Fix the "api-version query parameter (?api-version=) is required for all requests" error in Azure Billing. {pull}37158[37158]
+- add_cloud_metadata: fix the `orchestrator` metadata for the aws cloud provider
 
 *Winlogbeat*
 

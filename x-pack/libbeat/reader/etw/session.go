@@ -156,9 +156,8 @@ func newSessionProperties(sessionName string) *EventTraceProperties {
 }
 
 // NewSession initializes and returns a new ETW Session based on the provided configuration.
-func NewSession(conf Config) (Session, error) {
-	var session Session
-	var err error
+func NewSession(conf Config) (*Session, error) {
+	session := &Session{}
 
 	// Assign ETW Windows API functions
 	session.startTrace = _StartTrace
@@ -183,9 +182,10 @@ func NewSession(conf Config) (Session, error) {
 
 	session.NewSession = true // Indicate this is a new session
 
+	var err error
 	session.GUID, err = setSessionGUIDFunc(conf)
 	if err != nil {
-		return Session{}, err
+		return nil, fmt.Errorf("error when initializing session '%s': %w", session.Name, err)
 	}
 
 	// Initialize additional session properties.
@@ -229,10 +229,8 @@ func (s *Session) StartConsumer() error {
 	// Open an ETW trace processing handle for consuming events
 	// from an ETW real-time trace session or an ETW log file.
 	s.traceHandler, err = s.openTrace(&elf)
-
 	switch {
 	case err == nil:
-
 	// Handle specific errors for trace opening.
 	case errors.Is(err, ERROR_BAD_PATHNAME):
 		return fmt.Errorf("invalid log source when opening trace: %w", err)
@@ -241,10 +239,10 @@ func (s *Session) StartConsumer() error {
 	default:
 		return fmt.Errorf("failed to open trace: %w", err)
 	}
+
 	// Process the trace. This function blocks until processing ends.
 	if err := s.processTrace(&s.traceHandler, 1, nil, nil); err != nil {
 		return fmt.Errorf("failed to process trace: %w", err)
 	}
-
 	return nil
 }
