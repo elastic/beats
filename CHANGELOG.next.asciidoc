@@ -52,6 +52,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Heartbeat*
 
+- Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
+- Fix setuid root when running under cgroups v2. {pull}37794[37794]
+- Adjust State loader to only retry when response code status is 5xx {pull}37981[37981]
+- Reset prctl dumpable flag after cap drop. {pull}38269[38269] 
 
 *Metricbeat*
 
