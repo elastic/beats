@@ -30,7 +30,7 @@ var (
 		expect_error  bool
 	}{
 		{
-			testName: "Enrich Process",
+			testName: "enrich process",
 			config: config{
 				ReplaceFields: false,
 				PIDField:      "process.pid",
@@ -92,7 +92,7 @@ var (
 			expect_error: false,
 		},
 		{
-			testName: "No PID Field in Event",
+			testName: "no PID field in event",
 			config: config{
 				ReplaceFields: false,
 				PIDField:      "process.pid",
@@ -111,7 +111,7 @@ var (
 			expect_error: true,
 		},
 		{
-			testName: "PID Not Number",
+			testName: "PID not number",
 			config: config{
 				ReplaceFields: false,
 				PIDField:      "process.pid",
@@ -149,6 +149,104 @@ var (
 				},
 			},
 			expect_error: true,
+		},
+		{
+			testName: "process field not in event",
+			// This event, without a "process" field, is not supported by enrich, it should be handled gracefully
+			config: config{
+				ReplaceFields: false,
+				PIDField:      "action.pid",
+			},
+			input: beat.Event{
+				Fields: mapstr.M{
+					"action": mapstr.M{
+						"pid": "1010",
+					},
+				},
+			},
+			expect_error: true,
+		},
+		{
+			testName: "process field not mapstr",
+			// Unsupported process field type should be handled gracefully
+			config: config{
+				ReplaceFields: false,
+				PIDField:      "action.pid",
+			},
+			input: beat.Event{
+				Fields: mapstr.M{
+					"action": mapstr.M{
+						"pid": "100",
+					},
+					"process": map[int]int{
+						10: 100,
+						20: 200,
+					},
+				},
+			},
+			expect_error: true,
+		},
+		{
+			testName: "enrich event with map[string]any process field",
+			config: config{
+				ReplaceFields: false,
+				PIDField:      "process.pid",
+			},
+			mockProcesses: []types.ProcessExecEvent{
+				{
+					PIDs: types.PIDInfo{
+						Tid:  uint32(100),
+						Tgid: uint32(100),
+						Ppid: uint32(50),
+						Pgid: uint32(100),
+						Sid:  uint32(40),
+					},
+					CWD:      "/",
+					Filename: "/bin/ls",
+				},
+				{
+					PIDs: types.PIDInfo{
+						Tid:  uint32(50),
+						Tgid: uint32(50),
+						Ppid: uint32(40),
+						Sid:  uint32(40),
+					},
+				},
+				{
+					PIDs: types.PIDInfo{
+						Tid:  uint32(40),
+						Tgid: uint32(40),
+						Ppid: uint32(1),
+						Sid:  uint32(1),
+					},
+				},
+			},
+			input: beat.Event{
+				Fields: map[string]any{
+					"process": map[string]any{
+						"pid": uint32(100),
+					},
+				},
+			},
+			expected: beat.Event{
+				Fields: mapstr.M{
+					"process": mapstr.M{
+						"executable":        "/bin/ls",
+						"working_directory": "/",
+						"pid":               uint32(100),
+						"parent": mapstr.M{
+							"pid": uint32(50),
+						},
+						"session_leader": mapstr.M{
+							"pid": uint32(40),
+						},
+						"group_leader": mapstr.M{
+							"pid": uint32(100),
+						},
+					},
+				},
+			},
+			expect_error: false,
 		},
 	}
 
@@ -228,7 +326,8 @@ var (
 func TestEnrich(t *testing.T) {
 	for _, tt := range enrichTests {
 		reader := procfs.NewMockReader()
-		db := processdb.NewDB(reader, *logger)
+		db, err := processdb.NewDB(reader, *logger)
+		assert.Nil(t, err)
 
 		for _, ev := range tt.mockProcesses {
 			db.InsertExec(ev)

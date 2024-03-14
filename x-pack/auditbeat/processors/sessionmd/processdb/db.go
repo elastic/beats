@@ -84,22 +84,22 @@ type Process struct {
 }
 
 var (
-	// The contents of these two files are needed to calculate entity IDs.
-	// Fail fast on startup if we can't read them.
-	bootID     = mustReadBootID()
-	pidNsInode = mustReadPIDNsInode()
+	bootID     string
+	pidNsInode uint64
+	initError  error
+	once       sync.Once
 )
 
-func mustReadBootID() string {
+func readBootID() (string, error) {
 	bootID, err := os.ReadFile("/proc/sys/kernel/random/boot_id")
 	if err != nil {
 		panic(fmt.Sprintf("could not read /proc/sys/kernel/random/boot_id: %v", err))
 	}
 
-	return strings.TrimRight(string(bootID), "\n")
+	return strings.TrimRight(string(bootID), "\n"), nil
 }
 
-func mustReadPIDNsInode() uint64 {
+func readPIDNsInode() (uint64, error) {
 	var ret uint64
 
 	pidNsInodeRaw, err := os.Readlink("/proc/self/ns/pid")
@@ -111,7 +111,7 @@ func mustReadPIDNsInode() uint64 {
 		panic(fmt.Sprintf("could not parse contents of /proc/self/ns/pid (%s): %v", pidNsInodeRaw, err))
 	}
 
-	return ret
+	return ret, nil
 }
 
 func pidInfoFromProto(p types.PIDInfo) types.PIDInfo {
@@ -164,6 +164,19 @@ func ttyDevFromProto(p types.TTYDev) types.TTYDev {
 	}
 }
 
+func initialize() {
+	var err error
+	bootID, err = readBootID()
+	if err != nil {
+		initError = err
+		return
+	}
+	pidNsInode, err = readPIDNsInode()
+	if err != nil {
+		initError = err
+	}
+}
+
 type DB struct {
 	mutex                    sync.RWMutex
 	logger                   *logp.Logger
@@ -173,14 +186,18 @@ type DB struct {
 	procfs                   procfs.Reader
 }
 
-func NewDB(reader procfs.Reader, logger logp.Logger) *DB {
+func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
+	once.Do(initialize)
+	if initError != nil {
+		return &DB{}, initError
+	}
 	return &DB{
 		logger:                   logp.NewLogger("processdb"),
 		processes:                make(map[uint32]Process),
 		entryLeaders:             make(map[uint32]EntryType),
 		entryLeaderRelationships: make(map[uint32]uint32),
 		procfs:                   reader,
-	}
+	}, nil
 }
 
 func (db *DB) calculateEntityIDv1(pid uint32, startTime time.Time) string {

@@ -50,7 +50,10 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 
 	ctx := context.Background()
 	reader := procfs.NewProcfsReader(*logger)
-	db := processdb.NewDB(reader, *logger)
+	db, err := processdb.NewDB(reader, *logger)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create DB: %w", err)
+	}
 
 	backfilledPIDs := db.ScrapeProcfs()
 	logger.Debugf("backfilled %d processes", len(backfilledPIDs))
@@ -118,7 +121,15 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 
 	processMap := fullProcess.ToMap()
 
-	err = mapstr.MergeFieldsDeep(result.Fields["process"].(mapstr.M), processMap, true)
+	if b, err := result.Fields.HasKey("process"); !b || err != nil {
+		return nil, fmt.Errorf("no process field in event")
+	}
+	m, ok := tryToMapStr(result.Fields["process"])
+	if !ok {
+		return nil, fmt.Errorf("process field type not supported")
+	}
+
+	err = mapstr.MergeFieldsDeep(m, processMap, true)
 	if err != nil {
 		return nil, fmt.Errorf("merging enriched fields with event: %w", err)
 	}
@@ -190,4 +201,15 @@ func (p *addSessionMetadata) replaceFields(ev *beat.Event) error {
 		}
 	}
 	return nil
+}
+
+func tryToMapStr(v interface{}) (mapstr.M, bool) {
+	switch m := v.(type) {
+	case mapstr.M:
+		return m, true
+	case map[string]interface{}:
+		return mapstr.M(m), true
+	default:
+		return nil, false
+	}
 }

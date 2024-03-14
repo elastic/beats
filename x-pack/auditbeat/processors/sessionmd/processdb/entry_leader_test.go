@@ -188,7 +188,8 @@ func populateProcfsWithInit(reader *procfs.MockReader) {
 
 func TestSingleProcessSessionLeaderEntryTypeTerminal(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	pid := uint32(1234)
@@ -211,7 +212,8 @@ func TestSingleProcessSessionLeaderEntryTypeTerminal(t *testing.T) {
 
 func TestSingleProcessSessionLeaderLoginProcess(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	pid := uint32(1234)
@@ -239,7 +241,8 @@ func TestSingleProcessSessionLeaderLoginProcess(t *testing.T) {
 
 func TestSingleProcessSessionLeaderChildOfInit(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	pid := uint32(100)
@@ -268,7 +271,8 @@ func TestSingleProcessSessionLeaderChildOfInit(t *testing.T) {
 
 func TestSingleProcessSessionLeaderChildOfSsmSessionWorker(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	ssmPID := uint32(999)
@@ -303,7 +307,8 @@ func TestSingleProcessSessionLeaderChildOfSsmSessionWorker(t *testing.T) {
 
 func TestSingleProcessSessionLeaderChildOfSshd(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	sshdPID := uint32(999)
@@ -337,7 +342,8 @@ func TestSingleProcessSessionLeaderChildOfSshd(t *testing.T) {
 
 func TestSingleProcessSessionLeaderChildOfContainerdShim(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	containerdShimPID := uint32(999)
@@ -371,7 +377,8 @@ func TestSingleProcessSessionLeaderChildOfContainerdShim(t *testing.T) {
 
 func TestSingleProcessSessionLeaderChildOfRunc(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	runcPID := uint32(999)
@@ -406,7 +413,8 @@ func TestSingleProcessSessionLeaderChildOfRunc(t *testing.T) {
 
 func TestSingleProcessEmptyProcess(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	// No information in proc at all, entry type should be "unknown"
@@ -438,7 +446,8 @@ func TestSingleProcessEmptyProcess(t *testing.T) {
 // EntryLeaderEntryMetaType
 func TestSingleProcessOverwriteOldEntryLeader(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	ssmPID := uint32(999)
@@ -508,7 +517,8 @@ func TestSingleProcessOverwriteOldEntryLeader(t *testing.T) {
 func TestInitSshdBashLs(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	sshdPID := uint32(100)
@@ -590,7 +600,8 @@ func TestInitSshdBashLs(t *testing.T) {
 func TestInitSshdSshdBashLs(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	sshd0PID := uint32(100)
@@ -681,7 +692,8 @@ func TestInitSshdSshdBashLs(t *testing.T) {
 func TestInitSshdSshdSshdBashLs(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	sshd0PID := uint32(100)
@@ -789,7 +801,8 @@ func TestInitSshdSshdSshdBashLs(t *testing.T) {
 func TestInitContainerdContainerdShim(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	containerdPID := uint32(100)
@@ -841,7 +854,8 @@ func TestInitContainerdContainerdShim(t *testing.T) {
 func TestInitContainerdShimBashContainerdShimIsReparentedToInit(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	containerdPID := uint32(100)
@@ -909,7 +923,8 @@ func TestInitContainerdShimBashContainerdShimIsReparentedToInit(t *testing.T) {
 func TestInitContainerdShimPauseContainerdShimIsReparentedToInit(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	containerdPID := uint32(100)
@@ -980,7 +995,8 @@ func TestInitContainerdShimPauseContainerdShimIsReparentedToInit(t *testing.T) {
 func TestInitSshdBashLsAndGrepGrepOnlyHasGroupLeader(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	sshdPID := uint32(100)
@@ -1066,7 +1082,8 @@ func TestInitSshdBashLsAndGrepGrepOnlyHasGroupLeader(t *testing.T) {
 func TestInitSshdBashLsAndGrepGrepOnlyHasSessionLeader(t *testing.T) {
 	reader := procfs.NewMockReader()
 	populateProcfsWithInit(reader)
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	sshdPID := uint32(100)
@@ -1147,7 +1164,8 @@ func TestInitSshdBashLsAndGrepGrepOnlyHasSessionLeader(t *testing.T) {
 // entry meta type of "unknown" and making it an entry leader.
 func TestGrepInIsolation(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 	db.ScrapeProcfs()
 
 	grepPID := uint32(1001)
@@ -1179,7 +1197,8 @@ func TestGrepInIsolation(t *testing.T) {
 // Kernel threads should never have an entry meta type or entry leader set.
 func TestKernelThreads(t *testing.T) {
 	reader := procfs.NewMockReader()
-	db := NewDB(reader, *logger)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
 
 	kthreaddPID := uint32(2)
 	rcuGpPID := uint32(3)
