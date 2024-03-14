@@ -328,7 +328,7 @@ func _testProcessS3Object(t testing.TB, file, contentType string, numEvents uint
 	mockMsgHandler := NewMockSQSProcessor(ctrl)
 	msg := newSQSMessage(newS3Event("log.json"))
 	acker.MarkSQSProcessedWithData(&msg, numEvents, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
-	acker.EventsToBeTracked.Add(numEvents)
+	acker.eventsToBeAcked.Add(numEvents)
 
 	var events []beat.Event
 	gomock.InOrder(

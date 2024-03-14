@@ -283,8 +283,8 @@ type fakePipeline struct {
 func (fp *fakePipeline) ackEvents() {
 	for _, client := range fp.clients {
 		for _, acker := range client.ackers {
-			addedEvents := acker.EventsToBeTracked.Load()
-			for addedEvents > 0 && acker.EventsAcked.Load() != addedEvents {
+			addedEvents := acker.eventsToBeAcked.Load()
+			for addedEvents > 0 && acker.eventsAcked.Load() != addedEvents {
 				fp.pendingEvents.Dec()
 				client.eventListener.AddEvent(beat.Event{Private: acker}, true)
 				client.eventListener.ACKEvents(1)
