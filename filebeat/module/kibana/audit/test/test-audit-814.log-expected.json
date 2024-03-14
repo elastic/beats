@@ -52,7 +52,7 @@
         "labels.application": "elastic/fleet",
         "log.level": "INFO",
         "log.logger": "plugins.security.audit.ecs",
-        "log.offset": 2466,
+        "log.offset": 616,
         "message": "User is accessing ingest-outputs [id=a09a5397-7b9a-5a73-a622-e29f4c635658]",
         "process.pid": 7,
         "service.node.roles": [
