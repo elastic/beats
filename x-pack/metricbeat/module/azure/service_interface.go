@@ -14,6 +14,7 @@ type Service interface {
 	GetResourceDefinitionById(id string) (armresources.GenericResource, error)
 	GetResourceDefinitions(id []string, group []string, rType string, query string) ([]*armresources.GenericResourceExpanded, error)
 	GetMetricDefinitions(resourceId string, namespace string) (armmonitor.MetricDefinitionCollection, error)
+	GetMetricDefinitionsWithRetry(resource *armresources.GenericResourceExpanded, namespace string) (armmonitor.MetricDefinitionCollection, error)
 	GetMetricNamespaces(resourceId string) (armmonitor.MetricNamespaceCollection, error)
 	GetMetricValues(resourceId string, namespace string, timegrain string, timespan string, metricNames []string, aggregations string, filter string) ([]armmonitor.Metric, string, error)
 }
