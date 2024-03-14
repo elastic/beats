@@ -146,16 +146,15 @@ func NewArtifactAPIClient(opts ...ArtifactAPIClientOpt) *ArtifactAPIClient {
 func (aac ArtifactAPIClient) GetVersions(ctx context.Context) (list *VersionList, err error) {
 	joinedURL, err := aac.composeURL(artifactsAPIV1VersionsEndpoint)
 	if err != nil {
-		return
+		return nil, fmt.Errorf("couldn't compose URL: %w", err)
 	}
 
 	resp, err := aac.createAndPerformRequest(ctx, joinedURL)
+	defer resp.Body.Close()
 	if err != nil {
-		err = fmt.Errorf("getting versions: %w", err)
-		return
+		return nil, fmt.Errorf("getting versions: %w", err)
 	}
 
-	defer resp.Body.Close()
 	return checkResponseAndUnmarshal[VersionList](resp)
 }
 
@@ -165,16 +164,15 @@ func (aac ArtifactAPIClient) GetVersions(ctx context.Context) (list *VersionList
 func (aac ArtifactAPIClient) GetBuildsForVersion(ctx context.Context, version string) (builds *VersionBuilds, err error) {
 	joinedURL, err := aac.composeURL(fmt.Sprintf(artifactsAPIV1VersionBuildsEndpoint, version))
 	if err != nil {
-		return
+		return nil, fmt.Errorf("couldn't compose URL: %w", err)
 	}
 
 	resp, err := aac.createAndPerformRequest(ctx, joinedURL)
+	defer resp.Body.Close()
 	if err != nil {
-		err = fmt.Errorf("getting builds for version %s: %w", version, err)
-		return
+		return nil, fmt.Errorf("getting builds for version %s: %w", version, err)
 	}
 
-	defer resp.Body.Close()
 	return checkResponseAndUnmarshal[VersionBuilds](resp)
 }
 
@@ -184,16 +182,15 @@ func (aac ArtifactAPIClient) GetBuildsForVersion(ctx context.Context, version st
 func (aac ArtifactAPIClient) GetBuildDetails(ctx context.Context, version string, buildID string) (buildDetails *BuildDetails, err error) {
 	joinedURL, err := aac.composeURL(fmt.Sprintf(artifactAPIV1BuildDetailsEndpoint, version, buildID))
 	if err != nil {
-		return
+		return nil, fmt.Errorf("couldn't compose URL: %w", err)
 	}
 
 	resp, err := aac.createAndPerformRequest(ctx, joinedURL)
+	defer resp.Body.Close()
 	if err != nil {
-		err = fmt.Errorf("getting build details for version %s buildID %s: %w", version, buildID, err)
-		return
+		return nil, fmt.Errorf("getting build details for version %s buildID %s: %w", version, buildID, err)
 	}
 
-	defer resp.Body.Close()
 	return checkResponseAndUnmarshal[BuildDetails](resp)
 }
 

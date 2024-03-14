@@ -17,7 +17,7 @@ steps:
             value: "1"
           - label: "False"
             value: "0"
-        hint: "Increase verbosity of the mage commands, defaults to 0"
+        hint: "Increase verbosity of the mage commands, defaults to False"
       - select: "DRA Workflow"
         key: "DRA_WORKFLOW"
         required: true

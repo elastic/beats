@@ -136,7 +136,7 @@ func CrossBuild(options ...CrossBuildOption) error {
 
 	// Docker is required for this target.
 	if err := HaveDocker(); err != nil {
-		fmt.Printf("No docker found: %v\n", err)
+		log.Printf("No docker found: %v\n", err)
 		return err
 	}
 
@@ -245,7 +245,7 @@ type GolangCrossBuilder struct {
 
 // Build executes the build inside of Docker.
 func (b GolangCrossBuilder) Build() error {
-	fmt.Printf(">> %v: Building for %v\n", b.Target, b.Platform)
+	log.Printf(">> %v: Building for %v\n", b.Target, b.Platform)
 
 	repoInfo, err := GetProjectRepoInfo()
 	if err != nil {

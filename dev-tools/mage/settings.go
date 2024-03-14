@@ -84,7 +84,7 @@ var (
 	versionQualified bool
 	versionQualifier string
 
-	// PackagingFromManifest This value is set to tru when we have defined a ManifestURL variable
+	// PackagingFromManifest This value is set to true when we have defined a ManifestURL variable
 	PackagingFromManifest bool
 	// ManifestURL Location of the manifest file to package
 	ManifestURL string

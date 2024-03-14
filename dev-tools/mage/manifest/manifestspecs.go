@@ -38,15 +38,13 @@ func doWithRetries[T any](f func() (T, error)) (T, error) {
 	return resp, err
 }
 
-func downloadFile(ctx context.Context, url string, filepath string) (string, error) {
+func downloadFile(ctx context.Context, url string, filepath string) (path string, err error) {
 	outFile, fileErr := os.Create(filepath)
 	if fileErr != nil {
 		return "", fmt.Errorf("failed to create destination file %w", fileErr)
 	}
 	defer func() {
-		if err := outFile.Close(); err != nil {
-			panic(err)
-		}
+		err = outFile.Close()
 	}()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
@@ -59,9 +57,7 @@ func downloadFile(ctx context.Context, url string, filepath string) (string, err
 		return filepath, fmt.Errorf("failed to download manifest [%s]\n %w", url, err)
 	}
 	defer func() {
-		if err := resp.Body.Close(); err != nil {
-			panic(err)
-		}
+		err = resp.Body.Close()
 	}()
 
 	_, errCopy := io.Copy(outFile, resp.Body)

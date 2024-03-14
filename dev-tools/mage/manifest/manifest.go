@@ -48,6 +48,7 @@ func DownloadManifest(manifest string) (artifacts.Build, error) {
 	for _, manifestHost := range AllowedManifestHosts {
 		if manifestHost == manifestUrl.Host {
 			valid = true
+			break
 		}
 	}
 	if !valid {
@@ -60,10 +61,10 @@ func DownloadManifest(manifest string) (artifacts.Build, error) {
 	if err != nil {
 		return artifacts.Build{}, fmt.Errorf("downloading manifest: %w", err)
 	}
-	// if mg.Verbose() {
+
 	log.Printf(">>>> Downloaded manifest %s", manifest)
 	log.Printf(">>>> Packaing version: %s, build_id: %s, manifest_version:%s", manifestResponse.Version, manifestResponse.BuildID, manifestResponse.ManifestVersion)
-	// }
+
 	return manifestResponse, nil
 }
 

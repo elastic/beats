@@ -121,8 +121,7 @@ func (psv ParsedSemVer) GetPreviousMinor() (*ParsedSemVer, error) {
 	// We are at the first minor of the current major version series. To
 	// figure out the previous minor, we need to rely on knowledge of
 	// the release versions from the past major series'.
-	switch major {
-	case 8:
+	if major == 8 {
 		return NewParsedSemVer(7, 17, 10, psv.Prerelease(), psv.BuildMetadata()), nil
 	}
 
