@@ -215,7 +215,6 @@ func Filter(data *util.Data, config *config) bool {
 	if !ok {
 		return false
 	}
-	log := logp.NewLogger("syslog")
 
 	syslogFields := parseSyslogField(data)
 
