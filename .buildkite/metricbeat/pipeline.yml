@@ -1,4 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+name: "beats-metricbeat"
+
 env:
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
@@ -8,24 +10,28 @@ env:
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  GO_AGENT_IMAGE: "golang:${GO_VERSION}"
   BEATS_PROJECT_NAME: "metricbeat"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
+
 
 steps:
 
   - input: "Input Parameters"
-    key: "input-run-all-stages"
+    key: "run_metricbeat"
     fields:
-    - select: "Metricbeat - runAllStages"
-      key: "runAllStages"
+    - select: "Metricbeat - run_metricbeat"
+      key: "run_metricbeat"
       options:
         - label: "True"
           value: "true"
         - label: "False"
           value: "false"
       default: "false"
-    - select: "Metricbeat - runMacOsTests"
-      key: "UI_MACOS_TESTS"
+    - select: "Metricbeat - run_metricbeat_macos_tests"
+      key: "run_metricbeat_macos_tests"
       options:
         - label: "True"
           value: "true"
@@ -41,6 +47,6 @@ steps:
   - label: ":linux: Load dynamic metricbeat pipeline"
     key: "metricbeat-pipeline"
     command: ".buildkite/scripts/generate_metricbeat_pipeline.sh"
-    agents:
-      provider: "gcp"
-      image: "${IMAGE_UBUNTU_X86_64}"
+    notify:
+      - github_commit_status:
+          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"

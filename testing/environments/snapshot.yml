@@ -3,7 +3,7 @@
 version: '2.3'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0-2eea2ca0-SNAPSHOT
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.0-faa2d2d3-SNAPSHOT
     # When extend is used it merges healthcheck.tests, see:
     # https://github.com/docker/compose/issues/8962
     # healthcheck:
@@ -31,7 +31,7 @@ services:
     - "./docker/elasticsearch/users_roles:/usr/share/elasticsearch/config/users_roles"
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:8.13.0-2eea2ca0-SNAPSHOT
+    image: docker.elastic.co/logstash/logstash:8.14.0-faa2d2d3-SNAPSHOT
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9600/_node/stats"]
       retries: 600
@@ -44,7 +44,7 @@ services:
       - 5055:5055
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.13.0-2eea2ca0-SNAPSHOT
+    image: docker.elastic.co/kibana/kibana:8.14.0-faa2d2d3-SNAPSHOT
     environment:
     - "ELASTICSEARCH_USERNAME=kibana_system_user"
     - "ELASTICSEARCH_PASSWORD=testing"

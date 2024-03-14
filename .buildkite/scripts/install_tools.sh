@@ -9,10 +9,14 @@ echo "--- Env preparation"
 # Temporary solution to fix the issues with "sudo apt get...." https://elastic.slack.com/archives/C0522G6FBNE/p1706003603442859?thread_ts=1706003209.424539&cid=C0522G6FBNE
 # It could be removed when we use our own image for the BK agent.
 if [ "${platform_type}" == "Linux" ]; then
-  DEBIAN_FRONTEND="noninteractive"
-  #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
-  sudo mkdir -p /etc/needrestart
-  echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
+  if [ "${platform_type}" == "Linux" ]; then
+    if [ $(checkLinuxType) = "ubuntu" ]; then
+      DEBIAN_FRONTEND="noninteractive"
+      #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
+      sudo mkdir -p /etc/needrestart
+      echo "\$nrconf{restart} = 'a';" | sudo tee -a /etc/needrestart/needrestart.conf > /dev/null
+    fi
+  fi
 fi
 
 add_bin_path
@@ -36,6 +40,8 @@ with_go "${GO_VERSION}"
 with_mage
 with_python
 with_dependencies
+config_git
+mage dumpVariables
 
 #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
 sudo chmod -R go-w "${BEATS_PROJECT_NAME}/"     #TODO: Remove when the issue is solved https://github.com/elastic/beats/issues/37838

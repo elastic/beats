@@ -4,7 +4,7 @@ set -euo pipefail
 
 source .buildkite/env-scripts/linux-env.sh
 
-echo ":: Execute Integration Tests ::"
+echo "--- Executing Integration Tests"
 sudo chmod -R go-w filebeat/
 
 cd filebeat

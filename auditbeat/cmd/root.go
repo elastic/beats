@@ -30,9 +30,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	// Import processors
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata"
 )
 
 const (

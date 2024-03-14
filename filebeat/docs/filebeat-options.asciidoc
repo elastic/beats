@@ -75,8 +75,10 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-cometd>>
 * <<{beatname_lc}-input-container>>
 * <<{beatname_lc}-input-entity-analytics>>
+* <<{beatname_lc}-input-etw>>
 * <<{beatname_lc}-input-filestream>>
 * <<{beatname_lc}-input-gcp-pubsub>>
+* <<{beatname_lc}-input-gcs>>
 * <<{beatname_lc}-input-http_endpoint>>
 * <<{beatname_lc}-input-httpjson>>
 * <<{beatname_lc}-input-journald>>
@@ -90,7 +92,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-syslog>>
 * <<{beatname_lc}-input-tcp>>
 * <<{beatname_lc}-input-udp>>
-* <<{beatname_lc}-input-gcs>>
+* <<{beatname_lc}-input-websocket>>
 
 include::multiline.asciidoc[]
 
@@ -112,9 +114,13 @@ include::inputs/input-container.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-entity-analytics.asciidoc[]
 
+include::../../x-pack/filebeat/docs/inputs/input-etw.asciidoc[]
+
 include::inputs/input-filestream.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-gcp-pubsub.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-gcs.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-http-endpoint.asciidoc[]
 
@@ -144,4 +150,4 @@ include::inputs/input-udp.asciidoc[]
 
 include::inputs/input-unix.asciidoc[]
 
-include::../../x-pack/filebeat/docs/inputs/input-gcs.asciidoc[]
+include::../../x-pack/filebeat/docs/inputs/input-websocket.asciidoc[]

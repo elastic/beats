@@ -12,6 +12,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/oauth2/google"
@@ -35,6 +36,19 @@ func TestGetProviderIsCanonical(t *testing.T) {
 	got := oAuth2Config{Provider: "GOogle"}.getProvider()
 	if got != want {
 		t.Errorf("unexpected provider from getProvider: got:%s want:%s", got, want)
+	}
+}
+
+func TestRegexpConfig(t *testing.T) {
+	cfg := config{
+		Interval: time.Minute,
+		Program:  `{}`,
+		Resource: &ResourceConfig{URL: &urlConfig{URL: &url.URL{}}},
+		Regexps:  map[string]string{"regex_cve": `[Cc][Vv][Ee]-[0-9]{4}-[0-9]{4,7}`},
+	}
+	err := cfg.Validate()
+	if err != nil {
+		t.Errorf("failed to validate config with regexps: %v", err)
 	}
 }
 
@@ -489,8 +503,8 @@ var oAuth2ValidationTests = []struct {
 		},
 	},
 	{
-		name:    "okta requires token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file to be provided",
-		wantErr: errors.New("okta validation error: token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file must be provided accessing 'auth.oauth2'"),
+		name:    "unique_okta_jwk_token",
+		wantErr: errors.New("okta validation error: one of okta.jwk_json, okta.jwk_file or okta.jwk_pem must be provided accessing 'auth.oauth2'"),
 		input: map[string]interface{}{
 			"auth.oauth2": map[string]interface{}{
 				"provider":  "okta",
@@ -501,7 +515,7 @@ var oAuth2ValidationTests = []struct {
 		},
 	},
 	{
-		name:    "okta oauth2 validation fails if jwk_json is not a valid JSON",
+		name:    "invalid_okta_jwk_json",
 		wantErr: errors.New("the field can't be converted to valid JSON accessing 'auth.oauth2.okta.jwk_json'"),
 		input: map[string]interface{}{
 			"auth.oauth2": map[string]interface{}{
@@ -514,7 +528,7 @@ var oAuth2ValidationTests = []struct {
 		},
 	},
 	{
-		name: "okta successful oauth2 validation",
+		name: "okta_successful_oauth2_validation",
 		input: map[string]interface{}{
 			"auth.oauth2": map[string]interface{}{
 				"provider":      "okta",
