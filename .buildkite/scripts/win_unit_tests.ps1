@@ -52,31 +52,23 @@ function verifyFileChecksum {
 }
 
 function withGolang($version) {
-    Write-Host "-- Installing Go $version --"
-    $goDownloadPath = Join-Path $env:TEMP "go_installer.msi"
-    $goInstallerUrl = "https://golang.org/dl/go$version.windows-amd64.msi"
-    retry -retries 5 -scriptBlock {
-        Invoke-WebRequest -Uri $goInstallerUrl -OutFile $goDownloadPath
-    }
-    Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $goDownloadPath /quiet" -Wait
-    $env:GOPATH = "${env:ProgramFiles}\Go"
-    $env:GOBIN = "${env:GOPATH}\bin"
-    $env:Path += ";$env:GOPATH;$env:GOBIN"
-    go version
+    Write-Host "-- Active go version is: $(go version), under:"
+    Get-Command go.exe
     installGoDependencies
 }
 
 function withPython($version) {
-    Write-Host "-- Installing Python $version --"
-    [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
-    $pyDownloadPath = Join-Path $env:TEMP "python-$version-amd64.exe"
-    $pyInstallerUrl = "https://www.python.org/ftp/python/$version/python-$version-amd64.exe"
-    retry -retries 5 -scriptBlock {
-        Invoke-WebRequest -UseBasicParsing -Uri $pyInstallerUrl -OutFile $pyDownloadPath
-    }
-    Start-Process -FilePath $pyDownloadPath -ArgumentList "/quiet", "InstallAllUsers=1", "PrependPath=1", "Include_test=0" -Wait
-    $pyBinPath = "${env:ProgramFiles}\Python311"
-    $env:Path += ";$pyBinPath"
+#     Write-Host "-- Installing Python $version --"
+#     [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
+#     $pyDownloadPath = Join-Path $env:TEMP "python-$version-amd64.exe"
+#     $pyInstallerUrl = "https://www.python.org/ftp/python/$version/python-$version-amd64.exe"
+#     retry -retries 5 -scriptBlock {
+#         Invoke-WebRequest -UseBasicParsing -Uri $pyInstallerUrl -OutFile $pyDownloadPath
+#     }
+#     Start-Process -FilePath $pyDownloadPath -ArgumentList "/quiet", "InstallAllUsers=1", "PrependPath=1", "Include_test=0" -Wait
+#     $pyBinPath = "${env:ProgramFiles}\Python311"
+#     $env:Path += ";$pyBinPath"
+    Write-Host "-- Detected python version:"
     python --version
 }
 
@@ -102,27 +94,27 @@ function withMinGW {
 
 }
 function installGoDependencies {
-    $installPackages = @(
-        "github.com/magefile/mage"
-        "github.com/elastic/go-licenser"
-        "golang.org/x/tools/cmd/goimports"
-        "github.com/jstemmer/go-junit-report/v2"
-        "gotest.tools/gotestsum"
-    )
-    foreach ($pkg in $installPackages) {
-        go install "$pkg@latest"
-    }
+#     $installPackages = @(
+#         "github.com/magefile/mage"
+#         "github.com/elastic/go-licenser"
+#         "golang.org/x/tools/cmd/goimports"
+#         "github.com/jstemmer/go-junit-report/v2"
+#         "gotest.tools/gotestsum"
+#     )
+#     foreach ($pkg in $installPackages) {
+#         go install "$pkg@latest"
+#     }
 }
 
 function withNmap($version) {
-    Write-Host "-- Installing Nmap $version --"
-    [Net.ServicePointManager]::SecurityProtocol = "tls, tls11, tls12, ssl3"
-    $nmapInstallerUrl = "https://nmap.org/dist/nmap-$version-setup.exe"
-    $nmapDownloadPath = "$env:TEMP\nmap-$version-setup.exe"
-    retry -retries 5 -scriptBlock {
-        Invoke-WebRequest -UseBasicParsing -Uri $nmapInstallerUrl -OutFile $nmapDownloadPath
-    }
-    Start-Process -FilePath $nmapDownloadPath -ArgumentList "/S" -Wait
+#     Write-Host "-- Installing Nmap $version --"
+#     [Net.ServicePointManager]::SecurityProtocol = "tls, tls11, tls12, ssl3"
+#     $nmapInstallerUrl = "https://nmap.org/dist/nmap-$version-setup.exe"
+#     $nmapDownloadPath = "$env:TEMP\nmap-$version-setup.exe"
+#     retry -retries 5 -scriptBlock {
+#         Invoke-WebRequest -UseBasicParsing -Uri $nmapInstallerUrl -OutFile $nmapDownloadPath
+#     }
+#     Start-Process -FilePath $nmapDownloadPath -ArgumentList "/S" -Wait
 }
 function google_cloud_auth {
     $tempFileName = "google-cloud-credentials.json"
