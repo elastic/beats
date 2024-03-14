@@ -12,25 +12,25 @@ stages:
     mandatory:
         # NOTE: stage name should be unique!
         unitTest:
-            command: "mage -d filebeat build unitTest"
+            command: ".buildkite/filebeat/scripts/unit-tests.sh"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         crosscompile:
-            command: "make -C filebeat crosscompile"
+            command: ".buildkite/filebeat/scripts/crosscompile.sh"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         goIntegTest:
-            command: "mage -d filebeat goIntegTest"
+            command: ".buildkite/filebeat/scripts/integration-gotests.sh"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         pythonIntegTest:
-            command: "mage -d filebeat pythonIntegTest"
+            command: ".buildkite/filebeat/scripts/integration-pytests.sh"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         rhel-9:
-            command: "mage -d filebeat build unitTest"
+            command: ".buildkite/filebeat/scripts/unit-tests.sh"
             platform: "family/platform-ingest-beats-rhel-9"
         unitTest-windows-2022:
-            command: "mage -d filebeat build unitTest"
+            command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
             platform: "family/platform-ingest-beats-windows-2022"
         unitTest-windows-2016:
-            command: "mage -d filebeat build unitTest"
+            command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
             platform: "family/platform-ingest-beats-windows-2016"
     # optional stage - it runs on:
     #   - branches/tags
@@ -39,11 +39,11 @@ stages:
     #       - GitHub label <sub-stage-name> . i.e: integTest or unitTest-arm or unitTest-macos ...
     extended:
         unitTest-arm:
-            command: "mage build unitTest"
+            command: ".buildkite/filebeat/scripts/unit-tests.sh"
             platform: "core-ubuntu-2004-aarch64"
         unitTest-macos:
-            command: "mage build unitTest"
+            command: ".buildkite/filebeat/scripts/unit-tests.sh"
             platform: "generic-13-ventura-x64"
         unitTest-windows-2019:
-            command: "mage build unitTest"
-            platform: "family/core-windows-2019"
+            command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
+            platform: "family/platform-ingest-beats-windows-2019"
