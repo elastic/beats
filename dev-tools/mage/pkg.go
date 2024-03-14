@@ -204,14 +204,14 @@ func saveIronbank() error {
 	ironbank := getIronbankContextName()
 	buildDir := filepath.Join("build", ironbank)
 	if _, err := os.Stat(buildDir); os.IsNotExist(err) {
-		return fmt.Errorf("cannot find the folder with the ironbank context: %+v", err)
+		return fmt.Errorf("cannot find the folder with the ironbank context: %w", err)
 	}
 
 	distributionsDir := "build/distributions"
 	if _, err := os.Stat(distributionsDir); os.IsNotExist(err) {
 		err := os.MkdirAll(distributionsDir, 0750)
 		if err != nil {
-			return fmt.Errorf("cannot create folder for docker artifacts: %+v", err)
+			return fmt.Errorf("cannot create folder for docker artifacts: %w", err)
 		}
 	}
 	tarGzFile := filepath.Join(distributionsDir, ironbank+".tar.gz")
@@ -219,12 +219,12 @@ func saveIronbank() error {
 	// Save the build context as tar.gz artifact
 	err := TarWithOptions(buildDir, tarGzFile, true)
 	if err != nil {
-		return fmt.Errorf("cannot compress the tar.gz file: %+v", err)
+		return fmt.Errorf("cannot compress the tar.gz file: %w", err)
 	}
 
 	err = CreateSHA512File(tarGzFile)
 	if err != nil {
-		return fmt.Errorf("failed to create the sha512 file: %+v", err)
+		return fmt.Errorf("failed to create the sha512 file: %w", err)
 	}
 
 	return nil
