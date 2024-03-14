@@ -155,6 +155,14 @@ func TestConfigUnderElasticAgent(t *testing.T) {
 			},
 			expectError: true,
 		},
+		{
+			name: "topic with invalid characters from dynamic topic selection",
+			cfg: mapstr.M{
+				"topic": "%{event.field}",
+			},
+			expectError: true,
+		},
+
 		// The default config does not set `topic` not `topics`.
 		{
 			name:        "empty config is invalid",
