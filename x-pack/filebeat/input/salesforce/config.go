@@ -8,13 +8,60 @@ import (
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 type config struct {
+	Resource              *resourceConfig        `config:"resource"`
 	Auth                  *authConfig            `config:"auth"`
 	EventMonitoringMethod *eventMonitoringMethod `config:"event_monitoring_method"`
 	URL                   string                 `config:"url" validate:"required"`
 	Version               int                    `config:"version" validate:"required"`
+}
+
+type resourceConfig struct {
+	Retry     retryConfig                      `config:"retry"`
+	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+}
+
+type retryConfig struct {
+	MaxAttempts *int           `config:"max_attempts"`
+	WaitMin     *time.Duration `config:"wait_min"`
+	WaitMax     *time.Duration `config:"wait_max"`
+}
+
+func (c retryConfig) Validate() error {
+	switch {
+	case c.MaxAttempts != nil && *c.MaxAttempts <= 0:
+		return errors.New("max_attempts must be greater than zero")
+	case c.WaitMin != nil && *c.WaitMin <= 0:
+		return errors.New("wait_min must be greater than zero")
+	case c.WaitMax != nil && *c.WaitMax <= 0:
+		return errors.New("wait_max must be greater than zero")
+	}
+	return nil
+}
+
+func (c retryConfig) getMaxAttempts() int {
+	if c.MaxAttempts == nil {
+		return 0
+	}
+	return *c.MaxAttempts
+}
+
+func (c retryConfig) getWaitMin() time.Duration {
+	if c.WaitMin == nil {
+		return 0
+	}
+	return *c.WaitMin
+}
+
+func (c retryConfig) getWaitMax() time.Duration {
+	if c.WaitMax == nil {
+		return 0
+	}
+	return *c.WaitMax
 }
 
 type eventMonitoringMethod struct {

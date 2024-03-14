@@ -21,6 +21,8 @@ import (
 	"github.com/g8rswimmer/go-sfdc/session"
 	"github.com/g8rswimmer/go-sfdc/soql"
 	"github.com/golang-jwt/jwt"
+	"github.com/hashicorp/go-retryablehttp"
+	"go.uber.org/zap"
 	"golang.org/x/exp/slices"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -99,7 +101,7 @@ func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *
 	s.publisher = pub
 	s.cursor = cursor
 	s.log = env.Logger.With("input_url", cfg.URL)
-	s.sfdcConfig, err = getSFDCConfig(&cfg)
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
 	if err != nil {
 		return fmt.Errorf("error with configuration: %w", err)
 	}
@@ -318,10 +320,13 @@ func (s *salesforceInput) RunEventLogFile() error {
 
 			s.clientSession.AuthorizationHeader(req)
 
-			// NOTE: X-PrettyPrint:1 is for formatted response and ideally we do
-			// not need it. But see:
-			// https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/dome_event_log_file_download.htm?q=X-PrettyPrint%3A1
-			req.Header.Add("X-PrettyPrint", "1")
+			// NOTE: If we ever see a production issue relaated to this, then only
+			// we should consider adding the header: "X-PrettyPrint:1"
+			//
+			// // NOTE: X-PrettyPrint:1 is for formatted response and ideally we do
+			// // not need it. But see:
+			// // https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/dome_event_log_file_download.htm?q=X-PrettyPrint%3A1
+			// req.Header.Add("X-PrettyPrint", "1")
 
 			resp, err := s.sfdcConfig.Client.Do(req)
 			if err != nil {
@@ -377,7 +382,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 }
 
 // getSFDCConfig returns a new Salesforce configuration based on the configuration.
-func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
+func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 	var (
 		creds *credentials.Credentials
 		err   error
@@ -426,11 +431,61 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 
 	}
 
+	client, err := newClient(*cfg, s.log)
+	if err != nil {
+		return nil, fmt.Errorf("problem with client: %w", err)
+	}
+
 	return &sfdc.Configuration{
 		Credentials: creds,
-		Client:      http.DefaultClient,
+		Client:      client,
 		Version:     cfg.Version,
 	}, nil
+}
+
+// retryLog is a shim for the retryablehttp.Client.Logger.
+type retryLog struct{ log *logp.Logger }
+
+func newRetryLog(log *logp.Logger) *retryLog {
+	return &retryLog{log: log.Named("retryablehttp").WithOptions(zap.AddCallerSkip(1))}
+}
+
+func (l *retryLog) Error(msg string, kv ...interface{}) { l.log.Errorw(msg, kv...) }
+func (l *retryLog) Info(msg string, kv ...interface{})  { l.log.Infow(msg, kv...) }
+func (l *retryLog) Debug(msg string, kv ...interface{}) { l.log.Debugw(msg, kv...) }
+func (l *retryLog) Warn(msg string, kv ...interface{})  { l.log.Warnw(msg, kv...) }
+
+// retryErrorHandler returns a retryablehttp.ErrorHandler that will log retry resignation
+// but return the last retry attempt's response and a nil error to allow the retryablehttp.Client
+// evaluate the response status itself. Any error passed to the retryablehttp.ErrorHandler
+// is returned unaltered.
+func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
+	return func(resp *http.Response, err error, numTries int) (*http.Response, error) {
+		log.Warnw("giving up retries", "method", resp.Request.Method, "url", resp.Request.URL, "retries", max+1)
+		return resp, err
+	}
+}
+
+func newClient(cfg config, log *logp.Logger) (*http.Client, error) {
+	c, err := cfg.Resource.Transport.Client()
+	if err != nil {
+		return nil, err
+	}
+
+	if maxAttempts := cfg.Resource.Retry.getMaxAttempts(); maxAttempts > 1 {
+		c = (&retryablehttp.Client{
+			HTTPClient:   c,
+			Logger:       newRetryLog(log),
+			RetryWaitMin: cfg.Resource.Retry.getWaitMin(),
+			RetryWaitMax: cfg.Resource.Retry.getWaitMax(),
+			RetryMax:     maxAttempts,
+			CheckRetry:   retryablehttp.DefaultRetryPolicy,
+			Backoff:      retryablehttp.DefaultBackoff,
+			ErrorHandler: retryErrorHandler(maxAttempts, log),
+		}).StandardClient()
+	}
+
+	return c, nil
 }
 
 // publishEvent publishes an event using the configured publisher pub.

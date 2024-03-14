@@ -26,6 +26,7 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 const (
@@ -324,7 +325,7 @@ func TestInput(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			tc.setupServer(t, tc.handler, tc.baseConfig)
 
-			cfg := config{Version: 58}
+			cfg := defaultConfig()
 			err := conf.MustNewConfigFrom(tc.baseConfig).Unpack(&cfg)
 			assert.NoError(t, err)
 			timeout := 5 * time.Second
@@ -355,9 +356,9 @@ func TestInput(t *testing.T) {
 			salesforceInput.cancel = cancelClause
 			salesforceInput.srcConfig = &cfg
 			salesforceInput.publisher = &client
-			salesforceInput.log = logp.NewLogger("salesforce")
+			salesforceInput.log = logp.L().With("input_url", "salesforce")
 
-			salesforceInput.sfdcConfig, err = getSFDCConfig(&cfg)
+			salesforceInput.sfdcConfig, err = salesforceInput.getSFDCConfig(&cfg)
 			assert.NoError(t, err)
 
 			salesforceInput.soqlr, err = salesforceInput.SetupSFClientConnection()
@@ -577,6 +578,16 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 		soqlr      *soql.Resource
 		config     config
 	}
+
+	defaultResource := resourceConfig{
+		Retry: retryConfig{
+			MaxAttempts: pointer(5),
+			WaitMin:     pointer(time.Minute),
+			WaitMax:     pointer(time.Minute),
+		},
+		Transport: httpcommon.DefaultHTTPTransportSettings(),
+	}
+
 	tests := []struct {
 		fields               fields
 		setupServer          func(testing.TB, http.HandlerFunc, *config)
@@ -599,6 +610,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 					Version:               56,
 					Auth:                  &defaultUserPassAuthConfig,
 					EventMonitoringMethod: &objectEventMonitotingConfig,
+					Resource:              &defaultResource,
 				},
 				cursor: &state{},
 			},
@@ -614,6 +626,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 					Version:               56,
 					Auth:                  &defaultUserPassAuthConfig,
 					EventMonitoringMethod: &objectEventMonitoringWithWrongQuery,
+					Resource:              &defaultResource,
 				},
 				cursor: &state{},
 			},
@@ -629,6 +642,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 					Version:               56,
 					Auth:                  &defaultUserPassAuthConfig,
 					EventMonitoringMethod: &objectEventMonitoringWithWrongQuery,
+					Resource:              &defaultResource,
 				},
 				cursor: &state{
 					Object: dateTimeCursor{
@@ -651,6 +665,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 					Version:               56,
 					Auth:                  &defaultUserPassAuthConfig,
 					EventMonitoringMethod: &elfEventMonitotingConfig,
+					Resource:              &defaultResource,
 				},
 				cursor: &state{},
 			},
@@ -666,6 +681,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 					Version:               56,
 					Auth:                  &defaultUserPassAuthConfig,
 					EventMonitoringMethod: &elfEventMonitotingWithWrongQuery,
+					Resource:              &defaultResource,
 				},
 				cursor: &state{},
 			},
@@ -681,6 +697,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 					Version:               56,
 					Auth:                  &defaultUserPassAuthConfig,
 					EventMonitoringMethod: &elfEventMonitotingWithWrongQuery,
+					Resource:              &defaultResource,
 				},
 				cursor: &state{
 					EventLogFile: dateTimeCursor{
@@ -724,7 +741,7 @@ func TestSalesforceInputRunWithMethod(t *testing.T) {
 			s.srcConfig = &s.config
 
 			var err error
-			s.sfdcConfig, err = getSFDCConfig(&s.config)
+			s.sfdcConfig, err = s.getSFDCConfig(&s.config)
 			if err != nil && !tt.wantErr {
 				t.Errorf("unexpected error from running input: %v", err)
 			}
