@@ -52,7 +52,7 @@
         "labels.application": "elastic/fleet",
         "log.level": "INFO",
         "log.logger": "plugins.security.audit.ecs",
-        "log.offset": 616,
+        "log.offset": 2466,
         "message": "User is accessing ingest-outputs [id=a09a5397-7b9a-5a73-a622-e29f4c635658]",
         "process.pid": 7,
         "service.node.roles": [
@@ -136,7 +136,7 @@
         ]
     },
     {
-        "@timestamp": "2023-06-19T15:18:47.298+00:00",
+        "@timestamp": "2023-06-19T16:18:47.298+00:00",
         "event.action": "saved_object_create",
         "event.category": [
             "database"
@@ -151,7 +151,7 @@
         ],
         "fileset.name": "audit",
         "input.type": "log",
-        "kibana.saved_object.id": "fleet-default-settings",
+        "kibana.saved_object.id": "abcde-fghijk",
         "kibana.saved_object.type": "ingest_manager_settings",
         "kibana.saved_object.name": "fleet-object-name",
         "labels.application": "elastic/fleet",
