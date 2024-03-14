@@ -172,6 +172,27 @@ The URL for the JWT bearer flow.
 
 The URL of the Salesforce instance. Required.
 
+[[resource-parameters]]
+[float]
+==== `resource.timeout`
+
+Duration before declaring that the HTTP client connection has timed out. Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`. Default: `30s`.
+
+[float]
+==== `resource.retry.max_attempts`
+
+The maximum number of retries for the HTTP client. Default: `5`.
+
+[float]
+==== `resource.retry.wait_min`
+
+The minimum time to wait before a retry is attempted. Default: `1s`.
+
+[float]
+==== `resource.retry.wait_max`
+
+The maximum time to wait before a retry is attempted. Default: `60s`.
+
 [object]
 ==== `event_monitoring_method`
 
