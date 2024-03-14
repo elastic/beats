@@ -11,6 +11,7 @@ SOURCE_TAG+="${VERSION}${IMG_POSTFIX}"
 TARGET="observability-ci/${BEATS_PROJECT_NAME}"
 
 echo "--- Creating package"
+export GOFLAGS='-buildvcs=false'
 mage -d "${BEATS_PROJECT_NAME}" package
 
 echo "--- Distribution list"
