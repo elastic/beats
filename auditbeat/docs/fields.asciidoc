@@ -2729,6 +2729,22 @@ type: keyword
 --
 
 [float]
+=== container
+
+These fields help correlate data based containers from any runtime.
+
+
+
+*`file.container.id`*::
++
+--
+Unique container id.
+
+type: keyword
+
+--
+
+[float]
 === user
 
 User information.

@@ -85,6 +85,16 @@
         type: keyword
         description: Group name.
 
+    - name: container
+      type: group
+      description: >
+        These fields help correlate data based containers from any runtime.
+
+      fields:
+      - name: id
+        type: keyword
+        description: Unique container id.
+
   - name: user
     type: group
     description: User information.
