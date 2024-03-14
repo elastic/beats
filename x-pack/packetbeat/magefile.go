@@ -110,3 +110,53 @@ func Ironbank() error {
 func TestPackages() error {
 	return devtools.TestPackages()
 }
+<<<<<<< HEAD
+=======
+
+func SystemTest(ctx context.Context) error {
+	mg.SerialDeps(getNpcapInstaller, devtools.BuildSystemTestBinary)
+
+	args := devtools.DefaultGoTestIntegrationArgs()
+	args.Packages = []string{"./tests/system/..."}
+	return devtools.GoTest(ctx, args)
+}
+
+func getBucketName() string {
+	if os.Getenv("BUILDKITE") == "true" {
+		return "ingest-buildkite-ci"
+	}
+	return "obs-ci-cache"
+}
+
+// getNpcapInstaller gets the installer from the Google Cloud Storage service.
+//
+// On Windows platforms, if getNpcapInstaller is invoked with the environment variables
+// CI or NPCAP_LOCAL set to "true" and the OEM Npcap installer is not available it is
+// obtained from the cloud storage. This behaviour requires access to the private store.
+// If NPCAP_LOCAL is set to "true" and the file is in the npcap/installer directory, no
+// fetch will be made.
+func getNpcapInstaller() error {
+	// TODO: Consider whether to expose this as a target.
+	if runtime.GOOS != "windows" {
+		return nil
+	}
+	if os.Getenv("CI") != "true" && os.Getenv("NPCAP_LOCAL") != "true" {
+		return errors.New("only available if running in the CI or with NPCAP_LOCAL=true")
+	}
+	dstPath := filepath.Join("./npcap/installer", installer)
+	if os.Getenv("NPCAP_LOCAL") == "true" {
+		fi, err := os.Stat(dstPath)
+		if err == nil && !fi.IsDir() {
+			fmt.Println("using local Npcap installer with NPCAP_LOCAL=true")
+			return nil
+		}
+		if !errors.Is(err, fs.ErrNotExist) {
+			return err
+		}
+	}
+	ciBucketName := getBucketName()
+
+	fmt.Printf("getting %s from private cache\n", installer)
+	return sh.RunV("gsutil", "cp", "gs://"+ciBucketName+"/private/"+installer, dstPath)
+}
+>>>>>>> e0d5fe5fef (Migrate xpack packetbeat (#38135))

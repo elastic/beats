@@ -11,9 +11,14 @@ SETUP_WIN_PYTHON_VERSION="3.11.0"
 NMAP_WIN_VERSION="7.12"           # Earlier versions of NMap provide WinPcap (the winpcap packages don't install nicely because they pop-up a UI)
 GO_VERSION=$(cat .go-version)
 ASDF_MAGE_VERSION="1.15.0"
+<<<<<<< HEAD
 ASDF_TERRAFORM_VERSION="1.0.2"
 PACKAGING_PLATFORMS="+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
+=======
+PACKAGING_PLATFORMS="+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+>>>>>>> e0d5fe5fef (Migrate xpack packetbeat (#38135))
 PACKAGING_ARM_PLATFORMS="linux/arm64"
+ASDF_TERRAFORM_VERSION="1.0.2"
 AWS_REGION="eu-central-1"
 
 export SETUP_GVM_VERSION
