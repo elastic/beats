@@ -40,10 +40,12 @@ stages:
     extended:
         unitTest-arm:
             command: ".buildkite/filebeat/scripts/unit-tests.sh"
-            platform: "core-ubuntu-2004-aarch64"
+            platform: "platform-ingest-beats-ubuntu-2204-aarch64"
+            provider: "aws"
         unitTest-macos:
             command: ".buildkite/filebeat/scripts/unit-tests.sh"
             platform: "generic-13-ventura-x64"
+            provider: "orka"
         unitTest-windows-2019:
             command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
             platform: "family/platform-ingest-beats-windows-2019"

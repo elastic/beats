@@ -53,16 +53,74 @@ class Group:
         msg = tm.render(group=self)
         return msg
 
+@dataclass(unsafe_hash=True)
+class Agent:
+    """Buildkite Agent object"""
+    
+    image: str
+
+    def create_entity(self):
+        raise NotImplementedError("Not implemented yet")
+    
+@dataclass(unsafe_hash=True)
+class AWSAgent(Agent):
+    """AWS Agent object"""
+    
+    image: str 
+
+    def create_entity(self):
+        data = """
+        agents:
+          provider: "aws"
+          imagePrefix: "{{ agent.image }}"         
+          instanceType: "t4g.large"
+"""
+
+        tm = Template(data)
+        msg = tm.render(agent=self)
+        return msg
+
+@dataclass(unsafe_hash=True)
+class GCPAgent(Agent):
+    """GCP Agent object"""
+    
+    image: str 
+
+    def create_entity(self):
+        data = """
+        agents:
+          provider: "gcp"
+          image: "{{ agent.image }}"                   
+"""
+
+        tm = Template(data)
+        msg = tm.render(agent=self)
+        return msg
+@dataclass(unsafe_hash=True)
+class OrkaAgent(Agent):
+    """Orka Agent object"""
+    
+    image: str 
+
+    def create_entity(self):
+        data = """
+        agents:
+          provider: "orka"
+          imagePrefix: "{{ agent.image }}"                   
+"""
+
+        tm = Template(data)
+        msg = tm.render(agent=self)
+        return msg
 
 @dataclass(unsafe_hash=True)
 class Step:
     """Buildkite Step object"""
 
     command: str
+    agent: Agent
     name: str
-    runner: str
     project: str
-    provider: str
     category: str
     label: str = field(init=False)
     comment: str = field(init=False)
@@ -76,20 +134,19 @@ class Step:
 
     def create_entity(self):
         data = """
-      - label: "{{ stage.project }} {{ stage.name }}"
+      - label: "{{ step.project }} {{ step.name }}"
         command:
-          - "{{ stage.command }}"
+          - "{{ step.command }}"
         notify:
           - github_commit_status:
-              context: "{{ stage.project }}: {{ stage.name }}"
-        agents:
-          provider: "{{ stage.provider }}"
-          image: "{{ stage.runner }}"
+              context: "{{ step.project }}: {{ step.name }}"
+        {{ step.agent.create_entity() }}
 """
 
         tm = Template(data)
-        msg = tm.render(stage=self)
+        msg = tm.render(step=self)
         return msg
+
 
 # Conditions:
 
@@ -176,17 +233,20 @@ def is_group_enabled(group: Group, changeset_filters: list[str]) -> bool:
 def fetch_stage(name: str, stage, project: str, category: str) -> Step:
     """Create a step given the yaml object."""
 
-    # TODO: need to accomodate the provider type.
-    # maybe in the buildkite.yml or some dynamic analysis based on the
-    # name of the runners.
+    agent: Agent = None
+    if (not "provider" in stage) or stage["provider"] == "gcp":
+        agent = GCPAgent(image=stage["platform"])
+    elif stage["provider"] == "aws":
+        agent = AWSAgent(image=stage["platform"])
+    elif stage["provider"] == "orka":
+        agent = OrkaAgent(image=stage["platform"])
+    
     return Step(
             category=category,
             command=stage["command"],
             name=name,
-            runner=stage["platform"],
-            project=project,
-            provider="gcp")
-
+            agent=agent,
+            project=project)
 
 def fetch_group(stages, project: str, category: str) -> Group:
     """Create a group given the yaml object."""
