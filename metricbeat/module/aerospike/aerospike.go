@@ -29,8 +29,6 @@ import (
 
 type Config struct {
 	ClusterName *string           `config:"cluster_name"`
-	User        *string           `config:"username"`
-	Password    *string           `config:"password"`
 	TLS         *tlscommon.Config `config:"ssl"`
 }
 
@@ -47,14 +45,6 @@ func ParseClientPolicy(config Config) (*as.ClientPolicy, error) {
 			return nil, fmt.Errorf("could not initialize TLS configurations %w", err)
 		}
 		clientPolicy.TlsConfig = tlsconfig.ToConfig()
-	}
-	if config.User != nil && config.Password != nil {
-		clientPolicy.User = *config.User
-		clientPolicy.Password = *config.Password
-	} else if config.User != nil && config.Password == nil {
-		return nil, fmt.Errorf("if username is set, password should be set too")
-	} else if config.User == nil && config.Password != nil {
-		return nil, fmt.Errorf("if password is set, username should be set too")
 	}
 
 	if config.ClusterName != nil {

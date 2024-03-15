@@ -4,12 +4,6 @@
   period: 10s
   hosts: ["localhost:3000"]
 
-  # Username of hosts. Empty by default.
-  # username: root
-
-  # Password of hosts. Empty by default.
-  # password: secret
-
   # Aerospike Cluster Name
   # cluster_name: myclustername
 

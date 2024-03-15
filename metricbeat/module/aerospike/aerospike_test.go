@@ -19,7 +19,6 @@ package aerospike
 
 import (
 	"errors"
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -109,13 +108,8 @@ func getBoolPointer(value bool) *bool {
 }
 
 func TestParseClientPolicy(t *testing.T) {
-	sampleUser := "Test"
-	samplePassword := "MySecretPassword"
-	sampleClusterName := "TestCluster"
 
-	UserPasswordClientPolicy := as.NewClientPolicy()
-	UserPasswordClientPolicy.User = sampleUser
-	UserPasswordClientPolicy.Password = samplePassword
+	sampleClusterName := "TestCluster"
 
 	TLSPolicy := as.NewClientPolicy()
 	tlsconfig, _ := tlscommon.LoadTLSConfig(&tlscommon.Config{Enabled: getBoolPointer(true)})
@@ -135,31 +129,6 @@ func TestParseClientPolicy(t *testing.T) {
 			Config:               Config{},
 			expectedClientPolicy: as.NewClientPolicy(),
 			expectedErr:          nil,
-		},
-		{
-			Name: "Username and password are honored",
-			Config: Config{
-				User:     getStringPointer(sampleUser),
-				Password: getStringPointer(samplePassword),
-			},
-			expectedClientPolicy: UserPasswordClientPolicy,
-			expectedErr:          nil,
-		},
-		{
-			Name: "Username is set but Password is not",
-			Config: Config{
-				User: getStringPointer(sampleUser),
-			},
-			expectedClientPolicy: UserPasswordClientPolicy,
-			expectedErr:          fmt.Errorf("if username is set, password should be set too"),
-		},
-		{
-			Name: "Password is set but Username is not",
-			Config: Config{
-				Password: getStringPointer(samplePassword),
-			},
-			expectedClientPolicy: UserPasswordClientPolicy,
-			expectedErr:          fmt.Errorf("if password is set, username should be set too"),
 		},
 		{
 			Name: "TLS Declaration",
@@ -192,10 +161,6 @@ func TestParseClientPolicy(t *testing.T) {
 			t.Error(err)
 			continue
 		}
-		assert.Equalf(t, test.expectedClientPolicy.User, result.User,
-			"Aerospike policy username is wrong. Got '%s' expected '%s'", result.User, test.expectedClientPolicy.User)
-		assert.Equalf(t, test.expectedClientPolicy.Password, result.Password,
-			"Aerospike policy password is wrong. Got '%s' expected '%s'", result.Password, test.expectedClientPolicy.Password)
 		assert.Equalf(t, test.expectedClientPolicy.ClusterName, result.ClusterName,
 			"Aerospike policy cluster name is wrong. Got '%s' expected '%s'", result.ClusterName, test.expectedClientPolicy.ClusterName)
 		if test.Config.TLS.IsEnabled() {
