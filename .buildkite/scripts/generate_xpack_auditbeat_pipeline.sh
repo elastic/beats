@@ -18,7 +18,7 @@ steps:
 
       - label: ":linux: Ubuntu Unit (MODULE) Tests"
         key: "mandatory-linux-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: ".buildkite/scripts/unit_tests.sh"
         env:
           MODULE: $MODULE
         agents:
@@ -29,7 +29,7 @@ steps:
 
       - label: ":rhel: RHEL-9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: ".buildkite/scripts/unit_tests.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9_X86_64}"

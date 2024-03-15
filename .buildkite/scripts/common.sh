@@ -297,10 +297,10 @@ with_dependencies() {
   if [ "${platform_type}" == "Linux" ]; then
     if [ "${linuxType}" = "ubuntu" ]; then
       sudo apt-get update
-      sudo apt-get install -y libsystemd-dev libpcap-dev
+      sudo apt-get install -y libsystemd-dev libpcap-dev rpm-devel
     elif [ "${linuxType}" = "rhel" ]; then
       # sudo dnf update -y
-      sudo dnf install -y systemd-devel
+      sudo dnf install -y systemd-devel rpm-devel
       wget https://mirror.stream.centos.org/9-stream/CRB/${arch_type}/os/Packages/libpcap-devel-1.10.0-4.el9.${arch_type}.rpm     #TODO: move this step to our own image
       sudo dnf install -y libpcap-devel-1.10.0-4.el9.${arch_type}.rpm     #TODO: move this step to our own image
     fi
