@@ -131,7 +131,7 @@ func TestParseClientPolicy(t *testing.T) {
 		expectedErr          error
 	}{
 		{
-			Name:                 "No configurations lead to default policy",
+			Name:                 "Empty configuration leads to default policy",
 			Config:               Config{},
 			expectedClientPolicy: as.NewClientPolicy(),
 			expectedErr:          nil,
@@ -185,17 +185,21 @@ func TestParseClientPolicy(t *testing.T) {
 		result, err := ParseClientPolicy(test.Config)
 		if err != nil {
 			if test.expectedErr != nil {
-				assert.Equal(t, test.expectedErr.Error(), err.Error())
+				assert.Equalf(t, test.expectedErr.Error(), err.Error(),
+					"Aerospike policy the error produced is not the one expected. Got '%s' expected '%s'", err.Error(), test.expectedErr.Error())
 				continue
 			}
 			t.Error(err)
 			continue
 		}
-		assert.Equal(t, test.expectedClientPolicy.User, result.User, test.Name)
-		assert.Equal(t, test.expectedClientPolicy.Password, result.Password, test.Name)
-		assert.Equal(t, test.expectedClientPolicy.ClusterName, result.ClusterName, test.Name)
+		assert.Equalf(t, test.expectedClientPolicy.User, result.User,
+			"Aerospike policy username is wrong. Got '%s' expected '%s'", result.User, test.expectedClientPolicy.User)
+		assert.Equalf(t, test.expectedClientPolicy.Password, result.Password,
+			"Aerospike policy password is wrong. Got '%s' expected '%s'", result.Password, test.expectedClientPolicy.Password)
+		assert.Equalf(t, test.expectedClientPolicy.ClusterName, result.ClusterName,
+			"Aerospike policy cluster name is wrong. Got '%s' expected '%s'", result.ClusterName, test.expectedClientPolicy.ClusterName)
 		if test.Config.TLS.IsEnabled() {
-			assert.NotNil(t, result.TlsConfig)
+			assert.NotNil(t, result.TlsConfig, "Aerospike policy: TLS is not set even though TLS is specified in the configuration")
 		}
 	}
 }
