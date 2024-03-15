@@ -164,19 +164,17 @@ if are_conditions_met_packaging; then
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: "cd $BEATS_PROJECT_NAME && mage package"
+        command: ".buildkite/scripts/packaging.sh"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         env:
           PLATFORMS: "${PACKAGING_PLATFORMS}"
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
-        command: "cd $BEATS_PROJECT_NAME && mage package"
+        command: ".buildkite/scripts/packaging.sh"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
