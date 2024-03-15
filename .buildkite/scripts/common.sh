@@ -296,11 +296,11 @@ with_python() {
   echo "${linuxType}"
   if [ "${platform_type}" == "Linux" ]; then
     if [ "${linuxType}" = "ubuntu" ]; then
-      sudo apt-get update
+      sudo apt-get update -y
       sudo apt-get install -y software-properties-common
       sudo add-apt-repository -y ppa:deadsnakes/ppa
-      sudo apt update
-      sudo apt upgrade
+      sudo apt update -y
+      sudo apt upgrade -y
       sudo apt install -y python3.11 python3.11-venv
       sudo apt install -y python3.11-apt
       export PATH="/usr/bin/python3.11:${PATH}"
