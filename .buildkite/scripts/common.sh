@@ -300,11 +300,10 @@ with_python() {
       sudo apt-get install -y software-properties-common
       sudo add-apt-repository -y ppa:deadsnakes/ppa
       sudo apt update
-      sudo apt install -y python3.11 python3.11-venv
+      sudo apt install -y python3.11 python3.11-venv python3.11-apt
       export PATH="/usr/bin/python3.11:${PATH}"
       sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
       sudo update-alternatives --set python3 /usr/bin/python3.11
-      sudo apt-get install -y --reinstall python3-apt
     elif [ "${linuxType}" = "rhel" ]; then
       sudo dnf update -y
       sudo dnf install -y python3 python3-pip
