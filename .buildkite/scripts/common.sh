@@ -298,9 +298,9 @@ with_python() {
     if [ "${linuxType}" = "ubuntu" ]; then
       sudo apt-get update
       sudo apt-get install -y software-properties-common
-      sudo add-apt-repository ppa:deadsnakes/ppa
+      sudo add-apt-repository -y ppa:deadsnakes/ppa
       sudo apt update
-      sudo apt install python3.11 python3.11-venv
+      sudo apt install -y python3.11 python3.11-venv
       sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
       sudo update-alternatives --set python3 /usr/bin/python3.11
     elif [ "${linuxType}" = "rhel" ]; then
