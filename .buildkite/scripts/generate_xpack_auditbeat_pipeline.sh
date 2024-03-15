@@ -23,7 +23,7 @@ steps:
           MODULE: $MODULE
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
+          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
