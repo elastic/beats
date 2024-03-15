@@ -16,7 +16,7 @@ steps:
     key: "mandatory-tests"
     steps:
 
-      - label: ":windows: Windows 2019 Unit Tests"
+      - label: ":windows: Windows 2019 Unit (MODULE) Tests"
         key: "mandatory-win-2019-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
         env:
