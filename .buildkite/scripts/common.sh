@@ -302,7 +302,7 @@ with_python() {
       sudo apt update -y
       sudo apt upgrade -y
       sudo apt install -y python3.11 python3.11-venv
-      sudo apt install -y python3.11-apt
+      sudo apt install -y python3-pip python3-apt
       export PATH="/usr/bin/python3.11:${PATH}"
       sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
       sudo update-alternatives --set python3 /usr/bin/python3.11
