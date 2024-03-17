@@ -32,7 +32,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           ref: "${{ matrix.branch }}"
@@ -65,7 +65,7 @@ jobs:
           message: ":red_circle: Elastic Stack version for the `${{ matrix.branch }}` branch has not been updated for a while (`> 7 days`). Review the (<${{ env.URL_QUERY }}|open PRs>)"
 
       - if: ${{ contains(steps.search.outputs.found, 'true') }}
-        uses: hashicorp/vault-action@v2.5.0
+        uses: hashicorp/vault-action@v3.0.0
         with:
           url: ${{ secrets.VAULT_ADDR }}
           roleId: ${{ secrets.VAULT_ROLE_ID }}
@@ -80,7 +80,7 @@ jobs:
 
       - if: ${{ contains(steps.search.outputs.found, 'true') }}
         name: Report obsoleted branches (email)
-        uses: dawidd6/action-send-mail@6063705cefe50cb915fc53bb06d4049cae2953b2
+        uses: dawidd6/action-send-mail@4226df7daafa6fc901a43789c49bf7ab309066e7
         with:
           server_address: ${{ env.MAIL_SERVER }}
           username: ${{ env.MAIL_USERNAME }}
