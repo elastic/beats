@@ -1,6 +1,37 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 name: "beats-xpack-dockerlogbeat"
 
+env:
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  DEFAULT_UBUNTU_X86_64_IMAGE: "family/core-ubuntu-2204"
+  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  BEATS_PROJECT_NAME: "x-pack/dockerlogbeat"
+
 steps:
-  - label: "Example test"
-    command: echo "Hello!"
+
+  - input: "Input Parameters"
+    key: "force-run-stages"
+    fields:
+    - select: "Dockerlogbeat - run_xpack_dockerlogbeat"
+      key: "run_xpack_dockerlogbeat"
+      options:
+        - label: "True"
+          value: "true"
+        - label: "False"
+          value: "false"
+      default: "false"
+
+    if: "build.source == 'ui'"
+
+  - wait: ~
+    if: "build.source == 'ui'"
+    allow_dependency_failure: false
+
+  - label: ":linux: Load dynamic x-pack dockerlogbeat pipeline"
+    key: "dockerlogbeat-pipeline"
+    command: ".buildkite/scripts/generate_xpack_dockerlogbeat_pipeline.sh"
+    notify:
+      - github_commit_status:
+          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
