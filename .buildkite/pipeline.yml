@@ -3,3 +3,6 @@
 steps:
   - label: "Generate dynamic pipeline"
     command: ".buildkite/scripts/generate_pipeline.sh"
+    agents:
+      provider: "gcp"
+      image: "family/platform-ingest-beats-ubuntu-2204"
