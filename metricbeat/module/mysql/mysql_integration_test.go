@@ -20,6 +20,9 @@
 package mysql
 
 import (
+	"crypto/tls"
+	"crypto/x509"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,9 +34,58 @@ import (
 func TestNewDB(t *testing.T) {
 	service := compose.EnsureUp(t, "mysql")
 
-	db, err := NewDB(GetMySQLEnvDSN(service.Host()))
+	db, err := NewDB(GetMySQLEnvDSN(service.Host()), nil)
 	assert.NoError(t, err)
 
 	err = db.Ping()
 	assert.NoError(t, err)
+}
+
+func loadTLSConfig(caCertPath, clientCertPath, clientKeyPath string) (*tls.Config, error) {
+	caCert, err := os.ReadFile(caCertPath)
+	if err != nil {
+		return nil, err
+	}
+	caCertPool := x509.NewCertPool()
+	caCertPool.AppendCertsFromPEM(caCert)
+
+	cert, err := tls.LoadX509KeyPair(clientCertPath, clientKeyPath)
+	if err != nil {
+		return nil, err
+	}
+
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      caCertPool,
+		MinVersion:   tls.VersionTLS12,
+	}
+
+	return tlsConfig, nil
+}
+
+func TestNewDBWithSSL(t *testing.T) {
+	service := compose.EnsureUp(t, "mysql")
+
+	tlsConfig, err := loadTLSConfig("_meta/certs/root-ca.pem", "_meta/certs/client-cert.pem", "_meta/certs/client-key.pem")
+	tlsConfig.InsecureSkipVerify = true
+	assert.NoError(t, err)
+
+	db, err := NewDB(GetMySQLEnvDSN(service.Host())+"?tls=custom", tlsConfig)
+	assert.NoError(t, err)
+
+	err = db.Ping()
+	assert.NoError(t, err)
+
+	// Check if the current connection is using SSL
+	var sslCipher, variableName, value string
+	err = db.QueryRow(`show status like 'Ssl_cipher'`).Scan(&variableName, &sslCipher)
+	assert.NoError(t, err)
+
+	// If sslCipher is not empty, then SSL is being used for the connection
+	assert.NotEmpty(t, variableName)
+	assert.NotEmpty(t, sslCipher)
+
+	err = db.QueryRow(`show variables like 'have_ssl'`).Scan(&variableName, &value)
+	assert.NoError(t, err)
+	assert.Equal(t, "YES", value)
 }
