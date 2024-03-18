@@ -248,19 +248,15 @@ func (service *MonitorService) GetMetricDefinitionsWithRetry(resourceId string, 
 	metricDefinitionCollection := armmonitor.MetricDefinitionCollection{}
 
 	for pager.More() {
-
-		for {
-			nextPage, err := pager.NextPage(service.context)
-			if err != nil {
-				retryError := service.sleepIfPossible(err, resourceId, namespace)
-				if retryError != nil {
-					return armmonitor.MetricDefinitionCollection{}, err
-				}
-			} else {
-				metricDefinitionCollection.Value = append(metricDefinitionCollection.Value, nextPage.Value...)
-				break
+		nextPage, err := pager.NextPage(service.context)
+		if err != nil {
+			retryError := service.sleepIfPossible(err, resourceId, namespace)
+			if retryError != nil {
+				return armmonitor.MetricDefinitionCollection{}, err
 			}
+			continue
 		}
+		metricDefinitionCollection.Value = append(metricDefinitionCollection.Value, nextPage.Value...)
 	}
 
 	return metricDefinitionCollection, nil
