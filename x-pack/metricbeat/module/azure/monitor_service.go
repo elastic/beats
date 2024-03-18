@@ -200,8 +200,43 @@ func (service *MonitorService) GetMetricNamespaces(resourceId string) (armmonito
 	return metricNamespaceCollection, nil
 }
 
-// GetMetricDefinitions will return all supported metrics based on the resource id and namespace
-func (service *MonitorService) GetMetricDefinitions(resourceId string, namespace string) (armmonitor.MetricDefinitionCollection, error) {
+// sleepIfPossible will check for the error 429 in the azure response, and look for the retry after header.
+// If the header is present, then metricbeat will sleep for that duration, otherwise it will return an error.
+func (service *MonitorService) sleepIfPossible(err error, resourceId string, namespace string) error {
+	errorMsg := "no metric definitions were found for resource " + resourceId + " and namespace " + namespace
+
+	var respError *azcore.ResponseError
+	ok := errors.As(err, &respError)
+	if !ok {
+		return fmt.Errorf("%s, failed to cast error to azcore.ResponseError", errorMsg)
+	}
+	// Check for TooManyRequests error and retry if it is the case
+	if respError.StatusCode != http.StatusTooManyRequests {
+		return fmt.Errorf("%s, %w", errorMsg, err)
+	}
+
+	// Check if the error has the header Retry After.
+	// If it is present, then we should try to make this request again.
+	retryAfter := respError.RawResponse.Header.Get("Retry-After")
+	if retryAfter == "" {
+		return fmt.Errorf("%s %w, failed to find Retry-After header", errorMsg, err)
+	}
+
+	duration, errD := time.ParseDuration(retryAfter + "s")
+	if errD != nil {
+		return fmt.Errorf("%s, failed to parse duration %s from header retry after", errorMsg, retryAfter)
+	}
+
+	service.log.Infof("%s, metricbeat will try again after %s seconds", errorMsg, retryAfter)
+	time.Sleep(duration)
+	service.log.Infof("%s, metricbeat finished sleeping and will try again now", errorMsg)
+
+	return nil
+}
+
+// GetMetricDefinitionsWithRetry will return all supported metrics based on the resource id and namespace
+// It will check for an error when moving the pager to the next page, and retry if possible.
+func (service *MonitorService) GetMetricDefinitionsWithRetry(resourceId string, namespace string) (armmonitor.MetricDefinitionCollection, error) {
 	opts := &armmonitor.MetricDefinitionsClientListOptions{}
 
 	if namespace != "" {
@@ -213,53 +248,22 @@ func (service *MonitorService) GetMetricDefinitions(resourceId string, namespace
 	metricDefinitionCollection := armmonitor.MetricDefinitionCollection{}
 
 	for pager.More() {
-		nextPage, err := pager.NextPage(service.context)
-		if err != nil {
-			return armmonitor.MetricDefinitionCollection{}, err
-		}
 
-		metricDefinitionCollection.Value = append(metricDefinitionCollection.Value, nextPage.Value...)
+		for {
+			nextPage, err := pager.NextPage(service.context)
+			if err != nil {
+				retryError := service.sleepIfPossible(err, resourceId, namespace)
+				if retryError != nil {
+					return armmonitor.MetricDefinitionCollection{}, err
+				}
+			} else {
+				metricDefinitionCollection.Value = append(metricDefinitionCollection.Value, nextPage.Value...)
+				break
+			}
+		}
 	}
 
 	return metricDefinitionCollection, nil
-}
-
-func (service *MonitorService) GetMetricDefinitionsWithRetry(resource *armresources.GenericResourceExpanded, namespace string) (armmonitor.MetricDefinitionCollection, error) {
-	for {
-
-		metricDefinitions, err := service.GetMetricDefinitions(*resource.ID, namespace)
-		if err != nil {
-			errorMsg := "no metric definitions were found for resource " + *resource.ID + " and namespace " + namespace
-
-			var respError *azcore.ResponseError
-			ok := errors.As(err, &respError)
-			if !ok {
-				return metricDefinitions, fmt.Errorf("%s, failed to cast error to azcore.ResponseError", errorMsg)
-			}
-			// Check for TooManyRequests error and retry if it is the case
-			if respError.StatusCode != http.StatusTooManyRequests {
-				return metricDefinitions, fmt.Errorf("%s, %w", errorMsg, err)
-			}
-
-			// Check if the error has the header Retry After.
-			// If it is present, then we should try to make this request again.
-			retryAfter := respError.RawResponse.Header.Get("Retry-After")
-			if retryAfter == "" {
-				return metricDefinitions, fmt.Errorf("%s %w, failed to find Retry-After header", errorMsg, err)
-			}
-
-			duration, errD := time.ParseDuration(retryAfter + "s")
-			if errD != nil {
-				return metricDefinitions, fmt.Errorf("%s, failed to parse duration %s from header retry after", errorMsg, retryAfter)
-			}
-
-			service.log.Infof("%s, metricbeat will try again after %s seconds", errorMsg, retryAfter)
-			time.Sleep(duration)
-			service.log.Infof("%s, metricbeat finished sleeping and will try again now", errorMsg)
-		} else {
-			return metricDefinitions, err
-		}
-	}
 }
 
 // GetMetricValues will return the metric values based on the resource and metric details

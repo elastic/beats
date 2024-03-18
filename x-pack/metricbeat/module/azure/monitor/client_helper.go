@@ -33,7 +33,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 
 			metricDefinitions, exists := namespaceMetrics[metric.Namespace]
 			if !exists {
-				metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitionsWithRetry(resource, metric.Namespace)
+				metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitionsWithRetry(*resource.ID, metric.Namespace)
 				if err != nil {
 					return nil, err
 				}
