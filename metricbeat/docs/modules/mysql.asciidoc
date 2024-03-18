@@ -101,6 +101,8 @@ metricbeat.modules:
   
   # Client certificate key file
   #ssl.key: "/etc/pki/client/cert.key"----
+----
+
 
 [float]
 === Metricsets
