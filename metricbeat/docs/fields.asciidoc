@@ -53406,6 +53406,15 @@ type: long
 
 --
 
+*`mysql.performance.events_statements.schemaname`*::
++
+--
+Schema name.
+
+type: keyword
+
+--
+
 [float]
 === table_io_waits
 
