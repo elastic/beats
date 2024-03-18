@@ -47,7 +47,7 @@ func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceE
 			}
 
 			if len(metricDefinitions.Value) == 0 {
-				return nil, err
+				return nil, fmt.Errorf("no metric definitions were found for resource %s and namespace %s", resourceID, namespace)
 			}
 
 			var filteredMetricDefinitions []armmonitor.MetricDefinition
