@@ -116,7 +116,7 @@ func NewInput(
 	log := logp.NewLogger("syslog")
 
 	deprecatedNotificationOnce.Do(func() {
-		cfgwarn.Deprecate("8.14.0", "Syslog input. Use Syslog processor instead.")
+		cfgwarn.Deprecate("", "Syslog input. Use Syslog processor instead.")
 	})
 
 	out, err := outlet.Connect(cfg)
