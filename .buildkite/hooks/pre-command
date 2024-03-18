@@ -34,7 +34,7 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == 
   fi
 fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" ]]; then
   source .buildkite/scripts/setenv.sh
   if [[ "${BUILDKITE_COMMAND}" =~ ^buildkite-agent ]]; then
     echo "Skipped pre-command when running the Upload pipeline"
