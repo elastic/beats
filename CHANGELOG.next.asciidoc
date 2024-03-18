@@ -229,7 +229,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each metricset instance. {pull}36971[36971]
 - Add linux IO metrics to system/process {pull}37213[37213]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
-
+- Support schema_name for MySQL performance metricset {pull}38363[38363]
 
 *Metricbeat*
 
