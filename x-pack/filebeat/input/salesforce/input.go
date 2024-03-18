@@ -213,21 +213,28 @@ func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig, cursor m
 	return &querier{Query: qr}, err
 }
 
+// isZero checks if the given value v is the zero value for its type.
+// It compares v to the zero value obtained by new(T).
+func isZero[T comparable](v T) bool {
+	return v == *new(T)
+}
+
 // RunObject runs the Object method of the Event Monitoring API to collect events.
 func (s *salesforceInput) RunObject() error {
-	s.log.Debugf("Scrape Objects every %s", s.srcConfig.EventMonitoringMethod.Object.Interval)
+	s.log.Debugf("scrape object(s) every %s", s.srcConfig.EventMonitoringMethod.Object.Interval)
 
 	var cursor mapstr.M
-	if !(s.cursor.Object.FirstEventTime == "" && s.cursor.Object.LastEventTime == "") {
+	if !(isZero(s.cursor.Object.FirstEventTime) && isZero(s.cursor.Object.LastEventTime)) {
 		object := make(mapstr.M)
-		if s.cursor.Object.FirstEventTime != "" {
+		if !isZero(s.cursor.Object.FirstEventTime) {
 			object.Put("first_event_time", s.cursor.Object.FirstEventTime)
 		}
-		if s.cursor.Object.LastEventTime != "" {
+		if !isZero(s.cursor.Object.LastEventTime) {
 			object.Put("last_event_time", s.cursor.Object.LastEventTime)
 		}
 		cursor = mapstr.M{"object": object}
 	}
+
 	query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.Object.Query, cursor)
 	if err != nil {
 		return fmt.Errorf("error forming query based on cursor: %w", err)
@@ -282,15 +289,15 @@ func (s *salesforceInput) RunObject() error {
 // RunEventLogFile runs the EventLogFile method of the Event Monitoring API to
 // collect events.
 func (s *salesforceInput) RunEventLogFile() error {
-	s.log.Debugf("Scrape EventLogFiles every %s", s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
+	s.log.Debugf("scrape eventLogFile(s) every %s", s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
 
 	var cursor mapstr.M
-	if !(s.cursor.EventLogFile.FirstEventTime == "" && s.cursor.EventLogFile.LastEventTime == "") {
+	if !(isZero(s.cursor.Object.FirstEventTime) && isZero(s.cursor.Object.LastEventTime)) {
 		eventLogFile := make(mapstr.M)
-		if s.cursor.EventLogFile.FirstEventTime != "" {
+		if !isZero(s.cursor.Object.FirstEventTime) {
 			eventLogFile.Put("first_event_time", s.cursor.EventLogFile.FirstEventTime)
 		}
-		if s.cursor.EventLogFile.LastEventTime != "" {
+		if !isZero(s.cursor.Object.LastEventTime) {
 			eventLogFile.Put("last_event_time", s.cursor.EventLogFile.LastEventTime)
 		}
 		cursor = mapstr.M{"event_log_file": eventLogFile}
@@ -306,6 +313,9 @@ func (s *salesforceInput) RunEventLogFile() error {
 		return err
 	}
 
+	// NOTE: This is a failsafe check because the HTTP client is always set.
+	// This check allows unit tests to verify correct behavior when the HTTP
+	// client is nil.
 	if s.sfdcConfig.Client == nil {
 		return errors.New("internal error: salesforce configuration is not set properly")
 	}
@@ -413,8 +423,9 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 
 		creds, err = credentials.NewJWTCredentials(passCreds)
 		if err != nil {
-			return nil, fmt.Errorf("problem with credentials: %w", err)
+			return nil, fmt.Errorf("error creating jwt credentials: %w", err)
 		}
+
 	case cfg.Auth.OAuth2.UserPasswordFlow != nil && cfg.Auth.OAuth2.UserPasswordFlow.isEnabled():
 		passCreds := credentials.PasswordCredentials{
 			URL:          cfg.Auth.OAuth2.UserPasswordFlow.TokenURL,
@@ -426,7 +437,7 @@ func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error
 
 		creds, err = credentials.NewPasswordCredentials(passCreds)
 		if err != nil {
-			return nil, fmt.Errorf("problem with credentials: %w", err)
+			return nil, fmt.Errorf("error creating password credentials: %w", err)
 		}
 
 	}

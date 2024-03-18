@@ -9,7 +9,7 @@
 <titleabbrev>Salesforce</titleabbrev>
 ++++
 
-Use the `salesforce` input to monitor Salesforce events either via the Salesforce ELF API or the Salesforce Real-time event monitoring API. Both use REST API (to execute SOQL queries in the Salesforce instance) under the hood to query the relevant objects to fetch the events.
+Use the `salesforce` input to monitor Salesforce events either via the https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm[Salesforce EventLogFile (ELF) API] or the https://developer.salesforce.com/blogs/2020/05/introduction-to-real-time-event-monitoring[Salesforce Real-time event monitoring API]. Both use REST API (to execute SOQL queries in the Salesforce instance) under the hood to query the relevant objects to fetch the events.
 
 Here the `input` have cursor state(s) that will be provided to the next execution of event monitoring to fetch the events from the last cursor state. The cursor states can be used to control the behaviour of the program.
 
