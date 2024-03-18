@@ -17,7 +17,7 @@ stages:
         crosscompile:
             command: ".buildkite/auditbeat/scripts/crosscompile.sh"
             platform: "family/platform-ingest-beats-ubuntu-2204"
-        rhel-9:
+        unitTest-rhel-9:
             command: ".buildkite/auditbeat/scripts/unit-tests.sh"
             platform: "family/platform-ingest-beats-rhel-9"
         unitTest-windows-2022:
