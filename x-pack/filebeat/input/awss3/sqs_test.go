@@ -75,13 +75,13 @@ func TestSQSReceiver(t *testing.T) {
 
 		// Expect the one message returned to have been processed.
 		mockMsgHandler.EXPECT().
-			ProcessSQS(gomock.Any(), gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any()).
+			ProcessSQS(gomock.Any(), gomock.Eq(&msg), gomock.Any(), gomock.Any(), gomock.Any(), gomock.Any()).
 			Times(1).
 			DoAndReturn(
-				func(ctx context.Context, msg *types.Message, _ beat.Client, acker *EventACKTracker, _ time.Time) (uint64, error) {
+				func(ctx context.Context, msg *types.Message, _ beat.Client, acker *EventACKTracker, _ time.Time, metrics *inputMetrics) (uint64, error) {
 					_, keepaliveCancel := context.WithCancel(ctx)
 					log := log.Named("sqs_s3_event")
-					acker.MarkSQSProcessedWithData(msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
+					acker.MarkSQSProcessedWithData(msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log, metrics)
 					acker.ACK()
 					<-acker.ctx.Done()
 					return 1, nil
@@ -99,7 +99,6 @@ func TestSQSReceiver(t *testing.T) {
 		// Execute sqsReader and verify calls/state.
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler, mockBeatPipeline)
 		require.NoError(t, receiver.Receive(ctx))
-		assert.Equal(t, maxMessages, receiver.workerSem.Available())
 	})
 
 	t.Run("retry after ReceiveMessage error", func(t *testing.T) {
@@ -140,7 +139,6 @@ func TestSQSReceiver(t *testing.T) {
 		// Execute SQSReceiver and verify calls/state.
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler, mockBeatPipeline)
 		require.NoError(t, receiver.Receive(ctx))
-		assert.Equal(t, maxMessages, receiver.workerSem.Available())
 	})
 }
 

@@ -66,7 +66,7 @@ type sqsProcessor interface {
 	// given message and is responsible for updating the message's visibility
 	// timeout while it is being processed and for deleting it when processing
 	// completes successfully.
-	ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *EventACKTracker, start time.Time) (uint64, error)
+	ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *EventACKTracker, start time.Time, metrics *inputMetrics) (uint64, error)
 	DeleteSQS(msg *types.Message, receiveCount int, processingErr error, handles []s3ObjectHandler) error
 }
 

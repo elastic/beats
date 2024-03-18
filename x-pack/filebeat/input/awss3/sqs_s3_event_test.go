@@ -52,7 +52,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 
 		acker := NewEventACKTracker(ctx, new(sync.WaitGroup))
-		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now())
+		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now(), newInputMetrics("", nil, 0))
 		require.NoError(t, processingErr)
 		require.Equal(t, expectedEventsPublishedTotal, eventsPublishedTotal)
 
@@ -79,7 +79,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		acker := NewEventACKTracker(ctx, new(sync.WaitGroup))
-		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &invalidBodyMsg, mockClient, acker, time.Now())
+		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &invalidBodyMsg, mockClient, acker, time.Now(), newInputMetrics("", nil, 0))
 		t.Log(processingErr)
 		require.Error(t, processingErr)
 		require.Equal(t, uint64(0), eventsPublishedTotal)
@@ -104,7 +104,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		acker := NewEventACKTracker(ctx, new(sync.WaitGroup))
-		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &emptyRecordsMsg, mockClient, acker, time.Now())
+		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &emptyRecordsMsg, mockClient, acker, time.Now(), newInputMetrics("", nil, 0))
 		require.NoError(t, processingErr)
 		require.Equal(t, uint64(0), eventsPublishedTotal)
 
@@ -138,7 +138,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, visibilityTimeout, 5, mockS3HandlerFactory)
 		acker := NewEventACKTracker(ctx, new(sync.WaitGroup))
-		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now())
+		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now(), newInputMetrics("", nil, 0))
 		require.NoError(t, processingErr)
 		require.Equal(t, uint64(1), eventsPublishedTotal)
 
@@ -168,7 +168,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		acker := NewEventACKTracker(ctx, new(sync.WaitGroup))
-		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now())
+		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now(), newInputMetrics("", nil, 0))
 		t.Log(processingErr)
 		require.Error(t, processingErr)
 		require.Equal(t, uint64(0), eventsPublishedTotal)
@@ -199,7 +199,7 @@ func TestSQSS3EventProcessor(t *testing.T) {
 
 		p := newSQSS3EventProcessor(logp.NewLogger(inputName), nil, mockAPI, nil, time.Minute, 5, mockS3HandlerFactory)
 		acker := NewEventACKTracker(ctx, new(sync.WaitGroup))
-		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now())
+		eventsPublishedTotal, processingErr := p.ProcessSQS(ctx, &msg, mockClient, acker, time.Now(), newInputMetrics("", nil, 0))
 		t.Log(processingErr)
 		require.Error(t, processingErr)
 		require.Equal(t, uint64(0), eventsPublishedTotal)

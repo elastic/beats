@@ -120,7 +120,7 @@ characters. This only applies to non-JSON logs. See <<_encoding_3>>.
 ==== `decoding`
 
 The file decoding option is used to specify a codec that will be used to
-decode the file contents. This can apply to any file stream data.  
+decode the file contents. This can apply to any file stream data.
 An example config is shown below:
 
 [source,yaml]
@@ -131,17 +131,17 @@ An example config is shown below:
 Currently supported codecs are given below:-
 
     1. <<attrib-decoding-parquet,Parquet>>: This codec decodes parquet compressed data streams.
- 
+
 [id="attrib-decoding-parquet"]
 [float]
 ==== `the parquet codec`
 The `parquet` codec is used to decode parquet compressed data streams.
 Only enabling the codec will use the default codec options. The parquet codec supports
-two sub attributes which can make parquet decoding more efficient. The `batch_size` attribute and 
+two sub attributes which can make parquet decoding more efficient. The `batch_size` attribute and
 the `process_parallel` attribute. The `batch_size` attribute can be used to specify the number of
-records to read from the parquet stream at a time. By default the `batch size` is set to `1` and 
-`process_parallel` is set to `false`. If the `process_parallel` attribute is set to `true` then functions 
-which read multiple columns will read those columns in parallel from the parquet stream with a 
+records to read from the parquet stream at a time. By default the `batch size` is set to `1` and
+`process_parallel` is set to `false`. If the `process_parallel` attribute is set to `true` then functions
+which read multiple columns will read those columns in parallel from the parquet stream with a
 number of readers equal to the number of columns. Setting `process_parallel` to `true` will greatly
 increase the rate of processing at the cost of increased memory usage. Having a larger `batch_size`
 also helps to increase the rate of processing. An example config is shown below:
@@ -265,8 +265,9 @@ The default is `10 MiB`.
 [float]
 ==== `max_number_of_messages`
 
-The maximum number of SQS messages that can be inflight at any time. Defaults
-to 5.
+The maximum number of SQS messages to receive during a single `ReceiveMessage` call.
+As many goroutine workers will be started to process the SQS messages received.
+Defaults to 5.
 
 [id="input-{type}-parsers"]
 [float]

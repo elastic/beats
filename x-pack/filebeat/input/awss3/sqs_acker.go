@@ -47,6 +47,7 @@ type EventACKTracker struct {
 	keepaliveWg     *sync.WaitGroup
 	msgHandler      sqsProcessor
 	log             *logp.Logger
+	metrics         *inputMetrics
 }
 
 func NewEventACKTracker(ctx context.Context, deletionWg *sync.WaitGroup) *EventACKTracker {
@@ -82,7 +83,7 @@ func (a *EventACKTracker) cancelAndFlush() {
 }
 
 // MarkSQSProcessedWithData Every call after the first one is a no-op
-func (a *EventACKTracker) MarkSQSProcessedWithData(msg *types.Message, publishedEvent uint64, receiveCount int, start time.Time, processingErr error, handles []s3ObjectHandler, keepaliveCancel context.CancelFunc, keepaliveWg *sync.WaitGroup, msgHandler sqsProcessor, log *logp.Logger) {
+func (a *EventACKTracker) MarkSQSProcessedWithData(msg *types.Message, publishedEvent uint64, receiveCount int, start time.Time, processingErr error, handles []s3ObjectHandler, keepaliveCancel context.CancelFunc, keepaliveWg *sync.WaitGroup, msgHandler sqsProcessor, log *logp.Logger, metrics *inputMetrics) {
 	// We want to execute the logic of this call only once, when the ack mutex was locked on init
 	if a.eventsToBeAcked.Load() > 0 {
 		return
@@ -98,6 +99,7 @@ func (a *EventACKTracker) MarkSQSProcessedWithData(msg *types.Message, published
 	a.keepaliveWg = keepaliveWg
 	a.msgHandler = msgHandler
 	a.log = log
+	a.metrics = metrics
 }
 
 func (a *EventACKTracker) FullyTracked() bool {
@@ -116,6 +118,8 @@ func (a *EventACKTracker) deleteSQS() {
 	// Stop keepalive visibility routine before deleting.
 	a.keepaliveCancel()
 	a.keepaliveWg.Wait()
+
+	a.metrics.sqsMessagesInflight.Dec()
 
 	err := a.msgHandler.DeleteSQS(a.msg, a.ReceiveCount, a.processingErr, a.Handles)
 	if err != nil {

@@ -163,7 +163,7 @@ func (p *sqsS3EventProcessor) DeleteSQS(msg *types.Message, receiveCount int, pr
 	return fmt.Errorf("failed deleting SQS message (it will return to queue after visibility timeout): %w", processingErr)
 }
 
-func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *EventACKTracker, start time.Time) (uint64, error) {
+func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *EventACKTracker, start time.Time, metrics *inputMetrics) (uint64, error) {
 	keepaliveCtx, keepaliveCancel := context.WithCancel(ctx)
 
 	// Start SQS keepalive worker.
@@ -190,7 +190,7 @@ func (p *sqsS3EventProcessor) ProcessSQS(ctx context.Context, msg *types.Message
 
 	eventsPublishedTotal, handles, processingErr := p.processS3Events(ctx, log, *msg.Body, client, acker)
 	p.metrics.sqsMessagesProcessedTotal.Inc()
-	acker.MarkSQSProcessedWithData(msg, eventsPublishedTotal, receiveCount, start, processingErr, handles, keepaliveCancel, &keepaliveWg, p, p.log)
+	acker.MarkSQSProcessedWithData(msg, eventsPublishedTotal, receiveCount, start, processingErr, handles, keepaliveCancel, &keepaliveWg, p, p.log, metrics)
 
 	return eventsPublishedTotal, processingErr
 }

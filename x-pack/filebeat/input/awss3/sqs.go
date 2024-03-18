@@ -18,7 +18,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -29,7 +28,6 @@ const (
 
 type sqsReader struct {
 	maxMessagesInflight int
-	workerSem           *awscommon.Sem
 	sqs                 sqsAPI
 	pipeline            beat.Pipeline
 	msgHandler          sqsProcessor
@@ -44,7 +42,6 @@ func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessag
 	}
 	return &sqsReader{
 		maxMessagesInflight: maxMessagesInflight,
-		workerSem:           awscommon.NewSem(maxMessagesInflight),
 		sqs:                 sqs,
 		pipeline:            pipeline,
 		msgHandler:          msgHandler,
@@ -64,9 +61,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 	workersChan := make(chan processingData, r.maxMessagesInflight)
 
 	deletionWg := new(sync.WaitGroup)
-	deletionWaiter := new(atomic.Bool)
-
-	var clientsMutex sync.Mutex
+	deletionWaiter := atomic.MakeBool(true)
 	clients := make(map[uint64]beat.Client, r.maxMessagesInflight)
 
 	// Start a fixed amount of goroutines that will process all the SQS messages sent to the workersChan asynchronously.
@@ -83,9 +78,7 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 			},
 		})
 
-		clientsMutex.Lock()
 		clients[id] = client
-		clientsMutex.Unlock()
 
 		if err != nil {
 			r.log.Warnw("Failed setting up worker.",
@@ -121,7 +114,9 @@ func (r *sqsReader) Receive(ctx context.Context) error {
 				deletionWg.Add(1)
 				deletionWaiter.Swap(false)
 
-				eventsCreatedTotal, err := r.msgHandler.ProcessSQS(ctx, &msg, client, acker, start)
+				r.metrics.sqsMessagesInflight.Inc()
+
+				eventsCreatedTotal, err := r.msgHandler.ProcessSQS(ctx, &msg, client, acker, start, r.metrics)
 				// No Track will be invoked by the client event listener, deletionWg.Done() has to be called here
 				if eventsCreatedTotal == 0 {
 					deletionWg.Done()

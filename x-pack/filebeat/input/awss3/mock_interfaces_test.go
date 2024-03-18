@@ -291,18 +291,18 @@ func (mr *MockSQSProcessorMockRecorder) DeleteSQS(msg, receiveCount, processingE
 }
 
 // ProcessSQS mocks base method.
-func (m *MockSQSProcessor) ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *EventACKTracker, start time.Time) (uint64, error) {
+func (m *MockSQSProcessor) ProcessSQS(ctx context.Context, msg *types.Message, client beat.Client, acker *EventACKTracker, start time.Time, metrics *inputMetrics) (uint64, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ProcessSQS", ctx, msg, client, acker, start)
+	ret := m.ctrl.Call(m, "ProcessSQS", ctx, msg, client, acker, start, metrics)
 	ret0, _ := ret[0].(uint64)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ProcessSQS indicates an expected call of ProcessSQS.
-func (mr *MockSQSProcessorMockRecorder) ProcessSQS(ctx, msg, client, acker, start interface{}) *gomock.Call {
+func (mr *MockSQSProcessorMockRecorder) ProcessSQS(ctx, msg, client, acker, start, metrics interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessSQS", reflect.TypeOf((*MockSQSProcessor)(nil).ProcessSQS), ctx, msg, client, acker, start)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProcessSQS", reflect.TypeOf((*MockSQSProcessor)(nil).ProcessSQS), ctx, msg, client, acker, start, metrics)
 }
 
 // MockS3API is a mock of s3API interface.

@@ -32,7 +32,7 @@ func TestEventACKTracker(t *testing.T) {
 	mockMsgHandler := NewMockSQSProcessor(ctrl)
 	msg := newSQSMessage(newS3Event("log.json"))
 	mockMsgHandler.EXPECT().DeleteSQS(gomock.Eq(&msg), gomock.Eq(-1), gomock.Nil(), gomock.Nil()).Return(nil)
-	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
+	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log, newInputMetrics("", nil, 0))
 	acker.ACK()
 	<-acker.ctx.Done()
 
@@ -68,7 +68,7 @@ func TestEventACKHandler(t *testing.T) {
 	mockMsgHandler := NewMockSQSProcessor(ctrl)
 	msg := newSQSMessage(newS3Event("log.json"))
 	mockMsgHandler.EXPECT().DeleteSQS(gomock.Eq(&msg), gomock.Eq(-1), gomock.Nil(), gomock.Nil()).Return(nil)
-	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
+	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log, newInputMetrics("", nil, 0))
 
 	// Create an ACK handler and simulate one ACKed event.
 	ackHandler := NewEventACKHandler()
@@ -96,7 +96,7 @@ func TestEventACKHandlerFullyAcked(t *testing.T) {
 	mockMsgHandler := NewMockSQSProcessor(ctrl)
 	msg := newSQSMessage(newS3Event("log.json"))
 	mockMsgHandler.EXPECT().DeleteSQS(gomock.Eq(&msg), gomock.Eq(-1), gomock.Nil(), gomock.Nil()).Return(nil)
-	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log)
+	acker.MarkSQSProcessedWithData(&msg, 1, -1, time.Now(), nil, nil, keepaliveCancel, new(sync.WaitGroup), mockMsgHandler, log, newInputMetrics("", nil, 0))
 	acker.ACK()
 	<-acker.ctx.Done()
 	assert.EqualValues(t, true, acker.FullyTracked())

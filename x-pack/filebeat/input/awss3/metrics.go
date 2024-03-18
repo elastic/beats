@@ -84,8 +84,6 @@ func (m *inputMetrics) Close() {
 // must be used to call endSQSWorker when the worker finishes. It also
 // increments the sqsMessagesInflight counter.
 func (m *inputMetrics) beginSQSWorker() (id uint64) {
-	m.sqsMessagesInflight.Inc()
-
 	m.sqsWorkerUtilizationMutex.Lock()
 	defer m.sqsWorkerUtilizationMutex.Unlock()
 	m.sqsWorkerIDCounter++
@@ -98,8 +96,6 @@ func (m *inputMetrics) beginSQSWorker() (id uint64) {
 // It also decrements the sqsMessagesInflight counter and
 // sqsMessageProcessingTime histogram.
 func (m *inputMetrics) endSQSWorker(id uint64) {
-	m.sqsMessagesInflight.Dec()
-
 	m.sqsWorkerUtilizationMutex.Lock()
 	defer m.sqsWorkerUtilizationMutex.Unlock()
 	now := currentTime()
