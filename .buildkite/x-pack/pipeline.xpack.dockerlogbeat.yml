@@ -30,7 +30,7 @@ steps:
     allow_dependency_failure: false
 
   - label: ":linux: Load dynamic x-pack dockerlogbeat pipeline"
-    key: "dockerlogbeat-pipeline"
+    key: "xpack-dockerlogbeat-pipeline"
     command: ".buildkite/scripts/generate_xpack_dockerlogbeat_pipeline.sh"
     notify:
       - github_commit_status:
