@@ -7,6 +7,7 @@ env:
   IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
   BEATS_PROJECT_NAME: "x-pack/dockerlogbeat"
 
 steps:
