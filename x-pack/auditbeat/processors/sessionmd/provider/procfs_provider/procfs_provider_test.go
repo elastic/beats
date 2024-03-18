@@ -11,12 +11,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/processdb"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/procfs"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/types"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -63,8 +63,8 @@ var (
 			// prereq are mock processes that should be scraped into DB before running Update
 			prereq: []procfs.ProcessInfo{
 				{
-					Pids: types.PidInfo{
-						StartTimeNs: 0,
+					PIDs: types.PIDInfo{
+						StartTimeNS: 0,
 						Tid:         60,
 						Tgid:        60,
 						Vpid:        0,
@@ -74,8 +74,8 @@ var (
 					},
 				},
 				{
-					Pids: types.PidInfo{
-						StartTimeNs: 0,
+					PIDs: types.PIDInfo{
+						StartTimeNS: 0,
 						Tid:         80,
 						Tgid:        80,
 						Vpid:        0,
@@ -85,8 +85,8 @@ var (
 					},
 				},
 				{
-					Pids: types.PidInfo{
-						StartTimeNs: 0,
+					PIDs: types.PIDInfo{
+						StartTimeNS: 0,
 						Tid:         90,
 						Tgid:        90,
 						Vpid:        0,
@@ -99,8 +99,8 @@ var (
 			// procinfo are processes that are in mock procfs, but not DB
 			procinfo: []procfs.ProcessInfo{
 				{
-					Pids: types.PidInfo{
-						StartTimeNs: 0,
+					PIDs: types.PIDInfo{
+						StartTimeNS: 0,
 						Tid:         100,
 						Tgid:        100,
 						Vpid:        0,
@@ -111,7 +111,7 @@ var (
 				},
 			},
 			expected: procfs.ProcessInfo{
-				Pids: types.PidInfo{
+				PIDs: types.PIDInfo{
 					Tgid: 100,
 					Ppid: 80,
 					Pgid: 90,
@@ -148,8 +148,8 @@ var (
 			},
 			prereq: []procfs.ProcessInfo{
 				{
-					Pids: types.PidInfo{
-						StartTimeNs: 0,
+					PIDs: types.PIDInfo{
+						StartTimeNS: 0,
 						Tid:         60,
 						Tgid:        60,
 						Vpid:        0,
@@ -159,8 +159,8 @@ var (
 					},
 				},
 				{
-					Pids: types.PidInfo{
-						StartTimeNs: 0,
+					PIDs: types.PIDInfo{
+						StartTimeNS: 0,
 						Tid:         80,
 						Tgid:        80,
 						Vpid:        0,
@@ -170,8 +170,8 @@ var (
 					},
 				},
 				{
-					Pids: types.PidInfo{
-						StartTimeNs: 0,
+					PIDs: types.PIDInfo{
+						StartTimeNS: 0,
 						Tid:         90,
 						Tgid:        90,
 						Vpid:        0,
@@ -183,8 +183,8 @@ var (
 			},
 			procinfo: []procfs.ProcessInfo{
 				{
-					Pids: types.PidInfo{
-						StartTimeNs: 0,
+					PIDs: types.PIDInfo{
+						StartTimeNS: 0,
 						Tid:         100,
 						Tgid:        100,
 						Vpid:        0,
@@ -195,7 +195,7 @@ var (
 				},
 			},
 			expected: procfs.ProcessInfo{
-				Pids: types.PidInfo{
+				PIDs: types.PIDInfo{
 					Tgid: 100,
 					Ppid: 80,
 					Pgid: 90,
@@ -241,8 +241,8 @@ var (
 			},
 			prereq: []procfs.ProcessInfo{
 				{
-					Pids: types.PidInfo{
-						StartTimeNs: 0,
+					PIDs: types.PIDInfo{
+						StartTimeNS: 0,
 						Tid:         100,
 						Tgid:        100,
 						Vpid:        0,
@@ -252,8 +252,8 @@ var (
 					},
 				},
 				{
-					Pids: types.PidInfo{
-						StartTimeNs: 0,
+					PIDs: types.PIDInfo{
+						StartTimeNS: 0,
 						Tid:         200,
 						Tgid:        200,
 						Vpid:        0,
@@ -265,7 +265,7 @@ var (
 			},
 			procinfo: []procfs.ProcessInfo{},
 			expected: procfs.ProcessInfo{
-				Pids: types.PidInfo{
+				PIDs: types.PIDInfo{
 					Tid:  200,
 					Tgid: 200,
 					Ppid: 100,
@@ -303,8 +303,8 @@ var (
 			},
 			prereq: []procfs.ProcessInfo{
 				{
-					Pids: types.PidInfo{
-						StartTimeNs: 0,
+					PIDs: types.PIDInfo{
+						StartTimeNS: 0,
 						Tid:         100,
 						Tgid:        100,
 						Vpid:        0,
@@ -314,8 +314,8 @@ var (
 					},
 				},
 				{
-					Pids: types.PidInfo{
-						StartTimeNs: 0,
+					PIDs: types.PIDInfo{
+						StartTimeNS: 0,
 						Tid:         200,
 						Tgid:        200,
 						Vpid:        0,
@@ -327,7 +327,7 @@ var (
 			},
 			procinfo: []procfs.ProcessInfo{},
 			expected: procfs.ProcessInfo{
-				Pids: types.PidInfo{
+				PIDs: types.PIDInfo{
 					Tid:  200,
 					Tgid: 200,
 					Ppid: 100,
@@ -365,8 +365,8 @@ var (
 			},
 			prereq: []procfs.ProcessInfo{
 				{
-					Pids: types.PidInfo{
-						StartTimeNs: 0,
+					PIDs: types.PIDInfo{
+						StartTimeNS: 0,
 						Tid:         200,
 						Tgid:        200,
 						Vpid:        0,
@@ -378,7 +378,7 @@ var (
 			},
 			procinfo: []procfs.ProcessInfo{},
 			expected: procfs.ProcessInfo{
-				Pids: types.PidInfo{
+				PIDs: types.PIDInfo{
 					Tid:  200,
 					Tgid: 200,
 					Ppid: 100,
@@ -392,57 +392,61 @@ var (
 
 func TestExecEvent(t *testing.T) {
 	for _, tt := range execTests {
+		tt := tt // avoids taking address of loop variable within loop
 		reader := procfs.NewMockReader()
-		db := processdb.NewDB(reader, logger)
+		db, err := processdb.NewDB(reader, logger)
+		require.Nil(t, err)
 		for _, entry := range tt.prereq {
-			reader.AddEntry(uint32(entry.Pids.Tgid), entry)
+			reader.AddEntry(entry.PIDs.Tgid, entry)
 		}
 		db.ScrapeProcfs()
 
 		for _, entry := range tt.procinfo {
-			reader.AddEntry(uint32(entry.Pids.Tgid), entry)
+			reader.AddEntry(entry.PIDs.Tgid, entry)
 		}
 
 		provider, err := NewProvider(context.TODO(), &logger, db, reader, "process.pid")
-		assert.Nil(t, err, "error creating provider")
+		require.Nil(t, err, "error creating provider")
 
-		provider.UpdateDB(&tt.event)
+		err = provider.UpdateDB(&tt.event)
+		require.Nil(t, err)
 
 		actual, err := db.GetProcess(tt.pid)
-		if err != nil {
-			assert.Fail(t, "pid not found in db")
-		}
+		require.Nil(t, err, "pid not found in db")
 
-		assert.Equal(t, tt.expected.Pids.Tgid, actual.PID)
-		assert.Equal(t, tt.expected.Pids.Ppid, actual.Parent.PID)
-		assert.Equal(t, tt.expected.Pids.Pgid, actual.GroupLeader.PID)
-		assert.Equal(t, tt.expected.Pids.Sid, actual.SessionLeader.PID)
+		require.Equal(t, tt.expected.PIDs.Tgid, actual.PID)
+		require.Equal(t, tt.expected.PIDs.Ppid, actual.Parent.PID)
+		require.Equal(t, tt.expected.PIDs.Pgid, actual.GroupLeader.PID)
+		require.Equal(t, tt.expected.PIDs.Sid, actual.SessionLeader.PID)
 	}
 }
 
 func TestSetSidEvent(t *testing.T) {
 	for _, tt := range setSidTests {
+		tt := tt
 		reader := procfs.NewMockReader()
-		db := processdb.NewDB(reader, logger)
+		db, err := processdb.NewDB(reader, logger)
+		require.Nil(t, err)
 		for _, entry := range tt.prereq {
-			reader.AddEntry(uint32(entry.Pids.Tgid), entry)
+			reader.AddEntry(entry.PIDs.Tgid, entry)
 		}
 		db.ScrapeProcfs()
 
 		for _, entry := range tt.procinfo {
-			reader.AddEntry(uint32(entry.Pids.Tgid), entry)
+			reader.AddEntry(entry.PIDs.Tgid, entry)
 		}
 
 		provider, err := NewProvider(context.TODO(), &logger, db, reader, "process.pid")
-		assert.Nil(t, err, "error creating provider")
+		require.Nil(t, err, "error creating provider")
 
-		provider.UpdateDB(&tt.event)
+		err = provider.UpdateDB(&tt.event)
+		require.Nil(t, err)
 
 		actual, err := db.GetProcess(tt.pid)
 		if err != nil {
-			assert.Fail(t, "pid not found in db")
+			require.Fail(t, "pid not found in db")
 		}
 
-		assert.Equal(t, tt.expected.Pids.Sid, actual.SessionLeader.PID)
+		require.Equal(t, tt.expected.PIDs.Sid, actual.SessionLeader.PID)
 	}
 }

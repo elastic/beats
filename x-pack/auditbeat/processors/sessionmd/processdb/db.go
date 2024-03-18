@@ -671,7 +671,7 @@ func getTTYType(major uint16, minor uint16) TTYType {
 }
 
 func (db *DB) scrapeAncestors(proc Process) {
-	for _, pid := range []uint32{proc.Pids.Pgid, proc.Pids.Ppid, proc.Pids.Sid} {
+	for _, pid := range []uint32{proc.PIDs.Pgid, proc.PIDs.Ppid, proc.PIDs.Sid} {
 		if _, exists := db.processes[pid]; pid == 0 || exists {
 			continue
 		}
@@ -681,9 +681,9 @@ func (db *DB) scrapeAncestors(proc Process) {
 			continue
 		}
 		p := Process{
-			Pids:     pidInfoFromProto(procInfo.Pids),
+			PIDs:     pidInfoFromProto(procInfo.PIDs),
 			Creds:    credInfoFromProto(procInfo.Creds),
-			CTty:     ttyDevFromProto(procInfo.CTty),
+			CTTY:     ttyDevFromProto(procInfo.CTTY),
 			Argv:     procInfo.Argv,
 			Cwd:      procInfo.Cwd,
 			Env:      procInfo.Env,

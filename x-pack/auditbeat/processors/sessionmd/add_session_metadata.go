@@ -15,11 +15,11 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/add_session_metadata/provider/procfs_provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/procfs"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/ebpf_provider"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/procfs_provider"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -42,8 +42,11 @@ type addSessionMetadata struct {
 }
 
 func New(cfg *cfg.C) (beat.Processor, error) {
+	var p provider.Provider
+	var err error
+
 	c := defaultConfig()
-	if err := cfg.Unpack(&c); err != nil {
+	if err = cfg.Unpack(&c); err != nil {
 		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
 	}
 
@@ -59,15 +62,12 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 	backfilledPIDs := db.ScrapeProcfs()
 	logger.Debugf("backfilled %d processes", len(backfilledPIDs))
 
-	var p provider.Provider
-	var err error
-
 	switch c.Backend {
 	case "auto":
 		p, err = ebpf_provider.NewProvider(ctx, logger, db)
 		if err != nil {
 			// Most likely cause of error is not supporting ebpf on system, try procfs
-			p, err = procfs_provider.NewProvider(ctx, logger, db, reader, c.PidField)
+			p, err = procfs_provider.NewProvider(ctx, logger, db, reader, c.PIDField)
 			if err != nil {
 				return nil, fmt.Errorf("failed to create provider: %w", err)
 			}
@@ -78,7 +78,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 			return nil, fmt.Errorf("failed to create ebpf provider: %w", err)
 		}
 	case "procfs":
-		p, err = procfs_provider.NewProvider(ctx, logger, db, reader, c.PidField)
+		p, err = procfs_provider.NewProvider(ctx, logger, db, reader, c.PIDField)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create ebpf provider: %w", err)
 		}
