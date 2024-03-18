@@ -4,6 +4,7 @@ name: "beats-xpack-auditbeat"
 env:
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  DEFAULT_UBUNTU_X86_64_IMAGE: "family/core-ubuntu-2204"
   IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
   IMAGE_WIN_10: "family/general-windows-10"
   IMAGE_WIN_11: "family/general-windows-11"
