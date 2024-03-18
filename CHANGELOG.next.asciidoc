@@ -107,6 +107,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
 - Fix setuid root when running under cgroups v2. {pull}37794[37794]
 - Adjust State loader to only retry when response code status is 5xx {pull}37981[37981]
+- Reset prctl dumpable flag after cap drop. {pull}38269[38269] 
 
 *Metricbeat*
 
@@ -230,6 +231,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Add a `/inputs/` route to the HTTP monitoring endpoint that exposes metrics for each metricset instance. {pull}36971[36971]
 - Add linux IO metrics to system/process {pull}37213[37213]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
+- Add SSL support to mysql module {pull}37997[37997]
 
 
 *Metricbeat*
