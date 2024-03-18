@@ -1,0 +1,43 @@
+{
+    "@timestamp": "2017-10-12T08:05:34.853Z",
+    "aws": {
+        "awshealth": {
+            "affected_entities": [
+                {
+                    "aws_account_id": "627286350134",
+                    "entity_url": "",
+                    "entity_value": "arn:aws:eks:us-east-2:627286350134:cluster/michaliskatsoulisfargate",
+                    "last_updated_time": "2024-02-26T21:44:05.825Z",
+                    "status_code": "",
+                    "entity_arn": "arn:aws:health:us-east-2:627286350134:entity/g1vUSeoFZcvk3ucsO-BHDR55XHsSYYfs6wqo1QhqQeEto=1g"
+                }
+            ],
+            "affected_entities_others": 0,
+            "affected_entities_pending": 0,
+            "affected_entities_resolved": 0,
+            "end_time": "0001-01-01T00:00:00Z",
+            "event_arn": "arn:aws:health:us-east-2::event/EKS/AWS_EKS_OPERATIONAL_NOTIFICATION/AWS_EKS_OPERATIONAL_NOTIFICATION_5edf7d286ca1fbcdd70306479c60f8fd560afa53f174d79ae319faaedfc94646",
+            "event_scope_code": "ACCOUNT_SPECIFIC",
+            "event_type_category": "accountNotification",
+            "event_type_code": "AWS_EKS_OPERATIONAL_NOTIFICATION",
+            "last_updated_time": "2024-02-26T22:00:11.574Z",
+            "region": "us-east-2",
+            "service": "EKS",
+            "start_time": "2024-02-26T21:35:00Z",
+            "status_code": "open"
+        }
+    },
+    "cloud.provider": "aws",
+    "event": {
+        "dataset": "aws.awshealth",
+        "duration": 115000,
+        "module": "aws"
+    },
+    "metricset": {
+        "name": "awshealth",
+        "period": 10000
+    },
+    "service": {
+        "type": "aws"
+    }
+}
