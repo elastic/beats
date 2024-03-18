@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-source .buildkite/scripts/common.sh
-
 set -euo pipefail
 REPO="beats"
 TMP_FOLDER="tmp.${REPO}"
@@ -68,5 +66,6 @@ fi
 
 if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" ]]; then
   # Set the MODULE env variable if possible, it should be defined before generating pipeline's steps. It is used in multiple pipelines.
+  source .buildkite/scripts/common.sh
   defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
 fi
