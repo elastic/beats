@@ -11,6 +11,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -23,8 +24,11 @@ import (
 	"github.com/magefile/mage/mg"
 	"github.com/magefile/mage/sh"
 
+	"github.com/elastic/beats/v7/dev-tools/mage"
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/release"
+	"github.com/elastic/beats/v7/dev-tools/mage/manifest"
+	"github.com/elastic/beats/v7/dev-tools/mage/version"
+	bversion "github.com/elastic/beats/v7/libbeat/version"
 
 	// mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
@@ -52,6 +56,10 @@ var Aliases = map[string]interface{}{
 	"build": Build.All,
 	"demo":  Demo.Enroll,
 }
+
+var errNoManifest = errors.New("missing ManifestURL environment variable")
+var errNoAgentDropPath = errors.New("missing AGENT_DROP_PATH environment variable")
+var errAtLeastOnePlatform = errors.New("elastic-agent package is expected to build at least one platform package")
 
 func init() {
 	common.RegisterCheckDeps(Update, Check.All)
@@ -335,6 +343,52 @@ func Ironbank() error {
 	return devtools.Ironbank()
 }
 
+func FixDRADockerArtifacts() error {
+	return devtools.FixDRADockerArtifacts()
+}
+
+// DownloadManifest downloads the provided manifest file into the predefined folder
+func DownloadManifest() error {
+	fmt.Println("--- Downloading manifest")
+	start := time.Now()
+	defer func() { fmt.Println("Downloading manifest took", time.Since(start)) }()
+
+	dropPath, found := os.LookupEnv(agentDropPath)
+
+	if !found {
+		return errNoAgentDropPath
+	}
+
+	if !devtools.PackagingFromManifest {
+		return errNoManifest
+	}
+
+	platforms := devtools.Platforms.Names()
+	if len(platforms) == 0 {
+		return errAtLeastOnePlatform
+	}
+
+	platformPackages := map[string]string{
+		"darwin/amd64":  "darwin-x86_64.tar.gz",
+		"darwin/arm64":  "darwin-aarch64.tar.gz",
+		"linux/amd64":   "linux-x86_64.tar.gz",
+		"linux/arm64":   "linux-arm64.tar.gz",
+		"windows/amd64": "windows-x86_64.zip",
+	}
+
+	var requiredPackages []string
+	for _, p := range platforms {
+		requiredPackages = append(requiredPackages, platformPackages[p])
+	}
+
+	if e := manifest.DownloadComponentsFromManifest(devtools.ManifestURL, platforms, platformPackages, dropPath); e != nil {
+		return fmt.Errorf("failed to download the manifest file, %w", e)
+	}
+	log.Printf(">> Completed downloading packages from manifest into drop-in %s", dropPath)
+
+	return nil
+}
+
 func requiredPackagesPresent(basePath, beat, version string, requiredPackages []string) bool {
 	for _, pkg := range requiredPackages {
 		if _, ok := os.LookupEnv(snapshotEnv); ok {
@@ -348,6 +402,7 @@ func requiredPackagesPresent(basePath, beat, version string, requiredPackages []
 			return false
 		}
 	}
+	fmt.Printf("All packages for %s are present\n", beat)
 	return true
 }
 
@@ -392,6 +447,7 @@ func Update() {
 
 // CrossBuild cross-builds the beat for all target platforms.
 func CrossBuild() error {
+	fmt.Printf(">> Crossbuild")
 	return devtools.CrossBuild()
 }
 
@@ -566,10 +622,34 @@ func runAgent(env map[string]string) error {
 }
 
 func packageAgent(requiredPackages []string, packagingFn func()) {
-	version, found := os.LookupEnv("BEAT_VERSION")
-	if !found {
-		version = release.Version()
+	fmt.Println("--- Package Elastic-Agent")
+	var packageVersion string
+	// if we have defined a manifest URL to package Agent from, we should be using the same packageVersion of that manifest
+	if devtools.PackagingFromManifest {
+		fmt.Println(">>>> Using manifest to package Agent")
+		if manifestResponse, err := manifest.DownloadManifest(devtools.ManifestURL); err != nil {
+			log.Panicf("failed to download remote manifest file %s", err)
+		} else {
+			if parsedVersion, err := version.ParseVersion(manifestResponse.Version); err != nil {
+				log.Panicf("the manifest version from manifest is not semver, got %s", manifestResponse.Version)
+			} else {
+				// When getting the packageVersion from snapshot we should also update the env of SNAPSHOT=true which is
+				// something that we use as an implicit parameter to various functions
+				if parsedVersion.IsSnapshot() {
+					os.Setenv(snapshotEnv, "true")
+					mage.Snapshot = true
+				}
+				os.Setenv("BEAT_VERSION", parsedVersion.CoreVersion())
+			}
+		}
 	}
+	if beatVersion, found := os.LookupEnv("BEAT_VERSION"); !found {
+		packageVersion = bversion.GetDefaultVersion()
+	} else {
+		packageVersion = beatVersion
+	}
+
+	fmt.Printf(">>> BEAT_VERSION: %s\n", packageVersion)
 
 	// build deps only when drop is not provided
 	if dropPathEnv, found := os.LookupEnv(agentDropPath); !found || len(dropPathEnv) == 0 {
@@ -608,7 +688,7 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 				panic(err)
 			}
 
-			if !requiredPackagesPresent(pwd, b, version, requiredPackages) {
+			if !requiredPackagesPresent(pwd, b, packageVersion, requiredPackages) {
 				cmd := exec.Command("mage", "package")
 				cmd.Dir = pwd
 				cmd.Stdout = os.Stdout
@@ -617,7 +697,8 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 				if envVar := selectedPackageTypes(); envVar != "" {
 					cmd.Env = append(cmd.Env, envVar)
 				}
-
+				fmt.Println(">>> Running mage package for %s\n", b)
+				fmt.Println(cmd.String())
 				if err := cmd.Run(); err != nil {
 					panic(err)
 				}

@@ -1,0 +1,127 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+
+steps:
+  - input: "Build parameters"
+    if: build.env("ManifestURL") == null
+    fields:
+      - text: "ManifestURL"
+        key: "ManifestURL"
+        default: ""
+        required: true
+        hint: "Link to the build manifest URL."
+      - select: "Mage verbose"
+        key: "MAGEFILE_VERBOSE"
+        required: false
+        options:
+          - label: "True"
+            value: "1"
+          - label: "False"
+            value: "0"
+        hint: "Increase verbosity of the mage commands, defaults to False"
+      - select: "DRA Workflow"
+        key: "DRA_WORKFLOW"
+        required: true
+        options:
+          - label: "snapshot"
+            value: "snapshot"
+          - label: "staging"
+            value: "staging"
+        hint: "What workflow of the DRA release process this build is going to be triggered for"
+      - text: "DRA Version"
+        key: "DRA_VERSION"
+        required: true
+        default: ""
+        hint: "The packaging version to use"
+      - select: "DRA DRY-RUN"
+        key: "DRA_DRY_RUN"
+        required: false
+        options:
+          - label: "True"
+            value: "--dry-run"
+          - label: "False"
+            value: ""
+        hint: "If the DRA release manager script would actually publish anything or just print"
+
+  - wait: ~
+    if: build.env("ManifestURL") == null
+
+  - group: ":Packaging Artefacts"
+    key: "package"
+    steps:
+      - label: "Package elastic-agent"
+        key: package_elastic-agent
+        command: |
+          if [[ -z "$${ManifestURL}" ]]; then
+            export ManifestURL=$(buildkite-agent meta-data get ManifestURL --default "")
+            if [[ -z "$${ManifestURL}" ]]; then
+              echo ":broken_heart: Missing ManifestURL variable or empty string provided"
+              echo "Provided ManifestURL: ${ManifestURL}"
+              exit 1
+            fi
+          fi
+          if [[ -z "$${MAGEFILE_VERBOSE}" ]]; then
+            export MAGEFILE_VERBOSE=$(buildkite-agent meta-data get MAGEFILE_VERBOSE --default "0")
+          fi
+          .buildkite/x-pack/elastic-agent/scripts/steps/package.sh
+        artifact_paths:
+          - "x-pack/elastic-agent/build/distributions/**/*"
+        agents:
+          provider: "gcp"
+          image: "family/platform-ingest-beats-ubuntu-2204"
+
+      - label: "Package ARM elastic-agent"
+        env:
+          PLATFORMS: "linux/arm64"
+          PACKAGES: "docker"
+        key: package_elastic-agent-arm
+        command: |
+          if [[ -z "$${ManifestURL}" ]]; then
+            export ManifestURL=$(buildkite-agent meta-data get ManifestURL --default "")
+            if [[ -z "$${ManifestURL}" ]]; then
+              echo ":broken_heart: Missing ManifestURL variable or empty string provided"
+              echo "Provided ManifestURL: ${ManifestURL}"
+              exit 1
+            fi
+          fi
+          if [[ -z "$${MAGEFILE_VERBOSE}" ]]; then
+            export MAGEFILE_VERBOSE=$(buildkite-agent meta-data get MAGEFILE_VERBOSE --default "0")
+          fi
+          .buildkite/x-pack/elastic-agent/scripts/steps/package.sh
+        artifact_paths:
+          - "x-pack/elastic-agent/build/distributions/**/*"
+        agents:
+          provider: "aws"
+          instanceType: "t4g.2xlarge"
+          imagePrefix: "platform-ingest-beats-ubuntu-2004-aarch64"
+  #
+  - label: ":elastic-stack: Publishing to DRA"
+    key: dra-publish
+    depends_on: package
+    agents:
+      provider: "gcp"
+    env:
+      DRA_PROJECT_ID: "elastic-agent-package"
+      DRA_PROJECT_ARTIFACT_ID: "agent-package"
+    command: |
+      echo "+++ Restoring Artifacts"
+      mkdir build       
+      buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" .
+      echo "+++ Changing permissions for the release manager"
+      sudo chown -R :1000 x-pack/elastic-agent/build/distributions/
+      echo "+++ Running DRA publish step"
+      if [[ -z "${MAGEFILE_VERBOSE}" ]]; then
+        export MAGEFILE_VERBOSE=$(buildkite-agent meta-data get MAGEFILE_VERBOSE --default "0")
+      fi
+      if [[ -z "${DRA_DRY_RUN}" ]]; then
+        DRA_DRY_RUN=$(buildkite-agent meta-data get DRA_DRY_RUN --default "")
+        export DRA_DRY_RUN
+      fi
+      if [[ -z "${DRA_VERSION}" ]]; then
+        DRA_VERSION=$(buildkite-agent meta-data get DRA_VERSION --default "")
+        export DRA_VERSION
+      fi
+      if [[ -z "${DRA_WORKFLOW}" ]]; then
+        DRA_WORKFLOW=$(buildkite-agent meta-data get DRA_WORKFLOW --default "")
+        export DRA_WORKFLOW
+      fi      
+      .buildkite/x-pack/elastic-agent/scripts/steps/dra-publish.sh
