@@ -12,10 +12,10 @@ stages:
     mandatory:
         # NOTE: stage name should be unique!
         unitTest:
-            command: ".buildkite/auditbeat/scripts/unit-tests.sh"
+            command: "mage -d auditbeat build unitTest"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         crosscompile:
-            command: ".buildkite/auditbeat/scripts/crosscompile.sh"
+            command: "make -C auditbeat crosscompile"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         unitTest-rhel-9:
             command: ".buildkite/auditbeat/scripts/unit-tests.sh"
