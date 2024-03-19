@@ -2,9 +2,8 @@
 
 set -euo pipefail
 
-source .buildkite/scripts/common.sh
-
 echo "+++ Build Agent artifacts"
+
 SNAPSHOT=""
 BEAT_VERSION_FULL=$BEAT_VERSION
 if [ "$DRA_WORKFLOW" == "snapshot" ]; then
