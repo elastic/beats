@@ -12,13 +12,13 @@ stages:
     mandatory:
         # NOTE: stage name should be unique!
         unitTest:
-            command: "mage auditbeat build unitTest"
+            command: "mage -d auditbeat build unitTest"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         crosscompile:
             command: "make -C auditbeat crosscompile"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         unitTest-rhel-9:
-            command: "mage auditbeat build unitTest"
+            command: "mage -d auditbeat build unitTest"
             platform: "family/platform-ingest-beats-rhel-9"
         unitTest-windows-2022:
             command: "mage build unitTest"
