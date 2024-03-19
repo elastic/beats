@@ -12,6 +12,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"math/big"
 	"net/http"
@@ -162,7 +163,10 @@ func (i *base64int) UnmarshalJSON(b []byte) error {
 func generateOktaJWTPEM(pemdata string, cnf *oauth2.Config) (string, error) {
 	blk, rest := pem.Decode([]byte(pemdata))
 	if rest := bytes.TrimSpace(rest); len(rest) != 0 {
-		return "", fmt.Errorf("PEM text has trailing data: %s", rest)
+		return "", fmt.Errorf("PEM text has trailing data: %d bytes", len(rest))
+	}
+	if blk == nil {
+		return "", errors.New("no PEM data")
 	}
 	key, err := x509.ParsePKCS8PrivateKey(blk.Bytes)
 	if err != nil {

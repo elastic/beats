@@ -345,7 +345,10 @@ func (o *oAuth2Config) validateOktaProvider() error {
 	if o.OktaJWKPEM != "" {
 		blk, rest := pem.Decode([]byte(o.OktaJWKPEM))
 		if rest := bytes.TrimSpace(rest); len(rest) != 0 {
-			return fmt.Errorf("PEM text has trailing data: %s", rest)
+			return fmt.Errorf("okta validation error: PEM text has trailing data: %d bytes", len(rest))
+		}
+		if blk == nil {
+			return errors.New("okta validation error: no PEM data")
 		}
 		_, err := x509.ParsePKCS8PrivateKey(blk.Bytes)
 		if err != nil {
