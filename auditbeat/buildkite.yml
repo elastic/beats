@@ -34,21 +34,21 @@ stages:
     extended:
         # NOTE: stage name should be unique!
         integTest:
-            command: ".buildkite/auditbeat/scripts/integ-test.sh"
+            command: "mage -d auditbeat build integTest"
             platform: "platform-ingest-beats-ubuntu-2204-aarch64"
             provider: "aws"
         integTest-arm:
-            command: ".buildkite/auditbeat/scripts/integ-test.sh"
+            command: "mage -d auditbeat build integTest"
             platform: "platform-ingest-beats-ubuntu-2204-aarch64"
             provider: "aws"
         unitTest-arm:
-            command: ".buildkite/auditbeat/scripts/unit-tests.sh"
+            command: "mage -d auditbeat build unitTest"
             platform: "platform-ingest-beats-ubuntu-2204-aarch64"
             provider: "aws"
         unitTest-macos:
-            command: ".buildkite/auditbeat/scripts/unit-tests.sh"
+            command: "mage -d auditbeat build unitTest"
             platform: "generic-13-ventura-x64"
             provider: "orka"
         unitTest-windows-2019:
-            command: ".buildkite/auditbeat/scripts/unit-tests-win.ps1"
+            command: "mage build unitTest"
             platform: "family/core-windows-2019"
