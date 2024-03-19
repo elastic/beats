@@ -5,11 +5,8 @@
 package httpjson
 
 import (
-	"bytes"
 	"context"
-	"crypto/x509"
 	"encoding/json"
-	"encoding/pem"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -311,14 +308,7 @@ func (o *oAuth2Config) validateOktaProvider() error {
 	}
 	// jwk_pem
 	if o.OktaJWKPEM != "" {
-		blk, rest := pem.Decode([]byte(o.OktaJWKPEM))
-		if rest := bytes.TrimSpace(rest); len(rest) != 0 {
-			return fmt.Errorf("okta validation error: PEM text has trailing data: %d bytes", len(rest))
-		}
-		if blk == nil {
-			return errors.New("okta validation error: no PEM data")
-		}
-		_, err := x509.ParsePKCS8PrivateKey(blk.Bytes)
+		_, err := pemPKCS8PrivateKey([]byte(o.OktaJWKPEM))
 		if err != nil {
 			return fmt.Errorf("okta validation error: %w", err)
 		}

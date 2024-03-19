@@ -161,18 +161,22 @@ func (i *base64int) UnmarshalJSON(b []byte) error {
 }
 
 func generateOktaJWTPEM(pemdata string, cnf *oauth2.Config) (string, error) {
-	blk, rest := pem.Decode([]byte(pemdata))
-	if rest := bytes.TrimSpace(rest); len(rest) != 0 {
-		return "", fmt.Errorf("PEM text has trailing data: %d bytes", len(rest))
-	}
-	if blk == nil {
-		return "", errors.New("no PEM data")
-	}
-	key, err := x509.ParsePKCS8PrivateKey(blk.Bytes)
+	key, err := pemPKCS8PrivateKey([]byte(pemdata))
 	if err != nil {
 		return "", err
 	}
 	return signJWT(cnf, key)
+}
+
+func pemPKCS8PrivateKey(pemdata []byte) (any, error) {
+	blk, rest := pem.Decode(pemdata)
+	if rest := bytes.TrimSpace(rest); len(rest) != 0 {
+		return nil, fmt.Errorf("PEM text has trailing data: %d bytes", len(rest))
+	}
+	if blk == nil {
+		return nil, errors.New("no PEM data")
+	}
+	return x509.ParsePKCS8PrivateKey(blk.Bytes)
 }
 
 // signJWT creates a JWT token using required claims and sign it with the
