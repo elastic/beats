@@ -139,7 +139,7 @@ func (m *MetricSet) getEventsSummary(
 		},
 	}
 
-	var nextTokenString string = ""
+	var nextTokenString = ""
 	var eventOutput *health.DescribeEventsOutput
 	var err error
 
@@ -164,7 +164,6 @@ func (m *MetricSet) getEventsSummary(
 			err = fmt.Errorf("AWS Health DescribeEvents failed with %w", err)
 			m.Logger().Error(err.Error())
 			return nil
-
 		}
 		ets := eventOutput.Events
 		c := make(chan HealthDetails)
@@ -179,20 +178,7 @@ func (m *MetricSet) getEventsSummary(
 		}
 
 		for _, et := range ets {
-			fmt.Printf("ARN : %s\n", *(et.Arn))
-			if az := et.AvailabilityZone; az != nil {
-				fmt.Println("AZ", *(et.AvailabilityZone))
-			}
-			fmt.Println("End Time:", et.EndTime)
-			fmt.Println("Event Scope Code:", et.EventScopeCode)
-			fmt.Println("Event Type Category:", et.EventTypeCategory)
-			fmt.Println("Event Type Code:", *(et.EventTypeCode))
-			fmt.Println("Last updated Time:", et.LastUpdatedTime)
-			fmt.Println("Region:", *(et.Region))
-			fmt.Println("Service:", *(et.Service))
-			fmt.Println("Start Time:", et.StartTime)
-			fmt.Println("Event Status Code:", et.StatusCode)
-			fmt.Println("--------------------------")
+			m.Logger().Debugf("[AWS Health] [Fetch DescribeEventDetails] Event ARN : %s", getStringValueOrDefault(et.Arn))
 			go m.getDescribeEventDetails(ctx, awsHealth, et, c)
 		}
 
@@ -201,21 +187,14 @@ func (m *MetricSet) getEventsSummary(
 			case <-ctx.Done():
 				// Context cancelled, handle graceful termination
 				m.Logger().Debug("Context cancelled. Exiting gracefully.")
-
 				close(c)
 				return nil
 			case healthDetails, ok := <-c:
 				if !ok {
 					return nil
 				}
-				fmt.Println("Heatlh Details ARN", *healthDetails.event.Arn)
-				fmt.Println("Health Details Event Description", healthDetails.eventDescription)
-				fmt.Println("Health Details Pending", healthDetails.affectedEntityPending)
-				fmt.Println("Health Details Pending", healthDetails.affectedEntityResolved)
-				fmt.Println("")
-				fmt.Println("-------------------------------------------")
+				m.Logger().Debugf("[AWS Health] [DescribeEventDetails] Event ARN : %s, Affected Entities (Pending) : %d, Affected Entities (Resolved): %d, Affected Entities (Others) : %d", *healthDetails.event.Arn, healthDetails.affectedEntityPending, healthDetails.affectedEntityResolved, healthDetails.affectedEntityOthers)
 				events = append(events, createEvents(healthDetails))
-				fmt.Println("Event size ", len(events))
 			}
 		}
 		if eventOutput.NextToken == nil {
@@ -293,7 +272,7 @@ func getTimeValueOrDefault(t *time.Time) time.Time {
 // based on the given list of AffectedEntity instances.
 // Each AffectedEntity is converted into an AffectedEntityDetails struct,
 func createAffectedEntityDetails(affectedEntities []types.AffectedEntity) []AffectedEntityDetails {
-	var aed []AffectedEntityDetails
+	aed := []AffectedEntityDetails{}
 	// Populate a slice of AffectedEntityDetails
 	for _, entity := range affectedEntities {
 		aed = append(aed, AffectedEntityDetails{
@@ -335,7 +314,7 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 		hd.eventDescription = *(eventDetails.SuccessfulSet[0].EventDescription.LatestDescription)
 	}
 
-	var affEntityTokString string = ""
+	var affEntityTokString = ""
 	var nextToken *string
 	var pending int32 = 0
 	var resolved int32 = 0
