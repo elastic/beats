@@ -6,11 +6,12 @@ env:
   BEAT_URL: "https://www.elastic.co/elastic-agent"
   DRA_PROJECT_ID: "elastic-agent-core"
   DRA_PROJECT_ARTIFACT_ID: "agent-core"
+  ASDF_MAGE_VERSION: 1.15.0
 
 steps:
   - group: ":beats: DRA Elastic-Agent Core Snapshot :beats:"
     key: "dra-core-snapshot"
-    if: build.branch == 'main' || build.branch =~ /^[0-9]+\.[0-9]+\$/ || build.env("RUN_SNAPSHOT") == "true"
+    if: build.branch == '7.17' || build.branch =~ /^[0-9]+\.[0-9]+\$/ || build.env("RUN_SNAPSHOT") == "true"
     steps:
       - label: ":package: Build Elastic-Agent Core Snapshot"
         commands:
@@ -21,6 +22,7 @@ steps:
         agents:
           provider: "gcp"
           machineType: "c2-standard-16"
+          image: "platform-ingest-beats-ubuntu-2204"
         env:
           DRA_WORKFLOW: "snapshot"
 
@@ -38,12 +40,13 @@ steps:
         agents:
           provider: "gcp"
           machineType: "c2-standard-16"
+          image: "platform-ingest-beats-ubuntu-2204"
         env:
           DRA_WORKFLOW: "snapshot"
 
   - group: ":beats: DRA Elastic-Agent Core Staging :beats:"
     key: "dra-core-staging"
-    if: build.branch =~ /^[0-9]+\.[0-9]+\$/ || build.env("RUN_STAGING") == "true"
+    if: build.branch == '7.17' || build.env("RUN_STAGING") == "true"
     steps:
       - label: ":package: Build Elastic-Agent Core staging"
         commands:
@@ -54,6 +57,7 @@ steps:
         agents:
           provider: "gcp"
           machineType: "c2-standard-16"
+          image: "platform-ingest-beats-ubuntu-2204"
         env:
           DRA_WORKFLOW: "staging"
 
@@ -71,6 +75,7 @@ steps:
         agents:
           provider: "gcp"
           machineType: "c2-standard-16"
+          image: "platform-ingest-beats-ubuntu-2204"
         env:
           DRA_WORKFLOW: "staging"
 
