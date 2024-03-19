@@ -389,7 +389,7 @@ def main() -> None:
     yaml = YAML(typ="safe")
     all_groups = []
     if is_pr() and not os.getenv("GITHUB_PR_TRIGGER_COMMENT"):
-        all_groups = fetch_pr_pipeline()
+        all_groups = fetch_pr_pipeline(yaml)
 
     if is_pr() and os.getenv("GITHUB_PR_TRIGGER_COMMENT"):
         print(
