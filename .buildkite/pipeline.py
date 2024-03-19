@@ -130,20 +130,6 @@ def is_pr() -> bool:
     return os.getenv('BUILDKITE_PULL_REQUEST') != "false"
 
 
-def step_comment(step: Step) -> bool:
-    comment = os.getenv('GITHUB_PR_TRIGGER_COMMENT')
-    if comment:
-        # TODO: change /test
-        comment_prefix = "buildkite test " + step.project
-        # i.e: /test filebeat should run all the mandatory stages
-        if step.category == "mandatory" and comment_prefix == comment:
-            return True
-        # i.e: /test filebeat unitTest
-        return comment_prefix + " " + step.name in comment
-    else:
-        return True
-
-
 def group_comment(group: Group) -> bool:
     comment = os.getenv('GITHUB_PR_TRIGGER_COMMENT')
     if comment:
@@ -181,7 +167,7 @@ def get_pr_changeset():
 def filter_files_by_glob(files, patterns: list[str]):
     for pattern in patterns:
         # TODO: Support glob extended patterns: ^ and etc.
-        # Now it supports only linux glob patterns
+        # Now it supports only linux glob syntax
         if fnmatch.filter(files, pattern):
             return True
     return False
@@ -190,23 +176,6 @@ def filter_files_by_glob(files, patterns: list[str]):
 def is_in_pr_changeset(project_changeset_filters: list[str]) -> bool:
     changeset = get_pr_changeset()
     return filter_files_by_glob(changeset, project_changeset_filters)
-
-
-def is_step_enabled(step: Step) -> bool:
-    if not is_pr():
-        return True
-
-    if step_comment(step):
-        return True
-
-    labels_env = os.getenv('GITHUB_PR_LABELS')
-    if labels_env:
-        labels = labels_env.split()
-        # i.e: filebeat-unitTest
-        if step.project + '-' + step.name in labels:
-            return True
-
-    return False
 
 
 def is_group_enabled(group: Group, changeset_filters: list[str]) -> bool:
@@ -245,14 +214,11 @@ def fetch_group(stages, project: str, category: str) -> Group:
     steps = []
 
     for stage in stages:
-        step = fetch_stage(
+        steps.append(fetch_stage(
                 category=category,
                 name=stage,
                 project=project,
-                stage=stages[stage])
-
-        if is_step_enabled(step):
-            steps.append(step)
+                stage=stages[stage]))
 
     return Group(
                 project=project,
@@ -260,9 +226,7 @@ def fetch_group(stages, project: str, category: str) -> Group:
                 steps=steps)
 
 
-# TODO: validate unique stages!
-def main() -> None:
-
+def fetch_pr_pipeline() -> list[Group]:
     groups = []
     extended_groups = []
     with open(".buildkite/buildkite.yml", "r", encoding="utf8") as file:
@@ -286,7 +250,7 @@ def main() -> None:
                                     project=project,
                                     category="extended")
 
-                if is_group_enabled(group, project_obj["when"]["changeset"]):                    
+                if is_group_enabled(group, project_obj["when"]["changeset"]):
                     extended_groups.append(group)
 
     # TODO: improve this merging lists
@@ -295,6 +259,128 @@ def main() -> None:
         all_groups.append(group)
     for group in sorted(extended_groups):
         all_groups.append(group)
+
+    return all_groups
+
+
+class PRComment:
+    command: str
+    group: str
+    project: str
+    step: str
+
+    def __init__(self, comment: str):
+        words = comment.split()
+        self.command = words.pop(0) if words else ""
+        self.project = words.pop(0) if words else ""
+        self.group = words.pop(0) if words else ""
+        self.step = words.pop(0) if words else ""
+
+
+# A comment like "/test filebeat extended"
+# Returns a group of steps corresponding to the comment
+def fetch_pr_comment_group_pipeline(comment: PRComment) -> list[Group]:
+    groups = []
+    with open(".buildkite/buildkite.yml", "r", encoding="utf8") as file:
+        doc = yaml.load(file, yaml.FullLoader)
+        if comment.project in doc["projects"]:
+            project_file = os.path.join(comment.project, "buildkite.yml")
+
+            if not os.path.isfile(project_file):
+                raise FileNotFoundError("buildkite.yml not found in: " +
+                                        "{}".format(comment.project))
+            with open(project_file, "r", encoding="utf8") as file:
+                project_obj = yaml.load(file, yaml.FullLoader)
+
+                if not project_obj["stages"][comment.group]:
+                    raise ValueError("Group not found in {} buildkike.yml: {}"
+                                     .format(comment.project, comment.group))
+
+                group = fetch_group(
+                    stages=project_obj["stages"][comment.group],
+                    project=comment.project,
+                    category="mandatory"
+                )
+                groups.append(group)
+
+    return groups
+
+
+# A comment like "/test filebeat extended unitTest-macos"
+def fetch_pr_comment_step_pipeline(comment: PRComment) -> list[Group]:
+    groups = []
+    with open(".buildkite/buildkite.yml", "r", encoding="utf8") as file:
+        doc = yaml.load(file, yaml.FullLoader)
+        if comment.project in doc["projects"]:
+            project_file = os.path.join(comment.project, "buildkite.yml")
+
+            if not os.path.isfile(project_file):
+                raise FileNotFoundError("buildkite.yml not found in: " +
+                                        "{}".format(comment.project))
+            with open(project_file, "r", encoding="utf8") as file:
+                project_obj = yaml.load(file, yaml.FullLoader)
+
+                if not project_obj["stages"][comment.group]:
+                    raise ValueError("Group not found in {} buildkike.yml: {}"
+                                     .format(comment.project, comment.group))
+
+                group = fetch_group(
+                    stages=project_obj["stages"][comment.group],
+                    project=comment.project,
+                    category="mandatory"
+                )
+
+                filtered_steps = list(filter(
+                    lambda step: step.name == comment.step,
+                    group.steps
+                ))
+
+                if not filtered_steps:
+                    raise ValueError("Step {} not found in {} buildkike.yml"
+                                     .format(comment.step, comment.project))
+                group.steps = filtered_steps
+                groups.append(group)
+
+        return groups
+
+
+def pr_comment_pipeline(pr_comment: PRComment) -> list[Group]:
+
+    if pr_comment.command == "/test":
+
+        # A comment like "/test" for a PR
+        # We rerun the PR pipeline
+        if not pr_comment.group:
+            return fetch_pr_pipeline()
+
+        # A comment like "/test filebeat"
+        # We don't know what group to run hence raise an error
+        if pr_comment.project and not pr_comment.group:
+            raise ValueError(
+                "Specify group or/and step for {}".format(pr_comment.project)
+            )
+
+        # A comment like "/test filebeat extended"
+        # We rerun the filebeat extended pipeline for the PR
+        if pr_comment.group and not pr_comment.step:
+            return fetch_pr_comment_group_pipeline(pr_comment)
+
+        # A comment like "/test filebeat extended unitTest-macos"
+        if pr_comment.step:
+            return fetch_pr_comment_step_pipeline(pr_comment)
+
+
+# TODO: validate unique stages!
+def main() -> None:
+    all_groups = []
+    if is_pr() and not os.getenv('GITHUB_PR_TRIGGER_COMMENT'):
+        all_groups = fetch_pr_pipeline()
+
+    if is_pr() and os.getenv('GITHUB_PR_TRIGGER_COMMENT'):
+        print("GITHUB_PR_TRIGGER_COMMENT: {}".format(
+            os.getenv('GITHUB_PR_TRIGGER_COMMENT')))
+        comment = PRComment(os.getenv('GITHUB_PR_TRIGGER_COMMENT'))
+        all_groups = pr_comment_pipeline(comment)
 
     # Produce now the pipeline
     print(yaml.dump(Pipeline(all_groups).create_entity()))
