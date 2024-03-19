@@ -56,10 +56,16 @@ exportVars() {
   fi
 }
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" ]]; then
   exportVars
   export RACE_DETECTOR="true"
   export TEST_COVERAGE="true"
   export DOCKER_PULL="0"
   export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}oracle"
+fi
+
+if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" ]]; then
+  # Set the MODULE env variable if possible, it should be defined before generating pipeline's steps. It is used in multiple pipelines.
+  source .buildkite/scripts/common.sh
+  defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
 fi
