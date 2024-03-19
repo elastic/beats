@@ -21,10 +21,10 @@ stages:
             command: "mage -d auditbeat build unitTest"
             platform: "family/platform-ingest-beats-rhel-9"
         unitTest-windows-2022:
-            command: "mage build unitTest"
+            command: "mage -d auditbeat  build unitTest"
             platform: "family/platform-ingest-beats-windows-2022"
         unitTest-windows-2016:
-            command: "mage build unitTest"
+            command: "mage -d auditbeat  build unitTest"
             platform: "family/platform-ingest-beats-windows-2016"
     # optional stage - it runs on:
     #   - branches/tags
@@ -50,5 +50,5 @@ stages:
             platform: "generic-13-ventura-x64"
             provider: "orka"
         unitTest-windows-2019:
-            command: "mage build unitTest"
+            command: "mage -d auditbeat  build unitTest"
             platform: "family/core-windows-2019"
