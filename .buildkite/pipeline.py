@@ -86,7 +86,7 @@ class Step:
             "notify": [
                 {
                     "github_commit_status": {
-                        "context": f"{self.project}: {self.name}",
+                        "context": f"{self.project.title()}: {self.name}",
                     }
                 }
             ],
