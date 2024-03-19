@@ -19,6 +19,7 @@ you can achieve this by overwriting the value using an `add_fields` processor. {
 version of Elastic Agent as their own version. This includes all additional
 fields added to events containing the Beats version. {pull}37553[37553]
 - The behavior of `queue.mem.flush.min_events` has been simplified. It now serves as a simple maximum on the size of all event batches. There are no longer performance implications in its relationship to `bulk_max_size`. {pull}37795[37795]
+-  Introduce log message for not supported annotations for Hints based autodiscover {pull}38213[38213]
 
 *Auditbeat*
 

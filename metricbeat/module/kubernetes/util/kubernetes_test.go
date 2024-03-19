@@ -161,6 +161,10 @@ type mockWatcher struct {
 	started bool
 }
 
+func (m *mockWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
+	return m.handler
+}
+
 func (m *mockWatcher) Start() error {
 	m.started = true
 	return nil
