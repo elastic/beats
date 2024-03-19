@@ -190,7 +190,7 @@ func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
 		return nil, err
 	}
 
-	// set clientSession for re-use (EventLogFile)
+	// Set clientSession for re-use.
 	s.clientSession = session
 
 	// Create a new SOQL resource using the session.
@@ -494,6 +494,10 @@ func newClient(cfg config, log *logp.Logger) (*http.Client, error) {
 			Backoff:      retryablehttp.DefaultBackoff,
 			ErrorHandler: retryErrorHandler(maxAttempts, log),
 		}).StandardClient()
+
+		// BUG: retryablehttp ignores the timeout previously set. So, setting it
+		// again.
+		c.Timeout = cfg.Resource.Transport.Timeout
 	}
 
 	return c, nil
