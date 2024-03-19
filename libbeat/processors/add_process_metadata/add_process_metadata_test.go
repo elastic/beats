@@ -43,7 +43,7 @@ func TestAddProcessMetadata(t *testing.T) {
 
 	capMock, err := capabilities.FromUint64(0xabacabb)
 	if err != nil {
-		t.Fatal(err)
+		t.Fatalf("could not instantiate capabilities: %s", err)
 	}
 	startTime := time.Now()
 	testProcs := testProvider{
