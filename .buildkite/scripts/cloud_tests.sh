@@ -9,9 +9,6 @@ set -euo pipefail
 
 trap 'teardown || true; unset_secrets' EXIT
 
-# Set the MODULE env variable if possible
-defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
-
 # Prepare the cloud resources using Terraform
 startCloudTestEnv "${MODULE_DIR}"
 

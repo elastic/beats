@@ -27,23 +27,23 @@ steps:
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
         command: ".buildkite/scripts/go_int_tests.sh"
+        env:
+          MODULE: $MODULE
         agents:
           provider: "gcp"
           image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: ".buildkite/scripts/py_int_tests.sh"
+        env:
+          MODULE: $MODULE
         agents:
           provider: "gcp"
           image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
@@ -106,8 +106,7 @@ else
 fi
 
 #TODO: replace by commented-out below condition when issues mentioned in the PR https://github.com/elastic/beats/pull/38081 are resolved
-if [[ are_conditions_met_aws_tests || are_conditions_met_macos_tests ]]; then
-# if [[ are_conditions_met_macos_tests ]]; then
+if are_conditions_met_aws_tests || are_conditions_met_macos_tests ; then
   cat >> $pipelineName <<- YAML
 
   - group: "Extended Tests"
@@ -136,12 +135,12 @@ if  are_conditions_met_aws_tests; then
       - label: ":linux: Cloud Tests"
         key: "extended-cloud-test"
         command: ".buildkite/scripts/cloud_tests.sh"
+        env:
+          MODULE: $MODULE
         agents:
           provider: "gcp"
           image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
@@ -166,6 +165,8 @@ if are_conditions_met_packaging; then
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         env:
           PLATFORMS: "${PACKAGING_PLATFORMS}"
 

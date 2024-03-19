@@ -3,6 +3,7 @@
 set -euo pipefail
 
 AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_account_auth"
+PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
 
 retry() {
   local retries=$1
@@ -33,7 +34,7 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == 
   fi
 fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-dockerlogbeat" ]]; then
   source .buildkite/scripts/setenv.sh
   if [[ "${BUILDKITE_COMMAND}" =~ ^buildkite-agent ]]; then
     echo "Skipped pre-command when running the Upload pipeline"
@@ -46,4 +47,11 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" && "$BUILDKITE_STEP
   export BEATS_AWS_SECRET_KEY
   BEATS_AWS_ACCESS_KEY=$(retry 5 vault kv get -field access_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
   export BEATS_AWS_ACCESS_KEY
+fi
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
+  if [[ "$BUILDKITE_STEP_KEY" == "extended-win-10-system-tests" || "$BUILDKITE_STEP_KEY" == "mandatory-win-2022-system-tests" ]]; then
+    PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry 5 vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
+    export PRIVATE_CI_GCS_CREDENTIALS_SECRET
+  fi
 fi
