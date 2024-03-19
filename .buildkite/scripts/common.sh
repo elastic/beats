@@ -58,7 +58,7 @@ winlogbeat_changeset=(
 xpack_auditbeat_changeset=(
   "^x-pack/auditbeat/.*"
   )
-  
+
 xpack_dockerlogbeat_changeset=(
   "^x-pack/dockerlogbeat/.*"
   )
@@ -279,40 +279,13 @@ checkLinuxType() {
   fi
 }
 
-# with_python() {
-#   local linuxType="$(checkLinuxType)"
-#   echo "${linuxType}"
-#   if [ "${platform_type}" == "Linux" ]; then
-#     if [ "${linuxType}" = "ubuntu" ]; then
-#       sudo apt-get update
-#       sudo apt-get install -y python3-pip python3-venv
-#     elif [ "${linuxType}" = "rhel" ]; then
-#       sudo dnf update -y
-#       sudo dnf install -y python3 python3-pip
-#       pip3 install virtualenv
-#     fi
-#   elif [ "${platform_type}" == "Darwin" ]; then
-#     brew update
-#     pip3 install virtualenv
-#     ulimit -Sn 10000
-#   fi
-# }
-
 with_python() {
   local linuxType="$(checkLinuxType)"
   echo "${linuxType}"
   if [ "${platform_type}" == "Linux" ]; then
     if [ "${linuxType}" = "ubuntu" ]; then
-      sudo apt-get update -y
-      sudo apt-get install -y software-properties-common
-      sudo add-apt-repository -y ppa:deadsnakes/ppa
-      sudo apt update -y
-      sudo apt upgrade -y
-      sudo apt install -y python3.11 python3.11-venv
-      sudo apt install -y python3-pip
-      export PATH="/usr/bin/python3.11:${PATH}"
-      # sudo update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
-      # sudo update-alternatives --set python3 /usr/bin/python3.11
+      sudo apt-get update
+      sudo apt-get install -y python3-pip python3-venv
     elif [ "${linuxType}" = "rhel" ]; then
       sudo dnf update -y
       sudo dnf install -y python3 python3-pip

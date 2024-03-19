@@ -18,18 +18,18 @@ steps:
 
       - label: ":linux: Ubuntu Unit (MODULE) Tests"
         key: "mandatory-linux-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         env:
           MODULE: $MODULE
         agents:
           provider: "gcp"
-          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       # - label: ":rhel: RHEL-9 Unit Tests"
       #   key: "mandatory-rhel9-unit-test"
-      #   command: ".buildkite/scripts/unit_tests.sh"
+      #   command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
       #   agents:
       #     provider: "gcp"
       #     image: "${IMAGE_RHEL9_X86_64}"
@@ -111,7 +111,7 @@ if  are_conditions_met_arm_tests; then
   cat >> $pipelineName <<- YAML
       - label: ":linux: ARM Ubuntu Unit Tests"
         key: "extended-arm64-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
