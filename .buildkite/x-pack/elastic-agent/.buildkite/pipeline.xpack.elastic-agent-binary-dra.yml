@@ -22,7 +22,7 @@ steps:
         agents:
           provider: "gcp"
           machineType: "c2-standard-16"
-          image: "platform-ingest-beats-ubuntu-2204"
+          image: "family/platform-ingest-beats-ubuntu-2204"
         env:
           DRA_WORKFLOW: "snapshot"
 
@@ -40,7 +40,7 @@ steps:
         agents:
           provider: "gcp"
           machineType: "c2-standard-16"
-          image: "platform-ingest-beats-ubuntu-2204"
+          image: "family/platform-ingest-beats-ubuntu-2204"
         env:
           DRA_WORKFLOW: "snapshot"
 
@@ -57,7 +57,7 @@ steps:
         agents:
           provider: "gcp"
           machineType: "c2-standard-16"
-          image: "platform-ingest-beats-ubuntu-2204"
+          image: "family/platform-ingest-beats-ubuntu-2204"
         env:
           DRA_WORKFLOW: "staging"
 
@@ -75,7 +75,7 @@ steps:
         agents:
           provider: "gcp"
           machineType: "c2-standard-16"
-          image: "platform-ingest-beats-ubuntu-2204"
+          image: "family/platform-ingest-beats-ubuntu-2204"
         env:
           DRA_WORKFLOW: "staging"
 
