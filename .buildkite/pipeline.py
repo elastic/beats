@@ -393,11 +393,6 @@ def main() -> None:
         all_groups = fetch_pr_pipeline(yaml)
 
     if is_pr() and os.getenv("GITHUB_PR_TRIGGER_COMMENT"):
-        print(
-            "GITHUB_PR_TRIGGER_COMMENT: {}".format(
-                os.getenv("GITHUB_PR_TRIGGER_COMMENT")
-            )
-        )
         comment = PRComment(os.getenv("GITHUB_PR_TRIGGER_COMMENT"))
         all_groups = pr_comment_pipeline(comment, yaml)
 
