@@ -145,6 +145,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Upgrade go-sysinfo from 1.12.0 to 1.13.1. {pull}37996[37996]
 - Make `range` condition work with numeric values as strings. {pull}38080[38080]
 - Allow users to configure number of output workers (for outputs that support workers) with either `worker` or `workers`. {pull}38257[38257]
+- Kafka output now validates the `topics` and `topic` configuration values {pull}38058[38058]
 
 *Auditbeat*
 
