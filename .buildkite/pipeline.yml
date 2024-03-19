@@ -1,4 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+env:
+  ASDF_MAGE_VERSION: '1.15.0'
 
 steps:
   - label: "Generate dynamic pipeline"
