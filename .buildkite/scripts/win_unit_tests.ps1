@@ -1,5 +1,10 @@
+param(
+    [string]$testType = "unittest"
+)
+
 $ErrorActionPreference = "Stop" # set -e
-$WorkFolder = "metricbeat"
+$WorkFolder = $env:BEATS_PROJECT_NAME
+$WORKSPACE = Get-Location
 # Forcing to checkout again all the files with a correct autocrlf.
 # Doing this here because we cannot set git clone options before.
 function fixCRLF {
@@ -8,30 +13,93 @@ function fixCRLF {
     git rm --quiet --cached -r .
     git reset --quiet --hard
 }
-function withChoco {
-    Write-Host "-- Configure Choco --"
-    $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."
-    Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+
+function retry {
+    param(
+        [int]$retries,
+        [ScriptBlock]$scriptBlock
+    )
+    $count = 0
+    while ($count -lt $retries) {
+        $count++
+        try {
+            & $scriptBlock
+            return
+        } catch {
+            $exitCode = $_.Exception.ErrorCode
+            Write-Host "Retry $count/$retries exited $exitCode, retrying..."
+            Start-Sleep -Seconds ([Math]::Pow(2, $count))
+        }
+    }
+    Write-Host "Retry $count/$retries exited, no more retries left."
 }
+
+function verifyFileChecksum {
+    param (
+        [string]$filePath,
+        [string]$checksumFilePath
+    )
+    $actualHash = (Get-FileHash -Algorithm SHA256 -Path $filePath).Hash
+    $checksumData = Get-Content -Path $checksumFilePath
+    $expectedHash = ($checksumData -split "\s+")[0]
+    if ($actualHash -eq $expectedHash) {
+        Write-Host "CheckSum is checked. File is correct. Original checkSum is: $expectedHash "
+        return $true
+    } else {
+        Write-Host "CheckSum is wrong. File can be corrupted or modified. Current checksum is: $actualHash, the original checksum is: $expectedHash"
+        return $false
+    }
+}
+
 function withGolang($version) {
-    $downloadPath = Join-Path $env:TEMP "go_installer.msi"
+    Write-Host "-- Installing Go $version --"
+    $goDownloadPath = Join-Path $env:TEMP "go_installer.msi"
     $goInstallerUrl = "https://golang.org/dl/go$version.windows-amd64.msi"
-    Invoke-WebRequest -Uri $goInstallerUrl -OutFile $downloadPath
-    Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $downloadPath /quiet" -Wait
-    $goBinPath = "${env:ProgramFiles}\Go\bin"
-    $env:Path += ";$goBinPath"
+    retry -retries 5 -scriptBlock {
+        Invoke-WebRequest -Uri $goInstallerUrl -OutFile $goDownloadPath
+    }
+    Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $goDownloadPath /quiet" -Wait
+    $env:GOPATH = "${env:ProgramFiles}\Go"
+    $env:GOBIN = "${env:GOPATH}\bin"
+    $env:Path += ";$env:GOPATH;$env:GOBIN"
     go version
+    installGoDependencies
 }
+
 function withPython($version) {
-    Write-Host "-- Install Python $version --"
-    choco install python --version=$version
-    refreshenv
+    Write-Host "-- Installing Python $version --"
+    [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
+    $pyDownloadPath = Join-Path $env:TEMP "python-$version-amd64.exe"
+    $pyInstallerUrl = "https://www.python.org/ftp/python/$version/python-$version-amd64.exe"
+    retry -retries 5 -scriptBlock {
+        Invoke-WebRequest -UseBasicParsing -Uri $pyInstallerUrl -OutFile $pyDownloadPath
+    }
+    Start-Process -FilePath $pyDownloadPath -ArgumentList "/quiet", "InstallAllUsers=1", "PrependPath=1", "Include_test=0" -Wait
+    $pyBinPath = "${env:ProgramFiles}\Python311"
+    $env:Path += ";$pyBinPath"
     python --version
 }
+
 function withMinGW {
-    Write-Host "-- Install MinGW --"
-    choco install mingw -y
-    refreshenv
+    Write-Host "-- Installing MinGW --"
+    [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
+    $gwInstallerUrl = "https://github.com/brechtsanders/winlibs_mingw/releases/download/12.1.0-14.0.6-10.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-12.1.0-llvm-14.0.6-mingw-w64ucrt-10.0.0-r3.zip"
+    $gwInstallerCheckSumUrl = "$gwInstallerUrl.sha256"
+    $gwDownloadPath = "$env:TEMP\winlibs-x86_64.zip"
+    $gwDownloadCheckSumPath = "$env:TEMP\winlibs-x86_64.zip.sha256"
+    retry -retries 5 -scriptBlock {
+        Invoke-WebRequest -Uri $gwInstallerUrl -OutFile $gwDownloadPath
+        Invoke-WebRequest -Uri $gwInstallerCheckSumUrl -OutFile $gwDownloadCheckSumPath
+    }
+    $comparingResult = verifyFileChecksum -filePath $gwDownloadPath -checksumFilePath $gwDownloadCheckSumPath
+    if ($comparingResult) {
+                Expand-Archive -Path $gwDownloadPath -DestinationPath "$env:TEMP"
+        $gwBinPath = "$env:TEMP\mingw64\bin"
+        $env:Path += ";$gwBinPath"
+    } else {
+        exit 1
+    }
+
 }
 function installGoDependencies {
     $installPackages = @(
@@ -46,26 +114,73 @@ function installGoDependencies {
     }
 }
 
+function withNmap($version) {
+    Write-Host "-- Installing Nmap $version --"
+    [Net.ServicePointManager]::SecurityProtocol = "tls, tls11, tls12, ssl3"
+    $nmapInstallerUrl = "https://nmap.org/dist/nmap-$version-setup.exe"
+    $nmapDownloadPath = "$env:TEMP\nmap-$version-setup.exe"
+    retry -retries 5 -scriptBlock {
+        Invoke-WebRequest -UseBasicParsing -Uri $nmapInstallerUrl -OutFile $nmapDownloadPath
+    }
+    Start-Process -FilePath $nmapDownloadPath -ArgumentList "/S" -Wait
+}
+function google_cloud_auth {
+    $tempFileName = "google-cloud-credentials.json"
+    $secretFileLocation = Join-Path $env:TEMP $tempFileName
+    $null = New-Item -ItemType File -Path $secretFileLocation
+    Set-Content -Path $secretFileLocation -Value $env:PRIVATE_CI_GCS_CREDENTIALS_SECRET
+    gcloud auth activate-service-account --key-file $secretFileLocation > $null 2>&1
+    $env:GOOGLE_APPLICATION_CREDENTIALS = $secretFileLocation
+}
+
+function google_cloud_auth_cleanup {
+    if (Test-Path $env:GOOGLE_APPLICATION_CREDENTIALS) {
+        Remove-Item $env:GOOGLE_APPLICATION_CREDENTIALS -Force
+        Remove-Item Env:\GOOGLE_APPLICATION_CREDENTIALS
+    } else {
+        Write-Host "No GCP credentials were added"
+    }
+}
+
 fixCRLF
 
-withChoco
-
 withGolang $env:GO_VERSION
-
-installGoDependencies
 
 withPython $env:SETUP_WIN_PYTHON_VERSION
 
 withMinGW
 
+if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-packetbeat") {
+    withNmap $env:NMAP_WIN_VERSION
+}
+
 $ErrorActionPreference = "Continue" # set +e
 
-Push-Location $WorkFolder
+Set-Location -Path $WorkFolder
+
+$magefile = "$WORKSPACE\$WorkFolder\.magefile"
+$env:MAGEFILE_CACHE = $magefile
 
 New-Item -ItemType Directory -Force -Path "build"
-mage build unitTest
 
-Pop-Location
+if ($testType -eq "unittest") {
+    if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
+        mage -w reader/etw build goUnitTest
+    } else {
+        mage build unitTest
+    }
+}
+elseif ($testType -eq "systemtest") {
+    try {
+        google_cloud_auth
+        mage systemTest
+    } finally {
+        google_cloud_auth_cleanup
+    }
+}
+else {
+    Write-Host "Unknown test type. Please specify 'unittest' or 'systemtest'."
+}
 
 $EXITCODE=$LASTEXITCODE
 $ErrorActionPreference = "Stop"

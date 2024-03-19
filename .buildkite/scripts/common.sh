@@ -9,18 +9,25 @@ arch_type="$(uname -m)"
 GITHUB_PR_TRIGGER_COMMENT=${GITHUB_PR_TRIGGER_COMMENT:-""}
 GITHUB_PR_LABELS=${GITHUB_PR_LABELS:-""}
 ONLY_DOCS=${ONLY_DOCS:-"true"}
-
+OSS_MODULE_PATTERN="^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
+XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_libbeat+x}" ] && run_libbeat="$(buildkite-agent meta-data get run_libbeat --default "false")"
 [ -z "${run_metricbeat+x}" ] && run_metricbeat="$(buildkite-agent meta-data get run_metricbeat --default "false")"
 [ -z "${run_packetbeat+x}" ] && run_packetbeat="$(buildkite-agent meta-data get run_packetbeat --default "false")"
 [ -z "${run_winlogbeat+x}" ] && run_winlogbeat="$(buildkite-agent meta-data get run_winlogbeat --default "false")"
+[ -z "${run_xpack_libbeat+x}" ] && run_xpack_libbeat="$(buildkite-agent meta-data get run_xpack_libbeat --default "false")"
+[ -z "${run_xpack_metricbeat+x}" ] && run_xpack_metricbeat="$(buildkite-agent meta-data get run_xpack_metricbeat --default "false")"
+[ -z "${run_xpack_packetbeat+x}" ] && run_xpack_packetbeat="$(buildkite-agent meta-data get run_xpack_packetbeat --default "false")"
+[ -z "${run_xpack_winlogbeat+x}" ] && run_xpack_winlogbeat="$(buildkite-agent meta-data get run_xpack_winlogbeat --default "false")"
 [ -z "${run_libbeat_arm_tests+x}" ] && run_libbeat_arm_tests="$(buildkite-agent meta-data get run_libbeat_arm_tests --default "false")"
 [ -z "${run_packetbeat_arm_tests+x}" ] && run_packetbeat_arm_tests="$(buildkite-agent meta-data get run_packetbeat_arm_tests --default "false")"
 [ -z "${run_metricbeat_macos_tests+x}" ] && run_metricbeat_macos_tests="$(buildkite-agent meta-data get run_metricbeat_macos_tests --default "false")"
 [ -z "${run_packetbeat_macos_tests+x}" ] && run_packetbeat_macos_tests="$(buildkite-agent meta-data get run_packetbeat_macos_tests --default "false")"
-trigger_specific_beat="run_${BEATS_PROJECT_NAME}"
-trigger_specific_arm_tests="run_${BEATS_PROJECT_NAME}_arm_tests"
-trigger_specific_macos_tests="run_${BEATS_PROJECT_NAME}_macos_tests"
+[ -z "${run_xpack_libbeat_arm_tests+x}" ] && run_xpack_libbeat_arm_tests="$(buildkite-agent meta-data get run_xpack_libbeat_arm_tests --default "false")"
+[ -z "${run_xpack_metricbeat_aws_tests+x}" ] && run_xpack_metricbeat_aws_tests="$(buildkite-agent meta-data get run_xpack_metricbeat_aws_tests --default "false")"
+[ -z "${run_xpack_metricbeat_macos_tests+x}" ] && run_xpack_metricbeat_macos_tests="$(buildkite-agent meta-data get run_xpack_metricbeat_macos_tests --default "false")"
+[ -z "${run_xpack_packetbeat_arm_tests+x}" ] && run_xpack_packetbeat_arm_tests="$(buildkite-agent meta-data get run_xpack_packetbeat_arm_tests --default "false")"
+[ -z "${run_xpack_packetbeat_macos_tests+x}" ] && run_xpack_packetbeat_macos_tests="$(buildkite-agent meta-data get run_xpack_packetbeat_macos_tests --default "false")"
 
 metricbeat_changeset=(
   "^metricbeat/.*"
@@ -38,6 +45,34 @@ winlogbeat_changeset=(
   "^winlogbeat/.*"
   )
 
+xpack_dockerlogbeat_changeset=(
+  "^x-pack/dockerlogbeat/.*"
+  )
+
+xpack_libbeat_changeset=(
+  "^x-pack/libbeat/.*"
+  )
+
+xpack_metricbeat_changeset=(
+  "^x-pack/metricbeat/.*"
+  )
+
+xpack_packetbeat_changeset=(
+  "^x-pack/packetbeat/.*"
+  )
+
+xpack_winlogbeat_changeset=(
+  "^x-pack/winlogbeat/.*"
+  )
+
+ci_changeset=(
+  "^.buildkite/.*"
+  )
+
+go_mod_changeset=(
+  "^go.mod"
+  )
+
 oss_changeset=(
   "^go.mod"
   "^pytest.ini"
@@ -46,13 +81,10 @@ oss_changeset=(
   "^testing/.*"
 )
 
-ci_changeset=(
-  "^.buildkite/.*"
+xpack_changeset=(
+  "${xpack_libbeat_changeset[@]}"
+  "${oss_changeset[@]}"
 )
-
-go_mod_changeset=(
-  "^go.mod"
-  )
 
 docs_changeset=(
   ".*\\.(asciidoc|md)"
@@ -64,6 +96,76 @@ packaging_changeset=(
   ".go-version"
   )
 
+case "${BUILDKITE_PIPELINE_SLUG}" in
+  "beats-metricbeat")
+    BEAT_CHANGESET_REFERENCE=${metricbeat_changeset[@]}
+    ;;
+  "beats-libbeat")
+    BEAT_CHANGESET_REFERENCE=${libbeat_changeset[@]}
+    ;;
+  "beats-packetbeat")
+    BEAT_CHANGESET_REFERENCE=${packetbeat_changeset[@]}
+    ;;
+  "beats-winlogbeat")
+    BEAT_CHANGESET_REFERENCE=${winlogbeat_changeset[@]}
+    ;;
+  "beats-xpack-dockerlogbeat")
+    BEAT_CHANGESET_REFERENCE=${xpack_dockerlogbeat_changeset[@]}
+    ;;
+  "beats-xpack-libbeat")
+    BEAT_CHANGESET_REFERENCE=${xpack_libbeat_changeset[@]}
+    ;;
+  "beats-xpack-metricbeat")
+    BEAT_CHANGESET_REFERENCE=${xpack_metricbeat_changeset[@]}
+    ;;
+  "beats-xpack-packetbeat")
+    BEAT_CHANGESET_REFERENCE=${xpack_packetbeat_changeset[@]}
+    ;;
+  "beats-xpack-winlogbeat")
+    BEAT_CHANGESET_REFERENCE=${xpack_winlogbeat_changeset[@]}
+    ;;
+  *)
+  echo "The changeset for the ${BUILDKITE_PIPELINE_SLUG} pipeline hasn't been defined yet."
+  ;;
+esac
+
+check_and_set_beat_vars() {
+  if [[ -n "$BEATS_PROJECT_NAME" && "$BEATS_PROJECT_NAME" == *"x-pack/"* ]]; then
+    BEATS_XPACK_PROJECT_NAME=${BEATS_PROJECT_NAME//-/}              #remove -
+    BEATS_XPACK_PROJECT_NAME=${BEATS_XPACK_PROJECT_NAME//\//_}      #replace / to _
+    BEATS_XPACK_LABEL_PROJECT_NAME=${BEATS_PROJECT_NAME//\//-}      #replace / to - for labels
+    BEATS_GH_LABEL=${BEATS_XPACK_LABEL_PROJECT_NAME}
+    TRIGGER_SPECIFIC_BEAT="run_${BEATS_XPACK_PROJECT_NAME}"
+    TRIGGER_SPECIFIC_ARM_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_arm_tests"
+    TRIGGER_SPECIFIC_AWS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_aws_tests"
+    TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_macos_tests"
+    echo "Beats project name is $BEATS_XPACK_PROJECT_NAME"
+    mandatory_changeset=(
+      "${BEAT_CHANGESET_REFERENCE[@]}"
+      "${xpack_changeset[@]}"
+      "${ci_changeset[@]}"
+    )
+  else
+    BEATS_GH_LABEL=${BEATS_PROJECT_NAME}
+    TRIGGER_SPECIFIC_BEAT="run_${BEATS_PROJECT_NAME}"
+    TRIGGER_SPECIFIC_ARM_TESTS="run_${BEATS_PROJECT_NAME}_arm_tests"
+    TRIGGER_SPECIFIC_AWS_TESTS="run_${BEATS_PROJECT_NAME}_aws_tests"
+    TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_PROJECT_NAME}_macos_tests"
+    echo "Beats project name is $BEATS_PROJECT_NAME"
+    mandatory_changeset=(
+      "${BEAT_CHANGESET_REFERENCE[@]}"
+      "${oss_changeset[@]}"
+      "${ci_changeset[@]}"
+    )
+  fi
+  BEATS_GH_COMMENT="/test ${BEATS_PROJECT_NAME}"
+  BEATS_GH_MACOS_COMMENT="${BEATS_GH_COMMENT} for macos"
+  BEATS_GH_ARM_COMMENT="${BEATS_GH_COMMENT} for arm"
+  BEATS_GH_AWS_COMMENT="${BEATS_GH_COMMENT} for aws cloud"
+  BEATS_GH_MACOS_LABEL="macOS"
+  BEATS_GH_ARM_LABEL="arm"
+  BEATS_GH_AWS_LABEL="aws"
+}
 
 with_docker_compose() {
   local version=$1
@@ -73,6 +175,19 @@ with_docker_compose() {
   chmod +x ${BIN}/docker-compose
   export PATH="${BIN}:${PATH}"
   docker-compose version
+}
+
+with_Terraform() {
+    echo "Setting up the Terraform environment..."
+    local path_to_file="${WORKSPACE}/terraform.zip"
+    create_workspace
+    check_platform_architeture
+    retry 5 curl -sSL -o ${path_to_file} "https://releases.hashicorp.com/terraform/${ASDF_TERRAFORM_VERSION}/terraform_${ASDF_TERRAFORM_VERSION}_${platform_type_lowercase}_${go_arch_type}.zip"
+    unzip -q ${path_to_file} -d ${BIN}/
+    rm ${path_to_file}
+    chmod +x ${BIN}/terraform
+    export PATH="${BIN}:${PATH}"
+    terraform version
 }
 
 create_workspace() {
@@ -116,6 +231,8 @@ with_mage() {
   for pkg in "${install_packages[@]}"; do
     go install "${pkg}@latest"
   done
+  echo "Download modules to local cache"
+  retry 3 go mod download
 }
 
 with_go() {
@@ -231,20 +348,22 @@ are_paths_changed() {
 
 are_changed_only_paths() {
   local patterns=("${@}")
-  local changelist=()
-  local changed_files=$(git diff --name-only HEAD@{1} HEAD)
-  if [ -z "$changed_files" ] || grep -qE "$(IFS=\|; echo "${patterns[*]}")" <<< "$changed_files"; then
+  local changed_files=($(git diff --name-only HEAD@{1} HEAD))
+  local matched_files=()
+  for pattern in "${patterns[@]}"; do
+    local matched=($(grep -E "${pattern}" <<< "${changed_files[@]}"))
+    if [ "${#matched[@]}" -gt 0 ]; then
+      matched_files+=("${matched[@]}")
+    fi
+  done
+  if [ "${#matched_files[@]}" -eq "${#changed_files[@]}" ] || [ "${#changed_files[@]}" -eq 0 ]; then
     return 0
   fi
   return 1
 }
 
 are_conditions_met_mandatory_tests() {
-  declare -n beat_changeset_reference="${BEATS_PROJECT_NAME}_changeset"
-  if are_paths_changed "${oss_changeset[@]}" || are_paths_changed "${ci_changeset[@]}" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
-    return 0
-  fi
-  if are_paths_changed "${beat_changeset_reference[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test ${BEATS_PROJECT_NAME}" || "${GITHUB_PR_LABELS}" =~ /(?i)${BEATS_PROJECT_NAME}/ || "${!trigger_specific_beat}" == "true" ]]; then
+  if are_paths_changed "${mandatory_changeset[@]}" || [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_COMMENT}" || "${GITHUB_PR_LABELS}" =~ /(?i)${BEATS_GH_LABEL}/ || "${!TRIGGER_SPECIFIC_BEAT}" == "true" ]]; then
     return 0
   fi
   return 1
@@ -253,7 +372,7 @@ are_conditions_met_mandatory_tests() {
 are_conditions_met_arm_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
     if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
-      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test ${BEATS_PROJECT_NAME} for arm" || "${GITHUB_PR_LABELS}" =~ arm || "${!trigger_specific_arm_tests}" == "true" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_ARM_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_ARM_LABEL} || "${!TRIGGER_SPECIFIC_ARM_TESTS}" == "true" ]]; then
         return 0
       fi
     fi
@@ -263,8 +382,19 @@ are_conditions_met_arm_tests() {
 
 are_conditions_met_macos_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
-      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "/test ${BEATS_PROJECT_NAME} for macos" || "${GITHUB_PR_LABELS}" =~ macOS || "${!trigger_specific_macos_tests}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_MACOS_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_MACOS_LABEL} || "${!TRIGGER_SPECIFIC_MACOS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+        return 0
+      fi
+    fi
+  fi
+  return 1
+}
+
+are_conditions_met_aws_tests() {
+  if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_AWS_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_AWS_LABEL} || "${!TRIGGER_SPECIFIC_AWS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
         return 0
       fi
     fi
@@ -288,17 +418,106 @@ config_git() {
   fi
 }
 
+defineModuleFromTheChangeSet() {
+  # This method gathers the module name, if required, in order to run the ITs only if the changeset affects a specific module.
+  # For such, it's required to look for changes under the module folder and exclude anything else such as asciidoc and png files.
+  # This method defines and exports the MODULE variable with a particular module name or '' if changeset doesn't affect a specific module
+  local project_path=$1
+  local project_path_transformed=$(echo "$project_path" | sed 's/\//\\\//g')
+  local project_path_exclussion="((?!^${project_path_transformed}\\/).)*\$"
+  local exclude=("^(${project_path_exclussion}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
+
+  if [[ "$project_path" == *"x-pack/"* ]]; then
+    local pattern=("$XPACK_MODULE_PATTERN")
+  else
+    local pattern=("$OSS_MODULE_PATTERN")
+  fi
+  local changed_modules=""
+  local module_dirs=$(find "$project_path/module" -mindepth 1 -maxdepth 1 -type d)
+  for module_dir in $module_dirs; do
+    if are_paths_changed $module_dir && ! are_changed_only_paths "${exclude[@]}"; then
+      if [[ -z "$changed_modules" ]]; then
+        changed_modules=$(basename "$module_dir")
+      else
+        changed_modules+=",$(basename "$module_dir")"
+      fi
+    fi
+  done
+  if [[ -z "$changed_modules" ]]; then # TODO: remove this condition and uncomment the line below when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
+    export MODULE="aws"
+  else
+    export MODULE="${changed_modules}"  # TODO: remove this line and uncomment the line below when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
+  # export MODULE="${changed_modules}"     # TODO: uncomment the line when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
+  fi
+}
+
+terraformInit() {
+  local dir=$1
+  echo "Terraform Init on $dir"
+  pushd "${dir}" > /dev/null
+  terraform init
+  popd > /dev/null
+}
+
+withAWS() {
+  # This method gathers the masked AWS credentials from pre-command hook and sets the right AWS variable names.
+  export AWS_ACCESS_KEY_ID=$BEATS_AWS_ACCESS_KEY
+  export AWS_SECRET_ACCESS_KEY=$BEATS_AWS_SECRET_KEY
+  export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}aws"
+}
+
+startCloudTestEnv() {
+  local dir=$1
+  withAWS
+  echo "--- Run docker-compose services for emulated cloud env"
+  docker-compose -f .ci/jobs/docker-compose.yml up -d                     #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+  with_Terraform
+  terraformInit "$dir"
+  export TF_VAR_BRANCH=$(echo "${BUILDKITE_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
+  export TF_VAR_BUILD_ID="${BUILDKITE_BUILD_ID}"
+  export TF_VAR_CREATED_DATE=$(date +%s)
+  export TF_VAR_ENVIRONMENT="ci"
+  export TF_VAR_REPO="${REPO}"
+  pushd "${dir}" > /dev/null
+  terraform apply -auto-approve
+  popd > /dev/null
+}
+
+teardown() {
+  # Teardown resources after using them
+  echo "---Terraform Cleanup"
+  .ci/scripts/terraform-cleanup.sh "${MODULE_DIR}"              #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+
+  echo "---Docker Compose Cleanup"
+  docker-compose -f .ci/jobs/docker-compose.yml down -v         #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+}
+
+unset_secrets () {
+  for var in $(printenv | sed 's;=.*;;' | sort); do
+    if [[ "$var" == AWS_* || "$var" == BEATS_AWS_* ]]; then
+      unset "$var"
+    fi
+  done
+}
+
 if ! are_changed_only_paths "${docs_changeset[@]}" ; then
-  ONLY_DOCS="false"
+  export ONLY_DOCS="false"
   echo "Changes include files outside the docs_changeset vairiabe. ONLY_DOCS=$ONLY_DOCS."
 else
   echo "All changes are related to DOCS. ONLY_DOCS=$ONLY_DOCS."
 fi
 
 if are_paths_changed "${go_mod_changeset[@]}" ; then
-  GO_MOD_CHANGES="true"
+  export GO_MOD_CHANGES="true"
 fi
 
 if are_paths_changed "${packaging_changeset[@]}" ; then
-  PACKAGING_CHANGES="true"
+  export PACKAGING_CHANGES="true"
 fi
+
+if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" ]]; then
+  # Set the MODULE env variable if possible, it should be defined before generating pipeline's steps. It is used in multiple pipelines.
+  defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
+fi
+
+check_and_set_beat_vars

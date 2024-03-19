@@ -17,11 +17,16 @@ import (
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
 
+	"github.com/rcrowley/go-metrics"
+	"golang.org/x/sync/errgroup"
 	"golang.org/x/sys/windows"
 )
 
@@ -64,8 +69,10 @@ func (op *realSessionOperator) stopSession(session *etw.Session) error {
 // etwInput struct holds the configuration and state for the ETW input
 type etwInput struct {
 	log        *logp.Logger
+	metrics    *inputMetrics
 	config     config
 	etwSession *etw.Session
+	publisher  stateless.Publisher
 	operator   sessionOperator
 }
 
@@ -105,10 +112,15 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 	if err != nil {
 		return fmt.Errorf("error initializing ETW session: %w", err)
 	}
+	e.etwSession.Callback = e.consumeEvent
+	e.publisher = publisher
+	e.metrics = newInputMetrics(e.etwSession.Name, ctx.ID)
+	defer e.metrics.unregister()
 
 	// Set up logger with session information
 	e.log = ctx.Logger.With("session", e.etwSession.Name)
 	e.log.Info("Starting " + inputName + " input")
+	defer e.log.Info(inputName + " input stopped")
 
 	// Handle realtime session creation or attachment
 	if e.etwSession.Realtime {
@@ -125,71 +137,32 @@ func (e *etwInput) Run(ctx input.Context, publisher stateless.Publisher) error {
 			if err != nil {
 				return fmt.Errorf("realtime session could not be created: %w", err)
 			}
-			e.log.Debug("created session")
+			e.log.Debug("created new session")
 		}
 	}
-	// Defer the cleanup and closing of resources
-	var wg sync.WaitGroup
-	var once sync.Once
 
-	// Create an error channel to communicate errors from the goroutine
-	errChan := make(chan error, 1)
+	stopConsumer := sync.OnceFunc(e.Close)
+	defer stopConsumer()
 
-	defer func() {
-		once.Do(e.Close)
-		e.log.Info(inputName + " input stopped")
-	}()
-
-	// eventReceivedCallback processes each ETW event
-	eventReceivedCallback := func(record *etw.EventRecord) uintptr {
-		if record == nil {
-			e.log.Error("received null event record")
-			return 1
-		}
-
-		e.log.Debugf("received event %d with length %d", record.EventHeader.EventDescriptor.Id, record.UserDataLength)
-
-		data, err := etw.GetEventProperties(record)
-		if err != nil {
-			e.log.Errorw("failed to read event properties", "error", err)
-			return 1
-		}
-
-		evt := buildEvent(data, record.EventHeader, e.etwSession, e.config)
-		publisher.Publish(evt)
-
-		return 0
-	}
-
-	// Set the callback function for the ETW session
-	e.etwSession.Callback = eventReceivedCallback
-
-	// Start a goroutine to consume ETW events
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		e.log.Debug("starting to listen ETW events")
-		if err = e.operator.startConsumer(e.etwSession); err != nil {
-			errChan <- fmt.Errorf("failed to start consumer: %w", err) // Send error to channel
-			return
-		}
-		e.log.Debug("stopped to read ETW events from session")
-		errChan <- nil
-	}()
-
-	// We ensure resources are closed when receiving a cancellation signal
+	// Stop the consumer upon input cancellation (shutdown).
 	go func() {
 		<-ctx.Cancelation.Done()
-		once.Do(e.Close)
+		stopConsumer()
 	}()
 
-	wg.Wait() // Ensure all goroutines have finished before closing
-	close(errChan)
-	if err, ok := <-errChan; ok && err != nil {
-		return err
-	}
+	// Start a goroutine to consume ETW events
+	g := new(errgroup.Group)
+	g.Go(func() error {
+		e.log.Debug("starting ETW consumer")
+		defer e.log.Debug("stopped ETW consumer")
+		if err = e.operator.startConsumer(e.etwSession); err != nil {
+			e.metrics.errors.Inc()
+			return fmt.Errorf("failed running ETW consumer: %w", err)
+		}
+		return nil
+	})
 
-	return nil
+	return g.Wait()
 }
 
 var (
@@ -271,11 +244,86 @@ func convertFileTimeToGoTime(fileTime64 uint64) time.Time {
 	return time.Unix(0, fileTime.Nanoseconds()).UTC()
 }
 
+func (e *etwInput) consumeEvent(record *etw.EventRecord) uintptr {
+	if record == nil {
+		e.log.Error("received null event record")
+		e.metrics.errors.Inc()
+		return 1
+	}
+
+	start := time.Now()
+	defer func() {
+		elapsed := time.Since(start)
+		e.metrics.processingTime.Update(elapsed.Nanoseconds())
+	}()
+
+	data, err := etw.GetEventProperties(record)
+	if err != nil {
+		e.log.Errorw("failed to read event properties", "error", err)
+		e.metrics.errors.Inc()
+		e.metrics.dropped.Inc()
+		return 1
+	}
+
+	evt := buildEvent(data, record.EventHeader, e.etwSession, e.config)
+	e.publisher.Publish(evt)
+
+	e.metrics.events.Inc()
+	e.metrics.sourceLag.Update(start.Sub(evt.Timestamp).Nanoseconds())
+	if !e.metrics.lastCallback.IsZero() {
+		e.metrics.arrivalPeriod.Update(start.Sub(e.metrics.lastCallback).Nanoseconds())
+	}
+	e.metrics.lastCallback = start
+
+	return 0
+}
+
 // Close stops the ETW session and logs the outcome.
 func (e *etwInput) Close() {
 	if err := e.operator.stopSession(e.etwSession); err != nil {
 		e.log.Error("failed to shutdown ETW session")
+		e.metrics.errors.Inc()
 		return
 	}
 	e.log.Info("successfully shutdown")
+}
+
+// inputMetrics handles event log metric reporting.
+type inputMetrics struct {
+	unregister func()
+
+	lastCallback time.Time
+
+	name           *monitoring.String // name of the etw session being read
+	events         *monitoring.Uint   // total number of events received
+	dropped        *monitoring.Uint   // total number of discarded events
+	errors         *monitoring.Uint   // total number of errors
+	sourceLag      metrics.Sample     // histogram of the difference between timestamped event's creation and reading
+	arrivalPeriod  metrics.Sample     // histogram of the elapsed time between callbacks.
+	processingTime metrics.Sample     // histogram of the elapsed time between event callback receipt and publication.
+}
+
+// newInputMetrics returns an input metric for windows ETW.
+// If id is empty, a nil inputMetric is returned.
+func newInputMetrics(session, id string) *inputMetrics {
+	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
+	out := &inputMetrics{
+		unregister:     unreg,
+		name:           monitoring.NewString(reg, "session"),
+		events:         monitoring.NewUint(reg, "received_events_total"),
+		dropped:        monitoring.NewUint(reg, "discarded_events_total"),
+		errors:         monitoring.NewUint(reg, "errors_total"),
+		sourceLag:      metrics.NewUniformSample(1024),
+		arrivalPeriod:  metrics.NewUniformSample(1024),
+		processingTime: metrics.NewUniformSample(1024),
+	}
+	out.name.Set(session)
+	_ = adapter.NewGoMetrics(reg, "source_lag_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.sourceLag))
+	_ = adapter.NewGoMetrics(reg, "arrival_period", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.arrivalPeriod))
+	_ = adapter.NewGoMetrics(reg, "processing_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.processingTime))
+
+	return out
 }
