@@ -224,6 +224,7 @@ require (
 	github.com/pkg/xattr v0.4.9
 	github.com/sergi/go-diff v1.3.1
 	github.com/shirou/gopsutil/v3 v3.22.10
+	github.com/tklauser/go-sysconf v0.3.10
 	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.8
 	go.elastic.co/apm/module/apmhttp/v2 v2.4.8
 	go.elastic.co/apm/v2 v2.4.8
@@ -360,7 +361,6 @@ require (
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
 	github.com/stretchr/objx v0.5.0 // indirect
-	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect

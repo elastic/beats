@@ -20,6 +20,9 @@ import (
 	// Register Auditbeat x-pack modules.
 	_ "github.com/elastic/beats/v7/x-pack/auditbeat/include"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+
+	// Import processors
+	_ "github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd"
 )
 
 // Name of the beat
