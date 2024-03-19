@@ -57,9 +57,7 @@ func (s prvdr) UpdateDB(ev *beat.Event) error {
 	}
 
 	switch syscall {
-	case "execveat":
-		fallthrough
-	case "execve":
+	case "execveat", "execve":
 		pe := types.ProcessExecEvent{}
 		proc_info, err := s.reader.GetProcess(uint32(pid))
 		if err == nil {

@@ -71,6 +71,7 @@ const (
 	ttyMajor        = 4
 	consoleMaxMinor = 63
 	ttyMaxMinor     = 255
+	retryCount      = 2
 )
 
 type Process struct {
@@ -434,6 +435,8 @@ func fullProcessFromDBProcess(p Process) types.Process {
 	ret.Group.ID = strconv.FormatUint(uint64(egid), 10)
 	ret.Thread.Capabilities.Permitted, _ = capabilities.FromUint64(p.Creds.CapPermitted)
 	ret.Thread.Capabilities.Effective, _ = capabilities.FromUint64(p.Creds.CapEffective)
+	ret.TTY.CharDevice.Major = p.CTTY.Major
+	ret.TTY.CharDevice.Minor = p.CTTY.Minor
 
 	return ret
 }
@@ -558,16 +561,37 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 
 	ret := fullProcessFromDBProcess(process)
 
-	if parent, ok := db.processes[process.PIDs.Ppid]; ok {
-		fillParent(&ret, parent)
+	if process.PIDs.Ppid != 0 {
+		for i := 0; i < retryCount; i++ {
+			if parent, ok := db.processes[process.PIDs.Ppid]; ok {
+				fillParent(&ret, parent)
+				break
+			}
+			db.logger.Debugf("failed to find %d in DB (parent of %d), attempting to scrape", process.PIDs.Ppid, pid)
+			db.scrapeAncestors(process)
+		}
 	}
 
-	if groupLeader, ok := db.processes[process.PIDs.Pgid]; ok {
-		fillGroupLeader(&ret, groupLeader)
+	if process.PIDs.Pgid != 0 {
+		for i := 0; i < retryCount; i++ {
+			if groupLeader, ok := db.processes[process.PIDs.Pgid]; ok {
+				fillGroupLeader(&ret, groupLeader)
+				break
+			}
+			db.logger.Debugf("failed to find %d in DB (group leader of %d), attempting to scrape", process.PIDs.Pgid, pid)
+			db.scrapeAncestors(process)
+		}
 	}
 
-	if sessionLeader, ok := db.processes[process.PIDs.Sid]; ok {
-		fillSessionLeader(&ret, sessionLeader)
+	if process.PIDs.Sid != 0 {
+		for i := 0; i < retryCount; i++ {
+			if sessionLeader, ok := db.processes[process.PIDs.Sid]; ok {
+				fillSessionLeader(&ret, sessionLeader)
+				break
+			}
+			db.logger.Debugf("failed to find %d in DB (session leader of %d), attempting to scrape", process.PIDs.Sid, pid)
+			db.scrapeAncestors(process)
+		}
 	}
 
 	if entryLeaderPID, foundEntryLeaderPID := db.entryLeaderRelationships[process.PIDs.Tgid]; foundEntryLeaderPID {
@@ -575,10 +599,10 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 			// if there is an entry leader then there is a matching member in the entryLeaders table
 			fillEntryLeader(&ret, db.entryLeaders[entryLeaderPID], entryLeader)
 		} else {
-			db.logger.Errorf("failed to find entry leader entry %d for %d (%s)", entryLeaderPID, pid, db.processes[pid].Filename)
+			db.logger.Debugf("failed to find entry leader entry %d for %d (%s)", entryLeaderPID, pid, db.processes[pid].Filename)
 		}
 	} else {
-		db.logger.Errorf("failed to find entry leader for %d (%s)", pid, db.processes[pid].Filename)
+		db.logger.Debugf("failed to find entry leader for %d (%s)", pid, db.processes[pid].Filename)
 	}
 
 	db.setEntityID(&ret)
