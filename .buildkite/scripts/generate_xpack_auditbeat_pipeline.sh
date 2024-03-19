@@ -27,54 +27,54 @@ steps:
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
-      # - label: ":rhel: RHEL-9 Unit Tests"
-      #   key: "mandatory-rhel9-unit-test"
-      #   command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_RHEL9_X86_64}"
-      #     machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-      #   artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":rhel: RHEL-9 Unit Tests"
+        key: "mandatory-rhel9-unit-test"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_RHEL9_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 
-      # - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-      #   command: ".buildkite/scripts/win_unit_tests.ps1"
-      #   key: "mandatory-win-unit-tests"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "{{matrix.image}}"
-      #     machineType: "${GCP_WIN_MACHINE_TYPE}"
-      #     disk_size: 100
-      #     disk_type: "pd-ssd"
-      #   matrix:
-      #     setup:
-      #       image:
-      #         - "${IMAGE_WIN_2016}"
-      #         - "${IMAGE_WIN_2022}"
-      #   artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        key: "mandatory-win-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_2016}"
+              - "${IMAGE_WIN_2022}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 ## TODO: this condition will be changed in the Phase 3 of the Migration Plan https://docs.google.com/document/d/1IPNprVtcnHlem-uyGZM0zGzhfUuFAh4LeSl9JFHMSZQ/edit#heading=h.sltz78yy249h
 
-  # - group: "Extended Windows Tests"
-  #   key: "extended-win-tests"
-  #   steps:
+  - group: "Extended Windows Tests"
+    key: "extended-win-tests"
+    steps:
 
-  #     - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-  #       command: ".buildkite/scripts/win_unit_tests.ps1"
-  #       key: "extended-win-unit-tests"
-  #       agents:
-  #         provider: "gcp"
-  #         image: "{{matrix.image}}"
-  #         machineType: "${GCP_WIN_MACHINE_TYPE}"
-  #         disk_size: 100
-  #         disk_type: "pd-ssd"
-  #       matrix:
-  #         setup:
-  #           image:
-  #             - "${IMAGE_WIN_10}"
-  #             - "${IMAGE_WIN_11}"
-  #             - "${IMAGE_WIN_2019}"
-  #       artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        key: "extended-win-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_10}"
+              - "${IMAGE_WIN_11}"
+              - "${IMAGE_WIN_2019}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 
 YAML
@@ -93,19 +93,19 @@ if are_conditions_met_arm_tests || are_conditions_met_macos_tests ; then
 YAML
 fi
 
-# if  are_conditions_met_macos_tests; then
-#   cat >> $pipelineName <<- YAML
+if  are_conditions_met_macos_tests; then
+  cat >> $pipelineName <<- YAML
 
-#       - label: ":mac: MacOS Unit Tests"
-#         key: "extended-macos-unit-tests"
-#         command: ".buildkite/scripts/unit_tests.sh"
-#         agents:
-#           provider: "orka"
-#           imagePrefix: "${IMAGE_MACOS_X86_64}"
-#         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":mac: MacOS Unit Tests"
+        key: "extended-macos-unit-tests"
+        command: ".buildkite/scripts/unit_tests.sh"
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-# YAML
-# fi
+YAML
+fi
 
 if  are_conditions_met_arm_tests; then
   cat >> $pipelineName <<- YAML
