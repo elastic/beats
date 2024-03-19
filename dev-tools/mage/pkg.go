@@ -256,7 +256,7 @@ func (b packageBuilder) Build() error {
 	log.Printf("Package spec: %+v", b.Spec)
 	err := b.Type.Build(b.Spec)
 	if err != nil {
-		return fmt.Errorf("failed building %v type=%v for platform=%v: %w", err)
+		return fmt.Errorf("failed building %v type=%v for platform=%v: %w", b.Spec.Name, b.Type, b.Platform.Name, err)
 	}
 	return nil
 }
