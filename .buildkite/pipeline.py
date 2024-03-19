@@ -389,12 +389,13 @@ def pr_comment_pipeline(pr_comment: PRComment, yaml: YAML) -> list[Group]:
 def main() -> None:
     yaml = YAML(typ="safe")
     all_groups = []
-    if is_pr() and not os.getenv("GITHUB_PR_TRIGGER_COMMENT"):
-        all_groups = fetch_pr_pipeline(yaml)
-
-    if is_pr() and os.getenv("GITHUB_PR_TRIGGER_COMMENT"):
-        comment = PRComment(os.getenv("GITHUB_PR_TRIGGER_COMMENT"))
-        all_groups = pr_comment_pipeline(comment, yaml)
+    if is_pr():
+        if os.getenv("GITHUB_PR_TRIGGER_COMMENT"):
+            comment = PRComment(os.getenv("GITHUB_PR_TRIGGER_COMMENT"))
+            all_groups = pr_comment_pipeline(comment, yaml)
+        else:
+            all_groups = fetch_pr_pipeline(yaml)
+    # TODO what to load when not in PR
 
     # Produce the dynamic pipeline
     print(
