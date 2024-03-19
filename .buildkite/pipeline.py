@@ -92,7 +92,8 @@ class Step:
             ],
             "agents": self.agent.create_entity(),
             "artifact_paths": [
-                f"{self.project}/build/*.xml" f"{self.project}/build/*.json"
+                f"{self.project}/build/*.xml",
+                f"{self.project}/build/*.json"
             ],
         }
         return data
