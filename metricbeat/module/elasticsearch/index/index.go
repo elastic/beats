@@ -41,8 +41,8 @@ const (
 	expandWildcards = "expand_wildcards=open"
 	statsPath       = "/_stats/" + statsMetrics + "?filter_path=indices&" + expandWildcards
 
-	bulkSuffix   = ",bulk"
-	hiddenSuffix = ",hidden"
+	bulkSuffix         = ",bulk"
+	hiddenSuffix       = ",hidden"
 	allowClosedIndices = "&forbid_closed_indices=false"
 )
 
