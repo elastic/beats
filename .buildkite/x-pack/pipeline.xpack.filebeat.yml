@@ -62,7 +62,7 @@ steps:
     allow_dependency_failure: false
 
   - label: ":linux: Load dynamic x-pack filebeat pipeline"
-    key: "filebeat-pipeline"
+    key: "xpack-filebeat-pipeline"
     command: ".buildkite/scripts/generate_xpack_filebeat_pipeline.sh"
     notify:
       - github_commit_status:
