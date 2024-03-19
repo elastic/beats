@@ -48,7 +48,13 @@ const (
 	packageStagingDir = "build/package"
 
 	// defaultBinaryName specifies the output file for zip and tar.gz.
-	defaultBinaryName = "{{.Name}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
+	defaultBinaryName = "{{.Name}}{{if .Qualifier}}-{{.Qualifier}}{{end}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
+
+	// defaultRootDir is the default name of the root directory contained inside of zip and
+	// tar.gz packages.
+	// NOTE: This uses .BeatName instead of .Name because we wanted the internal
+	// directory to not include "-oss".
+	defaultRootDir = "{{.BeatName}}{{if .Qualifier}}-{{.Qualifier}}{{end}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}"
 )
 
 // PackageType defines the file format of the package (e.g. zip, rpm, etc).
@@ -88,6 +94,7 @@ type PackageSpec struct {
 	PreInstallScript  string                 `yaml:"pre_install_script,omitempty"`
 	PostInstallScript string                 `yaml:"post_install_script,omitempty"`
 	Files             map[string]PackageFile `yaml:"files"`
+	Qualifier         string                 `yaml:"qualifier,omitempty"`   // Optional
 	OutputFile        string                 `yaml:"output_file,omitempty"` // Optional
 	ExtraVars         map[string]string      `yaml:"extra_vars,omitempty"`  // Optional
 
@@ -530,9 +537,7 @@ func (s PackageSpec) rootDir() string {
 		return filepath.Base(s.OutputFile)
 	}
 
-	// NOTE: This uses .BeatName instead of .Name because we wanted the internal
-	// directory to not include "-oss".
-	return s.MustExpand("{{.BeatName}}-{{.Version}}{{if .Snapshot}}-SNAPSHOT{{end}}{{if .OS}}-{{.OS}}{{end}}{{if .Arch}}-{{.Arch}}{{end}}")
+	return s.MustExpand(defaultRootDir)
 }
 
 // PackageZip packages a zip file.
@@ -582,7 +587,10 @@ func PackageZip(spec PackageSpec) error {
 		return nil
 	}
 
-	return errors.Wrap(CreateSHA512File(spec.OutputFile), "failed to create .sha512 file")
+	if err := CreateSHA512File(spec.OutputFile); err != nil {
+		return fmt.Errorf("failed to create .sha512 file: %w", err)
+	}
+	return nil
 }
 
 // PackageTarGz packages a gzipped tar file.
@@ -661,7 +669,10 @@ func PackageTarGz(spec PackageSpec) error {
 		return nil
 	}
 
-	return errors.Wrap(CreateSHA512File(spec.OutputFile), "failed to create .sha512 file")
+	if err := CreateSHA512File(spec.OutputFile); err != nil {
+		return fmt.Errorf("failed to create .sha512 file: %w", err)
+	}
+	return nil
 }
 
 // PackageDeb packages a deb file. This requires Docker to execute FPM.
@@ -764,7 +775,10 @@ func runFPM(spec PackageSpec, packageType PackageType) error {
 		return errors.Wrap(err, "failed while running FPM in docker")
 	}
 
-	return errors.Wrap(CreateSHA512File(spec.OutputFile), "failed to create .sha512 file")
+	if err := CreateSHA512File(spec.OutputFile); err != nil {
+		return fmt.Errorf("failed to create .sha512 file: %w", err)
+	}
+	return nil
 }
 
 func addUidGidEnvArgs(args []string) ([]string, error) {
