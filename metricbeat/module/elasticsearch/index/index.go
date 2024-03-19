@@ -43,6 +43,7 @@ const (
 
 	bulkSuffix   = ",bulk"
 	hiddenSuffix = ",hidden"
+	allowClosedIndices = "&forbid_closed_indices=false"
 )
 
 // MetricSet type defines all fields of the MetricSet
@@ -111,6 +112,10 @@ func getServicePath(esVersion version.V) (string, error) {
 
 	if !esVersion.LessThan(elasticsearch.ExpandWildcardsHiddenAvailableVersion) {
 		u.RawQuery = strings.Replace(u.RawQuery, expandWildcards, expandWildcards+hiddenSuffix, 1)
+	}
+
+	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
+		u.RawQuery += allowClosedIndices
 	}
 
 	return u.String(), nil
