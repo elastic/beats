@@ -12,25 +12,25 @@ stages:
     mandatory:
         # NOTE: stage name should be unique!
         unitTest:
-            command: ".buildkite/filebeat/scripts/unit-tests.sh"
+            command: "mage -d filebeat unitTest"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         crosscompile:
-            command: ".buildkite/filebeat/scripts/crosscompile.sh"
+            command: "make -C filebeat crosscompile"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         goIntegTest:
-            command: ".buildkite/filebeat/scripts/integration-gotests.sh"
+            command: "mage -d filebeat goIntegTest"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         pythonIntegTest:
-            command: ".buildkite/filebeat/scripts/integration-pytests.sh"
+            command: "mage -d filebeat pythonIntegTest"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         rhel-9:
-            command: ".buildkite/filebeat/scripts/unit-tests.sh"
+            command: "mage -d filebeat unitTest"
             platform: "family/platform-ingest-beats-rhel-9"
         unitTest-windows-2022:
-            command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
+            command: "mage build unitTest"
             platform: "family/platform-ingest-beats-windows-2022"
         unitTest-windows-2016:
-            command: ".buildkite/filebeat/scripts/unit-tests-win.ps1"
+            command: "mage build unitTest"
             platform: "family/platform-ingest-beats-windows-2016"
     # optional stage - it runs on:
     #   - branches/tags
