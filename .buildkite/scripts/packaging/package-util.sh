@@ -20,11 +20,3 @@ define_tags() {
     tags+=("${SOURCE_TAG}" "${aliasVersion}")
   fi
 }
-
-check_is_arm() {
-  if [[ ${HW_TYPE} == "aarch64" || ${HW_TYPE} == "arm64" ]]; then
-    is_arm="-arm64"
-  else
-    is_arm=""
-  fi
-}

@@ -9,7 +9,7 @@ add_bin_path() {
 }
 
 with_go() {
-    local go_version="${GOLANG_VERSION}"
+    local go_version="${GO_VERSION}"
     echo "Setting up the Go environment..."
     create_bin
     check_platform_architecture
