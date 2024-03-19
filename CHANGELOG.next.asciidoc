@@ -99,6 +99,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - Fix a race condition that could crash Filebeat with a "negative WaitGroup counter" error {pull}38094[38094]
 - Fix "failed processing S3 event for object key" error on aws-s3 input when key contains the "+" character {issue}38012[38012] {pull}38125[38125]
 - Fix duplicated addition of regexp extension in CEL input. {pull}38181[38181]
+- Fix HTTPJSON handling of empty object bodies in POST requests. {issue}33961[33961] {pull}38290[38290]
 
 *Heartbeat*
 
