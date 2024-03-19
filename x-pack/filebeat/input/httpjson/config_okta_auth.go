@@ -179,7 +179,7 @@ func signJWT(cnf *oauth2.Config, key any) (string, error) {
 		Expiration(now.Add(time.Hour)).
 		Build()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to create token: %w", err)
 	}
 	signedToken, err := jwt.Sign(tok, jwt.WithKey(jwa.RS256, key))
 	if err != nil {

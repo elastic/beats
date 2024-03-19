@@ -5,9 +5,11 @@
 package httpjson
 
 import (
+	"bytes"
 	"context"
 	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"io/fs"
@@ -309,8 +311,15 @@ func (o *oAuth2Config) validateOktaProvider() error {
 	}
 	// jwk_pem
 	if o.OktaJWKPEM != "" {
-		_, err := x509.ParsePKCS1PrivateKey([]byte(o.OktaJWKPEM))
-		return err
+		blk, rest := pem.Decode([]byte(o.OktaJWKPEM))
+		if rest := bytes.TrimSpace(rest); len(rest) != 0 {
+			return fmt.Errorf("PEM text has trailing data: %s", rest)
+		}
+		_, err := x509.ParsePKCS8PrivateKey(blk.Bytes)
+		if err != nil {
+			return fmt.Errorf("okta validation error: %w", err)
+		}
+		return nil
 	}
 	// jwk_file
 	if o.OktaJWKFile != "" {
