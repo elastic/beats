@@ -311,7 +311,7 @@ def fetch_pr_comment_group_pipeline(comment: PRComment) -> list[Group]:
 
                 if not project_obj["stages"][comment.group]:
                     raise ValueError(
-                        "Group not found in {} buildkike.yml: {}".format(
+                        "Group not found in {} buildkite.yml: {}".format(
                             comment.project, comment.group
                         )
                     )
@@ -344,7 +344,7 @@ def fetch_pr_comment_step_pipeline(comment: PRComment) -> list[Group]:
 
                 if not project_obj["stages"][comment.group]:
                     raise ValueError(
-                        "Group not found in {} buildkike.yml: {}".format(
+                        "Group not found in {} buildkite.yml: {}".format(
                             comment.project, comment.group
                         )
                     )
@@ -361,7 +361,7 @@ def fetch_pr_comment_step_pipeline(comment: PRComment) -> list[Group]:
 
                 if not filtered_steps:
                     raise ValueError(
-                        "Step {} not found in {} buildkike.yml".format(
+                        "Step {} not found in {} buildkite.yml".format(
                             comment.step, comment.project
                         )
                     )
