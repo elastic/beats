@@ -94,6 +94,17 @@ var testCases = []struct {
 		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 	},
 	{
+		name:        "POST_request_with_empty_object_body",
+		setupServer: newTestServer(httptest.NewServer),
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodPost,
+			"request.body":   map[string]interface{}{},
+		},
+		handler:  defaultHandler(http.MethodPost, `{}`, ""),
+		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
 		name:        "repeated_POST_requests",
 		setupServer: newTestServer(httptest.NewServer),
 		baseConfig: map[string]interface{}{
@@ -1516,7 +1527,7 @@ func defaultHandler(expectedMethod, expectedBody, msg string) http.HandlerFunc {
 			r.Body.Close()
 			if expectedBody != string(body) {
 				w.WriteHeader(http.StatusBadRequest)
-				msg = fmt.Sprintf(`{"error":"expected body was %q"}`, expectedBody)
+				msg = fmt.Sprintf(`{"error":"expected body was %q, but got %q"}`, expectedBody, body)
 			}
 		}
 
