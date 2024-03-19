@@ -13,10 +13,10 @@ if [ "$DRA_WORKFLOW" == "snapshot" ]; then
     BEAT_VERSION_FULL="${BEAT_VERSION}-SNAPSHOT"
 fi
 
-SNAPSHOT=$SNAPSHOT mage packageAgentCore
-chmod -R 777 build/distributions
+SNAPSHOT=$SNAPSHOT mage -d x-pack/elastic-agent packageAgentCore
+chmod -R 777 x-pack/elastic-agent/build/distributions
 
 echo  "+++ Generate dependencies report"
 ./dev-tools/dependencies-report
-mkdir -p build/distributions/reports
-mv dependencies.csv "build/distributions/reports/dependencies-${BEAT_VERSION_FULL}.csv"
+mkdir -p x-pack/elastic-agent/build/distributions/reports
+mv dependencies.csv "x-pack/elastic-agent/build/distributions/reports/dependencies-${BEAT_VERSION_FULL}.csv"
