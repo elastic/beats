@@ -39,7 +39,6 @@ fi
 with_go "${GO_VERSION}"
 with_mage
 with_python
-python3 --version
 with_dependencies
 config_git
 mage dumpVariables
