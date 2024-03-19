@@ -28,6 +28,7 @@ import (
 	"github.com/elastic/beats/v7/filebeat/input"
 	"github.com/elastic/beats/v7/filebeat/inputsource"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -85,6 +86,8 @@ var (
 		"local6",
 		"local7",
 	}
+
+	deprecatedNotificationOnce sync.Once
 )
 
 func init() {
@@ -111,6 +114,10 @@ func NewInput(
 	context input.Context,
 ) (input.Input, error) {
 	log := logp.NewLogger("syslog")
+
+	deprecatedNotificationOnce.Do(func() {
+		cfgwarn.Deprecate("", "Syslog input. Use Syslog processor instead.")
+	})
 
 	out, err := outlet.Connect(cfg)
 	if err != nil {
@@ -180,7 +187,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 	case syslogFormatRFC5424:
 		return func(data []byte, metadata inputsource.NetworkMetadata) {
 			ev := parseAndCreateEvent5424(data, metadata, cfg.Timezone.Location(), log)
-			forwarder.Send(ev)
+			_ = forwarder.Send(ev)
 		}
 
 	case syslogFormatAuto:
@@ -191,7 +198,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 			} else {
 				ev = parseAndCreateEvent3164(data, metadata, cfg.Timezone.Location(), log)
 			}
-			forwarder.Send(ev)
+			_ = forwarder.Send(ev)
 		}
 	case syslogFormatRFC3164:
 		break
@@ -199,7 +206,7 @@ func GetCbByConfig(cfg config, forwarder *harvester.Forwarder, log *logp.Logger)
 
 	return func(data []byte, metadata inputsource.NetworkMetadata) {
 		ev := parseAndCreateEvent3164(data, metadata, cfg.Timezone.Location(), log)
-		forwarder.Send(ev)
+		_ = forwarder.Send(ev)
 	}
 }
 
