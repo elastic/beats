@@ -273,6 +273,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Filebeat*
 
+- Deprecate `syslog` input in favor of `syslog` processor. {issue}37555[37555] {pull}38277[38277]
 
 *Heartbeat*
 
