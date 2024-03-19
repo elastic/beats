@@ -240,38 +240,33 @@ def fetch_group(stages, project: str, category: str) -> Group:
     return Group(project=project, category=category, steps=steps)
 
 
-def fetch_pr_pipeline() -> list[Group]:
-    groups: list[Group] = []
-
+def fetch_pr_pipeline(yaml: YAML) -> list[Group]:
     git_helper = GitHelper()
     changeset = git_helper.get_pr_changeset()
-    yaml = YAML(typ="safe")
-    with open(".buildkite/buildkite.yml", "r", encoding="utf8") as file:
-        doc = yaml.load(file)
-        for project in doc["projects"]:
-            project_file = os.path.join(project, "buildkite.yml")
-            if not os.path.isfile(project_file):
-                continue
-            with open(project_file, "r", encoding="utf8") as project_fp:
-                project_obj = yaml.load(project_fp)
+    groups: list[Group] = []
+    doc = pipeline_loader(yaml)
+    for project in doc["projects"]:
+        project_file = os.path.join(project, "buildkite.yml")
+        if not os.path.isfile(project_file):
+            continue
+        project_obj = project_loader(yaml, project_file)
+        group = fetch_group(
+            stages=project_obj["stages"]["mandatory"],
+            project=project,
+            category="mandatory",
+        )
 
-                group = fetch_group(
-                    stages=project_obj["stages"]["mandatory"],
-                    project=project,
-                    category="mandatory",
-                )
+        if is_group_enabled(group, project_obj["when"]["changeset"], changeset):
+            groups.append(group)
 
-                if is_group_enabled(group, project_obj["when"]["changeset"], changeset):
-                    groups.append(group)
+        group = fetch_group(
+            stages=project_obj["stages"]["extended"],
+            project=project,
+            category="extended",
+        )
 
-                group = fetch_group(
-                    stages=project_obj["stages"]["extended"],
-                    project=project,
-                    category="extended",
-                )
-
-                if is_group_enabled(group, project_obj["when"]["changeset"], changeset):
-                    groups.append(group)
+        if is_group_enabled(group, project_obj["when"]["changeset"], changeset):
+            groups.append(group)
 
     # TODO: improve this merging lists
     all_groups = []
@@ -297,91 +292,80 @@ class PRComment:
 
 # A comment like "/test filebeat extended"
 # Returns a group of steps corresponding to the comment
-def fetch_pr_comment_group_pipeline(comment: PRComment) -> list[Group]:
+def fetch_pr_comment_group_pipeline(comment: PRComment, yaml: YAML) -> list[Group]:
     groups = []
-    yaml = YAML(typ="safe")
-    with open(".buildkite/buildkite.yml", "r", encoding="utf8") as file:
-        doc = yaml.load(file)
-        if comment.project in doc["projects"]:
-            project_file = os.path.join(comment.project, "buildkite.yml")
-
-            if not os.path.isfile(project_file):
-                raise FileNotFoundError(
-                    "buildkite.yml not found in: " + "{}".format(comment.project)
+    doc = pipeline_loader(yaml)
+    if comment.project in doc["projects"]:
+        project_file = os.path.join(comment.project, "buildkite.yml")
+        if not os.path.isfile(project_file):
+            raise FileNotFoundError(
+                "buildkite.yml not found in: " + "{}".format(comment.project)
+            )
+        project_obj = project_loader(yaml, project_file)
+        if not project_obj["stages"][comment.group]:
+            raise ValueError(
+                "Group not found in {} buildkite.yml: {}".format(
+                    comment.project, comment.group
                 )
-            with open(project_file, "r", encoding="utf8") as project_fp:
-                project_obj = yaml.load(project_fp)
+            )
 
-                if not project_obj["stages"][comment.group]:
-                    raise ValueError(
-                        "Group not found in {} buildkite.yml: {}".format(
-                            comment.project, comment.group
-                        )
-                    )
-
-                group = fetch_group(
-                    stages=project_obj["stages"][comment.group],
-                    project=comment.project,
-                    category="mandatory",
-                )
-                groups.append(group)
+        group = fetch_group(
+            stages=project_obj["stages"][comment.group],
+            project=comment.project,
+            category="mandatory",
+        )
+        groups.append(group)
 
     return groups
 
 
 # A comment like "/test filebeat extended unitTest-macos"
-def fetch_pr_comment_step_pipeline(comment: PRComment) -> list[Group]:
+def fetch_pr_comment_step_pipeline(comment: PRComment, yaml: YAML) -> list[Group]:
     groups = []
-    yaml = YAML(typ="safe")
-    with open(".buildkite/buildkite.yml", "r", encoding="utf8") as file:
-        doc = yaml.load(file)
-        if comment.project in doc["projects"]:
-            project_file = os.path.join(comment.project, "buildkite.yml")
-
-            if not os.path.isfile(project_file):
-                raise FileNotFoundError(
-                    "buildkite.yml not found in: " + "{}".format(comment.project)
+    doc = pipeline_loader(yaml)
+    if comment.project in doc["projects"]:
+        project_file = os.path.join(comment.project, "buildkite.yml")
+        if not os.path.isfile(project_file):
+            raise FileNotFoundError(
+                "buildkite.yml not found in: " + "{}".format(comment.project)
+            )
+        project_obj = project_loader(yaml, project_file)
+        if not project_obj["stages"][comment.group]:
+            raise ValueError(
+                "Group not found in {} buildkite.yml: {}".format(
+                    comment.project, comment.group
                 )
-            with open(project_file, "r", encoding="utf8") as project_fp:
-                project_obj = yaml.load(project_fp)
+            )
+        group = fetch_group(
+            stages=project_obj["stages"][comment.group],
+            project=comment.project,
+            category="mandatory",
+        )
 
-                if not project_obj["stages"][comment.group]:
-                    raise ValueError(
-                        "Group not found in {} buildkite.yml: {}".format(
-                            comment.project, comment.group
-                        )
-                    )
+        filtered_steps = list(
+            filter(lambda step: step.name == comment.step, group.steps)
+        )
 
-                group = fetch_group(
-                    stages=project_obj["stages"][comment.group],
-                    project=comment.project,
-                    category="mandatory",
+        if not filtered_steps:
+            raise ValueError(
+                "Step {} not found in {} buildkite.yml".format(
+                    comment.step, comment.project
                 )
+            )
+        group.steps = filtered_steps
+        groups.append(group)
 
-                filtered_steps = list(
-                    filter(lambda step: step.name == comment.step, group.steps)
-                )
-
-                if not filtered_steps:
-                    raise ValueError(
-                        "Step {} not found in {} buildkite.yml".format(
-                            comment.step, comment.project
-                        )
-                    )
-                group.steps = filtered_steps
-                groups.append(group)
-
-        return groups
+    return groups
 
 
-def pr_comment_pipeline(pr_comment: PRComment) -> list[Group]:
+def pr_comment_pipeline(pr_comment: PRComment, yaml: YAML) -> list[Group]:
 
     if pr_comment.command == "/test":
 
         # A comment like "/test" for a PR
         # We rerun the PR pipeline
         if not pr_comment.group:
-            return fetch_pr_pipeline()
+            return fetch_pr_pipeline(yaml)
 
         # A comment like "/test filebeat"
         # We don't know what group to run hence raise an error
@@ -393,15 +377,16 @@ def pr_comment_pipeline(pr_comment: PRComment) -> list[Group]:
         # A comment like "/test filebeat extended"
         # We rerun the filebeat extended pipeline for the PR
         if pr_comment.group and not pr_comment.step:
-            return fetch_pr_comment_group_pipeline(pr_comment)
+            return fetch_pr_comment_group_pipeline(pr_comment, yaml)
 
         # A comment like "/test filebeat extended unitTest-macos"
         if pr_comment.step:
-            return fetch_pr_comment_step_pipeline(pr_comment)
+            return fetch_pr_comment_step_pipeline(pr_comment, yaml)
 
 
 # TODO: validate unique stages!
 def main() -> None:
+    yaml = YAML(typ="safe")
     all_groups = []
     if is_pr() and not os.getenv("GITHUB_PR_TRIGGER_COMMENT"):
         all_groups = fetch_pr_pipeline()
@@ -413,14 +398,23 @@ def main() -> None:
             )
         )
         comment = PRComment(os.getenv("GITHUB_PR_TRIGGER_COMMENT"))
-        all_groups = pr_comment_pipeline(comment)
+        all_groups = pr_comment_pipeline(comment, yaml)
 
-    # Produce now the pipeline
+    # Produce the dynamic pipeline
     print(
         "# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json"
     )
-    yaml = YAML(typ="safe")
     yaml.dump(BuildkitePipeline(all_groups).create_entity(), sys.stdout)
+
+
+def pipeline_loader(yaml: YAML = YAML(typ="safe")):
+    with open(".buildkite/buildkite.yml", "r", encoding="utf8") as file:
+        return yaml.load(file)
+
+
+def project_loader(yaml: YAML = YAML(typ="safe"), project_file: str = ""):
+    with open(project_file, "r", encoding="utf8") as project_fp:
+        return yaml.load(project_fp)
 
 
 if __name__ == "__main__":
