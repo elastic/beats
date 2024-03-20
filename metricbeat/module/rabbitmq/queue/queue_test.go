@@ -55,7 +55,7 @@ func TestFetchEventContents(t *testing.T) {
 	consumers := event["consumers"].(common.MapStr)
 	utilisation := consumers["utilisation"].(common.MapStr)
 	assert.EqualValues(t, 3, consumers["count"])
-	assert.EqualValues(t, 0.7, utilisation["pct"])
+	assert.Equal(t, 0.7, utilisation["pct"])
 
 	memory := event["memory"].(common.MapStr)
 	assert.EqualValues(t, 232720, memory["bytes"])
