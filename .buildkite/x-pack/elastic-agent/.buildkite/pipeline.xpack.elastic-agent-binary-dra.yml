@@ -31,7 +31,7 @@ steps:
       - label: ":hammer: DRA Publish Elastic-Agent Core Snapshot"
         command: |
           echo "+++ Restoring Artifacts"
-          buildkite-agent artifact download "build/**/*" .
+          buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" .
           echo "+++ Changing permissions for the release manager"
           sudo chown -R :1000 x-pack/elastic-agent/build/distributions/
           echo "+++ Running DRA publish step"
@@ -66,7 +66,7 @@ steps:
       - label: ":hammer: DRA Publish Elastic-Agent Core staging"
         command: |
           echo "+++ Restoring Artifacts"
-          buildkite-agent artifact download "build/**/*" .
+          buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" .
           echo "+++ Changing permissions for the release manager"
           sudo chown -R :1000 x-pack/elastic-agent/build/distributions/
           echo "+++ Running DRA publish step"
