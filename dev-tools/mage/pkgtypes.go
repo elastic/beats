@@ -131,6 +131,7 @@ var OSArchNames = map[string]map[PackageType]map[string]string{
 		TarGz: map[string]string{
 			"386":   "x86",
 			"amd64": "x86_64",
+			"arm64": "aarch64",
 		},
 		DMG: map[string]string{
 			"386":   "x86",
