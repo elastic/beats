@@ -19,8 +19,11 @@
 package file_integrity
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"math"
+	"os"
 	"reflect"
 	"strconv"
 	"testing"
@@ -42,6 +45,12 @@ func TestExeObjParser(t *testing.T) {
 			t.Run(fmt.Sprintf("executableObject_%s_%s", format, builder), func(t *testing.T) {
 				if builder == "garble" && format == "pe" {
 					t.Skip("skipping test on garbled PE file: see https://github.com/elastic/beats/issues/35705")
+				}
+
+				if _, ci := os.LookupEnv("CI"); ci {
+					if _, err := os.Stat(target); err != nil && errors.Is(fs.ErrNotExist, err) {
+						t.Skip("skipping test because target binary was not found: see https://github.com/elastic/beats/issues/38211")
+					}
 				}
 
 				got := make(mapstr.M)
