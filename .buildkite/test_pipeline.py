@@ -12,8 +12,8 @@ def ubuntu2204_aws_agent():
 
 
 def test_fetch_stage(ubuntu2204_aws_agent):
-    step = pipeline.fetch_stage("test", "mandatory", "fake", "fake")
-    assert step.create_entity() ==  {
+    step = pipeline.fetch_stage("test", ubuntu2204_aws_agent, "fake", "fake")
+    assert step.create_entity() == {
         "label": "fake fake",
         "command": ["cd fake", "fake-cmd"],
         "notify": [
