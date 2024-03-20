@@ -8,7 +8,9 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"sync"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -107,7 +109,7 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 		}
 	})
 
-	events := m.getEventsSummary(ctx, health_client, startTime, endTime)
+	events := m.getEventsSummary(ctx, health_client)
 	for _, event := range events {
 		report.Event(event)
 	}
@@ -120,29 +122,23 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 func (m *MetricSet) getEventsSummary(
 	ctx context.Context,
 	awsHealth *health.Client,
-	startTime time.Time,
-	endTime time.Time,
 ) []mb.Event {
 	var events []mb.Event
 	eventFilter := types.EventFilter{
-		// LastUpdatedTimes: []types.DateTimeRange{
-		// 	{
-		// 		From: &startTime,
-		// 		To:   &endTime,
-		// 	},
-		// },
-		//Regions: []string{"ap-south"},
 		EventStatusCodes: []types.EventStatusCode{
 			types.EventStatusCodeUpcoming,
 			types.EventStatusCodeOpen,
-			// types.EventStatusCodeClosed,
 		},
 	}
 
 	var nextTokenString = ""
 	var eventOutput *health.DescribeEventsOutput
 	var err error
+	var wg sync.WaitGroup // WaitGroup for goroutine synchronization
 
+	errCh := make(chan error, maxResults)
+
+	c := make(chan HealthDetails, maxResults)
 	for {
 		if nextTokenString == "" {
 			eventOutput, err = awsHealth.DescribeEvents(ctx,
@@ -166,11 +162,9 @@ func (m *MetricSet) getEventsSummary(
 			return nil
 		}
 		ets := eventOutput.Events
-		c := make(chan HealthDetails)
 		select {
 		case <-ctx.Done():
 			// Context cancelled, handle graceful termination
-			m.Logger().Info("Context cancelled. Exiting gracefully.")
 			close(c)
 			return nil
 		default:
@@ -178,9 +172,23 @@ func (m *MetricSet) getEventsSummary(
 		}
 
 		for _, et := range ets {
-			m.Logger().Debugf("[AWS Health] [Fetch DescribeEventDetails] Event ARN : %s", getStringValueOrDefault(et.Arn))
-			go m.getDescribeEventDetails(ctx, awsHealth, et, c)
+			m.Logger().Infof("[AWS Health] [Fetch DescribeEventDetails] Event ARN : %s", getStringValueOrDefault(et.Arn))
+			// Increment the WaitGroup counter
+			wg.Add(1)
+			go func(et types.Event) {
+				defer wg.Done() // Decrement the WaitGroup counter when goroutine exits
+				err := m.getDescribeEventDetails(ctx, awsHealth, et, c)
+				if err != nil {
+					errCh <- err
+				}
+			}(et)
 		}
+		// Wait for all goroutines to finish
+		// wg.Wait()
+		// for healthDetails := range c {
+		// 	m.Logger().Infof("[AWS Health] [DescribeEventDetails] Event ARN : %s, Affected Entities (Pending) : %d, Affected Entities (Resolved): %d, Affected Entities (Others) : %d", *healthDetails.event.Arn, healthDetails.affectedEntityPending, healthDetails.affectedEntityResolved, healthDetails.affectedEntityOthers)
+		// 	events = append(events, createEvents(healthDetails))
+		// }
 
 		for i := 0; i < len(ets); i++ {
 			select {
@@ -189,22 +197,25 @@ func (m *MetricSet) getEventsSummary(
 				m.Logger().Debug("Context cancelled. Exiting gracefully.")
 				close(c)
 				return nil
+			case err := <-errCh:
+				// Handle errors received from goroutines
+				m.Logger().Error(err.Error())
 			case healthDetails, ok := <-c:
 				if !ok {
 					return nil
 				}
-				m.Logger().Debugf("[AWS Health] [DescribeEventDetails] Event ARN : %s, Affected Entities (Pending) : %d, Affected Entities (Resolved): %d, Affected Entities (Others) : %d", *healthDetails.event.Arn, healthDetails.affectedEntityPending, healthDetails.affectedEntityResolved, healthDetails.affectedEntityOthers)
+				m.Logger().Infof("[AWS Health] [DescribeEventDetails] Event ARN : %s, Affected Entities (Pending) : %d, Affected Entities (Resolved): %d, Affected Entities (Others) : %d", *healthDetails.event.Arn, healthDetails.affectedEntityPending, healthDetails.affectedEntityResolved, healthDetails.affectedEntityOthers)
 				events = append(events, createEvents(healthDetails))
 			}
 		}
+		wg.Wait()
 		if eventOutput.NextToken == nil {
 			break
 		} else {
 			nextTokenString = *eventOutput.NextToken
 		}
-		time.Sleep(10 * time.Millisecond)
-		close(c)
 	}
+	close(c)
 	return events
 }
 
@@ -295,7 +306,7 @@ func generateEventID(eventID string) string {
 	return prefix[:20]
 }
 
-func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *health.Client, event types.Event, ch chan<- HealthDetails) {
+func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *health.Client, event types.Event, ch chan<- HealthDetails) error {
 	var hd HealthDetails
 	hd.event = event
 	eventDetails, err := awsHealth.DescribeEventDetails(ctx, &health.DescribeEventDetailsInput{
@@ -303,13 +314,13 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 		Locale:    &Locale,
 	})
 	if err != nil {
-		if ctx.Err() == context.Canceled {
+		if errors.Is(err, context.Canceled) {
 			m.Logger().Debug("Context cancelled. Exiting gracefully.")
-			return
+			return nil
 		}
 		err = fmt.Errorf("AWS Health DescribeEventDetails failed with %w", err)
 		m.Logger().Error(err.Error())
-		return
+		return err
 	} else {
 		hd.eventDescription = *(eventDetails.SuccessfulSet[0].EventDescription.LatestDescription)
 	}
@@ -332,13 +343,13 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 				err = fmt.Errorf("AWS Health DescribeAffectedEntities failed with %w", err)
 
 				// Check if the error is due to context cancellation
-				if ctx.Err() == context.Canceled {
+				if errors.Is(err, context.Canceled) {
 					m.Logger().Info("Context cancelled. Exiting gracefully.")
-					return
+					return nil
 				}
 				// Handle other errors
 				m.Logger().Error(err.Error())
-				return
+				return err
 			}
 			if affectedEntities != nil {
 				nextToken = affectedEntities.NextToken
@@ -370,18 +381,16 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 				err = fmt.Errorf("AWS Health DescribeAffectedEntities failed with %w", err)
 
 				// Check if the error is due to context cancellation
-				if ctx.Err() == context.Canceled {
+				if errors.Is(err, context.Canceled) {
 					m.Logger().Info("Context cancelled. Exiting gracefully.")
-					return
+					return nil
 				}
 				// Handle other errors
 				m.Logger().Error(err.Error())
-				return
+				return err
 			}
 			if affectedEntities != nil {
 				nextToken = affectedEntities.NextToken
-
-				// nextToken = affectedEntities.NextToken
 				hd.affectedEntities = append(hd.affectedEntities, affectedEntities.Entities...)
 
 				for _, affEntity := range affectedEntities.Entities {
@@ -406,14 +415,15 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 	hd.affectedEntityResolved = resolved
 	hd.affectedEntityPending = pending
 	hd.affectedEntityOthers = others
+
 	select {
 	case ch <- hd:
 		// Writing to the channel
 	default:
 		// Channel is closed,
-		return
+		return nil
 	}
-	time.Sleep(10 * time.Millisecond)
+	return nil
 }
 
 func getCurrentDateTime() string {
