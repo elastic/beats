@@ -17,6 +17,8 @@ stages:
         crosscompile:
             command: "make -C filebeat crosscompile"
             platform: "family/platform-ingest-beats-ubuntu-2204"
+            env:
+              GOX_FLAGS: "-arch amd64"
         goIntegTest:
             command: "mage -d filebeat goIntegTest"
             platform: "family/platform-ingest-beats-ubuntu-2204"

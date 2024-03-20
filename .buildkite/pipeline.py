@@ -66,9 +66,15 @@ class Step:
     """Buildkite Step object"""
 
     def __init__(
-        self, name: str, command: str, project: str, category: str, agent: Agent
+        self,
+        name: str,
+        project: str,
+        category: str,
+        agent: Agent,
+        definition: dict[str, Any],
     ):
-        self.command: str = command
+        self.command = definition.get("command", "")
+        self.envs = definition.get("env", [])
         self.agent: Agent = agent
         self.name: str = name
         self.project: str = project
@@ -93,9 +99,11 @@ class Step:
             "agents": self.agent.create_entity(),
             "artifact_paths": [
                 f"{self.project}/build/*.xml",
-                f"{self.project}/build/*.json"
+                f"{self.project}/build/*.json",
             ],
         }
+        if len(self.envs) > 0:
+            data["env"] = [f"{k}:{v}" for k, v in self.envs]
         return data
 
 
@@ -218,11 +226,7 @@ def fetch_stage(name: str, stage, project: str, category: str) -> Step:
         agent = OrkaAgent(image=stage["platform"])
 
     return Step(
-        category=category,
-        command=stage["command"],
-        name=name,
-        agent=agent,
-        project=project,
+        category=category, name=name, agent=agent, project=project, definition=stage
     )
 
 
