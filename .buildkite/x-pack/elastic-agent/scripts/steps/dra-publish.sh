@@ -2,6 +2,13 @@
 
 set -uo pipefail
 
+BEAT_VERSION=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+(\-[a-zA-Z]+[0-9]+)?' "libbeat/version/version.go")
+BEAT_VERSION_FULL=$BEAT_VERSION
+if [ "$DRA_WORKFLOW" == "snapshot" ]; then
+    SNAPSHOT="true"
+    BEAT_VERSION_FULL="${BEAT_VERSION}-SNAPSHOT"
+fi
+
 DRY_RUN="${DRA_DRY_RUN:=""}"
 WORKFLOW="${DRA_WORKFLOW:=""}"
 COMMIT="${DRA_COMMIT:="${BUILDKITE_COMMIT:=""}"}"
@@ -16,7 +23,6 @@ if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" ]]; then
     DRY_RUN="--dry-run"
     echo "+++ Running in PR or test branch and setting branch 7.17 and --dry-run"
 fi
-
 
 
 if [[ -z "${WORKFLOW}" ]]; then
