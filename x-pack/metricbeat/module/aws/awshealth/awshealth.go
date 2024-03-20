@@ -172,7 +172,7 @@ func (m *MetricSet) getEventsSummary(
 		}
 
 		for _, et := range ets {
-			m.Logger().Infof("[AWS Health] [Fetch DescribeEventDetails] Event ARN : %s", getStringValueOrDefault(et.Arn))
+			m.Logger().Debugf("[AWS Health] [Fetch DescribeEventDetails] Event ARN : %s", getStringValueOrDefault(et.Arn))
 			// Increment the WaitGroup counter
 			wg.Add(1)
 			go func(et types.Event) {
@@ -204,7 +204,7 @@ func (m *MetricSet) getEventsSummary(
 				if !ok {
 					return nil
 				}
-				m.Logger().Infof("[AWS Health] [DescribeEventDetails] Event ARN : %s, Affected Entities (Pending) : %d, Affected Entities (Resolved): %d, Affected Entities (Others) : %d", *healthDetails.event.Arn, healthDetails.affectedEntityPending, healthDetails.affectedEntityResolved, healthDetails.affectedEntityOthers)
+				m.Logger().Debugf("[AWS Health] [DescribeEventDetails] Event ARN : %s, Affected Entities (Pending) : %d, Affected Entities (Resolved): %d, Affected Entities (Others) : %d", *healthDetails.event.Arn, healthDetails.affectedEntityPending, healthDetails.affectedEntityResolved, healthDetails.affectedEntityOthers)
 				events = append(events, createEvents(healthDetails))
 			}
 		}
@@ -344,7 +344,7 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 
 				// Check if the error is due to context cancellation
 				if errors.Is(err, context.Canceled) {
-					m.Logger().Info("Context cancelled. Exiting gracefully.")
+					m.Logger().Debug("Context cancelled. Exiting gracefully.")
 					return nil
 				}
 				// Handle other errors
