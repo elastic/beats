@@ -114,7 +114,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 *Metricbeat*
 
 - Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
-- rabbitmq/queue - Fix mapping type for `rabbitmq.queue.consumers.utilisation.pct` to be `scaled_float` instead of `long` because the values range on `[0, 1.0]`. Previously, truncation converted the value to an integer so it either reported zero or one.
+- rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
 
 *Osquerybeat*
 
