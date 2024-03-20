@@ -103,7 +103,7 @@ class Step:
             ],
         }
         if len(self.envs) > 0:
-            data["env"] = [f"{k}:{v}" for k, v in self.envs]
+            data["env"] = self.envs
         return data
 
 
