@@ -92,7 +92,6 @@ function run_release_manager_collect() {
 }
 
 echo "+++ Release Manager ${WORKFLOW} / ${BRANCH} / ${COMMIT}";
-ls -lah x-pack/elastic-agent/build/distributions
 release_manager_login
 run_release_manager_list "${DRA_PROJECT_ID}" "${DRA_PROJECT_ARTIFACT_ID}" "${WORKFLOW}" "${COMMIT}" "${BRANCH}" "${PACKAGE_VERSION}"
 run_release_manager_collect "${DRA_PROJECT_ID}" "${DRA_PROJECT_ARTIFACT_ID}" "${WORKFLOW}" "${COMMIT}" "${BRANCH}" "${PACKAGE_VERSION}" "${DRY_RUN}"
