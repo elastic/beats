@@ -37,8 +37,6 @@ func newACKLoop(broker *broker) *ackLoop {
 func (l *ackLoop) run() {
 	b := l.broker
 	for {
-		nextBatchChan := l.pendingBatches.nextBatchChannel()
-
 		select {
 		case <-b.ctx.Done():
 			// The queue is shutting down.
@@ -48,19 +46,45 @@ func (l *ackLoop) run() {
 			// New batches have been generated, add them to the pending list
 			l.pendingBatches.concat(&chanList)
 
-		case <-nextBatchChan:
-			// The oldest outstanding batch has been acknowledged, advance our
-			// position as much as we can.
-			l.handleBatchSig()
+			// Subtlety: because runLoop delivers batches to consumedChan
+			// asynchronously, it's possible that they were already acknowledged
+			// before being added to pendingBatches, and in that case we should
+			// advance our position immediately.
+			l.maybeAdvanceBatchPosition()
+
+		case acked := <-b.ackedChan:
+			// A batch has been acknowledged. Mark it as done, remove its events
+			// from the queue buffer, and check if the queue position can be
+			// advanced.
+			l.handleBatchACK(acked)
+			l.maybeAdvanceBatchPosition()
 		}
 	}
 }
 
-// handleBatchSig collects and handles a batch ACK/Cancel signal. handleBatchSig
-// is run by the ackLoop.
-func (l *ackLoop) handleBatchSig() int {
-	ackedBatches := l.collectAcked()
+// Collect all contiguous acknowledged batches from the start of the
+// pending list.
+func (l *ackLoop) collectACKed() batchList {
+	ackedBatches := batchList{}
 
+	for !l.pendingBatches.empty() {
+		batch := l.pendingBatches.front()
+		// This check is safe since only the ackLoop goroutine can modify
+		// "done" after the batch is created.
+		if !batch.done {
+			break
+		}
+		ackedBatches.append(l.pendingBatches.pop())
+	}
+
+	return ackedBatches
+}
+
+func (l *ackLoop) maybeAdvanceBatchPosition() {
+	ackedBatches := l.collectACKed()
+	if ackedBatches.empty() {
+		return
+	}
 	count := 0
 	for batch := ackedBatches.front(); batch != nil; batch = batch.next {
 		count += batch.count
@@ -84,28 +108,15 @@ func (l *ackLoop) handleBatchSig() int {
 	l.broker.logger.Debug("ackloop: return ack to broker loop:", count)
 
 	l.broker.logger.Debug("ackloop:  done send ack")
-	return count
 }
 
-func (l *ackLoop) collectAcked() batchList {
-	ackedBatches := batchList{}
-
-	acks := l.pendingBatches.pop()
-	ackedBatches.append(acks)
-
-	done := false
-	for !l.pendingBatches.empty() && !done {
-		acks := l.pendingBatches.front()
-		select {
-		case <-acks.doneChan:
-			ackedBatches.append(l.pendingBatches.pop())
-
-		default:
-			done = true
-		}
+func (l *ackLoop) handleBatchACK(b *batch) {
+	// Clear all event pointers so the memory can be reclaimed immediately.
+	for i := 0; i < b.count; i++ {
+		entry := b.rawEntry(i)
+		entry.event = nil
 	}
-
-	return ackedBatches
+	b.done = true
 }
 
 // Called by ackLoop. This function exists to decouple the work of collecting

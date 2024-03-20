@@ -78,6 +78,12 @@ type broker struct {
 	// through this channel so ackLoop can monitor them for acknowledgments.
 	consumedChan chan batchList
 
+	// When a batch is acknowledged by a consumer, it is sent to this channel,
+	// where it is read by ackLoop. When the oldest remaining batches are
+	// acknowledged, ackLoop calls any appropriate acknowledgment callbacks
+	// and notifies runLoop to advance the queue position.
+	ackedChan chan *batch
+
 	// ackCallback is a configurable callback to invoke when ACKs are processed.
 	// ackLoop calls this function when it advances the consumer ACK position.
 	// Right now this forwards the notification to queueACKed() in
@@ -86,8 +92,8 @@ type broker struct {
 
 	// When batches are acknowledged, ackLoop saves any metadata needed
 	// for producer callbacks and such, then notifies runLoop that it's
-	// safe to free these events and advance the queue by sending the
-	// acknowledged event count to this channel.
+	// safe to advance the queue position by sending the acknowledged
+	// event count to this channel.
 	deleteChan chan int
 
 	///////////////////////////////
@@ -129,9 +135,9 @@ type batch struct {
 	// Position and length of the events within the queue buffer
 	start, count int
 
-	// batch.Done() sends to doneChan, where ackLoop reads it and handles
-	// acknowledgment / cleanup.
-	doneChan chan batchDoneMsg
+	// Set to true when an acknowledgment for this batch is received.
+	// Only read/written by the ackLoop goroutine.
+	done bool
 }
 
 type batchList struct {
@@ -222,6 +228,10 @@ func newQueue(
 		// internal runLoop and ackLoop channels
 		consumedChan: make(chan batchList),
 		deleteChan:   make(chan int),
+		// ackedChan is buffered so output workers don't block on acknowledgment
+		// if ackLoop is busy. (10 is probably more than we really need, but
+		// no harm in being safe.)
+		ackedChan: make(chan *batch, 10),
 
 		ackCallback: ackCallback,
 	}
@@ -287,9 +297,7 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 
 var batchPool = sync.Pool{
 	New: func() interface{} {
-		return &batch{
-			doneChan: make(chan batchDoneMsg, 1),
-		}
+		return &batch{}
 	},
 }
 
@@ -299,6 +307,7 @@ func newBatch(queue *broker, start, count int) *batch {
 	batch.queue = queue
 	batch.start = start
 	batch.count = count
+	batch.done = false
 	return batch
 }
 
@@ -344,13 +353,6 @@ func (l *batchList) empty() bool {
 
 func (l *batchList) front() *batch {
 	return l.head
-}
-
-func (l *batchList) nextBatchChannel() chan batchDoneMsg {
-	if l.head == nil {
-		return nil
-	}
-	return l.head.doneChan
 }
 
 func (l *batchList) pop() *batch {
@@ -408,5 +410,5 @@ func (b *batch) FreeEntries() {
 }
 
 func (b *batch) Done() {
-	b.doneChan <- batchDoneMsg{}
+	b.queue.ackedChan <- b
 }
