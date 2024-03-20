@@ -296,12 +296,12 @@ func NewLeaderElectionManager(
 		RetryPeriod:     2 * time.Second,
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: func(ctx context.Context) {
-				logger.Debugf("leader election lock GAINED, holder:%v, eventID: %v", id, eventID)
+				logger.Debugf("leader election lock GAINED, holder: %v, eventID: %v", id, eventID)
 				eventID = fmt.Sprintf("%v-%v", leaseId, time.Now().UnixNano())
 				startLeading(uuid.String(), eventID)
 			},
 			OnStoppedLeading: func() {
-				logger.Debugf("leader election lock LOST, holder:%v, eventID: %v", id, eventID)
+				logger.Debugf("leader election lock LOST, holder: %v, eventID: %v", id, eventID)
 				stopLeading(uuid.String(), eventID)
 			},
 		},
