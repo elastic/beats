@@ -21,6 +21,7 @@ import (
 	"encoding/json"
 	"flag"
 	"os"
+	"reflect"
 	"testing"
 	"time"
 
@@ -137,6 +138,11 @@ func TestCreateEvent(t *testing.T) {
 	}
 	expectbiFlow.stats[0] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{0, 0}}
 	expectbiFlow.stats[1] = &flowStats{uintFlags: []uint8{1, 1}, uints: []uint64{0, 0}}
+
+	// Assert the biflow is not 0 before the test
+	assert.Assert(t, !reflect.DeepEqual(expectbiFlow.stats[0].uints, bif.stats[0].uints))
+	assert.Assert(t, !reflect.DeepEqual(expectbiFlow.stats[1].uints, bif.stats[1].uints))
+
 	event = createEvent(&procs.ProcessesWatcher{}, time.Now(), bif, true, nil, []string{"bytes", "packets"}, nil, true)
 	result = validate(event.Fields)
 	if errs := result.Errors(); len(errs) > 0 {
@@ -145,6 +151,8 @@ func TestCreateEvent(t *testing.T) {
 		}
 		t.FailNow()
 	}
+
+	// Assert the biflow is 0 after the test
 	assert.DeepEqual(t, expectbiFlow.stats[0].uintFlags, bif.stats[0].uintFlags)
 	assert.DeepEqual(t, expectbiFlow.stats[0].uints, bif.stats[0].uints)
 	assert.DeepEqual(t, expectbiFlow.stats[1].uintFlags, bif.stats[1].uintFlags)
