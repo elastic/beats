@@ -20,6 +20,7 @@ package filestream
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"hash"
 	"io"
@@ -43,6 +44,10 @@ const (
 	DefaultFingerprintSize int64 = 1024 // 1KB
 	scannerDebugKey              = "scanner"
 	watcherDebugKey              = "file_watcher"
+)
+
+var (
+	errFileTooSmall = errors.New("file size is too small for ingestion")
 )
 
 type fileWatcherConfig struct {
@@ -202,7 +207,7 @@ func (w *fileWatcher) watch(ctx unison.Canceler) {
 	for path, fd := range newFilesByName {
 		// no need to react on empty new files
 		if fd.Info.Size() == 0 {
-			w.log.Warnf("file %q has no content yet, skipping", fd.Filename)
+			w.log.Debugf("file %q has no content yet, skipping", fd.Filename)
 			delete(paths, path)
 			continue
 		}
@@ -385,6 +390,10 @@ func (s *fileScanner) GetFiles() map[string]loginp.FileDescriptor {
 			}
 
 			fd, err := s.toFileDescriptor(&it)
+			if errors.Is(err, errFileTooSmall) {
+				s.log.Debugf("cannot start ingesting from file %q: %s", filename, err)
+				continue
+			}
 			if err != nil {
 				s.log.Warnf("cannot create a file descriptor for an ingest target %q: %s", filename, err)
 				continue
@@ -473,7 +482,7 @@ func (s *fileScanner) toFileDescriptor(it *ingestTarget) (fd loginp.FileDescript
 		// we should not open the file if we know it's too small
 		minSize := s.cfg.Fingerprint.Offset + s.cfg.Fingerprint.Length
 		if fileSize < minSize {
-			return fd, fmt.Errorf("filesize of %q is %d bytes, expected at least %d bytes for fingerprinting", fd.Filename, fileSize, minSize)
+			return fd, fmt.Errorf("filesize of %q is %d bytes, expected at least %d bytes for fingerprinting: %w", fd.Filename, fileSize, minSize, errFileTooSmall)
 		}
 
 		file, err := os.Open(it.originalFilename)
