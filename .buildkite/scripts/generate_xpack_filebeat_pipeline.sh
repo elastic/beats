@@ -40,6 +40,8 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
@@ -135,7 +137,9 @@ if are_conditions_met_aws_tests; then
         agents:
           provider: "gcp"
           image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
