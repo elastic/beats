@@ -37,6 +37,7 @@ type config struct {
 	URL                   string                  `config:"url" validate:"required"`
 	Prefix                string                  `config:"prefix"`
 	ContentType           string                  `config:"content_type"`
+	Program               string                  `config:"program"`
 	SecretHeader          string                  `config:"secret.header"`
 	SecretValue           string                  `config:"secret.value"`
 	HMACHeader            string                  `config:"hmac.header"`
