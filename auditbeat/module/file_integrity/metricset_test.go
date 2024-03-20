@@ -62,6 +62,7 @@ func TestData(t *testing.T) {
 
 func TestActions(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
+	skipOnBuildkiteWindows(t)
 
 	defer abtest.SetupDataDir(t)()
 
@@ -154,6 +155,7 @@ func TestActions(t *testing.T) {
 
 func TestExcludedFiles(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
+	skipOnBuildkiteWindows(t)
 
 	defer abtest.SetupDataDir(t)()
 
@@ -201,6 +203,7 @@ func TestExcludedFiles(t *testing.T) {
 
 func TestIncludedExcludedFiles(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
+	skipOnBuildkiteWindows(t)
 
 	defer abtest.SetupDataDir(t)()
 
@@ -947,5 +950,11 @@ func getConfig(path ...string) map[string]interface{} {
 func skipOnCIForDarwinAMD64(t testing.TB) {
 	if os.Getenv("CI") == "true" && runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
 		t.Skip("Skip test on CI for darwin/amd64")
+	}
+}
+
+func skipOnBuildkiteWindows(t testing.TB) {
+	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "windows" {
+		t.Skip("Skip on Buildkite Windows: Shortened TMP problem")
 	}
 }
