@@ -124,6 +124,15 @@ The list below covers the major changes between 7.0.0-rc2 and master only.
 - Improve tests files with shorter statements. {pull}35667[35667]
 - Improve compatibility and reduce flakyness of Python tests {pull}31588[31588]
 - Pin PyYAML version to 5.3.1 to avoid CI errors temporarily {pull}36091[36091]
+- Skip dependabot updates for github.com/elastic/mito. {pull}36158[36158]
+- Add device handling to Okta API package for entity analytics. {pull}35980[35980]
+- Make Filebeat HTTPJSON input process responses sequentially. {pull}36493[36493]
+- Add initial infrastructure for a caching enrichment processor. {pull}36619[36619]
+- Add file-backed cache for cache enrichment processor. {pull}36686[36686] {pull}36696[36696]
+- Elide retryable HTTP client construction in Filebeat HTTPJSON and CEL inputs if not needed. {pull}36916[36916]
+- Allow assignment of packetbeat protocols to interfaces. {issue}36574[36564] {pull}36852[36852]
+- Add Active Directory entity collector for Filebeat entity analytics. {pull}37854[37854]
+- Make logs for empty and small files less noisy when using fingerprint file identity in filestream. {pull}38421[38421]
 
 ==== Deprecated
 
