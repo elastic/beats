@@ -114,7 +114,7 @@ func (inp *filestream) Test(src loginp.Source, ctx input.TestContext) error {
 		return fmt.Errorf("not file source")
 	}
 
-	reader, _, err := inp.open(ctx.Logger, ctx.Cancelation, fs, 0, src)
+	reader, _, err := inp.open(ctx.Logger, ctx.Cancelation, fs, 0)
 	if err != nil {
 		return err
 	}
@@ -136,7 +136,7 @@ func (inp *filestream) Run(
 	log := ctx.Logger.With("path", fs.newPath).With("state-id", src.Name())
 	state := initState(log, cursor, fs)
 
-	r, truncated, err := inp.open(log, ctx.Cancelation, fs, state.Offset, src)
+	r, truncated, err := inp.open(log, ctx.Cancelation, fs, state.Offset)
 	if err != nil {
 		log.Errorf("File could not be opened for reading: %v", err)
 		return err
@@ -182,10 +182,9 @@ func (inp *filestream) open(
 	canceler input.Canceler,
 	fs fileSource,
 	offset int64,
-	src loginp.Source,
 ) (reader.Reader, bool, error) {
 
-	f, encoding, truncated, err := inp.openFile(log, fs.newPath, offset, src)
+	f, encoding, truncated, err := inp.openFile(log, fs.newPath, offset)
 	if err != nil {
 		return nil, truncated, err
 	}
@@ -264,7 +263,6 @@ func (inp *filestream) openFile(
 	log *logp.Logger,
 	path string,
 	offset int64,
-	src loginp.Source,
 ) (*os.File, encoding.Encoding, bool, error) {
 	fi, err := os.Stat(path)
 	if err != nil {
