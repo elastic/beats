@@ -276,17 +276,20 @@ scanner:
 		err := os.WriteFile(filename, nil, 0777)
 		require.NoError(t, err)
 
-		t.Run("issues a warning in logs", func(t *testing.T) {
-			var lastWarning string
+		t.Run("issues a debug message in logs", func(t *testing.T) {
 			expLogMsg := fmt.Sprintf("file %q has no content yet, skipping", filename)
 			require.Eventually(t, func() bool {
-				logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
+				logs := logp.ObserverLogs().FilterLevelExact(logp.DebugLevel.ZapLevel()).TakeAll()
 				if len(logs) == 0 {
 					return false
 				}
-				lastWarning = logs[len(logs)-1].Message
-				return strings.Contains(lastWarning, expLogMsg)
-			}, 100*time.Millisecond, 10*time.Millisecond, "required a warning message %q but got %q", expLogMsg, lastWarning)
+				for _, l := range logs {
+					if strings.Contains(l.Message, expLogMsg) {
+						return true
+					}
+				}
+				return false
+			}, 100*time.Millisecond, 10*time.Millisecond, "required a debug message %q but never found", expLogMsg)
 		})
 
 		t.Run("emits a create event once something is written to the empty file", func(t *testing.T) {
@@ -796,6 +799,25 @@ scanner:
 			requireEqualFiles(t, tc.expDesc, s.GetFiles())
 		})
 	}
+
+	t.Run("does not issue warnings when file is too small", func(t *testing.T) {
+		cfgStr := `
+scanner:
+  fingerprint:
+    enabled: true
+    offset: 0
+    length: 1024
+`
+		logp.DevelopmentSetup(logp.ToObserverOutput())
+
+		// this file is 128 bytes long
+		paths := []string{filepath.Join(dir, undersizedBasename)}
+		s := createScannerWithConfig(t, paths, cfgStr)
+		files := s.GetFiles()
+		require.Empty(t, files)
+		logs := logp.ObserverLogs().FilterLevelExact(logp.WarnLevel.ZapLevel()).TakeAll()
+		require.Empty(t, logs, "there must be no warning logs for files too small")
+	})
 
 	t.Run("returns error when creating scanner with a fingerprint too small", func(t *testing.T) {
 		cfgStr := `
