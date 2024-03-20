@@ -279,7 +279,9 @@ func NewLeaderElectionManager(
 		Name:      cfg.LeaderLease,
 		Namespace: ns,
 	}
-	metaUID := lease.GetObjectMeta().GetUID()
+
+	var eventID string
+	leaseId := lease.Name + "-" + lease.Namespace
 	lem.leaderElection = leaderelection.LeaderElectionConfig{
 		Lock: &resourcelock.LeaseLock{
 			LeaseMeta: lease,
@@ -295,12 +297,11 @@ func NewLeaderElectionManager(
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: func(ctx context.Context) {
 				logger.Debugf("leader election lock GAINED, id %v", id)
-				eventID := fmt.Sprintf("%v-%v", metaUID, time.Now().UnixNano())
+				eventID = fmt.Sprintf("%v-%v", leaseId, time.Now().UnixNano())
 				startLeading(uuid.String(), eventID)
 			},
 			OnStoppedLeading: func() {
 				logger.Debugf("leader election lock LOST, id %v", id)
-				eventID := fmt.Sprintf("%v-%v", metaUID, time.Now().UnixNano())
 				stopLeading(uuid.String(), eventID)
 			},
 		},
