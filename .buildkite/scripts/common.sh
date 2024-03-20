@@ -137,7 +137,7 @@ case "${BUILDKITE_PIPELINE_SLUG}" in
   "beats-xpack-filebeat")
     BEAT_CHANGESET_REFERENCE=${xpack_filebeat_changeset[@]}
     ;;
-"beats-xpack-dockerlogbeat")
+  "beats-xpack-dockerlogbeat")
     BEAT_CHANGESET_REFERENCE=${xpack_dockerlogbeat_changeset[@]}
     ;;
   "beats-xpack-libbeat")
