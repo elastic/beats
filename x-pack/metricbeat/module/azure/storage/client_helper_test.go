@@ -119,17 +119,17 @@ func TestMapMetric(t *testing.T) {
 	client := azure.NewMockClient()
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
 		m := &azure.MockService{}
-		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(emptyMetricDefinitions, nil)
+		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(emptyMetricDefinitions, nil)
 		client.AzureMonitorService = m
 		metric, err := mapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig)
 		assert.Error(t, err)
-		assert.Equal(t, err.Error(), "no metric definitions were found for resource 123 and namespace Microsoft.Storage/storageAccounts %!w(<nil>)")
+		assert.Equal(t, err.Error(), "no metric definitions were found for resource 123 and namespace Microsoft.Storage/storageAccounts")
 		assert.Equal(t, metric, []azure.Metric(nil))
 		m.AssertExpectations(t)
 	})
 	t.Run("return mapped metrics correctly", func(t *testing.T) {
 		m := &azure.MockService{}
-		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
+		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
 		metrics, err := mapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig)
 		assert.NoError(t, err)
