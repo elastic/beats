@@ -34,6 +34,7 @@ steps:
           buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" .
           echo "+++ Changing permissions for the release manager"
           sudo chown -R :1000 x-pack/elastic-agent/build/distributions/
+          sudo chmod -R 775 x-pack/elastic-agent/build/distributions/
           echo "+++ Running DRA publish step"
           .buildkite/x-pack/elastic-agent/scripts/steps/dra-publish.sh
         key: "publish-dra-snapshot"
@@ -69,6 +70,7 @@ steps:
           buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" .
           echo "+++ Changing permissions for the release manager"
           sudo chown -R :1000 x-pack/elastic-agent/build/distributions/
+          sudo chmod -R 775 x-pack/elastic-agent/build/distributions/
           echo "+++ Running DRA publish step"
           .buildkite/x-pack/elastic-agent/scripts/steps/dra-publish.sh
         key: "publish-dra-staging"
