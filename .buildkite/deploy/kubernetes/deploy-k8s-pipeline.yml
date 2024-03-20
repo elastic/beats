@@ -3,14 +3,11 @@
 env:
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  KIND_VERSION: "v0.20.0"
-  K8S_VERSION": "v1.29.0"
-  KUBECONFIG: "${WORKSPACE}/kubecfg"
 
 steps:
   - label: "Checks"
     command: ".buildkite/deploy/kubernetes/scripts/make.sh"
-#    if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") == "kubernetes"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") == "kubernetes"
     notify:
       - github_commit_status:
           context: "Deploy K8S/Checks"
@@ -19,12 +16,22 @@ steps:
       image: "${IMAGE_UBUNTU_X86_64}"
       machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
 
-  - label: "K8S Test"
+  - label: "K8S Integration Tests/K8S verion: {{matrix}}"
+    key: "k8s-test"
     env:
-      k8sTest: "v1.29.0,v1.28.0,v1.27.3,v1.26.6"
-    command:
-      - ".buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh"
+      K8S_VERSION: "{{matrix}}"
+      matrix:
+        - "v1.29.0"
+        - "v1.28.0"
+        - "v1.27.3"
+        - "v1.26.6"
+    commands:
+#      - ".buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh"
       - "MODULE=kubernetes make -C metricbeat integration-tests"
+    agents:
+      provider: "gcp"
+      image: "${IMAGE_UBUNTU_X86_64}"
+      machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
 
 
 # setEnvVar('ONLY_DOCS', isGitRegionMatch(patterns: [ '(.*\\.(asciidoc|md)|deploy/kubernetes/.*-kubernetes\\.yaml)' ], shouldMatchAll: true).toString())
