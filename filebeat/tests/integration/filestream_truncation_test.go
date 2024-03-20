@@ -40,7 +40,7 @@ path.home: %s
 logging:
   level: debug
   selectors:
-#    - file_watcher
+    - file_watcher
     - input.filestream
     - input.harvester
   metrics:
@@ -59,10 +59,6 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 	registryLogFile := filepath.Join(tempDir, "data/registry/filebeat/log.json")
 	filebeat.WriteConfigFile(fmt.Sprintf(truncationCfg, logFile, tempDir, tempDir))
 
-	// genLogCtx, cancel := context.WithCancel(context.Background())
-	// t.Cleanup(cancel)
-	// integration.GenerateLogFile(genLogCtx, t, logFile, false)
-
 	// 1. Create a log file and let Filebeat harvest all contents
 	writeLogFile(t, logFile, 200, false)
 	filebeat.Start()
@@ -70,9 +66,6 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 
 	// 2. Truncate the file and wait Filebeat to close the file
-	// time.Sleep(10 * time.Second)
-	t.Log("sleeping done, truncating file")
-	// time.Sleep(1 * time.Second)
 	if err := os.Truncate(logFile, 0); err != nil {
 		t.Fatalf("could not truncate log file: %s", err)
 	}
@@ -87,22 +80,17 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 	filebeat.Stop()
 
 	// Assert we offset in the registry
-	// TODO (Tiago): decide whether Filebeat can exit without
-	// updating the offset. Currently it does and it can be considered
-	// one of the root causes for the issue
 	assertLastOffset(t, registryLogFile, 10_000)
-
-	// TODO: ensure data was read
 
 	// Open for appending because the file has already been truncated
 	writeLogFile(t, logFile, 10, true)
+
 	// 5. Start Filebeat again.
 	filebeat.Start()
 	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 
 	assertLastOffset(t, registryLogFile, 500)
-
 }
 
 func TestFilestreamOfflineFileTruncation(t *testing.T) {
