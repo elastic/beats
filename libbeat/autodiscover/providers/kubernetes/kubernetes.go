@@ -301,7 +301,7 @@ func NewLeaderElectionManager(
 				startLeading(uuid.String(), eventID)
 			},
 			OnStoppedLeading: func() {
-				logger.Debugf("leader election lock LOST, id %v", id)
+				logger.Debugf("leader election lock LOST, holder:%v, eventID: %v", id, eventID)
 				stopLeading(uuid.String(), eventID)
 			},
 		},
