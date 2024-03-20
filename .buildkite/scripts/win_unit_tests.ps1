@@ -150,7 +150,7 @@ withPython $env:SETUP_WIN_PYTHON_VERSION
 
 withMinGW
 
-if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-packetbeat") {
+if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-packetbeat" -or $env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-filebeat") {
     withNmap $env:NMAP_WIN_VERSION
 }
 
