@@ -61,7 +61,7 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == 
   fi
 fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-dockerlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-dockerlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
   source .buildkite/scripts/setenv.sh
   if [[ "${BUILDKITE_COMMAND}" =~ ^buildkite-agent ]]; then
     echo "Skipped pre-command when running the Upload pipeline"
@@ -69,12 +69,16 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_S
   fi
 fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" && "$BUILDKITE_STEP_KEY" == "extended-cloud-test" ]]; then
-  BEATS_AWS_SECRET_KEY=$(retry 5 vault kv get -field secret_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
-  export BEATS_AWS_SECRET_KEY
-  BEATS_AWS_ACCESS_KEY=$(retry 5 vault kv get -field access_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
-  export BEATS_AWS_ACCESS_KEY
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
+  if [[ "$BUILDKITE_STEP_KEY" == "extended-cloud-test" ]]; then
+    BEATS_AWS_SECRET_KEY=$(retry 5 vault kv get -field secret_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
+    export BEATS_AWS_SECRET_KEY
+    BEATS_AWS_ACCESS_KEY=$(retry 5 vault kv get -field access_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
+    export BEATS_AWS_ACCESS_KEY
+  fi
 fi
+
+
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
   if [[ "$BUILDKITE_STEP_KEY" == "extended-win-10-system-tests" || "$BUILDKITE_STEP_KEY" == "mandatory-win-2022-system-tests" ]]; then
