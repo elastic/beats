@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-echo ":: Checking K8S ::"
-cd deploy/kubernetes
+echo "--- Checking K8S"
 make -C deploy/kubernetes all
 make check-no-changes

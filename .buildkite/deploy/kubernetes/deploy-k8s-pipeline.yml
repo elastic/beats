@@ -1,13 +1,58 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
+env:
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  KIND_VERSION: "v0.20.0"
+  K8S_VERSION": "v1.29.0"
+  KUBECONFIG: "${WORKSPACE}/kubecfg"
+
 steps:
   - label: "Checks"
-    command: echo "Hello!"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") = "kubernetes"
+    command: ".buildkite/deploy/kubernetes/scripts/make.sh"
+#    if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") == "kubernetes"
     notify:
       - github_commit_status:
           context: "Deploy K8S/Checks"
     agents:
       provider: "gcp"
-      image: "family/platform-ingest-beats-ubuntu-2204"
-#    "K8S_VERSION=${v}"
+      image: "${IMAGE_UBUNTU_X86_64}"
+      machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+
+  - label: "K8S Test"
+    env:
+      k8sTest: "v1.29.0,v1.28.0,v1.27.3,v1.26.6"
+    command:
+      - ".buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh"
+      - "MODULE=kubernetes make -C metricbeat integration-tests"
+
+
+# setEnvVar('ONLY_DOCS', isGitRegionMatch(patterns: [ '(.*\\.(asciidoc|md)|deploy/kubernetes/.*-kubernetes\\.yaml)' ], shouldMatchAll: true).toString())
+
+#  def withK8s(Closure body) {
+#    withEnv(["KUBECONFIG=${env.WORKSPACE}/kubecfg"]){
+#     retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kind", script: ".ci/scripts/install-kind.sh") }
+#     retryWithSleep(retries: 2, seconds: 5, backoff: true){ sh(label: "Install kubectl", script: ".ci/scripts/install-kubectl.sh") }
+#       try {
+#         // Add some environmental resilience when setup does not work the very first time.
+#         def i = 0
+#         retryWithSleep(retries: 3, seconds: 5, backoff: true){
+#           try {
+#             sh(label: "Setup kind", script: ".ci/scripts/kind-setup.sh")
+#           } catch(err) {
+#             i++
+#              sh(label: 'Delete cluster', script: 'kind delete cluster')
+#             if (i > 2) {
+#               error("Setup kind failed with error '${err.toString()}'")
+#             }
+#           }
+#         }
+#         body()
+#       } finally {
+#         sh(label: 'Delete cluster', script: 'kind delete cluster')
+#       }
+#     }
+#  }
+
+  #sh(label: "Integration tests", script: "MODULE=kubernetes make -C metricbeat integration-tests")
+  #sh(label: "Deploy to kubernetes",script: "make -C deploy/kubernetes test")

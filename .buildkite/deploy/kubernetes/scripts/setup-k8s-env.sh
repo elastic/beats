@@ -4,13 +4,11 @@ set -euo pipefail
 
 source .buildkite/env-scripts/util.sh
 
-echo ":: Starting K8S Setup ::"
+echo "--- Installing kind"
+retry_with_count .buildkite/deploy/kubernetes/scripts/install-kind.sh
+retry_with_count .buildkite/deploy/kubernetes/scripts/install-kubectl.sh
 
-echo ":: Install kind ::"
-retry .buildkite/deploy/kubernetes/scripts/install-kind.sh
-retry .buildkite/deploy/kubernetes/scripts/install-kubectl.sh
-
-echo ":: Setup kind ::"
+echo "--- Setting up kind"
 max_retries=3
 timeout=5
 retries=0
@@ -26,14 +24,14 @@ else
 
   if [ $retries -gt $max_retries ]; then
     kind delete cluster
-    echo "Kind setup FAILED: $script_output"
+    echo "--- Kind setup FAILED: $script_output"
     exit 1
   fi
 
   kind delete cluster
 
   sleep_time=$((timeout * retries))
-  echo "Retry #$retries failed. Retrying after ${sleep_time}s..."
+  echo "--- Retry #$retries failed. Retrying after ${sleep_time}s..."
   sleep $sleep_time
 fi
 done
