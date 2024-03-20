@@ -12,7 +12,7 @@ stages:
     mandatory:
         # NOTE: stage name should be unique!
         unitTest:
-            command: "build unitTest"
+            command: "mage build unitTest"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         crosscompile:
             command: "make crosscompile"

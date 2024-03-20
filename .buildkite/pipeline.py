@@ -87,9 +87,7 @@ class Step:
 
     def step_command(self) -> list[str]:
         commands = [
-            # pushd works for windows as well
-            # https://en.wikipedia.org/wiki/Pushd_and_popd#:~:text=In%20Windows%20PowerShell%2C%20pushd%20is,the%20pushd%20and%20popd%20commands.
-            f"pushd {self.project}",
+            f"cd {self.project}",
             self.command,
         ]
         return commands
