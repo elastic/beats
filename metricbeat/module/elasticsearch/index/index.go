@@ -108,14 +108,11 @@ func getServicePath(esVersion version.V) (string, error) {
 
 	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
 		u.Path += bulkSuffix
+		u.RawQuery += allowClosedIndices
 	}
 
 	if !esVersion.LessThan(elasticsearch.ExpandWildcardsHiddenAvailableVersion) {
 		u.RawQuery = strings.Replace(u.RawQuery, expandWildcards, expandWildcards+hiddenSuffix, 1)
-	}
-
-	if !esVersion.LessThan(elasticsearch.BulkStatsAvailableVersion) {
-		u.RawQuery += allowClosedIndices
 	}
 
 	return u.String(), nil
