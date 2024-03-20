@@ -77,7 +77,7 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 	filebeat.WriteConfigFile(fmt.Sprintf(truncationCfg, logFile, tempDir, tempDir))
 
 	// 1. Create a log file and let Filebeat harvest all contents
-	writeLogFile(t, logFile, 200, false)
+	integration.GenerateLogFile(t, logFile, 200, false)
 	filebeat.Start()
 	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
 	filebeat.WaitForLogs("End of file reached", 30*time.Second, "Filebeat did not finish reading the log file")
@@ -100,7 +100,7 @@ func TestFilestreamLiveFileTruncation(t *testing.T) {
 	assertLastOffset(t, registryLogFile, 10_000)
 
 	// Open for appending because the file has already been truncated
-	writeLogFile(t, logFile, 10, true)
+	integration.GenerateLogFile(t, logFile, 10, true)
 
 	// 5. Start Filebeat again.
 	filebeat.Start()
@@ -123,7 +123,7 @@ func TestFilestreamOfflineFileTruncation(t *testing.T) {
 	filebeat.WriteConfigFile(fmt.Sprintf(truncationCfg, logFile, tempDir, tempDir))
 
 	// 1. Create a log file with some lines
-	writeLogFile(t, logFile, 10, false)
+	integration.GenerateLogFile(t, logFile, 10, false)
 
 	// 2. Ingest the file and stop Filebeat
 	filebeat.Start()
@@ -138,7 +138,7 @@ func TestFilestreamOfflineFileTruncation(t *testing.T) {
 	if err := os.Truncate(logFile, 0); err != nil {
 		t.Fatalf("could not truncate log file: %s", err)
 	}
-	writeLogFile(t, logFile, 5, true)
+	integration.GenerateLogFile(t, logFile, 5, true)
 
 	// 5. Read the file again and stop Filebeat
 	filebeat.Start()
@@ -167,53 +167,6 @@ func assertLastOffset(t *testing.T, path string, offset int) {
 		}
 
 		t.FailNow()
-	}
-}
-
-// writeLogFile writes count lines to path, each line is 50 bytes
-func writeLogFile(t *testing.T, path string, count int, append bool) {
-	var file *os.File
-	var err error
-	if !append {
-		file, err = os.Create(path)
-		if err != nil {
-			t.Fatalf("could not create file '%s': %s", path, err)
-		}
-	} else {
-		file, err = os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
-		if err != nil {
-			t.Fatalf("could not open or create file: '%s': %s", path, err)
-		}
-	}
-
-	defer assertFileSize(t, path, int64(count*50))
-	defer func() {
-		if err := file.Close(); err != nil {
-			t.Fatalf("could not close file: %s", err)
-		}
-	}()
-	defer func() {
-		if err := file.Sync(); err != nil {
-			t.Fatalf("could not sync file: %s", err)
-		}
-	}()
-	now := time.Now().Format(time.RFC3339)
-	for i := 0; i < count; i++ {
-		if _, err := fmt.Fprintf(file, "%s           %13d\n", now, i); err != nil {
-			t.Fatalf("could not write line %d to file: %s", count+1, err)
-		}
-	}
-}
-
-func assertFileSize(t *testing.T, path string, size int64) {
-	t.Helper()
-	fi, err := os.Stat(path)
-	if err != nil {
-		t.Errorf("could not call Stat on '%s': %s", path, err)
-	}
-
-	if fi.Size() != size {
-		t.Errorf("[%s] expecting size %d, got: %d", path, size, fi.Size())
 	}
 }
 

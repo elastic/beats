@@ -687,55 +687,37 @@ func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
 	return io.ReadAll(f)
 }
 
-// GenerateLogFile generates a log file by appending the current
-// time to it every second.
-// TODO (Tiago): Find a better name
-func GenerateLogFile(ctx context.Context, t *testing.T, fullPath string, append bool) {
-	var f *os.File
+// GenerateLogFile writes count lines to path, each line is 50 bytes.
+// Each line contains the current time (RFC3339) and a counter
+func GenerateLogFile(t *testing.T, path string, count int, append bool) {
+	var file *os.File
 	var err error
 	if !append {
-		f, err = os.Create(fullPath)
+		file, err = os.Create(path)
+		if err != nil {
+			t.Fatalf("could not create file '%s': %s", path, err)
+		}
 	} else {
-		f, err = os.OpenFile(fullPath, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+		file, err = os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+		if err != nil {
+			t.Fatalf("could not open or create file: '%s': %s", path, err)
+		}
 	}
-	if err != nil {
-		t.Fatalf("could not create file '%s': %s", fullPath, err)
-	}
 
-	go func() {
-		t.Helper()
-		ticker := time.NewTicker(time.Second)
-		t.Cleanup(ticker.Stop)
-
-		done := make(chan struct{})
-		t.Cleanup(func() { close(done) })
-
-		defer func() {
-			if err := f.Close(); err != nil {
-				t.Errorf("could not close log file '%s': %s", fullPath, err)
-			}
-		}()
-
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case <-done:
-				return
-			case now := <-ticker.C:
-				fmt.Println(now.Format(time.RFC3339))
-				_, err := fmt.Fprintln(f, now.Format(time.RFC3339))
-				if err != nil {
-					// The Go compiler does not allow me to call t.Fatalf from a non-test
-					// goroutine, so just log it instead
-					t.Errorf("could not write data to log file '%s': %s", fullPath, err)
-					return
-				}
-				// make sure log lines are synced as quickly as possible
-				if err := f.Sync(); err != nil {
-					t.Errorf("could not sync file '%s': %s", fullPath, err)
-				}
-			}
+	defer func() {
+		if err := file.Close(); err != nil {
+			t.Fatalf("could not close file: %s", err)
 		}
 	}()
+	defer func() {
+		if err := file.Sync(); err != nil {
+			t.Fatalf("could not sync file: %s", err)
+		}
+	}()
+	now := time.Now().Format(time.RFC3339)
+	for i := 0; i < count; i++ {
+		if _, err := fmt.Fprintf(file, "%s           %13d\n", now, i); err != nil {
+			t.Fatalf("could not write line %d to file: %s", count+1, err)
+		}
+	}
 }
