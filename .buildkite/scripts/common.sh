@@ -498,8 +498,8 @@ startCloudTestEnv() {
   local dir=$1
   withAWS
   echo "--- Run docker-compose services for emulated cloud env"
-  with_Terraform
   docker-compose -f .ci/jobs/docker-compose.yml up -d                     #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+  with_Terraform
   terraformInit "$dir"
   export TF_VAR_BRANCH=$(echo "${BUILDKITE_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
   export TF_VAR_BUILD_ID="${BUILDKITE_BUILD_ID}"
