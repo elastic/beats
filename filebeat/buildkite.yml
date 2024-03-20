@@ -29,10 +29,10 @@ stages:
             command: "mage -d filebeat unitTest"
             platform: "family/platform-ingest-beats-rhel-9"
         unitTest-windows-2022:
-            command: "mage build unitTest"
+            command: "mage -d filebeat build unitTest"
             platform: "family/platform-ingest-beats-windows-2022"
         unitTest-windows-2016:
-            command: "mage build unitTest"
+            command: "mage -d filebeat build unitTest"
             platform: "family/platform-ingest-beats-windows-2016"
     # optional stage - it runs on:
     #   - branches/tags
