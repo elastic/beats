@@ -74,7 +74,7 @@ class Step:
         definition: dict[str, Any],
     ):
         self.command = definition.get("command", "")
-        self.envs = definition.get("env", [])
+        self.env = definition.get("env", {})
         self.agent: Agent = agent
         self.name: str = name
         self.project: str = project
@@ -85,10 +85,19 @@ class Step:
     def __lt__(self, other):
         return self.name < other.name
 
+    def step_command(self) -> list[str]:
+        commands = [
+            # pushd works for windows as well
+            # https://en.wikipedia.org/wiki/Pushd_and_popd#:~:text=In%20Windows%20PowerShell%2C%20pushd%20is,the%20pushd%20and%20popd%20commands.
+            f"pushd {self.project}",
+            self.command,
+        ]
+        return commands
+
     def create_entity(self) -> dict[str, Any]:
         data = {
             "label": f"{self.project} {self.name}",
-            "command": [self.command],
+            "command": self.step_command(),
             "notify": [
                 {
                     "github_commit_status": {
@@ -102,8 +111,8 @@ class Step:
                 f"{self.project}/build/*.json",
             ],
         }
-        if len(self.envs) > 0:
-            data["env"] = self.envs
+        if self.env:
+            data["env"] = self.env
         return data
 
 

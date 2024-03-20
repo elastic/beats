@@ -12,21 +12,21 @@ stages:
     mandatory:
         # NOTE: stage name should be unique!
         unitTest:
-            command: "mage -d auditbeat build unitTest"
+            command: "build unitTest"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         crosscompile:
-            command: "make -C auditbeat crosscompile"
+            command: "make crosscompile"
             platform: "family/platform-ingest-beats-ubuntu-2204"
             env:
               GOX_FLAGS: "-arch amd64"
         unitTest-rhel-9:
-            command: "mage -d auditbeat build unitTest"
+            command: "mage build unitTest"
             platform: "family/platform-ingest-beats-rhel-9"
         unitTest-windows-2022:
-            command: "mage -d auditbeat  build unitTest"
+            command: "mage build unitTest"
             platform: "family/platform-ingest-beats-windows-2022"
         unitTest-windows-2016:
-            command: "mage -d auditbeat  build unitTest"
+            command: "mage build unitTest"
             platform: "family/platform-ingest-beats-windows-2016"
     # optional stage - it runs on:
     #   - branches/tags
@@ -36,21 +36,21 @@ stages:
     extended:
         # NOTE: stage name should be unique!
         integTest:
-            command: "mage -d auditbeat build integTest"
+            command: "mage build integTest"
             platform: "platform-ingest-beats-ubuntu-2204-aarch64"
             provider: "aws"
         integTest-arm:
-            command: "mage -d auditbeat build integTest"
+            command: "mage build integTest"
             platform: "platform-ingest-beats-ubuntu-2204-aarch64"
             provider: "aws"
         unitTest-arm:
-            command: "mage -d auditbeat build unitTest"
+            command: "mage build unitTest"
             platform: "platform-ingest-beats-ubuntu-2204-aarch64"
             provider: "aws"
         unitTest-macos:
-            command: "mage -d auditbeat build unitTest"
+            command: "mage build unitTest"
             platform: "generic-13-ventura-x64"
             provider: "orka"
         unitTest-windows-2019:
-            command: "mage -d auditbeat  build unitTest"
+            command: "mage build unitTest"
             platform: "family/core-windows-2019"

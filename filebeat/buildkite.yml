@@ -12,27 +12,27 @@ stages:
     mandatory:
         # NOTE: stage name should be unique!
         unitTest:
-            command: "mage -d filebeat unitTest"
+            command: "mage unitTest"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         crosscompile:
-            command: "make -C filebeat crosscompile"
+            command: "make crosscompile"
             platform: "family/platform-ingest-beats-ubuntu-2204"
             env:
               GOX_FLAGS: "-arch amd64"
         goIntegTest:
-            command: "mage -d filebeat goIntegTest"
+            command: "mage goIntegTest"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         pythonIntegTest:
-            command: "mage -d filebeat pythonIntegTest"
+            command: "mage pythonIntegTest"
             platform: "family/platform-ingest-beats-ubuntu-2204"
         rhel-9:
-            command: "mage -d filebeat unitTest"
+            command: "mage unitTest"
             platform: "family/platform-ingest-beats-rhel-9"
         unitTest-windows-2022:
-            command: "mage -d filebeat build unitTest"
+            command: "mage build unitTest"
             platform: "family/platform-ingest-beats-windows-2022"
         unitTest-windows-2016:
-            command: "mage -d filebeat build unitTest"
+            command: "mage build unitTest"
             platform: "family/platform-ingest-beats-windows-2016"
     # optional stage - it runs on:
     #   - branches/tags
