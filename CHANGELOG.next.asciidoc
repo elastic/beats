@@ -109,12 +109,13 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
 - Fix setuid root when running under cgroups v2. {pull}37794[37794]
 - Adjust State loader to only retry when response code status is 5xx {pull}37981[37981]
-- Reset prctl dumpable flag after cap drop. {pull}38269[38269] 
+- Reset prctl dumpable flag after cap drop. {pull}38269[38269]
 
 *Metricbeat*
 
 - Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
 - Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
+- rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
 
 *Osquerybeat*
 
