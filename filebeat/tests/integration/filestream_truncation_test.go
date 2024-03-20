@@ -35,7 +35,7 @@ import (
 var truncationCfg = `
 filebeat.inputs:
   - type: filestream
-    id: id
+    id: a-unique-filestream-input-id
     enabled: true
     prospector.scanner.check_interval: 30s
     paths:
@@ -181,16 +181,12 @@ func writeLogFile(t *testing.T, path string, count int, append bool) {
 		}
 	} else {
 		file, err = os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
-	}
-	defer func() {
-		assertFileSize(t, path, int64(count*50))
-		if t.Failed() {
-			t.Log("Waiting a few seconds")
-			time.Sleep(time.Second * 2)
-			t.Log("asserting file size again")
-			assertFileSize(t, path, int64(count*50))
+		if err != nil {
+			t.Fatalf("could not open or create file: '%s': %s", path, err)
 		}
-	}()
+	}
+
+	defer assertFileSize(t, path, int64(count*50))
 	defer func() {
 		if err := file.Close(); err != nil {
 			t.Fatalf("could not close file: %s", err)
@@ -245,15 +241,17 @@ func readFilestreamRegistryLog(t *testing.T, path string) []registryEntry {
 			t.Fatalf("could not read line '%s': %s", string(line), err)
 		}
 
-		if e.K == "" {
+		// Skips registry log entries containing the operation ID like:
+		// '{"op":"set","id":46}'
+		if e.Key == "" {
 			continue
 		}
 
 		entries = append(entries, registryEntry{
-			Key:      e.K,
-			Offset:   e.V.Cursor.Offset,
-			TTL:      e.V.TTL,
-			Filename: e.V.Meta.Source,
+			Key:      e.Key,
+			Offset:   e.Value.Cursor.Offset,
+			TTL:      e.Value.TTL,
+			Filename: e.Value.Meta.Source,
 		})
 	}
 
@@ -261,16 +259,14 @@ func readFilestreamRegistryLog(t *testing.T, path string) []registryEntry {
 }
 
 type entry struct {
-	K string `json:"k"`
-	V struct {
+	Key   string `json:"k"`
+	Value struct {
 		Cursor struct {
 			Offset int `json:"offset"`
 		} `json:"cursor"`
 		Meta struct {
-			Source         string `json:"source"`
-			IdentifierName string `json:"identifier_name"`
+			Source string `json:"source"`
 		} `json:"meta"`
-		TTL     time.Duration `json:"ttl"`
-		Updated []any         `json:"updated"`
+		TTL time.Duration `json:"ttl"`
 	} `json:"v"`
 }
