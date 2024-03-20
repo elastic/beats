@@ -18,15 +18,9 @@ if are_files_changed "$changeset"; then
       - label: ":ubuntu: ${BEATS_PROJECT_NAME}/Packaging Linux X86"
         key: "package-linux-x86"
         env:
-<<<<<<< HEAD:.buildkite/auditbeat/scripts/package-step.sh
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
-        command:
-          - ".buildkite/auditbeat/scripts/package.sh"
-=======
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
         command: ".buildkite/scripts/packaging/package.sh"
->>>>>>> 01f5a90209 (Snapshot packaging stage migration (#37827)):.buildkite/scripts/packaging/package-step.sh
         notify:
           - github_commit_status:
               context: "${BEATS_PROJECT_NAME}/Packaging: Linux X86"
