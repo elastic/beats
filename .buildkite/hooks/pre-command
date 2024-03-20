@@ -51,8 +51,6 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPE
   fi
 fi
 
-
-
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
   if [[ "$BUILDKITE_STEP_KEY" == "extended-win-10-system-tests" || "$BUILDKITE_STEP_KEY" == "mandatory-win-2022-system-tests" ]]; then
     PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry 5 vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
