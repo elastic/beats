@@ -37,6 +37,9 @@ fi
 echo "~~~ Execute pipeline generator tests"
 
 source /opt/buildkite-agent/hooks/pre-command
+echo $PATH
+which python3
+which pytest || true
 python3 -mpip install "pytest"
 pushd .buildkite
 pytest .
