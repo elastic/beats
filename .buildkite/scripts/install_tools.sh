@@ -48,8 +48,6 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
   export ELASTIC_SYNTHETICS_CAPABLE=true
   echo "Install @elastic/synthetics"
   npm i -g @elastic/synthetics
-  # install dependencies to run browsers
-  sudo npx playwright install-deps
 fi
 
 mage dumpVariables
