@@ -31,6 +31,7 @@ export TMP_FOLDER
 export DOCKER_REGISTRY
 export ASDF_TERRAFORM_VERSION
 export AWS_REGION
+export NODEJS_VERSION
 
 exportVars() {
   local platform_type="$(uname)"
