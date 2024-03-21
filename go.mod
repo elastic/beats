@@ -80,7 +80,7 @@ require (
 	github.com/elastic/go-structform v0.0.10
 	github.com/elastic/go-sysinfo v1.13.1
 	github.com/elastic/go-ucfg v0.8.7
-	github.com/elastic/gosigar v0.14.2
+	github.com/elastic/gosigar v0.14.3
 	github.com/fatih/color v1.15.0
 	github.com/fearful-symmetry/gorapl v0.0.4
 	github.com/fsnotify/fsevents v0.1.1
@@ -207,7 +207,7 @@ require (
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.9.2
 	github.com/elastic/go-elasticsearch/v8 v8.12.0
-	github.com/elastic/mito v1.9.0
+	github.com/elastic/mito v1.10.0
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
@@ -420,7 +420,6 @@ replace (
 	github.com/google/gopacket => github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a
 	github.com/insomniacslk/dhcp => github.com/elastic/dhcp v0.0.0-20200227161230-57ec251c7eb3 // indirect
 	github.com/snowflakedb/gosnowflake => github.com/snowflakedb/gosnowflake v1.6.19
-	github.com/stretchr/testify v1.9.0 => github.com/stretchr/testify v1.8.4 // Temporary fix for https://github.com/elastic/beats/pull/38436.
 	github.com/tonistiigi/fifo => github.com/containerd/fifo v0.0.0-20190816180239-bda0ff6ed73c
 	k8s.io/kubernetes v1.13.0 => k8s.io/kubernetes v1.24.15
 )
