@@ -18,7 +18,6 @@ env:
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
   BEATS_PROJECT_NAME: "x-pack/heartbeat"
 
-
 steps:
 
   - input: "Input Parameters"
