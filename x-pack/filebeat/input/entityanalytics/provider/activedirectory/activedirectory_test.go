@@ -103,6 +103,9 @@ func TestActiveDirectoryDoFetch(t *testing.T) {
 		}
 		t.Logf("user: %s", b)
 	})
+	if len(times) == 0 {
+		t.Fatal("no entries found")
+	}
 
 	// Find the time of the first changed entry for later.
 	sort.Slice(times, func(i, j int) bool { return times[i].Before(times[j]) })

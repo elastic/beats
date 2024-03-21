@@ -46,7 +46,7 @@ memberships, from Active Directory.
 ==== Setup
 
 A user with appropriate permissions must be set up in the Active Directory
-Server Manages in order for the provider to function properly.
+Server Manager in order for the provider to function properly.
 
 [float]
 ==== How It Works
@@ -187,7 +187,7 @@ The Active Directory Base Distinguished Name. Field is required.
 [float]
 ===== `ad_user`
 
-The client user name. Used for authentication. Field is required.
+The client user name. Used for authentication. The user must have Active Directory read access. Field is required.
 
 [float]
 ===== `ad_password`
