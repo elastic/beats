@@ -24,7 +24,12 @@ retry() {
   return 0
 }
 
+<<<<<<< HEAD
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" ]]; then
+=======
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
+>>>>>>> 4b7467b5c5 (Beats pipeline generator (#38162))
   source .buildkite/env-scripts/env.sh
   source .buildkite/env-scripts/util.sh
   source .buildkite/env-scripts/win-env.sh
