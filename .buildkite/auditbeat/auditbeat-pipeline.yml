@@ -1,13 +1,18 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 env:
-  IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
-  IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
+  BEATS_PROJECT_NAME: "auditbeat"
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
   IMAGE_WIN_2016: "family/core-windows-2016"
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
-  IMAGE_RHEL9: "family/core-rhel-9"
+  IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
 
 steps:
   - group: "Auditbeat Mandatory Testing"
@@ -24,6 +29,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
@@ -37,19 +43,20 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
 
       - label: ":windows:-{{matrix.image}} Unit Tests"
-        command: ".buildkite/auditbeat/scripts/unit-tests-win.ps1"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         notify:
           - github_commit_status:
               context: "Auditbeat: windows/Unit Tests"
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
-          machine_type: "n2-standard-8"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
           disk_type: "pd-ssd"
         matrix:
@@ -72,6 +79,7 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
 
   - group: "Extended Testing"
     key: "extended-tests"
@@ -88,8 +96,8 @@ steps:
               context: "Auditbeat/Extended: Unit Tests ARM"
         agents:
           provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.large"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "auditbeat/build/*.xml"
 
       - label: ":mac: MacOS Unit Tests"
@@ -112,14 +120,14 @@ steps:
     steps:
       - label: ":windows: Win 2019 Unit Tests"
         key: "win-extended-2019"
-        command: ".buildkite/auditbeat/scripts/unit-tests-win.ps1"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         notify:
           - github_commit_status:
               context: "Auditbeat/Extended: Win-2019 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
-          machine_type: "n2-standard-8"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
           disk_type: "pd-ssd"
         artifact_paths:
@@ -134,4 +142,4 @@ steps:
 
     steps:
       - label: Package pipeline
-        commands: ".buildkite/auditbeat/scripts/package-step.sh"
+        commands: ".buildkite/scripts/packaging/package-step.sh"
