@@ -216,6 +216,7 @@ func (m *MetricSet) getEventsSummary(
 		}
 	}
 	close(c)
+	close(errCh)
 	return events
 }
 
