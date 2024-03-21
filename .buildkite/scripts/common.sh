@@ -546,19 +546,23 @@ withNodeJSEnv() {
 
 installNodeJsDependencies() {
   # install dependencies to run browsers
-  sudo apt-get install libatk1.0-0\
-    libatk-bridge2.0-0\
-    libcups2\
-    libxkbcommon0\
-    libatspi2.0-0\
-    libxcomposite1\
-    libxdamage1\
-    libxfixes3\
-    libxrandr2\
-    libgbm1\
-    libpango-1.0-0\
-    libcairo2\
-    libasound2
+  if [ "${platform_type}" == "Linux" ]; then
+    sudo apt-get install -y libatk1.0-0\
+      libatk-bridge2.0-0\
+      libcups2\
+      libxkbcommon0\
+      libatspi2.0-0\
+      libxcomposite1\
+      libxdamage1\
+      libxfixes3\
+      libxrandr2\
+      libgbm1\
+      libpango-1.0-0\
+      libcairo2\
+      libasound2
+  elif [ "${platform_type}" == "Darwin" ]; then
+    # TBD
+  fi
 }
 
 teardown() {
