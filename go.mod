@@ -80,7 +80,7 @@ require (
 	github.com/elastic/go-structform v0.0.10
 	github.com/elastic/go-sysinfo v1.13.1
 	github.com/elastic/go-ucfg v0.8.7
-	github.com/elastic/gosigar v0.14.2
+	github.com/elastic/gosigar v0.14.3
 	github.com/fatih/color v1.15.0
 	github.com/fearful-symmetry/gorapl v0.0.4
 	github.com/fsnotify/fsevents v0.1.1
