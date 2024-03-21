@@ -68,11 +68,7 @@ fi
 if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-filebeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
   source .buildkite/scripts/common.sh
   if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
-    # Install NodeJS
-    withNodeJSEnv "${NODEJS_VERSION}"
     export ELASTIC_SYNTHETICS_CAPABLE=true
-    echo "Install @elastic/synthetics"
-    npm i -g @elastic/synthetics
   else
     # Set the MODULE env variable if possible, it should be defined before generating pipeline's steps. It is used in multiple pipelines.
     defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"

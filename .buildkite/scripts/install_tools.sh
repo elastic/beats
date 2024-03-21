@@ -41,6 +41,15 @@ with_mage
 with_python
 with_dependencies
 config_git
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
+  # Install NodeJS
+  withNodeJSEnv "${NODEJS_VERSION}"
+  export ELASTIC_SYNTHETICS_CAPABLE=true
+  echo "Install @elastic/synthetics"
+  npm i -g @elastic/synthetics
+fi
+
 mage dumpVariables
 
 #sudo command doesn't work at the "pre-command" hook because of another user environment (root with strange permissions)
