@@ -2,13 +2,6 @@
 
 set -uo pipefail
 
-BEAT_VERSION=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+(\-[a-zA-Z]+[0-9]+)?' "libbeat/version/version.go")
-BEAT_VERSION_FULL=$BEAT_VERSION
-if [ "$DRA_WORKFLOW" == "snapshot" ]; then
-    SNAPSHOT="true"
-    BEAT_VERSION_FULL="${BEAT_VERSION}-SNAPSHOT"
-fi
-
 DRY_RUN="${DRA_DRY_RUN:=""}"
 WORKFLOW="${DRA_WORKFLOW:=""}"
 COMMIT="${DRA_COMMIT:="${BUILDKITE_COMMIT:=""}"}"
@@ -18,11 +11,12 @@ CI_DRA_ROLE_PATH="kv/ci-shared/release/dra-role"
 
 # force main branch on PR's or it won't execute
 # because the PR branch does not have a project folder in release-manager
-if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" || "$BUILDKITE_BRANCH" == "xpack_agent_core_publish" ]]; then
+if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" ]]; then
     BRANCH=7.17
-    # DRY_RUN="--dry-run"
+    DRY_RUN="--dry-run"
     echo "+++ Running in PR or test branch and setting branch 7.17 and --dry-run"
 fi
+
 
 
 if [[ -z "${WORKFLOW}" ]]; then
