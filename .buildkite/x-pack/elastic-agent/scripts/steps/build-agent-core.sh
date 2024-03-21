@@ -14,7 +14,8 @@ if [ "$DRA_WORKFLOW" == "snapshot" ]; then
 fi
 
 SNAPSHOT=$SNAPSHOT mage -d x-pack/elastic-agent packageAgentCore
-chmod -R 777 x-pack/elastic-agent/build/distributions
+chmod 777 x-pack/elastic-agent/build/distributions
+chmod 664 x-pack/elastic-agent/build/distributions/*
 
 echo  "+++ Generate dependencies report"
 ./dev-tools/dependencies-report
