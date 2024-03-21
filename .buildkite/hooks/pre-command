@@ -29,7 +29,8 @@ retry() {
   return 0
 }
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
   source .buildkite/env-scripts/env.sh
   source .buildkite/env-scripts/util.sh
 
