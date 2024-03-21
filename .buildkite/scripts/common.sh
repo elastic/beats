@@ -533,9 +533,10 @@ withNodeJSEnv() {
   local version="v$1"
   echo "Installing the NodeJs version $version"
   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-  source ~/.bashrc
-  nvm install $version
-  nvm use $version
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+  nvm install "$version"
+  nvm use "$version"
   node --version
   nvm version | head -n1 > "${NVM_DIR}/.nvm-node-version"
 }
