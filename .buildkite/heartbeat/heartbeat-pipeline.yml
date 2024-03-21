@@ -4,9 +4,9 @@ env:
   BEATS_PROJECT_NAME: "heartbeat"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
-  IMAGE_WIN_2016: "family/core-windows-2016"
-  IMAGE_WIN_2019: "family/core-windows-2019"
-  IMAGE_WIN_2022: "family/core-windows-2022"
+  IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
+  IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
+  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
   IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
@@ -41,7 +41,7 @@ steps:
 
       - label: ":windows: Unit Tests / {{matrix.image}}"
         command:
-          - ".buildkite/scripts/win_unit_tests.ps1"
+          - ".buildkite/scripts/win-tests.ps1"
         notify:
           - github_commit_status:
               context: "Heartbeat: windows/Unit Tests"
@@ -126,7 +126,7 @@ steps:
     steps:
       - label: ":windows: Win 2019 Unit Tests"
         key: "win-extended-2019"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: ".buildkite/scripts/win-tests.ps1"
         notify:
           - github_commit_status:
               context: "Heartbeat/Extended: Win-2019 Unit Tests"
