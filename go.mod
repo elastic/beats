@@ -207,7 +207,7 @@ require (
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.9.2
 	github.com/elastic/go-elasticsearch/v8 v8.12.0
-	github.com/elastic/mito v1.9.0
+	github.com/elastic/mito v1.10.0
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
