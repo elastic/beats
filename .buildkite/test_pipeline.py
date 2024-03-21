@@ -65,7 +65,7 @@ def test_fetch_group(fake_simple_group):
 
 
 def test_is_pr():
-    os.environ["BUILDKITE_PULL_REQUEST___"] = ""
-    assert pipeline.is_pr() is False
-    os.environ["BUILDKITE_PULL_REQUEST"] = "true"
+    os.environ["BUILDKITE_PULL_REQUEST"] = "1234"
     assert pipeline.is_pr() is True
+    os.environ["BUILDKITE_PULL_REQUEST"] = "false"
+    assert pipeline.is_pr() is False
