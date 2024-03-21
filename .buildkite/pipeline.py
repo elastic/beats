@@ -6,7 +6,7 @@ import subprocess
 import fnmatch
 import sys
 
-
+# Remove comment after testing change detection
 class Agent:
     """Buildkite Agent object"""
 
