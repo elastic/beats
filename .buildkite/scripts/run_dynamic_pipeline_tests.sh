@@ -36,11 +36,8 @@ fi
 
 echo "~~~ Execute pipeline generator tests"
 
-source /opt/buildkite-agent/hooks/pre-command
-echo $PATH
-which python3
-which pytest || true
-python3 -mpip install "pytest"
+python3 -mpip install --quiet "pytest"
 pushd .buildkite
+${ASDF_DIR}/installs/python/${ASDF_PYTHON_VERSION}/bin/pytest .
 pytest .
 popd
