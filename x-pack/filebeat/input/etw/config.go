@@ -8,6 +8,8 @@ package etw
 
 import (
 	"fmt"
+	"regexp"
+	"strconv"
 
 	"github.com/elastic/beats/v7/x-pack/libbeat/reader/etw"
 )
@@ -35,7 +37,7 @@ type config struct {
 	SessionName string `config:"session_name"`
 	// TraceLevel filters all provider events with a level value
 	// that is less than or equal to this level.
-	// Allowed values are critical, error, warning, informational, and verbose.
+	// Allowed values are critical, error, warning, information, and verbose.
 	TraceLevel string `config:"trace_level"`
 	// MatchAnyKeyword is an 8-byte bitmask that enables the filtering of
 	// events from specific provider subcomponents. The provider will write
@@ -43,26 +45,37 @@ type config struct {
 	// in this bitmask.
 	// See https://learn.microsoft.com/en-us/message-analyzer/system-etw-provider-event-keyword-level-settings for more details.
 	// Use logman query providers "<provider.name>" to list the available keywords.
-	MatchAnyKeyword uint64 `config:"match_any_keyword"`
+	MatchAnyKeyword string `config:"match_any_keyword"`
 	// An 8-byte bitmask that enables the filtering of events from
 	// specific provider subcomponents. The provider will write a particular
 	// event if the event's keyword bits match all of the bits in this bitmask.
 	// See https://learn.microsoft.com/en-us/message-analyzer/system-etw-provider-event-keyword-level-settings for more details.
-	MatchAllKeyword uint64 `config:"match_all_keyword"`
+	MatchAllKeyword string `config:"match_all_keyword"`
 	// Session is the name of an existing session to read from.
 	// Run 'logman query -ets' to list existing sessions.
 	Session string `config:"session"`
 }
 
 func convertConfig(cfg config) etw.Config {
+	// Parse MatchAnyKeyword to uint64
+	matchAnyKeyword, err := strconv.ParseUint(cfg.MatchAnyKeyword[2:], 16, 64)
+	if err != nil {
+		return etw.Config{}
+	}
+	// Parse MatchAnyKeyword to uint64
+	matchAllKeyword, err := strconv.ParseUint(cfg.MatchAllKeyword[2:], 16, 64)
+	if err != nil {
+		return etw.Config{}
+	}
+
 	return etw.Config{
 		Logfile:         cfg.Logfile,
 		ProviderGUID:    cfg.ProviderGUID,
 		ProviderName:    cfg.ProviderName,
 		SessionName:     cfg.SessionName,
 		TraceLevel:      cfg.TraceLevel,
-		MatchAnyKeyword: cfg.MatchAnyKeyword,
-		MatchAllKeyword: cfg.MatchAllKeyword,
+		MatchAnyKeyword: matchAnyKeyword,
+		MatchAllKeyword: matchAllKeyword,
 		Session:         cfg.Session,
 	}
 }
@@ -70,7 +83,7 @@ func convertConfig(cfg config) etw.Config {
 func defaultConfig() config {
 	return config{
 		TraceLevel:      "verbose",
-		MatchAnyKeyword: 0xffffffffffffffff,
+		MatchAnyKeyword: "0xffffffffffffffff",
 	}
 }
 
@@ -108,6 +121,20 @@ func (c *config) Validate() error {
 		if c.Session != "" {
 			return fmt.Errorf("configuration constraint error: file and existing session cannot be defined together")
 		}
+	}
+
+	// Regular expression to validate match_any_keyword and match_all_keyword formats
+	re, err := regexp.Compile(`^0x[0-9a-fA-F]{16}$`)
+	if err != nil {
+		return fmt.Errorf("Error compiling regex: %w", err)
+	}
+
+	if !re.MatchString(c.MatchAnyKeyword) {
+		return fmt.Errorf("invalid match_any_keyword value '%s'", c.MatchAnyKeyword)
+	}
+
+	if c.MatchAllKeyword != "" && !re.MatchString(c.MatchAllKeyword) {
+		return fmt.Errorf("invalid match_all_keyword value '%s'", c.MatchAllKeyword)
 	}
 
 	return nil
