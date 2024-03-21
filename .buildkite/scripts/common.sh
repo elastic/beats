@@ -530,16 +530,13 @@ startCloudTestEnv() {
 }
 
 withNodeJSEnv() {
-  # HOME="${WORKSPACE}"
   local version=$1
-  # local nvmPath="${HOME}/.nvm/versions/node/${version}/bin"
   echo "Installing nvm"
   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
   export NVM_DIR="$HOME/.nvm"
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
   echo "Installing the NodeJs version $version"
   nvm install "$version"
-  # export PATH="${nvmPath}:${PATH}"
   nvm use "$version"
   node --version
 }
