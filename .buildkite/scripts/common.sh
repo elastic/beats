@@ -545,23 +545,33 @@ withNodeJSEnv() {
 }
 
 installNodeJsDependencies() {
-  # install dependencies to run browsers
+  # Install dependencies to run browsers
   if [ "${platform_type}" == "Linux" ]; then
-    sudo apt-get install -y libatk1.0-0\
-      libatk-bridge2.0-0\
-      libcups2\
-      libxkbcommon0\
-      libatspi2.0-0\
-      libxcomposite1\
-      libxdamage1\
-      libxfixes3\
-      libxrandr2\
-      libgbm1\
-      libpango-1.0-0\
-      libcairo2\
+    sudo apt-get install -y \
+      libatk1.0-0 \
+      libatk-bridge2.0-0 \
+      libcups2 \
+      libxkbcommon0 \
+      libatspi2.0-0 \
+      libxcomposite1 \
+      libxdamage1 \
+      libxfixes3 \
+      libxrandr2 \
+      libgbm1 \
+      libpango-1.0-0 \
+      libcairo2 \
       libasound2
+    if [ $? -ne 0 ]; then
+      echo "Error: Failed to install dependencies."
+      exit 1
+    else
+      echo "Dependencies installed successfully."
+    fi
   elif [ "${platform_type}" == "Darwin" ]; then
-    # TBD
+    echo "TBD"
+  else
+    echo "Unsupported platform type."
+    exit 1
   fi
 }
 
