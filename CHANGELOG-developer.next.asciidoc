@@ -92,6 +92,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Make winlogbeat/sys/wineventlog follow the unsafe.Pointer rules. {pull}36650[36650]
 - Cleaned up documentation errors & fixed a minor bug in Filebeat Azure blob storage input. {pull}36714[36714]
 - Fix copy arguments for strict aligned architectures. {pull}36976[36976]
+- Fix filebeat gcs input panic {pull}38407[38407]
 
 ==== Added
 
