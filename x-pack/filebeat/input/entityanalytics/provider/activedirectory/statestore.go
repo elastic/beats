@@ -30,6 +30,7 @@ type State int
 const (
 	Discovered State = iota + 1
 	Modified
+	Deleted
 )
 
 type User struct {
@@ -112,6 +113,19 @@ func (s *stateStore) storeUser(u activedirectory.Entry) *User {
 		s.users[u.ID] = &su
 	}
 	return &su
+}
+
+// len returns the number of user entries in the state store.
+func (s *stateStore) len() int {
+	return len(s.users)
+}
+
+// forEach iterates over all users in the state store. Changes to the
+// User's fields will be reflected in the state store.
+func (s *stateStore) forEach(fn func(*User)) {
+	for _, u := range s.users {
+		fn(u)
+	}
 }
 
 // close will close out the stateStore. If commit is true, the staged values on the

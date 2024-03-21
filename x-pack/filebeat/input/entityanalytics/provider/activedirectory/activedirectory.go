@@ -257,12 +257,41 @@ func (p *adInput) runIncrementalUpdate(inputCtx v2.Context, store *kvstore.Store
 	}
 
 	var tracker *kvstore.TxTracker
-	if len(updatedUsers) != 0 {
-		tracker = kvstore.NewTxTracker(ctx)
-		for _, u := range updatedUsers {
-			p.publishUser(u, state, inputCtx.ID, client, tracker)
+	if len(updatedUsers) != 0 || state.len() != 0 {
+		// Active Directory does not have a notion of deleted users
+		// beyond absence from the directory, so compare found users
+		// with users already known by the state store and if any
+		// are in the store but not returned in the previous fetch,
+		// mark them as deleted and publish the deletion. We do not
+		// have the time of the deletion, so use now.
+		if state.len() != 0 {
+			found := make(map[string]bool)
+			for _, u := range updatedUsers {
+				found[u.ID] = true
+			}
+			deleted := make(map[string]*User)
+			now := time.Now()
+			state.forEach(func(u *User) {
+				if u.State == Deleted || found[u.ID] {
+					return
+				}
+				// This modifies the state store's copy since u
+				// is a pointer held by the state store map.
+				u.State = Deleted
+				u.WhenChanged = now
+				deleted[u.ID] = u
+			})
+			for _, u := range deleted {
+				updatedUsers = append(updatedUsers, u)
+			}
 		}
-		tracker.Wait()
+		if len(updatedUsers) != 0 {
+			tracker = kvstore.NewTxTracker(ctx)
+			for _, u := range updatedUsers {
+				p.publishUser(u, state, inputCtx.ID, client, tracker)
+			}
+			tracker.Wait()
+		}
 	}
 
 	if ctx.Err() != nil {
@@ -359,6 +388,8 @@ func (p *adInput) publishUser(u *User, state *stateStore, inputID string, client
 	_, _ = userDoc.Put("user.id", u.ID)
 
 	switch u.State {
+	case Deleted:
+		_, _ = userDoc.Put("event.action", "user-deleted")
 	case Discovered:
 		_, _ = userDoc.Put("event.action", "user-discovered")
 	case Modified:

@@ -14,11 +14,12 @@ func _() {
 	var x [1]struct{}
 	_ = x[Discovered-1]
 	_ = x[Modified-2]
+	_ = x[Deleted-3]
 }
 
-const _State_name = "DiscoveredModified"
+const _State_name = "DiscoveredModifiedDeleted"
 
-var _State_index = [...]uint8{0, 10, 18}
+var _State_index = [...]uint8{0, 10, 18, 25}
 
 func (i State) String() string {
 	i -= 1
