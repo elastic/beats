@@ -259,6 +259,12 @@ ifeval::["{beatname_lc}"=="filebeat"]
 |Check for ingest pipelines used by modules. Needed when using modules.
 endif::[]
 
+ifeval::["{beatname_lc}"=="winlogbeat"]
+|Cluster
+|`read_pipeline`
+|Check for ingest pipelines used by winlogbeat.
+endif::[]
+
 |Index
 |`create_doc` on +{beat_default_index_prefix}-*+ indices
 |Write events into {es}
