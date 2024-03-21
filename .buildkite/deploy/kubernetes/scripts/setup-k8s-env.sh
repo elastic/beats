@@ -5,8 +5,8 @@ set -euo pipefail
 source .buildkite/env-scripts/util.sh
 
 echo "--- Installing kind & kubectl"
-retry_with_count 5 .buildkite/deploy/kubernetes/scripts/install-kubectl.sh
 retry_with_count 5 .buildkite/deploy/kubernetes/scripts/install-kind.sh
+retry_with_count 5 .buildkite/deploy/kubernetes/scripts/install-kubectl.sh
 
 echo "--- Setting up kind"
 max_retries=3

@@ -30,6 +30,7 @@ fi
 
 if curl -sSLo "${KUBECTL_BINARY}" "https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/${OS}/${ARCH_SUFFIX}/kubectl" ; then
     chmod +x "${KUBECTL_BINARY}"
+    echo "Current K8S Version: ${K8S_VERSION}"
     echo "Kubectl installed: ${KUBECTL_BINARY}"
 else
     echo "--- Something bad with the download, let's delete the corrupted binary"

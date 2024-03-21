@@ -31,7 +31,6 @@ PACKAGING_CHANGES=$(changeset_applies "$PACKAGING_CHANGESET")
 GO_MOD_CHANGES=$(changeset_applies "^go.mod")
 
 KIND_VERSION="v0.20.0"
-K8S_VERSION="v1.29.0"
 KUBECONFIG="${WORKSPACE}/kubecfg"
 
 export REPO
@@ -57,7 +56,6 @@ export PACKAGING_CHANGES
 export GO_MOD_CHANGES
 
 export KIND_VERSION
-export K8S_VERSION
 export KUBECONFIG
 
 add_bin_path

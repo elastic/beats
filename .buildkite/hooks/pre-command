@@ -15,11 +15,12 @@ GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
   source .buildkite/env-scripts/env.sh
 
-  if [[ -z "${GO_VERSION-""}" ]]; then
-    export GO_VERSION=$(cat "${WORKSPACE}/.go-version")
-  fi
-
   if [[ "$BUILDKITE_STEP_KEY" == macos* ]]; then
+    if [[ -z "${GO_VERSION-""}" ]]; then
+      GO_VERSION=$(cat "${WORKSPACE}/.go-version")
+      export GO_VERSION
+    fi
+
     ulimit -Sn 30000
 
     echo "--- Setting up environment"
@@ -29,9 +30,13 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == 
   fi
 
   if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
-    export DOCKER_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
-    export DOCKER_PASSWORD_SECRET=$(retry_with_count 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
-    export GITHUB_TOKEN_SECRET=$(retry_with_count 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
+    DOCKER_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
+    DOCKER_PASSWORD_SECRET=$(retry_with_count 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
+    GITHUB_TOKEN_SECRET=$(retry_with_count 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
+
+    export DOCKER_USERNAME_SECRET
+    export DOCKER_PASSWORD_SECRET
+    export GITHUB_TOKEN_SECRET
 
     docker login -u "${DOCKER_USERNAME_SECRET}" -p "${DOCKER_PASSWORD_SECRET}" "${DOCKER_REGISTRY}" 2>/dev/null
 
