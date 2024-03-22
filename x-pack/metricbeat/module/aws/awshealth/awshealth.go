@@ -26,9 +26,10 @@ import (
 
 const metricsetName = "awshealth"
 
-var Locale string = "en"
-
-var maxResults int32 = 10
+var (
+	locale     = "en"
+	maxResults = int32(10)
+)
 
 // init registers the MetricSet with the central registry as soon as the program
 // starts. The New function will be called later to instantiate an instance of
@@ -50,7 +51,7 @@ type MetricSet struct {
 	Config Config `config:"aws_health_config"`
 }
 
-// Config holds the configuration specific for aws health metricset
+// Config holds the configuration specific for aws-awshealth metricset
 type Config struct {
 	EventARNPattern []string `config:"event_arns_pattern"`
 }
@@ -65,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("error creating aws metricset: %w", err)
 	}
 
-	cfgwarn.Beta("The aws awshealth metricset is beta.")
+	cfgwarn.Beta("The aws:awshealth metricset is beta.")
 
 	config := struct {
 		Config Config `config:"aws_health_config"`
@@ -100,9 +101,6 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 
 	awsConfig := m.MetricSet.AwsConfig.Copy()
 
-	// Get startTime and endTime
-	startTime, endTime := aws.GetStartTimeEndTime(time.Now(), m.Period, m.Latency)
-	m.Logger().Debugf("[AWS Health] startTime = %s, endTime = %s", startTime, endTime)
 	health_client := health.NewFromConfig(awsConfig, func(o *health.Options) {
 		if config.AWSConfig.FIPSEnabled {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
@@ -131,15 +129,19 @@ func (m *MetricSet) getEventsSummary(
 		},
 	}
 
-	var nextTokenString = ""
-	var eventOutput *health.DescribeEventsOutput
-	var err error
-	var wg sync.WaitGroup // WaitGroup for goroutine synchronization
-
+	var (
+		nextTokenString string
+		eventOutput     *health.DescribeEventsOutput
+		err             error
+		wg              sync.WaitGroup
+	)
 	errCh := make(chan error, maxResults)
-
 	c := make(chan HealthDetails, maxResults)
+
 	for {
+		// When invoking the DescribeEvents for the first time, there must not exist any NextToken.
+		// DescribeEvents API call will return the next token if there are more records left for querying
+		// If there exist no futher records to fetch, next toke will be empty.
 		if nextTokenString == "" {
 			eventOutput, err = awsHealth.DescribeEvents(ctx,
 				&health.DescribeEventsInput{
@@ -157,7 +159,7 @@ func (m *MetricSet) getEventsSummary(
 			)
 		}
 		if err != nil {
-			err = fmt.Errorf("AWS Health DescribeEvents failed with %w", err)
+			err = fmt.Errorf("[AWS Health] DescribeEvents failed with : %w", err)
 			m.Logger().Error(err.Error())
 			return nil
 		}
@@ -183,12 +185,6 @@ func (m *MetricSet) getEventsSummary(
 				}
 			}(et)
 		}
-		// Wait for all goroutines to finish
-		// wg.Wait()
-		// for healthDetails := range c {
-		// 	m.Logger().Infof("[AWS Health] [DescribeEventDetails] Event ARN : %s, Affected Entities (Pending) : %d, Affected Entities (Resolved): %d, Affected Entities (Others) : %d", *healthDetails.event.Arn, healthDetails.affectedEntityPending, healthDetails.affectedEntityResolved, healthDetails.affectedEntityOthers)
-		// 	events = append(events, createEvents(healthDetails))
-		// }
 
 		for i := 0; i < len(ets); i++ {
 			select {
@@ -221,29 +217,30 @@ func (m *MetricSet) getEventsSummary(
 }
 
 func createEvents(hd HealthDetails) mb.Event {
-	event := mb.Event{}
-	event.MetricSetFields = mapstr.M{
-		"event_arn":                  getStringValueOrDefault(hd.event.Arn),
-		"end_time":                   getTimeValueOrDefault(hd.event.EndTime),
-		"event_scope_code":           getStringValueOrDefault((*string)(&hd.event.EventScopeCode)),
-		"event_type_category":        getStringValueOrDefault((*string)(&hd.event.EventTypeCategory)),
-		"event_type_code":            getStringValueOrDefault(hd.event.EventTypeCode),
-		"last_updated_time":          getTimeValueOrDefault(hd.event.LastUpdatedTime),
-		"region":                     getStringValueOrDefault(hd.event.Region),
-		"service":                    getStringValueOrDefault(hd.event.Service),
-		"start_time":                 getTimeValueOrDefault(hd.event.StartTime),
-		"status_code":                getStringValueOrDefault((*string)(&hd.event.StatusCode)),
-		"affected_entities_pending":  hd.affectedEntityPending,
-		"affected_entities_resolved": hd.affectedEntityResolved,
-		"affected_entities_others":   hd.affectedEntityOthers,
-		"affected_entities":          createAffectedEntityDetails(hd.affectedEntities),
-	}
-	event.RootFields = mapstr.M{
-		"cloud.provider": "aws",
-	}
 	currentDate := getCurrentDateTime()
 	eventID := currentDate + getStringValueOrDefault(hd.event.Arn) + getStringValueOrDefault((*string)(&hd.event.StatusCode))
-	event.ID = generateEventID(eventID)
+	event := mb.Event{
+		MetricSetFields: mapstr.M{
+			"event_arn":                  getStringValueOrDefault(hd.event.Arn),
+			"end_time":                   getTimeValueOrDefault(hd.event.EndTime),
+			"event_scope_code":           getStringValueOrDefault((*string)(&hd.event.EventScopeCode)),
+			"event_type_category":        getStringValueOrDefault((*string)(&hd.event.EventTypeCategory)),
+			"event_type_code":            getStringValueOrDefault(hd.event.EventTypeCode),
+			"last_updated_time":          getTimeValueOrDefault(hd.event.LastUpdatedTime),
+			"region":                     getStringValueOrDefault(hd.event.Region),
+			"service":                    getStringValueOrDefault(hd.event.Service),
+			"start_time":                 getTimeValueOrDefault(hd.event.StartTime),
+			"status_code":                getStringValueOrDefault((*string)(&hd.event.StatusCode)),
+			"affected_entities_pending":  hd.affectedEntityPending,
+			"affected_entities_resolved": hd.affectedEntityResolved,
+			"affected_entities_others":   hd.affectedEntityOthers,
+			"affected_entities":          createAffectedEntityDetails(hd.affectedEntities),
+		},
+		RootFields: mapstr.M{
+			"cloud.provider": "aws",
+		},
+		ID: generateEventID(eventID),
+	}
 	return event
 }
 
@@ -308,40 +305,41 @@ func generateEventID(eventID string) string {
 }
 
 func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *health.Client, event types.Event, ch chan<- HealthDetails) error {
-	var hd HealthDetails
-	hd.event = event
+	hd := HealthDetails{event: event}
 	eventDetails, err := awsHealth.DescribeEventDetails(ctx, &health.DescribeEventDetailsInput{
 		EventArns: []string{*event.Arn},
-		Locale:    &Locale,
+		Locale:    &locale,
 	})
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
 			m.Logger().Debug("Context cancelled. Exiting gracefully.")
 			return nil
 		}
-		err = fmt.Errorf("AWS Health DescribeEventDetails failed with %w", err)
+		err = fmt.Errorf("[AWS Health] DescribeEventDetails failed with : %w", err)
 		m.Logger().Error(err.Error())
 		return err
 	} else {
 		hd.eventDescription = *(eventDetails.SuccessfulSet[0].EventDescription.LatestDescription)
 	}
 
-	var affEntityTokString = ""
-	var nextToken *string
-	var pending int32 = 0
-	var resolved int32 = 0
-	var others int32 = 0
+	var (
+		affEntityTokString string
+		nextToken          *string
+		pending            int32
+		resolved           int32
+		others             int32
+	)
 	for {
 		if affEntityTokString == "" {
 			affectedEntities, err := awsHealth.DescribeAffectedEntities(ctx, &health.DescribeAffectedEntitiesInput{
 				Filter: &types.EntityFilter{
 					EventArns: []string{*event.Arn},
 				},
-				Locale:     &Locale,
+				Locale:     &locale,
 				MaxResults: &maxResults,
 			})
 			if err != nil {
-				err = fmt.Errorf("AWS Health DescribeAffectedEntities failed with %w", err)
+				err = fmt.Errorf("AWS Health DescribeAffectedEntities failed with : %w", err)
 
 				// Check if the error is due to context cancellation
 				if errors.Is(err, context.Canceled) {
@@ -357,14 +355,15 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 
 				hd.affectedEntities = append(hd.affectedEntities, affectedEntities.Entities...)
 				for _, affEntity := range affectedEntities.Entities {
-					if affEntity.StatusCode != "" {
-						if affEntity.StatusCode == "PENDING" {
-							pending++
-						} else if affEntity.StatusCode == "RESOLVED" {
-							resolved++
-						} else {
-							others++
-						}
+					switch affEntity.StatusCode {
+					case "PENDING":
+						pending++
+					case "RESOLVED":
+						resolved++
+					case "":
+						// Do nothing
+					default:
+						others++
 					}
 				}
 			}
@@ -374,12 +373,12 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 				Filter: &types.EntityFilter{
 					EventArns: []string{*event.Arn},
 				},
-				Locale:     &Locale,
+				Locale:     &locale,
 				MaxResults: &maxResults,
 				NextToken:  &affEntityTokString,
 			})
 			if err != nil {
-				err = fmt.Errorf("AWS Health DescribeAffectedEntities failed with %w", err)
+				err = fmt.Errorf("AWS Health DescribeAffectedEntities failed with : %w", err)
 
 				// Check if the error is due to context cancellation
 				if errors.Is(err, context.Canceled) {
@@ -395,14 +394,15 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 				hd.affectedEntities = append(hd.affectedEntities, affectedEntities.Entities...)
 
 				for _, affEntity := range affectedEntities.Entities {
-					if affEntity.StatusCode != "" {
-						if affEntity.StatusCode == "PENDING" {
-							pending++
-						} else if affEntity.StatusCode == "RESOLVED" {
-							resolved++
-						} else {
-							others++
-						}
+					switch affEntity.StatusCode {
+					case "PENDING":
+						pending++
+					case "RESOLVED":
+						resolved++
+					case "":
+						// Do nothing
+					default:
+						others++
 					}
 				}
 			}
@@ -428,6 +428,6 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 }
 
 func getCurrentDateTime() string {
-	currentTime := time.Now()
-	return fmt.Sprintf("%04d%02d%02d%02d%02d%02d", currentTime.Year(), int(currentTime.Month()), currentTime.Day(), currentTime.Hour(), currentTime.Minute(), currentTime.Second())
+	// Reference: https://golang.org/pkg/time/#Time.Format
+	return time.Now().Format("20060102150405")
 }
