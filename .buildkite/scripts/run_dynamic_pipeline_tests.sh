@@ -39,5 +39,5 @@ echo "~~~ Running pipeline generator tests"
 
 python3 -mpip install --quiet "pytest"
 pushd .buildkite
-${ASDF_DIR}/installs/python/${ASDF_PYTHON_VERSION}/bin/pytest .
+./pytest .
 popd
