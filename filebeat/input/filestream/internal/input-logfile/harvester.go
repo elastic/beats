@@ -219,7 +219,7 @@ func startHarvester(
 		defer releaseResource(resource)
 
 		client, err := hg.pipeline.ConnectWith(beat.ClientConfig{
-			CloseRef:      ctx.Cancelation,
+			// CloseRef:      ctx.Cancelation,
 			EventListener: newInputACKHandler(hg.ackCH),
 		})
 		if err != nil {

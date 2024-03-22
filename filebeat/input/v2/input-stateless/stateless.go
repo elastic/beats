@@ -87,7 +87,7 @@ func (si configuredInput) Run(ctx v2.Context, pipeline beat.PipelineConnector) (
 		PublishMode: beat.DefaultGuarantees,
 
 		// configure pipeline to disconnect input on stop signal.
-		CloseRef: ctx.Cancelation,
+		// CloseRef: ctx.Cancelation,
 	})
 	if err != nil {
 		return err

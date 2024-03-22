@@ -156,7 +156,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	if in.config.BucketARN != "" || in.config.NonAWSBucketName != "" {
 		// Create client for publishing events and receive notification of their ACKs.
 		client, err := pipeline.ConnectWith(beat.ClientConfig{
-			CloseRef:      inputContext.Cancelation,
+			// CloseRef:      inputContext.Cancelation,
 			EventListener: awscommon.NewEventACKHandler(),
 			Processing: beat.ProcessingConfig{
 				// This input only produces events with basic types so normalization

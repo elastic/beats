@@ -65,9 +65,13 @@ func (n *input) Run(runCtx v2.Context, connector beat.PipelineConnector) (err er
 	}()
 
 	client, err := connector.ConnectWith(beat.ClientConfig{
-		CloseRef:      runCtx.Cancelation,
+		// CloseRef:      runCtx.Cancelation,
 		EventListener: NewTxACKHandler(),
 	})
+	if err != nil {
+		return fmt.Errorf("could not connect to publishing pipeline: %s", err)
+	}
+	defer client.Close()
 
 	dataDir := paths.Resolve(paths.Data, "kvstore")
 	if err = os.MkdirAll(dataDir, 0700); err != nil {

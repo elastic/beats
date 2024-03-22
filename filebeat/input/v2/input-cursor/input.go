@@ -146,7 +146,7 @@ func (inp *managedInput) runSource(
 	}()
 
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:      ctx.Cancelation,
+		// CloseRef:      ctx.Cancelation,
 		EventListener: newInputACKHandler(ctx.Logger),
 	})
 	if err != nil {
