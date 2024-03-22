@@ -44,9 +44,14 @@ type Config struct {
 	// Scope can be either node or cluster.
 	Scope    string `config:"scope"`
 	Resource string `config:"resource"`
+
 	// Unique identifies if this provider enables its templates only when it is elected as leader in a k8s cluster
 	Unique      bool   `config:"unique"`
 	LeaderLease string `config:"leader_lease"`
+	//Parameters to configure election process
+	LeaseDuration time.Duration `config:"leader_leaseduration"`
+	RenewDeadline time.Duration `config:"leader_renewdeadline"`
+	RetryPeriod   time.Duration `config:"leader_retryperiod"`
 
 	Prefix    string                  `config:"prefix"`
 	Hints     *config.C               `config:"hints"`
@@ -68,6 +73,9 @@ func defaultConfig() *Config {
 		Prefix:              "co.elastic",
 		Unique:              false,
 		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
+		LeaseDuration:       15 * time.Second,
+		RenewDeadline:       10 * time.Second,
+		RetryPeriod:         2 * time.Second,
 	}
 }
 

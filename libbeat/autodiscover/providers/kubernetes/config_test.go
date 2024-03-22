@@ -72,6 +72,51 @@ func TestConfigWithIncorrectScope(t *testing.T) {
 	assert.Equal(t, "cluster", c.Scope)
 }
 
+func TestConfigLeaseFields(t *testing.T) {
+	cfg := mapstr.M{
+		"scope":  "cluster",
+		"unique": "true",
+	}
+
+	tests := []struct {
+		LeaseDuration string
+		RenewDeadline string
+		RetryPeriod   string
+		message       string
+	}{
+		{
+			LeaseDuration: "20seconds",
+			RenewDeadline: "15s",
+			RetryPeriod:   "2s",
+			message:       "incorrect lease duration, should be set to default",
+		},
+		{
+			LeaseDuration: "20s",
+			RenewDeadline: "15minutes",
+			RetryPeriod:   "2s",
+			message:       "incorrect renew deadline, should be set to default",
+		},
+		{
+			LeaseDuration: "20s",
+			RenewDeadline: "15s",
+			RetryPeriod:   "2hrs",
+			message:       "incorrect retry period, should be set to default",
+		},
+	}
+
+	for _, test := range tests {
+		cfg["leader_leaseduration"] = test.LeaseDuration
+		cfg["leader_renewdeadline"] = test.RenewDeadline
+		cfg["leader_retryperiod"] = test.RetryPeriod
+
+		config := conf.MustNewConfigFrom(&cfg)
+
+		c := defaultConfig()
+		err := config.Unpack(&c)
+		assert.Errorf(t, err, test.message)
+	}
+}
+
 type mockBuilder struct {
 }
 
