@@ -20,8 +20,6 @@ package kubernetes
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
@@ -34,7 +32,7 @@ import (
 
 func TestConfigWithCustomBuilders(t *testing.T) {
 	err := autodiscover.Registry.AddBuilder("mock", newMockBuilder)
-	require.NoError(t, err)
+	assert.NoError(t, err)
 
 	cfg := mapstr.M{
 		"hints.enabled": false,
