@@ -40,8 +40,8 @@ steps:
         key: "publish-dra-snapshot"
         agents:
           provider: "gcp"
-          machineType: "c2-standard-16"
-          image: "family/platform-ingest-beats-ubuntu-2204"
+          # machineType: "c2-standard-16"
+          # image: "family/platform-ingest-beats-ubuntu-2204"
         env:
           DRA_WORKFLOW: "snapshot"
 
@@ -76,8 +76,8 @@ steps:
         key: "publish-dra-staging"
         agents:
           provider: "gcp"
-          machineType: "c2-standard-16"
-          image: "family/platform-ingest-beats-ubuntu-2204"
+          # machineType: "c2-standard-16"
+          # image: "family/platform-ingest-beats-ubuntu-2204"
         env:
           DRA_WORKFLOW: "staging"
 
