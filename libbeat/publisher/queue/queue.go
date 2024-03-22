@@ -25,6 +25,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/opt"
 )
 
+type Event interface{}
+
 // Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
 type Metrics struct {
 	//EventCount is the total events currently in the queue
@@ -98,7 +100,7 @@ type ProducerConfig struct {
 	// the queue. Currently this can only happen when a Publish call is sent
 	// to the memory queue's request channel but the producer is cancelled
 	// before it reaches the queue buffer.
-	OnDrop func(interface{})
+	OnDrop func(Event)
 
 	// DropOnCancel is a hint to the queue to drop events if the producer disconnects
 	// via Cancel.
@@ -112,14 +114,14 @@ type EntryID uint64
 type Producer interface {
 	// Publish adds an event to the queue, blocking if necessary, and returns
 	// the new entry's id and true on success.
-	Publish(event interface{}) (EntryID, bool)
+	Publish(event Event) (EntryID, bool)
 
 	// TryPublish adds an event to the queue if doing so will not block the
 	// caller, otherwise it immediately returns. The reasons a publish attempt
 	// might block are defined by the specific queue implementation and its
 	// configuration. If the event was successfully added, returns true with
 	// the event's assigned ID, and false otherwise.
-	TryPublish(event interface{}) (EntryID, bool)
+	TryPublish(event Event) (EntryID, bool)
 
 	// Cancel closes this Producer endpoint. If the producer is configured to
 	// drop its events on Cancel, the number of dropped events is returned.
@@ -130,15 +132,14 @@ type Producer interface {
 }
 
 // Batch of events to be returned to Consumers. The `Done` method will tell the
-// queue that the batch has been consumed and its events can be discarded.
+// queue that the batch has been consumed and its events can be acknowledged
+// and discarded.
 type Batch interface {
 	Count() int
-	Entry(i int) interface{}
-	// Release the internal references to the contained events.
+	Entry(i int) Event
+	// Release the internal references to the contained events, if
+	// supported (the disk queue does not yet implement it).
 	// Count() and Entry() cannot be used after this call.
-	// This is only guaranteed to release references when using the
-	// proxy queue, where it is used to avoid keeping multiple copies
-	// of events that have already been queued by the shipper.
 	FreeEntries()
 	Done()
 }

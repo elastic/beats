@@ -113,7 +113,7 @@ type Settings struct {
 }
 
 type queueEntry struct {
-	event interface{}
+	event queue.Event
 	id    queue.EntryID
 
 	producer   *ackProducer
@@ -398,7 +398,7 @@ func (b *batch) rawEntry(i int) *queueEntry {
 }
 
 // Return the event referenced by the i-th element of this batch
-func (b *batch) Entry(i int) interface{} {
+func (b *batch) Entry(i int) queue.Event {
 	return b.rawEntry(i).event
 }
 

@@ -28,15 +28,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/outputs"
 )
 
-type batchRequest struct {
-	responseChan chan publisher.Batch
-}
-
 type worker struct {
-	//qu   chan publisher.Batch
-	batchRequestChan  chan batchRequest
-	batchResponseChan chan publisher.Batch
-	done              chan struct{}
+	qu   chan publisher.Batch
+	done chan struct{}
 }
 
 // clientWorker manages output client of type outputs.Client, not supporting reconnect.
@@ -55,11 +49,10 @@ type netClientWorker struct {
 	tracer *apm.Tracer
 }
 
-func makeClientWorker(batchRequestChan chan batchRequest, client outputs.Client, logger logger, tracer *apm.Tracer) outputWorker {
+func makeClientWorker(batchChan chan publisher.Batch, client outputs.Client, logger logger, tracer *apm.Tracer) outputWorker {
 	w := worker{
-		batchRequestChan:  batchRequestChan,
-		batchResponseChan: make(chan publisher.Batch, 1),
-		done:              make(chan struct{}),
+		qu:   batchChan,
+		done: make(chan struct{}),
 	}
 
 	var c interface {
@@ -92,7 +85,6 @@ func (w *clientWorker) Close() error {
 }
 
 func (w *clientWorker) run() {
-	req := batchRequest{responseChan: w.batchResponseChan}
 	for {
 		// We wait for either the worker to be closed or for there to be a batch of
 		// events to publish.
@@ -101,9 +93,7 @@ func (w *clientWorker) run() {
 		case <-w.done:
 			return
 
-		case w.batchRequestChan <- req:
-			// Our request got through, now we must wait for the response
-			batch := <-w.batchResponseChan
+		case batch := <-w.qu:
 			if batch == nil {
 				continue
 			}
@@ -125,7 +115,6 @@ func (w *netClientWorker) run() {
 		reconnectAttempts = 0
 	)
 
-	req := batchRequest{responseChan: w.batchResponseChan}
 	for {
 		// We wait for either the worker to be closed or for there to be a batch of
 		// events to publish.
@@ -134,8 +123,7 @@ func (w *netClientWorker) run() {
 		case <-w.done:
 			return
 
-		case w.batchRequestChan <- req:
-			batch := <-w.batchResponseChan
+		case batch := <-w.qu:
 			if batch == nil {
 				continue
 			}

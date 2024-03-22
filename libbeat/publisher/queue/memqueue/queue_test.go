@@ -97,7 +97,7 @@ func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
 	p := q.Producer(queue.ProducerConfig{
 		// We do not read from the queue, so the callbacks are never called
 		ACK:          func(count int) {},
-		OnDrop:       func(e interface{}) {},
+		OnDrop:       func(e queue.Event) {},
 		DropOnCancel: false,
 	})
 
@@ -170,7 +170,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 		ACK: func(count int) {
 			activeEvents.Add(-int64(count))
 		},
-		OnDrop: func(e interface{}) {
+		OnDrop: func(e queue.Event) {
 			//activeEvents.Add(-1)
 		},
 		DropOnCancel: false,

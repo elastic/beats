@@ -21,6 +21,7 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -59,7 +60,7 @@ type eventConsumer struct {
 // to generate a batch, and the output channel to send batches to.
 type consumerTarget struct {
 	queue          queue.Queue
-	ch             chan batchRequest
+	ch             chan publisher.Batch
 	timeToLive     int
 	batchSize      int
 	encoderFactory beat.PreEncoderFactory
@@ -153,15 +154,14 @@ outerLoop:
 		// and try to send to it. Otherwise, it will remain nil, and sends
 		// to it will always block, so the output case of the select below
 		// will be ignored.
-		var batchRequestChan chan batchRequest
+		var batchChan chan publisher.Batch
 		if active != nil {
-			batchRequestChan = target.ch
+			batchChan = target.ch
 		}
 
 		// Now we can block until the next state change.
 		select {
-		case req := <-batchRequestChan:
-			req.responseChan <- active
+		case batchChan <- active:
 			// Successfully sent a batch to the output workers
 			if len(retryBatches) > 0 {
 				// This was a retry, report it to the observer

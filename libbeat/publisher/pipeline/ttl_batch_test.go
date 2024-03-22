@@ -25,6 +25,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 func TestBatchSplitRetry(t *testing.T) {
@@ -128,7 +129,7 @@ func (b *mockQueueBatch) Count() int {
 func (b *mockQueueBatch) Done() {
 }
 
-func (b *mockQueueBatch) Entry(i int) interface{} {
+func (b *mockQueueBatch) Entry(i int) queue.Event {
 	return fmt.Sprintf("event %v", i)
 }
 

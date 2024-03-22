@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -57,7 +58,7 @@ type outputController struct {
 	// is called.
 	queueFactory queue.QueueFactory
 
-	workerChan chan batchRequest
+	workerChan chan publisher.Batch
 
 	consumer *eventConsumer
 	workers  []outputWorker
@@ -97,7 +98,7 @@ func newOutputController(
 		observer:       observer,
 		eventWaitGroup: eventWaitGroup,
 		queueFactory:   queueFactory,
-		workerChan:     make(chan batchRequest),
+		workerChan:     make(chan publisher.Batch),
 		consumer:       newEventConsumer(monitors.Logger, observer),
 		inputQueueSize: inputQueueSize,
 	}
@@ -305,11 +306,11 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 // a producer for a nonexistent queue.
 type emptyProducer struct{}
 
-func (emptyProducer) Publish(_ interface{}) (queue.EntryID, bool) {
+func (emptyProducer) Publish(_ queue.Event) (queue.EntryID, bool) {
 	return 0, false
 }
 
-func (emptyProducer) TryPublish(_ interface{}) (queue.EntryID, bool) {
+func (emptyProducer) TryPublish(_ queue.Event) (queue.EntryID, bool) {
 	return 0, false
 }
 
