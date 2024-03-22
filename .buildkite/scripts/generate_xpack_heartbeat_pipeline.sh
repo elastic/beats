@@ -34,8 +34,8 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
 ## TODO: there are windows test failures already reported
-https://github.com/elastic/beats/issues/23957 and https://github.com/elastic/beats/issues/23958
-waiting for being fixed.
+## https://github.com/elastic/beats/issues/23957 and https://github.com/elastic/beats/issues/23958
+## waiting for being fixed.
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command: ".buildkite/scripts/win_unit_tests.ps1"
