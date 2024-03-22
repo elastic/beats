@@ -18,7 +18,6 @@
 package pipeline
 
 import (
-	"context"
 	"runtime"
 	"sync"
 	"testing"
@@ -41,14 +40,11 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 	pipeline := makePipeline(t, Settings{}, makeDiscardQueue())
 
 	defer pipeline.Close()
-	ctx, cancel := context.WithCancel(context.Background())
 
-	n := 20 //35000 // This needs to be more than 10
+	n := 66000 //35000 // This needs to be more than 10
 	clients := []beat.Client{}
 	for i := 0; i < n; i++ {
-		c, err := pipeline.ConnectWith(beat.ClientConfig{
-			CloseRef: ctx,
-		})
+		c, err := pipeline.ConnectWith(beat.ClientConfig{})
 		if err != nil {
 			t.Fatalf("Could not connect to pipeline: %s", err)
 		}
@@ -73,8 +69,6 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 	}
 	runtime.Gosched()
 	runtime.Gosched()
-
-	cancel()
 
 	// Make sure all clients are closed
 	for _, c := range clients {
