@@ -104,7 +104,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - Fix HTTPJSON handling of empty object bodies in POST requests. {issue}33961[33961] {pull}38290[38290]
 - Fix PEM key validation for CEL and HTTPJSON inputs. {pull}38405[38405]
 - Fix filebeat gcs input panic {pull}38407[38407]
-- Rename `activity_guid` to `activity_id` in ETW input events. {pull}38530[38530]
+- Rename `activity_guid` to `activity_id` in ETW input events to suit other Windows inputs. {pull}38530[38530]
 
 *Heartbeat*
 
