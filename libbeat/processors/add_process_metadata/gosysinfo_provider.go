@@ -53,6 +53,9 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 		}
 	}
 
+	// Capabilities are linux only and other systems will fail
+	// with ErrUnsupported. In the event of any errors, we simply
+	// don't report the capabilities.
 	capPermitted, _ := capabilities.FromPid(capabilities.Permitted, pid)
 	capEffective, _ := capabilities.FromPid(capabilities.Effective, pid)
 
