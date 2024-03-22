@@ -214,6 +214,11 @@ func NewQueue(
 	activeFrameCount -= int(nextReadPosition.frameIndex)
 	logger.Infof("Found %d existing events on queue start", activeFrameCount)
 
+	var encoder queue.Encoder
+	if encoderFactory != nil {
+		encoder = encoderFactory()
+	}
+
 	queue := &diskQueue{
 		logger:   logger,
 		settings: settings,
@@ -227,7 +232,7 @@ func NewQueue(
 
 		acks: newDiskQueueACKs(logger, nextReadPosition, positionFile),
 
-		readerLoop:  newReaderLoop(settings),
+		readerLoop:  newReaderLoop(settings, encoder),
 		writerLoop:  newWriterLoop(logger, writeToDiskCallback, settings),
 		deleterLoop: newDeleterLoop(settings),
 

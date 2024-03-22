@@ -80,6 +80,8 @@ type Queue interface {
 	Metrics() (Metrics, error)
 }
 
+// If encoderFactory is provided, then the resulting queue must use it to
+// encode queued events before returning them.
 type QueueFactory func(
 	logger *logp.Logger,
 	ack func(eventCount int),
@@ -156,22 +158,12 @@ type Batch interface {
 // Outputs can provide an Encoder to enable early encoding in queues that
 // support it (currently just the memory queue).
 type Encoder interface {
-	// Return the encoded form of the entry that the output workers can use.
-	EncodeEntry(Entry) Entry
-
-	// IsEncoded returns true if EncodeEntry processing has already been
-	// run on the given entry.
-	// This is only needed because encoding is still done in the output
-	// workers if the configured queue doesn't support early encoding,
-	// and this call lets the output wrappers handle that generically.
-	// Once all queues support early encoding, IsEncoded and its call
-	// sites can be removed.
-	IsEncoded(Entry) bool
-
-	// The in-memory byte size of an encoded entry, or 0 if the event is not
-	// encoded. It is ok if this is just the memory used by the main encoded
-	// buffer and leaves out a small amount of per-event metadata.
-	ByteCount(Entry) int
+	// Return the encoded form of the entry that the output workers can use,
+	// and the in-memory size of the encoded buffer.
+	// EncodeEntry should return a valid Entry when given one, even if the
+	// encoding fails. In that case, the returned Entry should contain the
+	// metadata needed to report the error when the entry is consumed.
+	EncodeEntry(Entry) (Entry, int)
 }
 
 // Encoders are provided as factories so each worker goroutine can have its own

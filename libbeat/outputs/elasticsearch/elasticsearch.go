@@ -221,30 +221,17 @@ func newPreEncoder(escapeHTML bool,
 	}
 }
 
-func (pe *eventEncoder) EncodeEntry(entry queue.Entry) queue.Entry {
+func (pe *eventEncoder) EncodeEntry(entry queue.Entry) (queue.Entry, int) {
 	e, ok := entry.(publisher.Event)
 	if !ok {
-		// Currently all queue entries are publisher.Events but let's be cautious
-		return nil
+		// Currently all queue entries are publisher.Events but let's be cautious.
+		return entry, 0
 	}
 
-	e.CachedEncoding = pe.encodeEvent(&e.Content)
+	encodedEvent := pe.encodeEvent(&e.Content)
+	e.CachedEncoding = encodedEvent
 	e.Content = beat.Event{}
-	return e
-}
-
-func (pe *eventEncoder) IsEncoded(entry queue.Entry) bool {
-	e, ok := entry.(publisher.Event)
-	return ok && e.CachedEncoding != nil
-}
-
-func (pe *eventEncoder) ByteCount(entry queue.Entry) int {
-	e, ok := entry.(publisher.Event)
-	if !ok || e.CachedEncoding == nil {
-		return 0
-	}
-	encodedEvent := e.CachedEncoding.(*encodedEvent)
-	return len(encodedEvent.encoding)
+	return e, len(encodedEvent.encoding)
 }
 
 func (pe *eventEncoder) encodeEvent(e *beat.Event) *encodedEvent {
