@@ -70,9 +70,9 @@ func TestLeaseConfigurableFields(t *testing.T) {
 	logger := logp.NewLogger("kubernetes-test")
 
 	// the number of leader election managers corresponds to the number of nodes in a cluster with metricbeat
-	leaseDuration := time.Duration(0)
-	retryPeriod := time.Duration(0)
-	renewDeadline := time.Duration(0)
+	var leaseDuration time.Duration
+	var retryPeriod time.Duration
+	var renewDeadline time.Duration
 
 	cfg := Config{
 		Node:          "node-1",
@@ -127,8 +127,8 @@ func TestNewLeaderElectionManager(t *testing.T) {
 	numberNodes := 2
 	les := make([]*EventManager, numberNodes)
 	nodeNames := make([]string, numberNodes)
-	leaseDuration := time.Duration(0)
-	retryPeriod := time.Duration(0)
+	var leaseDuration time.Duration
+	var retryPeriod time.Duration
 	for i := 0; i < numberNodes; i++ {
 		nodeName := "node-" + fmt.Sprint(i)
 		nodeNames[i] = nodeName

@@ -18,6 +18,7 @@
 package kubernetes
 
 import (
+	"github.com/stretchr/testify/require"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -31,7 +32,8 @@ import (
 )
 
 func TestConfigWithCustomBuilders(t *testing.T) {
-	autodiscover.Registry.AddBuilder("mock", newMockBuilder)
+	err := autodiscover.Registry.AddBuilder("mock", newMockBuilder)
+	require.NoError(t, err)
 
 	cfg := mapstr.M{
 		"hints.enabled": false,
@@ -44,13 +46,15 @@ func TestConfigWithCustomBuilders(t *testing.T) {
 
 	config := conf.MustNewConfigFrom(&cfg)
 	c := defaultConfig()
-	err := config.Unpack(&c)
+	err = config.Unpack(&c)
 	assert.NoError(t, err)
 
 	cfg1 := mapstr.M{
 		"hints.enabled": false,
 	}
 	config, err = conf.NewConfigFrom(&cfg1)
+	assert.NoError(t, err)
+
 	c = defaultConfig()
 	err = config.Unpack(&c)
 	assert.Error(t, err)
