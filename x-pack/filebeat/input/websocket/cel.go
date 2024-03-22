@@ -63,10 +63,12 @@ func newProgram(ctx context.Context, src, root string, patterns map[string]*rege
 		lib.Try(),
 		lib.Debug(debug(log)),
 		lib.MIME(mimetypes),
-		lib.Regexp(patterns),
 		lib.Globals(map[string]interface{}{
 			"useragent": userAgent,
 		}),
+	}
+	if len(patterns) != 0 {
+		opts = append(opts, lib.Regexp(patterns))
 	}
 
 	env, err := cel.NewEnv(opts...)

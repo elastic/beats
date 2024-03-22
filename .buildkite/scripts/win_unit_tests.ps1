@@ -1,3 +1,7 @@
+param(
+    [string]$testType = "unittest"
+)
+
 $ErrorActionPreference = "Stop" # set -e
 $WorkFolder = $env:BEATS_PROJECT_NAME
 $WORKSPACE = Get-Location
@@ -120,6 +124,23 @@ function withNmap($version) {
     }
     Start-Process -FilePath $nmapDownloadPath -ArgumentList "/S" -Wait
 }
+function google_cloud_auth {
+    $tempFileName = "google-cloud-credentials.json"
+    $secretFileLocation = Join-Path $env:TEMP $tempFileName
+    $null = New-Item -ItemType File -Path $secretFileLocation
+    Set-Content -Path $secretFileLocation -Value $env:PRIVATE_CI_GCS_CREDENTIALS_SECRET
+    gcloud auth activate-service-account --key-file $secretFileLocation > $null 2>&1
+    $env:GOOGLE_APPLICATION_CREDENTIALS = $secretFileLocation
+}
+
+function google_cloud_auth_cleanup {
+    if (Test-Path $env:GOOGLE_APPLICATION_CREDENTIALS) {
+        Remove-Item $env:GOOGLE_APPLICATION_CREDENTIALS -Force
+        Remove-Item Env:\GOOGLE_APPLICATION_CREDENTIALS
+    } else {
+        Write-Host "No GCP credentials were added"
+    }
+}
 
 fixCRLF
 
@@ -129,7 +150,7 @@ withPython $env:SETUP_WIN_PYTHON_VERSION
 
 withMinGW
 
-if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-packetbeat") {
+if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-packetbeat" -or $env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-filebeat") {
     withNmap $env:NMAP_WIN_VERSION
 }
 
@@ -142,10 +163,23 @@ $env:MAGEFILE_CACHE = $magefile
 
 New-Item -ItemType Directory -Force -Path "build"
 
-if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
-    mage -w reader/etw build goUnitTest
-} else {
-    mage build unitTest
+if ($testType -eq "unittest") {
+    if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
+        mage -w reader/etw build goUnitTest
+    } else {
+        mage build unitTest
+    }
+}
+elseif ($testType -eq "systemtest") {
+    try {
+        google_cloud_auth
+        mage systemTest
+    } finally {
+        google_cloud_auth_cleanup
+    }
+}
+else {
+    Write-Host "Unknown test type. Please specify 'unittest' or 'systemtest'."
 }
 
 $EXITCODE=$LASTEXITCODE
