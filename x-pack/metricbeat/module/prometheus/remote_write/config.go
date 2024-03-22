@@ -6,14 +6,12 @@ package remote_write
 
 import (
 	"errors"
-	"time"
 )
 
 type config struct {
 	UseTypes      bool          `config:"use_types"`
 	RateCounters  bool          `config:"rate_counters"`
 	TypesPatterns TypesPatterns `config:"types_patterns" yaml:"types_patterns,omitempty"`
-	Period        time.Duration `config:"period" validate:"positive"`
 }
 
 type TypesPatterns struct {

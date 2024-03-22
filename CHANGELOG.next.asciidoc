@@ -33,7 +33,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 *Heartbeat*
 
 *Metricbeat*
-
+- Setting period of counetr cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 
 *Osquerybeat*
 
