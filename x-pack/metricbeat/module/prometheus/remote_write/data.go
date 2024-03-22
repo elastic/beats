@@ -44,13 +44,16 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.Remo
 	}
 
 	if config.UseTypes {
-		// use a counter cache with a timeout of 5x the period, as a safe value
-		// to make sure that all counters are available between fetches
+
+		// /metricbeat/module/mb/mb.go defines default as Period:  time.Second * 10,
+		// We are setting Period at least 60secs because of issue https://github.com/elastic/beats/issues/38458
 		duration := base.Module().Config().Period
 		if time.Duration(base.Module().Config().Period.Seconds()) < 60*time.Second {
 			duration = 60 * time.Second
 		}
 
+		// use a counter cache with a timeout of 5x the period, as a safe value
+		// to make sure that all counters are available between fetches
 		counters := collector.NewCounterCache(duration * 5)
 
 		g := remoteWriteTypedGenerator{

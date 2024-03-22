@@ -25,7 +25,6 @@ var defaultConfig = config{
 	TypesPatterns: TypesPatterns{
 		CounterPatterns:   nil,
 		HistogramPatterns: nil},
-	Period: time.Minute * 1,
 }
 
 func (c *config) Validate() error {
