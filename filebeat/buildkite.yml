@@ -4,6 +4,7 @@ when:
     - "filebeat/**"
     - "@ci" ## special token regarding the changeset for the ci
     - "@oss" ## special token regarding the changeset for the oss
+    - foo
 stages:
   mandatory:
     unitTest:
