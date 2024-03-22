@@ -40,6 +40,7 @@ type openState struct {
 	done      chan struct{}
 	queueDone <-chan struct{}
 	events    chan pushRequest
+	encoder   queue.Encoder
 }
 
 // producerID stores the order of events within a single producer, so multiple
@@ -57,12 +58,13 @@ type produceState struct {
 
 type ackHandler func(count int)
 
-func newProducer(b *broker, cb ackHandler, dropCB func(queue.Entry), dropOnCancel bool) queue.Producer {
+func newProducer(b *broker, cb ackHandler, dropCB func(queue.Entry), dropOnCancel bool, encoder queue.Encoder) queue.Producer {
 	openState := openState{
 		log:       b.logger,
 		done:      make(chan struct{}),
 		queueDone: b.ctx.Done(),
 		events:    b.pushChan,
+		encoder:   encoder,
 	}
 
 	if cb != nil {
@@ -143,6 +145,11 @@ func (st *openState) Close() {
 }
 
 func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
+	// If we were given an encoder callback for incoming events, apply it before
+	// sending the entry to the queue.
+	if st.encoder != nil {
+		req.event = st.encoder.EncodeEvent(req.event)
+	}
 	select {
 	case st.events <- req:
 		// The events channel is buffered, which means we may successfully
@@ -166,6 +173,11 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 }
 
 func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
+	// If we were given an encoder callback for incoming events, apply it before
+	// sending the entry to the queue.
+	if st.encoder != nil {
+		req.event = st.encoder.EncodeEvent(req.event)
+	}
 	select {
 	case st.events <- req:
 		// The events channel is buffered, which means we may successfully

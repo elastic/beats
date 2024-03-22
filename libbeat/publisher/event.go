@@ -65,9 +65,17 @@ type Batch interface {
 // Event is used by the publisher pipeline and broker to pass additional
 // meta-data to the consumers/outputs.
 type Event struct {
-	Content        beat.Event
-	Flags          EventFlags
-	Cache          EventCache
+	Content beat.Event
+	Flags   EventFlags
+	Cache   EventCache
+
+	// If the output provides an early encoder for incoming events,
+	// it should store the encoded form in CachedEncoding and clear Content
+	// to free the unencoded data. This encoded form may be provided to
+	// output workers when calling Publish.
+	// So far only the memory queue supports early encoding, so outputs that
+	// provide an encoder should still accept events where CachedEncoding is
+	// nil, and in that case they should encode the event themself.
 	CachedEncoding interface{}
 }
 

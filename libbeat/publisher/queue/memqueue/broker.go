@@ -54,6 +54,9 @@ type broker struct {
 	// wait group for queue workers (runLoop and ackLoop)
 	wg sync.WaitGroup
 
+	// The factory used to create an event encoder when creating a producer
+	encoderFactory queue.EncoderFactory
+
 	///////////////////////////
 	// api channels
 
@@ -251,7 +254,14 @@ func (b *broker) BufferConfig() queue.BufferConfig {
 }
 
 func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
-	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel)
+	// If we were given an encoder factory to allow producers to encode
+	// events for output before they entered the queue, then create an
+	// encoder for the new producer.
+	var encoder queue.Encoder
+	if b.encoderFactory != nil {
+		encoder = b.encoderFactory()
+	}
+	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel, encoder)
 }
 
 func (b *broker) Get(count int) (queue.Batch, error) {
