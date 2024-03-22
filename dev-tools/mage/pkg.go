@@ -41,6 +41,8 @@ func Package() error {
 		Platforms = NewPlatformList(expression)
 	}
 
+	log.Printf("1 platforms: %v", Platforms)
+
 	if len(Platforms) == 0 {
 		fmt.Println(">> package: Skipping because the platform list is empty")
 		return nil

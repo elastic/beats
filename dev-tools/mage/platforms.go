@@ -33,7 +33,7 @@ var BuildPlatforms = BuildPlatformList{
 	{"darwin/386", CGOSupported | CrossBuildSupported},
 	{"darwin/amd64", CGOSupported | CrossBuildSupported | Default},
 	{"darwin/arm", CGOSupported},
-	{"darwin/arm64", CGOSupported},
+	{"darwin/arm64", CGOSupported | CrossBuildSupported | Default},
 	{"dragonfly/amd64", CGOSupported},
 	{"freebsd/386", CGOSupported},
 	{"freebsd/amd64", CGOSupported},
