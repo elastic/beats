@@ -11,9 +11,9 @@ CI_DRA_ROLE_PATH="kv/ci-shared/release/dra-role"
 
 # force main branch on PR's or it won't execute
 # because the PR branch does not have a project folder in release-manager
-if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" ]]; then
+if  [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" || "$BUILDKITE_BRANCH" == "xpack_agent_core_publish" ]]; then
     BRANCH=7.17
-    DRY_RUN="--dry-run"
+    # DRY_RUN="--dry-run"
     echo "+++ Running in PR or test branch and setting branch 7.17 and --dry-run"
 fi
 
@@ -37,7 +37,7 @@ if [[ -z "${BRANCH:-""}" ]]; then
 fi
 
 function release_manager_login {
-  DRA_CREDS_SECRET=$(retry -t 5 vault kv get -field=data -format=json ${CI_DRA_ROLE_PATH})
+  DRA_CREDS_SECRET=$(retry 5 vault kv get -field=data -format=json ${CI_DRA_ROLE_PATH})
   VAULT_ADDR_SECRET=$(echo ${DRA_CREDS_SECRET} | jq -r '.vault_addr')
   VAULT_ROLE_ID_SECRET=$(echo ${DRA_CREDS_SECRET} | jq -r '.role_id')
   VAULT_SECRET=$(echo ${DRA_CREDS_SECRET} | jq -r '.secret_id')
