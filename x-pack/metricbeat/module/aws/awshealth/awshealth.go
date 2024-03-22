@@ -141,7 +141,7 @@ func (m *MetricSet) getEventsSummary(
 	for {
 		// When invoking the DescribeEvents for the first time, there must not exist any NextToken.
 		// DescribeEvents API call will return the next token if there are more records left for querying
-		// If there exist no futher records to fetch, next toke will be empty.
+		// If there exist no further records to fetch, next toke will be empty.
 		if nextTokenString == "" {
 			eventOutput, err = awsHealth.DescribeEvents(ctx,
 				&health.DescribeEventsInput{
@@ -330,6 +330,9 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 		others             int32
 	)
 	for {
+		// When invoking the DescribeAffectedEntities for the first time, there must not exist any NextToken.
+		// DescribeAffectedEntities API call will return the next token if there are more records left for querying
+		// If there exist no further records to fetch, next toke will be empty.
 		if affEntityTokString == "" {
 			affectedEntities, err := awsHealth.DescribeAffectedEntities(ctx, &health.DescribeAffectedEntitiesInput{
 				Filter: &types.EntityFilter{
