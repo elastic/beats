@@ -27,6 +27,7 @@ are_paths_changed() {
 
 pipeline_generator_changeset=(
   "^.buildkite/pipeline.py"
+  "^*/buildkite.yml"
 )
 
 if ! are_paths_changed "${pipeline_generator_changeset[@]}" || [[ "${BUILDKITE_PULL_REQUEST}" == "false" ]]; then
