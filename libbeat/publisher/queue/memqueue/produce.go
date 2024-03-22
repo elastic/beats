@@ -148,7 +148,7 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 	// If we were given an encoder callback for incoming events, apply it before
 	// sending the entry to the queue.
 	if st.encoder != nil {
-		req.event = st.encoder.EncodeEvent(req.event)
+		req.event = st.encoder.EncodeEntry(req.event)
 	}
 	select {
 	case st.events <- req:
@@ -176,7 +176,7 @@ func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
 	// If we were given an encoder callback for incoming events, apply it before
 	// sending the entry to the queue.
 	if st.encoder != nil {
-		req.event = st.encoder.EncodeEvent(req.event)
+		req.event = st.encoder.EncodeEntry(req.event)
 	}
 	select {
 	case st.events <- req:

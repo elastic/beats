@@ -50,8 +50,6 @@ type client struct {
 	observer       observer
 	eventListener  beat.EventListener
 	clientListener beat.ClientListener
-
-	encoder queue.Encoder
 }
 
 type clientCloseWaiter struct {
@@ -117,12 +115,8 @@ func (c *client) publish(e beat.Event) {
 
 	e = *event
 	pubEvent := publisher.Event{
-		Flags: c.eventFlags,
-	}
-	if c.encoder != nil {
-		pubEvent.CachedEncoding = c.encoder.EncodeEntry(event)
-	} else {
-		pubEvent.Content = e
+		Content: e,
+		Flags:   c.eventFlags,
 	}
 
 	var published bool
