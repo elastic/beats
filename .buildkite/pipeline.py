@@ -6,6 +6,7 @@ import subprocess
 import fnmatch
 import sys
 
+
 class Agent:
     """Buildkite Agent object"""
 
