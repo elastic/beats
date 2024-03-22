@@ -5,10 +5,6 @@ when:
     - "@ci" ## special token regarding the changeset for the ci
     - "@oss" ## special token regarding the changeset for the oss
 stages:
-  fake:
-    fake-cmd:
-      command: "echo 'hello'"
-
   mandatory:
     unitTest:
       command: "mage unitTest"
