@@ -72,6 +72,7 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - Fix the paths in the .cmd script added to the path by the Windows MSI to point to the new C:\Program Files installation location. https://github.com/elastic/elastic-stack-installers/pull/238
+- Change cache processor option `write_interval` to `write_period` to match documentation. {pull}38561[38561]
 
 *Auditbeat*
 
