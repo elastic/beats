@@ -13,7 +13,7 @@ if [ "$DRA_WORKFLOW" == "snapshot" ]; then
     BEAT_VERSION_FULL="${BEAT_VERSION}-SNAPSHOT"
 fi
 
-PLATFORMS="darwin/arm64,darwin/amd64,linux/386,linux/amd64,linux/arm64,windows/386,windows/amd64"
+PLATFORMS="darwin/arm64,darwin/amd64,linux/amd64,linux/arm64,windows/amd64"
 
 PLATFORMS=$PLATFORMS SNAPSHOT=$SNAPSHOT mage -d x-pack/elastic-agent packageAgentCore
 chmod 664 x-pack/elastic-agent/build/distributions/*
