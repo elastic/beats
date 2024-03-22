@@ -52,7 +52,7 @@ func (b *batch) Count() int {
 	return b.originalEntryCount
 }
 
-func (b *batch) Entry(i int) queue.Event {
+func (b *batch) Entry(i int) queue.Entry {
 	return b.entries[i].event
 }
 

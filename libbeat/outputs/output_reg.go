@@ -59,7 +59,7 @@ type Group struct {
 	BatchSize      int
 	Retry          int
 	QueueFactory   queue.QueueFactory
-	EncoderFactory beat.PreEncoderFactory
+	EncoderFactory queue.EncoderFactory
 }
 
 // RegisterType registers a new output type.

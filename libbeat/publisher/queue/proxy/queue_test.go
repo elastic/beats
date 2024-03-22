@@ -54,7 +54,7 @@ func TestBasicEventFlow(t *testing.T) {
 	logger := logp.NewLogger("proxy-queue-tests")
 
 	// Create a proxy queue where each batch is at most 2 events
-	testQueue := NewQueue(logger, nil, Settings{BatchSize: 2})
+	testQueue := NewQueue(logger, nil, Settings{BatchSize: 2}, nil)
 	defer testQueue.Close()
 
 	listener := newTestACKListener()
@@ -84,7 +84,7 @@ func TestBlockedProducers(t *testing.T) {
 	logger := logp.NewLogger("proxy-queue-tests")
 
 	// Create a proxy queue where each batch is at most 2 events
-	testQueue := NewQueue(logger, nil, Settings{BatchSize: 2})
+	testQueue := NewQueue(logger, nil, Settings{BatchSize: 2}, nil)
 	defer testQueue.Close()
 
 	listener := newTestACKListener()
@@ -125,7 +125,7 @@ func TestOutOfOrderACK(t *testing.T) {
 	logger := logp.NewLogger("proxy-queue-tests")
 
 	// Create a proxy queue where each batch is at most 2 events
-	testQueue := NewQueue(logger, nil, Settings{BatchSize: 2})
+	testQueue := NewQueue(logger, nil, Settings{BatchSize: 2}, nil)
 	defer testQueue.Close()
 
 	listener := newTestACKListener()
@@ -167,7 +167,7 @@ func TestOutOfOrderACK(t *testing.T) {
 func TestWriteAfterClose(t *testing.T) {
 	logger := logp.NewLogger("proxy-queue-tests")
 
-	testQueue := NewQueue(logger, nil, Settings{BatchSize: 2})
+	testQueue := NewQueue(logger, nil, Settings{BatchSize: 2}, nil)
 	producer := testQueue.Producer(queue.ProducerConfig{})
 	testQueue.Close()
 

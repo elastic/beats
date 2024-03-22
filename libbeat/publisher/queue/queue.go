@@ -25,7 +25,20 @@ import (
 	"github.com/elastic/elastic-agent-libs/opt"
 )
 
-type Event interface{}
+// Entry is a placeholder type for the objects contained by the queue, which
+// can be anything (but right now is always a publisher.Event). We could just
+// use interface{} everywhere but this makes the API's intentions clearer
+// and reduces accidental type mismatches.
+type Entry interface{}
+
+// Outputs can provide an Encoder to enable early encoding in queues that
+// support it (currently just the memory queue).
+type Encoder interface {
+	EncodeEvent(Entry) Entry
+}
+
+// Encoders are provided as factories so each worker goroutine can have its own
+type EncoderFactory func() Encoder
 
 // Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
 type Metrics struct {
@@ -76,7 +89,12 @@ type Queue interface {
 	Metrics() (Metrics, error)
 }
 
-type QueueFactory func(logger *logp.Logger, ack func(eventCount int), inputQueueSize int) (Queue, error)
+type QueueFactory func(
+	logger *logp.Logger,
+	ack func(eventCount int),
+	inputQueueSize int,
+	encoderFactory EncoderFactory,
+) (Queue, error)
 
 // BufferConfig returns the pipelines buffering settings,
 // for the pipeline to use.
@@ -100,7 +118,7 @@ type ProducerConfig struct {
 	// the queue. Currently this can only happen when a Publish call is sent
 	// to the memory queue's request channel but the producer is cancelled
 	// before it reaches the queue buffer.
-	OnDrop func(Event)
+	OnDrop func(Entry)
 
 	// DropOnCancel is a hint to the queue to drop events if the producer disconnects
 	// via Cancel.
@@ -112,31 +130,31 @@ type EntryID uint64
 // Producer is an interface to be used by the pipelines client to forward
 // events to a queue.
 type Producer interface {
-	// Publish adds an event to the queue, blocking if necessary, and returns
+	// Publish adds an entry to the queue, blocking if necessary, and returns
 	// the new entry's id and true on success.
-	Publish(event Event) (EntryID, bool)
+	Publish(entry Entry) (EntryID, bool)
 
-	// TryPublish adds an event to the queue if doing so will not block the
+	// TryPublish adds an entry to the queue if doing so will not block the
 	// caller, otherwise it immediately returns. The reasons a publish attempt
 	// might block are defined by the specific queue implementation and its
 	// configuration. If the event was successfully added, returns true with
 	// the event's assigned ID, and false otherwise.
-	TryPublish(event Event) (EntryID, bool)
+	TryPublish(entry Entry) (EntryID, bool)
 
 	// Cancel closes this Producer endpoint. If the producer is configured to
-	// drop its events on Cancel, the number of dropped events is returned.
+	// drop its entries on Cancel, the number of dropped entries is returned.
 	// Note: A queue may still send ACK signals even after Cancel is called on
 	//       the originating Producer. The pipeline client must accept and
 	//       discard these ACKs.
 	Cancel() int
 }
 
-// Batch of events to be returned to Consumers. The `Done` method will tell the
-// queue that the batch has been consumed and its events can be acknowledged
-// and discarded.
+// Batch of entries (usually publisher.Event) to be returned to Consumers.
+// The `Done` method will tell the queue that the batch has been consumed and
+// its entries can be acknowledged and discarded.
 type Batch interface {
 	Count() int
-	Entry(i int) Event
+	Entry(i int) Entry
 	// Release the internal references to the contained events, if
 	// supported (the disk queue does not yet implement it).
 	// Count() and Entry() cannot be used after this call.

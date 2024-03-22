@@ -91,8 +91,9 @@ func FactoryForSettings(settings Settings) queue.QueueFactory {
 		logger *logp.Logger,
 		ackCallback func(eventCount int),
 		inputQueueSize int,
+		encoderFactory queue.EncoderFactory,
 	) (queue.Queue, error) {
-		return NewQueue(logger, ackCallback, settings), nil
+		return NewQueue(logger, ackCallback, settings, encoderFactory), nil
 	}
 }
 
@@ -103,6 +104,7 @@ func NewQueue(
 	logger *logp.Logger,
 	ackCallback func(eventCount int),
 	settings Settings,
+	encoderFactory queue.EncoderFactory,
 ) *broker {
 	if logger == nil {
 		logger = logp.NewLogger("proxyqueue")

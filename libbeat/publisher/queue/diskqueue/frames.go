@@ -54,7 +54,7 @@ type readFrame struct {
 	id frameID
 
 	// The event decoded from the data frame.
-	event queue.Event
+	event queue.Entry
 
 	// How much space this frame occupied on disk (before deserialization),
 	// including the frame header / footer.

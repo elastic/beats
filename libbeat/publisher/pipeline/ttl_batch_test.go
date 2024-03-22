@@ -24,6 +24,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
@@ -129,8 +130,14 @@ func (b *mockQueueBatch) Count() int {
 func (b *mockQueueBatch) Done() {
 }
 
-func (b *mockQueueBatch) Entry(i int) queue.Event {
-	return fmt.Sprintf("event %v", i)
+func (b *mockQueueBatch) Entry(i int) queue.Entry {
+	return &publisher.Event{
+		Content: beat.Event{
+			Fields: map[string]interface{}{
+				"content": fmt.Sprintf("event %v", i),
+			},
+		},
+	}
 }
 
 func (b *mockQueueBatch) FreeEntries() {

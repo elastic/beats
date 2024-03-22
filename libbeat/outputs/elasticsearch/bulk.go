@@ -58,7 +58,7 @@ func bulkReadToItems(reader *jsonReader) error {
 			break
 		}
 
-		reader.ignoreNext()
+		_, _ = reader.ignoreNext()
 	}
 
 	// check items field is an array

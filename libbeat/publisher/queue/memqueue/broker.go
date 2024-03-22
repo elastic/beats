@@ -113,7 +113,7 @@ type Settings struct {
 }
 
 type queueEntry struct {
-	event queue.Event
+	event queue.Entry
 	id    queue.EntryID
 
 	producer   *ackProducer
@@ -147,8 +147,9 @@ func FactoryForSettings(settings Settings) queue.QueueFactory {
 		logger *logp.Logger,
 		ackCallback func(eventCount int),
 		inputQueueSize int,
+		encoderFactory queue.EncoderFactory,
 	) (queue.Queue, error) {
-		return NewQueue(logger, ackCallback, settings, inputQueueSize), nil
+		return NewQueue(logger, ackCallback, settings, inputQueueSize, encoderFactory), nil
 	}
 }
 
@@ -160,6 +161,7 @@ func NewQueue(
 	ackCallback func(eventCount int),
 	settings Settings,
 	inputQueueSize int,
+	encoderFactory queue.EncoderFactory,
 ) *broker {
 	b := newQueue(logger, ackCallback, settings, inputQueueSize)
 
@@ -398,7 +400,7 @@ func (b *batch) rawEntry(i int) *queueEntry {
 }
 
 // Return the event referenced by the i-th element of this batch
-func (b *batch) Entry(i int) queue.Event {
+func (b *batch) Entry(i int) queue.Entry {
 	return b.rawEntry(i).event
 }
 

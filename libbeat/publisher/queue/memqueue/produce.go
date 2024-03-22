@@ -50,14 +50,14 @@ type producerID uint64
 
 type produceState struct {
 	cb        ackHandler
-	dropCB    func(queue.Event)
+	dropCB    func(queue.Entry)
 	cancelled bool
 	lastACK   producerID
 }
 
 type ackHandler func(count int)
 
-func newProducer(b *broker, cb ackHandler, dropCB func(queue.Event), dropOnCancel bool) queue.Producer {
+func newProducer(b *broker, cb ackHandler, dropCB func(queue.Entry), dropOnCancel bool) queue.Producer {
 	openState := openState{
 		log:       b.logger,
 		done:      make(chan struct{}),
@@ -74,18 +74,18 @@ func newProducer(b *broker, cb ackHandler, dropCB func(queue.Event), dropOnCance
 	return &forgetfulProducer{broker: b, openState: openState}
 }
 
-func (p *forgetfulProducer) makePushRequest(event queue.Event) pushRequest {
+func (p *forgetfulProducer) makePushRequest(event queue.Entry) pushRequest {
 	resp := make(chan queue.EntryID, 1)
 	return pushRequest{
 		event: event,
 		resp:  resp}
 }
 
-func (p *forgetfulProducer) Publish(event queue.Event) (queue.EntryID, bool) {
+func (p *forgetfulProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
 	return p.openState.publish(p.makePushRequest(event))
 }
 
-func (p *forgetfulProducer) TryPublish(event queue.Event) (queue.EntryID, bool) {
+func (p *forgetfulProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
 	return p.openState.tryPublish(p.makePushRequest(event))
 }
 
@@ -94,7 +94,7 @@ func (p *forgetfulProducer) Cancel() int {
 	return 0
 }
 
-func (p *ackProducer) makePushRequest(event queue.Event) pushRequest {
+func (p *ackProducer) makePushRequest(event queue.Entry) pushRequest {
 	resp := make(chan queue.EntryID, 1)
 	return pushRequest{
 		event:    event,
@@ -105,7 +105,7 @@ func (p *ackProducer) makePushRequest(event queue.Event) pushRequest {
 		resp:       resp}
 }
 
-func (p *ackProducer) Publish(event queue.Event) (queue.EntryID, bool) {
+func (p *ackProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
 	id, published := p.openState.publish(p.makePushRequest(event))
 	if published {
 		p.producedCount++
@@ -113,7 +113,7 @@ func (p *ackProducer) Publish(event queue.Event) (queue.EntryID, bool) {
 	return id, published
 }
 
-func (p *ackProducer) TryPublish(event queue.Event) (queue.EntryID, bool) {
+func (p *ackProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
 	id, published := p.openState.tryPublish(p.makePushRequest(event))
 	if published {
 		p.producedCount++

@@ -27,6 +27,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -105,7 +107,7 @@ func makeES(
 		}
 	}
 
-	encoderFactory := func() beat.PreEncoder {
+	encoderFactory := func() queue.Encoder {
 		return newPreEncoder(
 			esConfig.EscapeHTML,
 			index,
@@ -208,7 +210,7 @@ type encodedEvent struct {
 func newPreEncoder(escapeHTML bool,
 	indexSelector outputs.IndexSelector,
 	pipelineSelector *outil.Selector,
-) beat.PreEncoder {
+) queue.Encoder {
 	buf := bytes.NewBuffer(nil)
 	enc := eslegclient.NewJSONEncoder(buf, escapeHTML)
 	return &eventEncoder{
@@ -219,18 +221,22 @@ func newPreEncoder(escapeHTML bool,
 	}
 }
 
-func (pe *eventEncoder) EncodeEvent(e *beat.Event) interface{} {
-	opType := events.GetOpType(*e)
-	pipeline, err := getPipeline(e, pe.pipelineSelector)
+func (pe *eventEncoder) EncodeEvent(entry queue.Entry) queue.Entry {
+	e, ok := entry.(publisher.Event)
+	if !ok {
+		return nil
+	}
+	opType := events.GetOpType(e.Content)
+	pipeline, err := getPipeline(&e.Content, pe.pipelineSelector)
 	if err != nil {
 		return &encodedEvent{err: fmt.Errorf("failed to select event pipeline: %w", err)}
 	}
-	index, err := pe.indexSelector.Select(e)
+	index, err := pe.indexSelector.Select(&e.Content)
 	if err != nil {
 		return &encodedEvent{err: fmt.Errorf("failed to select event index: %w", err)}
 	}
 
-	id, _ := events.GetMetaStringValue(*e, events.FieldMetaID)
+	id, _ := events.GetMetaStringValue(e.Content, events.FieldMetaID)
 
 	err = pe.enc.Marshal(e)
 	if err != nil {
@@ -239,11 +245,12 @@ func (pe *eventEncoder) EncodeEvent(e *beat.Event) interface{} {
 	bufBytes := pe.buf.Bytes()
 	bytes := make([]byte, len(bufBytes))
 	copy(bytes, bufBytes)
-	return &encodedEvent{
+	e.CachedEncoding = &encodedEvent{
 		id:       id,
 		opType:   opType,
 		encoding: bytes,
 		pipeline: pipeline,
 		index:    index,
 	}
+	return e
 }

@@ -110,8 +110,9 @@ func FactoryForSettings(settings Settings) queue.QueueFactory {
 		logger *logp.Logger,
 		ackCallback func(eventCount int),
 		inputQueueSize int,
+		encoderFactory queue.EncoderFactory,
 	) (queue.Queue, error) {
-		return NewQueue(logger, ackCallback, settings)
+		return NewQueue(logger, ackCallback, settings, encoderFactory)
 	}
 }
 
@@ -121,6 +122,7 @@ func NewQueue(
 	logger *logp.Logger,
 	writeToDiskCallback func(eventCount int),
 	settings Settings,
+	encoderFactory queue.EncoderFactory,
 ) (*diskQueue, error) {
 	logger = logger.Named("diskqueue")
 	logger.Debugf(

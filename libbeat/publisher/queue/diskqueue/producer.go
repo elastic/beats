@@ -49,16 +49,16 @@ type producerWriteRequest struct {
 // diskQueueProducer implementation of the queue.Producer interface
 //
 
-func (producer *diskQueueProducer) Publish(event queue.Event) (queue.EntryID, bool) {
+func (producer *diskQueueProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
 	return 0, producer.publish(event, true)
 }
 
-func (producer *diskQueueProducer) TryPublish(event queue.Event) (queue.EntryID, bool) {
+func (producer *diskQueueProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
 	return 0, producer.publish(event, false)
 }
 
 func (producer *diskQueueProducer) publish(
-	event queue.Event, shouldBlock bool,
+	event queue.Entry, shouldBlock bool,
 ) bool {
 	if producer.cancelled {
 		return false

@@ -51,7 +51,7 @@ type client struct {
 	eventListener  beat.EventListener
 	clientListener beat.ClientListener
 
-	encoder beat.PreEncoder
+	encoder queue.Encoder
 }
 
 type clientCloseWaiter struct {

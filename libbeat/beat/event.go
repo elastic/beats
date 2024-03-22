@@ -57,11 +57,11 @@ type Event struct {
 	TimeSeries bool        // true if the event contains timeseries data
 }
 
-type PreEncoder interface {
-	EncodeEvent(*Event) interface{}
-}
+//type PreEncoder interface {
+//	EncodeEvent(*Event) interface{}
+//}
 
-type PreEncoderFactory func() PreEncoder
+//type PreEncoderFactory func() PreEncoder
 
 var (
 	ErrValueNotTimestamp = errors.New("value is not a timestamp")

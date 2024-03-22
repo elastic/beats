@@ -92,12 +92,12 @@ func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
 			Events:        2, // Queue size
 			MaxGetRequest: 1, // make sure the queue won't buffer events
 			FlushTimeout:  time.Millisecond,
-		}, 0)
+		}, 0, nil)
 
 	p := q.Producer(queue.ProducerConfig{
 		// We do not read from the queue, so the callbacks are never called
 		ACK:          func(count int) {},
-		OnDrop:       func(e queue.Event) {},
+		OnDrop:       func(e queue.Entry) {},
 		DropOnCancel: false,
 	})
 
@@ -164,13 +164,13 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 			Events:        3, // Queue size
 			MaxGetRequest: 2,
 			FlushTimeout:  10 * time.Millisecond,
-		}, 1)
+		}, 1, nil)
 
 	p := q.Producer(queue.ProducerConfig{
 		ACK: func(count int) {
 			activeEvents.Add(-int64(count))
 		},
-		OnDrop: func(e queue.Event) {
+		OnDrop: func(e queue.Entry) {
 			//activeEvents.Add(-1)
 		},
 		DropOnCancel: false,
@@ -263,7 +263,7 @@ func TestQueueMetricsBuffer(t *testing.T) {
 }
 
 func queueTestWithSettings(t *testing.T, settings Settings, eventsToTest int, testName string) {
-	testQueue := NewQueue(nil, nil, settings, 0)
+	testQueue := NewQueue(nil, nil, settings, 0, nil)
 	defer testQueue.Close()
 
 	// Send events to queue
@@ -307,7 +307,7 @@ func makeTestQueue(sz, minEvents int, flushTimeout time.Duration) queuetest.Queu
 			Events:        sz,
 			MaxGetRequest: minEvents,
 			FlushTimeout:  flushTimeout,
-		}, 0)
+		}, 0, nil)
 	}
 }
 
@@ -418,22 +418,22 @@ func TestEntryIDs(t *testing.T) {
 	}
 
 	t.Run("acking in forward order with directEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000}, 0)
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000}, 0, nil)
 		testForward(testQueue)
 	})
 
 	t.Run("acking in reverse order with directEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000}, 0)
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000}, 0, nil)
 		testBackward(testQueue)
 	})
 
 	t.Run("acking in forward order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000, MaxGetRequest: 2, FlushTimeout: time.Microsecond}, 0)
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000, MaxGetRequest: 2, FlushTimeout: time.Microsecond}, 0, nil)
 		testForward(testQueue)
 	})
 
 	t.Run("acking in reverse order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000, MaxGetRequest: 2, FlushTimeout: time.Microsecond}, 0)
+		testQueue := NewQueue(nil, nil, Settings{Events: 1000, MaxGetRequest: 2, FlushTimeout: time.Microsecond}, 0, nil)
 		testBackward(testQueue)
 	})
 }
@@ -447,7 +447,7 @@ func TestBatchFreeEntries(t *testing.T) {
 	// 4. Make sure only events 6-10 are nil
 	// 5. Call FreeEntries on the first batch
 	// 6. Make sure all events are nil
-	testQueue := NewQueue(nil, nil, Settings{Events: queueSize, MaxGetRequest: batchSize, FlushTimeout: time.Second}, 0)
+	testQueue := NewQueue(nil, nil, Settings{Events: queueSize, MaxGetRequest: batchSize, FlushTimeout: time.Second}, 0, nil)
 	producer := testQueue.Producer(queue.ProducerConfig{})
 	for i := 0; i < queueSize; i++ {
 		_, ok := producer.Publish(i)

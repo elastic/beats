@@ -20,7 +20,6 @@ package pipeline
 import (
 	"sync"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -63,7 +62,7 @@ type consumerTarget struct {
 	ch             chan publisher.Batch
 	timeToLive     int
 	batchSize      int
-	encoderFactory beat.PreEncoderFactory
+	encoderFactory queue.EncoderFactory
 }
 
 // retryRequest is used by ttlBatch to add itself back to the eventConsumer
