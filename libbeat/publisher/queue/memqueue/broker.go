@@ -166,7 +166,7 @@ func NewQueue(
 	inputQueueSize int,
 	encoderFactory queue.EncoderFactory,
 ) *broker {
-	b := newQueue(logger, ackCallback, settings, inputQueueSize)
+	b := newQueue(logger, ackCallback, settings, inputQueueSize, encoderFactory)
 
 	// Start the queue workers
 	b.wg.Add(2)
@@ -191,6 +191,7 @@ func newQueue(
 	ackCallback func(eventCount int),
 	settings Settings,
 	inputQueueSize int,
+	encoderFactory queue.EncoderFactory,
 ) *broker {
 	chanSize := AdjustInputQueueSize(inputQueueSize, settings.Events)
 
@@ -217,6 +218,8 @@ func newQueue(
 		logger:   logger,
 
 		buf: make([]queueEntry, settings.Events),
+
+		encoderFactory: encoderFactory,
 
 		// broker API channels
 		pushChan:   make(chan pushRequest, chanSize),
