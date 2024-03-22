@@ -22,6 +22,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 
 	"go.elastic.co/apm/v2"
 
@@ -49,7 +50,13 @@ type netClientWorker struct {
 	tracer *apm.Tracer
 }
 
-func makeClientWorker(batchChan chan publisher.Batch, client outputs.Client, logger logger, tracer *apm.Tracer) outputWorker {
+func makeClientWorker(
+	batchChan chan publisher.Batch,
+	client outputs.Client,
+	logger logger,
+	tracer *apm.Tracer,
+	encoderFactory queue.EncoderFactory,
+) outputWorker {
 	w := worker{
 		qu:   batchChan,
 		done: make(chan struct{}),

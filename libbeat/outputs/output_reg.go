@@ -55,10 +55,25 @@ type IndexSelector interface {
 // output, but it also provides a natural migration path for moving queue
 // configuration into the outputs.
 type Group struct {
-	Clients        []Client
-	BatchSize      int
-	Retry          int
-	QueueFactory   queue.QueueFactory
+	Clients      []Client
+	BatchSize    int
+	Retry        int
+	QueueFactory queue.QueueFactory
+
+	// If the output supports early encoding (where events are converted to their
+	// output-serialized form before entering the queue) it should provide an
+	// encoder factory here. This factory will be used to create encoders that may be
+	// used by the input workers to preprocess events before they reach the output's
+	// Publish call.
+	// - Each encoder will be accessed from only one goroutine at a time.
+	// - Encoders should add the event's output-serialized form, along with any
+	// metadata needed to handle a Publish call, to the CachedEncoding field of
+	// the underlying publisher.Event.
+	// - Encoders should clear the Content field of the underlying publisher.Event
+	// so memory can be reclaimed for the unencoded version.
+	// - If there is a fatal error in encoding, provide a non-nil CachedEncoding
+	// and clear Content anyway. Metadata about the error should be saved in
+	// CachedEncoding and reported when Publish is called.
 	EncoderFactory queue.EncoderFactory
 }
 

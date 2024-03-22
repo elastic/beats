@@ -155,7 +155,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	c.workers = make([]outputWorker, len(clients))
 	for i, client := range clients {
 		logger := logp.NewLogger("publisher_pipeline_output")
-		c.workers[i] = makeClientWorker(c.workerChan, client, logger, c.monitors.Tracer)
+		c.workers[i] = makeClientWorker(c.workerChan, client, logger, c.monitors.Tracer, outGrp.EncoderFactory)
 	}
 
 	targetChan := c.workerChan

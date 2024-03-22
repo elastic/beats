@@ -221,22 +221,44 @@ func newPreEncoder(escapeHTML bool,
 	}
 }
 
-func (pe *eventEncoder) EncodeEvent(entry queue.Entry) queue.Entry {
+func (pe *eventEncoder) EncodeEntry(entry queue.Entry) queue.Entry {
 	e, ok := entry.(publisher.Event)
 	if !ok {
+		// Currently all queue entries are publisher.Events but let's be cautious
 		return nil
 	}
-	opType := events.GetOpType(e.Content)
-	pipeline, err := getPipeline(&e.Content, pe.pipelineSelector)
+
+	e.CachedEncoding = pe.encodeEvent(&e.Content)
+	e.Content = beat.Event{}
+	return e
+}
+
+func (pe *eventEncoder) IsEncoded(entry queue.Entry) bool {
+	e, ok := entry.(publisher.Event)
+	return ok && e.CachedEncoding != nil
+}
+
+func (pe *eventEncoder) ByteCount(entry queue.Entry) int {
+	e, ok := entry.(publisher.Event)
+	if !ok || e.CachedEncoding == nil {
+		return 0
+	}
+	encodedEvent := e.CachedEncoding.(*encodedEvent)
+	return len(encodedEvent.encoding)
+}
+
+func (pe *eventEncoder) encodeEvent(e *beat.Event) *encodedEvent {
+	opType := events.GetOpType(*e)
+	pipeline, err := getPipeline(e, pe.pipelineSelector)
 	if err != nil {
 		return &encodedEvent{err: fmt.Errorf("failed to select event pipeline: %w", err)}
 	}
-	index, err := pe.indexSelector.Select(&e.Content)
+	index, err := pe.indexSelector.Select(e)
 	if err != nil {
 		return &encodedEvent{err: fmt.Errorf("failed to select event index: %w", err)}
 	}
 
-	id, _ := events.GetMetaStringValue(e.Content, events.FieldMetaID)
+	id, _ := events.GetMetaStringValue(*e, events.FieldMetaID)
 
 	err = pe.enc.Marshal(e)
 	if err != nil {
@@ -245,12 +267,11 @@ func (pe *eventEncoder) EncodeEvent(entry queue.Entry) queue.Entry {
 	bufBytes := pe.buf.Bytes()
 	bytes := make([]byte, len(bufBytes))
 	copy(bytes, bufBytes)
-	e.CachedEncoding = &encodedEvent{
+	return &encodedEvent{
 		id:       id,
 		opType:   opType,
 		encoding: bytes,
 		pipeline: pipeline,
 		index:    index,
 	}
-	return e
 }

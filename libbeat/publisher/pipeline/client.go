@@ -120,7 +120,7 @@ func (c *client) publish(e beat.Event) {
 		Flags: c.eventFlags,
 	}
 	if c.encoder != nil {
-		pubEvent.CachedEncoding = c.encoder.EncodeEvent(event)
+		pubEvent.CachedEncoding = c.encoder.EncodeEntry(event)
 	} else {
 		pubEvent.Content = e
 	}

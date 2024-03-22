@@ -31,15 +31,6 @@ import (
 // and reduces accidental type mismatches.
 type Entry interface{}
 
-// Outputs can provide an Encoder to enable early encoding in queues that
-// support it (currently just the memory queue).
-type Encoder interface {
-	EncodeEvent(Entry) Entry
-}
-
-// Encoders are provided as factories so each worker goroutine can have its own
-type EncoderFactory func() Encoder
-
 // Metrics is a set of basic-user friendly metrics that report the current state of the queue. These metrics are meant to be relatively generic and high-level, and when reported directly, can be comprehensible to a user.
 type Metrics struct {
 	//EventCount is the total events currently in the queue
@@ -161,3 +152,27 @@ type Batch interface {
 	FreeEntries()
 	Done()
 }
+
+// Outputs can provide an Encoder to enable early encoding in queues that
+// support it (currently just the memory queue).
+type Encoder interface {
+	// Return the encoded form of the entry that the output workers can use.
+	EncodeEntry(Entry) Entry
+
+	// IsEncoded returns true if EncodeEntry processing has already been
+	// run on the given entry.
+	// This is only needed because encoding is still done in the output
+	// workers if the configured queue doesn't support early encoding,
+	// and this call lets the output wrappers handle that generically.
+	// Once all queues support early encoding, IsEncoded and its call
+	// sites can be removed.
+	IsEncoded(Entry) bool
+
+	// The in-memory byte size of an encoded entry, or 0 if the event is not
+	// encoded. It is ok if this is just the memory used by the main encoded
+	// buffer and leaves out a small amount of per-event metadata.
+	ByteCount(Entry) int
+}
+
+// Encoders are provided as factories so each worker goroutine can have its own
+type EncoderFactory func() Encoder
