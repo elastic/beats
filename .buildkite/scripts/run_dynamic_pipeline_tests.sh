@@ -39,5 +39,5 @@ echo "~~~ Running pipeline generator tests"
 
 python3 -mpip install --quiet "pytest"
 pushd .buildkite
-./pytest .
+pytest .
 popd
