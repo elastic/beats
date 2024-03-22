@@ -46,7 +46,7 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
   # Install NodeJS
   withNodeJSEnv "${NODEJS_VERSION}"
   installNodeJsDependencies
-  export ELASTIC_SYNTHETICS_CAPABLE=true
+
   echo "Install @elastic/synthetics"
   npm i -g @elastic/synthetics
 fi

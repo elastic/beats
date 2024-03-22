@@ -100,24 +100,6 @@ if are_conditions_met_macos_tests; then
 YAML
 fi
 
-if are_conditions_met_aws_tests; then
-  cat >> $pipelineName <<- YAML
-      - label: ":linux: Cloud Tests"
-        key: "extended-cloud-test"
-        command: ".buildkite/scripts/cloud_tests.sh"
-        env:
-          MODULE: $MODULE
-        agents:
-          provider: "gcp"
-          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-YAML
-fi
-
 echo "Check and add the Packaging into the pipeline"
 if are_conditions_met_packaging; then
   cat >> $pipelineName <<- YAML
