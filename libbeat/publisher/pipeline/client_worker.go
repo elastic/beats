@@ -49,14 +49,9 @@ type netClientWorker struct {
 	tracer *apm.Tracer
 }
 
-func makeClientWorker(
-	batchChan chan publisher.Batch,
-	client outputs.Client,
-	logger logger,
-	tracer *apm.Tracer,
-) outputWorker {
+func makeClientWorker(qu chan publisher.Batch, client outputs.Client, logger logger, tracer *apm.Tracer) outputWorker {
 	w := worker{
-		qu:   batchChan,
+		qu:   qu,
 		done: make(chan struct{}),
 	}
 
