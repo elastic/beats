@@ -310,7 +310,7 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 	okEvents := data[:0]
 	bulkItems := []interface{}{}
 	for i := range data {
-		event := data[i].CachedEncoding.(*encodedEvent)
+		event := data[i].EncodedEvent.(*encodedEvent)
 		if event.err != nil {
 			client.log.Error(event.err)
 			continue

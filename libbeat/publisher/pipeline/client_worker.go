@@ -22,7 +22,6 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 
 	"go.elastic.co/apm/v2"
 
@@ -55,7 +54,6 @@ func makeClientWorker(
 	client outputs.Client,
 	logger logger,
 	tracer *apm.Tracer,
-	encoderFactory queue.EncoderFactory,
 ) outputWorker {
 	w := worker{
 		qu:   batchChan,

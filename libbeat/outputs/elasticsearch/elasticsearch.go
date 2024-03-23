@@ -228,13 +228,13 @@ func (pe *eventEncoder) EncodeEntry(entry queue.Entry) (queue.Entry, int) {
 		return entry, 0
 	}
 
-	encodedEvent := pe.encodeEvent(&e.Content)
-	e.CachedEncoding = encodedEvent
+	encodedEvent := pe.encodeRawEvent(&e.Content)
+	e.EncodedEvent = encodedEvent
 	e.Content = beat.Event{}
 	return e, len(encodedEvent.encoding)
 }
 
-func (pe *eventEncoder) encodeEvent(e *beat.Event) *encodedEvent {
+func (pe *eventEncoder) encodeRawEvent(e *beat.Event) *encodedEvent {
 	opType := events.GetOpType(*e)
 	pipeline, err := getPipeline(e, pe.pipelineSelector)
 	if err != nil {

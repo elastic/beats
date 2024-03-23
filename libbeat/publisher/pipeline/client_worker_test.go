@@ -64,7 +64,7 @@ func TestMakeClientWorker(t *testing.T) {
 
 				client := ctor(publishFn)
 
-				worker := makeClientWorker(workQueue, client, logger, nil, nil)
+				worker := makeClientWorker(workQueue, client, logger, nil)
 				defer worker.Close()
 
 				for i := uint(0); i < numBatches; i++ {
@@ -158,7 +158,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				}
 
 				client := ctor(blockingPublishFn)
-				worker := makeClientWorker(workQueue, client, logger, nil, nil)
+				worker := makeClientWorker(workQueue, client, logger, nil)
 
 				// Allow the worker to make *some* progress before we close it
 				timeout := 10 * time.Second
@@ -185,7 +185,7 @@ func TestReplaceClientWorker(t *testing.T) {
 				}
 
 				client = ctor(countingPublishFn)
-				makeClientWorker(workQueue, client, logger, nil, nil)
+				makeClientWorker(workQueue, client, logger, nil)
 				wg.Wait()
 
 				// Make sure that all events have eventually been published
@@ -231,7 +231,7 @@ func TestMakeClientTracer(t *testing.T) {
 	recorder := apmtest.NewRecordingTracer()
 	defer recorder.Close()
 
-	worker := makeClientWorker(workQueue, client, logger, recorder.Tracer, nil)
+	worker := makeClientWorker(workQueue, client, logger, recorder.Tracer)
 	defer worker.Close()
 
 	for i := 0; i < numBatches; i++ {

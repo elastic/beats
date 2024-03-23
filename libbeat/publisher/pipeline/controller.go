@@ -153,7 +153,7 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	c.workers = make([]outputWorker, len(clients))
 	for i, client := range clients {
 		logger := logp.NewLogger("publisher_pipeline_output")
-		c.workers[i] = makeClientWorker(c.workerChan, client, logger, c.monitors.Tracer, outGrp.EncoderFactory)
+		c.workers[i] = makeClientWorker(c.workerChan, client, logger, c.monitors.Tracer)
 	}
 
 	targetChan := c.workerChan
@@ -170,11 +170,10 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	// Resume consumer targeting the new work queue
 	c.consumer.setTarget(
 		consumerTarget{
-			queue:          c.queue,
-			ch:             targetChan,
-			batchSize:      outGrp.BatchSize,
-			timeToLive:     outGrp.Retry + 1,
-			encoderFactory: outGrp.EncoderFactory,
+			queue:      c.queue,
+			ch:         targetChan,
+			batchSize:  outGrp.BatchSize,
+			timeToLive: outGrp.Retry + 1,
 		})
 }
 
