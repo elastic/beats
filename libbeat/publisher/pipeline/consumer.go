@@ -152,14 +152,14 @@ outerLoop:
 		// and try to send to it. Otherwise, it will remain nil, and sends
 		// to it will always block, so the output case of the select below
 		// will be ignored.
-		var batchChan chan publisher.Batch
+		var outputChan chan publisher.Batch
 		if active != nil {
-			batchChan = target.ch
+			outputChan = target.ch
 		}
 
 		// Now we can block until the next state change.
 		select {
-		case batchChan <- active:
+		case outputChan <- active:
 			// Successfully sent a batch to the output workers
 			if len(retryBatches) > 0 {
 				// This was a retry, report it to the observer
