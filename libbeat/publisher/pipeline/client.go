@@ -202,7 +202,7 @@ func (c *client) onPublished() {
 	}
 }
 
-func (c *client) onFilteredOut(_ beat.Event) {
+func (c *client) onFilteredOut(e beat.Event) {
 	c.observer.filteredEvent()
 }
 
