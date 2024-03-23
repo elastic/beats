@@ -25,9 +25,8 @@ import (
 )
 
 const (
-	dead_letter_marker_field = "deadlettered"
-	drop                     = "drop"
-	dead_letter_index        = "dead_letter_index"
+	drop              = "drop"
+	dead_letter_index = "dead_letter_index"
 )
 
 type DropPolicy struct{}

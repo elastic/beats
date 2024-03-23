@@ -419,8 +419,9 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 				stats.tooMany++
 			} else {
 				// hard failure, apply policy action
-				result, _ := data[i].Content.Meta.HasKey(dead_letter_marker_field)
-				if result {
+				encodedEvent := data[i].EncodedEvent.(*encodedEvent)
+				//result, _ := data[i].Content.Meta.HasKey(dead_letter_marker_field)
+				if encodedEvent.deadLetter {
 					stats.nonIndexable++
 					client.log.Errorf("Can't deliver to dead letter index event (status=%v). Enable debug logs to view the event and cause.", status)
 					client.log.Debugf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
@@ -428,13 +429,7 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 				} else if client.NonIndexableAction == dead_letter_index {
 					client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Enable debug logs to view the event and cause.", status)
 					client.log.Debugf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
-					if data[i].Content.Meta == nil {
-						data[i].Content.Meta = mapstr.M{
-							dead_letter_marker_field: true,
-						}
-					} else {
-						data[i].Content.Meta[dead_letter_marker_field] = true
-					}
+					encodedEvent.deadLetter = true
 					data[i].Content.Fields = mapstr.M{
 						"message":       data[i].Content.Fields.String(),
 						"error.type":    status,

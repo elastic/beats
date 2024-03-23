@@ -20,6 +20,7 @@ package elasticsearch
 import (
 	"bytes"
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
@@ -41,6 +42,17 @@ type encodedEvent struct {
 	// If err is set, the event couldn't be encoded, and other fields should
 	// not be relied on.
 	err error
+
+	// If deadLetter is true, this event produced an ingestion error on a
+	// previous attempt, and is now being retried as a bare event with all
+	// contents included as a raw string in the "message" field.
+	deadLetter bool
+
+	// timestamp is the timestamp from the source beat.Event. It's only used
+	// when reencoding for the dead letter index, so it isn't strictly needed
+	// but it avoids deserializing the encoded event to recover one field if
+	// there's an ingestion error.
+	timestamp time.Time
 
 	id       string
 	opType   events.OpType
@@ -103,10 +115,11 @@ func (pe *eventEncoder) encodeRawEvent(e *beat.Event) *encodedEvent {
 	bytes := make([]byte, len(bufBytes))
 	copy(bytes, bufBytes)
 	return &encodedEvent{
-		id:       id,
-		opType:   opType,
-		encoding: bytes,
-		pipeline: pipeline,
-		index:    index,
+		id:        id,
+		timestamp: e.Timestamp,
+		opType:    opType,
+		pipeline:  pipeline,
+		index:     index,
+		encoding:  bytes,
 	}
 }
