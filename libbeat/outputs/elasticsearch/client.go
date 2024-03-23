@@ -324,6 +324,8 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 			// We don't include the event source in a bulk DELETE
 			bulkItems = append(bulkItems, meta)
 		} else {
+			// Wrap the encoded event in a RawEncoding so the Elasticsearch client
+			// knows not to re-encode it
 			bulkItems = append(bulkItems, meta, eslegclient.RawEncoding{Encoding: event.encoding})
 		}
 		okEvents = append(okEvents, data[i])

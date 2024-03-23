@@ -108,7 +108,7 @@ func makeES(
 	}
 
 	encoderFactory := func() queue.Encoder {
-		return newPreEncoder(
+		return newEventEncoder(
 			esConfig.EscapeHTML,
 			index,
 			pipeline,
@@ -207,7 +207,7 @@ type encodedEvent struct {
 	encoding []byte
 }
 
-func newPreEncoder(escapeHTML bool,
+func newEventEncoder(escapeHTML bool,
 	indexSelector outputs.IndexSelector,
 	pipelineSelector *outil.Selector,
 ) queue.Encoder {
@@ -234,6 +234,12 @@ func (pe *eventEncoder) EncodeEntry(entry queue.Entry) (queue.Entry, int) {
 	return e, len(encodedEvent.encoding)
 }
 
+// Note: we can't early-encode the bulk metadata that goes with an event,
+// because it depends on the upstream Elasticsearch version and thus requires
+// a live client connection. However, benchmarks show that even for a known
+// version, encoding the bulk metadata and the event together gives slightly
+// worse performance, so there's no reason to try optimizing around this
+// dependency.
 func (pe *eventEncoder) encodeRawEvent(e *beat.Event) *encodedEvent {
 	opType := events.GetOpType(*e)
 	pipeline, err := getPipeline(e, pe.pipelineSelector)
