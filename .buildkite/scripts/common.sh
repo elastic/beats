@@ -47,6 +47,10 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_xpack_metricbeat_aws_tests+x}" ] && run_xpack_metricbeat_aws_tests="$(buildkite-agent meta-data get run_xpack_metricbeat_aws_tests --default "false")"
 [ -z "${run_xpack_filebeat_aws_tests+x}" ] && run_xpack_filebeat_aws_tests="$(buildkite-agent meta-data get run_xpack_filebeat_aws_tests --default "false")"
 
+auditbeat_changeset=(
+  "^auditbeat/.*"
+  )
+
 metricbeat_changeset=(
   "^metricbeat/.*"
   )
@@ -131,6 +135,9 @@ packaging_changeset=(
   )
 
 case "${BUILDKITE_PIPELINE_SLUG}" in
+  "auditbeat")
+    BEAT_CHANGESET_REFERENCE=${auditbeat_changeset[@]}
+    ;;
   "beats-metricbeat")
     BEAT_CHANGESET_REFERENCE=${metricbeat_changeset[@]}
     ;;
@@ -208,9 +215,11 @@ check_and_set_beat_vars() {
   BEATS_GH_MACOS_COMMENT="${BEATS_GH_COMMENT} for macos"
   BEATS_GH_ARM_COMMENT="${BEATS_GH_COMMENT} for arm"
   BEATS_GH_AWS_COMMENT="${BEATS_GH_COMMENT} for aws cloud"
+  BEATS_GH_WIN_COMMENT="${BEATS_GH_COMMENT} for windows"
   BEATS_GH_MACOS_LABEL="macOS"
   BEATS_GH_ARM_LABEL="arm"
   BEATS_GH_AWS_LABEL="aws"
+  BEATS_GH_WIN_LABEL="windows"
 }
 
 with_docker_compose() {
@@ -417,7 +426,7 @@ are_conditions_met_mandatory_tests() {
 
 are_conditions_met_arm_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
       if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_ARM_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_ARM_LABEL} || "${!TRIGGER_SPECIFIC_ARM_TESTS}" == "true" ]]; then
         return 0
       fi
@@ -428,8 +437,19 @@ are_conditions_met_arm_tests() {
 
 are_conditions_met_macos_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-osquerybeat" ]]; then
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-osquerybeat" ]]; then
       if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_MACOS_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_MACOS_LABEL} || "${!TRIGGER_SPECIFIC_MACOS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+        return 0
+      fi
+    fi
+  fi
+  return 1
+}
+
+are_conditions_met_win_tests() {
+  if are_conditions_met_mandatory_tests; then    
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" ]]; then
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_WIN_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_WIN_LABEL} || "${!TRIGGER_SPECIFIC_MACOS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
         return 0
       fi
     fi
@@ -449,8 +469,8 @@ are_conditions_met_aws_tests() {
 }
 
 are_conditions_met_packaging() {
-  if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "${BUILDKITE_TAG}" == "" || "${BUILDKITE_PULL_REQUEST}" != "" ]]; then
+  if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171    
+    if [[ "${BUILDKITE_TAG}" == "" || "${BUILDKITE_PULL_REQUEST}" != "false" ]]; then
       return 0
     fi
   fi
