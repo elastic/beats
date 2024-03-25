@@ -118,7 +118,6 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 		Processing: beat.ProcessingConfig{
 			EventNormalization: boolPtr(true),
 		},
-		// CloseRef:      ctx.Cancelation,
 		EventListener: nil,
 	})
 	if err != nil {
