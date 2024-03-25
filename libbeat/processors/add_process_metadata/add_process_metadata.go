@@ -73,6 +73,7 @@ type processMetadata struct {
 	env                                map[string]string
 	startTime                          time.Time
 	pid, ppid                          int
+	capEffective, capPermitted         []string
 	//
 	fields mapstr.M
 }
@@ -331,6 +332,12 @@ func (p *processMetadata) toMap() mapstr.M {
 			user["id"] = p.userid
 		}
 		process["owner"] = user
+	}
+	if len(p.capEffective) > 0 {
+		process.Put("thread.capabilities.effective", p.capEffective)
+	}
+	if len(p.capPermitted) > 0 {
+		process.Put("thread.capabilities.permitted", p.capPermitted)
 	}
 
 	return mapstr.M{
