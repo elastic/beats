@@ -65,7 +65,8 @@ steps:
           - "filebeat/build/*.json"
 
       - label: ":windows:-2016 Unit Tests"
-        command: ".buildkite/scripts/win-tests.ps1"
+        key: "windows-2016"
+        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: windows-2016/Unit Tests"
@@ -80,7 +81,8 @@ steps:
           - "filebeat/build/*.json"
 
       - label: ":windows:-2022 Unit Tests"
-        command: ".buildkite/scripts/win-tests.ps1"
+        key: "windows-2022"
+        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: windows-2022/Unit Tests"
@@ -145,8 +147,8 @@ steps:
 
     steps:
       - label: ":windows: Win 2019 Unit Tests"
-        key: "win-extended-2019"
-        command: ".buildkite/scripts/win-tests.ps1"
+        key: "windows-extended-2019"
+        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
         notify:
           - github_commit_status:
               context: "Filebea: Win-2019 Unit Tests"
@@ -161,8 +163,8 @@ steps:
           - "filebeat/build/*.json"
 
       - label: ":windows:-11 Unit Tests"
-        key: "win-extended-11"
-        command: ".buildkite/scripts/win-tests.ps1"
+        key: "windows-extended-11"
+        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Win-11 Unit Tests"
@@ -177,8 +179,8 @@ steps:
           - "filebeat/build/*.json"
 
       - label: ":windows:-10 Unit Tests"
-        key: "win-extended-10"
-        command: ".buildkite/scripts/win-tests.ps1"
+        key: "windows-extended-10"
+        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
         notify:
           - github_commit_status:
               context: "Filebea: Win-10 Unit Tests"

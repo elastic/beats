@@ -50,7 +50,8 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":windows:-2016 Unit Tests"
-        command: ".buildkite/scripts/win-tests.ps1"
+        key: "windows-2016"
+        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: windows-2016/Unit Tests"
@@ -65,7 +66,8 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":windows:-2022 Unit Tests"
-        command: ".buildkite/scripts/win-tests.ps1"
+        key: "windows-2022"
+        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: windows-2022/Unit Tests"
@@ -125,7 +127,7 @@ steps:
       - label: ":mac: MacOS ARM Unit Tests"
         key: "macos-extended-arm"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: mage -d "${BEATS_PROJECT_NAME}" unitTest
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: MacOS ARM Unit Tests"
@@ -135,13 +137,13 @@ steps:
         artifact_paths: "auditbeat/build/*.xml"
 
   - group: "Windows Extended Testing"
-    key: "extended-tests-win"
+    key: "windows-extended-tests"
     if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for windows" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
 
     steps:
       - label: ":windows:-2019 Unit Tests"
-        key: "win-extended-2019"
-        command: ".buildkite/scripts/win-tests.ps1"
+        key: "windows-extended-2019"
+        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: Win-2019 Unit Tests"
@@ -156,8 +158,8 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":windows:-11 Unit Tests"
-        key: "win-extended-11"
-        command: ".buildkite/scripts/win-tests.ps1"
+        key: "windows-extended-11"
+        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: Win-11 Unit Tests"
@@ -172,8 +174,8 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":windows:-10 Unit Tests"
-        key: "win-extended-10"
-        command: ".buildkite/scripts/win-tests.ps1"
+        key: "windows-extended-10"
+        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: Win-10 Unit Tests"
