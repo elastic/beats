@@ -192,6 +192,7 @@ check_and_set_beat_vars() {
     TRIGGER_SPECIFIC_ARM_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_arm_tests"
     TRIGGER_SPECIFIC_AWS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_aws_tests"
     TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_macos_tests"
+    TRIGGER_SPECIFIC_WIN_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_win_tests"
     echo "Beats project name is $BEATS_XPACK_PROJECT_NAME"
     mandatory_changeset=(
       "${BEAT_CHANGESET_REFERENCE[@]}"
@@ -204,6 +205,7 @@ check_and_set_beat_vars() {
     TRIGGER_SPECIFIC_ARM_TESTS="run_${BEATS_PROJECT_NAME}_arm_tests"
     TRIGGER_SPECIFIC_AWS_TESTS="run_${BEATS_PROJECT_NAME}_aws_tests"
     TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_PROJECT_NAME}_macos_tests"
+    TRIGGER_SPECIFIC_WIN_TESTS="run_${BEATS_PROJECT_NAME}_win_tests"
     echo "Beats project name is $BEATS_PROJECT_NAME"
     mandatory_changeset=(
       "${BEAT_CHANGESET_REFERENCE[@]}"
@@ -449,7 +451,7 @@ are_conditions_met_macos_tests() {
 are_conditions_met_win_tests() {
   if are_conditions_met_mandatory_tests; then    
     if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" ]]; then
-      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_WIN_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_WIN_LABEL} || "${!TRIGGER_SPECIFIC_MACOS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
+      if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_WIN_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_WIN_LABEL} || "${!TRIGGER_SPECIFIC_WIN_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
         return 0
       fi
     fi
