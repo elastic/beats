@@ -47,7 +47,9 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command:
+          - "cd $BEATS_PROJECT_NAME"
+          - "mage build unitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -67,7 +69,9 @@ steps:
     key: "extended-win-tests"
     steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command:
+          - "cd $BEATS_PROJECT_NAME"
+          - "mage build unitTest"
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"

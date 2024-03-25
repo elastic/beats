@@ -18,7 +18,7 @@ steps:
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
-        command: "make -C "${BEATS_PROJECT_NAME}" crosscompile"
+        command: "make -C $BEATS_PROJECT_NAME crosscompile"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -26,7 +26,9 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Windows 2016/2019/2022 Unit Tests - {{matrix.image}}"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command:
+          - "cd $BEATS_PROJECT_NAME"
+          - "mage build unitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -49,7 +51,9 @@ steps:
     key: "extended-win-tests"
     steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command:
+          - "cd $BEATS_PROJECT_NAME"
+          - "mage build unitTest"
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"

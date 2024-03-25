@@ -44,7 +44,7 @@ steps:
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
-        command: "make -C "${BEATS_PROJECT_NAME}" crosscompile"
+        command: "make -C $BEATS_PROJECT_NAME crosscompile"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
