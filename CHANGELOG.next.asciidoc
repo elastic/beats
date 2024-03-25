@@ -73,6 +73,8 @@ fields added to events containing the Beats version. {pull}37553[37553]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - Fix the paths in the .cmd script added to the path by the Windows MSI to point to the new C:\Program Files installation location. https://github.com/elastic/elastic-stack-installers/pull/238
 - Change cache processor documentation from `write_period` to `write_interval`. {pull}38561[38561]
+- Fix cache processor expiries heap cleanup on partial file writes. {pull}38561[38561]
+- Fix cache processor expiries infinite growth when large a large TTL is used and recurring keys are cached. {pull}38561[38561]
 
 *Auditbeat*
 
