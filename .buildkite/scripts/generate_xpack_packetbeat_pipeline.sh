@@ -35,7 +35,7 @@ steps:
 
       - label: ":rhel: RHEL-9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9_X86_64}"
@@ -44,7 +44,7 @@ steps:
 
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -78,7 +78,7 @@ steps:
     steps:
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
