@@ -104,12 +104,8 @@ spec:
       # env:
       #   ELASTIC_PR_COMMENTS_ENABLED: 'true'
       env:
-<<<<<<< HEAD
-        ELASTIC_PR_COMMENTS_ENABLED: 'true'
-=======
         # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
->>>>>>> 06a11e7cec (Disable Buildkite PR comments (#38554))
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
