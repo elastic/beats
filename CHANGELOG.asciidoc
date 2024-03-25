@@ -11,28 +11,9 @@ https://github.com/elastic/beats/compare/v7.17.18\...v7.17.19[View commits]
 
 *Affecting all Beats*
 
-- Upgrade to Go 1.21.8. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}38210[38210]
-
-*Auditbeat*
-
-*Filebeat*
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-
-*Functionbeat*
+- Upgrade Go version to 1.21.8. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}38210[38210]
 
 ==== Bugfixes
-
-*Affecting all Beats*
-
 
 *Auditbeat*
 
@@ -40,91 +21,8 @@ https://github.com/elastic/beats/compare/v7.17.18\...v7.17.19[View commits]
 
 *Filebeat*
 
-- [threatintel] MISP pagination fixes {pull}37898[37898]
-- Fix file handle leak when handling errors in filestream {pull}37973[37973]
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Winlogbeat*
-
-
-*Functionbeat*
-
-*Elastic Logging Plugin*
-
-
-==== Added
-
-*Affecting all Beats*
-
-
-*Auditbeat*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-
-*Functionbeat*
-
-
-*Winlogbeat*
-
-
-*Elastic Log Driver*
-
-
-==== Deprecated
-
-*Affecting all Beats*
-
-
-*Filebeat*
-
-
-*Heartbeat*
-
-*Metricbeat*
-
-
-*Packetbeat*
-
-*Winlogbeat*
-
-*Functionbeat*
-
-==== Known Issue
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- [threatintel] MISP pagination fixes. {pull}37898[37898]
+- Fix file handle leak when handling errors in filestream. {pull}37973[37973]
 
 
 [[release-notes-7.17.18]]
