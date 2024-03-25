@@ -48,7 +48,7 @@ https://github.com/elastic/beats/compare/v8.12.2\...v8.13.0[View commits]
 
 *Metricbeat*
 
-- Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
+- Fix Azure Monitor 429 error by causing Metricbeat to retry the request again. {pull}38294[38294]
 - Fix fields not being parsed correctly in postgresql/database. {issue}25301[25301] {pull}37720[37720]
 
 ==== Added
@@ -64,7 +64,7 @@ https://github.com/elastic/beats/compare/v8.12.2\...v8.13.0[View commits]
 
 *Auditbeat*
 
-- Add linux capabilities to processes in the system/process. {pull}37453[37453]
+- Add Linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
 
 *Filebeat*
@@ -92,7 +92,7 @@ https://github.com/elastic/beats/compare/v8.12.2\...v8.13.0[View commits]
 
 *Metricbeat*
 
-- Fix containerd metrics grouping for TSDB {pull}37537[37537]
+- Fix containerd metrics grouping for TSDB. {pull}37537[37537]
 
 *Packetbeat*
 
