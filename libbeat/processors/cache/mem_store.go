@@ -177,6 +177,11 @@ func (c *memStore) Put(key string, val any) error {
 		Value:   val,
 		Expires: now.Add(c.ttl),
 	}
+	// if the key is being overwritten we remove its previous expiry entry
+	// this will prevent expiries heap to grow with large TTLs and recurring keys
+	if prev, found := c.cache[key]; found {
+		heap.Remove(&c.expiries, prev.index)
+	}
 	c.cache[key] = e
 	heap.Push(&c.expiries, e)
 	c.dirty = true
