@@ -49,22 +49,28 @@ var (
 type Client struct {
 	conn eslegclient.Connection
 
-	index    outputs.IndexSelector
-	pipeline *outil.Selector
+	indexSelector outputs.IndexSelector
+	pipeline      *outil.Selector
 
-	observer           outputs.Observer
-	NonIndexableAction string
+	observer outputs.Observer
+
+	// If deadLetterIndex is set, events with bulk-ingest errors will be
+	// forwarded to this index. Otherwise, they will be dropped.
+	deadLetterIndex string
 
 	log *logp.Logger
 }
 
-// ClientSettings contains the settings for a client.
-type ClientSettings struct {
-	eslegclient.ConnectionSettings
-	Index              outputs.IndexSelector
-	Pipeline           *outil.Selector
-	Observer           outputs.Observer
-	NonIndexableAction string
+// clientSettings contains the settings for a client.
+type clientSettings struct {
+	connection       eslegclient.ConnectionSettings
+	indexSelector    outputs.IndexSelector
+	pipelineSelector *outil.Selector
+	observer         outputs.Observer
+
+	// If deadLetterIndex is set, events with bulk-ingest errors will be
+	// forwarded to this index. Otherwise, they will be dropped.
+	deadLetterIndex string
 }
 
 type bulkResultStats struct {
@@ -81,29 +87,15 @@ const (
 
 // NewClient instantiates a new client.
 func NewClient(
-	s ClientSettings,
+	s clientSettings,
 	onConnect *callbacksRegistry,
 ) (*Client, error) {
-	pipeline := s.Pipeline
+	pipeline := s.pipelineSelector
 	if pipeline != nil && pipeline.IsEmpty() {
 		pipeline = nil
 	}
 
-	conn, err := eslegclient.NewConnection(eslegclient.ConnectionSettings{
-		URL:              s.URL,
-		Beatname:         s.Beatname,
-		Username:         s.Username,
-		Password:         s.Password,
-		APIKey:           s.APIKey,
-		Headers:          s.Headers,
-		Kerberos:         s.Kerberos,
-		Observer:         s.Observer,
-		Parameters:       s.Parameters,
-		CompressionLevel: s.CompressionLevel,
-		EscapeHTML:       s.EscapeHTML,
-		Transport:        s.Transport,
-		IdleConnTimeout:  s.IdleConnTimeout,
-	})
+	conn, err := eslegclient.NewConnection(s.connection)
 	if err != nil {
 		return nil, err
 	}
@@ -134,11 +126,11 @@ func NewClient(
 	}
 
 	client := &Client{
-		conn:               *conn,
-		index:              s.Index,
-		pipeline:           pipeline,
-		observer:           s.Observer,
-		NonIndexableAction: s.NonIndexableAction,
+		conn:            *conn,
+		indexSelector:   s.indexSelector,
+		pipeline:        pipeline,
+		observer:        s.observer,
+		deadLetterIndex: s.deadLetterIndex,
 
 		log: logp.NewLogger("elasticsearch"),
 	}
@@ -174,11 +166,11 @@ func (client *Client) Clone() *Client {
 	client.conn.Transport.Proxy.Disable = client.conn.Transport.Proxy.URL == nil
 
 	c, _ := NewClient(
-		ClientSettings{
-			ConnectionSettings: connection,
-			Index:              client.index,
-			Pipeline:           client.pipeline,
-			NonIndexableAction: client.NonIndexableAction,
+		clientSettings{
+			connection:       connection,
+			indexSelector:    client.indexSelector,
+			pipelineSelector: client.pipeline,
+			deadLetterIndex:  client.deadLetterIndex,
 		},
 		nil, // XXX: do not pass connection callback?
 	)
@@ -296,10 +288,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 	}
 
 	if failed > 0 {
-		if sendErr == nil {
-			sendErr = eslegclient.ErrTempBulkFailure
-		}
-		return failedEvents, sendErr
+		return failedEvents, eslegclient.ErrTempBulkFailure
 	}
 	return nil, nil
 }
@@ -339,7 +328,7 @@ func (client *Client) createEventBulkMeta(version version.V, event *beat.Event) 
 		return nil, err
 	}
 
-	index, err := client.index.Select(event)
+	index, err := client.getIndex(event)
 	if err != nil {
 		err := fmt.Errorf("failed to select event index: %w", err)
 		return nil, err
@@ -369,6 +358,16 @@ func (client *Client) createEventBulkMeta(version version.V, event *beat.Event) 
 		return eslegclient.BulkCreateAction{Create: meta}, nil
 	}
 	return eslegclient.BulkIndexAction{Index: meta}, nil
+}
+
+func (client *Client) getIndex(event *beat.Event) (string, error) {
+	// If this event has been dead-lettered, override its index
+	if event.Meta != nil {
+		if deadLetter, _ := event.Meta.HasKey(dead_letter_marker_field); deadLetter {
+			return client.deadLetterIndex, nil
+		}
+	}
+	return client.indexSelector.Select(event)
 }
 
 func (client *Client) getPipeline(event *beat.Event) (string, error) {
@@ -434,7 +433,7 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 					client.log.Errorf("Can't deliver to dead letter index event (status=%v). Enable debug logs to view the event and cause.", status)
 					client.log.Debugf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
 					// poison pill - this will clog the pipeline if the underlying failure is non transient.
-				} else if client.NonIndexableAction == dead_letter_index {
+				} else if client.deadLetterIndex != "" {
 					client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Enable debug logs to view the event and cause.", status)
 					client.log.Debugf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
 					if data[i].Content.Meta == nil {
