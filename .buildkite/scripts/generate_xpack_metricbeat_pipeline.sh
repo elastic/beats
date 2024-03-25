@@ -31,7 +31,7 @@ steps:
           MODULE: $MODULE
         agents:
           provider: "gcp"
-          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
@@ -42,7 +42,7 @@ steps:
           MODULE: $MODULE
         agents:
           provider: "gcp"
-          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
@@ -127,7 +127,7 @@ if  are_conditions_met_aws_tests; then
           MODULE: $MODULE
         agents:
           provider: "gcp"
-          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
