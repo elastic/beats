@@ -45,7 +45,7 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -67,7 +67,7 @@ steps:
     steps:
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
