@@ -20,7 +20,7 @@ steps:
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
-          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
@@ -29,7 +29,7 @@ steps:
         command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
         agents:
           provider: "gcp"
-          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
