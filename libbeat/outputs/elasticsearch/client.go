@@ -49,8 +49,8 @@ var (
 type Client struct {
 	conn eslegclient.Connection
 
-	indexSelector outputs.IndexSelector
-	pipeline      *outil.Selector
+	indexSelector    outputs.IndexSelector
+	pipelineSelector *outil.Selector
 
 	observer outputs.Observer
 
@@ -126,11 +126,11 @@ func NewClient(
 	}
 
 	client := &Client{
-		conn:            *conn,
-		indexSelector:   s.indexSelector,
-		pipeline:        pipeline,
-		observer:        s.observer,
-		deadLetterIndex: s.deadLetterIndex,
+		conn:             *conn,
+		indexSelector:    s.indexSelector,
+		pipelineSelector: pipeline,
+		observer:         s.observer,
+		deadLetterIndex:  s.deadLetterIndex,
 
 		log: logp.NewLogger("elasticsearch"),
 	}
@@ -169,7 +169,7 @@ func (client *Client) Clone() *Client {
 		clientSettings{
 			connection:       connection,
 			indexSelector:    client.indexSelector,
-			pipelineSelector: client.pipeline,
+			pipelineSelector: client.pipelineSelector,
 			deadLetterIndex:  client.deadLetterIndex,
 		},
 		nil, // XXX: do not pass connection callback?
@@ -383,8 +383,8 @@ func (client *Client) getPipeline(event *beat.Event) (string, error) {
 		return strings.ToLower(pipeline), nil
 	}
 
-	if client.pipeline != nil {
-		return client.pipeline.Select(event)
+	if client.pipelineSelector != nil {
+		return client.pipelineSelector.Select(event)
 	}
 	return "", nil
 }
