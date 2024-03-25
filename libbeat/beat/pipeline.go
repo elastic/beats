@@ -49,8 +49,6 @@ type ClientConfig struct {
 
 	Processing ProcessingConfig
 
-	CloseRef CloseRef
-
 	// WaitClose sets the maximum duration to wait on ACK, if client still has events
 	// active non-acknowledged events in the publisher pipeline.
 	// WaitClose is only effective if one of ACKCount, ACKEvents and ACKLastEvents
@@ -89,13 +87,6 @@ type EventListener interface {
 	// to suppress any ACK event propagation if required.
 	// Close might be called from another go-routine than AddEvent and ACKEvents.
 	ClientClosed()
-}
-
-// CloseRef allows users to close the client asynchronously.
-// A CloseRef implements a subset of function required for context.Context.
-type CloseRef interface {
-	Done() <-chan struct{}
-	Err() error
 }
 
 // ProcessingConfig provides additional event processing settings a client can

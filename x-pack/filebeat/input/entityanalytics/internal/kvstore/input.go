@@ -65,7 +65,6 @@ func (n *input) Run(runCtx v2.Context, connector beat.PipelineConnector) (err er
 	}()
 
 	client, err := connector.ConnectWith(beat.ClientConfig{
-		// CloseRef:      runCtx.Cancelation,
 		EventListener: NewTxACKHandler(),
 	})
 	if err != nil {

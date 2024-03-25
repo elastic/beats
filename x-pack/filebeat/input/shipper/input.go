@@ -173,8 +173,6 @@ func (in *shipperInput) Run(inputContext v2.Context, pipeline beat.Pipeline) err
 				DisableHost: true,
 				DisableType: true,
 			},
-
-			// CloseRef: inputContext.Cancelation,
 		})
 		if err != nil {
 			return fmt.Errorf("error creating client for stream %s: %w", streamID, err)

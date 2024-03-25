@@ -120,7 +120,6 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 			// is not required.
 			EventNormalization: boolPtr(false),
 		},
-		// CloseRef:      ctx.Cancelation,
 		EventListener: nil,
 	})
 	if err != nil {

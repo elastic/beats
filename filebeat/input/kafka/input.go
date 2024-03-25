@@ -120,7 +120,6 @@ func (input *kafkaInput) Run(ctx input.Context, pipeline beat.Pipeline) error {
 				}
 			}),
 		),
-		// CloseRef:  ctx.Cancelation,
 		WaitClose: input.config.WaitClose,
 	})
 	if err != nil {
