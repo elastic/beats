@@ -4,6 +4,8 @@ env:
   BEATS_PROJECT_NAME: "auditbeat"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
+  IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
+  IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
@@ -48,22 +50,32 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
 
-      - label: ":windows:-{{matrix.image}} Unit Tests"
+      - label: ":windows:-2016 Unit Tests"
         command: ".buildkite/scripts/win-tests.ps1"
         notify:
           - github_commit_status:
-              context: "Auditbeat: windows/Unit Tests"
+              context: "Auditbeat: windows-2016/Unit Tests"
         agents:
           provider: "gcp"
-          image: "{{matrix.image}}"
+          image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
           disk_type: "pd-ssd"
-        matrix:
-          setup:
-            image:
-              - "${IMAGE_WIN_2016}"
-              - "${IMAGE_WIN_2022}"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
+
+      - label: ":windows:-2022 Unit Tests"
+        command: ".buildkite/scripts/win-tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "Auditbeat: windows-2022/Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
@@ -93,7 +105,7 @@ steps:
           - ".buildkite/auditbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "Auditbeat/Extended: Unit Tests ARM"
+              context: "Auditbeat: Unit Tests ARM"
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -107,7 +119,7 @@ steps:
           - ".buildkite/auditbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "Auditbeat/Extended: MacOS Unit Tests"
+              context: "Auditbeat: MacOS Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -123,10 +135,42 @@ steps:
         command: ".buildkite/scripts/win-tests.ps1"
         notify:
           - github_commit_status:
-              context: "Auditbeat/Extended: Win-2019 Unit Tests"
+              context: "Auditbeat: Win-2019 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
+
+      - label: ":windows: Win 11 Unit Tests"
+        key: "win-extended-11"
+        command: ".buildkite/scripts/win-tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "Auditbeat: Win-11 Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
+
+      - label: ":windows: Win 10 Unit Tests"
+        key: "win-extended-10"
+        command: ".buildkite/scripts/win-tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "Auditbeat: Win-10 Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
           disk_type: "pd-ssd"

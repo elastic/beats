@@ -4,6 +4,8 @@ env:
   BEATS_PROJECT_NAME: "heartbeat"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
+  IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
+  IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
@@ -39,22 +41,32 @@ steps:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
-      - label: ":windows: Unit Tests / {{matrix.image}}"
+      - label: ":windows:-2016 Unit Test"
         command:
           - ".buildkite/scripts/win-tests.ps1"
         notify:
           - github_commit_status:
-              context: "Heartbeat: windows/Unit Tests"
+              context: "Heartbeat: windows-2016/Unit Tests"
         agents:
           provider: "gcp"
-          image: "{{matrix.image}}"
+          image:  "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_type: "pd-ssd"
-        matrix:
-          setup:
-            image:
-              - "${IMAGE_WIN_2016}"
-              - "${IMAGE_WIN_2022}"
+        artifact_paths:
+          - "heartbeat/build/*.xml"
+          - "heartbeat/build/*.json"
+
+      - label: ":windows:-2022 Unit Test"
+        command:
+          - ".buildkite/scripts/win-tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: windows-2022/Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_type: "pd-ssd"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
@@ -99,7 +111,7 @@ steps:
           - ".buildkite/heartbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "Heartbeat/Extended: Unit Tests ARM"
+              context: "Heartbeat: Unit Tests ARM"
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -113,7 +125,7 @@ steps:
           - ".buildkite/heartbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "Heartbeat/Extended: MacOS Unit Tests"
+              context: "Heartbeat: MacOS Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -124,15 +136,45 @@ steps:
     if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for windows" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
 
     steps:
-      - label: ":windows: Win 2019 Unit Tests"
+      - label: ":windows:-2019 Unit Tests"
         key: "win-extended-2019"
         command: ".buildkite/scripts/win-tests.ps1"
         notify:
           - github_commit_status:
-              context: "Heartbeat/Extended: Win-2019 Unit Tests"
+              context: "Heartbeat: Win-2019 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "heartbeat/build/*.xml"
+          - "heartbeat/build/*.json"
+
+      - label: ":windows:-11 Unit Tests"
+        key: "win-extended-11"
+        command: ".buildkite/scripts/win-tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Win-11 Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "heartbeat/build/*.xml"
+          - "heartbeat/build/*.json"
+
+      - label: ":windows:-10 Unit Tests"
+        key: "win-extended-10"
+        command: ".buildkite/scripts/win-tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Win-10 Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_type: "pd-ssd"
         artifact_paths:
