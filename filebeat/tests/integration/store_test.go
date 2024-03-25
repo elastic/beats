@@ -81,10 +81,8 @@ func TestStore(t *testing.T) {
 		t.Fatalf("could not create logs folder '%s': %s", logsFolder, err)
 	}
 
-	logFiles := []string{}
 	for i := 0; i < numLogFiles; i++ {
 		logFile := path.Join(logsFolder, fmt.Sprintf("log-%d.log", i))
-		logFiles = append(logFiles, logFile)
 		integration.GenerateLogFile(t, logFile, 10, false)
 	}
 	logsFolderGlob := filepath.Join(logsFolder, "*")
