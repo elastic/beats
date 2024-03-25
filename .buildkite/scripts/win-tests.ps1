@@ -12,9 +12,8 @@ function fixCRLF {
 fixCRLF
 
 $ErrorActionPreference = "Continue" # set +e
-Set-Location -Path $env:BEATS_PROJECT_NAME
 
-mage build unitTest
+mage -d $env:BEATS_PROJECT_NAME build unitTest
 
 $EXITCODE=$LASTEXITCODE
 $ErrorActionPreference = "Stop"
