@@ -17,7 +17,7 @@ steps:
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
@@ -26,7 +26,7 @@ steps:
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: ".buildkite/scripts/go_int_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
         agents:
           provider: "gcp"
           image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
@@ -38,7 +38,7 @@ steps:
 # ## waiting for being fixed.
 
 #       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-#         command: ".buildkite/scripts/win_unit_tests.ps1"
+#         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
 #         key: "mandatory-win-unit-tests"
 #         agents:
 #           provider: "gcp"
@@ -60,7 +60,7 @@ steps:
 #     steps:
 
 #       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-#         command: ".buildkite/scripts/win_unit_tests.ps1"
+#         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
 #         key: "extended-win-unit-tests"
 #         agents:
 #           provider: "gcp"
