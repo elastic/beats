@@ -17,7 +17,7 @@ https://github.com/elastic/beats/compare/v7.17.18\...v7.17.19[View commits]
 
 *Auditbeat*
 
-- Fix guess trigger for system/socket creds on newer kernels. {issue}36905[36905] {pull}37136[37136]
+- Fix guess trigger for system/socket credentials on newer kernels. {issue}36905[36905] {pull}37136[37136]
 
 *Filebeat*
 
