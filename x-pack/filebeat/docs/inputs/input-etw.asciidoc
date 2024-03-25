@@ -120,24 +120,16 @@ When specified a provider, a new session is created. It sets the name for a new 
 [float]
 ==== `trace_level`
 
-<<<<<<< HEAD
-Defines the filtering level for events based on severity. Valid options include critical, error, warning, informational, and verbose.
-=======
 Defines the filtering level for events based on severity. Valid options include
 critical, error, warning, information, and verbose.
->>>>>>> fe132dac9e (x-pack/filebeat/input/etw: Rename activity_guid to activity_id in ETW events (#38530))
 
 [float]
 ==== `match_any_keyword`
 
-<<<<<<< HEAD
-An 8-byte bitmask used for filtering events from specific provider subcomponents based on keyword matching. Any matching keyword will enable the event to be written. Default value is `0xfffffffffffffffff` so it matches every available keyword.
-=======
 An 8-byte bitmask used for filtering events from specific provider subcomponents
 based on keyword matching. Any matching keyword will enable the event to be
 written. Default value is `0xffffffffffffffff` so it matches every available
 keyword.
->>>>>>> fe132dac9e (x-pack/filebeat/input/etw: Rename activity_guid to activity_id in ETW events (#38530))
 
 Run `logman query providers "<provider.name>"` to list the available keywords for a specific provider.
 
