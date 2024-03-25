@@ -26,7 +26,7 @@ steps:
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: ".buildkite/scripts/go_int_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
         env:
           MODULE: $MODULE
         agents:
@@ -37,7 +37,7 @@ steps:
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
-        command: ".buildkite/scripts/py_int_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
         env:
           MODULE: $MODULE
         agents:
@@ -47,7 +47,7 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -66,37 +66,21 @@ steps:
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
     steps:
-      - label: ":windows: Windows 10 Unit Tests"
-        key: "extended-win-10-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
-          image: "${IMAGE_WIN_10}"
+          image: "{{matrix.image}}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-      - label: ":windows: Windows 11 Unit Tests"
-        key: "extended-win-11-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-      - label: ":windows: Win 2019 Unit Tests"
-        key: "extended-win-2019-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_10}"
+              - "${IMAGE_WIN_11}"
+              - "${IMAGE_WIN_2019}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
