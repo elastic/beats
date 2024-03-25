@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Affecting all Beats*
 
-- Upgrade to Go 1.21.8. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}38210[38210]
 
 *Auditbeat*
 
@@ -35,12 +34,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 
 *Auditbeat*
 
-- Fix guess trigger for system/socket creds on newer kernels. {issue}36905[36905] {pull}37136[37136]
 
 *Filebeat*
 
-- [threatintel] MISP pagination fixes {pull}37898[37898]
-- Fix file handle leak when handling errors in filestream {pull}37973[37973]
 
 *Heartbeat*
 
@@ -108,6 +104,9 @@ https://github.com/elastic/beats/compare/v7.0.0-alpha2...master[Check the HEAD d
 *Functionbeat*
 
 ==== Known Issue
+
+
+
 
 
 
