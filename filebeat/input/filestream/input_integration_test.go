@@ -61,6 +61,7 @@ func TestFilestreamCloseRenamed(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	// first event has made it successfully
@@ -100,6 +101,7 @@ func TestFilestreamMetadataUpdatedOnRename(t *testing.T) {
 	env.mustWriteToFile(testlogName, testline)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(1)
@@ -139,6 +141,7 @@ func TestFilestreamCloseRemoved(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	// first event has made it successfully
@@ -179,6 +182,7 @@ func TestFilestreamCloseEOF(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	// first event has made it successfully
@@ -209,6 +213,7 @@ func TestFilestreamEmptyLine(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	testlines := []byte("first log line\nnext is an empty line\n")
@@ -247,6 +252,7 @@ func TestFilestreamEmptyLinesOnly(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	testlines := []byte("\n\n\n")
@@ -280,6 +286,7 @@ func TestFilestreamBOMUTF8(t *testing.T) {
 	env.mustWriteToFile(testlogName, lines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(7)
@@ -320,6 +327,7 @@ func TestFilestreamUTF16BOMs(t *testing.T) {
 			env.mustWriteToFile(testlogName, buf.Bytes())
 
 			ctx, cancelInput := context.WithCancel(context.Background())
+			defer cancelInput()
 			env.startInput(ctx, inp)
 
 			env.waitUntilEventCount(1)
@@ -349,6 +357,7 @@ func TestFilestreamCloseTimeout(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(1)
@@ -382,6 +391,7 @@ func TestFilestreamCloseAfterInterval(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
@@ -412,6 +422,7 @@ func TestFilestreamCloseAfterIntervalRemoved(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
@@ -444,6 +455,7 @@ func TestFilestreamCloseAfterIntervalRenamed(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
@@ -478,6 +490,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndRemoved(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
@@ -513,6 +526,7 @@ func TestFilestreamCloseAfterIntervalRotatedAndNewRemoved(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
@@ -549,6 +563,7 @@ func TestFilestreamTruncatedFileOpen(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
@@ -583,6 +598,7 @@ func TestFilestreamTruncatedFileClosed(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
@@ -628,6 +644,7 @@ func TestFilestreamTruncateWithSymlink(t *testing.T) {
 	env.mustSymlink(testlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
@@ -663,6 +680,7 @@ func TestFilestreamTruncateBigScannerInterval(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
@@ -694,6 +712,7 @@ func TestFilestreamTruncateCheckOffset(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	testlines := []byte("first line\nsecond line\nthird line\n")
@@ -725,6 +744,7 @@ func TestFilestreamTruncateBlockedOutput(t *testing.T) {
 	env.mustWriteToFile(testlogName, testlines)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	for env.pipeline.clientsCount() != 1 {
@@ -779,6 +799,7 @@ func TestFilestreamSymlinksEnabled(t *testing.T) {
 	env.mustSymlink(testlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(1)
@@ -815,6 +836,7 @@ func TestFilestreamSymlinkRotated(t *testing.T) {
 	env.mustSymlink(firstTestlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(1)
@@ -862,6 +884,7 @@ func TestFilestreamSymlinkRemoved(t *testing.T) {
 	env.mustSymlink(testlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(1)
@@ -904,6 +927,7 @@ func TestFilestreamTruncate(t *testing.T) {
 	env.mustSymlink(testlogName, symlinkName)
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	env.waitUntilEventCount(3)
@@ -994,6 +1018,7 @@ func TestRotatingCloseInactiveLargerWriteRate(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	time.Sleep(1 * time.Second)
@@ -1040,6 +1065,7 @@ func TestRotatingCloseInactiveLowWriteRate(t *testing.T) {
 	})
 
 	ctx, cancelInput := context.WithCancel(context.Background())
+	defer cancelInput()
 	env.startInput(ctx, inp)
 
 	time.Sleep(1 * time.Second)
