@@ -47,7 +47,7 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == 
     git config user.email "$github_email"
   fi
 
-  if [[ "$BUILDKITE_STEP_KEY" == "k8s-test" ]]; then
+  if [[ "$BUILDKITE_STEP_KEY" == k8s-test* ]]; then
    .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
   fi
 fi

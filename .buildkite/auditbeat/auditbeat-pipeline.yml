@@ -3,7 +3,7 @@
 env:
   BEATS_PROJECT_NAME: "auditbeat"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
@@ -11,10 +11,11 @@ env:
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
   IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
 
 steps:
   - group: "Auditbeat Mandatory Testing"
@@ -125,12 +126,25 @@ steps:
           imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths: "auditbeat/build/*.xml"
 
+      - label: ":mac: MacOS ARM Unit Tests"
+        key: "macos-extended-arm"
+        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        command:
+          - ".buildkite/auditbeat/scripts/unit-tests.sh"
+        notify:
+          - github_commit_status:
+              context: "Auditbeat: MacOS ARM Unit Tests"
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
+        artifact_paths: "auditbeat/build/*.xml"
+
   - group: "Windows Extended Testing"
     key: "extended-tests-win"
     if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for windows" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
 
     steps:
-      - label: ":windows: Win 2019 Unit Tests"
+      - label: ":windows:-2019 Unit Tests"
         key: "win-extended-2019"
         command: ".buildkite/scripts/win-tests.ps1"
         notify:
@@ -146,7 +160,7 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
 
-      - label: ":windows: Win 11 Unit Tests"
+      - label: ":windows:-11 Unit Tests"
         key: "win-extended-11"
         command: ".buildkite/scripts/win-tests.ps1"
         notify:
@@ -162,7 +176,7 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
 
-      - label: ":windows: Win 10 Unit Tests"
+      - label: ":windows:-10 Unit Tests"
         key: "win-extended-10"
         command: ".buildkite/scripts/win-tests.ps1"
         notify:

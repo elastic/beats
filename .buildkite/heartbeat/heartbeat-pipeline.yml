@@ -3,7 +3,7 @@
 env:
   BEATS_PROJECT_NAME: "heartbeat"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
@@ -11,6 +11,7 @@ env:
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
   IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
@@ -22,21 +23,30 @@ steps:
     if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat" || build.env("BUILDKITE_PULL_REQUEST") != "false"
 
     steps:
-      - label: ":linux: Unit Tests / {{matrix.image}}"
+      - label: ":ubuntu: Unit Tests"
         command:
           - ".buildkite/heartbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "Heartbeat: linux/Unit Tests"
+              context: "Heartbeat: ubuntu/Unit Tests"
         agents:
           provider: "gcp"
-          image: "{{matrix.image}}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        matrix:
-          setup:
-            image:
-              - "${IMAGE_UBUNTU_X86_64}"
-              - "${IMAGE_RHEL9}"
+        artifact_paths:
+          - "heartbeat/build/*.xml"
+          - "heartbeat/build/*.json"
+
+      - label: ":rhel:-9 Unit Tests"
+        command:
+          - ".buildkite/heartbeat/scripts/unit-tests.sh"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: rhel-9/Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_RHEL9}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
@@ -129,6 +139,19 @@ steps:
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
+        artifact_paths: "heartbeat/build/*.xml"
+
+      - label: ":mac: MacOS ARM Unit Tests"
+        key: "macos-extended-arm"
+        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        command:
+          - ".buildkite/heartbeat/scripts/unit-tests.sh"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: MacOS ARM Unit Tests"
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
         artifact_paths: "heartbeat/build/*.xml"
 
   - group: "Windows Extended Testing"

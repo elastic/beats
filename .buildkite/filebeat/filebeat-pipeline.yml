@@ -6,11 +6,11 @@ env:
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
-  IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
@@ -120,10 +120,23 @@ steps:
           - ".buildkite/filebeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "Filebeat/Extended: MacOS Unit Tests"
+              context: "Filebeat: MacOS Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
+        artifact_paths: "filebeat/build/*.xml"
+
+      - label: ":mac: MacOS ARM Unit Tests"
+        key: "macos-extended-arm"
+        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        command:
+          - ".buildkite/filebeat/scripts/unit-tests.sh"
+        notify:
+          - github_commit_status:
+              context: "Filebeat: MacOS ARM Unit Tests"
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
         artifact_paths: "filebeat/build/*.xml"
 
   - group: "Windows Extended Testing"
@@ -147,15 +160,15 @@ steps:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
 
-      - label: ":windows:-2011 Unit Tests"
-        key: "win-extended-2011"
+      - label: ":windows:-11 Unit Tests"
+        key: "win-extended-11"
         command: ".buildkite/scripts/win-tests.ps1"
         notify:
           - github_commit_status:
-              context: "Filebeat: Win-2011 Unit Tests"
+              context: "Filebeat: Win-11 Unit Tests"
         agents:
           provider: "gcp"
-          image: "${IMAGE_WIN_2011}"
+          image: "${IMAGE_WIN_11}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
           disk_type: "pd-ssd"
@@ -163,15 +176,15 @@ steps:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
 
-      - label: ":windows:-2010 Unit Tests"
-        key: "win-extended-2010"
+      - label: ":windows:-10 Unit Tests"
+        key: "win-extended-10"
         command: ".buildkite/scripts/win-tests.ps1"
         notify:
           - github_commit_status:
-              context: "Filebea: Win-2010 Unit Tests"
+              context: "Filebea: Win-10 Unit Tests"
         agents:
           provider: "gcp"
-          image: "${IMAGE_WIN_2010}"
+          image: "${IMAGE_WIN_10}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
           disk_type: "pd-ssd"

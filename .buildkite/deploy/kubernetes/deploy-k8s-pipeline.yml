@@ -16,15 +16,10 @@ steps:
       image: "${IMAGE_UBUNTU_X86_64}"
       machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
 
-  - label: "K8S Test/K8S version: {{matrix}}"
-    key: "k8s-test"
+  - label: "K8S Test/K8S version: v1.29.0"
+    key: "k8s-test-129"
     env:
-      K8S_VERSION: "{{matrix}}"
-    matrix:
-      - "v1.29.0"
-      - "v1.28.0"
-      - "v1.27.3"
-      - "v1.26.6"
+      K8S_VERSION: "v1.29.0"
     commands:
       - "MODULE=kubernetes make -C metricbeat integration-tests"
       - "make -C deploy/kubernetes test"
@@ -33,5 +28,38 @@ steps:
       image: "${IMAGE_UBUNTU_X86_64}"
       machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
 
+  - label: "K8S Test/K8S version: v1.28.0"
+    key: "k8s-test-128"
+    env:
+      K8S_VERSION: "v1.28.0"
+    commands:
+      - "MODULE=kubernetes make -C metricbeat integration-tests"
+      - "make -C deploy/kubernetes test"
+    agents:
+      provider: "gcp"
+      image: "${IMAGE_UBUNTU_X86_64}"
+      machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
 
-# setEnvVar('ONLY_DOCS', isGitRegionMatch(patterns: [ '(.*\\.(asciidoc|md)|deploy/kubernetes/.*-kubernetes\\.yaml)' ], shouldMatchAll: true).toString())
+  - label: "K8S Test/K8S version: v1.27.3"
+    key: "k8s-test-1273"
+    env:
+      K8S_VERSION: "v1.27.3"
+    commands:
+      - "MODULE=kubernetes make -C metricbeat integration-tests"
+      - "make -C deploy/kubernetes test"
+    agents:
+      provider: "gcp"
+      image: "${IMAGE_UBUNTU_X86_64}"
+      machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+
+  - label: "K8S Test/K8S version: v1.26.6"
+    key: "k8s-test-1266"
+    env:
+      K8S_VERSION: "v1.26.6"
+    commands:
+      - "MODULE=kubernetes make -C metricbeat integration-tests"
+      - "make -C deploy/kubernetes test"
+    agents:
+      provider: "gcp"
+      image: "${IMAGE_UBUNTU_X86_64}"
+      machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
