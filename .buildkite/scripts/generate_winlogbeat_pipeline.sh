@@ -18,7 +18,7 @@ steps:
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
-        command: ".buildkite/scripts/crosscompile.sh"
+        command: "make -C "${BEATS_PROJECT_NAME}" crosscompile"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -26,7 +26,7 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Windows 2016/2019/2022 Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -48,28 +48,22 @@ steps:
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
     steps:
-
-      - label: ":windows: Windows 10 Unit Tests"
-        key: "extended-win-10-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
-          image: "${IMAGE_WIN_10}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          image: "{{matrix.image}}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_10}"
+              - "${IMAGE_WIN_11}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      - label: ":windows: Windows 11 Unit Tests"
-        key: "extended-win-11-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 YAML
 else
   echo "The conditions don't match to requirements for generating pipeline steps."
@@ -90,7 +84,7 @@ if are_conditions_met_packaging; then
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: ".buildkite/scripts/packaging.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
