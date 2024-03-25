@@ -26,7 +26,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -525,7 +524,7 @@ func (b *BeatProc) LoadMeta() (Meta, error) {
 	}
 	defer metaFile.Close()
 
-	metaBytes, err := ioutil.ReadAll(metaFile)
+	metaBytes, err := io.ReadAll(metaFile)
 	require.NoError(b.t, err, "error reading meta file")
 	err = json.Unmarshal(metaBytes, &m)
 	require.NoError(b.t, err, "error unmarshalling meta data")
