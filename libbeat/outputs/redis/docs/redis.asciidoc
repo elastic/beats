@@ -216,10 +216,8 @@ endif::[]
 
 The maximum number of events to bulk in a single Redis request or pipeline. The default is 2048.
 
-Events can be collected into batches. When using the memory queue with `queue.mem.flush.min_events`
-set to a value greater than `1`, the maximum batch is is the value of `queue.mem.flush.min_events`.
-{beatname_uc} will split batches read from the queue which are larger than `bulk_max_size` into
-multiple batches.
+Events can be collected into batches.{beatname_uc} will split batches read from the queue which are
+larger than `bulk_max_size` into multiple batches.
 
 Specifying a larger batch size can improve performance by lowering the overhead
 of sending events. However big batch sizes can also increase processing times,
