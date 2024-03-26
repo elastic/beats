@@ -80,7 +80,6 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_S
         git config core.autocrlf false
         git rm --quiet --cached -r .
         git reset --quiet --hard
-
         ;;
     esac
   elif [[ "${arch_type}" == "aarch64" || "${arch_type}" == "arm64" ]]; then

@@ -44,10 +44,7 @@ steps:
 
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command:
-          - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage build unitTest"
+        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -81,10 +78,7 @@ steps:
     steps:
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command:
-          - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage build unitTest"
+        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"

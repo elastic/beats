@@ -17,7 +17,7 @@ steps:
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -26,7 +26,7 @@ steps:
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
+        command: "mage -d $BEATS_PROJECT_NAME goIntegTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -35,7 +35,7 @@ steps:
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
+        command: "mage -d $BEATS_PROJECT_NAME pythonIntegTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -45,10 +45,7 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command:
-          - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage build unitTest"
+        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -70,10 +67,7 @@ steps:
     steps:
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command:
-          - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage build unitTest"
+        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
@@ -123,7 +117,7 @@ if are_conditions_met_arm_tests; then
   cat >> $pipelineName <<- YAML
       - label: ":linux: ARM Ubuntu Unit Tests"
         key: "extended-arm64-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
@@ -165,7 +159,7 @@ if are_conditions_met_packaging; then
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: "cd $BEATS_PROJECT_NAME && mage package"
+        command: "mage -d $BEATS_PROJECT_NAME package"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -177,7 +171,7 @@ if are_conditions_met_packaging; then
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
-        command: "cd $BEATS_PROJECT_NAME && mage package"
+        command: "mage -d $BEATS_PROJECT_NAME package"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
