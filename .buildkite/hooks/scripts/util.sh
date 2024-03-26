@@ -25,6 +25,7 @@ google_cloud_logout_active_account() {
 }
 
 cleanup() {
+  # TODO: disable for upload pipieline
   echo "Deleting temporary files..."
   if [[ -e "${BIN}/${TMP_FOLDER}" ]]; then
     rm -rf "${BIN}/${TMP_FOLDER}.*"
