@@ -172,18 +172,21 @@ func (c *memStore) Put(key string, val any) error {
 	defer c.mu.Unlock()
 	now := time.Now()
 	c.evictExpired(now)
-	e := &CacheEntry{
-		Key:     key,
-		Value:   val,
-		Expires: now.Add(c.ttl),
-	}
-	// if the key is being overwritten we remove its previous expiry entry
-	// this will prevent expiries heap to grow with large TTLs and recurring keys
+	// If the key is being overwritten we remove its previous expiry entry
+	// this will prevent expiries heap to grow with large TTLs and recurring keys.
 	if prev, found := c.cache[key]; found {
-		heap.Remove(&c.expiries, prev.index)
+		prev.Value = val
+		prev.Expires = now.Add(c.ttl)
+		heap.Fix(&c.expiries, prev.index)
+	} else {
+		e := &CacheEntry{
+			Key:     key,
+			Value:   val,
+			Expires: now.Add(c.ttl),
+		}
+		c.cache[key] = e
+		heap.Push(&c.expiries, e)
 	}
-	c.cache[key] = e
-	heap.Push(&c.expiries, e)
 	c.dirty = true
 	return nil
 }
