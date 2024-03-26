@@ -2,6 +2,7 @@
 name: "beats-auditbeat"
 
 env:
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"

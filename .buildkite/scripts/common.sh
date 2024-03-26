@@ -13,7 +13,7 @@ OSS_MODULE_PATTERN="^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 # define if needed run the whole pipeline for the particular beat
 [ -z "${run_auditbeat+x}" ] && run_auditbeat="$(buildkite-agent meta-data get run_auditbeat --default "false")"
-[ -z "${run_filebeat+x}" ] && run_auditbeat="$(buildkite-agent meta-data get run_filebeat --default "false")"
+[ -z "${run_filebeat+x}" ] && run_filebeat="$(buildkite-agent meta-data get run_filebeat --default "false")"
 [ -z "${run_libbeat+x}" ] && run_libbeat="$(buildkite-agent meta-data get run_libbeat --default "false")"
 [ -z "${run_metricbeat+x}" ] && run_metricbeat="$(buildkite-agent meta-data get run_metricbeat --default "false")"
 [ -z "${run_packetbeat+x}" ] && run_packetbeat="$(buildkite-agent meta-data get run_packetbeat --default "false")"
@@ -467,7 +467,7 @@ are_conditions_met_macos_tests() {
 
 are_conditions_met_win_tests() {
   if are_conditions_met_mandatory_tests; then    
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" ]]; then
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
       if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_WIN_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_WIN_LABEL} || "${!TRIGGER_SPECIFIC_WIN_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
         return 0
       fi
@@ -488,7 +488,7 @@ are_conditions_met_aws_tests() {
 }
 
 are_conditions_met_packaging() {
-  if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171    
+  if are_conditions_met_mandatory_tests; then
     if [[ "${BUILDKITE_TAG}" == "" || "${BUILDKITE_PULL_REQUEST}" != "false" ]]; then
       return 0
     fi

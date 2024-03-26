@@ -100,21 +100,6 @@ if are_conditions_met_arm_tests; then
 YAML
 fi
 
-if are_conditions_met_macos_tests; then
-  cat >> $pipelineName <<- YAML
-    - group: "MacOS Extended Testing"
-      key: "extended-tests-macos"
-      steps:
-        - label: ":mac: MacOS Unit Tests"
-          key: "extended-macos-unit-tests"
-          command: ".buildkite/scripts/unit_tests.sh"
-          agents:
-            provider: "orka"
-            imagePrefix: "${IMAGE_MACOS_X86_64}"
-          artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-YAML
-fi
-
 if are_conditions_met_win_tests; then
   cat >> $pipelineName <<- YAML
     - group: "Windows Extended Testing"

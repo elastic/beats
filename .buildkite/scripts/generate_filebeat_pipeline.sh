@@ -60,22 +60,32 @@ steps:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
 
-      - label: ":windows:-{{matrix.image}} Unit Tests"
+      - label: ":windows:-2016 Unit Tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
         notify:
           - github_commit_status:
               context: "Filebeat: windows/Unit Tests"
         agents:
           provider: "gcp"
-          image: "{{matrix.image}}"
+          image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
           disk_type: "pd-ssd"
-        matrix:
-          setup:
-            image:
-              - "${IMAGE_WIN_2016}"
-              - "${IMAGE_WIN_2022}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+      - label: ":windows:-2022 Unit Tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "Filebeat: windows 2022/Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"        
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
@@ -106,26 +116,6 @@ if are_conditions_met_arm_tests; then
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "filebeat/build/*.xml"
 
-YAML
-fi
-
-if are_conditions_met_macos_tests; then
-  cat >> $pipelineName <<- YAML
-  - group: "MacOS Extended Testing"
-    key: "extended-tests-macos"
-    steps:
-      - label: ":mac: MacOS Unit Tests"
-        key: "macos-extended"
-        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command:
-          - ".buildkite/filebeat/scripts/unit-tests.sh"
-        notify:
-          - github_commit_status:
-              context: "Filebeat/Extended: MacOS Unit Tests"
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths: "filebeat/build/*.xml"
 YAML
 fi
 
