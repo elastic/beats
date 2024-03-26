@@ -102,6 +102,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix indexing failures by re-enabling event normalisation in netflow input. {issue}38703[38703] {pull}38780[38780]
 - Fix handling of truncated files in Filestream {issue}38070[38070] {pull}38416[38416]
 - Fix `clean_removed` on Filestream input. {issue}36761[36761] {pull}38488[38488]
+- Fix filestream's registry GC: registry entries are now removed from the in-memory and disk store when they're older than the set TTL {issue}36761[36761] {pull}38488[38488]
 
 *Heartbeat*
 
