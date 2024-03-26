@@ -24,7 +24,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/helper"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const (
@@ -36,15 +35,11 @@ const (
 	defaultPath = "/nginx_status"
 )
 
-var (
-	hostParser = parse.URLHostParserBuilder{
-		DefaultScheme: defaultScheme,
-		PathConfigKey: "server_status_path",
-		DefaultPath:   defaultPath,
-	}.Build()
-)
-
-var logger = logp.NewLogger("nginx.stubstatus")
+var hostParser = parse.URLHostParserBuilder{
+	DefaultScheme: defaultScheme,
+	PathConfigKey: "server_status_path",
+	DefaultPath:   defaultPath,
+}.Build()
 
 func init() {
 	mb.Registry.MustAddMetricSet("nginx", "stubstatus", New,
