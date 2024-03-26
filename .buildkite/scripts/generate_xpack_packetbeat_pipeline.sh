@@ -17,7 +17,7 @@ steps:
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -26,7 +26,7 @@ steps:
 
       - label: ":linux: Ubuntu System Tests"
         key: "mandatory-linux-system-test"
-        command: "cd $BEATS_PROJECT_NAME && mage systemTest"
+        command: "mage -d $BEATS_PROJECT_NAME systemTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -35,7 +35,7 @@ steps:
 
       - label: ":rhel: RHEL-9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9_X86_64}"
@@ -140,7 +140,7 @@ if  are_conditions_met_arm_tests; then
   cat >> $pipelineName <<- YAML
       - label: ":linux: ARM Ubuntu Unit Tests"
         key: "extended-arm64-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
@@ -164,7 +164,7 @@ if are_conditions_met_packaging; then
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: "cd $BEATS_PROJECT_NAME && mage package"
+        command: "mage -d $BEATS_PROJECT_NAME package"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -176,7 +176,7 @@ if are_conditions_met_packaging; then
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
-        command: "cd $BEATS_PROJECT_NAME && mage package"
+        command: "mage -d $BEATS_PROJECT_NAME package"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
