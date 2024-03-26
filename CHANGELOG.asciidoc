@@ -3,8 +3,6 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-<<<<<<< HEAD
-=======
 [[release-notes-8.13.0]]
 === Beats version 8.13.0
 https://github.com/elastic/beats/compare/v8.12.2\...v8.13.0[View commits]
@@ -102,7 +100,6 @@ https://github.com/elastic/beats/compare/v8.12.2\...v8.13.0[View commits]
 - Add support for pipeline loading. {pull}37291[37291]
 
 
->>>>>>> afca8bc077 (docs: Prepare Changelog for 8.13.0 (#38594))
 [[release-notes-8.12.2]]
 === Beats version 8.12.2
 https://github.com/elastic/beats/compare/v8.12.1\...v8.12.2[View commits]
