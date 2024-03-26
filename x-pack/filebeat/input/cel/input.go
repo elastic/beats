@@ -918,7 +918,6 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 		lib.Debug(debug(log, trace)),
 		lib.File(mimetypes),
 		lib.MIME(mimetypes),
-		lib.Regexp(patterns),
 		lib.Limit(limitPolicies),
 		lib.Globals(map[string]interface{}{
 			"useragent": userAgent,

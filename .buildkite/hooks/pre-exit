@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+source .buildkite/hooks/scripts/util.sh
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
+  if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
+    docker logout "${DOCKER_REGISTRY}"
+  fi
+
+  # Ensure that any temporal files created during any step are removed
+  cleanup
+  unset_secrets
+fi

@@ -84,7 +84,6 @@ steps:
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      # Temporary disabled https://github.com/elastic/beats/issues/37841
       - label: ":windows: Windows 10 Unit Tests"
         key: "extended-win-10-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
@@ -150,7 +149,7 @@ if are_conditions_met_packaging; then
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "${PACKAGING_PLATFORMS}"
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
@@ -160,7 +159,7 @@ if are_conditions_met_packaging; then
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         env:
-          PLATFORMS: "linux/arm64"
+          PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
           PACKAGES: "docker"
 
 YAML
