@@ -100,7 +100,7 @@ function withMinGW {
         exit 1
     }
 
-# }
+}
 # function installGoDependencies {
 #     $installPackages = @(
 #         "github.com/magefile/mage"
