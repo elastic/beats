@@ -6,6 +6,7 @@ package websocket
 
 import (
 	"fmt"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -117,5 +118,17 @@ func TestConfig(t *testing.T) {
 				// no error
 			}
 		})
+	}
+}
+
+func TestRegexpConfig(t *testing.T) {
+	cfg := config{
+		Program: `{}`,
+		URL:     &urlConfig{URL: &url.URL{Scheme: "ws"}},
+		Regexps: map[string]string{"regex_cve": `[Cc][Vv][Ee]-[0-9]{4}-[0-9]{4,7}`},
+	}
+	err := cfg.Validate()
+	if err != nil {
+		t.Errorf("failed to validate config with regexps: %v", err)
 	}
 }
