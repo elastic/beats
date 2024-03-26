@@ -5,18 +5,18 @@ IF NOT EXIST "%PROGRAMFILES(X86)%" (
 )
 set PATH=%WORKSPACE%\bin;C:\ProgramData\chocolatey\bin;C:\tools\mingw%MINGW_ARCH%\bin;%PATH%
 
-curl --version >nul 2>&1 && (
-    echo found curl
-) || (
-    choco install curl -y --no-progress --skipdownloadcache
-)
-
 REM Set the USERPROFILE to the previous location to fix issues with chocolatey in windows 2019
 SET PREVIOUS_USERPROFILE=%USERPROFILE%
 SET USERPROFILE=%OLD_USERPROFILE%
 
 echo "Upgrade chocolatey to latest version"
 choco upgrade chocolatey -y
+
+curl --version >nul 2>&1 && (
+    echo found curl
+) || (
+    choco install curl -y --no-progress
+)
 
 IF NOT EXIST C:\Python38\python.exe (
     REM Install python 3.11.3
