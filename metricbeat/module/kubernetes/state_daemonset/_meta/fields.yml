@@ -23,6 +23,10 @@
           type: long
           description: >
             The number of ready replicas per DaemonSet
+        - name: scheduled
+          type: long
+          description: >
+            The number of replicas scheduled per DaemonSet
         - name: unavailable
           type: long
           description: >

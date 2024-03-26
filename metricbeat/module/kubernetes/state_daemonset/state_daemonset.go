@@ -29,6 +29,7 @@ var mapping = &p.MetricsMapping{
 	Metrics: map[string]p.MetricMap{
 		"kube_daemonset_metadata_generation":             p.InfoMetric(),
 		"kube_daemonset_status_number_available":         p.Metric("replicas.available"),
+		"kube_daemonset_status_current_number_scheduled": p.Metric("replicas.scheduled"),
 		"kube_daemonset_status_desired_number_scheduled": p.Metric("replicas.desired"),
 		"kube_daemonset_status_number_ready":             p.Metric("replicas.ready"),
 		"kube_daemonset_status_number_unavailable":       p.Metric("replicas.unavailable"),
