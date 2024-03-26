@@ -166,8 +166,11 @@ cat >> $pipelineName <<- YAML
         - label: Package pipeline
           commands: ".buildkite/scripts/packaging/package-step.sh"
 
+YAML
+fi
+
 echo "--- Printing dynamic steps"     #TODO: remove if the pipeline is public
 cat $pipelineName
 
 echo "--- Loading dynamic steps"
-# buildkite-agent pipeline upload $pipelineName
+buildkite-agent pipeline upload $pipelineName
