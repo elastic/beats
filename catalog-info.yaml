@@ -104,7 +104,7 @@ spec:
       # env:
       #   ELASTIC_PR_COMMENTS_ENABLED: 'true'
       env:
-        # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
@@ -136,7 +136,6 @@ spec:
     spec:
       pipeline_file: ".buildkite/filebeat/filebeat-pipeline.yml"
       branch_configuration: "main 7.* 8.* v7.* v8.*"
-      pipeline_file: ".buildkite/filebeat/filebeat-pipeline.yml"
       maximum_timeout_in_minutes: 120
       provider_settings:
         trigger_mode: none # don't trigger jobs from github activity
@@ -152,7 +151,7 @@ spec:
       skip_intermediate_builds: true
       skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
       env:
-        # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
+        # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
