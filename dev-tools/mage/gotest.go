@@ -111,7 +111,7 @@ func DefaultGoTestIntegrationArgs() GoTestArgs {
 	if synth.Run() == nil {
 		// Run an empty journey to ensure playwright can be loaded
 		// catches situations like missing playwright deps
-		cmd := exec.Command("sh", "-c", "echo 'step(\"t\", () => { })' | elastic-synthetics --inline")
+		cmd := exec.Command("sh", "-c", "echo 'step(\"t\", () => { })' | npx @elastic/synthetics --inline")
 		var out strings.Builder
 		cmd.Stdout = &out
 		cmd.Stderr = &out
