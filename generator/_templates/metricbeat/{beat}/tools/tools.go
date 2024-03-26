@@ -7,7 +7,7 @@ package tools
 
 import (
 	_ "github.com/blakesmith/ar"
-	_ "github.com/cavaliercoder/go-rpm"
+	_ "github.com/cavaliergopher/rpm"
 	_ "github.com/magefile/mage"
 	_ "github.com/mitchellh/gox"
 	_ "github.com/pierrre/gotestcover"
