@@ -18,5 +18,8 @@ var:
   - name: log_file_interval
     default: Hourly
 
-ingest_pipeline: ingest/pipeline.yml
+ingest_pipeline:
+  - ingest/default.yml
+  - ingest/eventlogfile.yml
+  - ingest/object.yml
 input: config/logout.yml

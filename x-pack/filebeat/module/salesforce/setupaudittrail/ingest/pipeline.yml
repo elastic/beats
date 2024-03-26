@@ -8,10 +8,10 @@ processors:
     field: message
     target_field: event.original
     ignore_missing: true
-- remove:
-    field:
-      - message
-    ignore_missing: true
+- set:
+    field: salesforce.setup_audit_trail.document_id
+    copy_from: _id
+    ignore_empty_value: true
 
 - date:
     field: json.CreatedDate
@@ -96,12 +96,9 @@ processors:
     field: user.id
     copy_from: salesforce.setup_audit_trail.created_by_id
     ignore_failure: true
-- set:
-    field: temp_setup_audit_trail_display
-    copy_from: salesforce.setup_audit_trail.display
-    ignore_failure: true
+    ignore_empty_value: true
 - dissect:
-    field: temp_setup_audit_trail_display
+    field: salesforce.setup_audit_trail.display
     pattern: "For user %{user.name}, %{?}"
     ignore_failure: true
 
@@ -129,7 +126,12 @@ processors:
 - remove:
     field:
       - json
-      - temp_setup_audit_trail_display
+      - message
+    ignore_missing: true
+- remove:
+    field: event.original
+    if: "ctx.tags == null || !(ctx.tags.contains('preserve_original_event'))"
+    ignore_failure: true
     ignore_missing: true
 on_failure:
 - set:

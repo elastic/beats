@@ -13,7 +13,7 @@ event_monitoring_method:
     enabled: {{ if .real_time }}true{{ else }}false{{ end }}
     interval: {{ .real_time_interval }}
     query:
-      default: SELECT FIELDS(STANDARD) FROM SetupAuditTrail {{ if .initial_interval }}WHERE EventDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05+0700") ]] AND{{ end }} ORDER BY CreatedDate ASC NULLS FIRST
+      default: SELECT FIELDS(STANDARD) FROM SetupAuditTrail{{ if .initial_interval }} WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05+0700") ]]{{ end }} ORDER BY CreatedDate ASC NULLS FIRST
       value: SELECT FIELDS(STANDARD) FROM SetupAuditTrail WHERE CreatedDate > [[ .cursor.object.last_event_time ]] ORDER BY CreatedDate ASC NULLS FIRST
     cursor:
       field: "CreatedDate"

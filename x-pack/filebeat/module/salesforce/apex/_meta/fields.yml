@@ -7,16 +7,16 @@
     - name: instance_url
       type: keyword
       description: The Instance URL of the Salesforce instance.
-    - name: access_mode
-      type: keyword
-      description: >
-        The mode of collecting logs from Salesforce - "rest" or "stream".
     - name: apex
       type: group
       release: beta
       description: >
         Fileset for ingesting Salesforce Apex logs.
       fields:
+        - name: document_id
+          type: keyword
+          description: >
+            Unique Id.
         - name: action
           type: keyword
           description: >

@@ -8,6 +8,10 @@ processors:
     field:
       - message
     ignore_missing: true
+- set:
+    field: salesforce.apex.document_id
+    copy_from: _id
+    ignore_empty_value: true
 
 - date:
     field: json.TIMESTAMP_DERIVED

@@ -1,0 +1,202 @@
+---
+description: Pipeline for parsing Salesforce Login (EventLogFile) logs.
+processors:
+- date:
+    field: json.TIMESTAMP_DERIVED
+    target_field: "@timestamp"
+    formats:
+    - ISO8601
+    ignore_failure: true
+- rename:
+    field: json.API_TYPE
+    target_field: salesforce.login.api.type
+    ignore_failure: true
+    ignore_missing: true
+- script:
+    description: Set api type value from api type character.
+    lang: painless
+    ignore_failure: true
+    source: |
+        Map map = new HashMap();
+        map.put("D", "Apex Class");
+        map.put("E", "SOAP Enterprise");
+        map.put("I", "SOAP Cross Instance");
+        map.put("M", "SOAP Metadata");
+        map.put("O", "Old SOAP");
+        map.put("P", "SOAP Partner");
+        map.put("S", "SOAP Apex");
+        map.put("T", "SOAP Tooling");
+        map.put("X", "XmlRPC");
+        map.put("f", "Feed");
+        map.put("l", "Live Agent");
+        map.put("p", "SOAP ClientSync");
+        String temp = map.get(ctx.salesforce?.login?.api?.type);
+        if (temp != null) {
+            ctx.salesforce.login.api.type = temp;
+        }
+- rename:
+    field: json.AUTHENTICATION_METHOD_REFERENCE
+    target_field: salesforce.login.auth.service_id
+    ignore_failure: true
+    ignore_missing: true
+- rename:
+    field: json.REQUEST_STATUS
+    target_field: salesforce.login.request_status
+    ignore_failure: true
+    ignore_missing: true
+- script:
+    description: Set request status value from request status character.
+    lang: painless
+    ignore_failure: true
+    source: |
+        Map map = new HashMap();
+        map.put("S", "Success");
+        map.put("F", "Failure");
+        map.put("U", "Undefined");
+        map.put("A", "Authorization Error");
+        map.put("R", "Redirect");
+        map.put("N", "Not Found");
+        String temp = map.get(ctx.salesforce?.login?.request_status);
+        if (temp != null) {
+          ctx.salesforce.login.request_status = temp;
+        }
+- rename:
+    field: json.API_VERSION
+    target_field: salesforce.login.api.version
+    ignore_failure: true
+    ignore_missing: true
+- rename:
+    field: json.USER_ID
+    target_field: salesforce.login.user_id
+    ignore_failure: true
+    ignore_missing: true
+- rename:
+    field: json.LOGIN_KEY
+    target_field: salesforce.login.key
+    ignore_failure: true
+    ignore_missing: true
+- rename:
+    field: json.EVENT_TYPE
+    target_field: salesforce.login.event_type
+    ignore_failure: true
+    ignore_missing: true
+- rename:
+    field: json.REQUEST_ID
+    target_field: salesforce.login.request_id
+    ignore_failure: true
+    ignore_missing: true
+- rename:
+    field: json.ORGANIZATION_ID
+    target_field: salesforce.login.organization_id
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: json.RUN_TIME
+    type: float
+    target_field: salesforce.login.run_time
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: json.CPU_TIME
+    type: float
+    target_field: salesforce.login.cpu_time
+    ignore_failure: true
+    ignore_missing: true
+- convert:
+    field: json.DB_TOTAL_TIME
+    type: float
+    target_field: salesforce.login.db_time.total
+    ignore_failure: true
+    ignore_missing: true
+- script:
+    description: Convert db_time.total field from nanos (nanoseconds) to ms (milliseconds).
+    lang: painless
+    ignore_failure: true
+    source: |
+        def convert(def nanos){
+            def ms = (nanos/1000000);
+            return ms;
+        }
+        if(ctx.salesforce?.login?.db_time?.total != null || ctx.salesforce?.login?.db_time?.total != ""){
+            ctx.salesforce.login.db_time.total = convert(ctx.salesforce.login.db_time.total);
+        }
+- rename:
+    field: json.CLIENT_IP
+    target_field: salesforce.login.client_ip
+    ignore_failure: true
+    ignore_missing: true
+- rename:
+    field: json.URI_ID_DERIVED
+    target_field: salesforce.login.uri_derived_id
+    ignore_failure: true
+    ignore_missing: true
+- rename:
+    field: json.URI
+    target_field: event.url
+    ignore_failure: true
+    ignore_missing: true
+- set:
+    field: event.outcome
+    value: "success"
+    if: 'ctx.json?.LOGIN_STATUS == "LOGIN_NO_ERROR" && ctx.json?.LOGIN_STATUS != null'
+    ignore_failure: true
+    ignore_empty_value: true
+- set:
+    field: event.outcome
+    value: "failure"
+    if: 'ctx.json?.LOGIN_STATUS != "LOGIN_NO_ERROR" && ctx.json?.LOGIN_STATUS != null'
+    ignore_failure: true
+    ignore_empty_value: true
+- rename:
+    field: json.USER_NAME
+    target_field: user.email
+    ignore_missing: true
+    ignore_failure: true
+- rename:
+    field: json.USER_ID_DERIVED
+    target_field: user.id
+    ignore_missing: true
+    ignore_failure: true
+- set:
+    value: ["{{{json.USER_TYPE}}}"]
+    field: user.roles
+    ignore_failure: true
+    ignore_empty_value: true
+- remove:
+      field: json.USER_TYPE
+      ignore_failure: true
+      ignore_missing: true    
+- rename:
+    field: json.SOURCE_IP
+    target_field: source.ip
+    ignore_missing: true
+    ignore_failure: true
+    if: 'ctx.json?.SOURCE_IP != "Salesforce.com IP"'
+- geoip:
+    field: source.ip
+    target_field: source.geo
+    ignore_missing: true
+    ignore_failure: true
+- rename:
+    field: json.BROWSER_TYPE
+    target_field: user_agent.name
+    ignore_missing: true
+    ignore_failure: true
+- rename:
+    field: json.CIPHER_SUITE
+    target_field: tls.cipher
+    ignore_missing: true
+    ignore_failure: true
+- dissect:
+    pattern: "%{tls.version_protocol}v%{tls.version}"
+    field: json.TLS_PROTOCOL
+    ignore_failure: true
+    ignore_missing: true
+
+on_failure:
+- set:
+    field: event.kind
+    value: pipeline_error
+- append:
+    field: error.message
+    value: '{{{ _ingest.on_failure_message }}}'

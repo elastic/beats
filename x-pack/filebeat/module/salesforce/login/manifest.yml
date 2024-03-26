@@ -19,5 +19,7 @@ var:
     default: Hourly
   
 ingest_pipeline:
-  - ingest/pipeline.yml
+  - ingest/default.yml
+  - ingest/eventlogfile.yml
+  - ingest/object.yml
 input: config/login.yml

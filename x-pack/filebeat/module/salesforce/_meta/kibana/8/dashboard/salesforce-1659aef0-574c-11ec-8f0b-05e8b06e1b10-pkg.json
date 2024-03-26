@@ -1,0 +1,2300 @@
+{
+    "attributes": {
+        "controlGroupInput": {
+            "chainingSystem": "HIERARCHICAL",
+            "controlStyle": "oneLine",
+            "ignoreParentSettingsJSON": "{\"ignoreFilters\":false,\"ignoreQuery\":false,\"ignoreTimerange\":false,\"ignoreValidations\":false}",
+            "panelsJSON": "{\"9d6785f0-b96d-4e35-8c17-3d7c90855bd2\":{\"type\":\"optionsListControl\",\"order\":0,\"grow\":true,\"width\":\"large\",\"explicitInput\":{\"id\":\"9d6785f0-b96d-4e35-8c17-3d7c90855bd2\",\"fieldName\":\"salesforce.instance_url\",\"title\":\"Instance URL\",\"grow\":true,\"width\":\"medium\",\"enhancements\":{}}}}"
+        },
+        "description": "Salesforce Login Data",
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "syncColors": false,
+            "syncCursor": true,
+            "syncTooltips": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-e1b2bc2f-ba01-4998-8cf8-a20d5e2f4da5",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "6d11832d-25d1-4c0f-8a37-713bc1c54586",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "9d8c8465-f2be-4bd6-a21c-0b6367261090",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "e1b2bc2f-ba01-4998-8cf8-a20d5e2f4da5": {
+                                            "columnOrder": [
+                                                "22579769-dcb6-457e-82b4-76eacc56deb8",
+                                                "22579769-dcb6-457e-82b4-76eacc56deb8X0",
+                                                "22579769-dcb6-457e-82b4-76eacc56deb8X1",
+                                                "22579769-dcb6-457e-82b4-76eacc56deb8X2"
+                                            ],
+                                            "columns": {
+                                                "22579769-dcb6-457e-82b4-76eacc56deb8": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Login success rate",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "format": {
+                                                            "id": "percent",
+                                                            "params": {
+                                                                "decimals": 2
+                                                            }
+                                                        },
+                                                        "formula": "(count(kql='event.outcome : \"success\"')/count())",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "22579769-dcb6-457e-82b4-76eacc56deb8X2"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "22579769-dcb6-457e-82b4-76eacc56deb8X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "event.outcome : \"success\""
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Part of Login success rate",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                },
+                                                "22579769-dcb6-457e-82b4-76eacc56deb8X1": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Login success rate",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                },
+                                                "22579769-dcb6-457e-82b4-76eacc56deb8X2": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Login success rate",
+                                                    "operationType": "math",
+                                                    "params": {
+                                                        "tinymathAst": {
+                                                            "args": [
+                                                                "22579769-dcb6-457e-82b4-76eacc56deb8X0",
+                                                                "22579769-dcb6-457e-82b4-76eacc56deb8X1"
+                                                            ],
+                                                            "location": {
+                                                                "max": 48,
+                                                                "min": 0
+                                                            },
+                                                            "name": "divide",
+                                                            "text": "(count(kql='event.outcome : \"success\"')/count())",
+                                                            "type": "function"
+                                                        }
+                                                    },
+                                                    "references": [
+                                                        "22579769-dcb6-457e-82b4-76eacc56deb8X0",
+                                                        "22579769-dcb6-457e-82b4-76eacc56deb8X1"
+                                                    ],
+                                                    "scale": "ratio"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.action",
+                                        "index": "6d11832d-25d1-4c0f-8a37-713bc1c54586",
+                                        "key": "event.action",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "login-attempt"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.action": "login-attempt"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.dataset",
+                                        "index": "9d8c8465-f2be-4bd6-a21c-0b6367261090",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.login"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.login"
+                                        }
+                                    }
+                                }
+                            ],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "accessor": "22579769-dcb6-457e-82b4-76eacc56deb8",
+                                "layerId": "e1b2bc2f-ba01-4998-8cf8-a20d5e2f4da5",
+                                "layerType": "data",
+                                "size": "l",
+                                "textAlign": "center",
+                                "titlePosition": "bottom"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsLegacyMetric"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": true
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "0e854818-b5d3-4758-b099-04d68167678a",
+                    "w": 24,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "0e854818-b5d3-4758-b099-04d68167678a",
+                "title": "Login success rate [Logs Salesforce]",
+                "type": "lens",
+                "version": "8.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-e1b2bc2f-ba01-4998-8cf8-a20d5e2f4da5",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "202fa207-df51-44cd-895e-0b765f948b8a",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "28a2720d-e3b3-47b1-a86a-2f4dbbbe349a",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "b9e5a7d5-f88a-468b-939c-adcd1683da60",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "e1b2bc2f-ba01-4998-8cf8-a20d5e2f4da5": {
+                                            "columnOrder": [
+                                                "22579769-dcb6-457e-82b4-76eacc56deb8",
+                                                "22579769-dcb6-457e-82b4-76eacc56deb8X0"
+                                            ],
+                                            "columns": {
+                                                "22579769-dcb6-457e-82b4-76eacc56deb8": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Failed login attempts",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "formula": "count()",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "22579769-dcb6-457e-82b4-76eacc56deb8X0"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "22579769-dcb6-457e-82b4-76eacc56deb8X0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of Failed login attempts",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": false
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.action",
+                                        "index": "202fa207-df51-44cd-895e-0b765f948b8a",
+                                        "key": "event.action",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "login-attempt"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.action": "login-attempt"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.outcome",
+                                        "index": "28a2720d-e3b3-47b1-a86a-2f4dbbbe349a",
+                                        "key": "event.outcome",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "failure"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.outcome": "failure"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.dataset",
+                                        "index": "b9e5a7d5-f88a-468b-939c-adcd1683da60",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.login"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.login"
+                                        }
+                                    }
+                                }
+                            ],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "accessor": "22579769-dcb6-457e-82b4-76eacc56deb8",
+                                "layerId": "e1b2bc2f-ba01-4998-8cf8-a20d5e2f4da5",
+                                "layerType": "data",
+                                "size": "l",
+                                "textAlign": "center",
+                                "titlePosition": "bottom"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsLegacyMetric"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": true
+                },
+                "gridData": {
+                    "h": 9,
+                    "i": "e75fee04-c83e-48ad-83bd-498189cabec7",
+                    "w": 24,
+                    "x": 24,
+                    "y": 0
+                },
+                "panelIndex": "e75fee04-c83e-48ad-83bd-498189cabec7",
+                "title": "Failed login attempts [Logs Salesforce]",
+                "type": "lens",
+                "version": "8.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-440fc980-229c-428f-b87b-78b25eeb6155",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "12ab72cc-7cf8-4f95-a4e8-089246cf5b1f",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "38a8140e-6374-4f09-ac8b-f73c71a17c1e",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "440fc980-229c-428f-b87b-78b25eeb6155": {
+                                            "columnOrder": [
+                                                "f352fcbd-0e4a-4370-9e73-48616c476653",
+                                                "c1ff1268-7525-4784-b979-c05c5f137e75",
+                                                "24d3e40d-dba5-477a-9c98-85d41d66c0f6"
+                                            ],
+                                            "columns": {
+                                                "24d3e40d-dba5-477a-9c98-85d41d66c0f6": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "event.outcome : \"failure\" "
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Failure",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                },
+                                                "c1ff1268-7525-4784-b979-c05c5f137e75": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "event.outcome : \"success\" "
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Success",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                },
+                                                "f352fcbd-0e4a-4370-9e73-48616c476653": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.action",
+                                        "index": "12ab72cc-7cf8-4f95-a4e8-089246cf5b1f",
+                                        "key": "event.action",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "login-attempt"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.action": "login-attempt"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.dataset",
+                                        "index": "38a8140e-6374-4f09-ac8b-f73c71a17c1e",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.login"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.login"
+                                        }
+                                    }
+                                }
+                            ],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fillOpacity": 0,
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "c1ff1268-7525-4784-b979-c05c5f137e75",
+                                            "24d3e40d-dba5-477a-9c98-85d41d66c0f6"
+                                        ],
+                                        "layerId": "440fc980-229c-428f-b87b-78b25eeb6155",
+                                        "layerType": "data",
+                                        "palette": {
+                                            "name": "default",
+                                            "type": "palette"
+                                        },
+                                        "seriesType": "line",
+                                        "xAccessor": "f352fcbd-0e4a-4370-9e73-48616c476653",
+                                        "yConfig": [
+                                            {
+                                                "axisMode": "left",
+                                                "color": "#68BC00",
+                                                "forAccessor": "c1ff1268-7525-4784-b979-c05c5f137e75"
+                                            },
+                                            {
+                                                "color": "#e7664c",
+                                                "forAccessor": "24d3e40d-dba5-477a-9c98-85d41d66c0f6"
+                                            }
+                                        ]
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "maxLines": 1,
+                                    "position": "right",
+                                    "shouldTruncate": true,
+                                    "showSingleSeries": true
+                                },
+                                "preferredSeriesType": "bar_stacked",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide",
+                                "valuesInLegend": true,
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                },
+                                "yTitle": "Requests"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "e780606f-6362-497e-9e17-940937ead5bf",
+                    "w": 48,
+                    "x": 0,
+                    "y": 9
+                },
+                "panelIndex": "e780606f-6362-497e-9e17-940937ead5bf",
+                "title": "Login over time [Logs Salesforce]",
+                "type": "lens",
+                "version": "8.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-9c7705b7-2344-40b4-a257-d8ced3dd0740",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "6c90d865-14e0-4f74-b8ca-2b03f341b440",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "45176e6f-c3b8-4fd0-a490-a6e59f5eabc3",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "9c7705b7-2344-40b4-a257-d8ced3dd0740": {
+                                            "columnOrder": [
+                                                "8f42c063-bb66-4b3b-8f52-83103613cd09",
+                                                "68fb2e14-2d3c-49b3-a3d1-dadbf2e3d950"
+                                            ],
+                                            "columns": {
+                                                "68fb2e14-2d3c-49b3-a3d1-dadbf2e3d950": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Login Events",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                },
+                                                "8f42c063-bb66-4b3b-8f52-83103613cd09": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "dropPartials": false,
+                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.action",
+                                        "index": "6c90d865-14e0-4f74-b8ca-2b03f341b440",
+                                        "key": "event.action",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "login-attempt"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.action": "login-attempt"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.dataset",
+                                        "index": "45176e6f-c3b8-4fd0-a490-a6e59f5eabc3",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.login"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.login"
+                                        }
+                                    }
+                                }
+                            ],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "68fb2e14-2d3c-49b3-a3d1-dadbf2e3d950"
+                                        ],
+                                        "layerId": "9c7705b7-2344-40b4-a257-d8ced3dd0740",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar",
+                                        "showGridlines": false,
+                                        "xAccessor": "8f42c063-bb66-4b3b-8f52-83103613cd09"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "yTitle": ""
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "27d96d74-bfe5-4676-84fc-0f7e24594b5a",
+                    "w": 48,
+                    "x": 0,
+                    "y": 24
+                },
+                "panelIndex": "27d96d74-bfe5-4676-84fc-0f7e24594b5a",
+                "title": "Total login events over time [Logs Salesforce]",
+                "type": "lens",
+                "version": "8.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-c99534c3-c26a-4456-837b-3a71c0c9423e",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "0752e415-04f6-41fb-a9bd-0ea95119c23f",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "9d25551f-6855-484b-bcea-267ceefdb7fb",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "c99534c3-c26a-4456-837b-3a71c0c9423e": {
+                                            "columnOrder": [
+                                                "424fcd8e-fd11-4d5b-8eec-6a20473e1134",
+                                                "9478baac-1153-4cda-a4b4-08db8af7580a"
+                                            ],
+                                            "columns": {
+                                                "424fcd8e-fd11-4d5b-8eec-6a20473e1134": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 10 values of user.roles",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "9478baac-1153-4cda-a4b4-08db8af7580a",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "secondaryFields": [],
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "user.roles"
+                                                },
+                                                "9478baac-1153-4cda-a4b4-08db8af7580a": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Count of records",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.action",
+                                        "index": "0752e415-04f6-41fb-a9bd-0ea95119c23f",
+                                        "key": "event.action",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "login-attempt"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.action": "login-attempt"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.dataset",
+                                        "index": "9d25551f-6855-484b-bcea-267ceefdb7fb",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.login"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.login"
+                                        }
+                                    }
+                                }
+                            ],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "categoryDisplay": "default",
+                                        "layerId": "c99534c3-c26a-4456-837b-3a71c0c9423e",
+                                        "layerType": "data",
+                                        "legendDisplay": "default",
+                                        "metrics": [
+                                            "9478baac-1153-4cda-a4b4-08db8af7580a"
+                                        ],
+                                        "nestedLegend": false,
+                                        "numberDisplay": "percent",
+                                        "primaryGroups": [
+                                            "424fcd8e-fd11-4d5b-8eec-6a20473e1134"
+                                        ]
+                                    }
+                                ],
+                                "shape": "pie"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsPie"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "9ea2b92f-5fb6-4a83-b198-5275565a4bd6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 41
+                },
+                "panelIndex": "9ea2b92f-5fb6-4a83-b198-5275565a4bd6",
+                "title": "Distribution of type of users [Logs Salesforce]",
+                "type": "lens",
+                "version": "8.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-fe97c656-f063-45c6-8d2c-f681b01b9c25",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "33aa1d73-6050-4e83-b4d1-7fc4ceb0b413",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "2ffe6379-bcec-4a04-baed-bc28009cb12c",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "fe97c656-f063-45c6-8d2c-f681b01b9c25": {
+                                            "columnOrder": [
+                                                "429bdef4-3ab3-4826-aa68-2c13f0dc2557",
+                                                "a1b52fa9-f635-4caf-be9a-4b9cbdaf3a4d"
+                                            ],
+                                            "columns": {
+                                                "429bdef4-3ab3-4826-aa68-2c13f0dc2557": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "User Agent",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "a1b52fa9-f635-4caf-be9a-4b9cbdaf3a4d",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 5
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "user_agent.name"
+                                                },
+                                                "a1b52fa9-f635-4caf-be9a-4b9cbdaf3a4d": {
+                                                    "customLabel": false,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Count of records",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.action",
+                                        "index": "33aa1d73-6050-4e83-b4d1-7fc4ceb0b413",
+                                        "key": "event.action",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "login-attempt"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.action": "login-attempt"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.dataset",
+                                        "index": "2ffe6379-bcec-4a04-baed-bc28009cb12c",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.login"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.login"
+                                        }
+                                    }
+                                }
+                            ],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "categoryDisplay": "default",
+                                        "layerId": "fe97c656-f063-45c6-8d2c-f681b01b9c25",
+                                        "layerType": "data",
+                                        "legendDisplay": "default",
+                                        "metrics": [
+                                            "a1b52fa9-f635-4caf-be9a-4b9cbdaf3a4d"
+                                        ],
+                                        "nestedLegend": false,
+                                        "numberDisplay": "percent",
+                                        "primaryGroups": [
+                                            "429bdef4-3ab3-4826-aa68-2c13f0dc2557"
+                                        ]
+                                    }
+                                ],
+                                "shape": "donut"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsPie"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "4b6641b7-fa2a-4d84-a9f6-e358000702dc",
+                    "w": 24,
+                    "x": 24,
+                    "y": 41
+                },
+                "panelIndex": "4b6641b7-fa2a-4d84-a9f6-e358000702dc",
+                "title": "Activity by browser/client [Logs Salesforce]",
+                "type": "lens",
+                "version": "8.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-26b85139-d8f7-4158-829c-eed584dc6310",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "696f7220-4f11-4c84-bfad-d2abdb595843",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "5a4850c8-9bba-423e-8a12-6cbe09cae6f7",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "98986eae-7d8b-45ba-8bd4-5b6564dab9d9",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "26b85139-d8f7-4158-829c-eed584dc6310": {
+                                            "columnOrder": [
+                                                "28fa192e-d9c2-4e4a-9b4a-d2bf6070d553",
+                                                "747231b5-9a00-4095-ba5c-61753b1aa507",
+                                                "3515b14c-c836-46d3-b3e3-1b27b0eca9d8",
+                                                "7bdaf495-4429-4383-b8f4-f8ed16130036",
+                                                "89013969-6f87-4f17-9239-4c3ef1cc72e5"
+                                            ],
+                                            "columns": {
+                                                "28fa192e-d9c2-4e4a-9b4a-d2bf6070d553": {
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 10000 values of salesforce.login.document_id",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "747231b5-9a00-4095-ba5c-61753b1aa507",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10000
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "salesforce.login.document_id"
+                                                },
+                                                "3515b14c-c836-46d3-b3e3-1b27b0eca9d8": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "event.outcome: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Request status",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "event.outcome"
+                                                },
+                                                "747231b5-9a00-4095-ba5c-61753b1aa507": {
+                                                    "customLabel": true,
+                                                    "dataType": "date",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "@timestamp: *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Timestamp",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "7bdaf495-4429-4383-b8f4-f8ed16130036": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "\"salesforce.login.run_time\": *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Run time (ms)",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "salesforce.login.run_time"
+                                                },
+                                                "89013969-6f87-4f17-9239-4c3ef1cc72e5": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "\"salesforce.login.db_total_time\": *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "DB total time (ms)",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "salesforce.login.db_total_time"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.action",
+                                        "index": "696f7220-4f11-4c84-bfad-d2abdb595843",
+                                        "key": "event.action",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "login-attempt"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.action": "login-attempt"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.outcome",
+                                        "index": "5a4850c8-9bba-423e-8a12-6cbe09cae6f7",
+                                        "key": "event.outcome",
+                                        "negate": false,
+                                        "type": "exists",
+                                        "value": "exists"
+                                    },
+                                    "query": {
+                                        "exists": {
+                                            "field": "event.outcome"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.dataset",
+                                        "index": "98986eae-7d8b-45ba-8bd4-5b6564dab9d9",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.login"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.login"
+                                        }
+                                    }
+                                }
+                            ],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "columns": [
+                                    {
+                                        "columnId": "747231b5-9a00-4095-ba5c-61753b1aa507",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "3515b14c-c836-46d3-b3e3-1b27b0eca9d8",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "28fa192e-d9c2-4e4a-9b4a-d2bf6070d553",
+                                        "hidden": true,
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "7bdaf495-4429-4383-b8f4-f8ed16130036",
+                                        "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "89013969-6f87-4f17-9239-4c3ef1cc72e5",
+                                        "isTransposed": false
+                                    }
+                                ],
+                                "layerId": "26b85139-d8f7-4158-829c-eed584dc6310",
+                                "layerType": "data",
+                                "paging": {
+                                    "enabled": true,
+                                    "size": 10
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsDatatable"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "b2b60887-159a-4a2f-a477-eece1cda9620",
+                    "w": 24,
+                    "x": 0,
+                    "y": 71
+                },
+                "panelIndex": "b2b60887-159a-4a2f-a477-eece1cda9620",
+                "title": "Login events table [Logs Salesforce]",
+                "type": "lens",
+                "version": "8.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-75cb4ead-3ea9-4a50-b9e3-93a364e95f02",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "baf37a2c-beae-4c2c-bbc5-bb3347c7f931",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "c6500332-3aa6-477c-8722-ea96526e85b6",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "75cb4ead-3ea9-4a50-b9e3-93a364e95f02": {
+                                            "columnOrder": [
+                                                "8e5c4236-26b7-402d-b1ef-0af6d7028ebd",
+                                                "5a25315e-fd94-4e86-ba45-423bd31ab8bc"
+                                            ],
+                                            "columns": {
+                                                "5a25315e-fd94-4e86-ba45-423bd31ab8bc": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "User count",
+                                                    "operationType": "unique_count",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "user.email"
+                                                },
+                                                "8e5c4236-26b7-402d-b1ef-0af6d7028ebd": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Application type",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "5a25315e-fd94-4e86-ba45-423bd31ab8bc",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "secondaryFields": [],
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "salesforce.login.application"
+                                                }
+                                            },
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                },
+                                "textBased": {
+                                    "layers": {}
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.action",
+                                        "index": "baf37a2c-beae-4c2c-bbc5-bb3347c7f931",
+                                        "key": "event.action",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "login-attempt"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.action": "login-attempt"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.dataset",
+                                        "index": "c6500332-3aa6-477c-8722-ea96526e85b6",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.login"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.login"
+                                        }
+                                    }
+                                }
+                            ],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "5a25315e-fd94-4e86-ba45-423bd31ab8bc"
+                                        ],
+                                        "layerId": "75cb4ead-3ea9-4a50-b9e3-93a364e95f02",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar_horizontal",
+                                        "showGridlines": false,
+                                        "xAccessor": "8e5c4236-26b7-402d-b1ef-0af6d7028ebd"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_horizontal",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "6115a6d5-d780-4272-b952-2af28343a5b6",
+                    "w": 24,
+                    "x": 24,
+                    "y": 56
+                },
+                "panelIndex": "6115a6d5-d780-4272-b952-2af28343a5b6",
+                "title": "Top 10 Application type by user count [Logs Salesforce]",
+                "type": "lens",
+                "version": "8.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-21816ba6-c606-4532-9362-64890b01b81c",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "6778cb9a-4889-4d55-8300-0bd7584950f3",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "0d3528e5-e4b0-430d-8ed3-7c63b8bdb5cb",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "21816ba6-c606-4532-9362-64890b01b81c": {
+                                            "columnOrder": [
+                                                "20cea7a4-2d2b-4a01-8591-e8aa9a80d6c3",
+                                                "9ab68795-f5bc-485c-b0db-9e8f87d5b992"
+                                            ],
+                                            "columns": {
+                                                "20cea7a4-2d2b-4a01-8591-e8aa9a80d6c3": {
+                                                    "customLabel": true,
+                                                    "dataType": "ip",
+                                                    "isBucketed": true,
+                                                    "label": "IP Addresses",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "9ab68795-f5bc-485c-b0db-9e8f87d5b992",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": false,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "source.ip"
+                                                },
+                                                "9ab68795-f5bc-485c-b0db-9e8f87d5b992": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Request count",
+                                                    "operationType": "count",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "___records___"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.action",
+                                        "index": "6778cb9a-4889-4d55-8300-0bd7584950f3",
+                                        "key": "event.action",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "login-attempt"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.action": "login-attempt"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.dataset",
+                                        "index": "0d3528e5-e4b0-430d-8ed3-7c63b8bdb5cb",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.login"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.login"
+                                        }
+                                    }
+                                }
+                            ],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "axisTitlesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "fittingFunction": "None",
+                                "gridlinesVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "labelsOrientation": {
+                                    "x": 0,
+                                    "yLeft": 0,
+                                    "yRight": 0
+                                },
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "9ab68795-f5bc-485c-b0db-9e8f87d5b992"
+                                        ],
+                                        "layerId": "21816ba6-c606-4532-9362-64890b01b81c",
+                                        "layerType": "data",
+                                        "seriesType": "bar_horizontal",
+                                        "xAccessor": "20cea7a4-2d2b-4a01-8591-e8aa9a80d6c3"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_horizontal",
+                                "tickLabelsVisibilitySettings": {
+                                    "x": true,
+                                    "yLeft": true,
+                                    "yRight": true
+                                },
+                                "valueLabels": "hide"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 17,
+                    "i": "4a2b88af-ad1a-416d-9553-d21b23882c22",
+                    "w": 24,
+                    "x": 24,
+                    "y": 71
+                },
+                "panelIndex": "4a2b88af-ad1a-416d-9553-d21b23882c22",
+                "title": "Top 10 IP addresses by request count [Logs Salesforce]",
+                "type": "lens",
+                "version": "8.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "layerListJSON": [
+                            {
+                                "alpha": 1,
+                                "id": "3de98652-8d42-4415-91ca-d64b26bb6972",
+                                "includeInFitToBounds": true,
+                                "label": null,
+                                "locale": "autoselect",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "isAutoSelect": true,
+                                    "lightModeDefault": "road_map_desaturated",
+                                    "type": "EMS_TMS"
+                                },
+                                "style": {
+                                    "color": "",
+                                    "type": "EMS_VECTOR_TILE"
+                                },
+                                "type": "EMS_VECTOR_TILE",
+                                "visible": true
+                            },
+                            {
+                                "alpha": 0.75,
+                                "id": "546e11d2-db52-457b-8733-e1ee75c51fd8",
+                                "includeInFitToBounds": true,
+                                "joins": [],
+                                "label": "Login Activity",
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "sourceDescriptor": {
+                                    "applyForceRefresh": true,
+                                    "applyGlobalQuery": true,
+                                    "applyGlobalTime": true,
+                                    "filterByMapBounds": true,
+                                    "geoField": "source.geo.location",
+                                    "id": "6d0ed8a8-d5de-4d2e-9e05-0fd4b7dc2384",
+                                    "indexPatternRefName": "layer_1_source_index_pattern",
+                                    "scalingType": "MVT",
+                                    "sortField": "",
+                                    "sortOrder": "desc",
+                                    "tooltipProperties": [],
+                                    "topHitsSize": 1,
+                                    "topHitsSplitField": "",
+                                    "type": "ES_SEARCH"
+                                },
+                                "style": {
+                                    "isTimeAware": true,
+                                    "properties": {
+                                        "fillColor": {
+                                            "options": {
+                                                "color": "#54B399"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "icon": {
+                                            "options": {
+                                                "value": "marker"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconOrientation": {
+                                            "options": {
+                                                "orientation": 0
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "iconSize": {
+                                            "options": {
+                                                "size": 6
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderColor": {
+                                            "options": {
+                                                "color": "#FFFFFF"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelBorderSize": {
+                                            "options": {
+                                                "size": "SMALL"
+                                            }
+                                        },
+                                        "labelColor": {
+                                            "options": {
+                                                "color": "#000000"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelSize": {
+                                            "options": {
+                                                "size": 14
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelText": {
+                                            "options": {
+                                                "value": ""
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "labelZoomRange": {
+                                            "options": {
+                                                "maxZoom": 24,
+                                                "minZoom": 0,
+                                                "useLayerZoomRange": true
+                                            }
+                                        },
+                                        "lineColor": {
+                                            "options": {
+                                                "color": "#41937c"
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "lineWidth": {
+                                            "options": {
+                                                "size": 1
+                                            },
+                                            "type": "STATIC"
+                                        },
+                                        "symbolizeAs": {
+                                            "options": {
+                                                "value": "circle"
+                                            }
+                                        }
+                                    },
+                                    "type": "VECTOR"
+                                },
+                                "type": "MVT_VECTOR",
+                                "visible": true
+                            }
+                        ],
+                        "mapStateJSON": {
+                            "adHocDataViews": [],
+                            "center": {
+                                "lat": 0,
+                                "lon": -110.39069
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.dataset",
+                                        "index": "filebeat-*",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.login"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.login"
+                                        }
+                                    }
+                                }
+                            ],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "refreshConfig": {
+                                "interval": 900000,
+                                "isPaused": false
+                            },
+                            "settings": {
+                                "autoFitToDataBounds": false,
+                                "backgroundColor": "#ffffff",
+                                "browserLocation": {
+                                    "zoom": 2
+                                },
+                                "customIcons": [],
+                                "disableInteractive": false,
+                                "disableTooltipControl": false,
+                                "fixedLocation": {
+                                    "lat": 0,
+                                    "lon": 0,
+                                    "zoom": 2
+                                },
+                                "hideLayerControl": false,
+                                "hideToolbarOverlay": false,
+                                "hideViewControl": false,
+                                "initialLocation": "LAST_SAVED_LOCATION",
+                                "keydownScrollZoom": false,
+                                "maxZoom": 24,
+                                "minZoom": 0,
+                                "showScaleControl": false,
+                                "showSpatialFilters": true,
+                                "showTimesliderToggleButton": true,
+                                "spatialFiltersAlpa": 0.3,
+                                "spatialFiltersFillColor": "#DA8B45",
+                                "spatialFiltersLineColor": "#DA8B45"
+                            },
+                            "timeFilters": {
+                                "from": "now-7d/d",
+                                "to": "now"
+                            },
+                            "zoom": 0.61
+                        },
+                        "title": "",
+                        "uiStateJSON": {
+                            "isLayerTOCOpen": true,
+                            "openTOCDetails": []
+                        }
+                    },
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "hidePanelTitles": false,
+                    "isLayerTOCOpen": true,
+                    "mapBuffer": {
+                        "maxLat": 89.78601,
+                        "maxLon": 540,
+                        "minLat": -85.05113,
+                        "minLon": -720
+                    },
+                    "mapCenter": {
+                        "lat": 18.34294,
+                        "lon": -110.39069,
+                        "zoom": 0.29
+                    },
+                    "openTOCDetails": []
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "bc6b147a-bd41-4f00-affe-4a7b7fbaab7a",
+                    "w": 48,
+                    "x": 0,
+                    "y": 88
+                },
+                "panelIndex": "bc6b147a-bd41-4f00-affe-4a7b7fbaab7a",
+                "title": "Login activity by region [Logs Salesforce]",
+                "type": "map",
+                "version": "8.10.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "description": "",
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-75cb4ead-3ea9-4a50-b9e3-93a364e95f02",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "d110f063-ba9b-4d7e-9d00-124ef79bf704",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "adHocDataViews": {},
+                            "datasourceStates": {
+                                "formBased": {
+                                    "layers": {
+                                        "75cb4ead-3ea9-4a50-b9e3-93a364e95f02": {
+                                            "columnOrder": [
+                                                "f21fe70c-96b7-452f-9bdd-d0066baba7de",
+                                                "5a25315e-fd94-4e86-ba45-423bd31ab8bc"
+                                            ],
+                                            "columns": {
+                                                "5a25315e-fd94-4e86-ba45-423bd31ab8bc": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "User count",
+                                                    "operationType": "unique_count",
+                                                    "params": {
+                                                        "emptyAsNull": true
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "user.email"
+                                                },
+                                                "f21fe70c-96b7-452f-9bdd-d0066baba7de": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Postal code",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "5a25315e-fd94-4e86-ba45-423bd31ab8bc",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "source.geo.postal_code"
+                                                }
+                                            },
+                                            "incompleteColumns": {},
+                                            "sampling": 1
+                                        }
+                                    }
+                                },
+                                "textBased": {
+                                    "layers": {}
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "field": "event.dataset",
+                                        "index": "d110f063-ba9b-4d7e-9d00-124ef79bf704",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.login"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.login"
+                                        }
+                                    }
+                                }
+                            ],
+                            "internalReferences": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "5a25315e-fd94-4e86-ba45-423bd31ab8bc"
+                                        ],
+                                        "layerId": "75cb4ead-3ea9-4a50-b9e3-93a364e95f02",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar_horizontal",
+                                        "showGridlines": false,
+                                        "xAccessor": "f21fe70c-96b7-452f-9bdd-d0066baba7de"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_horizontal",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "a841d405-e28f-4eea-b7a4-5cfc0299a0c6",
+                    "w": 24,
+                    "x": 0,
+                    "y": 56
+                },
+                "panelIndex": "a841d405-e28f-4eea-b7a4-5cfc0299a0c6",
+                "title": "Top 10 Postal code by user count [Logs Salesforce]",
+                "type": "lens",
+                "version": "8.10.0"
+            }
+        ],
+        "refreshInterval": {
+            "pause": true,
+            "value": 900000
+        },
+        "timeFrom": "now-7d/d",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[Filebeat Salesforce] Login Dashboard",
+        "version": 1
+    },
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2024-03-26T07:09:58.704Z",
+    "id": "salesforce-1659aef0-574c-11ec-8f0b-05e8b06e1b10-pkg",
+    "managed": false,
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "0e854818-b5d3-4758-b099-04d68167678a:indexpattern-datasource-layer-e1b2bc2f-ba01-4998-8cf8-a20d5e2f4da5",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "0e854818-b5d3-4758-b099-04d68167678a:6d11832d-25d1-4c0f-8a37-713bc1c54586",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "0e854818-b5d3-4758-b099-04d68167678a:9d8c8465-f2be-4bd6-a21c-0b6367261090",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "e75fee04-c83e-48ad-83bd-498189cabec7:indexpattern-datasource-layer-e1b2bc2f-ba01-4998-8cf8-a20d5e2f4da5",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "e75fee04-c83e-48ad-83bd-498189cabec7:202fa207-df51-44cd-895e-0b765f948b8a",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "e75fee04-c83e-48ad-83bd-498189cabec7:28a2720d-e3b3-47b1-a86a-2f4dbbbe349a",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "e75fee04-c83e-48ad-83bd-498189cabec7:b9e5a7d5-f88a-468b-939c-adcd1683da60",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "e780606f-6362-497e-9e17-940937ead5bf:indexpattern-datasource-layer-440fc980-229c-428f-b87b-78b25eeb6155",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "e780606f-6362-497e-9e17-940937ead5bf:12ab72cc-7cf8-4f95-a4e8-089246cf5b1f",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "e780606f-6362-497e-9e17-940937ead5bf:38a8140e-6374-4f09-ac8b-f73c71a17c1e",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "27d96d74-bfe5-4676-84fc-0f7e24594b5a:indexpattern-datasource-layer-9c7705b7-2344-40b4-a257-d8ced3dd0740",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "27d96d74-bfe5-4676-84fc-0f7e24594b5a:6c90d865-14e0-4f74-b8ca-2b03f341b440",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "27d96d74-bfe5-4676-84fc-0f7e24594b5a:45176e6f-c3b8-4fd0-a490-a6e59f5eabc3",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "9ea2b92f-5fb6-4a83-b198-5275565a4bd6:indexpattern-datasource-layer-c99534c3-c26a-4456-837b-3a71c0c9423e",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "9ea2b92f-5fb6-4a83-b198-5275565a4bd6:0752e415-04f6-41fb-a9bd-0ea95119c23f",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "9ea2b92f-5fb6-4a83-b198-5275565a4bd6:9d25551f-6855-484b-bcea-267ceefdb7fb",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "4b6641b7-fa2a-4d84-a9f6-e358000702dc:indexpattern-datasource-layer-fe97c656-f063-45c6-8d2c-f681b01b9c25",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "4b6641b7-fa2a-4d84-a9f6-e358000702dc:33aa1d73-6050-4e83-b4d1-7fc4ceb0b413",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "4b6641b7-fa2a-4d84-a9f6-e358000702dc:2ffe6379-bcec-4a04-baed-bc28009cb12c",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "b2b60887-159a-4a2f-a477-eece1cda9620:indexpattern-datasource-layer-26b85139-d8f7-4158-829c-eed584dc6310",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "b2b60887-159a-4a2f-a477-eece1cda9620:696f7220-4f11-4c84-bfad-d2abdb595843",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "b2b60887-159a-4a2f-a477-eece1cda9620:5a4850c8-9bba-423e-8a12-6cbe09cae6f7",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "b2b60887-159a-4a2f-a477-eece1cda9620:98986eae-7d8b-45ba-8bd4-5b6564dab9d9",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "6115a6d5-d780-4272-b952-2af28343a5b6:indexpattern-datasource-layer-75cb4ead-3ea9-4a50-b9e3-93a364e95f02",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "6115a6d5-d780-4272-b952-2af28343a5b6:baf37a2c-beae-4c2c-bbc5-bb3347c7f931",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "6115a6d5-d780-4272-b952-2af28343a5b6:c6500332-3aa6-477c-8722-ea96526e85b6",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "4a2b88af-ad1a-416d-9553-d21b23882c22:indexpattern-datasource-layer-21816ba6-c606-4532-9362-64890b01b81c",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "4a2b88af-ad1a-416d-9553-d21b23882c22:6778cb9a-4889-4d55-8300-0bd7584950f3",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "4a2b88af-ad1a-416d-9553-d21b23882c22:0d3528e5-e4b0-430d-8ed3-7c63b8bdb5cb",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "bc6b147a-bd41-4f00-affe-4a7b7fbaab7a:layer_1_source_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "a841d405-e28f-4eea-b7a4-5cfc0299a0c6:indexpattern-datasource-layer-75cb4ead-3ea9-4a50-b9e3-93a364e95f02",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "a841d405-e28f-4eea-b7a4-5cfc0299a0c6:d110f063-ba9b-4d7e-9d00-124ef79bf704",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "controlGroup_9d6785f0-b96d-4e35-8c17-3d7c90855bd2:optionsListDataView",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "dashboard",
+    "typeMigrationVersion": "8.9.0",
+    "updated_at": "2024-03-26T07:09:58.704Z",
+    "version": "Wzk3MjAsMl0="
+}
