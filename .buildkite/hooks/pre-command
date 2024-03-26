@@ -83,11 +83,8 @@ ENABLED_BEATS_PIPELINES_SLUGS=(
 
 for slug in "${ENABLED_BEATS_PIPELINES_SLUGS[@]}"; do
   if [[ "$BUILDKITE_PIPELINE_SLUG" == "$slug" ]]; then
-    if [[ "${BUILDKITE_COMMAND}" =~ ^buildkite-agent ]]; then
-      echo "Skipped pre-command when running the Upload pipeline"
-      exit 0
-    fi
     source .buildkite/scripts/setenv.sh
+    break
   fi
 done
 
