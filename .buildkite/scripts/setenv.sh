@@ -31,8 +31,9 @@ export GCP_DEFAULT_MACHINE_TYPE="c2d-highcpu-8"
 export GCP_HI_PERF_MACHINE_TYPE="c2d-highcpu-16"
 export GCP_WIN_MACHINE_TYPE="n2-standard-8"
 export AWS_ARM_INSTANCE_TYPE="t4g.xlarge"
-export WORKSPACE=${WORKSPACE:-"$(pwd)"}
 
+WORKSPACE=${WORKSPACE:-"$(pwd)"}
+export WORKSPACE
 GO_VERSION=$(cat .go-version)
 export GO_VERSION
 
@@ -51,7 +52,9 @@ exportVars() {
         export GOX_FLAGS="-arch 386"
         export testResults="**\\build\\TEST*.xml"
         export artifacts="**\\build\\TEST*.out"
-        export MAGEFILE_CACHE="$WORKSPACE/$BEATS_PROJECT_NAME/.magefile"
+        $WORKSPACE_WIN=${WORKSPACE//\//\\\\}
+        $MAGEFILE="$WORKSPACE_WIN\\$BEATS_PROJECT_NAME\\.magefile"
+        export MAGEFILE_CACHE=$MAGEFILE
         ;;
     esac
   elif [[ "${arch_type}" == "aarch64" || "${arch_type}" == "arm64" ]]; then
