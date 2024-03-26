@@ -47,7 +47,6 @@ exportVars() {
         export artifacts="**/build/TEST*.out"
         ;;
       MINGW*)
-        export CGO_ENABLED=1
         export GOX_FLAGS="-arch 386"
         export testResults="**\\build\\TEST*.xml"
         export artifacts="**\\build\\TEST*.out"
