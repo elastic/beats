@@ -186,6 +186,9 @@ func addKey(store keystore.Keystore, keys []string, force, stdin bool) error {
 
 	key := strings.TrimSpace(keys[0])
 	value, err := store.Retrieve(key)
+	if err != nil {
+		return fmt.Errorf("error retrieving key: %w", err)
+	}
 	if value != nil && force == false {
 		if stdin == true {
 			return fmt.Errorf("the settings %s already exist in the keystore use `--force` to replace it", key)
