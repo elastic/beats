@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+env:
+  # this is required in order to allow the build process to override the default PWD of the BEAT_NAME.
+  BEAT_NAME: "elastic-agent"
+  # after moving elastic-agent out of beats, we should update the URL of the packaging.
+  BEAT_URL: "https://www.elastic.co/elastic-agent"
+  DRA_PROJECT_ID: "elastic-agent-core"
+  DRA_PROJECT_ARTIFACT_ID: "agent-core"
+  ASDF_MAGE_VERSION: 1.15.0
+
+steps:
+  - group: ":beats: DRA Elastic-Agent Core Snapshot :beats:"
+    key: "dra-core-snapshot"
+    if: build.branch == '7.17' || build.branch =~ /^[0-9]+\.[0-9]+\$/ || build.env("RUN_SNAPSHOT") == "true"
+    steps:
+      - label: ":package: Build Elastic-Agent Core Snapshot"
+        commands:
+          - .buildkite/x-pack/elastic-agent/scripts/steps/build-agent-core.sh
+        key: "build-dra-snapshot"
+        artifact_paths:
+          - "x-pack/elastic-agent/build/distributions/**/*"
+        agents:
+          provider: "gcp"
+          machineType: "c2-standard-16"
+          image: "family/platform-ingest-beats-ubuntu-2204"
+        env:
+          DRA_WORKFLOW: "snapshot"
+
+      - wait
+
+      - label: ":hammer: DRA Publish Elastic-Agent Core Snapshot"
+        command: |
+          echo "+++ Restoring Artifacts"
+          buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" .
+          echo "+++ Changing permissions for the release manager"
+          sudo chown -R :1000 x-pack/elastic-agent/build/distributions/
+          sudo chmod -R 775 x-pack/elastic-agent/build/distributions/
+          echo "+++ Running DRA publish step"
+          .buildkite/x-pack/elastic-agent/scripts/steps/dra-publish.sh
+        key: "publish-dra-snapshot"
+        agents:
+          provider: "gcp"
+          # machineType: "c2-standard-16"
+          # image: "family/platform-ingest-beats-ubuntu-2204"
+        env:
+          DRA_WORKFLOW: "snapshot"
+
+  - group: ":beats: DRA Elastic-Agent Core Staging :beats:"
+    key: "dra-core-staging"
+    if: build.branch == '7.17' || build.env("RUN_STAGING") == "true"
+    steps:
+      - label: ":package: Build Elastic-Agent Core staging"
+        commands:
+          - .buildkite/x-pack/elastic-agent/scripts/steps/build-agent-core.sh
+        key: "build-dra-staging"
+        artifact_paths:
+          - "x-pack/elastic-agent/build/distributions/**/*"
+        agents:
+          provider: "gcp"
+          machineType: "c2-standard-16"
+          image: "family/platform-ingest-beats-ubuntu-2204"
+        env:
+          DRA_WORKFLOW: "staging"
+
+      - wait
+
+      - label: ":hammer: DRA Publish Elastic-Agent Core staging"
+        command: |
+          echo "+++ Restoring Artifacts"
+          buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" .
+          echo "+++ Changing permissions for the release manager"
+          sudo chown -R :1000 x-pack/elastic-agent/build/distributions/
+          sudo chmod -R 775 x-pack/elastic-agent/build/distributions/
+          echo "+++ Running DRA publish step"
+          .buildkite/x-pack/elastic-agent/scripts/steps/dra-publish.sh
+        key: "publish-dra-staging"
+        agents:
+          provider: "gcp"
+          # machineType: "c2-standard-16"
+          # image: "family/platform-ingest-beats-ubuntu-2204"
+        env:
+          DRA_WORKFLOW: "staging"
+
+notify:
+  - slack: "#ingest-notifications"
