@@ -99,6 +99,13 @@ The default is 0.
 by memory. The processes are sorted by the `system.process.memory.rss.bytes`
 field. The default is 0.
 
+*`process.track_network_data`*:: If enabled, this will add counters of 
+sent and received network bytes associated with the process.
+This feature has a few limitations: it may not be able to correctly gather network data from
+short-lived processes, and it may drop packets on high-load systems.
+In cases where were the target machine has lots of short-lived network connections,
+it may also cause metricbeat to use a larger than normal amount of CPU.
+
 [float]
 === Monitoring Hybrid Hierarchy Cgroups
 
