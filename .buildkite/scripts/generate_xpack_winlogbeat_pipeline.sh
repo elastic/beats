@@ -18,7 +18,10 @@ steps:
 
       - label: ":windows: Windows 2019 Unit (MODULE) Tests"
         key: "mandatory-win-2019-unit-tests"
-        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
+        command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path 'build'"
+          - "mage build unitTest"
         env:
           MODULE: $MODULE
         agents:
@@ -30,7 +33,10 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Windows 2016/2022 Unit Tests - {{matrix.image}}"
-        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
+        command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path 'build'"
+          - "mage build unitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -53,7 +59,10 @@ steps:
     steps:
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
+        command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path 'build'"
+          - "mage build unitTest"
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
@@ -90,7 +99,7 @@ if are_conditions_met_packaging; then
 
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: "mage -d $BEATS_PROJECT_NAME package"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"

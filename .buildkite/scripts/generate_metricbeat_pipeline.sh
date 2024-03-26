@@ -17,7 +17,7 @@ steps:
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -26,7 +26,7 @@ steps:
 
       - label: ":go: Go Intergration Tests"
         key: "mandatory-int-test"
-        command: "mage -d $BEATS_PROJECT_NAME goIntegTest"
+        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
         env:
           MODULE: $MODULE
         agents:
@@ -37,7 +37,7 @@ steps:
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
-        command: "mage -d $BEATS_PROJECT_NAME pythonIntegTest"
+        command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
         env:
           MODULE: $MODULE
         agents:
@@ -56,7 +56,10 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Windows 2016/2022 Unit Tests - {{matrix.image}}"
-        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
+        command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path 'build'"
+          - "mage build unitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -78,7 +81,10 @@ steps:
     key: "extended-win-tests"
     steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
+        command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path 'build'"
+          - "mage build unitTest"
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
@@ -131,7 +137,7 @@ if are_conditions_met_packaging; then
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: "mage -d $BEATS_PROJECT_NAME package"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -143,7 +149,7 @@ if are_conditions_met_packaging; then
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
-        command: "mage -d $BEATS_PROJECT_NAME package"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"

@@ -17,7 +17,7 @@ steps:
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: "mage -d $BEATS_PROJECT_NAME build unitTest"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -26,7 +26,7 @@ steps:
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: "mage -d $BEATS_PROJECT_NAME goIntegTest"
+        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -37,21 +37,24 @@ steps:
 # ## https://github.com/elastic/beats/issues/23957 and https://github.com/elastic/beats/issues/23958
 # ## waiting for being fixed.
 
-      # - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-      #   command: "mage -d $BEATS_PROJECT_NAME build unitTest"
-      #   key: "mandatory-win-unit-tests"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "{{matrix.image}}"
-      #     machineType: "${GCP_WIN_MACHINE_TYPE}"
-      #     disk_size: 100
-      #     disk_type: "pd-ssd"
-      #   matrix:
-      #     setup:
-      #       image:
-      #         - "${IMAGE_WIN_2016}"
-      #         - "${IMAGE_WIN_2022}"
-      #   artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+#       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+#         command:
+#           - "Set-Location -Path $BEATS_PROJECT_NAME"
+#           - "New-Item -ItemType Directory -Force -Path 'build'"
+#           - "mage build unitTest"
+#         key: "mandatory-win-unit-tests"
+#         agents:
+#           provider: "gcp"
+#           image: "{{matrix.image}}"
+#           machineType: "${GCP_WIN_MACHINE_TYPE}"
+#           disk_size: 100
+#           disk_type: "pd-ssd"
+#         matrix:
+#           setup:
+#             image:
+#               - "${IMAGE_WIN_2016}"
+#               - "${IMAGE_WIN_2022}"
+#         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 # ## TODO: this condition will be changed in the Phase 3 of the Migration Plan https://docs.google.com/document/d/1IPNprVtcnHlem-uyGZM0zGzhfUuFAh4LeSl9JFHMSZQ/edit#heading=h.sltz78yy249h
 
@@ -59,22 +62,25 @@ steps:
 #     key: "extended-win-tests"
 #     steps:
 
-      # - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-      #   command: "mage -d $BEATS_PROJECT_NAME build unitTest"
-      #   key: "extended-win-unit-tests"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "{{matrix.image}}"
-      #     machineType: "${GCP_WIN_MACHINE_TYPE}"
-      #     disk_size: 100
-      #     disk_type: "pd-ssd"
-      #   matrix:
-      #     setup:
-      #       image:
-      #         - "${IMAGE_WIN_10}"
-      #         - "${IMAGE_WIN_11}"
-      #         - "${IMAGE_WIN_2019}"
-      #   artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+#       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+#         command:
+#           - "Set-Location -Path $BEATS_PROJECT_NAME"
+#           - "New-Item -ItemType Directory -Force -Path 'build'"
+#           - "mage build unitTest"
+#         key: "extended-win-unit-tests"
+#         agents:
+#           provider: "gcp"
+#           image: "{{matrix.image}}"
+#           machineType: "${GCP_WIN_MACHINE_TYPE}"
+#           disk_size: 100
+#           disk_type: "pd-ssd"
+#         matrix:
+#           setup:
+#             image:
+#               - "${IMAGE_WIN_10}"
+#               - "${IMAGE_WIN_11}"
+#               - "${IMAGE_WIN_2019}"
+#         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
 else
@@ -114,7 +120,7 @@ if are_conditions_met_packaging; then
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: "mage -d $BEATS_PROJECT_NAME package"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -126,7 +132,7 @@ if are_conditions_met_packaging; then
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
-        command: "mage -d $BEATS_PROJECT_NAME package"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
