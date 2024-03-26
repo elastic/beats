@@ -1,2 +1,6 @@
 [mysqld]
 bind-address = 0.0.0.0
+require_secure_transport = OFF
+ssl-ca = /etc/certs/root-ca.pem
+ssl-cert = /etc/certs/server-cert.pem
+ssl-key = /etc/certs/server-key.pem
