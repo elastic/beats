@@ -20,6 +20,8 @@
 package procs
 
 import (
+	"net"
+
 	"github.com/elastic/beats/v7/packetbeat/protos/applayer"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -33,4 +35,8 @@ func procName(info types.ProcessInfo) string {
 // that owns them.
 func (proc *ProcessesWatcher) GetLocalPortToPIDMapping(transport applayer.Transport) (ports map[endpoint]int, err error) {
 	return nil, nil
+}
+
+func (proc *ProcessesWatcher) GetSingleLocalPortToPIDMapping(transport applayer.Transport, address net.IP, port uint16) (int, bool, error) {
+	return 0, false, nil
 }
