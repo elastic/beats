@@ -45,18 +45,20 @@ Example config:
     var.initial_interval: 1d
     var.api_version: 56
 
-    var.jwt_authentication_enabled: true
-
-    var.client_id: "my-client-id"
-    var.client_username: "my.email@here.com"
-    var.client_key_path: client_key.pem
-    var.jwt_url: https://login.salesforce.com
-
-    var.user_pass_authentication_enabled: true
-    var.client_secret: "my-client-secret"
-    var.token_url: "https://login.salesforce.com"
-    var.user: "my.email@here.com"
-    var.password: "password"
+    var.authentication:
+      jwt_bearer_flow:
+        enabled: false
+        client.id: "my-client-id"
+        client.username: "my.email@here.com"
+        client.key_path: client_key.pem
+        url: https://login.salesforce.com
+      user_password_flow:
+        enabled: true
+        client.id: "my-client-id"
+        client.secret: "my-client-secret"
+        token_url: "https://login.salesforce.com"
+        username: "my.email@here.com"
+        password: "password"
 
     var.url: "https://instance-url.salesforce.com"
 
@@ -78,39 +80,43 @@ The initial interval for the `login` fileset. It defines the time window in whic
 
 The API version of the Salesforce instance.
 
-*`var.jwt_authentication_enabled`*::
+*`var.authentication`*::
 
-Set to true if JWT authentication is enabled.
+Authentication configuration for Salesforce data collection. Current module supports JWT and User-Password authentication flows.
 
-*`var.client_username`*::
+*`var.authentication.jwt_bearer_flow.client.id`*::
+
+The client id for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.username`*::
 
 The username used for JWT authentication.
 
-*`var.client_key_path`*::
+*`var.authentication.jwt_bearer_flow.client.key_path`*::
 
 Path to the client key for JWT authentication.
 
-*`var.jwt_url`*::
+*`var.authentication.jwt_bearer_flow.jwt_url`*::
 
 The audience URL for JWT authentication.
 
-*`var.user_pass_authentication_enabled`*::
+*`var.authentication.user_password_flow.client.id`*::
 
-Set to false if user-password authentication is enabled.
+The client id for user-password authentication.
 
-*`var.client_secret`*::
+*`var.authentication.user_password_flow.client.secret`*::
 
 The client secret for user-password authentication.
 
-*`var.token_url`*::
+*`var.authentication.user_password_flow.token_url`*::
 
 The token URL for user-password authentication.
 
-*`var.user`*::
+*`var.authentication.user_password_flow.username`*::
 
-The user used for user-password authentication.
+The username used for user-password authentication.
 
-*`var.password`*::
+*`var.authentication.user_password_flow.password`*::
 
 The password used for user-password authentication.
 
@@ -151,18 +157,20 @@ Example config:
     var.initial_interval: 1d
     var.api_version: 56
 
-    var.jwt_authentication_enabled: true
-
-    var.client_id: "my-client-id"
-    var.client_username: "my.email@here.com"
-    var.client_key_path: client_key.pem
-    var.jwt_url: https://login.salesforce.com
-
-    var.user_pass_authentication_enabled: true
-    var.client_secret: "my-client-secret"
-    var.token_url: "https://login.salesforce.com"
-    var.user: "my.email@here.com"
-    var.password: "password"
+    var.authentication:
+      jwt_bearer_flow:
+        enabled: false
+        client.id: "my-client-id"
+        client.username: "my.email@here.com"
+        client.key_path: client_key.pem
+        url: https://login.salesforce.com
+      user_password_flow:
+        enabled: true
+        client.id: "my-client-id"
+        client.secret: "my-client-secret"
+        token_url: "https://login.salesforce.com"
+        username: "my.email@here.com"
+        password: "password"
 
     var.url: "https://instance-url.salesforce.com"
 
@@ -184,39 +192,43 @@ The initial interval for the `logout` fileset. It defines the time window in whi
 
 The API version of the Salesforce instance.
 
-*`var.jwt_authentication_enabled`*::
+*`var.authentication`*::
 
-Set to true if JWT authentication is enabled.
+Authentication configuration for Salesforce data collection. Current module supports JWT and User-Password authentication flows.
 
-*`var.client_username`*::
+*`var.authentication.jwt_bearer_flow.client.id`*::
+
+The client id for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.username`*::
 
 The username used for JWT authentication.
 
-*`var.client_key_path`*::
+*`var.authentication.jwt_bearer_flow.client.key_path`*::
 
 Path to the client key for JWT authentication.
 
-*`var.jwt_url`*::
+*`var.authentication.jwt_bearer_flow.jwt_url`*::
 
 The audience URL for JWT authentication.
 
-*`var.user_pass_authentication_enabled`*::
+*`var.authentication.user_password_flow.client.id`*::
 
-Set to false if user-password authentication is enabled.
+The client id for user-password authentication.
 
-*`var.client_secret`*::
+*`var.authentication.user_password_flow.client.secret`*::
 
 The client secret for user-password authentication.
 
-*`var.token_url`*::
+*`var.authentication.user_password_flow.token_url`*::
 
 The token URL for user-password authentication.
 
-*`var.user`*::
+*`var.authentication.user_password_flow.username`*::
 
-The user used for user-password authentication.
+The username used for user-password authentication.
 
-*`var.password`*::
+*`var.authentication.user_password_flow.password`*::
 
 The password used for user-password authentication.
 
@@ -257,18 +269,20 @@ Example config:
     var.initial_interval: 1d
     var.api_version: 56
 
-    var.jwt_authentication_enabled: true
-
-    var.client_id: "my-client-id"
-    var.client_username: "my.email@here.com"
-    var.client_key_path: client_key.pem
-    var.jwt_url: https://login.salesforce.com
-
-    var.user_pass_authentication_enabled: true
-    var.client_secret: "my-client-secret"
-    var.token_url: "https://login.salesforce.com"
-    var.user: "my.email@here.com"
-    var.password: "password"
+    var.authentication:
+      jwt_bearer_flow:
+        enabled: false
+        client.id: "my-client-id"
+        client.username: "my.email@here.com"
+        client.key_path: client_key.pem
+        url: https://login.salesforce.com
+      user_password_flow:
+        enabled: true
+        client.id: "my-client-id"
+        client.secret: "my-client-secret"
+        token_url: "https://login.salesforce.com"
+        username: "my.email@here.com"
+        password: "password"
 
     var.url: "https://instance-url.salesforce.com"
 
@@ -286,39 +300,43 @@ The initial interval for the `logout` fileset. It defines the time window in whi
 
 The API version of the Salesforce instance.
 
-*`var.jwt_authentication_enabled`*::
+*`var.authentication`*::
 
-Set to true if JWT authentication is enabled.
+Authentication configuration for Salesforce data collection. Current module supports JWT and User-Password authentication flows.
 
-*`var.client_username`*::
+*`var.authentication.jwt_bearer_flow.client.id`*::
+
+The client id for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.username`*::
 
 The username used for JWT authentication.
 
-*`var.client_key_path`*::
+*`var.authentication.jwt_bearer_flow.client.key_path`*::
 
 Path to the client key for JWT authentication.
 
-*`var.jwt_url`*::
+*`var.authentication.jwt_bearer_flow.jwt_url`*::
 
 The audience URL for JWT authentication.
 
-*`var.user_pass_authentication_enabled`*::
+*`var.authentication.user_password_flow.client.id`*::
 
-Set to false if user-password authentication is enabled.
+The client id for user-password authentication.
 
-*`var.client_secret`*::
+*`var.authentication.user_password_flow.client.secret`*::
 
 The client secret for user-password authentication.
 
-*`var.token_url`*::
+*`var.authentication.user_password_flow.token_url`*::
 
 The token URL for user-password authentication.
 
-*`var.user`*::
+*`var.authentication.user_password_flow.username`*::
 
-The user used for user-password authentication.
+The username used for user-password authentication.
 
-*`var.password`*::
+*`var.authentication.user_password_flow.password`*::
 
 The password used for user-password authentication.
 
@@ -348,18 +366,20 @@ Example config:
     var.log_file_interval: Hourly
     var.api_version: 56
 
-    var.jwt_authentication_enabled: true
-
-    var.client_id: "my-client-id"
-    var.client_username: "my.email@here.com"
-    var.client_key_path: client_key.pem
-    var.jwt_url: https://login.salesforce.com
-
-    var.user_pass_authentication_enabled: true
-    var.client_secret: "my-client-secret"
-    var.token_url: "https://login.salesforce.com"
-    var.user: "my.email@here.com"
-    var.password: "password"
+    var.authentication:
+      jwt_bearer_flow:
+        enabled: false
+        client.id: "my-client-id"
+        client.username: "my.email@here.com"
+        client.key_path: client_key.pem
+        url: https://login.salesforce.com
+      user_password_flow:
+        enabled: true
+        client.id: "my-client-id"
+        client.secret: "my-client-secret"
+        token_url: "https://login.salesforce.com"
+        username: "my.email@here.com"
+        password: "password"
 
     var.url: "https://instance-url.salesforce.com"
 
@@ -378,39 +398,43 @@ The initial interval for the `logout` fileset. It defines the time window in whi
 
 The API version of the Salesforce instance.
 
-*`var.jwt_authentication_enabled`*::
+*`var.authentication`*::
 
-Set to true if JWT authentication is enabled.
+Authentication configuration for Salesforce data collection. Current module supports JWT and User-Password authentication flows.
 
-*`var.client_username`*::
+*`var.authentication.jwt_bearer_flow.client.id`*::
+
+The client id for JWT authentication.
+
+*`var.authentication.jwt_bearer_flow.client.username`*::
 
 The username used for JWT authentication.
 
-*`var.client_key_path`*::
+*`var.authentication.jwt_bearer_flow.client.key_path`*::
 
 Path to the client key for JWT authentication.
 
-*`var.jwt_url`*::
+*`var.authentication.jwt_bearer_flow.jwt_url`*::
 
 The audience URL for JWT authentication.
 
-*`var.user_pass_authentication_enabled`*::
+*`var.authentication.user_password_flow.client.id`*::
 
-Set to false if user-password authentication is enabled.
+The client id for user-password authentication.
 
-*`var.client_secret`*::
+*`var.authentication.user_password_flow.client.secret`*::
 
 The client secret for user-password authentication.
 
-*`var.token_url`*::
+*`var.authentication.user_password_flow.token_url`*::
 
 The token URL for user-password authentication.
 
-*`var.user`*::
+*`var.authentication.user_password_flow.username`*::
 
-The user used for user-password authentication.
+The username used for user-password authentication.
 
-*`var.password`*::
+*`var.authentication.user_password_flow.password`*::
 
 The password used for user-password authentication.
 

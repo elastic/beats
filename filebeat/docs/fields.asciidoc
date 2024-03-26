@@ -125100,11 +125100,10 @@ Fileset for ingesting Salesforce Apex logs.
 
 
 
-*`salesforce.access_mode`*::
+*`salesforce.instance_url`*::
 +
 --
-The mode of collecting logs from Salesforce - "rest" or "stream".
-
+The Instance URL of the Salesforce instance.
 
 type: keyword
 
@@ -125116,6 +125115,16 @@ type: keyword
 Fileset for ingesting Salesforce Apex logs.
 
 
+
+*`salesforce.apex.document_id`*::
++
+--
+Unique Id.
+
+
+type: keyword
+
+--
 
 *`salesforce.apex.action`*::
 +
@@ -125585,20 +125594,62 @@ Fileset for ingesting Salesforce Login (REST) logs.
 
 
 
-*`salesforce.login.api_type`*::
+*`salesforce.login.document_id`*::
 +
 --
-The type of API request.
+Unique Id.
 
 
 type: keyword
 
 --
 
-*`salesforce.login.api_version`*::
+*`salesforce.login.application`*::
 +
 --
-The version of the API that’s being used.
+The application used to access the org. Possible values include: AppExchange, Browser, Salesforce for iOS, Salesforce Developers API Explorer, N/A
+
+
+type: keyword
+
+--
+
+
+*`salesforce.login.api.type`*::
++
+--
+The type of Salesforce API request.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.api.version`*::
++
+--
+The version of the Salesforce API that's being used.
+
+
+type: keyword
+
+--
+
+
+*`salesforce.login.auth.service_id`*::
++
+--
+The authentication method used by a third-party identification provider for an OpenID Connect single sign-on protocol.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.auth.method_reference`*::
++
+--
+The authentication method used by a third-party identification provider for an OpenID Connect single sign-on protocol. This field is available in API version 51.0 and later.
 
 
 type: keyword
@@ -125615,10 +125666,10 @@ type: keyword
 
 --
 
-*`salesforce.login.authentication_method_reference`*::
+*`salesforce.login.client_version`*::
 +
 --
-The authentication method used by a third-party identification provider for an OpenID Connect single sign-on protocol. This field is available in API version 51.0 and later.
+The version number of the login client. If no version number is available, “Unknown” is returned.
 
 
 type: keyword
@@ -125645,7 +125696,7 @@ type: keyword
 
 --
 
-*`salesforce.login.db_total_time`*::
+*`salesforce.login.db_total.time`*::
 +
 --
 The time in nanoseconds for a database round trip. Includes time spent in the JDBC driver, network to the database, and DB_CPU_TIME. Compare this field to CPU_TIME to determine whether performance issues are occurring in the database layer or in your own code.
@@ -125725,6 +125776,26 @@ type: keyword
 
 --
 
+*`salesforce.login.evaluation_time`*::
++
+--
+The amount of time it took to evaluate the transaction security policy, in milliseconds.
+
+
+type: keyword
+
+--
+
+*`salesforce.login.login_type`*::
++
+--
+The type of login used to access the session.
+
+
+type: keyword
+
+--
+
 [float]
 === salesforce.logout
 
@@ -125732,10 +125803,31 @@ Fileset for parsing Salesforce Logout (REST) logs.
 
 
 
-*`salesforce.logout.session_level`*::
+*`salesforce.logout.document_id`*::
 +
 --
-Indicates the session-level security of the session that the user is logging out of for this event. Session-level security controls user access to features that support it, such as connected apps and reporting. Possible values are: HIGH_ASSURANCE, LOW, STANDARD
+Unique Id.
+
+
+type: keyword
+
+--
+
+
+*`salesforce.logout.session.level`*::
++
+--
+The security level of the session that was used when logging out (e.g. Standard Session or High-Assurance Session).
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.session.type`*::
++
+--
+The session type that was used when logging out (e.g. API, Oauth2 or UI).
 
 
 type: keyword
@@ -125752,20 +125844,21 @@ type: keyword
 
 --
 
-*`salesforce.logout.api_type`*::
+
+*`salesforce.logout.api.type`*::
 +
 --
-The type of API request.
+The type of Salesforce API request.
 
 
 type: keyword
 
 --
 
-*`salesforce.logout.api_version`*::
+*`salesforce.logout.api.version`*::
 +
 --
-The version of the API that’s being used.
+The version of the Salesforce API that's being used.
 
 
 type: keyword
@@ -125842,16 +125935,6 @@ type: keyword
 
 --
 
-*`salesforce.logout.session_type`*::
-+
---
-The session type that was used when logging out.
-
-
-type: keyword
-
---
-
 *`salesforce.logout.user_id_derived`*::
 +
 --
@@ -125872,12 +125955,42 @@ type: keyword
 
 --
 
+*`salesforce.logout.created_by_id`*::
++
+--
+Unavailable
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.event_identifier`*::
++
+--
+This field is populated only when the activity that this event monitors requires extra authentication, such as multi-factor authentication. In this case, Salesforce generates more events and sets the RelatedEventIdentifier field of the new events to the value of the EventIdentifier field of the original event. Use this field with the EventIdentifier field to correlate all the related events. If no extra authentication is required, this field is blank.
+
+
+type: keyword
+
+--
+
 [float]
 === salesforce.setup_audit_trail
 
 Fileset for ingesting Salesforce SetupAuditTrail logs.
 
 
+
+*`salesforce.setup_audit_trail.document_id`*::
++
+--
+Unique Id.
+
+
+type: keyword
+
+--
 
 *`salesforce.setup_audit_trail.event_type`*::
 +
@@ -125933,6 +126046,16 @@ type: keyword
 +
 --
 The full description of changes made in Setup. For example, if the Action field has a value of PermSetCreate, the Display field has a value like “Created permission set MAD: with user license Salesforce.
+
+
+type: keyword
+
+--
+
+*`salesforce.setup_audit_trail.event_type`*::
++
+--
+Event type.
 
 
 type: keyword
