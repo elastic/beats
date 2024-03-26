@@ -410,7 +410,7 @@ func TestFileStore(t *testing.T) {
 				var e CacheEntry
 				err = dec.Decode(&e)
 				if err != nil {
-					if !errors.Is(err, io.EOF) {
+					if err != io.EOF {
 						t.Fatalf("unexpected error reading persisted cache data: %v", err)
 					}
 					break
