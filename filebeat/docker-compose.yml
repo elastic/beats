@@ -46,6 +46,6 @@ services:
       - 1883:1883
 
   redis:
-    build: ${PWD}/input/redis/_meta
+    build: ${ES_BEATS}/filebeat/input/redis/_meta
     ports:
       - 6379:6379

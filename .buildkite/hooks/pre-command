@@ -21,6 +21,8 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == 
     git reset --quiet --hard
   fi
 
+  # Images with prefix "platform-ingest-beats-*" has Go pre-setup.
+  # Image itself takes care of Go version download/installation based on .go-version file
   if [[ "$BUILDKITE_STEP_KEY" == macos* ]]; then
     if [[ -z "${GO_VERSION-""}" ]]; then
       GO_VERSION=$(cat "${WORKSPACE}/.go-version")
