@@ -158,13 +158,13 @@ fi
 echo "Check and add the Packaging into the pipeline"
 if are_conditions_met_packaging; then
 cat >> $pipelineName <<- YAML
-    - group: "Packaging"
-      key: "packaging"      
-      depends_on:
-        - "mandatory-tests"
-      steps:
-        - label: Package pipeline
-          commands: ".buildkite/scripts/packaging/package-step.sh"
+  - group: "Packaging"
+    key: "packaging"      
+    depends_on:
+      - "mandatory-tests"
+    steps:
+      - label: Package pipeline
+        commands: ".buildkite/scripts/packaging/package-step.sh"
 
 YAML
 fi
