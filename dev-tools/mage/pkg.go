@@ -35,6 +35,7 @@ import (
 // Package packages the Beat for distribution. It generates packages based on
 // the set of target platforms and registered packaging specifications.
 func Package() error {
+
 	if len(Platforms) == 0 {
 		fmt.Println(">> package: Skipping because the platform list is empty")
 		return nil
