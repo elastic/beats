@@ -94,7 +94,7 @@ By default, {beatname_uc} identifies files based on their inodes and
 device IDs. However, on network shares and cloud providers these
 values might change during the lifetime of the file. If this happens
 {beatname_uc} thinks that file is new and resends the whole content
-of the file. To solve this problem you can configure `file_identity` option. Possible
+of the file. To solve this problem you can configure the `file_identity` option. Possible
 values besides the default `inode_deviceid` are `path`, `inode_marker` and `fingerprint`.
 
 WARNING: Changing `file_identity` methods between runs may result in

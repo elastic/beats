@@ -1,0 +1,41 @@
+[id="{beatname_lc}-modules"]
+[role="xpack"]
+= Modules
+
+[partintro]
+--
+This section contains detailed information about the available network packet
+log processing modules contained in {beatname_uc}.
+
+{beatname_uc} modules are implemented using Elasticsearch Ingest Node pipelines.
+The events receive their transformations within Elasticsearch. All events are
+sent through {beatname_uc}'s "routing" pipeline that routes events to specific
+module pipelines based on their network protocol.
+
+{beatname_uc}'s default config file contains the option to send all events to
+the routing pipeline. If you remove this option then the module processing
+will not be applied.
+
+[source,yaml,subs="attributes"]
+----
+output.elasticsearch.pipeline: packetbeat-%{[agent.version]}-routing
+----
+
+The general goal of each module is to transform events by renaming fields to
+comply with the {ecs-ref}/index.html[Elastic Common Schema] (ECS). The modules
+may also apply additional categorization, tagging, and parsing as necessary.
+about how to configure the language in `packetbeat`, refer to <<configuration-packetbeat-options>>.
+
+[id="{beatname_lc}-modules-setup"]
+[float]
+=== Setup of Ingest Node pipelines
+
+{beatname_uc}'s Ingest Node pipelines must be installed to Elasticsearch if you
+want to apply the module processing to events. The simplest way to get started
+is to use the Elasticsearch output and {beatname_uc} will automatically install
+the pipelines when it first connects to Elasticsearch.
+
+Installation Methods
+
+1. <<{beatname_lc}-load-pipeline-auto>>
+2. <<{beatname_lc}-load-pipeline-manual>>

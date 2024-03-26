@@ -462,6 +462,12 @@ disabled, flows are still reported once being timed out. The default value is
 10s.
 
 [float]
+==== `enable_delta_flow_reports`
+
+Configure network.bytes and network.packets to be a delta
+value instead of a cumlative sum for each flow period. The default value is false.
+
+[float]
 [[packetbeat-configuration-flows-fields]]
 ==== `fields`
 
@@ -1650,3 +1656,12 @@ Example configuration:
 -------------------------------------------------------------------------------------
 packetbeat.shutdown_timeout: 5s
 -------------------------------------------------------------------------------------
+
+[float]
+==== `overwrite_pipelines`
+
+By default Ingest pipelines are not updated if a pipeline with the same ID
+already exists. If this option is enabled {beatname_uc} overwrites pipelines
+every time a new Elasticsearch connection is established.
+
+The default value is `false`.

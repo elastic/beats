@@ -18,8 +18,8 @@ CHANGELOG*
 /go.sum @elastic/beats-tech-leads
 /NOTICE.txt @elastic/beats-tech-leads
 
-/.ci/ @elastic/elastic-agent-data-plane
-/.github/ @elastic/elastic-agent-data-plane
+/.ci/ @elastic/elastic-agent-data-plane @elastic/ingest-eng-prod
+/.github/ @elastic/ingest-eng-prod
 /auditbeat/ @elastic/sec-linux-platform
 /deploy/ @elastic/elastic-agent-data-plane
 /deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/obs-cloudnative-monitoring
@@ -68,6 +68,7 @@ CHANGELOG*
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /metricbeat/helper/kubernetes @elastic/obs-cloudnative-monitoring
+/metricbeat/module/aerospike @elastic/obs-infraobs-integrations
 /metricbeat/module/apache @elastic/obs-infraobs-integrations
 /metricbeat/module/beat/ @elastic/stack-monitoring
 /metricbeat/module/ceph @elastic/obs-infraobs-integrations
@@ -112,6 +113,7 @@ CHANGELOG*
 /x-pack/filebeat/input/cel/ @elastic/security-service-integrations
 /x-pack/filebeat/input/cometd/ @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/entityanalytics/ @elastic/security-service-integrations
+/x-pack/filebeat/input/etw/ @elastic/sec-windows-platform
 /x-pack/filebeat/input/gcppubsub/ @elastic/security-service-integrations
 /x-pack/filebeat/input/gcs/ @elastic/security-service-integrations
 /x-pack/filebeat/input/http_endpoint/ @elastic/security-service-integrations
@@ -121,6 +123,7 @@ CHANGELOG*
 /x-pack/filebeat/input/lumberjack/ @elastic/security-service-integrations
 /x-pack/filebeat/input/netflow/ @elastic/sec-deployment-and-devices
 /x-pack/filebeat/input/o365audit/ @elastic/security-service-integrations
+/x-pack/filebeat/input/websocket/ @elastic/security-service-integrations
 /x-pack/filebeat/module/activemq @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/aws @elastic/obs-cloud-monitoring
 /x-pack/filebeat/module/awsfargate @elastic/obs-cloud-monitoring
@@ -173,6 +176,8 @@ CHANGELOG*
 /x-pack/filebeat/modules.d/zoom.yml.disabled @elastic/security-service-integrations
 /x-pack/filebeat/processors/decode_cef/ @elastic/sec-deployment-and-devices
 /x-pack/heartbeat/ @elastic/obs-ds-hosted-services
+/x-pack/libbeat/reader/parquet/ @elastic/security-service-integrations
+/x-pack/libbeat/reader/etw/ @elastic/sec-windows-platform
 /x-pack/metricbeat/ @elastic/elastic-agent-data-plane
 /x-pack/metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /x-pack/metricbeat/module/activemq @elastic/obs-infraobs-integrations
@@ -219,4 +224,9 @@ CHANGELOG*
 /x-pack/osquerybeat/ @elastic/sec-deployment-and-devices
 /x-pack/packetbeat/ @elastic/sec-linux-platform
 /x-pack/winlogbeat/ @elastic/sec-windows-platform
-/x-pack/libbeat/reader/parquet/ @elastic/security-service-integrations
+
+# Ownership of CI or related files by the Ingest Eng Prod team
+/.buildkite @elastic/ingest-eng-prod
+/catalog-info.yml @elastic/ingest-eng-prod
+/libbeat/scripts @elastic/ingest-eng-prod
+/metricbeat/tests @elastic/ingest-eng-prod

@@ -1172,6 +1172,18 @@ metricbeat.modules:
   # By setting raw to true, all raw fields from the status metricset will be added to the event.
   #raw: false
 
+  # Optional SSL/TLS. By default is false.
+  #ssl.enabled: true
+
+  # List of root certificates for SSL/TLS server verification
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.crt"]
+
+  # Certificate for SSL/TLS client authentication
+  #ssl.certificate: "/etc/pki/client/cert.crt"
+
+  # Client certificate key file
+  #ssl.key: "/etc/pki/client/cert.key"
+
 #--------------------------------- NATS Module ---------------------------------
 - module: nats
   metricsets:
@@ -2762,9 +2774,9 @@ setup.template.settings:
 # to load your own lifecycle policy.
 #setup.ilm.policy_file:
 
-# Disable the check for an existing lifecycle policy. The default is true. If
-# you disable this check, set setup.ilm.overwrite: true so the lifecycle policy
-# can be installed.
+# Disable the check for an existing lifecycle policy. The default is true.
+# If you set this option to false, lifecycle policy will not be installed,
+# even if setup.ilm.overwrite is set to true.
 #setup.ilm.check_exists: true
 
 # Overwrite the lifecycle policy at startup. The default is false.
