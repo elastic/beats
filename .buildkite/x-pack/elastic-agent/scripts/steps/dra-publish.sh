@@ -2,6 +2,10 @@
 
 set -uo pipefail
 
+SNAPSHOT=""
+
+BEAT_VERSION=$(grep -oE '[0-9]+\.[0-9]+\.[0-9]+(\-[a-zA-Z]+[0-9]+)?' "libbeat/version/version.go")
+
 DRY_RUN="${DRA_DRY_RUN:=""}"
 WORKFLOW="${DRA_WORKFLOW:=""}"
 COMMIT="${DRA_COMMIT:="${BUILDKITE_COMMIT:=""}"}"
@@ -11,9 +15,9 @@ CI_DRA_ROLE_PATH="kv/ci-shared/release/dra-role"
 
 # force main branch on PR's or it won't execute
 # because the PR branch does not have a project folder in release-manager
-if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" ]]; then
+if  [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" || "$BUILDKITE_BRANCH" == "xpack_agent_core_publish" ]]; then
     BRANCH=7.17
-    DRY_RUN="--dry-run"
+    # DRY_RUN="--dry-run"
     echo "+++ Running in PR or test branch and setting branch 7.17 and --dry-run"
 fi
 
@@ -35,6 +39,26 @@ if [[ -z "${BRANCH:-""}" ]]; then
   echo "+++ Missing DRA_BRANCH";
   exit 1
 fi
+
+## TODO: common.sh fails when the job is triggered manually
+retry() {
+  local retries=$1
+  shift
+  local count=0
+  until "$@"; do
+    exit=$?
+    wait=$((2 ** count))
+    count=$((count + 1))
+    if [ $count -lt "$retries" ]; then
+      >&2 echo "Retry $count/$retries exited $exit, retrying in $wait seconds..."
+      sleep $wait
+    else
+      >&2 echo "Retry $count/$retries exited $exit, no more retries left."
+      return $exit
+    fi
+  done
+  return 0
+}
 
 function release_manager_login {
   DRA_CREDS_SECRET=$(retry 5 vault kv get -field=data -format=json ${CI_DRA_ROLE_PATH})
