@@ -35,7 +35,7 @@ type config struct {
 	SessionName string `config:"session_name"`
 	// TraceLevel filters all provider events with a level value
 	// that is less than or equal to this level.
-	// Allowed values are critical, error, warning, informational, and verbose.
+	// Allowed values are critical, error, warning, information, and verbose.
 	TraceLevel string `config:"trace_level"`
 	// MatchAnyKeyword is an 8-byte bitmask that enables the filtering of
 	// events from specific provider subcomponents. The provider will write
