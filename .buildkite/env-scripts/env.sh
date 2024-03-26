@@ -25,10 +25,13 @@ SETUP_WIN_PYTHON_VERSION="3.11.0"
 # Docker & DockerHub
 DOCKER_COMPOSE_VERSION="1.21.0"
 DOCKER_REGISTRY="docker.elastic.co"
-
 ONLY_DOCS=$(changeset_applies "$DOCS_CHANGESET")
+
 PACKAGING_CHANGES=$(changeset_applies "$PACKAGING_CHANGESET")
 GO_MOD_CHANGES=$(changeset_applies "^go.mod")
+
+KIND_VERSION="v0.20.0"
+KUBECONFIG="${WORKSPACE}/kubecfg"
 
 export REPO
 export WORKSPACE
@@ -51,3 +54,8 @@ export DOCKER_REGISTRY
 export ONLY_DOCS
 export PACKAGING_CHANGES
 export GO_MOD_CHANGES
+
+export KIND_VERSION
+export KUBECONFIG
+
+add_bin_path
