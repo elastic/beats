@@ -9,6 +9,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Breaking changes
 
 *Affecting all Beats*
+- Improve Beat `test output` command to honor proxy_url setting for output.logstash and output.elasticsearch. {issue}24751[24751] {pull}36715[36715]
 
 - Upgrade to Go 1.21.8. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}38209[38209]
 - add_cloud_metadata processor: `huawei` provider is now treated as `openstack`. Huawei cloud runs on OpenStack
