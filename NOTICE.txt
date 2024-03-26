@@ -15434,11 +15434,11 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-ucfg@v0.8.7/
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/gosigar
-Version: v0.14.2
+Version: v0.14.3
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/gosigar@v0.14.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/gosigar@v0.14.3/LICENSE:
 
                               Apache License
                         Version 2.0, January 2004
@@ -15645,11 +15645,11 @@ limitations under the License.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/mito
-Version: v1.9.0
+Version: v1.10.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.9.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.10.0/LICENSE:
 
 
                                  Apache License
