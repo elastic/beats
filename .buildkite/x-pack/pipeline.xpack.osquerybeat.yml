@@ -1,0 +1,50 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+name: "beats-xpack-osquerybeat"
+
+env:
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_WIN_10: "family/general-windows-10"
+  IMAGE_WIN_11: "family/general-windows-11"
+  IMAGE_WIN_2016: "family/core-windows-2016"
+  IMAGE_WIN_2019: "family/core-windows-2019"
+  IMAGE_WIN_2022: "family/core-windows-2022"
+  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  BEATS_PROJECT_NAME: "x-pack/osquerybeat"
+
+steps:
+
+  - input: "Input Parameters"
+    key: "force-run-stages"
+    fields:
+    - select: "Osquerybeat - run_xpack_osquerybeat"
+      key: "run_xpack_osquerybeat"
+      options:
+        - label: "True"
+          value: "true"
+        - label: "False"
+          value: "false"
+      default: "false"
+    - select: "Osquerybeat - run_xpack_osquerybeat_macos_tests"
+      key: "run_xpack_osquerybeat_macos_tests"
+      options:
+        - label: "True"
+          value: "true"
+        - label: "False"
+          value: "false"
+      default: "false"
+
+    if: "build.source == 'ui'"
+
+  - wait: ~
+    if: "build.source == 'ui'"
+    allow_dependency_failure: false
+
+  - label: ":linux: Load dynamic x-pack osquerybeat pipeline"
+    key: "xpack-osquerybeat-pipeline"
+    command: ".buildkite/scripts/generate_xpack_osquerybeat_pipeline.sh"
+    notify:
+      - github_commit_status:
+          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
