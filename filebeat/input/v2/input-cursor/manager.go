@@ -154,7 +154,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 
 	settings := struct {
 		ID           string        `config:"id"`
-		CleanTimeout time.Duration `config:"clean_timeout"`
+		CleanTimeout time.Duration `config:"clean_inactive"`
 	}{ID: "", CleanTimeout: cim.DefaultCleanTimeout}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
