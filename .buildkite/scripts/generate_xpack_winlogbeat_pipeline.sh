@@ -19,6 +19,8 @@ steps:
       - label: ":windows: Windows 2019 Unit (MODULE) Tests"
         key: "mandatory-win-2019-unit-tests"
         command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path 'build'"
           - "cd $BEATS_PROJECT_NAME"
           - "mage build unitTest"
         env:
@@ -34,7 +36,7 @@ steps:
       - label: ":windows: Windows 2016/2022 Unit Tests - {{matrix.image}}"
         command:
           - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path "build""
+          - "New-Item -ItemType Directory -Force -Path 'build'"
           - "cd $BEATS_PROJECT_NAME"
           - "mage build unitTest"
         key: "mandatory-win-unit-tests"
@@ -61,7 +63,7 @@ steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command:
           - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path "build""
+          - "New-Item -ItemType Directory -Force -Path 'build'"
           - "cd $BEATS_PROJECT_NAME"
           - "mage build unitTest"
         key: "extended-win-unit-tests"
