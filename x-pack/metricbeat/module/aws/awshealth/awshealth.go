@@ -115,8 +115,10 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 	return nil
 }
 
-// Make call to DescribeEvents()
-// Returns information about events that meet the specified filter criteria. Events are returned in a summary form and do not include the detailed description, any additional metadata that depends on the event type, or any affected resources.
+// getEventsSummary retrieves a summary of AWS Health events which are upcoming
+// or open. It uses the DescribeEvents API to get a list of events. Each event is
+// identified by a Event ARN. The function returns a slice of mb.Event structs
+// containing the summarized event info.
 func (m *MetricSet) getEventsSummary(
 	ctx context.Context,
 	awsHealth *health.Client,
@@ -174,11 +176,12 @@ func (m *MetricSet) getEventsSummary(
 		}
 
 		for _, et := range ets {
-			m.Logger().Debugf("[AWS Health] [Fetch DescribeEventDetails] Event ARN : %s", getStringValueOrDefault(et.Arn))
+			// m.Logger().Debugf("[AWS Health] [Fetch DescribeEventDetails] Event ARN : %s", getStringValueOrDefault(et.Arn))
+			m.Logger().Debugf("[AWS Health] [Fetch DescribeEventDetails] Event ARN : %s", getValueOrDefault(et.Arn, ""))
 			// Increment the WaitGroup counter
 			wg.Add(1)
 			go func(et types.Event) {
-				defer wg.Done() // Decrement the WaitGroup counter when goroutine exits
+				defer wg.Done()
 				err := m.getDescribeEventDetails(ctx, awsHealth, et, c)
 				if err != nil {
 					errCh <- err
@@ -216,21 +219,27 @@ func (m *MetricSet) getEventsSummary(
 	return events
 }
 
+// createEvents takes in a HealthDetails struct and returns an mb.Event struct
+// populated with the data from the HealthDetails. It sets the MetricSetFields,
+// RootFields and ID fields of the mb.Event struct. The MetricSetFields contain
+// the details of the health event. The RootFields specify that it is an AWS
+// event. The ID is generated from the event ARN, status code and current date.
 func createEvents(hd HealthDetails) mb.Event {
 	currentDate := getCurrentDateTime()
-	eventID := currentDate + getStringValueOrDefault(hd.event.Arn) + getStringValueOrDefault((*string)(&hd.event.StatusCode))
+	//eventID := currentDate + getStringValueOrDefault(hd.event.Arn) + getStringValueOrDefault((*string)(&hd.event.StatusCode))
+	eventID := currentDate + getValueOrDefault(hd.event.Arn, "") + getValueOrDefault((*string)(&hd.event.StatusCode), "")
 	event := mb.Event{
 		MetricSetFields: mapstr.M{
-			"event_arn":                  getStringValueOrDefault(hd.event.Arn),
-			"end_time":                   getTimeValueOrDefault(hd.event.EndTime),
-			"event_scope_code":           getStringValueOrDefault((*string)(&hd.event.EventScopeCode)),
-			"event_type_category":        getStringValueOrDefault((*string)(&hd.event.EventTypeCategory)),
-			"event_type_code":            getStringValueOrDefault(hd.event.EventTypeCode),
-			"last_updated_time":          getTimeValueOrDefault(hd.event.LastUpdatedTime),
-			"region":                     getStringValueOrDefault(hd.event.Region),
-			"service":                    getStringValueOrDefault(hd.event.Service),
-			"start_time":                 getTimeValueOrDefault(hd.event.StartTime),
-			"status_code":                getStringValueOrDefault((*string)(&hd.event.StatusCode)),
+			"event_arn":                  getValueOrDefault(hd.event.Arn, ""),
+			"end_time":                   getValueOrDefault(hd.event.EndTime, time.Time{}),
+			"event_scope_code":           getValueOrDefault((*string)(&hd.event.EventScopeCode), ""),
+			"event_type_category":        getValueOrDefault((*string)(&hd.event.EventTypeCategory), ""),
+			"event_type_code":            getValueOrDefault(hd.event.EventTypeCode, ""),
+			"last_updated_time":          getValueOrDefault(hd.event.LastUpdatedTime, time.Time{}),
+			"region":                     getValueOrDefault(hd.event.Region, ""),
+			"service":                    getValueOrDefault(hd.event.Service, ""),
+			"start_time":                 getValueOrDefault(hd.event.StartTime, time.Time{}),
+			"status_code":                getValueOrDefault((*string)(&hd.event.StatusCode), ""),
 			"affected_entities_pending":  hd.affectedEntityPending,
 			"affected_entities_resolved": hd.affectedEntityResolved,
 			"affected_entities_others":   hd.affectedEntityOthers,
@@ -262,41 +271,37 @@ type AffectedEntityDetails struct {
 	EntityArn       string    `json:"entity_arn"`
 }
 
-// getStringValueOrDefault returns the string value or an empty string if the pointer is nil.
-func getStringValueOrDefault(s *string) string {
-	if s != nil {
-		return *s
+// getValueOrDefault returns the dereferenced value of a pointer v of any type T.
+// If the pointer is nil, it returns the specified defaultValue of type T.
+func getValueOrDefault[T any](v *T, defaultValue T) T {
+	if v != nil {
+		return *v
 	}
-	return ""
-}
-
-func getTimeValueOrDefault(t *time.Time) time.Time {
-	if t != nil {
-		return *t
-	}
-	return time.Time{}
+	return defaultValue
 }
 
 // createAffectedEntityDetails populates and returns a slice of AffectedEntityDetails
 // based on the given list of AffectedEntity instances.
-// Each AffectedEntity is converted into an AffectedEntityDetails struct,
+// Each AffectedEntity is converted into an AffectedEntityDetails struct.
 func createAffectedEntityDetails(affectedEntities []types.AffectedEntity) []AffectedEntityDetails {
 	aed := []AffectedEntityDetails{}
 	// Populate a slice of AffectedEntityDetails
 	for _, entity := range affectedEntities {
 		aed = append(aed, AffectedEntityDetails{
-			AwsAccountId:    getStringValueOrDefault(entity.AwsAccountId),
-			EntityUrl:       getStringValueOrDefault(entity.EntityUrl),
-			EntityValue:     getStringValueOrDefault(entity.EntityValue),
-			LastUpdatedTime: getTimeValueOrDefault(entity.LastUpdatedTime),
-			StatusCode:      string(entity.StatusCode),
-			EntityArn:       getStringValueOrDefault(entity.EntityArn),
+			AwsAccountId:    getValueOrDefault(entity.AwsAccountId, ""),
+			EntityUrl:       getValueOrDefault(entity.EntityUrl, ""),
+			EntityValue:     getValueOrDefault(entity.EntityValue, ""),
+			LastUpdatedTime: getValueOrDefault(entity.LastUpdatedTime, time.Time{}),
+			StatusCode:      getValueOrDefault((*string)(&entity.StatusCode), ""),
+			EntityArn:       getValueOrDefault(entity.EntityArn, ""),
 		})
 	}
 	return aed
 
 }
 
+// generateEventID hashes the provided eventID and returns the first 20 characters.
+// This is used to generate a unique but consistent event ID prefix.
 func generateEventID(eventID string) string {
 	h := sha256.New()
 	h.Write([]byte(eventID))
@@ -304,6 +309,12 @@ func generateEventID(eventID string) string {
 	return prefix[:20]
 }
 
+// getEventsSummary retrieves a summary of AWS Health events that meet the specified
+// filter criteria. It uses the DescribeEvents API to get a list of events. For each
+// event, it calls getDescribeEventDetails with the EventARN to get details like details
+// of affected entities by calling DescribeAffectedEntities API. The DescribeAffectedEntities
+// is called to fetch the description of the event.
+// The function returns a slice of mb.Event structs containing the summarized event info.
 func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *health.Client, event types.Event, ch chan<- HealthDetails) error {
 	hd := HealthDetails{event: event}
 	eventDetails, err := awsHealth.DescribeEventDetails(ctx, &health.DescribeEventDetailsInput{
@@ -329,6 +340,7 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 		resolved           int32
 		others             int32
 	)
+
 	for {
 		// When invoking the DescribeAffectedEntities for the first time, there must not exist any NextToken.
 		// DescribeAffectedEntities API call will return the next token if there are more records left for querying
