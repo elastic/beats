@@ -216,7 +216,7 @@ endif::[]
 
 The maximum number of events to bulk in a single Redis request or pipeline. The default is 2048.
 
-Events can be collected into batches.{beatname_uc} will split batches read from the queue which are
+Events can be collected into batches. {beatname_uc} will split batches read from the queue which are
 larger than `bulk_max_size` into multiple batches.
 
 Specifying a larger batch size can improve performance by lowering the overhead
