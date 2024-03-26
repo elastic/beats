@@ -23,7 +23,7 @@ steps:
 
     steps:
       - label: ":ubuntu: Unit Tests"
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: linux/Unit Tests"
@@ -36,7 +36,7 @@ steps:
           - "filebeat/build/*.json"
 
       - label: ":ubuntu: Go Integration Tests"
-        command: "mage -d ${BEATS_PROJECT_NAME} goIntegTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage goIntegTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Go Integration Tests"
@@ -49,7 +49,7 @@ steps:
           - "filebeat/build/*.json"
 
       - label: ":ubuntu: Python Integration Tests"
-        command: "mage -d ${BEATS_PROJECT_NAME} pythonIntegTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage pythonIntegTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Python Integration Tests"
@@ -63,7 +63,7 @@ steps:
 
       - label: ":windows:-2016 Unit Tests"
         key: "windows-2016"
-        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: windows-2016/Unit Tests"
@@ -79,7 +79,7 @@ steps:
 
       - label: ":windows:-2022 Unit Tests"
         key: "windows-2022"
-        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: windows-2022/Unit Tests"
@@ -101,7 +101,7 @@ steps:
       - label: ":linux: ARM64 Unit Tests"
         key: "arm-extended"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for arm" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Unit Tests ARM"
@@ -114,7 +114,7 @@ steps:
       - label: ":mac: MacOS Unit Tests"
         key: "macos-extended"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: MacOS Unit Tests"
@@ -126,7 +126,7 @@ steps:
       - label: ":mac: MacOS ARM Unit Tests"
         key: "macos-extended-arm"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: MacOS ARM Unit Tests"
@@ -142,7 +142,7 @@ steps:
     steps:
       - label: ":windows: Win 2019 Unit Tests"
         key: "windows-extended-2019"
-        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Win-2019 Unit Tests"
@@ -158,7 +158,7 @@ steps:
 
       - label: ":windows:-11 Unit Tests"
         key: "windows-extended-11"
-        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Win-11 Unit Tests"
@@ -174,7 +174,7 @@ steps:
 
       - label: ":windows:-10 Unit Tests"
         key: "windows-extended-10"
-        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Win-10 Unit Tests"

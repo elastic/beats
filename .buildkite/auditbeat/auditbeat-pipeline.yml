@@ -24,7 +24,7 @@ steps:
 
     steps:
       - label: ":ubuntu: Unit Tests"
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: linux/Unit Tests"
@@ -37,7 +37,7 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":rhel: Unit Tests"
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: rhel/Unit Tests"
@@ -51,7 +51,7 @@ steps:
 
       - label: ":windows:-2016 Unit Tests"
         key: "windows-2016"
-        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: windows-2016/Unit Tests"
@@ -67,7 +67,7 @@ steps:
 
       - label: ":windows:-2022 Unit Tests"
         key: "windows-2022"
-        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: windows-2022/Unit Tests"
@@ -102,7 +102,7 @@ steps:
       - label: ":linux: ARM64 Unit Tests"
         key: "arm-extended"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for arm" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: Unit Tests ARM"
@@ -115,7 +115,7 @@ steps:
       - label: ":mac: MacOS Unit Tests"
         key: "macos-extended"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: MacOS Unit Tests"
@@ -127,7 +127,7 @@ steps:
       - label: ":mac: MacOS ARM Unit Tests"
         key: "macos-extended-arm"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: MacOS ARM Unit Tests"
@@ -143,7 +143,7 @@ steps:
     steps:
       - label: ":windows:-2019 Unit Tests"
         key: "windows-extended-2019"
-        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: Win-2019 Unit Tests"
@@ -159,7 +159,7 @@ steps:
 
       - label: ":windows:-11 Unit Tests"
         key: "windows-extended-11"
-        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: Win-11 Unit Tests"
@@ -175,7 +175,7 @@ steps:
 
       - label: ":windows:-10 Unit Tests"
         key: "windows-extended-10"
-        command: "mage -d ${BEATS_PROJECT_NAME} build unitTest"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: Win-10 Unit Tests"
