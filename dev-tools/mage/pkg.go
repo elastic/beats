@@ -35,6 +35,7 @@ import (
 // Package packages the Beat for distribution. It generates packages based on
 // the set of target platforms and registered packaging specifications.
 func Package() error {
+
 	if len(Platforms) == 0 {
 		fmt.Println(">> package: Skipping because the platform list is empty")
 		return nil
@@ -256,7 +257,7 @@ func (b packageBuilder) Build() error {
 	log.Printf("Package spec: %+v", b.Spec)
 	err := b.Type.Build(b.Spec)
 	if err != nil {
-		return fmt.Errorf("failed building %v type=%v for platform=%v: %w", err)
+		return fmt.Errorf("failed building %v type=%v for platform=%v: %w", b.Spec.Name, b.Type, b.Platform.Name, err)
 	}
 	return nil
 }

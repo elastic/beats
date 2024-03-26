@@ -1,0 +1,44 @@
+projects:
+    - "auditbeat"
+    - "deploy/kubernetes"
+    - "filebeat"
+    - "heartbeat"
+    - "libbeat"
+    - "metricbeat"
+    - "packetbeat"
+    - "winlogbeat"
+    - "x-pack/auditbeat"
+    - "x-pack/dockerlogbeat"
+    - "x-pack/filebeat"
+    - "x-pack/functionbeat"
+    - "x-pack/heartbeat"
+    - "x-pack/libbeat"
+    - "x-pack/metricbeat"
+    - "x-pack/osquerybeat"
+    - "x-pack/packetbeat"
+    - "x-pack/winlogbeat"
+
+## Changeset macros that are defined here and used in each specific 3.0 pipeline.
+changeset:
+    ci:
+        - "^Jenkinsfile"
+        - "^\\.ci/scripts/.*"
+    oss:
+        - "^go.mod"
+        - "^pytest.ini"
+        - "^dev-tools/.*"
+        - "^libbeat/.*"
+        - "^testing/.*"
+    xpack:
+        - "^go.mod"
+        - "^pytest.ini"
+        - "^dev-tools/.*"
+        - "^libbeat/.*"
+        - "^testing/.*"
+        - "^x-pack/libbeat/.*"
+
+disabled:
+    when:
+        labels: ## Skip the GitHub Pull Request builds if any of the given GitHub labels match with the assigned labels in the PR.
+            - skip-ci
+        draft: true  ## Skip the GitHub Pull Request builds with Draft PRs.

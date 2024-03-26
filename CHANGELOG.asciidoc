@@ -3,6 +3,28 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.19]]
+=== Beats version 7.17.19
+https://github.com/elastic/beats/compare/v7.17.18\...v7.17.19[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+- Upgrade Go version to 1.21.8. Removes support for Windows 8.1. See https://tip.golang.org/doc/go1.21#windows. {pull}38210[38210]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- Fix guess trigger for system/socket credentials on newer kernels. {issue}36905[36905] {pull}37136[37136]
+
+*Filebeat*
+
+- [threatintel] MISP pagination fixes. {pull}37898[37898]
+- Fix file handle leak when handling errors in filestream. {pull}37973[37973]
+
+
 [[release-notes-7.17.18]]
 === Beats version 7.17.18
 https://github.com/elastic/beats/compare/v7.17.17\...v7.17.18[View commits]

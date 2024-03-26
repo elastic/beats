@@ -456,6 +456,19 @@ func CrossBuildGoDaemon() error {
 	return devtools.CrossBuildGoDaemon()
 }
 
+// PackageAgentCore cross-builds and packages distribution artifacts containing
+// only elastic-agent binaries with no extra files or dependencies.
+func PackageAgentCore() {
+	start := time.Now()
+	defer func() { fmt.Println("packageAgentCore ran for", time.Since(start)) }()
+
+	mg.Deps(CrossBuild)
+
+	devtools.UseElasticAgentCorePackaging()
+
+	mg.Deps(devtools.Package)
+}
+
 // Config generates both the short/reference/docker.
 func Config() {
 	mg.Deps(configYML)
