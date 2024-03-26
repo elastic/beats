@@ -1,6 +1,6 @@
 - name: billing
   description: Google Cloud Billing metrics
-  release: beta
+  release: ga
   type: group
   fields:
   - name: cost_type

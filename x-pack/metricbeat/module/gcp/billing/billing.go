@@ -8,6 +8,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -17,7 +18,6 @@ import (
 	"google.golang.org/api/option"
 
 	"github.com/elastic/beats/v7/libbeat/common"
-	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/libbeat/logp"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/metricbeat/module/gcp"
@@ -84,8 +84,6 @@ func stringInSlice(a string, list []string) bool {
 // New creates a new instance of the MetricSet. New is responsible for unpacking
 // any MetricSet specific configuration options if there are any.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The gcp '%s' metricset is beta.", metricsetName)
-
 	m := &MetricSet{
 		BaseMetricSet: base,
 		logger:        logp.NewLogger(metricsetName),
@@ -164,7 +162,7 @@ func getTables(ctx context.Context, client *bigquery.Client, datasetID string, t
 
 	for {
 		dataset, err := dit.Next()
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 		if err != nil {
@@ -185,7 +183,7 @@ func getTables(ctx context.Context, client *bigquery.Client, datasetID string, t
 		for {
 			var tableMeta tableMeta
 			table, err := tit.Next()
-			if err == iterator.Done {
+			if errors.Is(err, iterator.Done) {
 				break
 			}
 			if err != nil {
@@ -236,10 +234,14 @@ func (m *MetricSet) queryBigQuery(ctx context.Context, client *bigquery.Client, 
 	}
 
 	it, err := job.Read(ctx)
+	if err != nil {
+		return events, fmt.Errorf("reading from bigquery job failed: %w", err)
+	}
+
 	for {
 		var row []bigquery.Value
 		err := it.Next(&row)
-		if err == iterator.Done {
+		if errors.Is(err, iterator.Done) {
 			break
 		}
 
