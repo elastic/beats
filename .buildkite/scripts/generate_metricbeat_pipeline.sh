@@ -27,6 +27,8 @@ steps:
       - label: ":go: Go Intergration Tests"
         key: "mandatory-int-test"
         command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
+        env:
+          MODULE: $MODULE
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -36,6 +38,8 @@ steps:
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
+        env:
+          MODULE: $MODULE
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -53,6 +57,8 @@ steps:
 
       - label: ":windows: Windows 2016/2022 Unit Tests - {{matrix.image}}"
         command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path "build""
           - "cd $BEATS_PROJECT_NAME"
           - "mage build unitTest"
         key: "mandatory-win-unit-tests"
@@ -77,6 +83,8 @@ steps:
     steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path "build""
           - "cd $BEATS_PROJECT_NAME"
           - "mage build unitTest"
         key: "extended-win-unit-tests"

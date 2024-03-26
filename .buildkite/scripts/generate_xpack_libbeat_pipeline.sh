@@ -66,6 +66,8 @@ steps:
     steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path "build""
           - "cd $BEATS_PROJECT_NAME"
           - "mage build unitTest"
         key: "extended-win-unit-tests"
