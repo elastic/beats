@@ -39,7 +39,7 @@ filebeat.inputs:
         client.id: client-id
         client.secret: client-secret
         token_url: https://instance-id.develop.my.salesforce.com
-        user: salesforce-instance@user.in
+        username: salesforce-instance@user.in
         password: salesforce-instance-password
       jwt_bearer_flow:
         enabled: true
@@ -131,7 +131,7 @@ The client secret for the user-password flow.
 The token URL for the user-password flow.
 
 [string]
-==== `auth.oauth2.user_password_flow.user`
+==== `auth.oauth2.user_password_flow.username`
 
 The username for the user-password flow.
 
