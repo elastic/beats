@@ -44,25 +44,35 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
 
-      - label: ":windows:-{{matrix.image}} Unit Tests"
+      - label: ":windows:-2016 Unit Tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
         notify:
           - github_commit_status:
-              context: "Auditbeat: windows/Unit Tests"
+              context: "Auditbeat: windows 2016/Unit Tests"
         agents:
           provider: "gcp"
-          image: "{{matrix.image}}"
+          image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
-          disk_type: "pd-ssd"
-        matrix:
-          setup:
-            image:
-              - "${IMAGE_WIN_2016}"
-              - "${IMAGE_WIN_2022}"
+          disk_type: "pd-ssd"        
         artifact_paths:
           - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
+          - "auditbeat/build/*.json"    
+
+      - label: ":windows:-2022 Unit Tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        notify:
+          - github_commit_status:
+              context: "Auditbeat: windows 2022/Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"        
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"              
 
       - label: ":linux: Crosscompile"
         command:
@@ -87,56 +97,68 @@ echo "Check and add the Extended Tests into the pipeline"
 if are_conditions_met_arm_tests; then
   cat >> $pipelineName <<- YAML
   - group: "Extended Tests"
-      key: "extended-tests-arm"
-      steps:
-        - label: ":arm: ARM64 Unit Tests"
-          key: "extended-arm64-unit-tests"
-          command: ".buildkite/scripts/unit_tests.sh"
-          agents:
-            provider: "gcp"
-            image: "${IMAGE_UBUNTU_ARM64}"
-            machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-          artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+    key: "extended-tests-arm"
+    steps:
+      - label: ":arm: ARM64 Unit Tests"
+        key: "extended-arm64-unit-tests"
+        command: ".buildkite/scripts/unit_tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_ARM64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        notify:
+          - github_commit_status:
+              context: "Auditbeat: ARM Unit tests"
 YAML
 fi
 
 if are_conditions_met_win_tests; then
   cat >> $pipelineName <<- YAML
-    - group: "Windows Extended Testing"
-      key: "extended-tests-win"
-      steps:
-        - label: ":windows: Windows 2019 Unit Tests"
-          key: "extended-win-2019-unit-tests"
-          command: ".buildkite/scripts/win_unit_tests.ps1"
-          agents:
-            provider: "gcp"
-            image: "${IMAGE_WIN_2019}"
-            machine_type: "${GCP_WIN_MACHINE_TYPE}"
-            disk_size: 100
-            disk_type: "pd-ssd"
-          artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+  - group: "Windows Extended Testing"
+    key: "extended-tests-win"
+    steps:
+      - label: ":windows: Windows 2019 Unit Tests"
+        key: "extended-win-2019-unit-tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        notify:
+          - github_commit_status:
+              context: "Auditbeat: Windows 2019 Unit Tests"
 
-        - label: ":windows: Windows 10 Unit Tests"
-          key: "extended-win-10-unit-tests"
-          command: ".buildkite/scripts/win_unit_tests.ps1"
-          agents:
-            provider: "gcp"
-            image: "${IMAGE_WIN_10}"
-            machine_type: "${GCP_WIN_MACHINE_TYPE}"
-            disk_size: 100
-            disk_type: "pd-ssd"
-          artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":windows: Windows 10 Unit Tests"
+        key: "extended-win-10-unit-tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        notify:
+          - github_commit_status:
+              context: "Auditbeat: Windows 10 Unit Tests"
 
-        - label: ":windows: Windows 11 Unit Tests"
-          key: "extended-win-11-unit-tests"
-          command: ".buildkite/scripts/win_unit_tests.ps1"
-          agents:
-            provider: "gcp"
-            image: "${IMAGE_WIN_11}"
-            machine_type: "${GCP_WIN_MACHINE_TYPE}"
-            disk_size: 100
-            disk_type: "pd-ssd"
-          artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":windows: Windows 11 Unit Tests"
+        key: "extended-win-11-unit-tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        notify:
+          - github_commit_status:
+              context: "Auditbeat: Windows 11 Unit Tests"
 YAML
 fi
 
@@ -150,6 +172,10 @@ cat >> $pipelineName <<- YAML
     steps:
       - label: Package pipeline
         commands: ".buildkite/scripts/packaging/package-step.sh"
+        notify:
+          - github_commit_status:
+              context: "Auditbeat: Packaging"
+
 
 YAML
 fi

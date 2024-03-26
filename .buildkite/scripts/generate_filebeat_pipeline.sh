@@ -154,6 +154,9 @@ cat >> $pipelineName <<- YAML
     steps:
       - label: Package pipeline
         commands: ".buildkite/scripts/packaging/package-step.sh"
+        notify:
+        - github_commit_status:
+            context: "Filebeat: Packaging"
 
 YAML
 fi
