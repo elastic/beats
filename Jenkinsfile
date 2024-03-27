@@ -11,7 +11,7 @@ pipeline {
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
     DOCKERHUB_SECRET = 'secret/observability-team/ci/elastic-observability-dockerhub'
     DOCKER_ELASTIC_SECRET = 'secret/observability-team/ci/docker-registry/prod'
-    DOCKER_COMPOSE_VERSION = "1.21.0"
+    DOCKER_COMPOSE_VERSION = "2.21.0"
     DOCKER_REGISTRY = 'docker.elastic.co'
     JOB_GCS_BUCKET = 'beats-ci-temp'
     JOB_GCS_CREDENTIALS = 'beats-ci-gcs-plugin'
