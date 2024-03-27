@@ -14,7 +14,7 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 # define if needed run the whole pipeline for the particular beat
 [ -z "${run_auditbeat+x}" ] && run_auditbeat="$(buildkite-agent meta-data get run_auditbeat --default "false")"
 [ -z "${run_filebeat+x}" ] && run_filebeat="$(buildkite-agent meta-data get run_filebeat --default "false")"
-[ -z "${run_heartbeat+x}" ] && run_filebeat="$(buildkite-agent meta-data get run_filebeat --default "false")"
+[ -z "${run_heartbeat+x}" ] && run_filebeat="$(buildkite-agent meta-data get run_heartbeat --default "false")"
 [ -z "${run_libbeat+x}" ] && run_libbeat="$(buildkite-agent meta-data get run_libbeat --default "false")"
 [ -z "${run_metricbeat+x}" ] && run_metricbeat="$(buildkite-agent meta-data get run_metricbeat --default "false")"
 [ -z "${run_packetbeat+x}" ] && run_packetbeat="$(buildkite-agent meta-data get run_packetbeat --default "false")"
