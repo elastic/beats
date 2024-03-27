@@ -43,10 +43,7 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command:
-          - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage -w reader/etw goUnitTest"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -66,10 +63,7 @@ steps:
     key: "extended-win-tests"
     steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command:
-          - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage -w reader/etw goUnitTest"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
