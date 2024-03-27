@@ -84,16 +84,16 @@ func (*nilEnricher) Stop(*Watchers)    {}
 func (*nilEnricher) Enrich([]mapstr.M) {}
 
 type metaWatcher struct {
-	watcher kubernetes.Watcher
-	started bool // true if watcher has started, false otherwise
+	watcher kubernetes.Watcher // watcher responsible for watching a specific resource
+	started bool               // true if watcher has started, false otherwise
 
-	metricsetsUsing []string // list of metricsets using this watcher
+	metricsetsUsing []string // list of metricsets using this shared watcher(e.g. pod, container, state_pod)
 
-	enrichers       map[string]*enricher // map of enrichers using this watcher. The key is the metricset name
-	metadataObjects map[string]bool      // map of ids of each object received by the handler functions
+	enrichers       map[string]*enricher // map of enrichers using this watcher. The key is the metricset name. Each metricset has its own enricher
+	metadataObjects map[string]bool      // representation of a set of ids(in the form of namespace_name-resource_name) of each object received by the watcher's handler functions
 
-	nodeScope      bool               // whether this watcher is only for current node
-	restartWatcher kubernetes.Watcher // whether this watcher needs a restart
+	nodeScope      bool               // whether this watcher should watch for resources in current node or in whole cluster
+	restartWatcher kubernetes.Watcher // whether this watcher needs a restart. Only relevant in leader nodes due to metricsets with different nodescope(pod, state_pod)
 }
 
 type Watchers struct {
@@ -207,9 +207,9 @@ func getExtraWatchers(resourceName string, addResourceMetadata *metadata.AddReso
 	}
 }
 
-// getResourceName returns the name of the resource for a metricset
-// Example: state_pod metricset uses pod resource
-// Exception is state_namespace
+// getResourceName returns the name of the resource for a metricset.
+// Example: state_pod metricset uses pod resource.
+// Exception is state_namespace.
 func getResourceName(metricsetName string) string {
 	resourceName := metricsetName
 	if resourceName != NamespaceResource {
@@ -218,14 +218,14 @@ func getResourceName(metricsetName string) string {
 	return resourceName
 }
 
-// getWatchOptions builds the kubernetes.WatchOptions{} needed for the watcher based on the config and nodeScope
+// getWatchOptions builds the kubernetes.WatchOptions{} needed for the watcher based on the config and nodeScope.
 func getWatchOptions(config *kubernetesConfig, nodeScope bool, client k8sclient.Interface, log *logp.Logger) (*kubernetes.WatchOptions, error) {
 	var err error
 	options := kubernetes.WatchOptions{
 		SyncTimeout: config.SyncPeriod,
 	}
 
-	// Watch objects in the node only
+	// Watch objects in the node only.
 	if nodeScope {
 		nd := &kubernetes.DiscoverKubernetesNodeParams{
 			ConfigHost:  config.Node,
@@ -249,7 +249,12 @@ func isNamespaced(resourceName string) bool {
 	return true
 }
 
-// createWatcher creates a watcher for a specific resource
+// createWatcher creates a watcher for a specific resource if not already created and stores it in the resourceWatchers map.
+// resourceName is the key in the resourceWatchers map where the created watcher gets stored.
+// options are the watch options for a specific watcher.
+// For example a watcher can be configured through options to watch only for resources on a specific node/namespace or in whole cluster.
+// resourceWatchers is the store for all created watchers.
+// extraWatcher bool sets apart the watchers that are created as main watcher for a resource and the ones that are created as an extra watcher.
 func createWatcher(
 	resourceName string,
 	resource kubernetes.Resource,
@@ -259,12 +264,12 @@ func createWatcher(
 	namespace string,
 	extraWatcher bool) (bool, error) {
 
-	// We need to check the node scope to decide on whether a watcher should be updated or not
+	// We need to check the node scope to decide on whether a watcher should be updated or not.
 	nodeScope := false
 	if options.Node != "" {
 		nodeScope = true
 	}
-	// The nodescope for extra watchers node, namespace, replicaset and job should be always false
+	// The nodescope for extra watchers node, namespace, replicaset and job should be always false.
 	if extraWatcher {
 		nodeScope = false
 		options.Node = ""
@@ -273,11 +278,12 @@ func createWatcher(
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
 
+	// Check if a watcher for the specific resource already exists.
 	resourceMetaWatcher, ok := resourceWatchers.metaWatchersMap[resourceName]
 
-	// if it does not exist, create the resourceMetaWatcher
+	// If it does not exist, create the resourceMetaWatcher.
 	if !ok {
-		// check if we need to add namespace to the resourceMetaWatcher options
+		// Check if we need to add namespace to the watcher's options.
 		if isNamespaced(resourceName) {
 			options.Namespace = namespace
 		}
@@ -287,7 +293,7 @@ func createWatcher(
 		}
 		resourceWatchers.metaWatchersMap[resourceName] = &metaWatcher{
 			watcher:         watcher,
-			started:         false,
+			started:         false, // not started yet
 			metadataObjects: make(map[string]bool),
 			enrichers:       make(map[string]*enricher),
 			metricsetsUsing: make([]string, 0),
@@ -296,10 +302,13 @@ func createWatcher(
 		}
 		return true, nil
 	} else if resourceMetaWatcher.nodeScope != nodeScope && resourceMetaWatcher.nodeScope {
-		// It might happen that the resourceMetaWatcher already exists, but is only being used to monitor the resources
-		// of a single node. In that case, we need to check if we are trying to create a new resourceMetaWatcher that will track
-		// the resources of multiple nodes. If it is the case, then we need to update the resourceMetaWatcher.
-		// check if we need to add namespace to the resourceMetaWatcher options
+		// It might happen that the watcher already exists, but is only being used to monitor the resources
+		// of a single node(e.g. created by pod metricset). In that case, we need to check if we are trying to create a new watcher that will track
+		// the resources of whole cluster(e.g. in case of state_pod metricset).
+		// If it is the case, then we need to update the watcher by changing its watch options (removing options.Node)
+		// A running watcher cannot be updated directly. Instead, we must create a new one with the correct watch options.
+		// The new restartWatcher must be identical to the old watcher, including the same handler function, with the only difference being the watch options.
+
 		if isNamespaced(resourceName) {
 			options.Namespace = namespace
 		}
@@ -307,7 +316,7 @@ func createWatcher(
 		if err != nil {
 			return false, err
 		}
-		// update the handler of the restart resourceMetaWatchers to match the current resourceMetaWatchers handler
+		// update the handler of the restartWatcher to match the current watcher's handler.
 		restartWatcher.AddEventHandler(resourceMetaWatcher.watcher.GetEventHandler())
 		resourceMetaWatcher.restartWatcher = restartWatcher
 		resourceMetaWatcher.nodeScope = nodeScope
@@ -316,7 +325,7 @@ func createWatcher(
 }
 
 // addToMetricsetsUsing adds metricset identified by metricsetUsing to the list of resources using the shared watcher
-// identified by resourceName
+// identified by resourceName.
 func addToMetricsetsUsing(resourceName string, metricsetUsing string, resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
@@ -378,7 +387,8 @@ func createAllWatchers(
 	if err != nil {
 		return err
 	}
-	// Create a watcher for the given resource.
+	// Create the main watcher for the given resource.
+	// For example pod metricset's main watcher will be pod watcher.
 	// If it fails, we return an error, so we can stop the extra watchers from creating.
 	created, err := createWatcher(resourceName, res, *options, client, resourceWatchers, config.Namespace, false)
 	if err != nil {
@@ -386,9 +396,10 @@ func createAllWatchers(
 	} else if created {
 		log.Debugf("Created watcher %s successfully, created by %s.", resourceName, metricsetName)
 	}
+	// add this metricset to the ones using the watcher
 	addToMetricsetsUsing(resourceName, metricsetName, resourceWatchers)
 
-	// Create the extra watchers required by this resource
+	// Create any extra watchers required by this resource
 	// For example pod requires also namespace and node watcher and possibly replicaset and job watcher.
 	extraWatchers := getExtraWatchers(resourceName, config.AddResourceMetadata)
 	for _, extra := range extraWatchers {
@@ -401,7 +412,7 @@ func createAllWatchers(
 				if created {
 					log.Debugf("Created watcher %s successfully, created by %s.", extra, metricsetName)
 				}
-				// add this metricset to the ones using the extra resource
+				// add this metricset to the ones using the extra watchers
 				addToMetricsetsUsing(extra, metricsetName, resourceWatchers)
 			}
 		} else {
@@ -412,7 +423,8 @@ func createAllWatchers(
 	return nil
 }
 
-// createMetadataGen creates the metadata generator for resources other than pod and service
+// createMetadataGen creates and returns the metadata generator for resources other than pod and service
+// metaGen is a struct of type Resource and implements Generate method for metadata generation for a given resource kind.
 func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
 	resourceName string, resourceWatchers *Watchers) (*metadata.Resource, error) {
 
@@ -439,7 +451,8 @@ func createMetadataGen(client k8sclient.Interface, commonConfig *conf.C, addReso
 	return metaGen, nil
 }
 
-// createMetadataGenSpecific creates the metadata generator for a specific resource - pod or service
+// createMetadataGenSpecific creates and returns the metadata generator for a specific resource - pod or service
+// A metaGen struct implements a MetaGen interface and is designed to utilize the necessary watchers to collect(Generate) metadata for a specific resource.
 func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C, addResourceMetadata *metadata.AddResourceMetadataConfig,
 	resourceName string, resourceWatchers *Watchers) (metadata.MetaGen, error) {
 
@@ -473,6 +486,8 @@ func createMetadataGenSpecific(client k8sclient.Interface, commonConfig *conf.C,
 		if jobMetaWatcher := resourceWatchers.metaWatchersMap[JobResource]; jobMetaWatcher != nil {
 			jobWatcher = (*jobMetaWatcher).watcher
 		}
+		// For example for pod named redis in namespace default, the generator uses the pod watcher for pod metadata,
+		// collects all node metadata using the node watcher's store and all namespace metadata using the namespacewatcher's store.
 		metaGen = metadata.GetPodMetaGen(commonConfig, mainWatcher, nodeWatcher, namespaceWatcher, replicaSetWatcher,
 			jobWatcher, addResourceMetadata)
 		return metaGen, nil
@@ -505,6 +520,7 @@ func NewResourceMetadataEnricher(
 	nodeScope bool) Enricher {
 	log := logp.NewLogger(selector)
 
+	// metricset configuration
 	config, err := GetValidatedConfig(base)
 	if err != nil {
 		log.Info("Kubernetes metricset enriching is disabled")
@@ -528,6 +544,7 @@ func NewResourceMetadataEnricher(
 
 	metricsetName := base.Name()
 	resourceName := getResourceName(metricsetName)
+	// Create all watchers needed for this metricset
 	err = createAllWatchers(client, metricsetName, resourceName, nodeScope, config, log, resourceWatchers)
 	if err != nil {
 		log.Errorf("Error starting the watchers: %s", err)
@@ -536,6 +553,8 @@ func NewResourceMetadataEnricher(
 
 	var specificMetaGen metadata.MetaGen
 	var generalMetaGen *metadata.Resource
+	// Create the metadata generator to be used in the watcher's event handler.
+	// Both specificMetaGen and generalMetaGen implement Generate method for metadata collection.
 	if resourceName == ServiceResource || resourceName == PodResource {
 		specificMetaGen, err = createMetadataGenSpecific(client, commonConfig, config.AddResourceMetadata, resourceName, resourceWatchers)
 	} else {
@@ -547,7 +566,10 @@ func NewResourceMetadataEnricher(
 	}
 
 	// updateFunc to be used as the resource watcher's add and update handler.
-	// It is responsible for generating the metadata for a detected resource
+	// The handler function is executed when a watcher is triggered(i.e. new/updated resource).
+	// It is responsible for generating the metadata for a detected resource by executing the metadata generator's Generate method.
+	// It is a common handler for all resource watchers. The kind of resource(e.g. pod or deployment) is checked inside the function.
+	// It returns a map of a resourse identifier(i.e namespace-resource_name) as key and the metadata as value.
 	updateFunc := func(r kubernetes.Resource) map[string]mapstr.M {
 		accessor, _ := meta.Accessor(r)
 		id := accessor.GetName()
@@ -604,8 +626,9 @@ func NewResourceMetadataEnricher(
 		}
 	}
 
-	// deleteFunc to be used as the resource watcher's delete handler
-	// If a resource deletion is detected it returns the id of the resource
+	// deleteFunc to be used as the resource watcher's delete handler.
+	// The deleteFunc is executed when a watcher is triggered for a resource deletion(e.g. pod deleted).
+	// It returns the identifier of the resource.
 	deleteFunc := func(r kubernetes.Resource) []string {
 		accessor, _ := meta.Accessor(r)
 
@@ -623,7 +646,9 @@ func NewResourceMetadataEnricher(
 		return []string{id}
 	}
 
-	// indexFunc retrieves the resource id from a given event
+	// indexFunc constructs and returns the resource identifier from a given event.
+	// If a resource is namespaced(e.g. pod) the identifier is in the form of namespace-resource_name.
+	// If it is not namespaced(e.g. node) the identifier is the resource's name.
 	indexFunc := func(e mapstr.M) string {
 		name := getString(e, "name")
 		namespace := getString(e, mb.ModuleDataKey+".namespace")
@@ -871,16 +896,19 @@ func buildMetadataEnricher(
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
 
+	// Check if a watcher for this resource already exists.
 	resourceMetaWatcher := resourceWatchers.metaWatchersMap[resourceName]
 	if resourceMetaWatcher != nil {
+		// Append the new enricher to watcher's enrichers map.
 		resourceMetaWatcher.enrichers[metricsetName] = enricher
 
-		// Check if this shared watcher has already detected resources from a previous enricher.
+		// Check if this shared watcher has already detected resources and collected their
+		// metadata for another enricher.
 		// In that case, for each resource, call the updateFunc of the current enricher to
-		// update its metadata. This is needed in cases where the watcher has already been
+		// generate its metadata. This is needed in cases where the watcher has already been
 		// notified for new/updated resources while the enricher for current metricset has not
 		// built yet (example is pod, state_pod metricsets).
-		for key, _ := range resourceMetaWatcher.metadataObjects {
+		for key := range resourceMetaWatcher.metadataObjects {
 			obj, exists, err := resourceMetaWatcher.watcher.Store().GetByKey(key)
 			if err != nil {
 				log.Errorf("Error trying to get the object from the store: %s", err)
@@ -903,9 +931,10 @@ func buildMetadataEnricher(
 				resourceWatchers.lock.Lock()
 				defer resourceWatchers.lock.Unlock()
 
-				// Add object to the list of metadata objects of this watcher,
-				// so it can be used by enrichers created after the event is
-				// triggered
+				// Add object(detected resource) to the list of metadata objects of this watcher,
+				// so it can be used by enrichers created after the event is triggered.
+				// The identifier of the object is in the form of namespace/name so that
+				// it can be easily fetched from watcher's store in previous step.
 				accessor, _ := meta.Accessor(obj.(kubernetes.Resource))
 				id := accessor.GetName()
 				namespace := accessor.GetNamespace()
@@ -913,7 +942,7 @@ func buildMetadataEnricher(
 					id = namespace + "/" + id
 				}
 				resourceMetaWatcher.metadataObjects[id] = true
-
+				// Execute the updateFunc of each enricher associated to thos watcher.
 				for _, enricher := range resourceMetaWatcher.enrichers {
 					enricher.Lock()
 					newMetadataEvents := enricher.updateFunc(obj.(kubernetes.Resource))
@@ -975,12 +1004,12 @@ func buildMetadataEnricher(
 	return enricher
 }
 
-// Start starts all the watchers associated with a given enricher resource
+// Start starts all the watchers associated with a given enricher's resource.
 func (e *enricher) Start(resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
 
-	// Each resource may require multiple watchers. We firstly start the
+	// Each resource may require multiple watchers. Firstly, we start the
 	// extra watchers as they are a dependency for the main resource watcher
 	// For example a pod watcher requires namespace and node watcher to be started
 	// first.
@@ -996,8 +1025,9 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 		}
 	}
 
-	// Start the main watcher if not already started
-	// If there is a restart watcher, stop the old watcher if started and start the restart watcher
+	// Start the main watcher if not already started.
+	// If there is a restart watcher, stop the old watcher if started and start the restart watcher.
+	// Then the restart watcher replaces the the old watcher and resourceMetaWatcher is set to nil.
 	resourceMetaWatcher := resourceWatchers.metaWatchersMap[e.resourceName]
 	if resourceMetaWatcher != nil {
 		if resourceMetaWatcher.restartWatcher != nil {
@@ -1024,7 +1054,7 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 }
 
 // Stop removes the enricher's metricset as a user of the associated watchers.
-// If no metricset is using the watchers anymore it stops them.
+// If no metricset is using the watchers anymore, the watcher gets stopped.
 func (e *enricher) Stop(resourceWatchers *Watchers) {
 	resourceWatchers.lock.Lock()
 	defer resourceWatchers.lock.Unlock()
@@ -1052,6 +1082,8 @@ func (e *enricher) Stop(resourceWatchers *Watchers) {
 }
 
 // Enrich enriches events with metadata saved in the enricher.metadata map
+// This method is executed whenever a new event is created and about to be published.
+// The enricher's index method is used to retrieve the resource identifier from each event.
 func (e *enricher) Enrich(events []mapstr.M) {
 	e.RLock()
 	defer e.RUnlock()
