@@ -41,10 +41,10 @@ output.file:
 logging:
   level: debug
   selectors:
-    - '*'
+    - input
+    - input.filestream
   metrics:
     enabled: false
-
 `
 
 func TestFilestreamCleanInactive(t *testing.T) {
