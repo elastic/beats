@@ -46,7 +46,7 @@ steps:
         command:
           - "Set-Location -Path $BEATS_PROJECT_NAME"
           - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage -w reader/etw build goUnitTest"
+          - "mage -w reader/etw goUnitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -69,7 +69,7 @@ steps:
         command:
           - "Set-Location -Path $BEATS_PROJECT_NAME"
           - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage -w reader/etw build goUnitTest"
+          - "mage -w reader/etw goUnitTest"
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
