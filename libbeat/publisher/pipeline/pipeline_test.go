@@ -41,7 +41,7 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 
 	defer pipeline.Close()
 
-	n := 66000 //35000 // This needs to be more than 10
+	n := 66000
 	clients := []beat.Client{}
 	for i := 0; i < n; i++ {
 		c, err := pipeline.ConnectWith(beat.ClientConfig{})
