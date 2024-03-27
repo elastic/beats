@@ -6,3 +6,4 @@ include $(ES_BEATS)/dev-tools/make/mage.mk
 .PHONY: create-metricset
 create-metricset:
 	mage createMetricset
+
