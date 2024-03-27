@@ -47,6 +47,3 @@ steps:
   - label: ":linux: Load dynamic metricbeat pipeline"
     key: "metricbeat-pipeline"
     command: ".buildkite/scripts/generate_metricbeat_pipeline.sh"
-    notify:
-      - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
