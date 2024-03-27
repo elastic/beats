@@ -93,6 +93,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix PEM key validation for CEL and HTTPJSON inputs. {pull}38405[38405]
 - Fix filebeat gcs input panic {pull}38407[38407]
 - Rename `activity_guid` to `activity_id` in ETW input events to suit other Windows inputs. {pull}38530[38530]
+- Add missing provider registration and fix published entity for Active Directory entityanalytics provider. {pull}38645[38645]
 
 *Heartbeat*
 
