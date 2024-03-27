@@ -70,6 +70,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-aws-s3>>
 * <<{beatname_lc}-input-azure-eventhub>>
 * <<{beatname_lc}-input-azure-blob-storage>>
+* <<{beatname_lc}-input-benchmark>>
 * <<{beatname_lc}-input-cel>>
 * <<{beatname_lc}-input-cloudfoundry>>
 * <<{beatname_lc}-input-cometd>>
@@ -103,6 +104,8 @@ include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
 include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-azure-blob-storage.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-benchmark.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-cel.asciidoc[]
 

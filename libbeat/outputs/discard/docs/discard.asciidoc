@@ -1,0 +1,34 @@
+[[discard-output]]
+=== Configure the Discard output
+
+++++
+<titleabbrev>Discard</titleabbrev>
+++++
+
+The Discard output throws away data.
+
+WARNING: The Discard output should be used only for development or
+debugging issues. Data is lost.
+
+This can be useful if you want to work on your input configuration
+without needing to configure an output. It can also be useful to test
+how changes in input and processor configuration affect performance.
+
+Example configuration:
+
+["source","yaml",subs="attributes"]
+------------------------------------------------------------------------------
+output.discard:
+  enabled: true
+------------------------------------------------------------------------------
+
+==== Configuration options
+
+You can specify the following `output.discard` options in the +{beatname_lc}.yml+ config file:
+
+===== `enabled`
+
+The enabled config is a boolean setting to enable or disable the output. If set
+to false, the output is disabled.
+
+The default value is `true`.
