@@ -56,6 +56,4 @@ steps:
   - label: ":linux: Load dynamic x-pack metricbeat pipeline"
     key: "xpack-metricbeat-pipeline"
     command: ".buildkite/scripts/generate_xpack_metricbeat_pipeline.sh"
-    notify:
-      - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
+
