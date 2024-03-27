@@ -2,6 +2,7 @@ module github.com/elastic/beats/v7
 
 go 1.21
 
+// replace github.com/elastic/elastic-agent-autodiscover => /Users/michaliskatsoulis/go/src/github.com/elastic/elastic-agent-autodiscover
 require (
 	cloud.google.com/go/bigquery v1.55.0
 	cloud.google.com/go/monitoring v1.16.0
@@ -69,7 +70,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/elastic-agent-client/v7 v7.8.0
+	github.com/elastic/elastic-agent-client/v7 v7.8.1
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.5.0
 	github.com/elastic/go-licenser v0.4.1
@@ -164,7 +165,7 @@ require (
 	google.golang.org/api v0.128.0
 	google.golang.org/genproto v0.0.0-20230920204549-e6e6cdab5c13 // indirect
 	google.golang.org/grpc v1.58.3
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/protobuf v1.33.0
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
 	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
