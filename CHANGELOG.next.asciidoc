@@ -103,6 +103,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of truncated files in Filestream {issue}38070[38070] {pull}38416[38416]
 - Fix `clean_removed` on Filestream input. {issue}36761[36761] {pull}38488[38488]
 - Fix filestream's registry GC: registry entries are now removed from the in-memory and disk store when they're older than the set TTL {issue}36761[36761] {pull}38488[38488]
+- Fix `clean_inactive` on Filestream input by correctly parsing the value from the configuration yaml {issue}36629[36629] {pull}38632[38632]
 
 *Heartbeat*
 
