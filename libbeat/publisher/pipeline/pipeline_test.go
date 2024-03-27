@@ -30,10 +30,6 @@ import (
 )
 
 func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping because short is enabled")
-	}
-
 	routinesChecker := resources.NewGoroutinesChecker()
 	defer routinesChecker.Check(t)
 
@@ -60,13 +56,15 @@ func TestPipelineAcceptsAnyNumberOfClients(t *testing.T) {
 	}
 
 	// Close the first 105 clients
-	nn := 6
-	tmpC := clients[:n]
+	nn := 105
+	clientsToClose := clients[:n]
 	clients = clients[nn:]
 
-	for _, c := range tmpC {
+	for _, c := range clientsToClose {
 		c.Close()
 	}
+
+	// Let other goroutines run
 	runtime.Gosched()
 	runtime.Gosched()
 
