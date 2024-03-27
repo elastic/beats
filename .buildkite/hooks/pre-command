@@ -8,6 +8,8 @@ AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_account_auth"
 PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
 DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
 GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
+platform_type="$(uname)"
+arch_type="$(uname -m)"
 
 retry() {
   local retries=$1
@@ -62,32 +64,49 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "fi
   fi
 fi
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-dockerlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-osquerybeat" ]]; then
-  if [[ "${BUILDKITE_COMMAND}" =~ ^buildkite-agent ]]; then
-    echo "Skipped pre-command when running the Upload pipeline"
-    exit 0
+ENABLED_BEATS_PIPELINES_SLUGS=(
+  "auditbeat"
+  "filebeat"
+  "beats-metricbeat"
+  "beats-libbeat"
+  "beats-packetbeat"
+  "beats-winlogbeat"
+  "beats-winlogbeat"
+  "beats-xpack-libbeat"
+  "beats-xpack-metricbeat"
+  "beats-xpack-packetbeat"
+  "beats-xpack-winlogbeat"
+  "beats-xpack-dockerlogbeat"
+  "beats-xpack-auditbeat"
+  "beats-xpack-filebeat" 
+  "beats-xpack-heartbeat" 
+  "beats-xpack-osquerybeat"
+  )
+
+for slug in "${ENABLED_BEATS_PIPELINES_SLUGS[@]}"; do
+  if [[ "$BUILDKITE_PIPELINE_SLUG" == "$slug" ]]; then
+    source .buildkite/scripts/setenv.sh
+    if [ "${arch_type}" == "x86_64" ]; then
+      case "${platform_type}" in
+        Linux|Darwin)
+          echo "TBD"
+          ;;
+        MINGW*)
+          echo "-- Fixing CRLF in git checkout --"
+          git config core.autocrlf false
+          git rm --quiet --cached -r .
+          git reset --quiet --hard
+          ;;
+      esac
+    elif [[ "${arch_type}" == "aarch64" || "${arch_type}" == "arm64" ]]; then
+          echo "TBD"
+    else
+      echo "Unsupported OS"
+    fi
+    break
   fi
-  source .buildkite/scripts/setenv.sh
-  platform_type="$(uname)"
-  arch_type="$(uname -m)"
-  if [ "${arch_type}" == "x86_64" ]; then
-    case "${platform_type}" in
-      Linux|Darwin)
-        echo "TBD"
-        ;;
-      MINGW*)
-        echo "-- Fixing CRLF in git checkout --"
-        git config core.autocrlf false
-        git rm --quiet --cached -r .
-        git reset --quiet --hard
-        ;;
-    esac
-  elif [[ "${arch_type}" == "aarch64" || "${arch_type}" == "arm64" ]]; then
-        echo "TBD"
-  else
-    echo "Unsupported OS"
-  fi
-fi
+done
+
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
   if [[ "$BUILDKITE_STEP_KEY" == "extended-cloud-test" ]]; then
@@ -97,8 +116,6 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPE
     export BEATS_AWS_ACCESS_KEY
   fi
 fi
-
-
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
   if [[ "$BUILDKITE_STEP_KEY" == "extended-win-10-system-tests" || "$BUILDKITE_STEP_KEY" == "mandatory-win-2022-system-tests" ]]; then
