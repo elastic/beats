@@ -52,8 +52,6 @@ exportVars() {
         export GOX_FLAGS="-arch 386"
         export testResults="**\\build\\TEST*.xml"
         export artifacts="**\\build\\TEST*.out"
-        export magefile="$BEATS_PROJECT_NAME/.magefile"
-        export MAGEFILE_CACHE=$magefile
         ;;
     esac
   elif [[ "${arch_type}" == "aarch64" || "${arch_type}" == "arm64" ]]; then

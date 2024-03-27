@@ -78,8 +78,8 @@ ENABLED_BEATS_PIPELINES_SLUGS=(
   "beats-xpack-winlogbeat"
   "beats-xpack-dockerlogbeat"
   "beats-xpack-auditbeat"
-  "beats-xpack-filebeat" 
-  "beats-xpack-heartbeat" 
+  "beats-xpack-filebeat"
+  "beats-xpack-heartbeat"
   "beats-xpack-osquerybeat"
   )
 
@@ -93,9 +93,9 @@ for slug in "${ENABLED_BEATS_PIPELINES_SLUGS[@]}"; do
           ;;
         MINGW*)
           echo "-- Fixing CRLF in git checkout --"
-          git config core.autocrlf false
-          git rm --quiet --cached -r .
-          git reset --quiet --hard
+          # git config core.autocrlf false
+          # git rm --quiet --cached -r .
+          # git reset --quiet --hard
           ;;
       esac
     elif [[ "${arch_type}" == "aarch64" || "${arch_type}" == "arm64" ]]; then
