@@ -13,6 +13,9 @@ on:
 env:
   BEAT_MODULE: 'x-pack/functionbeat'
 
+permissions:
+  contents: read
+
 jobs:
   macos:
     runs-on: macos-latest

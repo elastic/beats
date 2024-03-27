@@ -16,6 +16,9 @@ env:
   AREA_FIELD_ID: 'PVTSSF_lADOAGc3Zs4AEzn4zgEgZSo'
   ELASTIC_AGENT_OPTION_ID: 'c1e1a30a'
   
+permissions:
+  contents: read
+
 jobs:
   add_to_ingest_project:
     runs-on: ubuntu-latest
