@@ -6,10 +6,10 @@ input:
     namespace: performance
     queries:
       - query: >
-          SELECT digest_text, count_star, avg_timer_wait, max_timer_wait, last_seen, quantile_95
-            FROM performance_schema.events_statements_summary_by_digest
-            ORDER BY avg_timer_wait DESC
-            LIMIT 10
+          SELECT schema_name AS schemaname, digest_text, count_star, avg_timer_wait, max_timer_wait, last_seen, quantile_95
+          FROM performance_schema.events_statements_summary_by_digest
+          ORDER BY avg_timer_wait DESC
+          LIMIT 10
         query_namespace: events_statements
         response_format: table
         replace_underscores: true
