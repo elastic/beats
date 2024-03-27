@@ -48,6 +48,7 @@ steps:
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command:
+          - ".buildkite\\scripts\\win_unit_tests.ps1"
           - "Set-Location -Path $BEATS_PROJECT_NAME"
           - "New-Item -ItemType Directory -Force -Path 'build'"
           - "mage unitTest"
@@ -71,6 +72,7 @@ steps:
     steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command:
+          - ".buildkite\\scripts\\win_unit_tests.ps1"
           - "Set-Location -Path $BEATS_PROJECT_NAME"
           - "New-Item -ItemType Directory -Force -Path 'build'"
           - "mage unitTest"
