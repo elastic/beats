@@ -76,6 +76,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 - Reset prctl dumpable flag after cap drop. {pull}38269[38269]
+- Fix reference yaml format. {pull}38584[38584]
 
 *Metricbeat*
 
