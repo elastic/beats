@@ -71,7 +71,7 @@ func NewFlows(pub Reporter, watcher *procs.ProcessesWatcher, config *config.Flow
 
 	counter := &counterReg{}
 
-	worker, err := newFlowsWorker(pub, watcher, table, counter, timeout, period)
+	worker, err := newFlowsWorker(pub, watcher, table, counter, timeout, period, config.EnableDeltaFlowReports)
 	if err != nil {
 		logp.Err("failed to configure flows processing intervals: %v", err)
 		return nil, err

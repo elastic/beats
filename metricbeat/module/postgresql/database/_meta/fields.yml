@@ -36,12 +36,12 @@
         that a read was not necessary (this only includes hits in the PostgreSQL
         buffer cache, not the operating system's file system cache).
     - name: blocks.time.read.ms
-      type: long
+      type: double
       description: >
         Time spent reading data file blocks by backends in this database, in
         milliseconds.
     - name: blocks.time.write.ms
-      type: long
+      type: double
       description: >
         Time spent writing data file blocks by backends in this database, in
         milliseconds.
