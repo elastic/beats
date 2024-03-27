@@ -135,10 +135,6 @@ func (c *client) Close() error {
 	// first stop ack handling. ACK handler might block on wait (with timeout), waiting
 	// for pending events to be ACKed.
 	c.closeOnce.Do(func() {
-		// This is not needed any more as the pipeline does not
-		// keep any list of clients
-		// close(c.done)
-
 		c.isOpen.Store(false)
 		c.onClosing()
 
