@@ -10,6 +10,9 @@ on:
 env:
   BEAT_MODULE: 'heartbeat'
 
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
