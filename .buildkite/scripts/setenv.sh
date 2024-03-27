@@ -52,8 +52,8 @@ exportVars() {
         export GOX_FLAGS="-arch 386"
         export testResults="**\\build\\TEST*.xml"
         export artifacts="**\\build\\TEST*.out"
-        $WORKSPACE_WIN=${WORKSPACE//\//\\\\}
-        $MAGEFILE="$WORKSPACE_WIN\\$BEATS_PROJECT_NAME\\.magefile"
+        WORKSPACE_WIN=${WORKSPACE//\//\\\\}
+        MAGEFILE="$WORKSPACE_WIN\\$BEATS_PROJECT_NAME\\.magefile"
         export MAGEFILE_CACHE=$MAGEFILE
         ;;
     esac
