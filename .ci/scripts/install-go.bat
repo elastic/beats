@@ -3,10 +3,13 @@ set MAGEFILE_CACHE=%WORKSPACE%\.magefile
 
 set PATH=%WORKSPACE%\bin;C:\ProgramData\chocolatey\bin;%PATH%
 
+echo "Upgrade chocolatey to latest version"
+choco upgrade chocolatey -y
+
 curl --version >nul 2>&1 && (
     echo found curl
 ) || (
-    choco install curl -y --no-progress --skipdownloadcache
+    choco install curl -y --no-progress
 )
 
 mkdir %WORKSPACE%\bin
