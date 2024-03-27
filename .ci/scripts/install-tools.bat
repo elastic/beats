@@ -19,8 +19,8 @@ curl --version >nul 2>&1 && (
 )
 
 IF NOT EXIST C:\Python38\python.exe (
-    REM Install python 3.11.3
-    choco install python -y -r --no-progress --version 3.11.3 || exit /b 1
+    REM Install python 3.11
+    choco install python311 -y -r --no-progress || exit /b 1
 )
 python --version
 where python
