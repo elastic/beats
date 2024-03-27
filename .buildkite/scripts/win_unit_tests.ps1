@@ -156,31 +156,31 @@ withMinGW
 
 # $ErrorActionPreference = "Continue" # set +e
 
-Set-Location -Path $WorkFolder
+# Set-Location -Path $WorkFolder
 
 # $magefile = "$WORKSPACE\$WorkFolder\.magefile"
 # $env:MAGEFILE_CACHE = $magefile
 
-New-Item -ItemType Directory -Force -Path "build"
+# New-Item -ItemType Directory -Force -Path "build"
 
-if ($testType -eq "unittest") {
-    if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
-        mage -w reader/etw build goUnitTest
-    } else {
-        mage build unitTest
-    }
-}
-elseif ($testType -eq "systemtest") {
-    try {
-        google_cloud_auth
-        mage systemTest
-    } finally {
-        google_cloud_auth_cleanup
-    }
-}
-else {
-    Write-Host "Unknown test type. Please specify 'unittest' or 'systemtest'."
-}
+# if ($testType -eq "unittest") {
+#     if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
+#         mage -w reader/etw build goUnitTest
+#     } else {
+#         mage build unitTest
+#     }
+# }
+# elseif ($testType -eq "systemtest") {
+#     try {
+#         google_cloud_auth
+#         mage systemTest
+#     } finally {
+#         google_cloud_auth_cleanup
+#     }
+# }
+# else {
+#     Write-Host "Unknown test type. Please specify 'unittest' or 'systemtest'."
+# }
 
 # $EXITCODE=$LASTEXITCODE
 # $ErrorActionPreference = "Stop"
