@@ -1,8 +1,6 @@
 module github.com/elastic/beats/v7
 
-go 1.21.0
-
-toolchain go1.21.6
+go 1.21
 
 require (
 	cloud.google.com/go/bigquery v1.55.0
@@ -71,7 +69,7 @@ require (
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.2.0
 	github.com/eclipse/paho.mqtt.golang v1.3.5
-	github.com/elastic/elastic-agent-client/v7 v7.6.0
+	github.com/elastic/elastic-agent-client/v7 v7.8.1
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.5.0
 	github.com/elastic/go-licenser v0.4.1
@@ -80,9 +78,9 @@ require (
 	github.com/elastic/go-perf v0.0.0-20191212140718-9c656876f595
 	github.com/elastic/go-seccomp-bpf v1.4.0
 	github.com/elastic/go-structform v0.0.10
-	github.com/elastic/go-sysinfo v1.11.2
-	github.com/elastic/go-ucfg v0.8.6
-	github.com/elastic/gosigar v0.14.2
+	github.com/elastic/go-sysinfo v1.13.1
+	github.com/elastic/go-ucfg v0.8.7
+	github.com/elastic/gosigar v0.14.3
 	github.com/fatih/color v1.15.0
 	github.com/fearful-symmetry/gorapl v0.0.4
 	github.com/fsnotify/fsevents v0.1.1
@@ -141,7 +139,7 @@ require (
 	github.com/shopspring/decimal v1.3.1 // indirect
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
-	github.com/stretchr/testify v1.8.4
+	github.com/stretchr/testify v1.9.0
 	github.com/tsg/go-daemon v0.0.0-20200207173439-e704b93fd89b
 	github.com/ugorji/go/codec v1.1.8
 	github.com/urso/sderr v0.0.0-20210525210834-52b04e8f5c71
@@ -153,20 +151,20 @@ require (
 	go.uber.org/atomic v1.11.0
 	go.uber.org/multierr v1.11.0
 	go.uber.org/zap v1.26.0
-	golang.org/x/crypto v0.19.0
+	golang.org/x/crypto v0.21.0
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616
 	golang.org/x/mod v0.14.0
 	golang.org/x/net v0.21.0
 	golang.org/x/oauth2 v0.10.0
 	golang.org/x/sync v0.5.0
-	golang.org/x/sys v0.17.0
+	golang.org/x/sys v0.18.0
 	golang.org/x/text v0.14.0
 	golang.org/x/time v0.3.0
 	golang.org/x/tools v0.16.0
 	google.golang.org/api v0.128.0
 	google.golang.org/genproto v0.0.0-20230920204549-e6e6cdab5c13 // indirect
 	google.golang.org/grpc v1.58.3
-	google.golang.org/protobuf v1.31.0
+	google.golang.org/protobuf v1.33.0
 	gopkg.in/inf.v0 v0.9.1
 	gopkg.in/jcmturner/aescts.v1 v1.0.1 // indirect
 	gopkg.in/jcmturner/dnsutils.v1 v1.0.1 // indirect
@@ -186,10 +184,10 @@ require (
 	cloud.google.com/go v0.110.8
 	cloud.google.com/go/compute v1.23.0
 	cloud.google.com/go/redis v1.13.1
-	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.9.2
+	github.com/Azure/azure-sdk-for-go/sdk/azcore v1.9.0
 	github.com/Azure/azure-sdk-for-go/sdk/azidentity v1.4.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/consumption/armconsumption v1.1.0
-	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.8.0
+	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/containerservice/armcontainerservice/v4 v4.6.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/costmanagement/armcostmanagement v1.1.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor v0.8.0
 	github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources v1.1.1
@@ -203,13 +201,13 @@ require (
 	github.com/aws/smithy-go v1.13.5
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
-	github.com/elastic/ebpfevents v0.6.0
+	github.com/elastic/ebpfevents v0.4.0
 	github.com/elastic/elastic-agent-autodiscover v0.6.7
 	github.com/elastic/elastic-agent-libs v0.7.5
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
-	github.com/elastic/elastic-agent-system-metrics v0.9.1
+	github.com/elastic/elastic-agent-system-metrics v0.9.2
 	github.com/elastic/go-elasticsearch/v8 v8.12.0
-	github.com/elastic/mito v1.8.0
+	github.com/elastic/mito v1.10.0
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
@@ -222,7 +220,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/gorilla/websocket v1.4.2
 	github.com/icholy/digest v0.1.22
-	github.com/lestrrat-go/jwx/v2 v2.0.19
+	github.com/lestrrat-go/jwx/v2 v2.0.21
 	github.com/otiai10/copy v1.12.0
 	github.com/pierrec/lz4/v4 v4.1.18
 	github.com/pkg/xattr v0.4.9
@@ -247,7 +245,7 @@ require (
 	github.com/AdaLogics/go-fuzz-headers v0.0.0-20230811130428-ced1acdcaa24 // indirect
 	github.com/Azure/azure-amqp-common-go/v3 v3.2.1 // indirect
 	github.com/Azure/azure-pipeline-go v0.2.1 // indirect
-	github.com/Azure/azure-sdk-for-go/sdk/internal v1.5.2 // indirect
+	github.com/Azure/azure-sdk-for-go/sdk/internal v1.5.0 // indirect
 	github.com/Azure/go-amqp v0.16.0 // indirect
 	github.com/Azure/go-autorest v14.2.0+incompatible // indirect
 	github.com/Azure/go-autorest/autorest/to v0.4.0 // indirect
@@ -276,7 +274,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.13.5 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
-	github.com/cilium/ebpf v0.13.2 // indirect
+	github.com/cilium/ebpf v0.12.3 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/decred/dcrd/dcrec/secp256k1/v4 v4.2.0 // indirect
@@ -336,7 +334,7 @@ require (
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/lestrrat-go/blackmagic v1.0.2 // indirect
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
-	github.com/lestrrat-go/httprc v1.0.4 // indirect
+	github.com/lestrrat-go/httprc v1.0.5 // indirect
 	github.com/lestrrat-go/iter v1.0.2 // indirect
 	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
@@ -365,7 +363,7 @@ require (
 	github.com/shirou/gopsutil v3.21.11+incompatible // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
-	github.com/stretchr/objx v0.5.0 // indirect
+	github.com/stretchr/objx v0.5.2 // indirect
 	github.com/tklauser/go-sysconf v0.3.10 // indirect
 	github.com/tklauser/numcpus v0.4.0 // indirect
 	github.com/urso/diag v0.0.0-20200210123136-21b3cc8eb797 // indirect
