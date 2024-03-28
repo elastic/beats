@@ -335,6 +335,7 @@ func (s *store) updateMetadata(key string, meta interface{}) error {
 	resource.cursorMeta = meta
 
 	s.writeState(resource)
+	resource.Release()
 	return nil
 }
 
@@ -384,6 +385,7 @@ func (s *store) remove(key string) error {
 		return fmt.Errorf("resource '%s' not found", key)
 	}
 	s.UpdateTTL(resource, 0)
+	resource.Release()
 	return nil
 }
 
