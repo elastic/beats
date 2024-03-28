@@ -41,17 +41,17 @@ are_paths_changed() {
 }
 
 # Selecting pipelines according to the changeset
-if are_paths_changed "${heartbeat_changeset[@]}" || [[ are_paths_changed "${oss_changeset}" ]]; then
+if are_paths_changed "${heartbeat_changeset[@]}" || are_paths_changed "${oss_changeset}"; then
   echo "Uploading Heartbeat pipeline"
   buildkite-agent pipeline upload .buildkite/heartbeat/heartbeat-pipeline.yml
 fi  
 
-if are_paths_changed "${auditbeat_changeset[@]}" || [[ are_paths_changed "${oss_changeset}" ]]; then
+if are_paths_changed "${auditbeat_changeset[@]}" || are_paths_changed "${oss_changeset}"; then
   echo "Uploading Auditbeat pipeline"
   buildkite-agent pipeline upload .buildkite/auditbeat/auditbeat-pipeline.yml
 fi
 
-if are_paths_changed "${metricbeat_changeset[@]}" || [[ are_paths_changed "${oss_changeset}" ]]; then
+if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset}"; then
   echo "Uploading Metricbeat pipeline"
   buildkite-agent pipeline upload .buildkite/metricbeat/pipeline.yml
 fi
