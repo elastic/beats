@@ -2150,6 +2150,10 @@ func (s *mockUpdaterWatcher) Store() caches.Store {
 func (s *mockUpdaterWatcher) AddEventHandler(kubernetes.ResourceEventHandler) {
 }
 
+func (s *mockUpdaterWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
+	return nil
+}
+
 func (s *mockUpdaterStore) List() []interface{} {
 	return s.objects
 }
