@@ -73,7 +73,7 @@ and machine learning jobs.  Run this command:
 ifeval::["{beatname_lc}"=="filebeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
-docker run \
+docker run --rm \
 {dockerimage} \
 setup -E setup.kibana.host=kibana:5601 \
 -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
@@ -83,7 +83,7 @@ endif::[]
 ifeval::["{beatname_lc}"=="metricbeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
-docker run \
+docker run --rm \
 {dockerimage} \
 setup -E setup.kibana.host=kibana:5601 \
 -E output.elasticsearch.hosts=["elasticsearch:9200"] <1> <2>
@@ -93,7 +93,7 @@ endif::[]
 ifeval::["{beatname_lc}"=="heartbeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
-docker run \
+docker run --rm \
 --cap-add=NET_RAW \
 {dockerimage} \
 setup -E setup.kibana.host=kibana:5601 \
@@ -104,7 +104,7 @@ endif::[]
 ifeval::["{beatname_lc}"=="packetbeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
-docker run \
+docker run --rm \
 --cap-add=NET_ADMIN \
 {dockerimage} \
 setup -E setup.kibana.host=kibana:5601 \
@@ -115,7 +115,7 @@ endif::[]
 ifeval::["{beatname_lc}"=="auditbeat"]
 ["source", "sh", subs="attributes"]
 --------------------------------------------
-docker run \
+docker run --rm \
   --cap-add="AUDIT_CONTROL" \
   --cap-add="AUDIT_READ" \
   {dockerimage} \
