@@ -1026,8 +1026,8 @@ func (e *enricher) Start(resourceWatchers *Watchers) {
 	}
 
 	// Start the main watcher if not already started.
-	// If there is a restart watcher, stop the old watcher if started and start the restart watcher.
-	// Then the restart watcher replaces the the old watcher and resourceMetaWatcher is set to nil.
+	// If there is a restartWatcher defined, stop the old watcher if started and start the restartWatcher.
+	// restartWatcher replaces the old watcher and resourceMetaWatcher.restartWatcher is set to nil.
 	resourceMetaWatcher := resourceWatchers.metaWatchersMap[e.resourceName]
 	if resourceMetaWatcher != nil {
 		if resourceMetaWatcher.restartWatcher != nil {
