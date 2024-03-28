@@ -49,7 +49,7 @@ steps:
           - "mage unitTest"
         env:
           magefile: "$BEATS_PROJECT_NAME\.magefile"
-          MAGEFILE_CACHE: $magefile
+          MAGEFILE_CACHE: "$BEATS_PROJECT_NAME\.magefile"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -76,7 +76,7 @@ steps:
         key: "extended-win-unit-tests"
         env:
           magefile: "$BEATS_PROJECT_NAME\.magefile"
-          MAGEFILE_CACHE: $magefile
+          MAGEFILE_CACHE: "$BEATS_PROJECT_NAME\.magefile"
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
