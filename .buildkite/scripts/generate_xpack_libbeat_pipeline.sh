@@ -44,11 +44,12 @@ steps:
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command:
-          # - "$magefile='$BEATS_PROJECT_NAME\.magefile'"
-          # - "$env:MAGEFILE_CACHE = $magefile"
           - "Set-Location -Path $BEATS_PROJECT_NAME"
           - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "magefile='$BEATS_PROJECT_NAME\.magefile' MAGEFILE_CACHE=$magefile mage unitTest"
+          - "mage unitTest"
+        env:
+          magefile: "$BEATS_PROJECT_NAME\.magefile"
+          MAGEFILE_CACHE: $magefile
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -69,12 +70,13 @@ steps:
     steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command:
-          # - "$magefile='$BEATS_PROJECT_NAME\.magefile'"
-          # - "$env:MAGEFILE_CACHE = $magefile"
           - "Set-Location -Path $BEATS_PROJECT_NAME"
           - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "magefile='$BEATS_PROJECT_NAME\.magefile' MAGEFILE_CACHE=$magefile mage unitTest"
+          - "mage unitTest"
         key: "extended-win-unit-tests"
+        env:
+          magefile: "$BEATS_PROJECT_NAME\.magefile"
+          MAGEFILE_CACHE: $magefile
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
