@@ -3,12 +3,15 @@ set -euo pipefail
 
 heartbeat_changeset=(
   "^heartbeat/.*"
+  "^.buildkite/heartbeat/.*"
   )
 auditbeat_changeset=(
   "^auditbeat/.*"
+  "^.buildkite/auditbeat/.*"
   )  
 metricbeat_changeset=(
   "^metricbeat/.*"
+  "^.buildkite/metricbeat/.*"
   )
 
 oss_changeset=(
