@@ -197,6 +197,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.17
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.33
 	github.com/aws/aws-sdk-go-v2/service/cloudformation v1.20.4
+	github.com/aws/aws-sdk-go-v2/service/health v1.17.0
 	github.com/aws/aws-sdk-go-v2/service/kinesis v1.15.8
 	github.com/aws/smithy-go v1.13.5
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5

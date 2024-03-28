@@ -344,6 +344,8 @@ github.com/aws/aws-sdk-go-v2/service/ec2 v1.36.1 h1:FS8Ja6LuLDVHcX+rmoNpOXqYb52N
 github.com/aws/aws-sdk-go-v2/service/ec2 v1.36.1/go.mod h1:KOy1O7Fc2+GRgsbn/Kjr15vYDVXMEQALBaPRia3twSY=
 github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.18.4 h1:ZBYifRGfN3dOKzvk0+XJiUKOFzqoJddYqCVsN5quCh4=
 github.com/aws/aws-sdk-go-v2/service/elasticloadbalancingv2 v1.18.4/go.mod h1:9wKR88sRRyxrUAw5iVSDTfcCz90BLEFcAiyzP4v39uY=
+github.com/aws/aws-sdk-go-v2/service/health v1.17.0 h1:DlG9888p6n8Fizx8Vuw1qalBOBtjoDk70UzqyilQ7+s=
+github.com/aws/aws-sdk-go-v2/service/health v1.17.0/go.mod h1:z7JTQWRaBIdYYxK8TqDi4MKYYl04uI+jvTJuMEKIsL0=
 github.com/aws/aws-sdk-go-v2/service/iam v1.18.4 h1:E41guA79mjEbwJdh0zXz1d8+Zt4zxRr+b1ipiVbKXzs=
 github.com/aws/aws-sdk-go-v2/service/iam v1.18.4/go.mod h1:FpNvAfCZyIQ3qeNJUOw4CShKvdizHblXqAvSk0qmyL4=
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.9 h1:Lh1AShsuIJTwMkoxVCAYPJgNG5H+eN6SmoUn8nOZ5wE=

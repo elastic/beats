@@ -1,0 +1,75 @@
+- name: awshealth
+  type: group
+  release: beta
+  description: >
+    AWS Health metrics
+  fields:
+    - name: affected_entities_others
+      type: float
+      description: >
+        Number of affected resources, not able to verify status, related to the event.
+    - name: affected_entities_pending
+      type: float
+      description: >
+        Number of affected resources that may require action.
+    - name: affected_entities_resolved
+      type: float
+      description: >
+        Number of affected resources having no actions required.
+    - name: end_time
+      type: date
+      description: > 
+        The date and time that the event ended. Certain events may not have an End date.
+    - name: event_arn
+      type: keyword
+      description: >
+        The unique identifier for the event. The event ARN has the arn:aws:health:event-region::event/SERVICE/EVENT_TYPE_CODE/EVENT_TYPE_PLUS_ID format.
+    - name: event_scope_code
+      type: keyword
+      description: >
+        This parameter specifies if the Health event is a public Amazon Web Service event or an account-specific event. Allowed values are PUBLIC/ ACCOUNT_SPECIFIC/ NONE. 
+    - name: event_type_category
+      type: keyword
+      description: >
+        Event type category code. Possible values are issue accountNotification, or scheduledChange.
+    - name: event_type_code
+      type: keyword
+      description: >
+        The unique identifier for the event type. The format is AWS_SERVICE_DESCRIPTION
+    - name: last_updated_time
+      type: date
+      description: >
+        The most recent date and time that the event was updated.
+    - name: region
+      type: keyword
+      description: >
+        The Amazon Web Services Region name of the event.
+    - name: service
+      type: keyword
+      description: >
+        The Amazon Web Service that is affected by the event. For example, EC2 , RDS .
+    - name: start_time
+      type: date
+      description: >
+        The date and time that the event began.
+    - name: status_code
+      type: keyword
+      description: >
+        The most recent status of the event. Possible values are open , closed , and upcoming.
+    - name: affected_entities
+      type: nested
+      description: >
+        Information about an entity that is affected by a Health event.
+      fields:
+        - name: aws_account_id
+          type: keyword
+        - name: entity_url
+          type: keyword
+        - name: entity_value
+          type: keyword
+        - name: last_updated_time
+          type: date
+        - name: status_code
+          type: keyword
+        - name: entity_arn
+          type: keyword

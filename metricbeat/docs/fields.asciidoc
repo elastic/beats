@@ -1546,6 +1546,153 @@ type: keyword
 --
 
 [float]
+=== awshealth
+
+AWS Health metrics
+
+
+
+*`aws.awshealth.affected_entities_others`*::
++
+--
+Number of affected resources, not able to verify status, related to the event.
+
+
+type: float
+
+--
+
+*`aws.awshealth.affected_entities_pending`*::
++
+--
+Number of affected resources that may require action.
+
+
+type: float
+
+--
+
+*`aws.awshealth.affected_entities_resolved`*::
++
+--
+Number of affected resources having no actions required.
+
+
+type: float
+
+--
+
+*`aws.awshealth.end_time`*::
++
+--
+The date and time that the event ended. Certain events may not have an End date.
+
+
+type: date
+
+--
+
+*`aws.awshealth.event_arn`*::
++
+--
+The unique identifier for the event. The event ARN has the arn:aws:health:event-region::event/SERVICE/EVENT_TYPE_CODE/EVENT_TYPE_PLUS_ID format.
+
+
+type: keyword
+
+--
+
+*`aws.awshealth.event_scope_code`*::
++
+--
+This parameter specifies if the Health event is a public Amazon Web Service event or an account-specific event. Allowed values are PUBLIC/ ACCOUNT_SPECIFIC/ NONE. 
+
+
+type: keyword
+
+--
+
+*`aws.awshealth.event_type_category`*::
++
+--
+Event type category code. Possible values are issue accountNotification, or scheduledChange.
+
+
+type: keyword
+
+--
+
+*`aws.awshealth.event_type_code`*::
++
+--
+The unique identifier for the event type. The format is AWS_SERVICE_DESCRIPTION
+
+
+type: keyword
+
+--
+
+*`aws.awshealth.last_updated_time`*::
++
+--
+The most recent date and time that the event was updated.
+
+
+type: date
+
+--
+
+*`aws.awshealth.region`*::
++
+--
+The Amazon Web Services Region name of the event.
+
+
+type: keyword
+
+--
+
+*`aws.awshealth.service`*::
++
+--
+The Amazon Web Service that is affected by the event. For example, EC2 , RDS .
+
+
+type: keyword
+
+--
+
+*`aws.awshealth.start_time`*::
++
+--
+The date and time that the event began.
+
+
+type: date
+
+--
+
+*`aws.awshealth.status_code`*::
++
+--
+The most recent status of the event. Possible values are open , closed , and upcoming.
+
+
+type: keyword
+
+--
+
+*`aws.awshealth.affected_entities`*::
++
+--
+Information about an entity that is affected by a Health event.
+
+
+type: nested
+
+--
+
+[float]
 === billing
 
 `billing` contains the estimated charges for your AWS account in Cloudwatch.
