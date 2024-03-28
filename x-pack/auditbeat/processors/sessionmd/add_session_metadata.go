@@ -117,22 +117,22 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 		return nil, fmt.Errorf("pid %v not found in db: %w", pid, err)
 	}
 
-	result := ev.Clone()
-
 	processMap := fullProcess.ToMap()
 
-	if b, err := result.Fields.HasKey("process"); !b || err != nil {
+	if b, err := ev.Fields.HasKey("process"); !b || err != nil {
 		return nil, fmt.Errorf("no process field in event")
 	}
-	m, ok := tryToMapStr(result.Fields["process"])
+	m, ok := tryToMapStr(ev.Fields["process"])
 	if !ok {
 		return nil, fmt.Errorf("process field type not supported")
 	}
 
+	result := ev.Clone()
 	err = mapstr.MergeFieldsDeep(m, processMap, true)
 	if err != nil {
 		return nil, fmt.Errorf("merging enriched fields with event: %w", err)
 	}
+	result.Fields["process"] = m
 
 	if p.config.ReplaceFields {
 		if err := p.replaceFields(result); err != nil {
@@ -173,7 +173,7 @@ func pidToUInt32(value interface{}) (pid uint32, err error) {
 // The current version of session view in Kibana expects different values than what are used by auditbeat
 // for some fields. This function converts these field to have values that will work with session view.
 //
-// This function is temporary, and can be removed when Kibana is updated to work with the auditbeat field values.
+// This function is temporary, and can be removed when this Kibana issue is completed: https://github.com/elastic/kibana/issues/179396.
 func (p *addSessionMetadata) replaceFields(ev *beat.Event) error {
 	kind, err := ev.Fields.GetValue("event.kind")
 	if err != nil {

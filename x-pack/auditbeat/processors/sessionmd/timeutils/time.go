@@ -16,25 +16,9 @@ import (
 )
 
 var (
-	bootTime       time.Time
-	ticksPerSecond uint64
-	initError      error
-	once           sync.Once
+	getBootTimeOnce       = sync.OnceValues(getBootTime)
+	getTicksPerSecondOnce = sync.OnceValues(getTicksPerSecond)
 )
-
-func initialize() {
-	var err error
-	bootTime, err = getBootTime()
-	if err != nil {
-		initError = err
-		return
-	}
-
-	ticksPerSecond, err = getTicksPerSecond()
-	if err != nil {
-		initError = err
-	}
-}
 
 func getBootTime() (time.Time, error) {
 	fs, err := procfs.NewDefaultFS()
@@ -58,17 +42,17 @@ func getTicksPerSecond() (uint64, error) {
 }
 
 func TicksToNs(ticks uint64) uint64 {
-	once.Do(initialize)
-	if initError != nil {
+	ticksPerSecond, err := getTicksPerSecondOnce()
+	if err != nil {
 		return 0
 	}
 	return ticks * uint64(time.Second.Nanoseconds()) / ticksPerSecond
 }
 
 func TimeFromNsSinceBoot(t time.Duration) *time.Time {
-	once.Do(initialize)
-	if initError != nil {
-		return &time.Time{}
+	bootTime, err := getBootTime()
+	if err != nil {
+		return nil
 	}
 	timestamp := bootTime.Add(t)
 	return &timestamp
@@ -85,8 +69,8 @@ func TimeFromNsSinceBoot(t time.Duration) *time.Time {
 //   - We store timestamps as nanoseconds, but reduce the precision to 1/100th
 //     second
 func ReduceTimestampPrecision(timeNs uint64) time.Duration {
-	once.Do(initialize)
-	if initError != nil {
+	ticksPerSecond, err := getTicksPerSecondOnce()
+	if err != nil {
 		return 0
 	}
 	return time.Duration(timeNs).Truncate(time.Second / time.Duration(ticksPerSecond))
