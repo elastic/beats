@@ -50,6 +50,9 @@ cloud or on-premise).
 The second optional setting is `providers`. The `providers` settings accepts a
 list of cloud provider names to be used. If `providers` is not configured, then
 all providers that do not access a remote endpoint are enabled by default.
+The list of providers may alternatively be configured with the environment
+variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS`, by setting it to a comma-separated
+list of provider names.
 
 List of names the `providers` setting supports:
 
