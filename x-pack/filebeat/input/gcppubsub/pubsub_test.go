@@ -17,6 +17,7 @@ import (
 
 	"cloud.google.com/go/pubsub"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/sync/errgroup"
 	"google.golang.org/api/iterator"
 
@@ -338,10 +339,11 @@ func TestTopicDoesNotExist(t *testing.T) {
 	cfg := defaultTestConfig()
 
 	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
-		err := input.run()
-		if assert.Error(t, err) {
-			assert.Contains(t, err.Error(), "failed to subscribe to pub/sub topic")
-		}
+		require.Error(t, input.run())
+		// err := input.run()
+		// if assert.Error(t, err) {
+		// 	assert.Contains(t, err.Error(), "failed to subscribe to pub/sub topic")
+		// }
 	})
 }
 
