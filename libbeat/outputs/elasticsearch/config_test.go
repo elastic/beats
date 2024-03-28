@@ -21,7 +21,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -34,11 +36,11 @@ non_indexable_policy.drop: ~
 	if err != nil {
 		t.Fatalf("Can't create test configuration from valid input")
 	}
-	policy, err := newNonIndexablePolicy(elasticsearchOutputConfig.NonIndexablePolicy)
+	index, err := deadLetterIndexForPolicy(elasticsearchOutputConfig.NonIndexablePolicy)
 	if err != nil {
-		t.Fatalf("Can't create test configuration from valid input")
+		t.Fatalf("Can't read non-indexable policy: %v", err.Error())
 	}
-	assert.Equal(t, drop, policy.action(), "action should be drop")
+	assert.Equal(t, "", index, "dead letter index should be empty string")
 }
 
 func TestDeadLetterIndexPolicyConfig(t *testing.T) {
@@ -51,11 +53,11 @@ non_indexable_policy.dead_letter_index:
 	if err != nil {
 		t.Fatalf("Can't create test configuration from valid input")
 	}
-	policy, err := newNonIndexablePolicy(elasticsearchOutputConfig.NonIndexablePolicy)
+	index, err := deadLetterIndexForPolicy(elasticsearchOutputConfig.NonIndexablePolicy)
 	if err != nil {
-		t.Fatalf("Can't create test configuration from valid input")
+		t.Fatalf("Can't read non-indexable policy: %v", err.Error())
 	}
-	assert.Equal(t, "my-dead-letter-index", policy.index(), "index should match config")
+	assert.Equal(t, "my-dead-letter-index", index, "index should match config")
 }
 
 func TestInvalidNonIndexablePolicyConfig(t *testing.T) {
@@ -88,13 +90,34 @@ non_indexable_policy.dead_letter_index:
 			if err != nil {
 				t.Fatalf("Can't create test configuration from valid input")
 			}
-			_, err = newNonIndexablePolicy(elasticsearchOutputConfig.NonIndexablePolicy)
+
+			_, err = deadLetterIndexForPolicy(elasticsearchOutputConfig.NonIndexablePolicy)
 			if err == nil {
-				t.Fatalf("Can create test configuration from invalid input")
+				t.Fatalf("Invalid non-indexable policy config should produce an error")
 			}
 			t.Logf("error %s", err.Error())
 		})
 	}
+}
+
+func TestGetIndex(t *testing.T) {
+	dead_letter_index := "dead_index"
+	client := &Client{
+		deadLetterIndex: dead_letter_index,
+		indexSelector:   testIndexSelector{},
+	}
+
+	event := &beat.Event{
+		Meta: make(map[string]interface{}),
+	}
+	index, err := client.getIndex(event)
+	require.NoError(t, err, "getIndex call must succeed")
+	assert.Equal(t, "test", index, "Event with no dead letter marker should use the client's index selector")
+
+	event.Meta[dead_letter_marker_field] = true
+	index, err = client.getIndex(event)
+	require.NoError(t, err, "getIndex call must succeed")
+	assert.Equal(t, dead_letter_index, index, "Event with dead letter marker should use the client's dead letter index")
 }
 
 func TestCompressionIsOnByDefault(t *testing.T) {

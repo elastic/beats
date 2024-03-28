@@ -73,9 +73,9 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
-	policy, err := newNonIndexablePolicy(esConfig.NonIndexablePolicy)
+	deadLetterIndex, err := deadLetterIndexForPolicy(esConfig.NonIndexablePolicy)
 	if err != nil {
-		log.Errorf("error while creating file identifier: %v", err)
+		log.Errorf("error in non_indexable_policy: %v", err)
 		return outputs.Fail(err)
 	}
 
@@ -94,13 +94,6 @@ func makeES(
 		params = nil
 	}
 
-	if policy.action() == dead_letter_index {
-		index = DeadLetterSelector{
-			Selector:        index,
-			DeadLetterIndex: policy.index(),
-		}
-	}
-
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, host := range hosts {
 		esURL, err := common.MakeURL(esConfig.Protocol, esConfig.Path, host, 9200)
@@ -110,8 +103,8 @@ func makeES(
 		}
 
 		var client outputs.NetworkClient
-		client, err = NewClient(ClientSettings{
-			ConnectionSettings: eslegclient.ConnectionSettings{
+		client, err = NewClient(clientSettings{
+			connection: eslegclient.ConnectionSettings{
 				URL:              esURL,
 				Beatname:         beat.Beat,
 				Kerberos:         esConfig.Kerberos,
@@ -126,10 +119,10 @@ func makeES(
 				Transport:        esConfig.Transport,
 				IdleConnTimeout:  esConfig.Transport.IdleConnTimeout,
 			},
-			Index:              index,
-			Pipeline:           pipeline,
-			Observer:           observer,
-			NonIndexableAction: policy.action(),
+			indexSelector:    index,
+			pipelineSelector: pipeline,
+			observer:         observer,
+			deadLetterIndex:  deadLetterIndex,
 		}, &connectCallbackRegistry)
 		if err != nil {
 			return outputs.Fail(err)
@@ -144,7 +137,7 @@ func makeES(
 
 func buildSelectors(
 	im outputs.IndexManager,
-	beat beat.Info,
+	_ beat.Info,
 	cfg *config.C,
 ) (index outputs.IndexSelector, pipeline *outil.Selector, err error) {
 	index, err = im.BuildSelector(cfg)

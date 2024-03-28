@@ -119,10 +119,11 @@ func TestPipelineSelection(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, func(t *testing.T) {
 			selector, err := buildPipelineSelector(config.MustNewConfigFrom(test.cfg))
+			assert.NoError(t, err)
 
 			client, err := NewClient(
-				ClientSettings{
-					Pipeline: &selector,
+				clientSettings{
+					pipelineSelector: &selector,
 				},
 				nil,
 			)
