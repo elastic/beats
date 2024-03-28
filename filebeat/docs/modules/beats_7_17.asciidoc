@@ -1,0 +1,62 @@
+////
+This file is generated! See scripts/docs_collector.py
+////
+
+:edit_url: https://github.com/elastic/beats/edit/main/filebeat/module/beats_7_17/_meta/docs.asciidoc
+
+[[filebeat-module-beats_7_17]]
+:modulename: beats_7_17
+:has-dashboards: true
+
+== beats_7_17 module
+
+This is the beats_7_17 module.
+
+include::../include/what-happens.asciidoc[]
+
+include::../include/gs-link.asciidoc[]
+
+[float]
+=== Compatibility
+
+TODO: document with what versions of the software is this tested
+
+include::../include/configuring-intro.asciidoc[]
+
+TODO: provide an example configuration
+
+:fileset_ex: {fileset}
+
+include::../include/config-option-intro.asciidoc[]
+
+TODO: document the variables from each fileset. If you're describing a variable
+that's common to other modules, you can reuse shared descriptions by including
+the relevant file. For example:
+
+[float]
+==== `{fileset}` log fileset settings
+
+include::../include/var-paths.asciidoc[]
+
+[float]
+=== Example dashboard
+
+This module comes with a sample dashboard. For example:
+
+TODO: include an image of a sample dashboard. If you do not include a dashboard,
+remove this section and set `:has-dashboards: false` at the top of this file.
+
+:has-dashboards!:
+
+:fileset_ex!:
+
+:modulename!:
+
+
+[float]
+=== Fields
+
+For a description of each field in the module, see the
+<<exported-fields-beats_7_17,exported fields>> section.
+
+:edit_url!:

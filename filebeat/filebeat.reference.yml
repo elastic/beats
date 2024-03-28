@@ -76,6 +76,16 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
+#------------------------------ Beats_7_17 Module ------------------------------
+- module: beats_7_17
+  # All logs
+  log:
+    enabled: false
+
+    # Set custom paths for the log files. If left empty,
+    # Filebeat will choose the paths depending on your OS.
+    #var.paths:
+
 #---------------------------- Elasticsearch Module ----------------------------
 - module: elasticsearch
   # Server log
