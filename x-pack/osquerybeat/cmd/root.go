@@ -24,6 +24,7 @@ import (
 
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/beater"
+	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/include"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/install"
 )

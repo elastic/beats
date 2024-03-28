@@ -42,9 +42,8 @@ import (
 )
 
 const (
-	moduleName      = "system"
 	metricsetName   = "socket"
-	fullName        = moduleName + "/" + metricsetName
+	fullName        = system.ModuleName + "/" + metricsetName
 	namespace       = "system.audit.socket"
 	detailSelector  = metricsetName + "detailed"
 	groupNamePrefix = "auditbeat_"
@@ -80,7 +79,7 @@ type MetricSet struct {
 }
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	mb.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)

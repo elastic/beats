@@ -10,20 +10,20 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 )
 
 const (
-	moduleName    = "system"
 	metricsetName = "package"
 )
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	mb.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 	)
 }
 
 // New returns an error.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return nil, fmt.Errorf("the %v/%v dataset is not supported on Windows", moduleName, metricsetName)
+	return nil, fmt.Errorf("the %v/%v dataset is not supported on Windows", system.ModuleName, metricsetName)
 }

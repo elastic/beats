@@ -10,13 +10,9 @@ import (
 	"github.com/elastic/go-sysinfo"
 )
 
-const (
-	moduleName = "system"
-)
-
 func init() {
 	// Register the custom ModuleFactory function for the system module.
-	if err := mb.Registry.AddModule(moduleName, NewModule); err != nil {
+	if err := mb.Registry.AddModule(ModuleName, NewModule); err != nil {
 		panic(err)
 	}
 }
@@ -52,7 +48,7 @@ func NewModule(base mb.BaseModule) (mb.Module, error) {
 		return nil, err
 	}
 
-	log := logp.NewLogger(moduleName)
+	log := logp.NewLogger(ModuleName)
 
 	var hostID string
 	if hostInfo, err := sysinfo.Host(); err != nil {

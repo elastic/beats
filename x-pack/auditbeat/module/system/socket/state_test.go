@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/tracing"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/dns"
 )
 
@@ -50,7 +51,7 @@ type testingState struct {
 }
 
 func (ts *testingState) Event(event mb.Event) bool {
-	ts.flows = append(ts.flows, event.BeatEvent(moduleName, metricsetName))
+	ts.flows = append(ts.flows, event.BeatEvent(system.ModuleName, metricsetName))
 	return true
 }
 

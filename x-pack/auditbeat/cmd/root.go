@@ -17,6 +17,13 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	// Register includes.
+	_ "github.com/elastic/beats/v7/auditbeat/include"
+
+	// Register modules.
+	_ "github.com/elastic/beats/v7/auditbeat/module/auditd"
+	_ "github.com/elastic/beats/v7/auditbeat/module/file_integrity"
+
 	// Register Auditbeat x-pack modules.
 	_ "github.com/elastic/beats/v7/x-pack/auditbeat/include"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
