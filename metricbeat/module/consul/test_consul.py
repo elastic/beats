@@ -55,6 +55,6 @@ class ConsulAgentTest(metricbeat.BaseTest):
         print(consul_agent)
         self.assertCountEqual(self.de_dot(AGENT_FIELDS), consul_agent.keys())
 
-        assert (consul_agent["runtime"]["heap_objects"] > 0)
+        assert(consul_agent["runtime"]["heap_objects"] > 0)
 
         self.assert_fields_are_documented(evt)

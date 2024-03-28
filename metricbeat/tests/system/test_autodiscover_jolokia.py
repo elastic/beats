@@ -57,5 +57,5 @@ class Test(metricbeat.BaseTest):
         assert evt['jolokia']['server']['vendor'] == 'Apache'
 
         # Remove "test" fields because namespace specific fields are not documented
-        del (evt["jolokia"]["test"])
+        del(evt["jolokia"]["test"])
         self.assert_fields_are_documented(output[0])
