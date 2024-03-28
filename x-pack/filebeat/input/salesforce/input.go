@@ -21,6 +21,8 @@ import (
 	"github.com/g8rswimmer/go-sfdc/session"
 	"github.com/g8rswimmer/go-sfdc/soql"
 	"github.com/golang-jwt/jwt"
+	"github.com/hashicorp/go-retryablehttp"
+	"go.uber.org/zap"
 	"golang.org/x/exp/slices"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -99,7 +101,7 @@ func (s *salesforceInput) Setup(env v2.Context, src inputcursor.Source, cursor *
 	s.publisher = pub
 	s.cursor = cursor
 	s.log = env.Logger.With("input_url", cfg.URL)
-	s.sfdcConfig, err = getSFDCConfig(&cfg)
+	s.sfdcConfig, err = s.getSFDCConfig(&cfg)
 	if err != nil {
 		return fmt.Errorf("error with configuration: %w", err)
 	}
@@ -188,7 +190,7 @@ func (s *salesforceInput) SetupSFClientConnection() (*soql.Resource, error) {
 		return nil, err
 	}
 
-	// set clientSession for re-use (EventLogFile)
+	// Set clientSession for re-use.
 	s.clientSession = session
 
 	// Create a new SOQL resource using the session.
@@ -211,24 +213,31 @@ func (s *salesforceInput) FormQueryWithCursor(queryConfig *QueryConfig, cursor m
 	return &querier{Query: qr}, err
 }
 
+// isZero checks if the given value v is the zero value for its type.
+// It compares v to the zero value obtained by new(T).
+func isZero[T comparable](v T) bool {
+	return v == *new(T)
+}
+
 // RunObject runs the Object method of the Event Monitoring API to collect events.
 func (s *salesforceInput) RunObject() error {
-	s.log.Debugf("Scrape Objects every %s", s.srcConfig.EventMonitoringMethod.Object.Interval)
+	s.log.Debugf("scrape object(s) every %s", s.srcConfig.EventMonitoringMethod.Object.Interval)
 
 	var cursor mapstr.M
-	if !(s.cursor.Object.FirstEventTime == "" && s.cursor.Object.LastEventTime == "") {
+	if !(isZero(s.cursor.Object.FirstEventTime) && isZero(s.cursor.Object.LastEventTime)) {
 		object := make(mapstr.M)
-		if s.cursor.Object.FirstEventTime != "" {
+		if !isZero(s.cursor.Object.FirstEventTime) {
 			object.Put("first_event_time", s.cursor.Object.FirstEventTime)
 		}
-		if s.cursor.Object.LastEventTime != "" {
+		if !isZero(s.cursor.Object.LastEventTime) {
 			object.Put("last_event_time", s.cursor.Object.LastEventTime)
 		}
 		cursor = mapstr.M{"object": object}
 	}
+
 	query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.Object.Query, cursor)
 	if err != nil {
-		return fmt.Errorf("error forming based on cursor: %w", err)
+		return fmt.Errorf("error forming query based on cursor: %w", err)
 	}
 
 	res, err := s.soqlr.Query(query, false)
@@ -248,14 +257,11 @@ func (s *salesforceInput) RunObject() error {
 				return err
 			}
 
-			if firstEvent {
-				if timstamp, ok := val[s.config.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
-					s.cursor.Object.FirstEventTime = timstamp
+			if timestamp, ok := val[s.config.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
+				if firstEvent {
+					s.cursor.Object.FirstEventTime = timestamp
 				}
-			}
-
-			if timstamp, ok := val[s.config.EventMonitoringMethod.Object.Cursor.Field].(string); ok {
-				s.cursor.Object.LastEventTime = timstamp
+				s.cursor.Object.LastEventTime = timestamp
 			}
 
 			err = publishEvent(s.publisher, s.cursor, jsonStrEvent, "Object")
@@ -266,13 +272,13 @@ func (s *salesforceInput) RunObject() error {
 			totalEvents++
 		}
 
-		if res.MoreRecords() { // returns true if there are more records.
-			res, err = res.Next()
-			if err != nil {
-				return err
-			}
-		} else {
+		if !res.MoreRecords() { // returns true if there are more records.
 			break
+		}
+
+		res, err = res.Next()
+		if err != nil {
+			return err
 		}
 	}
 	s.log.Debugf("Total events: %d", totalEvents)
@@ -283,15 +289,15 @@ func (s *salesforceInput) RunObject() error {
 // RunEventLogFile runs the EventLogFile method of the Event Monitoring API to
 // collect events.
 func (s *salesforceInput) RunEventLogFile() error {
-	s.log.Debugf("Scrape EventLogFiles every %s", s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
+	s.log.Debugf("scrape eventLogFile(s) every %s", s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
 
 	var cursor mapstr.M
-	if !(s.cursor.EventLogFile.FirstEventTime == "" && s.cursor.EventLogFile.LastEventTime == "") {
+	if !(isZero(s.cursor.Object.FirstEventTime) && isZero(s.cursor.Object.LastEventTime)) {
 		eventLogFile := make(mapstr.M)
-		if s.cursor.EventLogFile.FirstEventTime != "" {
+		if !isZero(s.cursor.Object.FirstEventTime) {
 			eventLogFile.Put("first_event_time", s.cursor.EventLogFile.FirstEventTime)
 		}
-		if s.cursor.EventLogFile.LastEventTime != "" {
+		if !isZero(s.cursor.Object.LastEventTime) {
 			eventLogFile.Put("last_event_time", s.cursor.EventLogFile.LastEventTime)
 		}
 		cursor = mapstr.M{"event_log_file": eventLogFile}
@@ -299,7 +305,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 
 	query, err := s.FormQueryWithCursor(s.config.EventMonitoringMethod.EventLogFile.Query, cursor)
 	if err != nil {
-		return fmt.Errorf("error forming based on cursor: %w", err)
+		return fmt.Errorf("error forming query based on cursor: %w", err)
 	}
 
 	res, err := s.soqlr.Query(query, false)
@@ -307,6 +313,9 @@ func (s *salesforceInput) RunEventLogFile() error {
 		return err
 	}
 
+	// NOTE: This is a failsafe check because the HTTP client is always set.
+	// This check allows unit tests to verify correct behavior when the HTTP
+	// client is nil.
 	if s.sfdcConfig.Client == nil {
 		return errors.New("internal error: salesforce configuration is not set properly")
 	}
@@ -321,7 +330,13 @@ func (s *salesforceInput) RunEventLogFile() error {
 
 			s.clientSession.AuthorizationHeader(req)
 
-			req.Header.Add("X-PrettyPrint", "1")
+			// NOTE: If we ever see a production issue relaated to this, then only
+			// we should consider adding the header: "X-PrettyPrint:1"
+			//
+			// // NOTE: X-PrettyPrint:1 is for formatted response and ideally we do
+			// // not need it. But see:
+			// // https://developer.salesforce.com/docs/atlas.en-us.api_rest.meta/api_rest/dome_event_log_file_download.htm?q=X-PrettyPrint%3A1
+			// req.Header.Add("X-PrettyPrint", "1")
 
 			resp, err := s.sfdcConfig.Client.Do(req)
 			if err != nil {
@@ -340,14 +355,11 @@ func (s *salesforceInput) RunEventLogFile() error {
 				return err
 			}
 
-			if firstEvent {
-				if timstamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
-					s.cursor.EventLogFile.FirstEventTime = timstamp
+			if timestamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
+				if firstEvent {
+					s.cursor.EventLogFile.FirstEventTime = timestamp
 				}
-			}
-
-			if timstamp, ok := rec.Record().Fields()[s.config.EventMonitoringMethod.EventLogFile.Cursor.Field].(string); ok {
-				s.cursor.EventLogFile.LastEventTime = timstamp
+				s.cursor.EventLogFile.LastEventTime = timestamp
 			}
 
 			for _, val := range recs {
@@ -365,13 +377,13 @@ func (s *salesforceInput) RunEventLogFile() error {
 			firstEvent = false
 		}
 
-		if res.MoreRecords() {
-			res, err = res.Next()
-			if err != nil {
-				return err
-			}
-		} else {
+		if !res.MoreRecords() {
 			break
+		}
+
+		res, err = res.Next()
+		if err != nil {
+			return err
 		}
 	}
 	s.log.Debugf("Total events: %d", totalEvents)
@@ -380,7 +392,7 @@ func (s *salesforceInput) RunEventLogFile() error {
 }
 
 // getSFDCConfig returns a new Salesforce configuration based on the configuration.
-func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
+func (s *salesforceInput) getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 	var (
 		creds *credentials.Credentials
 		err   error
@@ -411,8 +423,9 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 
 		creds, err = credentials.NewJWTCredentials(passCreds)
 		if err != nil {
-			return nil, fmt.Errorf("problem with credentials: %w", err)
+			return nil, fmt.Errorf("error creating jwt credentials: %w", err)
 		}
+
 	case cfg.Auth.OAuth2.UserPasswordFlow != nil && cfg.Auth.OAuth2.UserPasswordFlow.isEnabled():
 		passCreds := credentials.PasswordCredentials{
 			URL:          cfg.Auth.OAuth2.UserPasswordFlow.TokenURL,
@@ -424,16 +437,70 @@ func getSFDCConfig(cfg *config) (*sfdc.Configuration, error) {
 
 		creds, err = credentials.NewPasswordCredentials(passCreds)
 		if err != nil {
-			return nil, fmt.Errorf("problem with credentials: %w", err)
+			return nil, fmt.Errorf("error creating password credentials: %w", err)
 		}
 
 	}
 
+	client, err := newClient(*cfg, s.log)
+	if err != nil {
+		return nil, fmt.Errorf("problem with client: %w", err)
+	}
+
 	return &sfdc.Configuration{
 		Credentials: creds,
-		Client:      http.DefaultClient,
+		Client:      client,
 		Version:     cfg.Version,
 	}, nil
+}
+
+// retryLog is a shim for the retryablehttp.Client.Logger.
+type retryLog struct{ log *logp.Logger }
+
+func newRetryLog(log *logp.Logger) *retryLog {
+	return &retryLog{log: log.Named("retryablehttp").WithOptions(zap.AddCallerSkip(1))}
+}
+
+func (l *retryLog) Error(msg string, kv ...interface{}) { l.log.Errorw(msg, kv...) }
+func (l *retryLog) Info(msg string, kv ...interface{})  { l.log.Infow(msg, kv...) }
+func (l *retryLog) Debug(msg string, kv ...interface{}) { l.log.Debugw(msg, kv...) }
+func (l *retryLog) Warn(msg string, kv ...interface{})  { l.log.Warnw(msg, kv...) }
+
+// retryErrorHandler returns a retryablehttp.ErrorHandler that will log retry resignation
+// but return the last retry attempt's response and a nil error to allow the retryablehttp.Client
+// evaluate the response status itself. Any error passed to the retryablehttp.ErrorHandler
+// is returned unaltered.
+func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
+	return func(resp *http.Response, err error, numTries int) (*http.Response, error) {
+		log.Warnw("giving up retries", "method", resp.Request.Method, "url", resp.Request.URL, "retries", max+1)
+		return resp, err
+	}
+}
+
+func newClient(cfg config, log *logp.Logger) (*http.Client, error) {
+	c, err := cfg.Resource.Transport.Client()
+	if err != nil {
+		return nil, err
+	}
+
+	if maxAttempts := cfg.Resource.Retry.getMaxAttempts(); maxAttempts > 1 {
+		c = (&retryablehttp.Client{
+			HTTPClient:   c,
+			Logger:       newRetryLog(log),
+			RetryWaitMin: cfg.Resource.Retry.getWaitMin(),
+			RetryWaitMax: cfg.Resource.Retry.getWaitMax(),
+			RetryMax:     maxAttempts,
+			CheckRetry:   retryablehttp.DefaultRetryPolicy,
+			Backoff:      retryablehttp.DefaultBackoff,
+			ErrorHandler: retryErrorHandler(maxAttempts, log),
+		}).StandardClient()
+
+		// BUG: retryablehttp ignores the timeout previously set. So, setting it
+		// again.
+		c.Timeout = cfg.Resource.Transport.Timeout
+	}
+
+	return c, nil
 }
 
 // publishEvent publishes an event using the configured publisher pub.

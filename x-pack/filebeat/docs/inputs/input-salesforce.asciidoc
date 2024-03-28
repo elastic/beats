@@ -9,7 +9,7 @@
 <titleabbrev>Salesforce</titleabbrev>
 ++++
 
-Use the `salesforce` input to monitor Salesforce events either via the Salesforce ELF API or the Salesforce Real-time event monitoring API. Both use REST API (to execute SOQL queries in the Salesforce instance) under the hood to query the relevant objects to fetch the events.
+Use the `salesforce` input to monitor Salesforce events either via the https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm[Salesforce EventLogFile (ELF) API] or the https://developer.salesforce.com/blogs/2020/05/introduction-to-real-time-event-monitoring[Salesforce Real-time event monitoring API]. Both use REST API (to execute SOQL queries in the Salesforce instance) under the hood to query the relevant objects to fetch the events.
 
 Here the `input` have cursor state(s) that will be provided to the next execution of event monitoring to fetch the events from the last cursor state. The cursor states can be used to control the behaviour of the program.
 
@@ -39,7 +39,7 @@ filebeat.inputs:
         client.id: client-id
         client.secret: client-secret
         token_url: https://instance-id.develop.my.salesforce.com
-        user: salesforce-instance@user.in
+        username: salesforce-instance@user.in
         password: salesforce-instance-password
       jwt_bearer_flow:
         enabled: true
@@ -131,7 +131,7 @@ The client secret for the user-password flow.
 The token URL for the user-password flow.
 
 [string]
-==== `auth.oauth2.user_password_flow.user`
+==== `auth.oauth2.user_password_flow.username`
 
 The username for the user-password flow.
 
@@ -171,6 +171,27 @@ The URL for the JWT bearer flow.
 ==== `url`
 
 The URL of the Salesforce instance. Required.
+
+[[resource-parameters]]
+[float]
+==== `resource.timeout`
+
+Duration before declaring that the HTTP client connection has timed out. Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`. Default: `30s`.
+
+[float]
+==== `resource.retry.max_attempts`
+
+The maximum number of retries for the HTTP client. Default: `5`.
+
+[float]
+==== `resource.retry.wait_min`
+
+The minimum time to wait before a retry is attempted. Default: `1s`.
+
+[float]
+==== `resource.retry.wait_max`
+
+The maximum time to wait before a retry is attempted. Default: `60s`.
 
 [object]
 ==== `event_monitoring_method`

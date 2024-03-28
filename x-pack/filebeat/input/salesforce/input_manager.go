@@ -6,6 +6,7 @@ package salesforce
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/elastic/go-concert/unison"
 
@@ -13,6 +14,7 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/transport/httpcommon"
 )
 
 // compile-time check if querier implements InputManager
@@ -37,9 +39,30 @@ func NewInputManager(log *logp.Logger, store inputcursor.StateStore) InputManage
 	}
 }
 
+func defaultConfig() config {
+	apiVersion := 58
+	maxAttempts := 5
+	waitMin := time.Second
+	waitMax := time.Minute
+	transport := httpcommon.DefaultHTTPTransportSettings()
+	transport.Timeout = 30 * time.Second
+
+	return config{
+		Version: apiVersion,
+		Resource: &resourceConfig{
+			Transport: transport,
+			Retry: retryConfig{
+				MaxAttempts: &maxAttempts,
+				WaitMin:     &waitMin,
+				WaitMax:     &waitMax,
+			},
+		},
+	}
+}
+
 // cursorConfigure configures the cursor input manager.
 func cursorConfigure(cfg *conf.C) ([]inputcursor.Source, inputcursor.Input, error) {
-	config := config{Version: 58}
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, nil, fmt.Errorf("reading config: %w", err)
 	}
@@ -58,7 +81,7 @@ func (m InputManager) Init(grp unison.Group, mode v2.Mode) error {
 
 // Create creates a cursor input manager.
 func (m InputManager) Create(cfg *conf.C) (v2.Input, error) {
-	config := config{Version: 58}
+	config := defaultConfig()
 	if err := cfg.Unpack(&config); err != nil {
 		return nil, err
 	}

@@ -213,7 +213,7 @@ require (
 	github.com/elastic/tk-btf v0.1.0
 	github.com/elastic/toutoumomoma v0.0.0-20221026030040-594ef30cb640
 	github.com/foxcpp/go-mockdns v0.0.0-20201212160233-ede2f9158d15
-	github.com/g8rswimmer/go-sfdc v2.0.2-0.20201201191151-3190c381b3e1+incompatible
+	github.com/g8rswimmer/go-sfdc v0.0.0-00010101000000-000000000000
 	github.com/go-ldap/ldap/v3 v3.4.6
 	github.com/golang-jwt/jwt v3.2.1+incompatible
 	github.com/google/cel-go v0.19.0
@@ -381,7 +381,7 @@ require (
 	go.opentelemetry.io/otel v1.21.0 // indirect
 	go.opentelemetry.io/otel/metric v1.21.0 // indirect
 	go.opentelemetry.io/otel/trace v1.21.0 // indirect
-	golang.org/x/term v0.17.0 // indirect
+	golang.org/x/term v0.18.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/appengine v1.6.7 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20231002182017-d307bd883b97 // indirect

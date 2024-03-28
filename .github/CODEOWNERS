@@ -123,6 +123,7 @@ CHANGELOG*
 /x-pack/filebeat/input/lumberjack/ @elastic/security-service-integrations
 /x-pack/filebeat/input/netflow/ @elastic/sec-deployment-and-devices
 /x-pack/filebeat/input/o365audit/ @elastic/security-service-integrations
+/x-pack/filebeat/input/salesforce @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/websocket/ @elastic/security-service-integrations
 /x-pack/filebeat/module/activemq @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/aws @elastic/obs-cloud-monitoring
