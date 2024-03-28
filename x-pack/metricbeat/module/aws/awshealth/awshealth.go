@@ -96,9 +96,6 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 		return err
 	}
 
-	// Get startDate and endDate
-	// startDate, endDate := getStartDateEndDate(m.Period)
-
 	awsConfig := m.MetricSet.AwsConfig.Copy()
 
 	health_client := health.NewFromConfig(awsConfig, func(o *health.Options) {
@@ -138,12 +135,14 @@ func (m *MetricSet) getEventsSummary(
 		wg              sync.WaitGroup
 	)
 	errCh := make(chan error, maxResults)
+
+	// Create buffered channel to receive event with event description and affected entity details
 	c := make(chan HealthDetails, maxResults)
 
 	for {
 		// When invoking the DescribeEvents for the first time, there must not exist any NextToken.
-		// DescribeEvents API call will return the next token if there are more records left for querying
-		// If there exist no further records to fetch, next toke will be empty.
+		// Upon calling the DescribeEvents API, the next token will be returned if there are additional records available for querying.
+		// If there are no more records to fetch, the next token will be empty.
 		if nextTokenString == "" {
 			eventOutput, err = awsHealth.DescribeEvents(ctx,
 				&health.DescribeEventsInput{
@@ -175,9 +174,8 @@ func (m *MetricSet) getEventsSummary(
 			// Context not cancelled, proceed with the function
 		}
 
-		for _, et := range ets {
-			// m.Logger().Debugf("[AWS Health] [Fetch DescribeEventDetails] Event ARN : %s", getStringValueOrDefault(et.Arn))
-			m.Logger().Debugf("[AWS Health] [Fetch DescribeEventDetails] Event ARN : %s", getValueOrDefault(et.Arn, ""))
+		for i := range ets {
+			m.Logger().Debugf("[AWS Health] [Fetch DescribeEventDetails] Event ARN : %s", getValueOrDefault(ets[i].Arn, ""))
 			// Increment the WaitGroup counter
 			wg.Add(1)
 			go func(et types.Event) {
@@ -186,7 +184,7 @@ func (m *MetricSet) getEventsSummary(
 				if err != nil {
 					errCh <- err
 				}
-			}(et)
+			}(ets[i])
 		}
 
 		for i := 0; i < len(ets); i++ {
@@ -280,24 +278,19 @@ func getValueOrDefault[T any](v *T, defaultValue T) T {
 	return defaultValue
 }
 
-// createAffectedEntityDetails populates and returns a slice of AffectedEntityDetails
-// based on the given list of AffectedEntity instances.
-// Each AffectedEntity is converted into an AffectedEntityDetails struct.
 func createAffectedEntityDetails(affectedEntities []types.AffectedEntity) []AffectedEntityDetails {
-	aed := []AffectedEntityDetails{}
-	// Populate a slice of AffectedEntityDetails
-	for _, entity := range affectedEntities {
-		aed = append(aed, AffectedEntityDetails{
-			AwsAccountId:    getValueOrDefault(entity.AwsAccountId, ""),
-			EntityUrl:       getValueOrDefault(entity.EntityUrl, ""),
-			EntityValue:     getValueOrDefault(entity.EntityValue, ""),
-			LastUpdatedTime: getValueOrDefault(entity.LastUpdatedTime, time.Time{}),
-			StatusCode:      getValueOrDefault((*string)(&entity.StatusCode), ""),
-			EntityArn:       getValueOrDefault(entity.EntityArn, ""),
-		})
+	aed := make([]AffectedEntityDetails, len(affectedEntities))
+	for i := range affectedEntities {
+		aed[i] = AffectedEntityDetails{
+			AwsAccountId:    getValueOrDefault(affectedEntities[i].AwsAccountId, ""),
+			EntityUrl:       getValueOrDefault(affectedEntities[i].EntityUrl, ""),
+			EntityValue:     getValueOrDefault(affectedEntities[i].EntityValue, ""),
+			LastUpdatedTime: getValueOrDefault(affectedEntities[i].LastUpdatedTime, time.Time{}),
+			StatusCode:      getValueOrDefault((*string)(&affectedEntities[i].StatusCode), ""),
+			EntityArn:       getValueOrDefault(affectedEntities[i].EntityArn, ""),
+		}
 	}
 	return aed
-
 }
 
 // generateEventID hashes the provided eventID and returns the first 20 characters.
