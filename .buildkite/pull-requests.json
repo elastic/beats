@@ -46,7 +46,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": [ "^metricbeat/.*", ".buildkite/metricbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
+            "always_require_ci_on_changed": [ ]
         },
         {
             "enabled": true,
@@ -62,7 +62,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": [ "^auditbeat/.*", ".buildkite/auditbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
+            "always_require_ci_on_changed": [ ]
         },
         {
             "enabled": true,
@@ -78,7 +78,7 @@
             "skip_ci_labels": [  ],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": [ "^heartbeat/.*", ".buildkite/heartbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
+            "always_require_ci_on_changed": [ ]
         },
         {
             "enabled": true,
