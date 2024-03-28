@@ -57,7 +57,7 @@ func GetListMetricsOutput(namespace string, regionName string, period time.Durat
 
 	listMetricsInput := &cloudwatch.ListMetricsInput{
 		NextToken:             nextToken,
-		IncludeLinkedAccounts: includeLinkedAccounts,
+		IncludeLinkedAccounts: &includeLinkedAccounts,
 	}
 
 	// To filter the results to show only metrics that have had data points published
