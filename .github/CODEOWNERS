@@ -106,7 +106,6 @@ CHANGELOG*
 /x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
 /x-pack/filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
-/x-pack/filebeat/docs/inputs/input-salesforce.asciidoc @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/awscloudwatch/ @elastic/obs-cloud-monitoring
 /x-pack/filebeat/input/awss3/ @elastic/obs-cloud-monitoring
 /x-pack/filebeat/input/azureblobstorage/ @elastic/security-service-integrations
