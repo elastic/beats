@@ -48,8 +48,8 @@ steps:
           - "New-Item -ItemType Directory -Force -Path 'build'"
           - "mage unitTest"
         env:
-          magefile: "$BEATS_PROJECT_NAME\.magefile"
-          MAGEFILE_CACHE: "$BEATS_PROJECT_NAME\.magefile"
+          magefile: "$BEATS_PROJECT_NAME/.magefile"
+          MAGEFILE_CACHE: "$BEATS_PROJECT_NAME/.magefile"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -75,8 +75,8 @@ steps:
           - "mage unitTest"
         key: "extended-win-unit-tests"
         env:
-          magefile: "$BEATS_PROJECT_NAME\.magefile"
-          MAGEFILE_CACHE: "$BEATS_PROJECT_NAME\.magefile"
+          magefile: "$BEATS_PROJECT_NAME/.magefile"
+          MAGEFILE_CACHE: "$BEATS_PROJECT_NAME/.magefile"
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
