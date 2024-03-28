@@ -54,30 +54,36 @@ class ComposeMixin(object):
             print("----")
 
         def is_healthy(container):
-            return container.inspect()['State']['Health']['Status'] == 'healthy'
+            return container.state.health.status == 'healthy' #container.inspect()['State']['Health']['Status'] == 'healthy'
 
         project = cls.compose_project()
 
         with disabled_logger('compose.service'):
             project.pull(
                 ignore_pull_failures=True,
-                service_names=cls.COMPOSE_SERVICES)
+                services=cls.COMPOSE_SERVICES)
 
+        # project.up(
+        #     strategy=ConvergenceStrategy.always,
+        #     service_names=cls.COMPOSE_SERVICES,
+        #     timeout=30)
         project.up(
-            strategy=ConvergenceStrategy.always,
-            service_names=cls.COMPOSE_SERVICES,
-            timeout=30)
+            services=cls.COMPOSE_SERVICES,
+            recreate=True,
+            detach=True,
+        )
 
         # Wait for them to be healthy
         start = time.time()
         while True:
-            containers = project.containers(
-                service_names=cls.COMPOSE_SERVICES,
-                stopped=True)
+            # containers = project.containers(
+            #     service_names=cls.COMPOSE_SERVICES,
+            #     stopped=True)
+            containers = project.ps(services=cls.COMPOSE_SERVICES, all=True)
 
             healthy = True
             for container in containers:
-                if not container.is_running:
+                if not container.state.status == 'running':
                     print_logs(container)
                     raise Exception(
                         "Container %s unexpectedly finished on startup" %
@@ -139,26 +145,27 @@ class ComposeMixin(object):
         if INTEGRATION_TESTS and cls.COMPOSE_SERVICES:
             # Use down on per-module scenarios to release network pools too
             if os.path.basename(os.path.dirname(cls.find_compose_path())) == "module":
-                cls.compose_project().down(remove_image_type=None, include_volumes=True)
+                cls.compose_project().down(volumes=True)
             else:
-                cls.compose_project().kill(service_names=cls.COMPOSE_SERVICES)
+                cls.compose_project().kill(services=cls.COMPOSE_SERVICES)
 
     @classmethod
     def get_hosts(cls):
         return [cls.compose_host()]
 
     @classmethod
-    def _private_host(cls, info, port):
+    def _private_host(cls, networks, port):
         """
         Return the address of the container, it should be reachable from the
         host if docker is being run natively. To be used when the tests are
         run from another container in the same network. It also works when
         running from the host network if the docker daemon runs natively.
         """
-        networks = list(info['NetworkSettings']['Networks'].values())
+        #networks = list(info['NetworkSettings']['Networks'].values())
+        networks = list(networks.values())
         port = port.split("/")[0]
         for network in networks:
-            ip = network['IPAddress']
+            ip = network.ip_address
             if ip:
                 return "%s:%s" % (ip, port)
 
@@ -183,9 +190,9 @@ class ComposeMixin(object):
         if host_env:
             return host_env
 
-        container = cls.compose_project().containers(service_names=[service])[0]
-        info = container.inspect()
-        portsConfig = info['HostConfig']['PortBindings']
+        container = cls.compose_project().ps(services=[service])[0]
+        # info = container.inspect()
+        portsConfig = container.host_config.port_bindings  #info['HostConfig']['PortBindings']
         if len(portsConfig) == 0:
             raise Exception("No exposed ports for service %s" % service)
         if port is None:
@@ -193,8 +200,9 @@ class ComposeMixin(object):
 
         # We can use _exposed_host for all platforms when we can use host network
         # in the metricbeat container
+        # networks = list(info['NetworkSettings']['Networks'].values())
         if sys.platform.startswith('linux'):
-            return cls._private_host(info, port)
+            return cls._private_host(container.network_settings.networks, port)
         return cls._exposed_host(info, port)
 
     @classmethod
@@ -210,9 +218,17 @@ class ComposeMixin(object):
     def compose_project(cls):
         env = Environment(os.environ.copy())
         env.update(cls.COMPOSE_ENV)
-        return get_project(cls.find_compose_path(),
-                           project_name=cls.compose_project_name(),
-                           environment=env)
+        
+        compose_files = [os.path.join(cls.find_compose_path(), "docker-compose.yml")]
+
+        from python_on_whales import DockerClient
+        docker = DockerClient(
+            compose_project_name=cls.compose_project_name().lower(),
+            compose_files=compose_files)
+        return docker.compose
+        # return get_project(cls.find_compose_path(),
+        #                    project_name=cls.compose_project_name(),
+        #                    environment=env)
 
     @classmethod
     def find_compose_path(cls):
@@ -226,7 +242,7 @@ class ComposeMixin(object):
 
     @classmethod
     def get_service_log(cls, service):
-        container = cls.compose_project().containers(service_names=[service])[0]
+        container = cls.compose_project().ps(services=[service])[0]
         return container.logs()
 
     @classmethod
@@ -234,7 +250,7 @@ class ComposeMixin(object):
         log = cls.get_service_log(service)
         counter = 0
         for line in log.splitlines():
-            if line.find(msg.encode("utf-8")) >= 0:
+            if line.find(msg) >= 0:
                 counter += 1
         return counter > 0
 
