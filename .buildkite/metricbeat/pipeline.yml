@@ -61,7 +61,7 @@ steps:
 
       - label: ":windows: Metricbeat Windows 2016/2022 Unit Tests - {{matrix.image}}"
         command: ".buildkite/scripts/win_unit_tests.ps1"
-        key: metricbeat-"mandatory-win-unit-tests"
+        key: "metricbeat-mandatory-win-unit-tests"
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
