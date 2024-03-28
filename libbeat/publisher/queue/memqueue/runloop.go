@@ -187,13 +187,8 @@ func (l *runLoop) handleGetReply(req *getRequest) {
 }
 
 func (l *runLoop) handleDelete(count int) {
-	// Clear the internal event pointers so they can be garbage collected
-	for i := 0; i < count; i++ {
-		index := (l.bufPos + i) % len(l.broker.buf)
-		l.broker.buf[index].event = nil
-	}
-
-	// Advance position and counters
+	// Advance position and counters. Event data was already cleared in
+	// batch.FreeEntries when the events were vended.
 	l.bufPos = (l.bufPos + count) % len(l.broker.buf)
 	l.eventCount -= count
 	l.consumedCount -= count

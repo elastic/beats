@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -89,6 +90,50 @@ func TestNestedBatchSplit(t *testing.T) {
 		retryer.batches[i].done()
 	}
 	assert.True(t, doneWasCalled, "Original callback should be invoked when all children are")
+}
+
+func TestBatchCallsDoneAndFreesEvents(t *testing.T) {
+	doneCalled := false
+	batch := &ttlBatch{
+		done:   func() { doneCalled = true },
+		events: []publisher.Event{{}},
+	}
+	require.NotNil(t, batch.events, "Initial batch events must be non-nil")
+	batch.ACK()
+	require.Nil(t, batch.events, "Calling batch.ACK should clear the events array")
+	require.True(t, doneCalled, "Calling batch.ACK should invoke the done callback")
+
+	doneCalled = false
+	batch.events = []publisher.Event{{}}
+	require.NotNil(t, batch.events, "Initial batch events must be non-nil")
+	batch.Drop()
+	require.Nil(t, batch.events, "Calling batch.Drop should clear the events array")
+	require.True(t, doneCalled, "Calling batch.Drop should invoke the done callback")
+}
+
+func TestNewBatchFreesEvents(t *testing.T) {
+	queueBatch := &mockQueueBatch{}
+	_ = newBatch(nil, queueBatch, 0)
+	assert.Equal(t, 1, queueBatch.freeEntriesCalled, "Creating a new ttlBatch should call FreeEntries on the underlying queue.Batch")
+}
+
+type mockQueueBatch struct {
+	freeEntriesCalled int
+}
+
+func (b *mockQueueBatch) Count() int {
+	return 1
+}
+
+func (b *mockQueueBatch) Done() {
+}
+
+func (b *mockQueueBatch) Entry(i int) interface{} {
+	return fmt.Sprintf("event %v", i)
+}
+
+func (b *mockQueueBatch) FreeEntries() {
+	b.freeEntriesCalled++
 }
 
 type mockRetryer struct {
