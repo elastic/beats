@@ -230,6 +230,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 *Metricbeat*
 
+- Add new fields to configure the lease duration, retry and renew when using leader elector with kubernetes autodiscover.{pull}38471[38471]
 - Add per-thread metrics to system_summary {pull}33614[33614]
 - Add GCP CloudSQL metadata {pull}33066[33066]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
