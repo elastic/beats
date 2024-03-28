@@ -161,7 +161,7 @@ if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-metricbeat") {
 
 Set-Location -Path $WorkFolder
 
-if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-lebbeat") {
+if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
     $magefile = "$WORKSPACE\$WorkFolder\.magefile"
     $env:MAGEFILE_CACHE = $magefile
 }
