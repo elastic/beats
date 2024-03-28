@@ -77,16 +77,15 @@ steps:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
-  - group: "Extended Testing"
-    key: "extended-tests"
+  - group: "Extended Testing ARM"
+    key: "extended-tests-arm"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
     notify:
       - github_commit_status:
-          context: "Heartbeat/Extended"
-
+          context: "Heartbeat/Extended ARM"
     steps:
       - label: ":linux: ARM64 Unit Tests"
         key: "arm-extended"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.pull_request.labels includes "arm"
         command:
           - ".buildkite/heartbeat/scripts/unit-tests.sh"
         agents:
@@ -95,9 +94,15 @@ steps:
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "heartbeat/build/*.xml"
 
+  - group: "Extended Testing MacOS"
+    key: "extended-tests-macos"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*MacOS.*/
+    notify:
+      - github_commit_status:
+          context: "Heartbeat/Extended MacOS"
+    steps:
       - label: ":mac: MacOS Unit Tests"
         key: "macos-extended"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.pull_request.labels includes "MacOS"
         command:
           - ".buildkite/heartbeat/scripts/unit-tests.sh"
         agents:
@@ -107,7 +112,7 @@ steps:
 
   - group: "Windows Extended Testing"
     key: "extended-tests-win"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.pull_request.labels includes "windows"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
 
     steps:
       - label: ":windows: Win 2019 Unit Tests"

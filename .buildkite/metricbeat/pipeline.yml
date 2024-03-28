@@ -74,7 +74,7 @@ steps:
 
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.pull_request.labels includes "windows"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
     steps:
       - label: ":windows: Windows 2019 Unit Tests"
         key: "extended-win-2019-unit-tests"
@@ -111,7 +111,7 @@ steps:
 
   - group: "Extended Tests"
     key: "extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.pull_request.labels includes "MacOS"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*MacOS.*/
     steps:
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
