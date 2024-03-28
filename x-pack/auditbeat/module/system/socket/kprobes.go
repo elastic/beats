@@ -179,7 +179,7 @@ var sharedKProbes = []helper.ProbeDef{
 		Probe: tracing.Probe{
 			Name:      "commit_creds",
 			Address:   "commit_creds",
-			Fetchargs: "uid=+{{.STRUCT_CRED_UID}}({{.P1}}):u32 gid=+{{.STRUCT_CRED_GID}}({{.P1}}):u32 euid=+{{.STRUCT_CRED_EUID}}({{.P1}}):u32 egid=+{{.STRUCT_CRED_EGID}}({{.P1}}):u32",
+			Fetchargs: "uid=+{{.STRUCT_CRED_UID}}({{.P1}}):u32 gid=+{{.STRUCT_CRED_GID}}({{.P1}}):u32 euid=+{{.STRUCT_CRED_EUID}}({{.P1}}):u32 egid=+{{.STRUCT_CRED_EGID}}({{.P1}}):u32 cap_permitted=+{{.STRUCT_CRED_CAP_PERMITTED}}({{.P1}}):u64 cap_effective=+{{.STRUCT_CRED_CAP_EFFECTIVE}}({{.P1}}):u64",
 		},
 		Decoder: helper.NewStructDecoder(func() interface{} { return new(commitCreds) }),
 	},

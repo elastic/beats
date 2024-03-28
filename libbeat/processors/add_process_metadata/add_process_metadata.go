@@ -70,6 +70,8 @@ type addProcessMetadata struct {
 type processMetadata struct {
 	name, title, exe, username, userid string
 	args                               []string
+	capPermitted                       []string
+	capEffective                       []string
 	env                                map[string]string
 	startTime                          time.Time
 	pid, ppid                          int
