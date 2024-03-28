@@ -1,0 +1,219 @@
+- name: k6metricset
+  type: group
+  release: beta
+  description: >
+    k6metricset
+  fields:
+    - name: data
+      type: group
+      description: >
+        Example field
+      fields:
+      - name: metrics
+        type: group
+        fields:
+          - name: vus
+            type: group
+            overwrite: true
+            description: Active virtual users
+            fields:
+                  - name: value
+                    type: integer
+                    optional: true
+                    description: Value of current number of active virtual users
+          - name: vus_max
+            type: group
+            overwrite: true
+            description: Max possible number of virtual users
+            fields:
+                  - name: value
+                    type: integer
+                    optional: true
+                    description: Value of max possible number of virtual users
+          - name: http_reqs
+            type: group
+            overwrite: true
+            description: Total number of HTTP requests
+            fields:
+                  - name: rate
+                    type: float
+                    optional: true
+                    description: Total number of HTTP requests
+                  - name: count
+                    type: integer
+                    optional: true
+                    description: Total number of HTTP requests
+          - name: http_req_duration
+            type: group
+            overwrite: true
+            description: Request time
+            fields:
+                  - name: avg
+                    type: float
+                    optional: true
+                    description: Average request time
+                  - name: max
+                    type: float
+                    optional: true
+                    description: Max request time
+                  - name: med
+                    type: float
+                    optional: true
+                    description: Median request time
+                  - name: p(90)
+                    type: float
+                    optional: true
+                    description: 90th request time
+                  - name: p(95)
+                    type: float
+                    optional: true
+                    description: 95th request time
+                  - name: rate
+                    type: float
+                    optional: true
+                    description: The number of http_req_duration values submitted during the interval
+          - name: http_req_connecting
+            type: group
+            overwrite: true
+            description: Time spent establishing TCP connection
+            fields:
+                  - name: avg
+                    type: float
+                    optional: true
+                    description: Average time spent establishing TCP connection
+                  - name: max
+                    type: float
+                    optional: true
+                    description: Max time spent establishing TCP connection
+                  - name: med
+                    type: float
+                    optional: true
+                    description: Median time spent establishing TCP connection
+                  - name: p(90)
+                    type: float
+                    optional: true
+                    description: 90th time spent blocked before initiating the request
+                  - name: p(95)
+                    type: float
+                    optional: true
+                    description: 95th time spent blocked before initiating the request
+                  - name: count
+                    type: integer
+                    optional: true
+                    description: The number of httpreqconnecting values submitted during the interval
+          - name: http_req_receiving
+            type: group
+            overwrite: true
+            description: Time spent receiving response data
+            fields:
+                  - name: avg
+                    type: float
+                    optional: true
+                    description: Average time spent receiving response data
+                  - name: max
+                    type: float
+                    optional: true
+                    description: Max time spent receiving response data
+                  - name: med
+                    type: float
+                    optional: true
+                    description: Median time spent receiving response data
+                  - name: p(90)
+                    type: float
+                    optional: true
+                    description: 90th time spent receiving response data
+                  - name: p(95)
+                    type: float
+                    optional: true
+                    description: 95th time spent receiving response data
+                  - name: count
+                    type: integer
+                    optional: true
+                    description: The number of http_req_receiving values submitted during the interval
+          - name: http_req_sending
+            type: group
+            overwrite: true
+            description: Time spent sending data
+            fields:
+                  - name: avg
+                    type: float
+                    optional: true
+                    description: Average time spent sending data
+                  - name: max
+                    type: float
+                    optional: true
+                    description: Max time spent sending data
+                  - name: med
+                    type: float
+                    optional: true
+                    description: Median time spent sending data
+                  - name: p(90)
+                    type: float
+                    optional: true
+                    description: 90th time spent sending data
+                  - name: p(95)
+                    type: float
+                    optional: true
+                    description: 95th time spent sending data
+                  - name: count
+                    type: integer
+                    optional: true
+                    description: The number of httpreqsending values submitted during the interval
+          - name: http_req_tls_handshaking
+            type: group
+            overwrite: true
+            description: Time spent handshaking TLS session
+            fields:
+                  - name: avg
+                    type: float
+                    optional: true
+                    description: Average time spent handshaking TLS session
+                  - name: max
+                    type: float
+                    optional: true
+                    description: Max time spent handshaking TLS session
+                  - name: med
+                    type: float
+                    optional: true
+                    description: Median time spent handshaking TLS session
+                  - name: p(90)
+                    type: float
+                    optional: true
+                    description: 90th time spent handshaking TLS session
+                  - name: p(95)
+                    type: float
+                    optional: true
+                    description: 95th time spent handshaking TLS session
+                  - name: count
+                    type: integer
+                    optional: true
+                    description: The number of httpreqtls_handshaking values submitted during the interval
+          - name: http_req_waiting
+            type: group
+            overwrite: true
+            description: Time spent waiting for response (TTFB)
+            fields:
+                  - name: avg
+                    type: float
+                    optional: true
+                    description: Average time spent waiting for response (TTFB)
+                  - name: max
+                    type: float
+                    optional: true
+                    description: Max time spent waiting for response (TTFB)
+                  - name: med
+                    type: float
+                    optional: true
+                    description: Median time spent waiting for response (TTFB)
+                  - name: p(90)
+                    type: float
+                    optional: true
+                    description: 90th time spent waiting for response (TTFB)
+                  - name: p(95)
+                    type: float
+                    optional: true
+                    description: 95th time spent waiting for response (TTFB)
+                  - name: count
+                    type: integer
+                    optional: true
+                    description: The number of http_req_waiting values submitted during the interval

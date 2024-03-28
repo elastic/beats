@@ -158,6 +158,8 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-istio-proxy,proxy>> beta[]  
 |<<metricbeat-module-jolokia,Jolokia>>     |image:./images/icon-no.png[No prebuilt dashboards]    |  
 .1+| .1+|  |<<metricbeat-metricset-jolokia-jmx,jmx>>   
+|<<metricbeat-module-k6,k6>>  beta[]   |image:./images/icon-no.png[No prebuilt dashboards]    |  
+.1+| .1+|  |<<metricbeat-metricset-k6-k6metricset,k6metricset>> beta[]  
 |<<metricbeat-module-kafka,Kafka>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .5+| .5+|  |<<metricbeat-metricset-kafka-broker,broker>> beta[]  
 |<<metricbeat-metricset-kafka-consumer,consumer>> beta[]  
@@ -355,6 +357,7 @@ include::modules/ibmmq.asciidoc[]
 include::modules/iis.asciidoc[]
 include::modules/istio.asciidoc[]
 include::modules/jolokia.asciidoc[]
+include::modules/k6.asciidoc[]
 include::modules/kafka.asciidoc[]
 include::modules/kibana.asciidoc[]
 include::modules/kubernetes.asciidoc[]

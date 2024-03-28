@@ -1,0 +1,11 @@
+version: '2.3'
+
+services:
+  k6:
+    image: docker.elastic.co/integrations-ci/beats-k6:${K6_VERSION:-0.48.0}-1
+    build:
+      context: ./_meta
+      args:
+        K6_VERSION: ${K6:-0.48.0}
+    ports:
+      - 6565
