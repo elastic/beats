@@ -23,6 +23,7 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_xpack_packetbeat+x}" ] && run_xpack_packetbeat="$(buildkite-agent meta-data get run_xpack_packetbeat --default "false")"
 [ -z "${run_xpack_winlogbeat+x}" ] && run_xpack_winlogbeat="$(buildkite-agent meta-data get run_xpack_winlogbeat --default "false")"
 [ -z "${run_xpack_auditbeat+x}" ] && run_xpack_auditbeat="$(buildkite-agent meta-data get run_xpack_auditbeat --default "false")"
+[ -z "${run_xpack_dockerlogbeat+x}" ] && run_xpack_dockerlogbeat="$(buildkite-agent meta-data get run_xpack_dockerlogbeat --default "false")"
 [ -z "${run_xpack_filebeat+x}" ] && run_xpack_filebeat="$(buildkite-agent meta-data get run_xpack_filebeat --default "false")"
 [ -z "${run_xpack_heartbeat+x}" ] && run_xpack_heartbeat="$(buildkite-agent meta-data get run_xpack_heartbeat --default "false")"
 [ -z "${run_xpack_osquerybeat+x}" ] && run_xpack_osquerybeat="$(buildkite-agent meta-data get run_xpack_osquerybeat --default "false")"
@@ -63,7 +64,7 @@ auditbeat_changeset=(
 
 filebeat_changeset=(
   "^filebeat/.*"
-  )  
+  )
 
 metricbeat_changeset=(
   "^metricbeat/.*"
@@ -466,7 +467,7 @@ are_conditions_met_macos_tests() {
 }
 
 are_conditions_met_win_tests() {
-  if are_conditions_met_mandatory_tests; then    
+  if are_conditions_met_mandatory_tests; then
     if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
       if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_WIN_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_WIN_LABEL} || "${!TRIGGER_SPECIFIC_WIN_TESTS}" == "true" ]]; then
         return 0
@@ -529,7 +530,11 @@ defineModuleFromTheChangeSet() {
     fi
   done
   if [[ -z "$changed_modules" ]]; then # TODO: remove this condition and uncomment the line below when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
-    export MODULE="aws"
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+      export MODULE="aws"
+    else
+      export MODULE="kubernetes"
+    fi
   else
     export MODULE="${changed_modules}"  # TODO: remove this line and uncomment the line below when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
   # export MODULE="${changed_modules}"     # TODO: uncomment the line when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved

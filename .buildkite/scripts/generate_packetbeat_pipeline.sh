@@ -17,7 +17,7 @@ steps:
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -26,7 +26,7 @@ steps:
 
       - label: ":rhel: RHEL-9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9_X86_64}"
@@ -35,7 +35,10 @@ steps:
 
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path 'build'"
+          - "mage unitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -53,37 +56,24 @@ steps:
   - group: "Extended Windowds Tests"
     key: "extended-win-tests"
     steps:
-      - label: ":windows: Win 2019 Unit Tests"
-        key: "extended-win-2019-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+        command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path 'build'"
+          - "mage unitTest"
+        key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
+          image: "{{matrix.image}}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-      - label: ":windows: Windows 10 Unit Tests"
-        key: "extended-win-10-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_10}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-      - label: ":windows: Windows 11 Unit Tests"
-        key: "extended-win-11-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_10}"
+              - "${IMAGE_WIN_11}"
+              - "${IMAGE_WIN_2019}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 YAML
@@ -120,7 +110,7 @@ if  are_conditions_met_arm_tests; then
   cat >> $pipelineName <<- YAML
       - label: ":linux: ARM Ubuntu Unit Tests"
         key: "extended-arm64-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
@@ -144,17 +134,19 @@ if are_conditions_met_packaging; then
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: ".buildkite/scripts/packaging.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         env:
           PLATFORMS: "${PACKAGING_PLATFORMS}"
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
-        command: ".buildkite/scripts/packaging.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"

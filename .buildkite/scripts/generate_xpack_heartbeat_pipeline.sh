@@ -17,19 +17,19 @@ steps:
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
-          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: ".buildkite/scripts/go_int_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
         agents:
           provider: "gcp"
-          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
@@ -38,7 +38,10 @@ steps:
 # ## waiting for being fixed.
 
 #       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-#         command: ".buildkite/scripts/win_unit_tests.ps1"
+#         command:
+#           - "Set-Location -Path $BEATS_PROJECT_NAME"
+#           - "New-Item -ItemType Directory -Force -Path 'build'"
+#           - "mage unitTest"
 #         key: "mandatory-win-unit-tests"
 #         agents:
 #           provider: "gcp"
@@ -60,7 +63,10 @@ steps:
 #     steps:
 
 #       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-#         command: ".buildkite/scripts/win_unit_tests.ps1"
+#         command:
+#           - "Set-Location -Path $BEATS_PROJECT_NAME"
+#           - "New-Item -ItemType Directory -Force -Path 'build'"
+#           - "mage unitTest"
 #         key: "extended-win-unit-tests"
 #         agents:
 #           provider: "gcp"

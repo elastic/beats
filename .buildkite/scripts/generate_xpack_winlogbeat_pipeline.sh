@@ -18,7 +18,10 @@ steps:
 
       - label: ":windows: Windows 2019 Unit (MODULE) Tests"
         key: "mandatory-win-2019-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path 'build'"
+          - "mage unitTest"
         env:
           MODULE: $MODULE
         agents:
@@ -30,7 +33,10 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Windows 2016/2022 Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path 'build'"
+          - "mage unitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -53,7 +59,10 @@ steps:
     steps:
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path 'build'"
+          - "mage unitTest"
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"

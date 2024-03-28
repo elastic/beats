@@ -2,17 +2,17 @@ param(
     [string]$testType = "unittest"
 )
 
-$ErrorActionPreference = "Stop" # set -e
+# $ErrorActionPreference = "Stop" # set -e
 $WorkFolder = $env:BEATS_PROJECT_NAME
 $WORKSPACE = Get-Location
-# Forcing to checkout again all the files with a correct autocrlf.
-# Doing this here because we cannot set git clone options before.
-function fixCRLF {
-    Write-Host "-- Fixing CRLF in git checkout --"
-    git config core.autocrlf false
-    git rm --quiet --cached -r .
-    git reset --quiet --hard
-}
+# # Forcing to checkout again all the files with a correct autocrlf.
+# # Doing this here because we cannot set git clone options before.
+# function fixCRLF {
+#     Write-Host "-- Fixing CRLF in git checkout --"
+#     git config core.autocrlf false
+#     git rm --quiet --cached -r .
+#     git reset --quiet --hard
+# }
 
 function retry {
     param(
@@ -51,123 +51,128 @@ function verifyFileChecksum {
     }
 }
 
-function withGolang($version) {
-    Write-Host "-- Installing Go $version --"
-    $goDownloadPath = Join-Path $env:TEMP "go_installer.msi"
-    $goInstallerUrl = "https://golang.org/dl/go$version.windows-amd64.msi"
-    retry -retries 5 -scriptBlock {
-        Invoke-WebRequest -Uri $goInstallerUrl -OutFile $goDownloadPath
-    }
-    Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $goDownloadPath /quiet" -Wait
-    $env:GOPATH = "${env:ProgramFiles}\Go"
-    $env:GOBIN = "${env:GOPATH}\bin"
-    $env:Path += ";$env:GOPATH;$env:GOBIN"
-    go version
-    installGoDependencies
-}
+# function withGolang($version) {
+#     Write-Host "-- Installing Go $version --"
+#     $goDownloadPath = Join-Path $env:TEMP "go_installer.msi"
+#     $goInstallerUrl = "https://golang.org/dl/go$version.windows-amd64.msi"
+#     retry -retries 5 -scriptBlock {
+#         Invoke-WebRequest -Uri $goInstallerUrl -OutFile $goDownloadPath
+#     }
+#     Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $goDownloadPath /quiet" -Wait
+#     $env:GOPATH = "${env:ProgramFiles}\Go"
+#     $env:GOBIN = "${env:GOPATH}\bin"
+#     $env:Path += ";$env:GOPATH;$env:GOBIN"
+#     go version
+#     installGoDependencies
+# }
 
-function withPython($version) {
-    Write-Host "-- Installing Python $version --"
-    [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
-    $pyDownloadPath = Join-Path $env:TEMP "python-$version-amd64.exe"
-    $pyInstallerUrl = "https://www.python.org/ftp/python/$version/python-$version-amd64.exe"
-    retry -retries 5 -scriptBlock {
-        Invoke-WebRequest -UseBasicParsing -Uri $pyInstallerUrl -OutFile $pyDownloadPath
-    }
-    Start-Process -FilePath $pyDownloadPath -ArgumentList "/quiet", "InstallAllUsers=1", "PrependPath=1", "Include_test=0" -Wait
-    $pyBinPath = "${env:ProgramFiles}\Python311"
-    $env:Path += ";$pyBinPath"
-    python --version
-}
+# function withPython($version) {
+#     Write-Host "-- Installing Python $version --"
+#     [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
+#     $pyDownloadPath = Join-Path $env:TEMP "python-$version-amd64.exe"
+#     $pyInstallerUrl = "https://www.python.org/ftp/python/$version/python-$version-amd64.exe"
+#     retry -retries 5 -scriptBlock {
+#         Invoke-WebRequest -UseBasicParsing -Uri $pyInstallerUrl -OutFile $pyDownloadPath
+#     }
+#     Start-Process -FilePath $pyDownloadPath -ArgumentList "/quiet", "InstallAllUsers=1", "PrependPath=1", "Include_test=0" -Wait
+#     $pyBinPath = "${env:ProgramFiles}\Python311"
+#     $env:Path += ";$pyBinPath"
+#     python --version
+# }
 
 function withMinGW {
-    Write-Host "-- Installing MinGW --"
-    [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
-    $gwInstallerUrl = "https://github.com/brechtsanders/winlibs_mingw/releases/download/12.1.0-14.0.6-10.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-12.1.0-llvm-14.0.6-mingw-w64ucrt-10.0.0-r3.zip"
-    $gwInstallerCheckSumUrl = "$gwInstallerUrl.sha256"
-    $gwDownloadPath = "$env:TEMP\winlibs-x86_64.zip"
-    $gwDownloadCheckSumPath = "$env:TEMP\winlibs-x86_64.zip.sha256"
-    retry -retries 5 -scriptBlock {
-        Invoke-WebRequest -Uri $gwInstallerUrl -OutFile $gwDownloadPath
-        Invoke-WebRequest -Uri $gwInstallerCheckSumUrl -OutFile $gwDownloadCheckSumPath
-    }
-    $comparingResult = verifyFileChecksum -filePath $gwDownloadPath -checksumFilePath $gwDownloadCheckSumPath
-    if ($comparingResult) {
-                Expand-Archive -Path $gwDownloadPath -DestinationPath "$env:TEMP"
-        $gwBinPath = "$env:TEMP\mingw64\bin"
-        $env:Path += ";$gwBinPath"
-    } else {
-        exit 1
-    }
-
+     Write-Host "-- Installing MinGW --"
+#     [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
+#     $gwInstallerUrl = "https://github.com/brechtsanders/winlibs_mingw/releases/download/12.1.0-14.0.6-10.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-12.1.0-llvm-14.0.6-mingw-w64ucrt-10.0.0-r3.zip"
+#     $gwInstallerCheckSumUrl = "$gwInstallerUrl.sha256"
+#     $gwDownloadPath = "$env:TEMP\winlibs-x86_64.zip"
+#     $gwDownloadCheckSumPath = "$env:TEMP\winlibs-x86_64.zip.sha256"
+#     retry -retries 5 -scriptBlock {
+#         Invoke-WebRequest -Uri $gwInstallerUrl -OutFile $gwDownloadPath
+#         Invoke-WebRequest -Uri $gwInstallerCheckSumUrl -OutFile $gwDownloadCheckSumPath
+#     }
+#     $comparingResult = verifyFileChecksum -filePath $gwDownloadPath -checksumFilePath $gwDownloadCheckSumPath
+#     if ($comparingResult) {
+#                 Expand-Archive -Path $gwDownloadPath -DestinationPath "$env:TEMP"
+#         $gwBinPath = "$env:TEMP\mingw64\bin"
+#         $env:Path += ";$gwBinPath"
+#     } else {
+#         exit 1
+#     }
+    [Environment]::SetEnvironmentVariable("Path", "C:\Program Files\Git\mingw64\bin;$env:Path", [EnvironmentVariableTarget]::Machine)
 }
-function installGoDependencies {
-    $installPackages = @(
-        "github.com/magefile/mage"
-        "github.com/elastic/go-licenser"
-        "golang.org/x/tools/cmd/goimports"
-        "github.com/jstemmer/go-junit-report/v2"
-        "gotest.tools/gotestsum"
-    )
-    foreach ($pkg in $installPackages) {
-        go install "$pkg@latest"
-    }
-}
+# function installGoDependencies {
+#     $installPackages = @(
+#         "github.com/magefile/mage"
+#         "github.com/elastic/go-licenser"
+#         "golang.org/x/tools/cmd/goimports"
+#         "github.com/jstemmer/go-junit-report/v2"
+#         "gotest.tools/gotestsum"
+#     )
+#     foreach ($pkg in $installPackages) {
+#         go install "$pkg@latest"
+#     }
+# }
 
-function withNmap($version) {
-    Write-Host "-- Installing Nmap $version --"
-    [Net.ServicePointManager]::SecurityProtocol = "tls, tls11, tls12, ssl3"
-    $nmapInstallerUrl = "https://nmap.org/dist/nmap-$version-setup.exe"
-    $nmapDownloadPath = "$env:TEMP\nmap-$version-setup.exe"
-    retry -retries 5 -scriptBlock {
-        Invoke-WebRequest -UseBasicParsing -Uri $nmapInstallerUrl -OutFile $nmapDownloadPath
-    }
-    Start-Process -FilePath $nmapDownloadPath -ArgumentList "/S" -Wait
-}
-function google_cloud_auth {
-    $tempFileName = "google-cloud-credentials.json"
-    $secretFileLocation = Join-Path $env:TEMP $tempFileName
-    $null = New-Item -ItemType File -Path $secretFileLocation
-    Set-Content -Path $secretFileLocation -Value $env:PRIVATE_CI_GCS_CREDENTIALS_SECRET
-    gcloud auth activate-service-account --key-file $secretFileLocation > $null 2>&1
-    $env:GOOGLE_APPLICATION_CREDENTIALS = $secretFileLocation
-}
+# function withNmap($version) {
+#     Write-Host "-- Installing Nmap $version --"
+#     [Net.ServicePointManager]::SecurityProtocol = "tls, tls11, tls12, ssl3"
+#     $nmapInstallerUrl = "https://nmap.org/dist/nmap-$version-setup.exe"
+#     $nmapDownloadPath = "$env:TEMP\nmap-$version-setup.exe"
+#     retry -retries 5 -scriptBlock {
+#         Invoke-WebRequest -UseBasicParsing -Uri $nmapInstallerUrl -OutFile $nmapDownloadPath
+#     }
+#     Start-Process -FilePath $nmapDownloadPath -ArgumentList "/S" -Wait
+# }
+# function google_cloud_auth {
+#     $tempFileName = "google-cloud-credentials.json"
+#     $secretFileLocation = Join-Path $env:TEMP $tempFileName
+#     $null = New-Item -ItemType File -Path $secretFileLocation
+#     Set-Content -Path $secretFileLocation -Value $env:PRIVATE_CI_GCS_CREDENTIALS_SECRET
+#     gcloud auth activate-service-account --key-file $secretFileLocation > $null 2>&1
+#     $env:GOOGLE_APPLICATION_CREDENTIALS = $secretFileLocation
+# }
 
-function google_cloud_auth_cleanup {
-    if (Test-Path $env:GOOGLE_APPLICATION_CREDENTIALS) {
-        Remove-Item $env:GOOGLE_APPLICATION_CREDENTIALS -Force
-        Remove-Item Env:\GOOGLE_APPLICATION_CREDENTIALS
-    } else {
-        Write-Host "No GCP credentials were added"
-    }
-}
+# function google_cloud_auth_cleanup {
+#     if (Test-Path $env:GOOGLE_APPLICATION_CREDENTIALS) {
+#         Remove-Item $env:GOOGLE_APPLICATION_CREDENTIALS -Force
+#         Remove-Item Env:\GOOGLE_APPLICATION_CREDENTIALS
+#     } else {
+#         Write-Host "No GCP credentials were added"
+#     }
+# }
 
-fixCRLF
+# fixCRLF
 
-withGolang $env:GO_VERSION
+# withGolang $env:GO_VERSION
 
-withPython $env:SETUP_WIN_PYTHON_VERSION
+# withPython $env:SETUP_WIN_PYTHON_VERSION
 
-withMinGW
-
-if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-packetbeat" -or $env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-filebeat") {
-    withNmap $env:NMAP_WIN_VERSION
+if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-metricbeat" -or $env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
+    withMinGW
 }
 
-$ErrorActionPreference = "Continue" # set +e
+
+# if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-packetbeat" -or $env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-filebeat") {
+#     withNmap $env:NMAP_WIN_VERSION
+# }
+
+# $ErrorActionPreference = "Continue" # set +e
 
 Set-Location -Path $WorkFolder
 
-$magefile = "$WORKSPACE\$WorkFolder\.magefile"
-$env:MAGEFILE_CACHE = $magefile
+# if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
+#     $magefile = "$WORKSPACE\$WorkFolder\.magefile"
+#     $env:MAGEFILE_CACHE = $magefile
+# }
 
 New-Item -ItemType Directory -Force -Path "build"
 
 if ($testType -eq "unittest") {
     if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
-        mage -w reader/etw build goUnitTest
+        mage -w reader/etw goUnitTest
     } else {
-        mage build unitTest
+        mage unitTest
     }
 }
 elseif ($testType -eq "systemtest") {
