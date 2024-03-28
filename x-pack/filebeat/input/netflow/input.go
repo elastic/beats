@@ -120,7 +120,6 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 			// is not required.
 			EventNormalization: boolPtr(false),
 		},
-		CloseRef:      ctx.Cancelation,
 		EventListener: nil,
 	})
 	if err != nil {
@@ -128,6 +127,7 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 		n.stop()
 		return err
 	}
+	defer client.Close()
 
 	const pollInterval = time.Minute
 	udpMetrics := netmetrics.NewUDP("netflow", ctx.ID, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)

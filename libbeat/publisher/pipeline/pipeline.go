@@ -22,7 +22,6 @@ package pipeline
 
 import (
 	"fmt"
-	"reflect"
 	"sync"
 	"time"
 
@@ -197,9 +196,6 @@ func (p *Pipeline) Close() error {
 	p.outputController.Close()
 
 	p.observer.cleanup()
-	if p.sigNewClient != nil {
-		close(p.sigNewClient)
-	}
 	return nil
 }
 
@@ -212,6 +208,8 @@ func (p *Pipeline) Connect() (beat.Client, error) {
 // The client behavior on close and ACK handling can be configured by setting
 // the appropriate fields in the passed ClientConfig.
 // If not set otherwise the defaut publish mode is OutputChooses.
+//
+// It is responsibility of the caller to close the client.
 func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	var (
 		canDrop    bool
@@ -239,8 +237,6 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 
 	client := &client{
 		logger:         p.monitors.Logger,
-		closeRef:       cfg.CloseRef,
-		done:           make(chan struct{}),
 		isOpen:         atomic.MakeBool(true),
 		clientListener: cfg.ClientListener,
 		processors:     processors,
@@ -295,91 +291,7 @@ func (p *Pipeline) ConnectWith(cfg beat.ClientConfig) (beat.Client, error) {
 	}
 
 	p.observer.clientConnected()
-
-	if client.closeRef != nil {
-		p.registerSignalPropagation(client)
-	}
-
 	return client, nil
-}
-
-func (p *Pipeline) registerSignalPropagation(c *client) {
-	p.guardStartSigPropagation.Do(func() {
-		p.sigNewClient = make(chan *client, 1)
-		go p.runSignalPropagation()
-	})
-	p.sigNewClient <- c
-}
-
-func (p *Pipeline) runSignalPropagation() {
-	var channels []reflect.SelectCase
-	var clients []*client
-
-	channels = append(channels, reflect.SelectCase{
-		Dir:  reflect.SelectRecv,
-		Chan: reflect.ValueOf(p.sigNewClient),
-	})
-
-	for {
-		chosen, recv, recvOK := reflect.Select(channels)
-		if chosen == 0 {
-			if !recvOK {
-				// sigNewClient was closed
-				return
-			}
-
-			// new client -> register client for signal propagation.
-			if client := recv.Interface().(*client); client != nil {
-				channels = append(channels,
-					reflect.SelectCase{
-						Dir:  reflect.SelectRecv,
-						Chan: reflect.ValueOf(client.closeRef.Done()),
-					},
-					reflect.SelectCase{
-						Dir:  reflect.SelectRecv,
-						Chan: reflect.ValueOf(client.done),
-					},
-				)
-				clients = append(clients, client)
-			}
-			continue
-		}
-
-		// find client we received a signal for. If client.done was closed, then
-		// we have to remove the client only. But if closeRef did trigger the signal, then
-		// we have to propagate the async close to the client.
-		// In either case, the client will be removed
-
-		i := (chosen - 1) / 2
-		isSig := (chosen & 1) == 1
-		if isSig {
-			client := clients[i]
-			client.Close()
-		}
-
-		// remove:
-		last := len(clients) - 1
-		ch1 := i*2 + 1
-		ch2 := ch1 + 1
-		lastCh1 := last*2 + 1
-		lastCh2 := lastCh1 + 1
-
-		clients[i], clients[last] = clients[last], nil
-		channels[ch1], channels[lastCh1] = channels[lastCh1], reflect.SelectCase{}
-		channels[ch2], channels[lastCh2] = channels[lastCh2], reflect.SelectCase{}
-
-		clients = clients[:last]
-		channels = channels[:lastCh1]
-		if cap(clients) > 10 && len(clients) <= cap(clients)/2 {
-			clientsTmp := make([]*client, len(clients))
-			copy(clientsTmp, clients)
-			clients = clientsTmp
-
-			channelsTmp := make([]reflect.SelectCase, len(channels))
-			copy(channelsTmp, channels)
-			channels = channelsTmp
-		}
-	}
 }
 
 func (p *Pipeline) createEventProcessing(cfg beat.ProcessingConfig, noPublish bool) (beat.Processor, error) {

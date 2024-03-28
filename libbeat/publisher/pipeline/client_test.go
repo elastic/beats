@@ -18,7 +18,6 @@
 package pipeline
 
 import (
-	"context"
 	"errors"
 	"io"
 	"sync"
@@ -95,15 +94,7 @@ func TestClient(t *testing.T) {
 				pipeline := makePipeline(t, Settings{}, makeTestQueue())
 				defer pipeline.Close()
 
-				var ctx context.Context
-				var cancel func()
-				if test.context {
-					ctx, cancel = context.WithCancel(context.Background())
-				}
-
-				client, err := pipeline.ConnectWith(beat.ClientConfig{
-					CloseRef: ctx,
-				})
+				client, err := pipeline.ConnectWith(beat.ClientConfig{})
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -116,7 +107,9 @@ func TestClient(t *testing.T) {
 					client.Publish(beat.Event{})
 				}()
 
-				test.close(client, cancel)
+				test.close(client, func() {
+					client.Close()
+				})
 				wg.Wait()
 			})
 		}
