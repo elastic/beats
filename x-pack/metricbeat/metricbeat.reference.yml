@@ -1334,7 +1334,7 @@ metricbeat.modules:
   # Store counter rates instead of original cumulative counters (experimental, default: false)
   #rate_counters: true
 
-  # Set period of counter cache timeout. This cache is used to calculate the rates of counters between fetches  (experimental, default: 60sec)
+  # Set timeout period for the counter cache. This cache is used to calculate the rates of counters between fetches  (experimental, default: 60sec)
   #period: 1m
 
   # Define patterns for counter and histogram types so as to identify metrics' types according to these patterns
