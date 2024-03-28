@@ -107,7 +107,6 @@ steps:
 
   - group: "Windows Extended Testing"
     key: "extended-tests-win"
-
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.pull_request.labels includes "windows"
 
     steps:
@@ -128,7 +127,7 @@ steps:
 
   - group: "Packaging"
     key: "packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "/package"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "/package"
     depends_on:
       - "mandatory-tests"
 

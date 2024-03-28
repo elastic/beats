@@ -40,25 +40,26 @@ are_paths_changed() {
   fi
 }
 
+# Selecting pipelines according to the changeset
 if [[ are_paths_changed "${heartbeat_changeset[@]}" || are_paths_changed "${oss_changeset}" ]]; then
   buildkite-agent pipeline upload .buildkite/heartbeat/heartbeat-pipeline.yml
 fi  
 
 if [[ are_paths_changed "${auditbeat_changeset[@]}" || are_paths_changed "${oss_changeset}" ]]; then
-  buildkite-agent pipeline upload .buildkite/heartbeat/heartbeat-pipeline.yml
+  buildkite-agent pipeline upload .buildkite/auditbeat/auditbeat-pipeline.yml
 fi
 
 if [[ are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_changeset}" ]]; then
-  buildkite-agent pipeline upload .buildkite/heartbeat/heartbeat-pipeline.yml
+  buildkite-agent pipeline upload .buildkite/metricbeat/pipeline.yml
 fi
 
-#......
+
 ## Packaging
-packaging_changeset=(
-  "^dev-tools/packaging/.*"
-  ".go-version"
-  )
+# packaging_changeset=(
+#   "^dev-tools/packaging/.*"
+#   ".go-version"
+#   )
 
-if [[ are_paths_changed "${packaging_changeset[@]}" ]]; then
-  buildkite-agent pipeline upload .buildkite/package-pipeline.yml
-fi
+# if [[ are_paths_changed "${packaging_changeset[@]}" ]]; then
+#   buildkite-agent pipeline upload .buildkite/package-pipeline.yml
+# fi
