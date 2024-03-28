@@ -68,7 +68,6 @@ require (
 	github.com/dop251/goja_nodejs v0.0.0-20240221231712-27eeffc9c235
 	github.com/dustin/go-humanize v1.0.1
 	github.com/eapache/go-resiliency v1.6.0
-	github.com/eclipse/paho.mqtt.golang v1.4.3
 	github.com/elastic/elastic-agent-client/v7 v7.8.0
 	github.com/elastic/go-concert v0.2.0
 	github.com/elastic/go-libaudit/v2 v2.5.0
