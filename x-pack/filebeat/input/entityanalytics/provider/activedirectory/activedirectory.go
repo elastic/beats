@@ -383,7 +383,7 @@ func (p *adInput) publishMarker(ts, eventTime time.Time, inputID string, start b
 func (p *adInput) publishUser(u *User, state *stateStore, inputID string, client beat.Client, tracker *kvstore.TxTracker) {
 	userDoc := mapstr.M{}
 
-	_, _ = userDoc.Put("activedirectory", u.User)
+	_, _ = userDoc.Put("activedirectory", u.Entry)
 	_, _ = userDoc.Put("labels.identity_source", inputID)
 	_, _ = userDoc.Put("user.id", u.ID)
 
