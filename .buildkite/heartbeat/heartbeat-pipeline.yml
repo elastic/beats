@@ -16,13 +16,13 @@ env:
 
 steps:
   - group: "Heartbeat Mandatory Testing"
-    key: "mandatory-tests"
+    key: "heartbeat-mandatory-tests"
     notify:
       - github_commit_status:
           context: "Heartbeat: Mandatory tests"
 
     steps:
-      - label: ":linux: Unit Tests / {{matrix.image}}"
+      - label: ":linux: Heartbeat Unit Tests / {{matrix.image}}"
         command:
           - ".buildkite/heartbeat/scripts/unit-tests.sh"
         agents:
@@ -38,7 +38,7 @@ steps:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
-      - label: ":windows: Unit Tests / {{matrix.image}}"
+      - label: ":windows: Heartbeat Unit Tests / {{matrix.image}}"
         command:
           - ".buildkite/scripts/win_unit_tests.ps1"
         agents:
@@ -55,7 +55,7 @@ steps:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
-      - label: ":ubuntu: Go Integration Tests"
+      - label: ":ubuntu: Heartbeat Go Integration Tests"
         command:
           - ".buildkite/heartbeat/scripts/integration-gotests.sh"
         agents:
@@ -66,7 +66,7 @@ steps:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
-      - label: ":ubuntu: Python Integration Tests"
+      - label: ":ubuntu: Heartbeat Python Integration Tests"
         command:
           - ".buildkite/heartbeat/scripts/integration-pytests.sh"
         agents:
@@ -77,15 +77,15 @@ steps:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
-  - group: "Extended Testing ARM"
-    key: "extended-tests-arm"
+  - group: "Heartbeat Extended Testing ARM"
+    key: "heartbeat-extended-tests-arm"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
     notify:
       - github_commit_status:
           context: "Heartbeat/Extended ARM"
     steps:
-      - label: ":linux: ARM64 Unit Tests"
-        key: "arm-extended"
+      - label: ":linux: Heartbeat ARM64 Unit Tests"
+        key: "heartbeat-arm-extended"
         command:
           - ".buildkite/heartbeat/scripts/unit-tests.sh"
         agents:
@@ -94,15 +94,15 @@ steps:
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "heartbeat/build/*.xml"
 
-  - group: "Extended Testing MacOS"
-    key: "extended-tests-macos"
+  - group: "Heartbeat Extended Testing MacOS"
+    key: "heartbeat-extended-tests-macos"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*MacOS.*/
     notify:
       - github_commit_status:
           context: "Heartbeat/Extended MacOS"
     steps:
       - label: ":mac: MacOS Unit Tests"
-        key: "macos-extended"
+        key: "heartbeat-macos-extended"
         command:
           - ".buildkite/heartbeat/scripts/unit-tests.sh"
         agents:
@@ -110,17 +110,17 @@ steps:
           imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths: "heartbeat/build/*.xml"
 
-  - group: "Windows Extended Testing"
-    key: "extended-tests-win"
+  - group: "Heartbeat Windows Extended Testing"
+    key: "heartbeat-extended-tests-win"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
+    notify:
+      - github_commit_status:
+          context: "Heartbeat/Extended: Windows"
 
     steps:
       - label: ":windows: Win 2019 Unit Tests"
-        key: "win-extended-2019"
+        key: "heartbeat-win-extended-2019"
         command: ".buildkite/scripts/win_unit_tests.ps1"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat/Extended: Win-2019 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -130,12 +130,14 @@ steps:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
-  - group: "Packaging"
-    key: "packaging"
+  - group: "Heartbeat Packaging"
+    key: "heartbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "/package"
     depends_on:
-      - "mandatory-tests"
-
+      - "heartbeat-mandatory-tests"
+    notify:
+      - github_commit_status:
+          context: "Heartbeat: Packaging"
     steps:
-      - label: Package pipeline
+      - label: Heartbeat Package pipeline
         commands: ".buildkite/scripts/packaging/package-step.sh"
