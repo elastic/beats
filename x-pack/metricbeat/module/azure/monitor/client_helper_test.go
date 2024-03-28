@@ -88,7 +88,7 @@ func TestMapMetric(t *testing.T) {
 	client := azure.NewMockClient()
 	t.Run("return error when no metric definitions were found", func(t *testing.T) {
 		m := &azure.MockService{}
-		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(armmonitor.MetricDefinitionCollection{}, fmt.Errorf("invalid resource ID"))
+		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(armmonitor.MetricDefinitionCollection{}, fmt.Errorf("invalid resource ID"))
 		client.AzureMonitorService = m
 		metric, err := mapMetrics(client, []*armresources.GenericResourceExpanded{resource}, resourceConfig)
 		assert.Error(t, err)
@@ -97,7 +97,7 @@ func TestMapMetric(t *testing.T) {
 	})
 	t.Run("return all metrics when all metric names and aggregations were configured", func(t *testing.T) {
 		m := &azure.MockService{}
-		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
+		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
 		metricConfig.Name = []string{"*"}
 		resourceConfig.Metrics = []azure.MetricConfig{metricConfig}
@@ -112,7 +112,7 @@ func TestMapMetric(t *testing.T) {
 	})
 	t.Run("return all metrics when specific metric names and aggregations were configured", func(t *testing.T) {
 		m := &azure.MockService{}
-		m.On("GetMetricDefinitions", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
+		m.On("GetMetricDefinitionsWithRetry", mock.Anything, mock.Anything).Return(metricDefinitions, nil)
 		client.AzureMonitorService = m
 		metricConfig.Name = []string{"TotalRequests", "Capacity"}
 		metricConfig.Aggregations = []string{"Average"}
