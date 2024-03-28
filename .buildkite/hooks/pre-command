@@ -24,8 +24,8 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "fi
     fi
 
     # To prevent "OSError: [Errno 24] Too many open files"
-    ulimit -Sn 50000
-    echo "Ulimit: $(ulimit)"
+    ulimit -Sn 80000
+    echo "--- Ulimit: $(ulimit)"
 
     echo "--- Setting up environment"
     add_bin_path
