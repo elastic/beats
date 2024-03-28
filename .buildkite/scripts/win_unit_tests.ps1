@@ -81,7 +81,7 @@ function verifyFileChecksum {
 # }
 
 function withMinGW {
-#     Write-Host "-- Installing MinGW --"
+     Write-Host "-- Installing MinGW --"
 #     [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
 #     $gwInstallerUrl = "https://github.com/brechtsanders/winlibs_mingw/releases/download/12.1.0-14.0.6-10.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-12.1.0-llvm-14.0.6-mingw-w64ucrt-10.0.0-r3.zip"
 #     $gwInstallerCheckSumUrl = "$gwInstallerUrl.sha256"
@@ -99,7 +99,7 @@ function withMinGW {
 #     } else {
 #         exit 1
 #     }
-    $env:Path += ";C:\Program Files\Git\mingw64\bin"
+    [Environment]::SetEnvironmentVariable("Path", "C:\Program Files\Git\mingw64\bin;$env:Path", [EnvironmentVariableTarget]::Machine)
 }
 # function installGoDependencies {
 #     $installPackages = @(
