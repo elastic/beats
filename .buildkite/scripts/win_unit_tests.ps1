@@ -161,8 +161,10 @@ if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-metricbeat") {
 
 Set-Location -Path $WorkFolder
 
-$magefile = "$WORKSPACE\$WorkFolder\.magefile"
-$env:MAGEFILE_CACHE = $magefile
+if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-lebbeat") {
+    $magefile = "$WORKSPACE\$WorkFolder\.magefile"
+    $env:MAGEFILE_CACHE = $magefile
+}
 
 New-Item -ItemType Directory -Force -Path "build"
 
