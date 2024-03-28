@@ -22,7 +22,11 @@ import "github.com/elastic/beats/v7/libbeat/publisher/queue"
 // producer -> broker API
 
 type pushRequest struct {
-	event interface{}
+	event queue.Entry
+
+	// The event's encoded size in bytes if the configured output supports
+	// early encoding, 0 otherwise.
+	eventSize int
 
 	// The producer that generated this event, or nil if this producer does
 	// not require ack callbacks.

@@ -23,6 +23,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -35,7 +36,7 @@ const logSelector = "elasticsearch"
 
 func makeES(
 	im outputs.IndexManager,
-	beat beat.Info,
+	beatInfo beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
 ) (outputs.Group, error) {
@@ -46,7 +47,7 @@ func makeES(
 		}
 	}
 
-	index, pipeline, err := buildSelectors(im, beat, cfg)
+	index, pipeline, err := buildSelectors(im, beatInfo, cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -73,9 +74,9 @@ func makeES(
 		return outputs.Fail(err)
 	}
 
-	policy, err := newNonIndexablePolicy(esConfig.NonIndexablePolicy)
+	deadLetterIndex, err := deadLetterIndexForPolicy(esConfig.NonIndexablePolicy)
 	if err != nil {
-		log.Errorf("error while creating file identifier: %v", err)
+		log.Errorf("error in non_indexable_policy: %v", err)
 		return outputs.Fail(err)
 	}
 
@@ -94,11 +95,12 @@ func makeES(
 		params = nil
 	}
 
-	if policy.action() == dead_letter_index {
-		index = DeadLetterSelector{
-			Selector:        index,
-			DeadLetterIndex: policy.index(),
-		}
+	encoderFactory := func() queue.Encoder {
+		return newEventEncoder(
+			esConfig.EscapeHTML,
+			index,
+			pipeline,
+		)
 	}
 
 	clients := make([]outputs.NetworkClient, len(hosts))
@@ -110,10 +112,10 @@ func makeES(
 		}
 
 		var client outputs.NetworkClient
-		client, err = NewClient(ClientSettings{
-			ConnectionSettings: eslegclient.ConnectionSettings{
+		client, err = NewClient(clientSettings{
+			connection: eslegclient.ConnectionSettings{
 				URL:              esURL,
-				Beatname:         beat.Beat,
+				Beatname:         beatInfo.Beat,
 				Kerberos:         esConfig.Kerberos,
 				Username:         esConfig.Username,
 				Password:         esConfig.Password,
@@ -126,10 +128,10 @@ func makeES(
 				Transport:        esConfig.Transport,
 				IdleConnTimeout:  esConfig.Transport.IdleConnTimeout,
 			},
-			Index:              index,
-			Pipeline:           pipeline,
-			Observer:           observer,
-			NonIndexableAction: policy.action(),
+			indexSelector:    index,
+			pipelineSelector: pipeline,
+			observer:         observer,
+			deadLetterIndex:  deadLetterIndex,
 		}, &connectCallbackRegistry)
 		if err != nil {
 			return outputs.Fail(err)
@@ -139,12 +141,12 @@ func makeES(
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, clients)
+	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, encoderFactory, clients)
 }
 
 func buildSelectors(
 	im outputs.IndexManager,
-	beat beat.Info,
+	_ beat.Info,
 	cfg *config.C,
 ) (index outputs.IndexSelector, pipeline *outil.Selector, err error) {
 	index, err = im.BuildSelector(cfg)

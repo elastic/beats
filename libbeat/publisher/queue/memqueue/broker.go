@@ -54,6 +54,9 @@ type broker struct {
 	// wait group for queue workers (runLoop and ackLoop)
 	wg sync.WaitGroup
 
+	// The factory used to create an event encoder when creating a producer
+	encoderFactory queue.EncoderFactory
+
 	///////////////////////////
 	// api channels
 
@@ -113,7 +116,7 @@ type Settings struct {
 }
 
 type queueEntry struct {
-	event interface{}
+	event queue.Entry
 	id    queue.EntryID
 
 	producer   *ackProducer
@@ -147,8 +150,9 @@ func FactoryForSettings(settings Settings) queue.QueueFactory {
 		logger *logp.Logger,
 		ackCallback func(eventCount int),
 		inputQueueSize int,
+		encoderFactory queue.EncoderFactory,
 	) (queue.Queue, error) {
-		return NewQueue(logger, ackCallback, settings, inputQueueSize), nil
+		return NewQueue(logger, ackCallback, settings, inputQueueSize, encoderFactory), nil
 	}
 }
 
@@ -160,8 +164,9 @@ func NewQueue(
 	ackCallback func(eventCount int),
 	settings Settings,
 	inputQueueSize int,
+	encoderFactory queue.EncoderFactory,
 ) *broker {
-	b := newQueue(logger, ackCallback, settings, inputQueueSize)
+	b := newQueue(logger, ackCallback, settings, inputQueueSize, encoderFactory)
 
 	// Start the queue workers
 	b.wg.Add(2)
@@ -186,6 +191,7 @@ func newQueue(
 	ackCallback func(eventCount int),
 	settings Settings,
 	inputQueueSize int,
+	encoderFactory queue.EncoderFactory,
 ) *broker {
 	chanSize := AdjustInputQueueSize(inputQueueSize, settings.Events)
 
@@ -212,6 +218,8 @@ func newQueue(
 		logger:   logger,
 
 		buf: make([]queueEntry, settings.Events),
+
+		encoderFactory: encoderFactory,
 
 		// broker API channels
 		pushChan:   make(chan pushRequest, chanSize),
@@ -249,7 +257,14 @@ func (b *broker) BufferConfig() queue.BufferConfig {
 }
 
 func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
-	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel)
+	// If we were given an encoder factory to allow producers to encode
+	// events for output before they entered the queue, then create an
+	// encoder for the new producer.
+	var encoder queue.Encoder
+	if b.encoderFactory != nil {
+		encoder = b.encoderFactory()
+	}
+	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel, encoder)
 }
 
 func (b *broker) Get(count int) (queue.Batch, error) {
@@ -398,7 +413,7 @@ func (b *batch) rawEntry(i int) *queueEntry {
 }
 
 // Return the event referenced by the i-th element of this batch
-func (b *batch) Entry(i int) interface{} {
+func (b *batch) Entry(i int) queue.Entry {
 	return b.rawEntry(i).event
 }
 

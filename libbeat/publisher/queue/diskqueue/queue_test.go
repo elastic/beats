@@ -89,7 +89,7 @@ func TestMetrics(t *testing.T) {
 	// lower max segment size so we can get multiple segments
 	settings.MaxSegmentSize = 100
 
-	testQueue, err := NewQueue(logp.L(), nil, settings)
+	testQueue, err := NewQueue(logp.L(), nil, settings, nil)
 	require.NoError(t, err)
 	defer testQueue.Close()
 
@@ -124,7 +124,7 @@ func makeTestQueue() queuetest.QueueFactory {
 		}
 		settings := DefaultSettings()
 		settings.Path = dir
-		queue, _ := NewQueue(logp.L(), nil, settings)
+		queue, _ := NewQueue(logp.L(), nil, settings, nil)
 		return testQueue{
 			diskQueue: queue,
 			teardown: func() {
