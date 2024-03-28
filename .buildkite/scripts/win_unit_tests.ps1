@@ -81,25 +81,25 @@ function verifyFileChecksum {
 # }
 
 function withMinGW {
-    Write-Host "-- Installing MinGW --"
-    [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
-    $gwInstallerUrl = "https://github.com/brechtsanders/winlibs_mingw/releases/download/12.1.0-14.0.6-10.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-12.1.0-llvm-14.0.6-mingw-w64ucrt-10.0.0-r3.zip"
-    $gwInstallerCheckSumUrl = "$gwInstallerUrl.sha256"
-    $gwDownloadPath = "$env:TEMP\winlibs-x86_64.zip"
-    $gwDownloadCheckSumPath = "$env:TEMP\winlibs-x86_64.zip.sha256"
-    retry -retries 5 -scriptBlock {
-        Invoke-WebRequest -Uri $gwInstallerUrl -OutFile $gwDownloadPath
-        Invoke-WebRequest -Uri $gwInstallerCheckSumUrl -OutFile $gwDownloadCheckSumPath
-    }
-    $comparingResult = verifyFileChecksum -filePath $gwDownloadPath -checksumFilePath $gwDownloadCheckSumPath
-    if ($comparingResult) {
-                Expand-Archive -Path $gwDownloadPath -DestinationPath "$env:TEMP"
-        $gwBinPath = "$env:TEMP\mingw64\bin"
-        $env:Path += ";$gwBinPath"
-    } else {
-        exit 1
-    }
-
+#     Write-Host "-- Installing MinGW --"
+#     [Net.ServicePointManager]::SecurityProtocol = "tls11, tls12, ssl3"
+#     $gwInstallerUrl = "https://github.com/brechtsanders/winlibs_mingw/releases/download/12.1.0-14.0.6-10.0.0-ucrt-r3/winlibs-x86_64-posix-seh-gcc-12.1.0-llvm-14.0.6-mingw-w64ucrt-10.0.0-r3.zip"
+#     $gwInstallerCheckSumUrl = "$gwInstallerUrl.sha256"
+#     $gwDownloadPath = "$env:TEMP\winlibs-x86_64.zip"
+#     $gwDownloadCheckSumPath = "$env:TEMP\winlibs-x86_64.zip.sha256"
+#     retry -retries 5 -scriptBlock {
+#         Invoke-WebRequest -Uri $gwInstallerUrl -OutFile $gwDownloadPath
+#         Invoke-WebRequest -Uri $gwInstallerCheckSumUrl -OutFile $gwDownloadCheckSumPath
+#     }
+#     $comparingResult = verifyFileChecksum -filePath $gwDownloadPath -checksumFilePath $gwDownloadCheckSumPath
+#     if ($comparingResult) {
+#                 Expand-Archive -Path $gwDownloadPath -DestinationPath "$env:TEMP"
+#         $gwBinPath = "$env:TEMP\mingw64\bin"
+#         $env:Path += ";$gwBinPath"
+#     } else {
+#         exit 1
+#     }
+    $env:Path += ";C:\Program Files\Git\mingw64\bin"
 }
 # function installGoDependencies {
 #     $installPackages = @(
