@@ -94,6 +94,11 @@ func TestLeaseConfigurableFields(t *testing.T) {
 	require.Equalf(t, cfg.RenewDeadline, renewDeadline, "renew deadline should be the same as the one provided in the configuration.")
 }
 
+// TestNewLeaderElectionManager will test the leader elector.
+// This tests aims to check two things:
+// 1. The event id used to stop the leader is the same as the event id that was used to start it.
+// 2. The leader elector runs again after it stops. The only way for it to stop, is to stop the event manager as well - this
+// could be caused by the provider stopping, for example.
 func TestNewLeaderElectionManager(t *testing.T) {
 	client := k8sfake.NewSimpleClientset()
 
