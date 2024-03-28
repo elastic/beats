@@ -23,6 +23,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 *Metricbeat*
+- Use user level for HAProxy socket {pull}34846[34846]
 
 
 *Osquerybeat*
