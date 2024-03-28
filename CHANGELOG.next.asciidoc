@@ -132,6 +132,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
 Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
+- The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 
 *Auditbeat*
 
