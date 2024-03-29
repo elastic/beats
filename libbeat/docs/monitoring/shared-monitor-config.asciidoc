@@ -27,14 +27,14 @@ If set to `true`, monitoring is enabled.
 
 The default value is `false`.
 
+==== `monitoring.cluster_uuid`
+
+The `monitoring.cluster_uuid` config identifies the {es} cluster under which the monitoring data will appear in the Stack Monitoring UI.
+
 ==== `monitoring.elasticsearch`
 
 The {es} instances that you want to ship your {beatname_uc} metrics to. This
 configuration option contains the following fields:
-
-==== `monitoring.cluster_uuid`
-
-The `monitoring.cluster_uuid` config identifies the {es} cluster under which the monitoring data will appear in the Stack Monitoring UI. 
 
 ===== `api_key`
 
