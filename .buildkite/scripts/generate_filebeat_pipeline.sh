@@ -6,7 +6,7 @@ set -euo pipefail
 
 pipelineName="pipeline.filebeat-dynamic.yml"
 
-# TODO: steps: must be always included 
+# TODO: steps: must be always included
 echo "Add the mandatory and extended tests without additional conditions into the pipeline"
 if are_conditions_met_mandatory_tests; then
   cat > $pipelineName <<- YAML
@@ -61,7 +61,9 @@ steps:
           - "filebeat/build/*.json"
 
       - label: ":windows:-2016 Unit Tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         notify:
           - github_commit_status:
               context: "Filebeat: windows/Unit Tests"
@@ -76,7 +78,9 @@ steps:
           - "filebeat/build/*.json"
 
       - label: ":windows:-2022 Unit Tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         notify:
           - github_commit_status:
               context: "Filebeat: windows 2022/Unit Tests"
@@ -85,7 +89,7 @@ steps:
           image: "${IMAGE_WIN_2022}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
-          disk_type: "pd-ssd"        
+          disk_type: "pd-ssd"
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
@@ -104,7 +108,7 @@ if are_conditions_met_arm_tests; then
       key: "extended-tests-arm"
       steps:
       - label: ":linux: ARM64 Unit Tests"
-        key: "arm-extended"        
+        key: "arm-extended"
         command:
           - ".buildkite/filebeat/scripts/unit-tests.sh"
         notify:
@@ -126,7 +130,9 @@ if are_conditions_met_win_tests; then
     steps:
     - label: ":windows: Win 2019 Unit Tests"
       key: "win-extended-2019"
-      command: ".buildkite/scripts/win_unit_tests.ps1"
+      command: |
+        Set-Location -Path $BEATS_PROJECT_NAME
+        mage build unitTest
       notify:
         - github_commit_status:
             context: "Filebeat/Extended: Win-2019 Unit Tests"
@@ -150,7 +156,6 @@ cat >> $pipelineName <<- YAML
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
       - "mandatory-tests"
-
     steps:
       - label: Package pipeline
         commands: ".buildkite/scripts/packaging/package-step.sh"
@@ -161,8 +166,8 @@ cat >> $pipelineName <<- YAML
 YAML
 fi
 
-echo "--- Printing dynamic steps"     #TODO: remove if the pipeline is public
-cat $pipelineName
+echo "+++ Printing dynamic steps"
+cat $pipelineName | yq . -P
 
 echo "--- Loading dynamic steps"
 buildkite-agent pipeline upload $pipelineName

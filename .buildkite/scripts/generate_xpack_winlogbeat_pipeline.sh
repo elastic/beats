@@ -18,10 +18,9 @@ steps:
 
       - label: ":windows: Windows 2019 Unit (MODULE) Tests"
         key: "mandatory-win-2019-unit-tests"
-        command:
-          - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage unitTest"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         env:
           MODULE: $MODULE
         agents:
@@ -33,10 +32,9 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Windows 2016/2022 Unit Tests - {{matrix.image}}"
-        command:
-          - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage unitTest"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -59,10 +57,9 @@ steps:
     steps:
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command:
-          - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage unitTest"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
@@ -112,8 +109,8 @@ if are_conditions_met_packaging; then
 YAML
 fi
 
-echo "--- Printing dynamic steps"     #TODO: remove if the pipeline is public
-cat $pipelineName
+echo "+++ Printing dynamic steps"
+cat $pipelineName | yq . -P
 
 echo "--- Loading dynamic steps"
 buildkite-agent pipeline upload $pipelineName

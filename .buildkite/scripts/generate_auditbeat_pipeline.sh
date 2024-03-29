@@ -6,14 +6,14 @@ set -euo pipefail
 
 pipelineName="pipeline.auditbeat-dynamic.yml"
 
-# TODO: steps: must be always included 
+# TODO: steps: must be always included
 echo "Add the mandatory and extended tests without additional conditions into the pipeline"
 if are_conditions_met_mandatory_tests; then
   cat > $pipelineName <<- YAML
 
 steps:
   - group: "Auditbeat Mandatory Testing"
-    key: "mandatory-tests"    
+    key: "mandatory-tests"
 
     steps:
       - label: ":ubuntu: Unit Tests"
@@ -45,7 +45,9 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":windows:-2016 Unit Tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         notify:
           - github_commit_status:
               context: "Auditbeat: windows 2016/Unit Tests"
@@ -54,13 +56,15 @@ steps:
           image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
-          disk_type: "pd-ssd"        
+          disk_type: "pd-ssd"
         artifact_paths:
           - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"    
+          - "auditbeat/build/*.json"
 
       - label: ":windows:-2022 Unit Tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         notify:
           - github_commit_status:
               context: "Auditbeat: windows 2022/Unit Tests"
@@ -69,10 +73,10 @@ steps:
           image: "${IMAGE_WIN_2022}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
-          disk_type: "pd-ssd"        
+          disk_type: "pd-ssd"
         artifact_paths:
           - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"              
+          - "auditbeat/build/*.json"
 
       - label: ":linux: Crosscompile"
         command:
@@ -120,7 +124,9 @@ if are_conditions_met_win_tests; then
     steps:
       - label: ":windows: Windows 2019 Unit Tests"
         key: "extended-win-2019-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -134,7 +140,9 @@ if are_conditions_met_win_tests; then
 
       - label: ":windows: Windows 10 Unit Tests"
         key: "extended-win-10-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -148,7 +156,9 @@ if are_conditions_met_win_tests; then
 
       - label: ":windows: Windows 11 Unit Tests"
         key: "extended-win-11-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -166,7 +176,7 @@ echo "Check and add the Packaging into the pipeline"
 if are_conditions_met_packaging; then
 cat >> $pipelineName <<- YAML
   - group: "Packaging"
-    key: "packaging"      
+    key: "packaging"
     depends_on:
       - "mandatory-tests"
     steps:
@@ -180,8 +190,8 @@ cat >> $pipelineName <<- YAML
 YAML
 fi
 
-echo "--- Printing dynamic steps"     #TODO: remove if the pipeline is public
-cat $pipelineName
+echo "+++ Printing dynamic steps"
+cat $pipelineName | yq . -P
 
 echo "--- Loading dynamic steps"
 buildkite-agent pipeline upload $pipelineName

@@ -48,7 +48,6 @@ steps:
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
@@ -56,6 +55,7 @@ steps:
           setup:
             image:
               - "${IMAGE_WIN_2016}"
+              - "${IMAGE_WIN_2022}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 ### TODO: this condition will be changed in the Phase 3 of the Migration Plan https://docs.google.com/document/d/1IPNprVtcnHlem-uyGZM0zGzhfUuFAh4LeSl9JFHMSZQ/edit#heading=h.sltz78yy249h
@@ -64,10 +64,6 @@ steps:
     steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command: ".buildkite/scripts/win_unit_tests.ps1"
-        # command:
-        #   - "Set-Location -Path $BEATS_PROJECT_NAME"
-        #   - "New-Item -ItemType Directory -Force -Path 'build'"
-        #   - "mage unitTest"
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
@@ -108,8 +104,8 @@ if are_conditions_met_arm_tests; then
 YAML
 fi
 
-echo "--- Printing dynamic steps"     #TODO: remove if the pipeline is public
-cat $pipelineName
+echo "+++ Printing dynamic steps"
+cat $pipelineName | yq . -P
 
 echo "--- Loading dynamic steps"
 buildkite-agent pipeline upload $pipelineName
