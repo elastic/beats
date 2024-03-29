@@ -196,7 +196,7 @@ case "${BUILDKITE_PIPELINE_SLUG}" in
     BEAT_CHANGESET_REFERENCE=${xpack_winlogbeat_changeset[@]}
     ;;
   *)
-  echo "The changeset for the ${BUILDKITE_PIPELINE_SLUG} pipeline hasn't been defined yet."
+  echo "~~~ The changeset for the ${BUILDKITE_PIPELINE_SLUG} pipeline hasn't been defined yet."
   ;;
 esac
 
@@ -211,7 +211,7 @@ check_and_set_beat_vars() {
     TRIGGER_SPECIFIC_AWS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_aws_tests"
     TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_macos_tests"
     TRIGGER_SPECIFIC_WIN_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_win_tests"
-    echo "Beats project name is $BEATS_XPACK_PROJECT_NAME"
+    echo "--- Beats project name is $BEATS_XPACK_PROJECT_NAME"
     mandatory_changeset=(
       "${BEAT_CHANGESET_REFERENCE[@]}"
       "${xpack_changeset[@]}"
@@ -224,7 +224,7 @@ check_and_set_beat_vars() {
     TRIGGER_SPECIFIC_AWS_TESTS="run_${BEATS_PROJECT_NAME}_aws_tests"
     TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_PROJECT_NAME}_macos_tests"
     TRIGGER_SPECIFIC_WIN_TESTS="run_${BEATS_PROJECT_NAME}_win_tests"
-    echo "Beats project name is $BEATS_PROJECT_NAME"
+    echo "--- Beats project name is $BEATS_PROJECT_NAME"
     mandatory_changeset=(
       "${BEAT_CHANGESET_REFERENCE[@]}"
       "${oss_changeset[@]}"
