@@ -17,7 +17,9 @@ steps:
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: |
+          cd $BEATS_PROJECT_NAME
+          mage build unitTest
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -26,7 +28,9 @@ steps:
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
+        command: |
+          cd $BEATS_PROJECT_NAME
+          mage goIntegTest
         env:
           MODULE: $MODULE
         agents:
@@ -37,7 +41,9 @@ steps:
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
+        command: |
+          cd $BEATS_PROJECT_NAME
+          mage pythonIntegTest
         env:
           MODULE: $MODULE
         agents:
