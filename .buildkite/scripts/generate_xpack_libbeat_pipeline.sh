@@ -45,13 +45,9 @@ steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
           command: ".buildkite/scripts/win_unit_tests.ps1"
         # command:
-        #   - "$env:PATH += ';C:\Program Files\Git\mingw64\bin'"
         #   - "Set-Location -Path $BEATS_PROJECT_NAME"
         #   - "New-Item -ItemType Directory -Force -Path 'build'"
         #   - "mage unitTest"
-        # env:
-        #   magefile: "$BEATS_PROJECT_NAME/.magefile"
-        #   MAGEFILE_CACHE: "$BEATS_PROJECT_NAME/.magefile"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -73,14 +69,10 @@ steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
           command: ".buildkite/scripts/win_unit_tests.ps1"
         # command:
-        #   - "$env:PATH += ';C:\Program Files\Git\mingw64\bin'"
         #   - "Set-Location -Path $BEATS_PROJECT_NAME"
         #   - "New-Item -ItemType Directory -Force -Path 'build'"
         #   - "mage unitTest"
         key: "extended-win-unit-tests"
-        # env:
-        #   magefile: "$BEATS_PROJECT_NAME/.magefile"
-        #   MAGEFILE_CACHE: "$BEATS_PROJECT_NAME/.magefile"
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
