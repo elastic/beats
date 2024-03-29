@@ -17,7 +17,7 @@ teardown() {
   docker-compose -f .ci/jobs/docker-compose.yml down -v         #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
 }
 
-trap 'teardown || true; unset_secrets' EXIT
+trap 'teardown' EXIT
 
 # Prepare the cloud resources using Terraform
 #startCloudTestEnv "${MODULE_DIR}"
@@ -32,7 +32,7 @@ set -o xtrace
 echo "~~~ Run docker-compose services for emulated cloud env"
 docker-compose -f .ci/jobs/docker-compose.yml up -d        #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
 echo "~~~ Initialize TF cloud resources"
-pushd "$dir"
+pushd "$MODULE_DIR"
 export TF_VAR_BRANCH=$(echo "${BUILDKITE_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
 export TF_VAR_BUILD_ID="${BUILDKITE_BUILD_ID}"
 export TF_VAR_CREATED_DATE=$(date +%s)
