@@ -43,10 +43,12 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command:
-          - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage unitTest"
+          command: ".buildkite/scripts/win_unit_tests.ps1"
+        # command:
+        #   - "$env:PATH += ';C:\Program Files\Git\mingw64\bin'"
+        #   - "Set-Location -Path $BEATS_PROJECT_NAME"
+        #   - "New-Item -ItemType Directory -Force -Path 'build'"
+        #   - "mage unitTest"
         # env:
         #   magefile: "$BEATS_PROJECT_NAME/.magefile"
         #   MAGEFILE_CACHE: "$BEATS_PROJECT_NAME/.magefile"
@@ -69,10 +71,12 @@ steps:
     key: "extended-win-tests"
     steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command:
-          - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage unitTest"
+          command: ".buildkite/scripts/win_unit_tests.ps1"
+        # command:
+        #   - "$env:PATH += ';C:\Program Files\Git\mingw64\bin'"
+        #   - "Set-Location -Path $BEATS_PROJECT_NAME"
+        #   - "New-Item -ItemType Directory -Force -Path 'build'"
+        #   - "mage unitTest"
         key: "extended-win-unit-tests"
         # env:
         #   magefile: "$BEATS_PROJECT_NAME/.magefile"
