@@ -52,6 +52,7 @@ steps:
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
@@ -59,7 +60,6 @@ steps:
           setup:
             image:
               - "${IMAGE_WIN_2016}"
-              - "${IMAGE_WIN_2022}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
 ## TODO: this condition will be changed in the Phase 3 of the Migration Plan https://docs.google.com/document/d/1IPNprVtcnHlem-uyGZM0zGzhfUuFAh4LeSl9JFHMSZQ/edit#heading=h.sltz78yy249h
