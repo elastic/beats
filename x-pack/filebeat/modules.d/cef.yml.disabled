@@ -1,5 +1,5 @@
 # Module: cef
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-cef.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.13/filebeat-module-cef.html
 
 - module: cef
   log:
