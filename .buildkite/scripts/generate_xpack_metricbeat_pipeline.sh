@@ -172,6 +172,17 @@ if are_conditions_met_packaging; then
 YAML
 fi
 
+# TODO Remove once is merged https://github.com/elastic/ci-agent-images/pull/597
+if ! [[ -x $(which yq) && $(yq --version) == *mikefarah* ]]; then
+  target_arch="amd64"
+  if [[ "$(uname -m)" =~ "arm64" || "$(uname -m)" =~ "aarch64" ]]; then
+      target_arch="arm64"
+  fi
+  curl -fsSL --retry-max-time 60 --retry 3 --retry-delay 5 -o /usr/sbin/yq "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${target_arch}"
+  chmod a+x /usr/sbin/yq
+fi
+
+
 echo "+++ Printing dynamic steps"     #TODO: remove if the pipeline is public
 cat $pipelineName | yq . -P
 
