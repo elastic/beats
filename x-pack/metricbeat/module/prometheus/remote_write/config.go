@@ -32,6 +32,14 @@ func (c *config) Validate() error {
 	if c.RateCounters && !c.UseTypes {
 		return errors.New("'rate_counters' can only be enabled when `use_types` is also enabled")
 	}
-
+	duration, err := time.ParseDuration(c.Period.String())
+	{
+		if err != nil {
+			return err
+		} else if duration < 60*time.Second {
+			// by default prometheus push data with the interval 60s, in order to calculate counter rate we are setting Period to 60secs accordingly
+			c.Period = time.Second * 60
+		}
+	}
 	return nil
 }

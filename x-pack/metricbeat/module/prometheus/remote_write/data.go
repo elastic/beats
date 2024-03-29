@@ -44,16 +44,10 @@ func remoteWriteEventsGeneratorFactory(base mb.BaseMetricSet) (remote_write.Remo
 	}
 
 	if config.UseTypes {
-		// By default prometheus in remote_write pushes data with the interval of 60s. In order to calculate counter rate we are setting Period to 60secs accordingly
-		duration, err := time.ParseDuration(config.Period.String())
-		if duration < 60*time.Second || err != nil {
-			duration = time.Second * 60
-		}
-		logp.Debug("Period for counter cache for remote_write", duration.String())
-
+		logp.Debug("prometheus.remote_write.cache", "Period for counter cache for remote_write: %v", config.Period.String())
 		// use a counter cache with a timeout of 5x the period, as a safe value
 		// to make sure that all counters are available between fetches
-		counters := collector.NewCounterCache(duration * 5)
+		counters := collector.NewCounterCache(config.Period * 5)
 
 		g := remoteWriteTypedGenerator{
 			counterCache: counters,
