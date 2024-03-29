@@ -43,7 +43,7 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-          command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         # command:
         #   - "Set-Location -Path $BEATS_PROJECT_NAME"
         #   - "New-Item -ItemType Directory -Force -Path 'build'"
@@ -67,7 +67,7 @@ steps:
     key: "extended-win-tests"
     steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-          command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         # command:
         #   - "Set-Location -Path $BEATS_PROJECT_NAME"
         #   - "New-Item -ItemType Directory -Force -Path 'build'"
