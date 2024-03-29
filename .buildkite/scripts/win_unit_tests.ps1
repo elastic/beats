@@ -148,9 +148,8 @@ function withMinGW {
 
 # withPython $env:SETUP_WIN_PYTHON_VERSION
 
-if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-metricbeat" -or $env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
-    withMinGW
-}
+withMinGW
+
 
 
 # if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-packetbeat" -or $env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-filebeat") {
@@ -161,10 +160,9 @@ if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-metricbeat" -or $env:BUILDKITE
 
 Set-Location -Path $WorkFolder
 
-# if ($env:BUILDKITE_PIPELINE_SLUG -eq "beats-xpack-libbeat") {
-#     $magefile = "$WORKSPACE\$WorkFolder\.magefile"
-#     $env:MAGEFILE_CACHE = $magefile
-# }
+
+$magefile = "$WORKSPACE\$WorkFolder\.magefile"
+$env:MAGEFILE_CACHE = $magefile
 
 New-Item -ItemType Directory -Force -Path "build"
 
