@@ -72,7 +72,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
 - Fix filebeat gcs input panic {pull}38407[38407]
-- Rename `activity_guid` to `activity_id` in ETW input events to suit other Windows inputs. {pull}38530[38530]
 - Add missing provider registration and fix published entity for Active Directory entityanalytics provider. {pull}38645[38645]
 
 *Heartbeat*
