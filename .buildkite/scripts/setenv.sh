@@ -14,21 +14,6 @@ export ASDF_TERRAFORM_VERSION="1.0.2"
 export ASDF_NODEJS_VERSION="18.17.1"
 export AWS_REGION="eu-central-1"
 export NODEJS_VERSION="18.17.1"             #TODO remove after tests of the agent with nodeJS
-export IMAGE_UBUNTU_X86_64="family/platform-ingest-beats-ubuntu-2204"
-export IMAGE_UBUNTU_ARM_64="platform-ingest-beats-ubuntu-2204-aarch64"
-export DEFAULT_UBUNTU_X86_64_IMAGE="family/core-ubuntu-2204"
-export IMAGE_RHEL9_X86_64="family/platform-ingest-beats-rhel-9"
-export IMAGE_WIN_10="family/platform-ingest-beats-windows-10"
-export IMAGE_WIN_11="family/platform-ingest-beats-windows-11"
-export IMAGE_WIN_2016="family/platform-ingest-beats-windows-2016"
-export IMAGE_WIN_2019="family/platform-ingest-beats-windows-2019"
-export IMAGE_WIN_2022="family/platform-ingest-beats-windows-2022"
-export IMAGE_MACOS_X86_64="generic-13-ventura-x64"
-export IMAGE_MACOS_ARM="generic-13-ventura-arm"
-export GCP_DEFAULT_MACHINE_TYPE="c2d-highcpu-8"
-export GCP_HI_PERF_MACHINE_TYPE="c2d-highcpu-16"
-export GCP_WIN_MACHINE_TYPE="n2-standard-8"
-export AWS_ARM_INSTANCE_TYPE="t4g.xlarge"
 
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
 export WORKSPACE

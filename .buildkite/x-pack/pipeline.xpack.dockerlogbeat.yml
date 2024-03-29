@@ -2,6 +2,21 @@
 name: "beats-xpack-dockerlogbeat"
 
 env:
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  DEFAULT_UBUNTU_X86_64_IMAGE: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
+  IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
+  IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
+  IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
+  IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
+  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
   BEATS_PROJECT_NAME: "x-pack/dockerlogbeat"
 
 steps:
