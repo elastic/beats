@@ -50,7 +50,7 @@ func TicksToNs(ticks uint64) uint64 {
 }
 
 func TimeFromNsSinceBoot(t time.Duration) *time.Time {
-	bootTime, err := getBootTime()
+	bootTime, err := getBootTimeOnce()
 	if err != nil {
 		return nil
 	}
