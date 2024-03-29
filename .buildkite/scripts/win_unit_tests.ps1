@@ -99,8 +99,8 @@ function withMinGW {
 #     } else {
 #         exit 1
 #     }
-    [Environment]::SetEnvironmentVariable("Path", "${env:ProgramFiles}\Git\mingw64\bin\;$env:Path", [EnvironmentVariableTarget]::Machine)
-    Write-Host "${env:ProgramFiles}\Git\mingw64\bin\;$env:Path"
+    [Environment]::SetEnvironmentVariable("Path", "C:\Users\buildkite\mingw64\bin\;$env:Path", [EnvironmentVariableTarget]::Machine)
+    Write-Host "C:\Users\buildkite\mingw64\bin\;$env:Path"
 }
 # function installGoDependencies {
 #     $installPackages = @(
