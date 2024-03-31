@@ -123,7 +123,7 @@ steps:
 
   - group: "Metricbeat Extended Tests MacOS"
     key: "metricbeat-extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*MacOS.*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
       - label: ":mac: Metricbeat MacOS Unit Tests"
         key: "metricbeat-extended-macos-unit-tests"
