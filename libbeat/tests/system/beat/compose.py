@@ -4,18 +4,14 @@ import os
 import sys
 import tarfile
 import time
+import tempfile
+import random
+from pathlib import Path
 
 from contextlib import contextmanager
-
+from python_on_whales import DockerClient
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
-
-if INTEGRATION_TESTS:
-    from compose.cli.command import get_project
-    from compose.config.environment import Environment
-    from compose.service import BuildAction
-    from compose.service import ConvergenceStrategy
-
 
 class ComposeMixin(object):
     """
@@ -29,10 +25,13 @@ class ComposeMixin(object):
     COMPOSE_ENV = {}
 
     # timeout waiting for health (seconds)
-    COMPOSE_TIMEOUT = 300
+    COMPOSE_TIMEOUT = 1
 
     # add advertised host environment file
     COMPOSE_ADVERTISED_HOST = False
+    
+    # max retries to check if services are healthy
+    COMPOSE_MAX_RETRIES = 7
 
     # port to advertise when COMPOSE_ADVERTISED_HOST is set to true
     COMPOSE_ADVERTISED_PORT = None
@@ -49,12 +48,13 @@ class ComposeMixin(object):
             return
 
         def print_logs(container):
-            print("---- " + container.name_without_project)
+            print("---- " + container.name)
             print(container.logs())
             print("----")
 
         def is_healthy(container):
-            return container.state.health.status == 'healthy' #container.inspect()['State']['Health']['Status'] == 'healthy'
+            print("Checking health of %s and the status is: %s" % (container.name, container.state.status))
+            return container.state.status == 'running'
 
         project = cls.compose_project()
 
@@ -63,52 +63,41 @@ class ComposeMixin(object):
                 ignore_pull_failures=True,
                 services=cls.COMPOSE_SERVICES)
 
-        # project.up(
-        #     strategy=ConvergenceStrategy.always,
-        #     service_names=cls.COMPOSE_SERVICES,
-        #     timeout=30)
         project.up(
             services=cls.COMPOSE_SERVICES,
             recreate=True,
             detach=True,
+            remove_orphans=True,
+            color=False,
         )
-
-        # Wait for them to be healthy
-        start = time.time()
-        while True:
-            # containers = project.containers(
-            #     service_names=cls.COMPOSE_SERVICES,
-            #     stopped=True)
-            containers = project.ps(services=cls.COMPOSE_SERVICES, all=True)
-
-            healthy = True
-            for container in containers:
-                if not container.state.status == 'running':
-                    print_logs(container)
-                    raise Exception(
-                        "Container %s unexpectedly finished on startup" %
-                        container.name_without_project)
-                if not is_healthy(container):
-                    healthy = False
-                    break
-
-            if healthy:
-                break
-
-            if cls.COMPOSE_ADVERTISED_HOST:
-                for service in cls.COMPOSE_SERVICES:
-                    cls._setup_advertised_host(project, service)
-
-            time.sleep(1)
-            timeout = time.time() - start > cls.COMPOSE_TIMEOUT
-            if timeout:
+        
+        print("Docker-compose services: %s" % ','.join(cls.COMPOSE_SERVICES))
+        print("Docker compose advertised host: %s" % cls.COMPOSE_ADVERTISED_HOST)
+        
+        
+        containers = project.ps(services=cls.COMPOSE_SERVICES, all=True)
+        retry_delay = cls.COMPOSE_TIMEOUT
+        for attempt in range(cls.COMPOSE_MAX_RETRIES):
+                print("Checking health status: %s with delay of %s" % (attempt, retry_delay))
+                healthy = True
                 for container in containers:
                     if not is_healthy(container):
-                        print_logs(container)
-                raise Exception(
-                    "Timeout while waiting for healthy "
-                    "docker-compose services: %s" %
-                    ','.join(cls.COMPOSE_SERVICES))
+                        healthy = False
+                        break
+
+                if healthy:
+                    break
+                
+                if cls.COMPOSE_ADVERTISED_HOST:
+                    for service in cls.COMPOSE_SERVICES:
+                        cls._setup_advertised_host(project, service)
+                
+                time.sleep(retry_delay)
+                retry_delay *= 2
+                retry_delay += random.uniform(0, 1)
+        else:
+            # This part executes if the loop completes without a 'break'
+            raise Exception("Max retries reached without achieving health status")
 
     @classmethod
     def _setup_advertised_host(cls, project, service):
@@ -130,9 +119,9 @@ class ComposeMixin(object):
         tar.addfile(info, fileobj=io.BytesIO(content.encode("utf-8")))
         tar.close()
 
-        containers = project.containers(service_names=[service])
+        containers = project.ps(service_names=[service])
         for container in containers:
-            container.client.put_archive(container=container.id, path="/", data=data.getvalue())
+            container.put_archive(path="/", data=data.getvalue())
 
     @classmethod
     def compose_down(cls):
@@ -147,7 +136,8 @@ class ComposeMixin(object):
             if os.path.basename(os.path.dirname(cls.find_compose_path())) == "module":
                 cls.compose_project().down(volumes=True)
             else:
-                cls.compose_project().kill(services=cls.COMPOSE_SERVICES)
+                for service in cls.COMPOSE_SERVICES:
+                    cls.compose_project().stop(services=[service])
 
     @classmethod
     def get_hosts(cls):
@@ -161,7 +151,6 @@ class ComposeMixin(object):
         run from another container in the same network. It also works when
         running from the host network if the docker daemon runs natively.
         """
-        #networks = list(info['NetworkSettings']['Networks'].values())
         networks = list(networks.values())
         port = port.split("/")[0]
         for network in networks:
@@ -175,8 +164,8 @@ class ComposeMixin(object):
         Return the exposed address in the host, can be used when the test is
         run from the host network. Recommended when using docker machines.
         """
-        hostPort = info['NetworkSettings']['Ports'][port][0]['HostPort']
-        return "localhost:%s" % hostPort
+        host_port = info.network_settings.ports[port][0]['HostPort']
+        return "localhost:%s" % host_port
 
     @classmethod
     def compose_host(cls, service=None, port=None):
@@ -190,20 +179,24 @@ class ComposeMixin(object):
         if host_env:
             return host_env
 
-        container = cls.compose_project().ps(services=[service])[0]
-        # info = container.inspect()
-        portsConfig = container.host_config.port_bindings  #info['HostConfig']['PortBindings']
-        if len(portsConfig) == 0:
-            raise Exception("No exposed ports for service %s" % service)
-        if port is None:
-            port = list(portsConfig.keys())[0]
+        containers = cls.compose_project().ps(services=[service], all=False)
+        try:
+            container = containers[0]
+        except IndexError:
+            raise Exception(f"No container found for service {service}")
+        
+        try:
+            ports_config = container.host_config.port_bindings
+            if not ports_config:
+                raise Exception(f"No exposed ports for service {service}")
+            if port is None:
+                port = list(ports_config.keys())[0]
+        except (IndexError, KeyError):
+            raise Exception(f"No valid port binding found for service {service}")
 
-        # We can use _exposed_host for all platforms when we can use host network
-        # in the metricbeat container
-        # networks = list(info['NetworkSettings']['Networks'].values())
         if sys.platform.startswith('linux'):
             return cls._private_host(container.network_settings.networks, port)
-        return cls._exposed_host(info, port)
+        return cls._exposed_host(container._get_inspect_result(), port)
 
     @classmethod
     def compose_project_name(cls):
@@ -216,19 +209,29 @@ class ComposeMixin(object):
 
     @classmethod
     def compose_project(cls):
-        env = Environment(os.environ.copy())
+        env = os.environ.copy()
         env.update(cls.COMPOSE_ENV)
-        
-        compose_files = [os.path.join(cls.find_compose_path(), "docker-compose.yml")]
 
-        from python_on_whales import DockerClient
-        docker = DockerClient(
+        compose_files = [os.path.join(cls.find_compose_path(), "docker-compose.yml")]
+        
+        with tempfile.NamedTemporaryFile(mode='w+', delete=False) as env_file:
+            # Write variables from os.environ
+            for key, value in os.environ.items():
+                env_file.write(f"{key}={value}\n")
+
+            # Write variables from COMPOSE_ENV
+            for key, value in cls.COMPOSE_ENV.items():
+                env_file.write(f"{key}={value}\n")
+
+            env_file_path = Path(env_file.name)
+
+        docker_client = DockerClient(
             compose_project_name=cls.compose_project_name().lower(),
-            compose_files=compose_files)
-        return docker.compose
-        # return get_project(cls.find_compose_path(),
-        #                    project_name=cls.compose_project_name(),
-        #                    environment=env)
+            compose_files=compose_files,
+            compose_env_file=env_file_path,
+        )
+        
+        return docker_client.compose
 
     @classmethod
     def find_compose_path(cls):
