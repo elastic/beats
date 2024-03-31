@@ -124,7 +124,7 @@ steps:
 
   - group: "Heartbeat Packaging"
     key: "heartbeat-packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "/package"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "/package"
     depends_on:
       - "heartbeat-mandatory-tests"
     steps:

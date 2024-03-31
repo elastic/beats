@@ -141,7 +141,7 @@ steps:
 
   - group: "Packaging"
     key: "metricbeat-packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "/package"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "/package"
     steps:
       - label: ":linux: Metricbeat Packaging Linux"
         key: "metricbeat-packaging-linux"

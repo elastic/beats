@@ -145,7 +145,7 @@ steps:
 
   - group: "Packaging"
     key: "auditbeat-packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "/package"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "/package"
     depends_on:
       - "auditbeat-mandatory-tests"
     steps:
