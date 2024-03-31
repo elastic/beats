@@ -13,6 +13,7 @@ from python_on_whales import DockerClient
 
 INTEGRATION_TESTS = os.environ.get('INTEGRATION_TESTS', False)
 
+
 class ComposeMixin(object):
     """
     Manage docker-compose to ensure that needed services are running during tests
@@ -29,7 +30,7 @@ class ComposeMixin(object):
 
     # add advertised host environment file
     COMPOSE_ADVERTISED_HOST = False
-    
+
     # max retries to check if services are healthy
     COMPOSE_MAX_RETRIES = 7
 
@@ -70,31 +71,30 @@ class ComposeMixin(object):
             remove_orphans=True,
             color=False,
         )
-        
+
         print("Docker-compose services: %s" % ','.join(cls.COMPOSE_SERVICES))
         print("Docker compose advertised host: %s" % cls.COMPOSE_ADVERTISED_HOST)
-        
-        
+
         containers = project.ps(services=cls.COMPOSE_SERVICES, all=True)
         retry_delay = cls.COMPOSE_TIMEOUT
         for attempt in range(cls.COMPOSE_MAX_RETRIES):
-                print("Checking health status: %s with delay of %s" % (attempt, retry_delay))
-                healthy = True
-                for container in containers:
-                    if not is_healthy(container):
-                        healthy = False
-                        break
-
-                if healthy:
+            print("Checking health status: %s with delay of %s" % (attempt, retry_delay))
+            healthy = True
+            for container in containers:
+                if not is_healthy(container):
+                    healthy = False
                     break
-                
-                if cls.COMPOSE_ADVERTISED_HOST:
-                    for service in cls.COMPOSE_SERVICES:
-                        cls._setup_advertised_host(project, service)
-                
-                time.sleep(retry_delay)
-                retry_delay *= 2
-                retry_delay += random.uniform(0, 1)
+
+            if healthy:
+                break
+
+            if cls.COMPOSE_ADVERTISED_HOST:
+                for service in cls.COMPOSE_SERVICES:
+                    cls._setup_advertised_host(project, service)
+
+            time.sleep(retry_delay)
+            retry_delay *= 2
+            retry_delay += random.uniform(0, 1)
         else:
             # This part executes if the loop completes without a 'break'
             raise Exception("Max retries reached without achieving health status")
@@ -184,7 +184,7 @@ class ComposeMixin(object):
             container = containers[0]
         except IndexError:
             raise Exception(f"No container found for service {service}")
-        
+
         try:
             ports_config = container.host_config.port_bindings
             if not ports_config:
@@ -213,7 +213,7 @@ class ComposeMixin(object):
         env.update(cls.COMPOSE_ENV)
 
         compose_files = [os.path.join(cls.find_compose_path(), "docker-compose.yml")]
-        
+
         with tempfile.NamedTemporaryFile(mode='w+', delete=False) as env_file:
             # Write variables from os.environ
             for key, value in os.environ.items():
@@ -230,7 +230,7 @@ class ComposeMixin(object):
             compose_files=compose_files,
             compose_env_file=env_file_path,
         )
-        
+
         return docker_client.compose
 
     @classmethod
