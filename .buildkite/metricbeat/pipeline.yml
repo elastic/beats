@@ -139,7 +139,7 @@ steps:
       - step: "mandatory-tests"
         allow_failure: false
 
-  - group: "Packaging"
+  - group: "Merticbeat Packaging"
     key: "metricbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "/package"
     steps:

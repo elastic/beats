@@ -143,7 +143,7 @@ steps:
         #   disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-  - group: "Packaging"
+  - group: "Auditbeat Packaging"
     key: "auditbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "/package"
     depends_on:
