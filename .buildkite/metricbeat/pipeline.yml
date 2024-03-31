@@ -136,10 +136,10 @@ steps:
 
   - wait: ~
     depends_on:
-      - step: "mandatory-tests"
+      - step: "metricbeat-mandatory-tests"
         allow_failure: false
 
-  - group: "Merticbeat Packaging"
+  - group: "Metricbeat Packaging"
     key: "metricbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "/package"
     steps:
