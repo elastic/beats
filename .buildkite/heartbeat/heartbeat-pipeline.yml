@@ -77,7 +77,7 @@ steps:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
-  - group: "Heartbeat Extended Testing ARM"
+  - group: "Heartbeat ARM Tests"
     key: "heartbeat-extended-tests-arm"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
     steps:
