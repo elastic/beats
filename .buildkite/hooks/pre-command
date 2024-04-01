@@ -86,24 +86,6 @@ ENABLED_BEATS_PIPELINES_SLUGS=(
 for slug in "${ENABLED_BEATS_PIPELINES_SLUGS[@]}"; do
   if [[ "$BUILDKITE_PIPELINE_SLUG" == "$slug" ]]; then
     source .buildkite/scripts/setenv.sh
-    ## TODO remove the code below if the test results are fine
-    # if [ "${arch_type}" == "x86_64" ]; then
-    #   case "${platform_type}" in
-    #     Linux|Darwin)
-    #       echo "TBD"
-    #       ;;
-    #     MINGW*)
-    #       echo "-- Fixing CRLF in git checkout --"
-    #       # git config core.autocrlf false
-    #       # git rm --quiet --cached -r .
-    #       # git reset --quiet --hard
-    #       ;;
-    #   esac
-    # elif [[ "${arch_type}" == "aarch64" || "${arch_type}" == "arm64" ]]; then
-    #       echo "TBD"
-    # else
-    #   echo "Unsupported OS"
-    # fi
     break
   fi
 done
