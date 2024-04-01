@@ -49,6 +49,8 @@ steps:
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
         key: "mandatory-win-unit-tests"
+        env:
+          MAGEFILE_DEBUG:1
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
