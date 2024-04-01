@@ -18,7 +18,7 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
   BEATS_PROJECT_NAME: "x-pack/libbeat"
-  MAGEFILE_CACHE: "C:\Users\buildkite\.magefile"
+  MAGEFILE_CACHE: "C:\\Users\\buildkite\\.magefile"
 
   #Packaging
   PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
