@@ -59,17 +59,14 @@ class ComposeMixin(object):
 
         project = cls.compose_project()
 
-        with disabled_logger('compose.service'):
-            project.pull(
-                ignore_pull_failures=True,
-                services=cls.COMPOSE_SERVICES)
-
         project.up(
             services=cls.COMPOSE_SERVICES,
             recreate=True,
             detach=True,
             remove_orphans=True,
             color=False,
+            pull="missing",
+            wait=True,
         )
 
         print("Docker-compose services: %s" % ','.join(cls.COMPOSE_SERVICES))
