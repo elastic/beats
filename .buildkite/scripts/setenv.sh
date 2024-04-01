@@ -13,7 +13,6 @@ export PACKAGING_ARM_PLATFORMS="linux/arm64"
 export ASDF_TERRAFORM_VERSION="1.0.2"
 export ASDF_NODEJS_VERSION="18.17.1"
 export AWS_REGION="eu-central-1"
-export NODEJS_VERSION="18.17.1"             #TODO remove after tests of the agent with nodeJS
 
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
 export WORKSPACE
