@@ -50,6 +50,7 @@ steps:
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
+          imageProject: elastic-images-qa
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
@@ -66,8 +67,8 @@ steps:
     steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command: |
-          Set-Location -Path $BEATS_PROJECT_NAME\reader\etw
-          mage build goUnitTest
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage -w reader\etw build goUnitTest
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
