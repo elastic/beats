@@ -19,8 +19,7 @@ steps:
 
     steps:
       - label: ":ubuntu: Unit Tests"
-        command:
-          - ".buildkite/filebeat/scripts/unit-tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: linux/Unit Tests"
@@ -33,8 +32,7 @@ steps:
           - "filebeat/build/*.json"
 
       - label: ":ubuntu: Go Integration Tests"
-        command:
-          - ".buildkite/filebeat/scripts/integration-gotests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Go Integration Tests"
@@ -47,8 +45,7 @@ steps:
           - "filebeat/build/*.json"
 
       - label: ":ubuntu: Python Integration Tests"
-        command:
-          - ".buildkite/filebeat/scripts/integration-pytests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Python Integration Tests"
@@ -60,40 +57,22 @@ steps:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
 
-      - label: ":windows:-2016 Unit Tests"
+      - label: ":windows: Windows 2016/2022 Unit Tests - {{matrix.image}}"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
-        notify:
-          - github_commit_status:
-              context: "Filebeat: windows/Unit Tests"
         agents:
           provider: "gcp"
-          image: "${IMAGE_WIN_2016}"
+          image: "{{matrix.image}}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 200
+          disk_size: 100
           disk_type: "pd-ssd"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-
-      - label: ":windows:-2022 Unit Tests"
-        command: |
-          Set-Location -Path $BEATS_PROJECT_NAME
-          mage build unitTest
-        notify:
-          - github_commit_status:
-              context: "Filebeat: windows 2022/Unit Tests"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 200
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_2016}"
+              - "${IMAGE_WIN_2022}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 YAML
 else
   echo "The conditions don't match to requirements for generating pipeline steps."
@@ -125,44 +104,60 @@ fi
 
 if are_conditions_met_win_tests; then
   cat >> $pipelineName <<- YAML
-  - group: "Windows Extended Testing"
-    key: "extended-tests-win"
+  - group: "Extended Windows Tests"
+    key: "extended-win-tests"
     steps:
-    - label: ":windows: Win 2019 Unit Tests"
-      key: "win-extended-2019"
-      command: |
-        Set-Location -Path $BEATS_PROJECT_NAME
-        mage build unitTest
-      notify:
-        - github_commit_status:
-            context: "Filebeat/Extended: Win-2019 Unit Tests"
-      agents:
-        provider: "gcp"
-        image: "${IMAGE_WIN_2019}"
-        machine_type: "${GCP_WIN_MACHINE_TYPE}"
-        disk_size: 200
-        disk_type: "pd-ssd"
-      artifact_paths:
-        - "filebeat/build/*.xml"
-        - "filebeat/build/*.json"
+      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "extended-win-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_10}"
+              - "${IMAGE_WIN_11}"
+              - "${IMAGE_WIN_2019}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 YAML
 fi
 
 echo "Check and add the Packaging into the pipeline"
 if are_conditions_met_packaging; then
 cat >> $pipelineName <<- YAML
-  - group: "Packaging"
+  - group: "Packaging"    # TODO: check conditions for future the main pipeline migration: https://github.com/elastic/beats/pull/28589
     key: "packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
-      - "mandatory-tests"
+          - "mandatory-tests"
     steps:
-      - label: Package pipeline
-        commands: ".buildkite/scripts/packaging/package-step.sh"
-        notify:
-        - github_commit_status:
-            context: "Filebeat: Packaging"
+      - label: ":linux: Packaging Linux"
+        key: "packaging-linux"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        env:
+          PLATFORMS: "${PACKAGING_PLATFORMS}"
 
+      - label: ":linux: Packaging ARM"
+        key: "packaging-arm"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        env:
+          PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
+          PACKAGES: "docker"
 YAML
 fi
 
