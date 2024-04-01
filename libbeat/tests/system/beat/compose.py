@@ -49,7 +49,7 @@ class ComposeMixin(object):
             return
 
         def print_logs(container):
-            print("---- " + container.name_without_project)
+            print("---- " + container.name)
             print(container.logs())
             print("----")
 
@@ -87,7 +87,7 @@ class ComposeMixin(object):
                     print_logs(container)
                     raise Exception(
                         "Container %s unexpectedly finished on startup" %
-                        container.name_without_project)
+                        container.name)
                 if not is_healthy(container):
                     healthy = False
                     break
@@ -120,19 +120,10 @@ class ComposeMixin(object):
         """
         host = cls.compose_host(service=service, port=cls.COMPOSE_ADVERTISED_PORT)
 
-        content = "SERVICE_HOST=%s" % host
-        info = tarfile.TarInfo(name="/run/compose_env")
-        info.mode = 0o100644
-        info.size = len(content)
-
-        data = io.BytesIO()
-        tar = tarfile.TarFile(fileobj=data, mode='w')
-        tar.addfile(info, fileobj=io.BytesIO(content.encode("utf-8")))
-        tar.close()
-
-        containers = project.containers(service_names=[service])
+        containers = project.ps(services=[service])
         for container in containers:
-            container.client.put_archive(container=container.id, path="/", data=data.getvalue())
+            container.execute(["sh", "-c", "echo SERVICE_HOST=%s >/run/compose_env" % host])
+            container.execute(["sh", "-c", "chmod 644 /run/compose_env"])
 
     @classmethod
     def compose_down(cls):
@@ -170,12 +161,12 @@ class ComposeMixin(object):
                 return "%s:%s" % (ip, port)
 
     @classmethod
-    def _exposed_host(cls, info, port):
+    def _exposed_host(cls, network_settings, port):
         """
         Return the exposed address in the host, can be used when the test is
         run from the host network. Recommended when using docker machines.
         """
-        hostPort = info['NetworkSettings']['Ports'][port][0]['HostPort']
+        hostPort = network_settings.ports[port][0]['HostPort']
         return "localhost:%s" % hostPort
 
     @classmethod
@@ -203,7 +194,7 @@ class ComposeMixin(object):
         # networks = list(info['NetworkSettings']['Networks'].values())
         if sys.platform.startswith('linux'):
             return cls._private_host(container.network_settings.networks, port)
-        return cls._exposed_host(info, port)
+        return cls._exposed_host(container.network_settings, port)
 
     @classmethod
     def compose_project_name(cls):
