@@ -54,8 +54,12 @@ class ComposeMixin(object):
             print("----")
 
         def is_healthy(container):
-            print("Checking health of %s and the status is: %s" % (container.name, container.state.status))
-            return container.state.status == 'running'
+            if hasattr(container.state, 'health'):
+                print("Checking health of %s and the status is: %s" % (container.name, container.state.health.status))
+                return container.state.health.status == 'healthy'
+            else:
+                print("No health status available for %s and the status is" % (container.name, container.state.status))
+                return container.state.status == 'running'
 
         project = cls.compose_project()
 
