@@ -66,8 +66,8 @@ steps:
     steps:
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command: |
-          Set-Location -Path $BEATS_PROJECT_NAME
-          mage -w reader/etw build goUnitTest
+          Set-Location -Path $BEATS_PROJECT_NAME\reader\etw
+          mage build goUnitTest
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
