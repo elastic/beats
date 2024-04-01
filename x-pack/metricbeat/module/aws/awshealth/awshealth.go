@@ -208,9 +208,8 @@ func (m *MetricSet) getEventsSummary(
 		wg.Wait()
 		if eventOutput.NextToken == nil {
 			break
-		} else {
-			nextTokenString = *eventOutput.NextToken
 		}
+		nextTokenString = *eventOutput.NextToken
 	}
 	close(c)
 	close(errCh)
@@ -417,9 +416,8 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 		}
 		if nextToken == nil {
 			break
-		} else {
-			affEntityTokString = *nextToken
 		}
+		affEntityTokString = *nextToken
 	}
 	hd.affectedEntityResolved = resolved
 	hd.affectedEntityPending = pending
@@ -429,7 +427,7 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 	case ch <- hd:
 		// Writing to the channel
 	default:
-		// Channel is closed,
+		// Channel buffer is full or closed, dropping the event to avoid blocking.
 		return nil
 	}
 	return nil
