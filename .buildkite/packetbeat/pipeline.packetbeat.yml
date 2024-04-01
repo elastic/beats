@@ -4,6 +4,13 @@ name: "beats-packetbeat"
 env:
   BEATS_PROJECT_NAME: "packetbeat"
 
+  #Packaging
+  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+  PACKAGING_ARM_PLATFORMS: "linux/arm64"
+
+  #Deps
+  ASDF_MAGE_VERSION: 1.15.0
+
 steps:
 
   - input: "Input Parameters"

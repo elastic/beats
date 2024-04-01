@@ -84,20 +84,20 @@ echo "Check and add the Extended Tests into the pipeline"
 if are_conditions_met_arm_tests; then
   cat >> $pipelineName <<- YAML
   - group: "Extended Tests: ARM"
-      key: "extended-tests-arm"
-      steps:
-      - label: ":linux: ARM64 Unit Tests"
-        key: "arm-extended"
-        command:
-          - ".buildkite/filebeat/scripts/unit-tests.sh"
-        notify:
-          - github_commit_status:
-              context: "Filebeat/Extended: Unit Tests ARM"
-        agents:
-          provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths: "filebeat/build/*.xml"
+    key: "extended-tests-arm"
+    steps:
+    - label: ":linux: ARM64 Unit Tests"
+      key: "arm-extended"
+      command:
+        - ".buildkite/filebeat/scripts/unit-tests.sh"
+      notify:
+        - github_commit_status:
+            context: "Filebeat/Extended: Unit Tests ARM"
+      agents:
+        provider: "aws"
+        imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+        instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+      artifact_paths: "filebeat/build/*.xml"
 
 YAML
 fi
