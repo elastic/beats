@@ -62,6 +62,8 @@ steps:
   - label: ":linux: Load dynamic filebeat pipeline"
     key: "filebeat-pipeline"
     command: ".buildkite/scripts/generate_filebeat_pipeline.sh"
+    agents:
+      image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci:latest"
     notify:
       - github_commit_status:
           context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"

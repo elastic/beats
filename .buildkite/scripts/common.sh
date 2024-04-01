@@ -664,6 +664,8 @@ if ! [[ -x $(which yq) && $(yq --version) == *mikefarah* ]]; then
   fi
   curl -fsSL --retry-max-time 60 --retry 3 --retry-delay 5 -o /usr/sbin/yq "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_${target_arch}"
   chmod a+x /usr/sbin/yq
+else
+  echo "~~~ Using image yq you can remove runtime install of it"
 fi
 
 check_and_set_beat_vars
