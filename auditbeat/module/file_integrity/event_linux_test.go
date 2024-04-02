@@ -74,7 +74,7 @@ func TestNewEventFromEbpfEvent(t *testing.T) {
 		},
 		Process: event.Process, // 1:1 copy this as it changes on every machine
 		Source:  SourceEBPF,
-		errors:  []error{},
+		errors:  nil,
 	}
 	event.Timestamp = expectedEvent.Timestamp
 
