@@ -11,8 +11,9 @@
         The percent of General Purpose SSD (gp2) burst-bucket I/O credits available.
     - name: cpu.total.pct
       type: scaled_float
+      format: percent
       description: >
-        The percentage of CPU utilization with value range from 0 to 1.
+        CPU utilization with value range from 0 to 1.
     - name: cpu.credit_usage
       type: long
       description: >
