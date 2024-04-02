@@ -211,6 +211,7 @@ func NewIntegrationRunners(path string, passInEnv map[string]string) (Integratio
 
 // NewDockerIntegrationRunner returns an integration runner configured only for docker.
 func NewDockerIntegrationRunner(passThroughEnvVars ...string) (*IntegrationRunner, error) {
+	fmt.Printf("hi fae, NewDockerIntegrationRunner\n")
 	cwd, err := os.Getwd()
 	if err != nil {
 		return nil, err
@@ -223,9 +224,11 @@ func NewDockerIntegrationRunner(passThroughEnvVars ...string) (*IntegrationRunne
 }
 
 func initRunner(tester IntegrationTester, dir string, passInEnv map[string]string, passThroughEnvVars ...string) (*IntegrationRunner, error) {
+	fmt.Printf("hi fae, initRunner\n")
 	var runnerSteps IntegrationTestSteps
 	requirements := tester.StepRequirements()
 	if requirements != nil {
+		fmt.Printf("hi fae, requirements: %v\n", requirements.Name())
 		runnerSteps = append(runnerSteps, requirements...)
 	}
 

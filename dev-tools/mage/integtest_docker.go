@@ -71,12 +71,15 @@ func (d *DockerIntegrationTester) Use(dir string) (bool, error) {
 
 // HasRequirements ensures that the required docker and docker-compose are installed.
 func (d *DockerIntegrationTester) HasRequirements() error {
+	fmt.Printf("hi fae, in DockerIntegrationTester.HasRequirements\n")
 	if err := HaveDocker(); err != nil {
 		return err
 	}
 	if err := HaveDockerCompose(); err != nil {
 		return err
 	}
+	fmt.Printf("everything passed\n")
+	os.Exit(1)
 	return nil
 }
 
@@ -88,6 +91,7 @@ func (d *DockerIntegrationTester) StepRequirements() IntegrationTestSteps {
 // Test performs the tests with docker-compose. The compose file must define a "beat" container,
 // containing the beats development environment. The tests are executed from within this container.
 func (d *DockerIntegrationTester) Test(dir string, mageTarget string, env map[string]string) error {
+	fmt.Printf("hi fae, DockerIntegrationTester.Test\n")
 	var err error
 	buildContainersOnce.Do(func() { err = BuildIntegTestContainers() })
 	if err != nil {

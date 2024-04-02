@@ -226,7 +226,7 @@ func GoIntegTest(ctx context.Context) error {
 // Use PYTEST_ADDOPTS="-k pattern" to only run tests matching the specified pattern.
 // Use any other PYTEST_* environment variable to influence the behavior of pytest.
 func PythonIntegTest(ctx context.Context) error {
-	fmt.Printf("hi fae\n")
+	fmt.Printf("hi fae, starting PythonIntegTest\n")
 	if !devtools.IsInIntegTestEnv() {
 		fmt.Printf("!IsInIntegTestEnv\n")
 		mg.SerialDeps(Fields, Dashboards)
@@ -236,7 +236,7 @@ func PythonIntegTest(ctx context.Context) error {
 		[]string{"ELASTICSEARCH_VERSION", "KIBANA_VERSION", "BEAT_VERSION"},
 		devtools.ListMatchingEnvVars("PYTEST_")...,
 	)
-	fmt.Printf("env vars: %v\n", passThroughEnvVars)
+	fmt.Printf("hi fae, env vars: %v\n", passThroughEnvVars)
 	//os.Exit(1)
 	runner, err := devtools.NewDockerIntegrationRunner(passThroughEnvVars...)
 	if err != nil {

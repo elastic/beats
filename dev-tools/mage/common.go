@@ -219,10 +219,19 @@ func dockerInfo() (*DockerInfo, error) {
 // HaveDockerCompose returns an error if docker-compose is not found on the
 // PATH.
 func HaveDockerCompose() error {
-	_, err := exec.LookPath("docker-compose")
+
+	path, err := exec.LookPath("docker")
+	if err != nil {
+		return fmt.Errorf("docker is not available")
+	} else {
+		fmt.Printf("hi fae, docker is at %v\n", path)
+	}
+
+	path, err = exec.LookPath("docker-compose")
 	if err != nil {
 		return fmt.Errorf("docker-compose is not available")
 	}
+	fmt.Printf("hi fae, docker compose is %v\n", path)
 	return nil
 }
 
