@@ -18,7 +18,6 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
   BEATS_PROJECT_NAME: "x-pack/libbeat"
-  MAGEFILE_CACHE: "C:\\Users\\buildkite\\.magefile"
 
   #Packaging
   PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
@@ -57,6 +56,8 @@ steps:
   - label: ":linux: Load dynamic x-pack libbeat pipeline"
     key: "libbeat-pipeline"
     command: ".buildkite/scripts/generate_xpack_libbeat_pipeline.sh"
+    agents:
+      image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci:latest"
     notify:
       - github_commit_status:
           context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
