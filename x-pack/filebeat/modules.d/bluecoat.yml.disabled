@@ -1,5 +1,5 @@
 # Module: bluecoat
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-bluecoat.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.13/filebeat-module-bluecoat.html
 
 - module: bluecoat
   director:
