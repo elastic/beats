@@ -2,7 +2,6 @@
 
 set -euo pipefail
 export REPO="beats"
-export TMP_FOLDER="tmp.${REPO}"
 export DOCKER_REGISTRY="docker.elastic.co"
 export SETUP_GVM_VERSION="v0.5.1"
 export DOCKER_COMPOSE_VERSION="1.21.0"
