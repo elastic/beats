@@ -16,10 +16,6 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
 
-notify:
-  - github_commit_status:
-      context: "Metricbeat"
-
 steps:
   - group: "Metricbeat Mandatory Tests"
     key: "metricbeat-mandatory-tests"
