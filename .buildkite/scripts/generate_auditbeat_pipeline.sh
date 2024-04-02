@@ -105,7 +105,7 @@ if are_conditions_met_arm_tests; then
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
-          image: "${IMAGE_UBUNTU_ARM64}"
+          image: "${IMAGE_UBUNTU_ARM_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
         notify:
