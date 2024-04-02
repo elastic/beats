@@ -14,6 +14,7 @@ teardown() {
   tf_cleanup "${MODULE_DIR}"              #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
 
   echo "~~~ Docker Compose Cleanup"
+  popd # move back to the parent directory, which is the root of the project and remove lingering containers
   docker-compose -f .ci/jobs/docker-compose.yml down -v         #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
 }
 
