@@ -50,41 +50,6 @@
         example: s0
         description: The object's SELinux level.
 
-  - name: process
-    type: group
-    description: >
-      These fields contain process and user information.
-      Available only on Linux when using the eBPF backend.
-
-    fields:
-      - name: entity_id
-        type: keyword
-        description: Globally unique identifier for a process.
-
-      - name: name
-        type: keyword
-        description: Process command.
-
-      - name: pid
-        type: long
-        description: PID.
-
-      - name: user.id
-        type: keyword
-        description: User ID (euid).
-
-      - name: user.name
-        type: keyword
-        description: User name.
-
-      - name: group.id
-        type: keyword
-        description: Group ID (egid).
-
-      - name: group.name
-        type: keyword
-        description: Group name.
-
   - name: user
     type: group
     description: User information.
