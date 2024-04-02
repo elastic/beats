@@ -2665,7 +2665,7 @@ These fields contain process and user information. Available only on Linux when 
 
 
 
-*`file.process.entity_id`*::
+*`process.entity_id`*::
 +
 --
 Globally unique identifier for a process.
@@ -2674,7 +2674,7 @@ type: keyword
 
 --
 
-*`file.process.name`*::
+*`process.name`*::
 +
 --
 Process command.
@@ -2683,7 +2683,7 @@ type: keyword
 
 --
 
-*`file.process.pid`*::
+*`process.pid`*::
 +
 --
 PID.
@@ -2692,7 +2692,7 @@ type: long
 
 --
 
-*`file.process.user.id`*::
+*`process.user.id`*::
 +
 --
 User ID (euid).
@@ -2701,7 +2701,7 @@ type: keyword
 
 --
 
-*`file.process.user.name`*::
+*`process.user.name`*::
 +
 --
 User name.
@@ -2710,7 +2710,7 @@ type: keyword
 
 --
 
-*`file.process.group.id`*::
+*`process.group.id`*::
 +
 --
 Group ID (egid).
@@ -2719,7 +2719,7 @@ type: keyword
 
 --
 
-*`file.process.group.name`*::
+*`process.group.name`*::
 +
 --
 Group name.

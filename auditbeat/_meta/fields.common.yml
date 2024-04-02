@@ -50,13 +50,13 @@
         example: s0
         description: The object's SELinux level.
 
-    - name: process
-      type: group
-      description: >
-        These fields contain process and user information.
-        Available only on Linux when using the eBPF backend.
+  - name: process
+    type: group
+    description: >
+      These fields contain process and user information.
+      Available only on Linux when using the eBPF backend.
 
-      fields:
+    fields:
       - name: entity_id
         type: keyword
         description: Globally unique identifier for a process.
