@@ -65,7 +65,6 @@ class ComposeMixin(object):
 
         project.up(
             services=cls.COMPOSE_SERVICES,
-            recreate=True,
             detach=True,
             remove_orphans=True,
             color=False,
@@ -133,12 +132,15 @@ class ComposeMixin(object):
             return
 
         if INTEGRATION_TESTS and cls.COMPOSE_SERVICES:
-            # Use down on per-module scenarios to release network pools too
-            if os.path.basename(os.path.dirname(cls.find_compose_path())) == "module":
-                cls.compose_project().down(volumes=True)
+            # Check if we are running a module test
+            is_module = os.path.basename(os.path.dirname(cls.find_compose_path())) == "module"
+
+            if is_module:
+                cls.compose_project().down(volumes=True, remove_orphans=True)
             else:
-                for service in cls.COMPOSE_SERVICES:
-                    cls.compose_project().stop(services=[service])
+                # For other tests, just stop and kill services
+                cls.compose_project().stop(services=cls.COMPOSE_SERVICES)
+                cls.compose_project().kill(services=cls.COMPOSE_SERVICES)
 
     @classmethod
     def get_hosts(cls):
@@ -227,6 +229,7 @@ class ComposeMixin(object):
             env_file_path = Path(env_file.name)
 
         docker_client = DockerClient(
+            debug=True,
             compose_project_name=cls.compose_project_name().lower(),
             compose_files=compose_files,
             compose_env_file=env_file_path,

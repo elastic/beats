@@ -10,6 +10,9 @@ RUN apt-get update && \
     python3-pip \
     libaio-dev \
     unzip \
+    docker-ce \
+    docker-ce-cli \
+    docker-compose-plugin \
     && rm -rf /var/lib/apt/lists/*
 
 # Use a virtualenv to avoid the PEP668 "externally managed environment" error
@@ -25,10 +28,10 @@ RUN curl -L "https://github.com/docker/compose/releases/download/v2.26.1/docker-
     chmod +x /usr/local/bin/docker-compose
 
 # Oracle instant client
-RUN cd /usr/lib \
-  && curl -sLo instantclient-basic-linux.zip https://download.oracle.com/otn_software/linux/instantclient/19600/instantclient-basic-linux.x64-19.6.0.0.0dbru.zip \
-  && unzip instantclient-basic-linux.zip \
-  && rm instantclient-basic-linux.zip
+RUN cd /usr/lib && \
+    curl -sLo instantclient-basic-linux.zip https://download.oracle.com/otn_software/linux/instantclient/19600/instantclient-basic-linux.x64-19.6.0.0.0dbru.zip && \
+    unzip instantclient-basic-linux.zip && \
+    rm instantclient-basic-linux.zip
 ENV LD_LIBRARY_PATH=/usr/lib/instantclient_19_6
 
 # Add healthcheck for the docker/healthcheck metricset to check during testing.
