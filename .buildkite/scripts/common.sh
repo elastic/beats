@@ -252,19 +252,6 @@ with_docker_compose() {
   docker-compose version
 }
 
-with_Terraform() {
-    echo "Setting up the Terraform environment..."
-    local path_to_file="${WORKSPACE}/terraform.zip"
-    create_workspace
-    check_platform_architeture
-    retry 5 curl -sSL -o ${path_to_file} "https://releases.hashicorp.com/terraform/${ASDF_TERRAFORM_VERSION}/terraform_${ASDF_TERRAFORM_VERSION}_${platform_type_lowercase}_${go_arch_type}.zip"
-    unzip -q ${path_to_file} -d ${BIN}/
-    rm ${path_to_file}
-    chmod +x ${BIN}/terraform
-    export PATH="${BIN}:${PATH}"
-    terraform version
-}
-
 create_workspace() {
   if [[ ! -d "${BIN}" ]]; then
     mkdir -p "${BIN}"

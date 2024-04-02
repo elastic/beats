@@ -11,10 +11,23 @@ fi
 teardown() {
   # Teardown resources after using them
   echo "~~~ Terraform Cleanup"
-  .ci/scripts/terraform-cleanup.sh "${MODULE_DIR}"              #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+  tf_cleanup "${MODULE_DIR}"              #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
 
   echo "~~~ Docker Compose Cleanup"
   docker-compose -f .ci/jobs/docker-compose.yml down -v         #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
+}
+
+tf_cleanup() {
+  DIRECTORY=${1:-.}
+
+  for tfstate in $(find $DIRECTORY -name terraform.tfstate); do
+    cd $(dirname $tfstate)
+    terraform init
+    if ! terraform destroy -auto-approve; then
+        echo "+++ Failed to Terraform destroy the resources"
+    fi
+    cd -
+  done
 }
 
 trap 'teardown' EXIT
@@ -27,7 +40,6 @@ export AWS_ACCESS_KEY_ID=$BEATS_AWS_ACCESS_KEY
 export AWS_SECRET_ACCESS_KEY=$BEATS_AWS_SECRET_KEY
 export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}aws"
 set -o xtrace
-
 
 echo "~~~ Run docker-compose services for emulated cloud env"
 docker-compose -f .ci/jobs/docker-compose.yml up -d        #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK

@@ -131,6 +131,7 @@ if  are_conditions_met_aws_tests; then
         command: ".buildkite/scripts/cloud_tests.sh"
         env:
           MODULE: $MODULE
+          ASDF_TERRAFORM_VERSION: 1.0.2
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
