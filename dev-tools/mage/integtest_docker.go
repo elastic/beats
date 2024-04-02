@@ -78,8 +78,8 @@ func (d *DockerIntegrationTester) HasRequirements() error {
 	if err := HaveDockerCompose(); err != nil {
 		return err
 	}
-	fmt.Printf("everything passed\n")
-	os.Exit(1)
+	fmt.Printf("hi fae, everything passed\n")
+	//os.Exit(1)
 	return nil
 }
 
