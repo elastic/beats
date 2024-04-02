@@ -14,21 +14,16 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
 
-notify:
-  - github_commit_status:
-      context: "Heartbeat"
-
 steps:
   - group: "Heartbeat Mandatory Testing"
     key: "heartbeat-mandatory-tests"
     steps:
       - label: ":linux: Heartbeat Unit Tests / {{matrix.image}}"
-        # command: ".buildkite/heartbeat/scripts/unit-tests.sh"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "{{matrix.image}}"
-        #   machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        command: ".buildkite/heartbeat/scripts/unit-tests.sh"
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         matrix:
           setup:
             image:
@@ -39,13 +34,12 @@ steps:
           - "heartbeat/build/*.json"
 
       - label: ":windows: Heartbeat Unit Tests / {{matrix.image}}"
-        # command: ".buildkite/scripts/win_unit_tests.ps1"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "{{matrix.image}}"
-        #   machine_type: "${GCP_WIN_MACHINE_TYPE}"
-        #   disk_type: "pd-ssd"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_type: "pd-ssd"
         matrix:
           setup:
             image:
@@ -56,23 +50,21 @@ steps:
           - "heartbeat/build/*.json"
 
       - label: ":ubuntu: Heartbeat Go Integration Tests"
-        # command: ".buildkite/heartbeat/scripts/integration-gotests.sh"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_UBUNTU_X86_64}"
-        #   machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        command: ".buildkite/heartbeat/scripts/integration-gotests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
       - label: ":ubuntu: Heartbeat Python Integration Tests"
-        # command: ".buildkite/heartbeat/scripts/integration-pytests.sh"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_UBUNTU_X86_64}"
-        #   machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        command: ".buildkite/heartbeat/scripts/integration-pytests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
@@ -83,12 +75,11 @@ steps:
     steps:
       - label: ":linux: Heartbeat ARM64 Unit Tests"
         key: "heartbeat-arm-extended"
-        # command: ".buildkite/heartbeat/scripts/unit-tests.sh"
-        command: echo "tests"
-        # agents:
-        #   provider: "aws"
-        #   imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-        #   instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        command: ".buildkite/heartbeat/scripts/unit-tests.sh"
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "heartbeat/build/*.xml"
 
   - group: "Heartbeat Extended Testing MacOS"
@@ -97,8 +88,7 @@ steps:
     steps:
       - label: ":mac: MacOS Unit Tests"
         key: "heartbeat-macos-extended"
-        # command: ".buildkite/heartbeat/scripts/unit-tests.sh"
-        command: echo "tests"
+        command: ".buildkite/heartbeat/scripts/unit-tests.sh"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -111,13 +101,12 @@ steps:
     steps:
       - label: ":windows: Win 2019 Unit Tests"
         key: "heartbeat-win-extended-2019"
-        # command: ".buildkite/scripts/win_unit_tests.ps1"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_WIN_2019}"
-        #   machine_type: "${GCP_WIN_MACHINE_TYPE}"
-        #   disk_type: "pd-ssd"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_type: "pd-ssd"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
@@ -129,5 +118,4 @@ steps:
       - "heartbeat-mandatory-tests"
     steps:
       - label: Heartbeat Package pipeline
-        # commands: ".buildkite/scripts/packaging/package-step.sh"
-        command: echo "tests"
+        commands: ".buildkite/scripts/packaging/package-step.sh"

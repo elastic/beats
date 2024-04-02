@@ -26,54 +26,49 @@ steps:
     steps:
       - label: ":linux: Metricbeat Ubuntu Unit Tests"
         key: "metricbeat-mandatory-linux-unit-test"
-        # command: ".buildkite/scripts/unit_tests.sh"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_UBUNTU_X86_64}"
-        #   machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        command: ".buildkite/scripts/unit_tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":go: Metricbeat Go Integration Tests"
         key: "metricbeat-mandatory-int-test"
-        # command: ".buildkite/scripts/go_int_tests.sh"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_UBUNTU_X86_64}"
-        #   machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        command: ".buildkite/scripts/go_int_tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":python: Metricbeat Python Integration Tests"
         key: "metricbeat-mandatory-python-int-test"
-        # command: ".buildkite/scripts/py_int_tests.sh"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_UBUNTU_X86_64}"
-        #   machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        command: ".buildkite/scripts/py_int_tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":negative_squared_cross_mark: Metricbeat Cross compile"
         key: "metricbeat-mandatory-cross-compile"
-        # command: ".buildkite/scripts/crosscompile.sh"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_UBUNTU_X86_64}"
-        #   machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        command: ".buildkite/scripts/crosscompile.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Metricbeat Windows 2016/2022 Unit Tests - {{matrix.image}}"
-        # command: ".buildkite/scripts/win_unit_tests.ps1"
-        command: echo "tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
         key: "metricbeat-mandatory-win-unit-tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "{{matrix.image}}"
-        #   machine_type: "${GCP_WIN_MACHINE_TYPE}"
-        #   disk_size: 100
-        #   disk_type: "pd-ssd"
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         matrix:
           setup:
             image:
@@ -87,38 +82,35 @@ steps:
     steps:
       - label: ":windows: Metricbeat Windows 2019 Unit Tests"
         key: "metricbeat-extended-win-2019-unit-tests"
-        # command: ".buildkite/scripts/win_unit_tests.ps1"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_WIN_2019}"
-        #   machine_type: "${GCP_WIN_MACHINE_TYPE}"
-        #   disk_size: 100
-        #   disk_type: "pd-ssd"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Metricbeat Windows 10 Unit Tests"
         key: "metricbeat-extended-win-10-unit-tests"
-        # command: ".buildkite/scripts/win_unit_tests.ps1"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_WIN_10}"
-        #   machine_type: "${GCP_WIN_MACHINE_TYPE}"
-        #   disk_size: 100
-        #   disk_type: "pd-ssd"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Metricbeat Windows 11 Unit Tests"
         key: "metricbeat-extended-win-11-unit-tests"
-        # command: ".buildkite/scripts/win_unit_tests.ps1"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_WIN_11}"
-        #   machine_type: "${GCP_WIN_MACHINE_TYPE}"
-        #   disk_size: 100
-        #   disk_type: "pd-ssd"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
   - group: "Metricbeat Extended Tests MacOS"
@@ -127,11 +119,10 @@ steps:
     steps:
       - label: ":mac: Metricbeat MacOS Unit Tests"
         key: "metricbeat-extended-macos-unit-tests"
-        # command: ".buildkite/scripts/unit_tests.sh"
-        command: echo "tests"
-        # agents:
-        #   provider: "orka"
-        #   imagePrefix: "${IMAGE_MACOS_X86_64}"
+        command: ".buildkite/scripts/unit_tests.sh"
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
   - wait: ~
@@ -145,23 +136,21 @@ steps:
     steps:
       - label: ":linux: Metricbeat Packaging Linux"
         key: "metricbeat-packaging-linux"
-        # command: ".buildkite/scripts/packaging.sh"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_UBUNTU_X86_64}"
-        #   machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        command: ".buildkite/scripts/packaging.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         env:
           PLATFORMS: "${PACKAGING_PLATFORMS}"
 
       - label: ":linux: Metricbeat Packaging ARM"
         key: "metricbeat-packaging-arm"
-        # command: ".buildkite/scripts/packaging.sh"
-        command: echo "tests"
-        # agents:
-        #   provider: "aws"
-        #   imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-        #   instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        command: ".buildkite/scripts/packaging.sh"
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         env:
           PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
           PACKAGES: "docker"

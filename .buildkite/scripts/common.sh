@@ -15,7 +15,6 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_auditbeat+x}" ] && run_auditbeat="$(buildkite-agent meta-data get run_auditbeat --default "false")"
 [ -z "${run_filebeat+x}" ] && run_filebeat="$(buildkite-agent meta-data get run_filebeat --default "false")"
 [ -z "${run_libbeat+x}" ] && run_libbeat="$(buildkite-agent meta-data get run_libbeat --default "false")"
-[ -z "${run_metricbeat+x}" ] && run_metricbeat="$(buildkite-agent meta-data get run_metricbeat --default "false")"
 [ -z "${run_packetbeat+x}" ] && run_packetbeat="$(buildkite-agent meta-data get run_packetbeat --default "false")"
 [ -z "${run_winlogbeat+x}" ] && run_winlogbeat="$(buildkite-agent meta-data get run_winlogbeat --default "false")"
 [ -z "${run_xpack_libbeat+x}" ] && run_xpack_libbeat="$(buildkite-agent meta-data get run_xpack_libbeat --default "false")"
@@ -40,7 +39,6 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 # define if needed run MacOS platform-specific tests for the particular beat
 [ -z "${run_auditbeat_tests+x}" ] && run_auditbeat_macos_tests="$(buildkite-agent meta-data get run_auditbeat_macos_tests --default "false")"
 [ -z "${run_filebeat_tests+x}" ] && run_filebeat_macos_tests="$(buildkite-agent meta-data get run_filebeat_macos_tests --default "false")"
-[ -z "${run_metricbeat_macos_tests+x}" ] && run_metricbeat_macos_tests="$(buildkite-agent meta-data get run_metricbeat_macos_tests --default "false")"
 [ -z "${run_packetbeat_macos_tests+x}" ] && run_packetbeat_macos_tests="$(buildkite-agent meta-data get run_packetbeat_macos_tests --default "false")"
 [ -z "${run_xpack_auditbeat_macos_tests+x}" ] && run_xpack_auditbeat_macos_tests="$(buildkite-agent meta-data get run_xpack_auditbeat_macos_tests --default "false")"
 [ -z "${run_xpack_filebeat_macos_tests+x}" ] && run_xpack_filebeat_macos_tests="$(buildkite-agent meta-data get run_xpack_filebeat_macos_tests --default "false")"
@@ -64,10 +62,6 @@ auditbeat_changeset=(
 filebeat_changeset=(
   "^filebeat/.*"
   )  
-
-metricbeat_changeset=(
-  "^metricbeat/.*"
-  )
 
 libbeat_changeset=(
   "^libbeat/.*"
@@ -154,9 +148,6 @@ case "${BUILDKITE_PIPELINE_SLUG}" in
     ;;
   "filebeat")
     BEAT_CHANGESET_REFERENCE=${filebeat_changeset[@]}
-    ;;
-  "beats-metricbeat")
-    BEAT_CHANGESET_REFERENCE=${metricbeat_changeset[@]}
     ;;
   "beats-libbeat")
     BEAT_CHANGESET_REFERENCE=${libbeat_changeset[@]}
@@ -456,7 +447,7 @@ are_conditions_met_arm_tests() {
 
 are_conditions_met_macos_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-osquerybeat" ]]; then
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-osquerybeat" ]]; then
       if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_MACOS_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_MACOS_LABEL} || "${!TRIGGER_SPECIFIC_MACOS_TESTS}" == "true" ]]; then   # from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/metricbeat/Jenkinsfile.yml#L3-L12
         return 0
       fi
@@ -467,7 +458,7 @@ are_conditions_met_macos_tests() {
 
 are_conditions_met_win_tests() {
   if are_conditions_met_mandatory_tests; then    
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
       if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_WIN_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_WIN_LABEL} || "${!TRIGGER_SPECIFIC_WIN_TESTS}" == "true" ]]; then
         return 0
       fi
@@ -646,7 +637,7 @@ if are_paths_changed "${packaging_changeset[@]}" ; then
   export PACKAGING_CHANGES="true"
 fi
 
-if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-auditbeat-pipeline" ]]; then
+if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-auditbeat-pipeline" ]]; then
   # Set the MODULE env variable if possible, it should be defined before generating pipeline's steps. It is used in multiple pipelines.
   defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
 fi

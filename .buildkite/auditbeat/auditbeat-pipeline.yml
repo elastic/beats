@@ -18,10 +18,6 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
 
-notify:
-  - github_commit_status:
-      context: "Auditbeat"
-
 steps:
   - group: "Auditbeat Mandatory Testing"
     key: "auditbeat-mandatory-tests"
@@ -29,65 +25,58 @@ steps:
     steps:
       - label: ":ubuntu: Auditbeat Unit Tests"
         command:
-          # - ".buildkite/auditbeat/scripts/unit-tests.sh"
-          - echo "unit-tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_UBUNTU_X86_64}"
-        #   machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          - ".buildkite/auditbeat/scripts/unit-tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
 
       - label: ":rhel: Auditbeat Unit Tests"
         command:
-          # - ".buildkite/auditbeat/scripts/unit-tests.sh"
-          - echo "unit-tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_RHEL9}"
-        #   machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          - ".buildkite/auditbeat/scripts/unit-tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_RHEL9}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
 
-      - label:
-          ":windows: Auditbeat Win-2016 Auditbeat Unit Tests"
-          # command: ".buildkite/scripts/win_unit_tests.ps1"
-        command: echo "unit-tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_WIN_2016}"
-        #   machine_type: "${GCP_WIN_MACHINE_TYPE}"
-        #   disk_size: 200
-        #   disk_type: "pd-ssd"
+      - label: ":windows: Auditbeat Win-2016 Auditbeat Unit Tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2016}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
 
       - label: ":windows: Auditbeat Win-2022 Unit Tests"
-        # command: ".buildkite/scripts/win_unit_tests.ps1"
-        command: echo "unit-tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_WIN_2022}"
-        #   machine_type: "${GCP_WIN_MACHINE_TYPE}"
-        #   disk_size: 200
-        #   disk_type: "pd-ssd"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
         artifact_paths:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
 
       - label: ":linux: Auditbeat Crosscompile"
-        command:
-          # - ".buildkite/auditbeat/scripts/crosscompile.sh"
-          - echo "cross"
+        command: ".buildkite/auditbeat/scripts/crosscompile.sh"
         env:
           GOX_FLAGS: "-arch amd64"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_UBUNTU_X86_64}"
-        #   machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
 
   - group: "Auditbeat ARM Tests"
     key: "auditbeat-extended-tests-arm"
@@ -95,12 +84,11 @@ steps:
     steps:
       - label: ":arm: ARM64 Unit Tests"
         key: "auditbeat-extended-arm64-unit-tests"
-        # command: ".buildkite/scripts/unit_tests.sh"
-        command: echo "arm tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_UBUNTU_ARM64}"
-        #   machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        command: ".buildkite/scripts/unit_tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_ARM64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
   - group: "Auditbeat Windows Extended Testing"
@@ -109,38 +97,35 @@ steps:
     steps:
       - label: ":windows: Auditbeat Windows 2019 Unit Tests"
         key: "auditbeat-extended-win-2019-unit-tests"
-        # command: ".buildkite/scripts/win_unit_tests.ps1"
-        command: echo "win"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_WIN_2019}"
-        #   machine_type: "${GCP_WIN_MACHINE_TYPE}"
-        #   disk_size: 100
-        #   disk_type: "pd-ssd"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Auditbeat Windows 10 Unit Tests"
         key: "auditbeat-extended-win-10-unit-tests"
-        # command: ".buildkite/scripts/win_unit_tests.ps1"
-        command: echo "win"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_WIN_10}"
-        #   machine_type: "${GCP_WIN_MACHINE_TYPE}"
-        #   disk_size: 100
-        #   disk_type: "pd-ssd"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Windows 11 Unit Tests"
         key: "auditbeat-extended-win-11-unit-tests"
-        # command: ".buildkite/scripts/win_unit_tests.ps1"
-        command: echo "win11"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_WIN_11}"
-        #   machine_type: "${GCP_WIN_MACHINE_TYPE}"
-        #   disk_size: 100
-        #   disk_type: "pd-ssd"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
   - group: "Auditbeat Packaging"
@@ -150,5 +135,4 @@ steps:
       - "auditbeat-mandatory-tests"
     steps:
       - label: Package pipeline
-        # commands: ".buildkite/scripts/packaging/package-step.sh"
-        commands: echo "pack"
+        commands: ".buildkite/scripts/packaging/package-step.sh"

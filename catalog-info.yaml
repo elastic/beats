@@ -67,53 +67,6 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
-  name: buildkite-pipeline-metricbeat
-  description: "Beats: Metricbeat pipeline"
-  links:
-    - title: Pipeline
-      url: https://buildkite.com/elastic/beats-metricbeat
-
-spec:
-  type: buildkite-pipeline
-  owner: group:ingest-fp
-  system: buildkite
-  implementation:
-    apiVersion: buildkite.elastic.dev/v1
-    kind: Pipeline
-    metadata:
-      name: beats-metricbeat
-      description: "Beats Metricbeat pipeline"
-    spec:
-      branch_configuration: "main 7.17 8.*"
-      pipeline_file: ".buildkite/metricbeat/pipeline.yml"
-      maximum_timeout_in_minutes: 120
-      provider_settings:
-        trigger_mode: none # don't trigger jobs from github activity
-        build_pull_request_forks: false
-        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
-        build_tags: true
-        filter_enabled: true
-        filter_condition: >-
-          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
-      repository: elastic/beats
-      cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
-      skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
-      env:
-        # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
-        ELASTIC_PR_COMMENTS_ENABLED: "false"
-      teams:
-        ingest-fp:
-          access_level: MANAGE_BUILD_AND_READ
-        everyone:
-          access_level: READ_ONLY
-
----
-# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
-apiVersion: backstage.io/v1alpha1
-kind: Resource
-metadata:
   name: buildkite-pipeline-filebeat
   description: "Filebeat pipeline"
   links:
@@ -150,53 +103,6 @@ spec:
       env:
         # TODO set to truue once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
         ELASTIC_PR_COMMENTS_ENABLED: "false"
-      teams:
-        ingest-fp:
-          access_level: MANAGE_BUILD_AND_READ
-        everyone:
-          access_level: READ_ONLY
-
----
-# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
-apiVersion: backstage.io/v1alpha1
-kind: Resource
-metadata:
-  name: buildkite-pipeline-auditbeat
-  description: "Auditbeat pipeline"
-  links:
-    - title: Pipeline
-      url: https://buildkite.com/elastic/auditbeat
-
-spec:
-  type: buildkite-pipeline
-  owner: group:ingest-fp
-  system: buildkite
-  implementation:
-    apiVersion: buildkite.elastic.dev/v1
-    kind: Pipeline
-    metadata:
-      name: auditbeat
-      description: "Auditbeat pipeline"
-    spec:
-      #      branch_configuration: "main 7.17 8.*" TODO: temporarily commented to build PRs from forks
-      pipeline_file: ".buildkite/auditbeat/auditbeat-pipeline.yml"
-      #      maximum_timeout_in_minutes: 120 TODO: uncomment when pipeline is ready
-      provider_settings:
-        trigger_mode: none # don't trigger jobs from github activity
-        build_pull_request_forks: false
-        build_pull_requests: true # requires filter_enabled and filter_condition settings as below when used with buildkite-pr-bot
-        build_tags: true
-        filter_enabled: true
-        filter_condition: >-
-          build.pull_request.id == null || (build.creator.name == 'elasticmachine' && build.pull_request.id != null)
-      repository: elastic/beats
-      cancel_intermediate_builds: true
-      cancel_intermediate_builds_branch_filter: "!main !7.* !8.*"
-      skip_intermediate_builds: true
-      skip_intermediate_builds_branch_filter: "!main !7.* !8.*"
-      env:
-         # TODO set to true once https://github.com/elastic/ingest-dev/issues/3001 has been resolved
-         ELASTIC_PR_COMMENTS_ENABLED: "false"
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
