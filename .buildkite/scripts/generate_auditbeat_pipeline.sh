@@ -104,9 +104,9 @@ if are_conditions_met_arm_tests; then
         key: "extended-arm64-unit-tests"
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_ARM_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
         notify:
           - github_commit_status:
