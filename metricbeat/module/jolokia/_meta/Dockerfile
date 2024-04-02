@@ -1,5 +1,5 @@
 # Tomcat is started to fetch Jolokia metrics from it
-FROM openjdk:8-jdk-alpine
+FROM openjdk:8-jdk-alpine3.9
 
 ENV TOMCAT_VERSION=7.0.86
 ENV TC=apache-tomcat-${TOMCAT_VERSION}
