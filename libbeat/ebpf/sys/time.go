@@ -82,7 +82,7 @@ func TicksToNs(ticks uint64) (uint64, error) {
 }
 
 func TimeFromNsSinceBoot(ns uint64) (time.Time, error) {
-	bt, err := BootTime()
+	_, bt, err := HostInfo()
 	if err != nil {
 		return time.Time{}, err
 	}
