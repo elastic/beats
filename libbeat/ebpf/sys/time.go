@@ -23,53 +23,34 @@ import (
 	"sync"
 	"time"
 
-	"github.com/prometheus/procfs"
 	"github.com/tklauser/go-sysconf"
 )
 
-var (
-	bootTimeOnce struct {
-		sync.Once
-		value time.Time
-		err   error
-	}
-	ticksPerSecondOnce struct {
-		sync.Once
-		value uint64
-		err   error
-	}
-)
-
-func BootTime() (time.Time, error) {
-	bootTimeOnce.Do(func() {
-		var (
-			fs   procfs.FS
-			stat procfs.Stat
-		)
-		fs, bootTimeOnce.err = procfs.NewDefaultFS()
-		if bootTimeOnce.err != nil {
-			return
-		}
-
-		stat, bootTimeOnce.err = fs.Stat()
-		if bootTimeOnce.err != nil {
-			return
-		}
-		bootTimeOnce.value = time.Unix(int64(stat.BootTime), 0)
-	})
-	return bootTimeOnce.value, bootTimeOnce.err
+type ticksPerSecond struct {
+	value uint64
+	err   error
 }
 
-func TicksPerSecond() (uint64, error) {
-	ticksPerSecondOnce.Do(func() {
-		var tps int64
-		tps, ticksPerSecondOnce.err = sysconf.Sysconf(sysconf.SC_CLK_TCK)
-		if ticksPerSecondOnce.err != nil {
-			return
+var (
+	tps = sync.OnceValue(func() ticksPerSecond {
+		ticks, err := sysconf.Sysconf(sysconf.SC_CLK_TCK)
+		if err != nil {
+			return ticksPerSecond{
+				value: 0,
+				err:   err,
+			}
 		}
-		ticksPerSecondOnce.value = uint64(tps)
+
+		return ticksPerSecond{
+			value: uint64(ticks),
+			err:   err,
+		}
 	})
-	return ticksPerSecondOnce.value, ticksPerSecondOnce.err
+)
+
+func TicksPerSecond() (uint64, error) {
+	ticks := tps()
+	return ticks.value, ticks.err
 }
 
 func TicksToNs(ticks uint64) (uint64, error) {
