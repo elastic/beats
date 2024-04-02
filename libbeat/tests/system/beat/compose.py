@@ -212,6 +212,11 @@ class ComposeMixin(object):
         
         compose_files = [os.path.join(cls.find_compose_path(), "docker-compose.yml")]
 
+        print("hi fae, in compose_project")
+        import shutil
+        print("hi fae, docker: %s" % shutil.which("docker"))
+        print("hi fae, docker-compose: %s" % shutil.which("docker-compose"))
+
         from python_on_whales import DockerClient
         docker = DockerClient(
             compose_project_name=cls.compose_project_name().lower(),

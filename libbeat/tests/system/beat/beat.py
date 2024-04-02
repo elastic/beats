@@ -215,9 +215,12 @@ class TestCase(unittest.TestCase, ComposeMixin):
         retries = 3
         for i in range(retries):
             try:
+                print("hi fae, trying compose_up")
                 cls.compose_up()
+                print("hi fae, compose_up succeeded")
                 return
             except Exception as ex:
+                print("hi fae, compose_up failed")
                 if i + 1 >= retries:
                     raise ex
                 print(f"Compose up failed, retrying: {ex}")
