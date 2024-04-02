@@ -3,6 +3,21 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.13.1]]
+=== Beats version 8.13.1
+https://github.com/elastic/beats/compare/v8.13.0\...v8.13.1[View commits]
+
+==== Bugfixes
+
+*Filebeat*
+
+- Fix Filebeat GCS input panic. {pull}38407[38407]
+
+*Heartbeat*
+
+- Reset prctl dumpable flag after cap drop. {pull}38269[38269]
+
+
 [[release-notes-8.13.0]]
 === Beats version 8.13.0
 https://github.com/elastic/beats/compare/v8.12.2\...v8.13.0[View commits]
