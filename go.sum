@@ -716,10 +716,10 @@ github.com/elastic/go-windows v1.0.1 h1:AlYZOldA+UJ0/2nBuqWdo90GFCgG9xuyw9SYzGUt
 github.com/elastic/go-windows v1.0.1/go.mod h1:FoVvqWSun28vaDQPbj2Elfc0JahhPB7WQEGa3c814Ss=
 github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a h1:8WfL/X6fK11iyX5t3Dd9dDMMNqPfEZNc//JsWGIhEgQ=
 github.com/elastic/gopacket v1.1.20-0.20211202005954-d412fca7f83a/go.mod h1:riddUzxTSBpJXk3qBHtYr4qOhFhT6k/1c0E3qkQjQpA=
-github.com/elastic/gosigar v0.14.2 h1:Dg80n8cr90OZ7x+bAax/QjoW/XqTI11RmA79ZwIm9/4=
-github.com/elastic/gosigar v0.14.2/go.mod h1:iXRIGg2tLnu7LBdpqzyQfGDEidKCfWcCMS0WKyPWoMs=
-github.com/elastic/mito v1.9.0 h1:gYB+0o5bhr5/XIlKuZOdeSFvWGTKpk0v73vsFRm98u8=
-github.com/elastic/mito v1.9.0/go.mod h1:n7AvUVtYQQXb8fq87FI8z67TNzuhwBV3kHBkDT1qJYQ=
+github.com/elastic/gosigar v0.14.3 h1:xwkKwPia+hSfg9GqrCUKYdId102m9qTJIIr7egmK/uo=
+github.com/elastic/gosigar v0.14.3/go.mod h1:iXRIGg2tLnu7LBdpqzyQfGDEidKCfWcCMS0WKyPWoMs=
+github.com/elastic/mito v1.10.0 h1:LhkzBXarU32zAf24k3HOWki0DIoxsNWbVYY6vyHk2RQ=
+github.com/elastic/mito v1.10.0/go.mod h1:n7AvUVtYQQXb8fq87FI8z67TNzuhwBV3kHBkDT1qJYQ=
 github.com/elastic/ristretto v0.1.1-0.20220602190459-83b0895ca5b3 h1:ChPwRVv1RR4a0cxoGjKcyWjTEpxYfm5gydMIzo32cAw=
 github.com/elastic/ristretto v0.1.1-0.20220602190459-83b0895ca5b3/go.mod h1:RAy2GVV4sTWVlNMavv3xhLsk18rxhfhDnombTe6EF5c=
 github.com/elastic/sarama v1.19.1-0.20220310193331-ebc2b0d8eef3 h1:FzA0/n4iMt8ojGDGRoiFPSHFvvdVIvxOxyLtiFnrLBM=
