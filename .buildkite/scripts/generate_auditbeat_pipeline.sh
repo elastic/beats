@@ -17,8 +17,7 @@ steps:
 
     steps:
       - label: ":ubuntu: Unit Tests"
-        command:
-          - ".buildkite/auditbeat/scripts/unit-tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: linux/Unit Tests"
@@ -31,8 +30,7 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":rhel: Unit Tests"
-        command:
-          - ".buildkite/auditbeat/scripts/unit-tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: rhel/Unit Tests"
@@ -79,8 +77,7 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":linux: Crosscompile"
-        command:
-          - ".buildkite/auditbeat/scripts/crosscompile.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         env:
           GOX_FLAGS: "-arch amd64"
         notify:
@@ -105,7 +102,7 @@ if are_conditions_met_arm_tests; then
     steps:
       - label: ":arm: ARM64 Unit Tests"
         key: "extended-arm64-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_ARM64}"

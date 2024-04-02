@@ -88,8 +88,7 @@ if are_conditions_met_arm_tests; then
     steps:
     - label: ":linux: ARM64 Unit Tests"
       key: "arm-extended"
-      command:
-        - ".buildkite/filebeat/scripts/unit-tests.sh"
+      command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
       notify:
         - github_commit_status:
             context: "Filebeat/Extended: Unit Tests ARM"
