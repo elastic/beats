@@ -44,7 +44,7 @@ func NewEventFromEbpfEvent(
 		metadata     Metadata
 		process      Process
 		err          error
-		errors       = make([]error, 0)
+		errors       []error
 	)
 	switch ee.Type {
 	case ebpfevents.EventTypeFileCreate:
