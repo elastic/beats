@@ -30,7 +30,14 @@ import (
 )
 
 func TestNewMetadata(t *testing.T) {
+<<<<<<< HEAD
 	f, err := ioutil.TempFile("", "metadata")
+=======
+	// Can be removed after https://github.com/elastic/beats/issues/37701 is solved
+	skipOnBuildkiteDarwin(t, "Group check")
+
+	f, err := os.CreateTemp(t.TempDir(), "metadata")
+>>>>>>> aaa482983c (Deploy K8S Pipeline migration (#38659))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +103,14 @@ func TestNewMetadata(t *testing.T) {
 }
 
 func TestSetUIDSetGIDBits(t *testing.T) {
+<<<<<<< HEAD
 	f, err := ioutil.TempFile("", "setuid")
+=======
+	// Can be removed after https://github.com/elastic/beats/issues/37701 is solved
+	skipOnBuildkiteDarwin(t, "Wheel permission issue")
+
+	f, err := os.CreateTemp(t.TempDir(), "setuid")
+>>>>>>> aaa482983c (Deploy K8S Pipeline migration (#38659))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -148,5 +162,11 @@ func TestSetUIDSetGIDBits(t *testing.T) {
 
 		assert.Equal(t, flags&os.ModeSetuid != 0, meta.SetUID)
 		assert.Equal(t, flags&os.ModeSetgid != 0, meta.SetGID)
+	}
+}
+
+func skipOnBuildkiteDarwin(t testing.TB, reason string) {
+	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "darwin" {
+		t.Skip("Skip test on Buildkite MacOS: Wheel permission while expected staff")
 	}
 }

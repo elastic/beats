@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+
 REPO="beats"
 TMP_FOLDER="tmp.${REPO}"
 DOCKER_REGISTRY="docker.elastic.co"
