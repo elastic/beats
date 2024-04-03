@@ -58,14 +58,3 @@ if are_paths_changed "${metricbeat_changeset[@]}" || are_paths_changed "${oss_ch
   echo "Uploading Metricbeat pipeline"
   buildkite-agent pipeline upload .buildkite/metricbeat/pipeline.yml
 fi
-
-## Packaging
-# TODO
-# packaging_changeset=(
-#   "^dev-tools/packaging/.*"
-#   ".go-version"
-#   )
-
-# if [[ are_paths_changed "${packaging_changeset[@]}" ]]; then
-#   buildkite-agent pipeline upload .buildkite/package-pipeline.yml
-# fi
