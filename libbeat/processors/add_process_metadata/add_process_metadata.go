@@ -34,6 +34,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+	"github.com/elastic/go-sysinfo"
 )
 
 const (
@@ -65,15 +66,19 @@ type addProcessMetadata struct {
 	cidProvider  cidProvider
 	log          *logp.Logger
 	mappings     mapstr.M
+	uniqueID     []byte
 }
 
 type processMetadata struct {
-	name, title, exe, username, userid, groupname, groupid string
-	args                                                   []string
-	env                                                    map[string]string
-	startTime                                              time.Time
-	pid, ppid                                              int
-	fields                                                 mapstr.M
+	entityID           string
+	name, title, exe   string
+	username, userid   string
+	groupname, groupid string
+	args               []string
+	env                map[string]string
+	startTime          time.Time
+	pid, ppid          int
+	fields             mapstr.M
 }
 
 type processMetadataProvider interface {
@@ -133,6 +138,13 @@ func newProcessMetadataProcessorWithProvider(cfg *conf.C, provider processMetada
 		log:      log,
 		mappings: mappings,
 	}
+
+	if host, _ := sysinfo.Host(); host != nil {
+		if uniqueID := host.Info().UniqueID; uniqueID != "" {
+			p.uniqueID = []byte(uniqueID)
+		}
+	}
+
 	// don't use cgroup.ProcessCgroupPaths to save it from doing the work when container id disabled
 	if ok := containsValue(mappings, "container.id"); ok {
 		if withCache && config.CgroupCacheExpireTime != 0 {
@@ -310,6 +322,7 @@ func (p *addProcessMetadata) String() string {
 
 func (p *processMetadata) toMap() mapstr.M {
 	process := mapstr.M{
+		"entity_id":  p.entityID,
 		"name":       p.name,
 		"title":      p.title,
 		"executable": p.exe,

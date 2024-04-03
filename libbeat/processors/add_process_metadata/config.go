@@ -80,6 +80,7 @@ var defaultFields = mapstr.M{
 		"parent": mapstr.M{
 			"pid": nil,
 		},
+		"entity_id":  nil,
 		"start_time": nil,
 		"owner": mapstr.M{
 			"name": nil,
