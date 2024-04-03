@@ -43,10 +43,11 @@ func TestAddProcessMetadata(t *testing.T) {
 	startTime := time.Now()
 	testProcs := testProvider{
 		1: {
-			name:  "systemd",
-			title: "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
-			exe:   "/usr/lib/systemd/systemd",
-			args:  []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+			name:     "systemd",
+			entityID: "XCOVE56SVVEOKBNX",
+			title:    "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+			exe:      "/usr/lib/systemd/systemd",
+			args:     []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 			env: map[string]string{
 				"HOME":       "/",
 				"TERM":       "linux",
@@ -60,10 +61,11 @@ func TestAddProcessMetadata(t *testing.T) {
 			userid:    "0",
 		},
 		3: {
-			name:  "systemd",
-			title: "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
-			exe:   "/usr/lib/systemd/systemd",
-			args:  []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
+			name:     "systemd",
+			entityID: "XCOVE56SVVEOKBNX",
+			title:    "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
+			exe:      "/usr/lib/systemd/systemd",
+			args:     []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
 			env: map[string]string{
 				"HOME":       "/",
 				"TERM":       "linux",
@@ -150,6 +152,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 				"process": mapstr.M{
 					"name":       "systemd",
+					"entity_id":  "XCOVE56SVVEOKBNX",
 					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 					"executable": "/usr/lib/systemd/systemd",
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
@@ -235,6 +238,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				"parent": mapstr.M{
 					"process": mapstr.M{
 						"name":       "systemd",
+						"entity_id":  "XCOVE56SVVEOKBNX",
 						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
@@ -269,6 +273,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				"parent": mapstr.M{
 					"process": mapstr.M{
 						"name":       "systemd",
+						"entity_id":  "XCOVE56SVVEOKBNX",
 						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
@@ -310,6 +315,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				"parent": mapstr.M{
 					"process": mapstr.M{
 						"name":       "systemd",
+						"entity_id":  "XCOVE56SVVEOKBNX",
 						"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 						"executable": "/usr/lib/systemd/systemd",
 						"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
@@ -508,6 +514,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 				"process": mapstr.M{
 					"name":       "systemd",
+					"entity_id":  "XCOVE56SVVEOKBNX",
 					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 					"executable": "/usr/lib/systemd/systemd",
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
@@ -633,6 +640,7 @@ func TestAddProcessMetadata(t *testing.T) {
 				},
 				"process": mapstr.M{
 					"name":       "systemd",
+					"entity_id":  "XCOVE56SVVEOKBNX",
 					"title":      "/usr/lib/systemd/systemd --switched-root --system --deserialize 22",
 					"executable": "/usr/lib/systemd/systemd",
 					"args":       []string{"/usr/lib/systemd/systemd", "--switched-root", "--system", "--deserialize", "22"},
