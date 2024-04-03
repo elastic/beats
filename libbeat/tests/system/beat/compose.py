@@ -216,6 +216,8 @@ class ComposeMixin(object):
         import shutil
         print("hi fae, docker: %s" % shutil.which("docker"))
         print("hi fae, docker-compose: %s" % shutil.which("docker-compose"))
+        import os.path
+        print("hi fae, isfile(/bin/docker):", os.path.isfile("/bin/docker"))
 
         from python_on_whales import DockerClient
         docker = DockerClient(
