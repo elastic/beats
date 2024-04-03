@@ -47,7 +47,7 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "fi
     with_mage
   fi
 
-  if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
+  if [[ "$BUILDKITE_STEP_KEY" == *package* ]]; then
     export DOCKER_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
     export DOCKER_PASSWORD_SECRET=$(retry_with_count 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
     export GITHUB_TOKEN_SECRET=$(retry_with_count 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
