@@ -131,12 +131,12 @@ if are_conditions_met_arm_tests; then
 YAML
 fi
 
-# Temporary disable as additional conditions are required and this is currently WIP
-if false && are_conditions_met_aws_tests; then
+if are_conditions_met_aws_tests; then
   cat >> $pipelineName <<- YAML
       - label: ":linux: Cloud Tests"
         key: "extended-cloud-test"
         command: ".buildkite/scripts/cloud_tests.sh"
+        skip: "Temporary disable, additional conditions required, we hit AWS limits"
         env:
           MODULE: $MODULE
           ASDF_TERRAFORM_VERSION: 1.0.2

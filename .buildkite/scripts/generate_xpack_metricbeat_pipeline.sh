@@ -124,12 +124,12 @@ if  are_conditions_met_macos_tests; then
 YAML
 fi
 
-# Disable as it looks like this steps for Metricbeat is not part of any stage in Jenkinsfile
-if  false && are_conditions_met_aws_tests; then
+if  are_conditions_met_aws_tests; then
   cat >> $pipelineName <<- YAML
       - label: ":linux: Cloud Tests"
         key: "extended-cloud-test"
         command: ".buildkite/scripts/cloud_tests.sh"
+        skip: "Does not belong to a stage, exists but not run"
         env:
           MODULE: $MODULE
           ASDF_TERRAFORM_VERSION: 1.0.2
