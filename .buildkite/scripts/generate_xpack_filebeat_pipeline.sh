@@ -131,7 +131,8 @@ if are_conditions_met_arm_tests; then
 YAML
 fi
 
-if are_conditions_met_aws_tests; then
+# Temporary disable as additional conditions are required and this is currently WIP
+if false && are_conditions_met_aws_tests; then
   cat >> $pipelineName <<- YAML
       - label: ":linux: Cloud Tests"
         key: "extended-cloud-test"

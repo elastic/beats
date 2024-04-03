@@ -124,7 +124,8 @@ if  are_conditions_met_macos_tests; then
 YAML
 fi
 
-if  are_conditions_met_aws_tests; then
+# Disable as it looks like this steps for Metricbeat is not part of any stage in Jenkinsfile
+if  false && are_conditions_met_aws_tests; then
   cat >> $pipelineName <<- YAML
       - label: ":linux: Cloud Tests"
         key: "extended-cloud-test"
