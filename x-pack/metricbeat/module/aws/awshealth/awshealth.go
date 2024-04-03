@@ -10,7 +10,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"sync"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -132,7 +131,6 @@ func (m *MetricSet) getEventsSummary(
 		nextTokenString string
 		eventOutput     *health.DescribeEventsOutput
 		err             error
-		wg              sync.WaitGroup
 	)
 	errCh := make(chan error, maxResults)
 
@@ -176,10 +174,7 @@ func (m *MetricSet) getEventsSummary(
 
 		for i := range ets {
 			m.Logger().Debugf("[AWS Health] [Fetch DescribeEventDetails] Event ARN : %s", getValueOrDefault(ets[i].Arn, ""))
-			// Increment the WaitGroup counter
-			wg.Add(1)
 			go func(et types.Event) {
-				defer wg.Done()
 				err := m.getDescribeEventDetails(ctx, awsHealth, et, c)
 				if err != nil {
 					errCh <- err
@@ -205,7 +200,6 @@ func (m *MetricSet) getEventsSummary(
 				events = append(events, createEvents(healthDetails))
 			}
 		}
-		wg.Wait()
 		if eventOutput.NextToken == nil {
 			break
 		}
@@ -321,9 +315,9 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 		err = fmt.Errorf("[AWS Health] DescribeEventDetails failed with : %w", err)
 		m.Logger().Error(err.Error())
 		return err
-	} else {
-		hd.eventDescription = *(eventDetails.SuccessfulSet[0].EventDescription.LatestDescription)
 	}
+
+	hd.eventDescription = *(eventDetails.SuccessfulSet[0].EventDescription.LatestDescription)
 
 	var (
 		affEntityTokString string
