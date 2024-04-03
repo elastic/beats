@@ -42,6 +42,7 @@ type Module interface {
 	GetStateMetricsFamilies(prometheus p.Prometheus) ([]*p.MetricFamily, error)
 	GetKubeletStats(http *helper.HTTP) ([]byte, error)
 	GetMetricsRepo() *util.MetricsRepo
+	GetResourceWatchers() *util.Watchers
 }
 
 type familiesCache struct {
@@ -86,6 +87,7 @@ type module struct {
 	kubeStateMetricsCache *kubeStateMetricsCache
 	kubeletStatsCache     *kubeletStatsCache
 	metricsRepo           *util.MetricsRepo
+	resourceWatchers      *util.Watchers
 	cacheHash             uint64
 }
 
@@ -97,6 +99,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 		cacheMap: make(map[uint64]*statsCache),
 	}
 	metricsRepo := util.NewMetricsRepo()
+	resourceWatchers := util.NewWatchers()
 	return func(base mb.BaseModule) (mb.Module, error) {
 		hash, err := generateCacheHash(base.Config().Hosts)
 		if err != nil {
@@ -108,6 +111,7 @@ func ModuleBuilder() func(base mb.BaseModule) (mb.Module, error) {
 			kubeStateMetricsCache: kubeStateMetricsCache,
 			kubeletStatsCache:     kubeletStatsCache,
 			metricsRepo:           metricsRepo,
+			resourceWatchers:      resourceWatchers,
 			cacheHash:             hash,
 		}
 		return &m, nil
@@ -161,4 +165,8 @@ func generateCacheHash(host []string) (uint64, error) {
 
 func (m *module) GetMetricsRepo() *util.MetricsRepo {
 	return m.metricsRepo
+}
+
+func (m *module) GetResourceWatchers() *util.Watchers {
+	return m.resourceWatchers
 }
