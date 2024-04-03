@@ -772,9 +772,10 @@ metricbeat.modules:
 
   # Certificate for SSL/TLS client authentication
   #ssl.certificate: "/etc/pki/client/cert.crt"
-  
+
   # Client certificate key file
   #ssl.key: "/etc/pki/client/cert.key"
+
 #--------------------------------- NATS Module ---------------------------------
 - module: nats
   metricsets:
