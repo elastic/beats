@@ -44,11 +44,11 @@ func NewEventFromEbpfEvent(
 ) (Event, bool) {
 	var (
 		path, target, cgroupPath string
-		action       Action
-		metadata     Metadata
-		process      Process
-		err          error
-		errors       = make([]error, 0)
+		action                   Action
+		metadata                 Metadata
+		process                  Process
+		err                      error
+		errors                   []error
 	)
 	switch ee.Type {
 	case ebpfevents.EventTypeFileCreate:

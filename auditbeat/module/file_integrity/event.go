@@ -402,7 +402,7 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 	}
 
 	if e.ContainerID != "" {
-		file["container.id"] = e.ContainerID
+		out.MetricSetFields.Put("container.id", e.ContainerID)
 	}
 
 	if len(e.Hashes) > 0 {
