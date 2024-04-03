@@ -17,11 +17,10 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var _ http.RoundTripper = (*LoggingRoundTripper)(nil)
