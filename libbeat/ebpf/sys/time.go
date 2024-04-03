@@ -26,35 +26,19 @@ import (
 	"github.com/tklauser/go-sysconf"
 )
 
-type ticksPerSecond struct {
-	value uint64
-	err   error
-}
-
 var (
-	tps = sync.OnceValue(func() ticksPerSecond {
+	ticksPerSecondOnce = sync.OnceValues(func() (uint64, error) {
 		ticks, err := sysconf.Sysconf(sysconf.SC_CLK_TCK)
 		if err != nil {
-			return ticksPerSecond{
-				value: 0,
-				err:   err,
-			}
+			return 0, err
 		}
 
-		return ticksPerSecond{
-			value: uint64(ticks),
-			err:   err,
-		}
+		return uint64(ticks), err
 	})
 )
 
-func TicksPerSecond() (uint64, error) {
-	ticks := tps()
-	return ticks.value, ticks.err
-}
-
 func TicksToNs(ticks uint64) (uint64, error) {
-	tps, err := TicksPerSecond()
+	tps, err := ticksPerSecondOnce()
 	if err != nil {
 		return 0, err
 	}
@@ -63,7 +47,7 @@ func TicksToNs(ticks uint64) (uint64, error) {
 }
 
 func TimeFromNsSinceBoot(ns uint64) (time.Time, error) {
-	_, bt, err := HostInfo()
+	info, err := hostInfoOnce()
 	if err != nil {
 		return time.Time{}, err
 	}
@@ -73,7 +57,7 @@ func TimeFromNsSinceBoot(ns uint64) (time.Time, error) {
 		return time.Time{}, err
 	}
 
-	return bt.Add(time.Duration(reduced)), nil
+	return info.BootTime.Add(time.Duration(reduced)), nil
 }
 
 // When generating an `entity_id` in ECS we need to reduce the precision of a
@@ -81,7 +65,7 @@ func TimeFromNsSinceBoot(ns uint64) (time.Time, error) {
 // eBPF (high precision) or other sources. We must reduce them all to the
 // lowest common denominator such that entity ID's generated are always consistent.
 func reduceTimestampPrecision(ns uint64) (uint64, error) {
-	tps, err := TicksPerSecond()
+	tps, err := ticksPerSecondOnce()
 	if err != nil {
 		return 0, err
 	}

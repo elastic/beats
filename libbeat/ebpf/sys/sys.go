@@ -26,47 +26,32 @@ import (
 
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/go-sysinfo"
+	"github.com/elastic/go-sysinfo/types"
 )
 
-type hostID struct {
-	uniqueID string
-	bootTime time.Time
-	err      error
-}
-
 var (
-	hostInfo = sync.OnceValue(func() hostID {
-		info, err := sysinfo.Host()
+	hostInfoOnce = sync.OnceValues(func() (types.HostInfo, error) {
+		host, err := sysinfo.Host()
 
-		if info == nil {
-			return hostID{
-				err: err,
-			}
+		if host == nil {
+			return types.HostInfo{}, err
 		}
 
-		return hostID{
-			uniqueID: info.Info().UniqueID,
-			bootTime: info.Info().BootTime,
-			err:      err,
-		}
+		return host.Info(), err
 	})
 )
 
-func HostInfo() (string, time.Time, error) {
-	hID := hostInfo()
-
-	return hID.uniqueID, hID.bootTime, hID.err
-}
-
 // EntityID creates an ID that uniquely identifies this process across machines.
 func EntityID(pid uint32, start time.Time) (string, error) {
-	hid, _, err := HostInfo()
+	info, err := hostInfoOnce()
 	if err != nil {
 		return "", err
 	}
 
 	h := system.NewEntityHash()
-	h.Write([]byte(hid))
+	if _, err := h.Write([]byte(info.UniqueID)); err != nil {
+		return "", err
+	}
 	if err := binary.Write(h, binary.LittleEndian, int64(pid)); err != nil {
 		return "", err
 	}
