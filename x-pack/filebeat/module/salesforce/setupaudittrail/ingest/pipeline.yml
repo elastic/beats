@@ -1,6 +1,10 @@
 ---
 description: Pipeline for parsing Salesforce SetupAuditTrail logs
 processors:
+- json:
+    field: message
+    target_field: json
+    ignore_failure: true
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
@@ -8,6 +12,7 @@ processors:
     field: message
     target_field: event.original
     ignore_missing: true
+    if: 'ctx.event?.original == null'
 - set:
     field: salesforce.setup_audit_trail.document_id
     copy_from: _id
@@ -57,18 +62,26 @@ processors:
 ## ECS Event Mapping ##
 #######################
 
+- set:
+    field: ecs.version
+    value: "8.5.0"
+    ignore_failure: true
+    ignore_empty_value: true
 - rename:
     field: json.Id
     target_field: event.id
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.Action
     target_field: event.action
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.attributes.url
     target_field: event.url
-    ignore_missing: true    
+    ignore_missing: true
+    ignore_failure: true
 - date:
     field: json.CreatedDate
     target_field: event.created
@@ -77,16 +90,24 @@ processors:
     ignore_failure: true
 - set:
     field: event.type
-    value: "admin"
+    value: ["admin"]
+    ignore_failure: true
+    ignore_empty_value: true
 - set:
     field: event.kind
     value: "event"
+    ignore_failure: true
+    ignore_empty_value: true
 - set:
     field: event.dataset
     value: "salesforce.setupaudittrail"
+    ignore_failure: true
+    ignore_empty_value: true
 - set:
     field: event.module
     value: "salesforce"
+    ignore_failure: true
+    ignore_empty_value: true
 
 ######################
 ## ECS User Mapping ##

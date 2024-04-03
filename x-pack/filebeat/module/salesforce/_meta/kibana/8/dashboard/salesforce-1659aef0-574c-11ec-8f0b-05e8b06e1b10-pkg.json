@@ -215,7 +215,7 @@
                     "y": 0
                 },
                 "panelIndex": "0e854818-b5d3-4758-b099-04d68167678a",
-                "title": "Login success rate [Logs Salesforce]",
+                "title": "Login success rate [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -386,7 +386,7 @@
                     "y": 0
                 },
                 "panelIndex": "e75fee04-c83e-48ad-83bd-498189cabec7",
-                "title": "Failed login attempts [Logs Salesforce]",
+                "title": "Failed login attempts [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -609,7 +609,7 @@
                     "y": 9
                 },
                 "panelIndex": "e780606f-6362-497e-9e17-940937ead5bf",
-                "title": "Login over time [Logs Salesforce]",
+                "title": "Login over time [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -781,7 +781,7 @@
                     "y": 24
                 },
                 "panelIndex": "27d96d74-bfe5-4676-84fc-0f7e24594b5a",
-                "title": "Total login events over time [Logs Salesforce]",
+                "title": "Total login events over time [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -942,7 +942,7 @@
                     "y": 41
                 },
                 "panelIndex": "9ea2b92f-5fb6-4a83-b198-5275565a4bd6",
-                "title": "Distribution of type of users [Logs Salesforce]",
+                "title": "Distribution of type of users [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -1104,7 +1104,7 @@
                     "y": 41
                 },
                 "panelIndex": "4b6641b7-fa2a-4d84-a9f6-e358000702dc",
-                "title": "Activity by browser/client [Logs Salesforce]",
+                "title": "Activity by browser/client [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -1120,17 +1120,17 @@
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "696f7220-4f11-4c84-bfad-d2abdb595843",
+                                "name": "0014db45-cedd-457a-8afa-590e2868cb24",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "5a4850c8-9bba-423e-8a12-6cbe09cae6f7",
+                                "name": "448602a9-394f-4efc-b521-bd376c28bdbc",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "98986eae-7d8b-45ba-8bd4-5b6564dab9d9",
+                                "name": "f8ab7947-48a5-4645-8a99-7be331ae65f1",
                                 "type": "index-pattern"
                             }
                         ],
@@ -1223,10 +1223,10 @@
                                                 },
                                                 "89013969-6f87-4f17-9239-4c3ef1cc72e5": {
                                                     "customLabel": true,
-                                                    "dataType": "string",
+                                                    "dataType": "number",
                                                     "filter": {
                                                         "language": "kuery",
-                                                        "query": "\"salesforce.login.db_total_time\": *"
+                                                        "query": "\"salesforce.login.db_time.total\": *"
                                                     },
                                                     "isBucketed": false,
                                                     "label": "DB total time (ms)",
@@ -1234,8 +1234,8 @@
                                                     "params": {
                                                         "sortField": "@timestamp"
                                                     },
-                                                    "scale": "ordinal",
-                                                    "sourceField": "salesforce.login.db_total_time"
+                                                    "scale": "ratio",
+                                                    "sourceField": "salesforce.login.db_time.total"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -1252,7 +1252,7 @@
                                         "alias": null,
                                         "disabled": false,
                                         "field": "event.action",
-                                        "index": "696f7220-4f11-4c84-bfad-d2abdb595843",
+                                        "index": "0014db45-cedd-457a-8afa-590e2868cb24",
                                         "key": "event.action",
                                         "negate": false,
                                         "params": {
@@ -1274,7 +1274,7 @@
                                         "alias": null,
                                         "disabled": false,
                                         "field": "event.outcome",
-                                        "index": "5a4850c8-9bba-423e-8a12-6cbe09cae6f7",
+                                        "index": "448602a9-394f-4efc-b521-bd376c28bdbc",
                                         "key": "event.outcome",
                                         "negate": false,
                                         "type": "exists",
@@ -1294,7 +1294,7 @@
                                         "alias": null,
                                         "disabled": false,
                                         "field": "event.dataset",
-                                        "index": "98986eae-7d8b-45ba-8bd4-5b6564dab9d9",
+                                        "index": "f8ab7947-48a5-4645-8a99-7be331ae65f1",
                                         "key": "event.dataset",
                                         "negate": false,
                                         "params": {
@@ -1361,7 +1361,7 @@
                     "y": 71
                 },
                 "panelIndex": "b2b60887-159a-4a2f-a477-eece1cda9620",
-                "title": "Login events table [Logs Salesforce]",
+                "title": "Login events table [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -1535,7 +1535,7 @@
                     "y": 56
                 },
                 "panelIndex": "6115a6d5-d780-4272-b952-2af28343a5b6",
-                "title": "Top 10 Application type by user count [Logs Salesforce]",
+                "title": "Top 10 application type by user count [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -1718,7 +1718,7 @@
                     "y": 71
                 },
                 "panelIndex": "4a2b88af-ad1a-416d-9553-d21b23882c22",
-                "title": "Top 10 IP addresses by request count [Logs Salesforce]",
+                "title": "Top 10 IP addresses by request count [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -1941,15 +1941,15 @@
                     "hidePanelTitles": false,
                     "isLayerTOCOpen": true,
                     "mapBuffer": {
-                        "maxLat": 89.78601,
-                        "maxLon": 540,
-                        "minLat": -85.05113,
-                        "minLon": -720
+                        "maxLat": 66.51326,
+                        "maxLon": 180,
+                        "minLat": 0,
+                        "minLon": -180
                     },
                     "mapCenter": {
-                        "lat": 18.34294,
-                        "lon": -110.39069,
-                        "zoom": 0.29
+                        "lat": 35.84709,
+                        "lon": 9.06803,
+                        "zoom": 2.13
                     },
                     "openTOCDetails": []
                 },
@@ -1961,7 +1961,7 @@
                     "y": 88
                 },
                 "panelIndex": "bc6b147a-bd41-4f00-affe-4a7b7fbaab7a",
-                "title": "Login activity by region [Logs Salesforce]",
+                "title": "Login activity by region [Filebeat Salesforce]",
                 "type": "map",
                 "version": "8.10.0"
             },
@@ -2107,7 +2107,7 @@
                     "y": 56
                 },
                 "panelIndex": "a841d405-e28f-4eea-b7a4-5cfc0299a0c6",
-                "title": "Top 10 Postal code by user count [Logs Salesforce]",
+                "title": "Top 10 postal code by user count [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             }
@@ -2123,7 +2123,7 @@
         "version": 1
     },
     "coreMigrationVersion": "8.8.0",
-    "created_at": "2024-03-26T07:09:58.704Z",
+    "created_at": "2024-04-03T06:59:40.737Z",
     "id": "salesforce-1659aef0-574c-11ec-8f0b-05e8b06e1b10-pkg",
     "managed": false,
     "references": [
@@ -2229,17 +2229,17 @@
         },
         {
             "id": "filebeat-*",
-            "name": "b2b60887-159a-4a2f-a477-eece1cda9620:696f7220-4f11-4c84-bfad-d2abdb595843",
+            "name": "b2b60887-159a-4a2f-a477-eece1cda9620:0014db45-cedd-457a-8afa-590e2868cb24",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "b2b60887-159a-4a2f-a477-eece1cda9620:5a4850c8-9bba-423e-8a12-6cbe09cae6f7",
+            "name": "b2b60887-159a-4a2f-a477-eece1cda9620:448602a9-394f-4efc-b521-bd376c28bdbc",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "b2b60887-159a-4a2f-a477-eece1cda9620:98986eae-7d8b-45ba-8bd4-5b6564dab9d9",
+            "name": "b2b60887-159a-4a2f-a477-eece1cda9620:f8ab7947-48a5-4645-8a99-7be331ae65f1",
             "type": "index-pattern"
         },
         {
@@ -2295,6 +2295,6 @@
     ],
     "type": "dashboard",
     "typeMigrationVersion": "8.9.0",
-    "updated_at": "2024-03-26T07:09:58.704Z",
-    "version": "Wzk3MjAsMl0="
+    "updated_at": "2024-04-03T06:59:40.737Z",
+    "version": "WzEwMDIwLDJd"
 }

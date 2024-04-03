@@ -1,13 +1,31 @@
 ---
 description: Pipeline for parsing Salesforce apex logs
 processors:
+- json:
+    field: message
+    target_field: json
+    ignore_failure: true
+- set:
+    field: event.original
+    value: '{{{message}}}'
+    ignore_empty_value: true
+    if: 'ctx.event?.original == null'
+- fingerprint:
+    fields:
+    - json.REQUEST_ID
+    - json.SESSION_KEY
+    - json.TIMESTAMP_DERIVED
+    - json.USER_ID
+    target_field: _id
+    ignore_missing: true
+- set:
+    field: ecs.version
+    value: "8.5.0"
+    ignore_failure: true
+    ignore_empty_value: true
 - set:
     field: event.ingested
     value: '{{_ingest.timestamp}}'
-- remove:
-    field:
-      - message
-    ignore_missing: true
 - set:
     field: salesforce.apex.document_id
     copy_from: _id
@@ -21,149 +39,275 @@ processors:
     ignore_failure: true
 
 - rename:
+    field: json.ACTION
+    target_field: salesforce.apex.action
+    ignore_missing: true
+    ignore_failure: true
+- convert:
     field: json.CALLOUT_TIME
     target_field: salesforce.apex.callout_time
+    type: float
     ignore_missing: true
+    ignore_failure: true
 - rename:
+    field: json.CLASS_NAME
+    target_field: salesforce.apex.class_name
+    ignore_missing: true
+    ignore_failure: true
+- rename:
+    field: json.CLIENT_NAME
+    target_field: salesforce.apex.client_name
+    ignore_missing: true
+    ignore_failure: true
+- convert:
     field: json.CPU_TIME
     target_field: salesforce.apex.cpu_time
+    type: float
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.DB_BLOCKS
     target_field: salesforce.apex.db_blocks
+    type: long
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.DB_CPU_TIME
     target_field: salesforce.apex.db_cpu_time
+    type: float
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.DB_TOTAL_TIME
-    target_field: salesforce.apex.db_total_time
+    target_field: salesforce.apex.db_time.total
+    type: float
     ignore_missing: true
+    ignore_failure: true
+- rename:
+    field: json.ENTITY
+    target_field: salesforce.apex.entity
+    ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.ENTITY_NAME
     target_field: salesforce.apex.entity_name
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.ENTRY_POINT
     target_field: salesforce.apex.entry_point
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.EVENT_TYPE
     target_field: salesforce.apex.event_type
     ignore_missing: true
+    ignore_failure: true
+- convert:
+    field: json.EXECUTE_MS
+    target_field: salesforce.apex.execute.ms
+    type: float
+    ignore_missing: true
+    ignore_failure: true
+- convert:
+    field: json.FETCH_MS
+    target_field: salesforce.apex.fetch.ms
+    type: long
+    ignore_missing: true
+    ignore_failure: true
+- rename:
+    field: json.FILTER
+    target_field: salesforce.apex.filter
+    ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.IS_LONG_RUNNING_REQUEST
     target_field: salesforce.apex.is_long_running_request
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.LOGIN_KEY
     target_field: salesforce.apex.login_key
     ignore_missing: true
+    ignore_failure: true
+- convert:
+    field: json.LIMIT
+    target_field: salesforce.apex.limit
+    type: long
+    ignore_missing: true
+    ignore_failure: true
+- convert:
+    field: json.LIMIT_USAGE_PERCENT
+    target_field: salesforce.apex.limit_usage.pct
+    type: float
+    ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.MEDIA_TYPE
     target_field: salesforce.apex.media_type
     ignore_missing: true
+    ignore_failure: true
+- rename:
+    field: json.MESSAGE
+    target_field: salesforce.apex.message
+    ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.METHOD_NAME
     target_field: salesforce.apex.method_name
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.NUMBER_FIELDS
-    target_field: salesforce.apex.number_fields
+    target_field: salesforce.apex.fields.count
+    type: long
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.NUMBER_SOQL_QUERIES
-    target_field: salesforce.apex.number_soql_queries
+    target_field: salesforce.apex.soql_queries.count
+    type: long
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.OFFSET
     target_field: salesforce.apex.offset
+    type: long
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.ORDERBY
     target_field: salesforce.apex.orderby
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.ORGANIZATION_ID
     target_field: salesforce.apex.organization_id
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.QUERY
     target_field: salesforce.apex.query
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.QUIDDITY
     target_field: salesforce.apex.quiddity
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.REQUEST_ID
     target_field: salesforce.apex.request.id
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.REQUEST_STATUS
     target_field: salesforce.apex.request.status
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.ROWS
     target_field: salesforce.apex.rows.total
+    type: long
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.ROWS_FETCHED
     target_field: salesforce.apex.rows.fetched
+    type: long
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.ROWS_PROCESSED
     target_field: salesforce.apex.rows.processed
+    type: long
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.RUN_TIME
     target_field: salesforce.apex.run_time
+    type: float
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.SELECT
     target_field: salesforce.apex.select
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.SUBQUERIES
     target_field: salesforce.apex.subqueries
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.THROUGHPUT
     target_field: salesforce.apex.throughput
+    type: float
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.TRIGGER_ID
     target_field: salesforce.apex.trigger.id
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.TRIGGER_NAME
     target_field: salesforce.apex.trigger.name
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.TRIGGER_TYPE
     target_field: salesforce.apex.trigger.type
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.TYPE
     target_field: salesforce.apex.type
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.URI
     target_field: salesforce.apex.uri
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.URI_ID_DERIVED
-    target_field: salesforce.apex.uri_id_derived
+    target_field: salesforce.apex.uri_derived_id
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.USER_AGENT
     target_field: salesforce.apex.user_agent
     ignore_missing: true
+    ignore_failure: true
+- script:
+    description: Set request user agent value from user agent numeric code.
+    lang: painless
+    ignore_failure: true
+    source: |
+        Map map = new HashMap();
+        map.put("100", "Internet Explorer");
+        map.put("110", "Firefox");
+        map.put("130", "Chrome");
+        map.put("140", "Safari");
+        map.put("150", "Opera");
+        map.put("160", "Android");
+        map.put("170", "Netscape");
+        map.put("180", "Webkit");
+        map.put("190", "Gecko");
+        map.put("230", "Blackberry");
+        map.put("240", "Good Access");
+        map.put("999", "Unknown");
+        String temp = map.get(ctx.salesforce.apex.user_agent.substring(0,3));
+        if (temp != null) {
+          ctx.salesforce.apex.user_agent = temp;
+        }
+    if: 'ctx.salesforce?.apex?.user_agent != null'
 - rename:
     field: json.USER_ID_DERIVED
     target_field: salesforce.apex.user_id_derived
     ignore_missing: true
+    ignore_failure: true
 
 #######################
 ## ECS Event Mapping ##
@@ -183,76 +327,83 @@ processors:
     field: event.type
     value: "connection"
     if: 'ctx?.salesforce?.apex?.event_type != "ApexExecution"'
+    ignore_failure: true
+    ignore_empty_value: true
 
 - set:
     field: event.category
-    value: "network"
+    value: ["network"]
     if: 'ctx?.salesforce?.apex?.event_type != "ApexTrigger" && ctx?.salesforce?.apex?.event_type != "ApexExecution"'
+    ignore_failure: true
+    ignore_empty_value: true
 
 - script:
-      if: ctx?.salesforce?.apex?.event_type != null && ctx?.salesforce?.apex?.event_type != "" 
-      lang: painless
-      source: |
+    description: Set event.action field based on the type of Apex event received.
+    if: ctx?.salesforce?.apex?.event_type != null && ctx?.salesforce?.apex?.event_type != "" 
+    lang: painless
+    source: |
         def eventType = ctx?.salesforce?.apex?.event_type?.toLowerCase();
         Map referenceTable = [
-          "apexcallout": "apex-callout",
-          "apextrigger": "apex-trigger",
-          "apexexecution": "apex-execution",
-          "apexrestApi": "apex-rest",
-          "apexsoap": "apex-soap",
-          "externalcustomapexcallout": ["apex-external-custom-callout"]
+            "apexcallout": "apex-callout",
+            "apextrigger": "apex-trigger",
+            "apexexecution": "apex-execution",
+            "apexrestApi": "apex-rest",
+            "apexsoap": "apex-soap",
+            "externalcustomapexcallout": ["apex-external-custom-callout"]
         ];
-
         ctx.event.action = referenceTable[eventType];
 
-- rename:
+- convert:
     field: json.TIME
     target_field: event.duration
-    if: 'ctx?.salesforce?.apex?.event_type == "ApexCallout" && ctx?.json?.TIME != ""'
-- rename:
+    type: long
+    if: 'ctx.salesforce?.apex?.event_type == "ApexCallout" && ctx.json?.TIME != ""'
+    ignore_failure: true
+- convert:
     field: json.EXEC_TIME
     target_field: event.duration
-    if: '(ctx?.salesforce?.apex?.event_type == "ApexTrigger" || ctx?.salesforce?.apex?.event_type == "ApexExecution") && ctx?.json?.EXEC_TIME != ""'
-- rename:
+    type: long
+    if: '(ctx.salesforce?.apex?.event_type == "ApexTrigger" || ctx.salesforce?.apex?.event_type == "ApexExecution") && ctx.json?.EXEC_TIME != ""'
+    ignore_failure: true
+- convert:
     field: salesforce.apex.run_time
     target_field: event.duration
-    if: '(ctx?.salesforce?.apex?.event_type == "ApexRestApi" || ctx?.salesforce?.apex?.event_type == "ApexSoap") && ctx?.salesforce?.apex?.run_time != ""'
-- rename:
+    type: float
+    if: '(ctx.salesforce?.apex?.event_type == "ApexRestApi" || ctx.salesforce?.apex?.event_type == "ApexSoap") && ctx.salesforce?.apex?.run_time != ""'
+    ignore_failure: true
+- convert:
     field: json.TOTAL_MS
     target_field: event.duration
-    if: 'ctx?.salesforce?.apex?.event_type == "ExternalCustomApexCallout" && ctx?.json?.TOTAL_MS != ""'
+    type: long
+    if: 'ctx.salesforce?.apex?.event_type == "ExternalCustomApexCallout" && ctx.json?.TOTAL_MS != ""'
+    ignore_failure: true
+
 
 - set:
     field: event.outcome
-    value: success
-    if: 'ctx?.json?.SUCCESS == "1" && ctx?.json?.SUCCESS != null'
+    value: "success"
+    if: '(ctx.json?.SUCCESS == "1" && ctx.json?.SUCCESS != null) || (ctx.json?.STATUS == "1" && ctx.json?.STATUS != null)'
     ignore_failure: true
+    ignore_empty_value: true
 - set:
     field: event.outcome
-    value: failure
-    if: 'ctx?.json?.SUCCESS != "1" && ctx?.json?.SUCCESS != null'
+    value: "failure"
+    if: '(ctx.json?.SUCCESS != "1" && ctx.json?.SUCCESS != null) || (ctx.json?.STATUS != "1" && ctx.json?.STATUS != null)'
     ignore_failure: true
-- set:
-    field: event.outcome
-    value: success
-    if: 'ctx?.json?.STATUS == "1" && ctx?.json?.STATUS != null'
-    ignore_failure: true
-- set:
-    field: event.outcome
-    value: failure
-    if: 'ctx?.json?.STATUS != "1" && ctx?.json?.STATUS != null'
-    ignore_failure: true
+    ignore_empty_value: true
 
 - rename:
     field: json.URL
     target_field: event.url
+    if: 'ctx.salesforce?.apex?.event_type == "ApexCallout"'
     ignore_missing: true
-    if: 'ctx?.salesforce?.apex?.event_type == "ApexCallout"'
+    ignore_failure: true
 - rename:
     field: salesforce.apex.uri
     target_field: event.url
+    if: 'ctx.salesforce?.apex?.event_type != "ApexCallout" && ctx.salesforce?.apex?.event_type != "ExternalCustomApexCallout"'
     ignore_missing: true
-    if: 'ctx?.salesforce?.apex?.event_type != "ApexCallout" && ctx?.salesforce?.apex?.event_type != "ExternalCustomApexCallout"'
+    ignore_failure: true
 
 ######################
 ## ECS User Mapping ##
@@ -262,9 +413,15 @@ processors:
     field: json.USER_ID
     target_field: user.id
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- set:
+    value: ["{{{json.USER_TYPE}}}"]
+    field: user.roles
+    ignore_failure: true
+    ignore_empty_value: true
+- remove:
     field: json.USER_TYPE
-    target_field: user.roles
+    ignore_failure: true
     ignore_missing: true
 
 ########################
@@ -275,8 +432,9 @@ processors:
 - rename:
     field: json.CLIENT_IP
     target_field: source.ip
+    if: 'ctx.json?.CLIENT_IP != "Salesforce.com IP" && ctx.json?.CLIENT_IP != "" && ctx.json?.CLIENT_IP != null'
     ignore_missing: true
-    if: 'ctx?.json?.CLIENT_IP != "Salesforce.com IP" && ctx?.json?.CLIENT_IP != "" && ctx?.json?.CLIENT_IP != null'
+    ignore_failure: true
 
 ############################
 ## ECS Source.Geo Mapping ##
@@ -286,8 +444,9 @@ processors:
 - geoip:
     field: source.ip
     target_field: source.geo
+    if: 'ctx.source?.ip != "Salesforce.com IP" && ctx.source?.ip != "" && ctx.source?.ip != null'
     ignore_missing: true
-    if: 'ctx?.source?.ip != "Salesforce.com IP" && ctx?.source?.ip != "" && ctx?.source?.ip != null'
+    ignore_failure: true
 
 ############################
 ## ECS Related.ip Mapping ##
@@ -308,18 +467,25 @@ processors:
     field: json.METHOD
     target_field: http.request.method
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.REQUEST_SIZE
     target_field: http.request.bytes
+    type: long
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.RESPONSE_SIZE
     target_field: http.response.bytes
+    type: long
     ignore_missing: true
-- rename:
+    ignore_failure: true
+- convert:
     field: json.STATUS_CODE
     target_field: http.response.status_code
+    type: long
     ignore_missing: true
+    ignore_failure: true
 
 #############
 ## Cleanup ##
@@ -345,6 +511,13 @@ processors:
 - remove:
     field:
       - json
+      - message
+    ignore_missing: true
+    ignore_failure: true
+- remove:
+    field: event.original
+    if: "ctx.tags == null || !(ctx.tags.contains('preserve_original_event'))"
+    ignore_failure: true
     ignore_missing: true
 on_failure:
 - set:

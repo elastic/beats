@@ -187,7 +187,7 @@
                     "y": 0
                 },
                 "panelIndex": "6b1afef8-3be5-4fca-a0c4-690a14979551",
-                "title": "Calls against the organization limit [Logs Salesforce]]",
+                "title": "Calls against the organization limit [Filebeat Salesforce]]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -319,7 +319,7 @@
                     "y": 0
                 },
                 "panelIndex": "8039ad1b-bbc7-4d77-bcff-77ef0299a766",
-                "title": "Distribution of request status [Logs Salesforce]",
+                "title": "Distribution of request status [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -452,7 +452,7 @@
                     "y": 0
                 },
                 "panelIndex": "00d05ee3-74f4-4621-9dc7-04fde76b86d9",
-                "title": "Responses by media type [Logs Salesforce]",
+                "title": "Responses by media type [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -603,7 +603,7 @@
                     "y": 15
                 },
                 "panelIndex": "0a33a409-0f61-42be-82ca-7ef8b8ec052f",
-                "title": "Top 10 apex triggers over time [Logs Salesforce]",
+                "title": "Top 10 apex triggers over time [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -613,7 +613,7 @@
                         "description": "",
                         "references": [
                             {
-                                "id": "logs-*",
+                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-1ddfa426-0787-44a0-a6d4-7ba89384d487",
                                 "type": "index-pattern"
                             },
@@ -777,7 +777,7 @@
                     "y": 32
                 },
                 "panelIndex": "b8767bce-c060-4957-acfa-9f289be40643",
-                "title": "Apex performance over time [Logs Salesforce]",
+                "title": "Apex performance over time [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -936,7 +936,8 @@
                         "type": "lens",
                         "visualizationType": "lnsXY"
                     },
-                    "enhancements": {}
+                    "enhancements": {},
+                    "hidePanelTitles": false
                 },
                 "gridData": {
                     "h": 16,
@@ -946,6 +947,7 @@
                     "y": 49
                 },
                 "panelIndex": "ddfe72ec-6854-4bf2-b50c-41e966e8b0fa",
+                "title": "Top 10 SOQL queries per entry point [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -1117,7 +1119,7 @@
                     "y": 65
                 },
                 "panelIndex": "36b2995c-f5ba-4699-b660-f5546cefd2a6",
-                "title": "Trigger trends over time [Logs Salesforce]",
+                "title": "Trigger trends over time [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -1270,7 +1272,7 @@
                     "y": 65
                 },
                 "panelIndex": "ac98a6ec-c930-45a7-b1aa-0877e2f8d281",
-                "title": "Number of triggers by type [Logs Salesforce]",
+                "title": "Number of triggers by type [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -1407,7 +1409,7 @@
                     "y": 81
                 },
                 "panelIndex": "5bbe083c-eff1-4abd-b3a2-012303c07523",
-                "title": "Requests per user type [Logs Salesforce]",
+                "title": "Requests per user type [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -1545,7 +1547,7 @@
                     "y": 81
                 },
                 "panelIndex": "97d94d13-e382-434e-99cb-dbff367cce72",
-                "title": "Responses per user agent [Logs Salesforce]",
+                "title": "Responses per user agent [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -1717,7 +1719,7 @@
                     "y": 97
                 },
                 "panelIndex": "04f06541-b6cf-4a31-865e-361ff701a4c0",
-                "title": "Triggers by entity categorization [Logs Salesforce]",
+                "title": "Triggers by entity categorization [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -1846,7 +1848,7 @@
                     "y": 97
                 },
                 "panelIndex": "a2b4090c-077d-495a-b002-0aceddb498c7",
-                "title": "Top 10 entry points by request count [Logs Salesforce]",
+                "title": "Top 10 entry points by request count [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -1862,12 +1864,12 @@
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "47046562-1692-4cd3-bdce-9f034779516d",
+                                "name": "f5e31933-76e5-4f4f-ba08-13e0d6d86c33",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "7493a672-4e03-4ab9-b641-b745a6c8ba7a",
+                                "name": "01e5ec14-b8db-4040-80e7-75bc9979071e",
                                 "type": "index-pattern"
                             }
                         ],
@@ -1881,7 +1883,8 @@
                                                 "35da24b7-398e-433a-85d9-49e7862e0813",
                                                 "2128b4e0-6345-485e-a410-87fa7ed6e610",
                                                 "20bb0e74-5ce7-4e96-9840-bb8cb4dd08c0",
-                                                "2b4a5fc5-a0ac-4b56-8543-677eb5793a5b"
+                                                "2b4a5fc5-a0ac-4b56-8543-677eb5793a5b",
+                                                "2bcf9e0d-7b52-44f6-a7ad-ad9209c599cc"
                                             ],
                                             "columns": {
                                                 "20bb0e74-5ce7-4e96-9840-bb8cb4dd08c0": {
@@ -1932,6 +1935,28 @@
                                                     "scale": "ordinal",
                                                     "sourceField": "salesforce.apex.throughput"
                                                 },
+                                                "2bcf9e0d-7b52-44f6-a7ad-ad9209c599cc": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "\"salesforce.apex.execute.ms\": *"
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Execute time (ms)",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "format": {
+                                                            "id": "number",
+                                                            "params": {
+                                                                "decimals": 0
+                                                            }
+                                                        },
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "salesforce.apex.execute.ms"
+                                                },
                                                 "35da24b7-398e-433a-85d9-49e7862e0813": {
                                                     "customLabel": true,
                                                     "dataType": "string",
@@ -1941,7 +1966,7 @@
                                                     "params": {
                                                         "missingBucket": false,
                                                         "orderBy": {
-                                                            "columnId": "fc521fd6-0696-4f71-bdd7-371cd87c0169",
+                                                            "columnId": "2128b4e0-6345-485e-a410-87fa7ed6e610",
                                                             "type": "column"
                                                         },
                                                         "orderDirection": "desc",
@@ -1969,7 +1994,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "47046562-1692-4cd3-bdce-9f034779516d",
+                                        "index": "f5e31933-76e5-4f4f-ba08-13e0d6d86c33",
                                         "key": "event.action",
                                         "negate": false,
                                         "params": {
@@ -1990,7 +2015,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "7493a672-4e03-4ab9-b641-b745a6c8ba7a",
+                                        "index": "01e5ec14-b8db-4040-80e7-75bc9979071e",
                                         "key": "event.dataset",
                                         "negate": false,
                                         "params": {
@@ -2031,6 +2056,10 @@
                                         "alignment": "center",
                                         "columnId": "2128b4e0-6345-485e-a410-87fa7ed6e610",
                                         "isTransposed": false
+                                    },
+                                    {
+                                        "columnId": "2bcf9e0d-7b52-44f6-a7ad-ad9209c599cc",
+                                        "isTransposed": false
                                     }
                                 ],
                                 "headerRowHeight": "auto",
@@ -2058,7 +2087,7 @@
                     "y": 113
                 },
                 "panelIndex": "1304595e-5a54-471b-9a24-9bb9e42e0a76",
-                "title": "Top 10 external calls [Logs Salesforce]",
+                "title": "Top 10 external calls [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             }
@@ -2074,7 +2103,7 @@
         "version": 1
     },
     "coreMigrationVersion": "8.8.0",
-    "created_at": "2024-03-14T10:59:53.912Z",
+    "created_at": "2024-04-03T07:05:38.117Z",
     "id": "salesforce-59ef0af0-5749-11ec-8f0b-05e8b06e1b10-pkg",
     "managed": false,
     "references": [
@@ -2129,7 +2158,7 @@
             "type": "index-pattern"
         },
         {
-            "id": "logs-*",
+            "id": "filebeat-*",
             "name": "b8767bce-c060-4957-acfa-9f289be40643:indexpattern-datasource-layer-1ddfa426-0787-44a0-a6d4-7ba89384d487",
             "type": "index-pattern"
         },
@@ -2220,12 +2249,12 @@
         },
         {
             "id": "filebeat-*",
-            "name": "1304595e-5a54-471b-9a24-9bb9e42e0a76:47046562-1692-4cd3-bdce-9f034779516d",
+            "name": "1304595e-5a54-471b-9a24-9bb9e42e0a76:f5e31933-76e5-4f4f-ba08-13e0d6d86c33",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "1304595e-5a54-471b-9a24-9bb9e42e0a76:7493a672-4e03-4ab9-b641-b745a6c8ba7a",
+            "name": "1304595e-5a54-471b-9a24-9bb9e42e0a76:01e5ec14-b8db-4040-80e7-75bc9979071e",
             "type": "index-pattern"
         },
         {
@@ -2236,6 +2265,6 @@
     ],
     "type": "dashboard",
     "typeMigrationVersion": "8.9.0",
-    "updated_at": "2024-03-14T10:59:53.912Z",
-    "version": "WzkzODksMl0="
+    "updated_at": "2024-04-03T07:05:38.117Z",
+    "version": "WzEwMDI0LDJd"
 }

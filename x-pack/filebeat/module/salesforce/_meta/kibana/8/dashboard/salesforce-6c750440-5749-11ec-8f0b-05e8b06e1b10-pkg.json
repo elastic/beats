@@ -188,7 +188,7 @@
                     "y": 0
                 },
                 "panelIndex": "ed7da063-bcce-4f03-a2f8-5f5e61679c94",
-                "title": "Percentage of user initiated logout [Logs Salesforce]",
+                "title": "Percentage of user initiated logout [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -204,7 +204,7 @@
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "928cfc22-397c-4d18-892d-7a619ea18b6b",
+                                "name": "a82a2f79-e3d6-4c70-8dfe-3658ebff7021",
                                 "type": "index-pattern"
                             }
                         ],
@@ -271,7 +271,7 @@
                                         "alias": null,
                                         "disabled": false,
                                         "field": "event.dataset",
-                                        "index": "928cfc22-397c-4d18-892d-7a619ea18b6b",
+                                        "index": "a82a2f79-e3d6-4c70-8dfe-3658ebff7021",
                                         "key": "event.dataset",
                                         "negate": false,
                                         "params": {
@@ -326,7 +326,7 @@
                     "y": 0
                 },
                 "panelIndex": "3c17916f-f16e-4ac8-bccf-73ecd11f212e",
-                "title": "Session levels used while logging out [Logs Salesforce]",
+                "title": "Session levels used while logging out [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -502,7 +502,7 @@
                     "y": 10
                 },
                 "panelIndex": "e0bbbc54-6b58-4290-bf0c-2197bacc9d57",
-                "title": "Logout over time [Logs Salesforce]",
+                "title": "Logout over time [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -640,7 +640,7 @@
                     "y": 23
                 },
                 "panelIndex": "b01bd690-ed72-4ca8-9b6f-9c81d338ccee",
-                "title": "Distribution of session types [Logs Salesforce]",
+                "title": "Distribution of session types [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -797,7 +797,7 @@
                     "y": 23
                 },
                 "panelIndex": "aa5b3dcc-cf05-47d1-9e8f-7619950d6de1",
-                "title": "Top 10 IP addresses by Logout request count [Logs Salesforce]",
+                "title": "Top 10 IP addresses by Logout request count [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -1020,15 +1020,15 @@
                     "hidePanelTitles": false,
                     "isLayerTOCOpen": true,
                     "mapBuffer": {
-                        "maxLat": 89.99075,
-                        "maxLon": 900,
-                        "minLat": -85.05113,
-                        "minLon": -900
+                        "maxLat": 31.95216,
+                        "maxLon": 112.5,
+                        "minLat": 11.1784,
+                        "minLon": 45
                     },
                     "mapCenter": {
-                        "lat": 39.90974,
-                        "lon": -42.96266,
-                        "zoom": 0
+                        "lat": 23.62555,
+                        "lon": 78.34794,
+                        "zoom": 4.45
                     },
                     "openTOCDetails": []
                 },
@@ -1040,7 +1040,7 @@
                     "y": 38
                 },
                 "panelIndex": "f6c9b613-b31a-4ba9-ad94-188afa349528",
-                "title": "Logout activity by region [Logs Salesforce]",
+                "title": "Logout activity by region [Filebeat Salesforce]",
                 "type": "map",
                 "version": "8.10.0"
             }
@@ -1056,7 +1056,7 @@
         "version": 1
     },
     "coreMigrationVersion": "8.8.0",
-    "created_at": "2024-03-26T06:34:07.388Z",
+    "created_at": "2024-04-03T07:01:35.658Z",
     "id": "salesforce-6c750440-5749-11ec-8f0b-05e8b06e1b10-pkg",
     "managed": false,
     "references": [
@@ -1077,7 +1077,7 @@
         },
         {
             "id": "filebeat-*",
-            "name": "3c17916f-f16e-4ac8-bccf-73ecd11f212e:928cfc22-397c-4d18-892d-7a619ea18b6b",
+            "name": "3c17916f-f16e-4ac8-bccf-73ecd11f212e:a82a2f79-e3d6-4c70-8dfe-3658ebff7021",
             "type": "index-pattern"
         },
         {
@@ -1123,6 +1123,6 @@
     ],
     "type": "dashboard",
     "typeMigrationVersion": "8.9.0",
-    "updated_at": "2024-03-26T06:34:07.388Z",
-    "version": "Wzk2OTYsMl0="
+    "updated_at": "2024-04-03T07:01:35.658Z",
+    "version": "WzEwMDIyLDJd"
 }

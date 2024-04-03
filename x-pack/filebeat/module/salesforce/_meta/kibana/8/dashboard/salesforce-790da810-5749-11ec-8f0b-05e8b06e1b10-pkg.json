@@ -36,7 +36,7 @@
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "8880374b-3372-4782-b014-d3c841f7094f",
+                                "name": "ddbc97e6-00ec-4164-9ef4-467b69d0c5a9",
                                 "type": "index-pattern"
                             }
                         ],
@@ -47,11 +47,37 @@
                                     "layers": {
                                         "d9d1a80f-da0d-4de3-b81b-915a1451dfae": {
                                             "columnOrder": [
-                                                "c330a448-da57-4033-9575-6fc498a6a00e",
+                                                "54511a48-3c24-4b01-88e1-5aa4c625d7aa",
                                                 "de7e5b08-824f-4884-b4af-4cca15a26500",
                                                 "aebdaa57-11d2-4742-b5d1-8c9359992816"
                                             ],
                                             "columns": {
+                                                "54511a48-3c24-4b01-88e1-5aa4c625d7aa": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Actions",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "exclude": [],
+                                                        "excludeIsRegex": false,
+                                                        "include": [],
+                                                        "includeIsRegex": false,
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "aebdaa57-11d2-4742-b5d1-8c9359992816",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "parentFormat": {
+                                                            "id": "terms"
+                                                        },
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "event.action"
+                                                },
                                                 "aebdaa57-11d2-4742-b5d1-8c9359992816": {
                                                     "customLabel": true,
                                                     "dataType": "number",
@@ -63,28 +89,6 @@
                                                     },
                                                     "scale": "ratio",
                                                     "sourceField": "___records___"
-                                                },
-                                                "c330a448-da57-4033-9575-6fc498a6a00e": {
-                                                    "customLabel": true,
-                                                    "dataType": "string",
-                                                    "isBucketed": true,
-                                                    "label": "Actions",
-                                                    "operationType": "terms",
-                                                    "params": {
-                                                        "missingBucket": false,
-                                                        "orderBy": {
-                                                            "columnId": "aebdaa57-11d2-4742-b5d1-8c9359992816",
-                                                            "type": "column"
-                                                        },
-                                                        "orderDirection": "desc",
-                                                        "otherBucket": false,
-                                                        "parentFormat": {
-                                                            "id": "terms"
-                                                        },
-                                                        "size": 10
-                                                    },
-                                                    "scale": "ordinal",
-                                                    "sourceField": "event.action"
                                                 },
                                                 "de7e5b08-824f-4884-b4af-4cca15a26500": {
                                                     "dataType": "string",
@@ -121,7 +125,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "8880374b-3372-4782-b014-d3c841f7094f",
+                                        "index": "ddbc97e6-00ec-4164-9ef4-467b69d0c5a9",
                                         "key": "event.dataset",
                                         "negate": false,
                                         "params": {
@@ -153,7 +157,7 @@
                                         "seriesType": "bar_stacked",
                                         "showGridlines": false,
                                         "splitAccessor": "de7e5b08-824f-4884-b4af-4cca15a26500",
-                                        "xAccessor": "c330a448-da57-4033-9575-6fc498a6a00e"
+                                        "xAccessor": "54511a48-3c24-4b01-88e1-5aa4c625d7aa"
                                     }
                                 ],
                                 "legend": {
@@ -180,7 +184,7 @@
                     "y": 0
                 },
                 "panelIndex": "86d0aa67-c1da-4027-9368-9d0c7b393ee7",
-                "title": "Top 10 Actions performed by delegated users [Logs Salesforce]",
+                "title": "Top 10 actions performed by delegated users [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -317,7 +321,7 @@
                     "y": 0
                 },
                 "panelIndex": "86eca459-ead0-451d-a319-db689af6fecd",
-                "title": "Top 10 Sections affected [Logs Salesforce]",
+                "title": "Top 10 sections affected [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -489,7 +493,7 @@
                     "y": 15
                 },
                 "panelIndex": "0e7e3952-b099-4b91-b6f3-9e0239707f87",
-                "title": "Top 10 Actions over time [Logs Salesforce]",
+                "title": "Top 10 actions over time [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             },
@@ -696,7 +700,7 @@
                     "y": 30
                 },
                 "panelIndex": "86bc6d31-3998-4a2e-ad1e-e2c373abeca8",
-                "title": "Changes made in the setup [Logs Salesforce]",
+                "title": "Changes made in the setup [Filebeat Salesforce]",
                 "type": "lens",
                 "version": "8.10.0"
             }
@@ -712,7 +716,7 @@
         "version": 1
     },
     "coreMigrationVersion": "8.8.0",
-    "created_at": "2024-03-14T10:59:36.255Z",
+    "created_at": "2024-04-01T08:19:33.765Z",
     "id": "salesforce-790da810-5749-11ec-8f0b-05e8b06e1b10-pkg",
     "managed": false,
     "references": [
@@ -723,7 +727,7 @@
         },
         {
             "id": "filebeat-*",
-            "name": "86d0aa67-c1da-4027-9368-9d0c7b393ee7:8880374b-3372-4782-b014-d3c841f7094f",
+            "name": "86d0aa67-c1da-4027-9368-9d0c7b393ee7:ddbc97e6-00ec-4164-9ef4-467b69d0c5a9",
             "type": "index-pattern"
         },
         {
@@ -764,6 +768,6 @@
     ],
     "type": "dashboard",
     "typeMigrationVersion": "8.9.0",
-    "updated_at": "2024-03-14T10:59:36.255Z",
-    "version": "WzkzODYsMl0="
+    "updated_at": "2024-04-01T08:19:33.765Z",
+    "version": "Wzk3NzMsMl0="
 }

@@ -92,19 +92,19 @@ processors:
     ignore_missing: true
 - convert:
     field: json.RUN_TIME
-    type: float
+    type: long
     target_field: salesforce.login.run_time
     ignore_failure: true
     ignore_missing: true
 - convert:
     field: json.CPU_TIME
-    type: float
+    type: long
     target_field: salesforce.login.cpu_time
     ignore_failure: true
     ignore_missing: true
 - convert:
     field: json.DB_TOTAL_TIME
-    type: float
+    type: long
     target_field: salesforce.login.db_time.total
     ignore_failure: true
     ignore_missing: true
