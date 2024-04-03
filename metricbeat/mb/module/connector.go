@@ -97,6 +97,17 @@ func (c *Connector) UseMetricSetProcessors(r metricSetRegister, moduleName, metr
 	return nil
 }
 
+// addProcessors appends processors to the connector properties.
+func (c *Connector) addProcessors(procs []beat.Processor) {
+	if c.processors == nil {
+		c.processors = processors.NewList(nil)
+	}
+
+	for _, p := range procs {
+		c.processors.AddProcessor(p)
+	}
+}
+
 func (c *Connector) Connect() (beat.Client, error) {
 	return c.pipeline.ConnectWith(beat.ClientConfig{
 		Processing: beat.ProcessingConfig{
