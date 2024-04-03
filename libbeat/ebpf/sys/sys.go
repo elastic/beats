@@ -20,11 +20,12 @@
 package sys
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
 	"encoding/binary"
 	"sync"
 	"time"
 
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -48,7 +49,7 @@ func EntityID(pid uint32, start time.Time) (string, error) {
 		return "", err
 	}
 
-	h := system.NewEntityHash()
+	h := sha256.New()
 	if _, err := h.Write([]byte(info.UniqueID)); err != nil {
 		return "", err
 	}
@@ -59,5 +60,9 @@ func EntityID(pid uint32, start time.Time) (string, error) {
 		return "", err
 	}
 
-	return h.Sum(), nil
+	sum := h.Sum(nil)
+	if len(sum) > 12 {
+		sum = sum[:12]
+	}
+	return base64.RawStdEncoding.EncodeToString(sum), nil
 }
