@@ -18,9 +18,9 @@ SET USERPROFILE=%OLD_USERPROFILE%
 echo "Upgrade chocolatey to latest version"
 choco upgrade chocolatey -y
 
-IF NOT EXIST C:\Python38\python.exe (
-    REM Install python 3.8
-    choco install python -y -r --no-progress --version 3.8.5 || exit /b 1
+IF NOT EXIST C:\Python311\python.exe (
+    REM Install python 3.11.3
+    choco install python -y -r --no-progress --version 3.11.3 || exit /b 1
 )
 python --version
 where python
