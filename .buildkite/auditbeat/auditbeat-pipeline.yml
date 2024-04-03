@@ -140,9 +140,6 @@ steps:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
         command: ".buildkite/scripts/packaging/package.sh"
-        notify:
-          - github_commit_status:
-              context: "${BEATS_PROJECT_NAME}/Packaging: Linux X86"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -155,9 +152,6 @@ steps:
           PACKAGES: "docker"
           SNAPSHOT: true
         command: ".buildkite/scripts/packaging/package.sh"
-        notify:
-          - github_commit_status:
-              context: "${BEATS_PROJECT_NAME}/Packaging: ARM"
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
