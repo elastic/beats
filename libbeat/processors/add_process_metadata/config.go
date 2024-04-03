@@ -85,6 +85,10 @@ var defaultFields = mapstr.M{
 			"name": nil,
 			"id":   nil,
 		},
+		"group": mapstr.M{
+			"name": nil,
+			"id":   nil,
+		},
 	},
 	"container": mapstr.M{
 		"id": nil,

@@ -44,11 +44,16 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 		env, _ = e.Environment()
 	}
 
-	username, userid := "", ""
+	username, userid, groupname, groupid := "", "", "", ""
 	if userInfo, err := proc.User(); err == nil {
 		userid = userInfo.UID
 		if u, err := user.LookupId(userInfo.UID); err == nil {
 			username = u.Username
+		}
+
+		groupid = userInfo.GID
+		if g, err := user.LookupGroupId(userInfo.GID); err == nil {
+			groupname = g.Name
 		}
 	}
 
@@ -63,6 +68,8 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 		startTime: info.StartTime,
 		username:  username,
 		userid:    userid,
+		groupname: groupname,
+		groupid:   groupid,
 	}
 	r.fields = r.toMap()
 	return &r, nil
