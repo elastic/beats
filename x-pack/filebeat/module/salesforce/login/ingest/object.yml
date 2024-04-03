@@ -6,7 +6,10 @@ processors:
     target_field: "@timestamp"
     formats:
     - ISO8601
-    ignore_failure: true
+    on_failure:
+    - append:
+        field: error.message
+        value: "Failed to parse EventDate field: {{{_ingest.on_failure_message}}}"
 - rename:
     field: json.AuthServiceId
     target_field: salesforce.login.auth.service_id
@@ -14,18 +17,13 @@ processors:
     ignore_missing: true
 - convert:
     field: json.EvaluationTime
-    type: float
+    type: double
     target_field: salesforce.login.evaluation_time
     ignore_failure: true
     ignore_missing: true
 - rename:
     field: json.ClientVersion
     target_field: salesforce.login.client_version
-    ignore_failure: true
-    ignore_missing: true
-- rename:
-    field: cometd.channel_name
-    target_field: salesforce.login.channel_name
     ignore_failure: true
     ignore_missing: true
 - rename:
@@ -101,21 +99,22 @@ processors:
 - set:
     field: event.outcome
     value: success
-    if: 'ctx?.json?.Status == "Success" && ctx?.json?.Status != null'
-    ignore_failure: true
+    if: 'ctx.json?.Status == "Success"'
     ignore_empty_value: true
 - set:
     field: event.outcome
     value: failure
-    if: 'ctx?.json?.Status != "Success" && ctx?.json?.Status != null'
-    ignore_failure: true
+    if: 'ctx.json?.Status != "Success" && ctx.json?.Status != null'
     ignore_empty_value: true
 - date:
     field: json.CreatedDate
     target_field: event.created
-    formats: 
+    formats:
     - ISO8601
-    ignore_failure: true
+    on_failure:
+    - append:
+        field: error.message
+        value: "Failed to parse CreatedDate field: {{{_ingest.on_failure_message}}}"
 - rename:
     field: json.LoginUrl
     target_field: event.url
@@ -132,20 +131,23 @@ processors:
     ignore_failure: true
     ignore_missing: true
 - set:
-    value: ["{{{json.UserType}}}"]
     field: user.roles
-    ignore_failure: true
+    value: '{{{json.UserType}}}'
+    if: ctx.json?.UserType != null
     ignore_empty_value: true
 - remove:
-      field: json.UserType
-      ignore_failure: true
-      ignore_missing: true
+    field: json.UserType
+    ignore_failure: true
+    ignore_missing: true
 - convert:
     field: json.SourceIp
-    type: ip
     target_field: source.ip
-    ignore_missing: true
+    type: ip
     ignore_failure: true
+    on_failure:
+      - append:
+          field: error.message
+          value: "Failed to convert SourceIp to IP: {{{_ingest.on_failure_message}}}"
 - rename:
     field: json.LoginLatitude
     target_field: source.geo.location.lat
@@ -203,7 +205,7 @@ processors:
     ignore_missing: true
 - rename:
     field: json.AdditionalInfo
-    target_field: http.request.body.content
+    target_field: salesforce.login.additional_info
     ignore_failure: true
     ignore_missing: true
 - rename:
@@ -212,15 +214,19 @@ processors:
     ignore_failure: true
     ignore_missing: true
 - dissect:
-    pattern: "%{tls.version_protocol} %{tls.version}"
     field: json.TlsProtocol
+    pattern: '%{tls.version_protocol} %{tls.version}'
     ignore_failure: true
     ignore_missing: true
+    on_failure:
+      - append:
+          field: error.message
+          value: "Failed to dissect TlsProtocol: {{{_ingest.on_failure_message}}}"
 
 on_failure:
+- append:
+    field: error.message
+    value: "Pipeline failed to process this event: {{{_ingest.on_failure_message}}}"
 - set:
     field: event.kind
     value: pipeline_error
-- append:
-    field: error.message
-    value: '{{{ _ingest.on_failure_message }}}'

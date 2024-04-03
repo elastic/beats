@@ -7,7 +7,7 @@ processors:
     ignore_failure: true
 - set:
     field: event.original
-    value: '{{{message}}}'
+    copy_from: message
     ignore_empty_value: true
     if: 'ctx.event?.original == null'
 - set:
@@ -20,6 +20,7 @@ processors:
     - json.TIMESTAMP_DERIVED
     - json.USER_ID
     target_field: _id
+    ignore_failure: true
     ignore_missing: true
 - set:
     field: ecs.version
@@ -30,90 +31,89 @@ processors:
     field: salesforce.login.document_id
     copy_from: _id
     ignore_empty_value: true
-
 - pipeline:
-    if: ctx.event.provider == "Object"
+    if: ctx.event?.provider == "Object"
     name: '{< IngestPipeline "object" >}'
+    ignore_missing_pipeline: true
 - pipeline:
-    if: ctx.event.provider == "EventLogFile"
+    if: ctx.event?.provider == "EventLogFile"
     name: '{< IngestPipeline "eventlogfile" >}'
-
-- set:
-    field: event.type
-    value: ["info"]
-    ignore_failure: true
-    ignore_empty_value: true
+    ignore_missing_pipeline: true
 - set:
     field: event.kind
     value: event
     ignore_failure: true
-    ignore_empty_value: true
+    if: ctx.event?.kind == null
+- set:
+    field: event.type
+    value: ["info"]
+    ignore_failure: true
+    if: ctx.event?.type == null
 - set:
     field: event.action
     value: login-attempt
     ignore_failure: true
-    ignore_empty_value: true
+    if: ctx.event?.action == null
 - set:
     field: event.category
-    value: [authentication]
+    value: authentication
     ignore_failure: true
-    ignore_empty_value: true
+    if: ctx.event?.category == null
 - set:
     field: event.dataset
     value: salesforce.login
     ignore_failure: true
-    ignore_empty_value: true
+    if: ctx.event?.dataset == null
 - set:
     field: event.module
-    value: "salesforce"
+    value: salesforce
     ignore_failure: true
-    ignore_empty_value: true
+    if: ctx.event?.module == null
 - append:
     field: related.ip
     value: '{{{source.ip}}}'
-    if: ctx?.source?.ip != null
     allow_duplicates: false
     ignore_failure: true
+    if: ctx.source?.ip != null
 - append:
     field: related.ip
     value: '{{{salesforce.login.client_ip}}}'
-    if: 'ctx.salesforce?.login?.client_ip != "Salesforce.com IP" && ctx.salesforce?.login?.client_ip != null'
     allow_duplicates: false
     ignore_failure: true
-
+    if: ctx.salesforce?.login?.client_ip != null && ctx.salesforce.login.client_ip != "Salesforce.com IP"
 - remove:
     field: event.original
-    if: "ctx.tags == null || !(ctx.tags.contains('preserve_original_event'))"
     ignore_failure: true
-    ignore_missing: true
+    if: "ctx.tags == null || !ctx.tags.contains('preserve_original_event')"
 - script:
     description: Drops null/empty values recursively.
     lang: painless
+    ignore_failure: true
     source: |
-        boolean dropEmptyFields(Object object) {
-            if (object == null || object == "") {
-                return true;
-            } else if (object instanceof Map) {
-                ((Map) object).values().removeIf(value -> dropEmptyFields(value));
-                return (((Map) object).size() == 0);
-            } else if (object instanceof List) {
-                ((List) object).removeIf(value -> dropEmptyFields(value));
-                return (((List) object).length == 0);
-            }
-            return false;
+      boolean dropEmptyFields(Object object) {
+        if (object == null || object == "") {
+          return true;
+        } else if (object instanceof Map) {
+          ((Map) object).values().removeIf(value -> dropEmptyFields(value));
+          return ((Map) object).isEmpty();
+        } else if (object instanceof List) {
+          ((List) object).removeIf(value -> dropEmptyFields(value));
+          return ((List) object).isEmpty();
         }
-        dropEmptyFields(ctx);
+        return false;
+      }
+      dropEmptyFields(ctx);
 - remove:
     field:
-      - json
-      - message
-    ignore_failure: true
+    - json
+    - message
     ignore_missing: true
 
 on_failure:
 - set:
     field: event.kind
     value: pipeline_error
+    override: true
 - append:
     field: error.message
     value: '{{{ _ingest.on_failure_message }}}'

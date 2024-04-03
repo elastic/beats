@@ -7,12 +7,19 @@ processors:
     ignore_failure: true
 - set:
     field: event.ingested
-    value: '{{_ingest.timestamp}}'
+    copy_from: _ingest.timestamp
 - rename:
     field: message
     target_field: event.original
+    ignore_failure: true
+    if: ctx.event?.original == null
+- fingerprint:
+    fields:
+    - json.Id
+    - json.CreatedDate
+    target_field: _id
+    ignore_failure: true
     ignore_missing: true
-    if: 'ctx.event?.original == null'
 - set:
     field: salesforce.setup_audit_trail.document_id
     copy_from: _id
@@ -25,38 +32,45 @@ processors:
     - ISO8601
     ignore_failure: true
 
-- rename:
-    field: json.attributes.type
-    target_field: salesforce.setup_audit_trail.event_type
-    ignore_missing: true
+- set:
+    field: salesforce.setup_audit_trail.event_type
+    copy_from: json.attributes.type
+    ignore_empty_value: true
 - rename:
     field: json.CreatedByContext
     target_field: salesforce.setup_audit_trail.created_by_context
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.CreatedById
     target_field: salesforce.setup_audit_trail.created_by_id
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.CreatedByIssuer
     target_field: salesforce.setup_audit_trail.created_by_issuer
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.DelegateUser
     target_field: salesforce.setup_audit_trail.delegate_user
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.Display
     target_field: salesforce.setup_audit_trail.display
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.ResponsibleNamespacePrefix
     target_field: salesforce.setup_audit_trail.responsible_namespace_prefix
     ignore_missing: true
+    ignore_failure: true
 - rename:
     field: json.Section
     target_field: salesforce.setup_audit_trail.section
     ignore_missing: true
+    ignore_failure: true
 
 #######################
 ## ECS Event Mapping ##
@@ -66,7 +80,6 @@ processors:
     field: ecs.version
     value: "8.5.0"
     ignore_failure: true
-    ignore_empty_value: true
 - rename:
     field: json.Id
     target_field: event.id
@@ -77,37 +90,33 @@ processors:
     target_field: event.action
     ignore_missing: true
     ignore_failure: true
-- rename:
-    field: json.attributes.url
-    target_field: event.url
-    ignore_missing: true
-    ignore_failure: true
+- set:
+    field: event.url
+    copy_from: json.attributes.url
+    ignore_empty_value: true
 - date:
     field: json.CreatedDate
     target_field: event.created
-    formats: 
+    formats:
     - ISO8601
     ignore_failure: true
-- set:
+- append:
     field: event.type
-    value: ["admin"]
+    value: admin
+    allow_duplicates: false
     ignore_failure: true
-    ignore_empty_value: true
 - set:
     field: event.kind
-    value: "event"
-    ignore_failure: true
-    ignore_empty_value: true
+    value: event
+    if: ctx.event?.kind == null
 - set:
     field: event.dataset
-    value: "salesforce.setupaudittrail"
-    ignore_failure: true
-    ignore_empty_value: true
+    value: salesforce.setupaudittrail
+    if: ctx.event?.dataset == null
 - set:
     field: event.module
-    value: "salesforce"
-    ignore_failure: true
-    ignore_empty_value: true
+    value: salesforce
+    if: ctx.event?.module == null
 
 ######################
 ## ECS User Mapping ##
@@ -116,12 +125,12 @@ processors:
 - set:
     field: user.id
     copy_from: salesforce.setup_audit_trail.created_by_id
-    ignore_failure: true
     ignore_empty_value: true
 - dissect:
     field: salesforce.setup_audit_trail.display
     pattern: "For user %{user.name}, %{?}"
     ignore_failure: true
+    ignore_missing: true
 
 #############
 ## Cleanup ##
@@ -130,31 +139,33 @@ processors:
 - script:
     description: Drops null/empty values recursively
     lang: painless
+    ignore_failure: true
     source: |
         boolean dropEmptyFields(Object object) {
             if (object == null || object == "") {
                 return true;
             } else if (object instanceof Map) {
                 ((Map) object).values().removeIf(value -> dropEmptyFields(value));
-                return (((Map) object).size() == 0);
+                return ((Map) object).isEmpty();
             } else if (object instanceof List) {
                 ((List) object).removeIf(value -> dropEmptyFields(value));
-                return (((List) object).length == 0);
+                return ((List) object).isEmpty();
             }
             return false;
         }
         dropEmptyFields(ctx);
 - remove:
     field:
-      - json
-      - message
+    - json
+    - message
     ignore_missing: true
 - remove:
     field: event.original
-    if: "ctx.tags == null || !(ctx.tags.contains('preserve_original_event'))"
+    if: "ctx.tags == null || !ctx.tags.contains('preserve_original_event')"
     ignore_failure: true
     ignore_missing: true
+
 on_failure:
 - set:
     field: error.message
-    value: '{{_ingest.on_failure_message}}'
+    value: '{{ _ingest.on_failure_message }}'

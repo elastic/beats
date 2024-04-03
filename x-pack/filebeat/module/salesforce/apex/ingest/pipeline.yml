@@ -7,7 +7,7 @@ processors:
     ignore_failure: true
 - set:
     field: event.original
-    value: '{{{message}}}'
+    copy_from: message
     ignore_empty_value: true
     if: 'ctx.event?.original == null'
 - fingerprint:
@@ -17,6 +17,7 @@ processors:
     - json.TIMESTAMP_DERIVED
     - json.USER_ID
     target_field: _id
+    ignore_failure: true
     ignore_missing: true
 - set:
     field: ecs.version
@@ -25,7 +26,7 @@ processors:
     ignore_empty_value: true
 - set:
     field: event.ingested
-    value: '{{_ingest.timestamp}}'
+    copy_from: _ingest.timestamp
 - set:
     field: salesforce.apex.document_id
     copy_from: _id
@@ -283,26 +284,26 @@ processors:
 - script:
     description: Set request user agent value from user agent numeric code.
     lang: painless
+    params:
+      user_agent_map:
+        "100": "Internet Explorer"
+        "110": "Firefox"
+        "130": "Chrome"
+        "140": "Safari"
+        "150": "Opera"
+        "160": "Android"
+        "170": "Netscape"
+        "180": "Webkit"
+        "190": "Gecko"
+        "230": "Blackberry"
+        "240": "Good Access"
+        "999": "Unknown"
+    if: 'ctx.salesforce?.apex?.user_agent != null'
     ignore_failure: true
     source: |
-        Map map = new HashMap();
-        map.put("100", "Internet Explorer");
-        map.put("110", "Firefox");
-        map.put("130", "Chrome");
-        map.put("140", "Safari");
-        map.put("150", "Opera");
-        map.put("160", "Android");
-        map.put("170", "Netscape");
-        map.put("180", "Webkit");
-        map.put("190", "Gecko");
-        map.put("230", "Blackberry");
-        map.put("240", "Good Access");
-        map.put("999", "Unknown");
-        String temp = map.get(ctx.salesforce.apex.user_agent.substring(0,3));
-        if (temp != null) {
-          ctx.salesforce.apex.user_agent = temp;
-        }
-    if: 'ctx.salesforce?.apex?.user_agent != null'
+      if (params.user_agent_map.containsKey(ctx.salesforce.apex.user_agent.substring(0,3))) {
+        ctx.salesforce.apex.user_agent = params.user_agent_map[ctx.salesforce.apex.user_agent.substring(0,3)];
+      }
 - rename:
     field: json.USER_ID_DERIVED
     target_field: salesforce.apex.user_id_derived
@@ -314,96 +315,94 @@ processors:
 #######################
 
 - set:
-    field: event.dataset
-    value: "salesforce.apex"
-- set:
     field: event.kind
-    value: "event"
-- set:
-    field: event.module
-    value: "salesforce"
-
+    value: event
+    if: ctx.event?.kind == null
 - set:
     field: event.type
-    value: "connection"
-    if: 'ctx?.salesforce?.apex?.event_type != "ApexExecution"'
+    value: connection
+    if: ctx.salesforce?.apex?.event_type != "ApexExecution"
     ignore_failure: true
-    ignore_empty_value: true
-
-- set:
+- append:
     field: event.category
-    value: ["network"]
-    if: 'ctx?.salesforce?.apex?.event_type != "ApexTrigger" && ctx?.salesforce?.apex?.event_type != "ApexExecution"'
+    value: network
+    if: ctx.salesforce?.apex?.event_type != "ApexTrigger" && ctx.salesforce?.apex?.event_type != "ApexExecution"
+    allow_duplicates: false
     ignore_failure: true
-    ignore_empty_value: true
-
 - script:
     description: Set event.action field based on the type of Apex event received.
-    if: ctx?.salesforce?.apex?.event_type != null && ctx?.salesforce?.apex?.event_type != "" 
+    if: ctx.salesforce?.apex?.event_type != null
     lang: painless
+    ignore_failure: true
+    params:
+      event_action_map:
+        apexcallout: apex-callout
+        apextrigger: apex-trigger
+        apexexecution: apex-execution
+        apexrestapi: apex-rest
+        apexsoap: apex-soap
+        externalcustomapexcallout: apex-external-custom-callout
     source: |
-        def eventType = ctx?.salesforce?.apex?.event_type?.toLowerCase();
-        Map referenceTable = [
-            "apexcallout": "apex-callout",
-            "apextrigger": "apex-trigger",
-            "apexexecution": "apex-execution",
-            "apexrestApi": "apex-rest",
-            "apexsoap": "apex-soap",
-            "externalcustomapexcallout": ["apex-external-custom-callout"]
-        ];
-        ctx.event.action = referenceTable[eventType];
-
+      def eventType = ctx?.salesforce?.apex?.event_type?.toLowerCase();
+      if (params.event_action_map.containsKey(eventType)) {
+        ctx.event.action = params.event_action_map[eventType];
+      }
 - convert:
     field: json.TIME
     target_field: event.duration
     type: long
-    if: 'ctx.salesforce?.apex?.event_type == "ApexCallout" && ctx.json?.TIME != ""'
+    if: ctx.salesforce?.apex?.event_type == "ApexCallout" && ctx.json?.TIME != null
     ignore_failure: true
 - convert:
     field: json.EXEC_TIME
     target_field: event.duration
     type: long
-    if: '(ctx.salesforce?.apex?.event_type == "ApexTrigger" || ctx.salesforce?.apex?.event_type == "ApexExecution") && ctx.json?.EXEC_TIME != ""'
+    if: (ctx.salesforce?.apex?.event_type == "ApexTrigger" || ctx.salesforce?.apex?.event_type == "ApexExecution") && ctx.json?.EXEC_TIME != null
     ignore_failure: true
 - convert:
     field: salesforce.apex.run_time
     target_field: event.duration
     type: float
-    if: '(ctx.salesforce?.apex?.event_type == "ApexRestApi" || ctx.salesforce?.apex?.event_type == "ApexSoap") && ctx.salesforce?.apex?.run_time != ""'
+    if: (ctx.salesforce?.apex?.event_type == "ApexRestApi" || ctx.salesforce?.apex?.event_type == "ApexSoap") && ctx.salesforce?.apex?.run_time != null
     ignore_failure: true
 - convert:
     field: json.TOTAL_MS
     target_field: event.duration
     type: long
-    if: 'ctx.salesforce?.apex?.event_type == "ExternalCustomApexCallout" && ctx.json?.TOTAL_MS != ""'
+    if: ctx.salesforce?.apex?.event_type == "ExternalCustomApexCallout" && ctx.json?.TOTAL_MS != null
     ignore_failure: true
-
 
 - set:
     field: event.outcome
-    value: "success"
-    if: '(ctx.json?.SUCCESS == "1" && ctx.json?.SUCCESS != null) || (ctx.json?.STATUS == "1" && ctx.json?.STATUS != null)'
+    value: success
+    if: (ctx.json?.SUCCESS == "1" && ctx.json?.SUCCESS != null) || (ctx.json?.STATUS == "1" && ctx.json?.STATUS != null)
     ignore_failure: true
-    ignore_empty_value: true
 - set:
     field: event.outcome
-    value: "failure"
-    if: '(ctx.json?.SUCCESS != "1" && ctx.json?.SUCCESS != null) || (ctx.json?.STATUS != "1" && ctx.json?.STATUS != null)'
+    value: failure
+    if: (ctx.json?.SUCCESS != "1" && ctx.json?.SUCCESS != null) || (ctx.json?.STATUS != "1" && ctx.json?.STATUS != null)
     ignore_failure: true
-    ignore_empty_value: true
 
 - rename:
     field: json.URL
     target_field: event.url
-    if: 'ctx.salesforce?.apex?.event_type == "ApexCallout"'
+    if: ctx.salesforce?.apex?.event_type == "ApexCallout"
     ignore_missing: true
     ignore_failure: true
 - rename:
     field: salesforce.apex.uri
     target_field: event.url
-    if: 'ctx.salesforce?.apex?.event_type != "ApexCallout" && ctx.salesforce?.apex?.event_type != "ExternalCustomApexCallout"'
+    if: ctx.salesforce?.apex?.event_type != "ApexCallout" && ctx.salesforce?.apex?.event_type != "ExternalCustomApexCallout"
     ignore_missing: true
     ignore_failure: true
+- set:
+    field: event.dataset
+    value: salesforce.apex
+    if: ctx.event?.dataset == null
+- set:
+    field: event.module
+    value: salesforce
+    if: ctx.event?.module == null    
 
 ######################
 ## ECS User Mapping ##
@@ -414,25 +413,24 @@ processors:
     target_field: user.id
     ignore_missing: true
     ignore_failure: true
-- set:
-    value: ["{{{json.USER_TYPE}}}"]
+- append:
     field: user.roles
+    value: "{{{json.USER_TYPE}}}"
+    allow_duplicates: false
     ignore_failure: true
-    ignore_empty_value: true
 - remove:
     field: json.USER_TYPE
-    ignore_failure: true
     ignore_missing: true
 
 ########################
 ## ECS Source Mapping ##
 ########################
 
-# A Salesforce internal IP (such as a login from Salesforce Workbench or AppExchange) is shown as “Salesforce.com IP”
+# A Salesforce internal IP (such as a login from Salesforce Workbench or AppExchange) is shown as "Salesforce.com IP"
 - rename:
     field: json.CLIENT_IP
     target_field: source.ip
-    if: 'ctx.json?.CLIENT_IP != "Salesforce.com IP" && ctx.json?.CLIENT_IP != "" && ctx.json?.CLIENT_IP != null'
+    if: ctx.json?.CLIENT_IP != "Salesforce.com IP" && ctx.json?.CLIENT_IP != null
     ignore_missing: true
     ignore_failure: true
 
@@ -440,11 +438,11 @@ processors:
 ## ECS Source.Geo Mapping ##
 ############################
 
-# A Salesforce internal IP (such as a login from Salesforce Workbench or AppExchange) is shown as “Salesforce.com IP”
+# A Salesforce internal IP (such as a login from Salesforce Workbench or AppExchange) is shown as "Salesforce.com IP"
 - geoip:
     field: source.ip
     target_field: source.geo
-    if: 'ctx.source?.ip != "Salesforce.com IP" && ctx.source?.ip != "" && ctx.source?.ip != null'
+    if: ctx.source?.ip != "Salesforce.com IP" && ctx.source?.ip != null
     ignore_missing: true
     ignore_failure: true
 

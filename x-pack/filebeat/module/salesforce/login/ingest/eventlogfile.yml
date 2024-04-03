@@ -15,25 +15,23 @@ processors:
 - script:
     description: Set api type value from api type character.
     lang: painless
+    params:
+      api_type_map:
+        D: "Apex Class"
+        E: "SOAP Enterprise"
+        I: "SOAP Cross Instance"
+        M: "SOAP Metadata"
+        O: "Old SOAP"
+        P: "SOAP Partner"
+        S: "SOAP Apex"
+        T: "SOAP Tooling"
+        X: "XmlRPC"
+        f: "Feed"
+        l: "Live Agent"
+        p: "SOAP ClientSync"
     ignore_failure: true
     source: |
-        Map map = new HashMap();
-        map.put("D", "Apex Class");
-        map.put("E", "SOAP Enterprise");
-        map.put("I", "SOAP Cross Instance");
-        map.put("M", "SOAP Metadata");
-        map.put("O", "Old SOAP");
-        map.put("P", "SOAP Partner");
-        map.put("S", "SOAP Apex");
-        map.put("T", "SOAP Tooling");
-        map.put("X", "XmlRPC");
-        map.put("f", "Feed");
-        map.put("l", "Live Agent");
-        map.put("p", "SOAP ClientSync");
-        String temp = map.get(ctx.salesforce?.login?.api?.type);
-        if (temp != null) {
-            ctx.salesforce.login.api.type = temp;
-        }
+        ctx.salesforce.login.api.type = params.api_type_map.getOrDefault(ctx.salesforce?.login?.api?.type, ctx.salesforce.login.api.type);
 - rename:
     field: json.AUTHENTICATION_METHOD_REFERENCE
     target_field: salesforce.login.auth.service_id
@@ -47,19 +45,17 @@ processors:
 - script:
     description: Set request status value from request status character.
     lang: painless
+    params:
+      request_status_map:
+        S: "Success"
+        F: "Failure"
+        U: "Undefined"
+        A: "Authorization Error"
+        R: "Redirect"
+        N: "Not Found"
     ignore_failure: true
     source: |
-        Map map = new HashMap();
-        map.put("S", "Success");
-        map.put("F", "Failure");
-        map.put("U", "Undefined");
-        map.put("A", "Authorization Error");
-        map.put("R", "Redirect");
-        map.put("N", "Not Found");
-        String temp = map.get(ctx.salesforce?.login?.request_status);
-        if (temp != null) {
-          ctx.salesforce.login.request_status = temp;
-        }
+        ctx.salesforce.login.request_status = params.request_status_map.getOrDefault(ctx.salesforce?.login?.request_status, ctx.salesforce.login.request_status);
 - rename:
     field: json.API_VERSION
     target_field: salesforce.login.api.version
@@ -113,12 +109,8 @@ processors:
     lang: painless
     ignore_failure: true
     source: |
-        def convert(def nanos){
-            def ms = (nanos/1000000);
-            return ms;
-        }
-        if(ctx.salesforce?.login?.db_time?.total != null || ctx.salesforce?.login?.db_time?.total != ""){
-            ctx.salesforce.login.db_time.total = convert(ctx.salesforce.login.db_time.total);
+        if (ctx.salesforce?.login?.db_time?.total != null) {
+            ctx.salesforce.login.db_time.total = ctx.salesforce.login.db_time.total / 1000000;
         }
 - rename:
     field: json.CLIENT_IP
@@ -163,9 +155,9 @@ processors:
     ignore_failure: true
     ignore_empty_value: true
 - remove:
-      field: json.USER_TYPE
-      ignore_failure: true
-      ignore_missing: true    
+    field: json.USER_TYPE
+    ignore_failure: true
+    ignore_missing: true
 - rename:
     field: json.SOURCE_IP
     target_field: source.ip
