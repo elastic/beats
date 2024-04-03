@@ -9,12 +9,12 @@ elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
 fi
 
 teardown() {
+  popd
   # Teardown resources after using them
   echo "~~~ Terraform Cleanup"
   tf_cleanup "${MODULE_DIR}"              #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
 
   echo "~~~ Docker Compose Cleanup"
-  popd # move back to the parent directory, which is the root of the project and remove lingering containers
   docker-compose -f .ci/jobs/docker-compose.yml down -v         #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
 }
 
@@ -52,7 +52,6 @@ export TF_VAR_CREATED_DATE=$(date +%s)
 export TF_VAR_ENVIRONMENT="ci"
 export TF_VAR_REPO="${REPO}"
 terraform init && terraform apply -auto-approve
-popd
 
 # Run tests
 echo "~~~ Run Cloud Tests for $BEATS_PROJECT_NAME"
