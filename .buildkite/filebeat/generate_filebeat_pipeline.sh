@@ -11,14 +11,13 @@ echo "Add the mandatory and extended tests without additional conditions into th
 if are_conditions_met_mandatory_tests; then
   cat > $pipelineName <<- YAML
 
-
 steps:
   - group: "Filebeat Mandatory Testing"
     key: "mandatory-tests"
 
     steps:
       - label: ":ubuntu: Unit Tests"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: linux/Unit Tests"
@@ -26,12 +25,10 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":ubuntu: Go Integration Tests"
-        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage goIntegTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Go Integration Tests"
@@ -39,12 +36,10 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":ubuntu: Python Integration Tests"
-        command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage pythonIntegTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Python Integration Tests"
@@ -52,18 +47,14 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows:-2016 Unit Tests"
-        key: "windows-2016-unit-tests"
-        command: |
-          Set-Location -Path $BEATS_PROJECT_NAME
-          mage build unitTest
+        key: "windows-2016"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
-              context: "Filebeat: windows 2016/Unit Tests"
+              context: "Filebeat: windows-2016/Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -73,13 +64,11 @@ steps:
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows:-2022 Unit Tests"
-        key: "windows-2022-unit-tests"
-        command: |
-          Set-Location -Path $BEATS_PROJECT_NAME
-          mage build unitTest
+        key: "windows-2022"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
-              context: "Filebeat: windows 2022/Unit Tests"
+              context: "Filebeat: windows-2022/Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -87,7 +76,6 @@ steps:
           disk_size: 200
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
 YAML
 else
   echo "The conditions don't match to requirements for generating pipeline steps."
@@ -110,7 +98,7 @@ if are_conditions_met_macos_tests; then
 
       - label: ":mac: MacOS Unit Tests"
         key: "macos-unit-tests-extended"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: MacOS Unit Tests"
@@ -121,14 +109,14 @@ if are_conditions_met_macos_tests; then
 
       - label: ":mac: MacOS ARM Unit Tests"
         key: "macos-arm64-unit-tests-extended"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: MacOS ARM Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 YAML
 fi
 
@@ -137,7 +125,7 @@ if are_conditions_met_arm_tests; then
 
       - label: ":linux: ARM Ubuntu Unit Tests"
         key: "extended-arm64-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Unit Tests ARM"
@@ -145,7 +133,7 @@ if are_conditions_met_arm_tests; then
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 YAML
 fi
 
@@ -157,9 +145,7 @@ if are_conditions_met_win_tests; then
     steps:
       - label: ":windows: Win 2019 Unit Tests"
         key: "windows-extended-2019"
-        command: |
-          Set-Location -Path $BEATS_PROJECT_NAME
-          mage build unitTest
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Win-2019 Unit Tests"
@@ -173,9 +159,7 @@ if are_conditions_met_win_tests; then
 
       - label: ":windows:-11 Unit Tests"
         key: "windows-extended-11"
-        command: |
-          Set-Location -Path $BEATS_PROJECT_NAME
-          mage build unitTest
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Win-11 Unit Tests"
@@ -189,9 +173,7 @@ if are_conditions_met_win_tests; then
 
       - label: ":windows:-10 Unit Tests"
         key: "windows-extended-10"
-        command: |
-          Set-Location -Path $BEATS_PROJECT_NAME
-          mage build unitTest
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         notify:
           - github_commit_status:
               context: "Filebeat: Win-10 Unit Tests"
@@ -224,8 +206,8 @@ cat >> $pipelineName <<- YAML
 YAML
 fi
 
-echo "+++ Printing dynamic steps"
-cat $pipelineName | yq . -P
+echo "--- Printing dynamic steps"     #TODO: remove if the pipeline is public
+cat $pipelineName
 
 echo "--- Loading dynamic steps"
 buildkite-agent pipeline upload $pipelineName

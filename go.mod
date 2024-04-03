@@ -202,7 +202,7 @@ require (
 	github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.4.0
-	github.com/elastic/elastic-agent-autodiscover v0.6.7
+	github.com/elastic/elastic-agent-autodiscover v0.6.8
 	github.com/elastic/elastic-agent-libs v0.7.5
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
 	github.com/elastic/elastic-agent-system-metrics v0.9.2

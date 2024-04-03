@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+
 export REPO="beats"
 export DOCKER_REGISTRY="docker.elastic.co"
 export SETUP_GVM_VERSION="v0.5.1"
