@@ -5,7 +5,6 @@ env:
   BEATS_PROJECT_NAME: "filebeat"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
-  IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
@@ -15,7 +14,7 @@ env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
 
 steps:
   - input: "Input Parameters"
