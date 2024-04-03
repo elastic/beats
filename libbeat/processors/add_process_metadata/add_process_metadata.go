@@ -68,13 +68,12 @@ type addProcessMetadata struct {
 }
 
 type processMetadata struct {
-	name, title, exe, username, userid string
-	args                               []string
-	env                                map[string]string
-	startTime                          time.Time
-	pid, ppid                          int
-	//
-	fields mapstr.M
+	name, title, exe, username, userid, groupname, groupid string
+	args                                                   []string
+	env                                                    map[string]string
+	startTime                                              time.Time
+	pid, ppid                                              int
+	fields                                                 mapstr.M
 }
 
 type processMetadataProvider interface {
@@ -331,6 +330,16 @@ func (p *processMetadata) toMap() mapstr.M {
 			user["id"] = p.userid
 		}
 		process["owner"] = user
+	}
+	if p.groupname != "" || p.groupid != "" {
+		group := mapstr.M{}
+		if p.groupname != "" {
+			group["name"] = p.groupname
+		}
+		if p.groupid != "" {
+			group["id"] = p.groupid
+		}
+		process["group"] = group
 	}
 
 	return mapstr.M{
