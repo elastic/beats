@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"strconv"
 
@@ -221,13 +220,7 @@ func NewDockerIntegrationRunner(passThroughEnvVars ...string) (*IntegrationRunne
 	if !ok {
 		return nil, fmt.Errorf("docker integration test runner not registered")
 	}
-	passInEnv := make(map[string]string)
-	if path, err := exec.LookPath("docker"); err == nil {
-		dockerDir := filepath.Dir(path)
-		passInEnv["PATH"] = dockerDir
-
-	}
-	return initRunner(tester, cwd, passInEnv, passThroughEnvVars...)
+	return initRunner(tester, cwd, nil, passThroughEnvVars...)
 }
 
 func initRunner(tester IntegrationTester, dir string, passInEnv map[string]string, passThroughEnvVars ...string) (*IntegrationRunner, error) {
