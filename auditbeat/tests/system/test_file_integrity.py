@@ -107,12 +107,12 @@ class Test(BaseTest):
     def _assert_process_data(self, event, backend):
         if backend != "ebpf":
             return
-        assert event["file.process.entity_id"] != ""
-        assert event["file.process.executable"] == "pytest"
-        assert event["file.process.pid"] == os.getpid()
-        assert int(event["file.process.user.id"]) == os.geteuid()
-        assert event["file.process.user.name"] == pwd.getpwuid(os.geteuid()).pw_name
-        assert int(event["file.process.group.id"]) == os.getegid()
+        assert event["process.entity_id"] != ""
+        assert event["process.executable"] == "pytest"
+        assert event["process.pid"] == os.getpid()
+        assert int(event["process.user.id"]) == os.geteuid()
+        assert event["process.user.name"] == pwd.getpwuid(os.geteuid()).pw_name
+        assert int(event["process.group.id"]) == os.getegid()
 
     def _test_non_recursive(self, backend):
         """
