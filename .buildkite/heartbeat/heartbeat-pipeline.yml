@@ -117,5 +117,25 @@ steps:
     depends_on:
       - "heartbeat-mandatory-tests"
     steps:
-      - label: Heartbeat Package pipeline
-        commands: ".buildkite/scripts/packaging/package-step.sh"
+      - label: ":ubuntu: Heartbeat/Packaging Linux X86"
+        key: "heartbeat-package-linux-x86"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          SNAPSHOT: true
+        command: ".buildkite/scripts/packaging/package.sh"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+
+      - label: ":linux: Heartbeat/Packaging Linux ARM"
+        key: "heartbeat-package-linux-arm"
+        env:
+          PLATFORMS: "linux/arm64"
+          PACKAGES: "docker"
+          SNAPSHOT: true
+        command: ".buildkite/scripts/packaging/package.sh"
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
