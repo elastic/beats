@@ -16,12 +16,22 @@ func init() {
 		// The system/package dataset uses librpm which has additional syscall
 		// requirements beyond the default policy from libbeat so whitelist
 		// these additional syscalls.
-		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, "umask", "mremap"); err != nil {
+		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
+			"mremap",
+			"umask",
+		); err != nil {
 			panic(err)
 		}
 
 		// The system/socket dataset uses additional syscalls
-		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall, "perf_event_open", "eventfd2", "ppoll", "mount", "umount2"); err != nil {
+		if err := seccomp.ModifyDefaultPolicy(seccomp.AddSyscall,
+			"eventfd2",
+			"mount",
+			"mq_open", // required for creds kprobe guess trigger.
+			"perf_event_open",
+			"ppoll",
+			"umount2",
+		); err != nil {
 			panic(err)
 		}
 	}

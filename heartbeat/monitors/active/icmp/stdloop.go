@@ -165,7 +165,7 @@ func (l *stdICMPLoop) runICMPRecv(conn *icmp.PacketConn, proto int) {
 		bytes := make([]byte, 512)
 		err := conn.SetReadDeadline(time.Now().Add(time.Second))
 		if err != nil {
-			logp.L().Error("could not set read deadline for ICMP: %w", err)
+			logp.L().Errorf("could not set read deadline for ICMP: %w", err)
 			return
 		}
 		_, addr, err := conn.ReadFrom(bytes)

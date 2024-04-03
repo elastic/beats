@@ -5,6 +5,9 @@
     "Revision": "7",
     "DesiredStatus": "RUNNING",
     "KnownStatus": "ACTIVATING",
+    "Limits": {
+      "Memory": 7168
+    },
     "Containers": [{
         "DockerId": "1234",
         "Name": "query-metadata",
@@ -14,6 +17,9 @@
             "com.amazonaws.ecs.container-name": "query-metadata",
             "com.amazonaws.ecs.task-arn": "arn:aws:ecs:us-west-2:111122223333:task/default/febee046097849aba589d4435207c04a",
             "com.amazonaws.ecs.task-definition-family": "query-metadata",
-            "com.amazonaws.ecs.task-definition-version": "7"}
+            "com.amazonaws.ecs.task-definition-version": "7"},
+        "Limits": {
+            "Memory": 3328
+        }
     }]
 }

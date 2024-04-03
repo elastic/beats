@@ -168,3 +168,21 @@ func (c *conf) Validate() error {
 		return errors.New("dataset must be 'all', 'users', 'devices' or empty")
 	}
 }
+
+func (c *conf) wantUsers() bool {
+	switch strings.ToLower(c.Dataset) {
+	case "", "all", "users":
+		return true
+	default:
+		return false
+	}
+}
+
+func (c *conf) wantDevices() bool {
+	switch strings.ToLower(c.Dataset) {
+	case "", "all", "devices":
+		return true
+	default:
+		return false
+	}
+}

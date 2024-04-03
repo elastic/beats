@@ -1,9 +1,9 @@
 {
     "@timestamp": "2019-03-01T08:05:34.853Z",
     "container": {
-        "id": "c260e83eedc09fc53e541d1ce22f4f75c3d316341ccb7b8f028abdfb9fc9945f",
+        "id": "eb97eb439a6c71ec0d24241d23c87b019776e770d09a3026a518b6910275ed5d",
         "image": {
-            "name": "registry.k8s.io/kube-proxy:v1.26.3"
+            "name": "registry.k8s.io/etcd:3.5.7-0"
         },
         "runtime": "containerd"
     },
@@ -14,8 +14,18 @@
     },
     "kubernetes": {
         "container": {
-            "id": "c260e83eedc09fc53e541d1ce22f4f75c3d316341ccb7b8f028abdfb9fc9945f",
-            "name": "kube-proxy",
+            "cpu": {
+                "request": {
+                    "cores": 0.1
+                }
+            },
+            "id": "eb97eb439a6c71ec0d24241d23c87b019776e770d09a3026a518b6910275ed5d",
+            "memory": {
+                "request": {
+                    "bytes": 104857600
+                }
+            },
+            "name": "etcd",
             "status": {
                 "phase": "running",
                 "ready": true,
@@ -27,7 +37,7 @@
             "name": "kind-control-plane"
         },
         "pod": {
-            "name": "kube-proxy-nw7gg"
+            "name": "etcd-kind-control-plane"
         }
     },
     "metricset": {

@@ -72,6 +72,20 @@
               type: long
             - name: used_in_bytes
               type: long
+        - name: cpuacct
+          type: group
+          fields:
+            - name: control_group
+              type: keyword
+            - name: usage_nanos
+              type: long
+        - name: cgroup_memory
+          type: group
+          fields:
+            - name: current_in_bytes
+              type: long
+            - name: swap_current_in_bytes
+              type: long
         - name: load
           type: group
           fields:
@@ -91,6 +105,10 @@
         Process metrics
       fields:
       - name: memory.resident_set_size.bytes
+        type: long
+      - name: memory.array_buffers.bytes
+        type: long
+      - name: memory.external.bytes
         type: long
       - name: uptime.ms
         type: long

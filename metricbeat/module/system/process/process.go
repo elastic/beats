@@ -32,7 +32,7 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
-var debugf = logp.MakeDebug("system.process")
+var debugf = logp.NewLogger("system.process").Debugf
 
 func init() {
 	mb.Registry.MustAddMetricSet("system", "process", New,

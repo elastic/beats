@@ -35,6 +35,14 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+func init() {
+	// Disable IMDS when the real AWS SDK IMDS client is used,
+	// so tests are isolated from the environment. Otherwise,
+	// tests for non-EC2 providers may fail when the tests are
+	// run within an EC2 VM.
+	os.Setenv("AWS_EC2_METADATA_DISABLED", "true")
+}
+
 type MockIMDSClient struct {
 	GetInstanceIdentityDocumentFunc func(ctx context.Context, params *imds.GetInstanceIdentityDocumentInput, optFns ...func(*imds.Options)) (*imds.GetInstanceIdentityDocumentOutput, error)
 }
@@ -52,7 +60,7 @@ func (e *MockEC2Client) DescribeTags(ctx context.Context, params *ec2.DescribeTa
 }
 
 func TestMain(m *testing.M) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 	code := m.Run()
 	os.Exit(code)
 }
@@ -153,11 +161,11 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
 					"service":           mapstr.M{"name": "EC2"},
-					"orchestrator": mapstr.M{
-						"cluster": mapstr.M{
-							"name": clusterNameValue,
-							"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
-						},
+				},
+				"orchestrator": mapstr.M{
+					"cluster": mapstr.M{
+						"name": clusterNameValue,
+						"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
 					},
 				},
 			},
@@ -197,6 +205,12 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 			expectedEvent: mapstr.M{
 				"cloud": mapstr.M{
 					"instance": mapstr.M{"id": instanceIDDoc2},
+				},
+				"orchestrator": mapstr.M{
+					"cluster": mapstr.M{
+						"name": clusterNameValue,
+						"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
+					},
 				},
 			},
 		},
@@ -244,11 +258,11 @@ func TestRetrieveAWSMetadataEC2(t *testing.T) {
 					"region":            regionDoc1,
 					"availability_zone": availabilityZoneDoc1,
 					"service":           mapstr.M{"name": "EC2"},
-					"orchestrator": mapstr.M{
-						"cluster": mapstr.M{
-							"name": clusterNameValue,
-							"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
-						},
+				},
+				"orchestrator": mapstr.M{
+					"cluster": mapstr.M{
+						"name": clusterNameValue,
+						"id":   fmt.Sprintf("arn:aws:eks:%s:%s:cluster/%s", regionDoc1, accountIDDoc1, clusterNameValue),
 					},
 				},
 			},

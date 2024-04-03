@@ -32,6 +32,9 @@ jobs:
         with:
           go-version-file: .go-version
 
+      - name: Install Apt Package
+        run: sudo apt-get update && sudo apt-get install -y libpcap-dev
+
       - name: golangci-lint
         env:
           GOOS: ${{ matrix.GOOS }}
@@ -39,7 +42,7 @@ jobs:
         uses: golangci/golangci-lint-action@v3
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
-          version: v1.51.2
+          version: v1.55.2
 
           # Give the job more time to execute.
           # Regarding `--whole-files`, the linter is supposed to support linting of changed a patch only but,

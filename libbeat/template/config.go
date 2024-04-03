@@ -42,8 +42,9 @@ type TemplateConfig struct {
 
 // TemplateSettings are part of the Elasticsearch template and hold index and source specific information.
 type TemplateSettings struct {
-	Index  map[string]interface{} `config:"index"`
-	Source map[string]interface{} `config:"_source"`
+	Index     map[string]interface{} `config:"index"`
+	Source    map[string]interface{} `config:"_source"`
+	Lifecycle map[string]interface{} `config:"lifecycle"`
 }
 
 // DefaultConfig for index template

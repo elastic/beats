@@ -19,8 +19,8 @@ package readfile
 
 import (
 	"fmt"
-	"os"
 
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -30,14 +30,14 @@ import (
 type FileMetaReader struct {
 	reader      reader.Reader
 	path        string
-	fi          os.FileInfo
+	fi          file.ExtendedFileInfo
 	fingerprint string
 	offset      int64
 }
 
 // New creates a new Encode reader from input reader by applying
 // the given codec.
-func NewFilemeta(r reader.Reader, path string, fi os.FileInfo, fingerprint string, offset int64) reader.Reader {
+func NewFilemeta(r reader.Reader, path string, fi file.ExtendedFileInfo, fingerprint string, offset int64) reader.Reader {
 	return &FileMetaReader{r, path, fi, fingerprint, offset}
 }
 

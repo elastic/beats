@@ -45,7 +45,7 @@ func TestData(t *testing.T) {
 }
 
 func TestDpkg(t *testing.T) {
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	defer abtest.SetupDataDir(t)()
 
@@ -104,7 +104,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 		"python2.7-minimal": 0,
 	}
 
-	_ = logp.TestingSetup()
+	logp.TestingSetup()
 
 	defer abtest.SetupDataDir(t)()
 

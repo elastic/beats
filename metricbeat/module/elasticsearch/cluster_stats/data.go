@@ -76,7 +76,8 @@ var (
 				"primaries": c.Int("primaries"),
 			}),
 			"store": c.Dict("store", s.Schema{
-				"size": s.Object{"bytes": c.Int("size_in_bytes")},
+				"size":                s.Object{"bytes": c.Int("size_in_bytes")},
+				"total_data_set_size": s.Object{"bytes": c.Int("total_data_set_size_in_bytes", s.Optional)},
 			}),
 			"fielddata": c.Dict("fielddata", s.Schema{
 				"memory": s.Object{

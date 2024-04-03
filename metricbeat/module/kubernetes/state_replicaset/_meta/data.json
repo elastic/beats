@@ -6,15 +6,15 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "kube-system",
+        "namespace": "local-path-storage",
         "replicaset": {
-            "name": "coredns-787d4945fb",
+            "name": "local-path-provisioner-6bc4bddd6b",
             "replicas": {
-                "available": 2,
-                "desired": 2,
-                "labeled": 2,
+                "available": 1,
+                "desired": 1,
+                "labeled": 1,
                 "observed": 1,
-                "ready": 2
+                "ready": 1
             }
         }
     },

@@ -10,7 +10,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233175700Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -99,7 +98,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233202400Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -188,7 +186,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233212800Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -283,7 +280,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233221700Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -372,7 +368,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233234500Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -460,7 +455,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233247200Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -548,7 +542,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233259700Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -636,7 +629,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233272300Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -724,7 +716,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233284800Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -815,7 +806,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233299300Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -904,7 +894,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233312100Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -999,7 +988,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233322700Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -1088,7 +1076,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233331Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -1177,7 +1164,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233343700Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -1266,7 +1252,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233356Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -1355,7 +1340,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233386300Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -1444,7 +1428,6 @@
         "authentication"
       ],
       "code": "4624",
-      "ingested": "2022-06-08T06:21:08.233400100Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -1533,7 +1516,6 @@
         "authentication"
       ],
       "code": "4625",
-      "ingested": "2022-06-08T06:21:08.233408800Z",
       "kind": "event",
       "module": "security",
       "outcome": "failure",

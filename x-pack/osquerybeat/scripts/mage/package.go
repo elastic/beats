@@ -47,6 +47,12 @@ func CustomizePackaging() {
 			Mode:   0640,
 			Source: filepath.Join(distro.GetDataInstallDir(distro.OSArch{OS: args.OS, Arch: arch}), "certs", "certs.pem"),
 		}
+
 		args.Spec.Files[filepath.Join("certs", "certs.pem")] = certsFile
+
+		// Augeas lenses are not available for Windows
+		if args.OS != "windows" {
+			args.Spec.Files["lenses"] = devtools.PackageFile{Source: filepath.Join(distro.GetDataInstallDir(distro.OSArch{OS: args.OS, Arch: arch}), "lenses")}
+		}
 	}
 }

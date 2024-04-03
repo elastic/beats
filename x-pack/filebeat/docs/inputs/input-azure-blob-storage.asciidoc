@@ -9,8 +9,6 @@
 <titleabbrev>Azure Blob Storage</titleabbrev>
 ++++
 
-Beta[Input]
-
 Use the `azure blob storage input` to read content from files stored in containers which reside on your Azure Cloud.
 The input can be configured to work with and without polling, though currently, if polling is disabled it will only 
 perform a one time passthrough, list the file contents and end the process. Polling is generally recommented for most cases
@@ -26,8 +24,6 @@ even though it can get expensive with dealing with a very large number of files.
 
 3.  If any major error occurs which stops the main thread, the logs will be appropriately generated,
     describing said error.
-
-NOTE: In the latest update the partial save mechanism has been removed for now due to concurrency issues, but will be added back in the future.
 
 [id="supported-types"]
 NOTE: NOTE: Currently only `JSON` and `NDJSON` are supported blob/file formats. Blobs/files may be also be gzip compressed.
@@ -364,4 +360,4 @@ In this configuration even though we have specified `max_workers = 10`, `poll = 
 will override these values with their own respective values which are defined as part of their sub attibutes.
 
 
-NOTE: Since this is a beta input, any feedback is welcome, which will help us optimise and make it better going forward. 
+NOTE: Any feedback is welcome which will help us further optimize this input. Please feel free to open a github issue for any bugs or feature requests.

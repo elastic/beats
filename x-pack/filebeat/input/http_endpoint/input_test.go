@@ -25,6 +25,7 @@ import (
 
 var serverPoolTests = []struct {
 	name    string
+	method  string
 	cfgs    []*httpEndpoint
 	events  []target
 	want    []mapstr.M
@@ -35,6 +36,60 @@ var serverPoolTests = []struct {
 		cfgs: []*httpEndpoint{{
 			addr: "127.0.0.1:9001",
 			config: config{
+				ResponseCode:  200,
+				ResponseBody:  `{"message": "success"}`,
+				ListenAddress: "127.0.0.1",
+				ListenPort:    "9001",
+				URL:           "/",
+				Prefix:        "json",
+				ContentType:   "application/json",
+			},
+		}},
+		events: []target{
+			{url: "http://127.0.0.1:9001/", event: `{"a":1}`},
+			{url: "http://127.0.0.1:9001/", event: `{"b":2}`},
+			{url: "http://127.0.0.1:9001/", event: `{"c":3}`},
+		},
+		want: []mapstr.M{
+			{"json": mapstr.M{"a": int64(1)}},
+			{"json": mapstr.M{"b": int64(2)}},
+			{"json": mapstr.M{"c": int64(3)}},
+		},
+	},
+	{
+		name:   "put",
+		method: http.MethodPut,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				Method:        http.MethodPut,
+				ResponseCode:  200,
+				ResponseBody:  `{"message": "success"}`,
+				ListenAddress: "127.0.0.1",
+				ListenPort:    "9001",
+				URL:           "/",
+				Prefix:        "json",
+				ContentType:   "application/json",
+			},
+		}},
+		events: []target{
+			{url: "http://127.0.0.1:9001/", event: `{"a":1}`},
+			{url: "http://127.0.0.1:9001/", event: `{"b":2}`},
+			{url: "http://127.0.0.1:9001/", event: `{"c":3}`},
+		},
+		want: []mapstr.M{
+			{"json": mapstr.M{"a": int64(1)}},
+			{"json": mapstr.M{"b": int64(2)}},
+			{"json": mapstr.M{"c": int64(3)}},
+		},
+	},
+	{
+		name:   "patch",
+		method: http.MethodPatch,
+		cfgs: []*httpEndpoint{{
+			addr: "127.0.0.1:9001",
+			config: config{
+				Method:        http.MethodPatch,
 				ResponseCode:  200,
 				ResponseBody:  `{"message": "success"}`,
 				ListenAddress: "127.0.0.1",
@@ -249,7 +304,7 @@ func TestServerPool(t *testing.T) {
 				}
 			}
 			for i, e := range test.events {
-				resp, err := http.Post(e.url, "application/json", strings.NewReader(e.event))
+				resp, err := doRequest(test.method, e.url, "application/json", strings.NewReader(e.event))
 				if err != nil {
 					t.Fatalf("failed to post event #%d: %v", i, err)
 				}
@@ -286,6 +341,18 @@ func TestServerPool(t *testing.T) {
 			wg.Wait()
 		})
 	}
+}
+
+func doRequest(method, url, contentType string, body io.Reader) (*http.Response, error) {
+	if method == "" {
+		method = http.MethodPost
+	}
+	req, err := http.NewRequest(method, url, body)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Content-Type", contentType)
+	return http.DefaultClient.Do(req)
 }
 
 // Is is included to simplify testing, but is not exposed to avoid unwanted error

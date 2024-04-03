@@ -51,6 +51,8 @@ const (
 	processors   = "processors"
 	json         = "json"
 	pipeline     = "pipeline"
+	ndjson       = "ndjson"
+	parsers      = "parsers"
 )
 
 // validModuleNames to sanitize user input
@@ -115,10 +117,20 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 			continue
 		}
 
+		inputType, _ := config.String("type", -1)
 		tempCfg := mapstr.M{}
-		mline := l.getMultiline(h)
-		if len(mline) != 0 {
-			kubernetes.ShouldPut(tempCfg, multiline, mline, l.log)
+
+		if mline := l.getMultiline(h); len(mline) != 0 {
+			if inputType == harvester.FilestreamType {
+				// multiline options should be under multiline parser in filestream input
+				parsersTempCfg := []mapstr.M{}
+				mlineTempCfg := mapstr.M{}
+				kubernetes.ShouldPut(mlineTempCfg, multiline, mline, l.log)
+				parsersTempCfg = append(parsersTempCfg, mlineTempCfg)
+				kubernetes.ShouldPut(tempCfg, parsers, parsersTempCfg, l.log)
+			} else {
+				kubernetes.ShouldPut(tempCfg, multiline, mline, l.log)
+			}
 		}
 		if ilines := l.getIncludeLines(h); len(ilines) != 0 {
 			kubernetes.ShouldPut(tempCfg, includeLines, ilines, l.log)
@@ -136,14 +148,24 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 		}
 
 		if jsonOpts := l.getJSONOptions(h); len(jsonOpts) != 0 {
-			kubernetes.ShouldPut(tempCfg, json, jsonOpts, l.log)
+			if inputType == harvester.FilestreamType {
+				// json options should be under ndjson parser in filestream input
+				parsersTempCfg := []mapstr.M{}
+				ndjsonTempCfg := mapstr.M{}
+				kubernetes.ShouldPut(ndjsonTempCfg, ndjson, jsonOpts, l.log)
+				parsersTempCfg = append(parsersTempCfg, ndjsonTempCfg)
+				kubernetes.ShouldPut(tempCfg, parsers, parsersTempCfg, l.log)
+			} else {
+				kubernetes.ShouldPut(tempCfg, json, jsonOpts, l.log)
+			}
+
 		}
 		// Merge config template with the configs from the annotations
-		if err := config.Merge(tempCfg); err != nil {
-			logp.Debug("hints.builder", "config merge failed with error: %v", err)
+		// AppendValues option is used to append arrays from annotations to existing arrays while merging
+		if err := config.MergeWithOpts(tempCfg, ucfg.AppendValues); err != nil {
+			l.log.Debugf("hints.builder", "config merge failed with error: %v", err)
 			continue
 		}
-
 		module := l.getModule(hints)
 		if module != "" {
 			moduleConf := map[string]interface{}{
@@ -153,9 +175,17 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 			filesets := l.getFilesets(hints, module)
 			for fileset, cfg := range filesets {
 				filesetConf, _ := conf.NewConfigFrom(config)
-
-				if inputType, _ := filesetConf.String("type", -1); inputType == harvester.ContainerType {
+				if inputType == harvester.ContainerType {
 					_ = filesetConf.SetString("stream", -1, cfg.Stream)
+				} else if inputType == harvester.FilestreamType {
+					filestreamContainerParser := map[string]interface{}{
+						"container": map[string]interface{}{
+							"stream": cfg.Stream,
+							"format": "auto",
+						},
+					}
+					parserCfg, _ := conf.NewConfigFrom(filestreamContainerParser)
+					_ = filesetConf.SetChild("parsers", 0, parserCfg)
 				} else {
 					_ = filesetConf.SetString("containers.stream", -1, cfg.Stream)
 				}
@@ -163,14 +193,13 @@ func (l *logHints) CreateConfig(event bus.Event, options ...ucfg.Option) []*conf
 				moduleConf[fileset+".enabled"] = cfg.Enabled
 				moduleConf[fileset+".input"] = filesetConf
 
-				logp.Debug("hints.builder", "generated config %+v", moduleConf)
+				l.log.Debugf("hints.builder", "generated config %+v", moduleConf)
 			}
 			config, _ = conf.NewConfigFrom(moduleConf)
 		}
-		logp.Debug("hints.builder", "generated config %+v", config)
+		l.log.Debugf("hints.builder", "generated config %+v of logHints %+v", config, l)
 		configs = append(configs, config)
 	}
-
 	// Apply information in event to the template to generate the final config
 	return template.ApplyConfigTemplate(event, configs)
 }
@@ -221,7 +250,7 @@ func (l *logHints) getFilesets(hints mapstr.M, module string) map[string]*filese
 
 	moduleFilesets, err := l.registry.ModuleAvailableFilesets(module)
 	if err != nil {
-		logp.Err("Error retrieving module filesets: %+v", err)
+		l.log.Errorf("Error retrieving module filesets: %+v", err)
 		return nil
 	}
 

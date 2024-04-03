@@ -153,10 +153,10 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 		return nil, err
 	}
 
-	watcher := &procs.ProcessesWatcher{}
+	var watch procs.ProcessesWatcher
 	// Enable the process watcher only if capturing live traffic
 	if config.Interfaces[0].File == "" {
-		err = watcher.Init(config.Procs)
+		err = watch.Init(config.Procs)
 		if err != nil {
 			logp.Critical(err.Error())
 			return nil, err
@@ -165,17 +165,11 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 		logp.Info("Process watcher disabled when file input is used")
 	}
 
-	logp.Debug("main", "Initializing protocol plugins")
-	protocols := protos.NewProtocols()
-	err = protocols.Init(false, publisher, watcher, config.Protocols, config.ProtocolsList)
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize protocol analyzers: %w", err)
-	}
-	flows, err := setupFlows(pipeline, watcher, config)
+	flows, err := setupFlows(pipeline, &watch, config)
 	if err != nil {
 		return nil, err
 	}
-	sniffer, err := setupSniffer(id, config, protocols, sniffer.DecodersFor(id, publisher, protocols, watcher, flows, config))
+	sniffer, err := setupSniffer(id, config, publisher, &watch, flows)
 	if err != nil {
 		return nil, err
 	}
@@ -185,7 +179,7 @@ func (p *processorFactory) Create(pipeline beat.PipelineConnector, cfg *conf.C) 
 
 // setupFlows returns a *flows.Flows that will publish to the provided pipeline,
 // configured with cfg and process enrichment via the provided watcher.
-func setupFlows(pipeline beat.Pipeline, watcher *procs.ProcessesWatcher, cfg config.Config) (*flows.Flows, error) {
+func setupFlows(pipeline beat.Pipeline, watch *procs.ProcessesWatcher, cfg config.Config) (*flows.Flows, error) {
 	if !cfg.Flows.IsEnabled() {
 		return nil, nil
 	}
@@ -211,10 +205,10 @@ func setupFlows(pipeline beat.Pipeline, watcher *procs.ProcessesWatcher, cfg con
 		return nil, err
 	}
 
-	return flows.NewFlows(client.PublishAll, watcher, cfg.Flows)
+	return flows.NewFlows(client.PublishAll, watch, cfg.Flows)
 }
 
-func setupSniffer(id string, cfg config.Config, protocols *protos.ProtocolsStruct, decoders sniffer.Decoders) (*sniffer.Sniffer, error) {
+func setupSniffer(id string, cfg config.Config, pub *publish.TransactionPublisher, watch *procs.ProcessesWatcher, flows *flows.Flows) (*sniffer.Sniffer, error) {
 	icmp, err := cfg.ICMP()
 	if err != nil {
 		return nil, err
@@ -237,7 +231,15 @@ func setupSniffer(id string, cfg config.Config, protocols *protos.ProtocolsStruc
 		interfaces = append(interfaces, iface)
 	}
 
+	logp.Debug("main", "Initializing protocol plugins")
+	decoders := make(map[string]sniffer.Decoders)
 	for i, iface := range interfaces {
+		protocols := protos.NewProtocols()
+		err = protocols.InitFiltered(false, iface.Device, pub, watch, cfg.Protocols, cfg.ProtocolsList)
+		if err != nil {
+			return nil, fmt.Errorf("failed to initialize protocol analyzers for %s: %w", iface.Device, err)
+		}
+		decoders[iface.Device] = sniffer.DecodersFor(id, pub, protocols, watch, flows, cfg)
 		if iface.BpfFilter != "" || cfg.Flows.IsEnabled() {
 			continue
 		}

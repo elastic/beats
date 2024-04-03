@@ -19,7 +19,6 @@ package file_integrity
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"runtime"
@@ -27,20 +26,23 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNewMetadata(t *testing.T) {
-	f, err := ioutil.TempFile("", "metadata")
+	// Can be removed after https://github.com/elastic/beats/issues/37701 is solved
+	skipOnBuildkiteDarwin(t, "Group check")
+
+	f, err := os.CreateTemp(t.TempDir(), "metadata")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(f.Name())
 
 	_, err = f.WriteString("metadata test")
 	if err != nil {
 		t.Fatal(err)
 	}
-	f.Sync()
+	require.NoError(t, f.Sync())
 	f.Close()
 
 	info, err := os.Lstat(f.Name())
@@ -96,17 +98,19 @@ func TestNewMetadata(t *testing.T) {
 }
 
 func TestSetUIDSetGIDBits(t *testing.T) {
-	f, err := ioutil.TempFile("", "setuid")
+	// Can be removed after https://github.com/elastic/beats/issues/37701 is solved
+	skipOnBuildkiteDarwin(t, "Wheel permission issue")
+
+	f, err := os.CreateTemp(t.TempDir(), "setuid")
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.Remove(f.Name())
 
 	_, err = f.WriteString("metadata test")
 	if err != nil {
 		t.Fatal(err)
 	}
-	f.Sync()
+	require.NoError(t, f.Sync())
 	f.Close()
 
 	info, err := os.Lstat(f.Name())
@@ -148,5 +152,11 @@ func TestSetUIDSetGIDBits(t *testing.T) {
 
 		assert.Equal(t, flags&os.ModeSetuid != 0, meta.SetUID)
 		assert.Equal(t, flags&os.ModeSetgid != 0, meta.SetGID)
+	}
+}
+
+func skipOnBuildkiteDarwin(t testing.TB, reason string) {
+	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "darwin" {
+		t.Skip("Skip test on Buildkite MacOS: Wheel permission while expected staff")
 	}
 }

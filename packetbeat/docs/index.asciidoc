@@ -22,6 +22,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :linux_os:
 :docker_platform:
 :win_os:
+:no_cache_processor:
 :no_decode_cef_processor:
 :no_decode_csv_fields_processor:
 :no_parse_aws_vpc_flow_log_processor:

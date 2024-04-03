@@ -114,6 +114,7 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 	}
 
 	for len(events) > 0 {
+
 		// check if we need to reconnect
 		if c.ticker != nil {
 			select {
@@ -136,12 +137,14 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 			err error
 		)
 
+		begin := time.Now()
 		if c.win == nil {
 			n, err = c.sendEvents(events)
 		} else {
 			n, err = c.publishWindowed(events)
 		}
-
+		took := time.Since(begin)
+		st.ReportLatency(took)
 		c.log.Debugf("%v events out of %v events sent to logstash host %s. Continue sending",
 			n, len(events), c.Host())
 
@@ -163,6 +166,7 @@ func (c *syncClient) Publish(_ context.Context, batch publisher.Batch) error {
 
 			return err
 		}
+
 	}
 
 	batch.ACK()

@@ -59,24 +59,6 @@ type metadataCollector struct {
 	logger    *logp.Logger
 }
 
-func (s *metadataCollector) ID(ctx context.Context, in *gcp.MetadataCollectorInputData) (string, error) {
-	metadata, err := s.Metadata(ctx, in.TimeSeries)
-	if err != nil {
-		return "", err
-	}
-
-	metadata.ECS.Update(metadata.Labels)
-	if in.Timestamp != nil {
-		_, _ = metadata.ECS.Put("timestamp", in.Timestamp)
-	} else if in.Point != nil {
-		_, _ = metadata.ECS.Put("timestamp", in.Point.Interval.EndTime)
-	} else {
-		return "", fmt.Errorf("no timestamp information found")
-	}
-
-	return metadata.ECS.String(), nil
-}
-
 // Metadata implements googlecloud.MetadataCollector to the known set of labels from a Redis TimeSeries single point of data.
 func (s *metadataCollector) Metadata(ctx context.Context, resp *monitoringpb.TimeSeries) (gcp.MetadataCollectorData, error) {
 	metadata, err := s.instanceMetadata(ctx, s.instanceID(resp), s.instanceRegion(resp))

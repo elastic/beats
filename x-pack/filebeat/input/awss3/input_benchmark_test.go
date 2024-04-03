@@ -256,7 +256,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 }
 
 func TestBenchmarkInputSQS(t *testing.T) {
-	_ = logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
+	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputSQS(t, 1),
@@ -393,7 +393,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 }
 
 func TestBenchmarkInputS3(t *testing.T) {
-	_ = logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
+	logp.TestingSetup(logp.WithLevel(logp.InfoLevel))
 
 	results := []testing.BenchmarkResult{
 		benchmarkInputS3(t, 1),

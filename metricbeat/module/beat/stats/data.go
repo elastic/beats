@@ -75,7 +75,8 @@ var (
 			"pipeline": c.Dict("pipeline", s.Schema{
 				"clients": c.Int("clients"),
 				"queue": c.Dict("queue", s.Schema{
-					"acked": c.Int("acked"),
+					"acked":      c.Int("acked"),
+					"max_events": c.Int("max_events"),
 				}),
 				"events": c.Dict("events", s.Schema{
 					"active":    c.Int("active"),

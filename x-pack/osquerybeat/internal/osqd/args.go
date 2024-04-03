@@ -92,6 +92,9 @@ var protectedFlags = Flags{
 
 	// certificates to use for curl table for example
 	"tls_server_certs": "certs.pem",
+
+	// Augeas lenses are bundled with osquery distributions
+	"augeas_lenses": "lenses",
 }
 
 func init() {

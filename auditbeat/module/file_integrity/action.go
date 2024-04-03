@@ -155,7 +155,7 @@ func (action Action) InOrder(existedBefore, existsNow bool) ActionArray {
 	hasConfigChange := action&ConfigChange != 0
 	hasUpdate := action&Updated != 0
 	hasAttrMod := action&AttributesModified != 0
-	action = Action(int(action) & int(^(ConfigChange | AttributesModified)))
+	action = Action(int(action) &^ (ConfigChange | AttributesModified))
 	if hasAttrMod {
 		action |= Updated
 	}

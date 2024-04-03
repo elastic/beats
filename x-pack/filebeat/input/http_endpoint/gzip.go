@@ -6,6 +6,7 @@ package http_endpoint
 
 import (
 	"compress/gzip"
+	"errors"
 	"io"
 	"sync"
 )
@@ -18,15 +19,16 @@ var gzipDecoderPool = sync.Pool{
 
 type pooledGzipReader struct {
 	Reader *gzip.Reader
+	closer io.Closer
 }
 
-func newPooledGzipReader(r io.Reader) (*pooledGzipReader, error) {
+func newPooledGzipReader(r io.ReadCloser) (*pooledGzipReader, error) {
 	gzipReader := gzipDecoderPool.Get().(*gzip.Reader)
 	if err := gzipReader.Reset(r); err != nil {
 		gzipDecoderPool.Put(gzipReader)
 		return nil, err
 	}
-	return &pooledGzipReader{Reader: gzipReader}, nil
+	return &pooledGzipReader{Reader: gzipReader, closer: r}, nil
 }
 
 // Read implements io.Reader, reading uncompressed bytes from its underlying Reader.
@@ -34,13 +36,14 @@ func (r *pooledGzipReader) Read(b []byte) (int, error) {
 	return r.Reader.Read(b)
 }
 
-// Close closes the Reader. It does not close the underlying io.Reader.
+// Close closes the Reader and the underlying source.
 // In order for the GZIP checksum to be verified, the reader must be
 // fully consumed until the io.EOF.
 //
 // After this call the reader should not be reused because it is returned to the pool.
 func (r *pooledGzipReader) Close() error {
 	err := r.Reader.Close()
+	err = errors.Join(err, r.closer.Close())
 	gzipDecoderPool.Put(r.Reader)
 	r.Reader = nil
 	return err

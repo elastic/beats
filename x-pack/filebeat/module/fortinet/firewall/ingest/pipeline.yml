@@ -169,6 +169,33 @@ processors:
     field: fortinet.firewall.level
     target_field: log.level
     ignore_missing: true
+- remove:
+    field:
+      - message
+    ignore_missing: true
+- pipeline:
+    name: '{< IngestPipeline "event" >}'
+    if: "ctx.fortinet?.firewall?.type == 'event'"
+- pipeline:
+    name: '{< IngestPipeline "traffic" >}'
+    if: "ctx.fortinet?.firewall?.type == 'traffic'"
+- pipeline:
+    name: '{< IngestPipeline "utm" >}'
+    if: "ctx.fortinet?.firewall?.type == 'utm' || ctx.fortinet?.firewall?.type == 'dns'"
+- rename:
+    field: fortinet.firewall.dir
+    target_field: network.direction
+    ignore_missing: true
+    if: ctx.network?.direction == null
+- rename:
+    field: fortinet.firewall.direction
+    target_field: network.direction
+    ignore_missing: true
+    if: ctx.network?.direction == null
+- network_direction:
+    internal_networks_field: _temp.internal_networks
+    ignore_missing: true
+    if: ctx.network?.direction == null
 # Handle interface-based network directionality
 - set:
     field: network.direction
@@ -228,19 +255,6 @@ processors:
           !ctx._temp.internal_interfaces.contains(ctx.observer.ingress.interface.name)
         )
       )
-- remove:
-    field:
-      - message
-    ignore_missing: true
-- pipeline:
-    name: '{< IngestPipeline "event" >}'
-    if: "ctx.fortinet?.firewall?.type == 'event'"
-- pipeline:
-    name: '{< IngestPipeline "traffic" >}'
-    if: "ctx.fortinet?.firewall?.type == 'traffic'"
-- pipeline:
-    name: '{< IngestPipeline "utm" >}'
-    if: "ctx.fortinet?.firewall?.type == 'utm' || ctx.fortinet?.firewall?.type == 'dns'"
 - rename:
     field: fortinet.firewall.reason
     target_field: event.reason

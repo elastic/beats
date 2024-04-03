@@ -34,43 +34,111 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+func generateFakeNetworkInfo() NetworkInfo {
+	networkInfo := NetworkInfo{
+		// All network info available in HB documentation
+		"resolve.ip":                  "192.168.1.254",
+		"resolve.rtt.us":              123,
+		"tls.rtt.handshake.us":        456,
+		"icmp.rtt.us":                 111,
+		"tcp.rtt.connect.us":          789,
+		"tcp.rtt.validate.us":         1234,
+		"http.rtt.content.us":         4567,
+		"http.rtt.validate.us":        7890,
+		"http.rtt.validate_body.us":   12345,
+		"http.rtt.write_request.us":   45678,
+		"http.rtt.response_header.us": 78901,
+		"http.rtt.total.us":           123456,
+		"socks5.rtt.connect.us":       789012,
+	}
+
+	return networkInfo
+}
+
 func TestLogRun(t *testing.T) {
-	core, observed := observer.New(zapcore.InfoLevel)
-	SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
-		return zapcore.NewTee(in, core)
-	})))
+	t.Run("should log the monitor completion", func(t *testing.T) {
+		core, observed := observer.New(zapcore.InfoLevel)
+		SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
+			return zapcore.NewTee(in, core)
+		})))
 
-	durationUs := int64(5000 * time.Microsecond)
-	steps := 1337
+		durationUs := int64(5000 * time.Microsecond)
+		steps := 1337
+		fields := mapstr.M{
+			"monitor.id":          "b0",
+			"monitor.duration.us": durationUs,
+			"monitor.type":        "browser",
+			"monitor.status":      "down",
+			"summary":             jobsummary.NewJobSummary(1, 1, "abc"),
+		}
 
-	fields := mapstr.M{
-		"monitor.id":          "b0",
-		"monitor.duration.us": durationUs,
-		"monitor.type":        "browser",
-		"monitor.status":      "down",
-		"summary":             jobsummary.NewJobSummary(1, 1, "abc"),
-	}
+		event := beat.Event{Fields: fields}
+		eventext.SetMeta(&event, META_STEP_COUNT, steps)
 
-	event := beat.Event{Fields: fields}
-	eventext.SetMeta(&event, META_STEP_COUNT, steps)
+		LogRun(&event)
 
-	LogRun(&event)
+		observedEntries := observed.All()
+		require.Len(t, observedEntries, 1)
+		assert.Equal(t, "Monitor finished", observedEntries[0].Message)
 
-	observedEntries := observed.All()
-	require.Len(t, observedEntries, 1)
-	assert.Equal(t, "Monitor finished", observedEntries[0].Message)
+		expectedMonitor := MonitorRunInfo{
+			MonitorID: "b0",
+			Type:      "browser",
+			Duration:  durationUs,
+			Status:    "down",
+			Steps:     &steps,
+			Attempt:   1,
+		}
 
-	expectedMonitor := MonitorRunInfo{
-		MonitorID: "b0",
-		Type:      "browser",
-		Duration:  durationUs,
-		Status:    "down",
-		Steps:     &steps,
-		Attempt:   1,
-	}
+		assert.ElementsMatch(t, []zap.Field{
+			logp.Any("event", map[string]string{"action": ActionMonitorRun}),
+			logp.Any("monitor", &expectedMonitor),
+		}, observedEntries[0].Context)
+	})
 
-	assert.ElementsMatch(t, []zap.Field{
-		logp.Any("event", map[string]string{"action": ActionMonitorRun}),
-		logp.Any("monitor", &expectedMonitor),
-	}, observedEntries[0].Context)
+	t.Run("should log network information if available", func(t *testing.T) {
+		core, observed := observer.New(zapcore.InfoLevel)
+		SetLogger(logp.NewLogger("t", zap.WrapCore(func(in zapcore.Core) zapcore.Core {
+			return zapcore.NewTee(in, core)
+		})))
+
+		durationUs := int64(5000 * time.Microsecond)
+		steps := 1337
+		fields := mapstr.M{
+			"monitor.id":          "b0",
+			"monitor.duration.us": durationUs,
+			"monitor.type":        "http",
+			"monitor.status":      "down",
+			"summary":             jobsummary.NewJobSummary(1, 1, "abc"),
+		}
+		networkInfo := generateFakeNetworkInfo()
+		// Add network info to the event
+		for key, value := range networkInfo {
+			fields[key] = value
+		}
+
+		event := beat.Event{Fields: fields}
+		eventext.SetMeta(&event, META_STEP_COUNT, steps)
+
+		LogRun(&event)
+
+		observedEntries := observed.All()
+		require.Len(t, observedEntries, 1)
+		assert.Equal(t, "Monitor finished", observedEntries[0].Message)
+
+		expectedMonitor := MonitorRunInfo{
+			MonitorID:   "b0",
+			Type:        "http",
+			Duration:    durationUs,
+			Status:      "down",
+			Steps:       &steps,
+			Attempt:     1,
+			NetworkInfo: networkInfo,
+		}
+
+		assert.ElementsMatch(t, []zap.Field{
+			logp.Any("event", map[string]string{"action": ActionMonitorRun}),
+			logp.Any("monitor", &expectedMonitor),
+		}, observedEntries[0].Context)
+	})
 }

@@ -24,6 +24,7 @@ import (
 	"time"
 
 	retryablehttp "github.com/hashicorp/go-retryablehttp"
+	"github.com/icholy/digest"
 	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
@@ -131,7 +132,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
-	client, err := newClient(ctx, cfg, log)
+	client, trace, err := newClient(ctx, cfg, log)
 	if err != nil {
 		return err
 	}
@@ -150,7 +151,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs, log)
+	prg, ast, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs, log, trace)
 	if err != nil {
 		return err
 	}
@@ -226,10 +227,13 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			}
 
 			// Process a set of event requests.
+			if trace != nil {
+				log.Debugw("previous transaction", "transaction.id", trace.TxID())
+			}
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			metrics.executions.Add(1)
-			start := i.now()
-			state, err = evalWith(ctx, prg, state, start)
+			start := i.now().In(time.UTC)
+			state, err = evalWith(ctx, prg, ast, state, start)
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
 				switch {
@@ -239,6 +243,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				log.Errorw("failed evaluation", "error", err)
 			}
 			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
+			if trace != nil {
+				log.Debugw("final transaction", "transaction.id", trace.TxID())
+			}
 
 			// On exit, state is expected to be in the shape:
 			//
@@ -679,15 +686,29 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 	return limit, true
 }
 
-func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client, error) {
+func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client, *httplog.LoggingRoundTripper, error) {
 	if !wantClient(cfg) {
-		return nil, nil
+		return nil, nil, nil
 	}
 	c, err := cfg.Resource.Transport.Client(clientOptions(cfg.Resource.URL.URL, cfg.Resource.KeepAlive.settings())...)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
+	if cfg.Auth.Digest.isEnabled() {
+		var noReuse bool
+		if cfg.Auth.Digest.NoReuse != nil {
+			noReuse = *cfg.Auth.Digest.NoReuse
+		}
+		c.Transport = &digest.Transport{
+			Transport: c.Transport,
+			Username:  cfg.Auth.Digest.User,
+			Password:  cfg.Auth.Digest.Password,
+			NoReuse:   noReuse,
+		}
+	}
+
+	var trace *httplog.LoggingRoundTripper
 	if cfg.Resource.Tracer != nil {
 		w := zapcore.AddSync(cfg.Resource.Tracer)
 		go func() {
@@ -702,30 +723,37 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 		)
 		traceLogger := zap.New(core)
 
-		c.Transport = httplog.NewLoggingRoundTripper(c.Transport, traceLogger)
+		const margin = 1e3 // 1OkB ought to be enough room for all the remainder of the trace details.
+		maxSize := cfg.Resource.Tracer.MaxSize * 1e6
+		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, max(0, maxSize-margin), log)
+		c.Transport = trace
 	}
 
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
 
-	client := &retryablehttp.Client{
-		HTTPClient:   c,
-		Logger:       newRetryLog(log),
-		RetryWaitMin: cfg.Resource.Retry.getWaitMin(),
-		RetryWaitMax: cfg.Resource.Retry.getWaitMax(),
-		RetryMax:     cfg.Resource.Retry.getMaxAttempts(),
-		CheckRetry:   retryablehttp.DefaultRetryPolicy,
-		Backoff:      retryablehttp.DefaultBackoff,
+	if cfg.Resource.Retry.getMaxAttempts() > 1 {
+		maxAttempts := cfg.Resource.Retry.getMaxAttempts()
+		c = (&retryablehttp.Client{
+			HTTPClient:   c,
+			Logger:       newRetryLog(log),
+			RetryWaitMin: cfg.Resource.Retry.getWaitMin(),
+			RetryWaitMax: cfg.Resource.Retry.getWaitMax(),
+			RetryMax:     maxAttempts,
+			CheckRetry:   retryablehttp.DefaultRetryPolicy,
+			Backoff:      retryablehttp.DefaultBackoff,
+			ErrorHandler: retryErrorHandler(maxAttempts, log),
+		}).StandardClient()
 	}
 
 	if cfg.Auth.OAuth2.isEnabled() {
-		authClient, err := cfg.Auth.OAuth2.client(ctx, client.StandardClient())
+		authClient, err := cfg.Auth.OAuth2.client(ctx, c)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
-		return authClient, nil
+		return authClient, trace, nil
 	}
 
-	return client.StandardClient(), nil
+	return c, trace, nil
 }
 
 func wantClient(cfg config) bool {
@@ -807,6 +835,17 @@ func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []
 	}
 }
 
+// retryErrorHandler returns a retryablehttp.ErrorHandler that will log retry resignation
+// but return the last retry attempt's response and a nil error so that the CEL code
+// can evaluate the response status itself. Any error passed to the retryablehttp.ErrorHandler
+// is returned unaltered.
+func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
+	return func(resp *http.Response, err error, numTries int) (*http.Response, error) {
+		log.Warnw("giving up retries", "method", resp.Request.Method, "url", resp.Request.URL, "retries", max+1)
+		return resp, err
+	}
+}
+
 func newRateLimiterFromConfig(cfg *ResourceConfig) *rate.Limiter {
 	r := rate.Inf
 	b := 1
@@ -861,13 +900,14 @@ var (
 	}
 )
 
-func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger) (cel.Program, error) {
+func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper) (cel.Program, *cel.Ast, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
-		return nil, fmt.Errorf("failed to build xml type hints: %w", err)
+		return nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
 	}
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
+		cel.OptionalTypes(cel.OptionalTypesVersion(lib.OptionalTypesVersion)),
 		lib.Collections(),
 		lib.Crypto(),
 		lib.JSON(nil),
@@ -875,10 +915,9 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 		lib.Strings(),
 		lib.Time(),
 		lib.Try(),
-		lib.Debug(debug(log)),
+		lib.Debug(debug(log, trace)),
 		lib.File(mimetypes),
 		lib.MIME(mimetypes),
-		lib.Regexp(patterns),
 		lib.Limit(limitPolicies),
 		lib.Globals(map[string]interface{}{
 			"useragent": userAgent,
@@ -892,33 +931,37 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 	}
 	env, err := cel.NewEnv(opts...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create env: %w", err)
+		return nil, nil, fmt.Errorf("failed to create env: %w", err)
 	}
 
 	ast, iss := env.Compile(src)
 	if iss.Err() != nil {
-		return nil, fmt.Errorf("failed compilation: %w", iss.Err())
+		return nil, nil, fmt.Errorf("failed compilation: %w", iss.Err())
 	}
 
 	prg, err := env.Program(ast)
 	if err != nil {
-		return nil, fmt.Errorf("failed program instantiation: %w", err)
+		return nil, nil, fmt.Errorf("failed program instantiation: %w", err)
 	}
-	return prg, nil
+	return prg, ast, nil
 }
 
-func debug(log *logp.Logger) func(string, any) {
+func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, any) {
 	log = log.Named("cel_debug")
 	return func(tag string, value any) {
 		level := "DEBUG"
 		if _, ok := value.(error); ok {
 			level = "ERROR"
 		}
-		log.Debugw(level, "tag", tag, "value", value)
+		if trace == nil {
+			log.Debugw(level, "tag", tag, "value", value)
+		} else {
+			log.Debugw(level, "tag", tag, "value", value, "transaction.id", trace.TxID())
+		}
 	}
 }
 
-func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
+func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
 	out, _, err := prg.ContextEval(ctx, map[string]interface{}{
 		// Replace global program "now" with current time. This is necessary
 		// as the lib.Time now global is static at program instantiation time
@@ -932,17 +975,22 @@ func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}
 		"now": now,
 		root:  state,
 	})
+	if err != nil {
+		err = lib.DecoratedError{AST: ast, Err: err}
+	}
 	if e := ctx.Err(); e != nil {
 		err = e
 	}
 	if err != nil {
 		state["events"] = errorMessage(fmt.Sprintf("failed eval: %v", err))
+		clearWantMore(state)
 		return state, fmt.Errorf("failed eval: %w", err)
 	}
 
 	v, err := out.ConvertToNative(reflect.TypeOf((*structpb.Struct)(nil)))
 	if err != nil {
 		state["events"] = errorMessage(fmt.Sprintf("failed proto conversion: %v", err))
+		clearWantMore(state)
 		return state, fmt.Errorf("failed proto conversion: %w", err)
 	}
 	switch v := v.(type) {
@@ -952,7 +1000,18 @@ func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}
 		// This should never happen.
 		errMsg := fmt.Sprintf("unexpected native conversion type: %T", v)
 		state["events"] = errorMessage(errMsg)
+		clearWantMore(state)
 		return state, errors.New(errMsg)
+	}
+}
+
+// clearWantMore sets the state to not request additional work in a periodic evaluation.
+// It leaves state intact if there is no "want_more" element, and sets the element to false
+// if there is. This is necessary instead of just doing delete(state, "want_more") as
+// client CEL code may expect the want_more field to be present.
+func clearWantMore(state map[string]interface{}) {
+	if _, ok := state["want_more"]; ok {
+		state["want_more"] = false
 	}
 }
 

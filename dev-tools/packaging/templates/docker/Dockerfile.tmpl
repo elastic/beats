@@ -22,7 +22,7 @@ FROM {{ .from }}
 
 {{- if contains .from "ubi-minimal" }}
 RUN microdnf -y update && \
-    microdnf install findutils shadow-utils && \
+    microdnf -y install findutils shadow-utils && \
     microdnf clean all
 {{- else }}
 RUN for iter in {1..10}; do \
@@ -123,7 +123,7 @@ RUN echo \
 ENV ELASTIC_SYNTHETICS_CAPABLE=true
 ENV TZ=UTC
 ENV SUITES_DIR={{ $beatHome }}/suites
-ENV NODE_VERSION=18.16.0
+ENV NODE_VERSION=18.18.2
 ENV PATH="$NODE_PATH/node/bin:$PATH"
 # Install the latest version of @elastic/synthetics forcefully ignoring the previously
 # cached node_modules, heartbeat then calls the global executable to run test suites

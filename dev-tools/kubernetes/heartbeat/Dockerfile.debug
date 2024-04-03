@@ -1,10 +1,10 @@
-FROM golang:1.20.8 as builder
+FROM golang:1.21.8 as builder
 
 ENV PATH=/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/go/bin:/usr/local/go/bin
 
 ENV CGO_ENABLED=0
 
-RUN go install github.com/go-delve/delve/cmd/dlv@v1.9.0
+RUN go install github.com/go-delve/delve/cmd/dlv@v1.21.2
 
 COPY build/heartbeat-debugger /usr/share/heartbeat/heartbeat-debugger
 

@@ -24,7 +24,6 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -87,7 +86,7 @@ func readLines(path string) (lines []string, err error) {
 }
 
 func readGoldenFile(t testing.TB, path string) (events []mapstr.M) {
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("can't read golden file '%s': %v", path, err)
 	}
@@ -216,7 +215,7 @@ func TestGoldenFiles(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				if err = ioutil.WriteFile(goldenPath, data, 0o644); err != nil {
+				if err = os.WriteFile(goldenPath, data, 0o644); err != nil {
 					t.Fatalf("failed writing golden file '%s': %v", goldenPath, err)
 				}
 			}

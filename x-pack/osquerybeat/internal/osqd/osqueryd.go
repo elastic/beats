@@ -10,7 +10,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -34,6 +33,7 @@ const (
 const (
 	defaultDataDir               = "osquery"
 	defaultCertsDir              = "certs"
+	defaultLensesDir             = "lenses"
 	defaultConfigRefreshInterval = 30 // interval osqueryd will poll for configuration changed; scheduled queries configuration for now
 )
 
@@ -49,6 +49,7 @@ type OSQueryD struct {
 	binPath    string
 	dataPath   string
 	certsPath  string
+	lensesPath string
 
 	configPlugin string
 	loggerPlugin string
@@ -103,7 +104,7 @@ func WithLoggerPlugin(name string) Option {
 	}
 }
 
-func New(socketPath string, opts ...Option) *OSQueryD {
+func New(socketPath string, opts ...Option) (*OSQueryD, error) {
 	q := &OSQueryD{
 		socketPath:            socketPath,
 		extensionsTimeout:     defaultExtensionsTimeout,
@@ -114,15 +115,34 @@ func New(socketPath string, opts ...Option) *OSQueryD {
 		opt(q)
 	}
 
+	// The working directory is set to something like ./data/elastic-agent-3afa07/run/osquery-default by the agent
+	// Use the child dir osquery for that, so the full path is resolved to ./data/elastic-agent-3afa07/run/osquery-default/oquery
+	//
+	// The following files are currently created there by osqueryd executable when it is started
+	//
+	// -rw-------   1 root  wheel  149 Nov 28 17:46 osquery.autoload
+	// drwx------  11 root  wheel  352 Nov 28 19:00 osquery.db
+	// -rw-r--r--   1 root  wheel    0 Nov 28 17:46 osquery.flags
+	// -rw-------   1 root  wheel    5 Nov 28 18:48 osquery.pid
 	if q.dataPath == "" {
-		q.dataPath = filepath.Join(q.binPath, defaultDataDir)
+		q.dataPath = defaultDataDir
+	}
+
+	// Initialize binPath before certsPath and the lensesPath are set
+	err := q.prepareBinPath()
+	if err != nil {
+		return nil, fmt.Errorf("failed to prepare bin path, %w", err)
 	}
 
 	if q.certsPath == "" {
 		q.certsPath = filepath.Join(q.binPath, defaultCertsDir)
 	}
 
-	return q
+	if q.lensesPath == "" {
+		q.lensesPath = filepath.Join(q.binPath, defaultLensesDir)
+	}
+
+	return q, nil
 }
 
 func (q *OSQueryD) SocketPath() string {
@@ -330,7 +350,7 @@ func prepareAutoloadFile(extensionAutoloadPath, mandatoryExtensionPath string, l
 	}
 
 	if rewrite {
-		if err := ioutil.WriteFile(extensionAutoloadPath, []byte(mandatoryExtensionPath), 0600); err != nil {
+		if err := os.WriteFile(extensionAutoloadPath, []byte(mandatoryExtensionPath), 0600); err != nil {
 			return fmt.Errorf("failed write osquery extension autoload file, %w", err)
 		}
 	}
@@ -399,6 +419,13 @@ func (q *OSQueryD) args(userFlags Flags) Args {
 	flags["flagfile"] = q.resolveDataPath(flags.GetString("flagfile"))
 
 	flags["tls_server_certs"] = q.resolveCertsPath(flags.GetString("tls_server_certs"))
+
+	// Augeas lenses are not available on windows
+	if runtime.GOOS == "windows" {
+		delete(flags, "augeas_lenses")
+	} else {
+		flags["augeas_lenses"] = q.lensesPath
+	}
 
 	flags["extensions_socket"] = q.socketPath
 

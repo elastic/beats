@@ -8,7 +8,7 @@
     "kubernetes": {
         "namespace": "default",
         "statefulset": {
-            "created": 1691568526,
+            "created": 1698751160,
             "generation": {
                 "desired": 1,
                 "observed": 1

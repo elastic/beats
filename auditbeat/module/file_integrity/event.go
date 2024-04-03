@@ -65,11 +65,17 @@ const (
 	// SourceFSNotify identifies events triggered by a notification from the
 	// file system.
 	SourceFSNotify
+	// SourceEBPF identifies events triggered by an eBPF program.
+	SourceEBPF
+	// SourceKProbes identifies events triggered by KProbes.
+	SourceKProbes
 )
 
 var sourceNames = map[Source]string{
 	SourceScan:     "scan",
 	SourceFSNotify: "fsnotify",
+	SourceEBPF:     "ebpf",
+	SourceKProbes:  "kprobes",
 }
 
 // Type identifies the file type (e.g. dir, file, symlink).
@@ -91,15 +97,23 @@ const (
 	FileType
 	DirType
 	SymlinkType
+	CharDeviceType
+	BlockDeviceType
+	FIFOType
+	SocketType
 )
 
 var typeNames = map[Type]string{
-	FileType:    "file",
-	DirType:     "dir",
-	SymlinkType: "symlink",
+	FileType:        "file",
+	DirType:         "dir",
+	SymlinkType:     "symlink",
+	CharDeviceType:  "char_device",
+	BlockDeviceType: "block_device",
+	FIFOType:        "fifo",
+	SocketType:      "socket",
 }
 
-// Digest is a output of a hash function.
+// Digest is an output of a hash function.
 type Digest []byte
 
 // String returns the digest value in lower-case hexadecimal form.
@@ -110,7 +124,7 @@ func (d Digest) String() string {
 // MarshalText encodes the digest to a hexadecimal representation of itself.
 func (d Digest) MarshalText() ([]byte, error) { return []byte(d.String()), nil }
 
-// Event describe the filesystem change and includes metadata about the file.
+// Event describes the filesystem change and includes metadata about the file.
 type Event struct {
 	Timestamp     time.Time           `json:"timestamp"`             // Time of event.
 	Path          string              `json:"path"`                  // The path associated with the event.
@@ -119,7 +133,7 @@ type Event struct {
 	Source        Source              `json:"source"`                // Source of the event.
 	Action        Action              `json:"action"`                // Action (like created, updated).
 	Hashes        map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
-	ParserResults mapstr.M            `json:"file,omitempty"`        // Results from runnimg file parsers.
+	ParserResults mapstr.M            `json:"file,omitempty"`        // Results from running file parsers.
 
 	// Metadata
 	rtt        time.Duration // Time taken to collect the info.
@@ -142,7 +156,7 @@ type Metadata struct {
 	Mode           os.FileMode `json:"mode"`             // Permissions
 	SetUID         bool        `json:"setuid"`           // setuid bit (POSIX only)
 	SetGID         bool        `json:"setgid"`           // setgid bit (POSIX only)
-	Origin         []string    `json:"origin"`           // External origin info for the file (MacOS only)
+	Origin         []string    `json:"origin"`           // External origin info for the file (macOS only)
 	SELinux        string      `json:"selinux"`          // security.selinux xattr value (Linux only)
 	POSIXACLAccess []byte      `json:"posix_acl_access"` // system.posix_acl_access xattr value (Linux only)
 }
@@ -189,34 +203,40 @@ func NewEventFromFileInfo(
 
 	switch event.Info.Type {
 	case FileType:
-		if event.Info.Size <= maxFileSize {
-			hashes, nbytes, err := hashFile(event.Path, maxFileSize, hashTypes...)
-			if err != nil {
-				event.errors = append(event.errors, err)
-				event.hashFailed = true
-			} else if hashes != nil {
-				// hashFile returns nil hashes and no error when:
-				// - There's no hashes configured.
-				// - File size at the time of hashing is larger than configured limit.
-				event.Hashes = hashes
-				event.Info.Size = nbytes
-			}
-
-			if len(fileParsers) != 0 && event.ParserResults == nil {
-				event.ParserResults = make(mapstr.M)
-			}
-			for _, p := range fileParsers {
-				err = p.Parse(event.ParserResults, path)
-				if err != nil {
-					event.errors = append(event.errors, err)
-				}
-			}
-		}
+		fillHashes(&event, path, maxFileSize, hashTypes, fileParsers)
 	case SymlinkType:
-		event.TargetPath, _ = filepath.EvalSymlinks(event.Path)
+		event.TargetPath, err = filepath.EvalSymlinks(event.Path)
+		if err != nil {
+			event.errors = append(event.errors, err)
+		}
 	}
 
 	return event
+}
+
+func fillHashes(event *Event, path string, maxFileSize uint64, hashTypes []HashType, fileParsers []FileParser) {
+	if event.Info.Size <= maxFileSize {
+		hashes, nbytes, err := hashFile(event.Path, maxFileSize, hashTypes...)
+		if err != nil {
+			event.errors = append(event.errors, err)
+			event.hashFailed = true
+		} else if hashes != nil {
+			// hashFile returns nil hashes and no error when:
+			// - There's no hashes configured.
+			// - File size at the time of hashing is larger than configured limit.
+			event.Hashes = hashes
+			event.Info.Size = nbytes
+		}
+
+		if len(fileParsers) != 0 && event.ParserResults == nil {
+			event.ParserResults = make(mapstr.M)
+		}
+		for _, p := range fileParsers {
+			if err = p.Parse(event.ParserResults, path); err != nil {
+				event.errors = append(event.errors, err)
+			}
+		}
+	}
 }
 
 // NewEvent creates a new Event. Any errors that occur are included in the

@@ -389,6 +389,64 @@ func TestPromHistogramToES(t *testing.T) {
 				},
 			},
 		},
+		"histogram with negative buckets": {
+			samples: []sample{
+				{
+					histogram: p.Histogram{
+						SampleCount: proto.Uint64(30),
+						SampleSum:   proto.Float64(5),
+						Bucket: []*p.Bucket{
+							{
+								UpperBound:      proto.Float64(-100),
+								CumulativeCount: proto.Uint64(2),
+							},
+							{
+								UpperBound:      proto.Float64(-99),
+								CumulativeCount: proto.Uint64(10),
+							},
+							{
+								UpperBound:      proto.Float64(0),
+								CumulativeCount: proto.Uint64(30),
+							},
+						},
+					},
+					expected: mapstr.M{
+						// rate of the first bucket is always 0, meaning that it was not increased as it is the first
+						// count rate: [0, 8, 20]
+						"counts": []uint64{0, 0, 0},
+						"values": []float64{-100, -99.5, -49.5},
+					},
+				},
+				{
+					histogram: p.Histogram{
+						SampleCount: proto.Uint64(100),
+						SampleSum:   proto.Float64(20),
+						Bucket: []*p.Bucket{
+							{
+								UpperBound:      proto.Float64(-100),
+								CumulativeCount: proto.Uint64(5),
+							},
+							{
+								UpperBound:      proto.Float64(-99),
+								CumulativeCount: proto.Uint64(16),
+							},
+							{
+								UpperBound:      proto.Float64(0),
+								CumulativeCount: proto.Uint64(100),
+							},
+						},
+					},
+					expected: mapstr.M{
+						// counts calculation:
+						// UpperBound -100: 5-2
+						// UpperBound -99: 16 - 5 (undo accumulation) - 8 (calculate rate)
+						// UpperBound 0: 100 - 16 (undo accumulation) - 20 (calculate rate)
+						"counts": []uint64{3, 3, 64},
+						"values": []float64{-100, -99.5, -49.5},
+					},
+				},
+			},
+		},
 	}
 
 	metricName := "somemetric"

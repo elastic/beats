@@ -54,6 +54,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/features"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/instrumentation"
 	"github.com/elastic/beats/v7/libbeat/kibana"
 	"github.com/elastic/beats/v7/libbeat/management"
@@ -65,6 +66,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/pprof"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipeline"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/diskqueue"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
@@ -133,6 +135,9 @@ type beatConfig struct {
 	// monitoring settings
 	MonitoringBeatConfig monitoring.BeatConfig `config:",inline"`
 
+	// ILM settings
+	LifecycleConfig lifecycle.RawConfig `config:",inline"`
+
 	// central management settings
 	Management *config.C `config:"management"`
 
@@ -192,7 +197,7 @@ func initRand() {
 	} else {
 		seed = n.Int64()
 	}
-	rand.Seed(seed)
+	rand.Seed(seed) //nolint:staticcheck // need seed from cryptographically strong PRNG.
 }
 
 // Run initializes and runs a Beater implementation. name is the name of the
@@ -671,7 +676,13 @@ func (b *Beat) Setup(settings Settings, bt beat.Creator, setup SetupSettings) er
 			if setup.IndexManagement || setup.ILMPolicy {
 				loadILM = idxmgmt.LoadModeEnabled
 			}
-			m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
+
+			mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
+			if err != nil {
+				return fmt.Errorf("error creating index management handler: %w", err)
+			}
+
+			m := b.IdxSupporter.Manager(mgmtHandler, idxmgmt.BeatsAssets(b.Fields))
 			if ok, warn := m.VerifySetup(loadTemplate, loadILM); !ok {
 				fmt.Println(warn)
 			}
@@ -773,6 +784,10 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error unpacking config data: %w", err)
 	}
 
+	if err := promoteOutputQueueSettings(&b.Config); err != nil {
+		return fmt.Errorf("could not promote output queue settings: %w", err)
+	}
+
 	if err := features.UpdateFromConfig(b.RawConfig); err != nil {
 		return fmt.Errorf("could not parse features: %w", err)
 	}
@@ -809,7 +824,10 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("failed to get host information: %w", err)
 	}
 
-	fqdn, err := h.FQDN()
+	fqdnLookupCtx, cancel := context.WithTimeout(context.Background(), 1*time.Minute)
+	defer cancel()
+
+	fqdn, err := h.FQDNWithContext(fqdnLookupCtx)
 	if err != nil {
 		// FQDN lookup is "best effort".  We log the error, fallback to
 		// the OS-reported hostname, and move on.
@@ -820,9 +838,24 @@ func (b *Beat) configure(settings Settings) error {
 	}
 
 	// initialize config manager
-	b.Manager, err = management.NewManager(b.Config.Management, reload.RegisterV2)
+	m, err := management.NewManager(b.Config.Management, reload.RegisterV2)
 	if err != nil {
 		return err
+	}
+	b.Manager = m
+
+	if b.Manager.AgentInfo().Version != "" {
+		// During the manager initialization the client to connect to the agent is
+		// also initialized. That makes the beat to read information sent by the
+		// agent, which includes the AgentInfo with the agent's package version.
+		// Components running under agent should report the agent's package version
+		// as their own version.
+		// In order to do so b.Info.Version needs to be set to the version the agent
+		// sent. As this Beat instance is initialized much before the package
+		// version is received, it's overridden here. So far it's early enough for
+		// the whole beat to report the right version.
+		b.Info.Version = b.Manager.AgentInfo().Version
+		version.SetPackageVersion(b.Info.Version)
 	}
 
 	if err := b.Manager.CheckRawConfig(b.RawConfig); err != nil {
@@ -860,6 +893,16 @@ func (b *Beat) configure(settings Settings) error {
 
 	b.Manager.RegisterDiagnosticHook("global processors", "a list of currently configured global beat processors",
 		"global_processors.txt", "text/plain", b.agentDiagnosticHook)
+	b.Manager.RegisterDiagnosticHook("beat_metrics", "Metrics from the default monitoring namespace and expvar.",
+		"beat_metrics.json", "application/json", func() []byte {
+			m := monitoring.CollectStructSnapshot(monitoring.Default, monitoring.Full, true)
+			data, err := json.MarshalIndent(m, "", "  ")
+			if err != nil {
+				logp.L().Warnw("Failed to collect beat metric snapshot for Agent diagnostics.", "error", err)
+				return []byte(err.Error())
+			}
+			return data
+		})
 
 	return err
 }
@@ -1018,16 +1061,18 @@ func (b *Beat) loadDashboards(ctx context.Context, force bool) error {
 func (b *Beat) registerESVersionCheckCallback() error {
 	_, err := elasticsearch.RegisterGlobalCallback(func(conn *eslegclient.Connection) error {
 		if !isElasticsearchOutput(b.Config.Output.Name()) {
-			return errors.New("Elasticsearch output is not configured")
+			return errors.New("elasticsearch output is not configured")
 		}
-		if b.isConnectionToOlderVersionAllowed() {
+		// if we allow older versions, return early and don't check versions
+		// versions don't matter on serverless, so always bypass
+		if b.isConnectionToOlderVersionAllowed() || conn.IsServerless() {
 			return nil
 		}
 
 		esVersion := conn.GetVersion()
 		beatVersion, err := libversion.New(b.Info.Version)
 		if err != nil {
-			return err
+			return fmt.Errorf("error fetching version from elasticsearch: %w", err)
 		}
 		if esVersion.LessThanMajorMinor(beatVersion) {
 			return fmt.Errorf("%w ES=%s, Beat=%s", elasticsearch.ErrTooOld, esVersion.String(), b.Info.Version)
@@ -1041,7 +1086,7 @@ func (b *Beat) registerESVersionCheckCallback() error {
 func (b *Beat) isConnectionToOlderVersionAllowed() bool {
 	config := struct {
 		AllowOlder bool `config:"allow_older_versions"`
-	}{false}
+	}{true}
 
 	_ = b.Config.Output.Config().Unpack(&config)
 
@@ -1065,7 +1110,11 @@ func (b *Beat) registerESIndexManagement() error {
 
 func (b *Beat) indexSetupCallback() elasticsearch.ConnectCallback {
 	return func(esClient *eslegclient.Connection) error {
-		m := b.IdxSupporter.Manager(idxmgmt.NewESClientHandler(esClient), idxmgmt.BeatsAssets(b.Fields))
+		mgmtHandler, err := idxmgmt.NewESClientHandler(esClient, b.Info, b.Config.LifecycleConfig)
+		if err != nil {
+			return fmt.Errorf("error creating index management handler: %w", err)
+		}
+		m := b.IdxSupporter.Manager(mgmtHandler, idxmgmt.BeatsAssets(b.Fields))
 		return m.Setup(idxmgmt.LoadModeEnabled, idxmgmt.LoadModeEnabled)
 	}
 }
@@ -1465,4 +1514,48 @@ func sanitizeIPs(ips []string) []string {
 		validIPs = append(validIPs, ip)
 	}
 	return validIPs
+}
+
+// promoteOutputQueueSettings checks to see if the output
+// configuration has queue settings defined and if so it promotes them
+// to the top level queue settings.  This is done to allow existing
+// behavior of specifying queue settings at the top level or like
+// elastic-agent that specifies queue settings under the output
+func promoteOutputQueueSettings(bc *beatConfig) error {
+	if bc.Output.IsSet() && bc.Output.Config().Enabled() {
+		pc := pipeline.Config{}
+		err := bc.Output.Config().Unpack(&pc)
+		if err != nil {
+			return fmt.Errorf("error unpacking output queue settings: %w", err)
+		}
+		if pc.Queue.IsSet() {
+			logp.Info("global queue settings replaced with output queue settings")
+			bc.Pipeline.Queue = pc.Queue
+		}
+	}
+	return nil
+}
+
+func (bc *beatConfig) Validate() error {
+	if bc.Output.IsSet() && bc.Output.Config().Enabled() {
+		outputPC := pipeline.Config{}
+		err := bc.Output.Config().Unpack(&outputPC)
+		if err != nil {
+			return fmt.Errorf("error unpacking output queue settings: %w", err)
+		}
+		if bc.Pipeline.Queue.IsSet() && outputPC.Queue.IsSet() {
+			return fmt.Errorf("top level queue and output level queue settings defined, only one is allowed")
+		}
+		// elastic-agent doesn't support disk queue yet
+		if bc.Management.Enabled() && outputPC.Queue.Config().Enabled() && outputPC.Queue.Name() == diskqueue.QueueType {
+			return fmt.Errorf("disk queue is not supported when management is enabled")
+		}
+	}
+
+	// elastic-agent doesn't support disk queue yet
+	if bc.Management.Enabled() && bc.Pipeline.Queue.Config().Enabled() && bc.Pipeline.Queue.Name() == diskqueue.QueueType {
+		return fmt.Errorf("disk queue is not supported when management is enabled")
+	}
+
+	return nil
 }

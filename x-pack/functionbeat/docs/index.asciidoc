@@ -25,6 +25,7 @@ include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 :mac_os:
 :win_os:
 :linux_os:
+:no_cache_processor:
 :no_dashboards:
 :no_repos:
 :no_decode_cef_processor:

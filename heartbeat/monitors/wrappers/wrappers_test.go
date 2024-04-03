@@ -43,8 +43,6 @@ import (
 	"github.com/elastic/beats/v7/heartbeat/monitors/jobs"
 	"github.com/elastic/beats/v7/heartbeat/monitors/logger"
 	"github.com/elastic/beats/v7/heartbeat/monitors/stdfields"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/monitorstate"
-	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/jobsummary"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/summarizer/summarizertesthelper"
 	"github.com/elastic/beats/v7/heartbeat/monitors/wrappers/wraputil"
 	"github.com/elastic/beats/v7/heartbeat/scheduler/schedule"
@@ -140,11 +138,12 @@ func TestSimpleJob(t *testing.T) {
 			require.NoError(t, err)
 
 			expectedMonitor := logger.MonitorRunInfo{
-				MonitorID: testMonFields.ID,
-				Type:      testMonFields.Type,
-				Duration:  durationUs.(int64),
-				Status:    "up",
-				Attempt:   1,
+				MonitorID:   testMonFields.ID,
+				Type:        testMonFields.Type,
+				Duration:    durationUs.(int64),
+				Status:      "up",
+				Attempt:     1,
+				NetworkInfo: logger.NetworkInfo{},
 			}
 			require.ElementsMatch(t, []zap.Field{
 				logp.Any("event", map[string]string{"action": logger.ActionMonitorRun}),
@@ -349,132 +348,6 @@ func TestMultiJobConts(t *testing.T) {
 		nil,
 		nil,
 	})
-}
-
-// TestRetryMultiCont is of somewhat dubious utility at the moment,
-// it mostly tests that we __don't__ retry on an initial down.
-// retry logic is better and more completely tested in the summarizer
-// and scenario tests.
-func TestRetryMultiCont(t *testing.T) {
-	uniqScope := isdef.ScopedIsUnique()
-
-	expected := []struct {
-		monStatus string
-		js        jobsummary.JobSummary
-		state     monitorstate.State
-	}{
-		{
-			"down",
-			jobsummary.JobSummary{
-				Status:       "down",
-				FinalAttempt: true,
-				// we expect two up since this is a lightweight
-				// job and all events get a monitor status
-				// since no errors are returned that's 2
-				Up:          0,
-				Down:        2,
-				Attempt:     1,
-				MaxAttempts: 2,
-			},
-			monitorstate.State{
-				Status: "down",
-				Up:     0,
-				Down:   2,
-				Checks: 2,
-			},
-		},
-		{
-			"down",
-			jobsummary.JobSummary{
-				Status:       "down",
-				FinalAttempt: true,
-				Up:           0,
-				Down:         2,
-				Attempt:      2,
-				MaxAttempts:  2,
-			},
-			monitorstate.State{
-				Status: "down",
-				Up:     0,
-				Down:   2,
-				Checks: 2,
-			},
-		},
-	}
-
-	jobErr := fmt.Errorf("down")
-
-	makeContJob := func(t *testing.T, u string) jobs.Job {
-		expIdx := 0
-		return func(event *beat.Event) ([]jobs.Job, error) {
-			eventext.MergeEventFields(event, mapstr.M{"cont": "1st"})
-			u, err := url.Parse(u)
-			require.NoError(t, err)
-			eventext.MergeEventFields(event, mapstr.M{"url": wraputil.URLFields(u)})
-
-			return []jobs.Job{
-				func(event *beat.Event) ([]jobs.Job, error) {
-					eventext.MergeEventFields(event, mapstr.M{"cont": "2nd"})
-					eventext.MergeEventFields(event, mapstr.M{"url": wraputil.URLFields(u)})
-
-					expIdx++
-					if expIdx >= len(expected)-1 {
-						expIdx = 0
-					}
-					exp := expected[expIdx]
-					if exp.js.Status == "down" {
-						return nil, jobErr
-					}
-
-					return nil, nil
-				},
-			}, jobErr
-		}
-	}
-
-	contJobValidator := func(u string, msg string) validator.Validator {
-		return lookslike.Compose(
-			urlValidator(t, u),
-			hbtestllext.MaybeHasEventType,
-			lookslike.MustCompile(map[string]interface{}{"cont": msg}),
-			lookslike.MustCompile(map[string]interface{}{
-				"error": map[string]interface{}{
-					"message": isdef.IsString,
-					"type":    isdef.IsString,
-				},
-				"monitor": map[string]interface{}{
-					"id":          uniqScope.IsUniqueTo(u),
-					"name":        testMonFields.Name,
-					"type":        testMonFields.Type,
-					"status":      "down",
-					"check_group": uniqScope.IsUniqueTo(u),
-				},
-				"state": isdef.Optional(hbtestllext.IsMonitorState),
-			}),
-			hbtestllext.MonitorTimespanValidator,
-		)
-	}
-
-	retryMonFields := testMonFields
-	retryMonFields.MaxAttempts = 2
-
-	for _, expected := range expected {
-		testCommonWrap(t, testDef{
-			"multi-job-continuations-retry",
-			retryMonFields,
-			[]jobs.Job{makeContJob(t, "http://foo.com")},
-			[]validator.Validator{
-				contJobValidator("http://foo.com", "1st"),
-				lookslike.Compose(
-					contJobValidator("http://foo.com", "2nd"),
-					summarizertesthelper.SummaryValidator(expected.js.Up, expected.js.Down),
-					hbtestllext.MaybeHasDuration,
-				),
-			},
-			nil,
-			nil,
-		})
-	}
 }
 
 func TestMultiJobContsCancelledEvents(t *testing.T) {

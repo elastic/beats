@@ -32,7 +32,14 @@ type StateOS struct {
 
 // GetOSState returns the FileStateOS for non windows systems
 func GetOSState(info os.FileInfo) StateOS {
-	stat := info.Sys().(*syscall.Stat_t)
+	sys := info.Sys()
+	if sys == nil {
+		return StateOS{}
+	}
+	stat, ok := sys.(*syscall.Stat_t)
+	if !ok {
+		return StateOS{}
+	}
 
 	// Convert inode and dev to uint64 to be cross platform compatible
 	fileState := StateOS{

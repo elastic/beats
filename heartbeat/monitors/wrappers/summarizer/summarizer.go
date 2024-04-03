@@ -42,6 +42,12 @@ type Summarizer struct {
 	startedAt      time.Time
 }
 
+func (s Summarizer) beforeEachEvent(event *beat.Event) {
+	for _, plugin := range s.plugins {
+		plugin.BeforeEachEvent(event)
+	}
+}
+
 // EachEventActions is a set of options using bitmasks to inform execution after the EachEvent callback
 type EachEventActions uint8
 
@@ -58,6 +64,9 @@ const RetryBeforeSummary = 1
 // in one location. Prior to this code was strewn about a bit more and following it was
 // a bit trickier.
 type SummarizerPlugin interface {
+	// BeforeEachEvent is called on each event, and allows for the mutation of events
+	// before monitor execution
+	BeforeEachEvent(event *beat.Event)
 	// EachEvent is called on each event, and allows for the mutation of events
 	EachEvent(event *beat.Event, err error) EachEventActions
 	// BeforeSummary is run on the final (summary) event for each monitor.
@@ -106,6 +115,10 @@ func (s *Summarizer) setupPlugins() {
 // This adds the state and summary top level fields.
 func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
+
+		// call BeforeEachEvent for each plugin before running job
+		s.beforeEachEvent(event)
+
 		conts, eventErr := j(event)
 
 		s.mtx.Lock()
@@ -145,14 +158,14 @@ func (s *Summarizer) Wrap(j jobs.Job) jobs.Job {
 				//    kibana queries
 				// 2. If the site error is very short 1s gives it a tiny bit of time to recover
 				delayedRootJob := func(event *beat.Event) ([]jobs.Job, error) {
+					time.Sleep(s.retryDelay)
 					for _, p := range s.plugins {
 						p.BeforeRetry()
 					}
-					time.Sleep(s.retryDelay)
-					return s.rootJob(event)
+					return s.Wrap(s.rootJob)(event)
 				}
 
-				conts = []jobs.Job{delayedRootJob}
+				return []jobs.Job{delayedRootJob}, eventErr
 			}
 		}
 

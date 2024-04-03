@@ -66,11 +66,10 @@
         "title": "Remote Interactive Connections and Disconnections [Winlogbeat Security]",
         "version": 1
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:04.303Z",
     "id": "6f4071a0-7a78-11ea-bc9a-0baf2ca323a3",
-    "migrationVersion": {
-        "search": "7.9.3"
-    },
+    "managed": false,
     "references": [
         {
             "id": "winlogbeat-*",
@@ -84,6 +83,7 @@
         }
     ],
     "type": "search",
-    "updated_at": "2021-08-11T13:18:58.346Z",
-    "version": "WzIyNzUsMl0="
+    "typeMigrationVersion": "7.9.3",
+    "updated_at": "2023-11-10T17:08:04.303Z",
+    "version": "WzIzNSwxXQ=="
 }

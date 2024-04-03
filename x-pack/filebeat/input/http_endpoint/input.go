@@ -7,6 +7,8 @@ package http_endpoint
 import (
 	"context"
 	"crypto/tls"
+	"encoding/base32"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"net"
@@ -17,6 +19,10 @@ import (
 	"time"
 
 	"github.com/rcrowley/go-metrics"
+	"go.elastic.co/ecszap"
+	"go.uber.org/atomic"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
@@ -128,6 +134,14 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 	metrics.route.Set(u.Path)
 	metrics.isTLS.Set(e.tlsConfig != nil)
 
+	var prg *program
+	if e.config.Program != "" {
+		prg, err = newProgram(e.config.Program)
+		if err != nil {
+			return err
+		}
+	}
+
 	p.mu.Lock()
 	s, ok := p.servers[e.addr]
 	if ok {
@@ -146,7 +160,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 			return err
 		}
 		log.Infof("Adding %s end point to server on %s", pattern, e.addr)
-		s.mux.Handle(pattern, newHandler(e.config, pub, log, metrics))
+		s.mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, log, metrics))
 		s.idOf[pattern] = ctx.ID
 		p.mu.Unlock()
 		<-s.ctx.Done()
@@ -154,7 +168,6 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle(pattern, newHandler(e.config, pub, log, metrics))
 	srv := &http.Server{Addr: e.addr, TLSConfig: e.tlsConfig, Handler: mux, ReadHeaderTimeout: 5 * time.Second}
 	s = &server{
 		idOf: map[string]string{pattern: ctx.ID},
@@ -163,6 +176,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 		srv:  srv,
 	}
 	s.ctx, s.cancel = ctxtool.WithFunc(ctx.Cancelation, func() { srv.Close() })
+	mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, log, metrics))
 	p.servers[e.addr] = s
 	p.mu.Unlock()
 
@@ -284,25 +298,28 @@ func (s *server) getErr() error {
 	return s.err
 }
 
-func newHandler(c config, pub stateless.Publisher, log *logp.Logger, metrics *inputMetrics) http.Handler {
-	validator := &apiValidator{
-		basicAuth:    c.BasicAuth,
-		username:     c.Username,
-		password:     c.Password,
-		method:       http.MethodPost,
-		contentType:  c.ContentType,
-		secretHeader: c.SecretHeader,
-		secretValue:  c.SecretValue,
-		hmacHeader:   c.HMACHeader,
-		hmacKey:      c.HMACKey,
-		hmacType:     c.HMACType,
-		hmacPrefix:   c.HMACPrefix,
-	}
+func newHandler(ctx context.Context, c config, prg *program, pub stateless.Publisher, log *logp.Logger, metrics *inputMetrics) http.Handler {
+	h := &handler{
+		log:         log,
+		txBaseID:    newID(),
+		txIDCounter: atomic.NewUint64(0),
 
-	handler := &httpHandler{
-		log:                   log,
-		publisher:             pub,
-		metrics:               metrics,
+		publisher: pub,
+		metrics:   metrics,
+		validator: apiValidator{
+			basicAuth:    c.BasicAuth,
+			username:     c.Username,
+			password:     c.Password,
+			method:       c.Method,
+			contentType:  c.ContentType,
+			secretHeader: c.SecretHeader,
+			secretValue:  c.SecretValue,
+			hmacHeader:   c.HMACHeader,
+			hmacKey:      c.HMACKey,
+			hmacType:     c.HMACType,
+			hmacPrefix:   c.HMACPrefix,
+		},
+		program:               prg,
 		messageField:          c.Prefix,
 		responseCode:          c.ResponseCode,
 		responseBody:          c.ResponseBody,
@@ -310,8 +327,34 @@ func newHandler(c config, pub stateless.Publisher, log *logp.Logger, metrics *in
 		preserveOriginalEvent: c.PreserveOriginalEvent,
 		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
 	}
+	if c.Tracer != nil {
+		w := zapcore.AddSync(c.Tracer)
+		go func() {
+			// Close the logger when we are done.
+			<-ctx.Done()
+			c.Tracer.Close()
+		}()
+		core := ecszap.NewCore(
+			ecszap.NewDefaultEncoderConfig(),
+			w,
+			zap.DebugLevel,
+		)
+		h.reqLogger = zap.New(core)
+		h.host = c.ListenAddress + ":" + c.ListenPort
+		if c.TLS != nil && c.TLS.IsEnabled() {
+			h.scheme = "https"
+		} else {
+			h.scheme = "http"
+		}
+	}
+	return h
+}
 
-	return newAPIValidationHandler(http.HandlerFunc(handler.apiResponse), validator, log)
+// newID returns an ID derived from the current time.
+func newID() string {
+	var data [8]byte
+	binary.LittleEndian.PutUint64(data[:], uint64(time.Now().UnixNano()))
+	return base32.HexEncoding.WithPadding(base32.NoPadding).EncodeToString(data[:])
 }
 
 // inputMetrics handles the input's metric reporting.

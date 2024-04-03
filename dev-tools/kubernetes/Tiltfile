@@ -137,7 +137,7 @@ def k8s_expose(
 # `beat`: `metricbeat` to test Metricbeat, `filebeat` to test Filebeat
 # `mode`: `debug` to start a remote debugger that you can connect to from your IDE with hot reloading enabled, `run` to just run Metricbeat without a debugger but still with hot reloading enabled
 # `arch`: `amd64` to build go binary for amd64 architecture, `arm64` to build go binary for arm64 (aka M1 Apple chip) architecture
-# `k8s_env`: `kind` to run against a Kind cluster with no docker repo, `gcp` to use a docker repo on GCP
+# `k8s_env`: `kind` to run against a Kind cluster with no docker repo, `gcp` to use a docker repo on GCP, `aws` to use a docker repo on AWS
 # `k8s_cluster`: `single` to use a single node k8s cluster, `multi` to use a k8s with more than 1 node.
 #       if running on a multi-node cluster we expect to have at least 2 workers and a control plane node. One of the workers (eg. worker1)
 #       should have a taint and a label (for node affinity) to make sure that only the debugger runs on that node. You need to run the following commands:
@@ -203,10 +203,20 @@ def beat(
     k8s_expose(beat=beat, mode=mode, k8s_cluster=k8s_cluster)
 
 
+# Note: Select only one of the following examples or modify one with the parameters you want to use
+
+# Run metricbeat in run mode against a single node k8s cluster with a docker repo on AWS
+# beat(beat="metricbeat",
+#      mode="run",
+#      arch="amd64",
+#      k8s_env="aws",
+#      k8s_cluster="single",
+#      )
+
+# Run on Mac M1 against a single node k8s cluster
 beat(beat="metricbeat",
-    #  mode="debug",
-     mode="run",
-     arch="amd64",
-     k8s_env="aws",
+     mode="debug",
+     arch="arm64",
+     k8s_env="kind",
      k8s_cluster="single",
      )

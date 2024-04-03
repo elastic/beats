@@ -62,12 +62,12 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 	}
 
 	if availabilityZone != "" {
-		ecs[ECSCloud+"."+ECSCloudAvailabilityZone] = availabilityZone
+		_, _ = ecs.Put(ECSCloud+"."+ECSCloudAvailabilityZone, availabilityZone)
 
 		// Get region name from availability zone name
 		region := getRegionName(availabilityZone)
 		if region != "" {
-			ecs[ECSCloud+"."+ECSCloudRegion] = region
+			_, _ = ecs.Put(ECSCloud+"."+ECSCloudRegion, region)
 		}
 	}
 
@@ -123,59 +123,6 @@ func (s *StackdriverTimeSeriesMetadataCollector) Metadata(ctx context.Context, i
 		ECS:    ecs,
 	}, nil
 }
-
-// ID returns a unique generated ID for an event when no service is implemented to get a "better" ID.`El trickerionEl trickerion
-func (s *StackdriverTimeSeriesMetadataCollector) ID(ctx context.Context, in *MetadataCollectorInputData) (string, error) {
-	m := mapstr.M{
-		KeyTimestamp: in.Timestamp.UnixNano(),
-	}
-
-	if s.timeSeries == nil {
-		return "", fmt.Errorf("no data found on the time series")
-	}
-
-	if s.timeSeries.Metric != nil {
-		if s.timeSeries.Metric.Type != "" {
-			_, _ = m.Put("metric.type", s.timeSeries.Metric.Type)
-		}
-
-		if s.timeSeries.Metric.Labels != nil {
-			_, _ = m.Put("metric.labels", s.timeSeries.Metric.Labels)
-		}
-	}
-
-	if s.timeSeries.Resource != nil {
-		if s.timeSeries.Resource.Type != "" {
-			_, _ = m.Put("resource.type", s.timeSeries.Resource.Type)
-		}
-
-		if s.timeSeries.Resource.Labels != nil {
-			_, _ = m.Put("resource.labels", s.timeSeries.Resource.Labels)
-		}
-	}
-
-	if s.timeSeries.Metadata != nil {
-		if s.timeSeries.Metadata.SystemLabels != nil {
-			_, _ = m.Put("metadata.system.labels", s.timeSeries.Metadata.SystemLabels)
-		}
-		if s.timeSeries.Metadata.UserLabels != nil {
-			_, _ = m.Put("metadata.user.labels", s.timeSeries.Metadata.UserLabels)
-		}
-	}
-
-	return m.String(), nil
-}
-
-/*
-func (s *StackdriverTimeSeriesMetadataCollector) getTimestamp(p *monitoringpb.Point) (t time.Time, err error) {
-	// Don't add point intervals that can't be "stated" at some timestamp.
-	if p != nil && p.Interval != nil {
-		return p.Interval.StartTime.AsTime(), nil
-	}
-
-	return time.Time{}, fmt.Errorf("error trying to extract the timestamp from the point data")
-}
-*/
 
 func getRegionName(availabilityZone string) string {
 	azSplit := strings.Split(availabilityZone, "-")

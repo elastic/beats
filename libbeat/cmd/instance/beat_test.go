@@ -27,7 +27,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/outputs"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 	"github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/go-ucfg/yaml"
 
 	"github.com/gofrs/uuid"
 	"github.com/stretchr/testify/assert"
@@ -236,7 +238,7 @@ func TestReloader(t *testing.T) {
 elasticsearch:
   hosts: ["https://127.0.0.1:9200"]
   username: "elastic"
-  allow_older_versions: true
+  allow_older_versions: false
 `
 		c, err := config.NewConfigWithYAML([]byte(cfg), cfg)
 		require.NoError(t, err)
@@ -248,13 +250,13 @@ elasticsearch:
 		reloader := b.makeOutputReloader(m)
 
 		require.False(t, b.Config.Output.IsSet(), "the output should not be set yet")
-		require.False(t, b.isConnectionToOlderVersionAllowed(), "the flag should not be present in the empty configuration")
+		require.True(t, b.isConnectionToOlderVersionAllowed(), "allow_older_versions flag should be true from 8.11")
 		err = reloader.Reload(update)
 		require.NoError(t, err)
 		require.True(t, b.Config.Output.IsSet(), "now the output should be set")
 		require.Equal(t, outCfg, b.Config.Output.Config())
 		require.Same(t, c, m.cfg.Config)
-		require.True(t, b.isConnectionToOlderVersionAllowed(), "the flag should be present")
+		require.False(t, b.isConnectionToOlderVersionAllowed(), "allow_older_versions flag should now be set to false")
 	})
 }
 
@@ -268,4 +270,166 @@ func (r *outputReloaderMock) Reload(
 ) error {
 	r.cfg = cfg
 	return nil
+}
+
+func TestPromoteOutputQueueSettings(t *testing.T) {
+	tests := map[string]struct {
+		input     []byte
+		memEvents int
+	}{
+		"blank": {
+			input:     []byte(""),
+			memEvents: 3200,
+		},
+		"defaults": {
+			input: []byte(`
+name: mockbeat
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			memEvents: 3200,
+		},
+		"topLevelQueue": {
+			input: []byte(`
+name: mockbeat
+queue:
+  mem:
+    events: 8096
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			memEvents: 8096,
+		},
+		"outputLevelQueue": {
+			input: []byte(`
+name: mockbeat
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      mem:
+        events: 8096
+`),
+			memEvents: 8096,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			cfg, err := yaml.NewConfig(tc.input)
+			require.NoError(t, err)
+
+			config := beatConfig{}
+			err = cfg.Unpack(&config)
+			require.NoError(t, err)
+
+			err = promoteOutputQueueSettings(&config)
+			require.NoError(t, err)
+
+			ms, err := memqueue.SettingsForUserConfig(config.Pipeline.Queue.Config())
+			require.NoError(t, err)
+			require.Equalf(t, tc.memEvents, ms.Events, "config was: %v", config.Pipeline.Queue.Config())
+		})
+	}
+}
+
+func TestValidateBeatConfig(t *testing.T) {
+	tests := map[string]struct {
+		input                 []byte
+		expectValidationError string
+	}{
+		"blank": {
+			input:                 []byte(""),
+			expectValidationError: "",
+		},
+		"defaults": {
+			input: []byte(`
+name: mockbeat
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			expectValidationError: "",
+		},
+		"topAndOutputLevelQueue": {
+			input: []byte(`
+name: mockbeat
+queue:
+  mem:
+    events: 2048
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      mem:
+        events: 8096
+`),
+			expectValidationError: "top level queue and output level queue settings defined, only one is allowed accessing config",
+		},
+		"managementTopLevelDiskQueue": {
+			input: []byte(`
+name: mockbeat
+management:
+  enabled: true
+queue:
+  disk:
+    max_size: 1G
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+`),
+			expectValidationError: "disk queue is not supported when management is enabled accessing config",
+		},
+		"managementOutputLevelDiskQueue": {
+			input: []byte(`
+name: mockbeat
+management:
+  enabled: true
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      disk:
+        max_size: 1G
+`),
+			expectValidationError: "disk queue is not supported when management is enabled accessing config",
+		},
+		"managementFalseOutputLevelDiskQueue": {
+			input: []byte(`
+name: mockbeat
+management:
+  enabled: false
+output:
+  elasticsearch:
+    hosts:
+      - "localhost:9200"
+    queue:
+      disk:
+        max_size: 1G
+`),
+			expectValidationError: "",
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			cfg, err := yaml.NewConfig(tc.input)
+			require.NoError(t, err)
+			config := beatConfig{}
+			err = cfg.Unpack(&config)
+			if tc.expectValidationError != "" {
+				require.Error(t, err)
+				require.Equal(t, tc.expectValidationError, err.Error())
+			} else {
+				require.NoError(t, err)
+			}
+		})
+	}
 }

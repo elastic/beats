@@ -18,9 +18,12 @@
 package kafka
 
 import (
+	"fmt"
+
 	"github.com/Shopify/sarama"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
@@ -47,7 +50,7 @@ func makeKafka(
 	log := logp.NewLogger(logSelector)
 	log.Debug("initialize kafka output")
 
-	config, err := readConfig(cfg)
+	kConfig, err := readConfig(cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -57,7 +60,7 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	libCfg, err := newSaramaConfig(log, config)
+	libCfg, err := newSaramaConfig(log, kConfig)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -67,24 +70,44 @@ func makeKafka(
 		return outputs.Fail(err)
 	}
 
-	codec, err := codec.CreateEncoder(beat, config.Codec)
+	codec, err := codec.CreateEncoder(beat, kConfig.Codec)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
-	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, config.Key, topic, config.Headers, codec, libCfg)
+	client, err := newKafkaClient(observer, hosts, beat.IndexPrefix, kConfig.Key, topic, kConfig.Headers, codec, libCfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
 
 	retry := 0
-	if config.MaxRetries < 0 {
+	if kConfig.MaxRetries < 0 {
 		retry = -1
 	}
-	return outputs.Success(config.BulkMaxSize, retry, client)
+	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, client)
 }
 
+// buildTopicSelector builds the topic selector for standalone Beat and when
+// running under Elastic-Agent based on cfg.
+//
+// When running standalone the topic selector works as expected and documented.
+// When running under Elastic-Agent, dynamic topic selection is not supported,
+// so a constant selector using the `topic` value is returned.
 func buildTopicSelector(cfg *config.C) (outil.Selector, error) {
+	topicCfg := struct {
+		Topic string `config:"topic" yaml:"topic"`
+	}{}
+
+	if err := cfg.Unpack(&topicCfg); err != nil {
+		return outil.Selector{}, fmt.Errorf("cannot unpack Kafka config to read the topic: %w", err)
+	}
+
+	if management.UnderAgent() {
+		exprSelector := outil.ConstSelectorExpr(topicCfg.Topic, outil.SelectorKeepCase)
+		selector := outil.MakeSelector(exprSelector)
+		return selector, nil
+	}
+
 	return outil.BuildSelectorFromConfig(cfg, outil.Settings{
 		Key:              "topic",
 		MultiKey:         "topics",

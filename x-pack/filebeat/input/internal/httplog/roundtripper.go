@@ -20,6 +20,8 @@ import (
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var _ http.RoundTripper = (*LoggingRoundTripper)(nil)
@@ -31,22 +33,26 @@ const TraceIDKey = contextKey("trace.id")
 type contextKey string
 
 // NewLoggingRoundTripper returns a LoggingRoundTripper that logs requests and
-// responses to the provided logger.
-func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger) *LoggingRoundTripper {
+// responses to the provided logger. Transaction creation is logged to log.
+func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger, maxBodyLen int, log *logp.Logger) *LoggingRoundTripper {
 	return &LoggingRoundTripper{
 		transport:   next,
-		logger:      logger,
+		maxBodyLen:  maxBodyLen,
+		txLog:       logger,
 		txBaseID:    newID(),
 		txIDCounter: atomic.NewUint64(0),
+		log:         log,
 	}
 }
 
 // LoggingRoundTripper is an http.RoundTripper that logs requests and responses.
 type LoggingRoundTripper struct {
 	transport   http.RoundTripper
-	logger      *zap.Logger    // Destination logger.
+	maxBodyLen  int            // The maximum length of a body. Longer bodies will be truncated.
+	txLog       *zap.Logger    // Destination logger.
 	txBaseID    string         // Random value to make transaction IDs unique.
 	txIDCounter *atomic.Uint64 // Transaction ID counter that is incremented for each request.
+	log         *logp.Logger
 }
 
 // RoundTrip implements the http.RoundTripper interface, logging
@@ -63,6 +69,7 @@ type LoggingRoundTripper struct {
 //	http.request
 //	user_agent.original
 //	http.request.body.content
+//	http.request.body.truncated
 //	http.request.body.bytes
 //	http.request.mime_type
 //	event.original (the request without body from httputil.DumpRequestOut)
@@ -71,13 +78,16 @@ type LoggingRoundTripper struct {
 //
 //	http.response.status_code
 //	http.response.body.content
+//	http.response.body.truncated
 //	http.response.body.bytes
 //	http.response.mime_type
 //	event.original (the response without body from httputil.DumpResponse)
 func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Create a child logger for this request.
-	log := rt.logger.With(
-		zap.String("transaction.id", rt.nextTxID()),
+	txID := rt.nextTxID()
+	rt.log.Debugw("new request trace transaction", "id", txID)
+	log := rt.txLog.With(
+		zap.String("transaction.id", txID),
 	)
 
 	if v := req.Context().Value(TraceIDKey); v != nil {
@@ -86,7 +96,77 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		}
 	}
 
-	reqParts := []zapcore.Field{
+	req, respParts, errorsMessages := logRequest(log, req, rt.maxBodyLen)
+
+	resp, err := rt.transport.RoundTrip(req)
+	if err != nil {
+		log.Debug("HTTP response error", zap.NamedError("error.message", err))
+		return resp, err
+	}
+	if resp == nil {
+		log.Debug("HTTP response error", noResponse)
+		return resp, err
+	}
+	respParts = append(respParts,
+		zap.Int("http.response.status_code", resp.StatusCode),
+	)
+	errorsMessages = errorsMessages[:0]
+	var body []byte
+	resp.Body, body, err = copyBody(resp.Body)
+	if err != nil {
+		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to read response body: %s", err))
+	} else {
+		respParts = append(respParts,
+			zap.ByteString("http.response.body.content", body[:min(len(body), rt.maxBodyLen)]),
+			zap.Bool("http.response.body.truncated", rt.maxBodyLen < len(body)),
+			zap.Int("http.response.body.bytes", len(body)),
+			zap.String("http.response.mime_type", resp.Header.Get("Content-Type")),
+		)
+	}
+	message, err := httputil.DumpResponse(resp, false)
+	if err != nil {
+		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to dump response: %s", err))
+	} else {
+		respParts = append(respParts, zap.ByteString("event.original", message))
+	}
+	switch len(errorsMessages) {
+	case 0:
+	case 1:
+		respParts = append(respParts, zap.String("error.message", errorsMessages[0]))
+	default:
+		respParts = append(respParts, zap.Strings("error.message", errorsMessages))
+	}
+	log.Debug("HTTP response", respParts...)
+
+	return resp, err
+}
+
+// LogRequest logs an HTTP request to the provided logger.
+//
+// Fields logged:
+//
+//	url.original
+//	url.scheme
+//	url.path
+//	url.domain
+//	url.port
+//	url.query
+//	http.request
+//	user_agent.original
+//	http.request.body.content
+//	http.request.body.truncated
+//	http.request.body.bytes
+//	http.request.mime_type
+//	event.original (the request without body from httputil.DumpRequestOut)
+//
+// Additional fields in extra will also be logged.
+func LogRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zapcore.Field) *http.Request {
+	req, _, _ = logRequest(log, req, maxBodyLen, extra...)
+	return req
+}
+
+func logRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zapcore.Field) (_ *http.Request, parts []zapcore.Field, errorsMessages []string) {
+	reqParts := append([]zapcore.Field{
 		zap.String("url.original", req.URL.String()),
 		zap.String("url.scheme", req.URL.Scheme),
 		zap.String("url.path", req.URL.Path),
@@ -95,18 +175,19 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 		zap.String("url.query", req.URL.RawQuery),
 		zap.String("http.request.method", req.Method),
 		zap.String("user_agent.original", req.Header.Get("User-Agent")),
-	}
+	}, extra...)
+
 	var (
-		body           []byte
-		err            error
-		errorsMessages []string
+		body []byte
+		err  error
 	)
 	req.Body, body, err = copyBody(req.Body)
 	if err != nil {
 		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to read request body: %s", err))
 	} else {
 		reqParts = append(reqParts,
-			zap.ByteString("http.request.body.content", body),
+			zap.ByteString("http.request.body.content", body[:min(len(body), maxBodyLen)]),
+			zap.Bool("http.request.body.truncated", maxBodyLen < len(body)),
 			zap.Int("http.request.body.bytes", len(body)),
 			zap.String("http.request.mime_type", req.Header.Get("Content-Type")),
 		)
@@ -126,51 +207,26 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 	}
 	log.Debug("HTTP request", reqParts...)
 
-	resp, err := rt.transport.RoundTrip(req)
-	if err != nil {
-		log.Debug("HTTP response error", zap.NamedError("error.message", err))
-		return resp, err
-	}
-	if resp == nil {
-		log.Debug("HTTP response error", noResponse)
-		return resp, err
-	}
-	respParts := append(reqParts[:0],
-		zap.Int("http.response.status_code", resp.StatusCode),
-	)
-	errorsMessages = errorsMessages[:0]
-	resp.Body, body, err = copyBody(resp.Body)
-	if err != nil {
-		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to read response body: %s", err))
-	} else {
-		respParts = append(respParts,
-			zap.ByteString("http.response.body.content", body),
-			zap.Int("http.response.body.bytes", len(body)),
-			zap.String("http.response.mime_type", resp.Header.Get("Content-Type")),
-		)
-	}
-	message, err = httputil.DumpResponse(resp, false)
-	if err != nil {
-		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to dump response: %s", err))
-	} else {
-		respParts = append(respParts, zap.ByteString("event.original", message))
-	}
-	switch len(errorsMessages) {
-	case 0:
-	case 1:
-		respParts = append(reqParts, zap.String("error.message", errorsMessages[0]))
-	default:
-		respParts = append(reqParts, zap.Strings("error.message", errorsMessages))
-	}
-	log.Debug("HTTP response", respParts...)
+	return req, reqParts[:0], errorsMessages
+}
 
-	return resp, err
+// TxID returns the current transaction.id value. If rt is nil, the empty string is returned.
+func (rt *LoggingRoundTripper) TxID() string {
+	if rt == nil {
+		return ""
+	}
+	count := rt.txIDCounter.Load()
+	return rt.formatTxID(count)
 }
 
 // nextTxID returns the next transaction.id value. It increments the internal
 // request counter.
 func (rt *LoggingRoundTripper) nextTxID() string {
 	count := rt.txIDCounter.Inc()
+	return rt.formatTxID(count)
+}
+
+func (rt *LoggingRoundTripper) formatTxID(count uint64) string {
 	return rt.txBaseID + "-" + strconv.FormatUint(count, 10)
 }
 

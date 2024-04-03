@@ -10,7 +10,6 @@
         "authentication"
       ],
       "code": "4634",
-      "ingested": "2022-06-08T06:21:08.274378300Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -79,7 +78,6 @@
         "authentication"
       ],
       "code": "4634",
-      "ingested": "2022-06-08T06:21:08.274397100Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",

@@ -21,6 +21,11 @@ The following cloud providers are supported:
 - Openstack Nova
 - Hetzner Cloud
 
+NOTE: `huawei` is an alias for `openstack`. Huawei cloud runs on OpenStack platform, and when
+viewed from a metadata API standpoint, it is impossible to differentiate it from OpenStack. If you know that your
+deployments run on Huawei Cloud exclusively, and you wish to have `cloud.provider` value as `huawei`, you can achieve
+this by overwriting the value using an `add_fields` processor.
+
 The Alibaba Cloud and Tencent cloud providers are disabled by default, because
 they require to access a remote host. The `providers` setting allows users to
 select a list of default providers to query.
@@ -50,13 +55,17 @@ List of names the `providers` setting supports:
 
 - "alibaba", or "ecs" for the Alibaba Cloud provider (disabled by default).
 - "azure" for Azure Virtual Machine (enabled by default).
+   If the virtual machine is part of an AKS managed cluster, the fields
+   `orchestrator.cluster.name` and `orchestrator.cluster.id` can also be
+   retrieved. "TENANT_ID", "CLIENT_ID" and "CLIENT_SECRET" environment
+   variables need to be set for authentication purposes. If not set we
+   fallback to https://learn.microsoft.com/en-us/azure/developer/go/azure-sdk-authentication?tabs=bash#2-authenticate-with-azure[DefaultAzureCredential] and user can choose different authentication methods (e.g. workload identity).
 - "digitalocean" for Digital Ocean (enabled by default).
 - "aws", or "ec2" for Amazon Web Services (enabled by default).
 - "gcp" for Google Copmute Enging (enabled by default).
-- "openstack", or "nova" for Openstack Nova (enabled by default).
+- "openstack", "nova", or "huawei" for Openstack Nova (enabled by default).
 - "openstack-ssl", or "nova-ssl" for Openstack Nova when SSL metadata APIs are enabled (enabled by default).
 - "tencent", or "qcloud" for Tencent Cloud (disabled by default).
-- "huawei" for Huawei Cloud (enabled by default).
 - "hetzner" for Hetzner Cloud (enabled by default).
 
 The third optional configuration setting is `overwrite`. When `overwrite` is
@@ -124,20 +133,6 @@ _Tencent Cloud_
     "instance.id": "ins-qcloudv5",
     "provider": "qcloud",
     "region": "china-south-gz"
-  }
-}
--------------------------------------------------------------------------------
-
-_Huawei Cloud_
-
-[source,json]
--------------------------------------------------------------------------------
-{
-  "cloud": {
-    "availability_zone": "cn-east-2b",
-    "instance.id": "37da9890-8289-4c58-ba34-a8271c4a8216",
-    "provider": "huawei",
-    "region": "cn-east-2"
   }
 }
 -------------------------------------------------------------------------------

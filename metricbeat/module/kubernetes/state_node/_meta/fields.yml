@@ -70,3 +70,7 @@
           type: long
           description: >
             Node pod capacity
+    - name: kubelet.version
+      type: keyword
+      description: >
+        Kubelet version.

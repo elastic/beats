@@ -17,7 +17,14 @@
 
 package outputs
 
-import "github.com/elastic/elastic-agent-libs/monitoring"
+import (
+	"time"
+
+	"github.com/rcrowley/go-metrics"
+
+	"github.com/elastic/elastic-agent-libs/monitoring"
+	"github.com/elastic/elastic-agent-libs/monitoring/adapter"
+)
 
 // Stats implements the Observer interface, for collecting metrics on common
 // outputs events.
@@ -46,13 +53,15 @@ type Stats struct {
 
 	readBytes  *monitoring.Uint // total amount of bytes read
 	readErrors *monitoring.Uint // total number of errors while waiting for response on output
+
+	sendLatencyMillis metrics.Sample
 }
 
 // NewStats creates a new Stats instance using a backing monitoring registry.
 // This function will create and register a number of metrics with the registry passed.
 // The registry must not be null.
 func NewStats(reg *monitoring.Registry) *Stats {
-	return &Stats{
+	obj := &Stats{
 		batches:    monitoring.NewUint(reg, "events.batches"),
 		events:     monitoring.NewUint(reg, "events.total"),
 		acked:      monitoring.NewUint(reg, "events.acked"),
@@ -69,7 +78,11 @@ func NewStats(reg *monitoring.Registry) *Stats {
 
 		readBytes:  monitoring.NewUint(reg, "read.bytes"),
 		readErrors: monitoring.NewUint(reg, "read.errors"),
+
+		sendLatencyMillis: metrics.NewUniformSample(1024),
 	}
+	_ = adapter.NewGoMetrics(reg, "write.latency", adapter.Accept).Register("histogram", metrics.NewHistogram(obj.sendLatencyMillis))
+	return obj
 }
 
 // NewBatch updates active batch and event metrics.
@@ -79,6 +92,10 @@ func (s *Stats) NewBatch(n int) {
 		s.events.Add(uint64(n))
 		s.active.Add(uint64(n))
 	}
+}
+
+func (s *Stats) ReportLatency(time time.Duration) {
+	s.sendLatencyMillis.Update(time.Milliseconds())
 }
 
 // Acked updates active and acked event metrics.

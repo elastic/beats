@@ -153,13 +153,12 @@ func New(
 	if b := userQueueConfig.Name(); b != "" {
 		queueType = b
 	}
-	queueFactory, err := queueFactoryForUserConfig(
-		queueType, userQueueConfig.Config(), settings.InputQueueSize)
+	queueFactory, err := queueFactoryForUserConfig(queueType, userQueueConfig.Config())
 	if err != nil {
 		return nil, err
 	}
 
-	output, err := newOutputController(beat, monitors, p.observer, p.eventWaitGroup, queueFactory)
+	output, err := newOutputController(beat, monitors, p.observer, p.eventWaitGroup, queueFactory, settings.InputQueueSize)
 	if err != nil {
 		return nil, err
 	}
@@ -399,16 +398,13 @@ func (p *Pipeline) OutputReloader() OutputReloader {
 // This helper exists to frontload config parsing errors: if there is an
 // error in the queue config, we want it to show up as fatal during
 // initialization, even if the queue itself isn't created until later.
-func queueFactoryForUserConfig(queueType string, userConfig *conf.C, inQueueSize int) (queue.QueueFactory, error) {
+func queueFactoryForUserConfig(queueType string, userConfig *conf.C) (queue.QueueFactory, error) {
 	switch queueType {
 	case memqueue.QueueType:
 		settings, err := memqueue.SettingsForUserConfig(userConfig)
 		if err != nil {
 			return nil, err
 		}
-		// The memory queue has a special override during pipeline
-		// initialization for the size of its API channel buffer.
-		settings.InputQueueSize = inQueueSize
 		return memqueue.FactoryForSettings(settings), nil
 	case diskqueue.QueueType:
 		settings, err := diskqueue.SettingsForUserConfig(userConfig)

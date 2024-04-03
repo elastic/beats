@@ -22,7 +22,7 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/idxmgmt"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 )
 
 // GenGetILMPolicyCmd is the command used to export the ilm policy.
@@ -35,14 +35,20 @@ func GenGetILMPolicyCmd(settings instance.Settings) *cobra.Command {
 			dir, _ := cmd.Flags().GetString("dir")
 
 			if settings.ILM == nil {
-				settings.ILM = ilm.StdSupport
+				settings.ILM = lifecycle.StdSupport
 			}
 			b, err := instance.NewInitializedBeat(settings)
 			if err != nil {
 				fatalfInitCmd(err)
 			}
 
-			clientHandler := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version))
+			// the way this works, we decide to export ILM or DSL based on the user's config.
+			// This means that if a user has no index management config, we'll default to ILM, regardless of what the user
+			// is connected to. Might not be a problem since a user who doesn't have any custom lifecycle config has nothing to export?
+			clientHandler, err := idxmgmt.NewFileClientHandler(newIdxmgmtClient(dir, version), b.Info, b.Config.LifecycleConfig)
+			if err != nil {
+				fatalf("error creating file handler: %s", err)
+			}
 			idxManager := b.IdxSupporter.Manager(clientHandler, idxmgmt.BeatsAssets(b.Fields))
 			if err := idxManager.Setup(idxmgmt.LoadModeDisabled, idxmgmt.LoadModeForce); err != nil {
 				fatalf("Error exporting ilm-policy: %+v.", err)

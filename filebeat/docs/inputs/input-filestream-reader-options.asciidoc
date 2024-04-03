@@ -182,6 +182,7 @@ multiple lines. See <<multiline-examples>> for more information about
 configuring multiline options.
 
 [float]
+[id="{beatname_lc}-input-{type}-ndjson"]
 ===== `ndjson`
 
 These options make it possible for {beatname_uc} to decode logs structured as

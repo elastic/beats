@@ -10,7 +10,6 @@
         "iam"
       ],
       "code": "4741",
-      "ingested": "2022-06-08T06:21:07.970367200Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -55,8 +54,9 @@
         "HomePath": "-",
         "LogonHours": "%%1793",
         "NewUACList": [
-          "SCRIPT",
-          "ENCRYPTED_TEXT_PWD_ALLOWED"
+          "USER_ACCOUNT_DISABLED",
+          "USER_PASSWORD_NOT_REQUIRED",
+          "USER_WORKSTATION_TRUST_ACCOUNT"
         ],
         "NewUacValue": "0x85",
         "OldUacValue": "0x0",

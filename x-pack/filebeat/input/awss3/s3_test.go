@@ -22,8 +22,7 @@ import (
 )
 
 func TestS3Poller(t *testing.T) {
-	err := logp.TestingSetup()
-	assert.Nil(t, err)
+	logp.TestingSetup()
 
 	const bucket = "bucket"
 	const numberOfWorkers = 5
@@ -94,6 +93,11 @@ func TestS3Poller(t *testing.T) {
 							Key:          aws.String("key5"),
 							LastModified: aws.Time(time.Now()),
 						},
+						{
+							ETag:         aws.String("etag6"),
+							Key:          aws.String("2024-02-08T08:35:00+00:02.json.gz"),
+							LastModified: aws.Time(time.Now()),
+						},
 					},
 				}, nil
 			})
@@ -123,6 +127,10 @@ func TestS3Poller(t *testing.T) {
 
 		mockAPI.EXPECT().
 			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key5")).
+			Return(nil, errFakeConnectivityFailure)
+
+		mockAPI.EXPECT().
+			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("2024-02-08T08:35:00+00:02.json.gz")).
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{}, numberOfWorkers)

@@ -31,12 +31,15 @@ type LightweightDurationPlugin struct {
 }
 
 func (lwdsp *LightweightDurationPlugin) EachEvent(event *beat.Event, _ error) EachEventActions {
-	// Effectively only runs once, on the first event
+	return 0 // noop
+}
+
+func (lwdsp *LightweightDurationPlugin) BeforeEachEvent(event *beat.Event) {
+	// Effectively capture on the first event
 	if lwdsp.startedAt == nil {
 		now := time.Now()
 		lwdsp.startedAt = &now
 	}
-	return 0
 }
 
 func (lwdsp *LightweightDurationPlugin) BeforeSummary(event *beat.Event) BeforeSummaryActions {
@@ -44,7 +47,10 @@ func (lwdsp *LightweightDurationPlugin) BeforeSummary(event *beat.Event) BeforeS
 	return 0
 }
 
-func (lwdsp *LightweightDurationPlugin) BeforeRetry() {}
+func (lwdsp *LightweightDurationPlugin) BeforeRetry() {
+	// Reset event start time
+	lwdsp.startedAt = nil
+}
 
 // BrowserDurationPlugin handles the logic for writing the `monitor.duration.us` field
 // for browser monitors.
@@ -82,4 +88,5 @@ func (bwdsp *BrowserDurationPlugin) BeforeSummary(event *beat.Event) BeforeSumma
 	return 0
 }
 
-func (bwdsp *BrowserDurationPlugin) BeforeRetry() {}
+func (bwdsp *BrowserDurationPlugin) BeforeRetry()                      {}
+func (bwdsp *BrowserDurationPlugin) BeforeEachEvent(event *beat.Event) {} // noop

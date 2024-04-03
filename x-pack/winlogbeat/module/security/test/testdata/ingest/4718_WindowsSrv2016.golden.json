@@ -11,7 +11,6 @@
         "configuration"
       ],
       "code": "4718",
-      "ingested": "2022-06-08T06:21:07.938661600Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",

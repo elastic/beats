@@ -12,6 +12,7 @@ import (
 	"net/http/httptest"
 	"path"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -457,28 +458,46 @@ func TestGraph_Devices(t *testing.T) {
 		},
 	}
 
-	rawConf := graphConf{
-		APIEndpoint: "http://" + testSrv.addr,
+	for _, test := range []struct {
+		name      string
+		selection selection
+	}{
+		{name: "default_selection"},
+		{
+			name: "user_selection",
+			selection: selection{
+				UserQuery:   strings.Split(strings.TrimPrefix(defaultUsersQuery, "$select="), ","),
+				GroupQuery:  strings.Split(strings.TrimPrefix(defaultGroupsQuery, "$select="), ","),
+				DeviceQuery: strings.Split(strings.TrimPrefix(defaultDevicesQuery, "$select="), ","),
+			},
+		},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			rawConf := graphConf{
+				APIEndpoint: "http://" + testSrv.addr,
+				Select:      test.selection,
+			}
+			c, err := config.NewConfigFrom(&rawConf)
+			require.NoError(t, err)
+			auth := mock.New(mock.DefaultTokenValue)
+
+			f, err := New(c, logp.L(), auth)
+			require.NoError(t, err)
+
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			gotDevices, gotDeltaLink, gotErr := f.Devices(ctx, "")
+
+			require.NoError(t, gotErr)
+			// Using go-cmp because testify is too weak for this comparison.
+			// reflect.DeepEqual works, but won't show a reasonable diff.
+			exporter := cmp.Exporter(func(t reflect.Type) bool {
+				return t == reflect.TypeOf(collections.UUIDSet{})
+			})
+			if !cmp.Equal(wantDevices, gotDevices, exporter) {
+				t.Errorf("unexpected result:\n--- got\n--- want\n%s", cmp.Diff(wantDevices, gotDevices, exporter))
+			}
+			require.Equal(t, wantDeltaLink, gotDeltaLink)
+		})
 	}
-	c, err := config.NewConfigFrom(&rawConf)
-	require.NoError(t, err)
-	auth := mock.New(mock.DefaultTokenValue)
-
-	f, err := New(c, logp.L(), auth)
-	require.NoError(t, err)
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	gotDevices, gotDeltaLink, gotErr := f.Devices(ctx, "")
-
-	require.NoError(t, gotErr)
-	// Using go-cmp because testify is too weak for this comparison.
-	// reflect.DeepEqual works, but won't show a reasonable diff.
-	exporter := cmp.Exporter(func(t reflect.Type) bool {
-		return t == reflect.TypeOf(collections.UUIDSet{})
-	})
-	if !cmp.Equal(wantDevices, gotDevices, exporter) {
-		t.Errorf("unexpected result:\n--- got\n--- want\n%s", cmp.Diff(wantDevices, gotDevices, exporter))
-	}
-	require.Equal(t, wantDeltaLink, gotDeltaLink)
 }

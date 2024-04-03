@@ -102,6 +102,7 @@ func NewClient(
 		CompressionLevel: s.CompressionLevel,
 		EscapeHTML:       s.EscapeHTML,
 		Transport:        s.Transport,
+		IdleConnTimeout:  s.IdleConnTimeout,
 	})
 	if err != nil {
 		return nil, err
@@ -220,7 +221,7 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 func (client *Client) publishEvents(ctx context.Context, data []publisher.Event) ([]publisher.Event, error) {
 	span, ctx := apm.StartSpan(ctx, "publishEvents", "output")
 	defer span.End()
-	begin := time.Now()
+
 	st := client.observer
 
 	if st != nil {
@@ -245,8 +246,10 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 		return nil, nil
 	}
 
+	begin := time.Now()
 	params := map[string]string{"filter_path": "errors,items.*.error,items.*.status"}
 	status, result, sendErr := client.conn.Bulk(ctx, "", "", params, bulkItems)
+	timeSinceSend := time.Since(begin)
 
 	if sendErr != nil {
 		if status == http.StatusRequestEntityTooLarge {
@@ -264,7 +267,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 
 	client.log.Debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
 		pubCount,
-		time.Since(begin))
+		timeSinceSend)
 
 	// check response for transient errors
 	var failedEvents []publisher.Event
@@ -288,6 +291,8 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 		st.Dropped(dropped)
 		st.Duplicate(duplicates)
 		st.ErrTooMany(stats.tooMany)
+		st.ReportLatency(timeSinceSend)
+
 	}
 
 	if failed > 0 {
@@ -426,10 +431,12 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 				result, _ := data[i].Content.Meta.HasKey(dead_letter_marker_field)
 				if result {
 					stats.nonIndexable++
-					client.log.Errorf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
+					client.log.Errorf("Can't deliver to dead letter index event (status=%v). Enable debug logs to view the event and cause.", status)
+					client.log.Debugf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
 					// poison pill - this will clog the pipeline if the underlying failure is non transient.
 				} else if client.NonIndexableAction == dead_letter_index {
-					client.log.Warnf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
+					client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Enable debug logs to view the event and cause.", status)
+					client.log.Debugf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
 					if data[i].Content.Meta == nil {
 						data[i].Content.Meta = mapstr.M{
 							dead_letter_marker_field: true,
@@ -444,7 +451,8 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 					}
 				} else { // drop
 					stats.nonIndexable++
-					client.log.Warnf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
+					client.log.Warnf("Cannot index event (status=%v): dropping event! Enable debug logs to view the event and cause.", status)
+					client.log.Debugf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
 					continue
 				}
 			}

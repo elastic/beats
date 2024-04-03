@@ -35,11 +35,12 @@ type testOutput struct {
 }
 
 type testOutputConfig struct {
-	Worker      int           `config:"worker" validate:"min=1"`
-	BulkMaxSize int           `config:"bulk_max_size"`
-	Retry       int           `config:"retry"`
-	MinWait     time.Duration `config:"min_wait"`
-	MaxWait     time.Duration `config:"max_wait"`
+	Worker      int            `config:"worker" validate:"min=1"`
+	BulkMaxSize int            `config:"bulk_max_size"`
+	Retry       int            `config:"retry"`
+	MinWait     time.Duration  `config:"min_wait"`
+	MaxWait     time.Duration  `config:"max_wait"`
+	Queue       conf.Namespace `config:"queue"`
 	Fail        struct {
 		EveryBatch int
 	}
@@ -66,7 +67,7 @@ func makeTestOutput(_ outputs.IndexManager, beat beat.Info, observer outputs.Obs
 		clients[i] = client
 	}
 
-	return outputs.Success(config.BulkMaxSize, config.Retry, clients...)
+	return outputs.Success(config.Queue, config.BulkMaxSize, config.Retry, clients...)
 }
 
 func (*testOutput) Close() error { return nil }

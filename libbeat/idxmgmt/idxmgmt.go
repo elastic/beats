@@ -22,7 +22,7 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/idxmgmt/ilm"
+	"github.com/elastic/beats/v7/libbeat/idxmgmt/lifecycle"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/template"
 	"github.com/elastic/elastic-agent-libs/config"
@@ -99,37 +99,47 @@ func DefaultSupport(log *logp.Logger, info beat.Info, configRoot *config.C) (Sup
 
 // MakeDefaultSupport creates some default index management support, with a
 // custom ILM support implementation.
-func MakeDefaultSupport(ilmSupport ilm.SupportFactory) SupportFactory {
+func MakeDefaultSupport(ilmSupport lifecycle.SupportFactory) SupportFactory {
 	if ilmSupport == nil {
-		ilmSupport = ilm.DefaultSupport
+		ilmSupport = lifecycle.DefaultSupport
 	}
 
 	return func(log *logp.Logger, info beat.Info, configRoot *config.C) (Supporter, error) {
 		const logName = "index-management"
-
-		cfg := struct {
-			ILM       *config.C        `config:"setup.ilm"`
-			Template  *config.C        `config:"setup.template"`
-			Output    config.Namespace `config:"output"`
-			Migration *config.C        `config:"migration.6_to_7"`
-		}{}
-		if configRoot != nil {
-			if err := configRoot.Unpack(&cfg); err != nil {
-				return nil, err
-			}
-		}
-
 		if log == nil {
 			log = logp.NewLogger(logName)
 		} else {
 			log = log.Named(logName)
 		}
 
+		// now that we have the "correct" default, unpack the rest of the config
+		cfg := struct {
+			Lifecycle lifecycle.RawConfig `config:",inline"`
+			Template  *config.C           `config:"setup.template"`
+			Output    config.Namespace    `config:"output"`
+			Migration *config.C           `config:"migration.6_to_7"`
+		}{}
+		if configRoot != nil {
+			if err := configRoot.Unpack(&cfg); err != nil {
+				return nil, fmt.Errorf("error unpacking cfg settings while setting up index support: %w", err)
+			}
+		}
+
+		// consider lifecycles enabled if the user has explicitly enabled them,
+		// or if no `enabled` setting has been set by the user, thus reverting to a default of enabled.
+		enabled := false
+		if cfg.Lifecycle.DSL.Enabled() || cfg.Lifecycle.ILM.Enabled() {
+			enabled = true
+		}
+		if (cfg.Lifecycle.DSL == nil || !cfg.Lifecycle.DSL.HasField("enabled")) && (cfg.Lifecycle.ILM == nil || !cfg.Lifecycle.ILM.HasField("enabled")) {
+			enabled = true
+		}
+
 		if err := checkTemplateESSettings(cfg.Template, cfg.Output); err != nil {
 			return nil, err
 		}
 
-		return newIndexSupport(log, info, ilmSupport, cfg.Template, cfg.ILM, cfg.Migration.Enabled())
+		return newIndexSupport(log, info, ilmSupport, cfg.Template, enabled, cfg.Migration.Enabled())
 	}
 }
 
@@ -156,7 +166,7 @@ func checkTemplateESSettings(tmpl *config.C, out config.Namespace) error {
 	var tmplCfg template.TemplateConfig
 	if tmpl != nil {
 		if err := tmpl.Unpack(&tmplCfg); err != nil {
-			return fmt.Errorf("unpacking template config fails: %v", err)
+			return fmt.Errorf("unpacking template config fails: %w", err)
 		}
 	}
 

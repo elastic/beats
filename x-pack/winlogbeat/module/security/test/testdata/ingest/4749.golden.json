@@ -10,7 +10,6 @@
         "iam"
       ],
       "code": "4749",
-      "ingested": "2022-06-08T06:21:08.034749600Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",

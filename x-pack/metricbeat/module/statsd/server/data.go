@@ -102,18 +102,18 @@ func parse(b []byte) ([]statsdMetric, error) {
 	return metrics, nil
 }
 
-func eventMapping(metricName string, metricValue interface{}, metricSetFields mapstr.M, mappings map[string]StatsdMapping) {
+func eventMapping(metricName string, metricValue interface{}, mappings map[string]StatsdMapping) mapstr.M {
+	m := mapstr.M{}
 	if len(mappings) == 0 {
-		metricSetFields[common.DeDot(metricName)] = metricValue
-		return
+		m[common.DeDot(metricName)] = metricValue
+		return m
 	}
 
 	for _, mapping := range mappings {
 		// The metricname match the one with no labels in mappings
-		// Let's insert it dedotted and continue
 		if metricName == mapping.Metric {
-			metricSetFields[mapping.Value.Field] = metricValue
-			return
+			m[mapping.Value.Field] = metricValue
+			return m
 		}
 
 		res := mapping.regex.FindStringSubmatch(metricName)
@@ -121,7 +121,7 @@ func eventMapping(metricName string, metricValue interface{}, metricSetFields ma
 		// Not all labels match
 		// Skip and continue to next mapping
 		if len(res) != (len(mapping.Labels) + 1) {
-			logger.Debug("not all labels match in statsd.mapping, skipped")
+			logger.Debug("not all labels match in statsd.mappings, skipped")
 			continue
 		}
 
@@ -133,13 +133,15 @@ func eventMapping(metricName string, metricValue interface{}, metricSetFields ma
 					continue
 				}
 
-				metricSetFields[label.Field] = res[i]
+				m[label.Field] = res[i]
 			}
 		}
 
 		// Let's add the metric with the value field
-		metricSetFields[mapping.Value.Field] = metricValue
+		m[mapping.Value.Field] = metricValue
+		break
 	}
+	return m
 }
 
 func newMetricProcessor(ttl time.Duration) *metricProcessor {

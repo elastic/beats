@@ -402,11 +402,10 @@
         "title": "[Winlogbeat Security] Group Management Events",
         "version": 1
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:09.418Z",
     "id": "bb858830-f412-11e9-8405-516218e3d268",
-    "migrationVersion": {
-        "dashboard": "7.14.0"
-    },
+    "managed": false,
     "references": [
         {
             "id": "6f0f2ea0-f414-11e9-8405-516218e3d268",
@@ -515,6 +514,7 @@
         }
     ],
     "type": "dashboard",
-    "updated_at": "2021-08-11T13:18:56.323Z",
-    "version": "WzIyMjcsMl0="
+    "typeMigrationVersion": "8.9.0",
+    "updated_at": "2023-11-10T17:08:09.418Z",
+    "version": "WzI5MiwxXQ=="
 }

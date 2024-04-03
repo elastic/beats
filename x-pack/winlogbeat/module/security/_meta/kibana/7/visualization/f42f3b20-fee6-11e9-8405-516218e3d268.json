@@ -155,11 +155,10 @@
             "type": "metric"
         }
     },
-    "coreMigrationVersion": "7.14.0",
+    "coreMigrationVersion": "8.8.0",
+    "created_at": "2023-11-10T17:08:03.260Z",
     "id": "f42f3b20-fee6-11e9-8405-516218e3d268",
-    "migrationVersion": {
-        "visualization": "7.14.0"
-    },
+    "managed": false,
     "references": [
         {
             "id": "winlogbeat-*",
@@ -173,6 +172,7 @@
         }
     ],
     "type": "visualization",
-    "updated_at": "2021-08-11T13:18:55.318Z",
-    "version": "WzIyMTYsMl0="
+    "typeMigrationVersion": "8.5.0",
+    "updated_at": "2023-11-10T17:08:03.260Z",
+    "version": "WzIxNCwxXQ=="
 }

@@ -122,6 +122,16 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	if cfg.Request.Tracer != nil {
 		id := sanitizeFileName(ctx.ID)
 		cfg.Request.Tracer.Filename = strings.ReplaceAll(cfg.Request.Tracer.Filename, "*", id)
+
+		// Propagate tracer behaviour to all chain children.
+		for i, c := range cfg.Chain {
+			if c.Step != nil { // Request is validated as required.
+				cfg.Chain[i].Step.Request.Tracer = cfg.Request.Tracer
+			}
+			if c.While != nil { // Request is validated as required.
+				cfg.Chain[i].While.Request.Tracer = cfg.Request.Tracer
+			}
+		}
 	}
 
 	metrics := newInputMetrics(reg)
@@ -153,6 +163,12 @@ func run(ctx v2.Context, cfg config, pub inputcursor.Publisher, crsr *inputcurso
 	trCtx.cursor.load(crsr)
 
 	doFunc := func() error {
+		defer func() {
+			// Clear response bodies between evaluations.
+			trCtx.firstResponse.body = nil
+			trCtx.lastResponse.body = nil
+		}()
+
 		log.Info("Process another repeated request.")
 
 		startTime := time.Now()
@@ -192,37 +208,38 @@ func sanitizeFileName(name string) string {
 }
 
 func newHTTPClient(ctx context.Context, config config, log *logp.Logger, reg *monitoring.Registry) (*httpClient, error) {
-	// Make retryable HTTP client
-	netHTTPClient, err := newNetHTTPClient(ctx, config.Request, log, reg)
+	client, err := newNetHTTPClient(ctx, config.Request, log, reg)
 	if err != nil {
 		return nil, err
 	}
 
-	client := &retryablehttp.Client{
-		HTTPClient:   netHTTPClient,
-		Logger:       newRetryLogger(log),
-		RetryWaitMin: config.Request.Retry.getWaitMin(),
-		RetryWaitMax: config.Request.Retry.getWaitMax(),
-		RetryMax:     config.Request.Retry.getMaxAttempts(),
-		CheckRetry:   retryablehttp.DefaultRetryPolicy,
-		Backoff:      retryablehttp.DefaultBackoff,
+	if config.Request.Retry.getMaxAttempts() > 1 {
+		// Make retryable HTTP client if needed.
+		client = (&retryablehttp.Client{
+			HTTPClient:   client,
+			Logger:       newRetryLogger(log),
+			RetryWaitMin: config.Request.Retry.getWaitMin(),
+			RetryWaitMax: config.Request.Retry.getWaitMax(),
+			RetryMax:     config.Request.Retry.getMaxAttempts(),
+			CheckRetry:   retryablehttp.DefaultRetryPolicy,
+			Backoff:      retryablehttp.DefaultBackoff,
+		}).StandardClient()
 	}
 
 	limiter := newRateLimiterFromConfig(config.Request.RateLimit, log)
 
 	if config.Auth.OAuth2.isEnabled() {
-		authClient, err := config.Auth.OAuth2.client(ctx, client.StandardClient())
+		authClient, err := config.Auth.OAuth2.client(ctx, client)
 		if err != nil {
 			return nil, err
 		}
 		return &httpClient{client: authClient, limiter: limiter}, nil
 	}
 
-	return &httpClient{client: client.StandardClient(), limiter: limiter}, nil
+	return &httpClient{client: client, limiter: limiter}, nil
 }
 
 func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger, reg *monitoring.Registry) (*http.Client, error) {
-	// Make retryable HTTP client
 	netHTTPClient, err := cfg.Transport.Client(clientOptions(cfg.URL.URL, cfg.KeepAlive.settings())...)
 	if err != nil {
 		return nil, err
@@ -242,7 +259,12 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 		)
 		traceLogger := zap.New(core)
 
-		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger)
+		const margin = 1e3 // 1OkB ought to be enough room for all the remainder of the trace details.
+		maxSize := cfg.Tracer.MaxSize*1e6 - margin
+		if maxSize < 0 {
+			maxSize = 0
+		}
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxSize, log)
 	}
 
 	if reg != nil {
@@ -255,8 +277,7 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 }
 
 func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *requestConfig, log *logp.Logger, reg *monitoring.Registry, p ...*Policy) (*httpClient, error) {
-	// Make retryable HTTP client
-	netHTTPClient, err := newNetHTTPClient(ctx, requestCfg, log, reg)
+	client, err := newNetHTTPClient(ctx, requestCfg, log, reg)
 	if err != nil {
 		return nil, err
 	}
@@ -268,27 +289,30 @@ func newChainHTTPClient(ctx context.Context, authCfg *authConfig, requestCfg *re
 		retryPolicyFunc = retryablehttp.DefaultRetryPolicy
 	}
 
-	client := &retryablehttp.Client{
-		HTTPClient:   netHTTPClient,
-		Logger:       newRetryLogger(log),
-		RetryWaitMin: requestCfg.Retry.getWaitMin(),
-		RetryWaitMax: requestCfg.Retry.getWaitMax(),
-		RetryMax:     requestCfg.Retry.getMaxAttempts(),
-		CheckRetry:   retryPolicyFunc,
-		Backoff:      retryablehttp.DefaultBackoff,
+	if requestCfg.Retry.getMaxAttempts() > 1 {
+		// Make retryable HTTP client if needed.
+		client = (&retryablehttp.Client{
+			HTTPClient:   client,
+			Logger:       newRetryLogger(log),
+			RetryWaitMin: requestCfg.Retry.getWaitMin(),
+			RetryWaitMax: requestCfg.Retry.getWaitMax(),
+			RetryMax:     requestCfg.Retry.getMaxAttempts(),
+			CheckRetry:   retryPolicyFunc,
+			Backoff:      retryablehttp.DefaultBackoff,
+		}).StandardClient()
 	}
 
 	limiter := newRateLimiterFromConfig(requestCfg.RateLimit, log)
 
 	if authCfg != nil && authCfg.OAuth2.isEnabled() {
-		authClient, err := authCfg.OAuth2.client(ctx, client.StandardClient())
+		authClient, err := authCfg.OAuth2.client(ctx, client)
 		if err != nil {
 			return nil, err
 		}
 		return &httpClient{client: authClient, limiter: limiter}, nil
 	}
 
-	return &httpClient{client: client.StandardClient(), limiter: limiter}, nil
+	return &httpClient{client: client, limiter: limiter}, nil
 }
 
 // clientOption returns constructed client configuration options, including

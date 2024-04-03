@@ -281,6 +281,8 @@ include::../include/timezone-support.asciidoc[]
 [float]
 ==== `nexus` fileset settings
 
+deprecated::[8.12.0,"This fileset is deprecated. Use the https://docs.elastic.co/integrations/cisco_nexus[Cisco Nexus] Elastic integration instead."]
+
 experimental[]
 
 NOTE: This was converted from RSA NetWitness log parser XML "cisconxos" device revision 134.
@@ -325,6 +327,8 @@ will be found under `rsa.raw`. The default is false.
 
 [float]
 ==== `meraki` fileset settings
+
+deprecated::[8.12.0,"This fileset is deprecated. Use the https://docs.elastic.co/integrations/cisco_meraki[Cisco Meraki] Elastic integration instead."]
 
 experimental[]
 

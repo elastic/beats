@@ -4986,6 +4986,16 @@ type: keyword
 
 --
 
+*`awsfargate.task_stats.memory_hard_limit`*::
++
+--
+The Hard Memory Limit for the task from Amazon ECS.
+
+
+type: scaled_float
+
+--
+
 [float]
 === cpu
 
@@ -5498,18 +5508,6 @@ Max memory usage.
 type: long
 
 format: bytes
-
---
-
-*`awsfargate.task_stats.memory.usage.pct`*::
-+
---
-Memory usage percentage.
-
-
-type: scaled_float
-
-format: percent
 
 --
 
@@ -8905,6 +8903,13 @@ type: long
 --
 
 *`beat.stats.libbeat.pipeline.queue.acked`*::
++
+--
+type: long
+
+--
+
+*`beat.stats.libbeat.pipeline.queue.max_events`*::
 +
 --
 type: long
@@ -28517,6 +28522,13 @@ Elasticsearch module
 
 
 
+*`cluster_settings.cluster.metadata.display_name`*::
++
+--
+type: keyword
+
+--
+
 
 *`index_recovery.shards.start_time_in_millis`*::
 +
@@ -30446,6 +30458,13 @@ type: long
 
 --
 
+*`elasticsearch.cluster.stats.indices.store.total_data_set_size.bytes`*::
++
+--
+type: long
+
+--
+
 *`elasticsearch.cluster.stats.indices.total`*::
 +
 --
@@ -30658,13 +30677,6 @@ index
 
 
 
-*`elasticsearch.index.created`*::
-+
---
-type: long
-
---
-
 *`elasticsearch.index.hidden`*::
 +
 --
@@ -30779,6 +30791,13 @@ type: long
 --
 
 *`elasticsearch.index.primaries.store.size_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`elasticsearch.index.primaries.store.total_data_set_size_in_bytes`*::
 +
 --
 type: long
@@ -30945,6 +30964,18 @@ type: long
 +
 --
 Total size of the index in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.index.total.store.total_data_set_size_in_bytes`*::
++
+--
+Total size of the index in bytes including backing data for partially mounted indices.
 
 
 type: long
@@ -31483,6 +31514,18 @@ format: bytes
 
 --
 
+*`elasticsearch.index.summary.primaries.store.total_data_set_size.bytes`*::
++
+--
+Total size of the index in bytes including backing data for partially mounted indices.
+
+
+type: long
+
+format: bytes
+
+--
+
 *`elasticsearch.index.summary.primaries.segments.count`*::
 +
 --
@@ -31598,6 +31641,18 @@ type: long
 +
 --
 Total size of the index in bytes.
+
+
+type: long
+
+format: bytes
+
+--
+
+*`elasticsearch.index.summary.total.store.total_data_set_size.bytes`*::
++
+--
+Total size of the index in bytes including backing data for partially mounted indices.
 
 
 type: long
@@ -32099,7 +32154,17 @@ format: bytes
 *`elasticsearch.node.stats.indices.store.size.bytes`*::
 +
 --
-Total size of the store in bytes.
+Total size of all shards assigned to this node in bytes.
+
+
+type: long
+
+--
+
+*`elasticsearch.node.stats.indices.store.total_data_set_size.bytes`*::
++
+--
+Total size of shards in bytes assigned to this node including backing data for partially mounted indices.
 
 
 type: long
@@ -35360,6 +35425,60 @@ type: keyword
 +
 --
 Total billing amount.
+
+type: float
+
+--
+
+*`gcp.billing.sku_id`*::
++
+--
+The ID of the resource used by the service.
+
+type: keyword
+
+--
+
+*`gcp.billing.sku_description`*::
++
+--
+A description of the resource type used by the service. For example, a resource type for Cloud Storage is Standard Storage US.
+
+type: keyword
+
+--
+
+*`gcp.billing.service_id`*::
++
+--
+The ID of the service that the usage is associated with.
+
+type: keyword
+
+--
+
+*`gcp.billing.service_description`*::
++
+--
+The Google Cloud service that reported the Cloud Billing data.
+
+type: keyword
+
+--
+
+*`gcp.billing.tags`*::
++
+--
+A collection of key-value pairs that provide additional metadata.
+
+type: nested
+
+--
+
+*`gcp.billing.effective_price`*::
++
+--
+The charged price for usage of the Google Cloud SKUs and SKU tiers. Reflects contract pricing if applicable, otherwise, it's the list price.
 
 type: float
 
@@ -42682,6 +42801,36 @@ type: long
 --
 
 
+*`kibana.stats.os.cpuacct.control_group`*::
++
+--
+type: keyword
+
+--
+
+*`kibana.stats.os.cpuacct.usage_nanos`*::
++
+--
+type: long
+
+--
+
+
+*`kibana.stats.os.cgroup_memory.current_in_bytes`*::
++
+--
+type: long
+
+--
+
+*`kibana.stats.os.cgroup_memory.swap_current_in_bytes`*::
++
+--
+type: long
+
+--
+
+
 *`kibana.stats.os.load.1m`*::
 +
 --
@@ -42721,6 +42870,20 @@ Process metrics
 
 
 *`kibana.stats.process.memory.resident_set_size.bytes`*::
++
+--
+type: long
+
+--
+
+*`kibana.stats.process.memory.array_buffers.bytes`*::
++
+--
+type: long
+
+--
+
+*`kibana.stats.process.memory.external.bytes`*::
 +
 --
 type: long
@@ -43171,6 +43334,26 @@ Information and statistics of pods managed by kubernetes.
 Kubernetes API server metrics
 
 
+
+*`kubernetes.apiserver.major.version`*::
++
+--
+API Server major version.
+
+
+type: keyword
+
+--
+
+*`kubernetes.apiserver.minor.version`*::
++
+--
+API Server minor version.
+
+
+type: keyword
+
+--
 
 *`kubernetes.apiserver.request.resource`*::
 +
@@ -46036,6 +46219,42 @@ type: keyword
 --
 
 [float]
+=== state_namespace
+
+Kubernetes namespace metrics.
+
+
+
+*`kubernetes.state_namespace.created.sec`*::
++
+--
+Unix creation timestamp.
+
+
+type: double
+
+--
+
+
+*`kubernetes.state_namespace.status.active`*::
++
+--
+Whether the namespace is active (true or false).
+
+type: boolean
+
+--
+
+*`kubernetes.state_namespace.status.terminating`*::
++
+--
+Whether the namespace is terminating (true or false).
+
+type: boolean
+
+--
+
+[float]
 === node
 
 kubernetes node metrics
@@ -46180,6 +46399,16 @@ type: long
 
 --
 
+*`kubernetes.node.kubelet.version`*::
++
+--
+Kubelet version.
+
+
+type: keyword
+
+--
+
 [float]
 === persistentvolume
 
@@ -46226,7 +46455,7 @@ type: keyword
 [float]
 === persistentvolumeclaim
 
-kubernetes persistent volume clame metrics from kube-state-metrics
+kubernetes persistent volume claim metrics from kube-state-metrics
 
 
 
@@ -46281,6 +46510,15 @@ type: keyword
 Storage class for the PVC.
 
 type: keyword
+
+--
+
+*`kubernetes.persistentvolumeclaim.created`*::
++
+--
+PersistentVolumeClaim creation date
+
+type: date
 
 --
 
@@ -56210,7 +56448,7 @@ type: long
 Time spent reading data file blocks by backends in this database, in milliseconds.
 
 
-type: long
+type: double
 
 --
 
@@ -56220,7 +56458,7 @@ type: long
 Time spent writing data file blocks by backends in this database, in milliseconds.
 
 
-type: long
+type: double
 
 --
 
@@ -57520,7 +57758,7 @@ type: long
 Fraction of the time (between 0.0 and 1.0) that the queue is able to immediately deliver messages to consumers. This can be less than 1.0 if consumers are limited by network congestion or prefetch count.
 
 
-type: long
+type: scaled_float
 
 format: percent
 
@@ -62020,6 +62258,16 @@ alias to: process.pgid
 
 --
 
+*`system.process.num_threads`*::
++
+--
+Number of threads in the process
+
+
+type: integer
+
+--
+
 *`system.process.cmdline`*::
 +
 --
@@ -62189,6 +62437,75 @@ The shared memory the process uses.
 type: long
 
 format: bytes
+
+--
+
+[float]
+=== io
+
+Disk I/O Metrics, as forwarded from /proc/[PID]/io. Available on Linux only.
+
+
+*`system.process.io.cancelled_write_bytes`*::
++
+--
+The number of bytes this process cancelled, or caused not to be written.
+
+type: long
+
+--
+
+*`system.process.io.read_bytes`*::
++
+--
+The number of bytes fetched from the storage layer.
+
+type: long
+
+--
+
+*`system.process.io.write_bytes`*::
++
+--
+The number of bytes written to the storage layer.
+
+type: long
+
+--
+
+*`system.process.io.read_char`*::
++
+--
+The number of bytes read from read(2) and similar syscalls.
+
+type: long
+
+--
+
+*`system.process.io.write_char`*::
++
+--
+The number of bytes sent to syscalls for writing.
+
+type: long
+
+--
+
+*`system.process.io.read_ops`*::
++
+--
+The count of read-related syscalls.
+
+type: long
+
+--
+
+*`system.process.io.write_ops`*::
++
+--
+The count of write-related syscalls.
+
+type: long
 
 --
 

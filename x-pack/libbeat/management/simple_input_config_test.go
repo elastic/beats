@@ -133,7 +133,7 @@ func TestSimpleInputConfig(t *testing.T) {
 		fmt.Sprintf(":%d", server.Port),
 		"",
 		client.VersionInfo{},
-		grpc.WithTransportCredentials(insecure.NewCredentials()))
+		client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 
 	m, err := NewV2AgentManagerWithClient(
 		&Config{

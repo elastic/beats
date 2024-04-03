@@ -95,7 +95,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 	mappings, err := buildMappings(config.Mappings)
 	if err != nil {
-		return nil, fmt.Errorf("invalid mapping configuration for `statsd.mapping`: %w", err)
+		return nil, fmt.Errorf("invalid mapping configuration for `statsd.mappings`: %w", err)
 	}
 	return &MetricSet{
 		BaseMetricSet: base,
@@ -107,8 +107,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Host returns the hostname or other module specific value that identifies a
 // specific host or service instance from which to collect metrics.
-func (b *MetricSet) Host() string {
-	return b.server.(*udp.UdpServer).GetHost()
+func (m *MetricSet) Host() string {
+	return m.server.(*udp.UdpServer).GetHost()
 }
 
 func buildMappings(config []StatsdMapping) (map[string]StatsdMapping, error) {
@@ -163,30 +163,36 @@ func buildMappings(config []StatsdMapping) (map[string]StatsdMapping, error) {
 	return mappings, nil
 }
 
+// It processes metric groups, applies event mappings, and creates Metricbeat events.
+// The generated events include metric fields, labels, and the namespace associated with the MetricSet.
+// Returns a slice of Metricbeat events.
 func (m *MetricSet) getEvents() []*mb.Event {
 	groups := m.processor.GetAll()
-	events := make([]*mb.Event, len(groups))
 
-	for idx, tagGroup := range groups {
-
-		mapstrTags := mapstr.M{}
+	// If there are no metric groups, return nil to indicate no events.
+	if len(groups) == 0 {
+		return nil
+	}
+	events := make([]*mb.Event, 0, len(groups))
+	for _, tagGroup := range groups {
+		mapstrTags := make(mapstr.M, len(tagGroup.tags))
 		for k, v := range tagGroup.tags {
 			mapstrTags[k] = v
 		}
 
-		sanitizedMetrics := mapstr.M{}
 		for k, v := range tagGroup.metrics {
-			eventMapping(k, v, sanitizedMetrics, m.mappings)
-		}
+			// Apply event mapping to the metric and get MetricSetFields.
+			ms := eventMapping(k, v, m.mappings)
 
-		if len(sanitizedMetrics) == 0 {
-			continue
-		}
-
-		events[idx] = &mb.Event{
-			MetricSetFields: sanitizedMetrics,
-			RootFields:      mapstr.M{"labels": mapstrTags},
-			Namespace:       m.Module().Name(),
+			// If no MetricSetFields were generated, continue to the next metric.
+			if len(ms) == 0 {
+				continue
+			}
+			events = append(events, &mb.Event{
+				MetricSetFields: ms,
+				RootFields:      mapstr.M{"labels": mapstrTags},
+				Namespace:       m.Module().Name(),
+			})
 		}
 	}
 	return events

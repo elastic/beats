@@ -53,7 +53,7 @@ func TestFileIdentifier(t *testing.T) {
 
 		src := identifier.GetSource(loginp.FSEvent{
 			NewPath:    tmpFile.Name(),
-			Descriptor: loginp.FileDescriptor{Info: fi},
+			Descriptor: loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)},
 		})
 
 		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String(), src.Name())
@@ -77,7 +77,7 @@ func TestFileIdentifier(t *testing.T) {
 
 		src := identifier.GetSource(loginp.FSEvent{
 			NewPath:    tmpFile.Name(),
-			Descriptor: loginp.FileDescriptor{Info: fi},
+			Descriptor: loginp.FileDescriptor{Info: file.ExtendFileInfo(fi)},
 		})
 
 		assert.Equal(t, identifier.Name()+"::"+file.GetOSState(fi).String()+"-my-suffix", src.Name())

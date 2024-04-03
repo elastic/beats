@@ -10,7 +10,6 @@
         "iam"
       ],
       "code": "4673",
-      "ingested": "2022-06-08T06:21:08.143556300Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",

@@ -18,12 +18,12 @@
 package readfile
 
 import (
-	"os"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/common/file"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -34,8 +34,8 @@ type winTestInfo struct {
 	vol   uint32
 }
 
-func createTestFileInfo() os.FileInfo {
-	return &winTestInfo{
+func createTestFileInfo() file.ExtendedFileInfo {
+	return file.ExtendFileInfo(&winTestInfo{
 		testFileInfo: testFileInfo{
 			name: "filename",
 			size: 42,
@@ -44,7 +44,7 @@ func createTestFileInfo() os.FileInfo {
 		idxhi: 100,
 		idxlo: 200,
 		vol:   300,
-	}
+	})
 }
 
 func checkFields(t *testing.T, expected, actual mapstr.M) {

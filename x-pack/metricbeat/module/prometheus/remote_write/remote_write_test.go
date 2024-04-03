@@ -811,7 +811,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	expected := mapstr.M{
 		"http_request_duration_seconds": mapstr.M{
 			"histogram": mapstr.M{
-				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
+				"values": []float64{float64(0.125), float64(0.375), float64(0.5)},
 				"counts": []uint64{uint64(0), uint64(0), uint64(0)},
 			},
 		},
@@ -825,7 +825,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 		},
 		"http_request_bytes": mapstr.M{
 			"histogram": mapstr.M{
-				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
+				"values": []float64{float64(0.125), float64(0.375), float64(0.5)},
 				"counts": []uint64{uint64(0), uint64(0), uint64(0)},
 			},
 		},
@@ -842,7 +842,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	expected2 := mapstr.M{
 		"http_request_bytes": mapstr.M{
 			"histogram": mapstr.M{
-				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
+				"values": []float64{float64(0.125), float64(0.375), float64(0.5)},
 				"counts": []uint64{uint64(0), uint64(0), uint64(0)},
 			},
 		},
@@ -1002,7 +1002,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	expected = mapstr.M{
 		"http_request_duration_seconds": mapstr.M{
 			"histogram": mapstr.M{
-				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
+				"values": []float64{float64(0.125), float64(0.375), float64(0.5)},
 				"counts": []uint64{uint64(100), uint64(0), uint64(0)},
 			},
 		},
@@ -1016,7 +1016,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 		},
 		"http_request_bytes": mapstr.M{
 			"histogram": mapstr.M{
-				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
+				"values": []float64{float64(0.125), float64(0.375), float64(0.5)},
 				"counts": []uint64{uint64(200), uint64(0), uint64(0)},
 			},
 		},
@@ -1033,7 +1033,7 @@ func TestGenerateEventsHistogramsDifferentLabels(t *testing.T) {
 	expected2 = mapstr.M{
 		"http_request_bytes": mapstr.M{
 			"histogram": mapstr.M{
-				"values": []float64{float64(0.125), float64(0.375), float64(0.75)},
+				"values": []float64{float64(0.125), float64(0.375), float64(0.5)},
 				"counts": []uint64{uint64(300), uint64(0), uint64(0)},
 			},
 		},

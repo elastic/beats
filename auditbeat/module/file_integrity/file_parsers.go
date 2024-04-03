@@ -23,7 +23,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-// FileParser is a file analyser the provides enrichment for file.* fields.
+// FileParser is a file analyser providing enrichment for file.* fields.
 type FileParser interface {
 	Parse(dst mapstr.M, path string) error
 }

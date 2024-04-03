@@ -23,19 +23,15 @@ import (
 
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/features"
+	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
+	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-
-	"github.com/elastic/beats/v7/libbeat/common/reload"
-	lbmanagement "github.com/elastic/beats/v7/libbeat/management"
-	"github.com/elastic/beats/v7/libbeat/publisher"
-	"github.com/elastic/beats/v7/libbeat/version"
 )
-
-var errStoppingOnOutputChange = errors.New("stopping Beat on output change")
 
 // diagnosticHandler is a wrapper type that's a bit of a hack, the compiler won't let us send the raw unit struct,
 // since there's a type disagreement with the `client.DiagnosticHook` argument, and due to licensing issues we can't import the agent client types into the reloader
@@ -163,6 +159,13 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 		}
 	}
 
+	versionInfo := client.VersionInfo{
+		Name:      "beat-v2-client",
+		BuildHash: version.Commit(),
+		Meta: map[string]string{
+			"commit":     version.Commit(),
+			"build_time": version.BuildTime().String(),
+		}}
 	var agentClient client.V2
 	var err error
 	if c.InsecureGRPCURLForTesting != "" && c.Enabled {
@@ -170,20 +173,11 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 		logger.Info("Using INSECURE GRPC connection, this should be only used for testing!")
 		agentClient = client.NewV2(c.InsecureGRPCURLForTesting,
 			"", // Insecure connection for test, no token needed
-			client.VersionInfo{
-				Name:    "beat-v2-client-for-testing",
-				Version: version.GetDefaultVersion(),
-			}, grpc.WithTransportCredentials(insecure.NewCredentials()))
+			versionInfo,
+			client.WithGRPCDialOptions(grpc.WithTransportCredentials(insecure.NewCredentials())))
 	} else {
 		// Normal Elastic-Agent-Client initialisation
-		agentClient, _, err = client.NewV2FromReader(os.Stdin, client.VersionInfo{
-			Name:    "beat-v2-client",
-			Version: version.GetDefaultVersion(),
-			Meta: map[string]string{
-				"commit":     version.Commit(),
-				"build_time": version.BuildTime().String(),
-			},
-		})
+		agentClient, _, err = client.NewV2FromReader(os.Stdin, versionInfo)
 		if err != nil {
 			return nil, fmt.Errorf("error reading control config from agent: %w", err)
 		}
@@ -192,7 +186,7 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 	// officially running under the elastic-agent; we set the publisher pipeline
 	// to inform it that we are running under elastic-agent (used to ensure "Publish event: "
 	// debug log messages are only outputted when running in trace mode
-	publisher.SetUnderAgent(true)
+	lbmanagement.SetUnderAgent(true)
 
 	return NewV2AgentManagerWithClient(c, registry, agentClient)
 }
@@ -232,6 +226,14 @@ func NewV2AgentManagerWithClient(config *Config, registry *reload.Registry, agen
 // ================================
 // Beats central management interface implementation
 // ================================
+
+func (cm *BeatV2Manager) AgentInfo() client.AgentInfo {
+	if cm.client.AgentInfo() == nil {
+		return client.AgentInfo{}
+	}
+
+	return *cm.client.AgentInfo()
+}
 
 // RegisterDiagnosticHook will register a diagnostic callback function when elastic-agent asks for a diagnostics dump
 func (cm *BeatV2Manager) RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook) {
@@ -557,7 +559,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 		for _, unit := range units {
 			errs := unitErrors[unit.ID()]
 			if len(errs) != 0 {
-				unit.UpdateState(client.UnitStateFailed, errors.Join(errs...).Error(), nil)
+				_ = unit.UpdateState(client.UnitStateFailed, errors.Join(errs...).Error(), nil)
 			}
 		}
 	}()
@@ -608,7 +610,7 @@ func (cm *BeatV2Manager) reload(units map[unitKey]*client.Unit) {
 	// set the new log level (if nothing has changed is a noop)
 	ll, trace := getZapcoreLevel(lowestLevel)
 	logp.SetLevel(ll)
-	publisher.SetUnderAgentTrace(trace)
+	lbmanagement.SetUnderAgentTrace(trace)
 
 	// reload the output configuration
 	restartBeat, err := cm.reloadOutput(outputUnit)

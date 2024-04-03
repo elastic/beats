@@ -11,6 +11,8 @@ var:
     default: udp
   - name: internal_interfaces
   - name: external_interfaces
+  - name: internal_networks
+    default: [private]
 
 ingest_pipeline:
   - ingest/pipeline.yml

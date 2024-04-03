@@ -89,7 +89,8 @@
                         "total": 11
                     },
                     "queue": {
-                        "acked": 0
+                        "acked": 0,
+                        "max_events": 0
                     }
                 }
             },

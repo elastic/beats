@@ -317,8 +317,8 @@ func getDetails[E entity](ctx context.Context, cli *http.Client, u *url.URL, key
 	}
 
 	var body bytes.Buffer
-	_, err = io.Copy(&body, resp.Body)
-	if err != nil {
+	n, err := io.Copy(&body, resp.Body)
+	if n == 0 || err != nil {
 		return nil, nil, err
 	}
 

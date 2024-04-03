@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.6.0
+:mito_version: v1.10.0
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
@@ -22,6 +22,7 @@ This input supports:
 
 * Auth
 ** Basic
+** Digest
 ** OAuth2
 * Retrieval at a configurable interval
 * Pagination
@@ -139,7 +140,7 @@ The field should be an array, but in the case of an error condition in the CEL p
 
 <3> If `rate_limit` is present it must be a map with numeric fields `rate` and `burst`. The `rate_limit` field may also have a string `error` field and other fields which will be logged. If it has an `error` field, the `rate` and `burst` will not be used to set rate limit behavior. The {mito_docs}/lib#Limit[Limit], and {mito_docs}/lib#OktaRateLimit[Okta Rate Limit policy] and {mito_docs}/lib#DraftRateLimit[Draft Rate Limit policy] documentation show how to construct this field.
 
-<4> The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned.
+<4> The evaluation is repeated with the new state, after removing the events field, if the "want_more" field is present and true, and a non-zero events array is returned. If the "want_more" field is present after a failed evaluation, it is set to false.
 
 The `status_code`, `header` and `rate_limit` values may be omitted if the program is not interacting with an HTTP API end-point and so will not be needed to contribute to program control.
 
@@ -159,8 +160,10 @@ As noted above the `cel` input provides functions, macros, and global variables 
 ** {mito_docs}/lib#hdr-Drop[Drop]
 ** {mito_docs}/lib#hdr-Drop_Empty[Drop Empty]
 ** {mito_docs}/lib#hdr-Flatten[Flatten]
+** {mito_docs}/lib#hdr-Keys[Keys]
 ** {mito_docs}/lib#hdr-Max[Max]
 ** {mito_docs}/lib#hdr-Min[Min]
+** {mito_docs}/lib#hdr-Values[Values]
 ** {mito_docs}/lib#hdr-With[With]
 ** {mito_docs}/lib#hdr-With_Replace[With Replace]
 ** {mito_docs}/lib#hdr-With_Update[With Update]
@@ -168,7 +171,9 @@ As noted above the `cel` input provides functions, macros, and global variables 
 
 * {mito_docs}/lib#Crypto[Crypto]
 ** {mito_docs}/lib#hdr-Base64[Base64]
+** {mito_docs}/lib#hdr-Base64_Decode[Base64 Decode]
 ** {mito_docs}/lib#hdr-Base64_Raw[Base64 Raw]
+** {mito_docs}/lib#hdr-Base64_Raw_Decode[Base64 Raw Decode]
 ** {mito_docs}/lib#hdr-Hex[Hex]
 ** {mito_docs}/lib#hdr-MD5[MD5]
 ** {mito_docs}/lib#hdr-SHA_1[SHA-1]
@@ -239,7 +244,9 @@ As noted above the `cel` input provides functions, macros, and global variables 
 
 In addition to the extensions provided in the packages listed above, a global variable `useragent` is also provided which gives the user CEL program access to the {beatname_lc} user-agent string.
 
-Additionally, it supports authentication via Basic auth, HTTP Headers or oauth2.
+The CEL environment enables the https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] library using the version defined {mito_docs}/lib#OptionalTypesVersion[here].
+
+Additionally, it supports authentication via Basic Authentication, Digest Authentication or OAuth2.
 
 Example configurations with authentication:
 
@@ -247,11 +254,20 @@ Example configurations with authentication:
 ----
 filebeat.inputs:
 - type: cel
+  auth.basic:
+    user: user@domain.tld
+    password: P@$$W0₹D
   resource.url: http://localhost
-  request.transforms:
-    - set:
-        target: header.Authorization
-        value: 'Basic aGVsbG86d29ybGQ='
+----
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+- type: cel
+  auth.digest:
+    user: user@domain.tld
+    password: P@$$W0₹D
+  resource.url: http://localhost
 ----
 
 ["source","yaml",subs="attributes"]
@@ -400,6 +416,29 @@ The user to authenticate with.
 The password to use.
 
 [float]
+==== `auth.digest.enabled`
+
+When set to `false`, disables the digest auth configuration. Default: `true`.
+
+NOTE: digest auth settings are disabled if either `enabled` is set to `false` or
+the `auth.digest` section is missing.
+
+[float]
+==== `auth.digest.user`
+
+The user to authenticate with.
+
+[float]
+==== `auth.digest.password`
+
+The password to use.
+
+[float]
+==== `auth.digest.no_reuse`
+
+When set to `true`, Digest Authentication challenges are not reused.
+
+[float]
 ==== `auth.oauth2.enabled`
 
 When set to `false`, disables the oauth2 configuration. Default: `true`.
@@ -542,6 +581,13 @@ NOTE: Only one of the credentials settings can be set at once. For more informat
 ==== `auth.oauth2.okta.jwk_json`
 
 The RSA JWK Private Key JSON for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
+
+NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
+
+[float]
+==== `auth.oauth2.okta.jwk_pem`
+
+The RSA JWK private key PEM block for your Okta Service App which is used for interacting with Okta Org Auth Server to mint tokens with okta.* scopes.
 
 NOTE: Only one of the credentials settings can be set at once. For more information please refer to https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/main/
 
@@ -693,7 +739,8 @@ filebeat.inputs:
     user: user@domain.tld
     password: P@$$W0₹D
   redact:
-    fields: password
+    fields:
+      - password
     delete: true
 ----
 

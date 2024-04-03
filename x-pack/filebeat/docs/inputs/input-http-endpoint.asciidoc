@@ -228,6 +228,11 @@ By default the input expects the incoming POST to include a Content-Type of `app
 In certain scenarios when the source of the request is not able to do that, it can be overwritten with another value or set to null.
 
 [float]
+==== `program`
+
+The normal operation of the input treats the body either as a single event when the body is an object, or as a set of events when the body is an array. If the body should be handled differently, for example a set of events in an array field of an object to be handled as a set of events, then a https://opensource.google.com/projects/cel[Common Expression Language (CEL)] program can be provided through this configuration field. No CEL extensions are provided beyond the function in the CEL https://github.com/google/cel-spec/blob/master/doc/langdef.md#standard[standard library]. CEL https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] are supported.
+
+[float]
 ==== `response_code`
 
 The HTTP response code returned upon success. Should be in the 2XX range.
@@ -278,6 +283,52 @@ This option defines the provider of the webhook that uses CRC (Challenge-Respons
 ==== `crc.secret`
 
 The secret token provided by the webhook owner for the CRC validation. It is required when a `crc.provider` is set.
+
+[float]
+==== `method`
+
+The HTTP method handled by the endpoint. If specified, `method` must be `POST`, `PUT` or `PATCH`.
+The default method is `POST`. If `PUT` or `PATCH` are specified, requests using those method types are accepted, but are treated as `POST` requests and are expected to have a request body containing the request data.
+
+[float]
+==== `tracer.filename`
+
+It is possible to log HTTP requests to a local file-system for debugging configurations.
+This option is enabled by setting the `tracer.filename` value. Additional options are available to
+tune log rotation behavior.
+
+To differentiate the trace files generated from different input instances, a placeholder `*` can be added to the filename and will be replaced with the input instance id.
+For Example, `http-request-trace-*.ndjson`.
+
+Enabling this option compromises security and should only be used for debugging.
+
+[float]
+==== `tracer.maxsize`
+
+This value sets the maximum size, in megabytes, the log file will reach before it is rotated. By default
+logs are allowed to reach 1MB before rotation.
+
+[float]
+==== `tracer.maxage`
+
+This specifies the number days to retain rotated log files. If it is not set, log files are retained
+indefinitely.
+
+[float]
+==== `tracer.maxbackups`
+
+The number of old logs to retain. If it is not set all old logs are retained subject to the `tracer.maxage`
+setting.
+
+[float]
+==== `tracer.localtime`
+
+Whether to use the host's local time rather that UTC for timestamping rotated log file names.
+
+[float]
+==== `tracer.compress`
+
+This determines whether rotated logs should be gzip compressed.
 
 [float]
 === Metrics

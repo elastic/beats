@@ -29,6 +29,7 @@ data:
                   period: 10s
                   add_metadata: true
                   metricsets:
+                    - state_namespace
                     - state_node
                     - state_deployment
                     - state_daemonset

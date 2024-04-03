@@ -1,0 +1,52 @@
+{
+    "beat": {
+        "name": "MacBook-Pro"
+    },
+    "host": {
+        "architecture": "arm64",
+        "hostname": "MacBook-Pro",
+        "id": "B0C1E948-241E-53FD-A6A3-0D0F352403AF",
+        "os": {
+            "build": "23B92",
+            "family": "darwin",
+            "kernel": "23.1.0",
+            "name": "macOS",
+            "platform": "darwin",
+            "version": "14.1.2"
+        }
+    },
+    "input": {
+        "count": 1,
+        "names": [
+            "log"
+        ]
+    },
+    "management": {
+        "enabled": false
+    },
+    "module": {
+        "count": 0,
+        "names": []
+    },
+    "monitoring": {
+        "cluster_uuid": "uuid_from_monitoring_config"
+    },
+    "output": {
+        "batch_size": 2048,
+        "clients": 1,
+        "name": "logstash"
+    },
+    "outputs": {
+        "elasticsearch": {
+            "cluster_uuid": ""
+        }
+    },
+    "queue": {
+        "name": "mem"
+    },
+    "service": {
+        "id": "8d6af17b-cf55-4029-bd22-64cd538acbd0",
+        "name": "filebeat",
+        "version": "8.13.0"
+    }
+}

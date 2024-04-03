@@ -33,7 +33,7 @@ import (
 )
 
 const (
-	DefaultTransactionHashSize                 = 2 ^ 16
+	DefaultTransactionHashSize                 = 1 << 16
 	DefaultTransactionExpiration time.Duration = 10 * time.Second
 )
 
@@ -110,14 +110,12 @@ type reporterFactory interface {
 	CreateReporter(*conf.C) (func(beat.Event), error)
 }
 
-func (s ProtocolsStruct) Init(
-	testMode bool,
-	pub reporterFactory,
-	watcher *procs.ProcessesWatcher,
-	configs map[string]*conf.C,
-	listConfigs []*conf.C,
-) error {
-	if len(configs) > 0 {
+func (s ProtocolsStruct) Init(test bool, pub reporterFactory, watch *procs.ProcessesWatcher, cfgs map[string]*conf.C, list []*conf.C) error {
+	return s.InitFiltered(test, "", pub, watch, cfgs, list)
+}
+
+func (s ProtocolsStruct) InitFiltered(test bool, device string, pub reporterFactory, watch *procs.ProcessesWatcher, cfgs map[string]*conf.C, list []*conf.C) error {
+	if len(cfgs) != 0 {
 		cfgwarn.Deprecate("7.0.0", "dictionary style protocols configuration has been deprecated. Please use list-style protocols configuration.")
 	}
 
@@ -125,21 +123,24 @@ func (s ProtocolsStruct) Init(
 		logp.Debug("protos", "registered protocol plugin: %v", proto)
 	}
 
-	for name, config := range configs {
-		if err := s.configureProtocol(testMode, pub, watcher, name, config); err != nil {
+	for name, cfg := range cfgs {
+		err := s.configureProtocol(test, device, pub, watch, name, cfg)
+		if err != nil {
 			return err
 		}
 	}
 
-	for _, config := range listConfigs {
+	for _, cfg := range list {
 		module := struct {
 			Name string `config:"type" validate:"required"`
 		}{}
-		if err := config.Unpack(&module); err != nil {
+		err := cfg.Unpack(&module)
+		if err != nil {
 			return err
 		}
 
-		if err := s.configureProtocol(testMode, pub, watcher, module.Name, config); err != nil {
+		err = s.configureProtocol(test, device, pub, watch, module.Name, cfg)
+		if err != nil {
 			return err
 		}
 	}
@@ -147,13 +148,7 @@ func (s ProtocolsStruct) Init(
 	return nil
 }
 
-func (s ProtocolsStruct) configureProtocol(
-	testMode bool,
-	pub reporterFactory,
-	watcher *procs.ProcessesWatcher,
-	name string,
-	config *conf.C,
-) error {
+func (s ProtocolsStruct) configureProtocol(test bool, device string, pub reporterFactory, watch *procs.ProcessesWatcher, name string, config *conf.C) error {
 	// XXX: icmp is special, ignore here :/
 	if name == "icmp" {
 		return nil
@@ -176,9 +171,16 @@ func (s ProtocolsStruct) configureProtocol(
 		return nil
 	}
 
+	if device != "" {
+		// This could happen earlier, but let any errors be found first.
+		if isValid, err := validateProtocolDevice(device, config); !isValid || err != nil {
+			return err
+		}
+	}
+
 	var client beat.Client
 	results := func(beat.Event) {}
-	if !testMode {
+	if !test {
 		var err error
 		results, err = pub.CreateReporter(config)
 		if err != nil {
@@ -186,7 +188,7 @@ func (s ProtocolsStruct) configureProtocol(
 		}
 	}
 
-	inst, err := plugin(testMode, results, watcher, config)
+	inst, err := plugin(test, results, watch, config)
 	if err != nil {
 		logp.Err("Failed to register protocol plugin: %v", err)
 		return err
@@ -194,6 +196,48 @@ func (s ProtocolsStruct) configureProtocol(
 
 	s.register(proto, client, inst)
 	return nil
+}
+
+func validateProtocolDevice(device string, config *conf.C) (bool, error) {
+	var protocol struct {
+		Interface struct {
+			Device string `config:"device"`
+		} `config:"interface"`
+	}
+
+	if err := config.Unpack(&protocol); err != nil {
+		return false, err
+	}
+
+	if protocol.Interface.Device != "" && protocol.Interface.Device != device {
+		return false, nil
+	}
+
+	return true, nil
+}
+
+func (s ProtocolsStruct) register(proto Protocol, client beat.Client, plugin Plugin) {
+	if _, exists := s.all[proto]; exists {
+		logp.Warn("Protocol (%s) plugin will overwritten by another plugin", proto.String())
+	}
+
+	s.all[proto] = protocolInstance{
+		client: client,
+		plugin: plugin,
+	}
+
+	success := false
+	if tcp, ok := plugin.(TCPPlugin); ok {
+		s.tcp[proto] = tcp
+		success = true
+	}
+	if udp, ok := plugin.(UDPPlugin); ok {
+		s.udp[proto] = udp
+		success = true
+	}
+	if !success {
+		logp.Warn("Protocol (%s) register failed, port: %v", proto.String(), plugin.GetPorts())
+	}
 }
 
 func (s ProtocolsStruct) GetTCP(proto Protocol) TCPPlugin {
@@ -228,7 +272,7 @@ func (s ProtocolsStruct) GetAllUDP() map[Protocol]UDPPlugin {
 // and unencapsulated packets
 func (s ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string {
 	// Sort the protocol IDs so that the return value is consistent.
-	var protos []int
+	protos := make([]int, 0, len(s.all))
 	for proto := range s.all {
 		protos = append(protos, int(proto))
 	}
@@ -271,28 +315,4 @@ func (s ProtocolsStruct) BpfFilter(withVlans bool, withICMP bool) string {
 		filter = fmt.Sprintf("%s or (vlan and (%s))", filter, filter)
 	}
 	return filter
-}
-
-func (s ProtocolsStruct) register(proto Protocol, client beat.Client, plugin Plugin) {
-	if _, exists := s.all[proto]; exists {
-		logp.Warn("Protocol (%s) plugin will overwritten by another plugin", proto.String())
-	}
-
-	s.all[proto] = protocolInstance{
-		client: client,
-		plugin: plugin,
-	}
-
-	success := false
-	if tcp, ok := plugin.(TCPPlugin); ok {
-		s.tcp[proto] = tcp
-		success = true
-	}
-	if udp, ok := plugin.(UDPPlugin); ok {
-		s.udp[proto] = udp
-		success = true
-	}
-	if !success {
-		logp.Warn("Protocol (%s) register failed, port: %v", proto.String(), plugin.GetPorts())
-	}
 }

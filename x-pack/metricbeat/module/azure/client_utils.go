@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 )
 
@@ -19,7 +21,7 @@ const DefaultTimeGrain = "PT5M"
 var instanceIdRegex = regexp.MustCompile(`.*?(\d+)$`)
 
 // mapMetricValues should map the metric values
-func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue, startTime time.Time, endTime time.Time) []MetricValue {
+func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue) []MetricValue {
 	var currentMetrics []MetricValue
 	// compare with the previously returned values and filter out any double records
 	for _, v := range metrics {
@@ -28,10 +30,10 @@ func mapMetricValues(metrics []armmonitor.Metric, previousMetrics []MetricValue,
 				if metricExists(*v.Name.Value, *mv, previousMetrics) || metricIsEmpty(*mv) {
 					continue
 				}
-				// remove metric values that are not part of the timeline selected
-				if mv.TimeStamp.After(startTime) && mv.TimeStamp.Before(endTime) {
-					continue
-				}
+				//// remove metric values that are not part of the timeline selected
+				//if mv.TimeStamp.After(startTime) && mv.TimeStamp.Before(endTime) {
+				//	continue
+				//}
 				// define the new metric value and match aggregations values
 				var val MetricValue
 				val.name = *v.Name.Value
@@ -133,10 +135,16 @@ func compareMetricValues(metVal *float64, metricVal *float64) bool {
 	return false
 }
 
-// convertTimegrainToDuration will convert azure timegrain options to actual duration values
-func convertTimegrainToDuration(timegrain string) time.Duration {
+// asDuration converts the Azure time grain options to the equivalent
+// `time.Duration` value.
+//
+// For example, converts "PT1M" to `time.Minute`.
+//
+// See https://docs.microsoft.com/en-us/azure/azure-monitor/platform/metrics-supported#time-grain
+// for more information.
+func asDuration(timeGrain string) time.Duration {
 	var duration time.Duration
-	switch timegrain {
+	switch timeGrain {
 	case "PT1M":
 		duration = time.Minute
 	case "PT5M":
@@ -155,11 +163,12 @@ func convertTimegrainToDuration(timegrain string) time.Duration {
 		duration = 24 * time.Hour
 	default:
 	}
+
 	return duration
 }
 
-// groupMetricsByResource is used in order to group metrics by resource and return data faster
-func groupMetricsByResource(metrics []Metric) map[string][]Metric {
+// groupMetricsDefinitionsByResourceId is used in order to group metrics by resource and return data faster
+func groupMetricsDefinitionsByResourceId(metrics []Metric) map[string][]Metric {
 	grouped := make(map[string][]Metric)
 	for _, metric := range metrics {
 		if _, ok := grouped[metric.ResourceId]; !ok {
@@ -170,14 +179,17 @@ func groupMetricsByResource(metrics []Metric) map[string][]Metric {
 	return grouped
 }
 
-// getDimension will check if the dimension value is found in the list
-func getDimension(dimension string, dimensions []Dimension) (Dimension, bool) {
-	for _, dim := range dimensions {
-		if strings.EqualFold(dim.Name, dimension) {
-			return dim, true
+// getDimension searches for the dimension name in the given dimensions.
+func getDimension(dimensionName string, dimensions mapstr.M) (string, bool) {
+	for name, value := range dimensions {
+		if strings.EqualFold(name, dimensionName) {
+			if valueAsString, ok := value.(string); ok {
+				return valueAsString, true
+			}
 		}
 	}
-	return Dimension{}, false
+
+	return "", false
 }
 
 func containsResource(resourceId string, resources []Resource) bool {
@@ -189,6 +201,8 @@ func containsResource(resourceId string, resources []Resource) bool {
 	return false
 }
 
+// getInstanceId returns the instance id from the given dimension value.
+// The dimension value is expected to be a string in the format "1234567890".
 func getInstanceId(dimensionValue string) string {
 	matches := instanceIdRegex.FindStringSubmatch(dimensionValue)
 	if len(matches) == 2 {

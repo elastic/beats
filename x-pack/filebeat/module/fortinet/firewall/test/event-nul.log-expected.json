@@ -79,6 +79,7 @@
         "log.level": "error",
         "log.offset": 361,
         "message": "IPsec phase 1 error",
+        "network.direction": "external",
         "network.type": "ipv4",
         "observer.name": "testswitch3",
         "observer.product": "Fortigate",

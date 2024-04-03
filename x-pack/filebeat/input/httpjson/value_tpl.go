@@ -71,6 +71,7 @@ func (t *valueTpl) Unpack(in string) error {
 			"mul":                 mul,
 			"now":                 now,
 			"parseDate":           parseDate,
+			"parseDateInTZ":       parseDateInTZ,
 			"parseDuration":       parseDuration,
 			"parseTimestamp":      parseTimestamp,
 			"parseTimestampMilli": parseTimestampMilli,
@@ -192,6 +193,58 @@ func parseDate(date string, layout ...string) time.Time {
 	}
 
 	return t.UTC()
+}
+
+// parseDateInTZ parses a date string within a specified timezone, returning a time.Time
+// 'tz' is the timezone (offset or IANA name) for parsing
+func parseDateInTZ(date string, tz string, layout ...string) time.Time {
+	var ly string
+	if len(layout) == 0 {
+		ly = defaultTimeLayout
+	} else {
+		ly = layout[0]
+	}
+	if found := predefinedLayouts[ly]; found != "" {
+		ly = found
+	}
+
+	var loc *time.Location
+	// Attempt to parse timezone as offset in various formats
+	for _, format := range []string{"-07", "-0700", "-07:00"} {
+		t, err := time.Parse(format, tz)
+		if err != nil {
+			continue
+		}
+		name, offset := t.Zone()
+		loc = time.FixedZone(name, offset)
+		break
+	}
+
+	// If parsing tz as offset fails, try loading location by name
+	if loc == nil {
+		var err error
+		loc, err = time.LoadLocation(tz)
+		if err != nil {
+			loc = time.UTC // Default to UTC on error
+		}
+	}
+
+	// Using Parse allows us not to worry about the timezone
+	// as the predefined timezone is applied afterwards
+	t, err := time.Parse(ly, date)
+	if err != nil {
+		return time.Time{}
+	}
+
+	// Manually create a new time object with the parsed date components and the desired location
+	// It allows interpreting the parsed time in the specified timezone
+	year, month, day := t.Date()
+	hour, min, sec := t.Clock()
+	nanosec := t.Nanosecond()
+	localTime := time.Date(year, month, day, hour, min, sec, nanosec, loc)
+
+	// Convert the time to UTC to standardize the output
+	return localTime.UTC()
 }
 
 func formatDate(date time.Time, layouttz ...string) string {

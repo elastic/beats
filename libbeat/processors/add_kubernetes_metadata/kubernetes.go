@@ -123,8 +123,7 @@ func New(cfg *config.C) (beat.Processor, error) {
 }
 
 func newProcessorConfig(cfg *config.C, register *Register) (kubeAnnotatorConfig, error) {
-	config := defaultKubernetesAnnotatorConfig()
-
+	var config kubeAnnotatorConfig
 	err := cfg.Unpack(&config)
 	if err != nil {
 		return config, fmt.Errorf("fail to unpack the kubernetes configuration: %w", err)

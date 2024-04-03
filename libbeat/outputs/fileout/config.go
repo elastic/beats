@@ -21,21 +21,23 @@ import (
 	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
+	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/file"
 )
 
-type config struct {
-	Path            string       `config:"path"`
-	Filename        string       `config:"filename"`
-	RotateEveryKb   uint         `config:"rotate_every_kb" validate:"min=1"`
-	NumberOfFiles   uint         `config:"number_of_files"`
-	Codec           codec.Config `config:"codec"`
-	Permissions     uint32       `config:"permissions"`
-	RotateOnStartup bool         `config:"rotate_on_startup"`
+type fileOutConfig struct {
+	Path            *PathFormatString `config:"path"`
+	Filename        string            `config:"filename"`
+	RotateEveryKb   uint              `config:"rotate_every_kb" validate:"min=1"`
+	NumberOfFiles   uint              `config:"number_of_files"`
+	Codec           codec.Config      `config:"codec"`
+	Permissions     uint32            `config:"permissions"`
+	RotateOnStartup bool              `config:"rotate_on_startup"`
+	Queue           config.Namespace  `config:"queue"`
 }
 
-func defaultConfig() config {
-	return config{
+func defaultConfig() fileOutConfig {
+	return fileOutConfig{
 		NumberOfFiles:   7,
 		RotateEveryKb:   10 * 1024,
 		Permissions:     0600,
@@ -43,7 +45,19 @@ func defaultConfig() config {
 	}
 }
 
-func (c *config) Validate() error {
+func readConfig(cfg *config.C) (*fileOutConfig, error) {
+	foConfig := defaultConfig()
+	if err := cfg.Unpack(&foConfig); err != nil {
+		return nil, err
+	}
+
+	// disable bulk support in publisher pipeline
+	_ = cfg.SetInt("bulk_max_size", -1, -1)
+
+	return &foConfig, nil
+}
+
+func (c *fileOutConfig) Validate() error {
 	if c.NumberOfFiles < 2 || c.NumberOfFiles > file.MaxBackupsLimit {
 		return fmt.Errorf("the number_of_files to keep should be between 2 and %v",
 			file.MaxBackupsLimit)

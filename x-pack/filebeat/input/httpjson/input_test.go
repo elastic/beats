@@ -94,6 +94,17 @@ var testCases = []struct {
 		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
 	},
 	{
+		name:        "POST_request_with_empty_object_body",
+		setupServer: newTestServer(httptest.NewServer),
+		baseConfig: map[string]interface{}{
+			"interval":       1,
+			"request.method": http.MethodPost,
+			"request.body":   map[string]interface{}{},
+		},
+		handler:  defaultHandler(http.MethodPost, `{}`, ""),
+		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
 		name:        "repeated_POST_requests",
 		setupServer: newTestServer(httptest.NewServer),
 		baseConfig: map[string]interface{}{
@@ -531,6 +542,25 @@ var testCases = []struct {
 					"step": map[string]interface{}{
 						"request.method": http.MethodGet,
 						"replace":        "$.records[:].id",
+					},
+				},
+			},
+		},
+		handler:  defaultHandler(http.MethodGet, "", ""),
+		expected: []string{`{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`},
+	},
+	{
+		name:        "simple_naked_Chain_GET_request",
+		setupServer: newNakedChainTestServer(httptest.NewServer),
+		baseConfig: map[string]interface{}{
+			"interval":       10,
+			"request.method": http.MethodGet,
+			"chain": []interface{}{
+				map[string]interface{}{
+					"step": map[string]interface{}{
+						"request.url":    "placeholder:$.records[:]",
+						"request.method": http.MethodGet,
+						"replace":        "$.records[:]",
 					},
 				},
 			},
@@ -1419,6 +1449,25 @@ func newChainTestServer(
 	}
 }
 
+func newNakedChainTestServer(
+	newServer func(http.Handler) *httptest.Server,
+) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
+	return func(t testing.TB, h http.HandlerFunc, config map[string]interface{}) {
+		var server *httptest.Server
+		r := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			switch r.URL.Path {
+			case "/":
+				fmt.Fprintln(w, `{"records":["`+server.URL+`/1"]}`)
+			case "/1":
+				fmt.Fprintln(w, `{"hello":[{"world":"moon"},{"space":[{"cake":"pumpkin"}]}]}`)
+			}
+		})
+		server = httptest.NewServer(r)
+		config["request.url"] = server.URL
+		t.Cleanup(server.Close)
+	}
+}
+
 func newChainPaginationTestServer(
 	newServer func(http.Handler) *httptest.Server,
 ) func(testing.TB, http.HandlerFunc, map[string]interface{}) {
@@ -1478,7 +1527,7 @@ func defaultHandler(expectedMethod, expectedBody, msg string) http.HandlerFunc {
 			r.Body.Close()
 			if expectedBody != string(body) {
 				w.WriteHeader(http.StatusBadRequest)
-				msg = fmt.Sprintf(`{"error":"expected body was %q"}`, expectedBody)
+				msg = fmt.Sprintf(`{"error":"expected body was %q, but got %q"}`, expectedBody, body)
 			}
 		}
 

@@ -29,8 +29,7 @@ var (
 )
 
 func TestSQSReceiver(t *testing.T) {
-	err := logp.TestingSetup()
-	assert.Nil(t, err)
+	logp.TestingSetup()
 
 	const maxMessages = 5
 
@@ -113,8 +112,7 @@ func TestSQSReceiver(t *testing.T) {
 }
 
 func TestGetApproximateMessageCount(t *testing.T) {
-	err := logp.TestingSetup()
-	assert.Nil(t, err)
+	logp.TestingSetup()
 
 	const maxMessages = 5
 	const count = 500

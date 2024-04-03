@@ -12,6 +12,8 @@ This file is generated! See scripts/docs_collector.py
 
 == Zscaler module
 
+deprecated::[8.12.0,"This module is deprecated. Use the https://docs.elastic.co/integrations/zscaler_zia[Zscaler Internet Access] Elastic integration instead."]
+
 experimental[]
 
 //temporarily override modulename to create working link

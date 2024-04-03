@@ -4,8 +4,6 @@
     index
   release: ga
   fields:
-    - name: created
-      type: long
     - name: hidden
       type: boolean
     - name: shards
@@ -54,6 +52,8 @@
             - name: miss_count
               type: long
         - name: store.size_in_bytes
+          type: long
+        - name: store.total_data_set_size_in_bytes
           type: long
         - name: docs.count
           type: long
@@ -115,6 +115,11 @@
           type: long
           description: >
               Total size of the index in bytes.
+        - name: store.total_data_set_size_in_bytes
+          format: bytes
+          type: long
+          description: >
+            Total size of the index in bytes including backing data for partially mounted indices.
         - name: query_cache
           type: group
           fields:

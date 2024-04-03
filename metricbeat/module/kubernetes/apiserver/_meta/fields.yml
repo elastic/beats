@@ -4,6 +4,14 @@
     Kubernetes API server metrics
   release: ga
   fields:
+    - name: major.version
+      type: keyword
+      description: >
+        API Server major version.
+    - name: minor.version
+      type: keyword
+      description: >
+        API Server minor version.
     - name: request.resource
       type: keyword
       description: >

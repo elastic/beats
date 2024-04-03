@@ -57,7 +57,7 @@ packetbeat.interfaces.buffer_size_mb: 100
 [float]
 === Windows Npcap installation options
 
-On Windows {beatname} requires an Npcap DLL installation. This is provided by {beatname}
+On Windows {beatname_uc} requires an Npcap DLL installation. This is provided by {beatname_uc}
 for users of the Elastic Licenced version. In some cases users may wish to use
 their own installed version. In order to do this the `packetbeat.npcap.never_install`
 option can be used. Setting this option to `true` will not attempt to install the
@@ -460,6 +460,12 @@ Configure the reporting interval. All flows are reported at the very same point
 in time. Periodical reporting can be disabled by setting the value to -1. If
 disabled, flows are still reported once being timed out. The default value is
 10s.
+
+[float]
+==== `enable_delta_flow_reports`
+
+Configure network.bytes and network.packets to be a delta
+value instead of a cumlative sum for each flow period. The default value is false.
 
 [float]
 [[packetbeat-configuration-flows-fields]]
@@ -1650,3 +1656,12 @@ Example configuration:
 -------------------------------------------------------------------------------------
 packetbeat.shutdown_timeout: 5s
 -------------------------------------------------------------------------------------
+
+[float]
+==== `overwrite_pipelines`
+
+By default Ingest pipelines are not updated if a pipeline with the same ID
+already exists. If this option is enabled {beatname_uc} overwrites pipelines
+every time a new Elasticsearch connection is established.
+
+The default value is `false`.

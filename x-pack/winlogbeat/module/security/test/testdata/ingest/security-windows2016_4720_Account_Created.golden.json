@@ -10,7 +10,6 @@
         "iam"
       ],
       "code": "4720",
-      "ingested": "2022-06-08T06:21:08.280835800Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -56,8 +55,9 @@
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
         "NewUACList": [
-          "SCRIPT",
-          "LOCKOUT"
+          "USER_ACCOUNT_DISABLED",
+          "USER_PASSWORD_NOT_REQUIRED",
+          "USER_NORMAL_ACCOUNT"
         ],
         "NewUacValue": "0x15",
         "OldUacValue": "0x0",
@@ -115,7 +115,6 @@
         "iam"
       ],
       "code": "4720",
-      "ingested": "2022-06-08T06:21:08.280855300Z",
       "kind": "event",
       "module": "security",
       "outcome": "success",
@@ -161,8 +160,9 @@
         "HomePath": "%%1793",
         "LogonHours": "%%1797",
         "NewUACList": [
-          "SCRIPT",
-          "LOCKOUT"
+          "USER_ACCOUNT_DISABLED",
+          "USER_PASSWORD_NOT_REQUIRED",
+          "USER_NORMAL_ACCOUNT"
         ],
         "NewUacValue": "0x15",
         "OldUacValue": "0x0",

@@ -7,6 +7,7 @@ package cel
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"io"
 	"math/rand"
@@ -22,6 +23,7 @@ import (
 	"time"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/icholy/digest"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
@@ -31,8 +33,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+var runRemote = flag.Bool("run_remote", false, "run tests using remote endpoints")
+
 var inputTests = []struct {
 	name          string
+	remote        bool
 	server        func(*testing.T, http.HandlerFunc, map[string]interface{})
 	handler       http.HandlerFunc
 	config        map[string]interface{}
@@ -337,6 +342,26 @@ var inputTests = []struct {
 			{"message": "first"},
 			{"message": "second"},
 			{"message": "third"},
+		},
+	},
+	{
+		name: "optional_types",
+		config: map[string]interface{}{
+			"interval": 1,
+			// Program returns a compilation error if optional types are not enabled.
+			"program": `{"events":[
+				has(state.?field.?does.?not.exist) ?
+					{"message":"Hello, World!"}
+				:
+					{"message":"Hello, Void!"}
+			]}`,
+			"state": nil,
+			"resource": map[string]interface{}{
+				"url": "",
+			},
+		},
+		want: []map[string]interface{}{
+			{"message": "Hello, Void!"},
 		},
 	},
 
@@ -676,6 +701,37 @@ var inputTests = []struct {
 		handler: retryHandler(),
 		want: []map[string]interface{}{
 			{"hello": "world"},
+		},
+	},
+	{
+		name:   "retry_failure_no_success",
+		server: newTestServer(httptest.NewServer),
+		config: map[string]interface{}{
+			"interval": 1,
+			"resource": map[string]interface{}{
+				"retry": map[string]interface{}{
+					"max_attempts": 2,
+				},
+			},
+			"program": `
+	get(state.url).as(resp, {
+		"url": state.url,
+		"events": [
+			bytes(resp.Body).decode_json(),
+			{"status": resp.StatusCode},
+		],
+	})
+	`,
+		},
+		handler: func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusGatewayTimeout)
+			//nolint:errcheck // No point checking errors in test server.
+			w.Write([]byte(`{"error":"we were too slow"}`))
+		},
+		want: []map[string]interface{}{
+			{"error": "we were too slow"},
+			{"status": float64(504)}, // Float because of JSON.
 		},
 	},
 
@@ -1056,6 +1112,100 @@ var inputTests = []struct {
 
 	// Authenticated access tests.
 	{
+		name: "digest_accept",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":             1,
+			"auth.digest.user":     "test_client",
+			"auth.digest.password": "secret_password",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: digestAuthHandler(
+			"test_client",
+			"secret_password",
+			"test",
+			"random_string",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"hello": []interface{}{
+					map[string]interface{}{
+						"world": "moon",
+					},
+					map[string]interface{}{
+						"space": []interface{}{
+							map[string]interface{}{
+								"cake": "pumpkin",
+							},
+						},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "digest_reject",
+		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
+			s := httptest.NewServer(h)
+			config["resource.url"] = s.URL
+			t.Cleanup(s.Close)
+		},
+		config: map[string]interface{}{
+			"interval":             1,
+			"auth.digest.user":     "test_client",
+			"auth.digest.password": "wrong_secret_password",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		handler: digestAuthHandler(
+			"test_client",
+			"secret_password",
+			"test",
+			"random_string",
+			defaultHandler(http.MethodGet, ""),
+		),
+		want: []map[string]interface{}{
+			{
+				"error": "not authorized",
+			},
+		},
+	},
+	{
+		// Test case modelled on `curl --digest -u test_user:secret_password https://httpbin.org/digest-auth/auth/test_user/secret_password/md5`.
+		name:   "digest_remote",
+		remote: true,
+		server: func(_ *testing.T, _ http.HandlerFunc, _ map[string]interface{}) {},
+		config: map[string]interface{}{
+			"resource.url":         "https://httpbin.org/digest-auth/auth/test_user/secret_password/md5",
+			"interval":             1,
+			"auth.digest.user":     "test_user",
+			"auth.digest.password": "secret_password",
+			"program": `
+	bytes(get(state.url).Body).as(body, {
+		"events": [body.decode_json()]
+	})
+	`,
+		},
+		want: []map[string]interface{}{
+			{
+				"authenticated": true,
+				"user":          "test_user",
+			},
+		},
+	},
+	{
 		name: "OAuth2",
 		server: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
 			s := httptest.NewServer(h)
@@ -1183,7 +1333,10 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
-					"message": "failed eval: no such overload", // This is the best we get for some errors from CEL.
+					// This is the best we get for some errors from CEL.
+					"message": `failed eval: ERROR: <input>:3:56: no such overload
+ |   bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
+ | .......................................................^`,
 				},
 			},
 		},
@@ -1247,6 +1400,9 @@ func TestInput(t *testing.T) {
 		t.Run(test.name, func(t *testing.T) {
 			if reason, skip := skipOnWindows[test.name]; runtime.GOOS == "windows" && skip {
 				t.Skip(reason)
+			}
+			if test.remote && !*runRemote {
+				t.Skip("skipping remote endpoint test")
 			}
 
 			if test.server != nil {
@@ -1479,6 +1635,52 @@ func retryHandler() http.HandlerFunc {
 		}
 		w.WriteHeader(rand.Intn(100) + 500)
 		count++
+	}
+}
+
+//nolint:errcheck // No point checking errors in test server.
+func digestAuthHandler(user, pass, realm, nonce string, handle http.HandlerFunc) http.HandlerFunc {
+	chal := &digest.Challenge{
+		Realm:     realm,
+		Nonce:     nonce,
+		Algorithm: "MD5",
+		QOP:       []string{"auth"},
+	}
+	return func(w http.ResponseWriter, r *http.Request) {
+		auth := r.Header.Get("Authorization")
+		if auth == "" {
+			w.Header().Add("WWW-Authenticate", chal.String())
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+
+		reqCred, err := digest.ParseCredentials(auth)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		srvCred, err := digest.Digest(chal, digest.Options{
+			Method:   r.Method,
+			URI:      r.URL.RequestURI(),
+			Cnonce:   reqCred.Cnonce,
+			Count:    reqCred.Nc,
+			Username: user,
+			Password: pass,
+		})
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		if reqCred.Response != srvCred.Response {
+			w.Header().Set("content-type", "application/json")
+			w.WriteHeader(http.StatusUnauthorized)
+			w.Write([]byte(`{"error":"not authorized"}`))
+			return
+		}
+
+		handle(w, r)
 	}
 }
 

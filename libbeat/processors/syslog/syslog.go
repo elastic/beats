@@ -89,6 +89,7 @@ func init() {
 				"ignore_missing",
 				"ignore_failure",
 				"tag",
+				"when",
 			),
 		),
 	)

@@ -104,6 +104,7 @@ type oAuth2Config struct {
 	// okta specific RSA JWK private key
 	OktaJWKFile string          `config:"okta.jwk_file"`
 	OktaJWKJSON common.JSONBlob `config:"okta.jwk_json"`
+	OktaJWKPEM  string          `config:"okta.jwk_pem"`
 }
 
 // IsEnabled returns true if the `enable` field is set to true in the yaml.
@@ -289,8 +290,29 @@ func (o *oAuth2Config) validateGoogleProvider() error {
 }
 
 func (o *oAuth2Config) validateOktaProvider() error {
-	if o.TokenURL == "" || o.ClientID == "" || len(o.Scopes) == 0 || (o.OktaJWKJSON == nil && o.OktaJWKFile == "") {
-		return errors.New("okta validation error: token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file must be provided")
+	if o.TokenURL == "" || o.ClientID == "" || len(o.Scopes) == 0 {
+		return errors.New("okta validation error: token_url, client_id, scopes must be provided")
+	}
+	var n int
+	if o.OktaJWKJSON != nil {
+		n++
+	}
+	if o.OktaJWKFile != "" {
+		n++
+	}
+	if o.OktaJWKPEM != "" {
+		n++
+	}
+	if n != 1 {
+		return errors.New("okta validation error: one of okta.jwk_json, okta.jwk_file or okta.jwk_pem must be provided")
+	}
+	// jwk_pem
+	if o.OktaJWKPEM != "" {
+		_, err := pemPKCS8PrivateKey([]byte(o.OktaJWKPEM))
+		if err != nil {
+			return fmt.Errorf("okta validation error: %w", err)
+		}
+		return nil
 	}
 	// jwk_file
 	if o.OktaJWKFile != "" {

@@ -18,7 +18,6 @@
 package testing
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -29,7 +28,7 @@ import (
 func SetupDataDir(t testing.TB) func() {
 	// path.data should be set so that the DB is written to a predictable location.
 	var err error
-	paths.Paths.Data, err = ioutil.TempDir("", "beat-data-dir")
+	paths.Paths.Data, err = os.MkdirTemp("", "beat-data-dir")
 	if err != nil {
 		t.Fatal()
 	}

@@ -109,6 +109,7 @@ func FactoryForSettings(settings Settings) queue.QueueFactory {
 	return func(
 		logger *logp.Logger,
 		ackCallback func(eventCount int),
+		inputQueueSize int,
 	) (queue.Queue, error) {
 		return NewQueue(logger, ackCallback, settings)
 	}

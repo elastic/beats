@@ -12,6 +12,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/oauth2/google"
@@ -38,26 +39,58 @@ func TestGetProviderIsCanonical(t *testing.T) {
 	}
 }
 
-func TestIsEnabled(t *testing.T) {
-	oauth2 := oAuth2Config{}
-	if !oauth2.isEnabled() {
-		t.Errorf("OAuth2 not enabled by default")
+func TestRegexpConfig(t *testing.T) {
+	cfg := config{
+		Interval: time.Minute,
+		Program:  `{}`,
+		Resource: &ResourceConfig{URL: &urlConfig{URL: &url.URL{}}},
+		Regexps:  map[string]string{"regex_cve": `[Cc][Vv][Ee]-[0-9]{4}-[0-9]{4,7}`},
 	}
-
-	var enabled bool
-	for i := 0; i < 4; i++ {
-		oauth2.Enabled = &enabled
-		if got := oauth2.isEnabled(); got != enabled {
-			t.Errorf("unexpected OAuth2 enabled state on iteration %d: got:%t want:%t", i, got, enabled)
-		}
-		enabled = !enabled
-	}
-
-	oauth2.Enabled = nil
-	if !oauth2.isEnabled() {
-		t.Errorf("OAuth2 not enabled if nilled")
+	err := cfg.Validate()
+	if err != nil {
+		t.Errorf("failed to validate config with regexps: %v", err)
 	}
 }
+
+func TestIsEnabled(t *testing.T) {
+	type enabler interface {
+		isEnabled() bool
+		take(*bool)
+	}
+	for _, test := range []struct {
+		name string
+		auth enabler
+	}{
+		{name: "basic", auth: &basicAuthConfig{}},
+		{name: "digest", auth: &digestAuthConfig{}},
+		{name: "OAuth2", auth: &oAuth2Config{}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			if !test.auth.isEnabled() {
+				t.Errorf("auth not enabled by default")
+			}
+
+			var enabled bool
+			for i := 0; i < 4; i++ {
+				test.auth.take(&enabled)
+				if got := test.auth.isEnabled(); got != enabled {
+					t.Errorf("unexpected auth enabled state on iteration %d: got:%t want:%t", i, got, enabled)
+				}
+				enabled = !enabled
+			}
+
+			test.auth.take(nil)
+			if !test.auth.isEnabled() {
+				t.Errorf("auth not enabled if nilled")
+			}
+		})
+	}
+}
+
+// take methods are for testing only.
+func (b *basicAuthConfig) take(on *bool)  { b.Enabled = on }
+func (d *digestAuthConfig) take(on *bool) { d.Enabled = on }
+func (o *oAuth2Config) take(on *bool)     { o.Enabled = on }
 
 func TestOAuth2GetTokenURL(t *testing.T) {
 	const host = "http://localhost"
@@ -141,6 +174,31 @@ var oAuth2ValidationTests = []struct {
 					"secret": "a_client_secret",
 				},
 			},
+		},
+	},
+	{
+		name:    "can't_set_oauth2_and_digest_auth_together",
+		wantErr: errors.New("only one kind of auth can be enabled accessing 'auth'"),
+		input: map[string]interface{}{
+			"auth.digest.user":     "user",
+			"auth.digest.password": "pass",
+			"auth.oauth2": map[string]interface{}{
+				"token_url": "localhost",
+				"client": map[string]interface{}{
+					"id":     "a_client_id",
+					"secret": "a_client_secret",
+				},
+			},
+		},
+	},
+	{
+		name:    "can't_set_basic_and_digest_auth_together",
+		wantErr: errors.New("only one kind of auth can be enabled accessing 'auth'"),
+		input: map[string]interface{}{
+			"auth.basic.user":      "user",
+			"auth.basic.password":  "pass",
+			"auth.digest.user":     "user",
+			"auth.digest.password": "pass",
 		},
 	},
 	{
@@ -445,8 +503,8 @@ var oAuth2ValidationTests = []struct {
 		},
 	},
 	{
-		name:    "okta requires token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file to be provided",
-		wantErr: errors.New("okta validation error: token_url, client_id, scopes and at least one of okta.jwk_json or okta.jwk_file must be provided accessing 'auth.oauth2'"),
+		name:    "unique_okta_jwk_token",
+		wantErr: errors.New("okta validation error: one of okta.jwk_json, okta.jwk_file or okta.jwk_pem must be provided accessing 'auth.oauth2'"),
 		input: map[string]interface{}{
 			"auth.oauth2": map[string]interface{}{
 				"provider":  "okta",
@@ -457,7 +515,7 @@ var oAuth2ValidationTests = []struct {
 		},
 	},
 	{
-		name:    "okta oauth2 validation fails if jwk_json is not a valid JSON",
+		name:    "invalid_okta_jwk_json",
 		wantErr: errors.New("the field can't be converted to valid JSON accessing 'auth.oauth2.okta.jwk_json'"),
 		input: map[string]interface{}{
 			"auth.oauth2": map[string]interface{}{
@@ -470,7 +528,7 @@ var oAuth2ValidationTests = []struct {
 		},
 	},
 	{
-		name: "okta successful oauth2 validation",
+		name: "okta_successful_oauth2_validation",
 		input: map[string]interface{}{
 			"auth.oauth2": map[string]interface{}{
 				"provider":      "okta",
@@ -478,6 +536,47 @@ var oAuth2ValidationTests = []struct {
 				"token_url":     "localhost",
 				"scopes":        []string{"foo"},
 				"okta.jwk_json": `{"p":"x","kty":"RSA","q":"x","d":"x","e":"x","use":"x","kid":"x","qi":"x","dp":"x","alg":"x","dq":"x","n":"x"}`,
+			},
+		},
+	},
+	{
+		name: "okta_successful_pem_oauth2_validation",
+		input: map[string]interface{}{
+			"auth.oauth2": map[string]interface{}{
+				"provider":  "okta",
+				"client.id": "a_client_id",
+				"token_url": "localhost",
+				"scopes":    []string{"foo"},
+				"okta.jwk_pem": `
+-----BEGIN PRIVATE KEY-----
+MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCOuef3HMRhohVT
+5kSoAJgV+atpDjkwTwkOq+ImnbBlv75GaApG90w8VpjXjhqN/1KJmwfyrKiquiMq
+OPu+o/672Dys5rUAaWSbT7wRF1GjLDDZrM0GHRdV4DGxM/LKI8I5yE1Mx3EzV+D5
+ZLmcRc5U4oEoMwtGpr0zRZ7uUr6a28UQwcUsVIPItc1/9rERlo1WTv8dcaj4ECC3
+2Sc0y/F+9XqwJvLd4Uv6ckzP0Sv4tbDA+7jpD9MneAIUiZ4LVj2cwbBd+YRY6jXx
+MkevcCSmSX60clBY1cIFkw1DYHqtdHEwAQcQHLGMoi72xRP2qrdzIPsaTKVYoHVo
+WA9vADdHAgMBAAECggEAIlx7jjCsztyYyeQsL05FTzUWoWo9NnYwtgmHnshkCXsK
+MiUmJEOxZO1sSqj5l6oakupyFWigCspZYPbrFNCiqVK7+NxqQzkccY/WtT6p9uDS
+ufUyPwCN96zMCd952lSVlBe3FH8Hr9a+YQxw60CbFjCZ67WuR0opTsi6JKJjJSDb
+TQQZ4qJR97D05I1TgfmO+VO7G/0/dDaNHnnlYz0AnOgZPSyvrU2G5cYye4842EMB
+ng81xjHD+xp55JNui/xYkhmYspYhrB2KlEjkKb08OInUjBeaLEAgA1r9yOHsfV/3
+DQzDPRO9iuqx5BfJhdIqUB1aifrye+sbxt9uMBtUgQKBgQDVdfO3GYT+ZycOQG9P
+QtdMn6uiSddchVCGFpk331u6M6yafCKjI/MlJDl29B+8R5sVsttwo8/qnV/xd3cn
+pY14HpKAsE4l6/Ciagzoj+0NqfPEDhEzbo8CyArcd7pSxt3XxECAfZe2+xivEPHe
+gFO60vSFjFtvlLRMDMOmqX3kYQKBgQCrK1DISyQTnD6/axsgh2/ESOmT7n+JRMx/
+YzA7Lxu3zGzUC8/sRDa1C41t054nf5ZXJueYLDSc4kEAPddzISuCLxFiTD2FQ75P
+lHWMgsEzQObDm4GPE9cdKOjoAvtAJwbvZcjDa029CDx7aCaDzbNvdmplZ7EUrznR
+55U8Wsm8pwKBgBytxTmzZwfbCgdDJvFKNKzpwuCB9TpL+v6Y6Kr2Clfg+26iAPFU
+MiWqUUInGGBuamqm5g6jI5sM28gQWeTsvC4IRXyes1Eq+uCHSQax15J/Y+3SSgNT
+9kjUYYkvWMwoRcPobRYWSZze7XkP2L8hFJ7EGvAaZGqAWxzgliS9HtnhAoGAONZ/
+UqMw7Zoac/Ga5mhSwrj7ZvXxP6Gqzjofj+eKqrOlB5yMhIX6LJATfH6iq7cAMxxm
+Fu/G4Ll4oB3o5wACtI3wldV/MDtYfJBtoCTjBqPsfNOsZ9hMvBATlsc2qwzKjsAb
+tFhzTevoOYpSD75EcSS/G8Ec2iN9bagatBnpl00CgYBVqAOFZelNfP7dj//lpk8y
+EUAw7ABOq0S9wkpFWTXIVPoBQUipm3iAUqGNPmvr/9ShdZC9xeu5AwKram4caMWJ
+ExRhcDP1hFM6CdmSkIYEgBKvN9N0O4Lx1ba34gk74Hm65KXxokjJHOC0plO7c7ok
+LNV/bIgMHOMoxiGrwyjAhg==
+-----END PRIVATE KEY-----
+`,
 			},
 		},
 	},
