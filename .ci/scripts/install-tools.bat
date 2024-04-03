@@ -14,7 +14,7 @@ curl --version >nul 2>&1 && (
 REM Set the USERPROFILE to the previous location to fix issues with chocolatey in windows 2019
 SET PREVIOUS_USERPROFILE=%USERPROFILE%
 SET USERPROFILE=%OLD_USERPROFILE%
-IF NOT EXIST C:\Python38\python.exe (
+IF NOT EXIST C:\Python311\python.exe (
     REM Install python 3.11.3
     choco install python -y -r --no-progress --version 3.11.3 || exit /b 1
 )
