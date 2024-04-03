@@ -31,6 +31,11 @@ type Factory struct {
 	options  []Option
 }
 
+// metricSetWithProcessors is an interface to check if a MetricSet has directly attached Processors
+type metricSetWithProcessors interface {
+	Processors() []beat.Processor
+}
+
 // NewFactory creates new Reloader instance for the given config
 func NewFactory(beatInfo beat.Info, options ...Option) *Factory {
 	return &Factory{
@@ -61,6 +66,10 @@ func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 		err = connector.UseMetricSetProcessors(mb.Registry, module.Name(), metricSet.Name())
 		if err != nil {
 			return nil, err
+		}
+
+		if msWithProcs, ok := metricSet.(metricSetWithProcessors); ok {
+			connector.addProcessors(msWithProcs.Processors())
 		}
 
 		client, err := connector.Connect()
