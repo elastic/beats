@@ -2,6 +2,8 @@
 name: "beats-metricbeat"
 
 env:
+  BEATS_PROJECT_NAME: "metricbeat"
+
   IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
   IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
   IMAGE_WIN_10: "family/general-windows-10"
@@ -10,7 +12,7 @@ env:
   IMAGE_WIN_2019: "family/core-windows-2019"
   IMAGE_WIN_2022: "family/core-windows-2022"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  BEATS_PROJECT_NAME: "metricbeat"
+
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
@@ -22,105 +24,104 @@ steps:
     steps:
       - label: ":linux: Metricbeat Ubuntu Unit Tests"
         key: "metricbeat-mandatory-linux-unit-test"
-        # command: ".buildkite/scripts/unit_tests.sh"
-        command: echo "tests"
-        # agents:
-        #   provider: "gcp"
-        #   image: "${IMAGE_UBUNTU_X86_64}"
-        #   machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        command: ".buildkite/scripts/unit_tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      # - label: ":go: Metricbeat Go Integration Tests"
-      #   key: "metricbeat-mandatory-int-test"
-      #   command: ".buildkite/scripts/go_int_tests.sh"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_UBUNTU_X86_64}"
-      #     machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-      #   artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":go: Metricbeat Go Integration Tests"
+        key: "metricbeat-mandatory-int-test"
+        command: ".buildkite/scripts/go_int_tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      # - label: ":python: Metricbeat Python Integration Tests"
-      #   key: "metricbeat-mandatory-python-int-test"
-      #   command: ".buildkite/scripts/py_int_tests.sh"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_UBUNTU_X86_64}"
-      #     machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-      #   artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":python: Metricbeat Python Integration Tests"
+        key: "metricbeat-mandatory-python-int-test"
+        command: ".buildkite/scripts/py_int_tests.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      # - label: ":negative_squared_cross_mark: Metricbeat Cross compile"
-      #   key: "metricbeat-mandatory-cross-compile"
-      #   command: ".buildkite/scripts/crosscompile.sh"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_UBUNTU_X86_64}"
-      #     machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-      #   artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":negative_squared_cross_mark: Metricbeat Cross compile"
+        key: "metricbeat-mandatory-cross-compile"
+        command: ".buildkite/scripts/crosscompile.sh"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      # - label: ":windows: Metricbeat Windows 2016/2022 Unit Tests - {{matrix.image}}"
-      #   command: ".buildkite/scripts/win_unit_tests.ps1"
-      #   key: "metricbeat-mandatory-win-unit-tests"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "{{matrix.image}}"
-      #     machine_type: "${GCP_WIN_MACHINE_TYPE}"
-      #     disk_size: 100
-      #     disk_type: "pd-ssd"
-      #   matrix:
-      #     setup:
-      #       image:
-      #         - "${IMAGE_WIN_2016}"
-      #         - "${IMAGE_WIN_2022}"
-      #   artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":windows: Metricbeat Windows 2016/2022 Unit Tests - {{matrix.image}}"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        key: "metricbeat-mandatory-win-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_2016}"
+              - "${IMAGE_WIN_2022}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-  # - group: "Metricbeat Extended Windows Tests"
-  #   key: "metricbeat-extended-win-tests"
-  #   if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
-  #   steps:
-  #     - label: ":windows: Metricbeat Windows 2019 Unit Tests"
-  #       key: "metricbeat-extended-win-2019-unit-tests"
-  #       command: ".buildkite/scripts/win_unit_tests.ps1"
-  #       agents:
-  #         provider: "gcp"
-  #         image: "${IMAGE_WIN_2019}"
-  #         machine_type: "${GCP_WIN_MACHINE_TYPE}"
-  #         disk_size: 100
-  #         disk_type: "pd-ssd"
-  #       artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+  - group: "Metricbeat Extended Windows Tests"
+    key: "metricbeat-extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
+    steps:
+      - label: ":windows: Metricbeat Windows 2019 Unit Tests"
+        key: "metricbeat-extended-win-2019-unit-tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-  #     - label: ":windows: Metricbeat Windows 10 Unit Tests"
-  #       key: "metricbeat-extended-win-10-unit-tests"
-  #       command: ".buildkite/scripts/win_unit_tests.ps1"
-  #       agents:
-  #         provider: "gcp"
-  #         image: "${IMAGE_WIN_10}"
-  #         machine_type: "${GCP_WIN_MACHINE_TYPE}"
-  #         disk_size: 100
-  #         disk_type: "pd-ssd"
-  #       artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":windows: Metricbeat Windows 10 Unit Tests"
+        key: "metricbeat-extended-win-10-unit-tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-  #     - label: ":windows: Metricbeat Windows 11 Unit Tests"
-  #       key: "metricbeat-extended-win-11-unit-tests"
-  #       command: ".buildkite/scripts/win_unit_tests.ps1"
-  #       agents:
-  #         provider: "gcp"
-  #         image: "${IMAGE_WIN_11}"
-  #         machine_type: "${GCP_WIN_MACHINE_TYPE}"
-  #         disk_size: 100
-  #         disk_type: "pd-ssd"
-  #       artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":windows: Metricbeat Windows 11 Unit Tests"
+        key: "metricbeat-extended-win-11-unit-tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-  # - group: "Metricbeat Extended Tests MacOS"
-  #   key: "metricbeat-extended-tests"
-  #   if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-  #   steps:
-  #     - label: ":mac: Metricbeat MacOS Unit Tests"
-  #       key: "metricbeat-extended-macos-unit-tests"
-  #       command: ".buildkite/scripts/unit_tests.sh"
-  #       agents:
-  #         provider: "orka"
-  #         imagePrefix: "${IMAGE_MACOS_X86_64}"
-  #       artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+  - group: "Metricbeat Extended Tests MacOS"
+    key: "metricbeat-extended-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+    steps:
+      - label: ":mac: Metricbeat MacOS Unit Tests"
+        key: "metricbeat-extended-macos-unit-tests"
+        command: ".buildkite/scripts/unit_tests.sh"
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
   - wait: ~
     depends_on:
@@ -129,7 +130,7 @@ steps:
 
   - group: "Metricbeat Packaging"
     key: "metricbeat-packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "/package"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     steps:
       - label: ":linux: Metricbeat Packaging Linux"
         key: "metricbeat-packaging-linux"
