@@ -228,8 +228,10 @@ func GoIntegTest(ctx context.Context) error {
 func PythonIntegTest(ctx context.Context) error {
 	fmt.Printf("hi fae, starting PythonIntegTest\n")
 	if !devtools.IsInIntegTestEnv() {
-		fmt.Printf("!IsInIntegTestEnv\n")
+		fmt.Printf("hi fae, !IsInIntegTestEnv\n")
 		mg.SerialDeps(Fields, Dashboards)
+	} else {
+		fmt.Printf("hi fae, IsInIntegTestEnv\n")
 	}
 
 	passThroughEnvVars := append(
