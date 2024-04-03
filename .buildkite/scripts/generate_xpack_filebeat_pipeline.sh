@@ -142,7 +142,7 @@ if are_conditions_met_aws_tests; then
           ASDF_TERRAFORM_VERSION: 1.0.2
         agents:
           provider: "gcp"
-          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
