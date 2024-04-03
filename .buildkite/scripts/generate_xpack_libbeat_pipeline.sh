@@ -50,7 +50,6 @@ steps:
         agents:
           provider: "gcp"
           image: "{{matrix.image}}"
-          imageProject: elastic-images-qa
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
