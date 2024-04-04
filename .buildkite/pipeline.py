@@ -144,7 +144,8 @@ class GitHelper:
 
     def get_pr_changeset(self) -> list[str]:
         base_branch = os.getenv("BUILDKITE_PULL_REQUEST_BASE_BRANCH", "main")
-        diff_command = ["git", "diff", "--name-only", "{}...HEAD".format(base_branch)]
+        diff_command = ["git", "diff", "--name-only", "{}".format(base_branch)]
+        print(f"DIF CMD [{diff_command}]")
         result = subprocess.run(diff_command, stdout=subprocess.PIPE)
         if result.returncode == 0:
             self.files = result.stdout.decode().splitlines()
