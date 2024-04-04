@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/spf13/cobra"
+
 	fbcmd "github.com/elastic/beats/v7/filebeat/cmd"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/processors"
@@ -26,7 +28,6 @@ const Name = fbcmd.Name
 
 // Filebeat build the beat root command for executing filebeat and it's subcommands.
 func Filebeat() *cmd.BeatsRootCmd {
-	management.ConfigTransform.SetTransform(filebeatCfg)
 	settings := fbcmd.FilebeatSettings()
 	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
 	if err != nil { // these are hard-coded, shouldn't fail
@@ -35,6 +36,9 @@ func Filebeat() *cmd.BeatsRootCmd {
 	settings.Processing = processing.MakeDefaultSupport(true, globalProcs, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
 	settings.ElasticLicensed = true
 	command := fbcmd.Filebeat(inputs.Init, settings)
+	command.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		management.ConfigTransform.SetTransform(filebeatCfg)
+	}
 	return command
 }
 

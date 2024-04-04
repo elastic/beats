@@ -8,10 +8,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/spf13/cobra"
+
 	auditbeatcmd "github.com/elastic/beats/v7/auditbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
@@ -43,12 +46,15 @@ func auditbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) 
 		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}
 
-	// Extract the type field that has "audit/auditd", treat this
-	// as the module config key
-	module := strings.Split(rawIn.Type, "/")[1]
-
-	for iter := range modules {
-		modules[iter]["module"] = module
+	if system.ModuleName == "audit/system" {
+		// running in agentbeat; no need to transform the type field
+	} else {
+		// not running in agentbeat; extract the type field that has
+		// "audit/auditd", treat this as the module config key
+		module := strings.Split(rawIn.Type, "/")[1]
+		for iter := range modules {
+			modules[iter]["module"] = module
+		}
 	}
 
 	// Format for the reloadable list needed bythe cm.Reload() method.
@@ -61,7 +67,6 @@ func auditbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) 
 }
 
 func init() {
-	management.ConfigTransform.SetTransform(auditbeatCfg)
 	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
 	if err != nil { // these are hard-coded, shouldn't fail
 		panic(fmt.Errorf("error creating global processors: %w", err))
@@ -69,6 +74,9 @@ func init() {
 	settings := auditbeatcmd.AuditbeatSettings(globalProcs)
 	settings.ElasticLicensed = true
 	RootCmd = auditbeatcmd.Initialize(settings)
+	RootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		management.ConfigTransform.SetTransform(auditbeatCfg)
+	}
 }
 
 func defaultProcessors() []mapstr.M {

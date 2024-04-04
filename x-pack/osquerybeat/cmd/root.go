@@ -7,6 +7,14 @@ package cmd
 import (
 	"fmt"
 
+	"github.com/spf13/cobra"
+
+	"github.com/elastic/beats/v7/x-pack/libbeat/management"
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/common/cli"
@@ -14,14 +22,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	"github.com/spf13/cobra"
-
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/beater"
 	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/include"
@@ -44,7 +44,6 @@ var withECSVersion = processing.WithFields(mapstr.M{
 var RootCmd = Osquerybeat()
 
 func Osquerybeat() *cmd.BeatsRootCmd {
-	management.ConfigTransform.SetTransform(osquerybeatCfg)
 	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
 	if err != nil { // these are hard-coded, shouldn't fail
 		panic(fmt.Errorf("error creating global processors: %w", err))
@@ -55,6 +54,9 @@ func Osquerybeat() *cmd.BeatsRootCmd {
 		ElasticLicensed: true,
 	}
 	command := cmd.GenRootCmdWithSettings(beater.New, settings)
+	command.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		management.ConfigTransform.SetTransform(osquerybeatCfg)
+	}
 
 	// Add verify command
 	command.AddCommand(genVerifyCmd(settings))
