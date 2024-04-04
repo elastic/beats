@@ -12,10 +12,18 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"reflect"
+	"strconv"
 	"time"
 
+	"github.com/google/cel-go/cel"
+	"github.com/google/cel-go/checker/decls"
+	"github.com/google/cel-go/common/types"
+	"github.com/google/cel-go/common/types/ref"
+	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
@@ -24,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/mito/lib"
 )
 
 const headerContentEncoding = "Content-Encoding"
@@ -35,14 +44,17 @@ var (
 )
 
 type handler struct {
-	metrics   *inputMetrics
-	publisher stateless.Publisher
-	log       *logp.Logger
-	validator apiValidator
+	metrics     *inputMetrics
+	publisher   stateless.Publisher
+	log         *logp.Logger
+	validator   apiValidator
+	txBaseID    string         // Random value to make transaction IDs unique.
+	txIDCounter *atomic.Uint64 // Transaction ID counter that is incremented for each request.
 
 	reqLogger    *zap.Logger
 	host, scheme string
 
+	program               *program
 	messageField          string
 	responseCode          int
 	responseBody          string
@@ -80,7 +92,7 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		r.Body = io.NopCloser(&buf)
 	}
 
-	objs, _, status, err := httpReadJSON(body)
+	objs, _, status, err := httpReadJSON(body, h.program)
 	if err != nil {
 		h.sendAPIErrorResponse(w, r, h.log, status, err)
 		h.metrics.apiErrors.Add(1)
@@ -177,15 +189,26 @@ func (h *handler) logRequest(r *http.Request, status int, respBody []byte) {
 			zap.ByteString("http.response.body.content", respBody),
 		)
 	}
+	txID := h.nextTxID()
+	h.log.Debugw("new request trace transaction", "id", txID)
 	// Limit request logging body size to 10kiB.
 	const maxBodyLen = 10 * (1 << 10)
-	httplog.LogRequest(h.reqLogger, r, maxBodyLen, extra...)
+	httplog.LogRequest(h.reqLogger.With(zap.String("transaction.id", txID)), r, maxBodyLen, extra...)
 	if scheme != "" {
 		r.URL.Scheme = scheme
 	}
 	if host != "" {
 		r.URL.Host = host
 	}
+}
+
+func (h *handler) nextTxID() string {
+	count := h.txIDCounter.Inc()
+	return h.formatTxID(count)
+}
+
+func (h *handler) formatTxID(count uint64) string {
+	return h.txBaseID + "-" + strconv.FormatUint(count, 10)
 }
 
 func (h *handler) sendResponse(w http.ResponseWriter, status int, message string) {
@@ -218,22 +241,22 @@ func (h *handler) publishEvent(obj, headers mapstr.M) error {
 	return nil
 }
 
-func httpReadJSON(body io.Reader) (objs []mapstr.M, rawMessages []json.RawMessage, status int, err error) {
+func httpReadJSON(body io.Reader, prg *program) (objs []mapstr.M, rawMessages []json.RawMessage, status int, err error) {
 	if body == http.NoBody {
 		return nil, nil, http.StatusNotAcceptable, errBodyEmpty
 	}
-	obj, rawMessage, err := decodeJSON(body)
+	obj, rawMessage, err := decodeJSON(body, prg)
 	if err != nil {
 		return nil, nil, http.StatusBadRequest, err
 	}
 	return obj, rawMessage, http.StatusOK, err
 }
 
-func decodeJSON(body io.Reader) (objs []mapstr.M, rawMessages []json.RawMessage, err error) {
+func decodeJSON(body io.Reader, prg *program) (objs []mapstr.M, rawMessages []json.RawMessage, err error) {
 	decoder := json.NewDecoder(body)
 	for decoder.More() {
 		var raw json.RawMessage
-		if err := decoder.Decode(&raw); err != nil {
+		if err = decoder.Decode(&raw); err != nil {
 			if err == io.EOF { //nolint:errorlint // This will never be a wrapped error.
 				break
 			}
@@ -241,9 +264,22 @@ func decodeJSON(body io.Reader) (objs []mapstr.M, rawMessages []json.RawMessage,
 		}
 
 		var obj interface{}
-		if err := newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
+		if err = newJSONDecoder(bytes.NewReader(raw)).Decode(&obj); err != nil {
 			return nil, nil, fmt.Errorf("malformed JSON object at stream position %d: %w", decoder.InputOffset(), err)
 		}
+
+		if prg != nil {
+			obj, err = prg.eval(obj)
+			if err != nil {
+				return nil, nil, err
+			}
+			// Re-marshal to ensure the raw bytes agree with the constructed object.
+			raw, err = json.Marshal(obj)
+			if err != nil {
+				return nil, nil, fmt.Errorf("failed to remarshal object: %w", err)
+			}
+		}
+
 		switch v := obj.(type) {
 		case map[string]interface{}:
 			objs = append(objs, v)
@@ -263,6 +299,86 @@ func decodeJSON(body io.Reader) (objs []mapstr.M, rawMessages []json.RawMessage,
 		jsontransform.TransformNumbers(objs[i])
 	}
 	return objs, rawMessages, nil
+}
+
+type program struct {
+	prg cel.Program
+	ast *cel.Ast
+}
+
+func newProgram(src string) (*program, error) {
+	if src == "" {
+		return nil, nil
+	}
+
+	registry, err := types.NewRegistry()
+	if err != nil {
+		return nil, fmt.Errorf("failed to create env: %w", err)
+	}
+	env, err := cel.NewEnv(
+		cel.Declarations(decls.NewVar("obj", decls.Dyn)),
+		cel.OptionalTypes(cel.OptionalTypesVersion(lib.OptionalTypesVersion)),
+		cel.CustomTypeAdapter(&numberAdapter{registry}),
+		cel.CustomTypeProvider(registry),
+	)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create env: %w", err)
+	}
+
+	ast, iss := env.Compile(src)
+	if iss.Err() != nil {
+		return nil, fmt.Errorf("failed compilation: %w", iss.Err())
+	}
+
+	prg, err := env.Program(ast)
+	if err != nil {
+		return nil, fmt.Errorf("failed program instantiation: %w", err)
+	}
+	return &program{prg: prg, ast: ast}, nil
+}
+
+var _ types.Adapter = (*numberAdapter)(nil)
+
+type numberAdapter struct {
+	fallback types.Adapter
+}
+
+func (a *numberAdapter) NativeToValue(value any) ref.Val {
+	if n, ok := value.(json.Number); ok {
+		var errs []error
+		i, err := n.Int64()
+		if err == nil {
+			return types.Int(i)
+		}
+		errs = append(errs, err)
+		f, err := n.Float64()
+		if err == nil {
+			return types.Double(f)
+		}
+		errs = append(errs, err)
+		return types.NewErr("%v", errors.Join(errs...))
+	}
+	return a.fallback.NativeToValue(value)
+}
+
+func (p *program) eval(obj interface{}) (interface{}, error) {
+	out, _, err := p.prg.Eval(map[string]interface{}{"obj": obj})
+	if err != nil {
+		err = lib.DecoratedError{AST: p.ast, Err: err}
+		return nil, fmt.Errorf("failed eval: %w", err)
+	}
+
+	v, err := out.ConvertToNative(reflect.TypeOf((*structpb.Value)(nil)))
+	if err != nil {
+		return nil, fmt.Errorf("failed proto conversion: %w", err)
+	}
+	switch v := v.(type) {
+	case *structpb.Value:
+		return v.AsInterface(), nil
+	default:
+		// This should never happen.
+		return nil, fmt.Errorf("unexpected native conversion type: %T", v)
+	}
 }
 
 func decodeJSONArray(raw *bytes.Reader) (objs []mapstr.M, rawMessages []json.RawMessage, err error) {

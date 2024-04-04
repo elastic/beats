@@ -95,6 +95,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 
 ==== Added
 
+- Update watchers to be shared between metricsets in Kubernetes module. {pull}37332[37332]
 - Add new metricset in Kubernetes module, `state_namespace`. {pull}36406[36406]
 - Add configuration for APM instrumentation and expose the tracer trough the Beat object. {pull}17938[17938]
 - Make the behavior of clientWorker and netClientWorker consistent when error is returned from publisher pipeline
@@ -181,6 +182,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Elide retryable HTTP client construction in Filebeat HTTPJSON and CEL inputs if not needed. {pull}36916[36916]
 - Allow assignment of packetbeat protocols to interfaces. {issue}36574[36564] {pull}36852[36852]
 - Add Active Directory entity collector for Filebeat entity analytics. {pull}37854[37854]
+- Make logs for empty and small files less noisy when using fingerprint file identity in filestream. {pull}38421[38421]
 
 ==== Deprecated
 
