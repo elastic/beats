@@ -13,15 +13,15 @@ if are_conditions_met_mandatory_tests; then
 
 
 steps:
-  - group: "Filebeat Mandatory Testing"
+  - group: "Mandatory Testing"
     key: "mandatory-tests"
 
     steps:
-      - label: ":ubuntu: Unit Tests"
+      - label: ":ubuntu: Ubuntu Unit Tests"
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         notify:
           - github_commit_status:
-              context: "Filebeat: linux/Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Ununtu Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -30,11 +30,11 @@ steps:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
 
-      - label: ":ubuntu: Go Integration Tests"
+      - label: ":ubuntu: Ubuntu Go Integration Tests"
         command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
         notify:
           - github_commit_status:
-              context: "Filebeat: Go Integration Tests"
+              context: "$BEATS_PROJECT_NAME: Go Integration Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -43,11 +43,11 @@ steps:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
 
-      - label: ":ubuntu: Python Integration Tests"
+      - label: ":ubuntu: Ubuntu Python Integration Tests"
         command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
         notify:
           - github_commit_status:
-              context: "Filebeat: Python Integration Tests"
+              context: "$BEATS_PROJECT_NAME: Python Integration Tests"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -56,14 +56,14 @@ steps:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
 
-      - label: ":windows:-2016 Unit Tests"
+      - label: ":windows: Windows 2016 Unit Tests"
         key: "windows-2016-unit-tests"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
         notify:
           - github_commit_status:
-              context: "Filebeat: windows 2016/Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Windows 2016 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -72,14 +72,14 @@ steps:
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      - label: ":windows:-2022 Unit Tests"
+      - label: ":windows: Windows 2022 Unit Tests"
         key: "windows-2022-unit-tests"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
         notify:
           - github_commit_status:
-              context: "Filebeat: windows 2022/Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Windows 2022 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -113,7 +113,7 @@ if are_conditions_met_macos_tests; then
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         notify:
           - github_commit_status:
-              context: "Filebeat: MacOS Unit Tests"
+              context: "$BEATS_PROJECT_NAME: MacOS Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -126,7 +126,7 @@ if are_conditions_met_macos_tests; then
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         notify:
           - github_commit_status:
-              context: "Filebeat: MacOS ARM Unit Tests"
+              context: "$BEATS_PROJECT_NAME: MacOS ARM Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -139,12 +139,12 @@ fi
 if are_conditions_met_arm_tests; then
   cat >> $pipelineName <<- YAML
 
-      - label: ":linux: ARM Ubuntu Unit Tests"
+      - label: ":linux: Ubuntu ARM Unit Tests"
         key: "extended-arm64-unit-test"
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         notify:
           - github_commit_status:
-              context: "Filebeat: Unit Tests ARM"
+              context: "$BEATS_PROJECT_NAME: Ubuntu ARM Unit Tests"
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -161,14 +161,14 @@ if are_conditions_met_win_tests; then
   - group: "Windows Extended Testing"
     key: "extended-tests-win"
     steps:
-      - label: ":windows: Win 2019 Unit Tests"
+      - label: ":windows: Windows 2019 Unit Tests"
         key: "windows-extended-2019"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
         notify:
           - github_commit_status:
-              context: "Filebeat: Win-2019 Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Windows 2019 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -179,14 +179,14 @@ if are_conditions_met_win_tests; then
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
 
-      - label: ":windows:-11 Unit Tests"
+      - label: ":windows: Windows 11 Unit Tests"
         key: "windows-extended-11"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
         notify:
           - github_commit_status:
-              context: "Filebeat: Win-11 Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Windows 11 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -197,14 +197,14 @@ if are_conditions_met_win_tests; then
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
 
-      - label: ":windows:-10 Unit Tests"
+      - label: ":windows: Windows 10 Unit Tests"
         key: "windows-extended-10"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
         notify:
           - github_commit_status:
-              context: "Filebeat: Win-10 Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Windows 10 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -231,7 +231,7 @@ cat >> $pipelineName <<- YAML
         commands: ".buildkite/scripts/packaging/package-step.sh"
         notify:
         - github_commit_status:
-            context: "Filebeat: Packaging"
+            context: "$BEATS_PROJECT_NAME: Packaging"
 
 YAML
 fi

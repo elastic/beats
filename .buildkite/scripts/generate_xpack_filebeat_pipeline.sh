@@ -25,6 +25,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu Unit Tests"
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
@@ -36,6 +39,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Go Integration Tests"
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
@@ -49,6 +55,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Python Integration Tests"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command: |
@@ -69,6 +78,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
 ## TODO: this condition will be changed in the Phase 3 of the Migration Plan https://docs.google.com/document/d/1IPNprVtcnHlem-uyGZM0zGzhfUuFAh4LeSl9JFHMSZQ/edit#heading=h.sltz78yy249h
 
@@ -96,6 +108,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
 YAML
 else
@@ -125,13 +140,16 @@ if are_conditions_met_macos_tests; then
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: MacOS Unit Tests"
 
 YAML
 fi
 
 if are_conditions_met_arm_tests; then
   cat >> $pipelineName <<- YAML
-      - label: ":linux: ARM Ubuntu Unit Tests"
+      - label: ":linux: Ubuntu ARM Unit Tests"
         key: "extended-arm64-unit-test"
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
@@ -141,6 +159,9 @@ if are_conditions_met_arm_tests; then
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu ARM Unit Tests"
 
 YAML
 fi
@@ -163,6 +184,9 @@ if are_conditions_met_aws_tests; then
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Cloud Tests"
 
 YAML
 fi

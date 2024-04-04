@@ -26,6 +26,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Cross compile"
 
       - label: ":windows: Windows 2016/2019/2022 Unit Tests - {{matrix.image}}"
         command: |
@@ -47,6 +50,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
 # echo "Add the extended windows tests into the pipeline"
 # TODO: ADD conditions from the main pipeline
@@ -54,7 +60,7 @@ steps:
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
     steps:
-      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+      - label: ":windows: Windows 10/11 Unit Tests - {{matrix.image}}"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
@@ -73,6 +79,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
 YAML
 else
@@ -101,6 +110,9 @@ if are_conditions_met_packaging; then
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         env:
           PLATFORMS: "${PACKAGING_PLATFORMS}"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Packaging Linux"
 
 
 YAML

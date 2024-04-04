@@ -25,6 +25,10 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu Unit Tests"
+
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
@@ -38,6 +42,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Go Integration Tests"
 
 YAML
 fi

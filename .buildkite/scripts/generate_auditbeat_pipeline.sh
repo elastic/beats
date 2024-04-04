@@ -12,15 +12,15 @@ if are_conditions_met_mandatory_tests; then
   cat > $pipelineName <<- YAML
 
 steps:
-  - group: "Auditbeat Mandatory Testing"
+  - group: "Mandatory Testing"
     key: "mandatory-tests"
 
     steps:
-      - label: ":ubuntu: Unit Tests"
+      - label: ":ubuntu: Ubuntu Unit Tests"
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         notify:
           - github_commit_status:
-              context: "Auditbeat: linux/Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Ubuntu Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -29,11 +29,11 @@ steps:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
 
-      - label: ":rhel: Unit Tests"
+      - label: ":rhel: RHEL Unit Tests"
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         notify:
           - github_commit_status:
-              context: "Auditbeat: rhel/Unit Tests"
+              context: "$BEATS_PROJECT_NAME: RHEL9 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -42,13 +42,13 @@ steps:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
 
-      - label: ":windows:-2016 Unit Tests"
+      - label: ":windows: Windows 2016 Unit Tests"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
         notify:
           - github_commit_status:
-              context: "Auditbeat: windows 2016/Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Windows 2016 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -59,13 +59,13 @@ steps:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
 
-      - label: ":windows:-2022 Unit Tests"
+      - label: ":windows: Windows 2022 Unit Tests"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
         notify:
           - github_commit_status:
-              context: "Auditbeat: windows 2022/Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Windows 2022 Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -82,7 +82,7 @@ steps:
           GOX_FLAGS: "-arch amd64"
         notify:
           - github_commit_status:
-              context: "Auditbeat: Crosscompile"
+              context: "$BEATS_PROJECT_NAME: Crosscompile"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -113,7 +113,7 @@ if are_conditions_met_macos_tests; then
         command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
-              context: "Auditbeat: MacOS Unit Tests"
+              context: "$BEATS_PROJECT_NAME: MacOS Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -126,7 +126,7 @@ if are_conditions_met_macos_tests; then
         command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
-              context: "Auditbeat: MacOS ARM Unit Tests"
+              context: "$BEATS_PROJECT_NAME: MacOS ARM Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -139,12 +139,12 @@ fi
 
 if are_conditions_met_arm_tests; then
   cat >> $pipelineName <<- YAML
-      - label: ":linux: ARM Ubuntu Unit Tests"
+      - label: ":linux: Ubuntu ARM Unit Tests"
         key: "extended-arm64-unit-test"
         command: "cd ${BEATS_PROJECT_NAME} && mage build unitTest"
         notify:
           - github_commit_status:
-              context: "Auditbeat: Unit Tests ARM"
+              context: "$BEATS_PROJECT_NAME: Ubuntu ARM Unit Tests"
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -177,7 +177,7 @@ if are_conditions_met_win_tests; then
           - "$BEATS_PROJECT_NAME/build/*.json"
         notify:
           - github_commit_status:
-              context: "Auditbeat: Windows 2019 Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Windows 2019 Unit Tests"
 
       - label: ":windows: Windows 10 Unit Tests"
         key: "extended-win-10-unit-tests"
@@ -195,7 +195,7 @@ if are_conditions_met_win_tests; then
           - "$BEATS_PROJECT_NAME/build/*.json"
         notify:
           - github_commit_status:
-              context: "Auditbeat: Windows 10 Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Windows 10 Unit Tests"
 
       - label: ":windows: Windows 11 Unit Tests"
         key: "extended-win-11-unit-tests"
@@ -213,7 +213,7 @@ if are_conditions_met_win_tests; then
           - "$BEATS_PROJECT_NAME/build/*.json"
         notify:
           - github_commit_status:
-              context: "Auditbeat: Windows 11 Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Windows 11 Unit Tests"
 YAML
 fi
 
@@ -229,7 +229,7 @@ cat >> $pipelineName <<- YAML
         commands: ".buildkite/scripts/packaging/package-step.sh"
         notify:
           - github_commit_status:
-              context: "Auditbeat: Packaging"
+              context: "$BEATS_PROJECT_NAME: Packaging"
 
 
 YAML

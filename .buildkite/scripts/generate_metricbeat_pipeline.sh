@@ -25,6 +25,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ununtu Unit Tests"
 
       - label: ":go: Go Intergration Tests"
         key: "mandatory-int-test"
@@ -38,6 +41,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Go Integration Tests"
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
@@ -51,6 +57,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Python Integration Tests"
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
@@ -62,6 +71,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Cross compile"
 
       - label: ":windows: Windows 2016/2022 Unit Tests - {{matrix.image}}"
         command: |
@@ -82,6 +94,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
 # echo "Add the extended windows tests into the pipeline"
 # TODO: ADD conditions from the main pipeline
@@ -109,6 +124,10 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
+
 YAML
 else
   echo "The conditions don't match to requirements for generating pipeline steps."
@@ -131,6 +150,10 @@ if are_conditions_met_macos_tests; then
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: MacOS Unit Tests"
+
 YAML
 
 fi

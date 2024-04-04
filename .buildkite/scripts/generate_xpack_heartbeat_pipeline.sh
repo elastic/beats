@@ -24,6 +24,9 @@ steps:
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu Unit Tests"
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
@@ -35,6 +38,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Go Integration Tests"
 
 # ## TODO: there are windows test failures already reported
 # ## https://github.com/elastic/beats/issues/23957 and https://github.com/elastic/beats/issues/23958
@@ -111,6 +117,9 @@ if are_conditions_met_macos_tests; then
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: MacOS Unit Tests"
 
 YAML
 fi

@@ -25,6 +25,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ununtu Unit Tests"
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
@@ -36,6 +39,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Go Integration Tests"
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
@@ -47,6 +53,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Python Integration Tests"
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
@@ -58,6 +67,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Cross compile"
 
       - label: ":testengine: Stress Tests"
         key: "mandatory-stress-test"
@@ -67,6 +79,9 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/libbeat-stress-test.xml"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Stress Tests"
 
 YAML
 else
@@ -81,7 +96,7 @@ if are_conditions_met_arm_tests; then
   - group: "Extended Tests"
     key: "extended-tests"
     steps:
-      - label: ":linux: Arm64 Unit Tests"
+      - label: ":linux: Ubuntu ARM64 Unit Tests"
         key: "extended-arm64-unit-tests"
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
@@ -91,6 +106,9 @@ if are_conditions_met_arm_tests; then
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu ARM64 Unit Tests"
 
 YAML
 fi

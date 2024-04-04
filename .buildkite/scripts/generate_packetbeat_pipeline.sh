@@ -25,8 +25,11 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu Unit Tests"
 
-      - label: ":rhel: RHEL-9 Unit Tests"
+      - label: ":rhel: RHEL9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
@@ -36,6 +39,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: RHEL9 Unit Tests"
 
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
@@ -57,6 +63,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
   - group: "Extended Windowds Tests"
     key: "extended-win-tests"
@@ -81,6 +90,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
 YAML
 else
@@ -110,13 +122,16 @@ if  are_conditions_met_macos_tests; then
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: MacOS Unit Tests"
 
 YAML
 fi
 
 if  are_conditions_met_arm_tests; then
   cat >> $pipelineName <<- YAML
-      - label: ":linux: ARM Ubuntu Unit Tests"
+      - label: ":linux: Ubuntu ARM Unit Tests"
         key: "extended-arm64-unit-test"
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
@@ -126,6 +141,9 @@ if  are_conditions_met_arm_tests; then
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu ARM Unit Tests"
 
 YAML
 fi

@@ -27,8 +27,11 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu Unit Tests"
 
-      - label: ":go: Go Integration Tests"
+      - label: ":go: Go (MODULE) Integration Tests"
         key: "mandatory-int-test"
         command: |
           cd $BEATS_PROJECT_NAME
@@ -42,8 +45,11 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Go (MODULE) Integration Tests"
 
-      - label: ":python: Python Integration Tests"
+      - label: ":python: Python (MODULE) Integration Tests"
         key: "mandatory-python-int-test"
         command: |
           cd $BEATS_PROJECT_NAME
@@ -57,6 +63,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Python (MODULE) Integration Tests"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command: |
@@ -77,6 +86,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
 ## TODO: this condition will be changed in the Phase 3 of the Migration Plan https://docs.google.com/document/d/1IPNprVtcnHlem-uyGZM0zGzhfUuFAh4LeSl9JFHMSZQ/edit#heading=h.sltz78yy249h
   - group: "Extended Windows Tests"
@@ -102,6 +114,9 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
 YAML
 else
@@ -132,13 +147,16 @@ if  are_conditions_met_macos_tests; then
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: MacOS Unit Tests"
 
 YAML
 fi
 
 if  are_conditions_met_aws_tests; then
   cat >> $pipelineName <<- YAML
-      - label: ":linux: Cloud Tests"
+      - label: ":linux: Cloud (MODULE) Tests"
         key: "extended-cloud-test"
         command: ".buildkite/scripts/cloud_tests.sh"
         skip: "Does not belong to a stage, exists but not run"
@@ -152,6 +170,9 @@ if  are_conditions_met_aws_tests; then
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Cloud (MODULE) Tests"
 
 YAML
 fi
