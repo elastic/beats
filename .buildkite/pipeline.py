@@ -144,8 +144,8 @@ class GitHelper:
 
     def get_pr_changeset(self) -> list[str]:
         hash = ["git", "rev-parse", "8.13"]
-        diff_command1 = ["git", "diff", "--name-only", "{}...HEAD".format(hash)]
-        result = subprocess.run(diff_command1, stdout=subprocess.PIPE)
+        diff_command = ["git", "diff", "--name-only", "{}...HEAD".format(hash)]
+        result = subprocess.run(diff_command, stdout=subprocess.PIPE)
 
         if result.returncode == 0:
             self.files = result.stdout.decode().splitlines()
