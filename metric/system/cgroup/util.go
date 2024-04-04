@@ -168,7 +168,7 @@ func SupportedSubsystems(rootfs resolve.Resolver) (map[string]struct{}, error) {
 // The returned map contains the subsystem name as a key and the value is the
 // mountpoint.
 func SubsystemMountpoints(rootfs resolve.Resolver, subsystems map[string]struct{}) (Mountpoints, error) {
-
+	// TODO: will we run into mount namespace issues if we use /proc/self/mountinfo?
 	mountinfo, err := os.Open(rootfs.ResolveHostFS("/proc/self/mountinfo"))
 	if err != nil {
 		return Mountpoints{}, err

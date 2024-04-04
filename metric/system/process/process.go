@@ -257,12 +257,14 @@ func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	if procStats.EnableCgroups {
 		cgStats, err := procStats.cgroups.GetStatsForPid(status.Pid.ValueOr(0))
 		if err != nil {
-			return status, true, fmt.Errorf("cgroups.GetStatsForPid: %w", err)
+			procStats.logger.Debugf("Non-fatal error fetching cgroups metrics for pid %d, metrics are valid but partial: %s", pid, err)
+		} else {
+			status.Cgroup = cgStats
+			if ok {
+				status.Cgroup.FillPercentages(last.Cgroup, status.SampleTime, last.SampleTime)
+			}
 		}
-		status.Cgroup = cgStats
-		if ok {
-			status.Cgroup.FillPercentages(last.Cgroup, status.SampleTime, last.SampleTime)
-		}
+
 	} // end cgroups processor
 
 	status, err = FillMetricsRequiringMoreAccess(pid, status)

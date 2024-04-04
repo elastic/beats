@@ -234,6 +234,37 @@ func TestParseProcStat(t *testing.T) {
 	assert.Equal(t, want, got, "")
 }
 
+func TestCgroupsBadCgroupsConfig(t *testing.T) {
+	_ = logp.DevelopmentSetup(logp.ToObserverOutput())
+	testStats := Stats{CPUTicks: true,
+		EnableCgroups: true,
+		EnableNetwork: true,
+		Hostfs:        resolve.NewTestResolver("/"),
+		Procs:         []string{".*"},
+		CgroupOpts:    cgroup.ReaderOptions{RootfsMountpoint: resolve.NewTestResolver("testdata")}, // procs here have no cgroup data, leading to errors
+	}
+	err := testStats.Init()
+	require.NoError(t, err)
+
+	// make sure we still have proc data despite cgroups errors
+	procs, _, err := testStats.Get()
+	require.NoError(t, err)
+	t.Logf("got %d procs", len(procs))
+	require.NotEmpty(t, procs)
+
+	gotLogs := logp.ObserverLogs().TakeAll()
+	// check to see if we got the "correct" error message
+	foundLogEntry := false
+
+	message := "metrics are valid but partial: error finding cgroup version"
+	for _, entry := range gotLogs {
+		if strings.Contains(entry.Message, message) {
+			foundLogEntry = true
+		}
+	}
+	require.True(t, foundLogEntry, "log line '%s' was not found", message)
+}
+
 func TestParseIO(t *testing.T) {
 	path := resolve.NewTestResolver("testdata/")
 	data, err := getIOData(path, 42)

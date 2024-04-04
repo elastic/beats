@@ -21,6 +21,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
  - Fix CmdLine generation and caching for system.process
  - Fix process metrics collection when both cgroup V1 and V2 controllers exist
  - Skip permissions errors when reading /proc/pid/io
+ - Skip non-fatal errors in cgroup data collection #134
 
 ## [0.7.0]
 

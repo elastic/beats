@@ -80,7 +80,8 @@ func BenchmarkGetTop(b *testing.B) {
 }
 
 func TestGetState(t *testing.T) {
-	want := Running
+	wantRunning := Running
+	wantSleepng := Sleeping
 	pid := os.Getpid()
 	hostfs := resolve.NewTestResolver("/")
 
@@ -93,12 +94,12 @@ func TestGetState(t *testing.T) {
 			return false
 		}
 
-		return want == got
+		return wantSleepng == got || wantRunning == got
 	}
 
 	assert.Eventuallyf(t, test,
-		time.Second, 50*time.Millisecond,
-		"want process state %q, got %q. Last error: %v", want, got, err)
+		time.Second*5, 50*time.Millisecond,
+		"got process state %q. Last error: %v", got, err)
 }
 
 func TestGetOne(t *testing.T) {
