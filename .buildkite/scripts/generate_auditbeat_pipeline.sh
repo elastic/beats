@@ -26,8 +26,8 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
       - label: ":rhel: Unit Tests"
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
@@ -39,8 +39,8 @@ steps:
           image: "${IMAGE_RHEL9}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
       - label: ":windows:-2016 Unit Tests"
         command: |
@@ -56,8 +56,8 @@ steps:
           disk_size: 200
           disk_type: "pd-ssd"
         artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
       - label: ":windows:-2022 Unit Tests"
         command: |
@@ -73,8 +73,8 @@ steps:
           disk_size: 200
           disk_type: "pd-ssd"
         artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
       - label: ":linux: Crosscompile"
         command: "make -C $BEATS_PROJECT_NAME crosscompile"
@@ -117,7 +117,9 @@ if are_conditions_met_macos_tests; then
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
       - label: ":mac: MacOS ARM Unit Tests"
         key: "macos-arm64-unit-tests-extended"
@@ -128,7 +130,9 @@ if are_conditions_met_macos_tests; then
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
 YAML
 fi
@@ -145,7 +149,9 @@ if are_conditions_met_arm_tests; then
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
 YAML
 fi
@@ -166,7 +172,9 @@ if are_conditions_met_win_tests; then
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
         notify:
           - github_commit_status:
               context: "Auditbeat: Windows 2019 Unit Tests"
@@ -182,7 +190,9 @@ if are_conditions_met_win_tests; then
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
         notify:
           - github_commit_status:
               context: "Auditbeat: Windows 10 Unit Tests"
@@ -198,7 +208,9 @@ if are_conditions_met_win_tests; then
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
         notify:
           - github_commit_status:
               context: "Auditbeat: Windows 11 Unit Tests"
