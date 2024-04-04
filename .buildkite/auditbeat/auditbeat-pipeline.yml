@@ -62,7 +62,7 @@ steps:
 
   - label: ":linux: Load dynamic auditbeat pipeline"
     key: "auditbeat-pipeline"
-    command: ".buildkite/scripts/generate_auditbeat_pipeline.sh"
+    command: ".buildkite/auditbeat/generate_auditbeat_pipeline.sh"
     notify:
       - github_commit_status:
           context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
