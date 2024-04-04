@@ -28,9 +28,15 @@ import (
 	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
-var (
-	moduleList *monitoring.UniqueList
-)
+var moduleList = monitoring.NewUniqueList()
+var moduleListMetricsOnce sync.Once
+
+// RegisterMonitoringModules registers the modules list with the monitoring system.
+func RegisterMonitoringModules() {
+	moduleListMetricsOnce.Do(func() {
+		monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
+	})
+}
 
 // Runner is a facade for a Wrapper that provides a simple interface
 // for starting and stopping a Module.

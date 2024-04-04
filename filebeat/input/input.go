@@ -30,6 +30,14 @@ import (
 )
 
 var inputList = monitoring.NewUniqueList()
+var inputListMetricsOnce sync.Once
+
+// RegisterMonitoringInputs registers the inputs list with the monitoring system.
+func RegisterMonitoringInputs() {
+	inputListMetricsOnce.Do(func() {
+		monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "input", inputList.Report, monitoring.Report)
+	})
+}
 
 // Input is the interface common to all input
 type Input interface {

@@ -50,4 +50,7 @@ type Settings struct {
 	// publisher pipeline. This is only useful when the Beat plans to use
 	// beat.DropIfFull PublishMode. Leave as zero for default.
 	InputQueueSize int
+
+	// RegisterMetrics function that is called to register any metrics that the beat provides.
+	RegisterMetrics func()
 }

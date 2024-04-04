@@ -32,7 +32,7 @@ shared:
         {{ commit }}
       mode: 0644
     '{{.BeatName}}.spec.yml':
-      source: {{.BeatName}}.spec.yml
+      source: '{{.BeatName}}.spec.yml'
       mode: 0644
 
   - &config_files

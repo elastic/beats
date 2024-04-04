@@ -19,6 +19,7 @@ package cmd
 
 import (
 	"flag"
+	"github.com/elastic/beats/v7/metricbeat/mb/module"
 
 	"github.com/spf13/pflag"
 
@@ -59,6 +60,9 @@ func MetricbeatSettings() instance.Settings {
 		Name:          Name,
 		HasDashboards: true,
 		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		RegisterMetrics: func() {
+			module.RegisterMonitoringModules()
+		},
 	}
 }
 

@@ -20,6 +20,7 @@ inputs:
       maximum_restarts_per_period: 1
       timeouts:
         restart: 1s
+      name: "auditbeat"
       args:
         - "auditbeat"
         - "-E"
@@ -242,6 +243,7 @@ inputs:
       maximum_restarts_per_period: 1
       timeouts:
         restart: 1s
+      name: "heartbeat"
       args:
         - "heartbeat"
         - "-E"
@@ -282,6 +284,7 @@ inputs:
       maximum_restarts_per_period: 1
       timeouts:
         restart: 1s
+      name: "metricbeat"
       args:
         - "metricbeat"
         - "-E"
@@ -519,6 +522,7 @@ inputs:
       maximum_restarts_per_period: 1
       timeouts:
         restart: 1s
+      name: "osquerybeat"
       args:
         - "osquerybeat"
         - "-E"
@@ -544,6 +548,7 @@ inputs:
       maximum_restarts_per_period: 1
       timeouts:
         restart: 1s
+      name: "packetbeat"
       args:
         - "packetbeat"
         - "-E"
