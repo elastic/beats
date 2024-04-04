@@ -40,7 +40,9 @@ func ConfiguredModules(modulesData []*conf.C, configModulesData *conf.C, moduleO
 	// Add dynamic modules
 	if configModulesData.Enabled() {
 		config := cfgfile.DefaultDynamicConfig
-		configModulesData.Unpack(&config)
+		if err := configModulesData.Unpack(&config); err != nil {
+			return nil, err
+		}
 
 		modulesManager, err := cfgfile.NewGlobManager(config.Path, ".yml", ".disabled")
 		if err != nil {
