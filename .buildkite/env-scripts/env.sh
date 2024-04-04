@@ -30,6 +30,9 @@ ONLY_DOCS=$(changeset_applies "$DOCS_CHANGESET")
 PACKAGING_CHANGES=$(changeset_applies "$PACKAGING_CHANGESET")
 GO_MOD_CHANGES=$(changeset_applies "^go.mod")
 
+KIND_VERSION="v0.20.0"
+KUBECONFIG="${WORKSPACE}/kubecfg"
+
 export REPO
 export WORKSPACE
 export BIN
@@ -51,3 +54,8 @@ export DOCKER_REGISTRY
 export ONLY_DOCS
 export PACKAGING_CHANGES
 export GO_MOD_CHANGES
+
+export KIND_VERSION
+export KUBECONFIG
+
+add_bin_path
