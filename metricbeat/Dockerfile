@@ -1,5 +1,5 @@
 FROM golang:1.21.8
-COPY --from=docker:latest /usr/local/bin/docker  /usr/local/bin/
+COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker  /usr/local/bin/
 
 RUN \
     apt update \
