@@ -51,7 +51,7 @@ func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 		return nil, err
 	}
 
-	var runners []cfgfile.Runner
+	runners := make([]cfgfile.Runner, 0, len(metricSets))
 	for _, metricSet := range metricSets {
 		wrapper, err := NewWrapperForMetricSet(module, metricSet, r.options...)
 		if err != nil {
