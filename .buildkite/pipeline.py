@@ -147,9 +147,6 @@ class GitHelper:
         diff_command1 = ["git", "diff", "--name-only", "{}...HEAD".format(hash)]
         result = subprocess.run(diff_command1, stdout=subprocess.PIPE)
 
-        # base_branch = os.getenv("BUILDKITE_PULL_REQUEST_BASE_BRANCH", "8.13")
-        # diff_command = ["git", "diff", "--name-only", "{}...HEAD".format(base_branch)]
-        # result = subprocess.run(diff_command, stdout=subprocess.PIPE)
         if result.returncode == 0:
             self.files = result.stdout.decode().splitlines()
         else:

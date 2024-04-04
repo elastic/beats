@@ -4,4 +4,4 @@ env:
 
 steps:
   - label: "Generate dynamic pipeline"
-    command: ".buildkite/scripts/generate_pipeline.sh"
+    command: "echo Main pipeline TBD"
