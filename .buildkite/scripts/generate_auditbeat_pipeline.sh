@@ -110,7 +110,7 @@ if are_conditions_met_macos_tests; then
 
       - label: ":mac: MacOS Unit Tests"
         key: "macos-unit-tests-extended"
-        command: "cd ${BEATS_PROJECT_NAME} && mage build unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: MacOS Unit Tests"
@@ -121,7 +121,7 @@ if are_conditions_met_macos_tests; then
 
       - label: ":mac: MacOS ARM Unit Tests"
         key: "macos-arm64-unit-tests-extended"
-        command: "cd ${BEATS_PROJECT_NAME} && mage build unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         notify:
           - github_commit_status:
               context: "Auditbeat: MacOS ARM Unit Tests"
