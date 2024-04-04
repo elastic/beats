@@ -34,7 +34,6 @@ type Connector struct {
 	pipeline   beat.PipelineConnector
 	processors *processors.Processors
 	eventMeta  mapstr.EventMetadata
-	timeSeries bool
 	keepNull   bool
 }
 
