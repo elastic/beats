@@ -111,7 +111,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
 - Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
 - rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
-- Fix for MySQL/Performance - Query failure in case of MySQL version 5.7 for `quantile_95`. {pull}38710[38710]
+- Fix for MySQL/Performance - Query failure for below version 8.0.1 of MySQL, for performance metric `quantile_95`. {pull}38710[38710]
 
 *Osquerybeat*
 
