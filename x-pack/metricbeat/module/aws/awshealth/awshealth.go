@@ -217,7 +217,6 @@ func (m *MetricSet) getEventsSummary(
 // event. The ID is generated from the event ARN, status code and current date.
 func createEvents(hd HealthDetails) mb.Event {
 	currentDate := getCurrentDateTime()
-	//eventID := currentDate + getStringValueOrDefault(hd.event.Arn) + getStringValueOrDefault((*string)(&hd.event.StatusCode))
 	eventID := currentDate + getValueOrDefault(hd.event.Arn, "") + getValueOrDefault((*string)(&hd.event.StatusCode), "")
 	event := mb.Event{
 		MetricSetFields: mapstr.M{
@@ -235,6 +234,7 @@ func createEvents(hd HealthDetails) mb.Event {
 			"affected_entities_resolved": hd.affectedEntityResolved,
 			"affected_entities_others":   hd.affectedEntityOthers,
 			"affected_entities":          createAffectedEntityDetails(hd.affectedEntities),
+			"event_description":          hd.eventDescription,
 		},
 		RootFields: mapstr.M{
 			"cloud.provider": "aws",
@@ -317,7 +317,11 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 		return err
 	}
 
-	hd.eventDescription = *(eventDetails.SuccessfulSet[0].EventDescription.LatestDescription)
+	if len(eventDetails.SuccessfulSet) > 0 {
+		hd.eventDescription = *(eventDetails.SuccessfulSet[0].EventDescription.LatestDescription)
+	} else {
+		hd.eventDescription = "Unable to find event description details."
+	}
 
 	var (
 		affEntityTokString string
