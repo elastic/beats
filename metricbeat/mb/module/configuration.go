@@ -27,7 +27,7 @@ import (
 
 // ConfiguredModules returns a list of all configured modules, including anyone present under dynamic config settings.
 func ConfiguredModules(modulesData []*conf.C, configModulesData *conf.C, moduleOptions []Option) ([]*Wrapper, error) {
-	var modules []*Wrapper
+	var modules []*Wrapper //nolint:prealloc //can't be preallocated
 
 	for _, moduleCfg := range modulesData {
 		module, err := NewWrapper(moduleCfg, mb.Registry, moduleOptions...)
