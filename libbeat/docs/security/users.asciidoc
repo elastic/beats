@@ -233,8 +233,9 @@ To grant the required privileges:
 . Create a *writer role*, called something like +{beat_default_index_prefix}_writer+,
 that has the following privileges:
 +
-NOTE: The `monitor` cluster privilege and the `create_doc` privilege on
-+{beat_default_index_prefix}-*+ indices are required in every configuration.
+NOTE: The `monitor` cluster privilege and the `create_doc` and `auto_configure`
+privileges on +{beat_default_index_prefix}-*+ indices are required in every
+configuration.
 +
 [options="header"]
 |====
@@ -262,13 +263,21 @@ endif::[]
 ifeval::["{beatname_lc}"=="winlogbeat"]
 |Cluster
 |`read_pipeline`
-|Check for ingest pipelines used by winlogbeat.
+|Check for ingest pipelines used by {beatname_uc}.
 endif::[]
 
 |Index
 |`create_doc` on +{beat_default_index_prefix}-*+ indices
 |Write events into {es}
+
+|Index
+|`auto_configure` on +{beat_default_index_prefix}-*+ indices
+|Update the datastream mapping. Consider either disabling entirely or adding the
+rule `-{beat_default_index_prefix}-*` to the cluster settings
+https://www.elastic.co/guide/en/elasticsearch/reference/current/docs-index_.html#index-creation,action.auto_create_index[action.auto_create_index]
+to prevent unwanted indices creations from the agents.
 |====
+
 ifndef::apm-server[]
 +
 Omit any privileges that aren't relevant in your environment.
