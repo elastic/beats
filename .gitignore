@@ -21,7 +21,7 @@ x-pack/elastic-agent/pkg/agent/operation/tests/downloads
 *.dev.yml
 *.generated.yml
 coverage.out
-.python-version
+#.python-version
 beat.db
 *.keystore
 go_env.properties
