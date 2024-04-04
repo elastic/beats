@@ -26,7 +26,7 @@ steps:
 
     steps:
       - label: ":ubuntu: Auditbeat Unit Tests"
-        command: ".buildkite/auditbeat/scripts/unit-tests.sh"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -37,7 +37,7 @@ steps:
 
       - label: ":rhel: Auditbeat Unit Tests"
         command:
-          - ".buildkite/auditbeat/scripts/unit-tests.sh"
+          - "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -47,7 +47,7 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":windows: Auditbeat Win-2016 Auditbeat Unit Tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -59,7 +59,7 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":windows: Auditbeat Win-2022 Unit Tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -71,7 +71,7 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":linux: Auditbeat Crosscompile"
-        command: ".buildkite/auditbeat/scripts/crosscompile.sh"
+        command: "make -C auditbeat crosscompile"
         env:
           GOX_FLAGS: "-arch amd64"
         agents:
@@ -85,11 +85,34 @@ steps:
     steps:
       - label: ":arm: ARM64 Unit Tests"
         key: "auditbeat-extended-arm64-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_ARM64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+
+  - group: "Heartbeat MacOS Extended"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+    steps:
+      - label: ":mac: MacOS Unit Tests"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
+        notify:
+          - github_commit_status:
+              context: "Auditbeat: MacOS Unit Tests"
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
+        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+
+      - label: ":mac: MacOS ARM Unit Tests"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
+        notify:
+          - github_commit_status:
+              context: "Auditbeat: MacOS ARM Unit Tests"
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
   - group: "Auditbeat Windows Extended Testing"
@@ -98,7 +121,7 @@ steps:
     steps:
       - label: ":windows: Auditbeat Windows 2019 Unit Tests"
         key: "auditbeat-extended-win-2019-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -109,7 +132,7 @@ steps:
 
       - label: ":windows: Auditbeat Windows 10 Unit Tests"
         key: "auditbeat-extended-win-10-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -120,7 +143,7 @@ steps:
 
       - label: ":windows: Windows 11 Unit Tests"
         key: "auditbeat-extended-win-11-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
