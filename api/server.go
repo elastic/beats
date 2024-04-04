@@ -101,6 +101,12 @@ func (s *Server) Shutdown(ctx context.Context) error {
 	return s.srv.Shutdown(ctx)
 }
 
+// Addr returns the network address of the server
+// This is useful for tests, where we usually pass the port as `0` to get allocated a random free port
+func (s *Server) Addr() net.Addr {
+	return s.l.Addr()
+}
+
 // AttachHandler will attach a handler at the specified route and return an error instead of panicing.
 func (s *Server) AttachHandler(route string, h http.Handler) (err error) {
 	defer func() {
