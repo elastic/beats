@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+<<<<<<< HEAD
 REPO="beats"
 TMP_FOLDER="tmp.${REPO}"
 DOCKER_REGISTRY="docker.elastic.co"
@@ -16,22 +17,22 @@ PACKAGING_PLATFORMS="+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
 PACKAGING_ARM_PLATFORMS="linux/arm64"
 AWS_REGION="eu-central-1"
 NODEJS_VERSION="18.17.1"
+=======
 
-export SETUP_GVM_VERSION
-export DOCKER_COMPOSE_VERSION
-export DOCKER_COMPOSE_VERSION_AARCH64
-export SETUP_WIN_PYTHON_VERSION
-export NMAP_WIN_VERSION
+export REPO="beats"
+export DOCKER_REGISTRY="docker.elastic.co"
+export SETUP_GVM_VERSION="v0.5.1"
+export DOCKER_COMPOSE_VERSION="1.21.0"
+export DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
+export ASDF_NODEJS_VERSION="18.17.1"
+export AWS_REGION="eu-central-1"
+>>>>>>> 80dab50f0c (replace default images (#38583))
+
+WORKSPACE=${WORKSPACE:-"$(pwd)"}
+export WORKSPACE
+GO_VERSION=$(cat .go-version)
 export GO_VERSION
-export ASDF_MAGE_VERSION
-export PACKAGING_PLATFORMS
-export PACKAGING_ARM_PLATFORMS
-export REPO
-export TMP_FOLDER
-export DOCKER_REGISTRY
-export ASDF_TERRAFORM_VERSION
-export AWS_REGION
-export NODEJS_VERSION
+
 
 exportVars() {
   local platform_type="$(uname)"
