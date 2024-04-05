@@ -22,42 +22,52 @@ steps:
     steps:
       - label: ":linux: Metricbeat Ubuntu Unit Tests"
         key: "metricbeat-mandatory-linux-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
       - label: ":go: Metricbeat Go Integration Tests"
         key: "metricbeat-mandatory-int-test"
-        command: ".buildkite/scripts/go_int_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
       - label: ":python: Metricbeat Python Integration Tests"
         key: "metricbeat-mandatory-python-int-test"
-        command: ".buildkite/scripts/py_int_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
       - label: ":negative_squared_cross_mark: Metricbeat Cross compile"
         key: "metricbeat-mandatory-cross-compile"
-        command: ".buildkite/scripts/crosscompile.sh"
+        command: "make -C $BEATS_PROJECT_NAME crosscompile"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
       - label: ":windows: Metricbeat Windows 2016/2022 Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         key: "metricbeat-mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -70,44 +80,33 @@ steps:
             image:
               - "${IMAGE_WIN_2016}"
               - "${IMAGE_WIN_2022}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
-  - group: "Metricbeat Extended Windows Tests"
+  - group: "Metricbeat Windows Extended"
     key: "metricbeat-extended-win-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
     steps:
-      - label: ":windows: Metricbeat Windows 2019 Unit Tests"
-        key: "metricbeat-extended-win-2019-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          image: "{{matrix.image}}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-      - label: ":windows: Metricbeat Windows 10 Unit Tests"
-        key: "metricbeat-extended-win-10-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_10}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-      - label: ":windows: Metricbeat Windows 11 Unit Tests"
-        key: "metricbeat-extended-win-11-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_10}"
+              - "${IMAGE_WIN_11}"
+              - "${IMAGE_WIN_2019}"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
   - group: "Metricbeat Extended Tests MacOS"
     key: "metricbeat-extended-tests"
@@ -115,7 +114,7 @@ steps:
     steps:
       - label: ":mac: Metricbeat MacOS Unit Tests"
         key: "metricbeat-extended-macos-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -132,21 +131,21 @@ steps:
     steps:
       - label: ":linux: Metricbeat Packaging Linux"
         key: "metricbeat-packaging-linux"
-        command: ".buildkite/scripts/packaging.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         env:
-          PLATFORMS: "${PACKAGING_PLATFORMS}"
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 
       - label: ":linux: Metricbeat Packaging ARM"
         key: "metricbeat-packaging-arm"
-        command: ".buildkite/scripts/packaging.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         env:
-          PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
+          PLATFORMS: "linux/arm64"
           PACKAGES: "docker"

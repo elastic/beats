@@ -33,7 +33,7 @@ steps:
 
     steps:
       - label: ":ubuntu: Auditbeat Unit Tests"
-        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -43,8 +43,7 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":rhel: Auditbeat Unit Tests"
-        command:
-          - "cd ${BEATS_PROJECT_NAME} && mage unitTest"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -54,7 +53,9 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":windows: Auditbeat Win-2016 Auditbeat Unit Tests"
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -66,7 +67,9 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":windows: Auditbeat Win-2022 Unit Tests"
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -78,7 +81,7 @@ steps:
           - "auditbeat/build/*.json"
 
       - label: ":linux: Auditbeat Crosscompile"
-        command: "make -C auditbeat crosscompile"
+        command: "make -C $BEATS_PROJECT_NAME crosscompile"
         env:
           GOX_FLAGS: "-arch amd64"
         agents:
@@ -92,7 +95,7 @@ steps:
     steps:
       - label: ":arm: ARM64 Unit Tests"
         key: "auditbeat-extended-arm64-unit-tests"
-        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage build unitTest"
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -170,7 +173,7 @@ steps:
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
-        command: ".buildkite/scripts/packaging/package.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -182,7 +185,7 @@ steps:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
           SNAPSHOT: true
-        command: ".buildkite/scripts/packaging/package.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"

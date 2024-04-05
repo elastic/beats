@@ -19,10 +19,6 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
 
-  #Packaging
-  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-  PACKAGING_ARM_PLATFORMS: "linux/arm64"
-
 steps:
   - group: "Heartbeat Mandatory Testing"
     key: "heartbeat-mandatory-tests"
@@ -108,7 +104,7 @@ steps:
       - label: ":linux: ARM64 Unit Tests"
         key: "arm-extended"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for arm" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-        command: "cd $BEATS_PROJECT_NAME && mage unitTest"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -190,7 +186,7 @@ steps:
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
-        command: ".buildkite/scripts/packaging/package.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -202,7 +198,7 @@ steps:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
           SNAPSHOT: true
-        command: ".buildkite/scripts/packaging/package.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
