@@ -71,11 +71,8 @@ type Event struct {
 
 	// If the output provides an early encoder for incoming events,
 	// it should store the encoded form in EncodedEvent and clear Content
-	// to free the unencoded data. This encoded form may be provided to
+	// to free the unencoded data. The updated event will be provided to
 	// output workers when calling Publish.
-	// So far only the memory queue supports early encoding, so outputs that
-	// provide an encoder should still accept events where EncodedEvent is
-	// nil, and in that case they should encode the event themself.
 	EncodedEvent interface{}
 }
 
