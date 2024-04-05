@@ -920,3 +920,23 @@ func TestPublishEventsWithBulkFiltering(t *testing.T) {
 		require.Equal(t, len(recParams), 1)
 	})
 }
+
+func TestGetIndex(t *testing.T) {
+	dead_letter_index := "dead_index"
+	client := &Client{
+		deadLetterIndex: dead_letter_index,
+		indexSelector:   testIndexSelector{},
+	}
+
+	event := &beat.Event{
+		Meta: make(map[string]interface{}),
+	}
+	index, err := client.getIndex(event)
+	require.NoError(t, err, "getIndex call must succeed")
+	assert.Equal(t, "test", index, "Event with no dead letter marker should use the client's index selector")
+
+	event.Meta[dead_letter_marker_field] = true
+	index, err = client.getIndex(event)
+	require.NoError(t, err, "getIndex call must succeed")
+	assert.Equal(t, dead_letter_index, index, "Event with dead letter marker should use the client's dead letter index")
+}
