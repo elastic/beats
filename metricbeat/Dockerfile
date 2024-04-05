@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 FROM golang:1.21.8
+=======
+FROM golang:1.21.9
+COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker  /usr/local/bin/
+>>>>>>> b08df788fb ([Automation] Bump Golang version to 1.21.9 (#38727))
 
 RUN \
     apt update \

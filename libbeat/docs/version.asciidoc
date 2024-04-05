@@ -1,6 +1,12 @@
+<<<<<<< HEAD
 :stack-version: 8.13.1
 :doc-branch: 8.13
 :go-version: 1.21.8
+=======
+:stack-version: 8.14.0
+:doc-branch: main
+:go-version: 1.21.9
+>>>>>>> b08df788fb ([Automation] Bump Golang version to 1.21.9 (#38727))
 :release-state: unreleased
 :python: 3.7
 :docker: 1.12
