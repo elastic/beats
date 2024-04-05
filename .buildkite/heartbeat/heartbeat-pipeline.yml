@@ -3,13 +3,6 @@
 env:
   BEATS_PROJECT_NAME: "heartbeat"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-<<<<<<< HEAD
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
-  IMAGE_WIN_2016: "family/core-windows-2016"
-  IMAGE_WIN_2019: "family/core-windows-2019"
-  IMAGE_WIN_2022: "family/core-windows-2022"
-  IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
-=======
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
@@ -17,12 +10,12 @@ env:
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
->>>>>>> 80dab50f0c (replace default images (#38583))
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
 
   #Packaging
   PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
@@ -34,46 +27,26 @@ steps:
     if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat" || build.env("BUILDKITE_PULL_REQUEST") != "false"
 
     steps:
-<<<<<<< HEAD
-      - label: ":linux: Unit Tests / {{matrix.image}}"
-        command:
-          - ".buildkite/heartbeat/scripts/unit-tests.sh"
-=======
       - label: ":ubuntu: Unit Tests"
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
->>>>>>> 80dab50f0c (replace default images (#38583))
         notify:
           - github_commit_status:
-              context: "Heartbeat: linux/Unit Tests"
+              context: "Heartbeat: ubuntu/Unit Tests"
         agents:
           provider: "gcp"
-          image: "{{matrix.image}}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        matrix:
-          setup:
-            image:
-              - "${IMAGE_UBUNTU_X86_64}"
-              - "${IMAGE_RHEL9}"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
-<<<<<<< HEAD
-      - label: ":windows: Unit Tests / {{matrix.image}}"
-        command:
-          - ".buildkite/scripts/win_unit_tests.ps1"
-=======
       - label: ":rhel:-9 Unit Tests"
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
->>>>>>> 80dab50f0c (replace default images (#38583))
         notify:
           - github_commit_status:
-              context: "Heartbeat: windows/Unit Tests"
+              context: "Heartbeat: rhel-9/Unit Tests"
         agents:
           provider: "gcp"
-<<<<<<< HEAD
-          image: "{{matrix.image}}"
-=======
           image: "${IMAGE_RHEL9}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
@@ -108,25 +81,14 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
->>>>>>> 80dab50f0c (replace default images (#38583))
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_type: "pd-ssd"
-        matrix:
-          setup:
-            image:
-              - "${IMAGE_WIN_2016}"
-              - "${IMAGE_WIN_2022}"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
       - label: ":ubuntu: Go Integration Tests"
-<<<<<<< HEAD
-        command:
-          - ".buildkite/heartbeat/scripts/integration-gotests.sh"
-=======
         command:  "cd $BEATS_PROJECT_NAME && mage goIntegTest"
->>>>>>> 80dab50f0c (replace default images (#38583))
         notify:
           - github_commit_status:
               context: "Heartbeat: Go Integration Tests"
@@ -139,12 +101,7 @@ steps:
           - "heartbeat/build/*.json"
 
       - label: ":ubuntu: Python Integration Tests"
-<<<<<<< HEAD
-        command:
-          - ".buildkite/heartbeat/scripts/integration-pytests.sh"
-=======
         command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
->>>>>>> 80dab50f0c (replace default images (#38583))
         notify:
           - github_commit_status:
               context: "Heartbeat: Python Integration Tests"
@@ -164,15 +121,10 @@ steps:
       - label: ":linux: ARM64 Unit Tests"
         key: "arm-extended"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for arm" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-<<<<<<< HEAD
-        command:
-          - ".buildkite/heartbeat/scripts/unit-tests.sh"
-=======
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
->>>>>>> 80dab50f0c (replace default images (#38583))
         notify:
           - github_commit_status:
-              context: "Heartbeat/Extended: Unit Tests ARM"
+              context: "Heartbeat: Unit Tests ARM"
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -182,22 +134,15 @@ steps:
       - label: ":mac: MacOS Unit Tests"
         key: "macos-extended"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-<<<<<<< HEAD
-        command:
-          - ".buildkite/heartbeat/scripts/unit-tests.sh"
-=======
         command: "cd ${BEATS_PROJECT_NAME} && mage build unitTest"
->>>>>>> 80dab50f0c (replace default images (#38583))
         notify:
           - github_commit_status:
-              context: "Heartbeat/Extended: MacOS Unit Tests"
+              context: "Heartbeat: MacOS Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths: "heartbeat/build/*.xml"
 
-<<<<<<< HEAD
-=======
       - label: ":mac: MacOS ARM Unit Tests"
         key: "macos-extended-arm"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
@@ -210,20 +155,11 @@ steps:
           imagePrefix: "${IMAGE_MACOS_ARM}"
         artifact_paths: "heartbeat/build/*.xml"
 
->>>>>>> 80dab50f0c (replace default images (#38583))
   - group: "Windows Extended Testing"
     key: "extended-tests-win"
     if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for windows" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
 
     steps:
-<<<<<<< HEAD
-      - label: ":windows: Win 2019 Unit Tests"
-        key: "win-extended-2019"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat/Extended: Win-2019 Unit Tests"
-=======
       - label: ":windows:-2019 Unit Tests"
         key: "windows-extended-2019"
         command: |
@@ -232,7 +168,6 @@ steps:
         notify:
           - github_commit_status:
               context: "Heartbeat: Windows 2019/Unit Tests"
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -242,8 +177,6 @@ steps:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
-<<<<<<< HEAD
-=======
       - label: ":windows:-11 Unit Tests"
         key: "windows-extended-11"
         command: |
@@ -278,7 +211,6 @@ steps:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
 
->>>>>>> 80dab50f0c (replace default images (#38583))
   - group: "Packaging"
     key: "packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
