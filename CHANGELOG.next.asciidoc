@@ -41,6 +41,26 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Support for multiline zookeeper logs {issue}2496[2496]
+- Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix namespacing on self-monitoring {pull}32336[32336]
+- Fix Beats started by agent do not respect the allow_older_versions: true configuration flag {issue}34227[34227] {pull}34964[34964]
+- Fix performance issues when we have a lot of inputs starting and stopping by allowing to disable global processors under fleet. {issue}35000[35000] {pull}35031[35031]
+- 'add_cloud_metadata' processor - add cloud.region field for GCE cloud provider
+- 'add_cloud_metadata' processor - update azure metadata api version to get missing `cloud.account.id` field
+- Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
+- Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
+- Support build of projects outside of beats directory {pull}36126[36126]
+- Support Elastic Agent control protocol chunking support {pull}37343[37343]
+- Upgrade elastic-agent-libs to v0.7.5. Removes obsolete "Treating the CommonName field on X.509 certificates as a host name..." deprecation warning for 8.0. {pull}37755[37755]
+- aws: Add credential caching for `AssumeRole` session tokens. {issue}37787[37787]
+- Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
+- Set timeout of 1 minute for FQDN requests {pull}37756[37756]
+- Fix the paths in the .cmd script added to the path by the Windows MSI to point to the new C:\Program Files installation location. https://github.com/elastic/elastic-stack-installers/pull/238
+- Change cache processor documentation from `write_period` to `write_interval`. {pull}38561[38561]
+- Fix cache processor expiries heap cleanup on partial file writes. {pull}38561[38561]
+- Fix cache processor expiries infinite growth when large a large TTL is used and recurring keys are cached. {pull}38561[38561]
 
 *Auditbeat*
 
