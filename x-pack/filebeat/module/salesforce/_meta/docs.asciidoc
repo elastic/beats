@@ -1,5 +1,3 @@
-Here is the updated asciidoc file with the definitions of `var.authentication.user_password_flow` and `var.authentication.jwt_bearer_flow` added:
-
 [role="xpack"]
 
 :modulename: salesforce

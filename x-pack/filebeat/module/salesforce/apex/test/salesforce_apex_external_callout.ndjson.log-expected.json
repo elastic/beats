@@ -19,7 +19,7 @@
         "salesforce.apex.offset": 0,
         "salesforce.apex.orderby": "(Order:[columnName=ExternalId, direction=ASCENDING, tableName=HealthcareBlog], Order:[columnName=ExternalId, direction=ASCENDING, tableName=HealthcareBlog])",
         "salesforce.apex.organization_id": "00D5j000000VI3n",
-        "salesforce.apex.request.id": "TID:10799890000ce8142a",
+        "salesforce.apex.request_id": "TID:10799890000ce8142a",
         "salesforce.apex.select": "(ColumnSelection:[aggregation=NONE, columnName=DisplayUrl, tableName=HealthcareBlog], ColumnSelection:[aggregation=NONE, columnName=ExternalId, tableName=HealthcareBlog])",
         "service.type": "salesforce",
         "tags": [

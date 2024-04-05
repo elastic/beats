@@ -20,7 +20,7 @@
         "salesforce.apex.number_soql_queries": 0,
         "salesforce.apex.organization_id": "00D5j000000VI3n",
         "salesforce.apex.quiddity": "V",
-        "salesforce.apex.request.id": "4fDkD4xoOfMXKFl1cJOo_V",
+        "salesforce.apex.request_id": "4fDkD4xoOfMXKFl1cJOo_V",
         "salesforce.apex.run_time": 162,
         "salesforce.apex.user_id_derived": "0055j000000utlPAAQ",
         "service.type": "salesforce",
