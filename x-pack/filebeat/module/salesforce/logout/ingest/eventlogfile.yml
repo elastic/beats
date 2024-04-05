@@ -1,235 +1,240 @@
 ---
 description: Pipeline for parsing Salesforce Logout (EventLogFile) logs.
 processors:
-- date:
-    field: json.TIMESTAMP_DERIVED
-    target_field: "@timestamp"
-    formats:
-    - ISO8601
-    ignore_failure: true
-- rename: 
-    field: json.SESSION_TYPE
-    target_field: salesforce.logout.session.type
-    ignore_failure: true
-    ignore_missing: true
-- script:
-    description: Set session type value from session type character.
-    lang: painless
-    ignore_failure: true
-    source: |
-        Map map = new HashMap();
-        map.put("A", "API");
-        map.put("I", "APIOnlyUser");
-        map.put("N", "ChatterNetworks");
-        map.put("Z", "ChatterNetworksAPIOnly");
-        map.put("C", "Content");
-        map.put("P", "OauthApprovalUI");
-        map.put("O", "Oauth2");
-        map.put("T", "SiteStudio");
-        map.put("R", "SitePreview");
-        map.put("S", "SubstituteUser");
-        map.put("B", "TempContentExchange");
-        map.put("G", "TempOauthAccessTokenFrontdoor");
-        map.put("Y", "TempVisualforceExchange");
-        map.put("F", "TempUIFrontdoor");
-        map.put("U", "UI");
-        map.put("E", "UserSite");
-        map.put("V", "Visualforce");
-        map.put("W", "WDC_API");
-        String temp = map.get(ctx.salesforce?.logout?.session?.type);
-        if (temp != null) {
-            ctx.salesforce.logout.session.type = temp;
-        }
-- rename: 
-    field: json.EVENT_TYPE
-    target_field: salesforce.logout.event_type
-    ignore_failure: true
-    ignore_missing: true
-- rename: 
-    field: json.SESSION_LEVEL
-    target_field: salesforce.logout.session.level
-    ignore_failure: true
-    ignore_missing: true
-- script:
-    description: Set session level value from session level integer.
-    lang: painless
-    ignore_failure: true
-    source: |
-        Map map = new HashMap();
-        map.put("1", "Standard Session");
-        map.put("2", "High-Assurance Session");
-        String temp = map.get(ctx.salesforce?.logout?.session?.level);
-        if (temp != null){
-            ctx.salesforce.logout.session.level = temp;
-        }
-- rename: 
-    field: json.BROWSER_TYPE
-    target_field: salesforce.logout.browser_type
-    ignore_failure: true
-    ignore_missing: true
-- rename: 
-    field: json.PLATFORM_TYPE
-    target_field: salesforce.logout.platform_type
-    ignore_failure: true
-    ignore_missing: true
-- script:
-    description: Set platform type value from platform type integers.
-    lang: painless
-    ignore_failure: true
-    source: |
-        Map map = new HashMap();
-        map.put("1000", "Windows");
-        map.put("1008", "Windows 2003");
-        map.put("1013", "Windows 8.1");
-        map.put("1015", "Windows 10");
-        map.put("2003", "Macintosh/Apple OSX");
-        map.put("4000", "Linux");
-        map.put("5005", "Android");
-        map.put("5006", "iPhone");
-        map.put("5007", "iPad");
-        map.put("5200", "Android 10.0");
-        String temp = map.get(ctx.salesforce?.logout?.platform_type);
-        if (temp != null) {
-            ctx.salesforce.logout.platform_type = temp;
-        }
-- rename: 
-    field: json.RESOLUTION_TYPE
-    target_field: salesforce.logout.resolution_type
-    ignore_failure: true
-    ignore_missing: true
-- rename: 
-    field: json.APP_TYPE
-    target_field: salesforce.logout.app_type
-    ignore_failure: true
-    ignore_missing: true
-- script:
-    description: Set application type value from application type integers.
-    lang: painless
-    ignore_failure: true
-    source: |
-        Map map = new HashMap();
-        map.put("1000", "Application");
-        map.put("1007", "SFDC Application");
-        map.put("1014", "Chat");
-        map.put("2501", "CTI");
-        map.put("2514", "OAuth");
-        map.put("3475", "SFDC Partner Portal");
-        String temp = map.get(ctx.salesforce?.logout?.app_type);
-        if (temp != null) {
-            ctx.salesforce.logout.app_type = temp;
-        }
-- rename: 
-    field: json.CLIENT_VERSION
-    target_field: salesforce.logout.client_version
-    ignore_failure: true
-    ignore_missing: true
-- rename: 
-    field: json.API_TYPE
-    target_field: salesforce.logout.api.type
-    ignore_failure: true
-    ignore_missing: true
-- script:
-    description: Set api type value from api type character.
-    lang: painless
-    ignore_failure: true
-    source: |
-        Map map = new HashMap();
-        map.put("D", "Apex Class");
-        map.put("E", "SOAP Enterprise");
-        map.put("I", "SOAP Cross Instance");
-        map.put("M", "SOAP Metadata");
-        map.put("O", "Old SOAP");
-        map.put("P", "SOAP Partner");
-        map.put("S", "SOAP Apex");
-        map.put("T", "SOAP Tooling");
-        map.put("X", "XmlRPC");
-        map.put("f", "Feed");
-        map.put("l", "Live Agent");
-        map.put("p", "SOAP ClientSync");
-        String temp = map.get(ctx.salesforce?.logout?.api?.type);
-        if (temp != null) {
-            ctx.salesforce.logout.api.type = temp;
-        }
-- rename: 
-    field: json.API_VERSION
-    target_field: salesforce.logout.api.version
-    ignore_failure: true
-    ignore_missing: true
-- rename: 
-    field: json.USER_INITIATED_LOGOUT
-    target_field: salesforce.logout.user_initiated_logout
-    ignore_failure: true
-    ignore_missing: true
-- rename: 
-    field: json.LOGIN_KEY
-    target_field: salesforce.logout.login_key
-    ignore_failure: true
-    ignore_missing: true
-- rename: 
-    field: json.USER_ID
-    target_field: salesforce.logout.user_id
-    ignore_failure: true
-    ignore_missing: true
-- rename: 
-    field: json.ORGANIZATION_ID
-    target_field: salesforce.logout.organization_id
-    ignore_failure: true
-    ignore_missing: true
-- rename:
-    field: json.REQUEST_ID
-    target_field: event.code
-    ignore_failure: true
-    ignore_missing: true
-- rename: 
-    field: json.USER_TYPE
-    target_field: user.roles
-    ignore_failure: true
-    ignore_missing: true
-- script:
-    description: Set user roles value from user roles character.
-    lang: painless
-    ignore_failure: true
-    source: |
-        Map map = new HashMap();
-        map.put("A", "Automated Process");
-        map.put("b", "High Volume Portal");
-        map.put("C", "Customer Portal User");
-        map.put("D", "External Who");
-        map.put("F", "Self-Service");
-        map.put("G", "Guest");
-        map.put("L", "Package License Manager");
-        map.put("N", "Salesforce to Salesforce");
-        map.put("n", "CSN Only");
-        map.put("O", "Power Custom");
-        map.put("o", "Custom");
-        map.put("P", "Partner");
-        map.put("p", "Customer Portal Manager");
-        map.put("S", "Standard");
-        map.put("X", "Salesforce Administrator");
-        String temp = map.get(ctx.user?.roles);
-        if (temp != null) {
-            ctx.user.roles = [temp];
-        }
-- rename: 
-    field: json.USER_ID_DERIVED
-    target_field: user.id
-    ignore_failure: true
-    ignore_missing: true
-- rename:
-    field: json.CLIENT_IP
-    target_field: source.ip
-    ignore_failure: true
-    ignore_missing: true
-    if: 'ctx.json?.CLIENT_IP != "Salesforce.com IP" && ctx.json?.CLIENT_IP != ""'
-- geoip:
-    field: source.ip
-    target_field: source.geo
-    ignore_missing: true
+    - date:
+          field: json.TIMESTAMP_DERIVED
+          target_field: "@timestamp"
+          formats:
+              - ISO8601
+          on_failure:
+              - append:
+                    field: error.message
+                    value: "Failed to parse TIMESTAMP_DERIVED field: {{{_ingest.on_failure_message}}}"
+    - rename:
+          field: json.SESSION_TYPE
+          target_field: salesforce.logout.session.type
+          ignore_missing: true
+    - script:
+          description: Set session type value from session type character.
+          lang: painless
+          source: |
+              def sessionTypes = [
+                "A": "API",
+                "I": "APIOnlyUser",
+                "N": "ChatterNetworks",
+                "Z": "ChatterNetworksAPIOnly",
+                "C": "Content",
+                "P": "OauthApprovalUI",
+                "O": "Oauth2",
+                "T": "SiteStudio",
+                "R": "SitePreview", 
+                "S": "SubstituteUser",
+                "B": "TempContentExchange",
+                "G": "TempOauthAccessTokenFrontdoor",
+                "Y": "TempVisualforceExchange",
+                "F": "TempUIFrontdoor",
+                "U": "UI",
+                "E": "UserSite",
+                "V": "Visualforce",
+                "W": "WDC_API"
+              ];
+              def type = ctx.salesforce?.logout?.session?.type;
+              if (type != null && sessionTypes.containsKey(type)) {
+                ctx.salesforce.logout.session.type = sessionTypes.get(type);
+              }
+          on_failure:
+              - append:
+                    field: error.message
+                    value: "Failed to set salesforce.logout.session.type: {{{_ingest.on_failure_message}}}"
+    - rename:
+          field: json.EVENT_TYPE
+          target_field: salesforce.logout.event_type
+          ignore_missing: true
+    - rename:
+          field: json.SESSION_LEVEL
+          target_field: salesforce.logout.session.level
+          ignore_missing: true
+    - script:
+          description: Set session level value from session level integer.
+          lang: painless
+          source: |
+              def levels = ["1": "Standard Session", "2": "High-Assurance Session"];
+              def level = ctx.salesforce?.logout?.session?.level;
+              if (level != null && levels.containsKey(level)) {
+                ctx.salesforce.logout.session.level = levels.get(level);
+              }
+          on_failure:
+              - append:
+                    field: error.message
+                    value: "Failed to set salesforce.logout.session.level: {{{_ingest.on_failure_message}}}"
+    - rename:
+          field: json.BROWSER_TYPE
+          target_field: salesforce.logout.browser_type
+          ignore_missing: true
+    - rename:
+          field: json.PLATFORM_TYPE
+          target_field: salesforce.logout.platform_type
+          ignore_missing: true
+    - script:
+          description: Set platform type value from platform type integers.
+          lang: painless
+          params:
+              platforms:
+                  "1000": "Windows"
+                  "1008": "Windows 2003"
+                  "1013": "Windows 8.1"
+                  "1015": "Windows 10"
+                  "2003": "Macintosh/Apple OSX"
+                  "4000": "Linux"
+                  "5005": "Android"
+                  "5006": "iPhone"
+                  "5007": "iPad"
+                  "5200": "Android 10.0"
+          source: |
+              def platform = ctx.salesforce?.logout?.platform_type; 
+              if (platform != null && params.platforms.containsKey(platform)) {
+                ctx.salesforce.logout.platform_type = params.platforms.get(platform);
+              }
+          on_failure:
+              - append:
+                    field: error.message
+                    value: "Failed to set salesforce.logout.platform_type: {{{_ingest.on_failure_message}}}"
+    - rename:
+          field: json.RESOLUTION_TYPE
+          target_field: salesforce.logout.resolution_type
+          ignore_missing: true
+    - rename:
+          field: json.APP_TYPE
+          target_field: salesforce.logout.app_type
+          ignore_missing: true
+    - script:
+          description: Set application type value from application type integers.
+          lang: painless
+          params:
+              appTypes:
+                  "1000": "Application"
+                  "1007": "SFDC Application"
+                  "1014": "Chat"
+                  "2501": "CTI"
+                  "2514": "OAuth"
+                  "3475": "SFDC Partner Portal"
+          source: |
+              def type = ctx.salesforce?.logout?.app_type;
+              if (type != null && params.appTypes.containsKey(type)) {
+                ctx.salesforce.logout.app_type = params.appTypes.get(type);
+              }
+          on_failure:
+              - append:
+                    field: error.message
+                    value: "Failed to set salesforce.logout.app_type: {{{_ingest.on_failure_message}}}"
+    - rename:
+          field: json.CLIENT_VERSION
+          target_field: salesforce.logout.client_version
+          ignore_missing: true
+    - rename:
+          field: json.API_TYPE
+          target_field: salesforce.logout.api.type
+          ignore_missing: true
+    - script:
+          description: Set api type value from api type character.
+          lang: painless
+          params:
+              apiTypes:
+                  "D": "Apex Class"
+                  "E": "SOAP Enterprise"
+                  "I": "SOAP Cross Instance"
+                  "M": "SOAP Metadata"
+                  "O": "Old SOAP"
+                  "P": "SOAP Partner"
+                  "S": "SOAP Apex"
+                  "T": "SOAP Tooling"
+                  "X": "XmlRPC"
+                  "f": "Feed"
+                  "l": "Live Agent"
+                  "p": "SOAP ClientSync"
+          source: |
+              def type = ctx.salesforce?.logout?.api?.type;
+              if (type != null && params.apiTypes.containsKey(type)) {
+                ctx.salesforce.logout.api.type = params.apiTypes.get(type);  
+              }
+          on_failure:
+              - append:
+                    field: error.message
+                    value: "Failed to set salesforce.logout.api.type: {{{_ingest.on_failure_message}}}"
+    - rename:
+          field: json.API_VERSION
+          target_field: salesforce.logout.api.version
+          ignore_missing: true
+    - rename:
+          field: json.USER_INITIATED_LOGOUT
+          target_field: salesforce.logout.user_initiated_logout
+          ignore_missing: true
+    - rename:
+          field: json.LOGIN_KEY
+          target_field: salesforce.logout.login_key
+          ignore_missing: true
+    - rename:
+          field: json.USER_ID
+          target_field: salesforce.logout.user_id
+          ignore_missing: true
+    - rename:
+          field: json.ORGANIZATION_ID
+          target_field: salesforce.logout.organization_id
+          ignore_missing: true
+    - rename:
+          field: json.REQUEST_ID
+          target_field: event.code
+          ignore_missing: true
+    - rename:
+          field: json.USER_TYPE
+          target_field: user.roles
+          ignore_missing: true
+    - script:
+          description: Set user roles value from user roles character.
+          lang: painless
+          params:
+              userRoles:
+                  "A": "Automated Process"
+                  "b": "High Volume Portal"
+                  "C": "Customer Portal User"
+                  "D": "External Who"
+                  "F": "Self-Service"
+                  "G": "Guest"
+                  "L": "Package License Manager"
+                  "N": "Salesforce to Salesforce"
+                  "n": "CSN Only"
+                  "O": "Power Custom"
+                  "o": "Custom"
+                  "P": "Partner"
+                  "p": "Customer Portal Manager"
+                  "S": "Standard"
+                  "X": "Salesforce Administrator"
+          source: |
+              def role = ctx.salesforce?.logout?.user?.roles;
+              if (role != null && params.userRoles.containsKey(role)) {
+                ctx.salesforce.logout.user.roles = [params.userRoles.get(role)];
+              }
+          on_failure:
+              - append:
+                    field: error.message
+                    value: "Failed to set salesforce.logout.user.roles: {{{_ingest.on_failure_message}}}"
+    - rename:
+          field: json.USER_ID_DERIVED
+          target_field: user.id
+          ignore_missing: true
+    - rename:
+          field: json.CLIENT_IP
+          target_field: source.ip
+          ignore_missing: true
+          if: ctx.json?.CLIENT_IP != 'Salesforce.com IP' && ctx.json?.CLIENT_IP != null
+    - geoip:
+          field: source.ip
+          target_field: source.geo
 
 on_failure:
-- set:
-    field: event.kind
-    value: pipeline_error
-- append:
-    field: error.message
-    value: '{{{ _ingest.on_failure_message }}}'
+    - set:
+          field: event.kind
+          value: pipeline_error
+    - append:
+          field: error.message
+          value: "{{{ _ingest.on_failure_message }}}"

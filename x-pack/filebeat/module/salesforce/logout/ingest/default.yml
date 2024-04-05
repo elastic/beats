@@ -1,117 +1,128 @@
 ---
 description: Pipeline for parsing Salesforce Logout logs.
 processors:
-- json:
-    field: message
-    target_field: json
-    ignore_failure: true
-- set:
-    field: event.original
-    value: '{{{message}}}'
-    ignore_empty_value: true
-    if: 'ctx.event?.original == null'
-- set:
-    field: event.ingested
-    value: '{{_ingest.timestamp}}'
-- fingerprint:
-    fields:
-    - json.REQUEST_ID
-    - json.SESSION_KEY
-    - json.TIMESTAMP_DERIVED
-    - json.USER_ID
-    target_field: _id
-    ignore_missing: true
-- set:
-    field: ecs.version
-    value: "8.5.0"
-    ignore_failure: true
-    ignore_empty_value: true
-- set:
-    field: salesforce.login.document_id
-    copy_from: _id
-    ignore_empty_value: true
+    - json:
+          field: message
+          target_field: json
+          on_failure:
+              - append:
+                    field: error.message
+                    value: "Failed to parse JSON: {{{_ingest.on_failure_message}}}"
+    - set:
+          field: event.original
+          copy_from: message
+          ignore_empty_value: true
+          if: "ctx.event?.original == null"
+    - set:
+          field: event.ingested
+          value: "{{_ingest.timestamp}}"
+    - fingerprint:
+          fields:
+              - json.REQUEST_ID
+              - json.SESSION_KEY
+              - json.TIMESTAMP_DERIVED
+              - json.USER_ID
+          target_field: _id
+          ignore_missing: true
+          ignore_failure: true
+    - set:
+          field: ecs.version
+          value: "8.5.0"
+          ignore_failure: true
+          ignore_empty_value: true
+    - set:
+          field: salesforce.login.document_id
+          copy_from: _id
+          ignore_empty_value: true
 
-- pipeline:
-    if: ctx.event.provider == "Object"
-    name: '{< IngestPipeline "object" >}'
-- pipeline:
-    if: ctx.event.provider == "EventLogFile"
-    name: '{< IngestPipeline "eventlogfile" >}'
+    - pipeline:
+          name: '{< IngestPipeline "object" >}'
+          if: ctx.event.provider == "Object"
+    - pipeline:
+          name: '{< IngestPipeline "eventlogfile" >}'
+          if: ctx.event.provider == "EventLogFile"
 
-- set:
-    field: event.type
-    value: ["info"]
-    ignore_failure: true
-    ignore_empty_value: true
-- set:
-    field: event.kind
-    value: "event"
-    ignore_failure: true
-    ignore_empty_value: true
-- set:
-    field: event.action
-    value: "logout"
-    ignore_failure: true
-    ignore_empty_value: true
-- set:
-    field: event.category
-    value: ["authentication"]
-    ignore_failure: true
-    ignore_empty_value: true
-- set:
-    field: event.dataset
-    value: "salesforce.logout"
-    ignore_failure: true
-    ignore_empty_value: true
-- set:
-    field: event.module
-    value: "salesforce"
-    ignore_failure: true
-    ignore_empty_value: true
-- geoip:
-    field: source.ip
-    target_field: source.geo
-    ignore_missing: true
-- append:
-    field: related.ip
-    value: '{{{source.ip}}}'
-    if: ctx?.source?.ip != null
-    allow_duplicates: false
-    ignore_failure: true
+    - set:
+          field: event.type
+          value: ["info"]
+          ignore_failure: true
+          ignore_empty_value: true
+    - set:
+          field: event.kind
+          value: "event"
+          ignore_failure: true
+          ignore_empty_value: true
+    - set:
+          field: event.action
+          value: "logout"
+          ignore_failure: true
+          ignore_empty_value: true
+    - set:
+          field: event.category
+          value: ["authentication"]
+          ignore_failure: true
+          ignore_empty_value: true
+    - set:
+          field: event.dataset
+          value: "salesforce.logout"
+          ignore_failure: true
+          ignore_empty_value: true
+    - set:
+          field: event.module
+          value: "salesforce"
+          ignore_failure: true
+          ignore_empty_value: true
+    - geoip:
+          field: source.ip
+          target_field: source.geo
+          ignore_missing: true
+    - append:
+          field: related.ip
+          value: "{{{source.ip}}}"
+          if: ctx?.source?.ip != null
+          allow_duplicates: false
+          ignore_failure: true
 
-- remove:
-    field: event.original
-    if: "ctx.tags == null || !(ctx.tags.contains('preserve_original_event'))"
-    ignore_failure: true
-    ignore_missing: true
-- script:
-    description: Drops null/empty values recursively.
-    lang: painless
-    source: |
-        boolean dropEmptyFields(Object object) {
-            if (object == null || object == "") {
-                return true;
-            } else if (object instanceof Map) {
-                ((Map) object).values().removeIf(value -> dropEmptyFields(value));
-                return (((Map) object).size() == 0);
-            } else if (object instanceof List) {
-                ((List) object).removeIf(value -> dropEmptyFields(value));
-                return (((List) object).length == 0);
-            }
-            return false;
-        }
-        dropEmptyFields(ctx);
-- remove:
-    field:
-      - json
-      - message
-    ignore_failure: true
-    ignore_missing: true
+    #############
+    ## Cleanup ##
+    #############
+
+    # Drop empty fields
+    - script:
+          lang: painless
+          source: |
+              boolean dropEmptyFields(Object object) {
+                if (object == null || object == "") {
+                  return true;
+                } else if (object instanceof Map) {
+                  ((Map) object).values().removeIf(value -> dropEmptyFields(value));
+                  return ((Map) object).isEmpty();
+                } else if (object instanceof List) {
+                  ((List) object).removeIf(value -> dropEmptyFields(value));
+                  return ((List) object).isEmpty();
+                }
+                return false;
+              }
+              dropEmptyFields(ctx);
+    - remove:
+          field:
+              - json
+              - message
+          ignore_failure: true
+          ignore_missing: true
+    - remove:
+          field: event.original
+          if: "ctx.tags == null || !ctx.tags.contains('preserve_original_event')"
+          ignore_failure: true
+          ignore_missing: true
 
 on_failure:
-- set:
-    field: event.kind
-    value: pipeline_error
-- append:
-    field: error.message
-    value: '{{{ _ingest.on_failure_message }}}'
+    - set:
+          field: event.kind
+          value: pipeline_error
+    - set:
+          field: error.message
+          value: "{{{_ingest.on_failure_message}}}"
+    - set:
+          field: error.type
+          value: "{{{_ingest.on_failure_processor_type}}}"
