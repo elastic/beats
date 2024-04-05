@@ -18,7 +18,7 @@ env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
 
   #Packaging
-  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
   PACKAGING_ARM_PLATFORMS: "linux/arm64"
 
 steps:
