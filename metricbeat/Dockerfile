@@ -1,4 +1,4 @@
-FROM golang:1.21.8
+FROM golang:1.21.9
 COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker /usr/local/bin/
 
 RUN \
