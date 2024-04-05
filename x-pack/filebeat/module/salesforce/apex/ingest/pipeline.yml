@@ -1,5 +1,5 @@
 ---
-description: Pipeline for parsing Salesforce apex logs
+description: Pipeline for parsing Salesforce Apex logs
 processors:
 - json:
     field: message
@@ -31,19 +31,16 @@ processors:
     field: salesforce.apex.document_id
     copy_from: _id
     ignore_empty_value: true
-
 - date:
     field: json.TIMESTAMP_DERIVED
     target_field: "@timestamp"
     formats:
     - ISO8601
     ignore_failure: true
-
 - rename:
     field: json.ACTION
     target_field: salesforce.apex.action
     ignore_missing: true
-    ignore_failure: true
 - convert:
     field: json.CALLOUT_TIME
     target_field: salesforce.apex.callout_time
@@ -80,7 +77,7 @@ processors:
     ignore_failure: true
 - convert:
     field: json.DB_TOTAL_TIME
-    target_field: salesforce.apex.db_time.total
+    target_field: salesforce.apex.db_total_time
     type: float
     ignore_missing: true
     ignore_failure: true
@@ -106,14 +103,14 @@ processors:
     ignore_failure: true
 - convert:
     field: json.EXECUTE_MS
-    target_field: salesforce.apex.execute.ms
+    target_field: salesforce.apex.execute_ms
     type: float
     ignore_missing: true
     ignore_failure: true
 - convert:
     field: json.FETCH_MS
-    target_field: salesforce.apex.fetch.ms
-    type: long
+    target_field: salesforce.apex.fetch_ms
+    type: float
     ignore_missing: true
     ignore_failure: true
 - rename:
@@ -139,7 +136,7 @@ processors:
     ignore_failure: true
 - convert:
     field: json.LIMIT_USAGE_PERCENT
-    target_field: salesforce.apex.limit_usage.pct
+    target_field: salesforce.apex.limit_usage_pct
     type: float
     ignore_missing: true
     ignore_failure: true
@@ -160,13 +157,13 @@ processors:
     ignore_failure: true
 - convert:
     field: json.NUMBER_FIELDS
-    target_field: salesforce.apex.fields.count
+    target_field: salesforce.apex.fields_count
     type: long
     ignore_missing: true
     ignore_failure: true
 - convert:
     field: json.NUMBER_SOQL_QUERIES
-    target_field: salesforce.apex.soql_queries.count
+    target_field: salesforce.apex.soql_queries_count
     type: long
     ignore_missing: true
     ignore_failure: true
@@ -198,29 +195,29 @@ processors:
     ignore_failure: true
 - rename:
     field: json.REQUEST_ID
-    target_field: salesforce.apex.request.id
+    target_field: salesforce.apex.request_id
     ignore_missing: true
     ignore_failure: true
 - rename:
     field: json.REQUEST_STATUS
-    target_field: salesforce.apex.request.status
+    target_field: salesforce.apex.request_status
     ignore_missing: true
     ignore_failure: true
 - convert:
     field: json.ROWS
-    target_field: salesforce.apex.rows.total
+    target_field: salesforce.apex.rows_total
     type: long
     ignore_missing: true
     ignore_failure: true
 - convert:
     field: json.ROWS_FETCHED
-    target_field: salesforce.apex.rows.fetched
+    target_field: salesforce.apex.rows_fetched
     type: long
     ignore_missing: true
     ignore_failure: true
 - convert:
     field: json.ROWS_PROCESSED
-    target_field: salesforce.apex.rows.processed
+    target_field: salesforce.apex.rows_processed
     type: long
     ignore_missing: true
     ignore_failure: true
@@ -248,17 +245,17 @@ processors:
     ignore_failure: true
 - rename:
     field: json.TRIGGER_ID
-    target_field: salesforce.apex.trigger.id
+    target_field: salesforce.apex.trigger_id
     ignore_missing: true
     ignore_failure: true
 - rename:
     field: json.TRIGGER_NAME
-    target_field: salesforce.apex.trigger.name
+    target_field: salesforce.apex.trigger_name
     ignore_missing: true
     ignore_failure: true
 - rename:
     field: json.TRIGGER_TYPE
-    target_field: salesforce.apex.trigger.type
+    target_field: salesforce.apex.trigger_type
     ignore_missing: true
     ignore_failure: true
 - rename:
@@ -301,8 +298,8 @@ processors:
     if: 'ctx.salesforce?.apex?.user_agent != null'
     ignore_failure: true
     source: |
-      if (params.user_agent_map.containsKey(ctx.salesforce.apex.user_agent.substring(0,3))) {
-        ctx.salesforce.apex.user_agent = params.user_agent_map[ctx.salesforce.apex.user_agent.substring(0,3)];
+      if (params.user_agent_map.containsKey(ctx.salesforce.apex.user_agent.toString().substring(0,3))) {
+        ctx.salesforce.apex.user_agent = params.user_agent_map[ctx.salesforce.apex.user_agent.toString().substring(0,3)];
       }
 - rename:
     field: json.USER_ID_DERIVED
@@ -350,13 +347,13 @@ processors:
 - convert:
     field: json.TIME
     target_field: event.duration
-    type: long
+    type: float
     if: ctx.salesforce?.apex?.event_type == "ApexCallout" && ctx.json?.TIME != null
     ignore_failure: true
 - convert:
     field: json.EXEC_TIME
     target_field: event.duration
-    type: long
+    type: float
     if: (ctx.salesforce?.apex?.event_type == "ApexTrigger" || ctx.salesforce?.apex?.event_type == "ApexExecution") && ctx.json?.EXEC_TIME != null
     ignore_failure: true
 - convert:
@@ -368,10 +365,9 @@ processors:
 - convert:
     field: json.TOTAL_MS
     target_field: event.duration
-    type: long
+    type: float
     if: ctx.salesforce?.apex?.event_type == "ExternalCustomApexCallout" && ctx.json?.TOTAL_MS != null
     ignore_failure: true
-
 - set:
     field: event.outcome
     value: success
@@ -382,7 +378,6 @@ processors:
     value: failure
     if: (ctx.json?.SUCCESS != "1" && ctx.json?.SUCCESS != null) || (ctx.json?.STATUS != "1" && ctx.json?.STATUS != null)
     ignore_failure: true
-
 - rename:
     field: json.URL
     target_field: event.url
@@ -402,7 +397,7 @@ processors:
 - set:
     field: event.module
     value: salesforce
-    if: ctx.event?.module == null    
+    if: ctx.event?.module == null
 
 ######################
 ## ECS User Mapping ##
@@ -435,7 +430,7 @@ processors:
     ignore_failure: true
 
 ############################
-## ECS Source.Geo Mapping ##
+## ECS source.geo Mapping ##
 ############################
 
 # A Salesforce internal IP (such as a login from Salesforce Workbench or AppExchange) is shown as "Salesforce.com IP"
@@ -447,7 +442,7 @@ processors:
     ignore_failure: true
 
 ############################
-## ECS Related.ip Mapping ##
+## ECS related.ip Mapping ##
 ############################
 
 - append:
