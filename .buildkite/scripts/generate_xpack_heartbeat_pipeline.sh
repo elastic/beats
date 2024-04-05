@@ -157,7 +157,7 @@ YAML
 fi
 
 echo "+++ Printing dynamic steps"
-yq . -P -e $pipelineName || (echo "Yaml formatting error, bellow is the YAML"; cat $pipelineName; exit 1)
+yq . -P -e $pipelineName || (echo "Yaml formatting error, below is the YAML"; cat $pipelineName; exit 1)
 
 echo "--- Loading dynamic steps"
 buildkite-agent pipeline upload $pipelineName
