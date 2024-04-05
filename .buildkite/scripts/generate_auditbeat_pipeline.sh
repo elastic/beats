@@ -6,28 +6,12 @@ set -euo pipefail
 
 pipelineName="pipeline.auditbeat-dynamic.yml"
 
-<<<<<<< HEAD
-# TODO: steps: must be always included 
-=======
 # TODO: steps: must be always included
->>>>>>> 80dab50f0c (replace default images (#38583))
 echo "Add the mandatory and extended tests without additional conditions into the pipeline"
 if are_conditions_met_mandatory_tests; then
   cat > $pipelineName <<- YAML
 
 steps:
-<<<<<<< HEAD
-  - group: "Auditbeat Mandatory Testing"
-    key: "mandatory-tests"    
-
-    steps:
-      - label: ":ubuntu: Unit Tests"
-        command:
-          - ".buildkite/auditbeat/scripts/unit-tests.sh"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: linux/Unit Tests"
-=======
   - group: "Mandatory Testing"
     key: "mandatory-tests"
 
@@ -37,23 +21,11 @@ steps:
         notify:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Ubuntu Unit Tests"
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
-<<<<<<< HEAD
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
-
-      - label: ":rhel: Unit Tests"
-        command:
-          - ".buildkite/auditbeat/scripts/unit-tests.sh"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: rhel/Unit Tests"
-=======
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
 
@@ -62,22 +34,11 @@ steps:
         notify:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: RHEL9 Unit Tests"
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
-<<<<<<< HEAD
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
-
-      - label: ":windows:-2016 Unit Tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: windows 2016/Unit Tests"
-=======
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
 
@@ -88,24 +49,11 @@ steps:
         notify:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Windows 2016 Unit Tests"
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
-<<<<<<< HEAD
-          disk_type: "pd-ssd"        
-        artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"    
-
-      - label: ":windows:-2022 Unit Tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: windows 2022/Unit Tests"
-=======
           disk_type: "pd-ssd"
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
@@ -118,22 +66,11 @@ steps:
         notify:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Windows 2022 Unit Tests"
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
-<<<<<<< HEAD
-          disk_type: "pd-ssd"        
-        artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"              
-
-      - label: ":linux: Crosscompile"
-        command:
-          - ".buildkite/auditbeat/scripts/crosscompile.sh"
-=======
           disk_type: "pd-ssd"
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
@@ -141,16 +78,11 @@ steps:
 
       - label: ":linux: Crosscompile"
         command: "make -C $BEATS_PROJECT_NAME crosscompile"
->>>>>>> 80dab50f0c (replace default images (#38583))
         env:
           GOX_FLAGS: "-arch amd64"
         notify:
           - github_commit_status:
-<<<<<<< HEAD
-              context: "Auditbeat: Crosscompile"
-=======
               context: "$BEATS_PROJECT_NAME: Crosscompile"
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -163,24 +95,6 @@ fi
 
 echo "Check and add the Extended Tests into the pipeline"
 
-<<<<<<< HEAD
-if are_conditions_met_arm_tests; then
-  cat >> $pipelineName <<- YAML
-  - group: "Extended Tests"
-    key: "extended-tests-arm"
-    steps:
-      - label: ":arm: ARM64 Unit Tests"
-        key: "extended-arm64-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_ARM64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: ARM Unit tests"
-=======
 if are_conditions_met_arm_tests || are_conditions_met_macos_tests; then
   cat >> $pipelineName <<- YAML
 
@@ -239,7 +153,6 @@ if are_conditions_met_arm_tests; then
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
 
->>>>>>> 80dab50f0c (replace default images (#38583))
 YAML
 fi
 
@@ -250,29 +163,15 @@ if are_conditions_met_win_tests; then
     steps:
       - label: ":windows: Windows 2019 Unit Tests"
         key: "extended-win-2019-unit-tests"
-<<<<<<< HEAD
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-=======
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-<<<<<<< HEAD
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: Windows 2019 Unit Tests"
-
-      - label: ":windows: Windows 10 Unit Tests"
-        key: "extended-win-10-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-=======
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
@@ -285,23 +184,12 @@ if are_conditions_met_win_tests; then
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-<<<<<<< HEAD
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: Windows 10 Unit Tests"
-
-      - label: ":windows: Windows 11 Unit Tests"
-        key: "extended-win-11-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-=======
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
@@ -314,26 +202,18 @@ if are_conditions_met_win_tests; then
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-<<<<<<< HEAD
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: Windows 11 Unit Tests"
-=======
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
         notify:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Windows 11 Unit Tests"
->>>>>>> 80dab50f0c (replace default images (#38583))
 YAML
 fi
 
@@ -341,17 +221,6 @@ echo "Check and add the Packaging into the pipeline"
 if are_conditions_met_packaging; then
 cat >> $pipelineName <<- YAML
   - group: "Packaging"
-<<<<<<< HEAD
-    key: "packaging"      
-    depends_on:
-      - "mandatory-tests"
-    steps:
-      - label: Package pipeline
-        commands: ".buildkite/scripts/packaging/package-step.sh"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: Packaging"
-=======
     key: "packaging"
     depends_on:
       - "mandatory-tests"
@@ -384,22 +253,13 @@ cat >> $pipelineName <<- YAML
         notify:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Packaging Linux ARM"
->>>>>>> 80dab50f0c (replace default images (#38583))
 
 
 YAML
 fi
 
-<<<<<<< HEAD
-echo "--- Printing dynamic steps"     #TODO: remove if the pipeline is public
-cat $pipelineName
-
-echo "--- Loading dynamic steps"
-buildkite-agent pipeline upload $pipelineName
-=======
 echo "+++ Printing dynamic steps"
 cat $pipelineName | yq . -P
 
 echo "--- Loading dynamic steps"
 buildkite-agent pipeline upload $pipelineName
->>>>>>> 80dab50f0c (replace default images (#38583))
