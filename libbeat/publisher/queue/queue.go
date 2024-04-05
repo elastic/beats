@@ -155,8 +155,9 @@ type Batch interface {
 	Done()
 }
 
-// Outputs can provide an Encoder to enable early encoding in queues that
-// support it (currently just the memory queue).
+// Outputs can provide an EncoderFactory to enable early encoding, in which
+// case the queue will run the given encoder on events before they reach
+// consumers.
 type Encoder interface {
 	// Return the encoded form of the entry that the output workers can use,
 	// and the in-memory size of the encoded buffer.
