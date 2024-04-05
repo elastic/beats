@@ -413,7 +413,6 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 			} else {
 				// hard failure, apply policy action
 				encodedEvent := data[i].EncodedEvent.(*encodedEvent)
-				//result, _ := data[i].Content.Meta.HasKey(dead_letter_marker_field)
 				if encodedEvent.deadLetter {
 					stats.nonIndexable++
 					client.log.Errorf("Can't deliver to dead letter index event (status=%v). Enable debug logs to view the event and cause.", status)
