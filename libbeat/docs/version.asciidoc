@@ -1,5 +1,5 @@
-:stack-version: 8.13.0
-:doc-branch: main
+:stack-version: 8.13.1
+:doc-branch: 8.13
 :go-version: 1.21.8
 :release-state: unreleased
 :python: 3.7

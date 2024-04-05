@@ -1,5 +1,5 @@
 # Module: sophos
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-sophos.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.13/filebeat-module-sophos.html
 
 - module: sophos
   xg:

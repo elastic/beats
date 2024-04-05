@@ -1,5 +1,5 @@
 # Module: salesforce
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-salesforce.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.13/filebeat-module-salesforce.html
 
 - module: salesforce
 

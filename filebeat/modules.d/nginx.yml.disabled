@@ -1,5 +1,5 @@
 # Module: nginx
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-nginx.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.13/filebeat-module-nginx.html
 
 - module: nginx
   # Access logs
