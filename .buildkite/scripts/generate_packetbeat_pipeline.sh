@@ -180,7 +180,7 @@ if are_conditions_met_packaging; then
         command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         env:
           PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
