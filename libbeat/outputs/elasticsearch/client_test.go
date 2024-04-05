@@ -20,7 +20,9 @@
 package elasticsearch
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -920,6 +922,33 @@ func TestPublishEventsWithBulkFiltering(t *testing.T) {
 	})
 }
 
+func TestSetDeadLetter(t *testing.T) {
+	dead_letter_index := "dead_index"
+	client := &Client{
+		deadLetterIndex: dead_letter_index,
+		indexSelector:   testIndexSelector{},
+	}
+
+	e := &encodedEvent{
+		index: "original_index",
+	}
+	errType := 123
+	errStr := "test error string"
+	client.setDeadLetter(e, errType, errStr)
+
+	assert.True(t, e.deadLetter, "setDeadLetter should set the event's deadLetter flag")
+	assert.Equal(t, dead_letter_index, e.index, "setDeadLetter should overwrite the event's original index")
+
+	var errFields struct {
+		ErrType    int    `json:"error.type"`
+		ErrMessage string `json:"error.message"`
+	}
+	err := json.NewDecoder(bytes.NewReader(e.encoding)).Decode(&errFields)
+	require.NoError(t, err, "json decoding of encoded event should succeed")
+	assert.Equal(t, errType, errFields.ErrType, "encoded error.type should match value in setDeadLetter")
+	assert.Equal(t, errStr, errFields.ErrMessage, "encoded error.message should match value in setDeadLetter")
+}
+
 // encodeBatch encodes a publisher.Batch so it can be provided to
 // Client.Publish and other helpers.
 // This modifies the batch in place, but also returns its input batch
@@ -939,7 +968,7 @@ func encodeEvents(client *Client, events []publisher.Event) []publisher.Event {
 	encoder := newEventEncoder(
 		client.conn.EscapeHTML,
 		client.indexSelector,
-		client.pipeline,
+		client.pipelineSelector,
 	)
 	for i := range events {
 		// Skip encoding if there's already encoded data present
@@ -956,7 +985,7 @@ func encodeEvent(client *Client, event publisher.Event) publisher.Event {
 	encoder := newEventEncoder(
 		client.conn.EscapeHTML,
 		client.indexSelector,
-		client.pipeline,
+		client.pipelineSelector,
 	)
 	encoded, _ := encoder.EncodeEntry(event)
 	return encoded.(publisher.Event)
