@@ -2,7 +2,6 @@ import os
 import metricbeat
 import unittest
 
-from time import sleep
 from beat.beat import INTEGRATION_TESTS
 
 

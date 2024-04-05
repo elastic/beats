@@ -1,4 +1,4 @@
-FROM openjdk:8-jre-alpine
+FROM openjdk:8-jdk-alpine3.9
 
 ARG ACTIVEMQ_VERSION
 
