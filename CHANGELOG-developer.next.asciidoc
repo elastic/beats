@@ -95,6 +95,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 
 ==== Added
 
+- Update watchers to be shared between metricsets in Kubernetes module. {pull}37332[37332]
 - Add new metricset in Kubernetes module, `state_namespace`. {pull}36406[36406]
 - Add configuration for APM instrumentation and expose the tracer trough the Beat object. {pull}17938[17938]
 - Make the behavior of clientWorker and netClientWorker consistent when error is returned from publisher pipeline
