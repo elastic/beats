@@ -125119,8 +125119,7 @@ Fileset for ingesting Salesforce Apex logs.
 *`salesforce.apex.document_id`*::
 +
 --
-Unique Id.
-
+Unique ID of the Apex document.
 
 type: keyword
 
@@ -125131,7 +125130,6 @@ type: keyword
 --
 Action performed by the callout.
 
-
 type: keyword
 
 --
@@ -125139,10 +125137,9 @@ type: keyword
 *`salesforce.apex.callout_time`*::
 +
 --
-Time spent waiting on webservice callouts, in milliseconds.
+Time spent waiting on web service callouts, in milliseconds.
 
-
-type: keyword
+type: float
 
 --
 
@@ -125151,7 +125148,6 @@ type: keyword
 --
 The Apex class name. If the class is part of a managed package, this string includes the package namespace.
 
-
 type: keyword
 
 --
@@ -125159,8 +125155,7 @@ type: keyword
 *`salesforce.apex.client_name`*::
 +
 --
-The name of the client that's using Salesforce services. This field is an optional parameter that can be passed in API calls. If blank, the caller didnt specify a client in the CallOptions header.
-
+The name of the client that's using Salesforce services. This field is an optional parameter that can be passed in API calls. If blank, the caller didn't specify a client in the CallOptions header.
 
 type: keyword
 
@@ -125171,8 +125166,7 @@ type: keyword
 --
 The CPU time in milliseconds used to complete the request.
 
-
-type: keyword
+type: float
 
 --
 
@@ -125181,8 +125175,7 @@ type: keyword
 --
 Indicates how much activity is occurring in the database. A high value for this field suggests that adding indexes or filters on your queries would benefit performance.
 
-
-type: keyword
+type: long
 
 --
 
@@ -125191,18 +125184,16 @@ type: keyword
 --
 The CPU time in milliseconds to complete the request. Indicates the amount of activity taking place in the database layer during the request.
 
-
-type: keyword
+type: float
 
 --
 
 *`salesforce.apex.db_total_time`*::
 +
 --
-Time (in milliseconds) spent waiting for database processing in aggregate for all operations in the request. Compare this field to CPU_TIME to determine whether performance issues are occurring in the database layer or in your own code.
+Time (in milliseconds) spent waiting for database processing in aggregate for all operations in the request. Compare this field to cpu_time to determine whether performance issues are occurring in the database layer or in your own code.
 
-
-type: keyword
+type: float
 
 --
 
@@ -125210,7 +125201,6 @@ type: keyword
 +
 --
 Name of the external object being accessed.
-
 
 type: keyword
 
@@ -125221,7 +125211,6 @@ type: keyword
 --
 The name of the object affected by the trigger.
 
-
 type: keyword
 
 --
@@ -125231,7 +125220,6 @@ type: keyword
 --
 The entry point for this Apex execution.
 
-
 type: keyword
 
 --
@@ -125239,8 +125227,7 @@ type: keyword
 *`salesforce.apex.event_type`*::
 +
 --
-The type of event. The value is always ApexCallout.
-
+The type of event.
 
 type: keyword
 
@@ -125251,8 +125238,7 @@ type: keyword
 --
 How long it took (in milliseconds) for Salesforce to prepare and execute the query. Available in API version 42.0 and later.
 
-
-type: keyword
+type: float
 
 --
 
@@ -125261,8 +125247,7 @@ type: keyword
 --
 How long it took (in milliseconds) to retrieve the query results from the external system. Available in API version 42.0 and later.
 
-
-type: keyword
+type: float
 
 --
 
@@ -125270,7 +125255,6 @@ type: keyword
 +
 --
 Field expressions to filter which rows to return. Corresponds to WHERE in SOQL queries.
-
 
 type: keyword
 
@@ -125281,8 +125265,7 @@ type: keyword
 --
 Indicates whether the request is counted against your org's concurrent long-running Apex request limit (true) or not (false).
 
-
-type: keyword
+type: boolean
 
 --
 
@@ -125291,18 +125274,16 @@ type: keyword
 --
 Maximum number of rows to return for a query. Corresponds to LIMIT in SOQL queries.
 
-
-type: keyword
+type: long
 
 --
 
-*`salesforce.apex.limit_usage_percent`*::
+*`salesforce.apex.limit_usage_pct`*::
 +
 --
 The percentage of Apex SOAP calls that were made against the organization's limit.
 
-
-type: keyword
+type: float
 
 --
 
@@ -125310,7 +125291,6 @@ type: keyword
 +
 --
 The string that ties together all events in a given user's login session. It starts with a login event and ends with either a logout event or the user session expiring.
-
 
 type: keyword
 
@@ -125321,7 +125301,6 @@ type: keyword
 --
 The media type of the response.
 
-
 type: keyword
 
 --
@@ -125331,8 +125310,7 @@ type: keyword
 --
 Error or warning message associated with the failed call.
 
-
-type: keyword
+type: text
 
 --
 
@@ -125341,28 +125319,25 @@ type: keyword
 --
 The name of the calling Apex method.
 
-
 type: keyword
 
 --
 
-*`salesforce.apex.number_fields`*::
+*`salesforce.apex.fields_count`*::
 +
 --
 The number of fields or columns, where applicable.
 
-
-type: keyword
+type: long
 
 --
 
-*`salesforce.apex.number_soql_queries`*::
+*`salesforce.apex.soql_queries_count`*::
 +
 --
 The number of SOQL queries that were executed during the event.
 
-
-type: keyword
+type: long
 
 --
 
@@ -125371,8 +125346,7 @@ type: keyword
 --
 Number of rows to skip when paging through a result set. Corresponds to OFFSET in SOQL queries.
 
-
-type: keyword
+type: long
 
 --
 
@@ -125380,7 +125354,6 @@ type: keyword
 +
 --
 Field or column to use for sorting query results, and whether to sort the results in ascending (default) or descending order. Corresponds to ORDER BY in SOQL queries.
-
 
 type: keyword
 
@@ -125391,7 +125364,6 @@ type: keyword
 --
 The 15-character ID of the organization.
 
-
 type: keyword
 
 --
@@ -125400,7 +125372,6 @@ type: keyword
 +
 --
 The SOQL query, if one was performed.
-
 
 type: keyword
 
@@ -125411,68 +125382,61 @@ type: keyword
 --
 The type of outer execution associated with this event.
 
-
 type: keyword
 
 --
 
-*`salesforce.apex.request.id`*::
+*`salesforce.apex.request_id`*::
 +
 --
-The unique ID of a single transaction. A transaction can contain one or more events. Each event in a given transaction has the same REQUEST_ID.
-
+The unique ID of a single transaction. A transaction can contain one or more events. Each event in a given transaction has the same request_id.
 
 type: keyword
 
 --
 
-*`salesforce.apex.request.status`*::
+*`salesforce.apex.request_status`*::
 +
 --
 The status of the request for a page view or user interface action.
 
-
 type: keyword
 
 --
 
-*`salesforce.apex.rows.total`*::
+*`salesforce.apex.rows_total`*::
 +
 --
 Total number of records in the result set. The value is always -1 if the custom adapter's DataSource.Provider class doesn't declare the QUERY_TOTAL_SIZE capability.
 
-
-type: keyword
+type: long
 
 --
 
-*`salesforce.apex.rows.fetched`*::
+*`salesforce.apex.rows_fetched`*::
 +
 --
 Number of rows fetched by the callout. Available in API version 42.0 and later.
 
-
-type: keyword
+type: long
 
 --
 
-*`salesforce.apex.rows.processed`*::
+*`salesforce.apex.rows_processed`*::
 +
 --
 The number of rows that were processed in the request.
 
-
-type: keyword
+type: long
 
 --
 
 *`salesforce.apex.run_time`*::
 +
 --
-Not used for this event type. Use the TIME field instead.
+The amount of time that the request took in milliseconds.
 
-
-type: keyword
+type: float
 
 --
 
@@ -125480,7 +125444,6 @@ type: keyword
 +
 --
 Comma-separated list of fields being queried. Corresponds to SELECT in SOQL queries.
-
 
 type: keyword
 
@@ -125491,7 +125454,6 @@ type: keyword
 --
 Reserved for future use.
 
-
 type: keyword
 
 --
@@ -125501,8 +125463,7 @@ type: keyword
 --
 Number of records retrieved in one second.
 
-
-type: keyword
+type: float
 
 --
 
@@ -125512,7 +125473,6 @@ type: keyword
 --
 The 15-character ID of the trigger that was fired.
 
-
 type: keyword
 
 --
@@ -125520,8 +125480,7 @@ type: keyword
 *`salesforce.apex.trigger.name`*::
 +
 --
-For triggers coming from managed packages, TRIGGER_NAME includes a namespace prefix separated with a . character. If no namespace prefix is present, the trigger is from an unmanaged trigger.
-
+For triggers coming from managed packages, trigger_name includes a namespace prefix separated with a . character. If no namespace prefix is present, the trigger is from an unmanaged trigger.
 
 type: keyword
 
@@ -125532,7 +125491,6 @@ type: keyword
 --
 The type of this trigger.
 
-
 type: keyword
 
 --
@@ -125541,7 +125499,6 @@ type: keyword
 +
 --
 The type of Apex callout.
-
 
 type: keyword
 
@@ -125552,16 +125509,14 @@ type: keyword
 --
 The URI of the page that's receiving the request.
 
-
 type: keyword
 
 --
 
-*`salesforce.apex.uri_id_derived`*::
+*`salesforce.apex.uri_derived_id`*::
 +
 --
 The 18-character case-safe ID of the URI of the page that's receiving the request.
-
 
 type: keyword
 
@@ -125572,7 +125527,6 @@ type: keyword
 --
 The numeric code for the type of client used to make the request (for example, the browser, application, or API).
 
-
 type: keyword
 
 --
@@ -125581,7 +125535,6 @@ type: keyword
 +
 --
 The 18-character case-safe ID of the user who's using Salesforce services through the UI or the API.
-
 
 type: keyword
 
@@ -125599,7 +125552,6 @@ Fileset for ingesting Salesforce Login (REST) logs.
 --
 Unique Id.
 
-
 type: keyword
 
 --
@@ -125607,8 +125559,7 @@ type: keyword
 *`salesforce.login.application`*::
 +
 --
-The application used to access the org. Possible values include: AppExchange, Browser, Salesforce for iOS, Salesforce Developers API Explorer, N/A
-
+The application used to access the organization.
 
 type: keyword
 
@@ -125620,7 +125571,6 @@ type: keyword
 --
 The type of Salesforce API request.
 
-
 type: keyword
 
 --
@@ -125629,7 +125579,6 @@ type: keyword
 +
 --
 The version of the Salesforce API that's being used.
-
 
 type: keyword
 
@@ -125641,7 +125590,6 @@ type: keyword
 --
 The authentication method used by a third-party identification provider for an OpenID Connect single sign-on protocol.
 
-
 type: keyword
 
 --
@@ -125650,7 +125598,6 @@ type: keyword
 +
 --
 The authentication method used by a third-party identification provider for an OpenID Connect single sign-on protocol. This field is available in API version 51.0 and later.
-
 
 type: keyword
 
@@ -125661,7 +125608,6 @@ type: keyword
 --
 The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
 
-
 type: keyword
 
 --
@@ -125670,7 +125616,6 @@ type: keyword
 +
 --
 The version number of the login client. If no version number is available, “Unknown” is returned.
-
 
 type: keyword
 
@@ -125681,7 +125626,6 @@ type: keyword
 --
 The IP address of the client that’s using Salesforce services. A Salesforce internal IP (such as a login from Salesforce Workbench or AppExchange) is shown as “Salesforce.com IP”.
 
-
 type: keyword
 
 --
@@ -125691,18 +125635,16 @@ type: keyword
 --
 The CPU time in milliseconds used to complete the request. This field indicates the amount of activity taking place in the app server layer.
 
-
-type: keyword
+type: long
 
 --
 
-*`salesforce.login.db_total.time`*::
+*`salesforce.login.db_time.total`*::
 +
 --
-The time in nanoseconds for a database round trip. Includes time spent in the JDBC driver, network to the database, and DB_CPU_TIME. Compare this field to CPU_TIME to determine whether performance issues are occurring in the database layer or in your own code.
+The time in milliseconds for a database round trip. Includes time spent in the JDBC driver, network to the database, and db_time.total. Compare this field to cpu_time to determine whether performance issues are occurring in the database layer or in your own code.
 
-
-type: keyword
+type: double
 
 --
 
@@ -125710,7 +125652,6 @@ type: keyword
 +
 --
 The type of event. The value is always Login.
-
 
 type: keyword
 
@@ -125721,7 +125662,6 @@ type: keyword
 --
 The 15-character ID of the organization.
 
-
 type: keyword
 
 --
@@ -125730,7 +125670,6 @@ type: keyword
 +
 --
 The unique ID of a single transaction. A transaction can contain one or more events. Each event in a given transaction has the same REQUEST_ID.
-
 
 type: keyword
 
@@ -125741,7 +125680,6 @@ type: keyword
 --
 The status of the request for a page view or user interface action.
 
-
 type: keyword
 
 --
@@ -125751,8 +125689,7 @@ type: keyword
 --
 The amount of time that the request took in milliseconds.
 
-
-type: keyword
+type: long
 
 --
 
@@ -125760,7 +125697,6 @@ type: keyword
 +
 --
 The 18-character case insensitive ID of the URI of the page that’s receiving the request.
-
 
 type: keyword
 
@@ -125771,7 +125707,6 @@ type: keyword
 --
 The 18-character case insensitive ID of the user who’s using Salesforce services through the UI or the API.
 
-
 type: keyword
 
 --
@@ -125781,8 +125716,7 @@ type: keyword
 --
 The amount of time it took to evaluate the transaction security policy, in milliseconds.
 
-
-type: keyword
+type: float
 
 --
 
@@ -125790,7 +125724,6 @@ type: keyword
 +
 --
 The type of login used to access the session.
-
 
 type: keyword
 
