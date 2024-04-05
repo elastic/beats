@@ -21,9 +21,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
@@ -98,26 +96,6 @@ non_indexable_policy.dead_letter_index:
 			t.Logf("error %s", err.Error())
 		})
 	}
-}
-
-func TestGetIndex(t *testing.T) {
-	dead_letter_index := "dead_index"
-	client := &Client{
-		deadLetterIndex: dead_letter_index,
-		indexSelector:   testIndexSelector{},
-	}
-
-	event := &beat.Event{
-		Meta: make(map[string]interface{}),
-	}
-	index, err := client.getIndex(event)
-	require.NoError(t, err, "getIndex call must succeed")
-	assert.Equal(t, "test", index, "Event with no dead letter marker should use the client's index selector")
-
-	event.Meta[dead_letter_marker_field] = true
-	index, err = client.getIndex(event)
-	require.NoError(t, err, "getIndex call must succeed")
-	assert.Equal(t, dead_letter_index, index, "Event with dead letter marker should use the client's dead letter index")
 }
 
 func TestCompressionIsOnByDefault(t *testing.T) {

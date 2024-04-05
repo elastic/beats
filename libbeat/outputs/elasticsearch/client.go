@@ -299,6 +299,10 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 	okEvents := data[:0]
 	bulkItems := []interface{}{}
 	for i := range data {
+		if data[i].EncodedEvent == nil {
+			client.log.Error("Elasticsearch output received unencoded publisher.Event")
+			continue
+		}
 		event := data[i].EncodedEvent.(*encodedEvent)
 		if event.err != nil {
 			client.log.Error(event.err)
@@ -443,7 +447,7 @@ func (client *Client) setDeadLetter(
 	encodedEvent.index = client.deadLetterIndex
 	deadLetterReencoding := mapstr.M{
 		"@timestamp":    encodedEvent.timestamp,
-		"message":       encodedEvent.encoding,
+		"message":       string(encodedEvent.encoding),
 		"error.type":    errType,
 		"error.message": errMsg,
 	}

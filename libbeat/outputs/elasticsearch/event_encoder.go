@@ -100,9 +100,12 @@ func (pe *eventEncoder) encodeRawEvent(e *beat.Event) *encodedEvent {
 	if err != nil {
 		return &encodedEvent{err: fmt.Errorf("failed to select event pipeline: %w", err)}
 	}
-	index, err := pe.indexSelector.Select(e)
-	if err != nil {
-		return &encodedEvent{err: fmt.Errorf("failed to select event index: %w", err)}
+	var index string
+	if pe.indexSelector != nil {
+		index, err = pe.indexSelector.Select(e)
+		if err != nil {
+			return &encodedEvent{err: fmt.Errorf("failed to select event index: %w", err)}
+		}
 	}
 
 	id, _ := events.GetMetaStringValue(*e, events.FieldMetaID)
