@@ -18,7 +18,7 @@ if are_files_changed "$changeset"; then
       - label: ":ubuntu: ${BEATS_PROJECT_NAME}/Packaging Linux X86"
         key: "package-linux-x86"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: $PACKAGING_PLATFORMS
           SNAPSHOT: true
         command: ".buildkite/scripts/packaging/package.sh"
         notify:
@@ -32,7 +32,7 @@ if are_files_changed "$changeset"; then
       - label: ":linux: ${BEATS_PROJECT_NAME}/Packaging Linux ARM"
         key: "package-linux-arm"
         env:
-          PLATFORMS: "linux/arm64"
+          PLATFORMS: $PACKAGING_ARM_PLATFORMS
           PACKAGES: "docker"
           SNAPSHOT: true
         command: ".buildkite/scripts/packaging/package.sh"
