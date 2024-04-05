@@ -13,6 +13,10 @@ IF ERRORLEVEL 1 (
 REM Set the USERPROFILE to the previous location to fix issues with chocolatey in windows 2019
 SET PREVIOUS_USERPROFILE=%USERPROFILE%
 SET USERPROFILE=%OLD_USERPROFILE%
+
+echo "Upgrade chocolatey to latest version"
+choco upgrade chocolatey -y
+
 IF NOT EXIST C:\Python38\python.exe (
     REM Install python 3.8
     choco install python -y -r --no-progress --version 3.8.5 || exit /b 1
