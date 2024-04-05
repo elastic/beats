@@ -4,6 +4,7 @@ set -euo pipefail
 
 AWS_SERVICE_ACCOUNT_SECRET_PATH="kv/ci-shared/platform-ingest/aws_account_auth"
 PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-ingest-ci-service-account"
+<<<<<<< HEAD
 
 retry() {
   local retries=$1
@@ -27,12 +28,22 @@ retry() {
 <<<<<<< HEAD
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" ]]; then
 =======
+=======
+DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
+GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
+>>>>>>> 80dab50f0c (replace default images (#38583))
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
 >>>>>>> 4b7467b5c5 (Beats pipeline generator (#38162))
   source .buildkite/env-scripts/env.sh
+<<<<<<< HEAD
   source .buildkite/env-scripts/util.sh
   source .buildkite/env-scripts/win-env.sh
+=======
+  if [[ -z "${GO_VERSION-""}" ]]; then
+    export GO_VERSION=$(cat "${WORKSPACE}/.go-version")
+  fi
+>>>>>>> 80dab50f0c (replace default images (#38583))
 
   if [[ -z "${GOLANG_VERSION-""}" ]]; then
     export GOLANG_VERSION=$(cat "${WORKSPACE}/.go-version")
