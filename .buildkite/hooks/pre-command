@@ -105,4 +105,3 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
     export PRIVATE_CI_GCS_CREDENTIALS_SECRET
   fi
 fi
-
