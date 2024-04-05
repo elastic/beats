@@ -6,30 +6,13 @@ set -euo pipefail
 
 pipelineName="pipeline.filebeat-dynamic.yml"
 
-<<<<<<< HEAD
-# TODO: steps: must be always included 
-=======
 # TODO: steps: must be always included
->>>>>>> 80dab50f0c (replace default images (#38583))
 echo "Add the mandatory and extended tests without additional conditions into the pipeline"
 if are_conditions_met_mandatory_tests; then
   cat > $pipelineName <<- YAML
 
 
 steps:
-<<<<<<< HEAD
-  - group: "Filebeat Mandatory Testing"
-    key: "mandatory-tests"
-    if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "filebeat" || build.env("BUILDKITE_PULL_REQUEST") != "false"
-
-    steps:
-      - label: ":ubuntu: Unit Tests"
-        command:
-          - ".buildkite/filebeat/scripts/unit-tests.sh"
-        notify:
-          - github_commit_status:
-              context: "Filebeat: linux/Unit Tests"
-=======
   - group: "Mandatory Testing"
     key: "mandatory-tests"
 
@@ -39,7 +22,6 @@ steps:
         notify:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Ununtu Unit Tests"
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -48,20 +30,11 @@ steps:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
 
-<<<<<<< HEAD
-      - label: ":ubuntu: Go Integration Tests"
-        command:
-          - ".buildkite/filebeat/scripts/integration-gotests.sh"
-        notify:
-          - github_commit_status:
-              context: "Filebeat: Go Integration Tests"
-=======
       - label: ":ubuntu: Ubuntu Go Integration Tests"
         command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
         notify:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Go Integration Tests"
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -70,20 +43,11 @@ steps:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
 
-<<<<<<< HEAD
-      - label: ":ubuntu: Python Integration Tests"
-        command:
-          - ".buildkite/filebeat/scripts/integration-pytests.sh"
-        notify:
-          - github_commit_status:
-              context: "Filebeat: Python Integration Tests"
-=======
       - label: ":ubuntu: Ubuntu Python Integration Tests"
         command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
         notify:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Python Integration Tests"
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -92,13 +56,6 @@ steps:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
 
-<<<<<<< HEAD
-      - label: ":windows:-2016 Unit Tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        notify:
-          - github_commit_status:
-              context: "Filebeat: windows/Unit Tests"
-=======
       - label: ":windows: Windows 2016 Unit Tests"
         key: "windows-2016-unit-tests"
         command: |
@@ -107,24 +64,12 @@ steps:
         notify:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Windows 2016 Unit Tests"
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
           disk_type: "pd-ssd"
-<<<<<<< HEAD
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-
-      - label: ":windows:-2022 Unit Tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        notify:
-          - github_commit_status:
-              context: "Filebeat: windows 2022/Unit Tests"
-=======
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
       - label: ":windows: Windows 2022 Unit Tests"
@@ -135,21 +80,13 @@ steps:
         notify:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Windows 2022 Unit Tests"
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
-<<<<<<< HEAD
-          disk_type: "pd-ssd"        
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-=======
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
->>>>>>> 80dab50f0c (replace default images (#38583))
 
 YAML
 else
@@ -159,20 +96,6 @@ fi
 
 echo "Check and add the Extended Tests into the pipeline"
 
-<<<<<<< HEAD
-if are_conditions_met_arm_tests; then
-  cat >> $pipelineName <<- YAML
-  - group: "Extended Tests: ARM"
-      key: "extended-tests-arm"
-      steps:
-      - label: ":linux: ARM64 Unit Tests"
-        key: "arm-extended"        
-        command:
-          - ".buildkite/filebeat/scripts/unit-tests.sh"
-        notify:
-          - github_commit_status:
-              context: "Filebeat/Extended: Unit Tests ARM"
-=======
 if are_conditions_met_arm_tests || are_conditions_met_macos_tests; then
   cat >> $pipelineName <<- YAML
 
@@ -222,44 +145,18 @@ if are_conditions_met_arm_tests; then
         notify:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Ubuntu ARM Unit Tests"
->>>>>>> 80dab50f0c (replace default images (#38583))
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-<<<<<<< HEAD
-        artifact_paths: "filebeat/build/*.xml"
-
-=======
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
->>>>>>> 80dab50f0c (replace default images (#38583))
 YAML
 fi
 
 if are_conditions_met_win_tests; then
   cat >> $pipelineName <<- YAML
-<<<<<<< HEAD
-  - group: "Windows Extended Testing"
-    key: "extended-tests-win"
-    steps:
-    - label: ":windows: Win 2019 Unit Tests"
-      key: "win-extended-2019"
-      command: ".buildkite/scripts/win_unit_tests.ps1"
-      notify:
-        - github_commit_status:
-            context: "Filebeat/Extended: Win-2019 Unit Tests"
-      agents:
-        provider: "gcp"
-        image: "${IMAGE_WIN_2019}"
-        machine_type: "${GCP_WIN_MACHINE_TYPE}"
-        disk_size: 200
-        disk_type: "pd-ssd"
-      artifact_paths:
-        - "filebeat/build/*.xml"
-        - "filebeat/build/*.json"
-=======
 
   - group: "Windows Extended Testing"
     key: "extended-tests-win"
@@ -317,33 +214,19 @@ if are_conditions_met_win_tests; then
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
->>>>>>> 80dab50f0c (replace default images (#38583))
 YAML
 fi
 
 echo "Check and add the Packaging into the pipeline"
 if are_conditions_met_packaging; then
 cat >> $pipelineName <<- YAML
-<<<<<<< HEAD
-  - group: "Packaging"
-    key: "packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-=======
 
   - group: "Packaging"
     key: "packaging"
->>>>>>> 80dab50f0c (replace default images (#38583))
     depends_on:
       - "mandatory-tests"
 
     steps:
-<<<<<<< HEAD
-      - label: Package pipeline
-        commands: ".buildkite/scripts/packaging/package-step.sh"
-        notify:
-        - github_commit_status:
-            context: "Filebeat: Packaging"
-=======
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
         command: "cd $BEATS_PROJECT_NAME && mage package"
@@ -372,18 +255,12 @@ cat >> $pipelineName <<- YAML
         notify:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Packaging Linux ARM"
->>>>>>> 80dab50f0c (replace default images (#38583))
 
 YAML
 fi
 
-<<<<<<< HEAD
-echo "--- Printing dynamic steps"     #TODO: remove if the pipeline is public
-cat $pipelineName
-=======
 echo "+++ Printing dynamic steps"
 cat $pipelineName | yq . -P
->>>>>>> 80dab50f0c (replace default images (#38583))
 
 echo "--- Loading dynamic steps"
 buildkite-agent pipeline upload $pipelineName

@@ -2,6 +2,10 @@
 
 set -euo pipefail
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> cba30347320f6d949c970c334f7e7bd50a92f0bd
 REPO="beats"
 TMP_FOLDER="tmp.${REPO}"
 DOCKER_REGISTRY="docker.elastic.co"
