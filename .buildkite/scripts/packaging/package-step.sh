@@ -18,11 +18,7 @@ if are_files_changed "$changeset"; then
       - label: ":ubuntu: ${BEATS_PROJECT_NAME}/Packaging Linux X86"
         key: "package-linux-x86"
         env:
-<<<<<<< HEAD
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
-=======
           PLATFORMS: $PACKAGING_PLATFORMS
->>>>>>> 80dab50f0c (replace default images (#38583))
           SNAPSHOT: true
         command: ".buildkite/scripts/packaging/package.sh"
         notify:
