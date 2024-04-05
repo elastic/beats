@@ -9,6 +9,7 @@ export DOCKER_COMPOSE_VERSION="1.21.0"
 export DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
 export ASDF_NODEJS_VERSION="18.17.1"
 export AWS_REGION="eu-central-1"
+
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
 export WORKSPACE
 GO_VERSION=$(cat .go-version)
