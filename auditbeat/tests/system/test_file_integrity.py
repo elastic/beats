@@ -5,6 +5,10 @@ import platform
 from auditbeat import *
 
 
+if platform.platform().split('-')[0] == 'Linux':
+    import pwd
+
+
 def is_root():
     if 'geteuid' not in dir(os):
         return False
@@ -100,6 +104,16 @@ class Test(BaseTest):
             # may differ
             self.wait_log_contains(escape_path(dir), max_timeout=30, ignore_case=True)
 
+    def _assert_process_data(self, event, backend):
+        if backend != "ebpf":
+            return
+        assert event["process.entity_id"] != ""
+        assert event["process.executable"] == "pytest"
+        assert event["process.pid"] == os.getpid()
+        assert int(event["process.user.id"]) == os.geteuid()
+        assert event["process.user.name"] == pwd.getpwuid(os.geteuid()).pw_name
+        assert int(event["process.group.id"]) == os.getegid()
+
     def _test_non_recursive(self, backend):
         """
         file_integrity monitors watched directories (non recursive).
@@ -171,6 +185,8 @@ class Test(BaseTest):
 
             # assert file inside subdir is not reported
             assert self.log_contains(file3) is False
+
+            self._assert_process_data(objs[0], backend)
 
     @unittest.skipIf(os.getenv("CI") is not None and platform.system() == 'Darwin',
                      'Flaky test: https://github.com/elastic/beats/issues/24678')
@@ -251,6 +267,8 @@ class Test(BaseTest):
 
             file_events(objs, file1, ['created'])
             file_events(objs, file2, ['created'])
+
+            self._assert_process_data(objs[0], backend)
 
     def test_recursive__fsnotify(self):
         self._test_recursive("fsnotify")
