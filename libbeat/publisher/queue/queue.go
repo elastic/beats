@@ -158,6 +158,9 @@ type Batch interface {
 // Outputs can provide an EncoderFactory to enable early encoding, in which
 // case the queue will run the given encoder on events before they reach
 // consumers.
+// Encoders are provided as factories so each worker goroutine can have its own
+type EncoderFactory func() Encoder
+
 type Encoder interface {
 	// Return the encoded form of the entry that the output workers can use,
 	// and the in-memory size of the encoded buffer.
@@ -166,6 +169,3 @@ type Encoder interface {
 	// metadata needed to report the error when the entry is consumed.
 	EncodeEntry(Entry) (Entry, int)
 }
-
-// Encoders are provided as factories so each worker goroutine can have its own
-type EncoderFactory func() Encoder
