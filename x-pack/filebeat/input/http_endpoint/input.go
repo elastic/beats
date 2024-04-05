@@ -7,6 +7,8 @@ package http_endpoint
 import (
 	"context"
 	"crypto/tls"
+	"encoding/base32"
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"net"
@@ -18,6 +20,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"
+	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -297,7 +300,10 @@ func (s *server) getErr() error {
 
 func newHandler(ctx context.Context, c config, prg *program, pub stateless.Publisher, log *logp.Logger, metrics *inputMetrics) http.Handler {
 	h := &handler{
-		log:       log,
+		log:         log,
+		txBaseID:    newID(),
+		txIDCounter: atomic.NewUint64(0),
+
 		publisher: pub,
 		metrics:   metrics,
 		validator: apiValidator{
@@ -342,6 +348,13 @@ func newHandler(ctx context.Context, c config, prg *program, pub stateless.Publi
 		}
 	}
 	return h
+}
+
+// newID returns an ID derived from the current time.
+func newID() string {
+	var data [8]byte
+	binary.LittleEndian.PutUint64(data[:], uint64(time.Now().UnixNano()))
+	return base32.HexEncoding.WithPadding(base32.NoPadding).EncodeToString(data[:])
 }
 
 // inputMetrics handles the input's metric reporting.
