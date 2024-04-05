@@ -165,7 +165,9 @@ func TestProxyDisableOverridesProxySettings(t *testing.T) {
 func execClient(t *testing.T, env ...string) {
 	// The child process always runs only the TestClientPing test, which pings
 	// the server at TEST_SERVER_URL and then terminates.
-	cmd := exec.Command(os.Args[0], "-test.run=TestClientPing")
+	executable, err := os.Executable()
+	require.NoError(t, err, "couldn't get current executable")
+	cmd := exec.Command(executable, "-test.run=TestClientPing")
 	cmd.Env = append(append(os.Environ(),
 		"TEST_START_CLIENT=1"),
 		env...)
@@ -173,7 +175,7 @@ func execClient(t *testing.T, env ...string) {
 	cmd.Stderr = cmdOutput
 	cmd.Stdout = cmdOutput
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		t.Error("Error executing client:\n" + cmdOutput.String())
 	}
