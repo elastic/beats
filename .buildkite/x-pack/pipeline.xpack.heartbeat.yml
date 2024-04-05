@@ -1,7 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 name: "beats-xpack-heartbeat"
 
-
 env:
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
   BEATS_PROJECT_NAME: "x-pack/heartbeat"
