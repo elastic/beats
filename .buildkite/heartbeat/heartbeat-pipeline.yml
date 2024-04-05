@@ -5,12 +5,12 @@ env:
 
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
-  IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
 
@@ -19,12 +19,16 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
 
+  #Packaging
+  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+  PACKAGING_ARM_PLATFORMS: "linux/arm64"
+
 steps:
   - group: "Heartbeat Mandatory Testing"
     key: "heartbeat-mandatory-tests"
     steps:
       - label: ":ubuntu: Unit Tests"
-        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -34,7 +38,7 @@ steps:
           - "heartbeat/build/*.json"
 
       - label: ":rhel:-9 Unit Tests"
-        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -45,10 +49,12 @@ steps:
 
       - label: ":windows:-2016 Unit Test"
         key: "windows-2016"
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         notify:
           - github_commit_status:
-              context: "Heartbeat: windows-2016/Unit Tests"
+              context: "Heartbeat: Windows 2016/Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -60,10 +66,12 @@ steps:
 
       - label: ":windows:-2022 Unit Test"
         key: "windows-2022"
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         notify:
           - github_commit_status:
-              context: "Heartbeat: windows-2022/Unit Tests"
+              context: "Heartbeat: Windows 2022/Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -84,7 +92,7 @@ steps:
           - "heartbeat/build/*.json"
 
       - label: ":ubuntu: Python Integration Tests"
-        command: "cd ${BEATS_PROJECT_NAME} && mage pythonIntegTest"
+        command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -100,7 +108,7 @@ steps:
       - label: ":linux: ARM64 Unit Tests"
         key: "arm-extended"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for arm" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
+        command: "cd $BEATS_PROJECT_NAME && mage unitTest"
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -114,7 +122,7 @@ steps:
       - label: ":mac: MacOS Unit Tests"
         key: "macos-extended"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
+        command: "cd ${BEATS_PROJECT_NAME} && mage build unitTest"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -139,10 +147,12 @@ steps:
 
       - label: ":windows:-11 Unit Tests"
         key: "heartbeat-windows-extended-11"
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         notify:
           - github_commit_status:
-              context: "Heartbeat: Win-11 Unit Tests"
+              context: "Heartbeat: Windows 11/Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -154,10 +164,12 @@ steps:
 
       - label: ":windows:-10 Unit Tests"
         key: "heartbeat-windows-extended-10"
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         notify:
           - github_commit_status:
-              context: "Heartbeat: Win-10 Unit Tests"
+              context: "Heartbeat: Windows 10/Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
