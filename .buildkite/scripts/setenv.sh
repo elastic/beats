@@ -1,27 +1,6 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
->>>>>>> cba30347320f6d949c970c334f7e7bd50a92f0bd
-REPO="beats"
-TMP_FOLDER="tmp.${REPO}"
-DOCKER_REGISTRY="docker.elastic.co"
-SETUP_GVM_VERSION="v0.5.1"
-DOCKER_COMPOSE_VERSION="1.21.0"
-DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
-SETUP_WIN_PYTHON_VERSION="3.11.0"
-NMAP_WIN_VERSION="7.12"           # Earlier versions of NMap provide WinPcap (the winpcap packages don't install nicely because they pop-up a UI)
-GO_VERSION=$(cat .go-version)
-ASDF_MAGE_VERSION="1.15.0"
-PACKAGING_PLATFORMS="+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-PACKAGING_ARM_PLATFORMS="linux/arm64"
-ASDF_TERRAFORM_VERSION="1.0.2"
-AWS_REGION="eu-central-1"
-NODEJS_VERSION="18.17.1"
-=======
 
 export REPO="beats"
 export DOCKER_REGISTRY="docker.elastic.co"
@@ -30,7 +9,6 @@ export DOCKER_COMPOSE_VERSION="1.21.0"
 export DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
 export ASDF_NODEJS_VERSION="18.17.1"
 export AWS_REGION="eu-central-1"
->>>>>>> 80dab50f0c (replace default images (#38583))
 
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
 export WORKSPACE
