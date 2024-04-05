@@ -61,7 +61,7 @@ steps:
 
   - label: ":linux: Load dynamic filebeat pipeline"
     key: "filebeat-pipeline"
-    command: ".buildkite/scripts/generate_filebeat_pipeline.sh"
+    command: ".buildkite/filebeat/generate_filebeat_pipeline.sh"
     notify:
       - github_commit_status:
           context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
