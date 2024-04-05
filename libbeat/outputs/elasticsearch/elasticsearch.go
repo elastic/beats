@@ -23,7 +23,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/outputs/outil"
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -47,7 +46,7 @@ func makeES(
 		}
 	}
 
-	index, pipeline, err := buildSelectors(im, beatInfo, cfg)
+	indexSelector, pipelineSelector, err := buildSelectors(im, beatInfo, cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -95,13 +94,8 @@ func makeES(
 		params = nil
 	}
 
-	encoderFactory := func() queue.Encoder {
-		return newEventEncoder(
-			esConfig.EscapeHTML,
-			index,
-			pipeline,
-		)
-	}
+	encoderFactory := newEventEncoderFactory(
+		esConfig.EscapeHTML, indexSelector, pipelineSelector)
 
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, host := range hosts {
@@ -128,8 +122,8 @@ func makeES(
 				Transport:        esConfig.Transport,
 				IdleConnTimeout:  esConfig.Transport.IdleConnTimeout,
 			},
-			indexSelector:    index,
-			pipelineSelector: pipeline,
+			indexSelector:    indexSelector,
+			pipelineSelector: pipelineSelector,
 			observer:         observer,
 			deadLetterIndex:  deadLetterIndex,
 		}, &connectCallbackRegistry)

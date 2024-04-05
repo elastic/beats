@@ -61,6 +61,16 @@ type encodedEvent struct {
 	encoding []byte
 }
 
+func newEventEncoderFactory(
+	escapeHTML bool,
+	indexSelector outputs.IndexSelector,
+	pipelineSelector *outil.Selector,
+) queue.EncoderFactory {
+	return func() queue.Encoder {
+		return newEventEncoder(escapeHTML, indexSelector, pipelineSelector)
+	}
+}
+
 func newEventEncoder(escapeHTML bool,
 	indexSelector outputs.IndexSelector,
 	pipelineSelector *outil.Selector,
