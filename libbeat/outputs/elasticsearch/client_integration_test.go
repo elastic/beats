@@ -87,13 +87,13 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 	// drop old index preparing test
 	client.conn.Delete(index, "", "", nil)
 
-	batch := outest.NewBatch(beat.Event{
+	batch := encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"type":    "libbeat",
 			"message": "Test message from libbeat",
 		},
-	})
+	}))
 
 	err := output.Publish(context.Background(), batch)
 	if err != nil {
@@ -139,7 +139,8 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	}
 
 	publish := func(event beat.Event) {
-		err := output.Publish(context.Background(), outest.NewBatch(event))
+		batch := encodeBatch(outest.NewBatch(event))
+		err := output.Publish(context.Background(), batch)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -220,7 +221,7 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 	client.conn.Delete(index, "", "", nil)
 	client.conn.Delete(deadletterIndex, "", "", nil)
 
-	err := output.Publish(context.Background(), outest.NewBatch(beat.Event{
+	batch := encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"type":      "libbeat",
@@ -228,18 +229,19 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 			"testfield": 0,
 		},
 	}))
+	err := output.Publish(context.Background(), batch)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	batch := outest.NewBatch(beat.Event{
+	batch = encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"type":      "libbeat",
 			"message":   "Test message 2",
 			"testfield": "foo0",
 		},
-	})
+	}))
 	err = output.Publish(context.Background(), batch)
 	if err == nil {
 		t.Fatal("Expecting mapping conflict")
@@ -284,7 +286,8 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	}
 
 	publish := func(events ...beat.Event) {
-		err := output.Publish(context.Background(), outest.NewBatch(events...))
+		batch := encodeBatch(client, outest.NewBatch(events...))
+		err := output.Publish(context.Background(), batch)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -356,12 +359,12 @@ func TestClientPublishTracer(t *testing.T) {
 
 	client.conn.Delete(index, "", "", nil)
 
-	batch := outest.NewBatch(beat.Event{
+	batch := encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
 			"message": "Hello world",
 		},
-	})
+	}))
 
 	tx, spans, _ := apmtest.WithTransaction(func(ctx context.Context) {
 		err := output.Publish(ctx, batch)
