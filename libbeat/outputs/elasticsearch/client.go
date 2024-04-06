@@ -179,6 +179,13 @@ func (client *Client) Clone() *Client {
 
 func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error {
 	events := batch.Events()
+	for _, event := range events {
+		if event.EncodedEvent == nil {
+			// This panic will be removed, this is here temporarily to flush out
+			// the remaining integration tests that pass through unencoded events
+			panic("Elasticsearch client received Publish with an unencoded event")
+		}
+	}
 	rest, err := client.publishEvents(ctx, events)
 
 	switch {
