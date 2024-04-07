@@ -43,8 +43,8 @@ const (
 	regionName    = "us-east-1"
 	dateLayout    = "2006-01-02"
 
-	defaultGroupByPrimaryType   = costexplorertypes.GroupDefinitionTypeDimension
-	defaultGroupBySecondaryType = costexplorertypes.GroupDefinitionTypeTag
+	defaultGroupByPrimaryType   = string(costexplorertypes.GroupDefinitionTypeDimension)
+	defaultGroupBySecondaryType = string(costexplorertypes.GroupDefinitionTypeTag)
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -69,10 +69,10 @@ type MetricSet struct {
 
 // CostExplorerConfig holds a configuration specific for billing metricset.
 type CostExplorerConfig struct {
-	GroupByPrimaryKeys   []string                              `config:"group_by_dimension_keys"`
-	GroupByPrimaryType   costexplorertypes.GroupDefinitionType `config:"group_by_primary_type"`
-	GroupBySecondaryKeys []string                              `config:"group_by_tag_keys"`
-	GroupBySecondaryType costexplorertypes.GroupDefinitionType `config:"group_by_secondary_type"`
+	GroupByPrimaryKeys   []string `config:"group_by_dimension_keys"`
+	GroupByPrimaryType   string   `config:"group_by_primary_type"`
+	GroupBySecondaryKeys []string `config:"group_by_tag_keys"`
+	GroupBySecondaryType string   `config:"group_by_secondary_type"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -113,17 +113,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Validate checks if given config is supported.
 func (c CostExplorerConfig) Validate() error {
 	// validate primary group by type
-	if supported, err := validateGroupByType(c.GroupByPrimaryType); !supported {
+	if supported, err := validateGroupByType(costexplorertypes.GroupDefinitionType(c.GroupByPrimaryType)); !supported {
 		return err
 	}
 
 	// validate secondary group by type
-	if supported, err := validateGroupByType(c.GroupBySecondaryType); !supported {
+	if supported, err := validateGroupByType(costexplorertypes.GroupDefinitionType(c.GroupBySecondaryType)); !supported {
 		return err
 	}
 
 	// validate dimension keys for primary if group by type is dimension
-	if c.GroupByPrimaryType == costexplorertypes.GroupDefinitionTypeDimension {
+	if costexplorertypes.GroupDefinitionType(c.GroupByPrimaryType) == costexplorertypes.GroupDefinitionTypeDimension {
 		for _, key := range c.GroupByPrimaryKeys {
 			supported, err := validateDimensionKey(key)
 			if !supported {
@@ -133,7 +133,7 @@ func (c CostExplorerConfig) Validate() error {
 	}
 
 	// validate dimension keys for secondary if group by type is dimension
-	if c.GroupBySecondaryType == costexplorertypes.GroupDefinitionTypeDimension {
+	if costexplorertypes.GroupDefinitionType(c.GroupBySecondaryType) == costexplorertypes.GroupDefinitionTypeDimension {
 		for _, key := range c.GroupBySecondaryKeys {
 			supported, err := validateDimensionKey(key)
 			if !supported {
@@ -213,7 +213,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	events = append(events, eventsCW...)
 
 	// Get total cost from Cost Explorer GetCostAndUsage with group by type "DIMENSION" and "TAG"
-	eventsCE := m.getCostGroupBy(svcCostExplorer, m.CostExplorerConfig.GroupByPrimaryType, m.CostExplorerConfig.GroupByPrimaryKeys, m.CostExplorerConfig.GroupBySecondaryType, m.CostExplorerConfig.GroupBySecondaryKeys, timePeriod, startDate, endDate)
+	eventsCE := m.getCostGroupBy(svcCostExplorer, costexplorertypes.GroupDefinitionType(m.CostExplorerConfig.GroupByPrimaryType), m.CostExplorerConfig.GroupByPrimaryKeys, costexplorertypes.GroupDefinitionType(m.CostExplorerConfig.GroupBySecondaryType), m.CostExplorerConfig.GroupBySecondaryKeys, timePeriod, startDate, endDate)
 	events = append(events, eventsCE...)
 
 	// report events
