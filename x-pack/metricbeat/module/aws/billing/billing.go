@@ -28,20 +28,13 @@ import (
 )
 
 var (
+	supportedDimensionKeys = costexplorertypes.Dimension("").Values()
+)
+
+const (
 	metricsetName = "billing"
 	regionName    = "us-east-1"
-
-	// This list is from https://github.com/aws/aws-sdk-go-v2/blob/master/service/costexplorer/api_enums.go#L60-L90
-	supportedDimensionKeys = []string{
-		"AZ", "INSTANCE_TYPE", "LINKED_ACCOUNT", "OPERATION", "PURCHASE_TYPE",
-		"REGION", "SERVICE", "USAGE_TYPE", "USAGE_TYPE_GROUP", "RECORD_TYPE",
-		"OPERATING_SYSTEM", "TENANCY", "SCOPE", "PLATFORM", "SUBSCRIPTION_ID",
-		"LEGAL_ENTITY_NAME", "DEPLOYMENT_OPTION", "DATABASE_ENGINE",
-		"CACHE_ENGINE", "INSTANCE_TYPE_FAMILY", "BILLING_ENTITY",
-		"RESERVATION_ID",
-	}
-
-	dateLayout = "2006-01-02"
+	dateLayout    = "2006-01-02"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -100,12 +93,22 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Validate checks if given dimension keys are supported.
 func (c CostExplorerConfig) Validate() error {
 	for _, key := range c.GroupByDimensionKeys {
-		supported, _ := aws.StringInSlice(key, supportedDimensionKeys)
+		supported := validateDimensionKey(key)
 		if !supported {
 			return fmt.Errorf("costexplorer GetCostAndUsageRequest does not support dimension key: %s", key)
 		}
 	}
 	return nil
+}
+
+// validateDimensionKey checks if a string value for dimension key is a supported value.
+func validateDimensionKey(dimensionKey string) bool {
+	for _, key := range supportedDimensionKeys {
+		if costexplorertypes.Dimension(dimensionKey) == key {
+			return true
+		}
+	}
+	return false
 }
 
 // Fetch methods implements the data gathering and data conversion to the right
