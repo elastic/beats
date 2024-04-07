@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 :stack-version: 8.13.1
 :doc-branch: 8.13
 :go-version: 1.21.9
