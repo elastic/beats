@@ -277,7 +277,7 @@ func (m *MetricSet) getCloudWatchBillingMetrics(
 	return events
 }
 
-func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupByPrimaryType costexplorertypes.GroupDefinitionType, groupByDimKeys []string, groupBySecondaryType costexplorertypes.GroupDefinitionType, groupByTags []string, timePeriod costexplorertypes.DateInterval, startDate string, endDate string) []mb.Event {
+func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupByPrimaryType costexplorertypes.GroupDefinitionType, groupByPrimaryKeys []string, groupBySecondaryType costexplorertypes.GroupDefinitionType, groupBySecondaryKeys []string, timePeriod costexplorertypes.DateInterval, startDate string, endDate string) []mb.Event {
 	var events []mb.Event
 
 	// get linked account IDs and names
@@ -287,7 +287,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 	if err != nil {
 		return nil
 	}
-	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", groupByDimKeys); ok {
+	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", groupByPrimaryKeys); ok {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 
 		svcOrg := organizations.NewFromConfig(awsConfig, func(o *organizations.Options) {
@@ -298,7 +298,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 		accounts = m.getAccountName(svcOrg)
 	}
 
-	groupBys := getGroupBys(groupByTags, groupByDimKeys)
+	groupBys := getGroupBys(groupBySecondaryKeys, groupByPrimaryKeys)
 	for _, groupBy := range groupBys {
 		var groupDefs []costexplorertypes.GroupDefinition
 
