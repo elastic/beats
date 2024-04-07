@@ -287,7 +287,8 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 	if err != nil {
 		return nil
 	}
-	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", groupByPrimaryKeys); ok {
+
+	if ok, _ := aws.StringInSlice("LINKED_ACCOUNT", append(groupByPrimaryKeys, groupBySecondaryKeys...)); ok {
 		awsConfig := m.MetricSet.AwsConfig.Copy()
 
 		svcOrg := organizations.NewFromConfig(awsConfig, func(o *organizations.Options) {
@@ -344,7 +345,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 					eventID += key
 
 					// primary linked account dimension processing
-					if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeDimension {
+					if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeDimension && !strings.Contains(key, "$") {
 						_, _ = event.MetricSetFields.Put("group_by."+groupBy.primary, key)
 						if groupBy.primary == "LINKED_ACCOUNT" {
 							if name, ok := accounts[key]; ok {
@@ -356,7 +357,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 					}
 
 					// secondary linked account dimension processing
-					if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeDimension {
+					if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeDimension && !strings.Contains(key, "$") {
 						_, _ = event.MetricSetFields.Put("group_by."+groupBy.secondary, key)
 						if groupBy.secondary == "LINKED_ACCOUNT" {
 							if name, ok := accounts[key]; ok {
@@ -367,7 +368,15 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 						continue
 					}
 
-					if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeTag || groupBySecondaryType == costexplorertypes.GroupDefinitionTypeTag {
+					if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeTag {
+						// tag key value is separated by $
+						tagKey, tagValue := parseGroupKey(key)
+						if tagValue != "" {
+							_, _ = event.MetricSetFields.Put("group_by."+tagKey, tagValue)
+						}
+					}
+
+					if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeTag {
 						// tag key value is separated by $
 						tagKey, tagValue := parseGroupKey(key)
 						if tagValue != "" {
