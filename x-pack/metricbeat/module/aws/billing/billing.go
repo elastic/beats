@@ -104,7 +104,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		config.CostExplorerConfig.GroupBySecondaryKeys = config.CostExplorerConfig.GroupByTagKeys
 	}
 
-	// handle setting default group by types
+	// handle setting default group_by types
 	if config.CostExplorerConfig.GroupByPrimaryType == "" {
 		config.CostExplorerConfig.GroupByPrimaryType = defaultGroupByPrimaryType
 	}
@@ -123,17 +123,17 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 
 // Validate checks if given config is supported.
 func (c CostExplorerConfig) Validate() error {
-	// validate primary group by type
+	// validate primary group_by type
 	if supported, err := validateGroupByType(costexplorertypes.GroupDefinitionType(c.GroupByPrimaryType)); !supported {
 		return err
 	}
 
-	// validate secondary group by type
+	// validate secondary group_by type
 	if supported, err := validateGroupByType(costexplorertypes.GroupDefinitionType(c.GroupBySecondaryType)); !supported {
 		return err
 	}
 
-	// validate dimension keys for primary if group by type is dimension
+	// validate dimension keys for primary if group_by type is dimension
 	if costexplorertypes.GroupDefinitionType(c.GroupByPrimaryType) == costexplorertypes.GroupDefinitionTypeDimension {
 		for _, key := range c.GroupByPrimaryKeys {
 			supported, err := validateDimensionKey(key)
@@ -143,7 +143,7 @@ func (c CostExplorerConfig) Validate() error {
 		}
 	}
 
-	// validate dimension keys for secondary if group by type is dimension
+	// validate dimension keys for secondary if group_by type is dimension
 	if costexplorertypes.GroupDefinitionType(c.GroupBySecondaryType) == costexplorertypes.GroupDefinitionTypeDimension {
 		for _, key := range c.GroupBySecondaryKeys {
 			supported, err := validateDimensionKey(key)
@@ -156,7 +156,7 @@ func (c CostExplorerConfig) Validate() error {
 	return nil
 }
 
-// validateGroupByType checks if a string value for group by type is a supported value.
+// validateGroupByType checks if a string value for group_by type is a supported value.
 func validateGroupByType(groupByType costexplorertypes.GroupDefinitionType) (bool, error) {
 	// handle setting a default value in New() call
 	if string(groupByType) == "" {
@@ -168,7 +168,7 @@ func validateGroupByType(groupByType costexplorertypes.GroupDefinitionType) (boo
 		}
 	}
 
-	return false, fmt.Errorf("costexplorer GetCostAndUsageRequest or metricbeat module does not support group by type: %s", groupByType)
+	return false, fmt.Errorf("costexplorer GetCostAndUsageRequest or metricbeat module does not support group_by type: %s", groupByType)
 }
 
 // validateDimensionKey checks if a string value for dimension key is a supported value.
@@ -223,7 +223,7 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 	eventsCW := m.getCloudWatchBillingMetrics(svcCloudwatch, startTime, endTime)
 	events = append(events, eventsCW...)
 
-	// Get total cost from Cost Explorer GetCostAndUsage with group by type "DIMENSION" and "TAG"
+	// Get total cost from Cost Explorer GetCostAndUsage with group_by type "DIMENSION" and "TAG"
 	eventsCE := m.getCostGroupBy(svcCostExplorer, costexplorertypes.GroupDefinitionType(m.CostExplorerConfig.GroupByPrimaryType), m.CostExplorerConfig.GroupByPrimaryKeys, costexplorertypes.GroupDefinitionType(m.CostExplorerConfig.GroupBySecondaryType), m.CostExplorerConfig.GroupBySecondaryKeys, timePeriod, startDate, endDate)
 	events = append(events, eventsCE...)
 
@@ -355,7 +355,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 				for index, key := range group.Keys {
 					eventID += key
 
-					// index 0 is the key for the primary group by
+					// index 0 is the key for the primary group_by
 					if index == 0 {
 						if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeDimension {
 							_, _ = event.MetricSetFields.Put("group_by."+groupBy.primary, key)
@@ -377,7 +377,7 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 						continue
 					}
 
-					// index 1 is the key for the secondary group by
+					// index 1 is the key for the secondary group_by
 					if index == 1 {
 						if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeDimension {
 							_, _ = event.MetricSetFields.Put("group_by."+groupBy.secondary, key)

@@ -41,12 +41,12 @@ func TestValidateGroupByType(t *testing.T) {
 		{
 			costexplorertypes.GroupDefinitionTypeCostCategory,
 			false,
-			errors.New(fmt.Sprintf("costexplorer GetCostAndUsageRequest or metricbeat module does not support group by type: %s", costexplorertypes.GroupDefinitionTypeCostCategory)),
+			errors.New(fmt.Sprintf("costexplorer GetCostAndUsageRequest or metricbeat module does not support group_by type: %s", costexplorertypes.GroupDefinitionTypeCostCategory)),
 		},
 		{
 			"INVALID_TYPE",
 			false,
-			errors.New("costexplorer GetCostAndUsageRequest or metricbeat module does not support group by type: INVALID_TYPE"),
+			errors.New("costexplorer GetCostAndUsageRequest or metricbeat module does not support group_by type: INVALID_TYPE"),
 		},
 	}
 
