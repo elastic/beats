@@ -359,6 +359,13 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 					if index == 0 {
 						if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeDimension {
 							_, _ = event.MetricSetFields.Put("group_by."+groupBy.primary, key)
+
+							if groupBy.primary == "LINKED_ACCOUNT" {
+								if name, ok := accounts[key]; ok {
+									_, _ = event.RootFields.Put("aws.linked_account.id", key)
+									_, _ = event.RootFields.Put("aws.linked_account.name", name)
+								}
+							}
 						}
 						if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeTag {
 							// tag key value is separated by $
@@ -374,6 +381,13 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 					if index == 1 {
 						if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeDimension {
 							_, _ = event.MetricSetFields.Put("group_by."+groupBy.secondary, key)
+
+							if groupBy.secondary == "LINKED_ACCOUNT" {
+								if name, ok := accounts[key]; ok {
+									_, _ = event.RootFields.Put("aws.linked_account.id", key)
+									_, _ = event.RootFields.Put("aws.linked_account.name", name)
+								}
+							}
 						}
 						if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeTag {
 							// tag key value is separated by $
@@ -390,13 +404,6 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 					if index > 1 {
 						m.Logger().Errorf("unexpected additional index %d, with key %s, while process metrics", index, key)
 						continue
-					}
-
-					if groupBy.primary == "LINKED_ACCOUNT" || groupBy.secondary == "LINKED_ACCOUNT" {
-						if name, ok := accounts[key]; ok {
-							_, _ = event.RootFields.Put("aws.linked_account.id", key)
-							_, _ = event.RootFields.Put("aws.linked_account.name", name)
-						}
 					}
 				}
 
