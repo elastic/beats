@@ -221,6 +221,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add linux IO metrics to system/process {pull}37213[37213]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 - Add SSL support to mysql module {pull}37997[37997]
+- Add AWS Billing configurable Group By types {issue}34193[34193] {pull}1[1]
 
 
 *Metricbeat*
