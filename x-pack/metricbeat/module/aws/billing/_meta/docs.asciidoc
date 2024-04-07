@@ -35,21 +35,22 @@ image::./images/metricbeat-aws-billing-overview.png[]
     - billing
   credential_profile_name: elastic-beats
   cost_explorer_config:
-    group_by_dimension_keys:
+    group_by_primary_keys:
       - "AZ"
       - "INSTANCE_TYPE"
       - "SERVICE"
-    group_by_tag_keys:
+    group_by_secondary_keys:
       - "aws:createdBy"
 ----
 
 [float]
 === Metricset-specific configuration notes
 When querying AWS Cost Explorer API, you can group AWS costs using up to two
-different groups, either dimensions, tag keys, or both. Right now we support
-group by type dimension and type tag with separate config parameters:
+different groups, either dimensions (`DIMENSION`), tags (`TAG`), or both. Currently the following configuration options are available:
 
-* *group_by_dimension_keys*: A list of keys used in Cost Explorer to group by
-dimensions. Valid values are AZ, INSTANCE_TYPE, LINKED_ACCOUNT, OPERATION, PURCHASE_TYPE, REGION, SERVICE, USAGE_TYPE, USAGE_TYPE_GROUP, RECORD_TYPE, OPERATING_SYSTEM, TENANCY, SCOPE, PLATFORM, SUBSCRIPTION_ID, LEGAL_ENTITY_NAME, DEPLOYMENT_OPTION, DATABASE_ENGINE, CACHE_ENGINE, INSTANCE_TYPE_FAMILY, BILLING_ENTITY and RESERVATION_ID.
+* *group_by_primary_type* The type of group for the primary keys, supports either `DIMENSION` or `TAG`. Default `DIMENSION`.
+* *group_by_primary_keys* A list of keys used in Cost Explorer to group by. It can either by a list of dimension values or a list of tags, but needs to match the type set by *group_by_primary_type*.
+* *group_by_secondary_type* The type of group for the secondary keys, supports either `DIMENSION` or `TAG`. Default `DIMENSION`.
+* *group_by_secondary_keys* A list of keys used in Cost Explorer to group by. It can either by a list of dimension values or a list of tags, but needs to match the type set by *group_by_secondary_type*.
 
-* *group_by_tag_keys*: A list of keys used in Cost Explorer to group by tags.
+Currently supported values for `DIMENSION` keys are: AZ, INSTANCE_TYPE, LINKED_ACCOUNT, OPERATION, PURCHASE_TYPE, SERVICE, USAGE_TYPE, PLATFORM, TENANCY, RECORD_TYPE, LEGAL_ENTITY_NAME, INVOICING_ENTITY, DEPLOYMENT_OPTION, DATABASE_ENGINE, CACHE_ENGINE, INSTANCE_TYPE_FAMILY, REGION, BILLING_ENTITY, RESERVATION_ID, SAVINGS_PLANS_TYPE, SAVINGS_PLAN_ARN, OPERATING_SYSTEM
