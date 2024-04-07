@@ -341,32 +341,51 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 
 				// generate unique event ID for each event
 				eventID := startDate + endDate + *groupByOutput.GroupDefinitions[0].Key + string(groupByOutput.GroupDefinitions[0].Type)
-				for _, key := range group.Keys {
+				for index, key := range group.Keys {
 					eventID += key
 
-					if !strings.Contains(key, "$") {
+					// index 0 is the key for the primary group by
+					if index == 0 {
 						if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeDimension {
 							_, _ = event.MetricSetFields.Put("group_by."+groupBy.primary, key)
 						}
-						if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeDimension {
-							_, _ = event.MetricSetFields.Put("group_by."+groupBy.secondary, key)
-						}
-						if groupBy.primary == "LINKED_ACCOUNT" || groupBy.secondary == "LINKED_ACCOUNT" {
-							if name, ok := accounts[key]; ok {
-								_, _ = event.RootFields.Put("aws.linked_account.id", key)
-								_, _ = event.RootFields.Put("aws.linked_account.name", name)
+						if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeTag {
+							// tag key value is separated by $
+							tagKey, tagValue := parseGroupKey(key)
+							if tagValue != "" {
+								_, _ = event.MetricSetFields.Put("group_by."+tagKey, tagValue)
 							}
 						}
 						continue
 					}
 
-					if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeTag || groupBySecondaryType == costexplorertypes.GroupDefinitionTypeTag {
-						// tag key value is separated by $
-						tagKey, tagValue := parseGroupKey(key)
-						if tagValue != "" {
-							_, _ = event.MetricSetFields.Put("group_by."+tagKey, tagValue)
+					// index 1 is the key for the secondary group by
+					if index == 1 {
+						if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeDimension {
+							_, _ = event.MetricSetFields.Put("group_by."+groupBy.secondary, key)
+						}
+						if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeTag {
+							// tag key value is separated by $
+							tagKey, tagValue := parseGroupKey(key)
+							if tagValue != "" {
+								_, _ = event.MetricSetFields.Put("group_by."+tagKey, tagValue)
+							}
 						}
 						continue
+					}
+
+					// there should be no more than 2 keys per metric
+					// this is a safety mechanism to track issues
+					if index > 1 {
+						m.Logger().Errorf("unexpected additional index %d, with key %s, while process metrics", index, key)
+						continue
+					}
+
+					if groupBy.primary == "LINKED_ACCOUNT" || groupBy.secondary == "LINKED_ACCOUNT" {
+						if name, ok := accounts[key]; ok {
+							_, _ = event.RootFields.Put("aws.linked_account.id", key)
+							_, _ = event.RootFields.Put("aws.linked_account.name", name)
+						}
 					}
 				}
 
