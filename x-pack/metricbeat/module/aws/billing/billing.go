@@ -42,6 +42,9 @@ const (
 	metricsetName = "billing"
 	regionName    = "us-east-1"
 	dateLayout    = "2006-01-02"
+
+	defaultGroupByPrimaryType   = costexplorertypes.GroupDefinitionTypeDimension
+	defaultGroupBySecondaryType = costexplorertypes.GroupDefinitionTypeTag
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -67,9 +70,9 @@ type MetricSet struct {
 // CostExplorerConfig holds a configuration specific for billing metricset.
 type CostExplorerConfig struct {
 	GroupByPrimaryKeys   []string                              `config:"group_by_dimension_keys" config:"group_by_primary_keys"`
-	GroupByPrimaryType   costexplorertypes.GroupDefinitionType `config:"group_by_primary_type" default:"DIMENSION"`
+	GroupByPrimaryType   costexplorertypes.GroupDefinitionType `config:"group_by_primary_type"`
 	GroupBySecondaryKeys []string                              `config:"group_by_tag_keys" config:"group_by_secondary_keys"`
-	GroupBySecondaryType costexplorertypes.GroupDefinitionType `config:"group_by_secondary_type" default:"TAG"`
+	GroupBySecondaryType costexplorertypes.GroupDefinitionType `config:"group_by_secondary_type"`
 }
 
 // New creates a new instance of the MetricSet. New is responsible for unpacking
@@ -91,6 +94,14 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	logger.Debugf("cost explorer config = %s", config)
+
+	if config.CostExplorerConfig.GroupByPrimaryType == "" {
+		config.CostExplorerConfig.GroupByPrimaryType = defaultGroupByPrimaryType
+	}
+
+	if config.CostExplorerConfig.GroupBySecondaryType == "" {
+		config.CostExplorerConfig.GroupBySecondaryType = defaultGroupBySecondaryType
+	}
 
 	return &MetricSet{
 		MetricSet:          metricSet,
@@ -136,6 +147,10 @@ func (c CostExplorerConfig) Validate() error {
 
 // validateGroupByType checks if a string value for group by type is a supported value.
 func validateGroupByType(groupByType costexplorertypes.GroupDefinitionType) (bool, error) {
+	// handle setting a default value in New() call
+	if string(groupByType) == "" {
+		return true, nil
+	}
 	for _, key := range supportedGroupByTypes {
 		if groupByType == key {
 			return true, nil
