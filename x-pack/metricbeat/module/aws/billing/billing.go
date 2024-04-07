@@ -69,7 +69,10 @@ type MetricSet struct {
 
 // CostExplorerConfig holds a configuration specific for billing metricset.
 type CostExplorerConfig struct {
-	GroupByPrimaryKeys   []string `config:"group_by_dimension_keys"`
+	GroupByDimensionKeys []string `config:"group_by_dimension_keys"` // deprecated
+	GroupByTagKeys       []string `config:"group_by_tag_keys"`       // deprecated
+
+	GroupByPrimaryKeys   []string `config:"group_by_primary_keys"`
 	GroupByPrimaryType   string   `config:"group_by_primary_type"`
 	GroupBySecondaryKeys []string `config:"group_by_tag_keys"`
 	GroupBySecondaryType string   `config:"group_by_secondary_type"`
@@ -93,15 +96,23 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		return nil, fmt.Errorf("error unpack raw module config using UnpackConfig: %w", err)
 	}
 
-	logger.Debugf("cost explorer config = %s", config)
+	// handle bwc with old config
+	if len(config.CostExplorerConfig.GroupByPrimaryKeys) == 0 && len(config.CostExplorerConfig.GroupByDimensionKeys) > 0 {
+		config.CostExplorerConfig.GroupByPrimaryKeys = config.CostExplorerConfig.GroupByDimensionKeys
+	}
+	if len(config.CostExplorerConfig.GroupBySecondaryKeys) == 0 && len(config.CostExplorerConfig.GroupByTagKeys) > 0 {
+		config.CostExplorerConfig.GroupBySecondaryKeys = config.CostExplorerConfig.GroupByTagKeys
+	}
 
+	// handle setting default group by types
 	if config.CostExplorerConfig.GroupByPrimaryType == "" {
 		config.CostExplorerConfig.GroupByPrimaryType = defaultGroupByPrimaryType
 	}
-
 	if config.CostExplorerConfig.GroupBySecondaryType == "" {
 		config.CostExplorerConfig.GroupBySecondaryType = defaultGroupBySecondaryType
 	}
+
+	logger.Debugf("cost explorer config = %s", config)
 
 	return &MetricSet{
 		MetricSet:          metricSet,
