@@ -130,10 +130,10 @@ func TestParseGroupKey(t *testing.T) {
 
 func TestGetGroupBys(t *testing.T) {
 	cases := []struct {
-		title            string
-		groupByTags      []string
-		groupByDimKeys   []string
-		expectedGroupBys []groupBy
+		title                string
+		groupBySecondaryKeys []string
+		groupByPrimaryKeys   []string
+		expectedGroupBys     []groupBy
 	}{
 		{
 			"test with both tags and dimKeys",
@@ -161,11 +161,19 @@ func TestGetGroupBys(t *testing.T) {
 				{"createdBy", ""},
 			},
 		},
+		{
+			"test with double dims",
+			[]string{"INSTANCE_TYPE"},
+			[]string{"AZ"},
+			[]groupBy{
+				{"INSTANCE_TYPE", "AZ"},
+			},
+		},
 	}
 
 	for _, c := range cases {
 		t.Run(c.title, func(t *testing.T) {
-			groupBys := getGroupBys(c.groupByTags, c.groupByDimKeys)
+			groupBys := getGroupBys(c.groupBySecondaryKeys, c.groupByPrimaryKeys)
 			assert.Equal(t, c.expectedGroupBys, groupBys)
 		})
 	}
