@@ -74,7 +74,7 @@ type CostExplorerConfig struct {
 
 	GroupByPrimaryKeys   []string `config:"group_by_primary_keys"`
 	GroupByPrimaryType   string   `config:"group_by_primary_type"`
-	GroupBySecondaryKeys []string `config:"group_by_tag_keys"`
+	GroupBySecondaryKeys []string `config:"group_by_secondary_keys"`
 	GroupBySecondaryType string   `config:"group_by_secondary_type"`
 }
 
