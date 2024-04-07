@@ -30,6 +30,7 @@ import (
 )
 
 func TestFetch(t *testing.T) {
+	t.Skip("Skipping due to flakiness, see 'https://github.com/elastic/beats/issues/38569'")
 	service := compose.EnsureUp(t, "nginx")
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
@@ -47,6 +48,7 @@ func TestFetch(t *testing.T) {
 }
 
 func TestData(t *testing.T) {
+	t.Skip("Skipping due to flakiness, see 'https://github.com/elastic/beats/issues/38569'")
 	service := compose.EnsureUp(t, "nginx")
 
 	f := mbtest.NewReportingMetricSetV2Error(t, getConfig(service.Host()))
