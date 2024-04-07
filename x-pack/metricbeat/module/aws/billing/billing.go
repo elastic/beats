@@ -69,9 +69,9 @@ type MetricSet struct {
 
 // CostExplorerConfig holds a configuration specific for billing metricset.
 type CostExplorerConfig struct {
-	GroupByPrimaryKeys   []string                              `config:"group_by_dimension_keys" config:"group_by_primary_keys"`
+	GroupByPrimaryKeys   []string                              `config:"group_by_dimension_keys"`
 	GroupByPrimaryType   costexplorertypes.GroupDefinitionType `config:"group_by_primary_type"`
-	GroupBySecondaryKeys []string                              `config:"group_by_tag_keys" config:"group_by_secondary_keys"`
+	GroupBySecondaryKeys []string                              `config:"group_by_tag_keys"`
 	GroupBySecondaryType costexplorertypes.GroupDefinitionType `config:"group_by_secondary_type"`
 }
 
@@ -344,10 +344,14 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 				for _, key := range group.Keys {
 					eventID += key
 
-					// primary linked account dimension processing
-					if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeDimension && !strings.Contains(key, "$") {
-						_, _ = event.MetricSetFields.Put("group_by."+groupBy.primary, key)
-						if groupBy.primary == "LINKED_ACCOUNT" {
+					if !strings.Contains(key, "$") {
+						if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeDimension {
+							_, _ = event.MetricSetFields.Put("group_by."+groupBy.primary, key)
+						}
+						if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeDimension {
+							_, _ = event.MetricSetFields.Put("group_by."+groupBy.secondary, key)
+						}
+						if groupBy.primary == "LINKED_ACCOUNT" || groupBy.secondary == "LINKED_ACCOUNT" {
 							if name, ok := accounts[key]; ok {
 								_, _ = event.RootFields.Put("aws.linked_account.id", key)
 								_, _ = event.RootFields.Put("aws.linked_account.name", name)
@@ -356,32 +360,13 @@ func (m *MetricSet) getCostGroupBy(svcCostExplorer *costexplorer.Client, groupBy
 						continue
 					}
 
-					// secondary linked account dimension processing
-					if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeDimension && !strings.Contains(key, "$") {
-						_, _ = event.MetricSetFields.Put("group_by."+groupBy.secondary, key)
-						if groupBy.secondary == "LINKED_ACCOUNT" {
-							if name, ok := accounts[key]; ok {
-								_, _ = event.RootFields.Put("aws.linked_account.id", key)
-								_, _ = event.RootFields.Put("aws.linked_account.name", name)
-							}
+					if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeTag || groupBySecondaryType == costexplorertypes.GroupDefinitionTypeTag {
+						// tag key value is separated by $
+						tagKey, tagValue := parseGroupKey(key)
+						if tagValue != "" {
+							_, _ = event.MetricSetFields.Put("group_by."+tagKey, tagValue)
 						}
 						continue
-					}
-
-					if groupByPrimaryType == costexplorertypes.GroupDefinitionTypeTag {
-						// tag key value is separated by $
-						tagKey, tagValue := parseGroupKey(key)
-						if tagValue != "" {
-							_, _ = event.MetricSetFields.Put("group_by."+tagKey, tagValue)
-						}
-					}
-
-					if groupBySecondaryType == costexplorertypes.GroupDefinitionTypeTag {
-						// tag key value is separated by $
-						tagKey, tagValue := parseGroupKey(key)
-						if tagValue != "" {
-							_, _ = event.MetricSetFields.Put("group_by."+tagKey, tagValue)
-						}
 					}
 				}
 
