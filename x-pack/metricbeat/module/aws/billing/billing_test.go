@@ -7,6 +7,9 @@
 package billing
 
 import (
+	"errors"
+	"fmt"
+	costexplorertypes "github.com/aws/aws-sdk-go-v2/service/costexplorer/types"
 	"testing"
 	"time"
 
@@ -17,6 +20,70 @@ func TestGetStartDateEndDate(t *testing.T) {
 	startDate, endDate := getStartDateEndDate(time.Duration(24) * time.Hour)
 	assert.NotEmpty(t, startDate)
 	assert.NotEmpty(t, endDate)
+}
+
+func TestValidateGroupByType(t *testing.T) {
+	cases := []struct {
+		groupByType     costexplorertypes.GroupDefinitionType
+		expectedSupport bool
+		expectedErr     error
+	}{
+		{
+			costexplorertypes.GroupDefinitionTypeDimension,
+			true,
+			nil,
+		},
+		{
+			costexplorertypes.GroupDefinitionTypeTag,
+			true,
+			nil,
+		},
+		{
+			costexplorertypes.GroupDefinitionTypeCostCategory,
+			false,
+			errors.New(fmt.Sprintf("costexplorer GetCostAndUsageRequest or metricbeat module does not support group by type: %s", costexplorertypes.GroupDefinitionTypeCostCategory)),
+		},
+		{
+			"INVALID_TYPE",
+			false,
+			errors.New("costexplorer GetCostAndUsageRequest or metricbeat module does not support group by type: INVALID_TYPE"),
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(string(c.groupByType), func(t *testing.T) {
+			supported, err := validateGroupByType(c.groupByType)
+			assert.Equal(t, c.expectedSupport, supported)
+			assert.Equal(t, c.expectedErr, err)
+		})
+	}
+}
+
+func TestValidateDimensionKey(t *testing.T) {
+	cases := []struct {
+		dimensionKey    string
+		expectedSupport bool
+		expectedErr     error
+	}{
+		{
+			"INSTANCE_TYPE",
+			true,
+			nil,
+		},
+		{
+			"INVALID_DIMENSION",
+			false,
+			errors.New("costexplorer GetCostAndUsageRequest does not support dimension key: INVALID_DIMENSION"),
+		},
+	}
+
+	for _, c := range cases {
+		t.Run(c.dimensionKey, func(t *testing.T) {
+			supported, err := validateDimensionKey(c.dimensionKey)
+			assert.Equal(t, c.expectedSupport, supported)
+			assert.Equal(t, c.expectedErr, err)
+		})
+	}
 }
 
 func TestParseGroupKey(t *testing.T) {
