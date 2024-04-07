@@ -30,7 +30,7 @@ import (
 var (
 	supportedDimensionKeys = costexplorertypes.Dimension("").Values()
 
-	// this module doesn't currently support `COST_CATEGORY`, so we can use the default aws sdk list
+	// this module doesn't currently support `COST_CATEGORY`, so we can't use the default aws sdk list
 	// values from https://github.com/aws/aws-sdk-go-v2/blob/main/service/costexplorer/types/enums.go#L455-L470
 	supportedGroupByTypes = []costexplorertypes.GroupDefinitionType{
 		costexplorertypes.GroupDefinitionTypeDimension,
