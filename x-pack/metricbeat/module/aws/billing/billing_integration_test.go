@@ -73,7 +73,7 @@ func TestData(t *testing.T) {
 
 func addCostExplorerToConfig(config map[string]interface{}) map[string]interface{} {
 	costExplorerConfig := map[string]interface{}{}
-	costExplorerConfig["group_by_dimension_keys"] = []string{"AZ", "INSTANCE_TYPE", "LINKED_ACCOUNT"}
+	costExplorerConfig["group_by_primary_keys"] = []string{"AZ", "INSTANCE_TYPE", "LINKED_ACCOUNT"}
 	config["cost_explorer_config"] = costExplorerConfig
 	return config
 }
