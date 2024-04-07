@@ -50,7 +50,7 @@ different groups, either dimensions (`DIMENSION`), tags (`TAG`), or both. Curren
 
 * *group_by_primary_type* The type of group for the primary keys, supports either `DIMENSION` or `TAG`. Default `DIMENSION`.
 * *group_by_primary_keys* A list of keys used in Cost Explorer to group by. It can either by a list of dimension values or a list of tags, but needs to match the type set by *group_by_primary_type*.
-* *group_by_secondary_type* The type of group for the secondary keys, supports either `DIMENSION` or `TAG`. Default `DIMENSION`.
+* *group_by_secondary_type* The type of group for the secondary keys, supports either `DIMENSION` or `TAG`. Default `TAG`.
 * *group_by_secondary_keys* A list of keys used in Cost Explorer to group by. It can either by a list of dimension values or a list of tags, but needs to match the type set by *group_by_secondary_type*.
 
 Currently supported values for `DIMENSION` keys are: AZ, INSTANCE_TYPE, LINKED_ACCOUNT, OPERATION, PURCHASE_TYPE, SERVICE, USAGE_TYPE, PLATFORM, TENANCY, RECORD_TYPE, LEGAL_ENTITY_NAME, INVOICING_ENTITY, DEPLOYMENT_OPTION, DATABASE_ENGINE, CACHE_ENGINE, INSTANCE_TYPE_FAMILY, REGION, BILLING_ENTITY, RESERVATION_ID, SAVINGS_PLANS_TYPE, SAVINGS_PLAN_ARN, OPERATING_SYSTEM
