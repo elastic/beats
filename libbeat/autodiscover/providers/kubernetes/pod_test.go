@@ -2173,11 +2173,28 @@ func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
 			name:        "add_resource_metadata.namespace and add_resource_metadata.node enabled and hints disabled.",
 			msg:         "Watcher should not be nil.",
 		},
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata default and hints default.",
+			msg:         "Watcher should not be nil.",
+		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
 			config := conf.MustNewConfigFrom(&test.cfg)
+			c := defaultConfig()
+			err = config.Unpack(&c)
+			assert.NoError(t, err)
 
 			eventer, err := NewPodEventer(uuid, config, client, nil)
 			if err != nil {

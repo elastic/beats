@@ -494,6 +494,20 @@ func TestServiceEventer_NamespaceWatcher(t *testing.T) {
 			name:        "add_resource_metadata.namespace enabled and hints disabled.",
 			msg:         "Namespace watcher should not be nil.",
 		},
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata default and hints default.",
+			msg:         "Watcher should not be nil.",
+		},
 	}
 
 	for _, test := range tests {
