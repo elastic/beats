@@ -118,7 +118,7 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization
 			// is not required.
-			EventNormalization: boolPtr(false),
+			EventNormalization: boolPtr(true),
 		},
 		CloseRef:      ctx.Cancelation,
 		EventListener: nil,
