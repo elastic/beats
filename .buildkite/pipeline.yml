@@ -3,5 +3,37 @@ env:
   ASDF_MAGE_VERSION: "1.15.0"
 
 steps:
-  - label: "Generate dynamic pipeline"
-    command: ".buildkite/scripts/pipeline_selector.sh"
+  - label: "Trigger Auditbeat"
+    branches: main
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only HEAD~1"
+          watch:
+            - path:
+                - auditbeat/
+                - .buildkite/auditbeat/
+              config:
+                trigger: "auditbeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                env:
+                  BUILDKITE_PULL_REQUEST: "${BUILDKITE_PULL_REQUEST}"
+                  GITHUB_PR_LABELS: "${GITHUB_PR_LABELS}"
+  - label: "Trigger Heartbeat"
+    branches: main
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only HEAD~1"
+          watch:
+            - path:
+                - heartbeat/
+                - .buildkite/heartbeat/
+              config:
+                trigger: "heartbeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    BUILDKITE_PULL_REQUEST: "${BUILDKITE_PULL_REQUEST}"
+                    GITHUB_PR_LABELS: "${GITHUB_PR_LABELS}"
