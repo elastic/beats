@@ -64,6 +64,7 @@ steps:
           fi
           .buildkite/x-pack/elastic-agent/scripts/steps/package.sh
           ls -lah x-pack/elastic-agent/build/distributions/
+          ls -lah x-pack/elastic-agent/build/distributions/elastic-agent-drop/
         artifact_paths:
           - "x-pack/elastic-agent/build/distributions/**/*"
         agents:
