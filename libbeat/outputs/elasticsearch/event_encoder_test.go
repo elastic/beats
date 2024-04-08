@@ -18,12 +18,12 @@
 package elasticsearch
 
 import (
+	"encoding/json"
 	"testing"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
-	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/stretchr/testify/assert"
@@ -38,12 +38,10 @@ func (testIndexSelector) Select(event *beat.Event) (string, error) {
 
 func TestEncodeEntry(t *testing.T) {
 	indexSelector := testIndexSelector{}
-	pipelineSelector := outil.MakeSelector(
-		outil.ConstSelectorExpr("testPipeline", outil.SelectorKeepCase))
 
-	encoder := newEventEncoder(true, indexSelector, &pipelineSelector)
+	encoder := newEventEncoder(true, indexSelector, nil)
 
-	timestamp := time.Date(1980, time.January, 1, 0, 0, 0, 0, time.FixedZone("UTC", 0))
+	timestamp := time.Date(1980, time.January, 1, 0, 0, 0, 0, time.UTC)
 	pubEvent := publisher.Event{
 		Content: beat.Event{
 			Timestamp: timestamp,
@@ -55,13 +53,12 @@ func TestEncodeEntry(t *testing.T) {
 				},
 			},
 			Meta: mapstr.M{
-				events.FieldMetaOpType: "create",
+				events.FieldMetaOpType:   "create",
+				events.FieldMetaPipeline: "TEST_PIPELINE",
+				events.FieldMetaID:       "test_id",
 			},
 		},
 	}
-	pipeline, err := pipelineSelector.Select(&pubEvent.Content)
-	require.NoError(t, err)
-	require.Equal(t, "testPipeline", pipeline)
 
 	encoded, encodedSize := encoder.EncodeEntry(pubEvent)
 	encPubEvent, ok := encoded.(publisher.Event)
@@ -76,11 +73,29 @@ func TestEncodeEntry(t *testing.T) {
 	require.True(t, ok, "EncodeEntry should set EncodedEvent to a *encodedEvent")
 	require.Equal(t, len(encBeatEvent.encoding), encodedSize, "Reported size should match encoded buffer")
 
+	// Check event metadata
+	assert.Equal(t, "test_id", encBeatEvent.id, "Event id should match original metadata")
 	assert.Equal(t, "test", encBeatEvent.index, "Event should have the index set by its selector")
-	assert.Equal(t, "testPipeline", encBeatEvent.pipeline, "Event should have the pipeline set by its selector")
+	assert.Equal(t, "test_pipeline", encBeatEvent.pipeline, "Event pipeline should match original metadata")
 	assert.Equal(t, timestamp, encBeatEvent.timestamp, "encodedEvent.timestamp should match the original event")
 	assert.Equal(t, events.OpTypeCreate, encBeatEvent.opType, "encoded opType should match the original metadata")
-	// encBeatEvent.opType)
+	assert.False(t, encBeatEvent.deadLetter, "encoded event shouldn't have deadLetter flag set")
+
+	// Check encoded fields
+	var eventContent struct {
+		Timestamp   time.Time `json:"@timestamp"`
+		TestField   string    `json:"test_field"`
+		NumberField int       `json:"number_field"`
+		Nested      struct {
+			NestedField string `json:"nested_field"`
+		} `json:"nested"`
+	}
+	err := json.Unmarshal(encBeatEvent.encoding, &eventContent)
+	require.NoError(t, err, "encoding should contain valid json")
+	assert.Equal(t, timestamp, eventContent.Timestamp, "Encoded timestamp should match original")
+	assert.Equal(t, "test_value", eventContent.TestField, "Encoded field should match original")
+	assert.Equal(t, 5, eventContent.NumberField, "Encoded field should match original")
+	assert.Equal(t, "nested_value", eventContent.Nested.NestedField, "Encoded field should match original")
 }
 
 // encodeBatch encodes a publisher.Batch so it can be provided to
