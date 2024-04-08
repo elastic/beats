@@ -7,6 +7,9 @@
     - name: AADGroupId
       type: keyword
 
+    - name: Activity
+      type: keyword
+
     - name: Actor
       type: array
       fields:
@@ -109,6 +112,9 @@
 
     - name: ExceptionInfo.*
       type: object
+
+    - name: Experience
+      type: keyword
 
     - name: ExtendedProperties.*
       type: object
@@ -215,8 +221,20 @@
     - name: ObjectId
       type: keyword
 
+    - name: ObjectDisplayName
+      type: keyword
+
+    - name: ObjectType
+      type: keyword
+
     - name: Operation
       type: keyword
+
+    - name: OperationId
+      type: keyword
+
+    - name: OperationProperties
+      type: object
 
     - name: OrganizationId
       type: keyword
@@ -237,6 +255,9 @@
       type: keyword
 
     - name: RecordType
+      type: keyword
+
+    - name: RequestId
       type: keyword
 
     - name: ResultStatus
@@ -305,6 +326,9 @@
     - name: TemplateTypeId
       type: keyword
 
+    - name: Timestamp
+      type: keyword
+
     - name: UniqueSharingId
       type: keyword
 
@@ -327,6 +351,12 @@
       type: keyword
 
     - name: Workload
+      type: keyword
+
+    - name: WorkspaceId
+      type: keyword
+
+    - name: WorkspaceName
       type: keyword
 
     - name: YammerNetworkId
