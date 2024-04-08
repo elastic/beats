@@ -165,9 +165,9 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 
 	settings := struct {
 		ID             string        `config:"id"`
-		CleanTimeout   time.Duration `config:"clean_inactive"`
+		CleanInactive  time.Duration `config:"clean_inactive"`
 		HarvesterLimit uint64        `config:"harvester_limit"`
-	}{CleanTimeout: cim.DefaultCleanTimeout}
+	}{CleanInactive: cim.DefaultCleanTimeout}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
@@ -230,7 +230,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		prospector:       prospector,
 		harvester:        harvester,
 		sourceIdentifier: sourceIdentifier,
-		cleanTimeout:     settings.CleanTimeout,
+		cleanTimeout:     settings.CleanInactive,
 		harvesterLimit:   settings.HarvesterLimit,
 	}, nil
 }
