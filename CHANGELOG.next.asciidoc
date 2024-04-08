@@ -77,7 +77,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Heartbeat*
 
-- Fix reference yaml format. {pull}38584[38584]
 
 *Metricbeat*
 
@@ -212,6 +211,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
