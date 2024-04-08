@@ -26,8 +26,7 @@ import (
 	"strconv"
 	"syscall"
 
-	sysinfo "github.com/elastic/go-sysinfo"
-
+	"golang.org/x/sys/unix"
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
 
@@ -36,13 +35,7 @@ func init() {
 	// In the context of a container, where users frequently run as root, we follow BEAT_SETUID_AS to setuid/gid
 	// and add capabilities to make this actually run as a regular user. This also helps Node.js in synthetics, which
 	// does not want to run as root. It's also just generally more secure.
-	sysInfo, err := sysinfo.Host()
-	isContainer := false
-	if err == nil && sysInfo.Info().Containerized != nil {
-		isContainer = *sysInfo.Info().Containerized
-	}
-
-	if localUserName := os.Getenv("BEAT_SETUID_AS"); isContainer && localUserName != "" && syscall.Geteuid() == 0 {
+	if localUserName := os.Getenv("BEAT_SETUID_AS"); localUserName != "" && syscall.Geteuid() == 0 {
 		err := setNodeProcAttr(localUserName)
 		if err != nil {
 			panic(err)
@@ -54,6 +47,9 @@ func init() {
 	// The beat should use `getcap` at a later point to examine available capabilities
 	// rather than relying on errors from `setcap`
 	_ = setCapabilities()
+
+	// Make heartbeat dumpable so elastic-agent can access process metrics.
+	_ = setDumpable()
 }
 
 func setNodeProcAttr(localUserName string) error {
@@ -103,6 +99,16 @@ func setCapabilities() error {
 	err = newcaps.SetProc()
 	if err != nil {
 		return fmt.Errorf("error setting new process capabilities via setcap: %w", err)
+	}
+
+	return nil
+}
+
+// Enforce PR_SET_DUMPABLE=true to allow user-level access to /proc/<pid>/io.
+func setDumpable() error {
+	_, err := cap.Prctl(unix.PR_SET_DUMPABLE, 1)
+	if err != nil {
+		return fmt.Errorf("error setting dumpable flag via prctl: %w", err)
 	}
 
 	return nil

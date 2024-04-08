@@ -65,11 +65,17 @@ const (
 	// SourceFSNotify identifies events triggered by a notification from the
 	// file system.
 	SourceFSNotify
+	// SourceEBPF identifies events triggered by an eBPF program.
+	SourceEBPF
+	// SourceKProbes identifies events triggered by KProbes.
+	SourceKProbes
 )
 
 var sourceNames = map[Source]string{
 	SourceScan:     "scan",
 	SourceFSNotify: "fsnotify",
+	SourceEBPF:     "ebpf",
+	SourceKProbes:  "kprobes",
 }
 
 // Type identifies the file type (e.g. dir, file, symlink).
@@ -91,12 +97,20 @@ const (
 	FileType
 	DirType
 	SymlinkType
+	CharDeviceType
+	BlockDeviceType
+	FIFOType
+	SocketType
 )
 
 var typeNames = map[Type]string{
-	FileType:    "file",
-	DirType:     "dir",
-	SymlinkType: "symlink",
+	FileType:        "file",
+	DirType:         "dir",
+	SymlinkType:     "symlink",
+	CharDeviceType:  "char_device",
+	BlockDeviceType: "block_device",
+	FIFOType:        "fifo",
+	SocketType:      "socket",
 }
 
 // Digest is an output of a hash function.
@@ -120,11 +134,39 @@ type Event struct {
 	Action        Action              `json:"action"`                // Action (like created, updated).
 	Hashes        map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
 	ParserResults mapstr.M            `json:"file,omitempty"`        // Results from running file parsers.
+	Process       *Process            `json:"process,omitempty"`     // Process data. Available only on Linux when using the eBPF backend.
 
 	// Metadata
 	rtt        time.Duration // Time taken to collect the info.
 	errors     []error       // Errors that occurred while collecting the info.
 	hashFailed bool          // Set when hashing the file failed.
+}
+
+// Process contain information about a process.
+// These fields can help you correlate metrics information with a process id/name from a log message.  The `process.pid` often stays in the metric itself and is copied to the global field for correlation.
+type Process struct {
+	// Unique identifier for the process.
+	// The implementation of this is specified by the data source, but some examples of what could be used here are a process-generated UUID, Sysmon Process GUIDs, or a hash of some uniquely identifying components of a process.
+	// Constructing a globally unique identifier is a common practice to mitigate PID reuse as well as to identify a specific process over time, across multiple monitored hosts.
+	EntityID string `json:"entity_id,omitempty"`
+	// Process name. Sometimes called program name or similar.
+	Name string `json:"name,omitempty"`
+	// The effective user (euid).
+	User struct {
+		// Unique identifier of the user.
+		ID string `json:"id,omitempty"`
+		// Short name or login of the user.
+		Name string `json:"name,omitempty"`
+	} `json:"user,omitempty"`
+	// The effective group (egid).
+	Group struct {
+		// Unique identifier for the group on the system/platform.
+		ID string `json:"id,omitempty"`
+		// Name of the group.
+		Name string `json:"name,omitempty"`
+	} `json:"group,omitempty"`
+	// Process id.
+	PID uint32 `json:"pid,omitempty"`
 }
 
 // Metadata contains file metadata.
@@ -189,34 +231,40 @@ func NewEventFromFileInfo(
 
 	switch event.Info.Type {
 	case FileType:
-		if event.Info.Size <= maxFileSize {
-			hashes, nbytes, err := hashFile(event.Path, maxFileSize, hashTypes...)
-			if err != nil {
-				event.errors = append(event.errors, err)
-				event.hashFailed = true
-			} else if hashes != nil {
-				// hashFile returns nil hashes and no error when:
-				// - There's no hashes configured.
-				// - File size at the time of hashing is larger than configured limit.
-				event.Hashes = hashes
-				event.Info.Size = nbytes
-			}
-
-			if len(fileParsers) != 0 && event.ParserResults == nil {
-				event.ParserResults = make(mapstr.M)
-			}
-			for _, p := range fileParsers {
-				err = p.Parse(event.ParserResults, path)
-				if err != nil {
-					event.errors = append(event.errors, err)
-				}
-			}
-		}
+		fillHashes(&event, path, maxFileSize, hashTypes, fileParsers)
 	case SymlinkType:
-		event.TargetPath, _ = filepath.EvalSymlinks(event.Path)
+		event.TargetPath, err = filepath.EvalSymlinks(event.Path)
+		if err != nil {
+			event.errors = append(event.errors, err)
+		}
 	}
 
 	return event
+}
+
+func fillHashes(event *Event, path string, maxFileSize uint64, hashTypes []HashType, fileParsers []FileParser) {
+	if event.Info.Size <= maxFileSize {
+		hashes, nbytes, err := hashFile(event.Path, maxFileSize, hashTypes...)
+		if err != nil {
+			event.errors = append(event.errors, err)
+			event.hashFailed = true
+		} else if hashes != nil {
+			// hashFile returns nil hashes and no error when:
+			// - There's no hashes configured.
+			// - File size at the time of hashing is larger than configured limit.
+			event.Hashes = hashes
+			event.Info.Size = nbytes
+		}
+
+		if len(fileParsers) != 0 && event.ParserResults == nil {
+			event.ParserResults = make(mapstr.M)
+		}
+		for _, p := range fileParsers {
+			if err = p.Parse(event.ParserResults, path); err != nil {
+				event.errors = append(event.errors, err)
+			}
+		}
+	}
 }
 
 // NewEvent creates a new Event. Any errors that occur are included in the
@@ -332,6 +380,24 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 				file["posix_acl_access"] = a
 			}
 		}
+	}
+
+	if e.Process != nil {
+		process := mapstr.M{
+			"pid":       e.Process.PID,
+			"name":      e.Process.Name,
+			"entity_id": e.Process.EntityID,
+			"user": mapstr.M{
+				"id":   e.Process.User.ID,
+				"name": e.Process.User.Name,
+			},
+			"group": mapstr.M{
+				"id":   e.Process.Group.ID,
+				"name": e.Process.Group.Name,
+			},
+		}
+
+		out.MetricSetFields.Put("process", process)
 	}
 
 	if len(e.Hashes) > 0 {

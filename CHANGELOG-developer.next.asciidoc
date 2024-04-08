@@ -69,6 +69,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 
 ==== Bugfixes
 
+- Fix multiple metricbeat instances reporting same metrics when using autodiscover with provider kubernetes, and ensure leader elector is always running in autodiscover mode.{pull}38471[38471]
 - Fix how Prometheus histograms are calculated when percentiles are provide.{pull}36537[36537]
 - Stop using `mage:import` in community beats. This was ignoring the vendorized beats directory for some mage targets, using the code available in GOPATH, this causes inconsistencies and compilation problems if the version of the code in the GOPATH is different to the vendored one. Use of `mage:import` will continue to be unsupported in custom beats till beats is migrated to go modules, or mage supports vendored dependencies. {issue}13998[13998] {pull}14162[14162]
 - Metricbeat module builders call host parser only once when instantiating light modules. {pull}20149[20149]
@@ -87,6 +88,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Fix ingest pipeline for panw module to parse url scheme correctly {pull}35757[35757]
 - Renamed an httpjson input metric to follow naming conventions. `httpjson_interval_pages_total` was renamed to `httpjson_interval_pages` because the `_total` suffix is reserved for counters. {issue}35933[35933] {pull}36169[36169]
 - Fixed some race conditions in tests {pull}36185[36185]
+- Fix Stringer implementation of fingerprint processor {issue}35174[35174]
 - Re-enable HTTPJSON fixed flakey test. {issue}34929[34929] {pull}36525[36525]
 - Make winlogbeat/sys/wineventlog follow the unsafe.Pointer rules. {pull}36650[36650]
 - Cleaned up documentation errors & fixed a minor bug in Filebeat Azure blob storage input. {pull}36714[36714]
@@ -94,6 +96,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 
 ==== Added
 
+- Update watchers to be shared between metricsets in Kubernetes module. {pull}37332[37332]
 - Add new metricset in Kubernetes module, `state_namespace`. {pull}36406[36406]
 - Add configuration for APM instrumentation and expose the tracer trough the Beat object. {pull}17938[17938]
 - Make the behavior of clientWorker and netClientWorker consistent when error is returned from publisher pipeline
@@ -178,7 +181,9 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Add initial infrastructure for a caching enrichment processor. {pull}36619[36619]
 - Add file-backed cache for cache enrichment processor. {pull}36686[36686] {pull}36696[36696]
 - Elide retryable HTTP client construction in Filebeat HTTPJSON and CEL inputs if not needed. {pull}36916[36916]
-- Allow assignment of packetbeat protocols to interfaces. {issue}36574[36564] {pull}[]
+- Allow assignment of packetbeat protocols to interfaces. {issue}36574[36564] {pull}36852[36852]
+- Add Active Directory entity collector for Filebeat entity analytics. {pull}37854[37854]
+- Make logs for empty and small files less noisy when using fingerprint file identity in filestream. {pull}38421[38421]
 
 ==== Deprecated
 

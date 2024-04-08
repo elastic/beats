@@ -1,7 +1,38 @@
+import os
 import time
 import unittest
 import platform
 from auditbeat import *
+
+
+if platform.platform().split('-')[0] == 'Linux':
+    import pwd
+
+
+def is_root():
+    if 'geteuid' not in dir(os):
+        return False
+    return os.geteuid() == 0
+
+
+def is_version_below(version, target):
+    t = list(map(int, target.split('.')))
+    v = list(map(int, version.split('.')))
+    v += [0] * (len(t) - len(v))
+    for i in range(len(t)):
+        if v[i] != t[i]:
+            return v[i] < t[i]
+    return False
+
+
+# Require Linux greater or equal than 3.10.0 and arm64/amd64 arch
+def is_platform_supported():
+    p = platform.platform().split('-')
+    if p[0] != 'Linux':
+        return False
+    if is_version_below(p[1], '3.10.0'):
+        return False
+    return {'aarch64', 'arm64', 'x86_64', 'amd64'}.intersection(p)
 
 
 # Escapes a path to match what's printed in the logs
@@ -49,22 +80,41 @@ def wrap_except(expr):
 
 
 class Test(BaseTest):
-
     def wait_output(self, min_events):
         self.wait_until(lambda: wrap_except(lambda: len(self.read_output()) >= min_events))
-        # wait for the number of lines in the file to stay constant for a second
+        # wait for the number of lines in the file to stay constant for 10 seconds
         prev_lines = -1
         while True:
             num_lines = self.output_lines()
             if prev_lines < num_lines:
                 prev_lines = num_lines
-                time.sleep(1)
+                time.sleep(10)
             else:
                 break
 
-    @unittest.skipIf(os.getenv("CI") is not None and platform.system() == 'Darwin',
-                     'Flaky test: https://github.com/elastic/beats/issues/24678')
-    def test_non_recursive(self):
+    def wait_startup(self, backend, dir):
+        if backend == "ebpf":
+            self.wait_log_contains("started ebpf watcher", max_timeout=30, ignore_case=True)
+        if backend == "kprobes":
+            self.wait_log_contains("Started kprobes watcher", max_timeout=30, ignore_case=True)
+        else:
+            # wait until the directories to watch are printed in the logs
+            # this happens when the file_integrity module starts.
+            # Case must be ignored under windows as capitalisation of paths
+            # may differ
+            self.wait_log_contains(escape_path(dir), max_timeout=30, ignore_case=True)
+
+    def _assert_process_data(self, event, backend):
+        if backend != "ebpf":
+            return
+        assert event["process.entity_id"] != ""
+        assert event["process.executable"] == "pytest"
+        assert event["process.pid"] == os.getpid()
+        assert int(event["process.user.id"]) == os.geteuid()
+        assert event["process.user.name"] == pwd.getpwuid(os.geteuid()).pw_name
+        assert int(event["process.group.id"]) == os.getegid()
+
+    def _test_non_recursive(self, backend):
         """
         file_integrity monitors watched directories (non recursive).
         """
@@ -73,22 +123,21 @@ class Test(BaseTest):
                 self.temp_dir("auditbeat_test")]
 
         with PathCleanup(dirs):
+            extras = {
+                "paths": dirs,
+                "scan_at_start": False
+            }
+            if platform.system() == "Linux":
+                extras["backend"] = backend
+
             self.render_config_template(
                 modules=[{
                     "name": "file_integrity",
-                    "extras": {
-                        "paths": dirs,
-                        "scan_at_start": False
-                    }
+                    "extras": extras
                 }],
             )
             proc = self.start_beat()
-
-            # wait until the directories to watch are printed in the logs
-            # this happens when the file_integrity module starts.
-            # Case must be ignored under windows as capitalisation of paths
-            # may differ
-            self.wait_log_contains(escape_path(dirs[0]), max_timeout=30, ignore_case=True)
+            self.wait_startup(backend, dirs[0])
 
             file1 = os.path.join(dirs[0], 'file.txt')
             self.create_file(file1, "hello world!")
@@ -109,10 +158,12 @@ class Test(BaseTest):
 
             # log entries are JSON formatted, this value shows up as an escaped json string.
             self.wait_log_contains("\\\"deleted\\\"")
-            self.wait_log_contains("\"path\":\"{0}\"".format(escape_path(subdir)), ignore_case=True)
-            self.wait_output(3)
-            self.wait_until(lambda: any(
-                'file.path' in obj and obj['file.path'].lower() == subdir.lower() for obj in self.read_output()))
+
+            if backend == "fsnotify" or backend == "kprobes":
+                self.wait_output(4)
+            else:
+                # ebpf backend doesn't catch directory creation
+                self.wait_output(3)
 
             proc.check_kill_and_wait()
             self.assert_no_logged_warnings()
@@ -126,7 +177,8 @@ class Test(BaseTest):
 
             has_file(objs, file1, "430ce34d020724ed75a196dfc2ad67c77772d169")
             has_file(objs, file2, "d23be250530a24be33069572db67995f21244c51")
-            has_dir(objs, subdir)
+            if backend == "fsnotify" or backend == "kprobes":
+                has_dir(objs, subdir)
 
             file_events(objs, file1, ['created', 'deleted'])
             file_events(objs, file2, ['created'])
@@ -134,8 +186,23 @@ class Test(BaseTest):
             # assert file inside subdir is not reported
             assert self.log_contains(file3) is False
 
-    @unittest.skipIf(os.getenv("BUILD_ID") is not None, "Skipped as flaky: https://github.com/elastic/beats/issues/7731")
-    def test_recursive(self):
+            self._assert_process_data(objs[0], backend)
+
+    @unittest.skipIf(os.getenv("CI") is not None and platform.system() == 'Darwin',
+                     'Flaky test: https://github.com/elastic/beats/issues/24678')
+    def test_non_recursive__fsnotify(self):
+        self._test_non_recursive("fsnotify")
+
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_non_recursive__ebpf(self):
+        self._test_non_recursive("ebpf")
+
+    @unittest.skipUnless(is_platform_supported(), "Requires Linux 3.10.0+ and arm64/amd64 arch")
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_non_recursive__kprobes(self):
+        self._test_non_recursive("kprobes")
+
+    def _test_recursive(self, backend):
         """
         file_integrity monitors watched directories (recursive).
         """
@@ -143,22 +210,22 @@ class Test(BaseTest):
         dirs = [self.temp_dir("auditbeat_test")]
 
         with PathCleanup(dirs):
+            extras = {
+                "paths": dirs,
+                "scan_at_start": False,
+                "recursive": True
+            }
+            if platform.system() == "Linux":
+                extras["backend"] = backend
+
             self.render_config_template(
                 modules=[{
                     "name": "file_integrity",
-                    "extras": {
-                        "paths": dirs,
-                        "scan_at_start": False,
-                        "recursive": True
-                    }
+                    "extras": extras
                 }],
             )
             proc = self.start_beat()
-
-            # wait until the directories to watch are printed in the logs
-            # this happens when the file_integrity module starts
-            self.wait_log_contains(escape_path(dirs[0]), max_timeout=30, ignore_case=True)
-            self.wait_log_contains("\"recursive\":true")
+            self.wait_startup(backend, dirs[0])
 
             # auditbeat_test/subdir/
             subdir = os.path.join(dirs[0], "subdir")
@@ -174,10 +241,13 @@ class Test(BaseTest):
             file2 = os.path.join(subdir2, "more.txt")
             self.create_file(file2, "")
 
-            self.wait_log_contains("\"path\":\"{0}\"".format(escape_path(file2)), ignore_case=True)
-            self.wait_output(4)
-            self.wait_until(lambda: any(
-                'file.path' in obj and obj['file.path'].lower() == subdir2.lower() for obj in self.read_output()))
+            if backend == "fsnotify" or backend == "kprobes":
+                self.wait_output(4)
+                self.wait_until(lambda: any(
+                    'file.path' in obj and obj['file.path'].lower() == subdir2.lower() for obj in self.read_output()))
+            else:
+                # ebpf backend doesn't catch directory creation
+                self.wait_output(2)
 
             proc.check_kill_and_wait()
             self.assert_no_logged_warnings()
@@ -191,8 +261,94 @@ class Test(BaseTest):
 
             has_file(objs, file1, "430ce34d020724ed75a196dfc2ad67c77772d169")
             has_file(objs, file2, "da39a3ee5e6b4b0d3255bfef95601890afd80709")
-            has_dir(objs, subdir)
-            has_dir(objs, subdir2)
+            if backend == "fsnotify" or backend == "kprobes":
+                has_dir(objs, subdir)
+                has_dir(objs, subdir2)
 
             file_events(objs, file1, ['created'])
             file_events(objs, file2, ['created'])
+
+            self._assert_process_data(objs[0], backend)
+
+    def test_recursive__fsnotify(self):
+        self._test_recursive("fsnotify")
+
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_recursive__ebpf(self):
+        self._test_recursive("ebpf")
+
+    @unittest.skipUnless(is_platform_supported(), "Requires Linux 3.10.0+ and arm64/amd64 arch")
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_recursive__kprobes(self):
+        self._test_recursive("kprobes")
+
+    @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
+    def _test_file_modified(self, backend):
+        """
+        file_integrity tests for file modifications (chmod, chown, write, truncate, xattrs).
+        """
+
+        dirs = [self.temp_dir("auditbeat_test")]
+
+        with PathCleanup(dirs):
+            self.render_config_template(
+                modules=[{
+                    "name": "file_integrity",
+                    "extras": {
+                        "paths": dirs,
+                        "scan_at_start": False,
+                        "recursive": False,
+                        "backend": backend
+                    }
+                }],
+            )
+            proc = self.start_beat()
+            self.wait_startup(backend, dirs[0])
+
+            # Event 1: file create
+            f = os.path.join(dirs[0], f'file_{backend}.txt')
+            self.create_file(f, "hello world!")
+
+            # FSNotify can't catch the events if operations happens too fast
+            time.sleep(1)
+
+            # Event 2: chmod
+            os.chmod(f, 0o777)
+            # FSNotify can't catch the events if operations happens too fast
+            time.sleep(1)
+
+            with open(f, "w") as fd:
+                # Event 3: write
+                fd.write("data")
+                # FSNotify can't catch the events if operations happens too fast
+                time.sleep(1)
+
+                # Event 4: truncate
+                fd.truncate(0)
+                # FSNotify can't catch the events if operations happens too fast
+                time.sleep(1)
+
+            # Wait N events
+            self.wait_output(4)
+
+            proc.check_kill_and_wait()
+            self.assert_no_logged_warnings()
+
+            # Ensure all Beater stages are used.
+            assert self.log_contains("Setup Beat: auditbeat")
+            assert self.log_contains("auditbeat start running")
+            assert self.log_contains("auditbeat stopped")
+
+    @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
+    def test_file_modified__fsnotify(self):
+        self._test_file_modified("fsnotify")
+
+    @unittest.skipIf(platform.system() != 'Linux', 'Non linux, skipping.')
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_file_modified__ebpf(self):
+        self._test_file_modified("ebpf")
+
+    @unittest.skipUnless(is_platform_supported(), "Requires Linux 3.10.0+ and arm64/amd64 arch")
+    @unittest.skipUnless(is_root(), "Requires root")
+    def test_file_modified__kprobes(self):
+        self._test_file_modified("kprobes")

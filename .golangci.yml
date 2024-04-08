@@ -66,9 +66,19 @@ linters:
     - wastedassign # wastedassign finds wasted assignment statements.
     - gomodguard # check for blocked dependencies
     - prealloc # Finds slice declarations that could potentially be pre-allocated
+    - depguard
 
 # all available settings of specific linters
 linters-settings:
+  depguard:
+    rules:
+      apache-licensed-code:
+        list-mode: lax
+        files:
+          - '!**/x-pack/**/*.go'
+        deny:
+          - pkg: github.com/elastic/beats/v7/x-pack
+            desc: Apache 2.0 licensed code cannot depend on Elastic licensed code (x-pack/).
   errcheck:
     # report about not checking of errors in type assertions: `a := b.(MyStruct)`;
     check-type-assertions: false
@@ -114,7 +124,7 @@ linters-settings:
 
   gosimple:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.21.6"
+    go: "1.21.9"
 
   nakedret:
     # make an issue if func has more lines of code than this setting and it has naked returns; default is 30
@@ -132,19 +142,19 @@ linters-settings:
 
   staticcheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.21.6"
+    go: "1.21.9"
     checks: ["all"]
 
   stylecheck:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.21.6"
+    go: "1.21.9"
     # Disabled:
     # ST1005: error strings should not be capitalized
     checks: ["all", "-ST1005"]
 
   unused:
     # Select the Go version to target. The default is '1.13'.
-    go: "1.21.6"
+    go: "1.21.9"
 
   gosec:
     excludes:

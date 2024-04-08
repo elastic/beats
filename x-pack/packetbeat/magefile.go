@@ -36,7 +36,7 @@ import (
 // the packetbeat executable. It is used to specify which npcap builder crossbuild
 // image to use and the installer to obtain from the cloud store for testing.
 const (
-	NpcapVersion = "1.78"
+	NpcapVersion = "1.79"
 	installer    = "npcap-" + NpcapVersion + "-oem.exe"
 )
 
@@ -47,6 +47,7 @@ func init() {
 
 	devtools.BeatDescription = "Packetbeat analyzes network traffic and sends the data to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
+	packetbeat.SelectLogic = devtools.XPackProject
 }
 
 // Update updates the generated files.
@@ -171,6 +172,13 @@ func SystemTest(ctx context.Context) error {
 	return devtools.GoTest(ctx, args)
 }
 
+func getBucketName() string {
+	if os.Getenv("BUILDKITE") == "true" {
+		return "ingest-buildkite-ci"
+	}
+	return "obs-ci-cache"
+}
+
 // getNpcapInstaller gets the installer from the Google Cloud Storage service.
 //
 // On Windows platforms, if getNpcapInstaller is invoked with the environment variables
@@ -197,7 +205,8 @@ func getNpcapInstaller() error {
 			return err
 		}
 	}
+	ciBucketName := getBucketName()
 
 	fmt.Printf("getting %s from private cache\n", installer)
-	return sh.RunV("gsutil", "cp", "gs://obs-ci-cache/private/"+installer, dstPath)
+	return sh.RunV("gsutil", "cp", "gs://"+ciBucketName+"/private/"+installer, dstPath)
 }
