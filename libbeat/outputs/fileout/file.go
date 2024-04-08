@@ -19,6 +19,7 @@ package fileout
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"time"
@@ -132,7 +133,8 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 			} else {
 				out.log.Warnf("Failed to serialize the event: %+v", err)
 			}
-			out.log.Debugf("Failed event: %v", event)
+			out.log.Debug("Failed event logged to event log file")
+			out.log.Debugw(fmt.Sprintf("Failed event: %v", event), "log.type", "event")
 
 			dropped++
 			continue

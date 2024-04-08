@@ -228,7 +228,8 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 	serializedEvent, err := c.codec.Encode(c.index, event)
 	if err != nil {
 		if c.log.IsDebug() {
-			c.log.Debugf("failed event: %v", event)
+			c.log.Debug("failed event logged to event log file")
+			c.log.Debugw(fmt.Sprintf("failed event: %v", event), "log.type", "event")
 		}
 		return nil, err
 	}

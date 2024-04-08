@@ -20,6 +20,7 @@ package redis
 import (
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -319,8 +320,8 @@ func serializeEvents(
 	for _, d := range data {
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
-			log.Errorf("Encoding event failed with error: %+v", err)
-			log.Debugf("Failed event: %v", d.Content)
+			log.Errorf("Encoding event failed with error: %+v. Look at the event log file to view the event", err)
+			log.Debugw(fmt.Sprintf("Failed event: %v", d.Content), "log.type", "event")
 			goto failLoop
 		}
 
@@ -337,8 +338,8 @@ failLoop:
 	for _, d := range rest {
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
-			log.Errorf("Encoding event failed with error: %+v", err)
-			log.Debugf("Failed event: %v", d.Content)
+			log.Errorf("Encoding event failed with error: %+v. Look at the event log file to view the event", err)
+			log.Debugw(fmt.Sprintf("Failed event: %v", d.Content), "log.type", "event")
 			i++
 			continue
 		}
