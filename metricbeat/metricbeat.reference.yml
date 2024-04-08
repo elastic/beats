@@ -148,6 +148,7 @@ metricbeat.modules:
   enabled: true
   period: 10s
   hosts: ["localhost:3000"]
+
   # Aerospike Cluster Name
   #cluster_name: myclustername
 
