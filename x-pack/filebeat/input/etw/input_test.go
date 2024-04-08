@@ -91,6 +91,7 @@ func Test_RunEtwInput_NewSessionError(t *testing.T) {
 			MatchAllKeyword: 0,
 		},
 		operator: mockOperator,
+		metrics:  newInputMetrics("", ""),
 	}
 
 	// Run test
@@ -131,6 +132,7 @@ func Test_RunEtwInput_AttachToExistingSessionError(t *testing.T) {
 			MatchAllKeyword: 0,
 		},
 		operator: mockOperator,
+		metrics:  newInputMetrics("", ""),
 	}
 
 	// Run test
@@ -175,6 +177,7 @@ func Test_RunEtwInput_CreateRealtimeSessionError(t *testing.T) {
 			MatchAllKeyword: 0,
 		},
 		operator: mockOperator,
+		metrics:  newInputMetrics("", ""),
 	}
 
 	// Run test
@@ -231,6 +234,7 @@ func Test_RunEtwInput_StartConsumerError(t *testing.T) {
 			MatchAllKeyword: 0,
 		},
 		operator: mockOperator,
+		metrics:  newInputMetrics("", ""),
 	}
 
 	// Run test
@@ -287,6 +291,7 @@ func Test_RunEtwInput_Success(t *testing.T) {
 			MatchAllKeyword: 0,
 		},
 		operator: mockOperator,
+		metrics:  newInputMetrics("", ""),
 	}
 
 	// Run test
@@ -362,8 +367,8 @@ func Test_buildEvent(t *testing.T) {
 
 			expected: mapstr.M{
 				"winlog": map[string]any{
-					"activity_guid": "{12345678-1234-1234-1234-123456789ABC}",
-					"channel":       "10",
+					"activity_id": "{12345678-1234-1234-1234-123456789ABC}",
+					"channel":     "10",
 					"event_data": map[string]any{
 						"key": "value",
 					},
@@ -430,8 +435,8 @@ func Test_buildEvent(t *testing.T) {
 
 			expected: mapstr.M{
 				"winlog": map[string]any{
-					"activity_guid": "{12345678-1234-1234-1234-123456789ABC}",
-					"channel":       "10",
+					"activity_id": "{12345678-1234-1234-1234-123456789ABC}",
+					"channel":     "10",
 					"event_data": map[string]any{
 						"key": "value",
 					},
@@ -456,7 +461,7 @@ func Test_buildEvent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			evt := buildEvent(tt.data, tt.header, tt.session, tt.cfg)
-			assert.Equal(t, tt.expected["winlog"].(map[string]any)["activity_guid"], evt.Fields["winlog"].(map[string]any)["activity_guid"])
+			assert.Equal(t, tt.expected["winlog"].(map[string]any)["activity_id"], evt.Fields["winlog"].(map[string]any)["activity_id"])
 			assert.Equal(t, tt.expected["winlog"].(map[string]any)["channel"], evt.Fields["winlog"].(map[string]any)["channel"])
 			assert.Equal(t, tt.expected["winlog"].(map[string]any)["event_data"], evt.Fields["winlog"].(map[string]any)["event_data"])
 			assert.Equal(t, tt.expected["winlog"].(map[string]any)["flags"], evt.Fields["winlog"].(map[string]any)["flags"])

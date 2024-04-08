@@ -19,7 +19,7 @@ CHANGELOG*
 /NOTICE.txt @elastic/beats-tech-leads
 
 /.ci/ @elastic/elastic-agent-data-plane @elastic/ingest-eng-prod
-/.github/ @elastic/elastic-agent-data-plane
+/.github/ @elastic/ingest-eng-prod
 /auditbeat/ @elastic/sec-linux-platform
 /deploy/ @elastic/elastic-agent-data-plane
 /deploy/kubernetes @elastic/elastic-agent-data-plane @elastic/obs-cloudnative-monitoring
@@ -68,6 +68,7 @@ CHANGELOG*
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /metricbeat/helper/kubernetes @elastic/obs-cloudnative-monitoring
+/metricbeat/module/aerospike @elastic/obs-infraobs-integrations
 /metricbeat/module/apache @elastic/obs-infraobs-integrations
 /metricbeat/module/beat/ @elastic/stack-monitoring
 /metricbeat/module/ceph @elastic/obs-infraobs-integrations
@@ -105,6 +106,7 @@ CHANGELOG*
 /x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
 /x-pack/filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
+/x-pack/filebeat/docs/inputs/input-salesforce.asciidoc @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/awscloudwatch/ @elastic/obs-cloud-monitoring
 /x-pack/filebeat/input/awss3/ @elastic/obs-cloud-monitoring
 /x-pack/filebeat/input/azureblobstorage/ @elastic/security-service-integrations
@@ -122,6 +124,7 @@ CHANGELOG*
 /x-pack/filebeat/input/lumberjack/ @elastic/security-service-integrations
 /x-pack/filebeat/input/netflow/ @elastic/sec-deployment-and-devices
 /x-pack/filebeat/input/o365audit/ @elastic/security-service-integrations
+/x-pack/filebeat/input/salesforce @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/websocket/ @elastic/security-service-integrations
 /x-pack/filebeat/module/activemq @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/aws @elastic/obs-cloud-monitoring

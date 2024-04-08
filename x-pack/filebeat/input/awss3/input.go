@@ -317,18 +317,20 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 	return s3Poller, nil
 }
 
-var errBadQueueURL = errors.New("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
+var errBadQueueURL = errors.New("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME} or https://{VPC_ENDPOINT}.sqs.{REGION_ENDPOINT}.vpce.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
 
 func getRegionFromQueueURL(queueURL string, endpoint, defaultRegion string) (region string, err error) {
 	// get region from queueURL
-	// Example: https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs
+	// Example for sqs queue: https://sqs.us-east-1.amazonaws.com/12345678912/test-s3-logs
+	// Example for vpce: https://vpce-test.sqs.us-east-1.vpce.amazonaws.com/12345678912/sqs-queue
 	u, err := url.Parse(queueURL)
 	if err != nil {
 		return "", fmt.Errorf(queueURL + " is not a valid URL")
 	}
 	if (u.Scheme == "https" || u.Scheme == "http") && u.Host != "" {
 		queueHostSplit := strings.SplitN(u.Host, ".", 3)
-		if len(queueHostSplit) == 3 {
+		// check for sqs queue url
+		if len(queueHostSplit) == 3 && queueHostSplit[0] == "sqs" {
 			if queueHostSplit[2] == endpoint || (endpoint == "" && strings.HasPrefix(queueHostSplit[2], "amazonaws.")) {
 				region = queueHostSplit[1]
 				if defaultRegion != "" && region != defaultRegion {
@@ -336,7 +338,21 @@ func getRegionFromQueueURL(queueURL string, endpoint, defaultRegion string) (reg
 				}
 				return region, nil
 			}
-		} else if defaultRegion != "" {
+		}
+
+		// check for vpce url
+		queueHostSplitVPC := strings.SplitN(u.Host, ".", 5)
+		if len(queueHostSplitVPC) == 5 && queueHostSplitVPC[1] == "sqs" {
+			if queueHostSplitVPC[4] == endpoint || (endpoint == "" && strings.HasPrefix(queueHostSplitVPC[4], "amazonaws.")) {
+				region = queueHostSplitVPC[2]
+				if defaultRegion != "" && region != defaultRegion {
+					return defaultRegion, regionMismatchError{queueURLRegion: region, defaultRegion: defaultRegion}
+				}
+				return region, nil
+			}
+		}
+
+		if defaultRegion != "" {
 			return defaultRegion, nil
 		}
 	}

@@ -116,7 +116,7 @@ The default value is `false`.
 
 
 [[worker-option]]
-===== `worker`
+===== `worker` or `workers`
 
 The number of workers per configured host publishing events to Elasticsearch. This
 is best used with load balancing mode enabled. Example: If you have 2 hosts and
@@ -666,10 +666,8 @@ endif::[]
 
 The maximum number of events to bulk in a single Elasticsearch bulk API index request. The default is 1600.
 
-Events can be collected into batches. When using the memory queue with `queue.mem.flush.min_events`
-set to a value greater than `1`, the maximum batch is is the value of `queue.mem.flush.min_events`.
-{beatname_uc} will split batches read from the queue which are larger than `bulk_max_size` into
-multiple batches.
+Events can be collected into batches. {beatname_uc} will split batches read from the queue which are
+larger than `bulk_max_size` into multiple batches.
 
 Specifying a larger batch size can improve performance by lowering the overhead of sending events.
 However big batch sizes can also increase processing times, which might result in

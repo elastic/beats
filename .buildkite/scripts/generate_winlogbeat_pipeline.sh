@@ -18,15 +18,22 @@ steps:
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
-        command: ".buildkite/scripts/crosscompile.sh"
+        command: "make -C $BEATS_PROJECT_NAME crosscompile"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Cross compile"
 
       - label: ":windows: Windows 2016/2019/2022 Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -40,7 +47,12 @@ steps:
               - "${IMAGE_WIN_2016}"
               - "${IMAGE_WIN_2019}"
               - "${IMAGE_WIN_2022}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
 # echo "Add the extended windows tests into the pipeline"
 # TODO: ADD conditions from the main pipeline
@@ -48,28 +60,29 @@ steps:
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
     steps:
-
-      - label: ":windows: Windows 10 Unit Tests"
-        key: "extended-win-10-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+      - label: ":windows: Windows 10/11 Unit Tests - {{matrix.image}}"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
-          image: "${IMAGE_WIN_10}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          image: "{{matrix.image}}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_10}"
+              - "${IMAGE_WIN_11}"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
-      - label: ":windows: Windows 11 Unit Tests"
-        key: "extended-win-11-unit-tests"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 YAML
 else
   echo "The conditions don't match to requirements for generating pipeline steps."
@@ -90,20 +103,23 @@ if are_conditions_met_packaging; then
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: ".buildkite/scripts/packaging.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "${PACKAGING_PLATFORMS}"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Packaging Linux"
 
 
 YAML
 fi
 
-echo "--- Printing dynamic steps"     #TODO: remove if the pipeline is public
-cat $pipelineName
+echo "+++ Printing dynamic steps"
+cat $pipelineName | yq . -P
 
 echo "--- Loading dynamic steps"
 buildkite-agent pipeline upload $pipelineName

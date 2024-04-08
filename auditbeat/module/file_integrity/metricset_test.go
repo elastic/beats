@@ -63,6 +63,11 @@ func TestData(t *testing.T) {
 func TestActions(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
 
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
+	skipOnBuildkiteWindows(t)
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
+	skipOnBuildkiteDarwinArm(t)
+
 	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName)
@@ -155,6 +160,11 @@ func TestActions(t *testing.T) {
 func TestExcludedFiles(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
 
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
+	skipOnBuildkiteWindows(t)
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
+	skipOnBuildkiteDarwinArm(t)
+
 	defer abtest.SetupDataDir(t)()
 
 	bucket, err := datastore.OpenBucket(bucketName)
@@ -201,6 +211,11 @@ func TestExcludedFiles(t *testing.T) {
 
 func TestIncludedExcludedFiles(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
+
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
+	skipOnBuildkiteWindows(t)
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
+	skipOnBuildkiteDarwinArm(t)
 
 	defer abtest.SetupDataDir(t)()
 
@@ -947,5 +962,17 @@ func getConfig(path ...string) map[string]interface{} {
 func skipOnCIForDarwinAMD64(t testing.TB) {
 	if os.Getenv("CI") == "true" && runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
 		t.Skip("Skip test on CI for darwin/amd64")
+	}
+}
+
+func skipOnBuildkiteWindows(t testing.TB) {
+	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "windows" {
+		t.Skip("Skip on Buildkite Windows: Shortened TMP problem")
+	}
+}
+
+func skipOnBuildkiteDarwinArm(t testing.TB) {
+	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
+		t.Skip("Skip test on Buldkite: unexpected path error")
 	}
 }
