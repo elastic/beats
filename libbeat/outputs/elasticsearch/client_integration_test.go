@@ -237,6 +237,7 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	//nolint:typecheck // Lint is wrong about this breaking type inference
 	batch = encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
@@ -289,6 +290,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 	}
 
 	publish := func(events ...beat.Event) {
+		//nolint:typecheck // Lint is wrong about this breaking type inference
 		batch := encodeBatch(client, outest.NewBatch(events...))
 		err := output.Publish(context.Background(), batch)
 		if err != nil {
@@ -362,6 +364,7 @@ func TestClientPublishTracer(t *testing.T) {
 
 	_, _, _ = client.conn.Delete(index, "", "", nil)
 
+	//nolint:typecheck // Lint is wrong about this breaking type inference
 	batch := encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
 		Fields: mapstr.M{
