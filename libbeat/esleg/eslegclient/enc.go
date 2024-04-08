@@ -109,6 +109,9 @@ func (b *jsonEncoder) Marshal(obj interface{}) error {
 	return b.AddRaw(obj)
 }
 
+// RawEncoding is used to wrap objects that have already been json-encoded,
+// so the encoder knows to append them directly instead of treating them
+// like a string.
 type RawEncoding struct {
 	Encoding []byte
 }
