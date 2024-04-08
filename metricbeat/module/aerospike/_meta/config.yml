@@ -7,7 +7,7 @@
   # Aerospike Cluster Name
   #cluster_name: myclustername
 
-  # Optional SSL/TLS. By default is off.
+  # Optional SSL/TLS (disabled by default)
   #ssl.enabled: true
 
   # List of root certificates for SSL/TLS server verification
