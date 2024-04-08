@@ -21,6 +21,13 @@ import (
 )
 
 func main() {
+	rootCmd := AgentBeat()
+	if err := rootCmd.Execute(); err != nil {
+		os.Exit(1)
+	}
+}
+
+func AgentBeat() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "agentbeat",
 		Short: "Combined beat ran only by the Elastic Agent",
@@ -38,9 +45,7 @@ into a single agentbeat binary.`,
 		prepareCommand(packetbeat.RootCmd),
 	)
 
-	if err := rootCmd.Execute(); err != nil {
-		os.Exit(1)
-	}
+	return rootCmd
 }
 
 func prepareCommand(rootCmd *cmd.BeatsRootCmd) *cobra.Command {

@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -23,9 +24,6 @@ import (
 
 	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"
-	//mage:import
-	//mage:import
-	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest"
 	//mage:import
 	_ "github.com/elastic/beats/v7/dev-tools/mage/target/integtest/docker"
 	//mage:import
@@ -61,6 +59,13 @@ func Build() error {
 		args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
 	}
 	return devtools.Build(args)
+}
+
+// BuildSystemTestBinary builds a binary instrumented for use with Python system tests.
+func BuildSystemTestBinary() error {
+	args := devtools.DefaultTestBinaryArgs()
+	args.ExtraFlags = append(args.ExtraFlags, "-tags=agentbeat")
+	return devtools.BuildSystemTestGoBinary(args)
 }
 
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
@@ -165,4 +170,25 @@ func callForBeat(target string, beat string) error {
 		return fmt.Errorf("failed to exec: %w", err)
 	}
 	return nil
+}
+
+// IntegTest executes integration tests (it uses Docker to run the tests).
+func IntegTest() {
+	mg.SerialDeps(GoIntegTest, PythonIntegTest)
+}
+
+// GoIntegTest starts the docker containers and executes the Go integration tests.
+func GoIntegTest(ctx context.Context) error {
+	mg.Deps(BuildSystemTestBinary)
+	args := devtools.DefaultGoTestIntegrationFromHostArgs()
+	args.Tags = append(args.Tags, "agentbeat")
+	//args.Packages = append(args.Packages, "../filebeat/...", "../heartbeat/...", "../metricbeat/...", "../osquerybeat/...", "../packetbeat/...")
+	args.Packages = append(args.Packages, "../packetbeat/...")
+	return devtools.GoIntegTestFromHost(ctx, args)
+}
+
+// PythonIntegTest starts the docker containers and executes the Python integration tests.
+func PythonIntegTest(ctx context.Context) error {
+	mg.Deps(BuildSystemTestBinary)
+	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
 }
