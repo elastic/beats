@@ -690,7 +690,7 @@ func packageAgent(requiredPackages []string, packagingFn func()) {
 		}
 
 		// cleanup after build
-		defer os.RemoveAll(dropPath)
+		// defer os.RemoveAll(dropPath)
 		defer os.Unsetenv(agentDropPath)
 
 		packedBeats := []string{"filebeat", "heartbeat", "metricbeat", "osquerybeat"}
