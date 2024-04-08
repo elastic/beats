@@ -19,6 +19,8 @@ steps:
                 env:
                   BUILDKITE_PULL_REQUEST: "${BUILDKITE_PULL_REQUEST}"
                   GITHUB_PR_LABELS: "${GITHUB_PR_LABELS}"
+                  BUILDKITE_REFSPEC: "refs/pull/${BUILDKITE_PULL_REQUEST}/merge"
+                  BUILDKITE_COMMIT: "${BUILDKITE_COMMIT}"
   - label: "Trigger Heartbeat"
     plugins:
       - monorepo-diff#v1.0.1:
@@ -35,3 +37,5 @@ steps:
                   env:
                     BUILDKITE_PULL_REQUEST: "${BUILDKITE_PULL_REQUEST}"
                     GITHUB_PR_LABELS: "${GITHUB_PR_LABELS}"
+                    BUILDKITE_REFSPEC: "refs/pull/${BUILDKITE_PULL_REQUEST}/merge"
+                    BUILDKITE_COMMIT: "${BUILDKITE_COMMIT}"
