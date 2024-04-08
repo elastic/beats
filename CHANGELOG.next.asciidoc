@@ -112,6 +112,13 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
 - Add process data to file events (Linux only, eBPF backend). {pull}38199[38199]
+- Added `add_session_metadata` processor, which enables session viewer on Auditbeat data. {pull}37640[37640]
+- Add linux capabilities to processes in the system/process. {pull}37453[37453]
+- Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
+- Add linux capabilities to processes in the system/process. {pull}37453[37453]
+- Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
+- Add process data to file events (Linux only, eBPF backend). {pull}38199[38199]
+- Add container id to file events (Linux only, eBPF backend). {pull}38328[38328]
 
 *Filebeat*
 
