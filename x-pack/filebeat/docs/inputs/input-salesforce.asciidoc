@@ -1,0 +1,276 @@
+[role="xpack"]
+
+:type: salesforce
+
+[id="{beatname_lc}-input-{type}"]
+=== Salesforce input
+
+++++
+<titleabbrev>Salesforce</titleabbrev>
+++++
+
+Use the `salesforce` input to monitor Salesforce events either via the https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm[Salesforce EventLogFile (ELF) API] or the https://developer.salesforce.com/blogs/2020/05/introduction-to-real-time-event-monitoring[Salesforce Real-time event monitoring API]. Both use REST API (to execute SOQL queries in the Salesforce instance) under the hood to query the relevant objects to fetch the events.
+
+Here the `input` have cursor state(s) that will be provided to the next execution of event monitoring to fetch the events from the last cursor state. The cursor states can be used to control the behaviour of the program.
+
+This input supports:
+
+* Auth
+** OAuth2
+*** User-Password flow
+*** JWT Bearer flow
+* Event Monitoring
+** EventLogFile (ELF) using REST API
+** REST API for objects (Used for Setup Audit Trail and for monitoring real-time events)
+
+Event Monitoring methods are highly configurable and can be used to monitor any supported object or event log file. The input can be configured to monitor multiple objects or event log files at the same time.
+
+Example configurations:
+
+["source","yaml",subs="attributes"]
+----
+filebeat.inputs:
+  - type: salesforce
+    enabled: true
+    version: 56
+    auth.oauth2:
+      user_password_flow:
+        enabled: true
+        client.id: client-id
+        client.secret: client-secret
+        token_url: https://instance-id.develop.my.salesforce.com
+        username: salesforce-instance@user.in
+        password: salesforce-instance-password
+      jwt_bearer_flow:
+        enabled: true
+        client.id: client-id
+        client.username: salesforce-instance@user.in
+        client.key_path: server_client.key
+        url: https://login.salesforce.com
+    url: https://instance-id.develop.my.salesforce.com
+    event_monitoring_method:
+      event_log_file:
+        enabled: true
+        interval: 1h
+        query:
+          default: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' ORDER BY CreatedDate ASC NULLS FIRST"
+          value: "SELECT Id,CreatedDate,LogDate,LogFile FROM EventLogFile WHERE EventType = 'Login' AND CreatedDate > [[ .cursor.event_log_file.last_event_time ]] ORDER BY CreatedDate ASC NULLS FIRST"
+        cursor:
+          field: "CreatedDate"
+      object:
+        enabled: true
+        interval: 5m
+        query:
+          default: "SELECT FIELDS(STANDARD) FROM LoginEvent"
+          value: "SELECT FIELDS(STANDARD) FROM LoginEvent WHERE EventDate > [[ .cursor.object.first_event_time ]]"
+        cursor:
+          field: "EventDate"
+----
+
+
+==== Execution
+
+The `salesforce` input is a long-running program that retrieves events from a Salesforce instance and sends them to the specified output. The program executes in a loop, fetching events from the Salesforce instance at a preconfigured interval. Each event monitoring method can be configured to run separately and at different intervals. To prevent a sudden spike in memory usage, if multiple event monitoring methods are configured, they are scheduled to run one at a time. Even if the intervals overlap, only one method will be executed randomly, and the other will be executed after the first one completes.
+
+There are two methods to fetch the events from the Salesforce instance:
+
+- event_log_file: https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm[EventLogFile] is a standard object in Salesforce and the event monitoring method uses the REST API under the hood to gather the Salesforce org's operational events from the object. There is a field EventType that helps distinguish between the types of operational events like — Login, Logout, etc. Uses Salesforce's query language SOQL to query the object.
+
+- object: This method is a general way of retrieving events from a Salesforce instance by using the REST API. It can be used for the SetupAuditTrail and for monitoring objects in real-time. In real-time event monitoring, subscribing to the events is a common practice, but the events are also stored in Salesforce org (if configured), specifically in big object tables that are preconfigured for each event type. To query the object, Salesforce's query language SOQL is used.
+
+==== Configuration options
+
+The `salesforce` input supports the following configuration options plus the
+<<{beatname_lc}-input-{type}-common-options>> described later.
+
+[bool]
+==== `enabled`
+
+Whether the input is enabled or not. Default: `false`.
+
+[integer]
+==== `version`
+
+The version of the Salesforce API to use. Minimum supported version is 46.
+
+[object]
+==== `auth`
+
+The authentication settings for the Salesforce instance.
+
+[object]
+==== `auth.oauth2`
+
+The OAuth2 authentication options for the Salesforce instance.
+
+There are two OAuth2 authentication flows supported:
+
+* `user_password_flow`: User-Password flow
+* `jwt_bearer_flow`: JWT Bearer flow
+
+[bool]
+==== `auth.oauth2.user_password_flow.enabled`
+
+Whether to use the user-password flow for authentication. Default: `false`.
+
+NOTE: Only one authentication flow can be enabled at a time.
+
+[string]
+==== `auth.oauth2.user_password_flow.client.id`
+
+The client ID for the user-password flow.
+
+[string]
+==== `auth.oauth2.user_password_flow.client.secret`
+
+The client secret for the user-password flow.
+
+[string]
+==== `auth.oauth2.user_password_flow.token_url`
+
+The token URL for the user-password flow.
+
+[string]
+==== `auth.oauth2.user_password_flow.username`
+
+The username for the user-password flow.
+
+[string]
+==== `auth.oauth2.user_password_flow.password`
+
+The password for the user-password flow.
+
+[bool]
+==== `auth.oauth2.jwt_bearer_flow.enabled`
+
+Whether to use the JWT bearer flow for authentication. Default: `false`.
+
+NOTE: Only one authentication flow can be enabled at a time.
+
+[string]
+==== `auth.oauth2.jwt_bearer_flow.client.id`
+
+The client ID for the JWT bearer flow.
+
+[string]
+==== `auth.oauth2.jwt_bearer_flow.client.username`
+
+The username for the JWT bearer flow.
+
+[string]
+==== `auth.oauth2.jwt_bearer_flow.client.key_path`
+
+The path to the private key file for the JWT bearer flow. The file must be PEM encoded PKCS1 or PKCS8 private key and must have the right permissions set to have read access for the user running the program.
+
+[string]
+==== `auth.oauth2.jwt_bearer_flow.url`
+
+The URL for the JWT bearer flow.
+
+[string]
+==== `url`
+
+The URL of the Salesforce instance. Required.
+
+[[resource-parameters]]
+[float]
+==== `resource.timeout`
+
+Duration before declaring that the HTTP client connection has timed out. Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`. Default: `30s`.
+
+[float]
+==== `resource.retry.max_attempts`
+
+The maximum number of retries for the HTTP client. Default: `5`.
+
+[float]
+==== `resource.retry.wait_min`
+
+The minimum time to wait before a retry is attempted. Default: `1s`.
+
+[float]
+==== `resource.retry.wait_max`
+
+The maximum time to wait before a retry is attempted. Default: `60s`.
+
+[object]
+==== `event_monitoring_method`
+
+The event monitoring method to use. There are two event monitoring methods supported:
+
+* `event_log_file`: EventLogFile (ELF) using REST API
+
+* `object`: Real-time event monitoring using REST API (objects)
+
+[object]
+==== `event_monitoring_method.event_log_file`
+
+The event monitoring method to use — event_log_file. Uses the EventLogFile API to fetch the events from the Salesforce instance.
+
+[bool]
+==== `event_monitoring_method.event_log_file.enabled`
+
+Whether to use the EventLogFile API for event monitoring. Default: `false`.
+
+[duration]
+==== `event_monitoring_method.event_log_file.interval`
+
+The interval to collect the events from the Salesforce instance using the EventLogFile API.
+
+[string]
+==== `event_monitoring_method.event_log_file.query.default`
+
+The default query to fetch the events from the Salesforce instance using the EventLogFile API.
+
+In case the cursor state is not available, the default query will be used to fetch the events from the Salesforce instance. The default query must be a valid SOQL query. If the SOQL query in `event_monitoring_method.event_log_file.query.value` is not valid, the default query will be used to fetch the events from the Salesforce instance.
+
+[string]
+==== `event_monitoring_method.event_log_file.query.value`
+
+The SOQL query to fetch the events from the Salesforce instance using the EventLogFile API but it uses the cursor state to fetch the events from the Salesforce instance. The SOQL query must be a valid SOQL query. If the SOQL query is not valid, the default query will be used to fetch the events from the Salesforce instance.
+
+In case of restarts or subsequent executions, the cursor state will be used to fetch the events from the Salesforce instance. The cursor state is the last event time of the last event fetched from the Salesforce instance. The cursor state is taken from `event_monitoring_method.event_log_file.cursor.field` field for the last event fetched from the Salesforce instance.
+
+[string]
+==== `event_monitoring_method.event_log_file.cursor.field`
+
+The field to use to fetch the cursor state from the last event fetched from the Salesforce instance. The field must be a valid field in the SOQL query specified in `event_monitoring_method.event_log_file.query.default` and `event_monitoring_method.event_log_file.query.value` i.e., part of the selected fields in the SOQL query.
+
+[object]
+==== `event_monitoring_method.object`
+
+The event monitoring method to use — object. Uses REST API to fetch the events directly from the objects from the Salesforce instance. This method is used for Setup Audit Trail and for monitoring real-time events.
+
+[bool]
+==== `event_monitoring_method.object.enabled`
+
+Whether to use the REST API for objects for event monitoring. Default: `false`.
+
+[duration]
+==== `event_monitoring_method.object.interval`
+
+The interval to collect the events from the Salesforce instance using the REST API from objects.
+
+[string]
+==== `event_monitoring_method.object.query.default`
+
+The default SOQL query to fetch the events from the Salesforce instance using the REST API from objects.
+
+In case the cursor state is not available, the default query will be used to fetch the events from the Salesforce instance. The default query must be a valid SOQL query. If the SOQL query in `event_monitoring_method.object.query.value` is not valid, the default query will be used to fetch the events from the Salesforce instance.
+
+[string]
+==== `event_monitoring_method.object.query.value`
+
+The SOQL query to fetch the events from the Salesforce instance using the REST API from objects but it uses the cursor state to fetch the events from the Salesforce instance. The SOQL query must be a valid SOQL query. If the SOQL query is not valid, the default query will be used to fetch the events from the Salesforce instance.
+
+In case of restarts or subsequent executions, the cursor state will be used to fetch the events from the Salesforce instance. The cursor state is the last event time of the last event fetched from the Salesforce instance. The cursor state is taken from `event_monitoring_method.object.cursor.field` field for the last event fetched from the Salesforce instance.
+
+[string]
+==== `event_monitoring_method.object.cursor.field`
+
+The field to use to fetch the cursor state from the last event fetched from the Salesforce instance. The field must be a valid field in the SOQL query specified in `event_monitoring_method.object.query.default` and `event_monitoring_method.object.query.value` i.e., part of the selected fields in the SOQL query.
+
+[id="{beatname_lc}-input-{type}-common-options"]
+include::../../../../filebeat/docs/inputs/input-common-options.asciidoc[]
+
+:type!:
