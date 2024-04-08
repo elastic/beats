@@ -155,7 +155,7 @@ func TestParseClientPolicy(t *testing.T) {
 		if err != nil {
 			if test.expectedErr != nil {
 				assert.Equalf(t, test.expectedErr.Error(), err.Error(),
-					"Aerospike policy the error produced is not the one expected. Got '%s' expected '%s'", err.Error(), test.expectedErr.Error())
+					"Aerospike policy the error produced is not the one expected: got '%s', expected '%s'", err.Error(), test.expectedErr.Error())
 				continue
 			}
 			t.Error(err)
