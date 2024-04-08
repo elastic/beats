@@ -1,0 +1,26 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+
+steps:
+  - trigger: "auditbeat"
+    label: ":rocket: Auditbeat"
+    if: build.env("RUN_AUDITBEAT") == "true"
+    # async: true
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - trigger: "heartbeat"
+    label: ":rocket: heartbeat"
+    if: build.env("RUN_HEARTBEAT") == "true"
+    # async: true
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+
+  - trigger: "merticbeat"
+    label: ":rocket: merticbeat"
+    if: build.env("RUN_MERTICBEAT") == "true"
+    # async: true
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
