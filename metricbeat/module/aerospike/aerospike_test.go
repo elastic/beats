@@ -99,20 +99,15 @@ func TestParseInfo(t *testing.T) {
 	}
 }
 
-func getStringPointer(value string) *string {
-	return &value
-}
-
-func getBoolPointer(value bool) *bool {
-	return &value
+func pointer[T any](d T) *T {
+	return &d
 }
 
 func TestParseClientPolicy(t *testing.T) {
-
 	sampleClusterName := "TestCluster"
 
 	TLSPolicy := as.NewClientPolicy()
-	tlsconfig, _ := tlscommon.LoadTLSConfig(&tlscommon.Config{Enabled: getBoolPointer(true)})
+	tlsconfig, _ := tlscommon.LoadTLSConfig(&tlscommon.Config{Enabled: pointer(true)})
 	TLSPolicy.TlsConfig = tlsconfig.ToConfig()
 
 	ClusterNamePolicy := as.NewClientPolicy()
@@ -134,7 +129,7 @@ func TestParseClientPolicy(t *testing.T) {
 			Name: "TLS Declaration",
 			Config: Config{
 				TLS: &tlscommon.Config{
-					Enabled: getBoolPointer(true),
+					Enabled: pointer(true),
 				},
 			},
 			expectedClientPolicy: TLSPolicy,
@@ -143,7 +138,7 @@ func TestParseClientPolicy(t *testing.T) {
 		{
 			Name: "Cluster Name Setting",
 			Config: Config{
-				ClusterName: getStringPointer(sampleClusterName),
+				ClusterName: pointer(sampleClusterName),
 			},
 			expectedClientPolicy: ClusterNamePolicy,
 			expectedErr:          nil,
