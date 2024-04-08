@@ -23,6 +23,7 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_xpack_packetbeat+x}" ] && run_xpack_packetbeat="$(buildkite-agent meta-data get run_xpack_packetbeat --default "false")"
 [ -z "${run_xpack_winlogbeat+x}" ] && run_xpack_winlogbeat="$(buildkite-agent meta-data get run_xpack_winlogbeat --default "false")"
 [ -z "${run_xpack_auditbeat+x}" ] && run_xpack_auditbeat="$(buildkite-agent meta-data get run_xpack_auditbeat --default "false")"
+[ -z "${run_xpack_dockerlogbeat+x}" ] && run_xpack_dockerlogbeat="$(buildkite-agent meta-data get run_xpack_dockerlogbeat --default "false")"
 [ -z "${run_xpack_filebeat+x}" ] && run_xpack_filebeat="$(buildkite-agent meta-data get run_xpack_filebeat --default "false")"
 [ -z "${run_xpack_heartbeat+x}" ] && run_xpack_heartbeat="$(buildkite-agent meta-data get run_xpack_heartbeat --default "false")"
 [ -z "${run_xpack_osquerybeat+x}" ] && run_xpack_osquerybeat="$(buildkite-agent meta-data get run_xpack_osquerybeat --default "false")"
@@ -63,7 +64,7 @@ auditbeat_changeset=(
 
 filebeat_changeset=(
   "^filebeat/.*"
-  )  
+  )
 
 metricbeat_changeset=(
   "^metricbeat/.*"
@@ -195,12 +196,13 @@ case "${BUILDKITE_PIPELINE_SLUG}" in
     BEAT_CHANGESET_REFERENCE=${xpack_winlogbeat_changeset[@]}
     ;;
   *)
-  echo "The changeset for the ${BUILDKITE_PIPELINE_SLUG} pipeline hasn't been defined yet."
+  echo "~~~ The changeset for the ${BUILDKITE_PIPELINE_SLUG} pipeline hasn't been defined yet."
   ;;
 esac
 
 check_and_set_beat_vars() {
-  if [[ -n "$BEATS_PROJECT_NAME" && "$BEATS_PROJECT_NAME" == *"x-pack/"* ]]; then
+  local BEATS_PROJECT_NAME=${BEATS_PROJECT_NAME:=""}
+  if [[ "${BEATS_PROJECT_NAME:=""}" == *"x-pack/"* ]]; then
     BEATS_XPACK_PROJECT_NAME=${BEATS_PROJECT_NAME//-/}              #remove -
     BEATS_XPACK_PROJECT_NAME=${BEATS_XPACK_PROJECT_NAME//\//_}      #replace / to _
     BEATS_XPACK_LABEL_PROJECT_NAME=${BEATS_PROJECT_NAME//\//-}      #replace / to - for labels
@@ -210,7 +212,7 @@ check_and_set_beat_vars() {
     TRIGGER_SPECIFIC_AWS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_aws_tests"
     TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_macos_tests"
     TRIGGER_SPECIFIC_WIN_TESTS="run_${BEATS_XPACK_PROJECT_NAME}_win_tests"
-    echo "Beats project name is $BEATS_XPACK_PROJECT_NAME"
+    echo "--- Beats project name is $BEATS_XPACK_PROJECT_NAME"
     mandatory_changeset=(
       "${BEAT_CHANGESET_REFERENCE[@]}"
       "${xpack_changeset[@]}"
@@ -223,7 +225,7 @@ check_and_set_beat_vars() {
     TRIGGER_SPECIFIC_AWS_TESTS="run_${BEATS_PROJECT_NAME}_aws_tests"
     TRIGGER_SPECIFIC_MACOS_TESTS="run_${BEATS_PROJECT_NAME}_macos_tests"
     TRIGGER_SPECIFIC_WIN_TESTS="run_${BEATS_PROJECT_NAME}_win_tests"
-    echo "Beats project name is $BEATS_PROJECT_NAME"
+    echo "--- Beats project name is $BEATS_PROJECT_NAME"
     mandatory_changeset=(
       "${BEAT_CHANGESET_REFERENCE[@]}"
       "${oss_changeset[@]}"
@@ -249,19 +251,6 @@ with_docker_compose() {
   chmod +x ${BIN}/docker-compose
   export PATH="${BIN}:${PATH}"
   docker-compose version
-}
-
-with_Terraform() {
-    echo "Setting up the Terraform environment..."
-    local path_to_file="${WORKSPACE}/terraform.zip"
-    create_workspace
-    check_platform_architeture
-    retry 5 curl -sSL -o ${path_to_file} "https://releases.hashicorp.com/terraform/${ASDF_TERRAFORM_VERSION}/terraform_${ASDF_TERRAFORM_VERSION}_${platform_type_lowercase}_${go_arch_type}.zip"
-    unzip -q ${path_to_file} -d ${BIN}/
-    rm ${path_to_file}
-    chmod +x ${BIN}/terraform
-    export PATH="${BIN}:${PATH}"
-    terraform version
 }
 
 create_workspace() {
@@ -466,7 +455,7 @@ are_conditions_met_macos_tests() {
 }
 
 are_conditions_met_win_tests() {
-  if are_conditions_met_mandatory_tests; then    
+  if are_conditions_met_mandatory_tests; then
     if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
       if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_WIN_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_WIN_LABEL} || "${!TRIGGER_SPECIFIC_WIN_TESTS}" == "true" ]]; then
         return 0
@@ -529,7 +518,11 @@ defineModuleFromTheChangeSet() {
     fi
   done
   if [[ -z "$changed_modules" ]]; then # TODO: remove this condition and uncomment the line below when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
-    export MODULE="aws"
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
+      export MODULE="aws"
+    else
+      export MODULE="kubernetes"
+    fi
   else
     export MODULE="${changed_modules}"  # TODO: remove this line and uncomment the line below when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
   # export MODULE="${changed_modules}"     # TODO: uncomment the line when the issue https://github.com/elastic/ingest-dev/issues/2993 is solved
