@@ -13,6 +13,9 @@ GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
   source .buildkite/env-scripts/env.sh
+  if [[ -z "${GO_VERSION-""}" ]]; then
+    export GO_VERSION=$(cat "${WORKSPACE}/.go-version")
+  fi
 
   # Images with prefix "platform-ingest-beats-*" has Go pre-setup.
   # Image itself takes care of Go version download/installation based on .go-version file
