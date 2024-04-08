@@ -202,6 +202,9 @@ Example:
   One can monitor the status of the lease with `kubectl describe lease beats-cluster-leader`.
   Different Beats that refer to the same leader lease will be competitors in holding the lease
   and only one will be elected as leader each time.
+`leader_leaseduration`:: (Optional) Duration that non-leader candidates will wait to force acquire the lease leadership. Defaults to `15s`.
+`leader_renewdeadline`:: (Optional) Duration that the leader will retry refreshing its leadership before giving up. Defaults to `10s`.
+`leader_retryperiod`:: (Optional) Duration that the metricbeat instances running to acquire the lease should wait between tries of actions. Defaults to `2s`.
 
 Configuration templates can contain variables from the autodiscover event. These variables can be accessed under the `data`
 namespace, e.g. to access Pod IP: `${data.kubernetes.pod.ip}`.
