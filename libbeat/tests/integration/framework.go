@@ -398,7 +398,11 @@ func (b *BeatProc) WriteConfigFile(cfg string) {
 // when the test ends.
 func (b *BeatProc) openLogFile() *os.File {
 	t := b.t
-	glob := fmt.Sprintf("%s-*.ndjson", filepath.Join(b.tempDir, b.beatName))
+	// Beats can produce two different log files, to make sure we're
+	// reading the normal one we add the year to the glob. The default
+	// log file name looks like: filebeat-20240116.ndjson
+	year := time.Now().Year()
+	glob := fmt.Sprintf("%s-%d*.ndjson", filepath.Join(b.tempDir, b.beatName), year)
 	files, err := filepath.Glob(glob)
 	if err != nil {
 		t.Fatalf("could not expand log file glob: %s", err)
@@ -484,9 +488,9 @@ func EnsureESIsRunning(t *testing.T) {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		// If you're reading this message, you probably forgot to start ES
-		// run `mage compose:Up` from Filebeat's folder to start all
+		// run `mage docker:composeUp` from Filebeat's folder to start all
 		// containers required for integration tests
-		t.Fatalf("cannot execute HTTP request to ES: '%s', check to make sure ES is running (mage compose:Up)", err)
+		t.Fatalf("cannot execute HTTP request to ES: '%s', check to make sure ES is running (mage docker:composeUp)", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
