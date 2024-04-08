@@ -4,7 +4,6 @@ env:
 
 steps:
   - label: "Trigger Auditbeat"
-    branches: main
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only HEAD~1"
@@ -21,7 +20,6 @@ steps:
                   BUILDKITE_PULL_REQUEST: "${BUILDKITE_PULL_REQUEST}"
                   GITHUB_PR_LABELS: "${GITHUB_PR_LABELS}"
   - label: "Trigger Heartbeat"
-    branches: main
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only HEAD~1"
