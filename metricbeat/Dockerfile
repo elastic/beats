@@ -1,9 +1,5 @@
-<<<<<<< HEAD
 FROM golang:1.20.12
-=======
-FROM golang:1.21.9
 COPY --from=docker:26.0.0-alpine3.19 /usr/local/bin/docker /usr/local/bin/
->>>>>>> 33b776a1b9 ([7.17] Fix Python systems tests with forked docker-compose package (#38743))
 
 RUN \
     apt update \
@@ -13,13 +9,10 @@ RUN \
          python3-dev \
          python3-pip \
          python3-venv \
-<<<<<<< HEAD
          libaio-dev \
          unzip \
-=======
          libssl-dev \
          libffi-dev \
->>>>>>> 33b776a1b9 ([7.17] Fix Python systems tests with forked docker-compose package (#38743))
       && rm -rf /var/lib/apt/lists/*
 
 # Use a virtualenv to avoid the PEP668 "externally managed environment" error caused by conflicts

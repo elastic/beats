@@ -39,12 +39,7 @@ pytest==7.3.2
 pytest-rerunfailures==9.1.1
 pytest-timeout==1.4.2
 PyYAML==5.3.1
-<<<<<<< HEAD
 redis==4.4.4
-requests==2.31.0
-=======
-redis==2.10.6
->>>>>>> 33b776a1b9 ([7.17] Fix Python systems tests with forked docker-compose package (#38743))
 semver==2.8.1
 setuptools==65.5.1
 six==1.15.0
@@ -52,10 +47,6 @@ stomp.py==4.1.22
 termcolor==1.1.0
 texttable==0.9.1
 toml==0.10.1
-<<<<<<< HEAD
-urllib3==1.26.5
-=======
->>>>>>> 33b776a1b9 ([7.17] Fix Python systems tests with forked docker-compose package (#38743))
 wcwidth==0.2.5
 websocket-client==0.47.0
 zipp>=1.2.0,<=3.1.0
