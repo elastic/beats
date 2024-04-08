@@ -22,11 +22,7 @@ package elasticsearch
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
-	"net/http"
-	"net/http/httptest"
-	"net/url"
 	"testing"
 	"time"
 
@@ -483,33 +479,4 @@ func randomClient(grp outputs.Group) outputs.NetworkClient {
 
 	client := grp.Clients[rand.Intn(L)]
 	return client.(outputs.NetworkClient)
-}
-
-// startTestProxy starts a proxy that redirects all connections to the specified URL
-func startTestProxy(t *testing.T, redirectURL string) *httptest.Server {
-	t.Helper()
-
-	realURL, err := url.Parse(redirectURL)
-	require.NoError(t, err)
-
-	proxy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		req := r.Clone(context.Background())
-		req.RequestURI = ""
-		req.URL.Scheme = realURL.Scheme
-		req.URL.Host = realURL.Host
-
-		resp, err := http.DefaultClient.Do(req)
-		require.NoError(t, err)
-		defer resp.Body.Close()
-
-		body, err := ioutil.ReadAll(resp.Body)
-		require.NoError(t, err)
-
-		for _, header := range []string{"Content-Encoding", "Content-Type"} {
-			w.Header().Set(header, resp.Header.Get(header))
-		}
-		w.WriteHeader(resp.StatusCode)
-		w.Write(body)
-	}))
-	return proxy
 }
