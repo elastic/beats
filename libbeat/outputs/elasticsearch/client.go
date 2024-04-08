@@ -312,6 +312,8 @@ func (client *Client) bulkEncodePublishRequest(version version.V, data []publish
 		}
 		event := data[i].EncodedEvent.(*encodedEvent)
 		if event.err != nil {
+			// This means there was an error when encoding the event and it isn't
+			// ingestable, so report the error and continue.
 			client.log.Error(event.err)
 			continue
 		}
