@@ -138,7 +138,7 @@ func TestParseClientPolicy(t *testing.T) {
 		{
 			Name: "Cluster Name Setting",
 			Config: Config{
-				ClusterName: pointer(sampleClusterName),
+				ClusterName: sampleClusterName,
 			},
 			expectedClientPolicy: ClusterNamePolicy,
 			expectedErr:          nil,

@@ -28,7 +28,7 @@ import (
 )
 
 type Config struct {
-	ClusterName *string           `config:"cluster_name"`
+	ClusterName string            `config:"cluster_name"`
 	TLS         *tlscommon.Config `config:"ssl"`
 }
 
@@ -47,8 +47,8 @@ func ParseClientPolicy(config Config) (*as.ClientPolicy, error) {
 		clientPolicy.TlsConfig = tlsconfig.ToConfig()
 	}
 
-	if config.ClusterName != nil {
-		clientPolicy.ClusterName = *config.ClusterName
+	if config.ClusterName != "" {
+		clientPolicy.ClusterName = config.ClusterName
 	}
 	return clientPolicy, nil
 }
