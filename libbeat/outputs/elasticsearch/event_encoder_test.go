@@ -19,21 +19,68 @@ package elasticsearch
 
 import (
 	"testing"
+	"time"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/beat/events"
+	"github.com/elastic/beats/v7/libbeat/outputs/outil"
 	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
+type testIndexSelector struct{}
+
+func (testIndexSelector) Select(event *beat.Event) (string, error) {
+	return "test", nil
+}
+
 func TestEncodeEntry(t *testing.T) {
-	/*cfg := c.MustNewConfigFrom(mapstr.M{})
-	info := beat.Info{
-		IndexPrefix: "test",
-		Version:     version.GetDefaultVersion(),
+	indexSelector := testIndexSelector{}
+	pipelineSelector := outil.MakeSelector(
+		outil.ConstSelectorExpr("testPipeline", outil.SelectorKeepCase))
+
+	encoder := newEventEncoder(true, indexSelector, &pipelineSelector)
+
+	timestamp := time.Date(1980, time.January, 1, 0, 0, 0, 0, time.FixedZone("UTC", 0))
+	pubEvent := publisher.Event{
+		Content: beat.Event{
+			Timestamp: timestamp,
+			Fields: mapstr.M{
+				"test_field":   "test_value",
+				"number_field": 5,
+				"nested": mapstr.M{
+					"nested_field": "nested_value",
+				},
+			},
+			Meta: mapstr.M{
+				events.FieldMetaOpType: "create",
+			},
+		},
 	}
-
-	index, pipeline, err := buildSelectors(im, info, cfg)
+	pipeline, err := pipelineSelector.Select(&pubEvent.Content)
 	require.NoError(t, err)
+	require.Equal(t, "testPipeline", pipeline)
 
-	encoder := newEventEncoder(true, testIndexSelector{})*/
+	encoded, encodedSize := encoder.EncodeEntry(pubEvent)
+	encPubEvent, ok := encoded.(publisher.Event)
+
+	// Check the resulting publisher.Event
+	require.True(t, ok, "EncodeEntry must return a publisher.Event")
+	require.NotNil(t, encPubEvent.EncodedEvent, "EncodeEntry must set EncodedEvent")
+	assert.Nil(t, encPubEvent.Content.Fields, "EncodeEntry should clear event.Content")
+
+	// Check the inner encodedEvent
+	encBeatEvent, ok := encPubEvent.EncodedEvent.(*encodedEvent)
+	require.True(t, ok, "EncodeEntry should set EncodedEvent to a *encodedEvent")
+	require.Equal(t, len(encBeatEvent.encoding), encodedSize, "Reported size should match encoded buffer")
+
+	assert.Equal(t, "test", encBeatEvent.index, "Event should have the index set by its selector")
+	assert.Equal(t, "testPipeline", encBeatEvent.pipeline, "Event should have the pipeline set by its selector")
+	assert.Equal(t, timestamp, encBeatEvent.timestamp, "encodedEvent.timestamp should match the original event")
+	assert.Equal(t, events.OpTypeCreate, encBeatEvent.opType, "encoded opType should match the original metadata")
+	// encBeatEvent.opType)
 }
 
 // encodeBatch encodes a publisher.Batch so it can be provided to

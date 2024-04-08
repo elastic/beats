@@ -52,12 +52,6 @@ import (
 	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
-type testIndexSelector struct{}
-
-func (testIndexSelector) Select(event *beat.Event) (string, error) {
-	return "test", nil
-}
-
 type batchMock struct {
 	events      []publisher.Event
 	ack         bool
