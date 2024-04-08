@@ -85,7 +85,7 @@ func testPublishEvent(t *testing.T, index string, cfg map[string]interface{}) {
 	output, client := connectTestEsWithStats(t, cfg, index)
 
 	// drop old index preparing test
-	client.conn.Delete(index, "", "", nil)
+	_, _, _ = client.conn.Delete(index, "", "", nil)
 
 	batch := encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
@@ -131,7 +131,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
 	})
-	client.conn.Delete(index, "", "", nil)
+	_, _, _ = client.conn.Delete(index, "", "", nil)
 
 	// Check version
 	if client.conn.GetVersion().Major < 5 {
@@ -139,7 +139,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 	}
 
 	publish := func(event beat.Event) {
-		batch := encodeBatch(outest.NewBatch(event))
+		batch := encodeBatch(client, outest.NewBatch(event))
 		err := output.Publish(context.Background(), batch)
 		if err != nil {
 			t.Fatal(err)
@@ -168,7 +168,7 @@ func TestClientPublishEventWithPipeline(t *testing.T) {
 		},
 	}
 
-	client.conn.DeletePipeline(pipeline, nil)
+	_, _, _ = client.conn.DeletePipeline(pipeline, nil)
 	_, resp, err := client.conn.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {
 		t.Fatal(err)
@@ -218,8 +218,8 @@ func TestClientBulkPublishEventsWithDeadletterIndex(t *testing.T) {
 			},
 		},
 	})
-	client.conn.Delete(index, "", "", nil)
-	client.conn.Delete(deadletterIndex, "", "", nil)
+	_, _, _ = client.conn.Delete(index, "", "", nil)
+	_, _, _ = client.conn.Delete(deadletterIndex, "", "", nil)
 
 	batch := encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
@@ -279,7 +279,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 		"index":    index,
 		"pipeline": "%{[pipeline]}",
 	})
-	client.conn.Delete(index, "", "", nil)
+	_, _, _ = client.conn.Delete(index, "", "", nil)
 
 	if client.conn.GetVersion().Major < 5 {
 		t.Skip("Skipping tests as pipeline not available in <5.x releases")
@@ -315,7 +315,7 @@ func TestClientBulkPublishEventsWithPipeline(t *testing.T) {
 		},
 	}
 
-	client.conn.DeletePipeline(pipeline, nil)
+	_, _, _ = client.conn.DeletePipeline(pipeline, nil)
 	_, resp, err := client.conn.CreatePipeline(pipeline, nil, pipelineBody)
 	if err != nil {
 		t.Fatal(err)
@@ -357,7 +357,7 @@ func TestClientPublishTracer(t *testing.T) {
 		"index": index,
 	})
 
-	client.conn.Delete(index, "", "", nil)
+	_, _, _ = client.conn.Delete(index, "", "", nil)
 
 	batch := encodeBatch(client, outest.NewBatch(beat.Event{
 		Timestamp: time.Now(),
@@ -437,7 +437,7 @@ func connectTestEs(t *testing.T, cfg interface{}, stats outputs.Observer) (outpu
 	client := randomClient(output).(clientWrap).Client().(*Client)
 
 	// Load version number
-	client.Connect()
+	_ = client.Connect()
 
 	return client, client
 }
