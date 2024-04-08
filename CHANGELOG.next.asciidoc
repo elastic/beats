@@ -61,6 +61,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - Fix the paths in the .cmd script added to the path by the Windows MSI to point to the new C:\Program Files installation location. https://github.com/elastic/elastic-stack-installers/pull/238
+- Change cache processor documentation from `write_period` to `write_interval`. {pull}38561[38561]
+- Fix cache processor expiries heap cleanup on partial file writes. {pull}38561[38561]
+- Fix cache processor expiries infinite growth when large a large TTL is used and recurring keys are cached. {pull}38561[38561]
 
 *Auditbeat*
 
@@ -93,6 +96,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix PEM key validation for CEL and HTTPJSON inputs. {pull}38405[38405]
 - Fix filebeat gcs input panic {pull}38407[38407]
 - Rename `activity_guid` to `activity_id` in ETW input events to suit other Windows inputs. {pull}38530[38530]
+- Add missing provider registration and fix published entity for Active Directory entityanalytics provider. {pull}38645[38645]
+- Fix handling of un-parsed JSON in O365 module. {issue}37800[37800] {pull}38709[38709]
 
 *Heartbeat*
 
@@ -100,6 +105,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix setuid root when running under cgroups v2. {pull}37794[37794]
 - Adjust State loader to only retry when response code status is 5xx {pull}37981[37981]
 - Reset prctl dumpable flag after cap drop. {pull}38269[38269]
+
+*Heartbeat*
+
 - Fix reference yaml format. {pull}38584[38584]
 
 *Metricbeat*
@@ -127,15 +135,20 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added append Processor which will append concrete values or values from a field to target. {issue}29934[29934] {pull}33364[33364]
 - dns processor: Add support for forward lookups (`A`, `AAAA`, and `TXT`). {issue}11416[11416] {pull}36394[36394]
 - [Enhanncement for host.ip and host.mac] Disabling netinfo.enabled option of add-host-metadata processor {pull}36506[36506]
-Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
 - allow `queue` configuration settings to be set under the output. {issue}35615[35615] {pull}36788[36788]
 - Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 - Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
-Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will disable the netinfo.enabled option of add_host_metadata processor
+- Update to Go 1.21.9. {pulk}38727[38727]
 
 *Auditbeat*
 
+- Added `add_session_metadata` processor, which enables session viewer on Auditbeat data. {pull}37640[37640]
+- Add linux capabilities to processes in the system/process. {pull}37453[37453]
+- Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
+- Add linux capabilities to processes in the system/process. {pull}37453[37453]
+- Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
+- Add process data to file events (Linux only, eBPF backend). {pull}38199[38199]
 
 *Filebeat*
 
@@ -187,6 +200,7 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 - Parse more fields from Elasticsearch slowlogs {pull}38295[38295]
 - Update CEL mito extensions to v1.10.0 to add keys/values helper. {pull}38504[38504]
 - Add support for Active Directory an entity analytics provider. {pull}37919[37919]
+- Add debugging breadcrumb to logs when writing request trace log. {pull}38636[38636]
 
 *Auditbeat*
 
@@ -268,6 +282,9 @@ Setting environmental variable ELASTIC_NETINFO:false in Elastic Agent pod will d
 
 
 ==== Known Issues
+
+
+
 
 
 
