@@ -19,6 +19,10 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
 
+  notify:
+    - github_commit_status:
+        context: "$BEATS_PROJECT_NAME PR test"
+
 steps:
   - label: ":ubuntu: Heartbeat Unit Tests"
     command: ".buildkite/scripts/test.sh"
