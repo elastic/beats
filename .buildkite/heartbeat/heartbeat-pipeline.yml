@@ -21,9 +21,9 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
 
-  notify:
-    - github_commit_status:
-        context: "$BEATS_PROJECT_NAME PR test"
+notify:
+  - github_commit_status:
+      context: "$BEATS_PROJECT_NAME PR test"
 
 steps:
   - group: "Heartbeat Mandatory Testing"

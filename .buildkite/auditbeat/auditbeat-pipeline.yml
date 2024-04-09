@@ -27,9 +27,9 @@ env:
   PACKAGING_ARM_PLATFORMS: "linux/arm64"
   PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 
-  notify:
-    - github_commit_status:
-        context: "$BEATS_PROJECT_NAME PR test"
+notify:
+  - github_commit_status:
+      context: "$BEATS_PROJECT_NAME PR test"
 
 steps:
   - group: "Auditbeat Mandatory Testing"
