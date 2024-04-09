@@ -96,7 +96,7 @@ steps:
 
   - label: ":elastic-stack: Publishing to DRA"
     key: dra-publish
-    depends_on: package
+    # depends_on: package
     agents:
       provider: "gcp"
     env:
