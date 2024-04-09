@@ -3536,7 +3536,7 @@ format: percent
 *`aws.rds.cpu.total.pct`*::
 +
 --
-The percentage of CPU utilization.
+CPU utilization with value range from 0 to 1.
 
 
 type: scaled_float
