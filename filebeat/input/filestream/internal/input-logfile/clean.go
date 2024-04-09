@@ -79,6 +79,10 @@ func gcStore(log *logp.Logger, started time.Time, store *store) {
 	if err := gcClean(store, keys); err != nil {
 		log.Errorf("Failed to remove all entries from the registry: %+v", err)
 	}
+
+	// The main reason for this log entry is to enable tests that want to observe
+	// if the resources are correctly removed from the store.
+	log.Debugf("%d entries removed", len(keys))
 }
 
 // gcFind searches the store of resources that can be removed. A set of keys to delete is returned.
