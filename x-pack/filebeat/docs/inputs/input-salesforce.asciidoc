@@ -11,21 +11,21 @@
 
 Use the `salesforce` input to monitor Salesforce events either via the https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm[Salesforce EventLogFile (ELF) API] or the https://developer.salesforce.com/blogs/2020/05/introduction-to-real-time-event-monitoring[Salesforce Real-time event monitoring API]. Both use REST API (to execute SOQL queries in the Salesforce instance) under the hood to query the relevant objects to fetch the events.
 
-Here the `input` have cursor state(s) that will be provided to the next execution of event monitoring to fetch the events from the last cursor state. The cursor states can be used to control the behaviour of the program.
+The Salesforce input maintains cursor states between requests to track the last event retrieved in each execution. These cursor states are passed to the next event monitoring execution to resume fetching events from the last known position. The cursor states allow the input to pick up where it left off and provide control over the behavior of the input.
 
-This input supports:
+Here are some key points about how cursors are used in the Salesforce input:
 
-* Auth
-** OAuth2
-*** User-Password flow
-*** JWT Bearer flow
-* Event Monitoring
-** EventLogFile (ELF) using REST API
-** REST API for objects (Used for Setup Audit Trail and for monitoring real-time events)
+- Separate cursor states are maintained for each configured event monitoring method (`event_log_file` and `object`).
+- The cursor state stores the unique identifier of the last event retrieved, based on the `cursor.field` specified in the configuration.
+- On the first run, the `query.default` is used to fetch an initial set of events.
+- On subsequent runs, the `query.value` template is populated with the cursor state to fetch events since the last execution.
+- If the input is restarted, it will resume from the last persisted cursor state rather than starting over from scratch.
+
+Using cursors allows the Salesforce input to reliably keep track of its progress and avoid missing or duplicating events across executions. The cursor field should be chosen carefully to have a monotonically increasing value for each new event.
 
 Event Monitoring methods are highly configurable and can be used to monitor any supported object or event log file. The input can be configured to monitor multiple objects or event log files at the same time.
 
-Example configurations:
+Example configuration:
 
 ["source","yaml",subs="attributes"]
 ----
@@ -78,6 +78,25 @@ There are two methods to fetch the events from the Salesforce instance:
 
 - object: This method is a general way of retrieving events from a Salesforce instance by using the REST API. It can be used for the SetupAuditTrail and for monitoring objects in real-time. In real-time event monitoring, subscribing to the events is a common practice, but the events are also stored in Salesforce org (if configured), specifically in big object tables that are preconfigured for each event type. To query the object, Salesforce's query language SOQL is used.
 
+[Note]
+
+[discrete]
+
+==== Salesforce Objects and SOQL Query Field Ordering Limitations
+
+Each Salesforce Object contains a set of fields, but SOQL queries have restrictions on the fields that can be ordered and the specific ordering method. The Object description on the Salesforce Developers page provides information about these limitations. For instance, the Login Object only allows ordering by the EventDate field in descending order.
+
+Cursor Inputs for Data Collection Over Time
+
+When collecting data over time using cursors, the following cursor inputs are available:
+
+- object.first_event_time: This cursor input stores the cursor value from the first event encountered during data collection using the object method.
+- object.last_event_time: This cursor input stores the cursor value from the last event encountered during data collection using the object method.
+- event_log_file.first_event_time: This cursor input stores the cursor value from the first event encountered during data collection using the event log file method.
+- event_log_file.last_event_time: This cursor input stores the cursor value from the last event encountered during data collection using the event log file method.
+
+By selecting one of the above cursor inputs, users can collect data from both the object and event log file in a desired order. The cursor configuration can be customized based on the user's specific requirements.
+
 ==== Configuration options
 
 The `salesforce` input supports the following configuration options plus the
@@ -113,7 +132,7 @@ There are two OAuth2 authentication flows supported:
 
 Whether to use the user-password flow for authentication. Default: `false`.
 
-NOTE: Only one authentication flow can be enabled at a time.
+[Note] Only one authentication flow can be enabled at a time.
 
 [string]
 ==== `auth.oauth2.user_password_flow.client.id`
@@ -145,7 +164,7 @@ The password for the user-password flow.
 
 Whether to use the JWT bearer flow for authentication. Default: `false`.
 
-NOTE: Only one authentication flow can be enabled at a time.
+[Note] Only one authentication flow can be enabled at a time.
 
 [string]
 ==== `auth.oauth2.jwt_bearer_flow.client.id`
