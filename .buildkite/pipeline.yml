@@ -14,6 +14,7 @@ steps:
               config:
                 trigger: "auditbeat"
                 build:
+                  message: "${BUILDKITE_MESSAGE}"
                   commit: "${BUILDKITE_COMMIT}"
                   branch: "${BUILDKITE_BRANCH}"
                 env:
@@ -31,6 +32,7 @@ steps:
               config:
                 trigger: "heartbeat"
                 build:
+                  message: "${BUILDKITE_MESSAGE}"
                   commit: "${BUILDKITE_COMMIT}"
                   branch: "${BUILDKITE_BRANCH}"
                   env:

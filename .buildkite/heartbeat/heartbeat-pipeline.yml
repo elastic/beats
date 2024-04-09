@@ -20,7 +20,7 @@ env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
 
 steps:
-  - label: ":ubuntu: Auditbeat Unit Tests"
+  - label: ":ubuntu: Heartbeat Unit Tests"
     command: ".buildkite/scripts/test.sh"
   # - group: "Heartbeat Mandatory Testing"
   #   key: "heartbeat-mandatory-tests"
