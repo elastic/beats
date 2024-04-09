@@ -65,7 +65,7 @@ limit the number of messages that can be processed concurrently or the maximum
 number of goroutines the input will create. Even with one goroutine, many
 messages might be processed at once, because that goroutine may continually
 receive messages. To limit the number of messages being processed concurrently,
-set `subscription.max_outstanding_messages`. Default is 1.
+set `subscription.max_outstanding_messages`. Default is 2.
 
 
 [float]
@@ -73,7 +73,7 @@ set `subscription.max_outstanding_messages`. Default is 1.
 
 The maximum number of unprocessed messages (unacknowledged but not yet expired).
 If the value is negative, then there will be no limit on the number of
-unprocessed messages. Default is 1000.
+unprocessed messages. Default is 1600.
 
 [float]
 ==== `credentials_file`

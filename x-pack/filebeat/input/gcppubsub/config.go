@@ -72,8 +72,8 @@ func defaultConfig() config {
 	c.ForwarderConfig = harvester.ForwarderConfig{
 		Type: "gcp-pubsub",
 	}
-	c.Subscription.NumGoroutines = 1
-	c.Subscription.MaxOutstandingMessages = 1000
+	c.Subscription.NumGoroutines = 2
+	c.Subscription.MaxOutstandingMessages = 1600
 	c.Subscription.Create = true
 	return c
 }
