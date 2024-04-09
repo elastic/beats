@@ -22,7 +22,12 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu Unit Tests"
 
       - label: ":linux: Ubuntu System Tests"
         key: "mandatory-linux-system-test"
@@ -31,20 +36,33 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu System Tests"
 
-      - label: ":rhel: RHEL-9 Unit Tests"
+      - label: ":rhel: RHEL9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: RHEL9 Unit Tests"
 
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command:
+          - "Set-Location -Path $BEATS_PROJECT_NAME"
+          - "New-Item -ItemType Directory -Force -Path 'build'"
+          - "mage unitTest"
         key: "mandatory-win-unit-tests"
         agents:
           provider: "gcp"
@@ -57,19 +75,26 @@ steps:
             image:
               - "${IMAGE_WIN_2016}"
               - "${IMAGE_WIN_2022}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
-      ##  TODO: uncomment when the issue https://github.com/elastic/beats/issues/38142 is solved
-      # - label: ":windows: Windows 2022 System Tests"
-      #   key: "mandatory-win-2022-system-tests"
-      #   command: ".buildkite/scripts/win_unit_tests.ps1 systemtest"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_WIN_2022}"
-      #     machineType: "${GCP_WIN_MACHINE_TYPE}"
-      #     disk_size: 100
-      #     disk_type: "pd-ssd"
-      #   artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":windows: Windows 2022 System Tests"
+        skip: "see https://github.com/elastic/beats/issues/38142"
+        key: "mandatory-win-2022-system-tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1 systemtest"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
 ## TODO: this condition will be changed in the Phase 3 of the Migration Plan https://docs.google.com/document/d/1IPNprVtcnHlem-uyGZM0zGzhfUuFAh4LeSl9JFHMSZQ/edit#heading=h.sltz78yy249h
 
@@ -78,7 +103,9 @@ steps:
     steps:
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
         key: "extended-win-unit-tests"
         agents:
           provider: "gcp"
@@ -92,19 +119,26 @@ steps:
               - "${IMAGE_WIN_10}"
               - "${IMAGE_WIN_11}"
               - "${IMAGE_WIN_2019}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
-      ##  TODO: uncomment when the issue https://github.com/elastic/beats/issues/38142 is solved
-      # - label: ":windows: Windows 10 System Tests"
-      #   key: "extended-win-10-system-tests"
-      #   command: ".buildkite/scripts/win_unit_tests.ps1 systemtest"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_WIN_10}"
-      #     machineType: "${GCP_WIN_MACHINE_TYPE}"
-      #     disk_size: 100
-      #     disk_type: "pd-ssd"
-      #   artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+      - label: ":windows: Windows 10 System Tests"
+        skip: "see https://github.com/elastic/beats/issues/38142"
+        key: "extended-win-10-system-tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1 systemtest"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
 YAML
 else
@@ -131,21 +165,31 @@ if  are_conditions_met_macos_tests; then
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: MacOS Unit Tests"
 
 YAML
 fi
 
 if  are_conditions_met_arm_tests; then
   cat >> $pipelineName <<- YAML
-      - label: ":linux: ARM Ubuntu Unit Tests"
+      - label: ":linux: Ubuntu ARM Unit Tests"
         key: "extended-arm64-unit-test"
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu ARM Unit Tests"
 
 YAML
 fi
@@ -173,6 +217,9 @@ if are_conditions_met_packaging; then
           disk_type: "pd-ssd"
         env:
           PLATFORMS: "${PACKAGING_PLATFORMS}"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Packaging Linux"
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
@@ -184,12 +231,15 @@ if are_conditions_met_packaging; then
         env:
           PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
           PACKAGES: "docker"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Packaging Linux ARM"
 
 YAML
 fi
 
-echo "--- Printing dynamic steps"     #TODO: remove if the pipeline is public
-cat $pipelineName
+echo "+++ Printing dynamic steps"
+cat $pipelineName | yq . -P
 
 echo "--- Loading dynamic steps"
 buildkite-agent pipeline upload $pipelineName

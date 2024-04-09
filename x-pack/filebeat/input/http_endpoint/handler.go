@@ -13,12 +13,14 @@ import (
 	"net"
 	"net/http"
 	"reflect"
+	"strconv"
 	"time"
 
 	"github.com/google/cel-go/cel"
 	"github.com/google/cel-go/checker/decls"
 	"github.com/google/cel-go/common/types"
 	"github.com/google/cel-go/common/types/ref"
+	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/types/known/structpb"
@@ -42,10 +44,12 @@ var (
 )
 
 type handler struct {
-	metrics   *inputMetrics
-	publisher stateless.Publisher
-	log       *logp.Logger
-	validator apiValidator
+	metrics     *inputMetrics
+	publisher   stateless.Publisher
+	log         *logp.Logger
+	validator   apiValidator
+	txBaseID    string         // Random value to make transaction IDs unique.
+	txIDCounter *atomic.Uint64 // Transaction ID counter that is incremented for each request.
 
 	reqLogger    *zap.Logger
 	host, scheme string
@@ -185,15 +189,26 @@ func (h *handler) logRequest(r *http.Request, status int, respBody []byte) {
 			zap.ByteString("http.response.body.content", respBody),
 		)
 	}
+	txID := h.nextTxID()
+	h.log.Debugw("new request trace transaction", "id", txID)
 	// Limit request logging body size to 10kiB.
 	const maxBodyLen = 10 * (1 << 10)
-	httplog.LogRequest(h.reqLogger, r, maxBodyLen, extra...)
+	httplog.LogRequest(h.reqLogger.With(zap.String("transaction.id", txID)), r, maxBodyLen, extra...)
 	if scheme != "" {
 		r.URL.Scheme = scheme
 	}
 	if host != "" {
 		r.URL.Host = host
 	}
+}
+
+func (h *handler) nextTxID() string {
+	count := h.txIDCounter.Inc()
+	return h.formatTxID(count)
+}
+
+func (h *handler) formatTxID(count uint64) string {
+	return h.txBaseID + "-" + strconv.FormatUint(count, 10)
 }
 
 func (h *handler) sendResponse(w http.ResponseWriter, status int, message string) {

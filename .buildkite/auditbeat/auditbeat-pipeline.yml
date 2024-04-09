@@ -1,137 +1,77 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+name: "beats-auditbeat"
 
 env:
-  IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
-  IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
-  IMAGE_WIN_2016: "family/core-windows-2016"
-  IMAGE_WIN_2019: "family/core-windows-2019"
-  IMAGE_WIN_2022: "family/core-windows-2022"
-  IMAGE_RHEL9: "family/core-rhel-9"
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  BEATS_PROJECT_NAME: "auditbeat"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
+  IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
+  IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
+  IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
+  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+
+  #Packaging
+  PACKAGING_ARM_PLATFORMS: "linux/arm64"
+  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+
+  #Deps
+  ASDF_MAGE_VERSION: 1.15.0
 
 steps:
-  - group: "Auditbeat Mandatory Testing"
-    key: "mandatory-tests"
-    if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat" || build.env("BUILDKITE_PULL_REQUEST") != "false"
+  - input: "Input Parameters"
+    key: "run_auditbeat"
+    fields:
+      - select: "auditbeat - run_auditbeat"
+        key: "run_auditbeat"
+        options:
+          - label: "True"
+            value: "true"
+          - label: "False"
+            value: "false"
+        default: "false"
+      - select: "auditbeat - run_auditbeat_macos_tests"
+        key: "run_auditbeat_macos_tests"
+        options:
+          - label: "True"
+            value: "true"
+          - label: "False"
+            value: "false"
+        default: "false"
+      - select: "auditbeat - run_auditbeat_arm_tests"
+        key: "run_auditbeat_arm_tests"
+        options:
+          - label: "True"
+            value: "true"
+          - label: "False"
+            value: "false"
+        default: "false"
+      - select: "auditbeat - run_auditbeat_win_tests"
+        key: "run_auditbeat_win_tests"
+        options:
+          - label: "True"
+            value: "true"
+          - label: "False"
+            value: "false"
+        default: "false"
+    if: "build.source == 'ui'"
 
-    steps:
-      - label: ":ubuntu: Unit Tests"
-        command:
-          - ".buildkite/auditbeat/scripts/unit-tests.sh"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: linux/Unit Tests"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-        artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
+  - wait: ~
+    if: "build.source == 'ui'"
+    allow_dependency_failure: false
 
-      - label: ":rhel: Unit Tests"
-        command:
-          - ".buildkite/auditbeat/scripts/unit-tests.sh"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: rhel/Unit Tests"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_RHEL9}"
-        artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
-
-      - label: ":windows:-{{matrix.image}} Unit Tests"
-        command: ".buildkite/auditbeat/scripts/unit-tests-win.ps1"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: windows/Unit Tests"
-        agents:
-          provider: "gcp"
-          image: "{{matrix.image}}"
-          machine_type: "n2-standard-8"
-          disk_size: 200
-          disk_type: "pd-ssd"
-        matrix:
-          setup:
-            image:
-              - "${IMAGE_WIN_2016}"
-              - "${IMAGE_WIN_2022}"
-        artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
-
-      - label: ":linux: Crosscompile"
-        command:
-          - ".buildkite/auditbeat/scripts/crosscompile.sh"
-        env:
-          GOX_FLAGS: "-arch amd64"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: Crosscompile"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-
-  - group: "Extended Testing"
-    key: "extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for extended support"
-
-    steps:
-      - label: ":linux: ARM64 Unit Tests"
-        key: "arm-extended"
-        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for arm" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-        command:
-          - ".buildkite/auditbeat/scripts/unit-tests.sh"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat/Extended: Unit Tests ARM"
-        agents:
-          provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "t4g.large"
-        artifact_paths: "auditbeat/build/*.xml"
-
-      - label: ":mac: MacOS Unit Tests"
-        key: "macos-extended"
-        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command:
-          - ".buildkite/auditbeat/scripts/unit-tests.sh"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat/Extended: MacOS Unit Tests"
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths: "auditbeat/build/*.xml"
-
-  - group: "Windows Extended Testing"
-    key: "extended-tests-win"
-    if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "auditbeat for windows" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
-
-    steps:
-      - label: ":windows: Win 2019 Unit Tests"
-        key: "win-extended-2019"
-        command: ".buildkite/auditbeat/scripts/unit-tests-win.ps1"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat/Extended: Win-2019 Unit Tests"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machine_type: "n2-standard-8"
-          disk_size: 200
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
-
-  - group: "Packaging"
-    key: "packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-    depends_on:
-      - "mandatory-tests"
-
-    steps:
-      - label: Package pipeline
-        commands: ".buildkite/auditbeat/scripts/package-step.sh"
+  - label: ":linux: Load dynamic auditbeat pipeline"
+    key: "auditbeat-pipeline"
+    command: ".buildkite/scripts/generate_auditbeat_pipeline.sh"
+    agents:
+      image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci:latest"
+    notify:
+      - github_commit_status:
+          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
