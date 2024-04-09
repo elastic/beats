@@ -62,7 +62,7 @@ steps:
                 - libbeat/**
                 - testing/**
               config:
-                trigger: "heartbeat"
+                trigger: "beats-metricbeat"
                 build:
                   commit: "${BUILDKITE_COMMIT}"
                   branch: "${BUILDKITE_BRANCH}"
