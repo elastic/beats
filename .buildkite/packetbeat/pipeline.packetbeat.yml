@@ -9,6 +9,7 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
@@ -25,34 +26,33 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
 
 steps:
-
   - input: "Input Parameters"
     key: "input-run-all-stages"
     fields:
-    - select: "Packetbeat - run_packetbeat"
-      key: "run_packetbeat"
-      options:
-        - label: "True"
-          value: "true"
-        - label: "False"
-          value: "false"
-      default: "false"
-    - select: "Packetbeat - run_packetbeat_arm_tests"
-      key: "run_packetbeat_arm_tests"
-      options:
-        - label: "True"
-          value: "true"
-        - label: "False"
-          value: "false"
-      default: "false"
-    - select: "Packetbeat - run_packetbeat_macos_tests"
-      key: "run_packetbeat_macos_tests"
-      options:
-        - label: "True"
-          value: "true"
-        - label: "False"
-          value: "false"
-      default: "false"
+      - select: "Packetbeat - run_packetbeat"
+        key: "run_packetbeat"
+        options:
+          - label: "True"
+            value: "true"
+          - label: "False"
+            value: "false"
+        default: "false"
+      - select: "Packetbeat - run_packetbeat_arm_tests"
+        key: "run_packetbeat_arm_tests"
+        options:
+          - label: "True"
+            value: "true"
+          - label: "False"
+            value: "false"
+        default: "false"
+      - select: "Packetbeat - run_packetbeat_macos_tests"
+        key: "run_packetbeat_macos_tests"
+        options:
+          - label: "True"
+            value: "true"
+          - label: "False"
+            value: "false"
+        default: "false"
     if: "build.source == 'ui'"
 
   - wait: ~
