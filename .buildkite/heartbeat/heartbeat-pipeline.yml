@@ -23,7 +23,7 @@ env:
 
 notify:
   - github_commit_status:
-      context: "$BEATS_PROJECT_NAME PR test"
+      context: "$BEATS_PROJECT_NAME"
 
 steps:
   - group: "Heartbeat Mandatory Testing"
@@ -54,9 +54,6 @@ steps:
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: Windows 2016/Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -71,9 +68,6 @@ steps:
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: Windows 2022/Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -152,9 +146,6 @@ steps:
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: Windows 11/Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -169,9 +160,6 @@ steps:
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: Windows 10/Unit Tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"

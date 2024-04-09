@@ -29,7 +29,7 @@ env:
 
 notify:
   - github_commit_status:
-      context: "$BEATS_PROJECT_NAME PR test"
+      context: "$BEATS_PROJECT_NAME"
 
 steps:
   - group: "Auditbeat Mandatory Testing"
@@ -37,7 +37,7 @@ steps:
 
     steps:
       - label: ":ubuntu: Auditbeat Unit Tests"
-        command: ".buildkite/scripts/test.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -121,9 +121,6 @@ steps:
     steps:
       - label: ":mac: MacOS Unit Tests"
         command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: MacOS Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -131,9 +128,6 @@ steps:
 
       - label: ":mac: MacOS ARM Unit Tests"
         command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
-        notify:
-          - github_commit_status:
-              context: "Auditbeat: MacOS ARM Unit Tests"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
