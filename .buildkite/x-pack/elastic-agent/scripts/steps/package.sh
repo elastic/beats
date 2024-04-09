@@ -16,8 +16,8 @@ echo "--- Packaging Elastic Agent"
 
 echo $ManifestURL
 
-# export AGENT_DROP_PATH=build/elastic-agent-drop
-# mkdir -p $AGENT_DROP_PATH
+export AGENT_DROP_PATH="build/distributions/elastic-agent-drop
+mkdir -p $AGENT_DROP_PATH
 
 mage -v -d x-pack/elastic-agent clean downloadManifest package ironbank fixDRADockerArtifacts
 
