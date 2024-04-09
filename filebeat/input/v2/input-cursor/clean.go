@@ -44,6 +44,7 @@ type cleaner struct {
 // once the last event has been ACKed.
 func (c *cleaner) run(canceler unison.Canceler, store *store, interval time.Duration) {
 	started := time.Now()
+	//nolint: errcheck // gcStore does not return an error
 	timed.Periodic(canceler, interval, func() error {
 		gcStore(c.log, started, store)
 		return nil
