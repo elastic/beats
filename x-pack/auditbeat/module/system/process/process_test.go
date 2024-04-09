@@ -5,7 +5,6 @@
 package process
 
 import (
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"os/user"
 	"testing"
 	"time"
@@ -16,6 +15,7 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/types"
 )

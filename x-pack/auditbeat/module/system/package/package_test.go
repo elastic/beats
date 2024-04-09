@@ -9,7 +9,6 @@ package pkg
 import (
 	"bytes"
 	"encoding/gob"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"io"
 	"os"
 	"path/filepath"
@@ -23,6 +22,7 @@ import (
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
