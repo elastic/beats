@@ -90,8 +90,7 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 	defer cancel()
 
 	var config aws.Config
-	err := m.Module().UnpackConfig(&config)
-	if err != nil {
+	if err := m.Module().UnpackConfig(&config); err != nil {
 		return err
 	}
 
@@ -157,9 +156,9 @@ func (m *MetricSet) getEventsSummary(
 				},
 			)
 		}
+
 		if err != nil {
-			err = fmt.Errorf("[AWS Health] DescribeEvents failed with : %w", err)
-			m.Logger().Error(err.Error())
+			m.Logger().Errorf("[AWS Health] DescribeEvents failed with : %w", err)
 			return nil
 		}
 		ets := eventOutput.Events
@@ -302,7 +301,7 @@ func generateEventID(eventID string) string {
 // is called to fetch the description of the event.
 // The function returns a slice of mb.Event structs containing the summarized event info.
 func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *health.Client, event types.Event, ch chan<- HealthDetails) error {
-	hd := HealthDetails{event: event}
+	hd := HealthDetails{event: event, affectedEntities: []types.AffectedEntity{}}
 	eventDetails, err := awsHealth.DescribeEventDetails(ctx, &health.DescribeEventDetailsInput{
 		EventArns: []string{*event.Arn},
 		Locale:    &locale,
@@ -313,7 +312,6 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 			return nil
 		}
 		err = fmt.Errorf("[AWS Health] DescribeEventDetails failed with : %w", err)
-		m.Logger().Error(err.Error())
 		return err
 	}
 
@@ -351,8 +349,6 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 					m.Logger().Debug("Context cancelled. Exiting gracefully.")
 					return nil
 				}
-				// Handle other errors
-				m.Logger().Error(err.Error())
 				return err
 			}
 			if affectedEntities != nil {
@@ -390,8 +386,6 @@ func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *heal
 					m.Logger().Info("Context cancelled. Exiting gracefully.")
 					return nil
 				}
-				// Handle other errors
-				m.Logger().Error(err.Error())
 				return err
 			}
 			if affectedEntities != nil {
