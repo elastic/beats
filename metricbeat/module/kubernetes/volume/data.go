@@ -75,6 +75,10 @@ func eventMapping(content []byte, logger *logp.Logger) ([]mapstr.M, error) {
 			if volume.Inodes > 0 {
 				kubernetes2.ShouldPut(volumeEvent, "fs.inodes.pct", float64(volume.InodesUsed)/float64(volume.Inodes), logger)
 			}
+			if volume.PvcRef.Name != "" && volume.PvcRef.Namespace != "" {
+				kubernetes2.ShouldPut(volumeEvent, "pvc.name", volume.PvcRef.Name, logger)
+				kubernetes2.ShouldPut(volumeEvent, "pvc.namespace", volume.PvcRef.Namespace, logger)
+			}
 			events = append(events, volumeEvent)
 		}
 
