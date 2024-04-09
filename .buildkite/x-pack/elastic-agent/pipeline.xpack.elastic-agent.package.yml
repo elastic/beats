@@ -45,55 +45,55 @@ steps:
   - wait: ~
     if: build.env("ManifestURL") == null
 
-  - group: ":Packaging Artefacts"
-    key: "package"
-    steps:
-      - label: "Package elastic-agent"
-        key: package_elastic-agent
-        command: |
-          if [[ -z "$${ManifestURL}" ]]; then
-            export ManifestURL=$(buildkite-agent meta-data get ManifestURL --default "")
-            if [[ -z "$${ManifestURL}" ]]; then
-              echo ":broken_heart: Missing ManifestURL variable or empty string provided"
-              echo "Provided ManifestURL: ${ManifestURL}"
-              exit 1
-            fi
-          fi
-          if [[ -z "$${MAGEFILE_VERBOSE}" ]]; then
-            export MAGEFILE_VERBOSE=$(buildkite-agent meta-data get MAGEFILE_VERBOSE --default "0")
-          fi
-          .buildkite/x-pack/elastic-agent/scripts/steps/package.sh
-        artifact_paths:
-          - "x-pack/elastic-agent/build/distributions/**/*"
-        agents:
-          provider: "gcp"
-          image: "family/platform-ingest-beats-ubuntu-2204"
+  # - group: ":Packaging Artefacts"
+  #   key: "package"
+  #   steps:
+  #     - label: "Package elastic-agent"
+  #       key: package_elastic-agent
+  #       command: |
+  #         if [[ -z "$${ManifestURL}" ]]; then
+  #           export ManifestURL=$(buildkite-agent meta-data get ManifestURL --default "")
+  #           if [[ -z "$${ManifestURL}" ]]; then
+  #             echo ":broken_heart: Missing ManifestURL variable or empty string provided"
+  #             echo "Provided ManifestURL: ${ManifestURL}"
+  #             exit 1
+  #           fi
+  #         fi
+  #         if [[ -z "$${MAGEFILE_VERBOSE}" ]]; then
+  #           export MAGEFILE_VERBOSE=$(buildkite-agent meta-data get MAGEFILE_VERBOSE --default "0")
+  #         fi
+  #         .buildkite/x-pack/elastic-agent/scripts/steps/package.sh
+  #       artifact_paths:
+  #         - "x-pack/elastic-agent/build/distributions/**/*"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "family/platform-ingest-beats-ubuntu-2204"
 
-      - label: "Package ARM elastic-agent"
-        env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
-        key: package_elastic-agent-arm
-        command: |
-          if [[ -z "$${ManifestURL}" ]]; then
-            export ManifestURL=$(buildkite-agent meta-data get ManifestURL --default "")
-            if [[ -z "$${ManifestURL}" ]]; then
-              echo ":broken_heart: Missing ManifestURL variable or empty string provided"
-              echo "Provided ManifestURL: ${ManifestURL}"
-              exit 1
-            fi
-          fi
-          if [[ -z "$${MAGEFILE_VERBOSE}" ]]; then
-            export MAGEFILE_VERBOSE=$(buildkite-agent meta-data get MAGEFILE_VERBOSE --default "0")
-          fi
-          .buildkite/x-pack/elastic-agent/scripts/steps/package.sh
-        artifact_paths:
-          - "x-pack/elastic-agent/build/distributions/**/*"
-        agents:
-          provider: "aws"
-          instanceType: "t4g.2xlarge"
-          imagePrefix: "platform-ingest-beats-ubuntu-2004-aarch64"
-  #
+  #     - label: "Package ARM elastic-agent"
+  #       env:
+  #         PLATFORMS: "linux/arm64"
+  #         PACKAGES: "docker"
+  #       key: package_elastic-agent-arm
+  #       command: |
+  #         if [[ -z "$${ManifestURL}" ]]; then
+  #           export ManifestURL=$(buildkite-agent meta-data get ManifestURL --default "")
+  #           if [[ -z "$${ManifestURL}" ]]; then
+  #             echo ":broken_heart: Missing ManifestURL variable or empty string provided"
+  #             echo "Provided ManifestURL: ${ManifestURL}"
+  #             exit 1
+  #           fi
+  #         fi
+  #         if [[ -z "$${MAGEFILE_VERBOSE}" ]]; then
+  #           export MAGEFILE_VERBOSE=$(buildkite-agent meta-data get MAGEFILE_VERBOSE --default "0")
+  #         fi
+  #         .buildkite/x-pack/elastic-agent/scripts/steps/package.sh
+  #       artifact_paths:
+  #         - "x-pack/elastic-agent/build/distributions/**/*"
+  #       agents:
+  #         provider: "aws"
+  #         instanceType: "t4g.2xlarge"
+  #         imagePrefix: "platform-ingest-beats-ubuntu-2004-aarch64"
+
   - label: ":elastic-stack: Publishing to DRA"
     key: dra-publish
     depends_on: package
@@ -105,7 +105,7 @@ steps:
     command: |
       echo "+++ Restoring Artifacts"
       mkdir build       
-      buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" .
+      buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" . --build 018ec2a4-ee3d-4a15-9e64-afbf25039705
       echo "+++ Changing permissions for the release manager"
       sudo chown -R :1000 x-pack/elastic-agent/build/distributions/
       echo "+++ Running DRA publish step"
