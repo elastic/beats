@@ -13,7 +13,7 @@ var:
   - name: initial_interval
   - name: log_file_interval
     default: Hourly
-  
+
 ingest_pipeline:
   - ingest/pipeline.yml
 input: config/apex.yml

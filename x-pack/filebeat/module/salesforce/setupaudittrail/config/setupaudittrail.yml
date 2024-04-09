@@ -14,7 +14,6 @@ event_monitoring_method:
     interval: {{ .real_time_interval }}
     query:
       default: SELECT FIELDS(STANDARD) FROM SetupAuditTrail{{ if .initial_interval }} WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05.000Z0700") ]]{{ end }} ORDER BY CreatedDate ASC NULLS FIRST
-
       value: SELECT FIELDS(STANDARD) FROM SetupAuditTrail WHERE CreatedDate > [[ .cursor.object.last_event_time ]] ORDER BY CreatedDate ASC NULLS FIRST
     cursor:
       field: "CreatedDate"
