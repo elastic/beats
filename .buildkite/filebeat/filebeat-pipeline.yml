@@ -2,20 +2,27 @@
 name: "beats-filebeat"
 
 env:
-  BEATS_PROJECT_NAME: "filebeat"
-  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  BEATS_PROJECT_NAME: "filebeat"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
+  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
-  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+
+  #Packaging
+  PACKAGING_ARM_PLATFORMS: "linux/arm64"
+  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+
+  #Deps
+  ASDF_MAGE_VERSION: 1.15.0
 
 steps:
   - input: "Input Parameters"
@@ -61,7 +68,9 @@ steps:
 
   - label: ":linux: Load dynamic filebeat pipeline"
     key: "filebeat-pipeline"
-    command: ".buildkite/filebeat/generate_filebeat_pipeline.sh"
+    command: ".buildkite/scripts/generate_filebeat_pipeline.sh"
+    agents:
+      image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci:latest"
     notify:
       - github_commit_status:
           context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"

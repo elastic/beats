@@ -9,9 +9,9 @@
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
-            "trigger_comment_regex": "^/test .*$",
-            "always_trigger_comment_regex": "^/test .*$",
-            "skip_ci_labels": [ ],
+            "trigger_comment_regex": "^/(?:test)",
+            "always_trigger_comment_regex": "^/(?:test)",
+            "skip_ci_labels": ["skip-ci"],
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
             "always_require_ci_on_changed": [ ]
