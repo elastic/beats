@@ -74,15 +74,15 @@ The `salesforce` input is a long-running program that retrieves events from a Sa
 
 There are two methods to fetch the events from the Salesforce instance:
 
-- event_log_file: https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm[EventLogFile] is a standard object in Salesforce and the event monitoring method uses the REST API under the hood to gather the Salesforce org's operational events from the object. There is a field EventType that helps distinguish between the types of operational events like — Login, Logout, etc. Uses Salesforce's query language SOQL to query the object.
+- `event_log_file`: https://developer.salesforce.com/docs/atlas.en-us.object_reference.meta/object_reference/sforce_api_objects_eventlogfile.htm[EventLogFile] is a standard object in Salesforce and the event monitoring method uses the REST API under the hood to gather the Salesforce org's operational events from the object. There is a field EventType that helps distinguish between the types of operational events like — Login, Logout, etc. Uses Salesforce's query language SOQL to query the object.
 
-- object: This method is a general way of retrieving events from a Salesforce instance by using the REST API. It can be used for the SetupAuditTrail and for monitoring objects in real-time. In real-time event monitoring, subscribing to the events is a common practice, but the events are also stored in Salesforce org (if configured), specifically in big object tables that are preconfigured for each event type. To query the object, Salesforce's query language SOQL is used.
+- `object`: This method is a general way of retrieving events from a Salesforce instance by using the REST API. It can be used for the SetupAuditTrail and for monitoring objects in real-time. In real-time event monitoring, subscribing to the events is a common practice, but the events are also stored in Salesforce org (if configured), specifically in big object tables that are preconfigured for each event type. To query the object, Salesforce's query language SOQL is used.
 
-[Note]
 
-[discrete]
+[NOTE]
+====
 
-==== Salesforce Objects and SOQL Query Field Ordering Limitations
+*Salesforce Objects and SOQL Query Field Ordering Limitations*
 
 Each Salesforce Object contains a set of fields, but SOQL queries have restrictions on the fields that can be ordered and the specific ordering method. The Object description on the Salesforce Developers page provides information about these limitations. For instance, the Login Object only allows ordering by the EventDate field in descending order.
 
@@ -90,12 +90,14 @@ Cursor Inputs for Data Collection Over Time
 
 When collecting data over time using cursors, the following cursor inputs are available:
 
-- object.first_event_time: This cursor input stores the cursor value from the first event encountered during data collection using the object method.
-- object.last_event_time: This cursor input stores the cursor value from the last event encountered during data collection using the object method.
-- event_log_file.first_event_time: This cursor input stores the cursor value from the first event encountered during data collection using the event log file method.
-- event_log_file.last_event_time: This cursor input stores the cursor value from the last event encountered during data collection using the event log file method.
+- `object.first_event_time`: This cursor input stores the cursor value from the first event encountered during data collection using the object method.
+- `object.last_event_time`: This cursor input stores the cursor value from the last event encountered during data collection using the object method.
+- `event_log_file.first_event_time`: This cursor input stores the cursor value from the first event encountered during data collection using the event log file method.
+- `event_log_file.last_event_time`: This cursor input stores the cursor value from the last event encountered during data collection using the event log file method.
 
 By selecting one of the above cursor inputs, users can collect data from both the object and event log file in a desired order. The cursor configuration can be customized based on the user's specific requirements.
+
+====
 
 ==== Configuration options
 
@@ -132,7 +134,9 @@ There are two OAuth2 authentication flows supported:
 
 Whether to use the user-password flow for authentication. Default: `false`.
 
-[Note] Only one authentication flow can be enabled at a time.
+[NOTE]
+
+Only one authentication flow can be enabled at a time.
 
 [string]
 ==== `auth.oauth2.user_password_flow.client.id`
@@ -164,7 +168,9 @@ The password for the user-password flow.
 
 Whether to use the JWT bearer flow for authentication. Default: `false`.
 
-[Note] Only one authentication flow can be enabled at a time.
+[NOTE]
+
+Only one authentication flow can be enabled at a time.
 
 [string]
 ==== `auth.oauth2.jwt_bearer_flow.client.id`
