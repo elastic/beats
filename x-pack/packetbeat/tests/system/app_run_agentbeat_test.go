@@ -37,7 +37,7 @@ func runPacketbeat(t testing.TB, args ...string) (stdout, stderr string, err err
 	if err != nil {
 		return "", "", err
 	}
-	cmd := exec.CommandContext(ctx, agentbeatPath, append([]string{"packetbeat", "-systemTest", "-c", conf}, args...)...)
+	cmd := exec.CommandContext(ctx, agentbeatPath, append([]string{"-systemTest", "packetbeat", "-c", conf}, args...)...)
 	cmd.Dir = t.TempDir()
 	var stdoutBuf, stderrBuf bytes.Buffer
 	cmd.Stdout = &stdoutBuf

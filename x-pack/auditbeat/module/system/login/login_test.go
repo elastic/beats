@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/auditbeat/core"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -268,7 +269,7 @@ func checkFieldValue(t *testing.T, mapstr mapstr.M, fieldName string, fieldValue
 
 func getBaseConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":   "system",
+		"module":   system.ModuleName,
 		"datasets": []string{"login"},
 	}
 }

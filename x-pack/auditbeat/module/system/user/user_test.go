@@ -7,6 +7,7 @@
 package user
 
 import (
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"os/user"
 	"testing"
 	"time"
@@ -78,7 +79,7 @@ func testUser() *User {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":     "system",
+		"module":     system.ModuleName,
 		"metricsets": []string{"user"},
 
 		// Would require root access to /etc/shadow
