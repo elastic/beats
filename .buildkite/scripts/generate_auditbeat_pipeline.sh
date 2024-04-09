@@ -254,7 +254,6 @@ cat >> $pipelineName <<- YAML
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Packaging Linux ARM"
 
-
 YAML
 fi
 
