@@ -47,7 +47,7 @@ steps:
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
-        key: "mandatory-win-unit-tests"
+        key: "mandatory-win-2016-unit-tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -65,7 +65,7 @@ steps:
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
-        key: "mandatory-win-unit-tests"
+        key: "mandatory-win-2022-unit-tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -86,7 +86,7 @@ steps:
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
-        key: "extended-win-unit-tests"
+        key: "extended-win-10-unit-tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -104,7 +104,7 @@ steps:
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
-        key: "extended-win-unit-tests"
+        key: "extended-win-11-unit-tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -122,7 +122,7 @@ steps:
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
-        key: "extended-win-unit-tests"
+        key: "extended-win-2019-unit-tests"
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
