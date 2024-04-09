@@ -60,7 +60,7 @@ steps:
       - label: ":windows: Windows 2016 Unit Tests"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
-          mage build unitTest
+          mage -w reader\etw build goUnitTest
         key: "mandatory-win-2016-unit-tests"
         agents:
           provider: "gcp"
@@ -78,7 +78,7 @@ steps:
       - label: ":windows: Windows 2022 Unit Tests"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
-          mage build unitTest
+          mage -w reader\etw build goUnitTest
         key: "mandatory-win-2022-unit-tests"
         agents:
           provider: "gcp"
@@ -100,7 +100,7 @@ steps:
       - label: ":windows: Windows 10 Unit Tests"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
-          mage build unitTest
+          mage -w reader\etw build goUnitTest
         key: "extended-win-10-unit-tests"
         agents:
           provider: "gcp"
@@ -118,7 +118,7 @@ steps:
       - label: ":windows: Windows 11 Unit Tests"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
-          mage build unitTest
+          mage -w reader\etw build goUnitTest
         key: "extended-win-11-unit-tests"
         agents:
           provider: "gcp"
@@ -136,7 +136,7 @@ steps:
       - label: ":windows: Windows 2019 Unit Tests"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
-          mage build unitTest
+          mage -w reader\etw build goUnitTest
         key: "extended-win-2019-unit-tests"
         agents:
           provider: "gcp"
