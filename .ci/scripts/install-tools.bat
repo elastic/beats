@@ -17,7 +17,6 @@ SET USERPROFILE=%OLD_USERPROFILE%
 
 echo "Upgrade chocolatey to latest version"
 choco upgrade chocolatey -y
-refreshenv
 
 IF NOT EXIST C:\Python38\python.exe (
     REM Install python 3.8
