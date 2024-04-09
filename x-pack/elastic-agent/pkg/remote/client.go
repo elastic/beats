@@ -175,6 +175,7 @@ func (c *Client) Send(
 	if err != nil {
 		return nil, errors.Wrapf(err, "fail to create HTTP request using method %s to %s", method, path)
 	}
+	c.log.Debugf("Creating new request to request URL %s", req.URL.String())
 
 	// Add generals headers to the request, we are dealing exclusively with JSON.
 	// Content-Type / Accepted type can be override from the called.

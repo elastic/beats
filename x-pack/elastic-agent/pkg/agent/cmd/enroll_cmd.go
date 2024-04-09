@@ -9,7 +9,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -269,7 +268,7 @@ func (c *enrollCmd) writeDelayEnroll(streams *cli.IOStreams) error {
 			errors.TypeConfig,
 			errors.M("path", enrollPath))
 	}
-	err = ioutil.WriteFile(enrollPath, data, 0600)
+	err = os.WriteFile(enrollPath, data, 0600)
 	if err != nil {
 		return errors.New(
 			err,
@@ -284,6 +283,9 @@ func (c *enrollCmd) writeDelayEnroll(streams *cli.IOStreams) error {
 func (c *enrollCmd) fleetServerBootstrap(ctx context.Context, persistentConfig map[string]interface{}) (string, error) {
 	c.log.Debug("verifying communication with running Elastic Agent daemon")
 	agentRunning := true
+	if c.options.FleetServer.InternalPort == 0 {
+		c.options.FleetServer.InternalPort = defaultFleetServerInternalPort
+	}
 	_, err := getDaemonStatus(ctx)
 	if err != nil {
 		if !c.options.FleetServer.SpawnAgent {
@@ -321,6 +323,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context, persistentConfig m
 	if err != nil {
 		return "", err
 	}
+	c.options.FleetServer.InternalPort = fleetConfig.Server.InternalPort
 
 	configToStore := map[string]interface{}{
 		"agent": agentConfig,
@@ -360,7 +363,7 @@ func (c *enrollCmd) fleetServerBootstrap(ctx context.Context, persistentConfig m
 func (c *enrollCmd) prepareFleetTLS() error {
 	host := c.options.FleetServer.Host
 	if host == "" {
-		host = "localhost"
+		host = defaultFleetServerInternalHost
 	}
 	port := c.options.FleetServer.Port
 	if port == 0 {
@@ -376,7 +379,7 @@ func (c *enrollCmd) prepareFleetTLS() error {
 		if c.options.FleetServer.Insecure {
 			// running insecure, force the binding to localhost (unless specified)
 			if c.options.FleetServer.Host == "" {
-				c.options.FleetServer.Host = "localhost"
+				c.options.FleetServer.Host = defaultFleetServerInternalHost
 			}
 			c.options.URL = fmt.Sprintf("http://%s:%d", host, port)
 			c.options.Insecure = true
@@ -531,6 +534,9 @@ func (c *enrollCmd) enroll(ctx context.Context, persistentConfig map[string]inte
 		// use internal URL for future requests
 		if c.options.InternalURL != "" {
 			fleetConfig.Client.Host = c.options.InternalURL
+			// fleet-server will bind the internal listenter to localhost:8221
+			// InternalURL is localhost:8221, however cert uses $HOSTNAME, so we need to disable hostname verification.
+			fleetConfig.Client.Transport.TLS.VerificationMode = tlscommon.VerifyCertificate
 		}
 	}
 
@@ -602,7 +608,7 @@ func (c *enrollCmd) startAgent(ctx context.Context) (<-chan *os.ProcessState, er
 
 func (c *enrollCmd) stopAgent() {
 	if c.agentProc != nil {
-		c.agentProc.StopWait()
+		_ = c.agentProc.StopWait()
 		c.agentProc = nil
 	}
 }
@@ -664,7 +670,7 @@ func waitForAgent(ctx context.Context, timeout time.Duration) error {
 		for {
 			backOff.Wait()
 			_, err := getDaemonStatus(innerCtx)
-			if err == context.Canceled {
+			if errors.Is(err, context.Canceled) {
 				resChan <- waitResult{err: err}
 				return
 			}
@@ -714,7 +720,7 @@ func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessStat
 		for {
 			backExp.Wait()
 			status, err := getDaemonStatus(innerCtx)
-			if err == context.Canceled {
+			if errors.Is(err, context.Canceled) {
 				resChan <- waitResult{err: err}
 				return
 			}
@@ -827,7 +833,7 @@ func safelyStoreAgentInfo(s saver, reader io.Reader) error {
 	for i := 0; i <= maxRetriesstoreAgentInfo; i++ {
 		backExp.Wait()
 		err = storeAgentInfo(s, reader)
-		if err != filelock.ErrAppAlreadyRunning {
+		if !errors.Is(err, filelock.ErrAppAlreadyRunning) {
 			break
 		}
 	}
@@ -841,7 +847,9 @@ func storeAgentInfo(s saver, reader io.Reader) error {
 	if err := fileLock.TryLock(); err != nil {
 		return err
 	}
-	defer fileLock.Unlock()
+	defer func() {
+		_ = fileLock.Unlock()
+	}()
 
 	if err := s.Save(reader); err != nil {
 		return errors.New(err, "could not save enrollment information", errors.TypeFilesystem)
