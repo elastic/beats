@@ -65,6 +65,7 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "fi
 fi
 
 ENABLED_BEATS_PIPELINES_SLUGS=(
+  "beats"
   "auditbeat"
   "filebeat"
   "beats-metricbeat"
