@@ -29,7 +29,6 @@ steps:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: Ubuntu Unit Tests"
 
-
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
         command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
