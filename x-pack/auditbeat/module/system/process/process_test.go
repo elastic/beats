@@ -20,6 +20,10 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
+func TestMain(t *testing.M) {
+	InitializeModule()
+}
+
 func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
 

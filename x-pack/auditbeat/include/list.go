@@ -8,11 +8,24 @@ package include
 
 import (
 	// Import packages that need to register themselves.
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/host"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/login"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/package"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/process"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket"
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/user"
+	m0 "github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
+	m1 "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/host"
+	m2 "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/login"
+	m3 "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/package"
+	m4 "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/process"
+	m5 "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket"
+	m6 "github.com/elastic/beats/v7/x-pack/auditbeat/module/system/user"
+	m7 "github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd"
 )
+
+// InitializeModules initialize all of the modules.
+func InitializeModules() {
+	m0.InitializeModule()
+	m1.InitializeModule()
+	m2.InitializeModule()
+	m3.InitializeModule()
+	m4.InitializeModule()
+	m5.InitializeModule()
+	m6.InitializeModule()
+	m7.InitializeModule()
+}

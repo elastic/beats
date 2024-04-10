@@ -10,7 +10,13 @@ import (
 	"github.com/elastic/go-sysinfo"
 )
 
-func init() {
+const (
+	// ModuleName is the name for this module.
+	ModuleName = "system"
+)
+
+// InitializeModule initializes this module.
+func InitializeModule() {
 	// Register the custom ModuleFactory function for the system module.
 	if err := mb.Registry.AddModule(ModuleName, NewModule); err != nil {
 		panic(err)

@@ -180,7 +180,8 @@ func formatHardwareAddr(addr net.HardwareAddr) string {
 	return string(buf)
 }
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	mb.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),

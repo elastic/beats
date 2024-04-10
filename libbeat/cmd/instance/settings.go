@@ -51,6 +51,6 @@ type Settings struct {
 	// beat.DropIfFull PublishMode. Leave as zero for default.
 	InputQueueSize int
 
-	// InitFunc function that is called to initialize unique items for the beat.
-	InitFunc func()
+	// Initialize functions that are called in-order to initialize unique items for the beat.
+	Initialize []func()
 }

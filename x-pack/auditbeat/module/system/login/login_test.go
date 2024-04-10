@@ -25,6 +25,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+func TestMain(t *testing.M) {
+	InitializeModule()
+}
+
 func TestData(t *testing.T) {
 	if byteOrder != binary.LittleEndian {
 		t.Skip("Test only works on little-endian systems - skipping.")

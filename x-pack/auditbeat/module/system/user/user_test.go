@@ -19,6 +19,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 )
 
+func TestMain(t *testing.M) {
+	InitializeModule()
+}
+
 func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
 

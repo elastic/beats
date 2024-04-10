@@ -26,6 +26,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+func TestMain(t *testing.M) {
+	InitializeModule()
+}
+
 func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
 

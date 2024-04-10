@@ -63,10 +63,7 @@ func AuditbeatSettings(globals processors.PluginConfig) instance.Settings {
 		Name:          Name,
 		HasDashboards: true,
 		Processing:    processing.MakeDefaultSupport(true, globals, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
-		InitFunc: func() {
-			include.InitializeAssets()
-			include.InitializeModules()
-		},
+		Initialize:    []func(){include.InitializeAssets, include.InitializeModules},
 	}
 }
 

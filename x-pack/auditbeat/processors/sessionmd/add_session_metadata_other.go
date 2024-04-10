@@ -2,11 +2,11 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build agentbeat
+//go:build !linux
 
-package system
+package sessionmd
 
-const (
-	// ModuleName is the name for this module.
-	ModuleName = "audit/system"
-)
+// InitializeModule initializes this module.
+func InitializeModule() {
+	// does nothing
+}

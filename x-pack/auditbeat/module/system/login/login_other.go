@@ -17,7 +17,8 @@ const (
 	metricsetName = "login"
 )
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	mb.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 	)

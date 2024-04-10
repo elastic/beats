@@ -10,15 +10,17 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/elastic/elastic-agent-client/v7/pkg/client"
+	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	auditbeatcmd "github.com/elastic/beats/v7/auditbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/processors"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/include"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
-	"github.com/elastic/elastic-agent-client/v7/pkg/client"
-	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	// Register includes.
 	_ "github.com/elastic/beats/v7/auditbeat/include"
@@ -30,9 +32,6 @@ import (
 	// Register Auditbeat x-pack modules.
 	_ "github.com/elastic/beats/v7/x-pack/auditbeat/include"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
-
-	// Import processors
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd"
 )
 
 // Name of the beat
@@ -76,6 +75,7 @@ func init() {
 	}
 	settings := auditbeatcmd.AuditbeatSettings(globalProcs)
 	settings.ElasticLicensed = true
+	settings.Initialize = append(settings.Initialize, include.InitializeModules)
 	RootCmd = auditbeatcmd.Initialize(settings)
 	RootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		management.ConfigTransform.SetTransform(auditbeatCfg)
