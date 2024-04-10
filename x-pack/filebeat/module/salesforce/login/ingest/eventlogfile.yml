@@ -14,6 +14,7 @@ processors:
           field: json.API_TYPE
           target_field: salesforce.login.api.type
           ignore_missing: true
+          ignore_failure: true
     - script:
           description: Set api type value from api type character.
           lang: painless
@@ -41,10 +42,12 @@ processors:
           field: json.AUTHENTICATION_METHOD_REFERENCE
           target_field: salesforce.login.auth.service_id
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.REQUEST_STATUS
           target_field: salesforce.login.request_status
           ignore_missing: true
+          ignore_failure: true
     - script:
           description: Set request status value from request status character.
           lang: painless
@@ -66,41 +69,50 @@ processors:
           field: json.API_VERSION
           target_field: salesforce.login.api.version
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.USER_ID
           target_field: salesforce.login.user_id
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.LOGIN_KEY
           target_field: salesforce.login.key
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.EVENT_TYPE
           target_field: salesforce.login.event_type
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.REQUEST_ID
           target_field: salesforce.login.request_id
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.ORGANIZATION_ID
           target_field: salesforce.login.organization_id
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.RUN_TIME
           type: long
           target_field: salesforce.login.run_time
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.CPU_TIME
           type: long
           target_field: salesforce.login.cpu_time
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.DB_TOTAL_TIME
           type: long
           target_field: salesforce.login.db_time.total
           ignore_missing: true
+          ignore_failure: true
     - script:
           description: Convert db_time.total field from nanos (nanoseconds) to ms (milliseconds).
           lang: painless
@@ -116,14 +128,17 @@ processors:
           field: json.CLIENT_IP
           target_field: salesforce.login.client_ip
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.URI_ID_DERIVED
           target_field: salesforce.login.uri_derived_id
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.URI
           target_field: event.url
           ignore_missing: true
+          ignore_failure: true
     - set:
           field: event.outcome
           value: "success"
@@ -137,22 +152,27 @@ processors:
     - rename:
           field: json.USER_NAME
           target_field: user.email
+          ignore_missing: true
           ignore_failure: true
     - rename:
           field: json.USER_ID_DERIVED
           target_field: user.id
+          ignore_missing: true
           ignore_failure: true
     - set:
           value: ["{{{json.USER_TYPE}}}"]
           field: user.roles
           ignore_empty_value: true
+          ignore_failure: true
     - remove:
           field: json.USER_TYPE
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.SOURCE_IP
           target_field: source.ip
           ignore_missing: true
+          ignore_failure: true
           if: 'ctx.json?.SOURCE_IP != "Salesforce.com IP"'
     - geoip:
           field: source.ip

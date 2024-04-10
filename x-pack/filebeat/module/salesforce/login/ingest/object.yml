@@ -122,6 +122,7 @@ processors:
           field: json.SourceIp
           target_field: source.ip
           type: ip
+          ignore_failure: true
           on_failure:
               - append:
                     field: error.message

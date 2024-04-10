@@ -14,6 +14,7 @@ processors:
           field: json.SESSION_TYPE
           target_field: salesforce.logout.session.type
           ignore_missing: true
+          ignore_failure: true
     - script:
           description: Set session type value from session type character.
           lang: painless
@@ -27,7 +28,7 @@ processors:
                 "P": "OauthApprovalUI",
                 "O": "Oauth2",
                 "T": "SiteStudio",
-                "R": "SitePreview", 
+                "R": "SitePreview",
                 "S": "SubstituteUser",
                 "B": "TempContentExchange",
                 "G": "TempOauthAccessTokenFrontdoor",
@@ -50,10 +51,12 @@ processors:
           field: json.EVENT_TYPE
           target_field: salesforce.logout.event_type
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.SESSION_LEVEL
           target_field: salesforce.logout.session.level
           ignore_missing: true
+          ignore_failure: true
     - script:
           description: Set session level value from session level integer.
           lang: painless
@@ -71,10 +74,12 @@ processors:
           field: json.BROWSER_TYPE
           target_field: salesforce.logout.browser_type
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.PLATFORM_TYPE
           target_field: salesforce.logout.platform_type
           ignore_missing: true
+          ignore_failure: true
     - script:
           description: Set platform type value from platform type integers.
           lang: painless
@@ -91,7 +96,7 @@ processors:
                   "5007": "iPad"
                   "5200": "Android 10.0"
           source: |
-              def platform = ctx.salesforce?.logout?.platform_type; 
+              def platform = ctx.salesforce?.logout?.platform_type;
               if (platform != null && params.platforms.containsKey(platform)) {
                 ctx.salesforce.logout.platform_type = params.platforms.get(platform);
               }
@@ -103,10 +108,12 @@ processors:
           field: json.RESOLUTION_TYPE
           target_field: salesforce.logout.resolution_type
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.APP_TYPE
           target_field: salesforce.logout.app_type
           ignore_missing: true
+          ignore_failure: true
     - script:
           description: Set application type value from application type integers.
           lang: painless
@@ -131,10 +138,12 @@ processors:
           field: json.CLIENT_VERSION
           target_field: salesforce.logout.client_version
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.API_TYPE
           target_field: salesforce.logout.api.type
           ignore_missing: true
+          ignore_failure: true
     - script:
           description: Set api type value from api type character.
           lang: painless
@@ -155,7 +164,7 @@ processors:
           source: |
               def type = ctx.salesforce?.logout?.api?.type;
               if (type != null && params.apiTypes.containsKey(type)) {
-                ctx.salesforce.logout.api.type = params.apiTypes.get(type);  
+                ctx.salesforce.logout.api.type = params.apiTypes.get(type);
               }
           on_failure:
               - append:
@@ -165,30 +174,37 @@ processors:
           field: json.API_VERSION
           target_field: salesforce.logout.api.version
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.USER_INITIATED_LOGOUT
           target_field: salesforce.logout.user_initiated_logout
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.LOGIN_KEY
           target_field: salesforce.logout.login_key
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.USER_ID
           target_field: salesforce.logout.user_id
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.ORGANIZATION_ID
           target_field: salesforce.logout.organization_id
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.REQUEST_ID
           target_field: event.code
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.USER_TYPE
           target_field: user.roles
           ignore_missing: true
+          ignore_failure: true
     - script:
           description: Set user roles value from user roles character.
           lang: painless
@@ -222,11 +238,13 @@ processors:
           field: json.USER_ID_DERIVED
           target_field: user.id
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.CLIENT_IP
           target_field: source.ip
           ignore_missing: true
           if: ctx.json?.CLIENT_IP != 'Salesforce.com IP' && ctx.json?.CLIENT_IP != null
+          ignore_failure: true
     - geoip:
           field: source.ip
           target_field: source.geo

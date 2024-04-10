@@ -48,30 +48,37 @@ processors:
     - rename:
           field: json.CreatedByContext
           target_field: salesforce.setup_audit_trail.created_by_context
+          ignore_failure: true
           ignore_missing: true
     - rename:
           field: json.CreatedById
           target_field: salesforce.setup_audit_trail.created_by_id
+          ignore_failure: true
           ignore_missing: true
     - rename:
           field: json.CreatedByIssuer
           target_field: salesforce.setup_audit_trail.created_by_issuer
+          ignore_failure: true
           ignore_missing: true
     - rename:
           field: json.DelegateUser
           target_field: salesforce.setup_audit_trail.delegate_user
+          ignore_failure: true
           ignore_missing: true
     - rename:
           field: json.Display
           target_field: salesforce.setup_audit_trail.display
+          ignore_failure: true
           ignore_missing: true
     - rename:
           field: json.ResponsibleNamespacePrefix
           target_field: salesforce.setup_audit_trail.responsible_namespace_prefix
+          ignore_failure: true
           ignore_missing: true
     - rename:
           field: json.Section
           target_field: salesforce.setup_audit_trail.section
+          ignore_failure: true
           ignore_missing: true
 
     #######################
@@ -86,18 +93,18 @@ processors:
     - rename:
           field: json.Id
           target_field: event.id
-          ignore_missing: true
           ignore_failure: true
+          ignore_missing: true
     - rename:
           field: json.Action
           target_field: event.action
-          ignore_missing: true
           ignore_failure: true
+          ignore_missing: true
     - rename:
           field: json.attributes.url
           target_field: event.url
-          ignore_missing: true
           ignore_failure: true
+          ignore_missing: true
     - date:
           field: json.CreatedDate
           target_field: event.created

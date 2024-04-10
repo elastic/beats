@@ -47,199 +47,244 @@ processors:
           field: json.ACTION
           target_field: salesforce.apex.action
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.CALLOUT_TIME
           target_field: salesforce.apex.callout_time
           type: float
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.CLASS_NAME
           target_field: salesforce.apex.class_name
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.CLIENT_NAME
           target_field: salesforce.apex.client_name
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.CPU_TIME
           target_field: salesforce.apex.cpu_time
           type: float
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.DB_BLOCKS
           target_field: salesforce.apex.db_blocks
           type: long
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.DB_CPU_TIME
           target_field: salesforce.apex.db_cpu_time
           type: float
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.DB_TOTAL_TIME
           target_field: salesforce.apex.db_total_time
           type: float
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.ENTITY
           target_field: salesforce.apex.entity
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.ENTITY_NAME
           target_field: salesforce.apex.entity_name
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.ENTRY_POINT
           target_field: salesforce.apex.entry_point
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.EVENT_TYPE
           target_field: salesforce.apex.event_type
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.EXECUTE_MS
           target_field: salesforce.apex.execute_ms
           type: float
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.FETCH_MS
           target_field: salesforce.apex.fetch_ms
           type: float
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.FILTER
           target_field: salesforce.apex.filter
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.IS_LONG_RUNNING_REQUEST
           target_field: salesforce.apex.is_long_running_request
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.LOGIN_KEY
           target_field: salesforce.apex.login_key
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.LIMIT
           target_field: salesforce.apex.limit
           type: long
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.LIMIT_USAGE_PERCENT
           target_field: salesforce.apex.limit_usage_pct
           type: float
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.MEDIA_TYPE
           target_field: salesforce.apex.media_type
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.MESSAGE
           target_field: salesforce.apex.message
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.METHOD_NAME
           target_field: salesforce.apex.method_name
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.NUMBER_FIELDS
           target_field: salesforce.apex.fields_count
           type: long
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.NUMBER_SOQL_QUERIES
           target_field: salesforce.apex.soql_queries_count
           type: long
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.OFFSET
           target_field: salesforce.apex.offset
           type: long
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.ORDERBY
           target_field: salesforce.apex.orderby
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.ORGANIZATION_ID
           target_field: salesforce.apex.organization_id
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.QUERY
           target_field: salesforce.apex.query
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.QUIDDITY
           target_field: salesforce.apex.quiddity
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.REQUEST_ID
           target_field: salesforce.apex.request_id
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.REQUEST_STATUS
           target_field: salesforce.apex.request_status
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.ROWS
           target_field: salesforce.apex.rows_total
           type: long
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.ROWS_FETCHED
           target_field: salesforce.apex.rows_fetched
           type: long
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.ROWS_PROCESSED
           target_field: salesforce.apex.rows_processed
           type: long
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.RUN_TIME
           target_field: salesforce.apex.run_time
           type: float
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.SELECT
           target_field: salesforce.apex.select
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.SUBQUERIES
           target_field: salesforce.apex.subqueries
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.THROUGHPUT
           target_field: salesforce.apex.throughput
           type: float
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.TRIGGER_ID
           target_field: salesforce.apex.trigger_id
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.TRIGGER_NAME
           target_field: salesforce.apex.trigger_name
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.TRIGGER_TYPE
           target_field: salesforce.apex.trigger_type
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.TYPE
           target_field: salesforce.apex.type
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.URI
           target_field: salesforce.apex.uri
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.URI_ID_DERIVED
           target_field: salesforce.apex.uri_derived_id
           ignore_missing: true
+          ignore_failure: true
     - rename:
           field: json.USER_AGENT
           target_field: salesforce.apex.user_agent
           ignore_missing: true
+          ignore_failure: true
     - script:
           description: Set request user agent value from user agent numeric code.
           lang: painless
@@ -270,6 +315,7 @@ processors:
           field: json.USER_ID_DERIVED
           target_field: salesforce.apex.user_id_derived
           ignore_missing: true
+          ignore_failure: true
 
     #######################
     ## ECS Event Mapping ##
@@ -374,13 +420,16 @@ processors:
           field: json.USER_ID
           target_field: user.id
           ignore_missing: true
+          ignore_failure: true
     - append:
           field: user.roles
           value: "{{{json.USER_TYPE}}}"
           allow_duplicates: false
+          ignore_failure: true
     - remove:
           field: json.USER_TYPE
           ignore_missing: true
+          ignore_failure: true
 
     ########################
     ## ECS Source Mapping ##
@@ -392,6 +441,7 @@ processors:
           target_field: source.ip
           if: ctx.json?.CLIENT_IP != "Salesforce.com IP" && ctx.json?.CLIENT_IP != null
           ignore_missing: true
+          ignore_failure: true
 
     ############################
     ## ECS source.geo Mapping ##
@@ -403,6 +453,7 @@ processors:
           target_field: source.geo
           if: ctx.source?.ip != "Salesforce.com IP" && ctx.source?.ip != null
           ignore_missing: true
+          ignore_failure: true
 
     ############################
     ## ECS related.ip Mapping ##
@@ -413,6 +464,7 @@ processors:
           value: "{{{source.ip}}}"
           if: ctx?.source?.ip != null
           allow_duplicates: false
+          ignore_failure: true
 
     ######################
     ## ECS HTTP Mapping ##
@@ -422,21 +474,25 @@ processors:
           field: json.METHOD
           target_field: http.request.method
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.REQUEST_SIZE
           target_field: http.request.bytes
           type: long
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.RESPONSE_SIZE
           target_field: http.response.bytes
           type: long
           ignore_missing: true
+          ignore_failure: true
     - convert:
           field: json.STATUS_CODE
           target_field: http.response.status_code
           type: long
           ignore_missing: true
+          ignore_failure: true
 
     #############
     ## Cleanup ##
