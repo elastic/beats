@@ -20,12 +20,24 @@ const missingNamespace = "no metric definitions were found for resource %s and n
 // mapMetrics should validate and map the metric related configuration to relevant azure monitor api parameters
 func mapMetrics(client *azure.Client, resources []*armresources.GenericResourceExpanded, resourceConfig azure.ResourceConfig) ([]azure.Metric, error) {
 	var metrics []azure.Metric
+
 	for _, resource := range resources {
+
+		// We use this map to avoid calling the metrics definition function for the same namespace and same resource
+		// multiple times.
+		namespaceMetrics := make(map[string]armmonitor.MetricDefinitionCollection)
+
 		for _, metric := range resourceConfig.Metrics {
-			// get all metrics supported by the namespace provided
-			metricDefinitions, err := client.AzureMonitorService.GetMetricDefinitions(*resource.ID, metric.Namespace)
-			if err != nil {
-				return nil, fmt.Errorf("no metric definitions were found for resource %s and namespace %s %w", *resource.ID, metric.Namespace, err)
+
+			var err error
+
+			metricDefinitions, exists := namespaceMetrics[metric.Namespace]
+			if !exists {
+				metricDefinitions, err = client.AzureMonitorService.GetMetricDefinitionsWithRetry(*resource.ID, metric.Namespace)
+				if err != nil {
+					return nil, err
+				}
+				namespaceMetrics[metric.Namespace] = metricDefinitions
 			}
 
 			if len(metricDefinitions.Value) == 0 {

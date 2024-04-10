@@ -20,6 +20,8 @@ import (
 	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 var _ http.RoundTripper = (*LoggingRoundTripper)(nil)
@@ -31,14 +33,15 @@ const TraceIDKey = contextKey("trace.id")
 type contextKey string
 
 // NewLoggingRoundTripper returns a LoggingRoundTripper that logs requests and
-// responses to the provided logger.
-func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger, maxBodyLen int) *LoggingRoundTripper {
+// responses to the provided logger. Transaction creation is logged to log.
+func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger, maxBodyLen int, log *logp.Logger) *LoggingRoundTripper {
 	return &LoggingRoundTripper{
 		transport:   next,
 		maxBodyLen:  maxBodyLen,
-		logger:      logger,
+		txLog:       logger,
 		txBaseID:    newID(),
 		txIDCounter: atomic.NewUint64(0),
+		log:         log,
 	}
 }
 
@@ -46,9 +49,10 @@ func NewLoggingRoundTripper(next http.RoundTripper, logger *zap.Logger, maxBodyL
 type LoggingRoundTripper struct {
 	transport   http.RoundTripper
 	maxBodyLen  int            // The maximum length of a body. Longer bodies will be truncated.
-	logger      *zap.Logger    // Destination logger.
+	txLog       *zap.Logger    // Destination logger.
 	txBaseID    string         // Random value to make transaction IDs unique.
 	txIDCounter *atomic.Uint64 // Transaction ID counter that is incremented for each request.
+	log         *logp.Logger
 }
 
 // RoundTrip implements the http.RoundTripper interface, logging
@@ -80,8 +84,10 @@ type LoggingRoundTripper struct {
 //	event.original (the response without body from httputil.DumpResponse)
 func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Create a child logger for this request.
-	log := rt.logger.With(
-		zap.String("transaction.id", rt.nextTxID()),
+	txID := rt.nextTxID()
+	rt.log.Debugw("new request trace transaction", "id", txID)
+	log := rt.txLog.With(
+		zap.String("transaction.id", txID),
 	)
 
 	if v := req.Context().Value(TraceIDKey); v != nil {

@@ -1,5 +1,48 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 steps:
-  - label: "Example test"
-    command: echo "Hello!"
+  - label: "Trigger Auditbeat"
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only HEAD~1"
+          watch:
+            - path:
+                - auditbeat/
+                - .buildkite/auditbeat/
+                #OSS
+                - go.mod
+                - pytest.ini
+                - dev-tools/**
+                - libbeat/**
+                - testing/**
+              config:
+                trigger: "auditbeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
+  - label: "Trigger Heartbeat"
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only HEAD~1"
+          watch:
+            - path:
+                - heartbeat/
+                - .buildkite/heartbeat/
+                #OSS
+                - go.mod
+                - pytest.ini
+                - dev-tools/**
+                - libbeat/**
+                - testing/**
+              config:
+                trigger: "heartbeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
