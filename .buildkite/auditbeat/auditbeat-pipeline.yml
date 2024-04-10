@@ -116,7 +116,7 @@ steps:
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-  - group: "Heartbeat MacOS Extended"
+  - group: "Auditbeat MacOS Extended"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
       - label: ":mac: MacOS Unit Tests"
@@ -159,7 +159,7 @@ steps:
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      - label: ":windows: Windows 11 Unit Tests"
+      - label: ":windows: Auditbeat Windows 11 Unit Tests"
         key: "auditbeat-extended-win-11-unit-tests"
         command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         agents:
