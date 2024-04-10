@@ -123,16 +123,18 @@ if are_conditions_met_macos_tests; then
 
       - label: ":mac: MacOS ARM Unit Tests"
         key: "macos-arm64-unit-tests-extended"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
-        notify:
-          - github_commit_status:
-              context: "$BEATS_PROJECT_NAME: MacOS ARM Unit Tests"
+        command: ".buildkite/scripts/unit_tests.sh"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: MacOS ARM Unit Tests"
+
+
 YAML
 fi
 
