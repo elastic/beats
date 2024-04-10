@@ -20,7 +20,9 @@
 package elasticsearch
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -49,12 +51,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	libversion "github.com/elastic/elastic-agent-libs/version"
 )
-
-type testIndexSelector struct{}
-
-func (testIndexSelector) Select(event *beat.Event) (string, error) {
-	return "test", nil
-}
 
 type batchMock struct {
 	events      []publisher.Event
@@ -117,20 +113,20 @@ func TestPublish(t *testing.T) {
 		client := makePublishTestClient(t, esMock.URL)
 
 		// Try publishing a batch that can be split
-		batch := &batchMock{
+		batch := encodeBatch(client, &batchMock{
 			events:   []publisher.Event{event1},
 			canSplit: true,
-		}
+		})
 		err := client.Publish(ctx, batch)
 
 		assert.NoError(t, err, "Publish should split the batch without error")
 		assert.True(t, batch.didSplit, "batch should be split")
 
 		// Try publishing a batch that cannot be split
-		batch = &batchMock{
+		batch = encodeBatch(client, &batchMock{
 			events:   []publisher.Event{event1},
 			canSplit: false,
-		}
+		})
 		err = client.Publish(ctx, batch)
 
 		assert.NoError(t, err, "Publish should drop the batch without error")
@@ -145,9 +141,9 @@ func TestPublish(t *testing.T) {
 		defer esMock.Close()
 		client := makePublishTestClient(t, esMock.URL)
 
-		batch := &batchMock{
+		batch := encodeBatch(client, &batchMock{
 			events: []publisher.Event{event1, event2},
-		}
+		})
 
 		err := client.Publish(ctx, batch)
 
@@ -171,7 +167,7 @@ func TestPublish(t *testing.T) {
 		// test results directly without atomics/mutexes.
 		done := false
 		retryCount := 0
-		batch := pipeline.NewBatchForTesting(
+		batch := encodeBatch(client, pipeline.NewBatchForTesting(
 			[]publisher.Event{event1, event2, event3},
 			func(b publisher.Batch) {
 				// The retry function sends the batch back through Publish.
@@ -179,11 +175,13 @@ func TestPublish(t *testing.T) {
 				// first and then back to Publish when an output worker was
 				// available.
 				retryCount++
+				// We shouldn't need to re-encode the events since that was done
+				// before the initial Publish call
 				err := client.Publish(ctx, b)
 				assert.NoError(t, err, "Publish should return without error")
 			},
 			func() { done = true },
-		)
+		))
 		err := client.Publish(ctx, batch)
 		assert.NoError(t, err, "Publish should return without error")
 
@@ -220,7 +218,7 @@ func TestPublish(t *testing.T) {
 		// test results directly without atomics/mutexes.
 		done := false
 		retryCount := 0
-		batch := pipeline.NewBatchForTesting(
+		batch := encodeBatch(client, pipeline.NewBatchForTesting(
 			[]publisher.Event{event1, event2, event3},
 			func(b publisher.Batch) {
 				// The retry function sends the batch back through Publish.
@@ -232,7 +230,7 @@ func TestPublish(t *testing.T) {
 				assert.NoError(t, err, "Publish should return without error")
 			},
 			func() { done = true },
-		)
+		))
 		err := client.Publish(ctx, batch)
 		assert.NoError(t, err, "Publish should return without error")
 
@@ -308,24 +306,25 @@ func TestCollectPublishFailDeadLetterQueue(t *testing.T) {
 	)
 	assert.NoError(t, err)
 
+	parseError := `{
+		"root_cause" : [
+			{
+			"type" : "mapper_parsing_exception",
+			"reason" : "failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'"
+			}
+		],
+		"type" : "mapper_parsing_exception",
+		"reason" : "failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'",
+		"caused_by" : {
+			"type" : "illegal_argument_exception",
+			"reason" : "For input string: \"bar1\""
+		}
+		}`
 	response := []byte(`
     { "items": [
       {"create": {"status": 200}},
       {"create": {
-		  "error" : {
-			"root_cause" : [
-			  {
-				"type" : "mapper_parsing_exception",
-				"reason" : "failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'"
-			  }
-			],
-			"type" : "mapper_parsing_exception",
-			"reason" : "failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'",
-			"caused_by" : {
-			  "type" : "illegal_argument_exception",
-			  "reason" : "For input string: \"bar1\""
-			}
-		  },
+		  "error" : ` + parseError + `,
 		  "status" : 400
 		}
       },
@@ -334,24 +333,18 @@ func TestCollectPublishFailDeadLetterQueue(t *testing.T) {
   `)
 
 	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 1}}}
+	event2 := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 2}}}
 	eventFail := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": "bar1"}}}
-	events := []publisher.Event{event, eventFail, event}
+	events := encodeEvents(client, []publisher.Event{event, eventFail, event2})
 
 	res, stats := client.bulkCollectPublishFails(response, events)
 	assert.Equal(t, 1, len(res))
 	if len(res) == 1 {
-		expected := publisher.Event{
-			Content: beat.Event{
-				Fields: mapstr.M{
-					"message":       "{\"bar\":\"bar1\"}",
-					"error.type":    400,
-					"error.message": "{\n\t\t\t\"root_cause\" : [\n\t\t\t  {\n\t\t\t\t\"type\" : \"mapper_parsing_exception\",\n\t\t\t\t\"reason\" : \"failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'\"\n\t\t\t  }\n\t\t\t],\n\t\t\t\"type\" : \"mapper_parsing_exception\",\n\t\t\t\"reason\" : \"failed to parse field [bar] of type [long] in document with id '1'. Preview of field's value: 'bar1'\",\n\t\t\t\"caused_by\" : {\n\t\t\t  \"type\" : \"illegal_argument_exception\",\n\t\t\t  \"reason\" : \"For input string: \\\"bar1\\\"\"\n\t\t\t}\n\t\t  }",
-				},
-				Meta: mapstr.M{
-					dead_letter_marker_field: true,
-				},
-			},
-		}
+		expected := encodeEvent(client, eventFail)
+		encodedEvent := expected.EncodedEvent.(*encodedEvent)
+		// Mark the encoded event with the expected error
+		client.setDeadLetter(encodedEvent, 400, parseError)
+
 		assert.Equal(t, expected, res[0])
 	}
 	assert.Equal(t, bulkResultStats{acked: 2, fails: 1, nonIndexable: 0}, stats)
@@ -394,7 +387,7 @@ func TestCollectPublishFailDrop(t *testing.T) {
 
 	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 1}}}
 	eventFail := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": "bar1"}}}
-	events := []publisher.Event{event, eventFail, event}
+	events := encodeEvents(client, []publisher.Event{event, eventFail, event})
 
 	res, stats := client.bulkCollectPublishFails(response, events)
 	assert.Equal(t, 0, len(res))
@@ -419,7 +412,7 @@ func TestCollectPublishFailAll(t *testing.T) {
   `)
 
 	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}}
-	events := []publisher.Event{event, event, event}
+	events := encodeEvents(client, []publisher.Event{event, event, event})
 
 	res, stats := client.bulkCollectPublishFails(response, events)
 	assert.Equal(t, 3, len(res))
@@ -468,7 +461,7 @@ func TestCollectPipelinePublishFail(t *testing.T) {
     }`)
 
 	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}}
-	events := []publisher.Event{event}
+	events := encodeEvents(client, []publisher.Event{event})
 
 	res, _ := client.bulkCollectPublishFails(response, events)
 	assert.Equal(t, 1, len(res))
@@ -494,7 +487,7 @@ func BenchmarkCollectPublishFailsNone(b *testing.B) {
   `)
 
 	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
-	events := []publisher.Event{event, event, event}
+	events := encodeEvents(client, []publisher.Event{event, event, event})
 
 	for i := 0; i < b.N; i++ {
 		res, _ := client.bulkCollectPublishFails(response, events)
@@ -523,7 +516,7 @@ func BenchmarkCollectPublishFailMiddle(b *testing.B) {
 
 	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
 	eventFail := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}}
-	events := []publisher.Event{event, eventFail, event}
+	events := encodeEvents(client, []publisher.Event{event, eventFail, event})
 
 	for i := 0; i < b.N; i++ {
 		res, _ := client.bulkCollectPublishFails(response, events)
@@ -551,7 +544,7 @@ func BenchmarkCollectPublishFailAll(b *testing.B) {
   `)
 
 	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}}
-	events := []publisher.Event{event, event, event}
+	events := encodeEvents(client, []publisher.Event{event, event, event})
 
 	for i := 0; i < b.N; i++ {
 		res, _ := client.bulkCollectPublishFails(response, events)
@@ -608,7 +601,7 @@ func TestClientWithHeaders(t *testing.T) {
 		"message":    "Test message from libbeat",
 	}}
 
-	batch := outest.NewBatch(event, event, event)
+	batch := encodeBatch(client, outest.NewBatch(event, event, event))
 	err = client.Publish(context.Background(), batch)
 	assert.NoError(t, err)
 	assert.Equal(t, 2, requestCount)
@@ -650,16 +643,6 @@ func TestBulkEncodeEvents(t *testing.T) {
 			index, pipeline, err := buildSelectors(im, info, cfg)
 			require.NoError(t, err)
 
-			events := make([]publisher.Event, len(test.events))
-			for i, fields := range test.events {
-				events[i] = publisher.Event{
-					Content: beat.Event{
-						Timestamp: time.Now(),
-						Fields:    fields,
-					},
-				}
-			}
-
 			client, err := NewClient(
 				clientSettings{
 					observer:         outputs.NewNilObserver(),
@@ -669,6 +652,17 @@ func TestBulkEncodeEvents(t *testing.T) {
 				nil,
 			)
 			assert.NoError(t, err)
+
+			events := make([]publisher.Event, len(test.events))
+			for i, fields := range test.events {
+				events[i] = publisher.Event{
+					Content: beat.Event{
+						Timestamp: time.Now(),
+						Fields:    fields,
+					},
+				}
+			}
+			encodeEvents(client, events)
 
 			encoded, bulkItems := client.bulkEncodePublishRequest(*libversion.MustNew(test.version), events)
 			assert.Equal(t, len(events), len(encoded), "all events should have been encoded")
@@ -717,6 +711,15 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 	index, pipeline, err := buildSelectors(im, info, cfg)
 	require.NoError(t, err)
 
+	client, _ := NewClient(
+		clientSettings{
+			observer:         outputs.NewNilObserver(),
+			indexSelector:    index,
+			pipelineSelector: pipeline,
+		},
+		nil,
+	)
+
 	events := make([]publisher.Event, len(cases))
 	for i, fields := range cases {
 		meta := mapstr.M{
@@ -735,15 +738,7 @@ func TestBulkEncodeEventsWithOpType(t *testing.T) {
 			},
 		}
 	}
-
-	client, _ := NewClient(
-		clientSettings{
-			observer:         outputs.NewNilObserver(),
-			indexSelector:    index,
-			pipelineSelector: pipeline,
-		},
-		nil,
-	)
+	encodeEvents(client, events)
 
 	encoded, bulkItems := client.bulkEncodePublishRequest(*libversion.MustNew(version.GetDefaultVersion()), events)
 	require.Equal(t, len(events)-1, len(encoded), "all events should have been encoded")
@@ -841,7 +836,7 @@ func TestPublishEventsWithBulkFiltering(t *testing.T) {
 		client := makePublishTestClient(t, esMock.URL, nil)
 
 		// Try publishing a batch that can be split
-		events := []publisher.Event{event1}
+		events := encodeEvents(client, []publisher.Event{event1})
 		evt, err := client.publishEvents(ctx, events)
 		require.NoError(t, err)
 		require.Equal(t, len(recParams), len(expectedFilteringParams))
@@ -872,7 +867,7 @@ func TestPublishEventsWithBulkFiltering(t *testing.T) {
 		client := makePublishTestClient(t, esMock.URL, configParams)
 
 		// Try publishing a batch that can be split
-		events := []publisher.Event{event1}
+		events := encodeEvents(client, []publisher.Event{event1})
 		evt, err := client.publishEvents(ctx, events)
 		require.NoError(t, err)
 		require.Equal(t, len(recParams), len(expectedFilteringParams)+len(configParams))
@@ -914,29 +909,36 @@ func TestPublishEventsWithBulkFiltering(t *testing.T) {
 		client := makePublishTestClient(t, esMock.URL, nil)
 
 		// Try publishing a batch that can be split
-		events := []publisher.Event{event1}
+		events := encodeEvents(client, []publisher.Event{event1})
 		_, err := client.publishEvents(ctx, events)
 		require.NoError(t, err)
 		require.Equal(t, len(recParams), 1)
 	})
 }
 
-func TestGetIndex(t *testing.T) {
+func TestSetDeadLetter(t *testing.T) {
 	dead_letter_index := "dead_index"
 	client := &Client{
 		deadLetterIndex: dead_letter_index,
 		indexSelector:   testIndexSelector{},
 	}
 
-	event := &beat.Event{
-		Meta: make(map[string]interface{}),
+	e := &encodedEvent{
+		index: "original_index",
 	}
-	index, err := client.getIndex(event)
-	require.NoError(t, err, "getIndex call must succeed")
-	assert.Equal(t, "test", index, "Event with no dead letter marker should use the client's index selector")
+	errType := 123
+	errStr := "test error string"
+	client.setDeadLetter(e, errType, errStr)
 
-	event.Meta[dead_letter_marker_field] = true
-	index, err = client.getIndex(event)
-	require.NoError(t, err, "getIndex call must succeed")
-	assert.Equal(t, dead_letter_index, index, "Event with dead letter marker should use the client's dead letter index")
+	assert.True(t, e.deadLetter, "setDeadLetter should set the event's deadLetter flag")
+	assert.Equal(t, dead_letter_index, e.index, "setDeadLetter should overwrite the event's original index")
+
+	var errFields struct {
+		ErrType    int    `json:"error.type"`
+		ErrMessage string `json:"error.message"`
+	}
+	err := json.NewDecoder(bytes.NewReader(e.encoding)).Decode(&errFields)
+	require.NoError(t, err, "json decoding of encoded event should succeed")
+	assert.Equal(t, errType, errFields.ErrType, "encoded error.type should match value in setDeadLetter")
+	assert.Equal(t, errStr, errFields.ErrMessage, "encoded error.message should match value in setDeadLetter")
 }
