@@ -192,12 +192,12 @@ steps:
 
   - group: "Packaging"
     key: "packaging"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*package.*/
     depends_on:
       - "mandatory-tests"
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*package.*/
         command: |
           cd filebeat
           mage package
@@ -212,7 +212,6 @@ steps:
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*package.*/
         command: |
           cd filebeat
           mage package
