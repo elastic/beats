@@ -1,4 +1,3 @@
 dashboards:
 - id:   d9eba730-c991-11e7-9835-2f31fe08873b
   file: metricbeat-windows-service.json
-1
