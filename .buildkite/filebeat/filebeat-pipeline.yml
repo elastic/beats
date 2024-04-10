@@ -192,7 +192,8 @@ steps:
 
   - group: "Packaging"
     key: "packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[pP]ackage.*/
+    # we have :Package, Packaging so match both of them in a single regexp
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*:?[pP]ackag[ei][ng]?.*/
     depends_on:
       - "mandatory-tests"
     steps:
