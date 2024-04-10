@@ -5,13 +5,7 @@ source .buildkite/scripts/install_tools.sh
 set -euo pipefail
 
 add_bin_path
-
-define_platform_architeture_for_docker_compose
-if [ "${arch_type}" == "arm64" ]; then
-  with_docker_compose "${DOCKER_COMPOSE_VERSION_AARCH64}"
-elif [ "${arch_type}" == "aarch64" ]; then
-  with_docker_compose "${DOCKER_COMPOSE_VERSION}"
-fi
+with_macos_docker_compose
 
 if [[ -z "${GO_VERSION-""}" ]]; then
   GO_VERSION=$(cat "${WORKSPACE}/.go-version")
