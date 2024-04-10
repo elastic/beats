@@ -237,8 +237,6 @@ with_docker_compose() {
   local version=$1
   echo "Setting up the Docker-compose environment..."
   create_workspace
-  echo "$arch_type"                   #TODO: revobe after debugging
-  echo "$platform_type_lowercase"     #TODO: revobe after debugging
   retry 3 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type_lowercase}-${arch_type}"
   chmod +x ${BIN}/docker-compose
   export PATH="${BIN}:${PATH}"
@@ -248,16 +246,14 @@ with_docker_compose() {
 with_macos_docker_compose() {
   echo "Setting up the Docker-compose environment..."
   create_workspace
-  echo "$arch_type"                   #TODO: revobe after debugging
-  echo "$platform_type_lowercase"     #TODO: revobe after debugging
   if [ "${arch_type}" == "arm64" ]; then
-    local version="${DOCKER_COMPOSE_VERSION_AARCH64}"
-    local docker_compose_url="https://github.com/docker/compose/releases/download/${version}/docker-compose-darwin-aarch64"
+    local docker_compose_url="https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-darwin-aarch64"
   elif [ "${arch_type}" == "aarch64" ]; then
-    local version="${DOCKER_COMPOSE_VERSION}"
-    local docker_compose_url="https://github.com/docker/compose/releases/download/${version}/docker-compose-Darwin-x86_64"
+    local docker_compose_url="https://github.com/docker/compose/releases/download/1.21.0/docker-compose-Darwin-x86_64"
   fi
+  ls -ls ${BIN}                   #TODO: revobe after debugging
   retry 3 curl -sSL -o ${BIN}/docker-compose "${docker_compose_url}"
+  ls -ls ${BIN}                   #TODO: revobe after debugging
   chmod +x ${BIN}/docker-compose
   export PATH="${BIN}:${PATH}"
   docker-compose version

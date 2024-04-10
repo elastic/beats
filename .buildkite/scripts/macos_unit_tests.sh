@@ -4,19 +4,18 @@ source .buildkite/scripts/install_tools.sh
 
 set -euo pipefail
 
-add_bin_path
-with_macos_docker_compose
-
 if [[ -z "${GO_VERSION-""}" ]]; then
   GO_VERSION=$(cat "${WORKSPACE}/.go-version")
   export GO_VERSION
 fi
 
+add_bin_path
 with_go "${GO_VERSION}"
 with_mage
 with_python
 with_dependencies
 config_git
+with_macos_docker_compose
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
   # Install NodeJS
