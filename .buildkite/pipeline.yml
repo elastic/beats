@@ -1,10 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 steps:
-<<<<<<< HEAD
-  - label: "Generate dynamic pipeline"
-    command: "echo Main pipeline TBD"
-=======
   - label: "Trigger Auditbeat"
     plugins:
       - monorepo-diff#v1.0.1:
@@ -50,4 +46,3 @@ steps:
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))

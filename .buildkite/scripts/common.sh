@@ -456,13 +456,8 @@ are_conditions_met_macos_tests() {
 }
 
 are_conditions_met_win_tests() {
-<<<<<<< HEAD
-  if are_conditions_met_mandatory_tests; then    
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
-=======
   if are_conditions_met_mandatory_tests; then
     if [[ "$BUILDKITE_PIPELINE_SLUG" == "filebeat" ]]; then
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))
       if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_WIN_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_WIN_LABEL} || "${!TRIGGER_SPECIFIC_WIN_TESTS}" == "true" ]]; then
         return 0
       fi

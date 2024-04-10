@@ -21,26 +21,16 @@ env:
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
 
-<<<<<<< HEAD
-=======
 notify:
   - github_commit_status:
       context: "$BEATS_PROJECT_NAME"
 
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))
 steps:
   - group: "Heartbeat Mandatory Testing"
     key: "heartbeat-mandatory-tests"
     steps:
       - label: ":ubuntu: Unit Tests"
-<<<<<<< HEAD
-        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: ubuntu/Unit Tests"
-=======
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -50,14 +40,7 @@ steps:
           - "heartbeat/build/*.json"
 
       - label: ":rhel:-9 Unit Tests"
-<<<<<<< HEAD
-        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: rhel-9/Unit Tests"
-=======
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -68,16 +51,9 @@ steps:
 
       - label: ":windows:-2016 Unit Test"
         key: "windows-2016"
-<<<<<<< HEAD
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: windows-2016/Unit Tests"
-=======
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -89,16 +65,9 @@ steps:
 
       - label: ":windows:-2022 Unit Test"
         key: "windows-2022"
-<<<<<<< HEAD
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: windows-2022/Unit Tests"
-=======
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -109,14 +78,7 @@ steps:
           - "heartbeat/build/*.json"
 
       - label: ":ubuntu: Go Integration Tests"
-<<<<<<< HEAD
-        command:  "cd ${BEATS_PROJECT_NAME} && mage goIntegTest"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: Go Integration Tests"
-=======
         command: "cd ${BEATS_PROJECT_NAME} && mage goIntegTest"
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -126,14 +88,7 @@ steps:
           - "heartbeat/build/*.json"
 
       - label: ":ubuntu: Python Integration Tests"
-<<<<<<< HEAD
-        command: "cd ${BEATS_PROJECT_NAME} && mage pythonIntegTest"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: Python Integration Tests"
-=======
         command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -149,14 +104,7 @@ steps:
       - label: ":linux: ARM64 Unit Tests"
         key: "arm-extended"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for arm" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-<<<<<<< HEAD
-        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: Unit Tests ARM"
-=======
         command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -170,44 +118,12 @@ steps:
       - label: ":mac: MacOS Unit Tests"
         key: "macos-extended"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-<<<<<<< HEAD
-        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: MacOS Unit Tests"
-=======
         command: "cd ${BEATS_PROJECT_NAME} && mage build unitTest"
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths: "heartbeat/build/*.xml"
 
-<<<<<<< HEAD
-      - label: ":mac: MacOS ARM Unit Tests"
-        key: "macos-extended-arm"
-        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: MacOS ARM Unit Tests"
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths: "heartbeat/build/*.xml"
-
-  - group: "Windows Extended Testing"
-    key: "extended-tests-win"
-    if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for windows" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
-
-    steps:
-      - label: ":windows:-2019 Unit Tests"
-        key: "windows-extended-2019"
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: Win-2019 Unit Tests"
-=======
   - group: "Heartbeat Windows Extended Testing"
     key: "heartbeat-extended-tests-win"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
@@ -216,7 +132,6 @@ steps:
       - label: ":windows: Win 2019 Unit Tests"
         key: "heartbeat-win-extended-2019"
         command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -227,18 +142,10 @@ steps:
           - "heartbeat/build/*.json"
 
       - label: ":windows:-11 Unit Tests"
-<<<<<<< HEAD
-        key: "windows-extended-11"
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: Win-11 Unit Tests"
-=======
         key: "heartbeat-windows-extended-11"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -249,18 +156,10 @@ steps:
           - "heartbeat/build/*.json"
 
       - label: ":windows:-10 Unit Tests"
-<<<<<<< HEAD
-        key: "windows-extended-10"
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: Win-10 Unit Tests"
-=======
         key: "heartbeat-windows-extended-10"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
->>>>>>> d0a3b457ec (Single pipeline entrypoint (#38783))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
