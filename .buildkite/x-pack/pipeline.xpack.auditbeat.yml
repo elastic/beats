@@ -26,46 +26,150 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
 
 steps:
+  - group: "Mandatory Tests"
+    key: "mandatory-tests"
+    steps:
+      - label: ":linux: Ubuntu Unit (MODULE) Tests"
+        key: "mandatory-linux-unit-test"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        env:
+          MODULE: $MODULE
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu Unit (MODULE) Tests"
 
-  - input: "Input Parameters"
-    key: "force-run-stages"
-    fields:
-    - select: "Auditbeat - run_xpack_auditbeat"
-      key: "run_xpack_auditbeat"
-      options:
-        - label: "True"
-          value: "true"
-        - label: "False"
-          value: "false"
-      default: "false"
-    - select: "Auditbeat - run_xpack_auditbeat_macos_tests"
-      key: "run_xpack_auditbeat_macos_tests"
-      options:
-        - label: "True"
-          value: "true"
-        - label: "False"
-          value: "false"
-      default: "false"
-    - select: "Auditbeat - run_xpack_auditbeat_arm_tests"
-      key: "run_xpack_auditbeat_arm_tests"
-      options:
-        - label: "True"
-          value: "true"
-        - label: "False"
-          value: "false"
-      default: "false"
+      - label: ":rhel: RHEL9 Unit Tests"
+        key: "mandatory-rhel9-unit-test"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_RHEL9_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: RHEL9 Unit Tests"
 
-    if: "build.source == 'ui'"
+      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "mandatory-win-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_2016}"
+              - "${IMAGE_WIN_2022}"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
+
+  - group: "Extended Windows Tests"
+    key: "extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
+    steps:
+      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "extended-win-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "{{matrix.image}}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        matrix:
+          setup:
+            image:
+              - "${IMAGE_WIN_10}"
+              - "${IMAGE_WIN_11}"
+              - "${IMAGE_WIN_2019}"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+
+  - group: "MacOs Extended Tests"
+    key: "extended-tests-macos"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+    steps:
+      - label: ":mac: MacOS Unit Tests"
+        key: "extended-macos-unit-tests"
+        command: ".buildkite/scripts/unit_tests.sh"
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+
+  - group: "ARM Extended Tests"
+    key: "extended-tests-arm"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+    steps:
+      - label: ":linux: Ubuntu ARM Unit Tests"
+        key: "extended-arm64-unit-test"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
   - wait: ~
-    if: "build.source == 'ui'"
-    allow_dependency_failure: false
+    depends_on:
+      - step: "mandatory-tests"
+        allow_failure: false
 
-  - label: ":linux: Load dynamic x-pack auditbeat pipeline"
-    key: "xpack-auditbeat-pipeline"
-    command: ".buildkite/scripts/generate_xpack_auditbeat_pipeline.sh"
-    agents:
-      image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci:latest"
-    notify:
-      - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
+  - group: "Packaging"
+    key: "packaging"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    steps:
+      - label: ":linux: Packaging Linux"
+        key: "packaging-linux"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        env:
+          PLATFORMS: "${PACKAGING_PLATFORMS}"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Packaging Linux"
+
+      - label: ":linux: Packaging ARM"
+        key: "packaging-arm"
+        command: "cd $BEATS_PROJECT_NAME && mage package"
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        env:
+          PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
+          PACKAGES: "docker"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Packaging Linux ARM"
