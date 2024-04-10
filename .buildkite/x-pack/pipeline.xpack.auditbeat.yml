@@ -31,9 +31,13 @@ steps:
     steps:
       - label: ":linux: Ubuntu Unit (MODULE) Tests"
         key: "mandatory-linux-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
-        env:
-          MODULE: $MODULE
+        command: |
+          set -euo pipefail
+          # defines the MODULE env var based on what's changed in a PR
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet $$PWD
+          echo "~~~ Will run tests with env var MODULE=$$MODULE"
+          cd $BEATS_PROJECT_NAME && mage build unitTest
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
