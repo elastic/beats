@@ -17,11 +17,15 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
-  #Packaging
+  # Integration Tests
+  K8S_VERSION: "v1.29.0"
+  ASDF_KIND_VERSION: "0.20.0"
+
+  # Packaging
   PACKAGING_ARM_PLATFORMS: "linux/arm64"
   PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 
-  #Deps
+  # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
 steps:
@@ -49,10 +53,18 @@ steps:
           # defines the MODULE env var based on what's changed in a PR
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet $$PWD
-          echo "+++ DEBUG: Module is $$MODULE"
-          echo "~~~ Continuing tests"
-          cd metricbeat
-          mage goIntegTest
+          echo "~~~ Will run tests with env var MODULE=$$MODULE"
+
+          # TODO move this section to base image / pre-command hook
+          echo "~~~ Installing kind"
+          asdf plugin add kind
+          asdf install kind $ASDF_KIND_VERSION
+
+          .buildkite/deploy/kubernetes/scripts/kind-setup.sh
+
+          echo "~~~ Running tests"
+          export KUBECONFIG="$${WORKSPACE}/kubecfg"
+          cd metricbeat && mage goIntegTest
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -70,8 +82,18 @@ steps:
           set -euo pipefail
           # defines the MODULE env var based on what's changed in a PR
           source .buildkite/scripts/changesets.sh && defineModuleFromTheChangeSet $$PWD
-          cd metricbeat
-          mage pythonIntegTest
+          echo "~~~ Running tests with env var MODULE=$$MODULE"
+
+          # TODO move this section to base image / pre-command hook
+          echo "~~~ Installing kind"
+          asdf plugin add kind
+          asdf install kind $ASDF_KIND_VERSION
+
+          .buildkite/deploy/kubernetes/scripts/kind-setup.sh
+
+          echo "~~~ Running tests"
+          export KUBECONFIG="$${WORKSPACE}/kubecfg"
+          cd metricbeat && mage pythonIntegTest
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -209,13 +231,14 @@ steps:
               context: "metricbeat: MacOS Unit Tests"
 
   - wait: ~
-    depends_on:
-      - step: "metricbeat-mandatory-tests"
-        allow_failure: false
+    # with PRs, we want to run packaging only if mandatory tests succeed
+    # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in mandatory tests
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "metricbeat-mandatory-tests"
 
   - group: "Metricbeat Packaging"
     key: "metricbeat-packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
