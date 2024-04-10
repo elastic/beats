@@ -3,6 +3,17 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.13.2]]
+=== Beats version 8.13.2
+https://github.com/elastic/beats/compare/v8.13.1\...v8.13.2[View commits]
+
+==== Bugfixes
+
+*Heartbeat*
+
+- Fix reference yaml format. {pull}38584[38584]
+
+
 [[release-notes-8.13.1]]
 === Beats version 8.13.1
 https://github.com/elastic/beats/compare/v8.13.0\...v8.13.1[View commits]
