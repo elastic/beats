@@ -55,6 +55,7 @@ steps:
             - path:
                 - metricbeat/
                 - .buildkite/metricbeat/
+                - .buildkite/scripts
                 #OSS
                 - go.mod
                 - pytest.ini
