@@ -25,6 +25,10 @@ env:
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
 
+notify:
+  - github_commit_status:
+      context: "$BEATS_PROJECT_NAME"
+
 steps:
   - group: "Mandatory Tests"
     key: "mandatory-tests"
