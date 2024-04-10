@@ -16,9 +16,6 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
-  #Packaging
-  PACKAGING_ARM_PLATFORMS: "linux/arm64"
-
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
 
@@ -95,7 +92,6 @@ steps:
   - group: "Extended"
     key: "extended-tests"
     steps:
-
       - label: ":mac: MacOS Unit Tests"
         key: "macos-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
@@ -196,7 +192,7 @@ steps:
 
   - group: "Packaging"
     key: "packaging"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*package.*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[pP]ackage.*/
     depends_on:
       - "mandatory-tests"
     steps:
