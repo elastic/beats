@@ -174,7 +174,8 @@ steps:
     key: "auditbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
-      - "auditbeat-mandatory-tests"
+        - "auditbeat-mandatory-tests"
+
     steps:
       - label: ":ubuntu: Auditbeat/Packaging Linux X86"
         key: "auditbeat-package-linux-x86"
