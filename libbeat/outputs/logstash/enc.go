@@ -76,8 +76,11 @@ func (e *eventEncoder) EncodeEntry(entry queue.Entry) (queue.Entry, int) {
 	if err != nil {
 		e.log.Debugf("Failed to encode event: %v", pubEvent.Content)
 	}
+
+	copiedEncoding := make([]byte, len(encoding))
+	copy(copiedEncoding, encoding)
 	pubEvent.EncodedEvent = &encodedEvent{
-		encoding: encoding,
+		encoding: copiedEncoding,
 		err:      err,
 	}
 	pubEvent.Content = beat.Event{}

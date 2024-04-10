@@ -80,7 +80,7 @@ func newAsyncClient(
 	queueSize := config.Pipelining - 1
 	timeout := config.Timeout
 	compressLvl := config.CompressionLevel
-	clientFactory := makeClientFactory(queueSize, timeout, logstashEventUnwrapper, compressLvl)
+	clientFactory := makeClientFactory(queueSize, timeout, compressLvl)
 
 	var err error
 	c.client, err = clientFactory(c.Client)
@@ -102,12 +102,11 @@ func newAsyncClient(
 func makeClientFactory(
 	queueSize int,
 	timeout time.Duration,
-	enc func(interface{}) ([]byte, error),
 	compressLvl int,
 ) func(net.Conn) (*v2.AsyncClient, error) {
 	return func(conn net.Conn) (*v2.AsyncClient, error) {
 		return v2.NewAsyncClientWithConn(conn, queueSize,
-			v2.JSONEncoder(enc),
+			v2.JSONEncoder(logstashEventUnwrapper),
 			v2.Timeout(timeout),
 			v2.CompressionLevel(compressLvl),
 		)
