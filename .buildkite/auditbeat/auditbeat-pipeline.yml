@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 name: "beats-auditbeat"
-
+# fake comment
 env:
   BEATS_PROJECT_NAME: "auditbeat"
 
