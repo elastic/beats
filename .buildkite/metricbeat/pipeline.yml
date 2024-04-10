@@ -46,9 +46,11 @@ steps:
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
+          pwd
+          ls .buildkite/scripts
           # defines the MODULE env var based on what's changed in a PR
           source ./buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet $$(PWD)
+          defineModuleFromTheChangeSet $$PWD
           echo "+++ DEBUG: Module is $$MODULE"
           echo "~~~ Continuing tests"
           cd metricbeat
@@ -68,8 +70,10 @@ steps:
         key: "mandatory-python-int-test"
         command: |
           set -euo pipefail
+          pwd
+          ls .buildkite/scripts
           # defines the MODULE env var based on what's changed in a PR
-          source ./buildkite/scripts/changesets.sh && defineModuleFromTheChangeSet $$(PWD)
+          source ./buildkite/scripts/changesets.sh && defineModuleFromTheChangeSet $$PWD
           cd metricbeat
           mage pythonIntegTest
         agents:
