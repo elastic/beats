@@ -245,9 +245,6 @@ processors:
           ignore_missing: true
           if: ctx.json?.CLIENT_IP != 'Salesforce.com IP' && ctx.json?.CLIENT_IP != null
           ignore_failure: true
-    - geoip:
-          field: source.ip
-          target_field: source.geo
 
 on_failure:
     - set:

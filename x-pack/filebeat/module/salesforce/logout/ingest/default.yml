@@ -76,6 +76,7 @@ processors:
           field: source.ip
           target_field: source.geo
           ignore_missing: true
+          ignore_failure: true
     - append:
           field: related.ip
           value: "{{{source.ip}}}"
