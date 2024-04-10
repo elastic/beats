@@ -2,15 +2,20 @@
 name: "beats-xpack-dockerlogbeat"
 
 env:
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
   BEATS_PROJECT_NAME: "x-pack/dockerlogbeat"
+
+  ASDF_MAGE_VERSION: 1.15.0
+
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
-  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
@@ -22,34 +27,67 @@ env:
   PACKAGING_ARM_PLATFORMS: "linux/arm64"
   PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 
-  #Deps
-  ASDF_MAGE_VERSION: 1.15.0
-
 steps:
 
-  - input: "Input Parameters"
-    key: "force-run-stages"
-    fields:
-    - select: "Dockerlogbeat - run_xpack_dockerlogbeat"
-      key: "run_xpack_dockerlogbeat"
-      options:
-        - label: "True"
-          value: "true"
-        - label: "False"
-          value: "false"
-      default: "false"
+  - group: "Xpack/Dockerlogbeat Mandatory Tests"
+    key: "xpack-dockerlogbeat-mandatory-tests"
+    steps:
+      - label: ":ubuntu: Xpack/Dockerlogbeat Ubuntu Unit Tests"
+        key: "mandatory-linux-unit-test"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu Unit Tests"
 
-    if: "build.source == 'ui'"
+      - label: ":ubuntu: Xpack/Dockerlogbeat Go Integration Tests"
+        key: "mandatory-int-test"
+        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
+        env:
+          MODULE: $MODULE
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Go Integration Tests"
 
-  - wait: ~
-    if: "build.source == 'ui'"
-    allow_dependency_failure: false
+  - group: "Xpack/Dockerlogbeat Packaging"
+    key: "xpack-dockerlogbeat-packaging"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on:
+      - "xpack-dockerlogbeat-mandatory-tests"
 
-  - label: ":linux: Load dynamic x-pack dockerlogbeat pipeline"
-    key: "xpack-dockerlogbeat-pipeline"
-    command: ".buildkite/scripts/generate_xpack_dockerlogbeat_pipeline.sh"
-    agents:
-      image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci:latest"
-    notify:
-      - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
+    steps:
+      - label: ":ubuntu: Xpack/Dockerlogbeat Packaging Linux X86"
+        key: "auditbeat-package-linux-x86"
+        env:
+          PLATFORMS: "${PACKAGING_PLATFORMS}"
+          SNAPSHOT: true
+        command: "cd $BEATS_PROJECT_NAME && mage package"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+
+      - label: ":linux: Xpack/Dockerlogbeat Packaging Linux ARM"
+        key: "auditbeat-package-linux-arm"
+        env:
+          PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
+          PACKAGES: "docker"
+          SNAPSHOT: true
+        command: "cd $BEATS_PROJECT_NAME && mage package"
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"

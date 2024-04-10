@@ -47,6 +47,29 @@ steps:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
+  - label: "Trigger Xpack/Dockerlogbeat"
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only ${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          watch:
+            - path:
+                - x-pack/dockerlogbeat/
+                - .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml
+                #OSS
+                - go.mod
+                - pytest.ini
+                - dev-tools/**
+                - libbeat/**
+                - testing/**
+              config:
+                trigger: "beats-xpack-dockerlogbeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
   - label: "Trigger Deploy/K8S"
     plugins:
       - monorepo-diff#v1.0.1:

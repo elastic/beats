@@ -66,7 +66,7 @@ steps:
           - "auditbeat/build/*.xml"
           - "auditbeat/build/*.json"
 
-      - label: ":windows: Auditbeat Win-2016 Auditbeat Unit Tests"
+      - label: ":windows: Auditbeat Win-2016 Unit Tests"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
@@ -175,6 +175,7 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
       - "auditbeat-mandatory-tests"
+
     steps:
       - label: ":ubuntu: Auditbeat/Packaging Linux X86"
         key: "auditbeat-package-linux-x86"
