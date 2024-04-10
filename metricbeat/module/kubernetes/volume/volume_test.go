@@ -49,14 +49,15 @@ func TestEventMapping(t *testing.T) {
 	testCases := map[string]interface{}{
 		"name": "default-token-sg8x5",
 
-		"fs.available.bytes": 1939689472,
-		"fs.capacity.bytes":  1939701760,
-		"fs.used.bytes":      12288,
-		"fs.used.pct":        float64(12288) / float64(1939701760),
-		"fs.inodes.used":     9,
-		"fs.inodes.free":     473551,
-		"fs.inodes.count":    473560,
-		"fs.inodes.pct":      float64(9) / float64(473560),
+		"fs.available.bytes":         1939689472,
+		"fs.capacity.bytes":          1939701760,
+		"fs.used.bytes":              12288,
+		"fs.used.pct":                float64(12288) / float64(1939701760),
+		"fs.inodes.used":             9,
+		"fs.inodes.free":             473551,
+		"fs.inodes.count":            473560,
+		"fs.inodes.pct":              float64(9) / float64(473560),
+		"persistentvolumeclaim.name": "pvc-demo",
 	}
 
 	for k, v := range testCases {
