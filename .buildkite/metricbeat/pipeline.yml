@@ -46,9 +46,8 @@ steps:
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
-          cd metricbeat
           # defines the MODULE env var based on what's changed in a PR
-          source ../buildkite/scripts/changesets.sh
+          source ./buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet $$(PWD)
           echo "+++ DEBUG: Module is $$MODULE"
           echo "~~~ Continuing tests"
