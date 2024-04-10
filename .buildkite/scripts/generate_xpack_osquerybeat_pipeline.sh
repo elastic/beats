@@ -153,7 +153,7 @@ if are_conditions_met_macos_tests; then
 
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: ".buildkite/scripts/macos_unit_tests.sh"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -166,7 +166,7 @@ if are_conditions_met_macos_tests; then
 
       - label: ":mac: MacOS ARM Unit Tests"
         key: "macos-arm64-unit-tests-extended"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: ".buildkite/scripts/macos_unit_tests.sh"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
