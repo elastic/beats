@@ -61,7 +61,7 @@ steps:
                 - dev-tools/
                 - libbeat/
                 - testing/
-                - x-pack/libbeat/"
+                - x-pack/libbeat/
               config:
                 trigger: "beats-xpack-auditbeat"
                 label: ":package: xpack/auditbeat pipeline"
