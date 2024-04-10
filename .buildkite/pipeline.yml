@@ -46,3 +46,28 @@ steps:
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
+  - label: "Trigger x-pack/Heartbeat"
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only HEAD~1"
+          watch:
+            - path:
+                - x-pack/heartbeat/
+                - .buildkite/x-pack/pipeline.xpack.heartbeat.yml
+                #XPACK
+                - go.mod
+                - pytest.ini
+                - dev-tools/
+                - libbeat/
+                - testing/
+                - x-pack/libbeat/
+              config:
+                trigger: "beats-xpack-heartbeat"
+                label: ":package: x-pack/heartbeat pipeline"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
