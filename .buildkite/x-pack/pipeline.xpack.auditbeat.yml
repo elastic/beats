@@ -41,9 +41,6 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "$BEATS_PROJECT_NAME: Ubuntu Unit (MODULE) Tests"
 
       - label: ":rhel: RHEL9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
@@ -55,9 +52,6 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "$BEATS_PROJECT_NAME: RHEL9 Unit Tests"
 
       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
         command: |
@@ -78,9 +72,6 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
 
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
@@ -156,9 +147,6 @@ steps:
           disk_type: "pd-ssd"
         env:
           PLATFORMS: "${PACKAGING_PLATFORMS}"
-        notify:
-          - github_commit_status:
-              context: "$BEATS_PROJECT_NAME: Packaging Linux"
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
@@ -170,6 +158,3 @@ steps:
         env:
           PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
           PACKAGES: "docker"
-        notify:
-          - github_commit_status:
-              context: "$BEATS_PROJECT_NAME: Packaging Linux ARM"

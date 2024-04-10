@@ -4,7 +4,6 @@ steps:
   - label: "Trigger Auditbeat"
     plugins:
       - monorepo-diff#v1.0.1:
-          log_level: "debug"
           diff: "git diff --name-only HEAD~1"
           watch:
             - path:
@@ -28,7 +27,6 @@ steps:
   - label: "Trigger Heartbeat"
     plugins:
       - monorepo-diff#v1.0.1:
-          log_level: "debug"
           diff: "git diff --name-only HEAD~1"
           watch:
             - path:
@@ -52,7 +50,6 @@ steps:
   - label: "Trigger x-pack/Auditbeat"
     plugins:
       - monorepo-diff#v1.0.1:
-          log_level: "debug"
           diff: "git diff --name-only HEAD~1"
           watch:
             - path:
