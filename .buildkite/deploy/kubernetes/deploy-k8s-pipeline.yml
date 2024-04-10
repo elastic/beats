@@ -11,11 +11,10 @@ notify:
 steps:
   - label: "Checks"
     command: ".buildkite/deploy/kubernetes/scripts/make.sh"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") == "kubernetes"
-#    ToDo: uncomment once Jenkins job is disabled
-#    notify:
-#      - github_commit_status:
-#          context: "Deploy/k8s-checks"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") =~ /.*kubernetes.*/
+    notify:
+      - github_commit_status:
+          context: "Deploy/k8s-checks"
     agents:
       provider: "gcp"
       image: "${IMAGE_UBUNTU_X86_64}"
@@ -25,13 +24,13 @@ steps:
     key: "k8s-test-129"
     env:
       K8S_VERSION: "v1.29.0"
-#    ToDo: uncomment once Jenkins job is disabled
-#    notify:
-#      - github_commit_status:
-#          context: "Deploy/k8s-test v1.29.0"
     commands:
       - "MODULE=kubernetes make -C metricbeat integration-tests"
       - "make -C deploy/kubernetes test"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") =~ /.*kubernetes.*/
+    notify:
+      - github_commit_status:
+          context: "Deploy/k8s-test v1.29.0"
     agents:
       provider: "gcp"
       image: "${IMAGE_UBUNTU_X86_64}"
@@ -41,13 +40,13 @@ steps:
     key: "k8s-test-128"
     env:
       K8S_VERSION: "v1.28.0"
-#    ToDo: uncomment once Jenkins job is disabled
-#    notify:
-#      - github_commit_status:
-#          context: "Deploy/k8s-test v1.28.0"
     commands:
       - "MODULE=kubernetes make -C metricbeat integration-tests"
       - "make -C deploy/kubernetes test"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") =~ /.*kubernetes.*/
+    notify:
+      - github_commit_status:
+          context: "Deploy/k8s-test v1.28.0"
     agents:
       provider: "gcp"
       image: "${IMAGE_UBUNTU_X86_64}"
@@ -57,13 +56,13 @@ steps:
     key: "k8s-test-1273"
     env:
       K8S_VERSION: "v1.27.3"
-#    ToDo: uncomment once Jenkins job is disabled
-#    notify:
-#      - github_commit_status:
-#          context: "Deploy/k8s-test v1.27.3"
     commands:
       - "MODULE=kubernetes make -C metricbeat integration-tests"
       - "make -C deploy/kubernetes test"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") =~ /.*kubernetes.*/
+    notify:
+      - github_commit_status:
+          context: "Deploy/k8s-test v1.27.3"
     agents:
       provider: "gcp"
       image: "${IMAGE_UBUNTU_X86_64}"
@@ -73,13 +72,13 @@ steps:
     key: "k8s-test-1266"
     env:
       K8S_VERSION: "v1.26.6"
-#    ToDo: uncomment once Jenkins job is disabled
-#    notify:
-#      - github_commit_status:
-#          context: "Deploy/k8s-test v1.26.6"
     commands:
       - "MODULE=kubernetes make -C metricbeat integration-tests"
       - "make -C deploy/kubernetes test"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") =~ /.*kubernetes.*/
+    notify:
+      - github_commit_status:
+          context: "Deploy/k8s-test v1.26.6"
     agents:
       provider: "gcp"
       image: "${IMAGE_UBUNTU_X86_64}"
