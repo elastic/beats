@@ -4,6 +4,7 @@ steps:
   - label: "Trigger Auditbeat"
     plugins:
       - monorepo-diff#v1.0.1:
+          log_level: "debug"
           diff: "git diff --name-only HEAD~1"
           watch:
             - path:
@@ -12,9 +13,9 @@ steps:
                 #OSS
                 - go.mod
                 - pytest.ini
-                - dev-tools/**
-                - libbeat/**
-                - testing/**
+                - dev-tools/
+                - libbeat/
+                - testing/
               config:
                 trigger: "auditbeat"
                 build:
@@ -27,6 +28,7 @@ steps:
   - label: "Trigger Heartbeat"
     plugins:
       - monorepo-diff#v1.0.1:
+          log_level: "debug"
           diff: "git diff --name-only HEAD~1"
           watch:
             - path:
@@ -35,9 +37,9 @@ steps:
                 #OSS
                 - go.mod
                 - pytest.ini
-                - dev-tools/**
-                - libbeat/**
-                - testing/**
+                - dev-tools/
+                - libbeat/
+                - testing/
               config:
                 trigger: "heartbeat"
                 build:
@@ -50,18 +52,19 @@ steps:
   - label: "Trigger x-pack/Auditbeat"
     plugins:
       - monorepo-diff#v1.0.1:
+          log_level: "debug"
           diff: "git diff --name-only HEAD~1"
           watch:
             - path:
                 - x-pack/auditbeat/
                 - .buildkite/x-pack/pipeline.xpack.auditbeat.yml
                 #XPACK
-                - "go.mod"
-                - "pytest.ini"
-                - "dev-tools/**"
-                - "libbeat/**"
-                - "testing/**"
-                - "x-pack/libbeat/**"
+                - go.mod
+                - pytest.ini
+                - dev-tools/
+                - libbeat/
+                - testing/
+                - x-pack/libbeat/"
               config:
                 trigger: "beats-xpack-auditbeat"
                 build:
