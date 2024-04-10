@@ -18,9 +18,208 @@ env:
 
   #Packaging
   PACKAGING_ARM_PLATFORMS: "linux/arm64"
-  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
 
 steps:
+  - group: "Mandatory Testing"
+    key: "mandatory-tests"
+    steps:
+      - label: ":ubuntu: Ubuntu Unit Tests"
+        command: |
+          cd filebeat
+          mage build unitTest
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+      - label: ":ubuntu: Ubuntu Go Integration Tests"
+        command: |
+          cd filebeat
+          mage goIntegTest
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+      - label: ":ubuntu: Ubuntu Python Integration Tests"
+        command: |
+          cd filebeat
+          mage pythonIntegTest
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+      - label: ":windows: Windows 2016 Unit Tests"
+        key: "windows-2016-unit-tests"
+        command: |
+          Set-Location -Path filebeat
+          mage build unitTest
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2016}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+      - label: ":windows: Windows 2022 Unit Tests"
+        key: "windows-2022-unit-tests"
+        command: |
+          Set-Location -Path filebeat
+          mage build unitTest
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+  - group: "Extended Tests"
+    key: "extended-tests"
+    steps:
+
+      - label: ":mac: MacOS Unit Tests"
+        key: "macos-unit-tests-extended"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        command: |
+          cd filebeat
+          mage build unitTest
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+      - label: ":mac: MacOS ARM Unit Tests"
+        key: "macos-arm64-unit-tests-extended"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        command: |
+          cd filebeat
+          mage build unitTest
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+      - label: ":linux: Ubuntu ARM Unit Tests"
+        key: "extended-arm64-unit-test"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+        command: |
+          cd filebeat
+          mage build unitTest
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+      - label: ":windows: Windows 2019 Unit Tests"
+        key: "windows-extended-2019"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
+        command: |
+          Set-Location -Path filebeat
+          mage build unitTest
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+      - label: ":windows: Windows 11 Unit Tests"
+        key: "windows-extended-11"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
+        command: |
+          Set-Location -Path filebeat
+          mage build unitTest
+        notify:
+          - github_commit_status:
+              context: "filebeat: Windows 11 Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+      - label: ":windows: Windows 10 Unit Tests"
+        key: "windows-extended-10"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
+        command: |
+          Set-Location -Path filebeat
+          mage build unitTest
+        notify:
+          - github_commit_status:
+              context: "filebeat: Windows 10 Unit Tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 200
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+
+  - group: "Packaging"
+    key: "packaging"
+    depends_on:
+      - "mandatory-tests"
+    steps:
+      - label: ":linux: Packaging Linux"
+        key: "packaging-linux"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*package.*/
+        command: |
+          cd filebeat
+          mage package
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+
+      - label: ":linux: Packaging ARM"
+        key: "packaging-arm"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*package.*/
+        command: |
+          cd filebeat
+          mage package
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        env:
+          PLATFORMS: "linux/arm64"
+          PACKAGES: "docker"
