@@ -74,6 +74,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
 - Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
+- Fix indexing failures by re-enabling event normalisation in netflow input. {issue}38703[38703] {pull}38780[38780]
 
 *Heartbeat*
 
