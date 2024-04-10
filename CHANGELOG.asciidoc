@@ -7,6 +7,11 @@
 === Beats version 7.17.20
 https://github.com/elastic/beats/compare/v7.17.19\...v7.17.20[View commits]
 
+==== Added
+
+*Affecting all Beats*
+
+- Upgrade Go version to 1.21.9. {pull}38728[38728]
 
 [[release-notes-7.17.19]]
 === Beats version 7.17.19
