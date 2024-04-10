@@ -222,7 +222,10 @@ steps:
     steps:
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
-        command: "cd metricbeat && mage build unitTest"
+        command: |
+          source .buildkite/scripts/install_tools.sh
+          set -euo pipefail
+          cd metricbeat && mage build unitTest
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
