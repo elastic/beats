@@ -67,6 +67,7 @@ steps:
                 - x-pack/libbeat/"
               config:
                 trigger: "beats-xpack-auditbeat"
+                label: ":package: xpack/auditbeat pipeline"
                 build:
                   commit: "${BUILDKITE_COMMIT}"
                   branch: "${BUILDKITE_BRANCH}"
