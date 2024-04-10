@@ -13,6 +13,17 @@ Use the `salesforce` input to monitor Salesforce events either via the https://d
 
 The Salesforce input maintains cursor states between requests to track the last event retrieved in each execution. These cursor states are passed to the next event monitoring execution to resume fetching events from the last known position. The cursor states allow the input to pick up where it left off and provide control over the behavior of the input.
 
+Here are some supported authentication methods and event monitoring methods:
+
+* Authentication methods
+** OAuth2
+*** User-Password flow
+*** JWT Bearer flow
+
+* Event monitoring methods
+** EventLogFile (ELF) using REST API
+** REST API for objects (Used for Setup Audit Trail and for monitoring real-time events)
+
 Here are some key points about how cursors are used in the Salesforce input:
 
 - Separate cursor states are maintained for each configured event monitoring method (`event_log_file` and `object`).
