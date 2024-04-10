@@ -27,7 +27,7 @@ processors:
           ignore_failure: true
     - set:
           field: ecs.version
-          value: "8.5.0"
+          value: "8.11.0"
           ignore_failure: true
           ignore_empty_value: true
     - set:
