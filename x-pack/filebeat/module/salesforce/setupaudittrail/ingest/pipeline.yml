@@ -44,6 +44,7 @@ processors:
     - set:
           field: salesforce.setup_audit_trail.event_type
           copy_from: json.attributes.type
+          ignore_failure: true
           ignore_missing: true
     - rename:
           field: json.CreatedByContext
