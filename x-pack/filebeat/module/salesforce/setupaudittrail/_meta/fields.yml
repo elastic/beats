@@ -32,10 +32,6 @@
       type: keyword
       description: >
         The full description of changes made in Setup. For example, if the Action field has a value of PermSetCreate, the Display field has a value like “Created permission set MAD: with user license Salesforce.
-    - name: event_type
-      type: keyword
-      description: >
-        Event type.
     - name: responsible_namespace_prefix
       type: keyword
       description: >

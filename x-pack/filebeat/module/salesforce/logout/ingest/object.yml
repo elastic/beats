@@ -14,22 +14,18 @@ processors:
           field: json.RelatedEventIdentifier
           target_field: salesforce.logout.related_event_identifier
           ignore_missing: true
-          ignore_failure: true
     - rename:
           field: json.LoginKey
           target_field: salesforce.logout.login_key
           ignore_missing: true
-          ignore_failure: true
     - rename:
           field: json.SessionLevel
           target_field: salesforce.logout.session.level
           ignore_missing: true
-          ignore_failure: true
     - rename:
           field: json.SessionKey
           target_field: salesforce.logout.session.key
           ignore_missing: true
-          ignore_failure: true
     - date:
           field: json.CreatedDate
           target_field: event.created
@@ -42,12 +38,10 @@ processors:
     - rename:
           field: json.Username
           target_field: user.email
-          ignore_failure: true
           ignore_missing: true
     - rename:
           field: json.UserId
           target_field: user.id
-          ignore_failure: true
           ignore_missing: true
     - convert:
           field: json.SourceIp
