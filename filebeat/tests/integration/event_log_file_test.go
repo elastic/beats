@@ -56,7 +56,7 @@ output:
     password: testing
 
 logging:
-  level: debug
+  level: info
   event_data:
     files:
       name: filebeat-my-event-log

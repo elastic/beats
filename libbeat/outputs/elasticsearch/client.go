@@ -418,16 +418,17 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 				if encodedEvent.deadLetter {
 					stats.nonIndexable++
 					client.log.Errorf("Can't deliver to dead letter index event (status=%v). Look at the event log to view the event and cause.", status)
-					client.log.Debugw(fmt.Sprintf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg), "log.type", "event")
+					client.log.Errorw(fmt.Sprintf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg), "log.type", "event")
 					// poison pill - this will clog the pipeline if the underlying failure is non transient.
 				} else if client.deadLetterIndex != "" {
 					client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Look at the event log to view the event and cause.", status)
 					client.log.Debugw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg), "log.type", "event")
 					client.setDeadLetter(encodedEvent, status, string(msg))
+
 				} else { // drop
 					stats.nonIndexable++
 					client.log.Warnf("Cannot index event (status=%v): dropping event! Look at the event log to view the event and cause.", status)
-					client.log.Debugw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg), "log.type", "event")
+					client.log.Warnw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg), "log.type", "event")
 					continue
 				}
 			}
