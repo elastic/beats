@@ -23,7 +23,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 *Metricbeat*
-
+- Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 
 *Osquerybeat*
 
@@ -99,6 +99,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add missing provider registration and fix published entity for Active Directory entityanalytics provider. {pull}38645[38645]
 - Fix handling of un-parsed JSON in O365 module. {issue}37800[37800] {pull}38709[38709]
 - Fix filestream's registry GC: registry entries are now removed from the in-memory and disk store when they're older than the set TTL {issue}36761[36761] {pull}38488[38488]
+- Fix indexing failures by re-enabling event normalisation in netflow input. {issue}38703[38703] {pull}38780[38780]
 
 *Heartbeat*
 
@@ -109,7 +110,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Heartbeat*
 
-- Fix reference yaml format. {pull}38584[38584]
 
 *Metricbeat*
 
@@ -285,6 +285,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
