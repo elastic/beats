@@ -274,6 +274,26 @@ check_platform_architeture() {
   esac
 }
 
+define_platform_architeture_for_docker_compose() {
+  case "${arch_type}" in
+    "x86_64")
+      docker_compose_arch_type="x86_64"
+      ;;
+    "amd64")
+      docker_compose_arch_type="x86_64"
+      ;;
+    "aarch64")
+      docker_compose_arch_type="aarch64"
+      ;;
+    "arm64")
+      docker_compose_arch_type="aarch64"
+      ;;
+    *)
+    echo "The current platform or OS type is unsupported yet"
+    ;;
+  esac
+}
+
 with_mage() {
   local install_packages=(
     "github.com/magefile/mage"
