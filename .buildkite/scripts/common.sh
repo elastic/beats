@@ -496,13 +496,6 @@ are_conditions_met_packaging() {
   return 1
 }
 
-config_git() {
-  if [ -z "$(git config --get user.email)" ]; then
-    git config --global user.email "beatsmachine@users.noreply.github.com"
-    git config --global user.name "beatsmachine"
-  fi
-}
-
 defineModuleFromTheChangeSet() {
   # This method gathers the module name, if required, in order to run the ITs only if the changeset affects a specific module.
   # For such, it's required to look for changes under the module folder and exclude anything else such as asciidoc and png files.
