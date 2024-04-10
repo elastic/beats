@@ -2,8 +2,6 @@
 name: "beats-metricbeat"
 
 env:
-  BEATS_PROJECT_NAME: "metricbeat"
-
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
@@ -44,13 +42,13 @@ steps:
           - github_commit_status:
               context: "metricbeat: Ubuntu Unit Tests"
 
-      - label: ":go: Go Intergration Tests"
+      - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
-          set -eou pipefail
+          set -euo pipefail
           cd metricbeat
-          # needed for evaluating the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/common.sh && defineModyleFromTheChangeSet $$(PWD)
+          # defines the MODULE env var based on what's changed in a PR
+          source .buildkite/scripts/changesets.sh && defineModuleFromTheChangeSet $$(PWD)
           mage goIntegTest
         agents:
           provider: "gcp"
@@ -65,11 +63,11 @@ steps:
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
-        command:
-          set -eou pipefail
+        command: |
+          set -euo pipefail
           cd metricbeat
-          # needed for evaluating the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/common.sh && defineModyleFromTheChangeSet $$(PWD)
+          # defines the MODULE env var based on what's changed in a PR
+          source .buildkite/scripts/changesets.sh && defineModuleFromTheChangeSet $$(PWD)
           mage pythonIntegTest
         agents:
           provider: "gcp"
@@ -132,11 +130,9 @@ steps:
           - github_commit_status:
               context: "metricbeat: Windows 2022 Unit Tests"
 
-  # echo "Add the extended windows tests into the pipeline"
-  # TODO: ADD conditions from the main pipeline
-
-  - group: "Extended Windows Tests"
-    key: "extended-win-tests"
+  - group: "Metricbeat Extended Windows Tests"
+    key: "metricbeat-extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
     steps:
       - label: ":windows: Windows 10 Unit Tests"
         command: |
@@ -192,65 +188,57 @@ steps:
           - github_commit_status:
               context: "metricbeat: Windows 2019 Unit Tests"
 
-- group: "Extended Tests"
-  key: "metricbeat-extended-tests-macos"
-  if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-  steps:
-    - label: ":mac: MacOS Unit Tests"
-      key: "extended-macos-unit-tests"
-      command: ".buildkite/scripts/unit_tests.sh"
-      agents:
-        provider: "orka"
-        imagePrefix: "${IMAGE_MACOS_X86_64}"
-      artifact_paths:
-        - "metricbeat/build/*.xml"
-        - "metricbeat/build/*.json"
-      notify:
-        - github_commit_status:
-            context: "metricbeat: MacOS Unit Tests"
+  - group: "Metricbeat Extended MacOS Tests"
+    key: "metricbeat-extended-macos-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+    steps:
+      - label: ":mac: MacOS Unit Tests"
+        key: "extended-macos-unit-tests"
+        command: "cd metricbeat && mage build unitTest"
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_X86_64}"
+        artifact_paths:
+          - "metricbeat/build/*.xml"
+          - "metricbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "metricbeat: MacOS Unit Tests"
 
-- wait: ~
-  depends_on:
-    - step: "metricbeat-mandatory-tests"
-      allow_failure: false
+  - wait: ~
+    depends_on:
+      - step: "metricbeat-mandatory-tests"
+        allow_failure: false
 
-- group: "Metricbeat Packaging"
-  key: "metricbeat-packaging"
-  steps:
-    - label: ":linux: Packaging Linux"
-      key: "packaging-linux"
-      command: "cd $BEATS_PROJECT_NAME && mage package"
-      agents:
-        provider: "gcp"
-        image: "${IMAGE_UBUNTU_X86_64}"
-        machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        disk_size: 100
-        disk_type: "pd-ssd"
-      env:
-        PLATFORMS: "${PACKAGING_PLATFORMS}"
-      notify:
-        - github_commit_status:
-            context: "$BEATS_PROJECT_NAME: Packaging Linux"
+  - group: "Metricbeat Packaging"
+    key: "metricbeat-packaging"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    steps:
+      - label: ":linux: Packaging Linux"
+        key: "packaging-linux"
+        command: "cd metricbeat && mage package"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        env:
+          PLATFORMS: "${PACKAGING_PLATFORMS}"
+        notify:
+          - github_commit_status:
+              context: "metricbeat: Packaging Linux"
 
-    - label: ":linux: Packaging ARM"
-      key: "packaging-arm"
-      command: "cd $BEATS_PROJECT_NAME && mage package"
-      agents:
-        provider: "aws"
-        imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-        instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-      env:
-        PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
-        PACKAGES: "docker"
-      notify:
-        - github_commit_status:
-            context: "$BEATS_PROJECT_NAME: Packaging Linux ARM"
-
-  YAML
-  fi
-
-  echo "+++ Printing dynamic steps"
-  cat $pipelineName | yq . -P
-
-  echo "--- Loading dynamic steps"
-  buildkite-agent pipeline upload $pipelineName
+      - label: ":linux: Packaging ARM"
+        key: "packaging-arm"
+        command: "cd metricbeat && mage package"
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        env:
+          PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
+          PACKAGES: "docker"
+        notify:
+          - github_commit_status:
+              context: "metricbeat: Packaging Linux ARM"
