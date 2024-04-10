@@ -98,6 +98,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Rename `activity_guid` to `activity_id` in ETW input events to suit other Windows inputs. {pull}38530[38530]
 - Add missing provider registration and fix published entity for Active Directory entityanalytics provider. {pull}38645[38645]
 - Fix handling of un-parsed JSON in O365 module. {issue}37800[37800] {pull}38709[38709]
+- Fix filestream's registry GC: registry entries are now removed from the in-memory and disk store when they're older than the set TTL {issue}36761[36761] {pull}38488[38488]
 
 *Heartbeat*
 
@@ -149,6 +150,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
 - Add process data to file events (Linux only, eBPF backend). {pull}38199[38199]
+- Add container id to file events (Linux only, eBPF backend). {pull}38328[38328]
 
 *Filebeat*
 
