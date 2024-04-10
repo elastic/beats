@@ -248,12 +248,11 @@ with_macos_docker_compose() {
   create_workspace
   if [ "${arch_type}" == "arm64" ]; then
     local docker_compose_url="https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-darwin-aarch64"
-  elif [ "${arch_type}" == "aarch64" ]; then
+  elif [ "${arch_type}" == "x86_64" ]; then
     local docker_compose_url="https://github.com/docker/compose/releases/download/1.21.0/docker-compose-Darwin-x86_64"
   fi
-  ls -ls ${BIN}                   #TODO: revobe after debugging
   retry 3 curl -sSL -o ${BIN}/docker-compose "${docker_compose_url}"
-  ls -ls ${BIN}                   #TODO: revobe after debugging
+  ls -la ${BIN}                   #TODO: revobe after debugging
   chmod +x ${BIN}/docker-compose
   export PATH="${BIN}:${PATH}"
   docker-compose version
