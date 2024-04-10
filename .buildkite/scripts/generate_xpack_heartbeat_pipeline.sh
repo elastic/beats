@@ -9,74 +9,38 @@ pipelineName="pipeline.xpack-heartbeat-dynamic.yml"
 echo "Add the mandatory and extended tests without additional conditions into the pipeline"
 if are_conditions_met_mandatory_tests; then
   cat > $pipelineName <<- YAML
-
 steps:
-
   - group: "Mandatory Tests"
     key: "mandatory-tests"
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
         agents:
           provider: "gcp"
-          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu Unit Tests"
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: ".buildkite/scripts/go_int_tests.sh"
+        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
         agents:
           provider: "gcp"
-          image: "${DEFAULT_UBUNTU_X86_64_IMAGE}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Go Integration Tests"
 
-<<<<<<< HEAD
-# ## TODO: there are windows test failures already reported
-# ## https://github.com/elastic/beats/issues/23957 and https://github.com/elastic/beats/issues/23958
-# ## waiting for being fixed.
-
-#       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-#         command: ".buildkite/scripts/win_unit_tests.ps1"
-#         key: "mandatory-win-unit-tests"
-#         agents:
-#           provider: "gcp"
-#           image: "{{matrix.image}}"
-#           machineType: "${GCP_WIN_MACHINE_TYPE}"
-#           disk_size: 100
-#           disk_type: "pd-ssd"
-#         matrix:
-#           setup:
-#             image:
-#               - "${IMAGE_WIN_2016}"
-#               - "${IMAGE_WIN_2022}"
-#         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-
-# ## TODO: this condition will be changed in the Phase 3 of the Migration Plan https://docs.google.com/document/d/1IPNprVtcnHlem-uyGZM0zGzhfUuFAh4LeSl9JFHMSZQ/edit#heading=h.sltz78yy249h
-
-#   - group: "Extended Windows Tests"
-#     key: "extended-win-tests"
-#     steps:
-
-#       - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-#         command: ".buildkite/scripts/win_unit_tests.ps1"
-#         key: "extended-win-unit-tests"
-#         agents:
-#           provider: "gcp"
-#           image: "{{matrix.image}}"
-#           machineType: "${GCP_WIN_MACHINE_TYPE}"
-#           disk_size: 100
-#           disk_type: "pd-ssd"
-#         matrix:
-#           setup:
-#             image:
-#               - "${IMAGE_WIN_10}"
-#               - "${IMAGE_WIN_11}"
-#               - "${IMAGE_WIN_2019}"
-#         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
-=======
   ####### skip: "see elastic/beats#23957 and elastic/beats#23958"
   #     - label: ":windows: Windows 2016 Unit Tests"
   #       command: |
@@ -171,7 +135,6 @@ steps:
   #         - github_commit_status:
   #             context: "$BEATS_PROJECT_NAME: Windows 2019 Unit Tests"
   ####### skip: "see elastic/beats#23957 and elastic/beats#23958"
->>>>>>> c749dacac1 (Split windows steps (#38782))
 
 YAML
 else
@@ -181,18 +144,21 @@ fi
 
 if are_conditions_met_macos_tests; then
   cat >> $pipelineName <<- YAML
-
   - group: "Extended Tests"
     key: "extended-tests"
     steps:
-
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
         command: ".buildkite/scripts/unit_tests.sh"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: MacOS Unit Tests"
 
 YAML
 fi
@@ -200,7 +166,6 @@ fi
 echo "Check and add the Packaging into the pipeline"
 if are_conditions_met_packaging; then
   cat >> $pipelineName <<- YAML
-
   - wait: ~
     depends_on:
       - step: "mandatory-tests"
@@ -220,6 +185,9 @@ if are_conditions_met_packaging; then
           disk_type: "pd-ssd"
         env:
           PLATFORMS: "${PACKAGING_PLATFORMS}"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Packaging Linux"
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
@@ -231,12 +199,15 @@ if are_conditions_met_packaging; then
         env:
           PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
           PACKAGES: "docker"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Packaging Linux ARM"
 
 YAML
 fi
 
-echo "--- Printing dynamic steps"     #TODO: remove if the pipeline is public
-cat $pipelineName
+echo "+++ Printing dynamic steps"
+yq . -P -e $pipelineName || (echo "Yaml formatting error, below is the YAML"; cat $pipelineName; exit 1)
 
 echo "--- Loading dynamic steps"
 buildkite-agent pipeline upload $pipelineName
