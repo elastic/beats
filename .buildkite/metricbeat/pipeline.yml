@@ -160,7 +160,7 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
     steps:
       - label: ":windows: Windows 10 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows?10.*/
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows-10.*/
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
@@ -179,7 +179,7 @@ steps:
               context: "metricbeat: Windows 10 Unit Tests"
 
       - label: ":windows: Windows 11 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows?11.*/
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows-11.*/
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
@@ -198,7 +198,7 @@ steps:
               context: "metricbeat: Windows 11 Unit Tests"
 
       - label: ":windows: Windows 2019 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows?2019.*/
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows-2019.*/
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
