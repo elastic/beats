@@ -82,10 +82,6 @@ retry_with_count() {
 are_files_changed() {
   local changeset=$1
 
-  echo "--- Changeset: $changeset"
-  echo "--- Git Diff head-head: $(git diff --name-only HEAD@{1} HEAD)"
-  echo "--- Git Diff prtarget-head: $(git diff --name-only ${GITHUB_PR_TARGET_BRANCH}...HEAD)"
-
   if git diff --name-only HEAD@{1} HEAD | grep -qE "$changeset"; then
     return 0;
   else
