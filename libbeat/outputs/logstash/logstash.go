@@ -21,6 +21,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/transport"
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
@@ -63,6 +64,12 @@ func makeLogstash(
 		Stats:   observer,
 	}
 
+	encoderFactory := newEventEncoderFactory(
+		logp.NewLogger("logstash"),
+		beat,
+		lsConfig.EscapeHTML,
+		lsConfig.Index)
+
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, host := range hosts {
 		var client outputs.NetworkClient
@@ -85,5 +92,5 @@ func makeLogstash(
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(lsConfig.Queue, lsConfig.LoadBalance, lsConfig.BulkMaxSize, lsConfig.MaxRetries, nil, clients)
+	return outputs.SuccessNet(lsConfig.Queue, lsConfig.LoadBalance, lsConfig.BulkMaxSize, lsConfig.MaxRetries, encoderFactory, clients)
 }

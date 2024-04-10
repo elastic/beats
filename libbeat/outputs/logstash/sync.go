@@ -61,9 +61,8 @@ func newSyncClient(
 	}
 
 	var err error
-	enc := makeLogstashEventEncoder(log, beat, config.EscapeHTML, config.Index)
 	c.client, err = v2.NewSyncClientWithConn(conn,
-		v2.JSONEncoder(enc),
+		v2.JSONEncoder(logstashEventUnwrapper),
 		v2.Timeout(config.Timeout),
 		v2.CompressionLevel(config.CompressionLevel),
 	)
@@ -196,7 +195,7 @@ func (c *syncClient) publishWindowed(events []publisher.Event) (int, error) {
 func (c *syncClient) sendEvents(events []publisher.Event) (int, error) {
 	window := make([]interface{}, len(events))
 	for i := range events {
-		window[i] = &events[i].Content
+		window[i] = events[i].EncodedEvent
 	}
 	return c.client.Send(window)
 }

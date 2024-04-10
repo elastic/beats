@@ -18,24 +18,76 @@
 package logstash
 
 import (
-	"strings"
+	"fmt"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec/json"
+	"github.com/elastic/beats/v7/libbeat/publisher"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func makeLogstashEventEncoder(log *logp.Logger, info beat.Info, escapeHTML bool, index string) func(interface{}) ([]byte, error) {
+type eventEncoder struct {
+	log   *logp.Logger
+	enc   *json.Encoder
+	index string
+}
+
+type encodedEvent struct {
+	encoding []byte
+	err      error
+}
+
+func newEventEncoderFactory(
+	log *logp.Logger,
+	info beat.Info,
+	escapeHTML bool,
+	index string,
+) queue.EncoderFactory {
+	return func() queue.Encoder {
+		return newEventEncoder(log, info, escapeHTML, index)
+	}
+}
+
+func newEventEncoder(
+	log *logp.Logger,
+	info beat.Info,
+	escapeHTML bool,
+	index string,
+) queue.Encoder {
 	enc := json.New(info.Version, json.Config{
 		Pretty:     false,
 		EscapeHTML: escapeHTML,
 	})
-	index = strings.ToLower(index)
-	return func(event interface{}) (d []byte, err error) {
-		d, err = enc.Encode(index, event.(*beat.Event))
-		if err != nil {
-			log.Debugf("Failed to encode event: %v", event)
-		}
-		return
+	return &eventEncoder{
+		log:   log,
+		enc:   enc,
+		index: index,
 	}
+}
+
+func (e *eventEncoder) EncodeEntry(entry queue.Entry) (queue.Entry, int) {
+	pubEvent, ok := entry.(publisher.Event)
+	if !ok {
+		// Currently all queue entries are publisher.Events but let's be cautious.
+		return entry, 0
+	}
+	encoding, err := e.enc.Encode(e.index, &pubEvent.Content)
+	if err != nil {
+		e.log.Debugf("Failed to encode event: %v", pubEvent.Content)
+	}
+	pubEvent.EncodedEvent = &encodedEvent{
+		encoding: encoding,
+		err:      err,
+	}
+	pubEvent.Content = beat.Event{}
+	return pubEvent, len(encoding)
+}
+
+func logstashEventUnwrapper(event interface{}) ([]byte, error) {
+	encoded, ok := event.(*encodedEvent)
+	if !ok {
+		return nil, fmt.Errorf("event is wrong type (expected *encodedEvent)")
+	}
+	return encoded.encoding, encoded.err
 }
