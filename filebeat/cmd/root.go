@@ -19,13 +19,19 @@ package cmd
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/spf13/pflag"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
+	"github.com/elastic/elastic-agent-libs/logp"
 
+	fbautodiscover "github.com/elastic/beats/v7/filebeat/autodiscover"
+	"github.com/elastic/beats/v7/filebeat/autodiscover/builder/hints"
+	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/filebeat/fileset"
 	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 
@@ -49,9 +55,16 @@ func FilebeatSettings() instance.Settings {
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
-		RegisterMetrics: func() {
+		InitFunc: func() {
 			fileset.RegisterMonitoringModules()
 			input.RegisterMonitoringInputs()
+
+			fbautodiscover.Initialize()
+			err := autodiscover.Registry.AddBuilder("hints", hints.NewLogHints)
+			if err != nil {
+				logp.Error(fmt.Errorf("could not add `hints` builder"))
+			}
+			add_kubernetes_metadata.Initialize()
 		},
 	}
 }

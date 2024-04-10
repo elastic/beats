@@ -30,10 +30,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
-	autodiscover.Registry.AddAppender("kubernetes.token", NewTokenAppender)
-}
-
 type tokenAppender struct {
 	TokenPath string
 	Condition conditions.Condition

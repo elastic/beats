@@ -15,34 +15,11 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package test
+//go:build aix
 
-import (
-	"fmt"
-	"os"
+package autodiscover
 
-	"github.com/spf13/cobra"
-
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/cmd/instance"
-)
-
-func GenTestConfigCmd(settings instance.Settings, beatCreator beat.Creator) *cobra.Command {
-	configTestCmd := cobra.Command{
-		Use:   "config",
-		Short: "Test configuration settings",
-		Run: func(cmd *cobra.Command, args []string) {
-			b, err := instance.NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed, settings.InitFunc)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "Error initializing beat: %s\n", err)
-				os.Exit(1)
-			}
-
-			if err = b.TestConfig(settings, beatCreator); err != nil {
-				os.Exit(1)
-			}
-		},
-	}
-
-	return &configTestCmd
+// Initialize initializes the configuration defaults for autodiscover for filebeat.
+func Initialize() {
+	// does nothing on aix
 }

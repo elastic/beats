@@ -224,7 +224,7 @@ func Run(settings Settings, bt beat.Creator) error {
 
 // NewInitializedBeat creates a new beat where all information and initialization is derived from settings
 func NewInitializedBeat(settings Settings) (*Beat, error) {
-	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed, settings.RegisterMetrics)
+	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed, settings.InitFunc)
 	if err != nil {
 		return nil, err
 	}
@@ -235,10 +235,10 @@ func NewInitializedBeat(settings Settings) (*Beat, error) {
 }
 
 // NewBeat creates a new beat instance
-func NewBeat(name, indexPrefix, v string, elasticLicensed bool, registerMetrics func()) (*Beat, error) {
-	// first thing always register the internal metrics
-	if registerMetrics != nil {
-		registerMetrics()
+func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFunc func()) (*Beat, error) {
+	// first thing always register the required inits
+	if initFunc != nil {
+		initFunc()
 	}
 
 	if v == "" {

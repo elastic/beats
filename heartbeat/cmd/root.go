@@ -18,12 +18,14 @@
 package cmd
 
 import (
+	"fmt"
 
-	// include all heartbeat specific autodiscovery builders
-	_ "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
 	"github.com/elastic/beats/v7/heartbeat/beater"
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
@@ -33,6 +35,9 @@ import (
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
+
+	// include all heartbeat specific autodiscovery builders
+	_ "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
 )
 
 const (
@@ -56,6 +61,12 @@ func HeartbeatSettings() instance.Settings {
 		Name:          Name,
 		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithAgentMeta()),
 		HasDashboards: false,
+		InitFunc: func() {
+			err := autodiscover.Registry.AddBuilder("hints", hints.NewHeartbeatHints)
+			if err != nil {
+				logp.Error(fmt.Errorf("could not add `hints` builder"))
+			}
+		},
 	}
 }
 

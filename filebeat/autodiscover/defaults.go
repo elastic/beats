@@ -26,7 +26,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/autodiscover/providers/kubernetes"
 )
 
-func init() {
+// Initialize initializes the configuration defaults for autodiscover for filebeat.
+//
+// Must be called from the settings `InitFunc`.
+func Initialize() {
 	docker.DefaultCleanupTimeout = 60 * time.Second
 	kubernetes.DefaultCleanupTimeout = 60 * time.Second
 }

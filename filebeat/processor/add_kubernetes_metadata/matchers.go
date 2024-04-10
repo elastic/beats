@@ -29,7 +29,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
+// Initialize initializes all the options for the `add_kubernetes_metadata` process for filebeat.
+//
+// Must be called from the settings `InitFunc`.
+func Initialize() {
 	add_kubernetes_metadata.Indexing.AddMatcher(LogPathMatcherName, newLogsPathMatcher)
 	cfg := conf.NewConfig()
 

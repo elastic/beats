@@ -34,10 +34,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
-	_ = autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
-}
-
 const (
 	schedule   = "schedule"
 	hosts      = "hosts"

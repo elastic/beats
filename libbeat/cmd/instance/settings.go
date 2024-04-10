@@ -51,6 +51,6 @@ type Settings struct {
 	// beat.DropIfFull PublishMode. Leave as zero for default.
 	InputQueueSize int
 
-	// RegisterMetrics function that is called to register any metrics that the beat provides.
-	RegisterMetrics func()
+	// InitFunc function that is called to initialize unique items for the beat.
+	InitFunc func()
 }

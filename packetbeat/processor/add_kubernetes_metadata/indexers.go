@@ -22,7 +22,10 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 )
 
-func init() {
+// Initialize initializes all the options for the `add_kubernetes_metadata` process for packetbeat.
+//
+// Must be called from the settings `InitFunc`.
+func Initialize() {
 	// Register default indexers
 	cfg := conf.NewConfig()
 

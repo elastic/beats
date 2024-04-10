@@ -19,18 +19,24 @@ package cmd
 
 import (
 	"flag"
+	"fmt"
 
 	"github.com/spf13/pflag"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/elastic/beats/v7/libbeat/autodiscover"
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/metricbeat/autodiscover/appender/kubernetes/token"
+	"github.com/elastic/beats/v7/metricbeat/autodiscover/builder/hints"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd/test"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
+	"github.com/elastic/beats/v7/metricbeat/processor/add_kubernetes_metadata"
 
 	// import modules
 	_ "github.com/elastic/beats/v7/metricbeat/include"
@@ -61,8 +67,18 @@ func MetricbeatSettings() instance.Settings {
 		Name:          Name,
 		HasDashboards: true,
 		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
-		RegisterMetrics: func() {
+		InitFunc: func() {
 			module.RegisterMonitoringModules()
+
+			err := autodiscover.Registry.AddBuilder("hints", hints.NewMetricHints)
+			if err != nil {
+				logp.Error(fmt.Errorf("could not add `hints` builder"))
+			}
+			err = autodiscover.Registry.AddAppender("kubernetes.token", token.NewTokenAppender)
+			if err != nil {
+				logp.Error(fmt.Errorf("could not add `kubernetes.token` appender"))
+			}
+			add_kubernetes_metadata.Initialize()
 		},
 	}
 }

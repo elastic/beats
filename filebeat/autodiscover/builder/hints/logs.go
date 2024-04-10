@@ -37,13 +37,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
-	err := autodiscover.Registry.AddBuilder("hints", NewLogHints)
-	if err != nil {
-		logp.Error(fmt.Errorf("could not add `hints` builder"))
-	}
-}
-
 const (
 	multiline    = "multiline"
 	includeLines = "include_lines"
