@@ -161,6 +161,13 @@
                   type: keyword
                   description: >
                     ip Address
+                - name: roles
+                  type: keyword
+                  description: >
+                    user role
+                - name: result_description
+                  description: >
+                    result description
 
 
 
