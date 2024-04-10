@@ -176,7 +176,7 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: Windows 10 Unit Tests"
+              context: "metricbeat: Extended Windows 10 Unit Tests"
 
       - label: ":windows: Windows 11 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows-11.*/
@@ -195,7 +195,7 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: Windows 11 Unit Tests"
+              context: "metricbeat: Extended Windows 11 Unit Tests"
 
       - label: ":windows: Windows 2019 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows-2019.*/
@@ -214,7 +214,7 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: Windows 2019 Unit Tests"
+              context: "metricbeat: Extended Windows 2019 Unit Tests"
 
   - group: "Metricbeat Extended MacOS Tests"
     key: "metricbeat-extended-macos-tests"
@@ -231,7 +231,7 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: MacOS Unit Tests"
+              context: "metricbeat: Extended MacOS Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
