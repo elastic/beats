@@ -18,6 +18,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Convert netflow input to API v2 and disable event normalisation {pull}37901[37901]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
+- Update Salesforce module to use new Salesforce input. {pull}37509[37509]
 
 
 *Heartbeat*
@@ -186,7 +187,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add request trace logging for chained API requests. {issue}37551[36551] {pull}37682[37682]
 - Relax TCP/UDP metric polling expectations to improve metric collection. {pull}37714[37714]
 - Add support for PEM-based Okta auth in HTTPJSON. {pull}37772[37772]
-- Add Salesforce input. {pull}37331[37331]
 - Prevent complete loss of long request trace data. {issue}37826[37826] {pull}37836[37836]
 - Added experimental version of the Websocket Input. {pull}37774[37774]
 - Add support for PEM-based Okta auth in CEL. {pull}37813[37813]
