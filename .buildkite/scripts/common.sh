@@ -142,7 +142,7 @@ packaging_changeset=(
   ".go-version"
   )
 
-case "${BUILDKITE_PIPELINE_SLUG}" in  
+case "${BUILDKITE_PIPELINE_SLUG}" in
   "filebeat")
     BEAT_CHANGESET_REFERENCE=${filebeat_changeset[@]}
     ;;
@@ -237,6 +237,8 @@ with_docker_compose() {
   local version=$1
   echo "Setting up the Docker-compose environment..."
   create_workspace
+  echo "$arch_type"                   #TODO: revobe after debugging
+  echo "$platform_type_lowercase"     #TODO: revobe after debugging
   retry 3 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type_lowercase}-${arch_type}"
   chmod +x ${BIN}/docker-compose
   export PATH="${BIN}:${PATH}"
