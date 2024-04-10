@@ -44,6 +44,7 @@ fi
 # Image itself takes care of Go version download/installation based on .go-version file
 if [[ "$BUILDKITE_STEP_KEY" == macos* ]]; then
   if [[ -z "${GO_VERSION-""}" ]]; then
+    WORKSPACE=${WORKSPACE:-"$(pwd)"}
     GO_VERSION=$(cat "${WORKSPACE}/.go-version")
     export GO_VERSION
   fi
