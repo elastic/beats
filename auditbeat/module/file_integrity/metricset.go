@@ -43,7 +43,8 @@ const (
 
 var underTest bool //nolint:unused // Used in Darwin-only builds.
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithHostParser(parse.EmptyHostParser),

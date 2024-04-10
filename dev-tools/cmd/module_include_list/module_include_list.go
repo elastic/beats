@@ -176,10 +176,17 @@ package {{ .Package }}
 
 import (
 	// Import packages that need to register themselves.
-{{- range $import := .Imports }}
-	_ "{{ $import }}"
+{{- range $i, $import := .Imports }}
+	m{{ $i }} "{{ $import }}"
 {{- end }}
 )
+
+// InitializeModules initialize all of the modules.
+func InitializeModules() {
+{{- range $i, $import := .Imports }}
+	m{{ $i }}.InitializeModule()
+{{- end }}
+}
 `[1:]))
 
 type Data struct {
@@ -244,7 +251,7 @@ func hasInitMethod(file string) bool {
 	}
 	defer f.Close()
 
-	var initSignature = []byte("func init()")
+	var initSignature = []byte("func InitializeModule()")
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		if bytes.Contains(scanner.Bytes(), initSignature) {

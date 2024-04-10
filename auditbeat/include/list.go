@@ -21,6 +21,12 @@ package include
 
 import (
 	// Import packages that need to register themselves.
-	_ "github.com/elastic/beats/v7/auditbeat/module/auditd"
-	_ "github.com/elastic/beats/v7/auditbeat/module/file_integrity"
+	m0 "github.com/elastic/beats/v7/auditbeat/module/auditd"
+	m1 "github.com/elastic/beats/v7/auditbeat/module/file_integrity"
 )
+
+// InitializeModules initialize all of the modules.
+func InitializeModules() {
+	m0.InitializeModule()
+	m1.InitializeModule()
+}

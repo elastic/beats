@@ -15,26 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-//go:build !linux
-
 package auditd
 
-import (
-	"fmt"
+import "testing"
 
-	"github.com/elastic/beats/v7/metricbeat/mb"
-	"github.com/elastic/beats/v7/metricbeat/mb/parse"
-)
-
-// InitializeModule initializes this module.
-func InitializeModule() {
-	mb.Registry.MustAddMetricSet(metricsetName, metricsetName, New,
-		mb.DefaultMetricSet(),
-		mb.WithHostParser(parse.EmptyHostParser),
-	)
-}
-
-// New constructs a new MetricSet.
-func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	return nil, fmt.Errorf("the %v module is only supported on Linux", metricsetName)
+func TestMain(_ *testing.M) {
+	InitializeModule()
 }

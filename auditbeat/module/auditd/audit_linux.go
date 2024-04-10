@@ -71,7 +71,8 @@ var (
 	receivedMetric        = monitoring.NewInt(auditdMetrics, "received_msgs")
 )
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithHostParser(parse.EmptyHostParser),

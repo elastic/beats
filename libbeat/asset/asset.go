@@ -48,7 +48,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
-func init() {
+// InitializeAssets initializes the assets for the running beat.
+func InitializeAssets() {
 	if err := asset.SetFields("{{ .Beat }}", "{{ .Name }}", {{ .Priority }}, Asset{{ .GoTypeName }}); err != nil {
 		panic(err)
 	}

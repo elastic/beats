@@ -15,11 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package module
+package file_integrity
 
-// Initialize initializes the modules for auditbeat.
-//
-// Must be called from the settings `InitFunc`.
-func Initialize() {
+import "testing"
 
+func TestMain(_ *testing.M) {
+	InitializeModule()
 }

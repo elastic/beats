@@ -23,7 +23,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/asset"
 )
 
-func init() {
+// InitializeAssets initializes the assets for the running beat.
+func InitializeAssets() {
 	if err := asset.SetFields("auditbeat", "fields.yml", asset.BeatFieldsPri, AssetFieldsYml); err != nil {
 		panic(err)
 	}
