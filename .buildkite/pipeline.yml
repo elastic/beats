@@ -50,7 +50,7 @@ steps:
   - label: "Trigger Filebeat"
     plugins:
       - monorepo-diff#v1.0.1:
-          diff: ./scripts/diff-files.sh
+          diff: ./buildkite/scripts/diff-files.sh
           watch:
             - path:
                 - filebeat/
