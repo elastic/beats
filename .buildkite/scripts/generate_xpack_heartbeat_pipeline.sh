@@ -33,6 +33,7 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
 
+<<<<<<< HEAD
 # ## TODO: there are windows test failures already reported
 # ## https://github.com/elastic/beats/issues/23957 and https://github.com/elastic/beats/issues/23958
 # ## waiting for being fixed.
@@ -75,6 +76,102 @@ steps:
 #               - "${IMAGE_WIN_11}"
 #               - "${IMAGE_WIN_2019}"
 #         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+=======
+  ####### skip: "see elastic/beats#23957 and elastic/beats#23958"
+  #     - label: ":windows: Windows 2016 Unit Tests"
+  #       command: |
+  #         Set-Location -Path $BEATS_PROJECT_NAME
+  #         mage build unitTest
+  #       key: "mandatory-win-2016-unit-tests"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_WIN_2016}"
+  #         machine_type: "${GCP_WIN_MACHINE_TYPE}"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       artifact_paths:
+  #         - "$BEATS_PROJECT_NAME/build/*.xml"
+  #         - "$BEATS_PROJECT_NAME/build/*.json"
+  #       notify:
+  #         - github_commit_status:
+  #             context: "$BEATS_PROJECT_NAME: Windows 2016 Unit Tests"
+
+  #     - label: ":windows: Windows 2022 Unit Tests"
+  #       command: |
+  #         Set-Location -Path $BEATS_PROJECT_NAME
+  #         mage build unitTest
+  #       key: "mandatory-win-2022-unit-tests"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_WIN_2022}"
+  #         machine_type: "${GCP_WIN_MACHINE_TYPE}"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       artifact_paths:
+  #         - "$BEATS_PROJECT_NAME/build/*.xml"
+  #         - "$BEATS_PROJECT_NAME/build/*.json"
+  #       notify:
+  #         - github_commit_status:
+  #             context: "$BEATS_PROJECT_NAME: Windows 2022 Unit Tests"
+
+  # - group: "Extended Windows Tests" ## TODO: this condition will be changed in the Phase 3
+  #   key: "extended-win-tests"
+  #   steps:
+  #     - label: ":windows: Windows 10 Unit Tests"
+  #       command: |
+  #         Set-Location -Path $BEATS_PROJECT_NAME
+  #         mage build unitTest
+  #       key: "extended-win-10-unit-tests"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_WIN_10}"
+  #         machineType: "${GCP_WIN_MACHINE_TYPE}"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       artifact_paths:
+  #         - "$BEATS_PROJECT_NAME/build/*.xml"
+  #         - "$BEATS_PROJECT_NAME/build/*.json"
+  #       notify:
+  #         - github_commit_status:
+  #             context: "$BEATS_PROJECT_NAME: Windows 10 Unit Tests"
+
+  #     - label: ":windows: Windows 11 Unit Tests"
+  #       command: |
+  #         Set-Location -Path $BEATS_PROJECT_NAME
+  #         mage build unitTest
+  #       key: "extended-win-11-unit-tests"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_WIN_11}"
+  #         machineType: "${GCP_WIN_MACHINE_TYPE}"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       artifact_paths:
+  #         - "$BEATS_PROJECT_NAME/build/*.xml"
+  #         - "$BEATS_PROJECT_NAME/build/*.json"
+  #       notify:
+  #         - github_commit_status:
+  #             context: "$BEATS_PROJECT_NAME: Windows 11 Unit Tests"
+
+  #     - label: ":windows: Windows 2019 Unit Tests"
+  #       command: |
+  #         Set-Location -Path $BEATS_PROJECT_NAME
+  #         mage build unitTest
+  #       key: "extended-win-2019-unit-tests"
+  #       agents:
+  #         provider: "gcp"
+  #         image: "${IMAGE_WIN_2019}"
+  #         machineType: "${GCP_WIN_MACHINE_TYPE}"
+  #         disk_size: 100
+  #         disk_type: "pd-ssd"
+  #       artifact_paths:
+  #         - "$BEATS_PROJECT_NAME/build/*.xml"
+  #         - "$BEATS_PROJECT_NAME/build/*.json"
+  #       notify:
+  #         - github_commit_status:
+  #             context: "$BEATS_PROJECT_NAME: Windows 2019 Unit Tests"
+  ####### skip: "see elastic/beats#23957 and elastic/beats#23958"
+>>>>>>> c749dacac1 (Split windows steps (#38782))
 
 YAML
 else

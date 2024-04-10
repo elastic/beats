@@ -51,21 +51,56 @@ steps:
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
+<<<<<<< HEAD
       - label: ":windows: Windows 2016/2022 Unit Tests - {{matrix.image}}"
         command: ".buildkite/scripts/win_unit_tests.ps1"
         key: "mandatory-win-unit-tests"
+=======
+      - label: ":windows: Windows 2016 Unit Tests"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "mandatory-win-2016-unit-tests"
+>>>>>>> c749dacac1 (Split windows steps (#38782))
         agents:
           provider: "gcp"
-          image: "{{matrix.image}}"
+          image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
+<<<<<<< HEAD
         matrix:
           setup:
             image:
               - "${IMAGE_WIN_2016}"
               - "${IMAGE_WIN_2022}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+=======
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows 2016 Unit Tests"
+
+      - label: ":windows: Windows 2022 Unit Tests"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "mandatory-win-2022-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows 2022 Unit Tests"
+>>>>>>> c749dacac1 (Split windows steps (#38782))
 
 # echo "Add the extended windows tests into the pipeline"
 # TODO: ADD conditions from the main pipeline
@@ -73,6 +108,7 @@ steps:
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
     steps:
+<<<<<<< HEAD
       - label: ":windows: Windows 2019 Unit Tests"
         key: "extended-win-2019-unit-tests"
         command: ".buildkite/scripts/win_unit_tests.ps1"
@@ -83,6 +119,61 @@ steps:
           disk_size: 100
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+=======
+      - label: ":windows: Windows 10 Unit Tests"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "extended-win-10-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows 10 Unit Tests"
+
+      - label: ":windows: Windows 11 Unit Tests"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "extended-win-11-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows 11 Unit Tests"
+
+      - label: ":windows: Windows 2019 Unit Tests"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "extended-win-2019-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows 2019 Unit Tests"
+>>>>>>> c749dacac1 (Split windows steps (#38782))
 
       - label: ":windows: Windows 10 Unit Tests"
         key: "extended-win-10-unit-tests"

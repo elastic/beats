@@ -22,7 +22,16 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+<<<<<<< HEAD
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.xml"
+=======
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Ubuntu Unit Tests"
+>>>>>>> c749dacac1 (Split windows steps (#38782))
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
