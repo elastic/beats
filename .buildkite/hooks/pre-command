@@ -55,7 +55,6 @@ fi
 ENABLED_BEATS_PIPELINES_SLUGS=(
   "auditbeat"
   "filebeat"
-  "beats-metricbeat"
   "beats-libbeat"
   "beats-packetbeat"
   "beats-winlogbeat"
