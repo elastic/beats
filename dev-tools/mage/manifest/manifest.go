@@ -26,6 +26,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"time"
 
 	artifacts "github.com/elastic/beats/v7/dev-tools/mage/artifacts"
@@ -90,8 +91,13 @@ func resolveManifestPackage(project artifacts.Project, pkg string, reqPackage st
 	if mg.Verbose() {
 		log.Printf(">>>>>>>>>>> Project branch/commit [%s, %s]", project.Branch, project.CommitHash)
 	}
-	return []string{val.URL, val.ShaURL, val.AscURL}
 
+	// Force the asc file to be downloaded even is the acs_url is empty
+	if len(val.AscURL) == 0 && strings.HasSuffix(val.URL, ".tar.gz") {
+		return []string{val.URL, val.ShaURL, val.URL + ".asc"}
+	}
+
+	return []string{val.URL, val.ShaURL, val.AscURL}
 }
 
 // DownloadComponentsFromManifest is going to download a set of components from the given manifest into the destination

@@ -15,7 +15,7 @@ CI_DRA_ROLE_PATH="kv/ci-shared/release/dra-role"
 
 # force main branch on PR's or it won't execute
 # because the PR branch does not have a project folder in release-manager
-if  [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" || "$BUILDKITE_BRANCH" == "xpack_agent_core_publish" ]]; then
+if  [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" || "$BUILDKITE_BRANCH" == "acs_filies_quick_fix" ]]; then
     BRANCH=7.17
     # DRY_RUN="--dry-run"
     echo "+++ Running in PR or test branch and setting branch 7.17 and --dry-run"
