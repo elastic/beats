@@ -12,7 +12,7 @@ steps:
                 #OSS
                 - go.mod
                 - pytest.ini
-                - dev-tools/**
+                - dev-tools/
                 - libbeat/**
                 - testing/**
               config:
@@ -35,7 +35,7 @@ steps:
                 #OSS
                 - go.mod
                 - pytest.ini
-                - dev-tools/**
+                - dev-tools/
                 - libbeat/**
                 - testing/**
               config:
@@ -64,6 +64,24 @@ steps:
                 - testing/**
               config:
                 trigger: "beats-metricbeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
+  - label: "Trigger Deploy/K8S"
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only HEAD~1"
+          watch:
+            - path:
+                - .buildkite/deploy/kubernetes/**
+                - deploy/kubernetes/**
+                - libbeat/docs/version.asciidoc
+              config:
+                trigger: "deploy-k8s"
                 build:
                   commit: "${BUILDKITE_COMMIT}"
                   branch: "${BUILDKITE_BRANCH}"
