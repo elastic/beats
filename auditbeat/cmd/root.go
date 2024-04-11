@@ -84,4 +84,5 @@ func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
 
 func init() {
 	RootCmd = Initialize(AuditbeatSettings(nil))
+	initShowRules()
 }
