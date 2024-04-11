@@ -73,7 +73,7 @@ steps:
   - label: "Trigger Metricbeat"
     plugins:
       - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only ${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          diff: "git diff --name-only HEAD~1"
           watch:
             - path:
                 - metricbeat/
