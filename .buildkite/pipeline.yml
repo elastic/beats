@@ -69,7 +69,7 @@ steps:
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
-                    
+
   - label: "Trigger Deploy/K8S"
     plugins:
       - monorepo-diff#v1.0.1:
