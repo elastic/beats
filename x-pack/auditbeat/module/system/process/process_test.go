@@ -5,13 +5,13 @@
 package process
 
 import (
-	"github.com/elastic/beats/v7/auditbeat/ab"
 	"os/user"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"

@@ -159,7 +159,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Op
 	}
 
 	// List all registered modules and metricsets.
-	logp.Debug("modules", "Available modules and metricsets: %s", mb.Registry.String())
+	logp.Debug("modules", "Available modules and metricsets: %s", registry.String())
 
 	if b.InSetupCmd {
 		// Return without instantiating the metricsets.
@@ -308,5 +308,5 @@ func (bt *Metricbeat) Stop() {
 
 // Modules return a list of all configured modules.
 func (bt *Metricbeat) Modules() ([]*module.Wrapper, error) {
-	return module.ConfiguredModules(bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions)
+	return module.ConfiguredModules(bt.registry, bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions)
 }

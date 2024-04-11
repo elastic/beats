@@ -39,6 +39,14 @@ func init() {
 	devtools.BeatLicense = "Elastic License"
 }
 
+func Fmt() {
+	mg.Deps(devtools.Format)
+}
+
+func AddLicenseHeaders() {
+	mg.Deps(devtools.AddLicenseHeaders)
+}
+
 func Check() error {
 	return devtools.Check()
 }

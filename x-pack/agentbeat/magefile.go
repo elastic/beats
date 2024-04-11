@@ -16,11 +16,12 @@ import (
 	"github.com/magefile/mage/sh"
 	"go.uber.org/multierr"
 
+	"github.com/magefile/mage/mg"
+
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	packetbeat "github.com/elastic/beats/v7/packetbeat/scripts/mage"
 	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
-	"github.com/magefile/mage/mg"
 
 	//mage:import
 	"github.com/elastic/beats/v7/dev-tools/mage/target/common"

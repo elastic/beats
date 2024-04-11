@@ -60,7 +60,7 @@ func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 			return nil, err
 		}
 
-		err = connector.UseMetricSetProcessors(mb.Registry, module.Name(), metricSet.Name())
+		err = connector.UseMetricSetProcessors(r.registry, module.Name(), metricSet.Name())
 		if err != nil {
 			return nil, err
 		}
@@ -77,7 +77,7 @@ func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, e
 
 // CheckConfig checks if a config is valid or not
 func (r *Factory) CheckConfig(config *conf.C) error {
-	_, err := NewWrapper(config, mb.Registry, r.options...)
+	_, err := NewWrapper(config, r.registry, r.options...)
 	if err != nil {
 		return err
 	}

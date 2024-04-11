@@ -19,6 +19,7 @@ package cmd
 
 import (
 	"flag"
+
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -31,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/cmd/test"
 	"github.com/elastic/beats/v7/metricbeat/include"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
+
 	// import modules
 	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
 )

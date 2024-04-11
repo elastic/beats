@@ -19,7 +19,6 @@ package file_integrity
 
 import (
 	"crypto/sha1"
-	"github.com/elastic/beats/v7/auditbeat/ab"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -31,6 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"

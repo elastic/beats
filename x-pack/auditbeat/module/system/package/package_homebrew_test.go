@@ -7,13 +7,13 @@
 package pkg
 
 import (
-	"github.com/elastic/beats/v7/auditbeat/ab"
 	"os"
 	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	"github.com/elastic/beats/v7/libbeat/beat"

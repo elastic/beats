@@ -20,13 +20,7 @@
 package include
 
 import (
-	// Import packages to perform 'func InitializeModule()' when in-use.
-
 	// Import packages that perform 'func init()'.
 	_ "github.com/elastic/beats/v7/auditbeat/module/auditd"
 	_ "github.com/elastic/beats/v7/auditbeat/module/file_integrity"
 )
-
-// InitializeModules initialize all of the modules.
-func InitializeModule() {
-}

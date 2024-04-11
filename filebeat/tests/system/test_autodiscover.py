@@ -24,23 +24,8 @@ class TestAutodiscover(filebeat.BaseTest):
                 autodiscover={
                     'docker': {
                         'cleanup_timeout': '0s',
-                        'templates': f'''
-                          - condition:
-                                equals.docker.container.name: {container.name}
-                            config:
-                              - type: log
-                                paths:
-                                  - %s/${{data.docker.container.name}}.log
-                        ''' % self.working_dir,
-                    },
-                },
-            )
-
-            proc = self.start_beat()
-            self._test(container)
-
-        self.wait_until(lambda: self.log_contains('Stopping runner: input'))
-        proc.check_kill_and_wait()
+                        'templates': f''' - condition:
+                                equals.docker.container.name: {container.name}                             config:                               - type: log                                 paths:  - %s/${{data.docker.container.name}}.log                         ''' % self.working_dir, }, },)             proc = self.start_beat()             self._test(container)         self.wait_until(lambda: self.log_contains('Stopping runner: input'))         proc.check_kill_and_wait()
 
     @unittest.skipIf(not INTEGRATION_TESTS or
                      os.getenv("TESTING_ENVIRONMENT") == "2x",

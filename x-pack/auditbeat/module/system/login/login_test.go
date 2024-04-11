@@ -8,7 +8,6 @@ package login
 
 import (
 	"encoding/binary"
-	"github.com/elastic/beats/v7/auditbeat/ab"
 	"io"
 	"io/ioutil"
 	"net"
@@ -19,6 +18,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"

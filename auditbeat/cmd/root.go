@@ -18,14 +18,13 @@
 package cmd
 
 import (
-	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
-	"github.com/elastic/beats/v7/auditbeat/include"
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
@@ -33,6 +32,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/mb/module"
+
+	// Register required includes
+	_ "github.com/elastic/beats/v7/auditbeat/include"
 )
 
 const (
@@ -64,7 +66,6 @@ func AuditbeatSettings(globals processors.PluginConfig) instance.Settings {
 		Name:          Name,
 		HasDashboards: true,
 		Processing:    processing.MakeDefaultSupport(true, globals, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
-		Initialize:    []func(){include.InitializeModule},
 	}
 }
 

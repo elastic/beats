@@ -6,9 +6,10 @@ package main
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
 	"github.com/elastic/beats/v7/libbeat/cmd"
-	"os"
 
 	"github.com/spf13/cobra"
 

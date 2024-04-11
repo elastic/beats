@@ -19,6 +19,7 @@ package cmd
 
 import (
 	"flag"
+
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
