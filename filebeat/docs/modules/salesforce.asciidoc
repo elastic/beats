@@ -12,23 +12,52 @@ This file is generated! See scripts/docs_collector.py
 
 == Salesforce module
 
-The Salesforce module collects logs from a Salesforce instance using the Salesforce REST API. It supports real-time and historical data collection for various log types including login, logout, Apex, and setup audit trails.
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
-The module provides the following filesets for receiving logs:
 
-- `login` fileset: Collects Salesforce Login logs from EventLogFile and Event Monitoring.
-- `logout` fileset: Collects Salesforce Logout logs from EventLogFile and Event Monitoring.
-- `apex` fileset: Collects Salesforce Apex logs from EventLogFile.
-- `setupaudittrail` fileset: Collects logs generated when admins make changes in your org's Setup area.
+The Salesforce module collects logs from a Salesforce instance using the Salesforce REST API. It supports real-time and historical data collection for various log types including Login, Logout, APEX, and Setup Audit Trail.
+
+The Salesforce module contains the following filesets for collecting different types of logs:
+
+- The `login` fileset collects Login events from the EventLogFile and Event Monitoring.
+- The `logout` fileset collects Logout events from the EventLogFile and Event Monitoring.
+- The `apex` fileset collects APEX execution logs from the EventLogFile.
+- The `setupaudittrail` fileset collects Audit Trails events generated when admins make configuration changes in the org's Setup area.
+
+[options="header"]
+|===
+| Fileset | EventLogFile | Real-time (Objects)
+
+|login
+|yes
+|yes
+
+|logout
+|yes
+|yes
+
+|apex
+|yes
+|no
+
+|setupaudittrail
+|no
+|yes
+|===
+
 
 [IMPORTANT]
 ====
 The default interval for collecting logs (`var.real_time_interval` or `var.elf_interval`) is 5m/1h. Exercise caution when reducing this interval, as it directly impacts the Salesforce API rate limit of ~1000 calls per hour. Exceeding the limit will result in errors from the Salesforce API. Refer to the https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_api.htm[Salesforce API Rate Limit] documentation for more details.
 ====
 
-include::../include/what-happens.asciidoc[]
-
 include::../include/gs-link.asciidoc[]
+
+include::../include/configuring-intro.asciidoc[]
+
+:fileset_ex: login
+
+include::../include/config-option-intro.asciidoc[]
 
 [float]
 === Fileset settings

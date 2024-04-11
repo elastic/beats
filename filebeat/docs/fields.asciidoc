@@ -125335,7 +125335,7 @@ type: keyword
 --
 Indicates whether the request is counted against your org's concurrent long-running Apex request limit (true) or not (false).
 
-type: boolean
+type: keyword
 
 --
 
@@ -125537,8 +125537,7 @@ type: float
 
 --
 
-
-*`salesforce.apex.trigger.id`*::
+*`salesforce.apex.trigger_id`*::
 +
 --
 The 15-character ID of the trigger that was fired.
@@ -125547,7 +125546,7 @@ type: keyword
 
 --
 
-*`salesforce.apex.trigger.name`*::
+*`salesforce.apex.trigger_name`*::
 +
 --
 For triggers coming from managed packages, trigger_name includes a namespace prefix separated with a . character. If no namespace prefix is present, the trigger is from an unmanaged trigger.
@@ -125556,7 +125555,7 @@ type: keyword
 
 --
 
-*`salesforce.apex.trigger.type`*::
+*`salesforce.apex.trigger_type`*::
 +
 --
 The type of this trigger.
