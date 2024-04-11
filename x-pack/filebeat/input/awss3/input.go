@@ -149,7 +149,7 @@ func (in *s3Input) runS3Poller(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 	persistentStore *statestore.Store,
-	states *states
+	states *states,
 ) error {
 	// Create client for publishing events and receive notification of their ACKs.
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
@@ -173,9 +173,7 @@ func (in *s3Input) runS3Poller(
 	}
 	defer poller.metrics.Close()
 
-	if err := poller.Poll(ctx); err != nil {
-		return err
-	}
+	return poller.Poll(ctx)
 }
 
 func (in *s3Input) runQueueReader(
