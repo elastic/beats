@@ -29,8 +29,8 @@ func (client *MockService) GetResourceDefinitions(id []string, group []string, r
 	return args.Get(0).([]*armresources.GenericResourceExpanded), args.Error(1)
 }
 
-// GetMetricDefinitions is a mock function for the azure service
-func (client *MockService) GetMetricDefinitions(resourceId string, namespace string) (armmonitor.MetricDefinitionCollection, error) {
+// GetMetricDefinitionsWithRetry is a mock function for the azure service
+func (client *MockService) GetMetricDefinitionsWithRetry(resourceId string, namespace string) (armmonitor.MetricDefinitionCollection, error) {
 	args := client.Called(resourceId, namespace)
 	return args.Get(0).(armmonitor.MetricDefinitionCollection), args.Error(1)
 }

@@ -19,8 +19,11 @@
 package file_integrity
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"math"
+	"os"
 	"reflect"
 	"strconv"
 	"testing"
@@ -44,10 +47,16 @@ func TestExeObjParser(t *testing.T) {
 					t.Skip("skipping test on garbled PE file: see https://github.com/elastic/beats/issues/35705")
 				}
 
+				if _, ci := os.LookupEnv("CI"); ci {
+					if _, err := os.Stat(target); err != nil && errors.Is(err, fs.ErrNotExist) {
+						t.Skip("skipping test because target binary was not found: see https://github.com/elastic/beats/issues/38211")
+					}
+				}
+
 				got := make(mapstr.M)
 				err := exeObjParser(nil).Parse(got, target)
 				if err != nil {
-					t.Errorf("unexpected error calling exeObjParser.Parse: %v", err)
+					t.Fatalf("unexpected error calling exeObjParser.Parse: %v", err)
 				}
 
 				fields := []struct {
