@@ -1,12 +1,7 @@
 {
     "attributes": {
-        "controlGroupInput": {
-            "chainingSystem": "HIERARCHICAL",
-            "controlStyle": "oneLine",
-            "ignoreParentSettingsJSON": "{\"ignoreFilters\":false,\"ignoreQuery\":false,\"ignoreTimerange\":false,\"ignoreValidations\":false}",
-            "panelsJSON": "{\"2c772825-53ca-4b0a-b3f1-3a444dab9ac6\":{\"type\":\"optionsListControl\",\"order\":0,\"grow\":true,\"width\":\"large\",\"explicitInput\":{\"id\":\"2c772825-53ca-4b0a-b3f1-3a444dab9ac6\",\"fieldName\":\"salesforce.instance_url\",\"title\":\"Instance URL\",\"grow\":true,\"width\":\"large\",\"enhancements\":{}}}}"
-        },
         "description": "Salesforce Apex Data",
+        "hits": 0,
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
                 "filter": [],
@@ -19,74 +14,110 @@
         "optionsJSON": {
             "hidePanelTitles": false,
             "syncColors": false,
-            "syncCursor": true,
-            "syncTooltips": false,
             "useMargins": true
         },
         "panelsJSON": [
             {
                 "embeddableConfig": {
-                    "attributes": {
+                    "enhancements": {},
+                    "hidePanelTitles": true,
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
                         "description": "",
+                        "params": {
+                            "controls": [
+                                {
+                                    "fieldName": "salesforce.instance_url",
+                                    "id": "1712824865887",
+                                    "indexPatternRefName": "control_2e30f60b-d451-4b0d-89eb-6ba01e94c2aa_0_index_pattern",
+                                    "label": "Instance URL",
+                                    "options": {
+                                        "dynamicOptions": true,
+                                        "multiselect": true,
+                                        "order": "desc",
+                                        "size": 5,
+                                        "type": "terms"
+                                    },
+                                    "parent": "",
+                                    "type": "list"
+                                }
+                            ],
+                            "pinFilters": false,
+                            "updateFiltersOnChange": false,
+                            "useTimeFilter": false
+                        },
+                        "title": "",
+                        "type": "input_control_vis",
+                        "uiState": {}
+                    }
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "2e30f60b-d451-4b0d-89eb-6ba01e94c2aa",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "2e30f60b-d451-4b0d-89eb-6ba01e94c2aa",
+                "type": "visualization",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
                         "references": [
                             {
                                 "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-bfd4a8f4-653c-49f7-bd04-dd9efd1f9aee",
+                                "name": "indexpattern-datasource-current-indexpattern",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "1f72d747-4e35-45fc-a02a-a8dfde49d1ea",
+                                "name": "indexpattern-datasource-layer-f7a3c405-487c-4473-aeb5-c6f5e63de3db",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "4684cf9e-b284-4945-9cb8-19ff055a9439",
+                                "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "8438a007-7d70-44fb-89f9-c2137ee48436",
+                                "name": "filter-index-pattern-1",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-2",
                                 "type": "index-pattern"
                             }
                         ],
                         "state": {
-                            "adHocDataViews": {},
                             "datasourceStates": {
-                                "formBased": {
+                                "indexpattern": {
                                     "layers": {
-                                        "bfd4a8f4-653c-49f7-bd04-dd9efd1f9aee": {
+                                        "f7a3c405-487c-4473-aeb5-c6f5e63de3db": {
                                             "columnOrder": [
-                                                "9e1cad3b-eb20-4dd8-8011-94fb5c46c517",
-                                                "9e1cad3b-eb20-4dd8-8011-94fb5c46c517X0"
+                                                "c8b7de64-e628-4200-8520-1699a69f49af"
                                             ],
                                             "columns": {
-                                                "9e1cad3b-eb20-4dd8-8011-94fb5c46c517": {
+                                                "c8b7de64-e628-4200-8520-1699a69f49af": {
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
                                                     "label": "Calls against the organization limit",
-                                                    "operationType": "formula",
-                                                    "params": {
-                                                        "formula": "count()",
-                                                        "isFormulaBroken": false
-                                                    },
-                                                    "references": [
-                                                        "9e1cad3b-eb20-4dd8-8011-94fb5c46c517X0"
-                                                    ],
-                                                    "scale": "ratio"
-                                                },
-                                                "9e1cad3b-eb20-4dd8-8011-94fb5c46c517X0": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "isBucketed": false,
-                                                    "label": "Part of Calls against the organization limit",
                                                     "operationType": "count",
-                                                    "params": {
-                                                        "emptyAsNull": false
-                                                    },
                                                     "scale": "ratio",
-                                                    "sourceField": "___records___"
+                                                    "sourceField": "Records"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -102,7 +133,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "1f72d747-4e35-45fc-a02a-a8dfde49d1ea",
+                                        "indexRefName": "filter-index-pattern-0",
                                         "key": "event.dataset",
                                         "negate": false,
                                         "params": {
@@ -123,7 +154,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "4684cf9e-b284-4945-9cb8-19ff055a9439",
+                                        "indexRefName": "filter-index-pattern-1",
                                         "key": "salesforce.apex.is_long_running_request",
                                         "negate": true,
                                         "params": {
@@ -141,95 +172,88 @@
                                     "$state": {
                                         "store": "appState"
                                     },
+                                    "exists": {
+                                        "field": "salesforce.apex.is_long_running_request"
+                                    },
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "8438a007-7d70-44fb-89f9-c2137ee48436",
+                                        "indexRefName": "filter-index-pattern-2",
                                         "key": "salesforce.apex.is_long_running_request",
                                         "negate": false,
-                                        "type": "exists",
-                                        "value": "exists"
-                                    },
-                                    "query": {
-                                        "exists": {
-                                            "field": "salesforce.apex.is_long_running_request"
-                                        }
+                                        "type": "exists"
                                     }
                                 }
                             ],
-                            "internalReferences": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
                             },
                             "visualization": {
-                                "accessor": "9e1cad3b-eb20-4dd8-8011-94fb5c46c517",
-                                "colorMode": "None",
-                                "layerId": "bfd4a8f4-653c-49f7-bd04-dd9efd1f9aee",
-                                "layerType": "data",
-                                "size": "l",
-                                "textAlign": "center",
-                                "titlePosition": "bottom"
+                                "accessor": "c8b7de64-e628-4200-8520-1699a69f49af",
+                                "layerId": "f7a3c405-487c-4473-aeb5-c6f5e63de3db",
+                                "layerType": "data"
                             }
                         },
                         "title": "",
                         "type": "lens",
-                        "visualizationType": "lnsLegacyMetric"
+                        "visualizationType": "lnsMetric"
                     },
                     "enhancements": {},
                     "hidePanelTitles": true
                 },
                 "gridData": {
                     "h": 15,
-                    "i": "6b1afef8-3be5-4fca-a0c4-690a14979551",
-                    "w": 16,
+                    "i": "7decef13-13b6-4eb2-bb2b-cd657951e930",
+                    "w": 14,
                     "x": 0,
-                    "y": 0
+                    "y": 5
                 },
-                "panelIndex": "6b1afef8-3be5-4fca-a0c4-690a14979551",
+                "panelIndex": "7decef13-13b6-4eb2-bb2b-cd657951e930",
                 "title": "Calls against the organization limit [Filebeat Salesforce]]",
                 "type": "lens",
-                "version": "8.10.0"
+                "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
                     "attributes": {
-                        "description": "",
                         "references": [
                             {
                                 "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-6b3e9ab2-2d33-46c3-9575-78a6bc8af75b",
+                                "name": "indexpattern-datasource-current-indexpattern",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "ad7e49e7-de0f-4efb-ae3f-852498e24371",
+                                "name": "indexpattern-datasource-layer-83c3e25a-134f-43bf-bca7-cd3c3d33eff3",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
                             }
                         ],
                         "state": {
-                            "adHocDataViews": {},
                             "datasourceStates": {
-                                "formBased": {
+                                "indexpattern": {
                                     "layers": {
-                                        "6b3e9ab2-2d33-46c3-9575-78a6bc8af75b": {
+                                        "83c3e25a-134f-43bf-bca7-cd3c3d33eff3": {
                                             "columnOrder": [
-                                                "d70ad4b5-d399-41ce-b3c1-e1314a80da88",
-                                                "4cfb821a-ad49-4dc4-ada1-cd7e4317242c"
+                                                "c55333c9-aa79-4829-8e41-34029ca8e56a",
+                                                "099c35b2-0b10-4026-8883-274a3bd24c10"
                                             ],
                                             "columns": {
-                                                "4cfb821a-ad49-4dc4-ada1-cd7e4317242c": {
+                                                "099c35b2-0b10-4026-8883-274a3bd24c10": {
                                                     "dataType": "number",
                                                     "isBucketed": false,
                                                     "label": "Count of records",
                                                     "operationType": "count",
-                                                    "params": {
-                                                        "emptyAsNull": true
-                                                    },
                                                     "scale": "ratio",
-                                                    "sourceField": "___records___"
+                                                    "sourceField": "Records"
                                                 },
-                                                "d70ad4b5-d399-41ce-b3c1-e1314a80da88": {
+                                                "c55333c9-aa79-4829-8e41-34029ca8e56a": {
+                                                    "customLabel": true,
                                                     "dataType": "string",
                                                     "isBucketed": true,
                                                     "label": "Top 5 values of event.outcome",
@@ -237,14 +261,11 @@
                                                     "params": {
                                                         "missingBucket": false,
                                                         "orderBy": {
-                                                            "columnId": "4cfb821a-ad49-4dc4-ada1-cd7e4317242c",
+                                                            "columnId": "099c35b2-0b10-4026-8883-274a3bd24c10",
                                                             "type": "column"
                                                         },
                                                         "orderDirection": "desc",
                                                         "otherBucket": true,
-                                                        "parentFormat": {
-                                                            "id": "terms"
-                                                        },
                                                         "size": 5
                                                     },
                                                     "scale": "ordinal",
@@ -264,7 +285,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "ad7e49e7-de0f-4efb-ae3f-852498e24371",
+                                        "indexRefName": "filter-index-pattern-0",
                                         "key": "event.dataset",
                                         "negate": false,
                                         "params": {
@@ -279,7 +300,6 @@
                                     }
                                 }
                             ],
-                            "internalReferences": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -288,17 +308,15 @@
                                 "layers": [
                                     {
                                         "categoryDisplay": "default",
-                                        "layerId": "6b3e9ab2-2d33-46c3-9575-78a6bc8af75b",
+                                        "groups": [
+                                            "c55333c9-aa79-4829-8e41-34029ca8e56a"
+                                        ],
+                                        "layerId": "83c3e25a-134f-43bf-bca7-cd3c3d33eff3",
                                         "layerType": "data",
                                         "legendDisplay": "default",
-                                        "metrics": [
-                                            "4cfb821a-ad49-4dc4-ada1-cd7e4317242c"
-                                        ],
+                                        "metric": "099c35b2-0b10-4026-8883-274a3bd24c10",
                                         "nestedLegend": false,
-                                        "numberDisplay": "percent",
-                                        "primaryGroups": [
-                                            "d70ad4b5-d399-41ce-b3c1-e1314a80da88"
-                                        ]
+                                        "numberDisplay": "percent"
                                     }
                                 ],
                                 "shape": "pie"
@@ -313,44 +331,47 @@
                 },
                 "gridData": {
                     "h": 15,
-                    "i": "8039ad1b-bbc7-4d77-bcff-77ef0299a766",
-                    "w": 16,
-                    "x": 16,
-                    "y": 0
+                    "i": "7154e44a-c51d-4881-8d23-6d822a0bd77d",
+                    "w": 17,
+                    "x": 14,
+                    "y": 5
                 },
-                "panelIndex": "8039ad1b-bbc7-4d77-bcff-77ef0299a766",
+                "panelIndex": "7154e44a-c51d-4881-8d23-6d822a0bd77d",
                 "title": "Distribution of request status [Filebeat Salesforce]",
                 "type": "lens",
-                "version": "8.10.0"
+                "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
                     "attributes": {
-                        "description": "",
                         "references": [
                             {
                                 "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-ce4e2479-29c1-4aa0-991e-0772b981e53e",
+                                "name": "indexpattern-datasource-current-indexpattern",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "99e1f29f-d65d-4e43-8229-0e7dada3babc",
+                                "name": "indexpattern-datasource-layer-23547c7a-8041-4b0a-856d-ffc03d80fbc0",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
                             }
                         ],
                         "state": {
-                            "adHocDataViews": {},
                             "datasourceStates": {
-                                "formBased": {
+                                "indexpattern": {
                                     "layers": {
-                                        "ce4e2479-29c1-4aa0-991e-0772b981e53e": {
+                                        "23547c7a-8041-4b0a-856d-ffc03d80fbc0": {
                                             "columnOrder": [
-                                                "7941b24c-6791-4993-b363-616eafaad185",
-                                                "ff53120c-8fee-489f-88a7-cdac245b92dd"
+                                                "55861941-7ec4-480b-800a-bae54e679ceb",
+                                                "ffcee30c-ac14-49a3-a634-04205ecc7788"
                                             ],
                                             "columns": {
-                                                "7941b24c-6791-4993-b363-616eafaad185": {
+                                                "55861941-7ec4-480b-800a-bae54e679ceb": {
                                                     "customLabel": true,
                                                     "dataType": "string",
                                                     "isBucketed": true,
@@ -359,29 +380,23 @@
                                                     "params": {
                                                         "missingBucket": false,
                                                         "orderBy": {
-                                                            "columnId": "ff53120c-8fee-489f-88a7-cdac245b92dd",
+                                                            "columnId": "ffcee30c-ac14-49a3-a634-04205ecc7788",
                                                             "type": "column"
                                                         },
                                                         "orderDirection": "desc",
-                                                        "otherBucket": false,
-                                                        "parentFormat": {
-                                                            "id": "terms"
-                                                        },
+                                                        "otherBucket": true,
                                                         "size": 10
                                                     },
                                                     "scale": "ordinal",
                                                     "sourceField": "salesforce.apex.media_type"
                                                 },
-                                                "ff53120c-8fee-489f-88a7-cdac245b92dd": {
+                                                "ffcee30c-ac14-49a3-a634-04205ecc7788": {
                                                     "dataType": "number",
                                                     "isBucketed": false,
                                                     "label": "Count of records",
                                                     "operationType": "count",
-                                                    "params": {
-                                                        "emptyAsNull": true
-                                                    },
                                                     "scale": "ratio",
-                                                    "sourceField": "___records___"
+                                                    "sourceField": "Records"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -397,7 +412,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "99e1f29f-d65d-4e43-8229-0e7dada3babc",
+                                        "indexRefName": "filter-index-pattern-0",
                                         "key": "event.dataset",
                                         "negate": false,
                                         "params": {
@@ -412,7 +427,6 @@
                                     }
                                 }
                             ],
-                            "internalReferences": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -421,17 +435,15 @@
                                 "layers": [
                                     {
                                         "categoryDisplay": "default",
-                                        "layerId": "ce4e2479-29c1-4aa0-991e-0772b981e53e",
+                                        "groups": [
+                                            "55861941-7ec4-480b-800a-bae54e679ceb"
+                                        ],
+                                        "layerId": "23547c7a-8041-4b0a-856d-ffc03d80fbc0",
                                         "layerType": "data",
                                         "legendDisplay": "default",
-                                        "metrics": [
-                                            "ff53120c-8fee-489f-88a7-cdac245b92dd"
-                                        ],
+                                        "metric": "ffcee30c-ac14-49a3-a634-04205ecc7788",
                                         "nestedLegend": false,
-                                        "numberDisplay": "percent",
-                                        "primaryGroups": [
-                                            "7941b24c-6791-4993-b363-616eafaad185"
-                                        ]
+                                        "numberDisplay": "percent"
                                     }
                                 ],
                                 "shape": "pie"
@@ -446,45 +458,49 @@
                 },
                 "gridData": {
                     "h": 15,
-                    "i": "00d05ee3-74f4-4621-9dc7-04fde76b86d9",
-                    "w": 16,
-                    "x": 32,
-                    "y": 0
+                    "i": "73688f67-7274-4172-bc72-81581d1b1dc2",
+                    "w": 17,
+                    "x": 31,
+                    "y": 5
                 },
-                "panelIndex": "00d05ee3-74f4-4621-9dc7-04fde76b86d9",
+                "panelIndex": "73688f67-7274-4172-bc72-81581d1b1dc2",
                 "title": "Responses by media type [Filebeat Salesforce]",
                 "type": "lens",
-                "version": "8.10.0"
+                "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
                     "attributes": {
-                        "description": "",
                         "references": [
                             {
                                 "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-197919f5-ef5b-4ae9-8432-cd2a91e337d2",
+                                "name": "indexpattern-datasource-current-indexpattern",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "4c4c54fa-53f8-4d2d-acc2-387cf2f67f6a",
+                                "name": "indexpattern-datasource-layer-2ea8d938-401b-4b61-92c4-c476e7d3e4bc",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
                             }
                         ],
                         "state": {
-                            "adHocDataViews": {},
                             "datasourceStates": {
-                                "formBased": {
+                                "indexpattern": {
                                     "layers": {
-                                        "197919f5-ef5b-4ae9-8432-cd2a91e337d2": {
+                                        "2ea8d938-401b-4b61-92c4-c476e7d3e4bc": {
                                             "columnOrder": [
-                                                "61308466-190f-4872-9976-8e5320f6eee6",
-                                                "b00acfd3-e92b-4b7c-bf69-86e3ebf49971",
-                                                "d856470e-3075-4c79-a99b-77cb8fd0f5ea"
+                                                "5ca49fa3-e0db-4c3f-9116-b0cdba13b3fb",
+                                                "d665ca71-d578-4fc0-a7eb-b6c4ea8b31d9",
+                                                "69ea92d8-1db1-4dd6-b01f-8ed3937c9ab8"
                                             ],
                                             "columns": {
-                                                "61308466-190f-4872-9976-8e5320f6eee6": {
+                                                "5ca49fa3-e0db-4c3f-9116-b0cdba13b3fb": {
+                                                    "customLabel": true,
                                                     "dataType": "string",
                                                     "isBucketed": true,
                                                     "label": "Top 10 values of salesforce.apex.trigger_name",
@@ -492,43 +508,35 @@
                                                     "params": {
                                                         "missingBucket": false,
                                                         "orderBy": {
-                                                            "columnId": "d856470e-3075-4c79-a99b-77cb8fd0f5ea",
+                                                            "columnId": "69ea92d8-1db1-4dd6-b01f-8ed3937c9ab8",
                                                             "type": "column"
                                                         },
                                                         "orderDirection": "desc",
                                                         "otherBucket": true,
-                                                        "parentFormat": {
-                                                            "id": "terms"
-                                                        },
                                                         "size": 10
                                                     },
                                                     "scale": "ordinal",
                                                     "sourceField": "salesforce.apex.trigger_name"
                                                 },
-                                                "b00acfd3-e92b-4b7c-bf69-86e3ebf49971": {
-                                                    "dataType": "date",
-                                                    "isBucketed": true,
-                                                    "label": "@timestamp",
-                                                    "operationType": "date_histogram",
-                                                    "params": {
-                                                        "dropPartials": false,
-                                                        "includeEmptyRows": true,
-                                                        "interval": "auto"
-                                                    },
-                                                    "scale": "interval",
-                                                    "sourceField": "@timestamp"
-                                                },
-                                                "d856470e-3075-4c79-a99b-77cb8fd0f5ea": {
+                                                "69ea92d8-1db1-4dd6-b01f-8ed3937c9ab8": {
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
                                                     "label": "Apex Trigger",
                                                     "operationType": "count",
-                                                    "params": {
-                                                        "emptyAsNull": true
-                                                    },
                                                     "scale": "ratio",
-                                                    "sourceField": "___records___"
+                                                    "sourceField": "Records"
+                                                },
+                                                "d665ca71-d578-4fc0-a7eb-b6c4ea8b31d9": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -544,7 +552,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "4c4c54fa-53f8-4d2d-acc2-387cf2f67f6a",
+                                        "indexRefName": "filter-index-pattern-0",
                                         "key": "event.dataset",
                                         "negate": false,
                                         "params": {
@@ -559,7 +567,6 @@
                                     }
                                 }
                             ],
-                            "internalReferences": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -568,15 +575,15 @@
                                 "layers": [
                                     {
                                         "accessors": [
-                                            "d856470e-3075-4c79-a99b-77cb8fd0f5ea"
+                                            "69ea92d8-1db1-4dd6-b01f-8ed3937c9ab8"
                                         ],
-                                        "layerId": "197919f5-ef5b-4ae9-8432-cd2a91e337d2",
+                                        "layerId": "2ea8d938-401b-4b61-92c4-c476e7d3e4bc",
                                         "layerType": "data",
                                         "position": "top",
                                         "seriesType": "line",
                                         "showGridlines": false,
-                                        "splitAccessor": "61308466-190f-4872-9976-8e5320f6eee6",
-                                        "xAccessor": "b00acfd3-e92b-4b7c-bf69-86e3ebf49971"
+                                        "splitAccessor": "5ca49fa3-e0db-4c3f-9116-b0cdba13b3fb",
+                                        "xAccessor": "d665ca71-d578-4fc0-a7eb-b6c4ea8b31d9"
                                     }
                                 ],
                                 "legend": {
@@ -585,7 +592,13 @@
                                 },
                                 "preferredSeriesType": "line",
                                 "title": "Empty XY chart",
-                                "valueLabels": "hide"
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
                             }
                         },
                         "title": "",
@@ -596,256 +609,105 @@
                     "hidePanelTitles": false
                 },
                 "gridData": {
-                    "h": 17,
-                    "i": "0a33a409-0f61-42be-82ca-7ef8b8ec052f",
+                    "h": 15,
+                    "i": "be541fae-8b1f-40e5-9fcc-e552b3544773",
                     "w": 48,
                     "x": 0,
-                    "y": 15
+                    "y": 20
                 },
-                "panelIndex": "0a33a409-0f61-42be-82ca-7ef8b8ec052f",
+                "panelIndex": "be541fae-8b1f-40e5-9fcc-e552b3544773",
                 "title": "Top 10 apex triggers over time [Filebeat Salesforce]",
                 "type": "lens",
-                "version": "8.10.0"
+                "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
                     "attributes": {
-                        "description": "",
                         "references": [
                             {
                                 "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-1ddfa426-0787-44a0-a6d4-7ba89384d487",
+                                "name": "indexpattern-datasource-current-indexpattern",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-9518bc3e-d87d-49f2-ba14-84a071cf9140",
+                                "name": "indexpattern-datasource-layer-dbfc2649-500a-4d9e-8035-f2094fc75c86",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-395b6aa2-d6cd-406e-9559-a0ed2b833854",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-1",
                                 "type": "index-pattern"
                             }
                         ],
                         "state": {
-                            "adHocDataViews": {},
                             "datasourceStates": {
-                                "formBased": {
+                                "indexpattern": {
                                     "layers": {
-                                        "1ddfa426-0787-44a0-a6d4-7ba89384d487": {
+                                        "395b6aa2-d6cd-406e-9559-a0ed2b833854": {
                                             "columnOrder": [
-                                                "189cd662-a8bb-44dd-b11c-a6006f3deb18",
-                                                "80b5b013-c11c-440a-af98-1d98a8c81eb4"
+                                                "7d694982-04a5-4e47-9aa9-eea47b40f505",
+                                                "7ac0b6dc-60e0-46b8-81f9-519459e354b3"
                                             ],
                                             "columns": {
-                                                "189cd662-a8bb-44dd-b11c-a6006f3deb18": {
-                                                    "dataType": "date",
-                                                    "isBucketed": true,
-                                                    "label": "@timestamp",
-                                                    "operationType": "date_histogram",
-                                                    "params": {
-                                                        "dropPartials": false,
-                                                        "includeEmptyRows": true,
-                                                        "interval": "auto"
-                                                    },
-                                                    "scale": "interval",
-                                                    "sourceField": "@timestamp"
-                                                },
-                                                "80b5b013-c11c-440a-af98-1d98a8c81eb4": {
+                                                "7ac0b6dc-60e0-46b8-81f9-519459e354b3": {
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
                                                     "label": "Average run time",
                                                     "operationType": "average",
-                                                    "params": {
-                                                        "emptyAsNull": true
-                                                    },
                                                     "scale": "ratio",
                                                     "sourceField": "salesforce.apex.run_time"
-                                                }
-                                            },
-                                            "incompleteColumns": {}
-                                        },
-                                        "9518bc3e-d87d-49f2-ba14-84a071cf9140": {
-                                            "columnOrder": [
-                                                "40d6a20f-660b-4268-b801-c1c46ff7ea34",
-                                                "65763421-d4aa-4e0d-8cfc-e7334715d1b9"
-                                            ],
-                                            "columns": {
-                                                "40d6a20f-660b-4268-b801-c1c46ff7ea34": {
+                                                },
+                                                "7d694982-04a5-4e47-9aa9-eea47b40f505": {
                                                     "dataType": "date",
                                                     "isBucketed": true,
                                                     "label": "@timestamp",
                                                     "operationType": "date_histogram",
                                                     "params": {
-                                                        "dropPartials": false,
-                                                        "includeEmptyRows": true,
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        },
+                                        "dbfc2649-500a-4d9e-8035-f2094fc75c86": {
+                                            "columnOrder": [
+                                                "ba09599b-cc6f-420b-bd27-e9126e585c0f",
+                                                "f6bac9bb-7015-41d6-8c02-ffede3aeba7e"
+                                            ],
+                                            "columns": {
+                                                "ba09599b-cc6f-420b-bd27-e9126e585c0f": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
                                                         "interval": "auto"
                                                     },
                                                     "scale": "interval",
                                                     "sourceField": "@timestamp"
                                                 },
-                                                "65763421-d4aa-4e0d-8cfc-e7334715d1b9": {
+                                                "f6bac9bb-7015-41d6-8c02-ffede3aeba7e": {
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
                                                     "label": "Request count",
                                                     "operationType": "count",
-                                                    "params": {
-                                                        "emptyAsNull": true
-                                                    },
                                                     "scale": "ratio",
-                                                    "sourceField": "___records___"
-                                                }
-                                            },
-                                            "incompleteColumns": {}
-                                        }
-                                    }
-                                }
-                            },
-                            "filters": [],
-                            "internalReferences": [],
-                            "query": {
-                                "language": "kuery",
-                                "query": "event.dataset: salesforce.apex* AND salesforce.apex.run_time: *"
-                            },
-                            "visualization": {
-                                "axisTitlesVisibilitySettings": {
-                                    "x": false,
-                                    "yLeft": true,
-                                    "yRight": true
-                                },
-                                "layers": [
-                                    {
-                                        "accessors": [
-                                            "65763421-d4aa-4e0d-8cfc-e7334715d1b9"
-                                        ],
-                                        "layerId": "9518bc3e-d87d-49f2-ba14-84a071cf9140",
-                                        "layerType": "data",
-                                        "position": "top",
-                                        "seriesType": "bar",
-                                        "showGridlines": false,
-                                        "xAccessor": "40d6a20f-660b-4268-b801-c1c46ff7ea34",
-                                        "yConfig": [
-                                            {
-                                                "axisMode": "left",
-                                                "color": "#00e499",
-                                                "forAccessor": "65763421-d4aa-4e0d-8cfc-e7334715d1b9"
-                                            }
-                                        ]
-                                    },
-                                    {
-                                        "accessors": [
-                                            "80b5b013-c11c-440a-af98-1d98a8c81eb4"
-                                        ],
-                                        "layerId": "1ddfa426-0787-44a0-a6d4-7ba89384d487",
-                                        "layerType": "data",
-                                        "seriesType": "line",
-                                        "xAccessor": "189cd662-a8bb-44dd-b11c-a6006f3deb18",
-                                        "yConfig": [
-                                            {
-                                                "axisMode": "right",
-                                                "color": "#ff3a66",
-                                                "forAccessor": "80b5b013-c11c-440a-af98-1d98a8c81eb4"
-                                            }
-                                        ]
-                                    }
-                                ],
-                                "legend": {
-                                    "isVisible": true,
-                                    "position": "right"
-                                },
-                                "preferredSeriesType": "bar_stacked",
-                                "title": "Empty XY chart",
-                                "valueLabels": "hide",
-                                "valuesInLegend": true,
-                                "xTitle": "",
-                                "yRightExtent": {
-                                    "mode": "dataBounds"
-                                },
-                                "yRightTitle": "Average run time (ms)"
-                            }
-                        },
-                        "title": "",
-                        "type": "lens",
-                        "visualizationType": "lnsXY"
-                    },
-                    "enhancements": {},
-                    "hidePanelTitles": false
-                },
-                "gridData": {
-                    "h": 17,
-                    "i": "b8767bce-c060-4957-acfa-9f289be40643",
-                    "w": 48,
-                    "x": 0,
-                    "y": 32
-                },
-                "panelIndex": "b8767bce-c060-4957-acfa-9f289be40643",
-                "title": "Apex performance over time [Filebeat Salesforce]",
-                "type": "lens",
-                "version": "8.10.0"
-            },
-            {
-                "embeddableConfig": {
-                    "attributes": {
-                        "description": "",
-                        "references": [
-                            {
-                                "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-e5191636-4eda-47ed-a871-fbbeecb288b2",
-                                "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "583c98ae-1213-41a0-b63a-b064df93a70a",
-                                "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "5512a380-a0f0-43d4-8dc7-8664e8187b34",
-                                "type": "index-pattern"
-                            }
-                        ],
-                        "state": {
-                            "adHocDataViews": {},
-                            "datasourceStates": {
-                                "formBased": {
-                                    "layers": {
-                                        "e5191636-4eda-47ed-a871-fbbeecb288b2": {
-                                            "columnOrder": [
-                                                "d6544130-d324-4e62-8147-bf8206321aa2",
-                                                "c06e0b3b-14ec-4692-8b1d-1f695ee57620"
-                                            ],
-                                            "columns": {
-                                                "c06e0b3b-14ec-4692-8b1d-1f695ee57620": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "isBucketed": false,
-                                                    "label": "SOQL queries",
-                                                    "operationType": "count",
-                                                    "params": {
-                                                        "emptyAsNull": true
-                                                    },
-                                                    "scale": "ratio",
-                                                    "sourceField": "___records___"
-                                                },
-                                                "d6544130-d324-4e62-8147-bf8206321aa2": {
-                                                    "customLabel": true,
-                                                    "dataType": "string",
-                                                    "isBucketed": true,
-                                                    "label": "Entry point",
-                                                    "operationType": "terms",
-                                                    "params": {
-                                                        "missingBucket": false,
-                                                        "orderBy": {
-                                                            "columnId": "c06e0b3b-14ec-4692-8b1d-1f695ee57620",
-                                                            "type": "column"
-                                                        },
-                                                        "orderDirection": "desc",
-                                                        "otherBucket": false,
-                                                        "parentFormat": {
-                                                            "id": "terms"
-                                                        },
-                                                        "size": 10
-                                                    },
-                                                    "scale": "ordinal",
-                                                    "sourceField": "salesforce.apex.entry_point"
+                                                    "sourceField": "Records"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -861,7 +723,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "583c98ae-1213-41a0-b63a-b064df93a70a",
+                                        "indexRefName": "filter-index-pattern-0",
                                         "key": "event.dataset",
                                         "negate": false,
                                         "params": {
@@ -879,182 +741,19 @@
                                     "$state": {
                                         "store": "appState"
                                     },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "index": "5512a380-a0f0-43d4-8dc7-8664e8187b34",
-                                        "key": "event.action",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "apex-execution"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.action": "apex-execution"
-                                        }
-                                    }
-                                }
-                            ],
-                            "internalReferences": [],
-                            "query": {
-                                "language": "kuery",
-                                "query": ""
-                            },
-                            "visualization": {
-                                "axisTitlesVisibilitySettings": {
-                                    "x": true,
-                                    "yLeft": true,
-                                    "yRight": true
-                                },
-                                "layers": [
-                                    {
-                                        "accessors": [
-                                            "c06e0b3b-14ec-4692-8b1d-1f695ee57620"
-                                        ],
-                                        "layerId": "e5191636-4eda-47ed-a871-fbbeecb288b2",
-                                        "layerType": "data",
-                                        "position": "top",
-                                        "seriesType": "bar_stacked",
-                                        "showGridlines": false,
-                                        "xAccessor": "d6544130-d324-4e62-8147-bf8206321aa2"
-                                    }
-                                ],
-                                "legend": {
-                                    "isVisible": true,
-                                    "position": "right",
-                                    "showSingleSeries": true
-                                },
-                                "preferredSeriesType": "bar_stacked",
-                                "title": "Empty XY chart",
-                                "valueLabels": "hide",
-                                "xTitle": ""
-                            }
-                        },
-                        "title": "Top 10 SOQL queries per entry point [Logs Salesforce]",
-                        "type": "lens",
-                        "visualizationType": "lnsXY"
-                    },
-                    "enhancements": {},
-                    "hidePanelTitles": false
-                },
-                "gridData": {
-                    "h": 16,
-                    "i": "ddfe72ec-6854-4bf2-b50c-41e966e8b0fa",
-                    "w": 48,
-                    "x": 0,
-                    "y": 49
-                },
-                "panelIndex": "ddfe72ec-6854-4bf2-b50c-41e966e8b0fa",
-                "title": "Top 10 SOQL queries per entry point [Filebeat Salesforce]",
-                "type": "lens",
-                "version": "8.10.0"
-            },
-            {
-                "embeddableConfig": {
-                    "attributes": {
-                        "description": "",
-                        "references": [
-                            {
-                                "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-70a83117-8122-47eb-80e0-dc92fc2602bb",
-                                "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "7140fce8-8a7e-4f59-9c44-52bfbb63a30b",
-                                "type": "index-pattern"
-                            }
-                        ],
-                        "state": {
-                            "adHocDataViews": {},
-                            "datasourceStates": {
-                                "formBased": {
-                                    "layers": {
-                                        "70a83117-8122-47eb-80e0-dc92fc2602bb": {
-                                            "columnOrder": [
-                                                "bb7f05fd-4314-447c-87c9-7be78c2e3e71",
-                                                "369b52fb-dcd6-4e19-bef8-adf4a5c73242",
-                                                "71d2e21f-621b-457b-b574-c8be7fb58b72"
-                                            ],
-                                            "columns": {
-                                                "369b52fb-dcd6-4e19-bef8-adf4a5c73242": {
-                                                    "dataType": "date",
-                                                    "isBucketed": true,
-                                                    "label": "@timestamp",
-                                                    "operationType": "date_histogram",
-                                                    "params": {
-                                                        "dropPartials": false,
-                                                        "includeEmptyRows": true,
-                                                        "interval": "auto"
-                                                    },
-                                                    "scale": "interval",
-                                                    "sourceField": "@timestamp"
-                                                },
-                                                "71d2e21f-621b-457b-b574-c8be7fb58b72": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "isBucketed": false,
-                                                    "label": "Trigger count",
-                                                    "operationType": "count",
-                                                    "params": {
-                                                        "emptyAsNull": true
-                                                    },
-                                                    "scale": "ratio",
-                                                    "sourceField": "___records___"
-                                                },
-                                                "bb7f05fd-4314-447c-87c9-7be78c2e3e71": {
-                                                    "dataType": "string",
-                                                    "isBucketed": true,
-                                                    "label": "Top 10 values of salesforce.apex.trigger_type",
-                                                    "operationType": "terms",
-                                                    "params": {
-                                                        "missingBucket": false,
-                                                        "orderBy": {
-                                                            "columnId": "71d2e21f-621b-457b-b574-c8be7fb58b72",
-                                                            "type": "column"
-                                                        },
-                                                        "orderDirection": "desc",
-                                                        "otherBucket": true,
-                                                        "parentFormat": {
-                                                            "id": "terms"
-                                                        },
-                                                        "size": 10
-                                                    },
-                                                    "scale": "ordinal",
-                                                    "sourceField": "salesforce.apex.trigger_type"
-                                                }
-                                            },
-                                            "incompleteColumns": {}
-                                        }
-                                    }
-                                }
-                            },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
+                                    "exists": {
+                                        "field": "salesforce.apex.run_time"
                                     },
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "7140fce8-8a7e-4f59-9c44-52bfbb63a30b",
-                                        "key": "event.dataset",
+                                        "indexRefName": "filter-index-pattern-1",
+                                        "key": "salesforce.apex.run_time",
                                         "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
+                                        "type": "exists"
                                     }
                                 }
                             ],
-                            "internalReferences": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -1079,29 +778,54 @@
                                 "layers": [
                                     {
                                         "accessors": [
-                                            "71d2e21f-621b-457b-b574-c8be7fb58b72"
+                                            "f6bac9bb-7015-41d6-8c02-ffede3aeba7e"
                                         ],
-                                        "layerId": "70a83117-8122-47eb-80e0-dc92fc2602bb",
+                                        "layerId": "dbfc2649-500a-4d9e-8035-f2094fc75c86",
                                         "layerType": "data",
                                         "position": "top",
-                                        "seriesType": "line",
+                                        "seriesType": "bar_stacked",
                                         "showGridlines": false,
-                                        "splitAccessor": "bb7f05fd-4314-447c-87c9-7be78c2e3e71",
-                                        "xAccessor": "369b52fb-dcd6-4e19-bef8-adf4a5c73242"
+                                        "xAccessor": "ba09599b-cc6f-420b-bd27-e9126e585c0f",
+                                        "yConfig": [
+                                            {
+                                                "color": "#00e499",
+                                                "forAccessor": "f6bac9bb-7015-41d6-8c02-ffede3aeba7e"
+                                            }
+                                        ]
+                                    },
+                                    {
+                                        "accessors": [
+                                            "7ac0b6dc-60e0-46b8-81f9-519459e354b3"
+                                        ],
+                                        "layerId": "395b6aa2-d6cd-406e-9559-a0ed2b833854",
+                                        "layerType": "data",
+                                        "seriesType": "line",
+                                        "xAccessor": "7d694982-04a5-4e47-9aa9-eea47b40f505",
+                                        "yConfig": [
+                                            {
+                                                "color": "#ff3a66",
+                                                "forAccessor": "7ac0b6dc-60e0-46b8-81f9-519459e354b3"
+                                            }
+                                        ]
                                     }
                                 ],
                                 "legend": {
                                     "isVisible": true,
                                     "position": "right"
                                 },
-                                "preferredSeriesType": "line",
+                                "preferredSeriesType": "bar_stacked",
                                 "tickLabelsVisibilitySettings": {
                                     "x": true,
                                     "yLeft": true,
                                     "yRight": true
                                 },
                                 "valueLabels": "hide",
-                                "xTitle": "Trigger type"
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
                             }
                         },
                         "title": "",
@@ -1113,56 +837,364 @@
                 },
                 "gridData": {
                     "h": 16,
-                    "i": "36b2995c-f5ba-4699-b660-f5546cefd2a6",
-                    "w": 24,
+                    "i": "fe66cbe2-e564-49ae-a724-6440517ceb3b",
+                    "w": 48,
                     "x": 0,
-                    "y": 65
+                    "y": 35
                 },
-                "panelIndex": "36b2995c-f5ba-4699-b660-f5546cefd2a6",
-                "title": "Trigger trends over time [Filebeat Salesforce]",
+                "panelIndex": "fe66cbe2-e564-49ae-a724-6440517ceb3b",
+                "title": "Apex performance over time [Filebeat Salesforce]",
                 "type": "lens",
-                "version": "8.10.0"
+                "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
                     "attributes": {
-                        "description": "",
                         "references": [
                             {
                                 "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-70a83117-8122-47eb-80e0-dc92fc2602bb",
+                                "name": "indexpattern-datasource-current-indexpattern",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "2bf12d97-e75b-4648-88f8-39892b8ca052",
+                                "name": "indexpattern-datasource-layer-f73f968b-392e-4f0e-8c9b-351ad7370ddd",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-1",
                                 "type": "index-pattern"
                             }
                         ],
                         "state": {
-                            "adHocDataViews": {},
                             "datasourceStates": {
-                                "formBased": {
+                                "indexpattern": {
                                     "layers": {
-                                        "70a83117-8122-47eb-80e0-dc92fc2602bb": {
+                                        "f73f968b-392e-4f0e-8c9b-351ad7370ddd": {
                                             "columnOrder": [
-                                                "fa79fcac-32b6-4a66-8ead-cc5bf315c3ab",
-                                                "71d2e21f-621b-457b-b574-c8be7fb58b72"
+                                                "e50a7586-31dd-47bd-8b42-2a02dd27aec9",
+                                                "148d81bd-6204-41a1-99d7-26580ab2a3e7"
                                             ],
                                             "columns": {
-                                                "71d2e21f-621b-457b-b574-c8be7fb58b72": {
+                                                "148d81bd-6204-41a1-99d7-26580ab2a3e7": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "SOQL queries",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                },
+                                                "e50a7586-31dd-47bd-8b42-2a02dd27aec9": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Entry point",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "148d81bd-6204-41a1-99d7-26580ab2a3e7",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "salesforce.apex.entry_point"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "indexRefName": "filter-index-pattern-0",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.apex"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.apex"
+                                        }
+                                    }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "indexRefName": "filter-index-pattern-1",
+                                        "key": "event.action",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "apex-execution"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.action": "apex-execution"
+                                        }
+                                    }
+                                }
+                            ],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "148d81bd-6204-41a1-99d7-26580ab2a3e7"
+                                        ],
+                                        "layerId": "f73f968b-392e-4f0e-8c9b-351ad7370ddd",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar_stacked",
+                                        "showGridlines": false,
+                                        "xAccessor": "e50a7586-31dd-47bd-8b42-2a02dd27aec9"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_stacked",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 16,
+                    "i": "574ede56-2b30-49a5-8888-8ae368c856af",
+                    "w": 48,
+                    "x": 0,
+                    "y": 51
+                },
+                "panelIndex": "574ede56-2b30-49a5-8888-8ae368c856af",
+                "title": "Top 10 SOQL queries per entry point [Filebeat Salesforce]",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-b53e356e-52be-419c-bf3d-282ec655706d",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "b53e356e-52be-419c-bf3d-282ec655706d": {
+                                            "columnOrder": [
+                                                "86ab6d3f-99be-44a8-9050-1a79992a7948",
+                                                "f3682f79-73a9-4bd4-aff4-d1be1c81f7dd",
+                                                "c231ae4b-9cb7-4bc1-96f2-06870e504081"
+                                            ],
+                                            "columns": {
+                                                "86ab6d3f-99be-44a8-9050-1a79992a7948": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 10 values of salesforce.apex.trigger_type",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "c231ae4b-9cb7-4bc1-96f2-06870e504081",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "salesforce.apex.trigger_type"
+                                                },
+                                                "c231ae4b-9cb7-4bc1-96f2-06870e504081": {
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
                                                     "label": "Trigger count",
                                                     "operationType": "count",
-                                                    "params": {
-                                                        "emptyAsNull": true
-                                                    },
                                                     "scale": "ratio",
-                                                    "sourceField": "___records___"
+                                                    "sourceField": "Records"
                                                 },
-                                                "fa79fcac-32b6-4a66-8ead-cc5bf315c3ab": {
+                                                "f3682f79-73a9-4bd4-aff4-d1be1c81f7dd": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "indexRefName": "filter-index-pattern-0",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.apex"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.apex"
+                                        }
+                                    }
+                                }
+                            ],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "c231ae4b-9cb7-4bc1-96f2-06870e504081"
+                                        ],
+                                        "layerId": "b53e356e-52be-419c-bf3d-282ec655706d",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "splitAccessor": "86ab6d3f-99be-44a8-9050-1a79992a7948",
+                                        "xAccessor": "f3682f79-73a9-4bd4-aff4-d1be1c81f7dd"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "line",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "f8ecb623-ff3c-4422-9f91-2676fe2e58e0",
+                    "w": 24,
+                    "x": 0,
+                    "y": 67
+                },
+                "panelIndex": "f8ecb623-ff3c-4422-9f91-2676fe2e58e0",
+                "title": "Trigger trends over time [Filebeat Salesforce]",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-b2559ffe-87f5-4f0e-a041-671ae182cad2",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "b2559ffe-87f5-4f0e-a041-671ae182cad2": {
+                                            "columnOrder": [
+                                                "b3a46082-815b-44d5-a8ab-77b1f4aa3e39",
+                                                "bf492b8e-efdf-423a-a3c2-33b59eee9cc2"
+                                            ],
+                                            "columns": {
+                                                "b3a46082-815b-44d5-a8ab-77b1f4aa3e39": {
                                                     "dataType": "string",
                                                     "isBucketed": true,
                                                     "label": "Filters",
@@ -1193,149 +1225,15 @@
                                                         ]
                                                     },
                                                     "scale": "ordinal"
-                                                }
-                                            },
-                                            "incompleteColumns": {}
-                                        }
-                                    }
-                                }
-                            },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "index": "2bf12d97-e75b-4648-88f8-39892b8ca052",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                }
-                            ],
-                            "internalReferences": [],
-                            "query": {
-                                "language": "kuery",
-                                "query": ""
-                            },
-                            "visualization": {
-                                "axisTitlesVisibilitySettings": {
-                                    "x": true,
-                                    "yLeft": true,
-                                    "yRight": true
-                                },
-                                "layers": [
-                                    {
-                                        "accessors": [
-                                            "71d2e21f-621b-457b-b574-c8be7fb58b72"
-                                        ],
-                                        "layerId": "70a83117-8122-47eb-80e0-dc92fc2602bb",
-                                        "layerType": "data",
-                                        "position": "top",
-                                        "seriesType": "bar_horizontal",
-                                        "showGridlines": false,
-                                        "xAccessor": "fa79fcac-32b6-4a66-8ead-cc5bf315c3ab"
-                                    }
-                                ],
-                                "legend": {
-                                    "isVisible": true,
-                                    "position": "right"
-                                },
-                                "preferredSeriesType": "bar_horizontal",
-                                "title": "Empty XY chart",
-                                "valueLabels": "hide",
-                                "xTitle": "Trigger type"
-                            }
-                        },
-                        "title": "",
-                        "type": "lens",
-                        "visualizationType": "lnsXY"
-                    },
-                    "enhancements": {},
-                    "hidePanelTitles": false
-                },
-                "gridData": {
-                    "h": 16,
-                    "i": "ac98a6ec-c930-45a7-b1aa-0877e2f8d281",
-                    "w": 24,
-                    "x": 24,
-                    "y": 65
-                },
-                "panelIndex": "ac98a6ec-c930-45a7-b1aa-0877e2f8d281",
-                "title": "Number of triggers by type [Filebeat Salesforce]",
-                "type": "lens",
-                "version": "8.10.0"
-            },
-            {
-                "embeddableConfig": {
-                    "attributes": {
-                        "description": "",
-                        "references": [
-                            {
-                                "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-0c3855f9-23b4-460b-9127-4ddcacbeaf97",
-                                "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "f0b44222-29c9-47aa-9645-36c7f020be1f",
-                                "type": "index-pattern"
-                            }
-                        ],
-                        "state": {
-                            "adHocDataViews": {},
-                            "datasourceStates": {
-                                "formBased": {
-                                    "layers": {
-                                        "0c3855f9-23b4-460b-9127-4ddcacbeaf97": {
-                                            "columnOrder": [
-                                                "1d579c7b-dca3-47eb-b48d-2f4d597d4767",
-                                                "f954088d-720b-41b9-89c1-4c686fee1d1a"
-                                            ],
-                                            "columns": {
-                                                "1d579c7b-dca3-47eb-b48d-2f4d597d4767": {
-                                                    "customLabel": true,
-                                                    "dataType": "string",
-                                                    "isBucketed": true,
-                                                    "label": "User type",
-                                                    "operationType": "terms",
-                                                    "params": {
-                                                        "missingBucket": false,
-                                                        "orderBy": {
-                                                            "columnId": "f954088d-720b-41b9-89c1-4c686fee1d1a",
-                                                            "type": "column"
-                                                        },
-                                                        "orderDirection": "desc",
-                                                        "otherBucket": true,
-                                                        "parentFormat": {
-                                                            "id": "terms"
-                                                        },
-                                                        "size": 10
-                                                    },
-                                                    "scale": "ordinal",
-                                                    "sourceField": "user.roles"
                                                 },
-                                                "f954088d-720b-41b9-89c1-4c686fee1d1a": {
+                                                "bf492b8e-efdf-423a-a3c2-33b59eee9cc2": {
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
-                                                    "label": "Requests count",
+                                                    "label": "Trigger count",
                                                     "operationType": "count",
-                                                    "params": {
-                                                        "emptyAsNull": true
-                                                    },
                                                     "scale": "ratio",
-                                                    "sourceField": "___records___"
+                                                    "sourceField": "Records"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -1351,7 +1249,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "f0b44222-29c9-47aa-9645-36c7f020be1f",
+                                        "indexRefName": "filter-index-pattern-0",
                                         "key": "event.dataset",
                                         "negate": false,
                                         "params": {
@@ -1366,296 +1264,6 @@
                                     }
                                 }
                             ],
-                            "internalReferences": [],
-                            "query": {
-                                "language": "kuery",
-                                "query": ""
-                            },
-                            "visualization": {
-                                "layers": [
-                                    {
-                                        "accessors": [
-                                            "f954088d-720b-41b9-89c1-4c686fee1d1a"
-                                        ],
-                                        "layerId": "0c3855f9-23b4-460b-9127-4ddcacbeaf97",
-                                        "layerType": "data",
-                                        "position": "top",
-                                        "seriesType": "bar",
-                                        "showGridlines": false,
-                                        "xAccessor": "1d579c7b-dca3-47eb-b48d-2f4d597d4767"
-                                    }
-                                ],
-                                "legend": {
-                                    "isVisible": true,
-                                    "position": "right"
-                                },
-                                "preferredSeriesType": "bar",
-                                "title": "Empty XY chart",
-                                "valueLabels": "hide"
-                            }
-                        },
-                        "title": "",
-                        "type": "lens",
-                        "visualizationType": "lnsXY"
-                    },
-                    "enhancements": {},
-                    "hidePanelTitles": false
-                },
-                "gridData": {
-                    "h": 16,
-                    "i": "5bbe083c-eff1-4abd-b3a2-012303c07523",
-                    "w": 24,
-                    "x": 0,
-                    "y": 81
-                },
-                "panelIndex": "5bbe083c-eff1-4abd-b3a2-012303c07523",
-                "title": "Requests per user type [Filebeat Salesforce]",
-                "type": "lens",
-                "version": "8.10.0"
-            },
-            {
-                "embeddableConfig": {
-                    "attributes": {
-                        "description": "",
-                        "references": [
-                            {
-                                "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-0c3855f9-23b4-460b-9127-4ddcacbeaf97",
-                                "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "f810d827-8c4a-4c9f-8487-3e3a67610219",
-                                "type": "index-pattern"
-                            }
-                        ],
-                        "state": {
-                            "adHocDataViews": {},
-                            "datasourceStates": {
-                                "formBased": {
-                                    "layers": {
-                                        "0c3855f9-23b4-460b-9127-4ddcacbeaf97": {
-                                            "columnOrder": [
-                                                "1d579c7b-dca3-47eb-b48d-2f4d597d4767",
-                                                "f954088d-720b-41b9-89c1-4c686fee1d1a"
-                                            ],
-                                            "columns": {
-                                                "1d579c7b-dca3-47eb-b48d-2f4d597d4767": {
-                                                    "customLabel": true,
-                                                    "dataType": "string",
-                                                    "isBucketed": true,
-                                                    "label": "User agent",
-                                                    "operationType": "terms",
-                                                    "params": {
-                                                        "missingBucket": false,
-                                                        "orderBy": {
-                                                            "columnId": "f954088d-720b-41b9-89c1-4c686fee1d1a",
-                                                            "type": "column"
-                                                        },
-                                                        "orderDirection": "desc",
-                                                        "otherBucket": true,
-                                                        "parentFormat": {
-                                                            "id": "terms"
-                                                        },
-                                                        "secondaryFields": [],
-                                                        "size": 10
-                                                    },
-                                                    "scale": "ordinal",
-                                                    "sourceField": "salesforce.apex.user_agent"
-                                                },
-                                                "f954088d-720b-41b9-89c1-4c686fee1d1a": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "isBucketed": false,
-                                                    "label": "Response count",
-                                                    "operationType": "count",
-                                                    "params": {
-                                                        "emptyAsNull": true
-                                                    },
-                                                    "scale": "ratio",
-                                                    "sourceField": "___records___"
-                                                }
-                                            },
-                                            "incompleteColumns": {}
-                                        }
-                                    }
-                                }
-                            },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "index": "f810d827-8c4a-4c9f-8487-3e3a67610219",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                }
-                            ],
-                            "internalReferences": [],
-                            "query": {
-                                "language": "kuery",
-                                "query": ""
-                            },
-                            "visualization": {
-                                "layers": [
-                                    {
-                                        "accessors": [
-                                            "f954088d-720b-41b9-89c1-4c686fee1d1a"
-                                        ],
-                                        "layerId": "0c3855f9-23b4-460b-9127-4ddcacbeaf97",
-                                        "layerType": "data",
-                                        "position": "top",
-                                        "seriesType": "bar",
-                                        "showGridlines": false,
-                                        "xAccessor": "1d579c7b-dca3-47eb-b48d-2f4d597d4767"
-                                    }
-                                ],
-                                "legend": {
-                                    "isVisible": true,
-                                    "position": "right"
-                                },
-                                "preferredSeriesType": "bar",
-                                "title": "Empty XY chart",
-                                "valueLabels": "hide"
-                            }
-                        },
-                        "title": "",
-                        "type": "lens",
-                        "visualizationType": "lnsXY"
-                    },
-                    "enhancements": {},
-                    "hidePanelTitles": false
-                },
-                "gridData": {
-                    "h": 16,
-                    "i": "97d94d13-e382-434e-99cb-dbff367cce72",
-                    "w": 24,
-                    "x": 24,
-                    "y": 81
-                },
-                "panelIndex": "97d94d13-e382-434e-99cb-dbff367cce72",
-                "title": "Responses per user agent [Filebeat Salesforce]",
-                "type": "lens",
-                "version": "8.10.0"
-            },
-            {
-                "embeddableConfig": {
-                    "attributes": {
-                        "description": "",
-                        "references": [
-                            {
-                                "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-5e5e7f82-ace7-426a-975b-c01a009ccc21",
-                                "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "d41d8228-27a6-47d5-9228-311aae15c18f",
-                                "type": "index-pattern"
-                            }
-                        ],
-                        "state": {
-                            "adHocDataViews": {},
-                            "datasourceStates": {
-                                "formBased": {
-                                    "layers": {
-                                        "5e5e7f82-ace7-426a-975b-c01a009ccc21": {
-                                            "columnOrder": [
-                                                "ffc42d57-84ce-42a8-966d-53b68f384ffd",
-                                                "67d65022-1482-4a0c-b68f-f9b134807989",
-                                                "30970875-b396-4f47-9b79-1defd279743f"
-                                            ],
-                                            "columns": {
-                                                "30970875-b396-4f47-9b79-1defd279743f": {
-                                                    "customLabel": true,
-                                                    "dataType": "number",
-                                                    "isBucketed": false,
-                                                    "label": "Apex trigger name",
-                                                    "operationType": "unique_count",
-                                                    "params": {
-                                                        "emptyAsNull": true
-                                                    },
-                                                    "scale": "ratio",
-                                                    "sourceField": "salesforce.apex.trigger_name"
-                                                },
-                                                "67d65022-1482-4a0c-b68f-f9b134807989": {
-                                                    "dataType": "date",
-                                                    "isBucketed": true,
-                                                    "label": "@timestamp",
-                                                    "operationType": "date_histogram",
-                                                    "params": {
-                                                        "dropPartials": false,
-                                                        "includeEmptyRows": true,
-                                                        "interval": "auto"
-                                                    },
-                                                    "scale": "interval",
-                                                    "sourceField": "@timestamp"
-                                                },
-                                                "ffc42d57-84ce-42a8-966d-53b68f384ffd": {
-                                                    "customLabel": true,
-                                                    "dataType": "string",
-                                                    "isBucketed": true,
-                                                    "label": "Entity name",
-                                                    "operationType": "terms",
-                                                    "params": {
-                                                        "missingBucket": false,
-                                                        "orderBy": {
-                                                            "columnId": "30970875-b396-4f47-9b79-1defd279743f",
-                                                            "type": "column"
-                                                        },
-                                                        "orderDirection": "desc",
-                                                        "otherBucket": true,
-                                                        "parentFormat": {
-                                                            "id": "terms"
-                                                        },
-                                                        "size": 10
-                                                    },
-                                                    "scale": "ordinal",
-                                                    "sourceField": "salesforce.apex.entity_name"
-                                                }
-                                            },
-                                            "incompleteColumns": {}
-                                        }
-                                    }
-                                }
-                            },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "index": "d41d8228-27a6-47d5-9228-311aae15c18f",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                }
-                            ],
-                            "internalReferences": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -1680,28 +1288,34 @@
                                 "layers": [
                                     {
                                         "accessors": [
-                                            "30970875-b396-4f47-9b79-1defd279743f"
+                                            "bf492b8e-efdf-423a-a3c2-33b59eee9cc2"
                                         ],
-                                        "layerId": "5e5e7f82-ace7-426a-975b-c01a009ccc21",
+                                        "layerId": "b2559ffe-87f5-4f0e-a041-671ae182cad2",
                                         "layerType": "data",
                                         "position": "top",
-                                        "seriesType": "bar_stacked",
+                                        "seriesType": "bar_horizontal",
                                         "showGridlines": false,
-                                        "splitAccessor": "ffc42d57-84ce-42a8-966d-53b68f384ffd",
-                                        "xAccessor": "67d65022-1482-4a0c-b68f-f9b134807989"
+                                        "xAccessor": "b3a46082-815b-44d5-a8ab-77b1f4aa3e39"
                                     }
                                 ],
                                 "legend": {
                                     "isVisible": true,
                                     "position": "right"
                                 },
-                                "preferredSeriesType": "bar_stacked",
+                                "preferredSeriesType": "bar_horizontal",
                                 "tickLabelsVisibilitySettings": {
                                     "x": true,
                                     "yLeft": true,
                                     "yRight": true
                                 },
-                                "valueLabels": "hide"
+                                "valueLabels": "hide",
+                                "xTitle": "Trigger type",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
                             }
                         },
                         "title": "",
@@ -1712,74 +1326,473 @@
                     "hidePanelTitles": false
                 },
                 "gridData": {
-                    "h": 16,
-                    "i": "04f06541-b6cf-4a31-865e-361ff701a4c0",
+                    "h": 15,
+                    "i": "c713f492-059e-48c9-bddb-bfa5dff4379a",
                     "w": 24,
-                    "x": 0,
-                    "y": 97
+                    "x": 24,
+                    "y": 67
                 },
-                "panelIndex": "04f06541-b6cf-4a31-865e-361ff701a4c0",
-                "title": "Triggers by entity categorization [Filebeat Salesforce]",
+                "panelIndex": "c713f492-059e-48c9-bddb-bfa5dff4379a",
+                "title": "Number of triggers by type [Filebeat Salesforce]",
                 "type": "lens",
-                "version": "8.10.0"
+                "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
                     "attributes": {
-                        "description": "",
                         "references": [
                             {
                                 "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-df249e19-0f2d-4700-96d3-0521bfff6614",
+                                "name": "indexpattern-datasource-current-indexpattern",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "3aacd3da-ed48-47df-b4ff-5e57de942969",
+                                "name": "indexpattern-datasource-layer-f2b00fda-234b-44d4-9ce5-7cd8c28efce3",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
                             }
                         ],
                         "state": {
-                            "adHocDataViews": {},
                             "datasourceStates": {
-                                "formBased": {
+                                "indexpattern": {
                                     "layers": {
-                                        "df249e19-0f2d-4700-96d3-0521bfff6614": {
+                                        "f2b00fda-234b-44d4-9ce5-7cd8c28efce3": {
                                             "columnOrder": [
-                                                "cb7add83-b77d-41a2-9600-55954e7d271e",
-                                                "4d47a9d2-3346-4cca-9381-817a87cfe236"
+                                                "844908c9-57a6-4468-b7bd-d7261afdc379",
+                                                "c20cc0fc-5742-405c-86e9-f535058df2b2"
                                             ],
                                             "columns": {
-                                                "4d47a9d2-3346-4cca-9381-817a87cfe236": {
+                                                "844908c9-57a6-4468-b7bd-d7261afdc379": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "User type",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "c20cc0fc-5742-405c-86e9-f535058df2b2",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "user.roles"
+                                                },
+                                                "c20cc0fc-5742-405c-86e9-f535058df2b2": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Requests count",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "indexRefName": "filter-index-pattern-0",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.apex"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.apex"
+                                        }
+                                    }
+                                }
+                            ],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "c20cc0fc-5742-405c-86e9-f535058df2b2"
+                                        ],
+                                        "layerId": "f2b00fda-234b-44d4-9ce5-7cd8c28efce3",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar",
+                                        "showGridlines": false,
+                                        "xAccessor": "844908c9-57a6-4468-b7bd-d7261afdc379"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_stacked",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "9d4bd40c-a3b5-4668-a58a-118e352c3ad2",
+                    "w": 24,
+                    "x": 0,
+                    "y": 82
+                },
+                "panelIndex": "9d4bd40c-a3b5-4668-a58a-118e352c3ad2",
+                "title": "Requests per user type [Filebeat Salesforce]",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-7b43a22c-ad61-444d-a002-8cc4116b4854",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "7b43a22c-ad61-444d-a002-8cc4116b4854": {
+                                            "columnOrder": [
+                                                "6619dbcd-313a-4a14-8991-8f4110656b5d",
+                                                "829d388d-4c2b-4e04-a26b-1a1ac2bdb434"
+                                            ],
+                                            "columns": {
+                                                "6619dbcd-313a-4a14-8991-8f4110656b5d": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "User agent",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "829d388d-4c2b-4e04-a26b-1a1ac2bdb434",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "salesforce.apex.user_agent"
+                                                },
+                                                "829d388d-4c2b-4e04-a26b-1a1ac2bdb434": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Response count",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "829d388d-4c2b-4e04-a26b-1a1ac2bdb434"
+                                        ],
+                                        "layerId": "7b43a22c-ad61-444d-a002-8cc4116b4854",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar",
+                                        "showGridlines": false,
+                                        "xAccessor": "6619dbcd-313a-4a14-8991-8f4110656b5d"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_stacked",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "f26b8459-e1af-4cee-92ac-9e91348c2c16",
+                    "w": 24,
+                    "x": 24,
+                    "y": 82
+                },
+                "panelIndex": "f26b8459-e1af-4cee-92ac-9e91348c2c16",
+                "title": "Responses per user agent [Filebeat Salesforce]",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-92994644-eb5e-41a8-871b-b0911dcbf481",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "92994644-eb5e-41a8-871b-b0911dcbf481": {
+                                            "columnOrder": [
+                                                "04755ce2-d91a-4fe9-8384-3247ccdb2980",
+                                                "5ba3835a-9391-4298-8cc6-3c6fa0678e5b",
+                                                "452aad19-1d09-4cc3-9e86-b6a84a6d0b6c"
+                                            ],
+                                            "columns": {
+                                                "04755ce2-d91a-4fe9-8384-3247ccdb2980": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Entity name",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "452aad19-1d09-4cc3-9e86-b6a84a6d0b6c",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "salesforce.apex.entity_name"
+                                                },
+                                                "452aad19-1d09-4cc3-9e86-b6a84a6d0b6c": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Apex trigger name",
+                                                    "operationType": "unique_count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "salesforce.apex.trigger_name"
+                                                },
+                                                "5ba3835a-9391-4298-8cc6-3c6fa0678e5b": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "indexRefName": "filter-index-pattern-0",
+                                        "key": "event.dataset",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "salesforce.apex"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.dataset": "salesforce.apex"
+                                        }
+                                    }
+                                }
+                            ],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "452aad19-1d09-4cc3-9e86-b6a84a6d0b6c"
+                                        ],
+                                        "layerId": "92994644-eb5e-41a8-871b-b0911dcbf481",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar_stacked",
+                                        "showGridlines": false,
+                                        "splitAccessor": "04755ce2-d91a-4fe9-8384-3247ccdb2980",
+                                        "xAccessor": "5ba3835a-9391-4298-8cc6-3c6fa0678e5b"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_stacked",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "cc5bf3a1-5a33-4204-8efc-32b2b1629e63",
+                    "w": 24,
+                    "x": 0,
+                    "y": 97
+                },
+                "panelIndex": "cc5bf3a1-5a33-4204-8efc-32b2b1629e63",
+                "title": "Triggers by entity categorization [Filebeat Salesforce]",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-84a0be7e-5127-485b-9ce2-9a9ba033a74c",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-0",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "84a0be7e-5127-485b-9ce2-9a9ba033a74c": {
+                                            "columnOrder": [
+                                                "4282f56c-5d7a-49e2-aa89-8533831afb6b",
+                                                "270e21c6-f213-4df6-bbcc-a4735f99028d"
+                                            ],
+                                            "columns": {
+                                                "270e21c6-f213-4df6-bbcc-a4735f99028d": {
                                                     "customLabel": true,
                                                     "dataType": "number",
                                                     "isBucketed": false,
                                                     "label": "Request count",
                                                     "operationType": "count",
-                                                    "params": {
-                                                        "emptyAsNull": true
-                                                    },
                                                     "scale": "ratio",
-                                                    "sourceField": "___records___"
+                                                    "sourceField": "Records"
                                                 },
-                                                "cb7add83-b77d-41a2-9600-55954e7d271e": {
-                                                    "customLabel": true,
+                                                "4282f56c-5d7a-49e2-aa89-8533831afb6b": {
                                                     "dataType": "string",
                                                     "isBucketed": true,
-                                                    "label": "Entry point",
+                                                    "label": "Top values of salesforce.apex.entry_point",
                                                     "operationType": "terms",
                                                     "params": {
                                                         "missingBucket": false,
                                                         "orderBy": {
-                                                            "columnId": "4d47a9d2-3346-4cca-9381-817a87cfe236",
+                                                            "columnId": "270e21c6-f213-4df6-bbcc-a4735f99028d",
                                                             "type": "column"
                                                         },
                                                         "orderDirection": "desc",
-                                                        "otherBucket": false,
-                                                        "parentFormat": {
-                                                            "id": "terms"
-                                                        },
-                                                        "size": 10
+                                                        "otherBucket": true,
+                                                        "size": 5
                                                     },
                                                     "scale": "ordinal",
                                                     "sourceField": "salesforce.apex.entry_point"
@@ -1798,7 +1811,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "3aacd3da-ed48-47df-b4ff-5e57de942969",
+                                        "indexRefName": "filter-index-pattern-0",
                                         "key": "event.dataset",
                                         "negate": false,
                                         "params": {
@@ -1813,7 +1826,6 @@
                                     }
                                 }
                             ],
-                            "internalReferences": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -1821,16 +1833,15 @@
                             "visualization": {
                                 "columns": [
                                     {
-                                        "columnId": "cb7add83-b77d-41a2-9600-55954e7d271e"
+                                        "columnId": "4282f56c-5d7a-49e2-aa89-8533831afb6b"
                                     },
                                     {
-                                        "columnId": "4d47a9d2-3346-4cca-9381-817a87cfe236"
+                                        "columnId": "270e21c6-f213-4df6-bbcc-a4735f99028d",
+                                        "isTransposed": false
                                     }
                                 ],
-                                "headerRowHeight": "auto",
-                                "layerId": "df249e19-0f2d-4700-96d3-0521bfff6614",
-                                "layerType": "data",
-                                "rowHeight": "auto"
+                                "layerId": "84a0be7e-5127-485b-9ce2-9a9ba033a74c",
+                                "layerType": "data"
                             }
                         },
                         "title": "",
@@ -1841,59 +1852,98 @@
                     "hidePanelTitles": false
                 },
                 "gridData": {
-                    "h": 16,
-                    "i": "a2b4090c-077d-495a-b002-0aceddb498c7",
+                    "h": 15,
+                    "i": "5904bcb3-1616-422d-855e-a86e6a69f802",
                     "w": 24,
                     "x": 24,
                     "y": 97
                 },
-                "panelIndex": "a2b4090c-077d-495a-b002-0aceddb498c7",
+                "panelIndex": "5904bcb3-1616-422d-855e-a86e6a69f802",
                 "title": "Top 10 entry points by request count [Filebeat Salesforce]",
                 "type": "lens",
-                "version": "8.10.0"
+                "version": "7.15.0"
             },
             {
                 "embeddableConfig": {
                     "attributes": {
-                        "description": "",
                         "references": [
                             {
                                 "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-d0976ec2-a99a-4fb6-b537-d6822e644ebb",
+                                "name": "indexpattern-datasource-current-indexpattern",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "f5e31933-76e5-4f4f-ba08-13e0d6d86c33",
+                                "name": "indexpattern-datasource-layer-be7d276c-1f0a-4697-a1bd-f92c2e835daa",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "01e5ec14-b8db-4040-80e7-75bc9979071e",
+                                "name": "filter-index-pattern-0",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "filter-index-pattern-1",
                                 "type": "index-pattern"
                             }
                         ],
                         "state": {
-                            "adHocDataViews": {},
                             "datasourceStates": {
-                                "formBased": {
+                                "indexpattern": {
                                     "layers": {
-                                        "d0976ec2-a99a-4fb6-b537-d6822e644ebb": {
+                                        "be7d276c-1f0a-4697-a1bd-f92c2e835daa": {
                                             "columnOrder": [
-                                                "35da24b7-398e-433a-85d9-49e7862e0813",
-                                                "2128b4e0-6345-485e-a410-87fa7ed6e610",
-                                                "20bb0e74-5ce7-4e96-9840-bb8cb4dd08c0",
-                                                "2b4a5fc5-a0ac-4b56-8543-677eb5793a5b",
-                                                "2bcf9e0d-7b52-44f6-a7ad-ad9209c599cc"
+                                                "2ed13d2d-70a3-4fd2-af65-dd655d880ad7",
+                                                "6afeaef8-f180-4d7e-8913-591ccd00973f",
+                                                "e9363c6b-f32e-4d19-adb4-c14777faa3a4",
+                                                "c4c26acd-dbc6-4ba9-bd72-37847db71d7a",
+                                                "ffaaffdc-d4ab-4d83-a66d-f506436a18ac"
                                             ],
                                             "columns": {
-                                                "20bb0e74-5ce7-4e96-9840-bb8cb4dd08c0": {
+                                                "2ed13d2d-70a3-4fd2-af65-dd655d880ad7": {
                                                     "customLabel": true,
                                                     "dataType": "string",
-                                                    "filter": {
-                                                        "language": "kuery",
-                                                        "query": "salesforce.apex.action: *"
+                                                    "isBucketed": true,
+                                                    "label": "Entity",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "6afeaef8-f180-4d7e-8913-591ccd00973f",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 10
                                                     },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "salesforce.apex.entity"
+                                                },
+                                                "6afeaef8-f180-4d7e-8913-591ccd00973f": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Timestamp",
+                                                    "operationType": "unique_count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "c4c26acd-dbc6-4ba9-bd72-37847db71d7a": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Throughput",
+                                                    "operationType": "last_value",
+                                                    "params": {
+                                                        "sortField": "@timestamp"
+                                                    },
+                                                    "scale": "ratio",
+                                                    "sourceField": "salesforce.apex.throughput"
+                                                },
+                                                "e9363c6b-f32e-4d19-adb4-c14777faa3a4": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
                                                     "isBucketed": false,
                                                     "label": "Action",
                                                     "operationType": "last_value",
@@ -1903,82 +1953,14 @@
                                                     "scale": "ordinal",
                                                     "sourceField": "salesforce.apex.action"
                                                 },
-                                                "2128b4e0-6345-485e-a410-87fa7ed6e610": {
-                                                    "customLabel": true,
-                                                    "dataType": "date",
-                                                    "filter": {
-                                                        "language": "kuery",
-                                                        "query": "@timestamp: *"
-                                                    },
-                                                    "isBucketed": false,
-                                                    "label": "Timestamp",
-                                                    "operationType": "last_value",
-                                                    "params": {
-                                                        "sortField": "@timestamp"
-                                                    },
-                                                    "scale": "ratio",
-                                                    "sourceField": "@timestamp"
-                                                },
-                                                "2b4a5fc5-a0ac-4b56-8543-677eb5793a5b": {
-                                                    "customLabel": true,
-                                                    "dataType": "string",
-                                                    "filter": {
-                                                        "language": "kuery",
-                                                        "query": "salesforce.apex.throughput: *"
-                                                    },
-                                                    "isBucketed": false,
-                                                    "label": "Throughput",
-                                                    "operationType": "last_value",
-                                                    "params": {
-                                                        "sortField": "@timestamp"
-                                                    },
-                                                    "scale": "ordinal",
-                                                    "sourceField": "salesforce.apex.throughput"
-                                                },
-                                                "2bcf9e0d-7b52-44f6-a7ad-ad9209c599cc": {
+                                                "ffaaffdc-d4ab-4d83-a66d-f506436a18ac": {
                                                     "customLabel": true,
                                                     "dataType": "number",
-                                                    "filter": {
-                                                        "language": "kuery",
-                                                        "query": "\"salesforce.apex.execute_ms\": *"
-                                                    },
                                                     "isBucketed": false,
                                                     "label": "Execute time (ms)",
-                                                    "operationType": "last_value",
-                                                    "params": {
-                                                        "format": {
-                                                            "id": "number",
-                                                            "params": {
-                                                                "decimals": 0
-                                                            }
-                                                        },
-                                                        "sortField": "@timestamp"
-                                                    },
+                                                    "operationType": "median",
                                                     "scale": "ratio",
                                                     "sourceField": "salesforce.apex.execute_ms"
-                                                },
-                                                "35da24b7-398e-433a-85d9-49e7862e0813": {
-                                                    "customLabel": true,
-                                                    "dataType": "string",
-                                                    "isBucketed": true,
-                                                    "label": "Entity",
-                                                    "operationType": "terms",
-                                                    "params": {
-                                                        "missingBucket": false,
-                                                        "orderBy": {
-                                                            "columnId": "2128b4e0-6345-485e-a410-87fa7ed6e610",
-                                                            "type": "column"
-                                                        },
-                                                        "orderDirection": "desc",
-                                                        "otherBucket": true,
-                                                        "parentFormat": {
-                                                            "id": "terms"
-                                                        },
-                                                        "secondaryFields": [],
-                                                        "size": 10
-                                                    },
-                                                    "scale": "ordinal",
-                                                    "sourceField": "salesforce.apex.entity"
                                                 }
                                             },
                                             "incompleteColumns": {}
@@ -1994,28 +1976,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "index": "f5e31933-76e5-4f4f-ba08-13e0d6d86c33",
-                                        "key": "event.action",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "apex-external-custom-callout"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.action": "apex-external-custom-callout"
-                                        }
-                                    }
-                                },
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "index": "01e5ec14-b8db-4040-80e7-75bc9979071e",
+                                        "indexRefName": "filter-index-pattern-0",
                                         "key": "event.dataset",
                                         "negate": false,
                                         "params": {
@@ -2028,9 +1989,29 @@
                                             "event.dataset": "salesforce.apex"
                                         }
                                     }
+                                },
+                                {
+                                    "$state": {
+                                        "store": "appState"
+                                    },
+                                    "meta": {
+                                        "alias": null,
+                                        "disabled": false,
+                                        "indexRefName": "filter-index-pattern-1",
+                                        "key": "event.action",
+                                        "negate": false,
+                                        "params": {
+                                            "query": "apex-external-custom-callout"
+                                        },
+                                        "type": "phrase"
+                                    },
+                                    "query": {
+                                        "match_phrase": {
+                                            "event.action": "apex-external-custom-callout"
+                                        }
+                                    }
                                 }
                             ],
-                            "internalReferences": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -2038,38 +2019,28 @@
                             "visualization": {
                                 "columns": [
                                     {
-                                        "alignment": "center",
-                                        "columnId": "35da24b7-398e-433a-85d9-49e7862e0813",
+                                        "columnId": "6afeaef8-f180-4d7e-8913-591ccd00973f",
                                         "isTransposed": false
                                     },
                                     {
-                                        "alignment": "center",
-                                        "columnId": "20bb0e74-5ce7-4e96-9840-bb8cb4dd08c0",
+                                        "columnId": "e9363c6b-f32e-4d19-adb4-c14777faa3a4",
                                         "isTransposed": false
                                     },
                                     {
-                                        "alignment": "center",
-                                        "columnId": "2b4a5fc5-a0ac-4b56-8543-677eb5793a5b",
+                                        "columnId": "c4c26acd-dbc6-4ba9-bd72-37847db71d7a",
                                         "isTransposed": false
                                     },
                                     {
-                                        "alignment": "center",
-                                        "columnId": "2128b4e0-6345-485e-a410-87fa7ed6e610",
+                                        "columnId": "ffaaffdc-d4ab-4d83-a66d-f506436a18ac",
                                         "isTransposed": false
                                     },
                                     {
-                                        "columnId": "2bcf9e0d-7b52-44f6-a7ad-ad9209c599cc",
+                                        "columnId": "2ed13d2d-70a3-4fd2-af65-dd655d880ad7",
                                         "isTransposed": false
                                     }
                                 ],
-                                "headerRowHeight": "auto",
-                                "layerId": "d0976ec2-a99a-4fb6-b537-d6822e644ebb",
-                                "layerType": "data",
-                                "paging": {
-                                    "enabled": true,
-                                    "size": 10
-                                },
-                                "rowHeight": "auto"
+                                "layerId": "be7d276c-1f0a-4697-a1bd-f92c2e835daa",
+                                "layerType": "data"
                             }
                         },
                         "title": "",
@@ -2080,16 +2051,16 @@
                     "hidePanelTitles": false
                 },
                 "gridData": {
-                    "h": 14,
-                    "i": "1304595e-5a54-471b-9a24-9bb9e42e0a76",
+                    "h": 17,
+                    "i": "fe451ecd-bfcd-443c-901c-0cef1a459179",
                     "w": 48,
                     "x": 0,
-                    "y": 113
+                    "y": 112
                 },
-                "panelIndex": "1304595e-5a54-471b-9a24-9bb9e42e0a76",
+                "panelIndex": "fe451ecd-bfcd-443c-901c-0cef1a459179",
                 "title": "Top 10 external calls [Filebeat Salesforce]",
                 "type": "lens",
-                "version": "8.10.0"
+                "version": "7.15.0"
             }
         ],
         "refreshInterval": {
@@ -2102,169 +2073,239 @@
         "title": "[Filebeat Salesforce] Apex Dashboard",
         "version": 1
     },
-    "coreMigrationVersion": "8.8.0",
-    "created_at": "2024-04-03T13:26:47.473Z",
-    "id": "salesforce-59ef0af0-5749-11ec-8f0b-05e8b06e1b10",
-    "managed": false,
+    "coreMigrationVersion": "7.15.0",
+    "id": "6e6bee90-f7e6-11ee-9088-0f36517484ce",
+    "migrationVersion": {
+        "dashboard": "7.15.0"
+    },
     "references": [
         {
             "id": "filebeat-*",
-            "name": "6b1afef8-3be5-4fca-a0c4-690a14979551:indexpattern-datasource-layer-bfd4a8f4-653c-49f7-bd04-dd9efd1f9aee",
+            "name": "2e30f60b-d451-4b0d-89eb-6ba01e94c2aa:control_2e30f60b-d451-4b0d-89eb-6ba01e94c2aa_0_index_pattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "6b1afef8-3be5-4fca-a0c4-690a14979551:1f72d747-4e35-45fc-a02a-a8dfde49d1ea",
+            "name": "7decef13-13b6-4eb2-bb2b-cd657951e930:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "6b1afef8-3be5-4fca-a0c4-690a14979551:4684cf9e-b284-4945-9cb8-19ff055a9439",
+            "name": "7decef13-13b6-4eb2-bb2b-cd657951e930:indexpattern-datasource-layer-f7a3c405-487c-4473-aeb5-c6f5e63de3db",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "6b1afef8-3be5-4fca-a0c4-690a14979551:8438a007-7d70-44fb-89f9-c2137ee48436",
+            "name": "7decef13-13b6-4eb2-bb2b-cd657951e930:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "8039ad1b-bbc7-4d77-bcff-77ef0299a766:indexpattern-datasource-layer-6b3e9ab2-2d33-46c3-9575-78a6bc8af75b",
+            "name": "7decef13-13b6-4eb2-bb2b-cd657951e930:filter-index-pattern-1",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "8039ad1b-bbc7-4d77-bcff-77ef0299a766:ad7e49e7-de0f-4efb-ae3f-852498e24371",
+            "name": "7decef13-13b6-4eb2-bb2b-cd657951e930:filter-index-pattern-2",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "00d05ee3-74f4-4621-9dc7-04fde76b86d9:indexpattern-datasource-layer-ce4e2479-29c1-4aa0-991e-0772b981e53e",
+            "name": "7154e44a-c51d-4881-8d23-6d822a0bd77d:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "00d05ee3-74f4-4621-9dc7-04fde76b86d9:99e1f29f-d65d-4e43-8229-0e7dada3babc",
+            "name": "7154e44a-c51d-4881-8d23-6d822a0bd77d:indexpattern-datasource-layer-83c3e25a-134f-43bf-bca7-cd3c3d33eff3",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "0a33a409-0f61-42be-82ca-7ef8b8ec052f:indexpattern-datasource-layer-197919f5-ef5b-4ae9-8432-cd2a91e337d2",
+            "name": "7154e44a-c51d-4881-8d23-6d822a0bd77d:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "0a33a409-0f61-42be-82ca-7ef8b8ec052f:4c4c54fa-53f8-4d2d-acc2-387cf2f67f6a",
+            "name": "73688f67-7274-4172-bc72-81581d1b1dc2:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "b8767bce-c060-4957-acfa-9f289be40643:indexpattern-datasource-layer-1ddfa426-0787-44a0-a6d4-7ba89384d487",
+            "name": "73688f67-7274-4172-bc72-81581d1b1dc2:indexpattern-datasource-layer-23547c7a-8041-4b0a-856d-ffc03d80fbc0",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "b8767bce-c060-4957-acfa-9f289be40643:indexpattern-datasource-layer-9518bc3e-d87d-49f2-ba14-84a071cf9140",
+            "name": "73688f67-7274-4172-bc72-81581d1b1dc2:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "ddfe72ec-6854-4bf2-b50c-41e966e8b0fa:indexpattern-datasource-layer-e5191636-4eda-47ed-a871-fbbeecb288b2",
+            "name": "be541fae-8b1f-40e5-9fcc-e552b3544773:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "ddfe72ec-6854-4bf2-b50c-41e966e8b0fa:583c98ae-1213-41a0-b63a-b064df93a70a",
+            "name": "be541fae-8b1f-40e5-9fcc-e552b3544773:indexpattern-datasource-layer-2ea8d938-401b-4b61-92c4-c476e7d3e4bc",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "ddfe72ec-6854-4bf2-b50c-41e966e8b0fa:5512a380-a0f0-43d4-8dc7-8664e8187b34",
+            "name": "be541fae-8b1f-40e5-9fcc-e552b3544773:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "36b2995c-f5ba-4699-b660-f5546cefd2a6:indexpattern-datasource-layer-70a83117-8122-47eb-80e0-dc92fc2602bb",
+            "name": "fe66cbe2-e564-49ae-a724-6440517ceb3b:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "36b2995c-f5ba-4699-b660-f5546cefd2a6:7140fce8-8a7e-4f59-9c44-52bfbb63a30b",
+            "name": "fe66cbe2-e564-49ae-a724-6440517ceb3b:indexpattern-datasource-layer-dbfc2649-500a-4d9e-8035-f2094fc75c86",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "ac98a6ec-c930-45a7-b1aa-0877e2f8d281:indexpattern-datasource-layer-70a83117-8122-47eb-80e0-dc92fc2602bb",
+            "name": "fe66cbe2-e564-49ae-a724-6440517ceb3b:indexpattern-datasource-layer-395b6aa2-d6cd-406e-9559-a0ed2b833854",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "ac98a6ec-c930-45a7-b1aa-0877e2f8d281:2bf12d97-e75b-4648-88f8-39892b8ca052",
+            "name": "fe66cbe2-e564-49ae-a724-6440517ceb3b:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "5bbe083c-eff1-4abd-b3a2-012303c07523:indexpattern-datasource-layer-0c3855f9-23b4-460b-9127-4ddcacbeaf97",
+            "name": "fe66cbe2-e564-49ae-a724-6440517ceb3b:filter-index-pattern-1",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "5bbe083c-eff1-4abd-b3a2-012303c07523:f0b44222-29c9-47aa-9645-36c7f020be1f",
+            "name": "574ede56-2b30-49a5-8888-8ae368c856af:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "97d94d13-e382-434e-99cb-dbff367cce72:indexpattern-datasource-layer-0c3855f9-23b4-460b-9127-4ddcacbeaf97",
+            "name": "574ede56-2b30-49a5-8888-8ae368c856af:indexpattern-datasource-layer-f73f968b-392e-4f0e-8c9b-351ad7370ddd",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "97d94d13-e382-434e-99cb-dbff367cce72:f810d827-8c4a-4c9f-8487-3e3a67610219",
+            "name": "574ede56-2b30-49a5-8888-8ae368c856af:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "04f06541-b6cf-4a31-865e-361ff701a4c0:indexpattern-datasource-layer-5e5e7f82-ace7-426a-975b-c01a009ccc21",
+            "name": "574ede56-2b30-49a5-8888-8ae368c856af:filter-index-pattern-1",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "04f06541-b6cf-4a31-865e-361ff701a4c0:d41d8228-27a6-47d5-9228-311aae15c18f",
+            "name": "f8ecb623-ff3c-4422-9f91-2676fe2e58e0:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "a2b4090c-077d-495a-b002-0aceddb498c7:indexpattern-datasource-layer-df249e19-0f2d-4700-96d3-0521bfff6614",
+            "name": "f8ecb623-ff3c-4422-9f91-2676fe2e58e0:indexpattern-datasource-layer-b53e356e-52be-419c-bf3d-282ec655706d",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "a2b4090c-077d-495a-b002-0aceddb498c7:3aacd3da-ed48-47df-b4ff-5e57de942969",
+            "name": "f8ecb623-ff3c-4422-9f91-2676fe2e58e0:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "1304595e-5a54-471b-9a24-9bb9e42e0a76:indexpattern-datasource-layer-d0976ec2-a99a-4fb6-b537-d6822e644ebb",
+            "name": "c713f492-059e-48c9-bddb-bfa5dff4379a:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "1304595e-5a54-471b-9a24-9bb9e42e0a76:f5e31933-76e5-4f4f-ba08-13e0d6d86c33",
+            "name": "c713f492-059e-48c9-bddb-bfa5dff4379a:indexpattern-datasource-layer-b2559ffe-87f5-4f0e-a041-671ae182cad2",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "1304595e-5a54-471b-9a24-9bb9e42e0a76:01e5ec14-b8db-4040-80e7-75bc9979071e",
+            "name": "c713f492-059e-48c9-bddb-bfa5dff4379a:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "controlGroup_2c772825-53ca-4b0a-b3f1-3a444dab9ac6:optionsListDataView",
+            "name": "9d4bd40c-a3b5-4668-a58a-118e352c3ad2:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "9d4bd40c-a3b5-4668-a58a-118e352c3ad2:indexpattern-datasource-layer-f2b00fda-234b-44d4-9ce5-7cd8c28efce3",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "9d4bd40c-a3b5-4668-a58a-118e352c3ad2:filter-index-pattern-0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "f26b8459-e1af-4cee-92ac-9e91348c2c16:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "f26b8459-e1af-4cee-92ac-9e91348c2c16:indexpattern-datasource-layer-7b43a22c-ad61-444d-a002-8cc4116b4854",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "cc5bf3a1-5a33-4204-8efc-32b2b1629e63:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "cc5bf3a1-5a33-4204-8efc-32b2b1629e63:indexpattern-datasource-layer-92994644-eb5e-41a8-871b-b0911dcbf481",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "cc5bf3a1-5a33-4204-8efc-32b2b1629e63:filter-index-pattern-0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "5904bcb3-1616-422d-855e-a86e6a69f802:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "5904bcb3-1616-422d-855e-a86e6a69f802:indexpattern-datasource-layer-84a0be7e-5127-485b-9ce2-9a9ba033a74c",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "5904bcb3-1616-422d-855e-a86e6a69f802:filter-index-pattern-0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "fe451ecd-bfcd-443c-901c-0cef1a459179:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "fe451ecd-bfcd-443c-901c-0cef1a459179:indexpattern-datasource-layer-be7d276c-1f0a-4697-a1bd-f92c2e835daa",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "fe451ecd-bfcd-443c-901c-0cef1a459179:filter-index-pattern-0",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "fe451ecd-bfcd-443c-901c-0cef1a459179:filter-index-pattern-1",
             "type": "index-pattern"
         }
     ],
     "type": "dashboard",
-    "typeMigrationVersion": "8.9.0",
-    "updated_at": "2024-04-03T13:26:47.473Z",
-    "version": "WzEwMDQwLDJd"
+    "updated_at": "2024-04-11T09:56:39.585Z",
+    "version": "WzY2OTcsMV0="
 }
