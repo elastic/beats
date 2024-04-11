@@ -63,7 +63,7 @@
     - name: affected_entities
       type: array
       description: >
-        Information about an entity affected by a Health event.
+        Information about an entity affected by a AWS Health event.
 
     - name: affected_entities.aws_account_id
       type: keyword

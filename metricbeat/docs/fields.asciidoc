@@ -1695,7 +1695,7 @@ type: text
 *`aws.awshealth.affected_entities`*::
 +
 --
-Information about an entity affected by a Health event.
+Information about an entity affected by a AWS Health event.
 
 
 type: array
