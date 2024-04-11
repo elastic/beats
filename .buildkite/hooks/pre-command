@@ -35,17 +35,7 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "fi
     with_mage
   fi
 
-<<<<<<< HEAD
-  if [[ "$BUILDKITE_STEP_KEY" == windows* ]]; then
-    git config core.autocrlf false
-    git rm --quiet --cached -r .
-    git reset --quiet --hard
-  fi
-
-  if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
-=======
   if [[ "$BUILDKITE_STEP_KEY" == *packaging* ]]; then
->>>>>>> af67c7dd89 (Moved deploy-k8s pipeline to central pipeline (#38805))
     DOCKER_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
     DOCKER_PASSWORD_SECRET=$(retry_with_count 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
     GITHUB_TOKEN_SECRET=$(retry_with_count 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
