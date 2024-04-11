@@ -20,12 +20,12 @@
 package include
 
 import (
-	// Import packages that only need to perform 'func InitializeModule()' when in-use.
+	// Import packages to perform 'func InitializeModule()' when in-use.
 	m0 "github.com/elastic/beats/v7/filebeat/autodiscover"
 	m1 "github.com/elastic/beats/v7/filebeat/autodiscover/builder/hints"
 	m2 "github.com/elastic/beats/v7/filebeat/processor/add_kubernetes_metadata"
 
-	// Import packages that only need to perform 'func init()'.
+	// Import packages that perform 'func init()'.
 	_ "github.com/elastic/beats/v7/filebeat/input"
 	_ "github.com/elastic/beats/v7/filebeat/input/container"
 	_ "github.com/elastic/beats/v7/filebeat/input/log"

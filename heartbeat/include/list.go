@@ -20,14 +20,14 @@
 package include
 
 import (
-	// Import packages that only need to perform 'func InitializeModule()' when in-use.
+	// Import packages to perform 'func InitializeModule()' when in-use.
 	m0 "github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
-	m1 "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
-	m2 "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
-	m3 "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
-	m4 "github.com/elastic/beats/v7/heartbeat/security"
+	m1 "github.com/elastic/beats/v7/heartbeat/security"
 
-	// Import packages that only need to perform 'func init()'.
+	// Import packages that perform 'func init()'.
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/http"
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/icmp"
+	_ "github.com/elastic/beats/v7/heartbeat/monitors/active/tcp"
 	_ "github.com/elastic/beats/v7/heartbeat/monitors/plugin"
 )
 
@@ -35,7 +35,4 @@ import (
 func InitializeModule() {
 	m0.InitializeModule()
 	m1.InitializeModule()
-	m2.InitializeModule()
-	m3.InitializeModule()
-	m4.InitializeModule()
 }
