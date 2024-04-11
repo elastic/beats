@@ -161,9 +161,7 @@ steps:
         command: |
           Set-Location -Path filebeat
           mage build unitTest
-        notify:
-          - github_commit_status:
-              context: "filebeat: Windows 11 Unit Tests"
+
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -179,9 +177,7 @@ steps:
         command: |
           Set-Location -Path filebeat
           mage build unitTest
-        notify:
-          - github_commit_status:
-              context: "filebeat: Windows 10 Unit Tests"
+
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
