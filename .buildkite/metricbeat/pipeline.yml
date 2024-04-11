@@ -225,7 +225,7 @@ steps:
         key: "extended-macos-unit-tests"
         command: |
           set -euo pipefail
-          .buildkite/scripts/install_macos_tools.sh
+          source .buildkite/scripts/install_macos_tools.sh
           cd metricbeat && mage build unitTest
         agents:
           provider: "orka"
