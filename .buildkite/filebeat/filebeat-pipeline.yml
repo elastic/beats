@@ -96,6 +96,8 @@ steps:
         key: "macos-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
           cd filebeat
           mage build unitTest
         agents:
@@ -109,6 +111,8 @@ steps:
         key: "macos-arm64-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
           cd filebeat
           mage build unitTest
         agents:
