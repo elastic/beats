@@ -2,15 +2,6 @@
 name: "beats-xpack-dockerlogbeat"
 
 env:
-<<<<<<< HEAD
-  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  DEFAULT_UBUNTU_X86_64_IMAGE: "family/core-ubuntu-2204"
-  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
-  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
-  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
-  BEATS_PROJECT_NAME: "x-pack/dockerlogbeat"
-=======
   BEATS_PROJECT_NAME: "x-pack/dockerlogbeat"
 
   ASDF_MAGE_VERSION: 1.15.0
@@ -34,11 +25,9 @@ env:
 
   #Packaging
   PACKAGING_ARM_PLATFORMS: "linux/arm64"
-  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
->>>>>>> 22de138c88 (Moved xpack/dockerlogbeat pipeline to central pipeline (#38826))
+  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
 
 steps:
-
   - group: "Xpack/Dockerlogbeat Mandatory Tests"
     key: "xpack-dockerlogbeat-mandatory-tests"
     steps:
@@ -78,14 +67,6 @@ steps:
     depends_on:
       - "xpack-dockerlogbeat-mandatory-tests"
 
-<<<<<<< HEAD
-  - label: ":linux: Load dynamic x-pack dockerlogbeat pipeline"
-    key: "xpack-dockerlogbeat-pipeline"
-    command: ".buildkite/scripts/generate_xpack_dockerlogbeat_pipeline.sh"
-    notify:
-      - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
-=======
     steps:
       - label: ":ubuntu: Xpack/Dockerlogbeat Packaging Linux X86"
         key: "auditbeat-package-linux-x86"
@@ -109,4 +90,3 @@ steps:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
->>>>>>> 22de138c88 (Moved xpack/dockerlogbeat pipeline to central pipeline (#38826))
