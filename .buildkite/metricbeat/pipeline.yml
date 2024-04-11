@@ -158,10 +158,10 @@ steps:
 
   - group: "Metricbeat Extended Windows Tests"
     key: "metricbeat-extended-win-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
     steps:
       - label: ":windows: Windows 10 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows-10.*/
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false"
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
@@ -180,7 +180,7 @@ steps:
               context: "metricbeat: Extended Windows 10 Unit Tests"
 
       - label: ":windows: Windows 11 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows-11.*/
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false"
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
@@ -199,7 +199,7 @@ steps:
               context: "metricbeat: Extended Windows 11 Unit Tests"
 
       - label: ":windows: Windows 2019 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows-2019.*/
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false"
         command: |
           Set-Location -Path metricbeat
           mage build unitTest
