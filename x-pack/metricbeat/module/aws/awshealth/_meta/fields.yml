@@ -61,19 +61,31 @@
       description: >
         The detailed description of the event.
     - name: affected_entities
-      type: nested
+      type: array
       description: >
         Information about an entity affected by a Health event.
-      fields:
-        - name: aws_account_id
-          type: keyword
-        - name: entity_url
-          type: keyword
-        - name: entity_value
-          type: keyword
-        - name: last_updated_time
-          type: date
-        - name: status_code
-          type: keyword
-        - name: entity_arn
-          type: keyword
+
+    - name: affected_entities.aws_account_id
+      type: keyword
+      description: >
+        The Amazon Web Services account number that contains the affected entity.
+    - name: affected_entities.entity_url
+      type: keyword
+      description: >
+        The URL of the affected entity.
+    - name: affected_entities.entity_value
+      type: keyword
+      description: >
+        The ID of the affected entity.
+    - name: affected_entities.last_updated_time
+      type: date
+      description: >
+        The most recent time that the entity was updated.
+    - name: affected_entities.status_code
+      type: keyword
+      description: >
+        The most recent status of the entity affected by the event.
+    - name: affected_entities.entity_arn
+      type: keyword
+      description: > 
+        The unique identifier for the entity. The entity ARN has the format: arn:aws:health:entity-region:aws-account:entity/entity-id.

@@ -1698,7 +1698,67 @@ type: text
 Information about an entity affected by a Health event.
 
 
-type: nested
+type: array
+
+--
+
+*`aws.awshealth.affected_entities.aws_account_id`*::
++
+--
+The Amazon Web Services account number that contains the affected entity.
+
+
+type: keyword
+
+--
+
+*`aws.awshealth.affected_entities.entity_url`*::
++
+--
+The URL of the affected entity.
+
+
+type: keyword
+
+--
+
+*`aws.awshealth.affected_entities.entity_value`*::
++
+--
+The ID of the affected entity.
+
+
+type: keyword
+
+--
+
+*`aws.awshealth.affected_entities.last_updated_time`*::
++
+--
+The most recent time that the entity was updated.
+
+
+type: date
+
+--
+
+*`aws.awshealth.affected_entities.status_code`*::
++
+--
+The most recent status of the entity affected by the event.
+
+
+type: keyword
+
+--
+
+*`aws.awshealth.affected_entities.entity_arn`*::
++
+--
+The unique identifier for the entity. The entity ARN has the format: arn:aws:health:entity-region:aws-account:entity/entity-id.
+
+
+type: keyword
 
 --
 

@@ -6,9 +6,6 @@ package awshealth
 
 import (
 	"context"
-	"crypto/sha256"
-	"encoding/hex"
-	"errors"
 	"fmt"
 	"time"
 
@@ -26,8 +23,7 @@ import (
 const metricsetName = "awshealth"
 
 var (
-	locale     = "en"
-	maxResults = int32(10)
+	locale = "en"
 )
 
 // init registers the MetricSet with the central registry as soon as the program
@@ -38,6 +34,33 @@ func init() {
 	mb.Registry.MustAddMetricSet(aws.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 	)
+}
+
+type AffectedEntityDetails struct {
+	AwsAccountId    string    `json:"aws_account_id"`
+	EntityUrl       string    `json:"entity_url"`
+	EntityValue     string    `json:"entity_value"`
+	LastUpdatedTime time.Time `json:"last_updated_time"`
+	StatusCode      string    `json:"status_code"`
+	EntityArn       string    `json:"entity_arn"`
+}
+
+type AWSHealthMetric struct {
+	EventArn                 string                  `json:"event_arn"`
+	EndTime                  time.Time               `json:"end_time"`
+	EventScopeCode           string                  `json:"event_scope_code"`
+	EventTypeCategory        string                  `json:"event_type_category"`
+	EventTypeCode            string                  `json:"event_type_code"`
+	LastUpdatedTime          time.Time               `json:"last_updated_time"`
+	Region                   string                  `json:"region"`
+	Service                  string                  `json:"service"`
+	StartTime                time.Time               `json:"start_time"`
+	StatusCode               string                  `json:"status_code"`
+	AffectedEntitiesPending  int32                   `json:"affected_entities_pending"`
+	AffectedEntitiesResolved int32                   `json:"affected_entities_resolved"`
+	AffectedEntitiesOthers   int32                   `json:"affected_entities_others"`
+	AffectedEntities         []AffectedEntityDetails `json:"affected_entities"`
+	EventDescription         string                  `json:"event_description"`
 }
 
 // MetricSet holds any configuration or state information. It must implement
@@ -101,8 +124,7 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 	})
-
-	events := m.getEventsSummary(ctx, health_client)
+	events := m.getEventDetails(ctx, health_client)
 	for _, event := range events {
 		report.Event(event)
 	}
@@ -110,11 +132,11 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 	return nil
 }
 
-// getEventsSummary retrieves a summary of AWS Health events which are upcoming
+// getEventDetails retrieves a AWS Health events which are upcoming
 // or open. It uses the DescribeEvents API to get a list of events. Each event is
 // identified by a Event ARN. The function returns a slice of mb.Event structs
 // containing the summarized event info.
-func (m *MetricSet) getEventsSummary(
+func (m *MetricSet) getEventDetails(
 	ctx context.Context,
 	awsHealth *health.Client,
 ) []mb.Event {
@@ -125,307 +147,166 @@ func (m *MetricSet) getEventsSummary(
 			types.EventStatusCodeOpen,
 		},
 	}
-
 	var (
-		nextTokenString string
-		eventOutput     *health.DescribeEventsOutput
-		err             error
+		deEvents          []types.Event
+		affPage           health.DescribeAffectedEntitiesPaginator
+		healthDetails     []AWSHealthMetric
+		healthDetailsTemp []AWSHealthMetric
+		affEntityTemp     AffectedEntityDetails
+		affInputParams    health.DescribeAffectedEntitiesInput
 	)
-	errCh := make(chan error, maxResults)
 
-	// Create buffered channel to receive event with event description and affected entity details
-	c := make(chan HealthDetails, maxResults)
+	// Create an instance of DescribeEventsInput with desired parameters
+	deInputParams := health.DescribeEventsInput{
+		Filter: &eventFilter,
+	}
 
-	for {
-		// When invoking the DescribeEvents for the first time, there must not exist any NextToken.
-		// Upon calling the DescribeEvents API, the next token will be returned if there are additional records available for querying.
-		// If there are no more records to fetch, the next token will be empty.
-		if nextTokenString == "" {
-			eventOutput, err = awsHealth.DescribeEvents(ctx,
-				&health.DescribeEventsInput{
-					Filter:     &eventFilter,
-					MaxResults: &maxResults,
-				},
-			)
-		} else {
-			eventOutput, err = awsHealth.DescribeEvents(ctx,
-				&health.DescribeEventsInput{
-					Filter:     &eventFilter,
-					MaxResults: &maxResults,
-					NextToken:  &nextTokenString,
-				},
-			)
-		}
+	// Create an instance of DescribeEventsPaginatorOptions with desired options
+	deOptions := &health.DescribeEventAggregatesPaginatorOptions{
+		Limit:                10,
+		StopOnDuplicateToken: true,
+	}
 
+	// Create a function option to apply the options to the paginator
+	deOptFn := func(options *health.DescribeEventsPaginatorOptions) {
+		// Apply the provided options
+		options.Limit = deOptions.Limit
+		options.StopOnDuplicateToken = deOptions.StopOnDuplicateToken
+	}
+
+	affOptions := &health.DescribeAffectedEntitiesPaginatorOptions{
+		Limit:                10,
+		StopOnDuplicateToken: true,
+	}
+	affOptFn := func(options *health.DescribeAffectedEntitiesPaginatorOptions) {
+		// Apply the provided options
+		options.Limit = affOptions.Limit
+		options.StopOnDuplicateToken = affOptions.StopOnDuplicateToken
+	}
+
+	dePage := health.NewDescribeEventsPaginator(awsHealth, &deInputParams, deOptFn)
+
+	for dePage.HasMorePages() {
+		healthDetailsTemp = []AWSHealthMetric{}
+
+		// Perform actions for the current page
+		currentPage, err := dePage.NextPage(ctx)
 		if err != nil {
 			m.Logger().Errorf("[AWS Health] DescribeEvents failed with : %w", err)
-			return nil
-		}
-		ets := eventOutput.Events
-		select {
-		case <-ctx.Done():
-			// Context cancelled, handle graceful termination
-			close(c)
-			return nil
-		default:
-			// Context not cancelled, proceed with the function
-		}
-
-		for i := range ets {
-			m.Logger().Debugf("[AWS Health] [Fetch DescribeEventDetails] Event ARN : %s", getValueOrDefault(ets[i].Arn, ""))
-			go func(et types.Event) {
-				err := m.getDescribeEventDetails(ctx, awsHealth, et, c)
-				if err != nil {
-					errCh <- err
-				}
-			}(ets[i])
-		}
-
-		for i := 0; i < len(ets); i++ {
-			select {
-			case <-ctx.Done():
-				// Context cancelled, handle graceful termination
-				m.Logger().Debug("Context cancelled. Exiting gracefully.")
-				close(c)
-				return nil
-			case err := <-errCh:
-				// Handle errors received from goroutines
-				m.Logger().Error(err.Error())
-			case healthDetails, ok := <-c:
-				if !ok {
-					return nil
-				}
-				m.Logger().Debugf("[AWS Health] [DescribeEventDetails] Event ARN : %s, Affected Entities (Pending) : %d, Affected Entities (Resolved): %d, Affected Entities (Others) : %d", *healthDetails.event.Arn, healthDetails.affectedEntityPending, healthDetails.affectedEntityResolved, healthDetails.affectedEntityOthers)
-				events = append(events, createEvents(healthDetails))
-			}
-		}
-		if eventOutput.NextToken == nil {
 			break
 		}
-		nextTokenString = *eventOutput.NextToken
+		deEvents = currentPage.Events
+		eventArns := make([]string, len(deEvents))
+		for i := range deEvents {
+			healthDetailsTemp = append(healthDetailsTemp, AWSHealthMetric{
+				EventArn:          awssdk.ToString(deEvents[i].Arn),
+				EndTime:           awssdk.ToTime(deEvents[i].EndTime),
+				EventScopeCode:    awssdk.ToString((*string)(&deEvents[i].EventScopeCode)),
+				EventTypeCategory: awssdk.ToString((*string)(&deEvents[i].EventTypeCategory)),
+				EventTypeCode:     awssdk.ToString(deEvents[i].EventTypeCode),
+				LastUpdatedTime:   awssdk.ToTime(deEvents[i].LastUpdatedTime),
+				Region:            awssdk.ToString(deEvents[i].Region),
+				Service:           awssdk.ToString(deEvents[i].Service),
+				StartTime:         awssdk.ToTime(deEvents[i].StartTime),
+				StatusCode:        awssdk.ToString((*string)(&deEvents[i].StatusCode)),
+			})
+			eventArns[i] = awssdk.ToString(deEvents[i].Arn)
+		}
+
+		eventDetails, err := awsHealth.DescribeEventDetails(ctx, &health.DescribeEventDetailsInput{
+			EventArns: eventArns,
+			Locale:    &locale,
+		})
+		if err != nil {
+			m.Logger().Errorf("[AWS Health] DescribeEventDetails failed with : %w", err)
+			break
+		}
+
+		successSet := eventDetails.SuccessfulSet
+		for x := range successSet {
+			for y := range healthDetailsTemp {
+				if awssdk.ToString(successSet[x].Event.Arn) == healthDetailsTemp[y].EventArn {
+					healthDetailsTemp[y].EventDescription = awssdk.ToString(successSet[x].EventDescription.LatestDescription)
+				}
+			}
+		}
+		// Fetch the details of all the affected Entities related to the EvenARNs in the present page of DescribeEvents API call
+
+		affInputParams = health.DescribeAffectedEntitiesInput{
+			Filter: &types.EntityFilter{
+				EventArns: eventArns,
+			},
+		}
+		affPage = *health.NewDescribeAffectedEntitiesPaginator(
+			awsHealth,
+			&affInputParams,
+			affOptFn,
+		)
+
+		for affPage.HasMorePages() {
+			affCurrentPage, err := affPage.NextPage(ctx)
+			if err != nil {
+				m.Logger().Errorf("[AWS Health] DescribeAffectedEntitie failed with : %w", err)
+				break
+			}
+			for k := range affCurrentPage.Entities {
+				affEntityTemp = AffectedEntityDetails{
+					AwsAccountId:    awssdk.ToString(affCurrentPage.Entities[k].AwsAccountId),
+					EntityUrl:       awssdk.ToString(affCurrentPage.Entities[k].EntityUrl),
+					EntityValue:     awssdk.ToString(affCurrentPage.Entities[k].EntityValue),
+					LastUpdatedTime: awssdk.ToTime(affCurrentPage.Entities[k].LastUpdatedTime),
+					StatusCode:      awssdk.ToString((*string)(&affCurrentPage.Entities[k].StatusCode)),
+					EntityArn:       awssdk.ToString(affCurrentPage.Entities[k].EntityArn),
+				}
+				for l := range healthDetailsTemp {
+
+					if awssdk.ToString(affCurrentPage.Entities[k].EventArn) == healthDetailsTemp[l].EventArn {
+						healthDetailsTemp[l].AffectedEntities = append(healthDetailsTemp[l].AffectedEntities, affEntityTemp)
+						switch awssdk.ToString((*string)(&affCurrentPage.Entities[k].StatusCode)) {
+						case "PENDING":
+							healthDetailsTemp[l].AffectedEntitiesPending++
+						case "RESOLVED":
+							healthDetailsTemp[l].AffectedEntitiesResolved++
+						case "":
+							// Do Nothing
+						default:
+							healthDetailsTemp[l].AffectedEntitiesOthers++
+
+						}
+					}
+				}
+			}
+
+		}
+		healthDetails = append(healthDetails, healthDetailsTemp...)
 	}
-	close(c)
-	close(errCh)
+
+	for _, detail := range healthDetails {
+		event := mb.Event{
+			MetricSetFields: mapstr.M{
+				"event_arn":                  detail.EventArn,
+				"end_time":                   detail.EndTime,
+				"event_scope_code":           detail.EventScopeCode,
+				"event_type_category":        detail.EventTypeCategory,
+				"event_type_code":            detail.EventTypeCode,
+				"last_updated_time":          detail.LastUpdatedTime,
+				"region":                     detail.Region,
+				"service":                    detail.Service,
+				"start_time":                 detail.StartTime,
+				"status_code":                detail.StatusCode,
+				"affected_entities":          detail.AffectedEntities,
+				"event_description":          detail.EventDescription,
+				"affected_entities_pending":  detail.AffectedEntitiesPending,
+				"affected_entities_resolved": detail.AffectedEntitiesResolved,
+				"affected_entities_others":   detail.AffectedEntitiesOthers,
+			},
+			RootFields: mapstr.M{
+				"cloud.provider": "aws",
+			},
+			Service: "aws-health",
+		}
+
+		events = append(events, event)
+	}
 	return events
-}
-
-// createEvents takes in a HealthDetails struct and returns an mb.Event struct
-// populated with the data from the HealthDetails. It sets the MetricSetFields,
-// RootFields and ID fields of the mb.Event struct. The MetricSetFields contain
-// the details of the health event. The RootFields specify that it is an AWS
-// event. The ID is generated from the event ARN, status code and current date.
-func createEvents(hd HealthDetails) mb.Event {
-	currentDate := getCurrentDateTime()
-	eventID := currentDate + getValueOrDefault(hd.event.Arn, "") + getValueOrDefault((*string)(&hd.event.StatusCode), "")
-	event := mb.Event{
-		MetricSetFields: mapstr.M{
-			"event_arn":                  getValueOrDefault(hd.event.Arn, ""),
-			"end_time":                   getValueOrDefault(hd.event.EndTime, time.Time{}),
-			"event_scope_code":           getValueOrDefault((*string)(&hd.event.EventScopeCode), ""),
-			"event_type_category":        getValueOrDefault((*string)(&hd.event.EventTypeCategory), ""),
-			"event_type_code":            getValueOrDefault(hd.event.EventTypeCode, ""),
-			"last_updated_time":          getValueOrDefault(hd.event.LastUpdatedTime, time.Time{}),
-			"region":                     getValueOrDefault(hd.event.Region, ""),
-			"service":                    getValueOrDefault(hd.event.Service, ""),
-			"start_time":                 getValueOrDefault(hd.event.StartTime, time.Time{}),
-			"status_code":                getValueOrDefault((*string)(&hd.event.StatusCode), ""),
-			"affected_entities_pending":  hd.affectedEntityPending,
-			"affected_entities_resolved": hd.affectedEntityResolved,
-			"affected_entities_others":   hd.affectedEntityOthers,
-			"affected_entities":          createAffectedEntityDetails(hd.affectedEntities),
-			"event_description":          hd.eventDescription,
-		},
-		RootFields: mapstr.M{
-			"cloud.provider": "aws",
-		},
-		ID: generateEventID(eventID),
-	}
-	return event
-}
-
-type HealthDetails struct {
-	event                  types.Event
-	eventDescription       string
-	affectedEntities       []types.AffectedEntity
-	affectedEntityPending  int32
-	affectedEntityResolved int32
-	affectedEntityOthers   int32
-}
-
-type AffectedEntityDetails struct {
-	AwsAccountId    string    `json:"aws_account_id"`
-	EntityUrl       string    `json:"entity_url"`
-	EntityValue     string    `json:"entity_value"`
-	LastUpdatedTime time.Time `json:"last_updated_time"`
-	StatusCode      string    `json:"status_code"`
-	EntityArn       string    `json:"entity_arn"`
-}
-
-// getValueOrDefault returns the dereferenced value of a pointer v of any type T.
-// If the pointer is nil, it returns the specified defaultValue of type T.
-func getValueOrDefault[T any](v *T, defaultValue T) T {
-	if v != nil {
-		return *v
-	}
-	return defaultValue
-}
-
-func createAffectedEntityDetails(affectedEntities []types.AffectedEntity) []AffectedEntityDetails {
-	aed := make([]AffectedEntityDetails, len(affectedEntities))
-	for i := range affectedEntities {
-		aed[i] = AffectedEntityDetails{
-			AwsAccountId:    getValueOrDefault(affectedEntities[i].AwsAccountId, ""),
-			EntityUrl:       getValueOrDefault(affectedEntities[i].EntityUrl, ""),
-			EntityValue:     getValueOrDefault(affectedEntities[i].EntityValue, ""),
-			LastUpdatedTime: getValueOrDefault(affectedEntities[i].LastUpdatedTime, time.Time{}),
-			StatusCode:      getValueOrDefault((*string)(&affectedEntities[i].StatusCode), ""),
-			EntityArn:       getValueOrDefault(affectedEntities[i].EntityArn, ""),
-		}
-	}
-	return aed
-}
-
-// generateEventID hashes the provided eventID and returns the first 20 characters.
-// This is used to generate a unique but consistent event ID prefix.
-func generateEventID(eventID string) string {
-	h := sha256.New()
-	h.Write([]byte(eventID))
-	prefix := hex.EncodeToString(h.Sum(nil))
-	return prefix[:20]
-}
-
-// getEventsSummary retrieves a summary of AWS Health events that meet the specified
-// filter criteria. It uses the DescribeEvents API to get a list of events. For each
-// event, it calls getDescribeEventDetails with the EventARN to get details like details
-// of affected entities by calling DescribeAffectedEntities API. The DescribeAffectedEntities
-// is called to fetch the description of the event.
-// The function returns a slice of mb.Event structs containing the summarized event info.
-func (m *MetricSet) getDescribeEventDetails(ctx context.Context, awsHealth *health.Client, event types.Event, ch chan<- HealthDetails) error {
-	hd := HealthDetails{event: event, affectedEntities: []types.AffectedEntity{}}
-	eventDetails, err := awsHealth.DescribeEventDetails(ctx, &health.DescribeEventDetailsInput{
-		EventArns: []string{*event.Arn},
-		Locale:    &locale,
-	})
-	if err != nil {
-		if errors.Is(err, context.Canceled) {
-			m.Logger().Debug("Context cancelled. Exiting gracefully.")
-			return nil
-		}
-		err = fmt.Errorf("[AWS Health] DescribeEventDetails failed with : %w", err)
-		return err
-	}
-
-	if len(eventDetails.SuccessfulSet) > 0 {
-		hd.eventDescription = *(eventDetails.SuccessfulSet[0].EventDescription.LatestDescription)
-	} else {
-		hd.eventDescription = "Unable to find event description details."
-	}
-
-	var (
-		affEntityTokString string
-		nextToken          *string
-		pending            int32
-		resolved           int32
-		others             int32
-	)
-
-	for {
-		// When invoking the DescribeAffectedEntities for the first time, there must not exist any NextToken.
-		// DescribeAffectedEntities API call will return the next token if there are more records left for querying
-		// If there exist no further records to fetch, next toke will be empty.
-		if affEntityTokString == "" {
-			affectedEntities, err := awsHealth.DescribeAffectedEntities(ctx, &health.DescribeAffectedEntitiesInput{
-				Filter: &types.EntityFilter{
-					EventArns: []string{*event.Arn},
-				},
-				Locale:     &locale,
-				MaxResults: &maxResults,
-			})
-			if err != nil {
-				err = fmt.Errorf("AWS Health DescribeAffectedEntities failed with : %w", err)
-
-				// Check if the error is due to context cancellation
-				if errors.Is(err, context.Canceled) {
-					m.Logger().Debug("Context cancelled. Exiting gracefully.")
-					return nil
-				}
-				return err
-			}
-			if affectedEntities != nil {
-				nextToken = affectedEntities.NextToken
-
-				hd.affectedEntities = append(hd.affectedEntities, affectedEntities.Entities...)
-				for _, affEntity := range affectedEntities.Entities {
-					switch affEntity.StatusCode {
-					case "PENDING":
-						pending++
-					case "RESOLVED":
-						resolved++
-					case "":
-						// Do nothing
-					default:
-						others++
-					}
-				}
-			}
-
-		} else {
-			affectedEntities, err := awsHealth.DescribeAffectedEntities(ctx, &health.DescribeAffectedEntitiesInput{
-				Filter: &types.EntityFilter{
-					EventArns: []string{*event.Arn},
-				},
-				Locale:     &locale,
-				MaxResults: &maxResults,
-				NextToken:  &affEntityTokString,
-			})
-			if err != nil {
-				err = fmt.Errorf("AWS Health DescribeAffectedEntities failed with : %w", err)
-
-				// Check if the error is due to context cancellation
-				if errors.Is(err, context.Canceled) {
-					m.Logger().Info("Context cancelled. Exiting gracefully.")
-					return nil
-				}
-				return err
-			}
-			if affectedEntities != nil {
-				nextToken = affectedEntities.NextToken
-				hd.affectedEntities = append(hd.affectedEntities, affectedEntities.Entities...)
-
-				for _, affEntity := range affectedEntities.Entities {
-					switch affEntity.StatusCode {
-					case "PENDING":
-						pending++
-					case "RESOLVED":
-						resolved++
-					case "":
-						// Do nothing
-					default:
-						others++
-					}
-				}
-			}
-		}
-		if nextToken == nil {
-			break
-		}
-		affEntityTokString = *nextToken
-	}
-	hd.affectedEntityResolved = resolved
-	hd.affectedEntityPending = pending
-	hd.affectedEntityOthers = others
-
-	select {
-	case ch <- hd:
-		// Writing to the channel
-	default:
-		// Channel buffer is full or closed, dropping the event to avoid blocking.
-		return nil
-	}
-	return nil
-}
-
-func getCurrentDateTime() string {
-	// Reference: https://golang.org/pkg/time/#Time.Format
-	return time.Now().Format("20060102150405")
 }
