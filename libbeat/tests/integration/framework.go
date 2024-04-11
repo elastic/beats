@@ -26,7 +26,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -115,6 +114,7 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 			"--path.logs", tempDir,
 			"-E", "logging.to_files=true",
 			"-E", "logging.files.rotateeverybytes=104857600", // About 100MB
+			"-E", "logging.files.rotateonstartup=false",
 		}, args...),
 		tempDir:    tempDir,
 		beatName:   beatName,
@@ -154,6 +154,7 @@ func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatPr
 			"--path.logs", tempDir,
 			"-E", "logging.to_files=true",
 			"-E", "logging.files.rotateeverybytes=104857600", // About 100MB
+			"-E", "logging.files.rotateonstartup=false",
 		}, args...),
 		tempDir:    tempDir,
 		beatName:   beatName,
@@ -539,7 +540,7 @@ func (b *BeatProc) LoadMeta() (Meta, error) {
 	}
 	defer metaFile.Close()
 
-	metaBytes, err := ioutil.ReadAll(metaFile)
+	metaBytes, err := io.ReadAll(metaFile)
 	require.NoError(b.t, err, "error reading meta file")
 	err = json.Unmarshal(metaBytes, &m)
 	require.NoError(b.t, err, "error unmarshalling meta data")
@@ -726,5 +727,40 @@ func reportErrors(t *testing.T, tempDir string, beatName string) {
 			t.Logf("error reading %s: %s", f, err)
 		}
 		t.Logf("Last %d bytes of %s:\n%s", len(contents), f, string(contents))
+	}
+}
+
+// GenerateLogFile writes count lines to path, each line is 50 bytes.
+// Each line contains the current time (RFC3339) and a counter
+func GenerateLogFile(t *testing.T, path string, count int, append bool) {
+	var file *os.File
+	var err error
+	if !append {
+		file, err = os.Create(path)
+		if err != nil {
+			t.Fatalf("could not create file '%s': %s", path, err)
+		}
+	} else {
+		file, err = os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+		if err != nil {
+			t.Fatalf("could not open or create file: '%s': %s", path, err)
+		}
+	}
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			t.Fatalf("could not close file: %s", err)
+		}
+	}()
+	defer func() {
+		if err := file.Sync(); err != nil {
+			t.Fatalf("could not sync file: %s", err)
+		}
+	}()
+	now := time.Now().Format(time.RFC3339)
+	for i := 0; i < count; i++ {
+		if _, err := fmt.Fprintf(file, "%s           %13d\n", now, i); err != nil {
+			t.Fatalf("could not write line %d to file: %s", count+1, err)
+		}
 	}
 }

@@ -23,7 +23,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 *Metricbeat*
-
+- Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 
 *Osquerybeat*
 
@@ -61,6 +61,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Lower logging level to debug when attempting to configure beats with unknown fields from autodiscovered events/environments {pull}[37816][37816]
 - Set timeout of 1 minute for FQDN requests {pull}37756[37756]
 - Fix the paths in the .cmd script added to the path by the Windows MSI to point to the new C:\Program Files installation location. https://github.com/elastic/elastic-stack-installers/pull/238
+- Change cache processor documentation from `write_period` to `write_interval`. {pull}38561[38561]
+- Fix cache processor expiries heap cleanup on partial file writes. {pull}38561[38561]
+- Fix cache processor expiries infinite growth when large a large TTL is used and recurring keys are cached. {pull}38561[38561]
 
 *Auditbeat*
 
@@ -94,6 +97,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix filebeat gcs input panic {pull}38407[38407]
 - Rename `activity_guid` to `activity_id` in ETW input events to suit other Windows inputs. {pull}38530[38530]
 - Add missing provider registration and fix published entity for Active Directory entityanalytics provider. {pull}38645[38645]
+- Fix handling of un-parsed JSON in O365 module. {issue}37800[37800] {pull}38709[38709]
+- Fix filestream's registry GC: registry entries are now removed from the in-memory and disk store when they're older than the set TTL {issue}36761[36761] {pull}38488[38488]
+- Fix indexing failures by re-enabling event normalisation in netflow input. {issue}38703[38703] {pull}38780[38780]
 
 *Heartbeat*
 
@@ -104,7 +110,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Heartbeat*
 
-- Fix reference yaml format. {pull}38584[38584]
 
 *Metricbeat*
 
@@ -135,6 +140,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 - Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
+- Update to Go 1.21.9. {pulk}38727[38727]
+- Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 
 *Auditbeat*
 
@@ -144,6 +151,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add linux capabilities to processes in the system/process. {pull}37453[37453]
 - Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
 - Add process data to file events (Linux only, eBPF backend). {pull}38199[38199]
+- Add container id to file events (Linux only, eBPF backend). {pull}38328[38328]
 
 *Filebeat*
 
@@ -207,6 +215,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Add new fields to configure the lease duration, retry and renew when using leader elector with kubernetes autodiscover.{pull}38471[38471]
 - Add per-thread metrics to system_summary {pull}33614[33614]
 - Add GCP CloudSQL metadata {pull}33066[33066]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
@@ -276,6 +285,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
