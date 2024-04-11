@@ -18,6 +18,7 @@
 package logp
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -49,4 +50,32 @@ func TestLoggerWithOptions(t *testing.T) {
 	observedEntries2 := observed2.All()
 	require.Len(t, observedEntries2, 1)
 	assert.Equal(t, "hello logger1 and logger2", observedEntries2[0].Message)
+}
+
+func TestNewInMemory(t *testing.T) {
+	log, buff := NewInMemory("in_memory", ConsoleEncoderConfig())
+
+	log.Debugw("a debug message", "debug_key", "debug_val")
+	log.Infow("a info message", "info_key", "info_val")
+	log.Warnw("a warn message", "warn_key", "warn_val")
+	log.Errorw("an error message", "error_key", "error_val")
+
+	logs := strings.Split(strings.TrimSpace(buff.String()), "\n")
+	assert.Len(t, logs, 4, "expected 4 log entries")
+
+	assert.Contains(t, logs[0], "a debug message")
+	assert.Contains(t, logs[0], "debug_key")
+	assert.Contains(t, logs[0], "debug_val")
+
+	assert.Contains(t, logs[1], "a info message")
+	assert.Contains(t, logs[1], "info_key")
+	assert.Contains(t, logs[1], "info_val")
+
+	assert.Contains(t, logs[2], "a warn message")
+	assert.Contains(t, logs[2], "warn_key")
+	assert.Contains(t, logs[2], "warn_val")
+
+	assert.Contains(t, logs[3], "an error message")
+	assert.Contains(t, logs[3], "error_key")
+	assert.Contains(t, logs[3], "error_val")
 }
