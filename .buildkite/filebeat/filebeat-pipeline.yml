@@ -20,8 +20,8 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
 
 steps:
-  - group: "Build&Test"
-    key: "mandatory-tests"
+  - group: "Filebeat Mandatory Tests"
+    key: "filebeat-mandatory-tests"
     steps:
       - label: ":ubuntu: Ubuntu Unit Tests"
         command: |
@@ -89,8 +89,8 @@ steps:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
 
-  - group: "Extended"
-    key: "extended-tests"
+  - group: "Filebeat Extended Tests"
+    key: "filebeat-extended-tests"
     steps:
       - label: ":mac: MacOS Unit Tests"
         key: "macos-unit-tests-extended"
@@ -148,13 +148,12 @@ steps:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
 
-  - group: "ExtendedWin"
-    key: "extended-win"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows-[11,10].*/
+  - group: "Extended Windows Tests"
+    key: "filebeat-extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
     steps:
       - label: ":windows: Windows 11 Unit Tests"
         key: "windows-extended-11"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows-11.*/
         command: |
           Set-Location -Path filebeat
           mage build unitTest
@@ -173,7 +172,6 @@ steps:
 
       - label: ":windows: Windows 10 Unit Tests"
         key: "windows-extended-10"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows-10.*/
         command: |
           Set-Location -Path filebeat
           mage build unitTest
@@ -190,12 +188,15 @@ steps:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
 
-  - group: "Packaging"
+  - wait: ~
+    # with PRs, we want to run packaging only if mandatory tests succeed
+    # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in mandatory tests
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "metricbeat-mandatory-tests"
+
+  - group: "Filebeat Packaging"
     key: "packaging"
-    # we have :Package, Packaging so match both of them in a single regexp
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*:?[pP]ackag[ei][ng]?.*/
-    depends_on:
-      - "mandatory-tests"
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
