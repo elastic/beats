@@ -237,6 +237,8 @@ with_docker_compose() {
   local version=$1
   echo "Setting up the Docker-compose environment..."
   create_workspace
+  echo "$arch_type"                   #TODO: revobe after debugging
+  echo "$platform_type_lowercase"     #TODO: revobe after debugging
   retry 3 curl -sSL -o ${BIN}/docker-compose "https://github.com/docker/compose/releases/download/${version}/docker-compose-${platform_type_lowercase}-${arch_type}"
   chmod +x ${BIN}/docker-compose
   export PATH="${BIN}:${PATH}"
@@ -247,12 +249,13 @@ with_macos_docker_compose() {
   echo "Setting up the Docker-compose environment..."
   create_workspace
   if [ "${arch_type}" == "arm64" ]; then
-    local docker_compose_url="https://github.com/docker/compose/releases/download/v2.21.0/docker-compose-darwin-aarch64"
+    local version="${DOCKER_COMPOSE_VERSION_AARCH64}"
+    local docker_compose_url="https://github.com/docker/compose/releases/download/${version}/docker-compose-darwin-aarch64"
   elif [ "${arch_type}" == "x86_64" ]; then
-    local docker_compose_url="https://github.com/docker/compose/releases/download/1.21.0/docker-compose-Darwin-x86_64"
+    local version="${DOCKER_COMPOSE_VERSION}"
+    local docker_compose_url="https://github.com/docker/compose/releases/download/${version}/docker-compose-Darwin-x86_64"
   fi
   retry 3 curl -sSL -o ${BIN}/docker-compose "${docker_compose_url}"
-  ls -la ${BIN}                   #TODO: revobe after debugging
   chmod +x ${BIN}/docker-compose
   export PATH="${BIN}:${PATH}"
   docker-compose version
@@ -280,26 +283,6 @@ check_platform_architeture() {
       ;;
     "arm64")
       go_arch_type="arm64"
-      ;;
-    *)
-    echo "The current platform or OS type is unsupported yet"
-    ;;
-  esac
-}
-
-define_platform_architeture_for_docker_compose() {
-  case "${arch_type}" in
-    "x86_64")
-      docker_compose_arch_type="x86_64"
-      ;;
-    "amd64")
-      docker_compose_arch_type="x86_64"
-      ;;
-    "aarch64")
-      docker_compose_arch_type="aarch64"
-      ;;
-    "arm64")
-      docker_compose_arch_type="aarch64"
       ;;
     *)
     echo "The current platform or OS type is unsupported yet"
