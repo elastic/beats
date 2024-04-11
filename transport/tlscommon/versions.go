@@ -38,12 +38,25 @@ func (v TLSVersion) Details() *TLSVersionDetails {
 }
 
 // Unpack transforms the string into a constant.
-func (v *TLSVersion) Unpack(s string) error {
-	version, found := tlsProtocolVersions[s]
-	if !found {
-		return fmt.Errorf("invalid tls version '%v'", s)
+func (v *TLSVersion) Unpack(i interface{}) error {
+	switch o := i.(type) {
+	case string:
+		version, found := tlsProtocolVersions[o]
+		if !found {
+			return fmt.Errorf("invalid tls version '%v'", o)
+		}
+		*v = version
+	case uint64:
+		*v = TLSVersion(o)
+	default:
+		return fmt.Errorf("tls version is an unknown type: %T", o)
 	}
+	return nil
+}
 
-	*v = version
+func (v *TLSVersion) Validate() error {
+	if *v < TLSVersionMin || *v > TLSVersionMax {
+		return fmt.Errorf("unsupported tls version: %v", v)
+	}
 	return nil
 }

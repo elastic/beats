@@ -159,28 +159,37 @@ func (m TLSVerificationMode) MarshalText() ([]byte, error) {
 	return nil, fmt.Errorf("could not marshal '%+v' to text", m)
 }
 
-// Unpack unpacks the string into constants.
+// Unpack unpacks the input into a TLSVerificationMode.
 func (m *TLSVerificationMode) Unpack(in interface{}) error {
 	if in == nil {
 		*m = VerifyFull
 		return nil
 	}
 
-	s, ok := in.(string)
-	if !ok {
-		return fmt.Errorf("verification mode must be an identifier")
-	}
-	if s == "" {
-		*m = VerifyFull
-		return nil
-	}
+	switch o := in.(type) {
+	case string:
+		if o == "" {
+			*m = VerifyFull
+			return nil
+		}
 
-	mode, found := tlsVerificationModes[s]
-	if !found {
-		return fmt.Errorf("unknown verification mode '%v'", s)
+		mode, found := tlsVerificationModes[o]
+		if !found {
+			return fmt.Errorf("unknown verification mode '%v'", o)
+		}
+		*m = mode
+	case uint64:
+		*m = TLSVerificationMode(o)
+	default:
+		return fmt.Errorf("verification mode is an unknown type: %T", o)
 	}
+	return nil
+}
 
-	*m = mode
+func (m *TLSVerificationMode) Validate() error {
+	if *m > VerifyStrict {
+		return fmt.Errorf("unsupported verification mode: %v", m)
+	}
 	return nil
 }
 
@@ -214,13 +223,20 @@ func (m *TLSClientAuth) Unpack(s string) error {
 
 type CipherSuite uint16
 
-func (cs *CipherSuite) Unpack(s string) error {
-	suite, found := tlsCipherSuites[s]
-	if !found {
-		return fmt.Errorf("invalid tls cipher suite '%v'", s)
-	}
+func (cs *CipherSuite) Unpack(i interface{}) error {
+	switch o := i.(type) {
+	case string:
+		suite, found := tlsCipherSuites[o]
+		if !found {
+			return fmt.Errorf("invalid tls cipher suite '%v'", o)
+		}
 
-	*cs = suite
+		*cs = suite
+	case uint64:
+		*cs = CipherSuite(o)
+	default:
+		return fmt.Errorf("cipher suite is an unknown type: %T", o)
+	}
 	return nil
 }
 
@@ -233,13 +249,20 @@ func (cs CipherSuite) String() string {
 
 type tlsCurveType tls.CurveID
 
-func (ct *tlsCurveType) Unpack(s string) error {
-	t, found := tlsCurveTypes[s]
-	if !found {
-		return fmt.Errorf("invalid tls curve type '%v'", s)
-	}
+func (ct *tlsCurveType) Unpack(i interface{}) error {
+	switch o := i.(type) {
+	case string:
+		t, found := tlsCurveTypes[o]
+		if !found {
+			return fmt.Errorf("invalid tls curve type '%v'", o)
+		}
 
-	*ct = t
+		*ct = t
+	case uint64:
+		*ct = tlsCurveType(o)
+	default:
+		return fmt.Errorf("tls curve type is an unsupported input type: %T", o)
+	}
 	return nil
 }
 
@@ -252,13 +275,20 @@ func (r TLSRenegotiationSupport) String() string {
 	return "<" + unknownType + ">"
 }
 
-func (r *TLSRenegotiationSupport) Unpack(s string) error {
-	t, found := tlsRenegotiationSupportTypes[s]
-	if !found {
-		return fmt.Errorf("invalid tls renegotiation type '%v'", s)
-	}
+func (r *TLSRenegotiationSupport) Unpack(i interface{}) error {
+	switch o := i.(type) {
+	case string:
+		t, found := tlsRenegotiationSupportTypes[o]
+		if !found {
+			return fmt.Errorf("invalid tls renegotiation type '%v'", o)
+		}
 
-	*r = t
+		*r = t
+	case uint64:
+		*r = TLSRenegotiationSupport(o)
+	default:
+		return fmt.Errorf("tls renegotation support is an unknown type: %T", o)
+	}
 	return nil
 }
 
