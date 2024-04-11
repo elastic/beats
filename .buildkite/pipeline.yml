@@ -58,7 +58,7 @@ steps:
                 #OSS
                 - go.mod
                 - pytest.ini
-                - dev-tools/**
+                - dev-tools
                 - libbeat/**
                 - testing/**
               config:
