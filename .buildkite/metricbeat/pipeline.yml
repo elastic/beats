@@ -63,7 +63,7 @@ steps:
           .buildkite/deploy/kubernetes/scripts/kind-setup.sh
 
           echo "~~~ Running tests"
-          export KUBECONFIG="$${WORKSPACE}/kubecfg"
+          export KUBECONFIG="$$PWD/kubecfg"
           cd metricbeat && mage goIntegTest
         agents:
           provider: "gcp"
@@ -93,7 +93,7 @@ steps:
           .buildkite/deploy/kubernetes/scripts/kind-setup.sh
 
           echo "~~~ Running tests"
-          export KUBECONFIG="$${WORKSPACE}/kubecfg"
+          export KUBECONFIG="$$PWD/kubecfg"
           cd metricbeat && mage pythonIntegTest
         agents:
           provider: "gcp"
