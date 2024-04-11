@@ -43,16 +43,16 @@
     var.authentication:
       user_password_flow:
         enabled: true
-        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        client.secret: "client-secret"
-        token_url: "https://login.salesforce.com"
-        username: "abc.xyz@mail.com"
-        password: "P@$$W0₹D"
+        client.id: "<YourClientIdHere>"
+        client.secret: "<YourClientSecretHere>"
+        token_url: "<YourTokenURLHere>"
+        username: "<YourUsernameHere>"
+        password: "<YourPasswordHere>"
       jwt_bearer_flow:
         enabled: false
-        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        client.username: "abc.xyz@mail.com"
-        client.key_path: "client_key.pem"
+        client.id: "<YourClientIdHere>"
+        client.username: "<YourClientUsernameHere>"
+        client.key_path: "<YourClientKeyPathHere>"
         url: "https://login.salesforce.com"
 
     var.url: "https://instance_id.my.salesforce.com"
@@ -69,16 +69,16 @@
     var.authentication:
       user_password_flow:
         enabled: true
-        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        client.id: "<YourClientIdHere>"
         client.secret: "client-secret"
-        token_url: "https://login.salesforce.com"
-        username: "abc.xyz@mail.com"
-        password: "P@$$W0₹D"
+        token_url: "<YourTokenURLHere>"
+        username: "<YourUsernameHere>"
+        password: "<YourPasswordHere>"
       jwt_bearer_flow:
         enabled: false
-        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        client.username: "abc.xyz@mail.com"
-        client.key_path: "client_key.pem"
+        client.id: "<YourClientIdHere>"
+        client.username: "<YourClientUsernameHere>"
+        client.key_path: "<YourClientKeyPathHere>"
         url: "https://login.salesforce.com"
 
     var.url: "https://instance_id.my.salesforce.com"
@@ -98,16 +98,16 @@
     var.authentication:
       user_password_flow:
         enabled: true
-        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        client.id: "<YourClientIdHere>"
         client.secret: "client-secret"
-        token_url: "https://login.salesforce.com"
-        username: "abc.xyz@mail.com"
-        password: "P@$$W0₹D"
+        token_url: "<YourTokenURLHere>"
+        username: "<YourUsernameHere>"
+        password: "<YourPasswordHere>"
       jwt_bearer_flow:
         enabled: false
-        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        client.username: "abc.xyz@mail.com"
-        client.key_path: "client_key.pem"
+        client.id: "<YourClientIdHere>"
+        client.username: "<YourClientUsernameHere>"
+        client.key_path: "<YourClientKeyPathHere>"
         url: "https://login.salesforce.com"
 
     var.url: "https://instance_id.my.salesforce.com"
@@ -127,16 +127,16 @@
     var.authentication:
       user_password_flow:
         enabled: true
-        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+        client.id: "<YourClientIdHere>"
         client.secret: "client-secret"
-        token_url: "https://login.salesforce.com"
-        username: "abc.xyz@mail.com"
-        password: "P@$$W0₹D"
+        token_url: "<YourTokenURLHere>"
+        username: "<YourUsernameHere>"
+        password: "<YourPasswordHere>"
       jwt_bearer_flow:
         enabled: false
-        client.id: "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-        client.username: "abc.xyz@mail.com"
-        client.key_path: "client_key.pem"
+        client.id: "<YourClientIdHere>"
+        client.username: "<YourClientUsernameHere>"
+        client.key_path: "<YourClientKeyPathHere>"
         url: "https://login.salesforce.com"
 
     var.url: "https://instance_id.my.salesforce.com"
