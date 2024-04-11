@@ -5,6 +5,7 @@
 package system
 
 import (
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-sysinfo"
@@ -15,10 +16,9 @@ const (
 	ModuleName = "system"
 )
 
-// InitializeModule initializes this module.
-func InitializeModule() {
+func init() {
 	// Register the custom ModuleFactory function for the system module.
-	if err := mb.Registry.AddModule(ModuleName, NewModule); err != nil {
+	if err := ab.Registry.AddModule(ModuleName, NewModule); err != nil {
 		panic(err)
 	}
 }

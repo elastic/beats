@@ -35,6 +35,14 @@ type tokenAppender struct {
 	Condition conditions.Condition
 }
 
+// InitializeModule initializes this module.
+func InitializeModule() {
+	err := autodiscover.Registry.AddAppender("kubernetes.token", NewTokenAppender)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `kubernetes.token` appender"))
+	}
+}
+
 // NewTokenAppender creates a token appender that can append a bearer token required to authenticate with
 // protected endpoints
 func NewTokenAppender(cfg *conf.C) (autodiscover.Appender, error) {

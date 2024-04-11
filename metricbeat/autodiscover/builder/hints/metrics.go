@@ -61,6 +61,14 @@ type metricHints struct {
 	logger *logp.Logger
 }
 
+// InitializeModule initializes this module.
+func InitializeModule() {
+	err := autodiscover.Registry.AddBuilder("hints", NewMetricHints)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
+}
+
 // NewMetricHints builds a new metrics builder based on hints
 func NewMetricHints(cfg *conf.C) (autodiscover.Builder, error) {
 	config := defaultConfig()

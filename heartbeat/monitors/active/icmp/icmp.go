@@ -37,7 +37,8 @@ import (
 
 var debugf = logp.MakeDebug("icmp")
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	plugin.Register("icmp", create, "synthetics/icmp")
 }
 

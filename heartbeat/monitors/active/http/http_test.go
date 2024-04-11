@@ -59,6 +59,10 @@ import (
 	btesting "github.com/elastic/beats/v7/libbeat/testing"
 )
 
+func TestMain(m *testing.M) {
+	InitializeModule()
+}
+
 func sendSimpleTLSRequest(t *testing.T, testURL string, useUrls bool) *beat.Event {
 	return sendTLSRequest(t, testURL, useUrls, nil)
 }

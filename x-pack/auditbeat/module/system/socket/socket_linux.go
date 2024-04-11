@@ -23,6 +23,7 @@ import (
 
 	"golang.org/x/sys/unix"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/tracing"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
@@ -78,9 +79,8 @@ type MetricSet struct {
 	terminated   sync.WaitGroup
 }
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	mb.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
+func init() {
+	ab.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)

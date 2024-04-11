@@ -41,7 +41,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
 )
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	plugin.Register("tcp", create, "synthetics/tcp")
 }
 

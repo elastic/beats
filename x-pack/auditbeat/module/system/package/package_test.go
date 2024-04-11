@@ -9,6 +9,7 @@ package pkg
 import (
 	"bytes"
 	"encoding/gob"
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"io"
 	"os"
 	"path/filepath"
@@ -26,14 +27,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func TestMain(t *testing.M) {
-	InitializeModule()
-}
-
 func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	defer deleteBucket(t, f)
 
 	events, errs := mbtest.ReportingFetchV2(f)
@@ -72,7 +69,7 @@ func TestDpkg(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	defer deleteBucket(t, f)
 
 	events, errs := mbtest.ReportingFetchV2(f)
@@ -131,7 +128,7 @@ func TestDpkgInstalledSize(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	defer deleteBucket(t, f)
 
 	events, errs := mbtest.ReportingFetchV2(f)

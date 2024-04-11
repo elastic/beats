@@ -29,19 +29,21 @@ import (
 type Factory struct {
 	beatInfo beat.Info
 	options  []Option
+	registry *mb.Register
 }
 
 // NewFactory creates new Reloader instance for the given config
-func NewFactory(beatInfo beat.Info, options ...Option) *Factory {
+func NewFactory(beatInfo beat.Info, registry *mb.Register, options ...Option) *Factory {
 	return &Factory{
 		beatInfo: beatInfo,
 		options:  options,
+		registry: registry,
 	}
 }
 
 // Create creates a new metricbeat module runner reporting events to the passed pipeline.
 func (r *Factory) Create(p beat.PipelineConnector, c *conf.C) (cfgfile.Runner, error) {
-	module, metricSets, err := mb.NewModule(c, mb.Registry)
+	module, metricSets, err := mb.NewModule(c, r.registry)
 	if err != nil {
 		return nil, err
 	}

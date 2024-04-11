@@ -18,6 +18,7 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/joeshaw/multierror"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -180,9 +181,8 @@ func formatHardwareAddr(addr net.HardwareAddr) string {
 	return string(buf)
 }
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	mb.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
+func init() {
+	ab.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)

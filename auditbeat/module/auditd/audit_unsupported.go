@@ -26,8 +26,7 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 )
 
-// InitializeModule initializes this module.
-func InitializeModule() {
+func init() {
 	mb.Registry.MustAddMetricSet(metricsetName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithHostParser(parse.EmptyHostParser),

@@ -16,6 +16,7 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
@@ -79,9 +80,8 @@ func (action eventAction) Type() string {
 	}
 }
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	mb.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
+func init() {
+	ab.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)

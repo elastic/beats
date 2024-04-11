@@ -5,6 +5,7 @@
 package process
 
 import (
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"os/user"
 	"testing"
 	"time"
@@ -20,14 +21,10 @@ import (
 	"github.com/elastic/go-sysinfo/types"
 )
 
-func TestMain(t *testing.M) {
-	InitializeModule()
-}
-
 func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 
 	// Set lastState and add test process to cache so it will be reported as stopped.
 	f.(*MetricSet).lastState = time.Now()
@@ -59,7 +56,7 @@ func getConfig() map[string]interface{} {
 }
 
 func TestProcessEvent(t *testing.T) {
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig()).(*MetricSet)
+	ms := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry).(*MetricSet)
 
 	eventType := eventTypeEvent
 	eventAction := eventActionProcessStarted

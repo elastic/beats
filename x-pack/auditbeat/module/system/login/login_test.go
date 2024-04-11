@@ -8,6 +8,7 @@ package login
 
 import (
 	"encoding/binary"
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"io"
 	"io/ioutil"
 	"net"
@@ -25,10 +26,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func TestMain(t *testing.M) {
-	InitializeModule()
-}
-
 func TestData(t *testing.T) {
 	if byteOrder != binary.LittleEndian {
 		t.Skip("Test only works on little-endian systems - skipping.")
@@ -39,7 +36,7 @@ func TestData(t *testing.T) {
 	config := getBaseConfig()
 	config["login.wtmp_file_pattern"] = "./testdata/wtmp"
 	config["login.btmp_file_pattern"] = ""
-	f := mbtest.NewReportingMetricSetV2(t, config)
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, config, ab.Registry)
 	defer f.(*MetricSet).utmpReader.bucket.DeleteBucket()
 
 	events, errs := mbtest.ReportingFetchV2(f)

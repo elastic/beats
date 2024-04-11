@@ -11,6 +11,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -73,9 +74,8 @@ type LoginRecord struct {
 	Origin    string
 }
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	mb.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
+func init() {
+	ab.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)

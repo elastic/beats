@@ -28,6 +28,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
@@ -71,9 +72,8 @@ var (
 	receivedMetric        = monitoring.NewInt(auditdMetrics, "received_msgs")
 )
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+func init() {
+	ab.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithHostParser(parse.EmptyHostParser),
 		mb.WithNamespace(namespace),

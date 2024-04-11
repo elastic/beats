@@ -46,6 +46,14 @@ type heartbeatHints struct {
 	logger *logp.Logger
 }
 
+// InitializeModule initializes this module.
+func InitializeModule() {
+	err := autodiscover.Registry.AddBuilder("hints", NewHeartbeatHints)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
+}
+
 // NewHeartbeatHints builds a heartbeat hints builder
 func NewHeartbeatHints(cfg *conf.C) (autodiscover.Builder, error) {
 	config := defaultConfig()

@@ -19,7 +19,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/reload"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/include"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 
 	// Register includes.
@@ -48,15 +47,11 @@ func auditbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) 
 		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}
 
-	if system.ModuleName == "audit/system" {
-		// running in agentbeat; no need to transform the type field
-	} else {
-		// not running in agentbeat; extract the type field that has
-		// "audit/auditd", treat this as the module config key
-		module := strings.Split(rawIn.Type, "/")[1]
-		for iter := range modules {
-			modules[iter]["module"] = module
-		}
+	// not running in agentbeat; extract the type field that has
+	// "audit/auditd", treat this as the module config key
+	module := strings.Split(rawIn.Type, "/")[1]
+	for iter := range modules {
+		modules[iter]["module"] = module
 	}
 
 	// Format for the reloadable list needed bythe cm.Reload() method.
@@ -75,7 +70,7 @@ func init() {
 	}
 	settings := auditbeatcmd.AuditbeatSettings(globalProcs)
 	settings.ElasticLicensed = true
-	settings.Initialize = append(settings.Initialize, include.InitializeModules)
+	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 	RootCmd = auditbeatcmd.Initialize(settings)
 	RootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
 		management.ConfigTransform.SetTransform(auditbeatCfg)

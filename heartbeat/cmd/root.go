@@ -18,14 +18,10 @@
 package cmd
 
 import (
-	"fmt"
-
-	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 
-	"github.com/elastic/beats/v7/heartbeat/autodiscover/builder/hints"
 	"github.com/elastic/beats/v7/heartbeat/beater"
-	"github.com/elastic/beats/v7/libbeat/autodiscover"
+	"github.com/elastic/beats/v7/heartbeat/include"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
@@ -61,12 +57,7 @@ func HeartbeatSettings() instance.Settings {
 		Name:          Name,
 		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithAgentMeta()),
 		HasDashboards: false,
-		InitFunc: func() {
-			err := autodiscover.Registry.AddBuilder("hints", hints.NewHeartbeatHints)
-			if err != nil {
-				logp.Error(fmt.Errorf("could not add `hints` builder"))
-			}
-		},
+		Initialize:    []func(){include.InitializeModule},
 	}
 }
 

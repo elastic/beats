@@ -28,11 +28,8 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/packetbeat/beater"
-	"github.com/elastic/beats/v7/packetbeat/processor/add_kubernetes_metadata"
+	"github.com/elastic/beats/v7/packetbeat/include"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-
-	// Register fields and protocol modules.
-	_ "github.com/elastic/beats/v7/packetbeat/include"
 )
 
 const (
@@ -65,9 +62,7 @@ func PacketbeatSettings(globals processors.PluginConfig) instance.Settings {
 		HasDashboards:  true,
 		Processing:     processing.MakeDefaultSupport(true, globals, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
 		InputQueueSize: 400,
-		InitFunc: func() {
-			add_kubernetes_metadata.Initialize()
-		},
+		Initialize:     []func(){include.InitializeModule},
 	}
 }
 

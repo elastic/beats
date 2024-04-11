@@ -37,6 +37,10 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
+func TestMain(m *testing.M) {
+	InitializeModule()
+}
+
 func TestICMPFields(t *testing.T) {
 	host := "localhost"
 	hostURL := &url.URL{Scheme: "icmp", Host: host}

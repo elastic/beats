@@ -33,7 +33,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/useragent"
 )
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	plugin.Register("http", create, "synthetics/http")
 }
 

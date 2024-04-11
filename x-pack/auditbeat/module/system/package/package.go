@@ -13,6 +13,7 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"io"
 	"io/fs"
 	"os"
@@ -91,9 +92,8 @@ func (action eventAction) Type() string {
 	}
 }
 
-// InitializeModule initializes this module.
-func InitializeModule() {
-	mb.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
+func init() {
+	ab.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)

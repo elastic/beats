@@ -15,10 +15,10 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package auditd
+package ab
 
-import "testing"
+import "github.com/elastic/beats/v7/metricbeat/mb"
 
-func TestMain(_ *testing.M) {
-	InitializeModule()
-}
+// Registry is the singleton Register instance where all ModuleFactory's and
+// MetricSetFactory's should be registered.
+var Registry = mb.NewRegister()

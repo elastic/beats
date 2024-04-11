@@ -18,6 +18,7 @@
 package cmd
 
 import (
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
@@ -63,13 +64,14 @@ func AuditbeatSettings(globals processors.PluginConfig) instance.Settings {
 		Name:          Name,
 		HasDashboards: true,
 		Processing:    processing.MakeDefaultSupport(true, globals, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
-		Initialize:    []func(){include.InitializeAssets, include.InitializeModules},
+		Initialize:    []func(){include.InitializeModule},
 	}
 }
 
 // Initialize initializes the entrypoint commands for auditbeat
 func Initialize(settings instance.Settings) *cmd.BeatsRootCmd {
-	create := beater.Creator(
+	create := beater.CreatorWithRegistry(
+		ab.Registry,
 		beater.WithModuleOptions(
 			module.WithEventModifier(core.AddDatasetToEvent),
 		),
