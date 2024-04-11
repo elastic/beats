@@ -217,7 +217,6 @@ func (in *pubsubInput) run() error {
 	var workerWg sync.WaitGroup
 
 	for ctx.Err() == nil {
-
 		workers, err := in.workerSem.AcquireContext(numGoRoutines, ctx)
 		if err != nil {
 			break
@@ -231,13 +230,12 @@ func (in *pubsubInput) run() error {
 			go func() {
 				client, err := in.newPubsubClient(ctx)
 				defer func() {
-					workerWg.Done()
 					in.workerSem.Release(1)
+					workerWg.Done()
 				}()
 				if err != nil {
-					in.log.Error("failed to create pub/sub client: ", err)
+					in.log.Errorw("failed to create pub/sub client: ", "error", err)
 					cancel()
-					// return err
 				} else {
 					defer client.Close()
 				}
@@ -247,7 +245,6 @@ func (in *pubsubInput) run() error {
 				if err != nil {
 					in.log.Error("failed to subscribe to pub/sub topic: ", err)
 					cancel()
-					// return fmt.Errorf("failed to subscribe to pub/sub topic: %w", err)
 				}
 				sub.ReceiveSettings.NumGoroutines = in.Subscription.NumGoroutines
 				sub.ReceiveSettings.MaxOutstandingMessages = in.Subscription.MaxOutstandingMessages

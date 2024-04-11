@@ -72,7 +72,13 @@ func defaultConfig() config {
 	c.ForwarderConfig = harvester.ForwarderConfig{
 		Type: "gcp-pubsub",
 	}
+	// Since we now support multiple beat.Clients, having multiple NumGoroutines
+	// greatly improves ingestion performance. Hence, default values are being
+	// adjusted to get the most of the input.
+	// It is not increased too high to cause high CPU usage.
 	c.Subscription.NumGoroutines = 2
+	// The input gets blocked until flush.min_events or flush.timeout is reached.
+	// Hence max_outstanding_message has to be atleast flush.min_events to avoid this blockage.
 	c.Subscription.MaxOutstandingMessages = 1600
 	c.Subscription.Create = true
 	return c

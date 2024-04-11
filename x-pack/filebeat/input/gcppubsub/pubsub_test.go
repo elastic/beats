@@ -340,10 +340,6 @@ func TestTopicDoesNotExist(t *testing.T) {
 
 	runTest(t, cfg, func(client *pubsub.Client, input *pubsubInput, out *stubOutleter, t *testing.T) {
 		require.Error(t, input.run())
-		// err := input.run()
-		// if assert.Error(t, err) {
-		// 	assert.Contains(t, err.Error(), "failed to subscribe to pub/sub topic")
-		// }
 	})
 }
 
