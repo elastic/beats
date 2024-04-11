@@ -52,7 +52,7 @@ steps:
           set -euo pipefail
           # defines the MODULE env var based on what's changed in a PR
           source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet $$PWD
+          defineModuleFromTheChangeSet metricbeat
           echo "~~~ Will run tests with env var MODULE=$$MODULE"
 
           # TODO move this section to base image / pre-command hook
@@ -81,7 +81,8 @@ steps:
         command: |
           set -euo pipefail
           # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh && defineModuleFromTheChangeSet $$PWD
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet metricbeat
           echo "~~~ Running tests with env var MODULE=$$MODULE"
 
           # TODO move this section to base image / pre-command hook
