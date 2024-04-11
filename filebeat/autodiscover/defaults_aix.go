@@ -19,7 +19,7 @@
 
 package autodiscover
 
-// Initialize initializes the configuration defaults for autodiscover for filebeat.
-func Initialize() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	// does nothing on aix
 }

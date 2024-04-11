@@ -9,7 +9,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -23,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
+	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/beater"
 	_ "github.com/elastic/beats/v7/x-pack/osquerybeat/include"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"

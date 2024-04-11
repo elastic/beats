@@ -4,7 +4,7 @@ from packetbeat import (BaseTest, TRANS_REQUIRED_FIELDS)
 def check_event(event, expected):
     for key in expected:
         assert key in event, "key '{0}' not found in event".format(key)
-        assert event[key] == expected[key], \
+        assert event[key] == expected[key],\
             "key '{0}' has value '{1}', expected '{2}'".format(key,
                                                                event[key],
                                                                expected[key])

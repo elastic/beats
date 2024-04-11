@@ -21,15 +21,10 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/include"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
 
-	// Register includes.
+	// Register base auditbeat includes.
 	_ "github.com/elastic/beats/v7/auditbeat/include"
 
-	// Register modules.
-	_ "github.com/elastic/beats/v7/auditbeat/module/auditd"
-	_ "github.com/elastic/beats/v7/auditbeat/module/file_integrity"
-
-	// Register Auditbeat x-pack modules.
-	_ "github.com/elastic/beats/v7/x-pack/auditbeat/include"
+	// Register libbeat x-pack modules.
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 )
 
@@ -47,9 +42,10 @@ func auditbeatCfg(rawIn *proto.UnitExpectedConfig, agentInfo *client.AgentInfo) 
 		return nil, fmt.Errorf("error creating input list from raw expected config: %w", err)
 	}
 
-	// not running in agentbeat; extract the type field that has
-	// "audit/auditd", treat this as the module config key
+	// Extract the type field that has "audit/auditd", treat this
+	// as the module config key
 	module := strings.Split(rawIn.Type, "/")[1]
+
 	for iter := range modules {
 		modules[iter]["module"] = module
 	}

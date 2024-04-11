@@ -40,10 +40,6 @@ import (
 	btesting "github.com/elastic/beats/v7/libbeat/testing"
 )
 
-func TestMain(m *testing.M) {
-	InitializeModule()
-}
-
 func testTCPCheck(t *testing.T, host string, port uint16) *beat.Event {
 	config := mapstr.M{
 		"hosts":   host,

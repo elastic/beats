@@ -59,6 +59,7 @@ func init() {
 func Asset{{ .GoTypeName }}() string {
 	return "{{ .Data }}"
 }
+
 `))
 
 type Data struct {
