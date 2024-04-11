@@ -23900,11 +23900,11 @@ Contents of probable licence file $GOMODCACHE/go.elastic.co/apm/module/apmelasti
 
 --------------------------------------------------------------------------------
 Dependency : go.elastic.co/apm/module/apmhttp/v2
-Version: v2.4.8
+Version: v2.5.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.elastic.co/apm/module/apmhttp/v2@v2.4.8/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.elastic.co/apm/module/apmhttp/v2@v2.5.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -24111,11 +24111,11 @@ Contents of probable licence file $GOMODCACHE/go.elastic.co/apm/module/apmhttp/v
 
 --------------------------------------------------------------------------------
 Dependency : go.elastic.co/apm/v2
-Version: v2.4.8
+Version: v2.5.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/go.elastic.co/apm/v2@v2.4.8/LICENSE:
+Contents of probable licence file $GOMODCACHE/go.elastic.co/apm/v2@v2.5.0/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
