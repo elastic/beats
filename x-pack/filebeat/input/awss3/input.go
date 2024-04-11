@@ -127,62 +127,85 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	defer cancelInputCtx()
 
 	if in.config.QueueURL != "" {
-		configRegion := in.config.RegionName
-		urlRegion, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
-		if err != nil && configRegion == "" {
-			// Only report an error if we don't have a configured region
-			// to fall back on.
-			return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
-		} else if configRegion != "" && configRegion != urlRegion {
-			inputContext.Logger.Warnf("configured region disagrees with queue_url region (%q != %q): using %q", configRegion, urlRegion, urlRegion)
-		}
-
-		in.awsConfig.Region = urlRegion
-
-		// Create SQS receiver and S3 notification processor.
-		receiver, err := in.createSQSReceiver(inputContext, pipeline)
+		err = in.runQueueReader(ctx, inputContext, pipeline)
 		if err != nil {
-			return fmt.Errorf("failed to initialize sqs receiver: %w", err)
-		}
-		defer receiver.metrics.Close()
-
-		// Poll metrics periodically in the background
-		go pollSqsWaitingMetric(ctx, receiver)
-
-		if err := receiver.Receive(ctx); err != nil {
+			// possibly this should be unconditional?
 			return err
 		}
 	}
 
 	if in.config.BucketARN != "" || in.config.NonAWSBucketName != "" {
-		// Create client for publishing events and receive notification of their ACKs.
-		client, err := pipeline.ConnectWith(beat.ClientConfig{
-			CloseRef:      inputContext.Cancelation,
-			EventListener: awscommon.NewEventACKHandler(),
-			Processing: beat.ProcessingConfig{
-				// This input only produces events with basic types so normalization
-				// is not required.
-				EventNormalization: boolPtr(false),
-			},
-		})
+		err = in.runS3Poller(ctx, inputContext, pipeline, persistentStore, states)
 		if err != nil {
-			return fmt.Errorf("failed to create pipeline client: %w", err)
-		}
-		defer client.Close()
-
-		// Create S3 receiver and S3 notification processor.
-		poller, err := in.createS3Lister(inputContext, ctx, client, persistentStore, states)
-		if err != nil {
-			return fmt.Errorf("failed to initialize s3 poller: %w", err)
-		}
-		defer poller.metrics.Close()
-
-		if err := poller.Poll(ctx); err != nil {
 			return err
 		}
 	}
 
 	return nil
+}
+
+func (in *s3Input) runS3Poller(
+	ctx context.Context,
+	inputContext v2.Context,
+	pipeline beat.Pipeline,
+	persistentStore *statestore.Store,
+	states *states
+) error {
+	// Create client for publishing events and receive notification of their ACKs.
+	client, err := pipeline.ConnectWith(beat.ClientConfig{
+		CloseRef:      inputContext.Cancelation,
+		EventListener: awscommon.NewEventACKHandler(),
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: boolPtr(false),
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create pipeline client: %w", err)
+	}
+	defer client.Close()
+
+	// Create S3 receiver and S3 notification processor.
+	poller, err := in.createS3Lister(inputContext, ctx, client, persistentStore, states)
+	if err != nil {
+		return fmt.Errorf("failed to initialize s3 poller: %w", err)
+	}
+	defer poller.metrics.Close()
+
+	if err := poller.Poll(ctx); err != nil {
+		return err
+	}
+}
+
+func (in *s3Input) runQueueReader(
+	ctx context.Context,
+	inputContext v2.Context,
+	pipeline beat.Pipeline,
+) error {
+	configRegion := in.config.RegionName
+	urlRegion, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
+	if err != nil && configRegion == "" {
+		// Only report an error if we don't have a configured region
+		// to fall back on.
+		return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
+	} else if configRegion != "" && configRegion != urlRegion {
+		inputContext.Logger.Warnf("configured region disagrees with queue_url region (%q != %q): using %q", configRegion, urlRegion, urlRegion)
+	}
+
+	in.awsConfig.Region = urlRegion
+
+	// Create SQS receiver and S3 notification processor.
+	receiver, err := in.createSQSReceiver(inputContext, pipeline)
+	if err != nil {
+		return fmt.Errorf("failed to initialize sqs receiver: %w", err)
+	}
+	defer receiver.metrics.Close()
+
+	// Poll metrics periodically in the background
+	go pollSqsWaitingMetric(ctx, receiver)
+
+	return receiver.Receive(ctx)
 }
 
 func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*sqsReader, error) {
@@ -227,8 +250,11 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 		return nil, err
 	}
 	in.metrics = newInputMetrics(ctx.ID, nil, in.config.MaxNumberOfMessages)
+
 	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig, in.config.MaxNumberOfMessages)
+
 	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), in.metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory, in.config.MaxNumberOfMessages)
+
 	sqsReader := newSQSReader(log.Named("sqs"), in.metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
 
 	return sqsReader, nil
