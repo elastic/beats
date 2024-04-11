@@ -1,186 +1,185 @@
 ---
 description: Pipeline for parsing Salesforce SetupAuditTrail logs
 processors:
-    - json:
-          field: message
-          target_field: json
-          on_failure:
-              - drop: {}
+  - json:
+      field: message
+      target_field: json
+      on_failure:
+        - drop: {}
 
-    - set:
-          field: event.ingested
-          copy_from: _ingest.timestamp
-    - rename:
-          field: message
-          target_field: event.original
-          ignore_failure: true
-          if: "ctx.event?.original == null"
-    - set:
-          field: salesforce.setup_audit_trail.document_id
-          copy_from: _id
-          ignore_empty_value: true
-    - fingerprint:
-          fields:
-              - json.Id
-              - json.CreatedDate
-          target_field: _id
-          ignore_failure: true
-          ignore_missing: true
+  - set:
+      field: event.ingested
+      copy_from: _ingest.timestamp
+  - rename:
+      field: message
+      target_field: event.original
+      ignore_failure: true
+      if: "ctx.event?.original == null"
+  - set:
+      field: salesforce.setup_audit_trail.document_id
+      copy_from: _id
+      ignore_empty_value: true
+  - fingerprint:
+      fields:
+        - json.Id
+        - json.CreatedDate
+      target_field: _id
+      ignore_failure: true
+      ignore_missing: true
 
-    - date:
-          field: json.CreatedDate
-          target_field: "@timestamp"
-          formats:
-              - ISO8601
-          on_failure:
-              - set:
-                    field: "@timestamp"
-                    value: "{{_ingest.timestamp}}"
-              - set:
-                    field: error.message
-                    value: "Failed to parse CreatedDate: {{json.CreatedDate}}"
+  - date:
+      field: json.CreatedDate
+      target_field: "@timestamp"
+      formats:
+        - ISO8601
+      on_failure:
+        - set:
+            field: "@timestamp"
+            value: "{{_ingest.timestamp}}"
+        - set:
+            field: error.message
+            value: "Failed to parse CreatedDate: {{json.CreatedDate}}"
 
-    # Normalize field names
-    - set:
-          field: salesforce.setup_audit_trail.event_type
-          copy_from: json.attributes.type
-          ignore_failure: true
-          ignore_missing: true
-    - rename:
-          field: json.CreatedByContext
-          target_field: salesforce.setup_audit_trail.created_by_context
-          ignore_failure: true
-          ignore_missing: true
-    - rename:
-          field: json.CreatedById
-          target_field: salesforce.setup_audit_trail.created_by_id
-          ignore_failure: true
-          ignore_missing: true
-    - rename:
-          field: json.CreatedByIssuer
-          target_field: salesforce.setup_audit_trail.created_by_issuer
-          ignore_failure: true
-          ignore_missing: true
-    - rename:
-          field: json.DelegateUser
-          target_field: salesforce.setup_audit_trail.delegate_user
-          ignore_failure: true
-          ignore_missing: true
-    - rename:
-          field: json.Display
-          target_field: salesforce.setup_audit_trail.display
-          ignore_failure: true
-          ignore_missing: true
-    - rename:
-          field: json.ResponsibleNamespacePrefix
-          target_field: salesforce.setup_audit_trail.responsible_namespace_prefix
-          ignore_failure: true
-          ignore_missing: true
-    - rename:
-          field: json.Section
-          target_field: salesforce.setup_audit_trail.section
-          ignore_failure: true
-          ignore_missing: true
+  # Normalize field names
+  - set:
+      field: salesforce.setup_audit_trail.event_type
+      copy_from: json.attributes.type
+      ignore_failure: true
+  - rename:
+      field: json.CreatedByContext
+      target_field: salesforce.setup_audit_trail.created_by_context
+      ignore_failure: true
+      ignore_missing: true
+  - rename:
+      field: json.CreatedById
+      target_field: salesforce.setup_audit_trail.created_by_id
+      ignore_failure: true
+      ignore_missing: true
+  - rename:
+      field: json.CreatedByIssuer
+      target_field: salesforce.setup_audit_trail.created_by_issuer
+      ignore_failure: true
+      ignore_missing: true
+  - rename:
+      field: json.DelegateUser
+      target_field: salesforce.setup_audit_trail.delegate_user
+      ignore_failure: true
+      ignore_missing: true
+  - rename:
+      field: json.Display
+      target_field: salesforce.setup_audit_trail.display
+      ignore_failure: true
+      ignore_missing: true
+  - rename:
+      field: json.ResponsibleNamespacePrefix
+      target_field: salesforce.setup_audit_trail.responsible_namespace_prefix
+      ignore_failure: true
+      ignore_missing: true
+  - rename:
+      field: json.Section
+      target_field: salesforce.setup_audit_trail.section
+      ignore_failure: true
+      ignore_missing: true
 
-    #######################
-    ## ECS Event Mapping ##
-    #######################
+  #######################
+  ## ECS Event Mapping ##
+  #######################
 
-    - set:
-          field: ecs.version
-          value: "8.11.0"
-          ignore_failure: true
-          ignore_empty_value: true
-    - rename:
-          field: json.Id
-          target_field: event.id
-          ignore_failure: true
-          ignore_missing: true
-    - rename:
-          field: json.Action
-          target_field: event.action
-          ignore_failure: true
-          ignore_missing: true
-    - rename:
-          field: json.attributes.url
-          target_field: event.url
-          ignore_failure: true
-          ignore_missing: true
-    - date:
-          field: json.CreatedDate
-          target_field: event.created
-          formats:
-              - ISO8601
-          ignore_failure: true
-    - set:
-          field: event.type
-          value: ["admin"]
-          ignore_failure: true
-          ignore_empty_value: true
-    - set:
-          field: event.kind
-          value: "event"
-          ignore_failure: true
-          ignore_empty_value: true
-    - set:
-          field: event.dataset
-          value: "salesforce.setupaudittrail"
-          ignore_failure: true
-          ignore_empty_value: true
-    - set:
-          field: event.module
-          value: salesforce
-          ignore_failure: true
-          ignore_empty_value: true
+  - set:
+      field: ecs.version
+      value: "8.11.0"
+      ignore_failure: true
+      ignore_empty_value: true
+  - rename:
+      field: json.Id
+      target_field: event.id
+      ignore_failure: true
+      ignore_missing: true
+  - rename:
+      field: json.Action
+      target_field: event.action
+      ignore_failure: true
+      ignore_missing: true
+  - rename:
+      field: json.attributes.url
+      target_field: event.url
+      ignore_failure: true
+      ignore_missing: true
+  - date:
+      field: json.CreatedDate
+      target_field: event.created
+      formats:
+        - ISO8601
+      ignore_failure: true
+  - set:
+      field: event.type
+      value: ["admin"]
+      ignore_failure: true
+      ignore_empty_value: true
+  - set:
+      field: event.kind
+      value: "event"
+      ignore_failure: true
+      ignore_empty_value: true
+  - set:
+      field: event.dataset
+      value: "salesforce.setupaudittrail"
+      ignore_failure: true
+      ignore_empty_value: true
+  - set:
+      field: event.module
+      value: salesforce
+      ignore_failure: true
+      ignore_empty_value: true
 
-    ######################
-    ## ECS User Mapping ##
-    ######################
+  ######################
+  ## ECS User Mapping ##
+  ######################
 
-    - set:
-          field: user.id
-          copy_from: salesforce.setup_audit_trail.created_by_id
-          ignore_failure: true
-          ignore_empty_value: true
-    - dissect:
-          field: salesforce.setup_audit_trail.display
-          pattern: "For user %{user.name}, %{?}"
-          ignore_failure: true
+  - set:
+      field: user.id
+      copy_from: salesforce.setup_audit_trail.created_by_id
+      ignore_failure: true
+      ignore_empty_value: true
+  - dissect:
+      field: salesforce.setup_audit_trail.display
+      pattern: "For user %{user.name}, %{?}"
+      ignore_failure: true
 
-    #############
-    ## Cleanup ##
-    #############
+  #############
+  ## Cleanup ##
+  #############
 
-    # Drop empty fields
-    - script:
-          lang: painless
-          source: |
-              boolean dropEmptyFields(Object object) {
-                if (object == null || object == "") {
-                  return true;
-                } else if (object instanceof Map) {
-                  ((Map) object).values().removeIf(value -> dropEmptyFields(value));
-                  return ((Map) object).isEmpty();
-                } else if (object instanceof List) {
-                  ((List) object).removeIf(value -> dropEmptyFields(value));
-                  return ((List) object).isEmpty();
-                }
-                return false;
-              }
-              dropEmptyFields(ctx);
+  # Drop empty fields
+  - script:
+      lang: painless
+      source: |
+        boolean dropEmptyFields(Object object) {
+          if (object == null || object == "") {
+            return true;
+          } else if (object instanceof Map) {
+            ((Map) object).values().removeIf(value -> dropEmptyFields(value));
+            return ((Map) object).isEmpty();
+          } else if (object instanceof List) {
+            ((List) object).removeIf(value -> dropEmptyFields(value));
+            return ((List) object).isEmpty();
+          }
+          return false;
+        }
+        dropEmptyFields(ctx);
 
-    - remove:
-          field:
-              - json
-              - message
-          ignore_missing: true
-    - remove:
-          field: event.original
-          if: "ctx.tags == null || !ctx.tags.contains('preserve_original_event')"
-          ignore_failure: true
-          ignore_missing: true
+  - remove:
+      field:
+        - json
+        - message
+      ignore_missing: true
+  - remove:
+      field: event.original
+      if: "ctx.tags == null || !ctx.tags.contains('preserve_original_event')"
+      ignore_failure: true
+      ignore_missing: true
 
 on_failure:
-    - set:
-          field: error.message
-          value: "{{{ _ingest.on_failure_message }}}"
+  - set:
+      field: error.message
+      value: "{{{ _ingest.on_failure_message }}}"
