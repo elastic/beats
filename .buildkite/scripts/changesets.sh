@@ -2,6 +2,9 @@
 
 # This script contains helper functions related to what should be run depending on Git changes
 
+OSS_MODULE_PATTERN="^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
+XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
+
 are_paths_changed() {
   local patterns=("${@}")
   local changelist=()
