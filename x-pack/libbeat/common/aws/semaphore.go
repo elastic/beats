@@ -10,19 +10,14 @@ import (
 )
 
 type Sem struct {
-	mutex     *sync.Mutex
 	cond      sync.Cond
 	available int
 }
 
 func NewSem(n int) *Sem {
-	var m sync.Mutex
 	return &Sem{
 		available: n,
-		mutex:     &m,
-		cond: sync.Cond{
-			L: &m,
-		},
+		cond:      sync.Cond{L: &sync.Mutex{}},
 	}
 }
 
@@ -46,8 +41,8 @@ func (s *Sem) Acquire(n int) int {
 		return 0
 	}
 
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.cond.L.Lock()
+	defer s.cond.L.Unlock()
 
 	if s.available == 0 {
 		s.cond.Wait()
@@ -68,16 +63,16 @@ func (s *Sem) Release(n int) {
 		return
 	}
 
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.cond.L.Lock()
+	defer s.cond.L.Unlock()
 
 	s.available += n
 	s.cond.Signal()
 }
 
 func (s *Sem) Available() int {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
+	s.cond.L.Lock()
+	defer s.cond.L.Unlock()
 
 	return s.available
 }
