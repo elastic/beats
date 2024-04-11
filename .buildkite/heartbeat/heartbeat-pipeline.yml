@@ -5,22 +5,26 @@ env:
 
   ASDF_MAGE_VERSION: 1.15.0
 
-  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
 
+  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
+  IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
-  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  #Packaging
+  PACKAGING_ARM_PLATFORMS: "linux/arm64"
+  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 
 notify:
   - github_commit_status:
@@ -179,7 +183,7 @@ steps:
       - label: ":ubuntu: Packaging Linux X86"
         key: "heartbeat-package-linux-x86"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "${PACKAGING_PLATFORMS}"
           SNAPSHOT: true
         command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
@@ -190,7 +194,7 @@ steps:
       - label: ":linux: Packaging Linux ARM"
         key: "heartbeat-package-linux-arm"
         env:
-          PLATFORMS: "linux/arm64"
+          PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
           PACKAGES: "docker"
           SNAPSHOT: true
         command: "cd $BEATS_PROJECT_NAME && mage package"
