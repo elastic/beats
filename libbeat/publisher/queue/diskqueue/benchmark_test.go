@@ -100,7 +100,7 @@ func setup(b *testing.B, encrypt bool, compress bool, protobuf bool) (*diskQueue
 	}
 	s.UseCompression = compress
 	s.UseProtobuf = protobuf
-	q, err := NewQueue(logp.L(), nil, s)
+	q, err := NewQueue(logp.L(), nil, s, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -118,7 +118,7 @@ func setup(b *testing.B, encrypt bool, compress bool, protobuf bool) (*diskQueue
 
 func publishEvents(p queue.Producer, num int, protobuf bool) {
 	for i := 0; i < num; i++ {
-		var e interface{}
+		var e queue.Entry
 		if protobuf {
 			e = makeMessagesEvent()
 		} else {
