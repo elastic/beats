@@ -116,7 +116,7 @@ steps:
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-  - group: "Heartbeat MacOS Extended"
+  - group: "Auditbeat MacOS Extended"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
       - label: ":mac: MacOS Unit Tests"
@@ -137,7 +137,7 @@ steps:
     key: "auditbeat-extended-tests-win"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
     steps:
-      - label: ":windows: Auditbeat Windows 2019 Unit Tests"
+      - label: ":windows: Auditbeat Win-2019 Unit Tests"
         key: "auditbeat-extended-win-2019-unit-tests"
         command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         agents:
@@ -148,7 +148,7 @@ steps:
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      - label: ":windows: Auditbeat Windows 10 Unit Tests"
+      - label: ":windows: Auditbeat Win-10 Unit Tests"
         key: "auditbeat-extended-win-10-unit-tests"
         command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         agents:
@@ -159,7 +159,7 @@ steps:
           disk_type: "pd-ssd"
         artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
 
-      - label: ":windows: Windows 11 Unit Tests"
+      - label: ":windows: Auditbeat Win-11 Unit Tests"
         key: "auditbeat-extended-win-11-unit-tests"
         command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
         agents:
@@ -179,7 +179,7 @@ steps:
       - label: ":ubuntu: Auditbeat/Packaging Linux X86"
         key: "auditbeat-package-linux-x86"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "${PACKAGING_PLATFORMS}"
           SNAPSHOT: true
         command: "cd $BEATS_PROJECT_NAME && mage package"
         agents:
@@ -190,7 +190,7 @@ steps:
       - label: ":linux: Auditbeat/Packaging Linux ARM"
         key: "auditbeat-package-linux-arm"
         env:
-          PLATFORMS: "linux/arm64"
+          PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
           PACKAGES: "docker"
           SNAPSHOT: true
         command: "cd $BEATS_PROJECT_NAME && mage package"
