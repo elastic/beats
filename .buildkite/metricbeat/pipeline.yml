@@ -21,10 +21,6 @@ env:
   K8S_VERSION: "v1.29.0"
   ASDF_KIND_VERSION: "0.20.0"
 
-  # Packaging
-  PACKAGING_ARM_PLATFORMS: "linux/arm64"
-  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
