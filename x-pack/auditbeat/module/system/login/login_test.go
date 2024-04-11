@@ -70,7 +70,7 @@ func TestWtmp(t *testing.T) {
 	config := getBaseConfig()
 	config["login.wtmp_file_pattern"] = wtmpFilepath
 	config["login.btmp_file_pattern"] = ""
-	f := mbtest.NewReportingMetricSetV2(t, config)
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, config, ab.Registry)
 	defer f.(*MetricSet).utmpReader.bucket.DeleteBucket()
 
 	events, errs := mbtest.ReportingFetchV2(f)
@@ -182,7 +182,7 @@ func TestBtmp(t *testing.T) {
 	config := getBaseConfig()
 	config["login.wtmp_file_pattern"] = ""
 	config["login.btmp_file_pattern"] = "./testdata/btmp*"
-	f := mbtest.NewReportingMetricSetV2(t, config)
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, config, ab.Registry)
 	defer f.(*MetricSet).utmpReader.bucket.DeleteBucket()
 
 	events, errs := mbtest.ReportingFetchV2(f)
