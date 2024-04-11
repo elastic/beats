@@ -47,8 +47,6 @@ steps:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-<<<<<<< HEAD
-=======
   - label: "Trigger Xpack/Dockerlogbeat"
     plugins:
       - monorepo-diff#v1.0.1:
@@ -96,7 +94,6 @@ steps:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
->>>>>>> 60b377470f (Move to static BK pipeline for metricbeat (#38827))
   - label: "Trigger Deploy/K8S"
     plugins:
       - monorepo-diff#v1.0.1:
