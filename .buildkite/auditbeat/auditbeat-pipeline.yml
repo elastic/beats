@@ -120,18 +120,22 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
       - label: ":mac: MacOS Unit Tests"
-        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
+        command: ".buildkite/scripts/macos_unit_tests.sh"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
       - label: ":mac: MacOS ARM Unit Tests"
-        command: "cd ${BEATS_PROJECT_NAME} && mage unitTest"
+        command: ".buildkite/scripts/macos_unit_tests.sh"
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/build/*.*"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
   - group: "Auditbeat Windows Extended Testing"
     key: "auditbeat-extended-tests-win"
