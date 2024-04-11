@@ -189,7 +189,7 @@ func TestOutputQueueFactoryTakesPrecedence(t *testing.T) {
 
 func TestFailedQueueFactoryRevertsToDefault(t *testing.T) {
 	defaultSettings, _ := memqueue.SettingsForUserConfig(nil)
-	failedFactory := func(_ *logp.Logger, _ func(int), _ int) (queue.Queue, error) {
+	failedFactory := func(_ *logp.Logger, _ func(int), _ int, _ queue.EncoderFactory) (queue.Queue, error) {
 		return nil, fmt.Errorf("This queue creation intentionally failed")
 	}
 	controller := outputController{
