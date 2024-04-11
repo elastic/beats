@@ -2,22 +2,6 @@
 name: "beats-metricbeat"
 
 env:
-<<<<<<< HEAD
-  IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
-  IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
-  IMAGE_WIN_10: "family/general-windows-10"
-  IMAGE_WIN_11: "family/general-windows-11"
-  IMAGE_WIN_2016: "family/core-windows-2016"
-  IMAGE_WIN_2019: "family/core-windows-2019"
-  IMAGE_WIN_2022: "family/core-windows-2022"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  BEATS_PROJECT_NAME: "metricbeat"
-  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
-  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
-
-=======
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
@@ -39,7 +23,6 @@ env:
 
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
->>>>>>> 60b377470f (Move to static BK pipeline for metricbeat (#38827))
 
 steps:
   - group: "Metricbeat Mandatory Tests"
@@ -254,14 +237,6 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "metricbeat-mandatory-tests"
 
-<<<<<<< HEAD
-  - label: ":linux: Load dynamic metricbeat pipeline"
-    key: "metricbeat-pipeline"
-    command: ".buildkite/scripts/generate_metricbeat_pipeline.sh"
-    notify:
-      - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
-=======
   - group: "Metricbeat Packaging"
     key: "metricbeat-packaging"
     steps:
@@ -293,4 +268,3 @@ steps:
         notify:
           - github_commit_status:
               context: "metricbeat: Packaging Linux ARM"
->>>>>>> 60b377470f (Move to static BK pipeline for metricbeat (#38827))
