@@ -165,7 +165,6 @@ func (m *TLSVerificationMode) Unpack(in interface{}) error {
 		*m = VerifyFull
 		return nil
 	}
-
 	switch o := in.(type) {
 	case string:
 		if o == "" {
@@ -207,17 +206,30 @@ func (m TLSClientAuth) MarshalText() ([]byte, error) {
 	return nil, fmt.Errorf("could not marshal '%+v' to text", m)
 }
 
-func (m *TLSClientAuth) Unpack(s string) error {
-	if s == "" {
+func (m *TLSClientAuth) Unpack(in interface{}) error {
+	if in == nil {
 		*m = TLSClientAuthNone
 		return nil
 	}
-	mode, found := tlsClientAuthTypes[s]
-	if !found {
-		return fmt.Errorf("unknown client authentication mode '%v'", s)
-	}
+	switch o := in.(type) {
+	case string:
+		if o == "" {
+			*m = TLSClientAuthNone
+			return nil
+		}
+		mode, found := tlsClientAuthTypes[o]
+		if !found {
+			return fmt.Errorf("unknown client authentication mode '%v'", o)
+		}
 
-	*m = mode
+		*m = mode
+	case uint64:
+		*m = TLSClientAuth(o)
+	case int64: // underlying type is int so we need both uint64 and int64 as options for TLSClientAuth
+		*m = TLSClientAuth(o)
+	default:
+		return fmt.Errorf("client auth mode is an unknown type: %T", o)
+	}
 	return nil
 }
 
