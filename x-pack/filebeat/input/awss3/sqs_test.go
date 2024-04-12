@@ -16,7 +16,6 @@ import (
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -73,8 +72,7 @@ func TestSQSReceiver(t *testing.T) {
 
 		// Execute sqsReader and verify calls/state.
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		require.NoError(t, receiver.Receive(ctx))
-		assert.Equal(t, maxMessages, receiver.workerSem.Available())
+		receiver.Receive(ctx)
 	})
 
 	t.Run("retry after ReceiveMessage error", func(t *testing.T) {
@@ -106,8 +104,7 @@ func TestSQSReceiver(t *testing.T) {
 
 		// Execute SQSReceiver and verify calls/state.
 		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		require.NoError(t, receiver.Receive(ctx))
-		assert.Equal(t, maxMessages, receiver.workerSem.Available())
+		receiver.Receive(ctx)
 	})
 }
 

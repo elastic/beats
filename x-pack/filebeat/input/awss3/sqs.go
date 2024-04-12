@@ -6,7 +6,6 @@ package awss3
 
 import (
 	"context"
-	"errors"
 	"strconv"
 	"sync"
 	"time"
@@ -36,14 +35,6 @@ type sqsReader struct {
 
 	// workerWg is used to wait on worker goroutines during shutdown
 	workerWg sync.WaitGroup
-
-	// This channel is used by wakeUpMainLoop() to signal to the main
-	// loop that a worker is ready for more data
-	wakeUpChan chan struct{}
-
-	// If retryTimer is set, there was an error receiving SQS messages,
-	// and the run loop will not try again until the timer expires.
-	retryTimer *time.Timer
 }
 
 func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, msgHandler sqsProcessor) *sqsReader {
@@ -58,17 +49,6 @@ func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessag
 		log:                 log,
 		metrics:             metrics,
 		workChan:            make(chan types.Message),
-
-		// wakeUpChan is buffered so we can always trigger it without blocking,
-		// even if the main loop is in the middle of other work
-		wakeUpChan: make(chan struct{}, 1),
-	}
-}
-
-func (r *sqsReader) wakeUpMainLoop() {
-	select {
-	case r.wakeUpChan <- struct{}{}:
-	default:
 	}
 }
 
@@ -85,27 +65,32 @@ func (r *sqsReader) sqsWorkerLoop(ctx context.Context) {
 		}
 		r.metrics.endSQSWorker(id)
 		r.activeMessages.Dec()
-		// Notify the main loop that we're ready for more data, in case it's asleep
-		r.wakeUpMainLoop()
 	}
 }
 
 func (r *sqsReader) getMessageBatch(ctx context.Context) []types.Message {
 	// We read enough messages to bring activeMessages up to the total
-	// worker count
-	receiveCount := r.maxMessagesInflight - r.activeMessages.Load()
-	if receiveCount > 0 {
-		msgs, err := r.sqs.ReceiveMessage(ctx, receiveCount)
-		if err != nil && ctx.Err() == nil {
-			r.log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
-			r.retryTimer = time.NewTimer(sqsRetryDelay)
-		}
-		r.activeMessages.Add(len(msgs))
-		r.log.Debugf("Received %v SQS messages.", len(msgs))
-		r.metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
-		return msgs
+	// worker count (plus one, to unblock us when workers are ready for
+	// more messages)
+	receiveCount := r.maxMessagesInflight + 1 - r.activeMessages.Load()
+	if receiveCount <= 0 {
+		return nil
 	}
-	return nil
+	msgs, err := r.sqs.ReceiveMessage(ctx, receiveCount)
+	for err != nil && ctx.Err() == nil {
+		r.log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
+		// Wait for the retry delay, but stop early if the context is cancelled.
+		select {
+		case <-ctx.Done():
+			return nil
+		case <-time.After(sqsRetryDelay):
+		}
+		msgs, err = r.sqs.ReceiveMessage(ctx, receiveCount)
+	}
+	r.activeMessages.Add(len(msgs))
+	r.log.Debugf("Received %v SQS messages.", len(msgs))
+	r.metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
+	return msgs
 }
 
 func (r *sqsReader) startWorkers(ctx context.Context) {
@@ -120,54 +105,26 @@ func (r *sqsReader) startWorkers(ctx context.Context) {
 	}
 }
 
-func (r *sqsReader) Receive(ctx context.Context) error {
-	var msgs []types.Message
+// The main loop of the reader, that fetches messages from SQS
+// and forwards them to workers via workChan.
+func (r *sqsReader) Receive(ctx context.Context) {
+	r.startWorkers(ctx)
+
 	for ctx.Err() == nil {
-		// If we don't have any messages, and we aren't in a retry delay,
-		// try to read some
-		if len(msgs) == 0 && r.retryTimer == nil {
-			msgs = r.getMessageBatch(ctx)
-		}
+		msgs := r.getMessageBatch(ctx)
 
-		// Unblock the local work channel only if there are messages to send
-		var workChan chan types.Message
-		var nextMessage types.Message
-		if len(msgs) > 0 {
-			workChan = r.workChan
-			nextMessage = msgs[0]
-		}
-
-		// Unblock the retry channel only if there's an active retry timer
-		var retryChan <-chan time.Time
-		if r.retryTimer != nil {
-			retryChan = r.retryTimer.C
-		}
-
-		select {
-		case <-ctx.Done():
-		case workChan <- nextMessage:
-			msgs = msgs[1:]
-		case <-retryChan:
-			// The retry interval has elapsed, clear the timer so we can request
-			// new messages again
-			r.retryTimer = nil
-		case <-r.wakeUpChan:
-			// No need to do anything, this is just to unblock us when a worker is
-			// ready for more data
+		for _, msg := range msgs {
+			select {
+			case <-ctx.Done():
+			case r.workChan <- msg:
+			}
 		}
 	}
 
-	// Close the work channel to signal to the workers that we're done
+	// Close the work channel to signal to the workers that we're done,
+	// then wait for them to finish.
 	close(r.workChan)
-
-	// Wait for all workers to finish.
 	r.workerWg.Wait()
-
-	if errors.Is(ctx.Err(), context.Canceled) {
-		// A canceled context is a normal shutdown.
-		return nil
-	}
-	return ctx.Err()
 }
 
 func (r *sqsReader) GetApproximateMessageCount(ctx context.Context) (int, error) {

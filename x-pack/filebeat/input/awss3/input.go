@@ -203,7 +203,8 @@ func (in *s3Input) runQueueReader(
 	// Poll metrics periodically in the background
 	go pollSqsWaitingMetric(ctx, receiver)
 
-	return receiver.Receive(ctx)
+	receiver.Receive(ctx)
+	return nil
 }
 
 func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*sqsReader, error) {
