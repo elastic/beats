@@ -32,6 +32,9 @@ type Factory struct {
 }
 
 // metricSetWithProcessors is an interface to check if a MetricSet has directly attached Processors
+// NOTE: Processors that implement the Closer interface are going to be closed from the pipeline when required,
+// namely during dynamic configuration reloading. Thus, it is critical for the Metricset to always instantiate
+// properly the processor and not consider it as always running.
 type metricSetWithProcessors interface {
 	Processors() []beat.Processor
 }
