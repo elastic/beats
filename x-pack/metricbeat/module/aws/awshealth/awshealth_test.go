@@ -156,21 +156,22 @@ func TestGetEventDetails(t *testing.T) {
 	assert.NotEmpty(t, eventsOutput.Events)
 
 	// Create a slice to store AWSHealthMetrics
-	var awsHealthMetrics []AWSHealthMetric
+	var awsHealthMetrics = make([]AWSHealthMetric, 0, len(eventsOutput.Events))
 
-	for _, event := range eventsOutput.Events {
+	for i, event := range eventsOutput.Events {
 		// Create a new instance of AWSHealthMetric
+
 		awsHealthMetric := AWSHealthMetric{
 			EventArn:          *event.Arn,
 			EndTime:           *event.EndTime,
-			EventScopeCode:    aws.ToString((*string)(&event.EventScopeCode)),
-			EventTypeCategory: aws.ToString((*string)(&event.EventTypeCategory)),
+			EventScopeCode:    aws.ToString((*string)(&eventsOutput.Events[i].EventScopeCode)),
+			EventTypeCategory: aws.ToString((*string)(&eventsOutput.Events[i].EventTypeCategory)),
 			EventTypeCode:     *event.EventTypeCode,
 			LastUpdatedTime:   *event.LastUpdatedTime,
 			Region:            *event.Region,
 			Service:           *event.Service,
 			StartTime:         *event.StartTime,
-			StatusCode:        aws.ToString((*string)(&event.StatusCode)),
+			StatusCode:        aws.ToString((*string)(&eventsOutput.Events[i].StatusCode)),
 		}
 		// Call DescribeEventDetails for the current event
 		eventDetailsOutput, err := awsHealth.DescribeEventDetails(ctx, &health.DescribeEventDetailsInput{
@@ -199,8 +200,8 @@ func TestGetEventDetails(t *testing.T) {
 
 		// Count affected entities by status
 		var pending, resolved, others int32
-		for _, entity := range affectedEntitiesOutput.Entities {
-			switch aws.ToString((*string)(&entity.StatusCode)) {
+		for j, entity := range affectedEntitiesOutput.Entities {
+			switch aws.ToString((*string)(&affectedEntitiesOutput.Entities[j].StatusCode)) {
 			case "PENDING":
 				pending++
 			case "RESOLVED":
