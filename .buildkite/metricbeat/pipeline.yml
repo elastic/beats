@@ -47,7 +47,7 @@ steps:
         command: |
           set -euo pipefail
 
-          # TODO: uncomment lines below (that set MODULE) when https://github.com/elastic/beats/issues/38874 has been resolved.
+          # TODO: uncomment all lines below (that set MODULE and install kind) when https://github.com/elastic/beats/issues/38874 has been resolved.
           # TODO: Note that this problem exists ONLY on 7.17 branch
           # # defines the MODULE env var based on what's changed in a PR
           # source .buildkite/scripts/changesets.sh
@@ -55,11 +55,11 @@ steps:
           # echo "~~~ Will run tests with env var MODULE=$$MODULE"
 
           # TODO move this section to base image / pre-command hook
-          echo "~~~ Installing kind"
-          asdf plugin add kind
-          asdf install kind $ASDF_KIND_VERSION
+          # echo "~~~ Installing kind"
+          # asdf plugin add kind
+          # asdf install kind $ASDF_KIND_VERSION
 
-          .buildkite/deploy/kubernetes/scripts/kind-setup.sh
+          # .buildkite/deploy/kubernetes/scripts/kind-setup.sh
 
           echo "~~~ Running tests"
           export KUBECONFIG="$$PWD/kubecfg"
