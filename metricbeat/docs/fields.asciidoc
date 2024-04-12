@@ -1745,7 +1745,7 @@ type: date
 *`aws.awshealth.affected_entities.status_code`*::
 +
 --
-The most recent status of the entity affected by the event.
+The most recent status of the event. Possible values are open , closed , and upcoming.
 
 
 type: keyword
