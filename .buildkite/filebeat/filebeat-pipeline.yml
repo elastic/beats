@@ -34,6 +34,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Ubuntu Unit Tests"
 
       - label: ":ubuntu: Ubuntu Go Integration Tests"
         command: |
@@ -46,6 +49,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Ubuntu Go Integration Tests"
 
       - label: ":ubuntu: Ubuntu Python Integration Tests"
         command: |
@@ -58,6 +64,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Python Integration Tests"
 
       - label: ":windows: Windows 2016 Unit Tests"
         key: "windows-2016-unit-tests"
@@ -73,6 +82,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Windows 2016 Unit Tests"
 
       - label: ":windows: Windows 2022 Unit Tests"
         key: "windows-2022-unit-tests"
@@ -88,6 +100,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Windows 2022 Unit Tests"
 
   - group: "Filebeat Extended Tests"
     key: "filebeat-extended-tests"
@@ -106,6 +121,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Extended MacOS Unit Tests"
 
       - label: ":mac: MacOS ARM Unit Tests"
         key: "macos-arm64-unit-tests-extended"
@@ -121,6 +139,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Extended MacOS ARM Unit Tests"
 
       - label: ":linux: Ubuntu ARM Unit Tests"
         key: "extended-arm64-unit-test"
@@ -135,6 +156,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Extended Ubuntu ARM Unit Tests"
 
       - label: ":windows: Windows 2019 Unit Tests"
         key: "windows-extended-2019"
@@ -151,6 +175,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Extended Windows 2019 Unit Tests"
 
   - group: "Extended Windows Tests"
     key: "filebeat-extended-win-tests"
@@ -161,7 +188,6 @@ steps:
         command: |
           Set-Location -Path filebeat
           mage build unitTest
-
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -171,13 +197,15 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Extended Windows 11 Unit Tests"
 
       - label: ":windows: Windows 10 Unit Tests"
         key: "windows-extended-10"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
-
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -187,6 +215,9 @@ steps:
         artifact_paths:
           - "filebeat/build/*.xml"
           - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Extended Windows 10 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -211,6 +242,9 @@ steps:
           disk_type: "pd-ssd"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Packaging"
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
@@ -224,3 +258,6 @@ steps:
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Packaging ARM"
