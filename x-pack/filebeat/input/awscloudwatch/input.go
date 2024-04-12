@@ -112,7 +112,6 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 
 	// Create client for publishing events and receive notification of their ACKs.
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:      inputContext.Cancelation,
 		EventListener: awscommon.NewEventACKHandler(),
 	})
 	if err != nil {
