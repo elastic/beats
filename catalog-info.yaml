@@ -39,7 +39,7 @@ spec:
       name: beats
       description: "Beats Main pipeline"
     spec:
-      branch_configuration: "main 7.17 8.* mergify*"
+      branch_configuration: "main 7.17 8.*"
       pipeline_file: ".buildkite/pipeline.yml"
       provider_settings:
         build_pull_request_forks: false
