@@ -45,6 +45,12 @@ steps:
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet filebeat
           echo "~~~ Will run tests with env var MODULE=$$MODULE"
+          # TODO move this section to base image / pre-command hook
+          echo "~~~ Installing kind"
+          asdf plugin add kind
+          asdf install kind $ASDF_KIND_VERSION
+          .buildkite/deploy/kubernetes/scripts/kind-setup.sh
+
           cd filebeat
           mage goIntegTest
         agents:
@@ -65,6 +71,12 @@ steps:
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet filebeat
           echo "~~~ Will run tests with env var MODULE=$$MODULE"
+          # TODO move this section to base image / pre-command hook
+          echo "~~~ Installing kind"
+          asdf plugin add kind
+          asdf install kind $ASDF_KIND_VERSION
+          .buildkite/deploy/kubernetes/scripts/kind-setup.sh
+
           cd filebeat
           mage pythonIntegTest
         agents:
