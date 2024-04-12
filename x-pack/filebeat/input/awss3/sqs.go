@@ -68,15 +68,15 @@ func (r *sqsReader) sqsWorkerLoop(ctx context.Context) {
 	}
 }
 
-func (r *sqsReader) getMessageBatch(ctx context.Context) []types.Message {
-	// We read enough messages to bring activeMessages up to the total
-	// worker count (plus one, to unblock us when workers are ready for
-	// more messages)
-	receiveCount := r.maxMessagesInflight + 1 - r.activeMessages.Load()
-	if receiveCount <= 0 {
+func (r *sqsReader) readMessages(ctx context.Context) []types.Message {
+	// We try to read enough messages to bring activeMessages up to the
+	// total worker count (plus one, to unblock us when workers are ready
+	// for more messages)
+	readCount := r.maxMessagesInflight + 1 - r.activeMessages.Load()
+	if readCount <= 0 {
 		return nil
 	}
-	msgs, err := r.sqs.ReceiveMessage(ctx, receiveCount)
+	msgs, err := r.sqs.ReceiveMessage(ctx, readCount)
 	for err != nil && ctx.Err() == nil {
 		r.log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
 		// Wait for the retry delay, but stop early if the context is cancelled.
@@ -85,7 +85,7 @@ func (r *sqsReader) getMessageBatch(ctx context.Context) []types.Message {
 			return nil
 		case <-time.After(sqsRetryDelay):
 		}
-		msgs, err = r.sqs.ReceiveMessage(ctx, receiveCount)
+		msgs, err = r.sqs.ReceiveMessage(ctx, readCount)
 	}
 	r.activeMessages.Add(len(msgs))
 	r.log.Debugf("Received %v SQS messages.", len(msgs))
@@ -111,7 +111,7 @@ func (r *sqsReader) Receive(ctx context.Context) {
 	r.startWorkers(ctx)
 
 	for ctx.Err() == nil {
-		msgs := r.getMessageBatch(ctx)
+		msgs := r.readMessages(ctx)
 
 		for _, msg := range msgs {
 			select {
