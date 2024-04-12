@@ -17,7 +17,7 @@ steps:
           diskSizeGb: 400
         command: |
           sudo apt update
-          sudo apt install msitools
+          sudo apt install -y msitools
           cd x-pack/agentbeat && mage package
         env:
           SNAPSHOT: true
