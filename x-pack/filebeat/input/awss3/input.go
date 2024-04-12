@@ -114,17 +114,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		return fmt.Errorf("can not start persistent store: %w", err)
 	}
 
-	// Wrap input Context's cancellation Done channel a context.Context. This
-	// goroutine stops with the parent closes the Done channel.
-	ctx, cancelInputCtx := context.WithCancel(context.Background())
-	go func() {
-		defer cancelInputCtx()
-		select {
-		case <-inputContext.Cancelation.Done():
-		case <-ctx.Done():
-		}
-	}()
-	defer cancelInputCtx()
+	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
 	if in.config.QueueURL != "" {
 		return in.runQueueReader(ctx, inputContext, pipeline)
