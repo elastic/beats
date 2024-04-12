@@ -1555,205 +1555,9 @@
             },
             {
                 "embeddableConfig": {
-                    "attributes": {
-                        "description": "",
-                        "layerListJSON": [
-                            {
-                                "alpha": 1,
-                                "id": "e14b9f6c-b5bc-44c3-a76d-cd3ce4416837",
-                                "includeInFitToBounds": true,
-                                "label": null,
-                                "maxZoom": 24,
-                                "minZoom": 0,
-                                "sourceDescriptor": {
-                                    "isAutoSelect": true,
-                                    "type": "EMS_TMS"
-                                },
-                                "style": {
-                                    "type": "TILE"
-                                },
-                                "type": "VECTOR_TILE",
-                                "visible": true
-                            },
-                            {
-                                "alpha": 0.75,
-                                "id": "af1017d3-ae58-4719-bfb4-a3cdfe33eec8",
-                                "includeInFitToBounds": true,
-                                "joins": [],
-                                "label": "Login Activity",
-                                "maxZoom": 24,
-                                "minZoom": 0,
-                                "sourceDescriptor": {
-                                    "applyGlobalQuery": true,
-                                    "applyGlobalTime": true,
-                                    "filterByMapBounds": true,
-                                    "geoField": "client.geo.location",
-                                    "id": "26c985c9-1742-40ad-8237-4613ee9099b9",
-                                    "indexPatternId": "filebeat-*",
-                                    "scalingType": "MVT",
-                                    "sortField": "",
-                                    "sortOrder": "desc",
-                                    "tooltipProperties": [],
-                                    "topHitsSize": 1,
-                                    "topHitsSplitField": "",
-                                    "type": "ES_SEARCH"
-                                },
-                                "style": {
-                                    "isTimeAware": true,
-                                    "properties": {
-                                        "fillColor": {
-                                            "options": {
-                                                "color": "#54B399"
-                                            },
-                                            "type": "STATIC"
-                                        },
-                                        "icon": {
-                                            "options": {
-                                                "value": "marker"
-                                            },
-                                            "type": "STATIC"
-                                        },
-                                        "iconOrientation": {
-                                            "options": {
-                                                "orientation": 0
-                                            },
-                                            "type": "STATIC"
-                                        },
-                                        "iconSize": {
-                                            "options": {
-                                                "size": 6
-                                            },
-                                            "type": "STATIC"
-                                        },
-                                        "labelBorderColor": {
-                                            "options": {
-                                                "color": "#FFFFFF"
-                                            },
-                                            "type": "STATIC"
-                                        },
-                                        "labelBorderSize": {
-                                            "options": {
-                                                "size": "SMALL"
-                                            }
-                                        },
-                                        "labelColor": {
-                                            "options": {
-                                                "color": "#000000"
-                                            },
-                                            "type": "STATIC"
-                                        },
-                                        "labelSize": {
-                                            "options": {
-                                                "size": 14
-                                            },
-                                            "type": "STATIC"
-                                        },
-                                        "labelText": {
-                                            "options": {
-                                                "value": ""
-                                            },
-                                            "type": "STATIC"
-                                        },
-                                        "lineColor": {
-                                            "options": {
-                                                "color": "#41937c"
-                                            },
-                                            "type": "STATIC"
-                                        },
-                                        "lineWidth": {
-                                            "options": {
-                                                "size": 1
-                                            },
-                                            "type": "STATIC"
-                                        },
-                                        "symbolizeAs": {
-                                            "options": {
-                                                "value": "circle"
-                                            }
-                                        }
-                                    },
-                                    "type": "VECTOR"
-                                },
-                                "type": "TILED_VECTOR",
-                                "visible": true
-                            }
-                        ],
-                        "mapStateJSON": {
-                            "center": {
-                                "lat": 15.07469,
-                                "lon": -0.10396
-                            },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "index": "filebeat-*",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.login"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.login"
-                                        }
-                                    }
-                                }
-                            ],
-                            "query": {
-                                "language": "kuery",
-                                "query": ""
-                            },
-                            "refreshConfig": {
-                                "interval": 0,
-                                "isPaused": true
-                            },
-                            "settings": {
-                                "autoFitToDataBounds": false,
-                                "backgroundColor": "#ffffff",
-                                "browserLocation": {
-                                    "zoom": 2
-                                },
-                                "disableInteractive": false,
-                                "disableTooltipControl": false,
-                                "fixedLocation": {
-                                    "lat": 0,
-                                    "lon": 0,
-                                    "zoom": 2
-                                },
-                                "hideLayerControl": false,
-                                "hideToolbarOverlay": false,
-                                "hideViewControl": false,
-                                "initialLocation": "LAST_SAVED_LOCATION",
-                                "maxZoom": 24,
-                                "minZoom": 0,
-                                "showScaleControl": false,
-                                "showSpatialFilters": true,
-                                "showTimesliderToggleButton": true,
-                                "spatialFiltersAlpa": 0.3,
-                                "spatialFiltersFillColor": "#DA8B45",
-                                "spatialFiltersLineColor": "#DA8B45"
-                            },
-                            "timeFilters": {
-                                "from": "now-7d/d",
-                                "to": "now"
-                            },
-                            "zoom": 1.38
-                        },
-                        "title": "",
-                        "uiStateJSON": {
-                            "isLayerTOCOpen": true,
-                            "openTOCDetails": []
-                        }
-                    },
                     "enhancements": {},
                     "hiddenLayers": [],
+                    "hidePanelTitles": false,
                     "isLayerTOCOpen": true,
                     "mapBuffer": {
                         "maxLat": 85.05113,
@@ -1770,12 +1574,14 @@
                 },
                 "gridData": {
                     "h": 25,
-                    "i": "7f4972e5-8854-4946-9a10-972a87427978",
+                    "i": "d860f236-a75a-4fde-81ce-f3de40ef7c19",
                     "w": 48,
                     "x": 0,
                     "y": 90
                 },
-                "panelIndex": "7f4972e5-8854-4946-9a10-972a87427978",
+                "panelIndex": "d860f236-a75a-4fde-81ce-f3de40ef7c19",
+                "panelRefName": "panel_d860f236-a75a-4fde-81ce-f3de40ef7c19",
+                "title": "Login activity by region [Filebeat Salesforce]",
                 "type": "map",
                 "version": "7.15.0"
             }
@@ -1987,12 +1793,12 @@
             "type": "index-pattern"
         },
         {
-            "id": "filebeat-*",
-            "name": "7f4972e5-8854-4946-9a10-972a87427978:layer_1_source_index_pattern",
-            "type": "index-pattern"
+            "id": "c9668e10-f88e-11ee-9088-0f36517484ce",
+            "name": "d860f236-a75a-4fde-81ce-f3de40ef7c19:panel_d860f236-a75a-4fde-81ce-f3de40ef7c19",
+            "type": "map"
         }
     ],
     "type": "dashboard",
-    "updated_at": "2024-04-11T13:17:09.904Z",
-    "version": "WzEwMTE2LDFd"
+    "updated_at": "2024-04-12T05:38:39.741Z",
+    "version": "WzEwMzE4LDFd"
 }
