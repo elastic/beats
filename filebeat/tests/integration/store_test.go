@@ -106,10 +106,10 @@ func TestStore(t *testing.T) {
 	filebeat.Stop()
 
 	registryLogFile := filepath.Join(tempDir, "data/registry/filebeat/log.json")
-	readFilestreamRegistryLog(t, registryLogFile, "remove", 10)
+	countOperationsFromFilestreamRegistry(t, registryLogFile, "remove", 10)
 }
 
-func readFilestreamRegistryLog(t *testing.T, path, op string, expectedCount int) {
+func countOperationsFromFilestreamRegistry(t *testing.T, path, op string, expectedCount int) {
 	file, err := os.Open(path)
 	if err != nil {
 		t.Fatalf("could not open file '%s': %s", path, err)

@@ -90,6 +90,12 @@ var defaultFields = mapstr.M{
 			"name": nil,
 			"id":   nil,
 		},
+		"thread": mapstr.M{
+			"capabilities": mapstr.M{
+				"effective": nil,
+				"permitted": nil,
+			},
+		},
 	},
 	"container": mapstr.M{
 		"id": nil,

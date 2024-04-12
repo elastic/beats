@@ -26,6 +26,7 @@ import (
 
 	bolt "go.etcd.io/bbolt"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -45,7 +46,7 @@ const (
 var underTest bool //nolint:unused // Used in Darwin-only builds.
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	ab.Registry.MustAddMetricSet(moduleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithHostParser(parse.EmptyHostParser),
 		mb.WithNamespace(namespace),

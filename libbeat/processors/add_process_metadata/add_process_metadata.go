@@ -71,14 +71,14 @@ type addProcessMetadata struct {
 
 type processMetadata struct {
 	entityID           string
-	name, title, exe   string
-	username, userid   string
+	name, title, exe, username, userid string
+	args                               []string
+	env                                map[string]string
+	startTime                          time.Time
+	pid, ppid                          int
 	groupname, groupid string
-	args               []string
-	env                map[string]string
-	startTime          time.Time
-	pid, ppid          int
-	fields             mapstr.M
+	capEffective, capPermitted         []string
+	fields mapstr.M
 }
 
 type processMetadataProvider interface {
@@ -358,6 +358,12 @@ func (p *processMetadata) toMap() mapstr.M {
 			user["id"] = p.userid
 		}
 		process["owner"] = user
+	}
+	if len(p.capEffective) > 0 {
+		process.Put("thread.capabilities.effective", p.capEffective)
+	}
+	if len(p.capPermitted) > 0 {
+		process.Put("thread.capabilities.permitted", p.capPermitted)
 	}
 	if p.groupname != "" || p.groupid != "" {
 		group := mapstr.M{}
