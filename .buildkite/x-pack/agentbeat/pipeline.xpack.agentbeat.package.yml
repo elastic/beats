@@ -17,7 +17,7 @@ steps:
           diskSizeGb: 400
         command: |
           sudo apt-get update -y
-          DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes msitools
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes msitools
           cd x-pack/agentbeat && mage package
         env:
           SNAPSHOT: true
