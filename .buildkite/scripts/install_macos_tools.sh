@@ -108,11 +108,11 @@ config_git() {
 
 withNodeJSEnv() {
   local version=$1
-  echo "Installing nvm"
+  echo "~~~ Installing nvm and Node.js"
   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
   export NVM_DIR="$HOME/.nvm"
   [ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh"
-  echo "~~~ Installing Node.js version: $version"
+  echo "Installing Node.js version: $version"
   nvm install "$version"
   # export PATH="${nvmPath}:${PATH}"
   nvm use "$version"
