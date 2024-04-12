@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
-	"sync"
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/kprobes"
@@ -45,22 +44,12 @@ type kProbesReader struct {
 	processor beat.Processor
 }
 
-var processMetadataProcessorOnce = sync.OnceValues(func() (beat.Processor, error) {
+func newKProbesReader(config Config, l *logp.Logger, parsers []FileParser) (*kProbesReader, error) {
+
 	processor, err := add_process_metadata.NewWithConfig(
 		add_process_metadata.ConfigOverwriteKeys(true),
 		add_process_metadata.ConfigMatchPIDs([]string{"process.pid"}),
 	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return processor, nil
-})
-
-func newKProbesReader(config Config, l *logp.Logger, parsers []FileParser) (*kProbesReader, error) {
-
-	processor, err := processMetadataProcessorOnce()
 	if err != nil {
 		return nil, err
 	}
