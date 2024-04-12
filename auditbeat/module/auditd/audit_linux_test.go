@@ -32,6 +32,7 @@ import (
 
 	"github.com/prometheus/procfs"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/libbeat/mapping"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -89,7 +90,7 @@ func TestImmutable(t *testing.T) {
 	config := getConfig()
 	config["immutable"] = true
 
-	ms := mbtest.NewPushMetricSetV2(t, config)
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
 	auditMetricSet := ms.(*MetricSet)
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
@@ -122,7 +123,7 @@ func TestData(t *testing.T) {
 		returnMessage(acceptMsgs...)
 
 	// Replace the default AuditClient with a mock.
-	ms := mbtest.NewPushMetricSetV2(t, getConfig())
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	auditMetricSet := ms.(*MetricSet)
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
@@ -155,7 +156,7 @@ func TestLoginType(t *testing.T) {
 		returnMessage(userAuthMsg)
 
 	// Replace the default AuditClient with a mock.
-	ms := mbtest.NewPushMetricSetV2(t, getConfig())
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 	auditMetricSet := ms.(*MetricSet)
 	auditMetricSet.client.Close()
 	auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}
@@ -274,7 +275,7 @@ func TestUnicastClient(t *testing.T) {
 	// PPID filter we applied to the rule.
 	time.AfterFunc(time.Second, func() { _, _ = exec.Command("cat", "/proc/self/status").Output() })
 
-	ms := mbtest.NewPushMetricSetV2(t, c)
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, c, ab.Registry)
 	events := mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
 	assertNoErrors(t, events)
 	assertHasBinCatExecve(t, events)
@@ -304,7 +305,7 @@ func TestMulticastClient(t *testing.T) {
 	// PPID filter we applied to the rule.
 	time.AfterFunc(time.Second, func() { _, _ = exec.Command("cat", "/proc/self/status").Output() })
 
-	ms := mbtest.NewPushMetricSetV2(t, c)
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, c, ab.Registry)
 	events := mbtest.RunPushMetricSetV2(5*time.Second, 0, ms)
 	assertNoErrors(t, events)
 	assertHasBinCatExecve(t, events)

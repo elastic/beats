@@ -15,7 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
-package auditd
+//go:build linux
+
+package cmd
 
 import (
 	"fmt"
@@ -26,8 +28,6 @@ import (
 
 	"github.com/elastic/go-libaudit/v2"
 	"github.com/elastic/go-libaudit/v2/rule"
-
-	"github.com/elastic/beats/v7/auditbeat/cmd"
 )
 
 var (
@@ -36,7 +36,7 @@ var (
 	singleLineStatus bool
 )
 
-func init() {
+func initShowRules() {
 	showRules := cobra.Command{
 		Use:     "auditd-rules",
 		Short:   "Show currently installed auditd rules",
@@ -63,7 +63,7 @@ func init() {
 		},
 	}
 	showStatus.Flags().BoolVarP(&singleLineStatus, "single-line", "s", false, "Output status as a single line")
-	cmd.ShowCmd.AddCommand(&showRules, &showStatus)
+	ShowCmd.AddCommand(&showRules, &showStatus)
 }
 
 func showAuditdRules(stdout, stderr io.Writer) error {

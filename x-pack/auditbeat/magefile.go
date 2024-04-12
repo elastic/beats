@@ -74,6 +74,15 @@ func AssembleDarwinUniversal() error {
 	return build.AssembleDarwinUniversal()
 }
 
+// GenerateIncludeListGo generates an include/list.go file containing imports
+// for the packages that match the paths (or globs) in importDirs (optional)
+// and moduleDirs (optional).
+func GenerateModuleIncludeListGo() error {
+	opts := devtools.DefaultIncludeListOptions()
+	opts.ImportDirs = []string{"processors/*"}
+	return devtools.GenerateIncludeListGo(opts)
+}
+
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.
@@ -86,7 +95,7 @@ func Package() {
 	devtools.PackageKibanaDashboardsFromBuildDir()
 	auditbeat.CustomizePackaging(auditbeat.XPackPackaging)
 
-	mg.SerialDeps(Fields, Dashboards, Config, devtools.GenerateModuleIncludeListGo)
+	mg.SerialDeps(Update)
 	mg.Deps(CrossBuild, CrossBuildGoDaemon)
 	mg.SerialDeps(devtools.Package, TestPackages)
 }
@@ -107,7 +116,7 @@ func TestPackages() error {
 
 // Update is an alias for running fields, dashboards, config.
 func Update() {
-	mg.SerialDeps(Fields, Dashboards, Config, devtools.GenerateModuleIncludeListGo)
+	mg.SerialDeps(Fields, Dashboards, Config, GenerateModuleIncludeListGo)
 }
 
 // Config generates both the short and reference configs.
