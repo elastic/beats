@@ -10,9 +10,10 @@ processors:
   - set:
       field: event.ingested
       value: "{{_ingest.timestamp}}"
-  - rename:
-      field: message
-      target_field: event.original
+  - set:
+      field: event.original
+      copy_from: message
+      ignore_empty_value: true
       ignore_failure: true
       if: "ctx.event?.original == null"
   - set:

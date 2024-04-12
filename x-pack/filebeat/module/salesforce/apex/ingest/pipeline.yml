@@ -12,6 +12,7 @@ processors:
       field: event.original
       copy_from: message
       ignore_empty_value: true
+      ignore_failure: true
       if: "ctx.event?.original == null"
   - fingerprint:
       fields:
