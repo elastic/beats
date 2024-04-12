@@ -114,7 +114,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		log:           logger,
 	}
 
-	// reader supports  a processor
+	// reader supports a processor
 	if rWithProcessor, ok := r.(eventProducerWithProcessor); ok {
 		if proc := rWithProcessor.Processor(); proc != nil {
 			ms.processors = append(ms.processors, proc)
