@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+
+env:
+  ASDF_MAGE_VERSION: 1.15.0
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+
+steps:
+  - group: ":Packaging Artifacts"
+    key: "package"
+    steps:
+      - label: ":package: Cross Building and package agentbeat"
+        key: package_agentbeat
+        agents:
+          provider: "gcp"
+          machineType: "c2-standard-16"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          diskSizeGb: 400
+        command: |
+          mage -d x-pack/agentbeat package
+        artifact_paths:
+          - "x-pack/agentbeat/build/distributions/**/*"
