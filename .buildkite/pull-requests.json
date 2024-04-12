@@ -5,7 +5,7 @@
             "pipelineSlug": "beats",
             "allow_org_users": true,
             "allowed_repo_permissions": ["admin", "write"],
-            "allowed_list": [ ],
+            "allowed_list": [ "mergify[bot]" ],
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
