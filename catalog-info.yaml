@@ -1001,7 +1001,7 @@ spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/x-pack/agentbeat/pipeline.xpack.agentbeat.package.yml"
       # todo release branched must be 8.14+
-      branch_configuration: "main 8.14 v8.14"
+      branch_configuration: "main 8.14"
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
       provider_settings:
