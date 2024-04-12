@@ -62,8 +62,7 @@ steps:
           .buildkite/deploy/kubernetes/scripts/kind-setup.sh
 
           echo "~~~ Running tests"
-          # uncomment line below when https://github.com/elastic/beats/issues/38874 has been resolved.
-          # export KUBECONFIG="$$PWD/kubecfg"
+          export KUBECONFIG="$$PWD/kubecfg"
           cd metricbeat && mage goIntegTest
         agents:
           provider: "gcp"
