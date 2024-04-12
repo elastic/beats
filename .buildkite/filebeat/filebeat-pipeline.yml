@@ -18,6 +18,9 @@ env:
 
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
+  # Integration Tests
+  K8S_VERSION: "v1.29.0"
+  ASDF_KIND_VERSION: "0.20.0"
 
 steps:
   - group: "Filebeat Mandatory Tests"
