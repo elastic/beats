@@ -91,8 +91,7 @@ func (s *states) Delete(id string) {
 	s.Lock()
 	defer s.Unlock()
 
-	index := s.findPrevious(id)
-	if index >= 0 {
+	if index, exists := s.idx[id]; exists {
 		last := len(s.states) - 1
 		s.states[last], s.states[index] = s.states[index], s.states[last]
 		s.states = s.states[:last]
@@ -155,9 +154,8 @@ func (s *states) Update(newState state, listingID string) {
 	defer s.Unlock()
 
 	id := newState.ID
-	index := s.findPrevious(id)
 
-	if index >= 0 {
+	if index, exists := s.idx[id]; exists {
 		s.states[index] = newState
 	} else {
 		// No existing state found, add new one
@@ -205,11 +203,10 @@ func (s *states) FindPrevious(newState state) state {
 	s.RLock()
 	defer s.RUnlock()
 	id := newState.ID
-	i := s.findPrevious(id)
-	if i < 0 {
-		return state{}
+	if i, exists := s.idx[id]; exists {
+		return s.states[i]
 	}
-	return s.states[i]
+	return state{}
 }
 
 // FindPreviousByID lookups a registered state, that matching the id.
@@ -217,33 +214,18 @@ func (s *states) FindPrevious(newState state) state {
 func (s *states) FindPreviousByID(id string) state {
 	s.RLock()
 	defer s.RUnlock()
-	i := s.findPrevious(id)
-	if i < 0 {
-		return state{}
+	if i, exists := s.idx[id]; exists {
+		return s.states[i]
 	}
-	return s.states[i]
+	return state{}
 }
 
 func (s *states) IsNew(state state) bool {
 	s.RLock()
 	defer s.RUnlock()
-	id := state.ID
-	i := s.findPrevious(id)
 
-	if i < 0 {
-		return true
-	}
-
-	return !s.states[i].IsEqual(&state)
-}
-
-// findPrevious returns the previous state for the file.
-// In case no previous state exists, index -1 is returned
-func (s *states) findPrevious(id string) int {
-	if i, exists := s.idx[id]; exists {
-		return i
-	}
-	return -1
+	i, exists := s.idx[state.ID]
+	return !exists || !s.states[i].IsEqual(&state)
 }
 
 // GetStates creates copy of the file states.
