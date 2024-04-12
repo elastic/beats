@@ -52,7 +52,32 @@ func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessag
 	}
 }
 
-func (r *sqsReader) sqsWorkerLoop(ctx context.Context) {
+// The main loop of the reader, that fetches messages from SQS
+// and forwards them to workers via workChan.
+func (r *sqsReader) Receive(ctx context.Context) {
+	r.startWorkers(ctx)
+	r.readerLoop(ctx)
+
+	// Close the work channel to signal to the workers that we're done,
+	// then wait for them to finish.
+	close(r.workChan)
+	r.workerWg.Wait()
+}
+
+func (r *sqsReader) readerLoop(ctx context.Context) {
+	for ctx.Err() == nil {
+		msgs := r.readMessages(ctx)
+
+		for _, msg := range msgs {
+			select {
+			case <-ctx.Done():
+			case r.workChan <- msg:
+			}
+		}
+	}
+}
+
+func (r *sqsReader) workerLoop(ctx context.Context) {
 	for msg := range r.workChan {
 		start := time.Now()
 
@@ -100,31 +125,9 @@ func (r *sqsReader) startWorkers(ctx context.Context) {
 		r.workerWg.Add(1)
 		go func() {
 			defer r.workerWg.Done()
-			r.sqsWorkerLoop(ctx)
+			r.workerLoop(ctx)
 		}()
 	}
-}
-
-// The main loop of the reader, that fetches messages from SQS
-// and forwards them to workers via workChan.
-func (r *sqsReader) Receive(ctx context.Context) {
-	r.startWorkers(ctx)
-
-	for ctx.Err() == nil {
-		msgs := r.readMessages(ctx)
-
-		for _, msg := range msgs {
-			select {
-			case <-ctx.Done():
-			case r.workChan <- msg:
-			}
-		}
-	}
-
-	// Close the work channel to signal to the workers that we're done,
-	// then wait for them to finish.
-	close(r.workChan)
-	r.workerWg.Wait()
 }
 
 func (r *sqsReader) GetApproximateMessageCount(ctx context.Context) (int, error) {
