@@ -127,18 +127,11 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	defer cancelInputCtx()
 
 	if in.config.QueueURL != "" {
-		err = in.runQueueReader(ctx, inputContext, pipeline)
-		if err != nil {
-			// possibly this should be unconditional?
-			return err
-		}
+		return in.runQueueReader(ctx, inputContext, pipeline)
 	}
 
 	if in.config.BucketARN != "" || in.config.NonAWSBucketName != "" {
-		err = in.runS3Poller(ctx, inputContext, pipeline, persistentStore, states)
-		if err != nil {
-			return err
-		}
+		return in.runS3Poller(ctx, inputContext, pipeline, persistentStore, states)
 	}
 
 	return nil

@@ -383,7 +383,7 @@ func (p *s3Poller) Poll(ctx context.Context) {
 			}()
 		}
 
-		timed.Wait(ctx, p.bucketPollInterval)
+		_ = timed.Wait(ctx, p.bucketPollInterval)
 	}
 
 	// Wait for all workers to finish.
