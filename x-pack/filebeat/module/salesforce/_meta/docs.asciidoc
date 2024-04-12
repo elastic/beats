@@ -5,21 +5,24 @@
 
 == Salesforce module
 
-include::{libbeat-dir}/shared/integration-link.asciidoc[]
+[NOTE]
 
+The Salesforce module has been completely revamped to use a new dedicated Salesforce input for event collection, replacing the previous HTTPJSON input method. This change brings improved performance and reliability. However, please be aware that this update introduces a breaking change. We believe this is the right time to make this necessary improvement as the previous module was in beta.
+
+include::{libbeat-dir}/shared/integration-link.asciidoc[]
 
 The Salesforce module collects logs from a Salesforce instance using the Salesforce REST API. It supports real-time and historical data collection for various log types including Login, Logout, APEX, and Setup Audit Trail.
 
 The Salesforce module contains the following filesets for collecting different types of logs:
 
-- The `login` fileset collects Login events from the EventLogFile and Event Monitoring.
-- The `logout` fileset collects Logout events from the EventLogFile and Event Monitoring.
+- The `login` fileset collects Login events from the EventLogFile or Objects (real-time).
+- The `logout` fileset collects Logout events from the EventLogFile or Objects (real-time).
 - The `apex` fileset collects APEX execution logs from the EventLogFile.
-- The `setupaudittrail` fileset collects Audit Trails events generated when admins make configuration changes in the org's Setup area.
+- The `setupaudittrail` fileset collects Audit Trails events generated when admins make configuration changes in the org's Setup area from the Objects (real-time).
 
 [options="header"]
 |===
-| Fileset | EventLogFile | Real-time (Objects)
+| Fileset | EventLogFile | Objects (real-time)
 
 |login
 |yes
