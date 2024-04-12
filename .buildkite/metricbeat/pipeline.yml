@@ -235,12 +235,12 @@ steps:
               context: "metricbeat: Extended MacOS Unit Tests"
 
   # temporarily disabled to speed up packaging tests
-  - wait: ~
-    # with PRs, we want to run packaging only if mandatory tests succeed
-    # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
-    # this allows building DRA artifacts even if there is flakiness in mandatory tests
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-    depends_on: "metricbeat-mandatory-tests"
+  # - wait: ~
+  #   # with PRs, we want to run packaging only if mandatory tests succeed
+  #   # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
+  #   # this allows building DRA artifacts even if there is flakiness in mandatory tests
+  #   if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+  #   depends_on: "metricbeat-mandatory-tests"
 
   - group: "Metricbeat Packaging"
     key: "metricbeat-packaging"
