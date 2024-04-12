@@ -68,7 +68,7 @@ func (n *input) Run(runCtx v2.Context, connector beat.PipelineConnector) (err er
 		EventListener: NewTxACKHandler(),
 	})
 	if err != nil {
-		return fmt.Errorf("could not connect to publishing pipeline: %s", err)
+		return fmt.Errorf("could not connect to publishing pipeline: %w", err)
 	}
 	defer client.Close()
 

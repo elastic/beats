@@ -98,8 +98,7 @@ func makeDiscardQueue() queue.Queue {
 			// count is a counter that increments on every published event
 			// it's also the returned Event ID
 			count := uint64(0)
-			var producer *testProducer
-			producer = &testProducer{
+			producer := &testProducer{
 				publish: func(try bool, event interface{}) (queue.EntryID, bool) {
 					count++
 					return queue.EntryID(count), true
