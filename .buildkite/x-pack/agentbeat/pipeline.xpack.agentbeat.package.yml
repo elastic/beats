@@ -16,6 +16,8 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           diskSizeGb: 400
         command: |
-          mage -d x-pack/agentbeat package
+          cd x-pack/agentbeat && mage package
+        env:
+          SNAPSHOT: true
         artifact_paths:
           - "x-pack/agentbeat/build/distributions/**/*"
