@@ -83,7 +83,7 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 	capEffective, _ := capabilities.FromPid(capabilities.Effective, pid)
 
 	r := processMetadata{
-		entityID:  eID,
+		entityID:     eID,
 		name:         info.Name,
 		args:         info.Args,
 		env:          env,
@@ -96,8 +96,8 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 		startTime:    info.StartTime,
 		username:     username,
 		userid:       userid,
-		groupname: groupname,
-		groupid:   groupid,
+		groupname:    groupname,
+		groupid:      groupid,
 	}
 
 	r.fields = r.toMap()

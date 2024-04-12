@@ -70,15 +70,15 @@ type addProcessMetadata struct {
 }
 
 type processMetadata struct {
-	entityID           string
+	entityID                           string
 	name, title, exe, username, userid string
 	args                               []string
 	env                                map[string]string
 	startTime                          time.Time
 	pid, ppid                          int
-	groupname, groupid string
+	groupname, groupid                 string
 	capEffective, capPermitted         []string
-	fields mapstr.M
+	fields                             mapstr.M
 }
 
 type processMetadataProvider interface {
