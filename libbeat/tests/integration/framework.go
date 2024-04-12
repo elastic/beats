@@ -714,6 +714,14 @@ func GenerateLogFile(t *testing.T, path string, count int, append bool) {
 		}
 	}()
 	now := time.Now().Format(time.RFC3339)
+	// If the length is different, e.g when there is no offset from UTC.
+	// add some padding so the length is predictable
+	if len(now) != len(time.RFC3339) {
+		paddingNeeded := len(time.RFC3339) - len(now)
+		for i := 0; i < paddingNeeded; i++ {
+			now += "-"
+		}
+	}
 	for i := 0; i < count; i++ {
 		if _, err := fmt.Fprintf(file, "%s           %13d\n", now, i); err != nil {
 			t.Fatalf("could not write line %d to file: %s", count+1, err)
