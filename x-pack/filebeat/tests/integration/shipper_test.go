@@ -64,7 +64,7 @@ func TestShipperInputOutput(t *testing.T) {
 
 	cfg := `filebeat.inputs:
 - type: filestream
-  id: my-filestream-id 
+  id: my-filestream-id
   paths:
     - %s
 output.elasticsearch:
@@ -99,7 +99,7 @@ processors:
       type: metricbeat
 `
 	// check that file can be ingested normally and found in elasticsearch
-	filebeat := integration.NewBeat(t, "filebeat", "../../filebeat.test")
+	filebeat := NewFilebeat(t)
 	filebeat.WriteConfigFile(fmt.Sprintf(cfg, inputFilePath, esURL.Host, esURL.User.Username(), esPassword, kURL.Host, kUserInfo.Username(), kPassword, uniqMsg))
 	filebeat.Start()
 	filebeat.WaitForLogs("Publish event: ", 10*time.Second)
@@ -125,7 +125,7 @@ processors:
 	shipperCfg := `filebeat.inputs:
 - type: shipper
   server: unix://%s
-  id: my-shipper-id 
+  id: my-shipper-id
   data_stream:
     data_set: generic
     type: log
@@ -148,14 +148,14 @@ queue.mem:
   flush.min_events: 0
 `
 	// start a shipper filebeat, wait until gRPC service starts
-	shipper := integration.NewBeat(t, "filebeat", "../../filebeat.test")
+	shipper := NewFilebeat(t)
 	shipper.WriteConfigFile(fmt.Sprintf(shipperCfg, gRpcPath, esURL.Host, esURL.User.Username(), esPassword, kURL.Host, kUserInfo.Username(), kPassword))
 	shipper.Start()
 	shipper.WaitForLogs("done setting up gRPC server", 30*time.Second)
 
 	fb2shipperCfg := `filebeat.inputs:
 - type: filestream
-  id: my-filestream-id 
+  id: my-filestream-id
   paths:
     - %s
 output.shipper:
@@ -191,7 +191,7 @@ processors:
       type: metricbeat
 `
 	// start filebeat with shipper output, make doc is ingested into elasticsearch
-	fb2shipper := integration.NewBeat(t, "filebeat", "../../filebeat.test")
+	fb2shipper := NewFilebeat(t)
 	fb2shipper.WriteConfigFile(fmt.Sprintf(fb2shipperCfg, inputFilePath, gRpcPath, kURL.Host, kUserInfo.Username(), kPassword, uniqMsg))
 	fb2shipper.Start()
 	fb2shipper.WaitForLogs("Publish event: ", 10*time.Second)

@@ -36,7 +36,7 @@ type cleaner struct {
 // run starts a loop that tries to clean entries from the registry.
 // The cleaner locks the store, such that no new states can be created
 // during the cleanup phase. Only resources that are finished and whose TTL
-// (clean_timeout setting) has expired will be removed.
+// (clean_inactive setting) has expired will be removed.
 //
 // Resources are considered "Finished" if they do not have a current owner (active input), and
 // if they have no pending updates that still need to be written to the registry file after associated

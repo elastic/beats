@@ -50,4 +50,7 @@ type Settings struct {
 	// publisher pipeline. This is only useful when the Beat plans to use
 	// beat.DropIfFull PublishMode. Leave as zero for default.
 	InputQueueSize int
+
+	// Initialize functions that are called in-order to initialize unique items for the beat.
+	Initialize []func()
 }

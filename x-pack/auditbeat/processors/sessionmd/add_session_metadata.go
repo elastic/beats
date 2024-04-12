@@ -30,7 +30,8 @@ const (
 	logName       = "processor." + processorName
 )
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	processors.RegisterPlugin(processorName, New)
 }
 
