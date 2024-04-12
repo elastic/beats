@@ -40,6 +40,11 @@ steps:
 
       - label: ":ubuntu: Ubuntu Go Integration Tests"
         command: |
+          set -euo pipefail
+          # defines the MODULE env var based on what's changed in a PR
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet filebeat
+          echo "~~~ Will run tests with env var MODULE=$$MODULE"
           cd filebeat
           mage goIntegTest
         agents:
@@ -55,6 +60,11 @@ steps:
 
       - label: ":ubuntu: Ubuntu Python Integration Tests"
         command: |
+          set -euo pipefail
+          # defines the MODULE env var based on what's changed in a PR
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet filebeat
+          echo "~~~ Will run tests with env var MODULE=$$MODULE"
           cd filebeat
           mage pythonIntegTest
         agents:
