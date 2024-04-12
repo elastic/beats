@@ -55,6 +55,7 @@ steps:
           .buildkite/deploy/kubernetes/scripts/kind-setup.sh
 
           export KUBECONFIG="$$PWD/kubecfg"
+          echo "~~~ Running tests"
           cd filebeat
           mage goIntegTest
         agents:
@@ -82,6 +83,7 @@ steps:
           .buildkite/deploy/kubernetes/scripts/kind-setup.sh
 
           export KUBECONFIG="$$PWD/kubecfg"
+          echo "~~~ Running tests"
           cd filebeat
           mage pythonIntegTest
         agents:
