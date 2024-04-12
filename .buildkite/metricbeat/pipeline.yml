@@ -234,6 +234,7 @@ steps:
           - github_commit_status:
               context: "metricbeat: Extended MacOS Unit Tests"
 
+  # temporarily disabled to speed up packaging tests
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
     # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
