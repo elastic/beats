@@ -99,7 +99,7 @@ func makeDiscardQueue() queue.Queue {
 			// it's also the returned Event ID
 			count := uint64(0)
 			producer := &testProducer{
-				publish: func(try bool, event interface{}) (queue.EntryID, bool) {
+				publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
 					count++
 					return queue.EntryID(count), true
 				},
