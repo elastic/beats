@@ -117,8 +117,6 @@ steps:
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-<<<<<<< HEAD
-=======
   - label: "Trigger Xpack/Winlogbeat"
     plugins:
       - monorepo-diff#v1.0.1:
@@ -161,4 +159,3 @@ steps:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
->>>>>>> fbae2851d5 (Moved xpack/winlogbeat pipeline to central pipeline (#38851))

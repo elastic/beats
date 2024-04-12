@@ -3,29 +3,18 @@ name: "beats-xpack-winlogbeat"
 
 env:
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-<<<<<<< HEAD
-  IMAGE_WIN_10: "family/general-windows-10"
-  IMAGE_WIN_11: "family/general-windows-11"
-  IMAGE_WIN_2016: "family/core-windows-2016"
-  IMAGE_WIN_2019: "family/core-windows-2019"
-  IMAGE_WIN_2022: "family/core-windows-2022"
-  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-=======
+
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
->>>>>>> fbae2851d5 (Moved xpack/winlogbeat pipeline to central pipeline (#38851))
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
 
-<<<<<<< HEAD
-=======
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
->>>>>>> fbae2851d5 (Moved xpack/winlogbeat pipeline to central pipeline (#38851))
 steps:
   - group: "Mandatory Tests"
     key: "xpack-winlogbeat-mandatory-tests"
@@ -168,17 +157,7 @@ steps:
           disk_size: 100
           disk_type: "pd-ssd"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
         notify:
           - github_commit_status:
               context: "Xpack/Winlogbeat Packaging"
-
-<<<<<<< HEAD
-  - label: ":linux: Load dynamic x-pack winlogbeat pipeline"
-    key: "xpack-winlogbeat-pipeline"
-    command: ".buildkite/scripts/generate_xpack_winlogbeat_pipeline.sh"
-    notify:
-      - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
-=======
->>>>>>> fbae2851d5 (Moved xpack/winlogbeat pipeline to central pipeline (#38851))
