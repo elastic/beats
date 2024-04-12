@@ -57,6 +57,7 @@ steps:
             - path:
                 - filebeat/
                 - .buildkite/filebeat/
+                - .buildkite/scripts
                 #OSS
                 - go.mod
                 - pytest.ini
