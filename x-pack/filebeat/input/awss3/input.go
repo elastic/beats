@@ -99,13 +99,12 @@ func (in *s3Input) Test(ctx v2.TestContext) error {
 }
 
 func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
-	var err error
+	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
 	persistentStore, err := in.store.Access()
 	if err != nil {
 		return fmt.Errorf("can not access persistent store: %w", err)
 	}
-
 	defer persistentStore.Close()
 
 	states := newStates(inputContext)
@@ -113,8 +112,6 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	if err != nil {
 		return fmt.Errorf("can not start persistent store: %w", err)
 	}
-
-	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
 	if in.config.QueueURL != "" {
 		return in.runQueueReader(ctx, inputContext, pipeline)
@@ -236,7 +233,7 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 
 	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig)
 
-	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), in.metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory, in.config.MaxNumberOfMessages)
+	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), in.metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory)
 
 	sqsReader := newSQSReader(log.Named("sqs"), in.metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
 
