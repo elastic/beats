@@ -4,7 +4,29 @@
         "hits": 0,
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
-                "filter": [],
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "salesforce.setupaudittrail"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "salesforce.setupaudittrail"
+                            }
+                        }
+                    }
+                ],
                 "query": {
                     "language": "kuery",
                     "query": ""
@@ -84,11 +106,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-5ca48d62-7341-48b7-a2c0-5f2410c2d045",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -155,29 +172,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.setupaudittrail"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.setupaudittrail"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -244,11 +239,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-72ce303a-9d98-4bab-856e-a67eb8605bfb",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -295,29 +285,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.setupaudittrail"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.setupaudittrail"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -383,11 +351,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-3ac7ca64-bfb5-471c-8a8a-2cb5837ee004",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -446,29 +409,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.setupaudittrail"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.setupaudittrail"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -557,6 +498,11 @@
     "references": [
         {
             "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
             "name": "198189b3-48f3-4fc4-ae69-5ac5ee520d24:control_198189b3-48f3-4fc4-ae69-5ac5ee520d24_0_index_pattern",
             "type": "index-pattern"
         },
@@ -572,22 +518,12 @@
         },
         {
             "id": "filebeat-*",
-            "name": "fc8067aa-c39c-4547-adfb-b618b9cbe4e8:filter-index-pattern-0",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
             "name": "6d50ae65-0cff-4b59-b347-ee6ea82d637e:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
             "name": "6d50ae65-0cff-4b59-b347-ee6ea82d637e:indexpattern-datasource-layer-72ce303a-9d98-4bab-856e-a67eb8605bfb",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "6d50ae65-0cff-4b59-b347-ee6ea82d637e:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
@@ -601,17 +537,12 @@
             "type": "index-pattern"
         },
         {
-            "id": "filebeat-*",
-            "name": "33acb8b4-5e5c-4ba2-8089-2554aaff7f23:filter-index-pattern-0",
-            "type": "index-pattern"
-        },
-        {
             "id": "3e7187a0-f894-11ee-9088-0f36517484ce",
             "name": "7c636e26-d3f1-4aa9-b263-683d6b75f2ab:panel_7c636e26-d3f1-4aa9-b263-683d6b75f2ab",
             "type": "search"
         }
     ],
     "type": "dashboard",
-    "updated_at": "2024-04-12T06:17:21.597Z",
-    "version": "WzEwOTE0LDFd"
+    "updated_at": "2024-04-12T11:38:19.817Z",
+    "version": "WzExMjcyLDFd"
 }

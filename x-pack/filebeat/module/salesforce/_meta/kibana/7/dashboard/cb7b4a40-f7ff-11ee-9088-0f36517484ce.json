@@ -4,7 +4,29 @@
         "hits": 0,
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
-                "filter": [],
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "salesforce.login"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "salesforce.login"
+                            }
+                        }
+                    }
+                ],
                 "query": {
                     "language": "kuery",
                     "query": ""
@@ -88,11 +110,6 @@
                             {
                                 "id": "filebeat-*",
                                 "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-1",
                                 "type": "index-pattern"
                             }
                         ],
@@ -193,27 +210,6 @@
                                         "alias": null,
                                         "disabled": false,
                                         "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.login"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.login"
-                                        }
-                                    }
-                                },
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-1",
                                         "key": "event.action",
                                         "negate": false,
                                         "params": {
@@ -239,6 +235,7 @@
                             }
                         },
                         "title": "Login success rate [Filebeat Salesforce]",
+                        "type": "lens",
                         "visualizationType": "lnsMetric"
                     },
                     "enhancements": {},
@@ -277,11 +274,6 @@
                             {
                                 "id": "filebeat-*",
                                 "name": "filter-index-pattern-1",
-                                "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-2",
                                 "type": "index-pattern"
                             }
                         ],
@@ -334,27 +326,6 @@
                                         "alias": null,
                                         "disabled": false,
                                         "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.login"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.login"
-                                        }
-                                    }
-                                },
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-1",
                                         "key": "event.outcome",
                                         "negate": false,
                                         "params": {
@@ -375,7 +346,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "indexRefName": "filter-index-pattern-2",
+                                        "indexRefName": "filter-index-pattern-1",
                                         "key": "event.action",
                                         "negate": false,
                                         "params": {
@@ -436,11 +407,6 @@
                             {
                                 "id": "filebeat-*",
                                 "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-1",
                                 "type": "index-pattern"
                             }
                         ],
@@ -507,27 +473,6 @@
                                         "alias": null,
                                         "disabled": false,
                                         "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.login"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.login"
-                                        }
-                                    }
-                                },
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-1",
                                         "key": "event.action",
                                         "negate": false,
                                         "params": {
@@ -623,11 +568,6 @@
                                 "id": "filebeat-*",
                                 "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-1",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -675,27 +615,6 @@
                                         "alias": null,
                                         "disabled": false,
                                         "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.login"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.login"
-                                        }
-                                    }
-                                },
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-1",
                                         "key": "event.action",
                                         "negate": false,
                                         "params": {
@@ -780,11 +699,6 @@
                                 "id": "filebeat-*",
                                 "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-1",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -839,27 +753,6 @@
                                         "alias": null,
                                         "disabled": false,
                                         "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.login"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.login"
-                                        }
-                                    }
-                                },
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-1",
                                         "key": "event.action",
                                         "negate": false,
                                         "params": {
@@ -933,11 +826,6 @@
                                 "id": "filebeat-*",
                                 "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-1",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -992,27 +880,6 @@
                                         "alias": null,
                                         "disabled": false,
                                         "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.login"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.login"
-                                        }
-                                    }
-                                },
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-1",
                                         "key": "event.action",
                                         "negate": false,
                                         "params": {
@@ -1081,11 +948,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-e6917172-0cfc-45d0-8761-9d151ca8c6d8",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -1132,29 +994,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.login"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.login"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -1225,11 +1065,6 @@
                                 "id": "filebeat-*",
                                 "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-1",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -1285,27 +1120,6 @@
                                         "alias": null,
                                         "disabled": false,
                                         "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.login"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.login"
-                                        }
-                                    }
-                                },
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-1",
                                         "key": "event.action",
                                         "negate": false,
                                         "params": {
@@ -1406,11 +1220,6 @@
                                 "id": "filebeat-*",
                                 "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-1",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -1466,27 +1275,6 @@
                                         "alias": null,
                                         "disabled": false,
                                         "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.login"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.login"
-                                        }
-                                    }
-                                },
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-1",
                                         "key": "event.action",
                                         "negate": false,
                                         "params": {
@@ -1604,6 +1392,11 @@
     "references": [
         {
             "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
             "name": "9788dc28-4697-4ec7-8953-e70fabbdb620:control_9788dc28-4697-4ec7-8953-e70fabbdb620_0_index_pattern",
             "type": "index-pattern"
         },
@@ -1620,11 +1413,6 @@
         {
             "id": "filebeat-*",
             "name": "ccd0f44d-f761-4a75-8fe1-f01955f30077:filter-index-pattern-0",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "ccd0f44d-f761-4a75-8fe1-f01955f30077:filter-index-pattern-1",
             "type": "index-pattern"
         },
         {
@@ -1649,11 +1437,6 @@
         },
         {
             "id": "filebeat-*",
-            "name": "da637943-7e6d-41a2-a9db-2d0fedc58956:filter-index-pattern-2",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
             "name": "71807bd3-d0ed-4328-93cc-6d9f3c93ea2c:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
@@ -1665,11 +1448,6 @@
         {
             "id": "filebeat-*",
             "name": "71807bd3-d0ed-4328-93cc-6d9f3c93ea2c:filter-index-pattern-0",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "71807bd3-d0ed-4328-93cc-6d9f3c93ea2c:filter-index-pattern-1",
             "type": "index-pattern"
         },
         {
@@ -1689,11 +1467,6 @@
         },
         {
             "id": "filebeat-*",
-            "name": "e988774b-2311-49ce-90d2-89c11abcdb07:filter-index-pattern-1",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
             "name": "89cc0806-06c0-44ff-a439-302308134141:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
@@ -1705,11 +1478,6 @@
         {
             "id": "filebeat-*",
             "name": "89cc0806-06c0-44ff-a439-302308134141:filter-index-pattern-0",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "89cc0806-06c0-44ff-a439-302308134141:filter-index-pattern-1",
             "type": "index-pattern"
         },
         {
@@ -1729,22 +1497,12 @@
         },
         {
             "id": "filebeat-*",
-            "name": "47159791-40d6-4728-a005-79ddba90c433:filter-index-pattern-1",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
             "name": "062d36b1-7b48-4942-8dc6-bc6c9da71ca4:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
             "name": "062d36b1-7b48-4942-8dc6-bc6c9da71ca4:indexpattern-datasource-layer-e6917172-0cfc-45d0-8761-9d151ca8c6d8",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "062d36b1-7b48-4942-8dc6-bc6c9da71ca4:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
@@ -1760,11 +1518,6 @@
         {
             "id": "filebeat-*",
             "name": "2f13c9f8-868c-420e-9243-4edc3bf8a52f:filter-index-pattern-0",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "2f13c9f8-868c-420e-9243-4edc3bf8a52f:filter-index-pattern-1",
             "type": "index-pattern"
         },
         {
@@ -1788,17 +1541,12 @@
             "type": "index-pattern"
         },
         {
-            "id": "filebeat-*",
-            "name": "02f53527-4721-4341-9d76-05d9075eef17:filter-index-pattern-1",
-            "type": "index-pattern"
-        },
-        {
             "id": "c9668e10-f88e-11ee-9088-0f36517484ce",
             "name": "d860f236-a75a-4fde-81ce-f3de40ef7c19:panel_d860f236-a75a-4fde-81ce-f3de40ef7c19",
             "type": "map"
         }
     ],
     "type": "dashboard",
-    "updated_at": "2024-04-12T05:38:39.741Z",
-    "version": "WzEwMzE4LDFd"
+    "updated_at": "2024-04-12T11:42:57.059Z",
+    "version": "WzExNjA3LDFd"
 }

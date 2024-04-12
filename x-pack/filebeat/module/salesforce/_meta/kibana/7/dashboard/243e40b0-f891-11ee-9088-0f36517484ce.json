@@ -4,7 +4,29 @@
         "hits": 0,
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
-                "filter": [],
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "salesforce.logout"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "salesforce.logout"
+                            }
+                        }
+                    }
+                ],
                 "query": {
                     "language": "kuery",
                     "query": ""
@@ -83,11 +105,6 @@
                             {
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-7f107c7d-34fd-481a-b6ac-6e0037488d00",
-                                "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
                             }
                         ],
@@ -179,29 +196,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.logout"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.logout"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -344,11 +339,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-07bd6025-fb9b-4980-94b7-4be1f9948220",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -387,29 +377,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.logout"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.logout"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -475,11 +443,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-aed1858a-a560-41f8-a5ca-58e917d3f0f6",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -525,29 +488,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.logout"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.logout"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -602,11 +543,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-6cd4c92e-cef0-46cf-937a-5123ddc95e7b",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -653,29 +589,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.logout"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.logout"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -779,6 +693,11 @@
     "references": [
         {
             "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
             "name": "e04d7dbe-82fb-438b-8097-594262a141ec:control_e04d7dbe-82fb-438b-8097-594262a141ec_0_index_pattern",
             "type": "index-pattern"
         },
@@ -790,11 +709,6 @@
         {
             "id": "filebeat-*",
             "name": "eaf7f094-92f3-46ca-84eb-ef2126f220bd:indexpattern-datasource-layer-7f107c7d-34fd-481a-b6ac-6e0037488d00",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "eaf7f094-92f3-46ca-84eb-ef2126f220bd:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
@@ -819,22 +733,12 @@
         },
         {
             "id": "filebeat-*",
-            "name": "9f2a2ef4-ba17-4d76-8a0a-76517f1c0936:filter-index-pattern-0",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
             "name": "ff455525-355f-49cd-a503-159a03ada387:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
             "name": "ff455525-355f-49cd-a503-159a03ada387:indexpattern-datasource-layer-aed1858a-a560-41f8-a5ca-58e917d3f0f6",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "ff455525-355f-49cd-a503-159a03ada387:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
@@ -848,17 +752,12 @@
             "type": "index-pattern"
         },
         {
-            "id": "filebeat-*",
-            "name": "69095005-0182-4363-b606-263449739e20:filter-index-pattern-0",
-            "type": "index-pattern"
-        },
-        {
             "id": "15bcb8a0-f891-11ee-9088-0f36517484ce",
             "name": "6e4e4f8a-da6a-482e-81a6-ae3a26ad10ef:panel_6e4e4f8a-da6a-482e-81a6-ae3a26ad10ef",
             "type": "map"
         }
     ],
     "type": "dashboard",
-    "updated_at": "2024-04-12T05:54:35.714Z",
-    "version": "WzEwNjA4LDFd"
+    "updated_at": "2024-04-12T11:40:07.036Z",
+    "version": "WzExMzc5LDFd"
 }

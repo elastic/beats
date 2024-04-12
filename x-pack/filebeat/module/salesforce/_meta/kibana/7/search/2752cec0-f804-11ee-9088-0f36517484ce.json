@@ -18,27 +18,6 @@
                             "alias": null,
                             "disabled": false,
                             "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                            "key": "event.dataset",
-                            "negate": false,
-                            "params": {
-                                "query": "salesforce.login"
-                            },
-                            "type": "phrase"
-                        },
-                        "query": {
-                            "match_phrase": {
-                                "event.dataset": "salesforce.login"
-                            }
-                        }
-                    },
-                    {
-                        "$state": {
-                            "store": "appState"
-                        },
-                        "meta": {
-                            "alias": null,
-                            "disabled": false,
-                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
                             "key": "event.action",
                             "negate": false,
                             "params": {
@@ -62,7 +41,7 @@
                         "meta": {
                             "alias": null,
                             "disabled": false,
-                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
                             "key": "event.outcome",
                             "negate": false,
                             "type": "exists",
@@ -106,14 +85,9 @@
             "id": "filebeat-*",
             "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[1].meta.index",
             "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[2].meta.index",
-            "type": "index-pattern"
         }
     ],
     "type": "search",
-    "updated_at": "2024-04-11T13:05:21.842Z",
-    "version": "Wzk5NDAsMV0="
+    "updated_at": "2024-04-12T11:42:31.623Z",
+    "version": "WzExNTc0LDFd"
 }

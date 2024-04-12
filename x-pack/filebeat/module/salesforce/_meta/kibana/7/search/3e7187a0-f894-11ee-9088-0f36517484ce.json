@@ -9,29 +9,7 @@
         "hits": 0,
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
-                "filter": [
-                    {
-                        "$state": {
-                            "store": "appState"
-                        },
-                        "meta": {
-                            "alias": null,
-                            "disabled": false,
-                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-                            "key": "event.dataset",
-                            "negate": false,
-                            "params": {
-                                "query": "salesforce.setupaudittrail"
-                            },
-                            "type": "phrase"
-                        },
-                        "query": {
-                            "match_phrase": {
-                                "event.dataset": "salesforce.setupaudittrail"
-                            }
-                        }
-                    }
-                ],
+                "filter": [],
                 "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
                 "query": {
                     "language": "kuery",
@@ -58,14 +36,9 @@
             "id": "filebeat-*",
             "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
             "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
-            "type": "index-pattern"
         }
     ],
     "type": "search",
-    "updated_at": "2024-04-12T06:16:48.160Z",
-    "version": "WzEwODk3LDFd"
+    "updated_at": "2024-04-12T11:37:55.498Z",
+    "version": "WzExMjQ3LDFd"
 }

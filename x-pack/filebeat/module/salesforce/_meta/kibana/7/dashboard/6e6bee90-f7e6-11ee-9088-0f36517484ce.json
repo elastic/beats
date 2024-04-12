@@ -4,7 +4,29 @@
         "hits": 0,
         "kibanaSavedObjectMeta": {
             "searchSourceJSON": {
-                "filter": [],
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "salesforce.apex"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "salesforce.apex"
+                            }
+                        }
+                    }
+                ],
                 "query": {
                     "language": "kuery",
                     "query": ""
@@ -94,11 +116,6 @@
                                 "id": "filebeat-*",
                                 "name": "filter-index-pattern-1",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-2",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -134,27 +151,6 @@
                                         "alias": null,
                                         "disabled": false,
                                         "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                },
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-1",
                                         "key": "salesforce.apex.is_long_running_request",
                                         "negate": true,
                                         "params": {
@@ -178,7 +174,7 @@
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "indexRefName": "filter-index-pattern-2",
+                                        "indexRefName": "filter-index-pattern-1",
                                         "key": "salesforce.apex.is_long_running_request",
                                         "negate": false,
                                         "type": "exists"
@@ -227,11 +223,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-83c3e25a-134f-43bf-bca7-cd3c3d33eff3",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -277,29 +268,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -354,11 +323,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-23547c7a-8041-4b0a-856d-ffc03d80fbc0",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -404,29 +368,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -480,11 +422,6 @@
                             {
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-2ea8d938-401b-4b61-92c4-c476e7d3e4bc",
-                                "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
                             }
                         ],
@@ -544,29 +481,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -631,22 +546,17 @@
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "indexpattern-datasource-layer-dbfc2649-500a-4d9e-8035-f2094fc75c86",
-                                "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-395b6aa2-d6cd-406e-9559-a0ed2b833854",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
+                                "name": "indexpattern-datasource-layer-dbfc2649-500a-4d9e-8035-f2094fc75c86",
                                 "type": "index-pattern"
                             },
                             {
                                 "id": "filebeat-*",
-                                "name": "filter-index-pattern-1",
+                                "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
                             }
                         ],
@@ -720,34 +630,13 @@
                                     "$state": {
                                         "store": "appState"
                                     },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                },
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
                                     "exists": {
                                         "field": "salesforce.apex.run_time"
                                     },
                                     "meta": {
                                         "alias": null,
                                         "disabled": false,
-                                        "indexRefName": "filter-index-pattern-1",
+                                        "indexRefName": "filter-index-pattern-0",
                                         "key": "salesforce.apex.run_time",
                                         "negate": false,
                                         "type": "exists"
@@ -865,11 +754,6 @@
                                 "id": "filebeat-*",
                                 "name": "filter-index-pattern-0",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-1",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -925,27 +809,6 @@
                                         "alias": null,
                                         "disabled": false,
                                         "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                },
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-1",
                                         "key": "event.action",
                                         "negate": false,
                                         "params": {
@@ -1025,11 +888,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-b53e356e-52be-419c-bf3d-282ec655706d",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -1088,29 +946,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -1177,11 +1013,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-b2559ffe-87f5-4f0e-a041-671ae182cad2",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -1241,29 +1072,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -1350,11 +1159,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-f2b00fda-234b-44d4-9ce5-7cd8c28efce3",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -1401,29 +1205,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -1601,11 +1383,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-92994644-eb5e-41a8-871b-b0911dcbf481",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -1664,29 +1441,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -1753,11 +1508,6 @@
                                 "id": "filebeat-*",
                                 "name": "indexpattern-datasource-layer-84a0be7e-5127-485b-9ce2-9a9ba033a74c",
                                 "type": "index-pattern"
-                            },
-                            {
-                                "id": "filebeat-*",
-                                "name": "filter-index-pattern-0",
-                                "type": "index-pattern"
                             }
                         ],
                         "state": {
@@ -1803,29 +1553,7 @@
                                     }
                                 }
                             },
-                            "filters": [
-                                {
-                                    "$state": {
-                                        "store": "appState"
-                                    },
-                                    "meta": {
-                                        "alias": null,
-                                        "disabled": false,
-                                        "indexRefName": "filter-index-pattern-0",
-                                        "key": "event.dataset",
-                                        "negate": false,
-                                        "params": {
-                                            "query": "salesforce.apex"
-                                        },
-                                        "type": "phrase"
-                                    },
-                                    "query": {
-                                        "match_phrase": {
-                                            "event.dataset": "salesforce.apex"
-                                        }
-                                    }
-                                }
-                            ],
+                            "filters": [],
                             "query": {
                                 "language": "kuery",
                                 "query": ""
@@ -1882,6 +1610,11 @@
     "references": [
         {
             "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
             "name": "2e30f60b-d451-4b0d-89eb-6ba01e94c2aa:control_2e30f60b-d451-4b0d-89eb-6ba01e94c2aa_0_index_pattern",
             "type": "index-pattern"
         },
@@ -1907,22 +1640,12 @@
         },
         {
             "id": "filebeat-*",
-            "name": "7decef13-13b6-4eb2-bb2b-cd657951e930:filter-index-pattern-2",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
             "name": "7154e44a-c51d-4881-8d23-6d822a0bd77d:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
             "name": "7154e44a-c51d-4881-8d23-6d822a0bd77d:indexpattern-datasource-layer-83c3e25a-134f-43bf-bca7-cd3c3d33eff3",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "7154e44a-c51d-4881-8d23-6d822a0bd77d:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
@@ -1937,11 +1660,6 @@
         },
         {
             "id": "filebeat-*",
-            "name": "73688f67-7274-4172-bc72-81581d1b1dc2:filter-index-pattern-0",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
             "name": "be541fae-8b1f-40e5-9fcc-e552b3544773:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
@@ -1952,17 +1670,7 @@
         },
         {
             "id": "filebeat-*",
-            "name": "be541fae-8b1f-40e5-9fcc-e552b3544773:filter-index-pattern-0",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
             "name": "fe66cbe2-e564-49ae-a724-6440517ceb3b:indexpattern-datasource-current-indexpattern",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "fe66cbe2-e564-49ae-a724-6440517ceb3b:indexpattern-datasource-layer-dbfc2649-500a-4d9e-8035-f2094fc75c86",
             "type": "index-pattern"
         },
         {
@@ -1972,12 +1680,12 @@
         },
         {
             "id": "filebeat-*",
-            "name": "fe66cbe2-e564-49ae-a724-6440517ceb3b:filter-index-pattern-0",
+            "name": "fe66cbe2-e564-49ae-a724-6440517ceb3b:indexpattern-datasource-layer-dbfc2649-500a-4d9e-8035-f2094fc75c86",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
-            "name": "fe66cbe2-e564-49ae-a724-6440517ceb3b:filter-index-pattern-1",
+            "name": "fe66cbe2-e564-49ae-a724-6440517ceb3b:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
@@ -1997,22 +1705,12 @@
         },
         {
             "id": "filebeat-*",
-            "name": "574ede56-2b30-49a5-8888-8ae368c856af:filter-index-pattern-1",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
             "name": "f8ecb623-ff3c-4422-9f91-2676fe2e58e0:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
             "name": "f8ecb623-ff3c-4422-9f91-2676fe2e58e0:indexpattern-datasource-layer-b53e356e-52be-419c-bf3d-282ec655706d",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "f8ecb623-ff3c-4422-9f91-2676fe2e58e0:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
@@ -2027,22 +1725,12 @@
         },
         {
             "id": "filebeat-*",
-            "name": "c713f492-059e-48c9-bddb-bfa5dff4379a:filter-index-pattern-0",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
             "name": "9d4bd40c-a3b5-4668-a58a-118e352c3ad2:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
         {
             "id": "filebeat-*",
             "name": "9d4bd40c-a3b5-4668-a58a-118e352c3ad2:indexpattern-datasource-layer-f2b00fda-234b-44d4-9ce5-7cd8c28efce3",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "9d4bd40c-a3b5-4668-a58a-118e352c3ad2:filter-index-pattern-0",
             "type": "index-pattern"
         },
         {
@@ -2067,11 +1755,6 @@
         },
         {
             "id": "filebeat-*",
-            "name": "cc5bf3a1-5a33-4204-8efc-32b2b1629e63:filter-index-pattern-0",
-            "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
             "name": "5904bcb3-1616-422d-855e-a86e6a69f802:indexpattern-datasource-current-indexpattern",
             "type": "index-pattern"
         },
@@ -2079,14 +1762,9 @@
             "id": "filebeat-*",
             "name": "5904bcb3-1616-422d-855e-a86e6a69f802:indexpattern-datasource-layer-84a0be7e-5127-485b-9ce2-9a9ba033a74c",
             "type": "index-pattern"
-        },
-        {
-            "id": "filebeat-*",
-            "name": "5904bcb3-1616-422d-855e-a86e6a69f802:filter-index-pattern-0",
-            "type": "index-pattern"
         }
     ],
     "type": "dashboard",
-    "updated_at": "2024-04-11T11:36:42.536Z",
-    "version": "WzkwNTQsMV0="
+    "updated_at": "2024-04-12T11:46:15.739Z",
+    "version": "WzExODE1LDFd"
 }

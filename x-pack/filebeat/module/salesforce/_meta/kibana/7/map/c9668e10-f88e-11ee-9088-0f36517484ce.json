@@ -127,29 +127,7 @@
                 "lat": 15.07469,
                 "lon": -0.10396
             },
-            "filters": [
-                {
-                    "$state": {
-                        "store": "appState"
-                    },
-                    "meta": {
-                        "alias": null,
-                        "disabled": false,
-                        "index": "filebeat-*",
-                        "key": "event.dataset",
-                        "negate": false,
-                        "params": {
-                            "query": "salesforce.login"
-                        },
-                        "type": "phrase"
-                    },
-                    "query": {
-                        "match_phrase": {
-                            "event.dataset": "salesforce.login"
-                        }
-                    }
-                }
-            ],
+            "filters": [],
             "query": {
                 "language": "kuery",
                 "query": ""
@@ -209,6 +187,6 @@
         }
     ],
     "type": "map",
-    "updated_at": "2024-04-12T05:37:44.310Z",
-    "version": "WzEwMzA4LDFd"
+    "updated_at": "2024-04-12T11:42:51.515Z",
+    "version": "WzExNjAwLDFd"
 }

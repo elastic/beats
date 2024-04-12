@@ -127,29 +127,7 @@
                 "lat": 19.94277,
                 "lon": 0
             },
-            "filters": [
-                {
-                    "$state": {
-                        "store": "appState"
-                    },
-                    "meta": {
-                        "alias": null,
-                        "disabled": false,
-                        "index": "filebeat-*",
-                        "key": "event.dataset",
-                        "negate": false,
-                        "params": {
-                            "query": "salesforce.logout"
-                        },
-                        "type": "phrase"
-                    },
-                    "query": {
-                        "match_phrase": {
-                            "event.dataset": "salesforce.logout"
-                        }
-                    }
-                }
-            ],
+            "filters": [],
             "query": {
                 "language": "kuery",
                 "query": ""
@@ -209,6 +187,6 @@
         }
     ],
     "type": "map",
-    "updated_at": "2024-04-12T05:54:11.378Z",
-    "version": "WzEwNjAxLDFd"
+    "updated_at": "2024-04-12T11:39:56.508Z",
+    "version": "WzExMzcxLDFd"
 }
