@@ -8,6 +8,7 @@ env:
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
 
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
@@ -218,8 +219,8 @@ steps:
     key: "metricbeat-extended-macos-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
-      - label: ":mac: MacOS Unit Tests"
-        key: "extended-macos-unit-tests"
+      - label: ":mac: MacOS x64_64 Unit Tests"
+        key: "extended-macos-x64-64-unit-tests"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -232,7 +233,25 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: Extended MacOS Unit Tests"
+              context: "metricbeat: Extended MacOS x86_64 Unit Tests"
+
+      - label: ":mac: MacOS arm64 Unit Tests"
+        key: "extended-macos-arm64-unit-tests"
+        skip: "due to https://github.com/elastic/beats/issues/33035"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
+          cd metricbeat && mage build unitTest
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
+        artifact_paths:
+          - "metricbeat/build/*.xml"
+          - "metricbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "metricbeat: Extended MacOS arm64 Unit Tests"
+
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
