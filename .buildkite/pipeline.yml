@@ -23,6 +23,7 @@ steps:
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
 
   - label: "Trigger Heartbeat"
     plugins:
@@ -46,6 +47,7 @@ steps:
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
 
   - label: "Trigger Xpack/Dockerlogbeat"
     plugins:
@@ -69,6 +71,7 @@ steps:
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
 
   - label: "Trigger Metricbeat"
     plugins:
@@ -93,6 +96,7 @@ steps:
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
 
   - label: "Trigger Deploy/K8S"
     plugins:
@@ -111,3 +115,4 @@ steps:
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
