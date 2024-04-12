@@ -4,7 +4,7 @@ steps:
   - label: "Trigger Auditbeat"
     plugins:
       - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only HEAD~1"
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
                 - auditbeat/
@@ -27,7 +27,7 @@ steps:
   - label: "Trigger Heartbeat"
     plugins:
       - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only HEAD~1"
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
                 - heartbeat/
@@ -50,7 +50,7 @@ steps:
   - label: "Trigger Xpack/Dockerlogbeat"
     plugins:
       - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only ${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
                 - x-pack/dockerlogbeat/
@@ -73,7 +73,7 @@ steps:
   - label: "Trigger Metricbeat"
     plugins:
       - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only ${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
                 - metricbeat/
@@ -97,7 +97,7 @@ steps:
   - label: "Trigger Deploy/K8S"
     plugins:
       - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only HEAD~1"
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
                 - .buildkite/deploy/kubernetes/**
