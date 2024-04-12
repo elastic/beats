@@ -119,6 +119,20 @@ func defaultConfig() config {
 	}
 }
 
+type ConfigOption func(c *config)
+
+func ConfigOverwriteKeys(overwriteKeys bool) ConfigOption {
+	return func(c *config) {
+		c.OverwriteKeys = overwriteKeys
+	}
+}
+
+func ConfigMatchPIDs(matchPIDs []string) ConfigOption {
+	return func(c *config) {
+		c.MatchPIDs = matchPIDs
+	}
+}
+
 func (c *config) getMappings() (mappings mapstr.M, err error) {
 	mappings = mapstr.M{}
 	validFields := defaultFields

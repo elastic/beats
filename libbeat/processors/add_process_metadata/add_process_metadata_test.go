@@ -731,7 +731,7 @@ func TestAddProcessMetadata(t *testing.T) {
 			config: mapstr.M{
 				"cgroup_regex": "",
 			},
-			initErr: errors.New("fail to unpack the add_process_metadata configuration: cgroup_regexp must contain exactly one capturing group for the container ID accessing config"),
+			initErr: errors.New("cgroup_regexp must contain exactly one capturing group for the container ID accessing config"),
 		},
 		{
 			description: "cgroup_prefixes configured",
@@ -752,17 +752,23 @@ func TestAddProcessMetadata(t *testing.T) {
 		},
 	} {
 		t.Run(test.description, func(t *testing.T) {
-			config, err := conf.NewConfigFrom(test.config)
-			if err != nil {
-				t.Fatal(err)
+			configC, err := conf.NewConfigFrom(test.config)
+			assert.NoError(t, err)
+
+			config := defaultConfig()
+			if err := configC.Unpack(&config); err != nil {
+				if test.initErr == nil {
+					t.Fatal(err)
+				}
+				assert.EqualError(t, err, test.initErr.Error())
+				return
 			}
 
 			proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true)
-			if test.initErr == nil {
-				if err != nil {
+			if err != nil {
+				if test.initErr == nil {
 					t.Fatal(err)
 				}
-			} else {
 				assert.EqualError(t, err, test.initErr.Error())
 				return
 			}
@@ -793,7 +799,11 @@ func TestAddProcessMetadata(t *testing.T) {
 			"include_fields": []string{"process.name"},
 		}
 
-		config, err := conf.NewConfigFrom(c)
+		configC, err := conf.NewConfigFrom(c)
+		assert.NoError(t, err)
+
+		config := defaultConfig()
+		err = configC.Unpack(&config)
 		assert.NoError(t, err)
 
 		proc, err := newProcessMetadataProcessorWithProvider(config, testProcs, true)

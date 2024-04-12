@@ -96,33 +96,48 @@ func init() {
 
 // New constructs a new add_process_metadata processor.
 func New(cfg *conf.C) (beat.Processor, error) {
-	return newProcessMetadataProcessorWithProvider(cfg, &procCache, false)
+	config := defaultConfig()
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
+	}
+
+	return newProcessMetadataProcessorWithProvider(config, &procCache, false)
 }
 
 // NewWithCache construct a new add_process_metadata processor with cache for container IDs.
 // Resulting processor implements `Close()` to release the cache resources.
 func NewWithCache(cfg *conf.C) (beat.Processor, error) {
+	config := defaultConfig()
+	if err := cfg.Unpack(&config); err != nil {
+		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
+	}
+
+	return newProcessMetadataProcessorWithProvider(config, &procCache, true)
+}
+
+func NewWithConfig(opts ...ConfigOption) (beat.Processor, error) {
+	cfg := defaultConfig()
+
+	for _, o := range opts {
+		o(&cfg)
+	}
+
 	return newProcessMetadataProcessorWithProvider(cfg, &procCache, true)
 }
 
-func newProcessMetadataProcessorWithProvider(cfg *conf.C, provider processMetadataProvider, withCache bool) (proc beat.Processor, err error) {
+func newProcessMetadataProcessorWithProvider(config config, provider processMetadataProvider, withCache bool) (proc beat.Processor, err error) {
 	// Logging (each processor instance has a unique ID).
 	var (
 		id  = int(instanceID.Inc())
 		log = logp.NewLogger(processorName).With("instance_id", id)
 	)
 
-	config := defaultConfig()
-	if err = cfg.Unpack(&config); err != nil {
-		return nil, fmt.Errorf("fail to unpack the %v configuration: %w", processorName, err)
-	}
-
 	// If neither option is configured, then add a default. A default cgroup_regex
 	// cannot be added to the struct returned by defaultConfig() because if
 	// config_regex is set, it would take precedence over any user-configured
 	// cgroup_prefixes.
-	hasCgroupPrefixes, _ := cfg.Has("cgroup_prefixes", -1)
-	hasCgroupRegex, _ := cfg.Has("cgroup_regex", -1)
+	hasCgroupPrefixes := len(config.CgroupPrefixes) > 0
+	hasCgroupRegex := config.CgroupRegex != nil
 	if !hasCgroupPrefixes && !hasCgroupRegex {
 		config.CgroupRegex = defaultCgroupRegex
 	}

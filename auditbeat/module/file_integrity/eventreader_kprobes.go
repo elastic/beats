@@ -30,10 +30,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors/add_process_metadata"
 
-	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/mapstr"
-
 	"golang.org/x/sys/unix"
 )
 
@@ -49,16 +46,16 @@ type kProbesReader struct {
 }
 
 var processMetadataProcessorOnce = sync.OnceValues(func() (beat.Processor, error) {
-	config, err := conf.NewConfigFrom(mapstr.M{
-		"match_pids":     []string{"process.pid"},
-		"overwrite_keys": true,
-	})
+	processor, err := add_process_metadata.NewWithConfig(
+		add_process_metadata.ConfigOverwriteKeys(true),
+		add_process_metadata.ConfigMatchPIDs([]string{"process.pid"}),
+	)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return add_process_metadata.NewWithCache(config)
+	return processor, nil
 })
 
 func newKProbesReader(config Config, l *logp.Logger, parsers []FileParser) (*kProbesReader, error) {
