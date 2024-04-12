@@ -6,7 +6,6 @@ package awss3
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -343,7 +342,7 @@ func (p *s3Poller) Purge(ctx context.Context) {
 	}
 }
 
-func (p *s3Poller) Poll(ctx context.Context) error {
+func (p *s3Poller) Poll(ctx context.Context) {
 	// This loop tries to keep the workers busy as much as possible while
 	// honoring the number in config opposed to a simpler loop that does one
 	//  listing, sequentially processes every object and then does another listing
@@ -384,23 +383,9 @@ func (p *s3Poller) Poll(ctx context.Context) error {
 			}()
 		}
 
-		err = timed.Wait(ctx, p.bucketPollInterval)
-		if err != nil {
-			if errors.Is(err, context.Canceled) {
-				// A canceled context is a normal shutdown.
-				return nil
-			}
-
-			return err
-		}
+		timed.Wait(ctx, p.bucketPollInterval)
 	}
 
 	// Wait for all workers to finish.
 	workerWg.Wait()
-
-	if errors.Is(ctx.Err(), context.Canceled) {
-		// A canceled context is a normal shutdown.
-		return nil
-	}
-	return ctx.Err()
 }

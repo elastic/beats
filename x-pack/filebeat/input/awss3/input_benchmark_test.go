@@ -347,11 +347,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors, backupConfig{})
 				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, client, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
 
-				if err := s3Poller.Poll(ctx); err != nil {
-					if !errors.Is(err, context.DeadlineExceeded) {
-						errChan <- err
-					}
-				}
+				s3Poller.Poll(ctx)
 			}(i, wg)
 		}
 

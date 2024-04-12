@@ -173,7 +173,8 @@ func (in *s3Input) runS3Poller(
 	}
 	defer poller.metrics.Close()
 
-	return poller.Poll(ctx)
+	poller.Poll(ctx)
+	return nil
 }
 
 func (in *s3Input) runQueueReader(
