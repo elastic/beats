@@ -39,8 +39,8 @@ type states struct {
 	// states store
 	states []state
 
-	// idx maps state IDs to state indexes for fast lookup and modifications.
-	idx map[string]int
+	// indexForStateID maps state IDs to state indexes for fast lookup and modifications.
+	indexForStateID map[string]int
 
 	listingIDs        map[string]struct{}
 	listingInfo       *sync.Map
@@ -52,7 +52,7 @@ func newStates(ctx v2.Context) *states {
 	return &states{
 		log:               ctx.Logger.Named("states"),
 		states:            nil,
-		idx:               map[string]int{},
+		indexForStateID:   map[string]int{},
 		listingInfo:       new(sync.Map),
 		listingIDs:        map[string]struct{}{},
 		statesByListingID: map[string][]state{},
@@ -91,14 +91,14 @@ func (s *states) Delete(id string) {
 	s.Lock()
 	defer s.Unlock()
 
-	if index, exists := s.idx[id]; exists {
+	if index, exists := s.indexForStateID[id]; exists {
 		last := len(s.states) - 1
 		s.states[last], s.states[index] = s.states[index], s.states[last]
 		s.states = s.states[:last]
 
-		s.idx = map[string]int{}
+		s.indexForStateID = map[string]int{}
 		for i, state := range s.states {
-			s.idx[state.ID] = i
+			s.indexForStateID[state.ID] = i
 		}
 	}
 }
@@ -155,11 +155,11 @@ func (s *states) Update(newState state, listingID string) {
 
 	id := newState.ID
 
-	if index, exists := s.idx[id]; exists {
+	if index, exists := s.indexForStateID[id]; exists {
 		s.states[index] = newState
 	} else {
 		// No existing state found, add new one
-		s.idx[id] = len(s.states)
+		s.indexForStateID[id] = len(s.states)
 		s.states = append(s.states, newState)
 		s.log.Debug("New state added for ", newState.ID)
 	}
@@ -203,7 +203,7 @@ func (s *states) FindPrevious(newState state) state {
 	s.RLock()
 	defer s.RUnlock()
 	id := newState.ID
-	if i, exists := s.idx[id]; exists {
+	if i, exists := s.indexForStateID[id]; exists {
 		return s.states[i]
 	}
 	return state{}
@@ -214,7 +214,7 @@ func (s *states) FindPrevious(newState state) state {
 func (s *states) FindPreviousByID(id string) state {
 	s.RLock()
 	defer s.RUnlock()
-	if i, exists := s.idx[id]; exists {
+	if i, exists := s.indexForStateID[id]; exists {
 		return s.states[i]
 	}
 	return state{}
@@ -224,7 +224,7 @@ func (s *states) IsNew(state state) bool {
 	s.RLock()
 	defer s.RUnlock()
 
-	i, exists := s.idx[state.ID]
+	i, exists := s.indexForStateID[state.ID]
 	return !exists || !s.states[i].IsEqual(&state)
 }
 
