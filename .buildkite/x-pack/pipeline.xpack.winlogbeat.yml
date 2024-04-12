@@ -2,20 +2,17 @@
 name: "beats-xpack-winlogbeat"
 
 env:
-  ASDF_MAGE_VERSION: 1.15.0
-
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
-  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
 
-notify:
-  - github_commit_status:
-      context: "x-pack/winlogbeat"
+  # Other deps
+  ASDF_MAGE_VERSION: 1.15.0
 
 steps:
   - group: "Mandatory Tests"
@@ -38,6 +35,9 @@ steps:
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Xpack/Winlogbeat Win-2019 Unit (MODULE) Tests"
 
       - label: ":windows: Xpack/Winlogbeat Win-2016 Unit Tests"
         command: |
@@ -53,6 +53,9 @@ steps:
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Xpack/Winlogbeat Win-2016 Unit Tests"
 
       - label: ":windows: Xpack/Winlogbeat Win-2022 Unit Tests"
         command: |
@@ -68,10 +71,13 @@ steps:
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Xpack/Winlogbeat Win-2022 Unit Tests"
 
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
       - label: ":windows: Xpack/Winlogbeat Win-10 Unit Tests"
@@ -88,6 +94,9 @@ steps:
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Xpack/Winlogbeat Win-10 Unit Tests"
 
       - label: ":windows: Xpack/Winlogbeat Win-11 Unit Tests"
         command: |
@@ -103,6 +112,9 @@ steps:
         artifact_paths:
           - "x-pack/winlogbeat/build/*.xml"
           - "x-pack/winlogbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Xpack/Winlogbeat Win-11 Unit Tests"
 
       - label: ":windows: Xpack/Winlogbeat Win-2019 Unit Tests"
         command: |
@@ -120,7 +132,7 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/winlogbeat: Windows 2019 Unit Tests"
+              context: "x-pack/winlogbeat: Win-2019 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -134,7 +146,7 @@ steps:
     key: "xpack-winlogbeat-packaging"
 
     steps:
-      - label: ":linux: Packaging Linux"
+      - label: ":ubuntu: Packaging Linux"
         key: "packaging-linux"
         command: "cd x-pack/winlogbeat && mage package"
         agents:
@@ -145,3 +157,7 @@ steps:
           disk_type: "pd-ssd"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+        notify:
+          - github_commit_status:
+              context: "Xpack/Winlogbeat Packaging"
+
