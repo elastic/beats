@@ -51,6 +51,7 @@ steps:
           asdf install kind $ASDF_KIND_VERSION
           .buildkite/deploy/kubernetes/scripts/kind-setup.sh
 
+          export KUBECONFIG="$$PWD/kubecfg"
           cd filebeat
           mage goIntegTest
         agents:
@@ -77,6 +78,7 @@ steps:
           asdf install kind $ASDF_KIND_VERSION
           .buildkite/deploy/kubernetes/scripts/kind-setup.sh
 
+          export KUBECONFIG="$$PWD/kubecfg"
           cd filebeat
           mage pythonIntegTest
         agents:
