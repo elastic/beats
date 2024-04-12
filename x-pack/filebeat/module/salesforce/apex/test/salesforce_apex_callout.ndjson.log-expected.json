@@ -2,9 +2,11 @@
     {
         "@timestamp": "2021-11-02T09:12:50.488Z",
         "event.action": "apex-callout",
-        "event.category": "network",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "salesforce.apex",
-        "event.duration": 1293,
+        "event.duration": 1293.0,
         "event.kind": "event",
         "event.module": "salesforce",
         "event.outcome": "failure",
@@ -20,13 +22,15 @@
         "related.ip": [
             "10.0.1.123"
         ],
-        "salesforce.apex.cpu_time": -1,
+        "salesforce.apex.cpu_time": -1.0,
+        "salesforce.apex.document_id": "/BTmFlfuGz8Dvtt1oBng376JZ5I=",
         "salesforce.apex.event_type": "ApexCallout",
         "salesforce.apex.organization_id": "00D5j000000VI3n",
-        "salesforce.apex.run_time": 1305,
+        "salesforce.apex.run_time": 1305.0,
         "salesforce.apex.type": "OData",
         "salesforce.apex.uri": "CALLOUT-LOG",
         "salesforce.apex.user_id_derived": "0055j000000utlPAAQ",
+        "salesforce.instance_url": "<no value>",
         "service.type": "salesforce",
         "source.ip": "10.0.1.123",
         "tags": [

@@ -1,9 +1,12 @@
 [
     {
         "@timestamp": "2021-11-09T06:00:01.635Z",
-        "event.category": "network",
+        "event.action": "apex-rest",
+        "event.category": [
+            "network"
+        ],
         "event.dataset": "salesforce.apex",
-        "event.duration": 478,
+        "event.duration": 478.0,
         "event.kind": "event",
         "event.module": "salesforce",
         "event.timezone": "-02:00",
@@ -17,18 +20,21 @@
         "related.ip": [
             "43.224.11.237"
         ],
-        "salesforce.apex.cpu_time": 94,
+        "salesforce.apex.cpu_time": 94.0,
         "salesforce.apex.db_blocks": 4401,
-        "salesforce.apex.db_cpu_time": 130,
-        "salesforce.apex.db_total_time": 232002551,
+        "salesforce.apex.db_cpu_time": 130.0,
+        "salesforce.apex.db_total_time": 232002540.0,
+        "salesforce.apex.document_id": "IIcdQ4XYyTmIUo5QQGa1oLhcPxs=",
         "salesforce.apex.event_type": "ApexRestApi",
         "salesforce.apex.login_key": "ieC2BVibz9GliuON",
         "salesforce.apex.media_type": "application/json;charset=UTF-8",
         "salesforce.apex.organization_id": "00D5j000000VI3n",
         "salesforce.apex.request_id": "4fMAJzbahOQk2kl1cJ0uSV",
         "salesforce.apex.request_status": "S",
+        "salesforce.apex.run_time": 478.0,
         "salesforce.apex.user_agent": 5236,
         "salesforce.apex.user_id_derived": "0055j000000utlPAAQ",
+        "salesforce.instance_url": "<no value>",
         "service.type": "salesforce",
         "source.ip": "43.224.11.237",
         "tags": [
@@ -36,6 +42,8 @@
             "salesforce-apex"
         ],
         "user.id": "0055j000000utlP",
-        "user.roles": "Standard"
+        "user.roles": [
+            "Standard"
+        ]
     }
 ]

@@ -1,25 +1,25 @@
 [
     {
-        "@timestamp": "2024-04-12T08:31:20.916796Z",
-        "event.action": "logout",
+        "@timestamp": "2024-04-12T08:32:10.084908Z",
+        "event.action": "login-attempt",
         "event.category": [
             "authentication"
         ],
-        "event.dataset": "salesforce.logout",
+        "event.dataset": "salesforce.login",
         "event.kind": "event",
         "event.module": "salesforce",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
         ],
-        "fileset.name": "logout",
+        "fileset.name": "login",
         "input.type": "log",
         "log.offset": 0,
         "salesforce.instance_url": "<no value>",
         "service.type": "salesforce",
         "tags": [
             "forwarded",
-            "salesforce-logout"
+            "salesforce-login"
         ]
     }
 ]

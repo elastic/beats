@@ -17,15 +17,6 @@ processors:
   - set:
       field: event.ingested
       value: "{{_ingest.timestamp}}"
-  - fingerprint:
-      fields:
-        - json.REQUEST_ID
-        - json.SESSION_KEY
-        - json.TIMESTAMP_DERIVED
-        - json.USER_ID
-      target_field: _id
-      ignore_failure: true
-      ignore_missing: true
   - set:
       field: ecs.version
       value: "8.11.0"
