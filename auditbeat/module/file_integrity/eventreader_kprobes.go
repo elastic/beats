@@ -29,8 +29,9 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/processors/add_process_metadata"
 
-	"github.com/elastic/elastic-agent-libs/logp"
 	"golang.org/x/sys/unix"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type kProbesReader struct {
