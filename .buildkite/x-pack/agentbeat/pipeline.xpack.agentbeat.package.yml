@@ -22,4 +22,4 @@ steps:
         env:
           SNAPSHOT: true
         artifact_paths:
-          - "x-pack/agentbeat/build/**/*"
+          - "x-pack/agentbeat/build/distributions/**/*"
