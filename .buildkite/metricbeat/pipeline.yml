@@ -220,9 +220,6 @@ steps:
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
-          # TODO remove below two lines, needed just for testing nodejs
-          withNodeJSEnv "18.17.1"
-          installNodeJsDependencies
           cd metricbeat && mage build unitTest
         agents:
           provider: "orka"
@@ -236,13 +233,10 @@ steps:
 
       - label: ":mac: MacOS arm64 Unit Tests"
         key: "extended-macos-arm64-unit-tests"
-        #skip: "due to https://github.com/elastic/beats/issues/33035"
+        skip: "due to https://github.com/elastic/beats/issues/33035"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
-          # TODO remove below two lines, needed just for testing nodejs
-          withNodeJSEnv "18.17.1"
-          installNodeJsDependencies
           cd metricbeat && mage build unitTest
         agents:
           provider: "orka"
