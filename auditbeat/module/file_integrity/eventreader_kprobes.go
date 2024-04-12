@@ -45,7 +45,6 @@ type kProbesReader struct {
 }
 
 func newKProbesReader(config Config, l *logp.Logger, parsers []FileParser) (*kProbesReader, error) {
-
 	processor, err := add_process_metadata.NewWithConfig(
 		add_process_metadata.ConfigOverwriteKeys(true),
 		add_process_metadata.ConfigMatchPIDs([]string{"process.pid"}),
