@@ -18,9 +18,7 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_xpack_libbeat+x}" ] && run_xpack_libbeat="$(buildkite-agent meta-data get run_xpack_libbeat --default "false")"
 [ -z "${run_xpack_metricbeat+x}" ] && run_xpack_metricbeat="$(buildkite-agent meta-data get run_xpack_metricbeat --default "false")"
 [ -z "${run_xpack_packetbeat+x}" ] && run_xpack_packetbeat="$(buildkite-agent meta-data get run_xpack_packetbeat --default "false")"
-[ -z "${run_xpack_winlogbeat+x}" ] && run_xpack_winlogbeat="$(buildkite-agent meta-data get run_xpack_winlogbeat --default "false")"
 [ -z "${run_xpack_auditbeat+x}" ] && run_xpack_auditbeat="$(buildkite-agent meta-data get run_xpack_auditbeat --default "false")"
-[ -z "${run_xpack_dockerlogbeat+x}" ] && run_xpack_dockerlogbeat="$(buildkite-agent meta-data get run_xpack_dockerlogbeat --default "false")"
 [ -z "${run_xpack_filebeat+x}" ] && run_xpack_filebeat="$(buildkite-agent meta-data get run_xpack_filebeat --default "false")"
 [ -z "${run_xpack_heartbeat+x}" ] && run_xpack_heartbeat="$(buildkite-agent meta-data get run_xpack_heartbeat --default "false")"
 [ -z "${run_xpack_osquerybeat+x}" ] && run_xpack_osquerybeat="$(buildkite-agent meta-data get run_xpack_osquerybeat --default "false")"
@@ -142,9 +140,6 @@ case "${BUILDKITE_PIPELINE_SLUG}" in
   "beats-xpack-auditbeat")
     BEAT_CHANGESET_REFERENCE=${xpack_auditbeat_changeset[@]}
     ;;
-  "beats-xpack-dockerlogbeat")
-    BEAT_CHANGESET_REFERENCE=${xpack_dockerlogbeat_changeset[@]}
-    ;;
   "beats-xpack-filebeat")
     BEAT_CHANGESET_REFERENCE=${xpack_filebeat_changeset[@]}
     ;;
@@ -162,9 +157,6 @@ case "${BUILDKITE_PIPELINE_SLUG}" in
     ;;
   "beats-xpack-packetbeat")
     BEAT_CHANGESET_REFERENCE=${xpack_packetbeat_changeset[@]}
-    ;;
-  "beats-xpack-winlogbeat")
-    BEAT_CHANGESET_REFERENCE=${xpack_winlogbeat_changeset[@]}
     ;;
   *)
   echo "~~~ The changeset for the ${BUILDKITE_PIPELINE_SLUG} pipeline hasn't been defined yet."

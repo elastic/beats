@@ -209,7 +209,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Libbeat*
-
+- Add support for linux capabilities in add_process_metadata. {pull}38252[38252]
 
 *Heartbeat*
 - Added status to monitor run log report.
