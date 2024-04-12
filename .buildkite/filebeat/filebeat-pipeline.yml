@@ -184,6 +184,10 @@ steps:
           - github_commit_status:
               context: "filebeat: Extended Ubuntu ARM Unit Tests"
 
+  - group: "Extended Windows Tests"
+    key: "filebeat-extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+    steps:
       - label: ":windows: Windows 2019 Unit Tests"
         key: "windows-extended-2019"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows-2019.*/
@@ -203,10 +207,6 @@ steps:
           - github_commit_status:
               context: "filebeat: Extended Windows 2019 Unit Tests"
 
-  - group: "Extended Windows Tests"
-    key: "filebeat-extended-win-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
-    steps:
       - label: ":windows: Windows 11 Unit Tests"
         key: "windows-extended-11"
         command: |
