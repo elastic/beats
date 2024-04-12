@@ -44,10 +44,10 @@ PR_COMMIT="${BUILDKITE_COMMIT}"
 PR_ID=${BUILDKITE_PULL_REQUEST}
 MERGE_BRANCH="pr_merge_${PR_ID}"
 
-checkout_merge "${TARGET_BRANCH}" "${PR_COMMIT}" "${MERGE_BRANCH}"
+#checkout_merge "${TARGET_BRANCH}" "${PR_COMMIT}" "${MERGE_BRANCH}"
 
-echo "--- Commit information"
-git --no-pager log --format=%B -n 1
+#echo "--- Commit information"
+#git --no-pager log --format=%B -n 1
 
 # Ensure buildkite groups are rendered
-echo ""
+#echo ""
