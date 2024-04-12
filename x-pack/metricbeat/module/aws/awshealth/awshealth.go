@@ -140,7 +140,7 @@ func (m *MetricSet) getEventDetails(
 	ctx context.Context,
 	awsHealth *health.Client,
 ) []mb.Event {
-	var events []mb.Event
+	//var events []mb.Event
 	eventFilter := types.EventFilter{
 		EventStatusCodes: []types.EventStatusCode{
 			types.EventStatusCodeUpcoming,
@@ -280,7 +280,7 @@ func (m *MetricSet) getEventDetails(
 		}
 		healthDetails = append(healthDetails, healthDetailsTemp...)
 	}
-
+	var events = make([]mb.Event, 0, len(healthDetails))
 	for _, detail := range healthDetails {
 		event := mb.Event{
 			MetricSetFields: mapstr.M{
@@ -305,7 +305,6 @@ func (m *MetricSet) getEventDetails(
 			},
 			Service: "aws-health",
 		}
-
 		events = append(events, event)
 	}
 	return events
