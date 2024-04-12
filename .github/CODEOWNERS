@@ -139,12 +139,10 @@ CHANGELOG*
 /x-pack/packetbeat/ @elastic/security-external-integrations
 /x-pack/winlogbeat/ @elastic/security-external-integrations
 
-<<<<<<< HEAD
 /x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
-=======
+
 # Ownership of CI or related files by the Ingest Eng Prod team
 /.buildkite @elastic/ingest-eng-prod
 /catalog-info.yaml @elastic/ingest-eng-prod
 /libbeat/scripts @elastic/ingest-eng-prod
 /metricbeat/tests @elastic/ingest-eng-prod
->>>>>>> e5f14b3fb0 (Update CODEOWNERS - catalog-info (#38893))
