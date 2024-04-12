@@ -46,10 +46,13 @@ steps:
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet metricbeat
-          echo "~~~ Will run tests with env var MODULE=$$MODULE"
+
+          # TODO: uncomment lines below (that set MODULE) when https://github.com/elastic/beats/issues/38874 has been resolved.
+          # TODO: Note that this problem exists ONLY on 7.17 branch
+          # # defines the MODULE env var based on what's changed in a PR
+          # source .buildkite/scripts/changesets.sh
+          # defineModuleFromTheChangeSet metricbeat
+          # echo "~~~ Will run tests with env var MODULE=$$MODULE"
 
           # TODO move this section to base image / pre-command hook
           echo "~~~ Installing kind"
