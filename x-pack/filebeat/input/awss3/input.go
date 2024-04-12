@@ -167,7 +167,7 @@ func (in *s3Input) runS3Poller(
 	defer client.Close()
 
 	// Create S3 receiver and S3 notification processor.
-	poller, err := in.createS3Lister(inputContext, ctx, client, persistentStore, states)
+	poller, err := in.createS3Poller(inputContext, ctx, client, persistentStore, states)
 	if err != nil {
 		return fmt.Errorf("failed to initialize s3 poller: %w", err)
 	}
@@ -267,7 +267,7 @@ func (n nonAWSBucketResolver) ResolveEndpoint(region string, options s3.Endpoint
 	return awssdk.Endpoint{URL: n.endpoint, SigningRegion: region, HostnameImmutable: true, Source: awssdk.EndpointSourceCustom}, nil
 }
 
-func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, client beat.Client, persistentStore *statestore.Store, states *states) (*s3Poller, error) {
+func (in *s3Input) createS3Poller(ctx v2.Context, cancelCtx context.Context, client beat.Client, persistentStore *statestore.Store, states *states) (*s3Poller, error) {
 	var bucketName string
 	var bucketID string
 	if in.config.NonAWSBucketName != "" {
