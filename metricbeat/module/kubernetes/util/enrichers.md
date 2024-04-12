@@ -1,13 +1,11 @@
 ## Kubernetes Metadata enrichment
 
-[metadata diag](../_meta/images/enrichers.png)
-
 The metadata enrichment process involves associating contextual information, such as Kubernetes metadata (e.g., labels, annotations, resource names), with metrics and events collected by Elastic Agent and Beats in Kubernetes environments. This process enhances the understanding and analysis of collected data by providing additional context.
 
 ### Key Components:
 
-1. **Metricsets:**
-   - Metricsets are responsible for collecting metrics and events from various sources within Kubernetes, such as kubelet and kube-state-metrics.
+1. **Metricsets/Datasets:**
+   - Metricsets/Datasets are responsible for collecting metrics and events from various sources within Kubernetes, such as kubelet and kube-state-metrics.
 
 2. **Enrichers:**
    - Enrichers are components responsible for enriching collected data with Kubernetes metadata. Each metricset is associated with its enricher, which handles the metadata enrichment process.
@@ -24,13 +22,13 @@ The metadata enrichment process involves associating contextual information, suc
    - Metricsets are initialized with their respective enrichers during startup. Enrichers are responsible for managing the metadata enrichment process for their associated metricsets.
 
 2. **Watcher Creation:**
-   - Watchers are created to monitor Kubernetes resources relevant to the metricset's data collection requirements. For example pod metricset triggers the creation of watcher for pods, nodes and namespaces.
    - Multiple enrichers are associated with one watcher. For example a pod watcher is associated with pod, state_pod, container and state_container metricsets and their enrichers. 
+   - Watchers are created to monitor Kubernetes resources relevant to the metricset's data collection requirements. For example pod metricset triggers the creation of watcher for pods, nodes and namespaces.
 
 3. **Metadata Generation:**
    - When a watcher detects a change in a monitored resource (e.g., a new pod creation or a label update), it triggers the associated enrichers' metadata generation process.
 
-4. **Enrichment:**
+4. **Enrichment Generation Process:**
    - The enricher collects relevant metadata from Kubernetes API objects corresponding to the detected changes. This metadata includes information like labels, annotations, resource names, etc.
 
 5. **Association with Events:**
@@ -40,6 +38,7 @@ The metadata enrichment process involves associating contextual information, suc
 
 1. **Synchronization:**
    - Special mechanisms are in place to handle scenarios where resources trigger events before associated enrichers are fully initialized. Proactive synchronization ensures that existing resource metadata is captured and updated in enricher maps.
+   - When a watcher detects events (like object additions or updates), it updates a list (metadataObjects) with the IDs of these detected objects. Before introducing new enrichers, existing metadataObjects are reviewed. For each existing object ID, the corresponding metadata is retrieved and used to update the new enrichers, ensuring that metadata for pre-existing resources is properly captured and integrated into the new enricher's metadata map. This synchronization process guarantees accurate metadata enrichment, even for resources that triggered events before the initialization of certain enrichers.
 
 ### Watcher Management:
 
@@ -49,3 +48,7 @@ The metadata enrichment process involves associating contextual information, suc
 2. **Configuration Updates:**
    - Watcher configurations, such as watch options or resource filtering criteria, can be updated dynamically. A mechanism is in place to seamlessly transition to updated configurations without disrupting data collection.
 
+
+
+
+[metadata diag](../_meta/images/enrichers.png)
