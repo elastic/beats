@@ -92,6 +92,7 @@ steps:
                   branch: "${BUILDKITE_BRANCH}"
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Deploy/K8S"
@@ -109,5 +110,6 @@ steps:
                   commit: "${BUILDKITE_COMMIT}"
                   branch: "${BUILDKITE_BRANCH}"
                   env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
