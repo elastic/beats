@@ -100,6 +100,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of un-parsed JSON in O365 module. {issue}37800[37800] {pull}38709[38709]
 - Fix filestream's registry GC: registry entries are now removed from the in-memory and disk store when they're older than the set TTL {issue}36761[36761] {pull}38488[38488]
 - Fix indexing failures by re-enabling event normalisation in netflow input. {issue}38703[38703] {pull}38780[38780]
+- Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
 
 *Heartbeat*
 
