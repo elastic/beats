@@ -84,7 +84,7 @@
     - name: affected_entities.status_code
       type: keyword
       description: >
-        The most recent status of the event. Possible values are open , closed , and upcoming.
+        The most recent status of the event. Possible values are open, closed, and upcoming.
     - name: affected_entities.entity_arn
       type: keyword
       description: > 
