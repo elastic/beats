@@ -136,7 +136,7 @@ steps:
   - group: "Filebeat Extended Tests"
     key: "filebeat-extended-tests"
     steps:
-      - label: ":mac: MacOS Unit Tests"
+      - label: ":mac: MacOS x64_64 Unit Tests"
         key: "macos-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
@@ -154,7 +154,7 @@ steps:
           - github_commit_status:
               context: "filebeat: Extended MacOS Unit Tests"
 
-      - label: ":mac: MacOS ARM Unit Tests"
+      - label: ":mac: MacOS arm64 Unit Tests"
         key: "macos-arm64-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
