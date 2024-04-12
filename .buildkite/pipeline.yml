@@ -22,8 +22,8 @@ steps:
                   branch: "${BUILDKITE_BRANCH}"
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Heartbeat"
     plugins:
@@ -46,8 +46,8 @@ steps:
                   branch: "${BUILDKITE_BRANCH}"
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Xpack/Dockerlogbeat"
     plugins:
@@ -70,8 +70,8 @@ steps:
                   branch: "${BUILDKITE_BRANCH}"
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Metricbeat"
     plugins:
@@ -95,8 +95,8 @@ steps:
                   branch: "${BUILDKITE_BRANCH}"
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Deploy/K8S"
     plugins:
@@ -114,5 +114,5 @@ steps:
                   branch: "${BUILDKITE_BRANCH}"
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
-                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
