@@ -138,17 +138,9 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 	// This loop tries to keep the workers busy as much as possible while
 	// honoring the number in config opposed to a simpler loop that does one
 	// listing, sequentially processes every object and then does another listing
-	start := true
 	workerWg := new(sync.WaitGroup)
 	lastLogGroupOffset := 0
 	for ctx.Err() == nil {
-		if !start {
-			cwPoller.log.Debugf("sleeping for %v before checking new logs", in.config.ScanFrequency)
-			time.Sleep(in.config.ScanFrequency)
-			cwPoller.log.Debug("done sleeping")
-		}
-		start = false
-
 		currentTime := time.Now()
 		cwPoller.startTime, cwPoller.endTime = getStartPosition(in.config.StartPosition, currentTime, cwPoller.endTime, in.config.ScanFrequency, in.config.Latency)
 		cwPoller.log.Debugf("start_position = %s, startTime = %v, endTime = %v", in.config.StartPosition, time.Unix(cwPoller.startTime/1000, 0), time.Unix(cwPoller.endTime/1000, 0))
@@ -189,6 +181,10 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 				cwPoller.run(svc, logGroup, startTime, endTime, logProcessor)
 			}(lg, cwPoller.startTime, cwPoller.endTime)
 		}
+
+		cwPoller.log.Debugf("sleeping for %v before checking new logs", in.config.ScanFrequency)
+		time.Sleep(in.config.ScanFrequency)
+		cwPoller.log.Debug("done sleeping")
 	}
 
 	// Wait for all workers to finish.
