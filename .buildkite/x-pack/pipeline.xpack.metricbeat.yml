@@ -177,10 +177,10 @@ steps:
 
   - group: "Extended Tests"
     key: "x-pack-metricbeat-extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(macos|aws).*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|aws).*/
     steps:
       - label: ":mac: MacOS x86_64 Unit Tests"
-        if: build.env("GITHUB_PR_LABELS") =~ /.*macos.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -197,7 +197,7 @@ steps:
 
       - label: ":mac: MacOS arm64 Unit Tests"
         #skip: "https://github.com/elastic/beats/issues/33036"
-        if: build.env("GITHUB_PR_LABELS") =~ /.*macos.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
