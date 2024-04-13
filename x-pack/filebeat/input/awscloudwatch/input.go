@@ -6,7 +6,6 @@ package awscloudwatch
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -143,10 +142,11 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		in.config.LogStreamPrefix)
 	logProcessor := newLogProcessor(log.Named("log_processor"), in.metrics, client, ctx)
 	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupNames)))
-	return in.Receive(svc, cwPoller, ctx, logProcessor, logGroupNames)
+	in.Receive(svc, cwPoller, ctx, logProcessor, logGroupNames)
+	return nil
 }
 
-func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwatchPoller, ctx context.Context, logProcessor *logProcessor, logGroupNames []string) error {
+func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwatchPoller, ctx context.Context, logProcessor *logProcessor, logGroupNames []string) {
 	// This loop tries to keep the workers busy as much as possible while
 	// honoring the number in config opposed to a simpler loop that does one
 	// listing, sequentially processes every object and then does another listing
@@ -173,7 +173,6 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 			continue
 		}
 
-		workerWg.Add(availableWorkers)
 		logGroupNamesLength := len(logGroupNames)
 		runningGoroutines := 0
 
@@ -187,13 +186,11 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 			if lastLogGroupOffset >= logGroupNamesLength {
 				// release unused workers
 				cwPoller.workerSem.Release(availableWorkers - runningGoroutines)
-				for j := 0; j < availableWorkers-runningGoroutines; j++ {
-					workerWg.Done()
-				}
 				lastLogGroupOffset = 0
 			}
 
 			lg := logGroupNames[i]
+			workerWg.Add(1)
 			go func(logGroup string, startTime int64, endTime int64) {
 				defer func() {
 					cwPoller.log.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", logGroup)
@@ -208,11 +205,6 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 
 	// Wait for all workers to finish.
 	workerWg.Wait()
-	if errors.Is(ctx.Err(), context.Canceled) {
-		// A canceled context is a normal shutdown.
-		return nil
-	}
-	return ctx.Err()
 }
 
 func parseARN(logGroupARN string) (string, string, error) {
