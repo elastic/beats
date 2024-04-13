@@ -36,11 +36,8 @@ type states struct {
 
 	log *logp.Logger
 
-	// states store
-	states []state
-
-	// indexForStateID maps state IDs to state indexes for fast lookup and modifications.
-	indexForStateID map[string]int
+	// states store, keyed by ID
+	states map[string]state
 
 	listingIDs        map[string]struct{}
 	listingInfo       *sync.Map
@@ -51,8 +48,7 @@ type states struct {
 func newStates(ctx v2.Context) *states {
 	return &states{
 		log:               ctx.Logger.Named("states"),
-		states:            nil,
-		indexForStateID:   map[string]int{},
+		states:            map[string]state{},
 		listingInfo:       new(sync.Map),
 		listingIDs:        map[string]struct{}{},
 		statesByListingID: map[string][]state{},
@@ -91,16 +87,7 @@ func (s *states) Delete(id string) {
 	s.Lock()
 	defer s.Unlock()
 
-	if index, exists := s.indexForStateID[id]; exists {
-		last := len(s.states) - 1
-		s.states[last], s.states[index] = s.states[index], s.states[last]
-		s.states = s.states[:last]
-
-		s.indexForStateID = map[string]int{}
-		for i, state := range s.states {
-			s.indexForStateID[state.ID] = i
-		}
-	}
+	delete(s.states, id)
 }
 
 // IsListingFullyStored check if listing if fully stored
@@ -153,16 +140,7 @@ func (s *states) Update(newState state, listingID string) {
 	s.Lock()
 	defer s.Unlock()
 
-	id := newState.ID
-
-	if index, exists := s.indexForStateID[id]; exists {
-		s.states[index] = newState
-	} else {
-		// No existing state found, add new one
-		s.indexForStateID[id] = len(s.states)
-		s.states = append(s.states, newState)
-		s.log.Debug("New state added for ", newState.ID)
-	}
+	s.states[newState.ID] = newState
 
 	if listingID == "" || !newState.IsProcessed() {
 		return
@@ -202,11 +180,7 @@ func (s *states) Update(newState state, listingID string) {
 func (s *states) FindPrevious(newState state) state {
 	s.RLock()
 	defer s.RUnlock()
-	id := newState.ID
-	if i, exists := s.indexForStateID[id]; exists {
-		return s.states[i]
-	}
-	return state{}
+	return s.states[newState.ID]
 }
 
 // FindPreviousByID lookups a registered state, that matching the id.
@@ -214,18 +188,14 @@ func (s *states) FindPrevious(newState state) state {
 func (s *states) FindPreviousByID(id string) state {
 	s.RLock()
 	defer s.RUnlock()
-	if i, exists := s.indexForStateID[id]; exists {
-		return s.states[i]
-	}
-	return state{}
+	return s.states[id]
 }
 
 func (s *states) IsNew(state state) bool {
 	s.RLock()
 	defer s.RUnlock()
-
-	i, exists := s.indexForStateID[state.ID]
-	return !exists || !s.states[i].IsEqual(&state)
+	oldState, exists := s.states[state.ID]
+	return !exists || !oldState.IsEqual(&state)
 }
 
 // GetStates creates copy of the file states.
@@ -233,8 +203,10 @@ func (s *states) GetStates() []state {
 	s.RLock()
 	defer s.RUnlock()
 
-	newStates := make([]state, len(s.states))
-	copy(newStates, s.states)
+	newStates := make([]state, 0, len(s.states))
+	for _, state := range s.states {
+		newStates = append(newStates, state)
+	}
 
 	return newStates
 }
