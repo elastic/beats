@@ -63,12 +63,12 @@ processors:
       field:
         - misp.Attribute
       ignore_missing: true
-      if: ctx.misp?.Attribute.size() == 0
+      if: ctx.misp?.Attribute?.size() == 0
   - remove:
       field:
         - misp.Object
       ignore_missing: true
-      if: ctx.misp?.Object.size() == 0
+      if: ctx.misp?.Object?.size() == 0
   - date:
       field: misp.timestamp
       formats:
