@@ -214,7 +214,7 @@ steps:
 
       - label: ":linux: Cloud (MODULE) Tests"
         key: "x-pack-metricbeat-extended-cloud-test"
-        skip: "doesn't belong in a stage in Jenkins, thus skipped"
+        #skip: "doesn't belong in a stage in Jenkins, thus skipped"
         command: |
           set -euo pipefail
           # defines the MODULE env var based on what's changed in a PR
