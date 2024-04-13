@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2024-04-13T05:01:40.922946Z",
+        "@timestamp": "2021-10-19T11:38:54.000Z",
         "event.action": "logout",
         "event.category": [
             "authentication"
@@ -15,11 +15,20 @@
         "fileset.name": "logout",
         "input.type": "log",
         "log.offset": 0,
+        "related.ip": [
+            "123.201.231.106"
+        ],
         "salesforce.instance_url": "<no value>",
+        "salesforce.logout.login_key": "CuRVtbMjat6xxbTH",
+        "salesforce.logout.session.key": "6/HAElgoPCwskqBU",
+        "salesforce.logout.session.level": "STANDARD",
         "service.type": "salesforce",
+        "source.ip": "123.201.231.106",
         "tags": [
             "forwarded",
             "salesforce-logout"
-        ]
+        ],
+        "user.email": "kush.rana@elastic.co",
+        "user.id": "0055j000000utlPAAQ"
     }
 ]

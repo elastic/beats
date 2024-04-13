@@ -32,7 +32,7 @@
       type: group
       fields:
         - name: level
-          type: keyword
+          type: text
           description: Session-level security controls user access to features that support it, such as connected apps and reporting. This field is available in API version 42.0 and later.
         - name: key
           type: keyword

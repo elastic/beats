@@ -11,8 +11,12 @@
     - name: session
       type: group
       fields:
-        - name: level
+        - name: key
           type: keyword
+          description: >
+            The user’s unique session ID. You can use this value to identify all user events within a session. When a user logs out and logs in again, a new session is started.
+        - name: level
+          type: text
           description: >
             The security level of the session that was used when logging out (e.g. Standard Session or High-Assurance Session).
         - name: type
@@ -62,6 +66,10 @@
       type: keyword
       description: >
         The screen resolution of the client. If a timeout caused the logout, this field is null.
+    - name: user_id
+      type: keyword
+      description: >
+        The 15-character ID of the user who’s using Salesforce services through the UI or the API.
     - name: user_id_derived
       type: keyword
       description: >
@@ -78,3 +86,7 @@
       type: keyword
       description: >
         This field is populated only when the activity that this event monitors requires extra authentication, such as multi-factor authentication. In this case, Salesforce generates more events and sets the RelatedEventIdentifier field of the new events to the value of the EventIdentifier field of the original event. Use this field with the EventIdentifier field to correlate all the related events. If no extra authentication is required, this field is blank.
+    - name: organization_id
+      type: keyword
+      description: >
+        The 15-character ID of the organization.
