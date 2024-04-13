@@ -133,7 +133,6 @@ func (in *s3Input) runS3Poller(
 ) error {
 	// Create client for publishing events and receive notification of their ACKs.
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:      inputContext.Cancelation,
 		EventListener: awscommon.NewEventACKHandler(),
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization

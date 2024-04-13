@@ -37,13 +37,6 @@ import (
 	"github.com/elastic/beats/v7/metricbeat/mb"
 )
 
-func init() {
-	err := autodiscover.Registry.AddBuilder("hints", NewMetricHints)
-	if err != nil {
-		logp.Error(fmt.Errorf("could not add `hints` builder"))
-	}
-}
-
 const (
 	module         = "module"
 	namespace      = "namespace"
@@ -66,6 +59,14 @@ type metricHints struct {
 	Registry *mb.Register
 
 	logger *logp.Logger
+}
+
+// InitializeModule initializes this module.
+func InitializeModule() {
+	err := autodiscover.Registry.AddBuilder("hints", NewMetricHints)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
 }
 
 // NewMetricHints builds a new metrics builder based on hints

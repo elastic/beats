@@ -21,6 +21,7 @@ import (
 	"os/user"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/go-sysinfo"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -52,17 +53,25 @@ func (p gosysinfoProvider) GetProcessMetadata(pid int) (result *processMetadata,
 		}
 	}
 
+	// Capabilities are linux only and other systems will fail
+	// with ErrUnsupported. In the event of any errors, we simply
+	// don't report the capabilities.
+	capPermitted, _ := capabilities.FromPid(capabilities.Permitted, pid)
+	capEffective, _ := capabilities.FromPid(capabilities.Effective, pid)
+
 	r := processMetadata{
-		name:      info.Name,
-		args:      info.Args,
-		env:       env,
-		title:     strings.Join(info.Args, " "),
-		exe:       info.Exe,
-		pid:       info.PID,
-		ppid:      info.PPID,
-		startTime: info.StartTime,
-		username:  username,
-		userid:    userid,
+		name:         info.Name,
+		args:         info.Args,
+		env:          env,
+		title:        strings.Join(info.Args, " "),
+		exe:          info.Exe,
+		pid:          info.PID,
+		ppid:         info.PPID,
+		capEffective: capEffective,
+		capPermitted: capPermitted,
+		startTime:    info.StartTime,
+		username:     username,
+		userid:       userid,
 	}
 	r.fields = r.toMap()
 	return &r, nil
