@@ -9,6 +9,7 @@
         "event.kind": "event",
         "event.module": "salesforce",
         "event.outcome": "success",
+        "event.provider": "EventLogFile",
         "event.timezone": "-02:00",
         "event.type": [
             "info"

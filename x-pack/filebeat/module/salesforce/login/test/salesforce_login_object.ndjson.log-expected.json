@@ -10,6 +10,7 @@
         "event.kind": "event",
         "event.module": "salesforce",
         "event.outcome": "success",
+        "event.provider": "Object",
         "event.timezone": "-02:00",
         "event.type": [
             "info"

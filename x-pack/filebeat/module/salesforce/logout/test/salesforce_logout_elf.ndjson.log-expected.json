@@ -9,6 +9,7 @@
         "event.dataset": "salesforce.logout",
         "event.kind": "event",
         "event.module": "salesforce",
+        "event.provider": "EventLogFile",
         "event.timezone": "-02:00",
         "event.type": [
             "info"

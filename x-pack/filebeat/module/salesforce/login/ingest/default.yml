@@ -26,24 +26,14 @@ processors:
       field: salesforce.login.document_id
       copy_from: _id
       ignore_empty_value: true
-  - grok:
-      field: message
-      patterns:
-      - "\"EVENT_TYPE\":\\s*\"(?<sf_event_type>\\w+)\""
-      ignore_failure: true
-  - set:
-      field: sf_event_type
-      value: ""
-      if: "ctx?.sf_event_type == null"
+  
   - pipeline:
       name: '{< IngestPipeline "object" >}'
-      if: ctx.event?.provider == "Object" || ctx.sf_event_type != 'Login'
+      if: ctx.event?.provider == "Object"
   - pipeline:
       name: '{< IngestPipeline "eventlogfile" >}'
-      if: ctx.event?.provider == "EventLogFile" || ctx.sf_event_type == 'Login'
-  - remove:
-      field: sf_event_type
-      ignore_failure: true
+      if: ctx.event?.provider == "EventLogFile"
+
   - set:
       field: event.type
       value: ["info"]

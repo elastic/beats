@@ -8,6 +8,7 @@
         "event.dataset": "salesforce.logout",
         "event.kind": "event",
         "event.module": "salesforce",
+        "event.provider": "Object",
         "event.timezone": "-02:00",
         "event.type": [
             "info"
