@@ -177,7 +177,7 @@ steps:
 
   - group: "Extended Tests"
     key: "x-pack-metricbeat-extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(macos|aws).*/
     steps:
       - label: ":mac: MacOS x86_64 Unit Tests"
         if: build.env("GITHUB_PR_LABELS") =~ /.*macos.*/
