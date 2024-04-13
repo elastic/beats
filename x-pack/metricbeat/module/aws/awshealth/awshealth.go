@@ -132,15 +132,13 @@ func (m *MetricSet) Fetch(ctx context.Context, report mb.ReporterV2) error {
 	return nil
 }
 
-// getEventDetails retrieves a AWS Health events which are upcoming
-// or open. It uses the DescribeEvents API to get a list of events. Each event is
-// identified by a Event ARN. The function returns a slice of mb.Event structs
-// containing the summarized event info.
+// getEventDetails retrieves AWS health events and their details using the provided AWS Health client.
+// It returns a list of Metricbeat events containing relevant AWS health information.
 func (m *MetricSet) getEventDetails(
 	ctx context.Context,
 	awsHealth *health.Client,
 ) []mb.Event {
-	//var events []mb.Event
+	// Define event filter to fetch only upcoming and open events
 	eventFilter := types.EventFilter{
 		EventStatusCodes: []types.EventStatusCode{
 			types.EventStatusCodeUpcoming,
@@ -161,29 +159,30 @@ func (m *MetricSet) getEventDetails(
 		Filter: &eventFilter,
 	}
 
-	// Create an instance of DescribeEventsPaginatorOptions with desired options
+	// Define options for DescribeEventsPaginator
 	deOptions := &health.DescribeEventAggregatesPaginatorOptions{
 		Limit:                10,
 		StopOnDuplicateToken: true,
 	}
 
-	// Create a function option to apply the options to the paginator
+	// Function option to apply options to the paginator
 	deOptFn := func(options *health.DescribeEventsPaginatorOptions) {
 		// Apply the provided options
 		options.Limit = deOptions.Limit
 		options.StopOnDuplicateToken = deOptions.StopOnDuplicateToken
 	}
-
+	// Define options for DescribeAffectedEntitiesPaginator
 	affOptions := &health.DescribeAffectedEntitiesPaginatorOptions{
 		Limit:                10,
 		StopOnDuplicateToken: true,
 	}
+	// Function option to apply options to the paginator
 	affOptFn := func(options *health.DescribeAffectedEntitiesPaginatorOptions) {
 		// Apply the provided options
 		options.Limit = affOptions.Limit
 		options.StopOnDuplicateToken = affOptions.StopOnDuplicateToken
 	}
-
+	// Create DescribeEventsPaginator with AWS Health client and options
 	dePage := health.NewDescribeEventsPaginator(awsHealth, &deInputParams, deOptFn)
 
 	for dePage.HasMorePages() {
@@ -197,6 +196,7 @@ func (m *MetricSet) getEventDetails(
 		}
 		deEvents = currentPage.Events
 		eventArns := make([]string, len(deEvents))
+		// Iterate through events to extract relevant information
 		for i := range deEvents {
 			healthDetailsTemp = append(healthDetailsTemp, AWSHealthMetric{
 				EventArn:          awssdk.ToString(deEvents[i].Arn),
@@ -212,7 +212,7 @@ func (m *MetricSet) getEventDetails(
 			})
 			eventArns[i] = awssdk.ToString(deEvents[i].Arn)
 		}
-
+		// Fetch event details for the current page of events
 		eventDetails, err := awsHealth.DescribeEventDetails(ctx, &health.DescribeEventDetailsInput{
 			EventArns: eventArns,
 			Locale:    &locale,
@@ -221,7 +221,7 @@ func (m *MetricSet) getEventDetails(
 			m.Logger().Errorf("[AWS Health] DescribeEventDetails failed with : %w", err)
 			break
 		}
-
+		// Fetch event description for the current page of events
 		successSet := eventDetails.SuccessfulSet
 		for x := range successSet {
 			for y := range healthDetailsTemp {
@@ -230,8 +230,7 @@ func (m *MetricSet) getEventDetails(
 				}
 			}
 		}
-		// Fetch the details of all the affected Entities related to the EvenARNs in the present page of DescribeEvents API call
-
+		// Fetch affected entities related to event ARNs in the current page
 		affInputParams = health.DescribeAffectedEntitiesInput{
 			Filter: &types.EntityFilter{
 				EventArns: eventArns,
@@ -244,11 +243,13 @@ func (m *MetricSet) getEventDetails(
 		)
 
 		for affPage.HasMorePages() {
+			// Fetch current page of affected entities
 			affCurrentPage, err := affPage.NextPage(ctx)
 			if err != nil {
 				m.Logger().Errorf("[AWS Health] DescribeAffectedEntitie failed with : %w", err)
 				break
 			}
+			// Extract relevant details of affected entities and match them with event details
 			for k := range affCurrentPage.Entities {
 				affEntityTemp = AffectedEntityDetails{
 					AwsAccountId:    awssdk.ToString(affCurrentPage.Entities[k].AwsAccountId),
@@ -278,8 +279,10 @@ func (m *MetricSet) getEventDetails(
 			}
 
 		}
+		// Append current page's health details to the overall list
 		healthDetails = append(healthDetails, healthDetailsTemp...)
 	}
+	// Convert health details to Metricbeat events
 	var events = make([]mb.Event, 0, len(healthDetails))
 	for _, detail := range healthDetails {
 		event := mb.Event{
