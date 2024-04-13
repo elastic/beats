@@ -24,8 +24,6 @@ type cloudwatchPoller struct {
 	region               string
 	logStreams           []*string
 	logStreamPrefix      string
-	startTime            int64
-	endTime              int64
 	workerSem            *awscommon.Sem
 	log                  *logp.Logger
 	metrics              *inputMetrics
@@ -46,8 +44,6 @@ func newCloudwatchPoller(log *logp.Logger, metrics *inputMetrics,
 		region:               awsRegion,
 		logStreams:           logStreams,
 		logStreamPrefix:      logStreamPrefix,
-		startTime:            int64(0),
-		endTime:              int64(0),
 		workerSem:            awscommon.NewSem(numberOfWorkers),
 		log:                  log,
 		metrics:              metrics,

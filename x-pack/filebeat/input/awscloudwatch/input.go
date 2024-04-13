@@ -140,10 +140,11 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 	// listing, sequentially processes every object and then does another listing
 	workerWg := new(sync.WaitGroup)
 	lastLogGroupOffset := 0
+	var startTime, endTime int64
 	for ctx.Err() == nil {
 		currentTime := time.Now()
-		cwPoller.startTime, cwPoller.endTime = getStartPosition(in.config.StartPosition, currentTime, cwPoller.endTime, in.config.ScanFrequency, in.config.Latency)
-		cwPoller.log.Debugf("start_position = %s, startTime = %v, endTime = %v", in.config.StartPosition, time.Unix(cwPoller.startTime/1000, 0), time.Unix(cwPoller.endTime/1000, 0))
+		startTime, endTime = getStartPosition(in.config.StartPosition, currentTime, endTime, in.config.ScanFrequency, in.config.Latency)
+		cwPoller.log.Debugf("start_position = %s, startTime = %v, endTime = %v", in.config.StartPosition, time.Unix(startTime/1000, 0), time.Unix(endTime/1000, 0))
 		availableWorkers, err := cwPoller.workerSem.AcquireContext(in.config.NumberOfWorkers, ctx)
 		if err != nil {
 			break
@@ -179,7 +180,7 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 				}()
 				cwPoller.log.Infof("aws-cloudwatch input worker for log group: '%v' has started", logGroup)
 				cwPoller.run(svc, logGroup, startTime, endTime, logProcessor)
-			}(lg, cwPoller.startTime, cwPoller.endTime)
+			}(lg, startTime, endTime)
 		}
 
 		cwPoller.log.Debugf("sleeping for %v before checking new logs", in.config.ScanFrequency)
