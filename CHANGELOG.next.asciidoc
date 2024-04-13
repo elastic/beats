@@ -113,6 +113,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
 - Add process data to file events (Linux only, eBPF backend). {pull}38199[38199]
 - Add container id to file events (Linux only, eBPF backend). {pull}38328[38328]
+- Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
 
 *Filebeat*
 

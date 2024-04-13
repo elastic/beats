@@ -26,8 +26,13 @@ import (
 )
 
 // ConfiguredModules returns a list of all configured modules, including anyone present under dynamic config settings.
+<<<<<<< HEAD
 func ConfiguredModules(modulesData []*conf.C, configModulesData *conf.C, moduleOptions []Option) ([]*Wrapper, error) {
 	var modules []*Wrapper
+=======
+func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModulesData *conf.C, moduleOptions []Option) ([]*Wrapper, error) {
+	var modules []*Wrapper //nolint:prealloc //can't be preallocated
+>>>>>>> ca4adcecac ([Auditbeat] fim(kprobes): enrich file events by coupling add_process_metadata processor (#38776))
 
 	for _, moduleCfg := range modulesData {
 		module, err := NewWrapper(moduleCfg, mb.Registry, moduleOptions...)
@@ -40,7 +45,9 @@ func ConfiguredModules(modulesData []*conf.C, configModulesData *conf.C, moduleO
 	// Add dynamic modules
 	if configModulesData.Enabled() {
 		config := cfgfile.DefaultDynamicConfig
-		configModulesData.Unpack(&config)
+		if err := configModulesData.Unpack(&config); err != nil {
+			return nil, err
+		}
 
 		modulesManager, err := cfgfile.NewGlobManager(config.Path, ".yml", ".disabled")
 		if err != nil {
