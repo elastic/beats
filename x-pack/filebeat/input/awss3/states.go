@@ -27,6 +27,7 @@ type listingInfo struct {
 	storedObjects int
 	errorObjects  int
 	finalCheck    bool
+	states        []state
 }
 
 // states handles list of s3 object state. One must use newStates to instantiate a
@@ -39,19 +40,17 @@ type states struct {
 	// states store, keyed by ID
 	states map[string]state
 
-	listingIDs        map[string]struct{}
-	listingInfo       map[string]*listingInfo
-	statesByListingID map[string][]state
+	listingIDs  map[string]struct{}
+	listingInfo map[string]*listingInfo
 }
 
 // newStates generates a new states registry.
 func newStates(ctx v2.Context) *states {
 	return &states{
-		log:               ctx.Logger.Named("states"),
-		states:            map[string]state{},
-		listingInfo:       map[string]*listingInfo{},
-		listingIDs:        map[string]struct{}{},
-		statesByListingID: map[string][]state{},
+		log:         ctx.Logger.Named("states"),
+		states:      map[string]state{},
+		listingInfo: map[string]*listingInfo{},
+		listingIDs:  map[string]struct{}{},
 	}
 }
 
@@ -129,7 +128,6 @@ func (s *states) DeleteListing(listingID string) {
 	s.Lock()
 	defer s.Unlock()
 	delete(s.listingIDs, listingID)
-	delete(s.statesByListingID, listingID)
 	delete(s.listingInfo, listingID)
 }
 
@@ -155,18 +153,12 @@ func (s *states) Update(newState state, listingID string) {
 	if newState.Stored {
 		listingInfo.storedObjects++
 	}
-
 	if newState.Error {
 		listingInfo.errorObjects++
 	}
+	listingInfo.states = append(listingInfo.states, newState)
 
 	listingInfo.mu.Unlock()
-
-	if _, ok := s.statesByListingID[listingID]; !ok {
-		s.statesByListingID[listingID] = make([]state, 0)
-	}
-
-	s.statesByListingID[listingID] = append(s.statesByListingID[listingID], newState)
 }
 
 // FindPrevious lookups a registered state, that matching the new state.
@@ -222,12 +214,13 @@ func (s *states) GetStatesByListingID(listingID string) []state {
 	s.RLock()
 	defer s.RUnlock()
 
-	if _, ok := s.statesByListingID[listingID]; !ok {
+	listingInfo, ok := s.listingInfo[listingID]
+	if !ok {
 		return nil
 	}
 
-	newStates := make([]state, len(s.statesByListingID[listingID]))
-	copy(newStates, s.statesByListingID[listingID])
+	newStates := make([]state, len(listingInfo.states))
+	copy(newStates, listingInfo.states)
 	return newStates
 }
 
