@@ -14,7 +14,7 @@
         - name: key
           type: keyword
           description: >
-            The user’s unique session ID. You can use this value to identify all user events within a session. When a user logs out and logs in again, a new session is started.
+            The user's unique session ID. You can use this value to identify all user events within a session. When a user logs out and logs in again, a new session is started.
         - name: level
           type: text
           description: >
@@ -26,7 +26,7 @@
     - name: login_key
       type: keyword
       description: >
-        The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
+        The string that ties together all events in a given user's login session. It starts with a login event and ends with either a logout event or the user session expiring.
     - name: api
       type: group
       fields:
@@ -69,15 +69,15 @@
     - name: user_id
       type: keyword
       description: >
-        The 15-character ID of the user who’s using Salesforce services through the UI or the API.
+        The 15-character ID of the user who's using Salesforce services through the UI or the API.
     - name: user_id_derived
       type: keyword
       description: >
-        The 18-character case-safe ID of the user who’s using Salesforce services through the UI or the API.
+        The 18-character case-safe ID of the user who's using Salesforce services through the UI or the API.
     - name: user_initiated_logout
       type: keyword
       description: >
-        The value is 1 if the user intentionally logged out of the organization by clicking the Logout button. If the user’s session timed out due to inactivity or another implicit logout action, the value is 0.
+        The value is 1 if the user intentionally logged out of the organization by clicking the Logout button. If the user's session timed out due to inactivity or another implicit logout action, the value is 0.
     - name: created_by_id
       type: keyword
       description: >

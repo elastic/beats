@@ -125672,12 +125672,67 @@ type: keyword
 
 --
 
-*`salesforce.login.login_key`*::
+
+*`salesforce.login.session.level`*::
 +
 --
-The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
+Session-level security controls user access to features that support it, such as connected apps and reporting. This field is available in API version 42.0 and later.
+
+type: text
+
+--
+
+*`salesforce.login.session.key`*::
++
+--
+The user's unique session ID. Use this value to identify all user events within a session. When a user logs out and logs in again, a new session is started. For LoginEvent, this field is often null because the event is captured before a session is created. For example, vMASKIU6AxEr+Op5. This field is available in API version 46.0 and later.
 
 type: keyword
+
+--
+
+*`salesforce.login.key`*::
++
+--
+The string that ties together all events in a given user's login session. It starts with a login event and ends with either a logout event or the user session expiring.
+
+type: keyword
+
+--
+
+*`salesforce.login.history_id`*::
++
+--
+Tracks a user session so you can correlate user activity with a particular login instance. This field is also available on the LoginHistory, AuthSession, and other objects, making it easier to trace events back to a user's original authentication.
+
+type: keyword
+
+--
+
+*`salesforce.login.type`*::
++
+--
+The type of login used to access the session.
+
+type: keyword
+
+--
+
+*`salesforce.login.geo_id`*::
++
+--
+The Salesforce ID of the LoginGeo object associated with the login user's IP address.
+
+type: keyword
+
+--
+
+*`salesforce.login.additional_info`*::
++
+--
+JSON serialization of additional information that's captured from the HTTP headers during a login request.
+
+type: text
 
 --
 
@@ -125693,7 +125748,7 @@ type: keyword
 *`salesforce.login.client_ip`*::
 +
 --
-The IP address of the client that’s using Salesforce services. A Salesforce internal IP (such as a login from Salesforce Workbench or AppExchange) is shown as “Salesforce.com IP”.
+The IP address of the client that's using Salesforce services. A Salesforce internal IP (such as a login from Salesforce Workbench or AppExchange) is shown as “Salesforce.com IP”.
 
 type: keyword
 
@@ -125708,10 +125763,10 @@ type: long
 
 --
 
-*`salesforce.login.db_time.total`*::
+*`salesforce.login.db_time_total`*::
 +
 --
-The time in milliseconds for a database round trip. Includes time spent in the JDBC driver, network to the database, and db_time.total. Compare this field to cpu_time to determine whether performance issues are occurring in the database layer or in your own code.
+The time in nanoseconds for a database round trip. Includes time spent in the JDBC driver, network to the database, and DB's CPU time. Compare this field to cpu_time to determine whether performance issues are occurring in the database layer or in your own code.
 
 type: double
 
@@ -125762,19 +125817,19 @@ type: long
 
 --
 
-*`salesforce.login.uri_id_derived`*::
+*`salesforce.login.user_id`*::
 +
 --
-The 18-character case insensitive ID of the URI of the page that’s receiving the request.
+The 15-character ID of the user who's using Salesforce services through the UI or the API.
 
 type: keyword
 
 --
 
-*`salesforce.login.user_id_derived`*::
+*`salesforce.login.uri_id_derived`*::
 +
 --
-The 18-character case insensitive ID of the user who’s using Salesforce services through the UI or the API.
+The 18-character case insensitive ID of the URI of the page that's receiving the request.
 
 type: keyword
 
@@ -125816,13 +125871,23 @@ type: keyword
 --
 
 
+*`salesforce.logout.session.key`*::
++
+--
+The user's unique session ID. You can use this value to identify all user events within a session. When a user logs out and logs in again, a new session is started.
+
+
+type: keyword
+
+--
+
 *`salesforce.logout.session.level`*::
 +
 --
 The security level of the session that was used when logging out (e.g. Standard Session or High-Assurance Session).
 
 
-type: keyword
+type: text
 
 --
 
@@ -125839,7 +125904,7 @@ type: keyword
 *`salesforce.logout.login_key`*::
 +
 --
-The string that ties together all events in a given user’s login session. It starts with a login event and ends with either a logout event or the user session expiring.
+The string that ties together all events in a given user's login session. It starts with a login event and ends with either a logout event or the user session expiring.
 
 
 type: keyword
@@ -125937,10 +126002,20 @@ type: keyword
 
 --
 
+*`salesforce.logout.user_id`*::
++
+--
+The 15-character ID of the user who's using Salesforce services through the UI or the API.
+
+
+type: keyword
+
+--
+
 *`salesforce.logout.user_id_derived`*::
 +
 --
-The 18-character case-safe ID of the user who’s using Salesforce services through the UI or the API.
+The 18-character case-safe ID of the user who's using Salesforce services through the UI or the API.
 
 
 type: keyword
@@ -125950,7 +126025,7 @@ type: keyword
 *`salesforce.logout.user_initiated_logout`*::
 +
 --
-The value is 1 if the user intentionally logged out of the organization by clicking the Logout button. If the user’s session timed out due to inactivity or another implicit logout action, the value is 0.
+The value is 1 if the user intentionally logged out of the organization by clicking the Logout button. If the user's session timed out due to inactivity or another implicit logout action, the value is 0.
 
 
 type: keyword
@@ -125971,6 +126046,16 @@ type: keyword
 +
 --
 This field is populated only when the activity that this event monitors requires extra authentication, such as multi-factor authentication. In this case, Salesforce generates more events and sets the RelatedEventIdentifier field of the new events to the value of the EventIdentifier field of the original event. Use this field with the EventIdentifier field to correlate all the related events. If no extra authentication is required, this field is blank.
+
+
+type: keyword
+
+--
+
+*`salesforce.logout.organization_id`*::
++
+--
+The 15-character ID of the organization.
 
 
 type: keyword
@@ -126037,7 +126122,7 @@ type: keyword
 *`salesforce.setup_audit_trail.delegate_user`*::
 +
 --
-The Login-As user who executed the action in Setup. If a Login-As user didn’t perform the action, this field is blank. This field is available in API version 35.0 and later.
+The Login-As user who executed the action in Setup. If a Login-As user didn't perform the action, this field is blank. This field is available in API version 35.0 and later.
 
 
 type: keyword

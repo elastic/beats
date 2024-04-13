@@ -27,7 +27,7 @@
     - name: delegate_user
       type: keyword
       description: >
-        The Login-As user who executed the action in Setup. If a Login-As user didn’t perform the action, this field is blank. This field is available in API version 35.0 and later.
+        The Login-As user who executed the action in Setup. If a Login-As user didn't perform the action, this field is blank. This field is available in API version 35.0 and later.
     - name: display
       type: keyword
       description: >
