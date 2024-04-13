@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
-	"go.uber.org/multierr"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -131,9 +130,7 @@ func (p *s3Poller) createS3ObjectProcessor(ctx context.Context, state state) (s3
 	return p.s3ObjectHandler.Create(ctx, p.log, p.client, acker, event), event
 }
 
-func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) error {
-	var errs []error
-
+func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) {
 	for s3ObjectPayload := range s3ObjectPayloadChan {
 		// Process S3 object (download, parse, create events).
 		err := s3ObjectPayload.s3ObjectHandler.ProcessS3Object()
@@ -145,7 +142,7 @@ func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) er
 
 		if err != nil {
 			event := s3ObjectPayload.s3ObjectEvent
-			errs = append(errs,
+			p.log.Warnw("processing S3 listing", "error",
 				fmt.Errorf(
 					fmt.Sprintf("failed processing S3 event for object key %q in bucket %q: %%w",
 						event.S3.Object.Key, event.S3.Bucket.Name),
@@ -160,13 +157,9 @@ func (p *s3Poller) ProcessObject(s3ObjectPayloadChan <-chan *s3ObjectPayload) er
 		// Metrics
 		p.metrics.s3ObjectsAckedTotal.Inc()
 	}
-
-	return multierr.Combine(errs...)
 }
 
 func (p *s3Poller) GetS3Objects(ctx context.Context, s3ObjectPayloadChan chan<- *s3ObjectPayload) {
-	defer close(s3ObjectPayloadChan)
-
 	bucketName := getBucketNameFromARN(p.bucket)
 
 	circuitBreaker := 0
@@ -343,49 +336,24 @@ func (p *s3Poller) Purge(ctx context.Context) {
 }
 
 func (p *s3Poller) Poll(ctx context.Context) {
-	// This loop tries to keep the workers busy as much as possible while
-	// honoring the number in config opposed to a simpler loop that does one
-	//  listing, sequentially processes every object and then does another listing
-	workerWg := new(sync.WaitGroup)
-	for ctx.Err() == nil {
-		// Determine how many S3 workers are available.
-		workers, err := p.workerSem.AcquireContext(p.numberOfWorkers, ctx)
-		if err != nil {
-			break
-		}
+	var workerWg sync.WaitGroup
+	s3ObjectPayloadChan := make(chan *s3ObjectPayload)
 
-		if workers == 0 {
-			continue
-		}
-
-		s3ObjectPayloadChan := make(chan *s3ObjectPayload)
-
-		workerWg.Add(1)
+	for i := 0; i < p.numberOfWorkers; i++ {
 		go func() {
-			defer func() {
-				workerWg.Done()
-			}()
-
-			p.GetS3Objects(ctx, s3ObjectPayloadChan)
-			p.Purge(ctx)
+			defer workerWg.Done()
+			p.ProcessObject(s3ObjectPayloadChan)
 		}()
+	}
 
-		workerWg.Add(workers)
-		for i := 0; i < workers; i++ {
-			go func() {
-				defer func() {
-					workerWg.Done()
-					p.workerSem.Release(1)
-				}()
-				if err := p.ProcessObject(s3ObjectPayloadChan); err != nil {
-					p.log.Warnw("Failed processing S3 listing.", "error", err)
-				}
-			}()
-		}
+	for ctx.Err() == nil {
+		p.GetS3Objects(ctx, s3ObjectPayloadChan)
+		go p.Purge(ctx)
 
 		_ = timed.Wait(ctx, p.bucketPollInterval)
 	}
 
-	// Wait for all workers to finish.
+	// Close the workers' input channel and wait for all of them to finish.
+	close(s3ObjectPayloadChan)
 	workerWg.Wait()
 }
