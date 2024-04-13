@@ -348,6 +348,8 @@ func (p *s3Poller) Poll(ctx context.Context) {
 
 	for ctx.Err() == nil {
 		p.GetS3Objects(ctx, s3ObjectPayloadChan)
+		// We purge in a goroutine since it will need to wait for acknowledgments
+		// for all objects in each listing
 		go p.Purge(ctx)
 
 		_ = timed.Wait(ctx, p.bucketPollInterval)

@@ -139,11 +139,10 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 	// honoring the number in config opposed to a simpler loop that does one
 	// listing, sequentially processes every object and then does another listing
 	workerWg := new(sync.WaitGroup)
-	lastLogGroupOffset := 0
+	nextLogGroupIndex := 0
 	var startTime, endTime int64
 	for ctx.Err() == nil {
-		currentTime := time.Now()
-		startTime, endTime = getStartPosition(in.config.StartPosition, currentTime, endTime, in.config.ScanFrequency, in.config.Latency)
+		startTime, endTime = in.getStartPosition(time.Now(), endTime)
 		cwPoller.log.Debugf("start_position = %s, startTime = %v, endTime = %v", in.config.StartPosition, time.Unix(startTime/1000, 0), time.Unix(endTime/1000, 0))
 		availableWorkers, err := cwPoller.workerSem.AcquireContext(in.config.NumberOfWorkers, ctx)
 		if err != nil {
@@ -154,20 +153,19 @@ func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwa
 			continue
 		}
 
-		logGroupNamesLength := len(logGroupNames)
 		runningGoroutines := 0
 
-		for i := lastLogGroupOffset; i < logGroupNamesLength; i++ {
+		for i := nextLogGroupIndex; i < len(logGroupNames); i++ {
 			if runningGoroutines >= availableWorkers {
 				break
 			}
 
 			runningGoroutines++
-			lastLogGroupOffset = i + 1
-			if lastLogGroupOffset >= logGroupNamesLength {
+			nextLogGroupIndex = i + 1
+			if nextLogGroupIndex >= len(logGroupNames) {
 				// release unused workers
 				cwPoller.workerSem.Release(availableWorkers - runningGoroutines)
-				lastLogGroupOffset = 0
+				nextLogGroupIndex = 0
 			}
 
 			lg := logGroupNames[i]
@@ -234,13 +232,10 @@ func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, log
 	return logGroupNames, nil
 }
 
-func getStartPosition(startPosition string, currentTime time.Time, endTime int64, scanFrequency time.Duration, latency time.Duration) (int64, int64) {
-	if latency != 0 {
-		// add latency if config is not 0
-		currentTime = currentTime.Add(latency * -1)
-	}
+func (in *cloudwatchInput) getStartPosition(currentTime time.Time, endTime int64) (int64, int64) {
+	currentTime = currentTime.Add(-in.config.Latency)
 
-	switch startPosition {
+	switch in.config.StartPosition {
 	case "beginning":
 		if endTime != int64(0) {
 			return endTime, currentTime.UnixNano() / int64(time.Millisecond)
@@ -250,7 +245,7 @@ func getStartPosition(startPosition string, currentTime time.Time, endTime int64
 		if endTime != int64(0) {
 			return endTime, currentTime.UnixNano() / int64(time.Millisecond)
 		}
-		return currentTime.Add(-scanFrequency).UnixNano() / int64(time.Millisecond), currentTime.UnixNano() / int64(time.Millisecond)
+		return currentTime.Add(-in.config.ScanFrequency).UnixNano() / int64(time.Millisecond), currentTime.UnixNano() / int64(time.Millisecond)
 	}
 	return 0, 0
 }
