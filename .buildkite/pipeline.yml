@@ -4,15 +4,16 @@ steps:
   - label: "Trigger Auditbeat"
     plugins:
       - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only HEAD~1"
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
                 - auditbeat/
                 - .buildkite/auditbeat/
+                - .buildkite/scripts
                 #OSS
                 - go.mod
                 - pytest.ini
-                - dev-tools/**
+                - dev-tools/
                 - libbeat/**
                 - testing/**
               config:
@@ -22,20 +23,22 @@ steps:
                   branch: "${BUILDKITE_BRANCH}"
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Heartbeat"
     plugins:
       - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only HEAD~1"
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
                 - heartbeat/
                 - .buildkite/heartbeat/
+                - .buildkite/scripts
                 #OSS
                 - go.mod
                 - pytest.ini
-                - dev-tools/**
+                - dev-tools/
                 - libbeat/**
                 - testing/**
               config:
@@ -45,17 +48,94 @@ steps:
                   branch: "${BUILDKITE_BRANCH}"
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
+  - label: "Trigger Xpack/Dockerlogbeat"
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          watch:
+            - path:
+                - x-pack/dockerlogbeat/
+                - .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml
+                - .buildkite/scripts
+                #OSS
+                - go.mod
+                - pytest.ini
+                - dev-tools/
+                - libbeat/**
+                - testing/**
+              config:
+                trigger: "beats-xpack-dockerlogbeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
+  - label: "Trigger Metricbeat"
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          watch:
+            - path:
+                - metricbeat/
+                - .buildkite/metricbeat/
+                - .buildkite/scripts
+                #OSS
+                - go.mod
+                - pytest.ini
+                - dev-tools/
+                - libbeat/**
+                - testing/**
+              config:
+                trigger: "beats-metricbeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
+  - label: "Trigger Xpack/Winlogbeat"
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          watch:
+            - path:
+                - x-pack/winlogbeat/
+                - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
+                - .buildkite/scripts
+                #OSS
+                - go.mod
+                - pytest.ini
+                - dev-tools/**
+                - libbeat/**
+                - testing/**
+              config:
+                trigger: "beats-xpack-winlogbeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Deploy/K8S"
     plugins:
       - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only HEAD~1"
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
                 - .buildkite/deploy/kubernetes/**
                 - deploy/kubernetes/**
                 - libbeat/docs/version.asciidoc
+                - .buildkite/scripts
               config:
                 trigger: "deploy-k8s"
                 build:
@@ -63,4 +143,5 @@ steps:
                   branch: "${BUILDKITE_BRANCH}"
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
