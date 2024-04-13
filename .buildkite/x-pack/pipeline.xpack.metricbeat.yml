@@ -196,7 +196,7 @@ steps:
               context: "x-pack/metricbeat: MacOS x86_64 Unit Tests"
 
       - label: ":mac: MacOS arm64 Unit Tests"
-        #skip: "https://github.com/elastic/beats/issues/33036"
+        skip: "https://github.com/elastic/beats/issues/33036"
         if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
