@@ -214,7 +214,10 @@ steps:
 
       - label: ":linux: Cloud (MODULE) Tests"
         key: "x-pack-metricbeat-extended-cloud-test"
-        #skip: "doesn't belong in a stage in Jenkins, thus skipped"
+        skip: "doesn't belong in a stage in Jenkins, thus skipped"
+        # additionally skipping due to error
+        # Error creating DB Instance: InvalidParameterCombination: RDS does not support creating a DB instance with the following combination: DBInstanceClass=db.t2.micro, Engine=mysql, EngineVersion=8.0.35, LicenseModel=general-public-license. For supported combinations of instance class and database engine version, see the documentation.
+        # see: https://buildkite.com/elastic/beats-xpack-metricbeat/builds/2401#018ed680-9251-4509-a283-c092244a3f56/208-625
         command: |
           set -euo pipefail
           # defines the MODULE env var based on what's changed in a PR
