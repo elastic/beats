@@ -108,6 +108,7 @@ steps:
           watch:
             - path:
                 - x-pack/metricbeat/
+                - x-pack/libbeat/common/aws
                 - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
                 - .buildkite/scripts
                 #OSS
