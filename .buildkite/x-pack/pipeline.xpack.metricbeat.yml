@@ -242,7 +242,10 @@ steps:
       - label: ":linux: Cloud AWS (MODULE) Tests"
         key: "x-pack-metricbeat-extended-cloud-test-aws"
         if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
-        #skip: "https://github.com/elastic/beats/issues/36425"
+        skip: "https://github.com/elastic/beats/issues/36425"
+        # additionally skipping due to error
+        # Error creating DB Instance: InvalidParameterCombination: RDS does not support creating a DB instance with the following combination: DBInstanceClass=db.t2.micro, Engine=mysql, EngineVersion=8.0.35, LicenseModel=general-public-license. For supported combinations of instance class and database engine version, see the documentation.
+        # see: https://buildkite.com/elastic/beats-xpack-metricbeat/builds/2396#018ed673-61d3-4e70-845a-98e4398b2d32/209-630
         command: |
           set -euo pipefail
           # defines the MODULE env var based on what's changed in a PR
