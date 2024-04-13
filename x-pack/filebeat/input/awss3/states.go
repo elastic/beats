@@ -40,7 +40,7 @@ type states struct {
 	states map[string]state
 
 	listingIDs        map[string]struct{}
-	listingInfo       *sync.Map
+	listingInfo       map[string]*listingInfo
 	statesByListingID map[string][]state
 }
 
@@ -49,7 +49,7 @@ func newStates(ctx v2.Context) *states {
 	return &states{
 		log:               ctx.Logger.Named("states"),
 		states:            map[string]state{},
-		listingInfo:       new(sync.Map),
+		listingInfo:       map[string]*listingInfo{},
 		listingIDs:        map[string]struct{}{},
 		statesByListingID: map[string][]state{},
 	}
@@ -93,12 +93,10 @@ func (s *states) Delete(id string) {
 // IsListingFullyStored check if listing if fully stored
 // After first time the condition is met it will always return false
 func (s *states) IsListingFullyStored(listingID string) bool {
-	info, ok := s.listingInfo.Load(listingID)
-	if !ok {
-		return false
-	}
-	listingInfo, ok := info.(*listingInfo)
-	if !ok {
+	s.RLock()
+	listingInfo := s.listingInfo[listingID]
+	s.RUnlock()
+	if listingInfo == nil {
 		return false
 	}
 
@@ -123,7 +121,7 @@ func (s *states) AddListing(listingID string, listingInfo *listingInfo) {
 	s.Lock()
 	defer s.Unlock()
 	s.listingIDs[listingID] = struct{}{}
-	s.listingInfo.Store(listingID, listingInfo)
+	s.listingInfo[listingID] = listingInfo
 }
 
 // DeleteListing delete listing info
@@ -132,7 +130,7 @@ func (s *states) DeleteListing(listingID string) {
 	defer s.Unlock()
 	delete(s.listingIDs, listingID)
 	delete(s.statesByListingID, listingID)
-	s.listingInfo.Delete(listingID)
+	delete(s.listingInfo, listingID)
 }
 
 // Update updates a state. If previous state didn't exist, new one is created
@@ -147,11 +145,7 @@ func (s *states) Update(newState state, listingID string) {
 	}
 
 	// here we increase the number of stored object
-	info, ok := s.listingInfo.Load(listingID)
-	if !ok {
-		return
-	}
-	listingInfo, ok := info.(*listingInfo)
+	listingInfo, ok := s.listingInfo[listingID]
 	if !ok {
 		return
 	}
