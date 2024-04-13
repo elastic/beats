@@ -40,7 +40,6 @@ type states struct {
 	// states store, keyed by ID
 	states map[string]state
 
-	listingIDs  map[string]struct{}
 	listingInfo map[string]*listingInfo
 }
 
@@ -50,7 +49,6 @@ func newStates(ctx v2.Context) *states {
 		log:         ctx.Logger.Named("states"),
 		states:      map[string]state{},
 		listingInfo: map[string]*listingInfo{},
-		listingIDs:  map[string]struct{}{},
 	}
 }
 
@@ -119,7 +117,6 @@ func (s *states) IsListingFullyStored(listingID string) bool {
 func (s *states) AddListing(listingID string, listingInfo *listingInfo) {
 	s.Lock()
 	defer s.Unlock()
-	s.listingIDs[listingID] = struct{}{}
 	s.listingInfo[listingID] = listingInfo
 }
 
@@ -127,7 +124,6 @@ func (s *states) AddListing(listingID string, listingInfo *listingInfo) {
 func (s *states) DeleteListing(listingID string) {
 	s.Lock()
 	defer s.Unlock()
-	delete(s.listingIDs, listingID)
 	delete(s.listingInfo, listingID)
 }
 
@@ -201,8 +197,8 @@ func (s *states) GetStates() []state {
 func (s *states) GetListingIDs() []string {
 	s.RLock()
 	defer s.RUnlock()
-	listingIDs := make([]string, 0, len(s.listingIDs))
-	for listingID := range s.listingIDs {
+	listingIDs := make([]string, 0, len(s.listingInfo))
+	for listingID := range s.listingInfo {
 		listingIDs = append(listingIDs, listingID)
 	}
 
@@ -212,12 +208,15 @@ func (s *states) GetListingIDs() []string {
 // GetStatesByListingID return a copy of the states by listing ID
 func (s *states) GetStatesByListingID(listingID string) []state {
 	s.RLock()
-	defer s.RUnlock()
-
 	listingInfo, ok := s.listingInfo[listingID]
+	s.RUnlock()
+
 	if !ok {
 		return nil
 	}
+
+	listingInfo.mu.Lock()
+	defer listingInfo.mu.Unlock()
 
 	newStates := make([]state, len(listingInfo.states))
 	copy(newStates, listingInfo.states)
