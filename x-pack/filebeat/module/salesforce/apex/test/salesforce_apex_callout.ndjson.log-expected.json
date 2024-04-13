@@ -23,7 +23,6 @@
             "10.0.1.123"
         ],
         "salesforce.apex.cpu_time": -1.0,
-        "salesforce.apex.document_id": "/BTmFlfuGz8Dvtt1oBng376JZ5I=",
         "salesforce.apex.event_type": "ApexCallout",
         "salesforce.apex.organization_id": "00D5j000000VI3n",
         "salesforce.apex.run_time": 1305.0,

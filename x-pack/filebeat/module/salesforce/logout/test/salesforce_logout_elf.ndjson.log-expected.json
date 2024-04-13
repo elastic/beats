@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2024-04-12T08:31:33.034071Z",
+        "@timestamp": "2024-04-13T05:01:53.068924Z",
         "event.action": "logout",
         "event.category": [
             "authentication"
@@ -16,7 +16,6 @@
         "input.type": "log",
         "log.offset": 0,
         "salesforce.instance_url": "<no value>",
-        "salesforce.login.document_id": "jP5eqZ2Q1aTRxCmtwi1X8Az0q9w=",
         "service.type": "salesforce",
         "tags": [
             "forwarded",

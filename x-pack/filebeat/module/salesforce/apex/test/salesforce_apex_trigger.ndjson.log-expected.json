@@ -12,7 +12,6 @@
         "input.type": "log",
         "log.offset": 0,
         "salesforce.apex.cpu_time": 3.0,
-        "salesforce.apex.document_id": "5qvFCLJvuRh4m8R452CUqYZmz/8=",
         "salesforce.apex.entity_name": "Book__c",
         "salesforce.apex.event_type": "ApexTrigger",
         "salesforce.apex.organization_id": "00D5j000000VI3n",

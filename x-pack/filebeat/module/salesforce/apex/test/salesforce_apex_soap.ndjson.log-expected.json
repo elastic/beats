@@ -21,7 +21,6 @@
         "salesforce.apex.class_name": "ContactResource",
         "salesforce.apex.cpu_time": 17.0,
         "salesforce.apex.db_total_time": 14928037.0,
-        "salesforce.apex.document_id": "MRckyKS/j1fvwx0uE8oTYK32aug=",
         "salesforce.apex.event_type": "ApexSoap",
         "salesforce.apex.limit_usage_pct": 2.67,
         "salesforce.apex.login_key": "1HQDaq9tglsI4Nlo",

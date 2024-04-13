@@ -1,6 +1,6 @@
 [
     {
-        "@timestamp": "2024-04-12T08:31:20.916796Z",
+        "@timestamp": "2024-04-13T05:01:40.922946Z",
         "event.action": "logout",
         "event.category": [
             "authentication"

@@ -119,7 +119,7 @@ processors:
   - convert:
       field: json.DB_TOTAL_TIME
       type: long
-      target_field: salesforce.login.db_time.total
+      target_field: salesforce.login.db_time_total
       ignore_missing: true
       ignore_failure: true
   - script:
@@ -129,13 +129,13 @@ processors:
       lang: painless
       source: |
         if (ctx.salesforce?.login?.db_time?.total != null) {
-            ctx.salesforce.login.db_time.total = ctx.salesforce.login.db_time.total / 1000000;
+            ctx.salesforce.login.db_time_total = ctx.salesforce.login.db_time_total / 1000000;
         }
       on_failure:
         - append:
             field: error.message
             value: >-
-              Failed to set salesforce.login.db_time.total:
+              Failed to set salesforce.login.db_time_total:
               {{{_ingest.on_failure_message}}}
   - rename:
       field: json.CLIENT_IP

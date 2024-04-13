@@ -208,23 +208,22 @@ The URL for the JWT bearer flow.
 
 The URL of the Salesforce instance. Required.
 
-[[resource-parameters]]
-[float]
+[duration]
 ==== `resource.timeout`
 
 Duration before declaring that the HTTP client connection has timed out. Valid time units are `ns`, `us`, `ms`, `s`, `m`, `h`. Default: `30s`.
 
-[float]
+[integer]
 ==== `resource.retry.max_attempts`
 
 The maximum number of retries for the HTTP client. Default: `5`.
 
-[float]
+[duration]
 ==== `resource.retry.wait_min`
 
 The minimum time to wait before a retry is attempted. Default: `1s`.
 
-[float]
+[duration]
 ==== `resource.retry.wait_max`
 
 The maximum time to wait before a retry is attempted. Default: `60s`.
@@ -275,7 +274,7 @@ The field to use to fetch the cursor state from the last event fetched from the 
 [object]
 ==== `event_monitoring_method.object`
 
-The event monitoring method to use — object. Uses REST API to fetch the events directly from the objects from the Salesforce instance. This method is used for Setup Audit Trail and for monitoring real-time events.
+The event monitoring method to use — object. Uses REST API to fetch the events directly from the objects from the Salesforce instance. This method is used for Setup Audit Trail and can be also used for Login and Logout to monitor real-time events.
 
 [bool]
 ==== `event_monitoring_method.object.enabled`

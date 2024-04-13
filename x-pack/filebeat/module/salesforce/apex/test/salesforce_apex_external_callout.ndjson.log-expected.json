@@ -16,7 +16,6 @@
         "input.type": "log",
         "log.offset": 0,
         "salesforce.apex.action": "query",
-        "salesforce.apex.document_id": "Y4bHVzlwvvTap8Y+QRyibrxSzG0=",
         "salesforce.apex.entity": "HealthcareBlog",
         "salesforce.apex.event_type": "ExternalCustomApexCallout",
         "salesforce.apex.execute_ms": 8.0,
