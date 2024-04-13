@@ -225,7 +225,9 @@ steps:
           .buildkite/scripts/cloud_tests.sh
         env:
           ASDF_TERRAFORM_VERSION: 1.0.2
+          BEATS_PROJECT_NAME: x-pack/metricbeat
           MODULE_DIR: x-pack/metricbeat/module/aws
+          REPO: beats
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -252,6 +254,7 @@ steps:
           ASDF_TERRAFORM_VERSION: 1.0.2
           BEATS_PROJECT_NAME: x-pack/metricbeat
           MODULE_DIR: x-pack/metricbeat/module/aws
+          REPO: beats
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
