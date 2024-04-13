@@ -247,17 +247,6 @@ steps:
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet x-pack/metricbeat
           echo "~~~ Running tests with env var MODULE=$$MODULE"
-
-          # TODO move this section to base image / pre-command hook
-          echo "~~~ Installing kind"
-          asdf plugin add kind
-          asdf install kind $ASDF_KIND_VERSION
-
-          .buildkite/deploy/kubernetes/scripts/kind-setup.sh
-
-          echo "~~~ Running tests"
-          export KUBECONFIG="$$PWD/kubecfg"
-
           mage build test goIntegTest
         env:
           ASDF_TERRAFORM_VERSION: 1.0.2
