@@ -103,8 +103,6 @@ Example config:
     var.real_time_interval: 5m
 ----
 
-include::../include/var-paths.asciidoc[]
-
 *`var.initial_interval`*::
 
 The time window for collecting historical data when the input starts. Expects a duration string (e.g. 12h or 7d).
@@ -223,8 +221,6 @@ Example config:
     var.real_time_interval: 5m
 ----
 
-include::../include/var-paths.asciidoc[]
-
 *`var.initial_interval`*::
 
 The time window for collecting historical data when the input starts. Expects a duration string (e.g. 12h or 7d).
@@ -339,8 +335,6 @@ Example config:
     var.real_time_interval: 5m
 ----
 
-include::../include/var-paths.asciidoc[]
-
 *`var.initial_interval`*::
 
 The time window for collecting historical data when the input starts. Expects a duration string (e.g. 12h or 7d).
@@ -444,8 +438,6 @@ Example config:
     var.elf_interval: 1h
     var.log_file_interval: Hourly
 ----
-
-include::../include/var-paths.asciidoc[]
 
 *`var.initial_interval`*::
 
