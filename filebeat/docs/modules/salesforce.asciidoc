@@ -533,6 +533,8 @@ image::./images/filebeat-salesforce-login-dashboard.png[]
 
 image::./images/filebeat-salesforce-logout-dashboard.png[]
 
+image::./images/filebeat-salesforce-setupaudittrail-dashboard.png[]
+
 Access these dashboards in Kibana by going to Management -> Kibana -> Dashboards and searching for "Salesforce".
 
 [float]
