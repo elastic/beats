@@ -18,9 +18,9 @@
 package k6metricset
 
 import (
-	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -30,13 +30,13 @@ import (
 )
 
 func TestFetchEventContents(t *testing.T) {
-	response, err := ioutil.ReadFile("./_meta/testdata/k6metrics.json")
+	response, err := os.ReadFile("./_meta/testdata/k6metrics.json")
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json;")
-		w.Write([]byte(response))
+		_, _ = w.Write([]byte(response))
 	}))
 	defer server.Close()
 
@@ -59,7 +59,7 @@ func TestFetchEventContents(t *testing.T) {
 }
 
 func TestEventMapping(t *testing.T) {
-	content, err := ioutil.ReadFile("./_meta/testdata/k6metrics.json")
+	content, err := os.ReadFile("./_meta/testdata/k6metrics.json")
 	assert.NoError(t, err)
 
 	event, _ := eventMapping(content)

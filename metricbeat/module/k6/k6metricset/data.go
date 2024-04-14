@@ -48,13 +48,11 @@ type Data struct {
 }
 
 func eventMapping(response []byte) (mapstr.M, error) {
-
 	var data Data
-	var err error
 
-	err = json.Unmarshal(response, &data)
+	var err error = json.Unmarshal(response, &data)
 	if err != nil {
-		return nil, fmt.Errorf("JSON unmarshall fail: %v", err)
+		return nil, fmt.Errorf("JSON unmarshall fail: %w", err)
 	}
 
 	event := mapstr.M{
