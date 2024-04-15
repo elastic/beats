@@ -46,7 +46,6 @@ type s3Poller struct {
 	region               string
 	provider             string
 	bucketPollInterval   time.Duration
-	workerSem            *awscommon.Sem
 	s3                   s3API
 	log                  *logp.Logger
 	metrics              *inputMetrics
@@ -83,7 +82,6 @@ func newS3Poller(log *logp.Logger,
 		region:               awsRegion,
 		provider:             provider,
 		bucketPollInterval:   bucketPollInterval,
-		workerSem:            awscommon.NewSem(numberOfWorkers),
 		s3:                   s3,
 		log:                  log,
 		metrics:              metrics,
