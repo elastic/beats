@@ -80,10 +80,7 @@ func TestProvidersFilter(t *testing.T) {
 	}
 
 	copyStrings := func(in []string) (out []string) {
-		for _, str := range in {
-			out = append(out, str)
-		}
-		return out
+		return append(out, in...)
 	}
 
 	for name, test := range cases {
