@@ -43,7 +43,7 @@ The metadata enrichment process involves associating contextual information, suc
 ### Watcher Management:
 
 1. **Initialization Sequence:**
-   - Watchers are initialized and managed by metricsets. Extra watchers, such as those for namespaces and nodes, are initialized first to ensure metadata availability before the main watcher starts monitoring resources.
+   - Watchers are initialized and managed by metricsets. Extra watchers, such as those for namespaces and nodes, are first initialized in order to ensure metadata availability before the main watcher starts monitoring resources.
 
 2. **Configuration Updates:**
    - Watcher configurations, such as watch options or resource filtering criteria, can be updated dynamically. A mechanism is in place to seamlessly transition to updated configurations without disrupting data collection.
