@@ -7,7 +7,7 @@
 
 deprecated:[8.14.0]
 
-The o365audit input is deprecated. Similar functionality can be achieved using the <<filebeat-input-cel,`CEL input`>> .
+The o365audit input is deprecated. For collecting Microsoft Office 365 log data, please use the https://docs.elastic.co/integrations/o365[Microsoft 365] integration package. For more complex or user-specific use cases, similar functionality can be achieved using the <<filebeat-input-cel,`CEL input`>> .
 
 ++++
 <titleabbrev>Office 365 Management Activity API</titleabbrev>
