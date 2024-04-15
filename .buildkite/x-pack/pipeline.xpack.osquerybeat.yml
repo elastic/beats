@@ -153,7 +153,7 @@ steps:
 
   - group: "x-pack/osquerybeat Extended Tests"
     key: "x-pack-osquerybeat-extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|aws).*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
       - label: ":mac: MacOS x86_64 Unit Tests"
         command: |
