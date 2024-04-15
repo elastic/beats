@@ -28,6 +28,7 @@ import (
 
 	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -63,6 +64,11 @@ type EventProducer interface {
 	Start(done <-chan struct{}) (<-chan Event, error)
 }
 
+// eventProducerWithProcessor is an EventProducer that requires a Processor
+type eventProducerWithProcessor interface {
+	Processor() beat.Processor
+}
+
 // MetricSet for monitoring file integrity.
 type MetricSet struct {
 	mb.BaseMetricSet
@@ -79,6 +85,9 @@ type MetricSet struct {
 
 	// Used when a hash can't be calculated
 	nullHashes map[HashType]Digest
+
+	// Processors
+	processors []beat.Processor
 }
 
 // New returns a new file.MetricSet.
@@ -106,6 +115,13 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		log:           logger,
 	}
 
+	// reader supports a processor
+	if rWithProcessor, ok := r.(eventProducerWithProcessor); ok {
+		if proc := rWithProcessor.Processor(); proc != nil {
+			ms.processors = append(ms.processors, proc)
+		}
+	}
+
 	ms.nullHashes = make(map[HashType]Digest, len(config.HashTypes))
 	for _, hashType := range ms.config.HashTypes {
 		// One byte is enough so that the hashes are persisted to the datastore.
@@ -116,6 +132,10 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	ms.log.Debugf("Initialized the file event reader. Running as euid=%v", os.Geteuid())
 
 	return ms, nil
+}
+
+func (ms *MetricSet) Processors() []beat.Processor {
+	return ms.processors
 }
 
 // Run runs the MetricSet. The method will not return control to the caller

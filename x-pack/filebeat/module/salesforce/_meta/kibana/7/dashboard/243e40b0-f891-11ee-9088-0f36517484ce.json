@@ -1,0 +1,763 @@
+{
+    "attributes": {
+        "description": "Salesforce Logout Data",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "salesforce.logout"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "salesforce.logout"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "syncColors": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": true,
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
+                        "description": "",
+                        "params": {
+                            "controls": [
+                                {
+                                    "fieldName": "salesforce.instance_url",
+                                    "id": "1712900437314",
+                                    "indexPatternRefName": "control_e04d7dbe-82fb-438b-8097-594262a141ec_0_index_pattern",
+                                    "label": "Instance URL",
+                                    "options": {
+                                        "dynamicOptions": true,
+                                        "multiselect": true,
+                                        "order": "desc",
+                                        "size": 5,
+                                        "type": "terms"
+                                    },
+                                    "parent": "",
+                                    "type": "list"
+                                }
+                            ],
+                            "pinFilters": false,
+                            "updateFiltersOnChange": false,
+                            "useTimeFilter": false
+                        },
+                        "title": "",
+                        "type": "input_control_vis",
+                        "uiState": {}
+                    }
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "e04d7dbe-82fb-438b-8097-594262a141ec",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "e04d7dbe-82fb-438b-8097-594262a141ec",
+                "type": "visualization",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-7f107c7d-34fd-481a-b6ac-6e0037488d00",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "7f107c7d-34fd-481a-b6ac-6e0037488d00": {
+                                            "columnOrder": [
+                                                "d0a8f0be-bff5-4156-b797-4ce54c84c2ad",
+                                                "d0a8f0be-bff5-4156-b797-4ce54c84c2adX0",
+                                                "d0a8f0be-bff5-4156-b797-4ce54c84c2adX1",
+                                                "d0a8f0be-bff5-4156-b797-4ce54c84c2adX2"
+                                            ],
+                                            "columns": {
+                                                "d0a8f0be-bff5-4156-b797-4ce54c84c2ad": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "User initiated logout",
+                                                    "operationType": "formula",
+                                                    "params": {
+                                                        "format": {
+                                                            "id": "percent",
+                                                            "params": {
+                                                                "decimals": 2
+                                                            }
+                                                        },
+                                                        "formula": "count(kql='salesforce.logout.user_initiated_logout : \"1\" ')/count()",
+                                                        "isFormulaBroken": false
+                                                    },
+                                                    "references": [
+                                                        "d0a8f0be-bff5-4156-b797-4ce54c84c2adX2"
+                                                    ],
+                                                    "scale": "ratio"
+                                                },
+                                                "d0a8f0be-bff5-4156-b797-4ce54c84c2adX0": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "filter": {
+                                                        "language": "kuery",
+                                                        "query": "salesforce.logout.user_initiated_logout : \"1\" "
+                                                    },
+                                                    "isBucketed": false,
+                                                    "label": "Part of count(kql='salesforce.logout.user_initiated_logout : \"1\" ')/count()",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                },
+                                                "d0a8f0be-bff5-4156-b797-4ce54c84c2adX1": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of count(kql='salesforce.logout.user_initiated_logout : \"1\" ')/count()",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                },
+                                                "d0a8f0be-bff5-4156-b797-4ce54c84c2adX2": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Part of count(kql='salesforce.logout.user_initiated_logout : \"1\" ')/count()",
+                                                    "operationType": "math",
+                                                    "params": {
+                                                        "tinymathAst": {
+                                                            "args": [
+                                                                "d0a8f0be-bff5-4156-b797-4ce54c84c2adX0",
+                                                                "d0a8f0be-bff5-4156-b797-4ce54c84c2adX1"
+                                                            ],
+                                                            "location": {
+                                                                "max": 67,
+                                                                "min": 0
+                                                            },
+                                                            "name": "divide",
+                                                            "text": "count(kql='salesforce.logout.user_initiated_logout : \"1\" ')/count()",
+                                                            "type": "function"
+                                                        }
+                                                    },
+                                                    "references": [
+                                                        "d0a8f0be-bff5-4156-b797-4ce54c84c2adX0",
+                                                        "d0a8f0be-bff5-4156-b797-4ce54c84c2adX1"
+                                                    ],
+                                                    "scale": "ratio"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "accessor": "d0a8f0be-bff5-4156-b797-4ce54c84c2ad",
+                                "layerId": "7f107c7d-34fd-481a-b6ac-6e0037488d00",
+                                "layerType": "data"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsMetric"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": true
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "eaf7f094-92f3-46ca-84eb-ef2126f220bd",
+                    "w": 24,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "eaf7f094-92f3-46ca-84eb-ef2126f220bd",
+                "title": "Percentage of user initiated logout [Filebeat Salesforce]",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-f3cc3792-a28a-4847-bd7d-bf08156d7def",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "f3cc3792-a28a-4847-bd7d-bf08156d7def": {
+                                            "columnOrder": [
+                                                "3134a608-006c-4bfc-b42c-0c1ad3c4315f",
+                                                "8e4f70e3-db21-4183-bd70-b1b56fe816b4"
+                                            ],
+                                            "columns": {
+                                                "3134a608-006c-4bfc-b42c-0c1ad3c4315f": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 5 values of salesforce.logout.session.level",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "8e4f70e3-db21-4183-bd70-b1b56fe816b4",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 5
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "salesforce.logout.session.level"
+                                                },
+                                                "8e4f70e3-db21-4183-bd70-b1b56fe816b4": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Count of records",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "categoryDisplay": "default",
+                                        "groups": [
+                                            "3134a608-006c-4bfc-b42c-0c1ad3c4315f"
+                                        ],
+                                        "layerId": "f3cc3792-a28a-4847-bd7d-bf08156d7def",
+                                        "layerType": "data",
+                                        "legendDisplay": "default",
+                                        "metric": "8e4f70e3-db21-4183-bd70-b1b56fe816b4",
+                                        "nestedLegend": false,
+                                        "numberDisplay": "percent"
+                                    }
+                                ],
+                                "shape": "pie"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsPie"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "698cb161-2847-4fe2-b8b0-29047d20472e",
+                    "w": 24,
+                    "x": 24,
+                    "y": 5
+                },
+                "panelIndex": "698cb161-2847-4fe2-b8b0-29047d20472e",
+                "title": "Session levels used while logging out [Filebeat Salesforce]",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-07bd6025-fb9b-4980-94b7-4be1f9948220",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "07bd6025-fb9b-4980-94b7-4be1f9948220": {
+                                            "columnOrder": [
+                                                "265a7158-90ba-4ba7-acb6-e8c1f700dd2c",
+                                                "3fe1c36a-768e-43c0-93fe-77fc2465f19a"
+                                            ],
+                                            "columns": {
+                                                "265a7158-90ba-4ba7-acb6-e8c1f700dd2c": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "3fe1c36a-768e-43c0-93fe-77fc2465f19a": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Count",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "3fe1c36a-768e-43c0-93fe-77fc2465f19a"
+                                        ],
+                                        "layerId": "07bd6025-fb9b-4980-94b7-4be1f9948220",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "line",
+                                        "showGridlines": false,
+                                        "xAccessor": "265a7158-90ba-4ba7-acb6-e8c1f700dd2c"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "line",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 12,
+                    "i": "9f2a2ef4-ba17-4d76-8a0a-76517f1c0936",
+                    "w": 48,
+                    "x": 0,
+                    "y": 17
+                },
+                "panelIndex": "9f2a2ef4-ba17-4d76-8a0a-76517f1c0936",
+                "title": "Logout over time [Filebeat Salesforce]",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-aed1858a-a560-41f8-a5ca-58e917d3f0f6",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "aed1858a-a560-41f8-a5ca-58e917d3f0f6": {
+                                            "columnOrder": [
+                                                "0d1ba1cc-f436-4f99-bab4-80da94ab8377",
+                                                "e3f18ea3-e3c9-4dcb-8617-0998a34460a2"
+                                            ],
+                                            "columns": {
+                                                "0d1ba1cc-f436-4f99-bab4-80da94ab8377": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 5 values of salesforce.logout.session.type",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "e3f18ea3-e3c9-4dcb-8617-0998a34460a2",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 5
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "salesforce.logout.session.type"
+                                                },
+                                                "e3f18ea3-e3c9-4dcb-8617-0998a34460a2": {
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Count of records",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "categoryDisplay": "default",
+                                        "groups": [
+                                            "0d1ba1cc-f436-4f99-bab4-80da94ab8377"
+                                        ],
+                                        "layerId": "aed1858a-a560-41f8-a5ca-58e917d3f0f6",
+                                        "layerType": "data",
+                                        "legendDisplay": "default",
+                                        "metric": "e3f18ea3-e3c9-4dcb-8617-0998a34460a2",
+                                        "nestedLegend": false,
+                                        "numberDisplay": "percent"
+                                    }
+                                ],
+                                "shape": "treemap"
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsPie"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "ff455525-355f-49cd-a503-159a03ada387",
+                    "w": 24,
+                    "x": 0,
+                    "y": 29
+                },
+                "panelIndex": "ff455525-355f-49cd-a503-159a03ada387",
+                "title": "Distribution of session types [Filebeat Salesforce]",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-6cd4c92e-cef0-46cf-937a-5123ddc95e7b",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "6cd4c92e-cef0-46cf-937a-5123ddc95e7b": {
+                                            "columnOrder": [
+                                                "26b08e8c-5391-4f11-9955-c414ba872de8",
+                                                "63d839ef-dad8-43bf-b6e3-4f162e8354ce"
+                                            ],
+                                            "columns": {
+                                                "26b08e8c-5391-4f11-9955-c414ba872de8": {
+                                                    "customLabel": true,
+                                                    "dataType": "ip",
+                                                    "isBucketed": true,
+                                                    "label": "IP Addresses",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "63d839ef-dad8-43bf-b6e3-4f162e8354ce",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "source.ip"
+                                                },
+                                                "63d839ef-dad8-43bf-b6e3-4f162e8354ce": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Request count",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "63d839ef-dad8-43bf-b6e3-4f162e8354ce"
+                                        ],
+                                        "layerId": "6cd4c92e-cef0-46cf-937a-5123ddc95e7b",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar_horizontal",
+                                        "showGridlines": false,
+                                        "xAccessor": "26b08e8c-5391-4f11-9955-c414ba872de8"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_horizontal",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "69095005-0182-4363-b606-263449739e20",
+                    "w": 24,
+                    "x": 24,
+                    "y": 29
+                },
+                "panelIndex": "69095005-0182-4363-b606-263449739e20",
+                "title": "Top 10 IP addresses by Logout request count [Filebeat Salesforce]",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hiddenLayers": [],
+                    "hidePanelTitles": false,
+                    "isLayerTOCOpen": true,
+                    "mapBuffer": {
+                        "maxLat": 85.05113,
+                        "maxLon": 270,
+                        "minLat": -66.51326,
+                        "minLon": -270
+                    },
+                    "mapCenter": {
+                        "lat": 24.87922,
+                        "lon": -0.42602,
+                        "zoom": 1.77
+                    },
+                    "openTOCDetails": []
+                },
+                "gridData": {
+                    "h": 25,
+                    "i": "6e4e4f8a-da6a-482e-81a6-ae3a26ad10ef",
+                    "w": 48,
+                    "x": 0,
+                    "y": 44
+                },
+                "panelIndex": "6e4e4f8a-da6a-482e-81a6-ae3a26ad10ef",
+                "panelRefName": "panel_6e4e4f8a-da6a-482e-81a6-ae3a26ad10ef",
+                "title": "Logout activity by region [Filebeat Salesforce]",
+                "type": "map",
+                "version": "7.15.0"
+            }
+        ],
+        "refreshInterval": {
+            "pause": true,
+            "value": 0
+        },
+        "timeFrom": "now-7d/d",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[Filebeat Salesforce] Logout Dashboard",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "243e40b0-f891-11ee-9088-0f36517484ce",
+    "migrationVersion": {
+        "dashboard": "7.15.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "e04d7dbe-82fb-438b-8097-594262a141ec:control_e04d7dbe-82fb-438b-8097-594262a141ec_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "eaf7f094-92f3-46ca-84eb-ef2126f220bd:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "eaf7f094-92f3-46ca-84eb-ef2126f220bd:indexpattern-datasource-layer-7f107c7d-34fd-481a-b6ac-6e0037488d00",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "698cb161-2847-4fe2-b8b0-29047d20472e:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "698cb161-2847-4fe2-b8b0-29047d20472e:indexpattern-datasource-layer-f3cc3792-a28a-4847-bd7d-bf08156d7def",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "9f2a2ef4-ba17-4d76-8a0a-76517f1c0936:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "9f2a2ef4-ba17-4d76-8a0a-76517f1c0936:indexpattern-datasource-layer-07bd6025-fb9b-4980-94b7-4be1f9948220",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "ff455525-355f-49cd-a503-159a03ada387:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "ff455525-355f-49cd-a503-159a03ada387:indexpattern-datasource-layer-aed1858a-a560-41f8-a5ca-58e917d3f0f6",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "69095005-0182-4363-b606-263449739e20:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "69095005-0182-4363-b606-263449739e20:indexpattern-datasource-layer-6cd4c92e-cef0-46cf-937a-5123ddc95e7b",
+            "type": "index-pattern"
+        },
+        {
+            "id": "15bcb8a0-f891-11ee-9088-0f36517484ce",
+            "name": "6e4e4f8a-da6a-482e-81a6-ae3a26ad10ef:panel_6e4e4f8a-da6a-482e-81a6-ae3a26ad10ef",
+            "type": "map"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2024-04-12T11:40:07.036Z",
+    "version": "WzExMzc5LDFd"
+}

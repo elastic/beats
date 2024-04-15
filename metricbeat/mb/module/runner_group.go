@@ -57,7 +57,7 @@ func (rg *runnerGroup) Stop() {
 }
 
 func (rg *runnerGroup) String() string {
-	var entries []string
+	entries := make([]string, 0, len(rg.runners))
 	for _, runner := range rg.runners {
 		entries = append(entries, runner.String())
 	}
