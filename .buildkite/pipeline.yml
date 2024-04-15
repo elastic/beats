@@ -154,12 +154,14 @@ steps:
             - path:
                 - libbeat/
                 - .buildkite/libbeat/pipeline.libbeat.yml
+                - .buildkite/scripts
+                - .buildkite/hooks
                 #OSS
                 - go.mod
                 - pytest.ini
                 - dev-tools/
-                - libbeat/
-                - testing/
+                - libbeat/**
+                - testing/**
               config:
                 trigger: "beats-libbeat"
                 build:
