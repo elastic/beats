@@ -49,6 +49,7 @@ type Metricbeat struct {
 	stopOnce     sync.Once        // wraps the Stop() method
 	runners      []cfgfile.Runner // Active list of module runners.
 	config       Config
+	registry     *mb.Register
 	autodiscover *autodiscover.Autodiscover
 
 	// Options
@@ -79,7 +80,15 @@ func WithLightModules() Option {
 // Metricbeat framework with the given options.
 func Creator(options ...Option) beat.Creator {
 	return func(b *beat.Beat, c *conf.C) (beat.Beater, error) {
-		return newMetricbeat(b, c, options...)
+		return newMetricbeat(b, c, mb.Registry, options...)
+	}
+}
+
+// CreatorWithRegistry returns a beat.Creator for instantiating a new instance of the
+// Metricbeat framework with a specific registry and the given options.
+func CreatorWithRegistry(registry *mb.Register, options ...Option) beat.Creator {
+	return func(b *beat.Beat, c *conf.C) (beat.Beater, error) {
+		return newMetricbeat(b, c, registry, options...)
 	}
 }
 
@@ -129,7 +138,7 @@ func DefaultTestModulesCreator() beat.Creator {
 }
 
 // newMetricbeat creates and returns a new Metricbeat instance.
-func newMetricbeat(b *beat.Beat, c *conf.C, options ...Option) (*Metricbeat, error) {
+func newMetricbeat(b *beat.Beat, c *conf.C, registry *mb.Register, options ...Option) (*Metricbeat, error) {
 	config := defaultConfig
 	if err := c.Unpack(&config); err != nil {
 		return nil, fmt.Errorf("error reading configuration file: %w", err)
@@ -141,15 +150,16 @@ func newMetricbeat(b *beat.Beat, c *conf.C, options ...Option) (*Metricbeat, err
 	}
 
 	metricbeat := &Metricbeat{
-		done:   make(chan struct{}),
-		config: config,
+		done:     make(chan struct{}),
+		config:   config,
+		registry: registry,
 	}
 	for _, applyOption := range options {
 		applyOption(metricbeat)
 	}
 
 	// List all registered modules and metricsets.
-	logp.Debug("modules", "Available modules and metricsets: %s", mb.Registry.String())
+	logp.Debug("modules", "Available modules and metricsets: %s", registry.String())
 
 	if b.InSetupCmd {
 		// Return without instantiating the metricsets.
@@ -178,7 +188,7 @@ func newMetricbeat(b *beat.Beat, c *conf.C, options ...Option) (*Metricbeat, err
 		[]module.Option{module.WithMaxStartDelay(config.MaxStartDelay)},
 		metricbeat.moduleOptions...)
 
-	factory := module.NewFactory(b.Info, moduleOptions...)
+	factory := module.NewFactory(b.Info, registry, moduleOptions...)
 
 	for _, moduleCfg := range config.Modules {
 		if !moduleCfg.Enabled() {
@@ -236,7 +246,7 @@ func (bt *Metricbeat) Run(b *beat.Beat) error {
 	}
 
 	// Centrally managed modules
-	factory := module.NewFactory(b.Info, bt.moduleOptions...)
+	factory := module.NewFactory(b.Info, bt.registry, bt.moduleOptions...)
 	modules := cfgfile.NewRunnerList(management.DebugK, factory, b.Publisher)
 	reload.RegisterV2.MustRegisterInput(modules)
 	wg.Add(1)
@@ -298,5 +308,5 @@ func (bt *Metricbeat) Stop() {
 
 // Modules return a list of all configured modules.
 func (bt *Metricbeat) Modules() ([]*module.Wrapper, error) {
-	return module.ConfiguredModules(bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions)
+	return module.ConfiguredModules(bt.registry, bt.config.Modules, bt.config.ConfigModules, bt.moduleOptions)
 }
