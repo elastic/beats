@@ -103,6 +103,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of truncated files in Filestream {issue}38070[38070] {pull}38416[38416]
 - Fix panic when more than 32767 pipeline clients are active. {issue}38197[38197] {pull}38556[38556]
 - Fix filestream's registry GC: registry entries are now removed from the in-memory and disk store when they're older than the set TTL {issue}36761[36761] {pull}38488[38488]
+- [threatintel] MISP splitting fix for empty responses {issue}38739[38739] {pull}38917[38917]
 - Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
 
 *Heartbeat*
