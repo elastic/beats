@@ -35,6 +35,7 @@ import (
 	_ "github.com/elastic/beats/v7/filebeat/input/syslog"
 	_ "github.com/elastic/beats/v7/filebeat/module/apache"
 	_ "github.com/elastic/beats/v7/filebeat/module/auditd"
+	_ "github.com/elastic/beats/v7/filebeat/module/beats_7_17"
 	_ "github.com/elastic/beats/v7/filebeat/module/elasticsearch"
 	_ "github.com/elastic/beats/v7/filebeat/module/haproxy"
 	_ "github.com/elastic/beats/v7/filebeat/module/icinga"
