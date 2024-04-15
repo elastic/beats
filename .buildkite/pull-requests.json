@@ -4,305 +4,177 @@
             "enabled": true,
             "pipelineSlug": "beats",
             "allow_org_users": true,
-            "allowed_repo_permissions": [
-                "admin",
-                "write"
-            ],
-            "allowed_list": [
-                "mergify[bot]"
-            ],
+            "allowed_repo_permissions": ["admin", "write"],
+            "allowed_list": [ "mergify[bot]" ],
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
             "trigger_comment_regex": "^/(?:test)",
             "always_trigger_comment_regex": "^/(?:test)",
-            "skip_ci_labels": [
-                "skip-ci"
-            ],
-            "skip_target_branches": [],
-            "skip_ci_on_only_changed": [],
-            "always_require_ci_on_changed": []
+            "skip_ci_labels": ["skip-ci"],
+            "skip_target_branches": [ ],
+            "skip_ci_on_only_changed": [ ],
+            "always_require_ci_on_changed": [ ]
         },
         {
             "enabled": true,
             "pipelineSlug": "beats-packetbeat",
             "allow_org_users": true,
-            "allowed_repo_permissions": [
-                "admin",
-                "write"
-            ],
-            "allowed_list": [],
+            "allowed_repo_permissions": ["admin", "write"],
+            "allowed_list": [ ],
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
             "trigger_comment_regex": "^/test packetbeat$",
             "always_trigger_comment_regex": "^/test packetbeat$",
-            "skip_ci_labels": [],
-            "skip_target_branches": [],
-            "skip_ci_on_only_changed": [],
-            "always_require_ci_on_changed": [
-                "^packetbeat/.*",
-                ".buildkite/packetbeat/.*",
-                "^go.mod",
-                "^pytest.ini",
-                "^dev-tools/.*",
-                "^libbeat/.*",
-                "^testing/.*"
-            ]
+            "skip_ci_labels": [  ],
+            "skip_target_branches": [ ],
+            "skip_ci_on_only_changed": [ ],
+            "always_require_ci_on_changed": ["^packetbeat/.*", ".buildkite/packetbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         },
         {
             "enabled": true,
             "pipelineSlug": "beats-xpack-elastic-agent",
             "allow_org_users": true,
-            "allowed_repo_permissions": [
-                "admin",
-                "write"
-            ],
-            "allowed_list": [],
+            "allowed_repo_permissions": ["admin", "write"],
+            "allowed_list": [ ],
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
             "trigger_comment_regex": "^/test elastic-agent$",
             "always_trigger_comment_regex": "^/test elastic-agent$",
-            "skip_ci_labels": [],
-            "skip_target_branches": [],
-            "skip_ci_on_only_changed": [
-                "^x-pack/elastic-agent/README.md",
-                "^x-pack/elastic-agent/docs/.*",
-                "^x-pack/elastic-agent/devtools/.*"
-            ],
-            "always_require_ci_on_changed": [
-                "^x-pack/elastic-agent/.*",
-                ".buildkite/x-pack/elastic-agent/.*",
-                "^go.mod",
-                "^pytest.ini",
-                "^dev-tools/.*",
-                "^libbeat/.*",
-                "^testing/.*"
-            ]
+            "skip_ci_labels": [  ],
+            "skip_target_branches": [ ],
+            "skip_ci_on_only_changed": ["^x-pack/elastic-agent/README.md", "^x-pack/elastic-agent/docs/.*", "^x-pack/elastic-agent/devtools/.*" ],
+            "always_require_ci_on_changed": ["^x-pack/elastic-agent/.*", ".buildkite/x-pack/elastic-agent/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         },
         {
             "enabled": true,
             "pipelineSlug": "beats-winlogbeat",
             "allow_org_users": true,
-            "allowed_repo_permissions": [
-                "admin",
-                "write"
-            ],
-            "allowed_list": [],
+            "allowed_repo_permissions": ["admin", "write"],
+            "allowed_list": [ ],
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
             "trigger_comment_regex": "^/test winlogbeat$",
             "always_trigger_comment_regex": "^/test winlogbeat$",
-            "skip_ci_labels": [],
-            "skip_target_branches": [],
-            "skip_ci_on_only_changed": [],
-            "always_require_ci_on_changed": [
-                "^winlogbeat/.*",
-                ".buildkite/winlogbeat/.*",
-                "^go.mod",
-                "^pytest.ini",
-                "^dev-tools/.*",
-                "^libbeat/.*",
-                "^testing/.*"
-            ]
+            "skip_ci_labels": [  ],
+            "skip_target_branches": [ ],
+            "skip_ci_on_only_changed": [ ],
+            "always_require_ci_on_changed": ["^winlogbeat/.*", ".buildkite/winlogbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
         },
         {
             "enabled": true,
             "pipelineSlug": "beats-xpack-packetbeat",
             "allow_org_users": true,
-            "allowed_repo_permissions": [
-                "admin",
-                "write"
-            ],
-            "allowed_list": [],
+            "allowed_repo_permissions": ["admin", "write"],
+            "allowed_list": [ ],
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
             "trigger_comment_regex": "^/test x-pack/packetbeat$",
             "always_trigger_comment_regex": "^/test x-pack/packetbeat$",
-            "skip_ci_labels": [],
-            "skip_target_branches": [],
-            "skip_ci_on_only_changed": [],
-            "always_require_ci_on_changed": [
-                "^x-pack/packetbeat/.*",
-                "^.buildkite/.*",
-                "^go.mod",
-                "^pytest.ini",
-                "^dev-tools/.*",
-                "^libbeat/.*",
-                "^testing/.*",
-                "^x-pack/libbeat/.*"
-            ]
+            "skip_ci_labels": [  ],
+            "skip_target_branches": [ ],
+            "skip_ci_on_only_changed": [ ],
+            "always_require_ci_on_changed": ["^x-pack/packetbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         },
         {
             "enabled": true,
             "pipelineSlug": "beats-xpack-libbeat",
             "allow_org_users": true,
-            "allowed_repo_permissions": [
-                "admin",
-                "write"
-            ],
-            "allowed_list": [],
+            "allowed_repo_permissions": ["admin", "write"],
+            "allowed_list": [ ],
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
             "trigger_comment_regex": "^/test x-pack/libbeat$",
             "always_trigger_comment_regex": "^/test x-pack/libbeat$",
-            "skip_ci_labels": [],
-            "skip_target_branches": [],
-            "skip_ci_on_only_changed": [],
-            "always_require_ci_on_changed": [
-                "^x-pack/libbeat/.*",
-                "^.buildkite/.*",
-                "^go.mod",
-                "^pytest.ini",
-                "^dev-tools/.*",
-                "^libbeat/.*",
-                "^testing/.*",
-                "^x-pack/libbeat/.*"
-            ]
+            "skip_ci_labels": [  ],
+            "skip_target_branches": [ ],
+            "skip_ci_on_only_changed": [ ],
+            "always_require_ci_on_changed": ["^x-pack/libbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         },
         {
             "enabled": true,
             "pipelineSlug": "beats-xpack-metricbeat",
             "allow_org_users": true,
-            "allowed_repo_permissions": [
-                "admin",
-                "write"
-            ],
-            "allowed_list": [],
+            "allowed_repo_permissions": ["admin", "write"],
+            "allowed_list": [ ],
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
             "trigger_comment_regex": "^/test x-pack/metricbeat$",
             "always_trigger_comment_regex": "^/test x-pack/metricbeat$",
-            "skip_ci_labels": [],
-            "skip_target_branches": [],
-            "skip_ci_on_only_changed": [],
-            "always_require_ci_on_changed": [
-                "^x-pack/metricbeat/.*",
-                "^.buildkite/.*",
-                "^go.mod",
-                "^pytest.ini",
-                "^dev-tools/.*",
-                "^libbeat/.*",
-                "^testing/.*",
-                "^x-pack/libbeat/.*"
-            ]
+            "skip_ci_labels": [  ],
+            "skip_target_branches": [ ],
+            "skip_ci_on_only_changed": [ ],
+            "always_require_ci_on_changed": ["^x-pack/metricbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         },
         {
             "enabled": true,
             "pipelineSlug": "beats-xpack-auditbeat",
             "allow_org_users": true,
-            "allowed_repo_permissions": [
-                "admin",
-                "write"
-            ],
-            "allowed_list": [],
+            "allowed_repo_permissions": ["admin", "write"],
+            "allowed_list": [ ],
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
             "trigger_comment_regex": "^/test x-pack/auditbeat$",
             "always_trigger_comment_regex": "^/test x-pack/auditbeat$",
-            "skip_ci_labels": [],
-            "skip_target_branches": [],
-            "skip_ci_on_only_changed": [],
-            "always_require_ci_on_changed": [
-                "^x-pack/auditbeat/.*",
-                "^.buildkite/.*",
-                "^go.mod",
-                "^pytest.ini",
-                "^dev-tools/.*",
-                "^libbeat/.*",
-                "^testing/.*",
-                "^x-pack/libbeat/.*"
-            ]
+            "skip_ci_labels": [  ],
+            "skip_target_branches": [ ],
+            "skip_ci_on_only_changed": [ ],
+            "always_require_ci_on_changed": ["^x-pack/auditbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         },
         {
             "enabled": true,
             "pipelineSlug": "beats-xpack-filebeat",
             "allow_org_users": true,
-            "allowed_repo_permissions": [
-                "admin",
-                "write"
-            ],
-            "allowed_list": [],
+            "allowed_repo_permissions": ["admin", "write"],
+            "allowed_list": [ ],
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
             "trigger_comment_regex": "^/test x-pack/filebeat$",
             "always_trigger_comment_regex": "^/test x-pack/filebeat$",
-            "skip_ci_labels": [],
-            "skip_target_branches": [],
-            "skip_ci_on_only_changed": [],
-            "always_require_ci_on_changed": [
-                "^x-pack/filebeat/.*",
-                "^.buildkite/.*",
-                "^go.mod",
-                "^pytest.ini",
-                "^dev-tools/.*",
-                "^libbeat/.*",
-                "^testing/.*",
-                "^x-pack/libbeat/.*"
-            ]
+            "skip_ci_labels": [  ],
+            "skip_target_branches": [ ],
+            "skip_ci_on_only_changed": [ ],
+            "always_require_ci_on_changed": ["^x-pack/filebeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         },
         {
             "enabled": true,
             "pipelineSlug": "beats-xpack-heartbeat",
             "allow_org_users": true,
-            "allowed_repo_permissions": [
-                "admin",
-                "write"
-            ],
-            "allowed_list": [],
+            "allowed_repo_permissions": ["admin", "write"],
+            "allowed_list": [ ],
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
             "trigger_comment_regex": "^/test x-pack/heartbeat$",
             "always_trigger_comment_regex": "^/test x-pack/heartbeat$",
-            "skip_ci_labels": [],
-            "skip_target_branches": [],
-            "skip_ci_on_only_changed": [],
-            "always_require_ci_on_changed": [
-                "^x-pack/heartbeat/.*",
-                "^.buildkite/.*",
-                "^go.mod",
-                "^pytest.ini",
-                "^dev-tools/.*",
-                "^libbeat/.*",
-                "^testing/.*",
-                "^x-pack/libbeat/.*"
-            ]
+            "skip_ci_labels": [  ],
+            "skip_target_branches": [ ],
+            "skip_ci_on_only_changed": [ ],
+            "always_require_ci_on_changed": ["^x-pack/heartbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         },
         {
             "enabled": true,
             "pipelineSlug": "beats-xpack-osquerybeat",
             "allow_org_users": true,
-            "allowed_repo_permissions": [
-                "admin",
-                "write"
-            ],
-            "allowed_list": [],
+            "allowed_repo_permissions": ["admin", "write"],
+            "allowed_list": [ ],
             "set_commit_status": true,
             "build_on_commit": true,
             "build_on_comment": true,
             "trigger_comment_regex": "^/test x-pack/osquerybeat$",
             "always_trigger_comment_regex": "^/test x-pack/osquerybeat$",
-            "skip_ci_labels": [],
-            "skip_target_branches": [],
-            "skip_ci_on_only_changed": [],
-            "always_require_ci_on_changed": [
-                "^x-pack/osquerybeat/.*",
-                "^.buildkite/.*",
-                "^go.mod",
-                "^pytest.ini",
-                "^dev-tools/.*",
-                "^libbeat/.*",
-                "^testing/.*",
-                "^x-pack/libbeat/.*"
-            ]
+            "skip_ci_labels": [  ],
+            "skip_target_branches": [ ],
+            "skip_ci_on_only_changed": [ ],
+            "always_require_ci_on_changed": ["^x-pack/osquerybeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         }
     ]
 }
