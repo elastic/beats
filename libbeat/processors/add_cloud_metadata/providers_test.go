@@ -32,10 +32,8 @@ func init() {
 }
 
 func TestProvidersFilter(t *testing.T) {
-	var all []string
 	var allLocal []string
 	for name, ff := range cloudMetaProviders {
-		all = append(all, name)
 		if ff.Local {
 			allLocal = append(allLocal, name)
 		}
