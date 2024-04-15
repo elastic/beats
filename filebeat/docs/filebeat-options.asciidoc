@@ -89,6 +89,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-netflow>>
 * <<{beatname_lc}-input-o365audit>>
 * <<{beatname_lc}-input-redis>>
+* <<{beatname_lc}-input-salesforce>>
 * <<{beatname_lc}-input-stdin>>
 * <<{beatname_lc}-input-syslog>>
 * <<{beatname_lc}-input-tcp>>
@@ -142,6 +143,8 @@ include::../../x-pack/filebeat/docs/inputs/input-netflow.asciidoc[]
 include::../../x-pack/filebeat/docs/inputs/input-o365audit.asciidoc[]
 
 include::inputs/input-redis.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-salesforce.asciidoc[]
 
 include::inputs/input-stdin.asciidoc[]
 

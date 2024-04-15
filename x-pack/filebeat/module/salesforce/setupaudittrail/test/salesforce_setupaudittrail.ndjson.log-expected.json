@@ -1,0 +1,28 @@
+[
+    {
+        "@timestamp": "2021-10-06T07:13:07.000Z",
+        "event.action": "changedUserEmailVerifiedStatusVerified",
+        "event.dataset": "salesforce.setupaudittrail",
+        "event.id": "0Ym5j12345BJKvABCD",
+        "event.kind": "event",
+        "event.module": "salesforce",
+        "event.timezone": "-02:00",
+        "event.type": [
+            "admin"
+        ],
+        "fileset.name": "setupaudittrail",
+        "input.type": "log",
+        "log.offset": 0,
+        "salesforce.instance_url": "<no value>",
+        "salesforce.setup_audit_trail.created_by_id": "1234j000000q9s7ABC",
+        "salesforce.setup_audit_trail.display": "For user abc.def@mail.com, the User Verified Email status changed to verified",
+        "salesforce.setup_audit_trail.section": "Manage Users",
+        "service.type": "salesforce",
+        "tags": [
+            "forwarded",
+            "salesforce-setupaudittrail"
+        ],
+        "user.id": "1234j000000q9s7ABC",
+        "user.name": "abc.def@mail.com"
+    }
+]

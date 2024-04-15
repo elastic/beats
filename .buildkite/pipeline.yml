@@ -10,6 +10,7 @@ steps:
                 - auditbeat/
                 - .buildkite/auditbeat/
                 - .buildkite/scripts
+                - .buildkite/hooks/
                 #OSS
                 - go.mod
                 - pytest.ini
@@ -35,6 +36,7 @@ steps:
                 - heartbeat/
                 - .buildkite/heartbeat/
                 - .buildkite/scripts
+                - .buildkite/hooks/
                 #OSS
                 - go.mod
                 - pytest.ini
@@ -51,6 +53,33 @@ steps:
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
+  - label: "Trigger Filebeat"
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          watch:
+            - path:
+                - filebeat/
+                - .buildkite/filebeat/
+                # CI related scripts
+                - .buildkite/scripts
+                - .buildkite/hooks/
+                #OSS
+                - go.mod
+                - pytest.ini
+                - dev-tools
+                - libbeat/**
+                - testing/**
+              config:
+                trigger: "filebeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
   - label: "Trigger Xpack/Dockerlogbeat"
     plugins:
       - monorepo-diff#v1.0.1:
@@ -59,6 +88,7 @@ steps:
             - path:
                 - x-pack/dockerlogbeat/
                 - .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml
+                - .buildkite/hooks/
                 - .buildkite/scripts
                 #OSS
                 - go.mod
@@ -85,6 +115,7 @@ steps:
                 - metricbeat/
                 - .buildkite/metricbeat/
                 - .buildkite/scripts
+                - .buildkite/hooks/
                 #OSS
                 - go.mod
                 - pytest.ini
@@ -93,6 +124,33 @@ steps:
                 - testing/**
               config:
                 trigger: "beats-metricbeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
+  - label: "Trigger x-pack/metricbeat"
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          watch:
+            - path:
+                - x-pack/metricbeat/
+                - x-pack/libbeat/common/aws
+                - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
+                - .buildkite/scripts
+                - .buildkite/hooks/
+                #OSS
+                - go.mod
+                - pytest.ini
+                - dev-tools/
+                - libbeat/**
+                - testing/**
+              config:
+                trigger: "beats-xpack-metricbeat"
                 build:
                   commit: "${BUILDKITE_COMMIT}"
                   branch: "${BUILDKITE_BRANCH}"
@@ -110,6 +168,7 @@ steps:
                 - x-pack/winlogbeat/
                 - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
                 - .buildkite/scripts
+                - .buildkite/hooks/
                 #OSS
                 - go.mod
                 - pytest.ini
@@ -133,9 +192,10 @@ steps:
           watch:
             - path:
                 - .buildkite/deploy/kubernetes/**
+                - .buildkite/hooks/
+                - .buildkite/scripts
                 - deploy/kubernetes/**
                 - libbeat/docs/version.asciidoc
-                - .buildkite/scripts
               config:
                 trigger: "deploy-k8s"
                 build:

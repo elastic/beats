@@ -80,8 +80,13 @@ var defaultFields = mapstr.M{
 		"parent": mapstr.M{
 			"pid": nil,
 		},
+		"entity_id":  nil,
 		"start_time": nil,
 		"owner": mapstr.M{
+			"name": nil,
+			"id":   nil,
+		},
+		"group": mapstr.M{
 			"name": nil,
 			"id":   nil,
 		},
@@ -117,6 +122,20 @@ func defaultConfig() config {
 		MatchPIDs:             []string{"process.pid", "process.parent.pid"},
 		HostPath:              "/",
 		CgroupCacheExpireTime: cacheExpiration,
+	}
+}
+
+type ConfigOption func(c *config)
+
+func ConfigOverwriteKeys(overwriteKeys bool) ConfigOption {
+	return func(c *config) {
+		c.OverwriteKeys = overwriteKeys
+	}
+}
+
+func ConfigMatchPIDs(matchPIDs []string) ConfigOption {
+	return func(c *config) {
+		c.MatchPIDs = matchPIDs
 	}
 }
 
