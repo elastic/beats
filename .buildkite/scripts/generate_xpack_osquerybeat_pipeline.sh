@@ -181,7 +181,10 @@ if are_conditions_met_packaging; then
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: "cd $BEATS_PROJECT_NAME && mage package"
+        command: |
+          sudo apt-get update -y
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes msitools
+          cd $BEATS_PROJECT_NAME && mage package
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
