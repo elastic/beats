@@ -17,7 +17,9 @@ steps:
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: |
+          cd libbeat
+          mage build unitTest
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -25,10 +27,15 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "libbeat: Ununtu Unit Tests"
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
+        command: |
+          cd libbeat
+          mage goIntegTest
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -36,10 +43,15 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "libbeat: Go Integration Tests"
 
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage pythonIntegTest"
+        command: |
+          cd libbeat
+          pythonIntegTest
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -47,10 +59,15 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "libbeat: Python Integration Tests"
 
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
-        command: "make -C $BEATS_PROJECT_NAME crosscompile"
+        command: |
+          cd libbeat
+          make crosscompile
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -58,15 +75,23 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "libbeat: Cross compile"
 
       - label: ":testengine: Stress Tests"
         key: "mandatory-stress-test"
-        command: "cd $BEATS_PROJECT_NAME && make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' GOTEST_OUTPUT_OPTIONS='| go-junit-report > libbeat-stress-test.xml' stress-tests"
+        command: |
+          cd libbeat
+          make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' GOTEST_OUTPUT_OPTIONS='| go-junit-report > libbeat-stress-test.xml' stress-tests
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths: "${BEATS_PROJECT_NAME}/libbeat-stress-test.xml"
+        notify:
+          - github_commit_status:
+              context: "libbeat: Stress Tests"
 
   - group: "Extended Tests"
     key: "extended-tests"
@@ -74,7 +99,9 @@ steps:
     steps:
       - label: ":linux: Ubuntu ARM64 Unit Tests"
         key: "extended-arm64-unit-tests"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: |
+          cd libbeat
+          mage build unitTest
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -82,3 +109,6 @@ steps:
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "libbeat: Ubuntu ARM64 Unit Tests"
