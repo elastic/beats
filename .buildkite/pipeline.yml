@@ -111,6 +111,7 @@ steps:
                 - x-pack/libbeat/common/aws
                 - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
                 - .buildkite/scripts
+                - .buildkite/hooks/
                 #OSS
                 - go.mod
                 - pytest.ini
