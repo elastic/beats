@@ -92,24 +92,24 @@ func Clean() error {
 	return devtools.Clean(paths)
 }
 
+func execCommand(ctx context.Context, name string, args ...string) error {
+	ps := strings.Join(append([]string{name}, args...), " ")
+	fmt.Println(ps)
+	output, err := command.Execute(ctx, name, args...)
+	if err != nil {
+		fmt.Println(ps, ", failed: ", err)
+		return err
+	}
+	fmt.Print(output)
+	return err
+}
+
 func extractFromMSI() error {
 	if os.Getenv("GOOS") != "windows" {
 		return nil
 	}
 
 	ctx := context.Background()
-
-	execCommand := func(name string, args ...string) error {
-		ps := strings.Join(append([]string{name}, args...), " ")
-		fmt.Println(ps)
-		output, err := command.Execute(ctx, name, args...)
-		if err != nil {
-			fmt.Println(ps, ", failed: ", err)
-			return err
-		}
-		fmt.Print(output)
-		return err
-	}
 
 	osArchs := osquerybeat.OSArchs(devtools.Platforms)
 
@@ -129,7 +129,7 @@ func extractFromMSI() error {
 		msiFile := spec.DistroFilepath(dip)
 
 		// MSI extract
-		err = execCommand("msiextract", "--directory", dip, msiFile)
+		err = execCommand(ctx, "msiextract", "--directory", dip, msiFile)
 		if err != nil {
 			return err
 		}
@@ -156,6 +156,30 @@ func extractFromMSI() error {
 	return nil
 }
 
+// stripLinuxOsqueryd Strips osqueryd binary, that is not stripped in linux tar.gz distro
+func stripLinuxOsqueryd() error {
+	if os.Getenv("GOOS") != "linux" {
+		return nil
+	}
+
+	ctx := context.Background()
+
+	osArchs := osquerybeat.OSArchs(devtools.Platforms)
+
+	for _, osarch := range osArchs {
+		// Skip everything but matching linux arch
+		if osarch.OS != os.Getenv("GOOS") || osarch.Arch != os.Getenv("GOARCH") {
+			continue
+		}
+		// Strip osqueryd
+		if err := execCommand(ctx, "strip", distro.OsquerydPath(distro.GetDataInstallDir(osarch))); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
@@ -173,6 +197,11 @@ func GolangCrossBuild() error {
 	if !strings.HasPrefix(args.Name, "osquery-extension-") {
 		// Extract osqueryd.exe from MSI
 		if err := extractFromMSI(); err != nil {
+			return err
+		}
+
+		// Strip linux osqueryd binary
+		if err := stripLinuxOsqueryd(); err != nil {
 			return err
 		}
 	}
