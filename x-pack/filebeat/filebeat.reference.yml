@@ -585,67 +585,6 @@ filebeat.modules:
  #     storage_account: ""
  #     storage_account_key: ""
 
-#------------------ Barracuda Web Application Firewall Module ------------------
-- module: barracuda
-  waf:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9503
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
-  spamfirewall:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9524
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
-#-------------------------- Blue Coat Director Module --------------------------
-- module: bluecoat
-  director:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9505
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #--------------------------------- CEF Module ---------------------------------
 - module: cef
   log:
@@ -785,44 +724,6 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-  nexus:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9506
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
-  meraki:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9525
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
   umbrella:
     enabled: false
 
@@ -901,27 +802,6 @@ filebeat.modules:
     # var.paths:
 
 
-#---------------------------- CylanceProtect Module ----------------------------
-- module: cylance
-  protect:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9508
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #---------------------------- Elasticsearch Module ----------------------------
 - module: elasticsearch
   # Server log
@@ -966,46 +846,6 @@ filebeat.modules:
     # Filebeat will choose the paths depending on your OS.
     #var.paths:
 
-#--------------------- Big-IP Access Policy Manager Module ---------------------
-- module: f5
-  bigipapm:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9504
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
-  bigipafm:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9528
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #------------------------------- Fortinet Module -------------------------------
 - module: fortinet
   firewall:
@@ -1036,63 +876,6 @@ filebeat.modules:
     # [here](https://www.elastic.co/guide/en/elasticsearch/reference/current/network-direction-processor.html#supported-named-network-ranges).
     # This can't be used in combination with internal_interfaces and external_interfaces.
     #var.internal_networks: [ "private" ]
-
-  clientendpoint:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9510
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
-  fortimail:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9529
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
-  fortimanager:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9530
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
 
 #--------------------- Google Cloud Platform (GCP) Module ---------------------
 - module: gcp
@@ -1308,48 +1091,6 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#------------------------- Imperva SecureSphere Module -------------------------
-- module: imperva
-  securesphere:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9511
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
-#---------------------------- Infoblox NIOS Module ----------------------------
-- module: infoblox
-  nios:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9512
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #------------------------------- Iptables Module -------------------------------
 - module: iptables
   log:
@@ -1364,44 +1105,6 @@ filebeat.modules:
 
 #---------------------------- Juniper JUNOS Module ----------------------------
 - module: juniper
-  junos:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9513
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
-  netscreen:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9523
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
   srx:
     enabled: false
 
@@ -1494,28 +1197,10 @@ filebeat.modules:
 
     # Oauth Token URL, should include the tenant ID
     #var.oauth2.token_url: "https://login.microsoftonline.com/TENANT-ID/oauth2/v2.0/token"
-    
+
     # Related scopes, default should be included
     #var.oauth2.scopes:
     #  - "https://api.security.microsoft.com/.default"
-  dhcp:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9515
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
 
 #--------------------------------- MISP Module ---------------------------------
 # Deprecated in 7.14.0: Recommended to migrate to the Threat Intel module.
@@ -1620,27 +1305,6 @@ filebeat.modules:
       # at: https://www.elastic.co/guide/en/beats/filebeat/current/defining-processors.html#condition-network
       internal_networks:
         - private
-
-#-------------------------- Arbor Peakflow SP Module --------------------------
-- module: netscout
-  sightline:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9502
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
 
 #-------------------------------- Nginx Module --------------------------------
 #- module: nginx
@@ -1805,27 +1469,6 @@ filebeat.modules:
     # can be added under this section.
     #input:
 
-#---------------------- Proofpoint Email Security Module ----------------------
-- module: proofpoint
-  emailsecurity:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9531
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #------------------------------- RabbitMQ Module -------------------------------
 - module: rabbitmq
   # All logs
@@ -1835,27 +1478,6 @@ filebeat.modules:
     # Set custom paths for the log files. If left empty,
     # Filebeat will choose the paths depending on your OS.
     #var.paths: ["/var/log/rabbitmq/rabbit@localhost.log*"]
-
-#-------------------------- Radware DefensePro Module --------------------------
-- module: radware
-  defensepro:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9518
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
 
 #-------------------------------- Redis Module --------------------------------
 #- module: redis
@@ -2016,27 +1638,6 @@ filebeat.modules:
     # Filebeat will choose the the default path.
     #var.paths:
 
-#--------------------------- Snort/Sourcefire Module ---------------------------
-- module: snort
-  log:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9532
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #--------------------------------- Snyk Module ---------------------------------
 - module: snyk
   audit:
@@ -2141,27 +1742,6 @@ filebeat.modules:
     #var.min_priority_score: 0
     #var.max_priority_score: 1000
 
-#----------------------------- Sonicwall-FW Module -----------------------------
-- module: sonicwall
-  firewall:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9519
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #-------------------------------- Sophos Module --------------------------------
 - module: sophos
   xg:
@@ -2187,46 +1767,6 @@ filebeat.modules:
       #- serial_number: "1234234590678557"
       #  hostname: "b.host.local"
 
-
-  utm:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9533
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
-#-------------------------------- Squid Module --------------------------------
-- module: squid
-  log:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9520
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
 
 #------------------------------- Suricata Module -------------------------------
 - module: suricata
@@ -2410,28 +1950,6 @@ filebeat.modules:
     # Customize the HTTP timeout configured for the API requests
     #var.http_client_timeout: 30s
 
-#---------------------------- Apache Tomcat Module ----------------------------
-- module: tomcat
-  log:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9501
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-    #   - /var/log/tomcat/*.log
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
-
 #------------------------------- Traefik Module -------------------------------
 #- module: traefik
   # Access logs
@@ -2574,27 +2092,6 @@ filebeat.modules:
 
     # The secret token value provided by Zoom for CRC validation
     #crc.secret: ZOOMSECRETTOKEN
-
-#----------------------------- Zscaler NSS Module -----------------------------
-- module: zscaler
-  zia:
-    enabled: false
-
-    # Set which input to use between udp (default), tcp or file.
-    # var.input: udp
-    # var.syslog_host: localhost
-    # var.syslog_port: 9521
-
-    # Set paths for the log files when file input is used.
-    # var.paths:
-
-    # Toggle output of non-ECS fields (default true).
-    # var.rsa_fields: true
-
-    # Set custom timezone offset.
-    # "local" (default) for system timezone.
-    # "+02:00" for GMT+02:00
-    # var.tz_offset: local
 
 
 
