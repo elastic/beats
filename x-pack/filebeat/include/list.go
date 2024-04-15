@@ -56,10 +56,6 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zeek"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zookeeper"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zoom"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zscaler"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/processors/add_nomad_metadata"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/processors/aws_vpcflow"
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef"
 )
 
 // InitializeModules initialize all of the modules.
