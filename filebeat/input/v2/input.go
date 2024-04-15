@@ -18,6 +18,9 @@
 package v2
 
 import (
+	"context"
+	"time"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -110,4 +113,20 @@ type TestContext struct {
 type Canceler interface {
 	Done() <-chan struct{}
 	Err() error
+}
+
+func GoContextFromCanceler(c Canceler) context.Context {
+	return cancelerCtx{c}
+}
+
+type cancelerCtx struct {
+	Canceler
+}
+
+func (c cancelerCtx) Deadline() (deadline time.Time, ok bool) {
+	return time.Time{}, false
+}
+
+func (c cancelerCtx) Value(_ any) any {
+	return nil
 }
