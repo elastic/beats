@@ -281,7 +281,7 @@ def generateLinuxStep(beat) {
       withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Linux ${beat}") {
           deleteDir()
-          if (beat.equals('x-pack/agentbeat')) {
+          if (beat.equals('x-pack/agentbeat') || beat.equals('x-pack/osquerybeat')) {
             sh(label: 'install msitools', script: '.ci/scripts/install-msitools.sh')
           }
           release('snapshot')
