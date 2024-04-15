@@ -47,13 +47,6 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_xpack_metricbeat_aws_tests+x}" ] && run_xpack_metricbeat_aws_tests="$(buildkite-agent meta-data get run_xpack_metricbeat_aws_tests --default "false")"
 [ -z "${run_xpack_filebeat_aws_tests+x}" ] && run_xpack_filebeat_aws_tests="$(buildkite-agent meta-data get run_xpack_filebeat_aws_tests --default "false")"
 
-<<<<<<< HEAD
-filebeat_changeset=(
-  "^filebeat/.*"
-  )  
-=======
->>>>>>> 0f118b18d3 (Migrate filebeat-pipeline.yaml (#38825))
-
 libbeat_changeset=(
   "^libbeat/.*"
   )
