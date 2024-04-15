@@ -176,7 +176,7 @@ steps:
                 - libbeat/**
                 - testing/**
               config:
-                trigger: "beats-x-pack-osquerybeat"
+                trigger: "beats-xpack-osquerybeat"
                 build:
                   commit: "${BUILDKITE_COMMIT}"
                   branch: "${BUILDKITE_BRANCH}"
