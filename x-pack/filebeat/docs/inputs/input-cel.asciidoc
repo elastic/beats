@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.9.0
+:mito_version: v1.10.0
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
@@ -171,7 +171,9 @@ As noted above the `cel` input provides functions, macros, and global variables 
 
 * {mito_docs}/lib#Crypto[Crypto]
 ** {mito_docs}/lib#hdr-Base64[Base64]
+** {mito_docs}/lib#hdr-Base64_Decode[Base64 Decode]
 ** {mito_docs}/lib#hdr-Base64_Raw[Base64 Raw]
+** {mito_docs}/lib#hdr-Base64_Raw_Decode[Base64 Raw Decode]
 ** {mito_docs}/lib#hdr-Hex[Hex]
 ** {mito_docs}/lib#hdr-MD5[MD5]
 ** {mito_docs}/lib#hdr-SHA_1[SHA-1]

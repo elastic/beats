@@ -7,7 +7,12 @@
 package include
 
 import (
-	// Import packages that need to register themselves.
+	// Import packages to perform 'func InitializeModule()' when in-use.
+	m0 "github.com/elastic/beats/v7/x-pack/filebeat/processors/add_nomad_metadata"
+	m1 "github.com/elastic/beats/v7/x-pack/filebeat/processors/aws_vpcflow"
+	m2 "github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef"
+
+	// Import packages that perform 'func init()'.
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/input/azureeventhub"
@@ -51,7 +56,15 @@ import (
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zeek"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zookeeper"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zoom"
+	_ "github.com/elastic/beats/v7/x-pack/filebeat/module/zscaler"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/processors/add_nomad_metadata"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/processors/aws_vpcflow"
 	_ "github.com/elastic/beats/v7/x-pack/filebeat/processors/decode_cef"
 )
+
+// InitializeModules initialize all of the modules.
+func InitializeModule() {
+	m0.InitializeModule()
+	m1.InitializeModule()
+	m2.InitializeModule()
+}

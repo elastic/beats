@@ -173,12 +173,11 @@ func (in *shipperInput) Run(inputContext v2.Context, pipeline beat.Pipeline) err
 				DisableHost: true,
 				DisableType: true,
 			},
-
-			CloseRef: inputContext.Cancelation,
 		})
 		if err != nil {
 			return fmt.Errorf("error creating client for stream %s: %w", streamID, err)
 		}
+		defer client.Close()
 		in.log.Infof("Creating beat client for stream %s", streamID)
 
 		newStreamData := streamData{client: client, index: in.streams[streamID].index, processors: in.streams[streamID].processors}
