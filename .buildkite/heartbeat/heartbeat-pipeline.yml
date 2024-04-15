@@ -18,18 +18,8 @@ env:
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
 
-<<<<<<< HEAD
-  #Packaging
-  PACKAGING_ARM_PLATFORMS: "linux/arm64"
-  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
-
-notify:
-  - github_commit_status:
-      context: "$BEATS_PROJECT_NAME"
-=======
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
->>>>>>> fe8ebd00df (Buildkite pipeline unification fixes (#38871))
 
 steps:
   - group: "Heartbeat Mandatory Testing"
@@ -184,7 +174,7 @@ steps:
       - label: ":ubuntu: Heartbeat Packaging Linux X86"
         key: "heartbeat-package-linux-x86"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
           SNAPSHOT: true
         command: "cd heartbeat && mage package"
         agents:
