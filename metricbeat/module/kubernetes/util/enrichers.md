@@ -4,8 +4,8 @@ The metadata enrichment process involves associating contextual information, suc
 
 ### Key Components:
 
-1. **Metricsets/Datasets:**
-   - Metricsets/Datasets are responsible for collecting metrics and events from various sources within Kubernetes, such as kubelet and kube-state-metrics.
+1. **Metricsets:**
+   - Metricsets are responsible for collecting metrics and events from various sources within Kubernetes, such as kubelet and kube-state-metrics.
 
 2. **Enrichers:**
    - Enrichers are components responsible for enriching collected data with Kubernetes metadata. Each metricset is associated with its enricher, which handles the metadata enrichment process.
@@ -49,6 +49,7 @@ The metadata enrichment process involves associating contextual information, suc
    - Watcher configurations, such as watch options or resource filtering criteria, can be updated dynamically. A mechanism is in place to seamlessly transition to updated configurations without disrupting data collection.
 
 
+### Flow example
 
 In the following diagram, an example of different metricsets leveraging the same watchers is depicted. Metricsets have their own enrichers but share watchers. The watchers monitor the Kubernetes API for specific resource updates.
 [metadata diag](../_meta/images/enrichers.png)
