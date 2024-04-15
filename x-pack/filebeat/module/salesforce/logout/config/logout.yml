@@ -21,7 +21,7 @@ event_monitoring_method:
     enabled: {{ if .real_time }}true{{ else }}false{{ end }}
     interval: {{ .real_time_interval }}
     query:
-      default: SELECT FIELDS(STANDARD) FROM LogoutEvent{{ if .initial_interval }} WHERE EventDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05+0700") ]]{{ end }}
+      default: SELECT FIELDS(STANDARD) FROM LogoutEvent{{ if .initial_interval }} WHERE EventDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05.000Z0700") ]]{{ end }}
       value: SELECT FIELDS(STANDARD) FROM LogoutEvent WHERE EventDate > [[ .cursor.object.first_event_time ]]
     cursor:
       field: "EventDate"
