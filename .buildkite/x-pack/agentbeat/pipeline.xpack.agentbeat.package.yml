@@ -8,27 +8,27 @@ steps:
   - group: ":Packaging Artifacts"
     key: "package"
     steps:
-      - label: ":package: Cross Building and package agentbeat"
-        key: package_agentbeat
-        agents:
-          provider: "gcp"
-          machineType: "c2-standard-16"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          diskSizeGb: 400
-        command: |
-          sudo apt-get update -y
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes msitools
-          cd x-pack/agentbeat && mage package
+      # - label: ":package: Cross Building and package agentbeat"
+      #   key: package_agentbeat
+      #   agents:
+      #     provider: "gcp"
+      #     machineType: "c2-standard-16"
+      #     image: "${IMAGE_UBUNTU_X86_64}"
+      #     diskSizeGb: 400
+      #   command: |
+      #     sudo apt-get update -y
+      #     DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes msitools
+      #     cd x-pack/agentbeat && mage package
 
-        env:
-          SNAPSHOT: true
+      #   env:
+      #     SNAPSHOT: true
 
-        artifact_paths:
-          - "x-pack/agentbeat/build/distributions/**/*"
+      #   artifact_paths:
+      #     - "x-pack/agentbeat/build/distributions/**/*"
 
       - label: ":elastic-stack: Publishing to DRA Snapshot"
         key: dra-publish
-        depends_on: package_agentbeat
+        # depends_on: package_agentbeat
         agents:
           provider: "gcp"
         command: |
