@@ -32,7 +32,9 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 			ModulesToExclude: []string{"module/docker", "module/kubernetes"},
 			Outfile:          "include/list_common.go",
 			BuildTags:        "",
-			Pkg:              "include"})
+			Pkg:              "include",
+			SkipInitModule:   true,
+		})
 	if err != nil {
 		return err
 	}
@@ -44,7 +46,22 @@ func GenerateOSSMetricbeatModuleIncludeListGo() error {
 			ModulesToExclude: nil,
 			Outfile:          "include/list_docker.go",
 			BuildTags:        "\n//go:build linux || darwin || windows\n",
-			Pkg:              "include"})
+			Pkg:              "include",
+			SkipInitModule:   true,
+		})
+	if err != nil {
+		return err
+	}
+	// generate include/list_init.go
+	err = devtools.GenerateIncludeListGo(
+		devtools.IncludeListOptions{
+			ImportDirs:       []string{"autodiscover/**/*", "autodiscover/**/*/*", "processor/*"},
+			ModuleDirs:       nil,
+			ModulesToExclude: nil,
+			Outfile:          "include/list_init.go",
+			Pkg:              "include",
+			SkipInitModule:   false,
+		})
 	if err != nil {
 		return err
 	}

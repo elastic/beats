@@ -26,7 +26,8 @@ const (
 
 // const allocIDTypeRegex = "([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}).*(stdout|stderr)"
 
-func init() {
+// InitializeModule initializes all the options for the `add_nomad_metadata` process for filebeat.
+func InitializeModule() {
 	add_nomad_metadata.Indexing.AddMatcher(LogPathMatcherName, newLogsPathMatcher)
 	cfg := conf.NewConfig()
 
