@@ -14,6 +14,26 @@ DRA_PROJECT_ARTIFACT_ID="agentbeat"
 
 CI_DRA_ROLE_PATH="kv/ci-shared/release/dra-role"
 
+# TODO use common function
+retry() {
+  local retries=$1
+  shift
+  local count=0
+  until "$@"; do
+    exit=$?
+    wait=$((2 ** count))
+    count=$((count + 1))
+    if [ $count -lt "$retries" ]; then
+      >&2 echo "Retry $count/$retries exited $exit, retrying in $wait seconds..."
+      sleep $wait
+    else
+      >&2 echo "Retry $count/$retries exited $exit, no more retries left."
+      return $exit
+    fi
+  done
+  return 0
+}
+
 function release_manager_login {
   DRA_CREDS_SECRET=$(retry 5 vault kv get -field=data -format=json ${CI_DRA_ROLE_PATH})
   VAULT_ADDR_SECRET=$(echo ${DRA_CREDS_SECRET} | jq -r '.vault_addr')
@@ -36,7 +56,7 @@ cd x-pack/agentbeat && docker run --rm \
         --project "beats/agentbeat" \
         --branch "${BRANCH}" \
         --commit "${BUILDKITE_COMMIT}" \
-        --workflow "${WORKFLOW}" \
+        --workflow "${DRA_WORKFLOW}" \
         --version "${BEAT_VERSION}" \
         --artifact-set "agentbeat" \
         ${_dry_run}
