@@ -8,6 +8,7 @@ if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" || "${BUILDKITE_BRANCH}" =
     echo "+++ Running in PR and setting branch main and --dry-run"
 fi
 
+BEAT_VERSION=$(make get-version)
 DRA_PROJECT_ID="beats/agentbeat"
 DRA_PROJECT_ARTIFACT_ID="agentbeat"
 

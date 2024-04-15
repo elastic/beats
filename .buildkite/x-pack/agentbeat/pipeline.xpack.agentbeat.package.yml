@@ -5,24 +5,40 @@ env:
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
 steps:
-  - label: ":package: Publishing agentbeat"
-    agents:
-      provider: "gcp"
-      machineType: "c2-standard-16"
-      image: "${IMAGE_UBUNTU_X86_64}"
-      diskSizeGb: 400
-    command: |
-      sudo apt-get update -y
-      DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes msitools
-      cd x-pack/agentbeat && mage package && cd ../..
+  - group: ":Packaging Artifacts"
+    key: "package"
+    steps:
+      - label: ":package: Cross Building and package agentbeat"
+        key: package_agentbeat
+        agents:
+          provider: "gcp"
+          machineType: "c2-standard-16"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          diskSizeGb: 400
+        command: |
+          sudo apt-get update -y
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes msitools
+          cd x-pack/agentbeat && mage package
 
-      echo "+++ Changing permissions for the release manager"
-      sudo chown -R :1000 build/distributions/
+        env:
+          SNAPSHOT: true
 
-      echo "+++ :hammer_and_pick: Publishing ${_branch} ${_workflow} DRA artifacts..."
-      BEAT_VERSION=$(make get-version) .buildkite/x-pack/agentbeat/scripts/dra.sh
-    env:
-      SNAPSHOT: true
-      DRA_WORKFLOW: snapshot
-    artifact_paths:
-      - "x-pack/agentbeat/build/distributions/**/*"
+        artifact_paths:
+          - "x-pack/agentbeat/build/distributions/**/*"
+
+      - label: ":elastic-stack: Publishing to DRA Snapshot"
+        key: dra-publish
+        depends_on: package_agentbeat
+        agents:
+          provider: "gcp"
+        command: |
+          echo "+++ Restoring Artifacts"
+          buildkite-agent artifact download "build/distributions/**/*" .
+
+          echo "+++ Changing permissions for the release manager"
+          sudo chown -R :1000 build/distributions/
+
+          echo "+++ :hammer_and_pick: Publishing DRA artifacts..."
+          .buildkite/x-pack/agentbeat/scripts/dra.sh
+        env:
+          DRA_WORKFLOW: snapshot
