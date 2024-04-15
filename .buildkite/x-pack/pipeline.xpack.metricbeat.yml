@@ -297,14 +297,6 @@ steps:
     depends_on:
       - step: "x-pack-metricbeat-mandatory-tests"
 
-<<<<<<< HEAD
-  - label: ":linux: Load dynamic x-pack metricbeat pipeline"
-    key: "xpack-metricbeat-pipeline"
-    command: ".buildkite/scripts/generate_xpack_metricbeat_pipeline.sh"
-    notify:
-      - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
-=======
   - group: "x-pack/metricbeat Packaging"
     key: "x-pack-metricbeat-packaging"
     steps:
@@ -320,7 +312,7 @@ steps:
           disk_size: 100
           disk_type: "pd-ssd"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Packaging Linux"
@@ -340,4 +332,3 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Packaging Linux ARM"
->>>>>>> 4f4fad6075 (Move to static BK pipeline for x-pack/metricbeat (#38913))
