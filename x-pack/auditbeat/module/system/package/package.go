@@ -26,6 +26,7 @@ import (
 	"github.com/joeshaw/multierror"
 	"go.etcd.io/bbolt"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/cache"
@@ -35,7 +36,6 @@ import (
 )
 
 const (
-	moduleName    = "system"
 	metricsetName = "package"
 	namespace     = "system.audit.package"
 
@@ -93,7 +93,7 @@ func (action eventAction) Type() string {
 }
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	ab.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)
@@ -203,7 +203,7 @@ func (pkg Package) entityID(hostID string) string {
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	config := defaultConfig()
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
+		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
 	}
 
 	if err := datastore.Update(migrateDatastoreSchema); err != nil {
