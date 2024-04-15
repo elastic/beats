@@ -40,6 +40,6 @@ steps:
 
           echo "+++ :hammer_and_pick: Publishing DRA artifacts..."
 
-          cd x-pack/agentbeat && .buildkite/x-pack/agentbeat/scripts/dra.sh
+          .buildkite/x-pack/agentbeat/scripts/dra.sh
         env:
           DRA_WORKFLOW: snapshot

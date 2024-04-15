@@ -25,7 +25,7 @@ function release_manager_login {
 release_manager_login
 
 echo "+++ :hammer_and_pick: Publishing $BRANCH $DRA_WORKFLOW DRA artifacts..."
-docker run --rm \
+cd x-pack/agentbeat && docker run --rm \
         --name release-manager \
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
         -e VAULT_ROLE_ID="${VAULT_ROLE_ID_SECRET}" \
