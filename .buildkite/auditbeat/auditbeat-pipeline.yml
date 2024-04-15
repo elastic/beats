@@ -109,7 +109,7 @@ steps:
     key: "auditbeat-extended-tests-linux-arm64"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
     steps:
-      - label: ":arm: Linux ARM Unit Tests"
+      - label: ":linux: Auditbeat Linux arm64 Unit Tests"
         key: "auditbeat-extended-arm64-unit-tests"
         command: |
           set -euo pipefail
@@ -127,7 +127,7 @@ steps:
   - group: "Auditbeat MacOS Extended"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
-      - label: ":mac: MacOS x86_64 Unit Tests"
+      - label: ":mac: Auditbeat macOS x86_64 Unit Tests"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -141,7 +141,7 @@ steps:
           - github_commit_status:
               context: "auditbeat: Extended MacOS x86_64 Unit Tests"
 
-      - label: ":mac: MacOS arm64 Unit Tests"
+      - label: ":mac: Auditbeat macOS arm64 Unit Tests"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
