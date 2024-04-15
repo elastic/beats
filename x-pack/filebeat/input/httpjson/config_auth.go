@@ -6,7 +6,6 @@ package httpjson
 
 import (
 	"context"
-	"crypto/x509"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -309,8 +308,11 @@ func (o *oAuth2Config) validateOktaProvider() error {
 	}
 	// jwk_pem
 	if o.OktaJWKPEM != "" {
-		_, err := x509.ParsePKCS1PrivateKey([]byte(o.OktaJWKPEM))
-		return err
+		_, err := pemPKCS8PrivateKey([]byte(o.OktaJWKPEM))
+		if err != nil {
+			return fmt.Errorf("okta validation error: %w", err)
+		}
+		return nil
 	}
 	// jwk_file
 	if o.OktaJWKFile != "" {

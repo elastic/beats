@@ -26,10 +26,12 @@ import (
 	"strconv"
 	"syscall"
 
+	"golang.org/x/sys/unix"
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	// Here we set a bunch of linux specific security stuff.
 	// In the context of a container, where users frequently run as root, we follow BEAT_SETUID_AS to setuid/gid
 	// and add capabilities to make this actually run as a regular user. This also helps Node.js in synthetics, which
@@ -46,6 +48,9 @@ func init() {
 	// The beat should use `getcap` at a later point to examine available capabilities
 	// rather than relying on errors from `setcap`
 	_ = setCapabilities()
+
+	// Make heartbeat dumpable so elastic-agent can access process metrics.
+	_ = setDumpable()
 }
 
 func setNodeProcAttr(localUserName string) error {
@@ -95,6 +100,16 @@ func setCapabilities() error {
 	err = newcaps.SetProc()
 	if err != nil {
 		return fmt.Errorf("error setting new process capabilities via setcap: %w", err)
+	}
+
+	return nil
+}
+
+// Enforce PR_SET_DUMPABLE=true to allow user-level access to /proc/<pid>/io.
+func setDumpable() error {
+	_, err := cap.Prctl(unix.PR_SET_DUMPABLE, 1)
+	if err != nil {
+		return fmt.Errorf("error setting dumpable flag via prctl: %w", err)
 	}
 
 	return nil

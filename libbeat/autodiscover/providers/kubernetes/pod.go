@@ -248,10 +248,8 @@ func (p *pod) GenerateHints(event bus.Event) bus.Event {
 	// Generate hints based on the cumulative of both namespace and pod annotations.
 	hints, incorrecthints := utils.GenerateHints(annotations, cname, p.config.Prefix, AllSupportedHints)
 	//We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
-	if len(incorrecthints) > 0 {
-		for _, value := range incorrecthints {
-			p.logger.Warnf("provided hint: %s/%s is not in the supported list", p.config.Prefix, value)
-		}
+	for _, value := range incorrecthints {
+		p.logger.Debugf("provided hint: %s/%s is not in the supported list", p.config.Prefix, value)
 	}
 	p.logger.Debugf("Generated hints %+v", hints)
 

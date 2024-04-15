@@ -1,0 +1,26 @@
+version: '2.3'
+services:
+  # This is a proxy used to block beats until all services are healthy.
+  # See: https://github.com/docker/compose/issues/4369
+  proxy_dep:
+    image: busybox
+    depends_on:
+      elasticsearch: { condition: service_healthy }
+      cometd: { condition: service_healthy }
+
+  elasticsearch:
+    extends:
+      file: ${ES_BEATS}/testing/environments/${STACK_ENVIRONMENT}.yml
+      service: elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -u admin:testing -s http://localhost:9200/_cat/health?h=status | grep -q green"]
+      retries: 300
+      interval: 1s
+    ports:
+      - 9200:9200
+
+  cometd:
+    build: ${ES_BEATS}/testing/environments/docker/cometd
+    hostname: cometd
+    ports:
+      - 8080:8080
