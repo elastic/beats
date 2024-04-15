@@ -26,11 +26,11 @@ import (
 )
 
 // ConfiguredModules returns a list of all configured modules, including anyone present under dynamic config settings.
-func ConfiguredModules(modulesData []*conf.C, configModulesData *conf.C, moduleOptions []Option) ([]*Wrapper, error) {
-	var modules []*Wrapper
+func ConfiguredModules(registry *mb.Register, modulesData []*conf.C, configModulesData *conf.C, moduleOptions []Option) ([]*Wrapper, error) {
+	var modules []*Wrapper //nolint:prealloc //can't be preallocated
 
 	for _, moduleCfg := range modulesData {
-		module, err := NewWrapper(moduleCfg, mb.Registry, moduleOptions...)
+		module, err := NewWrapper(moduleCfg, registry, moduleOptions...)
 		if err != nil {
 			return nil, err
 		}
@@ -40,7 +40,9 @@ func ConfiguredModules(modulesData []*conf.C, configModulesData *conf.C, moduleO
 	// Add dynamic modules
 	if configModulesData.Enabled() {
 		config := cfgfile.DefaultDynamicConfig
-		configModulesData.Unpack(&config)
+		if err := configModulesData.Unpack(&config); err != nil {
+			return nil, err
+		}
 
 		modulesManager, err := cfgfile.NewGlobManager(config.Path, ".yml", ".disabled")
 		if err != nil {
@@ -53,7 +55,7 @@ func ConfiguredModules(modulesData []*conf.C, configModulesData *conf.C, moduleO
 				return nil, fmt.Errorf("error loading config files: %w", err)
 			}
 			for _, conf := range confs {
-				m, err := NewWrapper(conf, mb.Registry, moduleOptions...)
+				m, err := NewWrapper(conf, registry, moduleOptions...)
 				if err != nil {
 					return nil, fmt.Errorf("module initialization error: %w", err)
 				}

@@ -440,12 +440,12 @@ WARNING: Only use this option if you understand that data loss is a potential
 side effect.
 
 When this option is enabled, {beatname_uc} removes the state of a file after the
-specified period of inactivity has elapsed. The  state can only be removed if
+specified period of inactivity has elapsed. The state can only be removed if
 the file is already ignored by {beatname_uc} (the file is older than
 `ignore_older`). The `clean_inactive` setting must be greater than `ignore_older +
 prospector.scanner.check_interval` to make sure that no states are removed while a file is still
 being harvested. Otherwise, the setting could result in {beatname_uc} resending
-the full content constantly because  `clean_inactive` removes state for files
+the full content constantly because `clean_inactive` removes state for files
 that are still detected by {beatname_uc}. If a file is updated or appears
 again, the file is read from the beginning.
 
@@ -461,10 +461,11 @@ for `clean_inactive` starts at 0 again.
 
 TIP: During testing, you might notice that the registry contains state entries
 that should be removed based on the `clean_inactive` setting. This happens
-because {beatname_uc} doesn't remove the entries until it opens the registry
-again to read a different file. If you are testing the `clean_inactive` setting,
-make sure {beatname_uc} is configured to read from more than one file, or the
-file state will never be removed from the registry.
+because {beatname_uc} doesn't remove the entries until the registry garbage
+collector (GC) runs. Once the TTL for a state expired, there are no active
+harvesters for the file and the registry GC runs, then, and only then
+the state is removed from memory and an `op: remove` is added to the registry
+log file.
 
 [float]
 [id="{beatname_lc}-input-{type}-clean-removed"]
