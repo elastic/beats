@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 
 # What Terraform Module will run
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
-  export MODULE_DIR="x-pack/metricbeat/module/aws"
-elif [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
   export MODULE_DIR="x-pack/filebeat/input/awss3/_meta/terraform"
 fi
 

@@ -59,7 +59,6 @@ ENABLED_BEATS_PIPELINES_SLUGS=(
   "beats-winlogbeat"
   "beats-winlogbeat"
   "beats-xpack-libbeat"
-  "beats-xpack-metricbeat"
   "beats-xpack-packetbeat"
   "beats-xpack-winlogbeat"
   "beats-xpack-dockerlogbeat"
@@ -77,8 +76,8 @@ for slug in "${ENABLED_BEATS_PIPELINES_SLUGS[@]}"; do
   fi
 done
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
-  if [[ "$BUILDKITE_STEP_KEY" == "extended-cloud-test" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == *"xpack-metricbeat"* || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
+  if [[ "$BUILDKITE_STEP_KEY" == *"extended-cloud-test"* ]]; then
     BEATS_AWS_SECRET_KEY=$(retry_with_count 5 vault kv get -field secret_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
     export BEATS_AWS_SECRET_KEY
     BEATS_AWS_ACCESS_KEY=$(retry_with_count 5 vault kv get -field access_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
