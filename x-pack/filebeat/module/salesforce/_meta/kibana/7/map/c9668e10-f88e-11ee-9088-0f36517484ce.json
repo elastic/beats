@@ -21,7 +21,7 @@
             },
             {
                 "alpha": 0.75,
-                "id": "af1017d3-ae58-4719-bfb4-a3cdfe33eec8",
+                "id": "b7f862e8-d875-4a1a-a922-63f5c2f6d06a",
                 "includeInFitToBounds": true,
                 "joins": [],
                 "label": "Login Activity",
@@ -31,8 +31,8 @@
                     "applyGlobalQuery": true,
                     "applyGlobalTime": true,
                     "filterByMapBounds": true,
-                    "geoField": "client.geo.location",
-                    "id": "26c985c9-1742-40ad-8237-4613ee9099b9",
+                    "geoField": "source.geo.location",
+                    "id": "97b373bc-81dc-42de-9d90-f7970d5c3a73",
                     "indexPatternRefName": "layer_1_source_index_pattern",
                     "scalingType": "MVT",
                     "sortField": "",
@@ -187,6 +187,6 @@
         }
     ],
     "type": "map",
-    "updated_at": "2024-04-12T11:42:51.515Z",
-    "version": "WzExNjAwLDFd"
+    "updated_at": "2024-04-15T13:15:17.835Z",
+    "version": "WzEyNTQ4LDFd"
 }
