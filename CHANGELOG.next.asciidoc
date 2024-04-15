@@ -257,6 +257,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Filebeat*
 
 - Deprecate `syslog` input in favor of `syslog` processor. {issue}37555[37555] {pull}38277[38277]
+- Deprecate `o365audit` input in favor of `CEL` input. {issue}37719[37719] {pull}38922[38922]
 
 *Heartbeat*
 
