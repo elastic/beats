@@ -52,6 +52,33 @@ steps:
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
+  - label: "Trigger Filebeat"
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          watch:
+            - path:
+                - filebeat/
+                - .buildkite/filebeat/
+                # CI related scripts
+                - .buildkite/scripts
+                - .buildkite/hooks/
+                #OSS
+                - go.mod
+                - pytest.ini
+                - dev-tools
+                - libbeat/**
+                - testing/**
+              config:
+                trigger: "filebeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
   - label: "Trigger Xpack/Dockerlogbeat"
     plugins:
       - monorepo-diff#v1.0.1:
