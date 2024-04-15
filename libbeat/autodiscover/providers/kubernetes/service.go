@@ -224,7 +224,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 		}
 	}
 
-	var events []bus.Event
+	events := []bus.Event{}
 	for _, port := range svc.Spec.Ports {
 		event := bus.Event{
 			"provider":   s.uuid,
