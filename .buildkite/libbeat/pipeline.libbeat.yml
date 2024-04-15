@@ -93,7 +93,7 @@ steps:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths: "${BEATS_PROJECT_NAME}/libbeat-stress-test.xml"
+        artifact_paths: "libbeat/libbeat-stress-test.xml"
         notify:
           - github_commit_status:
               context: "libbeat: Stress Tests"
