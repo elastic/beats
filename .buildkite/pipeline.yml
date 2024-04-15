@@ -10,6 +10,7 @@ steps:
                 - auditbeat/
                 - .buildkite/auditbeat/
                 - .buildkite/scripts
+                - .buildkite/hooks/
                 #OSS
                 - go.mod
                 - pytest.ini
