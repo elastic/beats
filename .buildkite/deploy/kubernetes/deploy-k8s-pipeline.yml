@@ -1,5 +1,84 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
+env:
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+
+notify:
+  - github_commit_status:
+      context: "Deploy/K8S"
+
 steps:
-  - label: "Example test"
-    command: echo "Hello!"
+  - group: "Depoy/K8S"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") =~ /.*kubernetes.*/
+
+    steps:
+    - label: "Checks"
+      command: ".buildkite/deploy/kubernetes/scripts/make.sh"
+      notify:
+        - github_commit_status:
+            context: "Deploy/k8s-checks"
+      agents:
+        provider: "gcp"
+        image: "${IMAGE_UBUNTU_X86_64}"
+        machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+
+    - label: "K8S Test/K8S version: v1.29.0"
+      key: "k8s-test-129"
+      env:
+        K8S_VERSION: "v1.29.0"
+      commands:
+        - "MODULE=kubernetes make -C metricbeat integration-tests"
+        - "make -C deploy/kubernetes test"
+      notify:
+        - github_commit_status:
+            context: "Deploy/k8s-test v1.29.0"
+      agents:
+        provider: "gcp"
+        image: "${IMAGE_UBUNTU_X86_64}"
+        machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+
+    - label: "K8S Test/K8S version: v1.28.0"
+      key: "k8s-test-128"
+      env:
+        K8S_VERSION: "v1.28.0"
+      commands:
+        - "MODULE=kubernetes make -C metricbeat integration-tests"
+        - "make -C deploy/kubernetes test"
+      notify:
+        - github_commit_status:
+            context: "Deploy/k8s-test v1.28.0"
+      agents:
+        provider: "gcp"
+        image: "${IMAGE_UBUNTU_X86_64}"
+        machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+
+    - label: "K8S Test/K8S version: v1.27.3"
+      key: "k8s-test-1273"
+      env:
+        K8S_VERSION: "v1.27.3"
+      commands:
+        - "MODULE=kubernetes make -C metricbeat integration-tests"
+        - "make -C deploy/kubernetes test"
+      notify:
+        - github_commit_status:
+            context: "Deploy/k8s-test v1.27.3"
+      agents:
+        provider: "gcp"
+        image: "${IMAGE_UBUNTU_X86_64}"
+        machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+
+    - label: "K8S Test/K8S version: v1.26.6"
+      key: "k8s-test-1266"
+      env:
+        K8S_VERSION: "v1.26.6"
+      commands:
+        - "MODULE=kubernetes make -C metricbeat integration-tests"
+        - "make -C deploy/kubernetes test"
+      notify:
+        - github_commit_status:
+            context: "Deploy/k8s-test v1.26.6"
+      agents:
+        provider: "gcp"
+        image: "${IMAGE_UBUNTU_X86_64}"
+        machineType: "${GCP_HI_PERF_MACHINE_TYPE}"

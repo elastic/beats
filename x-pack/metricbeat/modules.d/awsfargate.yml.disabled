@@ -1,5 +1,5 @@
 # Module: awsfargate
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-awsfargate.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.13/metricbeat-module-awsfargate.html
 
 - module: awsfargate
   period: 10s

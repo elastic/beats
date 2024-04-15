@@ -1,5 +1,5 @@
 # Module: envoyproxy
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-envoyproxy.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.13/filebeat-module-envoyproxy.html
 
 - module: envoyproxy
   # Fileset for native deployment

@@ -1,5 +1,5 @@
 # Module: ceph
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-ceph.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.13/metricbeat-module-ceph.html
 
 - module: ceph
   #metricsets:
