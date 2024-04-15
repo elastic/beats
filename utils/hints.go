@@ -20,6 +20,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -205,18 +206,63 @@ func IsDisabled(hints mapstr.M, key string) bool {
 func GenerateHints(annotations mapstr.M, container, prefix string, allSupportedHints []string) (mapstr.M, []string) {
 	hints := mapstr.M{}
 	var incorrecthints []string
-	found := false
+	var incorrecthint string
+	var digitCheck = regexp.MustCompile(`^[0-9]+$`)
+
 	if rawEntries, err := annotations.GetValue(prefix); err == nil {
 		if entries, ok := rawEntries.(mapstr.M); ok {
-			for key, rawValue := range entries {
 
+			//Start of Annotation Check: whether the annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+			datastreamlist := GetHintAsList(entries, logName+"/"+"data_streams", "")
+			// We check if multiple data_streams are defined and we retrieve the hints per data_stream. Only applicable in elastic-agent
+			// See Metrics_apache_package_and_specific_config_per_datastream test case in hints_test.go
+			for _, stream := range datastreamlist {
+				allSupportedHints = append(allSupportedHints, stream)
+				incorrecthints = checkSupportedHintsSets(annotations, prefix, stream, logName, allSupportedHints, incorrecthints)
+			}
+			metricsetlist := GetHintAsList(entries, "metrics"+"/"+"metricsets", "")
+			// We check if multiple metrcisets are defined and we retrieve the hints per metricset. Only applicable in beats
+			//See Metrics_istio_module_and_specific_config_per_metricset test case in hints_test.go
+			for _, metric := range metricsetlist {
+				allSupportedHints = append(allSupportedHints, metric)
+				incorrecthints = checkSupportedHintsSets(annotations, prefix, metric, "metrics", allSupportedHints, incorrecthints)
+			}
+			//End of Annotation Check
+
+			for key, rawValue := range entries {
+				enumeratedmodules := []string{}
 				// If there are top level hints like co.elastic.logs/ then just add the values after the /
 				// Only consider namespaced annotations
 				parts := strings.Split(key, "/")
 				if len(parts) == 2 {
 					hintKey := fmt.Sprintf("%s.%s", parts[0], parts[1])
+
+					checkdigit := digitCheck.MatchString(parts[1]) // With this regex we check if enumeration for modules is provided
+					if checkdigit {
+						allSupportedHints = append(allSupportedHints, parts[1])
+
+						specificlist, _ := entries.GetValue(key)
+						if specificentries, ok := specificlist.(mapstr.M); ok {
+							for keyspec := range specificentries {
+								// enumeratedmodules will be populated only in cases we have module enumeration, like:
+								// "co.elastic.metrics/1.module":  "prometheus",
+								// "co.elastic.metrics/2.module":  "istiod",
+								enumeratedmodules = append(enumeratedmodules, keyspec)
+							}
+						}
+					}
+
+					// We check if multiple metrcisets are defined and we retrieve the hints per metricset. Only applicable in beats
+					// See Metrics_multiple_modules_and_specific_config_per_module test case in hints_test.go
+					for _, metric := range enumeratedmodules {
+						_, incorrecthint = checkSupportedHints(metric, fmt.Sprintf("%s.%s", key, metric), allSupportedHints)
+						if incorrecthint != "" {
+							incorrecthints = append(incorrecthints, incorrecthint)
+						}
+
+					}
 					//We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
-					found = checkSupportedHints(parts[1], allSupportedHints)
+					_, incorrecthint = checkSupportedHints(parts[1], key, allSupportedHints)
 
 					// Insert only if there is no entry already. container level annotations take
 					// higher priority.
@@ -239,8 +285,36 @@ func GenerateHints(annotations mapstr.M, container, prefix string, allSupportedH
 						if strings.HasPrefix(hintKey, container) {
 							// Split the key to get part[1] to be the hint
 							parts := strings.Split(hintKey, "/")
+
+							checkdigit := digitCheck.MatchString(parts[1]) // With this regex we check if enumeration for modules is provided
+							if checkdigit {
+								allSupportedHints = append(allSupportedHints, parts[1])
+
+								specificlist, _ := entries.GetValue(key)
+								if specificentries, ok := specificlist.(mapstr.M); ok {
+									for keyspec := range specificentries {
+										// enumeratedmodules will be populated only in cases we have module enumeration, like:
+										// "co.elastic.metrics/1.module":  "prometheus",
+										// "co.elastic.metrics/2.module":  "istiod",
+										enumeratedmodules = append(enumeratedmodules, keyspec)
+									}
+								}
+							}
+
+							// We check if multiple metrcisets are defined and we retrieve the hints per metricset. Only applicable in beats
+							// See Metrics_multiple_modules_and_specific_config_per_module test case in hints_test.go
+							for _, metric := range enumeratedmodules {
+								_, incorrecthint = checkSupportedHints(metric, fmt.Sprintf("%s.%s", key, metric), allSupportedHints)
+								if incorrecthint != "" {
+									incorrecthints = append(incorrecthints, incorrecthint)
+								}
+
+							}
 							//We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
-							found = checkSupportedHints(parts[1], allSupportedHints)
+							_, incorrecthint = checkSupportedHints(parts[1], key, allSupportedHints)
+
+							//end of check
+
 							if len(parts) == 2 {
 								// key will be the hint type
 								hintKey := fmt.Sprintf("%s.%s", key, parts[1])
@@ -252,8 +326,8 @@ func GenerateHints(annotations mapstr.M, container, prefix string, allSupportedH
 						}
 					}
 				}
-				if !found {
-					incorrecthints = append(incorrecthints, key)
+				if incorrecthint != "" {
+					incorrecthints = append(incorrecthints, incorrecthint)
 				}
 			}
 		}
@@ -302,13 +376,39 @@ func GetHintsAsList(hints mapstr.M, key string) []mapstr.M {
 }
 
 // checkSupportedHints gets a specific hint annotation and compares it with the supported list of hints
-func checkSupportedHints(actualannotation string, allSupportedHints []string) bool {
+func checkSupportedHints(actualannotation, key string, allSupportedHints []string) (bool, string) {
 	found := false
+	var incorrecthint string
+
 	for _, checksupported := range allSupportedHints {
 		if actualannotation == checksupported {
 			found = true
 			break
 		}
+
 	}
-	return found
+	if !found {
+		incorrecthint = key
+	}
+	return found, incorrecthint
+}
+
+// checkSupportedHintsSets gest the data_streams or metricset lists that are defined. Searches inside specific list and returns the unsupported list of hints found
+// This function will merge the incorrect hints found in metricsets of data_streams with rest incorrect hints
+func checkSupportedHintsSets(annotations mapstr.M, prefix, stream, kind string, allSupportedHints, incorrecthints []string) []string {
+	var incorrecthint string
+
+	if hintsindatastream, err := annotations.GetValue(prefix + "." + kind + "/" + stream); err == nil {
+		if hintsentries, ok := hintsindatastream.(mapstr.M); ok {
+			for hintkey := range hintsentries {
+				_, incorrecthint = checkSupportedHints(hintkey, kind+"/"+stream+"."+hintkey, allSupportedHints)
+				if incorrecthint != "" {
+					incorrecthints = append(incorrecthints, incorrecthint)
+				}
+			}
+
+		}
+	}
+
+	return incorrecthints
 }
