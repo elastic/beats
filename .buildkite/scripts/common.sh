@@ -87,10 +87,6 @@ xpack_libbeat_changeset=(
   "^x-pack/libbeat/.*"
   )
 
-xpack_metricbeat_changeset=(
-  "^x-pack/metricbeat/.*"
-  )
-
 xpack_osquerybeat_changeset=(
   "^x-pack/osquerybeat/.*"
   )
