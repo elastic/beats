@@ -112,10 +112,6 @@ func CrossBuildDeps() error {
 	return callForBeat("crossBuildExt", "osquerybeat")
 }
 
-func FetchOsqueryDistros() error {
-	return osquerybeat.FetchOsqueryDistros()
-}
-
 // Package packages the Beat for distribution.
 // Use SNAPSHOT=true to build snapshots.
 // Use PLATFORMS to control the target platforms.

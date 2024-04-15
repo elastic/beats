@@ -8,7 +8,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/msiutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -19,6 +18,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fetch"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/hash"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/msiutil"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/pkgutil"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/tar"
 )
