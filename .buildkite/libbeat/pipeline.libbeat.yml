@@ -61,7 +61,10 @@ steps:
 
       - label: ":testengine: Stress Tests"
         key: "mandatory-stress-test"
-        command: "cd $BEATS_PROJECT_NAME && make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' GOTEST_OUTPUT_OPTIONS='| go-junit-report > libbeat-stress-test.xml' stress-tests"
+        command: |
+          set -euo pipefail
+          cd libbeat
+          make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' GOTEST_OUTPUT_OPTIONS=' | go-junit-report > libbeat-stress-test.xml' stress-tests
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
