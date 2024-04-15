@@ -608,6 +608,9 @@ def targetWithoutNode(Map args = [:]) {
         }
       }
       withTools(k8s: installK8s, gcp: withGCP, nodejs: withNodejs) {
+        if (isPackaging() && (directory == 'x-pack/agentbeat' || directory == 'x-pack/osquerybeat')) {
+          sh(label: 'install msitools', script: '.ci/scripts/install-msitools.sh')
+        }
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
