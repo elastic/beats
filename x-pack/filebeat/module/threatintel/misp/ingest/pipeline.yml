@@ -63,12 +63,12 @@ processors:
       field:
         - misp.Attribute
       ignore_missing: true
-      if: ctx.misp?.Attribute.size() == 0
+      if: ctx.misp?.Attribute?.size() == 0
   - remove:
       field:
         - misp.Object
       ignore_missing: true
-      if: ctx.misp?.Object.size() == 0
+      if: ctx.misp?.Object?.size() == 0
   - date:
       field: misp.timestamp
       formats:
@@ -144,12 +144,12 @@ processors:
   - set:
       field: threat.indicator.type
       value: file
-      if: "ctx.misp?.attribute?.type != null && (['md5', 'impfuzzy', 'imphash', 'pehash', 'sha1', 'sha224', 'sha256', 'sha3-224', 'sha3-256', 'sha3-384', 'sha3-512', 'sha384', 'sha512', 'sha512/224', 'sha512/256', 'ssdeep', 'tlsh', 'vhash'].contains(ctx.misp?.attribute?.type) || ctx.misp?.attribute?.type.startsWith('filename'))"
+      if: "['md5', 'impfuzzy', 'imphash', 'pehash', 'sha1', 'sha224', 'sha256', 'sha3-224', 'sha3-256', 'sha3-384', 'sha3-512', 'sha384', 'sha512', 'sha512/224', 'sha512/256', 'ssdeep', 'tlsh', 'vhash'].contains(ctx.misp?.attribute?.type) || ctx.misp?.attribute?.type?.startsWith('filename') == true"
   - rename:
       field: misp.attribute.value
       target_field: "threat.indicator.file.hash.{{misp.attribute.type}}"
       ignore_missing: true
-      if: "ctx.threat?.indicator?.type == 'file' && ctx.misp?.attribute?.type != null && !ctx.misp?.attribute?.type.startsWith('filename')"
+      if: "ctx.threat?.indicator?.type == 'file' && ctx.misp?.attribute?.type != null && !ctx.misp.attribute.type.startsWith('filename')"
   - rename:
       field: misp.attribute.value
       target_field: threat.indicator.file.name
@@ -160,23 +160,23 @@ processors:
       patterns:
         - "%{WORD}\\|%{WORD:_tmp.hashtype}"
       ignore_missing: true
-      if: ctx.misp?.attribute?.type != null && ctx.misp?.attribute?.type.startsWith('filename|')
+      if: ctx.misp?.attribute?.type?.startsWith('filename|') == true
   - grok:
       field: misp.attribute.value
       patterns:
         - "%{DATA:threat.indicator.file.name}\\|%{GREEDYDATA:_tmp.hashvalue}"
       ignore_missing: true
-      if: ctx.misp?.attribute?.type != null && ctx.misp?.attribute?.type.startsWith('filename|')
+      if: ctx.misp?.attribute?.type?.startsWith('filename|') == true
   - set:
       field: threat.indicator.file.hash.{{_tmp.hashtype}}
       value: "{{_tmp.hashvalue}}"
-      if: "ctx.misp?.attribute?.type != null && ctx.misp?.attribute?.type.startsWith('filename|') && ctx?._tmp?.hashvalue != null && ctx?._tmp?.hashtype != null"
+      if: "ctx.misp?.attribute?.type?.startsWith('filename|') == true && ctx._tmp?.hashvalue != null && ctx._tmp?.hashtype != null"
 
   ## URL/URI indicator operations
   - set:
       field: threat.indicator.type
       value: url
-      if: "ctx.misp?.attribute?.type != null && ['url', 'link', 'uri'].contains(ctx.misp?.attribute?.type)"
+      if: "['url', 'link', 'uri'].contains(ctx.misp?.attribute?.type)"
   - uri_parts:
       field: misp.attribute.value
       target_field: threat.indicator.url
@@ -193,7 +193,7 @@ processors:
   - set:
       field: threat.indicator.type
       value: windows-registry-key
-      if: "ctx.misp?.attribute?.type != null && ctx.misp?.attribute?.type.startsWith('regkey')"
+      if: "ctx.misp?.attribute?.type?.startsWith('regkey') == true"
   - rename:
       field: misp.attribute.value
       target_field: threat.indicator.registry.key
@@ -210,7 +210,7 @@ processors:
   - set:
       field: threat.indicator.type
       value: autonomous-system
-      if: "ctx.misp?.attribute?.type != null && ctx.misp?.attribute?.type == 'AS'"
+      if: "ctx.misp?.attribute?.type == 'AS'"
   - convert:
       field: misp.attribute.value
       type: long
@@ -222,11 +222,11 @@ processors:
   - set:
       field: threat.indicator.type
       value: domain-name
-      if: "ctx.misp?.attribute?.type != null && (ctx.misp?.attribute?.type == 'hostname' || ctx.misp?.attribute?.type.startsWith('domain'))"
+      if: "ctx.misp?.attribute?.type == 'hostname' || ctx.misp?.attribute?.type?.startsWith('domain') == true"
   - set:
       field: threat.indicator.type
       value: ipv4-addr
-      if: "ctx.misp?.attribute?.type != null && ['ip-src', 'ip-src|port', 'ip-dst', 'ip-dst|port'].contains(ctx.misp?.attribute?.type)"
+      if: "['ip-src', 'ip-src|port', 'ip-dst', 'ip-dst|port'].contains(ctx.misp?.attribute?.type)"
   - rename:
       field: misp.attribute.value
       target_field: threat.indicator.url.domain
@@ -257,11 +257,11 @@ processors:
   - set:
       field: threat.indicator.type
       value: email-addr
-      if: "ctx.misp?.attribute?.type != null && ['email-dst', 'email-src'].contains(ctx.misp?.attribute?.type)"
+      if: "['email-dst', 'email-src'].contains(ctx.misp?.attribute?.type)"
   - set:
       field: threat.indicator.type
       value: email-message
-      if: "ctx.misp?.attribute?.type != null && ctx.misp?.attribute?.type.startsWith('email') && !['email-dst', 'email-src'].contains(ctx.misp?.attribute?.type)"
+      if: "ctx.misp?.attribute?.type?.startsWith('email') == true && !['email-dst', 'email-src'].contains(ctx.misp.attribute.type)"
   - rename:
       field: misp.attribute.value
       target_field: threat.indicator.email.address
@@ -274,13 +274,13 @@ processors:
   - append:
       field: user.roles
       value: "reporting_user"
-      if: ctx?.user?.email != null
+      if: ctx.user?.email != null
 
   ## MAC Address indicator operations
   - set:
       field: threat.indicator.type
       value: mac-addr
-      if: "ctx.misp?.attribute?.type != null && ['mac-address', 'mac-eui-64'].contains(ctx.misp?.attribute?.type)"
+      if: "['mac-address', 'mac-eui-64'].contains(ctx.misp?.attribute?.type)"
   - rename:
       field: misp.attribute.value
       target_field: threat.indicator.mac
@@ -337,12 +337,12 @@ processors:
   ######################
   - remove:
       field: event.original
-      if: "ctx?.tags == null || !(ctx.tags.contains('preserve_original_event'))"
+      if: "ctx.tags == null || !(ctx.tags.contains('preserve_original_event'))"
       ignore_failure: true
       ignore_missing: true
   - script:
       lang: painless
-      if: ctx?.misp != null
+      if: ctx.misp != null
       source: |
         void handleMap(Map map) {
           for (def x : map.values()) {
