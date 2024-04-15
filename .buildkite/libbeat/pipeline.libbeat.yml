@@ -18,6 +18,7 @@ steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
+          set -euo pipefail
           cd libbeat
           mage build unitTest
         agents:
@@ -34,6 +35,7 @@ steps:
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
+          set -euo pipefail
           cd libbeat
           mage goIntegTest
         agents:
@@ -50,6 +52,7 @@ steps:
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: |
+          set -euo pipefail
           cd libbeat
           pythonIntegTest
         agents:
@@ -66,6 +69,7 @@ steps:
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
         command: |
+          set -euo pipefail
           cd libbeat
           make crosscompile
         agents:
@@ -82,8 +86,9 @@ steps:
       - label: ":testengine: Stress Tests"
         key: "mandatory-stress-test"
         command: |
+          set -euo pipefail
           cd libbeat
-          make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' GOTEST_OUTPUT_OPTIONS='| go-junit-report > libbeat-stress-test.xml' stress-tests
+          make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' GOTEST_OUTPUT_OPTIONS=' | go-junit-report > libbeat-stress-test.xml' stress-tests
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -100,6 +105,7 @@ steps:
       - label: ":linux: Ubuntu ARM64 Unit Tests"
         key: "extended-arm64-unit-tests"
         command: |
+          set -euo pipefail
           cd libbeat
           mage build unitTest
         agents:
