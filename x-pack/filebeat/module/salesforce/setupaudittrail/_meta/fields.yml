@@ -8,10 +8,6 @@
       type: keyword
       description: >
         Unique Id.
-    - name: event_type
-      type: keyword
-      description: >
-        Event type
     - name: created_by_context
       type: keyword
       description: >

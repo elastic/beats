@@ -42,10 +42,6 @@ processors:
             value: "Failed to parse CreatedDate: {{json.CreatedDate}}"
 
   # Normalize field names
-  - set:
-      field: salesforce.setup_audit_trail.event_type
-      copy_from: json.attributes.type
-      ignore_failure: true
   - rename:
       field: json.CreatedByContext
       target_field: salesforce.setup_audit_trail.created_by_context
@@ -99,11 +95,6 @@ processors:
   - rename:
       field: json.Action
       target_field: event.action
-      ignore_failure: true
-      ignore_missing: true
-  - rename:
-      field: json.attributes.url
-      target_field: event.url
       ignore_failure: true
       ignore_missing: true
   - date:

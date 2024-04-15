@@ -126079,16 +126079,6 @@ type: keyword
 
 --
 
-*`salesforce.setup_audit_trail.event_type`*::
-+
---
-Event type
-
-
-type: keyword
-
---
-
 *`salesforce.setup_audit_trail.created_by_context`*::
 +
 --
