@@ -722,10 +722,6 @@ func (m *mockWatcher) AddEventHandler(r kubernetes.ResourceEventHandler) {
 	m.handler = r
 }
 
-func (m *mockWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
-	return m.handler
-}
-
 func (m *mockWatcher) Store() cache.Store {
 	return nil
 }

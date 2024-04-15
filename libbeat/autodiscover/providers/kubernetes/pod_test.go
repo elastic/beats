@@ -108,7 +108,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.logs/multiline.pattern":    "^test",
 						"co.elastic.logs/json.keys_under_root": "true",
 						"co.elastic.metrics/module":            "prometheus",
-						"co.elastic.metrics/timeouts":          "5s", //On purpose we added this annotation with typo
+						"co.elastic.metrics/timeoutssssssss":   "5s", //On purpose we added this annotation with typo
 						"co.elastic.metrics/period":            "10s",
 						"co.elastic.metrics.foobar/period":     "15s",
 						"not.to.include":                       "true",
@@ -126,7 +126,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.logs/multiline.pattern":    "^test",
 						"co.elastic.logs/json.keys_under_root": "true",
 						"co.elastic.metrics/module":            "prometheus",
-						"co.elastic.metrics/timeouts":          "5s",
+						"co.elastic.metrics/timeoutssssssss":   "5s",
 						"not.to.include":                       "true",
 						"co.elastic.metrics/period":            "10s",
 						"co.elastic.metrics.foobar/period":     "15s",
@@ -2155,10 +2155,6 @@ func (s *mockUpdaterWatcher) Store() caches.Store {
 }
 
 func (s *mockUpdaterWatcher) AddEventHandler(kubernetes.ResourceEventHandler) {
-}
-
-func (s *mockUpdaterWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
-	return nil
 }
 
 func (s *mockUpdaterStore) List() []interface{} {

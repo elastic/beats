@@ -31,7 +31,7 @@ import (
 )
 
 // AllSupportedHints includes the set of all supported hints for both logs and metrics autodiscovery
-var AllSupportedHints = []string{"enabled", "module", "metricsets", "host", "period", "timeout", "metrics_path", "username", "password", "stream", "processors", "multiline", "json", "disable", "ssl", "metrics_filters", "raw", "include_lines", "exclude_lines", "fileset", "pipeline"}
+var AllSupportedHints = []string{"enabled", "module", "metricsets", "host", "period", "timeout", "metrics_path", "username", "password", "stream", "processors", "multiline", "json", "disable", "ssl", "metrics_filters", "raw", "include_lines", "exclude_lines", "fileset", "pipeline", "raw"}
 
 // Config for kubernetes autodiscover provider
 type Config struct {
