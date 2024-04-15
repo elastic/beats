@@ -1,0 +1,28 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+
+env:
+  ASDF_MAGE_VERSION: 1.15.0
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+
+steps:
+  - label: ":package: Publishing agentbeat"
+    agents:
+      provider: "gcp"
+      machineType: "c2-standard-16"
+      image: "${IMAGE_UBUNTU_X86_64}"
+      diskSizeGb: 400
+    command: |
+      sudo apt-get update -y
+      DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes msitools
+      cd x-pack/agentbeat && mage package && cd ../..
+
+      echo "+++ Changing permissions for the release manager"
+      sudo chown -R :1000 build/distributions/
+
+      echo "+++ :hammer_and_pick: Publishing ${_branch} ${_workflow} DRA artifacts..."
+      BEAT_VERSION=$(make get-version) .buildkite/x-pack/agentbeat/scripts/dra.sh
+    env:
+      SNAPSHOT: true
+      DRA_WORKFLOW: snapshot
+    artifact_paths:
+      - "x-pack/agentbeat/build/distributions/**/*"
