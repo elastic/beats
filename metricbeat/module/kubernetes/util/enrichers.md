@@ -50,5 +50,39 @@ The metadata enrichment process involves associating contextual information, suc
 
 
 
-
+In the following diagram, an example of different metricsets leveraging the same watchers is depicted. Metricsets have their own enrichers but share watchers. The watchers monitor the Kubernetes API for specific resource updates.
 [metadata diag](../_meta/images/enrichers.png)
+
+### Expected watchers per metricset
+
+The following table demonstrates which watchers are needed for each metricset by default.
+Note that no watcher monitoring the same resource kind will be created twice.
+
+| Metricset            | Namespace watcher | Node watcher | Resource watcher | Notes                                                     |
+|----------------------|:-----------------:|:------------:|:----------------:|-----------------------------------------------------------|
+| API Server           |     &#10005;      |   &#10005;   |     &#10005;     |                                                           |
+| Container            |      &check;      |   &check;    |     &check;      |                                                           |
+| Controller manager   |     &#10005;      |   &#10005;   |     &check;      |                                                           |
+| Event                |     &check;      |   &#10005;   |     &check;      |                                                           |
+| Node                 |     &#10005;      |   &check;    |     &check;      | Resource watcher should be the same as node watcher.      |
+| Pod                  |      &check;      |   &check;    |     &check;      |                                                           |
+| Proxy                |     &#10005;      |   &#10005;   |     &#10005;     |                                                           |
+| Scheduler            |     &#10005;      |   &#10005;   |     &#10005;     |                                                           |
+| State container      |      &check;      |   &check;    |     &check;      |                                                           |
+| State cronjob        |      &check;      |   &#10005;   |     &check;      |                                                           |
+| State daemonset      |      &check;      |   &#10005;   |     &check;      |                                                           |
+| State deployment     |      &check;      |   &#10005;   |     &check;      |                                                           |
+| State job            |      &check;      |   &#10005;    |     &check;      |                                                           |
+| State namespace      |      &check;      |   &#10005;   |     &check;      | Resource watcher should be the same as namespace watcher. |
+| State node           |     &#10005;      |   &check;    |     &check;      | Resource watcher should be the same as node watcher.      |
+| State PV             |     &#10005;      |   &#10005;   |     &check;      |                                                           |
+| State PVC            |      &check;      |   &#10005;   |     &check;      |                                                           |
+| State pod            |      &check;      |   &check;    |     &check;      |                                                           |
+| State replicaset     |      &check;      |   &#10005;   |     &check;      |                                                           |
+| State resource quota |     &check;      |   &#10005;   |     &check;     |                                                           |
+| State service        |      &check;      |   &#10005;   |     &check;      |                                                           |
+| State statefulset    |      &check;      |   &#10005;   |     &check;      |                                                           |
+| State storage class  |     &#10005;      |   &#10005;   |     &check;      |                                                           |
+| System               |     &#10005;      |   &#10005;   |     &#10005;     |                                                           |
+| Volume               |     &#10005;      |   &#10005;   |     &#10005;     |                                                           |
+
