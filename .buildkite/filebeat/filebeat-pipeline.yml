@@ -195,7 +195,6 @@ steps:
     steps:
       - label: ":windows: Windows 2019 Unit Tests"
         key: "windows-extended-2019"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows-2019.*/
         command: |
           Set-Location -Path filebeat
           mage build unitTest
