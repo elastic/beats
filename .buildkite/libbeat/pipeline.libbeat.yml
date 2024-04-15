@@ -4,14 +4,9 @@ name: "beats-libbeat"
 env:
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
-  BEATS_PROJECT_NAME: "libbeat"
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-
-  #Packaging
-  PACKAGING_ARM_PLATFORMS: "linux/arm64"
-  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
