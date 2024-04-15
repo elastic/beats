@@ -59,4 +59,4 @@ cd x-pack/agentbeat && docker run --rm \
         --workflow "${DRA_WORKFLOW}" \
         --version "${BEAT_VERSION}" \
         --artifact-set "agentbeat" \
-        ${_dry_run}
+        ${DRY_RUN}
