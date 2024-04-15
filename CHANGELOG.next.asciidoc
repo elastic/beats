@@ -176,6 +176,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - Upgrade go-sysinfo {pull}38778[38778]
 - Upgrade go-sysinfo to v1.14.0. See https://github.com/elastic/go-sysinfo/releases. {pull}38778[38778]
+- Upgrade go-sysinfo to v1.14.0. See https://github.com/elastic/go-sysinfo/releases/tag/v1.14.0. {pull}38778[38778]
 
 *Auditbeat*
 
