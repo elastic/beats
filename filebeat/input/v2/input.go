@@ -115,12 +115,12 @@ type Canceler interface {
 	Err() error
 }
 
-func GoContextFromCanceler(c Canceler) context.Context {
-	return cancelerCtx{c}
-}
-
 type cancelerCtx struct {
 	Canceler
+}
+
+func GoContextFromCanceler(c Canceler) context.Context {
+	return cancelerCtx{c}
 }
 
 func (c cancelerCtx) Deadline() (deadline time.Time, ok bool) {
