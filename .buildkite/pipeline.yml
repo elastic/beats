@@ -36,6 +36,7 @@ steps:
                 - heartbeat/
                 - .buildkite/heartbeat/
                 - .buildkite/scripts
+                - .buildkite/hooks/
                 #OSS
                 - go.mod
                 - pytest.ini
@@ -87,6 +88,7 @@ steps:
             - path:
                 - x-pack/dockerlogbeat/
                 - .buildkite/x-pack/pipeline.xpack.dockerlogbeat.yml
+                - .buildkite/hooks/
                 - .buildkite/scripts
                 #OSS
                 - go.mod
@@ -132,6 +134,7 @@ steps:
                 - metricbeat/
                 - .buildkite/metricbeat/
                 - .buildkite/scripts
+                - .buildkite/hooks/
                 #OSS
                 - go.mod
                 - pytest.ini
@@ -184,6 +187,7 @@ steps:
                 - x-pack/winlogbeat/
                 - .buildkite/x-pack/pipeline.xpack.winlogbeat.yml
                 - .buildkite/scripts
+                - .buildkite/hooks/
                 #OSS
                 - go.mod
                 - pytest.ini
@@ -207,9 +211,10 @@ steps:
           watch:
             - path:
                 - .buildkite/deploy/kubernetes/**
+                - .buildkite/hooks/
+                - .buildkite/scripts
                 - deploy/kubernetes/**
                 - libbeat/docs/version.asciidoc
-                - .buildkite/scripts
               config:
                 trigger: "deploy-k8s"
                 build:
