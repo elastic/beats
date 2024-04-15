@@ -59,7 +59,9 @@ steps:
             - path:
                 - filebeat/
                 - .buildkite/filebeat/
+                # CI related scripts
                 - .buildkite/scripts
+                - .buildkite/hooks/
                 #OSS
                 - go.mod
                 - pytest.ini
