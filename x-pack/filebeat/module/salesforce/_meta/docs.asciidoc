@@ -47,6 +47,40 @@ The Salesforce module contains the following filesets for collecting different t
 The default interval for collecting logs (`var.real_time_interval` or `var.elf_interval`) is 5m/1h. Exercise caution when reducing this interval, as it directly impacts the Salesforce API rate limit of ~1000 calls per hour. Exceeding the limit will result in errors from the Salesforce API. Refer to the https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_api.htm[Salesforce API Rate Limit] documentation for more details.
 ====
 
+== Set up the OAuth App in the Salesforce
+
+In order to use this integration, users need to create a new Salesforce Application using OAuth. Follow the steps below to create a connected application in Salesforce:
+
+1. Login to https://login.salesforce.com/[Salesforce] with the same user credentials that the user wants to collect data with.
+2. Click on Setup on the top right menu bar. On the Setup page, search for `App Manager` in the `Search Setup` search box at the top of the page, then select `App Manager`.
+3. Click _New Connected App_.
+4. Provide a name for the connected application. This will be displayed in the App Manager and on its App Launcher tile.
+5. Enter the API name. The default is a version of the name without spaces. Only letters, numbers, and underscores are allowed. If the original app name contains any other characters, edit the default name.
+6. Enter the contact email for Salesforce.
+7. Under the API (Enable OAuth Settings) section of the page, select _Enable OAuth Settings_.
+8. In the Callback URL, enter the Instance URL (Please refer to `Salesforce Instance URL`).
+9. Select the following OAuth scopes to apply to the connected app:
+- Manage user data via APIs (api).
+- Perform requests at any time (refresh_token, offline_access).
+- (Optional) In case of data collection, if any permission issues arise, add the Full access (full) scope.
+10. Select _Require Secret for the Web Server Flow_ to require the app's client secret in exchange for an access token.
+11. Select _Require Secret for Refresh Token Flow_ to require the app's client secret in the authorization request of a refresh token and hybrid refresh token flow.
+12. Click Save. It may take approximately 10 minutes for the changes to take effect.
+13. Click Continue and then under API details, click Manage Consumer Details. Verify the user account using the Verification Code.
+14. Copy `Consumer Key` and `Consumer Secret` from the Consumer Details section, which should be populated as values for Client ID and Client Secret respectively in the configuration.
+
+For more details on how to create a Connected App, refer to the Salesforce documentation https://help.salesforce.com/apex/HTViewHelpDoc?id=connected_app_create.htm[here].
+
+[NOTE]
+
+====
+
+*Enabling real-time events*
+
+To get started with https://developer.salesforce.com/blogs/2020/05/introduction-to-real-time-event-monitoring[real-time] events, head to setup and into the quick find search for 'Event Manager'. Enterprise and Unlimited environments have access to the Logout Event by default, but the remainder of the events need licensing to access https://help.salesforce.com/s/articleView?id=sf.salesforce_shield.htm&type=5[Shield Event Monitoring].
+
+====
+
 include::../include/gs-link.asciidoc[]
 
 include::../include/configuring-intro.asciidoc[]
