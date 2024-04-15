@@ -220,7 +220,7 @@ steps:
       - label: ":ubuntu: Auditbeat/Packaging Linux"
         key: "auditbeat-package-linux-x86"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
           SNAPSHOT: true
         command: |
           cd auditbeat
