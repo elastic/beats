@@ -32,7 +32,7 @@ The metadata enrichment process involves associating contextual information, suc
    - The enricher collects relevant metadata from Kubernetes API objects corresponding to the detected changes. This metadata includes information like labels, annotations, resource names, etc.
 
 5. **Association with Events:**
-   - The collected metadata is then associated with the metricset's events. This association enriches the events with contextual information, providing deeper insights into the collected data. The enriched events generated from beats/agent are then sent to the configured output (e.g. Elasticsearch).
+   - The collected metadata are associated with the metricset's events. This association process enriches the events with contextual information, providing deeper insights into the collected data. The enriched events generated from beats/agent are sent to the configured output (e.g. Elasticsearch).
 
 ### Handling Edge Cases:
 
