@@ -5,16 +5,13 @@ env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
-
-  #Packaging
-  PACKAGING_ARM_PLATFORMS: "linux/arm64"
-  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
 
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
@@ -24,7 +21,7 @@ steps:
     key: "winlogbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: Crossccompile"
+      - label: ":ubuntu: Winlogbeat Crossccompile"
         key: "mandatory-cross-compile"
         command: "make -C winlogbeat crosscompile"
         agents:
@@ -134,7 +131,7 @@ steps:
 
   - wait: ~
     depends_on:
-      - step: "mandatory-tests"
+      - step: "winlogbeat-mandatory-tests"
 
   - group: "Winlogbeat Packaging"
     key: "winlogbeat-packaging"
@@ -147,7 +144,7 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         env:
-          PLATFORMS: "${PACKAGING_PLATFORMS}"
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         notify:
           - github_commit_status:
               context: "Winlogbeat: Packaging Ubuntu x86_64"
