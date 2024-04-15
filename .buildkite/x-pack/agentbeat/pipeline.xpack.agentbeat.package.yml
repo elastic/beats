@@ -33,7 +33,7 @@ steps:
           provider: "gcp"
         command: |
           echo "+++ Restoring Artifacts"
-          buildkite-agent artifact download "x-pack/agentbeat/build/distributions/**/*" . --build 018ee250-9584-4296-b538-c64ff891c023
+          buildkite-agent artifact download "x-pack/agentbeat/build/**/*" . --build 018ee250-9584-4296-b538-c64ff891c023
 
           echo "+++ Changing permissions for the release manager"
           sudo chown -R :1000 build/distributions/
