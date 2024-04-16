@@ -32,7 +32,6 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "fi
     with_mage
   fi
 
-
   if [[ "$BUILDKITE_STEP_KEY" == *packaging* ]]; then
     DOCKER_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
     DOCKER_PASSWORD_SECRET=$(retry_with_count 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
@@ -55,20 +54,19 @@ fi
 ENABLED_BEATS_PIPELINES_SLUGS=(
   "auditbeat"
   "filebeat"
-  "beats-metricbeat"
   "beats-libbeat"
+  "beats-metricbeat"
   "beats-packetbeat"
   "beats-winlogbeat"
   "beats-winlogbeat"
   "beats-xpack-libbeat"
-  "beats-xpack-metricbeat"
   "beats-xpack-packetbeat"
   "beats-xpack-winlogbeat"
   "beats-xpack-dockerlogbeat"
   "beats-xpack-auditbeat"
   "beats-xpack-filebeat"
+  "beats-xpack-metricbeat"
   "beats-xpack-heartbeat"
-  "beats-xpack-osquerybeat"
   "deploy-k8s"
 )
 
@@ -79,8 +77,8 @@ for slug in "${ENABLED_BEATS_PIPELINES_SLUGS[@]}"; do
   fi
 done
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
-  if [[ "$BUILDKITE_STEP_KEY" == "extended-cloud-test" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == *"xpack-metricbeat"* || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
+  if [[ "$BUILDKITE_STEP_KEY" == *"extended-cloud-test"* ]]; then
     BEATS_AWS_SECRET_KEY=$(retry_with_count 5 vault kv get -field secret_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
     export BEATS_AWS_SECRET_KEY
     BEATS_AWS_ACCESS_KEY=$(retry_with_count 5 vault kv get -field access_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})

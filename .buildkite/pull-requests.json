@@ -18,22 +18,6 @@
         },
         {
             "enabled": true,
-            "pipelineSlug": "beats-metricbeat",
-            "allow_org_users": true,
-            "allowed_repo_permissions": ["admin", "write"],
-            "allowed_list": [ ],
-            "set_commit_status": true,
-            "build_on_commit": true,
-            "build_on_comment": true,
-            "trigger_comment_regex": "^/test metricbeat$",
-            "always_trigger_comment_regex": "^/test metricbeat$",
-            "skip_ci_labels": [  ],
-            "skip_target_branches": [ ],
-            "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": [ "^metricbeat/.*", ".buildkite/metricbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
-        },
-        {
-            "enabled": true,
             "pipelineSlug": "beats-libbeat",
             "allow_org_users": true,
             "allowed_repo_permissions": ["admin", "write"],
@@ -98,22 +82,6 @@
         },
         {
             "enabled": true,
-            "pipelineSlug": "beats-xpack-winlogbeat",
-            "allow_org_users": true,
-            "allowed_repo_permissions": ["admin", "write"],
-            "allowed_list": [ ],
-            "set_commit_status": true,
-            "build_on_commit": true,
-            "build_on_comment": true,
-            "trigger_comment_regex": "^/test x-pack/winlogbeat$",
-            "always_trigger_comment_regex": "^/test x-pack/winlogbeat$",
-            "skip_ci_labels": [  ],
-            "skip_target_branches": [ ],
-            "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": ["^x-pack/winlogbeat/.*", ".buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
-        },
-        {
-            "enabled": true,
             "pipelineSlug": "beats-xpack-packetbeat",
             "allow_org_users": true,
             "allowed_repo_permissions": ["admin", "write"],
@@ -143,22 +111,6 @@
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
             "always_require_ci_on_changed": ["^x-pack/libbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
-        },
-        {
-            "enabled": true,
-            "pipelineSlug": "beats-xpack-metricbeat",
-            "allow_org_users": true,
-            "allowed_repo_permissions": ["admin", "write"],
-            "allowed_list": [ ],
-            "set_commit_status": true,
-            "build_on_commit": true,
-            "build_on_comment": true,
-            "trigger_comment_regex": "^/test x-pack/metricbeat$",
-            "always_trigger_comment_regex": "^/test x-pack/metricbeat$",
-            "skip_ci_labels": [  ],
-            "skip_target_branches": [ ],
-            "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": ["^x-pack/metricbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         },
         {
             "enabled": true,
@@ -207,22 +159,6 @@
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
             "always_require_ci_on_changed": ["^x-pack/heartbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
-        },
-        {
-            "enabled": true,
-            "pipelineSlug": "beats-xpack-osquerybeat",
-            "allow_org_users": true,
-            "allowed_repo_permissions": ["admin", "write"],
-            "allowed_list": [ ],
-            "set_commit_status": true,
-            "build_on_commit": true,
-            "build_on_comment": true,
-            "trigger_comment_regex": "^/test x-pack/osquerybeat$",
-            "always_trigger_comment_regex": "^/test x-pack/osquerybeat$",
-            "skip_ci_labels": [  ],
-            "skip_target_branches": [ ],
-            "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": ["^x-pack/osquerybeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         }
     ]
 }
