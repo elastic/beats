@@ -64,6 +64,7 @@ class Test(metricbeat.BaseTest):
 
         self.assert_fields_are_documented(evt)
 
+
 @unittest.skip("use of host network incompatible with docker update: https://github.com/elastic/beats/issues/38854")
 class TestRemoteWrite(metricbeat.BaseTest):
 
