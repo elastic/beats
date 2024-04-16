@@ -91,7 +91,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix cache processor expiries infinite growth when large a large TTL is used and recurring keys are cached. {pull}38561[38561]
 
 *Auditbeat*
-
+- Set field types to correctly match ECS in sessionmd processor {issue}38955[38955] {pull}38994[38994]
 
 *Filebeat*
 
