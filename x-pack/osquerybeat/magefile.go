@@ -22,6 +22,7 @@ import (
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
 	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
 
 	// mage:import
@@ -162,6 +163,20 @@ func stripLinuxOsqueryd() error {
 		return nil
 	}
 
+	// Check that this step is called during x-pack/osquerybeat/ext/osquery-extension build
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	// Strip osqueryd only once when osquery-extension is built
+	// There are two build paths at the moment both through GolangCrossBuild
+	// 1. Standlone osquerybeat package (this function is called twice: for osquerybeat and osquery-extension)
+	// 2. Agentbeat package, this function is only called once for osquery-extension
+	if !strings.HasSuffix(cwd, "/osquery-extension") {
+		return nil
+	}
+
 	ctx := context.Background()
 
 	osArchs := osquerybeat.OSArchs(devtools.Platforms)
@@ -171,8 +186,44 @@ func stripLinuxOsqueryd() error {
 		if osarch.OS != os.Getenv("GOOS") || osarch.Arch != os.Getenv("GOARCH") {
 			continue
 		}
+
 		// Strip osqueryd
-		if err := execCommand(ctx, "strip", distro.OsquerydPath(distro.GetDataInstallDir(osarch))); err != nil {
+		// There are two scenarios where the build path is created depending on the type of build
+		// 1. Standlone osquerybeat build: the osqueryd binaries are downloaded into osquerybeat/build/data/install/[GOOS]/[GOARCH]
+		// 2. Agentbeat build: the osqueryd binaries are downloaded agentbeat/build/data/install/[GOOS]/[GOARCH]
+
+		// This returns something like build/data/install/linux/amd64/osqueryd
+		querydRelativePath := distro.OsquerydPath(distro.GetDataInstallDir(osarch))
+
+		osquerybeatPath := filepath.Clean(filepath.Join(cwd, "../..", querydRelativePath))
+		agentbeatPath := filepath.Clean(filepath.Join(cwd, "../../../agentbeat", querydRelativePath))
+
+		var osquerydPath string
+
+		ok, err := fileutil.FileExists(osquerybeatPath)
+		if err != nil {
+			return err
+		}
+		if ok {
+			osquerydPath = osquerybeatPath
+		} else {
+			ok, err = fileutil.FileExists(agentbeatPath)
+			if err != nil {
+				return err
+			}
+			if ok {
+				osquerydPath = agentbeatPath
+			}
+		}
+
+		if osquerydPath == "" {
+			return errors.New("osqueryd binary is not found")
+		}
+
+		fmt.Println("The osqueryd binary found at:", osquerydPath)
+
+		// Check if the file exists under osquerybeat or agentbeat
+		if err := execCommand(ctx, "strip", osquerydPath); err != nil {
 			return err
 		}
 	}
@@ -199,11 +250,11 @@ func GolangCrossBuild() error {
 		if err := extractFromMSI(); err != nil {
 			return err
 		}
+	}
 
-		// Strip linux osqueryd binary
-		if err := stripLinuxOsqueryd(); err != nil {
-			return err
-		}
+	// Strip linux osqueryd binary
+	if err := stripLinuxOsqueryd(); err != nil {
+		return err
 	}
 
 	return devtools.GolangCrossBuild(args)
