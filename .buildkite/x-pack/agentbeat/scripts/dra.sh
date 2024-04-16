@@ -53,7 +53,7 @@ cd x-pack/agentbeat && docker run --rm \
         --mount type=bind,readonly=false,src="${PWD}",target=/artifacts \
         docker.elastic.co/infra/release-manager:latest \
         cli collect \
-        --project "beats/agentbeat" \
+        --project "beats" \
         --branch "${BRANCH}" \
         --commit "${BUILDKITE_COMMIT}" \
         --workflow "${DRA_WORKFLOW}" \
