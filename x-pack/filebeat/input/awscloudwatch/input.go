@@ -111,9 +111,7 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 	defer cancelInputCtx()
 
 	// Create client for publishing events and receive notification of their ACKs.
-	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		EventListener: awscommon.NewEventACKHandler(),
-	})
+	client, err := pipeline.ConnectWith(beat.ClientConfig{})
 	if err != nil {
 		return fmt.Errorf("failed to create pipeline client: %w", err)
 	}
