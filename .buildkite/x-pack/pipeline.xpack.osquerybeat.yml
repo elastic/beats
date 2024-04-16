@@ -75,24 +75,7 @@ steps:
           - github_commit_status:
               context: "x-pack/osquerybeat: Windows 2019 Unit Tests"
 
-      - label: ":windows: Windows 2022 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/osquerybeat
-          mage build unitTest
-        key: "mandatory-win-2022-unit-tests"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/osquerybeat/build/*.xml"
-          - "x-pack/osquerybeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/osquerybeat: Windows 2022 Unit Tests"
-
+      # windows-2022 wasn't defined in Jenkins (mandatory or extended) hence not migrated -> https://github.com/elastic/beats/blob/f021699c4bc9a494d255eb339c819c2745eb87f8/x-pack/osquerybeat/Jenkinsfile.yml#L36-L70
   - group: "x-pack/osquerybeat Extended Windows Tests"
     key: "x-pack-osquerybeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
@@ -115,23 +98,7 @@ steps:
           - github_commit_status:
               context: "x-pack/osquerybeat: Windows 10 Unit Tests"
 
-      - label: ":windows: Windows 11 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/osquerybeat
-          mage build unitTest
-        key: "extended-win-11-unit-tests"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/osquerybeat/build/*.xml"
-          - "x-pack/osquerybeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/osquerybeat: Windows 11 Unit Tests"
+      # Windows 11 wasn't defined in Jenkins, hence not migrating -> https://github.com/elastic/beats/blob/f021699c4bc9a494d255eb339c819c2745eb87f8/x-pack/osquerybeat/Jenkinsfile.yml#L50-L53
 
       # contrary to other projects Windows 2016 is defined as extended for 7.17 -> https://github.com/elastic/beats/blob/ec9d1ccb50b947ed7d6c49d2e17a2cd611a251a9/x-pack/osquerybeat/Jenkinsfile.yml#L40-L44
       - label: ":windows: Windows 2016 Unit Tests"
