@@ -99,7 +99,7 @@ steps:
           - github_commit_status:
               context: "x-pack/auditbeat: Windows 2016 Unit Tests"
 
-  - group: "Extended Windows Tests"
+  - group: "x-pack/auditbeat Extended Windows Tests"
     key: "x-pack-auditbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
     steps:
@@ -193,7 +193,7 @@ steps:
           - github_commit_status:
               context: "x-pack/auditbeat: macOS arm64 Extended Tests"
 
-  - group: "x-pack/auditbeat Linux arm Extended Tests Linux"
+  - group: "x-pack/auditbeat Linux arm Extended Tests"
     key: "x-pack-auditbeat-extended-tests-linux-arm"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
     steps:
