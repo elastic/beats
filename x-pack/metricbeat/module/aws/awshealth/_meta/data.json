@@ -4,12 +4,12 @@
         "awshealth": {
             "affected_entities": [
                 {
-                    "aws_account_id": "627286350134",
+                    "aws_account_id": "12301234013123",
                     "entity_url": "",
-                    "entity_value": "arn:aws:eks:us-east-2:627286350134:cluster/tkravchenko",
+                    "entity_value": "arn:aws:eks:us-east-2:627286350134:cluster/XXXXXXXXXXXXX",
                     "last_updated_time": "2024-04-12T12:56:29.7Z",
                     "status_code": "PENDING",
-                    "entity_arn": "arn:aws:health:us-east-2:627286350134:entity/g1LKdVRHv2pW-kQsjjXgOstZvUwFJjOd22QT0hfqYFEcc=1g"
+                    "entity_arn": "arn:aws:health:us-east-2:627286350134:entity/YYYYYYYYYYYYYYYYYYYY"
                 }
             ],
             "affected_entities_others": 0,
