@@ -205,3 +205,27 @@ steps:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
+  - label: "Trigger Libbeat"
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only ${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          watch:
+            - path:
+                - libbeat/
+                - .buildkite/libbeat/pipeline.libbeat.yml
+                - .buildkite/scripts
+                - .buildkite/hooks
+                #OSS
+                - go.mod
+                - pytest.ini
+                - dev-tools/
+                - testing/
+              config:
+                trigger: "beats-libbeat"
+                build:
+                  commit: "${BUILDKITE_COMMIT}"
+                  branch: "${BUILDKITE_BRANCH}"
+                  env:
+                    - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+                    - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
