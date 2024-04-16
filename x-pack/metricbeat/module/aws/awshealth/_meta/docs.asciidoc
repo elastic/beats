@@ -15,7 +15,7 @@ health:DescribeEvents
 ----
 
 - module: aws
-  period: 1d
+  period: 24h
   metricsets:
     - awshealth
 ----
