@@ -15,13 +15,8 @@ steps:
                 - go.mod
                 - pytest.ini
                 - dev-tools/
-<<<<<<< HEAD
-                - libbeat/
-                - testing/
-=======
                 - libbeat/**
                 - testing/**
->>>>>>> main
               config:
                 trigger: "auditbeat"
                 build:
@@ -46,13 +41,8 @@ steps:
                 - go.mod
                 - pytest.ini
                 - dev-tools/
-<<<<<<< HEAD
-                - libbeat/
-                - testing/
-=======
                 - libbeat/**
                 - testing/**
->>>>>>> main
               config:
                 trigger: "heartbeat"
                 build:
