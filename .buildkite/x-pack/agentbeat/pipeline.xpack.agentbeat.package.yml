@@ -50,7 +50,7 @@ steps:
           DRA_WORKFLOW: snapshot
 
   - group: ":Publishing Staging Artifacts"
-    if: build.branch =~ /^\d+\.\d+$/
+    if: "build.branch =~ /\\d+\\.\\d+/"
     key: "package-staging"
     steps:
       - label: ":package: Cross Building and package agentbeat"
