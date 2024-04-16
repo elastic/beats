@@ -50,9 +50,6 @@ defineModuleFromTheChangeSet() {
   local project_path_transformed=$(echo "$project_path" | sed 's/\//\\\//g')
   local project_path_exclussion="((?!^${project_path_transformed}\\/).)*\$"
   local exclude=("^(${project_path_exclussion}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)")
-  
-  OSS_MODULE_PATTERN="^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
-  XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 
   if [[ "$project_path" == *"x-pack/"* ]]; then
     local pattern=("$XPACK_MODULE_PATTERN")
