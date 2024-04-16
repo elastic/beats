@@ -6,25 +6,26 @@
                 {
                     "aws_account_id": "627286350134",
                     "entity_url": "",
-                    "entity_value": "arn:aws:eks:us-east-2:627286350134:cluster/michaliskatsoulisfargate",
-                    "last_updated_time": "2024-02-26T21:44:05.825Z",
-                    "status_code": "",
-                    "entity_arn": "arn:aws:health:us-east-2:627286350134:entity/g1vUSeoFZcvk3ucsO-BHDR55XHsSYYfs6wqo1QhqQeEto=1g"
+                    "entity_value": "arn:aws:eks:us-east-2:627286350134:cluster/tkravchenko",
+                    "last_updated_time": "2024-04-12T12:56:29.7Z",
+                    "status_code": "PENDING",
+                    "entity_arn": "arn:aws:health:us-east-2:627286350134:entity/g1LKdVRHv2pW-kQsjjXgOstZvUwFJjOd22QT0hfqYFEcc=1g"
                 }
             ],
             "affected_entities_others": 0,
-            "affected_entities_pending": 0,
+            "affected_entities_pending": 1,
             "affected_entities_resolved": 0,
             "end_time": "0001-01-01T00:00:00Z",
-            "event_arn": "arn:aws:health:us-east-2::event/EKS/AWS_EKS_OPERATIONAL_NOTIFICATION/AWS_EKS_OPERATIONAL_NOTIFICATION_5edf7d286ca1fbcdd70306479c60f8fd560afa53f174d79ae319faaedfc94646",
+            "event_arn": "arn:aws:health:us-east-2::event/EKS/AWS_EKS_PLANNED_LIFECYCLE_EVENT/AWS_EKS_PLANNED_LIFECYCLE_EVENT_a7e64e77680080d19971a80f0131ff2239909cdbe7647dd57710b764b988f476",
+            "event_description": "On May 1, 2024, standard support for Kubernetes version 1.25 in Amazon EKS will end. From May 2, 2024 all Amazon EKS clusters running on 1.25 will enter extended support and will remain in extended support until May 1, 2025.\n\nAfter May 1, 2025, Kubernetes 1.25 will no longer be supported on Amazon EKS, and all Amazon EKS clusters running on 1.25 will be automatically updated to Kubernetes version 1.26.\n\nYou are receiving this message because you currently have 1 or more Amazon EKS clusters running on Kubernetes version 1.25. A list of your impacted clusters can be found in the \"Affected resources\" tab.\n\nExtended support is currently in free preview and is available to all customers. Effective April 1 2024, your Amazon EKS clusters running on a Kubernetes version in extended support will be charged at $0.60 per cluster hour.\n\nIf you do not want to use extended support, we recommend that you update your 1.25 clusters to Kubernetes version 1.26 or newer before May 1, 2024. To learn more about the extended support for Kubernetes versions pricing, see our announcement [1]. For instructions on how to update your cluster(s), see the Amazon EKS service 'Updating an Amazon EKS cluster Kubernetes version' documentation [2].\n\nTo learn more on Kubernetes version support, see the 'Amazon EKS Kubernetes versions' documentation [3].\n\nFor any questions or assistance, please contact AWS Support [4].\n\n\n[1] https://aws.amazon.com/blogs/containers/amazon-eks-extended-support-for-kubernetes-versions-pricing/\n[2] https://docs.aws.amazon.com/eks/latest/userguide/update-cluster.html\n[3] https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html\n[4] https://aws.amazon.com/support",
             "event_scope_code": "ACCOUNT_SPECIFIC",
-            "event_type_category": "accountNotification",
-            "event_type_code": "AWS_EKS_OPERATIONAL_NOTIFICATION",
-            "last_updated_time": "2024-02-26T22:00:11.574Z",
+            "event_type_category": "scheduledChange",
+            "event_type_code": "AWS_EKS_PLANNED_LIFECYCLE_EVENT",
+            "last_updated_time": "2024-04-12T13:12:39.273Z",
             "region": "us-east-2",
             "service": "EKS",
-            "start_time": "2024-02-26T21:35:00Z",
-            "status_code": "open"
+            "start_time": "2024-05-01T07:00:00Z",
+            "status_code": "upcoming"
         }
     },
     "cloud.provider": "aws",
@@ -38,6 +39,6 @@
         "period": 10000
     },
     "service": {
-        "type": "aws"
+        "type": "aws-health"
     }
 }
