@@ -5,11 +5,11 @@ env:
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
 steps:
-  - group: ":Packaging Artifacts"
-    key: "package"
+  - group: ":Publishing Snapshot Artifacts"
+    key: "package-snapshot"
     steps:
       - label: ":package: Cross Building and package agentbeat"
-        key: package_agentbeat
+        key: package-agentbeat-snapshot
         agents:
           provider: "gcp"
           machineType: "c2-standard-16"
@@ -27,18 +27,66 @@ steps:
           - "x-pack/agentbeat/build/distributions/**/*"
 
       - label: ":elastic-stack: Publishing to DRA Snapshot"
-        key: dra-publish
-        depends_on: package_agentbeat
+        key: dra-publish-snapshot
+        depends_on: package-agentbeat-snapshot
         agents:
           provider: "gcp"
+          #--build 018ee68f-2b88-48b5-9326-a3f14e5c9723
         command: |
           echo "+++ Restoring Artifacts"
-          buildkite-agent artifact download "build/distributions/**/*" .
+
+          buildkite-agent artifact download "x-pack/agentbeat/build/**/*" .
+
+          mkdir agentbeat
+          mv x-pack/agentbeat/build/distributions/* agentbeat
+          mv agentbeat x-pack/agentbeat/build/distributions/
 
           echo "+++ Changing permissions for the release manager"
-          sudo chown -R :1000 build/distributions/
+          sudo chown -R :1000 x-pack/agentbeat/build/distributions/
 
           echo "+++ :hammer_and_pick: Publishing DRA artifacts..."
           .buildkite/x-pack/agentbeat/scripts/dra.sh
         env:
           DRA_WORKFLOW: snapshot
+
+  - group: ":Publishing Staging Artifacts"
+    if: "build.branch =~ /\\d+\\.\\d+/"
+    key: "package-staging"
+    steps:
+      - label: ":package: Cross Building and package agentbeat"
+        key: package-agentbeat-staging
+        agents:
+          provider: "gcp"
+          machineType: "c2-standard-16"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          diskSizeGb: 400
+        command: |
+          sudo apt-get update -y
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes msitools
+          cd x-pack/agentbeat && mage package
+        env:
+          SNAPSHOT: false
+
+        artifact_paths:
+          - "x-pack/agentbeat/build/distributions/**/*"
+
+      - label: ":elastic-stack: Publishing to DRA Snapshot"
+        key: dra-publish-staging
+        depends_on: package-agentbeat-staging
+        agents:
+          provider: "gcp"
+        command: |
+          echo "+++ Restoring Artifacts"
+          buildkite-agent artifact download "x-pack/agentbeat/build/**/*" .
+
+          mkdir agentbeat
+          mv x-pack/agentbeat/build/distributions/* agentbeat
+          mv agentbeat x-pack/agentbeat/build/distributions/
+
+          echo "+++ Changing permissions for the release manager"
+          sudo chown -R :1000 x-pack/agentbeat/build/distributions/
+
+          echo "+++ :hammer_and_pick: Publishing DRA artifacts..."
+          .buildkite/x-pack/agentbeat/scripts/dra.sh
+        env:
+          DRA_WORKFLOW: staging
