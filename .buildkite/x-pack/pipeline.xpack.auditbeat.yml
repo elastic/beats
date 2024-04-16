@@ -10,6 +10,7 @@ env:
 
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
   IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
@@ -49,7 +50,6 @@ steps:
       - label: ":rhel: RHEL9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
         command: |
-          source /opt/buildkite-agent/hooks/pre-command
           cd x-pack/auditbeat
           mage build unitTest
         agents:
