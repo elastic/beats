@@ -39,15 +39,16 @@ set -o xtrace
 echo "~~~ Run docker-compose services for emulated cloud env"
 docker-compose -f .ci/jobs/docker-compose.yml up -d        #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
 echo "~~~ Initialize TF cloud resources"
-pushd "$MODULE_DIR"
+cd "$MODULE_DIR"
 export TF_VAR_BRANCH=$(echo "${BUILDKITE_BRANCH}" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9-]/-/g')
 export TF_VAR_BUILD_ID="${BUILDKITE_BUILD_ID}"
 export TF_VAR_CREATED_DATE=$(date +%s)
 export TF_VAR_ENVIRONMENT="ci"
 export TF_VAR_REPO="${REPO}"
 terraform init && terraform apply -auto-approve
+cd -
 
 # Run tests
 echo "~~~ Run Cloud Tests for $BEATS_PROJECT_NAME"
-pushd "${BEATS_PROJECT_NAME}"
+cd "${BEATS_PROJECT_NAME}"
 mage build test
