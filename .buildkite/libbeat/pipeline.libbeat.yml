@@ -2,15 +2,6 @@
 name: "beats-libbeat"
 
 env:
-<<<<<<< HEAD
-  IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
-  IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
-  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
-  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
-  BEATS_PROJECT_NAME: "libbeat"
-=======
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
@@ -19,7 +10,6 @@ env:
 
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
->>>>>>> 74ddea27a6 (migrate libbeat to static (#38924))
 
 steps:
   - group: "Mandatory Tests"
@@ -76,14 +66,6 @@ steps:
           - github_commit_status:
               context: "libbeat: Python Integration Tests"
 
-<<<<<<< HEAD
-  - label: ":linux: Load dynamic Libbeat pipeline"
-    key: "libbeat-pipeline"
-    command: ".buildkite/scripts/generate_libbeat_pipeline.sh"
-    notify:
-      - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
-=======
       - label: ":negative_squared_cross_mark: Cross compile"
         key: "mandatory-cross-compile"
         command: |
@@ -98,7 +80,7 @@ steps:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
         notify:
-          - github_commit_status:
+          - github_commit_status: 
               context: "libbeat: Cross compile"
 
       - label: ":testengine: Stress Tests"
@@ -136,4 +118,3 @@ steps:
         notify:
           - github_commit_status:
               context: "libbeat: Ubuntu ARM64 Unit Tests"
->>>>>>> 74ddea27a6 (migrate libbeat to static (#38924))
