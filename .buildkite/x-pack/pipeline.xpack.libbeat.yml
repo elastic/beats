@@ -111,6 +111,7 @@ steps:
   ### TODO: this condition will be changed in the Phase 3 of the Migration Plan https://docs.google.com/document/d/1IPNprVtcnHlem-uyGZM0zGzhfUuFAh4LeSl9JFHMSZQ/edit#heading=h.sltz78yy249h
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false"
     steps:
       - label: ":windows: Windows 10 Unit Tests"
         command: |
@@ -168,6 +169,7 @@ steps:
 
   - group: "Extended Tests"
     key: "extended-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
     steps:
       - label: ":linux: Ubuntu ARM64 Unit Tests"
         key: "extended-arm64-unit-tests"
