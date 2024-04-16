@@ -102,7 +102,6 @@ pipeline {
         }
       }
     }
-    
     stage('Build&Test') {
       options { skipDefaultCheckout() }
       when {
@@ -157,7 +156,7 @@ pipeline {
       steps {
         runBuildAndTest(filterStage: 'extended_win')
       }
-    }    
+    }
     stage('Packaging') {
       options { skipDefaultCheckout() }
       when {
