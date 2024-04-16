@@ -292,12 +292,12 @@ func (s *salesforceInput) RunEventLogFile() error {
 	s.log.Debugf("scrape eventLogFile(s) every %s", s.srcConfig.EventMonitoringMethod.EventLogFile.Interval)
 
 	var cursor mapstr.M
-	if !(isZero(s.cursor.Object.FirstEventTime) && isZero(s.cursor.Object.LastEventTime)) {
+	if !(isZero(s.cursor.EventLogFile.FirstEventTime) && isZero(s.cursor.EventLogFile.LastEventTime)) {
 		eventLogFile := make(mapstr.M)
-		if !isZero(s.cursor.Object.FirstEventTime) {
+		if !isZero(s.cursor.EventLogFile.FirstEventTime) {
 			eventLogFile.Put("first_event_time", s.cursor.EventLogFile.FirstEventTime)
 		}
-		if !isZero(s.cursor.Object.LastEventTime) {
+		if !isZero(s.cursor.EventLogFile.LastEventTime) {
 			eventLogFile.Put("last_event_time", s.cursor.EventLogFile.LastEventTime)
 		}
 		cursor = mapstr.M{"event_log_file": eventLogFile}

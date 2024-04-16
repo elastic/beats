@@ -1,9 +1,9 @@
 dashboards:
-- id: salesforce-6c750440-5749-11ec-8f0b-05e8b06e1b10
-  file: salesforce-6c750440-5749-11ec-8f0b-05e8b06e1b10.json
-- id: salesforce-59ef0af0-5749-11ec-8f0b-05e8b06e1b10
-  file: salesforce-59ef0af0-5749-11ec-8f0b-05e8b06e1b10.json
-- id: salesforce-790da810-5749-11ec-8f0b-05e8b06e1b10
-  file: salesforce-790da810-5749-11ec-8f0b-05e8b06e1b10.json
-- id: salesforce-1659aef0-574c-11ec-8f0b-05e8b06e1b10
-  file: salesforce-1659aef0-574c-11ec-8f0b-05e8b06e1b10.json
+- id: 6e6bee90-f7e6-11ee-9088-0f36517484ce
+  file: 6e6bee90-f7e6-11ee-9088-0f36517484ce.json
+- id: cb7b4a40-f7ff-11ee-9088-0f36517484ce
+  file: cb7b4a40-f7ff-11ee-9088-0f36517484ce.json
+- id: 243e40b0-f891-11ee-9088-0f36517484ce
+  file: 243e40b0-f891-11ee-9088-0f36517484ce.json
+- id: c66be450-f891-11ee-9088-0f36517484ce
+  file: c66be450-f891-11ee-9088-0f36517484ce.json
