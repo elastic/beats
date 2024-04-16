@@ -19,10 +19,10 @@ steps:
         - github_commit_status:
             context: "Deploy/k8s-checks"
 
-    - label: "K8S Test/K8S version: v1.29.0"
-      key: "k8s-test-129"
+    - label: "K8S Test/K8S version: v1.21.14"
+      key: "k8s-test-121"
       env:
-        K8S_VERSION: "v1.29.0"
+        K8S_VERSION: "v1.21.14"
       commands:
         - "MODULE=kubernetes make -C metricbeat integration-tests"
         - "make -C deploy/kubernetes test"
@@ -32,12 +32,12 @@ steps:
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:
-            context: "Deploy/k8s-test v1.29.0"
+            context: "Deploy/k8s-test v1.21.14"
 
-    - label: "K8S Test/K8S version: v1.28.0"
-      key: "k8s-test-128"
+    - label: "K8S Test/K8S version: v1.20.15"
+      key: "k8s-test-120"
       env:
-        K8S_VERSION: "v1.28.0"
+        K8S_VERSION: "v1.20.15"
       commands:
         - "MODULE=kubernetes make -C metricbeat integration-tests"
         - "make -C deploy/kubernetes test"
@@ -47,12 +47,12 @@ steps:
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:
-            context: "Deploy/k8s-test v1.28.0"
+            context: "Deploy/k8s-test v1.20.15"
 
-    - label: "K8S Test/K8S version: v1.27.3"
-      key: "k8s-test-1273"
+    - label: "K8S Test/K8S version: v1.19.16"
+      key: "k8s-test-119"
       env:
-        K8S_VERSION: "v1.27.3"
+        K8S_VERSION: "v1.19.16"
       commands:
         - "MODULE=kubernetes make -C metricbeat integration-tests"
         - "make -C deploy/kubernetes test"
@@ -62,19 +62,4 @@ steps:
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:
-            context: "Deploy/k8s-test v1.27.3"
-
-    - label: "K8S Test/K8S version: v1.26.6"
-      key: "k8s-test-1266"
-      env:
-        K8S_VERSION: "v1.26.6"
-      commands:
-        - "MODULE=kubernetes make -C metricbeat integration-tests"
-        - "make -C deploy/kubernetes test"
-      agents:
-        provider: "gcp"
-        image: "${IMAGE_UBUNTU_X86_64}"
-        machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-      notify:
-        - github_commit_status:
-            context: "Deploy/k8s-test v1.26.6"
+            context: "Deploy/k8s-test v1.19.16"
