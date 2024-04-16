@@ -35,6 +35,12 @@ steps:
           echo "+++ Restoring Artifacts"
           buildkite-agent artifact download "x-pack/agentbeat/build/**/*" . --build 018ee68f-2b88-48b5-9326-a3f14e5c9723
 
+          ls -lah x-pack/agentbeat/build/distributions/
+          mkdir agentbeat
+          mv x-pack/agentbeat/build/distributions/* agentbeat
+          mv agentbeat x-pack/agentbeat/build/distributions/
+          ls x-pack/agentbeat/build/distributions/agentbeat
+
           echo "+++ Changing permissions for the release manager"
           sudo chown -R :1000 x-pack/agentbeat/build/distributions/
 
