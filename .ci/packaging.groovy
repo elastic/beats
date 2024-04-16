@@ -282,7 +282,7 @@ def generateLinuxStep(beat) {
         withGithubNotify(context: "Packaging Linux ${beat}") {
           deleteDir()
           if (beat.equals('x-pack/agentbeat') || beat.equals('x-pack/osquerybeat')) {
-            sh(label: 'install msitools', script: '.ci/scripts/install-msitools.sh')
+            sh(label: 'install msitools', script: '.buildkite/scripts/install-msitools.sh')
           }
           release('snapshot')
           dir("${BASE_DIR}"){
