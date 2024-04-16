@@ -1,9 +1,15 @@
 when:
     branches: true             ## for all the branches
     changeset:                 ## when PR contains any of those entries in the changeset
-        - "^agentbeat/.*"
-        - "@ci"                ## special token regarding the changeset for the ci
-        - "@oss"               ## special token regarding the changeset for the oss
+        - "^x-pack/agentbeat/.*"
+        - "^auditbeat/.*"
+        - "^filebeat/.*"
+        - "^heartbeat/.*"
+        - "^metricbeat/.*"
+        - "^osquerybeat/.*"
+        - "^packetbeat/.*"
+        - "@oss"
+        - "@xpack"
     comments:                  ## when PR comment contains any of those entries
         - "/test agentbeat"
     labels:                    ## when PR labels matches any of those entries
