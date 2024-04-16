@@ -27,7 +27,7 @@ steps:
           - "x-pack/agentbeat/build/distributions/**/*"
 
       - label: ":elastic-stack: Publishing to DRA Snapshot"
-        key: dra-publish
+        key: dra-publish-snapshot
         depends_on: package-agentbeat-snapshot
         agents:
           provider: "gcp"
@@ -71,7 +71,7 @@ steps:
           - "x-pack/agentbeat/build/distributions/**/*"
 
       - label: ":elastic-stack: Publishing to DRA Snapshot"
-        key: dra-publish
+        key: dra-publish-staging
         depends_on: package-agentbeat-staging
         agents:
           provider: "gcp"
