@@ -814,16 +814,25 @@ class TestCase(unittest.TestCase, ComposeMixin):
                     return True
             return False
 
+        undocumented_keys = []
+        is_documented_aliases = []
+
         for key in flat.keys():
             meta_key = key.startswith('@metadata.')
             # Range keys as used in 'date_range' etc will not have docs of course
             is_range_key = key.split('.')[-1] in ['gte', 'gt', 'lte', 'lt']
+
             if not(is_documented(key, expected_fields) or meta_key or is_range_key):
-                raise Exception(
-                    f"Key '{key}' found in event ({str(evt)}) is not documented!")
+                undocumented_keys.append(key)
+
             if is_documented(key, aliases):
-                raise Exception(
-                    "Key '{key}' found in event is documented as an alias!")
+                is_documented_aliases.append(key)
+
+        if undocumented_keys:
+            raise Exception(f"Keys {undocumented_keys} not documented in event {str(evt)}")
+
+        if is_documented_aliases:
+            raise Exception(f"Keys {is_documented_aliases} documented as aliases!")
 
     def get_beat_version(self):
         """

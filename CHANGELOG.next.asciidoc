@@ -18,12 +18,38 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Filebeat*
 
 - Convert netflow input to API v2 and disable event normalisation {pull}37901[37901]
+- Removed deprecated ZScaler from Beats. Use the https://docs.elastic.co/integrations/zscaler_zia[Zscaler Internet Access] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Tomcat from Beats. Use the https://docs.elastic.co/integrations/apache_tomcat[Apache Tomcat] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Squid from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated SonicWall from Beats. Use the https://docs.elastic.co/integrations/sonicwall[SonicWall Firewall] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Sonicwall from Beats. Use the https://docs.elastic.co/integrations/sonicwall[SonicWall Firewall] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Snort from Beats. Use the https://docs.elastic.co/integrations/snort[Snort] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Radware from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Proofpoint from Beats. Use the https://docs.elastic.co/integrations/proofpoint_tap[Proofpoint TAP] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Netscout from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Microsoft DHCP from Beats. Use the https://docs.elastic.co/integrations/microsoft_dhcp[Microsoft DHCP] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Juniper Junos from Beats. Use the https://docs.elastic.co/integrations/juniper_srx[Juniper SRX] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Juniper Netscreen from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Infoblox from Beats. Use the https://docs.elastic.co/integrations/infoblox_nios[Infoblox NIOS] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Impreva from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Fortinet Client Endpoint from Beats. Use the https://docs.elastic.co/integrations/fortinet_forticlient[Fortinet FortiClient Logs] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Fortinet Fortimail from Beats. Use the https://docs.elastic.co/integrations/fortinet_fortimail[Fortinet FortiMail] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Fortinet Fortimanager from Beats. Use the https://docs.elastic.co/integrations/fortinet_fortimanager[Fortinet FortiManager Logs] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated F5 from Beats. Use the https://docs.elastic.co/integrations/f5_bigip[F5 BIG-IP] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Cylance from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Cisco Meraki from Beats. Use the https://docs.elastic.co/integrations/cisco_meraki[Cisco Meraki] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Cisco Nexus from Beats. Use the https://docs.elastic.co/integrations/cisco_nexus[Cisco Nexus] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Bluecoat from Beats. See <<migrate-from-deprecated-module>> for migration options. {pull}38037[38037]
+- Removed deprecated Barracuda from Beats. Use the https://docs.elastic.co/integrations/barracuda[Barracuda Web Application Firewall] Elastic integration instead. {pull}38037[38037]
+- Removed deprecated Sophos UTM from Beats. Use the https://docs.elastic.co/integrations/sophos[Sophos] Elastic integration instead. {pull}38037[38037]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
+- Update Salesforce module to use new Salesforce input. {pull}37509[37509]
 
 
 *Heartbeat*
 
 *Metricbeat*
+
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 
 *Osquerybeat*
@@ -45,6 +71,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
+
 - Support for multiline zookeeper logs {issue}2496[2496]
 - Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
 - Fix namespacing on self-monitoring {pull}32336[32336]
@@ -157,6 +184,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
 - Add process data to file events (Linux only, eBPF backend). {pull}38199[38199]
 - Add container id to file events (Linux only, eBPF backend). {pull}38328[38328]
+- Add procfs backend to the `add_session_metadata` processor. {pull}38799[38799]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
 
 *Filebeat*
@@ -216,9 +244,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Libbeat*
+
 - Add support for linux capabilities in add_process_metadata. {pull}38252[38252]
 
+
 *Heartbeat*
+
 - Added status to monitor run log report.
 
 *Metricbeat*
@@ -233,6 +264,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add linux IO metrics to system/process {pull}37213[37213]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 - Add SSL support to mysql module {pull}37997[37997]
+- Add SSL support for aerospike module {pull}38126[38126]
 
 
 *Metricbeat*
@@ -244,18 +276,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Packetbeat*
 
 
-*Packetbeat*
-
-
 *Winlogbeat*
 
 
 *Functionbeat*
-
-
-*Winlogbeat*
-
-
 
 *Elastic Log Driver*
 *Elastic Logging Plugin*
@@ -269,6 +293,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Filebeat*
 
 - Deprecate `syslog` input in favor of `syslog` processor. {issue}37555[37555] {pull}38277[38277]
+- Deprecate `o365audit` input in favor of `CEL` input. {issue}37719[37719] {pull}38922[38922]
 
 *Heartbeat*
 
