@@ -112,9 +112,9 @@ var (
 					"count": c.Int("query_total"),
 				},
 			}),
-			"shard_stats": s.Object{
+			"shard_stats": c.Dict("shard_stats", s.Schema{
 				"total_count": c.Int("total_count"),
-			},
+			}, c.DictOptional),
 			"store": c.Dict("store", s.Schema{
 				"size": s.Object{
 					"bytes": c.Int("size_in_bytes"),
