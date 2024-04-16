@@ -18,7 +18,8 @@ steps:
         command: |
           sudo apt-get update -y
           DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes msitools
-          cd x-pack/agentbeat && mage package
+          cd x-pack/agentbeat && mage package && cd -
+          echo $$PWD
           buildkite-agent artifact upload "x-pack/agentbeat/build/distributions/**/*"  --job $${BUILDKITE_TRIGGERED_FROM_BUILD_ID}
 
         env:
