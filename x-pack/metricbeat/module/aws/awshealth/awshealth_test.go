@@ -158,20 +158,20 @@ func TestGetEventDetails(t *testing.T) {
 	// Create a slice to store AWSHealthMetrics
 	var awsHealthMetrics = make([]AWSHealthMetric, 0, len(eventsOutput.Events))
 
-	for i, event := range eventsOutput.Events {
+	for _, event := range eventsOutput.Events {
 		// Create a new instance of AWSHealthMetric
 
 		awsHealthMetric := AWSHealthMetric{
 			EventArn:          *event.Arn,
 			EndTime:           *event.EndTime,
-			EventScopeCode:    aws.ToString((*string)(&eventsOutput.Events[i].EventScopeCode)),
-			EventTypeCategory: aws.ToString((*string)(&eventsOutput.Events[i].EventTypeCategory)),
+			EventScopeCode:    string(event.EventScopeCode),
+			EventTypeCategory: string(event.EventTypeCategory),
 			EventTypeCode:     *event.EventTypeCode,
 			LastUpdatedTime:   *event.LastUpdatedTime,
 			Region:            *event.Region,
 			Service:           *event.Service,
 			StartTime:         *event.StartTime,
-			StatusCode:        aws.ToString((*string)(&eventsOutput.Events[i].StatusCode)),
+			StatusCode:        string(event.StatusCode),
 		}
 		// Call DescribeEventDetails for the current event
 		eventDetailsOutput, err := awsHealth.DescribeEventDetails(ctx, &health.DescribeEventDetailsInput{

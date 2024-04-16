@@ -197,20 +197,20 @@ func (m *MetricSet) getEventDetails(
 		deEvents = currentPage.Events
 		eventArns := make([]string, len(deEvents))
 		// Iterate through events to extract relevant information
-		for i := range deEvents {
+		for i, de := range deEvents {
 			healthDetailsTemp = append(healthDetailsTemp, AWSHealthMetric{
-				EventArn:          awssdk.ToString(deEvents[i].Arn),
-				EndTime:           awssdk.ToTime(deEvents[i].EndTime),
-				EventScopeCode:    awssdk.ToString((*string)(&deEvents[i].EventScopeCode)),
-				EventTypeCategory: awssdk.ToString((*string)(&deEvents[i].EventTypeCategory)),
-				EventTypeCode:     awssdk.ToString(deEvents[i].EventTypeCode),
-				LastUpdatedTime:   awssdk.ToTime(deEvents[i].LastUpdatedTime),
-				Region:            awssdk.ToString(deEvents[i].Region),
-				Service:           awssdk.ToString(deEvents[i].Service),
-				StartTime:         awssdk.ToTime(deEvents[i].StartTime),
-				StatusCode:        awssdk.ToString((*string)(&deEvents[i].StatusCode)),
+				EventArn:          awssdk.ToString(de.Arn),
+				EndTime:           awssdk.ToTime(de.EndTime),
+				EventScopeCode:    string(de.EventScopeCode),
+				EventTypeCategory: string(de.EventTypeCategory),
+				EventTypeCode:     awssdk.ToString(de.EventTypeCode),
+				LastUpdatedTime:   awssdk.ToTime(de.LastUpdatedTime),
+				Region:            awssdk.ToString(de.Region),
+				Service:           awssdk.ToString(de.Service),
+				StartTime:         awssdk.ToTime(de.StartTime),
+				StatusCode:        string(de.StatusCode),
 			})
-			eventArns[i] = awssdk.ToString(deEvents[i].Arn)
+			eventArns[i] = awssdk.ToString(de.Arn)
 		}
 		// Fetch event details for the current page of events
 		eventDetails, err := awsHealth.DescribeEventDetails(ctx, &health.DescribeEventDetailsInput{
@@ -250,20 +250,19 @@ func (m *MetricSet) getEventDetails(
 				break
 			}
 			// Extract relevant details of affected entities and match them with event details
-			for k := range affCurrentPage.Entities {
+			for _, ace := range affCurrentPage.Entities {
 				affEntityTemp = AffectedEntityDetails{
-					AwsAccountId:    awssdk.ToString(affCurrentPage.Entities[k].AwsAccountId),
-					EntityUrl:       awssdk.ToString(affCurrentPage.Entities[k].EntityUrl),
-					EntityValue:     awssdk.ToString(affCurrentPage.Entities[k].EntityValue),
-					LastUpdatedTime: awssdk.ToTime(affCurrentPage.Entities[k].LastUpdatedTime),
-					StatusCode:      awssdk.ToString((*string)(&affCurrentPage.Entities[k].StatusCode)),
-					EntityArn:       awssdk.ToString(affCurrentPage.Entities[k].EntityArn),
+					AwsAccountId:    awssdk.ToString(ace.AwsAccountId),
+					EntityUrl:       awssdk.ToString(ace.EntityUrl),
+					EntityValue:     awssdk.ToString(ace.EntityValue),
+					LastUpdatedTime: awssdk.ToTime(ace.LastUpdatedTime),
+					StatusCode:      string(ace.StatusCode),
+					EntityArn:       awssdk.ToString(ace.EntityArn),
 				}
-				for l := range healthDetailsTemp {
-
-					if awssdk.ToString(affCurrentPage.Entities[k].EventArn) == healthDetailsTemp[l].EventArn {
+				for l, hd := range healthDetailsTemp {
+					if awssdk.ToString(ace.EventArn) == hd.EventArn {
 						healthDetailsTemp[l].AffectedEntities = append(healthDetailsTemp[l].AffectedEntities, affEntityTemp)
-						switch awssdk.ToString((*string)(&affCurrentPage.Entities[k].StatusCode)) {
+						switch string(ace.StatusCode) {
 						case "PENDING":
 							healthDetailsTemp[l].AffectedEntitiesPending++
 						case "RESOLVED":
@@ -277,7 +276,6 @@ func (m *MetricSet) getEventDetails(
 					}
 				}
 			}
-
 		}
 		// Append current page's health details to the overall list
 		healthDetails = append(healthDetails, healthDetailsTemp...)
