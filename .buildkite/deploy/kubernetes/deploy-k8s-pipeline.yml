@@ -4,9 +4,6 @@ env:
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
 
-  # Other deps
-  ASDF_MAGE_VERSION: 1.13.0
-
 steps:
   - group: "Deploy/K8S"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false" && build.env("GITHUB_PR_LABELS") =~ /.*kubernetes.*/
