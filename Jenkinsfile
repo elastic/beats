@@ -119,25 +119,6 @@ pipeline {
         runBuildAndTest(filterStage: 'packaging')
       }
     }
-    stage('Packaging-Pipeline') {
-      agent none
-      options { skipDefaultCheckout() }
-      when {
-        allOf {
-          anyOf {
-            expression { return env.GO_MOD_CHANGES == "true" }
-            expression { return env.PACKAGING_CHANGES == "true" }
-          }
-          changeRequest()
-        }
-      }
-      steps {
-        withGithubNotify(context: 'Packaging') {
-          build(job: "Beats/packaging/${env.BRANCH_NAME}", propagate: true,  wait: true)
-        }
-      }
-    }
-  }
     stage('Build&Test') {
       options { skipDefaultCheckout() }
       when {
@@ -192,8 +173,26 @@ pipeline {
       steps {
         runBuildAndTest(filterStage: 'extended_win')
       }
+    }    
+    stage('Packaging-Pipeline') {
+      agent none
+      options { skipDefaultCheckout() }
+      when {
+        allOf {
+          anyOf {
+            expression { return env.GO_MOD_CHANGES == "true" }
+            expression { return env.PACKAGING_CHANGES == "true" }
+          }
+          changeRequest()
+        }
+      }
+      steps {
+        withGithubNotify(context: 'Packaging') {
+          build(job: "Beats/packaging/${env.BRANCH_NAME}", propagate: true,  wait: true)
+        }
+      }
     }
-    
+  }
   post {
     success {
       writeFile(file: 'packaging.properties', text: """## To be consumed by the packaging pipeline
