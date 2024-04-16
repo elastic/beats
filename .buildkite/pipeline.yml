@@ -220,8 +220,7 @@ steps:
                 - go.mod
                 - pytest.ini
                 - dev-tools/
-                - libbeat/**
-                - testing/**
+                - testing/
               config:
                 trigger: "beats-libbeat"
                 build:
