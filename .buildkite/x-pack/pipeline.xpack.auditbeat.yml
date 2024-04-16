@@ -49,6 +49,7 @@ steps:
       - label: ":rhel: RHEL9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
         command: |
+          source /opt/buildkite-agent/hooks/pre-command
           cd x-pack/auditbeat
           mage build unitTest
         agents:
