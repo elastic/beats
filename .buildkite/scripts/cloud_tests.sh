@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# What Terraform Module will run
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
-  export MODULE_DIR="x-pack/filebeat/input/awss3/_meta/terraform"
-fi
 
 teardown() {
   popd
