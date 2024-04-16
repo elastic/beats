@@ -67,6 +67,7 @@ ENABLED_BEATS_PIPELINES_SLUGS=(
   "beats-xpack-dockerlogbeat"
   "beats-xpack-auditbeat"
   "beats-xpack-heartbeat"
+  "beats-xpack-metricbeat"
   "deploy-k8s"
 )
 
