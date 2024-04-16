@@ -70,7 +70,6 @@ ENABLED_BEATS_PIPELINES_SLUGS=(
   "beats-xpack-filebeat"
   "beats-xpack-metricbeat"
   "beats-xpack-heartbeat"
-  "beats-xpack-osquerybeat"
   "deploy-k8s"
 )
 
