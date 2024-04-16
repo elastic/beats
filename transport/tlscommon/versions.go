@@ -46,6 +46,8 @@ func (v *TLSVersion) Unpack(i interface{}) error {
 			return fmt.Errorf("invalid tls version '%v'", o)
 		}
 		*v = version
+	case int64:
+		*v = TLSVersion(o)
 	case uint64:
 		*v = TLSVersion(o)
 	default:

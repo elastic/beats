@@ -29,6 +29,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/config"
+
+	ucfg "github.com/elastic/go-ucfg"
+	"github.com/elastic/go-ucfg/json"
 )
 
 const (
@@ -70,6 +73,50 @@ func load(yamlStr string) (*Config, error) {
 
 func mustLoad(t *testing.T, yamlStr string) *Config {
 	cfg, err := load(yamlStr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return cfg
+}
+
+// copied from config.fromConfig
+func cfgConvert(in *ucfg.Config) *config.C {
+	return (*config.C)(in)
+}
+
+func loadJSON(jsonStr string) (*Config, error) {
+	var cfg Config
+	uc, err := json.NewConfig([]byte(jsonStr), ucfg.PathSep("."), ucfg.VarExp)
+	if err != nil {
+		return nil, err
+	}
+
+	c := cfgConvert(uc)
+
+	if err = c.Unpack(&cfg); err != nil {
+		return nil, err
+	}
+	return &cfg, nil
+}
+
+func loadServerConfigJSON(jsonStr string) (*ServerConfig, error) {
+	var cfg ServerConfig
+	uc, err := json.NewConfig([]byte(jsonStr), ucfg.PathSep("."), ucfg.VarExp)
+	if err != nil {
+		return nil, err
+	}
+
+	c := cfgConvert(uc)
+
+	if err = c.Unpack(&cfg); err != nil {
+		return nil, err
+	}
+	return &cfg, nil
+}
+
+func mustLoadServerConfigJSON(t *testing.T, jsonStr string) *ServerConfig {
+	t.Helper()
+	cfg, err := loadServerConfigJSON(jsonStr)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -647,6 +694,7 @@ mrPVWmOCMtwHJrO7kF1ENDgHPkhoZFcpFhu3lzOY7mhpW5mPZPVs87ZmI75G7zMV
 AcV8KJqa/7XTTpvIzXePw9FtSSux5SkU6iKAKqwUt82D1E73bbppSg==
 -----END CERTIFICATE-----
 `
+			//nolint:gosec // testing key
 			key := `
 -----BEGIN RSA PRIVATE KEY-----
 Proc-Type: 4,ENCRYPTED

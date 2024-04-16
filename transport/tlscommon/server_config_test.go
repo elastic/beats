@@ -173,3 +173,80 @@ func Test_ServerConfig_Repack(t *testing.T) {
 		})
 	}
 }
+
+func Test_ServerConfig_RepackJSON(t *testing.T) {
+	tests := []struct {
+		name string
+		json string
+		auth *TLSClientAuth
+	}{{
+		name: "with client auth",
+		json: `{
+    "enabled": true,
+    "verification_mode": "certificate",
+    "supported_protocols": ["TLSv1.1", "TLSv1.2"],
+    "cipher_suites": ["RSA-AES-256-CBC-SHA"],
+    "certificate_authorities": ["/path/to/ca.crt"],
+    "certificate": "/path/to/cert.crt",
+    "key": "/path/to/key.crt",
+    "curve_types": "P-521",
+    "renegotiation": "freely",
+    "ca_sha256": ["example"],
+    "ca_trusted_fingerprint": "fingerprint",
+    "client_authentication": "optional"
+    }`,
+		auth: &optional,
+	}, {
+		name: "nil client auth",
+		json: `{
+    "enabled": true,
+    "verification_mode": "certificate",
+    "supported_protocols": ["TLSv1.1", "TLSv1.2"],
+    "cipher_suites": ["RSA-AES-256-CBC-SHA"],
+    "certificate_authorities": ["/path/to/ca.crt"],
+    "certificate": "/path/to/cert.crt",
+    "key": "/path/to/key.crt",
+    "curve_types": "P-521",
+    "renegotiation": "freely",
+    "ca_sha256": ["example"],
+    "ca_trusted_fingerprint": "fingerprint"
+    }`,
+		auth: &required,
+	}, {
+		name: "nil client auth, no cas",
+		json: `{
+    "enabled": true,
+    "verification_mode": "certificate",
+    "supported_protocols": ["TLSv1.1", "TLSv1.2"],
+    "cipher_suites": ["RSA-AES-256-CBC-SHA"],
+    "certificate": "/path/to/cert.crt",
+    "key": "/path/to/key.crt",
+    "curve_types": "P-521",
+    "renegotiation": "freely",
+    "ca_sha256": ["example"]
+    }`,
+		auth: nil,
+	}}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := mustLoadServerConfigJSON(t, tc.json)
+			if tc.auth != nil {
+				require.Equal(t, *tc.auth, *cfg.ClientAuth)
+			} else {
+				require.Nil(t, cfg.ClientAuth)
+			}
+
+			tmp, err := ucfg.NewFrom(cfg)
+			require.NoError(t, err)
+
+			err = tmp.Unpack(&cfg)
+			require.NoError(t, err)
+			if tc.auth != nil {
+				require.Equal(t, *tc.auth, *cfg.ClientAuth)
+			} else {
+				require.Nil(t, cfg.ClientAuth)
+			}
+		})
+	}
+}

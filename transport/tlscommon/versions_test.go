@@ -21,6 +21,7 @@ import (
 	"crypto/tls"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -66,6 +67,50 @@ func TestTLSVersion(t *testing.T) {
 				require.Equal(t, tt.name, "unknown")
 			} else {
 				require.Equal(t, tt.name, tv.String())
+			}
+		})
+	}
+}
+
+func Test_TLSVersion_Unpack(t *testing.T) {
+	tests := []struct {
+		name   string
+		hasErr bool
+		in     interface{}
+		exp    TLSVersion
+	}{{
+		name:   "unknown string",
+		hasErr: true,
+		in:     "unknown",
+	}, {
+		name:   "string",
+		hasErr: false,
+		in:     "TLSv1.2",
+		exp:    TLSVersion12,
+	}, {
+		name:   "int64",
+		hasErr: false,
+		in:     int64(0x303),
+		exp:    TLSVersion12,
+	}, {
+		name:   "uint64",
+		hasErr: false,
+		in:     uint64(0x303),
+		exp:    TLSVersion12,
+	}, {
+		name:   "unknown type",
+		hasErr: true,
+		in:     uint8(1),
+	}}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			v := new(TLSVersion)
+			err := v.Unpack(tc.in)
+			if tc.hasErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tc.exp, *v)
 			}
 		})
 	}

@@ -177,6 +177,8 @@ func (m *TLSVerificationMode) Unpack(in interface{}) error {
 			return fmt.Errorf("unknown verification mode '%v'", o)
 		}
 		*m = mode
+	case int64:
+		*m = TLSVerificationMode(o)
 	case uint64:
 		*m = TLSVerificationMode(o)
 	default:
@@ -244,6 +246,8 @@ func (cs *CipherSuite) Unpack(i interface{}) error {
 		}
 
 		*cs = suite
+	case int64:
+		*cs = CipherSuite(o)
 	case uint64:
 		*cs = CipherSuite(o)
 	default:
@@ -270,6 +274,8 @@ func (ct *tlsCurveType) Unpack(i interface{}) error {
 		}
 
 		*ct = t
+	case int64:
+		*ct = tlsCurveType(o)
 	case uint64:
 		*ct = tlsCurveType(o)
 	default:
@@ -296,6 +302,8 @@ func (r *TLSRenegotiationSupport) Unpack(i interface{}) error {
 		}
 
 		*r = t
+	case int64:
+		*r = TLSRenegotiationSupport(o)
 	case uint64:
 		*r = TLSRenegotiationSupport(o)
 	default:
