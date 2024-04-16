@@ -199,6 +199,8 @@ steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
         command: |
+          sudo apt-get update -y
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes msitools
           cd x-pack/osquerybeat
           mage package
         agents:
