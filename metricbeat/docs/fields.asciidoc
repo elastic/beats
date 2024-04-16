@@ -32239,6 +32239,14 @@ type: long
 --
 
 
+*`elasticsearch.node.stats.indices.shard_stats.total_count`*::
++
+--
+type: long
+
+--
+
+
 *`elasticsearch.node.stats.indices.segments.doc_values.memory.bytes`*::
 +
 --
