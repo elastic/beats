@@ -200,7 +200,7 @@ steps:
       - label: ":linux: Ubuntu ARM Unit Tests"
         command: |
           cd x-pack/auditbeat
-          mage build unitTest"
+          mage build unitTest
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
