@@ -64,7 +64,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Change cache processor documentation from `write_period` to `write_interval`. {pull}38561[38561]
 - Fix cache processor expiries heap cleanup on partial file writes. {pull}38561[38561]
 - Fix cache processor expiries infinite growth when large a large TTL is used and recurring keys are cached. {pull}38561[38561]
-- Fix parsing of RFC 3164 process IDs in syslog processor. {issue}38947[38947] {pull}1[1]
+- Fix parsing of RFC 3164 process IDs in syslog processor. {issue}38947[38947] {pull}38982[38982]
 
 *Auditbeat*
 
