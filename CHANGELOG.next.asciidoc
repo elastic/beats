@@ -132,6 +132,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix filestream's registry GC: registry entries are now removed from the in-memory and disk store when they're older than the set TTL {issue}36761[36761] {pull}38488[38488]
 - [threatintel] MISP splitting fix for empty responses {issue}38739[38739] {pull}38917[38917]
 - Prevent GCP Pub/Sub input blockage by increasing default value of `max_outstanding_messages` {issue}35029[35029] {pull}38985[38985]
+- entity-analytics input: Fix format of some log messages. {pull}38990[38990]
 
 *Heartbeat*
 
