@@ -212,15 +212,15 @@ steps:
           diff: "git diff --name-only ${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
-                - x-pack/libbeat/**
+                - x-pack/libbeat/
                 - .buildkite/x-pack/pipeline.xpack.libbeat.yml
                 - .buildkite/scripts
                 - .buildkite/hooks
                 #OSS
                 - go.mod
                 - pytest.ini
-                - dev-tools/**
-                - testing/**
+                - dev-tools/
+                - testing/
               config:
                 trigger: "beats-xpack-libbeat"
                 build:
