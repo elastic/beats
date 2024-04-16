@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/benchmark"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cel"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cloudfoundry"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics"
@@ -45,5 +46,6 @@ func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2
 		shipper.Plugin(log, store),
 		websocket.Plugin(log, store),
 		netflow.Plugin(log),
+		benchmark.Plugin(),
 	}
 }

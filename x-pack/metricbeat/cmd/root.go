@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/v7/libbeat/cmd"
@@ -46,7 +47,6 @@ var withECSVersion = processing.WithFields(mapstr.M{
 })
 
 func init() {
-	management.ConfigTransform.SetTransform(metricbeatCfg)
 	var runFlags = pflag.NewFlagSet(Name, pflag.ExitOnError)
 	runFlags.AddGoFlag(flag.CommandLine.Lookup("system.hostfs"))
 	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
@@ -63,6 +63,9 @@ func init() {
 	RootCmd = cmd.GenRootCmdWithSettings(beater.DefaultCreator(), settings)
 	RootCmd.AddCommand(cmd.GenModulesCmd(Name, "", mbcmd.BuildModulesManager))
 	RootCmd.TestCmd.AddCommand(test.GenTestModulesCmd(Name, "", beater.DefaultTestModulesCreator()))
+	RootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		management.ConfigTransform.SetTransform(metricbeatCfg)
+	}
 }
 
 func defaultProcessors() []mapstr.M {
