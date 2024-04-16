@@ -8,34 +8,34 @@ steps:
   - group: ":Publishing Snapshot Artifacts"
     key: "package-snapshot"
     steps:
-      - label: ":package: Cross Building and package agentbeat"
-        key: package-agentbeat-snapshot
-        agents:
-          provider: "gcp"
-          machineType: "c2-standard-16"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          diskSizeGb: 400
-        command: |
-          sudo apt-get update -y
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes msitools
-          cd x-pack/agentbeat && mage package
+      # - label: ":package: Cross Building and package agentbeat"
+      #   key: package-agentbeat-snapshot
+      #   agents:
+      #     provider: "gcp"
+      #     machineType: "c2-standard-16"
+      #     image: "${IMAGE_UBUNTU_X86_64}"
+      #     diskSizeGb: 400
+      #   command: |
+      #     sudo apt-get update -y
+      #     DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes msitools
+      #     cd x-pack/agentbeat && mage package
 
-        env:
-          SNAPSHOT: true
+      #   env:
+      #     SNAPSHOT: true
 
-        artifact_paths:
-          - "x-pack/agentbeat/build/distributions/**/*"
+      #   artifact_paths:
+      #     - "x-pack/agentbeat/build/distributions/**/*"
 
       - label: ":elastic-stack: Publishing to DRA Snapshot"
         key: dra-publish
-        depends_on: package-agentbeat-snapshot
+        # depends_on: package-agentbeat-snapshot
         agents:
           provider: "gcp"
           #--build 018ee68f-2b88-48b5-9326-a3f14e5c9723
         command: |
           echo "+++ Restoring Artifacts"
 
-          buildkite-agent artifact download "x-pack/agentbeat/build/**/*" .  
+          buildkite-agent artifact download "x-pack/agentbeat/build/**/*" . --build 018ee68f-2b88-48b5-9326-a3f14e5c9723
 
           mkdir agentbeat
           mv x-pack/agentbeat/build/distributions/* agentbeat

@@ -4,7 +4,7 @@ DRY_RUN=""
 
 if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" || "${BUILDKITE_BRANCH}" == "ci_agentbeat_pack" ]]; then
     BRANCH=main
-    DRY_RUN="--dry-run"
+    # DRY_RUN="--dry-run"
     echo "+++ Running in PR and setting branch main and --dry-run"
 fi
 
