@@ -50,7 +50,7 @@ cd x-pack/agentbeat && docker run --rm \
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
         -e VAULT_ROLE_ID="${VAULT_ROLE_ID_SECRET}" \
         -e VAULT_SECRET_ID="${VAULT_SECRET}" \
-        --mount type=bind,readonly=false,src="${PWD}/x-pack/agentbeat/",target=/artifacts \
+        --mount type=bind,readonly=false,src="${PWD}",target=/artifacts \
         docker.elastic.co/infra/release-manager:latest \
         cli collect \
         --project "beats/agentbeat" \
