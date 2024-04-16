@@ -69,6 +69,7 @@ class TestRemoteWrite(metricbeat.BaseTest):
 
     COMPOSE_SERVICES = ['prometheus-host-network']
 
+    @unittest.skip("use of host network incompatible with docker update: https://github.com/elastic/beats/issues/38854")
     @unittest.skipUnless(metricbeat.INTEGRATION_TESTS, "integration test")
     def test_remote_write(self):
         """
