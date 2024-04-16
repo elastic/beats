@@ -48,6 +48,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 *Metricbeat*
+
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 
 *Osquerybeat*
@@ -69,6 +70,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 ==== Bugfixes
 
 *Affecting all Beats*
+
 - Support for multiline zookeeper logs {issue}2496[2496]
 - Add checks to ensure reloading of units if the configuration actually changed. {pull}34346[34346]
 - Fix namespacing on self-monitoring {pull}32336[32336]
@@ -242,9 +244,12 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 *Libbeat*
+
 - Add support for linux capabilities in add_process_metadata. {pull}38252[38252]
 
+
 *Heartbeat*
+
 - Added status to monitor run log report.
 
 *Metricbeat*
@@ -259,6 +264,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add linux IO metrics to system/process {pull}37213[37213]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 - Add SSL support to mysql module {pull}37997[37997]
+- Add SSL support for aerospike module {pull}38126[38126]
 
 
 *Metricbeat*
@@ -270,18 +276,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Packetbeat*
 
 
-*Packetbeat*
-
-
 *Winlogbeat*
 
 
 *Functionbeat*
-
-
-*Winlogbeat*
-
-
 
 *Elastic Log Driver*
 *Elastic Logging Plugin*
