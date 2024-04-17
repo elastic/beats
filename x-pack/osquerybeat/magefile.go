@@ -20,9 +20,11 @@ import (
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
+
 	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
 
 	// mage:import
@@ -181,6 +183,19 @@ func stripLinuxOsqueryd() error {
 
 	osArchs := osquerybeat.OSArchs(devtools.Platforms)
 
+	strip := func(oquerydPath string) error {
+		ok, err := fileutil.FileExists(oquerydPath)
+		if err != nil {
+			return err
+		}
+		if ok {
+			if err := execCommand(ctx, "strip", oquerydPath); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
 	for _, osarch := range osArchs {
 		// Skip everything but matching linux arch
 		if osarch.OS != os.Getenv("GOOS") || osarch.Arch != os.Getenv("GOARCH") {
@@ -195,35 +210,17 @@ func stripLinuxOsqueryd() error {
 		// This returns something like build/data/install/linux/amd64/osqueryd
 		querydRelativePath := distro.OsquerydPath(distro.GetDataInstallDir(osarch))
 
+		// Checking and stripping osqueryd binary and both paths osquerybeat/build and agentbeat/build
+		// because at the moment it's unclear if this step was initiated from osquerybeat or agentbeat build
 		osquerybeatPath := filepath.Clean(filepath.Join(cwd, "../..", querydRelativePath))
-		agentbeatPath := filepath.Clean(filepath.Join(cwd, "../../../agentbeat", querydRelativePath))
-
-		var osquerydPath string
-
-		ok, err := fileutil.FileExists(osquerybeatPath)
+		err = strip(osquerybeatPath)
 		if err != nil {
 			return err
 		}
-		if ok {
-			osquerydPath = osquerybeatPath
-		} else {
-			ok, err = fileutil.FileExists(agentbeatPath)
-			if err != nil {
-				return err
-			}
-			if ok {
-				osquerydPath = agentbeatPath
-			}
-		}
 
-		if osquerydPath == "" {
-			return errors.New("osqueryd binary is not found")
-		}
-
-		fmt.Println("The osqueryd binary found at:", osquerydPath)
-
-		// Check if the file exists under osquerybeat or agentbeat
-		if err := execCommand(ctx, "strip", osquerydPath); err != nil {
+		agentbeatPath := filepath.Clean(filepath.Join(cwd, "../../../agentbeat", querydRelativePath))
+		err = strip(agentbeatPath)
+		if err != nil {
 			return err
 		}
 	}
@@ -234,30 +231,12 @@ func stripLinuxOsqueryd() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	// This is to fix a defect in the field where msiexec fails to extract the osqueryd.exe
-	// from bundled osquery.msi, with error code 1603
-	// https://docs.microsoft.com/en-us/troubleshoot/windows-server/application-management/msi-installation-error-1603
-	// SDH: https://github.com/elastic/sdh-beats/issues/1575
-	// Currently we can't reproduce this is issue, but here we can eliminate the need for calling msiexec
-	// if extract the osqueryd.exe binary during the build.
-	//
-	// The cross build is currently called for two binaries osquerybeat and osqquery-extension
-	// Only extract osqueryd.exe during osquerybeat build on windows
-	args := devtools.DefaultGolangCrossBuildArgs()
-
-	if !strings.HasPrefix(args.Name, "osquery-extension-") {
-		// Extract osqueryd.exe from MSI
-		if err := extractFromMSI(); err != nil {
-			return err
-		}
-	}
-
 	// Strip linux osqueryd binary
 	if err := stripLinuxOsqueryd(); err != nil {
 		return err
 	}
 
-	return devtools.GolangCrossBuild(args)
+	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).

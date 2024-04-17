@@ -2964,7 +2964,8 @@ filebeat.inputs:
   #subscription.num_goroutines: 1
 
   # Maximum number of unprocessed messages to allow at any time.
-  #subscription.max_outstanding_messages: 1000
+  # This must be at least queue.mem.flush.min_events to prevent input blockage.
+  #subscription.max_outstanding_messages: 1600
 
   # Path to a JSON file containing the credentials and key used to subscribe.
   credentials_file: ${path.config}/my-pubsub-subscriber-credentials.json
