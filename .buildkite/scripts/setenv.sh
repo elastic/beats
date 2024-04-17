@@ -49,18 +49,9 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_S
   export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}oracle"
 fi
 
-if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-filebeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
+if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-filebeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" ]]; then
   source .buildkite/scripts/common.sh
-  if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
-    export ELASTIC_SYNTHETICS_CAPABLE=true
-  else
-    # Set the MODULE env variable if possible, it should be defined before generating pipeline's steps. It is used in multiple pipelines.
-    defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
-  fi
-fi
-
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
   # Set the MODULE env variable if possible, it should be defined before generating pipeline's steps. It is used in multiple pipelines.
-  source .buildkite/scripts/common.sh
   defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
+  fi
 fi

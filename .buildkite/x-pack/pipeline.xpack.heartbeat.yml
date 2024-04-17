@@ -3,10 +3,11 @@ name: "beats-xpack-heartbeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
-  BEATS_PROJECT_NAME: "x-pack/heartbeat"
+
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
@@ -18,166 +19,195 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
-  #Packaging
-  PACKAGING_ARM_PLATFORMS: "linux/arm64"
-  PACKAGING_PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+  # pipeline specific
+  ELASTIC_SYNTHETICS_CAPABLE: "true"
 
-  #Deps
+  # Other deps
   ASDF_MAGE_VERSION: 1.15.0
-
-notify:
-  - github_commit_status:
-      context: "$BEATS_PROJECT_NAME"
+  ASDF_NODEJS_VERSION: 18.17.1
 
 steps:
-  - group: "Mandatory Tests"
-    key: "mandatory-tests"
+  - group: "x-pack/heartbeat Mandatory Tests"
+    key: "x-pack-heartbeat-mandatory-tests"
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: "cd $BEATS_PROJECT_NAME && mage build unitTest"
+        command: |
+          set -euo pipefail
+          cd x-pack/heartbeat
+          echo "~~~ Installing @elastic/synthetics"
+          npm i -g @elastic/synthetics
+          echo "~~~ Running tests"
+          mage build unitTest
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
-          - "$BEATS_PROJECT_NAME/build/*.xml"
-          - "$BEATS_PROJECT_NAME/build/*.json"
+          - "x-pack/heartbeat/build/*.xml"
+          - "x-pack/heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "$BEATS_PROJECT_NAME: Ubuntu Unit Tests"
+              context: "x-pack/heartbeat: Ubuntu Unit Tests"
 
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
-        command: "cd $BEATS_PROJECT_NAME && mage goIntegTest"
+        command: |
+          set -euo pipefail
+          cd x-pack/heartbeat
+          echo "~~~ Installing @elastic/synthetics"
+          npm i -g @elastic/synthetics
+          echo "~~~ Running tests"
+          cd x-pack/heartbeat
+          mage goIntegTest
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
-          - "$BEATS_PROJECT_NAME/build/*.xml"
-          - "$BEATS_PROJECT_NAME/build/*.json"
+          - "x-pack/heartbeat/build/*.xml"
+          - "x-pack/heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "$BEATS_PROJECT_NAME: Go Integration Tests"
+              context: "x-pack/heartbeat: Go Integration Tests"
 
-  ####### skip: "see elastic/beats#23957 and elastic/beats#23958"
-  #     - label: ":windows: Windows 2016 Unit Tests"
-  #       command: |
-  #         Set-Location -Path $BEATS_PROJECT_NAME
-  #         mage build unitTest
-  #       key: "mandatory-win-2016-unit-tests"
-  #       agents:
-  #         provider: "gcp"
-  #         image: "${IMAGE_WIN_2016}"
-  #         machine_type: "${GCP_WIN_MACHINE_TYPE}"
-  #         disk_size: 100
-  #         disk_type: "pd-ssd"
-  #       artifact_paths:
-  #         - "$BEATS_PROJECT_NAME/build/*.xml"
-  #         - "$BEATS_PROJECT_NAME/build/*.json"
-  #       notify:
-  #         - github_commit_status:
-  #             context: "$BEATS_PROJECT_NAME: Windows 2016 Unit Tests"
+      - label: ":windows: Windows 2016 Unit Tests"
+        key: "mandatory-win-2016-unit-tests"
+        skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
+        command: |
+          Set-Location -Path x-pack/heartbeat
+          mage build unitTest
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2016}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/heartbeat/build/*.xml"
+          - "x-pack/heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/heartbeat: Windows 2016 Unit Tests"
 
-  #     - label: ":windows: Windows 2022 Unit Tests"
-  #       command: |
-  #         Set-Location -Path $BEATS_PROJECT_NAME
-  #         mage build unitTest
-  #       key: "mandatory-win-2022-unit-tests"
-  #       agents:
-  #         provider: "gcp"
-  #         image: "${IMAGE_WIN_2022}"
-  #         machine_type: "${GCP_WIN_MACHINE_TYPE}"
-  #         disk_size: 100
-  #         disk_type: "pd-ssd"
-  #       artifact_paths:
-  #         - "$BEATS_PROJECT_NAME/build/*.xml"
-  #         - "$BEATS_PROJECT_NAME/build/*.json"
-  #       notify:
-  #         - github_commit_status:
-  #             context: "$BEATS_PROJECT_NAME: Windows 2022 Unit Tests"
+      - label: ":windows: Windows 2022 Unit Tests"
+        key: "mandatory-win-2022-unit-tests"
+        skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
+        command: |
+          Set-Location -Path x-pack/heartbeat
+          mage build unitTest
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/heartbeat/build/*.xml"
+          - "x-pack/heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/heartbeat: Windows 2022 Unit Tests"
 
-  # - group: "Extended Windows Tests" ## TODO: this condition will be changed in the Phase 3
-  #   key: "extended-win-tests"
-  #   if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
-  #   steps:
-  #     - label: ":windows: Windows 10 Unit Tests"
-  #       command: |
-  #         Set-Location -Path $BEATS_PROJECT_NAME
-  #         mage build unitTest
-  #       key: "extended-win-10-unit-tests"
-  #       agents:
-  #         provider: "gcp"
-  #         image: "${IMAGE_WIN_10}"
-  #         machineType: "${GCP_WIN_MACHINE_TYPE}"
-  #         disk_size: 100
-  #         disk_type: "pd-ssd"
-  #       artifact_paths:
-  #         - "$BEATS_PROJECT_NAME/build/*.xml"
-  #         - "$BEATS_PROJECT_NAME/build/*.json"
-  #       notify:
-  #         - github_commit_status:
-  #             context: "$BEATS_PROJECT_NAME: Windows 10 Unit Tests"
+  - group: "x-pack/heartbeat Extended Windows Tests"
+    key: "x-pack-heartbeat-extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+    skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
+    steps:
+      - label: ":windows: Windows 10 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/heartbeat
+          mage build test
+        key: "extended-win-10-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/heartbeat/build/*.xml"
+          - "x-pack/heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/heartbeat: Windows 10 Unit Tests"
 
-  #     - label: ":windows: Windows 11 Unit Tests"
-  #       command: |
-  #         Set-Location -Path $BEATS_PROJECT_NAME
-  #         mage build unitTest
-  #       key: "extended-win-11-unit-tests"
-  #       agents:
-  #         provider: "gcp"
-  #         image: "${IMAGE_WIN_11}"
-  #         machineType: "${GCP_WIN_MACHINE_TYPE}"
-  #         disk_size: 100
-  #         disk_type: "pd-ssd"
-  #       artifact_paths:
-  #         - "$BEATS_PROJECT_NAME/build/*.xml"
-  #         - "$BEATS_PROJECT_NAME/build/*.json"
-  #       notify:
-  #         - github_commit_status:
-  #             context: "$BEATS_PROJECT_NAME: Windows 11 Unit Tests"
+      - label: ":windows: Windows 11 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/heartbeat
+          mage build test
+        key: "extended-win-11-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/heartbeat/build/*.xml"
+          - "x-pack/heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/heartbeat: Windows 11 Unit Tests"
 
-  #     - label: ":windows: Windows 2019 Unit Tests"
-  #       command: |
-  #         Set-Location -Path $BEATS_PROJECT_NAME
-  #         mage build unitTest
-  #       key: "extended-win-2019-unit-tests"
-  #       agents:
-  #         provider: "gcp"
-  #         image: "${IMAGE_WIN_2019}"
-  #         machineType: "${GCP_WIN_MACHINE_TYPE}"
-  #         disk_size: 100
-  #         disk_type: "pd-ssd"
-  #       artifact_paths:
-  #         - "$BEATS_PROJECT_NAME/build/*.xml"
-  #         - "$BEATS_PROJECT_NAME/build/*.json"
-  #       notify:
-  #         - github_commit_status:
-  #             context: "$BEATS_PROJECT_NAME: Windows 2019 Unit Tests"
-  ####### skip: "see elastic/beats#23957 and elastic/beats#23958"
-
-  - group: "MacOs Extended Tests"
-    key: "extended-tests-macos"
+      - label: ":windows: Windows 2019 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/heartbeat
+          mage build test
+        key: "extended-win-2019-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/heartbeat/build/*.xml"
+          - "x-pack/heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/heartbeat: Windows 2019 Unit Tests"
+  
+  - group: "x-pack/heartbeat MacOS Extended Tests"
+    key: "x-pack-heartbeat-extended-tests-macos"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
-      - label: ":mac: MacOS Unit Tests"
-        key: "extended-macos-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh"
+      - label: ":mac: MacOS x86_64 Unit Tests"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
+          cd x-pack/heartbeat
+          mage build unitTest
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
         artifact_paths:
-          - "$BEATS_PROJECT_NAME/build/*.xml"
-          - "$BEATS_PROJECT_NAME/build/*.json"
+          - "x-pack/heartbeat/build/*.xml"
+          - "x-pack/heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "$BEATS_PROJECT_NAME: MacOS Unit Tests"
+              context: "x-pack/heartbeat: MacOS x86_64 Extended Tests"
+
+      - label: ":mac: MacOS arm64 Unit Tests"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
+          cd x-pack/heartbeat
+          mage build unitTest
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
+        artifact_paths:
+          - "x-pack/heartbeat/build/*.xml"
+          - "x-pack/heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/heartbeat: MacOS arm64 Extended Tests"
 
   - wait: ~
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
-      - step: "mandatory-tests"
-        allow_failure: false
+      - step: "x-pack-heartbeat-mandatory-tests"
 
   - group: "Packaging"
     key: "packaging"
@@ -185,7 +215,9 @@ steps:
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: "cd $BEATS_PROJECT_NAME && mage package"
+        command: |
+          cd x-pack/heartbeat
+          mage package
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -193,21 +225,23 @@ steps:
           disk_size: 100
           disk_type: "pd-ssd"
         env:
-          PLATFORMS: "${PACKAGING_PLATFORMS}"
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         notify:
           - github_commit_status:
-              context: "$BEATS_PROJECT_NAME: Packaging Linux"
+              context: "x-pack/heartbeat: Packaging Linux"
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
-        command: "cd $BEATS_PROJECT_NAME && mage package"
+        command: |
+          cd x-pack/heartbeat
+          mage package
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         env:
-          PLATFORMS: "${PACKAGING_ARM_PLATFORMS}"
+          PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
         notify:
           - github_commit_status:
-              context: "$BEATS_PROJECT_NAME: Packaging Linux ARM"
+              context: "x-pack/heartbeat: Packaging Linux ARM"
