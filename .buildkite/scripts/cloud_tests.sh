@@ -2,8 +2,11 @@
 set -euo pipefail
 
 
+REPO_DIR=$(pwd)
+
 teardown() {
-  popd
+  # reset the directory to the root of the project
+  cd $REPO_DIR
   # Teardown resources after using them
   echo "~~~ Terraform Cleanup"
   tf_cleanup "${MODULE_DIR}"              #TODO: move all docker-compose files from the .ci to .buildkite folder before switching to BK
