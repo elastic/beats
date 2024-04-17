@@ -1268,11 +1268,6 @@
       description: The working directory of the process.
       example: /home/alice
       default_field: false
-    - name: start
-      level: extended
-      type: date
-      description: The time the process started.
-      example: '2016-05-23T08:05:34.853Z'
     - name: supplemental_groups.id
       level: extended
       type: keyword
@@ -1284,24 +1279,6 @@
       type: keyword
       ignore_above: 1024
       description: Name of the group.
-      default_field: false
-    - name: thread.capabilities.effective
-      level: extended
-      type: keyword
-      ignore_above: 1024
-      description: This is the set of capabilities used by the kernel to perform permission
-        checks for the thread.
-      example: '["CAP_BPF", "CAP_SYS_ADMIN"]'
-      pattern: ^(CAP_[A-Z_]+|\d+)$
-      default_field: false
-    - name: thread.capabilities.permitted
-      level: extended
-      type: keyword
-      ignore_above: 1024
-      description: This is a limiting superset for the effective capabilities that
-        the thread may assume.
-      example: '["CAP_BPF", "CAP_SYS_ADMIN"]'
-      pattern: ^(CAP_[A-Z_]+|\d+)$
       default_field: false
     - name: tty
       level: extended
