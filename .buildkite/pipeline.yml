@@ -238,7 +238,7 @@ steps:
   - label: "Trigger Libbeat"
     plugins:
       - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only ${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
                 - libbeat/
@@ -263,7 +263,7 @@ steps:
   - label: "Trigger x-pack/libbeat"
     plugins:
       - monorepo-diff#v1.0.1:
-          diff: "git diff --name-only ${GITHUB_PR_TARGET_BRANCH}...HEAD"
+          diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
           watch:
             - path:
                 - x-pack/libbeat/
