@@ -87,6 +87,11 @@ func resolveManifestPackage(project artifacts.Project, pkg string, reqPackage st
 	if !ok {
 		return nil
 	}
+	// Check if val.AscURL is empty and update it if necessary
+	if val.AscURL == "" {
+		val.AscURL = val.URL + ".asc"
+	}
+
 	if mg.Verbose() {
 		log.Printf(">>>>>>>>>>> Project branch/commit [%s, %s]", project.Branch, project.CommitHash)
 	}
