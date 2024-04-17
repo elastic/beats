@@ -102,6 +102,23 @@ pipeline {
         }
       }
     }
+    stage('Packaging') {
+      options { skipDefaultCheckout() }
+      when {
+        // On a PR basis, skip if changes are only related to docs.
+        // Always when forcing the input parameter
+        anyOf {
+          allOf {                                           // If PR and no docs changes
+            expression { return env.ONLY_DOCS == "false" }
+            changeRequest()
+          }
+          expression { return params.runAllStages }         // If UI forced
+        }
+      }
+      steps {
+        runBuildAndTest(filterStage: 'packaging')
+      }
+    }
     stage('Build&Test') {
       options { skipDefaultCheckout() }
       when {
@@ -157,23 +174,23 @@ pipeline {
         runBuildAndTest(filterStage: 'extended_win')
       }
     }
-    stage('Packaging') {
-      options { skipDefaultCheckout() }
-      when {
-        // On a PR basis, skip if changes are only related to docs.
-        // Always when forcing the input parameter
-        anyOf {
-          allOf {                                           // If PR and no docs changes
-            expression { return env.ONLY_DOCS == "false" }
-            changeRequest()
-          }
-          expression { return params.runAllStages }         // If UI forced
-        }
-      }
-      steps {
-        runBuildAndTest(filterStage: 'packaging')
-      }
-    }
+    // stage('Packaging') {
+    //   options { skipDefaultCheckout() }
+    //   when {
+    //     // On a PR basis, skip if changes are only related to docs.
+    //     // Always when forcing the input parameter
+    //     anyOf {
+    //       allOf {                                           // If PR and no docs changes
+    //         expression { return env.ONLY_DOCS == "false" }
+    //         changeRequest()
+    //       }
+    //       expression { return params.runAllStages }         // If UI forced
+    //     }
+    //   }
+    //   steps {
+    //     runBuildAndTest(filterStage: 'packaging')
+    //   }
+    // }
     stage('Packaging-Pipeline') {
       agent none
       options { skipDefaultCheckout() }
@@ -608,9 +625,9 @@ def targetWithoutNode(Map args = [:]) {
         }
       }
       withTools(k8s: installK8s, gcp: withGCP, nodejs: withNodejs) {
-        if (isPackaging && (directory.equals('x-pack/agentbeat') || directory.equals('x-pack/osquerybeat'))) {
-          sh(label: 'install msitools', script: '.buildkite/scripts/install-msitools.sh')
-        }
+        // if (isPackaging && (directory.equals('x-pack/agentbeat') || directory.equals('x-pack/osquerybeat'))) {
+        //   sh(label: 'install msitools', script: '.buildkite/scripts/install-msitools.sh')
+        // }
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {
