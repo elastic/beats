@@ -134,7 +134,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Prevent GCP Pub/Sub input blockage by increasing default value of `max_outstanding_messages` {issue}35029[35029] {pull}38985[38985]
 - Fix config validation for CEL and HTTPJSON inputs when using password grant authentication and `client.id` or `client.secret` are not present. {pull}38962[38962]
 - Updated Websocket input title to align with existing inputs {pull}39006[39006]
-- Restore netflow input on Windows {pull}1[1]
+- Restore netflow input on Windows {pull}39024[39024]
 
 *Heartbeat*
 
