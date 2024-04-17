@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-# debug
-set -x
-
-echo "+++ DEBUG: we are now in setenv.sh"
-
 set -euo pipefail
 
 REPO="beats"
@@ -87,4 +82,3 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
   source .buildkite/scripts/common.sh
   defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
 fi
-set +x
