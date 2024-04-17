@@ -281,11 +281,6 @@ def generateLinuxStep(beat) {
     withNode(labels: 'ubuntu-22.04 && immutable') {
       withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Linux ${beat}") {
-          dir("${BASE_DIR}"){
-            if (beat.equals('x-pack/agentbeat') || beat.equals('x-pack/osquerybeat')) {
-              sh(label: 'install msitools', script: '.buildkite/scripts/install-msitools.sh')
-            }
-          }  
           deleteDir()
           release('snapshot')
           dir("${BASE_DIR}"){
@@ -384,6 +379,11 @@ def release(type){
     withEnv([
       "DEV=${!type.equals('staging')}"
     ]) {
+      dir("${BASE_DIR}"){
+        if (env.BEATS_FOLDER.equals('x-pack/agentbeat') || env.BEATS_FOLDER.equals('x-pack/osquerybeat')) {
+          sh(label: 'install msitools', script: '.buildkite/scripts/install-msitools.sh')
+        }
+      }
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
         sh(label: "mage package ${type} ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
