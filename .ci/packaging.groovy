@@ -222,7 +222,6 @@ def generateSteps() {
     'heartbeat',
     'metricbeat',
     'packetbeat',
-    'x-pack/agentbeat',
     'x-pack/auditbeat',
     'x-pack/dockerlogbeat',
     'x-pack/filebeat',
