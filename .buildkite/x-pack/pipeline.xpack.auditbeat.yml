@@ -235,7 +235,7 @@ steps:
           disk_size: 100
           disk_type: "pd-ssd"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
         notify:
           - github_commit_status:
               context: "x-pack/auditbeat: Packaging Linux Linux"
