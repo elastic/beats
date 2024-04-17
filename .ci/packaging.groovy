@@ -281,10 +281,10 @@ def generateLinuxStep(beat) {
     withNode(labels: 'ubuntu-22.04 && immutable') {
       withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Linux ${beat}") {
+          if (beat.equals('x-pack/agentbeat') || beat.equals('x-pack/osquerybeat')) {
+            sh(label: 'install msitools', script: '.buildkite/scripts/install-msitools.sh')
+          }
           deleteDir()
-          // if (beat.equals('x-pack/agentbeat') || beat.equals('x-pack/osquerybeat')) {
-          //   sh(label: 'install msitools', script: '.buildkite/scripts/install-msitools.sh')
-          // }
           release('snapshot')
           dir("${BASE_DIR}"){
             pushCIDockerImages(arch: 'amd64')
