@@ -878,16 +878,6 @@
         the process exists within.'
       example: 4242
       default_field: false
-    - name: parent.working_directory
-      level: extended
-      type: keyword
-      ignore_above: 1024
-      multi_fields:
-      - name: text
-        type: match_only_text
-      description: The working directory of the process.
-      example: /home/alice
-      default_field: false
     - name: real_group.id
       level: extended
       type: keyword
