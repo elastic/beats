@@ -114,7 +114,9 @@ steps:
       - label: ":mac: Heartbeat MacOS Unit Tests"
         key: "macos-extended"
         if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: "cd ${BEATS_PROJECT_NAME} && mage build unitTest"
+        command: |
+          cd heartbeat
+          mage build unitTest
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -127,7 +129,9 @@ steps:
     steps:
       - label: ":windows: Heartbeat Win-2019 Unit Tests"
         key: "heartbeat-win-extended-2019"
-        command: "mage -d ${BEATS_PROJECT_NAME} unitTest"
+        command: |
+          Set-Location -Path heartbeat
+          mage unitTest
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
