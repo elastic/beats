@@ -1,6 +1,8 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 name: "beats-libbeat"
 
+# dummy comment to trigger buildkite
+
 env:
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
