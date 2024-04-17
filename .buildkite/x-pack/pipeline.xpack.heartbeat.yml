@@ -37,6 +37,7 @@ steps:
           echo "~~~ Installing @elastic/synthetics"
           npm install -g @elastic/synthetics
           echo "~~~ Running tests"
+          cd x-pack/heartbeat
           mage build unitTest
         agents:
           provider: "gcp"
