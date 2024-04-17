@@ -34,9 +34,8 @@ steps:
         key: "mandatory-linux-unit-test"
         command: |
           set -euo pipefail
-          cd x-pack/heartbeat
           echo "~~~ Installing @elastic/synthetics"
-          npm i -g @elastic/synthetics
+          npm install -g @elastic/synthetics
           echo "~~~ Running tests"
           mage build unitTest
         agents:
@@ -54,9 +53,8 @@ steps:
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
-          cd x-pack/heartbeat
           echo "~~~ Installing @elastic/synthetics"
-          npm i -g @elastic/synthetics
+          npm install -g @elastic/synthetics
           echo "~~~ Running tests"
           cd x-pack/heartbeat
           mage goIntegTest
