@@ -12,7 +12,7 @@ ONLY_DOCS=${ONLY_DOCS:-"true"}
 OSS_MODULE_PATTERN="^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 # define if needed run the whole pipeline for the particular beat
-[ -z "${run_libbeat+x}" ] && run_libbeat="$(buildkite-agent meta-data get run_libbeat --default "false")"
+[ -z "${run_filebeat+x}" ] && run_filebeat="$(buildkite-agent meta-data get run_filebeat --default "false")"
 [ -z "${run_packetbeat+x}" ] && run_packetbeat="$(buildkite-agent meta-data get run_packetbeat --default "false")"
 [ -z "${run_winlogbeat+x}" ] && run_winlogbeat="$(buildkite-agent meta-data get run_winlogbeat --default "false")"
 [ -z "${run_xpack_libbeat+x}" ] && run_xpack_libbeat="$(buildkite-agent meta-data get run_xpack_libbeat --default "false")"
@@ -22,7 +22,7 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_xpack_heartbeat+x}" ] && run_xpack_heartbeat="$(buildkite-agent meta-data get run_xpack_heartbeat --default "false")"
 
 # define if needed run ARM platform-specific tests for the particular beat
-[ -z "${run_libbeat_arm_tests+x}" ] && run_libbeat_arm_tests="$(buildkite-agent meta-data get run_libbeat_arm_tests --default "false")"
+[ -z "${run_filebeat_arm_tests+x}" ] && run_filebeat_arm_tests="$(buildkite-agent meta-data get run_filebeat_arm_tests --default "false")"
 [ -z "${run_packetbeat_arm_tests+x}" ] && run_packetbeat_arm_tests="$(buildkite-agent meta-data get run_packetbeat_arm_tests --default "false")"
 [ -z "${run_xpack_filebeat_arm_tests+x}" ] && run_xpack_filebeat_arm_tests="$(buildkite-agent meta-data get run_xpack_filebeat_arm_tests --default "false")"
 [ -z "${run_xpack_libbeat_arm_tests+x}" ] && run_xpack_libbeat_arm_tests="$(buildkite-agent meta-data get run_xpack_libbeat_arm_tests --default "false")"
