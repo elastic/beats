@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+
+# debug
+set -x
+
+echo "+++ DEBUG: we are now in common.sh"
 set -euo pipefail
 
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
@@ -574,3 +579,4 @@ if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_K
 fi
 
 check_and_set_beat_vars
+set +x
