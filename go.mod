@@ -30,7 +30,7 @@ require (
 	github.com/apoydence/eachers v0.0.0-20181020210610-23942921fe77 // indirect
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/aws/aws-lambda-go v1.13.3
-	github.com/aws/aws-sdk-go v1.19.48
+	github.com/aws/aws-sdk-go v1.51.14
 	github.com/aws/aws-sdk-go-v2 v0.24.0
 	github.com/awslabs/goformation/v4 v4.1.0
 	github.com/awslabs/kinesis-aggregation/go v0.0.0-20200810181507-d352038274c0
