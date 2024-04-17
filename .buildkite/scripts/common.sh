@@ -54,6 +54,10 @@ xpack_packetbeat_changeset=(
   "^x-pack/packetbeat/.*"
   )
 
+xpack_winlogbeat_changeset=(
+  "^x-pack/winlogbeat/.*"
+  )
+
 ci_changeset=(
   "^.buildkite/.*"
   )

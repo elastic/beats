@@ -89,11 +89,12 @@ steps:
           - github_commit_status:
               context: "Winlogbeat: Win-2022 Unit Tests"
 
-  - group: "Extended Windows Tests"
+  - group: "Winlogbeat Extended Windows Tests"
     key: "winlogbeat-extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Winlogbeat Wind-10 Unit Tests"
+      - label: ":windows: Winlogbeat Win-10 Unit Tests"
         command: |
           Set-Location -Path winlogbeat
           mage build unitTest
@@ -130,15 +131,17 @@ steps:
               context: "Winlogbeat: Win-11 Unit Tests"
 
   - wait: ~
-    depends_on:
-      - step: "winlogbeat-mandatory-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on: "winlogbeat-mandatory-tests"
 
   - group: "Winlogbeat Packaging"
     key: "winlogbeat-packaging"
     steps:
       - label: ":ubuntu: Winlogbeat Packaging Ubuntu x86_64"
         key: "packaging-linux"
-        command: "cd winlogbeat && mage package"
+        command: |
+          cd winlogbeat
+          mage package
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
