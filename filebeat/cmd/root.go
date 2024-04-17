@@ -23,8 +23,10 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/elastic/beats/v7/filebeat/beater"
-
-	cmd "github.com/elastic/beats/v7/libbeat/cmd"
+	"github.com/elastic/beats/v7/filebeat/fileset"
+	"github.com/elastic/beats/v7/filebeat/include"
+	"github.com/elastic/beats/v7/filebeat/input"
+	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 
 	// Import processors.
@@ -47,6 +49,11 @@ func FilebeatSettings() instance.Settings {
 		RunFlags:      runFlags,
 		Name:          Name,
 		HasDashboards: true,
+		Initialize: []func(){
+			include.InitializeModule,
+			fileset.RegisterMonitoringModules,
+			input.RegisterMonitoringInputs,
+		},
 	}
 }
 
