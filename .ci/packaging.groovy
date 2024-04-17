@@ -222,7 +222,6 @@ def generateSteps() {
     'heartbeat',
     'metricbeat',
     'packetbeat',
-    'x-pack/agentbeat',
     'x-pack/auditbeat',
     'x-pack/dockerlogbeat',
     'x-pack/filebeat',
@@ -282,9 +281,6 @@ def generateLinuxStep(beat) {
       withEnv(["HOME=${env.WORKSPACE}", "PLATFORMS=${linuxPlatforms()}", "BEATS_FOLDER=${beat}"]) {
         withGithubNotify(context: "Packaging Linux ${beat}") {
           deleteDir()
-          if (beat.equals('x-pack/agentbeat') || beat.equals('x-pack/osquerybeat')) {
-            sh(label: 'install msitools', script: '.buildkite/scripts/install-msitools.sh')
-          }
           release('snapshot')
           dir("${BASE_DIR}"){
             pushCIDockerImages(arch: 'amd64')
@@ -382,6 +378,16 @@ def release(type){
     withEnv([
       "DEV=${!type.equals('staging')}"
     ]) {
+      dir("${BASE_DIR}"){
+        if (env.BEATS_FOLDER.equals('x-pack/agentbeat') || env.BEATS_FOLDER.equals('x-pack/osquerybeat')) {
+          // sh(label: 'install msitools', script: '.buildkite/scripts/install-msitools.sh')
+          sh '''#!/usr/bin/env bash
+                set -euo pipefail
+                sudo apt-get update -y
+                DEBIAN_FRONTEND=noninteractive sudo apt-get install --no-install-recommends --yes msitools
+          '''
+        }
+      }
       dockerLogin(secret: "${DOCKERELASTIC_SECRET}", registry: "${DOCKER_REGISTRY}")
       dir("${env.BEATS_FOLDER}") {
         sh(label: "mage package ${type} ${env.BEATS_FOLDER} ${env.PLATFORMS}", script: 'mage package')
