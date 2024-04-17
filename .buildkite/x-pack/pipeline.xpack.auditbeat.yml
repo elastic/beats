@@ -2,23 +2,6 @@
 name: "beats-xpack-auditbeat"
 
 env:
-<<<<<<< HEAD
-  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
-  DEFAULT_UBUNTU_X86_64_IMAGE: "family/core-ubuntu-2204"
-  IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
-  IMAGE_WIN_10: "family/general-windows-10"
-  IMAGE_WIN_11: "family/general-windows-11"
-  IMAGE_WIN_2016: "family/core-windows-2016"
-  IMAGE_WIN_2019: "family/core-windows-2019"
-  IMAGE_WIN_2022: "family/core-windows-2022"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
-  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
-  BEATS_PROJECT_NAME: "x-pack/auditbeat"
-=======
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
@@ -38,7 +21,6 @@ env:
 
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
->>>>>>> 5b24b7d28a ([CI] xpack/auditbeat monorepo migration (#38828))
 
 steps:
   - group: "x-pack/auditbeat Mandatory Tests"
@@ -238,14 +220,6 @@ steps:
     depends_on:
       - step: "x-pack-auditbeat-mandatory-tests"
 
-<<<<<<< HEAD
-  - label: ":linux: Load dynamic x-pack auditbeat pipeline"
-    key: "xpack-auditbeat-pipeline"
-    command: ".buildkite/scripts/generate_xpack_auditbeat_pipeline.sh"
-    notify:
-      - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
-=======
   - group: "x-pack/auditbeat Packaging"
     key: "x-pack-auditbeat-packaging"
     steps:
@@ -281,4 +255,3 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/auditbeat: Packaging Linux ARM"
->>>>>>> 5b24b7d28a ([CI] xpack/auditbeat monorepo migration (#38828))
