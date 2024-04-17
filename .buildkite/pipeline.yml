@@ -234,8 +234,6 @@ steps:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
-<<<<<<< HEAD
-=======
 
   - label: "Trigger Libbeat"
     plugins:
@@ -287,4 +285,3 @@ steps:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
->>>>>>> 5b24b7d28a ([CI] xpack/auditbeat monorepo migration (#38828))
