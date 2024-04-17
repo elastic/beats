@@ -102,23 +102,6 @@ pipeline {
         }
       }
     }
-    stage('Packaging') {
-      options { skipDefaultCheckout() }
-      when {
-        // On a PR basis, skip if changes are only related to docs.
-        // Always when forcing the input parameter
-        anyOf {
-          allOf {                                           // If PR and no docs changes
-            expression { return env.ONLY_DOCS == "false" }
-            changeRequest()
-          }
-          expression { return params.runAllStages }         // If UI forced
-        }
-      }
-      steps {
-        runBuildAndTest(filterStage: 'packaging')
-      }
-    }
     stage('Build&Test') {
       options { skipDefaultCheckout() }
       when {
@@ -174,23 +157,23 @@ pipeline {
         runBuildAndTest(filterStage: 'extended_win')
       }
     }
-    // stage('Packaging') {
-    //   options { skipDefaultCheckout() }
-    //   when {
-    //     // On a PR basis, skip if changes are only related to docs.
-    //     // Always when forcing the input parameter
-    //     anyOf {
-    //       allOf {                                           // If PR and no docs changes
-    //         expression { return env.ONLY_DOCS == "false" }
-    //         changeRequest()
-    //       }
-    //       expression { return params.runAllStages }         // If UI forced
-    //     }
-    //   }
-    //   steps {
-    //     runBuildAndTest(filterStage: 'packaging')
-    //   }
-    // }
+    stage('Packaging') {
+      options { skipDefaultCheckout() }
+      when {
+        // On a PR basis, skip if changes are only related to docs.
+        // Always when forcing the input parameter
+        anyOf {
+          allOf {                                           // If PR and no docs changes
+            expression { return env.ONLY_DOCS == "false" }
+            changeRequest()
+          }
+          expression { return params.runAllStages }         // If UI forced
+        }
+      }
+      steps {
+        runBuildAndTest(filterStage: 'packaging')
+      }
+    }
     stage('Packaging-Pipeline') {
       agent none
       options { skipDefaultCheckout() }
