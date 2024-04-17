@@ -53,5 +53,4 @@ if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_K
   source .buildkite/scripts/common.sh
   # Set the MODULE env variable if possible, it should be defined before generating pipeline's steps. It is used in multiple pipelines.
   defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
-  fi
 fi
