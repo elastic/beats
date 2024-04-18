@@ -76,17 +76,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
 - Fix indexing failures by re-enabling event normalisation in netflow input. {issue}38703[38703] {pull}38780[38780]
 - Fix config validation for CEL and HTTPJSON inputs when using password grant authentication and `client.id` or `client.secret` are not present. {pull}38962[38962]
-- [threatintel] MISP splitting fix for empty responses {issue}38739[38739] {pull}38917[38917]
-- Updated Websocket input title to align with existing inputs {pull}39006[39006]
 - Restore netflow input on Windows {pull}39024[39024]
-- Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
 
 *Heartbeat*
 
-- Fix panics when parsing dereferencing invalid parsed url. {pull}34702[34702]
-- Fix setuid root when running under cgroups v2. {pull}37794[37794]
-- Adjust State loader to only retry when response code status is 5xx {pull}37981[37981]
-- Reset prctl dumpable flag after cap drop. {pull}38269[38269]
 
 *Heartbeat*
 
