@@ -21,18 +21,20 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/opt"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+	"github.com/elastic/elastic-agent-system-metrics/dev-tools/systemtests"
 )
 
 func TestMonitorSample(t *testing.T) {
-	cpu := &Monitor{lastSample: CPUMetrics{}, Hostfs: resolve.NewTestResolver("")}
+	_ = logp.DevelopmentSetup()
+	cpu := &Monitor{lastSample: CPUMetrics{}, Hostfs: systemtests.DockerTestResolver()}
 	s, err := cpu.Fetch()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	metricOpts := MetricOpts{Percentages: true, NormalizedPercentages: true, Ticks: true}
 	evt, err := s.Format(metricOpts)
 	assert.NoError(t, err, "error in Format")
@@ -41,14 +43,12 @@ func TestMonitorSample(t *testing.T) {
 
 func TestCoresMonitorSample(t *testing.T) {
 
-	cpuMetrics, err := Get(resolve.NewTestResolver(""))
+	cpuMetrics, err := Get(systemtests.DockerTestResolver())
 	assert.NoError(t, err, "error in Get()")
 
-	cores := &Monitor{lastSample: CPUMetrics{list: make([]CPU, len(cpuMetrics.list))}, Hostfs: resolve.NewTestResolver("")}
+	cores := &Monitor{lastSample: CPUMetrics{list: make([]CPU, len(cpuMetrics.list))}, Hostfs: systemtests.DockerTestResolver()}
 	sample, err := cores.FetchCores()
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	for _, s := range sample {
 		metricOpts := MetricOpts{Percentages: true, Ticks: true}

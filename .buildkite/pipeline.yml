@@ -15,6 +15,33 @@ steps:
       cpu: "8"
       memory: "4G"
 
+  - label: "Container-System tests; Rhel 9"
+    key: linux-container-test-rhel9
+    command: ".buildkite/scripts/system-container-tests.sh"
+    agents:
+      image: "family/platform-ingest-beats-rhel-9"
+      provider: "gcp"
+      cpu: "8"
+      memory: "4G"
+
+  - label: "Container-System tests; Old Ubuntu"
+    key: linux-container-test-u2004
+    command: ".buildkite/scripts/system-container-tests.sh"
+    agents:
+      image: "family/platform-ingest-beats-ubuntu-2004"
+      provider: "gcp"
+      cpu: "8"
+      memory: "4G"
+  
+  - label: "Container-System tests"
+    key: linux-container-test
+    command: ".buildkite/scripts/system-container-tests.sh"
+    agents:
+      image: "family/platform-ingest-beats-ubuntu-2204"
+      provider: "gcp"
+      cpu: "8"
+      memory: "4G"
+
   - label: ":linux: Tests on Linux"
     key: linux-test
     command: ".buildkite/scripts/run-linux-tests.sh"

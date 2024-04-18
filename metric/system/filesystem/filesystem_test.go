@@ -25,7 +25,7 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
+	"github.com/elastic/elastic-agent-system-metrics/dev-tools/systemtests"
 )
 
 func TestFileSystemList(t *testing.T) {
@@ -34,7 +34,7 @@ func TestFileSystemList(t *testing.T) {
 		t.Skip("FileSystem test fails on Travis/OSX with i/o error")
 	}
 	skipTypes := []string{"cdrom", "tracefs", "overlay", "fuse.lxcfs", "fuse.gvfsd-fuse", "nsfs", "squashfs", "vmhgfs"}
-	hostfs := resolve.NewTestResolver("/")
+	hostfs := systemtests.DockerTestResolver()
 	//Exclude FS types that will give us a permission error
 	fss, err := GetFilesystems(hostfs, BuildFilterWithList(skipTypes))
 	if err != nil {
@@ -147,7 +147,7 @@ func TestFileSystemListFiltering(t *testing.T) {
 
 // Emulate the filtering process that would normally happen inside the callbacks from platform-specific code
 func filterFileSystemList(stats []FSStat) []FSStat {
-	hostfs := resolve.NewTestResolver("/")
+	hostfs := systemtests.DockerTestResolver()
 	filtered := []FSStat{}
 	for _, stat := range stats {
 		if avoidFileSystem(stat) && buildDefaultFilters(hostfs)(stat) {
