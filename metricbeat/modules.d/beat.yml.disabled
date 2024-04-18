@@ -1,5 +1,5 @@
 # Module: beat
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-beat.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.14/metricbeat-module-beat.html
 
 - module: beat
   metricsets:

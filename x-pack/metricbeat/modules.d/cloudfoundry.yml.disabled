@@ -1,5 +1,5 @@
 # Module: cloudfoundry
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-cloudfoundry.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.14/metricbeat-module-cloudfoundry.html
 
 - module: cloudfoundry
   metricsets:

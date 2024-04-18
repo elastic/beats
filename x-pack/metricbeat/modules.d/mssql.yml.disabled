@@ -1,5 +1,5 @@
 # Module: mssql
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-mssql.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.14/metricbeat-module-mssql.html
 
 - module: mssql
   metricsets:

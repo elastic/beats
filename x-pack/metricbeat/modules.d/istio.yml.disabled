@@ -1,5 +1,5 @@
 # Module: istio
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-istio.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.14/metricbeat-module-istio.html
 
 # Istio mesh. To collect all Mixer-generated metrics. For versions of Istio prior to 1.5.
 - module: istio

@@ -1,5 +1,5 @@
 # Module: jolokia
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-jolokia.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.14/metricbeat-module-jolokia.html
 
 - module: jolokia
   #metricsets: ["jmx"]

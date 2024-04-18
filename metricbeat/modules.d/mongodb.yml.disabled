@@ -1,5 +1,5 @@
 # Module: mongodb
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-mongodb.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.14/metricbeat-module-mongodb.html
 
 - module: mongodb
   #metricsets:

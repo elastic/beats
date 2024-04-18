@@ -1,5 +1,5 @@
 # Module: azure
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-azure.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.14/metricbeat-module-azure.html
 
 - module: azure
   metricsets:

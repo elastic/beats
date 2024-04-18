@@ -1,5 +1,5 @@
 # Module: ibmmq
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-ibmmq.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.14/metricbeat-module-ibmmq.html
 
 - module: ibmmq
   metricsets: ['qmgr']
