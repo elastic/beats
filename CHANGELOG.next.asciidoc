@@ -93,7 +93,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix cache processor expiries infinite growth when large a large TTL is used and recurring keys are cached. {pull}38561[38561]
 
 *Auditbeat*
-
+- Set field types to correctly match ECS in sessionmd processor {issue}38955[38955] {pull}38994[38994]
 
 *Filebeat*
 
@@ -135,6 +135,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - entity-analytics input: Improve structured logging. {pull}38990[38990]
 - Fix config validation for CEL and HTTPJSON inputs when using password grant authentication and `client.id` or `client.secret` are not present. {pull}38962[38962]
 - Updated Websocket input title to align with existing inputs {pull}39006[39006]
+- Restore netflow input on Windows {pull}39024[39024]
+- Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
 
 *Heartbeat*
 
