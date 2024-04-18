@@ -146,14 +146,9 @@ steps:
     steps:
       - label: ":mac: Heartbeat MacOS Unit Tests"
         key: "macos-extended"
-<<<<<<< HEAD
-        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-=======
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
->>>>>>> b4ff53ce2b (Fixed issues with Heartbeat pipeline (#39045))
           cd heartbeat
           mage build unitTest
         agents:
@@ -190,15 +185,9 @@ steps:
     steps:
       - label: ":windows: Heartbeat Win-2019 Unit Tests"
         key: "heartbeat-win-extended-2019"
-<<<<<<< HEAD
-        command: |
-          Set-Location -Path heartbeat
-          mage unitTest
-=======
         command:  |
           Set-Location -Path heartbeat
           mage build unitTest
->>>>>>> b4ff53ce2b (Fixed issues with Heartbeat pipeline (#39045))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
