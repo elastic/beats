@@ -206,7 +206,7 @@ func (f *graph) Users(ctx context.Context, deltaLink string) ([]*fetcher.User, s
 		for _, v := range response.Users {
 			user, err := newUserFromAPI(v)
 			if err != nil {
-				f.logger.Errorf("Unable to parse user from API: %w", err)
+				f.logger.Errorw("Unable to parse user from API", "error", err)
 				continue
 			}
 			f.logger.Debugf("Got user %q from API", user.ID)
@@ -258,7 +258,7 @@ func (f *graph) Devices(ctx context.Context, deltaLink string) ([]*fetcher.Devic
 		for _, v := range response.Devices {
 			device, err := newDeviceFromAPI(v)
 			if err != nil {
-				f.logger.Errorf("Unable to parse device from API: %w", err)
+				f.logger.Errorw("Unable to parse device from API", "error", err)
 				continue
 			}
 			f.logger.Debugf("Got device %q from API", device.ID)
@@ -290,7 +290,7 @@ func (f *graph) addRegistered(ctx context.Context, device *fetcher.Device, typ s
 	switch {
 	case err == nil, errors.Is(err, nextLinkLoopError{"users"}), errors.Is(err, missingLinkError{"users"}):
 	default:
-		f.logger.Errorf("Failed to obtain some registered user data: %w", err)
+		f.logger.Errorw("Failed to obtain some registered user data", "error", err)
 	}
 	for _, u := range users {
 		set.Add(u.ID)

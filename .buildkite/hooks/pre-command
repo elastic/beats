@@ -11,7 +11,7 @@ PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-inges
 DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
 GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" || "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" ]]; then
   source .buildkite/env-scripts/env.sh
   if [[ -z "${GO_VERSION-""}" ]]; then
     export GO_VERSION=$(cat "${WORKSPACE}/.go-version")
@@ -35,13 +35,7 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "fi
     with_mage
   fi
 
-  if [[ "$BUILDKITE_STEP_KEY" == windows* ]]; then
-    git config core.autocrlf false
-    git rm --quiet --cached -r .
-    git reset --quiet --hard
-  fi
-
-  if [[ "$BUILDKITE_STEP_KEY" == package* ]]; then
+  if [[ "$BUILDKITE_STEP_KEY" == *packaging* ]]; then
     DOCKER_USERNAME_SECRET=$(retry_with_count 5 vault kv get -field user "${DOCKER_REGISTRY_SECRET_PATH}")
     DOCKER_PASSWORD_SECRET=$(retry_with_count 5 vault kv get -field password "${DOCKER_REGISTRY_SECRET_PATH}")
     GITHUB_TOKEN_SECRET=$(retry_with_count 5 vault kv get -field token ${GITHUB_TOKEN_VAULT_PATH})
@@ -58,30 +52,25 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "fi
     git config user.name "$github_username"
     git config user.email "$github_email"
   fi
-
-  if [[ "$BUILDKITE_STEP_KEY" == k8s-test* ]]; then
-    .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
-  fi
 fi
 
 ENABLED_BEATS_PIPELINES_SLUGS=(
   "auditbeat"
+  "heartbeat"
   "filebeat"
   "beats-metricbeat"
-  "beats-libbeat"
   "beats-packetbeat"
   "beats-winlogbeat"
   "beats-winlogbeat"
   "beats-xpack-libbeat"
-  "beats-xpack-metricbeat"
   "beats-xpack-packetbeat"
   "beats-xpack-winlogbeat"
   "beats-xpack-dockerlogbeat"
   "beats-xpack-auditbeat"
-  "beats-xpack-filebeat"
+  "beats-xpack-metricbeat"
   "beats-xpack-heartbeat"
-  "beats-xpack-osquerybeat"
-  )
+  "deploy-k8s"
+)
 
 for slug in "${ENABLED_BEATS_PIPELINES_SLUGS[@]}"; do
   if [[ "$BUILDKITE_PIPELINE_SLUG" == "$slug" ]]; then
@@ -90,8 +79,8 @@ for slug in "${ENABLED_BEATS_PIPELINES_SLUGS[@]}"; do
   fi
 done
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
-  if [[ "$BUILDKITE_STEP_KEY" == "extended-cloud-test" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == *"xpack-metricbeat"* || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
+  if [[ "$BUILDKITE_STEP_KEY" == *"extended-cloud-test"* ]]; then
     BEATS_AWS_SECRET_KEY=$(retry_with_count 5 vault kv get -field secret_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
     export BEATS_AWS_SECRET_KEY
     BEATS_AWS_ACCESS_KEY=$(retry_with_count 5 vault kv get -field access_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
@@ -103,5 +92,12 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-packetbeat" ]]; then
   if [[ "$BUILDKITE_STEP_KEY" == "extended-win-10-system-tests" || "$BUILDKITE_STEP_KEY" == "mandatory-win-2022-system-tests" ]]; then
     PRIVATE_CI_GCS_CREDENTIALS_SECRET=$(retry_with_count 5 vault kv get -field plaintext -format=json ${PRIVATE_CI_GCS_CREDENTIALS_PATH})
     export PRIVATE_CI_GCS_CREDENTIALS_SECRET
+  fi
+fi
+
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "deploy-k8s" ]]; then
+  source .buildkite/env-scripts/env.sh
+  if [[ "$BUILDKITE_STEP_KEY" == k8s-test* ]]; then
+    .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
   fi
 fi

@@ -70,6 +70,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-aws-s3>>
 * <<{beatname_lc}-input-azure-eventhub>>
 * <<{beatname_lc}-input-azure-blob-storage>>
+* <<{beatname_lc}-input-benchmark>>
 * <<{beatname_lc}-input-cel>>
 * <<{beatname_lc}-input-cloudfoundry>>
 * <<{beatname_lc}-input-cometd>>
@@ -88,6 +89,7 @@ You can configure {beatname_uc} to use the following inputs:
 * <<{beatname_lc}-input-netflow>>
 * <<{beatname_lc}-input-o365audit>>
 * <<{beatname_lc}-input-redis>>
+* <<{beatname_lc}-input-salesforce>>
 * <<{beatname_lc}-input-stdin>>
 * <<{beatname_lc}-input-syslog>>
 * <<{beatname_lc}-input-tcp>>
@@ -103,6 +105,8 @@ include::../../x-pack/filebeat/docs/inputs/input-aws-s3.asciidoc[]
 include::../../x-pack/filebeat/docs/inputs/input-azure-eventhub.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-azure-blob-storage.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-benchmark.asciidoc[]
 
 include::../../x-pack/filebeat/docs/inputs/input-cel.asciidoc[]
 
@@ -139,6 +143,8 @@ include::../../x-pack/filebeat/docs/inputs/input-netflow.asciidoc[]
 include::../../x-pack/filebeat/docs/inputs/input-o365audit.asciidoc[]
 
 include::inputs/input-redis.asciidoc[]
+
+include::../../x-pack/filebeat/docs/inputs/input-salesforce.asciidoc[]
 
 include::inputs/input-stdin.asciidoc[]
 
