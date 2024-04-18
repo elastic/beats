@@ -8,7 +8,6 @@ This file is generated! See scripts/docs_collector.py
 [role="xpack"]
 
 :modulename: salesforce
-:has-dashboards: true
 
 == Salesforce module
 
@@ -546,24 +545,6 @@ Interval for collecting EventLogFile logs, e.g. 1h or 5m.
 Either "Hourly" or "Daily". The time interval of each log file from EventLogFile.
 
 [float]
-=== Example dashboards
-
-The Salesforce module includes several predefined dashboards:
-
-- Login Dashboard: Visualizes login activity and trends.
-- Logout Dashboard: Visualizes logout activity and trends.
-- Apex Dashboard: Visualizes Apex executions and errors.
-- Setup Audit Trail Dashboard: Shows changes made in the Setup area.
-
-image::./images/filebeat-salesforce-login-dashboard.png[]
-
-image::./images/filebeat-salesforce-logout-dashboard.png[]
-
-image::./images/filebeat-salesforce-setupaudittrail-dashboard.png[]
-
-Access these dashboards in Kibana by going to Management -> Kibana -> Dashboards and searching for "Salesforce".
-
-[float]
 === Troubleshooting
 
 Here are some common issues and how to resolve them:
@@ -576,8 +557,6 @@ Verify the `var.url` is correct. Check that the user credentials are valid and h
 
 *Not seeing any data*::
 Check the Elastic Agent logs for errors. Verify the module configuration is correct, the filesets are enabled, and the intervals are reasonable. Confirm there is log activity in Salesforce for the log types being collected.
-
-:has-dashboards!:
 
 :fileset_ex!:
 
