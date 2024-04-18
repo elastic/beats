@@ -8,7 +8,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -105,58 +104,6 @@ func execCommand(ctx context.Context, name string, args ...string) error {
 	}
 	fmt.Print(output)
 	return err
-}
-
-func extractFromMSI() error {
-	if os.Getenv("GOOS") != "windows" {
-		return nil
-	}
-
-	ctx := context.Background()
-
-	osArchs := osquerybeat.OSArchs(devtools.Platforms)
-
-	for _, osarch := range osArchs {
-		if osarch.OS != "windows" {
-			continue
-		}
-		spec, err := distro.GetSpec(osarch)
-		if err != nil {
-			if errors.Is(err, distro.ErrUnsupportedOS) {
-				continue
-			} else {
-				return err
-			}
-		}
-		dip := distro.GetDataInstallDir(osarch)
-		msiFile := spec.DistroFilepath(dip)
-
-		// MSI extract
-		err = execCommand(ctx, "msiextract", "--directory", dip, msiFile)
-		if err != nil {
-			return err
-		}
-
-		fmt.Println("copy certs.pem from MSI")
-		err = devtools.Copy(filepath.Join(dip, distro.OsquerydCertsWindowsDistroPath()), distro.OsquerydCertsPath(dip))
-		if err != nil {
-			return err
-		}
-
-		fmt.Println("copy osqueryd.exe from MSI")
-		dp := distro.OsquerydPathForOS(osarch.OS, dip)
-		err = devtools.Copy(filepath.Join(dip, "osquery", "osqueryd", "osqueryd.exe"), dp)
-		if err != nil {
-			fmt.Println("copy osqueryd.exe from MSI failed: ", err)
-			return err
-		}
-		// Chmod set to the same as other executables in the final package
-		if err = os.Chmod(dp, 0755); err != nil {
-			return err
-		}
-	}
-
-	return nil
 }
 
 // stripLinuxOsqueryd Strips osqueryd binary, that is not stripped in linux tar.gz distro
