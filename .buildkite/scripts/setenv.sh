@@ -67,11 +67,7 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_S
   export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}oracle"
 fi
 
-<<<<<<< HEAD
-if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-filebeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
-=======
-if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" ]]; then
->>>>>>> 0d3a8b68d9 ([CI] x-pack/heartbeat monorepo (#38845))
+if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-filebeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" ]]; then
   source .buildkite/scripts/common.sh
   # Set the MODULE env variable if possible, it should be defined before generating pipeline's steps. It is used in multiple pipelines.
   defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
