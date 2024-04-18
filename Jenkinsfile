@@ -5,7 +5,7 @@
 pipeline {
   agent { label 'ubuntu-22 && immutable' }
   environment {
-    AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/elastic-observability-aws-account-auth'
+    AWS_ACCOUNT_SECRET = 'secret/observability-team/ci/platform-ingest/aws_account_auth'
     AWS_REGION = "${params.awsRegion}"
     REPO = 'beats'
     BASE_DIR = "src/github.com/elastic/${env.REPO}"
