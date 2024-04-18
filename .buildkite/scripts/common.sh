@@ -18,12 +18,6 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_xpack_libbeat+x}" ] && run_xpack_libbeat="$(buildkite-agent meta-data get run_xpack_libbeat --default "false")"
 [ -z "${run_xpack_metricbeat+x}" ] && run_xpack_metricbeat="$(buildkite-agent meta-data get run_xpack_metricbeat --default "false")"
 [ -z "${run_xpack_packetbeat+x}" ] && run_xpack_packetbeat="$(buildkite-agent meta-data get run_xpack_packetbeat --default "false")"
-<<<<<<< HEAD
-[ -z "${run_xpack_filebeat+x}" ] && run_xpack_filebeat="$(buildkite-agent meta-data get run_xpack_filebeat --default "false")"
-
-=======
-[ -z "${run_xpack_heartbeat+x}" ] && run_xpack_heartbeat="$(buildkite-agent meta-data get run_xpack_heartbeat --default "false")"
->>>>>>> main
 # define if needed run ARM platform-specific tests for the particular beat
 [ -z "${run_filebeat_arm_tests+x}" ] && run_filebeat_arm_tests="$(buildkite-agent meta-data get run_filebeat_arm_tests --default "false")"
 [ -z "${run_packetbeat_arm_tests+x}" ] && run_packetbeat_arm_tests="$(buildkite-agent meta-data get run_packetbeat_arm_tests --default "false")"
@@ -51,15 +45,6 @@ winlogbeat_changeset=(
 
 xpack_dockerlogbeat_changeset=(
   "^x-pack/dockerlogbeat/.*"
-  )
-
-<<<<<<< HEAD
-xpack_filebeat_changeset=(
-  "^x-pack/filebeat/.*"
-=======
-xpack_heartbeat_changeset=(
-  "^x-pack/heartbeat/.*"
->>>>>>> main
   )
 
 xpack_libbeat_changeset=(
@@ -114,14 +99,6 @@ case "${BUILDKITE_PIPELINE_SLUG}" in
     ;;
   "beats-winlogbeat")
     BEAT_CHANGESET_REFERENCE=${winlogbeat_changeset[@]}
-    ;;
-<<<<<<< HEAD
-  "beats-xpack-filebeat")
-    BEAT_CHANGESET_REFERENCE=${xpack_filebeat_changeset[@]}
-=======
-  "beats-xpack-heartbeat")
-    BEAT_CHANGESET_REFERENCE=${xpack_heartbeat_changeset[@]}
->>>>>>> main
     ;;
   "beats-xpack-libbeat")
     BEAT_CHANGESET_REFERENCE=${xpack_libbeat_changeset[@]}
