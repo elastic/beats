@@ -175,6 +175,8 @@ steps:
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
+          withNodeJSEnv $ASDF_NODEJS_VERSION
+          installNodeJsDependencies
           cd x-pack/heartbeat
           mage build unitTest
         agents:
@@ -191,6 +193,8 @@ steps:
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
+          withNodeJSEnv $ASDF_NODEJS_VERSION
+          installNodeJsDependencies
           cd x-pack/heartbeat
           mage build unitTest
         agents:
