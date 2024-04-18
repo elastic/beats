@@ -26,7 +26,7 @@ steps:
     key: "heartbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: Unit Tests"
+      - label: ":ubuntu: Heartbeat Unit Tests"
         command: |
           cd heartbeat
           mage build unitTest
@@ -37,6 +37,9 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Ubuntu Unit Tests"
 
       - label: ":rhel: Heartbeat Rhel9 Unit Tests"
         command: |
@@ -49,8 +52,11 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Rhel9 Unit Tests"
 
-      - label: ":windows: Heartbeat Win-2016 Unit Test"
+      - label: ":windows: Heartbeat Win-2016 Unit Tests"
         key: "windows-2016"
         command: |
           Set-Location -Path heartbeat
@@ -63,6 +69,9 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Win-2016 Unit Tests"
 
       - label: ":windows: Heartbeat Win-2022 Unit Test"
         key: "windows-2022"
@@ -77,6 +86,9 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Win-2022 Unit Tests"
 
       - label: ":ubuntu: Heartbeat Go Integration Tests"
         command:  |
@@ -89,6 +101,9 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Go Integration Tests"
 
       - label: ":ubuntu: Heartbeat Python Integration Tests"
         command: |
@@ -101,6 +116,9 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Python Integration Tests"
 
   - group: "Heartbeat ARM Tests"
     key: "heartbeat-extended-tests-arm"
@@ -117,6 +135,9 @@ steps:
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "heartbeat/build/*.xml"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Ubuntu ARM64 Unit Tests"
 
   - group: "Heartbeat Extended Testing MacOS"
     key: "heartbeat-extended-tests-macos"
@@ -126,12 +147,36 @@ steps:
       - label: ":mac: Heartbeat MacOS Unit Tests"
         key: "macos-extended"
         command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
           cd heartbeat
           mage build unitTest
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths: "heartbeat/build/*.xml"
+        artifact_paths:
+          - "metricbeat/build/*.xml"
+          - "metricbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: MacOS Unit Tests"
+
+      - label: ":mac: Heartbeat MacOS ARM Unit Tests"
+        key: "macos-arm-extended"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
+          cd heartbeat
+          mage build unitTest
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
+        artifact_paths:
+          - "metricbeat/build/*.xml"
+          - "metricbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: MacOS ARM Unit Tests"
 
   - group: "Heartbeat Windows Extended Testing"
     key: "heartbeat-extended-tests-win"
@@ -151,6 +196,9 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Win-2019 Unit Tests"
 
       - label: ":windows: Heartbeat Win-11 Unit Tests"
         key: "heartbeat-windows-extended-11"
@@ -165,6 +213,9 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Win-11 Unit Tests"
 
       - label: ":windows: Heartbeat Win-10 Unit Tests"
         key: "heartbeat-windows-extended-10"
@@ -179,6 +230,9 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Win-10 Unit Tests"
 
   - wait: ~
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
