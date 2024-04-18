@@ -100,14 +100,6 @@ case "${BUILDKITE_PIPELINE_SLUG}" in
   "beats-winlogbeat")
     BEAT_CHANGESET_REFERENCE=${winlogbeat_changeset[@]}
     ;;
-<<<<<<< HEAD
-  "beats-xpack-filebeat")
-    BEAT_CHANGESET_REFERENCE=${xpack_filebeat_changeset[@]}
-=======
-  "beats-xpack-heartbeat")
-    BEAT_CHANGESET_REFERENCE=${xpack_heartbeat_changeset[@]}
->>>>>>> main
-    ;;
   "beats-xpack-libbeat")
     BEAT_CHANGESET_REFERENCE=${xpack_libbeat_changeset[@]}
     ;;
