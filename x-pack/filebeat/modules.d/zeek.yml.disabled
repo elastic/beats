@@ -1,5 +1,5 @@
 # Module: zeek
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.14/filebeat-module-zeek.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-zeek.html
 
 - module: zeek
   capture_loss:

@@ -1,5 +1,5 @@
 # Module: syncgateway
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.14/metricbeat-module-syncgateway.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-syncgateway.html
 
 - module: syncgateway
   metricsets:

@@ -1,5 +1,5 @@
 # Module: netflow
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.14/filebeat-module-netflow.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-netflow.html
 
 - module: netflow
   log:

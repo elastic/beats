@@ -1,5 +1,5 @@
 # Module: apache
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.14/filebeat-module-apache.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-apache.html
 
 - module: apache
   # Access logs

@@ -1,5 +1,5 @@
 # Module: linux
-# Docs: https://www.elastic.co/guide/en/beats/metricbeat/8.14/metricbeat-module-linux.html
+# Docs: https://www.elastic.co/guide/en/beats/metricbeat/main/metricbeat-module-linux.html
 
 - module: linux
   period: 10s

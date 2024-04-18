@@ -1,5 +1,5 @@
 # Module: coredns
-# Docs: https://www.elastic.co/guide/en/beats/filebeat/8.14/filebeat-module-coredns.html
+# Docs: https://www.elastic.co/guide/en/beats/filebeat/main/filebeat-module-coredns.html
 
 - module: coredns
   # Fileset for native deployment
