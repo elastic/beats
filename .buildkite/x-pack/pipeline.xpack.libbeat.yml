@@ -2,20 +2,6 @@
 name: "beats-xpack-libbeat"
 
 env:
-<<<<<<< HEAD
-  IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
-  IMAGE_UBUNTU_ARM_64: "core-ubuntu-2004-aarch64"
-  IMAGE_WIN_10: "family/general-windows-10"
-  IMAGE_WIN_11: "family/general-windows-11"
-  IMAGE_WIN_2016: "family/core-windows-2016"
-  IMAGE_WIN_2019: "family/core-windows-2019"
-  IMAGE_WIN_2022: "family/core-windows-2022"
-  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
-  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
-  BEATS_PROJECT_NAME: "x-pack/libbeat"
-=======
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
@@ -30,7 +16,6 @@ env:
 
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
->>>>>>> b0690b5fb9 (migrate x-pack/libbeat to static (#38964))
 
 steps:
   - group: "x-pack/libbeat Mandatory Tests"
@@ -84,14 +69,6 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Python Integration Tests"
 
-<<<<<<< HEAD
-  - label: ":linux: Load dynamic x-pack libbeat pipeline"
-    key: "libbeat-pipeline"
-    command: ".buildkite/scripts/generate_xpack_libbeat_pipeline.sh"
-    notify:
-      - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
-=======
       - label: ":windows: Windows 2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/libbeat
@@ -205,4 +182,3 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/libbeat: Ubuntu ARM64 Extended Unit Tests"
->>>>>>> b0690b5fb9 (migrate x-pack/libbeat to static (#38964))
