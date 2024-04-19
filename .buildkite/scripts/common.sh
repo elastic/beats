@@ -50,10 +50,6 @@ xpack_filebeat_changeset=(
   "^x-pack/filebeat/.*"
   )
 
-xpack_libbeat_changeset=(
-  "^x-pack/libbeat/.*"
-  )
-
 xpack_packetbeat_changeset=(
   "^x-pack/packetbeat/.*"
   )
