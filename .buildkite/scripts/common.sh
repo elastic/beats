@@ -340,7 +340,7 @@ are_conditions_met_mandatory_tests() {
 
 are_conditions_met_arm_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
       if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_ARM_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_ARM_LABEL} || "${!TRIGGER_SPECIFIC_ARM_TESTS}" == "true" ]]; then
         return 0
       fi
