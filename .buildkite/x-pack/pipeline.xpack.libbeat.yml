@@ -18,13 +18,12 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
 
 steps:
-  - group: "Mandatory Tests"
-    key: "mandatory-tests"
+  - group: "x-pack/libbeat Mandatory Tests"
+    key: "x-pack-libbeat-mandatory-tests"
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
-          set -euo pipefail
           cd x-pack/libbeat
           mage build unitTest
         agents:
@@ -41,7 +40,6 @@ steps:
       - label: ":go: Go Integration Tests"
         key: "mandatory-int-test"
         command: |
-          set -euo pipefail
           cd x-pack/libbeat
           mage goIntegTest
         agents:
@@ -58,7 +56,6 @@ steps:
       - label: ":python: Python Integration Tests"
         key: "mandatory-python-int-test"
         command: |
-          set -euo pipefail
           cd x-pack/libbeat
           mage pythonIntegTest
         agents:
@@ -108,10 +105,9 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Windows 2022 Unit Tests"
 
-  ### TODO: this condition will be changed in the Phase 3 of the Migration Plan https://docs.google.com/document/d/1IPNprVtcnHlem-uyGZM0zGzhfUuFAh4LeSl9JFHMSZQ/edit#heading=h.sltz78yy249h
-  - group: "Extended Windows Tests"
-    key: "extended-win-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false"
+  - group: "x-pack/libbeat Extended Windows Tests"
+    key: "x-pack-libbeat-extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
     steps:
       - label: ":windows: Windows 10 Unit Tests"
         command: |
@@ -167,14 +163,13 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Windows 2019 Unit Tests"
 
-  - group: "Extended Tests"
-    key: "extended-tests"
+  - group: "x-pack/libbeat Linux arm Extended Tests"
+    key: "x-pack-libbeat-extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
     steps:
       - label: ":linux: Ubuntu ARM64 Unit Tests"
         key: "extended-arm64-unit-tests"
         command: |
-          set -euo pipefail
           cd x-pack/libbeat
           mage build unitTest
         agents:

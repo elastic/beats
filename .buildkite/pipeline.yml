@@ -275,6 +275,8 @@ steps:
                 - pytest.ini
                 - dev-tools/
                 - testing/
+                # x-pack
+                - libbeat/
               config:
                 trigger: "beats-xpack-libbeat"
                 build:
