@@ -200,7 +200,7 @@ steps:
 
   - group: "x-pack/packetbeat Linux arm Extended Tests"
     key: "x-pack-packetbeat-extended-linux-arm-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST" == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
     steps:
       - label: ":linux: Ubuntu ARM Unit Tests"
         key: "extended-arm64-unit-test"
