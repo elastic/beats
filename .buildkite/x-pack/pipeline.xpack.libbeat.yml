@@ -181,4 +181,4 @@ steps:
           - "x-pack/libbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/libbeat: Ubuntu ARM64 Unit Tests"
+              context: "x-pack/libbeat: Ubuntu ARM64 Extended Unit Tests"
