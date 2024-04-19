@@ -214,7 +214,7 @@ steps:
 
       - label: ":linux: Cloud (MODULE) Tests"
         key: "x-pack-metricbeat-extended-cloud-test"
-        skip: "doesn't belong in a stage in Jenkins, thus skipped"
+        #skip: "doesn't belong in a stage in Jenkins, thus skipped"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
         # see link in Jenkins: https://github.com/elastic/beats/blob/ccd7b135df70358f8a02393d9bd8b716428b8048/x-pack/metricbeat/Jenkinsfile.yml#L39
         # additionally skipping due to https://github.com/elastic/ingest-dev/issues/3170
@@ -245,7 +245,7 @@ steps:
 
       - label: ":linux: Cloud AWS (MODULE) Tests"
         key: "x-pack-metricbeat-extended-cloud-test-aws"
-        skip: "https://github.com/elastic/beats/issues/36425"
+        #skip: "https://github.com/elastic/beats/issues/36425"
         # see commented out section in Jenkins: https://github.com/elastic/beats/blob/main/x-pack/metricbeat/Jenkinsfile.yml#L41-L52
         # additionally skipping due to https://github.com/elastic/ingest-dev/issues/3170
         if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
