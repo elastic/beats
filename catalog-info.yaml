@@ -983,11 +983,11 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
-  name: beats-xpack-agentbeat-package
-  description: Buildkite pipeline for packaging and publishing agentbeat
+  name: beats-packaging-pipeline
+  description: Buildkite pipeline for packaging and publishing to DRA
   links:
     - title: Pipeline
-      url: https://buildkite.com/elastic/beats-xpack-agentbeat-package
+      url: https://buildkite.com/elastic/beats-packaging-pipeline
 spec:
   type: buildkite-pipeline
   owner: group:ingest-fp
@@ -996,19 +996,16 @@ spec:
     apiVersion: buildkite.elastic.dev/v1
     kind: Pipeline
     metadata:
-      name: beats-xpack-agentbeat-package
-      description: Buildkite pipeline for packaging and publishing agentbeat
+      name: beats-packaging-pipeline
+      description: Pipeline for Beats packaging and publishing
     spec:
       repository: elastic/beats
-      pipeline_file: ".buildkite/x-pack/agentbeat/pipeline.xpack.agentbeat.package.yml"
-      # todo release branched must be 8.14+
-      branch_configuration: "main 8.14"
+      pipeline_file: ".buildkite/packaging.pipeline.yml"
+      branch_configuration: "main 8.*"
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
       provider_settings:
-        trigger_mode: code
-        build_pull_requests: false
-        build_branches: true
+        trigger_mode: none
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
