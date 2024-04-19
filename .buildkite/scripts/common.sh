@@ -13,13 +13,13 @@ OSS_MODULE_PATTERN="^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 # define if needed run the whole pipeline for the particular beat
 [ -z "${run_filebeat+x}" ] && run_filebeat="$(buildkite-agent meta-data get run_filebeat --default "false")"
-[ -z "${run_xpack_libbeat+x}" ] && run_xpack_libbeat="$(buildkite-agent meta-data get run_xpack_libbeat --default "false")"
 [ -z "${run_xpack_metricbeat+x}" ] && run_xpack_metricbeat="$(buildkite-agent meta-data get run_xpack_metricbeat --default "false")"
 [ -z "${run_xpack_packetbeat+x}" ] && run_xpack_packetbeat="$(buildkite-agent meta-data get run_xpack_packetbeat --default "false")"
+
 # define if needed run ARM platform-specific tests for the particular beat
 [ -z "${run_filebeat_arm_tests+x}" ] && run_filebeat_arm_tests="$(buildkite-agent meta-data get run_filebeat_arm_tests --default "false")"
-[ -z "${run_xpack_libbeat_arm_tests+x}" ] && run_xpack_libbeat_arm_tests="$(buildkite-agent meta-data get run_xpack_libbeat_arm_tests --default "false")"
 [ -z "${run_xpack_packetbeat_arm_tests+x}" ] && run_xpack_packetbeat_arm_tests="$(buildkite-agent meta-data get run_xpack_packetbeat_arm_tests --default "false")"
+
 # define if needed run MacOS platform-specific tests for the particular beat
 [ -z "${run_xpack_metricbeat_macos_tests+x}" ] && run_xpack_metricbeat_macos_tests="$(buildkite-agent meta-data get run_xpack_metricbeat_macos_tests --default "false")"
 [ -z "${run_xpack_packetbeat_macos_tests+x}" ] && run_xpack_packetbeat_macos_tests="$(buildkite-agent meta-data get run_xpack_packetbeat_macos_tests --default "false")"
@@ -27,20 +27,12 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 # define if needed run cloud-specific tests for the particular beat
 [ -z "${run_xpack_metricbeat_aws_tests+x}" ] && run_xpack_metricbeat_aws_tests="$(buildkite-agent meta-data get run_xpack_metricbeat_aws_tests --default "false")"
 
-libbeat_changeset=(
-  "^libbeat/.*"
-  )
-
 winlogbeat_changeset=(
   "^winlogbeat/.*"
   )
 
 xpack_dockerlogbeat_changeset=(
   "^x-pack/dockerlogbeat/.*"
-  )
-
-xpack_libbeat_changeset=(
-  "^x-pack/libbeat/.*"
   )
 
 xpack_packetbeat_changeset=(
@@ -68,7 +60,6 @@ oss_changeset=(
 )
 
 xpack_changeset=(
-  "${xpack_libbeat_changeset[@]}"
   "${oss_changeset[@]}"
 )
 
@@ -83,14 +74,8 @@ packaging_changeset=(
   )
 
 case "${BUILDKITE_PIPELINE_SLUG}" in
-  "beats-libbeat")
-    BEAT_CHANGESET_REFERENCE=${libbeat_changeset[@]}
-    ;;
   "beats-winlogbeat")
     BEAT_CHANGESET_REFERENCE=${winlogbeat_changeset[@]}
-    ;;
-  "beats-xpack-libbeat")
-    BEAT_CHANGESET_REFERENCE=${xpack_libbeat_changeset[@]}
     ;;
   "beats-xpack-metricbeat")
     BEAT_CHANGESET_REFERENCE=${xpack_metricbeat_changeset[@]}
@@ -337,7 +322,7 @@ are_conditions_met_mandatory_tests() {
 
 are_conditions_met_arm_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" ]]; then
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" ]]; then
       if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_ARM_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_ARM_LABEL} || "${!TRIGGER_SPECIFIC_ARM_TESTS}" == "true" ]]; then
         return 0
       fi

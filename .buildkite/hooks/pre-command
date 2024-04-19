@@ -61,7 +61,6 @@ ENABLED_BEATS_PIPELINES_SLUGS=(
   "beats-metricbeat"
   "beats-winlogbeat"
   "beats-winlogbeat"
-  "beats-xpack-libbeat"
   "beats-xpack-packetbeat"
   "beats-xpack-winlogbeat"
   "beats-xpack-dockerlogbeat"
