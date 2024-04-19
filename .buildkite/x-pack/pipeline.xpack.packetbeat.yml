@@ -25,12 +25,14 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
 
 steps:
-  - group: "Mandatory Tests"
-    key: "mandatory-tests"
+  - group: "x-pack/packetbeat Mandatory Tests"
+    key: "x-pack-packetbeat-mandatory-tests"
     steps:
       - label: ":linux: Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: "cd x-pack/packetbeat && mage build unitTest"
+        command: |
+          cd x-pack/packetbeat
+          mage build unitTest
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -44,7 +46,9 @@ steps:
 
       - label: ":linux: Ubuntu System Tests"
         key: "mandatory-linux-system-test"
-        command: "cd x-pack/packetbeat && mage systemTest"
+        command: |
+          cd x-pack/packetbeat
+          mage systemTest
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -58,7 +62,9 @@ steps:
 
       - label: ":rhel: RHEL9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
-        command: "cd x-pack/packetbeat && mage build unitTest"
+        command: |
+          cd x-pack/packetbeat
+          mage build unitTest
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9_X86_64}"
@@ -120,8 +126,8 @@ steps:
       #     - "x-pack/packetbeat/build/*.xml"
       #     - "x-pack/packetbeat/build/*.json"
 
-  - group: "Extended Windows Tests"
-    key: "extended-win-tests"
+  - group: "x-pack/packetbeat Extended Windows Tests"
+    key: "x-pack-packetbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
     steps:
       - label: ":windows: Windows 10 Unit Tests"
@@ -177,6 +183,7 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Windows 2019 Unit Tests"
+
       #  #skip: "see https://github.com/elastic/beats/issues/38142"
       # - label: ":windows: Windows 10 System Tests"
       #   key: "extended-win-10-system-tests"
@@ -191,9 +198,28 @@ steps:
       #     - "x-pack/packetbeat/build/*.xml"
       #     - "x-pack/packetbeat/build/*.json"
 
-  - group: "Extended Tests"
-    key: "extended-tests"
-    if: (build.env("BUILDKITE_PULL_REQUEST") == "false") && (build.env("GITHUB_PR_LABELS") =~ /.*arm.*/ || build.env("GITHUB_PR_LABELS") =~ /.*macos.*/)
+  - group: "x-pack/packetbeat Linux arm Extended Tests"
+    key: "x-pack-packetbeat-extended-linux-arm-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST" == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+    steps:
+      - label: ":linux: Ubuntu ARM Unit Tests"
+        key: "extended-arm64-unit-test"
+        command: "cd x-pack/packetbeat && mage build unitTest"
+        if: build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - "x-pack/packetbeat/build/*.xml"
+          - "x-pack/packetbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/packetbeat: Ubuntu ARM Unit Tests"
+
+  - group: "x-pack/packetbeat MacOS Extended Tests"
+    key: "x-pack-packetbeat-extended-macos-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macos.*/
     steps:
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
@@ -223,23 +249,8 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: MacOS ARM Unit Tests"
 
-      - label: ":linux: Ubuntu ARM Unit Tests"
-        key: "extended-arm64-unit-test"
-        command: "cd x-pack/packetbeat && mage build unitTest"
-        if: build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-        agents:
-          provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths:
-          - "x-pack/packetbeat/build/*.xml"
-          - "x-pack/packetbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/packetbeat: Ubuntu ARM Unit Tests"
-
-  - group: "Packaging"
-    key: "packaging"
+  - group: "x-pack/packetbeat Packaging"
+    key: "x-pack-packetbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
       - step: "mandatory-tests"
