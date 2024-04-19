@@ -2,18 +2,6 @@
 name: "beats-winlogbeat"
 
 env:
-<<<<<<< HEAD
-  IMAGE_UBUNTU_X86_64: "family/core-ubuntu-2204"
-  IMAGE_WIN_10: "family/general-windows-10"
-  IMAGE_WIN_11: "family/general-windows-11"
-  IMAGE_WIN_2016: "family/core-windows-2016"
-  IMAGE_WIN_2019: "family/core-windows-2019"
-  IMAGE_WIN_2022: "family/core-windows-2022"
-  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
-  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  BEATS_PROJECT_NAME: "winlogbeat"
-=======
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
@@ -27,7 +15,6 @@ env:
 
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
->>>>>>> 2250273c77 (Moved winlogbeat pipeline to central pipeline (#38926))
 
 steps:
   - group: "Winlogbeat Mandatory Tests"
@@ -147,14 +134,6 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "winlogbeat-mandatory-tests"
 
-<<<<<<< HEAD
-  - label: ":linux: Load dynamic winlogbeat pipeline"
-    key: "winlogbeat-pipeline"
-    command: ".buildkite/scripts/generate_winlogbeat_pipeline.sh"
-    notify:
-      - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
-=======
   - group: "Winlogbeat Packaging"
     key: "winlogbeat-packaging"
     steps:
@@ -168,8 +147,7 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
         notify:
           - github_commit_status:
               context: "Winlogbeat: Packaging Ubuntu x86_64"
->>>>>>> 2250273c77 (Moved winlogbeat pipeline to central pipeline (#38926))
