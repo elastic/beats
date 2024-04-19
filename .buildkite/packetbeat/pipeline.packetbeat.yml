@@ -90,7 +90,7 @@ steps:
 
   - group: "Extended Windows Tests"
     key: "packetbeat-extended-windows-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Wwindows].*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
     steps:
       - label: ":windows: Windows 10 Unit Tests"
         command: |
