@@ -1,7 +1,7 @@
 function ArePathsChanged($patterns) {
     $changedlist = @()
     foreach ($pattern in $patterns) {
-        $changedFiles = & git diff --name-only "HEAD@{1}" HEAD | Select-String -Pattern $pattern
+        $changedFiles = & git diff --name-only "HEAD@{1}" HEAD | Select-String -Pattern $pattern -SimpleMatch
         if ($changedFiles) {
             $changedlist += $changedFiles
         }
@@ -23,7 +23,7 @@ function AreChangedOnlyPaths($patterns) {
 
     $matchedFiles = @()
     foreach ($pattern in $patterns) {
-        $matched = $changedFiles | Select-String -Pattern $pattern
+        $matched = $changedFiles | Select-String -Pattern $pattern -SimpleMatch
         if ($matched) {
             $matchedFiles += $matched
         }
