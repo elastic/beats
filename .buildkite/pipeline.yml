@@ -297,13 +297,12 @@ steps:
                 - .buildkite/x-pack/pipeline.xpack.libbeat.yml
                 - .buildkite/scripts
                 - .buildkite/hooks
-                #OSS
+                # x-pack
                 - go.mod
                 - pytest.ini
                 - dev-tools/
-                - testing/
-                # x-pack
                 - libbeat/
+                - testing/
               config:
                 trigger: "beats-xpack-libbeat"
                 build:
