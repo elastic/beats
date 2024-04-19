@@ -300,8 +300,9 @@ steps:
                 - go.mod
                 - pytest.ini
                 - dev-tools/
+                - libbeat/
                 - testing/
-                - x-pack/packetbeat/
+                - x-pack/libbeat/
               config:
                 trigger: "beats-xpack-packetbeat"
                 build:
