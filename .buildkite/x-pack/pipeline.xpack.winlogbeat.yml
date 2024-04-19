@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
-name: "beats-x-pack-winlogbeat"
+name: "beats-xpack-winlogbeat"
 
 env:
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
@@ -22,10 +22,10 @@ steps:
       - label: ":windows: x-pack/Winlogbeat Win-2019 Unit (MODULE) Tests"
         key: "mandatory-win-2019-module-unit-tests"
         command: |
-          Import-Module .\.buildkite\scripts\changesets.psm1
-          defineModuleFromTheChangeSet 'x-pack\winlogbeat'
-          Write-Output "~~~ Will run tests with env var MODULE=$Env:MODULE"
-          Set-Location -Path x-pack\winlogbeat
+          Import-Module ./.buildkite/scripts/changesets.psm1
+          defineModuleFromTheChangeSet 'x-pack/winlogbeat'
+          Write-Output "~~~ Will run tests with env var MODULE=$$Env:MODULE"
+          Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         env:
           MODULE: $MODULE
@@ -44,7 +44,7 @@ steps:
 
       - label: ":windows: x-pack/Winlogbeat Win-2016 Unit Tests"
         command: |
-          Set-Location -Path x-pack\winlogbeat
+          Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "mandatory-win-2016-unit-tests"
         agents:
@@ -62,7 +62,7 @@ steps:
 
       - label: ":windows: x-pack/Winlogbeat Win-2022 Unit Tests"
         command: |
-          Set-Location -Path x-pack\winlogbeat
+          Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "mandatory-win-2022-unit-tests"
         agents:
@@ -85,7 +85,7 @@ steps:
     steps:
       - label: ":windows: x-pack/Winlogbeat Win-10 Unit Tests"
         command: |
-          Set-Location -Path x-pack\winlogbeat
+          Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "extended-win-10-unit-tests"
         agents:
@@ -103,7 +103,7 @@ steps:
 
       - label: ":windows: x-pack/Winlogbeat Win-11 Unit Tests"
         command: |
-          Set-Location -Path x-pack\winlogbeat
+          Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "extended-win-11-unit-tests"
         agents:
@@ -121,7 +121,7 @@ steps:
 
       - label: ":windows: x-pack/Winlogbeat Win-2019 Unit Tests"
         command: |
-          Set-Location -Path x-pack\winlogbeat
+          Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "extended-win-2019-unit-tests"
         agents:

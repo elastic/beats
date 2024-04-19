@@ -7,19 +7,20 @@ function ArePathsChanged($patterns) {
         }
     }
     if ($changedlist) {
-        Write-Output "--- Files changed:"
-        Write-Output $changedlist
+        Write-Host "--- Files changed: $changedlist"
         return $true
     }
     else {
-        Write-Output "--- No files changed within specified changeset:"
-        Write-Output $patterns
+        Write-Host "--- No files changed within specified changeset: $patterns"
         return $false
     }
 }
 
 function AreChangedOnlyPaths($patterns) {
     $changedFiles = & git diff --name-only "HEAD@{1}" HEAD
+    Write-Host "--- Git Diff result:"
+    Write-Host "$changedFiles"
+
     $matchedFiles = @()
     foreach ($pattern in $patterns) {
         $matched = $changedFiles | Select-String -Pattern $pattern
