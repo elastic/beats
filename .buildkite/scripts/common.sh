@@ -42,14 +42,6 @@ xpack_dockerlogbeat_changeset=(
   "^x-pack/dockerlogbeat/.*"
   )
 
-xpack_heartbeat_changeset=(
-  "^x-pack/heartbeat/.*"
-  )
-
-xpack_filebeat_changeset=(
-  "^x-pack/filebeat/.*"
-  )
-
 xpack_packetbeat_changeset=(
   "^x-pack/packetbeat/.*"
   )
