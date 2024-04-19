@@ -17,7 +17,6 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_winlogbeat+x}" ] && run_winlogbeat="$(buildkite-agent meta-data get run_winlogbeat --default "false")"
 [ -z "${run_xpack_libbeat+x}" ] && run_xpack_libbeat="$(buildkite-agent meta-data get run_xpack_libbeat --default "false")"
 [ -z "${run_xpack_metricbeat+x}" ] && run_xpack_metricbeat="$(buildkite-agent meta-data get run_xpack_metricbeat --default "false")"
-[ -z "${run_xpack_packetbeat+x}" ] && run_xpack_packetbeat="$(buildkite-agent meta-data get run_xpack_packetbeat --default "false")"
 [ -z "${run_xpack_filebeat+x}" ] && run_xpack_filebeat="$(buildkite-agent meta-data get run_xpack_filebeat --default "false")"
 [ -z "${run_xpack_heartbeat+x}" ] && run_xpack_heartbeat="$(buildkite-agent meta-data get run_xpack_heartbeat --default "false")"
 
@@ -26,13 +25,11 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_packetbeat_arm_tests+x}" ] && run_packetbeat_arm_tests="$(buildkite-agent meta-data get run_packetbeat_arm_tests --default "false")"
 [ -z "${run_xpack_filebeat_arm_tests+x}" ] && run_xpack_filebeat_arm_tests="$(buildkite-agent meta-data get run_xpack_filebeat_arm_tests --default "false")"
 [ -z "${run_xpack_libbeat_arm_tests+x}" ] && run_xpack_libbeat_arm_tests="$(buildkite-agent meta-data get run_xpack_libbeat_arm_tests --default "false")"
-[ -z "${run_xpack_packetbeat_arm_tests+x}" ] && run_xpack_packetbeat_arm_tests="$(buildkite-agent meta-data get run_xpack_packetbeat_arm_tests --default "false")"
 
 # define if needed run MacOS platform-specific tests for the particular beat
 [ -z "${run_packetbeat_macos_tests+x}" ] && run_packetbeat_macos_tests="$(buildkite-agent meta-data get run_packetbeat_macos_tests --default "false")"
 [ -z "${run_xpack_filebeat_macos_tests+x}" ] && run_xpack_filebeat_macos_tests="$(buildkite-agent meta-data get run_xpack_filebeat_macos_tests --default "false")"
 [ -z "${run_xpack_metricbeat_macos_tests+x}" ] && run_xpack_metricbeat_macos_tests="$(buildkite-agent meta-data get run_xpack_metricbeat_macos_tests --default "false")"
-[ -z "${run_xpack_packetbeat_macos_tests+x}" ] && run_xpack_packetbeat_macos_tests="$(buildkite-agent meta-data get run_xpack_packetbeat_macos_tests --default "false")"
 [ -z "${run_xpack_heartbeat_macos_tests+x}" ] && run_xpack_heartbeat_macos_tests="$(buildkite-agent meta-data get run_xpack_heartbeat_macos_tests --default "false")"
 
 # define if needed run cloud-specific tests for the particular beat
@@ -66,10 +63,6 @@ xpack_filebeat_changeset=(
 
 xpack_libbeat_changeset=(
   "^x-pack/libbeat/.*"
-  )
-
-xpack_packetbeat_changeset=(
-  "^x-pack/packetbeat/.*"
   )
 
 xpack_winlogbeat_changeset=(
@@ -128,9 +121,6 @@ case "${BUILDKITE_PIPELINE_SLUG}" in
     ;;
   "beats-xpack-metricbeat")
     BEAT_CHANGESET_REFERENCE=${xpack_metricbeat_changeset[@]}
-    ;;
-  "beats-xpack-packetbeat")
-    BEAT_CHANGESET_REFERENCE=${xpack_packetbeat_changeset[@]}
     ;;
   *)
   echo "~~~ The changeset for the ${BUILDKITE_PIPELINE_SLUG} pipeline hasn't been defined yet."
