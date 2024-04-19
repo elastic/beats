@@ -178,7 +178,7 @@ var specs = map[OSArch]Spec{
 	{"linux", "arm64"}:   {"_1.linux_aarch64.tar.gz", osqueryDistroLinuxARMSHA256, true},
 	{"darwin", "amd64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
 	{"darwin", "arm64"}:  {osqueryPkgExt, osqueryDistroDarwinSHA256, true},
-	{"windows", "amd64"}: {osqueryMSIExt, osqueryDistroWindowsSHA256, false},
+	{"windows", "amd64"}: {osqueryMSIExt, osqueryDistroWindowsSHA256, true},
 }
 
 func GetSpec(osarch OSArch) (spec Spec, err error) {

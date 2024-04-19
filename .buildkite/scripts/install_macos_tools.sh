@@ -133,3 +133,8 @@ with_go "${GO_VERSION}"
 with_mage
 with_python
 config_git
+
+# prevent "OSError: [Errno 24] Too many open files" on macOS
+ulimit -Sn 150000
+echo "~~~ Setting ulimit: $(ulimit)"
+echo "~~~ Resuming commands"
