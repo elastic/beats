@@ -253,7 +253,7 @@ steps:
     key: "x-pack-packetbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
-      - step: "mandatory-tests"
+      - step: "x-pack-packetbeat-mandatory-tests"
         allow_failure: false
     steps:
       - label: ":linux: Packaging Linux"
