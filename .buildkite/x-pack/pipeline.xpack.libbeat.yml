@@ -164,7 +164,7 @@ steps:
               context: "x-pack/libbeat: Windows 2019 Unit Tests"
 
   - group: "x-pack/libbeat Linux arm Extended Tests"
-    key: "x-pack-libbeat-extended-tests"
+    key: "x-pack-libbeat-extended-tests-linux-arm"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
     steps:
       - label: ":linux: Ubuntu ARM64 Unit Tests"
