@@ -44,10 +44,6 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 [ -z "${run_xpack_filebeat_aws_tests+x}" ] && run_xpack_filebeat_aws_tests="$(buildkite-agent meta-data get run_xpack_filebeat_aws_tests --default "false")"
 
 
-libbeat_changeset=(
-  "^libbeat/.*"
-  )
-
 packetbeat_changeset=(
   "^packetbeat/.*"
   )
@@ -70,10 +66,6 @@ xpack_heartbeat_changeset=(
 
 xpack_filebeat_changeset=(
   "^x-pack/filebeat/.*"
-  )
-
-xpack_libbeat_changeset=(
-  "^x-pack/libbeat/.*"
   )
 
 xpack_packetbeat_changeset=(
@@ -101,7 +93,6 @@ oss_changeset=(
 )
 
 xpack_changeset=(
-  "${xpack_libbeat_changeset[@]}"
   "${oss_changeset[@]}"
 )
 
@@ -116,8 +107,6 @@ packaging_changeset=(
   )
 
 case "${BUILDKITE_PIPELINE_SLUG}" in
-  "beats-libbeat")
-    BEAT_CHANGESET_REFERENCE=${libbeat_changeset[@]}
     ;;
   "beats-packetbeat")
     BEAT_CHANGESET_REFERENCE=${packetbeat_changeset[@]}
@@ -133,9 +122,6 @@ case "${BUILDKITE_PIPELINE_SLUG}" in
     ;;
   "beats-xpack-heartbeat")
     BEAT_CHANGESET_REFERENCE=${xpack_heartbeat_changeset[@]}
-    ;;
-  "beats-xpack-libbeat")
-    BEAT_CHANGESET_REFERENCE=${xpack_libbeat_changeset[@]}
     ;;
   "beats-xpack-metricbeat")
     BEAT_CHANGESET_REFERENCE=${xpack_metricbeat_changeset[@]}
@@ -382,7 +368,7 @@ are_conditions_met_mandatory_tests() {
 
 are_conditions_met_arm_tests() {
   if are_conditions_met_mandatory_tests; then    #from https://github.com/elastic/beats/blob/c5e79a25d05d5bdfa9da4d187fe89523faa42afc/Jenkinsfile#L145-L171
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-libbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
+    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-packetbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
       if [[ "${GITHUB_PR_TRIGGER_COMMENT}" == "${BEATS_GH_ARM_COMMENT}" || "${GITHUB_PR_LABELS}" =~ ${BEATS_GH_ARM_LABEL} || "${!TRIGGER_SPECIFIC_ARM_TESTS}" == "true" ]]; then
         return 0
       fi
