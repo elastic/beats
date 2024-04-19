@@ -285,8 +285,6 @@ steps:
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-<<<<<<< HEAD
-=======
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/libbeat"
@@ -313,7 +311,6 @@ steps:
                   env:
                     - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
->>>>>>> b0690b5fb9 (migrate x-pack/libbeat to static (#38964))
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/auditbeat"
