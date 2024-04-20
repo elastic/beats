@@ -126,15 +126,16 @@ func (d Digest) MarshalText() ([]byte, error) { return []byte(d.String()), nil }
 
 // Event describes the filesystem change and includes metadata about the file.
 type Event struct {
-	Timestamp     time.Time           `json:"timestamp"`             // Time of event.
-	Path          string              `json:"path"`                  // The path associated with the event.
-	TargetPath    string              `json:"target_path,omitempty"` // Target path for symlinks.
-	Info          *Metadata           `json:"info"`                  // File metadata (if the file exists).
-	Source        Source              `json:"source"`                // Source of the event.
-	Action        Action              `json:"action"`                // Action (like created, updated).
-	Hashes        map[HashType]Digest `json:"hash,omitempty"`        // File hashes.
-	ParserResults mapstr.M            `json:"file,omitempty"`        // Results from running file parsers.
-	Process       *Process            `json:"process,omitempty"`     // Process data. Available only on Linux when using the eBPF backend.
+	Timestamp     time.Time           `json:"timestamp"`              // Time of event.
+	Path          string              `json:"path"`                   // The path associated with the event.
+	TargetPath    string              `json:"target_path,omitempty"`  // Target path for symlinks.
+	Info          *Metadata           `json:"info"`                   // File metadata (if the file exists).
+	Source        Source              `json:"source"`                 // Source of the event.
+	Action        Action              `json:"action"`                 // Action (like created, updated).
+	Hashes        map[HashType]Digest `json:"hash,omitempty"`         // File hashes.
+	ParserResults mapstr.M            `json:"file,omitempty"`         // Results from running file parsers.
+	Process       *Process            `json:"process,omitempty"`      // Process data. Available only on Linux when using the eBPF backend.
+	ContainerID   string              `json:"container_id,omitempty"` // Unique container ID. Available only on Linux when using the eBPF backend.
 
 	// Metadata
 	rtt        time.Duration // Time taken to collect the info.
@@ -398,6 +399,10 @@ func buildMetricbeatEvent(e *Event, existedBefore bool) mb.Event {
 		}
 
 		out.MetricSetFields.Put("process", process)
+	}
+
+	if e.ContainerID != "" {
+		out.MetricSetFields.Put("container.id", e.ContainerID)
 	}
 
 	if len(e.Hashes) > 0 {

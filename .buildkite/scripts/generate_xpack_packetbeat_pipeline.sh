@@ -57,88 +57,128 @@ steps:
           - github_commit_status:
               context: "$BEATS_PROJECT_NAME: RHEL9 Unit Tests"
 
-
-      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
-        command:
-          - "Set-Location -Path $BEATS_PROJECT_NAME"
-          - "New-Item -ItemType Directory -Force -Path 'build'"
-          - "mage unitTest"
-        key: "mandatory-win-unit-tests"
+      - label: ":windows: Windows 2016 Unit Tests"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "mandatory-win-2016-unit-tests"
         agents:
           provider: "gcp"
-          image: "{{matrix.image}}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          image: "${IMAGE_WIN_2016}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        matrix:
-          setup:
-            image:
-              - "${IMAGE_WIN_2016}"
-              - "${IMAGE_WIN_2022}"
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
         notify:
           - github_commit_status:
-              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Windows 2016 Unit Tests"
 
-      ##  TODO: uncomment when the issue https://github.com/elastic/beats/issues/38142 is solved
-      # - label: ":windows: Windows 2022 System Tests"
-      #   key: "mandatory-win-2022-system-tests"
-      #   command: ".buildkite/scripts/win_unit_tests.ps1 systemtest"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_WIN_2022}"
-      #     machineType: "${GCP_WIN_MACHINE_TYPE}"
-      #     disk_size: 100
-      #     disk_type: "pd-ssd"
-        # artifact_paths:
-        #   - "$BEATS_PROJECT_NAME/build/*.xml"
-        #   - "$BEATS_PROJECT_NAME/build/*.json"
+      - label: ":windows: Windows 2022 Unit Tests"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "mandatory-win-2022-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows 2022 Unit Tests"
+
+      - label: ":windows: Windows 2022 System Tests"
+        skip: "see https://github.com/elastic/beats/issues/38142"
+        key: "mandatory-win-2022-system-tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1 systemtest"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
 ## TODO: this condition will be changed in the Phase 3 of the Migration Plan https://docs.google.com/document/d/1IPNprVtcnHlem-uyGZM0zGzhfUuFAh4LeSl9JFHMSZQ/edit#heading=h.sltz78yy249h
 
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
     steps:
-
-      - label: ":windows: Windows Unit Tests - {{matrix.image}}"
+      - label: ":windows: Windows 10 Unit Tests"
         command: |
           Set-Location -Path $BEATS_PROJECT_NAME
           mage build unitTest
-        key: "extended-win-unit-tests"
+        key: "extended-win-10-unit-tests"
         agents:
           provider: "gcp"
-          image: "{{matrix.image}}"
+          image: "${IMAGE_WIN_10}"
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        matrix:
-          setup:
-            image:
-              - "${IMAGE_WIN_10}"
-              - "${IMAGE_WIN_11}"
-              - "${IMAGE_WIN_2019}"
         artifact_paths:
           - "$BEATS_PROJECT_NAME/build/*.xml"
           - "$BEATS_PROJECT_NAME/build/*.json"
         notify:
           - github_commit_status:
-              context: "$BEATS_PROJECT_NAME: Windows {{matrix.image}} Unit Tests"
+              context: "$BEATS_PROJECT_NAME: Windows 10 Unit Tests"
 
-      ##  TODO: uncomment when the issue https://github.com/elastic/beats/issues/38142 is solved
-      # - label: ":windows: Windows 10 System Tests"
-      #   key: "extended-win-10-system-tests"
-      #   command: ".buildkite/scripts/win_unit_tests.ps1 systemtest"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_WIN_10}"
-      #     machineType: "${GCP_WIN_MACHINE_TYPE}"
-      #     disk_size: 100
-      #     disk_type: "pd-ssd"
-        # artifact_paths:
-        #   - "$BEATS_PROJECT_NAME/build/*.xml"
-        #   - "$BEATS_PROJECT_NAME/build/*.json"
+      - label: ":windows: Windows 11 Unit Tests"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "extended-win-11-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows 11 Unit Tests"
+
+      - label: ":windows: Windows 2019 Unit Tests"
+        command: |
+          Set-Location -Path $BEATS_PROJECT_NAME
+          mage build unitTest
+        key: "extended-win-2019-unit-tests"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "$BEATS_PROJECT_NAME: Windows 2019 Unit Tests"
+
+      - label: ":windows: Windows 10 System Tests"
+        skip: "see https://github.com/elastic/beats/issues/38142"
+        key: "extended-win-10-system-tests"
+        command: ".buildkite/scripts/win_unit_tests.ps1 systemtest"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "$BEATS_PROJECT_NAME/build/*.xml"
+          - "$BEATS_PROJECT_NAME/build/*.json"
 
 YAML
 else

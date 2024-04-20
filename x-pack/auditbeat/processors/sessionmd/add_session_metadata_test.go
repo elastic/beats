@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
@@ -320,7 +320,7 @@ func TestEnrich(t *testing.T) {
 	for _, tt := range enrichTests {
 		reader := procfs.NewMockReader()
 		db, err := processdb.NewDB(reader, *logger)
-		assert.Nil(t, err)
+		require.Nil(t, err)
 
 		for _, ev := range tt.mockProcesses {
 			db.InsertExec(ev)
@@ -335,10 +335,10 @@ func TestEnrich(t *testing.T) {
 		i := tt.input
 		actual, err := s.enrich(&i)
 		if tt.expect_error {
-			assert.Error(t, err, "%s: error unexpectedly nil", tt.testName)
+			require.Error(t, err, "%s: error unexpectedly nil", tt.testName)
 		} else {
-			assert.Nil(t, err, "%s: enrich error: %w", tt.testName, err)
-			assert.NotNil(t, actual, "%s: returned nil event", tt.testName)
+			require.Nil(t, err, "%s: enrich error: %w", tt.testName, err)
+			require.NotNil(t, actual, "%s: returned nil event", tt.testName)
 
 			//Validate output
 			if diff := cmp.Diff(tt.expected.Fields, actual.Fields, ignoreMissingFrom(tt.expected.Fields)); diff != "" {

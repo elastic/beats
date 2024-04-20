@@ -26,10 +26,12 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/auditbeat/module/file_integrity/kprobes"
-
-	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/processors/add_process_metadata"
 
 	"golang.org/x/sys/unix"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type kProbesReader struct {
@@ -39,6 +41,30 @@ type kProbesReader struct {
 	log     *logp.Logger
 
 	parsers []FileParser
+
+	processor beat.Processor
+}
+
+func newKProbesReader(config Config, l *logp.Logger, parsers []FileParser) (*kProbesReader, error) {
+	processor, err := add_process_metadata.NewWithConfig(
+		add_process_metadata.ConfigOverwriteKeys(true),
+		add_process_metadata.ConfigMatchPIDs([]string{"process.pid"}),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &kProbesReader{
+		config:    config,
+		eventC:    make(chan Event),
+		log:       l,
+		parsers:   parsers,
+		processor: processor,
+	}, nil
+}
+
+func (r kProbesReader) Processor() beat.Processor {
+	return r.processor
 }
 
 func (r kProbesReader) Start(done <-chan struct{}) (<-chan Event, error) {
@@ -152,6 +178,13 @@ func (r kProbesReader) nextEvent(done <-chan struct{}) *Event {
 			start := time.Now()
 			e := NewEvent(event.Path, kProbeTypeToAction(event.Op), SourceKProbes,
 				r.config.MaxFileSizeBytes, r.config.HashTypes, r.parsers)
+
+			if e.Process == nil {
+				e.Process = &Process{}
+			}
+
+			e.Process.PID = event.PID
+
 			e.rtt = time.Since(start)
 
 			return &e

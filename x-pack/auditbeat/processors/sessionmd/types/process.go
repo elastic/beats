@@ -88,6 +88,15 @@ type Process struct {
 		} `json:"capabilities,omitempty"`
 	} `json:"thread,omitempty"`
 
+	// Information about the controlling TTY device.
+	// If set, the process belongs to an interactive session.
+	TTY struct {
+		CharDevice struct {
+			Major uint16 `json:"major,omitempty"`
+			Minor uint16 `json:"minor,omitempty"`
+		} `json:"char_device,omitempty"`
+	} `json:"tty,omitempty"`
+
 	// Information about the parent process.
 	Parent struct {
 		// Unique identifier for the process.
@@ -351,6 +360,12 @@ func (p *Process) ToMap() mapstr.M {
 			"capabilities": mapstr.M{
 				"permitted": p.Thread.Capabilities.Permitted,
 				"effective": p.Thread.Capabilities.Effective,
+			},
+		},
+		"tty": mapstr.M{
+			"char_device": mapstr.M{
+				"major": p.TTY.CharDevice.Major,
+				"minor": p.TTY.CharDevice.Minor,
 			},
 		},
 		"parent": mapstr.M{
