@@ -29,7 +29,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
         with:
