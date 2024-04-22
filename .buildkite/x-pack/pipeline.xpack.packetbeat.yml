@@ -231,7 +231,11 @@ steps:
     steps:
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
-        command: ".buildkite/scripts/unit_tests.sh"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
+          cd x-pack/packetbeat
+          mage build unitTest
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -247,7 +251,7 @@ steps:
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
-          cd heartbeat
+          cd x-pack/packetbeat
           mage build unitTest
         agents:
           provider: "orka"
