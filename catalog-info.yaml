@@ -1040,7 +1040,7 @@ spec:
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/packaging.pipeline.yml"
-      branch_configuration: "main 8.*"
+      branch_configuration: "main 8.* 7.17"
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
       provider_settings:
