@@ -39,10 +39,6 @@ xpack_packetbeat_changeset=(
   "^x-pack/packetbeat/.*"
   )
 
-xpack_winlogbeat_changeset=(
-  "^x-pack/winlogbeat/.*"
-  )
-
 ci_changeset=(
   "^.buildkite/.*"
   )
@@ -74,9 +70,6 @@ packaging_changeset=(
   )
 
 case "${BUILDKITE_PIPELINE_SLUG}" in
-  "beats-winlogbeat")
-    BEAT_CHANGESET_REFERENCE=${winlogbeat_changeset[@]}
-    ;;
   "beats-xpack-metricbeat")
     BEAT_CHANGESET_REFERENCE=${xpack_metricbeat_changeset[@]}
     ;;
@@ -498,7 +491,7 @@ if are_paths_changed "${packaging_changeset[@]}" ; then
   export PACKAGING_CHANGES="true"
 fi
 
-if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" ]]; then
+if [[ "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" ]]; then
   # Set the MODULE env variable if possible, it should be defined before generating pipeline's steps. It is used in multiple pipelines.
   defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
 fi
