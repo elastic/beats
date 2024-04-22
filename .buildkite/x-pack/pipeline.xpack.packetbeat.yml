@@ -210,7 +210,9 @@ steps:
     steps:
       - label: ":linux: Ubuntu ARM Unit Tests"
         key: "extended-arm64-unit-test"
-        command: "cd x-pack/packetbeat && mage build unitTest"
+        command: |
+          cd x-pack/packetbeat
+          mage build unitTest
         if: build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         agents:
           provider: "aws"
@@ -225,7 +227,7 @@ steps:
 
   - group: "x-pack/packetbeat MacOS Extended Tests"
     key: "x-pack-packetbeat-extended-macos-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macos.*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
@@ -242,7 +244,11 @@ steps:
 
       - label: ":mac: MacOS arm64 Unit Tests"
         key: "macos-arm64-unit-tests-extended"
-        command: ".buildkite/scripts/macos_unit_tests.sh"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
+          cd heartbeat
+          mage build unitTest
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -262,7 +268,9 @@ steps:
     steps:
       - label: ":linux: Packaging Linux"
         key: "packaging-linux"
-        command: "cd x-pack/packetbeat && mage package"
+        command: |
+          cd x-pack/packetbeat
+          mage package
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -277,7 +285,9 @@ steps:
 
       - label: ":linux: Packaging ARM"
         key: "packaging-arm"
-        command: "cd x-pack/packetbeat && mage package"
+        command: |
+          cd x-pack/packetbeat
+          mage package
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
