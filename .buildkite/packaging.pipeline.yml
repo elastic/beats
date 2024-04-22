@@ -8,6 +8,9 @@
 #
 
 env:
+  ASDF_MAGE_VERSION: 1.15.0
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
@@ -16,11 +19,11 @@ steps:
     key: dashboards
     steps:
       - label: Snapshot dashboards
+        # TODO: container with go and make
         agents:
-          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci:0.1"
-          cpu: "8"
-          memory: "16Gi"
-          ephemeralStorage: "200Gi"
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         commands:
           - make build/distributions/dependencies.csv
           - beats-dashboards
@@ -30,11 +33,11 @@ steps:
           - build/distributions/**
 
       - label: Staging dashboards
+        # TODO: container with go and make
         agents:
-          image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci:0.1"
-          cpu: "8"
-          memory: "16Gi"
-          ephemeralStorage: "200Gi"
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         commands:
           - make build/distributions/dependencies.csv
           - beats-dashboards
