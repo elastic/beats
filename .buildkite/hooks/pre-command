@@ -11,7 +11,7 @@ PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-inges
 DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
 GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" ]]; then
   source .buildkite/env-scripts/env.sh
   if [[ -z "${GO_VERSION-""}" ]]; then
     export GO_VERSION=$(cat "${WORKSPACE}/.go-version")
@@ -56,17 +56,16 @@ fi
 
 ENABLED_BEATS_PIPELINES_SLUGS=(
   "auditbeat"
+  "heartbeat"
   "filebeat"
   "beats-metricbeat"
   "beats-packetbeat"
   "beats-winlogbeat"
   "beats-winlogbeat"
-  "beats-xpack-libbeat"
   "beats-xpack-packetbeat"
   "beats-xpack-winlogbeat"
   "beats-xpack-dockerlogbeat"
   "beats-xpack-auditbeat"
-  "beats-xpack-filebeat"
   "beats-xpack-metricbeat"
   "beats-xpack-heartbeat"
   "deploy-k8s"
