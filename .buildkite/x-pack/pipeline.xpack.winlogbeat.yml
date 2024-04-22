@@ -15,13 +15,16 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
 
 steps:
-  - group: "Mandatory Tests"
-    key: "xpack-winlogbeat-mandatory-tests"
+  - group: "x-pack/Winlogbeat Mandatory Tests"
+    key: "x-pack-winlogbeat-mandatory-tests"
     steps:
 
-      - label: ":windows: Xpack/Winlogbeat Win-2019 Unit (MODULE) Tests"
+      - label: ":windows: x-pack/Winlogbeat Win-2019 Unit (MODULE) Tests"
         key: "mandatory-win-2019-module-unit-tests"
         command: |
+          Import-Module ./.buildkite/scripts/changesets.psm1
+          defineModuleFromTheChangeSet 'x-pack/winlogbeat'
+          Write-Output "~~~ Will run tests with env var MODULE=$$Env:MODULE"
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         env:
@@ -37,9 +40,9 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Xpack/Winlogbeat Win-2019 Unit (MODULE) Tests"
+              context: "x-pack/Winlogbeat Win-2019 Unit (MODULE) Tests"
 
-      - label: ":windows: Xpack/Winlogbeat Win-2016 Unit Tests"
+      - label: ":windows: x-pack/Winlogbeat Win-2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
@@ -55,9 +58,9 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Xpack/Winlogbeat Win-2016 Unit Tests"
+              context: "x-pack/Winlogbeat Win-2016 Unit Tests"
 
-      - label: ":windows: Xpack/Winlogbeat Win-2022 Unit Tests"
+      - label: ":windows: x-pack/Winlogbeat Win-2022 Unit Tests"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
@@ -73,14 +76,14 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Xpack/Winlogbeat Win-2022 Unit Tests"
+              context: "x-pack/Winlogbeat Win-2022 Unit Tests"
 
   - group: "Extended Windows Tests"
     key: "extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Xpack/Winlogbeat Win-10 Unit Tests"
+      - label: ":windows: x-pack/Winlogbeat Win-10 Unit Tests"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
@@ -96,9 +99,9 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Xpack/Winlogbeat Win-10 Unit Tests"
+              context: "x-pack/Winlogbeat Win-10 Unit Tests"
 
-      - label: ":windows: Xpack/Winlogbeat Win-11 Unit Tests"
+      - label: ":windows: x-pack/Winlogbeat Win-11 Unit Tests"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
@@ -114,9 +117,9 @@ steps:
           - "x-pack/winlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Xpack/Winlogbeat Win-11 Unit Tests"
+              context: "x-pack/Winlogbeat Win-11 Unit Tests"
 
-      - label: ":windows: Xpack/Winlogbeat Win-2019 Unit Tests"
+      - label: ":windows: x-pack/Winlogbeat Win-2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
@@ -140,10 +143,10 @@ steps:
     # this allows building DRA artifacts even if there is flakiness in mandatory tests
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
-      - "xpack-winlogbeat-mandatory-tests"
+      - "x-pack-winlogbeat-mandatory-tests"
 
-  - group: "Xpack/Winlogbeat Packaging"
-    key: "xpack-winlogbeat-packaging"
+  - group: "x-pack/Winlogbeat Packaging"
+    key: "x-pack-winlogbeat-packaging"
 
     steps:
       - label: ":ubuntu: Packaging Linux"
@@ -159,5 +162,4 @@ steps:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         notify:
           - github_commit_status:
-              context: "Xpack/Winlogbeat Packaging"
-
+              context: "x-pack/Winlogbeat Packaging"
