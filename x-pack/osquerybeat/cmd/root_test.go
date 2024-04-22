@@ -11,11 +11,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
+
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/google/go-cmp/cmp"
 )
 
 func TestOsquerybeatCfg(t *testing.T) {
