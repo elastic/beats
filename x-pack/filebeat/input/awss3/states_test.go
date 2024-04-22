@@ -325,7 +325,7 @@ func TestStatesDelete(t *testing.T) {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			states := test.states()
-			states.Delete(test.deleteID)
+			states.DeleteState(test.deleteID)
 			assert.Equal(t, test.expected, states.GetStates())
 		})
 	}

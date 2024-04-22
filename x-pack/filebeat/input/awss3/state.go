@@ -11,68 +11,48 @@ import (
 
 // state is used to communicate the publishing state of a s3 object
 type state struct {
-	// ID is used to identify the state in the store, and it is composed by
-	// Bucket + Key + Etag + LastModified.String(): changing this value or how it is
-	// composed will break backward compatibilities with entries already in the store.
-	ID           string    `json:"id" struct:"id"`
 	Bucket       string    `json:"bucket" struct:"bucket"`
 	Key          string    `json:"key" struct:"key"`
 	Etag         string    `json:"etag" struct:"etag"`
 	LastModified time.Time `json:"last_modified" struct:"last_modified"`
 
-	// ListPrefix is used for unique of the key in the store for awsS3WriteCommitPrefix
-	ListPrefix string `json:"list_prefix" struct:"list_prefix"`
-
 	// A state has Stored = true when all events are ACKed.
 	Stored bool `json:"stored" struct:"stored"`
-	// A state has Error = true when ProcessS3Object returned an error
-	Error bool `json:"error" struct:"error"`
+
+	// Failed is true when ProcessS3Object returned an error other than
+	// s3DownloadError.
+	// Before 8.14, this field was called "error". However, that field was
+	// set for many ephemeral reasons including client-side rate limiting
+	// (see https://github.com/elastic/beats/issues/39114). Now that we
+	// don't treat download errors as permanent, the field name was changed
+	// so that users upgrading from old versions aren't prevented from
+	// retrying old download failures.
+	Failed bool `json:"failed" struct:"failed"`
 }
 
+// ID is used to identify the state in the store, and it is composed by
+// Bucket + Key + Etag + LastModified.String(): changing this value or how it is
+// composed will break backward compatibilities with entries already in the store.
 func stateID(bucket, key, etag string, lastModified time.Time) string {
 	return bucket + key + etag + lastModified.String()
 }
 
 // newState creates a new s3 object state
-func newState(bucket, key, etag, listPrefix string, lastModified time.Time) state {
-	s := state{
+func newState(bucket, key, etag string, lastModified time.Time) state {
+	return state{
 		Bucket:       bucket,
 		Key:          key,
 		LastModified: lastModified,
 		Etag:         etag,
-		ListPrefix:   listPrefix,
-		Stored:       false,
-		Error:        false,
 	}
-
-	s.ID = stateID(s.Bucket, s.Key, s.Etag, s.LastModified)
-
-	return s
 }
 
-// MarkAsStored set the stored flag to true
-func (s *state) MarkAsStored() {
-	s.Stored = true
-}
-
-// MarkAsError set the error flag to true
-func (s *state) MarkAsError() {
-	s.Error = true
-}
-
-// IsProcessed checks if the state is either Stored or Error
-func (s *state) IsProcessed() bool {
-	return s.Stored || s.Error
+func (s *state) ID() string {
+	return stateID(s.Bucket, s.Key, s.Etag, s.LastModified)
 }
 
 // IsEqual checks if the two states point to the same s3 object.
 func (s *state) IsEqual(c *state) bool {
-	return s.Bucket == c.Bucket && s.Key == c.Key && s.Etag == c.Etag && s.LastModified.Equal(c.LastModified)
-}
-
-// IsEmpty checks if the state is empty
-func (s *state) IsEmpty() bool {
-	c := state{}
 	return s.Bucket == c.Bucket && s.Key == c.Key && s.Etag == c.Etag && s.LastModified.Equal(c.LastModified)
 }
 
