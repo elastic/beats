@@ -56,7 +56,6 @@ ENABLED_BEATS_PIPELINES_SLUGS=(
   "heartbeat"
   "filebeat"
   "beats-metricbeat"
-  "beats-packetbeat"
   "beats-winlogbeat"
   "beats-winlogbeat"
   "beats-xpack-packetbeat"
