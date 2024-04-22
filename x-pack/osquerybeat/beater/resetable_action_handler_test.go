@@ -41,10 +41,12 @@ func (a *mockActionHandler) Name() string {
 }
 
 type mockActionResultPublisher struct {
-	actionResult map[string]interface{}
+	req, res map[string]interface{}
 }
 
 func (p *mockActionResultPublisher) PublishActionResult(req map[string]interface{}, res map[string]interface{}) {
+	p.req = req
+	p.res = res
 }
 
 func TestResetableActionHandler(t *testing.T) {
