@@ -27,16 +27,12 @@ XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 # define if needed run cloud-specific tests for the particular beat
 [ -z "${run_xpack_metricbeat_aws_tests+x}" ] && run_xpack_metricbeat_aws_tests="$(buildkite-agent meta-data get run_xpack_metricbeat_aws_tests --default "false")"
 
-packetbeat_changeset=(
-  "^packetbeat/.*"
+winlogbeat_changeset=(
+  "^winlogbeat/.*"
   )
 
 xpack_dockerlogbeat_changeset=(
   "^x-pack/dockerlogbeat/.*"
-  )
-
-winlogbeat_changeset=(
-  "^winlogbeat/.*"
   )
 
 ci_changeset=(
