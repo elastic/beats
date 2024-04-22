@@ -25,10 +25,11 @@ google_cloud_logout_active_account() {
 }
 
 cleanup() {
-  # TODO: disable for upload pipeline
+  if [[ "$BUILDKITE_COMMAND" != *"buildkite-agent pipeline upload"* ]]; then
   echo "Deleting temporary files..."
-  if [[ -e "${BIN}/${TMP_FOLDER}" ]]; then
-    rm -rf "${BIN}/${TMP_FOLDER}.*"
-  fi
+    if [[ -n "${BIN:-}" ]] && [[ -e "${BIN}/${TMP_FOLDER}" ]]; then
+      rm -rf "${BIN}/${TMP_FOLDER}.*"
+    fi
   echo "Done."
+  fi
 }
