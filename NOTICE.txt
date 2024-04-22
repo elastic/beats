@@ -1680,11 +1680,11 @@ Contents of probable licence file $GOMODCACHE/code.cloudfoundry.org/go-loggregat
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-event-hubs-go/v3
-Version: v3.6.1
+Version: v3.3.15
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-event-hubs-go/v3@v3.6.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-event-hubs-go/v3@v3.3.15/LICENSE:
 
     MIT License
 
@@ -1711,11 +1711,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-event-hubs
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-sdk-for-go
-Version: v65.0.0+incompatible
+Version: v59.0.0+incompatible
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go@v65.0.0+incompatible/LICENSE.txt:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go@v59.0.0+incompatible/LICENSE.txt:
 
 The MIT License (MIT)
 
@@ -1984,11 +1984,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-sdk-for-go
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-storage-blob-go
-Version: v0.15.0
+Version: v0.8.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-storage-blob-go@v0.15.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-storage-blob-go@v0.8.0/LICENSE:
 
     MIT License
 
@@ -2014,11 +2014,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-storage-bl
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-autorest/autorest
-Version: v0.11.28
+Version: v0.11.19
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest@v0.11.28/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest@v0.11.19/LICENSE:
 
 
                                  Apache License
@@ -2215,11 +2215,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/auto
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-autorest/autorest/adal
-Version: v0.9.21
+Version: v0.9.14
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest/adal@v0.9.21/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest/adal@v0.9.14/LICENSE:
 
 
                                  Apache License
@@ -29826,12 +29826,12 @@ Contents of probable licence file $GOMODCACHE/github.com/!ada!logics/go-fuzz-hea
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/Azure/azure-amqp-common-go/v4
-Version: v4.2.0
+Dependency : github.com/Azure/azure-amqp-common-go/v3
+Version: v3.2.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-amqp-common-go/v4@v4.2.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-amqp-common-go/v3@v3.2.1/LICENSE:
 
     MIT License
 
@@ -29858,11 +29858,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-amqp-commo
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/azure-pipeline-go
-Version: v0.2.3
+Version: v0.2.1
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-pipeline-go@v0.2.3/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/azure-pipeline-go@v0.2.1/LICENSE:
 
     MIT License
 
@@ -30011,11 +30011,11 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-amqp
-Version: v1.0.0
+Version: v0.16.0
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-amqp@v1.0.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-amqp@v0.16.0/LICENSE:
 
     MIT License
 
@@ -30677,11 +30677,11 @@ Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/auto
 
 --------------------------------------------------------------------------------
 Dependency : github.com/Azure/go-autorest/autorest/mocks
-Version: v0.4.2
+Version: v0.4.1
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest/mocks@v0.4.2/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/!azure/go-autorest/autorest/mocks@v0.4.1/LICENSE:
 
 
                                  Apache License
@@ -38997,6 +38997,24 @@ Copyright (c) 2016 Felix Geisendörfer (felix@debuggable.com)
 
 
 --------------------------------------------------------------------------------
+Dependency : github.com/form3tech-oss/jwt-go
+Version: v3.2.5+incompatible
+Licence type (autodetected): MIT
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/form3tech-oss/jwt-go@v3.2.5+incompatible/LICENSE:
+
+Copyright (c) 2012 Dave Grijalva
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+
+--------------------------------------------------------------------------------
 Dependency : github.com/fortytw2/leaktest
 Version: v1.3.0
 Licence type (autodetected): BSD-3-Clause
@@ -40010,25 +40028,6 @@ Contents of probable licence file $GOMODCACHE/github.com/godror/knownpb@v0.1.0/L
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-
-
---------------------------------------------------------------------------------
-Dependency : github.com/golang-jwt/jwt/v4
-Version: v4.5.0
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/golang-jwt/jwt/v4@v4.5.0/LICENSE:
-
-Copyright (c) 2012 Dave Grijalva
-Copyright (c) 2021 golang-jwt maintainers
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
 
 
 --------------------------------------------------------------------------------
@@ -47129,11 +47128,11 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/mattn/go-ieproxy
-Version: v0.0.1
+Version: v0.0.0-20191113090002-7c0f6868bffe
 Licence type (autodetected): MIT
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/mattn/go-ieproxy@v0.0.1/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/mattn/go-ieproxy@v0.0.0-20191113090002-7c0f6868bffe/LICENSE:
 
 MIT License
 
