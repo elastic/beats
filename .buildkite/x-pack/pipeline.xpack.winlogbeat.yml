@@ -163,8 +163,4 @@ steps:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
         notify:
           - github_commit_status:
-<<<<<<< HEAD
-              context: "Xpack/Winlogbeat Packaging"
-=======
               context: "x-pack/Winlogbeat Packaging"
->>>>>>> 243f9c33d8 (Buildkite Xpack/Winlogbeat pipeline fixes (#39007))
