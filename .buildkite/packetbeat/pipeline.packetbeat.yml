@@ -39,21 +39,42 @@ steps:
           - github_commit_status:
               context: "packetbeat: Ubuntu Unit Tests"
 
-      - label: ":rhel: RHEL9 Unit Tests"
-        command: |
-          cd packetbeat
-          mage build unitTest
+      - label: ":linux: Ubuntu ARM Unit Tests"
+        key: "linux-arm64-unit-tests"
+        command: "cd packetbeat && mage build unitTest"
         agents:
-          provider: "gcp"
-          image: "${IMAGE_RHEL9_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - "packetbeat/build/*.xml"
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: RHEL9 Unit Tests"
+              context: "packetbeat: Ubuntu ARM Unit Tests"
 
+      - label: ":windows: Windows 2019 Unit Tests"
+        command: |
+          Set-Location -Path packetbeat
+          mage build unitTest
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "packetbeat/build/*.xml"
+          - "packetbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "packetbeat: Windows 2019 Unit Tests"
+
+
+  - group: "Extended Windows Tests"
+    key: "packetbeat-extended-windows-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+    steps:
       - label: ":windows: Windows 2016 Unit Tests"
         command: |
           Set-Location -Path packetbeat
@@ -69,7 +90,7 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Windows 2016 Unit Tests"
+              context: "packetbeat: Extended Windows 2016 Unit Tests"
 
       - label: ":windows: Windows 2022 Unit Tests"
         command: |
@@ -77,7 +98,7 @@ steps:
           mage build unitTest
         agents:
           provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
+          image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
@@ -86,12 +107,8 @@ steps:
           - "packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "packetbeat: Windows 2022 Unit Tests"
+              context: "packetbeat: Extended Windows 2022 Unit Tests"
 
-  - group: "Extended Windows Tests"
-    key: "packetbeat-extended-windows-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
-    steps:
       - label: ":windows: Windows 10 Unit Tests"
         command: |
           Set-Location -Path packetbeat
@@ -127,24 +144,6 @@ steps:
           - github_commit_status:
               context: "packetbeat: Extended Windows 11 Unit Tests"
 
-      - label: ":windows: Windows 2019 Unit Tests"
-        command: |
-          Set-Location -Path packetbeat
-          mage build unitTest
-        key: "extended-win-2019-unit-tests"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "packetbeat/build/*.xml"
-          - "packetbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "packetbeat: Extended Windows 2019 Unit Tests"
-
   - group: "Extended Tests"
     key: "extended-tests"
     steps:
@@ -165,40 +164,6 @@ steps:
         notify:
           - github_commit_status:
               context: "packetbeat: Extended MacOS x86_64 Unit Tests"
-
-      - label: ":mac: MacOS arm64 Unit Tests"
-        key: "macos-arm64-unit-tests-extended"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd packetbeat
-          mage build unitTest
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "packetbeat/build/*.xml"
-          - "packetbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "packetbeat: Extended MacOS arm64 Unit Tests"
-
-      - label: ":linux: Ubuntu ARM Unit Tests"
-        key: "linux-arm64-unit-tests-extended"
-        command: "cd packetbeat && mage build unitTest"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-        agents:
-          provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths:
-          - "packetbeat/build/*.xml"
-          - "packetbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "packetbeat: Extended Ubuntu ARM Unit Tests"
-
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
