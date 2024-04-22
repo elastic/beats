@@ -12313,11 +12313,11 @@ various licenses:
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/elastic-agent-autodiscover
-Version: v0.6.12
+Version: v0.6.13
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-autodiscover@v0.6.12/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-autodiscover@v0.6.13/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004

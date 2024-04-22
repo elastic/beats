@@ -277,7 +277,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	}
 
 	cname := utils.GetContainerName(container)
-	hints, _ := utils.GenerateHints(tasks, cname, p.config.Prefix, []string{})
+	hints, _ := utils.GenerateHints(tasks, cname, p.config.Prefix, false, []string{})
 	if len(hints) > 0 {
 		e["hints"] = hints
 	}

@@ -383,7 +383,7 @@ func (d *Provider) generateHints(event bus.Event) bus.Event {
 		e["ports"] = ports
 	}
 	if labels, err := dockerMeta.GetValue("labels"); err == nil {
-		hints, _ := utils.GenerateHints(labels.(mapstr.M), "", d.config.Prefix, []string{})
+		hints, _ := utils.GenerateHints(labels.(mapstr.M), "", d.config.Prefix, false, []string{})
 		e["hints"] = hints
 	}
 	return e

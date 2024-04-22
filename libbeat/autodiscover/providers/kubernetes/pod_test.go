@@ -147,9 +147,9 @@ func TestGenerateHints(t *testing.T) {
 						},
 					},
 					"metrics": mapstr.M{
-						"module":   "prometheus",
-						"period":   "15s",
-						"timeouts": "5s",
+						"module":          "prometheus",
+						"period":          "15s",
+						"timeoutssssssss": "5s",
 					},
 				},
 				"container": mapstr.M{
