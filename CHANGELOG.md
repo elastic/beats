@@ -62,3 +62,13 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 
 [0.6.12]: https://github.com/elastic/elastic-agent-autodiscover/compare/v0.6.10...v0.6.12
+
+
+## [0.6.13]
+
+### Changed
+
+- Enhance GenerateHints function with validate flag to enable the validation of hints
+
+
+[0.6.13]: https://github.com/elastic/elastic-agent-autodiscover/compare/v0.6.12...v0.6.13

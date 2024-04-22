@@ -311,11 +311,113 @@ func TestGenerateHints(t *testing.T) {
 			}
 		}
 
-		generateHints, incorrectHints := GenerateHints(annMap, "foobar", "co.elastic", allSupportedHints)
+		generateHints, incorrectHints := GenerateHints(annMap, "foobar", "co.elastic", true, allSupportedHints)
 		assert.Equal(t, test.expectedIncorrectHints, len(incorrectHints)) // We validate how many incorrect hints are provided per test case.
 		assert.Equal(t, test.result, generateHints)
 	}
 }
+
+func TestGenerateHintsWithValidatedisabled(t *testing.T) {
+
+	var allSupportedHints = []string{"enabled", "package", "module", "integration", "data_streams", "metricsets", "host", "period", "timeout", "metrics_path", "username", "password", "stream", "processors", "multiline", "json", "disable"}
+
+	tests := []struct {
+		name                   string
+		annotations            map[string]string
+		result                 mapstr.M
+		expectedIncorrectHints int // We set the number of hints that will be marked as incorrect and wont be included in the acceptable supported list
+	}{
+
+		// Scenarios being tested:
+		// have co.elastic.hints/package set.
+		// Define multiple co.elastic.hints/data_streams and also specific configuration for each one
+		// Typo errors introduced for "co.elastic.hints/access.streams" and "co.elastic.hints/error.streams"
+		{
+			name: "Metrics_apache_package_and_specific_config_per_datastream",
+			annotations: map[string]string{
+				"co.elastic.hints/package":                 "apache",
+				"co.elastic.hints/data_streams":            "access,error",
+				"co.elastic.hints/access.period":           "5m",
+				"co.elastic.hints/access.streamssssssssss": "stdout", // On purpose this added with typo
+				"co.elastic.hints/error.period":            "5m",
+				"co.elastic.hints/error.streamssssssssss":  "stderr", // On purpose this added with typo
+			},
+			result: mapstr.M{
+				"hints": mapstr.M{
+					"data_streams": "access,error",
+					"access":       mapstr.M{"period": "5m", "streamssssssssss": "stdout"},
+					"error":        mapstr.M{"period": "5m", "streamssssssssss": "stderr"},
+					"package":      "apache",
+				}},
+			expectedIncorrectHints: 0, // Validate flag= false in GenerateHints
+		},
+		// Scenarios being tested:
+		// have co.elastic.metrics/module set.
+		// Define multiple co.elastic.hints/data_streams and also specific configuration for each one
+		// A typo error introduced for "co.elastic.metrics/istiod.streams"
+		{
+			name: "Metrics_istio_module_and_specific_config_per_metricset",
+			annotations: map[string]string{
+				"co.elastic.metrics/module":                  "istio",
+				"co.elastic.metrics/metricsets":              "istiod,proxy",
+				"co.elastic.metrics/istiod.period":           "5m",
+				"co.elastic.metrics/istiod.streamssssssssss": "stdout", // On purpose this added with typo
+				"co.elastic.metrics/proxy.period":            "5m",
+				"co.elastic.metrics/proxy.stream":            "stderr",
+			},
+			result: mapstr.M{
+				"metrics": mapstr.M{
+					"metricsets": "istiod,proxy",
+					"istiod":     mapstr.M{"period": "5m", "streamssssssssss": "stdout"},
+					"proxy":      mapstr.M{"period": "5m", "stream": "stderr"},
+					"module":     "istio",
+				}},
+			expectedIncorrectHints: 0, // Validate flag= false in GenerateHints
+		},
+		// Scenarios being tested:
+		// have co.elastic.metrics/module set for multiple enumerations.
+		// Define different hints for each one enumeration
+		// A typo error introduced for "co.elastic.metrics/1.periods" and "co.elastic.metrics/2.streams"
+		{
+			name: "Metrics_multiple_modules_and_specific_config_per_module",
+			annotations: map[string]string{
+				"co.elastic.metrics/1.module":           "prometheus",
+				"co.elastic.metrics/1.periodssssssssss": "15s", // On purpose this added with typo
+				"co.elastic.metrics/2.module":           "istiod",
+				"co.elastic.metrics/2.period":           "15s",
+				"co.elastic.metrics/2.streamssssssssss": "stderr", // On purpose this added with typo
+			},
+			result: mapstr.M{
+				"metrics": mapstr.M{
+					"1": mapstr.M{
+						"module":           "prometheus",
+						"periodssssssssss": "15s",
+					},
+					"2": mapstr.M{
+						"module":           "istiod",
+						"period":           "15s",
+						"streamssssssssss": "stderr",
+					},
+				}},
+			expectedIncorrectHints: 0, // Validate flag= false in GenerateHints
+		},
+	}
+
+	for _, test := range tests {
+		annMap := mapstr.M{}
+		for k, v := range test.annotations {
+			_, err := annMap.Put(k, v)
+			if err != nil {
+				continue
+			}
+		}
+
+		generateHints, incorrectHints := GenerateHints(annMap, "foobar", "co.elastic", false, allSupportedHints)
+		assert.Equal(t, test.expectedIncorrectHints, len(incorrectHints)) // We validate how many incorrect hints are provided per test case.
+		assert.Equal(t, test.result, generateHints)
+	}
+}
+
 func TestGetHintsAsList(t *testing.T) {
 	tests := []struct {
 		input   mapstr.M

@@ -203,7 +203,9 @@ func IsDisabled(hints mapstr.M, key string) bool {
 }
 
 // GenerateHints parses annotations based on a prefix and sets up hints that can be picked up by individual Beats.
-func GenerateHints(annotations mapstr.M, container, prefix string, allSupportedHints []string) (mapstr.M, []string) {
+// Arguments: annotations: include the annotatons defined in the container, container: is the container name,
+// prefix: the prefix of the annotation to check, validate: boolean variable that enables the validation of hints format and allSupportedHints: list of supported annotations to validate against
+func GenerateHints(annotations mapstr.M, container, prefix string, validate bool, allSupportedHints []string) (mapstr.M, []string) {
 	hints := mapstr.M{}
 	var incorrecthints []string
 	var incorrecthint string
@@ -212,22 +214,23 @@ func GenerateHints(annotations mapstr.M, container, prefix string, allSupportedH
 	if rawEntries, err := annotations.GetValue(prefix); err == nil {
 		if entries, ok := rawEntries.(mapstr.M); ok {
 
-			//Start of Annotation Check: whether the annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
-			datastreamlist := GetHintAsList(entries, logName+"/"+"data_streams", "")
-			// We check if multiple data_streams are defined and we retrieve the hints per data_stream. Only applicable in elastic-agent
-			// See Metrics_apache_package_and_specific_config_per_datastream test case in hints_test.go
-			for _, stream := range datastreamlist {
-				allSupportedHints = append(allSupportedHints, stream)
-				incorrecthints = checkSupportedHintsSets(annotations, prefix, stream, logName, allSupportedHints, incorrecthints)
-			}
-			metricsetlist := GetHintAsList(entries, "metrics"+"/"+"metricsets", "")
-			// We check if multiple metrcisets are defined and we retrieve the hints per metricset. Only applicable in beats
-			//See Metrics_istio_module_and_specific_config_per_metricset test case in hints_test.go
-			for _, metric := range metricsetlist {
-				allSupportedHints = append(allSupportedHints, metric)
-				incorrecthints = checkSupportedHintsSets(annotations, prefix, metric, "metrics", allSupportedHints, incorrecthints)
-			}
-			//End of Annotation Check
+			if validate {
+				//Start of Annotation Check: whether the annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+				datastreamlist := GetHintAsList(entries, logName+"/"+"data_streams", "")
+				// We check if multiple data_streams are defined and we retrieve the hints per data_stream. Only applicable in elastic-agent
+				// See Metrics_apache_package_and_specific_config_per_datastream test case in hints_test.go
+				for _, stream := range datastreamlist {
+					allSupportedHints = append(allSupportedHints, stream)
+					incorrecthints = checkSupportedHintsSets(annotations, prefix, stream, logName, allSupportedHints, incorrecthints)
+				}
+				metricsetlist := GetHintAsList(entries, "metrics"+"/"+"metricsets", "")
+				// We check if multiple metrcisets are defined and we retrieve the hints per metricset. Only applicable in beats
+				//See Metrics_istio_module_and_specific_config_per_metricset test case in hints_test.go
+				for _, metric := range metricsetlist {
+					allSupportedHints = append(allSupportedHints, metric)
+					incorrecthints = checkSupportedHintsSets(annotations, prefix, metric, "metrics", allSupportedHints, incorrecthints)
+				}
+			} //end of annotation check
 
 			for key, rawValue := range entries {
 				enumeratedmodules := []string{}
@@ -237,32 +240,33 @@ func GenerateHints(annotations mapstr.M, container, prefix string, allSupportedH
 				if len(parts) == 2 {
 					hintKey := fmt.Sprintf("%s.%s", parts[0], parts[1])
 
-					checkdigit := digitCheck.MatchString(parts[1]) // With this regex we check if enumeration for modules is provided
-					if checkdigit {
-						allSupportedHints = append(allSupportedHints, parts[1])
+					if validate {
+						checkdigit := digitCheck.MatchString(parts[1]) // With this regex we check if enumeration for modules is provided
+						if checkdigit {
+							allSupportedHints = append(allSupportedHints, parts[1])
 
-						specificlist, _ := entries.GetValue(key)
-						if specificentries, ok := specificlist.(mapstr.M); ok {
-							for keyspec := range specificentries {
-								// enumeratedmodules will be populated only in cases we have module enumeration, like:
-								// "co.elastic.metrics/1.module":  "prometheus",
-								// "co.elastic.metrics/2.module":  "istiod",
-								enumeratedmodules = append(enumeratedmodules, keyspec)
+							specificlist, _ := entries.GetValue(key)
+							if specificentries, ok := specificlist.(mapstr.M); ok {
+								for keyspec := range specificentries {
+									// enumeratedmodules will be populated only in cases we have module enumeration, like:
+									// "co.elastic.metrics/1.module":  "prometheus",
+									// "co.elastic.metrics/2.module":  "istiod",
+									enumeratedmodules = append(enumeratedmodules, keyspec)
+								}
 							}
 						}
-					}
+						// We check if multiple metrcisets are defined and we retrieve the hints per metricset. Only applicable in beats
+						// See Metrics_multiple_modules_and_specific_config_per_module test case in hints_test.go
+						for _, metric := range enumeratedmodules {
+							_, incorrecthint = checkSupportedHints(metric, fmt.Sprintf("%s.%s", key, metric), allSupportedHints)
+							if incorrecthint != "" {
+								incorrecthints = append(incorrecthints, incorrecthint)
+							}
 
-					// We check if multiple metrcisets are defined and we retrieve the hints per metricset. Only applicable in beats
-					// See Metrics_multiple_modules_and_specific_config_per_module test case in hints_test.go
-					for _, metric := range enumeratedmodules {
-						_, incorrecthint = checkSupportedHints(metric, fmt.Sprintf("%s.%s", key, metric), allSupportedHints)
-						if incorrecthint != "" {
-							incorrecthints = append(incorrecthints, incorrecthint)
 						}
-
-					}
-					//We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
-					_, incorrecthint = checkSupportedHints(parts[1], key, allSupportedHints)
+						//We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+						_, incorrecthint = checkSupportedHints(parts[1], key, allSupportedHints)
+					} //end of annotation check
 
 					// Insert only if there is no entry already. container level annotations take
 					// higher priority.
@@ -286,34 +290,34 @@ func GenerateHints(annotations mapstr.M, container, prefix string, allSupportedH
 							// Split the key to get part[1] to be the hint
 							parts := strings.Split(hintKey, "/")
 
-							checkdigit := digitCheck.MatchString(parts[1]) // With this regex we check if enumeration for modules is provided
-							if checkdigit {
-								allSupportedHints = append(allSupportedHints, parts[1])
+							if validate {
+								checkdigit := digitCheck.MatchString(parts[1]) // With this regex we check if enumeration for modules is provided
+								if checkdigit {
+									allSupportedHints = append(allSupportedHints, parts[1])
 
-								specificlist, _ := entries.GetValue(key)
-								if specificentries, ok := specificlist.(mapstr.M); ok {
-									for keyspec := range specificentries {
-										// enumeratedmodules will be populated only in cases we have module enumeration, like:
-										// "co.elastic.metrics/1.module":  "prometheus",
-										// "co.elastic.metrics/2.module":  "istiod",
-										enumeratedmodules = append(enumeratedmodules, keyspec)
+									specificlist, _ := entries.GetValue(key)
+									if specificentries, ok := specificlist.(mapstr.M); ok {
+										for keyspec := range specificentries {
+											// enumeratedmodules will be populated only in cases we have module enumeration, like:
+											// "co.elastic.metrics/1.module":  "prometheus",
+											// "co.elastic.metrics/2.module":  "istiod",
+											enumeratedmodules = append(enumeratedmodules, keyspec)
+										}
 									}
 								}
-							}
 
-							// We check if multiple metrcisets are defined and we retrieve the hints per metricset. Only applicable in beats
-							// See Metrics_multiple_modules_and_specific_config_per_module test case in hints_test.go
-							for _, metric := range enumeratedmodules {
-								_, incorrecthint = checkSupportedHints(metric, fmt.Sprintf("%s.%s", key, metric), allSupportedHints)
-								if incorrecthint != "" {
-									incorrecthints = append(incorrecthints, incorrecthint)
+								// We check if multiple metrcisets are defined and we retrieve the hints per metricset. Only applicable in beats
+								// See Metrics_multiple_modules_and_specific_config_per_module test case in hints_test.go
+								for _, metric := range enumeratedmodules {
+									_, incorrecthint = checkSupportedHints(metric, fmt.Sprintf("%s.%s", key, metric), allSupportedHints)
+									if incorrecthint != "" {
+										incorrecthints = append(incorrecthints, incorrecthint)
+									}
+
 								}
-
-							}
-							//We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
-							_, incorrecthint = checkSupportedHints(parts[1], key, allSupportedHints)
-
-							//end of check
+								//We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+								_, incorrecthint = checkSupportedHints(parts[1], key, allSupportedHints)
+							} //end of annotation check
 
 							if len(parts) == 2 {
 								// key will be the hint type
@@ -326,7 +330,7 @@ func GenerateHints(annotations mapstr.M, container, prefix string, allSupportedH
 						}
 					}
 				}
-				if incorrecthint != "" {
+				if validate && incorrecthint != "" {
 					incorrecthints = append(incorrecthints, incorrecthint)
 				}
 			}
