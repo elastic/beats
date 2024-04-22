@@ -53,7 +53,7 @@ The Salesforce module contains the following filesets for collecting different t
 The default interval for collecting logs (`var.real_time_interval` or `var.elf_interval`) is 5m/1h. Exercise caution when reducing this interval, as it directly impacts the Salesforce API rate limit of ~1000 calls per hour. Exceeding the limit will result in errors from the Salesforce API. Refer to the https://developer.salesforce.com/docs/atlas.en-us.salesforce_app_limits_cheatsheet.meta/salesforce_app_limits_cheatsheet/salesforce_app_limits_platform_api.htm[Salesforce API Rate Limit] documentation for more details.
 ====
 
-== Set up the OAuth App in the Salesforce
+=== Set up the OAuth App in the Salesforce
 
 In order to use this integration, users need to create a new Salesforce Application using OAuth. Follow the steps below to create a connected application in Salesforce:
 
