@@ -112,19 +112,24 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: Windows 2022 Unit Tests"
 
-      #   #skip: "see https://github.com/elastic/beats/issues/38142"
-      # - label: ":windows: Windows 2022 System Tests"
-      #   key: "mandatory-win-2022-system-tests"
-      #   command: ".buildkite/scripts/win_unit_tests.ps1 systemtest"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_WIN_2022}"
-      #     machineType: "${GCP_WIN_MACHINE_TYPE}"
-      #     disk_size: 100
-      #     disk_type: "pd-ssd"
-      #   artifact_paths:
-      #     - "x-pack/packetbeat/build/*.xml"
-      #     - "x-pack/packetbeat/build/*.json"
+      #skip: "see https://github.com/elastic/beats/issues/38142"
+      - label: ":windows: Windows 2022 System Tests"
+        key: "mandatory-win-2022-system-tests"
+        command: |
+          Set-Location -Path x-pack/packetbeat
+          mage systemTest
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/packetbeat/build/*.xml"
+          - "x-pack/packetbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/packetbeat: Windows 2022 System Tests"
 
   - group: "x-pack/packetbeat Extended Windows Tests"
     key: "x-pack-packetbeat-extended-win-tests"
@@ -184,19 +189,24 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: Windows 2019 Unit Tests"
 
-      #  #skip: "see https://github.com/elastic/beats/issues/38142"
-      # - label: ":windows: Windows 10 System Tests"
-      #   key: "extended-win-10-system-tests"
-      #   command: ".buildkite/scripts/win_unit_tests.ps1 systemtest"
-      #   agents:
-      #     provider: "gcp"
-      #     image: "${IMAGE_WIN_10}"
-      #     machineType: "${GCP_WIN_MACHINE_TYPE}"
-      #     disk_size: 100
-      #     disk_type: "pd-ssd"
-      #   artifact_paths:
-      #     - "x-pack/packetbeat/build/*.xml"
-      #     - "x-pack/packetbeat/build/*.json"
+      #skip: "see https://github.com/elastic/beats/issues/38142"
+      - label: ":windows: Windows 10 System Tests"
+        key: "extended-win-10-system-tests"
+        command: |
+          Set-Location -Path x-pack/packetbeat
+          mage systemTest
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/packetbeat/build/*.xml"
+          - "x-pack/packetbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/packetbeat: Windows 2022 System Tests"
 
   - group: "x-pack/packetbeat Linux arm Extended Tests"
     key: "x-pack-packetbeat-extended-linux-arm-tests"
@@ -224,7 +234,6 @@ steps:
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
         command: ".buildkite/scripts/unit_tests.sh"
-        if: build.env("GITHUB_PR_LABELS") =~ /.*macos.*/
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -235,10 +244,9 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: MacOS Unit Tests"
 
-      - label: ":mac: MacOS ARM Unit Tests"
+      - label: ":mac: MacOS arm64 Unit Tests"
         key: "macos-arm64-unit-tests-extended"
         command: ".buildkite/scripts/macos_unit_tests.sh"
-        if: build.env("GITHUB_PR_LABELS") =~ /.*macos.*/
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -247,7 +255,7 @@ steps:
           - "x-pack/packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/packetbeat: MacOS ARM Unit Tests"
+              context: "x-pack/packetbeat: MacOS arm64 Unit Tests"
 
   - group: "x-pack/packetbeat Packaging"
     key: "x-pack-packetbeat-packaging"
