@@ -76,6 +76,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
 - Fix indexing failures by re-enabling event normalisation in netflow input. {issue}38703[38703] {pull}38780[38780]
 - Fix config validation for CEL and HTTPJSON inputs when using password grant authentication and `client.id` or `client.secret` are not present. {pull}38962[38962]
+- Updated Websocket input title to align with existing inputs {pull}39006[39006]
 - [threatintel] MISP splitting fix for empty responses {issue}38739[38739] {pull}38917[38917]
 
 *Heartbeat*
