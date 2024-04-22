@@ -20,16 +20,17 @@ const awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
 // states handles list of s3 object state. One must use newStates to instantiate a
 // file states registry. Using the zero-value is not safe.
 type states struct {
-	// This mutex must be held to access states or store
-	sync.Mutex
-
 	log *logp.Logger
 
-	// known states, indexed by state ID
-	states map[string]state
+	// Completed S3 object states, indexed by state ID.
+	// statesLock must be held to access states.
+	states     map[string]state
+	statesLock sync.Mutex
 
-	// The store used to persist state changes to the registry
-	store *statestore.Store
+	// The store used to persist state changes to the registry.
+	// storeLock must be held to access store.
+	store     *statestore.Store
+	storeLock sync.Mutex
 }
 
 // newStates generates a new states registry.
@@ -43,31 +44,34 @@ func newStates(ctx v2.Context, store *statestore.Store) (*states, error) {
 }
 
 func (s *states) AlreadyProcessed(state state) bool {
-	s.Lock()
-	defer s.Unlock()
+	s.statesLock.Lock()
+	defer s.statesLock.Unlock()
 	// Our in-memory table only stores completed objects
 	_, ok := s.states[state.ID()]
 	return ok
 }
 
 func (s *states) AddState(state state) {
-	s.Lock()
-	defer s.Unlock()
 
 	id := state.ID()
 	// Update in-memory copy
+	s.statesLock.Lock()
 	s.states[id] = state
+	s.statesLock.Unlock()
 
 	// Persist to the registry
+	s.storeLock.Lock()
 	key := awsS3ObjectStatePrefix + id
 	if err := s.store.Set(key, state); err != nil {
 		s.log.Errorw("Failed to write states to the registry", "error", err)
 	}
+	s.storeLock.Unlock()
 }
 
 func (s *states) loadFromRegistry() error {
-	var states map[string]state
+	states := map[string]state{}
 
+	s.storeLock.Lock()
 	err := s.store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
 		if !strings.HasPrefix(key, awsS3ObjectStatePrefix) {
 			return true, nil
@@ -91,13 +95,14 @@ func (s *states) loadFromRegistry() error {
 		states[st.ID()] = st
 		return true, nil
 	})
+	s.storeLock.Unlock()
 	if err != nil {
 		return err
 	}
 
-	s.Lock()
+	s.statesLock.Lock()
 	s.states = states
-	s.Unlock()
+	s.statesLock.Unlock()
 
 	return nil
 }
