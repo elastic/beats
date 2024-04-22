@@ -74,15 +74,6 @@ packaging_changeset=(
   )
 
 case "${BUILDKITE_PIPELINE_SLUG}" in
-<<<<<<< HEAD
-  "beats-packetbeat")
-    BEAT_CHANGESET_REFERENCE=${packetbeat_changeset[@]}
-    ;;
-  "beats-winlogbeat")
-    BEAT_CHANGESET_REFERENCE=${winlogbeat_changeset[@]}
-    ;;
-=======
->>>>>>> 8f8f3137f2 (Migrate packetbeat to static Buildkite pipeline (#39087))
   "beats-xpack-metricbeat")
     BEAT_CHANGESET_REFERENCE=${xpack_metricbeat_changeset[@]}
     ;;
