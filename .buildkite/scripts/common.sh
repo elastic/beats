@@ -31,10 +31,6 @@ packetbeat_changeset=(
   "^packetbeat/.*"
   )
 
-winlogbeat_changeset=(
-  "^winlogbeat/.*"
-  )
-
 xpack_dockerlogbeat_changeset=(
   "^x-pack/dockerlogbeat/.*"
   )
