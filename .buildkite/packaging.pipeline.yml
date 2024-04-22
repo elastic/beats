@@ -6,6 +6,7 @@
 #   ARM Step (Parallel)
 #   beats-dashboards (Parallel)
 #
+# TODO: Pre-cache beats-dev/golang-crossbuild container image
 
 env:
   ASDF_MAGE_VERSION: 1.15.0
@@ -26,7 +27,7 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         commands:
           - make build/distributions/dependencies.csv
-          - beats-dashboards
+          - make beats-dashboards
         env:
           SNAPSHOT: true
         artifact_paths:
@@ -40,7 +41,7 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         commands:
           - make build/distributions/dependencies.csv
-          - beats-dashboards
+          - make beats-dashboards
         artifact_paths:
           - build/distributions/**
 
@@ -60,7 +61,7 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
-          - build/distributions/**
+          - auditbeat/build/distributions/**
 
       - label: ":linux: Auditbeat/Packaging Linux arm64"
         key: "auditbeat-package-linux-arm64-snapshot"
@@ -76,7 +77,7 @@ steps:
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
-          - build/distributions/**
+          - auditbeat/build/distributions/**
 
   - group: Packaging staging
     key: packaging-staging
@@ -95,7 +96,7 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
-          - build/distributions/**
+          - auditbeat/build/distributions/**
 
       - label: ":linux: Auditbeat/Packaging Linux arm64"
         key: "auditbeat-package-linux-arm64-staging"
@@ -112,7 +113,7 @@ steps:
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
-          - build/distributions/**
+          - auditbeat/build/distributions/**
 
   - group: DRA publish
     key: dra
@@ -122,12 +123,14 @@ steps:
         depends_on:
           - packaging-snapshot
         command: |
-          buildkite-agent artifact download "build/**" .
-          ls - lah build/distributions
+          buildkite-agent artifact download "**build/**" .
+          ls -lah
+          ls -lah build/distributions
       - label: DRA Staging
         key: dra-staging
         depends_on:
           - packaging-staging
         command: |
-          buildkite-agent artifact download "build/**" .
-          ls - lah build/distributions
+          buildkite-agent artifact download ""**build/**"" .
+          ls -lah
+          ls -lah build/distributions
