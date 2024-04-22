@@ -1,0 +1,77 @@
+[
+    {
+        "data_stream": {
+            "namespace": "default"
+        },
+        "id": "74c7d0a8-ce04-4663-95da-ff6d537c268c",
+        "index": "logs-osquery_manager.result-default",
+        "meta": {
+            "package": {
+                "name": "osquery_manager",
+                "version": "1.12.1"
+            }
+        },
+        "name": "osquery_manager-1",
+        "package_policy_id": "74c7d0a8-ce04-4663-95da-ff6d537c268c",
+        "policy": {
+            "revision": 2
+        },
+        "processors": [
+            {
+                "add_fields": {
+                    "fields": {
+                        "input_id": "74c7d0a8-ce04-4663-95da-ff6d537c268c"
+                    },
+                    "target": "@metadata"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "dataset": "osquery_manager.result",
+                        "namespace": "default",
+                        "type": "logs"
+                    },
+                    "target": "data_stream"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "dataset": "osquery_manager.result"
+                    },
+                    "target": "event"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "stream_id": "74c7d0a8-ce04-4663-95da-ff6d537c268c"
+                    },
+                    "target": "@metadata"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "id": "abc7d0a8-ce04-4663-95da-ff6d537c268f",
+                        "snapshot": false,
+                        "version": "8.13.1"
+                    },
+                    "target": "elastic_agent"
+                }
+            },
+            {
+                "add_fields": {
+                    "fields": {
+                        "id": "abc7d0a8-ce04-4663-95da-ff6d537c268f"
+                    },
+                    "target": "agent"
+                }
+            }
+        ],
+        "revision": 1,
+        "streams": [],
+        "type": "log"
+    }
+]

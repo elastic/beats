@@ -177,7 +177,7 @@ func (bt *osquerybeat) Run(b *beat.Beat) error {
 	}
 
 	// Set reseable action handler
-	rah := newResetableActionHandler(bt.log)
+	rah := newResetableActionHandler(bt.pub, bt.log)
 	defer rah.Clear()
 
 	g, ctx := errgroup.WithContext(ctx)

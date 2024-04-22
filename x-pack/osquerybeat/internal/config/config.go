@@ -22,9 +22,10 @@ import (
 //   query: select * from usb_devices
 
 const (
-	DefaultNamespace = "default"
-	DefaultDataset   = "osquery_manager.result"
-	DefaultType      = "logs"
+	DefaultNamespace              = "default"
+	DefaultDataset                = "osquery_manager.result"
+	DefaultType                   = "logs"
+	DefaultActionResponsesDataset = "osquery_manager.action.responses"
 )
 
 var datastreamPrefix = fmt.Sprintf("%s-%s-", DefaultType, DefaultDataset)

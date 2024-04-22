@@ -21,6 +21,10 @@ var (
 	ErrNoQueryExecutor = errors.New("no query executor configures")
 )
 
+type actionResultPublisher interface {
+	PublishActionResult(req map[string]interface{}, res map[string]interface{})
+}
+
 type publisher interface {
 	Publish(index, actionID, responseID string, meta map[string]interface{}, hits []map[string]interface{}, ecsm ecs.Mapping, reqData interface{})
 }

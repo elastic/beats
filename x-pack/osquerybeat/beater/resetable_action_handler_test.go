@@ -40,6 +40,13 @@ func (a *mockActionHandler) Name() string {
 	return "osquery"
 }
 
+type mockActionResultPublisher struct {
+	actionResult map[string]interface{}
+}
+
+func (p *mockActionResultPublisher) PublishActionResult(req map[string]interface{}, res map[string]interface{}) {
+}
+
 func TestResetableActionHandler(t *testing.T) {
 	ctx, cn := context.WithCancel(context.Background())
 	defer cn()
@@ -78,7 +85,8 @@ func TestResetableActionHandler(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			rah := newResetableActionHandler(log, resetableActionHandlerWithTimeout(testActionHandlerTimeout))
+			pub := &mockActionResultPublisher{}
+			rah := newResetableActionHandler(pub, log, resetableActionHandlerWithTimeout(testActionHandlerTimeout))
 			defer rah.Clear()
 
 			if tc.ah != nil {
