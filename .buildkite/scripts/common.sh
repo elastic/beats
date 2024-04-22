@@ -74,6 +74,9 @@ packaging_changeset=(
   )
 
 case "${BUILDKITE_PIPELINE_SLUG}" in
+  "beats-winlogbeat")
+    BEAT_CHANGESET_REFERENCE=${winlogbeat_changeset[@]}
+    ;;
   "beats-xpack-metricbeat")
     BEAT_CHANGESET_REFERENCE=${xpack_metricbeat_changeset[@]}
     ;;
