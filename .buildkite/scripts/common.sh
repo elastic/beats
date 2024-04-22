@@ -35,8 +35,8 @@ xpack_dockerlogbeat_changeset=(
   "^x-pack/dockerlogbeat/.*"
   )
 
-xpack_winlogbeat_changeset=(
-  "^x-pack/winlogbeat/.*"
+winlogbeat_changeset=(
+  "^winlogbeat/.*"
   )
 
 ci_changeset=(
