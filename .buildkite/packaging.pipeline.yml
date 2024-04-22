@@ -60,7 +60,7 @@ steps:
           - build/distributions/**
 
       - label: ":linux: Auditbeat/Packaging Linux arm64"
-        key: "auditbeat-package-linux-arm64"
+        key: "auditbeat-package-linux-arm64-snapshot"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
@@ -79,7 +79,7 @@ steps:
     key: packaging-staging
     steps:
       - label: ":ubuntu: Auditbeat/Packaging Linux"
-        key: "auditbeat-package-linux-x86"
+        key: "auditbeat-package-linux-x86-staging"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
@@ -95,7 +95,7 @@ steps:
           - build/distributions/**
 
       - label: ":linux: Auditbeat/Packaging Linux arm64"
-        key: "auditbeat-package-linux-arm64"
+        key: "auditbeat-package-linux-arm64-staging"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
