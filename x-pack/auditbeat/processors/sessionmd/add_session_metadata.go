@@ -57,7 +57,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 	}
 
 	backfilledPIDs := db.ScrapeProcfs()
-	logger.Debugf("backfilled %d processes", len(backfilledPIDs))
+	logger.Errorf("backfilled %d processes", len(backfilledPIDs))
 
 	var p provider.Provider
 
@@ -106,6 +106,7 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 
 	result, err := p.enrich(ev)
 	if err != nil {
+		p.logger.Errorf("enriching event: %w", err)
 		return ev, fmt.Errorf("enriching event: %w", err)
 	}
 	return result, nil

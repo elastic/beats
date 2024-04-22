@@ -556,7 +556,22 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 
 	process, ok := db.processes[pid]
 	if !ok {
-		return types.Process{}, errors.New("process not found")
+		procInfo, err := db.procfs.GetProcess(pid)
+		if err != nil {
+			return types.Process{}, errors.New("process not found in db (scraping from proc failed)")
+		}
+		process := Process{
+			PIDs:     pidInfoFromProto(procInfo.PIDs),
+			Creds:    credInfoFromProto(procInfo.Creds),
+			CTTY:     ttyDevFromProto(procInfo.CTTY),
+			Argv:     procInfo.Argv,
+			Cwd:      procInfo.Cwd,
+			Env:      procInfo.Env,
+			Filename: procInfo.Filename,
+		}
+		db.insertProcess(process)
+
+		process = db.processes[pid]
 	}
 
 	ret := fullProcessFromDBProcess(process)
