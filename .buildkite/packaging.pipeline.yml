@@ -122,7 +122,7 @@ steps:
           buildkite-agent artifact download "build/**" .
           ls - lah build/distributions
       - label: DRA Staging
-        key: dra-snapshot
+        key: dra-staging
         depends_on:
           - packaging-staging
         command: |
