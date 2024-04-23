@@ -94,15 +94,18 @@ func (watcher *recursiveWatcher) watchFile(path string, info os.FileInfo) error 
 	}
 
 	if info.IsDir() {
-		if err = watcher.tree.AddDir(path); err == nil {
-			if err = watcher.inner.Add(path); err != nil {
-				return fmt.Errorf("failed adding watcher to '%s': %w", path, err)
-			}
+		if err = watcher.tree.AddDir(path); err != nil {
+			return err
 		}
-	} else {
-		err = watcher.tree.AddFile(path)
+
+		if err = watcher.inner.Add(path); err != nil {
+			return err
+		}
+
+		return nil
 	}
-	return err
+
+	return watcher.tree.AddFile(path)
 }
 
 func (watcher *recursiveWatcher) addRecursive(path string) error {
