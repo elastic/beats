@@ -55,8 +55,8 @@ steps:
         command: |
           cd auditbeat
           mage package
-          mage ironbank
-          mv auditbeat/build build
+          mage ironbank        
+          mv build ../build
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -74,7 +74,42 @@ steps:
           cd auditbeat
           mage package
           mage ironbank
-          mv auditbeat/build build
+          mv build ../build
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - build/distributions/**
+
+      - label: ":ubuntu: Filebeat/Packaging Linux"
+        key: "filebeat-package-linux-x86-snapshot"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          SNAPSHOT: true
+        command: |
+          cd filebeat
+          mage package
+          mage ironbank          
+          mv build ../build
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - build/distributions/**
+
+      - label: ":linux: Filebeat/Packaging Linux arm64"
+        key: "filebeat-package-linux-arm64-snapshot"
+        env:
+          PLATFORMS: "linux/arm64"
+          PACKAGES: "docker"
+          SNAPSHOT: true
+        command: |
+          cd filebeat
+          mage package
+          mage ironbank
+          mv build ../build
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -94,7 +129,7 @@ steps:
           cd auditbeat
           mage package
           mage ironbank
-          mv auditbeat/build build
+          mv build ../build
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -112,7 +147,42 @@ steps:
           cd auditbeat
           mage package
           mage ironbank
-          mv auditbeat/build build
+          mv build ../build
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - build/distributions/**
+
+      - label: ":ubuntu: Filebeat/Packaging Linux"
+        key: "filebeat-package-linux-x86-staging"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          SNAPSHOT: false
+        command: |
+          cd filebeat
+          mage package
+          mage ironbank
+          mv build ../build
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - build/distributions/**
+
+      - label: ":linux: Filebeat/Packaging Linux arm64"
+        key: "filebeat-package-linux-arm64-staging"
+        env:
+          PLATFORMS: "linux/arm64"
+          PACKAGES: "docker"
+          SNAPSHOT: false
+        command: |
+          cd filebeat
+          mage package
+          mage ironbank
+          mv build ../build
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
