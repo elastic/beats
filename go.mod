@@ -228,8 +228,8 @@ require (
 	github.com/sergi/go-diff v1.3.1
 	github.com/shirou/gopsutil/v3 v3.22.10
 	github.com/tklauser/go-sysconf v0.3.10
-	go.elastic.co/apm/module/apmelasticsearch/v2 v2.4.8
-	go.elastic.co/apm/module/apmhttp/v2 v2.5.0
+	go.elastic.co/apm/module/apmelasticsearch/v2 v2.6.0
+	go.elastic.co/apm/module/apmhttp/v2 v2.6.0
 	go.elastic.co/apm/v2 v2.6.0
 	go.mongodb.org/mongo-driver v1.5.1
 	golang.org/x/exp v0.0.0-20231127185646-65229373498e
