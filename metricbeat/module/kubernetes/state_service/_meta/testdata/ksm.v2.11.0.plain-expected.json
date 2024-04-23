@@ -1,0 +1,74 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.service",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "service": {
+                "cluster_ip": "10.96.0.10",
+                "created": "2024-04-23T08:49:44.000Z",
+                "name": "kube-dns",
+                "type": "ClusterIP"
+            }
+        },
+        "metricset": {
+            "name": "state_service",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.service",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "service": {
+                "cluster_ip": "None",
+                "created": "2024-04-23T08:50:43.000Z",
+                "name": "kube-state-metrics",
+                "type": "ClusterIP"
+            }
+        },
+        "metricset": {
+            "name": "state_service",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.service",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "default",
+            "service": {
+                "cluster_ip": "10.96.0.1",
+                "created": "2024-04-23T08:49:42.000Z",
+                "name": "kubernetes",
+                "type": "ClusterIP"
+            }
+        },
+        "metricset": {
+            "name": "state_service",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]

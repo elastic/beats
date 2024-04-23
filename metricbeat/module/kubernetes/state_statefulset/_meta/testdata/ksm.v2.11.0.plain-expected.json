@@ -1,0 +1,33 @@
+[
+    {
+        "event": {
+            "dataset": "kubernetes.statefulset",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "default",
+            "statefulset": {
+                "created": 1713862291,
+                "generation": {
+                    "desired": 1,
+                    "observed": 1
+                },
+                "name": "web",
+                "replicas": {
+                    "desired": 1,
+                    "observed": 1,
+                    "ready": 1
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_statefulset",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    }
+]
