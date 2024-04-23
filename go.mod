@@ -3,7 +3,7 @@ module github.com/elastic/elastic-agent-system-metrics
 go 1.21
 
 require (
-	github.com/docker/docker v26.0.0+incompatible
+	github.com/docker/docker v26.0.2+incompatible
 	github.com/elastic/elastic-agent-libs v0.9.3
 	github.com/elastic/go-licenser v0.4.0
 	github.com/elastic/go-structform v0.0.9

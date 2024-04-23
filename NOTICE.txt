@@ -11,11 +11,11 @@ Third party libraries used by the Elastic Agent System Metrics:
 
 --------------------------------------------------------------------------------
 Dependency : github.com/docker/docker
-Version: v26.0.0+incompatible
+Version: v26.0.2+incompatible
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/docker/docker@v26.0.0+incompatible/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/docker/docker@v26.0.2+incompatible/LICENSE:
 
 
                                  Apache License
