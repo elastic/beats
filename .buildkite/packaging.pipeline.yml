@@ -205,6 +205,8 @@ steps:
           ls -lah build
           ls -lah build/distributions
           .buildkite/scripts/dra.sh
+        agents:
+          provider: "gcp"
 
       - label: DRA Staging
         ## Only for release and main
@@ -219,3 +221,5 @@ steps:
           ls -lah build
           ls -lah build/distributions
           .buildkite/scripts/dra.sh
+        agents:
+          provider: "gcp"
