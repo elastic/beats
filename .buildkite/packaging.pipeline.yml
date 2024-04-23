@@ -13,6 +13,7 @@ steps:
     key: dashboards
     steps:
       - label: Snapshot dashboards
+        key: dashboards-snapshot
         # TODO: container with go and make
         agents:
           provider: gcp
@@ -24,9 +25,10 @@ steps:
         env:
           SNAPSHOT: true
         artifact_paths:
-          - build/distributions/**
+          - build/distributions/**/*
 
       - label: Staging dashboards
+        key: dashboards-staging
         # TODO: container with go and make
         agents:
           provider: gcp
@@ -36,7 +38,7 @@ steps:
           - make build/distributions/dependencies.csv
           - make beats-dashboards
         artifact_paths:
-          - build/distributions/**
+          - build/distributions/**/*
 
   # - group: Packaging snapshot
   #   key: packaging-snapshot
@@ -199,10 +201,12 @@ steps:
         key: dra-snapshot
         env:
           DRA_WORKFLOW: snapshot
-        # depends_on:
-        #   - packaging-snapshot
+        depends_on:
+          # - packaging-snapshot
+          - dashboards-snapshot
         command: |
           buildkite-agent artifact download "build/**/*" . --build 018f0d0c-5a6e-497d-9e96-e35747d1be87
+          buildkite-agent artifact download "build/**/*" . 
           ls -lah build
           ls -lah build/distributions
           .buildkite/scripts/packaging/prepare-release-manager.sh
@@ -218,6 +222,7 @@ steps:
           DRA_WORKFLOW: staging
         depends_on:
           - packaging-staging
+          - dashboards-staging
         command: |
           buildkite-agent artifact download "build/**" .
           ls -lah build
