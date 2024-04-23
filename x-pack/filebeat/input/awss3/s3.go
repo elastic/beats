@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws/ratelimit"
+
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
