@@ -8,7 +8,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -134,7 +133,7 @@ type constantS3 struct {
 var _ s3API = (*constantS3)(nil)
 
 func newConstantS3(t testing.TB) *constantS3 {
-	data, err := ioutil.ReadFile(cloudtrailTestFile)
+	data, err := os.ReadFile(cloudtrailTestFile)
 	if err != nil {
 		t.Fatal(err)
 	}
