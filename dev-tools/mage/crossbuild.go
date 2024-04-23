@@ -339,7 +339,7 @@ func (b GolangCrossBuilder) Build() error {
 	// This fixes an issue where during arm64 linux build for the currently used docker image
 	// docker.elastic.co/beats-dev/golang-crossbuild:1.21.9-arm the image for amd64 arch is pulled
 	// and causes problems when using native arch tools on the binaries that are built for arm64 arch.
-	if strings.HasPrefix(b.Platform, "linux/") {
+	if strings.HasPrefix(b.Platform, "linux/") && strings.Contains(b.Platform, "arm64") {
 		args = append(args,
 			"--platform", b.Platform,
 		)
