@@ -82,6 +82,7 @@ func (s *states) loadFromRegistry() error {
 		if err := dec.Decode(&st); err != nil {
 			// Skip this key but continue iteration
 			s.log.Warnf("invalid S3 state loading object key %v", key)
+			//nolint:nilerr // One bad object shouldn't stop iteration
 			return true, nil
 		}
 		if !st.Stored && !st.Failed {
