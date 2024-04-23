@@ -7,6 +7,7 @@ require (
 	github.com/docker/go-units v0.5.0
 	github.com/elastic/go-structform v0.0.9
 	github.com/elastic/go-ucfg v0.8.5
+	github.com/elastic/pkcs8 v1.0.0
 	github.com/fatih/color v1.13.0
 	github.com/gofrs/uuid v4.4.0+incompatible
 	github.com/magefile/mage v1.13.0
@@ -15,12 +16,11 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475
 	github.com/spf13/cobra v1.7.0
 	github.com/stretchr/testify v1.8.2
-	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a
 	go.elastic.co/apm/module/apmhttp/v2 v2.0.0
 	go.elastic.co/ecszap v1.0.1
 	go.elastic.co/go-licence-detector v0.5.0
 	go.uber.org/zap v1.27.0
-	golang.org/x/crypto v0.21.0
+	golang.org/x/crypto v0.22.0
 	golang.org/x/net v0.23.0
 	golang.org/x/sys v0.19.0
 	gopkg.in/yaml.v2 v2.4.0

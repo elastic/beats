@@ -665,6 +665,36 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-ucfg@v0.8.5/
 
 
 --------------------------------------------------------------------------------
+Dependency : github.com/elastic/pkcs8
+Version: v1.0.0
+Licence type (autodetected): MIT
+--------------------------------------------------------------------------------
+
+Contents of probable licence file $GOMODCACHE/github.com/elastic/pkcs8@v1.0.0/LICENSE:
+
+The MIT License (MIT)
+
+Copyright (c) 2014 youmark
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------------------
 Dependency : github.com/fatih/color
 Version: v1.13.0
 Licence type (autodetected): MIT
@@ -1250,36 +1280,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-
---------------------------------------------------------------------------------
-Dependency : github.com/youmark/pkcs8
-Version: v0.0.0-20201027041543-1326539a0a0a
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/youmark/pkcs8@v0.0.0-20201027041543-1326539a0a0a/LICENSE:
-
-The MIT License (MIT)
-
-Copyright (c) 2014 youmark
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : go.elastic.co/apm/module/apmhttp/v2
@@ -1946,11 +1946,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/crypto
-Version: v0.21.0
+Version: v0.22.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.21.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.22.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -5003,11 +5003,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/term
-Version: v0.18.0
+Version: v0.19.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.18.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.19.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 

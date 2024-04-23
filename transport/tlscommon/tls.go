@@ -27,13 +27,11 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"strings"
 
-	"github.com/youmark/pkcs8"
-
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/pkcs8"
 )
 
 const logSelector = "tls"
@@ -101,7 +99,7 @@ func ReadPEMFile(log *logp.Logger, s, passphrase string) ([]byte, error) {
 	}
 	defer r.Close()
 
-	content, err := ioutil.ReadAll(r)
+	content, err := io.ReadAll(r)
 	if err != nil {
 		return nil, err
 	}
@@ -219,7 +217,7 @@ func LoadCertificateAuthorities(CAs []string) (*x509.CertPool, []error) {
 		}
 		defer r.Close()
 
-		pemData, err := ioutil.ReadAll(r)
+		pemData, err := io.ReadAll(r)
 		if err != nil {
 			log.Errorf("Failed reading CA certificate: %+v", err)
 			errors = append(errors, fmt.Errorf("%w reading %v", err, r))
@@ -276,7 +274,7 @@ type PEMReader struct {
 // NewPEMReader returns a new PEMReader.
 func NewPEMReader(certificate string) (*PEMReader, error) {
 	if IsPEMString(certificate) {
-		return &PEMReader{reader: ioutil.NopCloser(strings.NewReader(certificate)), debugStr: "inline"}, nil
+		return &PEMReader{reader: io.NopCloser(strings.NewReader(certificate)), debugStr: "inline"}, nil
 	}
 
 	r, err := os.Open(certificate)
