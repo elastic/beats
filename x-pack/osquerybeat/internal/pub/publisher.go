@@ -139,6 +139,7 @@ func (p *Publisher) PublishActionResult(req map[string]interface{}, res map[stri
 
 	if p.actionResponsesClient == nil {
 		p.log.Info("Action responses stream is not configured. Action response is dropped.")
+		return
 	}
 
 	fields := actionResultToEvent(req, res)
