@@ -2,7 +2,6 @@
 
 # Generate steps
 #   Linux step (Parallel)
-#
 #   ARM Step (Parallel)
 #   beats-dashboards (Parallel)
 #
@@ -56,12 +55,14 @@ steps:
         command: |
           cd auditbeat
           mage package
+          mage ironbank
+          mv auditbeat/build build
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
-          - auditbeat/build/distributions/**
+          - build/distributions/**
 
       - label: ":linux: Auditbeat/Packaging Linux arm64"
         key: "auditbeat-package-linux-arm64-snapshot"
@@ -72,12 +73,14 @@ steps:
         command: |
           cd auditbeat
           mage package
+          mage ironbank
+          mv auditbeat/build build
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
-          - auditbeat/build/distributions/**
+          - build/distributions/**
 
   - group: Packaging staging
     key: packaging-staging
@@ -91,12 +94,13 @@ steps:
           cd auditbeat
           mage package
           mage ironbank
+          mv auditbeat/build build
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
-          - auditbeat/build/distributions/**
+          - build/distributions/**
 
       - label: ":linux: Auditbeat/Packaging Linux arm64"
         key: "auditbeat-package-linux-arm64-staging"
@@ -108,12 +112,13 @@ steps:
           cd auditbeat
           mage package
           mage ironbank
+          mv auditbeat/build build
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
-          - auditbeat/build/distributions/**
+          - build/distributions/**
 
   - group: DRA publish
     key: dra
@@ -123,14 +128,15 @@ steps:
         depends_on:
           - packaging-snapshot
         command: |
-          buildkite-agent artifact download "**build/**" .
-          ls -lah
+          buildkite-agent artifact download "build/**" .
+          ls -lah build
           ls -lah build/distributions
+
       - label: DRA Staging
         key: dra-staging
         depends_on:
           - packaging-staging
         command: |
-          buildkite-agent artifact download ""**build/**"" .
-          ls -lah
+          buildkite-agent artifact download "build/**" .
+          ls -lah build
           ls -lah build/distributions
