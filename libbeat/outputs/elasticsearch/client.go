@@ -422,7 +422,7 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 					// poison pill - this will clog the pipeline if the underlying failure is non transient.
 				} else if client.deadLetterIndex != "" {
 					client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Look at the event log to view the event and cause.", status)
-					client.log.Debugw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg), "log.type", "event")
+					client.log.Warnw(fmt.Sprintf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg), "log.type", "event")
 					client.setDeadLetter(encodedEvent, status, string(msg))
 
 				} else { // drop

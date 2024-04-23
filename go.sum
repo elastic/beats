@@ -380,8 +380,8 @@ github.com/awslabs/goformation/v4 v4.1.0 h1:JRxIW0IjhYpYDrIZOTJGMu2azXKI+OK5dP56
 github.com/awslabs/goformation/v4 v4.1.0/go.mod h1:MBDN7u1lMNDoehbFuO4uPvgwPeolTMA2TzX1yO6KlxI=
 github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5 h1:lxW5Q6K2IisyF5tlr6Ts0W4POGWQZco05MJjFmoeIHs=
 github.com/awslabs/kinesis-aggregation/go/v2 v2.0.0-20220623125934-28468a6701b5/go.mod h1:0Qr1uMHFmHsIYMcG4T7BJ9yrJtWadhOmpABCX69dwuc=
-github.com/belimawr/elastic-agent-libs v0.2.9-0.20240411111018-dc1fe80ad648 h1:udY8euEzgPnTFEA4NUUSr+cur2/DCZWteMGiLwYKbFI=
-github.com/belimawr/elastic-agent-libs v0.2.9-0.20240411111018-dc1fe80ad648/go.mod h1:pGMj5myawdqu+xE+WKvM5FQzKQ/MonikkWOzoFTJxaU=
+github.com/belimawr/elastic-agent-libs v0.2.9-0.20240423125757-a73eab058a9f h1:RucOKuoSI53KjEA+BBmlDVnqRc98z+YeDXBIcm2VZ+w=
+github.com/belimawr/elastic-agent-libs v0.2.9-0.20240423125757-a73eab058a9f/go.mod h1:h+izqYohdAEdb3OywTLvrrw7Yon5jiiP8N/F5NgDgBQ=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/benbjohnson/immutable v0.2.1/go.mod h1:uc6OHo6PN2++n98KHLxW8ef4W42ylHiQSENghE1ezxI=
 github.com/benbjohnson/tmpl v1.0.0/go.mod h1:igT620JFIi44B6awvU9IsDhR77IXWtFigTLil/RPdps=
