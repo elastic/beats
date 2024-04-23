@@ -1,10 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
-# Generate steps
-#   Linux step (Parallel)
-#   ARM Step (Parallel)
-#   beats-dashboards (Parallel)
-#
 # TODO: Pre-cache beats-dev/golang-crossbuild container image
 
 env:
@@ -47,148 +42,183 @@ steps:
   - group: Packaging snapshot
     key: packaging-snapshot
     steps:
-      - label: ":ubuntu: Auditbeat/Packaging Linux"
-        key: "auditbeat-package-linux-x86-snapshot"
+      # x86
+      - label: ":ubuntu: {{matrix}}/Packaging Linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
         command: |
-          cd auditbeat
+          WORKSPACE=$$PWD
+          cd {{matrix}}
           mage package
           mage ironbank        
-          mv build ../build
+          mv build $$WORKSPACE
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
           - build/distributions/**
+        matrix:
+          - auditbeat
+          - filebeat
+          - heartbeat
+          # - metricbeat
+          # - packetbeat
+          # - winlogbeat
+          - x-pack/auditbeat
+          # - x-pack/dockerlogbeat
+          # - x-pack/filebeat
+          # - x-pack/functionbeat
+          # - x-pack/heartbeat
+          # - x-pack/metricbeat
+          # - x-pack/packetbeat
+          - x-pack/winlogbeat
 
-      - label: ":linux: Auditbeat/Packaging Linux arm64"
-        key: "auditbeat-package-linux-arm64-snapshot"
+      ## ARM
+      - label: ":linux: {{matrix}}/Packaging Linux arm64"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
           SNAPSHOT: true
         command: |
-          cd auditbeat
+          WORKSPACE=$$PWD
+          cd {{matrix}}
           mage package
           mage ironbank
-          mv build ../build
+          mv build $$WORKSPACE
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - build/distributions/**
+        matrix:
+          - auditbeat
+          # - filebeat
+          # - heartbeat
+          # - metricbeat
+          # - packetbeat
+          - x-pack/auditbeat
+          # - x-pack/dockerlogbeat
+          # - x-pack/filebeat
+          # - x-pack/heartbeat
+          # - x-pack/metricbeat
+          - x-pack/packetbeat
 
-      - label: ":ubuntu: Filebeat/Packaging Linux"
-        key: "filebeat-package-linux-x86-snapshot"
+      ## Osquerybeat and agentbeat require msitools to be installed
+      ## TODO: pre-install msitools to the VM and delete this exclusion
+      - label: ":ubuntu: {{matrix}}/Packaging Linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
         command: |
-          cd filebeat
+          WORKSPACE=$$PWD
+          .buildkite/scripts/install-msitools.sh
+          cd {{matrix}}
           mage package
-          mage ironbank          
-          mv build ../build
+          mage ironbank        
+          mv build $$WORKSPACE
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
           - build/distributions/**
-
-      - label: ":linux: Filebeat/Packaging Linux arm64"
-        key: "filebeat-package-linux-arm64-snapshot"
-        env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
-          SNAPSHOT: true
-        command: |
-          cd filebeat
-          mage package
-          mage ironbank
-          mv build ../build
-        agents:
-          provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths:
-          - build/distributions/**
+        matrix:
+          - x-pack/agentbeat
+          - x-pack/osquerybeat
 
   - group: Packaging staging
     key: packaging-staging
+
     steps:
-      - label: ":ubuntu: Auditbeat/Packaging Linux"
-        key: "auditbeat-package-linux-x86-staging"
+      # x86
+      - label: ":ubuntu: {{matrix}}/Packaging Linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: false
         command: |
-          cd auditbeat
+          WORKSPACE=$$PWD
+          cd {{matrix}}
           mage package
-          mage ironbank
-          mv build ../build
+          mage ironbank        
+          mv build $$WORKSPACE
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
           - build/distributions/**
+        matrix:
+          - auditbeat
+          - filebeat
+          - heartbeat
+          # - metricbeat
+          # - packetbeat
+          # - winlogbeat
+          - x-pack/auditbeat
+          # - x-pack/dockerlogbeat
+          # - x-pack/filebeat
+          # - x-pack/functionbeat
+          # - x-pack/heartbeat
+          # - x-pack/metricbeat
+          # - x-pack/packetbeat
+          - x-pack/winlogbeat
 
-      - label: ":linux: Auditbeat/Packaging Linux arm64"
-        key: "auditbeat-package-linux-arm64-staging"
+      ## ARM
+      - label: ":linux: {{matrix}}/Packaging Linux arm64"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
           SNAPSHOT: false
         command: |
-          cd auditbeat
+          WORKSPACE=$$PWD
+          cd {{matrix}}
           mage package
           mage ironbank
-          mv build ../build
+          mv build $$WORKSPACE
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - build/distributions/**
+        matrix:
+          - auditbeat
+          # - filebeat
+          # - heartbeat
+          # - metricbeat
+          # - packetbeat
+          - x-pack/auditbeat
+          # - x-pack/dockerlogbeat
+          # - x-pack/filebeat
+          # - x-pack/heartbeat
+          # - x-pack/metricbeat
+          - x-pack/packetbeat
 
-      - label: ":ubuntu: Filebeat/Packaging Linux"
-        key: "filebeat-package-linux-x86-staging"
+        ## Osquerybeat and agentbeat require msitools to be installed
+        ## TODO: pre-install msitools to the VM and delete this exclusion
+      - label: ":ubuntu: {{matrix}}/Packaging Linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: false
         command: |
-          cd filebeat
+          WORKSPACE=$$PWD
+          .buildkite/scripts/install-msitools.sh
+          cd {{matrix}}
           mage package
-          mage ironbank
-          mv build ../build
+          mage ironbank        
+          mv build $$WORKSPACE
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
           - build/distributions/**
-
-      - label: ":linux: Filebeat/Packaging Linux arm64"
-        key: "filebeat-package-linux-arm64-staging"
-        env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
-          SNAPSHOT: false
-        command: |
-          cd filebeat
-          mage package
-          mage ironbank
-          mv build ../build
-        agents:
-          provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths:
-          - build/distributions/**
+        matrix:
+          - x-pack/agentbeat
+          - x-pack/osquerybeat
 
   - group: DRA publish
     key: dra
