@@ -19,15 +19,12 @@ import (
 	"github.com/elastic/go-concert/timed"
 )
 
-const maxCircuitBreaker = 10
-
-type commitWriteState struct {
-	time.Time
-}
+// var instead of const so it can be reduced during unit tests (instead of waiting
+// through 10 minutes of retry backoff)
+var readerLoopMaxCircuitBreaker = 10
 
 type s3ObjectPayload struct {
 	s3ObjectHandler s3ObjectHandler
-	s3ObjectEvent   s3EventV2
 	objectState     state
 }
 
@@ -38,7 +35,6 @@ type s3Poller struct {
 	region               string
 	provider             string
 	bucketPollInterval   time.Duration
-	workerSem            *awscommon.Sem
 	s3                   s3API
 	log                  *logp.Logger
 	metrics              *inputMetrics
@@ -72,7 +68,6 @@ func newS3Poller(log *logp.Logger,
 		region:               awsRegion,
 		provider:             provider,
 		bucketPollInterval:   bucketPollInterval,
-		workerSem:            awscommon.NewSem(numberOfWorkers),
 		s3:                   s3,
 		log:                  log,
 		metrics:              metrics,
@@ -105,7 +100,7 @@ func (p *s3Poller) workerLoop(ctx context.Context, s3ObjectPayloadChan <-chan *s
 
 		// Process S3 object (download, parse, create events).
 		err := objHandler.ProcessS3Object()
-		if errors.Is(err, s3DownloadError) {
+		if errors.Is(err, errS3DownloadFailed) {
 			// Download errors are ephemeral. Add a backoff delay, then skip to the
 			// next iteration so we don't mark the object as permanently failed.
 			rateLimitWaiter.Wait()
@@ -147,16 +142,12 @@ func (p *s3Poller) readerLoop(ctx context.Context, s3ObjectPayloadChan chan<- *s
 		page, err := paginator.NextPage(ctx)
 
 		if err != nil {
-			if !paginator.HasMorePages() {
-				break
-			}
-
 			p.log.Warnw("Error when paginating listing.", "error", err)
 			// QuotaExceededError is client-side rate limiting in the AWS sdk,
 			// don't include it in the circuit breaker count
 			if !errors.As(err, &ratelimit.QuotaExceededError{}) {
 				circuitBreaker++
-				if circuitBreaker >= maxCircuitBreaker {
+				if circuitBreaker >= readerLoopMaxCircuitBreaker {
 					p.log.Warnw(fmt.Sprintf("%d consecutive error when paginating listing, breaking the circuit.", circuitBreaker), "error", err)
 					break
 				}
@@ -175,7 +166,7 @@ func (p *s3Poller) readerLoop(ctx context.Context, s3ObjectPayloadChan chan<- *s
 		p.metrics.s3ObjectsListedTotal.Add(uint64(totListedObjects))
 		for _, object := range page.Contents {
 			state := newState(bucketName, *object.Key, *object.ETag, *object.LastModified)
-			if p.states.AlreadyProcessed(state) {
+			if p.states.IsProcessed(state) {
 				p.log.Debugw("skipping state.", "state", state)
 				continue
 			}

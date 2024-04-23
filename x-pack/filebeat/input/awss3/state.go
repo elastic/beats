@@ -5,7 +5,6 @@
 package awss3
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -54,15 +53,4 @@ func (s *state) ID() string {
 // IsEqual checks if the two states point to the same s3 object.
 func (s *state) IsEqual(c *state) bool {
 	return s.Bucket == c.Bucket && s.Key == c.Key && s.Etag == c.Etag && s.LastModified.Equal(c.LastModified)
-}
-
-// String returns string representation of the struct
-func (s *state) String() string {
-	return fmt.Sprintf(
-		"{ID: %v, Bucket: %v, Key: %v, Etag: %v, LastModified: %v}",
-		s.ID,
-		s.Bucket,
-		s.Key,
-		s.Etag,
-		s.LastModified)
 }

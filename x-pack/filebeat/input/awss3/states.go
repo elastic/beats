@@ -43,7 +43,7 @@ func newStates(ctx v2.Context, store *statestore.Store) (*states, error) {
 	return states, states.loadFromRegistry()
 }
 
-func (s *states) AlreadyProcessed(state state) bool {
+func (s *states) IsProcessed(state state) bool {
 	s.statesLock.Lock()
 	defer s.statesLock.Unlock()
 	// Our in-memory table only stores completed objects
