@@ -6,10 +6,9 @@ if [ -z "$BEAT_DIR" ]; then
     exit 1
 fi
 
-echo ">>> Packaging : $BEAT_DIR"
+echo "Packaging : $BEAT_DIR"
 
 WORKSPACE=$(pwd)
-
 BEAT_NAME_SLUG=$(echo "$BEAT_DIR" | sed 's/x-pack\///g')
 
 cd $BEAT_DIR
@@ -19,3 +18,4 @@ mage ironbank
 mkdir -p $WORKSPACE/build/distributions/$BEAT_NAME_SLUG
 cp build/distributions/* $WORKSPACE/build/distributions/$BEAT_NAME_SLUG/
 ls -l $WORKSPACE/build/distributions/$BEAT_NAME_SLUG/
+cd $WORKSPACE
