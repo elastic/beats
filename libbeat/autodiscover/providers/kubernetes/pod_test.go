@@ -233,6 +233,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.metrics/module":        "prometheus",
 						"co.elastic.metrics/period":        "10s",
 						"co.elastic.metrics.foobar/period": "15s",
+						"co.elastic.metrics/hosts":         "127.0.0.1:9090",
 						"not.to.include":                   "true",
 					}),
 					"namespace_annotations": getNestedAnnotations(mapstr.M{
@@ -254,6 +255,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.metrics/module":        "prometheus",
 						"co.elastic.metrics/period":        "10s",
 						"co.elastic.metrics.foobar/period": "15s",
+						"co.elastic.metrics/hosts":         "127.0.0.1:9090",
 						"not.to.include":                   "true",
 					}),
 					"namespace_annotations": getNestedAnnotations(mapstr.M{
@@ -271,6 +273,7 @@ func TestGenerateHints(t *testing.T) {
 				"hints": mapstr.M{
 					"metrics": mapstr.M{
 						"module": "prometheus",
+						"hosts":  "127.0.0.1:9090",
 						"period": "15s",
 					},
 				},
