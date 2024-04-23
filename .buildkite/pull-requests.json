@@ -63,6 +63,7 @@
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
             "always_require_ci_on_changed": ["^winlogbeat/.*", ".buildkite/winlogbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
+<<<<<<< HEAD
         },
         {
             "enabled": true,
@@ -127,6 +128,8 @@
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
             "always_require_ci_on_changed": ["^x-pack/heartbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
+=======
+>>>>>>> 27b4bae916 (move x-pack/packetbeat to static pipeline (#39072))
         }
     ]
 }
