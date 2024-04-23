@@ -191,22 +191,12 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		return fmt.Errorf("failure parsing Indices Stats Elasticsearch API response: %w", err)
 	}
 
-	indicesSettings, err := elasticsearch.GetIndicesSettings(httpClient, httpClient.GetURI())
-	if err != nil {
-		return fmt.Errorf("failure retrieving indices settings from Elasticsearch: %w", err)
-	}
-
 	var errs multierror.Errors
 	for name, idx := range indicesStats.Indices {
 		event := mb.Event{
 			ModuleFields: mapstr.M{},
 		}
 		idx.Index = name
-
-		settings, exists := indicesSettings[name]
-		if exists {
-			idx.Hidden = settings.Hidden
-		}
 
 		err = addClusterStateFields(&idx, clusterState)
 		if err != nil {

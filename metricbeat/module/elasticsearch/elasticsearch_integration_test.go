@@ -137,19 +137,11 @@ func TestGetAllIndices(t *testing.T) {
 			name, ok := event.MetricSetFields["name"]
 			require.True(t, ok)
 
-			hidden, ok := event.MetricSetFields["hidden"]
-			require.True(t, ok)
-
-			isHidden, ok := hidden.(bool)
-			require.True(t, ok)
-
 			switch name {
 			case indexVisible:
 				idxVisibleExists = true
-				require.False(t, isHidden)
 			case indexHidden:
 				idxHiddenExists = true
-				require.True(t, isHidden)
 			}
 		}
 
@@ -204,14 +196,14 @@ func createIndex(host string, isHidden bool) (string, error) {
 
 	req, err := http.NewRequest("PUT", fmt.Sprintf("http://%v/%v", host, indexName), strings.NewReader(reqBody))
 	if err != nil {
-		return "", fmt.Errorf("could not build create index request: %w", err)
+		return "", errors.Wrap(err, "could not build create index request")
 	}
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("could not send create index request: %w", err)
+		return "", errors.Wrap(err, "could not send create index request")
 	}
 	defer resp.Body.Close()
 	respBody, err := ioutil.ReadAll(resp.Body)
