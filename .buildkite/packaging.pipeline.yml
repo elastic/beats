@@ -47,7 +47,16 @@ steps:
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
-        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        command: |
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
+          echo 'build/distributions/'
+          ls -lah build/distributions/
+          echo '{{matrix}}/build/distributions/'
+          ls -lah {{matrix}}/build/distributions/
+          echo 'build/distributions/{{matrix}}'
+          ls -lah build/distributions/{{matrix}}
+          echo '{{matrix}}/build/distributions/{{matrix}}'
+          ls -lah {{matrix}}/build/distributions/{{matrix}}
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -76,7 +85,16 @@ steps:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
           SNAPSHOT: true
-        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        command: |
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
+          echo 'build/distributions/'
+          ls -lah build/distributions/
+          echo '{{matrix}}/build/distributions/'
+          ls -lah {{matrix}}/build/distributions/
+          echo 'build/distributions/{{matrix}}'
+          ls -lah build/distributions/{{matrix}}
+          echo '{{matrix}}/build/distributions/{{matrix}}'
+          ls -lah {{matrix}}/build/distributions/{{matrix}}
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -116,9 +134,10 @@ steps:
           - x-pack/osquerybeat
 
   - group: Packaging staging
+
     key: packaging-staging
     ## Only for release and main
-    # if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
+    if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
     steps:
       # x86
       - label: ":ubuntu: {{matrix}}/Packaging Linux"
@@ -219,7 +238,7 @@ steps:
 
       - label: DRA Staging
         ## Only for release and main
-        # if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
+        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
         key: dra-staging
         env:
           DRA_WORKFLOW: staging
