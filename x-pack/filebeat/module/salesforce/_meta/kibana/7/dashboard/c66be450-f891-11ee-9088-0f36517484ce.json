@@ -1,0 +1,548 @@
+{
+    "attributes": {
+        "description": "Salesforce SetupAuditTrail Data",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [
+                    {
+                        "$state": {
+                            "store": "appState"
+                        },
+                        "meta": {
+                            "alias": null,
+                            "disabled": false,
+                            "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+                            "key": "event.dataset",
+                            "negate": false,
+                            "params": {
+                                "query": "salesforce.setupaudittrail"
+                            },
+                            "type": "phrase"
+                        },
+                        "query": {
+                            "match_phrase": {
+                                "event.dataset": "salesforce.setupaudittrail"
+                            }
+                        }
+                    }
+                ],
+                "query": {
+                    "language": "kuery",
+                    "query": ""
+                }
+            }
+        },
+        "optionsJSON": {
+            "hidePanelTitles": false,
+            "syncColors": false,
+            "useMargins": true
+        },
+        "panelsJSON": [
+            {
+                "embeddableConfig": {
+                    "enhancements": {},
+                    "hidePanelTitles": true,
+                    "savedVis": {
+                        "data": {
+                            "aggs": [],
+                            "searchSource": {
+                                "filter": [],
+                                "query": {
+                                    "language": "kuery",
+                                    "query": ""
+                                }
+                            }
+                        },
+                        "description": "",
+                        "params": {
+                            "controls": [
+                                {
+                                    "fieldName": "salesforce.instance_url",
+                                    "id": "1712901482300",
+                                    "indexPatternRefName": "control_198189b3-48f3-4fc4-ae69-5ac5ee520d24_0_index_pattern",
+                                    "label": "Instance URL",
+                                    "options": {
+                                        "dynamicOptions": true,
+                                        "multiselect": true,
+                                        "order": "desc",
+                                        "size": 5,
+                                        "type": "terms"
+                                    },
+                                    "parent": "",
+                                    "type": "list"
+                                }
+                            ],
+                            "pinFilters": false,
+                            "updateFiltersOnChange": false,
+                            "useTimeFilter": false
+                        },
+                        "title": "",
+                        "type": "input_control_vis",
+                        "uiState": {}
+                    }
+                },
+                "gridData": {
+                    "h": 5,
+                    "i": "198189b3-48f3-4fc4-ae69-5ac5ee520d24",
+                    "w": 48,
+                    "x": 0,
+                    "y": 0
+                },
+                "panelIndex": "198189b3-48f3-4fc4-ae69-5ac5ee520d24",
+                "type": "visualization",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-5ca48d62-7341-48b7-a2c0-5f2410c2d045",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "5ca48d62-7341-48b7-a2c0-5f2410c2d045": {
+                                            "columnOrder": [
+                                                "81a88837-0d15-4349-8e0f-d75ba72a95bc",
+                                                "57312742-f268-4f68-bdd9-40461aeb51ec",
+                                                "06369992-979e-421a-928b-03d026695908"
+                                            ],
+                                            "columns": {
+                                                "06369992-979e-421a-928b-03d026695908": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Request count",
+                                                    "operationType": "unique_count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "57312742-f268-4f68-bdd9-40461aeb51ec": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 10 values of salesforce.setup_audit_trail.delegate_user",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "06369992-979e-421a-928b-03d026695908",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "salesforce.setup_audit_trail.delegate_user"
+                                                },
+                                                "81a88837-0d15-4349-8e0f-d75ba72a95bc": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Actions",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "06369992-979e-421a-928b-03d026695908",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "event.action"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "06369992-979e-421a-928b-03d026695908"
+                                        ],
+                                        "layerId": "5ca48d62-7341-48b7-a2c0-5f2410c2d045",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar_stacked",
+                                        "showGridlines": false,
+                                        "splitAccessor": "57312742-f268-4f68-bdd9-40461aeb51ec",
+                                        "xAccessor": "81a88837-0d15-4349-8e0f-d75ba72a95bc"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_stacked",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "fc8067aa-c39c-4547-adfb-b618b9cbe4e8",
+                    "w": 24,
+                    "x": 0,
+                    "y": 5
+                },
+                "panelIndex": "fc8067aa-c39c-4547-adfb-b618b9cbe4e8",
+                "title": "Top 10 actions performed by delegated users [Filebeat Salesforce]",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-72ce303a-9d98-4bab-856e-a67eb8605bfb",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "72ce303a-9d98-4bab-856e-a67eb8605bfb": {
+                                            "columnOrder": [
+                                                "46424fdd-77b9-4f4b-bd63-beda1a1fafe4",
+                                                "184aa36c-5bf5-4d94-8c2d-7199a208d5f9"
+                                            ],
+                                            "columns": {
+                                                "184aa36c-5bf5-4d94-8c2d-7199a208d5f9": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Request count",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                },
+                                                "46424fdd-77b9-4f4b-bd63-beda1a1fafe4": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Sections affected",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "184aa36c-5bf5-4d94-8c2d-7199a208d5f9",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "salesforce.setup_audit_trail.section"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "184aa36c-5bf5-4d94-8c2d-7199a208d5f9"
+                                        ],
+                                        "layerId": "72ce303a-9d98-4bab-856e-a67eb8605bfb",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar",
+                                        "showGridlines": false,
+                                        "xAccessor": "46424fdd-77b9-4f4b-bd63-beda1a1fafe4"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "6d50ae65-0cff-4b59-b347-ee6ea82d637e",
+                    "w": 24,
+                    "x": 24,
+                    "y": 5
+                },
+                "panelIndex": "6d50ae65-0cff-4b59-b347-ee6ea82d637e",
+                "title": "Top 10 sections affected [Filebeat Salesforce]",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "attributes": {
+                        "references": [
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-current-indexpattern",
+                                "type": "index-pattern"
+                            },
+                            {
+                                "id": "filebeat-*",
+                                "name": "indexpattern-datasource-layer-3ac7ca64-bfb5-471c-8a8a-2cb5837ee004",
+                                "type": "index-pattern"
+                            }
+                        ],
+                        "state": {
+                            "datasourceStates": {
+                                "indexpattern": {
+                                    "layers": {
+                                        "3ac7ca64-bfb5-471c-8a8a-2cb5837ee004": {
+                                            "columnOrder": [
+                                                "b3792010-1e80-401f-a6fc-54cbedf9720a",
+                                                "9056c574-d371-4c77-9f6b-04326402c8d1",
+                                                "a547e7f8-6d39-4b6a-a4fe-329c901d368c"
+                                            ],
+                                            "columns": {
+                                                "9056c574-d371-4c77-9f6b-04326402c8d1": {
+                                                    "dataType": "date",
+                                                    "isBucketed": true,
+                                                    "label": "@timestamp",
+                                                    "operationType": "date_histogram",
+                                                    "params": {
+                                                        "interval": "auto"
+                                                    },
+                                                    "scale": "interval",
+                                                    "sourceField": "@timestamp"
+                                                },
+                                                "a547e7f8-6d39-4b6a-a4fe-329c901d368c": {
+                                                    "customLabel": true,
+                                                    "dataType": "number",
+                                                    "isBucketed": false,
+                                                    "label": "Actions",
+                                                    "operationType": "count",
+                                                    "scale": "ratio",
+                                                    "sourceField": "Records"
+                                                },
+                                                "b3792010-1e80-401f-a6fc-54cbedf9720a": {
+                                                    "customLabel": true,
+                                                    "dataType": "string",
+                                                    "isBucketed": true,
+                                                    "label": "Top 10 values of event.action",
+                                                    "operationType": "terms",
+                                                    "params": {
+                                                        "missingBucket": false,
+                                                        "orderBy": {
+                                                            "columnId": "a547e7f8-6d39-4b6a-a4fe-329c901d368c",
+                                                            "type": "column"
+                                                        },
+                                                        "orderDirection": "desc",
+                                                        "otherBucket": true,
+                                                        "size": 10
+                                                    },
+                                                    "scale": "ordinal",
+                                                    "sourceField": "event.action"
+                                                }
+                                            },
+                                            "incompleteColumns": {}
+                                        }
+                                    }
+                                }
+                            },
+                            "filters": [],
+                            "query": {
+                                "language": "kuery",
+                                "query": ""
+                            },
+                            "visualization": {
+                                "layers": [
+                                    {
+                                        "accessors": [
+                                            "a547e7f8-6d39-4b6a-a4fe-329c901d368c"
+                                        ],
+                                        "layerId": "3ac7ca64-bfb5-471c-8a8a-2cb5837ee004",
+                                        "layerType": "data",
+                                        "position": "top",
+                                        "seriesType": "bar_stacked",
+                                        "showGridlines": false,
+                                        "splitAccessor": "b3792010-1e80-401f-a6fc-54cbedf9720a",
+                                        "xAccessor": "9056c574-d371-4c77-9f6b-04326402c8d1"
+                                    }
+                                ],
+                                "legend": {
+                                    "isVisible": true,
+                                    "position": "right"
+                                },
+                                "preferredSeriesType": "bar_stacked",
+                                "title": "Empty XY chart",
+                                "valueLabels": "hide",
+                                "yLeftExtent": {
+                                    "mode": "full"
+                                },
+                                "yRightExtent": {
+                                    "mode": "full"
+                                }
+                            }
+                        },
+                        "title": "",
+                        "type": "lens",
+                        "visualizationType": "lnsXY"
+                    },
+                    "enhancements": {},
+                    "hidePanelTitles": false
+                },
+                "gridData": {
+                    "h": 15,
+                    "i": "33acb8b4-5e5c-4ba2-8089-2554aaff7f23",
+                    "w": 48,
+                    "x": 0,
+                    "y": 20
+                },
+                "panelIndex": "33acb8b4-5e5c-4ba2-8089-2554aaff7f23",
+                "title": "Top 10 actions over time [Filebeat Salesforce]",
+                "type": "lens",
+                "version": "7.15.0"
+            },
+            {
+                "embeddableConfig": {
+                    "enhancements": {}
+                },
+                "gridData": {
+                    "h": 19,
+                    "i": "7c636e26-d3f1-4aa9-b263-683d6b75f2ab",
+                    "w": 48,
+                    "x": 0,
+                    "y": 35
+                },
+                "panelIndex": "7c636e26-d3f1-4aa9-b263-683d6b75f2ab",
+                "panelRefName": "panel_7c636e26-d3f1-4aa9-b263-683d6b75f2ab",
+                "type": "search",
+                "version": "7.15.0"
+            }
+        ],
+        "refreshInterval": {
+            "pause": true,
+            "value": 0
+        },
+        "timeFrom": "now-7d/d",
+        "timeRestore": true,
+        "timeTo": "now",
+        "title": "[Filebeat Salesforce] Setup Audit Trail Dashboard",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "c66be450-f891-11ee-9088-0f36517484ce",
+    "migrationVersion": {
+        "dashboard": "7.15.0"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.filter[0].meta.index",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "198189b3-48f3-4fc4-ae69-5ac5ee520d24:control_198189b3-48f3-4fc4-ae69-5ac5ee520d24_0_index_pattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "fc8067aa-c39c-4547-adfb-b618b9cbe4e8:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "fc8067aa-c39c-4547-adfb-b618b9cbe4e8:indexpattern-datasource-layer-5ca48d62-7341-48b7-a2c0-5f2410c2d045",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "6d50ae65-0cff-4b59-b347-ee6ea82d637e:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "6d50ae65-0cff-4b59-b347-ee6ea82d637e:indexpattern-datasource-layer-72ce303a-9d98-4bab-856e-a67eb8605bfb",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "33acb8b4-5e5c-4ba2-8089-2554aaff7f23:indexpattern-datasource-current-indexpattern",
+            "type": "index-pattern"
+        },
+        {
+            "id": "filebeat-*",
+            "name": "33acb8b4-5e5c-4ba2-8089-2554aaff7f23:indexpattern-datasource-layer-3ac7ca64-bfb5-471c-8a8a-2cb5837ee004",
+            "type": "index-pattern"
+        },
+        {
+            "id": "3e7187a0-f894-11ee-9088-0f36517484ce",
+            "name": "7c636e26-d3f1-4aa9-b263-683d6b75f2ab:panel_7c636e26-d3f1-4aa9-b263-683d6b75f2ab",
+            "type": "search"
+        }
+    ],
+    "type": "dashboard",
+    "updated_at": "2024-04-12T11:38:19.817Z",
+    "version": "WzExMjcyLDFd"
+}
