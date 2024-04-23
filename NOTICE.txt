@@ -12968,12 +12968,12 @@ SOFTWARE
 
 
 --------------------------------------------------------------------------------
-Dependency : github.com/elastic/elastic-agent-libs
-Version: v0.9.8
+Dependency : github.com/belimawr/elastic-agent-libs
+Version: v0.2.9-0.20240423125757-a73eab058a9f
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/elastic-agent-libs@v0.9.8/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/belimawr/elastic-agent-libs@v0.2.9-0.20240423125757-a73eab058a9f/LICENSE:
 
                                  Apache License
                            Version 2.0, January 2004
@@ -38751,36 +38751,6 @@ Contents of probable licence file $GOMODCACHE/github.com/elastic/go-windows@v1.0
    See the License for the specific language governing permissions and
    limitations under the License.
 
-
---------------------------------------------------------------------------------
-Dependency : github.com/elastic/pkcs8
-Version: v1.0.0
-Licence type (autodetected): MIT
---------------------------------------------------------------------------------
-
-Contents of probable licence file $GOMODCACHE/github.com/elastic/pkcs8@v1.0.0/LICENSE:
-
-The MIT License (MIT)
-
-Copyright (c) 2014 youmark
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elazarl/goproxy
