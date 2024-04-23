@@ -47,12 +47,7 @@ steps:
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
-        command: |
-          WORKSPACE=$$PWD
-          cd {{matrix}}
-          mage package
-          mage ironbank        
-          mv build $$WORKSPACE
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -81,12 +76,7 @@ steps:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
           SNAPSHOT: true
-        command: |
-          WORKSPACE=$$PWD
-          cd {{matrix}}
-          mage package
-          mage ironbank
-          mv build $$WORKSPACE
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -113,12 +103,8 @@ steps:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
         command: |
-          WORKSPACE=$$PWD
           .buildkite/scripts/install-msitools.sh
-          cd {{matrix}}
-          mage package
-          mage ironbank        
-          mv build $$WORKSPACE
+          .buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -131,19 +117,15 @@ steps:
 
   - group: Packaging staging
     key: packaging-staging
-
+    ## Only for release and main
+    # if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
     steps:
       # x86
       - label: ":ubuntu: {{matrix}}/Packaging Linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: false
-        command: |
-          WORKSPACE=$$PWD
-          cd {{matrix}}
-          mage package
-          mage ironbank        
-          mv build $$WORKSPACE
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -236,6 +218,8 @@ steps:
           .buildkite/scripts/dra.sh
 
       - label: DRA Staging
+        ## Only for release and main
+        # if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
         key: dra-staging
         env:
           DRA_WORKFLOW: staging
