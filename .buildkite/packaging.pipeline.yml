@@ -125,18 +125,24 @@ steps:
     steps:
       - label: DRA Snapshot
         key: dra-snapshot
+        env:
+          DRA_WORKFLOW: snapshot
         depends_on:
           - packaging-snapshot
         command: |
           buildkite-agent artifact download "build/**" .
           ls -lah build
           ls -lah build/distributions
+          .buildkite/scripts/dra.sh
 
       - label: DRA Staging
         key: dra-staging
+        env:
+          DRA_WORKFLOW: staging
         depends_on:
           - packaging-staging
         command: |
           buildkite-agent artifact download "build/**" .
           ls -lah build
           ls -lah build/distributions
+          .buildkite/scripts/dra.sh
