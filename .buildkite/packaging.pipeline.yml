@@ -96,6 +96,7 @@ steps:
   #         - x-pack/packetbeat
 
   #     ## Osquerybeat and agentbeat require msitools to be installed
+  #     ## Agentbeat needs more CPUs because it builds many other beats
   #     ## TODO: pre-install msitools to the VM and delete this exclusion
   #     - label: ":ubuntu: {{matrix}}/Packaging Linux Snapshot"
   #       env:
@@ -107,7 +108,7 @@ steps:
   #       agents:
   #         provider: gcp
   #         image: "${IMAGE_UBUNTU_X86_64}"
-  #         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+  #         machineType: "c2-standard-16"
   #       artifact_paths:
   #         - build/distributions/**/*
   #       matrix:
@@ -204,6 +205,7 @@ steps:
           buildkite-agent artifact download "build/**/*" . --build 018f0d0c-5a6e-497d-9e96-e35747d1be87
           ls -lah build
           ls -lah build/distributions
+          .buildkite/scripts/packaging/prepare-release-manager.sh
           .buildkite/scripts/dra.sh
         agents:
           provider: "gcp"
@@ -220,6 +222,7 @@ steps:
           buildkite-agent artifact download "build/**" .
           ls -lah build
           ls -lah build/distributions
+          .buildkite/scripts/packaging/prepare-release-manager.sh
           .buildkite/scripts/dra.sh
         agents:
           provider: "gcp"
