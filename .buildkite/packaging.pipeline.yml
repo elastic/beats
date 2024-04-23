@@ -55,14 +55,12 @@ steps:
           ls -lah {{matrix}}/build/distributions/
           echo 'build/distributions/{{matrix}}'
           ls -lah build/distributions/{{matrix}}
-          echo '{{matrix}}/build/distributions/{{matrix}}'
-          ls -lah {{matrix}}/build/distributions/{{matrix}}
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
-          - build/distributions/**
+          - build/distributions/**/*
         matrix:
           - auditbeat
           - filebeat
@@ -80,58 +78,58 @@ steps:
           - x-pack/winlogbeat
 
       ## ARM
-      - label: ":linux: {{matrix}}/Packaging Linux arm64"
-        env:
-          PLATFORMS: "linux/arm64"
-          PACKAGES: "docker"
-          SNAPSHOT: true
-        command: |
-          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
-          echo 'build/distributions/'
-          ls -lah build/distributions/
-          echo '{{matrix}}/build/distributions/'
-          ls -lah {{matrix}}/build/distributions/
-          echo 'build/distributions/{{matrix}}'
-          ls -lah build/distributions/{{matrix}}
-          echo '{{matrix}}/build/distributions/{{matrix}}'
-          ls -lah {{matrix}}/build/distributions/{{matrix}}
-        agents:
-          provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths:
-          - build/distributions/**
-        matrix:
-          - auditbeat
-          # - filebeat
-          # - heartbeat
-          # - metricbeat
-          # - packetbeat
-          - x-pack/auditbeat
-          # - x-pack/dockerlogbeat
-          # - x-pack/filebeat
-          # - x-pack/heartbeat
-          # - x-pack/metricbeat
-          - x-pack/packetbeat
+      # - label: ":linux: {{matrix}}/Packaging Linux arm64"
+      #   env:
+      #     PLATFORMS: "linux/arm64"
+      #     PACKAGES: "docker"
+      #     SNAPSHOT: true
+      #   command: |
+      #     .buildkite/scripts/packaging/package-dra.sh {{matrix}}
+      #     echo 'build/distributions/'
+      #     ls -lah build/distributions/
+      #     echo '{{matrix}}/build/distributions/'
+      #     ls -lah {{matrix}}/build/distributions/
+      #     echo 'build/distributions/{{matrix}}'
+      #     ls -lah build/distributions/{{matrix}}
+      #     echo '{{matrix}}/build/distributions/{{matrix}}'
+      #     ls -lah {{matrix}}/build/distributions/{{matrix}}
+      #   agents:
+      #     provider: "aws"
+      #     imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+      #     instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+      #   artifact_paths:
+      #     - build/distributions/**
+      #   matrix:
+      #     - auditbeat
+      #     # - filebeat
+      #     # - heartbeat
+      #     # - metricbeat
+      #     # - packetbeat
+      #     - x-pack/auditbeat
+      #     # - x-pack/dockerlogbeat
+      #     # - x-pack/filebeat
+      #     # - x-pack/heartbeat
+      #     # - x-pack/metricbeat
+      #     - x-pack/packetbeat
 
-      ## Osquerybeat and agentbeat require msitools to be installed
-      ## TODO: pre-install msitools to the VM and delete this exclusion
-      - label: ":ubuntu: {{matrix}}/Packaging Linux"
-        env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-          SNAPSHOT: true
-        command: |
-          .buildkite/scripts/install-msitools.sh
-          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
-        agents:
-          provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths:
-          - build/distributions/**
-        matrix:
-          - x-pack/agentbeat
-          - x-pack/osquerybeat
+      # ## Osquerybeat and agentbeat require msitools to be installed
+      # ## TODO: pre-install msitools to the VM and delete this exclusion
+      # - label: ":ubuntu: {{matrix}}/Packaging Linux"
+      #   env:
+      #     PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+      #     SNAPSHOT: true
+      #   command: |
+      #     .buildkite/scripts/install-msitools.sh
+      #     .buildkite/scripts/packaging/package-dra.sh {{matrix}}
+      #   agents:
+      #     provider: gcp
+      #     image: "${IMAGE_UBUNTU_X86_64}"
+      #     machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+      #   artifact_paths:
+      #     - build/distributions/**
+      #   matrix:
+      #     - x-pack/agentbeat
+      #     - x-pack/osquerybeat
 
   - group: Packaging staging
 
