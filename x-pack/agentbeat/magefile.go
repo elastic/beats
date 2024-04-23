@@ -134,6 +134,14 @@ func TestPackages() error {
 	return devtools.TestPackages()
 }
 
+// Package packages the Beat for IronBank distribution.
+//
+// Use SNAPSHOT=true to build snapshots.
+func Ironbank() error {
+	fmt.Println(">> Ironbank: this module is not subscribed to the IronBank releases.")
+	return nil
+}
+
 // Update is an alias for running fields, dashboards, config.
 func Update() {
 	callForEachBeat("update")
