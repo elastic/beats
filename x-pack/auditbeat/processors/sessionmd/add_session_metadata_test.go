@@ -32,8 +32,7 @@ var (
 		{
 			testName: "enrich process",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			mockProcesses: []types.ProcessExecEvent{
 				{
@@ -94,8 +93,7 @@ var (
 		{
 			testName: "no PID field in event",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -113,8 +111,7 @@ var (
 		{
 			testName: "PID not number",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -133,8 +130,7 @@ var (
 		{
 			testName: "PID not in DB",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -154,8 +150,7 @@ var (
 			testName: "process field not in event",
 			// This event, without a "process" field, is not supported by enrich, it should be handled gracefully
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "action.pid",
+				PIDField: "action.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -170,8 +165,7 @@ var (
 			testName: "process field not mapstr",
 			// Unsupported process field type should be handled gracefully
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "action.pid",
+				PIDField: "action.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -189,8 +183,7 @@ var (
 		{
 			testName: "enrich event with map[string]any process field",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			mockProcesses: []types.ProcessExecEvent{
 				{
