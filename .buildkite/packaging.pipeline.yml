@@ -1,0 +1,231 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+# TODO: Pre-cache beats-dev/golang-crossbuild container image
+
+env:
+  ASDF_MAGE_VERSION: 1.15.0
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+
+  PLATFORMS_AMD: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+  PLATFORMS_ARM: "linux/arm64"
+
+steps:
+  - group: Beats dashboards
+    key: dashboards
+    steps:
+      - label: Snapshot dashboards
+        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main' || build.env('RUN_SNAPSHOT')==true"
+        key: dashboards-snapshot
+        # TODO: container with go and make
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        commands:
+          - make build/distributions/dependencies.csv
+          - make beats-dashboards
+        env:
+          SNAPSHOT: true
+        artifact_paths:
+          - build/distributions/**/*
+
+      - label: Staging dashboards
+        if: "build.branch =~ /\\d+\\.\\d+/"
+        key: dashboards-staging
+        # TODO: container with go and make
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        commands:
+          - make build/distributions/dependencies.csv
+          - make beats-dashboards
+        artifact_paths:
+          - build/distributions/**/*
+
+  - group: Packaging snapshot
+    if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main' || build.env('RUN_SNAPSHOT')==true"
+    key: packaging-snapshot
+    steps:
+      # x86
+      - label: ":ubuntu: {{matrix}}/Packaging Linux Snapshot"
+        env:
+          PLATFORMS: "${PLATFORMS_AMD}"
+          SNAPSHOT: true
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - auditbeat
+          - filebeat
+          - heartbeat
+          - metricbeat
+          - packetbeat
+          - winlogbeat
+          - x-pack/auditbeat
+          - x-pack/dockerlogbeat
+          - x-pack/filebeat
+          - x-pack/functionbeat
+          - x-pack/heartbeat
+          - x-pack/metricbeat
+          - x-pack/osquerybeat
+          - x-pack/packetbeat
+          - x-pack/winlogbeat
+
+      ## ARM
+      - label: ":linux: {{matrix}}/Packaging Linux arm64 Snapshot"
+        env:
+          PLATFORMS: "${PLATFORMS_ARM}"
+          PACKAGES: "docker"
+          SNAPSHOT: true
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - auditbeat
+          - filebeat
+          - heartbeat
+          - metricbeat
+          - packetbeat
+          - x-pack/auditbeat
+          - x-pack/dockerlogbeat
+          - x-pack/filebeat
+          - x-pack/heartbeat
+          - x-pack/metricbeat
+          - x-pack/packetbeat
+
+      ## Agentbeat needs more CPUs because it builds many other beats
+      - label: ":ubuntu: {{matrix}}/Packaging Linux Snapshot"
+        env:
+          PLATFORMS: "${PLATFORMS_AMD}"
+          SNAPSHOT: true
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - x-pack/agentbeat
+
+  - group: Packaging staging
+
+    key: packaging-staging
+    ## Only for release
+    if: "build.branch =~ /\\d+\\.\\d+/"
+    steps:
+      # x86
+      - label: ":ubuntu: {{matrix}}/Packaging Linux Staging"
+        env:
+          PLATFORMS: "${PLATFORMS_AMD}"
+          SNAPSHOT: false
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - auditbeat
+          - filebeat
+          - heartbeat
+          - metricbeat
+          - packetbeat
+          - winlogbeat
+          - x-pack/auditbeat
+          - x-pack/dockerlogbeat
+          - x-pack/filebeat
+          - x-pack/functionbeat
+          - x-pack/heartbeat
+          - x-pack/metricbeat
+          - x-pack/osquerybeat
+          - x-pack/packetbeat
+          - x-pack/winlogbeat
+
+      ## ARM
+      - label: ":linux: {{matrix}}/Packaging Linux arm64 Staging"
+        env:
+          PLATFORMS: "${PLATFORMS_ARM}"
+          PACKAGES: "docker"
+          SNAPSHOT: false
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - build/distributions/**
+        matrix:
+          - auditbeat
+          - filebeat
+          - heartbeat
+          - metricbeat
+          - packetbeat
+          - x-pack/auditbeat
+          - x-pack/dockerlogbeat
+          - x-pack/filebeat
+          - x-pack/heartbeat
+          - x-pack/metricbeat
+          - x-pack/packetbeat
+
+        ## Agentbeat needs more CPUs because it builds many other beats
+      - label: ":ubuntu: {{matrix}}/Packaging Linux Snapshot"
+        env:
+          PLATFORMS: "${PLATFORMS_AMD}"
+          SNAPSHOT: true
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "c2-standard-16"
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - x-pack/agentbeat
+
+  - group: DRA publish
+    key: dra
+    steps:
+      - label: DRA Snapshot
+        ## Only for release branches and main
+        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main' || build.env('RUN_SNAPSHOT')==true"
+        key: dra-snapshot
+        env:
+          DRA_WORKFLOW: snapshot
+        depends_on:
+          - packaging-snapshot
+          - dashboards-snapshot
+        command: |
+          buildkite-agent artifact download "build/**/*" . 
+          .buildkite/scripts/packaging/prepare-release-manager.sh
+          .buildkite/scripts/dra.sh
+        agents:
+          provider: "gcp"
+
+      - label: DRA Staging
+        ## Only for release branches
+        if: "build.branch =~ /\\d+\\.\\d+/"
+        key: dra-staging
+        env:
+          DRA_WORKFLOW: staging
+        depends_on:
+          - packaging-staging
+          - dashboards-staging
+        command: |
+          buildkite-agent artifact download "build/**" .
+          .buildkite/scripts/packaging/prepare-release-manager.sh
+          .buildkite/scripts/dra.sh
+        agents:
+          provider: "gcp"
