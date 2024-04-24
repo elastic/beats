@@ -2,6 +2,7 @@
 
 steps:
   - label: "Trigger Auditbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -28,6 +29,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Heartbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -54,6 +56,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Filebeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -81,6 +84,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/filebeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -108,6 +112,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Xpack/Dockerlogbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -134,6 +139,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Metricbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -160,6 +166,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/metricbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -187,6 +194,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/osquerybeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -216,6 +224,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Xpack/Winlogbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -242,6 +251,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Deploy/K8S"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -263,6 +273,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Libbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -288,6 +299,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/libbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -314,6 +326,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/auditbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -341,6 +354,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/heartbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -368,6 +382,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/packetbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -395,6 +410,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Winlogbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
@@ -421,6 +437,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Trigger Packetbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
       - monorepo-diff#v1.0.1:
           diff: "git diff --name-only origin/${GITHUB_PR_TARGET_BRANCH}...HEAD"
