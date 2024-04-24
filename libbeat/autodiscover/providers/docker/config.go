@@ -43,7 +43,7 @@ type Config struct {
 	CleanupTimeout time.Duration           `config:"cleanup_timeout" validate:"positive"`
 }
 
-// Public variable, so specific beats (as Filebeat) can set a different cleanup timeout if they need it.
+// DefaultCleanupTimeout Public variable, so specific beats (as Filebeat) can set a different cleanup timeout if they need it.
 var DefaultCleanupTimeout time.Duration = 0
 
 func defaultConfig() *Config {
