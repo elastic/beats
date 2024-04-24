@@ -8,13 +8,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
@@ -132,7 +133,7 @@ type constantS3 struct {
 var _ s3API = (*constantS3)(nil)
 
 func newConstantS3(t testing.TB) *constantS3 {
-	data, err := ioutil.ReadFile(cloudtrailTestFile)
+	data, err := os.ReadFile(cloudtrailTestFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -338,14 +339,11 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					return
 				}
 
-				err = store.Set(awsS3WriteCommitPrefix+"bucket"+listPrefix, &commitWriteState{time.Time{}})
-				if err != nil {
-					errChan <- err
-					return
-				}
+				states, err := newStates(inputCtx, store)
+				assert.NoError(t, err, "states creation should succeed")
 
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors, backupConfig{})
-				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, client, s3EventHandlerFactory, newStates(inputCtx), store, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
+				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, client, s3EventHandlerFactory, states, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
 
 				s3Poller.Poll(ctx)
 			}(i, wg)

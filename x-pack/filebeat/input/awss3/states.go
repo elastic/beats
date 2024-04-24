@@ -15,218 +15,64 @@ import (
 	"github.com/elastic/beats/v7/libbeat/statestore"
 )
 
-const (
-	awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
-	awsS3WriteCommitPrefix = "filebeat::aws-s3::writeCommit::"
-)
-
-type listingInfo struct {
-	totObjects int
-
-	mu            sync.Mutex
-	storedObjects int
-	errorObjects  int
-	finalCheck    bool
-	states        []state
-}
+const awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
 
 // states handles list of s3 object state. One must use newStates to instantiate a
 // file states registry. Using the zero-value is not safe.
 type states struct {
-	sync.RWMutex
-
 	log *logp.Logger
 
-	// states store, keyed by ID
-	states map[string]state
+	// Completed S3 object states, indexed by state ID.
+	// statesLock must be held to access states.
+	states     map[string]state
+	statesLock sync.Mutex
 
-	listingInfo map[string]*listingInfo
+	// The store used to persist state changes to the registry.
+	// storeLock must be held to access store.
+	store     *statestore.Store
+	storeLock sync.Mutex
 }
 
 // newStates generates a new states registry.
-func newStates(ctx v2.Context) *states {
-	return &states{
-		log:         ctx.Logger.Named("states"),
-		states:      map[string]state{},
-		listingInfo: map[string]*listingInfo{},
+func newStates(ctx v2.Context, store *statestore.Store) (*states, error) {
+	states := &states{
+		log:    ctx.Logger.Named("states"),
+		states: map[string]state{},
+		store:  store,
 	}
+	return states, states.loadFromRegistry()
 }
 
-func (s *states) MustSkip(state state, store *statestore.Store) bool {
-	if !s.IsNew(state) {
-		s.log.Debugw("not new state in must skip", "state", state)
-		return true
-	}
-
-	previousState := s.FindPrevious(state)
-
-	// status is forgotten. if there is no previous state and
-	// the state.LastModified is before the last cleanStore
-	// write commit we can remove
-	var commitWriteState commitWriteState
-	err := store.Get(awsS3WriteCommitPrefix+state.Bucket+state.ListPrefix, &commitWriteState)
-	if err == nil && previousState.IsEmpty() &&
-		(state.LastModified.Before(commitWriteState.Time) || state.LastModified.Equal(commitWriteState.Time)) {
-		s.log.Debugw("state.LastModified older than writeCommitState in must skip", "state", state, "commitWriteState", commitWriteState)
-		return true
-	}
-
-	// the previous state is stored or has error: let's skip
-	if !previousState.IsEmpty() && previousState.IsProcessed() {
-		s.log.Debugw("previous state is stored or has error", "state", state)
-		return true
-	}
-
-	return false
+func (s *states) IsProcessed(state state) bool {
+	s.statesLock.Lock()
+	defer s.statesLock.Unlock()
+	// Our in-memory table only stores completed objects
+	_, ok := s.states[state.ID()]
+	return ok
 }
 
-func (s *states) Delete(id string) {
-	s.Lock()
-	defer s.Unlock()
+func (s *states) AddState(state state) {
 
-	delete(s.states, id)
-}
+	id := state.ID()
+	// Update in-memory copy
+	s.statesLock.Lock()
+	s.states[id] = state
+	s.statesLock.Unlock()
 
-// IsListingFullyStored check if listing if fully stored
-// After first time the condition is met it will always return false
-func (s *states) IsListingFullyStored(listingID string) bool {
-	s.RLock()
-	listingInfo := s.listingInfo[listingID]
-	s.RUnlock()
-	if listingInfo == nil {
-		return false
+	// Persist to the registry
+	s.storeLock.Lock()
+	key := awsS3ObjectStatePrefix + id
+	if err := s.store.Set(key, state); err != nil {
+		s.log.Errorw("Failed to write states to the registry", "error", err)
 	}
-
-	listingInfo.mu.Lock()
-	defer listingInfo.mu.Unlock()
-	if listingInfo.finalCheck {
-		return false
-	}
-
-	listingInfo.finalCheck = (listingInfo.storedObjects + listingInfo.errorObjects) == listingInfo.totObjects
-
-	if (listingInfo.storedObjects + listingInfo.errorObjects) > listingInfo.totObjects {
-		s.log.Warnf("unexepected mixmatch between storedObjects (%d), errorObjects (%d) and totObjects (%d)",
-			listingInfo.storedObjects, listingInfo.errorObjects, listingInfo.totObjects)
-	}
-
-	return listingInfo.finalCheck
+	s.storeLock.Unlock()
 }
 
-// AddListing add listing info
-func (s *states) AddListing(listingID string, listingInfo *listingInfo) {
-	s.Lock()
-	defer s.Unlock()
-	s.listingInfo[listingID] = listingInfo
-}
+func (s *states) loadFromRegistry() error {
+	states := map[string]state{}
 
-// DeleteListing delete listing info
-func (s *states) DeleteListing(listingID string) {
-	s.Lock()
-	defer s.Unlock()
-	delete(s.listingInfo, listingID)
-}
-
-// Update updates a state. If previous state didn't exist, new one is created
-func (s *states) Update(newState state, listingID string) {
-	s.Lock()
-	defer s.Unlock()
-
-	s.states[newState.ID] = newState
-
-	if listingID == "" || !newState.IsProcessed() {
-		return
-	}
-
-	// here we increase the number of stored object
-	listingInfo, ok := s.listingInfo[listingID]
-	if !ok {
-		return
-	}
-
-	listingInfo.mu.Lock()
-
-	if newState.Stored {
-		listingInfo.storedObjects++
-	}
-	if newState.Error {
-		listingInfo.errorObjects++
-	}
-	listingInfo.states = append(listingInfo.states, newState)
-
-	listingInfo.mu.Unlock()
-}
-
-// FindPrevious lookups a registered state, that matching the new state.
-// Returns a zero-state if no match is found.
-func (s *states) FindPrevious(newState state) state {
-	s.RLock()
-	defer s.RUnlock()
-	return s.states[newState.ID]
-}
-
-// FindPreviousByID lookups a registered state, that matching the id.
-// Returns a zero-state if no match is found.
-func (s *states) FindPreviousByID(id string) state {
-	s.RLock()
-	defer s.RUnlock()
-	return s.states[id]
-}
-
-func (s *states) IsNew(state state) bool {
-	s.RLock()
-	defer s.RUnlock()
-	oldState, exists := s.states[state.ID]
-	return !exists || !oldState.IsEqual(&state)
-}
-
-// GetStates creates copy of the file states.
-func (s *states) GetStates() []state {
-	s.RLock()
-	defer s.RUnlock()
-
-	newStates := make([]state, 0, len(s.states))
-	for _, state := range s.states {
-		newStates = append(newStates, state)
-	}
-
-	return newStates
-}
-
-// GetListingIDs return a of the listing IDs
-func (s *states) GetListingIDs() []string {
-	s.RLock()
-	defer s.RUnlock()
-	listingIDs := make([]string, 0, len(s.listingInfo))
-	for listingID := range s.listingInfo {
-		listingIDs = append(listingIDs, listingID)
-	}
-
-	return listingIDs
-}
-
-// GetStatesByListingID return a copy of the states by listing ID
-func (s *states) GetStatesByListingID(listingID string) []state {
-	s.RLock()
-	listingInfo, ok := s.listingInfo[listingID]
-	s.RUnlock()
-
-	if !ok {
-		return nil
-	}
-
-	listingInfo.mu.Lock()
-	defer listingInfo.mu.Unlock()
-
-	newStates := make([]state, len(listingInfo.states))
-	copy(newStates, listingInfo.states)
-	return newStates
-}
-
-func (s *states) readStatesFrom(store *statestore.Store) error {
-	var states []state
-
-	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
+	s.storeLock.Lock()
+	err := s.store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
 		if !strings.HasPrefix(key, awsS3ObjectStatePrefix) {
 			return true, nil
 		}
@@ -234,78 +80,30 @@ func (s *states) readStatesFrom(store *statestore.Store) error {
 		// try to decode. Ignore faulty/incompatible values.
 		var st state
 		if err := dec.Decode(&st); err != nil {
-			// XXX: Do we want to log here? In case we start to store other
-			// state types in the registry, then this operation will likely fail
-			// quite often, producing some false-positives in the logs...
-			return false, err
+			// Skip this key but continue iteration
+			s.log.Warnf("invalid S3 state loading object key %v", key)
+			//nolint:nilerr // One bad object shouldn't stop iteration
+			return true, nil
+		}
+		if !st.Stored && !st.Failed {
+			// This is from an older version where state could be stored in the
+			// registry even if the object wasn't processed, or if it encountered
+			// ephemeral download errors. We don't add these to the in-memory cache,
+			// so if we see them during a bucket scan we will still retry them.
+			return true, nil
 		}
 
-		st.ID = key[len(awsS3ObjectStatePrefix):]
-		states = append(states, st)
+		states[st.ID()] = st
 		return true, nil
 	})
+	s.storeLock.Unlock()
 	if err != nil {
 		return err
 	}
 
-	states = fixStates(states)
+	s.statesLock.Lock()
+	s.states = states
+	s.statesLock.Unlock()
 
-	for _, state := range states {
-		s.Update(state, "")
-	}
-
-	return nil
-}
-
-// fixStates cleans up the registry states when updating from an older version
-// of filebeat potentially writing invalid entries.
-func fixStates(states []state) []state {
-	if len(states) == 0 {
-		return states
-	}
-
-	// we use a map of states here, so to identify and merge duplicate entries.
-	idx := map[string]*state{}
-	for i := range states {
-		state := &states[i]
-
-		old, exists := idx[state.ID]
-		if !exists {
-			idx[state.ID] = state
-		} else {
-			mergeStates(old, state) // overwrite the entry in 'old'
-		}
-	}
-
-	if len(idx) == len(states) {
-		return states
-	}
-
-	i := 0
-	newStates := make([]state, len(idx))
-	for _, state := range idx {
-		newStates[i] = *state
-		i++
-	}
-	return newStates
-}
-
-// mergeStates merges 2 states by trying to determine the 'newer' state.
-// The st state is overwritten with the updated fields.
-func mergeStates(st, other *state) {
-	// update file meta-data. As these are updated concurrently by the
-	// inputs, select the newer state based on the update timestamp.
-	if st.LastModified.Before(other.LastModified) {
-		st.LastModified = other.LastModified
-	}
-}
-
-func (s *states) writeStates(store *statestore.Store) error {
-	for _, state := range s.GetStates() {
-		key := awsS3ObjectStatePrefix + state.ID
-		if err := store.Set(key, state); err != nil {
-			return err
-		}
-	}
 	return nil
 }
