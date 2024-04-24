@@ -28,6 +28,17 @@ steps:
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
+  - label: "Triggering Build for Auditbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false"
+    trigger: "auditbeat"
+    build:
+      commit: "${BUILDKITE_COMMIT}"
+      branch: "${BUILDKITE_BRANCH}"
+      env:
+        - BUILDKITE_PULL_REQUEST=${BUILDKITE_PULL_REQUEST}
+        - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
+        - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
+
   - label: "Trigger Heartbeat"
     if: build.env("BUILDKITE_PULL_REQUEST") == "true"
     plugins:
