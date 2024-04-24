@@ -8,6 +8,9 @@ env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
+  PLATFORMS_AMD: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+  PLATFORMS_ARM: "linux/arm64"
+
 steps:
   - group: Beats dashboards
     key: dashboards
@@ -49,7 +52,7 @@ steps:
       # x86
       - label: ":ubuntu: {{matrix}}/Packaging Linux Snapshot"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "${PLATFORMS_AMD}"
           SNAPSHOT: true
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
@@ -78,7 +81,7 @@ steps:
       ## ARM
       - label: ":linux: {{matrix}}/Packaging Linux arm64 Snapshot"
         env:
-          PLATFORMS: "linux/arm64"
+          PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
           SNAPSHOT: true
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
@@ -104,7 +107,7 @@ steps:
       ## Agentbeat needs more CPUs because it builds many other beats
       - label: ":ubuntu: {{matrix}}/Packaging Linux Snapshot"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "${PLATFORMS_AMD}"
           SNAPSHOT: true
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
@@ -125,7 +128,7 @@ steps:
       # x86
       - label: ":ubuntu: {{matrix}}/Packaging Linux Staging"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "${PLATFORMS_AMD}"
           SNAPSHOT: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
@@ -154,7 +157,7 @@ steps:
       ## ARM
       - label: ":linux: {{matrix}}/Packaging Linux arm64 Staging"
         env:
-          PLATFORMS: "linux/arm64"
+          PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
           SNAPSHOT: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
@@ -180,7 +183,7 @@ steps:
         ## Agentbeat needs more CPUs because it builds many other beats
       - label: ":ubuntu: {{matrix}}/Packaging Linux Snapshot"
         env:
-          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          PLATFORMS: "${PLATFORMS_AMD}"
           SNAPSHOT: true
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
