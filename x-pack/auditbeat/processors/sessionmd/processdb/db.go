@@ -26,6 +26,11 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+const (
+	reaperInterval = 15 * time.Second // run the reaper process at this interval
+	removalTime    = 10 * time.Second // remove processes that have been exited longer than this
+)
+
 type TTYType int
 
 const (
@@ -186,6 +191,8 @@ type DB struct {
 	entryLeaders             map[uint32]EntryType
 	entryLeaderRelationships map[uint32]uint32
 	procfs                   procfs.Reader
+	stopChan                 chan struct{}
+	removalCandidates        map[uint32]removalCandidate
 }
 
 func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
@@ -193,13 +200,17 @@ func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
 	if initError != nil {
 		return &DB{}, initError
 	}
-	return &DB{
+	db := DB{
 		logger:                   logp.NewLogger("processdb"),
 		processes:                make(map[uint32]Process),
 		entryLeaders:             make(map[uint32]EntryType),
 		entryLeaderRelationships: make(map[uint32]uint32),
 		procfs:                   reader,
-	}, nil
+		stopChan: make(chan struct{}),
+		removalCandidates: make(map[uint32]removalCandidate),
+	}
+	db.startReaper()
+	return &db, nil
 }
 
 func (db *DB) calculateEntityIDv1(pid uint32, startTime time.Time) string {
@@ -407,8 +418,6 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	defer db.mutex.Unlock()
 
 	pid := exit.PIDs.Tgid
-	delete(db.entryLeaders, pid)
-	delete(db.entryLeaderRelationships, pid)
 	process, ok := db.processes[pid]
 	if !ok {
 		db.logger.Errorf("could not insert exit, pid %v not found in db", pid)
@@ -416,6 +425,10 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	}
 	process.ExitCode = exit.ExitCode
 	db.processes[pid] = process
+	db.removalCandidates[pid] = removalCandidate{
+		startTime: process.PIDs.StartTimeNS,
+		exitTime: time.Now(),
+	}
 }
 
 func interactiveFromTTY(tty types.TTYDev) bool {
@@ -723,4 +736,57 @@ func (db *DB) scrapeAncestors(proc Process) {
 		}
 		db.insertProcess(p)
 	}
+}
+
+func (db *DB) Close() {
+	close(db.stopChan)
+}
+
+type removalCandidate struct {
+	exitTime  time.Time
+	startTime uint64
+}
+
+// The reaper will remove exited processes from the DB a short time after they have exited.
+// Processes cannot be removed immediately when exiting, as the event enrichment will happen sometime
+// afterwards, and will fail if the process is already removed from the DB.
+//
+// In Linux, exited processes cannot be session leader, process group leader or parent, so if a process has exited,
+// it cannot have a relation with any other longer-lived processes. If this processor is ported to other OSs, this
+// assumption will need to be revisited.
+func (db *DB) startReaper() {
+	ticker := time.NewTicker(reaperInterval)
+	defer ticker.Stop()
+	now := time.Now()
+
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				db.mutex.Lock()
+				for pid, c := range db.removalCandidates {
+					p, ok := db.processes[pid]
+					if !ok {
+						db.logger.Debugf("pid %v was candidate for removal, but was already removed", pid)
+						delete(db.removalCandidates, pid)
+						continue
+					}
+					if p.PIDs.StartTimeNS != c.startTime {
+						db.logger.Debugf("start times of removal candidate %v differs, not removing (PID had been reused?)", pid)
+						delete(db.removalCandidates, pid)
+						continue
+					}
+					if now.Sub(c.exitTime) > removalTime {
+						delete(db.processes, pid)
+						delete(db.entryLeaders, pid)
+						delete(db.entryLeaderRelationships, pid)
+						delete(db.removalCandidates, pid)
+					}
+				}
+				db.mutex.Unlock()
+			case <-db.stopChan:
+				return
+			}
+		}
+	}()
 }

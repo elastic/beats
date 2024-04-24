@@ -114,6 +114,11 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 	return result, nil
 }
 
+func (p *addSessionMetadata) Close() error {
+	p.db.Close()
+	return nil
+}
+
 func (p *addSessionMetadata) String() string {
 	return fmt.Sprintf("%v=[backend=%s, pid_field=%s]",
 		processorName, p.config.Backend, p.config.PIDField)
