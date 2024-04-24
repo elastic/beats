@@ -34,10 +34,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Heartbeat"
     if: build.pull_request.id != null
@@ -72,10 +68,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Filebeat"
     if: build.pull_request.id != null
@@ -111,10 +103,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/filebeat"
     if: build.pull_request.id != null
@@ -150,10 +138,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Xpack/Dockerlogbeat"
     if: build.pull_request.id != null
@@ -188,10 +172,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Metricbeat"
     if: build.pull_request.id != null
@@ -226,10 +206,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/metricbeat"
     if: build.pull_request.id != null
@@ -265,10 +241,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/osquerybeat"
     if: build.pull_request.id != null
@@ -306,10 +278,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Xpack/Winlogbeat"
     if: build.pull_request.id != null
@@ -344,10 +312,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Deploy/K8S"
     if: build.pull_request.id != null
@@ -377,10 +341,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Libbeat"
     if: build.pull_request.id != null
@@ -414,10 +374,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/libbeat"
     if: build.pull_request.id != null
@@ -452,10 +408,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/auditbeat"
     if: build.pull_request.id != null
@@ -491,10 +443,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/heartbeat"
     if: build.pull_request.id != null
@@ -530,10 +478,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger x-pack/packetbeat"
     if: build.pull_request.id != null
@@ -569,10 +513,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Winlogbeat"
     if: build.pull_request.id != null
@@ -607,10 +547,6 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
 
   - label: "Trigger Packetbeat"
     if: build.pull_request.id != null
@@ -645,7 +581,3 @@ steps:
     build:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
-      env:
-        BUILDKITE_PULL_REQUEST: ${BUILDKITE_PULL_REQUEST}
-        BUILDKITE_PULL_REQUEST_BASE_BRANCH: ${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
-        GITHUB_PR_LABELS: ${GITHUB_PR_LABELS}
