@@ -16,7 +16,7 @@ steps:
     key: dashboards
     steps:
       - label: Snapshot dashboards
-        # if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
+        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
         key: dashboards-snapshot
         # TODO: container with go and make
         agents:
@@ -46,7 +46,7 @@ steps:
           - build/distributions/**/*
 
   - group: Packaging snapshot
-    # if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
+    if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
     key: packaging-snapshot
     steps:
       # x86
@@ -200,7 +200,7 @@ steps:
     steps:
       - label: DRA Snapshot
         ## Only for release branches and main
-        # if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
+        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
         key: dra-snapshot
         env:
           DRA_WORKFLOW: snapshot
