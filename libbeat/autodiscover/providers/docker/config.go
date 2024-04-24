@@ -27,6 +27,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/config"
 )
 
+// AllSupportedHints includes the set of all supported hints for both logs and metrics autodiscovery
+var AllSupportedHints = []string{"enabled", "module", "metricsets", "hosts", "period", "timeout", "metrics_path", "username", "password", "stream", "processors", "multiline", "json", "disable", "ssl", "metrics_filters", "raw", "include_lines", "exclude_lines", "fileset", "pipeline", "raw"}
+
 // Config for docker autodiscover provider
 type Config struct {
 	Host           string                  `config:"host"`
