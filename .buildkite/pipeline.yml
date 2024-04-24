@@ -29,6 +29,7 @@ steps:
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
   - label: "Triggering Build for Auditbeat"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false"
     trigger: "auditbeat"
     build:
       commit: "${BUILDKITE_COMMIT}"
