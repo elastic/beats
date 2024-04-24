@@ -239,11 +239,6 @@ func Filter(data *util.Data, config *config) bool {
 				text = ""
 			}
 
-			if text == "" {
-				access = false
-				break
-			}
-
 			if !matcher(text) {
 				access = false
 				break
