@@ -275,6 +275,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add new memory/cgroup metrics to Kibana module {pull}37232[37232]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
+- Add last_terminated_reason_timestamp metric in kubernetes module {issue}3802[3802]
 
 
 *Metricbeat*

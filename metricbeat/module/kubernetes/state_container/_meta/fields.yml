@@ -32,6 +32,10 @@
           type: keyword
           description: >
             The last reason the container was in terminated state (Completed, ContainerCannotRun, Error or OOMKilled).
+        - name: last_terminated_reason_timestamp
+          type: double
+          description: >
+            Last terminated time (epoch) of a container
     - name: cpu
       type: group
       fields:
