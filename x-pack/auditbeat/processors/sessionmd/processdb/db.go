@@ -407,16 +407,15 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	defer db.mutex.Unlock()
 
 	pid := exit.PIDs.Tgid
+	delete(db.entryLeaders, pid)
+	delete(db.entryLeaderRelationships, pid)
 	process, ok := db.processes[pid]
 	if !ok {
 		db.logger.Errorf("could not insert exit, pid %v not found in db", pid)
+		return
 	}
-
 	process.ExitCode = exit.ExitCode
 	db.processes[pid] = process
-
-	delete(db.entryLeaders, pid)
-	delete(db.entryLeaderRelationships, pid)
 }
 
 func interactiveFromTTY(tty types.TTYDev) bool {
