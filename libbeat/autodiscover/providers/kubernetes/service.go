@@ -156,7 +156,7 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 	}
 
 	hints, incorrecthints := utils.GenerateHints(annotations, "", s.config.Prefix, true, AllSupportedHints)
-	//We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+	// We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
 	for _, value := range incorrecthints {
 		s.logger.Debugf("provided hint: %s/%s is not in the supported list", s.config.Prefix, value)
 	}
