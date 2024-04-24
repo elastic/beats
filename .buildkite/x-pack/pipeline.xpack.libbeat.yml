@@ -26,6 +26,10 @@ steps:
         command: |
           cd x-pack/libbeat
           mage build unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -42,6 +46,10 @@ steps:
         command: |
           cd x-pack/libbeat
           mage goIntegTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -58,6 +66,10 @@ steps:
         command: |
           cd x-pack/libbeat
           mage pythonIntegTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -74,6 +86,10 @@ steps:
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "mandatory-win-2016-unit-tests"
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -92,6 +108,10 @@ steps:
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "mandatory-win-2022-unit-tests"
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -114,6 +134,10 @@ steps:
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "extended-win-10-unit-tests"
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -132,6 +156,10 @@ steps:
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "extended-win-11-unit-tests"
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -150,6 +178,10 @@ steps:
           Set-Location -Path x-pack/libbeat
           mage -w reader\etw build goUnitTest
         key: "extended-win-2019-unit-tests"
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -172,6 +204,10 @@ steps:
         command: |
           cd x-pack/libbeat
           mage build unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"

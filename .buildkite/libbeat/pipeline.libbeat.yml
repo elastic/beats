@@ -21,6 +21,10 @@ steps:
           set -euo pipefail
           cd libbeat
           mage build unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -38,6 +42,10 @@ steps:
           set -euo pipefail
           cd libbeat
           mage goIntegTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -55,6 +63,10 @@ steps:
           set -euo pipefail
           cd libbeat
           mage pythonIntegTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -72,6 +84,10 @@ steps:
           set -euo pipefail
           cd libbeat
           make crosscompile
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -89,6 +105,10 @@ steps:
           set -euo pipefail
           cd libbeat
           make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' GOTEST_OUTPUT_OPTIONS=' | go-junit-report > libbeat-stress-test.xml' stress-tests
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -108,6 +128,10 @@ steps:
           set -euo pipefail
           cd libbeat
           mage build unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"

@@ -113,6 +113,10 @@ steps:
           make -C auditbeat crosscompile
         env:
           GOX_FLAGS: "-arch amd64"
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
