@@ -42,7 +42,6 @@ type Index struct {
 
 	Index  string     `json:"index"`
 	Status string     `json:"status"`
-	Hidden bool       `json:"hidden"`
 	Shards shardStats `json:"shards"`
 }
 
