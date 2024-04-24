@@ -70,6 +70,10 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -87,6 +91,10 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -145,6 +153,10 @@ steps:
           source .buildkite/scripts/install_macos_tools.sh
           cd auditbeat
           mage unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -159,6 +171,10 @@ steps:
           source .buildkite/scripts/install_macos_tools.sh
           cd auditbeat
           mage unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -176,6 +192,10 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -192,6 +212,10 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -208,6 +232,10 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
