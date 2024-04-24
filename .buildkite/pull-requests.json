@@ -63,6 +63,20 @@
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
             "always_require_ci_on_changed": ["^x-pack/packetbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
+        },
+        {
+            "enabled": true,
+            "pipelineSlug": "beats-packaging-pipeline",
+            "allow_org_users": true,
+            "allowed_repo_permissions": ["admin", "write"],
+            "allowed_list": [ ],
+            "set_commit_status": false,
+            "build_on_commit": false,
+            "build_on_comment": true,
+            "trigger_comment_regex": "^/package",
+            "always_trigger_comment_regex": "^/package",
+            "skip_ci_labels": [  ],
+            "skip_target_branches": [ ]
         }
     ]
 }

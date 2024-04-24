@@ -2,6 +2,10 @@
 [Buildkite packaging pipeline](https://buildkite.com/elastic/beats-packaging-pipeline) is used to build and publish the packages for the Beats. The pipeline is triggered by a commit to the `main` or release branches.
 The pipeline definition is located in the `.buildkite/packaging.pipeline.yml`
 
+### Triggers
+Staging packaging DRA is triggered for the `main` and release branches.
+Snapshot can be triggered for any branch by the `/package` comment in the PR. The release-manager dry-run will be used for PR builds.
+
 ### Pipeline steps
 
 #### Beats dashboards

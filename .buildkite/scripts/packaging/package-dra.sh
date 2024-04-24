@@ -17,5 +17,4 @@ mage ironbank
 
 mkdir -p $WORKSPACE/build/distributions/$BEAT_NAME_SLUG
 cp build/distributions/* $WORKSPACE/build/distributions/$BEAT_NAME_SLUG/
-ls -l $WORKSPACE/build/distributions/$BEAT_NAME_SLUG/
 cd $WORKSPACE
