@@ -13,6 +13,7 @@ steps:
     key: dashboards
     steps:
       - label: Snapshot dashboards
+        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
         key: dashboards-snapshot
         # TODO: container with go and make
         agents:
@@ -28,7 +29,7 @@ steps:
           - build/distributions/**/*
 
       - label: Staging dashboards
-        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
+        if: "build.branch =~ /\\d+\\.\\d+/"
         key: dashboards-staging
         # TODO: container with go and make
         agents:
@@ -42,6 +43,7 @@ steps:
           - build/distributions/**/*
 
   - group: Packaging snapshot
+    if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
     key: packaging-snapshot
     steps:
       # x86
@@ -121,8 +123,8 @@ steps:
   - group: Packaging staging
 
     key: packaging-staging
-    ## Only for release and main
-    if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
+    ## Only for release
+    if: "build.branch =~ /\\d+\\.\\d+/"
     steps:
       # x86
       - label: ":ubuntu: {{matrix}}/Packaging Linux Staging"
@@ -199,6 +201,8 @@ steps:
     key: dra
     steps:
       - label: DRA Snapshot
+        ## Only for release branches and main
+        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
         key: dra-snapshot
         env:
           DRA_WORKFLOW: snapshot
@@ -213,8 +217,8 @@ steps:
           provider: "gcp"
 
       - label: DRA Staging
-        ## Only for release and main
-        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
+        ## Only for release branches
+        if: "build.branch =~ /\\d+\\.\\d+/"
         key: dra-staging
         env:
           DRA_WORKFLOW: staging

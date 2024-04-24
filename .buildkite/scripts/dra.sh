@@ -1,9 +1,11 @@
+#!/usr/bin/env bash
 set -uo pipefail
 
-DRY_RUN=""
+## TODO: Set to empty string when Jenkins is disabled
+DRY_RUN="--dry-run"
 BRANCH="${BUILDKITE_BRANCH}"
 
-if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" || "${BUILDKITE_BRANCH}" == "ci_packaging_pipieline" ]]; then
+if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" ]]; then
     BRANCH=main
     DRY_RUN="--dry-run"
     echo "+++ Running in PR and setting branch main and --dry-run"
@@ -13,28 +15,8 @@ BEAT_VERSION=$(make get-version)
 
 CI_DRA_ROLE_PATH="kv/ci-shared/release/dra-role"
 
-# TODO use common function
-retry() {
-  local retries=$1
-  shift
-  local count=0
-  until "$@"; do
-    exit=$?
-    wait=$((2 ** count))
-    count=$((count + 1))
-    if [ $count -lt "$retries" ]; then
-      >&2 echo "Retry $count/$retries exited $exit, retrying in $wait seconds..."
-      sleep $wait
-    else
-      >&2 echo "Retry $count/$retries exited $exit, no more retries left."
-      return $exit
-    fi
-  done
-  return 0
-}
-
 function release_manager_login {
-  DRA_CREDS_SECRET=$(retry 5 vault kv get -field=data -format=json ${CI_DRA_ROLE_PATH})
+  DRA_CREDS_SECRET=$(retry -t 5 -- vault kv get -field=data -format=json ${CI_DRA_ROLE_PATH})
   VAULT_ADDR_SECRET=$(echo ${DRA_CREDS_SECRET} | jq -r '.vault_addr')
   VAULT_ROLE_ID_SECRET=$(echo ${DRA_CREDS_SECRET} | jq -r '.role_id')
   VAULT_SECRET=$(echo ${DRA_CREDS_SECRET} | jq -r '.secret_id')
