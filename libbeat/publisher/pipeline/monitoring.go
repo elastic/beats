@@ -67,8 +67,9 @@ type metricsObserverVars struct {
 	activeEvents                        *monitoring.Uint
 
 	// queue metrics
-	queueACKed     *monitoring.Uint
-	queueMaxEvents *monitoring.Uint
+	queueACKed       *monitoring.Uint
+	queueMaxEvents   *monitoring.Uint
+	percentQueueFull *monitoring.Float
 }
 
 func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
@@ -92,7 +93,8 @@ func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 			queueACKed:     monitoring.NewUint(reg, "queue.acked"),
 			queueMaxEvents: monitoring.NewUint(reg, "queue.max_events"),
 
-			activeEvents: monitoring.NewUint(reg, "events.active"), // Gauge
+			activeEvents:     monitoring.NewUint(reg, "events.active"), // Gauge
+			percentQueueFull: monitoring.NewFloat(reg, "queue.full"),
 		},
 	}
 }
@@ -121,12 +123,20 @@ func (o *metricsObserver) clientClosed() { o.vars.clients.Dec() }
 func (o *metricsObserver) newEvent() {
 	o.vars.events.Inc()
 	o.vars.activeEvents.Inc()
+	o.setPercentageFull()
+}
+
+// setPercentageFull is used interally to set the `queue.full` metric
+func (o *metricsObserver) setPercentageFull() {
+	var pct float64 = float64(o.vars.activeEvents.Get()) / float64(o.vars.queueMaxEvents.Get())
+	o.vars.percentQueueFull.Set(pct)
 }
 
 // (client) event is filtered out (on purpose or failed)
 func (o *metricsObserver) filteredEvent() {
 	o.vars.filtered.Inc()
 	o.vars.activeEvents.Dec()
+	o.setPercentageFull()
 }
 
 // (client) managed to push an event into the publisher pipeline
@@ -138,6 +148,7 @@ func (o *metricsObserver) publishedEvent() {
 func (o *metricsObserver) failedPublishEvent() {
 	o.vars.failed.Inc()
 	o.vars.activeEvents.Dec()
+	o.setPercentageFull()
 }
 
 //
@@ -148,6 +159,7 @@ func (o *metricsObserver) failedPublishEvent() {
 func (o *metricsObserver) queueACKed(n int) {
 	o.vars.queueACKed.Add(uint64(n))
 	o.vars.activeEvents.Sub(uint64(n))
+	o.setPercentageFull()
 }
 
 // (queue) maximum queue event capacity
