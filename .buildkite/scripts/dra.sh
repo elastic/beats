@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-set -euo pipefail
 
 ## TODO: Set to empty string when Jenkins is disabled
 if [[ "$DRY_RUN" == "false" ]]; then echo "--- Running in publish mode"; DRY_RUN=""; else echo "--- Running in dry-run mode"; DRY_RUN="--dry-run"; fi
+set -euo pipefail
 BRANCH="${BUILDKITE_BRANCH}"
 
 if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" ]]; then
