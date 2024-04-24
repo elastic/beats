@@ -84,6 +84,7 @@ func New(
 	if pattern == "" {
 		pattern = name + "*"
 	}
+
 	event := &beat.Event{
 		Fields: mapstr.M{
 			// beat object was left in for backward compatibility reason for older configs.
