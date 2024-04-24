@@ -5,7 +5,7 @@ set -uo pipefail
 DRY_RUN="--dry-run"
 BRANCH="${BUILDKITE_BRANCH}"
 
-if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" ]]; then
+if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" || "${BUILDKITE_BRANCH}" == "ci_packaging_pipieline" ]]; then
     BRANCH=main
     DRY_RUN="--dry-run"
     echo "+++ Running in PR and setting branch main and --dry-run"

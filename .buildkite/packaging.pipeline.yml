@@ -13,7 +13,7 @@ steps:
     key: dashboards
     steps:
       - label: Snapshot dashboards
-        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
+        # if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
         key: dashboards-snapshot
         # TODO: container with go and make
         agents:
@@ -43,7 +43,7 @@ steps:
           - build/distributions/**/*
 
   - group: Packaging snapshot
-    if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
+    # if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
     key: packaging-snapshot
     steps:
       # x86
@@ -71,6 +71,7 @@ steps:
           - x-pack/functionbeat
           - x-pack/heartbeat
           - x-pack/metricbeat
+          - x-pack/osquerybeat
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
@@ -100,16 +101,12 @@ steps:
           - x-pack/metricbeat
           - x-pack/packetbeat
 
-      ## Osquerybeat and agentbeat require msitools to be installed
       ## Agentbeat needs more CPUs because it builds many other beats
-      ## TODO: pre-install msitools to the VM and delete this exclusion
       - label: ":ubuntu: {{matrix}}/Packaging Linux Snapshot"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
-        command: |
-          .buildkite/scripts/install-msitools.sh
-          .buildkite/scripts/packaging/package-dra.sh {{matrix}}
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -118,7 +115,6 @@ steps:
           - build/distributions/**/*
         matrix:
           - x-pack/agentbeat
-          - x-pack/osquerybeat
 
   - group: Packaging staging
 
@@ -151,6 +147,7 @@ steps:
           - x-pack/functionbeat
           - x-pack/heartbeat
           - x-pack/metricbeat
+          - x-pack/osquerybeat
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
@@ -180,29 +177,27 @@ steps:
           - x-pack/metricbeat
           - x-pack/packetbeat
 
-        ## Osquerybeat and agentbeat require msitools to be installed
-        ## TODO: pre-install msitools to the VM and delete this exclusion
-      - label: ":ubuntu: {{matrix}}/Packaging Linux Staging"
+        ## Agentbeat needs more CPUs because it builds many other beats
+      - label: ":ubuntu: {{matrix}}/Packaging Linux Snapshot"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-          SNAPSHOT: false
+          SNAPSHOT: true
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          machineType: "c2-standard-16"
         artifact_paths:
-          - build/distributions/**
+          - build/distributions/**/*
         matrix:
           - x-pack/agentbeat
-          - x-pack/osquerybeat
 
   - group: DRA publish
     key: dra
     steps:
       - label: DRA Snapshot
         ## Only for release branches and main
-        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
+        # if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main'"
         key: dra-snapshot
         env:
           DRA_WORKFLOW: snapshot
