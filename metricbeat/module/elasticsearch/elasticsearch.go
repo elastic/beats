@@ -367,7 +367,6 @@ func GetXPack(http *helper.HTTP, resetURI string) (XPack, error) {
 	return xpack, err
 }
 
-
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
 func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error) {
 	content, err := fetchPath(http, resetURI, "_nodes/"+nodeID, "filter_path=nodes.*.process.mlockall")
