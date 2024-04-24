@@ -63,22 +63,6 @@
             "skip_target_branches": [ ],
             "skip_ci_on_only_changed": [ ],
             "always_require_ci_on_changed": ["^winlogbeat/.*", ".buildkite/winlogbeat/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*"]
-        },
-        {
-            "enabled": true,
-            "pipelineSlug": "beats-xpack-packetbeat",
-            "allow_org_users": true,
-            "allowed_repo_permissions": ["admin", "write"],
-            "allowed_list": [ ],
-            "set_commit_status": true,
-            "build_on_commit": true,
-            "build_on_comment": true,
-            "trigger_comment_regex": "^/test x-pack/packetbeat$",
-            "always_trigger_comment_regex": "^/test x-pack/packetbeat$",
-            "skip_ci_labels": [  ],
-            "skip_target_branches": [ ],
-            "skip_ci_on_only_changed": [ ],
-            "always_require_ci_on_changed": ["^x-pack/packetbeat/.*", "^.buildkite/.*", "^go.mod", "^pytest.ini", "^dev-tools/.*", "^libbeat/.*", "^testing/.*", "^x-pack/libbeat/.*"]
         }
     ]
 }
