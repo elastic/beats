@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -uo pipefail
+set -euo pipefail
 
 ## TODO: Set to empty string when Jenkins is disabled
 DRY_RUN="--dry-run"
