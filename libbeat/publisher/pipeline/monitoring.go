@@ -128,8 +128,11 @@ func (o *metricsObserver) newEvent() {
 
 // setPercentageFull is used interally to set the `queue.full` metric
 func (o *metricsObserver) setPercentageFull() {
-	var pct float64 = float64(o.vars.activeEvents.Get()) / float64(o.vars.queueMaxEvents.Get())
-	o.vars.percentQueueFull.Set(pct)
+	maxEvt := o.vars.queueMaxEvents.Get()
+	if maxEvt != 0 {
+		var pct float64 = float64(o.vars.activeEvents.Get()) / float64(maxEvt)
+		o.vars.percentQueueFull.Set(pct)
+	}
 }
 
 // (client) event is filtered out (on purpose or failed)
