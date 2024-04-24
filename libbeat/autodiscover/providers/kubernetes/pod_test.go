@@ -2114,6 +2114,113 @@ func TestNodePodUpdater(t *testing.T) {
 	}
 }
 
+func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		cfg         mapstr.M
+		expectedNil bool
+		name        string
+		msg         string
+	}{
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": false,
+					"node.enabled":      false,
+				},
+				"hints.enabled": false,
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: true,
+			name:        "add_resource_metadata.namespace and add_resource_metadata.node disabled and hints disabled.",
+			msg:         "Watcher should be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": false,
+					"node.enabled":      false,
+				},
+				"hints.enabled": true,
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata.namespace and add_resource_metadata.node disabled and hints enabled.",
+			msg:         "Watcher should not be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": true,
+					"node.enabled":      true,
+				},
+				"hints.enabled": false,
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata.namespace and add_resource_metadata.node enabled and hints disabled.",
+			msg:         "Watcher should not be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata default and hints default.",
+			msg:         "Watcher should not be nil.",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			config := conf.MustNewConfigFrom(&test.cfg)
+			c := defaultConfig()
+			err = config.Unpack(&c)
+			assert.NoError(t, err)
+
+			eventer, err := NewPodEventer(uuid, config, client, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			namespaceWatcher := eventer.(*pod).namespaceWatcher
+			nodeWatcher := eventer.(*pod).nodeWatcher
+
+			if test.expectedNil {
+				assert.Equalf(t, nil, namespaceWatcher, "Namespace "+test.msg)
+				assert.Equalf(t, nil, nodeWatcher, "Node "+test.msg)
+			} else {
+				assert.NotEqualf(t, nil, namespaceWatcher, "Namespace "+test.msg)
+				assert.NotEqualf(t, nil, nodeWatcher, "Node "+test.msg)
+			}
+		})
+	}
+}
+
 type mockUpdaterHandler struct {
 	objects []interface{}
 }

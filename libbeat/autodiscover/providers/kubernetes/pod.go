@@ -59,7 +59,7 @@ type pod struct {
 func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish func(event []bus.Event)) (Eventer, error) {
 	logger := logp.NewLogger("autodiscover.pod")
 
-	var replicaSetWatcher, jobWatcher kubernetes.Watcher
+	var replicaSetWatcher, jobWatcher, namespaceWatcher, nodeWatcher kubernetes.Watcher
 
 	config := defaultConfig()
 	err := cfg.Unpack(&config)
@@ -96,22 +96,27 @@ func NewPodEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publish fu
 		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Pod{}, err)
 	}
 
-	options := kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Node:        config.Node,
-		Namespace:   config.Namespace,
+	metaConf := config.AddResourceMetadata
+
+	if metaConf.Node.Enabled() || config.Hints.Enabled() {
+		options := kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+			Node:        config.Node,
+			Namespace:   config.Namespace,
+		}
+		nodeWatcher, err = kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil)
+		if err != nil {
+			logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
+		}
 	}
 
-	metaConf := config.AddResourceMetadata
-	nodeWatcher, err := kubernetes.NewNamedWatcher("node", client, &kubernetes.Node{}, options, nil)
-	if err != nil {
-		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Node{}, err)
-	}
-	namespaceWatcher, err := kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-	}, nil)
-	if err != nil {
-		logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+	if metaConf.Namespace.Enabled() || config.Hints.Enabled() {
+		namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+		}, nil)
+		if err != nil {
+			logger.Errorf("couldn't create watcher for %T due to error %+v", &kubernetes.Namespace{}, err)
+		}
 	}
 
 	// Resource is Pod so we need to create watchers for Replicasets and Jobs that it might belongs to
