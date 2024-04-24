@@ -95,6 +95,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 - Set field types to correctly match ECS in sessionmd processor {issue}38955[38955] {pull}38994[38994]
+- Keep process info on exited processes, to avoid failing to enrich events in sessionmd processor {pull}39173[39173]
 
 *Filebeat*
 
