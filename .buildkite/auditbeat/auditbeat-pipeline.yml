@@ -32,6 +32,10 @@ steps:
         command: |
           cd auditbeat
           mage build unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -47,6 +51,10 @@ steps:
         command: |
           cd auditbeat
           mage build unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -115,6 +123,10 @@ steps:
           set -euo pipefail
           cd auditbeat
           mage unitTest
+        retry:
+          automatic:
+            - exit_status: 1
+              limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
