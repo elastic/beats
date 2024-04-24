@@ -82,6 +82,7 @@ type Process struct {
 	Cwd      string
 	Env      map[string]string
 	Filename string
+	ExitCode int32
 }
 
 var (
@@ -406,7 +407,14 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	defer db.mutex.Unlock()
 
 	pid := exit.PIDs.Tgid
-	delete(db.processes, pid)
+	process, ok := db.processes[pid]
+	if !ok {
+		db.logger.Errorf("could not insert exit, pid %v not found in db", pid)
+	}
+
+	process.ExitCode = exit.ExitCode
+	db.processes[pid] = process
+
 	delete(db.entryLeaders, pid)
 	delete(db.entryLeaderRelationships, pid)
 }
@@ -437,6 +445,7 @@ func fullProcessFromDBProcess(p Process) types.Process {
 	ret.Thread.Capabilities.Effective, _ = capabilities.FromUint64(p.Creds.CapEffective)
 	ret.TTY.CharDevice.Major = p.CTTY.Major
 	ret.TTY.CharDevice.Minor = p.CTTY.Minor
+	ret.ExitCode = p.ExitCode
 
 	return ret
 }
@@ -556,22 +565,7 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 
 	process, ok := db.processes[pid]
 	if !ok {
-		procInfo, err := db.procfs.GetProcess(pid)
-		if err != nil {
-			return types.Process{}, errors.New("process not found in db (scraping from proc failed)")
-		}
-		process := Process{
-			PIDs:     pidInfoFromProto(procInfo.PIDs),
-			Creds:    credInfoFromProto(procInfo.Creds),
-			CTTY:     ttyDevFromProto(procInfo.CTTY),
-			Argv:     procInfo.Argv,
-			Cwd:      procInfo.Cwd,
-			Env:      procInfo.Env,
-			Filename: procInfo.Filename,
-		}
-		db.insertProcess(process)
-
-		process = db.processes[pid]
+		return types.Process{}, errors.New("process not found")
 	}
 
 	ret := fullProcessFromDBProcess(process)

@@ -70,6 +70,9 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 			if err != nil {
 				return nil, fmt.Errorf("failed to create provider: %w", err)
 			}
+			logger.Info("backend=auto using procfs")
+		} else {
+			logger.Info("backend=auto using ebpf")
 		}
 	case "ebpf":
 		p, err = ebpf_provider.NewProvider(ctx, logger, db)
