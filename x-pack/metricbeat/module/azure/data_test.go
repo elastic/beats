@@ -62,7 +62,60 @@ func TestMapToKeyValuePoints(t *testing.T) {
 	resourceSubId := "test"
 	timeGrain := "PT1M"
 
-	t.Run("test aggregation types", func(t *testing.T) {
+	t.Run("test multiple aggregation types", func(t *testing.T) {
+		metrics := []Metric{{
+			Namespace:    namespace,
+			Names:        []string{"test"},
+			Aggregations: "Minimum,Maximum,Average",
+			Values: []MetricValue{
+				{name: metricName, min: &minValue, timestamp: timestamp},
+				{name: metricName, max: &maxValue, timestamp: timestamp},
+				{name: metricName, avg: &avgValue, timestamp: timestamp},
+			},
+			TimeGrain:     timeGrain,
+			ResourceId:    resourceId,
+			ResourceSubId: resourceSubId,
+		}}
+
+		actual := mapToKeyValuePoints(metrics)
+
+		expected := []KeyValuePoint{
+			{
+				Key:           fmt.Sprintf("%s.%s", metricName, "min"),
+				Value:         &minValue,
+				Namespace:     namespace,
+				TimeGrain:     timeGrain,
+				Timestamp:     timestamp,
+				ResourceId:    resourceId,
+				ResourceSubId: resourceSubId,
+				Dimensions:    map[string]interface{}{},
+			},
+			{
+				Key:           fmt.Sprintf("%s.%s", metricName, "max"),
+				Value:         &maxValue,
+				Namespace:     namespace,
+				TimeGrain:     timeGrain,
+				Timestamp:     timestamp,
+				ResourceId:    resourceId,
+				ResourceSubId: resourceSubId,
+				Dimensions:    map[string]interface{}{},
+			},
+			{
+				Key:           fmt.Sprintf("%s.%s", metricName, "avg"),
+				Value:         &avgValue,
+				Namespace:     namespace,
+				TimeGrain:     timeGrain,
+				Timestamp:     timestamp,
+				ResourceId:    resourceId,
+				ResourceSubId: resourceSubId,
+				Dimensions:    map[string]interface{}{},
+			},
+		}
+
+		assert.Equal(t, expected, actual)
+	})
+
+	t.Run("test single aggregation types", func(t *testing.T) {
 
 		metrics := []Metric{{
 			Namespace:     namespace,
