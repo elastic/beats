@@ -2196,10 +2196,9 @@ func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
 	}
 
 	for _, test := range tests {
-
 		t.Run(test.name, func(t *testing.T) {
-			testcfg := &test.cfg
-			config := conf.MustNewConfigFrom(testcfg)
+			// #nosec G601
+			config := conf.MustNewConfigFrom(&test.cfg)
 			c := defaultConfig()
 			err = config.Unpack(&c)
 			assert.NoError(t, err)
