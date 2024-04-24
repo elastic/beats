@@ -192,10 +192,11 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 	}
 
 	var errs multierror.Errors
-	for name, idx := range indicesStats.Indices {
+	for name := range indicesStats.Indices {
 		event := mb.Event{
 			ModuleFields: mapstr.M{},
 		}
+		idx := indicesStats.Indices[name]
 		idx.Index = name
 
 		err = addClusterStateFields(&idx, clusterState)

@@ -196,14 +196,14 @@ func createIndex(host string, isHidden bool) (string, error) {
 
 	req, err := http.NewRequest("PUT", fmt.Sprintf("http://%v/%v", host, indexName), strings.NewReader(reqBody))
 	if err != nil {
-		return "", errors.Wrap(err, "could not build create index request")
+		return "", fmt.Errorf("could not build create index request: %w", err)
 	}
 	req.Header.Add("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", errors.Wrap(err, "could not send create index request")
+		return "", fmt.Errorf("could not send create index request: %w", err)
 	}
 	defer resp.Body.Close()
 	respBody, err := ioutil.ReadAll(resp.Body)

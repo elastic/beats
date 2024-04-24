@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -368,23 +367,6 @@ func GetXPack(http *helper.HTTP, resetURI string) (XPack, error) {
 	return xpack, err
 }
 
-type boolStr bool
-
-func (b *boolStr) UnmarshalJSON(raw []byte) error {
-	var bs string
-	err := json.Unmarshal(raw, &bs)
-	if err != nil {
-		return err
-	}
-
-	bv, err := strconv.ParseBool(bs)
-	if err != nil {
-		return err
-	}
-
-	*b = boolStr(bv)
-	return nil
-}
 
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled
 func IsMLockAllEnabled(http *helper.HTTP, resetURI, nodeID string) (bool, error) {
