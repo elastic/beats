@@ -130,7 +130,7 @@ func (o *metricsObserver) newEvent() {
 func (o *metricsObserver) setPercentageFull() {
 	maxEvt := o.vars.queueMaxEvents.Get()
 	if maxEvt != 0 {
-		var pct float64 = float64(o.vars.activeEvents.Get()) / float64(maxEvt)
+		pct := float64(o.vars.activeEvents.Get()) / float64(maxEvt)
 		o.vars.percentQueueFull.Set(pct)
 	}
 }
