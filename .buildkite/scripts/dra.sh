@@ -25,8 +25,6 @@ function release_manager_login {
 
 release_manager_login
 
-echo "+++ Changing permissions for the BK API commands"
-sudo chown -R :1000 build/distributions/
 
 echo "+++ :hammer_and_pick: Listing $BRANCH $DRA_WORKFLOW DRA artifacts..."
 set +x
