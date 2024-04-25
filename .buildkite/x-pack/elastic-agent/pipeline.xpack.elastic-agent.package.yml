@@ -2,10 +2,10 @@
 
 steps:
   - input: "Build parameters"
-    if: build.env("ManifestURL") == null
+    if: build.env("MANIFEST_URL") == null
     fields:
-      - text: "ManifestURL"
-        key: "ManifestURL"
+      - text: "MANIFEST_URL"
+        key: "MANIFEST_URL"
         default: ""
         required: true
         hint: "Link to the build manifest URL."
@@ -43,7 +43,7 @@ steps:
         hint: "If the DRA release manager script would actually publish anything or just print"
 
   - wait: ~
-    if: build.env("ManifestURL") == null
+    if: build.env("MANIFEST_URL") == null
 
   - group: ":Packaging Artefacts"
     key: "package"
@@ -51,11 +51,11 @@ steps:
       - label: "Package elastic-agent"
         key: package_elastic-agent
         command: |
-          if [[ -z "$${ManifestURL}" ]]; then
-            export ManifestURL=$(buildkite-agent meta-data get ManifestURL --default "")
-            if [[ -z "$${ManifestURL}" ]]; then
-              echo ":broken_heart: Missing ManifestURL variable or empty string provided"
-              echo "Provided ManifestURL: ${ManifestURL}"
+          if [[ -z "$${MANIFEST_URL}" ]]; then
+            export MANIFEST_URL=$(buildkite-agent meta-data get MANIFEST_URL --default "")
+            if [[ -z "$${MANIFEST_URL}" ]]; then
+              echo ":broken_heart: Missing MANIFEST_URL variable or empty string provided"
+              echo "Provided MANIFEST_URL: ${MANIFEST_URL}"
               exit 1
             fi
           fi
@@ -75,11 +75,11 @@ steps:
           PACKAGES: "docker"
         key: package_elastic-agent-arm
         command: |
-          if [[ -z "$${ManifestURL}" ]]; then
-            export ManifestURL=$(buildkite-agent meta-data get ManifestURL --default "")
-            if [[ -z "$${ManifestURL}" ]]; then
-              echo ":broken_heart: Missing ManifestURL variable or empty string provided"
-              echo "Provided ManifestURL: ${ManifestURL}"
+          if [[ -z "$${MANIFEST_URL}" ]]; then
+            export MANIFEST_URL=$(buildkite-agent meta-data get MANIFEST_URL --default "")
+            if [[ -z "$${MANIFEST_URL}" ]]; then
+              echo ":broken_heart: Missing MANIFEST_URL variable or empty string provided"
+              echo "Provided MANIFEST_URL: ${MANIFEST_URL}"
               exit 1
             fi
           fi
@@ -104,7 +104,7 @@ steps:
       DRA_PROJECT_ARTIFACT_ID: "agent-package"
     command: |
       echo "+++ Restoring Artifacts"
-      mkdir build       
+      mkdir build
       buildkite-agent artifact download "x-pack/elastic-agent/build/**/*" .
       echo "+++ Changing permissions for the release manager"
       sudo chown -R :1000 x-pack/elastic-agent/build/distributions/
@@ -123,5 +123,5 @@ steps:
       if [[ -z "${DRA_WORKFLOW}" ]]; then
         DRA_WORKFLOW=$(buildkite-agent meta-data get DRA_WORKFLOW --default "")
         export DRA_WORKFLOW
-      fi      
+      fi
       .buildkite/x-pack/elastic-agent/scripts/steps/dra-publish.sh

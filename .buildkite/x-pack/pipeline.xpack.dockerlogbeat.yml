@@ -2,37 +2,90 @@
 name: "beats-xpack-dockerlogbeat"
 
 env:
-  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  DEFAULT_UBUNTU_X86_64_IMAGE: "family/core-ubuntu-2204"
-  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  ASDF_MAGE_VERSION: 1.15.0
+
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
-  BEATS_PROJECT_NAME: "x-pack/dockerlogbeat"
+  GCP_WIN_MACHINE_TYPE: "n2-standard-8"
+
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
+  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
+  IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
+  IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
+  IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
+  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
 steps:
+  - group: "Xpack/Dockerlogbeat Mandatory Tests"
+    key: "xpack-dockerlogbeat-mandatory-tests"
+    steps:
+      - label: ":ubuntu: Xpack/Dockerlogbeat Ubuntu Unit Tests"
+        key: "mandatory-linux-unit-test"
+        command: "cd x-pack/dockerlogbeat && mage build unitTest"
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/dockerlogbeat/build/*.xml"
+          - "x-pack/dockerlogbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/dockerlogbeat: Ubuntu Unit Tests"
 
-  - input: "Input Parameters"
-    key: "force-run-stages"
-    fields:
-    - select: "Dockerlogbeat - run_xpack_dockerlogbeat"
-      key: "run_xpack_dockerlogbeat"
-      options:
-        - label: "True"
-          value: "true"
-        - label: "False"
-          value: "false"
-      default: "false"
-
-    if: "build.source == 'ui'"
+      - label: ":ubuntu: Xpack/Dockerlogbeat Go Integration Tests"
+        key: "mandatory-int-test"
+        command: "cd x-pack/dockerlogbeat && mage goIntegTest"
+        env:
+          MODULE: $MODULE
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/dockerlogbeat/build/*.xml"
+          - "x-pack/dockerlogbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/dockerlogbeat: Go Integration Tests"
 
   - wait: ~
-    if: "build.source == 'ui'"
-    allow_dependency_failure: false
+    # with PRs, we want to run packaging only if mandatory tests succeed
+    # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in mandatory tests
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on:
+      - "xpack-dockerlogbeat-mandatory-tests"
 
-  - label: ":linux: Load dynamic x-pack dockerlogbeat pipeline"
-    key: "xpack-dockerlogbeat-pipeline"
-    command: ".buildkite/scripts/generate_xpack_dockerlogbeat_pipeline.sh"
-    notify:
-      - github_commit_status:
-          context: "${BEATS_PROJECT_NAME}: Load dynamic pipeline's steps"
+  - group: "Xpack/Dockerlogbeat Packaging"
+    key: "xpack-dockerlogbeat-packaging"
+
+    steps:
+      - label: ":ubuntu: Xpack/Dockerlogbeat Packaging Linux X86"
+        key: "auditbeat-package-linux-x86"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
+          SNAPSHOT: true
+        command: "cd x-pack/dockerlogbeat && mage package"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+
+      - label: ":linux: Xpack/Dockerlogbeat Packaging Linux ARM"
+        key: "auditbeat-package-linux-arm"
+        env:
+          PLATFORMS: "linux/arm64"
+          PACKAGES: "docker"
+          SNAPSHOT: true
+        command: "cd x-pack/dockerlogbeat && mage package"
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
