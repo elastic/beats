@@ -33,7 +33,7 @@ type Process struct {
 
 	// The exit code of the process, if this is a termination event.
 	// The field should be absent if there is no exit code for the event (e.g. process start).
-	ExitCode *int64 `json:"exit_code,omitempty"`
+	ExitCode int32 `json:"exit_code,omitempty"`
 
 	// Whether the process is connected to an interactive shell.
 	// Process interactivity is inferred from the processes file descriptors. If the character device for the controlling tty is the same as stdin and stderr for the process, the process is considered interactive.
