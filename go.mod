@@ -206,7 +206,7 @@ require (
 	github.com/elastic/bayeux v1.0.5
 	github.com/elastic/ebpfevents v0.6.0
 	github.com/elastic/elastic-agent-autodiscover v0.6.14
-	github.com/elastic/elastic-agent-libs v0.9.8
+	github.com/elastic/elastic-agent-libs v0.9.6
 	github.com/elastic/elastic-agent-system-metrics v0.9.2
 	github.com/elastic/go-elasticsearch/v8 v8.13.1
 	github.com/elastic/mito v1.11.0
@@ -433,5 +433,3 @@ replace (
 
 // Exclude this version because the version has an invalid checksum.
 exclude github.com/docker/distribution v2.8.0+incompatible
-
-replace github.com/elastic/elastic-agent-libs => github.com/belimawr/elastic-agent-libs v0.2.9-0.20240424130432-8391f6f90ef5
