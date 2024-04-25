@@ -3,7 +3,7 @@
 ## TODO: Set to empty string when Jenkins is disabled
 if [[ "$DRY_RUN" == "false" ]]; then echo "--- Running in publish mode"; DRY_RUN=""; else echo "--- Running in dry-run mode"; DRY_RUN="--dry-run"; fi
 set -euo pipefail
-BRANCH="${BUILDKITE_BRANCH}"
+BRANCH="${DRA_BRANCH:="${BUILDKITE_BRANCH:=""}"}"
 
 if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" ]]; then
     BRANCH=main
@@ -29,6 +29,7 @@ echo "+++ Changing permissions for the BK API commands"
 sudo chown -R :1000 build/distributions/
 
 echo "+++ :hammer_and_pick: Listing $BRANCH $DRA_WORKFLOW DRA artifacts..."
+set +x
 docker run --rm \
         --name release-manager \
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
@@ -43,8 +44,10 @@ docker run --rm \
         --workflow "${DRA_WORKFLOW}" \
         --version "${BEAT_VERSION}" \
         --artifact-set "main"
+set -x
 
 echo "+++ :hammer_and_pick: Publishing $BRANCH $DRA_WORKFLOW DRA artifacts..."
+set +x
 docker run --rm \
         --name release-manager \
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
@@ -60,3 +63,4 @@ docker run --rm \
         --version "${BEAT_VERSION}" \
         --artifact-set "main" \
         ${DRY_RUN}
+set -x
