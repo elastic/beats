@@ -129,6 +129,7 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
@@ -158,6 +159,7 @@ steps:
           PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
           SNAPSHOT: false
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: "aws"
@@ -183,6 +185,7 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
         agents:
           provider: gcp
