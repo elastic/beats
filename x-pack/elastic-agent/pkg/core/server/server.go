@@ -97,6 +97,9 @@ type Handler interface {
 
 // Server is the GRPC server that the launched applications connect back to.
 type Server struct {
+	// Disable forward compatibility
+	*proto.UnimplementedElasticAgentServer
+
 	logger     *logger.Logger
 	ca         *authority.CertificateAuthority
 	listenAddr string
@@ -122,13 +125,14 @@ func New(logger *logger.Logger, listenAddr string, handler Handler) (*Server, er
 		return nil, err
 	}
 	return &Server{
-		logger:                logger,
-		ca:                    ca,
-		listenAddr:            listenAddr,
-		handler:               handler,
-		serverLock:            &sync.Mutex{},
-		watchdogCheckInterval: WatchdogCheckLoop,
-		checkInMinTimeout:     client.CheckinMinimumTimeout + CheckinMinimumTimeoutGracePeriod,
+		UnimplementedElasticAgentServer: &proto.UnimplementedElasticAgentServer{},
+		logger:                          logger,
+		ca:                              ca,
+		listenAddr:                      listenAddr,
+		handler:                         handler,
+		serverLock:                      &sync.Mutex{},
+		watchdogCheckInterval:           WatchdogCheckLoop,
+		checkInMinTimeout:               client.CheckinMinimumTimeout + CheckinMinimumTimeoutGracePeriod,
 	}, nil
 }
 
@@ -544,7 +548,7 @@ func (s *Server) Actions(server proto.ElasticAgent_ActionsServer) error {
 //
 // Note: If the writer implements io.Closer the writer is also closed.
 func (as *ApplicationState) WriteConnInfo(w io.Writer) error {
-	connInfo := &proto.ConnInfo{
+	connInfo := &proto.StartUpInfo{
 		Addr:       as.srv.getListenAddr(),
 		ServerName: as.srvName,
 		Token:      as.token,
