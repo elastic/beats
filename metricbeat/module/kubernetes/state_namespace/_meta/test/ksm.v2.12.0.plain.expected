@@ -1,0 +1,127 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-node-lease"
+		},
+		"MetricSetFields": {
+			"created": {
+				"sec": 1713862181
+			},
+			"status": {
+				"active": true,
+				"terminating": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.state_namespace",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "local-path-storage"
+		},
+		"MetricSetFields": {
+			"created": {
+				"sec": 1713862186
+			},
+			"status": {
+				"active": true,
+				"terminating": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.state_namespace",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-system"
+		},
+		"MetricSetFields": {
+			"created": {
+				"sec": 1713862181
+			},
+			"status": {
+				"active": true,
+				"terminating": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.state_namespace",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "kube-public"
+		},
+		"MetricSetFields": {
+			"created": {
+				"sec": 1713862181
+			},
+			"status": {
+				"active": true,
+				"terminating": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.state_namespace",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	},
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"created": {
+				"sec": 1713862181
+			},
+			"status": {
+				"active": true,
+				"terminating": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.state_namespace",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]
