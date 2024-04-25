@@ -1,0 +1,53 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": null,
+		"MetricSetFields": {
+			"cpu": {
+				"allocatable": {
+					"cores": 16
+				},
+				"capacity": {
+					"cores": 16
+				}
+			},
+			"kubelet": {
+				"version": "v1.29.1"
+			},
+			"memory": {
+				"allocatable": {
+					"bytes": 16769380352
+				},
+				"capacity": {
+					"bytes": 16769380352
+				}
+			},
+			"name": "kind-control-plane",
+			"pod": {
+				"allocatable": {
+					"total": 110
+				},
+				"capacity": {
+					"total": 110
+				}
+			},
+			"status": {
+				"disk_pressure": "false",
+				"memory_pressure": "false",
+				"pid_pressure": "false",
+				"ready": "true",
+				"unschedulable": false
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.node",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]
