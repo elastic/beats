@@ -40,6 +40,8 @@ var gauges = map[string]bool{
 	"libbeat.output.events.active":       true,
 	"libbeat.pipeline.events.active":     true,
 	"libbeat.pipeline.clients":           true,
+	"libbeat.pipeline.queue.max_events":  true,
+	"libbeat.pipeline.queue.full.pct":    true,
 	"libbeat.config.module.running":      true,
 	"registrar.states.current":           true,
 	"filebeat.events.active":             true,
