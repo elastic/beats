@@ -69,7 +69,7 @@ func (s prvdr) UpdateDB(ev *beat.Event) error {
 			pe.Env = proc_info.Env
 			pe.Filename = proc_info.Filename
 		} else {
-			s.logger.Errorf("get process info from proc for pid %v: %w", pid, err)
+			s.logger.Warnf("couldn't get process info from proc for pid %v: %w", pid, err)
 			// If process info couldn't be taken from procfs, populate with as much info as
 			// possible from the event
 			pe.PIDs.Tgid = uint32(pid)
