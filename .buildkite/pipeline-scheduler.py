@@ -22,7 +22,7 @@ import urllib.request
 from ruamel.yaml import YAML
 
 
-ACTIVE_BRANCHES_URL = "https://raw.githubusercontent.com/elastic/logstash/main/ci/branches.json"
+ACTIVE_BRANCHES_URL = "https://storage.googleapis.com/artifacts-api/snapshots/branches.json"
 
 
 class InputError(Exception):
@@ -71,7 +71,7 @@ def get_json_with_retries(uri, retries=3, delay=5) -> typing.Dict:
 def get_release_branches() -> typing.List[str]:
     resp = get_json_with_retries(uri=ACTIVE_BRANCHES_URL)
     try:
-        release_branches = [entry["branch"] for entry in resp["branches"]]
+        release_branches = [branch for branch in resp["branches"]]
     except KeyError:
         fail_with_error(f'''Didn't find the excepted structure ["branches"] in the response [{resp}] from [{ACTIVE_BRANCHES_URL}]''')
 
