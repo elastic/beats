@@ -88,6 +88,30 @@ func DefaultConfig(environment Environment) Config {
 	}
 }
 
+// DefaultEventConfig returns the default config options for the event logger in
+// a given environment the Beat is supposed to be run within.
+func DefaultEventConfig(environment Environment) Config {
+	return Config{
+		Level:    defaultLevel,
+		ToFiles:  true,
+		ToStderr: false,
+		Files: FileConfig{
+			MaxSize:         5 * 1024 * 1024, // 5Mb
+			MaxBackups:      2,
+			Permissions:     0600,
+			Interval:        0,
+			RotateOnStartup: false,
+			RedirectStderr:  false,
+			Name:            "event-data",
+		},
+		Metrics: MetricsConfig{
+			Enabled: false,
+		},
+		environment: environment,
+		addCaller:   true,
+	}
+}
+
 // LogFilename returns the base filename to which logs will be written for
 // the "files" log output. If another log output is used, or `logging.files.name`
 // is unspecified, then the beat name will be returned.

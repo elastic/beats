@@ -45,6 +45,10 @@ func init() {
 	flag.Var((*environmentVar)(&environment), "environment", "set environment being ran in")
 }
 
+func GetEnvironment() logp.Environment {
+	return environment
+}
+
 // Logging builds a logp.Config based on the given common.Config and the specified
 // CLI flags.
 func Logging(beatName string, cfg *config.C) error {
@@ -73,6 +77,39 @@ func LoggingWithOutputs(beatName string, cfg *config.C, outputs ...zapcore.Core)
 
 	applyFlags(&config)
 	return logp.ConfigureWithOutputs(config, outputs...)
+}
+
+// LoggingWithTypedOutputs applies some defaults then calls ConfigureWithTypedOutputs
+func LoggingWithTypedOutputs(beatName string, cfg, typedCfg *config.C, logKey, kind string, outputs ...zapcore.Core) error {
+	config := logp.DefaultConfig(environment)
+	config.Beat = beatName
+	if cfg != nil {
+		if err := cfg.Unpack(&config); err != nil {
+			return err
+		}
+	}
+
+	applyFlags(&config)
+
+	typedLogpConfig := logp.DefaultEventConfig(environment)
+	defaultName := typedLogpConfig.Files.Name
+	typedLogpConfig.Beat = beatName
+	if typedCfg != nil {
+		if err := typedCfg.Unpack(&typedLogpConfig); err != nil {
+			return fmt.Errorf("cannot unpack typed output config: %w", err)
+		}
+	}
+
+	// Make sure we're always running on the same log level
+	typedLogpConfig.Level = config.Level
+	typedLogpConfig.Selectors = config.Selectors
+
+	// If the name has not been configured, make it {beatName}-events-data
+	if typedLogpConfig.Files.Name == defaultName {
+		typedLogpConfig.Files.Name = beatName + "-events-data"
+	}
+
+	return logp.ConfigureWithTypedOutput(config, typedLogpConfig, logKey, kind, outputs...)
 }
 
 func applyFlags(cfg *logp.Config) {

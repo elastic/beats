@@ -54,3 +54,68 @@ func TestLoggerSelectors(t *testing.T) {
 	logs = ObserverLogs().TakeAll()
 	assert.Len(t, logs, 1)
 }
+
+func TestTypedCoreSelectors(t *testing.T) {
+	logSelector := "enabled-log-selector"
+	expectedMsg := "this should be logged"
+
+	defaultCfg := DefaultConfig(DefaultEnvironment)
+	eventsCfg := DefaultEventConfig(DefaultEnvironment)
+
+	defaultCfg.Level = DebugLevel
+	defaultCfg.toObserver = true
+	defaultCfg.ToStderr = false
+	defaultCfg.ToFiles = false
+	defaultCfg.Selectors = []string{logSelector}
+
+	eventsCfg.Level = defaultCfg.Level
+	eventsCfg.toObserver = defaultCfg.toObserver
+	eventsCfg.ToStderr = defaultCfg.ToStderr
+	eventsCfg.ToFiles = defaultCfg.ToFiles
+	eventsCfg.Selectors = defaultCfg.Selectors
+
+	if err := ConfigureWithTypedOutput(defaultCfg, eventsCfg, "log.type", "event"); err != nil {
+		t.Fatalf("could not configure logger: %s", err)
+	}
+
+	enabledSelector := NewLogger(logSelector)
+	disabledSelector := NewLogger("foo-selector")
+
+	enabledSelector.Debugw(expectedMsg)
+	enabledSelector.Debugw(expectedMsg, "log.type", "event")
+	disabledSelector.Debug("this should not be logged")
+
+	logEntries := ObserverLogs().TakeAll()
+	if len(logEntries) != 2 {
+		t.Errorf("expecting 2 log entries, got %d", len(logEntries))
+		t.Log("Log entries:")
+		for _, e := range logEntries {
+			t.Log("Message:", e.Message, "Fields:", e.Context)
+		}
+		t.FailNow()
+	}
+
+	for i, logEntry := range logEntries {
+		msg := logEntry.Message
+		if msg != expectedMsg {
+			t.Fatalf("[%d] expecting log message '%s', got '%s'", i, expectedMsg, msg)
+		}
+
+		// The second entry should also contain `log.type: event`
+		if i == 1 {
+			fields := logEntry.Context
+			if len(fields) != 1 {
+				t.Errorf("expecting one field, got %d", len(fields))
+			}
+
+			k := fields[0].Key
+			v := fields[0].String
+			if k != "log.type" {
+				t.Errorf("expecting key 'log.type', got '%s'", k)
+			}
+			if v != "event" {
+				t.Errorf("expecting value 'event', got '%s'", v)
+			}
+		}
+	}
+}
