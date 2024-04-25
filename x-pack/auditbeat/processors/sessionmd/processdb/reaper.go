@@ -2,6 +2,8 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
+//go:build linux
+
 package processdb
 
 import (
@@ -11,7 +13,7 @@ import (
 
 const (
 	reaperInterval = 30 * time.Second // run the reaper process at this interval
-	removalTime    = 10 * time.Second // remove processes that have been exited longer than this
+	removalTimeout    = 10 * time.Second // remove processes that have been exited longer than this
 )
 
 type removalCandidate struct {
@@ -75,7 +77,7 @@ func (db *DB) startReaper() {
 						db.logger.Debugf("unexpected item in removal queue: \"%v\"", v)
 						continue
 					}
-					if now.Sub(c.exitTime) < removalTime {
+					if now.Sub(c.exitTime) < removalTimeout {
 						// this candidate hasn't reached its timeout, put it back on the heap
 						// everything else will have a later exit time, so end this run
 						heap.Push(h, c)
