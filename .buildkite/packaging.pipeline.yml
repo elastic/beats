@@ -16,7 +16,7 @@ steps:
     key: dashboards
     steps:
       - label: Snapshot dashboards
-        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main' || build.env('RUN_SNAPSHOT')==true"
+        if: build.branch =~ /\d+\.\d+/ || build.branch == 'main' || build.env('RUN_SNAPSHOT')==true
         key: dashboards-snapshot
         # TODO: container with go and make
         agents:
@@ -46,7 +46,7 @@ steps:
           - build/distributions/**/*
 
   - group: Packaging snapshot
-    if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main' || build.env('RUN_SNAPSHOT')==true"
+    if: build.branch =~ /\d+\.\d+/ || build.branch == 'main' || build.env('RUN_SNAPSHOT')==true
     key: packaging-snapshot
     steps:
       # x86
@@ -123,7 +123,7 @@ steps:
 
     key: packaging-staging
     ## Only for release
-    if: "build.branch =~ /\\d+\\.\\d+/"
+    if: build.branch =~ /\d+\.\d+/
     steps:
       # x86
       - label: ":ubuntu: {{matrix}}/Packaging Linux Staging"
@@ -181,10 +181,10 @@ steps:
           - x-pack/packetbeat
 
         ## Agentbeat needs more CPUs because it builds many other beats
-      - label: ":ubuntu: {{matrix}}/Packaging Linux Snapshot"
+      - label: ":ubuntu: {{matrix}}/Packaging Linux Staging"
         env:
           PLATFORMS: "${PLATFORMS_AMD}"
-          SNAPSHOT: true
+          SNAPSHOT: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
@@ -200,7 +200,7 @@ steps:
     steps:
       - label: DRA Snapshot
         ## Only for release branches and main
-        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main' || build.env('RUN_SNAPSHOT')==true"
+        if: build.branch =~ /\d+\.\d+/ || build.branch == 'main' || build.env('RUN_SNAPSHOT')==true
         key: dra-snapshot
         env:
           DRA_WORKFLOW: snapshot
@@ -216,7 +216,7 @@ steps:
 
       - label: DRA Staging
         ## Only for release branches
-        if: "build.branch =~ /\\d+\\.\\d+/"
+        if: build.branch =~ /\d+\.\d+/
         key: dra-staging
         env:
           DRA_WORKFLOW: staging
