@@ -5,10 +5,12 @@
 package http_endpoint
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"encoding/base32"
 	"encoding/binary"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -322,7 +324,7 @@ func newHandler(ctx context.Context, c config, prg *program, pub stateless.Publi
 		program:               prg,
 		messageField:          c.Prefix,
 		responseCode:          c.ResponseCode,
-		responseBody:          c.ResponseBody,
+		responseBody:          htmlEscape(c.ResponseBody),
 		includeHeaders:        canonicalizeHeaders(c.IncludeHeaders),
 		preserveOriginalEvent: c.PreserveOriginalEvent,
 		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
@@ -348,6 +350,12 @@ func newHandler(ctx context.Context, c config, prg *program, pub stateless.Publi
 		}
 	}
 	return h
+}
+
+func htmlEscape(s string) string {
+	var buf bytes.Buffer
+	json.HTMLEscape(&buf, []byte(s))
+	return buf.String()
 }
 
 // newID returns an ID derived from the current time.
