@@ -49,7 +49,7 @@ steps:
     if: build.branch =~ /\d+\.\d+/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
     key: packaging-snapshot
     steps:
-      - label: "{{matrix}} Packaging"
+      - label: "SNAPSHOT: {{matrix}}"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
@@ -77,7 +77,7 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "{{matrix}} Packaging docker Linux/arm64"
+      - label: "SNAPSHOT: {{matrix}} docker Linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
@@ -103,7 +103,7 @@ steps:
           - x-pack/packetbeat
 
       ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "x-pack/agentbeat Packaging"
+      - label: "SNAPSHOT: x-pack/agentbeat"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
@@ -121,7 +121,7 @@ steps:
     ## Only for release
     if: build.branch =~ /\d+\.\d+/
     steps:
-      - label: "{{matrix}} Packaging"
+      - label: "STAGING: {{matrix}}"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
@@ -149,7 +149,7 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      - label: "{{matrix}} Packaging docker Linux/arm64"
+      - label: "STAGING: {{matrix}} docker Linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
@@ -175,7 +175,7 @@ steps:
           - x-pack/packetbeat
 
         ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "x-pack/agentbeat Packaging"
+      - label: "STAGING: x-pack/agentbeat"
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
