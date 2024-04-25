@@ -204,7 +204,9 @@ steps:
           .buildkite/scripts/packaging/prepare-release-manager.sh
           .buildkite/scripts/dra.sh
         agents:
-          provider: "gcp"
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
 
       - label: DRA Staging
         ## Only for release branches
@@ -220,4 +222,6 @@ steps:
           .buildkite/scripts/packaging/prepare-release-manager.sh
           .buildkite/scripts/dra.sh
         agents:
-          provider: "gcp"
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
