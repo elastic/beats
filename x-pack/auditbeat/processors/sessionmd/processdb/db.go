@@ -550,6 +550,11 @@ func setSameAsProcess(process *types.Process) {
 	}
 }
 
+func (db *DB) HasProcess(pid uint32) bool {
+	_, ok := db.processes[pid]
+	return ok
+}
+
 func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 	db.mutex.RLock()
 	defer db.mutex.RUnlock()

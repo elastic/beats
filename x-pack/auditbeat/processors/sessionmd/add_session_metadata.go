@@ -93,18 +93,23 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 }
 
 func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
-	_, err := ev.GetValue(p.config.PIDField)
+	pi, err := ev.GetValue(p.config.PIDField)
 	if err != nil {
 		// Do not attempt to enrich events without PID; it's not a supported event
 		return ev, nil //nolint:nilerr // Running on events without PID is expected
 	}
 
-	err = p.provider.UpdateDB(ev)
+	pid, err := pidToUInt32(pi)
+	if err != nil {
+		return ev, nil  //nolint:nilerr // Running on events with a different PID type is not a processor error
+	}
+
+	err = p.provider.UpdateDB(ev, pid)
 	if err != nil {
 		return ev, err
 	}
 
-	result, err := p.enrich(ev)
+	result, err := p.enrich(ev, pid)
 	if err != nil {
 		return ev, fmt.Errorf("enriching event: %w", err)
 	}
@@ -116,19 +121,12 @@ func (p *addSessionMetadata) String() string {
 		processorName, p.config.Backend, p.config.PIDField)
 }
 
-func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
-	pidIf, err := ev.GetValue(p.config.PIDField)
-	if err != nil {
-		return nil, err
-	}
-	pid, err := pidToUInt32(pidIf)
-	if err != nil {
-		return nil, fmt.Errorf("cannot parse pid field '%s': %w", p.config.PIDField, err)
-	}
-
+func (p *addSessionMetadata) enrich(ev *beat.Event, pid uint32) (*beat.Event, error) {
 	fullProcess, err := p.db.GetProcess(pid)
 	if err != nil {
-		return nil, fmt.Errorf("pid %v not found in db: %w", pid, err)
+		m := fmt.Errorf("pid %v not found in db: %w", pid, err)
+//		p.logger.Warnf("%s", m)
+		return nil, m
 	}
 
 	processMap := fullProcess.ToMap()
