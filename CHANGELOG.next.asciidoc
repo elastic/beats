@@ -10,7 +10,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
-
 *Auditbeat*
 
 
@@ -156,6 +155,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix Azure Monitor 429 error by causing metricbeat to retry the request again. {pull}38294[38294]
 - Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
 - rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
+- Fix timeout caused by the retrival of which indices are hidden {pull}39165[39165]
 
 *Osquerybeat*
 
@@ -183,6 +183,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update to Go 1.21.9. {pulk}38727[38727]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
+- Introduce log message for not supported annotations for Hints based autodiscover {pull}38213[38213]
+
 
 *Auditbeat*
 
@@ -329,7 +331,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
-
 
 
 
