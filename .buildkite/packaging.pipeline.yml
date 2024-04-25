@@ -22,7 +22,7 @@ steps:
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         commands:
           - make build/distributions/dependencies.csv
           - make beats-dashboards
@@ -38,7 +38,7 @@ steps:
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         commands:
           - make build/distributions/dependencies.csv
           - make beats-dashboards
@@ -57,7 +57,7 @@ steps:
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - build/distributions/**/*
         matrix:
@@ -129,7 +129,7 @@ steps:
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - build/distributions/**/*
         matrix:
