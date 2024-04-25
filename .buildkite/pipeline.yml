@@ -1,8 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 env:
-  SETUP_GVM_VERSION: 'v0.5.0'
-  GO_VERSION_CHOCO: "1.20.5"
+  SETUP_GVM_VERSION: 'v0.5.2'
   LINUX_AGENT_IMAGE: "golang:${GO_VERSION}"
   WINDOWS_AGENT_IMAGE: "family/ci-windows-2022"
 
@@ -32,7 +31,7 @@ steps:
       provider: "gcp"
       cpu: "8"
       memory: "4G"
-  
+
   - label: "Container-System tests"
     key: linux-container-test
     command: ".buildkite/scripts/system-container-tests.sh"
