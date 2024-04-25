@@ -25,9 +25,11 @@ function release_manager_login {
 
 release_manager_login
 
+chmod -R a+r build/*
+chmod -R a+w build
 
 echo "+++ :hammer_and_pick: Listing $BRANCH $DRA_WORKFLOW DRA artifacts..."
-set +x
+set -x
 docker run --rm \
         --name release-manager \
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
@@ -42,10 +44,10 @@ docker run --rm \
         --workflow "${DRA_WORKFLOW}" \
         --version "${BEAT_VERSION}" \
         --artifact-set "main"
-set -x
+set +x
 
 echo "+++ :hammer_and_pick: Publishing $BRANCH $DRA_WORKFLOW DRA artifacts..."
-set +x
+set -x
 docker run --rm \
         --name release-manager \
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
@@ -61,4 +63,4 @@ docker run --rm \
         --version "${BEAT_VERSION}" \
         --artifact-set "main" \
         ${DRY_RUN}
-set -x
+set +x
