@@ -718,6 +718,10 @@ type mockWatcher struct {
 	handler kubernetes.ResourceEventHandler
 }
 
+func (m *mockWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
+	return m.handler
+}
+
 func (m *mockWatcher) Start() error {
 	return nil
 }
@@ -728,10 +732,6 @@ func (m *mockWatcher) Stop() {
 
 func (m *mockWatcher) AddEventHandler(r kubernetes.ResourceEventHandler) {
 	m.handler = r
-}
-
-func (m *mockWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
-	return m.handler
 }
 
 func (m *mockWatcher) Store() cache.Store {
