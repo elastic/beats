@@ -29,7 +29,7 @@ steps:
   - group: "x-pack/filebeat Mandatory Tests"
     key: "x-pack-filebeat-mandatory-tests"
     steps:
-      - label: ":linux: Ubuntu Unit Tests"
+      - label: ":ubuntu: Unit Tests"
         key: "x-pack-filebeat-mandatory-linux-unit-test"
         command: |
           cd x-pack/filebeat
@@ -48,7 +48,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Ubuntu Unit Tests"
 
-      - label: ":go: Go (MODULE) Integration Tests"
+      - label: ":ubuntu: Go Integration Tests"
         key: "x-pack-filebeat-mandatory-int-test"
         command: |
           set -euo pipefail
@@ -94,7 +94,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Python (MODULE) Integration Tests"
 
-      - label: ":windows: Windows 2022 Unit Tests"
+      - label: ":windows: Win-2022 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -113,9 +113,9 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Windows 2022 Unit Tests"
+              context: "x-pack/filebeat: Win-2022 Unit Tests"
 
-      - label: ":windows: Windows 2016 Unit Tests"
+      - label: ":windows: Win-2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -134,32 +134,13 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Windows 2016 Unit Tests"
-
-      - label: ":linux: Ubuntu ARM Unit Tests"
-        key: "x-pack-filebeat-mandatory-linux-arm-unit-test"
-        command: |
-          cd x-pack/filebeat
-          mage build unitTest
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths:
-          - "x-pack/filebeat/build/*.xml"
-          - "x-pack/filebeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/filebeat: Ubuntu ARM Unit Tests"
+              context: "x-pack/filebeat: Win-2016 Unit Tests"
 
   - group: "x-pack/filebeat Extended Windows Tests"
     key: "x-pack-filebeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
     steps:
-      - label: ":windows: Windows 2019 Unit Tests"
+      - label: ":windows: Win-2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -178,9 +159,9 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Windows 2019 Unit Tests"
+              context: "x-pack/filebeat: Win-2019 Unit Tests"
 
-      - label: ":windows: Windows 10 Unit Tests"
+      - label: ":windows: Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -199,9 +180,9 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Windows 10 Unit Tests"
+              context: "x-pack/filebeat: Win 10 Unit Tests"
 
-      - label: ":windows: Windows 11 Unit Tests"
+      - label: ":windows: Win 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
           mage build unitTest
@@ -220,17 +201,37 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Windows 11 Unit Tests"
+              context: "x-pack/filebeat: Win 11 Unit Tests"
 
   - group: "x-pack/filebeat Extended Tests"
     key: "x-pack-filebeat-extended-tests"
     steps:
+
+      - label: ":ubuntu: ARM Unit Tests"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+        key: "x-pack-filebeat-mandatory-linux-arm-unit-test"
+        command: |
+          set -euo pipefail
+          cd x-pack/filebeat
+          mage build unitTest
+        agents:
+          provider: "aws"
+          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - "x-pack/filebeat/build/*.xml"
+          - "x-pack/filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/filebeat: Ubuntu ARM Unit Tests"
+
       - label: ":mac: MacOS x86_64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(macOS).*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
-          cd x-pack/filebeat && mage build unitTest
+          cd x-pack/filebeat
+          mage build unitTest
         retry:
           automatic:
             - limit: 3
@@ -250,7 +251,8 @@ steps:
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
-          cd x-pack/filebeat && mage build unitTest
+          cd x-pack/filebeat
+          mage build unitTest
         retry:
           automatic:
             - limit: 3
@@ -264,7 +266,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: MacOS arm64 Unit Tests"
 
-      - label: ":linux: Cloud (MODULE) Tests"
+      - label: ":ubuntu: Cloud (MODULE) Tests"
         key: "x-pack-filebeat-extended-cloud-test"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
         command: |
@@ -292,7 +294,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Cloud (MODULE) Tests"
 
-      - label: ":linux: Cloud AWS (MODULE) Tests"
+      - label: ":ubuntu: Cloud AWS (MODULE) Tests"
         key: "x-pack-filebeat-extended-cloud-test-aws"
         skip: "Skip test until fixed https://github.com/elastic/beats/issues/36425"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
