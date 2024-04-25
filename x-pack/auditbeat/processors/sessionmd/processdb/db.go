@@ -7,6 +7,7 @@
 package processdb
 
 import (
+	"container/heap"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -24,11 +25,6 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/timeutils"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/types"
 	"github.com/elastic/elastic-agent-libs/logp"
-)
-
-const (
-	reaperInterval = 15 * time.Second // run the reaper process at this interval
-	removalTime    = 10 * time.Second // remove processes that have been exited longer than this
 )
 
 type TTYType int
@@ -192,7 +188,7 @@ type DB struct {
 	entryLeaderRelationships map[uint32]uint32
 	procfs                   procfs.Reader
 	stopChan                 chan struct{}
-	removalCandidates        map[uint32]removalCandidate
+	removalCandidates        rcHeap
 }
 
 func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
@@ -206,8 +202,8 @@ func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
 		entryLeaders:             make(map[uint32]EntryType),
 		entryLeaderRelationships: make(map[uint32]uint32),
 		procfs:                   reader,
-		stopChan: make(chan struct{}),
-		removalCandidates: make(map[uint32]removalCandidate),
+		stopChan:                 make(chan struct{}),
+		removalCandidates:        make(rcHeap, 0),
 	}
 	db.startReaper()
 	return &db, nil
@@ -425,10 +421,11 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	}
 	process.ExitCode = exit.ExitCode
 	db.processes[pid] = process
-	db.removalCandidates[pid] = removalCandidate{
+	heap.Push(&db.removalCandidates, removalCandidate{
+		pid:       pid,
 		startTime: process.PIDs.StartTimeNS,
-		exitTime: time.Now(),
-	}
+		exitTime:  time.Now(),
+	})
 }
 
 func interactiveFromTTY(tty types.TTYDev) bool {
@@ -742,9 +739,41 @@ func (db *DB) Close() {
 	close(db.stopChan)
 }
 
+const (
+	reaperInterval = 10 * time.Second // run the reaper process at this interval
+	removalTime    = 5 * time.Second // remove processes that have been exited longer than this
+)
+
 type removalCandidate struct {
+	pid       uint32
 	exitTime  time.Time
 	startTime uint64
+}
+
+type rcHeap []removalCandidate
+
+func (h rcHeap) Len() int {
+	return len(h)
+}
+
+func (h rcHeap) Less(i, j int) bool {
+	return h[i].exitTime.Sub(h[j].exitTime) < 0
+}
+
+func (h rcHeap) Swap(i, j int) {
+	h[i], h[j] = h[j], h[i]
+}
+
+func (h *rcHeap) Push(x any) {
+	*h = append(*h, x.(removalCandidate))
+}
+
+func (h *rcHeap) Pop() any {
+	old := *h
+	n := len(old)
+	x := old[n-1]
+	*h = old[0 : n-1]
+	return x
 }
 
 // The reaper will remove exited processes from the DB a short time after they have exited.
@@ -755,38 +784,52 @@ type removalCandidate struct {
 // it cannot have a relation with any other longer-lived processes. If this processor is ported to other OSs, this
 // assumption will need to be revisited.
 func (db *DB) startReaper() {
-	ticker := time.NewTicker(reaperInterval)
-	defer ticker.Stop()
-	now := time.Now()
+	go func(db *DB) {
+		ticker := time.NewTicker(reaperInterval)
+		defer ticker.Stop()
 
-	go func() {
+		h := &db.removalCandidates
+		heap.Init(h)
 		for {
 			select {
 			case <-ticker.C:
 				db.mutex.Lock()
-				for pid, c := range db.removalCandidates {
-					p, ok := db.processes[pid]
+				now := time.Now()
+				for {
+					if len(db.removalCandidates) == 0 {
+						break
+					}
+					v := heap.Pop(h)
+					c, ok := v.(removalCandidate)
 					if !ok {
-						db.logger.Debugf("pid %v was candidate for removal, but was already removed", pid)
-						delete(db.removalCandidates, pid)
+						db.logger.Errorf("unexpected item in removal queue: \"%v\"", v)
+						continue
+					}
+					if now.Sub(c.exitTime) < removalTime {
+						// this candidate hasn't reached its timeout, put it back on the heap
+						// everything else will have a later exit time, so end this run
+						heap.Push(h, c)
+						break
+					}
+					p, ok := db.processes[c.pid]
+					if !ok {
+						db.logger.Errorf("pid %v was candidate for removal, but was already removed", c.pid)
 						continue
 					}
 					if p.PIDs.StartTimeNS != c.startTime {
-						db.logger.Debugf("start times of removal candidate %v differs, not removing (PID had been reused?)", pid)
-						delete(db.removalCandidates, pid)
+						// this could happen if the PID has already rolled over and reached this PID again.
+						db.logger.Debugf("start times of removal candidate %v differs, not removing (PID had been reused?)", c.pid)
 						continue
 					}
-					if now.Sub(c.exitTime) > removalTime {
-						delete(db.processes, pid)
-						delete(db.entryLeaders, pid)
-						delete(db.entryLeaderRelationships, pid)
-						delete(db.removalCandidates, pid)
-					}
+					db.logger.Errorf("Removing pid %v", c.pid)
+					delete(db.processes, c.pid)
+					delete(db.entryLeaders, c.pid)
+					delete(db.entryLeaderRelationships, c.pid)
 				}
 				db.mutex.Unlock()
 			case <-db.stopChan:
 				return
 			}
 		}
-	}()
+	}(db)
 }
