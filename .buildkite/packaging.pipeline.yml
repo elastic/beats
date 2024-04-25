@@ -8,7 +8,7 @@ env:
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
-  PLATFORMS_AMD: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+  PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
   PLATFORMS_ARM: "linux/arm64"
 
 steps:
@@ -16,13 +16,13 @@ steps:
     key: dashboards
     steps:
       - label: Snapshot dashboards
-        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main' || build.env('RUN_SNAPSHOT')==true"
+        if: build.branch =~ /^\d+\.\d+$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
         key: dashboards-snapshot
         # TODO: container with go and make
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         commands:
           - make build/distributions/dependencies.csv
           - make beats-dashboards
@@ -32,13 +32,13 @@ steps:
           - build/distributions/**/*
 
       - label: Staging dashboards
-        if: "build.branch =~ /\\d+\\.\\d+/"
+        if: build.branch =~ /^\d+\.\d+$/
         key: dashboards-staging
         # TODO: container with go and make
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         commands:
           - make build/distributions/dependencies.csv
           - make beats-dashboards
@@ -46,19 +46,18 @@ steps:
           - build/distributions/**/*
 
   - group: Packaging snapshot
-    if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main' || build.env('RUN_SNAPSHOT')==true"
+    if: build.branch =~ /^\d+\.\d+$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
     key: packaging-snapshot
     steps:
-      # x86
-      - label: ":ubuntu: {{matrix}}/Packaging Linux Snapshot"
+      - label: "SNAPSHOT: {{matrix}}"
         env:
-          PLATFORMS: "${PLATFORMS_AMD}"
+          PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - build/distributions/**/*
         matrix:
@@ -78,8 +77,7 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      ## ARM
-      - label: ":linux: {{matrix}}/Packaging Linux arm64 Snapshot"
+      - label: "SNAPSHOT: {{matrix}} docker Linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
@@ -105,36 +103,33 @@ steps:
           - x-pack/packetbeat
 
       ## Agentbeat needs more CPUs because it builds many other beats
-      - label: ":ubuntu: {{matrix}}/Packaging Linux Snapshot"
+      - label: "SNAPSHOT: x-pack/agentbeat"
         env:
-          PLATFORMS: "${PLATFORMS_AMD}"
+          PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
-        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
         artifact_paths:
           - build/distributions/**/*
-        matrix:
-          - x-pack/agentbeat
 
-  - group: Packaging staging
+  - group: Packaging Staging
 
     key: packaging-staging
     ## Only for release
-    if: "build.branch =~ /\\d+\\.\\d+/"
+    if: build.branch =~ /^\d+\.\d+$/
     steps:
-      # x86
-      - label: ":ubuntu: {{matrix}}/Packaging Linux Staging"
+      - label: "STAGING: {{matrix}}"
         env:
-          PLATFORMS: "${PLATFORMS_AMD}"
+          PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
         artifact_paths:
           - build/distributions/**/*
         matrix:
@@ -154,8 +149,7 @@ steps:
           - x-pack/packetbeat
           - x-pack/winlogbeat
 
-      ## ARM
-      - label: ":linux: {{matrix}}/Packaging Linux arm64 Staging"
+      - label: "STAGING: {{matrix}} docker Linux/arm64"
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
@@ -181,26 +175,24 @@ steps:
           - x-pack/packetbeat
 
         ## Agentbeat needs more CPUs because it builds many other beats
-      - label: ":ubuntu: {{matrix}}/Packaging Linux Snapshot"
+      - label: "STAGING: x-pack/agentbeat"
         env:
-          PLATFORMS: "${PLATFORMS_AMD}"
-          SNAPSHOT: true
-        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+          PLATFORMS: "${PLATFORMS}"
+          SNAPSHOT: false
+        command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
         artifact_paths:
           - build/distributions/**/*
-        matrix:
-          - x-pack/agentbeat
 
   - group: DRA publish
     key: dra
     steps:
       - label: DRA Snapshot
         ## Only for release branches and main
-        if: "build.branch =~ /\\d+\\.\\d+/ || build.branch == 'main' || build.env('RUN_SNAPSHOT')==true"
+        if: build.branch =~ /^\d+\.\d+$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
         key: dra-snapshot
         env:
           DRA_WORKFLOW: snapshot
@@ -212,11 +204,13 @@ steps:
           .buildkite/scripts/packaging/prepare-release-manager.sh
           .buildkite/scripts/dra.sh
         agents:
-          provider: "gcp"
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
 
       - label: DRA Staging
         ## Only for release branches
-        if: "build.branch =~ /\\d+\\.\\d+/"
+        if: build.branch =~ /^\d+\.\d+$/
         key: dra-staging
         env:
           DRA_WORKFLOW: staging
@@ -228,4 +222,6 @@ steps:
           .buildkite/scripts/packaging/prepare-release-manager.sh
           .buildkite/scripts/dra.sh
         agents:
-          provider: "gcp"
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
