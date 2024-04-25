@@ -13,7 +13,7 @@ import (
 
 const (
 	reaperInterval = 30 * time.Second // run the reaper process at this interval
-	removalTimeout    = 10 * time.Second // remove processes that have been exited longer than this
+	removalTimeout = 10 * time.Second // remove processes that have been exited longer than this
 )
 
 type removalCandidate struct {
@@ -37,7 +37,10 @@ func (h rcHeap) Swap(i, j int) {
 }
 
 func (h *rcHeap) Push(x any) {
-	*h = append(*h, x.(removalCandidate))
+	v, ok := x.(removalCandidate)
+	if ok {
+		*h = append(*h, v)
+	}
 }
 
 func (h *rcHeap) Pop() any {
