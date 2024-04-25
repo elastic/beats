@@ -32,7 +32,7 @@ steps:
           - build/distributions/**/*
 
       - label: Staging dashboards
-        if: "build.branch =~ /\\d+\\.\\d+/"
+        if: build.branch =~ /\d+\.\d+/
         key: dashboards-staging
         # TODO: container with go and make
         agents:
