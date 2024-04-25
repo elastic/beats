@@ -28,6 +28,22 @@ release_manager_login
 echo "+++ Changing permissions for the BK API commands"
 sudo chown -R :1000 build/distributions/
 
+echo "+++ :hammer_and_pick: Listing $BRANCH $DRA_WORKFLOW DRA artifacts..."
+docker run --rm \
+        --name release-manager \
+        -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
+        -e VAULT_ROLE_ID="${VAULT_ROLE_ID_SECRET}" \
+        -e VAULT_SECRET_ID="${VAULT_SECRET}" \
+        --mount type=bind,readonly=false,src="${PWD}",target=/artifacts \
+        docker.elastic.co/infra/release-manager:latest \
+        cli list \
+        --project "beats" \
+        --branch "${BRANCH}" \
+        --commit "${BUILDKITE_COMMIT}" \
+        --workflow "${DRA_WORKFLOW}" \
+        --version "${BEAT_VERSION}" \
+        --artifact-set "main"
+
 echo "+++ :hammer_and_pick: Publishing $BRANCH $DRA_WORKFLOW DRA artifacts..."
 docker run --rm \
         --name release-manager \
