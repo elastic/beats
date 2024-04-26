@@ -5,6 +5,11 @@
 <titleabbrev>add_docker_metadata</titleabbrev>
 ++++
 
+ifeval::["{beatname_lc}"=="packetbeat"]
+There is currently extremely limited capability for using {beatname_lc} to monitor and coexist with containers, for example Docker, Podman, or Kubernetes). Using the `add_docker_metadata` processor with {beatname_lc} is not recommended nor supported. 
+endif::[]
+
+ifeval::["{beatname_lc}"!="packetbeat"]
 The `add_docker_metadata` processor annotates each event with relevant metadata
 from Docker containers. At startup it detects a docker environment and caches the metadata.
 The events are annotated with Docker metadata, only if a valid configuration
@@ -88,3 +93,4 @@ forget metadata for a container, 60s by default.
 
 `labels.dedot`:: (Optional) Default to be false. If set to true, replace dots in
  labels with `_`.
+endif::[]
