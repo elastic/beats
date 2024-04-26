@@ -8,6 +8,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	stderr "errors"
 	"fmt"
 	"io"
 	"net"
@@ -152,6 +153,7 @@ func (s *Server) Start() error {
 	if ok := certPool.AppendCertsFromPEM(s.ca.Crt()); !ok {
 		return errors.New("failed to append root CA", errors.TypeSecurity)
 	}
+	//nolint:gosec // G402: TLS MinVersion too low.
 	creds := credentials.NewTLS(&tls.Config{
 		ClientAuth:     tls.RequireAndVerifyClientCert,
 		ClientCAs:      certPool,
@@ -984,7 +986,7 @@ type actionResult struct {
 }
 
 func reportableErr(err error) bool {
-	if err == io.EOF {
+	if stderr.Is(err, io.EOF) {
 		return false
 	}
 	s, ok := status.FromError(err)
