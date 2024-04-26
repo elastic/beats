@@ -28,6 +28,7 @@ steps:
           - make beats-dashboards
         env:
           SNAPSHOT: true
+          DEV: true
         artifact_paths:
           - build/distributions/**/*
 
@@ -42,6 +43,9 @@ steps:
         commands:
           - make build/distributions/dependencies.csv
           - make beats-dashboards
+        env:
+          SNAPSHOT: false
+          DEV: false
         artifact_paths:
           - build/distributions/**/*
 
@@ -53,6 +57,7 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
+          DEV: true
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
@@ -82,6 +87,7 @@ steps:
           PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
           SNAPSHOT: true
+          DEV: true
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: "aws"
@@ -103,7 +109,6 @@ steps:
           - x-pack/packetbeat
 
   - group: Packaging staging
-
     key: packaging-staging
     ## Only for release
     if: build.branch =~ /^\d+\.\d+$$/
@@ -112,6 +117,7 @@ steps:
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: gcp
@@ -141,6 +147,7 @@ steps:
           PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
           SNAPSHOT: false
+          DEV: false
         command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
         agents:
           provider: "aws"
@@ -175,7 +182,7 @@ steps:
           - dashboards-snapshot
         command: |
           buildkite-agent artifact download "build/**/*" . 
-          .buildkite/scripts/packaging/prepare-release-manager.sh
+          .buildkite/scripts/packaging/prepare-release-manager.sh snapshot
           .buildkite/scripts/dra.sh
         agents:
           provider: gcp
@@ -193,7 +200,7 @@ steps:
           - dashboards-staging
         command: |
           buildkite-agent artifact download "build/**" .
-          .buildkite/scripts/packaging/prepare-release-manager.sh
+          .buildkite/scripts/packaging/prepare-release-manager.sh staging
           .buildkite/scripts/dra.sh
         agents:
           provider: gcp
