@@ -24,12 +24,6 @@ set -euo pipefail
 # e.g. define `DRA_BRANCH="main"` and `RUN_SNAPSHOT="true"` under Options/Environment Variables in the Buildkite UI after clicking new Build
 BRANCH="${DRA_BRANCH:="${BUILDKITE_BRANCH:=""}"}"
 
-if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" ]]; then
-    BRANCH=main
-    DRY_RUN="--dry-run"
-    echo "+++ Running in PR and setting branch main and --dry-run"
-fi
-
 BEAT_VERSION=$(make get-version)
 
 CI_DRA_ROLE_PATH="kv/ci-shared/release/dra-role"
@@ -45,13 +39,12 @@ function release_manager_login {
 set +x
 release_manager_login
 
-
 # required by the release-manager docker image, otherwise we hit:
 # > java.io.FileNotFoundException: /artifacts/build/distributions/agentbeat/agentbeat-8.15.0-SNAPSHOT-darwin-x86_64.tar.gz.sha512 (Permission denied)
 chmod -R a+r build/*
 chmod -R a+w build
 
-echo "+++ :clipboard: Listing DRA artifacts for branch [$BRANCH] using workflow [$DRA_WORKFLOW]"
+echo "+++ :clipboard: Listing DRA artifacts for version [$BEAT_VERSION], branch [$BRANCH] and workflow [$DRA_WORKFLOW]"
 set +x
 docker run --rm \
         --name release-manager \
@@ -68,7 +61,7 @@ docker run --rm \
         --version "${BEAT_VERSION}" \
         --artifact-set "main"
 
-echo "+++ :hammer_and_pick: Publishing DRA artifacts for branch [$BRANCH] using workflow [$DRA_WORKFLOW] and DRY_RUN: [$DRY_RUN]"
+echo "+++ :hammer_and_pick: Publishing DRA artifacts for version [$BEAT_VERSION], branch [$BRANCH], workflow [$DRA_WORKFLOW] and DRY_RUN: [$DRY_RUN]"
 
 set +x
 docker run --rm \
