@@ -84,25 +84,62 @@ func (watcher *recursiveWatcher) ErrorChannel() <-chan error {
 	return watcher.inner.Errors
 }
 
+func (watcher *recursiveWatcher) watchFile(path string, info os.FileInfo) error {
+	var err error
+	if info == nil {
+		info, err = os.Lstat(path)
+		if err != nil {
+			return err
+		}
+	}
+
+	if info.IsDir() {
+		if err = watcher.tree.AddDir(path); err != nil {
+			return err
+		}
+
+		if err = watcher.inner.Add(path); err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	return watcher.tree.AddFile(path)
+}
+
 func (watcher *recursiveWatcher) addRecursive(path string) error {
 	if watcher.isExcludedPath(path) {
 		return nil
 	}
 
+	if err := watcher.watchFile(path, nil); err != nil {
+		return fmt.Errorf("failed adding watcher to '%s': %w", path, err)
+	}
+
 	var errs multierror.Errors
-	err := filepath.Walk(path, func(path string, info os.FileInfo, fnErr error) error {
-		if watcher.isExcludedPath(path) {
+	err := filepath.Walk(path, func(walkPath string, info os.FileInfo, fnErr error) error {
+		if walkPath == path {
+			return nil
+		}
+
+		if watcher.isExcludedPath(walkPath) {
 			return nil
 		}
 
 		if fnErr != nil {
+<<<<<<< HEAD
 			errs = append(errs, errors.Wrapf(fnErr, "error walking path '%s'", path))
+=======
+			errs = append(errs, fmt.Errorf("error walking path '%s': %w", walkPath, fnErr))
+>>>>>>> 074f2219da ([Auditbeat/FIM/fsnotify]: remove time window where a child file operation of a directory can be lost (#39133))
 			// If FileInfo is not nil, the directory entry can be processed
 			// even if there was some error
 			if info == nil {
 				return nil
 			}
 		}
+<<<<<<< HEAD
 		var err error
 		if info.IsDir() {
 			if err = watcher.tree.AddDir(path); err == nil {
@@ -113,8 +150,14 @@ func (watcher *recursiveWatcher) addRecursive(path string) error {
 			}
 		} else {
 			err = watcher.tree.AddFile(path)
+=======
+
+		if err := watcher.watchFile(walkPath, info); err != nil {
+			errs = append(errs, fmt.Errorf("failed adding watcher to '%s': %w", walkPath, err))
+>>>>>>> 074f2219da ([Auditbeat/FIM/fsnotify]: remove time window where a child file operation of a directory can be lost (#39133))
 		}
-		return err
+
+		return nil
 	})
 	watcher.log.Debugw("Added recursive watch", "path", path)
 
