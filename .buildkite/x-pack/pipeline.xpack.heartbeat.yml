@@ -2,7 +2,8 @@
 name: "beats-xpack-heartbeat"
 
 env:
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
@@ -11,7 +12,6 @@ env:
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
-  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
@@ -81,7 +81,7 @@ steps:
         skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
         command: |
           Set-Location -Path x-pack/heartbeat
-          mage build unitTest
+          mage build test
         retry:
           automatic:
            - limit: 3
@@ -98,6 +98,7 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Windows 2016 Unit Tests"
 
+      # Doesn't exist in Jenkins
       - label: ":windows: Windows 2022 Unit Tests"
         key: "mandatory-win-2022-unit-tests"
         skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
@@ -124,6 +125,7 @@ steps:
     key: "x-pack-heartbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
     skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
+
     steps:
       - label: ":windows: Windows 10 Unit Tests"
         command: |
@@ -146,6 +148,7 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Windows 10 Unit Tests"
 
+      # Doesn't exist in Jenkins
       - label: ":windows: Windows 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/heartbeat
@@ -191,6 +194,7 @@ steps:
   - group: "x-pack/heartbeat MacOS Extended Tests"
     key: "x-pack-heartbeat-extended-tests-macos"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+
     steps:
       - label: ":mac: MacOS x86_64 Unit Tests"
         command: |
@@ -235,6 +239,9 @@ steps:
               context: "x-pack/heartbeat: MacOS arm64 Extended Tests"
 
   - wait: ~
+    # with PRs, we want to run packaging only if mandatory tests succeed
+    # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in mandatory tests
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
       - step: "x-pack-heartbeat-mandatory-tests"
@@ -267,7 +274,7 @@ steps:
           mage package
         agents:
           provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         env:
           PLATFORMS: "linux/arm64"
