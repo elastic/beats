@@ -57,7 +57,7 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 	}
 
 	backfilledPIDs := db.ScrapeProcfs()
-	logger.Debugf("backfilled %d processes", len(backfilledPIDs))
+	logger.Infof("backfilled %d processes", len(backfilledPIDs))
 
 	var p provider.Provider
 
@@ -70,6 +70,9 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 			if err != nil {
 				return nil, fmt.Errorf("failed to create provider: %w", err)
 			}
+			logger.Info("backend=auto using procfs")
+		} else {
+			logger.Info("backend=auto using ebpf")
 		}
 	case "ebpf":
 		p, err = ebpf_provider.NewProvider(ctx, logger, db)
@@ -109,6 +112,11 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 		return ev, fmt.Errorf("enriching event: %w", err)
 	}
 	return result, nil
+}
+
+func (p *addSessionMetadata) Close() error {
+	p.db.Close()
+	return nil
 }
 
 func (p *addSessionMetadata) String() string {
