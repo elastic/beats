@@ -43,6 +43,9 @@ steps:
         commands:
           - make build/distributions/dependencies.csv
           - make beats-dashboards
+        env:
+          SNAPSHOT: false
+          DEV: false
         artifact_paths:
           - build/distributions/**/*
 
