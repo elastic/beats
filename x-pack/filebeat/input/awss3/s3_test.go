@@ -133,7 +133,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{})
-		states, err := newStates(inputCtx, store)
+		states, err := newStates(inputCtx.Logger, store)
 		require.NoError(t, err, "states creation must succeed")
 		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, s3ObjProc, states, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
 		receiver.Poll(ctx)
@@ -260,7 +260,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{})
-		states, err := newStates(inputCtx, store)
+		states, err := newStates(inputCtx.Logger, store)
 		require.NoError(t, err, "states creation must succeed")
 		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, s3ObjProc, states, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
 		receiver.Poll(ctx)

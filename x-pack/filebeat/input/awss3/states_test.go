@@ -121,13 +121,13 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 			if err != nil {
 				t.Fatalf("unexpected err: %v", err)
 			}
-			states, err := newStates(inputCtx, persistentStore)
+			states, err := newStates(inputCtx.Logger, persistentStore)
 			require.NoError(t, err, "states creation must succeed")
 			if test.statesEdit != nil {
 				test.statesEdit(states)
 			}
 			if test.shouldReload {
-				states, err = newStates(inputCtx, persistentStore)
+				states, err = newStates(inputCtx.Logger, persistentStore)
 				require.NoError(t, err, "states creation must succeed")
 			}
 

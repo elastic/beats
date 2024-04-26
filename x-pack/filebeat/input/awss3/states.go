@@ -8,8 +8,6 @@ import (
 	"strings"
 	"sync"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-
 	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -34,9 +32,9 @@ type states struct {
 }
 
 // newStates generates a new states registry.
-func newStates(ctx v2.Context, store *statestore.Store) (*states, error) {
+func newStates(log *logp.Logger, store *statestore.Store) (*states, error) {
 	states := &states{
-		log:    ctx.Logger.Named("states"),
+		log:    log.Named("states"),
 		states: map[string]state{},
 		store:  store,
 	}

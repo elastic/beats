@@ -139,7 +139,7 @@ func (in *s3Input) runS3Poller(
 	}
 	defer persistentStore.Close()
 
-	states, err := newStates(inputContext, persistentStore)
+	states, err := newStates(inputContext.Logger, persistentStore)
 	if err != nil {
 		return fmt.Errorf("can not start persistent store: %w", err)
 	}
