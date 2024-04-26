@@ -44,7 +44,14 @@ steps:
 
       - label: ":ubuntu: Xpack/Dockerlogbeat Go Integration Tests"
         key: "mandatory-int-test"
-        command: "cd x-pack/dockerlogbeat && mage goIntegTest"
+        command: |
+          set -euo pipefail
+          # defines the MODULE env var based on what's changed in a PR
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet x-pack/dockerlogbeat
+          echo "~~~ Running tests with env var MODULE=$$MODULE"
+          cd x-pack/dockerlogbeat
+          mage goIntegTest
         env:
           MODULE: $MODULE
         retry:
