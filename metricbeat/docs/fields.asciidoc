@@ -45985,6 +45985,16 @@ type: keyword
 
 --
 
+*`kubernetes.container.status.last_terminated_timestamp`*::
++
+--
+Last terminated time (epoch) of the container
+
+
+type: double
+
+--
+
 
 *`kubernetes.container.cpu.limit.cores`*::
 +
