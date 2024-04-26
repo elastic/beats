@@ -18,6 +18,7 @@
 package syslog
 
 import (
+	"bytes"
 	"math"
 	"time"
 )
@@ -71,7 +72,17 @@ type event struct {
 	nanosecond int
 	year       int
 	loc        *time.Location
+	sequence   int
+
+	// RFC 5424
+	version   int
+	appName   string
+	msgID     string
+	processID string
+	data      EventData
 }
+
+type EventData map[string]map[string]string
 
 // newEvent() return a new event.
 func newEvent() *event {
@@ -196,7 +207,12 @@ func (s *event) Year() int {
 
 // SetMessage sets the message.
 func (s *event) SetMessage(b []byte) {
-	s.message = string(b)
+	// remove BOM
+	if b[0] == 0xef && b[1] == 0xbb && b[2] == 0xbf {
+		s.message = string(b[3:])
+	} else {
+		s.message = string(b)
+	}
 }
 
 // Message returns the message.
@@ -269,6 +285,16 @@ func (s *event) HasPid() bool {
 	return s.pid > 0
 }
 
+func (s *event) SetSequence(b []byte) {
+	s.sequence = bytesToInt(b)
+}
+
+// Sequence returns the sequence number of the event when defined,
+// otherwise return -1.
+func (s *event) Sequence() int {
+	return s.sequence
+}
+
 // SetNanoSecond sets the nanosecond.
 func (s *event) SetNanosecond(b []byte) {
 	// We assume that we receive a byte array representing a nanosecond, this might not be
@@ -283,6 +309,39 @@ func (s *event) SetNanosecond(b []byte) {
 // NanoSecond returns the nanosecond.
 func (s *event) Nanosecond() int {
 	return s.nanosecond
+}
+
+// SetVersion sets the version.
+func (s *event) SetVersion(version []byte) {
+	s.version = bytesToInt(version)
+}
+
+func (s *event) Version() int {
+	return s.version
+}
+
+func (s *event) SetAppName(appname []byte) {
+	s.appName = string(appname)
+}
+
+func (s *event) AppName() string {
+	return s.appName
+}
+
+func (s *event) SetMsgID(msgID []byte) {
+	s.msgID = string(msgID)
+}
+
+func (s *event) MsgID() string {
+	return s.msgID
+}
+
+func (s *event) SetProcID(processID []byte) {
+	s.processID = string(processID)
+}
+
+func (s *event) ProcID() string {
+	return s.processID
 }
 
 // Timestamp return the timestamp in UTC.
@@ -306,9 +365,39 @@ func (s *event) Timestamp(timezone *time.Location) time.Time {
 	).UTC()
 }
 
+func (s *event) IsDataEmpty() bool {
+	if s.data == nil {
+		return true
+	}
+	return len(s.data) == 0
+}
+
 // IsValid returns true if the date and the message are present.
 func (s *event) IsValid() bool {
-	return s.day != -1 && s.hour != -1 && s.minute != -1 && s.second != -1 && s.message != ""
+	return s.day != -1 && s.hour != -1 && s.minute != -1 && s.second != -1 && (s.message != "" || !s.IsDataEmpty())
+}
+
+func (s *event) SetData(id string, key string, data []byte, start int, end int, bs []int) {
+	var v string
+
+	// param value escape
+	// https://tools.ietf.org/html/rfc5424#section-6.3.3
+	if len(bs) > 0 {
+		buf := bytes.NewBufferString("")
+		for _, i := range bs {
+			buf.Write(data[start:i])
+			start = i + 1
+		}
+		if start <= end {
+			buf.Write(data[start:end])
+		}
+		v = buf.String()
+	} else {
+		v = string(data[start:end])
+	}
+	if element, ok := s.data[id]; ok {
+		element[key] = v
+	}
 }
 
 // BytesToInt takes a variable length of bytes and assume ascii chars and convert it to int, this is
@@ -325,7 +414,7 @@ func bytesToInt(b []byte) int {
 
 func skipLeadZero(b []byte) []byte {
 	if len(b) > 1 && b[0] == '0' {
-		return b[1:len(b)]
+		return b[1:]
 	}
 	return b
 }
