@@ -153,10 +153,10 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 }
 
 const (
-	maxWaitLimit      = 500 * time.Millisecond // Maximum time UpdateDB will wait for process
-	combinedWaitLimit = 5 * time.Second        // Multiple UpdateDB calls will wait up to this amount within resetDuration
-	backoffDuration   = 2 * time.Second        // UpdateDB will stop waiting for processes for this time
-	resetDuration     = 7 * time.Second        // After this amount of times with no backoffs, the combinedWait will be reset
+	maxWaitLimit      = 200 * time.Millisecond // Maximum time UpdateDB will wait for process
+	combinedWaitLimit = 2 * time.Second        // Multiple UpdateDB calls will wait up to this amount within resetDuration
+	backoffDuration   = 10 * time.Second       // UpdateDB will stop waiting for processes for this time
+	resetDuration     = 5 * time.Second        // After this amount of times with no backoffs, the combinedWait will be reset
 )
 
 var (
@@ -168,13 +168,14 @@ var (
 )
 
 // With ebpf, process events are pushed to the DB by the above goroutine, so this doesn't actually update the DB.
-// It does try sync the processor and ebpf events, so that the process is in the process db before continuing.
+// It does to try sync the processor and ebpf events, so that the process is in the process db before continuing.
+//
 // It's possible that the event to enrich arrives before the process is inserted into the DB. In that case, this
 // will block continuing the enrichment until the process is seen (or the timeout is reached).
 //
 // If for some reason a lot of time has been spent waiting for missing processes, this also has a backoff timer during
 // which it will continue without waiting for missing events to arrive, so the processor doesn't become overly backed-up
-// waiting for these processes.
+// waiting for these processes, at the cost of possibly not enriching some processes.
 func (s prvdr) UpdateDB(ev *beat.Event, pid uint32) error {
 	if s.db.HasProcess(pid) {
 		return nil
