@@ -112,6 +112,37 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 	return nil
 }
 
+func (in *s3Input) runQueueReader(
+	ctx context.Context,
+	inputContext v2.Context,
+	pipeline beat.Pipeline,
+) error {
+	configRegion := in.config.RegionName
+	urlRegion, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
+	if err != nil && configRegion == "" {
+		// Only report an error if we don't have a configured region
+		// to fall back on.
+		return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
+	} else if configRegion != "" && configRegion != urlRegion {
+		inputContext.Logger.Warnf("configured region disagrees with queue_url region (%q != %q): using %q", configRegion, urlRegion, urlRegion)
+	}
+
+	in.awsConfig.Region = urlRegion
+
+	// Create SQS receiver and S3 notification processor.
+	receiver, err := in.createSQSReceiver(inputContext, pipeline)
+	if err != nil {
+		return fmt.Errorf("failed to initialize sqs receiver: %w", err)
+	}
+	defer receiver.metrics.Close()
+
+	// Poll metrics periodically in the background
+	go pollSqsWaitingMetric(ctx, receiver)
+
+	receiver.Receive(ctx)
+	return nil
+}
+
 func (in *s3Input) runS3Poller(
 	ctx context.Context,
 	inputContext v2.Context,
@@ -145,44 +176,13 @@ func (in *s3Input) runS3Poller(
 	}
 
 	// Create S3 receiver and S3 notification processor.
-	poller, err := in.createS3Lister(inputContext, ctx, client, states)
+	poller, err := in.createS3Poller(inputContext, ctx, client, states)
 	if err != nil {
 		return fmt.Errorf("failed to initialize s3 poller: %w", err)
 	}
 	defer poller.metrics.Close()
 
 	poller.Poll(ctx)
-	return nil
-}
-
-func (in *s3Input) runQueueReader(
-	ctx context.Context,
-	inputContext v2.Context,
-	pipeline beat.Pipeline,
-) error {
-	configRegion := in.config.RegionName
-	urlRegion, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
-	if err != nil && configRegion == "" {
-		// Only report an error if we don't have a configured region
-		// to fall back on.
-		return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
-	} else if configRegion != "" && configRegion != urlRegion {
-		inputContext.Logger.Warnf("configured region disagrees with queue_url region (%q != %q): using %q", configRegion, urlRegion, urlRegion)
-	}
-
-	in.awsConfig.Region = urlRegion
-
-	// Create SQS receiver and S3 notification processor.
-	receiver, err := in.createSQSReceiver(inputContext, pipeline)
-	if err != nil {
-		return fmt.Errorf("failed to initialize sqs receiver: %w", err)
-	}
-	defer receiver.metrics.Close()
-
-	// Poll metrics periodically in the background
-	go pollSqsWaitingMetric(ctx, receiver)
-
-	receiver.Receive(ctx)
 	return nil
 }
 
@@ -246,7 +246,7 @@ func (n nonAWSBucketResolver) ResolveEndpoint(region string, options s3.Endpoint
 	return awssdk.Endpoint{URL: n.endpoint, SigningRegion: region, HostnameImmutable: true, Source: awssdk.EndpointSourceCustom}, nil
 }
 
-func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, client beat.Client, states *states) (*s3Poller, error) {
+func (in *s3Input) createS3Poller(ctx v2.Context, cancelCtx context.Context, client beat.Client, states *states) (*s3Poller, error) {
 	var bucketName string
 	var bucketID string
 	if in.config.NonAWSBucketName != "" {
