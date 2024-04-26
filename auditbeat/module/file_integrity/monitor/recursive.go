@@ -18,6 +18,7 @@
 package monitor
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -128,33 +129,16 @@ func (watcher *recursiveWatcher) addRecursive(path string) error {
 		}
 
 		if fnErr != nil {
-<<<<<<< HEAD
-			errs = append(errs, errors.Wrapf(fnErr, "error walking path '%s'", path))
-=======
 			errs = append(errs, fmt.Errorf("error walking path '%s': %w", walkPath, fnErr))
->>>>>>> 074f2219da ([Auditbeat/FIM/fsnotify]: remove time window where a child file operation of a directory can be lost (#39133))
 			// If FileInfo is not nil, the directory entry can be processed
 			// even if there was some error
 			if info == nil {
 				return nil
 			}
 		}
-<<<<<<< HEAD
-		var err error
-		if info.IsDir() {
-			if err = watcher.tree.AddDir(path); err == nil {
-				if err = watcher.inner.Add(path); err != nil {
-					errs = append(errs, errors.Wrapf(err, "failed adding watcher to '%s'", path))
-					return nil
-				}
-			}
-		} else {
-			err = watcher.tree.AddFile(path)
-=======
 
 		if err := watcher.watchFile(walkPath, info); err != nil {
 			errs = append(errs, fmt.Errorf("failed adding watcher to '%s': %w", walkPath, err))
->>>>>>> 074f2219da ([Auditbeat/FIM/fsnotify]: remove time window where a child file operation of a directory can be lost (#39133))
 		}
 
 		return nil
