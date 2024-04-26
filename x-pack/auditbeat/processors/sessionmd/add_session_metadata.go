@@ -105,13 +105,12 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 	// Do not enrich failed syscalls, as there was no actual process change related to it
 	v, err := ev.GetValue("auditd.result")
 	if err == nil && v == "fail" {
-		p.logger.Errorf("!!!! got failed syscall")
 		return ev, nil
 	}
 
 	pid, err := pidToUInt32(pi)
 	if err != nil {
-		return ev, nil  //nolint:nilerr // Running on events with a different PID type is not a processor error
+		return ev, nil //nolint:nilerr // Running on events with a different PID type is not a processor error
 	}
 
 	err = p.provider.UpdateDB(ev, pid)
@@ -119,7 +118,7 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 		return ev, err
 	}
 
-	result, err := p.enrich(ev, pid)
+	result, err := p.enrich(ev)
 	if err != nil {
 		return ev, fmt.Errorf("enriching event: %w", err)
 	}
@@ -136,7 +135,16 @@ func (p *addSessionMetadata) String() string {
 		processorName, p.config.Backend, p.config.PIDField)
 }
 
-func (p *addSessionMetadata) enrich(ev *beat.Event, pid uint32) (*beat.Event, error) {
+func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
+	pidIf, err := ev.GetValue(p.config.PIDField)
+	if err != nil {
+		return nil, err
+	}
+	pid, err := pidToUInt32(pidIf)
+	if err != nil {
+		return nil, fmt.Errorf("cannot parse pid field '%s': %w", p.config.PIDField, err)
+	}
+
 	fullProcess, err := p.db.GetProcess(pid)
 	if err != nil {
 		m := fmt.Errorf("pid %v not found in db: %w", pid, err)

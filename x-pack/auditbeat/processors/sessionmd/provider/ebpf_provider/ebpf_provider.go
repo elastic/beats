@@ -23,7 +23,6 @@ import (
 const (
 	name      = "add_session_metadata"
 	eventMask = ebpf.EventMask(ebpfevents.EventTypeProcessFork | ebpfevents.EventTypeProcessExec | ebpfevents.EventTypeProcessExit)
-
 )
 
 type prvdr struct {
@@ -154,32 +153,34 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 }
 
 const (
-	maxWaitLimit = 500 * time.Millisecond
-	combinedWaitLimit = 5 * time.Second
-	backoffDuration = 2 * time.Second
-	resetDuration = 7 * time.Second
+	maxWaitLimit      = 500 * time.Millisecond // Maximum time UpdateDB will wait for process
+	combinedWaitLimit = 5 * time.Second        // Multiple UpdateDB calls will wait up to this amount within resetDuration
+	backoffDuration   = 2 * time.Second        // UpdateDB will stop waiting for processes for this time
+	resetDuration     = 7 * time.Second        // After this amount of times with no backoffs, the combinedWait will be reset
 )
 
 var (
-	combinedWait = 0 * time.Millisecond
-	inBackoff = false
-	backoffStart = time.Now()
-	since = time.Now()
+	combinedWait   = 0 * time.Millisecond
+	inBackoff      = false
+	backoffStart   = time.Now()
+	since          = time.Now()
 	backoffSkipped = 0
 )
 
-
+// With ebpf, process events are pushed to the DB by the above goroutine, so this doesn't actually update the DB.
+// It does try sync the processor and ebpf events, so that the process is in the process db before continuing.
+// It's possible that the event to enrich arrives before the process is inserted into the DB. In that case, this
+// will block continuing the enrichment until the process is seen (or the timeout is reached).
+//
+// If for some reason a lot of time has been spent waiting for missing processes, this also has a backoff timer during
+// which it will continue without waiting for missing events to arrive, so the processor doesn't become overly backed-up
+// waiting for these processes.
 func (s prvdr) UpdateDB(ev *beat.Event, pid uint32) error {
-	// With ebpf, process events are pushed to the DB by the above goroutine, but the event push could happen
-	// after the processor receives the event document to enrich (since auditd and ebpfevents are running separately
-	// and not synced).
-	// Instead of updating the DB, this will ensure that the DB was updated asynchronously before continuing.
 	if s.db.HasProcess(pid) {
 		return nil
 	}
 
 	now := time.Now()
-	// To avoid the processors getting backed up, there is a bockoff window with no waiting
 	if inBackoff {
 		if now.Sub(backoffStart) > backoffDuration {
 			s.logger.Warnf("ended backoff, skipped %d processes", backoffSkipped)
@@ -206,21 +207,21 @@ func (s prvdr) UpdateDB(ev *beat.Event, pid uint32) error {
 
 	start := now
 	nextWait := 5 * time.Millisecond
-	for	{
-		waited := time.Now().Sub(start)
+	for {
+		waited := time.Since(start)
 		if s.db.HasProcess(pid) {
-			s.logger.Warnf("***** Got process that was missing after %v", waited)
+			s.logger.Debugf("got process that was missing after %v", waited)
 			combinedWait = combinedWait + waited
 			return nil
 		}
 		if waited >= maxWaitLimit {
-			m := fmt.Errorf("!!!!did not get process %v after %vs", pid, waited.Seconds())
-			s.logger.Warnf("%s", m)
+			e := fmt.Errorf("process %v was not seen after %v", pid, waited)
+			s.logger.Warnf("%w", e)
 			combinedWait = combinedWait + waited
-			return m
+			return e
 		}
 		time.Sleep(nextWait)
-		if nextWait * 2 + waited > maxWaitLimit {
+		if nextWait*2+waited > maxWaitLimit {
 			nextWait = maxWaitLimit - waited
 		} else {
 			nextWait = nextWait * 2
