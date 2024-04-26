@@ -50,7 +50,7 @@ release_manager_login
 chmod -R a+r build/*
 chmod -R a+w build
 
-echo "+++ :clipboard: Listing DRA artifacts for branch: $BRANCH using workflow: $DRA_WORKFLOW"
+echo "+++ :clipboard: Listing DRA artifacts for branch [$BRANCH] using workflow[$DRA_WORKFLOW]"
 docker run --rm \
         --name release-manager \
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
@@ -66,7 +66,7 @@ docker run --rm \
         --version "${BEAT_VERSION}" \
         --artifact-set "main"
 
-echo "+++ :hammer_and_pick: Publishing DRA artifacts for branch: $BRANCH using workflow: $DRA_WORKFLOW"
+echo "+++ :hammer_and_pick: Publishing DRA artifacts for branch [$BRANCH] using workflow [$DRA_WORKFLOW] and DRY_RUN: [$DRY_RUN]"
 docker run --rm \
         --name release-manager \
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
