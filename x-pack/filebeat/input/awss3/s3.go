@@ -8,11 +8,18 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/url"
+	"strings"
 	"sync"
 	"time"
 
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/ratelimit"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 
+	"github.com/elastic/beats/v7/filebeat/beater"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
@@ -29,6 +36,12 @@ type s3ObjectPayload struct {
 	objectState     state
 }
 
+type s3PollerInput struct {
+	config    config
+	awsConfig awssdk.Config
+	store     beater.StateStore
+}
+
 type s3Poller struct {
 	numberOfWorkers      int
 	bucket               string
@@ -43,6 +56,148 @@ type s3Poller struct {
 	s3ObjectHandler      s3ObjectHandlerFactory
 	states               *states
 	workersProcessingMap *sync.Map
+}
+
+func (in *s3PollerInput) Name() string { return inputName }
+
+func (in *s3PollerInput) Test(ctx v2.TestContext) error {
+	return nil
+}
+
+func newS3PollerInput(
+	config config,
+	awsConfig awssdk.Config,
+	store beater.StateStore,
+) (v2.Input, error) {
+	return &s3PollerInput{
+		config:    config,
+		awsConfig: awsConfig,
+		store:     store,
+	}, nil
+}
+
+func (in *s3PollerInput) Run(
+	inputContext v2.Context,
+	pipeline beat.Pipeline,
+) error {
+	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+
+	// Create client for publishing events and receive notification of their ACKs.
+	client, err := pipeline.ConnectWith(beat.ClientConfig{
+		EventListener: awscommon.NewEventACKHandler(),
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: boolPtr(false),
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create pipeline client: %w", err)
+	}
+	defer client.Close()
+
+	// Connect to the registry and create our states lookup
+	persistentStore, err := in.store.Access()
+	if err != nil {
+		return fmt.Errorf("can not access persistent store: %w", err)
+	}
+	defer persistentStore.Close()
+
+	states, err := newStates(inputContext.Logger, persistentStore)
+	if err != nil {
+		return fmt.Errorf("can not start persistent store: %w", err)
+	}
+
+	// Create S3 receiver and S3 notification processor.
+	poller, err := in.createS3Poller(inputContext, ctx, client, states)
+	if err != nil {
+		return fmt.Errorf("failed to initialize s3 poller: %w", err)
+	}
+	defer poller.metrics.Close()
+
+	poller.Poll(ctx)
+	return nil
+}
+
+func (in *s3PollerInput) createS3Poller(ctx v2.Context, cancelCtx context.Context, client beat.Client, states *states) (*s3Poller, error) {
+	var bucketName string
+	var bucketID string
+	if in.config.NonAWSBucketName != "" {
+		bucketName = in.config.NonAWSBucketName
+		bucketID = bucketName
+	} else if in.config.BucketARN != "" {
+		bucketName = getBucketNameFromARN(in.config.BucketARN)
+		bucketID = in.config.BucketARN
+	}
+
+	s3Client := s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
+		if in.config.NonAWSBucketName != "" {
+			o.EndpointResolver = nonAWSBucketResolver{endpoint: in.config.AWSConfig.Endpoint}
+		}
+
+		if in.config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+		o.UsePathStyle = in.config.PathStyle
+
+		o.Retryer = retry.NewStandard(func(so *retry.StandardOptions) {
+			so.MaxAttempts = 5
+			// Recover quickly when requests start working again
+			so.NoRetryIncrement = 100
+		})
+	})
+	regionName, err := getRegionForBucket(cancelCtx, s3Client, bucketName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get AWS region for bucket: %w", err)
+	}
+
+	originalAwsConfigRegion := in.awsConfig.Region
+
+	in.awsConfig.Region = regionName
+
+	if regionName != originalAwsConfigRegion {
+		s3Client = s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
+			if in.config.NonAWSBucketName != "" {
+				o.EndpointResolver = nonAWSBucketResolver{endpoint: in.config.AWSConfig.Endpoint}
+			}
+
+			if in.config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+			o.UsePathStyle = in.config.PathStyle
+		})
+	}
+
+	s3API := &awsS3API{
+		client: s3Client,
+	}
+
+	log := ctx.Logger.With("bucket", bucketID)
+	log.Infof("number_of_workers is set to %v.", in.config.NumberOfWorkers)
+	log.Infof("bucket_list_interval is set to %v.", in.config.BucketListInterval)
+	log.Infof("bucket_list_prefix is set to %v.", in.config.BucketListPrefix)
+	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
+
+	fileSelectors := in.config.FileSelectors
+	if len(in.config.FileSelectors) == 0 {
+		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
+	}
+	metrics := newInputMetrics(ctx.ID, nil, in.config.MaxNumberOfMessages)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors, in.config.BackupConfig)
+	s3Poller := newS3Poller(log.Named("s3_poller"),
+		metrics,
+		s3API,
+		client,
+		s3EventHandlerFactory,
+		states,
+		bucketID,
+		in.config.BucketListPrefix,
+		in.awsConfig.Region,
+		getProviderFromDomain(in.config.AWSConfig.Endpoint, in.config.ProviderOverride),
+		in.config.NumberOfWorkers,
+		in.config.BucketListInterval)
+
+	return s3Poller, nil
 }
 
 func newS3Poller(log *logp.Logger,
@@ -208,4 +363,81 @@ func (p *s3Poller) Poll(ctx context.Context) {
 
 		_ = timed.Wait(ctx, p.bucketPollInterval)
 	}
+}
+
+func getRegionForBucket(ctx context.Context, s3Client *s3.Client, bucketName string) (string, error) {
+	getBucketLocationOutput, err := s3Client.GetBucketLocation(ctx, &s3.GetBucketLocationInput{
+		Bucket: awssdk.String(bucketName),
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	// Region us-east-1 have a LocationConstraint of null.
+	if len(getBucketLocationOutput.LocationConstraint) == 0 {
+		return "us-east-1", nil
+	}
+
+	return string(getBucketLocationOutput.LocationConstraint), nil
+}
+
+func getBucketNameFromARN(bucketARN string) string {
+	bucketMetadata := strings.Split(bucketARN, ":")
+	bucketName := bucketMetadata[len(bucketMetadata)-1]
+	return bucketName
+}
+
+func getProviderFromDomain(endpoint string, ProviderOverride string) string {
+	if ProviderOverride != "" {
+		return ProviderOverride
+	}
+	if endpoint == "" {
+		return "aws"
+	}
+	// List of popular S3 SaaS providers
+	providers := map[string]string{
+		"amazonaws.com":          "aws",
+		"c2s.sgov.gov":           "aws",
+		"c2s.ic.gov":             "aws",
+		"amazonaws.com.cn":       "aws",
+		"backblazeb2.com":        "backblaze",
+		"cloudflarestorage.com":  "cloudflare",
+		"wasabisys.com":          "wasabi",
+		"digitaloceanspaces.com": "digitalocean",
+		"dream.io":               "dreamhost",
+		"scw.cloud":              "scaleway",
+		"googleapis.com":         "gcp",
+		"cloud.it":               "arubacloud",
+		"linodeobjects.com":      "linode",
+		"vultrobjects.com":       "vultr",
+		"appdomain.cloud":        "ibm",
+		"aliyuncs.com":           "alibaba",
+		"oraclecloud.com":        "oracle",
+		"exo.io":                 "exoscale",
+		"upcloudobjects.com":     "upcloud",
+		"ilandcloud.com":         "iland",
+		"zadarazios.com":         "zadara",
+	}
+
+	parsedEndpoint, _ := url.Parse(endpoint)
+	for key, provider := range providers {
+		// support endpoint with and without scheme (http(s)://abc.xyz, abc.xyz)
+		constraint := parsedEndpoint.Hostname()
+		if len(parsedEndpoint.Scheme) == 0 {
+			constraint = parsedEndpoint.Path
+		}
+		if strings.HasSuffix(constraint, key) {
+			return provider
+		}
+	}
+	return "unknown"
+}
+
+type nonAWSBucketResolver struct {
+	endpoint string
+}
+
+func (n nonAWSBucketResolver) ResolveEndpoint(region string, options s3.EndpointResolverOptions) (awssdk.Endpoint, error) {
+	return awssdk.Endpoint{URL: n.endpoint, SigningRegion: region, HostnameImmutable: true, Source: awssdk.EndpointSourceCustom}, nil
 }
