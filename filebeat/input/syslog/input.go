@@ -94,38 +94,36 @@ func init() {
 }
 
 // syslogFormatter 兼容syslog数据格式
-func syslogFormatter(event *util.Data) *util.Data {
+func syslogFormatter(event beat.Event) beat.Event {
+	message, _ := event.Fields.GetValue("message")
+	event.Fields.Put("data", message)
 
-	fields := event.Event.Fields
-	fields["data"] = fields["message"]
-
-	// 标准syslog RFC3164 格式
-	if _, ok := fields["log"]; ok {
-		address := fields["log"].(common.MapStr)["source"].(common.MapStr)["address"].(string)
+	if _, ok := event.Fields["log"]; ok {
+		address := event.Fields["log"].(common.MapStr)["source"].(common.MapStr)["address"].(string)
 		arr := strings.Split(address, ":")
 		if len(arr) > 1 {
 			port, err := strconv.Atoi(arr[1])
 			if err != nil {
 				port = 0
 			}
-			fields["log"].(common.MapStr)["source"].(common.MapStr)["address"] = arr[0]
-			fields["log"].(common.MapStr)["source"].(common.MapStr)["port"] = port
+			event.Fields["log"].(common.MapStr)["source"].(common.MapStr)["address"] = arr[0]
+			event.Fields["log"].(common.MapStr)["source"].(common.MapStr)["port"] = port
 		} else {
-			fields["log"].(common.MapStr)["source"].(common.MapStr)["port"] = 0
+			event.Fields["log"].(common.MapStr)["source"].(common.MapStr)["port"] = 0
 		}
 	} else {
-		fields["event"] = common.MapStr{}
-		fields["process"] = common.MapStr{}
-		fields["log"] = common.MapStr{}
-		fields["syslog"] = common.MapStr{}
+		event.Fields["event"] = common.MapStr{}
+		event.Fields["process"] = common.MapStr{}
+		event.Fields["log"] = common.MapStr{}
+		event.Fields["syslog"] = common.MapStr{}
 	}
 
-	err := fields.Delete("message")
+	err := event.Fields.Delete("message")
 	log := logp.NewLogger("syslog")
 	if err != nil {
 		log.Errorw("key not found: %v", err)
 	}
-	event.Event.Fields = fields
+
 	return event
 }
 
@@ -317,29 +315,16 @@ func NewInput(
 
 	forwarder := harvester.NewForwarder(out)
 	cb := func(data []byte, metadata inputsource.NetworkMetadata) {
-		ev := newEvent()
-		Parse(data, ev)
-		var d *util.Data
-		if !ev.IsValid() {
-			log.Errorw("can't parse event as syslog rfc3164", "message", string(data))
-			// On error revert to the raw bytes content, we need a better way to communicate this kind of
-			// error upstream this should be a global effort.
-			d = &util.Data{
-				Event: beat.Event{
-					Timestamp: time.Now(),
-					Meta: common.MapStr{
-						"truncated": metadata.Truncated,
-					},
-					Fields: common.MapStr{
-						"message": string(data),
-					},
-				},
-			}
+		var ev beat.Event
+
+		if IsRFC5424Format(data) {
+			ev = parseAndCreateEvent5424(data, metadata, time.UTC, log)
 		} else {
-			event := createEvent(ev, metadata, time.Local, log)
-			d = &util.Data{Event: *event}
+			ev = parseAndCreateEvent3164(data, metadata, time.UTC, log)
 		}
-		d = syslogFormatter(d)
+		log.Error(ev)
+
+		var d = &util.Data{Event: syslogFormatter(ev)}
 		filterAccess := true
 		if config.SyslogFilters != nil {
 			filterAccess = Filter(d, &config)
@@ -404,7 +389,7 @@ func (p *Input) Wait() {
 	p.Stop()
 }
 
-func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) *beat.Event {
+func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) beat.Event {
 	f := common.MapStr{
 		"message": strings.TrimRight(ev.Message(), "\n"),
 		"log": common.MapStr{
@@ -454,7 +439,7 @@ func createEvent(ev *event, metadata inputsource.NetworkMetadata, timezone *time
 	f["event"] = event
 	f["process"] = process
 
-	return &beat.Event{
+	return beat.Event{
 		Timestamp: ev.Timestamp(timezone),
 		Meta: common.MapStr{
 			"truncated": metadata.Truncated,
@@ -468,4 +453,42 @@ func mapValueToName(v int, m mapper) (string, error) {
 		return "", errors.Errorf("value out of bound: %d", v)
 	}
 	return m[v], nil
+}
+
+func parseAndCreateEvent3164(data []byte, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) beat.Event {
+	ev := newEvent()
+	ParserRFC3164(data, ev)
+	if !ev.IsValid() {
+		log.Errorw("can't parse event as syslog rfc3164", "message", string(data))
+		return newBeatEvent(time.Now(), metadata, common.MapStr{
+			"message": string(data),
+		})
+	}
+	return createEvent(ev, metadata, timezone, log)
+}
+
+func parseAndCreateEvent5424(data []byte, metadata inputsource.NetworkMetadata, timezone *time.Location, log *logp.Logger) beat.Event {
+	ev := newEvent()
+	ParserRFC5424(data, ev)
+	if !ev.IsValid() {
+		log.Errorw("can't parse event as syslog rfc5424", "message", string(data))
+		return newBeatEvent(time.Now(), metadata, common.MapStr{
+			"message": string(data),
+		})
+	}
+	return createEvent(ev, metadata, timezone, log)
+}
+
+func newBeatEvent(timestamp time.Time, metadata inputsource.NetworkMetadata, fields common.MapStr) beat.Event {
+	event := beat.Event{
+		Timestamp: timestamp,
+		Meta: common.MapStr{
+			"truncated": metadata.Truncated,
+		},
+		Fields: fields,
+	}
+	if metadata.RemoteAddr != nil {
+		event.Fields.Put("log.source.address", metadata.RemoteAddr.String())
+	}
+	return event
 }
