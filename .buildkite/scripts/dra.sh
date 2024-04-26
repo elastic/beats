@@ -9,7 +9,6 @@
 #     DRY_RUN=""
 # fi
 
-
 # TODO: delete the conditional below (and replace it with the above, uncommented out, section) after Jenkins packaging has been stopped
 if [[ "$DRY_RUN" == "false" ]]; then
     echo "~~~ Running in publish mode"
@@ -43,14 +42,17 @@ function release_manager_login {
   export VAULT_ADDR_SECRET VAULT_ROLE_ID_SECRET VAULT_SECRET
 }
 
+set +x
 release_manager_login
+
 
 # required by the release-manager docker image, otherwise we hit:
 # > java.io.FileNotFoundException: /artifacts/build/distributions/agentbeat/agentbeat-8.15.0-SNAPSHOT-darwin-x86_64.tar.gz.sha512 (Permission denied)
 chmod -R a+r build/*
 chmod -R a+w build
 
-echo "+++ :clipboard: Listing DRA artifacts for branch [$BRANCH] using workflow[$DRA_WORKFLOW]"
+echo "+++ :clipboard: Listing DRA artifacts for branch [$BRANCH] using workflow [$DRA_WORKFLOW]"
+set +x
 docker run --rm \
         --name release-manager \
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
@@ -67,6 +69,8 @@ docker run --rm \
         --artifact-set "main"
 
 echo "+++ :hammer_and_pick: Publishing DRA artifacts for branch [$BRANCH] using workflow [$DRA_WORKFLOW] and DRY_RUN: [$DRY_RUN]"
+
+set +x
 docker run --rm \
         --name release-manager \
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
