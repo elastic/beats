@@ -604,7 +604,7 @@
 			"name": "kube-scheduler",
 			"status": {
 				"last_terminated_reason": "Error",
-				"last_terminated_reason_timestamp": 1713935860,
+				"last_terminated_timestamp": 1713935860,
 				"phase": "running",
 				"ready": true,
 				"restarts": 0

@@ -271,6 +271,53 @@
     },
     {
         "container": {
+            "id": "cd52120cda244a98ed01e9259381cbcd439bc087115d93c7573bada504dbb620",
+            "image": {
+                "name": "registry.k8s.io/kube-scheduler-amd64:v1.29.1"
+            },
+            "runtime": "containerd"
+        },
+        "event": {
+            "dataset": "kubernetes.container",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "container": {
+                "cpu": {
+                    "request": {
+                        "cores": 0.1
+                    }
+                },
+                "id": "cd52120cda244a98ed01e9259381cbcd439bc087115d93c7573bada504dbb620",
+                "name": "kube-scheduler",
+                "status": {
+                    "last_terminated_reason": "Error",
+                    "last_terminated_timestamp": 1713935860,
+                    "phase": "running",
+                    "ready": true,
+                    "restarts": 0
+                }
+            },
+            "namespace": "kube-system",
+            "node": {
+                "name": "kind-control-plane"
+            },
+            "pod": {
+                "name": "kube-scheduler-kind-control-plane"
+            }
+        },
+        "metricset": {
+            "name": "state_container",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "container": {
             "id": "be5708afe249a81a67f812bfda962b8c60022ec47250f9e84a2bcfd0d74e94bc",
             "image": {
                 "name": "docker.io/curlimages/curl:latest"
@@ -663,53 +710,6 @@
             },
             "pod": {
                 "name": "coredns-76f75df574-v8skx"
-            }
-        },
-        "metricset": {
-            "name": "state_container",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "container": {
-            "id": "cd52120cda244a98ed01e9259381cbcd439bc087115d93c7573bada504dbb620",
-            "image": {
-                "name": "registry.k8s.io/kube-scheduler-amd64:v1.29.1"
-            },
-            "runtime": "containerd"
-        },
-        "event": {
-            "dataset": "kubernetes.container",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "container": {
-                "cpu": {
-                    "request": {
-                        "cores": 0.1
-                    }
-                },
-                "id": "cd52120cda244a98ed01e9259381cbcd439bc087115d93c7573bada504dbb620",
-                "name": "kube-scheduler",
-                "status": {
-                    "last_terminated_reason": "Error",
-                    "last_terminated_reason_timestamp": 1713935860,
-                    "phase": "running",
-                    "ready": true,
-                    "restarts": 0
-                }
-            },
-            "namespace": "kube-system",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "name": "kube-scheduler-kind-control-plane"
             }
         },
         "metricset": {
