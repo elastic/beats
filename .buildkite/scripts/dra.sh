@@ -1,8 +1,28 @@
 #!/usr/bin/env bash
 
-## TODO: Set to empty string when Jenkins is disabled
-if [[ "$DRY_RUN" == "false" ]]; then echo "--- Running in publish mode"; DRY_RUN=""; else echo "--- Running in dry-run mode"; DRY_RUN="--dry-run"; fi
+# TODO: uncomment out below when Jenkins packaging has been stopped
+# if [[ "$DRY_RUN" == "true" ]]; then
+#     echo "~~~ Running in dry-run mode -- will NOT publish artifacts"
+#     DRY_RUN="--dry-run"
+# else
+#     echo "~~~ Running in publish mode"
+#     DRY_RUN=""
+# fi
+
+
+# TODO: delete the conditional below (and replace it with the above, uncommented out, section) after Jenkins packaging has been stopped
+if [[ "$DRY_RUN" == "false" ]]; then
+    echo "~~~ Running in publish mode"
+    DRY_RUN=""
+else
+    echo "~~~ Running in dry-run mode -- will NOT publish artifacts"
+    DRY_RUN="--dry-run"
+fi
+
 set -euo pipefail
+
+# DRA_BRANCH can be used for manually testing packaging with PRs
+# e.g. define `DRA_BRANCH="main"` and `RUN_SNAPSHOT="true"` under Options/Environment Variables in the Buildkite UI after clicking new Build
 BRANCH="${DRA_BRANCH:="${BUILDKITE_BRANCH:=""}"}"
 
 if [[ "${BUILDKITE_PULL_REQUEST:="false"}" != "false" ]]; then
@@ -25,11 +45,12 @@ function release_manager_login {
 
 release_manager_login
 
+# required by the release-manager docker image, otherwise we hit:
+# > java.io.FileNotFoundException: /artifacts/build/distributions/agentbeat/agentbeat-8.15.0-SNAPSHOT-darwin-x86_64.tar.gz.sha512 (Permission denied)
 chmod -R a+r build/*
 chmod -R a+w build
 
-echo "+++ :hammer_and_pick: Listing $BRANCH $DRA_WORKFLOW DRA artifacts..."
-set -x
+echo "+++ :clipboard: Listing DRA artifacts for branch: $BRANCH using workflow: $DRA_WORKFLOW"
 docker run --rm \
         --name release-manager \
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
@@ -44,10 +65,8 @@ docker run --rm \
         --workflow "${DRA_WORKFLOW}" \
         --version "${BEAT_VERSION}" \
         --artifact-set "main"
-set +x
 
-echo "+++ :hammer_and_pick: Publishing $BRANCH $DRA_WORKFLOW DRA artifacts..."
-set -x
+echo "+++ :hammer_and_pick: Publishing DRA artifacts for branch: $BRANCH using workflow: $DRA_WORKFLOW"
 docker run --rm \
         --name release-manager \
         -e VAULT_ADDR="${VAULT_ADDR_SECRET}" \
@@ -63,4 +82,3 @@ docker run --rm \
         --version "${BEAT_VERSION}" \
         --artifact-set "main" \
         ${DRY_RUN}
-set +x
