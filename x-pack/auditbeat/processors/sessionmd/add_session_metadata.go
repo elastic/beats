@@ -147,9 +147,9 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 
 	fullProcess, err := p.db.GetProcess(pid)
 	if err != nil {
-		m := fmt.Errorf("pid %v not found in db: %w", pid, err)
-		p.logger.Errorf("%v", m)
-		return nil, m
+		e := fmt.Errorf("pid %v not found in db: %w", pid, err)
+		p.logger.Errorf("%v", e)
+		return nil, e
 	}
 
 	processMap := fullProcess.ToMap()
