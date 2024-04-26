@@ -102,6 +102,13 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 		return ev, nil //nolint:nilerr // Running on events without PID is expected
 	}
 
+	// Do not enrich failed syscalls, as there was no actual process change related to it
+	v, err := ev.GetValue("auditd.result")
+	if err == nil && v == "fail" {
+		p.logger.Errorf("!!!! got failed syscall")
+		return ev, nil
+	}
+
 	err = p.provider.UpdateDB(ev)
 	if err != nil {
 		return ev, err
@@ -136,7 +143,9 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 
 	fullProcess, err := p.db.GetProcess(pid)
 	if err != nil {
-		return nil, fmt.Errorf("pid %v not found in db: %w", pid, err)
+		m := fmt.Errorf("pid %v not found in db: %w", pid, err)
+		p.logger.Errorf("%v", m)
+		return nil, m
 	}
 
 	processMap := fullProcess.ToMap()
