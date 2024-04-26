@@ -28,9 +28,6 @@
               ignore-tags-older-than: -1
               ignore-tags-newer-than: 30
           - named-branches:
-              - exact-name:
-                  name: 'main'
-                  case-sensitive: true
               - regex-name:
                   regex: '7\.1[6789]'
                   case-sensitive: true
