@@ -11,7 +11,7 @@ PRIVATE_CI_GCS_CREDENTIALS_PATH="kv/ci-shared/platform-ingest/gcp-platform-inges
 DOCKER_REGISTRY_SECRET_PATH="kv/ci-shared/platform-ingest/docker_registry_prod"
 GITHUB_TOKEN_VAULT_PATH="kv/ci-shared/platform-ingest/github_token"
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" || "$BUILDKITE_PIPELINE_SLUG" == "heartbeat" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats" || "$BUILDKITE_PIPELINE_SLUG" == "filebeat" || "$BUILDKITE_PIPELINE_SLUG" == "auditbeat" ]]; then
   source .buildkite/env-scripts/env.sh
   if [[ -z "${GO_VERSION-""}" ]]; then
     export GO_VERSION=$(cat "${WORKSPACE}/.go-version")
@@ -56,20 +56,15 @@ fi
 
 ENABLED_BEATS_PIPELINES_SLUGS=(
   "auditbeat"
+  "heartbeat"
   "filebeat"
-  "beats-libbeat"
-  "beats-packetbeat"
+  "beats-metricbeat"
   "beats-winlogbeat"
-  "beats-winlogbeat"
-  "beats-xpack-libbeat"
-  "beats-xpack-metricbeat"
-  "beats-xpack-packetbeat"
   "beats-xpack-winlogbeat"
   "beats-xpack-dockerlogbeat"
   "beats-xpack-auditbeat"
-  "beats-xpack-filebeat"
+  "beats-xpack-metricbeat"
   "beats-xpack-heartbeat"
-  "beats-xpack-osquerybeat"
   "deploy-k8s"
 )
 
@@ -80,8 +75,8 @@ for slug in "${ENABLED_BEATS_PIPELINES_SLUGS[@]}"; do
   fi
 done
 
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
-  if [[ "$BUILDKITE_STEP_KEY" == "extended-cloud-test" ]]; then
+if [[ "$BUILDKITE_PIPELINE_SLUG" == *"xpack-metricbeat"* || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-filebeat" ]]; then
+  if [[ "$BUILDKITE_STEP_KEY" == *"extended-cloud-test"* ]]; then
     BEATS_AWS_SECRET_KEY=$(retry_with_count 5 vault kv get -field secret_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})
     export BEATS_AWS_SECRET_KEY
     BEATS_AWS_ACCESS_KEY=$(retry_with_count 5 vault kv get -field access_key ${AWS_SERVICE_ACCOUNT_SECRET_PATH})

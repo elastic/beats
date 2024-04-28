@@ -7,6 +7,7 @@
 package processdb
 
 import (
+	"container/heap"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -71,6 +72,7 @@ const (
 	ttyMajor        = 4
 	consoleMaxMinor = 63
 	ttyMaxMinor     = 255
+	retryCount      = 2
 )
 
 type Process struct {
@@ -81,6 +83,7 @@ type Process struct {
 	Cwd      string
 	Env      map[string]string
 	Filename string
+	ExitCode int32
 }
 
 var (
@@ -184,6 +187,8 @@ type DB struct {
 	entryLeaders             map[uint32]EntryType
 	entryLeaderRelationships map[uint32]uint32
 	procfs                   procfs.Reader
+	stopChan                 chan struct{}
+	removalCandidates        rcHeap
 }
 
 func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
@@ -191,13 +196,17 @@ func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
 	if initError != nil {
 		return &DB{}, initError
 	}
-	return &DB{
+	db := DB{
 		logger:                   logp.NewLogger("processdb"),
 		processes:                make(map[uint32]Process),
 		entryLeaders:             make(map[uint32]EntryType),
 		entryLeaderRelationships: make(map[uint32]uint32),
 		procfs:                   reader,
-	}, nil
+		stopChan:                 make(chan struct{}),
+		removalCandidates:        make(rcHeap, 0),
+	}
+	db.startReaper()
+	return &db, nil
 }
 
 func (db *DB) calculateEntityIDv1(pid uint32, startTime time.Time) string {
@@ -229,6 +238,8 @@ func (db *DB) InsertFork(fork types.ProcessForkEvent) {
 
 	pid := fork.ChildPIDs.Tgid
 	ppid := fork.ParentPIDs.Tgid
+	db.scrapeAncestors(db.processes[pid])
+
 	if entry, ok := db.processes[ppid]; ok {
 		entry.PIDs = pidInfoFromProto(fork.ChildPIDs)
 		entry.Creds = credInfoFromProto(fork.Creds)
@@ -271,6 +282,7 @@ func (db *DB) InsertExec(exec types.ProcessExecEvent) {
 	}
 
 	db.processes[exec.PIDs.Tgid] = proc
+	db.scrapeAncestors(proc)
 	entryLeaderPID := db.evaluateEntryLeader(proc)
 	if entryLeaderPID != nil {
 		db.entryLeaderRelationships[exec.PIDs.Tgid] = *entryLeaderPID
@@ -402,9 +414,18 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	defer db.mutex.Unlock()
 
 	pid := exit.PIDs.Tgid
-	delete(db.processes, pid)
-	delete(db.entryLeaders, pid)
-	delete(db.entryLeaderRelationships, pid)
+	process, ok := db.processes[pid]
+	if !ok {
+		db.logger.Errorf("could not insert exit, pid %v not found in db", pid)
+		return
+	}
+	process.ExitCode = exit.ExitCode
+	db.processes[pid] = process
+	heap.Push(&db.removalCandidates, removalCandidate{
+		pid:       pid,
+		startTime: process.PIDs.StartTimeNS,
+		exitTime:  time.Now(),
+	})
 }
 
 func interactiveFromTTY(tty types.TTYDev) bool {
@@ -431,6 +452,9 @@ func fullProcessFromDBProcess(p Process) types.Process {
 	ret.Group.ID = strconv.FormatUint(uint64(egid), 10)
 	ret.Thread.Capabilities.Permitted, _ = capabilities.FromUint64(p.Creds.CapPermitted)
 	ret.Thread.Capabilities.Effective, _ = capabilities.FromUint64(p.Creds.CapEffective)
+	ret.TTY.CharDevice.Major = p.CTTY.Major
+	ret.TTY.CharDevice.Minor = p.CTTY.Minor
+	ret.ExitCode = p.ExitCode
 
 	return ret
 }
@@ -555,16 +579,37 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 
 	ret := fullProcessFromDBProcess(process)
 
-	if parent, ok := db.processes[process.PIDs.Ppid]; ok {
-		fillParent(&ret, parent)
+	if process.PIDs.Ppid != 0 {
+		for i := 0; i < retryCount; i++ {
+			if parent, ok := db.processes[process.PIDs.Ppid]; ok {
+				fillParent(&ret, parent)
+				break
+			}
+			db.logger.Debugf("failed to find %d in DB (parent of %d), attempting to scrape", process.PIDs.Ppid, pid)
+			db.scrapeAncestors(process)
+		}
 	}
 
-	if groupLeader, ok := db.processes[process.PIDs.Pgid]; ok {
-		fillGroupLeader(&ret, groupLeader)
+	if process.PIDs.Pgid != 0 {
+		for i := 0; i < retryCount; i++ {
+			if groupLeader, ok := db.processes[process.PIDs.Pgid]; ok {
+				fillGroupLeader(&ret, groupLeader)
+				break
+			}
+			db.logger.Debugf("failed to find %d in DB (group leader of %d), attempting to scrape", process.PIDs.Pgid, pid)
+			db.scrapeAncestors(process)
+		}
 	}
 
-	if sessionLeader, ok := db.processes[process.PIDs.Sid]; ok {
-		fillSessionLeader(&ret, sessionLeader)
+	if process.PIDs.Sid != 0 {
+		for i := 0; i < retryCount; i++ {
+			if sessionLeader, ok := db.processes[process.PIDs.Sid]; ok {
+				fillSessionLeader(&ret, sessionLeader)
+				break
+			}
+			db.logger.Debugf("failed to find %d in DB (session leader of %d), attempting to scrape", process.PIDs.Sid, pid)
+			db.scrapeAncestors(process)
+		}
 	}
 
 	if entryLeaderPID, foundEntryLeaderPID := db.entryLeaderRelationships[process.PIDs.Tgid]; foundEntryLeaderPID {
@@ -572,10 +617,10 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 			// if there is an entry leader then there is a matching member in the entryLeaders table
 			fillEntryLeader(&ret, db.entryLeaders[entryLeaderPID], entryLeader)
 		} else {
-			db.logger.Errorf("failed to find entry leader entry %d for %d (%s)", entryLeaderPID, pid, db.processes[pid].Filename)
+			db.logger.Debugf("failed to find entry leader entry %d for %d (%s)", entryLeaderPID, pid, db.processes[pid].Filename)
 		}
 	} else {
-		db.logger.Errorf("failed to find entry leader for %d (%s)", pid, db.processes[pid].Filename)
+		db.logger.Debugf("failed to find entry leader for %d (%s)", pid, db.processes[pid].Filename)
 	}
 
 	db.setEntityID(&ret)
@@ -665,4 +710,31 @@ func getTTYType(major uint16, minor uint16) TTYType {
 	}
 
 	return TTYUnknown
+}
+
+func (db *DB) scrapeAncestors(proc Process) {
+	for _, pid := range []uint32{proc.PIDs.Pgid, proc.PIDs.Ppid, proc.PIDs.Sid} {
+		if _, exists := db.processes[pid]; pid == 0 || exists {
+			continue
+		}
+		procInfo, err := db.procfs.GetProcess(pid)
+		if err != nil {
+			db.logger.Debugf("couldn't get %v from procfs: %w", pid, err)
+			continue
+		}
+		p := Process{
+			PIDs:     pidInfoFromProto(procInfo.PIDs),
+			Creds:    credInfoFromProto(procInfo.Creds),
+			CTTY:     ttyDevFromProto(procInfo.CTTY),
+			Argv:     procInfo.Argv,
+			Cwd:      procInfo.Cwd,
+			Env:      procInfo.Env,
+			Filename: procInfo.Filename,
+		}
+		db.insertProcess(p)
+	}
+}
+
+func (db *DB) Close() {
+	close(db.stopChan)
 }

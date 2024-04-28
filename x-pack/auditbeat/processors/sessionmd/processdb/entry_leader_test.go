@@ -23,6 +23,7 @@ const (
 	lsPath             = "/usr/bin/ls"
 	bashPath           = "/usr/bin/bash"
 	grepPath           = "/usr/bin/grep"
+	wPath              = "/usr/bin/w"
 )
 
 // Entry evaluation tests
@@ -1241,4 +1242,350 @@ func TestKernelThreads(t *testing.T) {
 
 	requireProcess(t, db, rcuGpPID, rcuGpPath)
 	requireParent(t, db, rcuGpPID, kthreaddPID)
+}
+
+// PIDs can be reused when the maximum PID is reached and the number rolls over.
+// The DB should always have the current process representation when PIDs are reused.
+// In the same session a process exits and the PID is reused for a new process.
+func TestPIDReuseSameSession(t *testing.T) {
+	reader := procfs.NewMockReader()
+	populateProcfsWithInit(reader)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
+	db.ScrapeProcfs()
+
+	sshd0PID := uint32(100)
+	sshd1PID := uint32(101)
+	bashPID := uint32(1000)
+	commandPID := uint32(1001)
+
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: sshdPath,
+		PIDs: types.PIDInfo{
+			Tgid: sshd0PID,
+			Sid:  sshd0PID,
+			Ppid: 1,
+		},
+	})
+
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: sshdPath,
+		PIDs: types.PIDInfo{
+			Tgid: sshd1PID,
+			Sid:  sshd1PID,
+			Ppid: sshd0PID,
+		},
+	})
+
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: bashPath,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: sshd1PID,
+			Pgid: bashPID,
+		},
+	})
+
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: lsPath,
+		PIDs: types.PIDInfo{
+			Tgid: commandPID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: commandPID,
+		},
+	})
+
+	db.InsertExit(types.ProcessExitEvent{
+		PIDs: types.PIDInfo{
+			Tgid: commandPID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: commandPID,
+		},
+		ExitCode: 0,
+	})
+
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: grepPath,
+		PIDs: types.PIDInfo{
+			Tgid: commandPID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: commandPID,
+		},
+	})
+
+	// systemd
+	systemd, err := db.GetProcess(1)
+	require.Nil(t, err)
+	requireParentUnset(t, systemd)
+	requireEntryLeaderUnset(t, systemd)
+
+	requireProcess(t, db, 1, systemdPath)
+	requireSessionLeader(t, db, 1, 1)
+
+	// sshd0
+	requireProcess(t, db, sshd0PID, sshdPath)
+	requireParent(t, db, sshd0PID, 1)
+	requireSessionLeader(t, db, sshd0PID, sshd0PID)
+	requireEntryLeader(t, db, sshd0PID, sshd0PID, Init)
+
+	// sshd1
+	requireProcess(t, db, sshd1PID, sshdPath)
+	requireParent(t, db, sshd1PID, sshd0PID)
+	requireSessionLeader(t, db, sshd1PID, sshd1PID)
+	requireEntryLeader(t, db, sshd1PID, sshd0PID, Init)
+
+	// bash
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, sshd1PID)
+	requireSessionLeader(t, db, bashPID, bashPID)
+	requireEntryLeader(t, db, bashPID, bashPID, Sshd)
+
+	// grep
+	requireProcess(t, db, commandPID, grepPath)
+	requireParent(t, db, commandPID, bashPID)
+	requireSessionLeader(t, db, commandPID, bashPID)
+	requireEntryLeader(t, db, commandPID, bashPID, Sshd)
+}
+
+// A new session, where all PIDs have been previously used for other, now exited, processes
+func TestPIDReuseNewSession(t *testing.T) {
+	reader := procfs.NewMockReader()
+	populateProcfsWithInit(reader)
+	db, err := NewDB(reader, *logger)
+	require.Nil(t, err)
+	db.ScrapeProcfs()
+
+	sshd0PID := uint32(100)
+	sshd1PID := uint32(101)
+	bashPID := uint32(1000)
+	command0PID := uint32(1001)
+	command1PID := uint32(1002)
+	command2PID := uint32(1003)
+
+	// 1st session
+	// sshd0
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: sshdPath,
+		PIDs: types.PIDInfo{
+			Tgid: sshd0PID,
+			Sid:  sshd0PID,
+			Ppid: 1,
+		},
+	})
+
+	// sshd1
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: sshdPath,
+		PIDs: types.PIDInfo{
+			Tgid: sshd1PID,
+			Sid:  sshd1PID,
+			Ppid: sshd0PID,
+		},
+	})
+
+	// bash
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: bashPath,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: sshd1PID,
+			Pgid: bashPID,
+		},
+	})
+
+	// command0
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: lsPath,
+		PIDs: types.PIDInfo{
+			Tgid: command0PID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: command0PID,
+		},
+	})
+
+	db.InsertExit(types.ProcessExitEvent{
+		PIDs: types.PIDInfo{
+			Tgid: command0PID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: command0PID,
+		},
+		ExitCode: 0,
+	})
+
+	// command 1 & 2 in pg
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: grepPath,
+		PIDs: types.PIDInfo{
+			Tgid: command1PID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: command1PID,
+		},
+	})
+
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: grepPath,
+		PIDs: types.PIDInfo{
+			Tgid: command2PID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: command1PID,
+		},
+	})
+
+	db.InsertExit(types.ProcessExitEvent{
+		PIDs: types.PIDInfo{
+			Tgid: command2PID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: command1PID,
+		},
+		ExitCode: 0,
+	})
+
+	db.InsertExit(types.ProcessExitEvent{
+		PIDs: types.PIDInfo{
+			Tgid: command1PID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: command1PID,
+		},
+		ExitCode: 0,
+	})
+
+	// exit bash
+	db.InsertExit(types.ProcessExitEvent{
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: sshd1PID,
+			Pgid: bashPID,
+		},
+		ExitCode: 0,
+	})
+
+	// exit sshd1
+	db.InsertExit(types.ProcessExitEvent{
+		PIDs: types.PIDInfo{
+			Tgid: sshd1PID,
+			Sid:  sshd1PID,
+			Ppid: sshd0PID,
+		},
+		ExitCode: 0,
+	})
+
+	// exit sshd0
+	db.InsertExit(types.ProcessExitEvent{
+		PIDs: types.PIDInfo{
+			Tgid: sshd0PID,
+			Sid:  sshd0PID,
+			Ppid: 1,
+		},
+		ExitCode: 0,
+	})
+
+	//2nd session
+	x1 := bashPID
+	x2 := sshd0PID
+	sshd0PID = command0PID
+	sshd1PID = command1PID
+	bashPID = command2PID
+	command0PID = x1
+	command1PID = x2
+
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: sshdPath,
+		PIDs: types.PIDInfo{
+			Tgid: sshd0PID,
+			Sid:  sshd0PID,
+			Ppid: 1,
+		},
+	})
+
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: sshdPath,
+		PIDs: types.PIDInfo{
+			Tgid: sshd1PID,
+			Sid:  sshd1PID,
+			Ppid: sshd0PID,
+		},
+	})
+
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: bashPath,
+		PIDs: types.PIDInfo{
+			Tgid: bashPID,
+			Sid:  bashPID,
+			Ppid: sshd1PID,
+			Pgid: bashPID,
+		},
+	})
+
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: wPath,
+		PIDs: types.PIDInfo{
+			Tgid: command0PID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: command0PID,
+		},
+	})
+
+	insertForkAndExec(t, db, types.ProcessExecEvent{
+		Filename: grepPath,
+		PIDs: types.PIDInfo{
+			Tgid: command1PID,
+			Sid:  bashPID,
+			Ppid: bashPID,
+			Pgid: command0PID,
+		},
+	})
+
+	// systemd
+	systemd, err := db.GetProcess(1)
+	require.Nil(t, err)
+	requireParentUnset(t, systemd)
+	requireEntryLeaderUnset(t, systemd)
+
+	requireProcess(t, db, 1, systemdPath)
+	requireSessionLeader(t, db, 1, 1)
+
+	// sshd0
+	requireProcess(t, db, sshd0PID, sshdPath)
+	requireParent(t, db, sshd0PID, 1)
+	requireSessionLeader(t, db, sshd0PID, sshd0PID)
+	requireEntryLeader(t, db, sshd0PID, sshd0PID, Init)
+
+	// sshd1
+	requireProcess(t, db, sshd1PID, sshdPath)
+	requireParent(t, db, sshd1PID, sshd0PID)
+	requireSessionLeader(t, db, sshd1PID, sshd1PID)
+	requireEntryLeader(t, db, sshd1PID, sshd0PID, Init)
+
+	// bash
+	requireProcess(t, db, bashPID, bashPath)
+	requireParent(t, db, bashPID, sshd1PID)
+	requireSessionLeader(t, db, bashPID, bashPID)
+	requireEntryLeader(t, db, bashPID, bashPID, Sshd)
+
+	// w
+	requireProcess(t, db, command0PID, wPath)
+	requireParent(t, db, command0PID, bashPID)
+	requireSessionLeader(t, db, command0PID, bashPID)
+	requireEntryLeader(t, db, command0PID, bashPID, Sshd)
+	requireGroupLeader(t, db, command0PID, command0PID)
+
+	// grep
+	requireProcess(t, db, command1PID, grepPath)
+	requireParent(t, db, command1PID, bashPID)
+	requireSessionLeader(t, db, command1PID, bashPID)
+	requireEntryLeader(t, db, command1PID, bashPID, Sshd)
+	requireGroupLeader(t, db, command1PID, command0PID)
 }

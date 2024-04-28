@@ -1016,3 +1016,100 @@ spec:
           access_level: BUILD_AND_READ
         everyone:
           access_level: READ_ONLY
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: beats-packaging-pipeline
+  description: Buildkite pipeline for packaging and publishing to DRA
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-packaging-pipeline
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-packaging-pipeline
+      description: Pipeline for Beats packaging and publishing DRA artifacts
+    spec:
+      repository: elastic/beats
+      pipeline_file: ".buildkite/packaging.pipeline.yml"
+      branch_configuration: "main"
+      # TODO enable after packaging backports for release branches
+      # branch_configuration: "main 8.* 7.17"
+      cancel_intermediate_builds: false
+      skip_intermediate_builds: false
+      provider_settings:
+        trigger_mode: code
+      env:
+        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
+        SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
+        SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        release-eng:
+          access_level: BUILD_AND_READ
+        everyone:
+          access_level: READ_ONLY
+
+---
+# yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: beats-ironbank-validation
+  description: Buildkite pipeline for validating the Ironbank docker context
+  links:
+    - title: Pipeline
+      url: https://buildkite.com/elastic/beats-ironbank-validation
+spec:
+  type: buildkite-pipeline
+  owner: group:ingest-fp
+  system: buildkite
+  implementation:
+    apiVersion: buildkite.elastic.dev/v1
+    kind: Pipeline
+    metadata:
+      name: beats-ironbank-validation
+      description: Buildkite pipeline for validating the Ironbank docker context
+    spec:
+      repository: elastic/beats
+      pipeline_file: ".buildkite/ironbank-validation.yml"
+      branch_configuration: "main 8.* 7.17"
+      cancel_intermediate_builds: false
+      skip_intermediate_builds: false
+      provider_settings:
+        trigger_mode: none
+      # TODO uncomment out after https://github.com/elastic/ingest-dev/issues/3235
+      # schedules:
+      #   # TODO to be replaced with a generic scheduler similar to https://github.com/elastic/logstash/pull/15705
+      #   Daily run of ironbank validation / main:
+      #     branch: main
+      #     cronline: 30 02 * * *
+      #     message: Daily trigger of IronBank validation on main
+      #   Daily run of ironbank validation / 8.14:
+      #     branch: 8.14
+      #     cronline: 30 02 * * *
+      #     message: Daily trigger of IronBank validation on 8.14
+      #   Daily run of ironbank validation / 8.13:
+      #     branch: 8.13
+      #     cronline: 30 02 * * *
+      #     message: Daily trigger of IronBank validation on 8.13
+      #   Daily run of ironbank validation / 7.17:
+      #     branch: 7.17
+      #     cronline: 30 02 * * *
+      #     message: Daily trigger of IronBank validation on 7.17
+      teams:
+        ingest-fp:
+          access_level: MANAGE_BUILD_AND_READ
+        release-eng:
+          access_level: BUILD_AND_READ
+        everyone:
+          access_level: READ_ONLY

@@ -33,7 +33,7 @@ type Process struct {
 
 	// The exit code of the process, if this is a termination event.
 	// The field should be absent if there is no exit code for the event (e.g. process start).
-	ExitCode *int64 `json:"exit_code,omitempty"`
+	ExitCode int32 `json:"exit_code,omitempty"`
 
 	// Whether the process is connected to an interactive shell.
 	// Process interactivity is inferred from the processes file descriptors. If the character device for the controlling tty is the same as stdin and stderr for the process, the process is considered interactive.
@@ -87,6 +87,15 @@ type Process struct {
 			Effective []string `json:"effective,omitempty"`
 		} `json:"capabilities,omitempty"`
 	} `json:"thread,omitempty"`
+
+	// Information about the controlling TTY device.
+	// If set, the process belongs to an interactive session.
+	TTY struct {
+		CharDevice struct {
+			Major uint16 `json:"major,omitempty"`
+			Minor uint16 `json:"minor,omitempty"`
+		} `json:"char_device,omitempty"`
+	} `json:"tty,omitempty"`
 
 	// Information about the parent process.
 	Parent struct {
@@ -351,6 +360,12 @@ func (p *Process) ToMap() mapstr.M {
 			"capabilities": mapstr.M{
 				"permitted": p.Thread.Capabilities.Permitted,
 				"effective": p.Thread.Capabilities.Effective,
+			},
+		},
+		"tty": mapstr.M{
+			"char_device": mapstr.M{
+				"major": p.TTY.CharDevice.Major,
+				"minor": p.TTY.CharDevice.Minor,
 			},
 		},
 		"parent": mapstr.M{
