@@ -1047,6 +1047,9 @@ spec:
       skip_intermediate_builds: false
       provider_settings:
         trigger_mode: code
+        build_pull_requests: false
+        build_branches: false
+        build_tags: false
       env:
         ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
         SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
