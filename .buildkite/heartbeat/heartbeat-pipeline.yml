@@ -32,8 +32,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -51,8 +50,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -71,8 +69,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -92,8 +89,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -112,8 +108,7 @@ steps:
           mage goIntegTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -131,8 +126,7 @@ steps:
           mage pythonIntegTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -156,8 +150,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -181,8 +174,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -202,8 +194,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -226,8 +217,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -247,8 +237,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -268,8 +257,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"

@@ -34,8 +34,7 @@ steps:
         command: "cd metricbeat && mage build unitTest"
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -68,8 +67,7 @@ steps:
           cd metricbeat && mage goIntegTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -102,8 +100,7 @@ steps:
           cd metricbeat && mage pythonIntegTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -120,8 +117,7 @@ steps:
         command: "make -C metricbeat crosscompile"
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -140,8 +136,7 @@ steps:
         key: "mandatory-win-2016-unit-tests"
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -162,8 +157,7 @@ steps:
         key: "mandatory-win-2022-unit-tests"
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -188,8 +182,7 @@ steps:
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -210,8 +203,7 @@ steps:
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -232,8 +224,7 @@ steps:
         key: "extended-win-2019-unit-tests"
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -259,8 +250,7 @@ steps:
           cd metricbeat && mage build unitTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -280,8 +270,7 @@ steps:
           cd metricbeat && mage build unitTest
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"

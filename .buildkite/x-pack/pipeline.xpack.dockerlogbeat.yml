@@ -30,8 +30,7 @@ steps:
         command: "cd x-pack/dockerlogbeat && mage build unitTest"
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -50,8 +49,7 @@ steps:
           MODULE: $MODULE
         retry:
           automatic:
-            - exit_status: 1
-              limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
