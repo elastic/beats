@@ -99,22 +99,6 @@ func (in *s3Input) Test(ctx v2.TestContext) error {
 }
 
 func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
-<<<<<<< HEAD
-	var err error
-
-	persistentStore, err := in.store.Access()
-	if err != nil {
-		return fmt.Errorf("can not access persistent store: %w", err)
-	}
-
-	defer persistentStore.Close()
-
-	states := newStates(inputContext)
-	err = states.readStatesFrom(persistentStore)
-	if err != nil {
-		return fmt.Errorf("can not start persistent store: %w", err)
-	}
-
 	// Wrap input Context's cancellation Done channel a context.Context. This
 	// goroutine stops with the parent closes the Done channel.
 	ctx, cancelInputCtx := context.WithCancel(context.Background())
@@ -126,9 +110,6 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 	}()
 	defer cancelInputCtx()
-=======
-	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
->>>>>>> e588628b24 (Fix concurrency bugs that could cause data loss in the `aws-s3` input (#39131))
 
 	if in.config.QueueURL != "" {
 		regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint, in.config.RegionName)
