@@ -94,7 +94,7 @@ func newMetricsObserver(metrics *monitoring.Registry) *metricsObserver {
 			queueMaxEvents: monitoring.NewUint(reg, "queue.max_events"),
 
 			activeEvents:     monitoring.NewUint(reg, "events.active"), // Gauge
-			percentQueueFull: monitoring.NewFloat(reg, "queue.events.full.pct"),
+			percentQueueFull: monitoring.NewFloat(reg, "queue.filled.pct.events"),
 		},
 	}
 }
