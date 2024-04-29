@@ -246,6 +246,8 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
 
+  - wait
+
   - command: echo "End of concurrency gate <--"
     concurrency_group: gate
     concurrency: 1
