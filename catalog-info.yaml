@@ -1130,8 +1130,7 @@ spec:
       provider_settings:
         trigger_mode: none
       env:
-        # TODO enable slack notifications when it's tested
-        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'false'
+        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
         SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
         SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
       teams:
