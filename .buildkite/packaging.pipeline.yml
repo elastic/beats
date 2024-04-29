@@ -12,14 +12,16 @@ env:
   PLATFORMS_ARM: "linux/arm64"
 
 steps:
-  - key: beats_dra_concurrency_group
-    command: echo "Only one DRA job per commit is allowed to run."
-    concurrency_group: beats_dra
+  - command: echo "--> Start of concurrency gate"
+    concurrency_group: gate
     concurrency: 1
+    key: start-gate
+
+  - wait
 
   - group: Beats dashboards
     key: dashboards
-    depends_on: beats_dra_concurrency_group
+    depends_on: start-gate
     steps:
       - label: Snapshot dashboards
         if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
@@ -58,7 +60,7 @@ steps:
   - group: Packaging snapshot
     if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
     key: packaging-snapshot
-    depends_on: beats_dra_concurrency_group
+    depends_on: start-gate
     steps:
       - label: "SNAPSHOT: {{matrix}}"
         env:
@@ -131,7 +133,7 @@ steps:
 
   - group: Packaging Staging
     key: packaging-staging
-    depends_on: beats_dra_concurrency_group
+    depends_on: start-gate
     ## Only for release
     if: build.branch =~ /^\d+\.\d+$$/
     steps:
@@ -206,7 +208,7 @@ steps:
 
   - group: DRA publish
     key: dra
-    depends_on: beats_dra_concurrency_group
+    depends_on: start-gate
     steps:
       - label: DRA Snapshot
         ## Only for release branches and main
@@ -243,3 +245,8 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+
+  - command: echo "End of concurrency gate <--"
+    concurrency_group: gate
+    concurrency: 1
+    key: end-gate
