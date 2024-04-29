@@ -12,18 +12,14 @@ env:
   PLATFORMS_ARM: "linux/arm64"
 
 steps:
-  - key: beats_dra_concurrency_group
-    command: echo "Only one DRA job per commit is allowed to run."
-    concurrency_group: beats_dra
-    concurrency: 1
-
   - group: Beats dashboards
     key: dashboards
-    depends_on: beats_dra_concurrency_group
     steps:
       - label: Snapshot dashboards
         if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
         key: dashboards-snapshot
+        concurrency_group: beats-snapshot-dashboards
+        concurrency: 1
         # TODO: container with go and make
         agents:
           provider: gcp
@@ -41,6 +37,8 @@ steps:
       - label: Staging dashboards
         if: build.branch =~ /^\d+\.\d+$$/
         key: dashboards-staging
+        concurrency_group: beats-staging-dashboards
+        concurrency: 1
         # TODO: container with go and make
         agents:
           provider: gcp
@@ -58,9 +56,10 @@ steps:
   - group: Packaging snapshot
     if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
     key: packaging-snapshot
-    depends_on: beats_dra_concurrency_group
     steps:
       - label: "SNAPSHOT: {{matrix}}"
+        concurrency_group: "{{matrix}}-packaging-snapshot"
+        concurrency: 1
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
@@ -90,6 +89,8 @@ steps:
           - x-pack/winlogbeat
 
       - label: "SNAPSHOT: {{matrix}} docker Linux/arm64"
+        concurrency_group: "{{matrix}}-packaging-docker-snapshot"
+        concurrency: 1
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
@@ -117,6 +118,8 @@ steps:
 
       ## Agentbeat needs more CPUs because it builds many other beats
       - label: "SNAPSHOT: x-pack/agentbeat"
+        concurrency_group: "x-pack/agentbeat-packaging-snapshot"
+        concurrency: 1
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: true
@@ -131,11 +134,12 @@ steps:
 
   - group: Packaging Staging
     key: packaging-staging
-    depends_on: beats_dra_concurrency_group
     ## Only for release
     if: build.branch =~ /^\d+\.\d+$$/
     steps:
       - label: "STAGING: {{matrix}}"
+        concurrency_group: "{{matrix}}-packaging-staging"
+        concurrency: 1
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
@@ -165,6 +169,8 @@ steps:
           - x-pack/winlogbeat
 
       - label: "STAGING: {{matrix}} docker Linux/arm64"
+        concurrency_group: "{{matrix}}-packaging-docker-staging"
+        concurrency: 1
         env:
           PLATFORMS: "${PLATFORMS_ARM}"
           PACKAGES: "docker"
@@ -192,6 +198,8 @@ steps:
 
         ## Agentbeat needs more CPUs because it builds many other beats
       - label: "STAGING: x-pack/agentbeat"
+        concurrency_group: "x-pack/agentbeat-packaging-staging"
+        concurrency: 1
         env:
           PLATFORMS: "${PLATFORMS}"
           SNAPSHOT: false
@@ -206,9 +214,10 @@ steps:
 
   - group: DRA publish
     key: dra
-    depends_on: beats_dra_concurrency_group
     steps:
       - label: DRA Snapshot
+        concurrency_group: "dra-snapshot"
+        concurrency: 1
         ## Only for release branches and main
         if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
         key: dra-snapshot
@@ -227,6 +236,8 @@ steps:
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
 
       - label: DRA Staging
+        concurrency_group: "dra-staging"
+        concurrency: 1
         ## Only for release branches
         if: build.branch =~ /^\d+\.\d+$$/
         key: dra-staging
