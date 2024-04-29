@@ -5,8 +5,9 @@
 package azure
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestGroupMetricsDefinitionsByResourceId(t *testing.T) {
