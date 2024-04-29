@@ -252,15 +252,18 @@ func TestGetMetricValues(t *testing.T) {
 		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
 
 		require.Equal(t, 3, len(metricValues))
+
 		require.Equal(t, 1, len(metricValues[0].Values))
+		require.Equal(t, 1, len(metricValues[1].Values))
+		require.Equal(t, 1, len(metricValues[2].Values))
 
 		require.NotNil(t, metricValues[0].Values[0].max, "max value is nil")
-		require.NotNil(t, metricValues[0].Values[0].min, "min value is nil")
-		require.NotNil(t, metricValues[0].Values[0].avg, "avg value is nil")
+		require.NotNil(t, metricValues[1].Values[0].min, "min value is nil")
+		require.NotNil(t, metricValues[2].Values[0].avg, "avg value is nil")
 
 		assert.Equal(t, *metricValues[0].Values[0].max, 3.0)
-		assert.Equal(t, *metricValues[2].Values[0].min, 1.0)
-		assert.Equal(t, *metricValues[1].Values[0].avg, 2.0)
+		assert.Equal(t, *metricValues[1].Values[0].min, 1.0)
+		assert.Equal(t, *metricValues[2].Values[0].avg, 2.0)
 
 		m.AssertExpectations(t)
 	})
