@@ -226,6 +226,6 @@ CHANGELOG*
 
 # Ownership of CI or related files by the Ingest Eng Prod team
 /.buildkite @elastic/ingest-eng-prod
-/catalog-info.yml @elastic/ingest-eng-prod
+/catalog-info.yaml @elastic/ingest-eng-prod
 /libbeat/scripts @elastic/ingest-eng-prod
 /metricbeat/tests @elastic/ingest-eng-prod

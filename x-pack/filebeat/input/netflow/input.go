@@ -147,9 +147,7 @@ func (n *netflowInput) Run(context v2.Context, connector beat.PipelineConnector)
 	client, err := connector.ConnectWith(beat.ClientConfig{
 		PublishMode: beat.DefaultGuarantees,
 		Processing: beat.ProcessingConfig{
-			// This input only produces events with basic types so normalization
-			// is not required.
-			EventNormalization: boolPtr(false),
+			EventNormalization: boolPtr(true),
 		},
 		CloseRef:      context.Cancelation,
 		EventListener: nil,

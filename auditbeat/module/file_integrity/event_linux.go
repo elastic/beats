@@ -23,12 +23,16 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/ebpf/sys"
 	"github.com/elastic/ebpfevents"
 )
+
+// cgroupRegex captures 64-character lowercase hexadecimal container IDs found in cgroup paths.
+var cgroupRegex = regexp.MustCompile(`[-/]([0-9a-f]{64})(\.scope)?$`)
 
 // NewEventFromEbpfEvent creates a new Event from an ebpfevents.Event.
 func NewEventFromEbpfEvent(
@@ -39,12 +43,12 @@ func NewEventFromEbpfEvent(
 	isExcludedPath func(string) bool,
 ) (Event, bool) {
 	var (
-		path, target string
-		action       Action
-		metadata     Metadata
-		process      Process
-		err          error
-		errors       []error
+		path, target, cgroupPath string
+		action                   Action
+		metadata                 Metadata
+		process                  Process
+		err                      error
+		errors                   []error
 	)
 	switch ee.Type {
 	case ebpfevents.EventTypeFileCreate:
@@ -67,6 +71,8 @@ func NewEventFromEbpfEvent(
 		if err != nil {
 			errors = append(errors, err)
 		}
+
+		cgroupPath = fileCreateEvent.CgroupPath
 	case ebpfevents.EventTypeFileRename:
 		action = Moved
 
@@ -87,6 +93,8 @@ func NewEventFromEbpfEvent(
 		if err != nil {
 			errors = append(errors, err)
 		}
+
+		cgroupPath = fileRenameEvent.CgroupPath
 	case ebpfevents.EventTypeFileDelete:
 		action = Deleted
 
@@ -102,6 +110,8 @@ func NewEventFromEbpfEvent(
 		if err != nil {
 			errors = append(errors, err)
 		}
+
+		cgroupPath = fileDeleteEvent.CgroupPath
 	case ebpfevents.EventTypeFileModify:
 		fileModifyEvent := ee.Body.(*ebpfevents.FileModify)
 
@@ -128,17 +138,23 @@ func NewEventFromEbpfEvent(
 		if err != nil {
 			errors = append(errors, err)
 		}
+
+		cgroupPath = fileModifyEvent.CgroupPath
 	}
 
 	event := Event{
-		Timestamp:  time.Now().UTC(),
-		Path:       path,
-		TargetPath: target,
-		Info:       &metadata,
-		Source:     SourceEBPF,
-		Action:     action,
-		Process:    &process,
-		errors:     errors,
+		Timestamp:   time.Now().UTC(),
+		Path:        path,
+		TargetPath:  target,
+		Info:        &metadata,
+		Source:      SourceEBPF,
+		Action:      action,
+		Process:     &process,
+		ContainerID: containerIDFromCgroupPath(cgroupPath),
+		errors:      errors,
+	}
+	if err != nil {
+		event.errors = append(event.errors, err)
 	}
 
 	if event.Action == Deleted {
@@ -156,6 +172,14 @@ func NewEventFromEbpfEvent(
 	}
 
 	return event, true
+}
+
+func containerIDFromCgroupPath(path string) string {
+	matches := cgroupRegex.FindStringSubmatch(path)
+	if len(matches) > 1 {
+		return matches[1]
+	}
+	return ""
 }
 
 func metadataFromFileCreate(evt *ebpfevents.FileCreate) (Metadata, error) {
