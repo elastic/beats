@@ -1,11 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 # TODO: Pre-cache beats-dev/golang-crossbuild container image
 
-# prevent out of order DRA publishing
-# otherwise commits in quick succession will run in parallel and possibly result in our of order DRA artifacts
-agents:
-  queue: "dra-builder-queue"
-
 env:
   ASDF_MAGE_VERSION: 1.15.0
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
@@ -17,8 +12,14 @@ env:
   PLATFORMS_ARM: "linux/arm64"
 
 steps:
+  - key: beats_dra_concurrency_group
+    command: echo "Only one DRA job per commit is allowed to run."
+    concurrency_group: beats_dra
+    concurrency: 1
+
   - group: Beats dashboards
     key: dashboards
+    depends_on: beats_dra_concurrency_group
     steps:
       - label: Snapshot dashboards
         if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
@@ -57,6 +58,7 @@ steps:
   - group: Packaging snapshot
     if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
     key: packaging-snapshot
+    depends_on: beats_dra_concurrency_group
     steps:
       - label: "SNAPSHOT: {{matrix}}"
         env:
@@ -128,8 +130,8 @@ steps:
           - build/distributions/**/*
 
   - group: Packaging Staging
-
     key: packaging-staging
+    depends_on: beats_dra_concurrency_group
     ## Only for release
     if: build.branch =~ /^\d+\.\d+$$/
     steps:
@@ -204,6 +206,7 @@ steps:
 
   - group: DRA publish
     key: dra
+    depends_on: beats_dra_concurrency_group
     steps:
       - label: DRA Snapshot
         ## Only for release branches and main
