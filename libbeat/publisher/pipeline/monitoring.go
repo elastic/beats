@@ -17,7 +17,11 @@
 
 package pipeline
 
-import "github.com/elastic/elastic-agent-libs/monitoring"
+import (
+	"math"
+
+	"github.com/elastic/elastic-agent-libs/monitoring"
+)
 
 type observer interface {
 	pipelineObserver
@@ -131,7 +135,8 @@ func (o *metricsObserver) setPercentageFull() {
 	maxEvt := o.vars.queueMaxEvents.Get()
 	if maxEvt != 0 {
 		pct := float64(o.vars.activeEvents.Get()) / float64(maxEvt)
-		o.vars.percentQueueFull.Set(pct)
+		pctRound := math.Round(pct/0.0005) * 0.0005
+		o.vars.percentQueueFull.Set(pctRound)
 	}
 }
 
