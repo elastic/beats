@@ -1,0 +1,10 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+
+# this intermediate pipeline is required because we can't specify a custom agent (k8s image) yet
+# in catalog-info: https://github.com/elastic/ci/blob/71e83d340e3b93ab43fcf16a7a70ac33bdeec6e9/terrazzo/terrazzo/constructs/buildkite/pipelines.py#L787-L842
+
+steps:
+  - label: ":pipeline: Generate trigger steps for $PIPELINES_TO_TRIGGER"
+    command: ".buildkite/pipeline-scheduler.py"
+    agents:
+      image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:0.1"
