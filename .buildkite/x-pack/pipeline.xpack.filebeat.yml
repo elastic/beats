@@ -205,8 +205,9 @@ steps:
 
   - group: "x-pack/filebeat Extended Tests"
     key: "x-pack-filebeat-extended-tests"
-    steps:
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm|aws).*/
 
+    steps:
       - label: ":ubuntu: ARM Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         key: "x-pack-filebeat-mandatory-linux-arm-unit-test"
