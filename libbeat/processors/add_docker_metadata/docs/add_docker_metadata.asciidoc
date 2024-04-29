@@ -6,7 +6,7 @@
 ++++
 
 ifeval::["{beatname_lc}"=="packetbeat"]
-There is currently extremely limited capability for using {beatname_lc} to monitor and coexist with containers, for example Docker, Podman, or Kubernetes). Using the `add_docker_metadata` processor with {beatname_lc} is not recommended nor supported. 
+There is currently extremely limited capability for using {beatname_lc} to monitor and coexist with containers, for example Docker, Podman, or Kubernetes. Using the `add_docker_metadata` processor with {beatname_lc} is not recommended nor supported. 
 endif::[]
 
 ifeval::["{beatname_lc}"!="packetbeat"]
