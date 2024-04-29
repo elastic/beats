@@ -20,7 +20,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/aws/smithy-go"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/atomic"
@@ -28,6 +27,7 @@ import (
 )
 
 const (
+	sqsAccessDeniedErrorCode       = "AccessDeniedException"
 	sqsRetryDelay                  = 10 * time.Second
 	sqsApproximateNumberOfMessages = "ApproximateNumberOfMessages"
 )
@@ -53,10 +53,7 @@ type sqsReader struct {
 	workerWg sync.WaitGroup
 }
 
-func newSQSReaderInput(config config,
-	awsConfig awssdk.Config,
-	store beater.StateStore,
-) (v2.Input, error) {
+func newSQSReaderInput(config config, awsConfig awssdk.Config) (v2.Input, error) {
 	return &sqsReaderInput{
 		config:    config,
 		awsConfig: awsConfig,

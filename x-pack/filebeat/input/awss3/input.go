@@ -17,10 +17,7 @@ import (
 	"github.com/elastic/go-concert/unison"
 )
 
-const (
-	inputName                = "aws-s3"
-	sqsAccessDeniedErrorCode = "AccessDeniedException"
-)
+const inputName = "aws-s3"
 
 func Plugin(store beater.StateStore) v2.Plugin {
 	return v2.Plugin{
@@ -36,14 +33,6 @@ type s3InputManager struct {
 	store beater.StateStore
 }
 
-// s3Input is a input for reading logs from S3 when triggered by an SQS message.
-type s3Input struct {
-	config    config
-	awsConfig awssdk.Config
-	store     beater.StateStore
-	metrics   *inputMetrics
-}
-
 func (im *s3InputManager) Init(grp unison.Group, mode v2.Mode) error {
 	return nil
 }
@@ -54,11 +43,10 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, err
 	}
 
-	return newInput(config, im.store)
-}
-
-func newInput(config config, store beater.StateStore) (v2.Input, error) {
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
+	if err != nil {
+		return nil, fmt.Errorf("initializing AWS config: %w", err)
+	}
 
 	if config.AWSConfig.Endpoint != "" {
 		// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
@@ -71,27 +59,19 @@ func newInput(config config, store beater.StateStore) (v2.Input, error) {
 		})
 	}
 
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
-	}
-
 	if config.QueueURL != "" {
-		return newSQSReaderInput(config, awsConfig, store)
-		//return in.runQueueReader(ctx, inputContext, pipeline)
+		return newSQSReaderInput(config, awsConfig)
 	}
 
 	if config.BucketARN != "" || config.NonAWSBucketName != "" {
-		return newS3PollerInput(config, awsConfig, store)
-		//return in.runS3Poller(ctx, inputContext, pipeline)
+		persistentStore, err := im.store.Access()
+		if err != nil {
+			return nil, fmt.Errorf("can not access persistent store: %w", err)
+		}
+		return newS3PollerInput(config, awsConfig, persistentStore)
 	}
 
 	return nil, fmt.Errorf("configuration has no SQS queue URL and no S3 bucket ARN")
-
-	// return &s3Input{
-	// 	config:    config,
-	// 	awsConfig: awsConfig,
-	// 	store:     store,
-	// }, nil
 }
 
 // boolPtr returns a pointer to b.

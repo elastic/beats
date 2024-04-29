@@ -8,9 +8,8 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/elastic/elastic-agent-libs/logp"
-
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
@@ -18,8 +17,6 @@ const awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
 // states handles list of s3 object state. One must use newStates to instantiate a
 // file states registry. Using the zero-value is not safe.
 type states struct {
-	log *logp.Logger
-
 	// Completed S3 object states, indexed by state ID.
 	// statesLock must be held to access states.
 	states     map[string]state
@@ -33,44 +30,9 @@ type states struct {
 
 // newStates generates a new states registry.
 func newStates(log *logp.Logger, store *statestore.Store) (*states, error) {
-	states := &states{
-		log:    log.Named("states"),
-		states: map[string]state{},
-		store:  store,
-	}
-	return states, states.loadFromRegistry()
-}
+	stateTable := map[string]state{}
 
-func (s *states) IsProcessed(state state) bool {
-	s.statesLock.Lock()
-	defer s.statesLock.Unlock()
-	// Our in-memory table only stores completed objects
-	_, ok := s.states[state.ID()]
-	return ok
-}
-
-func (s *states) AddState(state state) {
-
-	id := state.ID()
-	// Update in-memory copy
-	s.statesLock.Lock()
-	s.states[id] = state
-	s.statesLock.Unlock()
-
-	// Persist to the registry
-	s.storeLock.Lock()
-	key := awsS3ObjectStatePrefix + id
-	if err := s.store.Set(key, state); err != nil {
-		s.log.Errorw("Failed to write states to the registry", "error", err)
-	}
-	s.storeLock.Unlock()
-}
-
-func (s *states) loadFromRegistry() error {
-	states := map[string]state{}
-
-	s.storeLock.Lock()
-	err := s.store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
+	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
 		if !strings.HasPrefix(key, awsS3ObjectStatePrefix) {
 			return true, nil
 		}
@@ -79,7 +41,7 @@ func (s *states) loadFromRegistry() error {
 		var st state
 		if err := dec.Decode(&st); err != nil {
 			// Skip this key but continue iteration
-			s.log.Warnf("invalid S3 state loading object key %v", key)
+			log.Warnf("invalid S3 state loading object key %v", key)
 			//nolint:nilerr // One bad object shouldn't stop iteration
 			return true, nil
 		}
@@ -91,17 +53,40 @@ func (s *states) loadFromRegistry() error {
 			return true, nil
 		}
 
-		states[st.ID()] = st
+		stateTable[st.ID()] = st
 		return true, nil
 	})
-	s.storeLock.Unlock()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
+	return &states{
+		store:  store,
+		states: stateTable,
+	}, nil
+}
+
+func (s *states) IsProcessed(state state) bool {
 	s.statesLock.Lock()
-	s.states = states
+	defer s.statesLock.Unlock()
+	// Our in-memory table only stores completed objects
+	_, ok := s.states[state.ID()]
+	return ok
+}
+
+func (s *states) AddState(state state) error {
+	id := state.ID()
+	// Update in-memory copy
+	s.statesLock.Lock()
+	s.states[id] = state
 	s.statesLock.Unlock()
 
+	// Persist to the registry
+	s.storeLock.Lock()
+	defer s.storeLock.Unlock()
+	key := awsS3ObjectStatePrefix + id
+	if err := s.store.Set(key, state); err != nil {
+		return err
+	}
 	return nil
 }

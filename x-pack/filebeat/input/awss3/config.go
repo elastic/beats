@@ -9,6 +9,9 @@ import (
 	"fmt"
 	"time"
 
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/dustin/go-humanize"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
@@ -221,4 +224,48 @@ func (rc *readerConfig) InitDefaults() {
 	rc.BufferSize = 16 * humanize.KiByte
 	rc.MaxBytes = 10 * humanize.MiByte
 	rc.LineTerminator = readfile.AutoLineTerminator
+}
+
+func (c config) getBucketName() string {
+	if c.NonAWSBucketName != "" {
+		return c.NonAWSBucketName
+	}
+	if c.BucketARN != "" {
+		return getBucketNameFromARN(c.BucketARN)
+	}
+	return ""
+}
+
+func (c config) getBucketARN() string {
+	if c.NonAWSBucketName != "" {
+		return c.NonAWSBucketName
+	}
+	if c.BucketARN != "" {
+		return c.BucketARN
+	}
+	return ""
+}
+
+func (c config) s3OptionsFn(o *s3.Options) {
+	if c.NonAWSBucketName != "" {
+		o.EndpointResolver = nonAWSBucketResolver{endpoint: c.AWSConfig.Endpoint}
+	}
+
+	if c.AWSConfig.FIPSEnabled {
+		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+	}
+	o.UsePathStyle = c.PathStyle
+
+	o.Retryer = retry.NewStandard(func(so *retry.StandardOptions) {
+		so.MaxAttempts = 5
+		// Recover quickly when requests start working again
+		so.NoRetryIncrement = 100
+	})
+}
+
+func (c config) getFileSelectors() []fileSelectorConfig {
+	if len(c.FileSelectors) == 0 {
+		return []fileSelectorConfig{{ReaderConfig: c.ReaderConfig}}
+	}
+	return c.FileSelectors
 }

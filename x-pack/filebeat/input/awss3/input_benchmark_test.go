@@ -343,7 +343,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				assert.NoError(t, err, "states creation should succeed")
 
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors, backupConfig{})
-				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, client, s3EventHandlerFactory, states, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
+				s3Poller := newS3Poller(logp.NewLogger(inputName), config, nil, metrics, s3API, client, s3EventHandlerFactory, states, "bucket", listPrefix, "region", "provider", time.Second)
 
 				s3Poller.Poll(ctx)
 			}(i, wg)

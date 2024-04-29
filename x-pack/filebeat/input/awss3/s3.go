@@ -11,17 +11,15 @@ import (
 	"net/url"
 	"strings"
 	"sync"
-	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/ratelimit"
-	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 
-	"github.com/elastic/beats/v7/filebeat/beater"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
+	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
@@ -39,23 +37,19 @@ type s3ObjectPayload struct {
 type s3PollerInput struct {
 	config    config
 	awsConfig awssdk.Config
-	store     beater.StateStore
+	store     *statestore.Store
 }
 
 type s3Poller struct {
-	numberOfWorkers      int
-	bucket               string
-	listPrefix           string
-	region               string
-	provider             string
-	bucketPollInterval   time.Duration
-	s3                   s3API
-	log                  *logp.Logger
-	metrics              *inputMetrics
-	client               beat.Client
-	s3ObjectHandler      s3ObjectHandlerFactory
-	states               *states
-	workersProcessingMap *sync.Map
+	log             *logp.Logger
+	config          config
+	awsConfig       awssdk.Config
+	provider        string
+	s3              s3API
+	metrics         *inputMetrics
+	client          beat.Client
+	s3ObjectHandler s3ObjectHandlerFactory
+	states          *states
 }
 
 func (in *s3PollerInput) Name() string { return inputName }
@@ -67,8 +61,9 @@ func (in *s3PollerInput) Test(ctx v2.TestContext) error {
 func newS3PollerInput(
 	config config,
 	awsConfig awssdk.Config,
-	store beater.StateStore,
+	store *statestore.Store,
 ) (v2.Input, error) {
+
 	return &s3PollerInput{
 		config:    config,
 		awsConfig: awsConfig,
@@ -81,6 +76,13 @@ func (in *s3PollerInput) Run(
 	pipeline beat.Pipeline,
 ) error {
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+
+	defer in.store.Close()
+
+	states, err := newStates(inputContext.Logger, in.store)
+	if err != nil {
+		return fmt.Errorf("can not start persistent store: %w", err)
+	}
 
 	// Create client for publishing events and receive notification of their ACKs.
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
@@ -96,20 +98,8 @@ func (in *s3PollerInput) Run(
 	}
 	defer client.Close()
 
-	// Connect to the registry and create our states lookup
-	persistentStore, err := in.store.Access()
-	if err != nil {
-		return fmt.Errorf("can not access persistent store: %w", err)
-	}
-	defer persistentStore.Close()
-
-	states, err := newStates(inputContext.Logger, persistentStore)
-	if err != nil {
-		return fmt.Errorf("can not start persistent store: %w", err)
-	}
-
 	// Create S3 receiver and S3 notification processor.
-	poller, err := in.createS3Poller(inputContext, ctx, client, states)
+	poller, err := in.createS3Poller(inputContext.Logger, inputContext.ID, ctx, client, states)
 	if err != nil {
 		return fmt.Errorf("failed to initialize s3 poller: %w", err)
 	}
@@ -119,127 +109,82 @@ func (in *s3PollerInput) Run(
 	return nil
 }
 
-func (in *s3PollerInput) createS3Poller(ctx v2.Context, cancelCtx context.Context, client beat.Client, states *states) (*s3Poller, error) {
-	var bucketName string
-	var bucketID string
-	if in.config.NonAWSBucketName != "" {
-		bucketName = in.config.NonAWSBucketName
-		bucketID = bucketName
-	} else if in.config.BucketARN != "" {
-		bucketName = getBucketNameFromARN(in.config.BucketARN)
-		bucketID = in.config.BucketARN
-	}
-
-	s3Client := s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
-		if in.config.NonAWSBucketName != "" {
-			o.EndpointResolver = nonAWSBucketResolver{endpoint: in.config.AWSConfig.Endpoint}
-		}
-
-		if in.config.AWSConfig.FIPSEnabled {
-			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
-		}
-		o.UsePathStyle = in.config.PathStyle
-
-		o.Retryer = retry.NewStandard(func(so *retry.StandardOptions) {
-			so.MaxAttempts = 5
-			// Recover quickly when requests start working again
-			so.NoRetryIncrement = 100
-		})
-	})
-	regionName, err := getRegionForBucket(cancelCtx, s3Client, bucketName)
+func (in *s3PollerInput) createS3API(ctx context.Context) (*awsS3API, error) {
+	s3Client := s3.NewFromConfig(in.awsConfig, in.config.s3OptionsFn)
+	regionName, err := getRegionForBucket(ctx, s3Client, in.config.getBucketName())
 	if err != nil {
 		return nil, fmt.Errorf("failed to get AWS region for bucket: %w", err)
 	}
-
-	originalAwsConfigRegion := in.awsConfig.Region
-
-	in.awsConfig.Region = regionName
-
-	if regionName != originalAwsConfigRegion {
-		s3Client = s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
-			if in.config.NonAWSBucketName != "" {
-				o.EndpointResolver = nonAWSBucketResolver{endpoint: in.config.AWSConfig.Endpoint}
-			}
-
-			if in.config.AWSConfig.FIPSEnabled {
-				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
-			}
-			o.UsePathStyle = in.config.PathStyle
-		})
+	// Can this really happen?
+	if regionName != in.awsConfig.Region {
+		in.awsConfig.Region = regionName
+		s3Client = s3.NewFromConfig(in.awsConfig, in.config.s3OptionsFn)
 	}
 
-	s3API := &awsS3API{
+	return &awsS3API{
 		client: s3Client,
+	}, nil
+}
+
+func (in *s3PollerInput) createS3Poller(log *logp.Logger, inputID string, cancelCtx context.Context, client beat.Client, states *states) (*s3Poller, error) {
+	s3API, err := in.createS3API(cancelCtx)
+	if err != nil {
+		return nil, err
 	}
 
-	log := ctx.Logger.With("bucket", bucketID)
+	log = log.With("bucket", in.config.getBucketARN())
 	log.Infof("number_of_workers is set to %v.", in.config.NumberOfWorkers)
 	log.Infof("bucket_list_interval is set to %v.", in.config.BucketListInterval)
 	log.Infof("bucket_list_prefix is set to %v.", in.config.BucketListPrefix)
 	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
 
-	fileSelectors := in.config.FileSelectors
-	if len(in.config.FileSelectors) == 0 {
-		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
-	}
-	metrics := newInputMetrics(ctx.ID, nil, in.config.MaxNumberOfMessages)
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors, in.config.BackupConfig)
+	metrics := newInputMetrics(inputID, nil, in.config.MaxNumberOfMessages)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, in.config.getFileSelectors(), in.config.BackupConfig)
 	s3Poller := newS3Poller(log.Named("s3_poller"),
+		in.config, in.awsConfig,
 		metrics,
 		s3API,
 		client,
 		s3EventHandlerFactory,
 		states,
-		bucketID,
-		in.config.BucketListPrefix,
-		in.awsConfig.Region,
-		getProviderFromDomain(in.config.AWSConfig.Endpoint, in.config.ProviderOverride),
-		in.config.NumberOfWorkers,
-		in.config.BucketListInterval)
+		getProviderFromDomain(in.config.AWSConfig.Endpoint, in.config.ProviderOverride))
 
 	return s3Poller, nil
 }
 
 func newS3Poller(log *logp.Logger,
+	config config,
+	awsConfig awssdk.Config,
 	metrics *inputMetrics,
 	s3 s3API,
 	client beat.Client,
 	s3ObjectHandler s3ObjectHandlerFactory,
 	states *states,
-	bucket string,
-	listPrefix string,
-	awsRegion string,
 	provider string,
-	numberOfWorkers int,
-	bucketPollInterval time.Duration,
 ) *s3Poller {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
 		metrics = newInputMetrics("", nil, 0)
 	}
 	return &s3Poller{
-		numberOfWorkers:      numberOfWorkers,
-		bucket:               bucket,
-		listPrefix:           listPrefix,
-		region:               awsRegion,
-		provider:             provider,
-		bucketPollInterval:   bucketPollInterval,
-		s3:                   s3,
-		log:                  log,
-		metrics:              metrics,
-		client:               client,
-		s3ObjectHandler:      s3ObjectHandler,
-		states:               states,
-		workersProcessingMap: new(sync.Map),
+		config:          config,
+		awsConfig:       awsConfig,
+		provider:        provider,
+		s3:              s3,
+		log:             log,
+		metrics:         metrics,
+		client:          client,
+		s3ObjectHandler: s3ObjectHandler,
+		states:          states,
 	}
 }
 
 func (p *s3Poller) createS3ObjectProcessor(ctx context.Context, state state) s3ObjectHandler {
 	event := s3EventV2{}
-	event.AWSRegion = p.region
+	event.AWSRegion = p.awsConfig.Region
 	event.Provider = p.provider
 	event.S3.Bucket.Name = state.Bucket
-	event.S3.Bucket.ARN = p.bucket
+	event.S3.Bucket.ARN = p.config.getBucketARN()
 	event.S3.Object.Key = state.Key
 
 	acker := awscommon.NewEventACKTracker(ctx)
@@ -278,8 +223,11 @@ func (p *s3Poller) workerLoop(ctx context.Context, s3ObjectPayloadChan <-chan *s
 			state.Stored = true
 		}
 
-		// Persist the result
-		p.states.AddState(state)
+		// Persist the result, report any errors
+		err = p.states.AddState(state)
+		if err != nil {
+			p.log.Errorf("saving completed object state: %v", err.Error())
+		}
 
 		// Metrics
 		p.metrics.s3ObjectsAckedTotal.Inc()
@@ -289,11 +237,11 @@ func (p *s3Poller) workerLoop(ctx context.Context, s3ObjectPayloadChan <-chan *s
 func (p *s3Poller) readerLoop(ctx context.Context, s3ObjectPayloadChan chan<- *s3ObjectPayload) {
 	defer close(s3ObjectPayloadChan)
 
-	bucketName := getBucketNameFromARN(p.bucket)
+	bucketName := getBucketNameFromARN(p.config.getBucketARN())
 
 	errorBackoff := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 	circuitBreaker := 0
-	paginator := p.s3.ListObjectsPaginator(bucketName, p.listPrefix)
+	paginator := p.s3.ListObjectsPaginator(bucketName, p.config.BucketListPrefix)
 	for paginator.HasMorePages() {
 		page, err := paginator.NextPage(ctx)
 
@@ -349,7 +297,7 @@ func (p *s3Poller) Poll(ctx context.Context) {
 		workChan := make(chan *s3ObjectPayload)
 
 		// Start the worker goroutines to listen on the work channel
-		for i := 0; i < p.numberOfWorkers; i++ {
+		for i := 0; i < p.config.NumberOfWorkers; i++ {
 			workerWg.Add(1)
 			go func() {
 				defer workerWg.Done()
@@ -361,7 +309,7 @@ func (p *s3Poller) Poll(ctx context.Context) {
 		p.readerLoop(ctx, workChan)
 		workerWg.Wait()
 
-		_ = timed.Wait(ctx, p.bucketPollInterval)
+		_ = timed.Wait(ctx, p.config.BucketListInterval)
 	}
 }
 
