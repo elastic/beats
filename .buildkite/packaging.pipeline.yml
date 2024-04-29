@@ -1,6 +1,11 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 # TODO: Pre-cache beats-dev/golang-crossbuild container image
 
+# prevent out of order DRA publishing
+# otherwise commits in quick succession will run in parallel and possibly result in our of order DRA artifacts
+agents:
+  queue: "dra-builder-queue"
+
 env:
   ASDF_MAGE_VERSION: 1.15.0
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
