@@ -41,6 +41,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Affecting all Beats*
 
+- Change cache processor documentation from `write_period` to `write_interval`. {pull}38561[38561]
+- Fix cache processor expiries heap cleanup on partial file writes. {pull}38561[38561]
+- Fix cache processor expiries infinite growth when large a large TTL is used and recurring keys are cached. {pull}38561[38561]
 
 *Auditbeat*
 
@@ -49,6 +52,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Fix a race condition that could crash Filebeat with a "negative WaitGroup counter" error {pull}38094[38094]
 - Prevent HTTPJSON holding response bodies between executions. {issue}35219[35219] {pull}38116[38116]
+- [threatintel] MISP splitting fix for empty responses {issue}38739[38739] {pull}38917[38917]
 
 *Heartbeat*
 
