@@ -168,6 +168,7 @@ func (o *metricsObserver) queueACKed(n int) {
 // (queue) maximum queue event capacity
 func (o *metricsObserver) queueMaxEvents(n int) {
 	o.vars.queueMaxEvents.Set(uint64(n))
+	o.setPercentageFull()
 }
 
 //
