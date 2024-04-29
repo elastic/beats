@@ -188,7 +188,7 @@ func (s prvdr) UpdateDB(ev *beat.Event, pid uint32) error {
 			inBackoff = false
 			combinedWait = 0 * time.Millisecond
 		} else {
-			backoffSkipped += backoffSkipped
+			backoffSkipped += 1
 			return nil
 		}
 	} else {
