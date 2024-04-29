@@ -8,7 +8,8 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"io/ioutil"
+	"io"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -27,7 +28,7 @@ import (
 )
 
 func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.GetObjectOutput) {
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,7 +40,7 @@ func newS3GetObjectResponse(filename string, data []byte, contentType string) *s
 	r := bytes.NewReader(data)
 	getObjectOutput := s3.GetObjectOutput{}
 	getObjectOutput.ContentLength = int64(r.Len())
-	getObjectOutput.Body = ioutil.NopCloser(r)
+	getObjectOutput.Body = io.NopCloser(r)
 	if contentType != "" {
 		getObjectOutput.ContentType = &contentType
 	}
@@ -157,7 +158,7 @@ func TestS3ObjectProcessor(t *testing.T) {
 		ack := awscommon.NewEventACKTracker(ctx)
 		err := s3ObjProc.Create(ctx, logp.NewLogger(inputName), mockPublisher, ack, s3Event).ProcessS3Object()
 		require.Error(t, err)
-		assert.True(t, errors.Is(err, errFakeConnectivityFailure), "expected errFakeConnectivityFailure error")
+		assert.True(t, errors.Is(err, errS3DownloadFailed), "expected errS3DownloadFailed")
 	})
 
 	t.Run("no error empty result in download", func(t *testing.T) {

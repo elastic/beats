@@ -13,6 +13,7 @@ import (
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/smithy-go"
@@ -21,7 +22,6 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
-	"github.com/elastic/beats/v7/libbeat/statestore"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/go-concert/unison"
@@ -99,6 +99,7 @@ func (in *s3Input) Test(ctx v2.TestContext) error {
 }
 
 func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
+<<<<<<< HEAD
 	var err error
 
 	persistentStore, err := in.store.Access()
@@ -125,6 +126,9 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 	}()
 	defer cancelInputCtx()
+=======
+	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+>>>>>>> e588628b24 (Fix concurrency bugs that could cause data loss in the `aws-s3` input (#39131))
 
 	if in.config.QueueURL != "" {
 		regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint, in.config.RegionName)
@@ -168,8 +172,20 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 		defer client.Close()
 
+		// Connect to the registry and create our states lookup
+		persistentStore, err := in.store.Access()
+		if err != nil {
+			return fmt.Errorf("can not access persistent store: %w", err)
+		}
+		defer persistentStore.Close()
+
+		states, err := newStates(inputContext, persistentStore)
+		if err != nil {
+			return fmt.Errorf("can not start persistent store: %w", err)
+		}
+
 		// Create S3 receiver and S3 notification processor.
-		poller, err := in.createS3Lister(inputContext, ctx, client, persistentStore, states)
+		poller, err := in.createS3Lister(inputContext, ctx, client, states)
 		if err != nil {
 			return fmt.Errorf("failed to initialize s3 poller: %w", err)
 		}
@@ -240,7 +256,7 @@ func (n nonAWSBucketResolver) ResolveEndpoint(region string, options s3.Endpoint
 	return awssdk.Endpoint{URL: n.endpoint, SigningRegion: region, HostnameImmutable: true, Source: awssdk.EndpointSourceCustom}, nil
 }
 
-func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, client beat.Client, persistentStore *statestore.Store, states *states) (*s3Poller, error) {
+func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, client beat.Client, states *states) (*s3Poller, error) {
 	var bucketName string
 	var bucketID string
 	if in.config.NonAWSBucketName != "" {
@@ -260,6 +276,12 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 		}
 		o.UsePathStyle = in.config.PathStyle
+
+		o.Retryer = retry.NewStandard(func(so *retry.StandardOptions) {
+			so.MaxAttempts = 5
+			// Recover quickly when requests start working again
+			so.NoRetryIncrement = 100
+		})
 	})
 	regionName, err := getRegionForBucket(cancelCtx, s3Client, bucketName)
 	if err != nil {
@@ -305,7 +327,6 @@ func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, cli
 		client,
 		s3EventHandlerFactory,
 		states,
-		persistentStore,
 		bucketID,
 		in.config.BucketListPrefix,
 		in.awsConfig.Region,
