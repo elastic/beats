@@ -155,6 +155,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix fields not being parsed correctly in postgresql/database {issue}25301[25301] {pull}37720[37720]
 - rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
 - Fix timeout caused by the retrival of which indices are hidden {pull}39165[39165]
+- Fix Azure Monitor support for multiple aggregation types {issue}39192[39192] {pull}39204[39204]
 
 *Osquerybeat*
 
