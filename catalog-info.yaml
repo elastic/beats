@@ -1087,25 +1087,6 @@ spec:
       skip_intermediate_builds: false
       provider_settings:
         trigger_mode: none
-      # TODO uncomment out after https://github.com/elastic/ingest-dev/issues/3235
-      # schedules:
-      #   # TODO to be replaced with a generic scheduler similar to https://github.com/elastic/logstash/pull/15705
-      #   Daily run of ironbank validation / main:
-      #     branch: main
-      #     cronline: 30 02 * * *
-      #     message: Daily trigger of IronBank validation on main
-      #   Daily run of ironbank validation / 8.14:
-      #     branch: 8.14
-      #     cronline: 30 02 * * *
-      #     message: Daily trigger of IronBank validation on 8.14
-      #   Daily run of ironbank validation / 8.13:
-      #     branch: 8.13
-      #     cronline: 30 02 * * *
-      #     message: Daily trigger of IronBank validation on 8.13
-      #   Daily run of ironbank validation / 7.17:
-      #     branch: 7.17
-      #     cronline: 30 02 * * *
-      #     message: Daily trigger of IronBank validation on 7.17
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
@@ -1139,7 +1120,7 @@ spec:
       pipeline_file: ".buildkite/pipeline-scheduler.yml"
       maximum_timeout_in_minutes: 240
       schedules:
-        Daily Snapshot DRA:
+        Daily run of Iron Bank validation:
           branch: main
           cronline: 30 02 * * *
           message: Daily trigger of Iron Bank validation Pipeline per branch
@@ -1149,8 +1130,7 @@ spec:
       provider_settings:
         trigger_mode: none
       env:
-        # TODO enable slack notifications when it's tested
-        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'false'
+        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
         SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
         SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
       teams:
