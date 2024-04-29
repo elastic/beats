@@ -37,6 +37,7 @@ var (
 					},
 				}}},
 	}
+	countUnit = armmonitor.MetricUnit("Count")
 )
 
 func mockMapResourceMetrics(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error) {
@@ -155,7 +156,7 @@ func TestGetMetricValues(t *testing.T) {
 					}},
 				}},
 				Type:               to.Ptr("Microsoft.Insights/metrics"),
-				Unit:               to.Ptr(armmonitor.MetricUnit("Count")),
+				Unit:               &countUnit,
 				DisplayDescription: to.Ptr("Total Active Connections for Microsoft.EventHub."),
 				ErrorCode:          to.Ptr("Success"),
 			}},
@@ -237,7 +238,7 @@ func TestGetMetricValues(t *testing.T) {
 						Data: v.data,
 					}},
 					Type:               to.Ptr("Microsoft.Insights/metrics"),
-					Unit:               to.Ptr(armmonitor.MetricUnit("Count")),
+					Unit:               &countUnit,
 					DisplayDescription: to.Ptr("Total Active Connections for Microsoft.EventHub."),
 					ErrorCode:          to.Ptr("Success"),
 				}},
