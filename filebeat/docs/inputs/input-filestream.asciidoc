@@ -11,8 +11,9 @@ Use the `filestream` input to read lines from active log files. It is the
 new, improved alternative to the `log` input. It comes with various improvements
 to the existing input:
 
-1. Checking of `close_*` options happens out of band. Thus, if an output is blocked,
-{beatname_uc} can close the reader and avoid keeping too many files open.
+1. Checking of `close.on_state_change.*` options happens out of
+band. Thus, if an output is blocked, {beatname_uc} can close the
+reader and avoid keeping too many files open.
 
 2. Detailed metrics are available for all files that match the `paths` configuration
 regardless of the `harvester_limit`. This way, you can keep track of all files,
