@@ -5,7 +5,13 @@
 
 steps:
   - label: ":pipeline: Generate trigger steps for $PIPELINES_TO_TRIGGER"
-    command: ".buildkite/pipeline-scheduler.py | buildkite-agent pipeline upload"
+    command: |
+      set -eo pipefail
+      .buildkite/pipeline-scheduler.py >steps.yml
+      echo "~~~ Printing pipeline steps"
+      yq . steps.yml
+      echo "~~~ Uploading steps"
+      buildkite-agent pipeline upload steps.yml
     agents:
       image: "docker.elastic.co/ci-agent-images/platform-ingest/buildkite-agent-beats-ci-with-hooks:0.1"
       useCustomGlobalHooks: true
