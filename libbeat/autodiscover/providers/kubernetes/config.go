@@ -30,6 +30,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
+// AllSupportedHints includes the set of all supported hints for both logs and metrics autodiscovery
+var AllSupportedHints = []string{"enabled", "module", "metricsets", "hosts", "period", "timeout", "metrics_path", "username", "password", "stream", "processors", "multiline", "json", "disable", "ssl", "metrics_filters", "raw", "include_lines", "exclude_lines", "fileset", "pipeline", "raw"}
+
 // Config for kubernetes autodiscover provider
 type Config struct {
 	KubeConfig        string                       `config:"kube_config"`
@@ -44,9 +47,14 @@ type Config struct {
 	// Scope can be either node or cluster.
 	Scope    string `config:"scope"`
 	Resource string `config:"resource"`
+
 	// Unique identifies if this provider enables its templates only when it is elected as leader in a k8s cluster
 	Unique      bool   `config:"unique"`
 	LeaderLease string `config:"leader_lease"`
+	//Parameters to configure election process
+	LeaseDuration time.Duration `config:"leader_leaseduration"`
+	RenewDeadline time.Duration `config:"leader_renewdeadline"`
+	RetryPeriod   time.Duration `config:"leader_retryperiod"`
 
 	Prefix    string                  `config:"prefix"`
 	Hints     *config.C               `config:"hints"`
@@ -57,7 +65,7 @@ type Config struct {
 	AddResourceMetadata *metadata.AddResourceMetadataConfig `config:"add_resource_metadata"`
 }
 
-// Public variable, so specific beats (as Filebeat) can set a different cleanup timeout if they need it.
+// DefaultCleanupTimeout Public variable, so specific beats (as Filebeat) can set a different cleanup timeout if they need it.
 var DefaultCleanupTimeout time.Duration = 0
 
 func defaultConfig() *Config {
@@ -68,6 +76,9 @@ func defaultConfig() *Config {
 		Prefix:              "co.elastic",
 		Unique:              false,
 		AddResourceMetadata: metadata.GetDefaultResourceMetadataConfig(),
+		LeaseDuration:       15 * time.Second,
+		RenewDeadline:       10 * time.Second,
+		RetryPeriod:         2 * time.Second,
 	}
 }
 

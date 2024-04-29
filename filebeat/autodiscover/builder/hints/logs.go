@@ -37,13 +37,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
-	err := autodiscover.Registry.AddBuilder("hints", NewLogHints)
-	if err != nil {
-		logp.Error(fmt.Errorf("could not add `hints` builder"))
-	}
-}
-
 const (
 	multiline    = "multiline"
 	includeLines = "include_lines"
@@ -62,6 +55,14 @@ type logHints struct {
 	config   *config
 	registry *fileset.ModuleRegistry
 	log      *logp.Logger
+}
+
+// InitializeModule initializes this module.
+func InitializeModule() {
+	err := autodiscover.Registry.AddBuilder("hints", NewLogHints)
+	if err != nil {
+		logp.Error(fmt.Errorf("could not add `hints` builder"))
+	}
 }
 
 // NewLogHints builds a log hints builder

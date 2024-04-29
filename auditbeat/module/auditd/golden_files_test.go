@@ -37,6 +37,7 @@ import (
 	"github.com/elastic/go-libaudit/v2"
 	"github.com/elastic/go-libaudit/v2/aucoalesce"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
 )
@@ -201,7 +202,7 @@ func TestGoldenFiles(t *testing.T) {
 				// Send stream terminator
 				returnMessage(terminator)
 
-			ms := mbtest.NewPushMetricSetV2(t, configForGolden())
+			ms := mbtest.NewPushMetricSetV2WithRegistry(t, configForGolden(), ab.Registry)
 			auditMetricSet := ms.(*MetricSet)
 			auditMetricSet.client.Close()
 			auditMetricSet.client = &libaudit.AuditClient{Netlink: mock}

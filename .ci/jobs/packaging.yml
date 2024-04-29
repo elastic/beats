@@ -14,7 +14,7 @@
           discover-pr-forks-trust: 'permission'
           discover-pr-origin: 'merge-current'
           discover-tags: true
-          head-filter-regex: '(main|7\.1[6789]|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
+          head-filter-regex: '(7\.1[6789]|8\.\d+|PR-.*|v\d+\.\d+\.\d+)'
           disable-pr-notifications: true
           notification-context: 'beats-packaging'
           repo: 'beats'
@@ -28,9 +28,6 @@
               ignore-tags-older-than: -1
               ignore-tags-newer-than: 30
           - named-branches:
-              - exact-name:
-                  name: 'main'
-                  case-sensitive: true
               - regex-name:
                   regex: '7\.1[6789]'
                   case-sensitive: true
