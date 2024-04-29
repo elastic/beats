@@ -111069,13 +111069,6 @@ type: keyword
 
 --
 
-*`o365.audit.Activity`*::
-+
---
-type: keyword
-
---
-
 *`o365.audit.Actor`*::
 +
 --
@@ -111297,13 +111290,6 @@ type: keyword
 +
 --
 type: object
-
---
-
-*`o365.audit.Experience`*::
-+
---
-type: keyword
 
 --
 
@@ -111552,38 +111538,10 @@ type: keyword
 
 --
 
-*`o365.audit.ObjectDisplayName`*::
-+
---
-type: keyword
-
---
-
-*`o365.audit.ObjectType`*::
-+
---
-type: keyword
-
---
-
 *`o365.audit.Operation`*::
 +
 --
 type: keyword
-
---
-
-*`o365.audit.OperationId`*::
-+
---
-type: keyword
-
---
-
-*`o365.audit.OperationProperties`*::
-+
---
-type: object
 
 --
 
@@ -111630,13 +111588,6 @@ type: keyword
 --
 
 *`o365.audit.RecordType`*::
-+
---
-type: keyword
-
---
-
-*`o365.audit.RequestId`*::
 +
 --
 type: keyword
@@ -111783,13 +111734,6 @@ type: keyword
 
 --
 
-*`o365.audit.Timestamp`*::
-+
---
-type: keyword
-
---
-
 *`o365.audit.UniqueSharingId`*::
 +
 --
@@ -111840,20 +111784,6 @@ type: keyword
 --
 
 *`o365.audit.Workload`*::
-+
---
-type: keyword
-
---
-
-*`o365.audit.WorkspaceId`*::
-+
---
-type: keyword
-
---
-
-*`o365.audit.WorkspaceName`*::
 +
 --
 type: keyword
