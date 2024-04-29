@@ -1046,11 +1046,11 @@ spec:
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
       provider_settings:
-        trigger_mode: code
-        build_pull_requests: false
         build_branches: false
-        build_tags: false
         build_pull_request_forks: false
+        build_pull_requests: false
+        build_tags: false
+        trigger_mode: code
       env:
         ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
         SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
