@@ -1050,6 +1050,7 @@ spec:
         build_pull_requests: false
         build_branches: false
         build_tags: false
+        build_pull_request_forks: false
       env:
         ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
         SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
