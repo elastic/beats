@@ -19,14 +19,14 @@ steps:
   - name: Start of concurrency group for DRA Snapshot
     if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
     command: echo "--> Start of concurrency gate dra-snapshot"
-    concurrency_group: "dra-gate-snapshot"
+    concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
     key: start-gate-snapshot
 
   - name: Start of concurrency group for DRA Staging
     if: build.branch =~ /^\d+\.\d+$$/
     command: echo "--> Start of concurrency gate dra-staging"
-    concurrency_group: "dra-gate-staging"
+    concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
     key: start-gate-staging
 
@@ -265,12 +265,12 @@ steps:
 
   - command: echo "End of concurrency gate dra-snapshot <--"
     if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
-    concurrency_group: "dra-gate-snapshot"
+    concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-snapshot
 
   - command: echo "End of concurrency gate dra-staging <--"
     if: build.branch =~ /^\d+\.\d+$$/
-    concurrency_group: "dra-gate-staging"
+    concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
     concurrency: 1
     key: end-gate-staging
