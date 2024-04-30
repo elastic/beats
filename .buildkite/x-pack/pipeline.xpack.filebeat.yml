@@ -139,6 +139,7 @@ steps:
   - group: "x-pack/filebeat Extended Windows Tests"
     key: "x-pack-filebeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+
     steps:
       - label: ":windows: Win-2019 Unit Tests"
         command: |
@@ -276,7 +277,6 @@ steps:
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet x-pack/filebeat
           echo "~~~ Running tests"
-
           .buildkite/scripts/cloud_tests.sh
         env:
           ASDF_TERRAFORM_VERSION: 1.0.2
