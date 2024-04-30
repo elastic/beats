@@ -1045,6 +1045,7 @@ spec:
       # branch_configuration: "main 8.* 7.17"
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
+      maximum_timeout_in_minutes: 60
       provider_settings:
         build_branches: true
         build_pull_request_forks: false
