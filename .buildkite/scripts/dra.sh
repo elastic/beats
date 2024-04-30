@@ -78,5 +78,5 @@ if [[ "$DRY_RUN" != "--dry-run" ]]; then
   rm rm-output.txt
 
   # and make it easily clickable as a Builkite annotation
-  printf "**Summary link:** [${SUMMARY_URL}](${SUMMARY_URL})\n" | buildkite-agent annotate --style=success 
+  printf "**${DRA_WORKFLOW} summary link:** [${SUMMARY_URL}](${SUMMARY_URL})\n" | buildkite-agent annotate --style=success --append
 fi
