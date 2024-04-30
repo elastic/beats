@@ -12,11 +12,32 @@ env:
   PLATFORMS_ARM: "linux/arm64"
 
 steps:
+  # we use concurrency gates (https://buildkite.com/blog/concurrency-gates)
+  # to implement two FIFO queues for DRA-snapshot and DRA-staging
+  # this prevents parallel builds and possibility of publishing out of order DRA artifacts if the first job takes longer than the second
+
+  - name: Start of concurrency group for DRA Snapshot
+    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    command: echo "--> Start of concurrency gate dra-snapshot"
+    concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
+    concurrency: 1
+    key: start-gate-snapshot
+
+  - name: Start of concurrency group for DRA Staging
+    if: build.branch =~ /^\d+\.\d+$$/
+    command: echo "--> Start of concurrency gate dra-staging"
+    concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
+    concurrency: 1
+    key: start-gate-staging
+
+  - wait
+
   - group: Beats dashboards
     key: dashboards
     steps:
       - label: Snapshot dashboards
         if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+        depends_on: start-gate-snapshot
         key: dashboards-snapshot
         # TODO: container with go and make
         agents:
@@ -34,6 +55,7 @@ steps:
 
       - label: Staging dashboards
         if: build.branch =~ /^\d+\.\d+$$/
+        depends_on: start-gate-staging
         key: dashboards-staging
         # TODO: container with go and make
         agents:
@@ -52,6 +74,7 @@ steps:
   - group: Packaging snapshot
     if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
     key: packaging-snapshot
+    depends_on: start-gate-snapshot
     steps:
       - label: "SNAPSHOT: {{matrix}}"
         env:
@@ -123,8 +146,8 @@ steps:
           - build/distributions/**/*
 
   - group: Packaging Staging
-
     key: packaging-staging
+    depends_on: start-gate-staging
     ## Only for release
     if: build.branch =~ /^\d+\.\d+$$/
     steps:
@@ -169,7 +192,7 @@ steps:
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
-          - build/distributions/**
+          - build/distributions/**/*
         matrix:
           - auditbeat
           - filebeat
@@ -207,6 +230,7 @@ steps:
         env:
           DRA_WORKFLOW: snapshot
         depends_on:
+          - start-gate-snapshot
           - packaging-snapshot
           - dashboards-snapshot
         command: |
@@ -225,6 +249,7 @@ steps:
         env:
           DRA_WORKFLOW: staging
         depends_on:
+          - start-gate-staging
           - packaging-staging
           - dashboards-staging
         command: |
@@ -235,3 +260,17 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+
+  - wait
+
+  - command: echo "End of concurrency gate dra-snapshot <--"
+    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
+    concurrency: 1
+    key: end-gate-snapshot
+
+  - command: echo "End of concurrency gate dra-staging <--"
+    if: build.branch =~ /^\d+\.\d+$$/
+    concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
+    concurrency: 1
+    key: end-gate-staging
