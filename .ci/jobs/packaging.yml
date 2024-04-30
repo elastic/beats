@@ -32,7 +32,7 @@
                   regex: '8\.13'
                   case-sensitive: true
               - regex-name:
-                  regex: '8\.\d+'
+                  regex: '7\.1[6789]'
                   case-sensitive: true
           - change-request:
               ignore-target-only-changes: true
