@@ -33,7 +33,7 @@ if curl -sSLo "${KUBECTL_BINARY}" "https://storage.googleapis.com/kubernetes-rel
     echo "Current K8S Version: ${K8S_VERSION}"
     echo "Kubectl installed: ${KUBECTL_BINARY}"
 else
-    echo "--- Something bad with the download, let's delete the corrupted binary"
+    echo "Something bad with the download, let's delete the corrupted binary"
     if [ -e "${KUBECTL_BINARY}" ] ; then
         rm "${KUBECTL_BINARY}"
     fi
