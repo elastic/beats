@@ -9,7 +9,6 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
@@ -29,7 +28,7 @@ type states struct {
 }
 
 // newStates generates a new states registry.
-func newStates(log *logp.Logger, store *statestore.Store) (*states, error) {
+func newStates(store *statestore.Store) (*states, error) {
 	stateTable := map[string]state{}
 
 	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
@@ -41,7 +40,6 @@ func newStates(log *logp.Logger, store *statestore.Store) (*states, error) {
 		var st state
 		if err := dec.Decode(&st); err != nil {
 			// Skip this key but continue iteration
-			log.Warnf("invalid S3 state loading object key %v", key)
 			//nolint:nilerr // One bad object shouldn't stop iteration
 			return true, nil
 		}
@@ -89,4 +87,10 @@ func (s *states) AddState(state state) error {
 		return err
 	}
 	return nil
+}
+
+func (s *states) Close() {
+	s.storeLock.Lock()
+	s.store.Close()
+	s.storeLock.Unlock()
 }

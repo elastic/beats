@@ -246,7 +246,9 @@ func (c config) getBucketARN() string {
 	return ""
 }
 
-func (c config) s3OptionsFn(o *s3.Options) {
+// A callback to apply the configuration's settings to an S3 options struct.
+// Should be provided to s3.NewFromConfig.
+func (c config) s3ConfigModifier(o *s3.Options) {
 	if c.NonAWSBucketName != "" {
 		o.EndpointResolver = nonAWSBucketResolver{endpoint: c.AWSConfig.Endpoint}
 	}

@@ -329,9 +329,10 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 			wg.Add(1)
 			go func(i int, wg *sync.WaitGroup) {
 				defer wg.Done()
-				listPrefix := fmt.Sprintf("list_prefix_%d", i)
+				curConfig := config
+				curConfig.BucketListPrefix = fmt.Sprintf("list_prefix_%d", i)
 				s3API := newConstantS3(t)
-				s3API.pagerConstant = newS3PagerConstant(listPrefix)
+				s3API.pagerConstant = newS3PagerConstant(curConfig.BucketListPrefix)
 				storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
 				store, err := storeReg.Get("test")
 				if err != nil {
@@ -339,11 +340,11 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					return
 				}
 
-				states, err := newStates(inputCtx.Logger, store)
+				states, err := newStates(store)
 				assert.NoError(t, err, "states creation should succeed")
 
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors, backupConfig{})
-				s3Poller := newS3Poller(logp.NewLogger(inputName), config, nil, metrics, s3API, client, s3EventHandlerFactory, states, "bucket", listPrefix, "region", "provider", time.Second)
+				s3Poller := newS3Poller(logp.NewLogger(inputName), config, nil, metrics, s3API, client, s3EventHandlerFactory, states, "bucket", "region", "provider", time.Second)
 
 				s3Poller.Poll(ctx)
 			}(i, wg)

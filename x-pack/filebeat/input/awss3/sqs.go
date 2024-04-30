@@ -11,18 +11,11 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
-	awssdk "github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/aws/smithy-go"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -31,123 +24,6 @@ const (
 	sqsRetryDelay                  = 10 * time.Second
 	sqsApproximateNumberOfMessages = "ApproximateNumberOfMessages"
 )
-
-type sqsReaderInput struct {
-	config    config
-	awsConfig awssdk.Config
-}
-
-type sqsReader struct {
-	maxMessagesInflight int
-	activeMessages      atomic.Int
-	sqs                 sqsAPI
-	msgHandler          sqsProcessor
-	log                 *logp.Logger
-	metrics             *inputMetrics
-
-	// The main loop sends incoming messages to workChan, and the worker
-	// goroutines read from it.
-	workChan chan types.Message
-
-	// workerWg is used to wait on worker goroutines during shutdown
-	workerWg sync.WaitGroup
-}
-
-func newSQSReaderInput(config config, awsConfig awssdk.Config) (v2.Input, error) {
-	return &sqsReaderInput{
-		config:    config,
-		awsConfig: awsConfig,
-	}, nil
-}
-
-func (in *sqsReaderInput) Name() string { return inputName }
-
-func (in *sqsReaderInput) Test(ctx v2.TestContext) error {
-	return nil
-}
-
-func (in *sqsReaderInput) Run(
-	inputContext v2.Context,
-	pipeline beat.Pipeline,
-) error {
-	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
-	configRegion := in.config.RegionName
-	urlRegion, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
-	if err != nil && configRegion == "" {
-		// Only report an error if we don't have a configured region
-		// to fall back on.
-		return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
-	} else if configRegion != "" && configRegion != urlRegion {
-		inputContext.Logger.Warnf("configured region disagrees with queue_url region (%q != %q): using %q", configRegion, urlRegion, urlRegion)
-	}
-
-	in.awsConfig.Region = urlRegion
-
-	// Create SQS receiver and S3 notification processor.
-	receiver, err := in.createSQSReceiver(inputContext, pipeline)
-	if err != nil {
-		return fmt.Errorf("failed to initialize sqs receiver: %w", err)
-	}
-	defer receiver.metrics.Close()
-
-	// Poll metrics periodically in the background
-	go pollSqsWaitingMetric(ctx, receiver)
-
-	receiver.Receive(ctx)
-	return nil
-}
-
-func (in *sqsReaderInput) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*sqsReader, error) {
-	sqsAPI := &awsSQSAPI{
-		client: sqs.NewFromConfig(in.awsConfig, func(o *sqs.Options) {
-			if in.config.AWSConfig.FIPSEnabled {
-				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
-			}
-		}),
-		queueURL:          in.config.QueueURL,
-		apiTimeout:        in.config.APITimeout,
-		visibilityTimeout: in.config.VisibilityTimeout,
-		longPollWaitTime:  in.config.SQSWaitTime,
-	}
-
-	s3API := &awsS3API{
-		client: s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
-			if in.config.AWSConfig.FIPSEnabled {
-				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
-			}
-			o.UsePathStyle = in.config.PathStyle
-		}),
-	}
-
-	log := ctx.Logger.With("queue_url", in.config.QueueURL)
-	log.Infof("AWS api_timeout is set to %v.", in.config.APITimeout)
-	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
-	log.Infof("AWS SQS visibility_timeout is set to %v.", in.config.VisibilityTimeout)
-	log.Infof("AWS SQS max_number_of_messages is set to %v.", in.config.MaxNumberOfMessages)
-
-	if in.config.BackupConfig.GetBucketName() != "" {
-		log.Warnf("You have the backup_to_bucket functionality activated with SQS. Please make sure to set appropriate destination buckets" +
-			"or prefixes to avoid an infinite loop.")
-	}
-
-	fileSelectors := in.config.FileSelectors
-	if len(in.config.FileSelectors) == 0 {
-		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
-	}
-	script, err := newScriptFromConfig(log.Named("sqs_script"), in.config.SQSScript)
-	if err != nil {
-		return nil, err
-	}
-	metrics := newInputMetrics(ctx.ID, nil, in.config.MaxNumberOfMessages)
-
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, fileSelectors, in.config.BackupConfig)
-
-	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory)
-
-	sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
-
-	return sqsReader, nil
-}
 
 func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, msgHandler sqsProcessor) *sqsReader {
 	if metrics == nil {
@@ -285,42 +161,37 @@ func getRegionFromQueueURL(queueURL, endpoint string) (string, error) {
 }
 
 func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
-	// Run GetApproximateMessageCount before start of timer to set initial count for sqs waiting metric
-	// This is to avoid misleading values in metric when sqs messages are processed before the ticker channel kicks in
-	if shouldReturn := updateMessageCount(receiver, ctx); shouldReturn {
-		return
-	}
-
 	t := time.NewTicker(time.Minute)
 	defer t.Stop()
 	for {
+		if err := updateMessageCount(receiver, ctx); isSQSAuthError(err) {
+			// stop polling if auth error is encountered
+			// Set it back to -1 because there is a permission error
+			receiver.metrics.sqsMessagesWaiting.Set(int64(-1))
+			return
+		}
 		select {
 		case <-ctx.Done():
 			return
 		case <-t.C:
-			if shouldReturn := updateMessageCount(receiver, ctx); shouldReturn {
-				return
-			}
 		}
 	}
 }
 
 // updateMessageCount runs GetApproximateMessageCount for the given context and updates the receiver metric with the count returning false on no error
 // If there is an error, the metric is reinitialized to -1 and true is returned
-func updateMessageCount(receiver *sqsReader, ctx context.Context) bool {
+func updateMessageCount(receiver *sqsReader, ctx context.Context) error {
 	count, err := receiver.GetApproximateMessageCount(ctx)
+	if err == nil {
+		receiver.metrics.sqsMessagesWaiting.Set(int64(count))
+	}
+	return err
+}
 
+func isSQSAuthError(err error) bool {
 	var apiError smithy.APIError
 	if errors.As(err, &apiError) {
-		switch apiError.ErrorCode() {
-		case sqsAccessDeniedErrorCode:
-			// stop polling if auth error is encountered
-			// Set it back to -1 because there is a permission error
-			receiver.metrics.sqsMessagesWaiting.Set(int64(-1))
-			return true
-		}
+		return apiError.ErrorCode() == sqsAccessDeniedErrorCode
 	}
-
-	receiver.metrics.sqsMessagesWaiting.Set(int64(count))
 	return false
 }
