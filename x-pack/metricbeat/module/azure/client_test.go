@@ -9,10 +9,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/monitor/armmonitor"
 	"github.com/Azure/azure-sdk-for-go/sdk/resourcemanager/resources/armresources"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 )
 
 var (
@@ -35,6 +37,7 @@ var (
 					},
 				}}},
 	}
+	countUnit = armmonitor.MetricUnit("Count")
 )
 
 func mockMapResourceMetrics(client *Client, resources []*armresources.GenericResourceExpanded, resourceConfig ResourceConfig) ([]Metric, error) {
@@ -110,6 +113,159 @@ func TestGetMetricValues(t *testing.T) {
 		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
 		assert.Equal(t, len(metricValues), 0)
 		assert.Equal(t, len(client.ResourceConfigurations.Metrics[0].Values), 0)
+		m.AssertExpectations(t)
+	})
+
+	t.Run("multiple aggregation types", func(t *testing.T) {
+		client := NewMockClient()
+		referenceTime := time.Now().UTC()
+		client.ResourceConfigurations = ResourceConfiguration{
+			Metrics: []Metric{
+				{
+					Namespace:    "Microsoft.EventHub/Namespaces",
+					Names:        []string{"ActiveConnections"},
+					Aggregations: "Maximum,Minimum,Average",
+					TimeGrain:    "PT1M",
+				},
+			},
+		}
+
+		m := &MockService{}
+		m.On(
+			"GetMetricValues",
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+			mock.Anything,
+		).Return(
+			[]armmonitor.Metric{{
+				ID: to.Ptr("test"),
+				Name: &armmonitor.LocalizableString{
+					Value:          to.Ptr("ActiveConnections"),
+					LocalizedValue: to.Ptr("ActiveConnections"),
+				},
+				Timeseries: []*armmonitor.TimeSeriesElement{{
+					Data: []*armmonitor.MetricValue{{
+						Average:   to.Ptr(1.0),
+						Maximum:   to.Ptr(2.0),
+						Minimum:   to.Ptr(3.0),
+						TimeStamp: to.Ptr(time.Now()),
+					}},
+				}},
+				Type:               to.Ptr("Microsoft.Insights/metrics"),
+				Unit:               &countUnit,
+				DisplayDescription: to.Ptr("Total Active Connections for Microsoft.EventHub."),
+				ErrorCode:          to.Ptr("Success"),
+			}},
+			"PT1M",
+			nil,
+		)
+
+		client.AzureMonitorService = m
+		mr := MockReporterV2{}
+
+		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
+
+		require.Equal(t, len(metricValues), 1)
+		require.Equal(t, len(metricValues[0].Values), 1)
+
+		assert.Equal(t, *metricValues[0].Values[0].avg, 1.0)
+		assert.Equal(t, *metricValues[0].Values[0].max, 2.0)
+		assert.Equal(t, *metricValues[0].Values[0].min, 3.0)
+
+		require.Equal(t, len(client.ResourceConfigurations.Metrics[0].Values), 1)
+
+		m.AssertExpectations(t)
+	})
+
+	t.Run("single aggregation types", func(t *testing.T) {
+		client := NewMockClient()
+		referenceTime := time.Now().UTC()
+		timestamp := time.Now().UTC()
+		client.ResourceConfigurations = ResourceConfiguration{
+			Metrics: []Metric{
+				{
+					Namespace:    "Microsoft.EventHub/Namespaces",
+					Names:        []string{"ActiveConnections"},
+					Aggregations: "Maximum",
+					TimeGrain:    "PT1M",
+				}, {
+					Namespace:    "Microsoft.EventHub/Namespaces",
+					Names:        []string{"ActiveConnections"},
+					Aggregations: "Minimum",
+					TimeGrain:    "PT1M",
+				}, {
+					Namespace:    "Microsoft.EventHub/Namespaces",
+					Names:        []string{"ActiveConnections"},
+					Aggregations: "Average",
+					TimeGrain:    "PT1M",
+				},
+			},
+		}
+
+		m := &MockService{}
+
+		x := []struct {
+			aggregation string
+			data        []*armmonitor.MetricValue
+		}{
+			{aggregation: "Maximum", data: []*armmonitor.MetricValue{{Maximum: to.Ptr(3.0), TimeStamp: to.Ptr(timestamp)}}},
+			{aggregation: "Minimum", data: []*armmonitor.MetricValue{{Minimum: to.Ptr(1.0), TimeStamp: to.Ptr(timestamp)}}},
+			{aggregation: "Average", data: []*armmonitor.MetricValue{{Average: to.Ptr(2.0), TimeStamp: to.Ptr(timestamp)}}},
+		}
+
+		for _, v := range x {
+			m.On(
+				"GetMetricValues",
+				mock.Anything,
+				mock.Anything,
+				mock.Anything,
+				mock.Anything,
+				mock.Anything,
+				v.aggregation,
+				mock.Anything,
+			).Return(
+				[]armmonitor.Metric{{
+					ID: to.Ptr("test"),
+					Name: &armmonitor.LocalizableString{
+						Value:          to.Ptr("ActiveConnections"),
+						LocalizedValue: to.Ptr("ActiveConnections"),
+					},
+					Timeseries: []*armmonitor.TimeSeriesElement{{
+						Data: v.data,
+					}},
+					Type:               to.Ptr("Microsoft.Insights/metrics"),
+					Unit:               &countUnit,
+					DisplayDescription: to.Ptr("Total Active Connections for Microsoft.EventHub."),
+					ErrorCode:          to.Ptr("Success"),
+				}},
+				"PT1M",
+				nil,
+			).Once()
+		}
+
+		client.AzureMonitorService = m
+		mr := MockReporterV2{}
+
+		metricValues := client.GetMetricValues(referenceTime, client.ResourceConfigurations.Metrics, &mr)
+
+		require.Equal(t, 3, len(metricValues))
+
+		require.Equal(t, 1, len(metricValues[0].Values))
+		require.Equal(t, 1, len(metricValues[1].Values))
+		require.Equal(t, 1, len(metricValues[2].Values))
+
+		require.NotNil(t, metricValues[0].Values[0].max, "max value is nil")
+		require.NotNil(t, metricValues[1].Values[0].min, "min value is nil")
+		require.NotNil(t, metricValues[2].Values[0].avg, "avg value is nil")
+
+		assert.Equal(t, *metricValues[0].Values[0].max, 3.0)
+		assert.Equal(t, *metricValues[1].Values[0].min, 1.0)
+		assert.Equal(t, *metricValues[2].Values[0].avg, 2.0)
+
 		m.AssertExpectations(t)
 	})
 }
