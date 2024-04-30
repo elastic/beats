@@ -2,19 +2,28 @@
 
 set -euo pipefail
 
+source .buildkite/scripts/common.sh
+
+WORKSPACE=${WORKSPACE:-"$(pwd)"}
+GO_VERSION=$(cat .go-version)
+
 export REPO="beats"
 export DOCKER_REGISTRY="docker.elastic.co"
 export SETUP_GVM_VERSION="v0.5.1"
 export DOCKER_COMPOSE_VERSION="1.21.0"
 export DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
+
 export ASDF_NODEJS_VERSION="18.17.1"
 export AWS_REGION="eu-central-1"
+export KIND_VERSION="v0.20.0"
 
-WORKSPACE=${WORKSPACE:-"$(pwd)"}
 export WORKSPACE
-GO_VERSION=$(cat .go-version)
 export GO_VERSION
+export KUBECONFIG="${WORKSPACE}/kubecfg"
+export BIN="${WORKSPACE}/bin"
+export TMP_FOLDER="tmp.${REPO}"
 
+add_bin_path
 
 exportVars() {
   local platform_type="$(uname)"

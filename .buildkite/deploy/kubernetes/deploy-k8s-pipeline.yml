@@ -28,9 +28,7 @@ steps:
         K8S_VERSION: "v1.29.0"
       commands: |
         set -euo pipefail
-        echo "--- Setting up K8S environment"
         .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
-        echo "--- Running Tests"
         MODULE=kubernetes make -C metricbeat integration-tests
         make -C deploy/kubernetes test
       retry:
@@ -50,9 +48,7 @@ steps:
         K8S_VERSION: "v1.28.0"
       commands: |
         set -euo pipefail
-        echo "--- Setting up K8S environment"
         .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
-        echo "--- Running Tests"
         MODULE=kubernetes make -C metricbeat integration-tests
         make -C deploy/kubernetes test
       retry:
@@ -72,9 +68,7 @@ steps:
         K8S_VERSION: "v1.27.3"
       commands: |
         set -euo pipefail
-        echo "--- Setting up K8S environment"
         .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
-        echo "--- Running Tests"
         MODULE=kubernetes make -C metricbeat integration-tests
         make -C deploy/kubernetes test
       retry:
@@ -94,9 +88,7 @@ steps:
         K8S_VERSION: "v1.26.6"
       commands: |
         set -euo pipefail
-        echo "--- Setting up K8S environment"
         .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
-        echo "--- Running Tests"
         MODULE=kubernetes make -C metricbeat integration-tests
         make -C deploy/kubernetes test
       retry:
