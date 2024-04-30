@@ -135,9 +135,37 @@ func TestS3Poller(t *testing.T) {
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{})
 		states, err := newStates(store)
 		require.NoError(t, err, "states creation must succeed")
-		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, s3ObjProc, states, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
-		receiver.Poll(ctx)
+		poller := &s3PollerInput{
+			log: logp.NewLogger(inputName),
+			config: config{
+				NumberOfWorkers:    numberOfWorkers,
+				BucketListInterval: pollInterval,
+				BucketARN:          bucket,
+				BucketListPrefix:   "key",
+				RegionName:         "region",
+			},
+			s3:              mockAPI,
+			client:          mockPublisher,
+			s3ObjectHandler: s3ObjProc,
+			states:          states,
+			provider:        "provider",
+		}
+		poller.runPoll(ctx)
 	})
+
+	/*
+			func newS3Poller(log *logp.Logger,
+		-       metrics *inputMetrics,
+		-       s3 s3API,
+		-       client beat.Client,
+		-       s3ObjectHandler s3ObjectHandlerFactory,
+		-       states *states,
+		-       bucket string,
+		-       listPrefix string,
+		-       awsRegion string,
+		-       provider string,
+		-       numberOfWorkers int,
+		-       bucketPollInterval time.Duration,*/
 
 	t.Run("restart bucket scan after paging errors", func(t *testing.T) {
 		// Change the restart limit to 2 consecutive errors, so the test doesn't
@@ -262,7 +290,21 @@ func TestS3Poller(t *testing.T) {
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{})
 		states, err := newStates(store)
 		require.NoError(t, err, "states creation must succeed")
-		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, s3ObjProc, states, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
-		receiver.Poll(ctx)
+		poller := &s3PollerInput{
+			log: logp.NewLogger(inputName),
+			config: config{
+				NumberOfWorkers:    numberOfWorkers,
+				BucketListInterval: pollInterval,
+				BucketARN:          bucket,
+				BucketListPrefix:   "key",
+				RegionName:         "region",
+			},
+			s3:              mockAPI,
+			client:          mockPublisher,
+			s3ObjectHandler: s3ObjProc,
+			states:          states,
+			provider:        "provider",
+		}
+		poller.runPoll(ctx)
 	})
 }

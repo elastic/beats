@@ -120,12 +120,12 @@ func (in *s3PollerInput) Run(
 
 func (in *s3PollerInput) scanLoop(ctx context.Context) {
 	for ctx.Err() == nil {
-		in.runScan(ctx)
+		in.runPoll(ctx)
 		_ = timed.Wait(ctx, in.config.BucketListInterval)
 	}
 }
 
-func (in *s3PollerInput) runScan(ctx context.Context) {
+func (in *s3PollerInput) runPoll(ctx context.Context) {
 	var workerWg sync.WaitGroup
 	workChan := make(chan *s3FetchTask)
 
