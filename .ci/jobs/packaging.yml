@@ -29,7 +29,7 @@
               ignore-tags-newer-than: 30
           - named-branches:
               - exact-name:
-                  regex: '8\.13'
+                  name: '8.13'
                   case-sensitive: true
               - regex-name:
                   regex: '7\.1[6789]'
