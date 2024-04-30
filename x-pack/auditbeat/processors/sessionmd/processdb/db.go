@@ -7,6 +7,7 @@
 package processdb
 
 import (
+	"container/heap"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -82,6 +83,7 @@ type Process struct {
 	Cwd      string
 	Env      map[string]string
 	Filename string
+	ExitCode int32
 }
 
 var (
@@ -185,6 +187,8 @@ type DB struct {
 	entryLeaders             map[uint32]EntryType
 	entryLeaderRelationships map[uint32]uint32
 	procfs                   procfs.Reader
+	stopChan                 chan struct{}
+	removalCandidates        rcHeap
 }
 
 func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
@@ -192,13 +196,17 @@ func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
 	if initError != nil {
 		return &DB{}, initError
 	}
-	return &DB{
+	db := DB{
 		logger:                   logp.NewLogger("processdb"),
 		processes:                make(map[uint32]Process),
 		entryLeaders:             make(map[uint32]EntryType),
 		entryLeaderRelationships: make(map[uint32]uint32),
 		procfs:                   reader,
-	}, nil
+		stopChan:                 make(chan struct{}),
+		removalCandidates:        make(rcHeap, 0),
+	}
+	db.startReaper()
+	return &db, nil
 }
 
 func (db *DB) calculateEntityIDv1(pid uint32, startTime time.Time) string {
@@ -406,9 +414,18 @@ func (db *DB) InsertExit(exit types.ProcessExitEvent) {
 	defer db.mutex.Unlock()
 
 	pid := exit.PIDs.Tgid
-	delete(db.processes, pid)
-	delete(db.entryLeaders, pid)
-	delete(db.entryLeaderRelationships, pid)
+	process, ok := db.processes[pid]
+	if !ok {
+		db.logger.Errorf("could not insert exit, pid %v not found in db", pid)
+		return
+	}
+	process.ExitCode = exit.ExitCode
+	db.processes[pid] = process
+	heap.Push(&db.removalCandidates, removalCandidate{
+		pid:       pid,
+		startTime: process.PIDs.StartTimeNS,
+		exitTime:  time.Now(),
+	})
 }
 
 func interactiveFromTTY(tty types.TTYDev) bool {
@@ -437,6 +454,7 @@ func fullProcessFromDBProcess(p Process) types.Process {
 	ret.Thread.Capabilities.Effective, _ = capabilities.FromUint64(p.Creds.CapEffective)
 	ret.TTY.CharDevice.Major = p.CTTY.Major
 	ret.TTY.CharDevice.Minor = p.CTTY.Minor
+	ret.ExitCode = p.ExitCode
 
 	return ret
 }
@@ -715,4 +733,8 @@ func (db *DB) scrapeAncestors(proc Process) {
 		}
 		db.insertProcess(p)
 	}
+}
+
+func (db *DB) Close() {
+	close(db.stopChan)
 }

@@ -552,10 +552,13 @@ kube_pod_container_state_started{namespace="kube-system",pod="kube-proxy-45qj9",
 kube_pod_container_state_started{namespace="kube-system",pod="kube-state-metrics-5bcd4898-bntgt",uid="38cad684-d5e5-4187-8a98-2999c0f5b252",container="kube-state-metrics"} 1.713873336e+09
 # HELP kube_pod_container_status_last_terminated_reason Describes the last reason the container was in terminated state.
 # TYPE kube_pod_container_status_last_terminated_reason gauge
+kube_pod_container_status_last_terminated_reason{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="82154115-17ff-4943-8088-879d4d045b52",container="kube-scheduler",reason="Error"} 1
 # HELP kube_pod_container_status_last_terminated_exitcode Describes the exit code for the last container in terminated state.
 # TYPE kube_pod_container_status_last_terminated_exitcode gauge
+kube_pod_container_status_last_terminated_exitcode{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="82154115-17ff-4943-8088-879d4d045b52",container="kube-scheduler"} 1
 # HELP kube_pod_container_status_last_terminated_timestamp Last terminated time for a pod container in unix timestamp.
 # TYPE kube_pod_container_status_last_terminated_timestamp gauge
+kube_pod_container_status_last_terminated_timestamp{namespace="kube-system",pod="kube-scheduler-kind-control-plane",uid="82154115-17ff-4943-8088-879d4d045b52",container="kube-scheduler"} 1.71393586e+09
 # HELP kube_pod_container_status_ready [STABLE] Describes whether the containers readiness check succeeded.
 # TYPE kube_pod_container_status_ready gauge
 kube_pod_container_status_ready{namespace="default",pod="hello-28564556-gkqsk",uid="888e4e15-5ffc-40cd-826d-af822fee80dd",container="hello"} 0
