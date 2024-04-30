@@ -80,11 +80,13 @@ docker run --rm \
         --artifact-set "main" \
         ${DRY_RUN} | tee rm-output.txt
 
-# extract the summary URL from a release manager output line like:
-# Report summary-18.22.0.html can be found at https://artifacts-staging.elastic.co/beats/18.22.0-ABCDEFGH/summary-18.22.0.html
 
-SUMMARY_URL=$(grep -E '^Report summary-.* can be found at ' rm-output.txt | grep -oP 'https://\S+' | awk '{print $1}')
-rm rm-output.txt
+if [[ "$DRY_RUN" != "--dry-run" ]]; then
+  # extract the summary URL from a release manager output line like:
+  # Report summary-18.22.0.html can be found at https://artifacts-staging.elastic.co/beats/18.22.0-ABCDEFGH/summary-18.22.0.html
+  SUMMARY_URL=$(grep -E '^Report summary-.* can be found at ' rm-output.txt | grep -oP 'https://\S+' | awk '{print $1}')
+  rm rm-output.txt
 
-# and make it easily clickable as a Builkite annotation
-printf "**Summary link:** [${SUMMARY_URL}](${SUMMARY_URL})\n" | buildkite-agent annotate --style=success 
+  # and make it easily clickable as a Builkite annotation
+  printf "**Summary link:** [${SUMMARY_URL}](${SUMMARY_URL})\n" | buildkite-agent annotate --style=success 
+fi
