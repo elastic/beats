@@ -517,6 +517,30 @@ If `backoff.max` needs to be higher, it is recommended to close the file handler
 instead and let {beatname_uc} pick up the file again.
 
 [float]
+[id="{beatname_lc}-input-{type}-harvester-limit"]
+===== `harvester_limit`
+
+The `harvester_limit` option limits the number of harvesters that are started in
+parallel for one input. This directly relates to the maximum number of file
+handlers that are opened. The default for `harvester_limit` is 0, which means
+there is no limit. This configuration is useful if the number of files to be
+harvested exceeds the open file handler limit of the operating system.
+
+Setting a limit on the number of harvesters means that potentially not all files
+are opened in parallel. Therefore we recommended that you use this option in
+combination with the `close.on_state_change.*` options to make sure
+harvesters are stopped more often so that new files can be picked up.
+
+Currently if a new harvester can be started again, the harvester is picked
+randomly. This means it's possible that the harvester for a file that was just
+closed and then updated again might be started instead of the harvester for a
+file that hasn't been harvested for a longer period of time.
+
+This configuration option applies per input. You can use this option to
+indirectly set higher priorities on certain inputs by assigning a higher
+limit of harvesters.
+
+[float]
 ===== `file_identity`
 
 Different `file_identity` methods can be configured to suit the
