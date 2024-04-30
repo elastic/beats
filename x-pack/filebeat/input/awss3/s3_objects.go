@@ -43,6 +43,11 @@ type s3ObjectProcessorFactory struct {
 	backupConfig  backupConfig
 }
 
+// errS3DownloadFailed reports problems downloading an S3 object. Download errors
+// should never treated as permanent, they are just an indication to apply a
+// retry backoff until the connection is healthy again.
+var errS3DownloadFailed = errors.New("S3 download failure")
+
 func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig, maxWorkers int) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
@@ -135,8 +140,9 @@ func (p *s3ObjectProcessor) ProcessS3Object() error {
 	// Request object (download).
 	contentType, meta, body, err := p.download()
 	if err != nil {
-		return fmt.Errorf("failed to get s3 object (elapsed_time_ns=%d): %w",
-			time.Since(start).Nanoseconds(), err)
+		// Wrap downloadError in the result so the caller knows it's not a
+		// permanent failure.
+		return fmt.Errorf("%w: %w", errS3DownloadFailed, err)
 	}
 	defer body.Close()
 	p.s3Metadata = meta
@@ -434,10 +440,7 @@ func (p *s3ObjectProcessor) FinalizeS3Object() error {
 	if bucketName == "" {
 		return nil
 	}
-	backupKey := p.s3Obj.S3.Object.Key
-	if p.backupConfig.BackupToBucketPrefix != "" {
-		backupKey = fmt.Sprintf("%s%s", p.backupConfig.BackupToBucketPrefix, backupKey)
-	}
+	backupKey := p.backupConfig.BackupToBucketPrefix + p.s3Obj.S3.Object.Key
 	_, err := p.s3.CopyObject(p.ctx, p.s3Obj.S3.Bucket.Name, bucketName, p.s3Obj.S3.Object.Key, backupKey)
 	if err != nil {
 		return fmt.Errorf("failed to copy object to backup bucket: %w", err)

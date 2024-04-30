@@ -13,7 +13,7 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-func TestNewMetricRegistry(t *testing.T) {
+func TestMetricRegistry(t *testing.T) {
 	logger := logp.NewLogger("test azure monitor")
 
 	t.Run("Collect metrics with a regular 5 minutes period", func(t *testing.T) {
@@ -89,5 +89,141 @@ func TestNewMetricRegistry(t *testing.T) {
 		needsUpdate := metricRegistry.NeedsUpdate(referenceTime, metric)
 
 		assert.True(t, needsUpdate, "metric should not need update")
+	})
+
+	t.Run("Metrics with different aggregation types", func(t *testing.T) {
+		metricRegistry := NewMetricRegistry(logger)
+
+		referenceTime := time.Now().UTC()
+		lastCollectionAt := referenceTime.Add(-time.Minute * 10)
+
+		metric1 := Metric{
+			ResourceId:   "test",
+			Namespace:    "test",
+			Aggregations: "Maximum",
+		}
+		metric2 := Metric{
+			ResourceId:   "test",
+			Namespace:    "test",
+			Aggregations: "Minimum",
+		}
+
+		metricCollectionInfo := MetricCollectionInfo{
+			timeGrain: "PT5M",
+			timestamp: lastCollectionAt,
+		}
+
+		// Update metrics collection info for previous collection
+		metricRegistry.Update(metric1, metricCollectionInfo)
+		metricRegistry.Update(metric2, metricCollectionInfo)
+
+		// Update metric info for metric1
+		metricRegistry.Update(metric1, MetricCollectionInfo{
+			timeGrain: "PT5M",
+			timestamp: referenceTime,
+		})
+
+		// Check if metrics need update
+		metric1NeedsUpdate := metricRegistry.NeedsUpdate(referenceTime, metric1)
+		metric2NeedsUpdate := metricRegistry.NeedsUpdate(referenceTime, metric2)
+
+		assert.False(t, metric1NeedsUpdate, "metric should not need update")
+		assert.True(t, metric2NeedsUpdate, "metric should need update")
+	})
+
+	t.Run("Metrics with different dimensions", func(t *testing.T) {
+		metricRegistry := NewMetricRegistry(logger)
+
+		referenceTime := time.Now().UTC()
+		lastCollectionAt := referenceTime.Add(-time.Minute * 10)
+
+		metric1 := Metric{
+			ResourceId: "resource-id-1",
+			Namespace:  "namespace-1",
+			Names:      []string{"metric-name-1"},
+			Dimensions: []Dimension{
+				{Name: "dimension-1", Value: "*"},
+			},
+			TimeGrain: "PT1M",
+		}
+		metric2 := Metric{
+			ResourceId: "resource-id-1",
+			Namespace:  "namespace-1",
+			Names:      []string{"metric-name-1"},
+			Dimensions: []Dimension{
+				{Name: "dimension-2", Value: "*"},
+			},
+			TimeGrain: "PT1M",
+		}
+
+		metricCollectionInfo := MetricCollectionInfo{
+			timeGrain: "PT1M",
+			timestamp: lastCollectionAt,
+		}
+
+		// Update metrics collection info for previous collection
+		metricRegistry.Update(metric1, metricCollectionInfo)
+		metricRegistry.Update(metric2, metricCollectionInfo)
+
+		// Update metric info for metric1
+		metricRegistry.Update(metric1, MetricCollectionInfo{
+			timeGrain: "PT1M",
+			timestamp: referenceTime,
+		})
+
+		// Check if metrics need update
+		metric1NeedsUpdate := metricRegistry.NeedsUpdate(referenceTime, metric1)
+		metric2NeedsUpdate := metricRegistry.NeedsUpdate(referenceTime, metric2)
+
+		assert.False(t, metric1NeedsUpdate, "metric should not need update")
+		assert.True(t, metric2NeedsUpdate, "metric should need update")
+	})
+
+	t.Run("Metrics with different timegrain", func(t *testing.T) {
+		metricRegistry := NewMetricRegistry(logger)
+
+		referenceTime := time.Now().UTC()
+		lastCollectionAt := referenceTime.Add(-time.Minute * 10)
+
+		metric1 := Metric{
+			ResourceId: "resource-id-1",
+			Namespace:  "namespace-1",
+			Names:      []string{"metric-name-1"},
+			Dimensions: []Dimension{
+				{Name: "dimension-1", Value: "*"},
+			},
+			TimeGrain: "PT1M",
+		}
+		metric2 := Metric{
+			ResourceId: "resource-id-1",
+			Namespace:  "namespace-1",
+			Names:      []string{"metric-name-1"},
+			Dimensions: []Dimension{
+				{Name: "dimension-1", Value: "*"},
+			},
+			TimeGrain: "PT5M",
+		}
+
+		metricCollectionInfo := MetricCollectionInfo{
+			timeGrain: "PT1M",
+			timestamp: lastCollectionAt,
+		}
+
+		// Update metrics collection info for previous collection
+		metricRegistry.Update(metric1, metricCollectionInfo)
+		metricRegistry.Update(metric2, metricCollectionInfo)
+
+		// Update metric info for metric1
+		metricRegistry.Update(metric1, MetricCollectionInfo{
+			timeGrain: "PT1M",
+			timestamp: referenceTime,
+		})
+
+		// Check if metrics need update
+		metric1NeedsUpdate := metricRegistry.NeedsUpdate(referenceTime, metric1)
+		metric2NeedsUpdate := metricRegistry.NeedsUpdate(referenceTime, metric2)
+
+		assert.False(t, metric1NeedsUpdate, "metric should not need update")
+		assert.True(t, metric2NeedsUpdate, "metric should need update")
 	})
 }

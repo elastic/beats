@@ -448,7 +448,7 @@ func (e *inputTestingEnvironment) waitUntilHarvesterIsDone() {
 	}
 }
 
-// requireEventReceived requires that the list of messages has made it into the output.
+// requireEventsReceived requires that the list of messages has made it into the output.
 func (e *inputTestingEnvironment) requireEventsReceived(events []string) {
 	foundEvents := make([]bool, len(events))
 	checkedEventCount := 0
