@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
-name: "beats-xpack-dockerlogbeat"
+name: "beats-x-pack-dockerlogbeat"
 
 env:
   ASDF_MAGE_VERSION: 1.15.0
@@ -22,10 +22,10 @@ env:
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
 steps:
-  - group: "Xpack/Dockerlogbeat Mandatory Tests"
-    key: "xpack-dockerlogbeat-mandatory-tests"
+  - group: "x-pack/Dockerlogbeat Mandatory Tests"
+    key: "x-pack-dockerlogbeat-mandatory-tests"
     steps:
-      - label: ":ubuntu: Xpack/Dockerlogbeat Ubuntu Unit Tests"
+      - label: ":ubuntu: x-pack/Dockerlogbeat Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
         command: "cd x-pack/dockerlogbeat && mage build unitTest"
         retry:
@@ -42,7 +42,7 @@ steps:
           - github_commit_status:
               context: "x-pack/dockerlogbeat: Ubuntu Unit Tests"
 
-      - label: ":ubuntu: Xpack/Dockerlogbeat Go Integration Tests"
+      - label: ":ubuntu: x-pack/Dockerlogbeat Go Integration Tests"
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
@@ -74,13 +74,13 @@ steps:
     # this allows building DRA artifacts even if there is flakiness in mandatory tests
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
-      - "xpack-dockerlogbeat-mandatory-tests"
+      - "x-pack-dockerlogbeat-mandatory-tests"
 
-  - group: "Xpack/Dockerlogbeat Packaging"
-    key: "xpack-dockerlogbeat-packaging"
+  - group: "x-pack/Dockerlogbeat Packaging"
+    key: "x-pack-dockerlogbeat-packaging"
 
     steps:
-      - label: ":ubuntu: Xpack/Dockerlogbeat Packaging Linux X86"
+      - label: ":ubuntu: x-pack/Dockerlogbeat Packaging Linux X86"
         key: "auditbeat-package-linux-x86"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
@@ -90,8 +90,11 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "x-pack/dockerlogbeat: Packaging Linux X86"
 
-      - label: ":linux: Xpack/Dockerlogbeat Packaging Linux ARM"
+      - label: ":linux: x-pack/Dockerlogbeat Packaging Linux ARM"
         key: "auditbeat-package-linux-arm"
         env:
           PLATFORMS: "linux/arm64"
@@ -102,3 +105,6 @@ steps:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "x-pack/dockerlogbeat: Packaging Linux ARM"
