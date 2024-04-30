@@ -78,7 +78,7 @@ func (in *sqsReaderInput) Run(
 	defer receiver.metrics.Close()
 
 	// Poll metrics periodically in the background
-	go pollSqsWaitingMetric(ctx, receiver)
+	go pollSqsWaitingMetric(ctx, receiver.sqs, receiver.metrics)
 
 	receiver.Receive(ctx)
 	return nil

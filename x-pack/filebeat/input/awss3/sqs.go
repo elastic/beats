@@ -118,8 +118,8 @@ func (r *sqsReader) startWorkers(ctx context.Context) {
 	}
 }
 
-func (r *sqsReader) GetApproximateMessageCount(ctx context.Context) (int, error) {
-	attributes, err := r.sqs.GetQueueAttributes(ctx, []types.QueueAttributeName{sqsApproximateNumberOfMessages})
+func getApproximateMessageCount(ctx context.Context, sqs sqsAPI) (int, error) {
+	attributes, err := sqs.GetQueueAttributes(ctx, []types.QueueAttributeName{sqsApproximateNumberOfMessages})
 	if err == nil {
 		if c, found := attributes[sqsApproximateNumberOfMessages]; found {
 			if messagesCount, err := strconv.Atoi(c); err == nil {
@@ -160,14 +160,14 @@ func getRegionFromQueueURL(queueURL, endpoint string) (string, error) {
 	return "", errBadQueueURL
 }
 
-func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
+func pollSqsWaitingMetric(ctx context.Context, sqs sqsAPI, metrics *inputMetrics) {
 	t := time.NewTicker(time.Minute)
 	defer t.Stop()
 	for {
-		if err := updateMessageCount(receiver, ctx); isSQSAuthError(err) {
+		if err := updateMessageCount(ctx, sqs, metrics); isSQSAuthError(err) {
 			// stop polling if auth error is encountered
 			// Set it back to -1 because there is a permission error
-			receiver.metrics.sqsMessagesWaiting.Set(int64(-1))
+			metrics.sqsMessagesWaiting.Set(int64(-1))
 			return
 		}
 		select {
@@ -180,10 +180,10 @@ func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
 
 // updateMessageCount runs GetApproximateMessageCount for the given context and updates the receiver metric with the count returning false on no error
 // If there is an error, the metric is reinitialized to -1 and true is returned
-func updateMessageCount(receiver *sqsReader, ctx context.Context) error {
-	count, err := receiver.GetApproximateMessageCount(ctx)
+func updateMessageCount(ctx context.Context, sqs sqsAPI, metrics *inputMetrics) error {
+	count, err := getApproximateMessageCount(ctx, sqs)
 	if err == nil {
-		receiver.metrics.sqsMessagesWaiting.Set(int64(count))
+		metrics.sqsMessagesWaiting.Set(int64(count))
 	}
 	return err
 }

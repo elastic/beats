@@ -68,16 +68,8 @@ func newS3PollerInput(
 	}, nil
 }
 
-func (in *s3PollerInput) Run(
-	inputContext v2.Context,
-	pipeline beat.Pipeline,
-) error {
-	var err error
-
-	defer in.states.Close()
-
-	// Create client for publishing events and receive notification of their ACKs.
-	in.client, err = pipeline.ConnectWith(beat.ClientConfig{
+func createClient(pipeline beat.Pipeline) (beat.Client, error) {
+	return pipeline.ConnectWith(beat.ClientConfig{
 		EventListener: awscommon.NewEventACKHandler(),
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization
@@ -85,6 +77,19 @@ func (in *s3PollerInput) Run(
 			EventNormalization: boolPtr(false),
 		},
 	})
+}
+
+func (in *s3PollerInput) Run(
+	inputContext v2.Context,
+	pipeline beat.Pipeline,
+) error {
+	log := inputContext.Logger.Named("s3")
+	var err error
+
+	defer in.states.Close()
+
+	// Create client for publishing events and receive notification of their ACKs.
+	in.client, err = createClient(pipeline)
 	if err != nil {
 		return fmt.Errorf("failed to create pipeline client: %w", err)
 	}
@@ -100,7 +105,7 @@ func (in *s3PollerInput) Run(
 	defer in.metrics.Close()
 
 	in.s3ObjectHandler = newS3ObjectProcessorFactory(
-		inputContext.Logger.Named("s3"),
+		log,
 		in.metrics,
 		in.s3,
 		in.config.getFileSelectors(),
@@ -108,12 +113,16 @@ func (in *s3PollerInput) Run(
 
 	// Scan the bucket in a loop, delaying by the configured interval each
 	// iteration.
+	in.scanLoop(ctx)
+
+	return nil
+}
+
+func (in *s3PollerInput) scanLoop(ctx context.Context) {
 	for ctx.Err() == nil {
 		in.runScan(ctx)
 		_ = timed.Wait(ctx, in.config.BucketListInterval)
 	}
-
-	return nil
 }
 
 func (in *s3PollerInput) runScan(ctx context.Context) {
