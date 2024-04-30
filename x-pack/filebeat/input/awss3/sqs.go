@@ -5,7 +5,6 @@
 package awss3
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net/url"
@@ -16,7 +15,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/aws/smithy-go"
 
-	"github.com/elastic/elastic-agent-libs/logp"
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 )
 
 const (
@@ -24,111 +23,6 @@ const (
 	sqsRetryDelay                  = 10 * time.Second
 	sqsApproximateNumberOfMessages = "ApproximateNumberOfMessages"
 )
-
-func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, msgHandler sqsProcessor) *sqsReader {
-	if metrics == nil {
-		// Metrics are optional. Initialize a stub.
-		metrics = newInputMetrics("", nil, 0)
-	}
-	return &sqsReader{
-		maxMessagesInflight: maxMessagesInflight,
-		sqs:                 sqs,
-		msgHandler:          msgHandler,
-		log:                 log,
-		metrics:             metrics,
-		workChan:            make(chan types.Message),
-	}
-}
-
-// The main loop of the reader, that fetches messages from SQS
-// and forwards them to workers via workChan.
-func (r *sqsReader) Receive(ctx context.Context) {
-	r.startWorkers(ctx)
-	r.readerLoop(ctx)
-
-	// Close the work channel to signal to the workers that we're done,
-	// then wait for them to finish.
-	close(r.workChan)
-	r.workerWg.Wait()
-}
-
-func (r *sqsReader) readerLoop(ctx context.Context) {
-	for ctx.Err() == nil {
-		msgs := r.readMessages(ctx)
-
-		for _, msg := range msgs {
-			select {
-			case <-ctx.Done():
-			case r.workChan <- msg:
-			}
-		}
-	}
-}
-
-func (r *sqsReader) workerLoop(ctx context.Context) {
-	for msg := range r.workChan {
-		start := time.Now()
-
-		id := r.metrics.beginSQSWorker()
-		if err := r.msgHandler.ProcessSQS(ctx, &msg); err != nil {
-			r.log.Warnw("Failed processing SQS message.",
-				"error", err,
-				"message_id", *msg.MessageId,
-				"elapsed_time_ns", time.Since(start))
-		}
-		r.metrics.endSQSWorker(id)
-		r.activeMessages.Dec()
-	}
-}
-
-func (r *sqsReader) readMessages(ctx context.Context) []types.Message {
-	// We try to read enough messages to bring activeMessages up to the
-	// total worker count (plus one, to unblock us when workers are ready
-	// for more messages)
-	readCount := r.maxMessagesInflight + 1 - r.activeMessages.Load()
-	if readCount <= 0 {
-		return nil
-	}
-	msgs, err := r.sqs.ReceiveMessage(ctx, readCount)
-	for err != nil && ctx.Err() == nil {
-		r.log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
-		// Wait for the retry delay, but stop early if the context is cancelled.
-		select {
-		case <-ctx.Done():
-			return nil
-		case <-time.After(sqsRetryDelay):
-		}
-		msgs, err = r.sqs.ReceiveMessage(ctx, readCount)
-	}
-	r.activeMessages.Add(len(msgs))
-	r.log.Debugf("Received %v SQS messages.", len(msgs))
-	r.metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
-	return msgs
-}
-
-func (r *sqsReader) startWorkers(ctx context.Context) {
-	// Start the worker goroutines that will process messages from workChan
-	// until the input shuts down.
-	for i := 0; i < r.maxMessagesInflight; i++ {
-		r.workerWg.Add(1)
-		go func() {
-			defer r.workerWg.Done()
-			r.workerLoop(ctx)
-		}()
-	}
-}
-
-func getApproximateMessageCount(ctx context.Context, sqs sqsAPI) (int, error) {
-	attributes, err := sqs.GetQueueAttributes(ctx, []types.QueueAttributeName{sqsApproximateNumberOfMessages})
-	if err == nil {
-		if c, found := attributes[sqsApproximateNumberOfMessages]; found {
-			if messagesCount, err := strconv.Atoi(c); err == nil {
-				return messagesCount, nil
-			}
-		}
-	}
-	return -1, err
-}
 
 var errBadQueueURL = errors.New("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME} or https://{VPC_ENDPOINT}.sqs.{REGION_ENDPOINT}.vpce.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
 
@@ -160,18 +54,18 @@ func getRegionFromQueueURL(queueURL, endpoint string) (string, error) {
 	return "", errBadQueueURL
 }
 
-func pollSqsWaitingMetric(ctx context.Context, sqs sqsAPI, metrics *inputMetrics) {
+func pollSqsWaitingMetric(canceler v2.Canceler, sqs sqsAPI, metrics *inputMetrics) {
 	t := time.NewTicker(time.Minute)
 	defer t.Stop()
 	for {
-		if err := updateMessageCount(ctx, sqs, metrics); isSQSAuthError(err) {
+		if err := updateMessageCount(canceler, sqs, metrics); isSQSAuthError(err) {
 			// stop polling if auth error is encountered
 			// Set it back to -1 because there is a permission error
 			metrics.sqsMessagesWaiting.Set(int64(-1))
 			return
 		}
 		select {
-		case <-ctx.Done():
+		case <-canceler.Done():
 			return
 		case <-t.C:
 		}
@@ -180,12 +74,25 @@ func pollSqsWaitingMetric(ctx context.Context, sqs sqsAPI, metrics *inputMetrics
 
 // updateMessageCount runs GetApproximateMessageCount for the given context and updates the receiver metric with the count returning false on no error
 // If there is an error, the metric is reinitialized to -1 and true is returned
-func updateMessageCount(ctx context.Context, sqs sqsAPI, metrics *inputMetrics) error {
-	count, err := getApproximateMessageCount(ctx, sqs)
+func updateMessageCount(canceler v2.Canceler, sqs sqsAPI, metrics *inputMetrics) error {
+	count, err := getApproximateMessageCount(canceler, sqs)
 	if err == nil {
 		metrics.sqsMessagesWaiting.Set(int64(count))
 	}
 	return err
+}
+
+func getApproximateMessageCount(canceler v2.Canceler, sqs sqsAPI) (int, error) {
+	ctx := v2.GoContextFromCanceler(canceler)
+	attributes, err := sqs.GetQueueAttributes(ctx, []types.QueueAttributeName{sqsApproximateNumberOfMessages})
+	if err == nil {
+		if c, found := attributes[sqsApproximateNumberOfMessages]; found {
+			if messagesCount, err := strconv.Atoi(c); err == nil {
+				return messagesCount, nil
+			}
+		}
+	}
+	return -1, err
 }
 
 func isSQSAuthError(err error) bool {
