@@ -24,6 +24,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/feature"
 	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/unison"
 )
 
@@ -117,17 +118,12 @@ func (in *s3Input) runQueueReader(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
-	configRegion := in.config.RegionName
-	urlRegion, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
-	if err != nil && configRegion == "" {
-		// Only report an error if we don't have a configured region
-		// to fall back on.
-		return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
-	} else if configRegion != "" && configRegion != urlRegion {
-		inputContext.Logger.Warnf("configured region disagrees with queue_url region (%q != %q): using %q", configRegion, urlRegion, urlRegion)
+	// Set awsConfig.Region based on the config and queue URL
+	region, err := chooseRegion(inputContext.Logger, in.config)
+	if err != nil {
+		return err
 	}
-
-	in.awsConfig.Region = urlRegion
+	in.awsConfig.Region = region
 
 	// Create SQS receiver and S3 notification processor.
 	receiver, err := in.createSQSReceiver(inputContext, pipeline)
@@ -326,32 +322,51 @@ func (in *s3Input) createS3Poller(ctx v2.Context, cancelCtx context.Context, cli
 
 var errBadQueueURL = errors.New("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME} or https://{VPC_ENDPOINT}.sqs.{REGION_ENDPOINT}.vpce.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
 
-func getRegionFromQueueURL(queueURL, endpoint string) (string, error) {
+func chooseRegion(log *logp.Logger, config config) (string, error) {
+	urlRegion := getRegionFromQueueURL(config.QueueURL, config.AWSConfig.Endpoint)
+	if config.RegionName != "" {
+		// If a region is configured, that takes precedence over the URL.
+		if log != nil && config.RegionName != urlRegion {
+			log.Warnf("configured region disagrees with queue_url region (%q != %q): using %q", config.RegionName, urlRegion, config.RegionName)
+		}
+		return config.RegionName, nil
+	}
+	if urlRegion != "" {
+		// If no region is configured, fall back on the URL.
+		return urlRegion, nil
+	}
+	// If we can't get the region from the config or the URL, report an error.
+	return "", fmt.Errorf("failed to get AWS region from queue_url: %w", errBadQueueURL)
+}
+
+// getRegionFromQueueURL returns the region from standard queue URLs, or the
+// empty string if it couldn't be determined.
+func getRegionFromQueueURL(queueURL, endpoint string) string {
 	// get region from queueURL
 	// Example for sqs queue: https://sqs.us-east-1.amazonaws.com/12345678912/test-s3-logs
 	// Example for vpce: https://vpce-test.sqs.us-east-1.vpce.amazonaws.com/12345678912/sqs-queue
 	u, err := url.Parse(queueURL)
 	if err != nil {
-		return "", fmt.Errorf(queueURL + " is not a valid URL")
+		return ""
 	}
-	if (u.Scheme == "https" || u.Scheme == "http") && u.Host != "" {
-		queueHostSplit := strings.SplitN(u.Host, ".", 3)
-		// check for sqs queue url
-		if len(queueHostSplit) == 3 && queueHostSplit[0] == "sqs" {
-			if queueHostSplit[2] == endpoint || (endpoint == "" && strings.HasPrefix(queueHostSplit[2], "amazonaws.")) {
-				return queueHostSplit[1], nil
-			}
-		}
 
-		// check for vpce url
-		queueHostSplitVPC := strings.SplitN(u.Host, ".", 5)
-		if len(queueHostSplitVPC) == 5 && queueHostSplitVPC[1] == "sqs" {
-			if queueHostSplitVPC[4] == endpoint || (endpoint == "" && strings.HasPrefix(queueHostSplitVPC[4], "amazonaws.")) {
-				return queueHostSplitVPC[2], nil
-			}
+	// check for sqs queue url
+	host := strings.SplitN(u.Host, ".", 3)
+	if len(host) == 3 && host[0] == "sqs" {
+		if host[2] == endpoint || (endpoint == "" && strings.HasPrefix(host[2], "amazonaws.")) {
+			return host[1]
 		}
 	}
-	return "", errBadQueueURL
+
+	// check for vpce url
+	host = strings.SplitN(u.Host, ".", 5)
+	if len(host) == 5 && host[1] == "sqs" {
+		if host[4] == endpoint || (endpoint == "" && strings.HasPrefix(host[4], "amazonaws.")) {
+			return host[2]
+		}
+	}
+
+	return ""
 }
 
 func getRegionForBucket(ctx context.Context, s3Client *s3.Client, bucketName string) (string, error) {
