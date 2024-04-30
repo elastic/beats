@@ -86,6 +86,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
+- Fix Azure Monitor support for multiple aggregation types {issue}39192[39192] {pull}39204[39204]
 
 *Osquerybeat*
 
