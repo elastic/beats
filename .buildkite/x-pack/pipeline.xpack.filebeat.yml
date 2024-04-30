@@ -52,11 +52,8 @@ steps:
         key: "x-pack-filebeat-mandatory-int-test"
         command: |
           set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet x-pack/filebeat
-          echo "~~~ Running tests"
-          cd x-pack/filebeat && mage goIntegTest
+          cd x-pack/filebeat
+          mage goIntegTest
         retry:
           automatic:
             - limit: 3
@@ -69,17 +66,14 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Go (MODULE) Integration Tests"
+              context: "x-pack/filebeat: Go Integration Tests"
 
-      - label: ":python: Python (MODULE) Integration Tests"
+      - label: ":ubuntu: Python Integration Tests"
         key: "x-pack-filebeat-mandatory-python-int-test"
         command: |
           set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet x-pack/filebeat
-          echo "~~~ Running tests"
-          cd x-pack/filebeat && mage pythonIntegTest
+          cd x-pack/filebeat
+          mage pythonIntegTest
         retry:
           automatic:
             - limit: 3
@@ -92,7 +86,7 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: Python (MODULE) Integration Tests"
+              context: "x-pack/filebeat: Python Integration Tests"
 
       - label: ":windows: Win-2022 Unit Tests"
         command: |
@@ -227,7 +221,7 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Ubuntu ARM Unit Tests"
 
-      - label: ":mac: MacOS x86_64 Unit Tests"
+      - label: ":mac: macOS x86_64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(macOS).*/
         command: |
           set -euo pipefail
@@ -245,9 +239,9 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: MacOS x86_64 Unit Tests"
+              context: "x-pack/filebeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: MacOS arm64 Unit Tests"
+      - label: ":mac: macOS arm64 Unit Tests"
         skip: "https://github.com/elastic/beats/issues/33036"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*(macOS).*/
         command: |
@@ -257,7 +251,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+          - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -266,7 +260,7 @@ steps:
           - "x-pack/filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/filebeat: MacOS arm64 Unit Tests"
+              context: "x-pack/filebeat: macOS arm64 Unit Tests"
 
       - label: ":ubuntu: Cloud (MODULE) Tests"
         key: "x-pack-filebeat-extended-cloud-test"
