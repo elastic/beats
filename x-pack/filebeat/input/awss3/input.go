@@ -63,6 +63,7 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return newSQSReaderInput(config, awsConfig)
 	}
 
+<<<<<<< HEAD
 	if config.BucketARN != "" || config.NonAWSBucketName != "" {
 		persistentStore, err := im.store.Access()
 		if err != nil {
@@ -72,6 +73,385 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	}
 
 	return nil, fmt.Errorf("configuration has no SQS queue URL and no S3 bucket ARN")
+=======
+	return &s3Input{
+		config:    config,
+		awsConfig: awsConfig,
+		store:     store,
+	}, nil
+}
+
+func (in *s3Input) Name() string { return inputName }
+
+func (in *s3Input) Test(ctx v2.TestContext) error {
+	return nil
+}
+
+func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
+	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+
+	if in.config.QueueURL != "" {
+		return in.runQueueReader(ctx, inputContext, pipeline)
+	}
+
+	if in.config.BucketARN != "" || in.config.NonAWSBucketName != "" {
+		return in.runS3Poller(ctx, inputContext, pipeline)
+	}
+
+	return nil
+}
+
+func (in *s3Input) runQueueReader(
+	ctx context.Context,
+	inputContext v2.Context,
+	pipeline beat.Pipeline,
+) error {
+	configRegion := in.config.RegionName
+	urlRegion, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
+	if err != nil && configRegion == "" {
+		// Only report an error if we don't have a configured region
+		// to fall back on.
+		return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
+	} else if configRegion != "" && configRegion != urlRegion {
+		inputContext.Logger.Warnf("configured region disagrees with queue_url region (%q != %q): using %q", configRegion, urlRegion, urlRegion)
+	}
+
+	in.awsConfig.Region = urlRegion
+
+	// Create SQS receiver and S3 notification processor.
+	receiver, err := in.createSQSReceiver(inputContext, pipeline)
+	if err != nil {
+		return fmt.Errorf("failed to initialize sqs receiver: %w", err)
+	}
+	defer receiver.metrics.Close()
+
+	// Poll metrics periodically in the background
+	go pollSqsWaitingMetric(ctx, receiver)
+
+	return receiver.Receive(ctx)
+}
+
+func (in *s3Input) runS3Poller(
+	ctx context.Context,
+	inputContext v2.Context,
+	pipeline beat.Pipeline,
+) error {
+	// Create client for publishing events and receive notification of their ACKs.
+	client, err := pipeline.ConnectWith(beat.ClientConfig{
+		EventListener: awscommon.NewEventACKHandler(),
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: boolPtr(false),
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create pipeline client: %w", err)
+	}
+	defer client.Close()
+
+	// Connect to the registry and create our states lookup
+	persistentStore, err := in.store.Access()
+	if err != nil {
+		return fmt.Errorf("can not access persistent store: %w", err)
+	}
+	defer persistentStore.Close()
+
+	states, err := newStates(inputContext, persistentStore)
+	if err != nil {
+		return fmt.Errorf("can not start persistent store: %w", err)
+	}
+
+	// Create S3 receiver and S3 notification processor.
+	poller, err := in.createS3Poller(inputContext, ctx, client, states)
+	if err != nil {
+		return fmt.Errorf("failed to initialize s3 poller: %w", err)
+	}
+	defer poller.metrics.Close()
+
+	return poller.Poll(ctx)
+}
+
+func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*sqsReader, error) {
+	sqsAPI := &awsSQSAPI{
+		client: sqs.NewFromConfig(in.awsConfig, func(o *sqs.Options) {
+			if in.config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+		}),
+		queueURL:          in.config.QueueURL,
+		apiTimeout:        in.config.APITimeout,
+		visibilityTimeout: in.config.VisibilityTimeout,
+		longPollWaitTime:  in.config.SQSWaitTime,
+	}
+
+	s3API := &awsS3API{
+		client: s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
+			if in.config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+			o.UsePathStyle = in.config.PathStyle
+		}),
+	}
+
+	log := ctx.Logger.With("queue_url", in.config.QueueURL)
+	log.Infof("AWS api_timeout is set to %v.", in.config.APITimeout)
+	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
+	log.Infof("AWS SQS visibility_timeout is set to %v.", in.config.VisibilityTimeout)
+	log.Infof("AWS SQS max_number_of_messages is set to %v.", in.config.MaxNumberOfMessages)
+
+	if in.config.BackupConfig.GetBucketName() != "" {
+		log.Warnf("You have the backup_to_bucket functionality activated with SQS. Please make sure to set appropriate destination buckets" +
+			"or prefixes to avoid an infinite loop.")
+	}
+
+	fileSelectors := in.config.FileSelectors
+	if len(in.config.FileSelectors) == 0 {
+		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
+	}
+	script, err := newScriptFromConfig(log.Named("sqs_script"), in.config.SQSScript)
+	if err != nil {
+		return nil, err
+	}
+	in.metrics = newInputMetrics(ctx.ID, nil, in.config.MaxNumberOfMessages)
+
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig, in.config.MaxNumberOfMessages)
+
+	sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), in.metrics, sqsAPI, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory, in.config.MaxNumberOfMessages)
+
+	sqsReader := newSQSReader(log.Named("sqs"), in.metrics, sqsAPI, in.config.MaxNumberOfMessages, sqsMessageHandler)
+
+	return sqsReader, nil
+}
+
+type nonAWSBucketResolver struct {
+	endpoint string
+}
+
+func (n nonAWSBucketResolver) ResolveEndpoint(region string, options s3.EndpointResolverOptions) (awssdk.Endpoint, error) {
+	return awssdk.Endpoint{URL: n.endpoint, SigningRegion: region, HostnameImmutable: true, Source: awssdk.EndpointSourceCustom}, nil
+}
+
+func (in *s3Input) createS3Poller(ctx v2.Context, cancelCtx context.Context, client beat.Client, states *states) (*s3Poller, error) {
+	var bucketName string
+	var bucketID string
+	if in.config.NonAWSBucketName != "" {
+		bucketName = in.config.NonAWSBucketName
+		bucketID = bucketName
+	} else if in.config.BucketARN != "" {
+		bucketName = getBucketNameFromARN(in.config.BucketARN)
+		bucketID = in.config.BucketARN
+	}
+
+	s3Client := s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
+		if in.config.NonAWSBucketName != "" {
+			o.EndpointResolver = nonAWSBucketResolver{endpoint: in.config.AWSConfig.Endpoint}
+		}
+
+		if in.config.AWSConfig.FIPSEnabled {
+			o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+		}
+		o.UsePathStyle = in.config.PathStyle
+
+		o.Retryer = retry.NewStandard(func(so *retry.StandardOptions) {
+			so.MaxAttempts = 5
+			// Recover quickly when requests start working again
+			so.NoRetryIncrement = 100
+		})
+	})
+	regionName, err := getRegionForBucket(cancelCtx, s3Client, bucketName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get AWS region for bucket: %w", err)
+	}
+
+	originalAwsConfigRegion := in.awsConfig.Region
+
+	in.awsConfig.Region = regionName
+
+	if regionName != originalAwsConfigRegion {
+		s3Client = s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
+			if in.config.NonAWSBucketName != "" {
+				o.EndpointResolver = nonAWSBucketResolver{endpoint: in.config.AWSConfig.Endpoint}
+			}
+
+			if in.config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+			o.UsePathStyle = in.config.PathStyle
+		})
+	}
+
+	s3API := &awsS3API{
+		client: s3Client,
+	}
+
+	log := ctx.Logger.With("bucket", bucketID)
+	log.Infof("number_of_workers is set to %v.", in.config.NumberOfWorkers)
+	log.Infof("bucket_list_interval is set to %v.", in.config.BucketListInterval)
+	log.Infof("bucket_list_prefix is set to %v.", in.config.BucketListPrefix)
+	log.Infof("AWS region is set to %v.", in.awsConfig.Region)
+
+	fileSelectors := in.config.FileSelectors
+	if len(in.config.FileSelectors) == 0 {
+		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
+	}
+	in.metrics = newInputMetrics(ctx.ID, nil, in.config.MaxNumberOfMessages)
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), in.metrics, s3API, fileSelectors, in.config.BackupConfig, in.config.MaxNumberOfMessages)
+	s3Poller := newS3Poller(log.Named("s3_poller"),
+		in.metrics,
+		s3API,
+		client,
+		s3EventHandlerFactory,
+		states,
+		bucketID,
+		in.config.BucketListPrefix,
+		in.awsConfig.Region,
+		getProviderFromDomain(in.config.AWSConfig.Endpoint, in.config.ProviderOverride),
+		in.config.NumberOfWorkers,
+		in.config.BucketListInterval)
+
+	return s3Poller, nil
+}
+
+var errBadQueueURL = errors.New("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME} or https://{VPC_ENDPOINT}.sqs.{REGION_ENDPOINT}.vpce.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
+
+func getRegionFromQueueURL(queueURL, endpoint string) (string, error) {
+	// get region from queueURL
+	// Example for sqs queue: https://sqs.us-east-1.amazonaws.com/12345678912/test-s3-logs
+	// Example for vpce: https://vpce-test.sqs.us-east-1.vpce.amazonaws.com/12345678912/sqs-queue
+	u, err := url.Parse(queueURL)
+	if err != nil {
+		return "", fmt.Errorf(queueURL + " is not a valid URL")
+	}
+	if (u.Scheme == "https" || u.Scheme == "http") && u.Host != "" {
+		queueHostSplit := strings.SplitN(u.Host, ".", 3)
+		// check for sqs queue url
+		if len(queueHostSplit) == 3 && queueHostSplit[0] == "sqs" {
+			if queueHostSplit[2] == endpoint || (endpoint == "" && strings.HasPrefix(queueHostSplit[2], "amazonaws.")) {
+				return queueHostSplit[1], nil
+			}
+		}
+
+		// check for vpce url
+		queueHostSplitVPC := strings.SplitN(u.Host, ".", 5)
+		if len(queueHostSplitVPC) == 5 && queueHostSplitVPC[1] == "sqs" {
+			if queueHostSplitVPC[4] == endpoint || (endpoint == "" && strings.HasPrefix(queueHostSplitVPC[4], "amazonaws.")) {
+				return queueHostSplitVPC[2], nil
+			}
+		}
+	}
+	return "", errBadQueueURL
+}
+
+func getRegionForBucket(ctx context.Context, s3Client *s3.Client, bucketName string) (string, error) {
+	getBucketLocationOutput, err := s3Client.GetBucketLocation(ctx, &s3.GetBucketLocationInput{
+		Bucket: awssdk.String(bucketName),
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	// Region us-east-1 have a LocationConstraint of null.
+	if len(getBucketLocationOutput.LocationConstraint) == 0 {
+		return "us-east-1", nil
+	}
+
+	return string(getBucketLocationOutput.LocationConstraint), nil
+}
+
+func getBucketNameFromARN(bucketARN string) string {
+	bucketMetadata := strings.Split(bucketARN, ":")
+	bucketName := bucketMetadata[len(bucketMetadata)-1]
+	return bucketName
+}
+
+func getProviderFromDomain(endpoint string, ProviderOverride string) string {
+	if ProviderOverride != "" {
+		return ProviderOverride
+	}
+	if endpoint == "" {
+		return "aws"
+	}
+	// List of popular S3 SaaS providers
+	providers := map[string]string{
+		"amazonaws.com":          "aws",
+		"c2s.sgov.gov":           "aws",
+		"c2s.ic.gov":             "aws",
+		"amazonaws.com.cn":       "aws",
+		"backblazeb2.com":        "backblaze",
+		"cloudflarestorage.com":  "cloudflare",
+		"wasabisys.com":          "wasabi",
+		"digitaloceanspaces.com": "digitalocean",
+		"dream.io":               "dreamhost",
+		"scw.cloud":              "scaleway",
+		"googleapis.com":         "gcp",
+		"cloud.it":               "arubacloud",
+		"linodeobjects.com":      "linode",
+		"vultrobjects.com":       "vultr",
+		"appdomain.cloud":        "ibm",
+		"aliyuncs.com":           "alibaba",
+		"oraclecloud.com":        "oracle",
+		"exo.io":                 "exoscale",
+		"upcloudobjects.com":     "upcloud",
+		"ilandcloud.com":         "iland",
+		"zadarazios.com":         "zadara",
+	}
+
+	parsedEndpoint, _ := url.Parse(endpoint)
+	for key, provider := range providers {
+		// support endpoint with and without scheme (http(s)://abc.xyz, abc.xyz)
+		constraint := parsedEndpoint.Hostname()
+		if len(parsedEndpoint.Scheme) == 0 {
+			constraint = parsedEndpoint.Path
+		}
+		if strings.HasSuffix(constraint, key) {
+			return provider
+		}
+	}
+	return "unknown"
+}
+
+func pollSqsWaitingMetric(ctx context.Context, receiver *sqsReader) {
+	// Run GetApproximateMessageCount before start of timer to set initial count for sqs waiting metric
+	// This is to avoid misleading values in metric when sqs messages are processed before the ticker channel kicks in
+	if shouldReturn := updateMessageCount(receiver, ctx); shouldReturn {
+		return
+	}
+
+	t := time.NewTicker(time.Minute)
+	defer t.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-t.C:
+			if shouldReturn := updateMessageCount(receiver, ctx); shouldReturn {
+				return
+			}
+		}
+	}
+}
+
+// updateMessageCount runs GetApproximateMessageCount for the given context and updates the receiver metric with the count returning false on no error
+// If there is an error, the metric is reinitialized to -1 and true is returned
+func updateMessageCount(receiver *sqsReader, ctx context.Context) bool {
+	count, err := receiver.GetApproximateMessageCount(ctx)
+
+	var apiError smithy.APIError
+	if errors.As(err, &apiError) {
+		switch apiError.ErrorCode() {
+		case sqsAccessDeniedErrorCode:
+			// stop polling if auth error is encountered
+			// Set it back to -1 because there is a permission error
+			receiver.metrics.sqsMessagesWaiting.Set(int64(-1))
+			return true
+		}
+	}
+
+	receiver.metrics.sqsMessagesWaiting.Set(int64(count))
+	return false
+>>>>>>> main
 }
 
 // boolPtr returns a pointer to b.
