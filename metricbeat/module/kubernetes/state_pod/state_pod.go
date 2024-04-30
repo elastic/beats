@@ -31,8 +31,8 @@ var mapping = &p.MetricsMapping{
 		"kube_pod_status_phase":      p.LabelMetric("status.phase", "phase", p.OpLowercaseValue()),
 		"kube_pod_status_ready":      p.LabelMetric("status.ready", "condition", p.OpLowercaseValue()),
 		"kube_pod_status_scheduled":  p.LabelMetric("status.scheduled", "condition", p.OpLowercaseValue()),
+		"kube_pod_status_reason":     p.LabelMetric("status.reason", "reason", p.OpLowercaseValue()),
 		"kube_pod_status_ready_time": p.Metric("status.ready_time"),
-		"kube_pod_status_reason":     p.LabelMetric("status.reason", "reason"),
 	},
 
 	Labels: map[string]p.LabelMap{

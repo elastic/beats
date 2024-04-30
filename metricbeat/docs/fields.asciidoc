@@ -46827,7 +46827,7 @@ type: keyword
 Time in unix timestamp for a pod to achieve readiness 
 
 
-type: keyword
+type: double
 
 --
 
