@@ -46811,6 +46811,26 @@ type: keyword
 
 --
 
+*`kubernetes.pod.status.reason`*::
++
+--
+The reason the pod is in its current state (Evicted, NodeAffinity, NodeLost, Shutdown or UnexpectedAdmissionError)
+
+
+type: keyword
+
+--
+
+*`kubernetes.pod.status.ready_time`*::
++
+--
+Time in unix timestamp for a pod to achieve readiness 
+
+
+type: keyword
+
+--
+
 [float]
 === replicaset
 

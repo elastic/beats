@@ -6,17 +6,18 @@
             "module": "kubernetes"
         },
         "kubernetes": {
-            "namespace": "default",
+            "namespace": "local-path-storage",
             "node": {
                 "name": "kind-control-plane"
             },
             "pod": {
                 "host_ip": "172.18.0.2",
-                "ip": "10.244.0.6",
-                "name": "web-0",
+                "ip": "10.244.0.2",
+                "name": "local-path-provisioner-6bc4bddd6b-6vl7d",
                 "status": {
                     "phase": "running",
                     "ready": "true",
+                    "ready_time": 1698675701,
                     "scheduled": "true"
                 }
             }
@@ -48,6 +49,39 @@
                 "status": {
                     "phase": "running",
                     "ready": "true",
+                    "ready_time": 1698675701,
+                    "scheduled": "true"
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_pod",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.pod",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "node": {
+                "name": "kind-control-plane"
+            },
+            "pod": {
+                "host_ip": "172.18.0.2",
+                "ip": "10.244.0.7",
+                "name": "fluentd-elasticsearch-m2tlp",
+                "status": {
+                    "phase": "running",
+                    "ready": "true",
+                    "ready_time": 1698751174,
                     "scheduled": "true"
                 }
             }
@@ -106,10 +140,11 @@
             "pod": {
                 "host_ip": "172.18.0.2",
                 "ip": "172.18.0.2",
-                "name": "kube-apiserver-kind-control-plane",
+                "name": "kube-scheduler-kind-control-plane",
                 "status": {
                     "phase": "running",
                     "ready": "true",
+                    "ready_time": 1698675684,
                     "scheduled": "true"
                 }
             }
@@ -168,134 +203,11 @@
             "pod": {
                 "host_ip": "172.18.0.2",
                 "ip": "172.18.0.2",
-                "name": "kube-controller-manager-kind-control-plane",
+                "name": "kube-apiserver-kind-control-plane",
                 "status": {
                     "phase": "running",
                     "ready": "true",
-                    "scheduled": "true"
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_pod",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.pod",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "kube-system",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "host_ip": "172.18.0.2",
-                "ip": "172.18.0.2",
-                "name": "etcd-kind-control-plane",
-                "status": {
-                    "phase": "running",
-                    "ready": "true",
-                    "scheduled": "true"
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_pod",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.pod",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "local-path-storage",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "host_ip": "172.18.0.2",
-                "ip": "10.244.0.2",
-                "name": "local-path-provisioner-6bc4bddd6b-6vl7d",
-                "status": {
-                    "phase": "running",
-                    "ready": "true",
-                    "scheduled": "true"
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_pod",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.pod",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "kube-system",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "host_ip": "172.18.0.2",
-                "ip": "10.244.0.5",
-                "name": "kube-state-metrics-7857446fb4-x78j6",
-                "status": {
-                    "phase": "running",
-                    "ready": "true",
-                    "scheduled": "true"
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_pod",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.pod",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "kube-system",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "host_ip": "172.18.0.2",
-                "ip": "172.18.0.2",
-                "name": "kube-scheduler-kind-control-plane",
-                "status": {
-                    "phase": "running",
-                    "ready": "true",
+                    "ready_time": 1698675692,
                     "scheduled": "true"
                 }
             }
@@ -327,6 +239,39 @@
                 "status": {
                     "phase": "running",
                     "ready": "true",
+                    "ready_time": 1698675698,
+                    "scheduled": "true"
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_pod",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.pod",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "node": {
+                "name": "kind-control-plane"
+            },
+            "pod": {
+                "host_ip": "172.18.0.2",
+                "ip": "10.244.0.5",
+                "name": "kube-state-metrics-7857446fb4-x78j6",
+                "status": {
+                    "phase": "running",
+                    "ready": "true",
+                    "ready_time": 1698751133,
                     "scheduled": "true"
                 }
             }
@@ -354,41 +299,11 @@
             "pod": {
                 "host_ip": "172.18.0.2",
                 "ip": "172.18.0.2",
-                "name": "kube-proxy-2nq9k",
+                "name": "etcd-kind-control-plane",
                 "status": {
                     "phase": "running",
                     "ready": "true",
-                    "scheduled": "true"
-                }
-            }
-        },
-        "metricset": {
-            "name": "state_pod",
-            "period": 10000
-        },
-        "service": {
-            "address": "127.0.0.1:55555",
-            "type": "kubernetes"
-        }
-    },
-    {
-        "event": {
-            "dataset": "kubernetes.pod",
-            "duration": 115000,
-            "module": "kubernetes"
-        },
-        "kubernetes": {
-            "namespace": "kube-system",
-            "node": {
-                "name": "kind-control-plane"
-            },
-            "pod": {
-                "host_ip": "172.18.0.2",
-                "ip": "10.244.0.7",
-                "name": "fluentd-elasticsearch-m2tlp",
-                "status": {
-                    "phase": "running",
-                    "ready": "true",
+                    "ready_time": 1698675692,
                     "scheduled": "true"
                 }
             }
@@ -420,6 +335,103 @@
                 "status": {
                     "phase": "running",
                     "ready": "true",
+                    "ready_time": 1698675701,
+                    "scheduled": "true"
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_pod",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.pod",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "node": {
+                "name": "kind-control-plane"
+            },
+            "pod": {
+                "host_ip": "172.18.0.2",
+                "ip": "172.18.0.2",
+                "name": "kube-proxy-2nq9k",
+                "status": {
+                    "phase": "running",
+                    "ready": "true",
+                    "ready_time": 1698675697,
+                    "scheduled": "true"
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_pod",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.pod",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "default",
+            "node": {
+                "name": "kind-control-plane"
+            },
+            "pod": {
+                "host_ip": "172.18.0.2",
+                "ip": "10.244.0.6",
+                "name": "web-0",
+                "status": {
+                    "phase": "running",
+                    "ready": "true",
+                    "ready_time": 1698751165,
+                    "scheduled": "true"
+                }
+            }
+        },
+        "metricset": {
+            "name": "state_pod",
+            "period": 10000
+        },
+        "service": {
+            "address": "127.0.0.1:55555",
+            "type": "kubernetes"
+        }
+    },
+    {
+        "event": {
+            "dataset": "kubernetes.pod",
+            "duration": 115000,
+            "module": "kubernetes"
+        },
+        "kubernetes": {
+            "namespace": "kube-system",
+            "node": {
+                "name": "kind-control-plane"
+            },
+            "pod": {
+                "host_ip": "172.18.0.2",
+                "ip": "172.18.0.2",
+                "name": "kube-controller-manager-kind-control-plane",
+                "status": {
+                    "phase": "running",
+                    "ready": "true",
+                    "ready_time": 1698675686,
                     "scheduled": "true"
                 }
             }
