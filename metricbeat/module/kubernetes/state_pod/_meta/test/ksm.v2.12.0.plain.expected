@@ -417,19 +417,20 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "kube-system",
+			"namespace": "default",
 			"node": {
 				"name": "kind-control-plane"
 			}
 		},
 		"MetricSetFields": {
 			"host_ip": "172.21.0.2",
-			"ip": "172.21.0.2",
-			"name": "etcd-kind-control-plane",
+			"ip": "10.244.0.8",
+			"name": "web-0",
 			"status": {
 				"phase": "running",
 				"ready": "true",
-				"ready_time": 1713862189,
+				"ready_time": 1713862311,
+				"reason": "evicted",
 				"scheduled": "true"
 			}
 		},
@@ -447,19 +448,19 @@
 	{
 		"RootFields": null,
 		"ModuleFields": {
-			"namespace": "default",
+			"namespace": "kube-system",
 			"node": {
 				"name": "kind-control-plane"
 			}
 		},
 		"MetricSetFields": {
 			"host_ip": "172.21.0.2",
-			"ip": "10.244.0.8",
-			"name": "web-0",
+			"ip": "172.21.0.2",
+			"name": "etcd-kind-control-plane",
 			"status": {
 				"phase": "running",
 				"ready": "true",
-				"ready_time": 1713862311,
+				"ready_time": 1713862189,
 				"scheduled": "true"
 			}
 		},

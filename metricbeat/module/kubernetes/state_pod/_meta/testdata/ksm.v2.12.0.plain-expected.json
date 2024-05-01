@@ -456,12 +456,11 @@
             },
             "pod": {
                 "host_ip": "172.21.0.2",
-                "ip": "10.244.0.8",
-                "name": "web-0",
+                "ip": "10.244.0.176",
+                "name": "hello-28564556-gkqsk",
                 "status": {
-                    "phase": "running",
-                    "ready": "true",
-                    "ready_time": 1713862311,
+                    "phase": "succeeded",
+                    "ready": "false",
                     "scheduled": "true"
                 }
             }
@@ -488,11 +487,13 @@
             },
             "pod": {
                 "host_ip": "172.21.0.2",
-                "ip": "10.244.0.176",
-                "name": "hello-28564556-gkqsk",
+                "ip": "10.244.0.8",
+                "name": "web-0",
                 "status": {
-                    "phase": "succeeded",
-                    "ready": "false",
+                    "phase": "running",
+                    "ready": "true",
+                    "ready_time": 1713862311,
+                    "reason": "evicted",
                     "scheduled": "true"
                 }
             }
