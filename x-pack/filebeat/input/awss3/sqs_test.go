@@ -71,7 +71,12 @@ func TestSQSReceiver(t *testing.T) {
 			Return(nil)
 
 		// Execute sqsReader and verify calls/state.
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
+		receiver := &sqsReaderInput{
+			log:                 logp.NewLogger(inputName),
+			sqs:                 mockAPI,
+			maxMessagesInFlight: maxMessages,
+			msgHandler:          mockMsgHandler,
+		}
 		receiver.Receive(ctx)
 	})
 
@@ -103,7 +108,12 @@ func TestSQSReceiver(t *testing.T) {
 		)
 
 		// Execute SQSReceiver and verify calls/state.
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
+		receiver := &sqsReaderInput{
+			log:                 logp.NewLogger(inputName),
+			sqs:                 mockAPI,
+			maxMessagesInFlight: maxMessages,
+			msgHandler:          mockMsgHandler,
+		}
 		receiver.Receive(ctx)
 	})
 }
@@ -134,7 +144,12 @@ func TestGetApproximateMessageCount(t *testing.T) {
 				}),
 		)
 
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
+		receiver := &sqsReaderInput{
+			log:                 logp.NewLogger(inputName),
+			sqs:                 mockAPI,
+			maxMessagesInFlight: maxMessages,
+			msgHandler:          mockMsgHandler,
+		}
 		receivedCount, err := getApproximateMessageCount(ctx, receiver.sqs)
 		assert.Equal(t, count, receivedCount)
 		assert.Nil(t, err)
@@ -159,7 +174,12 @@ func TestGetApproximateMessageCount(t *testing.T) {
 				}),
 		)
 
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
+		receiver := &sqsReaderInput{
+			log:                 logp.NewLogger(inputName),
+			sqs:                 mockAPI,
+			maxMessagesInFlight: maxMessages,
+			msgHandler:          mockMsgHandler,
+		}
 		receivedCount, err := getApproximateMessageCount(ctx, receiver.sqs)
 		assert.Equal(t, -1, receivedCount)
 		assert.NotNil(t, err)
