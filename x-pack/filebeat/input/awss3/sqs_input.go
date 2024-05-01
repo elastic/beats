@@ -126,20 +126,6 @@ func (in *sqsReaderInput) run(ctx context.Context) {
 	in.workerWg.Wait()
 }
 
-func (in *sqsReaderInput) createEventProcessor(pipeline beat.Pipeline) (sqsProcessor, error) {
-	fileSelectors := in.config.FileSelectors
-	if len(in.config.FileSelectors) == 0 {
-		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
-	}
-	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.log.Named("s3"), in.metrics, in.s3, fileSelectors, in.config.BackupConfig)
-
-	script, err := newScriptFromConfig(in.log.Named("sqs_script"), in.config.SQSScript)
-	if err != nil {
-		return nil, err
-	}
-	return newSQSS3EventProcessor(in.log.Named("sqs_s3_event"), in.metrics, in.sqs, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory), nil
-}
-
 func (in *sqsReaderInput) readerLoop(ctx context.Context) {
 	// requestCount is the number of outstanding work requests that the
 	// reader will try to fulfill
@@ -212,9 +198,23 @@ func (in *sqsReaderInput) logConfigSummary() {
 	log.Infof("AWS SQS max_number_of_messages is set to %v.", in.config.MaxNumberOfMessages)
 
 	if in.config.BackupConfig.GetBucketName() != "" {
-		log.Warnf("You have the backup_to_bucket functionality activated with SQS. Please make sure to set appropriate destination buckets" +
+		log.Warnf("You have the backup_to_bucket functionality activated with SQS. Please make sure to set appropriate destination buckets " +
 			"or prefixes to avoid an infinite loop.")
 	}
+}
+
+func (in *sqsReaderInput) createEventProcessor(pipeline beat.Pipeline) (sqsProcessor, error) {
+	fileSelectors := in.config.FileSelectors
+	if len(in.config.FileSelectors) == 0 {
+		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
+	}
+	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.log.Named("s3"), in.metrics, in.s3, fileSelectors, in.config.BackupConfig)
+
+	script, err := newScriptFromConfig(in.log.Named("sqs_script"), in.config.SQSScript)
+	if err != nil {
+		return nil, err
+	}
+	return newSQSS3EventProcessor(in.log.Named("sqs_s3_event"), in.metrics, in.sqs, script, in.config.VisibilityTimeout, in.config.SQSMaxReceiveCount, pipeline, s3EventHandlerFactory), nil
 }
 
 // Read all pending requests and return their count. If block is true,
