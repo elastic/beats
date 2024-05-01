@@ -266,8 +266,8 @@ func (c config) s3ConfigModifier(o *s3.Options) {
 }
 
 func (c config) getFileSelectors() []fileSelectorConfig {
-	if len(c.FileSelectors) == 0 {
-		return []fileSelectorConfig{{ReaderConfig: c.ReaderConfig}}
+	if len(c.FileSelectors) > 0 {
+		return c.FileSelectors
 	}
-	return c.FileSelectors
+	return []fileSelectorConfig{{ReaderConfig: c.ReaderConfig}}
 }
