@@ -39,6 +39,9 @@ steps:
           echo "~~~ Running tests"
           cd x-pack/heartbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -59,6 +62,9 @@ steps:
           echo "~~~ Running tests"
           cd x-pack/heartbeat
           mage goIntegTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -74,8 +80,15 @@ steps:
         skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
         command: |
           Set-Location -Path x-pack/heartbeat
+<<<<<<< HEAD
           mage build test
         key: "extended-win-2019-unit-tests"
+=======
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
+>>>>>>> 02ea29d8cf (Enabling retries for Beats flaky tests (#39174))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -87,7 +100,33 @@ steps:
           - "x-pack/heartbeat/build/*.json"
         notify:
           - github_commit_status:
+<<<<<<< HEAD
               context: "x-pack/heartbeat: Windows 2019 Unit Tests"
+=======
+              context: "x-pack/heartbeat: Windows 2016 Unit Tests"
+
+      - label: ":windows: Windows 2022 Unit Tests"
+        key: "mandatory-win-2022-unit-tests"
+        skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
+        command: |
+          Set-Location -Path x-pack/heartbeat
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/heartbeat/build/*.xml"
+          - "x-pack/heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/heartbeat: Windows 2022 Unit Tests"
+>>>>>>> 02ea29d8cf (Enabling retries for Beats flaky tests (#39174))
 
   - group: "x-pack/heartbeat Extended Windows Tests"
     key: "x-pack-heartbeat-extended-win-tests"
@@ -99,6 +138,9 @@ steps:
           Set-Location -Path x-pack/heartbeat
           mage build test
         key: "extended-win-10-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -117,6 +159,9 @@ steps:
           Set-Location -Path x-pack/heartbeat
           mage build test
         key: "extended-win-11-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -134,7 +179,15 @@ steps:
         key: "mandatory-win-2016-unit-tests"
         command: |
           Set-Location -Path x-pack/heartbeat
+<<<<<<< HEAD
           mage build unitTest
+=======
+          mage build test
+        retry:
+          automatic:
+           - limit: 3
+        key: "extended-win-2019-unit-tests"
+>>>>>>> 02ea29d8cf (Enabling retries for Beats flaky tests (#39174))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -146,6 +199,7 @@ steps:
           - "x-pack/heartbeat/build/*.json"
         notify:
           - github_commit_status:
+<<<<<<< HEAD
               context: "x-pack/heartbeat: Windows 2016 Unit Tests"
 
       - label: ":windows: Windows 2022 Unit Tests"
@@ -166,6 +220,10 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Windows 2022 Unit Tests"
   
+=======
+              context: "x-pack/heartbeat: Windows 2019 Unit Tests"
+
+>>>>>>> 02ea29d8cf (Enabling retries for Beats flaky tests (#39174))
   - group: "x-pack/heartbeat MacOS Extended Tests"
     key: "x-pack-heartbeat-extended-tests-macos"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
@@ -178,6 +236,9 @@ steps:
           installNodeJsDependencies
           cd x-pack/heartbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -196,6 +257,9 @@ steps:
           installNodeJsDependencies
           cd x-pack/heartbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"

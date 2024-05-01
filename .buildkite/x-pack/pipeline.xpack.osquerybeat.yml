@@ -30,6 +30,9 @@ steps:
         command: |
           cd x-pack/osquerybeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -46,6 +49,9 @@ steps:
         command: |
           cd x-pack/osquerybeat
           mage goIntegTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -61,7 +67,14 @@ steps:
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
+<<<<<<< HEAD
         key: "mandatory-win-2019-unit-tests"
+=======
+        key: "mandatory-win-2016-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
+>>>>>>> 02ea29d8cf (Enabling retries for Beats flaky tests (#39174))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -73,7 +86,32 @@ steps:
           - "x-pack/osquerybeat/build/*.json"
         notify:
           - github_commit_status:
+<<<<<<< HEAD
               context: "x-pack/osquerybeat: Windows 2019 Unit Tests"
+=======
+              context: "x-pack/osquerybeat: Windows 2016 Unit Tests"
+
+      - label: ":windows: Windows 2022 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/osquerybeat
+          mage build unitTest
+        key: "mandatory-win-2022-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/osquerybeat/build/*.xml"
+          - "x-pack/osquerybeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/osquerybeat: Windows 2022 Unit Tests"
+>>>>>>> 02ea29d8cf (Enabling retries for Beats flaky tests (#39174))
 
       # windows-2022 wasn't defined in Jenkins (mandatory or extended) hence not migrated -> https://github.com/elastic/beats/blob/f021699c4bc9a494d255eb339c819c2745eb87f8/x-pack/osquerybeat/Jenkinsfile.yml#L36-L70
   - group: "x-pack/osquerybeat Extended Windows Tests"
@@ -85,6 +123,9 @@ steps:
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
         key: "extended-win-10-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -98,14 +139,44 @@ steps:
           - github_commit_status:
               context: "x-pack/osquerybeat: Windows 10 Unit Tests"
 
+<<<<<<< HEAD
       # Windows 11 wasn't defined in Jenkins, hence not migrating -> https://github.com/elastic/beats/blob/f021699c4bc9a494d255eb339c819c2745eb87f8/x-pack/osquerybeat/Jenkinsfile.yml#L50-L53
+=======
+      - label: ":windows: Windows 11 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/osquerybeat
+          mage build unitTest
+        key: "extended-win-11-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/osquerybeat/build/*.xml"
+          - "x-pack/osquerybeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/osquerybeat: Windows 11 Unit Tests"
+>>>>>>> 02ea29d8cf (Enabling retries for Beats flaky tests (#39174))
 
       # contrary to other projects Windows 2016 is defined as extended for 7.17 -> https://github.com/elastic/beats/blob/ec9d1ccb50b947ed7d6c49d2e17a2cd611a251a9/x-pack/osquerybeat/Jenkinsfile.yml#L40-L44
       - label: ":windows: Windows 2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
+<<<<<<< HEAD
         key: "extended-win-2016-unit-tests"
+=======
+        key: "extended-win-2019-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
+>>>>>>> 02ea29d8cf (Enabling retries for Beats flaky tests (#39174))
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -128,6 +199,9 @@ steps:
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
           cd x-pack/osquerybeat && mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -138,7 +212,27 @@ steps:
           - github_commit_status:
               context: "x-pack/osquerybeat: MacOS x86_64 Unit Tests"
 
+<<<<<<< HEAD
       # macOS arm64 is not tested on 7.17 see https://github.com/elastic/beats/blob/ec9d1ccb50b947ed7d6c49d2e17a2cd611a251a9/x-pack/osquerybeat/Jenkinsfile.yml#L22-L34
+=======
+      - label: ":mac: MacOS arm64 Unit Tests"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
+          cd x-pack/osquerybeat && mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
+        artifact_paths:
+          - "x-pack/osquerybeat/build/*.xml"
+          - "x-pack/osquerybeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/osquerybeat: MacOS arm64 Unit Tests"
+>>>>>>> 02ea29d8cf (Enabling retries for Beats flaky tests (#39174))
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed

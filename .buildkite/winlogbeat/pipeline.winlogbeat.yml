@@ -24,6 +24,9 @@ steps:
       - label: ":ubuntu: Winlogbeat Crossccompile"
         key: "mandatory-cross-compile"
         command: "make -C winlogbeat crosscompile"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -35,11 +38,38 @@ steps:
           - github_commit_status:
               context: "Winlogbeat: Crosscompile"
 
+<<<<<<< HEAD
+=======
+      - label: ":windows: Winlogbeat Win-2016 Unit Tests"
+        command: |
+          Set-Location -Path winlogbeat
+          mage build unitTest
+        key: "mandatory-win-2016-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2016}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "winlogbeat/build/*.xml"
+          - "winlogbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Winlogbeat: Win-2016 Unit Tests"
+
+>>>>>>> 02ea29d8cf (Enabling retries for Beats flaky tests (#39174))
       - label: ":windows: Winlogbeat Win-2019 Unit Tests"
         command: |
           Set-Location -Path winlogbeat
           mage build unitTest
         key: "mandatory-win-2019-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -58,6 +88,9 @@ steps:
           Set-Location -Path winlogbeat
           mage build unitTest
         key: "mandatory-win-2022-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -81,6 +114,9 @@ steps:
           Set-Location -Path winlogbeat
           mage build unitTest
         key: "extended-win-10-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -99,6 +135,9 @@ steps:
           Set-Location -Path winlogbeat
           mage build unitTest
         key: "extended-win-11-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
