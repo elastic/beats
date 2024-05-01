@@ -106,7 +106,7 @@ steps:
           - github_commit_status:
               context: "heartbeat: Win-2022 Unit Tests"
 
-      - label: ":ubuntu: Heartbeat Go (Module) Integration Tests"
+      - label: ":ubuntu: Go (Module) Integration Tests"
         command: |
           set -euo pipefail
           echo "~~~ Installing @elastic/synthetics"
@@ -116,6 +116,7 @@ steps:
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet heartbeat
 
+          echo "~~~ Running tests"
           cd heartbeat
           mage goIntegTest
         retry:
@@ -132,7 +133,7 @@ steps:
           - github_commit_status:
               context: "heartbeat: Go Integration Tests"
 
-      - label: ":ubuntu: Heartbeat Python (Module) Integration Tests"
+      - label: ":ubuntu: Python (Module) Integration Tests"
         command: |
           set -euo pipefail
           # defines the MODULE env var based on what's changed in a PR
