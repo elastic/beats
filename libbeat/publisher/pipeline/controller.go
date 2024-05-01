@@ -267,11 +267,11 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 		factory = c.queueFactory
 	}
 
-	queue, err := factory(logger, c.onACK, c.inputQueueSize)
+	queue, err := factory(logger, c.onACK, c.inputQueueSize, outGrp.EncoderFactory)
 	if err != nil {
 		logger.Errorf("queue creation failed, falling back to default memory queue, check your queue configuration")
 		s, _ := memqueue.SettingsForUserConfig(nil)
-		queue = memqueue.NewQueue(logger, c.onACK, s, c.inputQueueSize)
+		queue = memqueue.NewQueue(logger, c.onACK, s, c.inputQueueSize, outGrp.EncoderFactory)
 	}
 	c.queue = queue
 
@@ -295,11 +295,11 @@ func (c *outputController) createQueueIfNeeded(outGrp outputs.Group) {
 // a producer for a nonexistent queue.
 type emptyProducer struct{}
 
-func (emptyProducer) Publish(_ interface{}) (queue.EntryID, bool) {
+func (emptyProducer) Publish(_ queue.Entry) (queue.EntryID, bool) {
 	return 0, false
 }
 
-func (emptyProducer) TryPublish(_ interface{}) (queue.EntryID, bool) {
+func (emptyProducer) TryPublish(_ queue.Entry) (queue.EntryID, bool) {
 	return 0, false
 }
 

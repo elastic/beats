@@ -66,9 +66,12 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Rename `queue.Batch.ACK()` to `queue.Batch.Done()`. {pull}31903[31903]
 - `queue.ACKListener` has been removed. Queue configurations now accept an explicit callback function for ACK handling. {pull}35078[35078]
 - Split split httpmon out of x-pack/filebeat/input/internal/httplog. {pull}36385[36385]
+- Beats publishing pipeline does not propagate the close signal to its clients any more. It's responsibility of the user to close the pipeline client. {issue}38197[38197] {pull}38556[38556]
 
 ==== Bugfixes
 
+- Handle the starting of namespace and node watchers for metadata enrichment according to `add_resource_metadata` configuration.{pull}38762[38762]
+- Fix multiple metricbeat instances reporting same metrics when using autodiscover with provider kubernetes, and ensure leader elector is always running in autodiscover mode.{pull}38471[38471]
 - Fix how Prometheus histograms are calculated when percentiles are provide.{pull}36537[36537]
 - Stop using `mage:import` in community beats. This was ignoring the vendorized beats directory for some mage targets, using the code available in GOPATH, this causes inconsistencies and compilation problems if the version of the code in the GOPATH is different to the vendored one. Use of `mage:import` will continue to be unsupported in custom beats till beats is migrated to go modules, or mage supports vendored dependencies. {issue}13998[13998] {pull}14162[14162]
 - Metricbeat module builders call host parser only once when instantiating light modules. {pull}20149[20149]
@@ -92,9 +95,11 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 - Make winlogbeat/sys/wineventlog follow the unsafe.Pointer rules. {pull}36650[36650]
 - Cleaned up documentation errors & fixed a minor bug in Filebeat Azure blob storage input. {pull}36714[36714]
 - Fix copy arguments for strict aligned architectures. {pull}36976[36976]
+- Fix panic when more than 32767 pipeline clients are active. {issue}38197[38197] {pull}38556[38556]
 
 ==== Added
 
+- Update watchers to be shared between metricsets in Kubernetes module. {pull}37332[37332]
 - Add new metricset in Kubernetes module, `state_namespace`. {pull}36406[36406]
 - Add configuration for APM instrumentation and expose the tracer trough the Beat object. {pull}17938[17938]
 - Make the behavior of clientWorker and netClientWorker consistent when error is returned from publisher pipeline

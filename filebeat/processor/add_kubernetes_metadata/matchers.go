@@ -29,7 +29,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	add_kubernetes_metadata.Indexing.AddMatcher(LogPathMatcherName, newLogsPathMatcher)
 	cfg := conf.NewConfig()
 

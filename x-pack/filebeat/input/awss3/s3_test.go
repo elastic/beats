@@ -13,7 +13,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/statestore"
@@ -134,12 +133,16 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{}, numberOfWorkers)
-		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, s3ObjProc, newStates(inputCtx), store, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
+		states, err := newStates(inputCtx, store)
+		require.NoError(t, err, "states creation must succeed")
+		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, s3ObjProc, states, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
 		require.Error(t, context.DeadlineExceeded, receiver.Poll(ctx))
-		assert.Equal(t, numberOfWorkers, receiver.workerSem.Available())
 	})
 
-	t.Run("retry after Poll error", func(t *testing.T) {
+	t.Run("restart bucket scan after paging errors", func(t *testing.T) {
+		// Change the restart limit to 2 consecutive errors, so the test doesn't
+		// take too long to run
+		readerLoopMaxCircuitBreaker = 2
 		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
 		store, err := storeReg.Get("test")
 		if err != nil {
@@ -176,13 +179,13 @@ func TestS3Poller(t *testing.T) {
 		// Initial Next gets an error.
 		mockPagerFirst.EXPECT().
 			HasMorePages().
-			Times(10).
+			Times(2).
 			DoAndReturn(func() bool {
 				return true
 			})
 		mockPagerFirst.EXPECT().
 			NextPage(gomock.Any()).
-			Times(5).
+			Times(2).
 			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
 				return nil, errFakeConnectivityFailure
 			})
@@ -257,8 +260,9 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{}, numberOfWorkers)
-		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, s3ObjProc, newStates(inputCtx), store, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
+		states, err := newStates(inputCtx, store)
+		require.NoError(t, err, "states creation must succeed")
+		receiver := newS3Poller(logp.NewLogger(inputName), nil, mockAPI, mockPublisher, s3ObjProc, states, bucket, "key", "region", "provider", numberOfWorkers, pollInterval)
 		require.Error(t, context.DeadlineExceeded, receiver.Poll(ctx))
-		assert.Equal(t, numberOfWorkers, receiver.workerSem.Available())
 	})
 }

@@ -8,7 +8,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -20,8 +19,11 @@ import (
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
+
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
+
 	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
 
 	// mage:import
@@ -39,23 +41,34 @@ func init() {
 	devtools.BeatLicense = "Elastic License"
 }
 
+func Fmt() {
+	mg.Deps(devtools.Format)
+}
+
+func AddLicenseHeaders() {
+	mg.Deps(devtools.AddLicenseHeaders)
+}
+
 func Check() error {
 	return devtools.Check()
 }
 
 func Build() error {
-	params := devtools.DefaultBuildArgs()
-
 	// Building osquerybeat
-	err := devtools.Build(params)
+	err := devtools.Build(devtools.DefaultBuildArgs())
 	if err != nil {
 		return err
 	}
+	return BuildExt()
+}
 
+// BuildExt builds the osquery-extension.
+func BuildExt() error {
+	params := devtools.DefaultBuildArgs()
 	params.InputFiles = []string{"./ext/osquery-extension/."}
 	params.Name = "osquery-extension"
 	params.CGO = false
-	err = devtools.Build(params)
+	err := devtools.Build(params)
 	if err != nil {
 		return err
 	}
@@ -67,7 +80,6 @@ func Build() error {
 			return err
 		}
 	}
-
 	return nil
 }
 
@@ -82,63 +94,80 @@ func Clean() error {
 	return devtools.Clean(paths)
 }
 
-func extractFromMSI() error {
-	if os.Getenv("GOOS") != "windows" {
+func execCommand(ctx context.Context, name string, args ...string) error {
+	ps := strings.Join(append([]string{name}, args...), " ")
+	fmt.Println(ps)
+	output, err := command.Execute(ctx, name, args...)
+	if err != nil {
+		fmt.Println(ps, ", failed: ", err)
+		return err
+	}
+	fmt.Print(output)
+	return err
+}
+
+// stripLinuxOsqueryd Strips osqueryd binary, that is not stripped in linux tar.gz distro
+func stripLinuxOsqueryd() error {
+	if os.Getenv("GOOS") != "linux" {
+		return nil
+	}
+
+	// Check that this step is called during x-pack/osquerybeat/ext/osquery-extension build
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	// Strip osqueryd only once when osquery-extension is built
+	// There are two build paths at the moment both through GolangCrossBuild
+	// 1. Standlone osquerybeat package (this function is called twice: for osquerybeat and osquery-extension)
+	// 2. Agentbeat package, this function is only called once for osquery-extension
+	if !strings.HasSuffix(cwd, "/osquery-extension") {
 		return nil
 	}
 
 	ctx := context.Background()
 
-	execCommand := func(name string, args ...string) error {
-		ps := strings.Join(append([]string{name}, args...), " ")
-		fmt.Println(ps)
-		output, err := command.Execute(ctx, name, args...)
-		if err != nil {
-			fmt.Println(ps, ", failed: ", err)
-			return err
-		}
-		fmt.Print(output)
-		return err
-	}
-
 	osArchs := osquerybeat.OSArchs(devtools.Platforms)
 
-	for _, osarch := range osArchs {
-		if osarch.OS != "windows" {
-			continue
-		}
-		spec, err := distro.GetSpec(osarch)
+	strip := func(oquerydPath string) error {
+		ok, err := fileutil.FileExists(oquerydPath)
 		if err != nil {
-			if errors.Is(err, distro.ErrUnsupportedOS) {
-				continue
-			} else {
+			return err
+		}
+		if ok {
+			if err := execCommand(ctx, "strip", oquerydPath); err != nil {
 				return err
 			}
 		}
-		dip := distro.GetDataInstallDir(osarch)
-		msiFile := spec.DistroFilepath(dip)
+		return nil
+	}
 
-		// MSI extract
-		err = execCommand("msiextract", "--directory", dip, msiFile)
+	for _, osarch := range osArchs {
+		// Skip everything but matching linux arch
+		if osarch.OS != os.Getenv("GOOS") || osarch.Arch != os.Getenv("GOARCH") {
+			continue
+		}
+
+		// Strip osqueryd
+		// There are two scenarios where the build path is created depending on the type of build
+		// 1. Standlone osquerybeat build: the osqueryd binaries are downloaded into osquerybeat/build/data/install/[GOOS]/[GOARCH]
+		// 2. Agentbeat build: the osqueryd binaries are downloaded agentbeat/build/data/install/[GOOS]/[GOARCH]
+
+		// This returns something like build/data/install/linux/amd64/osqueryd
+		querydRelativePath := distro.OsquerydPath(distro.GetDataInstallDir(osarch))
+
+		// Checking and stripping osqueryd binary and both paths osquerybeat/build and agentbeat/build
+		// because at the moment it's unclear if this step was initiated from osquerybeat or agentbeat build
+		osquerybeatPath := filepath.Clean(filepath.Join(cwd, "../..", querydRelativePath))
+		err = strip(osquerybeatPath)
 		if err != nil {
 			return err
 		}
 
-		fmt.Println("copy certs.pem from MSI")
-		err = devtools.Copy(filepath.Join(dip, distro.OsquerydCertsWindowsDistroPath()), distro.OsquerydCertsPath(dip))
+		agentbeatPath := filepath.Clean(filepath.Join(cwd, "../../../agentbeat", querydRelativePath))
+		err = strip(agentbeatPath)
 		if err != nil {
-			return err
-		}
-
-		fmt.Println("copy osqueryd.exe from MSI")
-		dp := distro.OsquerydPathForOS(osarch.OS, dip)
-		err = devtools.Copy(filepath.Join(dip, "osquery", "osqueryd", "osqueryd.exe"), dp)
-		if err != nil {
-			fmt.Println("copy osqueryd.exe from MSI failed: ", err)
-			return err
-		}
-		// Chmod set to the same as other executables in the final package
-		if err = os.Chmod(dp, 0755); err != nil {
 			return err
 		}
 	}
@@ -149,25 +178,12 @@ func extractFromMSI() error {
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
-	// This is to fix a defect in the field where msiexec fails to extract the osqueryd.exe
-	// from bundled osquery.msi, with error code 1603
-	// https://docs.microsoft.com/en-us/troubleshoot/windows-server/application-management/msi-installation-error-1603
-	// SDH: https://github.com/elastic/sdh-beats/issues/1575
-	// Currently we can't reproduce this is issue, but here we can eliminate the need for calling msiexec
-	// if extract the osqueryd.exe binary during the build.
-	//
-	// The cross build is currently called for two binaries osquerybeat and osqquery-extension
-	// Only extract osqueryd.exe during osquerybeat build on windows
-	args := devtools.DefaultGolangCrossBuildArgs()
-
-	if !strings.HasPrefix(args.Name, "osquery-extension-") {
-		// Extract osqueryd.exe from MSI
-		if err := extractFromMSI(); err != nil {
-			return err
-		}
+	// Strip linux osqueryd binary
+	if err := stripLinuxOsqueryd(); err != nil {
+		return err
 	}
 
-	return devtools.GolangCrossBuild(args)
+	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
 // BuildGoDaemon builds the go-daemon binary (use crossBuildGoDaemon).
@@ -182,12 +198,12 @@ func CrossBuild() error {
 	if err != nil {
 		return err
 	}
+	return CrossBuildExt()
+}
 
-	err = devtools.CrossBuild(devtools.InDir("x-pack", "osquerybeat", "ext", "osquery-extension"))
-	if err != nil {
-		return err
-	}
-	return nil
+// CrossBuildExt cross-builds the osquery-extension.
+func CrossBuildExt() error {
+	return devtools.CrossBuild(devtools.InDir("x-pack", "osquerybeat", "ext", "osquery-extension"))
 }
 
 // CrossBuildGoDaemon cross-builds the go-daemon binary using Docker.
