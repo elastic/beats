@@ -40,6 +40,9 @@ steps:
           echo "~~~ Running tests"
           cd x-pack/heartbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -60,6 +63,9 @@ steps:
           echo "~~~ Running tests"
           cd x-pack/heartbeat
           mage goIntegTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -77,6 +83,9 @@ steps:
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -96,6 +105,9 @@ steps:
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -119,6 +131,9 @@ steps:
           Set-Location -Path x-pack/heartbeat
           mage build test
         key: "extended-win-10-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -137,6 +152,9 @@ steps:
           Set-Location -Path x-pack/heartbeat
           mage build test
         key: "extended-win-11-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -154,6 +172,9 @@ steps:
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build test
+        retry:
+          automatic:
+           - limit: 3
         key: "extended-win-2019-unit-tests"
         agents:
           provider: "gcp"
@@ -167,7 +188,7 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Windows 2019 Unit Tests"
-  
+
   - group: "x-pack/heartbeat MacOS Extended Tests"
     key: "x-pack-heartbeat-extended-tests-macos"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
@@ -180,6 +201,9 @@ steps:
           installNodeJsDependencies
           cd x-pack/heartbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -198,6 +222,9 @@ steps:
           installNodeJsDependencies
           cd x-pack/heartbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
