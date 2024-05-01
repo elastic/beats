@@ -17,9 +17,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -339,14 +336,9 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 				curConfig.BucketListPrefix = fmt.Sprintf("list_prefix_%d", i)
 				s3API := newConstantS3(t)
 				s3API.pagerConstant = newS3PagerConstant(curConfig.BucketListPrefix)
-				storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
-				store, err := storeReg.Get("test")
-				if err != nil {
-					errChan <- fmt.Errorf("failed to access store: %w", err)
-					return
-				}
+				store := openTestStatestore()
 
-				states, err := newStates(store)
+				states, err := newStates(nil, store)
 				assert.NoError(t, err, "states creation should succeed")
 
 				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors, backupConfig{})
@@ -361,7 +353,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 					provider:        "provider",
 				}
 
-				s3Poller.scanLoop(ctx)
+				s3Poller.run(ctx)
 			}(i, wg)
 		}
 

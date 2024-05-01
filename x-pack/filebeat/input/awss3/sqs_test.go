@@ -121,7 +121,6 @@ func TestSQSReceiver(t *testing.T) {
 func TestGetApproximateMessageCount(t *testing.T) {
 	logp.TestingSetup()
 
-	const maxMessages = 5
 	const count = 500
 	attrName := []types.QueueAttributeName{sqsApproximateNumberOfMessages}
 	attr := map[string]string{"ApproximateNumberOfMessages": "500"}

@@ -64,11 +64,7 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	}
 
 	if config.BucketARN != "" || config.NonAWSBucketName != "" {
-		persistentStore, err := im.store.Access()
-		if err != nil {
-			return nil, fmt.Errorf("can not access persistent store: %w", err)
-		}
-		return newS3PollerInput(config, awsConfig, persistentStore)
+		return newS3PollerInput(config, awsConfig, im.store)
 	}
 
 	return nil, fmt.Errorf("configuration has no SQS queue URL and no S3 bucket ARN")

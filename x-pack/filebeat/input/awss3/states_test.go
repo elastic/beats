@@ -5,7 +5,6 @@
 package awss3
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -15,9 +14,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type testInputStore struct {
@@ -40,11 +36,6 @@ func (s *testInputStore) Access() (*statestore.Store, error) {
 
 func (s *testInputStore) CleanupInterval() time.Duration {
 	return 24 * time.Hour
-}
-
-var inputCtx = v2.Context{
-	Logger:      logp.NewLogger("test"),
-	Cancelation: context.Background(),
 }
 
 func TestStatesAddStateAndIsProcessed(t *testing.T) {
@@ -117,17 +108,13 @@ func TestStatesAddStateAndIsProcessed(t *testing.T) {
 		test := test
 		t.Run(name, func(t *testing.T) {
 			store := openTestStatestore()
-			persistentStore, err := store.Access()
-			if err != nil {
-				t.Fatalf("unexpected err: %v", err)
-			}
-			states, err := newStates(persistentStore)
+			states, err := newStates(nil, store)
 			require.NoError(t, err, "states creation must succeed")
 			if test.statesEdit != nil {
 				test.statesEdit(states)
 			}
 			if test.shouldReload {
-				states, err = newStates(persistentStore)
+				states, err = newStates(nil, store)
 				require.NoError(t, err, "states creation must succeed")
 			}
 

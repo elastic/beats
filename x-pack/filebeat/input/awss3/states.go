@@ -5,10 +5,13 @@
 package awss3
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 
+	"github.com/elastic/beats/v7/filebeat/beater"
 	"github.com/elastic/beats/v7/libbeat/statestore"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 const awsS3ObjectStatePrefix = "filebeat::aws-s3::state::"
@@ -28,34 +31,15 @@ type states struct {
 }
 
 // newStates generates a new states registry.
-func newStates(store *statestore.Store) (*states, error) {
-	stateTable := map[string]state{}
-
-	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
-		if !strings.HasPrefix(key, awsS3ObjectStatePrefix) {
-			return true, nil
-		}
-
-		// try to decode. Ignore faulty/incompatible values.
-		var st state
-		if err := dec.Decode(&st); err != nil {
-			// Skip this key but continue iteration
-			//nolint:nilerr // One bad object shouldn't stop iteration
-			return true, nil
-		}
-		if !st.Stored && !st.Failed {
-			// This is from an older version where state could be stored in the
-			// registry even if the object wasn't processed, or if it encountered
-			// ephemeral download errors. We don't add these to the in-memory cache,
-			// so if we see them during a bucket scan we will still retry them.
-			return true, nil
-		}
-
-		stateTable[st.ID()] = st
-		return true, nil
-	})
+func newStates(log *logp.Logger, stateStore beater.StateStore) (*states, error) {
+	store, err := stateStore.Access()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("can't access persistent store: %w", err)
+	}
+
+	stateTable, err := loadS3StatesFromRegistry(log, store)
+	if err != nil {
+		return nil, fmt.Errorf("loading S3 input state: %w", err)
 	}
 
 	return &states{
@@ -93,4 +77,37 @@ func (s *states) Close() {
 	s.storeLock.Lock()
 	s.store.Close()
 	s.storeLock.Unlock()
+}
+
+func loadS3StatesFromRegistry(log *logp.Logger, store *statestore.Store) (map[string]state, error) {
+	stateTable := map[string]state{}
+	err := store.Each(func(key string, dec statestore.ValueDecoder) (bool, error) {
+		if !strings.HasPrefix(key, awsS3ObjectStatePrefix) {
+			return true, nil
+		}
+
+		// try to decode. Ignore faulty/incompatible values.
+		var st state
+		if err := dec.Decode(&st); err != nil {
+			// Skip this key but continue iteration
+			if log != nil {
+				log.Warnf("invalid S3 state loading object key %v", key)
+			}
+			return true, nil
+		}
+		if !st.Stored && !st.Failed {
+			// This is from an older version where state could be stored in the
+			// registry even if the object wasn't processed, or if it encountered
+			// ephemeral download errors. We don't add these to the in-memory cache,
+			// so if we see them during a bucket scan we will still retry them.
+			return true, nil
+		}
+
+		stateTable[st.ID()] = st
+		return true, nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return stateTable, nil
 }

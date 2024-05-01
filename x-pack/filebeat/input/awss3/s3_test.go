@@ -15,8 +15,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -29,11 +27,7 @@ func TestS3Poller(t *testing.T) {
 	const testTimeout = 1 * time.Second
 
 	t.Run("Poll success", func(t *testing.T) {
-		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
-		store, err := storeReg.Get("test")
-		if err != nil {
-			t.Fatalf("Failed to access store: %v", err)
-		}
+		store := openTestStatestore()
 
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 		defer cancel()
@@ -133,7 +127,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{})
-		states, err := newStates(store)
+		states, err := newStates(nil, store)
 		require.NoError(t, err, "states creation must succeed")
 		poller := &s3PollerInput{
 			log: logp.NewLogger(inputName),
@@ -153,29 +147,11 @@ func TestS3Poller(t *testing.T) {
 		poller.runPoll(ctx)
 	})
 
-	/*
-			func newS3Poller(log *logp.Logger,
-		-       metrics *inputMetrics,
-		-       s3 s3API,
-		-       client beat.Client,
-		-       s3ObjectHandler s3ObjectHandlerFactory,
-		-       states *states,
-		-       bucket string,
-		-       listPrefix string,
-		-       awsRegion string,
-		-       provider string,
-		-       numberOfWorkers int,
-		-       bucketPollInterval time.Duration,*/
-
 	t.Run("restart bucket scan after paging errors", func(t *testing.T) {
 		// Change the restart limit to 2 consecutive errors, so the test doesn't
 		// take too long to run
 		readerLoopMaxCircuitBreaker = 2
-		storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
-		store, err := storeReg.Get("test")
-		if err != nil {
-			t.Fatalf("Failed to access store: %v", err)
-		}
+		store := openTestStatestore()
 
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout+pollInterval)
 		defer cancel()
@@ -288,7 +264,7 @@ func TestS3Poller(t *testing.T) {
 			Return(nil, errFakeConnectivityFailure)
 
 		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{})
-		states, err := newStates(store)
+		states, err := newStates(nil, store)
 		require.NoError(t, err, "states creation must succeed")
 		poller := &s3PollerInput{
 			log: logp.NewLogger(inputName),
