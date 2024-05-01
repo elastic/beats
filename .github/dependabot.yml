@@ -34,6 +34,7 @@ updates:
       - dependency-name: github.com/elastic/go-perf
       - dependency-name: github.com/elastic/go-seccomp-bpf
       - dependency-name: github.com/elastic/toutoumomoma
+      - dependency-name: github.com/elastic/ebpfevents
     ignore:
       # Skip github.com/elastic/mito because it requires documentation updates.
       - dependency-name: github.com/elastic/mito
