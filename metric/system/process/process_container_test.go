@@ -20,6 +20,7 @@ package process
 import (
 	"os"
 	"os/user"
+	"runtime"
 	"strconv"
 	"testing"
 
@@ -29,26 +30,45 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/dev-tools/systemtests"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // ======================================== NOTE:
 // The tests here are meant to be run from the containerized framework in ./tests
 // However, they are designed so that `go test` can run them normally as well
 
-// TODO:
-// Right now, cgroups checks are disabled because they're just broken for too many edge cases:
-// https://github.com/elastic/elastic-agent-system-metrics/issues/139
-// https://github.com/elastic/elastic-agent-system-metrics/issues/132
-// After those are fixed, this test needs to have cgroups re-enabled
+func TestContainerMonitoringFromInsideContainer(t *testing.T) {
+	_ = logp.DevelopmentSetup()
+
+	testStats := Stats{CPUTicks: true,
+		EnableCgroups: true,
+		EnableNetwork: false,
+		// TODO: These should use DockerTestResolver,
+		// once https://github.com/elastic/elastic-agent-system-metrics/issues/147 is merged
+		Hostfs:     resolve.NewTestResolver(""),
+		Procs:      []string{".*"},
+		CgroupOpts: cgroup.ReaderOptions{RootfsMountpoint: resolve.NewTestResolver("")},
+	}
+	err := testStats.Init()
+	require.NoError(t, err)
+
+	stats, err := testStats.GetSelf()
+	require.NoError(t, err)
+	if runtime.GOOS == "linux" {
+		cgstats, err := stats.Cgroup.Format()
+		require.NoError(t, err)
+		require.NotEmpty(t, cgstats)
+	}
+
+	require.NotEmpty(t, stats.Cmdline)
+	require.NotEmpty(t, stats.Username)
+}
 
 func TestSystemHostFromContainer(t *testing.T) {
 	_ = logp.DevelopmentSetup()
-	// This is more rigorous version of the unit tests
-	// Because this is meant to run in privileged mode,
-	// we know that all data should be in the final event, and we should get no errors
 
 	testStats := Stats{CPUTicks: true,
-		EnableCgroups: false,
+		EnableCgroups: true,
 		EnableNetwork: false,
 		Hostfs:        systemtests.DockerTestResolver(),
 		Procs:         []string{".*"},
@@ -110,8 +130,9 @@ func validateProcResult(t *testing.T, result mapstr.M) {
 	numThreads := result["num_threads"]
 	require.NotNil(t, numThreads)
 
-	// see comment at top of file
-	// cgroups := result["cgroup"].(map[string]interface{})
-	// require.NotNil(t, cgroups)
+	if runtime.GOOS == "linux" {
+		cgroups := result["cgroup"]
+		require.NotNil(t, cgroups)
+	}
 
 }

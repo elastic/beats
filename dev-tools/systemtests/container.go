@@ -86,7 +86,7 @@ type testCase struct {
 }
 
 func (tc testCase) String() string {
-	return fmt.Sprintf("%s-priv:%v-user:%s", tc.nsmode, tc.priv, tc.user)
+	return fmt.Sprintf("nsmode:%s_priv:%v_user:%s", tc.nsmode, tc.priv, tc.user)
 }
 
 // CreateAndRunPermissionMatrix is a helper that runs RunTestsOnDocker() across a range of possible docker settings.
@@ -182,6 +182,11 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context) {
 
 	require.Equal(tr.Runner, int64(0), result.ReturnCode, "got bad docker return code. stdout: %s \nstderr: %s", result.Stdout, result.Stderr)
 
+	if tr.Verbose {
+		fmt.Fprintf(os.Stdout, "stderr: %s\n", result.Stderr)
+		fmt.Fprintf(os.Stdout, "stdout: %s\n", result.Stdout)
+	}
+
 	// iterate by lines to make this easier to read
 	if len(tr.FatalLogMessages) > 0 {
 		for _, badLine := range tr.FatalLogMessages {
@@ -189,15 +194,14 @@ func (tr *DockerTestRunner) RunTestsOnDocker(ctx context.Context) {
 				require.NotContains(tr.Runner, line, badLine)
 			}
 			for _, line := range strings.Split(result.Stderr, "\n") {
-				require.NotContains(tr.Runner, line, badLine)
+				// filter our the go mod package download messages
+				if !strings.Contains(line, "go: downloading") {
+					require.NotContains(tr.Runner, line, badLine)
+				}
+
 			}
 		}
 
-	}
-
-	if tr.Verbose {
-		fmt.Fprintf(os.Stdout, "stderr: %s\n", result.Stderr)
-		fmt.Fprintf(os.Stdout, "stdout: %s\n", result.Stdout)
 	}
 
 }

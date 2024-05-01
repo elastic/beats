@@ -15,17 +15,31 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux
+// +build linux
+
 package cgv2
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/testhelpers"
 )
 
 const v2Path = "../testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope"
 const ubuntu = "../testdata/io_statfiles/ubuntu"
 const ubuntu2 = "../testdata/io_statfiles/ubuntu2"
+
+var testFileList = []string{
+	"../testdata/docker.zip",
+}
+
+func TestMain(m *testing.M) {
+	os.Exit(testhelpers.MainTestWrapper(m, testFileList))
+}
 
 func TestGetIO(t *testing.T) {
 	ioTest := IOSubsystem{}

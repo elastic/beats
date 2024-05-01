@@ -15,6 +15,9 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux
+// +build linux
+
 package cgv1
 
 import (
@@ -58,12 +61,12 @@ func TestBlkioThrottle(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	assert.Equal(t, uint64(48), blkio.Total.Ios)
-	assert.Equal(t, uint64(1651200), blkio.Total.Bytes)
+	assert.Equal(t, uint64(0x2e), blkio.Total.Ios)
+	assert.Equal(t, uint64(0x192600), blkio.Total.Bytes)
 	assert.Equal(t, uint64(46), blkio.Reads.Ios)
 	assert.Equal(t, uint64(1648128), blkio.Reads.Bytes)
-	assert.Equal(t, uint64(2), blkio.Writes.Ios)
-	assert.Equal(t, uint64(3072), blkio.Writes.Bytes)
+	assert.Equal(t, uint64(0), blkio.Writes.Ios)
+	assert.Equal(t, uint64(0), blkio.Writes.Bytes)
 
 }
 

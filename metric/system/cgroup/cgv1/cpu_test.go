@@ -15,14 +15,28 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux
+// +build linux
+
 package cgv1
 
 import (
 	"encoding/json"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/testhelpers"
 )
+
+var testFileList = []string{
+	"../testdata/docker.zip",
+}
+
+func TestMain(m *testing.M) {
+	os.Exit(testhelpers.MainTestWrapper(m, testFileList))
+}
 
 const cpuPath = "../testdata/docker/sys/fs/cgroup/cpu/docker/b29faf21b7eff959f64b4192c34d5d67a707fe8561e9eaa608cb27693fba4242"
 

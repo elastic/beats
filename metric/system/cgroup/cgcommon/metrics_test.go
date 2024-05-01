@@ -15,16 +15,29 @@
 // specific language governing permissions and limitations
 // under the License.
 
+//go:build linux
+// +build linux
+
 package cgcommon
 
 import (
+	"os"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-libs/opt"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/testhelpers"
 )
+
+var testFileList = []string{
+	"../testdata/docker.zip",
+}
+
+func TestMain(m *testing.M) {
+	os.Exit(testhelpers.MainTestWrapper(m, testFileList))
+}
 
 func TestPressure(t *testing.T) {
 	v2Path := "../testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope"

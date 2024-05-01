@@ -170,7 +170,7 @@ func (r *Reader) CgroupsVersion(pid int) (CgroupsVersion, error) {
 			return CgroupsV2, nil
 		}
 		// Otherwise, check to see what's in the controllers file
-		controllers, err := readControllerList(cgstring, r.cgroupMountpoints.V2Loc)
+		controllers, err := r.readControllerList(cgstring)
 		if err != nil {
 			return CgroupsV1, fmt.Errorf("error fetching cgroup controller list for pid %d: %w", pid, err)
 		}
@@ -353,9 +353,9 @@ func getCommonCgroupMetadata(mounts map[string]ControllerPath, ignoreRoot bool) 
 }
 
 // Read a cgroup.controllers list from a v2 cgroup
-func readControllerList(cgroupsFile string, v2path string) ([]string, error) {
+func (r *Reader) readControllerList(cgroupsFile string) ([]string, error) {
 	// edge case: There's no V2 controller
-	if v2path == "" {
+	if r.cgroupMountpoints.V2Loc == "" {
 		return []string{}, nil
 	}
 	controllers := strings.Split(cgroupsFile, "\n")
@@ -370,10 +370,14 @@ func readControllerList(cgroupsFile string, v2path string) ([]string, error) {
 	if cgpath == "" {
 		return []string{}, nil
 	}
-	file := filepath.Join(v2path, cgpath, "cgroup.controllers")
-	controllersRaw, err := os.ReadFile(file)
+	cgFilePath := filepath.Join(r.cgroupMountpoints.V2Loc, cgpath, "cgroup.controllers")
+	if cgroupNSStateFetch() && r.rootfsMountpoint.IsSet() {
+		cgFilePath = filepath.Join(r.cgroupMountpoints.V2Loc, r.cgroupMountpoints.ContainerizedRootMount, cgpath, "cgroup.controllers")
+	}
+
+	controllersRaw, err := os.ReadFile(cgFilePath)
 	if err != nil {
-		return nil, fmt.Errorf("error reading %s: %w", file, err)
+		return nil, fmt.Errorf("error reading cgroup '%s': file %s: %w", cgpath, cgFilePath, err)
 	}
 
 	if len(controllersRaw) == 0 {

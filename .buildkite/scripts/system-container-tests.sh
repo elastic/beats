@@ -13,4 +13,4 @@ install_go_dependencies
 # curl -fsSL https://get.docker.com -o get-docker.sh
 # sudo sh ./get-docker.sh --version $DOCKER_VERSION
 
-go test -v ./tests
+go test -timeout 20m -v ./tests

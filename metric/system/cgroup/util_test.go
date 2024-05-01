@@ -21,103 +21,80 @@
 package cgroup
 
 import (
-	"archive/zip"
 	"errors"
 	"fmt"
-	"io"
 	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup/testhelpers"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
-const dockerTestData = "testdata/docker.zip"
-const ubuntuTestData = "testdata/ubuntu1804.zip"
-const amazonLinux2TestData = "testdata/amzn2.zip"
+var testFileList = []string{
+	"testdata/docker.zip",
+	"testdata/ubuntu1804.zip",
+	"testdata/amzn2.zip",
+	"testdata/docker2.zip",
+}
 
 func TestMain(m *testing.M) {
-	err := extractTestData(dockerTestData)
-	if err != nil {
-		fmt.Println(err) //nolint:forbidigo //this is test startup code that might fail
-		os.Exit(1)
-	}
-	err = extractTestData(ubuntuTestData)
-	if err != nil {
-		fmt.Println(err) //nolint:forbidigo //this is test startup code that might fail
-		os.Exit(1)
-	}
-	err = extractTestData(amazonLinux2TestData)
-	if err != nil {
-		fmt.Println(err) //nolint:forbidigo //this is test startup code that might fail
-		os.Exit(1)
-	}
-	os.Exit(m.Run())
+	os.Exit(testhelpers.MainTestWrapper(m, testFileList))
 }
 
-// extractTestData from zip file and write it in the same dir as the zip file.
-func extractTestData(path string) error {
-	r, err := zip.OpenReader(path)
-	if err != nil {
-		return err
-	}
-	defer r.Close()
+func TestFindMatchingPid(t *testing.T) {
+	testFile := `
+12
+13
+14
+1585724
+1585725
+1586244
+1586245
+`
+	got := foundMatchingPidInProcsFile(14, testFile)
+	assert.True(t, got)
 
-	dest := filepath.Dir(path)
+	gotFalse := foundMatchingPidInProcsFile(15, testFile)
 
-	extractAndWriteFile := func(f *zip.File) error {
-		rc, err := f.Open()
-		if err != nil {
-			return err
-		}
-		defer rc.Close()
-
-		path := filepath.Join(dest, f.Name) //nolint: gosec // test with controlled input
-		if found, err := exists(path); err != nil || found {
-			return err
-		}
-
-		if f.FileInfo().IsDir() {
-			_ = os.MkdirAll(path, f.Mode())
-		} else {
-			destFile, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.FileMode(0700))
-			if err != nil {
-				return err
-			}
-			defer destFile.Close()
-
-			_, err = io.Copy(destFile, rc) //nolint: gosec // test with controlled input
-			if err != nil {
-				return err
-			}
-
-			_ = os.Chmod(path, f.Mode())
-		}
-		return nil
-	}
-
-	for _, f := range r.File {
-		err := extractAndWriteFile(f)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+	assert.False(t, gotFalse)
 }
 
-// exists returns whether the given file or directory exists or not
-func exists(path string) (bool, error) {
-	_, err := os.Stat(path)
-	if err == nil {
-		return true, nil
-	}
-	if os.IsNotExist(err) {
-		return false, nil
-	}
-	return true, err
+func TestFindCgroup(t *testing.T) {
+	path, err := guessContainerCgroupPath("/sys/fs/cgroup", os.Getpid())
+	require.NoError(t, err)
+	t.Logf("got path: %s", path)
+}
+
+func TestFindCgroupCache(t *testing.T) {
+	testPid := 2233801
+	path, err := guessContainerCgroupPath("testdata/docker2/sys/fs/cgroup", testPid)
+	goodPath := "/user.slice/user-1000.slice/session-520.scope"
+	require.NoError(t, err)
+	t.Logf("got path: %s", path)
+	require.Equal(t, goodPath, path)
+
+	cached := cgroupContainerPath.get()
+	t.Logf("got cached path: %s", cached)
+	require.Equal(t, goodPath, cached)
+
+	// run again with cached path
+	path, err = guessContainerCgroupPath("testdata/docker2/sys/fs/cgroup", testPid)
+	require.NoError(t, err)
+	require.Equal(t, goodPath, path)
+
+	// set outdated cache path
+	cgroupContainerPath.set("/user.slice/user-1000.slice/session-521.scope")
+
+	// should still get a good path
+	path, err = guessContainerCgroupPath("testdata/docker2/sys/fs/cgroup", testPid)
+	require.NoError(t, err)
+	require.Equal(t, goodPath, path)
+	cached = cgroupContainerPath.get()
+	require.Equal(t, goodPath, cached)
 }
 
 func TestSupportedSubsystems(t *testing.T) {
@@ -244,6 +221,31 @@ func TestProcessCgroupPathsV2(t *testing.T) {
 	assert.Equal(t, "testdata/docker/sys/fs/cgroup/system.slice/docker-1c8fa019edd4b9d4b2856f4932c55929c5c118c808ed5faee9a135ca6e84b039.scope", paths.V2["memory"].FullPath)
 }
 
+func TestMountpointsV2(t *testing.T) {
+	// emulate running in a private namespace docker container
+	cgroupNSStateFetch = func() bool { return true }
+	// inject our PID into the cgroup.procs file to so ProcessCgroupPaths()
+	// can find our root cgroup
+	pid := os.Getpid()
+	pidFmt := fmt.Sprintf("%d\n", pid)
+	err := os.WriteFile("testdata/docker2/sys/fs/cgroup/user.slice/user-1000.slice/session-520.scope/cgroup.procs",
+		[]byte(pidFmt), 0o744)
+	require.NoError(t, err)
+
+	_ = logp.DevelopmentSetup()
+
+	reader, err := NewReader(resolve.NewTestResolver("testdata/docker2"), false)
+	require.NoError(t, err)
+
+	stats, err := reader.GetStatsForPid(2233801)
+	require.NoError(t, err)
+	// unpack the interface so we can test this a little better
+	rawObject, ok := stats.(*StatsV2)
+	require.True(t, ok)
+	require.Equal(t, rawObject.ID, "session-520.scope")
+	require.Equal(t, rawObject.Path, "/user.slice/user-1000.slice/session-520.scope")
+}
+
 func assertContains(t testing.TB, m map[string]struct{}, key string) {
 	_, contains := m[key]
 	if !contains {
@@ -268,5 +270,68 @@ func TestParseMountinfoLine(t *testing.T) {
 		assert.Equal(t, "/sys/fs/cgroup/blkio", mount.mountpoint)
 		assert.Equal(t, "cgroup", mount.filesystemType)
 		assert.Len(t, mount.superOptions, 2)
+	}
+}
+
+func TestFetchV2Paths(t *testing.T) {
+	cases := []struct {
+		name         string
+		lines        []string
+		rootfs       resolve.Resolver
+		expectedPath string
+	}{
+		{
+			name:   "hostfspaths-with-hostfs",
+			rootfs: resolve.NewTestResolver("/hostfs"),
+			lines: []string{
+				"/sys/fs/cgroup",
+				"/hostfs/sys/fs/cgroup",
+				"/hostfs/var/lib/docker/overlay2/1b570230fa3ec3679e354b0c219757c739f91d774ebc02174106488606549da0/merged/sys/fs/cgroup",
+			},
+			expectedPath: "/hostfs/sys/fs/cgroup",
+		},
+		{
+			name:   "hostfspaths-without-hostfs",
+			rootfs: resolve.NewTestResolver(""),
+			lines: []string{
+				"/sys/fs/cgroup",
+				"/hostfs/sys/fs/cgroup",
+				"/hostfs/var/lib/docker/overlay2/1b570230fa3ec3679e354b0c219757c739f91d774ebc02174106488606549da0/merged/sys/fs/cgroup",
+			},
+			expectedPath: "/hostfs/sys/fs/cgroup",
+		},
+		{
+			name:   "hostfspaths-with-hostfs-werid-order",
+			rootfs: resolve.NewTestResolver("/hostfs"),
+			lines: []string{
+				"/sys/fs/cgroup",
+				"/hostfs/var/lib/docker/overlay2/1b570230fa3ec3679e354b0c219757c739f91d774ebc02174106488606549da0/merged/sys/fs/cgroup",
+				"/hostfs/sys/fs/cgroup",
+			},
+			expectedPath: "/hostfs/sys/fs/cgroup",
+		},
+		{
+			name:   "hostfspaths-with-hostfs-werider-order",
+			rootfs: resolve.NewTestResolver("/hostfs"),
+			lines: []string{
+				"/sys/fs/cgroup",
+				"/hostfs/sys/fs/cgroup",
+				"/hostfs/var/lib/docker/overlay2/1b570230fa3ec3679e354b0c219757c739f91d774ebc02174106488606549da0/merged/sys/fs/cgroup",
+			},
+			expectedPath: "/hostfs/sys/fs/cgroup",
+		},
+		{
+			name:         "no-hostfs-normalv2",
+			rootfs:       resolve.NewTestResolver(""),
+			lines:        []string{"/sys/fs/cgroup"},
+			expectedPath: "/sys/fs/cgroup",
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			got := getProperV2Paths(testCase.rootfs, testCase.lines)
+			assert.Equal(t, testCase.expectedPath, got)
+		})
 	}
 }

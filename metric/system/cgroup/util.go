@@ -21,15 +21,46 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
+
+// cgroupCntainerCache is a performance helper used for
+// cases where we're in a container and we need to fetch our cgroup
+// path from the host system. We want to cache these results, since traversing
+// /hostfs/sys/fs/cgroup is a bit intensive.
+// This value is also unlikely to change more than once.
+// see guessContainerCgroupPath() below for more context
+type cgroupContainerCache struct {
+	mut    sync.Mutex
+	cgPath string
+}
+
+func (cgc *cgroupContainerCache) get() string {
+	cgc.mut.Lock()
+	defer cgc.mut.Unlock()
+	return cgc.cgPath
+}
+
+func (cgc *cgroupContainerCache) set(update string) {
+	cgc.mut.Lock()
+	defer cgc.mut.Unlock()
+	cgc.cgPath = update
+}
+
+var cgroupContainerPath *cgroupContainerCache
+
+func init() {
+	cgroupContainerPath = &cgroupContainerCache{cgPath: ""}
+}
 
 var (
 	// ErrCgroupsMissing indicates the /proc/cgroups was not found. This means
@@ -48,8 +79,9 @@ type mountinfo struct {
 // Mountpoints organizes info about V1 and V2 cgroup mountpoints
 // V2 uses a "unified" hierarchy, so we have less to keep track of
 type Mountpoints struct {
-	V1Mounts map[string]string
-	V2Loc    string
+	V1Mounts               map[string]string
+	V2Loc                  string
+	ContainerizedRootMount string
 }
 
 // ControllerPath wraps the controller path
@@ -65,6 +97,9 @@ type PathList struct {
 	V1 map[string]ControllerPath
 	V2 map[string]ControllerPath
 }
+
+// wrapper that allows us to bypass isCgroupNSPrivate() for testing
+var cgroupNSStateFetch = isCgroupNSPrivate
 
 // Flatten combines the V1 and V2 cgroups in cases where we don't need a map with keys
 func (pl PathList) Flatten() []ControllerPath {
@@ -178,6 +213,7 @@ func SubsystemMountpoints(rootfs resolve.Resolver, subsystems map[string]struct{
 	mounts := map[string]string{}
 	mountInfo := Mountpoints{}
 	sc := bufio.NewScanner(mountinfo)
+	possibleV2Paths := []string{}
 	for sc.Scan() {
 		// https://www.kernel.org/doc/Documentation/filesystems/proc.txt
 		// Example:
@@ -218,14 +254,178 @@ func SubsystemMountpoints(rootfs resolve.Resolver, subsystems map[string]struct{
 
 		// V2 option
 		if mount.filesystemType == "cgroup2" {
-			mountInfo.V2Loc = mount.mountpoint
+			possibleV2Paths = append(possibleV2Paths, mount.mountpoint)
 		}
 
 	}
 
+	mountInfo.V2Loc = getProperV2Paths(rootfs, possibleV2Paths)
 	mountInfo.V1Mounts = mounts
 
+	// we only care about a contanerized root path if we're trying to monitor a host system
+	// from inside a container
+	// This logic helps us proper fetch the cgroup path when we're running inside a container
+	// with a private namespace
+	if mountInfo.V2Loc != "" && rootfs.IsSet() && cgroupNSStateFetch() {
+		mountInfo.ContainerizedRootMount, err = guessContainerCgroupPath(mountInfo.V2Loc, os.Getpid())
+		// treat this as a non-fatal error. If we end up needing this value, the lookups will fail down the line
+		if err != nil {
+			logp.L().Debugf("could not fetch cgroup path inside container: %w", err)
+		}
+	}
+
 	return mountInfo, sc.Err()
+}
+
+// isCgroupNSHost returns true if we're running inside a container with a
+// private cgroup namespace. Will return true if we're in a public namespace, or there's an error
+// Note that this function only makes sense *inside* a container. Outside it will probably always return false.
+func isCgroupNSPrivate() bool {
+	// we don't care about hostfs here, since we're just concerned about
+	// detecting the environment we're running under.
+	raw, err := os.ReadFile("/proc/self/cgroup")
+	if err != nil {
+		logp.L().Debugf("error reading /proc/self/cgroup to detect docker namespace settings: %w", err)
+		return false
+	}
+	// if we have a path of just "/" that means we're in our own private namespace
+	// if it's something else, we're probably in a host namespace
+	segments := strings.Split(strings.TrimSpace(string(raw)), ":")
+	return segments[len(segments)-1] == "/"
+
+}
+
+// tries to find the cgroup path for the currently-running container,
+// assuming we are running in a container.
+// see https://docs.docker.com/config/containers/runmetrics/#find-the-cgroup-for-a-given-container
+// We need to know the root cgroup we're running under, as
+// for monitoring a v2 system with a private namespace, we'll get relative paths
+// for the cgroup of a pid, see https://github.com/elastic/elastic-agent-system-metrics/issues/139
+// This will only work on v2 cgroups, I haven't run into this on a system with cgroups v1 yet;
+// not sure if docker namespacing behaves the same.
+func guessContainerCgroupPath(v2Loc string, OurPid int) (string, error) {
+	// check the cache first
+	if cachePath := cgroupContainerPath.get(); cachePath != "" {
+		// check the validity of the cache
+		rawFile, err := os.ReadFile(filepath.Join(v2Loc, cachePath, "cgroup.procs"))
+		// if we get a read error, assume the cache is invalid, move on
+		if err == nil {
+			if foundMatchingPidInProcsFile(OurPid, string(rawFile)) {
+				return cachePath, nil
+			}
+		}
+	}
+	// pattern:
+	// if in a private cgroup namespace,
+	// traverse over the root cgroup path, look for *.procs files
+	// go through all of the *.procs files until we have one that contains our pid
+	// that path is our cgroup
+
+	foundCgroupPath := ""
+	err := filepath.WalkDir(v2Loc, func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if d.IsDir() {
+			return nil
+		}
+		if strings.Contains(d.Name(), "procs") {
+			pidfile, err := os.ReadFile(path) //nolint: nilerr // we can get lots of weird permissions errors here, so don't fail on an error
+			if err != nil {
+				return nil //nolint: nilerr // we can get lots of weird permissions errors here, so don't fail on an error
+			}
+			if foundMatchingPidInProcsFile(OurPid, string(pidfile)) {
+				foundCgroupPath = path
+				return nil
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		return "", fmt.Errorf("error traversing paths to find cgroup: %w", err)
+	}
+
+	if foundCgroupPath == "" {
+		return "", nil
+	}
+	// strip to cgroup path
+	cgroupDir := filepath.Dir(foundCgroupPath)
+	relativePath := strings.TrimPrefix(cgroupDir, v2Loc)
+	cgroupContainerPath.set(relativePath)
+	return relativePath, nil
+}
+
+// foundMatchingPidInProcsFile is a helper for guessContainerCgroupPath
+// that tells us if we have a matching process in a cgroup.procs file
+func foundMatchingPidInProcsFile(ourPid int, fileData string) bool {
+	for _, rawPid := range strings.Split(fileData, "\n") {
+		if len(rawPid) == 0 {
+			continue
+		}
+		pidInt, err := strconv.ParseInt(strings.TrimSpace(rawPid), 10, 64)
+		if err != nil {
+			return false
+		}
+		if pidInt == int64(ourPid) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// when we're reading from a host mountinfo path from inside a container
+// (i.e) `/hostfs/proc/self/mountinfo`, we can get a set of cgroup2 mountpoints like this:
+// 1718 1686 0:26 / /hostfs/sys/fs/cgroup rw,nosuid,nodev,noexec,relatime master:4 - cgroup2 cgroup2 rw,seclabel
+// 1771 1770 0:26 / /hostfs/var/lib/docker/overlay2/1b570230fa3ec3679e354b0c219757c739f91d774ebc02174106488606549da0/merged/sys/fs/cgroup ro,nosuid,nodev,noexec,relatime - cgroup2 cgroup rw,seclabel
+// That latter mountpoint, just a link to the overlayfs, is almost guaranteed to throw a permissions error
+// try to sort out the mountpoints, and use the correct one
+func getProperV2Paths(rootfs resolve.Resolver, possibleV2Paths []string) string {
+	if len(possibleV2Paths) > 1 {
+		// try to sort out anything that looks like a docker fs
+		filteredPaths := []string{}
+		for _, path := range possibleV2Paths {
+			if strings.Contains(path, "overlay2") {
+				continue
+			}
+			filteredPaths = append(filteredPaths, path)
+		}
+		// if we have no correct paths, give up and use the last one
+		// the "last one" ideom preserves behavior before we got more clever with looking for the V2 paths
+		if len(filteredPaths) == 0 {
+			usePath := possibleV2Paths[len(possibleV2Paths)-1]
+			logp.L().Debugf("could not find correct cgroupv2 path, reverting to path that may produce errors: %s", usePath)
+			return usePath
+		}
+
+		// if we're using an alternate hostfs, assume we want to monitor the host system, from inside a container
+		// and use that path
+		if rootfs.IsSet() {
+			root := rootfs.ResolveHostFS("")
+			hostFSPaths := []string{}
+			for _, path := range filteredPaths {
+				if strings.Contains(path, root) {
+					hostFSPaths = append(hostFSPaths, path)
+				}
+			}
+			// return the last path
+			if len(hostFSPaths) > 0 {
+				return hostFSPaths[len(hostFSPaths)-1]
+			} else {
+				usePath := filteredPaths[len(filteredPaths)-1]
+				logp.L().Debugf("An alternate hostfs was specified, but could not find any cgroup mountpoints that contain a hostfs. Using: %s", usePath)
+				return usePath
+			}
+		} else {
+			// if no hosfs is set, just use the last element
+			return filteredPaths[len(filteredPaths)-1]
+		}
+
+	} else if len(possibleV2Paths) == 1 {
+		return possibleV2Paths[0]
+	}
+
+	return ""
 }
 
 // ProcessCgroupPaths returns the cgroups to which a process belongs and the
@@ -261,6 +461,27 @@ func (r *Reader) ProcessCgroupPaths(pid int) (PathList, error) {
 		if r.cgroupsHierarchyOverride != "" {
 			path = r.cgroupsHierarchyOverride
 		}
+
+		//on newer docker versions (1.41+?), docker will do  namespacing with cgroups
+		// such that we'll get a cgroup path like `0::/../../user.slice/user-1000.slice/session-520.scope`
+		// `man 7 cgroups` says the following about the path field in the `cgroup` file (emphasis mine):
+		//
+		// This field contains the pathname of the control group
+		// in the hierarchy to which the process belongs.  This
+		// pathname is **relative to the mount point of the hierarchy**.
+		//
+		// However, when we try to append something like `/../..` to another path, we obviously blow things up.
+		// we need to use the absolute path of the container cgroup
+		if cgroupNSStateFetch() && r.rootfsMountpoint.IsSet() {
+			if r.cgroupMountpoints.ContainerizedRootMount == "" {
+				logp.L().Debugf("cgroup for process %d contains a relative cgroup path (%s), but we were not able to find a root cgroup. Cgroup monitoring for this PID may be incomplete",
+					pid, path)
+			} else {
+				logp.L().Infof("using root mount %s and path %s", r.cgroupMountpoints.ContainerizedRootMount, path)
+				path = filepath.Join(r.cgroupMountpoints.ContainerizedRootMount, path)
+			}
+		}
+
 		// cgroup V2
 		// cgroup v2 controllers will always start with this string
 		if strings.HasPrefix(line, "0::/") {
