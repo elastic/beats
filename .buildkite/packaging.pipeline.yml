@@ -44,6 +44,10 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
         commands:
           - make build/distributions/dependencies.csv
           - make beats-dashboards
@@ -62,6 +66,10 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
         commands:
           - make build/distributions/dependencies.csv
           - make beats-dashboards
@@ -86,6 +94,10 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
         artifact_paths:
           - build/distributions/**/*
         matrix:
@@ -116,6 +128,10 @@ steps:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
         artifact_paths:
           - build/distributions/**/*
         matrix:
@@ -142,6 +158,10 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
         artifact_paths:
           - build/distributions/**/*
 
@@ -161,6 +181,10 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
         artifact_paths:
           - build/distributions/**/*
         matrix:
@@ -191,6 +215,10 @@ steps:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
         artifact_paths:
           - build/distributions/**/*
         matrix:
@@ -217,6 +245,10 @@ steps:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "c2-standard-16"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
         artifact_paths:
           - build/distributions/**/*
 
