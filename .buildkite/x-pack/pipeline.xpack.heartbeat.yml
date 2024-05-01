@@ -191,12 +191,12 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Windows 2019 Unit Tests"
 
-  - group: "x-pack/heartbeat MacOS Extended Tests"
+  - group: "x-pack/heartbeat macOS Extended Tests"
     key: "x-pack-heartbeat-extended-tests-macos"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
 
     steps:
-      - label: ":mac: MacOS x86_64 Unit Tests"
+      - label: ":mac: macOS x86_64 Unit Tests"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -215,9 +215,9 @@ steps:
           - "x-pack/heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/heartbeat: MacOS x86_64 Extended Tests"
+              context: "x-pack/heartbeat: macOS x86_64 Extended Tests"
 
-      - label: ":mac: MacOS arm64 Unit Tests"
+      - label: ":mac: macOS arm64 Unit Tests"
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -236,7 +236,7 @@ steps:
           - "x-pack/heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/heartbeat: MacOS arm64 Extended Tests"
+              context: "x-pack/heartbeat: macOS arm64 Extended Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
