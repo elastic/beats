@@ -61,7 +61,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -108,7 +108,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -155,7 +155,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -202,7 +202,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -249,7 +249,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -296,7 +296,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -343,7 +343,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -390,7 +390,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -436,7 +436,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -483,7 +483,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -530,7 +530,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -577,7 +577,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -624,7 +624,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -671,7 +671,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -706,7 +706,7 @@ spec:
         release-eng:
           access_level: BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
 apiVersion: backstage.io/v1alpha1
@@ -788,7 +788,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -835,7 +835,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -882,7 +882,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -929,7 +929,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -976,7 +976,7 @@ spec:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -1015,7 +1015,7 @@ spec:
         release-eng:
           access_level: BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -1040,28 +1040,33 @@ spec:
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/packaging.pipeline.yml"
-      branch_configuration: "main"
+      branch_configuration: "main 8.14"
       # TODO enable after packaging backports for release branches
       # branch_configuration: "main 8.* 7.17"
       cancel_intermediate_builds: false
       skip_intermediate_builds: false
+      maximum_timeout_in_minutes: 90
       provider_settings:
-        build_branches: false
+        build_branches: true
         build_pull_request_forks: false
         build_pull_requests: false
         build_tags: false
+        filter_condition: >-
+          build.branch =~ /^[0-9]+\.[0-9]+$$/ || build.branch == "main"
+        filter_enabled: true
         trigger_mode: code
       env:
         ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
         SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
         SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
+        SLACK_NOTIFICATIONS_SKIP_FOR_RETRIES: 'true'        
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
         release-eng:
           access_level: BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -1097,7 +1102,7 @@ spec:
         release-eng:
           access_level: BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
 
 ---
 # yaml-language-server: $schema=https://gist.githubusercontent.com/elasticmachine/988b80dae436cafea07d9a4a460a011d/raw/rre.schema.json
@@ -1143,4 +1148,4 @@ spec:
         release-eng:
           access_level: BUILD_AND_READ
         everyone:
-          access_level: READ_ONLY
+          access_level: BUILD_AND_READ
