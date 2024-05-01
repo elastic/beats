@@ -90,8 +90,12 @@ func validateProcResult(t *testing.T, result mapstr.M) {
 	require.NoError(t, err)
 	gotUser, _ := result["username"].(string)
 
+	gotPpid, ok := result["ppid"].(int)
+	require.True(t, ok)
+
 	// if we're root or the same user as the pid, check `exe`
-	if privilegedMode && (os.Getuid() == 0 || user.Name == gotUser) {
+	// kernel procs also don't have `exe`
+	if (privilegedMode && (os.Getuid() == 0 || user.Name == gotUser)) && gotPpid != 2 {
 		exe := result["exe"]
 		require.NotNil(t, exe)
 	}

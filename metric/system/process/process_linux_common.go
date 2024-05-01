@@ -115,7 +115,11 @@ func FillPidMetrics(hostfs resolve.Resolver, pid int, state ProcState, filter fu
 	}
 
 	state.Exe, state.Cwd, err = getProcStringData(hostfs, pid)
-	if err != nil && !errors.Is(err, os.ErrPermission) { // ignore permission errors
+	// skip permission errors and file not found errors
+	// see https://github.com/elastic/elastic-agent-system-metrics/issues/135 for a bit more context,
+	// depending on the permissions/caps that this is running with, the /exe symlink may have different levels of permission restrictions.
+	// A kernel proc will also return file not found.
+	if err != nil && !errors.Is(err, os.ErrPermission) && !errors.Is(err, os.ErrNotExist) { // ignore permission errors
 		return state, fmt.Errorf("error getting metadata for pid %d: %w", pid, err)
 	}
 
@@ -206,7 +210,7 @@ func parseProcStat(data []byte) (ProcState, error) {
 
 func getProcStringData(hostfs resolve.Resolver, pid int) (string, string, error) {
 	exe, err := os.Readlink(hostfs.Join("proc", strconv.Itoa(pid), "exe"))
-	if errors.Is(err, os.ErrPermission) { // pass through permission errors
+	if errors.Is(err, os.ErrPermission) || errors.Is(err, os.ErrNotExist) { // pass through errors
 		return "", "", err
 	} else if err != nil {
 		return "", "", fmt.Errorf("error fetching exe from pid %d: %w", pid, err)
