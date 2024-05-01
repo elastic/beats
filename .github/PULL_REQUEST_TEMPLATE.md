@@ -44,12 +44,12 @@ List here all the items you have verified BEFORE sending this PR. Please DO NOT 
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] I have added an entry in `CHANGELOG.next.asciidoc` or `CHANGELOG-developer.next.asciidoc`.
 
-## Breaking Change Mitigations
+## Disruptive User Impact
 
 <!--
-If this PR introduces a breaking change for end users, describe what changes they could make on
-their end to nullify or minimize the impacts of this change. Consider impacts in related systems, not
-just directly when using Beats.
+Will the changes introduced by this PR cause disruption to users in any way? If so, please describe what changes users
+could make on their end to nullify or minimize this disruption. Consider impacts in related systems, not just directly
+when using Beats.
 -->
 
 ## Author's Checklist
