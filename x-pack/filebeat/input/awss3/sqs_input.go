@@ -17,19 +17,17 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
-	"github.com/elastic/beats/v7/libbeat/common/atomic"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 type sqsReaderInput struct {
-	config         config
-	awsConfig      awssdk.Config
-	activeMessages atomic.Int
-	sqs            sqsAPI
-	s3             s3API
-	msgHandler     sqsProcessor
-	log            *logp.Logger
-	metrics        *inputMetrics
+	config     config
+	awsConfig  awssdk.Config
+	sqs        sqsAPI
+	s3         s3API
+	msgHandler sqsProcessor
+	log        *logp.Logger
+	metrics    *inputMetrics
 
 	// The expected region based on the queue URL
 	detectedRegion string
@@ -43,14 +41,14 @@ type sqsReaderInput struct {
 	workerWg sync.WaitGroup
 }
 
-func newSQSReaderInput(config config, awsConfig awssdk.Config) (v2.Input, error) {
-	detectedRegion, err := getRegionFromQueueURL(config.QueueURL, config.AWSConfig.Endpoint)
+func newSQSReaderInput(config config, awsConfig awssdk.Config) (*sqsReaderInput, error) {
+	detectedRegion := getRegionFromQueueURL(config.QueueURL, config.AWSConfig.Endpoint)
 	if config.RegionName != "" {
 		awsConfig.Region = config.RegionName
-	} else if err != nil {
+	} else if detectedRegion == "" {
 		// Only report an error if we don't have a configured region
 		// to fall back on.
-		return nil, fmt.Errorf("failed to get AWS region from queue_url: %w", err)
+		return nil, fmt.Errorf("failed to get AWS region from queue_url: %w", errBadQueueURL)
 	}
 
 	sqsAPI := &awsSQSAPI{
@@ -107,11 +105,17 @@ func (in *sqsReaderInput) Run(
 		return fmt.Errorf("failed to initialize sqs reader: %w", err)
 	}
 
-	// Poll metrics periodically in the background
-	go pollSqsWaitingMetric(inputContext.Cancelation, in.sqs, in.metrics)
-
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+
+	// Poll metrics periodically in the background
+	go messageCountMonitor{
+		sqs:     in.sqs,
+		metrics: in.metrics,
+	}.run(ctx)
+
+	// Start the main run loop
 	in.run(ctx)
+
 	return nil
 }
 
@@ -137,21 +141,21 @@ func (in *sqsReaderInput) createEventProcessor(pipeline beat.Pipeline) (sqsProce
 }
 
 func (in *sqsReaderInput) readerLoop(ctx context.Context) {
+	// requestCount is the number of outstanding work requests that the
+	// reader will try to fulfill
 	requestCount := 0
 	for ctx.Err() == nil {
-		// Check for any new pending work requests
-		for {
-			select {
-				case <-in.
-			}
-		}
+		// Block to wait for more requests if requestCount is zero
+		requestCount += channelRequestCount(ctx, in.workRequestChan, requestCount == 0)
 
-		msgs := in.readMessages(ctx)
+		msgs := readSQSMessages(ctx, in.log, in.sqs, in.metrics, requestCount)
 
 		for _, msg := range msgs {
 			select {
 			case <-ctx.Done():
-			case in.workChan <- msg:
+				return
+			case in.workResponseChan <- msg:
+				requestCount--
 			}
 		}
 	}
@@ -159,55 +163,30 @@ func (in *sqsReaderInput) readerLoop(ctx context.Context) {
 
 func (in *sqsReaderInput) workerLoop(ctx context.Context) {
 	for ctx.Err() == nil {
+		// Send a work request
 		select {
 		case <-ctx.Done():
 			// Shutting down
 			return
 		case in.workRequestChan <- struct{}{}:
 		}
-		// We successfully sent a work request, now we must wait for the
-		// response (even if ctx expires).
-		msg, ok := <-in.workResponseChan
-		if !ok {
-			// No task available, reader is shutting down
-			return
-		}
-		start := time.Now()
-
-		id := in.metrics.beginSQSWorker()
-		if err := in.msgHandler.ProcessSQS(ctx, &msg); err != nil {
-			in.log.Warnw("Failed processing SQS message.",
-				"error", err,
-				"message_id", *msg.MessageId,
-				"elapsed_time_ns", time.Since(start))
-		}
-		in.metrics.endSQSWorker(id)
-	}
-}
-
-func (in *sqsReaderInput) readMessages(ctx context.Context) []types.Message {
-	// We try to read enough messages to bring activeMessages up to the
-	// total worker count (plus one, to unblock us when workers are ready
-	// for more messages)
-	readCount := in.config.MaxNumberOfMessages + 1 - in.activeMessages.Load()
-	if readCount <= 0 {
-		return nil
-	}
-	msgs, err := in.sqs.ReceiveMessage(ctx, readCount)
-	for err != nil && ctx.Err() == nil {
-		in.log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
-		// Wait for the retry delay, but stop early if the context is cancelled.
+		// The request is sent, wait for a response
 		select {
 		case <-ctx.Done():
-			return nil
-		case <-time.After(sqsRetryDelay):
+			return
+		case msg := <-in.workResponseChan:
+			start := time.Now()
+
+			id := in.metrics.beginSQSWorker()
+			if err := in.msgHandler.ProcessSQS(ctx, &msg); err != nil {
+				in.log.Warnw("Failed processing SQS message.",
+					"error", err,
+					"message_id", *msg.MessageId,
+					"elapsed_time_ns", time.Since(start))
+			}
+			in.metrics.endSQSWorker(id)
 		}
-		msgs, err = in.sqs.ReceiveMessage(ctx, readCount)
 	}
-	in.activeMessages.Add(len(msgs))
-	in.log.Debugf("Received %v SQS messages.", len(msgs))
-	in.metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
-	return msgs
 }
 
 func (in *sqsReaderInput) startWorkers(ctx context.Context) {
@@ -235,5 +214,33 @@ func (in *sqsReaderInput) logConfigSummary() {
 	if in.config.BackupConfig.GetBucketName() != "" {
 		log.Warnf("You have the backup_to_bucket functionality activated with SQS. Please make sure to set appropriate destination buckets" +
 			"or prefixes to avoid an infinite loop.")
+	}
+}
+
+// Read all pending requests and return their count. If block is true,
+// waits until the result is at least 1, unless the context expires.
+func channelRequestCount(
+	ctx context.Context,
+	requestChan chan struct{},
+	block bool,
+) int {
+	requestCount := 0
+	if block {
+		// Wait until at least one request comes in.
+		select {
+		case <-ctx.Done():
+			return 0
+		case <-requestChan:
+			requestCount++
+		}
+	}
+	// Read as many requests as we can without blocking.
+	for {
+		select {
+		case <-requestChan:
+			requestCount++
+		default:
+			return requestCount
+		}
 	}
 }

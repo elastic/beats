@@ -240,7 +240,7 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 
 		b.ResetTimer()
 		start := time.Now()
-		sqsReader.Receive(ctx)
+		sqsReader.run(ctx)
 		b.StopTimer()
 		elapsed := time.Since(start)
 

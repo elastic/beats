@@ -77,7 +77,7 @@ func TestSQSReceiver(t *testing.T) {
 			sqs:        mockAPI,
 			msgHandler: mockMsgHandler,
 		}
-		receiver.Receive(ctx)
+		receiver.run(ctx)
 	})
 
 	t.Run("retry after ReceiveMessage error", func(t *testing.T) {
@@ -114,7 +114,7 @@ func TestSQSReceiver(t *testing.T) {
 			sqs:        mockAPI,
 			msgHandler: mockMsgHandler,
 		}
-		receiver.Receive(ctx)
+		receiver.run(ctx)
 	})
 }
 
@@ -126,14 +126,13 @@ func TestGetApproximateMessageCount(t *testing.T) {
 	attrName := []types.QueueAttributeName{sqsApproximateNumberOfMessages}
 	attr := map[string]string{"ApproximateNumberOfMessages": "500"}
 
-	t.Run("GetApproximateMessageCount success", func(t *testing.T) {
+	t.Run("getApproximateMessageCount success", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 		defer cancel()
 
 		ctrl, ctx := gomock.WithContext(ctx, t)
 		defer ctrl.Finish()
 		mockAPI := NewMockSQSAPI(ctrl)
-		mockMsgHandler := NewMockSQSProcessor(ctrl)
 
 		gomock.InOrder(
 			mockAPI.EXPECT().
@@ -144,15 +143,10 @@ func TestGetApproximateMessageCount(t *testing.T) {
 				}),
 		)
 
-		receiver := &sqsReaderInput{
-			log:        logp.NewLogger(inputName),
-			config:     config{MaxNumberOfMessages: maxMessages},
-			sqs:        mockAPI,
-			msgHandler: mockMsgHandler,
-		}
-		receivedCount, err := getApproximateMessageCount(ctx, receiver.sqs)
+		receivedCount, err :=
+			messageCountMonitor{sqs: mockAPI}.getApproximateMessageCount(ctx)
 		assert.Equal(t, count, receivedCount)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 	})
 
 	t.Run("GetApproximateMessageCount error", func(t *testing.T) {
@@ -163,7 +157,6 @@ func TestGetApproximateMessageCount(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockAPI := NewMockSQSAPI(ctrl)
-		mockMsgHandler := NewMockSQSProcessor(ctrl)
 
 		gomock.InOrder(
 			mockAPI.EXPECT().
@@ -174,13 +167,7 @@ func TestGetApproximateMessageCount(t *testing.T) {
 				}),
 		)
 
-		receiver := &sqsReaderInput{
-			log:        logp.NewLogger(inputName),
-			config:     config{MaxNumberOfMessages: maxMessages},
-			sqs:        mockAPI,
-			msgHandler: mockMsgHandler,
-		}
-		receivedCount, err := getApproximateMessageCount(ctx, receiver.sqs)
+		receivedCount, err := messageCountMonitor{sqs: mockAPI}.getApproximateMessageCount(ctx)
 		assert.Equal(t, -1, receivedCount)
 		assert.NotNil(t, err)
 	})

@@ -88,10 +88,7 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := getRegionFromQueueURL(test.queueURL, test.endpoint)
-			if !sameError(err, test.wantErr) {
-				t.Errorf("unexpected error: got:%v want:%v", err, test.wantErr)
-			}
+			got := getRegionFromQueueURL(test.queueURL, test.endpoint)
 			if got != test.want {
 				t.Errorf("unexpected result: got:%q want:%q", got, test.want)
 			}
