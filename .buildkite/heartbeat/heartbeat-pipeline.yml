@@ -26,8 +26,9 @@ steps:
     key: "heartbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: Heartbeat Unit Tests"
+      - label: ":ubuntu: Unit Tests"
         command: |
+          set -euo pipefail
           cd heartbeat
           mage build unitTest
         retry:
@@ -42,10 +43,11 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Ubuntu Unit Tests"
+              context: "heartbeat: Ubuntu Unit Tests"
 
-      - label: ":rhel: Heartbeat Rhel9 Unit Tests"
+      - label: ":rhel: Rhel9 Unit Tests"
         command: |
+          set -euo pipefail
           cd heartbeat
           mage build unitTest
         retry:
@@ -60,9 +62,9 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Rhel9 Unit Tests"
+              context: "heartbeat: Rhel9 Unit Tests"
 
-      - label: ":windows: Heartbeat Win-2016 Unit Tests"
+      - label: ":windows: Win-2016 Unit Tests"
         key: "windows-2016"
         command: |
           Set-Location -Path heartbeat
@@ -80,9 +82,9 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Win-2016 Unit Tests"
+              context: "heartbeat: Win-2016 Unit Tests"
 
-      - label: ":windows: Heartbeat Win-2022 Unit Test"
+      - label: ":windows: Win-2022 Unit Test"
         key: "windows-2022"
         command: |
           Set-Location -Path heartbeat
@@ -100,10 +102,15 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Win-2022 Unit Tests"
+              context: "heartbeat: Win-2022 Unit Tests"
 
-      - label: ":ubuntu: Heartbeat Go Integration Tests"
-        command:  |
+      - label: ":ubuntu: Go (Module) Integration Tests"
+        command: |
+          set -euo pipefail
+          # defines the MODULE env var based on what's changed in a PR
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet heartbeat
+          echo "~~~ Will run tests with env var MODULE=$$MODULE"
           cd heartbeat
           mage goIntegTest
         retry:
@@ -118,10 +125,15 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Go Integration Tests"
+              context: "heartbeat: Go Integration Tests"
 
-      - label: ":ubuntu: Heartbeat Python Integration Tests"
+      - label: ":ubuntu: Python (Module) Integration Tests"
         command: |
+          set -euo pipefail
+          # defines the MODULE env var based on what's changed in a PR
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet heartbeat
+          echo "~~~ Will run tests with env var MODULE=$$MODULE"
           cd heartbeat
           mage pythonIntegTest
         retry:
@@ -136,16 +148,18 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Python Integration Tests"
+              context: "heartbeat: Python Integration Tests"
 
-  - group: "Heartbeat ARM Tests"
-    key: "heartbeat-extended-tests-arm"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+  - group: "Heartbeat Extended Tests"
+    key: "heartbeat-extended-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
 
     steps:
       - label: ":linux: Heartbeat ARM64 Unit Tests"
         key: "arm-extended"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         command: |
+          set -euo pipefail
           cd heartbeat
           mage build unitTest
         retry:
@@ -158,15 +172,11 @@ steps:
         artifact_paths: "heartbeat/build/*.xml"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Ubuntu ARM64 Unit Tests"
+              context: "heartbeat: Ubuntu ARM64 Unit Tests"
 
-  - group: "Heartbeat Extended Testing MacOS"
-    key: "heartbeat-extended-tests-macos"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-
-    steps:
-      - label: ":mac: Heartbeat MacOS Unit Tests"
+      - label: ":mac: MacOS Unit Tests"
         key: "macos-extended"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -183,10 +193,11 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: MacOS Unit Tests"
+              context: "heartbeat: MacOS Unit Tests"
 
-      - label: ":mac: Heartbeat MacOS ARM Unit Tests"
+      - label: ":mac: MacOS ARM Unit Tests"
         key: "macos-arm-extended"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -203,14 +214,14 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: MacOS ARM Unit Tests"
+              context: "heartbeat: MacOS ARM Unit Tests"
 
   - group: "Heartbeat Windows Extended Testing"
     key: "heartbeat-extended-tests-win"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Heartbeat Win-2019 Unit Tests"
+      - label: ":windows: Win-2019 Unit Tests"
         key: "heartbeat-win-extended-2019"
         command:  |
           Set-Location -Path heartbeat
@@ -228,9 +239,9 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Win-2019 Unit Tests"
+              context: "heartbeat: Win-2019 Unit Tests"
 
-      - label: ":windows: Heartbeat Win-11 Unit Tests"
+      - label: ":windows: Win-11 Unit Tests"
         key: "heartbeat-windows-extended-11"
         command: |
           Set-Location -Path heartbeat
@@ -248,9 +259,9 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Win-11 Unit Tests"
+              context: "heartbeat: Win-11 Unit Tests"
 
-      - label: ":windows: Heartbeat Win-10 Unit Tests"
+      - label: ":windows: Win-10 Unit Tests"
         key: "heartbeat-windows-extended-10"
         command: |
           Set-Location -Path heartbeat
@@ -268,21 +279,25 @@ steps:
           - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Win-10 Unit Tests"
+              context: "heartbeat: Win-10 Unit Tests"
 
   - wait: ~
+    # with PRs, we want to run packaging only if mandatory tests succeed
+    # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in mandatory tests
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on: "heartbeat-mandatory-tests"
 
   - group: "Heartbeat Packaging"
     key: "heartbeat-packaging"
     steps:
-      - label: ":ubuntu: Heartbeat Packaging Linux X86"
+      - label: ":ubuntu: Packaging Linux X86"
         key: "heartbeat-package-linux-x86"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
         command: |
+          set -euo pipefail
           cd heartbeat
           mage package
         agents:
@@ -291,15 +306,16 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Packaging Ubuntu x86_64"
+              context: "heartbeat: Packaging Ubuntu x86_64"
 
-      - label: ":linux: Heartbeat Packaging Linux ARM"
+      - label: ":linux: Packaging Linux ARM"
         key: "heartbeat-package-linux-arm"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
           SNAPSHOT: true
         command: |
+          set -euo pipefail
           cd heartbeat
           mage package
         agents:
@@ -308,4 +324,4 @@ steps:
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         notify:
           - github_commit_status:
-              context: "Heartbeat: Packaging Ubuntu ARM"
+              context: "heartbeat: Packaging Ubuntu ARM"
