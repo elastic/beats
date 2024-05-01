@@ -96,13 +96,24 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 }
 
 func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
-	_, err := ev.GetValue(p.config.PIDField)
+	pi, err := ev.GetValue(p.config.PIDField)
 	if err != nil {
 		// Do not attempt to enrich events without PID; it's not a supported event
 		return ev, nil //nolint:nilerr // Running on events without PID is expected
 	}
 
-	err = p.provider.UpdateDB(ev)
+	// Do not enrich failed syscalls, as there was no actual process change related to it
+	v, err := ev.GetValue("auditd.result")
+	if err == nil && v == "fail" {
+		return ev, nil
+	}
+
+	pid, err := pidToUInt32(pi)
+	if err != nil {
+		return ev, nil //nolint:nilerr // Running on events with a different PID type is not a processor error
+	}
+
+	err = p.provider.UpdateDB(ev, pid)
 	if err != nil {
 		return ev, err
 	}
@@ -136,7 +147,9 @@ func (p *addSessionMetadata) enrich(ev *beat.Event) (*beat.Event, error) {
 
 	fullProcess, err := p.db.GetProcess(pid)
 	if err != nil {
-		return nil, fmt.Errorf("pid %v not found in db: %w", pid, err)
+		e := fmt.Errorf("pid %v not found in db: %w", pid, err)
+		p.logger.Errorf("%v", e)
+		return nil, e
 	}
 
 	processMap := fullProcess.ToMap()
