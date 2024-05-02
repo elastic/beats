@@ -192,7 +192,7 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 
 	ev, err := readTimeout(t, watcher)
 	assert.Equal(t, errReadTimeout, err)
-	if !errors.Is(err, errReadTimeout) {
+	if err != errReadTimeout {
 		t.Fatalf("Expected timeout, got event %+v", ev)
 	}
 
