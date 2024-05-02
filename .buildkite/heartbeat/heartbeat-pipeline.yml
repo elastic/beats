@@ -1,70 +1,132 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
 
 env:
-  BEATS_PROJECT_NAME: "heartbeat"
-  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
-  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2004-aarch64"
-  IMAGE_WIN_2016: "family/core-windows-2016"
-  IMAGE_WIN_2019: "family/core-windows-2019"
-  IMAGE_WIN_2022: "family/core-windows-2022"
-  IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
-  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
+
+  IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
+  IMAGE_MACOS_ARM: "generic-13-ventura-arm"
+  IMAGE_RHEL9: "family/platform-ingest-beats-rhel-9"
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+  IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
+  IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
+  IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
+  IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
+  IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
+
+  # Other deps
+  ASDF_MAGE_VERSION: 1.15.0
 
 steps:
   - group: "Heartbeat Mandatory Testing"
-    key: "mandatory-tests"
-    if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat" || build.env("BUILDKITE_PULL_REQUEST") != "false"
+    key: "heartbeat-mandatory-tests"
 
     steps:
-      - label: ":linux: Unit Tests / {{matrix.image}}"
-        command:
-          - ".buildkite/heartbeat/scripts/unit-tests.sh"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat: linux/Unit Tests"
+      - label: ":ubuntu: Heartbeat Unit Tests"
+        command: |
+          cd heartbeat
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
-          image: "{{matrix.image}}"
+          image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        matrix:
-          setup:
-            image:
-              - "${IMAGE_UBUNTU_X86_64}"
-              - "${IMAGE_RHEL9}"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
-
-      - label: ":windows: Unit Tests / {{matrix.image}}"
-        command:
-          - ".buildkite/scripts/win_unit_tests.ps1"
         notify:
           - github_commit_status:
-              context: "Heartbeat: windows/Unit Tests"
+              context: "Heartbeat: Ubuntu Unit Tests"
+
+      - label: ":rhel: Heartbeat Rhel9 Unit Tests"
+        command: |
+          cd heartbeat
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
-          image: "{{matrix.image}}"
+          image: "${IMAGE_RHEL9}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "heartbeat/build/*.xml"
+          - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Rhel9 Unit Tests"
+
+      - label: ":windows: Heartbeat Win-2016 Unit Tests"
+        key: "windows-2016"
+        command: |
+          Set-Location -Path heartbeat
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_type: "pd-ssd"
-        matrix:
-          setup:
-            image:
-              - "${IMAGE_WIN_2016}"
-              - "${IMAGE_WIN_2022}"
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Win-2016 Unit Tests"
 
-      - label: ":ubuntu: Go Integration Tests"
-        command:
-          - ".buildkite/heartbeat/scripts/integration-gotests.sh"
+      - label: ":windows: Heartbeat Win-2022 Unit Test"
+        key: "windows-2022"
+        command: |
+          Set-Location -Path heartbeat
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2022}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "heartbeat/build/*.xml"
+          - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Win-2022 Unit Tests"
+
+      - label: ":ubuntu: Heartbeat Go Integration Tests"
+        command:  |
+          cd heartbeat
+          mage goIntegTest
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "heartbeat/build/*.xml"
+          - "heartbeat/build/*.json"
         notify:
           - github_commit_status:
               context: "Heartbeat: Go Integration Tests"
+
+      - label: ":ubuntu: Heartbeat Python Integration Tests"
+        command: |
+          cd heartbeat
+          mage pythonIntegTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -72,64 +134,90 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
-
-      - label: ":ubuntu: Python Integration Tests"
-        command:
-          - ".buildkite/heartbeat/scripts/integration-pytests.sh"
         notify:
           - github_commit_status:
               context: "Heartbeat: Python Integration Tests"
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths:
-          - "heartbeat/build/*.xml"
-          - "heartbeat/build/*.json"
 
-  - group: "Extended Testing"
-    key: "extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") != "false" || build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for extended support"
+  - group: "Heartbeat ARM Tests"
+    key: "heartbeat-extended-tests-arm"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
 
     steps:
-      - label: ":linux: ARM64 Unit Tests"
+      - label: ":linux: Heartbeat ARM64 Unit Tests"
         key: "arm-extended"
-        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for arm" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-        command:
-          - ".buildkite/heartbeat/scripts/unit-tests.sh"
-        notify:
-          - github_commit_status:
-              context: "Heartbeat/Extended: Unit Tests ARM"
+        command: |
+          cd heartbeat
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths: "heartbeat/build/*.xml"
-
-      - label: ":mac: MacOS Unit Tests"
-        key: "macos-extended"
-        if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for macos" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command:
-          - ".buildkite/heartbeat/scripts/unit-tests.sh"
         notify:
           - github_commit_status:
-              context: "Heartbeat/Extended: MacOS Unit Tests"
+              context: "Heartbeat: Ubuntu ARM64 Unit Tests"
+
+  - group: "Heartbeat Extended Testing MacOS"
+    key: "heartbeat-extended-tests-macos"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+
+    steps:
+      - label: ":mac: Heartbeat MacOS Unit Tests"
+        key: "macos-extended"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
+          cd heartbeat
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths: "heartbeat/build/*.xml"
-
-  - group: "Windows Extended Testing"
-    key: "extended-tests-win"
-    if: build.env("GITHUB_PR_TRIGGER_COMMENT") == "heartbeat for windows" || build.env("GITHUB_PR_LABELS") =~ /.*windows.*/
-
-    steps:
-      - label: ":windows: Win 2019 Unit Tests"
-        key: "win-extended-2019"
-        command: ".buildkite/scripts/win_unit_tests.ps1"
+        artifact_paths:
+          - "metricbeat/build/*.xml"
+          - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "Heartbeat/Extended: Win-2019 Unit Tests"
+              context: "Heartbeat: MacOS Unit Tests"
+
+      - label: ":mac: Heartbeat MacOS ARM Unit Tests"
+        key: "macos-arm-extended"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/install_macos_tools.sh
+          cd heartbeat
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "orka"
+          imagePrefix: "${IMAGE_MACOS_ARM}"
+        artifact_paths:
+          - "metricbeat/build/*.xml"
+          - "metricbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: MacOS ARM Unit Tests"
+
+  - group: "Heartbeat Windows Extended Testing"
+    key: "heartbeat-extended-tests-win"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+
+    steps:
+      - label: ":windows: Heartbeat Win-2019 Unit Tests"
+        key: "heartbeat-win-extended-2019"
+        command:  |
+          Set-Location -Path heartbeat
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -138,13 +226,86 @@ steps:
         artifact_paths:
           - "heartbeat/build/*.xml"
           - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Win-2019 Unit Tests"
 
-  - group: "Packaging"
-    key: "packaging"
+      - label: ":windows: Heartbeat Win-11 Unit Tests"
+        key: "heartbeat-windows-extended-11"
+        command: |
+          Set-Location -Path heartbeat
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_11}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "heartbeat/build/*.xml"
+          - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Win-11 Unit Tests"
+
+      - label: ":windows: Heartbeat Win-10 Unit Tests"
+        key: "heartbeat-windows-extended-10"
+        command: |
+          Set-Location -Path heartbeat
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_10}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "heartbeat/build/*.xml"
+          - "heartbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Win-10 Unit Tests"
+
+  - wait: ~
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
-    depends_on:
-      - "mandatory-tests"
+    depends_on: "heartbeat-mandatory-tests"
 
+  - group: "Heartbeat Packaging"
+    key: "heartbeat-packaging"
     steps:
-      - label: Package pipeline
-        commands: ".buildkite/scripts/packaging/package-step.sh"
+      - label: ":ubuntu: Heartbeat Packaging Linux X86"
+        key: "heartbeat-package-linux-x86"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          SNAPSHOT: true
+        command: |
+          cd heartbeat
+          mage package
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Packaging Ubuntu x86_64"
+
+      - label: ":linux: Heartbeat Packaging Linux ARM"
+        key: "heartbeat-package-linux-arm"
+        env:
+          PLATFORMS: "linux/arm64"
+          PACKAGES: "docker"
+          SNAPSHOT: true
+        command: |
+          cd heartbeat
+          mage package
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "Heartbeat: Packaging Ubuntu ARM"

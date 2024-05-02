@@ -1,0 +1,38 @@
+[
+    {
+        "@timestamp": "2021-11-10T10:11:09.997Z",
+        "event.action": "apex-external-custom-callout",
+        "event.category": [
+            "network"
+        ],
+        "event.dataset": "salesforce.apex",
+        "event.duration": 13.0,
+        "event.kind": "event",
+        "event.module": "salesforce",
+        "event.outcome": "failure",
+        "event.timezone": "-02:00",
+        "event.type": "connection",
+        "fileset.name": "apex",
+        "input.type": "log",
+        "log.offset": 0,
+        "salesforce.apex.action": "query",
+        "salesforce.apex.entity": "HealthcareBlog",
+        "salesforce.apex.event_type": "ExternalCustomApexCallout",
+        "salesforce.apex.execute_ms": 8.0,
+        "salesforce.apex.fetch_ms": 5.0,
+        "salesforce.apex.limit": 51,
+        "salesforce.apex.message": "Unauthorized endpoint, please check Setup->Security->Remote site settings. endpoint = https://www.healthcare.gov/api/blog.json : ()",
+        "salesforce.apex.offset": 0,
+        "salesforce.apex.orderby": "(Order:[columnName=ExternalId, direction=ASCENDING, tableName=HealthcareBlog], Order:[columnName=ExternalId, direction=ASCENDING, tableName=HealthcareBlog])",
+        "salesforce.apex.organization_id": "00D5j000000VI3n",
+        "salesforce.apex.request_id": "TID:10799890000ce8142a",
+        "salesforce.apex.select": "(ColumnSelection:[aggregation=NONE, columnName=DisplayUrl, tableName=HealthcareBlog], ColumnSelection:[aggregation=NONE, columnName=ExternalId, tableName=HealthcareBlog])",
+        "salesforce.instance_url": "<no value>",
+        "service.type": "salesforce",
+        "tags": [
+            "forwarded",
+            "salesforce-apex"
+        ],
+        "user.id": "0055j000000utlP"
+    }
+]

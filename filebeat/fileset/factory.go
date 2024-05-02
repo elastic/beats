@@ -19,6 +19,7 @@ package fileset
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/gofrs/uuid"
 	"github.com/mitchellh/hashstructure"
@@ -33,9 +34,13 @@ import (
 )
 
 var moduleList = monitoring.NewUniqueList()
+var moduleListMetricsOnce sync.Once
 
-func init() {
-	monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
+// RegisterMonitoringModules registers the modules list with the monitoring system.
+func RegisterMonitoringModules() {
+	moduleListMetricsOnce.Do(func() {
+		monitoring.NewFunc(monitoring.GetNamespace("state").GetRegistry(), "module", moduleList.Report, monitoring.Report)
+	})
 }
 
 // Factory for modules

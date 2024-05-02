@@ -36,7 +36,7 @@ type cleaner struct {
 // run starts a loop that tries to clean entries from the registry.
 // The cleaner locks the store, such that no new states can be created
 // during the cleanup phase. Only resources that are finished and whose TTL
-// (clean_timeout setting) has expired will be removed.
+// (clean_inactive setting) has expired will be removed.
 //
 // Resources are considered "Finished" if they do not have a current owner (active input), and
 // if they have no pending updates that still need to be written to the registry file after associated
@@ -79,6 +79,10 @@ func gcStore(log *logp.Logger, started time.Time, store *store) {
 	if err := gcClean(store, keys); err != nil {
 		log.Errorf("Failed to remove all entries from the registry: %+v", err)
 	}
+
+	// The main reason for this log entry is to enable tests that want to observe
+	// if the resources are correctly removed from the store.
+	log.Debugf("%d entries removed", len(keys))
 }
 
 // gcFind searches the store of resources that can be removed. A set of keys to delete is returned.

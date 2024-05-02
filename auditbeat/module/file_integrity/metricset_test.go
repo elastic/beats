@@ -30,6 +30,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
@@ -48,7 +49,7 @@ func TestData(t *testing.T) {
 		require.NoError(t, os.WriteFile(file, []byte("hello world"), 0o600))
 	}()
 
-	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(dir), ab.Registry)
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 2, ms)
 	for _, e := range events {
 		if e.Error != nil {
@@ -62,7 +63,11 @@ func TestData(t *testing.T) {
 
 func TestActions(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
+
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
 	skipOnBuildkiteWindows(t)
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
+	skipOnBuildkiteDarwinArm(t)
 
 	defer abtest.SetupDataDir(t)()
 
@@ -118,7 +123,7 @@ func TestActions(t *testing.T) {
 	require.NoError(t, os.WriteFile(createdFilepath, []byte("hello world"), 0o600))
 	require.NoError(t, os.WriteFile(updatedFilepath, []byte("hello world"), 0o600))
 
-	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir, newDir))
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(dir, newDir), ab.Registry)
 	events := mbtest.RunPushMetricSetV2(10*time.Second, 5, ms)
 	assert.Len(t, events, 5)
 
@@ -155,7 +160,11 @@ func TestActions(t *testing.T) {
 
 func TestExcludedFiles(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
+
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
 	skipOnBuildkiteWindows(t)
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
+	skipOnBuildkiteDarwinArm(t)
 
 	defer abtest.SetupDataDir(t)()
 
@@ -167,7 +176,7 @@ func TestExcludedFiles(t *testing.T) {
 
 	dir := t.TempDir()
 
-	ms := mbtest.NewPushMetricSetV2(t, getConfig(dir))
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, getConfig(dir), ab.Registry)
 
 	go func() {
 		for _, f := range []string{"FILE.TXT", "FILE.TXT.SWP", "file.txt.swo", ".git/HEAD", ".gitignore"} {
@@ -203,7 +212,11 @@ func TestExcludedFiles(t *testing.T) {
 
 func TestIncludedExcludedFiles(t *testing.T) {
 	skipOnCIForDarwinAMD64(t)
+
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3016 is solved
 	skipOnBuildkiteWindows(t)
+	// Can be removed after https://github.com/elastic/ingest-dev/issues/3076 is solved
+	skipOnBuildkiteDarwinArm(t)
 
 	defer abtest.SetupDataDir(t)()
 
@@ -223,7 +236,7 @@ func TestIncludedExcludedFiles(t *testing.T) {
 	config := getConfig(dir)
 	config["include_files"] = []string{`\.ssh`}
 	config["recursive"] = true
-	ms := mbtest.NewPushMetricSetV2(t, config)
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
 
 	for _, f := range []string{"FILE.TXT", ".ssh/known_hosts", ".ssh/known_hosts.swp"} {
 		file := filepath.Join(dir, f)
@@ -285,7 +298,7 @@ func TestErrorReporting(t *testing.T) {
 
 	config := getConfig(dir)
 	config["scan_at_start"] = false
-	ms := mbtest.NewPushMetricSetV2(t, config)
+	ms := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry)
 
 	done := make(chan struct{}, 1)
 	ready := make(chan struct{}, 1)
@@ -460,7 +473,7 @@ func (e expectedEvents) validate(t *testing.T) {
 	defer bucket.Close()
 	config := getConfig("somepath")
 	config["hash_types"] = []string{"sha1"}
-	ms, ok := mbtest.NewPushMetricSetV2(t, config).(*MetricSet)
+	ms, ok := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry).(*MetricSet)
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
 	}
@@ -733,7 +746,7 @@ func TestEventDelete(t *testing.T) {
 	defer bucket.Close()
 	config := getConfig("somepath")
 	config["hash_types"] = []string{"sha1"}
-	ms, ok := mbtest.NewPushMetricSetV2(t, config).(*MetricSet)
+	ms, ok := mbtest.NewPushMetricSetV2WithRegistry(t, config, ab.Registry).(*MetricSet)
 	if !assert.True(t, ok) {
 		t.Fatal("can't create metricset")
 	}
@@ -956,5 +969,11 @@ func skipOnCIForDarwinAMD64(t testing.TB) {
 func skipOnBuildkiteWindows(t testing.TB) {
 	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "windows" {
 		t.Skip("Skip on Buildkite Windows: Shortened TMP problem")
+	}
+}
+
+func skipOnBuildkiteDarwinArm(t testing.TB) {
+	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
+		t.Skip("Skip test on Buldkite: unexpected path error")
 	}
 }
