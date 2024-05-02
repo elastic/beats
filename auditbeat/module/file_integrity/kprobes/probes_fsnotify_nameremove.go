@@ -35,7 +35,7 @@ func loadFsNotifyNameRemoveSymbol(s *probeManager) error {
 	if err != nil {
 		if errors.Is(err, ErrSymbolNotFound) {
 			s.buildChecks = append(s.buildChecks, func(spec *tkbtf.Spec) bool {
-				return !spec.ContainsSymbol("fsnotify_nameremove")
+				return !spec.ContainsSymbol(symbolInfo.symbolName)
 			})
 			return nil
 		}
