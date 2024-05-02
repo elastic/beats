@@ -157,6 +157,6 @@ func TestSetUIDSetGIDBits(t *testing.T) {
 
 func skipOnBuildkiteDarwin(t testing.TB, reason string) {
 	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "darwin" {
-		t.Skip(reason)
+		t.Skip("Skip test on Buildkite MacOS: Wheel permission while expected staff")
 	}
 }

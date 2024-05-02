@@ -144,9 +144,6 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 		t.Skip("Skipping permissions test on Windows")
 	}
 
-	// Can be removed after https://github.com/elastic/ingest-dev/issues/3268 is solved
-	skipOnBuildkiteDarwin(t, "TMP dir issue on MacOS")
-
 	if os.Getuid() == 0 {
 		t.Skip("skipping as root can access every file and thus this unittest will fail")
 		return
@@ -430,11 +427,5 @@ func assertNoError(t *testing.T, err error) {
 
 	if err != nil {
 		t.Fatal(err)
-	}
-}
-
-func skipOnBuildkiteDarwin(t testing.TB, reason string) {
-	if os.Getenv("BUILDKITE") == "true" && runtime.GOOS == "darwin" {
-		t.Skip(reason)
 	}
 }
