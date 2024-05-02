@@ -42,7 +42,7 @@ https://github.com/elastic/beats/compare/v8.13.2\...v8.13.3[View commits]
 
 *Metricbeat*
 
-- Add new fields to configure the lease duration, retry and renew when using leader elector with kubernetes autodiscover.{pull}38471[38471]
+- Add new fields to configure the lease duration, retry and renew when using leader elector with Kubernetes autodiscover.{pull}38471[38471]
 
 
 [[release-notes-8.13.2]]
