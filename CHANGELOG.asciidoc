@@ -3,6 +3,134 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.21]]
+=== Beats version 7.17.21
+https://github.com/elastic/beats/compare/v7.17.20\...v7.17.21[View commits]
+
+==== Breaking changes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+*Filebeat*
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+==== Bugfixes
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Winlogbeat*
+
+
+*Functionbeat*
+
+*Elastic Logging Plugin*
+
+
+==== Added
+
+*Affecting all Beats*
+
+
+*Auditbeat*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+
+*Functionbeat*
+
+
+*Winlogbeat*
+
+
+*Elastic Log Driver*
+
+
+==== Deprecated
+
+*Affecting all Beats*
+
+
+*Filebeat*
+
+
+*Heartbeat*
+
+*Metricbeat*
+
+
+*Packetbeat*
+
+*Winlogbeat*
+
+*Functionbeat*
+
+==== Known Issue
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 [[release-notes-7.17.20]]
 === Beats version 7.17.20
 https://github.com/elastic/beats/compare/v7.17.19\...v7.17.20[View commits]
