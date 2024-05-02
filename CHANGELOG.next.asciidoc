@@ -100,6 +100,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix losing events in FIM for OS X by allowing always to walk an added directory to monitor {pull}39362[39362]
 
 
+
 *Filebeat*
 
 - [Gcs Input] - Added missing locks for safe concurrency {pull}34914[34914]
