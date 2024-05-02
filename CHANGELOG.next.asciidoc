@@ -190,6 +190,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - Introduce log message for not supported annotations for Hints based autodiscover {pull}38213[38213]
+- Add persistent volume claim name to volume if available {pull}38839[38839]
 
 
 *Auditbeat*
