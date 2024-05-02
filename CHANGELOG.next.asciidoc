@@ -58,6 +58,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 - Prevent scenario of losing children-related file events in a directory for recursive fsnotify backend of auditbeat file integrity module {pull}39133[39133]
 - Allow extra syscalls by auditbeat required in FIM with kprobes back-end {pull}39361[39361]
+- Fix losing events in FIM for OS X by allowing always to walk an added directory to monitor {pull}39362[39362]
 
 
 *Filebeat*
