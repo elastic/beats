@@ -18,7 +18,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -209,43 +208,32 @@ file_selectors:
 
 func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
-		log := logp.NewLogger(inputName)
-		metricRegistry := monitoring.NewRegistry()
-		metrics := newInputMetrics("test_id", metricRegistry, maxMessagesInflight)
-		sqsAPI := newConstantSQS()
-		s3API := newConstantS3(t)
 		pipeline := &fakePipeline{}
-		conf := makeBenchmarkConfig(t)
-		conf.MaxNumberOfMessages = maxMessagesInflight
 
 		//s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, conf.FileSelectors, backupConfig{})
 		//sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, pipeline, s3EventHandlerFactory)
-		sqsReader, err := newSQSReaderInput(
-			config{MaxNumberOfMessages: maxMessagesInflight}, aws.Config{})
-		require.NoError(t, err, "newSQSReaderInput must succeed")
-		/*sqsReader := &sqsReaderInput{
-			log:        log.Named("sqs"),
-			config:     config{MaxNumberOfMessages: maxMessagesInflight},
-			metrics:    metrics,
-			sqs:        sqsAPI,
-			msgHandler: sqsMessageHandler,
-		}*/
+		conf := makeBenchmarkConfig(t)
+		conf.MaxNumberOfMessages = maxMessagesInflight
+		sqsReader := newSQSReaderInput(conf, aws.Config{})
+		sqsReader.log = log.Named("sqs")
+		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), maxMessagesInflight)
+		sqsReader.sqs = newConstantSQS()
+		sqsReader.s3 = newConstantS3(t)
+		//sqsReader.msgHandler = sqsMessageHandler
+
+		var err error
+		sqsReader.msgHandler, err = sqsReader.createEventProcessor(pipeline)
+		require.NoError(t, err, "createEventProcessor must succeed")
 
 		ctx, cancel := context.WithCancel(context.Background())
 		b.Cleanup(cancel)
 
 		go func() {
-			for metrics.sqsMessagesReceivedTotal.Get() < uint64(b.N) {
+			for sqsReader.metrics.sqsMessagesReceivedTotal.Get() < uint64(b.N) {
 				time.Sleep(5 * time.Millisecond)
 			}
 			cancel()
 		}()
-
-		sqsReader.setup(v2.Context{}, &fakePipeline{})
-		// Override the internal helper APIs with mocked versions
-		sqsReader.s3 = s3API
-		sqsReader.sqs = sqsAPI
-		sqsReader.metrics = metrics
 
 		b.ResetTimer()
 		start := time.Now()
@@ -256,14 +244,14 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		b.ReportMetric(float64(maxMessagesInflight), "max_messages_inflight")
 		b.ReportMetric(elapsed.Seconds(), "sec")
 
-		b.ReportMetric(float64(metrics.s3EventsCreatedTotal.Get()), "events")
-		b.ReportMetric(float64(metrics.s3EventsCreatedTotal.Get())/elapsed.Seconds(), "events_per_sec")
+		b.ReportMetric(float64(sqsReader.metrics.s3EventsCreatedTotal.Get()), "events")
+		b.ReportMetric(float64(sqsReader.metrics.s3EventsCreatedTotal.Get())/elapsed.Seconds(), "events_per_sec")
 
-		b.ReportMetric(float64(metrics.s3BytesProcessedTotal.Get()), "s3_bytes")
-		b.ReportMetric(float64(metrics.s3BytesProcessedTotal.Get())/elapsed.Seconds(), "s3_bytes_per_sec")
+		b.ReportMetric(float64(sqsReader.metrics.s3BytesProcessedTotal.Get()), "s3_bytes")
+		b.ReportMetric(float64(sqsReader.metrics.s3BytesProcessedTotal.Get())/elapsed.Seconds(), "s3_bytes_per_sec")
 
-		b.ReportMetric(float64(metrics.sqsMessagesDeletedTotal.Get()), "sqs_messages")
-		b.ReportMetric(float64(metrics.sqsMessagesDeletedTotal.Get())/elapsed.Seconds(), "sqs_messages_per_sec")
+		b.ReportMetric(float64(sqsReader.metrics.sqsMessagesDeletedTotal.Get()), "sqs_messages")
+		b.ReportMetric(float64(sqsReader.metrics.sqsMessagesDeletedTotal.Get())/elapsed.Seconds(), "sqs_messages_per_sec")
 	})
 }
 

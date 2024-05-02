@@ -60,7 +60,7 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 	}
 
 	if config.QueueURL != "" {
-		return newSQSReaderInput(config, awsConfig)
+		return newSQSReaderInput(config, awsConfig), nil
 	}
 
 	if config.BucketARN != "" || config.NonAWSBucketName != "" {

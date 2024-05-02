@@ -18,6 +18,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type sqsReaderInput struct {
@@ -41,46 +42,14 @@ type sqsReaderInput struct {
 	workerWg sync.WaitGroup
 }
 
-func newSQSReaderInput(config config, awsConfig awssdk.Config) (*sqsReaderInput, error) {
-	detectedRegion := getRegionFromQueueURL(config.QueueURL, config.AWSConfig.Endpoint)
-	if config.RegionName != "" {
-		awsConfig.Region = config.RegionName
-	} else if detectedRegion == "" {
-		// Only report an error if we don't have a configured region
-		// to fall back on.
-		return nil, fmt.Errorf("failed to get AWS region from queue_url: %w", errBadQueueURL)
-	}
-
-	sqsAPI := &awsSQSAPI{
-		client: sqs.NewFromConfig(awsConfig, func(o *sqs.Options) {
-			if config.AWSConfig.FIPSEnabled {
-				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
-			}
-		}),
-		queueURL:          config.QueueURL,
-		apiTimeout:        config.APITimeout,
-		visibilityTimeout: config.VisibilityTimeout,
-		longPollWaitTime:  config.SQSWaitTime,
-	}
-
-	s3API := &awsS3API{
-		client: s3.NewFromConfig(awsConfig, func(o *s3.Options) {
-			if config.AWSConfig.FIPSEnabled {
-				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
-			}
-			o.UsePathStyle = config.PathStyle
-		}),
-	}
-
+// Simple wrapper to handle creation of internal channels
+func newSQSReaderInput(config config, awsConfig awssdk.Config) *sqsReaderInput {
 	return &sqsReaderInput{
 		config:           config,
 		awsConfig:        awsConfig,
-		sqs:              sqsAPI,
-		s3:               s3API,
-		detectedRegion:   detectedRegion,
 		workRequestChan:  make(chan struct{}, config.MaxNumberOfMessages),
 		workResponseChan: make(chan types.Message),
-	}, nil
+	}
 }
 
 func (in *sqsReaderInput) Name() string { return inputName }
@@ -94,7 +63,7 @@ func (in *sqsReaderInput) Run(
 	pipeline beat.Pipeline,
 ) error {
 	// Initialize everything for this run
-	err := in.setup(inputContext, pipeline)
+	err := in.setup(inputContext, pipeline, nil)
 	if err != nil {
 		return err
 	}
@@ -109,11 +78,48 @@ func (in *sqsReaderInput) Run(
 
 // Apply internal initialization based on the parameters of Run, in
 // preparation for calling run. setup and run are separate functions so
-// tests can apply mocks and overrides before the run loop starts.
-func (in *sqsReaderInput) setup(inputContext v2.Context, pipeline beat.Pipeline) error {
+// tests can apply mocks and overrides. Tests should apply overrides
+// after calling setup (or skip setup entirely if everything is already
+// initialized). If a test does call setup, it can use optRegistry to
+// report metrics under a subregistry instead of using the global one.
+func (in *sqsReaderInput) setup(
+	inputContext v2.Context,
+	pipeline beat.Pipeline,
+	optRegistry *monitoring.Registry,
+) error {
+	detectedRegion := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
+	if in.config.RegionName != "" {
+		in.awsConfig.Region = in.config.RegionName
+	} else if detectedRegion == "" {
+		// Only report an error if we don't have a configured region
+		// to fall back on.
+		return fmt.Errorf("failed to get AWS region from queue_url: %w", errBadQueueURL)
+	}
+
+	in.sqs = &awsSQSAPI{
+		client: sqs.NewFromConfig(in.awsConfig, func(o *sqs.Options) {
+			if in.config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+		}),
+		queueURL:          in.config.QueueURL,
+		apiTimeout:        in.config.APITimeout,
+		visibilityTimeout: in.config.VisibilityTimeout,
+		longPollWaitTime:  in.config.SQSWaitTime,
+	}
+
+	in.s3 = &awsS3API{
+		client: s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
+			if in.config.AWSConfig.FIPSEnabled {
+				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+			o.UsePathStyle = in.config.PathStyle
+		}),
+	}
+
 	in.log = inputContext.Logger.With("queue_url", in.config.QueueURL)
 
-	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.MaxNumberOfMessages)
+	in.metrics = newInputMetrics(inputContext.ID, optRegistry, in.config.MaxNumberOfMessages)
 
 	var err error
 	in.msgHandler, err = in.createEventProcessor(pipeline)
@@ -140,7 +146,7 @@ func (in *sqsReaderInput) run(ctx context.Context) {
 		metrics: in.metrics,
 	}.run(ctx)
 
-	fmt.Printf("hi fae: sqsReaderInput.run\n")
+	//fmt.Printf("hi fae: sqsReaderInput.run\n")
 	in.startWorkers(ctx)
 	in.readerLoop(ctx)
 
@@ -152,21 +158,21 @@ func (in *sqsReaderInput) readerLoop(ctx context.Context) {
 	// reader will try to fulfill
 	requestCount := 0
 	for ctx.Err() == nil {
-		fmt.Printf("hi fae: readerLoop begin\n")
+		//fmt.Printf("hi fae: readerLoop begin\n")
 		// Block to wait for more requests if requestCount is zero
 		requestCount += channelRequestCount(ctx, in.workRequestChan, requestCount == 0)
-		fmt.Printf("hi fae: requestCount %v\n", requestCount)
+		//fmt.Printf("hi fae: requestCount %v\n", requestCount)
 
 		msgs := readSQSMessages(ctx, in.log, in.sqs, in.metrics, requestCount)
-		fmt.Printf("hi fae: got %v messages\n", len(msgs))
+		//fmt.Printf("hi fae: got %v messages\n", len(msgs))
 
 		for _, msg := range msgs {
-			fmt.Printf("hi fae, sending one message\n")
+			//fmt.Printf("hi fae, sending one message\n")
 			select {
 			case <-ctx.Done():
 				return
 			case in.workResponseChan <- msg:
-				fmt.Printf("hi fae, message sent\n")
+				//fmt.Printf("hi fae, message sent\n")
 				requestCount--
 			}
 		}
@@ -181,14 +187,14 @@ func (in *sqsReaderInput) workerLoop(ctx context.Context) {
 			// Shutting down
 			return
 		case in.workRequestChan <- struct{}{}:
-			fmt.Printf("hi fae: sent work request\n")
+			//fmt.Printf("hi fae: sent work request\n")
 		}
 		// The request is sent, wait for a response
 		select {
 		case <-ctx.Done():
 			return
 		case msg := <-in.workResponseChan:
-			fmt.Printf("hi fae: received work response\n")
+			//fmt.Printf("hi fae: received work response\n")
 			start := time.Now()
 
 			id := in.metrics.beginSQSWorker()
@@ -232,10 +238,7 @@ func (in *sqsReaderInput) logConfigSummary() {
 }
 
 func (in *sqsReaderInput) createEventProcessor(pipeline beat.Pipeline) (sqsProcessor, error) {
-	fileSelectors := in.config.FileSelectors
-	if len(in.config.FileSelectors) == 0 {
-		fileSelectors = []fileSelectorConfig{{ReaderConfig: in.config.ReaderConfig}}
-	}
+	fileSelectors := in.config.getFileSelectors()
 	s3EventHandlerFactory := newS3ObjectProcessorFactory(in.log.Named("s3"), in.metrics, in.s3, fileSelectors, in.config.BackupConfig)
 
 	script, err := newScriptFromConfig(in.log.Named("sqs_script"), in.config.SQSScript)
