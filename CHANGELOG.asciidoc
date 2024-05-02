@@ -10,7 +10,7 @@ https://github.com/elastic/beats/compare/v8.13.2\...v8.13.3[View commits]
 ==== Breaking changes
 
 *Metricbeat*
-- Setting period for counter cache for Prometheus remote_write at least to 60sec. {pull}38553[38553]
+- Setting period for counter cache for Prometheus `remote_write` to at least to 60 seconds. {pull}38553[38553]
 
 ==== Bugfixes
 
