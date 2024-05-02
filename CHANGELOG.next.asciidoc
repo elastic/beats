@@ -21,7 +21,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Heartbeat*
 
 *Metricbeat*
-- Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
 
 *Osquerybeat*
 
@@ -53,10 +52,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Upgraded apache arrow library used in x-pack/libbeat/reader/parquet from v11 to v12.0.1 in order to fix cross-compilation issues {pull}35640[35640]
 - Fix panic when MaxRetryInterval is specified, but RetryInterval is not {pull}35820[35820]
 - Support build of projects outside of beats directory {pull}36126[36126]
-- Change cache processor documentation from `write_period` to `write_interval`. {pull}38561[38561]
-- Fix cache processor expiries heap cleanup on partial file writes. {pull}38561[38561]
-- Fix cache processor expiries infinite growth when large a large TTL is used and recurring keys are cached. {pull}38561[38561]
-- Fix parsing of RFC 3164 process IDs in syslog processor. {issue}38947[38947] {pull}38982[38982]
 
 *Auditbeat*
 
@@ -78,11 +73,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Fix handling of Juniper SRX structured data when there is no leading junos element. {issue}36270[36270] {pull}36308[36308]
 - Fix Filebeat Cisco module with missing escape character {issue}36325[36325] {pull}36326[36326]
 - Added a fix for Crowdstrike pipeline handling process arrays {pull}36496[36496]
-- Fix indexing failures by re-enabling event normalisation in netflow input. {issue}38703[38703] {pull}38780[38780]
-- Fix config validation for CEL and HTTPJSON inputs when using password grant authentication and `client.id` or `client.secret` are not present. {pull}38962[38962]
-- Updated Websocket input title to align with existing inputs {pull}39006[39006]
-- [threatintel] MISP splitting fix for empty responses {issue}38739[38739] {pull}38917[38917]
-- Restore netflow input on Windows {pull}39024[39024]
 
 *Heartbeat*
 
@@ -114,15 +104,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 - Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
-- Update to Go 1.21.9. {pulk}38727[38727]
-- The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 
 *Auditbeat*
 
-- Add linux capabilities to processes in the system/process. {pull}37453[37453]
-- Add opt-in eBPF backend for file_integrity module. {pull}37223[37223]
-- Add process data to file events (Linux only, eBPF backend). {pull}38199[38199]
-- Add container id to file events (Linux only, eBPF backend). {pull}38328[38328]
 
 *Filebeat*
 
@@ -159,7 +143,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Metricbeat*
 
-- Add new fields to configure the lease duration, retry and renew when using leader elector with kubernetes autodiscover.{pull}38471[38471]
 - Add per-thread metrics to system_summary {pull}33614[33614]
 - Add GCP CloudSQL metadata {pull}33066[33066]
 - Add GCP Carbon Footprint metricbeat data {pull}34820[34820]
@@ -227,6 +210,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
 
 
 
