@@ -41,16 +41,7 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB, rea
 }
 
 // UpdateDB will update the process DB with process info from procfs or the event itself
-func (s prvdr) UpdateDB(ev *beat.Event) error {
-	pi, err := ev.Fields.GetValue(s.pidField)
-	if err != nil {
-		return fmt.Errorf("event not supported, no pid")
-	}
-	pid, ok := pi.(int)
-	if !ok {
-		return fmt.Errorf("pid field not int")
-	}
-
+func (s prvdr) UpdateDB(ev *beat.Event, pid uint32) error {
 	syscall, err := ev.GetValue(syscallField)
 	if err != nil {
 		return fmt.Errorf("event not supported, no syscall data")
@@ -59,7 +50,7 @@ func (s prvdr) UpdateDB(ev *beat.Event) error {
 	switch syscall {
 	case "execveat", "execve":
 		pe := types.ProcessExecEvent{}
-		proc_info, err := s.reader.GetProcess(uint32(pid))
+		proc_info, err := s.reader.GetProcess(pid)
 		if err == nil {
 			pe.PIDs = proc_info.PIDs
 			pe.Creds = proc_info.Creds
@@ -72,7 +63,7 @@ func (s prvdr) UpdateDB(ev *beat.Event) error {
 			s.logger.Warnf("couldn't get process info from proc for pid %v: %w", pid, err)
 			// If process info couldn't be taken from procfs, populate with as much info as
 			// possible from the event
-			pe.PIDs.Tgid = uint32(pid)
+			pe.PIDs.Tgid = pid
 			var intr interface{}
 			var i int
 			var ok bool
@@ -106,7 +97,7 @@ func (s prvdr) UpdateDB(ev *beat.Event) error {
 	case "exit_group":
 		pe := types.ProcessExitEvent{
 			PIDs: types.PIDInfo{
-				Tgid: uint32(pid),
+				Tgid: pid,
 			},
 		}
 		s.db.InsertExit(pe)
@@ -122,8 +113,8 @@ func (s prvdr) UpdateDB(ev *beat.Event) error {
 		if result == "success" {
 			setsid_ev := types.ProcessSetsidEvent{
 				PIDs: types.PIDInfo{
-					Tgid: uint32(pid),
-					Sid:  uint32(pid),
+					Tgid: pid,
+					Sid:  pid,
 				},
 			}
 			s.db.InsertSetsid(setsid_ev)
