@@ -97,6 +97,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Keep process info on exited processes, to avoid failing to enrich events in sessionmd processor {pull}39173[39173]
 
 - Prevent scenario of losing children-related file events in a directory for recursive fsnotify backend of auditbeat file integrity module {pull}39133[39133]
+- Allow extra syscalls by auditbeat required in FIM with kprobes back-end {pull}39361[39361]
 
 
 *Filebeat*
