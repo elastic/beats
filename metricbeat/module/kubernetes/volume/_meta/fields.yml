@@ -60,3 +60,12 @@
               format: percent
               description: >
                 Percentage of used inodes
+- name: persistentvolumeclaim
+  type: group
+  description: >
+    kubernetes persistent volume claim
+  release: ga
+  fields:
+    - name: name
+      type: keyword
+      description: PVC name.
