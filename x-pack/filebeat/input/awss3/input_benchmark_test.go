@@ -16,7 +16,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -214,16 +216,20 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		s3API := newConstantS3(t)
 		pipeline := &fakePipeline{}
 		conf := makeBenchmarkConfig(t)
+		conf.MaxNumberOfMessages = maxMessagesInflight
 
-		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, conf.FileSelectors, backupConfig{})
-		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, pipeline, s3EventHandlerFactory)
-		sqsReader := &sqsReaderInput{
+		//s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, conf.FileSelectors, backupConfig{})
+		//sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, pipeline, s3EventHandlerFactory)
+		sqsReader, err := newSQSReaderInput(
+			config{MaxNumberOfMessages: maxMessagesInflight}, aws.Config{})
+		require.NoError(t, err, "newSQSReaderInput must succeed")
+		/*sqsReader := &sqsReaderInput{
 			log:        log.Named("sqs"),
 			config:     config{MaxNumberOfMessages: maxMessagesInflight},
 			metrics:    metrics,
 			sqs:        sqsAPI,
 			msgHandler: sqsMessageHandler,
-		}
+		}*/
 
 		ctx, cancel := context.WithCancel(context.Background())
 		b.Cleanup(cancel)
@@ -234,6 +240,12 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 			}
 			cancel()
 		}()
+
+		sqsReader.setup(v2.Context{}, &fakePipeline{})
+		// Override the internal helper APIs with mocked versions
+		sqsReader.s3 = s3API
+		sqsReader.sqs = sqsAPI
+		sqsReader.metrics = metrics
 
 		b.ResetTimer()
 		start := time.Now()

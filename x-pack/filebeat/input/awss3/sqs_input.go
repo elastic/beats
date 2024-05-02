@@ -93,19 +93,46 @@ func (in *sqsReaderInput) Run(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
+	// Initialize everything for this run
+	err := in.setup(inputContext, pipeline)
+	if err != nil {
+		return err
+	}
+
+	// Start the main run loop
+	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+	in.run(ctx)
+	in.cleanup()
+
+	return nil
+}
+
+// Apply internal initialization based on the parameters of Run, in
+// preparation for calling run. setup and run are separate functions so
+// tests can apply mocks and overrides before the run loop starts.
+func (in *sqsReaderInput) setup(inputContext v2.Context, pipeline beat.Pipeline) error {
 	in.log = inputContext.Logger.With("queue_url", in.config.QueueURL)
-	in.logConfigSummary()
 
 	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.MaxNumberOfMessages)
-	defer in.metrics.Close()
 
 	var err error
 	in.msgHandler, err = in.createEventProcessor(pipeline)
 	if err != nil {
 		return fmt.Errorf("failed to initialize sqs reader: %w", err)
 	}
+	return nil
+}
 
-	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
+// Release internal resources created during setup (currently just metrics).
+// This is its own function so tests can handle the run loop in isolation.
+func (in *sqsReaderInput) cleanup() {
+	in.metrics.Close()
+}
+
+// Create the main goroutines for the input (workers, message count monitor)
+// and begin the run loop.
+func (in *sqsReaderInput) run(ctx context.Context) {
+	in.logConfigSummary()
 
 	// Poll metrics periodically in the background
 	go messageCountMonitor{
@@ -113,13 +140,7 @@ func (in *sqsReaderInput) Run(
 		metrics: in.metrics,
 	}.run(ctx)
 
-	// Start the main run loop
-	in.run(ctx)
-
-	return nil
-}
-
-func (in *sqsReaderInput) run(ctx context.Context) {
+	fmt.Printf("hi fae: sqsReaderInput.run\n")
 	in.startWorkers(ctx)
 	in.readerLoop(ctx)
 
@@ -131,16 +152,21 @@ func (in *sqsReaderInput) readerLoop(ctx context.Context) {
 	// reader will try to fulfill
 	requestCount := 0
 	for ctx.Err() == nil {
+		fmt.Printf("hi fae: readerLoop begin\n")
 		// Block to wait for more requests if requestCount is zero
 		requestCount += channelRequestCount(ctx, in.workRequestChan, requestCount == 0)
+		fmt.Printf("hi fae: requestCount %v\n", requestCount)
 
 		msgs := readSQSMessages(ctx, in.log, in.sqs, in.metrics, requestCount)
+		fmt.Printf("hi fae: got %v messages\n", len(msgs))
 
 		for _, msg := range msgs {
+			fmt.Printf("hi fae, sending one message\n")
 			select {
 			case <-ctx.Done():
 				return
 			case in.workResponseChan <- msg:
+				fmt.Printf("hi fae, message sent\n")
 				requestCount--
 			}
 		}
@@ -155,12 +181,14 @@ func (in *sqsReaderInput) workerLoop(ctx context.Context) {
 			// Shutting down
 			return
 		case in.workRequestChan <- struct{}{}:
+			fmt.Printf("hi fae: sent work request\n")
 		}
 		// The request is sent, wait for a response
 		select {
 		case <-ctx.Done():
 			return
 		case msg := <-in.workResponseChan:
+			fmt.Printf("hi fae: received work response\n")
 			start := time.Now()
 
 			id := in.metrics.beginSQSWorker()
