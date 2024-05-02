@@ -28,6 +28,9 @@ steps:
       - label: ":ubuntu: Xpack/Dockerlogbeat Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
         command: "cd x-pack/dockerlogbeat && mage build unitTest"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -44,6 +47,9 @@ steps:
         command: "cd x-pack/dockerlogbeat && mage goIntegTest"
         env:
           MODULE: $MODULE
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
