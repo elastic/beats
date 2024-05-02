@@ -121,12 +121,22 @@
       "inodesFree": 473551,
       "inodes": 473560,
       "inodesUsed": 9,
-      "name": "default-token-sg8x5",
-      "pvcRef": {
-        "name": "pvc-demo",
-        "namespace": "default"
+      "name": "default-token-sg8x5"
+     },
+     {
+        "time": "2024-04-09T17:34:17Z",
+        "availableBytes": 31509590016,
+        "capacityBytes": 31526391808,
+        "usedBytes": 24576,
+        "inodesFree": 1966069,
+        "inodes": 1966080,
+        "inodesUsed": 11,
+        "name": "pvc-demo-vol",
+        "pvcRef": {
+          "name": "pvc-demo",
+          "namespace": "default"
+        }
       }
-     }
     ]
    }
   ]
