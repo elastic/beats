@@ -29,6 +29,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+func TestMain(m *testing.M) {
+	InitializeModule()
+}
+
 func TestTokenAppender(t *testing.T) {
 	tests := []struct {
 		eventConfig string

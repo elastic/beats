@@ -81,9 +81,15 @@ func Fields() error {
 	return heartbeat.Fields()
 }
 
+func GenerateModuleIncludeListGo() error {
+	opts := devtools.DefaultIncludeListOptions()
+	opts.ImportDirs = append(opts.ImportDirs, "autodiscover/**/*", "monitors/*", "monitors/**/*", "security")
+	return devtools.GenerateIncludeListGo(opts)
+}
+
 // Update updates the generated files (aka make update).
 func Update() {
-	mg.SerialDeps(Fields, FieldDocs, Config)
+	mg.SerialDeps(Fields, FieldDocs, Config, GenerateModuleIncludeListGo)
 }
 
 func IntegTest() {

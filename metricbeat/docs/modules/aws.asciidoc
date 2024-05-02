@@ -439,6 +439,8 @@ metricbeat.modules:
 
 The following metricsets are available:
 
+* <<metricbeat-metricset-aws-awshealth,awshealth>>
+
 * <<metricbeat-metricset-aws-billing,billing>>
 
 * <<metricbeat-metricset-aws-cloudwatch,cloudwatch>>
@@ -472,6 +474,8 @@ The following metricsets are available:
 * <<metricbeat-metricset-aws-usage,usage>>
 
 * <<metricbeat-metricset-aws-vpn,vpn>>
+
+include::aws/awshealth.asciidoc[]
 
 include::aws/billing.asciidoc[]
 

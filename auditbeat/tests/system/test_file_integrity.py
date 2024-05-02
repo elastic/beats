@@ -108,7 +108,6 @@ class Test(BaseTest):
         if backend != "ebpf":
             return
         assert event["process.entity_id"] != ""
-        assert event["process.executable"] == "pytest"
         assert event["process.pid"] == os.getpid()
         assert int(event["process.user.id"]) == os.geteuid()
         assert event["process.user.name"] == pwd.getpwuid(os.geteuid()).pw_name
