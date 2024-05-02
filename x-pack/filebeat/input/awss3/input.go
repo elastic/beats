@@ -46,7 +46,7 @@ type s3InputManager struct {
 	store beater.StateStore
 }
 
-func (im *s3InputManager) Init(grp unison.Group, mode v2.Mode) error {
+func (im *s3InputManager) Init(grp unison.Group) error {
 	return nil
 }
 
