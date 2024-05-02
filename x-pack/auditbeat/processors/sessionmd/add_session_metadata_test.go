@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
@@ -32,8 +32,7 @@ var (
 		{
 			testName: "enrich process",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			mockProcesses: []types.ProcessExecEvent{
 				{
@@ -94,8 +93,7 @@ var (
 		{
 			testName: "no PID field in event",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -113,8 +111,7 @@ var (
 		{
 			testName: "PID not number",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -133,8 +130,7 @@ var (
 		{
 			testName: "PID not in DB",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -154,8 +150,7 @@ var (
 			testName: "process field not in event",
 			// This event, without a "process" field, is not supported by enrich, it should be handled gracefully
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "action.pid",
+				PIDField: "action.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -170,8 +165,7 @@ var (
 			testName: "process field not mapstr",
 			// Unsupported process field type should be handled gracefully
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "action.pid",
+				PIDField: "action.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -189,8 +183,7 @@ var (
 		{
 			testName: "enrich event with map[string]any process field",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			mockProcesses: []types.ProcessExecEvent{
 				{
@@ -327,7 +320,7 @@ func TestEnrich(t *testing.T) {
 	for _, tt := range enrichTests {
 		reader := procfs.NewMockReader()
 		db, err := processdb.NewDB(reader, *logger)
-		assert.Nil(t, err)
+		require.Nil(t, err)
 
 		for _, ev := range tt.mockProcesses {
 			db.InsertExec(ev)
@@ -342,10 +335,10 @@ func TestEnrich(t *testing.T) {
 		i := tt.input
 		actual, err := s.enrich(&i)
 		if tt.expect_error {
-			assert.Error(t, err, "%s: error unexpectedly nil", tt.testName)
+			require.Error(t, err, "%s: error unexpectedly nil", tt.testName)
 		} else {
-			assert.Nil(t, err, "%s: enrich error: %w", tt.testName, err)
-			assert.NotNil(t, actual, "%s: returned nil event", tt.testName)
+			require.Nil(t, err, "%s: enrich error: %w", tt.testName, err)
+			require.NotNil(t, actual, "%s: returned nil event", tt.testName)
 
 			//Validate output
 			if diff := cmp.Diff(tt.expected.Fields, actual.Fields, ignoreMissingFrom(tt.expected.Fields)); diff != "" {

@@ -498,13 +498,13 @@ This is a list of optional query parameters. The default is `["accountEnabled", 
 [float]
 ===== `select.groups`
 
-Override the default https://learn.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http#optional-query-parameters[group query selections].
+Override the default https://learn.microsoft.com/en-us/graph/api/group-get?view=graph-rest-1.0&tabs=http#optional-query-parameters[group query selections].
 This is a list of optional query parameters. The default is `["displayName", "members"]`.
 
 [float]
 ===== `select.devices`
 
-Override the default https://learn.microsoft.com/en-us/graph/api/user-get?view=graph-rest-1.0&tabs=http#optional-query-parameters[device query selections].
+Override the default https://learn.microsoft.com/en-us/graph/api/device-get?view=graph-rest-1.0&tabs=http#optional-query-parameters[device query selections].
 This is a list of optional query parameters. The default is `["accountEnabled", "deviceId",
 "displayName", "operatingSystem", "operatingSystemVersion", "physicalIds", "extensionAttributes",
 "alternativeSecurityIds"]`.

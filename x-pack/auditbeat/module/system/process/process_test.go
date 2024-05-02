@@ -11,10 +11,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-sysinfo/types"
 )
@@ -22,7 +24,7 @@ import (
 func TestData(t *testing.T) {
 	defer abtest.SetupDataDir(t)()
 
-	f := mbtest.NewReportingMetricSetV2(t, getConfig())
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry)
 
 	// Set lastState and add test process to cache so it will be reported as stopped.
 	f.(*MetricSet).lastState = time.Now()
@@ -44,7 +46,7 @@ func TestData(t *testing.T) {
 
 func getConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":   "system",
+		"module":   system.ModuleName,
 		"datasets": []string{"process"},
 
 		// To speed things up during testing, we effectively
@@ -54,7 +56,7 @@ func getConfig() map[string]interface{} {
 }
 
 func TestProcessEvent(t *testing.T) {
-	ms := mbtest.NewReportingMetricSetV2(t, getConfig()).(*MetricSet)
+	ms := mbtest.NewReportingMetricSetV2WithRegistry(t, getConfig(), ab.Registry).(*MetricSet)
 
 	eventType := eventTypeEvent
 	eventAction := eventActionProcessStarted
