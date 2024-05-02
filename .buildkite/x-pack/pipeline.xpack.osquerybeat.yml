@@ -30,9 +30,6 @@ steps:
         command: |
           cd x-pack/osquerybeat
           mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -49,9 +46,6 @@ steps:
         command: |
           cd x-pack/osquerybeat
           mage goIntegTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -68,9 +62,6 @@ steps:
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
         key: "mandatory-win-2016-unit-tests"
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -89,9 +80,6 @@ steps:
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
         key: "mandatory-win-2022-unit-tests"
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -114,9 +102,6 @@ steps:
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
         key: "extended-win-10-unit-tests"
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -135,9 +120,6 @@ steps:
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
         key: "extended-win-11-unit-tests"
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -156,9 +138,6 @@ steps:
           Set-Location -Path x-pack/osquerybeat
           mage build unitTest
         key: "extended-win-2019-unit-tests"
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -181,9 +160,6 @@ steps:
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
           cd x-pack/osquerybeat && mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -199,9 +175,6 @@ steps:
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
           cd x-pack/osquerybeat && mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"

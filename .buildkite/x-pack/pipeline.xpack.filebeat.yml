@@ -30,9 +30,6 @@ steps:
         command: |
           cd x-pack/filebeat
           mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -53,9 +50,6 @@ steps:
           defineModuleFromTheChangeSet x-pack/filebeat
           echo "~~~ Will run tests with env var MODULE=$$MODULE"
           cd x-pack/filebeat && mage goIntegTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -76,9 +70,6 @@ steps:
           defineModuleFromTheChangeSet x-pack/filebeat
           echo "~~~ Running tests with env var MODULE=$$MODULE"
           cd x-pack/filebeat && mage pythonIntegTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -95,9 +86,6 @@ steps:
           Set-Location -Path x-pack/filebeat
           mage build unitTest
         key: "x-pack-filebeat-mandatory-win-2022-unit-tests"
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -116,9 +104,6 @@ steps:
           Set-Location -Path x-pack/filebeat
           mage build unitTest
         key: "x-pack-filebeat-mandatory-win-2016-unit-tests"
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -137,9 +122,6 @@ steps:
         command: |
           cd x-pack/filebeat
           mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
@@ -160,9 +142,6 @@ steps:
           Set-Location -Path x-pack/filebeat
           mage build unitTest
         key: "x-pack-filebeat-extended-win-2019-unit-tests"
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -181,9 +160,6 @@ steps:
           Set-Location -Path x-pack/filebeat
           mage build unitTest
         key: "x-pack-filebeat-extended-win-10-unit-tests"
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -202,9 +178,6 @@ steps:
           Set-Location -Path x-pack/filebeat
           mage build unitTest
         key: "x-pack-filebeat-extended-win-11-unit-tests"
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -227,9 +200,6 @@ steps:
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
           cd x-pack/filebeat && mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -247,9 +217,6 @@ steps:
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
           cd x-pack/filebeat && mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"

@@ -32,9 +32,6 @@ steps:
           set -euo pipefail
           cd auditbeat
           mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -51,9 +48,6 @@ steps:
           set -euo pipefail
           cd auditbeat
           mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -69,9 +63,6 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -89,9 +80,6 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -110,9 +98,6 @@ steps:
           make -C auditbeat crosscompile
         env:
           GOX_FLAGS: "-arch amd64"
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -151,9 +136,6 @@ steps:
           set -euo pipefail
           cd auditbeat
           mage build integTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -189,14 +171,7 @@ steps:
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
           cd auditbeat
-<<<<<<< HEAD
           mage build unitTest
-=======
-          mage unitTest
-        retry:
-          automatic:
-           - limit: 3
->>>>>>> 02ea29d8cf (Enabling retries for Beats flaky tests (#39174))
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -213,14 +188,7 @@ steps:
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
           cd auditbeat
-<<<<<<< HEAD
           mage build unitTest
-=======
-          mage unitTest
-        retry:
-          automatic:
-           - limit: 3
->>>>>>> 02ea29d8cf (Enabling retries for Beats flaky tests (#39174))
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -241,9 +209,6 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -262,9 +227,6 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -283,9 +245,6 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
