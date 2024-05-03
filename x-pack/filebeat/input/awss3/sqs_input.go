@@ -82,6 +82,8 @@ func (in *sqsReaderInput) setup(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
+	in.log = inputContext.Logger.With("queue_url", in.config.QueueURL)
+
 	in.detectedRegion = getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
 	if in.config.RegionName != "" {
 		in.awsConfig.Region = in.config.RegionName
@@ -104,8 +106,6 @@ func (in *sqsReaderInput) setup(
 	in.s3 = &awsS3API{
 		client: s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier),
 	}
-
-	in.log = inputContext.Logger.With("queue_url", in.config.QueueURL)
 
 	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.MaxNumberOfMessages)
 
