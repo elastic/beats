@@ -12,6 +12,8 @@ import (
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/elastic/beats/v7/libbeat/beat"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 func createS3API(ctx context.Context, config config, awsConfig awssdk.Config) (*awsS3API, error) {
@@ -29,6 +31,17 @@ func createS3API(ctx context.Context, config config, awsConfig awssdk.Config) (*
 	return &awsS3API{
 		client: s3Client,
 	}, nil
+}
+
+func createPipelineClient(pipeline beat.Pipeline) (beat.Client, error) {
+	return pipeline.ConnectWith(beat.ClientConfig{
+		EventListener: awscommon.NewEventACKHandler(),
+		Processing: beat.ProcessingConfig{
+			// This input only produces events with basic types so normalization
+			// is not required.
+			EventNormalization: boolPtr(false),
+		},
+	})
 }
 
 func getRegionForBucket(ctx context.Context, s3Client *s3.Client, bucketName string) (string, error) {

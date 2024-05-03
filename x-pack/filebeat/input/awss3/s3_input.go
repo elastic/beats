@@ -64,17 +64,6 @@ func newS3PollerInput(
 	}, nil
 }
 
-func createClient(pipeline beat.Pipeline) (beat.Client, error) {
-	return pipeline.ConnectWith(beat.ClientConfig{
-		EventListener: awscommon.NewEventACKHandler(),
-		Processing: beat.ProcessingConfig{
-			// This input only produces events with basic types so normalization
-			// is not required.
-			EventNormalization: boolPtr(false),
-		},
-	})
-}
-
 func (in *s3PollerInput) Run(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
@@ -90,7 +79,7 @@ func (in *s3PollerInput) Run(
 	defer in.states.Close()
 
 	// Create client for publishing events and receive notification of their ACKs.
-	in.client, err = createClient(pipeline)
+	in.client, err = createPipelineClient(pipeline)
 	if err != nil {
 		return fmt.Errorf("failed to create pipeline client: %w", err)
 	}
