@@ -45,12 +45,6 @@ type s3FetchTask struct {
 	objectState     state
 }
 
-func (in *s3PollerInput) Name() string { return inputName }
-
-func (in *s3PollerInput) Test(ctx v2.TestContext) error {
-	return nil
-}
-
 func newS3PollerInput(
 	config config,
 	awsConfig awssdk.Config,
@@ -62,6 +56,12 @@ func newS3PollerInput(
 		awsConfig: awsConfig,
 		store:     store,
 	}, nil
+}
+
+func (in *s3PollerInput) Name() string { return inputName }
+
+func (in *s3PollerInput) Test(ctx v2.TestContext) error {
+	return nil
 }
 
 func (in *s3PollerInput) Run(
