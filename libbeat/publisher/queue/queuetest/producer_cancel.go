@@ -76,7 +76,7 @@ func TestProducerCancelRemovesEvents(t *testing.T, factory QueueFactory) {
 		total := N2 - N1
 		events := make([]interface{}, 0, total)
 		for len(events) < total {
-			batch, err := b.Get(-1) // collect all events
+			batch, err := b.Get(-1, 0) // collect all events
 			if err != nil {
 				panic(err)
 			}

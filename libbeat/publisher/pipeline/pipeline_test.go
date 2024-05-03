@@ -157,7 +157,7 @@ func (q *testQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return nil
 }
 
-func (q *testQueue) Get(sz int) (queue.Batch, error) {
+func (q *testQueue) Get(sz int, _ int) (queue.Batch, error) {
 	if q.get != nil {
 		return q.get(sz)
 	}

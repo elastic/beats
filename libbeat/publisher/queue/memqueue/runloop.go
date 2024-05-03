@@ -20,6 +20,8 @@ package memqueue
 import (
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/fifo"
+
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
@@ -37,6 +39,9 @@ type runLoop struct {
 	// The total number of events in the queue.
 	eventCount int
 
+	// The total number of bytes in the queue
+	byteCount int
+
 	// The number of consumed events waiting for acknowledgment. The next Get
 	// request will return events starting at position
 	// (bufPos + consumedCount) % len(buf).
@@ -46,6 +51,11 @@ type runLoop struct {
 	// to ackLoop for acknowledgment handling. (This list doesn't contain all
 	// outstanding batches, only the ones not yet forwarded to ackLoop.)
 	consumedBatches batchList
+
+	// pendingPushRequests stores incoming events that can't yet fit in the
+	// queue. As space in the queue is freed, these requests will be handled
+	// in order.
+	pendingPushRequests fifo.FIFO[pushRequest]
 
 	// If there aren't enough events ready to fill an incoming get request,
 	// the queue may block based on its flush settings. When this happens,
@@ -86,15 +96,19 @@ func (l *runLoop) run() {
 	}
 }
 
+func (l *runLoop) isSpaceAvailable() bool {
+	maxEvents := l.broker.settings.Events
+	maxBytes := l.broker.settings.Bytes
+
+	eventsAvailable := maxEvents <= 0 || l.eventCount < maxEvents
+	bytesAvailable := maxBytes <= 0 || l.byteCount < maxBytes
+
+	return eventsAvailable && bytesAvailable
+}
+
 // Perform one iteration of the queue's main run loop. Broken out into a
 // standalone helper function to allow testing of loop invariants.
 func (l *runLoop) runIteration() {
-	var pushChan chan pushRequest
-	// Push requests are enabled if the queue isn't yet full.
-	if l.eventCount < len(l.broker.buf) {
-		pushChan = l.broker.pushChan
-	}
-
 	var getChan chan getRequest
 	// Get requests are enabled if the queue has events that weren't yet sent
 	// to consumers, and no existing request is active.
@@ -119,7 +133,7 @@ func (l *runLoop) runIteration() {
 	case <-l.broker.ctx.Done():
 		return
 
-	case req := <-pushChan: // producer pushing new event
+	case req := <-l.broker.pushChan: // producer pushing new event
 		l.handleInsert(&req)
 
 	case req := <-l.broker.cancelChan: // producer cancelling active events
@@ -148,8 +162,12 @@ func (l *runLoop) runIteration() {
 }
 
 func (l *runLoop) handleGetRequest(req *getRequest) {
-	if req.entryCount <= 0 || req.entryCount > l.broker.settings.MaxGetRequest {
-		req.entryCount = l.broker.settings.MaxGetRequest
+	// Backwards compatibility: if all byte parameters are <= 0, get requests
+	// are capped by settings.MaxGetRequest.
+	if req.byteCount <= 0 && l.broker.settings.Bytes <= 0 {
+		if req.entryCount <= 0 || req.entryCount > l.broker.settings.MaxGetRequest {
+			req.entryCount = l.broker.settings.MaxGetRequest
+		}
 	}
 	if l.getRequestShouldBlock(req) {
 		l.pendingGetRequest = req

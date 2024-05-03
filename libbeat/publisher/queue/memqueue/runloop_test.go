@@ -61,7 +61,7 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 	go func() {
 		// Run the Get asynchronously so the test itself doesn't block if
 		// there's a logical error.
-		_, _ = broker.Get(100)
+		_, _ = broker.Get(100, 0)
 	}()
 	rl.runIteration()
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since the request should succeed immediately")
@@ -98,7 +98,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 	go func() {
 		// Run the Get asynchronously so the test itself doesn't block if
 		// there's a logical error.
-		_, _ = broker.Get(101)
+		_, _ = broker.Get(101, 0)
 	}()
 	rl.runIteration()
 	assert.NotNil(t, rl.pendingGetRequest, "Queue should have a pending get request since the queue doesn't have the requested event count")

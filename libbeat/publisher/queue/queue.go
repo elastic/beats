@@ -73,9 +73,10 @@ type Queue interface {
 
 	Producer(cfg ProducerConfig) Producer
 
-	// Get retrieves a batch of up to eventCount events. If eventCount <= 0,
-	// there is no bound on the number of returned events.
-	Get(eventCount int) (Batch, error)
+	// Get retrieves an event batch with up to eventCount events or up to
+	// byteCount bytes, whichever is smaller. If either parameter is <= 0,
+	// there is no limit on that value.
+	Get(eventCount int, byteCount int) (Batch, error)
 
 	Metrics() (Metrics, error)
 }

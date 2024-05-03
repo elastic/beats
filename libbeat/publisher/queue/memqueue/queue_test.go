@@ -217,7 +217,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 	// Get call will block until the queue itself is cancelled.
 	go func() {
 		for i := 0; i < 2; i++ {
-			batch, err := q.Get(2)
+			batch, err := q.Get(2, 0)
 			// Only error to worry about is queue closing, which isn't
 			// a test failure.
 			if err == nil {
@@ -274,7 +274,7 @@ func queueTestWithSettings(t *testing.T, settings Settings, eventsToTest int, te
 	queueMetricsAreValid(t, testQueue, 5, settings.Events, 0, fmt.Sprintf("%s - First send of metrics to queue", testName))
 
 	// Read events, don't yet ack them
-	batch, err := testQueue.Get(eventsToTest)
+	batch, err := testQueue.Get(eventsToTest, 0)
 	assert.NoError(t, err, "error in Get")
 	t.Logf("Got batch of %d events", batch.Count())
 
@@ -350,7 +350,7 @@ func TestEntryIDs(t *testing.T) {
 		}
 
 		for i := 0; i < entryCount; i++ {
-			batch, err := q.Get(1)
+			batch, err := q.Get(1, 0)
 			assert.NoError(t, err, "Queue read should succeed")
 			assert.Equal(t, batch.Count(), 1, "Returned batch should have 1 entry")
 
@@ -381,7 +381,7 @@ func TestEntryIDs(t *testing.T) {
 		batches := []queue.Batch{}
 
 		for i := 0; i < entryCount; i++ {
-			batch, err := q.Get(1)
+			batch, err := q.Get(1, 0)
 			assert.NoError(t, err, "Queue read should succeed")
 			assert.Equal(t, batch.Count(), 1, "Returned batch should have 1 entry")
 			batches = append(batches, batch)
@@ -453,10 +453,10 @@ func TestBatchFreeEntries(t *testing.T) {
 		_, ok := producer.Publish(i)
 		require.True(t, ok, "Queue publish must succeed")
 	}
-	batch1, err := testQueue.Get(batchSize)
+	batch1, err := testQueue.Get(batchSize, 0)
 	require.NoError(t, err, "Queue read must succeed")
 	require.Equal(t, batchSize, batch1.Count(), "Returned batch size must match request")
-	batch2, err := testQueue.Get(batchSize)
+	batch2, err := testQueue.Get(batchSize, 0)
 	require.NoError(t, err, "Queue read must succeed")
 	require.Equal(t, batchSize, batch2.Count(), "Returned batch size must match request")
 	// Slight concurrency subtlety: we check events are non-nil after the queue

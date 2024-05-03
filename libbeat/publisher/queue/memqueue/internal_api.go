@@ -28,6 +28,11 @@ type pushRequest struct {
 	// early encoding, 0 otherwise.
 	eventSize int
 
+	// If the queue doesn't have room for an incoming event and blockIfFull
+	// is true, the request will be held until there is space in the queue.
+	// Otherwise, the queue will return failure immediately.
+	blockIfFull bool
+
 	// The producer that generated this event, or nil if this producer does
 	// not require ack callbacks.
 	producer *ackProducer
@@ -50,8 +55,14 @@ type producerCancelResponse struct {
 // consumer -> broker API
 
 type getRequest struct {
-	entryCount   int         // request entryCount events from the broker
-	responseChan chan *batch // channel to send response to
+	// The number of entries to request, or <= 0 for no limit.
+	entryCount int
+
+	// The number of (encoded) event bytes to request, or <= 0 for no limit.
+	byteCount int
+
+	// The channel to send the new batch to.
+	responseChan chan *batch
 }
 
 type batchDoneMsg struct{}

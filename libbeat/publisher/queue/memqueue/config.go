@@ -27,22 +27,25 @@ import (
 
 type config struct {
 	Events int `config:"events" validate:"min=32"`
-	// This field is named MaxGetRequest because its logical effect is to give
+	Bytes  int `config:"bytes" validate:"min=32768"`
+
+	// This field is named MaxGetEvents because its logical effect is to give
 	// a maximum on the number of events a Get request can return, but the
 	// user-exposed name is "flush.min_events" for backwards compatibility,
 	// since it used to control buffer size in the internal buffer chain.
-	MaxGetRequest int           `config:"flush.min_events" validate:"min=0"`
-	FlushTimeout  time.Duration `config:"flush.timeout"`
+	// Ignored if a byte limit is set in the queue or the get request.
+	MaxGetEvents int           `config:"flush.min_events" validate:"min=0"`
+	FlushTimeout time.Duration `config:"flush.timeout"`
 }
 
 var defaultConfig = config{
-	Events:        3200,
-	MaxGetRequest: 1600,
-	FlushTimeout:  10 * time.Second,
+	Events:       3200,
+	MaxGetEvents: 1600,
+	FlushTimeout: 10 * time.Second,
 }
 
 func (c *config) Validate() error {
-	if c.MaxGetRequest > c.Events {
+	if c.MaxGetEvents > c.Events {
 		return errors.New("flush.min_events must be less events")
 	}
 	return nil
@@ -60,7 +63,7 @@ func SettingsForUserConfig(cfg *c.C) (Settings, error) {
 	//nolint:gosimple // Actually want this conversion to be explicit since the types aren't definitionally equal.
 	return Settings{
 		Events:        config.Events,
-		MaxGetRequest: config.MaxGetRequest,
+		MaxGetRequest: config.MaxGetEvents,
 		FlushTimeout:  config.FlushTimeout,
 	}, nil
 }

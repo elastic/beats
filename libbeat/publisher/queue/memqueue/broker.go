@@ -104,8 +104,9 @@ type broker struct {
 }
 
 type Settings struct {
-	// The number of events the queue can hold.
-	Events int
+	// The number of events and bytes the queue can hold. <= zero means no limit.
+	// At least one must be greater than zero.
+	Events, Bytes int
 
 	// The most events that will ever be returned from one Get request.
 	MaxGetRequest int
@@ -267,13 +268,13 @@ func (b *broker) Producer(cfg queue.ProducerConfig) queue.Producer {
 	return newProducer(b, cfg.ACK, cfg.OnDrop, cfg.DropOnCancel, encoder)
 }
 
-func (b *broker) Get(count int) (queue.Batch, error) {
+func (b *broker) Get(count int, bytes int) (queue.Batch, error) {
 	responseChan := make(chan *batch, 1)
 	select {
 	case <-b.ctx.Done():
 		return nil, io.EOF
 	case b.getChan <- getRequest{
-		entryCount: count, responseChan: responseChan}:
+		entryCount: count, byteCount: bytes, responseChan: responseChan}:
 	}
 
 	// if request has been sent, we have to wait for a response

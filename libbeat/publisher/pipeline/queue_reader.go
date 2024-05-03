@@ -54,7 +54,7 @@ func (qr *queueReader) run(logger *logp.Logger) {
 			logger.Debug("pipeline event consumer queue reader: stop")
 			return
 		}
-		queueBatch, _ := req.queue.Get(req.batchSize)
+		queueBatch, _ := req.queue.Get(req.batchSize, 0)
 		var batch *ttlBatch
 		if queueBatch != nil {
 			batch = newBatch(req.retryer, queueBatch, req.timeToLive)

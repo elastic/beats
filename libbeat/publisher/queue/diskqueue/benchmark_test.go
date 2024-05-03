@@ -134,7 +134,7 @@ func publishEvents(p queue.Producer, num int, protobuf bool) {
 func getAndAckEvents(q *diskQueue, num_events int, batch_size int) error {
 	var received int
 	for {
-		batch, err := q.Get(batch_size)
+		batch, err := q.Get(batch_size, 0)
 		if err != nil {
 			return err
 		}
