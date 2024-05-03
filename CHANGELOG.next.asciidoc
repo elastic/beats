@@ -94,9 +94,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Auditbeat*
 - Set field types to correctly match ECS in sessionmd processor {issue}38955[38955] {pull}38994[38994]
-- Keep process info on exited processes, to avoid failing to enrich events in sessionmd processor {pull}39173[39173]
-
+- Fix failing to enrich process events in sessionmd processor {issue}38955[38955] {pull}39173[39173] {pull}39243[39243]
 - Prevent scenario of losing children-related file events in a directory for recursive fsnotify backend of auditbeat file integrity module {pull}39133[39133]
+- Allow extra syscalls by auditbeat required in FIM with kprobes back-end {pull}39361[39361]
+- Fix losing events in FIM for OS X by allowing always to walk an added directory to monitor {pull}39362[39362]
 
 
 *Filebeat*
@@ -142,6 +143,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Updated Websocket input title to align with existing inputs {pull}39006[39006]
 - Restore netflow input on Windows {pull}39024[39024]
 - Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
+- Fix concurrency/error handling bugs in the AWS S3 input that could drop data and prevent ingestion of large buckets. {pull}39131[39131]
 
 *Heartbeat*
 
