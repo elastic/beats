@@ -147,25 +147,8 @@ steps:
           - x-pack/metricbeat
           - x-pack/packetbeat
 
-      ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "SNAPSHOT: x-pack/agentbeat"
-        env:
-          PLATFORMS: "${PLATFORMS}"
-          SNAPSHOT: true
-          DEV: true
-        command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
-        agents:
-          provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
-        timeout_in_minutes: 40
-        retry:
-          automatic:
-            - limit: 1
-        artifact_paths:
-          - build/distributions/**/*
+  - group: Packaging staging
 
-  - group: Packaging Staging
     key: packaging-staging
     depends_on: start-gate-staging
     ## Only for release
@@ -233,24 +216,6 @@ steps:
           - x-pack/heartbeat
           - x-pack/metricbeat
           - x-pack/packetbeat
-
-        ## Agentbeat needs more CPUs because it builds many other beats
-      - label: "STAGING: x-pack/agentbeat"
-        env:
-          PLATFORMS: "${PLATFORMS}"
-          SNAPSHOT: false
-          DEV: false
-        command: ".buildkite/scripts/packaging/package-dra.sh x-pack/agentbeat"
-        agents:
-          provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "c2-standard-16"
-        timeout_in_minutes: 40
-        retry:
-          automatic:
-            - limit: 1
-        artifact_paths:
-          - build/distributions/**/*
 
   - group: DRA publish
     key: dra

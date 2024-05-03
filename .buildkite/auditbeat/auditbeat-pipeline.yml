@@ -3,7 +3,6 @@ name: "beats-auditbeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
-
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
@@ -30,8 +29,12 @@ steps:
     steps:
       - label: ":ubuntu: Auditbeat Unit Tests"
         command: |
+          set -euo pipefail
           cd auditbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -45,8 +48,12 @@ steps:
 
       - label: ":rhel: Auditbeat Unit Tests"
         command: |
+          set -euo pipefail
           cd auditbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -62,6 +69,9 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -79,6 +89,9 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -97,80 +110,147 @@ steps:
           make -C auditbeat crosscompile
         env:
           GOX_FLAGS: "-arch amd64"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:
-              context: "auditbeat: Cross compile"
+              context: "auditbeat: Crosscompile"
 
-  - group: "Auditbeat Linux arm64 Tests"
-    key: "auditbeat-extended-tests-linux-arm64"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+  - group: "Auditbeat Extended Tests"
+    key: "auditbeat-extended-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" ||  build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm|integrations).*/
+
     steps:
-      - label: ":linux: Auditbeat Linux arm64 Unit Tests"
-        key: "auditbeat-extended-arm64-unit-tests"
+      - label: ":linux: Auditbeat Ubuntu Integration Tests"
+        key: "auditbeat-extended-integ-tests"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
           cd auditbeat
-          mage unitTest
+          mage build integTest
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "auditbeat: Linux Integration Tests"
+
+      - label: ":linux: Auditbeat Ubuntu arm64 Integration Tests"
+        key: "auditbeat-extended-arm64-integ-tests"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
+        command: |
+          set -euo pipefail
+          cd auditbeat
+          mage build integTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths: "auditbeat/build/*.*"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "metricbeat: Linux arm64 tests"
+              context: "auditbeat: Linux arm64 Integration Tests"
 
-  - group: "Auditbeat MacOS Extended"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-    steps:
+      - label: ":linux: Auditbeat Ubuntu arm64 Unit Tests"
+        key: "auditbeat-extended-arm64-unit-tests"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+        command: |
+          set -euo pipefail
+          cd auditbeat
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "auditbeat: Linux arm64 Unit Tests"
+
       - label: ":mac: Auditbeat macOS x86_64 Unit Tests"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
           cd auditbeat
-          mage unitTest
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
-        artifact_paths: "auditbeat/build/*.*"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Extended MacOS x86_64 Unit Tests"
+              context: "auditbeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: Auditbeat macOS arm64 Unit Tests"
+      - label: ":mac: Auditbeat macOS arm64 ARM Unit Tests"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
           cd auditbeat
-          mage unitTest
+          mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths: "auditbeat/build/*.*"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "auditbeat: Extended MacOS arm64 Unit Tests"
+              context: "auditbeat: macOS arm64 Unit Tests"
 
   - group: "Auditbeat Windows Extended Testing"
     key: "auditbeat-extended-tests-win"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+
     steps:
       - label: ":windows: Auditbeat Win-2019 Unit Tests"
         key: "auditbeat-extended-win-2019-unit-tests"
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        artifact_paths: "auditbeat/build/*.*"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
               context: "auditbeat: Extended Windows 2019 Unit Tests"
@@ -180,13 +260,18 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        artifact_paths: "auditbeat/build/*.*"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
               context: "auditbeat: Extended Windows 10 Unit Tests"
@@ -196,13 +281,18 @@ steps:
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
-        artifact_paths: "auditbeat/build/*.*"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
         notify:
           - github_commit_status:
               context: "auditbeat: Extended Windows 11 Unit Tests"
@@ -223,6 +313,7 @@ steps:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
         command: |
+          set -euo pipefail
           cd auditbeat
           mage package
         agents:
@@ -240,6 +331,7 @@ steps:
           PACKAGES: "docker"
           SNAPSHOT: true
         command: |
+          set -euo pipefail
           cd auditbeat
           mage package
         agents:
