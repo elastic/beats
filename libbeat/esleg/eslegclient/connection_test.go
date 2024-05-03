@@ -127,7 +127,9 @@ func TestUserAgentHeader(t *testing.T) {
 	rawClient, ok := conn.HTTP.(*http.Client)
 	require.True(t, ok)
 
-	_, _ = rawClient.Transport.RoundTrip(req)
+	// don't want to check the error, since the URL doesn't exist, so we'll always return an error.
+	resp, _ := rawClient.Transport.RoundTrip(req)
+	resp.Body.Close()
 	require.Contains(t, req.Header.Get("User-Agent"), "Elastic-testbeat-Agent")
 
 }
