@@ -402,6 +402,7 @@ func (s *diskstore) checkpointClearLog() {
 	err := s.logFile.Truncate(0)
 	if err == nil {
 		_, err = s.logFile.Seek(0, io.SeekStart)
+		s.logInvalid = false
 	}
 
 	if err != nil {
