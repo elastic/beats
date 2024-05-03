@@ -118,7 +118,6 @@ type Settings struct {
 
 type queueEntry struct {
 	event queue.Entry
-	id    queue.EntryID
 
 	producer   *ackProducer
 	producerID producerID // The order of this entry within its producer
@@ -297,7 +296,6 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 		EventCount:            opt.UintWith(uint64(resp.currentQueueSize)),
 		EventLimit:            opt.UintWith(uint64(len(b.buf))),
 		UnackedConsumedEvents: opt.UintWith(uint64(resp.occupiedRead)),
-		OldestEntryID:         resp.oldestEntryID,
 	}, nil
 }
 

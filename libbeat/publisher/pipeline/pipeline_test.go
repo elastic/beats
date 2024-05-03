@@ -99,9 +99,9 @@ func makeDiscardQueue() queue.Queue {
 			// it's also the returned Event ID
 			count := uint64(0)
 			producer := &testProducer{
-				publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
+				publish: func(try bool, event queue.Entry) bool {
 					count++
-					return queue.EntryID(count), true
+					return true
 				},
 				cancel: func() int {
 
@@ -124,7 +124,7 @@ type testQueue struct {
 }
 
 type testProducer struct {
-	publish func(try bool, event queue.Entry) (queue.EntryID, bool)
+	publish func(try bool, event queue.Entry) bool
 	cancel  func() int
 }
 
@@ -164,18 +164,18 @@ func (q *testQueue) Get(sz int, _ int) (queue.Batch, error) {
 	return nil, nil
 }
 
-func (p *testProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
+func (p *testProducer) Publish(event queue.Entry) bool {
 	if p.publish != nil {
 		return p.publish(false, event)
 	}
-	return 0, false
+	return false
 }
 
-func (p *testProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
+func (p *testProducer) TryPublish(event queue.Entry) bool {
 	if p.publish != nil {
 		return p.publish(true, event)
 	}
-	return 0, false
+	return false
 }
 
 func (p *testProducer) Cancel() int {
@@ -210,7 +210,7 @@ func makeTestQueue() queue.Queue {
 			var producer *testProducer
 			p := blockingProducer(cfg)
 			producer = &testProducer{
-				publish: func(try bool, event queue.Entry) (queue.EntryID, bool) {
+				publish: func(try bool, event queue.Entry) bool {
 					if try {
 						return p.TryPublish(event)
 					}
@@ -242,10 +242,10 @@ func blockingProducer(_ queue.ProducerConfig) queue.Producer {
 	waiting := atomic.MakeInt(0)
 
 	return &testProducer{
-		publish: func(_ bool, _ queue.Entry) (queue.EntryID, bool) {
+		publish: func(_ bool, _ queue.Entry) bool {
 			waiting.Inc()
 			<-sig
-			return 0, false
+			return false
 		},
 
 		cancel: func() int {

@@ -107,14 +107,14 @@ func TestProducerDoesNotBlockWhenQueueClosed(t *testing.T) {
 		// Publish 2 events, this will make the queue full, but
 		// both will be accepted
 		for i := 0; i < 2; i++ {
-			id, ok := p.Publish(fmt.Sprintf("Event %d", i))
+			ok := p.Publish(fmt.Sprintf("Event %d", i))
 			if !ok {
-				t.Errorf("failed to publish to the queue, event ID: %v", id)
+				t.Errorf("failed to publish to the queue")
 				return
 			}
 			publishCount.Add(1)
 		}
-		_, ok := p.Publish("Event 3")
+		ok := p.Publish("Event 3")
 		if ok {
 			t.Errorf("publishing the 3rd event must fail")
 			return
@@ -191,7 +191,7 @@ func TestProducerClosePreservesEventCount(t *testing.T) {
 			// decrement afterwards if it failed (otherwise the event count
 			// could become negative even under correct queue operation).
 			activeEvents.Add(1)
-			_, ok := p.Publish(event)
+			ok := p.Publish(event)
 			if !ok {
 				activeEvents.Add(-1)
 			}
@@ -337,107 +337,6 @@ func TestAdjustInputQueueSize(t *testing.T) {
 	})
 }
 
-func TestEntryIDs(t *testing.T) {
-	entryCount := 100
-
-	testForward := func(q queue.Queue) {
-		waiter := &producerACKWaiter{}
-		producer := q.Producer(queue.ProducerConfig{ACK: waiter.ack})
-		for i := 0; i < entryCount; i++ {
-			id, success := producer.Publish(nil)
-			assert.Equal(t, success, true, "Queue publish should succeed")
-			assert.Equal(t, id, queue.EntryID(i), "Entry ID should match publication order")
-		}
-
-		for i := 0; i < entryCount; i++ {
-			batch, err := q.Get(1, 0)
-			assert.NoError(t, err, "Queue read should succeed")
-			assert.Equal(t, batch.Count(), 1, "Returned batch should have 1 entry")
-
-			metrics, err := q.Metrics()
-			assert.NoError(t, err, "Queue metrics call should succeed")
-			assert.Equal(t, metrics.OldestEntryID, queue.EntryID(i),
-				fmt.Sprintf("Oldest entry ID before ACKing event %v should be %v", i, i))
-
-			batch.Done()
-			waiter.waitForEvents(1)
-			metrics, err = q.Metrics()
-			assert.NoError(t, err, "Queue metrics call should succeed")
-			assert.Equal(t, metrics.OldestEntryID, queue.EntryID(i+1),
-				fmt.Sprintf("Oldest entry ID after ACKing event %v should be %v", i, i+1))
-
-		}
-	}
-
-	testBackward := func(q queue.Queue) {
-		waiter := &producerACKWaiter{}
-		producer := q.Producer(queue.ProducerConfig{ACK: waiter.ack})
-		for i := 0; i < entryCount; i++ {
-			id, success := producer.Publish(nil)
-			assert.Equal(t, success, true, "Queue publish should succeed")
-			assert.Equal(t, id, queue.EntryID(i), "Entry ID should match publication order")
-		}
-
-		batches := []queue.Batch{}
-
-		for i := 0; i < entryCount; i++ {
-			batch, err := q.Get(1, 0)
-			assert.NoError(t, err, "Queue read should succeed")
-			assert.Equal(t, batch.Count(), 1, "Returned batch should have 1 entry")
-			batches = append(batches, batch)
-		}
-
-		for i := entryCount - 1; i > 0; i-- {
-			batches[i].Done()
-
-			// It's hard to remove this delay since the Done signal is propagated
-			// asynchronously to the queue, and since this test is ensuring that the
-			// queue _doesn't_ advance we can't use a callback to gate the comparison
-			// like we do in testForward. However:
-			// - While this race condition could sometimes let a buggy implementation
-			//   pass, it will not produce a false failure (so it won't contribute
-			//   to general test flakiness)
-			// - That notwithstanding, when the ACK _does_ cause an incorrect
-			//   metrics update, this delay is enough to recognize it approximately
-			//   100% of the time, so this test is still a good signal despite
-			//   the slight nondeterminism.
-			time.Sleep(1 * time.Millisecond)
-			metrics, err := q.Metrics()
-			assert.NoError(t, err, "Queue metrics call should succeed")
-			assert.Equal(t, metrics.OldestEntryID, queue.EntryID(0),
-				fmt.Sprintf("Oldest entry ID after ACKing event %v should be 0", i))
-		}
-		// ACK the first batch, which should unblock all the later ones
-		batches[0].Done()
-		waiter.waitForEvents(100)
-		metrics, err := q.Metrics()
-		assert.NoError(t, err, "Queue metrics call should succeed")
-		assert.Equal(t, metrics.OldestEntryID, queue.EntryID(100),
-			fmt.Sprintf("Oldest entry ID after ACKing event 0 should be %v", queue.EntryID(entryCount)))
-
-	}
-
-	t.Run("acking in forward order with directEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000}, 0, nil)
-		testForward(testQueue)
-	})
-
-	t.Run("acking in reverse order with directEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000}, 0, nil)
-		testBackward(testQueue)
-	})
-
-	t.Run("acking in forward order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000, MaxGetRequest: 2, FlushTimeout: time.Microsecond}, 0, nil)
-		testForward(testQueue)
-	})
-
-	t.Run("acking in reverse order with bufferedEventLoop reports the right event IDs", func(t *testing.T) {
-		testQueue := NewQueue(nil, nil, Settings{Events: 1000, MaxGetRequest: 2, FlushTimeout: time.Microsecond}, 0, nil)
-		testBackward(testQueue)
-	})
-}
-
 func TestBatchFreeEntries(t *testing.T) {
 	const queueSize = 10
 	const batchSize = 5
@@ -450,7 +349,7 @@ func TestBatchFreeEntries(t *testing.T) {
 	testQueue := NewQueue(nil, nil, Settings{Events: queueSize, MaxGetRequest: batchSize, FlushTimeout: time.Second}, 0, nil)
 	producer := testQueue.Producer(queue.ProducerConfig{})
 	for i := 0; i < queueSize; i++ {
-		_, ok := producer.Publish(i)
+		ok := producer.Publish(i)
 		require.True(t, ok, "Queue publish must succeed")
 	}
 	batch1, err := testQueue.Get(batchSize, 0)

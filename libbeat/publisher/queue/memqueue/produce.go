@@ -76,19 +76,23 @@ func newProducer(b *broker, cb ackHandler, dropCB func(queue.Entry), dropOnCance
 	return &forgetfulProducer{broker: b, openState: openState}
 }
 
-func (p *forgetfulProducer) makePushRequest(event queue.Entry) pushRequest {
-	resp := make(chan queue.EntryID, 1)
+func (p *forgetfulProducer) makePushRequest(
+	event queue.Entry,
+	blockIfFull bool,
+) pushRequest {
+	resp := make(chan bool, 1)
 	return pushRequest{
-		event: event,
-		resp:  resp}
+		event:       event,
+		blockIfFull: blockIfFull,
+		resp:        resp}
 }
 
-func (p *forgetfulProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
-	return p.openState.publish(p.makePushRequest(event))
+func (p *forgetfulProducer) Publish(event queue.Entry) bool {
+	return p.openState.publish(p.makePushRequest(event, true))
 }
 
-func (p *forgetfulProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
-	return p.openState.tryPublish(p.makePushRequest(event))
+func (p *forgetfulProducer) TryPublish(event queue.Entry) bool {
+	return p.openState.publish(p.makePushRequest(event, false))
 }
 
 func (p *forgetfulProducer) Cancel() int {
@@ -96,31 +100,32 @@ func (p *forgetfulProducer) Cancel() int {
 	return 0
 }
 
-func (p *ackProducer) makePushRequest(event queue.Entry) pushRequest {
-	resp := make(chan queue.EntryID, 1)
+func (p *ackProducer) makePushRequest(event queue.Entry, blockIfFull bool) pushRequest {
+	resp := make(chan bool, 1)
 	return pushRequest{
-		event:    event,
-		producer: p,
+		event:       event,
+		blockIfFull: blockIfFull,
+		producer:    p,
 		// We add 1 to the id so the default lastACK of 0 is a
 		// valid initial state and 1 is the first real id.
 		producerID: producerID(p.producedCount + 1),
 		resp:       resp}
 }
 
-func (p *ackProducer) Publish(event queue.Entry) (queue.EntryID, bool) {
-	id, published := p.openState.publish(p.makePushRequest(event))
+func (p *ackProducer) Publish(event queue.Entry) bool {
+	published := p.openState.publish(p.makePushRequest(event, true))
 	if published {
 		p.producedCount++
 	}
-	return id, published
+	return published
 }
 
-func (p *ackProducer) TryPublish(event queue.Entry) (queue.EntryID, bool) {
-	id, published := p.openState.tryPublish(p.makePushRequest(event))
+func (p *ackProducer) TryPublish(event queue.Entry) bool {
+	published := p.openState.publish(p.makePushRequest(event, false))
 	if published {
 		p.producedCount++
 	}
-	return id, published
+	return published
 }
 
 func (p *ackProducer) Cancel() int {
@@ -144,7 +149,7 @@ func (st *openState) Close() {
 	close(st.done)
 }
 
-func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
+func (st *openState) publish(req pushRequest) bool {
 	// If we were given an encoder callback for incoming events, apply it before
 	// sending the entry to the queue.
 	if st.encoder != nil {
@@ -158,44 +163,12 @@ func (st *openState) publish(req pushRequest) (queue.EntryID, bool) {
 		// shutdown channel.
 		select {
 		case resp := <-req.resp:
-			return resp, true
+			return resp
 		case <-st.queueDone:
-			st.events = nil
-			return 0, false
 		}
 	case <-st.done:
-		st.events = nil
-		return 0, false
 	case <-st.queueDone:
-		st.events = nil
-		return 0, false
 	}
-}
-
-func (st *openState) tryPublish(req pushRequest) (queue.EntryID, bool) {
-	// If we were given an encoder callback for incoming events, apply it before
-	// sending the entry to the queue.
-	if st.encoder != nil {
-		req.event, req.eventSize = st.encoder.EncodeEntry(req.event)
-	}
-	select {
-	case st.events <- req:
-		// The events channel is buffered, which means we may successfully
-		// write to it even if the queue is shutting down. To avoid blocking
-		// forever during shutdown, we also have to wait on the queue's
-		// shutdown channel.
-		select {
-		case resp := <-req.resp:
-			return resp, true
-		case <-st.queueDone:
-			st.events = nil
-			return 0, false
-		}
-	case <-st.done:
-		st.events = nil
-		return 0, false
-	default:
-		st.log.Debugf("Dropping event, queue is blocked")
-		return 0, false
-	}
+	st.events = nil
+	return false
 }

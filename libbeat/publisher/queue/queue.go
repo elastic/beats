@@ -47,10 +47,6 @@ type Metrics struct {
 
 	//OldestActiveTimestamp is the timestamp of the oldest item in the queue.
 	OldestActiveTimestamp common.Time
-
-	// OldestActiveID is ID of the oldest unacknowledged event in the queue, or
-	// the next ID that will be assigned if the queue is empty.
-	OldestEntryID EntryID
 }
 
 // ErrMetricsNotImplemented is a hopefully temporary type to mark queue metrics as not yet implemented
@@ -119,21 +115,16 @@ type ProducerConfig struct {
 	DropOnCancel bool
 }
 
-type EntryID uint64
-
 // Producer is an interface to be used by the pipelines client to forward
 // events to a queue.
 type Producer interface {
-	// Publish adds an entry to the queue, blocking if necessary, and returns
-	// the new entry's id and true on success.
-	Publish(entry Entry) (EntryID, bool)
+	// Publish adds an entry to the queue, blocking until there is space
+	// if necessary, and returns true on success.
+	Publish(entry Entry) bool
 
-	// TryPublish adds an entry to the queue if doing so will not block the
-	// caller, otherwise it immediately returns. The reasons a publish attempt
-	// might block are defined by the specific queue implementation and its
-	// configuration. If the event was successfully added, returns true with
-	// the event's assigned ID, and false otherwise.
-	TryPublish(entry Entry) (EntryID, bool)
+	// TryPublish adds an entry to the queue if the queue has space for it,
+	// otherwise it returns false immediately.
+	TryPublish(entry Entry) bool
 
 	// Cancel closes this Producer endpoint. If the producer is configured to
 	// drop its entries on Cancel, the number of dropped entries is returned.

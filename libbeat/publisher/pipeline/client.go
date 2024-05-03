@@ -119,9 +119,9 @@ func (c *client) publish(e beat.Event) {
 
 	var published bool
 	if c.canDrop {
-		_, published = c.producer.TryPublish(pubEvent)
+		published = c.producer.TryPublish(pubEvent)
 	} else {
-		_, published = c.producer.Publish(pubEvent)
+		published = c.producer.Publish(pubEvent)
 	}
 
 	if published {

@@ -21,8 +21,6 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common/fifo"
-
-	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // runLoop internal state. These fields could mostly be local variables
@@ -66,11 +64,6 @@ type runLoop struct {
 	// to a pending getRequest even if we can't fill the requested event count.
 	// It is active if and only if pendingGetRequest is non-nil.
 	getTimer *time.Timer
-
-	// TODO (https://github.com/elastic/beats/issues/37893): entry IDs were a
-	// workaround for an external project that no longer exists. At this point
-	// they just complicate the API and should be removed.
-	nextEntryID queue.EntryID
 }
 
 func newRunLoop(broker *broker) *runLoop {
@@ -106,6 +99,10 @@ func (l *runLoop) isSpaceAvailable() bool {
 	return eventsAvailable && bytesAvailable
 }
 
+func (l *runLoop) canHandlePushRequest(req pushRequest) bool {
+	return false
+}
+
 // Perform one iteration of the queue's main run loop. Broken out into a
 // standalone helper function to allow testing of loop invariants.
 func (l *runLoop) runIteration() {
@@ -134,7 +131,7 @@ func (l *runLoop) runIteration() {
 		return
 
 	case req := <-l.broker.pushChan: // producer pushing new event
-		l.handleInsert(&req)
+		l.handleInsert(req)
 
 	case req := <-l.broker.cancelChan: // producer cancelling active events
 		l.handleCancel(&req)
@@ -212,12 +209,21 @@ func (l *runLoop) handleDelete(count int) {
 	l.consumedCount -= count
 }
 
-func (l *runLoop) handleInsert(req *pushRequest) {
-	if l.insert(req, l.nextEntryID) {
+func (l *runLoop) handleInsert(req pushRequest) {
+	if !l.canHandlePushRequest(req) {
+		if req.blockIfFull {
+			// Add this request to the pending list to be handled when there's space.
+			l.pendingPushRequests.Add(req)
+		} else {
+			l.broker.logger.Debugf("Dropping event, queue is blocked")
+			req.resp <- false
+		}
+		return
+	}
+	if l.insert(req) {
 		// Send back the new event id.
-		req.resp <- l.nextEntryID
+		req.resp <- true
 
-		l.nextEntryID++
 		l.eventCount++
 
 		// See if this gave us enough for a new batch
@@ -242,16 +248,14 @@ func (l *runLoop) maybeUnblockGetRequest() {
 }
 
 // Returns true if the event was inserted, false if insertion was cancelled.
-func (l *runLoop) insert(req *pushRequest, id queue.EntryID) bool {
+func (l *runLoop) insert(req pushRequest) bool {
 	if req.producer != nil && req.producer.state.cancelled {
-		reportCancelledState(req)
 		return false
 	}
 
 	index := (l.bufPos + l.eventCount) % len(l.broker.buf)
 	l.broker.buf[index] = queueEntry{
 		event:      req.event,
-		id:         id,
 		producer:   req.producer,
 		producerID: req.producerID,
 	}
@@ -259,16 +263,9 @@ func (l *runLoop) insert(req *pushRequest, id queue.EntryID) bool {
 }
 
 func (l *runLoop) handleMetricsRequest(req *metricsRequest) {
-	oldestEntryID := l.nextEntryID
-	if l.eventCount > 0 {
-		index := l.bufPos % len(l.broker.buf)
-		oldestEntryID = l.broker.buf[index].id
-	}
-
 	req.responseChan <- memQueueMetrics{
 		currentQueueSize: l.eventCount,
 		occupiedRead:     l.consumedCount,
-		oldestEntryID:    oldestEntryID,
 	}
 }
 
@@ -309,12 +306,5 @@ func (l *runLoop) handleCancel(req *producerCancelRequest) {
 	// signal cancel request being finished
 	if req.resp != nil {
 		req.resp <- producerCancelResponse{removed: removedCount}
-	}
-}
-
-func reportCancelledState(req *pushRequest) {
-	// do not add waiting events if producer did send cancel signal
-	if cb := req.producer.state.dropCB; cb != nil {
-		cb(req.event)
 	}
 }

@@ -40,7 +40,7 @@ type pushRequest struct {
 	// The index of the event in this producer only. Used to condense
 	// multiple acknowledgments for a producer to a single callback call.
 	producerID producerID
-	resp       chan queue.EntryID
+	resp       chan bool
 }
 
 type producerCancelRequest struct {
@@ -79,6 +79,4 @@ type memQueueMetrics struct {
 	currentQueueSize int
 	// the number of items that have been read by a consumer but not yet ack'ed
 	occupiedRead int
-
-	oldestEntryID queue.EntryID
 }
