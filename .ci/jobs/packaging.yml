@@ -1,0 +1,50 @@
+---
+- job:
+    name: Beats/packaging
+    display-name: Beats Packaging
+    description: Make the packages for beats and publish them on a GCS bucket.
+    view: Beats
+    disabled: false
+    project-type: multibranch
+    script-path: .ci/packaging.groovy
+    scm:
+      - github:
+          branch-discovery: 'no-pr'
+          discover-pr-forks-strategy: 'merge-current'
+          discover-pr-forks-trust: 'permission'
+          discover-pr-origin: 'merge-current'
+          discover-tags: true
+          head-filter-regex: '(7\.17|PR-.*)'
+          disable-pr-notifications: true
+          notification-context: 'beats-packaging'
+          repo: 'beats'
+          repo-owner: 'elastic'
+          credentials-id: github-app-beats-ci
+          ssh-checkout:
+            credentials: f6c7695a-671e-4f4f-a331-acdce44ff9ba
+          build-strategies:
+          - skip-initial-build: true
+          - tags:
+              ignore-tags-older-than: -1
+              ignore-tags-newer-than: 30
+          - named-branches:
+              - regex-name:
+                  regex: '7\.17'
+                  case-sensitive: true
+          - change-request:
+              ignore-target-only-changes: true
+          clean:
+              after: true
+              before: true
+          prune: true
+          shallow-clone: true
+          depth: 10
+          do-not-fetch-tags: true
+          submodule:
+              disable: false
+              recursive: true
+              parent-credentials: true
+              timeout: 100
+          timeout: '15'
+          use-author: true
+          wipe-workspace: true
