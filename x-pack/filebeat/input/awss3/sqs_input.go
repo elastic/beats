@@ -18,7 +18,6 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/elastic-agent-libs/monitoring"
 )
 
 type sqsReaderInput struct {
@@ -63,7 +62,7 @@ func (in *sqsReaderInput) Run(
 	pipeline beat.Pipeline,
 ) error {
 	// Initialize everything for this run
-	err := in.setup(inputContext, pipeline, nil)
+	err := in.setup(inputContext, pipeline)
 	if err != nil {
 		return err
 	}
@@ -78,14 +77,10 @@ func (in *sqsReaderInput) Run(
 
 // Apply internal initialization based on the parameters of Run, in
 // preparation for calling run. setup and run are separate functions so
-// tests can apply mocks and overrides. Tests should apply overrides
-// after calling setup (or skip setup entirely if everything is already
-// initialized). If a test does call setup, it can use optRegistry to
-// report metrics under a subregistry instead of using the global one.
+// tests can apply mocks and overrides before the run loop.
 func (in *sqsReaderInput) setup(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
-	optRegistry *monitoring.Registry,
 ) error {
 	detectedRegion := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
 	if in.config.RegionName != "" {
@@ -119,7 +114,7 @@ func (in *sqsReaderInput) setup(
 
 	in.log = inputContext.Logger.With("queue_url", in.config.QueueURL)
 
-	in.metrics = newInputMetrics(inputContext.ID, optRegistry, in.config.MaxNumberOfMessages)
+	in.metrics = newInputMetrics(inputContext.ID, nil, in.config.MaxNumberOfMessages)
 
 	var err error
 	in.msgHandler, err = in.createEventProcessor(pipeline)
