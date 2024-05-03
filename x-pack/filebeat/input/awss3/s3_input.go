@@ -133,19 +133,6 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 	workerWg.Wait()
 }
 
-func (in *s3PollerInput) createS3ObjectProcessor(ctx context.Context, state state) s3ObjectHandler {
-	event := s3EventV2{}
-	event.AWSRegion = in.awsConfig.Region
-	event.Provider = in.provider
-	event.S3.Bucket.Name = state.Bucket
-	event.S3.Bucket.ARN = in.config.getBucketARN()
-	event.S3.Object.Key = state.Key
-
-	acker := awscommon.NewEventACKTracker(ctx)
-
-	return in.s3ObjectHandler.Create(ctx, in.log, in.client, acker, event)
-}
-
 func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan *s3FetchTask) {
 	rateLimitWaiter := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 
@@ -243,4 +230,17 @@ func (in *s3PollerInput) readerLoop(ctx context.Context, workChan chan<- *s3Fetc
 			in.metrics.s3ObjectsProcessedTotal.Inc()
 		}
 	}
+}
+
+func (in *s3PollerInput) createS3ObjectProcessor(ctx context.Context, state state) s3ObjectHandler {
+	event := s3EventV2{}
+	event.AWSRegion = in.awsConfig.Region
+	event.Provider = in.provider
+	event.S3.Bucket.Name = state.Bucket
+	event.S3.Bucket.ARN = in.config.getBucketARN()
+	event.S3.Object.Key = state.Key
+
+	acker := awscommon.NewEventACKTracker(ctx)
+
+	return in.s3ObjectHandler.Create(ctx, in.log, in.client, acker, event)
 }
