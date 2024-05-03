@@ -30,6 +30,7 @@ import (
 	"go.elastic.co/apm/module/apmelasticsearch/v2"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	"github.com/elastic/beats/v7/libbeat/common/fleetmode"
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
 	"github.com/elastic/beats/v7/libbeat/version"
@@ -134,6 +135,9 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 
 	if s.Beatname == "" {
 		s.Beatname = "Libbeat"
+	}
+	if fleetmode.Enabled() {
+		s.Beatname = fmt.Sprintf("%s-Managed", s.Beatname)
 	}
 	userAgent := useragent.UserAgent(s.Beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 

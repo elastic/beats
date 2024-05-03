@@ -22,12 +22,14 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"flag"
 	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/common/productorigin"
+	cfglib "github.com/elastic/elastic-agent-libs/config"
 )
 
 func TestAPIKeyEncoding(t *testing.T) {
@@ -104,7 +106,30 @@ func TestHeaders(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Equal(t, req.Header, http.Header(td.expected))
+
 	}
+}
+
+func TestUserAgentHeader(t *testing.T) {
+	// manually set cli to put beats into agent mode
+	_ = cfglib.SettingFlag(nil, "E", "Configuration overwrite")
+	flag.Set("E", "management.enabled=true")
+	flag.Parse()
+
+	conn, err := NewConnection(ConnectionSettings{
+		Beatname: "testbeat",
+	})
+	require.NoError(t, err)
+
+	req, err := http.NewRequestWithContext(context.Background(), "GET", "http://localhost/some/path", nil)
+	require.NoError(t, err)
+
+	rawClient, ok := conn.HTTP.(*http.Client)
+	require.True(t, ok)
+
+	_, _ = rawClient.Transport.RoundTrip(req)
+	require.Contains(t, req.Header.Get("User-Agent"), "Elastic-testbeat-Managed")
+
 }
 
 func BenchmarkExecHTTPRequest(b *testing.B) {
