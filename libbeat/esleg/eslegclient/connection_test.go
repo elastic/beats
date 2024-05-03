@@ -129,7 +129,12 @@ func TestUserAgentHeader(t *testing.T) {
 
 	// don't want to check the error, since the URL doesn't exist, so we'll always return an error.
 	resp, _ := rawClient.Transport.RoundTrip(req)
-	resp.Body.Close()
+	// just to make linter happy, there's no body
+	if resp.Body != nil {
+		resp.Body.Close()
+	}
+
+	// the `RoundTrip` will set the header in our request
 	require.Contains(t, req.Header.Get("User-Agent"), "Elastic-testbeat-Agent")
 
 }
