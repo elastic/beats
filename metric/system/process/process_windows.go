@@ -20,6 +20,7 @@ package process
 import (
 	"errors"
 	"fmt"
+	"os"
 	"path/filepath"
 	"syscall"
 	"unsafe"
@@ -48,6 +49,12 @@ func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 	}
 
 	return procMap, plist, nil
+}
+
+// GetSelfPid is the darwin implementation; see the linux version in
+// process_linux_common.go for more context.
+func GetSelfPid(hostfs resolve.Resolver) (int, error) {
+	return os.Getpid(), nil
 }
 
 // GetInfoForPid returns basic info for the process
@@ -87,7 +94,9 @@ func FetchNumThreads(pid int) (int, error) {
 	if err != nil {
 		return 0, fmt.Errorf("OpenProcess failed for PID %d: %w", pid, err)
 	}
-	defer syscall.CloseHandle(targetProcessHandle)
+	defer func() {
+		_ = syscall.CloseHandle(targetProcessHandle)
+	}()
 
 	currentProcessHandle, err := syscall.GetCurrentProcess()
 	if err != nil {
@@ -96,7 +105,9 @@ func FetchNumThreads(pid int) (int, error) {
 	// The pseudo handle need not be closed when it is no longer
 	// needed, calling CloseHandle has no effect.  Adding here to
 	// remind us to close any handles we open.
-	defer syscall.CloseHandle(currentProcessHandle)
+	defer func() {
+		_ = syscall.CloseHandle(currentProcessHandle)
+	}()
 
 	var snapshotHandle syscall.Handle
 	err = PssCaptureSnapshot(targetProcessHandle, PSSCaptureThreads, 0, &snapshotHandle)

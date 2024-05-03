@@ -30,7 +30,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/dev-tools/systemtests"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
-	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
 // ======================================== NOTE:
@@ -43,11 +42,9 @@ func TestContainerMonitoringFromInsideContainer(t *testing.T) {
 	testStats := Stats{CPUTicks: true,
 		EnableCgroups: true,
 		EnableNetwork: false,
-		// TODO: These should use DockerTestResolver,
-		// once https://github.com/elastic/elastic-agent-system-metrics/issues/147 is merged
-		Hostfs:     resolve.NewTestResolver(""),
-		Procs:      []string{".*"},
-		CgroupOpts: cgroup.ReaderOptions{RootfsMountpoint: resolve.NewTestResolver("")},
+		Hostfs:        systemtests.DockerTestResolver(),
+		Procs:         []string{".*"},
+		CgroupOpts:    cgroup.ReaderOptions{RootfsMountpoint: systemtests.DockerTestResolver()},
 	}
 	err := testStats.Init()
 	require.NoError(t, err)
@@ -62,6 +59,32 @@ func TestContainerMonitoringFromInsideContainer(t *testing.T) {
 
 	require.NotEmpty(t, stats.Cmdline)
 	require.NotEmpty(t, stats.Username)
+	require.NotZero(t, stats.Pid)
+}
+
+func TestSelfMonitoringFromInsideContainer(t *testing.T) {
+	_ = logp.DevelopmentSetup()
+
+	testStats := Stats{CPUTicks: true,
+		EnableCgroups: true,
+		EnableNetwork: false,
+		Procs:         []string{".*"},
+		CgroupOpts:    cgroup.ReaderOptions{},
+	}
+	err := testStats.Init()
+	require.NoError(t, err)
+
+	stats, err := testStats.GetSelf()
+	require.NoError(t, err)
+	if runtime.GOOS == "linux" {
+		cgstats, err := stats.Cgroup.Format()
+		require.NoError(t, err)
+		require.NotEmpty(t, cgstats)
+	}
+
+	require.NotEmpty(t, stats.Cmdline)
+	require.NotEmpty(t, stats.Username)
+	require.NotZero(t, stats.Pid)
 }
 
 func TestSystemHostFromContainer(t *testing.T) {

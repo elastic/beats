@@ -36,6 +36,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"os"
 	"os/user"
 	"strconv"
 	"syscall"
@@ -46,6 +47,12 @@ import (
 	"github.com/elastic/elastic-agent-libs/opt"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
+
+// GetSelfPid is the darwin implementation; see the linux version in
+// process_linux_common.go for more context.
+func GetSelfPid(hostfs resolve.Resolver) (int, error) {
+	return os.Getpid(), nil
+}
 
 // FetchPids returns a map and array of pids
 func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {

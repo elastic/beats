@@ -43,6 +43,31 @@ var bootTime uint64 = 0
 // system tick multiplier, see C.sysconf(C._SC_CLK_TCK)
 const ticks = 100
 
+// GetSelfPid returns the process we're running as.
+// for cases of self-monitoring this requires some actual thought;
+// if we use os.Getpid() and we're running inside a container, that PID will
+// only be valid inside the container, and an attempt to fetch metrics from
+// `/hostfs/proc/` for that pid will fail. If we're using a hostfs, revert to _that_ for fetching the pid metrics.
+func GetSelfPid(hostfs resolve.Resolver) (int, error) {
+	if !hostfs.IsSet() {
+		return os.Getpid(), nil
+	}
+
+	statRaw, err := os.ReadFile(hostfs.ResolveHostFS("/proc/self/stat"))
+	if err != nil {
+		return 0, fmt.Errorf("error reading from self/stat while searching for our PID in a container: %w", err)
+	}
+
+	parts := strings.Split(string(statRaw), " ")
+	pidRaw := parts[0]
+	pid, err := strconv.ParseInt(pidRaw, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("error parsing int from `stat` while searching for our pid in a container: %w", err)
+	}
+	return int(pid), nil
+
+}
+
 // FetchPids is the linux implementation of FetchPids
 func (procStats *Stats) FetchPids() (ProcsMap, []ProcState, error) {
 	dir, err := os.Open(procStats.Hostfs.ResolveHostFS("proc"))

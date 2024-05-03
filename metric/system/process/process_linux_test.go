@@ -64,6 +64,16 @@ func TestFetchOtherProcessCgroup(t *testing.T) {
 	t.Logf("Got %d events", len(evts))
 }
 
+func TestGetSelfPidNoHostfs(t *testing.T) {
+	ourPid := os.Getpid()
+
+	foundPid, err := GetSelfPid(resolve.NewTestResolver(""))
+	require.NoError(t, err)
+
+	require.Equal(t, ourPid, foundPid)
+
+}
+
 func TestFetchProcessFromOtherUser(t *testing.T) {
 	_ = logp.DevelopmentSetup()
 	// If we just used Get() or FetchPids() to get a list of processes on the system, this would produce a bootstrapping problem

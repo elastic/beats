@@ -23,7 +23,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"sort"
 	"strings"
 	"time"
@@ -152,8 +151,15 @@ func (procStats *Stats) GetOne(pid int) (mapstr.M, error) {
 }
 
 // GetSelf gets process info for the beat itself
+// Be advised that if you call this method on a Stats object that was created with an alternate
+// `Hostfs` setting, this method will return data for that pid as it exists on that hostfs.
+// For example, if called from inside a container with a `hostfs` path for the container host,
+// the PID in the ProcState object will be the PID as the host sees it.
 func (procStats *Stats) GetSelf() (ProcState, error) {
-	self := os.Getpid()
+	self, err := GetSelfPid(procStats.Hostfs)
+	if err != nil {
+		return ProcState{}, fmt.Errorf("error finding PID: %w", err)
+	}
 
 	pidStat, _, err := procStats.pidFill(self, false)
 	if err != nil {
@@ -161,6 +167,7 @@ func (procStats *Stats) GetSelf() (ProcState, error) {
 	}
 
 	procStats.ProcsMap.SetPid(self, pidStat)
+
 	return pidStat, nil
 }
 
@@ -210,7 +217,7 @@ func (c NonFatalErr) Is(other error) bool {
 // pidFill is an entrypoint used by OS-specific code to fill out a pid.
 // This in turn calls various OS-specific code to fill out the various bits of PID data
 // This is done to minimize the code duplication between different OS implementations
-// The second return value will only be false if an event has been filtered out
+// The second return value will only be false if an event has been filtered out.
 func (procStats *Stats) pidFill(pid int, filter bool) (ProcState, bool, error) {
 	// Fetch proc state so we can get the name for filtering based on user's filter.
 
