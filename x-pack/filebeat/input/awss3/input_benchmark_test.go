@@ -208,10 +208,9 @@ file_selectors:
 
 func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
+		var err error
 		pipeline := &fakePipeline{}
 
-		//s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, conf.FileSelectors, backupConfig{})
-		//sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, pipeline, s3EventHandlerFactory)
 		conf := makeBenchmarkConfig(t)
 		conf.MaxNumberOfMessages = maxMessagesInflight
 		sqsReader := newSQSReaderInput(conf, aws.Config{})
@@ -219,9 +218,6 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), maxMessagesInflight)
 		sqsReader.sqs = newConstantSQS()
 		sqsReader.s3 = newConstantS3(t)
-		//sqsReader.msgHandler = sqsMessageHandler
-
-		var err error
 		sqsReader.msgHandler, err = sqsReader.createEventProcessor(pipeline)
 		require.NoError(t, err, "createEventProcessor must succeed")
 
