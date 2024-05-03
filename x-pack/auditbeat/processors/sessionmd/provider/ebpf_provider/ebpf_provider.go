@@ -9,6 +9,7 @@ package ebpf_provider
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/ebpf"
@@ -151,7 +152,80 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 	return &p, nil
 }
 
-func (s prvdr) UpdateDB(ev *beat.Event) error {
-	// no-op for ebpf, DB is updated from pushed ebpf events
-	return nil
+const (
+	maxWaitLimit      = 200 * time.Millisecond // Maximum time UpdateDB will wait for process
+	combinedWaitLimit = 2 * time.Second        // Multiple UpdateDB calls will wait up to this amount within resetDuration
+	backoffDuration   = 10 * time.Second       // UpdateDB will stop waiting for processes for this time
+	resetDuration     = 5 * time.Second        // After this amount of times with no backoffs, the combinedWait will be reset
+)
+
+var (
+	combinedWait   = 0 * time.Millisecond
+	inBackoff      = false
+	backoffStart   = time.Now()
+	since          = time.Now()
+	backoffSkipped = 0
+)
+
+// With ebpf, process events are pushed to the DB by the above goroutine, so this doesn't actually update the DB.
+// It does to try sync the processor and ebpf events, so that the process is in the process db before continuing.
+//
+// It's possible that the event to enrich arrives before the process is inserted into the DB. In that case, this
+// will block continuing the enrichment until the process is seen (or the timeout is reached).
+//
+// If for some reason a lot of time has been spent waiting for missing processes, this also has a backoff timer during
+// which it will continue without waiting for missing events to arrive, so the processor doesn't become overly backed-up
+// waiting for these processes, at the cost of possibly not enriching some processes.
+func (s prvdr) UpdateDB(ev *beat.Event, pid uint32) error {
+	if s.db.HasProcess(pid) {
+		return nil
+	}
+
+	now := time.Now()
+	if inBackoff {
+		if now.Sub(backoffStart) > backoffDuration {
+			s.logger.Warnf("ended backoff, skipped %d processes", backoffSkipped)
+			inBackoff = false
+			combinedWait = 0 * time.Millisecond
+		} else {
+			backoffSkipped += 1
+			return nil
+		}
+	} else {
+		if combinedWait > combinedWaitLimit {
+			s.logger.Warn("starting backoff")
+			inBackoff = true
+			backoffStart = now
+			backoffSkipped = 0
+			return nil
+		}
+		// maintain a moving window of time for the delays we track
+		if now.Sub(since) > resetDuration {
+			since = now
+			combinedWait = 0 * time.Millisecond
+		}
+	}
+
+	start := now
+	nextWait := 5 * time.Millisecond
+	for {
+		waited := time.Since(start)
+		if s.db.HasProcess(pid) {
+			s.logger.Debugf("got process that was missing after %v", waited)
+			combinedWait = combinedWait + waited
+			return nil
+		}
+		if waited >= maxWaitLimit {
+			e := fmt.Errorf("process %v was not seen after %v", pid, waited)
+			s.logger.Warnf("%w", e)
+			combinedWait = combinedWait + waited
+			return e
+		}
+		time.Sleep(nextWait)
+		if nextWait*2+waited > maxWaitLimit {
+			nextWait = maxWaitLimit - waited
+		} else {
+			nextWait = nextWait * 2
+		}
+	}
 }

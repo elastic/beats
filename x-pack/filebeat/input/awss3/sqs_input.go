@@ -82,12 +82,13 @@ func (in *sqsReaderInput) setup(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
-	detectedRegion := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
+	in.detectedRegion = getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint)
 	if in.config.RegionName != "" {
 		in.awsConfig.Region = in.config.RegionName
-	} else if detectedRegion == "" {
-		// Only report an error if we don't have a configured region
-		// to fall back on.
+	} else if in.detectedRegion != "" {
+		in.awsConfig.Region = in.detectedRegion
+	} else {
+		// If we can't get a region from the config or the URL, return an error.
 		return fmt.Errorf("failed to get AWS region from queue_url: %w", errBadQueueURL)
 	}
 
@@ -127,7 +128,9 @@ func (in *sqsReaderInput) setup(
 // Release internal resources created during setup (currently just metrics).
 // This is its own function so tests can handle the run loop in isolation.
 func (in *sqsReaderInput) cleanup() {
-	in.metrics.Close()
+	if in.metrics != nil {
+		in.metrics.Close()
+	}
 }
 
 // Create the main goroutines for the input (workers, message count monitor)
