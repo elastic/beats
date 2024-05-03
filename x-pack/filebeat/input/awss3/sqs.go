@@ -108,7 +108,8 @@ func (mcm messageCountMonitor) run(ctx context.Context) {
 	}
 }
 
-// updateMessageCount runs GetApproximateMessageCount for the given context and updates the receiver metric with the count returning false on no error
+// updateMessageCount runs GetApproximateMessageCount and updates the
+// sqsMessagesWaiting metric with the result.
 // If there is an error, the metric is reinitialized to -1 and true is returned
 func (mcm messageCountMonitor) updateMessageCount(ctx context.Context) error {
 	count, err := mcm.getApproximateMessageCount(ctx)
@@ -118,6 +119,7 @@ func (mcm messageCountMonitor) updateMessageCount(ctx context.Context) error {
 	return err
 }
 
+// Query the approximate message count for the queue via the SQS API.
 func (mcm messageCountMonitor) getApproximateMessageCount(ctx context.Context) (int, error) {
 	attributes, err := mcm.sqs.GetQueueAttributes(ctx, []types.QueueAttributeName{sqsApproximateNumberOfMessages})
 	if err == nil {
