@@ -192,8 +192,8 @@ func (in *sqsReaderInput) workerLoop(ctx context.Context) {
 }
 
 func (in *sqsReaderInput) startWorkers(ctx context.Context) {
-	// Start the worker goroutines that will process messages from workChan
-	// until the input shuts down.
+	// Start the worker goroutines that will fetch messages via workRequestChan
+	// and workResponseChan until the input shuts down.
 	for i := 0; i < in.config.MaxNumberOfMessages; i++ {
 		in.workerWg.Add(1)
 		go func() {

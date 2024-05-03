@@ -39,7 +39,7 @@ type s3PollerInput struct {
 	states          *states
 }
 
-// s3FetchTask contains metadata for one S3 object that a worker should fech.
+// s3FetchTask contains metadata for one S3 object that a worker should fetch.
 type s3FetchTask struct {
 	s3ObjectHandler s3ObjectHandler
 	objectState     state
