@@ -313,6 +313,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		}()
 
 		config := makeBenchmarkConfig(t)
+		config.NumberOfWorkers = numberOfWorkers
 
 		b.ResetTimer()
 		start := time.Now()

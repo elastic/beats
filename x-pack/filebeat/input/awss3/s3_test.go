@@ -143,6 +143,7 @@ func TestS3Poller(t *testing.T) {
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
+			metrics:         newInputMetrics("", nil, 0),
 		}
 		poller.runPoll(ctx)
 	})
@@ -158,36 +159,36 @@ func TestS3Poller(t *testing.T) {
 
 		ctrl, ctx := gomock.WithContext(ctx, t)
 		defer ctrl.Finish()
-		mockAPI := NewMockS3API(ctrl)
-		mockPagerFirst := NewMockS3Pager(ctrl)
-		mockPagerSecond := NewMockS3Pager(ctrl)
+		mockS3 := NewMockS3API(ctrl)
+		mockErrorPager := NewMockS3Pager(ctrl)
+		mockSuccessPager := NewMockS3Pager(ctrl)
 		mockPublisher := NewMockBeatClient(ctrl)
 
 		gomock.InOrder(
 			// Initial ListObjectPaginator gets an error.
-			mockAPI.EXPECT().
+			mockS3.EXPECT().
 				ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq("key")).
 				Times(1).
 				DoAndReturn(func(_, _ string) s3Pager {
-					return mockPagerFirst
+					return mockErrorPager
 				}),
 			// After waiting for pollInterval, it retries.
-			mockAPI.EXPECT().
+			mockS3.EXPECT().
 				ListObjectsPaginator(gomock.Eq(bucket), gomock.Eq("key")).
 				Times(1).
 				DoAndReturn(func(_, _ string) s3Pager {
-					return mockPagerSecond
+					return mockSuccessPager
 				}),
 		)
 
 		// Initial Next gets an error.
-		mockPagerFirst.EXPECT().
+		mockErrorPager.EXPECT().
 			HasMorePages().
 			Times(2).
 			DoAndReturn(func() bool {
 				return true
 			})
-		mockPagerFirst.EXPECT().
+		mockErrorPager.EXPECT().
 			NextPage(gomock.Any()).
 			Times(2).
 			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
@@ -195,13 +196,13 @@ func TestS3Poller(t *testing.T) {
 			})
 
 		// After waiting for pollInterval, it retries.
-		mockPagerSecond.EXPECT().
+		mockSuccessPager.EXPECT().
 			HasMorePages().
 			Times(1).
 			DoAndReturn(func() bool {
 				return true
 			})
-		mockPagerSecond.EXPECT().
+		mockSuccessPager.EXPECT().
 			NextPage(gomock.Any()).
 			Times(1).
 			DoAndReturn(func(_ context.Context, optFns ...func(*s3.Options)) (*s3.ListObjectsV2Output, error) {
@@ -236,34 +237,34 @@ func TestS3Poller(t *testing.T) {
 				}, nil
 			})
 
-		mockPagerSecond.EXPECT().
+		mockSuccessPager.EXPECT().
 			HasMorePages().
 			Times(1).
 			DoAndReturn(func() bool {
 				return false
 			})
 
-		mockAPI.EXPECT().
+		mockS3.EXPECT().
 			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key1")).
 			Return(nil, errFakeConnectivityFailure)
 
-		mockAPI.EXPECT().
+		mockS3.EXPECT().
 			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key2")).
 			Return(nil, errFakeConnectivityFailure)
 
-		mockAPI.EXPECT().
+		mockS3.EXPECT().
 			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key3")).
 			Return(nil, errFakeConnectivityFailure)
 
-		mockAPI.EXPECT().
+		mockS3.EXPECT().
 			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key4")).
 			Return(nil, errFakeConnectivityFailure)
 
-		mockAPI.EXPECT().
+		mockS3.EXPECT().
 			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key5")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{})
+		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3, nil, backupConfig{})
 		states, err := newStates(nil, store)
 		require.NoError(t, err, "states creation must succeed")
 		poller := &s3PollerInput{
@@ -275,12 +276,13 @@ func TestS3Poller(t *testing.T) {
 				BucketListPrefix:   "key",
 				RegionName:         "region",
 			},
-			s3:              mockAPI,
+			s3:              mockS3,
 			client:          mockPublisher,
 			s3ObjectHandler: s3ObjProc,
 			states:          states,
 			provider:        "provider",
+			metrics:         newInputMetrics("", nil, 0),
 		}
-		poller.runPoll(ctx)
+		poller.run(ctx)
 	})
 }

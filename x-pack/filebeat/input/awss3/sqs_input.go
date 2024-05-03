@@ -146,7 +146,6 @@ func (in *sqsReaderInput) run(ctx context.Context) {
 		metrics: in.metrics,
 	}.run(ctx)
 
-	//fmt.Printf("hi fae: sqsReaderInput.run\n")
 	in.startWorkers(ctx)
 	in.readerLoop(ctx)
 
@@ -158,21 +157,16 @@ func (in *sqsReaderInput) readerLoop(ctx context.Context) {
 	// reader will try to fulfill
 	requestCount := 0
 	for ctx.Err() == nil {
-		//fmt.Printf("hi fae: readerLoop begin\n")
 		// Block to wait for more requests if requestCount is zero
 		requestCount += channelRequestCount(ctx, in.workRequestChan, requestCount == 0)
-		//fmt.Printf("hi fae: requestCount %v\n", requestCount)
 
 		msgs := readSQSMessages(ctx, in.log, in.sqs, in.metrics, requestCount)
-		//fmt.Printf("hi fae: got %v messages\n", len(msgs))
 
 		for _, msg := range msgs {
-			//fmt.Printf("hi fae, sending one message\n")
 			select {
 			case <-ctx.Done():
 				return
 			case in.workResponseChan <- msg:
-				//fmt.Printf("hi fae, message sent\n")
 				requestCount--
 			}
 		}
@@ -187,14 +181,12 @@ func (in *sqsReaderInput) workerLoop(ctx context.Context) {
 			// Shutting down
 			return
 		case in.workRequestChan <- struct{}{}:
-			//fmt.Printf("hi fae: sent work request\n")
 		}
 		// The request is sent, wait for a response
 		select {
 		case <-ctx.Done():
 			return
 		case msg := <-in.workResponseChan:
-			//fmt.Printf("hi fae: received work response\n")
 			start := time.Now()
 
 			id := in.metrics.beginSQSWorker()
