@@ -29,7 +29,7 @@
               ignore-tags-newer-than: 30
           - named-branches:
               - regex-name:
-                  regex: '7\.1[6789]'
+                  regex: '7\.1[7]'
                   case-sensitive: true
           - change-request:
               ignore-target-only-changes: true
