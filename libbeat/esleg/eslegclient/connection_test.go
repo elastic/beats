@@ -130,7 +130,7 @@ func TestUserAgentHeader(t *testing.T) {
 	// don't want to check the error, since the URL doesn't exist, so we'll always return an error.
 	resp, _ := rawClient.Transport.RoundTrip(req)
 	// just to make linter happy, there's no body
-	if resp.Body != nil {
+	if resp != nil {
 		resp.Body.Close()
 	}
 
