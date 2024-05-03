@@ -113,7 +113,7 @@ func TestHeaders(t *testing.T) {
 func TestUserAgentHeader(t *testing.T) {
 	// manually set cli to put beats into agent mode
 	_ = cfglib.SettingFlag(nil, "E", "Configuration overwrite")
-	flag.Set("E", "management.enabled=true")
+	_ = flag.Set("E", "management.enabled=true")
 	flag.Parse()
 
 	conn, err := NewConnection(ConnectionSettings{
@@ -128,7 +128,7 @@ func TestUserAgentHeader(t *testing.T) {
 	require.True(t, ok)
 
 	_, _ = rawClient.Transport.RoundTrip(req)
-	require.Contains(t, req.Header.Get("User-Agent"), "Elastic-testbeat-Managed")
+	require.Contains(t, req.Header.Get("User-Agent"), "Elastic-testbeat-Agent")
 
 }
 

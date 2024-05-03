@@ -137,7 +137,7 @@ func NewConnection(s ConnectionSettings) (*Connection, error) {
 		s.Beatname = "Libbeat"
 	}
 	if fleetmode.Enabled() {
-		s.Beatname = fmt.Sprintf("%s-Managed", s.Beatname)
+		s.Beatname = fmt.Sprintf("%s-Agent", s.Beatname)
 	}
 	userAgent := useragent.UserAgent(s.Beatname, version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
