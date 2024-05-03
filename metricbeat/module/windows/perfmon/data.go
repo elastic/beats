@@ -69,7 +69,9 @@ func (re *Reader) groupToEvents(counters map[string][]pdh.CounterValue) []mb.Eve
 			if _, ok := eventMap[eventKey]; !ok {
 				eventMap[eventKey] = &mb.Event{
 					MetricSetFields: mapstr.M{},
-					Error:           fmt.Errorf("failed on query=%v: %w", counterPath, val.Err.Error),
+				}
+				if val.Err.Error != nil {
+					eventMap[eventKey].Error = fmt.Errorf("failed on query=%v: %w", counterPath, val.Err.Error)
 				}
 				if val.Instance != "" {
 					// will ignore instance index
