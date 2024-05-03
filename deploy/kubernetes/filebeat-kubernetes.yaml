@@ -64,7 +64,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: filebeat
-        image: docker.elastic.co/beats/filebeat:7.17.20
+        image: docker.elastic.co/beats/filebeat:7.17.21
         args: [
           "-c", "/etc/filebeat.yml",
           "-e",

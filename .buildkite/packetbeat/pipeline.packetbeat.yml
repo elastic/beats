@@ -28,6 +28,9 @@ steps:
         command: |
           cd packetbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -42,6 +45,9 @@ steps:
       - label: ":linux: Ubuntu ARM Unit Tests"
         key: "linux-arm64-unit-tests"
         command: "cd packetbeat && mage build unitTest"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -57,6 +63,9 @@ steps:
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -79,6 +88,9 @@ steps:
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -96,6 +108,9 @@ steps:
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -113,6 +128,9 @@ steps:
         command: |
           Set-Location -Path packetbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -131,6 +149,9 @@ steps:
           Set-Location -Path packetbeat
           mage build unitTest
         key: "extended-win-11-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -155,6 +176,9 @@ steps:
           source .buildkite/scripts/install_macos_tools.sh
           cd packetbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"

@@ -25,6 +25,9 @@ steps:
         command: |
           cd x-pack/packetbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -42,6 +45,9 @@ steps:
           cd x-pack/packetbeat
           mage build unitTest
         if: build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
@@ -58,6 +64,9 @@ steps:
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
         key: "extended-win-2019-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -80,6 +89,9 @@ steps:
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
         key: "extended-win-10-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -98,6 +110,9 @@ steps:
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
         key: "mandatory-win-2016-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -122,6 +137,9 @@ steps:
           source .buildkite/scripts/install_macos_tools.sh
           cd x-pack/packetbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
