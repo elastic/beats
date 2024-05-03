@@ -93,11 +93,8 @@ func (in *sqsReaderInput) setup(
 	}
 
 	in.sqs = &awsSQSAPI{
-		client: sqs.NewFromConfig(in.awsConfig, func(o *sqs.Options) {
-			if in.config.AWSConfig.FIPSEnabled {
-				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
-			}
-		}),
+		client: sqs.NewFromConfig(in.awsConfig, in.config.sqsConfigModifier),
+
 		queueURL:          in.config.QueueURL,
 		apiTimeout:        in.config.APITimeout,
 		visibilityTimeout: in.config.VisibilityTimeout,
@@ -105,12 +102,7 @@ func (in *sqsReaderInput) setup(
 	}
 
 	in.s3 = &awsS3API{
-		client: s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
-			if in.config.AWSConfig.FIPSEnabled {
-				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
-			}
-			o.UsePathStyle = in.config.PathStyle
-		}),
+		client: s3.NewFromConfig(in.awsConfig, in.config.s3ConfigModifier),
 	}
 
 	in.log = inputContext.Logger.With("queue_url", in.config.QueueURL)

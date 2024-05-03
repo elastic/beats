@@ -12,6 +12,7 @@ import (
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/aws/retry"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/sqs"
 	"github.com/dustin/go-humanize"
 
 	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
@@ -263,6 +264,12 @@ func (c config) s3ConfigModifier(o *s3.Options) {
 		// Recover quickly when requests start working again
 		so.NoRetryIncrement = 100
 	})
+}
+
+func (c config) sqsConfigModifier(o *sqs.Options) {
+	if c.AWSConfig.FIPSEnabled {
+		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+	}
 }
 
 func (c config) getFileSelectors() []fileSelectorConfig {
