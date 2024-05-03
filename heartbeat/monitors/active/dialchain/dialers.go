@@ -101,7 +101,7 @@ func CreateNetDialer(timeout time.Duration) NetDialer {
 			dialer := &net.Dialer{Timeout: timeout}
 
 			start := time.Now()
-			conn, err := transport.DialWith(context.TODO(), dialer, network, host, addresses, port)
+			conn, err := transport.DialWith(ctx, dialer, network, host, addresses, port)
 			if err != nil {
 				return nil, ecserr.NewCouldNotConnectErr(host, port, err)
 			}
