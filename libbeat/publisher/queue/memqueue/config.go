@@ -22,12 +22,13 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/elastic/beats/v7/libbeat/common/cfgtype"
 	c "github.com/elastic/elastic-agent-libs/config"
 )
 
 type config struct {
-	Events int `config:"events" validate:"min=32"`
-	Bytes  int `config:"bytes" validate:"min=32768"`
+	Events *int              `config:"events" validate:"min=32"`
+	Bytes  *cfgtype.ByteSize `config:"bytes"`
 
 	// This field is named MaxGetEvents because its logical effect is to give
 	// a maximum on the number of events a Get request can return, but the
@@ -38,32 +39,52 @@ type config struct {
 	FlushTimeout time.Duration `config:"flush.timeout"`
 }
 
-var defaultConfig = config{
-	Events:       3200,
-	MaxGetEvents: 1600,
-	FlushTimeout: 10 * time.Second,
-}
+const minQueueBytes = 32768
+const minQueueEvents = 32
 
 func (c *config) Validate() error {
-	if c.MaxGetEvents > c.Events {
-		return errors.New("flush.min_events must be less events")
+	if c.Bytes != nil && *c.Bytes < minQueueBytes {
+		return errors.New(fmt.Sprintf("queue byte size must be at least %v", minQueueBytes))
+	}
+	if c.Events != nil && *c.Events < minQueueEvents {
+		return errors.New(fmt.Sprintf("queue event size must be at least %v", minQueueEvents))
+	}
+	if c.Events == nil && c.Bytes == nil {
+		return errors.New("queue must have an event limit or a byte limit")
+	}
+	if c.Events != nil && c.MaxGetEvents > *c.Events {
+		return errors.New("flush.min_events must be less than events")
 	}
 	return nil
+}
+
+var defaultConfig = config{
+	MaxGetEvents: 1600,
+	FlushTimeout: 10 * time.Second,
 }
 
 // SettingsForUserConfig unpacks a ucfg config from a Beats queue
 // configuration and returns the equivalent memqueue.Settings object.
 func SettingsForUserConfig(cfg *c.C) (Settings, error) {
-	config := defaultConfig
+	var config config
 	if cfg != nil {
 		if err := cfg.Unpack(&config); err != nil {
 			return Settings{}, fmt.Errorf("couldn't unpack memory queue config: %w", err)
 		}
 	}
-	//nolint:gosimple // Actually want this conversion to be explicit since the types aren't definitionally equal.
-	return Settings{
-		Events:        config.Events,
+	result := Settings{
 		MaxGetRequest: config.MaxGetEvents,
 		FlushTimeout:  config.FlushTimeout,
-	}, nil
+	}
+	if config.Events != nil {
+		result.Events = *config.Events
+	}
+	if config.Bytes != nil {
+		result.Bytes = int(*config.Bytes)
+	}
+	// If no size constraint was given, fall back on the default event cap
+	if config.Events == nil && config.Bytes == nil {
+		result.Events = 3200
+	}
+	return result, nil
 }

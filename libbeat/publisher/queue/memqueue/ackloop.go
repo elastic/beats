@@ -122,7 +122,7 @@ func (l *ackLoop) processACK(lst batchList, N int) {
 		// Traverse entries from last to first, so we can acknowledge the most recent
 		// ones first and skip subsequent producer callbacks.
 		for i := batch.count - 1; i >= 0; i-- {
-			entry := batch.mutableEntry(i)
+			entry := batch.entry(i)
 			if entry.producer == nil {
 				continue
 			}

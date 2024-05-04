@@ -54,11 +54,12 @@ func (f *FIFO[T]) First() (T, error) {
 	return f.first.value, nil
 }
 
-// Remove the first entry in the queue, returning its value
-func (f *FIFO[T]) Get() (T, error) {
-	result, err := f.First()
+// Remove the first entry in the queue. Does nothing if the FIFO is empty.
+func (f *FIFO[T]) Remove() {
 	if f.first != nil {
 		f.first = f.first.next
+		if f.first == nil {
+			f.last = nil
+		}
 	}
-	return result, err
 }

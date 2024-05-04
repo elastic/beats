@@ -29,21 +29,31 @@ import (
 type runLoop struct {
 	broker *broker
 
-	// The index of the beginning of the current ring buffer within its backing
-	// array. If the queue isn't empty, bufPos points to the oldest remaining
-	// event.
-	bufPos entryIndex
+	// The buffer backing the queue. Don't access its internal array directly,
+	// use an entryIndex: buf.entry(entryIndex) returns a pointer to the target
+	// entry within the buffer.
+	// Accessing this way handles the modular arithmetic to convert entry index
+	// to buffer index, in a way that's compatible with dynamically growing the
+	// underlying array (which is important when the queue has no maximum event
+	// count).
+	buf circularBuffer
 
-	// The total number of events in the queue.
+	// The index of the oldest entry in the underlying circular buffer.
+	bufferStart entryIndex
+
+	// The current number of events in the queue.
 	eventCount int
 
-	// The total number of bytes in the queue
+	// The current number of bytes in the queue.
 	byteCount int
 
 	// The number of consumed events waiting for acknowledgment. The next Get
-	// request will return events starting at position
-	// (bufPos + consumedEventCount) % len(buf).
+	// request will return events starting at index
+	// bufferStart.plus(consumedEventCount).
 	consumedEventCount int
+
+	// The number of event bytes in the queue corresponding to consumed events.
+	consumedByteCount int
 
 	// The list of batches that have been consumed and are waiting to be sent
 	// to ackLoop for acknowledgment handling. (This list doesn't contain all
@@ -56,13 +66,15 @@ type runLoop struct {
 	pendingPushRequests fifo.FIFO[pushRequest]
 
 	// If there aren't enough events ready to fill an incoming get request,
-	// the queue may block based on its flush settings. When this happens,
-	// pendingGetRequest stores the request until we're ready to handle it.
+	// the request may block based on the queue flush settings. When this
+	// happens, pendingGetRequest stores the request until we can handle it.
 	pendingGetRequest *getRequest
 
-	// This timer tracks the configured flush timeout when we will respond
-	// to a pending getRequest even if we can't fill the requested event count.
-	// It is active if and only if pendingGetRequest is non-nil.
+	// When a get request is blocked because the queue doesn't have enough
+	// events, getTimer stores the flush timer. When it expires, the queue
+	// will respond to the request even if the requested number of events
+	// and/or bytes is not available.
+	// getTimer is active if and only if pendingGetRequest is non-nil.
 	getTimer *time.Timer
 }
 
@@ -77,9 +89,18 @@ func newRunLoop(broker *broker) *runLoop {
 			<-timer.C
 		}
 	}
+
+	eventBufSize := broker.settings.Events
+	if eventBufSize <= 0 {
+		// The queue is using byte limits, start with a buffer of 2^10 and
+		// we will expand it as needed.
+		eventBufSize = 1 << 10
+	}
+
 	return &runLoop{
 		broker:   broker,
 		getTimer: timer,
+		buf:      newCircularBuffer(eventBufSize),
 	}
 }
 
@@ -87,21 +108,6 @@ func (l *runLoop) run() {
 	for l.broker.ctx.Err() == nil {
 		l.runIteration()
 	}
-}
-
-// Returns true if the given push request can be added to the queue
-// without exceeding entry count or byte limits
-func (l *runLoop) canFitPushRequest(req pushRequest) bool {
-	maxEvents := l.broker.settings.Events
-	maxBytes := l.broker.settings.Bytes
-
-	newEventCount := l.eventCount + 1
-	newByteCount := l.byteCount + req.eventSize
-
-	eventCountFits := maxEvents <= 0 || newEventCount <= maxEvents
-	byteCountFits := maxBytes <= 0 || newByteCount <= maxBytes
-
-	return eventCountFits && byteCountFits
 }
 
 // Perform one iteration of the queue's main run loop. Broken out into a
@@ -132,7 +138,7 @@ func (l *runLoop) runIteration() {
 		return
 
 	case req := <-l.broker.pushChan: // producer pushing new event
-		l.handleInsert(req)
+		l.handlePushRequest(req)
 
 	case req := <-l.broker.cancelChan: // producer cancelling active events
 		l.handleCancel(&req)
@@ -163,7 +169,7 @@ func (l *runLoop) handleGetRequest(req *getRequest) {
 	// Backwards compatibility: if all byte parameters are <= 0, get requests
 	// are capped by settings.MaxGetRequest.
 	if req.byteCount <= 0 && l.broker.settings.Bytes <= 0 {
-		if req.entryCount <= 0 || req.entryCount > l.broker.settings.MaxGetRequest {
+		if req.entryCount > l.broker.settings.MaxGetRequest {
 			req.entryCount = l.broker.settings.MaxGetRequest
 		}
 	}
@@ -181,46 +187,84 @@ func (l *runLoop) getRequestShouldBlock(req *getRequest) bool {
 		// Never block if the flush timeout isn't positive
 		return false
 	}
-	eventsAvailable := l.eventCount - l.consumedEventCount
-	// Block if the available events aren't enough to fill the request
-	return eventsAvailable < req.entryCount
+	availableEntries := l.eventCount - l.consumedEventCount
+	availableBytes := l.byteCount - l.consumedByteCount
+
+	// The entry/byte limits are satisfied if they are <= 0 (indicating no
+	// limit) or if we have at least the requested number available.
+	entriesSatisfied := req.entryCount <= 0 || availableEntries >= req.entryCount
+	bytesSatisfied := req.byteCount <= 0 || availableBytes >= req.byteCount
+
+	// Block if there are neither enough entries nor enough bytes to fill
+	// the request.
+	return !entriesSatisfied && !bytesSatisfied
 }
 
 // Respond to the given get request without blocking or waiting for more events
 func (l *runLoop) handleGetReply(req *getRequest) {
-	eventsAvailable := l.eventCount - l.consumedEventCount
-	batchSize := req.entryCount
-	if eventsAvailable < batchSize {
-		batchSize = eventsAvailable
+	entriesAvailable := l.eventCount - l.consumedEventCount
+	// backwards compatibility: if all byte bounds are <= 0 then batch size
+	// can't be more than settings.MaxGetRequest.
+	if req.byteCount <= 0 && l.broker.settings.Bytes <= 0 {
+		if entriesAvailable > l.broker.settings.MaxGetRequest {
+			entriesAvailable = l.broker.settings.MaxGetRequest
+		}
+	}
+	startIndex := l.bufferStart.plus(l.consumedEventCount)
+	batchEntryCount := 0
+	batchByteCount := 0
+
+	for i := 0; i < entriesAvailable; i++ {
+		if req.entryCount > 0 && batchEntryCount+1 > req.entryCount {
+			// This would push us over the requested event limit, stop here.
+			break
+		}
+		eventSize := l.buf.entry(startIndex.plus(batchEntryCount)).eventSize
+		// Don't apply size checks on the first event: if a single event is
+		// larger than the configured batch maximum, we'll still try to send it,
+		// we'll just do it in a "batch" of one event.
+		if i > 0 && req.byteCount > 0 && batchByteCount+eventSize > req.byteCount {
+			// This would push us over the requested byte limit, stop here.
+			break
+		}
+		batchEntryCount++
+		batchByteCount += eventSize
 	}
 
-	startIndex := l.bufPos.plus(l.consumedEventCount)
-	batch := newBatch(l.broker, startIndex, batchSize)
+	batch := newBatch(l.buf, startIndex, batchEntryCount)
 
 	// Send the batch to the caller and update internal state
 	req.responseChan <- batch
 	l.consumedBatches.append(batch)
-	l.consumedEventCount += batchSize
+	l.consumedEventCount += batchEntryCount
+	l.consumedByteCount += batchByteCount
 }
 
-func (l *runLoop) handleDelete(count int) {
+func (l *runLoop) handleDelete(deletedEntryCount int) {
 	// Advance position and counters. Event data was already cleared in
 	// batch.FreeEntries when the events were vended, so we just need to
 	// check the byte total being removed.
 	deletedByteCount := 0
-	for i := 0; i < count; i++ {
-		entryIndex := l.bufPos.plus(i)
-		entry := entryIndex.inBuffer(l.broker.buf)
-		deletedByteCount += entry.eventSize
+	for i := 0; i < deletedEntryCount; i++ {
+		entryIndex := l.bufferStart.plus(i)
+		deletedByteCount += l.buf.entry(entryIndex).eventSize
 	}
-	l.bufPos = l.bufPos.plus(count)
-	l.eventCount -= count
-	l.consumedEventCount -= count
+	l.bufferStart = l.bufferStart.plus(deletedEntryCount)
+	l.eventCount -= deletedEntryCount
 	l.byteCount -= deletedByteCount
+	l.consumedEventCount -= deletedEntryCount
+	l.consumedByteCount -= deletedByteCount
+
+	// We just freed up space in the queue, see if this unblocked any
+	// pending inserts.
+	l.maybeUnblockPushRequests()
 }
 
-func (l *runLoop) handleInsert(req pushRequest) {
-	if !l.canFitPushRequest(req) {
+func (l *runLoop) handlePushRequest(req pushRequest) {
+	// If other inserts are already pending, or we don't have enough room
+	// for the new entry, we need to either reject the request or block
+	// until we can handle it.
+	if !l.pendingPushRequests.Empty() || !l.canFitPushRequest(req) {
 		if req.blockIfFull {
 			// Add this request to the pending list to be handled when there's space.
 			l.pendingPushRequests.Add(req)
@@ -232,31 +276,48 @@ func (l *runLoop) handleInsert(req pushRequest) {
 		return
 	}
 	// There is space, insert the new event and report the result.
-	if l.insert(req) {
-		// Send back the new event id.
-		req.resp <- true
+	l.doInsert(req)
+}
 
-		l.eventCount++
-		l.byteCount += req.eventSize
+// Returns true if the given push request can be added to the queue
+// without exceeding entry count or byte limits
+func (l *runLoop) canFitPushRequest(req pushRequest) bool {
+	maxEvents := l.broker.settings.Events
+	maxBytes := l.broker.settings.Bytes
 
-		// See if this gave us enough for a new batch
-		l.maybeUnblockGetRequest()
-	}
+	newEventCount := l.eventCount + 1
+	newByteCount := l.byteCount + req.eventSize
+
+	eventCountFits := maxEvents <= 0 || newEventCount <= maxEvents
+	byteCountFits := maxBytes <= 0 || newByteCount <= maxBytes
+
+	return eventCountFits && byteCountFits
 }
 
 // Checks if we can handle pendingGetRequest yet, and handles it if so
 func (l *runLoop) maybeUnblockGetRequest() {
-	// If a get request is blocked waiting for more events, check if
-	// we should unblock it.
-	if getRequest := l.pendingGetRequest; getRequest != nil {
-		available := l.eventCount - l.consumedEventCount
-		if available >= getRequest.entryCount {
+	if l.pendingGetRequest != nil {
+		if !l.getRequestShouldBlock(l.pendingGetRequest) {
+			l.handleGetReply(l.pendingGetRequest)
 			l.pendingGetRequest = nil
 			if !l.getTimer.Stop() {
 				<-l.getTimer.C
 			}
-			l.handleGetReply(getRequest)
 		}
+	}
+}
+
+func (l *runLoop) maybeUnblockPushRequests() {
+	req, err := l.pendingPushRequests.First()
+	for err == nil {
+		if !l.canFitPushRequest(req) {
+			break
+		}
+		l.doInsert(req)
+		l.pendingPushRequests.Remove()
+
+		// Fetch the next request
+		req, err = l.pendingPushRequests.First()
 	}
 }
 
@@ -271,32 +332,51 @@ func (l *runLoop) maybeUnblockGetRequest() {
 // a queue with buffer size N, the entries stored in buf[0] will have
 // entry indices 0, N, 2*N, 3*N, ...
 func (l *runLoop) growEventBuffer() {
-
+	bufSize := l.buf.size()
+	newBuffer := newCircularBuffer(bufSize * 2)
+	// Copy the elements to the new buffer
+	for i := 0; i < bufSize; i++ {
+		index := l.bufferStart.plus(i)
+		*newBuffer.entry(index) = *l.buf.entry(index)
+	}
+	l.buf = newBuffer
 }
 
-// Returns true if the event was inserted, false if insertion was cancelled.
-func (l *runLoop) insert(req pushRequest) bool {
+// Insert the given new event without bounds checks, and report the result
+// to the caller via the push request's response channel.
+func (l *runLoop) doInsert(req pushRequest) {
 	// We reject events if their producer was cancelled before they reach
 	// the queue.
 	if req.producer != nil && req.producer.state.cancelled {
-		return false
+		// Report failure to the caller (this only happens if the producer is
+		// closed before we handle the insert request).
+		req.resp <- false
+		return
 	}
 
 	maxEvents := l.broker.settings.Events
-	if maxEvents <= 0 && l.eventCount >= len(l.broker.buf) {
-		// We are allowed to add this event, but we need to grow the queue buffer
-		// in order to do it.
+	// If there is no event limit, check if we need to grow the current queue
+	// buffer to fit the new event.
+	if maxEvents <= 0 && l.eventCount >= l.buf.size() {
 		l.growEventBuffer()
 	}
 
-	entryIndex := l.bufPos.plus(l.eventCount)
-	*entryIndex.inBuffer(l.broker.buf) = queueEntry{
+	entryIndex := l.bufferStart.plus(l.eventCount)
+	*l.buf.entry(entryIndex) = queueEntry{
 		event:      req.event,
 		eventSize:  req.eventSize,
 		producer:   req.producer,
 		producerID: req.producerID,
 	}
-	return true
+
+	// Report success to the caller
+	req.resp <- true
+
+	l.eventCount++
+	l.byteCount += req.eventSize
+
+	// See if this gave us enough for a new batch
+	l.maybeUnblockGetRequest()
 }
 
 func (l *runLoop) handleMetricsRequest(req *metricsRequest) {
@@ -312,12 +392,11 @@ func (l *runLoop) handleCancel(req *producerCancelRequest) {
 	// Traverse all unconsumed events in the buffer, removing any with
 	// the specified producer. As we go we condense all the remaining
 	// events to be sequential.
-	buf := l.broker.buf
-	startIndex := l.bufPos.plus(l.consumedEventCount)
+	startIndex := l.bufferStart.plus(l.consumedEventCount)
 	unconsumedEventCount := l.eventCount - l.consumedEventCount
 	for i := 0; i < unconsumedEventCount; i++ {
 		readIndex := startIndex.plus(i)
-		entry := readIndex.inBuffer(buf)
+		entry := *l.buf.entry(readIndex)
 		if entry.producer == req.producer {
 			// The producer matches, skip this event
 			removedCount++
@@ -326,9 +405,9 @@ func (l *runLoop) handleCancel(req *producerCancelRequest) {
 			// earlier indices that were removed.
 			// (Count backwards from (startIndex + i), not from readIndex, to avoid
 			// sign issues when the buffer wraps.)
-			writeIndex := startIndex.plus(i - removedCount)
-			if readIndex != writeIndex {
-				*writeIndex.inBuffer(buf) = *readIndex.inBuffer(buf)
+			if removedCount > 0 {
+				writeIndex := readIndex.plus(-removedCount)
+				*l.buf.entry(writeIndex) = entry
 			}
 		}
 	}
@@ -336,8 +415,8 @@ func (l *runLoop) handleCancel(req *producerCancelRequest) {
 	// Clear the event pointers at the end of the buffer so we don't keep
 	// old events in memory by accident.
 	for i := l.eventCount - removedCount; i < l.eventCount; i++ {
-		entryIndex := l.bufPos.plus(i)
-		entryIndex.inBuffer(buf).event = nil
+		entryIndex := l.bufferStart.plus(i)
+		l.buf.entry(entryIndex).event = nil
 	}
 
 	// Subtract removed events from the internal event count

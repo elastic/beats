@@ -47,10 +47,6 @@ type broker struct {
 	ctx       context.Context
 	ctxCancel context.CancelFunc
 
-	// The ring buffer backing the queue. All buffer positions should be taken
-	// modulo the size of this array.
-	buf []queueEntry
-
 	// wait group for queue workers (runLoop and ackLoop)
 	wg sync.WaitGroup
 
@@ -96,7 +92,8 @@ type broker struct {
 	///////////////////////////////
 	// internal goroutine state
 
-	// The goroutine that manages the queue's core run state
+	// The goroutine that manages the queue's core run state and owns its
+	// backing buffer.
 	runLoop *runLoop
 
 	// The goroutine that manages ack notifications and callbacks
@@ -106,7 +103,8 @@ type broker struct {
 type Settings struct {
 	// The number of events and bytes the queue can hold. <= zero means no limit.
 	// At least one must be greater than zero.
-	Events, Bytes int
+	Events int
+	Bytes  int
 
 	// The most events that will ever be returned from one Get request.
 	MaxGetRequest int
@@ -124,14 +122,11 @@ type queueEntry struct {
 	producerID producerID // The order of this entry within its producer
 }
 
-type entryIndex int
-
-func (ei entryIndex) plus(offset int) entryIndex {
-	return entryIndex(int(ei) + offset)
-}
-
 type batch struct {
-	queue *broker
+	// The queue buffer (at the time that this batch was generated --
+	// only the indices corresponding to this batch's events are guaranteed
+	// to be valid).
+	queueBuf circularBuffer
 
 	// Next batch in the containing batchList
 	next *batch
@@ -217,7 +212,7 @@ func newQueue(
 	}
 
 	// Can't request more than the full queue
-	if settings.MaxGetRequest > settings.Events {
+	if settings.Events > 0 && settings.MaxGetRequest > settings.Events {
 		settings.MaxGetRequest = settings.Events
 	}
 
@@ -228,8 +223,6 @@ func newQueue(
 	b := &broker{
 		settings: settings,
 		logger:   logger,
-
-		buf: make([]queueEntry, settings.Events),
 
 		encoderFactory: encoderFactory,
 
@@ -264,7 +257,7 @@ func (b *broker) QueueType() string {
 
 func (b *broker) BufferConfig() queue.BufferConfig {
 	return queue.BufferConfig{
-		MaxEvents: len(b.buf),
+		MaxEvents: b.settings.Events,
 	}
 }
 
@@ -305,8 +298,9 @@ func (b *broker) Metrics() (queue.Metrics, error) {
 	resp := <-responseChan
 
 	return queue.Metrics{
-		EventCount:            opt.UintWith(uint64(resp.currentQueueSize)),
-		EventLimit:            opt.UintWith(uint64(len(b.buf))),
+		EventCount: opt.UintWith(uint64(resp.currentQueueSize)),
+		// hi fae, this metric is sometimes inapplicable now:
+		EventLimit:            opt.UintWith(uint64(b.settings.Events)),
 		UnackedConsumedEvents: opt.UintWith(uint64(resp.occupiedRead)),
 	}, nil
 }
@@ -319,10 +313,10 @@ var batchPool = sync.Pool{
 	},
 }
 
-func newBatch(queue *broker, start entryIndex, count int) *batch {
+func newBatch(queueBuf circularBuffer, start entryIndex, count int) *batch {
 	batch := batchPool.Get().(*batch)
 	batch.next = nil
-	batch.queue = queue
+	batch.queueBuf = queueBuf
 	batch.start = start
 	batch.count = count
 	return batch
@@ -422,15 +416,14 @@ func (ei entryIndex) inBuffer(buf []queueEntry) *queueEntry {
 }
 
 // Return a pointer to the queueEntry for the i-th element of this batch
-func (b *batch) mutableEntry(i int) *queueEntry {
-	// Indexes wrap around the end of the queue buffer
+func (b *batch) entry(i int) *queueEntry {
 	entryIndex := b.start.plus(i)
-	return entryIndex.inBuffer(b.queue.buf)
+	return b.queueBuf.entry(entryIndex)
 }
 
 // Return the event referenced by the i-th element of this batch
 func (b *batch) Entry(i int) queue.Entry {
-	return b.mutableEntry(i).event
+	return b.entry(i).event
 }
 
 func (b *batch) FreeEntries() {
@@ -438,7 +431,7 @@ func (b *batch) FreeEntries() {
 	// safe to free from the queue buffer, so set all the event pointers to nil.
 	for i := 0; i < b.count; i++ {
 		index := b.start.plus(i)
-		entry := index.inBuffer(b.queue.buf)
+		entry := b.queueBuf.entry(index)
 		entry.event = nil
 	}
 }

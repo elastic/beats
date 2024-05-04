@@ -155,7 +155,7 @@ func loadOutput(
 			telemetry = monitors.Telemetry.NewRegistry("output")
 		}
 		monitoring.NewString(telemetry, "name").Set(outName)
-		monitoring.NewInt(telemetry, "batch_size").Set(int64(out.BatchSize))
+		monitoring.NewInt(telemetry, "batch_size").Set(int64(out.BatchEvents))
 		monitoring.NewInt(telemetry, "clients").Set(int64(len(out.Clients)))
 	}
 

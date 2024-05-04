@@ -336,8 +336,8 @@ func TestMonitoring(t *testing.T) {
 				})
 			}
 			return "output_name", outputs.Group{
-				BatchSize: batchSize,
-				Clients:   clients,
+				BatchEvents: batchSize,
+				Clients:     clients,
 			}, nil
 		},
 	)

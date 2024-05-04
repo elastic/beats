@@ -361,17 +361,19 @@ func TestBatchFreeEntries(t *testing.T) {
 	// Slight concurrency subtlety: we check events are non-nil after the queue
 	// reads, since if we do it before we have no way to be sure the insert
 	// has been completed.
+	queueBuf := testQueue.runLoop.buf
 	for i := 0; i < queueSize; i++ {
-		require.NotNil(t, testQueue.buf[i].event, "All queue events must be non-nil")
+		require.NotNil(t, queueBuf.entry(entryIndex(i)).event, "All queue events must be non-nil")
 	}
 	batch2.FreeEntries()
 	for i := 0; i < batchSize; i++ {
-		require.NotNilf(t, testQueue.buf[i].event, "Queue index %v: batch 1's events should be unaffected by calling FreeEntries on Batch 2", i)
-		require.Nilf(t, testQueue.buf[batchSize+i].event, "Queue index %v: batch 2's events should be nil after FreeEntries", batchSize+i)
+		entryIndex := entryIndex(i)
+		require.NotNilf(t, queueBuf.entry(entryIndex).event, "Queue index %v: batch 1's events should be unaffected by calling FreeEntries on Batch 2", i)
+		require.Nilf(t, queueBuf.entry(entryIndex.plus(batchSize)).event, "Queue index %v: batch 2's events should be nil after FreeEntries", batchSize+i)
 	}
 	batch1.FreeEntries()
 	for i := 0; i < queueSize; i++ {
-		require.Nilf(t, testQueue.buf[i].event, "Queue index %v: all events should be nil after calling FreeEntries on both batches")
+		require.Nilf(t, queueBuf.entry(entryIndex(i)).event, "Queue index %v: all events should be nil after calling FreeEntries on both batches")
 	}
 }
 

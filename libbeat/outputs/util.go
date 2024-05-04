@@ -35,7 +35,7 @@ func Fail(err error) (Group, error) { return Group{}, err }
 // instances.  The first argument is expected to contain a queue
 // config.Namespace.  The queue config is passed to assign the queue
 // factory when elastic-agent reloads the output.
-func Success(cfg config.Namespace, batchSize, retry int, encoderFactory queue.EncoderFactory, clients ...Client) (Group, error) {
+func Success(cfg config.Namespace, batchEvents, batchBytes, retry int, encoderFactory queue.EncoderFactory, clients ...Client) (Group, error) {
 	var q queue.QueueFactory
 	if cfg.IsSet() && cfg.Config().Enabled() {
 		switch cfg.Name() {
@@ -60,7 +60,8 @@ func Success(cfg config.Namespace, batchSize, retry int, encoderFactory queue.En
 	}
 	return Group{
 		Clients:        clients,
-		BatchSize:      batchSize,
+		BatchEvents:    batchEvents,
+		BatchBytes:     batchBytes,
 		Retry:          retry,
 		QueueFactory:   q,
 		EncoderFactory: encoderFactory,
@@ -80,12 +81,12 @@ func NetworkClients(netclients []NetworkClient) []Client {
 // The first argument is expected to contain a queue config.Namespace.
 // The queue config is passed to assign the queue factory when
 // elastic-agent reloads the output.
-func SuccessNet(cfg config.Namespace, loadbalance bool, batchSize, retry int, encoderFactory queue.EncoderFactory, netclients []NetworkClient) (Group, error) {
+func SuccessNet(cfg config.Namespace, loadbalance bool, batchEvents, batchBytes, retry int, encoderFactory queue.EncoderFactory, netclients []NetworkClient) (Group, error) {
 
 	if !loadbalance {
-		return Success(cfg, batchSize, retry, encoderFactory, NewFailoverClient(netclients))
+		return Success(cfg, batchEvents, batchBytes, retry, encoderFactory, NewFailoverClient(netclients))
 	}
 
 	clients := NetworkClients(netclients)
-	return Success(cfg, batchSize, retry, encoderFactory, clients...)
+	return Success(cfg, batchEvents, batchBytes, retry, encoderFactory, clients...)
 }

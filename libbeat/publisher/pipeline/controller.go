@@ -170,10 +170,11 @@ func (c *outputController) Set(outGrp outputs.Group) {
 	// Resume consumer targeting the new work queue
 	c.consumer.setTarget(
 		consumerTarget{
-			queue:      c.queue,
-			ch:         targetChan,
-			batchSize:  outGrp.BatchSize,
-			timeToLive: outGrp.Retry + 1,
+			queue:       c.queue,
+			ch:          targetChan,
+			batchEvents: outGrp.BatchEvents,
+			batchBytes:  outGrp.BatchBytes,
+			timeToLive:  outGrp.Retry + 1,
 		})
 }
 

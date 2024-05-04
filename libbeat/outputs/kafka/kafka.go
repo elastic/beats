@@ -84,7 +84,7 @@ func makeKafka(
 	if kConfig.MaxRetries < 0 {
 		retry = -1
 	}
-	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, retry, nil, client)
+	return outputs.Success(kConfig.Queue, kConfig.BulkMaxSize, 0, retry, nil, client)
 }
 
 // buildTopicSelector builds the topic selector for standalone Beat and when

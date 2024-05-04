@@ -165,9 +165,9 @@ func makeReporter(beat beat.Info, settings report.Settings, cfg *conf.C) (report
 		},
 		queueConfig,
 		outputs.Group{
-			Clients:   []outputs.Client{outClient},
-			BatchSize: windowSize,
-			Retry:     0, // no retry. Drop event on error.
+			Clients:     []outputs.Client{outClient},
+			BatchEvents: windowSize,
+			Retry:       0, // no retry. Drop event on error.
 		},
 		pipeline.Settings{
 			WaitClose:     0,
