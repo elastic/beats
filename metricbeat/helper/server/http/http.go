@@ -76,7 +76,7 @@ func getDefaultHttpServer(mb mb.BaseMetricSet) (*HttpServer, error) {
 		Addr: net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
 	}
 	if tlsConfig != nil {
-		httpServer.TLSConfig = tlsConfig.BuildModuleClientConfig(config.Host)
+		httpServer.TLSConfig = tlsConfig.BuildServerConfig(config.Host)
 	}
 	h.server = httpServer
 	return h, nil
