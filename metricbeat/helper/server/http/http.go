@@ -19,10 +19,11 @@ package http
 
 import (
 	"context"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/elastic/beats/v7/metricbeat/helper/server"
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -73,7 +74,8 @@ func getDefaultHttpServer(mb mb.BaseMetricSet) (*HttpServer, error) {
 	}
 
 	httpServer := &http.Server{
-		Addr: net.JoinHostPort(config.Host, strconv.Itoa(int(config.Port))),
+		Addr:              net.JoinHostPort(config.Host, strconv.Itoa(config.Port)),
+		ReadHeaderTimeout: 10 * time.Second,
 	}
 	if tlsConfig != nil {
 		httpServer.TLSConfig = tlsConfig.BuildServerConfig(config.Host)
@@ -126,7 +128,7 @@ func (h *HttpServer) Start() error {
 func (h *HttpServer) Stop() {
 	close(h.done)
 	h.stop()
-	h.server.Shutdown(h.ctx)
+	_ = h.server.Shutdown(h.ctx)
 	close(h.eventQueue)
 }
 
@@ -147,7 +149,7 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 			meta["Content-Type"] = contentType
 		}
 
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 		if err != nil {
 			logp.Err("Error reading body: %v", err)
 			http.Error(writer, "Unexpected error reading request payload", http.StatusBadRequest)
@@ -168,9 +170,9 @@ func (h *HttpServer) handleFunc(writer http.ResponseWriter, req *http.Request) {
 	case "GET":
 		writer.WriteHeader(http.StatusOK)
 		if req.TLS != nil {
-			writer.Write([]byte("HTTPS Server accepts data via POST"))
+			_, _ = writer.Write([]byte("HTTPS Server accepts data via POST"))
 		} else {
-			writer.Write([]byte("HTTP Server accepts data via POST"))
+			_, _ = writer.Write([]byte("HTTP Server accepts data via POST"))
 		}
 
 	}
