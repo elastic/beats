@@ -253,7 +253,6 @@ steps:
       - label: ":ubuntu: x-pack/heartbeat Packaging Linux x86_64"
         key: "packaging-linux"
         command: |
-          set -euo pipefail
           cd x-pack/heartbeat
           mage package
         agents:
@@ -271,7 +270,6 @@ steps:
       - label: ":ubuntu: x-pack/heartbeat Packaging Linux arm64"
         key: "packaging-arm"
         command: |
-          set -euo pipefail
           cd x-pack/heartbeat
           mage package
         agents:
