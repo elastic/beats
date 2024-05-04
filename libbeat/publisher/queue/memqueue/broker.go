@@ -117,10 +117,17 @@ type Settings struct {
 }
 
 type queueEntry struct {
-	event queue.Entry
+	event     queue.Entry
+	eventSize int
 
 	producer   *ackProducer
 	producerID producerID // The order of this entry within its producer
+}
+
+type entryIndex int
+
+func (ei entryIndex) plus(offset int) entryIndex {
+	return entryIndex(int(ei) + offset)
 }
 
 type batch struct {
@@ -129,8 +136,13 @@ type batch struct {
 	// Next batch in the containing batchList
 	next *batch
 
-	// Position and length of the events within the queue buffer
-	start, count int
+	// Position of the batch's events within the queue. This is an absolute
+	// index over the lifetime of the queue, to get the position within the
+	// queue's current circular buffer, use (start % len(queue.buf)).
+	start entryIndex
+
+	// Number of sequential events in this batch.
+	count int
 
 	// batch.Done() sends to doneChan, where ackLoop reads it and handles
 	// acknowledgment / cleanup.
@@ -307,7 +319,7 @@ var batchPool = sync.Pool{
 	},
 }
 
-func newBatch(queue *broker, start, count int) *batch {
+func newBatch(queue *broker, start entryIndex, count int) *batch {
 	batch := batchPool.Get().(*batch)
 	batch.next = nil
 	batch.queue = queue
@@ -405,23 +417,29 @@ func (b *batch) Count() int {
 	return b.count
 }
 
+func (ei entryIndex) inBuffer(buf []queueEntry) *queueEntry {
+	return &buf[int(ei)%len(buf)]
+}
+
 // Return a pointer to the queueEntry for the i-th element of this batch
-func (b *batch) rawEntry(i int) *queueEntry {
+func (b *batch) mutableEntry(i int) *queueEntry {
 	// Indexes wrap around the end of the queue buffer
-	return &b.queue.buf[(b.start+i)%len(b.queue.buf)]
+	entryIndex := b.start.plus(i)
+	return entryIndex.inBuffer(b.queue.buf)
 }
 
 // Return the event referenced by the i-th element of this batch
 func (b *batch) Entry(i int) queue.Entry {
-	return b.rawEntry(i).event
+	return b.mutableEntry(i).event
 }
 
 func (b *batch) FreeEntries() {
 	// This signals that the event data has been copied out of the batch, and is
 	// safe to free from the queue buffer, so set all the event pointers to nil.
 	for i := 0; i < b.count; i++ {
-		index := (b.start + i) % len(b.queue.buf)
-		b.queue.buf[index].event = nil
+		index := b.start.plus(i)
+		entry := index.inBuffer(b.queue.buf)
+		entry.event = nil
 	}
 }
 

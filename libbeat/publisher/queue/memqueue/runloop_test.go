@@ -65,7 +65,7 @@ func TestFlushSettingsDoNotBlockFullBatches(t *testing.T) {
 	}()
 	rl.runIteration()
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since the request should succeed immediately")
-	assert.Equal(t, 100, rl.consumedCount, "Queue should have a consumedCount of 100 after a consumer requested all its events")
+	assert.Equal(t, 100, rl.consumedEventCount, "Queue should have a consumedCount of 100 after a consumer requested all its events")
 }
 
 func TestFlushSettingsBlockPartialBatches(t *testing.T) {
@@ -102,7 +102,7 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 	}()
 	rl.runIteration()
 	assert.NotNil(t, rl.pendingGetRequest, "Queue should have a pending get request since the queue doesn't have the requested event count")
-	assert.Equal(t, 0, rl.consumedCount, "Queue should have a consumedCount of 0 since the Get request couldn't be completely filled")
+	assert.Equal(t, 0, rl.consumedEventCount, "Queue should have a consumedCount of 0 since the Get request couldn't be completely filled")
 
 	// Now confirm that adding one more event unblocks the request
 	go func() {
@@ -110,5 +110,5 @@ func TestFlushSettingsBlockPartialBatches(t *testing.T) {
 	}()
 	rl.runIteration()
 	assert.Nil(t, rl.pendingGetRequest, "Queue should have no pending get request since adding an event should unblock the previous one")
-	assert.Equal(t, 101, rl.consumedCount, "Queue should have a consumedCount of 101 after adding an event unblocked the pending get request")
+	assert.Equal(t, 101, rl.consumedEventCount, "Queue should have a consumedCount of 101 after adding an event unblocked the pending get request")
 }
