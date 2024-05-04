@@ -22,12 +22,15 @@ env:
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
 steps:
-  - group: "x-pack/Dockerlogbeat Mandatory Tests"
+  - group: "x-pack/dockerlogbeat Mandatory Tests"
     key: "x-pack-dockerlogbeat-mandatory-tests"
     steps:
-      - label: ":ubuntu: x-pack/Dockerlogbeat Ubuntu Unit Tests"
+      - label: ":ubuntu: x-pack/dockerlogbeat Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: "cd x-pack/dockerlogbeat && mage build unitTest"
+        command: |
+          set -euo pipefail
+          cd x-pack/dockerlogbeat
+          mage build unitTest
         retry:
           automatic:
            - limit: 3
@@ -42,7 +45,7 @@ steps:
           - github_commit_status:
               context: "x-pack/dockerlogbeat: Ubuntu Unit Tests"
 
-      - label: ":ubuntu: x-pack/Dockerlogbeat Go Integration Tests"
+      - label: ":ubuntu: x-pack/dockerlogbeat Go (Module) Integration Tests"
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
@@ -66,7 +69,7 @@ steps:
           - "x-pack/dockerlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/dockerlogbeat: Go Integration Tests"
+              context: "x-pack/dockerlogbeat: Go (Module) Integration Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -76,31 +79,37 @@ steps:
     depends_on:
       - "x-pack-dockerlogbeat-mandatory-tests"
 
-  - group: "x-pack/Dockerlogbeat Packaging"
+  - group: "x-pack/dockerlogbeat Packaging"
     key: "x-pack-dockerlogbeat-packaging"
 
     steps:
-      - label: ":ubuntu: x-pack/Dockerlogbeat Packaging Linux X86"
+      - label: ":ubuntu: x-pack/dockerlogbeat Packaging Linux x86_64"
         key: "auditbeat-package-linux-x86"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
-        command: "cd x-pack/dockerlogbeat && mage package"
+        command: |
+          set -euo pipefail
+          cd x-pack/dockerlogbeat
+          mage package
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:
-              context: "x-pack/dockerlogbeat: Packaging Linux X86"
+              context: "x-pack/dockerlogbeat: Packaging Linux x86_64"
 
-      - label: ":linux: x-pack/Dockerlogbeat Packaging Linux ARM"
+      - label: ":linux: x-pack/dockerlogbeat Packaging Linux ARM"
         key: "auditbeat-package-linux-arm"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
           SNAPSHOT: true
-        command: "cd x-pack/dockerlogbeat && mage package"
+        command: |
+          set -euo pipefail
+          cd x-pack/dockerlogbeat
+          mage package
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
