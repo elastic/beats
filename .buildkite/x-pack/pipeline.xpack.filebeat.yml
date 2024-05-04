@@ -51,7 +51,6 @@ steps:
       - label: ":ubuntu: Go Integration Tests"
         key: "x-pack-filebeat-mandatory-int-test"
         command: |
-          set -euo pipefail
           cd x-pack/filebeat
           mage goIntegTest
         retry:
@@ -71,7 +70,6 @@ steps:
       - label: ":ubuntu: Python Integration Tests"
         key: "x-pack-filebeat-mandatory-python-int-test"
         command: |
-          set -euo pipefail
           cd x-pack/filebeat
           mage pythonIntegTest
         retry:
@@ -207,7 +205,6 @@ steps:
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         key: "x-pack-filebeat-mandatory-linux-arm-unit-test"
         command: |
-          set -euo pipefail
           cd x-pack/filebeat
           mage build unitTest
         agents:
