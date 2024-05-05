@@ -1,0 +1,273 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+# TODO: Pre-cache beats-dev/golang-crossbuild container image
+
+env:
+  ASDF_MAGE_VERSION: 1.15.0
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+
+  PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+  PLATFORMS_ARM: "linux/arm64"
+
+steps:
+  # we use concurrency gates (https://buildkite.com/blog/concurrency-gates)
+  # to implement two FIFO queues for DRA-snapshot and DRA-staging
+  # this prevents parallel builds and possibility of publishing out of order DRA artifacts if the first job takes longer than the second
+
+  - name: Start of concurrency group for DRA Snapshot
+    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    command: echo "--> Start of concurrency gate dra-snapshot"
+    concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
+    concurrency: 1
+    key: start-gate-snapshot
+
+  - name: Start of concurrency group for DRA Staging
+    if: build.branch =~ /^\d+\.\d+$$/
+    command: echo "--> Start of concurrency gate dra-staging"
+    concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
+    concurrency: 1
+    key: start-gate-staging
+
+  - wait
+
+  - group: Beats dashboards
+    key: dashboards
+    steps:
+      - label: Snapshot dashboards
+        if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+        depends_on: start-gate-snapshot
+        key: dashboards-snapshot
+        # TODO: container with go and make
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        commands:
+          - make build/distributions/dependencies.csv
+          - make beats-dashboards
+        env:
+          SNAPSHOT: true
+          DEV: true
+        artifact_paths:
+          - build/distributions/**/*
+
+      - label: Staging dashboards
+        if: build.branch =~ /^\d+\.\d+$$/
+        depends_on: start-gate-staging
+        key: dashboards-staging
+        # TODO: container with go and make
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        commands:
+          - make build/distributions/dependencies.csv
+          - make beats-dashboards
+        env:
+          SNAPSHOT: false
+          DEV: false
+        artifact_paths:
+          - build/distributions/**/*
+
+  - group: Packaging snapshot
+    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    key: packaging-snapshot
+    depends_on: start-gate-snapshot
+    steps:
+      - label: "SNAPSHOT: {{matrix}}"
+        env:
+          PLATFORMS: "${PLATFORMS}"
+          SNAPSHOT: true
+          DEV: true
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - auditbeat
+          - filebeat
+          - heartbeat
+          - metricbeat
+          - packetbeat
+          - winlogbeat
+          - x-pack/auditbeat
+          - x-pack/dockerlogbeat
+          - x-pack/filebeat
+          - x-pack/functionbeat
+          - x-pack/heartbeat
+          - x-pack/metricbeat
+          - x-pack/osquerybeat
+          - x-pack/packetbeat
+          - x-pack/winlogbeat
+
+      - label: "SNAPSHOT: {{matrix}} docker Linux/arm64"
+        env:
+          PLATFORMS: "${PLATFORMS_ARM}"
+          PACKAGES: "docker"
+          SNAPSHOT: true
+          DEV: true
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - auditbeat
+          - filebeat
+          - heartbeat
+          - metricbeat
+          - packetbeat
+          - x-pack/auditbeat
+          - x-pack/dockerlogbeat
+          - x-pack/filebeat
+          - x-pack/heartbeat
+          - x-pack/metricbeat
+          - x-pack/packetbeat
+
+  - group: Packaging staging
+
+    key: packaging-staging
+    depends_on: start-gate-staging
+    ## Only for release
+    if: build.branch =~ /^\d+\.\d+$$/
+    steps:
+      - label: "STAGING: {{matrix}}"
+        env:
+          PLATFORMS: "${PLATFORMS}"
+          SNAPSHOT: false
+          DEV: false
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - auditbeat
+          - filebeat
+          - heartbeat
+          - metricbeat
+          - packetbeat
+          - winlogbeat
+          - x-pack/auditbeat
+          - x-pack/dockerlogbeat
+          - x-pack/filebeat
+          - x-pack/functionbeat
+          - x-pack/heartbeat
+          - x-pack/metricbeat
+          - x-pack/osquerybeat
+          - x-pack/packetbeat
+          - x-pack/winlogbeat
+
+      - label: "STAGING: {{matrix}} docker Linux/arm64"
+        env:
+          PLATFORMS: "${PLATFORMS_ARM}"
+          PACKAGES: "docker"
+          SNAPSHOT: false
+          DEV: false
+        command: ".buildkite/scripts/packaging/package-dra.sh {{matrix}}"
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        timeout_in_minutes: 40
+        retry:
+          automatic:
+            - limit: 1
+        artifact_paths:
+          - build/distributions/**/*
+        matrix:
+          - auditbeat
+          - filebeat
+          - heartbeat
+          - metricbeat
+          - packetbeat
+          - x-pack/auditbeat
+          - x-pack/dockerlogbeat
+          - x-pack/filebeat
+          - x-pack/heartbeat
+          - x-pack/metricbeat
+          - x-pack/packetbeat
+
+  - group: DRA publish
+    key: dra
+    steps:
+      - label: DRA Snapshot
+        ## Only for release branches and main
+        if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+        key: dra-snapshot
+        env:
+          DRA_WORKFLOW: snapshot
+        depends_on:
+          - start-gate-snapshot
+          - packaging-snapshot
+          - dashboards-snapshot
+        command: |
+          buildkite-agent artifact download "build/**/*" . 
+          .buildkite/scripts/packaging/prepare-release-manager.sh snapshot
+          .buildkite/scripts/dra.sh
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+
+      - label: DRA Staging
+        ## Only for release branches
+        if: build.branch =~ /^\d+\.\d+$$/
+        key: dra-staging
+        env:
+          DRA_WORKFLOW: staging
+        depends_on:
+          - start-gate-staging
+          - packaging-staging
+          - dashboards-staging
+        command: |
+          buildkite-agent artifact download "build/**" .
+          .buildkite/scripts/packaging/prepare-release-manager.sh staging
+          .buildkite/scripts/dra.sh
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+
+  - wait
+
+  - command: echo "End of concurrency gate dra-snapshot <--"
+    if: build.branch =~ /^\d+\.\d+$$/ || build.branch == 'main' || build.env('RUN_SNAPSHOT') == "true"
+    concurrency_group: "dra-gate-snapshot-$BUILDKITE_BRANCH"
+    concurrency: 1
+    key: end-gate-snapshot
+
+  - command: echo "End of concurrency gate dra-staging <--"
+    if: build.branch =~ /^\d+\.\d+$$/
+    concurrency_group: "dra-gate-staging-$BUILDKITE_BRANCH"
+    concurrency: 1
+    key: end-gate-staging
