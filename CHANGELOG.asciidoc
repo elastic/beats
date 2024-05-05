@@ -3,6 +3,11 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-7.17.21]]
+=== Beats version 7.17.21
+https://github.com/elastic/beats/compare/v7.17.20\...v7.17.21[View commits]
+
+
 [[release-notes-7.17.20]]
 === Beats version 7.17.20
 https://github.com/elastic/beats/compare/v7.17.19\...v7.17.20[View commits]
