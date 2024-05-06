@@ -23,6 +23,25 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+// TypeKey is the default key to define log types.
+//
+// Different log types can be handled by different cores, the `typedLoggerCore`
+// allows for choosing a different core based on a key/value pair. TypeKey
+// is the default key for using the typedLoggerCore.
+//
+// It should be used in conjunction with the defined types on this package.
+const TypeKey = "log.type"
+
+// DefaultType is the default log type. If `log.type` is not defined a log
+// entry is considered of type `DefaultType`. Those log entries should follow
+// the default logging configuration.
+const DefaultType = "default"
+
+// EventType is the type for log entries containing event data.
+// Beats and Elastic-Agent use this with the `typedLoggerCore` to direct
+// those log entries to a different file.
+const EventType = "event"
+
 // typedLoggerCore takes two cores and directs logs entries to one of them
 // with the value of the field defined by the pair `key` and `value`
 //
