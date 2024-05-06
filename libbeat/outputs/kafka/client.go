@@ -229,7 +229,7 @@ func (c *client) getEventMessage(data *publisher.Event) (*message, error) {
 	if err != nil {
 		if c.log.IsDebug() {
 			c.log.Debug("failed event logged to event log file")
-			c.log.Debugw(fmt.Sprintf("failed event: %v", event), "log.type", "event")
+			c.log.Debugw(fmt.Sprintf("failed event: %v", event), logp.TypeKey, logp.EventType)
 		}
 		return nil, err
 	}

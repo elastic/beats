@@ -134,7 +134,7 @@ func (out *fileOutput) Publish(_ context.Context, batch publisher.Batch) error {
 				out.log.Warnf("Failed to serialize the event: %+v", err)
 			}
 			out.log.Debug("Failed event logged to event log file")
-			out.log.Debugw(fmt.Sprintf("Failed event: %v", event), "log.type", "event")
+			out.log.Debugw(fmt.Sprintf("Failed event: %v", event), logp.TypeKey, logp.EventType)
 
 			dropped++
 			continue

@@ -809,7 +809,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error setting timestamp precision: %w", err)
 	}
 
-	if err := configure.LoggingWithTypedOutputs(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, "log.type", "event"); err != nil {
+	if err := configure.LoggingWithTypedOutputs(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType); err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
 
