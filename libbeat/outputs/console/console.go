@@ -111,8 +111,8 @@ func (c *console) Publish(_ context.Context, batch publisher.Batch) error {
 	c.writer.Flush()
 	batch.ACK()
 
-	st.Dropped(dropped)
-	st.Acked(len(events) - dropped)
+	st.PermanentErrors(dropped)
+	st.AckedEvents(len(events) - dropped)
 
 	return nil
 }

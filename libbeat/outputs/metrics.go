@@ -32,18 +32,38 @@ type Stats struct {
 	//
 	// Output event stats
 	//
-	batches *monitoring.Uint // total number of batches processed by output
-	events  *monitoring.Uint // total number of events processed by output
 
-	acked      *monitoring.Uint // total number of events ACKed by output
-	failed     *monitoring.Uint // total number of events failed in output
-	active     *monitoring.Uint // events sent and waiting for ACK/fail from output
-	duplicates *monitoring.Uint // events sent and waiting for ACK/fail from output
-	dropped    *monitoring.Uint // total number of invalid events dropped by the output
-	tooMany    *monitoring.Uint // total number of too many requests replies from output
+	// Number of calls to the output's Publish function
+	eventsBatches *monitoring.Uint
+
+	// Number of events sent to the output's Publish function.
+	eventsTotal *monitoring.Uint
+
+	// Number of events accepted by the output's receiver.
+	eventsACKed *monitoring.Uint
+
+	// Number of events that reported a retryable error from the output's
+	// receiver.
+	eventsFailed *monitoring.Uint
+
+	// Number of events that were dropped due to a non-retryable error.
+	eventsDropped *monitoring.Uint
+
+	// Number of events rejected by the output's receiver for being duplicates.
+	eventsDuplicates *monitoring.Uint
+
+	// (Gauge) Number of events that have been sent to the output's Publish
+	// call but have not yet been ACKed,
+	eventsActive *monitoring.Uint // (gauge) events sent and waiting for ACK/fail from output
+
+	// Number of events that failed due to a "429 too many requests" error.
+	// These events are also included in eventsFailed.
+	eventsTooMany *monitoring.Uint
 
 	// Output batch stats
-	split *monitoring.Uint // total number of batches split for being too large
+
+	// Number of times a batch was split for being too large
+	batchesSplit *monitoring.Uint
 
 	//
 	// Output network connection stats
@@ -62,16 +82,16 @@ type Stats struct {
 // The registry must not be null.
 func NewStats(reg *monitoring.Registry) *Stats {
 	obj := &Stats{
-		batches:    monitoring.NewUint(reg, "events.batches"),
-		events:     monitoring.NewUint(reg, "events.total"),
-		acked:      monitoring.NewUint(reg, "events.acked"),
-		failed:     monitoring.NewUint(reg, "events.failed"),
-		dropped:    monitoring.NewUint(reg, "events.dropped"),
-		duplicates: monitoring.NewUint(reg, "events.duplicates"),
-		active:     monitoring.NewUint(reg, "events.active"),
-		tooMany:    monitoring.NewUint(reg, "events.toomany"),
+		eventsBatches:    monitoring.NewUint(reg, "events.batches"),
+		eventsTotal:      monitoring.NewUint(reg, "events.total"),
+		eventsACKed:      monitoring.NewUint(reg, "events.acked"),
+		eventsFailed:     monitoring.NewUint(reg, "events.failed"),
+		eventsDropped:    monitoring.NewUint(reg, "events.dropped"),
+		eventsDuplicates: monitoring.NewUint(reg, "events.duplicates"),
+		eventsActive:     monitoring.NewUint(reg, "events.active"),
+		eventsTooMany:    monitoring.NewUint(reg, "events.toomany"),
 
-		split: monitoring.NewUint(reg, "batches.split"),
+		batchesSplit: monitoring.NewUint(reg, "batches.split"),
 
 		writeBytes:  monitoring.NewUint(reg, "write.bytes"),
 		writeErrors: monitoring.NewUint(reg, "write.errors"),
@@ -88,9 +108,9 @@ func NewStats(reg *monitoring.Registry) *Stats {
 // NewBatch updates active batch and event metrics.
 func (s *Stats) NewBatch(n int) {
 	if s != nil {
-		s.batches.Inc()
-		s.events.Add(uint64(n))
-		s.active.Add(uint64(n))
+		s.eventsBatches.Inc()
+		s.eventsTotal.Add(uint64(n))
+		s.eventsActive.Add(uint64(n))
 	}
 }
 
@@ -98,59 +118,59 @@ func (s *Stats) ReportLatency(time time.Duration) {
 	s.sendLatencyMillis.Update(time.Milliseconds())
 }
 
-// Acked updates active and acked event metrics.
-func (s *Stats) Acked(n int) {
+// AckedEvents updates active and acked event metrics.
+func (s *Stats) AckedEvents(n int) {
 	if s != nil {
-		s.acked.Add(uint64(n))
-		s.active.Sub(uint64(n))
+		s.eventsACKed.Add(uint64(n))
+		s.eventsActive.Sub(uint64(n))
 	}
 }
 
-// Failed updates active and failed event metrics.
-func (s *Stats) Failed(n int) {
+// RetryableErrors updates active and failed event metrics.
+func (s *Stats) RetryableErrors(n int) {
 	if s != nil {
-		s.failed.Add(uint64(n))
-		s.active.Sub(uint64(n))
+		s.eventsFailed.Add(uint64(n))
+		s.eventsActive.Sub(uint64(n))
 	}
 }
 
-// Duplicate updates the active and duplicate event metrics.
-func (s *Stats) Duplicate(n int) {
+// DuplicateEvents updates the active and duplicate event metrics.
+func (s *Stats) DuplicateEvents(n int) {
 	if s != nil {
-		s.duplicates.Add(uint64(n))
-		s.active.Sub(uint64(n))
+		s.eventsDuplicates.Add(uint64(n))
+		s.eventsActive.Sub(uint64(n))
 	}
 }
 
-// Dropped updates total number of event drops as reported by the output.
+// PermanentErrors updates total number of event drops as reported by the output.
 // Outputs will only report dropped events on fatal errors which lead to the
 // event not being publishable. For example encoding errors or total event size
 // being bigger then maximum supported event size.
-func (s *Stats) Dropped(n int) {
+func (s *Stats) PermanentErrors(n int) {
 	// number of dropped events (e.g. encoding failures)
 	if s != nil {
-		s.active.Sub(uint64(n))
-		s.dropped.Add(uint64(n))
+		s.eventsActive.Sub(uint64(n))
+		s.eventsDropped.Add(uint64(n))
 	}
 }
 
-// Cancelled updates the active event metrics.
-func (s *Stats) Cancelled(n int) {
+// CancelledEvents updates the active event metrics.
+func (s *Stats) CancelledEvents(n int) {
 	if s != nil {
-		s.active.Sub(uint64(n))
+		s.eventsActive.Sub(uint64(n))
 	}
 }
 
-func (s *Stats) Split() {
+func (s *Stats) BatchSplit() {
 	if s != nil {
-		s.split.Inc()
+		s.batchesSplit.Inc()
 	}
 }
 
 // ErrTooMany updates the number of Too Many Requests responses reported by the output.
 func (s *Stats) ErrTooMany(n int) {
 	if s != nil {
-		s.tooMany.Add(uint64(n))
+		s.eventsTooMany.Add(uint64(n))
 	}
 }
 

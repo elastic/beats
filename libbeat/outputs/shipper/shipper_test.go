@@ -638,13 +638,13 @@ type TestObserver struct {
 }
 
 func (to *TestObserver) NewBatch(batch int)            { to.batch += batch }
-func (to *TestObserver) Acked(acked int)               { to.acked += acked }
+func (to *TestObserver) AckedEvents(acked int)         { to.acked += acked }
 func (to *TestObserver) ReportLatency(_ time.Duration) {}
-func (to *TestObserver) Duplicate(duplicate int)       { to.duplicate += duplicate }
-func (to *TestObserver) Failed(failed int)             { to.failed += failed }
-func (to *TestObserver) Dropped(dropped int)           { to.dropped += dropped }
-func (to *TestObserver) Cancelled(cancelled int)       { to.cancelled += cancelled }
-func (to *TestObserver) Split()                        { to.split++ }
+func (to *TestObserver) DuplicateEvents(duplicate int) { to.duplicate += duplicate }
+func (to *TestObserver) RetryableErrors(failed int)    { to.failed += failed }
+func (to *TestObserver) PermanentErrors(dropped int)   { to.dropped += dropped }
+func (to *TestObserver) CancelledEvents(cancelled int) { to.cancelled += cancelled }
+func (to *TestObserver) BatchSplit()                   { to.split++ }
 func (to *TestObserver) WriteError(we error)           { to.writeError = we }
 func (to *TestObserver) WriteBytes(wb int)             { to.writeBytes += wb }
 func (to *TestObserver) ReadError(re error)            { to.readError = re }

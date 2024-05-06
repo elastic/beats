@@ -171,7 +171,7 @@ func (c *client) Publish(_ context.Context, batch publisher.Batch) error {
 		if err != nil {
 			c.log.Errorf("Dropping event: %+v", err)
 			ref.done()
-			c.observer.Dropped(1)
+			c.observer.PermanentErrors(1)
 			continue
 		}
 
@@ -359,13 +359,13 @@ func (r *msgRef) fail(msg *message, err error) {
 	switch err {
 	case sarama.ErrInvalidMessage:
 		r.client.log.Errorf("Kafka (topic=%v): dropping invalid message", msg.topic)
-		r.client.observer.Dropped(1)
+		r.client.observer.PermanentErrors(1)
 
 	case sarama.ErrMessageSizeTooLarge, sarama.ErrInvalidMessageSize:
 		r.client.log.Errorf("Kafka (topic=%v): dropping too large message of size %v.",
 			msg.topic,
 			len(msg.key)+len(msg.value))
-		r.client.observer.Dropped(1)
+		r.client.observer.PermanentErrors(1)
 
 	case breaker.ErrBreakerOpen:
 		// Add this message to the failed list, but don't overwrite r.err since
@@ -398,15 +398,15 @@ func (r *msgRef) dec() {
 		success := r.total - failed
 		r.batch.RetryEvents(r.failed)
 
-		stats.Failed(failed)
+		stats.RetryableErrors(failed)
 		if success > 0 {
-			stats.Acked(success)
+			stats.AckedEvents(success)
 		}
 
 		r.client.log.Debugf("Kafka publish failed with: %+v", err)
 	} else {
 		r.batch.ACK()
-		stats.Acked(r.total)
+		stats.AckedEvents(r.total)
 	}
 }
 

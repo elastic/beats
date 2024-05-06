@@ -76,8 +76,9 @@ type clientSettings struct {
 type bulkResultStats struct {
 	acked        int // number of events ACKed by Elasticsearch
 	duplicates   int // number of events failed with `create` due to ID already being indexed
-	fails        int // number of failed events (can be retried)
-	nonIndexable int // number of failed events (not indexable)
+	fails        int // number of events with retryable failures.
+	nonIndexable int // number of events with permanent failures.
+	deadLetter   int // number of failed events ingested to the dead letter index.
 	tooMany      int // number of events receiving HTTP 429 Too Many Requests
 }
 
@@ -181,16 +182,16 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 	events := batch.Events()
 	rest, err := client.publishEvents(ctx, events)
 
-	switch {
-	case errors.Is(err, errPayloadTooLarge):
+	if errors.Is(err, errPayloadTooLarge) {
 		if batch.SplitRetry() {
 			// Report that we split a batch
-			client.observer.Split()
+			client.observer.BatchSplit()
+			client.observer.RetryableErrors(len(events))
 		} else {
 			// If the batch could not be split, there is no option left but
 			// to drop it and log the error state.
 			batch.Drop()
-			client.observer.Dropped(len(events))
+			client.observer.PermanentErrors(len(events))
 			err := apm.CaptureError(ctx, fmt.Errorf("failed to perform bulk index operation: %w", err))
 			err.Send()
 			client.log.Error(err)
@@ -199,10 +200,13 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 		// so don't pass this error through since it doesn't indicate anything
 		// wrong with the connection.
 		return nil
-	case len(rest) == 0:
-		batch.ACK()
-	default:
+	}
+	if len(rest) > 0 {
+		// At least some events failed, retry them
 		batch.RetryEvents(rest)
+	} else {
+		// All events were sent successfully
+		batch.ACK()
 	}
 	return err
 }
@@ -232,7 +236,7 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 	newCount := len(data)
 	span.Context.SetLabel("events_encoded", newCount)
 	if st != nil && origCount > newCount {
-		st.Dropped(origCount - newCount)
+		st.PermanentErrors(origCount - newCount)
 	}
 	if newCount == 0 {
 		return nil, nil
@@ -278,10 +282,10 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 		duplicates := stats.duplicates
 		acked := len(data) - failed - dropped - duplicates
 
-		st.Acked(acked)
-		st.Failed(failed)
-		st.Dropped(dropped)
-		st.Duplicate(duplicates)
+		st.AckedEvents(acked)
+		st.RetryableErrors(failed)
+		st.PermanentErrors(dropped)
+		st.DuplicateEvents(duplicates)
 		st.ErrTooMany(stats.tooMany)
 		st.ReportLatency(timeSinceSend)
 
@@ -391,6 +395,7 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 	failed := data[:0]
 	stats := bulkResultStats{}
 	for i := 0; i < count; i++ {
+		encodedEvent := data[i].EncodedEvent.(*encodedEvent)
 		status, msg, err := bulkReadItemStatus(client.log, reader)
 		if err != nil {
 			client.log.Error(err)
@@ -398,7 +403,12 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 		}
 
 		if status < 300 {
-			stats.acked++
+			if encodedEvent.deadLetter {
+				// This was ingested into the dead letter index, not the original target
+				stats.deadLetter++
+			} else {
+				stats.acked++
+			}
 			continue // ok value
 		}
 
@@ -409,28 +419,30 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 			continue // ok
 		}
 
-		if status < 500 {
-			if status == http.StatusTooManyRequests {
-				stats.tooMany++
-			} else {
-				// hard failure, apply policy action
-				encodedEvent := data[i].EncodedEvent.(*encodedEvent)
-				if encodedEvent.deadLetter {
-					stats.nonIndexable++
-					client.log.Errorf("Can't deliver to dead letter index event (status=%v). Enable debug logs to view the event and cause.", status)
-					client.log.Debugf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
-					// poison pill - this will clog the pipeline if the underlying failure is non transient.
-				} else if client.deadLetterIndex != "" {
-					client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Enable debug logs to view the event and cause.", status)
-					client.log.Debugf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
-					client.setDeadLetter(encodedEvent, status, string(msg))
-				} else { // drop
-					stats.nonIndexable++
-					client.log.Warnf("Cannot index event (status=%v): dropping event! Enable debug logs to view the event and cause.", status)
-					client.log.Debugf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
-					continue
-				}
+		if status == http.StatusTooManyRequests {
+			stats.tooMany++
+		} else if status < 500 {
+			// hard failure, apply policy action
+			if encodedEvent.deadLetter {
+				stats.nonIndexable++
+				client.log.Errorf("Can't deliver to dead letter index event (status=%v). Enable debug logs to view the event and cause.", status)
+				client.log.Debugf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
+				// poison pill - this will clog the pipeline if the underlying failure is non transient.
+			} else if client.deadLetterIndex != "" {
+				// Send this failure to the dead letter index.
+				// We count this as a "retryable failure", then if the dead letter
+				// ingestion succeeds it is counted in the "deadLetter" counter
+				// rather than the "acked" counter.
+				stats.fails++
+				client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Enable debug logs to view the event and cause.", status)
+				client.log.Debugf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
+				client.setDeadLetter(encodedEvent, status, string(msg))
+			} else { // drop
+				stats.nonIndexable++
+				client.log.Warnf("Cannot index event (status=%v): dropping event! Enable debug logs to view the event and cause.", status)
+				client.log.Debugf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
 			}
+			continue
 		}
 
 		client.log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)

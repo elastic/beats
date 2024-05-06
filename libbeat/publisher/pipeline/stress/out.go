@@ -93,7 +93,7 @@ func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 
 		if config.Fail.EveryBatch == t.batchCount {
 			t.batchCount = 0
-			t.observer.Failed(n)
+			t.observer.RetryableErrors(n)
 			batch.Retry()
 			return nil
 		}
@@ -104,7 +104,7 @@ func (t *testOutput) Publish(_ context.Context, batch publisher.Batch) error {
 
 	// ack complete batch
 	batch.ACK()
-	t.observer.Acked(n)
+	t.observer.AckedEvents(n)
 
 	return nil
 }

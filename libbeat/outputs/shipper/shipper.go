@@ -196,7 +196,7 @@ func (s *shipper) publish(ctx context.Context, batch publisher.Batch) error {
 
 	convertedCount := len(toSend)
 
-	s.observer.Dropped(droppedCount)
+	s.observer.PermanentErrors(droppedCount)
 	s.log.Debugf("%d events converted to protobuf, %d dropped", convertedCount, droppedCount)
 
 	var lastAcceptedIndex uint64
@@ -218,10 +218,10 @@ func (s *shipper) publish(ctx context.Context, batch publisher.Batch) error {
 				// need to drop it.
 				if batch.SplitRetry() {
 					// Report that we split a batch
-					s.observer.Split()
+					s.observer.BatchSplit()
 				} else {
 					batch.Drop()
-					s.observer.Dropped(len(events))
+					s.observer.PermanentErrors(len(events))
 					s.log.Errorf("dropping %d events because of RPC failure: %v", len(events), err)
 				}
 				return nil
@@ -233,8 +233,8 @@ func (s *shipper) publish(ctx context.Context, batch publisher.Batch) error {
 			// request, then cancelling here (instead of dropping or retrying)
 			// will cause an infinite retry loop, wedging the pipeline.
 
-			batch.Cancelled()                 // does not decrease the TTL
-			s.observer.Cancelled(len(events)) // we cancel the whole batch not just non-dropped events
+			batch.Cancelled()                       // does not decrease the TTL
+			s.observer.CancelledEvents(len(events)) // we cancel the whole batch not just non-dropped events
 			return fmt.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(toSend), err)
 		}
 
@@ -387,7 +387,7 @@ func (s *shipper) ackWorker(ctx context.Context) {
 
 				p.batch.ACK()
 				ackedCount := p.eventCount - p.droppedCount
-				s.observer.Acked(ackedCount)
+				s.observer.AckedEvents(ackedCount)
 				s.log.Debugf("%d events have been acknowledged, %d dropped", ackedCount, p.droppedCount)
 				lastProcessed++
 			}
