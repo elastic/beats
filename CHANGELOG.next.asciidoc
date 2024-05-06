@@ -171,7 +171,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
-- Fix error handling in perfmon metrics {pull}39404[39404]
+- Fix error handling in perfmon metrics. {issue}38140[38140] {pull}39404[39404]
 
 *Elastic Logging Plugin*
 
