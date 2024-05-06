@@ -273,6 +273,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add default user-agent to CEL HTTP requests. {issue}39502[39502] {pull}39587[39587]
 - Improve reindexing support in security module pipelines. {issue}38224[38224] {pull}[]
 - Improve reindexing support in security module pipelines. {issue}38224[38224] {pull}39588[39588]
+- Make HTTP Endpoint input GA. {issue}38979[38979] {pull}39410[39410]
 
 *Auditbeat*
 

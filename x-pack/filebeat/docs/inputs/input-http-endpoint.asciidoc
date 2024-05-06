@@ -9,13 +9,12 @@
 <titleabbrev>HTTP Endpoint</titleabbrev>
 ++++
 
-beta[]
-
 The HTTP Endpoint input initializes a listening HTTP server that collects
-incoming HTTP POST requests containing a JSON body. The body must be either an
-object or an array of objects. Any other data types will result in an HTTP 400
-(Bad Request) response. For arrays, one document is created for each object in
-the array.
+incoming HTTP POST requests containing a JSON body. The body must be either
+an object or an array of objects, otherwise a Common Expression Language
+expression that converts the the JSON body to these types can be provided.
+Any other data types will result in an HTTP 400 (Bad Request) response. For
+arrays, one document is created for each object in the array.
 
 gzip encoded request bodies are supported if a `Content-Encoding: gzip` header
 is sent with the request.
@@ -171,6 +170,40 @@ Preserving original event and including headers in document
   include_headers: ["TestHeader"]
 ----
 
+Common Expression Language example:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+  program: |
+    obj.records.map(r, {
+     "requestId": obj.requestId,
+     "timestamp": string(obj.timestamp),
+     "event": r,
+    })
+----
+This example would allow handling of a JSON body that is an object containing
+more than one event that each should be ingested as separate documents with
+the common timestamp and request ID:
+["source","json",subs="attributes"]
+----
+{
+  "requestId": "ed4acda5-034f-9f42-bba1-f29aea6d7d8f",
+  "timestamp": 1578090901599,
+  "records": [
+    {
+      "data": "event record 1"
+    },
+    {
+      "data": "event record 2"
+    }
+  ]
+}
+----
+
 ==== Configuration options
 
 The `http_endpoint` input supports the following configuration options plus the
@@ -230,7 +263,7 @@ In certain scenarios when the source of the request is not able to do that, it c
 [float]
 ==== `program`
 
-The normal operation of the input treats the body either as a single event when the body is an object, or as a set of events when the body is an array. If the body should be handled differently, for example a set of events in an array field of an object to be handled as a set of events, then a https://opensource.google.com/projects/cel[Common Expression Language (CEL)] program can be provided through this configuration field. No CEL extensions are provided beyond the function in the CEL https://github.com/google/cel-spec/blob/master/doc/langdef.md#standard[standard library]. CEL https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] are supported.
+The normal operation of the input treats the body either as a single event when the body is an object, or as a set of events when the body is an array. If the body should be handled differently, for example a set of events in an array field of an object to be handled as a set of events, then a https://opensource.google.com/projects/cel[Common Expression Language (CEL)] program can be provided through this configuration field. The name of the object in the CEL program is `obj`. No CEL extensions are provided beyond the function in the CEL https://github.com/google/cel-spec/blob/master/doc/langdef.md#standard[standard library]. CEL https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] are supported.
 
 [float]
 ==== `response_code`
