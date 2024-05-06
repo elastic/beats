@@ -10,7 +10,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	cursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/statestore"
 	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
@@ -49,7 +48,7 @@ func TestInputManager(t *testing.T) {
 	var inputTaskGroup unison.TaskGroup
 	defer inputTaskGroup.Stop() //nolint:errcheck // ignore error in test
 
-	err := inputManager.Init(&inputTaskGroup, v2.ModeRun)
+	err := inputManager.Init(&inputTaskGroup)
 	assert.NoError(t, err)
 
 	config, err := conf.NewConfigFrom(map[string]interface{}{

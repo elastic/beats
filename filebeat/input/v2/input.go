@@ -39,7 +39,7 @@ type InputManager interface {
 	// Init signals to InputManager to initialize internal resources.
 	// The mode tells the input manager if the Beat is actually running the inputs or
 	// if inputs are only configured for testing/validation purposes.
-	Init(grp unison.Group, mode Mode) error
+	Init(grp unison.Group) error
 
 	// Create builds a new Input instance from the given configuation, or returns
 	// an error if the configuation is invalid.
@@ -47,16 +47,6 @@ type InputManager interface {
 	// will use the Test/Run methods of the input.
 	Create(*conf.C) (Input, error)
 }
-
-// Mode tells the InputManager in which mode it is initialized.
-type Mode uint8
-
-//go:generate stringer -type Mode -trimprefix Mode
-const (
-	ModeRun Mode = iota
-	ModeTest
-	ModeOther
-)
 
 // Input is a configured input object that can be used to test or start
 // the actual data collection.
