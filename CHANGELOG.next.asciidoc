@@ -204,6 +204,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add procfs backend to the `add_session_metadata` processor. {pull}38799[38799]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
 
+*Auditbeat*
+
+
 *Filebeat*
 
 - Adding Saved Object name field to Kibana audit logs {pull}38307[38307]
@@ -339,6 +342,10 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 
 ==== Known Issues
+
+
+
+
 
 
 
