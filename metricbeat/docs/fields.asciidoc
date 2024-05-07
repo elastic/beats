@@ -62676,6 +62676,60 @@ format: bytes
 --
 
 [float]
+=== network
+
+Network-specific metrics
+
+
+[float]
+=== inbound
+
+Incoming network counters
+
+
+*`system.process.network.inbound.tcp`*::
++
+--
+total bytes received over TCP
+
+type: long
+
+--
+
+*`system.process.network.inbound.udp`*::
++
+--
+total bytes received over UDP
+
+type: long
+
+--
+
+[float]
+=== outbound
+
+Outgoing network counters
+
+
+*`system.process.network.outbound.tcp`*::
++
+--
+total bytes received over TCP
+
+type: long
+
+--
+
+*`system.process.network.outbound.udp`*::
++
+--
+total bytes received over UDP
+
+type: long
+
+--
+
+[float]
 === io
 
 Disk I/O Metrics, as forwarded from /proc/[PID]/io. Available on Linux only.

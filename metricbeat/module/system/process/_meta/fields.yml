@@ -111,6 +111,30 @@
           format: bytes
           description: >
             The shared memory the process uses.
+    - name: network
+      type: group
+      description: Network-specific metrics
+      fields:
+        - name: inbound
+          type: group
+          description: Incoming network counters
+          fields: 
+            - name: tcp
+              type: long
+              description: total bytes received over TCP
+            - name: udp
+              type: long
+              description: total bytes received over UDP
+        - name: outbound
+          type: group
+          description: Outgoing network counters
+          fields:
+            - name: tcp
+              type: long
+              description: total bytes received over TCP
+            - name: udp
+              type: long
+              description: total bytes received over UDP
     - name: io
       type: group
       description: Disk I/O Metrics, as forwarded from /proc/[PID]/io. Available on Linux only.

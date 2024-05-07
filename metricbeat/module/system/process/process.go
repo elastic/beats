@@ -26,7 +26,9 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/metricbeat/mb/parse"
+	"github.com/elastic/beats/v7/metricbeat/module/system/process/network"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/process"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
@@ -45,8 +47,9 @@ func init() {
 type MetricSet struct {
 	mb.BaseMetricSet
 	stats  *process.Stats
-	cgroup *cgroup.Reader
 	perCPU bool
+
+	networkMonitoring *network.Tracker
 }
 
 // New creates and returns a new MetricSet.
@@ -91,6 +94,20 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		}
 	}
 
+	// setup network tracking
+	if config.TrackNetworkData {
+		m.Logger().Infof("Starting system/process network monitoring")
+		var err error
+		m.networkMonitoring, err = network.NewNetworkTracker()
+		if err != nil {
+			return nil, fmt.Errorf("error creating network tracker: %w", err)
+		}
+		err = m.networkMonitoring.Track()
+		if err != nil {
+			return nil, fmt.Errorf("error starting network tracker: %w", err)
+		}
+	}
+
 	err := m.stats.Init()
 	if err != nil {
 		return nil, err
@@ -107,6 +124,27 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	for evtI := range procs {
+		if m.networkMonitoring != nil {
+			pid, err := extractPID(roots[evtI])
+			if err != nil {
+				m.Logger().Debugf("error fetching pid for network data: %s", err)
+			} else {
+				netData := m.networkMonitoring.Get(pid)
+				if netData.ContainsMetrics() {
+					procs[evtI].Put("network.usage", mapstr.M{
+						"inbound": mapstr.M{
+							"tcp": netData.Incoming.TCP,
+							"udp": netData.Incoming.UDP,
+						},
+						"outbound": mapstr.M{
+							"tcp": netData.Outgoing.TCP,
+							"udp": netData.Outgoing.UDP,
+						},
+					})
+				}
+			}
+		}
+
 		isOpen := r.Event(mb.Event{
 			MetricSetFields: procs[evtI],
 			RootFields:      roots[evtI],
@@ -117,4 +155,24 @@ func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 	}
 
 	return nil
+}
+
+func (m *MetricSet) Close() error {
+	if m.networkMonitoring != nil {
+		m.networkMonitoring.Stop()
+	}
+	return nil
+}
+
+func extractPID(rootMap mapstr.M) (int, error) {
+	rawPid, err := rootMap.GetValue("process.pid")
+	if err != nil {
+		return 0, fmt.Errorf("error fetching root event PID for pid: %w", err)
+	}
+
+	if unwrappedPid, ok := rawPid.(int); ok {
+		return unwrappedPid, nil
+	}
+	return 0, fmt.Errorf("could not unpack PID from root event, got %T", rawPid)
+
 }
