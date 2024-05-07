@@ -1,21 +1,11 @@
 #!/usr/bin/env bash
 
-# TODO: uncomment out below when Jenkins packaging has been stopped
-# if [[ "$DRY_RUN" == "true" ]]; then
-#     echo "~~~ Running in dry-run mode -- will NOT publish artifacts"
-#     DRY_RUN="--dry-run"
-# else
-#     echo "~~~ Running in publish mode"
-#     DRY_RUN=""
-# fi
-
-# TODO: delete the conditional below (and replace it with the above, uncommented out, section) after Jenkins packaging has been stopped
-if [[ "$DRY_RUN" == "false" ]]; then
-    echo "~~~ Running in publish mode"
-    DRY_RUN=""
-else
+if [[ "$DRY_RUN" == "true" ]]; then
     echo "~~~ Running in dry-run mode -- will NOT publish artifacts"
     DRY_RUN="--dry-run"
+else
+    echo "~~~ Running in publish mode"
+    DRY_RUN=""
 fi
 
 set -euo pipefail
