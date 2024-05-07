@@ -2,13 +2,15 @@
 
 set -euo pipefail
 
-source .buildkite/env-scripts/util.sh
+source .buildkite/scripts/common.sh
+
+add_bin_path
 
 echo "--- Installing kind & kubectl"
 retry -t 5 -- .buildkite/deploy/kubernetes/scripts/install-kind.sh
 retry -t 5 -- .buildkite/deploy/kubernetes/scripts/install-kubectl.sh
 
-echo "Setting up kind"
+echo "~~~ Setting up kind"
 max_retries=3
 timeout=5
 retries=0
