@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-#source .buildkite/scripts/common.sh
-
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
 GO_VERSION=$(cat .go-version)
 
@@ -22,8 +20,6 @@ export GO_VERSION
 export KUBECONFIG="${WORKSPACE}/kubecfg"
 export BIN="${WORKSPACE}/bin"
 export TMP_FOLDER="tmp.${REPO}"
-
-#add_bin_path
 
 exportVars() {
   local platform_type="$(uname)"

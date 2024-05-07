@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-source .buildkite/scripts/common.sh
+source .buildkite/env-scripts/util.sh
 
 add_bin_path
 
