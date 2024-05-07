@@ -76,27 +76,19 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Go Integration Tests"
 
-<<<<<<< HEAD
-      - label: ":windows: Windows 2019 Unit Tests"
-=======
       - label: ":windows: x-pack/heartbeat Windows 2016 Unit Tests"
         key: "mandatory-win-2016-unit-tests"
->>>>>>> 4f5b23a89f (Update x-pack/heartbeat pipeline to match Jenkins (#39239))
         skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
         command: |
           Set-Location -Path x-pack/heartbeat
           mage build test
-<<<<<<< HEAD
-        key: "extended-win-2019-unit-tests"
-=======
->>>>>>> 4f5b23a89f (Update x-pack/heartbeat pipeline to match Jenkins (#39239))
         retry:
           automatic:
            - limit: 3
         agents:
           provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          image: "${IMAGE_WIN_2016}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
         artifact_paths:
@@ -104,9 +96,6 @@ steps:
           - "x-pack/heartbeat/build/*.json"
         notify:
           - github_commit_status:
-<<<<<<< HEAD
-              context: "x-pack/heartbeat: Windows 2019 Unit Tests"
-=======
               context: "x-pack/heartbeat: Windows 2016 Unit Tests"
 
       # Doesn't exist in Jenkins
@@ -131,7 +120,6 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/heartbeat: Windows 2022 Unit Tests"
->>>>>>> 4f5b23a89f (Update x-pack/heartbeat pipeline to match Jenkins (#39239))
 
   - group: "x-pack/heartbeat Extended Windows Tests"
     key: "x-pack-heartbeat-extended-win-tests"
@@ -182,22 +170,18 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Windows 11 Unit Tests"
 
-<<<<<<< HEAD
-      - label: ":windows: Windows 2016 Unit Tests"
-        key: "mandatory-win-2016-unit-tests"
-=======
       - label: ":windows: x-pack/heartbeat Windows 2019 Unit Tests"
->>>>>>> 4f5b23a89f (Update x-pack/heartbeat pipeline to match Jenkins (#39239))
         command: |
           Set-Location -Path x-pack/heartbeat
-          mage build unitTest
+          mage build test
         retry:
           automatic:
            - limit: 3
+        key: "extended-win-2019-unit-tests"
         agents:
           provider: "gcp"
-          image: "${IMAGE_WIN_2016}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          image: "${IMAGE_WIN_2019}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
         artifact_paths:
@@ -205,34 +189,9 @@ steps:
           - "x-pack/heartbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/heartbeat: Windows 2016 Unit Tests"
+              context: "x-pack/heartbeat: Windows 2019 Unit Tests"
 
-<<<<<<< HEAD
-      - label: ":windows: Windows 2022 Unit Tests"
-        key: "mandatory-win-2022-unit-tests"
-        command: |
-          Set-Location -Path x-pack/heartbeat
-          mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/heartbeat/build/*.xml"
-          - "x-pack/heartbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/heartbeat: Windows 2022 Unit Tests"
-  
-  - group: "x-pack/heartbeat MacOS Extended Tests"
-=======
   - group: "x-pack/heartbeat macOS Extended Tests"
->>>>>>> 4f5b23a89f (Update x-pack/heartbeat pipeline to match Jenkins (#39239))
     key: "x-pack-heartbeat-extended-tests-macos"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
 
