@@ -4737,6 +4737,93 @@ format: duration
 --
 
 [float]
+=== servicequotas
+
+AWS Service quotas metrics.
+
+
+
+*`aws.servicequotas.adjustable`*::
++
+--
+Indicates whether the service quota value can be modified. 
+
+
+type: boolean
+
+--
+
+*`aws.servicequotas.global_quota`*::
++
+--
+Indicates whether the service quota applies globally to the AWS account or not.
+
+
+type: boolean
+
+--
+
+*`aws.servicequotas.quota_arn`*::
++
+--
+The Amazon Resource Name (ARN) of the quota.
+
+
+type: keyword
+
+--
+
+*`aws.servicequotas.quota_code`*::
++
+--
+The service quota identifier.
+
+
+type: keyword
+
+--
+
+*`aws.servicequotas.quota_name`*::
++
+--
+The name of the service quota.
+
+
+type: keyword
+
+--
+
+*`aws.servicequotas.service_name`*::
++
+--
+The name of the service.
+
+
+type: keyword
+
+--
+
+*`aws.servicequotas.unit`*::
++
+--
+The unit of measurement quota value.
+
+
+type: keyword
+
+--
+
+*`aws.servicequotas.value`*::
++
+--
+The value of the quota.
+
+
+type: long
+
+--
+
+[float]
 === sns
 
 `sns` contains the metrics that were scraped from AWS CloudWatch which contains monitoring metrics sent by AWS SNS.

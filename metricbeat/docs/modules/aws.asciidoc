@@ -465,6 +465,8 @@ The following metricsets are available:
 
 * <<metricbeat-metricset-aws-s3_request,s3_request>>
 
+* <<metricbeat-metricset-aws-servicequotas,servicequotas>>
+
 * <<metricbeat-metricset-aws-sns,sns>>
 
 * <<metricbeat-metricset-aws-sqs,sqs>>
@@ -500,6 +502,8 @@ include::aws/rds.asciidoc[]
 include::aws/s3_daily_storage.asciidoc[]
 
 include::aws/s3_request.asciidoc[]
+
+include::aws/servicequotas.asciidoc[]
 
 include::aws/sns.asciidoc[]
 

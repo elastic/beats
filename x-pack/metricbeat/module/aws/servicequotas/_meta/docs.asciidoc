@@ -1,0 +1,34 @@
+This is the Service Quotas metricset of the module aws. https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html[Service Quotas] is an AWS service that helps you manage your quotas, formerly referred to as limits, for over 100 AWS services, from one location. In addition to viewing quota values, you can also request a quota increase from the https://console.aws.amazon.com/servicequotas/[Service Quotas console].  
+
+
+[float]
+=== AWS Permissions
+To collect Service Quotas metrics using Elastic Metricbeat, you would need specific AWS permissions to access the necessary data. Here's a list of permissions required for an IAM user to collect AWS Service quotas metrics:
+----
+servicequotas:ListServiceQuotas
+servicequotas:ListServices
+----
+
+[float]
+=== Configuration example
+
+The `service_quotas_config` key allows you to specify the service quotas of interest. Add the AWS services for which you want to collect service quotas metrics. You can customize this list to include any AWS services relevant to your infrastructure. The service names must match exactly the https://console.aws.amazon.com/servicequotas/home/services[names of the services] mentioned in AWS console.
+
+[source,yaml]
+----
+
+- module: aws
+  period: 5m
+  regions:
+    - "ap-south-1"
+  metricsets:
+    - servicequotas
+  service_quotas_config:
+    service_names:
+      - "Amazon MQ"
+      - "AWS Lambda"
+      - "Amazon DynamoDB"
+----
+
+
+

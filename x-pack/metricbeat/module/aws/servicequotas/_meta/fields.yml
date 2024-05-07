@@ -1,0 +1,41 @@
+- name: servicequotas
+  type: group
+  release: beta
+  description: >
+    AWS Service quotas metrics.
+  fields:
+    - name: adjustable
+      type: boolean
+      description: >
+        Indicates whether the service quota value can be modified. 
+    - name: global_quota
+      type: boolean
+      description: >
+        Indicates whether the service quota applies globally to the AWS account or not.
+    - name: quota_arn
+      type: keyword
+      description: >
+        The Amazon Resource Name (ARN) of the quota.
+    - name: quota_code
+      type: keyword
+      description: >
+        The service quota identifier.
+    - name : quota_name
+      type: keyword
+      description: >
+        The name of the service quota.
+    - name: service_name
+      type: keyword
+      description: >
+        The name of the service.
+    - name: unit
+      type: keyword
+      description: >
+        The unit of measurement quota value.
+    - name: value
+      type: long
+      description: >
+        The value of the quota.
+
+    
+        

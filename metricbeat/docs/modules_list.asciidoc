@@ -16,7 +16,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-module-apache,Apache>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
 .1+| .1+|  |<<metricbeat-metricset-apache-status,status>>   
 |<<metricbeat-module-aws,AWS>>     |image:./images/icon-yes.png[Prebuilt dashboards are available]    |  
-.18+| .18+|  |<<metricbeat-metricset-aws-awshealth,awshealth>> beta[]  
+.19+| .19+|  |<<metricbeat-metricset-aws-awshealth,awshealth>> beta[]  
 |<<metricbeat-metricset-aws-billing,billing>> beta[]  
 |<<metricbeat-metricset-aws-cloudwatch,cloudwatch>>   
 |<<metricbeat-metricset-aws-dynamodb,dynamodb>> beta[]  
@@ -29,6 +29,7 @@ This file is generated! See scripts/mage/docs_collector.go
 |<<metricbeat-metricset-aws-rds,rds>>   
 |<<metricbeat-metricset-aws-s3_daily_storage,s3_daily_storage>>   
 |<<metricbeat-metricset-aws-s3_request,s3_request>>   
+|<<metricbeat-metricset-aws-servicequotas,servicequotas>> beta[]  
 |<<metricbeat-metricset-aws-sns,sns>> beta[]  
 |<<metricbeat-metricset-aws-sqs,sqs>>   
 |<<metricbeat-metricset-aws-transitgateway,transitgateway>> beta[]  
