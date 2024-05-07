@@ -233,3 +233,11 @@ func newS3Event(key string) s3EventV2 {
 	record.S3.Object.Key = key
 	return record
 }
+
+func TestSQSReaderLoop(t *testing.T) {
+
+}
+
+func TestSQSWorkerLoop(t *testing.T) {
+
+}
