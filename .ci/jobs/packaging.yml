@@ -13,7 +13,7 @@
           discover-pr-forks-strategy: 'merge-current'
           discover-pr-forks-trust: 'permission'
           discover-pr-origin: 'merge-current'
-          discover-tags: true
+          discover-tags: false
           head-filter-regex: '(PR-.*)'
           disable-pr-notifications: true
           notification-context: 'beats-packaging'
@@ -27,7 +27,6 @@
           - tags:
               ignore-tags-older-than: -1
               ignore-tags-newer-than: 30
-          - named-branches:
           - change-request:
               ignore-target-only-changes: true
           clean:
