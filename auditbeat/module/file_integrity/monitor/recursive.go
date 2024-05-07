@@ -114,11 +114,11 @@ func (watcher *recursiveWatcher) addRecursive(path string) error {
 		return nil
 	}
 
+	var errs multierror.Errors
 	if err := watcher.watchFile(path, nil); err != nil {
-		return fmt.Errorf("failed adding watcher to '%s': %w", path, err)
+		errs = append(errs, fmt.Errorf("failed adding watcher to '%s': %w", path, err))
 	}
 
-	var errs multierror.Errors
 	err := filepath.Walk(path, func(walkPath string, info os.FileInfo, fnErr error) error {
 		if walkPath == path {
 			return nil
