@@ -13,12 +13,9 @@ export DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
 
 export ASDF_NODEJS_VERSION="18.17.1"
 export AWS_REGION="eu-central-1"
-export KIND_VERSION="v0.20.0"
 
 export WORKSPACE
 export GO_VERSION
-export KUBECONFIG="${WORKSPACE}/kubecfg"
-export BIN="${WORKSPACE}/bin"
 export TMP_FOLDER="tmp.${REPO}"
 
 exportVars() {

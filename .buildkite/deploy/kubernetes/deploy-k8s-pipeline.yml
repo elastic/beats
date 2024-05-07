@@ -3,6 +3,10 @@
 env:
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  MODULE: "kubernetes"
+
+  # Other deps
+  ASDF_KIND_VERSION: "0.20.0"
 
 steps:
   - group: "Deploy/K8S"
@@ -26,10 +30,10 @@ steps:
       key: "k8s-test-129"
       env:
         K8S_VERSION: "v1.29.0"
-        MODULE: "kubernetes"
+        MODULE: "${MODULE}"
       commands: |
         set -euo pipefail
-        .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
+        source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
         make -C metricbeat integration-tests
         make -C deploy/kubernetes test
       retry:
@@ -47,10 +51,10 @@ steps:
       key: "k8s-test-128"
       env:
         K8S_VERSION: "v1.28.0"
-        MODULE: "kubernetes"
+        MODULE: "${MODULE}"
       commands: |
         set -euo pipefail
-        .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
+        source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
         make -C metricbeat integration-tests
         make -C deploy/kubernetes test
       retry:
@@ -68,10 +72,10 @@ steps:
       key: "k8s-test-1273"
       env:
         K8S_VERSION: "v1.27.3"
-        MODULE: "kubernetes"
+        MODULE: "${MODULE}"
       commands: |
         set -euo pipefail
-        .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
+        source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
         make -C metricbeat integration-tests
         make -C deploy/kubernetes test
       retry:
@@ -89,9 +93,10 @@ steps:
       key: "k8s-test-1266"
       env:
         K8S_VERSION: "v1.26.6"
+        MODULE: "${MODULE}"
       commands: |
         set -euo pipefail
-        .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
+        source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
         make -C metricbeat integration-tests
         make -C deploy/kubernetes test
       retry:

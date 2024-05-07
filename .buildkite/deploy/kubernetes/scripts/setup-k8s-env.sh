@@ -4,11 +4,13 @@ set -euo pipefail
 
 source .buildkite/env-scripts/util.sh
 
+export KUBECONFIG="${WORKSPACE}/kubecfg"
+export BIN="${WORKSPACE}/bin"
 add_bin_path
 
 echo "--- Installing kind & kubectl"
-retry -t 5 -- .buildkite/deploy/kubernetes/scripts/install-kind.sh
-retry -t 5 -- .buildkite/deploy/kubernetes/scripts/install-kubectl.sh
+asdf plugin add kind
+asdf install kind $ASDF_KIND_VERSION
 
 echo "~~~ Setting up kind"
 max_retries=3
