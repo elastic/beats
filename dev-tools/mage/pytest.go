@@ -144,7 +144,7 @@ func PythonTest(params PythonTestArgs) error {
 	}
 
 	pytestOptions := []string{
-		"--timeout=120",
+		"--timeout=90",
 		"--durations=20",
 		// Enable -x to stop at the first failing test
 		// "-x",
