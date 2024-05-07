@@ -30,6 +30,9 @@ steps:
           mage build unitTest
         env:
           MODULE: $MODULE
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -48,6 +51,9 @@ steps:
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "mandatory-win-2022-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -89,6 +95,9 @@ steps:
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "extended-win-10-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -107,6 +116,9 @@ steps:
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "extended-win-11-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -125,6 +137,9 @@ steps:
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
         key: "extended-win-2019-unit-tests"
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"

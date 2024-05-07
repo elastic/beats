@@ -20,6 +20,9 @@ steps:
         command: |
           cd x-pack/libbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -36,6 +39,9 @@ steps:
         command: |
           cd x-pack/libbeat
           mage goIntegTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -52,6 +58,9 @@ steps:
         command: |
           cd x-pack/libbeat
           mage pythonIntegTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -72,6 +81,9 @@ steps:
         command: |
           cd x-pack/libbeat
           mage build unitTest
+        retry:
+          automatic:
+           - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
