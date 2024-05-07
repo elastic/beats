@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
-name: "beats-x-pack-dockerlogbeat"
+name: "beats-xpack-dockerlogbeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
@@ -24,7 +24,7 @@ env:
 
 steps:
   - group: "x-pack/dockerlogbeat Mandatory Tests"
-    key: "x-pack-dockerlogbeat-mandatory-tests"
+    key: "xpack-dockerlogbeat-mandatory-tests"
     steps:
       - label: ":ubuntu: x-pack/dockerlogbeat Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
@@ -77,13 +77,13 @@ steps:
     # this allows building DRA artifacts even if there is flakiness in mandatory tests
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
     depends_on:
-      - "x-pack-dockerlogbeat-mandatory-tests"
+      - "xpack-dockerlogbeat-mandatory-tests"
 
   - group: "x-pack/dockerlogbeat Packaging"
-    key: "x-pack-dockerlogbeat-packaging"
+    key: "xpack-dockerlogbeat-packaging"
 
     steps:
-      - label: ":ubuntu: x-pack/dockerlogbeat Packaging Linux x86_64"
+      - label: ":ubuntu: x-pack/dockerlogbeat Packaging Linux"
         key: "auditbeat-package-linux-x86"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
@@ -97,9 +97,9 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:
-              context: "x-pack/dockerlogbeat: Packaging Linux x86_64"
+              context: "x-pack/dockerlogbeat: Packaging Linux"
 
-      - label: ":linux: x-pack/dockerlogbeat Packaging Linux ARM"
+      - label: ":linux: x-pack/dockerlogbeat Packaging Linux arm64"
         key: "auditbeat-package-linux-arm"
         env:
           PLATFORMS: "linux/arm64"
@@ -114,4 +114,4 @@ steps:
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         notify:
           - github_commit_status:
-              context: "x-pack/dockerlogbeat: Packaging Linux ARM"
+              context: "x-pack/dockerlogbeat: Packaging Linux arm64"
