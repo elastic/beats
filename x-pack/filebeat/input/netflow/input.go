@@ -45,7 +45,7 @@ type netflowInputManager struct {
 	log *logp.Logger
 }
 
-func (im *netflowInputManager) Init(_ unison.Group, _ v2.Mode) error {
+func (im *netflowInputManager) Init(_ unison.Group) error {
 	return nil
 }
 
@@ -116,11 +116,8 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 	client, err := connector.ConnectWith(beat.ClientConfig{
 		PublishMode: beat.DefaultGuarantees,
 		Processing: beat.ProcessingConfig{
-			// This input only produces events with basic types so normalization
-			// is not required.
-			EventNormalization: boolPtr(false),
+			EventNormalization: boolPtr(true),
 		},
-		CloseRef:      ctx.Cancelation,
 		EventListener: nil,
 	})
 	if err != nil {
@@ -128,6 +125,7 @@ func (n *netflowInput) Run(ctx v2.Context, connector beat.PipelineConnector) err
 		n.stop()
 		return err
 	}
+	defer client.Close()
 
 	const pollInterval = time.Minute
 	udpMetrics := netmetrics.NewUDP("netflow", ctx.ID, n.cfg.Host, uint64(n.cfg.ReadBuffer), pollInterval, n.logger)

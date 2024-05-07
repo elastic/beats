@@ -95,7 +95,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 	e.t.Helper()
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
-	manager.Init(&e.grp, v2.ModeRun)
+	manager.Init(&e.grp)
 	c := conf.MustNewConfigFrom(config)
 	inp, err := manager.Create(c)
 	if err != nil {
@@ -107,7 +107,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 func (e *inputTestingEnvironment) createInput(config map[string]interface{}) (v2.Input, error) {
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
-	manager.Init(&e.grp, v2.ModeRun)
+	manager.Init(&e.grp)
 	c := conf.MustNewConfigFrom(config)
 	inp, err := manager.Create(c)
 	if err != nil {
@@ -448,7 +448,7 @@ func (e *inputTestingEnvironment) waitUntilHarvesterIsDone() {
 	}
 }
 
-// requireEventReceived requires that the list of messages has made it into the output.
+// requireEventsReceived requires that the list of messages has made it into the output.
 func (e *inputTestingEnvironment) requireEventsReceived(events []string) {
 	foundEvents := make([]bool, len(events))
 	checkedEventCount := 0

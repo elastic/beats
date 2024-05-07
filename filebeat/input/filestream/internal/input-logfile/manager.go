@@ -119,11 +119,7 @@ func (cim *InputManager) init() error {
 
 // Init starts background processes for deleting old entries from the
 // persistent store if mode is ModeRun.
-func (cim *InputManager) Init(group unison.Group, mode v2.Mode) error {
-	if mode != v2.ModeRun {
-		return nil
-	}
-
+func (cim *InputManager) Init(group unison.Group) error {
 	if err := cim.init(); err != nil {
 		return err
 	}
@@ -165,9 +161,9 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 
 	settings := struct {
 		ID             string        `config:"id"`
-		CleanTimeout   time.Duration `config:"clean_timeout"`
+		CleanInactive  time.Duration `config:"clean_inactive"`
 		HarvesterLimit uint64        `config:"harvester_limit"`
-	}{CleanTimeout: cim.DefaultCleanTimeout}
+	}{CleanInactive: cim.DefaultCleanTimeout}
 	if err := config.Unpack(&settings); err != nil {
 		return nil, err
 	}
@@ -230,7 +226,7 @@ func (cim *InputManager) Create(config *conf.C) (v2.Input, error) {
 		prospector:       prospector,
 		harvester:        harvester,
 		sourceIdentifier: sourceIdentifier,
-		cleanTimeout:     settings.CleanTimeout,
+		cleanTimeout:     settings.CleanInactive,
 		harvesterLimit:   settings.HarvesterLimit,
 	}, nil
 }

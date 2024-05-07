@@ -3,6 +3,59 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.13.3]]
+=== Beats version 8.13.3
+https://github.com/elastic/beats/compare/v8.13.2\...v8.13.3[View commits]
+
+==== Breaking changes
+
+*Metricbeat*
+- Setting period for counter cache for Prometheus `remote_write` to at least to 60 seconds. {pull}38553[38553]
+
+==== Bugfixes
+
+*Affecting all Beats*
+- Change cache processor documentation from `write_period` to `write_interval`. {pull}38561[38561]
+- Fix cache processor expiries heap cleanup on partial file writes. {pull}38561[38561]
+- Fix cache processor expiries infinite growth when large a large TTL is used and recurring keys are cached. {pull}38561[38561]
+- Fix parsing of RFC 3164 process IDs in syslog processor. {issue}38947[38947] {pull}38982[38982]
+
+*Filebeat*
+
+- Fix indexing failures by re-enabling event normalisation in netflow input. {issue}38703[38703] {pull}38780[38780]
+- Fix config validation for CEL and HTTPJSON inputs when using password grant authentication and `client.id` or `client.secret` are not present. {pull}38962[38962]
+- Updated Websocket input title to align with existing inputs. {pull}39006[39006]
+- [threatintel] MISP splitting fix for empty responses. {issue}38739[38739] {pull}38917[38917]
+- Restore netflow input on Windows. {pull}39024[39024]
+
+==== Added
+
+*Affecting all Beats*
+
+- Update Go version to 1.21.9. {pulk}38727[38727]
+- The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers. {pull}38669[38669]
+
+*Auditbeat*
+
+- Add process data to file events (Linux only, eBPF backend). {pull}38199[38199]
+- Add container id to file events (Linux only, eBPF backend). {pull}38328[38328]
+
+*Metricbeat*
+
+- Add new fields to configure the lease duration, retry and renew when using leader elector with Kubernetes autodiscover.{pull}38471[38471]
+
+
+[[release-notes-8.13.2]]
+=== Beats version 8.13.2
+https://github.com/elastic/beats/compare/v8.13.1\...v8.13.2[View commits]
+
+==== Bugfixes
+
+*Heartbeat*
+
+- Fix reference yaml format. {pull}38584[38584]
+
+
 [[release-notes-8.13.1]]
 === Beats version 8.13.1
 https://github.com/elastic/beats/compare/v8.13.0\...v8.13.1[View commits]

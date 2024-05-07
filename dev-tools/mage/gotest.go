@@ -55,6 +55,7 @@ type GoTestArgs struct {
 type TestBinaryArgs struct {
 	Name       string // Name of the binary to build
 	InputFiles []string
+	ExtraFlags []string // Extra flags to pass to 'go test'.
 }
 
 func makeGoTestArgs(name string) GoTestArgs {
@@ -389,6 +390,7 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 	if TestCoverage {
 		args = append(args, "-coverpkg", "./...")
 	}
+	args = append(args, binArgs.ExtraFlags...)
 	if len(binArgs.InputFiles) > 0 {
 		args = append(args, binArgs.InputFiles...)
 	}

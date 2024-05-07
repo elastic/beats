@@ -10,7 +10,12 @@
             "completions": {
                 "desired": 1
             },
-            "name": "hello",
+            "name": "hello-28564554",
+            "owner": {
+                "is_controller": "true",
+                "kind": "CronJob",
+                "name": "hello"
+            },
             "parallelism": {
                 "desired": 1
             },
@@ -23,8 +28,8 @@
                 "complete": "true"
             },
             "time": {
-                "completed": "2023-10-31T11:19:41.000Z",
-                "created": "2023-10-31T11:19:20.000Z"
+                "completed": "2024-04-23T11:54:02.000Z",
+                "created": "2024-04-23T11:54:00.000Z"
             }
         },
         "namespace": "default"
