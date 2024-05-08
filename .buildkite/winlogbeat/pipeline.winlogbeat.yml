@@ -160,6 +160,9 @@ steps:
         command: |
           cd winlogbeat
           mage package
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"

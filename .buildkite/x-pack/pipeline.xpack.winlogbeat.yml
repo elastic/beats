@@ -170,6 +170,9 @@ steps:
       - label: ":ubuntu: Packaging Linux"
         key: "packaging-linux"
         command: "cd x-pack/winlogbeat && mage package"
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"

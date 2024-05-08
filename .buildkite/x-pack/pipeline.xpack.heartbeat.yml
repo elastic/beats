@@ -255,6 +255,9 @@ steps:
         command: |
           cd x-pack/heartbeat
           mage package
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -272,6 +275,9 @@ steps:
         command: |
           cd x-pack/heartbeat
           mage package
+        retry:
+          automatic:
+            - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
