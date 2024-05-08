@@ -3,6 +3,23 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
+[[release-notes-8.13.4]]
+=== Beats version 8.13.4
+https://github.com/elastic/beats/compare/v8.13.3\...v8.13.4[View commits]
+
+==== Bugfixes
+
+*Auditbeat*
+
+- Prevent scenario of losing children-related file events in a directory for recursive fsnotify backend of auditbeat file integrity module. {pull}39133[39133]
+- Allow extra syscalls by auditbeat required in FIM with kprobes back-end. {pull}39361[39361]
+- Fix losing events in FIM for MacOS X by allowing always to walk an added directory to monitor. {pull}39362[39362]
+
+*Metricbeat*
+
+- Fix Azure Monitor support for multiple aggregation types. {issue}39192[39192] {pull}39204[39204]
+
+
 [[release-notes-8.13.3]]
 === Beats version 8.13.3
 https://github.com/elastic/beats/compare/v8.13.2\...v8.13.3[View commits]
