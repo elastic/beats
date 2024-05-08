@@ -2,16 +2,14 @@
 name: "beats-xpack-dockerlogbeat"
 
 env:
-  ASDF_MAGE_VERSION: 1.15.0
-
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
-
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
+
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
   IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
@@ -21,13 +19,18 @@ env:
   IMAGE_WIN_2019: "family/platform-ingest-beats-windows-2019"
   IMAGE_WIN_2022: "family/platform-ingest-beats-windows-2022"
 
+  # Other deps
+  ASDF_MAGE_VERSION: 1.15.0
+
 steps:
-  - group: "Xpack/Dockerlogbeat Mandatory Tests"
+  - group: "x-pack/dockerlogbeat Mandatory Tests"
     key: "xpack-dockerlogbeat-mandatory-tests"
     steps:
-      - label: ":ubuntu: Xpack/Dockerlogbeat Ubuntu Unit Tests"
+      - label: ":ubuntu: x-pack/dockerlogbeat Ubuntu Unit Tests"
         key: "mandatory-linux-unit-test"
-        command: "cd x-pack/dockerlogbeat && mage build unitTest"
+        command: |
+          cd x-pack/dockerlogbeat
+          mage build unitTest
         retry:
           automatic:
            - limit: 3
@@ -42,9 +45,16 @@ steps:
           - github_commit_status:
               context: "x-pack/dockerlogbeat: Ubuntu Unit Tests"
 
-      - label: ":ubuntu: Xpack/Dockerlogbeat Go Integration Tests"
+      - label: ":ubuntu: x-pack/dockerlogbeat Go (Module) Integration Tests"
         key: "mandatory-int-test"
-        command: "cd x-pack/dockerlogbeat && mage goIntegTest"
+        command: |
+          set -euo pipefail
+          # defines the MODULE env var based on what's changed in a PR
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet x-pack/dockerlogbeat
+          echo "~~~ Running tests with env var MODULE=$$MODULE"
+          cd x-pack/dockerlogbeat
+          mage goIntegTest
         env:
           MODULE: $MODULE
         retry:
@@ -59,7 +69,7 @@ steps:
           - "x-pack/dockerlogbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/dockerlogbeat: Go Integration Tests"
+              context: "x-pack/dockerlogbeat: Go (Module) Integration Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -69,29 +79,39 @@ steps:
     depends_on:
       - "xpack-dockerlogbeat-mandatory-tests"
 
-  - group: "Xpack/Dockerlogbeat Packaging"
+  - group: "x-pack/dockerlogbeat Packaging"
     key: "xpack-dockerlogbeat-packaging"
 
     steps:
-      - label: ":ubuntu: Xpack/Dockerlogbeat Packaging Linux X86"
+      - label: ":ubuntu: x-pack/dockerlogbeat Packaging Linux"
         key: "auditbeat-package-linux-x86"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
-        command: "cd x-pack/dockerlogbeat && mage package"
+        command: |
+          cd x-pack/dockerlogbeat
+          mage package
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "x-pack/dockerlogbeat: Packaging Linux"
 
-      - label: ":linux: Xpack/Dockerlogbeat Packaging Linux ARM"
+      - label: ":linux: x-pack/dockerlogbeat Packaging Linux arm64"
         key: "auditbeat-package-linux-arm"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
           SNAPSHOT: true
-        command: "cd x-pack/dockerlogbeat && mage package"
+        command: |
+          cd x-pack/dockerlogbeat
+          mage package
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "x-pack/dockerlogbeat: Packaging Linux arm64"

@@ -139,7 +139,7 @@ steps:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
 
-  - label: "Trigger Xpack/Dockerlogbeat"
+  - label: "Trigger x-pack/dockerlogbeat"
     if: build.pull_request.id != null
     plugins:
       - monorepo-diff#v1.0.1:
