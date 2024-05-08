@@ -47376,22 +47376,6 @@ format: percent
 
 --
 
-[float]
-=== persistentvolumeclaim
-
-kubernetes persistent volume claim
-
-
-
-*`kubernetes.persistentvolumeclaim.name`*::
-+
---
-PVC name.
-
-type: keyword
-
---
-
 [[exported-fields-kvm]]
 == KVM fields
 
