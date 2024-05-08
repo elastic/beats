@@ -26,9 +26,8 @@ steps:
     key: "heartbeat-mandatory-tests"
 
     steps:
-      - label: ":ubuntu: Unit Tests"
+      - label: ":ubuntu: Heartbeat Unit Tests"
         command: |
-          set -euo pipefail
           cd heartbeat
           mage build unitTest
         retry:
@@ -45,9 +44,8 @@ steps:
           - github_commit_status:
               context: "heartbeat: Ubuntu Unit Tests"
 
-      - label: ":rhel: Rhel9 Unit Tests"
+      - label: ":rhel: Heartbeat Rhel9 Unit Tests"
         command: |
-          set -euo pipefail
           cd heartbeat
           mage build unitTest
         retry:
@@ -84,7 +82,7 @@ steps:
           - github_commit_status:
               context: "heartbeat: Win-2016 Unit Tests"
 
-      - label: ":windows: Win-2022 Unit Test"
+      - label: ":windows: Heartbeat Win-2022 Unit Test"
         key: "windows-2022"
         command: |
           Set-Location -Path heartbeat
@@ -104,7 +102,7 @@ steps:
           - github_commit_status:
               context: "heartbeat: Win-2022 Unit Tests"
 
-      - label: ":ubuntu: Go (Module) Integration Tests"
+      - label: ":ubuntu: Heartbeat Go (Module) Integration Tests"
         command: |
           set -euo pipefail
           # defines the MODULE env var based on what's changed in a PR
@@ -127,7 +125,7 @@ steps:
           - github_commit_status:
               context: "heartbeat: Go Integration Tests"
 
-      - label: ":ubuntu: Python (Module) Integration Tests"
+      - label: ":ubuntu: Heartbeat Python (Module) Integration Tests"
         command: |
           set -euo pipefail
           # defines the MODULE env var based on what's changed in a PR
@@ -155,11 +153,10 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
 
     steps:
-      - label: ":linux: Heartbeat ARM64 Unit Tests"
+      - label: ":linux: Heartbeat arm64 Unit Tests"
         key: "arm-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         command: |
-          set -euo pipefail
           cd heartbeat
           mage build unitTest
         retry:
@@ -172,9 +169,9 @@ steps:
         artifact_paths: "heartbeat/build/*.xml"
         notify:
           - github_commit_status:
-              context: "heartbeat: Ubuntu ARM64 Unit Tests"
+              context: "heartbeat: Linux arm64 Unit Tests"
 
-      - label: ":mac: MacOS Unit Tests"
+      - label: ":mac: macOS x86_64 Unit Tests"
         key: "macos-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
@@ -193,9 +190,9 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "heartbeat: MacOS Unit Tests"
+              context: "heartbeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: MacOS ARM Unit Tests"
+      - label: ":mac: macOS arm64 Unit Tests"
         key: "macos-arm-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
@@ -214,7 +211,7 @@ steps:
           - "metricbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "heartbeat: MacOS ARM Unit Tests"
+              context: "heartbeat: macOS arm64 Unit Tests"
 
   - group: "Heartbeat Windows Extended Testing"
     key: "heartbeat-extended-tests-win"
@@ -291,13 +288,12 @@ steps:
   - group: "Heartbeat Packaging"
     key: "heartbeat-packaging"
     steps:
-      - label: ":ubuntu: Packaging Linux X86"
-        key: "heartbeat-package-linux-x86"
+      - label: ":ubuntu: Heartbeat Packaging Linux"
+        key: "heartbeat-package-linux"
         env:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
           SNAPSHOT: true
         command: |
-          set -euo pipefail
           cd heartbeat
           mage package
         agents:
@@ -306,16 +302,15 @@ steps:
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         notify:
           - github_commit_status:
-              context: "heartbeat: Packaging Ubuntu x86_64"
+              context: "heartbeat: Packaging Linux"
 
-      - label: ":linux: Packaging Linux ARM"
+      - label: ":linux: Heartbeat Packaging Linux arm64"
         key: "heartbeat-package-linux-arm"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
           SNAPSHOT: true
         command: |
-          set -euo pipefail
           cd heartbeat
           mage package
         agents:
@@ -324,4 +319,4 @@ steps:
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         notify:
           - github_commit_status:
-              context: "heartbeat: Packaging Ubuntu ARM"
+              context: "heartbeat: Packaging Linux arm64"
