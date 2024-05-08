@@ -25,7 +25,6 @@ import (
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/types/known/structpb"
 
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/jsontransform"
@@ -45,7 +44,7 @@ var (
 
 type handler struct {
 	metrics     *inputMetrics
-	publisher   stateless.Publisher
+	publish     func(beat.Event)
 	log         *logp.Logger
 	validator   apiValidator
 	txBaseID    string         // Random value to make transaction IDs unique.
@@ -71,6 +70,11 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	start := time.Now()
+	acker := newBatchACKTracker(func() {
+		h.metrics.batchACKTime.Update(time.Since(start).Nanoseconds())
+		h.metrics.batchesACKedTotal.Inc()
+	})
+	defer acker.Ready()
 	h.metrics.batchesReceived.Add(1)
 	h.metrics.contentLength.Update(r.ContentLength)
 	body, status, err := getBodyReader(r)
@@ -124,7 +128,8 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		if err = h.publishEvent(obj, headers); err != nil {
+		acker.Add()
+		if err = h.publishEvent(obj, headers, acker); err != nil {
 			h.metrics.apiErrors.Add(1)
 			h.sendAPIErrorResponse(w, r, h.log, http.StatusInternalServerError, err)
 			return
@@ -219,10 +224,11 @@ func (h *handler) sendResponse(w http.ResponseWriter, status int, message string
 	}
 }
 
-func (h *handler) publishEvent(obj, headers mapstr.M) error {
+func (h *handler) publishEvent(obj, headers mapstr.M, acker *batchACKTracker) error {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
 		Fields:    mapstr.M{},
+		Private:   acker,
 	}
 	if h.preserveOriginalEvent {
 		event.Fields["event"] = mapstr.M{
@@ -237,7 +243,7 @@ func (h *handler) publishEvent(obj, headers mapstr.M) error {
 		return fmt.Errorf("failed to put data into event key %q: %w", h.messageField, err)
 	}
 
-	h.publisher.Publish(event)
+	h.publish(event)
 	return nil
 }
 
