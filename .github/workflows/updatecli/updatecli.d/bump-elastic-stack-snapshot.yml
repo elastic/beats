@@ -21,10 +21,10 @@ scms:
     spec:
       owner: '{{ .scm.owner }}'
       repository: '{{ .scm.repository }}'
-      user: '{{ requiredEnv "GIT_USER" }}'
-      email: '{{ requiredEnv "GIT_EMAIL" }}'
+      user: '{{ requiredEnv "GITHUB_ACTOR" }}'
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       branch: '{{ requiredEnv "BRANCH" }}'
+      commitusingapi: true
 
 sources:
   latestVersion:

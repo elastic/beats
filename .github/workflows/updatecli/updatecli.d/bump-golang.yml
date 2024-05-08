@@ -8,9 +8,10 @@ scms:
     spec:
       owner: '{{ .scm.owner }}'
       repository: '{{ .scm.repository }}'
-      user: '{{ requiredEnv "GIT_USER" }}'
+      user: '{{ requiredEnv "GITHUB_ACTOR" }}'
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
       branch: main
+      commitusingapi: true
 
 actions:
   beats:
