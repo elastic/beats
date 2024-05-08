@@ -1,7 +1,7 @@
 [role="xpack"]
 
 :type: cel
-:mito_version: v1.10.0
+:mito_version: v1.11.0
 :mito_docs: https://pkg.go.dev/github.com/elastic/mito@{mito_version}
 
 [id="{beatname_lc}-input-{type}"]
