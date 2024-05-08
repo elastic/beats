@@ -20,7 +20,8 @@ jobs:
           vaultUrl: ${{ secrets.VAULT_ADDR }}
           vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
           vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
-          pipeline: ./.ci/bump-golang.yml
+          pipeline: ./.github/workflows/updatecli/updatecli.d/bump-golang.yml
+          values: ./.github/workflows/updatecli/values.d/scm.yml
           notifySlackChannel: "#ingest-notifications"
           messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <${{ env.JOB_URL }}|here>"
 
@@ -34,6 +35,7 @@ jobs:
           vaultUrl: ${{ secrets.VAULT_ADDR }}
           vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
           vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
-          pipeline: ./.ci/bump-golang-7.17.yml
+          pipeline: ./.github/workflows/updatecli/updatecli.d/bump-golang-7.17.yml
+          values: ./.github/workflows/updatecli/values.d/scm.yml
           notifySlackChannel: "#ingest-notifications"
           messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <${{ env.JOB_URL }}|here>"

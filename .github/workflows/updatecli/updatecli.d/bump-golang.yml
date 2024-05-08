@@ -1,25 +1,23 @@
 ---
-name: Bump golang-version to latest version in 7.17
-pipelineid: "bump-golang-version-7.17"
+name: Bump golang-version to latest version
+pipelineid: 'bump-golang-version'
 
 scms:
   githubConfig:
     kind: github
     spec:
+      owner: '{{ .scm.owner }}'
+      repository: '{{ .scm.repository }}'
       user: '{{ requiredEnv "GIT_USER" }}'
-      email: '{{ requiredEnv "GIT_EMAIL" }}'
-      owner: elastic
-      repository: beats
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
-      username: '{{ requiredEnv "GIT_USER" }}'
-      branch: "7.17"
+      branch: main
 
 actions:
   beats:
     kind: github/pullrequest
     scmid: githubConfig
     sourceid: latestGoVersion
-    title: '[Automation][7.17] Bump Golang version to {{ source "latestGoVersion" }}'
+    title: '[Automation] Bump Golang version to {{ source "latestGoVersion" }}'
     spec:
       labels:
         - dependencies
@@ -89,7 +87,7 @@ targets:
     spec:
       content: 'go {{ source "gomod" }}'
       file: go.mod
-      matchpattern: 'go \d+.\d+'
+      matchpattern: 'go \d+.\d+.\d+'
   update-go-version:
     name: "Update .go-version"
     sourceid: latestGoVersion
@@ -117,6 +115,15 @@ targets:
       content: ':go-version: {{ source "latestGoVersion" }}'
       file: libbeat/docs/version.asciidoc
       matchpattern: ':go-version: \d+.\d+.\d+'
+  update-devcontainer:
+    name: "Update .devcontainer/devcontainer.json"
+    sourceid: gomod
+    scmid: githubConfig
+    kind: file
+    spec:
+      content: 'go:1-{{ source "gomod" }}'
+      file: ./.devcontainer/devcontainer.json
+      matchpattern: 'go:1-\d+.\d+'
   update-auditbeat-dockerfile:
     name: "Update Auditbeat Dockerfile"
     sourceid: latestGoVersion
@@ -237,34 +244,3 @@ targets:
         keyword: "FROM"
         matcher: "golang"
       file: ./x-pack/metricbeat/module/stan/_meta/Dockerfile
-  # The following Dockerfiles aren't present on the main branch, this is the main reason we have a separate job
-  update-filebeat-dockerfile:
-    name: "Update Filebeat Dockerfile"
-    sourceid: latestGoVersion
-    scmid: githubConfig
-    kind: dockerfile
-    spec:
-      instruction:
-        keyword: "FROM"
-        matcher: "golang"
-      file: ./filebeat/Dockerfile
-  update-libbeat-dockerfile:
-    name: "Update libbeat Dockerfile"
-    sourceid: latestGoVersion
-    scmid: githubConfig
-    kind: dockerfile
-    spec:
-      instruction:
-        keyword: "FROM"
-        matcher: "golang"
-      file: ./libbeat/Dockerfile
-  update-x-pack-libbeat-dockerfile:
-    name: "Update x-pack/libbeat Dockerfile"
-    sourceid: latestGoVersion
-    scmid: githubConfig
-    kind: dockerfile
-    spec:
-      instruction:
-        keyword: "FROM"
-        matcher: "golang"
-      file: ./x-pack/libbeat/Dockerfile

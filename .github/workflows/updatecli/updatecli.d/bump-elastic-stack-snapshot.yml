@@ -19,12 +19,11 @@ scms:
   default:
     kind: github
     spec:
+      owner: '{{ .scm.owner }}'
+      repository: '{{ .scm.repository }}'
       user: '{{ requiredEnv "GIT_USER" }}'
       email: '{{ requiredEnv "GIT_EMAIL" }}'
-      owner: elastic
-      repository: beats
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
-      username: '{{ requiredEnv "GIT_USER" }}'
       branch: '{{ requiredEnv "BRANCH" }}'
 
 sources:
