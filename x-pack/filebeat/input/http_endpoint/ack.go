@@ -47,8 +47,8 @@ func newBatchACKTracker(fn func()) *batchACKTracker {
 }
 
 // Ready signals that the batch has been fully consumed. Only
-// after the batch is marked as "ready" can the lumberjack batch
-// be ACKed. This prevents the batch from being ACKed prematurely.
+// after the batch is marked as "ready" can the batch be ACKed.
+// This prevents the batch from being ACKed prematurely.
 func (t *batchACKTracker) Ready() {
 	t.ACK()
 }

@@ -379,10 +379,12 @@ observe the activity of the input.
 | `api_errors_total`        | Number of API errors.
 | `batches_received_total`  | Number of event arrays received.
 | `batches_published_total` | Number of event arrays published.
+| `batches_acked_total`     | Number of event arrays ACKed.
 | `events_published_total`  | Number of events published.
 | `size`                    | Histogram of request content lengths.
 | `batch_size`              | Histogram of the received event array length.
 | `batch_processing_time`   | Histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
+| `batch_ack_time`          | Histogram of the elapsed successful batch ACKing times in nanoseconds (time of handler start to time of ACK for non-empty batches).
 |=======
 
 [id="{beatname_lc}-input-{type}-common-options"]
