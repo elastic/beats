@@ -32,4 +32,4 @@
         - name: ready_time
           type: double
           description: >
-            Time in unix timestamp for a pod to achieve readiness 
+            Readiness achieved time in unix timestamp for a pod 

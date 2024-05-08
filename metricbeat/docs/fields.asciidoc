@@ -46824,7 +46824,7 @@ type: keyword
 *`kubernetes.pod.status.ready_time`*::
 +
 --
-Time in unix timestamp for a pod to achieve readiness 
+Readiness achieved time in unix timestamp for a pod 
 
 
 type: double
