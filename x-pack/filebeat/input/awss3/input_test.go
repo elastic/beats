@@ -9,6 +9,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	aws "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 )
 
 func TestGetProviderFromDomain(t *testing.T) {
