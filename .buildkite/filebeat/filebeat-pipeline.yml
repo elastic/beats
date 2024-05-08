@@ -26,9 +26,8 @@ steps:
   - group: "Filebeat Mandatory Tests"
     key: "filebeat-mandatory-tests"
     steps:
-      - label: ":ubuntu: Ubuntu Unit Tests"
+      - label: ":ubuntu: Filebeat Unit Tests"
         command: |
-          set -euo pipefail
           cd filebeat
           mage build unitTest
         retry:
@@ -43,11 +42,10 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Ubuntu Unit Tests"
+              context: "filebeat: Linux x86_64 Unit Tests"
 
-      - label: ":ubuntu: Ubuntu Go Integration Tests"
+      - label: ":ubuntu: Filebeat Go Integration Tests"
         command: |
-          set -euo pipefail
           cd filebeat
           mage goIntegTest
         retry:
@@ -62,11 +60,10 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Ubuntu Go Integration Tests"
+              context: "filebeat: Filebeat Go Integration Tests"
 
-      - label: ":ubuntu: Ubuntu Python Integration Tests"
+      - label: ":ubuntu: Filebeat Python Integration Tests"
         command: |
-          set -euo pipefail
           cd filebeat
           mage pythonIntegTest
         retry:
@@ -83,7 +80,7 @@ steps:
           - github_commit_status:
               context: "filebeat: Python Integration Tests"
 
-      - label: ":windows: Windows 2016 Unit Tests"
+      - label: ":windows: Filebeat Windows 2016 Unit Tests"
         key: "windows-2016-unit-tests"
         command: |
           Set-Location -Path filebeat
@@ -104,7 +101,7 @@ steps:
           - github_commit_status:
               context: "filebeat: Windows 2016 Unit Tests"
 
-      - label: ":windows: Windows 2022 Unit Tests"
+      - label: ":windows: Filebeat Windows 2022 Unit Tests"
         key: "windows-2022-unit-tests"
         command: |
           Set-Location -Path filebeat
@@ -130,7 +127,7 @@ steps:
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
 
     steps:
-      - label: ":mac: MacOS x64_64 Unit Tests"
+      - label: ":mac: Filebeat macOS x86_64 Unit Tests"
         key: "macos-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
@@ -149,9 +146,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: MacOS Unit Tests"
+              context: "filebeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: MacOS ARM Unit Tests"
+      - label: ":mac: Filebeat macOS arm64 Unit Tests"
         key: "macos-arm64-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
@@ -170,13 +167,12 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: MacOS ARM Unit Tests"
+              context: "filebeat: macOS arm64 Unit Tests"
 
-      - label: ":linux: Ubuntu ARM Unit Tests"
+      - label: ":linux: Filebeat arm64 Unit Tests"
         key: "extended-arm64-unit-test"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         command: |
-          set -euo pipefail
           cd filebeat
           mage build unitTest
         retry:
@@ -191,14 +187,14 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Extended Ubuntu ARM Unit Tests"
+              context: "filebeat: Linux arm64 Unit Tests"
 
-  - group: "Extended Windows Tests"
+  - group: "Filebeat Extended Windows Tests"
     key: "filebeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Windows 2019 Unit Tests"
+      - label: ":windows: Filebeat Windows 2019 Unit Tests"
         key: "windows-extended-2019"
         command: |
           Set-Location -Path filebeat
@@ -217,9 +213,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Extended Windows 2019 Unit Tests"
+              context: "filebeat: Windows 2019 Unit Tests"
 
-      - label: ":windows: Windows 11 Unit Tests"
+      - label: ":windows: Filebeat Windows 11 Unit Tests"
         key: "windows-extended-11"
         command: |
           Set-Location -Path filebeat
@@ -238,9 +234,9 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Extended Windows 11 Unit Tests"
+              context: "filebeat: Windows 11 Unit Tests"
 
-      - label: ":windows: Windows 10 Unit Tests"
+      - label: ":windows: Filebeat Windows 10 Unit Tests"
         key: "windows-extended-10"
         command: |
           Set-Location -Path filebeat
@@ -259,7 +255,7 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Extended Windows 10 Unit Tests"
+              context: "filebeat: Windows 10 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -271,10 +267,9 @@ steps:
   - group: "Filebeat Packaging"
     key: "packaging"
     steps:
-      - label: ":linux: Packaging Linux"
+      - label: ":linux: Filebeat Packaging Linux"
         key: "packaging-linux"
         command: |
-          set -euo pipefail
           cd filebeat
           mage package
         agents:
@@ -287,12 +282,11 @@ steps:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
         notify:
           - github_commit_status:
-              context: "filebeat: Packaging"
+              context: "filebeat: Packaging Linux"
 
-      - label: ":linux: Packaging ARM"
+      - label: ":linux: Filebeat Packaging arm64"
         key: "packaging-arm"
         command: |
-          set -euo pipefail
           cd filebeat
           mage package
         agents:
@@ -304,4 +298,4 @@ steps:
           PACKAGES: "docker"
         notify:
           - github_commit_status:
-              context: "filebeat: Packaging ARM"
+              context: "filebeat: Packaging arm64"
