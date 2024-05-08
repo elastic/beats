@@ -9,14 +9,11 @@ on:
 permissions:
   contents: read
 
-env:
-  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
 jobs:
   bump-main:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
         with:
@@ -30,7 +27,7 @@ jobs:
   bump-7-17:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
         with:

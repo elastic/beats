@@ -9,9 +9,6 @@ on:
 permissions:
   contents: read
 
-env:
-  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
 jobs:
   filter:
     runs-on: ubuntu-latest
@@ -29,7 +26,7 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
         with:

@@ -6,6 +6,7 @@ actions:
   default:
     title: '[updatecli] update elastic stack version for testing {{ source "latestVersion" }}'
     kind: github/pullrequest
+    scmid: default
     spec:
       labels:
         - automation
@@ -13,9 +14,6 @@ actions:
         - backport-skip
         - build-monitoring
         - Team:Beats-On-Call
-      description: |
-        Generated automatically with {{ requiredEnv "JOB_URL" }}
-    scmid: default
 
 scms:
   default:

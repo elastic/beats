@@ -21,12 +21,9 @@ actions:
     sourceid: latestGoVersion
     title: '[Automation][7.17] Bump Golang version to {{ source "latestGoVersion" }}'
     spec:
-      automerge: false
       labels:
         - dependencies
         - backport-skip
-      description: |
-        Generated automatically with {{ requiredEnv "JOB_URL" }}
 
 sources:
   minor:
