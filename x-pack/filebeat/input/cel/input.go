@@ -1184,7 +1184,7 @@ func cloneMap(dst, src mapstr.M) {
 // walkMap walks to all ends of the provided path in m and applies fn to the
 // final element of each walk. Nested arrays are not handled.
 func walkMap(m mapstr.M, path string, fn func(parent mapstr.M, key string)) {
-	key, rest, more := strings.Cut(path, ".") //nolint:typecheck // reset is used in recursive calls.
+	key, rest, more := strings.Cut(path, ".")
 	v, ok := m[key]
 	if !ok {
 		return
