@@ -33,8 +33,8 @@ jobs:
           vaultUrl: ${{ secrets.VAULT_ADDR }}
           vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
           vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
-          pipeline: ./.github/workflows/updatecli/updatecli.d/bump-elastic-stack-snapshot.yml
-          values: ./.github/workflows/updatecli/values.d/scm.yml
+          pipeline: .github/workflows/updatecli.d/bump-elastic-stack-snapshot.yml
+          values: .github/workflows/updatecli.d/scm.yml
           command: '--experimental apply'
           notifySlackChannel: "#ingest-notifications"
           messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <${{ env.JOB_URL }}|here>"
