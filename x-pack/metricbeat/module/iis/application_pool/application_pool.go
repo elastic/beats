@@ -71,7 +71,8 @@ func (m *MetricSet) Fetch(report mb.ReporterV2) error {
 			return fmt.Errorf("failed retrieving counters: %w", err)
 		}
 	}
-	events, err := m.reader.read()
+	// Read both running and non-running applications
+	events, err := m.reader.readAll()
 	if err != nil {
 		return fmt.Errorf("failed reading counters: %w", err)
 	}

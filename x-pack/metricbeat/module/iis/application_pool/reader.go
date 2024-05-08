@@ -16,6 +16,12 @@ import (
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"gopkg.in/oleiade/reflections.v1"
+	"gopkg.in/webconfig.v1"
+	"gopkg.in/webconfig.v1/applicationhost"
+	"gopkg.in/webconfig.v1/applicationhost/configs"
+	"gopkg.in/webconfig.v1/helpers"
+
 )
 
 const ecsProcessId = "process.pid"
@@ -81,15 +87,15 @@ func newReader(config Config) (*Reader, error) {
 	return r, nil
 }
 
-// initAppPools will check for any new instances and add them to the counter list
+// initAppPools will retrieve all application pools, running or not, and add them to the counter list
 func (r *Reader) initAppPools() error {
-	apps, err := getApplicationPools(r.config.Names)
+	apps, err := getAllApplicationPools(r.config.Names)
 	if err != nil {
-		return fmt.Errorf("failed retrieving running worker processes: %w", err)
+		return fmt.Errorf("failed retrieving all application pools: %w", err)
 	}
 	r.applicationPools = apps
 	if len(apps) == 0 {
-		r.log.Info("no running application pools found")
+		r.log.Info("no application pools found")
 		return nil
 	}
 	var newQueries []string
@@ -125,6 +131,58 @@ func (r *Reader) initAppPools() error {
 		return fmt.Errorf("failed removing unused counter values: %w", err)
 	}
 	return nil
+}
+
+// getAllApplicationPools retrieves all application pools configured in IIS
+func getAllApplicationPools(names []string) ([]ApplicationPool, error) {
+    // Load the IIS applicationHost.config file
+    config, err := webconfig.NewAppHostConfig()
+    if err != nil {
+        return nil, fmt.Errorf("failed to load applicationHost.config: %w", err)
+    }
+
+    // Get the list of application pools from the config
+    pools, err := getApplicationPoolsFromConfig(config)
+    if err != nil {
+        return nil, fmt.Errorf("failed to get application pools from config: %w", err)
+    }
+
+    // Filter the pools based on the names configured by users
+    var filteredPools []ApplicationPool
+    for _, pool := range pools {
+        if contains(names, pool.Name) {
+            filteredPools = append(filteredPools, pool)
+        }
+    }
+
+    return filteredPools, nil
+}
+
+// getApplicationPoolsFromConfig retrieves all application pools from the IIS configuration
+func getApplicationPoolsFromConfig(config *applicationhost.Config) ([]ApplicationPool, error) {
+    var pools []ApplicationPool
+
+    // Iterate over each application pool in the config
+    for _, site := range config.Sites {
+        for _, app in range site.Applications {
+            for _, poolName := range app.ApplicationPool {
+                pool := ApplicationPool{Name: poolName}
+                pools = append(pools, pool)
+            }
+        }
+    }
+
+    return pools, nil
+}
+
+// contains checks if a string is present in a slice of strings
+func contains(names []string, name string) bool {
+    for _, n := range names {
+        if n == name {
+            return true
+        }
+    }
+    return false
 }
 
 // read executes a query and returns those values in an event.
