@@ -26,6 +26,9 @@ steps:
       commands:
         - "MODULE=kubernetes make -C metricbeat integration-tests"
         - "make -C deploy/kubernetes test"
+      retry:
+        automatic:
+          - limit: 3
       agents:
         provider: "gcp"
         image: "${IMAGE_UBUNTU_X86_64}"
@@ -41,6 +44,9 @@ steps:
       commands:
         - "MODULE=kubernetes make -C metricbeat integration-tests"
         - "make -C deploy/kubernetes test"
+      retry:
+        automatic:
+          - limit: 3
       agents:
         provider: "gcp"
         image: "${IMAGE_UBUNTU_X86_64}"
@@ -56,10 +62,35 @@ steps:
       commands:
         - "MODULE=kubernetes make -C metricbeat integration-tests"
         - "make -C deploy/kubernetes test"
+      retry:
+        automatic:
+          - limit: 3
       agents:
         provider: "gcp"
         image: "${IMAGE_UBUNTU_X86_64}"
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:
+<<<<<<< HEAD
             context: "Deploy/k8s-test v1.19.16"
+=======
+            context: "Deploy/k8s-test v1.27.3"
+
+    - label: "K8S Test/K8S version: v1.26.6"
+      key: "k8s-test-1266"
+      env:
+        K8S_VERSION: "v1.26.6"
+      commands:
+        - "MODULE=kubernetes make -C metricbeat integration-tests"
+        - "make -C deploy/kubernetes test"
+      retry:
+        automatic:
+          - limit: 3
+      agents:
+        provider: "gcp"
+        image: "${IMAGE_UBUNTU_X86_64}"
+        machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+      notify:
+        - github_commit_status:
+            context: "Deploy/k8s-test v1.26.6"
+>>>>>>> 75397eb0fa (Added retries for packaging steps & K8S tests (#39466))
