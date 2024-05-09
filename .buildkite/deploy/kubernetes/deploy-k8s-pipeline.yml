@@ -26,6 +26,9 @@ steps:
       commands:
         - "MODULE=kubernetes make -C metricbeat integration-tests"
         - "make -C deploy/kubernetes test"
+      retry:
+        automatic:
+          - limit: 3
       agents:
         provider: "gcp"
         image: "${IMAGE_UBUNTU_X86_64}"
@@ -41,6 +44,9 @@ steps:
       commands:
         - "MODULE=kubernetes make -C metricbeat integration-tests"
         - "make -C deploy/kubernetes test"
+      retry:
+        automatic:
+          - limit: 3
       agents:
         provider: "gcp"
         image: "${IMAGE_UBUNTU_X86_64}"
@@ -56,6 +62,9 @@ steps:
       commands:
         - "MODULE=kubernetes make -C metricbeat integration-tests"
         - "make -C deploy/kubernetes test"
+      retry:
+        automatic:
+          - limit: 3
       agents:
         provider: "gcp"
         image: "${IMAGE_UBUNTU_X86_64}"
