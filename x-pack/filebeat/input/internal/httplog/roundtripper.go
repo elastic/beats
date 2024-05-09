@@ -105,13 +105,22 @@ func (rt *LoggingRoundTripper) RoundTrip(req *http.Request) (*http.Response, err
 	resp.Body, body, err = copyBody(resp.Body)
 	if err != nil {
 		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to read response body: %s", err))
+<<<<<<< HEAD
 	} else {
 		respParts = append(respParts,
 			zap.ByteString("http.response.body.content", body),
 			zap.Int("http.response.body.bytes", len(body)),
 			zap.String("http.response.mime_type", resp.Header.Get("Content-Type")),
 		)
+=======
+>>>>>>> 3efb1e8612 (x-pack/filebeat/input/internal/httplog: improve req/resp logging (#39455))
 	}
+	respParts = append(respParts,
+		zap.ByteString("http.response.body.content", body[:min(len(body), rt.maxBodyLen)]),
+		zap.Bool("http.response.body.truncated", rt.maxBodyLen < len(body)),
+		zap.Int("http.response.body.bytes", len(body)),
+		zap.String("http.response.mime_type", resp.Header.Get("Content-Type")),
+	)
 	message, err := httputil.DumpResponse(resp, false)
 	if err != nil {
 		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to dump response: %s", err))
@@ -172,13 +181,22 @@ func logRequest(log *zap.Logger, req *http.Request, extra ...zapcore.Field) (_ *
 	req.Body, body, err = copyBody(req.Body)
 	if err != nil {
 		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to read request body: %s", err))
+<<<<<<< HEAD
 	} else {
 		reqParts = append(reqParts,
 			zap.ByteString("http.request.body.content", body),
 			zap.Int("http.request.body.bytes", len(body)),
 			zap.String("http.request.mime_type", req.Header.Get("Content-Type")),
 		)
+=======
+>>>>>>> 3efb1e8612 (x-pack/filebeat/input/internal/httplog: improve req/resp logging (#39455))
 	}
+	reqParts = append(reqParts,
+		zap.ByteString("http.request.body.content", body[:min(len(body), maxBodyLen)]),
+		zap.Bool("http.request.body.truncated", maxBodyLen < len(body)),
+		zap.Int("http.request.body.bytes", len(body)),
+		zap.String("http.request.mime_type", req.Header.Get("Content-Type")),
+	)
 	message, err := httputil.DumpRequestOut(req, false)
 	if err != nil {
 		errorsMessages = append(errorsMessages, fmt.Sprintf("failed to dump request: %s", err))
