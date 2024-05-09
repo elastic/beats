@@ -8,21 +8,31 @@ package integration
 
 import (
 	"fmt"
-	"github.com/elastic/beats/v7/libbeat/management/status"
-	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	filebeat "github.com/elastic/beats/v7/x-pack/filebeat/cmd"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
+
+func setUnitsRevisionNumber(units []*proto.UnitExpected, revision uint64) {
+	for _, unit := range units {
+		if unit.Config == nil {
+			return
+		}
+
+		unit.Config.Revision = revision
+	}
+}
 
 func TestCELInput(t *testing.T) {
 	invalidResponse := []byte("invalid json")
@@ -266,6 +276,8 @@ func TestCELInput(t *testing.T) {
 			}
 
 			serverOneResponse = invalidResponse
+
+			setUnitsRevisionNumber(allStreams, 0)
 			return true, allStreams
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
@@ -358,6 +370,7 @@ func TestCELInput(t *testing.T) {
 				return false, allStreams
 			}
 
+			setUnitsRevisionNumber(oneStream, 1)
 			return true, oneStream
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
@@ -374,7 +387,7 @@ func TestCELInput(t *testing.T) {
 			}, payload) {
 				return false, oneStream
 			}
-
+			setUnitsRevisionNumber(noStream, 2)
 			return true, noStream
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
@@ -386,6 +399,7 @@ func TestCELInput(t *testing.T) {
 			serverOneResponse = validResponse
 			serverTwoResponse = validResponse
 
+			setUnitsRevisionNumber(allStreams, 3)
 			return true, allStreams
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
@@ -408,6 +422,7 @@ func TestCELInput(t *testing.T) {
 				return false, allStreams
 			}
 
+			setUnitsRevisionNumber(noStream, 4)
 			return true, noStream
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
