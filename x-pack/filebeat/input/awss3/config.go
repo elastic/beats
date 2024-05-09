@@ -247,8 +247,9 @@ func (c config) getBucketARN() string {
 	return ""
 }
 
-// A callback to apply the configuration's settings to an S3 options struct.
-// Should be provided to s3.NewFromConfig.
+// An AWS SDK callback to apply the input configuration's settings to an S3
+// options struct.
+// Should be provided as a parameter to s3.NewFromConfig.
 func (c config) s3ConfigModifier(o *s3.Options) {
 	if c.NonAWSBucketName != "" {
 		o.EndpointResolver = nonAWSBucketResolver{endpoint: c.AWSConfig.Endpoint}
@@ -266,6 +267,9 @@ func (c config) s3ConfigModifier(o *s3.Options) {
 	})
 }
 
+// An AWS SDK callback to apply the input configuration's settings to an SQS
+// options struct.
+// Should be provided as a parameter to sqs.NewFromConfig.
 func (c config) sqsConfigModifier(o *sqs.Options) {
 	if c.AWSConfig.FIPSEnabled {
 		o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
