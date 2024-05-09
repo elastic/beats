@@ -68,11 +68,11 @@ func (in *s3PollerInput) Run(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
 ) error {
-	log := inputContext.Logger.Named("s3")
+	in.log = inputContext.Logger.Named("s3")
 	var err error
 
 	// Load the persistent S3 polling state.
-	in.states, err = newStates(log, in.store)
+	in.states, err = newStates(in.log, in.store)
 	if err != nil {
 		return fmt.Errorf("can not start persistent store: %w", err)
 	}
@@ -95,7 +95,7 @@ func (in *s3PollerInput) Run(
 	defer in.metrics.Close()
 
 	in.s3ObjectHandler = newS3ObjectProcessorFactory(
-		log,
+		in.log,
 		in.metrics,
 		in.s3,
 		in.config.getFileSelectors(),
