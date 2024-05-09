@@ -342,7 +342,7 @@ func (fb *Filebeat) Run(b *beat.Beat) error {
 	defer func() {
 		_ = inputTaskGroup.Stop()
 	}()
-	if err := v2InputLoader.Init(&inputTaskGroup, v2.ModeRun); err != nil {
+	if err := v2InputLoader.Init(&inputTaskGroup); err != nil {
 		logp.Err("Failed to initialize the input managers: %v", err)
 		return err
 	}

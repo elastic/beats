@@ -48,7 +48,7 @@ type s3ObjectProcessorFactory struct {
 // retry backoff until the connection is healthy again.
 var errS3DownloadFailed = errors.New("S3 download failure")
 
-func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig, maxWorkers int) *s3ObjectProcessorFactory {
+func newS3ObjectProcessorFactory(log *logp.Logger, metrics *inputMetrics, s3 s3API, sel []fileSelectorConfig, backupConfig backupConfig) *s3ObjectProcessorFactory {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
 		metrics = newInputMetrics("", nil, 0)

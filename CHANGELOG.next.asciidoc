@@ -144,6 +144,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Restore netflow input on Windows {pull}39024[39024]
 - Upgrade azure-event-hubs-go and azure-storage-blob-go dependencies. {pull}38861[38861]
 - Fix concurrency/error handling bugs in the AWS S3 input that could drop data and prevent ingestion of large buckets. {pull}39131[39131]
+- Fix EntraID query handling. {issue}39419[39419] {pull}39420[39420]
 
 *Heartbeat*
 
@@ -187,7 +188,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Beats will now connect to older Elasticsearch instances by default {pull}36884[36884]
 - Raise up logging level to warning when attempting to configure beats with unknown fields from autodiscovered events/environments
 - elasticsearch output now supports `idle_connection_timeout`. {issue}35616[35615] {pull}36843[36843]
-- Update to Go 1.21.9. {pulk}38727[38727]
+- Update to Go 1.21.10. {pull}39467[39467]
 - Enable early event encoding in the Elasticsearch output, improving cpu and memory use {pull}38572[38572]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - Introduce log message for not supported annotations for Hints based autodiscover {pull}38213[38213]
@@ -255,13 +256,15 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add parseDateInTZ value template for the HTTPJSON input. {pull}37738[37738]
 - Add support for complex event objects in the HTTP Endpoint input. {issue}37910[37910] {pull}38193[38193]
 - Parse more fields from Elasticsearch slowlogs {pull}38295[38295]
-- Update CEL mito extensions to v1.10.0 to add keys/values helper. {pull}38504[38504]
+- Update CEL mito extensions to v1.10.0 to add base64 decode functions. {pull}38504[38504]
 - Add support for Active Directory an entity analytics provider. {pull}37919[37919]
 - Add AWS AWSHealth metricset. {pull}38370[38370]
 - Add debugging breadcrumb to logs when writing request trace log. {pull}38636[38636]
 - added benchmark input {pull}37437[37437]
 - added benchmark input and discard output {pull}37437[37437]
 - Ensure all responses sent by HTTP Endpoint are HTML-escaped. {pull}39329[39329]
+- Update CEL mito extensions to v1.11.0 to improve type checking. {pull}39460[39460]
+- Improve logging of request and response with request trace logging in error conditions. {pull}39455[39455]
 
 *Auditbeat*
 
@@ -290,6 +293,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add SSL support to mysql module {pull}37997[37997]
 - Add SSL support for aerospike module {pull}38126[38126]
 - Add last_terminated_timestamp metric in kubernetes module {pull}39200[39200] {issue}3802[3802]
+- Add pod.status.ready_time and pod.status.reason metrics in kubernetes module {pull}39316[39316]
 
 
 *Metricbeat*

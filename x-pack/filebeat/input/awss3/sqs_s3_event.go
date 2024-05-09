@@ -104,7 +104,6 @@ func newSQSS3EventProcessor(
 	maxReceiveCount int,
 	pipeline beat.Pipeline,
 	s3 s3ObjectHandlerFactory,
-	maxWorkers int,
 ) *sqsS3EventProcessor {
 	if metrics == nil {
 		// Metrics are optional. Initialize a stub.
