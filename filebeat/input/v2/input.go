@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 
@@ -83,6 +84,8 @@ type Context struct {
 
 	// Cancelation is used by Beats to signal the input to shutdown.
 	Cancelation Canceler
+
+	StatusReporter status.StatusReporter
 }
 
 // TestContext provides the Input Test function with common environmental

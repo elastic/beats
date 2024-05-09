@@ -384,7 +384,7 @@ func groupByOutputs(outCfg *proto.UnitExpectedConfig) (*reload.ConfigWithMeta, e
 	// We still need to emulate the InjectHeadersRule AST code,
 	// I don't think we can get the `Headers()` data reported by the AgentInfo()
 	sourceMap := outCfg.GetSource().AsMap()
-	outputType := outCfg.GetType() //nolint:typecheck // this is used, linter just doesn't seem to see it
+	outputType := outCfg.GetType()
 	if outputType == "" {
 		return nil, fmt.Errorf("output config does not have a configured type field")
 	}

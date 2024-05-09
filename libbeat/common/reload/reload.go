@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -47,6 +48,8 @@ type ConfigWithMeta struct {
 
 	// InputUnitID is the unit's ID that generated this ConfigWithMeta
 	InputUnitID string
+
+	StatusReporter status.StatusReporter
 }
 
 // ReloadableList provides a method to reload the configuration of a list of entities

@@ -23,7 +23,7 @@ import (
 	"strings"
 	"time"
 
-	retryablehttp "github.com/hashicorp/go-retryablehttp"
+	"github.com/hashicorp/go-retryablehttp"
 	"github.com/icholy/digest"
 	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"
@@ -39,6 +39,7 @@ import (
 	inputcursor "github.com/elastic/beats/v7/filebeat/input/v2/input-cursor"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
@@ -96,17 +97,33 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 	return test(cfg.Resource.URL.URL)
 }
 
+func updateStatus(reporter status.StatusReporter, state status.Status, msg string) {
+	if reporter == nil {
+		return
+	}
+
+	reporter.UpdateStatus(state, msg)
+}
+
 // Run starts the input and blocks until it ends completes. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
 	var cursor map[string]interface{}
+	updateStatus(env.StatusReporter, status.Starting, "")
 	if !crsr.IsNew() { // Allow the user to bootstrap the program if needed.
-		err := crsr.Unpack(&cursor)
-		if err != nil {
+		if err := crsr.Unpack(&cursor); err != nil {
+			updateStatus(env.StatusReporter, status.Failed, "failed to unpack cursor: "+err.Error())
 			return err
 		}
 	}
-	return input{}.run(env, src.(*source), cursor, pub)
+
+	if err := (input{}.run(env, src.(*source), cursor, pub)); err != nil {
+		updateStatus(env.StatusReporter, status.Failed, "error: "+err.Error())
+		return err
+	}
+
+	updateStatus(env.StatusReporter, status.Stopped, "")
+	return nil
 }
 
 // sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
@@ -121,6 +138,7 @@ func sanitizeFileName(name string) string {
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
+	statusReporter := env.StatusReporter
 
 	metrics := newInputMetrics(env.ID)
 	defer metrics.Close()
@@ -202,6 +220,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// In addition to this and the functions and globals available
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
+
+	updateStatus(statusReporter, status.Running, "")
 	err = periodically(ctx, cfg.Interval, func() error {
 		log.Info("process repeated request")
 		var (
@@ -241,6 +261,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					return err
 				}
 				log.Errorw("failed evaluation", "error", err)
+				updateStatus(statusReporter, status.Degraded, err.Error())
 			}
 			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
 			if trace != nil {
@@ -348,6 +369,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			e, ok := state["events"]
 			if !ok {
 				log.Error("unexpected missing events array from evaluation")
+				updateStatus(statusReporter, status.Degraded, "unexpected missing events array from evaluation")
 			}
 			var events []interface{}
 			switch e := e.(type) {
@@ -364,6 +386,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				events = []interface{}{e}
 				// Make sure the cursor is not updated.
 				delete(state, "cursor")
+				updateStatus(statusReporter, status.Degraded, "single event object returned by evaluation")
 			default:
 				return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 			}
@@ -386,6 +409,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if ok {
 					if len(cursors) != len(events) {
 						log.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
+						updateStatus(statusReporter, status.Degraded, "unexpected cursor list length")
 						// But try to continue.
 						if len(cursors) < len(events) {
 							cursors = nil
@@ -436,6 +460,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if err != nil {
 					hadPublicationError = true
 					log.Errorw("error publishing event", "error", err)
+					updateStatus(statusReporter, status.Degraded, "error publishing event")
 					cursors = nil // We are lost, so retry with this event's cursor,
 					continue      // but continue with the events that we have without
 					// advancing the cursor. This allows us to potentially publish the
@@ -450,6 +475,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				err = ctx.Err()
 				if err != nil {
 					return err
+				}
+
+				if _, hasErr := event["error"]; !hasErr {
+					updateStatus(statusReporter, status.Running, "")
 				}
 			}
 			metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
@@ -471,6 +500,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			budget--
 			if budget <= 0 {
 				log.Warnw("exceeding maximum number of CEL executions", "limit", *cfg.MaxExecutions)
+				updateStatus(statusReporter, status.Degraded, "exceeding maximum number of CEL executions")
 				return nil
 			}
 		}
