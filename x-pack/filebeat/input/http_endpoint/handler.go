@@ -6,12 +6,14 @@ package http_endpoint
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
+	"net/url"
 	"reflect"
 	"strconv"
 	"time"
@@ -43,6 +45,8 @@ var (
 )
 
 type handler struct {
+	ctx context.Context
+
 	metrics     *inputMetrics
 	publish     func(beat.Event)
 	log         *logp.Logger
@@ -69,12 +73,23 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	wait := getTimeoutWait(r.URL, h.log)
+	var (
+		acked   chan struct{}
+		timeout *time.Timer
+	)
+	if wait != 0 {
+		acked = make(chan struct{})
+		timeout = time.NewTimer(wait)
+	}
 	start := time.Now()
 	acker := newBatchACKTracker(func() {
 		h.metrics.batchACKTime.Update(time.Since(start).Nanoseconds())
 		h.metrics.batchesACKedTotal.Inc()
+		if acked != nil {
+			close(acked)
+		}
 	})
-	defer acker.Ready()
 	h.metrics.batchesReceived.Add(1)
 	h.metrics.contentLength.Update(r.ContentLength)
 	body, status, err := getBodyReader(r)
@@ -138,12 +153,47 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		respCode, respBody = h.responseCode, h.responseBody
 	}
 
-	h.sendResponse(w, respCode, respBody)
-	if h.reqLogger != nil {
-		h.logRequest(r, respCode, nil)
+	acker.Ready()
+	if acked == nil {
+		h.sendResponse(w, respCode, respBody)
+	} else {
+		select {
+		case <-acked:
+			if !timeout.Stop() {
+				<-timeout.C
+			}
+			h.sendResponse(w, respCode, respBody)
+		case <-timeout.C:
+			h.sendAPIErrorResponse(w, r, h.log, http.StatusGatewayTimeout, errTookTooLong)
+		case <-h.ctx.Done():
+			h.sendAPIErrorResponse(w, r, h.log, http.StatusGatewayTimeout, h.ctx.Err())
+		}
+		if h.reqLogger != nil {
+			h.logRequest(r, respCode, nil)
+		}
 	}
 	h.metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
 	h.metrics.batchesPublished.Add(1)
+}
+
+var errTookTooLong = errors.New("could not publish event within timeout")
+
+func getTimeoutWait(u *url.URL, log *logp.Logger) time.Duration {
+	p := u.Query().Get("wait_for_completion_timeout")
+	if p == "" {
+		return 0
+	}
+	log.Debugw("wait_for_completion_timeout parameter", "value", p)
+	t, err := time.ParseDuration(p)
+	if err != nil {
+		log.Warnw("could not parse wait_for_completion_timeout parameter", "error", err)
+		return 0
+	}
+	if t < 0 {
+		log.Warnw("negative wait_for_completion_timeout parameter", "error", err)
+		return 0
+	}
+	return t
 }
 
 func (h *handler) sendAPIErrorResponse(w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
