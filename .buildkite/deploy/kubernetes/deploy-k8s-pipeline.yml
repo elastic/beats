@@ -46,7 +46,7 @@ steps:
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:
-            context: "Deploy/k8s-test v1.21.14"
+            context: "deploy/k8s test v1.21.14"
 
     - label: "K8S Test/K8S version: v1.20.15"
       key: "k8s-test-120"
@@ -68,7 +68,7 @@ steps:
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:
-            context: "Deploy/k8s-test v1.20.15"
+            context: "deploy/k8s test v1.20.15"
 
     - label: "K8S Test/K8S version: v1.19.16"
       key: "k8s-test-119"
@@ -90,4 +90,4 @@ steps:
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:
-            context: "Deploy/k8s-test v1.19.16"
+            context: "deploy/k8s test v1.19.16"
