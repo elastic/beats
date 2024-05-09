@@ -3,6 +3,10 @@
 env:
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+  MODULE: "kubernetes"
+
+  # Other deps
+  ASDF_KIND_VERSION: "0.20.0"
 
 steps:
   - group: "Deploy/K8S"
@@ -10,22 +14,36 @@ steps:
 
     steps:
     - label: "Checks"
-      command: ".buildkite/deploy/kubernetes/scripts/make.sh"
+      command: |
+        set -euo pipefail
+        make -C deploy/kubernetes all
+        make check-no-changes
       agents:
         provider: "gcp"
         image: "${IMAGE_UBUNTU_X86_64}"
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:
-            context: "Deploy/k8s-checks"
+            context: "deploy/k8s checks"
 
     - label: "K8S Test/K8S version: v1.21.14"
       key: "k8s-test-121"
       env:
+<<<<<<< HEAD
         K8S_VERSION: "v1.21.14"
       commands:
         - "MODULE=kubernetes make -C metricbeat integration-tests"
         - "make -C deploy/kubernetes test"
+=======
+        K8S_VERSION: "v1.29.0"
+        MODULE: "${MODULE}"
+      commands: |
+        set -euo pipefail
+        source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
+        echo "--- Executing Tests"
+        make -C metricbeat integration-tests
+        make -C deploy/kubernetes test
+>>>>>>> 8664cae202 (Deploy/K8S pipeline post-migration fixes (#39295))
       retry:
         automatic:
           - limit: 3
@@ -35,15 +53,30 @@ steps:
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:
+<<<<<<< HEAD
             context: "Deploy/k8s-test v1.21.14"
+=======
+            context: "deploy/k8s test v1.29.0"
+>>>>>>> 8664cae202 (Deploy/K8S pipeline post-migration fixes (#39295))
 
     - label: "K8S Test/K8S version: v1.20.15"
       key: "k8s-test-120"
       env:
+<<<<<<< HEAD
         K8S_VERSION: "v1.20.15"
       commands:
         - "MODULE=kubernetes make -C metricbeat integration-tests"
         - "make -C deploy/kubernetes test"
+=======
+        K8S_VERSION: "v1.28.0"
+        MODULE: "${MODULE}"
+      commands: |
+        set -euo pipefail
+        source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
+        echo "--- Executing Tests"
+        make -C metricbeat integration-tests
+        make -C deploy/kubernetes test
+>>>>>>> 8664cae202 (Deploy/K8S pipeline post-migration fixes (#39295))
       retry:
         automatic:
           - limit: 3
@@ -53,15 +86,30 @@ steps:
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:
+<<<<<<< HEAD
             context: "Deploy/k8s-test v1.20.15"
+=======
+            context: "deploy/k8s test v1.28.0"
+>>>>>>> 8664cae202 (Deploy/K8S pipeline post-migration fixes (#39295))
 
     - label: "K8S Test/K8S version: v1.19.16"
       key: "k8s-test-119"
       env:
+<<<<<<< HEAD
         K8S_VERSION: "v1.19.16"
       commands:
         - "MODULE=kubernetes make -C metricbeat integration-tests"
         - "make -C deploy/kubernetes test"
+=======
+        K8S_VERSION: "v1.27.3"
+        MODULE: "${MODULE}"
+      commands: |
+        set -euo pipefail
+        source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
+        echo "--- Executing Tests"
+        make -C metricbeat integration-tests
+        make -C deploy/kubernetes test
+>>>>>>> 8664cae202 (Deploy/K8S pipeline post-migration fixes (#39295))
       retry:
         automatic:
           - limit: 3
@@ -71,4 +119,30 @@ steps:
         machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
       notify:
         - github_commit_status:
+<<<<<<< HEAD
             context: "Deploy/k8s-test v1.19.16"
+=======
+            context: "deploy/k8s test v1.27.3"
+
+    - label: "K8S Test/K8S version: v1.26.6"
+      key: "k8s-test-1266"
+      env:
+        K8S_VERSION: "v1.26.6"
+        MODULE: "${MODULE}"
+      commands: |
+        set -euo pipefail
+        source .buildkite/deploy/kubernetes/scripts/setup-k8s-env.sh
+        echo "--- Executing Tests"
+        make -C metricbeat integration-tests
+        make -C deploy/kubernetes test
+      retry:
+        automatic:
+          - limit: 3
+      agents:
+        provider: "gcp"
+        image: "${IMAGE_UBUNTU_X86_64}"
+        machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+      notify:
+        - github_commit_status:
+            context: "deploy/k8s test v1.26.6"
+>>>>>>> 8664cae202 (Deploy/K8S pipeline post-migration fixes (#39295))

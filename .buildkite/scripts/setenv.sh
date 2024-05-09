@@ -2,6 +2,7 @@
 
 set -euo pipefail
 
+<<<<<<< HEAD
 REPO="beats"
 TMP_FOLDER="tmp.${REPO}"
 DOCKER_REGISTRY="docker.elastic.co"
@@ -34,6 +35,23 @@ export ASDF_TERRAFORM_VERSION
 export AWS_REGION
 export NODEJS_VERSION
 
+=======
+WORKSPACE=${WORKSPACE:-"$(pwd)"}
+GO_VERSION=$(cat .go-version)
+
+export REPO="beats"
+export DOCKER_REGISTRY="docker.elastic.co"
+export SETUP_GVM_VERSION="v0.5.1"
+export DOCKER_COMPOSE_VERSION="1.21.0"
+export DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
+
+export ASDF_NODEJS_VERSION="18.17.1"
+export AWS_REGION="eu-central-1"
+
+export WORKSPACE
+export GO_VERSION
+
+>>>>>>> 8664cae202 (Deploy/K8S pipeline post-migration fixes (#39295))
 exportVars() {
   local platform_type="$(uname)"
   local arch_type="$(uname -m)"
