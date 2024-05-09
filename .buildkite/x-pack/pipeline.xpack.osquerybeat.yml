@@ -228,6 +228,10 @@ steps:
         command: |
           cd x-pack/osquerybeat
           mage package
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
