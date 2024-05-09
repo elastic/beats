@@ -54,7 +54,6 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 		name     string
 		queueURL string
 		endpoint string
-		deflt    string
 		want     string
 		wantErr  error
 	}{
@@ -77,7 +76,6 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 		{
 			name:     "vpce_endpoint",
 			queueURL: "https://vpce-test.sqs.us-east-2.vpce.amazonaws.com/12345678912/sqs-queue",
-			deflt:    "",
 			want:     "us-east-2",
 		},
 		{
@@ -90,7 +88,7 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := getRegionFromQueueURL(test.queueURL, test.endpoint, test.deflt)
+			got, err := getRegionFromQueueURL(test.queueURL, test.endpoint)
 			if !sameError(err, test.wantErr) {
 				t.Errorf("unexpected error: got:%v want:%v", err, test.wantErr)
 			}

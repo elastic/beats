@@ -18,9 +18,10 @@ import (
 	klogger "github.com/osquery/osquery-go/plugin/logger"
 	"golang.org/x/sync/errgroup"
 
-	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
 
+	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/x-pack/libbeat/common/proc"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/config"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
 	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/osqd"
@@ -128,6 +129,12 @@ func (bt *osquerybeat) close() {
 
 // Run starts osquerybeat.
 func (bt *osquerybeat) Run(b *beat.Beat) error {
+	pj, err := proc.CreateJobObject()
+	if err != nil {
+		return fmt.Errorf("failed to create process JobObject: %w", err)
+	}
+	defer pj.Close()
+
 	ctx, err := bt.init()
 	if err != nil {
 		return err

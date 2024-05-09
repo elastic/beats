@@ -6,14 +6,14 @@
         "module": "kubernetes"
     },
     "kubernetes": {
-        "namespace": "default",
+        "namespace": "kube-system",
         "node": {
             "name": "kind-control-plane"
         },
         "pod": {
-            "host_ip": "172.18.0.2",
-            "ip": "10.244.0.6",
-            "name": "web-0",
+            "host_ip": "172.21.0.2",
+            "ip": "172.21.0.2",
+            "name": "etcd-kind-control-plane",
             "status": {
                 "phase": "running",
                 "ready": "true",

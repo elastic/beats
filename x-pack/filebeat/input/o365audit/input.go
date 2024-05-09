@@ -55,7 +55,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) v2.Plugin {
 	return v2.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Experimental,
-		Deprecated: false,
+		Deprecated: true,
 		Info:       "O365 logs",
 		Doc:        "Collect logs from O365 service",
 		Manager: &cursor.InputManager{

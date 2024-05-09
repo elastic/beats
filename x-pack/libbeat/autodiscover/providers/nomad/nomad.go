@@ -277,7 +277,7 @@ func (p *Provider) generateHints(event bus.Event) bus.Event {
 	}
 
 	cname := utils.GetContainerName(container)
-	hints := utils.GenerateHints(tasks, cname, p.config.Prefix)
+	hints, _ := utils.GenerateHints(tasks, cname, p.config.Prefix, false, []string{}) // Parameter validate=false of utils.GenerateHints. This disables the validation of hints
 	if len(hints) > 0 {
 		e["hints"] = hints
 	}

@@ -92,7 +92,7 @@ targets:
     spec:
       content: 'go {{ source "gomod" }}'
       file: go.mod
-      matchpattern: 'go \d+.\d+'
+      matchpattern: 'go \d+.\d+.\d+'
   update-go-version:
     name: "Update .go-version"
     sourceid: latestGoVersion

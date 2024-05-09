@@ -108,6 +108,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.logs/multiline.pattern":    "^test",
 						"co.elastic.logs/json.keys_under_root": "true",
 						"co.elastic.metrics/module":            "prometheus",
+						"co.elastic.metrics/timeoutssssssss":   "5s", //On purpose we added this annotation with typo
 						"co.elastic.metrics/period":            "10s",
 						"co.elastic.metrics.foobar/period":     "15s",
 						"not.to.include":                       "true",
@@ -125,6 +126,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.logs/multiline.pattern":    "^test",
 						"co.elastic.logs/json.keys_under_root": "true",
 						"co.elastic.metrics/module":            "prometheus",
+						"co.elastic.metrics/timeoutssssssss":   "5s",
 						"not.to.include":                       "true",
 						"co.elastic.metrics/period":            "10s",
 						"co.elastic.metrics.foobar/period":     "15s",
@@ -145,8 +147,9 @@ func TestGenerateHints(t *testing.T) {
 						},
 					},
 					"metrics": mapstr.M{
-						"module": "prometheus",
-						"period": "15s",
+						"module":          "prometheus",
+						"period":          "15s",
+						"timeoutssssssss": "5s",
 					},
 				},
 				"container": mapstr.M{
@@ -230,6 +233,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.metrics/module":        "prometheus",
 						"co.elastic.metrics/period":        "10s",
 						"co.elastic.metrics.foobar/period": "15s",
+						"co.elastic.metrics/hosts":         "127.0.0.1:9090",
 						"not.to.include":                   "true",
 					}),
 					"namespace_annotations": getNestedAnnotations(mapstr.M{
@@ -251,6 +255,7 @@ func TestGenerateHints(t *testing.T) {
 						"co.elastic.metrics/module":        "prometheus",
 						"co.elastic.metrics/period":        "10s",
 						"co.elastic.metrics.foobar/period": "15s",
+						"co.elastic.metrics/hosts":         "127.0.0.1:9090",
 						"not.to.include":                   "true",
 					}),
 					"namespace_annotations": getNestedAnnotations(mapstr.M{
@@ -268,6 +273,7 @@ func TestGenerateHints(t *testing.T) {
 				"hints": mapstr.M{
 					"metrics": mapstr.M{
 						"module": "prometheus",
+						"hosts":  "127.0.0.1:9090",
 						"period": "15s",
 					},
 				},
@@ -2108,6 +2114,114 @@ func TestNodePodUpdater(t *testing.T) {
 	}
 }
 
+func TestPodEventer_Namespace_Node_Watcher(t *testing.T) {
+	client := k8sfake.NewSimpleClientset()
+	uuid, err := uuid.NewV4()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		cfg         mapstr.M
+		expectedNil bool
+		name        string
+		msg         string
+	}{
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": false,
+					"node.enabled":      false,
+				},
+				"hints.enabled": false,
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: true,
+			name:        "add_resource_metadata.namespace and add_resource_metadata.node disabled and hints disabled.",
+			msg:         "Watcher should be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": false,
+					"node.enabled":      false,
+				},
+				"hints.enabled": true,
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata.namespace and add_resource_metadata.node disabled and hints enabled.",
+			msg:         "Watcher should not be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"add_resource_metadata": mapstr.M{
+					"namespace.enabled": true,
+					"node.enabled":      true,
+				},
+				"hints.enabled": false,
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata.namespace and add_resource_metadata.node enabled and hints disabled.",
+			msg:         "Watcher should not be nil.",
+		},
+		{
+			cfg: mapstr.M{
+				"resource": "pod",
+				"node":     "node-1",
+				"builders": []mapstr.M{
+					{
+						"mock": mapstr.M{},
+					},
+				},
+			},
+			expectedNil: false,
+			name:        "add_resource_metadata default and hints default.",
+			msg:         "Watcher should not be nil.",
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			// #nosec G601
+			config := conf.MustNewConfigFrom(&test.cfg)
+			c := defaultConfig()
+			err = config.Unpack(&c)
+			assert.NoError(t, err)
+
+			eventer, err := NewPodEventer(uuid, config, client, nil)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			namespaceWatcher := eventer.(*pod).namespaceWatcher
+			nodeWatcher := eventer.(*pod).nodeWatcher
+
+			if test.expectedNil {
+				assert.Equalf(t, nil, namespaceWatcher, "Namespace "+test.msg)
+				assert.Equalf(t, nil, nodeWatcher, "Node "+test.msg)
+			} else {
+				assert.NotEqualf(t, nil, namespaceWatcher, "Namespace "+test.msg)
+				assert.NotEqualf(t, nil, nodeWatcher, "Node "+test.msg)
+			}
+		})
+	}
+}
+
 type mockUpdaterHandler struct {
 	objects []interface{}
 }
@@ -2138,6 +2252,10 @@ func (s *mockUpdaterWatcher) Client() interfaces.Interface {
 
 func (s *mockUpdaterWatcher) Start() error {
 	return err
+}
+
+func (s *mockUpdaterWatcher) GetEventHandler() kubernetes.ResourceEventHandler {
+	return nil
 }
 
 func (s *mockUpdaterWatcher) Stop() {

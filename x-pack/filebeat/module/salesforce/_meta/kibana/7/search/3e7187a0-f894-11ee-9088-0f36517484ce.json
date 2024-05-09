@@ -1,0 +1,44 @@
+{
+    "attributes": {
+        "columns": [
+            "salesforce.setup_audit_trail.section",
+            "event.action",
+            "salesforce.setup_audit_trail.display"
+        ],
+        "description": "",
+        "hits": 0,
+        "kibanaSavedObjectMeta": {
+            "searchSourceJSON": {
+                "filter": [],
+                "indexRefName": "kibanaSavedObjectMeta.searchSourceJSON.index",
+                "query": {
+                    "language": "kuery",
+                    "query": "salesforce.setup_audit_trail.section : * or event.action : * or salesforce.setup_audit_trail.display : *"
+                }
+            }
+        },
+        "sort": [
+            [
+                "@timestamp",
+                "desc"
+            ]
+        ],
+        "title": "Changes made in the setup [Filebeat Salesforce]",
+        "version": 1
+    },
+    "coreMigrationVersion": "7.15.0",
+    "id": "3e7187a0-f894-11ee-9088-0f36517484ce",
+    "migrationVersion": {
+        "search": "7.9.3"
+    },
+    "references": [
+        {
+            "id": "filebeat-*",
+            "name": "kibanaSavedObjectMeta.searchSourceJSON.index",
+            "type": "index-pattern"
+        }
+    ],
+    "type": "search",
+    "updated_at": "2024-04-12T11:37:55.498Z",
+    "version": "WzExMjQ3LDFd"
+}

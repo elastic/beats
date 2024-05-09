@@ -223,6 +223,16 @@ func TestConfigOauth2Validation(t *testing.T) {
 			},
 		},
 		{
+			name: "if password is set credentials may be missing for user-password authentication",
+			input: map[string]interface{}{
+				"auth.oauth2": map[string]interface{}{
+					"user":      "a_client_user",
+					"password":  "a_client_password",
+					"token_url": "localhost",
+				},
+			},
+		},
+		{
 			name:        "must fail with an unknown provider",
 			expectedErr: "unknown provider \"unknown\" accessing 'auth.oauth2'",
 			input: map[string]interface{}{

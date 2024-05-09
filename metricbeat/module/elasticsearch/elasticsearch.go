@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"net/url"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -366,61 +365,6 @@ func GetXPack(http *helper.HTTP, resetURI string) (XPack, error) {
 	var xpack XPack
 	err = json.Unmarshal(content, &xpack)
 	return xpack, err
-}
-
-type boolStr bool
-
-func (b *boolStr) UnmarshalJSON(raw []byte) error {
-	var bs string
-	err := json.Unmarshal(raw, &bs)
-	if err != nil {
-		return err
-	}
-
-	bv, err := strconv.ParseBool(bs)
-	if err != nil {
-		return err
-	}
-
-	*b = boolStr(bv)
-	return nil
-}
-
-type IndexSettings struct {
-	Hidden bool
-}
-
-// GetIndicesSettings returns a map of index names to their settings.
-// Note that as of now it is optimized to fetch only the "hidden" index setting to keep the memory
-// footprint of this function call as low as possible.
-func GetIndicesSettings(http *helper.HTTP, resetURI string) (map[string]IndexSettings, error) {
-	content, err := fetchPath(http, resetURI, "*/_settings", "filter_path=*.settings.index.hidden&expand_wildcards=all")
-
-	if err != nil {
-		return nil, fmt.Errorf("could not fetch indices settings: %w", err)
-	}
-
-	var resp map[string]struct {
-		Settings struct {
-			Index struct {
-				Hidden boolStr `json:"hidden"`
-			} `json:"index"`
-		} `json:"settings"`
-	}
-
-	err = json.Unmarshal(content, &resp)
-	if err != nil {
-		return nil, fmt.Errorf("could not parse indices settings response: %w", err)
-	}
-
-	ret := make(map[string]IndexSettings, len(resp))
-	for index, settings := range resp {
-		ret[index] = IndexSettings{
-			Hidden: bool(settings.Settings.Index.Hidden),
-		}
-	}
-
-	return ret, nil
 }
 
 // IsMLockAllEnabled returns if the given Elasticsearch node has mlockall enabled

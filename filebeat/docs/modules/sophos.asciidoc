@@ -18,7 +18,6 @@ This is a module for Sophos Products, currently it accepts
 logs in syslog format or from a file for the following devices:
 
 - `xg` fileset: supports Sophos XG SFOS logs.
-- `utm` fileset: supports Sophos UTM logs.
 
 To configure a remote syslog destination, please reference the https://docs.sophos.com/nsg/sophos-firewall/18.5/Help/en-us/webhelp/onlinehelp/nsg/tasks/SyslogServerAdd.html[SophosXG/SFOS Documentation].
 
@@ -144,53 +143,6 @@ This is a list of SophosXG fields that are mapped to ECS.
 | user_name                  | source.user.name               |
 | ws_protocol                | http.version                   |
 |==============================================================
-
-:has-dashboards!:
-
-:fileset_ex!:
-
-[float]
-==== `utm` fileset settings
-
-deprecated::[8.12.0,"This fileset is deprecated. Use the https://docs.elastic.co/integrations/sophos[Sophos] Elastic integration instead."]
-
-experimental[]
-
-NOTE: This was converted from RSA NetWitness log parser XML "astarosg" device revision 123.
-
-*`var.input`*::
-
-The input from which messages are read. One of `file`, `tcp` or `udp`. Defaults to `udp`.
-
-*`var.syslog_host`*::
-
-The address to listen to UDP or TCP based syslog traffic.
-Defaults to `localhost`.
-Set to `0.0.0.0` to bind to all available interfaces.
-
-*`var.syslog_port`*::
-
-The port to listen for syslog traffic. Defaults to `9533`
-
-NOTE: Ports below 1024 require Filebeat to run as root.
-
-*`var.tz_offset`*::
-
-By default, datetimes in the logs will be interpreted as relative to
-the timezone configured in the host where {beatname_uc} is running. If ingesting
-logs from a host on a different timezone, use this field to set the timezone
-offset so that datetimes are correctly parsed. Valid values are in the form
-±HH:mm, for example, `-07:00` for `UTC-7`.
-
-*`var.rsa_fields`*::
-
-Flag to control the addition of non-ECS fields to the event. Defaults to true,
-which causes both ECS and custom fields under `rsa` to be added.
-
-*`var.keep_raw_fields`*::
-
-Flag to control the addition of the raw parser fields to the event. This fields
-will be found under `rsa.raw`. The default is false.
 
 :has-dashboards!:
 

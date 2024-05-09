@@ -7,6 +7,16 @@ processors:
   - user_agent:
       field: user_agent.original
       ignore_missing: true
+  - json:
+      tag: json-extract-stringly-OperationProperties
+      field: o365.audit.OperationProperties
+      if: ctx.o365?.audit?.OperationProperties instanceof String
+      on_failure:
+        - remove:
+            field: o365.audit.OperationProperties
+        - append:
+            field: error.message
+            value: 'Processor {{{_ingest.on_failure_processor_type}}} with tag {{{_ingest.on_failure_processor_tag}}} in pipeline {{{_ingest.pipeline}}} failed with message: {{{_ingest.on_failure_message}}}'
   # URL
   - uri_parts:
       field: url.original

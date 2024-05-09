@@ -6,10 +6,8 @@ package awscloudwatch
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strings"
-	"sync"
 	"time"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
@@ -96,25 +94,10 @@ func (in *cloudwatchInput) Test(ctx v2.TestContext) error {
 }
 
 func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
-	var err error
-
-	// Wrap input Context's cancellation Done channel a context.Context. This
-	// goroutine stops with the parent closes the Done channel.
-	ctx, cancelInputCtx := context.WithCancel(context.Background())
-	go func() {
-		defer cancelInputCtx()
-		select {
-		case <-inputContext.Cancelation.Done():
-		case <-ctx.Done():
-		}
-	}()
-	defer cancelInputCtx()
+	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
 	// Create client for publishing events and receive notification of their ACKs.
-	client, err := pipeline.ConnectWith(beat.ClientConfig{
-		CloseRef:      inputContext.Cancelation,
-		EventListener: awscommon.NewEventACKHandler(),
-	})
+	client, err := pipeline.ConnectWith(beat.ClientConfig{})
 	if err != nil {
 		return fmt.Errorf("failed to create pipeline client: %w", err)
 	}
@@ -138,82 +121,12 @@ func (in *cloudwatchInput) Run(inputContext v2.Context, pipeline beat.Pipeline) 
 		log.Named("cloudwatch_poller"),
 		in.metrics,
 		in.awsConfig.Region,
-		in.config.APISleep,
-		in.config.NumberOfWorkers,
-		in.config.LogStreams,
-		in.config.LogStreamPrefix)
+		in.config)
 	logProcessor := newLogProcessor(log.Named("log_processor"), in.metrics, client, ctx)
 	cwPoller.metrics.logGroupsTotal.Add(uint64(len(logGroupNames)))
-	return in.Receive(svc, cwPoller, ctx, logProcessor, logGroupNames)
-}
-
-func (in *cloudwatchInput) Receive(svc *cloudwatchlogs.Client, cwPoller *cloudwatchPoller, ctx context.Context, logProcessor *logProcessor, logGroupNames []string) error {
-	// This loop tries to keep the workers busy as much as possible while
-	// honoring the number in config opposed to a simpler loop that does one
-	// listing, sequentially processes every object and then does another listing
-	start := true
-	workerWg := new(sync.WaitGroup)
-	lastLogGroupOffset := 0
-	for ctx.Err() == nil {
-		if !start {
-			cwPoller.log.Debugf("sleeping for %v before checking new logs", in.config.ScanFrequency)
-			time.Sleep(in.config.ScanFrequency)
-			cwPoller.log.Debug("done sleeping")
-		}
-		start = false
-
-		currentTime := time.Now()
-		cwPoller.startTime, cwPoller.endTime = getStartPosition(in.config.StartPosition, currentTime, cwPoller.endTime, in.config.ScanFrequency, in.config.Latency)
-		cwPoller.log.Debugf("start_position = %s, startTime = %v, endTime = %v", in.config.StartPosition, time.Unix(cwPoller.startTime/1000, 0), time.Unix(cwPoller.endTime/1000, 0))
-		availableWorkers, err := cwPoller.workerSem.AcquireContext(in.config.NumberOfWorkers, ctx)
-		if err != nil {
-			break
-		}
-
-		if availableWorkers == 0 {
-			continue
-		}
-
-		workerWg.Add(availableWorkers)
-		logGroupNamesLength := len(logGroupNames)
-		runningGoroutines := 0
-
-		for i := lastLogGroupOffset; i < logGroupNamesLength; i++ {
-			if runningGoroutines >= availableWorkers {
-				break
-			}
-
-			runningGoroutines++
-			lastLogGroupOffset = i + 1
-			if lastLogGroupOffset >= logGroupNamesLength {
-				// release unused workers
-				cwPoller.workerSem.Release(availableWorkers - runningGoroutines)
-				for j := 0; j < availableWorkers-runningGoroutines; j++ {
-					workerWg.Done()
-				}
-				lastLogGroupOffset = 0
-			}
-
-			lg := logGroupNames[i]
-			go func(logGroup string, startTime int64, endTime int64) {
-				defer func() {
-					cwPoller.log.Infof("aws-cloudwatch input worker for log group '%v' has stopped.", logGroup)
-					workerWg.Done()
-					cwPoller.workerSem.Release(1)
-				}()
-				cwPoller.log.Infof("aws-cloudwatch input worker for log group: '%v' has started", logGroup)
-				cwPoller.run(svc, logGroup, startTime, endTime, logProcessor)
-			}(lg, cwPoller.startTime, cwPoller.endTime)
-		}
-	}
-
-	// Wait for all workers to finish.
-	workerWg.Wait()
-	if errors.Is(ctx.Err(), context.Canceled) {
-		// A canceled context is a normal shutdown.
-		return nil
-	}
-	return ctx.Err()
+	cwPoller.startWorkers(ctx, svc, logProcessor)
+	cwPoller.receive(ctx, logGroupNames, time.Now)
+	return nil
 }
 
 func parseARN(logGroupARN string) (string, string, error) {
@@ -256,25 +169,4 @@ func getLogGroupNames(svc *cloudwatchlogs.Client, logGroupNamePrefix string, log
 		}
 	}
 	return logGroupNames, nil
-}
-
-func getStartPosition(startPosition string, currentTime time.Time, endTime int64, scanFrequency time.Duration, latency time.Duration) (int64, int64) {
-	if latency != 0 {
-		// add latency if config is not 0
-		currentTime = currentTime.Add(latency * -1)
-	}
-
-	switch startPosition {
-	case "beginning":
-		if endTime != int64(0) {
-			return endTime, currentTime.UnixNano() / int64(time.Millisecond)
-		}
-		return 0, currentTime.UnixNano() / int64(time.Millisecond)
-	case "end":
-		if endTime != int64(0) {
-			return endTime, currentTime.UnixNano() / int64(time.Millisecond)
-		}
-		return currentTime.Add(-scanFrequency).UnixNano() / int64(time.Millisecond), currentTime.UnixNano() / int64(time.Millisecond)
-	}
-	return 0, 0
 }

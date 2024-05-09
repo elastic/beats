@@ -34,11 +34,11 @@ non_indexable_policy.drop: ~
 	if err != nil {
 		t.Fatalf("Can't create test configuration from valid input")
 	}
-	policy, err := newNonIndexablePolicy(elasticsearchOutputConfig.NonIndexablePolicy)
+	index, err := deadLetterIndexForPolicy(elasticsearchOutputConfig.NonIndexablePolicy)
 	if err != nil {
-		t.Fatalf("Can't create test configuration from valid input")
+		t.Fatalf("Can't read non-indexable policy: %v", err.Error())
 	}
-	assert.Equal(t, drop, policy.action(), "action should be drop")
+	assert.Equal(t, "", index, "dead letter index should be empty string")
 }
 
 func TestDeadLetterIndexPolicyConfig(t *testing.T) {
@@ -51,11 +51,11 @@ non_indexable_policy.dead_letter_index:
 	if err != nil {
 		t.Fatalf("Can't create test configuration from valid input")
 	}
-	policy, err := newNonIndexablePolicy(elasticsearchOutputConfig.NonIndexablePolicy)
+	index, err := deadLetterIndexForPolicy(elasticsearchOutputConfig.NonIndexablePolicy)
 	if err != nil {
-		t.Fatalf("Can't create test configuration from valid input")
+		t.Fatalf("Can't read non-indexable policy: %v", err.Error())
 	}
-	assert.Equal(t, "my-dead-letter-index", policy.index(), "index should match config")
+	assert.Equal(t, "my-dead-letter-index", index, "index should match config")
 }
 
 func TestInvalidNonIndexablePolicyConfig(t *testing.T) {
@@ -88,9 +88,10 @@ non_indexable_policy.dead_letter_index:
 			if err != nil {
 				t.Fatalf("Can't create test configuration from valid input")
 			}
-			_, err = newNonIndexablePolicy(elasticsearchOutputConfig.NonIndexablePolicy)
+
+			_, err = deadLetterIndexForPolicy(elasticsearchOutputConfig.NonIndexablePolicy)
 			if err == nil {
-				t.Fatalf("Can create test configuration from invalid input")
+				t.Fatalf("Invalid non-indexable policy config should produce an error")
 			}
 			t.Logf("error %s", err.Error())
 		})

@@ -1,37 +1,20 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
-REPO="beats"
-TMP_FOLDER="tmp.${REPO}"
-DOCKER_REGISTRY="docker.elastic.co"
-SETUP_GVM_VERSION="v0.5.1"
-DOCKER_COMPOSE_VERSION="1.21.0"
-DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
-SETUP_WIN_PYTHON_VERSION="3.11.0"
-NMAP_WIN_VERSION="7.12"           # Earlier versions of NMap provide WinPcap (the winpcap packages don't install nicely because they pop-up a UI)
-GO_VERSION=$(cat .go-version)
-ASDF_MAGE_VERSION="1.15.0"
-PACKAGING_PLATFORMS="+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
-PACKAGING_ARM_PLATFORMS="linux/arm64"
-ASDF_TERRAFORM_VERSION="1.0.2"
-AWS_REGION="eu-central-1"
-NODEJS_VERSION="18.17.1"
 
-export SETUP_GVM_VERSION
-export DOCKER_COMPOSE_VERSION
-export DOCKER_COMPOSE_VERSION_AARCH64
-export SETUP_WIN_PYTHON_VERSION
-export NMAP_WIN_VERSION
+export REPO="beats"
+export DOCKER_REGISTRY="docker.elastic.co"
+export SETUP_GVM_VERSION="v0.5.1"
+export DOCKER_COMPOSE_VERSION="1.21.0"
+export DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
+export ASDF_NODEJS_VERSION="18.17.1"
+export AWS_REGION="eu-central-1"
+
+WORKSPACE=${WORKSPACE:-"$(pwd)"}
+export WORKSPACE
+GO_VERSION=$(cat .go-version)
 export GO_VERSION
-export ASDF_MAGE_VERSION
-export PACKAGING_PLATFORMS
-export PACKAGING_ARM_PLATFORMS
-export REPO
-export TMP_FOLDER
-export DOCKER_REGISTRY
-export ASDF_TERRAFORM_VERSION
-export AWS_REGION
-export NODEJS_VERSION
+
 
 exportVars() {
   local platform_type="$(uname)"
@@ -66,18 +49,8 @@ if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_S
   export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}oracle"
 fi
 
-if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-filebeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
+if [[ "$BUILDKITE_STEP_KEY" == "xpack-winlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-metricbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "xpack-dockerlogbeat-pipeline" || "$BUILDKITE_STEP_KEY" == "metricbeat-pipeline" ]]; then
   source .buildkite/scripts/common.sh
-  if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
-    export ELASTIC_SYNTHETICS_CAPABLE=true
-  else
-    # Set the MODULE env variable if possible, it should be defined before generating pipeline's steps. It is used in multiple pipelines.
-    defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
-  fi
-fi
-
-if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-heartbeat" ]]; then
   # Set the MODULE env variable if possible, it should be defined before generating pipeline's steps. It is used in multiple pipelines.
-  source .buildkite/scripts/common.sh
   defineModuleFromTheChangeSet "${BEATS_PROJECT_NAME}"
 fi

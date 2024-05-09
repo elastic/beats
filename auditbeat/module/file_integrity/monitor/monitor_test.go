@@ -144,6 +144,11 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 		t.Skip("Skipping permissions test on Windows")
 	}
 
+	if os.Getuid() == 0 {
+		t.Skip("skipping as root can access every file and thus this unittest will fail")
+		return
+	}
+
 	// Create dir to be watched
 
 	dir, err := os.MkdirTemp("", "monitor")
@@ -202,7 +207,7 @@ func TestRecursiveSubdirPermissions(t *testing.T) {
 	for {
 		// No event is received
 		ev, err := readTimeout(t, watcher)
-		if err == errReadTimeout {
+		if errors.Is(err, errReadTimeout) {
 			break
 		}
 		assertNoError(t, err)
