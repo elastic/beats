@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+
+# test comment
 set -euo pipefail
 
 WORKSPACE=${WORKSPACE:-"$(pwd)"}
