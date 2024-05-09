@@ -7,111 +7,121 @@ package awss3
 import (
 	"context"
 	"errors"
+	"net/url"
 	"strconv"
-	"sync"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
+	"github.com/aws/smithy-go"
 
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/elastic/go-concert/timed"
 )
 
+type messageCountMonitor struct {
+	sqs     sqsAPI
+	metrics *inputMetrics
+}
+
 const (
+	sqsAccessDeniedErrorCode       = "AccessDeniedException"
 	sqsRetryDelay                  = 10 * time.Second
 	sqsApproximateNumberOfMessages = "ApproximateNumberOfMessages"
 )
 
-type sqsReader struct {
-	maxMessagesInflight int
-	workerSem           *awscommon.Sem
-	sqs                 sqsAPI
-	msgHandler          sqsProcessor
-	log                 *logp.Logger
-	metrics             *inputMetrics
+var errBadQueueURL = errors.New("QueueURL is not in format: https://sqs.{REGION_ENDPOINT}.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME} or https://{VPC_ENDPOINT}.sqs.{REGION_ENDPOINT}.vpce.{ENDPOINT}/{ACCOUNT_NUMBER}/{QUEUE_NAME}")
+
+func getRegionFromQueueURL(queueURL, endpoint string) string {
+	// get region from queueURL
+	// Example for sqs queue: https://sqs.us-east-1.amazonaws.com/12345678912/test-s3-logs
+	// Example for vpce: https://vpce-test.sqs.us-east-1.vpce.amazonaws.com/12345678912/sqs-queue
+	u, err := url.Parse(queueURL)
+	if err != nil {
+		return ""
+	}
+
+	// check for sqs queue url
+	host := strings.SplitN(u.Host, ".", 3)
+	if len(host) == 3 && host[0] == "sqs" {
+		if host[2] == endpoint || (endpoint == "" && strings.HasPrefix(host[2], "amazonaws.")) {
+			return host[1]
+		}
+	}
+
+	// check for vpce url
+	host = strings.SplitN(u.Host, ".", 5)
+	if len(host) == 5 && host[1] == "sqs" {
+		if host[4] == endpoint || (endpoint == "" && strings.HasPrefix(host[4], "amazonaws.")) {
+			return host[2]
+		}
+	}
+
+	return ""
 }
 
-func newSQSReader(log *logp.Logger, metrics *inputMetrics, sqs sqsAPI, maxMessagesInflight int, msgHandler sqsProcessor) *sqsReader {
-	if metrics == nil {
-		// Metrics are optional. Initialize a stub.
-		metrics = newInputMetrics("", nil, 0)
-	}
-	return &sqsReader{
-		maxMessagesInflight: maxMessagesInflight,
-		workerSem:           awscommon.NewSem(maxMessagesInflight),
-		sqs:                 sqs,
-		msgHandler:          msgHandler,
-		log:                 log,
-		metrics:             metrics,
-	}
-}
-
-func (r *sqsReader) Receive(ctx context.Context) error {
-	// This loop tries to keep the workers busy as much as possible while
-	// honoring the max message cap as opposed to a simpler loop that receives
-	// N messages, waits for them all to finish, then requests N more messages.
-	var workerWg sync.WaitGroup
-	for ctx.Err() == nil {
-		// Determine how many SQS workers are available.
-		workers, err := r.workerSem.AcquireContext(r.maxMessagesInflight, ctx)
-		if err != nil {
-			break
-		}
-
-		// Receive (at most) as many SQS messages as there are workers.
-		msgs, err := r.sqs.ReceiveMessage(ctx, workers)
-		if err != nil {
-			r.workerSem.Release(workers)
-
-			if ctx.Err() == nil {
-				r.log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
-
-				// Throttle retries.
-				_ = timed.Wait(ctx, sqsRetryDelay)
-			}
-			continue
-		}
-
-		// Release unused workers.
-		r.workerSem.Release(workers - len(msgs))
-
-		// Process each SQS message asynchronously with a goroutine.
-		r.log.Debugf("Received %v SQS messages.", len(msgs))
-		r.metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
-		workerWg.Add(len(msgs))
-
-		for _, msg := range msgs {
-			go func(msg types.Message, start time.Time) {
-				id := r.metrics.beginSQSWorker()
-				defer func() {
-					r.metrics.endSQSWorker(id)
-					workerWg.Done()
-					r.workerSem.Release(1)
-				}()
-
-				if err := r.msgHandler.ProcessSQS(ctx, &msg); err != nil {
-					r.log.Warnw("Failed processing SQS message.",
-						"error", err,
-						"message_id", *msg.MessageId,
-						"elapsed_time_ns", time.Since(start))
-				}
-			}(msg, time.Now())
-		}
-	}
-
-	// Wait for all workers to finish.
-	workerWg.Wait()
-
-	if errors.Is(ctx.Err(), context.Canceled) {
-		// A canceled context is a normal shutdown.
+// readSQSMessages reads up to the requested number of SQS messages via
+// ReceiveMessage. It always returns at least one result unless the
+// context expires
+func readSQSMessages(
+	ctx context.Context,
+	log *logp.Logger,
+	sqs sqsAPI,
+	metrics *inputMetrics,
+	count int,
+) []types.Message {
+	if count <= 0 {
 		return nil
 	}
-	return ctx.Err()
+	msgs, err := sqs.ReceiveMessage(ctx, count)
+	for (err != nil || len(msgs) == 0) && ctx.Err() == nil {
+		if err != nil {
+			log.Warnw("SQS ReceiveMessage returned an error. Will retry after a short delay.", "error", err)
+		}
+		// Wait for the retry delay, but stop early if the context is cancelled.
+		select {
+		case <-ctx.Done():
+			return nil
+		case <-time.After(sqsRetryDelay):
+		}
+		msgs, err = sqs.ReceiveMessage(ctx, count)
+	}
+	log.Debugf("Received %v SQS messages.", len(msgs))
+	metrics.sqsMessagesReceivedTotal.Add(uint64(len(msgs)))
+	return msgs
 }
 
-func (r *sqsReader) GetApproximateMessageCount(ctx context.Context) (int, error) {
-	attributes, err := r.sqs.GetQueueAttributes(ctx, []types.QueueAttributeName{sqsApproximateNumberOfMessages})
+func (mcm messageCountMonitor) run(ctx context.Context) {
+	t := time.NewTicker(time.Minute)
+	defer t.Stop()
+	for {
+		if err := mcm.updateMessageCount(ctx); isSQSAuthError(err) {
+			// stop polling if auth error is encountered
+			// Set it back to -1 because there is a permission error
+			mcm.metrics.sqsMessagesWaiting.Set(int64(-1))
+			return
+		}
+		select {
+		case <-ctx.Done():
+			return
+		case <-t.C:
+		}
+	}
+}
+
+// updateMessageCount runs GetApproximateMessageCount and updates the
+// sqsMessagesWaiting metric with the result.
+// If there is an error, the metric is reinitialized to -1 and true is returned
+func (mcm messageCountMonitor) updateMessageCount(ctx context.Context) error {
+	count, err := mcm.getApproximateMessageCount(ctx)
+	if err == nil {
+		mcm.metrics.sqsMessagesWaiting.Set(int64(count))
+	}
+	return err
+}
+
+// Query the approximate message count for the queue via the SQS API.
+func (mcm messageCountMonitor) getApproximateMessageCount(ctx context.Context) (int, error) {
+	attributes, err := mcm.sqs.GetQueueAttributes(ctx, []types.QueueAttributeName{sqsApproximateNumberOfMessages})
 	if err == nil {
 		if c, found := attributes[sqsApproximateNumberOfMessages]; found {
 			if messagesCount, err := strconv.Atoi(c); err == nil {
@@ -120,4 +130,12 @@ func (r *sqsReader) GetApproximateMessageCount(ctx context.Context) (int, error)
 		}
 	}
 	return -1, err
+}
+
+func isSQSAuthError(err error) bool {
+	var apiError smithy.APIError
+	if errors.As(err, &apiError) {
+		return apiError.ErrorCode() == sqsAccessDeniedErrorCode
+	}
+	return false
 }
