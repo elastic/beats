@@ -202,6 +202,13 @@ func logRequest(log *zap.Logger, req *http.Request, maxBodyLen int, extra ...zap
 	return req, reqParts[:0], errorsMessages
 }
 
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
 // TxID returns the current transaction.id value. If rt is nil, the empty string is returned.
 func (rt *LoggingRoundTripper) TxID() string {
 	if rt == nil {
