@@ -16,7 +16,6 @@ export AWS_REGION="eu-central-1"
 
 export WORKSPACE
 export GO_VERSION
-export TMP_FOLDER="tmp.${REPO}"
 
 exportVars() {
   local platform_type="$(uname)"
