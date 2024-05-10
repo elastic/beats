@@ -200,16 +200,6 @@ COMMIT=${env.GIT_BASE_COMMIT}
 VERSION=${env.VERSION}-SNAPSHOT""")
       archiveArtifacts artifacts: 'packaging.properties'
     }
-    cleanup {
-      // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
-      dir("${BASE_DIR}"){
-        notifyBuildResult(prComment: true,
-                          slackComment: true,
-                          analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()),
-                          githubIssue: isGitHubIssueEnabled(),
-                          githubLabels: 'Team:Elastic-Agent-Data-Plane')
-      }
-    }
   }
 }
 

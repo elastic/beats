@@ -60,7 +60,7 @@ func NewInputManager(log *logp.Logger) *InputManager {
 
 // Init initializes the manager
 // not sure if the shipper needs to do anything at this point?
-func (im *InputManager) Init(_ unison.Group, _ v2.Mode) error {
+func (im *InputManager) Init(_ unison.Group) error {
 	return nil
 }
 

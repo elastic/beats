@@ -70,6 +70,7 @@ The list below covers the major changes between 7.0.0-rc2 and main only.
 
 ==== Bugfixes
 
+- Handle the starting of namespace and node watchers for metadata enrichment according to `add_resource_metadata` configuration.{pull}38762[38762]
 - Fix multiple metricbeat instances reporting same metrics when using autodiscover with provider kubernetes, and ensure leader elector is always running in autodiscover mode.{pull}38471[38471]
 - Fix how Prometheus histograms are calculated when percentiles are provide.{pull}36537[36537]
 - Stop using `mage:import` in community beats. This was ignoring the vendorized beats directory for some mage targets, using the code available in GOPATH, this causes inconsistencies and compilation problems if the version of the code in the GOPATH is different to the vendored one. Use of `mage:import` will continue to be unsupported in custom beats till beats is migrated to go modules, or mage supports vendored dependencies. {issue}13998[13998] {pull}14162[14162]
