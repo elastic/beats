@@ -105,9 +105,9 @@ class Test(BaseTest):
 
         self.wait_until(lambda: self.output_lines() == 1)
 
-        # Remove input
-        with open(self.working_dir + "/configs/input.yml", 'w') as f:
-            f.write("")
+        # Remove input by moving the file
+        # we keep it around to help debugging
+        os.rename(self.working_dir + "/configs/input.yml", self.working_dir + "/configs/input.yml.disabled")
 
         # Wait until input is stopped
         self.wait_until(
