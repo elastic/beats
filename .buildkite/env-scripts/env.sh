@@ -14,8 +14,6 @@ HW_TYPE="$(uname -m)"
 PLATFORM_TYPE="$(uname)"
 SNAPSHOT="true"
 PYTEST_ADDOPTS=""
-OSS_MODULE_PATTERN="^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
-XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 
 SETUP_GVM_VERSION="v0.5.1"
 ASDF_MAGE_VERSION="1.14.0"
@@ -32,15 +30,12 @@ GO_MOD_CHANGES=$(changeset_applies "^go.mod")
 KIND_VERSION="v0.20.0"
 KUBECONFIG="${WORKSPACE}/kubecfg"
 
-export REPO
 export WORKSPACE
 export BIN
 export HW_TYPE
 export PLATFORM_TYPE
 export SNAPSHOT
 export PYTEST_ADDOPTS
-export OSS_MODULE_PATTERN
-export XPACK_MODULE_PATTERN
 
 export SETUP_GVM_VERSION
 export ASDF_MAGE_VERSION
