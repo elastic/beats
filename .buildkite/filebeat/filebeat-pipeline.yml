@@ -22,6 +22,10 @@ env:
   K8S_VERSION: "v1.29.0"
   ASDF_KIND_VERSION: "0.20.0"
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "Filebeat Mandatory Tests"
     key: "filebeat-mandatory-tests"
