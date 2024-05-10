@@ -102,6 +102,35 @@ func TestGetState(t *testing.T) {
 		"got process state %q. Last error: %v", got, err)
 }
 
+func TestGetOneRoot(t *testing.T) {
+	testConfig := Stats{
+		Procs:        []string{".*"},
+		Hostfs:       resolve.NewTestResolver("/"),
+		CPUTicks:     false,
+		CacheCmdLine: true,
+		EnvWhitelist: []string{".*"},
+		IncludeTop: IncludeTopConfig{
+			Enabled:  true,
+			ByCPU:    4,
+			ByMemory: 0,
+		},
+		EnableCgroups: false,
+		CgroupOpts: cgroup.ReaderOptions{
+			RootfsMountpoint:  resolve.NewTestResolver("/"),
+			IgnoreRootCgroups: true,
+		},
+	}
+	err := testConfig.Init()
+	assert.NoError(t, err, "Init")
+
+	evt, rootEvt, err := testConfig.GetOneRootEvent(os.Getpid())
+	require.NoError(t, err)
+
+	require.NotEmpty(t, rootEvt["process"].(map[string]interface{})["pid"])
+
+	require.NotEmpty(t, evt["cpu"])
+}
+
 func TestGetOne(t *testing.T) {
 	testConfig := Stats{
 		Procs:        []string{".*"},

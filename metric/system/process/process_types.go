@@ -139,6 +139,8 @@ func (t ProcFDInfo) IsZero() bool {
 	return t.Open.IsZero() && t.Limit.Hard.IsZero() && t.Limit.Soft.IsZero()
 }
 
+// FormatForRoot takes the ProcState event and turns the fields into a ProcStateRootEvent
+// struct. These are the root fields expected for events sent from the system/process metricset.
 func (p *ProcState) FormatForRoot() ProcStateRootEvent {
 	root := ProcStateRootEvent{}
 

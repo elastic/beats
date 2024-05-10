@@ -62,7 +62,7 @@ func ListStates(hostfs resolve.Resolver) ([]ProcState, error) {
 }
 
 // GetPIDState returns the state of a given PID
-// It will return ProcNotExist if the process was not found.
+// It will return ErrProcNotExist if the process was not found.
 func GetPIDState(hostfs resolve.Resolver, pid int) (PidState, error) {
 	// This library still doesn't have a good cross-platform way to distinguish between "does not eixst" and other process errors.
 	// This is a fairly difficult problem to solve in a cross-platform way
@@ -71,7 +71,7 @@ func GetPIDState(hostfs resolve.Resolver, pid int) (PidState, error) {
 		return "", fmt.Errorf("Error trying to find process: %d: %w", pid, err)
 	}
 	if !exists {
-		return "", ProcNotExist
+		return "", ErrProcNotExist
 	}
 	// GetInfoForPid will return the smallest possible dataset for a PID
 	procState, err := GetInfoForPid(hostfs, pid)
@@ -122,9 +122,7 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 		// Add the RSS pct memory first
 		process.Memory.Rss.Pct = GetProcMemPercentage(process, totalPhyMem)
 		// Create the root event
-		root := process.FormatForRoot()
-		rootMap := mapstr.M{}
-		_ = typeconv.Convert(&rootMap, root)
+		rootMap := processRootEvent(process)
 
 		proc, err := procStats.getProcessEvent(&process)
 		if err != nil {
@@ -148,6 +146,26 @@ func (procStats *Stats) GetOne(pid int) (mapstr.M, error) {
 	procStats.ProcsMap.SetPid(pid, pidStat)
 
 	return procStats.getProcessEvent(&pidStat)
+}
+
+// GetOneRootEvent is the same as `GetOne()` but it returns an
+// event formatted as expected by ECS
+func (procStats *Stats) GetOneRootEvent(pid int) (mapstr.M, mapstr.M, error) {
+	pidStat, _, err := procStats.pidFill(pid, false)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error fetching PID %d: %w", pid, err)
+	}
+
+	procStats.ProcsMap.SetPid(pid, pidStat)
+
+	procMap, err := procStats.getProcessEvent(&pidStat)
+	if err != nil {
+		return nil, nil, fmt.Errorf("error formatting process %d: %w", pid, err)
+	}
+
+	rootMap := processRootEvent(pidStat)
+
+	return procMap, rootMap, err
 }
 
 // GetSelf gets process info for the beat itself

@@ -25,7 +25,9 @@ import (
 	"sync"
 
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/match"
+	"github.com/elastic/elastic-agent-libs/transform/typeconv"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/cgroup"
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 	"github.com/elastic/go-sysinfo/types"
@@ -33,8 +35,8 @@ import (
 	"github.com/elastic/go-sysinfo"
 )
 
-// ProcNotExist indicates that a process was not found.
-var ProcNotExist = errors.New("process does not exist")
+// ErrProcNotExist indicates that a process was not found.
+var ErrProcNotExist = errors.New("process does not exist")
 
 // ProcsMap is a convenience wrapper for the oft-used idiom of map[int]ProcState
 type ProcsMap map[int]ProcState
@@ -206,4 +208,13 @@ func (procStats *Stats) Init() error {
 		procStats.cgroups = cgReader
 	}
 	return nil
+}
+
+// processRootEvent formats the process state event for the ECS root fields used by the system/process metricsets
+func processRootEvent(process ProcState) mapstr.M {
+	// Create the root event
+	root := process.FormatForRoot()
+	rootMap := mapstr.M{}
+	_ = typeconv.Convert(&rootMap, root)
+	return rootMap
 }
