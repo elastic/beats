@@ -21,6 +21,10 @@ env:
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "x-pack/osquerybeat Mandatory Tests"
     key: "x-pack-osquerybeat-mandatory-tests"

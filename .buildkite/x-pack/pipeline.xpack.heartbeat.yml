@@ -26,6 +26,10 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
   ASDF_NODEJS_VERSION: 18.17.1
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "x-pack/heartbeat Mandatory Tests"
     key: "x-pack-heartbeat-mandatory-tests"
