@@ -80,17 +80,17 @@ steps:
           - github_commit_status:
               context: "filebeat: Python Integration Tests"
 
-      - label: ":windows: Filebeat Windows 2016 Unit Tests"
-        key: "windows-2016-unit-tests"
+      - label: ":windows: Filebeat Windows 2019 Unit Tests"
+        key: "windows-extended-2019"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
-          image: "${IMAGE_WIN_2016}"
+          image: "${IMAGE_WIN_2019}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
           disk_type: "pd-ssd"
@@ -99,7 +99,7 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Windows 2016 Unit Tests"
+              context: "filebeat: Windows 2019 Unit Tests"
 
       - label: ":windows: Filebeat Windows 2022 Unit Tests"
         key: "windows-2022-unit-tests"
@@ -122,9 +122,80 @@ steps:
           - github_commit_status:
               context: "filebeat: Windows 2022 Unit Tests"
 
+      - label: ":ubuntu: Filebeat Module Compatibility ITs (Previous Minor)"
+        command: |
+          # defines the MODULE env var based on what's changed in a PR
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet filebeat
+
+          # echo "~~~ Will run tests with env var MODULE=$$MODULE"
+          cd filebeat
+          mage pythonIntegTest
+        retry:
+          automatic:
+            - limit: 3
+        env:
+          STACK_ENVIRONMENT: prev-minor
+          TESTING_FILEBEAT_SKIP_DIFF: 1
+          PYTEST_ADDOPTS: '-k test_modules'
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Module Compatibility ITs (Previous Minor)"
+
+      - label: ":ubuntu: Filebeat Module Compatibility ITs (Next Major)"
+        command: |
+          # defines the MODULE env var based on what's changed in a PR
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet filebeat
+
+          # echo "~~~ Will run tests with env var MODULE=$$MODULE"
+          cd filebeat
+          mage pythonIntegTest
+        retry:
+          automatic:
+            - limit: 3
+        env:
+          STACK_ENVIRONMENT: next-major
+          TESTING_FILEBEAT_SKIP_DIFF: 1
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Module Compatibility ITs (Next Major)"
+
+      - label: ":linux: Filebeat arm64 Unit Tests"
+        command: |
+          cd filebeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Linux arm64 Unit Tests"
+
   - group: "Filebeat Extended Tests"
     key: "filebeat-extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS).*/
 
     steps:
       - label: ":mac: Filebeat macOS x86_64 Unit Tests"
@@ -148,63 +219,22 @@ steps:
           - github_commit_status:
               context: "filebeat: macOS x86_64 Unit Tests"
 
-      - label: ":mac: Filebeat macOS arm64 Unit Tests"
-        key: "macos-arm64-unit-tests-extended"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd filebeat
-          mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "filebeat: macOS arm64 Unit Tests"
-
-      - label: ":linux: Filebeat arm64 Unit Tests"
-        key: "extended-arm64-unit-test"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-        command: |
-          cd filebeat
-          mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
-        agents:
-          provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "filebeat: Linux arm64 Unit Tests"
-
   - group: "Filebeat Extended Windows Tests"
     key: "filebeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 
     steps:
-      - label: ":windows: Filebeat Windows 2019 Unit Tests"
-        key: "windows-extended-2019"
+      - label: ":windows: Filebeat Windows 2016 Unit Tests"
+        key: "windows-2016-unit-tests"
         command: |
           Set-Location -Path filebeat
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
+          image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 200
           disk_type: "pd-ssd"
@@ -213,28 +243,7 @@ steps:
           - "filebeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "filebeat: Windows 2019 Unit Tests"
-
-      - label: ":windows: Filebeat Windows 11 Unit Tests"
-        key: "windows-extended-11"
-        command: |
-          Set-Location -Path filebeat
-          mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 200
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "filebeat: Windows 11 Unit Tests"
+              context: "filebeat: Windows 2016 Unit Tests"
 
       - label: ":windows: Filebeat Windows 10 Unit Tests"
         key: "windows-extended-10"
