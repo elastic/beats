@@ -35,25 +35,12 @@ updates:
       - dependency-name: github.com/elastic/go-seccomp-bpf
       - dependency-name: github.com/elastic/toutoumomoma
       - dependency-name: github.com/elastic/ebpfevents
+      # Team:obs-ds-hosted-services
+      - dependency-name: github.com/Azure/azure-sdk-for-go/*
+      - dependency-name: github.com/Azure/azure-event-hubs-go/*
     ignore:
       # Skip github.com/elastic/mito because it requires documentation updates.
       - dependency-name: github.com/elastic/mito
-    open-pull-requests-limit: 2
-
-  # Azure SDKs
-  - package-ecosystem: "gomod"
-    directory: "/"
-    ignore:
-      - dependency-name: "github.com/elastic/beats/v7"
-    schedule:
-      interval: "daily"
-    groups:
-      azure-sdk-for-go:
-        patterns:
-          - "github.com/Azure/azure-sdk-for-go/*"
-      azure-event-hubs-go:
-        patterns:
-          - "github.com/Azure/azure-event-hubs-go/*"
     open-pull-requests-limit: 2
 
   # GitHub actions
