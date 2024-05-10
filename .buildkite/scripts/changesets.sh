@@ -69,9 +69,11 @@ defineModuleFromTheChangeSet() {
   done
 
   # export MODULE="" leads to an infinite loop https://github.com/elastic/ingest-dev/issues/2993
-  if [[ ! -z $changed_modules ]]; then 
+  if [[ ! -z $changed_modules ]]; then
     export MODULE="${changed_modules}"
     echo "~~~ Set env var MODULE to [$MODULE]"
     echo "~~~ Resuming commands"
+  else
+    export MODULE="null"
   fi
 }

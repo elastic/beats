@@ -4,52 +4,59 @@ set -euo pipefail
 
 OSS_MODULE_PATTERN="^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
 XPACK_MODULE_PATTERN="^x-pack\\/[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
-BEAT_PATH=$1
-MODULE=''
 
 definePattern() {
-  pattern="${XPACK_MODULE_PATTERN}"
+  pattern="${OSS_MODULE_PATTERN}"
 
-  if [[ "$BEAT_PATH" == *"x-pack/"* ]]; then
-    pattern="${OSS_MODULE_PATTERN}"
+  if [[ "$beatPath" == *"x-pack/"* ]]; then
+    pattern="${XPACK_MODULE_PATTERN}"
   fi
 }
 
 defineExclusions() {
-  local transformedDirectory=${BEAT_PATH//\//\\\/}
-  local exclusion="((?!^${transformedDirectory}\\/).)*\$"
-  exclude="^(${exclusion}|((?!\\/module\\/).)*\$|.*\\.asciidoc|.*\\.png)"
+  exclude="^$beatPath\/module\/(.*(?<!\.asciidoc|\.png))$"
 }
 
-getGitMatchingGroup() {
+defineFromCommit() {
   local previousCommit
-  local matches
-  local match
-
   local changeTarget=${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-$BUILDKITE_BRANCH}
-  local baseCommit=$BUILDKITE_COMMIT
+
   previousCommit=$(git rev-parse HEAD^)
-  from=$(echo ${changeTarget:+"origin/$changeTarget"}${previousCommit:-$baseCommit})
-  to=$baseCommit
 
-  matches=$(git diff --name-only "$from"..."$to" | grep -v "$exclude" | grep -oP "$pattern" | sort -u)
+  from=${changeTarget:+"origin/$changeTarget"}
+  from=${from:-$previousCommit}
+  from=${from:-$BUILDKITE_COMMIT}
+}
 
-  match=$(echo "$matches" | wc -w)
+getMatchingModules() {
+  local changedPaths
+  mapfile -t changedPaths < <(git diff --name-only "$from"..."$BUILDKITE_COMMIT" | grep -P "$exclude" | grep -oP "$pattern")
+  mapfile -t modulesMatched < <(printf "%s\n" "${changedPaths[@]}" | grep -o 'module/.*' | awk -F '/' '{print $2}' | sort -u)
+}
 
-  if [ "$match" -eq 1 ]; then
-    echo "$matches"
-  else
-    echo ''
-  fi
+addToModuleEnvVar() {
+  local module
+  for module in "${modulesMatched[@]}"; do
+    if [[ -z ${modules+x} ]]; then
+      modules="$module"
+    else
+      modules+=",$module"
+    fi
+  done
 }
 
 defineModule() {
-  cd "${BEAT_PATH}"
-  NEW_MODULE=$(getGitMatchingGroup "$pattern" "$exclude")
-  if [ ! -f "$BEAT_PATH/module/${module}" ]; then
-    NEW_MODULE=''
-  fi
-  cd - >/dev/null
+  beatPath=$1
 
-  export NEW_MODULE
+  definePattern
+  defineExclusions
+  defineFromCommit
+  getMatchingModules
+
+  if [ "${#modulesMatched[@]}" -gt 0 ]; then
+    addToModuleEnvVar
+    export MODULE=$modules
+  else
+    echo "~~~ No changes in modules for $beatPath"
+  fi
 }
