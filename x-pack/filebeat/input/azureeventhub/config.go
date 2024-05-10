@@ -20,13 +20,16 @@ type azureInputConfig struct {
 	EventHubName     string `config:"eventhub" validate:"required"`
 	ConsumerGroup    string `config:"consumer_group"`
 	// Azure Storage container to store leases and checkpoints
-	SAName      string `config:"storage_account"`
-	SAKey       string `config:"storage_account_key"`
-	SAContainer string `config:"storage_account_container"`
+	SAName             string `config:"storage_account"`
+	SAConnectionString string `config:"storage_account_connection_string"` // engine v2 only
+	SAKey              string `config:"storage_account_key"`
+	SAContainer        string `config:"storage_account_container"`
 	// by default the azure public environment is used, to override, users can provide a specific resource manager endpoint
 	OverrideEnvironment string `config:"resource_manager_endpoint"`
 	// cleanup the log JSON input for known issues, options: SINGLE_QUOTES, NEW_LINES
 	SanitizeOptions []string `config:"sanitize_options"`
+	// Engine version to use (v1 or v2). Default is v1.
+	EngineVersion string `config:"engine_version"`
 }
 
 const ephContainerName = "filebeat"
@@ -71,6 +74,10 @@ func (conf *azureInputConfig) Validate() error {
 		if err != nil {
 			logger.Warnf("%s: %v", opt, err)
 		}
+	}
+
+	if conf.EngineVersion == "" {
+		conf.EngineVersion = "v1"
 	}
 
 	return nil
