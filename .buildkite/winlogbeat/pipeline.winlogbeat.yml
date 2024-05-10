@@ -19,6 +19,8 @@ env:
   # Unit tests
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
+  # See docker.go. Sets --pull to docker-compose
+  DOCKER_PULL: 0
 
 steps:
   - group: "Winlogbeat Mandatory Tests"

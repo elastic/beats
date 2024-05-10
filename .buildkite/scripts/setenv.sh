@@ -43,8 +43,7 @@ exportVars() {
 }
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" ]]; then
-  exportVars  
-  export DOCKER_PULL="0"
+  exportVars
   export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}oracle"
 fi
 
