@@ -16,9 +16,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-
-	"github.com/elastic/beats/v7/libbeat/statestore"
-	"github.com/elastic/beats/v7/libbeat/statestore/storetest"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 
@@ -210,23 +208,24 @@ file_selectors:
 
 func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkResult {
 	return testing.Benchmark(func(b *testing.B) {
-		log := logp.NewLogger(inputName)
-		metricRegistry := monitoring.NewRegistry()
-		metrics := newInputMetrics("test_id", metricRegistry, maxMessagesInflight)
-		sqsAPI := newConstantSQS()
-		s3API := newConstantS3(t)
+		var err error
 		pipeline := &fakePipeline{}
-		conf := makeBenchmarkConfig(t)
 
-		s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, conf.FileSelectors, backupConfig{}, maxMessagesInflight)
-		sqsMessageHandler := newSQSS3EventProcessor(log.Named("sqs_s3_event"), metrics, sqsAPI, nil, time.Minute, 5, pipeline, s3EventHandlerFactory, maxMessagesInflight)
-		sqsReader := newSQSReader(log.Named("sqs"), metrics, sqsAPI, maxMessagesInflight, sqsMessageHandler)
+		conf := makeBenchmarkConfig(t)
+		conf.MaxNumberOfMessages = maxMessagesInflight
+		sqsReader := newSQSReaderInput(conf, aws.Config{})
+		sqsReader.log = log.Named("sqs")
+		sqsReader.metrics = newInputMetrics("test_id", monitoring.NewRegistry(), maxMessagesInflight)
+		sqsReader.sqs = newConstantSQS()
+		sqsReader.s3 = newConstantS3(t)
+		sqsReader.msgHandler, err = sqsReader.createEventProcessor(pipeline)
+		require.NoError(t, err, "createEventProcessor must succeed")
 
 		ctx, cancel := context.WithCancel(context.Background())
 		b.Cleanup(cancel)
 
 		go func() {
-			for metrics.sqsMessagesReceivedTotal.Get() < uint64(b.N) {
+			for sqsReader.metrics.sqsMessagesReceivedTotal.Get() < uint64(b.N) {
 				time.Sleep(5 * time.Millisecond)
 			}
 			cancel()
@@ -234,25 +233,21 @@ func benchmarkInputSQS(t *testing.T, maxMessagesInflight int) testing.BenchmarkR
 
 		b.ResetTimer()
 		start := time.Now()
-		if err := sqsReader.Receive(ctx); err != nil {
-			if !errors.Is(err, context.DeadlineExceeded) {
-				t.Fatal(err)
-			}
-		}
+		sqsReader.run(ctx)
 		b.StopTimer()
 		elapsed := time.Since(start)
 
 		b.ReportMetric(float64(maxMessagesInflight), "max_messages_inflight")
 		b.ReportMetric(elapsed.Seconds(), "sec")
 
-		b.ReportMetric(float64(metrics.s3EventsCreatedTotal.Get()), "events")
-		b.ReportMetric(float64(metrics.s3EventsCreatedTotal.Get())/elapsed.Seconds(), "events_per_sec")
+		b.ReportMetric(float64(sqsReader.metrics.s3EventsCreatedTotal.Get()), "events")
+		b.ReportMetric(float64(sqsReader.metrics.s3EventsCreatedTotal.Get())/elapsed.Seconds(), "events_per_sec")
 
-		b.ReportMetric(float64(metrics.s3BytesProcessedTotal.Get()), "s3_bytes")
-		b.ReportMetric(float64(metrics.s3BytesProcessedTotal.Get())/elapsed.Seconds(), "s3_bytes_per_sec")
+		b.ReportMetric(float64(sqsReader.metrics.s3BytesProcessedTotal.Get()), "s3_bytes")
+		b.ReportMetric(float64(sqsReader.metrics.s3BytesProcessedTotal.Get())/elapsed.Seconds(), "s3_bytes_per_sec")
 
-		b.ReportMetric(float64(metrics.sqsMessagesDeletedTotal.Get()), "sqs_messages")
-		b.ReportMetric(float64(metrics.sqsMessagesDeletedTotal.Get())/elapsed.Seconds(), "sqs_messages_per_sec")
+		b.ReportMetric(float64(sqsReader.metrics.sqsMessagesDeletedTotal.Get()), "sqs_messages")
+		b.ReportMetric(float64(sqsReader.metrics.sqsMessagesDeletedTotal.Get())/elapsed.Seconds(), "sqs_messages_per_sec")
 	})
 }
 
@@ -314,6 +309,7 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 		}()
 
 		config := makeBenchmarkConfig(t)
+		config.NumberOfWorkers = numberOfWorkers
 
 		b.ResetTimer()
 		start := time.Now()
@@ -333,27 +329,28 @@ func benchmarkInputS3(t *testing.T, numberOfWorkers int) testing.BenchmarkResult
 			wg.Add(1)
 			go func(i int, wg *sync.WaitGroup) {
 				defer wg.Done()
-				listPrefix := fmt.Sprintf("list_prefix_%d", i)
+				curConfig := config
+				curConfig.BucketListPrefix = fmt.Sprintf("list_prefix_%d", i)
 				s3API := newConstantS3(t)
-				s3API.pagerConstant = newS3PagerConstant(listPrefix)
-				storeReg := statestore.NewRegistry(storetest.NewMemoryStoreBackend())
-				store, err := storeReg.Get("test")
-				if err != nil {
-					errChan <- fmt.Errorf("failed to access store: %w", err)
-					return
-				}
+				s3API.pagerConstant = newS3PagerConstant(curConfig.BucketListPrefix)
+				store := openTestStatestore()
 
-				states, err := newStates(inputCtx, store)
+				states, err := newStates(nil, store)
 				assert.NoError(t, err, "states creation should succeed")
 
-				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors, backupConfig{}, numberOfWorkers)
-				s3Poller := newS3Poller(logp.NewLogger(inputName), metrics, s3API, client, s3EventHandlerFactory, states, "bucket", listPrefix, "region", "provider", numberOfWorkers, time.Second)
-
-				if err := s3Poller.Poll(ctx); err != nil {
-					if !errors.Is(err, context.DeadlineExceeded) {
-						errChan <- err
-					}
+				s3EventHandlerFactory := newS3ObjectProcessorFactory(log.Named("s3"), metrics, s3API, config.FileSelectors, backupConfig{})
+				s3Poller := &s3PollerInput{
+					log:             logp.NewLogger(inputName),
+					config:          config,
+					metrics:         metrics,
+					s3:              s3API,
+					client:          client,
+					s3ObjectHandler: s3EventHandlerFactory,
+					states:          states,
+					provider:        "provider",
 				}
+
+				s3Poller.run(ctx)
 			}(i, wg)
 		}
 

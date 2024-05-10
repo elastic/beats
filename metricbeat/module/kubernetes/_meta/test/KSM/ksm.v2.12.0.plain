@@ -1057,7 +1057,7 @@ kube_pod_status_container_ready_time{namespace="kube-system",pod="kube-scheduler
 kube_pod_status_container_ready_time{namespace="kube-system",pod="coredns-76f75df574-v8skx",uid="b02dd54a-7c6b-4a45-8f42-cbc00c6fb040"} 1.713862204e+09
 # HELP kube_pod_status_reason The pod status reasons
 # TYPE kube_pod_status_reason gauge
-kube_pod_status_reason{namespace="default",pod="web-0",uid="37dd3592-b439-4090-a233-49b8faa2b9b3",reason="Evicted"} 0
+kube_pod_status_reason{namespace="default",pod="web-0",uid="37dd3592-b439-4090-a233-49b8faa2b9b3",reason="Evicted"} 1
 kube_pod_status_reason{namespace="default",pod="web-0",uid="37dd3592-b439-4090-a233-49b8faa2b9b3",reason="NodeAffinity"} 0
 kube_pod_status_reason{namespace="default",pod="web-0",uid="37dd3592-b439-4090-a233-49b8faa2b9b3",reason="NodeLost"} 0
 kube_pod_status_reason{namespace="default",pod="web-0",uid="37dd3592-b439-4090-a233-49b8faa2b9b3",reason="Shutdown"} 0
