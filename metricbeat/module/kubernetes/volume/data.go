@@ -40,6 +40,7 @@ func eventMapping(content []byte, logger *logp.Logger) ([]mapstr.M, error) {
 	node := summary.Node
 	for _, pod := range summary.Pods {
 		for _, volume := range pod.Volume {
+
 			volumeEvent := mapstr.M{
 				mb.ModuleDataKey: mapstr.M{
 					"namespace": pod.PodRef.Namespace,
@@ -75,8 +76,9 @@ func eventMapping(content []byte, logger *logp.Logger) ([]mapstr.M, error) {
 			if volume.Inodes > 0 {
 				kubernetes2.ShouldPut(volumeEvent, "fs.inodes.pct", float64(volume.InodesUsed)/float64(volume.Inodes), logger)
 			}
+
 			if volume.PvcRef.Name != "" {
-				kubernetes2.ShouldPut(volumeEvent, "persistentvolumeclaim.name", volume.PvcRef.Name, logger)
+				kubernetes2.ShouldPut(volumeEvent, mb.ModuleDataKey+".persistentvolumeclaim.name", volume.PvcRef.Name, logger)
 			}
 			events = append(events, volumeEvent)
 		}
