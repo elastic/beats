@@ -35,6 +35,7 @@ func getRegionFromQueueURL(queueURL, endpoint string) string {
 	// get region from queueURL
 	// Example for sqs queue: https://sqs.us-east-1.amazonaws.com/12345678912/test-s3-logs
 	// Example for vpce: https://vpce-test.sqs.us-east-1.vpce.amazonaws.com/12345678912/sqs-queue
+	// Example for other domains: https://sqs.us-east-1.subdomain.domain.com/12345678912/sqs-queue
 	u, err := url.Parse(queueURL)
 	if err != nil {
 		return ""
@@ -53,6 +54,16 @@ func getRegionFromQueueURL(queueURL, endpoint string) string {
 	if len(host) == 5 && host[1] == "sqs" {
 		if host[4] == endpoint || (endpoint == "" && strings.HasPrefix(host[4], "amazonaws.")) {
 			return host[2]
+		}
+	}
+
+	// check for sqs urls with region and custom domains
+	host = strings.Split(u.Host, ".")
+	if len(host) >= 4 && host[0] == "sqs" {
+
+		// make sure the second last part of split host is "amazonaws"
+		if endpoint == "" && !strings.HasPrefix(host[len(host)-2], "amazonaws.") {
+			return host[1]
 		}
 	}
 

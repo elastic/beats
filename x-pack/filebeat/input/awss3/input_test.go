@@ -91,7 +91,13 @@ func TestRegionSelection(t *testing.T) {
 		{
 			name:     "abc.xyz_and_domain_with_blank_endpoint",
 			queueURL: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
-			wantErr:  errBadQueueURL,
+			want:     "us-east-1",
+		},
+		{
+			name:     "non_aws_vpce_with_endpoint",
+			queueURL: "https://vpce-test.sqs.us-east-1.vpce.abc.xyz/12345678912/sqs-queue",
+			endpoint: "abc.xyz",
+			want:     "us-east-1",
 		},
 		{
 			name:     "vpce_endpoint",
