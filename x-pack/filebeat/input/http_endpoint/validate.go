@@ -56,7 +56,7 @@ func (v *apiValidator) validateRequest(r *http.Request) (status int, err error) 
 		return http.StatusMethodNotAllowed, fmt.Errorf("only %v requests are allowed", v.method)
 	}
 
-	if v.contentType != "" && r.Header.Get("Content-Type") != v.contentType {
+	if v.contentType != "" && !strings.Contains(r.Header.Get("Content-Type"), v.contentType) {
 		return http.StatusUnsupportedMediaType, fmt.Errorf("wrong Content-Type header, expecting %v", v.contentType)
 	}
 
