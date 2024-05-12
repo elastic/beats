@@ -90,6 +90,33 @@ class Test(BaseTest):
         assert output[0]["input.type"] == "http_endpoint"
         assert output[0]["json.{}".format(self.prefix)] == message
 
+    def test_http_endpoint_request_acked(self):
+        """
+        Test http_endpoint input with HTTP events requiring ACK.
+        """
+        self.get_config()
+        filebeat = self.start_beat()
+        self.wait_until(lambda: self.log_contains(
+            "Starting HTTP server on {}:{}".format(self.host, self.port)))
+
+        message = "somerandommessage"
+        payload = {self.prefix: message}
+        query = {"wait_for_completion_timeout": "1m"}
+        headers = {"Content-Type": "application/json",
+                   "Accept": "application/json"}
+        r = requests.post(self.url, params=query, headers=headers, data=json.dumps(payload))
+
+        self.wait_until(lambda: self.output_count(lambda x: x >= 1))
+        filebeat.check_kill_and_wait()
+
+        output = self.read_output()
+
+        print("response:", r.status_code, r.text)
+
+        assert r.text == '{"message": "success"}'
+        assert output[0]["input.type"] == "http_endpoint"
+        assert output[0]["json.{}".format(self.prefix)] == message
+
     def test_http_endpoint_cel_request(self):
         """
         Test http_endpoint input with HTTP events using CEL.
