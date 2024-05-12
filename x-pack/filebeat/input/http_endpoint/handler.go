@@ -15,7 +15,9 @@ import (
 	"net/http"
 	"net/url"
 	"reflect"
+	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/google/cel-go/cel"
@@ -75,7 +77,11 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wait := getTimeoutWait(r.URL, h.log)
+	wait, err := getTimeoutWait(r.URL, h.log)
+	if err != nil {
+		h.sendAPIErrorResponse(txID, w, r, h.log, http.StatusBadRequest, err)
+		return
+	}
 	var (
 		acked   chan struct{}
 		timeout *time.Timer
@@ -183,22 +189,42 @@ func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 var errTookTooLong = errors.New("could not publish event within timeout")
 
-func getTimeoutWait(u *url.URL, log *logp.Logger) time.Duration {
-	p := u.Query().Get("wait_for_completion_timeout")
+func getTimeoutWait(u *url.URL, log *logp.Logger) (time.Duration, error) {
+	q := u.Query()
+	switch len(q) {
+	case 0:
+		return 0, nil
+	case 1:
+		if _, ok := q["wait_for_completion_timeout"]; !ok {
+			var k string
+			for k = range q {
+				break
+			}
+			return 0, fmt.Errorf("unexpected URL query: %s", k)
+		}
+	default:
+		delete(q, "wait_for_completion_timeout")
+		keys := make([]string, 0, len(q))
+		for k := range q {
+			keys = append(keys, k)
+		}
+		sort.Strings(keys)
+		return 0, fmt.Errorf("unexpected URL query: %s", strings.Join(keys, ", "))
+	}
+	p := q.Get("wait_for_completion_timeout")
 	if p == "" {
-		return 0
+		// This will never happen; it is already handled in the check switch above.
+		return 0, nil
 	}
 	log.Debugw("wait_for_completion_timeout parameter", "value", p)
 	t, err := time.ParseDuration(p)
 	if err != nil {
-		log.Warnw("could not parse wait_for_completion_timeout parameter", "error", err)
-		return 0
+		return 0, fmt.Errorf("could not parse wait_for_completion_timeout parameter: %w", err)
 	}
 	if t < 0 {
-		log.Warnw("negative wait_for_completion_timeout parameter", "error", err)
-		return 0
+		return 0, fmt.Errorf("negative wait_for_completion_timeout parameter: %w", err)
 	}
-	return t
+	return t, nil
 }
 
 func (h *handler) sendAPIErrorResponse(txID string, w http.ResponseWriter, r *http.Request, log *logp.Logger, status int, apiError error) {
