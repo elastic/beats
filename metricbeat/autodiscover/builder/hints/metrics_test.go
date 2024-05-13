@@ -23,7 +23,6 @@ import (
 	"sort"
 	"testing"
 
-	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/beats/v7/metricbeat/mb"
@@ -652,7 +651,7 @@ func TestGenerateHints(t *testing.T) {
 }
 
 func TestGenerateHintsDoesNotAccessGlobalKeystore(t *testing.T) {
-	path := getTemporaryKeystoreFile()
+	path := getTemporaryKeystoreFile(t)
 	defer os.Remove(path)
 	// store the secret
 	keystore := createAnExistingKeystore(t, path, "stored_secret")
@@ -768,10 +767,6 @@ func createAnExistingKeystore(t *testing.T, path string, secret string) keystore
 }
 
 // create a temporary file on disk to save the keystore.
-func getTemporaryKeystoreFile() string {
-	path, err := ioutils.TempDir("", "testing")
-	if err != nil {
-		panic(err)
-	}
-	return filepath.Join(path, "keystore")
+func getTemporaryKeystoreFile(t *testing.T) string {
+	return filepath.Join(t.TempDir(), "keystore")
 }

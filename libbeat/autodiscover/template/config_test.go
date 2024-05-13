@@ -22,7 +22,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/docker/docker/pkg/ioutils"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/elastic/elastic-agent-autodiscover/bus"
@@ -174,7 +173,7 @@ func TestConfigsMappingKeystore(t *testing.T) {
 		"password": secret,
 	})
 
-	path := getTemporaryKeystoreFile()
+	path := getTemporaryKeystoreFile(t)
 	defer os.Remove(path)
 	// store the secret
 	keystore := createAnExistingKeystore(path, secret)
@@ -228,7 +227,7 @@ func TestConfigsMappingKeystoreProvider(t *testing.T) {
 		"password": secret,
 	})
 
-	path := getTemporaryKeystoreFile()
+	path := getTemporaryKeystoreFile(t)
 	defer os.Remove(path)
 	// store the secret
 	keystore := createAnExistingKeystore(path, secret)
@@ -253,7 +252,7 @@ func TestConfigsMappingKeystoreProvider(t *testing.T) {
 		},
 	}
 
-	keystoreProvider := newMockKeystoreProvider(secret)
+	keystoreProvider := newMockKeystoreProvider(t, secret)
 	for _, test := range tests {
 		var mappings MapperSettings
 		config, err := conf.NewConfigWithYAML([]byte(test.mapping), "")
@@ -277,15 +276,16 @@ func TestConfigsMappingKeystoreProvider(t *testing.T) {
 
 type mockKeystore struct {
 	secret string
+	t      *testing.T
 }
 
-func newMockKeystoreProvider(secret string) bus.KeystoreProvider {
-	return &mockKeystore{secret}
+func newMockKeystoreProvider(t *testing.T, secret string) bus.KeystoreProvider {
+	return &mockKeystore{secret, t}
 }
 
 // GetKeystore return a KubernetesSecretsKeystore if it already exists for a given namespace or creates a new one.
 func (kr *mockKeystore) GetKeystore(event bus.Event) keystore.Keystore {
-	path := getTemporaryKeystoreFile()
+	path := getTemporaryKeystoreFile(kr.t)
 	defer os.Remove(path)
 	// store the secret
 	keystore := createAnExistingKeystore(path, kr.secret)
@@ -331,10 +331,6 @@ func createAnExistingKeystore(path string, secret string) keystore.Keystore {
 }
 
 // create a temporary file on disk to save the keystore.
-func getTemporaryKeystoreFile() string {
-	path, err := ioutils.TempDir("", "testing")
-	if err != nil {
-		panic(err)
-	}
-	return filepath.Join(path, "keystore")
+func getTemporaryKeystoreFile(t *testing.T) string {
+	return filepath.Join(t.TempDir(), "keystore")
 }

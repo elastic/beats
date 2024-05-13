@@ -20,14 +20,14 @@ package image
 import (
 	"time"
 
-	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/image"
 
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/elastic-agent-autodiscover/docker"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-func eventsMapping(imagesList []types.ImageSummary, dedot bool) []mapstr.M {
+func eventsMapping(imagesList []image.Summary, dedot bool) []mapstr.M {
 	events := []mapstr.M{}
 	for _, image := range imagesList {
 		events = append(events, eventMapping(&image, dedot))
@@ -35,7 +35,7 @@ func eventsMapping(imagesList []types.ImageSummary, dedot bool) []mapstr.M {
 	return events
 }
 
-func eventMapping(image *types.ImageSummary, dedot bool) mapstr.M {
+func eventMapping(image *image.Summary, dedot bool) mapstr.M {
 	event := mapstr.M{
 		"id": mapstr.M{
 			"current": image.ID,

@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
 	"github.com/docker/go-connections/tlsconfig"
 
@@ -93,7 +94,7 @@ func NewDockerClient(endpoint string, config Config) (*client.Client, error) {
 func FetchStats(client *client.Client, timeout time.Duration) ([]Stat, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
-	containers, err := client.ContainerList(ctx, types.ContainerListOptions{})
+	containers, err := client.ContainerList(ctx, container.ListOptions{})
 	if err != nil {
 		return nil, err
 	}
