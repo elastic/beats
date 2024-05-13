@@ -32,6 +32,7 @@ type Config struct {
 	IncludeCPUTicks bool                     `config:"process.include_cpu_ticks"`
 	IncludePerCPU   bool                     `config:"process.include_per_cpu"`
 	CPUTicks        *bool                    `config:"cpu_ticks"` // Deprecated
+	Pid             int                      `config:"process.pid"`
 }
 
 // Validate checks for depricated config options

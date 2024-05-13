@@ -47,6 +47,7 @@ type MetricSet struct {
 	stats  *process.Stats
 	cgroup *cgroup.Reader
 	perCPU bool
+	setpid int
 }
 
 // New creates and returns a new MetricSet.
@@ -83,6 +84,8 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 		perCPU: config.IncludePerCPU,
 	}
 
+	m.setpid = config.Pid
+
 	// If hostfs is set, we may not want to force the hierarchy override, as the user could be expecting a custom path.
 	if !sys.IsSet() {
 		override, isset := os.LookupEnv("LIBBEAT_MONITORING_CGROUPS_HIERARCHY_OVERRIDE")
@@ -101,19 +104,31 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // Fetch fetches metrics for all processes. It iterates over each PID and
 // collects process metadata, CPU metrics, and memory metrics.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
-	procs, roots, err := m.stats.Get()
-	if err != nil {
-		return fmt.Errorf("process stats: %w", err)
-	}
 
-	for evtI := range procs {
-		isOpen := r.Event(mb.Event{
-			MetricSetFields: procs[evtI],
-			RootFields:      roots[evtI],
-		})
-		if !isOpen {
-			return nil
+	if m.setpid == 0 {
+		procs, roots, err := m.stats.Get()
+		if err != nil {
+			return fmt.Errorf("process stats: %w", err)
 		}
+
+		for evtI := range procs {
+			isOpen := r.Event(mb.Event{
+				MetricSetFields: procs[evtI],
+				RootFields:      roots[evtI],
+			})
+			if !isOpen {
+				return nil
+			}
+		}
+	} else {
+		proc, root, err := m.stats.GetOneRootEvent(m.setpid)
+		if err != nil {
+			return fmt.Errorf("error fetching pid %d: %w", m.setpid, err)
+		}
+		r.Event(mb.Event{
+			MetricSetFields: proc,
+			RootFields:      root,
+		})
 	}
 
 	return nil
