@@ -166,7 +166,7 @@ func (r *Registry) GetReloadableOutput() Reloadable {
 func (r *Registry) GetRegisteredNames() []string {
 	r.RLock()
 	defer r.RUnlock()
-	var names []string
+	names := make([]string, 0, len(r.confs)+len(r.confsLists))
 
 	for name := range r.confs {
 		names = append(names, name)
