@@ -318,6 +318,7 @@ func serializeEvents(
 
 	succeeded := data
 	for _, d := range data {
+		d := d
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
 			log.Errorf("Encoding event failed with error: %+v. Look at the event log file to view the event", err)
@@ -336,6 +337,7 @@ failLoop:
 	succeeded = data[:i]
 	rest := data[i+1:]
 	for _, d := range rest {
+		d := d
 		serializedEvent, err := codec.Encode(index, &d.Content)
 		if err != nil {
 			log.Errorf("Encoding event failed with error: %+v. Look at the event log file to view the event", err)
