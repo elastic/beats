@@ -16,6 +16,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	filebeat "github.com/elastic/beats/v7/x-pack/filebeat/cmd"
@@ -23,13 +24,17 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
-func setUnitsRevisionNumber(units []*proto.UnitExpected, revision uint64) {
+func setInputUnitsConfigStateIdx(units []*proto.UnitExpected, idx uint64) {
 	for _, unit := range units {
+		if unit.Type != proto.UnitType_INPUT {
+			continue
+		}
+
 		if unit.Config == nil {
 			return
 		}
-
-		unit.Config.Revision = revision
+		unit.ConfigStateIdx = idx
+		unit.Config.Source.Fields["revision"] = structpb.NewNumberValue(float64(idx))
 	}
 }
 
@@ -61,7 +66,7 @@ func TestCELCheckinV2(t *testing.T) {
 		{
 			Id:             "output-unit",
 			Type:           proto.UnitType_OUTPUT,
-			ConfigStateIdx: 1,
+			ConfigStateIdx: 0,
 			State:          proto.State_HEALTHY,
 			LogLevel:       proto.UnitLogLevel_INFO,
 			Config: &proto.UnitExpectedConfig{
@@ -91,7 +96,7 @@ func TestCELCheckinV2(t *testing.T) {
 				Name: "cel-1",
 				Source: integration.RequireNewStruct(t, map[string]interface{}{
 					"use_output": "default",
-					"revision":   1,
+					"revision":   0,
 				}),
 				DataStream: &proto.DataStream{
 					Namespace: "default",
@@ -140,7 +145,7 @@ func TestCELCheckinV2(t *testing.T) {
 		{
 			Id:             "output-unit",
 			Type:           proto.UnitType_OUTPUT,
-			ConfigStateIdx: 1,
+			ConfigStateIdx: 0,
 			State:          proto.State_HEALTHY,
 			LogLevel:       proto.UnitLogLevel_INFO,
 			Config: &proto.UnitExpectedConfig{
@@ -170,7 +175,7 @@ func TestCELCheckinV2(t *testing.T) {
 				Name: "cel-1",
 				Source: integration.RequireNewStruct(t, map[string]interface{}{
 					"use_output": "default",
-					"revision":   1,
+					"revision":   0,
 				}),
 				DataStream: &proto.DataStream{
 					Namespace: "default",
@@ -205,7 +210,7 @@ func TestCELCheckinV2(t *testing.T) {
 		{
 			Id:             "output-unit",
 			Type:           proto.UnitType_OUTPUT,
-			ConfigStateIdx: 1,
+			ConfigStateIdx: 0,
 			State:          proto.State_HEALTHY,
 			LogLevel:       proto.UnitLogLevel_INFO,
 			Config: &proto.UnitExpectedConfig{
@@ -286,7 +291,6 @@ func TestCELCheckinV2(t *testing.T) {
 
 			serverOneResponse = invalidResponse
 
-			setUnitsRevisionNumber(allStreams, 0)
 			return true, allStreams
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
@@ -387,7 +391,7 @@ func TestCELCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			setUnitsRevisionNumber(oneStream, 1)
+			setInputUnitsConfigStateIdx(oneStream, 1)
 			return true, oneStream
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
@@ -406,7 +410,7 @@ func TestCELCheckinV2(t *testing.T) {
 			}, payload) {
 				return false, oneStream
 			}
-			setUnitsRevisionNumber(noStream, 2)
+			setInputUnitsConfigStateIdx(noStream, 2)
 			return true, noStream
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
@@ -418,7 +422,7 @@ func TestCELCheckinV2(t *testing.T) {
 			serverOneResponse = validResponse
 			serverTwoResponse = validResponse
 
-			setUnitsRevisionNumber(allStreams, 3)
+			setInputUnitsConfigStateIdx(allStreams, 3)
 			return true, allStreams
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
@@ -443,7 +447,7 @@ func TestCELCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			setUnitsRevisionNumber(noStream, 4)
+			setInputUnitsConfigStateIdx(noStream, 4)
 			return true, noStream
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
