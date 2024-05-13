@@ -81,6 +81,17 @@ Custom response example:
   prefix: "json"
 ----
 
+Map request to root of document example:
+["source","yaml",subs="attributes"]
+----
+{beatname_lc}.inputs:
+- type: http_endpoint
+  enabled: true
+  listen_address: 192.168.1.1
+  listen_port: 8080
+  prefix: "."
+----
+
 Multiple endpoints example:
 ["source","yaml",subs="attributes"]
 ----
@@ -306,7 +317,7 @@ This options specific which URL path to accept requests on. Defaults to `/`
 [float]
 ==== `prefix`
 
-This option specifies which prefix the incoming request will be mapped to.
+This option specifies which prefix the incoming request will be mapped to. If `prefix` is "`.`", the request will be mapped to the root of the resulting document.
 
 [float]
 ==== `include_headers`

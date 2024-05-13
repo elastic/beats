@@ -307,8 +307,14 @@ func (h *handler) sendResponse(w http.ResponseWriter, status int, message string
 func (h *handler) publishEvent(obj, headers mapstr.M, acker *batchACKTracker) error {
 	event := beat.Event{
 		Timestamp: time.Now().UTC(),
-		Fields:    mapstr.M{},
 		Private:   acker,
+	}
+	if h.messageField == "." {
+		event.Fields = obj
+	} else {
+		if _, err := event.PutValue(h.messageField, obj); err != nil {
+			return fmt.Errorf("failed to put data into event key %q: %w", h.messageField, err)
+		}
 	}
 	if h.preserveOriginalEvent {
 		event.Fields["event"] = mapstr.M{
@@ -317,10 +323,6 @@ func (h *handler) publishEvent(obj, headers mapstr.M, acker *batchACKTracker) er
 	}
 	if len(headers) > 0 {
 		event.Fields["headers"] = headers
-	}
-
-	if _, err := event.PutValue(h.messageField, obj); err != nil {
-		return fmt.Errorf("failed to put data into event key %q: %w", h.messageField, err)
 	}
 
 	h.publish(event)
