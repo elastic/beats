@@ -17,7 +17,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
 	filebeat "github.com/elastic/beats/v7/x-pack/filebeat/cmd"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client/mock"
@@ -263,13 +262,15 @@ func TestCELInput(t *testing.T) {
 			}
 
 			if !assert.ObjectsAreEqualValues(map[string]interface{}{
-				"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
-					"state": float64(status.Running),
-					"msg":   "",
-				},
-				"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
-					"state": float64(status.Running),
-					"msg":   "",
+				"streams": map[string]interface{}{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+						"status": "HEALTHY",
+						"error":  "",
+					},
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
+						"status": "HEALTHY",
+						"error":  "",
+					},
 				},
 			}, payload) {
 				return false, allStreams
@@ -288,13 +289,15 @@ func TestCELInput(t *testing.T) {
 			}
 
 			if !assert.ObjectsAreEqualValues(map[string]interface{}{
-				"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
-					"state": float64(status.Degraded),
-					"msg":   "failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
-				},
-				"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
-					"state": float64(status.Running),
-					"msg":   "",
+				"streams": map[string]interface{}{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+						"status": "DEGRADED",
+						"error":  "failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+					},
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
+						"status": "HEALTHY",
+						"error":  "",
+					},
 				},
 			}, payload) {
 				return false, allStreams
@@ -311,13 +314,15 @@ func TestCELInput(t *testing.T) {
 			}
 
 			if !assert.ObjectsAreEqualValues(map[string]interface{}{
-				"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
-					"state": float64(status.Degraded),
-					"msg":   "failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
-				},
-				"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
-					"state": float64(status.Degraded),
-					"msg":   "failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+				"streams": map[string]interface{}{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+						"status": "DEGRADED",
+						"error":  "failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+					},
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
+						"status": "DEGRADED",
+						"error":  "failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+					},
 				},
 			}, payload) {
 				return false, allStreams
@@ -335,13 +340,15 @@ func TestCELInput(t *testing.T) {
 			}
 
 			if !assert.ObjectsAreEqualValues(map[string]interface{}{
-				"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
-					"state": float64(status.Running),
-					"msg":   "",
-				},
-				"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
-					"state": float64(status.Running),
-					"msg":   "",
+				"streams": map[string]interface{}{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+						"status": "HEALTHY",
+						"error":  "",
+					},
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
+						"status": "HEALTHY",
+						"error":  "",
+					},
 				},
 			}, payload) {
 				return false, allStreams
@@ -358,13 +365,15 @@ func TestCELInput(t *testing.T) {
 			}
 
 			if !assert.ObjectsAreEqualValues(map[string]interface{}{
-				"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
-					"state": float64(status.Running),
-					"msg":   "",
-				},
-				"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
-					"state": float64(status.Degraded),
-					"msg":   "failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+				"streams": map[string]interface{}{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+						"status": "HEALTHY",
+						"error":  "",
+					},
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
+						"status": "DEGRADED",
+						"error":  "failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+					},
 				},
 			}, payload) {
 				return false, allStreams
@@ -380,9 +389,11 @@ func TestCELInput(t *testing.T) {
 			}
 
 			if !assert.ObjectsAreEqualValues(map[string]interface{}{
-				"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
-					"state": float64(status.Running),
-					"msg":   "",
+				"streams": map[string]interface{}{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+						"status": "HEALTHY",
+						"error":  "",
+					},
 				},
 			}, payload) {
 				return false, oneStream
@@ -410,13 +421,15 @@ func TestCELInput(t *testing.T) {
 			}
 
 			if !assert.ObjectsAreEqualValues(map[string]interface{}{
-				"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
-					"state": float64(status.Running),
-					"msg":   "",
-				},
-				"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
-					"state": float64(status.Running),
-					"msg":   "",
+				"streams": map[string]interface{}{
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
+						"status": "HEALTHY",
+						"error":  "",
+					},
+					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
+						"status": "HEALTHY",
+						"error":  "",
+					},
 				},
 			}, payload) {
 				return false, allStreams

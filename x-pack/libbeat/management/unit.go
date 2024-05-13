@@ -266,16 +266,20 @@ func (u *agentUnit) UpdateState(state status.Status, msg string, payload map[str
 		return u.clientUnit.UpdateState(getUnitState(state), msg, payload)
 	}
 
+	streamsPayload := make(map[string]interface{}, len(u.streamStates))
+
+	for streamID, streamState := range u.streamStates {
+		streamsPayload[streamID] = map[string]interface{}{
+			"status": getUnitState(streamState.state).String(),
+			"error":  streamState.msg,
+		}
+	}
+
 	if payload == nil {
 		payload = make(map[string]interface{})
 	}
 
-	for streamID, streamState := range u.streamStates {
-		payload[streamID] = map[string]interface{}{
-			"state": int32(streamState.state),
-			"msg":   streamState.msg,
-		}
-	}
+	payload["streams"] = streamsPayload
 
 	return u.clientUnit.UpdateState(getUnitState(state), msg, payload)
 }
@@ -304,13 +308,17 @@ func (u *agentUnit) updateStateForStream(streamID string, state status.Status, m
 
 	state, msg = u.calcState()
 
-	payload := make(map[string]interface{}, len(u.streamStates))
+	streamsPayload := make(map[string]interface{}, len(u.streamStates))
 
 	for id, streamState := range u.streamStates {
-		payload[id] = map[string]interface{}{
-			"state": int32(streamState.state),
-			"msg":   streamState.msg,
+		streamsPayload[id] = map[string]interface{}{
+			"status": getUnitState(streamState.state).String(),
+			"error":  streamState.msg,
 		}
+	}
+
+	payload := map[string]interface{}{
+		"streams": streamsPayload,
 	}
 
 	if err := u.clientUnit.UpdateState(getUnitState(state), msg, payload); err != nil {
@@ -366,15 +374,6 @@ func (u *agentUnit) markAsDeleted() {
 	defer u.mtx.Unlock()
 
 	u.softDeleted = true
-}
-
-func (u *agentUnit) clear() {
-	u.mtx.Lock()
-	defer u.mtx.Unlock()
-
-	u.clientUnit = nil
-	u.streamStates = nil
-	u.streamIDs = nil
 }
 
 // GetReporterForStreamByIndex returns a status reporter for the stream at the given index.
