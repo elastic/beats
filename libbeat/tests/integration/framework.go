@@ -22,6 +22,7 @@ package integration
 import (
 	"bufio"
 	"context"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -481,7 +482,18 @@ func EnsureESIsRunning(t *testing.T) {
 	p, _ := esURL.User.Password()
 	req.SetBasicAuth(u, p)
 
-	resp, err := http.DefaultClient.Do(req)
+	skipSSL := false
+
+	if envESSSL := os.Getenv("ES_SKIP_SSL"); envESSSL == "1" {
+		skipSSL = true
+	}
+
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: skipSSL},
+	}
+	client := &http.Client{Transport: tr}
+
+	resp, err := client.Do(req)
 	if err != nil {
 		// If you're reading this message, you probably forgot to start ES
 		// run `mage compose:Up` from Filebeat's folder to start all
@@ -553,6 +565,10 @@ func (b *BeatProc) Stdin() io.WriteCloser {
 
 func GetESURL(t *testing.T, scheme string) url.URL {
 	t.Helper()
+
+	if envScheme := os.Getenv("ES_SCHEME"); envScheme != "" {
+		scheme = envScheme
+	}
 
 	esHost := os.Getenv("ES_HOST")
 	if esHost == "" {
