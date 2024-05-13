@@ -11,5 +11,5 @@ import (
 )
 
 type Provider interface {
-	UpdateDB(*beat.Event) error
+	UpdateDB(*beat.Event, uint32) error
 }

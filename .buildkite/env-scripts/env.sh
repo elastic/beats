@@ -12,7 +12,6 @@ WORKSPACE="$(pwd)"
 BIN="${WORKSPACE}/bin"
 HW_TYPE="$(uname -m)"
 PLATFORM_TYPE="$(uname)"
-TMP_FOLDER="tmp.${REPO}"
 SNAPSHOT="true"
 PYTEST_ADDOPTS=""
 OSS_MODULE_PATTERN="^[a-z0-9]+beat\\/module\\/([^\\/]+)\\/.*"
@@ -38,7 +37,6 @@ export WORKSPACE
 export BIN
 export HW_TYPE
 export PLATFORM_TYPE
-export TMP_FOLDER
 export SNAPSHOT
 export PYTEST_ADDOPTS
 export OSS_MODULE_PATTERN

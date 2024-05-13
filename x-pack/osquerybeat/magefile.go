@@ -7,16 +7,23 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 
 	"github.com/magefile/mage/mg"
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
+
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/command"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/distro"
+	"github.com/elastic/beats/v7/x-pack/osquerybeat/internal/fileutil"
+
 	osquerybeat "github.com/elastic/beats/v7/x-pack/osquerybeat/scripts/mage"
 
 	// mage:import
@@ -87,9 +94,95 @@ func Clean() error {
 	return devtools.Clean(paths)
 }
 
+func execCommand(ctx context.Context, name string, args ...string) error {
+	ps := strings.Join(append([]string{name}, args...), " ")
+	fmt.Println(ps)
+	output, err := command.Execute(ctx, name, args...)
+	if err != nil {
+		fmt.Println(ps, ", failed: ", err)
+		return err
+	}
+	fmt.Print(output)
+	return err
+}
+
+// stripLinuxOsqueryd Strips osqueryd binary, that is not stripped in linux tar.gz distro
+func stripLinuxOsqueryd() error {
+	if os.Getenv("GOOS") != "linux" {
+		return nil
+	}
+
+	// Check that this step is called during x-pack/osquerybeat/ext/osquery-extension build
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	// Strip osqueryd only once when osquery-extension is built
+	// There are two build paths at the moment both through GolangCrossBuild
+	// 1. Standlone osquerybeat package (this function is called twice: for osquerybeat and osquery-extension)
+	// 2. Agentbeat package, this function is only called once for osquery-extension
+	if !strings.HasSuffix(cwd, "/osquery-extension") {
+		return nil
+	}
+
+	ctx := context.Background()
+
+	osArchs := osquerybeat.OSArchs(devtools.Platforms)
+
+	strip := func(oquerydPath string) error {
+		ok, err := fileutil.FileExists(oquerydPath)
+		if err != nil {
+			return err
+		}
+		if ok {
+			if err := execCommand(ctx, "strip", oquerydPath); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
+	for _, osarch := range osArchs {
+		// Skip everything but matching linux arch
+		if osarch.OS != os.Getenv("GOOS") || osarch.Arch != os.Getenv("GOARCH") {
+			continue
+		}
+
+		// Strip osqueryd
+		// There are two scenarios where the build path is created depending on the type of build
+		// 1. Standlone osquerybeat build: the osqueryd binaries are downloaded into osquerybeat/build/data/install/[GOOS]/[GOARCH]
+		// 2. Agentbeat build: the osqueryd binaries are downloaded agentbeat/build/data/install/[GOOS]/[GOARCH]
+
+		// This returns something like build/data/install/linux/amd64/osqueryd
+		querydRelativePath := distro.OsquerydPath(distro.GetDataInstallDir(osarch))
+
+		// Checking and stripping osqueryd binary and both paths osquerybeat/build and agentbeat/build
+		// because at the moment it's unclear if this step was initiated from osquerybeat or agentbeat build
+		osquerybeatPath := filepath.Clean(filepath.Join(cwd, "../..", querydRelativePath))
+		err = strip(osquerybeatPath)
+		if err != nil {
+			return err
+		}
+
+		agentbeatPath := filepath.Clean(filepath.Join(cwd, "../../../agentbeat", querydRelativePath))
+		err = strip(agentbeatPath)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // GolangCrossBuild build the Beat binary inside of the golang-builder.
 // Do not use directly, use crossBuild instead.
 func GolangCrossBuild() error {
+	// Strip linux osqueryd binary
+	if err := stripLinuxOsqueryd(); err != nil {
+		return err
+	}
+
 	return devtools.GolangCrossBuild(devtools.DefaultGolangCrossBuildArgs())
 }
 
