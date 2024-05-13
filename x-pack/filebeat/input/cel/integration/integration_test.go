@@ -33,7 +33,9 @@ func setUnitsRevisionNumber(units []*proto.UnitExpected, revision uint64) {
 	}
 }
 
-func TestCELInput(t *testing.T) {
+func TestCELCheckinV2(t *testing.T) {
+	integration.EnsureESIsRunning(t)
+
 	invalidResponse := []byte("invalid json")
 	validResponse := []byte("{\"ip\":\"0.0.0.0\"}")
 
@@ -49,6 +51,12 @@ func TestCELInput(t *testing.T) {
 	}))
 	defer svrTwo.Close()
 
+	esConnectionDetails := integration.GetESURL(t, "http")
+	outputHosts := []interface{}{fmt.Sprintf("%s://%s:%s", esConnectionDetails.Scheme, esConnectionDetails.Hostname(), esConnectionDetails.Port())}
+	outputUsername := esConnectionDetails.User.Username()
+	outputPassword, _ := esConnectionDetails.User.Password()
+	outputProtocol := esConnectionDetails.Scheme
+
 	allStreams := []*proto.UnitExpected{
 		{
 			Id:             "output-unit",
@@ -62,10 +70,10 @@ func TestCELInput(t *testing.T) {
 				Name: "elasticsearch",
 				Source: integration.RequireNewStruct(t, map[string]interface{}{
 					"type":                  "elasticsearch",
-					"hosts":                 []interface{}{"https://127.0.0.1:9200"},
-					"username":              "elastic",
-					"password":              "changeme",
-					"protocol":              "http",
+					"hosts":                 outputHosts,
+					"username":              outputUsername,
+					"password":              outputPassword,
+					"protocol":              outputProtocol,
 					"enabled":               true,
 					"ssl.verification_mode": "none",
 				}),
@@ -141,10 +149,10 @@ func TestCELInput(t *testing.T) {
 				Name: "elasticsearch",
 				Source: integration.RequireNewStruct(t, map[string]interface{}{
 					"type":                  "elasticsearch",
-					"hosts":                 []interface{}{"https://127.0.0.1:9200"},
-					"username":              "elastic",
-					"password":              "changeme",
-					"protocol":              "http",
+					"hosts":                 outputHosts,
+					"username":              outputUsername,
+					"password":              outputPassword,
+					"protocol":              outputProtocol,
 					"enabled":               true,
 					"ssl.verification_mode": "none",
 				}),
@@ -206,10 +214,10 @@ func TestCELInput(t *testing.T) {
 				Name: "elasticsearch",
 				Source: integration.RequireNewStruct(t, map[string]interface{}{
 					"type":                  "elasticsearch",
-					"hosts":                 []interface{}{"https://127.0.0.1:9200"},
-					"username":              "elastic",
-					"password":              "changeme",
-					"protocol":              "http",
+					"hosts":                 outputHosts,
+					"username":              outputUsername,
+					"password":              outputPassword,
+					"protocol":              outputProtocol,
 					"enabled":               true,
 					"ssl.verification_mode": "none",
 				}),
