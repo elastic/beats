@@ -20,7 +20,7 @@ package status
 // Status describes the current status of the beat.
 type Status int
 
-//go:generate stringer -type=Status
+//go:generate go run golang.org/x/tools/cmd/stringer -type=Status
 const (
 	// Unknown is initial status when none has been reported.
 	Unknown Status = iota
