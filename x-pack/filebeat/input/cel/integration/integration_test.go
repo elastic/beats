@@ -464,7 +464,6 @@ func TestCELCheckinV2(t *testing.T) {
 	for {
 		select {
 		case observed := <-observedStates:
-			t.Logf("observed: %v", observed)
 			next, expected := checks[0](t, observed)
 
 			expectedUnits <- expected
