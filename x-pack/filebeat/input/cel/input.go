@@ -383,10 +383,10 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					return nil
 				}
 				log.Errorw("single event object returned by evaluation", "event", e)
+				updateStatus(statusReporter, status.Degraded, "single event object returned by evaluation")
 				events = []interface{}{e}
 				// Make sure the cursor is not updated.
 				delete(state, "cursor")
-				updateStatus(statusReporter, status.Degraded, "single event object returned by evaluation")
 			default:
 				return fmt.Errorf("unexpected type returned for evaluation events: %T", e)
 			}
