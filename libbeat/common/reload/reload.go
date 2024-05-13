@@ -49,6 +49,9 @@ type ConfigWithMeta struct {
 	// InputUnitID is the unit's ID that generated this ConfigWithMeta
 	InputUnitID string
 
+	// StatusReporter provides a method to update the status of the underlying unit
+	// that maps to the config. Note: Under standalone execution of a Beat this is
+	// expected to be nil.
 	StatusReporter status.StatusReporter
 }
 

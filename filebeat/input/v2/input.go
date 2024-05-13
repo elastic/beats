@@ -85,6 +85,9 @@ type Context struct {
 	// Cancelation is used by Beats to signal the input to shutdown.
 	Cancelation Canceler
 
+	// StatusReporter provides a method to update the status of the underlying unit
+	// that maps to the config. Note: Under standalone execution of Filebeat this is
+	// expected to be nil.
 	StatusReporter status.StatusReporter
 }
 
