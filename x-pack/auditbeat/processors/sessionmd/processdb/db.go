@@ -189,6 +189,7 @@ type DB struct {
 	procfs                   procfs.Reader
 	stopChan                 chan struct{}
 	removalCandidates        rcHeap
+	namesCache               *namesCache
 }
 
 func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
@@ -204,6 +205,7 @@ func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
 		procfs:                   reader,
 		stopChan:                 make(chan struct{}),
 		removalCandidates:        make(rcHeap, 0),
+		namesCache:               newNamesCache(),
 	}
 	db.startReaper()
 	return &db, nil
@@ -430,7 +432,7 @@ func interactiveFromTTY(tty types.TTYDev) bool {
 	return TTYUnknown != getTTYType(tty.Major, tty.Minor)
 }
 
-func fullProcessFromDBProcess(p Process) types.Process {
+func (db *DB) fullProcessFromDBProcess(p Process) types.Process {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(p.PIDs.StartTimeNS)
 	interactive := interactiveFromTTY(p.CTTY)
 
@@ -447,7 +449,15 @@ func fullProcessFromDBProcess(p Process) types.Process {
 	euid := p.Creds.Euid
 	egid := p.Creds.Egid
 	ret.User.ID = strconv.FormatUint(uint64(euid), 10)
+	username, ok := db.namesCache.getUserName(ret.User.ID)
+	if ok {
+		ret.User.Name = username
+	}
 	ret.Group.ID = strconv.FormatUint(uint64(egid), 10)
+	groupname, ok := db.namesCache.getGroupName(ret.Group.ID)
+	if ok {
+		ret.Group.Name = groupname
+	}
 	ret.Thread.Capabilities.Permitted, _ = capabilities.FromUint64(p.Creds.CapPermitted)
 	ret.Thread.Capabilities.Effective, _ = capabilities.FromUint64(p.Creds.CapEffective)
 	ret.TTY.CharDevice.Major = p.CTTY.Major
@@ -457,7 +467,7 @@ func fullProcessFromDBProcess(p Process) types.Process {
 	return ret
 }
 
-func fillParent(process *types.Process, parent Process) {
+func (db *DB) fillParent(process *types.Process, parent Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(parent.PIDs.StartTimeNS)
 
 	interactive := interactiveFromTTY(parent.CTTY)
@@ -471,10 +481,18 @@ func fillParent(process *types.Process, parent Process) {
 	process.Parent.WorkingDirectory = parent.Cwd
 	process.Parent.Interactive = &interactive
 	process.Parent.User.ID = strconv.FormatUint(uint64(euid), 10)
+	username, ok := db.namesCache.getUserName(process.Parent.User.ID)
+	if ok {
+		process.Parent.User.Name = username
+	}
 	process.Parent.Group.ID = strconv.FormatUint(uint64(egid), 10)
+	groupname, ok := db.namesCache.getGroupName(process.Parent.Group.ID)
+	if ok {
+		process.Parent.Group.Name = groupname
+	}
 }
 
-func fillGroupLeader(process *types.Process, groupLeader Process) {
+func (db *DB) fillGroupLeader(process *types.Process, groupLeader Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(groupLeader.PIDs.StartTimeNS)
 
 	interactive := interactiveFromTTY(groupLeader.CTTY)
@@ -488,10 +506,18 @@ func fillGroupLeader(process *types.Process, groupLeader Process) {
 	process.GroupLeader.WorkingDirectory = groupLeader.Cwd
 	process.GroupLeader.Interactive = &interactive
 	process.GroupLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
+	username, ok := db.namesCache.getUserName(process.GroupLeader.User.ID)
+	if ok {
+		process.GroupLeader.User.Name = username
+	}
 	process.GroupLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
+	groupname, ok := db.namesCache.getGroupName(process.GroupLeader.Group.ID)
+	if ok {
+		process.GroupLeader.Group.Name = groupname
+	}
 }
 
-func fillSessionLeader(process *types.Process, sessionLeader Process) {
+func (db *DB) fillSessionLeader(process *types.Process, sessionLeader Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(sessionLeader.PIDs.StartTimeNS)
 
 	interactive := interactiveFromTTY(sessionLeader.CTTY)
@@ -505,10 +531,18 @@ func fillSessionLeader(process *types.Process, sessionLeader Process) {
 	process.SessionLeader.WorkingDirectory = sessionLeader.Cwd
 	process.SessionLeader.Interactive = &interactive
 	process.SessionLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
+	username, ok := db.namesCache.getUserName(process.SessionLeader.User.ID)
+	if ok {
+		process.SessionLeader.User.Name = username
+	}
 	process.SessionLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
+	groupname, ok := db.namesCache.getGroupName(process.SessionLeader.Group.ID)
+	if ok {
+		process.SessionLeader.Group.Name = groupname
+	}
 }
 
-func fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Process) {
+func (db *DB) fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(entryLeader.PIDs.StartTimeNS)
 
 	interactive := interactiveFromTTY(entryLeader.CTTY)
@@ -522,7 +556,15 @@ func fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Pr
 	process.EntryLeader.WorkingDirectory = entryLeader.Cwd
 	process.EntryLeader.Interactive = &interactive
 	process.EntryLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
+	username, ok := db.namesCache.getUserName(process.EntryLeader.User.ID)
+	if ok {
+		process.EntryLeader.User.Name = username
+	}
 	process.EntryLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
+	groupname, ok := db.namesCache.getGroupName(process.EntryLeader.Group.ID)
+	if ok {
+		process.EntryLeader.Group.Name = groupname
+	}
 
 	process.EntryLeader.EntryMeta.Type = string(entryType)
 }
@@ -583,12 +625,12 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 		return types.Process{}, errors.New("process not found")
 	}
 
-	ret := fullProcessFromDBProcess(process)
+	ret := db.fullProcessFromDBProcess(process)
 
 	if process.PIDs.Ppid != 0 {
 		for i := 0; i < retryCount; i++ {
 			if parent, ok := db.processes[process.PIDs.Ppid]; ok {
-				fillParent(&ret, parent)
+				db.fillParent(&ret, parent)
 				break
 			}
 		}
@@ -597,7 +639,7 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 	if process.PIDs.Pgid != 0 {
 		for i := 0; i < retryCount; i++ {
 			if groupLeader, ok := db.processes[process.PIDs.Pgid]; ok {
-				fillGroupLeader(&ret, groupLeader)
+				db.fillGroupLeader(&ret, groupLeader)
 				break
 			}
 		}
@@ -606,7 +648,7 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 	if process.PIDs.Sid != 0 {
 		for i := 0; i < retryCount; i++ {
 			if sessionLeader, ok := db.processes[process.PIDs.Sid]; ok {
-				fillSessionLeader(&ret, sessionLeader)
+				db.fillSessionLeader(&ret, sessionLeader)
 				break
 			}
 		}
@@ -615,7 +657,7 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 	if entryLeaderPID, foundEntryLeaderPID := db.entryLeaderRelationships[process.PIDs.Tgid]; foundEntryLeaderPID {
 		if entryLeader, foundEntryLeader := db.processes[entryLeaderPID]; foundEntryLeader {
 			// if there is an entry leader then there is a matching member in the entryLeaders table
-			fillEntryLeader(&ret, db.entryLeaders[entryLeaderPID], entryLeader)
+			db.fillEntryLeader(&ret, db.entryLeaders[entryLeaderPID], entryLeader)
 		} else {
 			db.logger.Debugf("failed to find entry leader entry %d for %d (%s)", entryLeaderPID, pid, db.processes[pid].Filename)
 		}
