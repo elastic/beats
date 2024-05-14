@@ -416,6 +416,11 @@ func FormatEventString(
 	if err != nil && err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno.
 		return fmt.Errorf("failed in EvtFormatMessage: %w", err)
 	} else if err == nil {
+		// Windows API returns a null terminated WCHAR C-style string in the buffer. bufferNeeded applies
+		// only when ERROR_INSUFFICIENT_BUFFER is returned. Luckily the UTF16ToUTF8Bytes/UTF16ToString
+		// functions stop at null termination. Note, as signaled in a comment at the end of this function,
+		// this behavior is bad for EvtFormatMessageKeyword as then the API returns a list of null terminated
+		// strings in the buffer (it's fine for now as we don't use this parameter value).
 		return common.UTF16ToUTF8Bytes(renderBuf, out)
 	}
 
