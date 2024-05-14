@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// Variant of exec.command with redacted params, which could contain sensitive stuff
+// Variant of exec.command with redacted params and playwright options, which might contain sensitive information.  
 type SynthCmd struct {
 	*exec.Cmd
 }
