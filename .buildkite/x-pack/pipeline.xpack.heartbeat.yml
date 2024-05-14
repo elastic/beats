@@ -149,7 +149,7 @@ steps:
 
   - group: "x-pack/heartbeat macOS Extended Tests"
     key: "x-pack-heartbeat-extended-tests-macos"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+    if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
 
     steps:
       - label: ":mac: x-pack/heartbeat macOS x86_64 Unit Tests"
