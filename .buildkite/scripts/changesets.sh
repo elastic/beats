@@ -68,13 +68,10 @@ defineModuleFromTheChangeSet() {
     fi
   done
 
-  if [[ -z "$changed_modules" ]]; then # TODO: remove this conditional when issue https://github.com/elastic/ingest-dev/issues/2993 gets resolved
-    if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" ]]; then
-      export MODULE="aws"
-    else
-      export MODULE="kubernetes"
-    fi
-  else
-    export MODULE="${changed_modules}"  # TODO: once https://github.com/elastic/ingest-dev/issues/2993 gets resolved, this should be the only thing we export
+  # export MODULE="" leads to an infinite loop https://github.com/elastic/ingest-dev/issues/2993
+  if [[ ! -z $changed_modules ]]; then 
+    export MODULE="${changed_modules}"
+    echo "~~~ Set env var MODULE to [$MODULE]"
+    echo "~~~ Resuming commands"
   fi
 }

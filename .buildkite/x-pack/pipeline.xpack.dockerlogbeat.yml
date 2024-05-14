@@ -56,11 +56,9 @@ steps:
           # defines the MODULE env var based on what's changed in a PR
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet x-pack/dockerlogbeat
-          echo "~~~ Running tests with env var MODULE=$$MODULE"
+          echo "~~~ Running tests"
           cd x-pack/dockerlogbeat
           mage goIntegTest
-        env:
-          MODULE: $MODULE
         retry:
           automatic:
            - limit: 3
