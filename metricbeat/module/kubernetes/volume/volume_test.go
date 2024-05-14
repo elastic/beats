@@ -20,7 +20,6 @@
 package volume
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
@@ -47,8 +46,6 @@ func TestEventMapping(t *testing.T) {
 	assert.NoError(t, err, "error mapping "+testFile)
 
 	assert.Len(t, events, 2, "got wrong number of events")
-
-	fmt.Printf("%v", events[1])
 
 	testCases := []map[string]interface{}{
 		// Test for ephemeral volume
