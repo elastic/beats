@@ -4,7 +4,7 @@
 
 //go:build integration
 
-package integration
+package cel_test
 
 import (
 	"fmt"
@@ -23,30 +23,40 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
+// TestCheckinV2 is an integration test that checks that CEL input reports in
+// the expected statuses. Specifically it configures a filebeat instance to
+// run a CEL input with two streams as well as it monitors the reported state
+// by spawning an elastic-agent V2 mock server.
+// This test also spawns two http servers for making the CEL input streams
+// to report different states that are checked to match the expected states.
 func TestCheckinV2(t *testing.T) {
+	// make sure there is an ES instance running
 	integration.EnsureESIsRunning(t)
-
-	invalidResponse := []byte("invalid json")
-	validResponse := []byte("{\"ip\":\"0.0.0.0\"}")
-
-	serverOneResponse := validResponse
-	svrOne := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write(serverOneResponse)
-	}))
-	defer svrOne.Close()
-
-	serverTwoResponse := validResponse
-	svrTwo := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = w.Write(serverTwoResponse)
-	}))
-	defer svrTwo.Close()
-
 	esConnectionDetails := integration.GetESURL(t, "http")
 	outputHosts := []interface{}{fmt.Sprintf("%s://%s:%s", esConnectionDetails.Scheme, esConnectionDetails.Hostname(), esConnectionDetails.Port())}
 	outputUsername := esConnectionDetails.User.Username()
 	outputPassword, _ := esConnectionDetails.User.Password()
 	outputProtocol := esConnectionDetails.Scheme
 
+	invalidResponse := []byte("invalid json")
+	validResponse := []byte("{\"ip\":\"0.0.0.0\"}")
+
+	// http server for the first CEL input stream
+	serverOneResponse := validResponse
+	svrOne := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write(serverOneResponse)
+	}))
+	defer svrOne.Close()
+
+	// http server for the second CEL input stream
+	serverTwoResponse := validResponse
+	svrTwo := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write(serverTwoResponse)
+	}))
+	defer svrTwo.Close()
+
+	// allStreams is an elastic-agent configuration with an ES output and one CEL
+	// input with two streams
 	allStreams := []*proto.UnitExpected{
 		{
 			Id:             "output-unit",
@@ -126,6 +136,9 @@ func TestCheckinV2(t *testing.T) {
 		},
 	}
 
+	// oneStream is an elastic-agent configuration with an ES output and one CEL
+	// input with one stream. Effectively this is the same as allStreams with
+	// stream cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2 removed
 	oneStream := []*proto.UnitExpected{
 		{
 			Id:             "output-unit",
@@ -191,6 +204,7 @@ func TestCheckinV2(t *testing.T) {
 		},
 	}
 
+	// noStream is an elastic-agent configuration with just an ES output
 	noStream := []*proto.UnitExpected{
 		{
 			Id:             "output-unit",
@@ -215,6 +229,7 @@ func TestCheckinV2(t *testing.T) {
 		},
 	}
 
+	// elastic-agent management V2 mock server
 	observedStates := make(chan *proto.CheckinObserved)
 	expectedUnits := make(chan []*proto.UnitExpected)
 	done := make(chan struct{})
@@ -233,11 +248,10 @@ func TestCheckinV2(t *testing.T) {
 			return nil
 		},
 	}
-	defer server.Stop()
-
 	if err := server.Start(); err != nil {
 		t.Fatalf("failed to start StubServerV2 server: %v", err)
 	}
+	defer server.Stop()
 
 	initialOSArgs := os.Args
 	// necessary to change this so filebeat.Filebeat() can read the appropriate args
@@ -259,6 +273,9 @@ func TestCheckinV2(t *testing.T) {
 		beatRunErr <- beat.Execute()
 	}()
 
+	// slice of funcs that check if the observed states match the expected ones.
+	// They return true if they match and false if they don't as well as a slice
+	// of units expected for the server to respond with.
 	checks := []func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected){
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
 			// wait for all healthy
@@ -461,21 +478,24 @@ func TestCheckinV2(t *testing.T) {
 	for {
 		select {
 		case observed := <-observedStates:
-			t.Logf("observed: %v", observed)
-			next, expected := checks[0](t, observed)
+			matched, expected := checks[0](t, observed)
 
 			expectedUnits <- expected
 
-			if !next {
+			// if not matched, do not proceed to the next check
+			if !matched {
 				continue
 			}
 
+			// check returned true, so reset the timer
 			timer.Reset(3 * time.Minute)
 
+			// proceed to the next check
 			if len(checks) > 0 {
 				checks = checks[1:]
 			}
 
+			// if no more checks, return
 			if len(checks) == 0 {
 				return
 			}
@@ -484,6 +504,8 @@ func TestCheckinV2(t *testing.T) {
 				t.Fatalf("beat run err: %v", err)
 			}
 		case <-timer.C:
+			// a check hasn't returned true for the whole timeout
+			// so fail
 			t.Fatal("timeout waiting for checkin")
 		}
 	}
