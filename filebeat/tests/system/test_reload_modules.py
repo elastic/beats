@@ -146,7 +146,7 @@ class Test(BaseTest):
 
         # Remove input by moving the file
         # we keep it around to help debugging
-        os.rename(self.working_dir + "/configs/input.yml", self.working_dir + "/configs/input.yml.disabled")
+        os.rename(self.working_dir + "/configs/system.yml", self.working_dir + "/configs/system.yml.disabled")
 
         # Wait until input is stopped
         self.wait_until(
