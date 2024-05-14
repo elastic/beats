@@ -24,11 +24,9 @@ steps:
         command: |
           Import-Module ./.buildkite/scripts/changesets.psm1
           defineModuleFromTheChangeSet 'x-pack/winlogbeat'
-          Write-Output "~~~ Will run tests with env var MODULE=$$Env:MODULE"
+          Write-Output "~~~ Running tests"
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
-        env:
-          MODULE: $MODULE
         retry:
           automatic:
            - limit: 3
