@@ -7,6 +7,7 @@
 package httpjson
 
 import (
+	"context"
 	"errors"
 	"net"
 )
@@ -17,5 +18,9 @@ type npipeDialer struct {
 }
 
 func (npipeDialer) Dial(_, _ string) (net.Conn, error) {
+	return nil, errors.New("named pipe only available on windows")
+}
+
+func (npipeDialer) DialContext(_ context.Context, _, _ string) (net.Conn, error) {
 	return nil, errors.New("named pipe only available on windows")
 }

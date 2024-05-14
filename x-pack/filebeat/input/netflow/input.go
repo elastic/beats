@@ -45,7 +45,7 @@ type netflowInputManager struct {
 	log *logp.Logger
 }
 
-func (im *netflowInputManager) Init(_ unison.Group, _ v2.Mode) error {
+func (im *netflowInputManager) Init(_ unison.Group) error {
 	return nil
 }
 
