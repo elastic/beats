@@ -115,13 +115,12 @@ func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor
 		updateStatus(env.StatusReporter, status.Failed, "failed to run: "+err.Error())
 		return err
 	}
-
 	updateStatus(env.StatusReporter, status.Stopped, "")
 	return nil
 }
 
 // sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
-// The request.tracer.filename may have ":" when a httpjson input has cursor config and
+// The request.tracer.filename may have ":" when a cel input has cursor config and
 // the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
 func sanitizeFileName(name string) string {
 	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
@@ -181,6 +180,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	goodURL := cfg.Resource.URL.String()
 	state["url"] = goodURL
 	metrics.resource.Set(goodURL)
+	updateStatus(rep, status.Running, "")
 	// On entry, state is expected to be in the shape:
 	//
 	// {
@@ -214,18 +214,15 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// In addition to this and the functions and globals available
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
-
-	updateStatus(rep, status.Running, "")
 	err = periodically(ctx, cfg.Interval, func() error {
 		log.Info("process repeated request")
 		var (
 			budget    = *cfg.MaxExecutions
 			waitUntil time.Time
 		)
+		// Keep track of whether CEL is degraded for this periodic run.
+		var isDegraded bool
 		for {
-			// keep track if CEL is degraded for this iteration
-			isDegraded := false
-
 			if wait := time.Until(waitUntil); wait > 0 {
 				// We have a special-case wait for when we have a zero limit.
 				// x/time/rate allow a burst through even when the limit is zero
@@ -259,8 +256,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				}
 				log.Errorw("failed evaluation", "error", err)
 				updateStatus(rep, status.Degraded, "failed evaluation: "+err.Error())
-				isDegraded = true
 			}
+			isDegraded = err != nil
 			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
 			if trace != nil {
 				log.Debugw("final transaction", "transaction.id", trace.TxID())

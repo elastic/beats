@@ -56,7 +56,7 @@ func TestCheckinV2(t *testing.T) {
 	defer svrTwo.Close()
 
 	// allStreams is an elastic-agent configuration with an ES output and one CEL
-	// input with two streams
+	// input with two streams.
 	allStreams := []*proto.UnitExpected{
 		{
 			Id:             "output-unit",
@@ -138,7 +138,7 @@ func TestCheckinV2(t *testing.T) {
 
 	// oneStream is an elastic-agent configuration with an ES output and one CEL
 	// input with one stream. Effectively this is the same as allStreams with
-	// stream cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2 removed
+	// stream cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2 removed.
 	oneStream := []*proto.UnitExpected{
 		{
 			Id:             "output-unit",
@@ -204,7 +204,7 @@ func TestCheckinV2(t *testing.T) {
 		},
 	}
 
-	// noStream is an elastic-agent configuration with just an ES output
+	// noStream is an elastic-agent configuration with just an ES output.
 	noStream := []*proto.UnitExpected{
 		{
 			Id:             "output-unit",
@@ -253,9 +253,9 @@ func TestCheckinV2(t *testing.T) {
 	}
 	defer server.Stop()
 
+	// It's necessary to change os.Args so filebeat.Filebeat() can read the
+	// appropriate args at beat.Execute().
 	initialOSArgs := os.Args
-	// necessary to change this so filebeat.Filebeat() can read the appropriate args
-	// at beat.Execute()
 	os.Args = []string{
 		"filebeat",
 		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
@@ -278,7 +278,7 @@ func TestCheckinV2(t *testing.T) {
 	// of units expected for the server to respond with.
 	checks := []func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected){
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
-			// wait for all healthy
+			// Wait for all healthy.
 			unitState, payload := extractStateAndPayload(observed, "input-unit-1")
 			if unitState != proto.State_HEALTHY {
 				return false, allStreams
@@ -304,7 +304,7 @@ func TestCheckinV2(t *testing.T) {
 			return true, allStreams
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
-			// wait for one degraded
+			// Wait for one degraded.
 			unitState, payload := extractStateAndPayload(observed, "input-unit-1")
 			if unitState != proto.State_DEGRADED {
 				return false, allStreams
@@ -329,7 +329,7 @@ func TestCheckinV2(t *testing.T) {
 			return true, allStreams
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
-			// wait for all degraded
+			// Wait for all degraded.
 			unitState, payload := extractStateAndPayload(observed, "input-unit-1")
 			if unitState != proto.State_DEGRADED {
 				return false, allStreams
@@ -355,7 +355,7 @@ func TestCheckinV2(t *testing.T) {
 			return true, allStreams
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
-			// wait for all healthy
+			// Wait for all healthy.
 			unitState, payload := extractStateAndPayload(observed, "input-unit-1")
 			if unitState != proto.State_HEALTHY {
 				return false, allStreams
@@ -380,7 +380,7 @@ func TestCheckinV2(t *testing.T) {
 			return true, allStreams
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
-			// wait for all healthy
+			// Wait for all healthy.
 			unitState, payload := extractStateAndPayload(observed, "input-unit-1")
 			if unitState != proto.State_DEGRADED {
 				return false, allStreams
@@ -436,7 +436,7 @@ func TestCheckinV2(t *testing.T) {
 			return true, allStreams
 		},
 		func(t *testing.T, observed *proto.CheckinObserved) (bool, []*proto.UnitExpected) {
-			// wait for all healthy
+			// Wait for all healthy.
 			unitState, payload := extractStateAndPayload(observed, "input-unit-1")
 			if unitState != proto.State_HEALTHY {
 				return false, allStreams
@@ -473,47 +473,31 @@ func TestCheckinV2(t *testing.T) {
 		},
 	}
 
-	timer := time.NewTimer(3 * time.Minute)
+	const wait = 3 * time.Minute
+	timer := time.NewTimer(wait)
 	defer timer.Stop()
-	for {
+	for len(checks) > 0 {
 		select {
 		case observed := <-observedStates:
+			t.Logf("observed: %v", observed)
 			matched, expected := checks[0](t, observed)
-
 			expectedUnits <- expected
-
-			// if not matched, do not proceed to the next check
 			if !matched {
 				continue
 			}
-
-			// check returned true, so reset the timer
-			timer.Reset(3 * time.Minute)
-
-			// proceed to the next check
-			if len(checks) > 0 {
-				checks = checks[1:]
-			}
-
-			// if no more checks, return
-			if len(checks) == 0 {
-				return
-			}
+			timer.Reset(wait)
+			checks = checks[1:]
 		case err := <-beatRunErr:
 			if err != nil {
 				t.Fatalf("beat run err: %v", err)
 			}
 		case <-timer.C:
-			// a check hasn't returned true for the whole timeout
-			// so fail
 			t.Fatal("timeout waiting for checkin")
 		}
 	}
-
 }
 
 func extractStateAndPayload(observed *proto.CheckinObserved, inputID string) (proto.State, map[string]interface{}) {
-
 	for _, unit := range observed.GetUnits() {
 		if unit.Id == inputID {
 			return unit.GetState(), unit.Payload.AsMap()
