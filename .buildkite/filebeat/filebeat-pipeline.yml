@@ -84,6 +84,59 @@ steps:
           - github_commit_status:
               context: "filebeat: Python Integration Tests"
 
+      - label: "Module compat tests: previous minor"
+        # Runs module integration tests under previous minor of ES to ensure ingest pipeline compatibility
+        env:
+          STACK_ENVIRONMENT: "prev-minor"
+          TESTING_FILEBEAT_SKIP_DIFF: 1
+          PYTEST_ADDOPTS: "-k test_xpack_modules"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet filbeat
+          echo "~~~ Running tests"
+          cd filebeat
+          mage pythonIntegTest
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Module compat tests / previous minor"
+
+      - label: "Module compat tests: next major"
+        # Run module integration tests under next major of Elastic stack.
+        env:
+          STACK_ENVIRONMENT: "next-major"
+          TESTING_FILEBEAT_SKIP_DIFF: 1
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet filebeat
+          echo "~~~ Running tests"
+          cd filebeat
+          mage pythonIntegTest
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Module compat tests / next major"
+
       - label: ":windows: Windows 2016 Unit Tests"
         key: "windows-2016-unit-tests"
         command: |
