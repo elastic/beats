@@ -97,28 +97,22 @@ func (input) Test(src inputcursor.Source, _ v2.TestContext) error {
 	return test(cfg.Resource.URL.URL)
 }
 
-func updateStatus(reporter status.StatusReporter, state status.Status, msg string) {
-	if reporter == nil {
-		return
-	}
-
-	reporter.UpdateStatus(state, msg)
-}
-
 // Run starts the input and blocks until it ends completes. It will return on
 // context cancellation or type invalidity errors, any other error will be retried.
 func (input) Run(env v2.Context, src inputcursor.Source, crsr inputcursor.Cursor, pub inputcursor.Publisher) error {
 	var cursor map[string]interface{}
 	updateStatus(env.StatusReporter, status.Starting, "")
 	if !crsr.IsNew() { // Allow the user to bootstrap the program if needed.
-		if err := crsr.Unpack(&cursor); err != nil {
+		err := crsr.Unpack(&cursor)
+		if err != nil {
 			updateStatus(env.StatusReporter, status.Failed, "failed to unpack cursor: "+err.Error())
 			return err
 		}
 	}
 
-	if err := (input{}.run(env, src.(*source), cursor, pub)); err != nil {
-		updateStatus(env.StatusReporter, status.Failed, "error: "+err.Error())
+	err := input{}.run(env, src.(*source), cursor, pub)
+	if err != nil {
+		updateStatus(env.StatusReporter, status.Failed, "failed to run: "+err.Error())
 		return err
 	}
 
@@ -138,7 +132,7 @@ func sanitizeFileName(name string) string {
 func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, pub inputcursor.Publisher) error {
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
-	statusReporter := env.StatusReporter
+	rep := env.StatusReporter
 
 	metrics := newInputMetrics(env.ID)
 	defer metrics.Close()
@@ -221,7 +215,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	// from mito/lib, a global, useragent, is available to use
 	// in requests.
 
-	updateStatus(statusReporter, status.Running, "")
+	updateStatus(rep, status.Running, "")
 	err = periodically(ctx, cfg.Interval, func() error {
 		log.Info("process repeated request")
 		var (
@@ -229,6 +223,9 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			waitUntil time.Time
 		)
 		for {
+			// keep track if CEL is degraded for this iteration
+			isDegraded := false
+
 			if wait := time.Until(waitUntil); wait > 0 {
 				// We have a special-case wait for when we have a zero limit.
 				// x/time/rate allow a burst through even when the limit is zero
@@ -261,7 +258,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					return err
 				}
 				log.Errorw("failed evaluation", "error", err)
-				updateStatus(statusReporter, status.Degraded, err.Error())
+				updateStatus(rep, status.Degraded, "failed evaluation: "+err.Error())
+				isDegraded = true
 			}
 			metrics.celProcessingTime.Update(time.Since(start).Nanoseconds())
 			if trace != nil {
@@ -369,7 +367,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			e, ok := state["events"]
 			if !ok {
 				log.Error("unexpected missing events array from evaluation")
-				updateStatus(statusReporter, status.Degraded, "unexpected missing events array from evaluation")
+				updateStatus(rep, status.Degraded, "unexpected missing events array from evaluation")
+				isDegraded = true
 			}
 			var events []interface{}
 			switch e := e.(type) {
@@ -383,7 +382,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 					return nil
 				}
 				log.Errorw("single event object returned by evaluation", "event", e)
-				updateStatus(statusReporter, status.Degraded, "single event object returned by evaluation")
+				updateStatus(rep, status.Degraded, "single event object returned by evaluation")
+				isDegraded = true
 				events = []interface{}{e}
 				// Make sure the cursor is not updated.
 				delete(state, "cursor")
@@ -409,7 +409,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if ok {
 					if len(cursors) != len(events) {
 						log.Errorw("unexpected cursor list length", "cursors", len(cursors), "events", len(events))
-						updateStatus(statusReporter, status.Degraded, "unexpected cursor list length")
+						updateStatus(rep, status.Degraded, "unexpected cursor list length")
+						isDegraded = true
 						// But try to continue.
 						if len(cursors) < len(events) {
 							cursors = nil
@@ -460,7 +461,8 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if err != nil {
 					hadPublicationError = true
 					log.Errorw("error publishing event", "error", err)
-					updateStatus(statusReporter, status.Degraded, "error publishing event")
+					updateStatus(rep, status.Degraded, "error publishing event: "+err.Error())
+					isDegraded = true
 					cursors = nil // We are lost, so retry with this event's cursor,
 					continue      // but continue with the events that we have without
 					// advancing the cursor. This allows us to potentially publish the
@@ -476,11 +478,12 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 				if err != nil {
 					return err
 				}
-
-				if _, hasErr := event["error"]; !hasErr {
-					updateStatus(statusReporter, status.Running, "")
-				}
 			}
+
+			if !isDegraded {
+				updateStatus(rep, status.Running, "")
+			}
+
 			metrics.batchProcessingTime.Update(time.Since(start).Nanoseconds())
 
 			// Advance the cursor to the final state if there was no error during
@@ -500,7 +503,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			budget--
 			if budget <= 0 {
 				log.Warnw("exceeding maximum number of CEL executions", "limit", *cfg.MaxExecutions)
-				updateStatus(statusReporter, status.Degraded, "exceeding maximum number of CEL executions")
+				updateStatus(rep, status.Degraded, "exceeding maximum number of CEL executions")
 				return nil
 			}
 		}
@@ -511,6 +514,12 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		err = nil
 	}
 	return err
+}
+
+func updateStatus(reporter status.StatusReporter, state status.Status, msg string) {
+	if reporter != nil {
+		reporter.UpdateStatus(state, msg)
+	}
 }
 
 func periodically(ctx context.Context, each time.Duration, fn func() error) error {
@@ -1191,7 +1200,7 @@ func cloneMap(dst, src mapstr.M) {
 // walkMap walks to all ends of the provided path in m and applies fn to the
 // final element of each walk. Nested arrays are not handled.
 func walkMap(m mapstr.M, path string, fn func(parent mapstr.M, key string)) {
-	key, rest, more := strings.Cut(path, ".") //nolint:typecheck // rest is used below
+	key, rest, more := strings.Cut(path, ".")
 	v, ok := m[key]
 	if !ok {
 		return
