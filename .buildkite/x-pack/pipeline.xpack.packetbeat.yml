@@ -16,6 +16,10 @@ env:
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "x-pack/packetbeat Mandatory Tests"
     key: "x-pack-packetbeat-mandatory-tests"
