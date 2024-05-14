@@ -7,6 +7,7 @@
 package cel
 
 import (
+	"context"
 	"net"
 	"path/filepath"
 
@@ -20,4 +21,8 @@ type npipeDialer struct {
 
 func (d npipeDialer) Dial(_, _ string) (net.Conn, error) {
 	return winio.DialPipe(`\\.\pipe`+filepath.FromSlash(d.path), nil)
+}
+
+func (d npipeDialer) DialContext(ctx context.Context, _, _ string) (net.Conn, error) {
+	return winio.DialPipeContext(ctx, `\\.\pipe`+filepath.FromSlash(d.path))
 }
