@@ -196,6 +196,8 @@ func getTimeoutWait(u *url.URL, log *logp.Logger) (time.Duration, error) {
 		return 0, nil
 	case 1:
 		if _, ok := q["wait_for_completion_timeout"]; !ok {
+			// Get the only key in q. We don't know what it is, so iterate
+			// over the first one of one.
 			var k string
 			for k = range q {
 				break
