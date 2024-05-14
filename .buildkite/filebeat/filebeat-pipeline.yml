@@ -93,7 +93,7 @@ steps:
         command: |
           set -euo pipefail
           source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet filbeat
+          defineModuleFromTheChangeSet filebeat
           echo "~~~ Running tests"
           cd filebeat
           mage pythonIntegTest
