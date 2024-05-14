@@ -24,21 +24,21 @@ type Status int
 const (
 	// Unknown is initial status when none has been reported.
 	Unknown Status = iota
-	// Starting is status describing application is starting.
+	// Starting is status describing unit is starting.
 	Starting
-	// Configuring is status describing application is configuring.
+	// Configuring is status describing unit is configuring.
 	Configuring
-	// Running is status describing application is running.
+	// Running is status describing unit is running.
 	Running
-	// Degraded is status describing application is degraded.
+	// Degraded is status describing unit is degraded.
 	Degraded
-	// Failed is status describing application is failed. This status should
+	// Failed is status describing unit is failed. This status should
 	// only be used in the case the beat should stop running as the failure
 	// cannot be recovered.
 	Failed
-	// Stopping is status describing application is stopping.
+	// Stopping is status describing unit is stopping.
 	Stopping
-	// Stopped is status describing application is stopped.
+	// Stopped is status describing unit is stopped.
 	Stopped
 )
 
