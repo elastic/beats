@@ -11,11 +11,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"reflect"
 	"testing"
 	"time"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/types/known/structpb"
 
 	"github.com/elastic/beats/v7/libbeat/tests/integration"
@@ -24,21 +23,7 @@ import (
 	"github.com/elastic/elastic-agent-client/v7/pkg/proto"
 )
 
-func setInputUnitsConfigStateIdx(units []*proto.UnitExpected, idx uint64) {
-	for _, unit := range units {
-		if unit.Type != proto.UnitType_INPUT {
-			continue
-		}
-
-		if unit.Config == nil {
-			return
-		}
-		unit.ConfigStateIdx = idx
-		unit.Config.Source.Fields["revision"] = structpb.NewNumberValue(float64(idx))
-	}
-}
-
-func TestCELCheckinV2(t *testing.T) {
+func TestCheckinV2(t *testing.T) {
 	integration.EnsureESIsRunning(t)
 
 	invalidResponse := []byte("invalid json")
@@ -250,14 +235,22 @@ func TestCELCheckinV2(t *testing.T) {
 	}
 	defer server.Stop()
 
-	require.NoError(t, server.Start())
+	if err := server.Start(); err != nil {
+		t.Fatalf("failed to start StubServerV2 server: %v", err)
+	}
 
+	initialOSArgs := os.Args
+	// necessary to change this so filebeat.Filebeat() can read the appropriate args
+	// at beat.Execute()
 	os.Args = []string{
 		"filebeat",
 		"-E", fmt.Sprintf(`management.insecure_grpc_url_for_testing="localhost:%d"`, server.Port),
 		"-E", "management.enabled=true",
 		"-E", "management.restart_on_output_change=true",
 	}
+	defer func() {
+		os.Args = initialOSArgs
+	}()
 
 	beat := filebeat.Filebeat()
 	beatRunErr := make(chan error)
@@ -274,7 +267,7 @@ func TestCELCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			if !assert.ObjectsAreEqualValues(map[string]interface{}{
+			if !reflect.DeepEqual(map[string]interface{}{
 				"streams": map[string]interface{}{
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
 						"status": "HEALTHY",
@@ -300,11 +293,11 @@ func TestCELCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			if !assert.ObjectsAreEqualValues(map[string]interface{}{
+			if !reflect.DeepEqual(map[string]interface{}{
 				"streams": map[string]interface{}{
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
 						"status": "DEGRADED",
-						"error":  "failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+						"error":  "failed evaluation: failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
 					},
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
 						"status": "HEALTHY",
@@ -325,15 +318,15 @@ func TestCELCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			if !assert.ObjectsAreEqualValues(map[string]interface{}{
+			if !reflect.DeepEqual(map[string]interface{}{
 				"streams": map[string]interface{}{
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
 						"status": "DEGRADED",
-						"error":  "failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+						"error":  "failed evaluation: failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
 					},
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
 						"status": "DEGRADED",
-						"error":  "failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+						"error":  "failed evaluation: failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
 					},
 				},
 			}, payload) {
@@ -351,7 +344,7 @@ func TestCELCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			if !assert.ObjectsAreEqualValues(map[string]interface{}{
+			if !reflect.DeepEqual(map[string]interface{}{
 				"streams": map[string]interface{}{
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
 						"status": "HEALTHY",
@@ -376,7 +369,7 @@ func TestCELCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			if !assert.ObjectsAreEqualValues(map[string]interface{}{
+			if !reflect.DeepEqual(map[string]interface{}{
 				"streams": map[string]interface{}{
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
 						"status": "HEALTHY",
@@ -384,7 +377,7 @@ func TestCELCheckinV2(t *testing.T) {
 					},
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-ffffffc482e2": map[string]interface{}{
 						"status": "DEGRADED",
-						"error":  "failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
+						"error":  "failed evaluation: failed eval: ERROR: <input>:1:30: failed to unmarshal JSON message: invalid character 'i' looking for beginning of value\n | bytes(get(state.url).Body).as(body,{\"events\":[body.decode_json()]})\n | .............................^",
 					},
 				},
 			}, payload) {
@@ -400,7 +393,7 @@ func TestCELCheckinV2(t *testing.T) {
 				return false, oneStream
 			}
 
-			if !assert.ObjectsAreEqualValues(map[string]interface{}{
+			if !reflect.DeepEqual(map[string]interface{}{
 				"streams": map[string]interface{}{
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
 						"status": "HEALTHY",
@@ -432,7 +425,7 @@ func TestCELCheckinV2(t *testing.T) {
 				return false, allStreams
 			}
 
-			if !assert.ObjectsAreEqualValues(map[string]interface{}{
+			if !reflect.DeepEqual(map[string]interface{}{
 				"streams": map[string]interface{}{
 					"cel-cel.cel-1e8b33de-d54a-45cd-90da-23ed71c482e2": map[string]interface{}{
 						"status": "HEALTHY",
@@ -468,6 +461,7 @@ func TestCELCheckinV2(t *testing.T) {
 	for {
 		select {
 		case observed := <-observedStates:
+			t.Logf("observed: %v", observed)
 			next, expected := checks[0](t, observed)
 
 			expectedUnits <- expected
@@ -486,9 +480,11 @@ func TestCELCheckinV2(t *testing.T) {
 				return
 			}
 		case err := <-beatRunErr:
-			require.NoError(t, err)
+			if err != nil {
+				t.Fatalf("beat run err: %v", err)
+			}
 		case <-timer.C:
-			require.FailNow(t, "timeout waiting for checkin")
+			t.Fatal("timeout waiting for checkin")
 		}
 	}
 
@@ -503,4 +499,18 @@ func extractStateAndPayload(observed *proto.CheckinObserved, inputID string) (pr
 	}
 
 	return -1, nil
+}
+
+func setInputUnitsConfigStateIdx(units []*proto.UnitExpected, idx uint64) {
+	for _, unit := range units {
+		if unit.Type != proto.UnitType_INPUT {
+			continue
+		}
+
+		if unit.Config == nil {
+			return
+		}
+		unit.ConfigStateIdx = idx
+		unit.Config.Source.Fields["revision"] = structpb.NewNumberValue(float64(idx))
+	}
 }
