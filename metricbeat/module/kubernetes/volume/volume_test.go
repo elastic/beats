@@ -20,12 +20,14 @@
 package volume
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -46,6 +48,8 @@ func TestEventMapping(t *testing.T) {
 
 	assert.Len(t, events, 2, "got wrong number of events")
 
+	fmt.Printf("%v", events[1])
+
 	testCases := []map[string]interface{}{
 		// Test for ephemeral volume
 		{
@@ -61,8 +65,8 @@ func TestEventMapping(t *testing.T) {
 		},
 		// Test for the persistent volume claim
 		{
-			"persistentvolumeclaim.name": "pvc-demo",
-			"name":                       "pvc-demo-vol",
+			mb.ModuleDataKey + ".persistentvolumeclaim.name": "pvc-demo",
+			"name": "pvc-demo-vol",
 		},
 	}
 
