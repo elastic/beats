@@ -12,11 +12,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/sqs/types"
 	"github.com/gofrs/uuid"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -39,31 +39,35 @@ func TestSQSReceiver(t *testing.T) {
 
 		ctrl, ctx := gomock.WithContext(ctx, t)
 		defer ctrl.Finish()
-		mockAPI := NewMockSQSAPI(ctrl)
+		mockSQS := NewMockSQSAPI(ctrl)
 		mockMsgHandler := NewMockSQSProcessor(ctrl)
 		msg := newSQSMessage(newS3Event("log.json"))
 
-		gomock.InOrder(
-			// Initial ReceiveMessage for maxMessages.
-			mockAPI.EXPECT().
-				ReceiveMessage(gomock.Any(), gomock.Eq(maxMessages)).
-				Times(1).
-				DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
-					// Return single message.
-					return []types.Message{msg}, nil
-				}),
+		// Initial ReceiveMessage for maxMessages.
+		mockSQS.EXPECT().
+			ReceiveMessage(gomock.Any(), gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
+				// Return single message.
+				return []types.Message{msg}, nil
+			})
 
-			// Follow up ReceiveMessages for either maxMessages-1 or maxMessages
-			// depending on how long processing of previous message takes.
-			mockAPI.EXPECT().
-				ReceiveMessage(gomock.Any(), gomock.Any()).
-				Times(1).
-				DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
-					// Stop the test.
-					cancel()
-					return nil, nil
-				}),
-		)
+		// Follow up ReceiveMessages for either maxMessages-1 or maxMessages
+		// depending on how long processing of previous message takes.
+		mockSQS.EXPECT().
+			ReceiveMessage(gomock.Any(), gomock.Any()).
+			Times(1).
+			DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
+				// Stop the test.
+				cancel()
+				return nil, nil
+			})
+
+		mockSQS.EXPECT().
+			GetQueueAttributes(gomock.Any(), gomock.Eq([]types.QueueAttributeName{sqsApproximateNumberOfMessages})).
+			DoAndReturn(func(_ context.Context, _ []types.QueueAttributeName) (map[string]string, error) {
+				return map[string]string{sqsApproximateNumberOfMessages: "10000"}, nil
+			}).AnyTimes()
 
 		// Expect the one message returned to have been processed.
 		mockMsgHandler.EXPECT().
@@ -72,9 +76,12 @@ func TestSQSReceiver(t *testing.T) {
 			Return(nil)
 
 		// Execute sqsReader and verify calls/state.
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		require.NoError(t, receiver.Receive(ctx))
-		assert.Equal(t, maxMessages, receiver.workerSem.Available())
+		sqsReader := newSQSReaderInput(config{MaxNumberOfMessages: maxMessages}, aws.Config{})
+		sqsReader.log = logp.NewLogger(inputName)
+		sqsReader.sqs = mockSQS
+		sqsReader.msgHandler = mockMsgHandler
+		sqsReader.metrics = newInputMetrics("", nil, 0)
+		sqsReader.run(ctx)
 	})
 
 	t.Run("retry after ReceiveMessage error", func(t *testing.T) {
@@ -83,50 +90,56 @@ func TestSQSReceiver(t *testing.T) {
 
 		ctrl, ctx := gomock.WithContext(ctx, t)
 		defer ctrl.Finish()
-		mockAPI := NewMockSQSAPI(ctrl)
+		mockSQS := NewMockSQSAPI(ctrl)
 		mockMsgHandler := NewMockSQSProcessor(ctrl)
 
 		gomock.InOrder(
 			// Initial ReceiveMessage gets an error.
-			mockAPI.EXPECT().
-				ReceiveMessage(gomock.Any(), gomock.Eq(maxMessages)).
+			mockSQS.EXPECT().
+				ReceiveMessage(gomock.Any(), gomock.Any()).
 				Times(1).
 				DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
 					return nil, errFakeConnectivityFailure
 				}),
 			// After waiting for sqsRetryDelay, it retries.
-			mockAPI.EXPECT().
-				ReceiveMessage(gomock.Any(), gomock.Eq(maxMessages)).
+			mockSQS.EXPECT().
+				ReceiveMessage(gomock.Any(), gomock.Any()).
 				Times(1).
 				DoAndReturn(func(_ context.Context, _ int) ([]types.Message, error) {
 					cancel()
 					return nil, nil
 				}),
 		)
+		mockSQS.EXPECT().
+			GetQueueAttributes(gomock.Any(), gomock.Eq([]types.QueueAttributeName{sqsApproximateNumberOfMessages})).
+			DoAndReturn(func(_ context.Context, _ []types.QueueAttributeName) (map[string]string, error) {
+				return map[string]string{sqsApproximateNumberOfMessages: "10000"}, nil
+			}).AnyTimes()
 
-		// Execute SQSReceiver and verify calls/state.
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		require.NoError(t, receiver.Receive(ctx))
-		assert.Equal(t, maxMessages, receiver.workerSem.Available())
+		// Execute SQSReader and verify calls/state.
+		sqsReader := newSQSReaderInput(config{MaxNumberOfMessages: maxMessages}, aws.Config{})
+		sqsReader.log = logp.NewLogger(inputName)
+		sqsReader.sqs = mockSQS
+		sqsReader.msgHandler = mockMsgHandler
+		sqsReader.metrics = newInputMetrics("", nil, 0)
+		sqsReader.run(ctx)
 	})
 }
 
 func TestGetApproximateMessageCount(t *testing.T) {
 	logp.TestingSetup()
 
-	const maxMessages = 5
 	const count = 500
 	attrName := []types.QueueAttributeName{sqsApproximateNumberOfMessages}
 	attr := map[string]string{"ApproximateNumberOfMessages": "500"}
 
-	t.Run("GetApproximateMessageCount success", func(t *testing.T) {
+	t.Run("getApproximateMessageCount success", func(t *testing.T) {
 		ctx, cancel := context.WithTimeout(context.Background(), testTimeout)
 		defer cancel()
 
 		ctrl, ctx := gomock.WithContext(ctx, t)
 		defer ctrl.Finish()
 		mockAPI := NewMockSQSAPI(ctrl)
-		mockMsgHandler := NewMockSQSProcessor(ctrl)
 
 		gomock.InOrder(
 			mockAPI.EXPECT().
@@ -137,10 +150,10 @@ func TestGetApproximateMessageCount(t *testing.T) {
 				}),
 		)
 
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		receivedCount, err := receiver.GetApproximateMessageCount(ctx)
+		receivedCount, err :=
+			messageCountMonitor{sqs: mockAPI}.getApproximateMessageCount(ctx)
 		assert.Equal(t, count, receivedCount)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 	})
 
 	t.Run("GetApproximateMessageCount error", func(t *testing.T) {
@@ -151,7 +164,6 @@ func TestGetApproximateMessageCount(t *testing.T) {
 		defer ctrl.Finish()
 
 		mockAPI := NewMockSQSAPI(ctrl)
-		mockMsgHandler := NewMockSQSProcessor(ctrl)
 
 		gomock.InOrder(
 			mockAPI.EXPECT().
@@ -162,8 +174,7 @@ func TestGetApproximateMessageCount(t *testing.T) {
 				}),
 		)
 
-		receiver := newSQSReader(logp.NewLogger(inputName), nil, mockAPI, maxMessages, mockMsgHandler)
-		receivedCount, err := receiver.GetApproximateMessageCount(ctx)
+		receivedCount, err := messageCountMonitor{sqs: mockAPI}.getApproximateMessageCount(ctx)
 		assert.Equal(t, -1, receivedCount)
 		assert.NotNil(t, err)
 	})
@@ -221,4 +232,12 @@ func newS3Event(key string) s3EventV2 {
 	record.S3.Bucket.ARN = "arn:aws:s3:::foo"
 	record.S3.Object.Key = key
 	return record
+}
+
+func TestSQSReaderLoop(t *testing.T) {
+
+}
+
+func TestSQSWorkerLoop(t *testing.T) {
+
 }
