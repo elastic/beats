@@ -52,9 +52,10 @@ func getUnitState(s status.Status) client.UnitState {
 		return client.UnitStateStopping
 	case status.Stopped:
 		return client.UnitStateStopped
+	default:
+		// as this is an unknown state, return failed to get some attention
+		return client.UnitStateFailed
 	}
-	// unknown again?
-	return client.UnitStateStarting
 }
 
 // getUnitState converts status.Status to client.UnitState
@@ -74,9 +75,9 @@ func getStatus(s client.UnitState) status.Status {
 		return status.Stopping
 	case client.UnitStateStopped:
 		return status.Stopped
+	default:
+		return status.Unknown
 	}
-	// unknown again?
-	return status.Unknown
 }
 
 func getSteamStates(expected client.Expected) (map[string]unitState, []string) {
