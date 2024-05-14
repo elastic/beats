@@ -166,8 +166,7 @@ steps:
 
   - group: "Heartbeat Extended Testing MacOS"
     key: "heartbeat-extended-tests-macos"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-
+    if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
       - label: ":mac: Heartbeat MacOS Unit Tests"
         key: "macos-extended"
