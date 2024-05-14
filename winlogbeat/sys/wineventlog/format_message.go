@@ -89,13 +89,22 @@ func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID
 	bb.Reserve(int(bufferSize * 2))
 
 	err := _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, bufferSize, bb.PtrAt(0), &bufferNeeded)
-	if err != nil && err != windows.ERROR_INSUFFICIENT_BUFFER { //nolint:errorlint // This is an errno.
-		return "", fmt.Errorf("failed in EvtFormatMessage: %w", err)
-	} else if err == nil {
+	switch err { //nolint:errorlint // This is an errno or nil.
+	case nil: // OK
 		return sys.UTF16BytesToString(bb.Bytes())
-	}
 
-	bb.Reserve(int(bufferNeeded * 2))
+	// Ignore some errors so it can tolerate missing or mismatched parameter values.
+	case windows.ERROR_EVT_UNRESOLVED_VALUE_INSERT,
+		windows.ERROR_EVT_UNRESOLVED_PARAMETER_INSERT,
+		windows.ERROR_EVT_MAX_INSERTS_REACHED:
+		return sys.UTF16BytesToString(bb.Bytes())
+
+	case windows.ERROR_INSUFFICIENT_BUFFER:
+		bb.Reserve(int(bufferNeeded * 2))
+
+	default:
+		return "", fmt.Errorf("failed in EvtFormatMessage: %w", err)
+	}
 
 	err = _EvtFormatMessage(metadataHandle, eventHandle, messageID, valuesCount, valuesPtr, messageFlag, bufferSize, bb.PtrAt(0), &bufferNeeded)
 	switch err { //nolint:errorlint // This is an errno or nil.
