@@ -22,6 +22,10 @@ env:
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "x-pack/dockerlogbeat Mandatory Tests"
     key: "xpack-dockerlogbeat-mandatory-tests"
@@ -33,7 +37,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -52,14 +56,12 @@ steps:
           # defines the MODULE env var based on what's changed in a PR
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet x-pack/dockerlogbeat
-          echo "~~~ Running tests with env var MODULE=$$MODULE"
+          echo "~~~ Running tests"
           cd x-pack/dockerlogbeat
           mage goIntegTest
-        env:
-          MODULE: $MODULE
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -91,6 +93,10 @@ steps:
         command: |
           cd x-pack/dockerlogbeat
           mage package
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -108,6 +114,10 @@ steps:
         command: |
           cd x-pack/dockerlogbeat
           mage package
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"

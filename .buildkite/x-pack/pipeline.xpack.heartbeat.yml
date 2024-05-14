@@ -26,6 +26,10 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
   ASDF_NODEJS_VERSION: 18.17.1
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "x-pack/heartbeat Mandatory Tests"
     key: "x-pack-heartbeat-mandatory-tests"
@@ -41,7 +45,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -64,7 +68,7 @@ steps:
           mage goIntegTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -84,7 +88,7 @@ steps:
           mage build test
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -107,7 +111,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -134,7 +138,7 @@ steps:
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -156,7 +160,7 @@ steps:
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -176,7 +180,7 @@ steps:
           mage build test
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         key: "extended-win-2019-unit-tests"
         agents:
           provider: "gcp"
@@ -193,7 +197,7 @@ steps:
 
   - group: "x-pack/heartbeat macOS Extended Tests"
     key: "x-pack-heartbeat-extended-tests-macos"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+    if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
 
     steps:
       - label: ":mac: x-pack/heartbeat macOS x86_64 Unit Tests"
@@ -206,7 +210,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -227,7 +231,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -255,6 +259,10 @@ steps:
         command: |
           cd x-pack/heartbeat
           mage package
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -272,6 +280,10 @@ steps:
         command: |
           cd x-pack/heartbeat
           mage package
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"

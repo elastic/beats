@@ -15857,11 +15857,11 @@ limitations under the License.
 
 --------------------------------------------------------------------------------
 Dependency : github.com/elastic/mito
-Version: v1.10.0
+Version: v1.11.0
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.10.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/elastic/mito@v1.11.0/LICENSE:
 
 
                                  Apache License
@@ -25285,11 +25285,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/crypto
-Version: v0.21.0
+Version: v0.22.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.21.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/crypto@v0.22.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -25433,11 +25433,11 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/net
-Version: v0.23.0
+Version: v0.24.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.23.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/net@v0.24.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 
@@ -54386,11 +54386,11 @@ THE SOFTWARE.
 
 --------------------------------------------------------------------------------
 Dependency : golang.org/x/term
-Version: v0.18.0
+Version: v0.19.0
 Licence type (autodetected): BSD-3-Clause
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.18.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/golang.org/x/term@v0.19.0/LICENSE:
 
 Copyright (c) 2009 The Go Authors. All rights reserved.
 

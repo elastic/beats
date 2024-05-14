@@ -22,6 +22,10 @@ env:
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "Auditbeat Mandatory Testing"
     key: "auditbeat-mandatory-tests"
@@ -34,7 +38,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -53,7 +57,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -71,7 +75,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -91,7 +95,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -112,7 +116,7 @@ steps:
           GOX_FLAGS: "-arch amd64"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -128,14 +132,14 @@ steps:
     steps:
       - label: ":linux: Auditbeat Ubuntu Integration Tests"
         key: "auditbeat-extended-integ-tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
           cd auditbeat
           mage build integTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -149,14 +153,14 @@ steps:
 
       - label: ":linux: Auditbeat Ubuntu arm64 Integration Tests"
         key: "auditbeat-extended-arm64-integ-tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
           cd auditbeat
           mage build integTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -177,7 +181,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -190,7 +194,7 @@ steps:
               context: "auditbeat: Linux arm64 Unit Tests"
 
       - label: ":mac: Auditbeat macOS x86_64 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -198,7 +202,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -210,7 +214,7 @@ steps:
               context: "auditbeat: macOS x86_64 Unit Tests"
 
       - label: ":mac: Auditbeat macOS arm64 ARM Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -218,7 +222,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -241,7 +245,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -262,7 +266,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -283,7 +287,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -316,6 +320,10 @@ steps:
           set -euo pipefail
           cd auditbeat
           mage package
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: gcp
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -334,6 +342,10 @@ steps:
           set -euo pipefail
           cd auditbeat
           mage package
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
