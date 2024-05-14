@@ -109,10 +109,13 @@ steps:
       - label: ":ubuntu: Heartbeat Go (Module) Integration Tests"
         command: |
           set -euo pipefail
+          echo "~~~ Installing @elastic/synthetics"
+          npm install -g @elastic/synthetics
+
           # defines the MODULE env var based on what's changed in a PR
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet heartbeat
-          echo "~~~ Will run tests with env var MODULE=$$MODULE"
+
           cd heartbeat
           mage goIntegTest
         retry:
@@ -135,7 +138,8 @@ steps:
           # defines the MODULE env var based on what's changed in a PR
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet heartbeat
-          echo "~~~ Will run tests with env var MODULE=$$MODULE"
+
+          echo "~~~ Running tests"
           cd heartbeat
           mage pythonIntegTest
         retry:
