@@ -24,11 +24,9 @@ steps:
         command: |
           Import-Module ./.buildkite/scripts/changesets.psm1
           defineModuleFromTheChangeSet 'x-pack/winlogbeat'
-          Write-Output "~~~ Will run tests with env var MODULE=$$Env:MODULE"
+          Write-Output "~~~ Running tests"
           Set-Location -Path x-pack/winlogbeat
           mage build unitTest
-        env:
-          MODULE: $MODULE
         retry:
           automatic:
            - limit: 3
@@ -170,6 +168,10 @@ steps:
       - label: ":ubuntu: Packaging Linux"
         key: "packaging-linux"
         command: "cd x-pack/winlogbeat && mage package"
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
