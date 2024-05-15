@@ -189,7 +189,6 @@ type DB struct {
 	procfs                   procfs.Reader
 	stopChan                 chan struct{}
 	removalCandidates        rcHeap
-	namesCache               *namesCache
 }
 
 func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
@@ -205,7 +204,6 @@ func NewDB(reader procfs.Reader, logger logp.Logger) (*DB, error) {
 		procfs:                   reader,
 		stopChan:                 make(chan struct{}),
 		removalCandidates:        make(rcHeap, 0),
-		namesCache:               newNamesCache(),
 	}
 	db.startReaper()
 	return &db, nil
@@ -449,12 +447,12 @@ func (db *DB) fullProcessFromDBProcess(p Process) types.Process {
 	euid := p.Creds.Euid
 	egid := p.Creds.Egid
 	ret.User.ID = strconv.FormatUint(uint64(euid), 10)
-	username, ok := db.namesCache.getUserName(ret.User.ID)
+	username, ok := getUserName(ret.User.ID)
 	if ok {
 		ret.User.Name = username
 	}
 	ret.Group.ID = strconv.FormatUint(uint64(egid), 10)
-	groupname, ok := db.namesCache.getGroupName(ret.Group.ID)
+	groupname, ok := getGroupName(ret.Group.ID)
 	if ok {
 		ret.Group.Name = groupname
 	}
@@ -481,12 +479,12 @@ func (db *DB) fillParent(process *types.Process, parent Process) {
 	process.Parent.WorkingDirectory = parent.Cwd
 	process.Parent.Interactive = &interactive
 	process.Parent.User.ID = strconv.FormatUint(uint64(euid), 10)
-	username, ok := db.namesCache.getUserName(process.Parent.User.ID)
+	username, ok := getUserName(process.Parent.User.ID)
 	if ok {
 		process.Parent.User.Name = username
 	}
 	process.Parent.Group.ID = strconv.FormatUint(uint64(egid), 10)
-	groupname, ok := db.namesCache.getGroupName(process.Parent.Group.ID)
+	groupname, ok := getGroupName(process.Parent.Group.ID)
 	if ok {
 		process.Parent.Group.Name = groupname
 	}
@@ -506,12 +504,12 @@ func (db *DB) fillGroupLeader(process *types.Process, groupLeader Process) {
 	process.GroupLeader.WorkingDirectory = groupLeader.Cwd
 	process.GroupLeader.Interactive = &interactive
 	process.GroupLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
-	username, ok := db.namesCache.getUserName(process.GroupLeader.User.ID)
+	username, ok := getUserName(process.GroupLeader.User.ID)
 	if ok {
 		process.GroupLeader.User.Name = username
 	}
 	process.GroupLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
-	groupname, ok := db.namesCache.getGroupName(process.GroupLeader.Group.ID)
+	groupname, ok := getGroupName(process.GroupLeader.Group.ID)
 	if ok {
 		process.GroupLeader.Group.Name = groupname
 	}
@@ -531,12 +529,12 @@ func (db *DB) fillSessionLeader(process *types.Process, sessionLeader Process) {
 	process.SessionLeader.WorkingDirectory = sessionLeader.Cwd
 	process.SessionLeader.Interactive = &interactive
 	process.SessionLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
-	username, ok := db.namesCache.getUserName(process.SessionLeader.User.ID)
+	username, ok := getUserName(process.SessionLeader.User.ID)
 	if ok {
 		process.SessionLeader.User.Name = username
 	}
 	process.SessionLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
-	groupname, ok := db.namesCache.getGroupName(process.SessionLeader.Group.ID)
+	groupname, ok := getGroupName(process.SessionLeader.Group.ID)
 	if ok {
 		process.SessionLeader.Group.Name = groupname
 	}
@@ -556,12 +554,12 @@ func (db *DB) fillEntryLeader(process *types.Process, entryType EntryType, entry
 	process.EntryLeader.WorkingDirectory = entryLeader.Cwd
 	process.EntryLeader.Interactive = &interactive
 	process.EntryLeader.User.ID = strconv.FormatUint(uint64(euid), 10)
-	username, ok := db.namesCache.getUserName(process.EntryLeader.User.ID)
+	username, ok := getUserName(process.EntryLeader.User.ID)
 	if ok {
 		process.EntryLeader.User.Name = username
 	}
 	process.EntryLeader.Group.ID = strconv.FormatUint(uint64(egid), 10)
-	groupname, ok := db.namesCache.getGroupName(process.EntryLeader.Group.ID)
+	groupname, ok := getGroupName(process.EntryLeader.Group.ID)
 	if ok {
 		process.EntryLeader.Group.Name = groupname
 	}
