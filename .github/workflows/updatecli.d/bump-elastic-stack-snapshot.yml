@@ -6,6 +6,7 @@ actions:
   default:
     title: '[updatecli] update elastic stack version for testing {{ source "latestVersion" }}'
     kind: github/pullrequest
+    scmid: default
     spec:
       labels:
         - automation
@@ -13,21 +14,17 @@ actions:
         - backport-skip
         - build-monitoring
         - Team:Beats-On-Call
-      description: |
-        Generated automatically with {{ requiredEnv "JOB_URL" }}
-    scmid: default
 
 scms:
   default:
     kind: github
     spec:
-      user: '{{ requiredEnv "GIT_USER" }}'
-      email: '{{ requiredEnv "GIT_EMAIL" }}'
-      owner: elastic
-      repository: beats
+      owner: '{{ .scm.owner }}'
+      repository: '{{ .scm.repository }}'
+      user: '{{ requiredEnv "GITHUB_ACTOR" }}'
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
-      username: '{{ requiredEnv "GIT_USER" }}'
       branch: '{{ requiredEnv "BRANCH" }}'
+      commitusingapi: true
 
 sources:
   latestVersion:
