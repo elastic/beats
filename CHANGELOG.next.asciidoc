@@ -52,6 +52,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Osquerybeat*
 
+- Add action responses data stream, allowing osquerybeat to post action results directly to elasticsearch. {pull}39143[39143]
 
 *Packetbeat*
 
