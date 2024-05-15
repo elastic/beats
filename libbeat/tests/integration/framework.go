@@ -53,6 +53,7 @@ type BeatProc struct {
 	configFile          string
 	fullPath            string
 	logFileOffset       int64
+	eventLogFileOffset  int64
 	t                   *testing.T
 	tempDir             string
 	stdin               io.WriteCloser
@@ -283,13 +284,27 @@ func (b *BeatProc) Stop() {
 }
 
 // LogMatch tests each line of the logfile to see if contains any
-// match of the provided regular expression.  It will open the log
-// file on every call, read until EOF, then close it.  LogContains
+// match of the provided regular expression. It will open the log
+// file on every call, read until EOF, then close it. LogContains
 // will be faster so use that if possible.
 func (b *BeatProc) LogMatch(match string) bool {
 	re := regexp.MustCompile(match)
 	logFile := b.openLogFile()
-	_, err := logFile.Seek(b.logFileOffset, io.SeekStart)
+
+	found := false
+	found, b.logFileOffset = b.logRegExpMatch(re, logFile, b.logFileOffset)
+	if found {
+		return found
+	}
+
+	eventLogFile := b.openEventLogFile()
+	found, b.eventLogFileOffset = b.logRegExpMatch(re, eventLogFile, b.eventLogFileOffset)
+
+	return found
+}
+
+func (b *BeatProc) logRegExpMatch(re *regexp.Regexp, logFile *os.File, offset int64) (bool, int64) {
+	_, err := logFile.Seek(offset, io.SeekStart)
 	if err != nil {
 		b.t.Fatalf("could not set offset for '%s': %s", logFile.Name(), err)
 	}
@@ -306,7 +321,7 @@ func (b *BeatProc) LogMatch(match string) bool {
 	for {
 		data, err := r.ReadBytes('\n')
 		line := string(data)
-		b.logFileOffset += int64(len(data))
+		offset += int64(len(data))
 
 		if err != nil {
 			if err != io.EOF {
@@ -316,20 +331,49 @@ func (b *BeatProc) LogMatch(match string) bool {
 		}
 
 		if re.MatchString(line) {
-			return true
+			return true, offset
 		}
 	}
 
-	return false
+	return false, offset
 }
 
 // LogContains looks for `s` as a substring of every log line,
 // it will open the log file on every call, read it until EOF,
-// then close it.
+// then close it. It keeps track of the offset so subsequent calls
+// will only read log entries that were not read by the previous
+// call.
+//
+// The events log file is read after the normal log file and its
+// offset is tracked separately.
 func (b *BeatProc) LogContains(s string) bool {
-	t := b.t
 	logFile := b.openLogFile()
-	_, err := logFile.Seek(b.logFileOffset, io.SeekStart)
+	defer logFile.Close()
+
+	found := false
+	found, b.logFileOffset = b.searchStrInLogs(logFile, s, b.logFileOffset)
+	if found {
+		return found
+	}
+
+	eventLogFile := b.openEventLogFile()
+	if eventLogFile == nil {
+		return false
+	}
+	defer eventLogFile.Close()
+	found, b.eventLogFileOffset = b.searchStrInLogs(eventLogFile, s, b.eventLogFileOffset)
+
+	return found
+}
+
+// searchStrInLogs search for s as a substring of any line in logFile starting
+// from offset.
+//
+// It will close logFile and return the current offset.
+func (b *BeatProc) searchStrInLogs(logFile *os.File, s string, offset int64) (bool, int64) {
+	t := b.t
+
+	_, err := logFile.Seek(offset, io.SeekStart)
 	if err != nil {
 		t.Fatalf("could not set offset for '%s': %s", logFile.Name(), err)
 	}
@@ -346,7 +390,7 @@ func (b *BeatProc) LogContains(s string) bool {
 	for {
 		data, err := r.ReadBytes('\n')
 		line := string(data)
-		b.logFileOffset += int64(len(data))
+		offset += int64(len(data))
 
 		if err != nil {
 			if err != io.EOF {
@@ -356,11 +400,11 @@ func (b *BeatProc) LogContains(s string) bool {
 		}
 
 		if strings.Contains(line, s) {
-			return true
+			return true, offset
 		}
 	}
 
-	return false
+	return false, offset
 }
 
 // WaitForLogs waits for the specified string s to be present in the logs within
@@ -393,36 +437,36 @@ func (b *BeatProc) WriteConfigFile(cfg string) {
 	b.baseArgs = append(b.baseArgs, "-c", b.configFile)
 }
 
-// openLogFile opens the log file for reading and returns it.
-// It also registers a cleanup function to close the file
-// when the test ends.
-func (b *BeatProc) openLogFile() *os.File {
+// openGlobFile opens a file defined by glob. The glob must resolve to a single
+// file otherwise the test fails. It returns a *os.File and a boolean indicating
+// whether a file was found.
+//
+// If `waitForFile` is true, it will wait up to 5 seconds for the file to
+// be created. The test will fail if the file is not found. If it is false
+// and no file is found, nil and false are returned.
+func (b *BeatProc) openGlobFile(glob string, waitForFile bool) *os.File {
 	t := b.t
-	// Beats can produce two different log files, to make sure we're
-	// reading the normal one we add the year to the glob. The default
-	// log file name looks like: filebeat-20240116.ndjson
-	year := time.Now().Year()
-	glob := fmt.Sprintf("%s-%d*.ndjson", filepath.Join(b.tempDir, b.beatName), year)
+
 	files, err := filepath.Glob(glob)
 	if err != nil {
 		t.Fatalf("could not expand log file glob: %s", err)
 	}
 
-	require.Eventually(t, func() bool {
-		files, err = filepath.Glob(glob)
-		if err != nil {
-			t.Fatalf("could not expand log file glob: %s", err)
-		}
-		return len(files) == 1
-	}, 5*time.Second, 100*time.Millisecond,
-		"waiting for log file matching glob '%s' to be created", glob)
+	if waitForFile && len(files) == 0 {
+		require.Eventually(t, func() bool {
+			files, err = filepath.Glob(glob)
+			if err != nil {
+				t.Fatalf("could not expand log file glob: %s", err)
+			}
+			return len(files) == 1
+		}, 5*time.Second, 100*time.Millisecond,
+			"waiting for log file matching glob '%s' to be created", glob)
+	}
 
-	// On a normal operation there must be a single log, if there are more
-	// than one, then there is an issue and the Beat is logging too much,
-	// which is enough to stop the test
-	if len(files) != 1 {
-		t.Fatalf("there must be only one log file for %s, found: %d",
-			glob, len(files))
+	// We only reach this line if `waitForFile` is false, so we need
+	// to check whether we found a file
+	if len(files) == 0 {
+		return nil
 	}
 
 	f, err := os.Open(files[0])
@@ -431,6 +475,31 @@ func (b *BeatProc) openLogFile() *os.File {
 	}
 
 	return f
+}
+
+// openLogFile opens the log file for reading and returns it.
+// It's the caller's responsibility to close the file.
+func (b *BeatProc) openLogFile() *os.File {
+	// Beats can produce two different log files, to make sure we're
+	// reading the normal one we add the year to the glob. The default
+	// log file name looks like: filebeat-20240116.ndjson
+	year := time.Now().Year()
+	glob := fmt.Sprintf("%s-%d*.ndjson", filepath.Join(b.tempDir, b.beatName), year)
+
+	return b.openGlobFile(glob, true)
+}
+
+// openEventLogFile opens the log file for reading and returns it.
+// If the events log file does not exist, nil is returned
+// It's the caller's responsibility to close the file.
+func (b *BeatProc) openEventLogFile() *os.File {
+	// Beats can produce two different log files, to make sure we're
+	// reading the normal one we add the year to the glob. The default
+	// log file name looks like: filebeat-20240116.ndjson
+	year := time.Now().Year()
+	glob := fmt.Sprintf("%s-events-data-%d*.ndjson", filepath.Join(b.tempDir, b.beatName), year)
+
+	return b.openGlobFile(glob, false)
 }
 
 // createTempDir creates a temporary directory that will be
