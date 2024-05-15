@@ -18,9 +18,6 @@ env:
 
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
-  # Integration Tests
-  K8S_VERSION: "v1.29.0"
-  ASDF_KIND_VERSION: "0.20.0"
 
   # Unit tests
   RACE_DETECTOR: "true"
@@ -47,6 +44,24 @@ steps:
         notify:
           - github_commit_status:
               context: "filebeat: Linux x86_64 Unit Tests"
+
+      - label: ":linux: Filebeat arm64 Unit Tests"
+        command: |
+          cd filebeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Linux arm64 Unit Tests"
 
       - label: ":ubuntu: Filebeat Go Integration Tests"
         command: |
@@ -84,6 +99,59 @@ steps:
           - github_commit_status:
               context: "filebeat: Python Integration Tests"
 
+      - label: "Module compat tests: previous minor"
+        # Runs module integration tests under previous minor of ES to ensure ingest pipeline compatibility
+        env:
+          STACK_ENVIRONMENT: "prev-minor"
+          TESTING_FILEBEAT_SKIP_DIFF: 1
+          PYTEST_ADDOPTS: "-k test_xpack_modules"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet filebeat
+          echo "~~~ Running tests"
+          cd filebeat
+          mage pythonIntegTest
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Module compat tests / previous minor"
+
+      - label: "Module compat tests: next major"
+        # Run module integration tests under next major of Elastic stack.
+        env:
+          STACK_ENVIRONMENT: "next-major"
+          TESTING_FILEBEAT_SKIP_DIFF: 1
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet filebeat
+          echo "~~~ Running tests"
+          cd filebeat
+          mage pythonIntegTest
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Module compat tests / next major"
+
       - label: ":windows: Filebeat Windows 2019 Unit Tests"
         key: "windows-extended-2019"
         command: |
@@ -105,100 +173,11 @@ steps:
           - github_commit_status:
               context: "filebeat: Windows 2019 Unit Tests"
 
-      - label: ":windows: Filebeat Windows 2022 Unit Tests"
-        key: "windows-2022-unit-tests"
-        command: |
-          Set-Location -Path filebeat
-          mage build unitTest
-        retry:
-          automatic:
-           - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 200
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "filebeat: Windows 2022 Unit Tests"
-
-      - label: ":ubuntu: Filebeat Module Compatibility ITs (Previous Minor)"
-        command: |
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet filebeat
-          cd filebeat
-          mage pythonIntegTest
-        retry:
-          automatic:
-            - limit: 3
-        env:
-          STACK_ENVIRONMENT: prev-minor
-          TESTING_FILEBEAT_SKIP_DIFF: 1
-          PYTEST_ADDOPTS: '-k test_modules'
-        agents:
-          provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "filebeat: Module Compatibility ITs (Previous Minor)"
-
-      - label: ":ubuntu: Filebeat Module Compatibility ITs (Next Major)"
-        command: |
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet filebeat
-          cd filebeat
-          mage pythonIntegTest
-        retry:
-          automatic:
-            - limit: 3
-        env:
-          STACK_ENVIRONMENT: next-major
-          TESTING_FILEBEAT_SKIP_DIFF: 1
-        agents:
-          provider: gcp
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "filebeat: Module Compatibility ITs (Next Major)"
-
-      - label: ":linux: Filebeat arm64 Unit Tests"
-        command: |
-          cd filebeat
-          mage build unitTest
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths:
-          - "filebeat/build/*.xml"
-          - "filebeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "filebeat: Linux arm64 Unit Tests"
-
   - group: "Filebeat Extended Tests"
     key: "filebeat-extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS).*/
 
     steps:
-      - label: ":mac: Filebeat macOS x86_64 Unit Tests"
+      - label: ":mac: MacOS x64_64 Unit Tests"
         key: "macos-unit-tests-extended"
         if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
@@ -219,7 +198,7 @@ steps:
           - github_commit_status:
               context: "filebeat: macOS x86_64 Unit Tests"
 
-  - group: "Filebeat Extended Windows Tests"
+  - group: "Extended Windows Tests"
     key: "filebeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
 

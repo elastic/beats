@@ -245,7 +245,7 @@ steps:
 
   - group: "Metricbeat Extended MacOS Tests"
     key: "metricbeat-extended-macos-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+    if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
       - label: ":mac: MacOS x64_64 Unit Tests"
         key: "extended-macos-x64-64-unit-tests"
