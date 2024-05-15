@@ -26,6 +26,10 @@ env:
   ASDF_MAGE_VERSION: 1.15.0
   ASDF_NODEJS_VERSION: 18.17.1
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "x-pack/heartbeat Mandatory Tests"
     key: "x-pack-heartbeat-mandatory-tests"
@@ -193,7 +197,7 @@ steps:
 
   - group: "x-pack/heartbeat macOS Extended Tests"
     key: "x-pack-heartbeat-extended-tests-macos"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+    if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
 
     steps:
       - label: ":mac: x-pack/heartbeat macOS x86_64 Unit Tests"

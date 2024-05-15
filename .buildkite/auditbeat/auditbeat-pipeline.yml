@@ -22,6 +22,10 @@ env:
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "Auditbeat Mandatory Testing"
     key: "auditbeat-mandatory-tests"
@@ -128,7 +132,7 @@ steps:
     steps:
       - label: ":linux: Auditbeat Ubuntu Integration Tests"
         key: "auditbeat-extended-integ-tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
           cd auditbeat
@@ -149,7 +153,7 @@ steps:
 
       - label: ":linux: Auditbeat Ubuntu arm64 Integration Tests"
         key: "auditbeat-extended-arm64-integ-tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
           cd auditbeat
@@ -190,7 +194,7 @@ steps:
               context: "auditbeat: Linux arm64 Unit Tests"
 
       - label: ":mac: Auditbeat macOS x86_64 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
@@ -210,7 +214,7 @@ steps:
               context: "auditbeat: macOS x86_64 Unit Tests"
 
       - label: ":mac: Auditbeat macOS arm64 ARM Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
