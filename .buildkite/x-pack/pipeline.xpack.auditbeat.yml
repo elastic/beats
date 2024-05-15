@@ -180,7 +180,7 @@ steps:
 
   - group: "x-pack/auditbeat MacOS Extended Tests"
     key: "x-pack-auditbeat-extended-tests-macos"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+    if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
       - label: ":mac: MacOS x86_64 Unit Tests"
         command: |
