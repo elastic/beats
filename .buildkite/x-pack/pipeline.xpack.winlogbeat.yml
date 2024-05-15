@@ -15,6 +15,10 @@ env:
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "x-pack/Winlogbeat Mandatory Tests"
     key: "x-pack-winlogbeat-mandatory-tests"
