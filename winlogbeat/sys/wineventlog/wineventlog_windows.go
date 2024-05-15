@@ -429,6 +429,7 @@ func FormatEventString(
 	defer bb.Free()
 
 	bb.Reserve(int(bufferNeeded * 2))
+	bufferSize = bufferNeeded
 
 	err = _EvtFormatMessage(ph, eventHandle, 0, 0, nil, messageFlag, bufferSize, bb.PtrAt(0), &bufferNeeded)
 	if err != nil {

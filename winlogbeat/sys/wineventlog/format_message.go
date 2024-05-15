@@ -101,6 +101,7 @@ func evtFormatMessage(metadataHandle EvtHandle, eventHandle EvtHandle, messageID
 
 	case windows.ERROR_INSUFFICIENT_BUFFER:
 		bb.Reserve(int(bufferNeeded * 2))
+		bufferSize = bufferNeeded
 
 	default:
 		return "", fmt.Errorf("failed in EvtFormatMessage: %w", err)
