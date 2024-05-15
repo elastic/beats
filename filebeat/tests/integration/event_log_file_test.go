@@ -128,4 +128,9 @@ func TestEventsLoggerESOutput(t *testing.T) {
 		t.Errorf("Contents:\n%s", strData)
 		t.FailNow()
 	}
+
+	// Ensure the normal log file does not contain the event data
+	if filebeat.LogContains(eventMsg) {
+		t.Fatalf("normal log file must NOT contain event data, '%s' found in the logs", eventMsg)
+	}
 }
