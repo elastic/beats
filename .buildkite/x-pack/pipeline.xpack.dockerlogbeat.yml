@@ -1,0 +1,118 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite/pipeline-schema/main/schema.json
+name: "beats-xpack-dockerlogbeat"
+
+env:
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
+  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
+  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
+
+  IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
+
+  # Other deps
+  ASDF_MAGE_VERSION: 1.15.0
+
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
+steps:
+  - group: "x-pack/dockerlogbeat Mandatory Tests"
+    key: "xpack-dockerlogbeat-mandatory-tests"
+    steps:
+      - label: ":ubuntu: x-pack/dockerlogbeat Ubuntu Unit Tests"
+        key: "mandatory-linux-unit-test"
+        command: |
+          cd x-pack/dockerlogbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/dockerlogbeat/build/*.xml"
+          - "x-pack/dockerlogbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/dockerlogbeat: Ubuntu Unit Tests"
+
+      - label: ":ubuntu: x-pack/dockerlogbeat Go (Module) Integration Tests"
+        key: "mandatory-int-test"
+        command: |
+          set -euo pipefail
+          # defines the MODULE env var based on what's changed in a PR
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet x-pack/dockerlogbeat
+          echo "~~~ Running tests"
+          cd x-pack/dockerlogbeat
+          mage goIntegTest
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths:
+          - "x-pack/dockerlogbeat/build/*.xml"
+          - "x-pack/dockerlogbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/dockerlogbeat: Go (Module) Integration Tests"
+
+  - wait: ~
+    # with PRs, we want to run packaging only if mandatory tests succeed
+    # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
+    # this allows building DRA artifacts even if there is flakiness in mandatory tests
+    if: build.env("BUILDKITE_PULL_REQUEST") != "false"
+    depends_on:
+      - "xpack-dockerlogbeat-mandatory-tests"
+
+  - group: "x-pack/dockerlogbeat Packaging"
+    key: "xpack-dockerlogbeat-packaging"
+
+    steps:
+      - label: ":ubuntu: x-pack/dockerlogbeat Packaging Linux"
+        key: "auditbeat-package-linux-x86"
+        env:
+          PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64 darwin/arm64"
+          SNAPSHOT: true
+        command: |
+          cd x-pack/dockerlogbeat
+          mage package
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 20
+        agents:
+          provider: gcp
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "x-pack/dockerlogbeat: Packaging Linux"
+
+      - label: ":linux: x-pack/dockerlogbeat Packaging Linux arm64"
+        key: "auditbeat-package-linux-arm"
+        env:
+          PLATFORMS: "linux/arm64"
+          PACKAGES: "docker"
+          SNAPSHOT: true
+        command: |
+          cd x-pack/dockerlogbeat
+          mage package
+        retry:
+          automatic:
+            - limit: 3
+        timeout_in_minutes: 20
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        notify:
+          - github_commit_status:
+              context: "x-pack/dockerlogbeat: Packaging Linux arm64"

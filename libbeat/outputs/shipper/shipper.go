@@ -25,7 +25,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs"
 	"github.com/elastic/beats/v7/libbeat/publisher"
-	proxyqueue "github.com/elastic/beats/v7/libbeat/publisher/queue/proxy"
+	"github.com/elastic/beats/v7/libbeat/publisher/queue/memqueue"
 
 	"github.com/elastic/elastic-agent-shipper-client/pkg/helpers"
 	sc "github.com/elastic/elastic-agent-shipper-client/pkg/proto"
@@ -111,8 +111,12 @@ func makeShipper(
 	return outputs.Group{
 		Clients: []outputs.Client{swb},
 		Retry:   config.MaxRetries,
-		QueueFactory: proxyqueue.FactoryForSettings(
-			proxyqueue.Settings{BatchSize: config.BulkMaxSize}),
+		QueueFactory: memqueue.FactoryForSettings(
+			memqueue.Settings{
+				Events:        config.BulkMaxSize * 2,
+				MaxGetRequest: config.BulkMaxSize,
+				FlushTimeout:  0,
+			}),
 	}, nil
 }
 

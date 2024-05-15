@@ -25,7 +25,8 @@ const (
 	logName  = "processor." + procName
 )
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	processors.RegisterPlugin(procName, New)
 }
 

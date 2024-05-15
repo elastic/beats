@@ -250,7 +250,7 @@ func (r *KubeRemote) waitForPod(wait time.Duration, condition watchtools.Conditi
 	return nil, err
 }
 
-// portFoward runs the port forwarding so SSH rsync can be ran into the pod.
+// portForward runs the port forwarding so SSH rsync can be ran into the pod.
 func (r *KubeRemote) portForward(ports []string, stopChannel, readyChannel chan struct{}, stdout, stderr io.Writer) (*portforward.PortForwarder, error) {
 	roundTripper, upgrader, err := spdy.RoundTripperFor(r.cfg)
 	if err != nil {

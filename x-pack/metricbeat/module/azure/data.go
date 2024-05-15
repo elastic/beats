@@ -133,41 +133,8 @@ func mapToKeyValuePoints(metrics []Metric) []KeyValuePoint {
 	var points []KeyValuePoint
 	for _, metric := range metrics {
 		for _, value := range metric.Values {
-			point := KeyValuePoint{
-				Timestamp:  value.timestamp,
-				Dimensions: mapstr.M{},
-			}
-
 			metricName := managePropertyName(value.name)
-			switch {
-			case value.min != nil:
-				point.Key = fmt.Sprintf("%s.%s", metricName, "min")
-				point.Value = value.min
-			case value.max != nil:
-				point.Key = fmt.Sprintf("%s.%s", metricName, "max")
-				point.Value = value.max
-			case value.avg != nil:
-				point.Key = fmt.Sprintf("%s.%s", metricName, "avg")
-				point.Value = value.avg
-			case value.total != nil:
-				point.Key = fmt.Sprintf("%s.%s", metricName, "total")
-				point.Value = value.total
-			case value.count != nil:
-				point.Key = fmt.Sprintf("%s.%s", metricName, "count")
-				point.Value = value.count
-			}
-
-			point.Namespace = metric.Namespace
-			point.ResourceId = metric.ResourceId
-			point.ResourceSubId = metric.ResourceSubId
-			point.TimeGrain = metric.TimeGrain
-
-			// The number of dimensions in the metric definition and the
-			// number of dimensions in the metric values should be the same.
-			//
-			// But, since definitions and values are retrieved from different
-			// API endpoints, we need to make sure that we don't panic if the
-			// number of dimensions is different.
+			dimensions := mapstr.M{}
 			if len(metric.Dimensions) == len(value.dimensions) {
 				// Take the dimension name from the metric definition and the
 				// dimension value from the metric value.
@@ -180,11 +147,75 @@ func mapToKeyValuePoints(metrics []Metric) []KeyValuePoint {
 					// Dimensions from metric definition and metric value are
 					// not guaranteed to be in the same order, so we need to
 					// find by name the right value for each dimension.
-					_, _ = point.Dimensions.Put(dim.Name, getDimensionValue(dim.Name, value.dimensions))
+					// _, _ = point.Dimensions.Put(dim.Name, getDimensionValue(dim.Name, value.dimensions))
+					_, _ = dimensions.Put(dim.Name, getDimensionValue(dim.Name, value.dimensions))
 				}
 			}
 
-			points = append(points, point)
+			if value.min != nil {
+				points = append(points, KeyValuePoint{
+					Key:           fmt.Sprintf("%s.%s", metricName, "min"),
+					Value:         value.min,
+					Namespace:     metric.Namespace,
+					ResourceId:    metric.ResourceId,
+					ResourceSubId: metric.ResourceSubId,
+					TimeGrain:     metric.TimeGrain,
+					Dimensions:    dimensions,
+					Timestamp:     value.timestamp,
+				})
+			}
+
+			if value.max != nil {
+				points = append(points, KeyValuePoint{
+					Key:           fmt.Sprintf("%s.%s", metricName, "max"),
+					Value:         value.max,
+					Namespace:     metric.Namespace,
+					ResourceId:    metric.ResourceId,
+					ResourceSubId: metric.ResourceSubId,
+					TimeGrain:     metric.TimeGrain,
+					Dimensions:    dimensions,
+					Timestamp:     value.timestamp,
+				})
+			}
+
+			if value.avg != nil {
+				points = append(points, KeyValuePoint{
+					Key:           fmt.Sprintf("%s.%s", metricName, "avg"),
+					Value:         value.avg,
+					Namespace:     metric.Namespace,
+					ResourceId:    metric.ResourceId,
+					ResourceSubId: metric.ResourceSubId,
+					TimeGrain:     metric.TimeGrain,
+					Dimensions:    dimensions,
+					Timestamp:     value.timestamp,
+				})
+			}
+
+			if value.total != nil {
+				points = append(points, KeyValuePoint{
+					Key:           fmt.Sprintf("%s.%s", metricName, "total"),
+					Value:         value.total,
+					Namespace:     metric.Namespace,
+					ResourceId:    metric.ResourceId,
+					ResourceSubId: metric.ResourceSubId,
+					TimeGrain:     metric.TimeGrain,
+					Dimensions:    dimensions,
+					Timestamp:     value.timestamp,
+				})
+			}
+
+			if value.count != nil {
+				points = append(points, KeyValuePoint{
+					Key:           fmt.Sprintf("%s.%s", metricName, "count"),
+					Value:         value.count,
+					Namespace:     metric.Namespace,
+					ResourceId:    metric.ResourceId,
+					ResourceSubId: metric.ResourceSubId,
+					TimeGrain:     metric.TimeGrain,
+					Dimensions:    dimensions,
+					Timestamp:     value.timestamp,
+				})
+			}
 		}
 	}
 

@@ -287,8 +287,8 @@ func (c *fileStore) writeState(final bool) {
 	enc := json.NewEncoder(f)
 	enc.SetEscapeHTML(false)
 	now := time.Now()
-	for c.expiries.Len() != 0 {
-		e := c.expiries.pop()
+	for i := 0; i < c.expiries.Len(); i++ {
+		e := c.expiries[i]
 		if e.Expires.Before(now) {
 			// Don't write expired elements.
 			continue

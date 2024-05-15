@@ -61,13 +61,16 @@ CHANGELOG*
 /libbeat/processors/decode_xml_wineventlog/ @elastic/sec-windows-platform
 /libbeat/processors/dns/ @elastic/sec-deployment-and-devices
 /libbeat/processors/registered_domain/ @elastic/sec-deployment-and-devices
+/libbeat/processors/syslog/ @elastic/sec-deployment-and-devices
 /libbeat/processors/translate_sid/ @elastic/sec-windows-platform
 /libbeat/processors/add_cloud_metadata @elastic/obs-cloud-monitoring
 /libbeat/processors/add_kubernetes_metadata @elastic/obs-cloudnative-monitoring
+/libbeat/reader/syslog/ @elastic/sec-deployment-and-devices
 /licenses/ @elastic/elastic-agent-data-plane
 /metricbeat/ @elastic/elastic-agent-data-plane
 /metricbeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
 /metricbeat/helper/kubernetes @elastic/obs-cloudnative-monitoring
+/metricbeat/module/aerospike @elastic/obs-infraobs-integrations
 /metricbeat/module/apache @elastic/obs-infraobs-integrations
 /metricbeat/module/beat/ @elastic/stack-monitoring
 /metricbeat/module/ceph @elastic/obs-infraobs-integrations
@@ -105,6 +108,7 @@ CHANGELOG*
 /x-pack/elastic-agent/ @elastic/elastic-agent-control-plane
 /x-pack/filebeat @elastic/elastic-agent-data-plane
 /x-pack/filebeat/docs/ # Listed without an owner to avoid maintaining doc ownership for each input and module.
+/x-pack/filebeat/docs/inputs/input-salesforce.asciidoc @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/awscloudwatch/ @elastic/obs-cloud-monitoring
 /x-pack/filebeat/input/awss3/ @elastic/obs-cloud-monitoring
 /x-pack/filebeat/input/azureblobstorage/ @elastic/security-service-integrations
@@ -122,6 +126,7 @@ CHANGELOG*
 /x-pack/filebeat/input/lumberjack/ @elastic/security-service-integrations
 /x-pack/filebeat/input/netflow/ @elastic/sec-deployment-and-devices
 /x-pack/filebeat/input/o365audit/ @elastic/security-service-integrations
+/x-pack/filebeat/input/salesforce @elastic/obs-infraobs-integrations
 /x-pack/filebeat/input/websocket/ @elastic/security-service-integrations
 /x-pack/filebeat/module/activemq @elastic/obs-infraobs-integrations
 /x-pack/filebeat/module/aws @elastic/obs-cloud-monitoring
@@ -226,6 +231,6 @@ CHANGELOG*
 
 # Ownership of CI or related files by the Ingest Eng Prod team
 /.buildkite @elastic/ingest-eng-prod
-/catalog-info.yml @elastic/ingest-eng-prod
+/catalog-info.yaml @elastic/ingest-eng-prod
 /libbeat/scripts @elastic/ingest-eng-prod
 /metricbeat/tests @elastic/ingest-eng-prod

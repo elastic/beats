@@ -5,8 +5,12 @@
 package http_endpoint
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
+	"encoding/base32"
+	"encoding/binary"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
@@ -18,6 +22,7 @@ import (
 
 	"github.com/rcrowley/go-metrics"
 	"go.elastic.co/ecszap"
+	"go.uber.org/atomic"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 
@@ -131,6 +136,14 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 	metrics.route.Set(u.Path)
 	metrics.isTLS.Set(e.tlsConfig != nil)
 
+	var prg *program
+	if e.config.Program != "" {
+		prg, err = newProgram(e.config.Program)
+		if err != nil {
+			return err
+		}
+	}
+
 	p.mu.Lock()
 	s, ok := p.servers[e.addr]
 	if ok {
@@ -149,7 +162,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 			return err
 		}
 		log.Infof("Adding %s end point to server on %s", pattern, e.addr)
-		s.mux.Handle(pattern, newHandler(s.ctx, e.config, pub, log, metrics))
+		s.mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, log, metrics))
 		s.idOf[pattern] = ctx.ID
 		p.mu.Unlock()
 		<-s.ctx.Done()
@@ -165,7 +178,7 @@ func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, m
 		srv:  srv,
 	}
 	s.ctx, s.cancel = ctxtool.WithFunc(ctx.Cancelation, func() { srv.Close() })
-	mux.Handle(pattern, newHandler(s.ctx, e.config, pub, log, metrics))
+	mux.Handle(pattern, newHandler(s.ctx, e.config, prg, pub, log, metrics))
 	p.servers[e.addr] = s
 	p.mu.Unlock()
 
@@ -287,9 +300,12 @@ func (s *server) getErr() error {
 	return s.err
 }
 
-func newHandler(ctx context.Context, c config, pub stateless.Publisher, log *logp.Logger, metrics *inputMetrics) http.Handler {
+func newHandler(ctx context.Context, c config, prg *program, pub stateless.Publisher, log *logp.Logger, metrics *inputMetrics) http.Handler {
 	h := &handler{
-		log:       log,
+		log:         log,
+		txBaseID:    newID(),
+		txIDCounter: atomic.NewUint64(0),
+
 		publisher: pub,
 		metrics:   metrics,
 		validator: apiValidator{
@@ -305,9 +321,10 @@ func newHandler(ctx context.Context, c config, pub stateless.Publisher, log *log
 			hmacType:     c.HMACType,
 			hmacPrefix:   c.HMACPrefix,
 		},
+		program:               prg,
 		messageField:          c.Prefix,
 		responseCode:          c.ResponseCode,
-		responseBody:          c.ResponseBody,
+		responseBody:          htmlEscape(c.ResponseBody),
 		includeHeaders:        canonicalizeHeaders(c.IncludeHeaders),
 		preserveOriginalEvent: c.PreserveOriginalEvent,
 		crc:                   newCRC(c.CRCProvider, c.CRCSecret),
@@ -333,6 +350,19 @@ func newHandler(ctx context.Context, c config, pub stateless.Publisher, log *log
 		}
 	}
 	return h
+}
+
+func htmlEscape(s string) string {
+	var buf bytes.Buffer
+	json.HTMLEscape(&buf, []byte(s))
+	return buf.String()
+}
+
+// newID returns an ID derived from the current time.
+func newID() string {
+	var data [8]byte
+	binary.LittleEndian.PutUint64(data[:], uint64(time.Now().UnixNano()))
+	return base32.HexEncoding.WithPadding(base32.NoPadding).EncodeToString(data[:])
 }
 
 // inputMetrics handles the input's metric reporting.

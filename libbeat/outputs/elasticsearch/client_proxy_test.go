@@ -165,7 +165,9 @@ func TestProxyDisableOverridesProxySettings(t *testing.T) {
 func execClient(t *testing.T, env ...string) {
 	// The child process always runs only the TestClientPing test, which pings
 	// the server at TEST_SERVER_URL and then terminates.
-	cmd := exec.Command(os.Args[0], "-test.run=TestClientPing")
+	executable, err := os.Executable()
+	require.NoError(t, err, "couldn't get current executable")
+	cmd := exec.Command(executable, "-test.run=TestClientPing")
 	cmd.Env = append(append(os.Environ(),
 		"TEST_START_CLIENT=1"),
 		env...)
@@ -173,7 +175,7 @@ func execClient(t *testing.T, env ...string) {
 	cmd.Stderr = cmdOutput
 	cmd.Stdout = cmdOutput
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		t.Error("Error executing client:\n" + cmdOutput.String())
 	}
@@ -185,8 +187,8 @@ func doClientPing(t *testing.T) {
 	proxy := os.Getenv("TEST_PROXY_URL")
 	// if TEST_PROXY_DISABLE is nonempty, set ClientSettings.ProxyDisable.
 	proxyDisable := os.Getenv("TEST_PROXY_DISABLE")
-	clientSettings := ClientSettings{
-		ConnectionSettings: eslegclient.ConnectionSettings{
+	clientSettings := clientSettings{
+		connection: eslegclient.ConnectionSettings{
 			URL:     serverURL,
 			Headers: map[string]string{headerTestField: headerTestValue},
 			Transport: httpcommon.HTTPTransportSettings{
@@ -195,14 +197,14 @@ func doClientPing(t *testing.T) {
 				},
 			},
 		},
-		Index: outil.MakeSelector(outil.ConstSelectorExpr("test", outil.SelectorLowerCase)),
+		indexSelector: outil.MakeSelector(outil.ConstSelectorExpr("test", outil.SelectorLowerCase)),
 	}
 	if proxy != "" {
 		u, err := url.Parse(proxy)
 		require.NoError(t, err)
 		proxyURL := httpcommon.ProxyURI(*u)
 
-		clientSettings.Transport.Proxy.URL = &proxyURL
+		clientSettings.connection.Transport.Proxy.URL = &proxyURL
 	}
 	client, err := NewClient(clientSettings, nil)
 	require.NoError(t, err)
@@ -210,7 +212,7 @@ func doClientPing(t *testing.T) {
 	// This ping won't succeed; we aren't testing end-to-end communication
 	// (which would require a lot more setup work), we just want to make sure
 	// the client is pointed at the right server or proxy.
-	client.Connect()
+	_ = client.Connect()
 }
 
 // serverState contains the state of the http listeners for proxy tests,

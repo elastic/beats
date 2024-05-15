@@ -1,0 +1,34 @@
+[
+	{
+		"RootFields": null,
+		"ModuleFields": {
+			"namespace": "default"
+		},
+		"MetricSetFields": {
+			"active": {
+				"count": 0
+			},
+			"created": {
+				"sec": 1713862291
+			},
+			"is_suspended": false,
+			"last_schedule": {
+				"sec": 1713881940
+			},
+			"name": "hello",
+			"next_schedule": {
+				"sec": 1713882000
+			}
+		},
+		"Index": "",
+		"ID": "",
+		"Namespace": "kubernetes.cronjob",
+		"Timestamp": "0001-01-01T00:00:00Z",
+		"Error": null,
+		"Host": "",
+		"Service": "",
+		"Took": 0,
+		"Period": 0,
+		"DisableTimeSeries": false
+	}
+]

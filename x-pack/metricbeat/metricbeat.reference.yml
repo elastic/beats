@@ -158,6 +158,21 @@ metricbeat.modules:
   period: 10s
   hosts: ["localhost:3000"]
 
+  # Aerospike Cluster Name
+  #cluster_name: myclustername
+
+  # Optional SSL/TLS (disabled by default)
+  #ssl.enabled: true
+
+  # List of root certificates for SSL/TLS server verification
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.crt"]
+
+  # Certificate for SSL/TLS client authentication
+  #ssl.certificate: "/etc/pki/client/cert.crt"
+
+  # Client certificate key file
+  #ssl.key: "/etc/pki/client/cert.key"
+
 #------------------------------- Airflow Module -------------------------------
 - module: airflow
   host: "localhost"
@@ -1171,6 +1186,18 @@ metricbeat.modules:
 
   # By setting raw to true, all raw fields from the status metricset will be added to the event.
   #raw: false
+
+  # Optional SSL/TLS. By default is false.
+  #ssl.enabled: true
+
+  # List of root certificates for SSL/TLS server verification
+  #ssl.certificate_authorities: ["/etc/pki/root/ca.crt"]
+
+  # Certificate for SSL/TLS client authentication
+  #ssl.certificate: "/etc/pki/client/cert.crt"
+
+  # Client certificate key file
+  #ssl.key: "/etc/pki/client/cert.key"
 
 #--------------------------------- NATS Module ---------------------------------
 - module: nats

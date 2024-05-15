@@ -32,7 +32,6 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	pubtest "github.com/elastic/beats/v7/libbeat/publisher/testing"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
@@ -163,12 +162,6 @@ func TestInputWithLogGroupNamePrefix(t *testing.T) {
 
 	client := pubtest.NewChanClient(0)
 	defer close(client.Channel)
-	go func() {
-		for event := range client.Channel {
-			// Fake the ACK handling that's not implemented in pubtest.
-			event.Private.(*awscommon.EventACKTracker).ACK()
-		}
-	}()
 
 	var errGroup errgroup.Group
 	errGroup.Go(func() error {

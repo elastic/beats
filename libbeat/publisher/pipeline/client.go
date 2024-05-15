@@ -42,10 +42,8 @@ type client struct {
 	eventWaitGroup *sync.WaitGroup
 
 	// Open state, signaling, and sync primitives for coordinating client Close.
-	isOpen    atomic.Bool   // set to false during shutdown, such that no new events will be accepted anymore.
-	closeOnce sync.Once     // closeOnce ensure that the client shutdown sequence is only executed once
-	closeRef  beat.CloseRef // extern closeRef for sending a signal that the client should be closed.
-	done      chan struct{} // the done channel will be closed if the closeReg gets closed, or Close is run.
+	isOpen    atomic.Bool // set to false during shutdown, such that no new events will be accepted anymore.
+	closeOnce sync.Once   // closeOnce ensure that the client shutdown sequence is only executed once
 
 	observer       observer
 	eventListener  beat.EventListener
@@ -137,8 +135,6 @@ func (c *client) Close() error {
 	// first stop ack handling. ACK handler might block on wait (with timeout), waiting
 	// for pending events to be ACKed.
 	c.closeOnce.Do(func() {
-		close(c.done)
-
 		c.isOpen.Store(false)
 		c.onClosing()
 

@@ -23,6 +23,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/elastic-agent-libs/transport/tlscommon"
+
 	as "github.com/aerospike/aerospike-client-go"
 )
 
@@ -94,5 +96,70 @@ func TestParseInfo(t *testing.T) {
 	for _, test := range tests {
 		result := ParseInfo(test.info)
 		assert.Equal(t, test.expected, result, test.Name)
+	}
+}
+
+func pointer[T any](d T) *T {
+	return &d
+}
+
+func TestParseClientPolicy(t *testing.T) {
+	sampleClusterName := "TestCluster"
+
+	TLSPolicy := as.NewClientPolicy()
+	tlsconfig, _ := tlscommon.LoadTLSConfig(&tlscommon.Config{Enabled: pointer(true)})
+	TLSPolicy.TlsConfig = tlsconfig.ToConfig()
+
+	ClusterNamePolicy := as.NewClientPolicy()
+	ClusterNamePolicy.ClusterName = sampleClusterName
+
+	tests := []struct {
+		Name                 string
+		Config               Config
+		expectedClientPolicy *as.ClientPolicy
+		expectedErr          error
+	}{
+		{
+			Name:                 "Empty configuration leads to default policy",
+			Config:               Config{},
+			expectedClientPolicy: as.NewClientPolicy(),
+			expectedErr:          nil,
+		},
+		{
+			Name: "TLS Declaration",
+			Config: Config{
+				TLS: &tlscommon.Config{
+					Enabled: pointer(true),
+				},
+			},
+			expectedClientPolicy: TLSPolicy,
+			expectedErr:          nil,
+		},
+		{
+			Name: "Cluster Name Setting",
+			Config: Config{
+				ClusterName: sampleClusterName,
+			},
+			expectedClientPolicy: ClusterNamePolicy,
+			expectedErr:          nil,
+		},
+	}
+
+	for _, test := range tests {
+		result, err := ParseClientPolicy(test.Config)
+		if err != nil {
+			if test.expectedErr != nil {
+				assert.Equalf(t, test.expectedErr.Error(), err.Error(),
+					"Aerospike policy the error produced is not the one expected: got '%s', expected '%s'", err.Error(), test.expectedErr.Error())
+				continue
+			}
+			t.Error(err)
+			continue
+		}
+		assert.Equalf(t, test.expectedClientPolicy.ClusterName, result.ClusterName,
+			"Aerospike policy cluster name is wrong. Got '%s' expected '%s'", result.ClusterName, test.expectedClientPolicy.ClusterName)
+		if test.Config.TLS.IsEnabled() {
+			assert.NotNil(t, result.TlsConfig, "Aerospike policy: TLS is not set even though TLS is specified in the configuration")
+		}
 	}
 }

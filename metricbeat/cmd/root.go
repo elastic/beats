@@ -22,16 +22,18 @@ import (
 
 	"github.com/spf13/pflag"
 
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	"github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/cmd/instance"
 	"github.com/elastic/beats/v7/libbeat/ecs"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
 	"github.com/elastic/beats/v7/metricbeat/beater"
 	"github.com/elastic/beats/v7/metricbeat/cmd/test"
-	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/beats/v7/metricbeat/include"
+	"github.com/elastic/beats/v7/metricbeat/mb/module"
 
 	// import modules
-	_ "github.com/elastic/beats/v7/metricbeat/include"
 	_ "github.com/elastic/beats/v7/metricbeat/include/fields"
 )
 
@@ -59,6 +61,10 @@ func MetricbeatSettings() instance.Settings {
 		Name:          Name,
 		HasDashboards: true,
 		Processing:    processing.MakeDefaultSupport(true, nil, withECSVersion, processing.WithHost, processing.WithAgentMeta()),
+		Initialize: []func(){
+			include.InitializeModule,
+			module.RegisterMonitoringModules,
+		},
 	}
 }
 

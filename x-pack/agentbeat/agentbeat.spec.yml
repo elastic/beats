@@ -1,0 +1,568 @@
+version: 2
+inputs:
+  - name: audit/auditd
+    description: "Auditd"
+    platforms: &platforms
+      - linux/amd64
+      - linux/arm64
+      - darwin/amd64
+      - darwin/arm64
+      - windows/amd64
+      - container/amd64
+      - container/arm64
+    outputs: &outputs
+      - elasticsearch
+      - kafka
+      - logstash
+      - redis
+    command: &auditbeat_command
+      restart_monitoring_period: 5s
+      maximum_restarts_per_period: 1
+      timeouts:
+        restart: 1s
+      name: "auditbeat"
+      args:
+        - "auditbeat"
+        - "-E"
+        - "setup.ilm.enabled=false"
+        - "-E"
+        - "setup.template.enabled=false"
+        - "-E"
+        - "management.enabled=true"
+        - "-E"
+        - "management.restart_on_output_change=true"
+        - "-E"
+        - "logging.level=info"
+        - "-E"
+        - "logging.to_stderr=true"
+        - "-E"
+        - "gc_percent=${AUDITBEAT_GOGC:100}"
+        - "-E"
+        - "auditbeat.config.modules.enabled=false"
+  - name: audit/file_integrity
+    description: "Audit File Integrity"
+    platforms: *platforms
+    outputs: *outputs
+    command: *auditbeat_command
+  - name: audit/system
+    description: "Audit System"
+    platforms: *platforms
+    outputs: *outputs
+    command: *auditbeat_command
+  - name: aws-cloudwatch
+    description: "AWS Cloudwatch"
+    platforms: *platforms
+    outputs: *outputs
+    command: &filebeat_command
+      restart_monitoring_period: 5s
+      maximum_restarts_per_period: 1
+      timeouts:
+        restart: 1s
+      name: "filebeat"
+      args:
+        - "filebeat"
+        - "-E"
+        - "setup.ilm.enabled=false"
+        - "-E"
+        - "setup.template.enabled=false"
+        - "-E"
+        - "management.enabled=true"
+        - "-E"
+        - "management.restart_on_output_change=true"
+        - "-E"
+        - "logging.level=info"
+        - "-E"
+        - "logging.to_stderr=true"
+        - "-E"
+        - "gc_percent=${FILEBEAT_GOGC:100}"
+        - "-E"
+        - "filebeat.config.modules.enabled=false"
+  - name: aws-s3
+    description: "AWS S3"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: azure-blob-storage
+    description: "Azure Blob Storage"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: azure-eventhub
+    description: "Azure Eventhub"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: cel
+    description: "Common Expression Language Input"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: cloudfoundry
+    description: "PCF Cloudfoundry"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: cometd
+    description: "CometD input"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: container
+    description: "Container logs"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: docker
+    aliases:
+      - log/docker
+    description: "Docker logs"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: entity-analytics
+    description: "Entity Analytics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: etw
+    description: "Event Tracing for Windows"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: gcp-pubsub
+    description: "GCP Pub-Sub"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: gcs
+    description: "Google Cloud Storage"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: http_endpoint
+    description: "HTTP Endpoint"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: httpjson
+    description: "HTTP JSON Endpoint"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: journald
+    description: "Journald"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: kafka
+    description: "Kafka"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: log
+    aliases:
+      - logfile
+      - event/file
+    description: "Logfile"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: lumberjack
+    description: "Lumberjack"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: mqtt
+    description: "MQTT"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: netflow
+    description: "Netflow"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: o365audit
+    description: "Office 365 Audit"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: redis
+    aliases:
+      - log/redis_slowlog
+    description: "Redis"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: syslog
+    aliases:
+      - log/syslog
+    description: "Syslog"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: tcp
+    aliases:
+      - event/tcp
+    description: "TCP"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: udp
+    aliases:
+      - event/udp
+    description: "UDP"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: unix
+    description: "Unix Socket"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: winlog
+    description: "Winlog"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: filestream
+    description: "Filestream"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: websocket
+    description: "Websocket"
+    platforms: *platforms
+    outputs: *outputs
+    command: *filebeat_command
+  - name: synthetics/browser
+    description: "Synthetics Browser Monitor"
+    platforms: *platforms
+    outputs: *outputs
+    command: &heartbeat_command
+      restart_monitoring_period: 5s
+      maximum_restarts_per_period: 1
+      timeouts:
+        restart: 1s
+      name: "heartbeat"
+      args:
+        - "heartbeat"
+        - "-E"
+        - "setup.ilm.enabled=false"
+        - "-E"
+        - "setup.template.enabled=false"
+        - "-E"
+        - "management.enabled=true"
+        - "-E"
+        - "management.restart_on_output_change=true"
+        - "-E"
+        - "logging.level=info"
+        - "-E"
+        - "logging.to_stderr=true"
+        - "-E"
+        - "gc_percent=${HEARTBEAT_GOGC:100}"
+  - name: synthetics/http
+    description: "Synthetics HTTP Monitor"
+    platforms: *platforms
+    outputs: *outputs
+    command: *heartbeat_command
+  - name: synthetics/icmp
+    description: "Synthetics ICMP Monitor"
+    platforms: *platforms
+    outputs: *outputs
+    command: *heartbeat_command
+  - name: synthetics/tcp
+    description: "Synthetics TCP Monitor"
+    platforms: *platforms
+    outputs: *outputs
+    command: *heartbeat_command
+  - name: beat/metrics
+    description: "Beat metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: &metricbeat_command
+      restart_monitoring_period: 5s
+      maximum_restarts_per_period: 1
+      timeouts:
+        restart: 1s
+      name: "metricbeat"
+      args:
+        - "metricbeat"
+        - "-E"
+        - "setup.ilm.enabled=false"
+        - "-E"
+        - "setup.template.enabled=false"
+        - "-E"
+        - "management.enabled=true"
+        - "-E"
+        - "management.restart_on_output_change=true"
+        - "-E"
+        - "logging.level=info"
+        - "-E"
+        - "logging.to_stderr=true"
+        - "-E"
+        - "gc_percent=${METRICBEAT_GOGC:100}"
+        - "-E"
+        - "metricbeat.config.modules.enabled=false"
+  - name: docker/metrics
+    description: "Docker metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: elasticsearch/metrics
+    description: "Elasticsearch metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: enterprisesearch/metrics
+    description: "Enterprise search metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: kibana/metrics
+    description: "Kibana metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: kubernetes/metrics
+    description: "Kubernetes metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: linux/metrics
+    description: "Linux metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: logstash/metrics
+    description: "Logstash metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: mongodb/metrics
+    description: "Mongodb metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: mysql/metrics
+    description: "MySQL metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: postgresql/metrics
+    description: "PostgreSQL metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: redis/metrics
+    description: "Redis metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: system/metrics
+    description: "System metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: uwsgi/metrics
+    description: "UWSGI metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: windows/metrics
+    description: "Windows metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: aws/metrics
+    description: "AWS metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: awsfargate/metrics
+    description: "AWS Fargate metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: azure/metrics
+    description: "Azure metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: cloudfoundry/metrics
+    description: "PCF Cloudfoundry metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: containerd/metrics
+    description: "Containerd metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: mssql/metrics
+    description: "Microsoft SQL Server metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: oracle/metrics
+    description: "Oracle Database metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: syncgateway/metrics
+    description: "Couchbase Sync Gateway metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: http/metrics
+    description: "HTTP metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: activemq/metrics
+    description: "ActiveMQ metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: apache/metrics
+    description: "Apache metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: etcd/metrics
+    description: "Etcd metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: gcp/metrics
+    description: "GCP metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: haproxy/metrics
+    description: "HAProxy metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: iis/metrics
+    description: "IIS metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: jolokia/metrics
+    description: "Jolokia metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: kafka/metrics
+    description: "Kafka metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: memcached/metrics
+    description: "Memcached metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: nats/metrics
+    description: "NATS metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: nginx/metrics
+    description: "NGINX metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: prometheus/metrics
+    description: "Prometheus metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: rabbitmq/metrics
+    description: "RabbitMQ metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: sql/metrics
+    description: "SQL metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: stan/metrics
+    description: "Stan metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: statsd/metrics
+    description: "Statsd metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: traefik/metrics
+    description: "Traefik metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: vsphere/metrics
+    description: "VSphere metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: zookeeper/metrics
+    description: "ZooKeeper metrics"
+    platforms: *platforms
+    outputs: *outputs
+    command: *metricbeat_command
+  - name: osquery
+    description: "Osquery"
+    platforms: *platforms
+    outputs: *outputs
+    command:
+      restart_monitoring_period: 5s
+      maximum_restarts_per_period: 1
+      timeouts:
+        restart: 1s
+      name: "osquerybeat"
+      args:
+        - "osquerybeat"
+        - "-E"
+        - "setup.ilm.enabled=false"
+        - "-E"
+        - "setup.template.enabled=false"
+        - "-E"
+        - "management.enabled=true"
+        - "-E"
+        - "management.restart_on_output_change=true"
+        - "-E"
+        - "logging.level=info"
+        - "-E"
+        - "logging.to_stderr=true"
+        - "-E"
+        - "gc_percent=${OSQUERYBEAT_GOGC:100}"
+  - name: packet
+    description: "Packet Capture"
+    platforms: *platforms
+    outputs: *outputs
+    command:
+      restart_monitoring_period: 5s
+      maximum_restarts_per_period: 1
+      timeouts:
+        restart: 1s
+      name: "packetbeat"
+      args:
+        - "packetbeat"
+        - "-E"
+        - "setup.ilm.enabled=false"
+        - "-E"
+        - "setup.template.enabled=false"
+        - "-E"
+        - "management.enabled=true"
+        - "-E"
+        - "management.restart_on_output_change=true"
+        - "-E"
+        - "logging.level=info"
+        - "-E"
+        - "logging.to_stderr=true"
+        - "-E"
+        - "gc_percent=${PACKETBEAT_GOGC:100}"

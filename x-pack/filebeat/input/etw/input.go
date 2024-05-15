@@ -182,7 +182,7 @@ var (
 // buildEvent builds the final beat.Event emitted by this input.
 func buildEvent(data map[string]any, h etw.EventHeader, session *etw.Session, cfg config) beat.Event {
 	winlog := map[string]any{
-		"activity_guid": h.ActivityId.String(),
+		"activity_id":   h.ActivityId.String(),
 		"channel":       strconv.FormatUint(uint64(h.EventDescriptor.Channel), 10),
 		"event_data":    data,
 		"flags":         strconv.FormatUint(uint64(h.Flags), 10),

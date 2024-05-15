@@ -44,6 +44,7 @@ type IncludeListOptions struct {
 	Outfile          string
 	BuildTags        string
 	Pkg              string
+	SkipInitModule   bool
 }
 
 // DefaultIncludeListOptions initializes IncludeListOptions struct with default values
@@ -55,6 +56,7 @@ func DefaultIncludeListOptions() IncludeListOptions {
 		Outfile:          "include/list.go",
 		BuildTags:        "",
 		Pkg:              "include",
+		SkipInitModule:   false,
 	}
 }
 
@@ -193,6 +195,9 @@ func GenerateIncludeListGo(options IncludeListOptions) error {
 		"-license", toLibbeatLicenseName(BeatLicense),
 		"-out", options.Outfile, "-buildTags", options.BuildTags,
 		"-pkg", options.Pkg,
+	}
+	if options.SkipInitModule {
+		cmd = append(cmd, "-skip-init-module")
 	}
 
 	includeListCmd := sh.RunCmd("go", cmd...)

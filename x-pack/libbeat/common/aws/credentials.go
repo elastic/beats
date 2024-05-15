@@ -56,7 +56,7 @@ type ConfigAWS struct {
 
 // InitializeAWSConfig function creates the awssdk.Config object from the provided config
 func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
-	awsConfig, _ := GetAWSCredentials(beatsConfig)
+	awsConfig, _ := getAWSCredentials(beatsConfig)
 	if awsConfig.Region == "" {
 		if beatsConfig.DefaultRegion != "" {
 			awsConfig.Region = beatsConfig.DefaultRegion
@@ -92,12 +92,12 @@ func InitializeAWSConfig(beatsConfig ConfigAWS) (awssdk.Config, error) {
 	return awsConfig, nil
 }
 
-// GetAWSCredentials function gets aws credentials from the config.
+// getAWSCredentials function gets aws credentials from the config.
 // If access keys given, use them as credentials.
 // If access keys are not given, then load from AWS config file. If credential_profile_name is not
 // given, default profile will be used.
 // If role_arn is given, assume the IAM role either with access keys or default profile.
-func GetAWSCredentials(beatsConfig ConfigAWS) (awssdk.Config, error) {
+func getAWSCredentials(beatsConfig ConfigAWS) (awssdk.Config, error) {
 	// Check if accessKeyID or secretAccessKey or sessionToken is given from configuration
 	if beatsConfig.AccessKeyID != "" || beatsConfig.SecretAccessKey != "" || beatsConfig.SessionToken != "" {
 		return getConfigForKeys(beatsConfig), nil
@@ -110,17 +110,10 @@ func GetAWSCredentials(beatsConfig ConfigAWS) (awssdk.Config, error) {
 // Provided config must contain an accessKeyID, secretAccessKey and sessionToken to generate a valid CredentialsProfile
 func getConfigForKeys(beatsConfig ConfigAWS) awssdk.Config {
 	config := awssdk.NewConfig()
-	awsCredentials := awssdk.Credentials{
-		AccessKeyID:     beatsConfig.AccessKeyID,
-		SecretAccessKey: beatsConfig.SecretAccessKey,
-	}
-
-	if beatsConfig.SessionToken != "" {
-		awsCredentials.SessionToken = beatsConfig.SessionToken
-	}
-
-	addStaticCredentialsProviderToAwsConfig(beatsConfig, config)
-
+	config.Credentials = credentials.NewStaticCredentialsProvider(
+		beatsConfig.AccessKeyID,
+		beatsConfig.SecretAccessKey,
+		beatsConfig.SessionToken)
 	return *config
 }
 
@@ -171,16 +164,4 @@ func addAssumeRoleProviderToAwsConfig(config ConfigAWS, awsConfig *awssdk.Config
 			options.ExpiryWindow = config.AssumeRoleExpiryWindow
 		}
 	})
-}
-
-// addStaticCredentialsProviderToAwsConfig adds a static credentials provider to the current AWS config by using the keys stored in Beats config
-func addStaticCredentialsProviderToAwsConfig(beatsConfig ConfigAWS, awsConfig *awssdk.Config) {
-	logger := logp.NewLogger("addStaticCredentialsProviderToAwsConfig")
-	logger.Debug("Switching credentials provider to StaticCredentialsProvider")
-	staticCredentialsProvider := credentials.NewStaticCredentialsProvider(
-		beatsConfig.AccessKeyID,
-		beatsConfig.SecretAccessKey,
-		beatsConfig.SessionToken)
-
-	awsConfig.Credentials = staticCredentialsProvider
 }

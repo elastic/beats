@@ -264,7 +264,7 @@ func newNetHTTPClient(ctx context.Context, cfg *requestConfig, log *logp.Logger,
 		if maxSize < 0 {
 			maxSize = 0
 		}
-		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxSize)
+		netHTTPClient.Transport = httplog.NewLoggingRoundTripper(netHTTPClient.Transport, traceLogger, maxSize, log)
 	}
 
 	if reg != nil {
@@ -356,6 +356,11 @@ type socketDialer struct {
 
 func (d socketDialer) Dial(_, _ string) (net.Conn, error) {
 	return net.Dial("unix", d.path)
+}
+
+func (d socketDialer) DialContext(ctx context.Context, _, _ string) (net.Conn, error) {
+	var nd net.Dialer
+	return nd.DialContext(ctx, "unix", d.path)
 }
 
 func checkRedirect(config *requestConfig, log *logp.Logger) func(*http.Request, []*http.Request) error {

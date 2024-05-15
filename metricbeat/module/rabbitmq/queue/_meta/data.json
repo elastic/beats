@@ -20,7 +20,7 @@
             "consumers": {
                 "count": 3,
                 "utilisation": {
-                    "pct": 0
+                    "pct": 0.7
                 }
             },
             "disk": {

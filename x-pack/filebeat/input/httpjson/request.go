@@ -440,7 +440,7 @@ func (rf *requestFactory) newRequest(ctx *transformContext) (transformable, erro
 	req := transformable{}
 	req.setURL(rf.url)
 
-	if rf.body != nil && len(*rf.body) > 0 {
+	if rf.body != nil {
 		req.setBody(rf.body.Clone())
 	}
 

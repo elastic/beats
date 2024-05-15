@@ -5,10 +5,16 @@
 package awss3
 
 import (
+	"context"
 	"errors"
 	"testing"
 
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/stretchr/testify/assert"
+
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGetProviderFromDomain(t *testing.T) {
@@ -50,19 +56,25 @@ func TestGetProviderFromDomain(t *testing.T) {
 	}
 }
 
-func TestGetRegionFromQueueURL(t *testing.T) {
+func TestRegionSelection(t *testing.T) {
 	tests := []struct {
-		name     string
-		queueURL string
-		endpoint string
-		deflt    string
-		want     string
-		wantErr  error
+		name       string
+		queueURL   string
+		regionName string
+		endpoint   string
+		want       string
+		wantErr    error
 	}{
 		{
 			name:     "amazonaws.com_domain_with_blank_endpoint",
 			queueURL: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
 			want:     "us-east-1",
+		},
+		{
+			name:       "amazonaws.com_domain_with_region_override",
+			queueURL:   "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
+			regionName: "us-east-2",
+			want:       "us-east-2",
 		},
 		{
 			name:     "abc.xyz_and_domain_with_matching_endpoint",
@@ -71,52 +83,70 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 			want:     "us-east-1",
 		},
 		{
+			name:       "abc.xyz_with_region_override",
+			queueURL:   "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
+			regionName: "us-west-3",
+			want:       "us-west-3",
+		},
+		{
 			name:     "abc.xyz_and_domain_with_blank_endpoint",
 			queueURL: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
 			wantErr:  errBadQueueURL,
 		},
 		{
-			name:     "abc.xyz_and_domain_with_different_endpoint",
-			queueURL: "https://sqs.us-east-1.abc.xyz/627959692251/test-s3-logs",
-			endpoint: "googlecloud.com",
-			wantErr:  errBadQueueURL,
+			name:     "vpce_endpoint",
+			queueURL: "https://vpce-test.sqs.us-east-2.vpce.amazonaws.com/12345678912/sqs-queue",
+			want:     "us-east-2",
 		},
 		{
-			name:     "mismatch_regions_no_default",
-			queueURL: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
-			deflt:    "",
+			name:       "vpce_endpoint_with_region_override",
+			queueURL:   "https://vpce-test.sqs.us-east-2.vpce.amazonaws.com/12345678912/sqs-queue",
+			regionName: "us-west-1",
+			want:       "us-west-1",
+		},
+		{
+			name:     "vpce_endpoint_with_endpoint",
+			queueURL: "https://vpce-test.sqs.us-east-1.vpce.amazonaws.com/12345678912/sqs-queue",
+			endpoint: "amazonaws.com",
 			want:     "us-east-1",
 		},
 		{
-			name:     "mismatch_regions",
-			queueURL: "https://sqs.us-east-1.amazonaws.com/627959692251/test-s3-logs",
-			deflt:    "ap-west-1",
-			want:     "ap-west-1",
-			wantErr:  regionMismatchError{queueURLRegion: "us-east-1", defaultRegion: "ap-west-1"},
+			name:     "non_aws_vpce_with_endpoint",
+			queueURL: "https://vpce-test.sqs.us-east-1.vpce.abc.xyz/12345678912/sqs-queue",
+			endpoint: "abc.xyz",
+			want:     "us-east-1",
 		},
 		{
-			name:     "localstack",
-			queueURL: "http://localhost:4566/000000000000/filebeat-s3-integtest-d9clk9",
-			deflt:    "localstack",
-			want:     "localstack",
+			name:     "non_aws_vpce_without_endpoint",
+			queueURL: "https://vpce-test.sqs.us-east-1.vpce.abc.xyz/12345678912/sqs-queue",
+			wantErr:  errBadQueueURL,
 		},
 		{
-			name:     "localstack_sns",
-			queueURL: "http://localhost:4566/000000000000/filebeat-s3-integtest-sns-d9clk9",
-			deflt:    "localstack_sns",
-			want:     "localstack_sns",
-		},
-		{
-			name:     "invalid_queue_url",
-			queueURL: ":foo",
-			wantErr:  errors.New(":foo is not a valid URL"),
+			name:       "non_aws_vpce_with_region_override",
+			queueURL:   "https://vpce-test.sqs.us-east-1.vpce.abc.xyz/12345678912/sqs-queue",
+			regionName: "us-west-1",
+			want:       "us-west-1",
 		},
 	}
 
 	for _, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			got, err := getRegionFromQueueURL(test.queueURL, test.endpoint, test.deflt)
-			if !sameError(err, test.wantErr) {
+			config := config{
+				QueueURL:   test.queueURL,
+				RegionName: test.regionName,
+				AWSConfig:  awscommon.ConfigAWS{Endpoint: test.endpoint},
+			}
+			in := newSQSReaderInput(config, awssdk.Config{})
+			inputCtx := v2.Context{
+				Logger: logp.NewLogger("awss3_test"),
+				ID:     "test_id",
+			}
+
+			// Run setup and verify that it put the correct region in awsConfig.Region
+			err := in.setup(inputCtx, &fakePipeline{})
+			in.cleanup()
+			got := in.awsConfig.Region // The region passed into the AWS API
+			if !errors.Is(err, test.wantErr) {
 				t.Errorf("unexpected error: got:%v want:%v", err, test.wantErr)
 			}
 			if got != test.want {
@@ -126,13 +156,11 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 	}
 }
 
-func sameError(a, b error) bool {
-	switch {
-	case a == nil && b == nil:
-		return true
-	case a == nil, b == nil:
-		return false
-	default:
-		return a.Error() == b.Error()
-	}
+func newV2Context() (v2.Context, func()) {
+	ctx, cancel := context.WithCancel(context.Background())
+	return v2.Context{
+		Logger:      logp.NewLogger("awss3_test"),
+		ID:          "test_id",
+		Cancelation: ctx,
+	}, cancel
 }
