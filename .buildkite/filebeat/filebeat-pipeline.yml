@@ -205,7 +205,7 @@ steps:
 
       - label: ":mac: MacOS arm64 Unit Tests"
         key: "macos-arm64-unit-tests-extended"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
