@@ -128,6 +128,7 @@ steps:
 
   - group: "Filebeat Extended Tests"
     key: "filebeat-extended-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
 
     steps:
       - label: ":mac: Filebeat macOS x86_64 Unit Tests"
