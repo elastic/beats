@@ -479,7 +479,6 @@ func TestCheckinV2(t *testing.T) {
 	for len(checks) > 0 {
 		select {
 		case observed := <-observedStates:
-			t.Logf("observed: %v", observed)
 			matched, expected := checks[0](t, observed)
 			expectedUnits <- expected
 			if !matched {
