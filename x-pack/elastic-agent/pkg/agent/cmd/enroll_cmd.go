@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/cproto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
@@ -751,7 +751,7 @@ func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessStat
 				continue
 			}
 			log.Debugf("%s: %s - %s", waitingForFleetServer, app.Status, app.Message)
-			if app.Status == proto.Status_DEGRADED || app.Status == proto.Status_HEALTHY {
+			if app.Status == cproto.Status_DEGRADED || app.Status == cproto.Status_HEALTHY {
 				// app has started and is running
 				if app.Message != "" {
 					log.Infof("Fleet Server - %s", app.Message)

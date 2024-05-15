@@ -19,7 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/reexec"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/upgrade"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/cproto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/program"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/core/logger"
@@ -33,7 +33,7 @@ import (
 
 // Server is the daemon side of the control protocol.
 type Server struct {
-	proto.UnimplementedElasticAgentControlServer
+	cproto.UnimplementedElasticAgentControlServer
 
 	logger     *logger.Logger
 	rex        reexec.ExecManager
@@ -87,7 +87,7 @@ func (s *Server) Start() error {
 	}
 	s.listener = lis
 	s.server = grpc.NewServer()
-	proto.RegisterElasticAgentControlServer(s.server, s)
+	cproto.RegisterElasticAgentControlServer(s.server, s)
 
 	// start serving GRPC connections
 	go func() {
@@ -111,8 +111,8 @@ func (s *Server) Stop() {
 }
 
 // Version returns the currently running version.
-func (s *Server) Version(_ context.Context, _ *proto.Empty) (*proto.VersionResponse, error) {
-	return &proto.VersionResponse{
+func (s *Server) Version(_ context.Context, _ *cproto.Empty) (*cproto.VersionResponse, error) {
+	return &cproto.VersionResponse{
 		Version:   release.Version(),
 		Commit:    release.Commit(),
 		BuildTime: release.BuildTime().Format(control.TimeFormat()),
@@ -121,9 +121,9 @@ func (s *Server) Version(_ context.Context, _ *proto.Empty) (*proto.VersionRespo
 }
 
 // Status returns the overall status of the agent.
-func (s *Server) Status(_ context.Context, _ *proto.Empty) (*proto.StatusResponse, error) {
+func (s *Server) Status(_ context.Context, _ *cproto.Empty) (*cproto.StatusResponse, error) {
 	status := s.statusCtrl.Status()
-	return &proto.StatusResponse{
+	return &cproto.StatusResponse{
 		Status:       agentStatusToProto(status.Status),
 		Message:      status.Message,
 		Applications: agentAppStatusToProto(status.Applications),
@@ -131,29 +131,29 @@ func (s *Server) Status(_ context.Context, _ *proto.Empty) (*proto.StatusRespons
 }
 
 // Restart performs re-exec.
-func (s *Server) Restart(_ context.Context, _ *proto.Empty) (*proto.RestartResponse, error) {
+func (s *Server) Restart(_ context.Context, _ *cproto.Empty) (*cproto.RestartResponse, error) {
 	s.rex.ReExec(nil)
-	return &proto.RestartResponse{
-		Status: proto.ActionStatus_SUCCESS,
+	return &cproto.RestartResponse{
+		Status: cproto.ActionStatus_SUCCESS,
 	}, nil
 }
 
 // Upgrade performs the upgrade operation.
-func (s *Server) Upgrade(ctx context.Context, request *proto.UpgradeRequest) (*proto.UpgradeResponse, error) {
+func (s *Server) Upgrade(ctx context.Context, request *cproto.UpgradeRequest) (*cproto.UpgradeResponse, error) {
 	s.lock.RLock()
 	u := s.up
 	s.lock.RUnlock()
 	if u == nil {
 		// not running with upgrader (must be controlled by Fleet)
-		return &proto.UpgradeResponse{
-			Status: proto.ActionStatus_FAILURE,
+		return &cproto.UpgradeResponse{
+			Status: cproto.ActionStatus_FAILURE,
 			Error:  "cannot be upgraded; perform upgrading using Fleet",
 		}, nil
 	}
 	cb, err := u.Upgrade(ctx, &upgradeRequest{request}, false, request.SkipVerify, request.PgpBytes...)
 	if err != nil {
-		return &proto.UpgradeResponse{
-			Status: proto.ActionStatus_FAILURE,
+		return &cproto.UpgradeResponse{
+			Status: cproto.ActionStatus_FAILURE,
 			Error:  err.Error(),
 		}, nil
 	}
@@ -163,8 +163,8 @@ func (s *Server) Upgrade(ctx context.Context, request *proto.UpgradeRequest) (*p
 		<-time.After(time.Second)
 		s.rex.ReExec(cb)
 	}()
-	return &proto.UpgradeResponse{
-		Status:  proto.ActionStatus_SUCCESS,
+	return &cproto.UpgradeResponse{
+		Status:  cproto.ActionStatus_SUCCESS,
 		Version: request.Version,
 	}, nil
 }
@@ -187,13 +187,13 @@ type BeatInfo struct {
 }
 
 // ProcMeta returns version and beat inforation for all running processes.
-func (s *Server) ProcMeta(ctx context.Context, _ *proto.Empty) (*proto.ProcMetaResponse, error) {
+func (s *Server) ProcMeta(ctx context.Context, _ *cproto.Empty) (*cproto.ProcMetaResponse, error) {
 	if s.routeFn == nil {
 		return nil, errors.New("route function is nil")
 	}
 
-	resp := &proto.ProcMetaResponse{
-		Procs: []*proto.ProcMeta{},
+	resp := &cproto.ProcMetaResponse{
+		Procs: []*cproto.ProcMeta{},
 	}
 
 	routes := s.routeFn()
@@ -212,7 +212,7 @@ func (s *Server) ProcMeta(ctx context.Context, _ *proto.Empty) (*proto.ProcMetaR
 		specs := sp.Specs()
 
 		for n, spec := range specs {
-			procMeta := &proto.ProcMeta{
+			procMeta := &cproto.ProcMeta{
 				Name:     n,
 				RouteKey: rk,
 			}
@@ -277,7 +277,7 @@ func (s *Server) ProcMeta(ctx context.Context, _ *proto.Empty) (*proto.ProcMetaR
 }
 
 type upgradeRequest struct {
-	*proto.UpgradeRequest
+	*cproto.UpgradeRequest
 }
 
 func (r *upgradeRequest) Version() string {
@@ -293,27 +293,27 @@ func (r *upgradeRequest) FleetAction() *fleetapi.ActionUpgrade {
 	return nil
 }
 
-func agentStatusToProto(code status.AgentStatusCode) proto.Status {
+func agentStatusToProto(code status.AgentStatusCode) cproto.Status {
 	if code == status.Degraded {
-		return proto.Status_DEGRADED
+		return cproto.Status_DEGRADED
 	}
 	if code == status.Failed {
-		return proto.Status_FAILED
+		return cproto.Status_FAILED
 	}
-	return proto.Status_HEALTHY
+	return cproto.Status_HEALTHY
 }
 
-func agentAppStatusToProto(apps []status.AgentApplicationStatus) []*proto.ApplicationStatus {
-	s := make([]*proto.ApplicationStatus, len(apps))
+func agentAppStatusToProto(apps []status.AgentApplicationStatus) []*cproto.ApplicationStatus {
+	s := make([]*cproto.ApplicationStatus, len(apps))
 	for i, a := range apps {
 		var payload []byte
 		if a.Payload != nil {
 			payload, _ = json.Marshal(a.Payload)
 		}
-		s[i] = &proto.ApplicationStatus{
+		s[i] = &cproto.ApplicationStatus{
 			Id:      a.ID,
 			Name:    a.Name,
-			Status:  proto.Status(a.Status.ToProto()),
+			Status:  cproto.Status(a.Status.ToProto()),
 			Message: a.Message,
 			Payload: string(payload),
 		}
