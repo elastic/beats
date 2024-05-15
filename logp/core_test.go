@@ -612,6 +612,25 @@ func TestTypedLoggerCoreWith(t *testing.T) {
 	}
 }
 
+func TestCreateLogOutputAllDisabled(t *testing.T) {
+	cfg := DefaultConfig(DefaultEnvironment)
+	cfg.toIODiscard = false
+	cfg.toObserver = false
+	cfg.ToEventLog = false
+	cfg.ToFiles = false
+	cfg.ToStderr = false
+	cfg.ToSyslog = false
+
+	out, err := createLogOutput(cfg, zap.DebugLevel)
+	if err != nil {
+		t.Fatalf("did not expect an error calling createLogOutput: %s", err)
+	}
+
+	if out.Enabled(zap.DebugLevel) {
+		t.Fatal("the output must be disabled to all log levels")
+	}
+}
+
 func strField(key, val string) zapcore.Field {
 	return zapcore.Field{Type: zapcore.StringType, Key: key, String: val}
 }
