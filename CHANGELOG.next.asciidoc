@@ -172,6 +172,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Fix error handling in perfmon metrics. {issue}38140[38140] {pull}39404[39404]
 
 *Elastic Logging Plugin*
 
@@ -204,6 +205,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add container id to file events (Linux only, eBPF backend). {pull}38328[38328]
 - Add procfs backend to the `add_session_metadata` processor. {pull}38799[38799]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
+- Reduce data size for add_session_metadata processor by removing unneeded fields {pull}39500[39500]
 
 *Auditbeat*
 
@@ -265,6 +267,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update CEL mito extensions to v1.11.0 to improve type checking. {pull}39460[39460]
 - Improve logging of request and response with request trace logging in error conditions. {pull}39455[39455]
 - Implement Elastic Agent status and health reporting for CEL Filebeat input. {pull}39209[39209]
+- Add HTTP metrics to CEL input. {issue}39501[39501] {pull}39503[39503]
 
 *Auditbeat*
 

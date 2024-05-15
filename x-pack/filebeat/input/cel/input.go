@@ -43,6 +43,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -133,7 +134,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 	rep := env.StatusReporter
 
-	metrics := newInputMetrics(env.ID)
+	metrics, reg := newInputMetrics(env.ID)
 	defer metrics.Close()
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
@@ -143,7 +144,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
-	client, trace, err := newClient(ctx, cfg, log)
+	client, trace, err := newClient(ctx, cfg, log, reg)
 	if err != nil {
 		return err
 	}
@@ -722,7 +723,7 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 	return limit, true
 }
 
-func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client, *httplog.LoggingRoundTripper, error) {
+func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry) (*http.Client, *httplog.LoggingRoundTripper, error) {
 	if !wantClient(cfg) {
 		return nil, nil, nil
 	}
@@ -763,6 +764,10 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 		maxSize := cfg.Resource.Tracer.MaxSize * 1e6
 		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, max(0, maxSize-margin), log)
 		c.Transport = trace
+	}
+
+	if reg != nil {
+		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg)
 	}
 
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
@@ -1106,7 +1111,7 @@ type inputMetrics struct {
 	batchProcessingTime metrics.Sample     // histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
 }
 
-func newInputMetrics(id string) *inputMetrics {
+func newInputMetrics(id string) (*inputMetrics, *monitoring.Registry) {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
 	out := &inputMetrics{
 		unregister:          unreg,
@@ -1124,7 +1129,7 @@ func newInputMetrics(id string) *inputMetrics {
 	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
 
-	return out
+	return out, reg
 }
 
 func (m *inputMetrics) Close() {

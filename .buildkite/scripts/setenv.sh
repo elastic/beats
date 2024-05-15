@@ -2,19 +2,20 @@
 
 set -euo pipefail
 
+WORKSPACE=${WORKSPACE:-"$(pwd)"}
+GO_VERSION=$(cat .go-version)
+
 export REPO="beats"
 export DOCKER_REGISTRY="docker.elastic.co"
 export SETUP_GVM_VERSION="v0.5.1"
 export DOCKER_COMPOSE_VERSION="1.21.0"
 export DOCKER_COMPOSE_VERSION_AARCH64="v2.21.0"
+
 export ASDF_NODEJS_VERSION="18.17.1"
 export AWS_REGION="eu-central-1"
 
-WORKSPACE=${WORKSPACE:-"$(pwd)"}
 export WORKSPACE
-GO_VERSION=$(cat .go-version)
 export GO_VERSION
-
 
 exportVars() {
   local platform_type="$(uname)"
@@ -43,9 +44,6 @@ exportVars() {
 
 if [[ "$BUILDKITE_PIPELINE_SLUG" == "beats-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-metricbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-winlogbeat" || "$BUILDKITE_PIPELINE_SLUG" == "beats-xpack-auditbeat" ]]; then
   exportVars
-  export RACE_DETECTOR="true"
-  export TEST_COVERAGE="true"
-  export DOCKER_PULL="0"
   export TEST_TAGS="${TEST_TAGS:+$TEST_TAGS,}oracle"
 fi
 

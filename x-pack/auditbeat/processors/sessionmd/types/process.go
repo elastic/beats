@@ -356,18 +356,6 @@ func (p *Process) ToMap() mapstr.M {
 		"pid":  p.PID,
 		"vpid": p.Vpid,
 		"args": p.Args,
-		"thread": mapstr.M{
-			"capabilities": mapstr.M{
-				"permitted": p.Thread.Capabilities.Permitted,
-				"effective": p.Thread.Capabilities.Effective,
-			},
-		},
-		"tty": mapstr.M{
-			"char_device": mapstr.M{
-				"major": p.TTY.CharDevice.Major,
-				"minor": p.TTY.CharDevice.Minor,
-			},
-		},
 		"parent": mapstr.M{
 			"entity_id":         p.Parent.EntityID,
 			"executable":        p.Parent.Executable,
@@ -384,12 +372,6 @@ func (p *Process) ToMap() mapstr.M {
 			},
 			"pid":  p.Parent.PID,
 			"args": p.Parent.Args,
-			"thread": mapstr.M{
-				"capabilities": mapstr.M{
-					"permitted": p.Parent.Thread.Capabilities.Permitted,
-					"effective": p.Parent.Thread.Capabilities.Effective,
-				},
-			},
 		},
 		"group_leader": mapstr.M{
 			"entity_id":         p.GroupLeader.EntityID,
