@@ -33,14 +33,13 @@ steps:
     steps:
       - label: ":linux: Auditbeat Ubuntu arm64 Unit Tests"
         key: "auditbeat-extended-arm64-unit-tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
         command: |
           set -euo pipefail
           cd auditbeat
           mage build unitTest
         retry:
           automatic:
-            - limit: 3
+           - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -71,6 +70,31 @@ steps:
           - github_commit_status:
               context: "auditbeat: Ubuntu Unit Tests"
 
+      - label: "Module compat tests: next major"
+        # Run module integration tests under next major of Elastic stack.
+        env:
+          STACK_ENVIRONMENT: "next-major"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet auditbeat
+          echo "~~~ Running tests"
+          cd auditbeat
+          mage pythonIntegTest
+        retry:
+          automatic:
+           - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "auditbeat/build/*.xml"
+          - "auditbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "auditbeat: Module compat tests / next major"
+
       - label: ":linux: Auditbeat Crosscompile"
         command: |
           make -C auditbeat crosscompile
@@ -78,7 +102,7 @@ steps:
           GOX_FLAGS: "-arch amd64"
         retry:
           automatic:
-            - limit: 3
+           - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -87,39 +111,13 @@ steps:
           - github_commit_status:
               context: "auditbeat: Crosscompile"
 
-      - label: ":ubuntu: Auditbeat Shipping To Next Major"
-        command: |
-          set -euo pipefail
-          # defines the MODULE env var based on what's changed in a PR
-          source .buildkite/scripts/changesets.sh
-          defineModuleFromTheChangeSet auditbeat
-
-          echo "~~~ Running tests"
-          cd auditbeat
-          mage pythonIntegTest
-        retry:
-          automatic:
-            - limit: 3
-        env:
-          STACK_ENVIRONMENT: next-major
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_UBUNTU_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "auditbeat: Shipping Next Major"
-
       - label: ":windows: Auditbeat Win-2019 Unit Tests"
         command: |
           Set-Location -Path auditbeat
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -139,7 +137,7 @@ steps:
 
     steps:
       - label: ":mac: Auditbeat macOS x86_64 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
           source .buildkite/scripts/install_macos_tools.sh
