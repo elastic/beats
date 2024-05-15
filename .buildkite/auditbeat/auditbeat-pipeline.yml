@@ -34,7 +34,6 @@ steps:
       - label: ":linux: Auditbeat Ubuntu arm64 Unit Tests"
         key: "auditbeat-extended-arm64-unit-tests"
         command: |
-          set -euo pipefail
           cd auditbeat
           mage build unitTest
         retry:
@@ -53,7 +52,6 @@ steps:
 
       - label: ":ubuntu: Auditbeat Unit Tests"
         command: |
-          set -euo pipefail
           cd auditbeat
           mage build unitTest
         retry:
@@ -102,7 +100,7 @@ steps:
           GOX_FLAGS: "-arch amd64"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -219,7 +217,6 @@ steps:
           PLATFORMS: "+all linux/amd64 linux/arm64 windows/amd64 darwin/amd64"
           SNAPSHOT: true
         command: |
-          set -euo pipefail
           cd auditbeat
           mage package
         retry:
@@ -241,7 +238,6 @@ steps:
           PACKAGES: "docker"
           SNAPSHOT: true
         command: |
-          set -euo pipefail
           cd auditbeat
           mage package
         retry:
