@@ -5,11 +5,16 @@
 package awss3
 
 import (
+	"context"
 	"errors"
 	"testing"
 
-	aws "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/stretchr/testify/assert"
+
+	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
+	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func TestGetProviderFromDomain(t *testing.T) {
@@ -51,7 +56,7 @@ func TestGetProviderFromDomain(t *testing.T) {
 	}
 }
 
-func TestGetRegionFromQueueURL(t *testing.T) {
+func TestRegionSelection(t *testing.T) {
 	tests := []struct {
 		name       string
 		queueURL   string
@@ -129,9 +134,18 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 			config := config{
 				QueueURL:   test.queueURL,
 				RegionName: test.regionName,
-				AWSConfig:  aws.ConfigAWS{Endpoint: test.endpoint},
+				AWSConfig:  awscommon.ConfigAWS{Endpoint: test.endpoint},
 			}
-			got, err := chooseRegion(nil, config)
+			in := newSQSReaderInput(config, awssdk.Config{})
+			inputCtx := v2.Context{
+				Logger: logp.NewLogger("awss3_test"),
+				ID:     "test_id",
+			}
+
+			// Run setup and verify that it put the correct region in awsConfig.Region
+			err := in.setup(inputCtx, &fakePipeline{})
+			in.cleanup()
+			got := in.awsConfig.Region // The region passed into the AWS API
 			if !errors.Is(err, test.wantErr) {
 				t.Errorf("unexpected error: got:%v want:%v", err, test.wantErr)
 			}
@@ -140,4 +154,13 @@ func TestGetRegionFromQueueURL(t *testing.T) {
 			}
 		})
 	}
+}
+
+func newV2Context() (v2.Context, func()) {
+	ctx, cancel := context.WithCancel(context.Background())
+	return v2.Context{
+		Logger:      logp.NewLogger("awss3_test"),
+		ID:          "test_id",
+		Cancelation: ctx,
+	}, cancel
 }
