@@ -40,7 +40,7 @@ func Plugin() v2.Plugin {
 type cloudwatchInputManager struct {
 }
 
-func (im *cloudwatchInputManager) Init(grp unison.Group, mode v2.Mode) error {
+func (im *cloudwatchInputManager) Init(grp unison.Group) error {
 	return nil
 }
 
