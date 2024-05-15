@@ -430,7 +430,7 @@ func interactiveFromTTY(tty types.TTYDev) bool {
 	return TTYUnknown != getTTYType(tty.Major, tty.Minor)
 }
 
-func (db *DB) fullProcessFromDBProcess(p Process) types.Process {
+func fullProcessFromDBProcess(p Process) types.Process {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(p.PIDs.StartTimeNS)
 	interactive := interactiveFromTTY(p.CTTY)
 
@@ -465,7 +465,7 @@ func (db *DB) fullProcessFromDBProcess(p Process) types.Process {
 	return ret
 }
 
-func (db *DB) fillParent(process *types.Process, parent Process) {
+func fillParent(process *types.Process, parent Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(parent.PIDs.StartTimeNS)
 
 	interactive := interactiveFromTTY(parent.CTTY)
@@ -490,7 +490,7 @@ func (db *DB) fillParent(process *types.Process, parent Process) {
 	}
 }
 
-func (db *DB) fillGroupLeader(process *types.Process, groupLeader Process) {
+func fillGroupLeader(process *types.Process, groupLeader Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(groupLeader.PIDs.StartTimeNS)
 
 	interactive := interactiveFromTTY(groupLeader.CTTY)
@@ -515,7 +515,7 @@ func (db *DB) fillGroupLeader(process *types.Process, groupLeader Process) {
 	}
 }
 
-func (db *DB) fillSessionLeader(process *types.Process, sessionLeader Process) {
+func fillSessionLeader(process *types.Process, sessionLeader Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(sessionLeader.PIDs.StartTimeNS)
 
 	interactive := interactiveFromTTY(sessionLeader.CTTY)
@@ -540,7 +540,7 @@ func (db *DB) fillSessionLeader(process *types.Process, sessionLeader Process) {
 	}
 }
 
-func (db *DB) fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Process) {
+func fillEntryLeader(process *types.Process, entryType EntryType, entryLeader Process) {
 	reducedPrecisionStartTime := timeutils.ReduceTimestampPrecision(entryLeader.PIDs.StartTimeNS)
 
 	interactive := interactiveFromTTY(entryLeader.CTTY)
@@ -623,12 +623,12 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 		return types.Process{}, errors.New("process not found")
 	}
 
-	ret := db.fullProcessFromDBProcess(process)
+	ret := fullProcessFromDBProcess(process)
 
 	if process.PIDs.Ppid != 0 {
 		for i := 0; i < retryCount; i++ {
 			if parent, ok := db.processes[process.PIDs.Ppid]; ok {
-				db.fillParent(&ret, parent)
+				fillParent(&ret, parent)
 				break
 			}
 		}
@@ -637,7 +637,7 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 	if process.PIDs.Pgid != 0 {
 		for i := 0; i < retryCount; i++ {
 			if groupLeader, ok := db.processes[process.PIDs.Pgid]; ok {
-				db.fillGroupLeader(&ret, groupLeader)
+				fillGroupLeader(&ret, groupLeader)
 				break
 			}
 		}
@@ -646,7 +646,7 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 	if process.PIDs.Sid != 0 {
 		for i := 0; i < retryCount; i++ {
 			if sessionLeader, ok := db.processes[process.PIDs.Sid]; ok {
-				db.fillSessionLeader(&ret, sessionLeader)
+				fillSessionLeader(&ret, sessionLeader)
 				break
 			}
 		}
@@ -655,7 +655,7 @@ func (db *DB) GetProcess(pid uint32) (types.Process, error) {
 	if entryLeaderPID, foundEntryLeaderPID := db.entryLeaderRelationships[process.PIDs.Tgid]; foundEntryLeaderPID {
 		if entryLeader, foundEntryLeader := db.processes[entryLeaderPID]; foundEntryLeader {
 			// if there is an entry leader then there is a matching member in the entryLeaders table
-			db.fillEntryLeader(&ret, db.entryLeaders[entryLeaderPID], entryLeader)
+			fillEntryLeader(&ret, db.entryLeaders[entryLeaderPID], entryLeader)
 		} else {
 			db.logger.Debugf("failed to find entry leader entry %d for %d (%s)", entryLeaderPID, pid, db.processes[pid].Filename)
 		}

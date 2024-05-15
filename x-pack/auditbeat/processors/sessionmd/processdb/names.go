@@ -14,7 +14,7 @@ import (
 func getUserName(id string) (string, bool) {
 	user, err := user.LookupId(id)
 	if err != nil {
-	  return "", false
+		return "", false
 	}
 	return user.Username, true
 }
@@ -23,7 +23,7 @@ func getUserName(id string) (string, bool) {
 func getGroupName(id string) (string, bool) {
 	group, err := user.LookupGroupId(id)
 	if err != nil {
-	  return "", false
+		return "", false
 	}
 	return group.Name, true
 }
