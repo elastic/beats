@@ -98,8 +98,8 @@ steps:
           image: "${IMAGE_UBUNTU_X86_64}"
           machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
         artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
+          - "libbeat/build/*.xml"
+          - "libbeat/build/*.json"
         notify:
           - github_commit_status:
               context: "libbeat: Module compat tests / next major"
