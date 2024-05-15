@@ -10,6 +10,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/beat"
 )
 
+// SyncDB should ensure the DB is in a state to handle the event before returning.
 type Provider interface {
-	UpdateDB(*beat.Event, uint32) error
+	SyncDB(event *beat.Event, pid uint32) error
 }
