@@ -25,6 +25,10 @@ env:
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "Metricbeat Mandatory Tests"
     key: "metricbeat-mandatory-tests"
