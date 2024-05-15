@@ -189,8 +189,6 @@ steps:
           - github_commit_status:
               context: "packetbeat: Extended MacOS x86_64 Unit Tests"
 
-<<<<<<< HEAD
-=======
       - label: ":mac: MacOS arm64 Unit Tests"
         key: "macos-arm64-unit-tests-extended"
         if: build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
@@ -230,7 +228,6 @@ steps:
           - github_commit_status:
               context: "packetbeat: Extended Ubuntu ARM Unit Tests"
 
->>>>>>> 176e9b8c6d ([BK] - Remove certain steps from running for Branches (#39533))
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
     # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests
