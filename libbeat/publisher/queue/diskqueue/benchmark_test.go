@@ -34,14 +34,11 @@ import (
 	"testing"
 	"time"
 
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
 )
 
 var (
@@ -72,22 +69,6 @@ func makePublisherEvent() publisher.Event {
 	}
 }
 
-// makeMessagesEvent creates a sample *messages.Event, using a random message from msgs list
-func makeMessagesEvent() *messages.Event {
-	return &messages.Event{
-		Timestamp: timestamppb.New(eventTime),
-		Fields: &messages.Struct{
-			Data: map[string]*messages.Value{
-				"message": {
-					Kind: &messages.Value_StringValue{
-						StringValue: msgs[rand.Intn(len(msgs))],
-					},
-				},
-			},
-		},
-	}
-}
-
 // setup creates the disk queue, including a temporary directory to
 // hold the queue.  Location of the temporary directory is stored in
 // the queue settings.  Call `cleanup` when done with the queue to
@@ -99,7 +80,6 @@ func setup(b *testing.B, encrypt bool, compress bool, protobuf bool) (*diskQueue
 		s.EncryptionKey = []byte("testtesttesttest")
 	}
 	s.UseCompression = compress
-	s.UseProtobuf = protobuf
 	q, err := NewQueue(logp.L(), nil, s, nil)
 	if err != nil {
 		panic(err)
@@ -116,14 +96,10 @@ func setup(b *testing.B, encrypt bool, compress bool, protobuf bool) (*diskQueue
 	return q, p
 }
 
-func publishEvents(p queue.Producer, num int, protobuf bool) {
+func publishEvents(p queue.Producer, num int) {
 	for i := 0; i < num; i++ {
 		var e queue.Entry
-		if protobuf {
-			e = makeMessagesEvent()
-		} else {
-			e = makePublisherEvent()
-		}
+		e = makePublisherEvent()
 		_, ok := p.Publish(e)
 		if !ok {
 			panic("didn't publish")
@@ -149,15 +125,15 @@ func getAndAckEvents(q *diskQueue, num_events int, batch_size int) error {
 // produceAndConsume generates and publishes events in a go routine, in
 // the main go routine it consumes and acks them.  This interleaves
 // publish and consume.
-func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int, protobuf bool) error {
-	go publishEvents(p, num_events, protobuf)
+func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
+	go publishEvents(p, num_events)
 	return getAndAckEvents(q, num_events, batch_size)
 }
 
 // produceThenConsume generates and publishes events, when all events
 // are published it consumes and acks them.
-func produceThenConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int, protobuf bool) error {
-	publishEvents(p, num_events, protobuf)
+func produceThenConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
+	publishEvents(p, num_events)
 	return getAndAckEvents(q, num_events, batch_size)
 }
 
@@ -173,11 +149,11 @@ func benchmarkQueue(num_events int, batch_size int, encrypt bool, compress bool,
 		q, p := setup(b, encrypt, compress, protobuf)
 		b.StartTimer()
 		if async {
-			if err = produceAndConsume(p, q, num_events, batch_size, protobuf); err != nil {
+			if err = produceAndConsume(p, q, num_events, batch_size); err != nil {
 				break
 			}
 		} else {
-			if err = produceThenConsume(p, q, num_events, batch_size, protobuf); err != nil {
+			if err = produceThenConsume(p, q, num_events, batch_size); err != nil {
 				break
 			}
 		}

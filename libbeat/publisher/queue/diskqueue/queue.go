@@ -289,16 +289,10 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 }
 
 func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
-	var serializationFormat SerializationFormat
-	if dq.settings.UseProtobuf {
-		serializationFormat = SerializationProtobuf
-	} else {
-		serializationFormat = SerializationCBOR
-	}
 	return &diskQueueProducer{
 		queue:   dq,
 		config:  cfg,
-		encoder: newEventEncoder(serializationFormat),
+		encoder: newEventEncoder(SerializationCBOR),
 		done:    make(chan struct{}),
 	}
 }

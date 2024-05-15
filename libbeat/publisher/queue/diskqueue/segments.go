@@ -251,11 +251,7 @@ func (segment *queueSegment) getReader(queueSettings Settings) (*segmentReader, 
 	// Version 1 is CBOR, Version 2 could be CBOR or ProtoBuf, the
 	// options control which
 	if header.version > 0 {
-		if (header.options & ENABLE_PROTOBUF) == ENABLE_PROTOBUF {
-			sr.serializationFormat = SerializationProtobuf
-		} else {
-			sr.serializationFormat = SerializationCBOR
-		}
+		sr.serializationFormat = SerializationCBOR
 	}
 
 	if (header.options & ENABLE_ENCRYPTION) == ENABLE_ENCRYPTION {
@@ -295,10 +291,6 @@ func (segment *queueSegment) getWriter(queueSettings Settings) (*segmentWriter, 
 
 	if queueSettings.UseCompression {
 		options = options | ENABLE_COMPRESSION
-	}
-
-	if queueSettings.UseProtobuf {
-		options = options | ENABLE_PROTOBUF
 	}
 
 	sw := &segmentWriter{}
