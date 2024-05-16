@@ -44,7 +44,7 @@ func newPulsar(
 		return outputs.Fail(err)
 	}
 
-	return outputs.Success(config0.Queue, config0.BulkMaxSize, config0.MaxRetries, &client{
+	return outputs.Success(config0.Queue, config0.BulkMaxSize, config0.MaxRetries, nil, &client{
 		config:   config0,
 		codec:    codec0,
 		observer: stats,
