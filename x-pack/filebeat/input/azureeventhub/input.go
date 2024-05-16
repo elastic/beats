@@ -214,7 +214,7 @@ func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
 //			a.log.Infof("%s input worker is stopping.", inputName)
 //			if a.processor != nil {
 //				// Tells the processor to stop processing events and release all
-//				// resources (like scheduler, leaser, checkpointer, and client).
+//				// resources (like scheduler, leaser, checkpointer, and pipelineClient).
 //				err := a.processor.Close(context.Background())
 //				if err != nil {
 //					a.log.Errorw("error while closing eventhostprocessor", "error", err)
@@ -240,7 +240,7 @@ func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
 //// 	a.log.Infof("%s input worker is stopping.", inputName)
 //// 	if a.processor != nil {
 //// 		// Tells the processor to stop processing events and release all
-//// 		// resources (like scheduler, leaser, checkpointer, and client).
+//// 		// resources (like scheduler, leaser, checkpointer, and pipelineClient).
 //// 		err := a.processor.Close(context.Background())
 //// 		if err != nil {
 //// 			a.log.Errorw("error while closing eventhostprocessor", "error", err)

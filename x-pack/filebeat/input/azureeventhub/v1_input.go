@@ -24,11 +24,11 @@ import (
 )
 
 type eventHubInputV1 struct {
-	config    azureInputConfig
-	log       *logp.Logger
-	metrics   *inputMetrics
-	processor *eph.EventProcessorHost
-	client    beat.Client
+	config         azureInputConfig
+	log            *logp.Logger
+	metrics        *inputMetrics
+	processor      *eph.EventProcessorHost
+	pipelineClient beat.Client
 }
 
 func newEventHubInputV1(config azureInputConfig, log *logp.Logger) (v2.Input, error) {
@@ -53,12 +53,12 @@ func (in *eventHubInputV1) Run(
 ) error {
 	var err error
 
-	// Create client for publishing events and receive notification of their ACKs.
-	in.client, err = createPipelineClient(pipeline)
+	// Create pipelineClient for publishing events and receive notification of their ACKs.
+	in.pipelineClient, err = createPipelineClient(pipeline)
 	if err != nil {
-		return fmt.Errorf("failed to create pipeline client: %w", err)
+		return fmt.Errorf("failed to create pipeline pipelineClient: %w", err)
 	}
-	defer in.client.Close()
+	defer in.pipelineClient.Close()
 
 	// Setup input metrics
 	inputMetrics := newInputMetrics(inputContext.ID, nil)
