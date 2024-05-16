@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/Azure/go-autorest/autorest/azure"
 	"time"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
@@ -22,6 +23,13 @@ import (
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+var environments = map[string]azure.Environment{
+	azure.ChinaCloud.ResourceManagerEndpoint:        azure.ChinaCloud,
+	azure.GermanCloud.ResourceManagerEndpoint:       azure.GermanCloud,
+	azure.PublicCloud.ResourceManagerEndpoint:       azure.PublicCloud,
+	azure.USGovernmentCloud.ResourceManagerEndpoint: azure.USGovernmentCloud,
+}
 
 type eventHubInputV1 struct {
 	config         azureInputConfig
@@ -305,4 +313,16 @@ func (in *eventHubInputV1) parseMultipleRecords(bMessage []byte) []string {
 	}
 
 	return messages
+}
+
+func getAzureEnvironment(overrideResManager string) (azure.Environment, error) {
+	// if no override is set then the azure public cloud is used
+	if overrideResManager == "" || overrideResManager == "<no value>" {
+		return azure.PublicCloud, nil
+	}
+	if env, ok := environments[overrideResManager]; ok {
+		return env, nil
+	}
+	// can retrieve hybrid env from the resource manager endpoint
+	return azure.EnvironmentFromURL(overrideResManager)
 }
