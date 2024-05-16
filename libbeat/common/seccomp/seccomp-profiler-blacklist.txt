@@ -4,7 +4,6 @@ clock_adjtime
 create_module
 delete_module
 execveat
-fork
 init_module
 mount
 prctl

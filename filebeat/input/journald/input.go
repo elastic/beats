@@ -20,11 +20,14 @@
 package journald
 
 import (
+	"context"
+	"errors"
+	"fmt"
+	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/coreos/go-systemd/v22/sdjournal"
-	"github.com/urso/sderr"
-
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -35,6 +38,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
+	"github.com/urso/sderr"
 )
 
 type journald struct {
@@ -63,21 +67,44 @@ const localSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
 
 const pluginName = "journald"
 
+var ErrSystemdVersionNotSupported = errors.New("systemd version must be >= 255")
+var ErrCannotGetSystemdVersion = errors.New("cannot get systemd version")
+
 // Plugin creates a new journald input plugin for creating a stateful input.
 func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
-	return input.Plugin{
+	m := &cursor.InputManager{
+		Logger:     log,
+		StateStore: store,
+		Type:       pluginName,
+		Configure:  configure,
+	}
+	p := input.Plugin{
 		Name:       pluginName,
 		Stability:  feature.Experimental,
 		Deprecated: false,
 		Info:       "journald input",
 		Doc:        "The journald input collects logs from the local journald service",
-		Manager: &cursor.InputManager{
-			Logger:     log,
-			StateStore: store,
-			Type:       pluginName,
-			Configure:  configure,
-		},
+		Manager:    m,
 	}
+
+	version, err := getJournaldVersion()
+	if err != nil {
+		configErr := fmt.Errorf("%w: %s", ErrCannotGetSystemdVersion, err)
+		m.Configure = func(_ *conf.C) ([]cursor.Source, cursor.Input, error) {
+			return nil, nil, configErr
+		}
+		return p
+	}
+
+	if version < 255 {
+		configErr := fmt.Errorf("%w. Systemd version: %d", ErrSystemdVersionNotSupported, version)
+		m.Configure = func(_ *conf.C) ([]cursor.Source, cursor.Input, error) {
+			return nil, nil, configErr
+		}
+		return p
+	}
+
+	return p
 }
 
 type pathSource string
@@ -302,4 +329,26 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 	}
 
 	return m, nil
+}
+func getJournaldVersion() (int, error) {
+	cmd := exec.CommandContext(context.Background(), "journalctl", "--version")
+	outputBytes, err := cmd.CombinedOutput()
+	if err != nil {
+		return 0, fmt.Errorf("cannot call journald. Err: '%w'. Output: '%s'", err, string(outputBytes))
+	}
+
+	return parseJournaldVersion(string(outputBytes))
+}
+
+func parseJournaldVersion(output string) (int, error) {
+	lines := strings.Split(output, "\n")
+	if len(lines) < 2 {
+		return 0, fmt.Errorf("unexpected format for version command. Returned value: '%s'", output)
+	}
+
+	versionLine := lines[0]
+	version := 0
+	_, err := fmt.Sscanf(versionLine, "systemd %d", &version)
+
+	return version, err
 }

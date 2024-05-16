@@ -72,7 +72,7 @@ func (e *inputTestingEnvironment) mustCreateInput(config map[string]interface{})
 	e.t.Helper()
 	e.grp = unison.TaskGroup{}
 	manager := e.getManager()
-	if err := manager.Init(&e.grp, v2.ModeRun); err != nil {
+	if err := manager.Init(&e.grp); err != nil {
 		e.t.Fatalf("failed to initialise manager: %+v", err)
 	}
 

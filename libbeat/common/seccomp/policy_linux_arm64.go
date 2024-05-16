@@ -27,6 +27,7 @@ func init() {
 				Action: seccomp.ActionErrno,
 				Names: []string{
 					"execveat",
+					"fork",
 				},
 			},
 		},

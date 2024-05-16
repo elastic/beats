@@ -61,6 +61,7 @@ func init() {
 					"fcntl",
 					"fdatasync",
 					"flock",
+					"fork",
 					"fstat",
 					"fstatfs",
 					"fsync",

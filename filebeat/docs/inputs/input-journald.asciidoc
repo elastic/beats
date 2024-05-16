@@ -13,6 +13,9 @@ https://www.freedesktop.org/software/systemd/man/systemd-journald.service.html[`
 is a system service that collects and stores logging data. The `journald` input
 reads this log data and the metadata associated with it.
 
+WARNING: There is bug in journald < v255 that causes {beatname_uc} to
+crash. Only use this input with journald >= v255.
+
 The simplest configuration example is one that reads all logs from the default
 journal.
 
