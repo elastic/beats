@@ -113,6 +113,8 @@ steps:
           - github_commit_status:
               context: "x-pack/osquerybeat: Windows 10 Unit Tests"
 
+      # Windows 11 wasn't defined in Jenkins, hence not migrating -> https://github.com/elastic/beats/blob/f021699c4bc9a494d255eb339c819c2745eb87f8/x-pack/osquerybeat/Jenkinsfile.yml#L50-L53
+
       # contrary to other projects Windows 2016 is defined as extended for 7.17 -> https://github.com/elastic/beats/blob/ec9d1ccb50b947ed7d6c49d2e17a2cd611a251a9/x-pack/osquerybeat/Jenkinsfile.yml#L40-L44
       - label: ":windows: Windows 2016 Unit Tests"
         command: |
@@ -156,6 +158,8 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: MacOS x86_64 Unit Tests"
+
+      # macOS arm64 is not tested on 7.17 see https://github.com/elastic/beats/blob/ec9d1ccb50b947ed7d6c49d2e17a2cd611a251a9/x-pack/osquerybeat/Jenkinsfile.yml#L22-L34
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
