@@ -170,15 +170,16 @@ func (s bySegmentID) Less(i, j int) bool { return s[i].id < s[j].id }
 // Scan the given path for segment files, and return them in a list
 // ordered by segment id.
 func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment, error) {
-	entries, err := os.ReadDir(pathStr)
+	segmentFiles, err := os.ReadDir(pathStr)
 	if err != nil {
 		return nil, fmt.Errorf("could not read queue directory '%s': %w", pathStr, err)
 	}
-	files := make([]fs.FileInfo, 0, len(entries))
-	for _, entry := range entries {
+	files := make([]fs.FileInfo, 0, len(segmentFiles))
+	for _, entry := range segmentFiles {
 		info, err := entry.Info()
 		if err != nil {
-			return nil, fmt.Errorf("could not get info for file '%s': %w", info.Name(), err)
+			logger.Errorf("could not get info for file '%s': %w. Skipping it", info.Name(), err)
+			continue
 		}
 		files = append(files, info)
 	}
