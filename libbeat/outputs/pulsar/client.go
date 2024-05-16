@@ -83,7 +83,7 @@ func (c *client) Close() error {
 
 	var err error = nil
 	if c.producer != nil {
-		err = c.producer.Flush()
+		err = c.producer.FlushWithCtx(context.Background())
 		c.producer.Close()
 	}
 	if c.client != nil {
