@@ -41,7 +41,7 @@ type FilterJourneyConfig struct {
 // This is practically just used by synthexec_unix.go to add Sysprocattrs
 // It's still nice for devs to be able to test browser monitors on OSX
 // where these are unsupported
-var platformCmdMutate func(*exec.Cmd) = func(*exec.Cmd) {}
+var platformCmdMutate func(*SynthCmd) = func(*SynthCmd) {}
 
 var SynthexecTimeout struct{}
 
@@ -57,13 +57,13 @@ func ProjectJob(ctx context.Context, projectPath string, params mapstr.M, filter
 	return startCmdJob(ctx, cmdFactory, nil, params, filterJourneys, fields), nil
 }
 
-func projectCommandFactory(projectPath string, args ...string) (func() *exec.Cmd, error) {
+func projectCommandFactory(projectPath string, args ...string) (func() *SynthCmd, error) {
 	npmRoot, err := getNpmRoot(projectPath)
 	if err != nil {
 		return nil, err
 	}
 
-	newCmd := func() *exec.Cmd {
+	newCmd := func() *SynthCmd {
 		bin := filepath.Join(npmRoot, "node_modules/.bin/elastic-synthetics")
 		// Always put the project path first to prevent conflation with variadic args!
 		// See https://github.com/tj/commander.js/blob/master/docs/options-taking-varying-arguments.md
@@ -71,7 +71,7 @@ func projectCommandFactory(projectPath string, args ...string) (func() *exec.Cmd
 		// to the end.
 		cmd := exec.Command(bin, append([]string{projectPath}, args...)...)
 		cmd.Dir = npmRoot
-		return cmd
+		return &SynthCmd{cmd}
 	}
 
 	return newCmd, nil
@@ -79,8 +79,8 @@ func projectCommandFactory(projectPath string, args ...string) (func() *exec.Cmd
 
 // InlineJourneyJob returns a job that runs the given source as a single journey.
 func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, fields stdfields.StdMonitorFields, extraArgs ...string) jobs.Job {
-	newCmd := func() *exec.Cmd {
-		return exec.Command("elastic-synthetics", append(extraArgs, "--inline")...) //nolint:gosec // we are safely building a command here, users can add args at their own risk
+	newCmd := func() *SynthCmd {
+		return &SynthCmd{exec.Command("elastic-synthetics", append(extraArgs, "--inline")...)} //nolint:gosec // we are safely building a command here, users can add args at their own risk
 	}
 
 	return startCmdJob(ctx, newCmd, &script, params, FilterJourneyConfig{}, fields)
@@ -89,7 +89,7 @@ func InlineJourneyJob(ctx context.Context, script string, params mapstr.M, field
 // startCmdJob adapts commands into a heartbeat job. This is a little awkward given that the command's output is
 // available via a sequence of events in the multiplexer, while heartbeat jobs are tail recursive continuations.
 // Here, we adapt one to the other, where each recursive job pulls another item off the chan until none are left.
-func startCmdJob(ctx context.Context, newCmd func() *exec.Cmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
+func startCmdJob(ctx context.Context, newCmd func() *SynthCmd, stdinStr *string, params mapstr.M, filterJourneys FilterJourneyConfig, sFields stdfields.StdMonitorFields) jobs.Job {
 	return func(event *beat.Event) ([]jobs.Job, error) {
 		senr := newStreamEnricher(sFields)
 		mpx, err := runCmd(ctx, newCmd(), stdinStr, params, filterJourneys)
@@ -124,7 +124,7 @@ func readResultsJob(ctx context.Context, synthEvents <-chan *SynthEvent, enrich 
 // the params var as a CLI argument.
 func runCmd(
 	ctx context.Context,
-	cmd *exec.Cmd,
+	cmd *SynthCmd,
 	stdinStr *string,
 	params mapstr.M,
 	filterJourneys FilterJourneyConfig,
@@ -151,12 +151,9 @@ func runCmd(
 		cmd.Args = append(cmd.Args, "--match", filterJourneys.Match)
 	}
 
-	// Variant of the command with no params, which could contain sensitive stuff
-	loggableCmd := exec.Command(cmd.Path, cmd.Args...) //nolint:gosec // we are safely building a command here...
 	if len(params) > 0 {
 		paramsBytes, _ := json.Marshal(params)
 		cmd.Args = append(cmd.Args, "--params", string(paramsBytes))
-		loggableCmd.Args = append(loggableCmd.Args, "--params", fmt.Sprintf("\"{%d hidden params}\"", len(params)))
 	}
 
 	// We need to pass both files in here otherwise we get a broken pipe, even
@@ -166,10 +163,10 @@ func runCmd(
 	// see the docs for ExtraFiles in https://golang.org/pkg/os/exec/#Cmd
 	cmd.Args = append(cmd.Args, "--outfd", "3")
 
-	logp.Info("Running command: %s in directory: '%s'", loggableCmd.String(), cmd.Dir)
+	logp.L().Info("Running command: %s in directory: '%s'", cmd, cmd.Dir)
 
 	if stdinStr != nil {
-		logp.Debug(debugSelector, "Using stdin str %s", *stdinStr)
+		logp.L().Debug(debugSelector, "Using stdin str %s", *stdinStr)
 		cmd.Stdin = strings.NewReader(*stdinStr)
 	}
 
@@ -184,7 +181,7 @@ func runCmd(
 	go func() {
 		err := scanToSynthEvents(stdoutPipe, stdoutToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
-			logp.Warn("could not scan stdout events from synthetics: %s", err)
+			logp.L().Warn("could not scan stdout events from synthetics: %s", err)
 		}
 
 		wg.Done()
@@ -198,7 +195,7 @@ func runCmd(
 	go func() {
 		err := scanToSynthEvents(stderrPipe, stderrToSynthEvent, mpx.writeSynthEvent)
 		if err != nil {
-			logp.Warn("could not scan stderr events from synthetics: %s", err)
+			logp.L().Warn("could not scan stderr events from synthetics: %s", err)
 		}
 		wg.Done()
 	}()
@@ -247,7 +244,7 @@ func runCmd(
 
 	err = <-cmdStarted
 	if err != nil {
-		logp.Warn("Could not start command %s: %s", cmd, err)
+		logp.L().Warn("Could not start command %s: %s", cmd, err)
 		return nil, err
 	}
 
@@ -264,7 +261,7 @@ func runCmd(
 
 		err := cmd.Process.Kill()
 		if err != nil {
-			logp.Warn("could not kill synthetics process: %s", err)
+			logp.L().Warn("could not kill synthetics process: %s", err)
 		}
 	}()
 
@@ -272,19 +269,19 @@ func runCmd(
 	go func() {
 		err := <-cmdDone
 		_ = jsonWriter.Close()
-		logp.Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), loggableCmd.String())
+		logp.L().Info("Command has completed(%d): %s", cmd.ProcessState.ExitCode(), cmd)
 
 		var cmdError *SynthError = nil
 		if err != nil {
 			// err could be generic or it could have been killed by context timeout, log and check context
 			// to decide which error to stream
-			logp.Warn("Error executing command '%s' (%d): %s", loggableCmd.String(), cmd.ProcessState.ExitCode(), err)
+			logp.L().Warn("Error executing command '%s' (%d): %s", cmd, cmd.ProcessState.ExitCode(), err)
 
 			if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 				timeout, _ := ctx.Value(SynthexecTimeout).(time.Duration)
-				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(timeout, loggableCmd.String()))
+				cmdError = ECSErrToSynthError(ecserr.NewCmdTimeoutStatusErr(timeout, cmd.String()))
 			} else {
-				cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), loggableCmd.String()))
+				cmdError = ECSErrToSynthError(ecserr.NewBadCmdStatusErr(cmd.ProcessState.ExitCode(), cmd.String()))
 			}
 		}
 
@@ -315,7 +312,7 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 	for scanner.Scan() {
 		se, err := transform(scanner.Bytes(), scanner.Text())
 		if err != nil {
-			logp.Warn("error parsing line: %s for line: %s", err, scanner.Text())
+			logp.L().Warn("error parsing line: %s for line: %s", err, scanner.Text())
 			continue
 		}
 		if se != nil {
@@ -324,7 +321,7 @@ func scanToSynthEvents(rdr io.ReadCloser, transform func(bytes []byte, text stri
 	}
 
 	if scanner.Err() != nil {
-		logp.Warn("error scanning synthetics runner results %s", scanner.Err())
+		logp.L().Warn("error scanning synthetics runner results %s", scanner.Err())
 		return scanner.Err()
 	}
 
@@ -337,7 +334,7 @@ var stderrToSynthEvent = lineToSynthEventFactory(Stderr)
 // lineToSynthEventFactory is a factory that can take a line from the scanner and transform it into a *SynthEvent.
 func lineToSynthEventFactory(typ string) func(bytes []byte, text string) (res *SynthEvent, err error) {
 	return func(bytes []byte, text string) (res *SynthEvent, err error) {
-		logp.Info("%s: %s", typ, text)
+		logp.L().Info("%s: %s", typ, text)
 		return &SynthEvent{
 			Type:                 typ,
 			TimestampEpochMicros: float64(time.Now().UnixMicro()),
