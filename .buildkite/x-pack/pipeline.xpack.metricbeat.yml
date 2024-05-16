@@ -251,7 +251,7 @@ steps:
         key: "x-pack-metricbeat-extended-cloud-test"
         skip: "Not a stage on Jenkins & elastic/ingest-dev#3170"
         # https://github.com/elastic/ingest-dev/issues/3170
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false"  || build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*aws.*/
         command: |
           set -euo pipefail
           # defines the MODULE env var based on what's changed in a PR
