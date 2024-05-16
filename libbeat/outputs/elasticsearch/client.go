@@ -424,25 +424,27 @@ func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, dat
 		} else if status < 500 {
 			// hard failure, apply policy action
 			if encodedEvent.deadLetter {
-				stats.nonIndexable++
+				// Fatal error while sending an already-failed event to the dead letter
+				// index, drop.
 				client.log.Errorf("Can't deliver to dead letter index event (status=%v). Enable debug logs to view the event and cause.", status)
 				client.log.Debugf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
-				// poison pill - this will clog the pipeline if the underlying failure is non transient.
-			} else if client.deadLetterIndex != "" {
-				// Send this failure to the dead letter index.
-				// We count this as a "retryable failure", then if the dead letter
-				// ingestion succeeds it is counted in the "deadLetter" counter
-				// rather than the "acked" counter.
-				stats.fails++
-				client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Enable debug logs to view the event and cause.", status)
-				client.log.Debugf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
-				client.setDeadLetter(encodedEvent, status, string(msg))
-			} else { // drop
 				stats.nonIndexable++
+				continue
+			}
+			if client.deadLetterIndex == "" {
+				// Fatal error and no dead letter index, drop.
 				client.log.Warnf("Cannot index event (status=%v): dropping event! Enable debug logs to view the event and cause.", status)
 				client.log.Debugf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
+				stats.nonIndexable++
+				continue
 			}
-			continue
+			// Send this failure to the dead letter index and "retry".
+			// We count this as a "retryable failure", then if the dead letter
+			// ingestion succeeds it is counted in the "deadLetter" counter
+			// rather than the "acked" counter.
+			client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Enable debug logs to view the event and cause.", status)
+			client.log.Debugf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
+			client.setDeadLetter(encodedEvent, status, string(msg))
 		}
 
 		client.log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)

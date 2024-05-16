@@ -263,7 +263,7 @@ func TestCollectPublishFailsNone(t *testing.T) {
 		events[i] = publisher.Event{Content: beat.Event{Fields: event}}
 	}
 
-	res, _ := client.bulkCollectPublishFails(response, events)
+	res, _ := client.bulkCollectPublishFails(response, encodeEvents(client, events))
 	assert.Equal(t, 0, len(res))
 }
 
@@ -284,9 +284,10 @@ func TestCollectPublishFailMiddle(t *testing.T) {
     ]}
   `)
 
-	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}}
-	eventFail := publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}}
-	events := []publisher.Event{event, eventFail, event}
+	event1 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 1}}})
+	event2 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 2}}})
+	eventFail := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"field": 3}}})
+	events := []publisher.Event{event1, eventFail, event2}
 
 	res, stats := client.bulkCollectPublishFails(response, events)
 	assert.Equal(t, 1, len(res))
@@ -332,10 +333,10 @@ func TestCollectPublishFailDeadLetterQueue(t *testing.T) {
     ]}
   `)
 
-	event := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 1}}}
+	event1 := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 1}}}
 	event2 := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 2}}}
 	eventFail := publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": "bar1"}}}
-	events := encodeEvents(client, []publisher.Event{event, eventFail, event2})
+	events := encodeEvents(client, []publisher.Event{event1, eventFail, event2})
 
 	res, stats := client.bulkCollectPublishFails(response, events)
 	assert.Equal(t, 1, len(res))
