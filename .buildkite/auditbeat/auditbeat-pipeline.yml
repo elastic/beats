@@ -38,7 +38,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -56,7 +56,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -81,7 +81,7 @@ steps:
           mage pythonIntegTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -143,7 +143,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -166,7 +166,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -187,7 +187,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"

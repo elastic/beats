@@ -42,7 +42,7 @@ steps:
           mage update build test
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -61,7 +61,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9_X86_64}"
@@ -80,7 +80,7 @@ steps:
         key: "mandatory-win-2022-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -101,7 +101,7 @@ steps:
         key: "mandatory-win-2016-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -126,7 +126,7 @@ steps:
         key: "extended-win-2019-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -147,7 +147,7 @@ steps:
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -168,7 +168,7 @@ steps:
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -194,7 +194,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_X86_64}"
@@ -213,7 +213,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "orka"
           imagePrefix: "${IMAGE_MACOS_ARM}"
@@ -234,7 +234,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${IMAGE_UBUNTU_ARM_64}"

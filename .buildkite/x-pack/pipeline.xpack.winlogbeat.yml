@@ -23,7 +23,6 @@ steps:
   - group: "x-pack/Winlogbeat Mandatory Tests"
     key: "x-pack-winlogbeat-mandatory-tests"
     steps:
-
       - label: ":windows: x-pack/Winlogbeat Win-2019 Unit (MODULE) Tests"
         key: "mandatory-win-2019-module-unit-tests"
         command: |
@@ -34,7 +33,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -55,7 +54,7 @@ steps:
         key: "mandatory-win-2022-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -99,7 +98,7 @@ steps:
         key: "extended-win-10-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
@@ -120,7 +119,7 @@ steps:
         key: "extended-win-11-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -141,7 +140,7 @@ steps:
         key: "extended-win-2019-unit-tests"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
