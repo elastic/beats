@@ -10,7 +10,6 @@ env:
 
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
@@ -20,6 +19,10 @@ env:
 
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
+
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
 
 steps:
   - group: "x-pack/osquerybeat Mandatory Tests"

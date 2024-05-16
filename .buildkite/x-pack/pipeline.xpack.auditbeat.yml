@@ -22,6 +22,10 @@ env:
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "x-pack/auditbeat Mandatory Tests"
     key: "x-pack-auditbeat-mandatory-tests"
@@ -33,7 +37,7 @@ steps:
           # defines the MODULE env var based on what's changed in a PR
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet x-pack/auditbeat
-          echo "~~~ Will run tests with env var MODULE=$$MODULE"
+          echo "~~~ Running tests"
           cd x-pack/auditbeat
           mage update build test
         retry:
@@ -180,7 +184,7 @@ steps:
 
   - group: "x-pack/auditbeat MacOS Extended Tests"
     key: "x-pack-auditbeat-extended-tests-macos"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+    if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
       - label: ":mac: MacOS x86_64 Unit Tests"
         command: |

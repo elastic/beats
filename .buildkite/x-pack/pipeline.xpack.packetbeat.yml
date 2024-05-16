@@ -16,6 +16,10 @@ env:
   #Deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "x-pack/packetbeat Mandatory Tests"
     key: "x-pack-packetbeat-mandatory-tests"
@@ -257,7 +261,7 @@ steps:
 
   - group: "x-pack/packetbeat MacOS Extended Tests"
     key: "x-pack-packetbeat-extended-macos-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+    if: build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
     steps:
       - label: ":mac: MacOS Unit Tests"
         key: "extended-macos-unit-tests"
