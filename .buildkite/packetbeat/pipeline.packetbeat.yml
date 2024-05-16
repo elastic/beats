@@ -168,27 +168,6 @@ steps:
           - github_commit_status:
               context: "packetbeat: Extended Windows 11 Unit Tests"
 
-      - label: ":windows: Windows 2019 Unit Tests"
-        command: |
-          Set-Location -Path packetbeat
-          mage build unitTest
-        key: "extended-win-2019-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "packetbeat/build/*.xml"
-          - "packetbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "packetbeat: Extended Windows 2019 Unit Tests"
-
   - group: "Extended Tests"
     key: "extended-tests"
     steps:
