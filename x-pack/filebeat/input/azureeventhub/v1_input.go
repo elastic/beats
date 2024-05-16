@@ -12,8 +12,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Azure/go-autorest/autorest/azure"
-
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/Azure/azure-event-hubs-go/v3/eph"
 	"github.com/Azure/azure-event-hubs-go/v3/storage"
@@ -344,16 +342,4 @@ func (in *eventHubInputV1) unpackRecords(bMessage []byte) []string {
 	}
 
 	return messages
-}
-
-func getAzureEnvironment(overrideResManager string) (azure.Environment, error) {
-	// if no override is set then the azure public cloud is used
-	if overrideResManager == "" || overrideResManager == "<no value>" {
-		return azure.PublicCloud, nil
-	}
-	if env, ok := environments[overrideResManager]; ok {
-		return env, nil
-	}
-	// can retrieve hybrid env from the resource manager endpoint
-	return azure.EnvironmentFromURL(overrideResManager)
 }
