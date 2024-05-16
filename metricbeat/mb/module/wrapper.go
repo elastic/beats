@@ -199,13 +199,13 @@ func (msw *metricSetWrapper) run(done <-chan struct{}, out chan<- beat.Event) {
 	}
 
 	switch ms := msw.MetricSet.(type) {
-	case mb.PushMetricSet:
+	case mb.PushMetricSet: //nolint:staticcheck // PushMetricSet is deprecated but not removed
 		ms.Run(reporter.V1())
 	case mb.PushMetricSetV2:
 		ms.Run(reporter.V2())
 	case mb.PushMetricSetV2WithContext:
 		ms.Run(&channelContext{done}, reporter.V2())
-	case mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext:
+	case mb.ReportingMetricSet, mb.ReportingMetricSetV2, mb.ReportingMetricSetV2Error, mb.ReportingMetricSetV2WithContext: //nolint:staticcheck // ReportingMetricSet is deprecated but not removed
 		msw.startPeriodicFetching(&channelContext{done}, reporter)
 	default:
 		// Earlier startup stages prevent this from happening.
@@ -242,7 +242,7 @@ func (msw *metricSetWrapper) startPeriodicFetching(ctx context.Context, reporter
 // and log a stack track if one occurs.
 func (msw *metricSetWrapper) fetch(ctx context.Context, reporter reporter) {
 	switch fetcher := msw.MetricSet.(type) {
-	case mb.ReportingMetricSet:
+	case mb.ReportingMetricSet: //nolint:staticcheck // ReportingMetricSet is deprecated but not removed
 		reporter.StartFetchTimer()
 		fetcher.Fetch(reporter.V1())
 	case mb.ReportingMetricSetV2:
@@ -292,7 +292,7 @@ func (msw *metricSetWrapper) Test(d testing.Driver) {
 
 type reporter interface {
 	StartFetchTimer()
-	V1() mb.PushReporter
+	V1() mb.PushReporter //nolint:staticcheck // PushReporter is deprecated but not removed
 	V2() mb.PushReporterV2
 }
 
@@ -309,7 +309,7 @@ type eventReporter struct {
 // startFetchTimer demarcates the start of a new fetch. The elapsed time of a
 // fetch is computed based on the time of this call.
 func (r *eventReporter) StartFetchTimer() { r.start = time.Now() }
-func (r *eventReporter) V1() mb.PushReporter {
+func (r *eventReporter) V1() mb.PushReporter { //nolint:staticcheck // PushReporter is deprecated but not removed
 	return reporterV1{v2: r.V2(), module: r.msw.module.Name()}
 }
 func (r *eventReporter) V2() mb.PushReporterV2 { return reporterV2{r} }

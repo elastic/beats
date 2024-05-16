@@ -213,10 +213,6 @@ output.elasticsearch:
   # Array of hosts to connect to.
   hosts: ["localhost:9200"]
 
-  # Performance preset - one of "balanced", "throughput", "scale",
-  # "latency", or "custom".
-  preset: balanced
-
   # Protocol - either `http` (default) or `https`.
   #protocol: "https"
 
@@ -224,6 +220,9 @@ output.elasticsearch:
   #api_key: "id:api_key"
   #username: "elastic"
   #password: "changeme"
+
+  # Pipeline to route events to protocol pipelines.
+  pipeline: "packetbeat-%{[agent.version]}-routing"
 
 # ------------------------------ Logstash Output -------------------------------
 #output.logstash:

@@ -26,10 +26,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -55,6 +55,7 @@ type BeatProc struct {
 	logFileOffset       int64
 	t                   *testing.T
 	tempDir             string
+	stdin               io.WriteCloser
 	stdout              *os.File
 	stderr              *os.File
 	Process             *os.Process
@@ -90,7 +91,7 @@ type Total struct {
 	Value int `json:"value"`
 }
 
-// NewBeat createa a new Beat process from the system tests binary.
+// NewBeat creates a new Beat process from the system tests binary.
 // It sets some required options like the home path, logging, etc.
 // `tempDir` will be used as home and logs directory for the Beat
 // `args` will be passed as CLI arguments to the Beat
@@ -98,10 +99,12 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 	require.FileExistsf(t, binary, "beat binary must exists")
 	tempDir := createTempDir(t)
 	configFile := filepath.Join(tempDir, beatName+".yml")
+
 	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
 	require.NoError(t, err, "error creating stdout file")
 	stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
 	require.NoError(t, err, "error creating stderr file")
+
 	p := BeatProc{
 		Binary: binary,
 		baseArgs: append([]string{
@@ -111,6 +114,7 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 			"--path.logs", tempDir,
 			"-E", "logging.to_files=true",
 			"-E", "logging.files.rotateeverybytes=104857600", // About 100MB
+			"-E", "logging.files.rotateonstartup=false",
 		}, args...),
 		tempDir:    tempDir,
 		beatName:   beatName,
@@ -123,31 +127,47 @@ func NewBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
 		if !t.Failed() {
 			return
 		}
-		var maxlen int64 = 2048
-		stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
-		if err != nil {
-			t.Logf("error reading stderr: %s", err)
-		}
-		t.Logf("Last %d bytes of stderr:\n%s", len(stderr), string(stderr))
+		reportErrors(t, tempDir, beatName)
+	})
+	return &p
+}
 
-		stdout, err := readLastNBytes(filepath.Join(tempDir, "stdout"), maxlen)
-		if err != nil {
-			t.Logf("error reading stdout: %s", err)
-		}
-		t.Logf("Last %d bytes of stdout:\n%s", len(stdout), string(stdout))
+// NewAgentBeat creates a new agentbeat process that runs the beatName as a subcommand.
+// See `NewBeat` for options and information for the parameters.
+func NewAgentBeat(t *testing.T, beatName, binary string, args ...string) *BeatProc {
+	require.FileExistsf(t, binary, "agentbeat binary must exists")
+	tempDir := createTempDir(t)
+	configFile := filepath.Join(tempDir, beatName+".yml")
 
-		glob := fmt.Sprintf("%s-*.ndjson", filepath.Join(tempDir, beatName))
-		files, err := filepath.Glob(glob)
-		if err != nil {
-			t.Logf("glob error with: %s: %s", glob, err)
+	stdoutFile, err := os.Create(filepath.Join(tempDir, "stdout"))
+	require.NoError(t, err, "error creating stdout file")
+	stderrFile, err := os.Create(filepath.Join(tempDir, "stderr"))
+	require.NoError(t, err, "error creating stderr file")
+
+	p := BeatProc{
+		Binary: binary,
+		baseArgs: append([]string{
+			"agentbeat",
+			"--systemTest",
+			beatName,
+			"--path.home", tempDir,
+			"--path.logs", tempDir,
+			"-E", "logging.to_files=true",
+			"-E", "logging.files.rotateeverybytes=104857600", // About 100MB
+			"-E", "logging.files.rotateonstartup=false",
+		}, args...),
+		tempDir:    tempDir,
+		beatName:   beatName,
+		configFile: configFile,
+		t:          t,
+		stdout:     stdoutFile,
+		stderr:     stderrFile,
+	}
+	t.Cleanup(func() {
+		if !t.Failed() {
+			return
 		}
-		for _, f := range files {
-			contents, err := readLastNBytes(f, maxlen)
-			if err != nil {
-				t.Logf("error reading %s: %s", f, err)
-			}
-			t.Logf("Last %d bytes of %s:\n%s", len(contents), f, string(contents))
-		}
+		reportErrors(t, tempDir, beatName)
 	})
 	return &p
 }
@@ -213,15 +233,27 @@ func (b *BeatProc) Start(args ...string) {
 func (b *BeatProc) startBeat() {
 	b.cmdMutex.Lock()
 	defer b.cmdMutex.Unlock()
+
 	_, _ = b.stdout.Seek(0, 0)
 	_ = b.stdout.Truncate(0)
 	_, _ = b.stderr.Seek(0, 0)
 	_ = b.stderr.Truncate(0)
-	var procAttr os.ProcAttr
-	procAttr.Files = []*os.File{os.Stdin, b.stdout, b.stderr}
-	process, err := os.StartProcess(b.fullPath, b.Args, &procAttr)
+
+	cmd := exec.Cmd{
+		Path:   b.fullPath,
+		Args:   b.Args,
+		Stdout: b.stdout,
+		Stderr: b.stderr,
+	}
+
+	var err error
+	b.stdin, err = cmd.StdinPipe()
+	require.NoError(b.t, err, "could not get cmd StdinPipe")
+
+	err = cmd.Start()
 	require.NoError(b.t, err, "error starting beat process")
-	b.Process = process
+
+	b.Process = cmd.Process
 }
 
 // waitBeatToExit blocks until the Beat exits, it returns
@@ -508,11 +540,15 @@ func (b *BeatProc) LoadMeta() (Meta, error) {
 	}
 	defer metaFile.Close()
 
-	metaBytes, err := ioutil.ReadAll(metaFile)
+	metaBytes, err := io.ReadAll(metaFile)
 	require.NoError(b.t, err, "error reading meta file")
 	err = json.Unmarshal(metaBytes, &m)
 	require.NoError(b.t, err, "error unmarshalling meta data")
 	return m, nil
+}
+
+func (b *BeatProc) Stdin() io.WriteCloser {
+	return b.stdin
 }
 
 func GetESURL(t *testing.T, scheme string) url.URL {
@@ -664,4 +700,75 @@ func readLastNBytes(filename string, numBytes int64) ([]byte, error) {
 		return nil, fmt.Errorf("error seeking to %d in %s: %w", startPosition, filename, err)
 	}
 	return io.ReadAll(f)
+}
+
+func reportErrors(t *testing.T, tempDir string, beatName string) {
+	var maxlen int64 = 2048
+	stderr, err := readLastNBytes(filepath.Join(tempDir, "stderr"), maxlen)
+	if err != nil {
+		t.Logf("error reading stderr: %s", err)
+	}
+	t.Logf("Last %d bytes of stderr:\n%s", len(stderr), string(stderr))
+
+	stdout, err := readLastNBytes(filepath.Join(tempDir, "stdout"), maxlen)
+	if err != nil {
+		t.Logf("error reading stdout: %s", err)
+	}
+	t.Logf("Last %d bytes of stdout:\n%s", len(stdout), string(stdout))
+
+	glob := fmt.Sprintf("%s-*.ndjson", filepath.Join(tempDir, beatName))
+	files, err := filepath.Glob(glob)
+	if err != nil {
+		t.Logf("glob error with: %s: %s", glob, err)
+	}
+	for _, f := range files {
+		contents, err := readLastNBytes(f, maxlen)
+		if err != nil {
+			t.Logf("error reading %s: %s", f, err)
+		}
+		t.Logf("Last %d bytes of %s:\n%s", len(contents), f, string(contents))
+	}
+}
+
+// GenerateLogFile writes count lines to path, each line is 50 bytes.
+// Each line contains the current time (RFC3339) and a counter
+func GenerateLogFile(t *testing.T, path string, count int, append bool) {
+	var file *os.File
+	var err error
+	if !append {
+		file, err = os.Create(path)
+		if err != nil {
+			t.Fatalf("could not create file '%s': %s", path, err)
+		}
+	} else {
+		file, err = os.OpenFile(path, os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+		if err != nil {
+			t.Fatalf("could not open or create file: '%s': %s", path, err)
+		}
+	}
+
+	defer func() {
+		if err := file.Close(); err != nil {
+			t.Fatalf("could not close file: %s", err)
+		}
+	}()
+	defer func() {
+		if err := file.Sync(); err != nil {
+			t.Fatalf("could not sync file: %s", err)
+		}
+	}()
+	now := time.Now().Format(time.RFC3339)
+	// If the length is different, e.g when there is no offset from UTC.
+	// add some padding so the length is predictable
+	if len(now) != len(time.RFC3339) {
+		paddingNeeded := len(time.RFC3339) - len(now)
+		for i := 0; i < paddingNeeded; i++ {
+			now += "-"
+		}
+	}
+	for i := 0; i < count; i++ {
+		if _, err := fmt.Fprintf(file, "%s           %13d\n", now, i); err != nil {
+			t.Fatalf("could not write line %d to file: %s", count+1, err)
+		}
+	}
 }

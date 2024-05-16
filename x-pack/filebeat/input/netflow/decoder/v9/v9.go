@@ -34,7 +34,7 @@ type NetflowV9Protocol struct {
 }
 
 func init() {
-	protocol.Registry.Register(ProtocolName, New)
+	_ = protocol.Registry.Register(ProtocolName, New)
 }
 
 func New(config config.Config) protocol.Protocol {
@@ -45,7 +45,7 @@ func New(config config.Config) protocol.Protocol {
 func NewProtocolWithDecoder(decoder Decoder, config config.Config, logger *log.Logger) *NetflowV9Protocol {
 	return &NetflowV9Protocol{
 		decoder:     decoder,
-		Session:     NewSessionMap(logger),
+		Session:     NewSessionMap(logger, config.ActiveSessionsMetric()),
 		logger:      logger,
 		timeout:     config.ExpirationTimeout(),
 		detectReset: config.SequenceResetEnabled(),

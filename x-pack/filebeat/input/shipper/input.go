@@ -60,7 +60,7 @@ func NewInputManager(log *logp.Logger) *InputManager {
 
 // Init initializes the manager
 // not sure if the shipper needs to do anything at this point?
-func (im *InputManager) Init(_ unison.Group, _ v2.Mode) error {
+func (im *InputManager) Init(_ unison.Group) error {
 	return nil
 }
 
@@ -173,12 +173,11 @@ func (in *shipperInput) Run(inputContext v2.Context, pipeline beat.Pipeline) err
 				DisableHost: true,
 				DisableType: true,
 			},
-
-			CloseRef: inputContext.Cancelation,
 		})
 		if err != nil {
 			return fmt.Errorf("error creating client for stream %s: %w", streamID, err)
 		}
+		defer client.Close()
 		in.log.Infof("Creating beat client for stream %s", streamID)
 
 		newStreamData := streamData{client: client, index: in.streams[streamID].index, processors: in.streams[streamID].processors}

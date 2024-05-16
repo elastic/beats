@@ -23,6 +23,8 @@ include::{libbeat-dir}/howto/load-dashboards.asciidoc[]
 
 include::{libbeat-dir}/shared-geoip.asciidoc[]
 
+include::load-ingest-pipelines.asciidoc[]
+
 :standalone:
 include::{libbeat-dir}/shared-env-vars.asciidoc[]
 :standalone!:

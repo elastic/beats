@@ -42,7 +42,7 @@ func init() {
 
 // MetricSet for fetching Galera-MySQL server status
 type MetricSet struct {
-	mb.BaseMetricSet
+	*mysql.Metricset
 	db *sql.DB
 }
 
@@ -50,7 +50,13 @@ type MetricSet struct {
 // Loads query_mode config setting from the config file
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	cfgwarn.Experimental("The galera_status metricset is experimental.")
-	return &MetricSet{BaseMetricSet: base}, nil
+
+	ms, err := mysql.NewMetricset(base)
+	if err != nil {
+		return nil, err
+	}
+
+	return &MetricSet{Metricset: ms, db: nil}, nil
 }
 
 // Fetch methods implements the data gathering and data conversion to the right format
@@ -58,7 +64,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 func (m *MetricSet) Fetch(reporter mb.ReporterV2) error {
 	if m.db == nil {
 		var err error
-		m.db, err = mysql.NewDB(m.HostData().URI)
+		m.db, err = mysql.NewDB(m.HostData().URI, m.Metricset.Config.TLSConfig)
 		if err != nil {
 			return fmt.Errorf("Galera-status fetch failed: %w", err)
 		}

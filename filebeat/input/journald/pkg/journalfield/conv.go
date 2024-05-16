@@ -19,11 +19,11 @@ package journalfield
 
 import (
 	"fmt"
-	"math/bits"
 	"regexp"
 	"strconv"
 	"strings"
 
+	"github.com/elastic/beats/v7/libbeat/common/capabilities"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -190,70 +190,11 @@ func expandCapabilities(fields mapstr.M) {
 	if !ok {
 		return
 	}
-	w, err := strconv.ParseUint(c, 16, 64)
-	if err != nil {
+	caps, err := capabilities.FromString(c, 16)
+	if err != nil || len(caps) == 0 {
 		return
-	}
-	if w == 0 {
-		return
-	}
-	caps := make([]string, 0, bits.OnesCount64(w))
-	for i := 0; w != 0; i++ {
-		if w&1 != 0 {
-			if i < len(capTable) {
-				caps = append(caps, capTable[i])
-			} else {
-				caps = append(caps, strconv.Itoa(i))
-			}
-		}
-		w >>= 1
 	}
 	fields.Put("process.thread.capabilities.effective", caps)
-}
-
-// include/uapi/linux/capability.h
-var capTable = [...]string{
-	0:  "CAP_CHOWN",
-	1:  "CAP_DAC_OVERRIDE",
-	2:  "CAP_DAC_READ_SEARCH",
-	3:  "CAP_FOWNER",
-	4:  "CAP_FSETID",
-	5:  "CAP_KILL",
-	6:  "CAP_SETGID",
-	7:  "CAP_SETUID",
-	8:  "CAP_SETPCAP",
-	9:  "CAP_LINUX_IMMUTABLE",
-	10: "CAP_NET_BIND_SERVICE",
-	11: "CAP_NET_BROADCAST",
-	12: "CAP_NET_ADMIN",
-	13: "CAP_NET_RAW",
-	14: "CAP_IPC_LOCK",
-	15: "CAP_IPC_OWNER",
-	16: "CAP_SYS_MODULE",
-	17: "CAP_SYS_RAWIO",
-	18: "CAP_SYS_CHROOT",
-	19: "CAP_SYS_PTRACE",
-	20: "CAP_SYS_PACCT",
-	21: "CAP_SYS_ADMIN",
-	22: "CAP_SYS_BOOT",
-	23: "CAP_SYS_NICE",
-	24: "CAP_SYS_RESOURCE",
-	25: "CAP_SYS_TIME",
-	26: "CAP_SYS_TTY_CONFIG",
-	27: "CAP_MKNOD",
-	28: "CAP_LEASE",
-	29: "CAP_AUDIT_WRITE",
-	30: "CAP_AUDIT_CONTROL",
-	31: "CAP_SETFCAP",
-	32: "CAP_MAC_OVERRIDE",
-	33: "CAP_MAC_ADMIN",
-	34: "CAP_SYSLOG",
-	35: "CAP_WAKE_ALARM",
-	36: "CAP_BLOCK_SUSPEND",
-	37: "CAP_AUDIT_READ",
-	38: "CAP_PERFMON",
-	39: "CAP_BPF",
-	40: "CAP_CHECKPOINT_RESTORE",
 }
 
 func getStringFromFields(key string, fields mapstr.M) string {

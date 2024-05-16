@@ -204,8 +204,7 @@ func TestManagerV2(t *testing.T) {
 	defer srv.Stop()
 
 	client := client.NewV2(fmt.Sprintf(":%d", srv.Port), "", client.VersionInfo{
-		Name:    "program",
-		Version: "v1.0.0",
+		Name: "program",
 		Meta: map[string]string{
 			"key": "value",
 		},

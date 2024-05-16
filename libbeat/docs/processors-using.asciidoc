@@ -276,7 +276,7 @@ regexp:
 
 The `range` condition checks if the field is in a certain range of values. The
 condition supports `lt`, `lte`, `gt` and `gte`. The condition accepts only
-integer or float values.
+integer, float, or strings that can be converted to either of these as values.
 
 For example, the following condition checks for failed HTTP transactions by
 comparing the `http.response.code` field with 400.

@@ -89,7 +89,7 @@ func (c config) Validate() error {
 	if len(c.Regexps) != 0 {
 		patterns = map[string]*regexp.Regexp{".": nil}
 	}
-	_, err = newProgram(context.Background(), c.Program, root, client, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil)
+	_, _, err = newProgram(context.Background(), c.Program, root, client, nil, nil, patterns, c.XSDs, logp.L().Named("input.cel"), nil)
 	if err != nil {
 		return fmt.Errorf("failed to check program: %w", err)
 	}

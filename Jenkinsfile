@@ -200,16 +200,6 @@ COMMIT=${env.GIT_BASE_COMMIT}
 VERSION=${env.VERSION}-SNAPSHOT""")
       archiveArtifacts artifacts: 'packaging.properties'
     }
-    cleanup {
-      // Required to enable the flaky test reporting with GitHub. Workspace exists since the post/always runs earlier
-      dir("${BASE_DIR}"){
-        notifyBuildResult(prComment: true,
-                          slackComment: true,
-                          analyzeFlakey: !isTag(), jobName: getFlakyJobName(withBranch: getFlakyBranch()),
-                          githubIssue: isGitHubIssueEnabled(),
-                          githubLabels: 'Team:Elastic-Agent-Data-Plane')
-      }
-    }
   }
 }
 
@@ -608,6 +598,9 @@ def targetWithoutNode(Map args = [:]) {
         }
       }
       withTools(k8s: installK8s, gcp: withGCP, nodejs: withNodejs) {
+        if (isPackaging && (directory.equals('x-pack/agentbeat') || directory.equals('x-pack/osquerybeat'))) {
+          sh(label: 'install msitools', script: '.buildkite/scripts/install-msitools.sh')
+        }
         // make commands use -C <folder> while mage commands require the dir(folder)
         // let's support this scenario with the location variable.
         dir(isMage ? directory : '') {

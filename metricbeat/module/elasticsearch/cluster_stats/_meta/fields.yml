@@ -55,6 +55,8 @@
       fields:
       - name: store.size.bytes
         type: long
+      - name: store.total_data_set_size.bytes
+        type: long
       - name: total
         type: long
         description: >

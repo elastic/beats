@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"regexp"
 	"strings"
 	"time"
 
@@ -31,6 +32,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common/fmtstr"
 	"github.com/elastic/beats/v7/libbeat/common/kafka"
 	"github.com/elastic/beats/v7/libbeat/common/transport/kerberos"
+	"github.com/elastic/beats/v7/libbeat/management"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -77,6 +79,11 @@ type kafkaConfig struct {
 	Sasl               kafka.SaslConfig          `config:"sasl"`
 	EnableFAST         bool                      `config:"enable_krb5_fast"`
 	Queue              config.Namespace          `config:"queue"`
+
+	// Currently only used for validation. Those values are later
+	// unpacked into temporary structs whenever they're necessary.
+	Topic  string `config:"topic"`
+	Topics []any  `config:"topics"`
 }
 
 type metaConfig struct {
@@ -101,6 +108,11 @@ var compressionModes = map[string]sarama.CompressionCodec{
 	"lz4":    sarama.CompressionLZ4,
 	"snappy": sarama.CompressionSnappy,
 }
+
+// validTopicRegExp is used to validate the topic contains only valid characters
+// when running under Elastic-Agent. The regexp is taken from:
+// https://github.com/apache/kafka/blob/a126e3a622f2b7142f3543b9dbee54b6412ba9d8/clients/src/main/java/org/apache/kafka/common/internals/Topic.java#L33
+var validTopicRegExp = regexp.MustCompile("^[a-zA-Z0-9._-]+$")
 
 func defaultConfig() kafkaConfig {
 	return kafkaConfig{
@@ -169,6 +181,24 @@ func (c *kafkaConfig) Validate() error {
 			return fmt.Errorf("compression_level must be between 0 and 9")
 		}
 	}
+
+	if c.Topic == "" && len(c.Topics) == 0 {
+		return errors.New("either 'topic' or 'topics' must be defined")
+	}
+
+	// When running under Elastic-Agent we do not support dynamic topic
+	// selection, so `topics` is not supported and `topic` is treated as an
+	// plain string
+	if management.UnderAgent() {
+		if len(c.Topics) != 0 {
+			return errors.New("'topics' is not supported when running under Elastic-Agent")
+		}
+
+		if !validTopicRegExp.MatchString(c.Topic) {
+			return fmt.Errorf("topic '%s' is invalid, it must match '[a-zA-Z0-9._-]'", c.Topic)
+		}
+	}
+
 	return nil
 }
 

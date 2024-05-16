@@ -15,6 +15,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/google/uuid"
 
@@ -30,9 +31,10 @@ import (
 const (
 	defaultAPIEndpoint = "https://graph.microsoft.com/v1.0"
 
-	defaultGroupsQuery  = "$select=displayName,members"
-	defaultUsersQuery   = "$select=accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones"
-	defaultDevicesQuery = "$select=accountEnabled,deviceId,displayName,operatingSystem,operatingSystemVersion,physicalIds,extensionAttributes,alternativeSecurityIds"
+	queryName           = "$select"
+	defaultGroupsQuery  = "displayName,members"
+	defaultUsersQuery   = "accountEnabled,userPrincipalName,mail,displayName,givenName,surname,jobTitle,officeLocation,mobilePhone,businessPhones"
+	defaultDevicesQuery = "accountEnabled,deviceId,displayName,operatingSystem,operatingSystemVersion,physicalIds,extensionAttributes,alternativeSecurityIds"
 
 	apiGroupType  = "#microsoft.graph.group"
 	apiUserType   = "#microsoft.graph.user"
@@ -98,9 +100,16 @@ type removed struct {
 
 // conf contains parameters needed to configure the fetcher.
 type graphConf struct {
-	APIEndpoint string `config:"api_endpoint"`
+	APIEndpoint string    `config:"api_endpoint"`
+	Select      selection `config:"select"`
 
 	Transport httpcommon.HTTPTransportSettings `config:",inline"`
+}
+
+type selection struct {
+	UserQuery   []string `config:"users"`
+	GroupQuery  []string `config:"groups"`
+	DeviceQuery []string `config:"devices"`
 }
 
 // graph implements the fetcher.Fetcher interface.
@@ -198,7 +207,7 @@ func (f *graph) Users(ctx context.Context, deltaLink string) ([]*fetcher.User, s
 		for _, v := range response.Users {
 			user, err := newUserFromAPI(v)
 			if err != nil {
-				f.logger.Errorf("Unable to parse user from API: %w", err)
+				f.logger.Errorw("Unable to parse user from API", "error", err)
 				continue
 			}
 			f.logger.Debugf("Got user %q from API", user.ID)
@@ -250,7 +259,7 @@ func (f *graph) Devices(ctx context.Context, deltaLink string) ([]*fetcher.Devic
 		for _, v := range response.Devices {
 			device, err := newDeviceFromAPI(v)
 			if err != nil {
-				f.logger.Errorf("Unable to parse device from API: %w", err)
+				f.logger.Errorw("Unable to parse device from API", "error", err)
 				continue
 			}
 			f.logger.Debugf("Got device %q from API", device.ID)
@@ -282,7 +291,7 @@ func (f *graph) addRegistered(ctx context.Context, device *fetcher.Device, typ s
 	switch {
 	case err == nil, errors.Is(err, nextLinkLoopError{"users"}), errors.Is(err, missingLinkError{"users"}):
 	default:
-		f.logger.Errorf("Failed to obtain some registered user data: %w", err)
+		f.logger.Errorw("Failed to obtain some registered user data", "error", err)
 	}
 	for _, u := range users {
 		set.Add(u.ID)
@@ -345,21 +354,21 @@ func New(cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (
 	if err != nil {
 		return nil, fmt.Errorf("invalid groups URL endpoint: %w", err)
 	}
-	groupsURL.RawQuery = url.QueryEscape(defaultGroupsQuery)
+	groupsURL.RawQuery = formatQuery(queryName, c.Select.GroupQuery, defaultGroupsQuery)
 	f.groupsURL = groupsURL.String()
 
 	usersURL, err := url.Parse(f.conf.APIEndpoint + "/users/delta")
 	if err != nil {
 		return nil, fmt.Errorf("invalid users URL endpoint: %w", err)
 	}
-	usersURL.RawQuery = url.QueryEscape(defaultUsersQuery)
+	usersURL.RawQuery = formatQuery(queryName, c.Select.UserQuery, defaultUsersQuery)
 	f.usersURL = usersURL.String()
 
 	devicesURL, err := url.Parse(f.conf.APIEndpoint + "/devices/delta")
 	if err != nil {
 		return nil, fmt.Errorf("invalid devices URL endpoint: %w", err)
 	}
-	devicesURL.RawQuery = url.QueryEscape(defaultDevicesQuery)
+	devicesURL.RawQuery = formatQuery(queryName, c.Select.DeviceQuery, defaultDevicesQuery)
 	f.devicesURL = devicesURL.String()
 
 	// The API takes a departure from the query approach here, so we
@@ -372,6 +381,14 @@ func New(cfg *config.C, logger *logp.Logger, auth authenticator.Authenticator) (
 	f.deviceOwnerUserURL = ownerUserURL.String()
 
 	return &f, nil
+}
+
+func formatQuery(name string, query []string, dflt string) string {
+	q := dflt
+	if len(query) != 0 {
+		q = strings.Join(query, ",")
+	}
+	return url.Values{name: []string{q}}.Encode()
 }
 
 // newUserFromAPI translates an API-representation of a user to a fetcher.User.

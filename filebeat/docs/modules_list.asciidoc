@@ -9,18 +9,14 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-aws>>
   * <<filebeat-module-awsfargate>>
   * <<filebeat-module-azure>>
-  * <<filebeat-module-barracuda>>
-  * <<filebeat-module-bluecoat>>
   * <<filebeat-module-cef>>
   * <<filebeat-module-checkpoint>>
   * <<filebeat-module-cisco>>
   * <<filebeat-module-coredns>>
   * <<filebeat-module-crowdstrike>>
   * <<filebeat-module-cyberarkpas>>
-  * <<filebeat-module-cylance>>
   * <<filebeat-module-elasticsearch>>
   * <<filebeat-module-envoyproxy>>
-  * <<filebeat-module-f5>>
   * <<filebeat-module-fortinet>>
   * <<filebeat-module-gcp>>
   * <<filebeat-module-google_workspace>>
@@ -28,8 +24,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-ibmmq>>
   * <<filebeat-module-icinga>>
   * <<filebeat-module-iis>>
-  * <<filebeat-module-imperva>>
-  * <<filebeat-module-infoblox>>
   * <<filebeat-module-iptables>>
   * <<filebeat-module-juniper>>
   * <<filebeat-module-kafka>>
@@ -43,7 +37,6 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-mysqlenterprise>>
   * <<filebeat-module-nats>>
   * <<filebeat-module-netflow>>
-  * <<filebeat-module-netscout>>
   * <<filebeat-module-nginx>>
   * <<filebeat-module-o365>>
   * <<filebeat-module-okta>>
@@ -52,26 +45,19 @@ This file is generated! See scripts/docs_collector.py
   * <<filebeat-module-panw>>
   * <<filebeat-module-pensando>>
   * <<filebeat-module-postgresql>>
-  * <<filebeat-module-proofpoint>>
   * <<filebeat-module-rabbitmq>>
-  * <<filebeat-module-radware>>
   * <<filebeat-module-redis>>
   * <<filebeat-module-salesforce>>
   * <<filebeat-module-santa>>
-  * <<filebeat-module-snort>>
   * <<filebeat-module-snyk>>
-  * <<filebeat-module-sonicwall>>
   * <<filebeat-module-sophos>>
-  * <<filebeat-module-squid>>
   * <<filebeat-module-suricata>>
   * <<filebeat-module-system>>
   * <<filebeat-module-threatintel>>
-  * <<filebeat-module-tomcat>>
   * <<filebeat-module-traefik>>
   * <<filebeat-module-zeek>>
   * <<filebeat-module-zookeeper>>
   * <<filebeat-module-zoom>>
-  * <<filebeat-module-zscaler>>
 
 
 --
@@ -83,18 +69,14 @@ include::modules/auditd.asciidoc[]
 include::modules/aws.asciidoc[]
 include::modules/awsfargate.asciidoc[]
 include::modules/azure.asciidoc[]
-include::modules/barracuda.asciidoc[]
-include::modules/bluecoat.asciidoc[]
 include::modules/cef.asciidoc[]
 include::modules/checkpoint.asciidoc[]
 include::modules/cisco.asciidoc[]
 include::modules/coredns.asciidoc[]
 include::modules/crowdstrike.asciidoc[]
 include::modules/cyberarkpas.asciidoc[]
-include::modules/cylance.asciidoc[]
 include::modules/elasticsearch.asciidoc[]
 include::modules/envoyproxy.asciidoc[]
-include::modules/f5.asciidoc[]
 include::modules/fortinet.asciidoc[]
 include::modules/gcp.asciidoc[]
 include::modules/google_workspace.asciidoc[]
@@ -102,8 +84,6 @@ include::modules/haproxy.asciidoc[]
 include::modules/ibmmq.asciidoc[]
 include::modules/icinga.asciidoc[]
 include::modules/iis.asciidoc[]
-include::modules/imperva.asciidoc[]
-include::modules/infoblox.asciidoc[]
 include::modules/iptables.asciidoc[]
 include::modules/juniper.asciidoc[]
 include::modules/kafka.asciidoc[]
@@ -117,7 +97,6 @@ include::modules/mysql.asciidoc[]
 include::modules/mysqlenterprise.asciidoc[]
 include::modules/nats.asciidoc[]
 include::modules/netflow.asciidoc[]
-include::modules/netscout.asciidoc[]
 include::modules/nginx.asciidoc[]
 include::modules/o365.asciidoc[]
 include::modules/okta.asciidoc[]
@@ -126,23 +105,16 @@ include::modules/osquery.asciidoc[]
 include::modules/panw.asciidoc[]
 include::modules/pensando.asciidoc[]
 include::modules/postgresql.asciidoc[]
-include::modules/proofpoint.asciidoc[]
 include::modules/rabbitmq.asciidoc[]
-include::modules/radware.asciidoc[]
 include::modules/redis.asciidoc[]
 include::modules/salesforce.asciidoc[]
 include::modules/santa.asciidoc[]
-include::modules/snort.asciidoc[]
 include::modules/snyk.asciidoc[]
-include::modules/sonicwall.asciidoc[]
 include::modules/sophos.asciidoc[]
-include::modules/squid.asciidoc[]
 include::modules/suricata.asciidoc[]
 include::modules/system.asciidoc[]
 include::modules/threatintel.asciidoc[]
-include::modules/tomcat.asciidoc[]
 include::modules/traefik.asciidoc[]
 include::modules/zeek.asciidoc[]
 include::modules/zookeeper.asciidoc[]
 include::modules/zoom.asciidoc[]
-include::modules/zscaler.asciidoc[]

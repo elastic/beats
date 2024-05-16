@@ -164,6 +164,14 @@ func fbWriteMetadata(b *flatbuffers.Builder, m *Metadata) flatbuffers.UOffsetT {
 		schema.MetadataAddType(b, schema.TypeDir)
 	case SymlinkType:
 		schema.MetadataAddType(b, schema.TypeSymlink)
+	case CharDeviceType:
+		schema.MetadataAddType(b, schema.TypeCharDevice)
+	case BlockDeviceType:
+		schema.MetadataAddType(b, schema.TypeBlockDevice)
+	case FIFOType:
+		schema.MetadataAddType(b, schema.TypeFIFO)
+	case SocketType:
+		schema.MetadataAddType(b, schema.TypeSocket)
 	}
 	if selinuxOffset > 0 {
 		schema.MetadataAddSelinux(b, selinuxOffset)
@@ -191,10 +199,12 @@ func fbWriteEvent(b *flatbuffers.Builder, e *Event) flatbuffers.UOffsetT {
 	schema.EventAddTimestampNs(b, e.Timestamp.UnixNano())
 
 	switch e.Source {
-	case SourceFSNotify:
-		schema.EventAddSource(b, schema.SourceFSNotify)
 	case SourceScan:
 		schema.EventAddSource(b, schema.SourceScan)
+	case SourceFSNotify:
+		schema.EventAddSource(b, schema.SourceFSNotify)
+	case SourceEBPF:
+		schema.EventAddSource(b, schema.SourceEBPF)
 	}
 
 	if targetPathOffset > 0 {
@@ -235,6 +245,8 @@ func fbDecodeEvent(path string, buf []byte) *Event {
 		rtn.Source = SourceScan
 	case schema.SourceFSNotify:
 		rtn.Source = SourceFSNotify
+	case schema.SourceEBPF:
+		rtn.Source = SourceEBPF
 	}
 
 	action := e.Action()
@@ -285,6 +297,14 @@ func fbDecodeMetadata(e *schema.Event) *Metadata {
 		rtn.Type = DirType
 	case schema.TypeSymlink:
 		rtn.Type = SymlinkType
+	case schema.TypeCharDevice:
+		rtn.Type = CharDeviceType
+	case schema.TypeBlockDevice:
+		rtn.Type = BlockDeviceType
+	case schema.TypeFIFO:
+		rtn.Type = FIFOType
+	case schema.TypeSocket:
+		rtn.Type = SocketType
 	default:
 		rtn.Type = UnknownType
 	}

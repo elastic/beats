@@ -1,0 +1,40 @@
+{{ if eq .input "salesforce" }}
+
+id: setupaudittrail
+type: salesforce
+enabled: true
+{{ if .api_version }}
+version: {{ .api_version }}
+{{ end }}
+auth.oauth2: {{ .authentication | tojson }}
+url: {{ .url }}
+event_monitoring_method:
+  object:
+    enabled: {{ if .real_time }}true{{ else }}false{{ end }}
+    interval: {{ .real_time_interval }}
+    query:
+      default: SELECT FIELDS(STANDARD) FROM SetupAuditTrail{{ if .initial_interval }} WHERE CreatedDate > [[ (formatTime (now.Add (parseDuration "-{{ .initial_interval }}")) "2006-01-02T15:04:05.000Z0700") ]]{{ end }} ORDER BY CreatedDate ASC NULLS FIRST
+      value: SELECT FIELDS(STANDARD) FROM SetupAuditTrail WHERE CreatedDate > [[ .cursor.object.last_event_time ]] ORDER BY CreatedDate ASC NULLS FIRST
+    cursor:
+      field: "CreatedDate"
+
+{{ else if eq .input "file" }}
+
+type: log
+paths:
+{{ range $i, $path := .paths }}
+  - {{$path}}
+{{ end }}
+exclude_files: [".gz$"]
+
+{{ end }}
+
+tags: {{.tags | tojson}}
+publisher_pipeline.disable_host: {{ inList .tags "forwarded" }}
+
+processors:
+  - add_fields:
+      target: salesforce
+      fields:
+        instance_url: {{ .url }}
+  - add_locale: ~

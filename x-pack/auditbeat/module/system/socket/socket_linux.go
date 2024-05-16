@@ -23,13 +23,14 @@ import (
 
 	"golang.org/x/sys/unix"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
+	"github.com/elastic/beats/v7/auditbeat/tracing"
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/cfgwarn"
 	"github.com/elastic/beats/v7/metricbeat/mb"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/guess"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system/socket/helper"
-	"github.com/elastic/beats/v7/x-pack/auditbeat/tracing"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/go-perf"
@@ -42,9 +43,8 @@ import (
 )
 
 const (
-	moduleName      = "system"
 	metricsetName   = "socket"
-	fullName        = moduleName + "/" + metricsetName
+	fullName        = system.ModuleName + "/" + metricsetName
 	namespace       = "system.audit.socket"
 	detailSelector  = metricsetName + "detailed"
 	groupNamePrefix = "auditbeat_"
@@ -80,7 +80,7 @@ type MetricSet struct {
 }
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	ab.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)

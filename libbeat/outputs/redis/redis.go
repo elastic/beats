@@ -165,7 +165,7 @@ func makeRedis(
 		clients[i] = newBackoffClient(client, rConfig.Backoff.Init, rConfig.Backoff.Max)
 	}
 
-	return outputs.SuccessNet(rConfig.Queue, rConfig.LoadBalance, rConfig.BulkMaxSize, rConfig.MaxRetries, clients)
+	return outputs.SuccessNet(rConfig.Queue, rConfig.LoadBalance, rConfig.BulkMaxSize, rConfig.MaxRetries, nil, clients)
 }
 
 func buildKeySelector(cfg *config.C) (outil.Selector, error) {

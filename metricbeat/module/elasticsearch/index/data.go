@@ -42,7 +42,6 @@ type Index struct {
 
 	Index  string     `json:"index"`
 	Status string     `json:"status"`
-	Hidden bool       `json:"hidden"`
 	Shards shardStats `json:"shards"`
 }
 
@@ -73,7 +72,8 @@ type primaries struct {
 		FixedBitSetMemoryInBytes  int `json:"fixed_bit_set_memory_in_bytes"`
 	} `json:"segments"`
 	Store struct {
-		SizeInBytes int `json:"size_in_bytes"`
+		SizeInBytes             int `json:"size_in_bytes"`
+		TotalDataSetSizeInBytes int `json:"total_data_set_size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
 		TotalTimeInMillis         int `json:"total_time_in_millis"`
@@ -132,7 +132,8 @@ type total struct {
 		FixedBitSetMemoryInBytes  int `json:"fixed_bit_set_memory_in_bytes"`
 	} `json:"segments"`
 	Store struct {
-		SizeInBytes int `json:"size_in_bytes"`
+		SizeInBytes             int `json:"size_in_bytes"`
+		TotalDataSetSizeInBytes int `json:"total_data_set_size_in_bytes"`
 	} `json:"store"`
 	Refresh struct {
 		TotalTimeInMillis         int `json:"total_time_in_millis"`
@@ -189,22 +190,13 @@ func eventsMapping(r mb.ReporterV2, httpClient *helper.HTTP, info elasticsearch.
 		return fmt.Errorf("failure parsing Indices Stats Elasticsearch API response: %w", err)
 	}
 
-	indicesSettings, err := elasticsearch.GetIndicesSettings(httpClient, httpClient.GetURI())
-	if err != nil {
-		return fmt.Errorf("failure retrieving indices settings from Elasticsearch: %w", err)
-	}
-
 	var errs multierror.Errors
-	for name, idx := range indicesStats.Indices {
+	for name := range indicesStats.Indices {
 		event := mb.Event{
 			ModuleFields: mapstr.M{},
 		}
+		idx := indicesStats.Indices[name]
 		idx.Index = name
-
-		settings, exists := indicesSettings[name]
-		if exists {
-			idx.Hidden = settings.Hidden
-		}
 
 		err = addClusterStateFields(&idx, clusterState)
 		if err != nil {

@@ -24,6 +24,8 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/common"
+	conf "github.com/elastic/elastic-agent-libs/config"
+	"github.com/elastic/go-ucfg"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -199,4 +201,59 @@ func TestGetUDP(t *testing.T) {
 	udp = p.GetUDP(3)
 	assert.NotNil(t, udp)
 	assert.Contains(t, udp.GetPorts(), 53)
+}
+
+func TestValidateProtocolDevice(t *testing.T) {
+	tcs := []struct {
+		testCase, device string
+		config           map[string]interface{}
+		expectedValid    bool
+		expectedErr      string
+	}{
+		{
+			"DeviceIsIncorrect",
+			"eth0",
+			map[string]interface{}{
+				"interface": map[string]interface{}{
+					"device": "eth1",
+				},
+			},
+			false,
+			"",
+		},
+		{
+			"DeviceIsCorrect",
+			"eth1",
+			map[string]interface{}{
+				"interface": map[string]interface{}{
+					"device": "eth1",
+				},
+			},
+			true,
+			"",
+		},
+		{
+			"ConfigIsInvalid",
+			"eth0",
+			map[string]interface{}{
+				"interface": "eth1",
+			},
+			false,
+			"required 'object', but found 'string' in field 'interface'",
+		},
+	}
+
+	for _, tc := range tcs {
+		tc := tc
+		t.Run(tc.testCase, func(t *testing.T) {
+			cfg := (*conf.C)(ucfg.MustNewFrom(tc.config))
+			isValid, err := validateProtocolDevice(tc.device, cfg)
+			assert.Equal(t, tc.expectedValid, isValid)
+			if tc.expectedErr == "" {
+				assert.Nil(t, err)
+			} else {
+				assert.EqualError(t, err, tc.expectedErr)
+			}
+		})
+	}
 }

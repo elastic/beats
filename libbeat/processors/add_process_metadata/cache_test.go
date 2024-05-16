@@ -21,6 +21,8 @@ import (
 	"math/rand"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/require"
 )
 
 var cacheEvictionTests = []struct {
@@ -96,7 +98,8 @@ func TestCacheEviction(t *testing.T) {
 
 		for i := 0; i < test.iters; i++ {
 			pid := rnd.Intn(test.maxPID)
-			c.GetProcessMetadata(pid)
+			_, err := c.GetProcessMetadata(pid)
+			require.NoError(t, err)
 			if len(c.cache) > test.cap {
 				t.Errorf("cache overflow for %s after %d iterations", test.name, i)
 				break

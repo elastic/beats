@@ -31,6 +31,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 )
 
 func init() {
@@ -49,7 +51,7 @@ func TestEventReader(t *testing.T) {
 	// Create a new EventProducer.
 	config := defaultConfig
 	config.Paths = []string{dir}
-	r, err := NewEventReader(config)
+	r, err := NewEventReader(config, logp.NewLogger(""))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -251,7 +253,7 @@ func TestRaces(t *testing.T) {
 	config := defaultConfig
 	config.Paths = dirs
 	config.Recursive = true
-	r, err := NewEventReader(config)
+	r, err := NewEventReader(config, logp.NewLogger(""))
 	if err != nil {
 		t.Fatal(err)
 	}

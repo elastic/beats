@@ -21,6 +21,8 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+
+	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 )
 
 // startPosition and endPosition are absolute byte offsets into the segment
@@ -67,16 +69,22 @@ type readerLoop struct {
 	// The helper object to deserialize binary blobs from the queue into
 	// publisher.Event objects that can be returned in a readFrame.
 	decoder *eventDecoder
+
+	// If set, this encoding helper is called on events after loading
+	// them from disk, to convert them to their final output serialization
+	// format.
+	outputEncoder queue.Encoder
 }
 
-func newReaderLoop(settings Settings) *readerLoop {
+func newReaderLoop(settings Settings, outputEncoder queue.Encoder) *readerLoop {
 	return &readerLoop{
 		settings: settings,
 
-		requestChan:  make(chan readerLoopRequest, 1),
-		responseChan: make(chan readerLoopResponse),
-		output:       make(chan *readFrame, settings.ReadAheadLimit),
-		decoder:      newEventDecoder(),
+		requestChan:   make(chan readerLoopRequest, 1),
+		responseChan:  make(chan readerLoopResponse),
+		output:        make(chan *readFrame, settings.ReadAheadLimit),
+		decoder:       newEventDecoder(),
+		outputEncoder: outputEncoder,
 	}
 }
 
@@ -124,6 +132,10 @@ func (rl *readerLoop) processRequest(request readerLoopRequest) readerLoopRespon
 			frame.segment = request.segment
 			frame.id = nextFrameID
 			nextFrameID++
+			// If an output encoder is configured, apply it now
+			if rl.outputEncoder != nil {
+				frame.event, _ = rl.outputEncoder.EncodeEntry(frame.event)
+			}
 			// We've read the frame, try sending it to the output channel.
 			select {
 			case rl.output <- frame:

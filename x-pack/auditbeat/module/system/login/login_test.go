@@ -18,9 +18,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/core"
 	abtest "github.com/elastic/beats/v7/auditbeat/testing"
 	mbtest "github.com/elastic/beats/v7/metricbeat/mb/testing"
+	"github.com/elastic/beats/v7/x-pack/auditbeat/module/system"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
@@ -34,7 +36,7 @@ func TestData(t *testing.T) {
 	config := getBaseConfig()
 	config["login.wtmp_file_pattern"] = "./testdata/wtmp"
 	config["login.btmp_file_pattern"] = ""
-	f := mbtest.NewReportingMetricSetV2(t, config)
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, config, ab.Registry)
 	defer f.(*MetricSet).utmpReader.bucket.DeleteBucket()
 
 	events, errs := mbtest.ReportingFetchV2(f)
@@ -68,7 +70,7 @@ func TestWtmp(t *testing.T) {
 	config := getBaseConfig()
 	config["login.wtmp_file_pattern"] = wtmpFilepath
 	config["login.btmp_file_pattern"] = ""
-	f := mbtest.NewReportingMetricSetV2(t, config)
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, config, ab.Registry)
 	defer f.(*MetricSet).utmpReader.bucket.DeleteBucket()
 
 	events, errs := mbtest.ReportingFetchV2(f)
@@ -180,7 +182,7 @@ func TestBtmp(t *testing.T) {
 	config := getBaseConfig()
 	config["login.wtmp_file_pattern"] = ""
 	config["login.btmp_file_pattern"] = "./testdata/btmp*"
-	f := mbtest.NewReportingMetricSetV2(t, config)
+	f := mbtest.NewReportingMetricSetV2WithRegistry(t, config, ab.Registry)
 	defer f.(*MetricSet).utmpReader.bucket.DeleteBucket()
 
 	events, errs := mbtest.ReportingFetchV2(f)
@@ -268,7 +270,7 @@ func checkFieldValue(t *testing.T, mapstr mapstr.M, fieldName string, fieldValue
 
 func getBaseConfig() map[string]interface{} {
 	return map[string]interface{}{
-		"module":   "system",
+		"module":   system.ModuleName,
 		"datasets": []string{"login"},
 	}
 }

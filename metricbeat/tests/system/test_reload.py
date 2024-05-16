@@ -42,7 +42,8 @@ class Test(metricbeat.BaseTest):
         self.wait_until(lambda: self.output_lines() > 0)
         proc.check_kill_and_wait()
 
-    @unittest.skipUnless(re.match("(?i)win|linux|darwin|freebsd|openbsd", sys.platform), "os")
+    # windows is disabled, see https://github.com/elastic/beats/issues/37841
+    @unittest.skipUnless(re.match("(?i)linux|darwin|freebsd|openbsd", sys.platform), "os")
     def test_start_stop(self):
         """
         Test if module is properly started and stopped

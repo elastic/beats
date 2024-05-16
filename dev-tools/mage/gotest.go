@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
@@ -56,6 +55,7 @@ type GoTestArgs struct {
 type TestBinaryArgs struct {
 	Name       string // Name of the binary to build
 	InputFiles []string
+	ExtraFlags []string // Extra flags to pass to 'go test'.
 }
 
 func makeGoTestArgs(name string) GoTestArgs {
@@ -169,15 +169,16 @@ func DefaultTestBinaryArgs() TestBinaryArgs {
 // Use MODULE=module to run only tests for `module`.
 func GoTestIntegrationForModule(ctx context.Context) error {
 	module := EnvOr("MODULE", "")
-	modulesFileInfo, err := ioutil.ReadDir("./module")
+	modulesFileInfo, err := os.ReadDir("./module")
 	if err != nil {
 		return err
 	}
 
 	foundModule := false
-	failedModules := []string{}
+	failedModules := make([]string, 0, len(modulesFileInfo))
 	for _, fi := range modulesFileInfo {
-		if !fi.IsDir() {
+		// skip the ones that are not directories or with suffix @tmp, which are created by Jenkins build job
+		if !fi.IsDir() || strings.HasSuffix(fi.Name(), "@tmp") {
 			continue
 		}
 		if module != "" && module != fi.Name() {
@@ -289,7 +290,7 @@ func GoTest(ctx context.Context, params GoTestArgs) error {
 	}
 
 	if params.OutputFile != "" {
-		fileOutput, err := os.Create(createDir(params.OutputFile))
+		fileOutput, err := os.Create(CreateDir(params.OutputFile))
 		if err != nil {
 			return fmt.Errorf("failed to create go test output file: %w", err)
 		}
@@ -356,7 +357,7 @@ func makeCommand(ctx context.Context, env map[string]string, cmd string, args ..
 	for k, v := range env {
 		c.Env = append(c.Env, k+"="+v)
 	}
-	c.Stdout = ioutil.Discard
+	c.Stdout = io.Discard
 	if mg.Verbose() {
 		c.Stdout = os.Stdout
 	}
@@ -389,6 +390,7 @@ func BuildSystemTestGoBinary(binArgs TestBinaryArgs) error {
 	if TestCoverage {
 		args = append(args, "-coverpkg", "./...")
 	}
+	args = append(args, binArgs.ExtraFlags...)
 	if len(binArgs.InputFiles) > 0 {
 		args = append(args, binArgs.InputFiles...)
 	}

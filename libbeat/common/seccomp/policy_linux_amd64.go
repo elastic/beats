@@ -34,6 +34,7 @@ func init() {
 					"arch_prctl",
 					"bind",
 					"brk",
+					"capget",
 					"chmod",
 					"chown",
 					"clock_gettime",

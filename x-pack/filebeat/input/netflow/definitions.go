@@ -7,7 +7,7 @@ package netflow
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math"
 	"os"
 	"strconv"
@@ -95,7 +95,7 @@ func LoadFieldDefinitionsFromFile(path string) (defs fields.FieldDict, err error
 		return nil, err
 	}
 	defer file.Close()
-	contents, err := ioutil.ReadAll(file)
+	contents, err := io.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}
@@ -169,7 +169,7 @@ func loadFields(def map[interface{}]interface{}, pem uint32, dest fields.FieldDi
 			return fmt.Errorf("bad field ID %d: should have two items (type, name) or one (:skip) (Got %+v)", fieldID, list)
 		}
 		key := fields.Key{
-			EnterpriseID: uint32(pem),
+			EnterpriseID: pem,
 			FieldID:      uint16(fieldID),
 		}
 		if _, exists := dest[key]; exists {

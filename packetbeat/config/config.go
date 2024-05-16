@@ -33,14 +33,15 @@ import (
 var errFanoutGroupAFPacketOnly = errors.New("fanout_group is only valid with af_packet type")
 
 type Config struct {
-	Interface       *InterfaceConfig   `config:"interfaces"`
-	Interfaces      []InterfaceConfig  `config:"interfaces"`
-	Flows           *Flows             `config:"flows"`
-	Protocols       map[string]*conf.C `config:"protocols"`
-	ProtocolsList   []*conf.C          `config:"protocols"`
-	Procs           procs.ProcsConfig  `config:"procs"`
-	IgnoreOutgoing  bool               `config:"ignore_outgoing"`
-	ShutdownTimeout time.Duration      `config:"shutdown_timeout"`
+	Interface          *InterfaceConfig   `config:"interfaces"`
+	Interfaces         []InterfaceConfig  `config:"interfaces"`
+	Flows              *Flows             `config:"flows"`
+	Protocols          map[string]*conf.C `config:"protocols"`
+	ProtocolsList      []*conf.C          `config:"protocols"`
+	Procs              procs.ProcsConfig  `config:"procs"`
+	IgnoreOutgoing     bool               `config:"ignore_outgoing"`
+	ShutdownTimeout    time.Duration      `config:"shutdown_timeout"`
+	OverwritePipelines bool               `config:"overwrite_pipelines"` // Only used by standalone Packetbeat.
 }
 
 // FromStatic initializes a configuration given a config.C
@@ -143,6 +144,8 @@ type Flows struct {
 	KeepNull      bool                    `config:"keep_null"`
 	// Index is used to overwrite the index where flows are published
 	Index string `config:"index"`
+	// DeltaFlowReports when enabled will report flow network stats(bytes, packets) as delta values
+	EnableDeltaFlowReports bool `config:"enable_delta_flow_reports"`
 }
 
 type ProtocolCommon struct {

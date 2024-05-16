@@ -42,6 +42,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	"github.com/elastic/beats/v7/libbeat/version"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httplog"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/internal/httpmon"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 	"github.com/elastic/elastic-agent-libs/monitoring"
@@ -122,7 +123,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 	cfg := src.cfg
 	log := env.Logger.With("input_url", cfg.Resource.URL)
 
-	metrics := newInputMetrics(env.ID)
+	metrics, reg := newInputMetrics(env.ID)
 	defer metrics.Close()
 
 	ctx := ctxtool.FromCanceller(env.Cancelation)
@@ -132,7 +133,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 		cfg.Resource.Tracer.Filename = strings.ReplaceAll(cfg.Resource.Tracer.Filename, "*", id)
 	}
 
-	client, trace, err := newClient(ctx, cfg, log)
+	client, trace, err := newClient(ctx, cfg, log, reg)
 	if err != nil {
 		return err
 	}
@@ -151,7 +152,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			Password: cfg.Auth.Basic.Password,
 		}
 	}
-	prg, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs, log, trace)
+	prg, ast, err := newProgram(ctx, cfg.Program, root, client, limiter, auth, patterns, cfg.XSDs, log, trace)
 	if err != nil {
 		return err
 	}
@@ -233,7 +234,7 @@ func (i input) run(env v2.Context, src *source, cursor map[string]interface{}, p
 			log.Debugw("request state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			metrics.executions.Add(1)
 			start := i.now().In(time.UTC)
-			state, err = evalWith(ctx, prg, state, start)
+			state, err = evalWith(ctx, prg, ast, state, start)
 			log.Debugw("response state", logp.Namespace("cel"), "state", redactor{state: state, cfg: cfg.Redact})
 			if err != nil {
 				switch {
@@ -686,7 +687,7 @@ func getLimit(which string, rateLimit map[string]interface{}, log *logp.Logger) 
 	return limit, true
 }
 
-func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client, *httplog.LoggingRoundTripper, error) {
+func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitoring.Registry) (*http.Client, *httplog.LoggingRoundTripper, error) {
 	if !wantClient(cfg) {
 		return nil, nil, nil
 	}
@@ -723,8 +724,14 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger) (*http.Client,
 		)
 		traceLogger := zap.New(core)
 
-		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger)
+		const margin = 1e3 // 1OkB ought to be enough room for all the remainder of the trace details.
+		maxSize := cfg.Resource.Tracer.MaxSize * 1e6
+		trace = httplog.NewLoggingRoundTripper(c.Transport, traceLogger, max(0, maxSize-margin), log)
 		c.Transport = trace
+	}
+
+	if reg != nil {
+		c.Transport = httpmon.NewMetricsRoundTripper(c.Transport, reg)
 	}
 
 	c.CheckRedirect = checkRedirect(cfg.Resource, log)
@@ -804,6 +811,11 @@ type socketDialer struct {
 
 func (d socketDialer) Dial(_, _ string) (net.Conn, error) {
 	return net.Dial("unix", d.path)
+}
+
+func (d socketDialer) DialContext(ctx context.Context, _, _ string) (net.Conn, error) {
+	var nd net.Dialer
+	return nd.DialContext(ctx, "unix", d.path)
 }
 
 func checkRedirect(cfg *ResourceConfig, log *logp.Logger) func(*http.Request, []*http.Request) error {
@@ -898,10 +910,10 @@ var (
 	}
 )
 
-func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper) (cel.Program, error) {
+func newProgram(ctx context.Context, src, root string, client *http.Client, limiter *rate.Limiter, auth *lib.BasicAuth, patterns map[string]*regexp.Regexp, xsd map[string]string, log *logp.Logger, trace *httplog.LoggingRoundTripper) (cel.Program, *cel.Ast, error) {
 	xml, err := lib.XML(nil, xsd)
 	if err != nil {
-		return nil, fmt.Errorf("failed to build xml type hints: %w", err)
+		return nil, nil, fmt.Errorf("failed to build xml type hints: %w", err)
 	}
 	opts := []cel.EnvOption{
 		cel.Declarations(decls.NewVar(root, decls.Dyn)),
@@ -916,7 +928,6 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 		lib.Debug(debug(log, trace)),
 		lib.File(mimetypes),
 		lib.MIME(mimetypes),
-		lib.Regexp(patterns),
 		lib.Limit(limitPolicies),
 		lib.Globals(map[string]interface{}{
 			"useragent": userAgent,
@@ -930,19 +941,19 @@ func newProgram(ctx context.Context, src, root string, client *http.Client, limi
 	}
 	env, err := cel.NewEnv(opts...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create env: %w", err)
+		return nil, nil, fmt.Errorf("failed to create env: %w", err)
 	}
 
 	ast, iss := env.Compile(src)
 	if iss.Err() != nil {
-		return nil, fmt.Errorf("failed compilation: %w", iss.Err())
+		return nil, nil, fmt.Errorf("failed compilation: %w", iss.Err())
 	}
 
 	prg, err := env.Program(ast)
 	if err != nil {
-		return nil, fmt.Errorf("failed program instantiation: %w", err)
+		return nil, nil, fmt.Errorf("failed program instantiation: %w", err)
 	}
-	return prg, nil
+	return prg, ast, nil
 }
 
 func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, any) {
@@ -960,7 +971,7 @@ func debug(log *logp.Logger, trace *httplog.LoggingRoundTripper) func(string, an
 	}
 }
 
-func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
+func evalWith(ctx context.Context, prg cel.Program, ast *cel.Ast, state map[string]interface{}, now time.Time) (map[string]interface{}, error) {
 	out, _, err := prg.ContextEval(ctx, map[string]interface{}{
 		// Replace global program "now" with current time. This is necessary
 		// as the lib.Time now global is static at program instantiation time
@@ -974,6 +985,9 @@ func evalWith(ctx context.Context, prg cel.Program, state map[string]interface{}
 		"now": now,
 		root:  state,
 	})
+	if err != nil {
+		err = lib.DecoratedError{AST: ast, Err: err}
+	}
 	if e := ctx.Err(); e != nil {
 		err = e
 	}
@@ -1061,7 +1075,7 @@ type inputMetrics struct {
 	batchProcessingTime metrics.Sample     // histogram of the elapsed successful batch processing times in nanoseconds (time of receipt to time of ACK for non-empty batches).
 }
 
-func newInputMetrics(id string) *inputMetrics {
+func newInputMetrics(id string) (*inputMetrics, *monitoring.Registry) {
 	reg, unreg := inputmon.NewInputRegistry(inputName, id, nil)
 	out := &inputMetrics{
 		unregister:          unreg,
@@ -1079,7 +1093,7 @@ func newInputMetrics(id string) *inputMetrics {
 	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
 
-	return out
+	return out, reg
 }
 
 func (m *inputMetrics) Close() {

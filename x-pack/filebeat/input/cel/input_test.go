@@ -1333,7 +1333,10 @@ var inputTests = []struct {
 		want: []map[string]interface{}{
 			{
 				"error": map[string]interface{}{
-					"message": "failed eval: no such overload", // This is the best we get for some errors from CEL.
+					// This is the best we get for some errors from CEL.
+					"message": `failed eval: ERROR: <input>:3:56: no such overload
+ |   bytes(get(state.url+'/'+r.id).Body).decode_json()).as(events, {
+ | .......................................................^`,
 				},
 			},
 		},

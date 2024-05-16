@@ -68,6 +68,12 @@ type Event struct {
 	Content beat.Event
 	Flags   EventFlags
 	Cache   EventCache
+
+	// If the output provides an early encoder for incoming events,
+	// it should store the encoded form in EncodedEvent and clear Content
+	// to free the unencoded data. The updated event will be provided to
+	// output workers when calling Publish.
+	EncodedEvent interface{}
 }
 
 // EventFlags provides additional flags/option types  for used with the outputs.

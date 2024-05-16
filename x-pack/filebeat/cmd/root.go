@@ -8,16 +8,19 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/spf13/cobra"
+
+	"github.com/elastic/elastic-agent-libs/mapstr"
+
 	fbcmd "github.com/elastic/beats/v7/filebeat/cmd"
 	cmd "github.com/elastic/beats/v7/libbeat/cmd"
 	"github.com/elastic/beats/v7/libbeat/processors"
 	"github.com/elastic/beats/v7/libbeat/publisher/processing"
+	"github.com/elastic/beats/v7/x-pack/filebeat/include"
+	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 	"github.com/elastic/beats/v7/x-pack/libbeat/management"
-	"github.com/elastic/elastic-agent-libs/mapstr"
 
 	// Register the includes.
-	_ "github.com/elastic/beats/v7/x-pack/filebeat/include"
-	inputs "github.com/elastic/beats/v7/x-pack/filebeat/input/default-inputs"
 	_ "github.com/elastic/beats/v7/x-pack/libbeat/include"
 )
 
@@ -26,7 +29,6 @@ const Name = fbcmd.Name
 
 // Filebeat build the beat root command for executing filebeat and it's subcommands.
 func Filebeat() *cmd.BeatsRootCmd {
-	management.ConfigTransform.SetTransform(filebeatCfg)
 	settings := fbcmd.FilebeatSettings()
 	globalProcs, err := processors.NewPluginConfigFromList(defaultProcessors())
 	if err != nil { // these are hard-coded, shouldn't fail
@@ -34,7 +36,11 @@ func Filebeat() *cmd.BeatsRootCmd {
 	}
 	settings.Processing = processing.MakeDefaultSupport(true, globalProcs, processing.WithECS, processing.WithHost, processing.WithAgentMeta())
 	settings.ElasticLicensed = true
+	settings.Initialize = append(settings.Initialize, include.InitializeModule)
 	command := fbcmd.Filebeat(inputs.Init, settings)
+	command.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		management.ConfigTransform.SetTransform(filebeatCfg)
+	}
 	return command
 }
 

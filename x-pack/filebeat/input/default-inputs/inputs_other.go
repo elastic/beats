@@ -2,7 +2,7 @@
 // or more contributor license agreements. Licensed under the Elastic License;
 // you may not use this file except in compliance with the Elastic License.
 
-//go:build !aix
+//go:build !aix && !windows
 
 package inputs
 
@@ -13,6 +13,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awscloudwatch"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/awss3"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/azureblobstorage"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/benchmark"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cel"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/cloudfoundry"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/entityanalytics"
@@ -20,8 +21,11 @@ import (
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/http_endpoint"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/httpjson"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/lumberjack"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/netflow"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/o365audit"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/salesforce"
 	"github.com/elastic/beats/v7/x-pack/filebeat/input/shipper"
+	"github.com/elastic/beats/v7/x-pack/filebeat/input/websocket"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
@@ -38,6 +42,10 @@ func xpackInputs(info beat.Info, log *logp.Logger, store beater.StateStore) []v2
 		awss3.Plugin(store),
 		awscloudwatch.Plugin(),
 		lumberjack.Plugin(),
+		salesforce.Plugin(log, store),
 		shipper.Plugin(log, store),
+		websocket.Plugin(log, store),
+		netflow.Plugin(log),
+		benchmark.Plugin(),
 	}
 }

@@ -5,10 +5,14 @@
 package cel
 
 import (
+	"bytes"
 	"context"
 	"crypto/rsa"
+	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
+	"encoding/pem"
+	"errors"
 	"fmt"
 	"math/big"
 	"net/http"
@@ -43,9 +47,20 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, _ *http.Client)
 		},
 	}
 
-	oktaJWT, err := generateOktaJWT(o.OktaJWKJSON, conf)
-	if err != nil {
-		return nil, fmt.Errorf("oauth2 client: error generating Okta JWT: %w", err)
+	var (
+		oktaJWT string
+		err     error
+	)
+	if len(o.OktaJWKPEM) != 0 {
+		oktaJWT, err = generateOktaJWTPEM(o.OktaJWKPEM, conf)
+		if err != nil {
+			return nil, fmt.Errorf("oauth2 client: error generating Okta JWT PEM: %w", err)
+		}
+	} else {
+		oktaJWT, err = generateOktaJWT(o.OktaJWKJSON, conf)
+		if err != nil {
+			return nil, fmt.Errorf("oauth2 client: error generating Okta JWT: %w", err)
+		}
 	}
 
 	token, err := exchangeForBearerToken(ctx, oktaJWT, conf)
@@ -59,14 +74,16 @@ func (o *oAuth2Config) fetchOktaOauthClient(ctx context.Context, _ *http.Client)
 		oktaJWK: o.OktaJWKJSON,
 		token:   token,
 	}
-	// reuse the tokenSource to refresh the token (automatically calls the custom Token() method when token is no longer valid).
+	// reuse the tokenSource to refresh the token (automatically calls
+	// the custom Token() method when token is no longer valid).
 	client := oauth2.NewClient(ctx, oauth2.ReuseTokenSource(token, tokenSource))
 
 	return client, nil
 }
 
-// Token implements the oauth2.TokenSource interface and helps to implement custom token refresh logic.
-// Parent context is passed via the customTokenSource struct since we cannot modify the function signature here.
+// Token implements the oauth2.TokenSource interface and helps to implement
+// custom token refresh logic. The parent context is passed via the
+// customTokenSource struct since we cannot modify the function signature here.
 func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
 	ts.mu.Lock()
 	defer ts.mu.Unlock()
@@ -85,70 +102,86 @@ func (ts *oktaTokenSource) Token() (*oauth2.Token, error) {
 }
 
 func generateOktaJWT(oktaJWK []byte, cnf *oauth2.Config) (string, error) {
-	// unmarshal the JWK into a map
-	var jwkData map[string]string
+	// Unmarshal the JWK into big ints.
+	var jwkData struct {
+		N    base64int `json:"n"`
+		E    base64int `json:"e"`
+		D    base64int `json:"d"`
+		P    base64int `json:"p"`
+		Q    base64int `json:"q"`
+		Dp   base64int `json:"dp"`
+		Dq   base64int `json:"dq"`
+		Qinv base64int `json:"qi"`
+	}
 	err := json.Unmarshal(oktaJWK, &jwkData)
 	if err != nil {
 		return "", fmt.Errorf("error decoding JWK: %w", err)
 	}
 
-	// create an RSA private key from JWK components
-	decodeBase64 := func(key string) (*big.Int, error) {
-		data, err := base64.RawURLEncoding.DecodeString(jwkData[key])
-		if err != nil {
-			return nil, fmt.Errorf("error decoding RSA JWK component %s: %w", key, err)
-		}
-		return new(big.Int).SetBytes(data), nil
-	}
-
-	n, err := decodeBase64("n")
-	if err != nil {
-		return "", err
-	}
-	e, err := decodeBase64("e")
-	if err != nil {
-		return "", err
-	}
-	d, err := decodeBase64("d")
-	if err != nil {
-		return "", err
-	}
-	p, err := decodeBase64("p")
-	if err != nil {
-		return "", err
-	}
-	q, err := decodeBase64("q")
-	if err != nil {
-		return "", err
-	}
-	dp, err := decodeBase64("dp")
-	if err != nil {
-		return "", err
-	}
-	dq, err := decodeBase64("dq")
-	if err != nil {
-		return "", err
-	}
-	qi, err := decodeBase64("qi")
-	if err != nil {
-		return "", err
-	}
-
-	privateKeyRSA := &rsa.PrivateKey{
+	// Create an RSA private key from JWK components.
+	key := &rsa.PrivateKey{
 		PublicKey: rsa.PublicKey{
-			N: n,
-			E: int(e.Int64()),
+			N: &jwkData.N.Int,
+			E: int(jwkData.E.Int64()),
 		},
-		D:      d,
-		Primes: []*big.Int{p, q},
+		D:      &jwkData.D.Int,
+		Primes: []*big.Int{&jwkData.P.Int, &jwkData.Q.Int},
 		Precomputed: rsa.PrecomputedValues{
-			Dp:   dp,
-			Dq:   dq,
-			Qinv: qi,
+			Dp:   &jwkData.Dp.Int,
+			Dq:   &jwkData.Dq.Int,
+			Qinv: &jwkData.Qinv.Int,
 		},
 	}
 
-	// create a JWT token using required claims and sign it with the private key
+	return signJWT(cnf, key)
+
+}
+
+// base64int is a JSON decoding shim for base64-encoded big.Int.
+type base64int struct {
+	big.Int
+}
+
+func (i *base64int) UnmarshalJSON(b []byte) error {
+	src, ok := bytes.CutPrefix(b, []byte{'"'})
+	if !ok {
+		return fmt.Errorf("invalid JSON type: %s", b)
+	}
+	src, ok = bytes.CutSuffix(src, []byte{'"'})
+	if !ok {
+		return fmt.Errorf("invalid JSON type: %s", b)
+	}
+	dst := make([]byte, base64.RawURLEncoding.DecodedLen(len(src)))
+	_, err := base64.RawURLEncoding.Decode(dst, src)
+	if err != nil {
+		return err
+	}
+	i.SetBytes(dst)
+	return nil
+}
+
+func generateOktaJWTPEM(pemdata string, cnf *oauth2.Config) (string, error) {
+	key, err := pemPKCS8PrivateKey([]byte(pemdata))
+	if err != nil {
+		return "", err
+	}
+	return signJWT(cnf, key)
+}
+
+func pemPKCS8PrivateKey(pemdata []byte) (any, error) {
+	blk, rest := pem.Decode(pemdata)
+	if rest := bytes.TrimSpace(rest); len(rest) != 0 {
+		return nil, fmt.Errorf("PEM text has trailing data: %d bytes", len(rest))
+	}
+	if blk == nil {
+		return nil, errors.New("no PEM data")
+	}
+	return x509.ParsePKCS8PrivateKey(blk.Bytes)
+}
+
+// signJWT creates a JWT token using required claims and sign it with the
+// private key.
+func signJWT(cnf *oauth2.Config, key any) (string, error) {
 	now := time.Now()
 	tok, err := jwt.NewBuilder().Audience([]string{cnf.Endpoint.TokenURL}).
 		Issuer(cnf.ClientID).
@@ -157,13 +190,12 @@ func generateOktaJWT(oktaJWK []byte, cnf *oauth2.Config) (string, error) {
 		Expiration(now.Add(time.Hour)).
 		Build()
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to create token: %w", err)
 	}
-	signedToken, err := jwt.Sign(tok, jwt.WithKey(jwa.RS256, privateKeyRSA))
+	signedToken, err := jwt.Sign(tok, jwt.WithKey(jwa.RS256, key))
 	if err != nil {
 		return "", fmt.Errorf("failed to sign token: %w", err)
 	}
-
 	return string(signedToken), nil
 }
 

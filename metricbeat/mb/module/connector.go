@@ -34,7 +34,6 @@ type Connector struct {
 	pipeline   beat.PipelineConnector
 	processors *processors.Processors
 	eventMeta  mapstr.EventMetadata
-	timeSeries bool
 	keepNull   bool
 }
 
@@ -95,6 +94,17 @@ func (c *Connector) UseMetricSetProcessors(r metricSetRegister, moduleName, metr
 	}
 	c.processors = procs
 	return nil
+}
+
+// addProcessors appends processors to the connector properties.
+func (c *Connector) addProcessors(procs []beat.Processor) {
+	if c.processors == nil {
+		c.processors = processors.NewList(nil)
+	}
+
+	for _, p := range procs {
+		c.processors.AddProcessor(p)
+	}
 }
 
 func (c *Connector) Connect() (beat.Client, error) {

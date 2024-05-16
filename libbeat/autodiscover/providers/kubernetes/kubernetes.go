@@ -279,7 +279,9 @@ func NewLeaderElectionManager(
 		Name:      cfg.LeaderLease,
 		Namespace: ns,
 	}
-	metaUID := lease.GetObjectMeta().GetUID()
+
+	var eventID string
+	leaseId := lease.Name + "-" + lease.Namespace
 	lem.leaderElection = leaderelection.LeaderElectionConfig{
 		Lock: &resourcelock.LeaseLock{
 			LeaseMeta: lease,
@@ -289,18 +291,17 @@ func NewLeaderElectionManager(
 			},
 		},
 		ReleaseOnCancel: true,
-		LeaseDuration:   15 * time.Second,
-		RenewDeadline:   10 * time.Second,
-		RetryPeriod:     2 * time.Second,
+		LeaseDuration:   cfg.LeaseDuration,
+		RenewDeadline:   cfg.RenewDeadline,
+		RetryPeriod:     cfg.RetryPeriod,
 		Callbacks: leaderelection.LeaderCallbacks{
 			OnStartedLeading: func(ctx context.Context) {
-				logger.Debugf("leader election lock GAINED, id %v", id)
-				eventID := fmt.Sprintf("%v-%v", metaUID, time.Now().UnixNano())
+				eventID = fmt.Sprintf("%v-%v", leaseId, time.Now().UnixNano())
+				logger.Debugf("leader election lock GAINED, holder: %v, eventID: %v", id, eventID)
 				startLeading(uuid.String(), eventID)
 			},
 			OnStoppedLeading: func() {
-				logger.Debugf("leader election lock LOST, id %v", id)
-				eventID := fmt.Sprintf("%v-%v", metaUID, time.Now().UnixNano())
+				logger.Debugf("leader election lock LOST, holder: %v, eventID: %v", id, eventID)
 				stopLeading(uuid.String(), eventID)
 			},
 		},
@@ -329,7 +330,7 @@ func (p *eventerManager) GenerateHints(event bus.Event) bus.Event {
 func (p *leaderElectionManager) Start() {
 	ctx, cancel := context.WithCancel(context.TODO())
 	p.cancelLeaderElection = cancel
-	p.startLeaderElector(ctx, p.leaderElection)
+	p.startLeaderElectorIndefinitely(ctx, p.leaderElection)
 }
 
 // Stop signals the stop channel to force the leader election loop routine to stop.
@@ -344,14 +345,27 @@ func (p *leaderElectionManager) GenerateHints(event bus.Event) bus.Event {
 	return event
 }
 
-// startLeaderElector starts a Leader Elector in the background with the provided config
-func (p *leaderElectionManager) startLeaderElector(ctx context.Context, lec leaderelection.LeaderElectionConfig) {
+// startLeaderElectorIndefinitely starts a Leader Elector in the background with the provided config.
+// If this instance gets the lease lock and later loses it, we run the leader elector again.
+func (p *leaderElectionManager) startLeaderElectorIndefinitely(ctx context.Context, lec leaderelection.LeaderElectionConfig) {
 	le, err := leaderelection.NewLeaderElector(lec)
 	if err != nil {
 		p.logger.Errorf("error while creating Leader Elector: %w", err)
 	}
 	p.logger.Debugf("Starting Leader Elector")
-	go le.Run(ctx)
+
+	go func() {
+		for {
+			le.Run(ctx)
+			select {
+			case <-ctx.Done():
+				return
+			default:
+				// Run returned because the lease was lost. Run the leader elector again, so this instance
+				// is still a candidate to get the lease.
+			}
+		}
+	}()
 }
 
 func ShouldPut(event mapstr.M, field string, value interface{}, logger *logp.Logger) {

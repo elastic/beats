@@ -52,32 +52,33 @@ func makeFileout(
 	observer outputs.Observer,
 	cfg *c.C,
 ) (outputs.Group, error) {
-	foConfig := defaultConfig()
-	if err := cfg.Unpack(&foConfig); err != nil {
+	foConfig, err := readConfig(cfg)
+	if err != nil {
 		return outputs.Fail(err)
 	}
-
-	// disable bulk support in publisher pipeline
-	_ = cfg.SetInt("bulk_max_size", -1, -1)
 
 	fo := &fileOutput{
 		log:      logp.NewLogger("file"),
 		beat:     beat,
 		observer: observer,
 	}
-	if err := fo.init(beat, foConfig); err != nil {
+	if err = fo.init(beat, *foConfig); err != nil {
 		return outputs.Fail(err)
 	}
 
-	return outputs.Success(foConfig.Queue, -1, 0, fo)
+	return outputs.Success(foConfig.Queue, -1, 0, nil, fo)
 }
 
 func (out *fileOutput) init(beat beat.Info, c fileOutConfig) error {
 	var path string
+	configPath, runErr := c.Path.Run(time.Now().UTC())
+	if runErr != nil {
+		return runErr
+	}
 	if c.Filename != "" {
-		path = filepath.Join(c.Path, c.Filename)
+		path = filepath.Join(configPath, c.Filename)
 	} else {
-		path = filepath.Join(c.Path, out.beat.Beat)
+		path = filepath.Join(configPath, out.beat.Beat)
 	}
 
 	out.filePath = path

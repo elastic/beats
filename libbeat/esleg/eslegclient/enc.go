@@ -109,6 +109,13 @@ func (b *jsonEncoder) Marshal(obj interface{}) error {
 	return b.AddRaw(obj)
 }
 
+// RawEncoding is used to wrap objects that have already been json-encoded,
+// so the encoder knows to append them directly instead of treating them
+// like a string.
+type RawEncoding struct {
+	Encoding []byte
+}
+
 func (b *jsonEncoder) AddRaw(obj interface{}) error {
 	var err error
 	switch v := obj.(type) {
@@ -116,6 +123,8 @@ func (b *jsonEncoder) AddRaw(obj interface{}) error {
 		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
 	case *beat.Event:
 		err = b.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
+	case RawEncoding:
+		_, err = b.buf.Write(v.Encoding)
 	default:
 		err = b.folder.Fold(obj)
 	}
@@ -199,6 +208,8 @@ func (g *gzipEncoder) AddRaw(obj interface{}) error {
 		err = g.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
 	case *beat.Event:
 		err = g.folder.Fold(event{Timestamp: v.Timestamp, Fields: v.Fields})
+	case RawEncoding:
+		_, err = g.gzip.Write(v.Encoding)
 	default:
 		err = g.folder.Fold(obj)
 	}

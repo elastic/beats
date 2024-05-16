@@ -53,6 +53,8 @@
               type: long
         - name: store.size_in_bytes
           type: long
+        - name: store.total_data_set_size_in_bytes
+          type: long
         - name: docs.count
           type: long
         - name: docs.deleted
@@ -113,6 +115,11 @@
           type: long
           description: >
               Total size of the index in bytes.
+        - name: store.total_data_set_size_in_bytes
+          format: bytes
+          type: long
+          description: >
+            Total size of the index in bytes including backing data for partially mounted indices.
         - name: query_cache
           type: group
           fields:
