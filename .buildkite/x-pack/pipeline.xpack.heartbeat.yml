@@ -126,8 +126,6 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Windows 2016 Unit Tests"
 
-<<<<<<< HEAD
-=======
       # Doesn't exist in Jenkins
       - label: ":windows: x-pack/heartbeat Windows 2022 Unit Tests"
         key: "mandatory-win-2022-unit-tests"
@@ -157,7 +155,6 @@ steps:
     skip: "skipping due to elastic/beats#23957 and elastic/beats#23958"
 
     steps:
->>>>>>> 5bff7ec4ed (Fixed pipelines formatting (#39513))
       - label: ":windows: x-pack/heartbeat Windows 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/heartbeat
@@ -179,8 +176,6 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Windows 10 Unit Tests"
 
-<<<<<<< HEAD
-=======
       # Doesn't exist in Jenkins
       - label: ":windows: x-pack/heartbeat Windows 11 Unit Tests"
         command: |
@@ -224,7 +219,6 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: Windows 2019 Unit Tests"
 
->>>>>>> 5bff7ec4ed (Fixed pipelines formatting (#39513))
   - group: "x-pack/heartbeat macOS Extended Tests"
     key: "x-pack-heartbeat-extended-tests-macos"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
@@ -251,8 +245,6 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: macOS x86_64 Extended Tests"
 
-<<<<<<< HEAD
-=======
       - label: ":mac: x-pack/heartbeat macOS arm64 Unit Tests"
         command: |
           set -euo pipefail
@@ -274,7 +266,6 @@ steps:
           - github_commit_status:
               context: "x-pack/heartbeat: macOS arm64 Extended Tests"
 
->>>>>>> 5bff7ec4ed (Fixed pipelines formatting (#39513))
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
     # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests

@@ -47,7 +47,7 @@ steps:
         command: "cd packetbeat && mage build unitTest"
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
@@ -78,7 +78,6 @@ steps:
         notify:
           - github_commit_status:
               context: "packetbeat: Windows 2019 Unit Tests"
-
 
   - group: "Extended Windows Tests"
     key: "packetbeat-extended-windows-tests"
@@ -165,8 +164,6 @@ steps:
           - github_commit_status:
               context: "packetbeat: Extended Windows 11 Unit Tests"
 
-<<<<<<< HEAD
-=======
       - label: ":windows: Windows 2019 Unit Tests"
         command: |
           Set-Location -Path packetbeat
@@ -188,7 +185,6 @@ steps:
           - github_commit_status:
               context: "packetbeat: Extended Windows 2019 Unit Tests"
 
->>>>>>> 5bff7ec4ed (Fixed pipelines formatting (#39513))
   - group: "Extended Tests"
     key: "extended-tests"
     steps:
@@ -213,8 +209,6 @@ steps:
           - github_commit_status:
               context: "packetbeat: Extended MacOS x86_64 Unit Tests"
 
-<<<<<<< HEAD
-=======
       - label: ":mac: MacOS arm64 Unit Tests"
         key: "macos-arm64-unit-tests-extended"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
@@ -254,7 +248,6 @@ steps:
           - github_commit_status:
               context: "packetbeat: Extended Ubuntu ARM Unit Tests"
 
->>>>>>> 5bff7ec4ed (Fixed pipelines formatting (#39513))
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
     # for other cases, e.g. merge commits, we want to run packaging (and publish) independently of other tests

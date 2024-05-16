@@ -82,9 +82,6 @@ steps:
           - "x-pack/osquerybeat/build/*.json"
         notify:
           - github_commit_status:
-<<<<<<< HEAD
-              context: "x-pack/osquerybeat: Windows 2019 Unit Tests"
-=======
               context: "x-pack/osquerybeat: Windows 2016 Unit Tests"
 
       - label: ":windows: Windows 2022 Unit Tests"
@@ -107,7 +104,6 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: Windows 2022 Unit Tests"
->>>>>>> 5bff7ec4ed (Fixed pipelines formatting (#39513))
 
       # windows-2022 wasn't defined in Jenkins (mandatory or extended) hence not migrated -> https://github.com/elastic/beats/blob/f021699c4bc9a494d255eb339c819c2745eb87f8/x-pack/osquerybeat/Jenkinsfile.yml#L36-L70
   - group: "x-pack/osquerybeat Extended Windows Tests"
@@ -135,9 +131,6 @@ steps:
           - github_commit_status:
               context: "x-pack/osquerybeat: Windows 10 Unit Tests"
 
-<<<<<<< HEAD
-      # Windows 11 wasn't defined in Jenkins, hence not migrating -> https://github.com/elastic/beats/blob/f021699c4bc9a494d255eb339c819c2745eb87f8/x-pack/osquerybeat/Jenkinsfile.yml#L50-L53
-=======
       - label: ":windows: Windows 11 Unit Tests"
         command: |
           Set-Location -Path x-pack/osquerybeat
@@ -158,7 +151,6 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: Windows 11 Unit Tests"
->>>>>>> 5bff7ec4ed (Fixed pipelines formatting (#39513))
 
       # contrary to other projects Windows 2016 is defined as extended for 7.17 -> https://github.com/elastic/beats/blob/ec9d1ccb50b947ed7d6c49d2e17a2cd611a251a9/x-pack/osquerybeat/Jenkinsfile.yml#L40-L44
       - label: ":windows: Windows 2016 Unit Tests"
@@ -204,9 +196,6 @@ steps:
           - github_commit_status:
               context: "x-pack/osquerybeat: MacOS x86_64 Unit Tests"
 
-<<<<<<< HEAD
-      # macOS arm64 is not tested on 7.17 see https://github.com/elastic/beats/blob/ec9d1ccb50b947ed7d6c49d2e17a2cd611a251a9/x-pack/osquerybeat/Jenkinsfile.yml#L22-L34
-=======
       - label: ":mac: MacOS arm64 Unit Tests"
         command: |
           set -euo pipefail
@@ -224,7 +213,6 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/osquerybeat: MacOS arm64 Unit Tests"
->>>>>>> 5bff7ec4ed (Fixed pipelines formatting (#39513))
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed

@@ -39,10 +39,6 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: Ubuntu Unit Tests"
 
-<<<<<<< HEAD
-      - label: ":linux: Ubuntu ARM Unit Tests"
-        key: "extended-arm64-unit-test"
-=======
       - label: ":linux: Ubuntu System Tests"
         key: "mandatory-linux-system-test"
         command: |
@@ -64,7 +60,6 @@ steps:
 
       - label: ":rhel: RHEL9 Unit Tests"
         key: "mandatory-rhel9-unit-test"
->>>>>>> 5bff7ec4ed (Fixed pipelines formatting (#39513))
         command: |
           cd x-pack/packetbeat
           mage build unitTest
@@ -93,9 +88,6 @@ steps:
             - limit: 3
         agents:
           provider: "gcp"
-<<<<<<< HEAD
-          image: "${IMAGE_WIN_2019}"
-=======
           image: "${IMAGE_WIN_2016}"
           machine_type: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
@@ -140,7 +132,6 @@ steps:
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
->>>>>>> 5bff7ec4ed (Fixed pipelines formatting (#39513))
           machineType: "${GCP_WIN_MACHINE_TYPE}"
           disk_size: 100
           disk_type: "pd-ssd"
@@ -195,9 +186,6 @@ steps:
           - "x-pack/packetbeat/build/*.json"
         notify:
           - github_commit_status:
-<<<<<<< HEAD
-              context: "x-pack/packetbeat: Windows 2016 Unit Tests"
-=======
               context: "x-pack/packetbeat: Windows 11 Unit Tests"
 
       - label: ":windows: Windows 2019 Unit Tests"
@@ -266,7 +254,6 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/packetbeat: Ubuntu ARM Unit Tests"
->>>>>>> 5bff7ec4ed (Fixed pipelines formatting (#39513))
 
   - group: "x-pack/packetbeat MacOS Extended Tests"
     key: "x-pack-packetbeat-extended-macos-tests"
@@ -292,8 +279,6 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: MacOS Unit Tests"
 
-<<<<<<< HEAD
-=======
       - label: ":mac: MacOS arm64 Unit Tests"
         key: "macos-arm64-unit-tests-extended"
         command: |
@@ -314,7 +299,6 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: MacOS arm64 Unit Tests"
 
->>>>>>> 5bff7ec4ed (Fixed pipelines formatting (#39513))
   - group: "x-pack/packetbeat Packaging"
     key: "x-pack-packetbeat-packaging"
     if: build.env("BUILDKITE_PULL_REQUEST") != "false"
