@@ -154,29 +154,6 @@ steps:
           - github_commit_status:
               context: "auditbeat: macOS x86_64 Unit Tests"
 
-<<<<<<< HEAD
-=======
-      - label: ":mac: Auditbeat macOS arm64 ARM Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd auditbeat
-          mage build unitTest
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "auditbeat/build/*.xml"
-          - "auditbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "auditbeat: macOS arm64 Unit Tests"
-
->>>>>>> 2aef900171 (Restore macOS CI execution with merge commits (#39598))
   - group: "Auditbeat Windows Extended Testing"
     key: "auditbeat-extended-tests-win"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
