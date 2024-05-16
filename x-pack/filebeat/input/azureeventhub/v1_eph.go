@@ -6,8 +6,6 @@
 
 package azureeventhub
 
-import "github.com/Azure/go-autorest/autorest/azure"
-
 // import (
 //
 //	"context"
@@ -23,12 +21,12 @@ import "github.com/Azure/go-autorest/autorest/azure"
 // )
 //
 // // users can select from one of the already defined azure cloud envs
-var environments = map[string]azure.Environment{
-	azure.ChinaCloud.ResourceManagerEndpoint:        azure.ChinaCloud,
-	azure.GermanCloud.ResourceManagerEndpoint:       azure.GermanCloud,
-	azure.PublicCloud.ResourceManagerEndpoint:       azure.PublicCloud,
-	azure.USGovernmentCloud.ResourceManagerEndpoint: azure.USGovernmentCloud,
-}
+//var environments = map[string]azure.Environment{
+//	azure.ChinaCloud.ResourceManagerEndpoint:        azure.ChinaCloud,
+//	azure.GermanCloud.ResourceManagerEndpoint:       azure.GermanCloud,
+//	azure.PublicCloud.ResourceManagerEndpoint:       azure.PublicCloud,
+//	azure.USGovernmentCloud.ResourceManagerEndpoint: azure.USGovernmentCloud,
+//}
 
 // // runWithEPH will consume ingested events using the Event Processor Host (EPH).
 // //
@@ -105,14 +103,14 @@ var environments = map[string]azure.Environment{
 //
 //		return nil
 //	}
-func getAzureEnvironment(overrideResManager string) (azure.Environment, error) {
-	// if no override is set then the azure public cloud is used
-	if overrideResManager == "" || overrideResManager == "<no value>" {
-		return azure.PublicCloud, nil
-	}
-	if env, ok := environments[overrideResManager]; ok {
-		return env, nil
-	}
-	// can retrieve hybrid env from the resource manager endpoint
-	return azure.EnvironmentFromURL(overrideResManager)
-}
+//func getAzureEnvironment(overrideResManager string) (azure.Environment, error) {
+//	// if no override is set then the azure public cloud is used
+//	if overrideResManager == "" || overrideResManager == "<no value>" {
+//		return azure.PublicCloud, nil
+//	}
+//	if env, ok := environments[overrideResManager]; ok {
+//		return env, nil
+//	}
+//	// can retrieve hybrid env from the resource manager endpoint
+//	return azure.EnvironmentFromURL(overrideResManager)
+//}
