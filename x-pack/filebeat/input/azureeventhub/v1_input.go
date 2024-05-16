@@ -198,9 +198,9 @@ func (in *eventHubInputV1) run(ctx context.Context) error {
 
 func (in *eventHubInputV1) processEvents(event *eventhub.Event, partitionID string) bool {
 	processingStartTime := time.Now()
-	azure := mapstr.M{
-		// partitionID is only mapped in the non-eph option which is not available yet, this field will be temporary unavailable
-		//"partition_id":   partitionID,
+	eventHubMetadata := mapstr.M{
+		// The `partition_id` is not available in the
+		// current version of the SDK.
 		"eventhub":       in.config.EventHubName,
 		"consumer_group": in.config.ConsumerGroup,
 	}
@@ -212,9 +212,9 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event, partitionID stri
 	records := in.parseMultipleRecords(event.Data)
 
 	for _, record := range records {
-		_, _ = azure.Put("offset", event.SystemProperties.Offset)
-		_, _ = azure.Put("sequence_number", event.SystemProperties.SequenceNumber)
-		_, _ = azure.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
+		_, _ = eventHubMetadata.Put("offset", event.SystemProperties.Offset)
+		_, _ = eventHubMetadata.Put("sequence_number", event.SystemProperties.SequenceNumber)
+		_, _ = eventHubMetadata.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
 
 		//ok := in.outlet.OnEvent(beat.Event{
 		//	// this is the default value for the @timestamp field; usually the ingest
@@ -237,7 +237,7 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event, partitionID stri
 			Timestamp: processingStartTime,
 			Fields: mapstr.M{
 				"message": record,
-				"azure":   azure,
+				"azure":   eventHubMetadata,
 			},
 			Private: event.Data,
 		}
