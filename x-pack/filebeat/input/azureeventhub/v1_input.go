@@ -69,12 +69,8 @@ func (in *eventHubInputV1) Run(
 	defer in.pipelineClient.Close()
 
 	// Setup input metrics
-	inputMetrics := newInputMetrics(inputContext.ID, nil)
-	if err != nil {
-		return fmt.Errorf("failed to create input metrics: %w", err)
-	}
-	defer inputMetrics.Close()
-	in.metrics = inputMetrics
+	in.metrics = newInputMetrics(inputContext.ID, nil)
+	defer in.metrics.Close()
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
