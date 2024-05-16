@@ -113,7 +113,7 @@ func (p *addSessionMetadata) Run(ev *beat.Event) (*beat.Event, error) {
 		return ev, nil //nolint:nilerr // Running on events with a different PID type is not a processor error
 	}
 
-	err = p.provider.UpdateDB(ev, pid)
+	err = p.provider.SyncDB(ev, pid)
 	if err != nil {
 		return ev, err
 	}
