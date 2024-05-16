@@ -29,3 +29,6 @@ wait4
 
 # Reexec
 execve
+
+# Get Systemd version
+fork
