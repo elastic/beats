@@ -27,7 +27,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -47,7 +47,7 @@ steps:
           mage goIntegTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -67,7 +67,7 @@ steps:
           mage pythonIntegTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -79,15 +79,20 @@ steps:
           - github_commit_status:
               context: "libbeat: Python Integration Tests"
 
-      - label: ":negative_squared_cross_mark: Cross compile"
-        key: "mandatory-cross-compile"
+      - label: "Module compat tests: next major"
+        # Run module integration tests under next major of Elastic stack.
+        env:
+          STACK_ENVIRONMENT: "next-major"
         command: |
           set -euo pipefail
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet libbeat
+          echo "~~~ Running tests"
           cd libbeat
-          make crosscompile
+          mage pythonIntegTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -96,7 +101,27 @@ steps:
           - "libbeat/build/*.xml"
           - "libbeat/build/*.json"
         notify:
-          - github_commit_status: 
+          - github_commit_status:
+              context: "libbeat: Module compat tests / next major"
+
+      - label: ":negative_squared_cross_mark: Cross compile"
+        key: "mandatory-cross-compile"
+        command: |
+          set -euo pipefail
+          cd libbeat
+          make crosscompile
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "libbeat/build/*.xml"
+          - "libbeat/build/*.json"
+        notify:
+          - github_commit_status:
               context: "libbeat: Cross compile"
 
       - label: ":testengine: Stress Tests"
@@ -107,7 +132,7 @@ steps:
           make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' GOTEST_OUTPUT_OPTIONS=' | go-junit-report > libbeat-stress-test.xml' stress-tests
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -129,7 +154,7 @@ steps:
           mage build unitTest
         retry:
           automatic:
-           - limit: 3
+            - limit: 3
         agents:
           provider: "aws"
           imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
