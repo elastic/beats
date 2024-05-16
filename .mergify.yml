@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+queue_rules:
+  - name: default
+    conditions:
+      - check-success=buildkite/beats
+>>>>>>> 37105d7a09 ([BK] - Migrate left over to buildkite (#39591))
 pull_request_rules:
   - name: backport patches to 7.x branch
     conditions:
@@ -65,9 +72,35 @@ pull_request_rules:
             git merge upstream/{{base}}
             git push upstream {{head}}
             ```
+<<<<<<< HEAD
   - name: Automatic squash and merge with success checks and the files matching the regex ^testing/environments/snapshot* are modified.
+=======
+  - name: close automated pull requests with bump updates if any conflict
     conditions:
-      - check-success=beats-ci/pr-merge
+      - -merged
+      - -closed
+      - conflict
+      - author=apmmachine
+      - label=automation
+    actions:
+      close:
+        message: |
+          This pull request has been automatically closed by Mergify.
+          There are some other up-to-date pull requests.
+  - name: automatic approval for automated pull requests with bump updates
+    conditions:
+      - author=apmmachine
+      - check-success=buildkite/beats
+      - label=automation
+      - files~=^testing/environments/snapshot.*\.yml$
+    actions:
+      review:
+        type: APPROVE
+        message: Automatically approving mergify
+  - name: automatic squash and merge with success checks and the files matching the regex ^testing/environments/snapshot* are modified.
+>>>>>>> 37105d7a09 ([BK] - Migrate left over to buildkite (#39591))
+    conditions:
+      - check-success=buildkite/beats
       - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
     actions:
@@ -96,3 +129,238 @@ pull_request_rules:
         - files~=^\.go-version$
     actions:
       delete_head_branch:
+<<<<<<< HEAD
+=======
+  - name: automatic approval for mergify pull requests with changes in bump-rules
+    conditions:
+      - author=mergify[bot]
+      - check-success=buildkite/beats
+      - label=automation
+      - files~=^\.mergify\.yml$
+      - head~=^add-backport-next.*
+    actions:
+      review:
+        type: APPROVE
+        message: Automatically approving mergify
+  - name: automatic squash and merge with success checks and the files matching the regex ^.mergify.yml is modified.
+    conditions:
+      - check-success=buildkite/beats
+      - label=automation
+      - files~=^\.mergify\.yml$
+      - head~=^add-backport-next.*
+      - "#approved-reviews-by>=1"
+    actions:
+      queue:
+        method: squash
+        name: default
+  - name: delete upstream branch with changes on ^.mergify.yml that has been merged or closed
+    conditions:
+      - or:
+        - merged
+        - closed
+      - and:
+        - label=automation
+        - head~=^add-backport-next.*
+        - files~=^\.mergify\.yml$
+    actions:
+      delete_head_branch:
+  - name: notify the backport policy
+    conditions:
+      - -label~=^backport
+      - base=main
+      - -merged
+      - -closed
+    actions:
+      comment:
+        message: |
+          This pull request does not have a backport label.
+          If this is a bug or security fix, could you label this PR @{{author}}? 🙏.
+          For such, you'll need to label your PR with:
+          * The upcoming major version of the Elastic Stack
+          * The upcoming minor version of the Elastic Stack (if you're not pushing a breaking change)
+
+          To fixup this pull request, you need to add the backport labels for the needed
+          branches, such as:
+          * `backport-v8./d.0` is the label to automatically backport to the `8./d` branch. `/d` is the digit
+  - name: notify the backport has not been merged yet
+    conditions:
+      - -merged
+      - -closed
+      - author=mergify[bot]
+      - "#check-success>0"
+      - schedule=Mon-Mon 06:00-10:00[Europe/Paris]
+      - "#assignee>=1"
+    actions:
+      comment:
+        message: |
+          This pull request has not been merged yet. Could you please review and merge it @{{ assignee | join(', @') }}? 🙏
+  - name: backport patches to 7.17 branch
+    conditions:
+      - merged
+      - label=backport-v7.17.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "7.17"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.3 branch
+    conditions:
+      - merged
+      - label=backport-v8.3.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.3"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.4 branch
+    conditions:
+      - merged
+      - label=backport-v8.4.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.4"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.5 branch
+    conditions:
+      - merged
+      - label=backport-v8.5.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.5"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.6 branch
+    conditions:
+      - merged
+      - label=backport-v8.6.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.6"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.7 branch
+    conditions:
+      - merged
+      - label=backport-v8.7.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.7"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.8 branch
+    conditions:
+      - merged
+      - label=backport-v8.8.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.8"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.9 branch
+    conditions:
+      - merged
+      - label=backport-v8.9.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.9"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.10 branch
+    conditions:
+      - merged
+      - label=backport-v8.10.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.10"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.11 branch
+    conditions:
+      - merged
+      - label=backport-v8.11.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.11"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.12 branch
+    conditions:
+      - merged
+      - label=backport-v8.12.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.12"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.13 branch
+    conditions:
+      - merged
+      - label=backport-v8.13.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.13"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+  - name: backport patches to 8.14 branch
+    conditions:
+      - merged
+      - label=backport-v8.14.0
+    actions:
+      backport:
+        assignees:
+          - "{{ author }}"
+        branches:
+          - "8.14"
+        labels:
+          - "backport"
+        title: "[{{ destination_branch }}](backport #{{ number }}) {{ title }}"
+>>>>>>> 37105d7a09 ([BK] - Migrate left over to buildkite (#39591))
