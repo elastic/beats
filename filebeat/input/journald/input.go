@@ -28,6 +28,8 @@ import (
 	"time"
 
 	"github.com/coreos/go-systemd/v22/sdjournal"
+	"github.com/urso/sderr"
+
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalread"
 	input "github.com/elastic/beats/v7/filebeat/input/v2"
@@ -38,7 +40,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader/parser"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
-	"github.com/urso/sderr"
 )
 
 type journald struct {
