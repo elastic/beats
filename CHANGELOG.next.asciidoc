@@ -43,7 +43,6 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Introduce input/netmetrics and refactor netflow input metrics {pull}38055[38055]
 - Update Salesforce module to use new Salesforce input. {pull}37509[37509]
 
-
 *Heartbeat*
 
 *Metricbeat*
@@ -207,6 +206,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Add procfs backend to the `add_session_metadata` processor. {pull}38799[38799]
 - Add process.entity_id, process.group.name and process.group.id in add_process_metadata processor. Make fim module with kprobes backend to always add an appropriately configured add_process_metadata processor to enrich file events {pull}38776[38776]
 - Reduce data size for add_session_metadata processor by removing unneeded fields {pull}39500[39500]
+- Enrich process events with user and group names, with add_session_metadata processor  {pull}39537[39537]
 
 *Auditbeat*
 
@@ -310,6 +310,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Winlogbeat*
 
+- Use fixed size buffer at first pass for event parsing, improving throughput {issue}39530[39530] {pull}39544[39544]
 
 *Functionbeat*
 
