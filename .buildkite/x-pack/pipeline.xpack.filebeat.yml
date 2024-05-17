@@ -28,7 +28,25 @@ env:
 steps:
   - group: "x-pack/filebeat Mandatory Tests"
     key: "x-pack-filebeat-mandatory-tests"
+
     steps:
+      - label: ":ubuntu: x-pack/filebeat Linux arm64 Unit Tests"
+        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
+        key: "x-pack-filebeat-mandatory-linux-arm-unit-test"
+        command: |
+          cd x-pack/filebeat
+          mage build unitTest
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - "x-pack/filebeat/build/*.xml"
+          - "x-pack/filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/filebeat: Linux arm64 Unit Tests"
+
       - label: ":ubuntu: x-pack/filebeat Unit Tests"
         key: "x-pack-filebeat-mandatory-linux-unit-test"
         command: |
@@ -86,53 +104,6 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Python Integration Tests"
 
-      - label: ":windows: x-pack/filebeat Win-2022 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/filebeat
-          mage build unitTest
-        key: "x-pack-filebeat-mandatory-win-2022-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/filebeat/build/*.xml"
-          - "x-pack/filebeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/filebeat: Win-2022 Unit Tests"
-
-      - label: ":windows: x-pack/filebeat Win-2016 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/filebeat
-          mage build unitTest
-        key: "x-pack-filebeat-mandatory-win-2016-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2016}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/filebeat/build/*.xml"
-          - "x-pack/filebeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/filebeat: Win-2016 Unit Tests"
-
-  - group: "x-pack/filebeat Extended Windows Tests"
-    key: "x-pack-filebeat-extended-win-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
-
-    steps:
       - label: ":windows: x-pack/filebeat Win-2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
@@ -153,6 +124,32 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/filebeat: Win-2019 Unit Tests"
+
+  - group: "x-pack/filebeat Extended Windows Tests"
+    key: "x-pack-filebeat-extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+
+    steps:
+      - label: ":windows: x-pack/filebeat Win-2016 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/filebeat
+          mage build unitTest
+        key: "x-pack-filebeat-mandatory-win-2016-unit-tests"
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2016}"
+          machine_type: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/filebeat/build/*.xml"
+          - "x-pack/filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/filebeat: Win-2016 Unit Tests"
 
       - label: ":windows: x-pack/filebeat Win 10 Unit Tests"
         command: |
@@ -175,48 +172,10 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Win 10 Unit Tests"
 
-      - label: ":windows: x-pack/filebeat Win 11 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/filebeat
-          mage build unitTest
-        key: "x-pack-filebeat-extended-win-11-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/filebeat/build/*.xml"
-          - "x-pack/filebeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/filebeat: Win 11 Unit Tests"
-
   - group: "x-pack/filebeat Extended Tests"
     key: "x-pack-filebeat-extended-tests"
 
     steps:
-      - label: ":ubuntu: x-pack/filebeat Linux arm64 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-        key: "x-pack-filebeat-mandatory-linux-arm-unit-test"
-        command: |
-          cd x-pack/filebeat
-          mage build unitTest
-        agents:
-          provider: "aws"
-          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths:
-          - "x-pack/filebeat/build/*.xml"
-          - "x-pack/filebeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/filebeat: Linux arm64 Unit Tests"
-
       - label: ":mac: x-pack/filebeat macOS x86_64 Unit Tests"
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
