@@ -16,7 +16,9 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"reflect"
+	"strings"
 	"sync"
 	"time"
 
@@ -27,7 +29,7 @@ import (
 	"go.uber.org/zap/zapcore"
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
-	stateless "github.com/elastic/beats/v7/filebeat/input/v2/input-stateless"
+	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	"github.com/elastic/beats/v7/libbeat/monitoring/inputmon"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -52,13 +54,13 @@ type httpEndpoint struct {
 func Plugin() v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
-		Stability:  feature.Beta,
+		Stability:  feature.Stable,
 		Deprecated: false,
-		Manager:    stateless.NewInputManager(configure),
+		Manager:    v2.ConfigureWith(configure),
 	}
 }
 
-func configure(cfg *conf.C) (stateless.Input, error) {
+func configure(cfg *conf.C) (v2.Input, error) {
 	conf := defaultConfig()
 	if err := cfg.Unpack(&conf); err != nil {
 		return nil, err
@@ -100,14 +102,37 @@ func (e *httpEndpoint) Test(_ v2.TestContext) error {
 	return l.Close()
 }
 
-func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error {
+func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	metrics := newInputMetrics(ctx.ID)
 	defer metrics.Close()
-	err := servers.serve(ctx, e, publisher, metrics)
+
+	if e.config.Tracer != nil {
+		id := sanitizeFileName(ctx.ID)
+		e.config.Tracer.Filename = strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
+	}
+
+	client, err := pipeline.ConnectWith(beat.ClientConfig{
+		EventListener: newEventACKHandler(),
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create pipeline client: %w", err)
+	}
+	defer client.Close()
+
+	err = servers.serve(ctx, e, client.Publish, metrics)
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return fmt.Errorf("unable to start server due to error: %w", err)
 	}
 	return nil
+}
+
+// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
+// The request.tracer.filename may have ":" when a http_endpoint input has cursor config and
+// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
+func sanitizeFileName(name string) string {
+	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
+	name = filepath.Clean(name)
+	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
 // servers is the package-level server pool.
@@ -125,7 +150,7 @@ type pool struct {
 // cancelled or the context of another end-point sharing the same address
 // has had its context cancelled. If an end-point is re-registered with
 // the same address and mux pattern, serve will return an error.
-func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub stateless.Publisher, metrics *inputMetrics) error {
+func (p *pool) serve(ctx v2.Context, e *httpEndpoint, pub func(beat.Event), metrics *inputMetrics) error {
 	log := ctx.Logger.With("address", e.addr)
 	pattern := e.config.URL
 
@@ -300,14 +325,15 @@ func (s *server) getErr() error {
 	return s.err
 }
 
-func newHandler(ctx context.Context, c config, prg *program, pub stateless.Publisher, log *logp.Logger, metrics *inputMetrics) http.Handler {
+func newHandler(ctx context.Context, c config, prg *program, pub func(beat.Event), log *logp.Logger, metrics *inputMetrics) http.Handler {
 	h := &handler{
+		ctx:         ctx,
 		log:         log,
 		txBaseID:    newID(),
 		txIDCounter: atomic.NewUint64(0),
 
-		publisher: pub,
-		metrics:   metrics,
+		publish: pub,
+		metrics: metrics,
 		validator: apiValidator{
 			basicAuth:    c.BasicAuth,
 			username:     c.Username,
@@ -375,10 +401,12 @@ type inputMetrics struct {
 	apiErrors           *monitoring.Uint   // number of API errors
 	batchesReceived     *monitoring.Uint   // number of event arrays received
 	batchesPublished    *monitoring.Uint   // number of event arrays published
+	batchesACKedTotal   *monitoring.Uint   // Number of event arrays ACKed.
 	eventsPublished     *monitoring.Uint   // number of events published
 	contentLength       metrics.Sample     // histogram of request content lengths.
 	batchSize           metrics.Sample     // histogram of the received batch sizes.
 	batchProcessingTime metrics.Sample     // histogram of the elapsed successful batch processing times in nanoseconds (time of handler start to time of ACK for non-empty batches).
+	batchACKTime        metrics.Sample     // histogram of the elapsed successful batch acking times in nanoseconds (time of handler start to time of ACK for non-empty batches).
 }
 
 func newInputMetrics(id string) *inputMetrics {
@@ -391,10 +419,12 @@ func newInputMetrics(id string) *inputMetrics {
 		apiErrors:           monitoring.NewUint(reg, "api_errors_total"),
 		batchesReceived:     monitoring.NewUint(reg, "batches_received_total"),
 		batchesPublished:    monitoring.NewUint(reg, "batches_published_total"),
+		batchesACKedTotal:   monitoring.NewUint(reg, "batches_acked_total"),
 		eventsPublished:     monitoring.NewUint(reg, "events_published_total"),
 		contentLength:       metrics.NewUniformSample(1024),
 		batchSize:           metrics.NewUniformSample(1024),
 		batchProcessingTime: metrics.NewUniformSample(1024),
+		batchACKTime:        metrics.NewUniformSample(1024),
 	}
 	_ = adapter.NewGoMetrics(reg, "size", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.contentLength))
@@ -402,6 +432,8 @@ func newInputMetrics(id string) *inputMetrics {
 		Register("histogram", metrics.NewHistogram(out.batchSize))
 	_ = adapter.NewGoMetrics(reg, "batch_processing_time", adapter.Accept).
 		Register("histogram", metrics.NewHistogram(out.batchProcessingTime))
+	_ = adapter.NewGoMetrics(reg, "batch_ack_time", adapter.Accept).
+		Register("histogram", metrics.NewHistogram(out.batchACKTime))
 
 	return out
 }
