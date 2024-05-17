@@ -94,6 +94,32 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Python (MODULE) Integration Tests"
 
+      - label: ":windows: Windows 2019 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/metricbeat
+          mage build unitTest
+        key: "extended-win-2019-unit-tests"
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2019}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/metricbeat/build/*.xml"
+          - "x-pack/metricbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/metricbeat: Windows 2019 Unit Tests"
+
+  - group: "x-pack/metricbeat Extended Windows Tests"
+    key: "x-pack-metricbeat-extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+
+    steps:
       - label: ":windows: Windows 2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/metricbeat
@@ -115,31 +141,6 @@ steps:
           - github_commit_status:
               context: "x-pack/metricbeat: Windows 2016 Unit Tests"
 
-      - label: ":windows: Windows 2022 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/metricbeat
-          mage build unitTest
-        key: "mandatory-win-2022-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: Windows 2022 Unit Tests"
-
-  - group: "x-pack/metricbeat Extended Windows Tests"
-    key: "x-pack-metricbeat-extended-win-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
-    steps:
       - label: ":windows: Windows 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/metricbeat
@@ -160,48 +161,6 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: Windows 10 Unit Tests"
-
-      - label: ":windows: Windows 11 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/metricbeat
-          mage build unitTest
-        key: "extended-win-11-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: Windows 11 Unit Tests"
-
-      - label: ":windows: Windows 2019 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/metricbeat
-          mage build unitTest
-        key: "extended-win-2019-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: Windows 2019 Unit Tests"
 
   - group: "x-pack/metricbeat Extended Tests"
     key: "x-pack-metricbeat-extended-tests"
@@ -225,27 +184,6 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: MacOS x86_64 Unit Tests"
-
-      - label: ":mac: MacOS arm64 Unit Tests"
-        skip: "Skipping due to elastic/beats#33036"
-        # https://github.com/elastic/beats/issues/33036
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd x-pack/metricbeat && mage build unitTest
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "x-pack/metricbeat/build/*.xml"
-          - "x-pack/metricbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/metricbeat: MacOS arm64 Unit Tests"
 
       - label: ":linux: Cloud (MODULE) Tests"
         key: "x-pack-metricbeat-extended-cloud-test"
@@ -291,7 +229,7 @@ steps:
           echo "~~~ Running tests"
           source .buildkite/scripts/setup_cloud_env.sh
           cd x-pack/metricbeat
-          mage build test goIntegTest
+          mage build test
         env:
           ASDF_TERRAFORM_VERSION: 1.0.2
           AWS_REGION: "eu-central-1"
