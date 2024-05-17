@@ -16,7 +16,9 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"reflect"
+	"strings"
 	"sync"
 	"time"
 
@@ -104,6 +106,11 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 	metrics := newInputMetrics(ctx.ID)
 	defer metrics.Close()
 
+	if e.config.Tracer != nil {
+		id := sanitizeFileName(ctx.ID)
+		e.config.Tracer.Filename = strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
+	}
+
 	client, err := pipeline.ConnectWith(beat.ClientConfig{
 		EventListener: newEventACKHandler(),
 	})
@@ -117,6 +124,15 @@ func (e *httpEndpoint) Run(ctx v2.Context, pipeline beat.Pipeline) error {
 		return fmt.Errorf("unable to start server due to error: %w", err)
 	}
 	return nil
+}
+
+// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
+// The request.tracer.filename may have ":" when a http_endpoint input has cursor config and
+// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
+func sanitizeFileName(name string) string {
+	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
+	name = filepath.Clean(name)
+	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
 // servers is the package-level server pool.
