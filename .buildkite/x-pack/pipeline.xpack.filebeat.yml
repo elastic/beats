@@ -115,7 +115,7 @@ steps:
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet x-pack/filebeat
           echo "~~~ Running tests"
-          cd filebeat
+          cd x-pack/filebeat
           mage pythonIntegTest
         retry:
           automatic:
