@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"os"
 	"path"
 	"sort"
@@ -170,22 +169,19 @@ func (s bySegmentID) Less(i, j int) bool { return s[i].id < s[j].id }
 // Scan the given path for segment files, and return them in a list
 // ordered by segment id.
 func scanExistingSegments(logger *logp.Logger, pathStr string) ([]*queueSegment, error) {
-	segmentFiles, err := os.ReadDir(pathStr)
+	dirEntries, err := os.ReadDir(pathStr)
 	if err != nil {
 		return nil, fmt.Errorf("could not read queue directory '%s': %w", pathStr, err)
 	}
-	files := make([]fs.FileInfo, 0, len(segmentFiles))
-	for _, entry := range segmentFiles {
-		info, err := entry.Info()
-		if err != nil {
-			logger.Errorf("could not get info for file '%s': %w. Skipping it", info.Name(), err)
-			continue
-		}
-		files = append(files, info)
-	}
 
 	segments := []*queueSegment{}
-	for _, file := range files {
+	for _, dirEntry := range dirEntries {
+		file, err := dirEntry.Info()
+		if err != nil {
+			logger.Errorf("could not get info for file '%s', skipping. Error: %w", dirEntry.Name(), err)
+			continue
+		}
+
 		components := strings.Split(file.Name(), ".")
 		if len(components) == 2 && strings.ToLower(components[1]) == "seg" {
 			// Parse the id as base-10 64-bit unsigned int. We ignore file names that
