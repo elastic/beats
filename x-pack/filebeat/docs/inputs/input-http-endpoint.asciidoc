@@ -46,9 +46,9 @@ These are the possible response codes from the server.
 The endpoint will enforce end-to-end ACK when a URL query parameter
 `wait_for_completion_timeout` with a duration is provided. For example
 `http://localhost:8080/?wait_for_completion_timeout=1m` will wait up
-to 1min for the event to be published to the cluster and then return
+to 1 minute for the event to be published to the cluster and then return
 the user-defined response message. In the case that the publication
-does not happen within the timeout duration, the HTTP response will
+does not complete within the timeout duration, the HTTP response will
 have a 504 Gateway Timeout status code. The syntax for durations is
 a number followed by units which may be h, m and s. No other HTTP query
 is accepted. If another query parameter is provided or duration syntax
