@@ -1015,10 +1015,10 @@ spec:
         filter_enabled: true
         trigger_mode: code
       env:
-        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: "true"
-        SLACK_NOTIFICATIONS_CHANNEL: "#ingest-notifications"
-        SLACK_NOTIFICATIONS_ON_SUCCESS: "false"
-        SLACK_NOTIFICATIONS_SKIP_FOR_RETRIES: "true"
+        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
+        SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
+        SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
+        SLACK_NOTIFICATIONS_SKIP_FOR_RETRIES: 'true'        
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
@@ -1069,9 +1069,9 @@ apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
   name: beats-pipeline-scheduler
-  description: "Scheduled runs of various Beats pipelines per release branch"
+  description: 'Scheduled runs of various Beats pipelines per release branch'
   links:
-    - title: "Scheduled runs of Beats pipelines per release branch"
+    - title: 'Scheduled runs of Beats pipelines per release branch'
       url: https://buildkite.com/elastic/logstash-pipeline-scheduler
 spec:
   type: buildkite-pipeline
@@ -1082,7 +1082,7 @@ spec:
     kind: Pipeline
     metadata:
       name: beats-pipeline-scheduler
-      description: ":alarm_clock: Scheduled runs of various Beats pipelines per release branch"
+      description: ':alarm_clock: Scheduled runs of various Beats pipelines per release branch'
     spec:
       repository: elastic/beats
       pipeline_file: ".buildkite/pipeline-scheduler.yml"
@@ -1093,14 +1093,14 @@ spec:
           cronline: 30 02 * * *
           message: Daily trigger of Iron Bank validation Pipeline per branch
           env:
-            PIPELINES_TO_TRIGGER: "beats-ironbank-validation"
+            PIPELINES_TO_TRIGGER: 'beats-ironbank-validation'
       skip_intermediate_builds: true
       provider_settings:
         trigger_mode: none
       env:
-        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: "true"
-        SLACK_NOTIFICATIONS_CHANNEL: "#ingest-notifications"
-        SLACK_NOTIFICATIONS_ON_SUCCESS: "false"
+        ELASTIC_SLACK_NOTIFICATIONS_ENABLED: 'true'
+        SLACK_NOTIFICATIONS_CHANNEL: '#ingest-notifications'
+        SLACK_NOTIFICATIONS_ON_SUCCESS: 'false'
       teams:
         ingest-fp:
           access_level: MANAGE_BUILD_AND_READ
