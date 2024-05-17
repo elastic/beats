@@ -122,7 +122,7 @@ func (procStats *Stats) Get() ([]mapstr.M, []mapstr.M, error) {
 		// Add the RSS pct memory first
 		process.Memory.Rss.Pct = GetProcMemPercentage(process, totalPhyMem)
 		// Create the root event
-		rootMap := processRootEvent(process)
+		rootMap := processRootEvent(&process)
 
 		proc, err := procStats.getProcessEvent(&process)
 		if err != nil {
@@ -163,7 +163,7 @@ func (procStats *Stats) GetOneRootEvent(pid int) (mapstr.M, mapstr.M, error) {
 		return nil, nil, fmt.Errorf("error formatting process %d: %w", pid, err)
 	}
 
-	rootMap := processRootEvent(pidStat)
+	rootMap := processRootEvent(&pidStat)
 
 	return procMap, rootMap, err
 }

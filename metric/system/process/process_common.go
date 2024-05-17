@@ -211,7 +211,7 @@ func (procStats *Stats) Init() error {
 }
 
 // processRootEvent formats the process state event for the ECS root fields used by the system/process metricsets
-func processRootEvent(process ProcState) mapstr.M {
+func processRootEvent(process *ProcState) mapstr.M {
 	// Create the root event
 	root := process.FormatForRoot()
 	rootMap := mapstr.M{}

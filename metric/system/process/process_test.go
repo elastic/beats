@@ -42,6 +42,22 @@ import (
 	"github.com/elastic/elastic-agent-system-metrics/metric/system/resolve"
 )
 
+func TestProcessEvent(t *testing.T) {
+	proc := ProcState{Args: []string{"-b", "-c"},
+		Name:     "test",
+		Username: "user",
+		Memory:   ProcMemInfo{Rss: MemBytePct{Pct: opt.FloatWith(4.5)}},
+	}
+
+	root := processRootEvent(&proc)
+
+	require.Empty(t, proc.Name)
+	require.Empty(t, proc.Username)
+	require.Empty(t, proc.Args)
+
+	require.NotNil(t, root["process"].(map[string]interface{})["memory"])
+}
+
 // BenchmarkGetProcess runs a benchmark of the GetProcess method with caching
 // of the command line and environment variables.
 func BenchmarkGetProcess(b *testing.B) {
