@@ -7,7 +7,6 @@ package synthexec
 
 import (
 	"os"
-	"os/exec"
 
 	"golang.org/x/sys/unix"
 
@@ -16,7 +15,7 @@ import (
 )
 
 func init() {
-	platformCmdMutate = func(cmd *exec.Cmd) {
+	platformCmdMutate = func(cmd *SynthCmd) {
 		logp.L().Warn("invoking node as:", security.NodeChildProcCred, " from: ", os.Getenv("HOME"))
 		// Note that while cmd.SysProcAtr takes a syscall.SysProcAttr object
 		// we are passing in a unix.SysProcAttr object

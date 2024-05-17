@@ -153,9 +153,9 @@ func NewProvider(ctx context.Context, logger *logp.Logger, db *processdb.DB) (pr
 }
 
 const (
-	maxWaitLimit      = 200 * time.Millisecond // Maximum time UpdateDB will wait for process
-	combinedWaitLimit = 2 * time.Second        // Multiple UpdateDB calls will wait up to this amount within resetDuration
-	backoffDuration   = 10 * time.Second       // UpdateDB will stop waiting for processes for this time
+	maxWaitLimit      = 200 * time.Millisecond // Maximum time SyncDB will wait for process
+	combinedWaitLimit = 2 * time.Second        // Multiple SyncDB calls will wait up to this amount within resetDuration
+	backoffDuration   = 10 * time.Second       // SyncDB will stop waiting for processes for this time
 	resetDuration     = 5 * time.Second        // After this amount of times with no backoffs, the combinedWait will be reset
 )
 
@@ -176,7 +176,7 @@ var (
 // If for some reason a lot of time has been spent waiting for missing processes, this also has a backoff timer during
 // which it will continue without waiting for missing events to arrive, so the processor doesn't become overly backed-up
 // waiting for these processes, at the cost of possibly not enriching some processes.
-func (s prvdr) UpdateDB(ev *beat.Event, pid uint32) error {
+func (s prvdr) SyncDB(ev *beat.Event, pid uint32) error {
 	if s.db.HasProcess(pid) {
 		return nil
 	}

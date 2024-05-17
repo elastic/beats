@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-
 REPO_DIR=$(pwd)
 
 teardown() {
@@ -31,7 +30,6 @@ tf_cleanup() {
 trap 'teardown' EXIT
 
 # Prepare the cloud resources using Terraform
-#startCloudTestEnv "${MODULE_DIR}"
 echo "~~~ Loading creds"
 set +o xtrace
 export AWS_ACCESS_KEY_ID=$BEATS_AWS_ACCESS_KEY
@@ -50,8 +48,3 @@ export TF_VAR_ENVIRONMENT="ci"
 export TF_VAR_REPO="${REPO}"
 terraform init && terraform apply -auto-approve
 cd -
-
-# Run tests
-echo "~~~ Run Cloud Tests for $BEATS_PROJECT_NAME"
-cd "${BEATS_PROJECT_NAME}"
-mage build test
