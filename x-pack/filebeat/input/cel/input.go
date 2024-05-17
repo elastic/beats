@@ -64,7 +64,8 @@ const (
 	root = "state"
 )
 
-// The Filebeat user-agent is provided to the program as useragent.
+// The Filebeat user-agent is provided to the program as useragent. If a request
+// is not given a user-agent string, this user agent is added to the request.
 var userAgent = useragent.UserAgent("Filebeat", version.GetDefaultVersion(), version.Commit(), version.BuildTime().String())
 
 func Plugin(log *logp.Logger, store inputcursor.StateStore) v2.Plugin {
@@ -758,6 +759,11 @@ func newClient(ctx context.Context, cfg config, log *logp.Logger, reg *monitorin
 		return authClient, trace, nil
 	}
 
+	c.Transport = userAgentDecorator{
+		UserAgent: userAgent,
+		Transport: c.Transport,
+	}
+
 	return c, trace, nil
 }
 
@@ -854,6 +860,18 @@ func retryErrorHandler(max int, log *logp.Logger) retryablehttp.ErrorHandler {
 		log.Warnw("giving up retries", "method", resp.Request.Method, "url", resp.Request.URL, "retries", max+1)
 		return resp, err
 	}
+}
+
+type userAgentDecorator struct {
+	UserAgent string
+	Transport http.RoundTripper
+}
+
+func (t userAgentDecorator) RoundTrip(r *http.Request) (*http.Response, error) {
+	if _, ok := r.Header["User-Agent"]; !ok {
+		r.Header.Set("User-Agent", t.UserAgent)
+	}
+	return t.Transport.RoundTrip(r)
 }
 
 func newRateLimiterFromConfig(cfg *ResourceConfig) *rate.Limiter {

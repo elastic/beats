@@ -270,6 +270,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Update CEL mito extensions to v1.11.0 to improve type checking. {pull}39460[39460]
 - Improve logging of request and response with request trace logging in error conditions. {pull}39455[39455]
 - Add HTTP metrics to CEL input. {issue}39501[39501] {pull}39503[39503]
+- Add default user-agent to CEL HTTP requests. {issue}39502[39502] {pull}39587[39587]
 
 *Auditbeat*
 
