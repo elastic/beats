@@ -242,7 +242,7 @@ As noted above the `cel` input provides functions, macros, and global variables 
 * {mito_docs}/lib#Debug[Debug] — the debug handler registers a logger with the name extension `cel_debug` and calls to the CEL `debug` function are emitted to that logger.
 ** {mito_docs}/lib#hdr-Debug[Debug]
 
-In addition to the extensions provided in the packages listed above, a global variable `useragent` is also provided which gives the user CEL program access to the {beatname_lc} user-agent string.
+In addition to the extensions provided in the packages listed above, a global variable `useragent` is also provided which gives the user CEL program access to the {beatname_lc} user-agent string. By default, this value is assigned to all requests' user-agent headers unless the CEL program has already set the user-agent header value. Programs wishing to not provide a user-agent, should set this header to the empty string, `""`.
 
 The CEL environment enables the https://pkg.go.dev/github.com/google/cel-go/cel#OptionalTypes[optional types] library using the version defined {mito_docs}/lib#OptionalTypesVersion[here].
 
