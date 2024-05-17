@@ -45,6 +45,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 
 *Heartbeat*
 
+- Fix monitor state loader to not wait extra seconds for the last attempt {pull}39621[39621]
+
 *Metricbeat*
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
