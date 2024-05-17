@@ -208,7 +208,7 @@ require (
 	github.com/elastic/elastic-agent-autodiscover v0.6.14
 	github.com/elastic/elastic-agent-libs v0.9.7
 	github.com/elastic/elastic-agent-shipper-client v0.5.1-0.20230228231646-f04347b666f3
-	github.com/elastic/elastic-agent-system-metrics v0.10.1
+	github.com/elastic/elastic-agent-system-metrics v0.10.2
 	github.com/elastic/go-elasticsearch/v8 v8.13.1
 	github.com/elastic/mito v1.11.0
 	github.com/elastic/tk-btf v0.1.0
