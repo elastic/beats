@@ -12,6 +12,7 @@ processors:
 - set:
     field: event.original
     value: "{{message}}"
+    if: ctx.event?.original == null
 ############
 # DNS Logs #
 ############

@@ -271,6 +271,8 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Improve logging of request and response with request trace logging in error conditions. {pull}39455[39455]
 - Add HTTP metrics to CEL input. {issue}39501[39501] {pull}39503[39503]
 - Add default user-agent to CEL HTTP requests. {issue}39502[39502] {pull}39587[39587]
+- Improve reindexing support in security module pipelines. {issue}38224[38224] {pull}[]
+- Improve reindexing support in security module pipelines. {issue}38224[38224] {pull}39588[39588]
 
 *Auditbeat*
 
