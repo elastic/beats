@@ -34,14 +34,11 @@ import (
 	"testing"
 	"time"
 
-	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/beats/v7/libbeat/publisher/queue"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
 )
 
 var (
@@ -61,28 +58,12 @@ var (
 )
 
 // makePublisherEvent creates a sample publisher.Event, using a random message from msgs list
-func makePublisherEvent() publisher.Event {
+func makePublisherEvent(r *rand.Rand) publisher.Event {
 	return publisher.Event{
 		Content: beat.Event{
 			Timestamp: eventTime,
 			Fields: mapstr.M{
-				"message": msgs[rand.Intn(len(msgs))],
-			},
-		},
-	}
-}
-
-// makeMessagesEvent creates a sample *messages.Event, using a random message from msgs list
-func makeMessagesEvent() *messages.Event {
-	return &messages.Event{
-		Timestamp: timestamppb.New(eventTime),
-		Fields: &messages.Struct{
-			Data: map[string]*messages.Value{
-				"message": {
-					Kind: &messages.Value_StringValue{
-						StringValue: msgs[rand.Intn(len(msgs))],
-					},
-				},
+				"message": msgs[r.Intn(len(msgs))],
 			},
 		},
 	}
@@ -99,7 +80,6 @@ func setup(b *testing.B, encrypt bool, compress bool, protobuf bool) (*diskQueue
 		s.EncryptionKey = []byte("testtesttesttest")
 	}
 	s.UseCompression = compress
-	s.UseProtobuf = protobuf
 	q, err := NewQueue(logp.L(), nil, s, nil)
 	if err != nil {
 		panic(err)
@@ -116,14 +96,9 @@ func setup(b *testing.B, encrypt bool, compress bool, protobuf bool) (*diskQueue
 	return q, p
 }
 
-func publishEvents(p queue.Producer, num int, protobuf bool) {
+func publishEvents(r *rand.Rand, p queue.Producer, num int) {
 	for i := 0; i < num; i++ {
-		var e queue.Entry
-		if protobuf {
-			e = makeMessagesEvent()
-		} else {
-			e = makePublisherEvent()
-		}
+		e := makePublisherEvent(r)
 		_, ok := p.Publish(e)
 		if !ok {
 			panic("didn't publish")
@@ -149,15 +124,15 @@ func getAndAckEvents(q *diskQueue, num_events int, batch_size int) error {
 // produceAndConsume generates and publishes events in a go routine, in
 // the main go routine it consumes and acks them.  This interleaves
 // publish and consume.
-func produceAndConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int, protobuf bool) error {
-	go publishEvents(p, num_events, protobuf)
+func produceAndConsume(r *rand.Rand, p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
+	go publishEvents(r, p, num_events)
 	return getAndAckEvents(q, num_events, batch_size)
 }
 
 // produceThenConsume generates and publishes events, when all events
 // are published it consumes and acks them.
-func produceThenConsume(p queue.Producer, q *diskQueue, num_events int, batch_size int, protobuf bool) error {
-	publishEvents(p, num_events, protobuf)
+func produceThenConsume(r *rand.Rand, p queue.Producer, q *diskQueue, num_events int, batch_size int) error {
+	publishEvents(r, p, num_events)
 	return getAndAckEvents(q, num_events, batch_size)
 }
 
@@ -169,15 +144,15 @@ func benchmarkQueue(num_events int, batch_size int, encrypt bool, compress bool,
 
 	for n := 0; n < b.N; n++ {
 		b.StopTimer()
-		rand.Seed(1)
+		r := rand.New(rand.NewSource(1))
 		q, p := setup(b, encrypt, compress, protobuf)
 		b.StartTimer()
 		if async {
-			if err = produceAndConsume(p, q, num_events, batch_size, protobuf); err != nil {
+			if err = produceAndConsume(r, p, q, num_events, batch_size); err != nil {
 				break
 			}
 		} else {
-			if err = produceThenConsume(p, q, num_events, batch_size, protobuf); err != nil {
+			if err = produceThenConsume(r, p, q, num_events, batch_size); err != nil {
 				break
 			}
 		}
