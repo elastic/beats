@@ -26,6 +26,7 @@ import (
 	"time"
 
 	"go.elastic.co/apm/v2"
+	"gotest.tools/gotestsum/log"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/beat/events"
@@ -66,7 +67,11 @@ type clientSettings struct {
 	connection       eslegclient.ConnectionSettings
 	indexSelector    outputs.IndexSelector
 	pipelineSelector *outil.Selector
-	observer         outputs.Observer
+
+	// The metrics observer from the clientSettings, or a no-op placeholder if
+	// none is provided. This variable is always non-nil for a client created
+	// via NewClient.
+	observer outputs.Observer
 
 	// If deadLetterIndex is set, events with bulk-ingest errors will be
 	// forwarded to this index. Otherwise, they will be dropped.
@@ -126,11 +131,17 @@ func NewClient(
 		return nil
 	}
 
+	// Make sure there's a non-nil obser
+	observer := s.observer
+	if observer == nil {
+		observer = outputs.NewNilObserver()
+	}
+
 	client := &Client{
 		conn:             *conn,
 		indexSelector:    s.indexSelector,
 		pipelineSelector: pipeline,
-		observer:         s.observer,
+		observer:         observer,
 		deadLetterIndex:  s.deadLetterIndex,
 
 		log: logp.NewLogger("elasticsearch"),
@@ -179,129 +190,149 @@ func (client *Client) Clone() *Client {
 }
 
 func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error {
-	events := batch.Events()
-	eventsToRetry, err := client.publishEvents(ctx, events)
+	client.observer.NewBatch(len(batch.Events()))
 
-	if errors.Is(err, errPayloadTooLarge) {
+	span, ctx := apm.StartSpan(ctx, "publishEvents", "output")
+	defer span.End()
+
+	// Create and send the bulk request.
+	bulkResult := client.doBulkRequest(ctx, span, batch)
+	client.observer.ReportLatency(bulkResult.duration)
+
+	// If there was a connection-level error there is no per-item response,
+	// handle it and return.
+	if bulkResult.err != nil {
+		return client.handleBulkResultError(ctx, batch, bulkResult)
+	}
+
+	// At this point we have an Elasticsearch response for our request,
+	// check and report the per-item results.
+	client.reportBulkResult(ctx, span, batch, bulkResult)
+	return nil
+}
+
+type bulkResult struct {
+	err error
+
+	// The array of events sent via bulk request. This excludes any events that
+	// had encoding errors while assembling the request.
+	events []publisher.Event
+
+	// The http status returned by the bulk request.
+	status int
+
+	// The API response from Elasticsearch.
+	response eslegclient.BulkResult
+
+	// The time it took to send the bulk request and read the response.
+	duration time.Duration
+}
+
+var bulkRequestParams = map[string]string{
+	"filter_path": "errors,items.*.error,items.*.status",
+}
+
+// Encode a batch's events into a bulk publish request, send the request to
+// Elasticsearch, and return the resulting metadata.
+// The events list in the result will be shorter than the original batch if
+// some events couldn't be encoded. In this case, the removed events will
+// be reported to the Client's metrics observer via PermanentErrors.
+func (client *Client) doBulkRequest(
+	ctx context.Context,
+	span *apm.Span,
+	batch publisher.Batch,
+) bulkResult {
+	var result bulkResult
+
+	rawEvents := batch.Events()
+
+	// encode events into bulk request buffer, dropping failed elements from
+	// events slice
+	span.Context.SetLabel("events_original", len(rawEvents))
+	resultEvents, bulkItems := client.bulkEncodePublishRequest(client.conn.GetVersion(), rawEvents)
+	result.events = resultEvents
+	span.Context.SetLabel("events_encoded", len(resultEvents))
+	client.observer.PermanentErrors(len(rawEvents) - len(resultEvents))
+
+	// If we encoded any events, send the network request.
+	if len(result.events) > 0 {
+		begin := time.Now()
+		result.status, result.response, result.err = client.conn.Bulk(ctx, "", "", bulkRequestParams, bulkItems)
+		result.duration = time.Since(begin)
+	}
+
+	return result
+}
+
+func (client *Client) handleBulkResultError(
+	ctx context.Context, batch publisher.Batch, bulkResult bulkResult,
+) error {
+	if bulkResult.status == http.StatusRequestEntityTooLarge {
 		if batch.SplitRetry() {
 			// Report that we split a batch
 			client.observer.BatchSplit()
-			client.observer.RetryableErrors(len(events))
+			client.observer.RetryableErrors(len(bulkResult.events))
 		} else {
 			// If the batch could not be split, there is no option left but
 			// to drop it and log the error state.
 			batch.Drop()
-			client.observer.PermanentErrors(len(events))
-			err := apm.CaptureError(ctx, fmt.Errorf("failed to perform bulk index operation: %w", err))
+			client.observer.PermanentErrors(len(bulkResult.events))
+			err := apm.CaptureError(ctx, fmt.Errorf("failed to perform bulk index operation: %w", bulkResult.err))
 			err.Send()
 			client.log.Error(err)
 		}
-		// Returning an error from Publish forces a client close / reconnect,
-		// so don't pass this error through since it doesn't indicate anything
-		// wrong with the connection.
+		// Don't propagate a too-large error since it doesn't indicate a problem
+		// with the connection.
 		return nil
 	}
-	if len(eventsToRetry) > 0 {
+	err := apm.CaptureError(ctx, fmt.Errorf("failed to perform any bulk index operations: %w", bulkResult.err))
+	err.Send()
+	client.log.Error(err)
+
+	if len(bulkResult.events) > 0 {
 		// At least some events failed, retry them
-		batch.RetryEvents(eventsToRetry)
+		batch.RetryEvents(bulkResult.events)
 	} else {
 		// All events were sent successfully
 		batch.ACK()
 	}
-	return err
+	return bulkResult.err
 }
 
-// PublishEvents sends all events to elasticsearch. On error a slice with all
-// events not published or confirmed to be processed by elasticsearch will be
-// returned. The input slice backing memory will be reused by return the value.
-// Each input event will be reported to the metrics observer via NewBatch, and
-// exactly one of:
-// - RetryableErrors
-// - PermanentErrors
-// - DuplicateEvents
-// - AckedEvents
-func (client *Client) publishEvents(ctx context.Context, events []publisher.Event) ([]publisher.Event, error) {
-	span, ctx := apm.StartSpan(ctx, "publishEvents", "output")
-	defer span.End()
+// reportBulkResult processes the result of a bulk request. It reports the
+// event states to the metrics observer and acknowledges or retries the
+// batch as appropriate.
+// The returned error is for connection-level errors. A non-nil value should
+// be returned from (*Client).Publish to trigger a reconnection attempt.
+func (client *Client) reportBulkResult(
+	ctx context.Context,
+	span *apm.Span,
+	batch publisher.Batch,
+	bulkResult bulkResult,
+) {
+	span.Context.SetLabel("events_published", len(bulkResult.events))
+	client.log.Debugf("PublishEvents: %d events have been sent to elasticsearch in %v.",
+		len(bulkResult.events), bulkResult.duration)
 
-	st := client.observer
+	eventsToRetry, stats := client.bulkCollectPublishFails(bulkResult)
+	stats.reportToObserver(client.observer)
 
-	if st != nil {
-		st.NewBatch(len(events))
-	}
-
-	if len(events) == 0 {
-		return nil, nil
-	}
-
-	// encode events into bulk request buffer, dropping failed elements from
-	// events slice
-	origCount := len(events)
-	span.Context.SetLabel("events_original", origCount)
-	events, bulkItems := client.bulkEncodePublishRequest(client.conn.GetVersion(), events)
-	newCount := len(events)
-	span.Context.SetLabel("events_encoded", newCount)
-	if st != nil && origCount > newCount {
-		st.PermanentErrors(origCount - newCount)
-	}
-	if newCount == 0 {
-		return nil, nil
-	}
-
-	begin := time.Now()
-	params := map[string]string{"filter_path": "errors,items.*.error,items.*.status"}
-	status, result, sendErr := client.conn.Bulk(ctx, "", "", params, bulkItems)
-	timeSinceSend := time.Since(begin)
-
-	if sendErr != nil {
-		if status == http.StatusRequestEntityTooLarge {
-			// This error must be handled by splitting the batch, propagate it
-			// back to Publish instead of reporting it directly
-			return events, errPayloadTooLarge
-		}
-		err := apm.CaptureError(ctx, fmt.Errorf("failed to perform any bulk index operations: %w", sendErr))
-		err.Send()
-		client.log.Error(err)
-		return events, sendErr
-	}
-	pubCount := len(events)
-	span.Context.SetLabel("events_published", pubCount)
-
-	client.log.Debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
-		pubCount,
-		timeSinceSend)
-
-	// check response for transient errors
-	var failedEvents []publisher.Event
-	var stats bulkResultStats
-	if status != 200 {
-		failedEvents = events
-		stats.fails = len(failedEvents)
+	if len(eventsToRetry) > 0 {
+		span.Context.SetLabel("events_failed", len(eventsToRetry))
+		batch.RetryEvents(eventsToRetry)
 	} else {
-		failedEvents, stats = client.bulkCollectPublishFails(result, events)
+		batch.ACK()
 	}
+}
 
-	failed := len(failedEvents)
-	span.Context.SetLabel("events_failed", failed)
-	if st := client.observer; st != nil {
-		dropped := stats.nonIndexable
-		duplicates := stats.duplicates
-		acked := len(events) - failed - dropped - duplicates
+func (stats bulkResultStats) reportToObserver(ob outputs.Observer) {
+	ob.AckedEvents(stats.acked)
+	ob.RetryableErrors(stats.fails)
+	ob.PermanentErrors(stats.nonIndexable)
+	ob.DuplicateEvents(stats.duplicates)
+	ob.DeadLetterEvents(stats.deadLetter)
 
-		st.AckedEvents(acked)
-		st.RetryableErrors(failed)
-		st.PermanentErrors(dropped)
-		st.DuplicateEvents(duplicates)
-		st.DeadLetterEvents(stats.deadLetter)
-		st.ErrTooMany(stats.tooMany)
-		st.ReportLatency(timeSinceSend)
-
-	}
-
-	if failed > 0 {
-		return failedEvents, eslegclient.ErrTempBulkFailure
-	}
-	return nil, nil
+	ob.ErrTooMany(stats.tooMany)
 }
 
 // bulkEncodePublishRequest encodes all bulk requests and returns slice of events
@@ -391,89 +422,108 @@ func getPipeline(event *beat.Event, defaultSelector *outil.Selector) (string, er
 // to be tried again due to error code returned for that items. If indexing an
 // event failed due to some error in the event itself (e.g. does not respect mapping),
 // the event will be dropped.
-func (client *Client) bulkCollectPublishFails(result eslegclient.BulkResult, data []publisher.Event) ([]publisher.Event, bulkResultStats) {
-	reader := newJSONReader(result)
-	if err := bulkReadToItems(reader); err != nil {
-		client.log.Errorf("failed to parse bulk response: %v", err.Error())
+// Each of the events will be reported in the returned stats as exactly one of
+// acked, duplicates, fails, nonIndexable, or deadLetter.
+func (client *Client) bulkCollectPublishFails(bulkResult bulkResult) ([]publisher.Event, bulkResultStats) {
+	events := bulkResult.events
+
+	if len(bulkResult.events) == 0 {
+		// No events to process
 		return nil, bulkResultStats{}
 	}
+	if bulkResult.status != 200 {
+		return events, bulkResultStats{fails: len(events)}
+	}
+	reader := newJSONReader(bulkResult.response)
+	if err := bulkReadToItems(reader); err != nil {
+		client.log.Errorf("failed to parse bulk response: %v", err.Error())
+		return events, bulkResultStats{fails: len(events)}
+	}
 
-	count := len(data)
-	failed := data[:0]
+	count := len(events)
+	eventsToRetry := events[:0]
 	stats := bulkResultStats{}
 	for i := 0; i < count; i++ {
-		encodedEvent := data[i].EncodedEvent.(*encodedEvent)
-		status, msg, err := bulkReadItemStatus(client.log, reader)
+		itemStatus, itemMessage, err := bulkReadItemStatus(client.log, reader)
 		if err != nil {
-			client.log.Error(err)
-			return nil, bulkResultStats{}
+			// The response json is invalid, mark the remaining events for retry.
+			stats.fails += count - i
+			eventsToRetry = append(eventsToRetry, events[i:]...)
+			break
 		}
 
-		if status < 300 {
-			if encodedEvent.deadLetter {
-				// This was ingested into the dead letter index, not the original target
-				stats.deadLetter++
-			} else {
-				stats.acked++
-			}
-			continue // ok value
+		if client.applyItemStatus(events[i], itemStatus, itemMessage, &stats) {
+			eventsToRetry = append(eventsToRetry, events[i])
+			log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, itemStatus, itemMessage)
 		}
-
-		if status == 409 {
-			// 409 is used to indicate an event with same ID already exists if
-			// `create` op_type is used.
-			stats.duplicates++
-			continue // ok
-		}
-
-		if status == http.StatusTooManyRequests {
-			stats.tooMany++
-		} else if status < 500 {
-			// hard failure, apply policy action
-			if encodedEvent.deadLetter {
-				// Fatal error while sending an already-failed event to the dead letter
-				// index, drop.
-				client.log.Errorf("Can't deliver to dead letter index event (status=%v). Enable debug logs to view the event and cause.", status)
-				client.log.Debugf("Can't deliver to dead letter index event %#v (status=%v): %s", data[i], status, msg)
-				stats.nonIndexable++
-				continue
-			}
-			if client.deadLetterIndex == "" {
-				// Fatal error and no dead letter index, drop.
-				client.log.Warnf("Cannot index event (status=%v): dropping event! Enable debug logs to view the event and cause.", status)
-				client.log.Debugf("Cannot index event %#v (status=%v): %s, dropping event!", data[i], status, msg)
-				stats.nonIndexable++
-				continue
-			}
-			// Send this failure to the dead letter index and "retry".
-			// We count this as a "retryable failure", then if the dead letter
-			// ingestion succeeds it is counted in the "deadLetter" counter
-			// rather than the "acked" counter.
-			client.log.Warnf("Cannot index event (status=%v), trying dead letter index. Enable debug logs to view the event and cause.", status)
-			client.log.Debugf("Cannot index event %#v (status=%v): %s, trying dead letter index", data[i], status, msg)
-			client.setDeadLetter(encodedEvent, status, string(msg))
-		}
-
-		client.log.Debugf("Bulk item insert failed (i=%v, status=%v): %s", i, status, msg)
-		stats.fails++
-		failed = append(failed, data[i])
 	}
 
-	return failed, stats
+	return eventsToRetry, stats
 }
 
-func (client *Client) setDeadLetter(
-	encodedEvent *encodedEvent, errType int, errMsg string,
-) {
-	encodedEvent.deadLetter = true
-	encodedEvent.index = client.deadLetterIndex
-	deadLetterReencoding := mapstr.M{
-		"@timestamp":    encodedEvent.timestamp,
-		"message":       string(encodedEvent.encoding),
-		"error.type":    errType,
-		"error.message": errMsg,
+// applyItemStatus processes the ingestion status of one event from a bulk request.
+// Returns true if the item should be retried.
+// In the provided bulkResultStats, applyItemStatus increments exactly one of:
+// acked, duplicates, deadLetter, fails, nonIndexable.
+func (client *Client) applyItemStatus(
+	event publisher.Event,
+	itemStatus int,
+	itemMessage []byte,
+	stats *bulkResultStats,
+) bool {
+	encodedEvent := event.EncodedEvent.(*encodedEvent)
+	if itemStatus < 300 {
+		if encodedEvent.deadLetter {
+			// This was ingested into the dead letter index, not the original target
+			stats.deadLetter++
+		} else {
+			stats.acked++
+		}
+		return false // ok value
 	}
-	encodedEvent.encoding = []byte(deadLetterReencoding.String())
+
+	if itemStatus == 409 {
+		// 409 is used to indicate an event with same ID already exists if
+		// `create` op_type is used.
+		stats.duplicates++
+		return false // ok
+	}
+
+	if itemStatus == http.StatusTooManyRequests {
+		stats.fails++
+		stats.tooMany++
+		return true
+	}
+
+	if itemStatus < 500 {
+		// hard failure, apply policy action
+		if encodedEvent.deadLetter {
+			// Fatal error while sending an already-failed event to the dead letter
+			// index, drop.
+			log.Errorf("Can't deliver to dead letter index event (status=%v). Enable debug logs to view the event and cause.", itemStatus)
+			log.Debugf("Can't deliver to dead letter index event %#v (status=%v): %s", event, itemStatus, itemMessage)
+			stats.nonIndexable++
+			return false
+		}
+		if client.deadLetterIndex == "" {
+			// Fatal error and no dead letter index, drop.
+			log.Warnf("Cannot index event (status=%v): dropping event! Enable debug logs to view the event and cause.", itemStatus)
+			log.Debugf("Cannot index event %#v (status=%v): %s, dropping event!", event, itemStatus, itemMessage)
+			stats.nonIndexable++
+			return false
+		}
+		// Send this failure to the dead letter index and "retry".
+		// We count this as a "retryable failure", and then if the dead letter
+		// ingestion succeeds it is counted in the "deadLetter" counter
+		// rather than the "acked" counter.
+		log.Warnf("Cannot index event (status=%v), trying dead letter index. Enable debug logs to view the event and cause.", itemStatus)
+		log.Debugf("Cannot index event %#v (status=%v): %s, trying dead letter index", event, itemStatus, itemMessage)
+		encodedEvent.setDeadLetter(client.deadLetterIndex, itemStatus, string(itemMessage))
+	}
+
+	// Everything else gets retried.
+	stats.fails++
+	return true
 }
 
 func (client *Client) Connect() error {
