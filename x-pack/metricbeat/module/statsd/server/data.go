@@ -33,13 +33,24 @@ type statsdMetric struct {
 
 func splitTags(rawTags, kvSep []byte) map[string]string {
 	tags := map[string]string{}
-	for _, kv := range bytes.Split(rawTags, []byte(",")) {
-		kvSplit := bytes.SplitN(kv, kvSep, 2)
-		if len(kvSplit) != 2 {
-			logger.Warn("could not parse tags")
-			continue
+	if bytes.Contains(rawTags, []byte(",")) {
+		for _, kv := range bytes.Split(rawTags, []byte(",")) {
+			kvSplit := bytes.SplitN(kv, kvSep, 2)
+			if len(kvSplit) != 2 {
+				logger.Warn("could not parse tags")
+				continue
+			}
+			tags[string(kvSplit[0])] = string(kvSplit[1])
 		}
-		tags[string(kvSplit[0])] = string(kvSplit[1])
+	} else {
+		for _, kv := range bytes.Split(rawTags, []byte(";")) {
+			kvSplit := bytes.SplitN(kv, kvSep, 2)
+			if len(kvSplit) != 2 {
+				logger.Warn("could not parse tags")
+				continue
+			}
+			tags[string(kvSplit[0])] = string(kvSplit[1])
+		}
 	}
 	return tags
 }
@@ -47,6 +58,7 @@ func splitTags(rawTags, kvSep []byte) map[string]string {
 func parseSingle(b []byte) (statsdMetric, error) {
 	// format: <metric name>:<value>|<type>[|@samplerate][|#<k>:<v>,<k>:<v>]
 	// alternative: <metric name>[,<k>=<v>,<k>=<v>]:<value>|<type>[|@samplerate]
+	// alternative: <metric name>[;<k>=<v>;<k>=<v>]:<value>|<type>[|@samplerate]
 	s := statsdMetric{}
 
 	parts := bytes.SplitN(b, []byte("|"), 4)
@@ -73,7 +85,14 @@ func parseSingle(b []byte) (statsdMetric, error) {
 		return s, errInvalidPacket
 	}
 
-	nameTagsSplit := bytes.SplitN(nameSplit[0], []byte(","), 2)
+	var nameTagsSplit [][]byte
+
+	if bytes.Contains(nameSplit[0], []byte(",")) {
+		nameTagsSplit = bytes.SplitN(nameSplit[0], []byte(","), 2)
+	} else {
+		nameTagsSplit = bytes.SplitN(nameSplit[0], []byte(";"), 2)
+	}
+
 	s.name = string(nameTagsSplit[0])
 	if len(nameTagsSplit) > 1 {
 		s.tags = splitTags(nameTagsSplit[1], []byte("="))

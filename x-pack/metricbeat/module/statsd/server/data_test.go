@@ -1022,6 +1022,20 @@ func TestParseMetrics(t *testing.T) {
 				},
 			},
 		},
+		{ // Graphite 1.1.x Tags
+			input: "tags3;k1=v1;k2=v2:1|c",
+			expected: []statsdMetric{
+				{
+					name:       "tags3",
+					metricType: "c",
+					value:      "1",
+					tags: map[string]string{
+						"k1": "v1",
+						"k2": "v2",
+					},
+				},
+			},
+		},
 		/// errors
 		{
 			input:    "meter1-1.4|m",
