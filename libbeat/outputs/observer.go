@@ -24,12 +24,12 @@ import "time"
 type Observer interface {
 	NewBatch(int) // report new batch being processed with number of events
 
-	CancelledEvents(int) // report number of events whose Publish call was cancelled for reasons unrelated to ingestion error.
-	RetryableErrors(int) // report number of events with retryable errors
-	PermanentErrors(int) // report number of events dropped due to permanent errors
-	DuplicateEvents(int) // report number of events detected as duplicates (e.g. on resends)
-	AckedEvents(int)     // report number of acked events
-	ErrTooMany(int)      // report too many requests response
+	RetryableErrors(int)  // report number of events with retryable errors
+	PermanentErrors(int)  // report number of events dropped due to permanent errors
+	DuplicateEvents(int)  // report number of events detected as duplicates (e.g. on resends)
+	DeadLetterEvents(int) // report number of failed events ingested to dead letter index
+	AckedEvents(int)      // report number of acked events
+	ErrTooMany(int)       // report too many requests response
 
 	BatchSplit() // report a batch was split for being too large to ingest
 
@@ -53,10 +53,10 @@ func NewNilObserver() Observer {
 func (*emptyObserver) NewBatch(int)                  {}
 func (*emptyObserver) ReportLatency(_ time.Duration) {}
 func (*emptyObserver) AckedEvents(int)               {}
+func (*emptyObserver) DeadLetterEvents(int)          {}
 func (*emptyObserver) DuplicateEvents(int)           {}
 func (*emptyObserver) RetryableErrors(int)           {}
 func (*emptyObserver) PermanentErrors(int)           {}
-func (*emptyObserver) CancelledEvents(int)           {}
 func (*emptyObserver) BatchSplit()                   {}
 func (*emptyObserver) WriteError(error)              {}
 func (*emptyObserver) WriteBytes(int)                {}

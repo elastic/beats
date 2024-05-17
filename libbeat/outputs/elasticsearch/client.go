@@ -180,7 +180,7 @@ func (client *Client) Clone() *Client {
 
 func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error {
 	events := batch.Events()
-	rest, err := client.publishEvents(ctx, events)
+	eventsToRetry, err := client.publishEvents(ctx, events)
 
 	if errors.Is(err, errPayloadTooLarge) {
 		if batch.SplitRetry() {
@@ -201,9 +201,9 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 		// wrong with the connection.
 		return nil
 	}
-	if len(rest) > 0 {
+	if len(eventsToRetry) > 0 {
 		// At least some events failed, retry them
-		batch.RetryEvents(rest)
+		batch.RetryEvents(eventsToRetry)
 	} else {
 		// All events were sent successfully
 		batch.ACK()
@@ -214,26 +214,32 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 // PublishEvents sends all events to elasticsearch. On error a slice with all
 // events not published or confirmed to be processed by elasticsearch will be
 // returned. The input slice backing memory will be reused by return the value.
-func (client *Client) publishEvents(ctx context.Context, data []publisher.Event) ([]publisher.Event, error) {
+// Each input event will be reported to the metrics observer via NewBatch, and
+// exactly one of:
+// - RetryableErrors
+// - PermanentErrors
+// - DuplicateEvents
+// - AckedEvents
+func (client *Client) publishEvents(ctx context.Context, events []publisher.Event) ([]publisher.Event, error) {
 	span, ctx := apm.StartSpan(ctx, "publishEvents", "output")
 	defer span.End()
 
 	st := client.observer
 
 	if st != nil {
-		st.NewBatch(len(data))
+		st.NewBatch(len(events))
 	}
 
-	if len(data) == 0 {
+	if len(events) == 0 {
 		return nil, nil
 	}
 
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
-	origCount := len(data)
+	origCount := len(events)
 	span.Context.SetLabel("events_original", origCount)
-	data, bulkItems := client.bulkEncodePublishRequest(client.conn.GetVersion(), data)
-	newCount := len(data)
+	events, bulkItems := client.bulkEncodePublishRequest(client.conn.GetVersion(), events)
+	newCount := len(events)
 	span.Context.SetLabel("events_encoded", newCount)
 	if st != nil && origCount > newCount {
 		st.PermanentErrors(origCount - newCount)
@@ -251,14 +257,14 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 		if status == http.StatusRequestEntityTooLarge {
 			// This error must be handled by splitting the batch, propagate it
 			// back to Publish instead of reporting it directly
-			return data, errPayloadTooLarge
+			return events, errPayloadTooLarge
 		}
 		err := apm.CaptureError(ctx, fmt.Errorf("failed to perform any bulk index operations: %w", sendErr))
 		err.Send()
 		client.log.Error(err)
-		return data, sendErr
+		return events, sendErr
 	}
-	pubCount := len(data)
+	pubCount := len(events)
 	span.Context.SetLabel("events_published", pubCount)
 
 	client.log.Debugf("PublishEvents: %d events have been published to elasticsearch in %v.",
@@ -269,10 +275,10 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 	var failedEvents []publisher.Event
 	var stats bulkResultStats
 	if status != 200 {
-		failedEvents = data
+		failedEvents = events
 		stats.fails = len(failedEvents)
 	} else {
-		failedEvents, stats = client.bulkCollectPublishFails(result, data)
+		failedEvents, stats = client.bulkCollectPublishFails(result, events)
 	}
 
 	failed := len(failedEvents)
@@ -280,12 +286,13 @@ func (client *Client) publishEvents(ctx context.Context, data []publisher.Event)
 	if st := client.observer; st != nil {
 		dropped := stats.nonIndexable
 		duplicates := stats.duplicates
-		acked := len(data) - failed - dropped - duplicates
+		acked := len(events) - failed - dropped - duplicates
 
 		st.AckedEvents(acked)
 		st.RetryableErrors(failed)
 		st.PermanentErrors(dropped)
 		st.DuplicateEvents(duplicates)
+		st.DeadLetterEvents(stats.deadLetter)
 		st.ErrTooMany(stats.tooMany)
 		st.ReportLatency(timeSinceSend)
 

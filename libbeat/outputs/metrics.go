@@ -42,6 +42,9 @@ type Stats struct {
 	// Number of events accepted by the output's receiver.
 	eventsACKed *monitoring.Uint
 
+	// Number of failed events ingested to the dead letter index
+	eventsDeadLetter *monitoring.Uint
+
 	// Number of events that reported a retryable error from the output's
 	// receiver.
 	eventsFailed *monitoring.Uint
@@ -85,6 +88,7 @@ func NewStats(reg *monitoring.Registry) *Stats {
 		eventsBatches:    monitoring.NewUint(reg, "events.batches"),
 		eventsTotal:      monitoring.NewUint(reg, "events.total"),
 		eventsACKed:      monitoring.NewUint(reg, "events.acked"),
+		eventsDeadLetter: monitoring.NewUint(reg, "events.dead_letter"),
 		eventsFailed:     monitoring.NewUint(reg, "events.failed"),
 		eventsDropped:    monitoring.NewUint(reg, "events.dropped"),
 		eventsDuplicates: monitoring.NewUint(reg, "events.duplicates"),
@@ -126,6 +130,13 @@ func (s *Stats) AckedEvents(n int) {
 	}
 }
 
+func (s *Stats) DeadLetterEvents(n int) {
+	if s != nil {
+		s.eventsDeadLetter.Add(uint64(n))
+		s.eventsActive.Sub(uint64(n))
+	}
+}
+
 // RetryableErrors updates active and failed event metrics.
 func (s *Stats) RetryableErrors(n int) {
 	if s != nil {
@@ -151,13 +162,6 @@ func (s *Stats) PermanentErrors(n int) {
 	if s != nil {
 		s.eventsActive.Sub(uint64(n))
 		s.eventsDropped.Add(uint64(n))
-	}
-}
-
-// CancelledEvents updates the active event metrics.
-func (s *Stats) CancelledEvents(n int) {
-	if s != nil {
-		s.eventsActive.Sub(uint64(n))
 	}
 }
 

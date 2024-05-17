@@ -297,7 +297,15 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 	assert.Equal(t, bulkResultStats{acked: 2, fails: 1, tooMany: 1}, stats)
 }
 
-func TestCollectPublishFailDeadLetterQueue(t *testing.T) {
+func TestCollectPublishFailDeadLetterSuccess(t *testing.T) {
+
+}
+
+func TestColllectPublishFailFatalErrorNotRetried(t *testing.T) {
+
+}
+
+func TestCollectPublishFailDeadLetterIndex(t *testing.T) {
 	client, err := NewClient(
 		clientSettings{
 			observer:        outputs.NewNilObserver(),
@@ -915,6 +923,10 @@ func TestPublishEventsWithBulkFiltering(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, len(recParams), 1)
 	})
+}
+
+func TestPublishPayloadTooLargeReportsMetrics(t *testing.T) {
+
 }
 
 func TestSetDeadLetter(t *testing.T) {

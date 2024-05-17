@@ -233,8 +233,7 @@ func (s *shipper) publish(ctx context.Context, batch publisher.Batch) error {
 			// request, then cancelling here (instead of dropping or retrying)
 			// will cause an infinite retry loop, wedging the pipeline.
 
-			batch.Cancelled()                       // does not decrease the TTL
-			s.observer.CancelledEvents(len(events)) // we cancel the whole batch not just non-dropped events
+			batch.Cancelled() // does not decrease the TTL
 			return fmt.Errorf("failed to publish the batch to the shipper, none of the %d events were accepted: %w", len(toSend), err)
 		}
 
