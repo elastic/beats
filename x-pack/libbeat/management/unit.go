@@ -80,7 +80,7 @@ func getStatus(s client.UnitState) status.Status {
 	}
 }
 
-func getSteamStates(expected client.Expected) (map[string]unitState, []string) {
+func getStreamStates(expected client.Expected) (map[string]unitState, []string) {
 
 	expectedCfg := expected.Config
 
@@ -127,7 +127,7 @@ func newAgentUnit(cu *client.Unit, log *logp.Logger) *agentUnit {
 	)
 
 	if cu.Type() == client.UnitTypeInput {
-		streamStates, streamIDs = getSteamStates(cu.Expected())
+		streamStates, streamIDs = getStreamStates(cu.Expected())
 	}
 
 	return &agentUnit{
@@ -197,38 +197,28 @@ func (u *agentUnit) calcState() (status.Status, string) {
 	}
 
 	// input state is marked as running, check the stream states
+	currStatus := status.Running
 	countFailed := 0
 	countDegraded := 0
 	for _, streamState := range u.streamStates {
 		switch streamState.state {
 		case status.Degraded:
 			countDegraded++
+			if currStatus == status.Running {
+				currStatus = status.Degraded
+			}
 		case status.Failed:
 			countFailed++
+			currStatus = status.Failed
 		}
 	}
 
-	if countDegraded > 0 && countFailed > 0 {
-		return status.Failed, "Some streams are Failed and some are Degraded"
+	if currStatus == status.Running {
+		return currStatus, "Healthy"
 	}
 
-	if countDegraded > 0 {
-		if countDegraded == len(u.streamStates) {
-			return status.Degraded, "All streams are Degraded"
-		} else {
-			return status.Degraded, "Some streams are Degraded"
-		}
-	}
-
-	if countFailed > 0 {
-		if countFailed == len(u.streamStates) {
-			return status.Failed, "All streams are Failed"
-		} else {
-			return status.Failed, "Some streams are Failed"
-		}
-	}
-
-	return status.Running, "Healthy"
+	return currStatus, fmt.Sprintf("Out of %d streams, %d are failed, %d are degraded",
+		len(u.streamStates), countFailed, countDegraded)
 }
 
 // Type of the unit.
@@ -341,7 +331,7 @@ func (u *agentUnit) update(cu *client.Unit) {
 		}
 	}
 
-	newStreamStates, newStreamIDs := getSteamStates(cu.Expected())
+	newStreamStates, newStreamIDs := getStreamStates(cu.Expected())
 
 	for key, state := range newStreamStates {
 		if _, exists := u.streamStates[key]; exists {
