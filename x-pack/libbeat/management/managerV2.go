@@ -420,6 +420,7 @@ func (cm *BeatV2Manager) updateUnit(unit *client.Unit) {
 
 	aUnit, ok := cm.units[unitKey{unit.Type(), unit.ID()}]
 	if !ok {
+		cm.logger.Infof("BeatV2Manager.updateUnit Unit %s not found", unit.ID())
 		return
 	}
 
