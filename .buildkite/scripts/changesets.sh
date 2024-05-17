@@ -45,7 +45,7 @@ addToModuleEnvVar() {
   done
 }
 
-defineModule() {
+defineModuleFromTheChangeSet() {
   beatPath=$1
 
   definePattern
