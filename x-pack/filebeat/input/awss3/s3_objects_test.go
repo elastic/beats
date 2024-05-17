@@ -38,8 +38,10 @@ func newS3Object(t testing.TB, filename, contentType string) (s3EventV2, *s3.Get
 
 func newS3GetObjectResponse(filename string, data []byte, contentType string) *s3.GetObjectOutput {
 	r := bytes.NewReader(data)
+	contentLength := int64(r.Len())
+
 	getObjectOutput := s3.GetObjectOutput{}
-	getObjectOutput.ContentLength = int64(r.Len())
+	getObjectOutput.ContentLength = &contentLength
 	getObjectOutput.Body = io.NopCloser(r)
 	if contentType != "" {
 		getObjectOutput.ContentType = &contentType
