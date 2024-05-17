@@ -104,6 +104,33 @@ steps:
           - github_commit_status:
               context: "x-pack/filebeat: Python Integration Tests"
 
+      - label: "Filebeat: Module compat tests - previous minor"
+        # Run module integration tests under previous minor of Elastic stack.
+        env:
+          STACK_ENVIRONMENT: "prev-minor"
+          TESTING_FILEBEAT_SKIP_DIFF: 1
+          PYTEST_ADDOPTS: "-k test_xpack_modules"
+        command: |
+          set -euo pipefail
+          source .buildkite/scripts/changesets.sh
+          defineModuleFromTheChangeSet x-pack/filebeat
+          echo "~~~ Running tests"
+          cd filebeat
+          mage pythonIntegTest
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "filebeat/build/*.xml"
+          - "filebeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "filebeat: Module compat tests / previous minor"
+
       - label: ":windows: x-pack/filebeat Win-2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/filebeat
