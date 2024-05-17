@@ -105,6 +105,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 // collects process metadata, CPU metrics, and memory metrics.
 func (m *MetricSet) Fetch(r mb.ReporterV2) error {
 
+	// monitor either a single PID, or the configured set of processes.
 	if m.setpid == 0 {
 		procs, roots, err := m.stats.Get()
 		if err != nil {
