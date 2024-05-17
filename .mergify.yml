@@ -67,7 +67,7 @@ pull_request_rules:
             ```
   - name: Automatic squash and merge with success checks and the files matching the regex ^testing/environments/snapshot* are modified.
     conditions:
-      - check-success=beats-ci/pr-merge
+      - check-success=buildkite/beats
       - label=automation
       - files~=^testing/environments/snapshot.*\.yml$
     actions:
