@@ -46,6 +46,7 @@ steps:
         retry:
           automatic:
             - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -69,6 +70,7 @@ steps:
         retry:
           automatic:
             - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -89,6 +91,7 @@ steps:
         retry:
           automatic:
             - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"

@@ -37,6 +37,7 @@ steps:
         retry:
           automatic:
             - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -55,6 +56,7 @@ steps:
         retry:
           automatic:
             - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_RHEL9}"
@@ -74,6 +76,7 @@ steps:
         retry:
           automatic:
             - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2016}"
@@ -94,6 +97,7 @@ steps:
         retry:
           automatic:
             - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2022}"
@@ -113,6 +117,7 @@ steps:
         retry:
           automatic:
             - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_UBUNTU_X86_64}"
@@ -221,6 +226,7 @@ steps:
         retry:
           automatic:
             - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_2019}"
@@ -241,6 +247,7 @@ steps:
         retry:
           automatic:
             - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_11}"
@@ -261,6 +268,7 @@ steps:
         retry:
           automatic:
             - limit: 3
+        timeout_in_minutes: 20
         agents:
           provider: "gcp"
           image: "${IMAGE_WIN_10}"
