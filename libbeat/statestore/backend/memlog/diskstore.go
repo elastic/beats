@@ -23,7 +23,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -182,7 +181,7 @@ func (s *diskstore) tryOpenLog() error {
 		f.Close()
 	})
 
-	_, err = f.Seek(0, os.SEEK_END)
+	_, err = f.Seek(0, io.SeekEnd)
 	if err != nil {
 		return err
 	}
@@ -439,7 +438,7 @@ func updateActiveMarker(log *logp.Logger, homePath, checkpointFilePath string) e
 		log.Errorf("Failed to remove old temporary active.dat.tmp file: %v", err)
 		return err
 	}
-	if err := ioutil.WriteFile(tmpLink, []byte(checkpointFilePath), 0600); err != nil {
+	if err := os.WriteFile(tmpLink, []byte(checkpointFilePath), 0600); err != nil {
 		log.Errorf("Failed to write temporary pointer file: %v", err)
 		return err
 	}
@@ -539,7 +538,7 @@ func readDataFile(path string, fn func(string, mapstr.M)) error {
 	var states []map[string]interface{}
 	dec := json.NewDecoder(f)
 	if err := dec.Decode(&states); err != nil {
-		return fmt.Errorf("%w: %v", ErrCorruptStore, err)
+		return fmt.Errorf("%w: %w", ErrCorruptStore, err)
 	}
 
 	for _, state := range states {
