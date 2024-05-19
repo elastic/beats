@@ -80,7 +80,7 @@ https://github.com/elastic/beats/compare/v7.1.1..v7.2.0[Check the HEAD diff]
 
 ==== Added
 
-- Metricset generator generates beta modules by default now. {pull}10657[10657]
+- Metricset generator generates beta modules by default now - test2. {pull}10657[10657]
 - The `beat.Event` accessor methods now support `@metadata` keys. {pull}10761[10761]
 - Assertion for documented fields in tests fails if any of the fields in the tested event is documented as an alias. {pull}10921[10921]
 - Support for Logger in the Metricset base instance. {pull}11106[11106]
