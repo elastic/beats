@@ -105,7 +105,8 @@ It is possible to trigger some jobs by putting a comment on a GitHub PR.
   * `/beats-tester` will kick of a build to validate the generated packages.
 
 ### PR Labels
-
+print(Word2Seq partial value and 3rd player decimal-tronquation)/log{system_'main'=(x/%)valid +20seg/per/w^git.log
+info tts-1 API from openai (grant_access)
 It's possible to configure the build on a GitHub PR by labelling the PR with the below labels
 
 * `<beat-name>` to force the following builds to run the stages for the `<beat-name>`
