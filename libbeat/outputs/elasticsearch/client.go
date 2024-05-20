@@ -87,9 +87,31 @@ type bulkResultStats struct {
 	tooMany      int // number of events receiving HTTP 429 Too Many Requests
 }
 
+type bulkResult struct {
+	// A connection-level error if the request couldn't be sent or the response
+	// couldn't be read. This error is returned from (*Client).Publish to signal
+	// to the pipeline that this output worker needs to be reconnected before the
+	// next Publish call.
+	connErr error
+
+	// The array of events sent via bulk request. This excludes any events that
+	// had encoding errors while assembling the request.
+	events []publisher.Event
+
+	// The http status returned by the bulk request.
+	status int
+
+	// The API response from Elasticsearch.
+	response eslegclient.BulkResponse
+}
+
 const (
 	defaultEventType = "doc"
 )
+
+var bulkRequestParams = map[string]string{
+	"filter_path": "errors,items.*.error,items.*.status",
+}
 
 // NewClient instantiates a new client.
 func NewClient(
@@ -190,56 +212,43 @@ func (client *Client) Clone() *Client {
 }
 
 func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error {
-	client.observer.NewBatch(len(batch.Events()))
-
 	span, ctx := apm.StartSpan(ctx, "publishEvents", "output")
 	defer span.End()
+	span.Context.SetLabel("events_original", len(batch.Events()))
+	client.observer.NewBatch(len(batch.Events()))
 
 	// Create and send the bulk request.
-	bulkResult := client.doBulkRequest(ctx, span, batch)
-	client.observer.ReportLatency(bulkResult.duration)
-
-	// If there was a connection-level error there is no per-item response,
-	// handle it and return.
-	if bulkResult.err != nil {
+	bulkResult := client.doBulkRequest(ctx, batch)
+	span.Context.SetLabel("events_encoded", len(bulkResult.events))
+	if bulkResult.connErr != nil {
+		// If there was a connection-level error there is no per-item response,
+		// handle it and return.
 		return client.handleBulkResultError(ctx, batch, bulkResult)
 	}
+	span.Context.SetLabel("events_published", len(bulkResult.events))
 
 	// At this point we have an Elasticsearch response for our request,
 	// check and report the per-item results.
-	client.reportBulkResult(ctx, span, batch, bulkResult)
+	eventsToRetry, stats := client.bulkCollectPublishFails(bulkResult)
+	stats.reportToObserver(client.observer)
+
+	if len(eventsToRetry) > 0 {
+		span.Context.SetLabel("events_failed", len(eventsToRetry))
+		batch.RetryEvents(eventsToRetry)
+	} else {
+		batch.ACK()
+	}
 	return nil
-}
-
-type bulkResult struct {
-	err error
-
-	// The array of events sent via bulk request. This excludes any events that
-	// had encoding errors while assembling the request.
-	events []publisher.Event
-
-	// The http status returned by the bulk request.
-	status int
-
-	// The API response from Elasticsearch.
-	response eslegclient.BulkResult
-
-	// The time it took to send the bulk request and read the response.
-	duration time.Duration
-}
-
-var bulkRequestParams = map[string]string{
-	"filter_path": "errors,items.*.error,items.*.status",
 }
 
 // Encode a batch's events into a bulk publish request, send the request to
 // Elasticsearch, and return the resulting metadata.
+// Reports the network request latency to the client's metrics observer.
 // The events list in the result will be shorter than the original batch if
 // some events couldn't be encoded. In this case, the removed events will
 // be reported to the Client's metrics observer via PermanentErrors.
 func (client *Client) doBulkRequest(
 	ctx context.Context,
-	span *apm.Span,
 	batch publisher.Batch,
 ) bulkResult {
 	var result bulkResult
@@ -248,17 +257,22 @@ func (client *Client) doBulkRequest(
 
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
-	span.Context.SetLabel("events_original", len(rawEvents))
 	resultEvents, bulkItems := client.bulkEncodePublishRequest(client.conn.GetVersion(), rawEvents)
 	result.events = resultEvents
-	span.Context.SetLabel("events_encoded", len(resultEvents))
 	client.observer.PermanentErrors(len(rawEvents) - len(resultEvents))
 
 	// If we encoded any events, send the network request.
 	if len(result.events) > 0 {
 		begin := time.Now()
-		result.status, result.response, result.err = client.conn.Bulk(ctx, "", "", bulkRequestParams, bulkItems)
-		result.duration = time.Since(begin)
+		result.status, result.response, result.connErr =
+			client.conn.Bulk(ctx, "", "", bulkRequestParams, bulkItems)
+		if result.connErr == nil {
+			duration := time.Since(begin)
+			client.observer.ReportLatency(duration)
+			client.log.Debugf(
+				"doBulkRequest: %d events have been sent to elasticsearch in %v.",
+				len(result.events), duration)
+		}
 	}
 
 	return result
@@ -277,7 +291,7 @@ func (client *Client) handleBulkResultError(
 			// to drop it and log the error state.
 			batch.Drop()
 			client.observer.PermanentErrors(len(bulkResult.events))
-			err := apm.CaptureError(ctx, fmt.Errorf("failed to perform bulk index operation: %w", bulkResult.err))
+			err := apm.CaptureError(ctx, fmt.Errorf("failed to perform bulk index operation: %w", bulkResult.connErr))
 			err.Send()
 			client.log.Error(err)
 		}
@@ -285,7 +299,7 @@ func (client *Client) handleBulkResultError(
 		// with the connection.
 		return nil
 	}
-	err := apm.CaptureError(ctx, fmt.Errorf("failed to perform any bulk index operations: %w", bulkResult.err))
+	err := apm.CaptureError(ctx, fmt.Errorf("failed to perform any bulk index operations: %w", bulkResult.connErr))
 	err.Send()
 	client.log.Error(err)
 
@@ -296,43 +310,7 @@ func (client *Client) handleBulkResultError(
 		// All events were sent successfully
 		batch.ACK()
 	}
-	return bulkResult.err
-}
-
-// reportBulkResult processes the result of a bulk request. It reports the
-// event states to the metrics observer and acknowledges or retries the
-// batch as appropriate.
-// The returned error is for connection-level errors. A non-nil value should
-// be returned from (*Client).Publish to trigger a reconnection attempt.
-func (client *Client) reportBulkResult(
-	ctx context.Context,
-	span *apm.Span,
-	batch publisher.Batch,
-	bulkResult bulkResult,
-) {
-	span.Context.SetLabel("events_published", len(bulkResult.events))
-	client.log.Debugf("PublishEvents: %d events have been sent to elasticsearch in %v.",
-		len(bulkResult.events), bulkResult.duration)
-
-	eventsToRetry, stats := client.bulkCollectPublishFails(bulkResult)
-	stats.reportToObserver(client.observer)
-
-	if len(eventsToRetry) > 0 {
-		span.Context.SetLabel("events_failed", len(eventsToRetry))
-		batch.RetryEvents(eventsToRetry)
-	} else {
-		batch.ACK()
-	}
-}
-
-func (stats bulkResultStats) reportToObserver(ob outputs.Observer) {
-	ob.AckedEvents(stats.acked)
-	ob.RetryableErrors(stats.fails)
-	ob.PermanentErrors(stats.nonIndexable)
-	ob.DuplicateEvents(stats.duplicates)
-	ob.DeadLetterEvents(stats.deadLetter)
-
-	ob.ErrTooMany(stats.tooMany)
+	return bulkResult.connErr
 }
 
 // bulkEncodePublishRequest encodes all bulk requests and returns slice of events
@@ -540,4 +518,14 @@ func (client *Client) String() string {
 
 func (client *Client) Test(d testing.Driver) {
 	client.conn.Test(d)
+}
+
+func (stats bulkResultStats) reportToObserver(ob outputs.Observer) {
+	ob.AckedEvents(stats.acked)
+	ob.RetryableErrors(stats.fails)
+	ob.PermanentErrors(stats.nonIndexable)
+	ob.DuplicateEvents(stats.duplicates)
+	ob.DeadLetterEvents(stats.deadLetter)
+
+	ob.ErrTooMany(stats.tooMany)
 }

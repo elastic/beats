@@ -60,8 +60,8 @@ type bulkRequest struct {
 	requ *http.Request
 }
 
-// BulkResult contains the result of a bulk API request.
-type BulkResult json.RawMessage
+// BulkResponse contains the result of a bulk API request.
+type BulkResponse json.RawMessage
 
 // Bulk performs many index/delete operations in a single API call.
 // Implements: http://www.elastic.co/guide/en/elasticsearch/reference/current/docs-bulk.html
@@ -69,7 +69,7 @@ func (conn *Connection) Bulk(
 	ctx context.Context,
 	index, docType string,
 	params map[string]string, body []interface{},
-) (int, BulkResult, error) {
+) (int, BulkResponse, error) {
 	if len(body) == 0 {
 		return 0, nil, nil
 	}
@@ -160,9 +160,9 @@ func (r *bulkRequest) reset(body BodyEncoder) {
 	body.AddHeader(&r.requ.Header)
 }
 
-func (conn *Connection) sendBulkRequest(requ *bulkRequest) (int, BulkResult, error) {
+func (conn *Connection) sendBulkRequest(requ *bulkRequest) (int, BulkResponse, error) {
 	status, resp, err := conn.execHTTPRequest(requ.requ)
-	return status, BulkResult(resp), err
+	return status, BulkResponse(resp), err
 }
 
 func bulkEncode(log *logp.Logger, out BulkWriter, body []interface{}) error {
