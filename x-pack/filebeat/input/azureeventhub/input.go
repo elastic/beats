@@ -68,7 +68,19 @@ func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, fmt.Errorf("reading %s input config: %w", inputName, err)
 	}
 
-	return newEventHubInputV1(config, m.log)
+	switch config.ProcessorVersion {
+	case "v1":
+		return newEventHubInputV1(config, m.log)
+	case "v2":
+		return newEventHubInputV2(config, m.log)
+	default:
+		return nil, fmt.Errorf("invalid azure-eventhub processor version: %s", config.ProcessorVersion)
+	}
+
+	//return &azureInput{
+	//	config: config,
+	//	log:    logp.NewLogger(fmt.Sprintf("%s input", inputName)).With("connection string", stripConnectionString(config.ConnectionString)),
+	//}, nil
 }
 
 func createPipelineClient(pipeline beat.Pipeline) (beat.Client, error) {

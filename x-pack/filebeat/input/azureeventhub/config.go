@@ -27,6 +27,8 @@ type azureInputConfig struct {
 	OverrideEnvironment string `config:"resource_manager_endpoint"`
 	// cleanup the log JSON input for known issues, options: SINGLE_QUOTES, NEW_LINES
 	SanitizeOptions []string `config:"sanitize_options"`
+	// Processor version to use (v1 or v2). Default is v1.
+	ProcessorVersion string `config:"processor_version"`
 }
 
 const ephContainerName = "filebeat"
@@ -40,6 +42,7 @@ func (conf *azureInputConfig) Validate() error {
 	if conf.EventHubName == "" {
 		return errors.New("no event hub name configured")
 	}
+	// FIXME: this check applies only to processor v1
 	if conf.SAName == "" || conf.SAKey == "" {
 		return errors.New("no storage account or storage account key configured")
 	}
@@ -71,6 +74,10 @@ func (conf *azureInputConfig) Validate() error {
 		if err != nil {
 			logger.Warnf("%s: %v", opt, err)
 		}
+	}
+
+	if conf.ProcessorVersion == "" {
+		conf.ProcessorVersion = "v1"
 	}
 
 	return nil
