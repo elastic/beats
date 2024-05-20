@@ -139,7 +139,6 @@ steps:
 #          # defines the MODULE env var based on what's changed in a PR
 #          source .buildkite/scripts/changesets.sh
 #          defineModuleFromTheChangeSet heartbeat
-
           echo "~~~ Running tests"
           cd heartbeat
           mage pythonIntegTest
