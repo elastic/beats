@@ -56,17 +56,9 @@ function DefineModuleFromTheChangeSet($projectPath) {
         }
     }
 
-    # TODO: remove this conditional when issue https://github.com/elastic/ingest-dev/issues/2993 gets resolved
-    if(!$changedModules) {
-        if($Env:BUILDKITE_PIPELINE_SLUG -eq 'beats-xpack-metricbeat') {
-            $Env:MODULE = "aws"
-        }
-        else {
-            $Env:MODULE = "kubernetes"
-        }
-    }
-    else {
-        # TODO: once https://github.com/elastic/ingest-dev/issues/2993 gets resolved, this should be the only thing we export
-        $Env:MODULE = $changedModules
+    if ($changedModules) {
+        $env:MODULE = $changedModules
+        Write-Output "~~~ Set env var MODULE to [$env:MODULE]"
+        Write-Output "~~~ Resuming commands"
     }
 }
