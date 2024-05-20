@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# This script contains helper functions related to what should be run depending on Git changes
 
 set -euo pipefail
 
@@ -26,6 +27,18 @@ defineFromCommit() {
   from=${changeTarget:+"origin/$changeTarget"}
   from=${from:-$previousCommit}
   from=${from:-$BUILDKITE_COMMIT}
+
+  echo "--- Change target: $changeTarget"
+  echo "--- Previous commit: $previousCommit"
+  echo "--- Defined from commit: $from"
+
+  lastCommit=$(git rev-parse HEAD)
+  if [[ "$BUILDKITE_PULL_REQUEST" != "false" ]]; then
+    baseCommit=$(git rev-parse "$lastCommit"^)
+  else
+    baseCommit=$lastCommit
+  fi
+  echo "--- Defined base commit: $baseCommit"
 }
 
 getMatchingModules() {
@@ -56,6 +69,8 @@ defineModuleFromTheChangeSet() {
   if [ "${#modulesMatched[@]}" -gt 0 ]; then
     addToModuleEnvVar
     export MODULE=$modules
+    echo "~~~ Detected file changes for some modules. Setting env var MODULE to [$MODULE]"
+    echo "~~~ Resuming commands"
   else
     echo "~~~ No changes in modules for $beatPath"
   fi
