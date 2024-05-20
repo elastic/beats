@@ -137,7 +137,6 @@ func TestActionResultToEvent(t *testing.T) {
 				"count": 1,
 				"started_at": "2024-04-18T19:39:39.532125Z"
 			} `),
-			// "agent_id": "bf3d6036-2260-4bbf-94a3-5ccce0d75d9e",
 			want: toMap(t, `{
 				"completed_at": "2024-04-18T19:39:39.740162Z",
 				"action_response": {
@@ -170,7 +169,6 @@ func TestActionResultToEvent(t *testing.T) {
 				"error": "query failed, code: 1, message: no such table: osquery_foo",
 				"started_at": "2024-04-20T14:56:34.87195Z"
 			}`),
-			// "agent_id": "bf3d6036-2260-4bbf-94a3-5ccce0d75d9e",
 			want: toMap(t, `{
 				"completed_at": "2024-04-20T14:56:34.87195Z",
 				"action_id": "70539d80-4082-41e9-aff4-fbb877dd752b",
@@ -186,11 +184,13 @@ func TestActionResultToEvent(t *testing.T) {
 	}
 
 	for _, tc := range tests {
-		got := actionResultToEvent(tc.req, tc.res)
-		diff := cmp.Diff(tc.want, got)
-		if diff != "" {
-			t.Error(diff)
-		}
+		t.Run(tc.name, func(t *testing.T) {
+			got := actionResultToEvent(tc.req, tc.res)
+			diff := cmp.Diff(tc.want, got)
+			if diff != "" {
+				t.Error(diff)
+			}
+		})
 	}
 }
 
