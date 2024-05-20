@@ -8,11 +8,13 @@ package azureeventhub
 
 import (
 	"fmt"
-	"github.com/Azure/go-autorest/autorest/azure"
-	"github.com/elastic/elastic-agent-libs/logp"
 	"sync"
 	"testing"
 	"time"
+
+	"github.com/Azure/go-autorest/autorest/azure"
+
+	"github.com/elastic/elastic-agent-libs/logp"
 
 	"github.com/elastic/elastic-agent-libs/monitoring"
 
@@ -181,18 +183,18 @@ func TestStripConnectionString(t *testing.T) {
 	}
 }
 
-// fakePipeline returns new fakeClients for simple tests.
-type fakePipeline struct{}
+//// fakePipeline returns new fakeClients for simple tests.
+//type fakePipeline struct{}
+//
+//func (c *fakePipeline) ConnectWith(clientConfig beat.ClientConfig) (beat.Client, error) {
+//	return &fakeClient{}, nil
+//}
+//
+//func (c *fakePipeline) Connect() (beat.Client, error) {
+//	return &fakeClient{}, nil
+//}
 
-func (c *fakePipeline) ConnectWith(clientConfig beat.ClientConfig) (beat.Client, error) {
-	return &fakeClient{}, nil
-}
-
-func (c *fakePipeline) Connect() (beat.Client, error) {
-	return &fakeClient{}, nil
-}
-
-var _ beat.Client = (*fakeClient)(nil)
+//var _ beat.Client = (*fakeClient)(nil)
 
 // ackClient is a fake beat.Client that ACKs the published messages.
 type fakeClient struct {

@@ -11,13 +11,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/Azure/go-autorest/autorest/azure"
 	"time"
+
+	"github.com/Azure/go-autorest/autorest/azure"
 
 	eventhub "github.com/Azure/azure-event-hubs-go/v3"
 	"github.com/Azure/azure-event-hubs-go/v3/eph"
 	"github.com/Azure/azure-event-hubs-go/v3/storage"
 	"github.com/Azure/azure-storage-blob-go/azblob"
+
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/elastic-agent-libs/logp"
