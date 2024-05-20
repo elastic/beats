@@ -183,19 +183,6 @@ func TestStripConnectionString(t *testing.T) {
 	}
 }
 
-//// fakePipeline returns new fakeClients for simple tests.
-//type fakePipeline struct{}
-//
-//func (c *fakePipeline) ConnectWith(clientConfig beat.ClientConfig) (beat.Client, error) {
-//	return &fakeClient{}, nil
-//}
-//
-//func (c *fakePipeline) Connect() (beat.Client, error) {
-//	return &fakeClient{}, nil
-//}
-
-//var _ beat.Client = (*fakeClient)(nil)
-
 // ackClient is a fake beat.Client that ACKs the published messages.
 type fakeClient struct {
 	sync.Mutex
@@ -215,38 +202,3 @@ func (c *fakeClient) PublishAll(event []beat.Event) {
 		c.Publish(e)
 	}
 }
-
-//
-//type stubOutleter struct {
-//	sync.Mutex
-//	cond   *sync.Cond
-//	done   bool
-//	Events []beat.Event
-//}
-//
-//func newStubOutlet(stub *stubOutleter) (channel.Outleter, error) {
-//	stub.cond = sync.NewCond(stub)
-//	defer stub.Close()
-//
-//	connector := channel.ConnectorFunc(func(_ *conf.C, _ beat.ClientConfig) (channel.Outleter, error) {
-//		return stub, nil
-//	})
-//	return connector.ConnectWith(nil, beat.ClientConfig{
-//		Processing: beat.ProcessingConfig{},
-//	})
-//}
-//
-//func (o *stubOutleter) Close() error {
-//	o.Lock()
-//	defer o.Unlock()
-//	o.done = true
-//	return nil
-//}
-//func (o *stubOutleter) Done() <-chan struct{} { return nil }
-//func (o *stubOutleter) OnEvent(event beat.Event) bool {
-//	o.Lock()
-//	defer o.Unlock()
-//	o.Events = append(o.Events, event)
-//	o.cond.Broadcast()
-//	return o.done
-//}
