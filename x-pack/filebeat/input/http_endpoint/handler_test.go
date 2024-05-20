@@ -240,6 +240,26 @@ func Test_apiResponse(t *testing.T) {
 			wantResponse: `{"message": "success"}`,
 		},
 		{
+			name: "single_event_root",
+			conf: func() config {
+				c := defaultConfig()
+				c.Prefix = "."
+				return c
+			}(),
+			request: func() *http.Request {
+				req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(`{"id":0}`))
+				req.Header.Set("Content-Type", "application/json")
+				return req
+			}(),
+			events: []mapstr.M{
+				{
+					"id": int64(0),
+				},
+			},
+			wantStatus:   http.StatusOK,
+			wantResponse: `{"message": "success"}`,
+		},
+		{
 			name: "single_event_gzip",
 			conf: defaultConfig(),
 			request: func() *http.Request {
@@ -378,7 +398,7 @@ func Test_apiResponse(t *testing.T) {
 			pub := new(publisher)
 			metrics := newInputMetrics("")
 			defer metrics.Close()
-			apiHandler := newHandler(ctx, tracerConfig(tc.name, tc.conf, *withTraces), nil, pub, logp.NewLogger("http_endpoint.test"), metrics)
+			apiHandler := newHandler(ctx, tracerConfig(tc.name, tc.conf, *withTraces), nil, pub.Publish, logp.NewLogger("http_endpoint.test"), metrics)
 
 			// Execute handler.
 			respRec := httptest.NewRecorder()

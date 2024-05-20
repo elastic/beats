@@ -112,12 +112,6 @@ func TestBatchCallsDoneAndFreesEvents(t *testing.T) {
 	require.True(t, doneCalled, "Calling batch.Drop should invoke the done callback")
 }
 
-func TestNewBatchFreesEvents(t *testing.T) {
-	queueBatch := &mockQueueBatch{}
-	_ = newBatch(nil, queueBatch, 0)
-	assert.Equal(t, 1, queueBatch.freeEntriesCalled, "Creating a new ttlBatch should call FreeEntries on the underlying queue.Batch")
-}
-
 type mockQueueBatch struct {
 	freeEntriesCalled int
 }
@@ -131,10 +125,6 @@ func (b *mockQueueBatch) Done() {
 
 func (b *mockQueueBatch) Entry(i int) queue.Entry {
 	return fmt.Sprintf("event %v", i)
-}
-
-func (b *mockQueueBatch) FreeEntries() {
-	b.freeEntriesCalled++
 }
 
 type mockRetryer struct {
