@@ -24,13 +24,6 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
-var environments = map[string]azure.Environment{
-	azure.ChinaCloud.ResourceManagerEndpoint:        azure.ChinaCloud,
-	azure.GermanCloud.ResourceManagerEndpoint:       azure.GermanCloud,
-	azure.PublicCloud.ResourceManagerEndpoint:       azure.PublicCloud,
-	azure.USGovernmentCloud.ResourceManagerEndpoint: azure.USGovernmentCloud,
-}
-
 type eventHubInputV1 struct {
 	config         azureInputConfig
 	log            *logp.Logger
@@ -39,11 +32,18 @@ type eventHubInputV1 struct {
 	pipelineClient beat.Client
 }
 
-func newEventHubInputV1(config azureInputConfig, log *logp.Logger) (v2.Input, error) {
-	//log := logp.NewLogger(fmt.Sprintf("%s input", inputName)).With("connection string", stripConnectionString(config.ConnectionString))
+// newEventHubInputV1 creates a new instance of the Azure Event Hub input V1.
+// This input uses the Azure Event Hub SDK v3 (legacy).
+func newEventHubInputV1(config azureInputConfig, logger *logp.Logger) (v2.Input, error) {
+	log := logger.
+		Named(inputName).
+		With(
+			"connection string", stripConnectionString(config.ConnectionString),
+		)
+
 	return &eventHubInputV1{
 		config: config,
-		log:    log.Named(inputName),
+		log:    log,
 	}, nil
 }
 
@@ -145,6 +145,7 @@ func (in *eventHubInputV1) setup(ctx context.Context) error {
 	// register a message handler -- many can be registered
 	handlerID, err := in.processor.RegisterHandler(ctx,
 		func(c context.Context, e *eventhub.Event) error {
+			in.log.Debugw("received event", "ts", time.Now().String())
 			var onEventErr error
 			// partitionID is not yet mapped in the azure-eventhub sdk
 			ok := in.processEvents(e, "")
@@ -155,6 +156,8 @@ func (in *eventHubInputV1) setup(ctx context.Context) error {
 				// FIXME: should we stop the processor here?
 				// in.Stop()
 			}
+
+			//time.Sleep(5 * time.Second)
 
 			return onEventErr
 		})
@@ -172,6 +175,10 @@ func (in *eventHubInputV1) run(ctx context.Context) error {
 	// Start handling messages from all the partitions balancing across
 	// multiple consumers.
 	// The processor can be stopped by calling `Close()` on the processor.
+
+	// The `Start()` function is not an option because
+	// it waits for an `os.Interrupt` signal to stop
+	// the processor.
 	err := in.processor.StartNonBlocking(ctx)
 	if err != nil {
 		in.log.Errorw("error starting the processor", "error", err)
@@ -213,7 +220,7 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event, partitionID stri
 	in.metrics.receivedMessages.Inc()
 	in.metrics.receivedBytes.Add(uint64(len(event.Data)))
 
-	records := in.parseMultipleRecords(event.Data)
+	records := in.unpackRecords(event.Data)
 
 	for _, record := range records {
 		_, _ = eventHubMetadata.Put("offset", event.SystemProperties.Offset)
@@ -246,7 +253,15 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event, partitionID stri
 			Private: event.Data,
 		}
 
-		in.client.Publish(event)
+		// FIXME: error handling on publish?
+		// The previous implementation was using an Outlet
+		// to send the event to the pipeline.
+		// The Outlet.OnEvent() function returns a `false`
+		// value if the outlet is closed.
+		//
+		// Should the new implementation use the `Publish()`
+		// function do something?
+		in.pipelineClient.Publish(event)
 
 		in.metrics.sentEvents.Inc()
 	}
@@ -257,8 +272,8 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event, partitionID stri
 	return true
 }
 
-// parseMultipleRecords will try to split the message into multiple ones based on the group field provided by the configuration
-func (in *eventHubInputV1) parseMultipleRecords(bMessage []byte) []string {
+// unpackRecords will try to split the message into multiple ones based on the group field provided by the configuration
+func (in *eventHubInputV1) unpackRecords(bMessage []byte) []string {
 	var mapObject map[string][]interface{}
 	var messages []string
 

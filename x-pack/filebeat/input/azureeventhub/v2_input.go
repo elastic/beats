@@ -51,10 +51,10 @@ func (in *eventHubInputV2) Run(
 ) error {
 	var err error
 
-	// Create client for publishing events and receive notification of their ACKs.
+	// Create pipelineClient for publishing events and receive notification of their ACKs.
 	in.client, err = createPipelineClient(pipeline)
 	if err != nil {
-		return fmt.Errorf("failed to create pipeline client: %w", err)
+		return fmt.Errorf("failed to create pipeline pipelineClient: %w", err)
 	}
 	defer in.client.Close()
 
@@ -82,14 +82,14 @@ func (in *eventHubInputV2) Run(
 }
 
 func (in *eventHubInputV2) setup(ctx context.Context) error {
-	// FIXME: check more client creation options.
+	// FIXME: check more pipelineClient creation options.
 	blobContainerClient, err := container.NewClientFromConnectionString(
 		in.config.SAConnectionString,
 		in.config.SAContainer,
 		nil,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to create blob container client: %w", err)
+		return fmt.Errorf("failed to create blob container pipelineClient: %w", err)
 	}
 
 	checkpointStore, err := checkpoints.NewBlobStore(blobContainerClient, nil)
@@ -105,7 +105,7 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 		nil,
 	)
 	if err != nil {
-		return fmt.Errorf("failed to create consumer client: %w", err)
+		return fmt.Errorf("failed to create consumer pipelineClient: %w", err)
 	}
 	in.consumerClient = consumerClient
 
@@ -127,6 +127,9 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 	go in.workersLoop(processor)
 
 	if err := processor.Run(ctx); err != nil {
+		// FIXME: `Run()` returns an error when the processor thinks it's unrecoverable.
+		// We should check the error and decide if we want to retry or not. Should
+		// we add an exponential backoff and retry mechanism?
 		in.log.Errorw("error running processor", "error", err)
 	}
 }
@@ -134,7 +137,6 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 func (in *eventHubInputV2) workersLoop(processor *azeventhubs.Processor) {
 	for {
 		processorPartitionClient := processor.NextPartitionClient(context.TODO())
-
 		if processorPartitionClient == nil {
 			// Processor has stopped
 			break
@@ -143,8 +145,17 @@ func (in *eventHubInputV2) workersLoop(processor *azeventhubs.Processor) {
 		go func() {
 			if err := in.processEventsForPartition(processorPartitionClient); err != nil {
 				//panic(err)
-				logp.Info("error processing events for partition: %v", err)
+				in.log.Errorw(
+					"processing events for partition failed",
+					"error", err,
+					"partition", processorPartitionClient.PartitionID(),
+				)
 			}
+
+			in.log.Infow(
+				"partition worker exited",
+				"partition", processorPartitionClient.PartitionID(),
+			)
 		}()
 	}
 }
@@ -195,6 +206,7 @@ func (in *eventHubInputV2) processEventsForPartition(partitionClient *azeventhub
 		// Updates the checkpoint with the latest event received. If processing needs to restart
 		// it will restart from this point, automatically.
 		if err := partitionClient.UpdateCheckpoint(context.TODO(), events[len(events)-1], nil); err != nil {
+			in.log.Errorw("error updating checkpoint", "error", err)
 			return err
 		}
 	}

@@ -9,6 +9,7 @@ package azureeventhub
 import (
 	"fmt"
 	"github.com/Azure/azure-sdk-for-go/sdk/azcore/to"
+	"github.com/Azure/go-autorest/autorest/azure"
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/feature"
@@ -23,6 +24,13 @@ const (
 	expandEventListFromField = "records"
 	inputName                = "azure-eventhub"
 )
+
+var environments = map[string]azure.Environment{
+	azure.ChinaCloud.ResourceManagerEndpoint:        azure.ChinaCloud,
+	azure.GermanCloud.ResourceManagerEndpoint:       azure.GermanCloud,
+	azure.PublicCloud.ResourceManagerEndpoint:       azure.PublicCloud,
+	azure.USGovernmentCloud.ResourceManagerEndpoint: azure.USGovernmentCloud,
+}
 
 func Plugin(log *logp.Logger) v2.Plugin {
 	return v2.Plugin{
