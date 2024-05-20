@@ -3,8 +3,6 @@
 :issue: https://github.com/elastic/beats/issues/
 :pull: https://github.com/elastic/beats/pull/
 
-<<<<<<< HEAD
-=======
 [[release-notes-8.13.4]]
 === Beats version 8.13.4
 https://github.com/elastic/beats/compare/v8.13.3\...v8.13.4[View commits]
@@ -64,7 +62,6 @@ https://github.com/elastic/beats/compare/v8.13.2\...v8.13.3[View commits]
 - Add new fields to configure the lease duration, retry and renew when using leader elector with Kubernetes autodiscover.{pull}38471[38471]
 
 
->>>>>>> 0fd63999c5 (docs: Prepare Changelog for 8.13.4 (#39436) (#39465))
 [[release-notes-8.13.2]]
 === Beats version 8.13.2
 https://github.com/elastic/beats/compare/v8.13.1\...v8.13.2[View commits]
