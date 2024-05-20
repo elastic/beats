@@ -10,11 +10,13 @@ var:
   - name: connection_string
   - name: storage_account
   - name: storage_account_key
+  - name: storage_account_connection_string
   - name: storage_account_container
   - name: resource_manager_endpoint
   - name: tags
     default: [forwarded]
-
+  - name: storage_account_connection_string
+    default: "v1"
 ingest_pipeline:
   - ingest/pipeline.yml
   - ../azure-shared-pipeline.yml
