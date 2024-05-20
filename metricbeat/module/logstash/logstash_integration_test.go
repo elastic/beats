@@ -63,6 +63,7 @@ func TestFetch(t *testing.T) {
 
 			t.Logf("%s/%s event: %+v", f.Module().Name(), f.Name(),
 				events[0].BeatEvent("logstash", metricSet).Fields.StringToPrint())
+			t.Logf("%s just to test changesets", f.Name())
 		})
 	}
 }
