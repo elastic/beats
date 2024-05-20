@@ -103,8 +103,10 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields, rc RetryConfig)
 	var i int
 	for i = 1; i <= attempts; i++ {
 		loadedState, err = t.stateLoader(sf)
-		if err == nil && loadedState != nil {
-			logp.L().Infof("loaded previous state for monitor %s: %s", sf.ID, loadedState.String())
+		if err == nil {
+			if loadedState != nil {
+				logp.L().Infof("loaded previous state for monitor %s: %s", sf.ID, loadedState.String())
+			}
 			break
 		}
 		var loaderError LoaderError
