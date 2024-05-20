@@ -106,6 +106,44 @@ steps:
           - github_commit_status:
               context: "libbeat: Module compat tests / next major"
 
+      - label: ":ubuntu: Libbeat Crosscompile"
+        key: "mandatory-cross-compile"
+        command: |
+          set -euo pipefail
+          cd libbeat
+          make crosscompile
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_HI_PERF_MACHINE_TYPE}"
+        artifact_paths:
+          - "libbeat/build/*.xml"
+          - "libbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "libbeat: Crosscompile"
+
+      - label: ":ubuntu: Libbeat Stress Tests"
+        key: "mandatory-stress-test"
+        command: |
+          set -euo pipefail
+          cd libbeat
+          make STRESS_TEST_OPTIONS='-timeout=20m -race -v -parallel 1' GOTEST_OUTPUT_OPTIONS=' | go-junit-report > libbeat-stress-test.xml' stress-tests
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_UBUNTU_X86_64}"
+          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
+        artifact_paths: "libbeat/libbeat-stress-test.xml"
+        notify:
+          - github_commit_status:
+              context: "libbeat: Stress Tests"
+
   - group: "Libbeat Extended Tests"
     key: "extended-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
