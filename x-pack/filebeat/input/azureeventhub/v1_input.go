@@ -85,6 +85,7 @@ func (in *eventHubInputV1) Run(
 	// Start the main run loop
 	err = in.run(ctx)
 	if err != nil {
+		in.log.Errorw("error running input", "error", err)
 		return err
 	}
 
@@ -197,14 +198,8 @@ func (in *eventHubInputV1) run(ctx context.Context) error {
 
 	in.log.Infof("%s input worker has started.", inputName)
 
-	for ctx.Err() == nil {
-		select {
-		case <-ctx.Done():
-			return nil
-		}
-	}
-
-	in.log.Errorw("error during processing", "error", ctx.Err())
+	// wait for the context to be done
+	<-ctx.Done()
 
 	return ctx.Err()
 }
