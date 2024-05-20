@@ -9,9 +9,6 @@ on:
 permissions:
   contents: read
 
-env:
-  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
 jobs:
   filter:
     runs-on: ubuntu-latest
@@ -29,14 +26,16 @@ jobs:
       fail-fast: false
       matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
         with:
           vaultUrl: ${{ secrets.VAULT_ADDR }}
           vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
           vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
-          pipeline: ./.ci/bump-elastic-stack-snapshot.yml
+          pipeline: .github/workflows/updatecli.d/bump-elastic-stack-snapshot.yml
+          values: .github/workflows/updatecli.d/scm.yml
+          command: '--experimental apply'
           notifySlackChannel: "#ingest-notifications"
           messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <${{ env.JOB_URL }}|here>"
         env:
