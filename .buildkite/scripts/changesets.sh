@@ -19,26 +19,15 @@ defineExclusions() {
 }
 
 defineFromCommit() {
-  local previousCommit
   local changeTarget=${BUILDKITE_PULL_REQUEST_BASE_BRANCH:-$BUILDKITE_BRANCH}
 
-  previousCommit=$(git rev-parse HEAD^)
-
-  from=${changeTarget:+"origin/$changeTarget"}
-  from=${from:-$previousCommit}
-  from=${from:-$BUILDKITE_COMMIT}
-
-  echo "--- Change target: $changeTarget"
-  echo "--- Previous commit: $previousCommit"
-  echo "--- Defined from commit: $from"
-
-  lastCommit=$(git rev-parse HEAD)
-  if [[ "$BUILDKITE_PULL_REQUEST" != "false" ]]; then
-    baseCommit=$(git rev-parse "$lastCommit"^)
+  if [[ -z ${changeTarget+x} ]]; then
+    # If not a PR (no target branch) - use last commit
+    from=$(git rev-parse HEAD^)
   else
-    baseCommit=$lastCommit
+    # If it's a PR - add "origin/"
+    from="origin/$changeTarget"
   fi
-  echo "--- Defined base commit: $baseCommit"
 }
 
 getMatchingModules() {
