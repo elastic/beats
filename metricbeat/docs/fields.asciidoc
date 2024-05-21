@@ -53661,7 +53661,7 @@ type: long
 
 --
 
-*`mysql.performance.events_statements.schemaname`*::
+*`mysql.performance.events_statements.schema`*::
 +
 --
 Schema name.
