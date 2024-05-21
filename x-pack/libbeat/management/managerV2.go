@@ -394,7 +394,8 @@ func (cm *BeatV2Manager) upsertUnit(unit *client.Unit) {
 	if ok {
 		aUnit.update(unit)
 	} else {
-		aUnit = newAgentUnit(unit, cm.logger.Named("state-unit"))
+		unitLogger := cm.logger.Named(fmt.Sprintf("state-unit-%s", unit.ID()))
+		aUnit = newAgentUnit(unit, unitLogger)
 		cm.units[unitKey{unit.Type(), unit.ID()}] = aUnit
 	}
 
