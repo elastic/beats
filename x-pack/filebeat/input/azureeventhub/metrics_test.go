@@ -137,10 +137,7 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			SystemProperties: &properties,
 		}
 
-		ok := input.processEvents(&ev, "0")
-		if !ok {
-			t.Fatal("OnEvent function returned false")
-		}
+		input.processEvents(&ev)
 
 		if ok := assert.Equal(t, len(tc.expectedRecords), len(fakeClient.publishedEvents)); ok {
 			for i, e := range fakeClient.publishedEvents {

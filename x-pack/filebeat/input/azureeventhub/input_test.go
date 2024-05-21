@@ -83,10 +83,7 @@ func TestProcessEvents(t *testing.T) {
 		Data:             []byte(msg),
 		SystemProperties: &properties,
 	}
-	ok := input.processEvents(&ev, "0")
-	if !ok {
-		t.Fatal("OnEvent function returned false")
-	}
+	input.processEvents(&ev)
 
 	assert.Equal(t, len(fakePipelineClient.publishedEvents), 1)
 	message, err := fakePipelineClient.publishedEvents[0].Fields.GetValue("message")
