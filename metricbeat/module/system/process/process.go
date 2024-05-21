@@ -66,7 +66,7 @@ func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
 	}
 
 	if config.Pid != 0 && config.Procs[0] != ".*" {
-		logp.L().Warnf("`processes.pid` set to %d, but `processes` is set to a non-default value. Metricset will only report metrics for pid %d", config.Pid, config.Pid)
+		logp.L().Warnf("`process.pid` set to %d, but `processes` is set to a non-default value. Metricset will only report metrics for pid %d", config.Pid, config.Pid)
 	}
 
 	m := &MetricSet{
