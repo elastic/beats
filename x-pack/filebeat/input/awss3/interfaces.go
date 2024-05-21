@@ -100,25 +100,18 @@ type s3ObjectHandlerFactory interface {
 	// Create returns a new s3ObjectHandler that can be used to process the
 	// specified S3 object. If the handler is not configured to process the
 	// given S3 object (based on key name) then it will return nil.
-	Create(ctx context.Context, log *logp.Logger, client beat.Client, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler
+	Create(ctx context.Context, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler
 }
 
 type s3ObjectHandler interface {
 	// ProcessS3Object downloads the S3 object, parses it, creates events, and
-	// publishes them. It returns when processing finishes or when it encounters
-	// an unrecoverable error. It does not wait for the events to be ACKed by
-	// the publisher before returning (use eventACKTracker's Wait() method to
-	// determine this).
-	ProcessS3Object() error
+	// sends them to the given channel. It returns when processing finishes or
+	// when it encounters an unrecoverable error.
+	ProcessS3Object(log *logp.Logger, eventChan chan<- *beat.Event) error
 
 	// FinalizeS3Object finalizes processing of an S3 object after the current
 	// batch is finished.
 	FinalizeS3Object() error
-
-	// Wait waits for every event published by ProcessS3Object() to be ACKed
-	// by the publisher before returning. Internally it uses the
-	// s3ObjectHandler eventACKTracker's Wait() method
-	Wait()
 }
 
 // ------

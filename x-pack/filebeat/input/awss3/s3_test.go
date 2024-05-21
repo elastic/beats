@@ -126,7 +126,7 @@ func TestS3Poller(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("2024-02-08T08:35:00+00:02.json.gz")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockAPI, nil, backupConfig{})
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockAPI, nil, backupConfig{})
 		states, err := newStates(nil, store)
 		require.NoError(t, err, "states creation must succeed")
 		poller := &s3PollerInput{
@@ -264,7 +264,7 @@ func TestS3Poller(t *testing.T) {
 			GetObject(gomock.Any(), gomock.Eq(bucket), gomock.Eq("key5")).
 			Return(nil, errFakeConnectivityFailure)
 
-		s3ObjProc := newS3ObjectProcessorFactory(logp.NewLogger(inputName), nil, mockS3, nil, backupConfig{})
+		s3ObjProc := newS3ObjectProcessorFactory(nil, mockS3, nil, backupConfig{})
 		states, err := newStates(nil, store)
 		require.NoError(t, err, "states creation must succeed")
 		poller := &s3PollerInput{
