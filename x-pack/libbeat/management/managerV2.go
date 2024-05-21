@@ -38,7 +38,7 @@ import (
 // since there's a type disagreement with the `client.DiagnosticHook` argument, and due to licensing issues we can't import the agent client types into the reloader
 type diagnosticHandler struct {
 	log    *logp.Logger
-	client *client.Unit
+	client *agentUnit
 }
 
 func (handler diagnosticHandler) Register(name string, description string, filename string, contentType string, callback func() []byte) {
@@ -166,7 +166,8 @@ func NewV2AgentManager(config *conf.C, registry *reload.Registry) (lbmanagement.
 		Meta: map[string]string{
 			"commit":     version.Commit(),
 			"build_time": version.BuildTime().String(),
-		}}
+		},
+	}
 	var agentClient client.V2
 	var err error
 	if c.InsecureGRPCURLForTesting != "" && c.Enabled {
@@ -795,7 +796,7 @@ func (cm *BeatV2Manager) reloadInputs(inputUnits []*agentUnit) error {
 		// add diag callbacks for unit
 		// we want to add the diagnostic handler that's specific to the unit, and not the gobal diagnostic handler
 		for idx, in := range inputCfg {
-			in.DiagCallback = diagnosticHandler{client: unit.clientUnit, log: cm.logger.Named("diagnostic-manager")}
+			in.DiagCallback = diagnosticHandler{client: unit, log: cm.logger.Named("diagnostic-manager")}
 			in.InputUnitID = unit.ID()
 			in.StatusReporter = unit.GetReporterForStreamByIndex(idx)
 		}

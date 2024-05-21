@@ -19,6 +19,16 @@ type unitState struct {
 	msg   string
 }
 
+type clientUnit interface {
+	ID() string
+	Type() client.UnitType
+	Expected() client.Expected
+	UpdateState(state client.UnitState, message string, payload map[string]interface{}) error
+	RegisterAction(action client.Action)
+	UnregisterAction(action client.Action)
+	RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook)
+}
+
 // agentUnit implements status.StatusReporter and holds an unitState
 // fot the input as well as a unitState for each stream of
 // the input in when this a client.UnitTypeInput.
@@ -26,7 +36,7 @@ type agentUnit struct {
 	softDeleted  bool
 	mtx          sync.Mutex
 	logger       *logp.Logger
-	clientUnit   *client.Unit
+	clientUnit   clientUnit
 	input        unitState
 	streamIDs    []string
 	streamStates map[string]unitState
@@ -81,7 +91,6 @@ func getStatus(s client.UnitState) status.Status {
 }
 
 func getStreamStates(expected client.Expected) (map[string]unitState, []string) {
-
 	expectedCfg := expected.Config
 
 	if expectedCfg == nil {
@@ -120,7 +129,7 @@ func getStreamStates(expected client.Expected) (map[string]unitState, []string) 
 
 // newAgentUnit creates a new agentUnit. In case the supplied client.Unit is of type
 // client.UnitTypeInput it initializes the streamStates with a unitState.Unknown
-func newAgentUnit(cu *client.Unit, log *logp.Logger) *agentUnit {
+func newAgentUnit(cu clientUnit, log *logp.Logger) *agentUnit {
 	var (
 		streamStates map[string]unitState
 		streamIDs    []string
@@ -160,6 +169,17 @@ func (u *agentUnit) UnregisterAction(action client.Action) {
 	}
 
 	u.clientUnit.UnregisterAction(action)
+}
+
+func (u *agentUnit) RegisterDiagnosticHook(name string, description string, filename string, contentType string, hook client.DiagnosticHook) {
+	u.mtx.Lock()
+	defer u.mtx.Unlock()
+
+	if u.clientUnit == nil {
+		return
+	}
+
+	u.clientUnit.RegisterDiagnosticHook(name, description, filename, contentType, hook)
 }
 
 func (u *agentUnit) Expected() client.Expected {
