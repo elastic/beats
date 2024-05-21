@@ -64,24 +64,6 @@ steps:
           - github_commit_status:
               context: "heartbeat: Ubuntu Unit Tests"
 
-      - label: ":rhel: Heartbeat Rhel9 Unit Tests"
-        command: |
-          cd heartbeat
-          mage build unitTest
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_RHEL9}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "heartbeat/build/*.xml"
-          - "heartbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "heartbeat: Rhel9 Unit Tests"
-
       - label: ":windows: Win-2019 Unit Tests"
         key: "windows-2019"
         command: |
