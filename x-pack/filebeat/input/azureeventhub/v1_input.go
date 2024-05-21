@@ -159,28 +159,11 @@ func (in *eventHubInputV1) setup(ctx context.Context) error {
 	// ------------------------------------------------
 
 	// register a message handler -- many can be registered
-	handlerID, err := in.processor.RegisterHandler(ctx,
-		func(c context.Context, e *eventhub.Event) error {
-			in.log.Debugw("received event")
-			//var onEventErr error
-			//ok := in.processEvents(e)
-			//if !ok {
-			//	onEventErr = errors.New("OnEvent function returned false. Stopping input worker")
-			//	in.log.Error(onEventErr.Error())
-			//
-			//	// FIXME: should we stop the processor here?
-			//	// in.Stop()
-			//}
-			//
-			//return onEventErr
-
-			// FIXME:
-			// No function in `processEvents()` returns errors:
-			// can we safely ignore the return value?
-			in.processEvents(e)
-
-			return nil
-		})
+	handlerID, err := in.processor.RegisterHandler(ctx, func(c context.Context, e *eventhub.Event) error {
+		in.log.Debugw("received event")
+		in.processEvents(e)
+		return nil
+	})
 	if err != nil {
 		in.log.Errorw("error registering handler", "error", err)
 		return err
@@ -242,8 +225,11 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 		_, _ = eventHubMetadata.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
 
 		event := beat.Event{
-			// this is the default value for the @timestamp field; usually the ingest
-			// pipeline replaces it with a value in the payload.
+			// We set the timestamp to the processing
+			// start time as default value.
+			//
+			// Usually, the ingest pipeline replaces it
+			// with a value in the payload.
 			Timestamp: processingStartTime,
 			Fields: mapstr.M{
 				"message": record,
@@ -252,21 +238,6 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 			Private: event.Data,
 		}
 
-		// FIXME:
-		// The previous implementation was using an Outlet
-		// to send the event to the pipeline (an input v1
-		// thing).
-		//
-		// The input v2 equivalent is to use the `Publish()`
-		// function on a `beat.Client` to publish the event
-		// to the pipeline.
-		//
-		// The Outlet.OnEvent() function returns a `false`
-		// value if the outlet is closed. When this happens,
-		// the input worker should stop processing events.
-		//
-		// Is there a v2 equivalent for this?
-		//
 		in.pipelineClient.Publish(event)
 
 		in.metrics.sentEvents.Inc()
