@@ -117,7 +117,7 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields, rc RetryConfig)
 
 		// last attempt, exit and log error without sleeping
 		if i == attempts {
-			logp.L().Warnf("failed to load previous monitor state after %d attempts: %v", i, err)
+			logp.L().Warnf("failed to load previous monitor state: %s after %d attempts: %v", sf.ID, i, err)
 			break
 		}
 
@@ -133,7 +133,6 @@ func (t *Tracker) GetCurrentState(sf stdfields.StdMonitorFields, rc RetryConfig)
 	if loadedState != nil {
 		t.states[sf.ID] = loadedState
 	}
-
 	// Return what we found, even if nil
 	return loadedState
 }
