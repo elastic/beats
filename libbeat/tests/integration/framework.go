@@ -290,6 +290,7 @@ func (b *BeatProc) Stop() {
 func (b *BeatProc) LogMatch(match string) bool {
 	re := regexp.MustCompile(match)
 	logFile := b.openLogFile()
+	defer logFile.Close()
 
 	found := false
 	found, b.logFileOffset = b.logRegExpMatch(re, logFile, b.logFileOffset)
@@ -298,6 +299,10 @@ func (b *BeatProc) LogMatch(match string) bool {
 	}
 
 	eventLogFile := b.openEventLogFile()
+	if eventLogFile == nil {
+		return false
+	}
+	defer eventLogFile.Close()
 	found, b.eventLogFileOffset = b.logRegExpMatch(re, eventLogFile, b.eventLogFileOffset)
 
 	return found
@@ -479,6 +484,8 @@ func (b *BeatProc) openGlobFile(glob string, waitForFile bool) *os.File {
 
 // openLogFile opens the log file for reading and returns it.
 // It's the caller's responsibility to close the file.
+// If the log file is not found, the test fails. The returned
+// value is never nil.
 func (b *BeatProc) openLogFile() *os.File {
 	// Beats can produce two different log files, to make sure we're
 	// reading the normal one we add the year to the glob. The default
