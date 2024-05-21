@@ -47,6 +47,7 @@ updates:
       interval: "daily"
     reviewers:
       - "elastic/obs-ds-hosted-services"
+      - "elastic/obs-infraobs-integrations"
     groups:
       azure-sdks:
         patterns:
