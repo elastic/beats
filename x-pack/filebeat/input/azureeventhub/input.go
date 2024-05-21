@@ -34,6 +34,10 @@ var environments = map[string]azure.Environment{
 	azure.USGovernmentCloud.ResourceManagerEndpoint: azure.USGovernmentCloud,
 }
 
+// Plugin returns the Azure Event Hub input plugin.
+//
+// Required register the plugin loader for the
+// input API v2.
 func Plugin(log *logp.Logger) v2.Plugin {
 	return v2.Plugin{
 		Name:       inputName,
@@ -46,6 +50,10 @@ func Plugin(log *logp.Logger) v2.Plugin {
 	}
 }
 
+// eventHubInputManager is the manager for the Azure Event Hub input.
+//
+// It is responsible for creating new instances of the input, according
+// to the configuration provided.
 type eventHubInputManager struct {
 	log *logp.Logger
 }

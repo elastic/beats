@@ -9,7 +9,6 @@ package azureeventhub
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"time"
 
@@ -26,6 +25,9 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// eventHubInputV1 is the Azure Event Hub input V1.
+//
+// This input uses the Azure Event Hub SDK v3 (legacy).
 type eventHubInputV1 struct {
 	config         azureInputConfig
 	log            *logp.Logger
@@ -63,7 +65,7 @@ func (in *eventHubInputV1) Run(
 ) error {
 	var err error
 
-	// Create pipelineClient for publishing events and receive notification of their ACKs.
+	// Create pipelineClient for publishing events.
 	in.pipelineClient, err = createPipelineClient(pipeline)
 	if err != nil {
 		return fmt.Errorf("failed to create pipeline pipelineClient: %w", err)
@@ -76,7 +78,8 @@ func (in *eventHubInputV1) Run(
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
-	// Initialize everything for this run
+	// Initialize the input components
+	// in preparation for the main run loop.
 	err = in.setup(ctx)
 	if err != nil {
 		return err
@@ -92,6 +95,12 @@ func (in *eventHubInputV1) Run(
 	return nil
 }
 
+// setup initializes the input components.
+//
+// The main components are:
+// 1. Azure Storage Leaser / Checkpointer
+// 2. Event Processor Host
+// 3. Message handler
 func (in *eventHubInputV1) setup(ctx context.Context) error {
 
 	// ----------------------------------------------------
@@ -113,6 +122,8 @@ func (in *eventHubInputV1) setup(ctx context.Context) error {
 		in.log.Errorw("error creating storage leaser checkpointer", "error", err)
 		return err
 	}
+
+	in.log.Infof("storage leaser checkpointer created for container %q", in.config.SAContainer)
 
 	// ------------------------------------------------
 	// 2 — Create a new event processor host
@@ -141,6 +152,8 @@ func (in *eventHubInputV1) setup(ctx context.Context) error {
 		return err
 	}
 
+	in.log.Infof("event processor host created for event hub %q", in.config.EventHubName)
+
 	// ------------------------------------------------
 	// 3 — Register a message handler
 	// ------------------------------------------------
@@ -148,21 +161,25 @@ func (in *eventHubInputV1) setup(ctx context.Context) error {
 	// register a message handler -- many can be registered
 	handlerID, err := in.processor.RegisterHandler(ctx,
 		func(c context.Context, e *eventhub.Event) error {
-			in.log.Debugw("received event", "ts", time.Now().String())
-			var onEventErr error
-			// partitionID is not yet mapped in the azure-eventhub sdk
-			ok := in.processEvents(e, "")
-			if !ok {
-				onEventErr = errors.New("OnEvent function returned false. Stopping input worker")
-				in.log.Error(onEventErr.Error())
+			in.log.Debugw("received event")
+			//var onEventErr error
+			//ok := in.processEvents(e)
+			//if !ok {
+			//	onEventErr = errors.New("OnEvent function returned false. Stopping input worker")
+			//	in.log.Error(onEventErr.Error())
+			//
+			//	// FIXME: should we stop the processor here?
+			//	// in.Stop()
+			//}
+			//
+			//return onEventErr
 
-				// FIXME: should we stop the processor here?
-				// in.Stop()
-			}
+			// FIXME:
+			// No function in `processEvents()` returns errors:
+			// can we safely ignore the return value?
+			in.processEvents(e)
 
-			//time.Sleep(5 * time.Second)
-
-			return onEventErr
+			return nil
 		})
 	if err != nil {
 		in.log.Errorw("error registering handler", "error", err)
@@ -204,7 +221,7 @@ func (in *eventHubInputV1) run(ctx context.Context) error {
 	return ctx.Err()
 }
 
-func (in *eventHubInputV1) processEvents(event *eventhub.Event, partitionID string) bool {
+func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 	processingStartTime := time.Now()
 	eventHubMetadata := mapstr.M{
 		// The `partition_id` is not available in the
@@ -224,21 +241,6 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event, partitionID stri
 		_, _ = eventHubMetadata.Put("sequence_number", event.SystemProperties.SequenceNumber)
 		_, _ = eventHubMetadata.Put("enqueued_time", event.SystemProperties.EnqueuedTime)
 
-		//ok := in.outlet.OnEvent(beat.Event{
-		//	// this is the default value for the @timestamp field; usually the ingest
-		//	// pipeline replaces it with a value in the payload.
-		//	Timestamp: processingStartTime,
-		//	Fields: mapstr.M{
-		//		"message": record,
-		//		"azure":   azure,
-		//	},
-		//	Private: event.Data,
-		//})
-		//if !ok {
-		//	in.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
-		//	return ok
-		//}
-
 		event := beat.Event{
 			// this is the default value for the @timestamp field; usually the ingest
 			// pipeline replaces it with a value in the payload.
@@ -250,14 +252,21 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event, partitionID stri
 			Private: event.Data,
 		}
 
-		// FIXME: error handling on publish?
+		// FIXME:
 		// The previous implementation was using an Outlet
-		// to send the event to the pipeline.
-		// The Outlet.OnEvent() function returns a `false`
-		// value if the outlet is closed.
+		// to send the event to the pipeline (an input v1
+		// thing).
 		//
-		// Should the new implementation use the `Publish()`
-		// function do something?
+		// The input v2 equivalent is to use the `Publish()`
+		// function on a `beat.Client` to publish the event
+		// to the pipeline.
+		//
+		// The Outlet.OnEvent() function returns a `false`
+		// value if the outlet is closed. When this happens,
+		// the input worker should stop processing events.
+		//
+		// Is there a v2 equivalent for this?
+		//
 		in.pipelineClient.Publish(event)
 
 		in.metrics.sentEvents.Inc()
@@ -265,11 +274,39 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event, partitionID stri
 
 	in.metrics.processedMessages.Inc()
 	in.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
-
-	return true
 }
 
-// unpackRecords will try to split the message into multiple ones based on the group field provided by the configuration
+// unpackRecords will try to split the message into multiple ones based on
+// the group field provided by the configuration.
+//
+// `unpackRecords()` supports two types of messages:
+//
+//  1. A message with an object with a `records`
+//     field containing a list of events.
+//  2. A message with a single event.
+//
+// (1) Here is an example of a message containing an object with
+// a `records` field:
+//
+//	{
+//	  "records": [
+//	    {
+//	      "time": "2019-12-17T13:43:44.4946995Z",
+//	      "test": "this is some message"
+//	    }
+//	  ]
+//	}
+//
+// (2) Here is an example of a message with a single event:
+//
+//	{
+//	  "time": "2019-12-17T13:43:44.4946995Z",
+//	  "test": "this is some message"
+//	}
+//
+// The Diagnostic Settings uses the single object with `records`
+// fields (1) when exporting data from an Azure service to an
+// event hub. This is the most common case.
 func (in *eventHubInputV1) unpackRecords(bMessage []byte) []string {
 	var mapObject map[string][]interface{}
 	var messages []string
