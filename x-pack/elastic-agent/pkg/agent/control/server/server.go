@@ -152,7 +152,7 @@ func (s *Server) Upgrade(ctx context.Context, request *cproto.UpgradeRequest) (*
 	}
 	cb, err := u.Upgrade(ctx, &upgradeRequest{request}, false, request.SkipVerify, request.PgpBytes...)
 	if err != nil {
-		return &cproto.UpgradeResponse{
+		return &cproto.UpgradeResponse{ //nolint:nilerr // error is wrapped in response
 			Status: cproto.ActionStatus_FAILURE,
 			Error:  err.Error(),
 		}, nil
@@ -235,7 +235,13 @@ func (s *Server) ProcMeta(ctx context.Context, _ *cproto.Empty) (*cproto.ProcMet
 				endpoint = "npipe"
 			}
 
-			res, err := client.Get("http://" + endpoint + "/")
+			req, err := http.NewRequestWithContext(ctx, "GET", "http://"+endpoint+"/", nil)
+			if err != nil {
+				procMeta.Error = err.Error()
+				resp.Procs = append(resp.Procs, procMeta)
+				continue
+			}
+			res, err := client.Do(req)
 			if err != nil {
 				procMeta.Error = err.Error()
 				resp.Procs = append(resp.Procs, procMeta)
