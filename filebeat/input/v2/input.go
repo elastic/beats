@@ -91,6 +91,12 @@ type Context struct {
 	StatusReporter status.StatusReporter
 }
 
+func (c Context) UpdateStatus(status status.Status, msg string) {
+	if c.StatusReporter != nil {
+		c.StatusReporter.UpdateStatus(status, msg)
+	}
+}
+
 // TestContext provides the Input Test function with common environmental
 // information and services.
 type TestContext struct {
