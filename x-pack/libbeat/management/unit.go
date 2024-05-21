@@ -30,16 +30,16 @@ type clientUnit interface {
 }
 
 // agentUnit implements status.StatusReporter and holds an unitState
-// fot the input as well as a unitState for each stream of
+// for the input as well as a unitState for each stream of
 // the input in when this a client.UnitTypeInput.
 type agentUnit struct {
-	softDeleted  bool
-	mtx          sync.Mutex
-	logger       *logp.Logger
-	clientUnit   clientUnit
-	input        unitState
-	streamIDs    []string
-	streamStates map[string]unitState
+	softDeleted     bool
+	mtx             sync.Mutex
+	logger          *logp.Logger
+	clientUnit      clientUnit
+	inputLevelState unitState
+	streamIDs       []string
+	streamStates    map[string]unitState
 }
 
 // getUnitState converts status.Status to client.UnitState
@@ -208,37 +208,31 @@ func (u *agentUnit) ID() string {
 func (u *agentUnit) calcState() (status.Status, string) {
 	// for type output return the unit state directly as it has no streams
 	if u.clientUnit.Type() == client.UnitTypeOutput {
-		return u.input.state, u.input.msg
+		return u.inputLevelState.state, u.inputLevelState.msg
 	}
 
-	// if input state is not running return the input state
-	if u.input.state != status.Running {
-		return u.input.state, u.input.msg
+	// if inputLevelState state is not running return the inputLevelState state
+	if u.inputLevelState.state != status.Running {
+		return u.inputLevelState.state, u.inputLevelState.msg
 	}
 
-	// input state is marked as running, check the stream states
-	currStatus := status.Running
-	countFailed := 0
-	countDegraded := 0
+	// inputLevelState state is marked as running, check the stream states
+	reportedStatus := status.Running
+	reportedMsg := "Healthy"
 	for _, streamState := range u.streamStates {
 		switch streamState.state {
 		case status.Degraded:
-			countDegraded++
-			if currStatus == status.Running {
-				currStatus = status.Degraded
+			if reportedStatus != status.Degraded {
+				reportedStatus = status.Degraded
+				reportedMsg = streamState.msg
 			}
 		case status.Failed:
-			countFailed++
-			currStatus = status.Failed
+			// return the first failed stream
+			return streamState.state, streamState.msg
 		}
 	}
 
-	if currStatus == status.Running {
-		return currStatus, "Healthy"
-	}
-
-	return currStatus, fmt.Sprintf("Out of %d streams, %d are failed, %d are degraded",
-		len(u.streamStates), countFailed, countDegraded)
+	return reportedStatus, reportedMsg
 }
 
 // Type of the unit.
@@ -262,11 +256,11 @@ func (u *agentUnit) UpdateState(state status.Status, msg string, payload map[str
 		return nil
 	}
 
-	if u.input.state == state && u.input.msg == msg {
+	if u.inputLevelState.state == state && u.inputLevelState.msg == msg {
 		return nil
 	}
 
-	u.input = unitState{
+	u.inputLevelState = unitState{
 		state: state,
 		msg:   msg,
 	}
@@ -345,8 +339,8 @@ func (u *agentUnit) update(cu *client.Unit) {
 	u.clientUnit = cu
 
 	inputStatus := getStatus(cu.Expected().State)
-	if u.input.state != inputStatus {
-		u.input = unitState{
+	if u.inputLevelState.state != inputStatus {
+		u.inputLevelState = unitState{
 			state: inputStatus,
 		}
 	}
