@@ -63,6 +63,16 @@ type coreLogger struct {
 	observedLogs *observer.ObservedLogs // Contains events generated while in observation mode (a testing mode).
 }
 
+type closerCore struct {
+	zapcore.Core
+	io.Closer
+}
+
+func (c *closerCore) With(fields []zapcore.Field) zapcore.Core {
+	c.Core = c.Core.With(fields)
+	return c
+}
+
 // Configure configures the logp package.
 func Configure(cfg Config) error {
 	return ConfigureWithOutputs(cfg)
@@ -314,14 +324,35 @@ func makeFileOutput(cfg Config, enab zapcore.LevelEnabler) (zapcore.Core, error)
 		return nil, fmt.Errorf("failed to create file rotator: %w", err)
 	}
 
-	return newCore(buildEncoder(cfg), rotator, enab), nil
+	// Keep the same behaviour from before we introduced the closerCore.
+	core, err := newCore(buildEncoder(cfg), rotator, enab), nil
+	if err != nil {
+		return core, err
+	}
+
+	cc := closerCore{
+		Core:   core,
+		Closer: rotator,
+	}
+
+	return &cc, err
 }
 
 func newCore(enc zapcore.Encoder, ws zapcore.WriteSyncer, enab zapcore.LevelEnabler) zapcore.Core {
 	return wrappedCore(zapcore.NewCore(enc, ws, enab))
 }
 func wrappedCore(core zapcore.Core) zapcore.Core {
-	return ecszap.WrapCore(core)
+	wc := ecszap.WrapCore(core)
+
+	if closeCore, ok := core.(io.Closer); ok {
+		cc := closerCore{
+			Core:   wc,
+			Closer: closeCore,
+		}
+		return &cc
+	}
+
+	return wc
 }
 
 func globalLogger() *zap.Logger {
@@ -404,5 +435,19 @@ func (m multiCore) Sync() error {
 			errs = append(errs, err)
 		}
 	}
+	return errors.Join(errs...)
+}
+
+// Close calls Close on any core that implements io.Closer.
+// All returned errors are joined by errors.Join and returned.
+func (m multiCore) Close() error {
+	errs := []error{}
+	for _, core := range m.cores {
+		if closer, ok := core.(io.Closer); ok {
+			closeErr := closer.Close()
+			errs = append(errs, closeErr)
+		}
+	}
+
 	return errors.Join(errs...)
 }

@@ -18,6 +18,8 @@
 package logp
 
 import (
+	"io"
+
 	"go.uber.org/zap/zapcore"
 )
 
@@ -86,4 +88,13 @@ func (c *selectiveCore) Write(ent zapcore.Entry, fields []zapcore.Field) error {
 // Sync flushes buffered logs (if any).
 func (c *selectiveCore) Sync() error {
 	return c.core.Sync()
+}
+
+// Close calls Close on c.core if it implements io.Closer
+func (c *selectiveCore) Close() error {
+	if closer, ok := c.core.(io.Closer); ok {
+		return closer.Close()
+	}
+
+	return nil
 }

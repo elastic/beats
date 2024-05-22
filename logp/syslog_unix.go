@@ -101,6 +101,11 @@ func (c *syslogCore) Clone() *syslogCore {
 	return &clone
 }
 
+// Close calls close in the syslog writer
+func (c *syslogCore) Close() error {
+	return c.writer.Close()
+}
+
 func replaceTabsWithSpaces(b []byte, n int) {
 	var count = 0
 	for i, v := range b {

@@ -18,7 +18,9 @@
 package logp
 
 import (
+	"errors"
 	"fmt"
+	"io"
 
 	"go.uber.org/zap/zapcore"
 )
@@ -101,4 +103,21 @@ func (t *typedLoggerCore) Write(e zapcore.Entry, fields []zapcore.Field) error {
 	}
 
 	return t.defaultCore.Write(e, fields)
+}
+
+// Close calls Close on any core that implements io.Close
+// all errors are joined by errors.Join and returned
+func (t *typedLoggerCore) Close() error {
+	errs := []error{}
+	if closer, ok := t.defaultCore.(io.Closer); ok {
+		closeErr := closer.Close()
+		errs = append(errs, closeErr)
+	}
+
+	if closer, ok := t.typedCore.(io.Closer); ok {
+		closeErr := closer.Close()
+		errs = append(errs, closeErr)
+	}
+
+	return errors.Join(errs...)
 }

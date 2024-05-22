@@ -25,7 +25,6 @@ import (
 	golog "log"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 
@@ -222,33 +221,10 @@ func TestLoggingECSFields(t *testing.T) {
 }
 
 func TestCreatingNewLoggerWithDifferentOutput(t *testing.T) {
-	var tempDir1, tempDir2 string
-	// Because of the way logp and zap work, when the test finishes, the log
-	// file is still open, this creates a problem on Windows because the
-	// temporary directory cannot be removed if a file inside it is still
-	// open.
-	// See https://github.com/elastic/elastic-agent-libs/issues/179
-	// for more details
-	//
-	// To circumvent this problem on Windows we use os.MkdirTemp
-	// leaving it behind and delegating to the OS the responsibility
-	// of cleaning it up (usually on restart).
-	if runtime.GOOS == "windows" {
-		var err error
-		tempDir1, err = os.MkdirTemp("", t.Name()+"-*")
-		if err != nil {
-			t.Fatalf("could not create temporary directory: %s", err)
-		}
-		tempDir2, err = os.MkdirTemp("", t.Name()+"-*")
-		if err != nil {
-			t.Fatalf("could not create temporary directory: %s", err)
-		}
-	} else {
-		// We have no problems on Linux and Darwin, so we can rely on t.TempDir
-		// that will remove the files once the tests finishes.
-		tempDir1 = t.TempDir()
-		tempDir2 = t.TempDir()
-	}
+	// We have no problems on Linux and Darwin, so we can rely on t.TempDir
+	// that will remove the files once the tests finishes.
+	tempDir1 := t.TempDir()
+	tempDir2 := t.TempDir()
 
 	secondLoggerMessage := "this is a log message"
 	secondLoggerName := t.Name() + "-second"
@@ -279,6 +255,11 @@ func TestCreatingNewLoggerWithDifferentOutput(t *testing.T) {
 	if err := logger.Sync(); err != nil {
 		t.Fatalf("could not sync log file from fist logger: %s", err)
 	}
+	t.Cleanup(func() {
+		if err := logger.Close(); err != nil {
+			t.Fatalf("could not close first logger: %s", err)
+		}
+	})
 
 	// Actually clones the logger and use the "WithFileOutput" function
 	secondCfg := DefaultConfig(DefaultEnvironment)
@@ -303,6 +284,11 @@ func TestCreatingNewLoggerWithDifferentOutput(t *testing.T) {
 	if err := secondLogger.Sync(); err != nil {
 		t.Fatalf("could not sync log file from second logger: %s", err)
 	}
+	t.Cleanup(func() {
+		if err := secondLogger.Close(); err != nil {
+			t.Fatalf("could not close second logger: %s", err)
+		}
+	})
 
 	// Write again with the first logger to ensure it has not been affected
 	// by the new configuration on the second logger.
@@ -628,6 +614,24 @@ func TestCreateLogOutputAllDisabled(t *testing.T) {
 
 	if out.Enabled(zap.DebugLevel) {
 		t.Fatal("the output must be disabled to all log levels")
+	}
+}
+
+func TestCoresCanBeClosed(t *testing.T) {
+	cfg := DefaultConfig(DefaultEnvironment)
+	cfg.ToFiles = true
+
+	fileOutput, err := makeFileOutput(cfg, zapcore.DebugLevel)
+	if err != nil {
+		t.Fatalf("cannot create file output: %s", err)
+	}
+
+	closer, ok := fileOutput.(io.Closer)
+	if !ok {
+		t.Fatal("the 'File Output' does not implement io.Closer")
+	}
+	if err := closer.Close(); err != nil {
+		t.Fatalf("Close must not return any error, got: %s", err)
 	}
 }
 

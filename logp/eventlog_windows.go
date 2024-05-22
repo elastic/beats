@@ -24,6 +24,8 @@ import (
 
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/sys/windows/svc/eventlog"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 const (
@@ -45,7 +47,9 @@ func newEventLog(appName string, encoder zapcore.Encoder, enab zapcore.LevelEnab
 	if appName == "" {
 		return nil, errors.New("appName cannot be empty")
 	}
-	appName = strings.Title(strings.ToLower(appName))
+
+	toTilteCase := cases.Title(language.English)
+	appName = toTilteCase.String(strings.ToLower(appName))
 
 	if err := eventlog.InstallAsEventCreate(appName, supports); err != nil {
 		if !strings.Contains(err.Error(), alreadyExistsMsg) {
@@ -107,4 +111,8 @@ func (c *eventLogCore) Clone() *eventLogCore {
 	clone.fields = make([]zapcore.Field, len(c.fields), len(c.fields)+10)
 	copy(clone.fields, c.fields)
 	return &clone
+}
+
+func (c *eventLogCore) Close() error {
+	return c.log.Close()
 }

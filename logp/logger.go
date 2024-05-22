@@ -20,6 +20,7 @@ package logp
 import (
 	"bytes"
 	"fmt"
+	"io"
 
 	"go.elastic.co/ecszap"
 	"go.uber.org/zap"
@@ -257,6 +258,15 @@ func (l *Logger) Sync() error {
 // Core returns the backend zapcore.Core for the logger.
 func (l *Logger) Core() zapcore.Core {
 	return l.logger.Core()
+}
+
+// Close closes the underlying logger core/writer.
+func (l *Logger) Close() error {
+	if closer, ok := l.logger.Core().(io.Closer); ok {
+		return closer.Close()
+	}
+
+	return nil
 }
 
 // L returns an unnamed global logger.
