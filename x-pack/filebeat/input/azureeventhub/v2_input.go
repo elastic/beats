@@ -122,25 +122,34 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 }
 
 func (in *eventHubInputV2) run(ctx context.Context) {
-	processor, err := azeventhubs.NewProcessor(
-		in.consumerClient,
-		in.checkpointStore,
-		nil,
-	)
-	if err != nil {
-		in.log.Errorw("error creating processor", "error", err)
-		return
+
+	for ctx.Err() == nil {
+
+		processor, err := azeventhubs.NewProcessor(
+			in.consumerClient,
+			in.checkpointStore,
+			nil,
+		)
+		if err != nil {
+			in.log.Errorw("error creating processor", "error", err)
+			return
+		}
+
+		// Run in the background, launching goroutines to process each partition
+		go in.workersLoop(processor)
+
+		if err := processor.Run(ctx); err != nil {
+			// FIXME: `Run()` returns an error when the processor thinks it's unrecoverable.
+			// We should check the error and decide if we want to retry or not. Should
+			// we add an and retry mechanism with exponential backoff?
+			in.log.Errorw("processor completed with an error", "error", err)
+
+			time.Sleep(30 * time.Second)
+		}
+
+		in.log.Infow("run completed", "error", err)
 	}
 
-	// Run in the background, launching goroutines to process each partition
-	go in.workersLoop(processor)
-
-	if err := processor.Run(ctx); err != nil {
-		// FIXME: `Run()` returns an error when the processor thinks it's unrecoverable.
-		// We should check the error and decide if we want to retry or not. Should
-		// we add an exponential backoff and retry mechanism?
-		in.log.Errorw("error running processor", "error", err)
-	}
 }
 
 func (in *eventHubInputV2) workersLoop(processor *azeventhubs.Processor) {
