@@ -2,7 +2,8 @@
 name: "beats-xpack-auditbeat"
 
 env:
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
+  AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
@@ -10,8 +11,6 @@ env:
 
   IMAGE_MACOS_ARM: "generic-13-ventura-arm"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  IMAGE_RHEL9_X86_64: "family/platform-ingest-beats-rhel-9"
-  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_11: "family/platform-ingest-beats-windows-11"
@@ -31,6 +30,24 @@ steps:
     key: "x-pack-auditbeat-mandatory-tests"
 
     steps:
+      - label: ":ubuntu: x-pack/auditbeat arm64 Unit Tests"
+        command: |
+          cd x-pack/auditbeat
+          mage build unitTest
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "aws"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
+          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
+        artifact_paths:
+          - "x-pack/auditbeat/build/*.xml"
+          - "x-pack/auditbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/auditbeat: Linux arm64 Unit Tests"
+
       - label: ":ubuntu: x-pack/auditbeat Build (MODULE) Tests"
         key: "mandatory-linux-unit-test"
         command: |
@@ -53,74 +70,8 @@ steps:
           - "x-pack/auditbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/auditbeat: Ubuntu Unit (MODULE) Tests"
+              context: "x-pack/auditbeat: Build (MODULE) Tests"
 
-      - label: ":rhel: x-pack/auditbeat RHEL9 Unit Tests"
-        key: "mandatory-rhel9-unit-test"
-        command: |
-          cd x-pack/auditbeat
-          mage build unitTest
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_RHEL9_X86_64}"
-          machineType: "${GCP_DEFAULT_MACHINE_TYPE}"
-        artifact_paths:
-          - "x-pack/auditbeat/build/*.xml"
-          - "x-pack/auditbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/auditbeat: RHEL9 Unit Tests"
-
-      - label: ":windows: x-pack/auditbeat Windows 2022 Unit Tests"
-        key: "mandatory-win-2022-unit-tests"
-        command: |
-          Set-Location -Path x-pack/auditbeat
-          mage build unitTest
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/auditbeat/build/*.xml"
-          - "x-pack/auditbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/auditbeat: Windows 2022 Unit Tests"
-
-      - label: ":windows: x-pack/auditbeat Windows 2016 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/auditbeat
-          mage build unitTest
-        key: "mandatory-win-2016-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2016}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/auditbeat/build/*.xml"
-          - "x-pack/auditbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/auditbeat: Windows 2016 Unit Tests"
-
-  - group: "x-pack/auditbeat Extended Windows Tests"
-    key: "x-pack-auditbeat-extended-win-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
-
-    steps:
       - label: ":windows: x-pack/auditbeat Windows 2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/auditbeat
@@ -141,6 +92,33 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/auditbeat: Windows 2019 Extended Tests"
+
+
+  - group: "x-pack/auditbeat Extended Windows Tests"
+    key: "x-pack-auditbeat-extended-win-tests"
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+
+    steps:
+      - label: ":windows: x-pack/auditbeat Windows 2016 Unit Tests"
+        command: |
+          Set-Location -Path x-pack/auditbeat
+          mage build unitTest
+        key: "mandatory-win-2016-unit-tests"
+        retry:
+          automatic:
+            - limit: 3
+        agents:
+          provider: "gcp"
+          image: "${IMAGE_WIN_2016}"
+          machineType: "${GCP_WIN_MACHINE_TYPE}"
+          disk_size: 100
+          disk_type: "pd-ssd"
+        artifact_paths:
+          - "x-pack/auditbeat/build/*.xml"
+          - "x-pack/auditbeat/build/*.json"
+        notify:
+          - github_commit_status:
+              context: "x-pack/auditbeat: Windows 2016 Unit Tests"
 
       - label: ":windows: x-pack/auditbeat Windows 10 Unit Tests"
         command: |
@@ -163,30 +141,9 @@ steps:
           - github_commit_status:
               context: "x-pack/auditbeat: Windows 10 Extended Tests"
 
-      - label: ":windows: x-pack/auditbeat Windows 11 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/auditbeat
-          mage build unitTest
-        key: "extended-win-11-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/auditbeat/build/*.xml"
-          - "x-pack/auditbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/auditbeat: Windows 11 Extended Tests"
-
   - group: "x-pack/auditbeat Extended Tests"
     key: "x-pack-auditbeat-extended-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS|arm).*/
+    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*(macOS).*/
 
     steps:
       - label: ":mac: x-pack/auditbeat macOS x86_64 Unit Tests"
@@ -208,45 +165,6 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/auditbeat: macOS x86_64 Unit Tests"
-
-      - label: ":mac: x-pack/auditbeat macOS arm64 Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
-        command: |
-          set -euo pipefail
-          source .buildkite/scripts/install_macos_tools.sh
-          cd x-pack/auditbeat
-          mage build unitTest
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "orka"
-          imagePrefix: "${IMAGE_MACOS_ARM}"
-        artifact_paths:
-          - "x-pack/auditbeat/build/*.xml"
-          - "x-pack/auditbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/auditbeat: macOS arm64 Unit Tests"
-
-      - label: ":linux: x-pack/auditbeat Ubuntu ARM Unit Tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
-        command: |
-          cd x-pack/auditbeat
-          mage build unitTest
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
-          instanceType: "${AWS_ARM_INSTANCE_TYPE}"
-        artifact_paths:
-          - "x-pack/auditbeat/build/*.xml"
-          - "x-pack/auditbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/auditbeat: Linux arm64 Unit Tests"
 
   - wait: ~
     # with PRs, we want to run packaging only if mandatory tests succeed
@@ -292,7 +210,7 @@ steps:
         timeout_in_minutes: 20
         agents:
           provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         env:
           PLATFORMS: "linux/arm64"
