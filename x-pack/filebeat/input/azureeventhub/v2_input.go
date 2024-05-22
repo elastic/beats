@@ -8,7 +8,6 @@ package azureeventhub
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"time"
@@ -23,6 +22,8 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+// azureInputConfig the Azure Event Hub input v2,
+// that uses the modern Azure Event Hub SDK for Go.
 type eventHubInputV2 struct {
 	config          azureInputConfig
 	log             *logp.Logger
@@ -33,6 +34,8 @@ type eventHubInputV2 struct {
 	messageDecoder  messageDecoder
 }
 
+// newEventHubInputV2 creates a new instance of the Azure Event Hub input v2,
+// that uses the modern Azure Event Hub SDK for Go.
 func newEventHubInputV2(config azureInputConfig, log *logp.Logger) (v2.Input, error) {
 	return &eventHubInputV2{
 		config: config,
@@ -48,6 +51,7 @@ func (in *eventHubInputV2) Test(v2.TestContext) error {
 	return nil
 }
 
+// Run starts the Azure Event Hub input v2.
 func (in *eventHubInputV2) Run(
 	inputContext v2.Context,
 	pipeline beat.Pipeline,
@@ -55,13 +59,6 @@ func (in *eventHubInputV2) Run(
 	var err error
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
-
-	// Create pipelineClient for publishing events and receive notification of their ACKs.
-	in.pipelineClient, err = createPipelineClient(pipeline)
-	if err != nil {
-		return fmt.Errorf("failed to create pipeline pipelineClient: %w", err)
-	}
-	defer in.pipelineClient.Close()
 
 	// Setup input metrics
 	inputMetrics := newInputMetrics(inputContext.ID, nil)
@@ -76,13 +73,21 @@ func (in *eventHubInputV2) Run(
 		metrics: in.metrics,
 	}
 
-	// Initialize the components needed to process events, in particular
-	// the consumerClient.
+	// Initialize the components needed to process events,
+	// in particular the consumerClient.
 	err = in.setup(ctx)
 	if err != nil {
 		return err
 	}
 	defer in.consumerClient.Close(context.Background())
+
+	// Create pipelineClient for publishing events and receive
+	// notification of their ACKs.
+	in.pipelineClient, err = createPipelineClient(pipeline)
+	if err != nil {
+		return fmt.Errorf("failed to create pipeline pipelineClient: %w", err)
+	}
+	defer in.pipelineClient.Close()
 
 	// Start the main run loop
 	in.run(ctx)
@@ -90,6 +95,7 @@ func (in *eventHubInputV2) Run(
 	return nil
 }
 
+// setup initializes the components needed to process events.
 func (in *eventHubInputV2) setup(ctx context.Context) error {
 	// FIXME: check more pipelineClient creation options.
 	blobContainerClient, err := container.NewClientFromConnectionString(
@@ -121,10 +127,13 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 	return nil
 }
 
+// run starts the main loop for processing events.
 func (in *eventHubInputV2) run(ctx context.Context) {
-
 	for ctx.Err() == nil {
-
+		// Create a new processor for each run.
+		//
+		// The docs explicitly say that the processor
+		// is not reusable.
 		processor, err := azeventhubs.NewProcessor(
 			in.consumerClient,
 			in.checkpointStore,
@@ -135,15 +144,20 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 			return
 		}
 
-		// Run in the background, launching goroutines to process each partition
+		// Launch one goroutines for each partition
+		// to process events.
 		go in.workersLoop(processor)
 
+		// Run the processor to start processing events.
+		// This is a blocking call.
 		if err := processor.Run(ctx); err != nil {
 			// FIXME: `Run()` returns an error when the processor thinks it's unrecoverable.
 			// We should check the error and decide if we want to retry or not. Should
 			// we add an and retry mechanism with exponential backoff?
 			in.log.Errorw("processor completed with an error", "error", err)
 
+			// FIXME: `time.Sleep()` is not the best way to handle this.
+			// Using it for testing purposes.
 			time.Sleep(30 * time.Second)
 		}
 
@@ -152,35 +166,41 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 
 }
 
+// workersLoop starts a goroutine for each partition to process events.
 func (in *eventHubInputV2) workersLoop(processor *azeventhubs.Processor) {
 	for {
 		processorPartitionClient := processor.NextPartitionClient(context.TODO())
 		if processorPartitionClient == nil {
-			// Processor has stopped
+			// We break out from the for loop when `NextPartitionClient`
+			// return `nil` (signals the processor has stopped).
 			break
 		}
 
+		partitionID := processorPartitionClient.PartitionID()
 		go func() {
-			in.log.Infow("starting a partition worker", "partition", processorPartitionClient.PartitionID())
+			in.log.Infow(
+				"starting a partition worker",
+				"partition", partitionID,
+			)
 
 			if err := in.processEventsForPartition(processorPartitionClient); err != nil {
 				// FIXME: it seems we always get an error, even when the processor is stopped.
 				in.log.Infow(
 					"stopping processing events for partition",
 					"reason", err,
-					"partition", processorPartitionClient.PartitionID(),
+					"partition", partitionID,
 				)
 			}
 
 			in.log.Infow(
 				"partition worker exited",
-				"partition", processorPartitionClient.PartitionID(),
+				"partition", partitionID,
 			)
 		}()
 	}
 }
 
-// processEventsForPartition shows the typical pattern for processing a partition.
+// processEventsForPartition receives events from a partition and processes them.
 func (in *eventHubInputV2) processEventsForPartition(partitionClient *azeventhubs.ProcessorPartitionClient) error {
 	// 1. [BEGIN] Initialize any partition specific resources for your application.
 	// 2. [CONTINUOUS] Loop, calling ReceiveEvents() and UpdateCheckpoint().
@@ -228,8 +248,10 @@ func (in *eventHubInputV2) processEventsForPartition(partitionClient *azeventhub
 
 		in.log.Debugw("updating checkpoint information", "partition", partitionID)
 
-		// Updates the checkpoint with the latest event received. If processing needs to restart
-		// it will restart from this point, automatically.
+		// Updates the checkpoint with the latest event received.
+		//
+		// If processing needs to restart it will restart from this
+		// point, automatically.
 		if err := partitionClient.UpdateCheckpoint(context.TODO(), events[len(events)-1], nil); err != nil {
 			in.log.Errorw("error updating checkpoint", "error", err)
 			return err
@@ -250,6 +272,10 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 	}
 
 	for _, receivedEventData := range receivedEvents {
+		// Update input metrics.
+		in.metrics.receivedMessages.Inc()
+		in.metrics.receivedBytes.Add(uint64(len(receivedEventData.Body)))
+
 		// A single event can contain multiple records. We create a new event for each record.
 		//records := in.unpackRecords(receivedEventData.Body)
 		records := in.messageDecoder.Decode(receivedEventData.Body)
@@ -267,67 +293,22 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 					"message": record,
 					"azure":   azure,
 				},
-				Private: receivedEventData.Body,
+				Private: receivedEventData,
 			}
 
+			// Publish the event to the Beats pipeline.
 			in.pipelineClient.Publish(event)
+
+			// Update input metrics.
+			in.metrics.sentEvents.Inc()
 		}
+
+		// Update input metrics.
+		in.metrics.processedMessages.Inc()
+		in.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
 	}
 
 	return nil
-}
-
-func (in *eventHubInputV2) unpackRecords(bMessage []byte) []string {
-	var mapObject map[string][]interface{}
-	var records []string
-
-	// Clean up the message for known issues [1] where Azure services produce malformed JSON documents.
-	// Sanitization occurs if options are available and the message contains an invalid JSON.
-	//
-	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
-	if len(in.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
-		bMessage = sanitize(bMessage, in.config.SanitizeOptions...)
-		in.metrics.sanitizedMessages.Inc()
-	}
-
-	// check if the message is a "records" object containing a list of events
-	err := json.Unmarshal(bMessage, &mapObject)
-	if err == nil {
-		if len(mapObject[expandEventListFromField]) > 0 {
-			for _, ms := range mapObject[expandEventListFromField] {
-				js, err := json.Marshal(ms)
-				if err == nil {
-					records = append(records, string(js))
-					in.metrics.receivedEvents.Inc()
-				} else {
-					in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-				}
-			}
-		}
-	} else {
-		in.log.Debugf("deserializing multiple messages to a `records` object returning error: %s", err)
-		// in some cases the message is an array
-		var arrayObject []interface{}
-		err = json.Unmarshal(bMessage, &arrayObject)
-		if err != nil {
-			// return entire message
-			in.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
-			in.metrics.decodeErrors.Inc()
-			return []string{string(bMessage)}
-		}
-
-		for _, ms := range arrayObject {
-			js, err := json.Marshal(ms)
-			if err == nil {
-				records = append(records, string(js))
-				in.metrics.receivedEvents.Inc()
-			} else {
-				in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-			}
-		}
-	}
-
-	return records
 }
 
 func initializePartitionResources(partitionID string) error {
