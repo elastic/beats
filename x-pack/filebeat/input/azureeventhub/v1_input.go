@@ -160,8 +160,23 @@ func (in *eventHubInputV1) setup(ctx context.Context) error {
 
 	// register a message handler -- many can be registered
 	handlerID, err := in.processor.RegisterHandler(ctx, func(c context.Context, e *eventhub.Event) error {
-		in.log.Debugw("received event")
+		
+		// Take the event message from the event hub,
+		// creates and publishes one (or more) events 
+		// to the beats pipeline.
 		in.processEvents(e)
+
+		// Why is this function always returning no error?
+		//
+		// The legacy SDK does not offer hooks to control
+		// checkpointing (it internally updates the checkpoint
+		// info after a successful handler execution).
+		// 
+		// So we are keeping the existing behaviour (do not
+		// handle publish acks).
+		//
+		// On shutdown, Filebeat stops the input, waits for
+		// the output to process all the events in the queue.
 		return nil
 	})
 	if err != nil {
