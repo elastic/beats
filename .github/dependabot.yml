@@ -45,6 +45,9 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    labels:
+      - automation
+      - dependabot
     reviewers:
       - "elastic/obs-ds-hosted-services"
       - "elastic/obs-infraobs-integrations"
