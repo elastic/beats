@@ -441,15 +441,6 @@ installNodeJsDependencies() {
   fi
 }
 
-teardown() {
-  # Teardown resources after using them
-  echo "---Terraform Cleanup"
-  .buildkite/scripts/terraform-cleanup.sh "${MODULE_DIR}"
-
-  echo "---Docker Compose Cleanup"
-  docker-compose -f .buildkite/deploy/docker/docker-compose.yml down -v
-}
-
 unset_secrets () {
   for var in $(printenv | sed 's;=.*;;' | sort); do
     if [[ "$var" == AWS_* || "$var" == BEATS_AWS_* ]]; then
