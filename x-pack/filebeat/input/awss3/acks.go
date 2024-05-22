@@ -48,10 +48,12 @@ func (ah *s3ACKHandler) advance() []func() {
 	var callbacks []func()
 	for !ah.pendingACKs.Empty() {
 		nextObj := ah.pendingACKs.First()
-		if nextObj.publishCount > ah.ackedCount {
+		if ah.ackedCount < nextObj.publishCount {
 			// This object hasn't been fully acknowledged yet
 			break
 		}
+		//fmt.Printf("\033[94mhi fae, ack handler finished an object\033[0m\n")
+		ah.ackedCount -= nextObj.publishCount
 		callbacks = append(callbacks, nextObj.ackCallback)
 		ah.pendingACKs.Remove()
 	}
@@ -59,7 +61,5 @@ func (ah *s3ACKHandler) advance() []func() {
 }
 
 func (ah *s3ACKHandler) pipelineEventListener() beat.EventListener {
-	return acker.TrackingCounter(func(_ int, total int) {
-		ah.ACK(total)
-	})
+	return acker.TrackingCounter(func(_ int, total int) { ah.ACK(total) })
 }

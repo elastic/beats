@@ -137,7 +137,8 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 
 	rateLimitWaiter := backoff.NewEqualJitterBackoff(ctx.Done(), 1, 120)
 
-	for state := range workChan {
+	for _state := range workChan {
+		state := _state
 		event := in.s3EventForState(state)
 
 		objHandler := in.s3ObjectHandler.Create(ctx, event)
@@ -174,6 +175,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 
 		// Add the cleanup handling to the acks helper
 		acks.Add(publishCount, func() {
+			fmt.Printf("\033[94mhi fae, receiving callback for \033[0m\n"
 			err := in.states.AddState(state)
 			if err != nil {
 				in.log.Errorf("saving completed object state: %v", err.Error())
