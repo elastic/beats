@@ -30,6 +30,7 @@ type eventHubInputV2 struct {
 	checkpointStore *checkpoints.BlobStore
 	consumerClient  *azeventhubs.ConsumerClient
 	pipelineClient  beat.Client
+	messageDecoder  messageDecoder
 }
 
 func newEventHubInputV2(config azureInputConfig, log *logp.Logger) (v2.Input, error) {
@@ -66,6 +67,14 @@ func (in *eventHubInputV2) Run(
 	inputMetrics := newInputMetrics(inputContext.ID, nil)
 	defer inputMetrics.Close()
 	in.metrics = inputMetrics
+
+	// Decode the messages from event hub into
+	// a `[]string`.
+	in.messageDecoder = messageDecoder{
+		config:  &in.config,
+		log:     in.log,
+		metrics: in.metrics,
+	}
 
 	// Initialize the components needed to process events, in particular
 	// the consumerClient.
@@ -221,6 +230,7 @@ func (in *eventHubInputV2) processEventsForPartition(partitionClient *azeventhub
 	}
 }
 
+// processReceivedEvents
 func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.ReceivedEventData) error {
 	processingStartTime := time.Now()
 	azure := mapstr.M{
@@ -232,7 +242,8 @@ func (in *eventHubInputV2) processReceivedEvents(receivedEvents []*azeventhubs.R
 
 	for _, receivedEventData := range receivedEvents {
 		// A single event can contain multiple records. We create a new event for each record.
-		records := in.unpackRecords(receivedEventData.Body)
+		//records := in.unpackRecords(receivedEventData.Body)
+		records := in.messageDecoder.Decode(receivedEventData.Body)
 
 		for record := range records {
 			_, _ = azure.Put("offset", receivedEventData.Offset)

@@ -8,7 +8,6 @@ package azureeventhub
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"time"
 
@@ -34,6 +33,7 @@ type eventHubInputV1 struct {
 	metrics        *inputMetrics
 	processor      *eph.EventProcessorHost
 	pipelineClient beat.Client
+	messageDecoder messageDecoder
 }
 
 // newEventHubInputV1 creates a new instance of the Azure Event Hub input V1.
@@ -75,6 +75,12 @@ func (in *eventHubInputV1) Run(
 	// Setup input metrics
 	in.metrics = newInputMetrics(inputContext.ID, nil)
 	defer in.metrics.Close()
+
+	in.messageDecoder = messageDecoder{
+		config:  &in.config,
+		log:     in.log,
+		metrics: in.metrics,
+	}
 
 	ctx := v2.GoContextFromCanceler(inputContext.Cancelation)
 
@@ -232,7 +238,7 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 	in.metrics.receivedMessages.Inc()
 	in.metrics.receivedBytes.Add(uint64(len(event.Data)))
 
-	records := in.unpackRecords(event.Data)
+	records := in.messageDecoder.Decode(event.Data)
 
 	for _, record := range records {
 		_, _ = eventHubMetadata.Put("offset", event.SystemProperties.Offset)
@@ -262,89 +268,59 @@ func (in *eventHubInputV1) processEvents(event *eventhub.Event) {
 	in.metrics.processingTime.Update(time.Since(processingStartTime).Nanoseconds())
 }
 
-// unpackRecords will try to split the message into multiple ones based on
-// the group field provided by the configuration.
+//// unpackRecords will try to split the message into multiple ones based on the group field provided by the configuration
+//func (in *eventHubInputV1) unpackRecords(bMessage []byte) []string {
+//	var mapObject map[string][]interface{}
+//	var messages []string
 //
-// `unpackRecords()` supports two types of messages:
-//
-//  1. A message with an object with a `records`
-//     field containing a list of events.
-//  2. A message with a single event.
-//
-// (1) Here is an example of a message containing an object with
-// a `records` field:
-//
-//	{
-//	  "records": [
-//	    {
-//	      "time": "2019-12-17T13:43:44.4946995Z",
-//	      "test": "this is some message"
-//	    }
-//	  ]
+//	// Clean up the message for known issues [1] where Azure services produce malformed JSON documents.
+//	// Sanitization occurs if options are available and the message contains an invalid JSON.
+//	//
+//	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
+//	if len(in.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
+//		bMessage = sanitize(bMessage, in.config.SanitizeOptions...)
+//		in.metrics.sanitizedMessages.Inc()
 //	}
 //
-// (2) Here is an example of a message with a single event:
+//	// check if the message is a "records" object containing a list of events
+//	err := json.Unmarshal(bMessage, &mapObject)
+//	if err == nil {
+//		if len(mapObject[expandEventListFromField]) > 0 {
+//			for _, ms := range mapObject[expandEventListFromField] {
+//				js, err := json.Marshal(ms)
+//				if err == nil {
+//					messages = append(messages, string(js))
+//					in.metrics.receivedEvents.Inc()
+//				} else {
+//					in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+//				}
+//			}
+//		}
+//	} else {
+//		in.log.Debugf("deserializing multiple messages to a `records` object returning error: %s", err)
+//		// in some cases the message is an array
+//		var arrayObject []interface{}
+//		err = json.Unmarshal(bMessage, &arrayObject)
+//		if err != nil {
+//			// return entire message
+//			in.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
+//			in.metrics.decodeErrors.Inc()
+//			return []string{string(bMessage)}
+//		}
 //
-//	{
-//	  "time": "2019-12-17T13:43:44.4946995Z",
-//	  "test": "this is some message"
+//		for _, ms := range arrayObject {
+//			js, err := json.Marshal(ms)
+//			if err == nil {
+//				messages = append(messages, string(js))
+//				in.metrics.receivedEvents.Inc()
+//			} else {
+//				in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
+//			}
+//		}
 //	}
 //
-// The Diagnostic Settings uses the single object with `records`
-// fields (1) when exporting data from an Azure service to an
-// event hub. This is the most common case.
-func (in *eventHubInputV1) unpackRecords(bMessage []byte) []string {
-	var mapObject map[string][]interface{}
-	var messages []string
-
-	// Clean up the message for known issues [1] where Azure services produce malformed JSON documents.
-	// Sanitization occurs if options are available and the message contains an invalid JSON.
-	//
-	// [1]: https://learn.microsoft.com/en-us/answers/questions/1001797/invalid-json-logs-produced-for-function-apps
-	if len(in.config.SanitizeOptions) != 0 && !json.Valid(bMessage) {
-		bMessage = sanitize(bMessage, in.config.SanitizeOptions...)
-		in.metrics.sanitizedMessages.Inc()
-	}
-
-	// check if the message is a "records" object containing a list of events
-	err := json.Unmarshal(bMessage, &mapObject)
-	if err == nil {
-		if len(mapObject[expandEventListFromField]) > 0 {
-			for _, ms := range mapObject[expandEventListFromField] {
-				js, err := json.Marshal(ms)
-				if err == nil {
-					messages = append(messages, string(js))
-					in.metrics.receivedEvents.Inc()
-				} else {
-					in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-				}
-			}
-		}
-	} else {
-		in.log.Debugf("deserializing multiple messages to a `records` object returning error: %s", err)
-		// in some cases the message is an array
-		var arrayObject []interface{}
-		err = json.Unmarshal(bMessage, &arrayObject)
-		if err != nil {
-			// return entire message
-			in.log.Debugf("deserializing multiple messages to an array returning error: %s", err)
-			in.metrics.decodeErrors.Inc()
-			return []string{string(bMessage)}
-		}
-
-		for _, ms := range arrayObject {
-			js, err := json.Marshal(ms)
-			if err == nil {
-				messages = append(messages, string(js))
-				in.metrics.receivedEvents.Inc()
-			} else {
-				in.log.Errorw(fmt.Sprintf("serializing message %s", ms), "error", err)
-			}
-		}
-	}
-
-	return messages
-}
+//	return messages
+//}
 
 func getAzureEnvironment(overrideResManager string) (azure.Environment, error) {
 	// if no override is set then the azure public cloud is used
