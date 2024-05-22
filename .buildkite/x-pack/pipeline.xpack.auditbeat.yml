@@ -49,7 +49,7 @@ steps:
               context: "x-pack/auditbeat: Linux arm64 Unit Tests"
 
       - label: ":ubuntu: x-pack/auditbeat Build (MODULE) Tests"
-        key: "mandatory-linux-unit-test"
+        key: "mandatory-build-test"
         command: |
           set -euo pipefail
           # defines the MODULE env var based on what's changed in a PR
