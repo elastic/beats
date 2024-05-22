@@ -35,7 +35,7 @@ func TestMetrics(t *testing.T) {
 		skipReason string // GOOS:reason or GOOS,GOOS,...:reason.
 	}{
 		{
-			skipReason: "windows:flakey test on windows",
+			skipReason: "windows:flakey test on windows - see https://github.com/elastic/beats/issues/39676",
 
 			name: "Test pagination metrics",
 			setupServer: func(t *testing.T, h http.HandlerFunc, config map[string]interface{}) {
