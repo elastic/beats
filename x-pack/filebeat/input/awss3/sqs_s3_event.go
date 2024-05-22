@@ -327,13 +327,16 @@ func (p *sqsS3EventProcessor) processS3Events(ctx context.Context, log *logp.Log
 	var errs []error
 	var handles []s3ObjectHandler
 	for i, event := range s3Events {
-		s3Processor := p.s3ObjectHandler.Create(ctx, acker, event)
+		s3Processor := p.s3ObjectHandler.Create(ctx, event)
 		if s3Processor == nil {
 			continue
 		}
 
 		// Process S3 object (download, parse, create events).
-		if err := s3Processor.ProcessS3Object(log, client); err != nil {
+		if err := s3Processor.ProcessS3Object(log, func(e beat.Event) {
+			// hi fae, this section is unfinished
+			client.Publish(e)
+		}); err != nil {
 			errs = append(errs, fmt.Errorf(
 				"failed processing S3 event for object key %q in bucket %q (object record %d of %d in SQS notification): %w",
 				event.S3.Object.Key, event.S3.Bucket.Name, i+1, len(s3Events), err))

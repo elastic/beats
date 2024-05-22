@@ -17,7 +17,6 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/common/backoff"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/timed"
 )
@@ -127,8 +126,9 @@ func (in *s3PollerInput) runPoll(ctx context.Context) {
 }
 
 func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) {
+	var acks s3ACKHandler
 	// Create client for publishing events and receive notification of their ACKs.
-	client, err := createPipelineClient(in.pipeline)
+	client, err := createPipelineClient(in.pipeline, &acks)
 	if err != nil {
 		in.log.Errorf("failed to create pipeline client: %v", err.Error())
 		return
@@ -140,20 +140,18 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 	for state := range workChan {
 		event := in.s3EventForState(state)
 
-		acker := awscommon.NewEventACKTracker(ctx)
-		objHandler := in.s3ObjectHandler.Create(ctx, acker, event)
+		objHandler := in.s3ObjectHandler.Create(ctx, event)
 		if objHandler == nil {
 			in.log.Debugw("empty s3 processor (no matching reader configs).", "state", state)
 			continue
 		}
 
-		eventChan := make(chan *beat.Event)
-		go func() {
-			//for
-		}()
-
 		// Process S3 object (download, parse, create events).
-		err := objHandler.ProcessS3Object(in.log, eventChan)
+		publishCount := 0
+		err := objHandler.ProcessS3Object(in.log, func(e beat.Event) {
+			client.Publish(e)
+			publishCount++
+		})
 		if errors.Is(err, errS3DownloadFailed) {
 			// Download errors are ephemeral. Add a backoff delay, then skip to the
 			// next iteration so we don't mark the object as permanently failed.
@@ -163,10 +161,7 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 		// Reset the rate limit delay on results that aren't download errors.
 		rateLimitWaiter.Reset()
 
-		// Wait for downloaded objects to be ACKed.
-		acker.Wait()
-		//objHandler.Wait()
-
+		// Update state, but don't persist it until this object is acknowledged.
 		if err != nil {
 			in.log.Errorf("failed processing S3 event for object key %q in bucket %q: %v",
 				state.Key, state.Bucket, err.Error())
@@ -177,14 +172,16 @@ func (in *s3PollerInput) workerLoop(ctx context.Context, workChan <-chan state) 
 			state.Stored = true
 		}
 
-		// Persist the result, report any errors
-		err = in.states.AddState(state)
-		if err != nil {
-			in.log.Errorf("saving completed object state: %v", err.Error())
-		}
+		// Add the cleanup handling to the acks helper
+		acks.Add(publishCount, func() {
+			err := in.states.AddState(state)
+			if err != nil {
+				in.log.Errorf("saving completed object state: %v", err.Error())
+			}
 
-		// Metrics
-		in.metrics.s3ObjectsAckedTotal.Inc()
+			// Metrics
+			in.metrics.s3ObjectsAckedTotal.Inc()
+		})
 	}
 }
 
@@ -249,7 +246,5 @@ func (in *s3PollerInput) s3EventForState(state state) s3EventV2 {
 func (in *s3PollerInput) createS3ObjectProcessor(ctx context.Context, state state) s3ObjectHandler {
 	event := in.s3EventForState(state)
 
-	acker := awscommon.NewEventACKTracker(ctx)
-
-	return in.s3ObjectHandler.Create(ctx, acker, event)
+	return in.s3ObjectHandler.Create(ctx, event)
 }

@@ -25,7 +25,6 @@ import (
 	"github.com/elastic/beats/v7/libbeat/reader"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile"
 	"github.com/elastic/beats/v7/libbeat/reader/readfile/encoding"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -40,14 +39,12 @@ type s3ObjectProcessorFactory struct {
 type s3ObjectProcessor struct {
 	*s3ObjectProcessorFactory
 
-	ctx context.Context
-	// The processor sends decoded events from its object to this channel
-	eventChan    chan *beat.Event
-	acker        *awscommon.EventACKTracker // ACKer tied to the SQS message (multiple S3 readers share an ACKer when the S3 notification event contains more than one S3 object).
-	readerConfig *readerConfig              // Config about how to process the object.
-	s3Obj        s3EventV2                  // S3 object information.
-	s3ObjHash    string
-	s3RequestURL string
+	ctx           context.Context
+	eventCallback func(beat.Event)
+	readerConfig  *readerConfig // Config about how to process the object.
+	s3Obj         s3EventV2     // S3 object information.
+	s3ObjHash     string
+	s3RequestURL  string
 
 	s3Metadata map[string]interface{} // S3 object metadata.
 }
@@ -91,7 +88,7 @@ func (f *s3ObjectProcessorFactory) findReaderConfig(key string) *readerConfig {
 
 // Create returns a new s3ObjectProcessor. It returns nil when no file selectors
 // match the S3 object key.
-func (f *s3ObjectProcessorFactory) Create(ctx context.Context, ack *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler {
+func (f *s3ObjectProcessorFactory) Create(ctx context.Context, obj s3EventV2) s3ObjectHandler {
 	readerConfig := f.findReaderConfig(obj.S3.Object.Key)
 	if readerConfig == nil {
 		// No file_selectors are a match, skip.
@@ -101,25 +98,17 @@ func (f *s3ObjectProcessorFactory) Create(ctx context.Context, ack *awscommon.Ev
 	return &s3ObjectProcessor{
 		s3ObjectProcessorFactory: f,
 		ctx:                      ctx,
-		acker:                    ack,
 		readerConfig:             readerConfig,
 		s3Obj:                    obj,
 		s3ObjHash:                s3ObjectHash(obj),
 	}
 }
 
-func (p *s3ObjectProcessor) Wait() {
-	p.acker.Wait()
-}
-
-func (p *s3ObjectProcessor) Done() <-chan struct{} {
-	return nil
-}
-
-func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventChan chan<- *beat.Event) error {
+func (p *s3ObjectProcessor) ProcessS3Object(log *logp.Logger, eventCallback func(e beat.Event)) error {
 	if p == nil {
 		return nil
 	}
+	p.eventCallback = eventCallback
 	log = log.With(
 		"bucket_arn", p.s3Obj.S3.Bucket.Name,
 		"object_key", p.s3Obj.S3.Object.Key)
@@ -255,7 +244,7 @@ func (p *s3ObjectProcessor) readJSON(r io.Reader) error {
 
 		data, _ := item.MarshalJSON()
 		evt := p.createEvent(string(data), offset)
-		p.eventChan <- &evt
+		p.eventCallback(evt)
 	}
 
 	return nil
@@ -290,7 +279,7 @@ func (p *s3ObjectProcessor) readJSONSlice(r io.Reader, evtOffset int64) (int64, 
 
 		data, _ := item.MarshalJSON()
 		evt := p.createEvent(string(data), evtOffset)
-		p.eventChan <- &evt
+		p.eventCallback(evt)
 		evtOffset++
 	}
 
@@ -335,7 +324,7 @@ func (p *s3ObjectProcessor) splitEventList(key string, raw json.RawMessage, offs
 		data, _ := item.MarshalJSON()
 		p.s3ObjHash = objHash
 		evt := p.createEvent(string(data), offset+arrayOffset)
-		p.eventChan <- &evt
+		p.eventCallback(evt)
 	}
 
 	return nil
@@ -375,7 +364,7 @@ func (p *s3ObjectProcessor) readFile(r io.Reader) error {
 			event := p.createEvent(string(message.Content), offset)
 			event.Fields.DeepUpdate(message.Fields)
 			offset += int64(message.Bytes)
-			p.eventChan <- &event
+			p.eventCallback(event)
 		}
 
 		if errors.Is(err, io.EOF) {

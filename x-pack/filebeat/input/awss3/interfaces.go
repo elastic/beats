@@ -16,7 +16,6 @@ import (
 	"github.com/aws/smithy-go/middleware"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
-	awscommon "github.com/elastic/beats/v7/x-pack/libbeat/common/aws"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
@@ -100,14 +99,14 @@ type s3ObjectHandlerFactory interface {
 	// Create returns a new s3ObjectHandler that can be used to process the
 	// specified S3 object. If the handler is not configured to process the
 	// given S3 object (based on key name) then it will return nil.
-	Create(ctx context.Context, acker *awscommon.EventACKTracker, obj s3EventV2) s3ObjectHandler
+	Create(ctx context.Context, obj s3EventV2) s3ObjectHandler
 }
 
 type s3ObjectHandler interface {
 	// ProcessS3Object downloads the S3 object, parses it, creates events, and
 	// sends them to the given channel. It returns when processing finishes or
 	// when it encounters an unrecoverable error.
-	ProcessS3Object(log *logp.Logger, eventChan chan<- *beat.Event) error
+	ProcessS3Object(log *logp.Logger, eventCallback func(e beat.Event)) error
 
 	// FinalizeS3Object finalizes processing of an S3 object after the current
 	// batch is finished.
