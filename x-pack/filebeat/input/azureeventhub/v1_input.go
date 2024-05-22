@@ -160,9 +160,9 @@ func (in *eventHubInputV1) setup(ctx context.Context) error {
 
 	// register a message handler -- many can be registered
 	handlerID, err := in.processor.RegisterHandler(ctx, func(c context.Context, e *eventhub.Event) error {
-		
+
 		// Take the event message from the event hub,
-		// creates and publishes one (or more) events 
+		// creates and publishes one (or more) events
 		// to the beats pipeline.
 		in.processEvents(e)
 
@@ -171,7 +171,7 @@ func (in *eventHubInputV1) setup(ctx context.Context) error {
 		// The legacy SDK does not offer hooks to control
 		// checkpointing (it internally updates the checkpoint
 		// info after a successful handler execution).
-		// 
+		//
 		// So we are keeping the existing behaviour (do not
 		// handle publish acks).
 		//
