@@ -48,8 +48,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 *Metricbeat*
 
 - Setting period for counter cache for Prometheus remote_write at least to 60sec {pull}38553[38553]
-- Added conditional to check if statsd metric contains , or ; and split accordingly {pull}39619[39619]
-
+- Added a conditional check to see if the statsd metric contains ',' or ';' and split accordingly. {pull}39619[39619]
 *Osquerybeat*
 
 
