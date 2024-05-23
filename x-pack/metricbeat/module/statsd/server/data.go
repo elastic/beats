@@ -86,7 +86,6 @@ func parseSingle(b []byte) (statsdMetric, error) {
 	}
 
 	var nameTagsSplit [][]byte
-
 	if bytes.Contains(nameSplit[0], []byte(",")) {
 		nameTagsSplit = bytes.SplitN(nameSplit[0], []byte(","), 2)
 	} else {
