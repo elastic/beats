@@ -1,0 +1,269 @@
+---
+name: Bump golang-version to latest version in 7.17
+pipelineid: "bump-golang-version-7.17"
+
+scms:
+  githubConfig:
+    kind: github
+    spec:
+      owner: '{{ .scm.owner }}'
+      repository: '{{ .scm.repository }}'
+      user: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      branch: "7.17"
+      commitusingapi: true
+
+actions:
+  beats:
+    kind: github/pullrequest
+    scmid: githubConfig
+    sourceid: latestGoVersion
+    title: '[Automation][7.17] Bump Golang version to {{ source "latestGoVersion" }}'
+    spec:
+      labels:
+        - dependencies
+        - backport-skip
+
+sources:
+  minor:
+    name: Get minor version in .go-version
+    kind: shell
+    transformers:
+      - findsubmatch:
+          pattern: '^\d+.(\d+).\d+$'
+          captureindex: 1
+    spec:
+      command: cat .go-version
+
+  latestGoVersion:
+    name: Get Latest Go Release
+    kind: githubrelease
+    dependson:
+      - minor
+    transformers:
+      - trimprefix: v
+    spec:
+      owner: elastic
+      repository: golang-crossbuild
+      token: '{{ requiredEnv "GITHUB_TOKEN" }}'
+      username: '{{ requiredEnv "GITHUB_ACTOR" }}'
+      versionfilter:
+        kind: regex
+        pattern: v1\.{{ source "minor" }}\.(\d*)$
+
+  gomod:
+    dependson:
+      - latestGoVersion
+    name: Get version in go.mod format
+    kind: shell
+    transformers:
+      - findsubmatch:
+          pattern: '^(\d+.\d+).\d+'
+          captureindex: 1
+    spec:
+      command: echo {{ source "latestGoVersion" }}
+
+conditions:
+  dockerTag:
+    name: Is docker image golang:{{ source "latestGoVersion" }} published
+    kind: dockerimage
+    spec:
+      image: golang
+      tag: '{{ source "latestGoVersion" }}'
+    sourceid: latestGoVersion
+
+  goDefaultVersion-check:
+    name: Check if defined golang version differs
+    kind: shell
+    sourceid: latestGoVersion
+    spec:
+      command: 'grep -v -q {{ source "latestGoVersion" }} .go-version #'
+
+targets:
+  update-gomod:
+    name: "Update go.mod"
+    sourceid: gomod
+    scmid: githubConfig
+    kind: file
+    spec:
+      content: 'go {{ source "gomod" }}'
+      file: go.mod
+      matchpattern: 'go \d+.\d+'
+  update-go-version:
+    name: "Update .go-version"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: file
+    spec:
+      content: '{{ source "latestGoVersion" }}'
+      file: .go-version
+      matchpattern: '\d+.\d+.\d+'
+  update-golang.ci:
+    name: "Update .golangci.yml"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: file
+    spec:
+      content: '{{ source "latestGoVersion" }}'
+      file: .golangci.yml
+      matchpattern: '\d+.\d+.\d+'
+  update-version.asciidoc:
+    name: "Update version.asciidoc"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: file
+    spec:
+      content: ':go-version: {{ source "latestGoVersion" }}'
+      file: libbeat/docs/version.asciidoc
+      matchpattern: ':go-version: \d+.\d+.\d+'
+  update-auditbeat-dockerfile:
+    name: "Update Auditbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./auditbeat/Dockerfile
+  update-heartbeat-dockerfile:
+    name: "Update Heartbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./heartbeat/Dockerfile
+  update-metricbeat-dockerfile:
+    name: "Update Metricbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./metricbeat/Dockerfile
+  update-packetbeat-dockerfile:
+    name: "Update Packetbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./packetbeat/Dockerfile
+  update-functionbeat-dockerfile:
+    name: "Update Functionbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./x-pack/functionbeat/Dockerfile
+  update-nats-module-dockerfile:
+    name: "Update NATS module Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./metricbeat/module/nats/_meta/Dockerfile
+  update-http-module-dockerfile:
+    name: "Update HTTP module Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./metricbeat/module/http/_meta/Dockerfile
+  update-vsphere-module-dockerfile:
+    name: "Update from vsphere Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./metricbeat/module/vsphere/_meta/Dockerfile
+  update-metricbeat-debug-dockerfile:
+    name: "Update Metricbeat debug Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./dev-tools/kubernetes/metricbeat/Dockerfile.debug
+  update-dockerfiles-filebeat-debug:
+    name: "Update Filebeat debug Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./dev-tools/kubernetes/filebeat/Dockerfile.debug
+  update-heartbeat-debug-dockerfile:
+    name: "Update Heartbeat debug Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./dev-tools/kubernetes/heartbeat/Dockerfile.debug
+  update-stan-module-dockerfile:
+    name: "Update stan Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./x-pack/metricbeat/module/stan/_meta/Dockerfile
+  # The following Dockerfiles aren't present on the main branch, this is the main reason we have a separate job
+  update-filebeat-dockerfile:
+    name: "Update Filebeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./filebeat/Dockerfile
+  update-libbeat-dockerfile:
+    name: "Update libbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./libbeat/Dockerfile
+  update-x-pack-libbeat-dockerfile:
+    name: "Update x-pack/libbeat Dockerfile"
+    sourceid: latestGoVersion
+    scmid: githubConfig
+    kind: dockerfile
+    spec:
+      instruction:
+        keyword: "FROM"
+        matcher: "golang"
+      file: ./x-pack/libbeat/Dockerfile

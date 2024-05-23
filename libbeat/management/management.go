@@ -21,49 +21,19 @@ import (
 	"sync"
 
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/elastic-agent-client/v7/pkg/client"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
 
-// Status describes the current status of the beat.
-type Status int
-
-//go:generate stringer -type=Status
-const (
-	// Unknown is initial status when none has been reported.
-	Unknown Status = iota
-	// Starting is status describing application is starting.
-	Starting
-	// Configuring is status describing application is configuring.
-	Configuring
-	// Running is status describing application is running.
-	Running
-	// Degraded is status describing application is degraded.
-	Degraded
-	// Failed is status describing application is failed. This status should
-	// only be used in the case the beat should stop running as the failure
-	// cannot be recovered.
-	Failed
-	// Stopping is status describing application is stopping.
-	Stopping
-	// Stopped is status describing application is stopped.
-	Stopped
-)
-
 // DebugK used as key for all things central management
 var DebugK = "centralmgmt"
-
-// StatusReporter provides a method to update current status of the beat.
-type StatusReporter interface {
-	// UpdateStatus called when the status of the beat has changed.
-	UpdateStatus(status Status, msg string)
-}
 
 // Manager interacts with the beat to provide status updates and to receive
 // configurations.
 type Manager interface {
-	StatusReporter
+	status.StatusReporter
 
 	// Enabled returns true if manager is enabled.
 	Enabled() bool
@@ -133,7 +103,7 @@ func NewManager(cfg *config.C, registry *reload.Registry) (Manager, error) {
 	}
 	return &fallbackManager{
 		logger: logp.NewLogger("mgmt"),
-		status: Unknown,
+		status: status.Unknown,
 		msg:    "",
 	}, nil
 }
@@ -152,13 +122,13 @@ func SetManagerFactory(factory ManagerFactory) {
 type fallbackManager struct {
 	logger   *logp.Logger
 	lock     sync.Mutex
-	status   Status
+	status   status.Status
 	msg      string
 	stopFunc func()
 	stopOnce sync.Once
 }
 
-func (n *fallbackManager) UpdateStatus(status Status, msg string) {
+func (n *fallbackManager) UpdateStatus(status status.Status, msg string) {
 	n.lock.Lock()
 	defer n.lock.Unlock()
 	if n.status != status || n.msg != msg {

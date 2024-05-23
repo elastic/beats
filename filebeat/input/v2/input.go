@@ -22,6 +22,7 @@ import (
 	"time"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 
@@ -83,6 +84,17 @@ type Context struct {
 
 	// Cancelation is used by Beats to signal the input to shutdown.
 	Cancelation Canceler
+
+	// StatusReporter provides a method to update the status of the underlying unit
+	// that maps to the config. Note: Under standalone execution of Filebeat this is
+	// expected to be nil.
+	StatusReporter status.StatusReporter
+}
+
+func (c Context) UpdateStatus(status status.Status, msg string) {
+	if c.StatusReporter != nil {
+		c.StatusReporter.UpdateStatus(status, msg)
+	}
 }
 
 // TestContext provides the Input Test function with common environmental

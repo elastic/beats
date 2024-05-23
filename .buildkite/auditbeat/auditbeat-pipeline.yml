@@ -22,6 +22,10 @@ env:
   # Other deps
   ASDF_MAGE_VERSION: 1.15.0
 
+  # Unit tests
+  RACE_DETECTOR: "true"
+  TEST_COVERAGE: "true"
+
 steps:
   - group: "Auditbeat Mandatory Testing"
     key: "auditbeat-mandatory-tests"
@@ -128,7 +132,7 @@ steps:
     steps:
       - label: ":linux: Auditbeat Ubuntu Integration Tests"
         key: "auditbeat-extended-integ-tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
           cd auditbeat
@@ -149,7 +153,7 @@ steps:
 
       - label: ":linux: Auditbeat Ubuntu arm64 Integration Tests"
         key: "auditbeat-extended-arm64-integ-tests"
-        if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
+        if: build.env("GITHUB_PR_LABELS") =~ /.*integrations.*/
         command: |
           set -euo pipefail
           cd auditbeat
