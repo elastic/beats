@@ -187,3 +187,16 @@ func PythonIntegTest(ctx context.Context) error {
 	mg.Deps(Fields, Dashboards, devtools.BuildSystemTestBinary)
 	return devtools.PythonIntegTestFromHost(devtools.DefaultPythonTestIntegrationFromHostArgs())
 }
+
+// TestJournald executes the Journald input tests
+// Use TEST_COVERAGE=true to enable code coverage profiling.
+// Use RACE_DETECTOR=true to enable the race detector.
+func TestJournald(ctx context.Context) error {
+	utArgs := devtools.DefaultGoTestUnitArgs()
+	utArgs.Packages = []string{"./input/journald"}
+	if devtools.Platform.GOOS == "linux" {
+		utArgs.ExtraFlags = append(utArgs.ExtraFlags, "-tags=withjournald")
+	}
+
+	return devtools.GoTest(ctx, utArgs)
+}
