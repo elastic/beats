@@ -2,16 +2,9 @@
 name: "beats-xpack-libbeat"
 
 env:
-<<<<<<< HEAD
-  AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
-  GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
-  GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
-  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
-=======
   AWS_ARM_INSTANCE_TYPE: "m6g.xlarge"
   AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
 
->>>>>>> 2562e44814 (updated xpack/libbeat pipeline (#39642))
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
 
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
@@ -25,7 +18,7 @@ env:
   RACE_DETECTOR: "true"
   TEST_COVERAGE: "true"
 
-steps:
+  steps:
   - group: "x-pack/libbeat Mandatory Tests"
     key: "x-pack-libbeat-mandatory-tests"
 
@@ -87,121 +80,7 @@ steps:
           - github_commit_status:
               context: "x-pack/libbeat: Python Integration Tests"
 
-<<<<<<< HEAD
-  - group: "x-pack/libbeat Linux arm Extended Tests"
-=======
-      - label: ":windows: x-pack/libbeat Win-2016 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/libbeat
-          mage -w reader\etw build goUnitTest
-        key: "mandatory-win-2016-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2016}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/libbeat/build/*.xml"
-          - "x-pack/libbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/libbeat: Win-2016 Unit Tests"
-
-      - label: ":windows: x-pack/libbeat Win-2022 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/libbeat
-          mage -w reader\etw build goUnitTest
-        key: "mandatory-win-2022-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2022}"
-          machine_type: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/libbeat/build/*.xml"
-          - "x-pack/libbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/libbeat: Win-2022 Unit Tests"
-
-  - group: "x-pack/libbeat Extended Windows Tests"
-    key: "x-pack-libbeat-extended-win-tests"
-    if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
-
-    steps:
-      - label: ":windows: x-pack/libbeat Win 10 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/libbeat
-          mage -w reader\etw build goUnitTest
-        key: "extended-win-10-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_10}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/libbeat/build/*.xml"
-          - "x-pack/libbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/libbeat: Win 10 Unit Tests"
-
-      - label: ":windows: x-pack/libbeat Win 11 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/libbeat
-          mage -w reader\etw build goUnitTest
-        key: "extended-win-11-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_11}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/libbeat/build/*.xml"
-          - "x-pack/libbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/libbeat: Win 11 Unit Tests"
-
-      - label: ":windows: x-pack/libbeat Win-2019 Unit Tests"
-        command: |
-          Set-Location -Path x-pack/libbeat
-          mage -w reader\etw build goUnitTest
-        key: "extended-win-2019-unit-tests"
-        retry:
-          automatic:
-            - limit: 3
-        agents:
-          provider: "gcp"
-          image: "${IMAGE_WIN_2019}"
-          machineType: "${GCP_WIN_MACHINE_TYPE}"
-          disk_size: 100
-          disk_type: "pd-ssd"
-        artifact_paths:
-          - "x-pack/libbeat/build/*.xml"
-          - "x-pack/libbeat/build/*.json"
-        notify:
-          - github_commit_status:
-              context: "x-pack/libbeat: Win-2019 Unit Tests"
-
   - group: "x-pack/libbeat Extended Tests"
->>>>>>> 2562e44814 (updated xpack/libbeat pipeline (#39642))
     key: "x-pack-libbeat-extended-tests-linux-arm"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*arm.*/
 
