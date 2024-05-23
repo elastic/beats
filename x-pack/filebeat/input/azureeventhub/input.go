@@ -15,6 +15,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/acker"
 	"github.com/elastic/beats/v7/libbeat/feature"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -85,6 +86,9 @@ func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
 
 func createPipelineClient(pipeline beat.Pipeline) (beat.Client, error) {
 	return pipeline.ConnectWith(beat.ClientConfig{
+		EventListener: acker.LastEventPrivateReporter(func(acked int, data interface{}) {
+			// fmt.Println(acked, data)
+		}),
 		Processing: beat.ProcessingConfig{
 			// This input only produces events with basic types so normalization
 			// is not required.
