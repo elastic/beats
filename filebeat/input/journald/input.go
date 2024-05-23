@@ -20,14 +20,14 @@
 package journald
 
 import (
-	"context"
 	"errors"
 	"fmt"
-	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/coreos/go-systemd/v22/sdjournal"
+	"github.com/godbus/dbus/v5"
 	"github.com/urso/sderr"
 
 	"github.com/elastic/beats/v7/filebeat/input/journald/pkg/journalfield"
@@ -63,6 +63,10 @@ type checkpoint struct {
 	MonotonicTimestamp uint64
 }
 
+// errCannotConnectToDBus is returned when the connection to D-Bus
+// cannot be established.
+var errCannotConnectToDBus = errors.New("cannot connect to D-Bus")
+
 // LocalSystemJournalID is the ID of the local system journal.
 const localSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
 
@@ -88,7 +92,7 @@ func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
 		Manager:    m,
 	}
 
-	version, err := getJournaldVersion()
+	version, err := systemdVersion()
 	if err != nil {
 		configErr := fmt.Errorf("%w: %s", ErrCannotGetSystemdVersion, err)
 		m.Configure = func(_ *conf.C) ([]cursor.Source, cursor.Input, error) {
@@ -331,25 +335,70 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 
 	return m, nil
 }
-func getJournaldVersion() (int, error) {
-	cmd := exec.CommandContext(context.Background(), "journalctl", "--version")
-	outputBytes, err := cmd.CombinedOutput()
+
+// parseSystemdVersion parses the string version from Systemd fetched via D-Bus.
+//
+// The expected format is:
+//
+//   - 255.6-1-arch
+//   - 252.16-1.amzn2023.0.2
+//
+// The function will parse and return the integer before the full stop.
+func parseSystemdVersion(output string) (int, error) {
+	parts := strings.Split(output, ".")
+	if len(parts) < 2 {
+		return 0, errors.New("unexpected format for version.")
+	}
+
+	version, err := strconv.Atoi(parts[0])
 	if err != nil {
-		return 0, fmt.Errorf("cannot call journald. Err: '%w'. Output: '%s'", err, string(outputBytes))
+		return 0, fmt.Errorf("cannot parse Systemd version: %s", err)
 	}
-
-	return parseJournaldVersion(string(outputBytes))
-}
-
-func parseJournaldVersion(output string) (int, error) {
-	lines := strings.Split(output, "\n")
-	if len(lines) < 2 {
-		return 0, fmt.Errorf("unexpected format for version command. Returned value: '%s'", output)
-	}
-
-	versionLine := lines[0]
-	version := 0
-	_, err := fmt.Sscanf(versionLine, "systemd %d", &version)
 
 	return version, err
+}
+
+// getSystemdVersionViaDBus foo
+//
+// Version string should not be parsed:
+//
+//	 Version encodes the version string of the running systemd
+//	 instance. Note that the version string is purely informational,
+//	 it should not be parsed, one may not assume the version to be
+//	 formatted in any particular way. We take the liberty to change
+//	 the versioning scheme at any time and it is not part of the API.
+//	Source: https://www.freedesktop.org/wiki/Software/systemd/dbus/
+func getSystemdVersionViaDBus() (string, error) {
+	conn, err := dbus.ConnectSessionBus()
+	if err != nil {
+		return "", fmt.Errorf("%w: %w", errCannotConnectToDBus, err)
+	}
+	defer conn.Close()
+
+	obj := conn.Object("org.freedesktop.systemd1", "/org/freedesktop/systemd1")
+	resp, err := obj.GetProperty("org.freedesktop.systemd1.Manager.Version")
+	if err != nil {
+		return "", fmt.Errorf("cannot get version property from D-Bus %w", err)
+	}
+
+	version := ""
+	if err := resp.Store(&version); err != nil {
+		return "", fmt.Errorf("cannot store Systemd version into Go string: %s", err)
+	}
+
+	return version, nil
+}
+
+func systemdVersion() (int, error) {
+	versionStr, err := getSystemdVersionViaDBus()
+	if err != nil {
+		return 0, fmt.Errorf("caanot get Systemd version: %w", err)
+	}
+
+	version, err := parseSystemdVersion(versionStr)
+	if err != nil {
+		return 0, fmt.Errorf("cannot parse Systemd version: %w", err)
+	}
+
+	return version, nil
 }

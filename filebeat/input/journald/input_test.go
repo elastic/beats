@@ -92,24 +92,21 @@ func TestParseJournaldVersion(t *testing.T) {
 	}{
 		"Archlinux": {
 			expected: 255,
-			data: `systemd 255 (255.6-1-arch)
-+PAM +AUDIT -SELINUX -APPARMOR -IMA +SMACK +SECCOMP +GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 +PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD +BPF_FRAMEWORK +XKBCOMMON +UTMP -SYSVINIT default-hierarchy=unified`,
+			data:     `255.6-1-arch`,
 		},
 		"AmazonLinux2": {
-			expected: 219,
-			data: `systemd 219
-				+PAM +AUDIT +SELINUX +IMA -APPARMOR +SMACK +SYSVINIT +UTMP +LIBCRYPTSETUP +GCRYPT +GNUTLS +ACL +XZ +LZ4 -SECCOMP +BLKID +ELFUTILS +KMOD +IDN`,
+			expected: 252,
+			data:     `252.16-1.amzn2023.0.2`,
 		},
 		"Ubuntu 2204": {
 			expected: 249,
-			data: `systemd 249 (249.11-0ubuntu3.12)
-		+PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT +GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 -PWQUALITY -P11KIT -QRENCODE +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -XKBCOMMON +UTMP +SYSVINIT default-hierarchy=unified`,
+			data:     `249.11-0ubuntu3.12`,
 		},
 	}
 
 	for name, tc := range foo {
 		t.Run(name, func(t *testing.T) {
-			version, err := parseJournaldVersion(tc.data)
+			version, err := parseSystemdVersion(tc.data)
 			if err != nil {
 				t.Errorf("did not expect an error: %s", err)
 			}
@@ -122,15 +119,12 @@ func TestParseJournaldVersion(t *testing.T) {
 }
 
 func TestGetJounraldVersion(t *testing.T) {
-	// This test already has build tags to only run on systems
-	// with systemd. So there should be no problem calling
-	// journalctl directly.
-	version, err := getJournaldVersion()
+	version, err := getSystemdVersionViaDBus()
 	if err != nil {
 		t.Fatalf("did not expect an error: %s", err)
 	}
 
-	if version == 0 {
-		t.Fatal("version must be grater than 0")
+	if version == "" {
+		t.Fatal("version must not be an empty string")
 	}
 }
