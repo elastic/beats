@@ -33,24 +33,21 @@ type statsdMetric struct {
 
 func splitTags(rawTags, kvSep []byte) map[string]string {
 	tags := map[string]string{}
+	var tagSplit [][]byte
+
 	if bytes.Contains(rawTags, []byte(",")) {
-		for _, kv := range bytes.Split(rawTags, []byte(",")) {
-			kvSplit := bytes.SplitN(kv, kvSep, 2)
-			if len(kvSplit) != 2 {
-				logger.Warn("could not parse tags")
-				continue
-			}
-			tags[string(kvSplit[0])] = string(kvSplit[1])
-		}
+		tagSplit = bytes.Split(rawTags, []byte(","))
 	} else {
-		for _, kv := range bytes.Split(rawTags, []byte(";")) {
-			kvSplit := bytes.SplitN(kv, kvSep, 2)
-			if len(kvSplit) != 2 {
-				logger.Warn("could not parse tags")
-				continue
-			}
-			tags[string(kvSplit[0])] = string(kvSplit[1])
+		tagSplit = bytes.Split(rawTags, []byte(";"))
+	}
+
+	for _, kv := range tagSplit {
+		kvSplit := bytes.SplitN(kv, kvSep, 2)
+		if len(kvSplit) != 2 {
+			logger.Warn("could not parse tags")
+			continue
 		}
+		tags[string(kvSplit[0])] = string(kvSplit[1])
 	}
 	return tags
 }
@@ -85,6 +82,8 @@ func parseSingle(b []byte) (statsdMetric, error) {
 		return s, errInvalidPacket
 	}
 
+	// Metric tags could be separated by `,` or `;`
+	// We split here based on the separator
 	var nameTagsSplit [][]byte
 	if bytes.Contains(nameSplit[0], []byte(",")) {
 		nameTagsSplit = bytes.SplitN(nameSplit[0], []byte(","), 2)
