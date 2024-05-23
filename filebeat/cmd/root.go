@@ -63,7 +63,14 @@ func Filebeat(inputs beater.PluginFactory, settings instance.Settings) *cmd.Beat
 	command.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))
 	command.TestCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
 	command.SetupCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
-	command.Flags().AddGoFlag(flag.CommandLine.Lookup("ignore-journald-version"))
+
+	// main_test.go calls this function before the Journald input is initialised
+	// to avoid panics, we check whether the flag is defined before calling
+	// AddGoFlag
+	if ignoreSystemdFlag := flag.CommandLine.Lookup("ignore-journald-version"); ignoreSystemdFlag != nil {
+		command.Flags().AddGoFlag(ignoreSystemdFlag)
+	}
+
 	command.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
 	command.AddCommand(genGenerateCmd())
 	return command

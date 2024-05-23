@@ -16,6 +16,7 @@ import (
 
 	devtools "github.com/elastic/beats/v7/dev-tools/mage"
 	"github.com/elastic/beats/v7/dev-tools/mage/target/build"
+	"github.com/elastic/beats/v7/dev-tools/mage/target/unittest"
 	filebeat "github.com/elastic/beats/v7/filebeat/scripts/mage"
 
 	//mage:import
@@ -33,6 +34,7 @@ import (
 func init() {
 	common.RegisterCheckDeps(Update)
 	test.RegisterDeps(IntegTest)
+	unittest.RegisterGoTestDeps(TestJournaldInput)
 
 	devtools.BeatDescription = "Filebeat sends log files to Logstash or directly to Elasticsearch."
 	devtools.BeatLicense = "Elastic License"
@@ -191,9 +193,9 @@ func PythonIntegTest(ctx context.Context) error {
 // TestJournald executes the Journald input tests
 // Use TEST_COVERAGE=true to enable code coverage profiling.
 // Use RACE_DETECTOR=true to enable the race detector.
-func TestJournald(ctx context.Context) error {
+func TestJournaldInput(ctx context.Context) error {
 	utArgs := devtools.DefaultGoTestUnitArgs()
-	utArgs.Packages = []string{"./input/journald"}
+	utArgs.Packages = []string{"../../filebeat/input/journald"}
 	if devtools.Platform.GOOS == "linux" {
 		utArgs.ExtraFlags = append(utArgs.ExtraFlags, "-tags=withjournald")
 	}

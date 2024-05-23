@@ -23,7 +23,6 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"os"
 	"path"
 	"testing"
 
@@ -31,9 +30,14 @@ import (
 )
 
 func TestMain(m *testing.M) {
+	// We use TestMain because all of our current (May 2024) supported Linux
+	// distributions ship with a version of Systemd that will cause Filebeat
+	// input to crash when the journal reached the maximum number of files and
+	// a new rotation happens. To allow the Journald input to be instantiated
+	// we need to set a CLI flag and that needs to be done before all tests run.
 	flag.Parse()
 	noVersionCheck = true
-	os.Exit(m.Run())
+	m.Run()
 }
 
 func TestInputFieldsTranslation(t *testing.T) {
@@ -93,7 +97,7 @@ func TestInputFieldsTranslation(t *testing.T) {
 	}
 }
 
-func TestParseJournaldVersion(t *testing.T) {
+func TestParseSystemdVersion(t *testing.T) {
 	foo := map[string]struct {
 		data     string
 		expected int
@@ -109,6 +113,14 @@ func TestParseJournaldVersion(t *testing.T) {
 		"Ubuntu 2204": {
 			expected: 249,
 			data:     `249.11-0ubuntu3.12`,
+		},
+		"Debain 10": {
+			expected: 241,
+			data:     "241",
+		},
+		"Red Hat Enterprise Linux 8": {
+			expected: 239,
+			data:     "239 (239-78.el8)",
 		},
 	}
 

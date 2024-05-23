@@ -73,16 +73,17 @@ type checkpoint struct {
 	MonotonicTimestamp uint64
 }
 
-// errCannotConnectToDBus is returned when the connection to D-Bus
-// cannot be established.
-var errCannotConnectToDBus = errors.New("cannot connect to D-Bus")
-
 // LocalSystemJournalID is the ID of the local system journal.
 const localSystemJournalID = "LOCAL_SYSTEM_JOURNAL"
 
 const pluginName = "journald"
 
+// ErrSystemdVersionNotSupported is returned by the plugin manager when the
+// Systemd version is not supported.
 var ErrSystemdVersionNotSupported = errors.New("systemd version must be >= 255")
+
+// ErrCannotGetSystemdVersion is returned by the plugin manager when it is
+// not possible to get the Systemd version via D-Bus.
 var ErrCannotGetSystemdVersion = errors.New("cannot get systemd version")
 
 // Plugin creates a new journald input plugin for creating a stateful input.
@@ -359,26 +360,34 @@ func (r *readerAdapter) Next() (reader.Message, error) {
 //   - 252.16-1.amzn2023.0.2
 //
 // The function will parse and return the integer before the full stop.
-func parseSystemdVersion(output string) (int, error) {
-	parts := strings.Split(output, ".")
-	if len(parts) < 2 {
-		return 0, errors.New("unexpected format for version.")
+func parseSystemdVersion(ver string) (int, error) {
+	// First try, it's just the version number
+	version, err := strconv.Atoi(ver)
+	if err == nil {
+		return version, nil
 	}
 
-	version, err := strconv.Atoi(parts[0])
-	if err != nil {
-		return 0, fmt.Errorf("cannot parse Systemd version: %s", err)
+	separators := []string{" ", "."}
+	// Second try, it's separated by '.' like: 255.6-1-arch
+	for _, sep := range separators {
+		parts := strings.Split(ver, sep)
+		if len(parts) >= 2 {
+			version, err := strconv.Atoi(parts[0])
+			if err == nil {
+				return version, nil
+			}
+		}
 	}
 
-	return version, err
+	return 0, fmt.Errorf("unknown format for Systemd version: '%s'", ver)
 }
 
 // getSystemdVersionViaDBus gets the Systemd version from D-Bus
 //
 // We get the version by reading the property
 // `org.freedesktop.systemd1.Manager.Version`. Even though this property is
-// is documented as not being part of the official API and having an unstable
-// scheme, on our tests it proved to be stable enough.
+// documented as not being part of the official API and having an unstable
+// scheme, on our tests it proved to be stable enough for this use.
 //
 // The Systemd D-Bus documentation states:
 //
@@ -391,7 +400,7 @@ func parseSystemdVersion(output string) (int, error) {
 func getSystemdVersionViaDBus() (string, error) {
 	conn, err := dbus.ConnectSessionBus()
 	if err != nil {
-		return "", fmt.Errorf("%w: %w", errCannotConnectToDBus, err)
+		return "", fmt.Errorf("cannot connect to D-Bus: %w", err)
 	}
 	defer conn.Close()
 
