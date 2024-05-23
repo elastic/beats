@@ -6,13 +6,12 @@ scms:
   githubConfig:
     kind: github
     spec:
-      user: '{{ requiredEnv "GIT_USER" }}'
-      email: '{{ requiredEnv "GIT_EMAIL" }}'
-      owner: elastic
-      repository: beats
+      owner: '{{ .scm.owner }}'
+      repository: '{{ .scm.repository }}'
+      user: '{{ requiredEnv "GITHUB_ACTOR" }}'
       token: '{{ requiredEnv "GITHUB_TOKEN" }}'
-      username: '{{ requiredEnv "GIT_USER" }}'
       branch: main
+      commitusingapi: true
 
 actions:
   beats:
@@ -21,12 +20,9 @@ actions:
     sourceid: latestGoVersion
     title: '[Automation] Bump Golang version to {{ source "latestGoVersion" }}'
     spec:
-      automerge: false
       labels:
         - dependencies
         - backport-skip
-      description: |
-        Generated automatically with {{ requiredEnv "JOB_URL" }}
 
 sources:
   minor:
