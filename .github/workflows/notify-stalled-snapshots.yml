@@ -1,0 +1,76 @@
+---
+name: notify-stalled-snapshots
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * 1'
+
+permissions:
+  contents: read
+
+env:
+  EMAIL: beats-contrib@elastic.co
+  URL_QUERY: 'https://github.com/elastic/beats/pulls?q=is%3Apr+is%3Aopen+label%3ATeam%3ABeats-On-Call'
+  JOB_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+jobs:
+  filter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    outputs:
+      matrix: ${{ steps.generator.outputs.matrix }}
+    steps:
+      - id: generator
+        uses: elastic/apm-pipeline-library/.github/actions/elastic-stack-snapshot-branches@current
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [filter]
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.filter.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: "${{ matrix.branch }}"
+
+      - id: date
+        run: echo "date=$(date +%Y-%m-%d)" >> "${GITHUB_OUTPUT}"
+
+      - id: search
+        run: |-
+          if git --no-pager \
+            log --pretty=format: \
+              --name-only \
+              --since="7 days ago" \
+            | grep 'testing/environments/snapshot.yml' ; then
+            echo "found=false" >> $GITHUB_OUTPUT
+          else
+            echo "found=true" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - if: ${{ contains(steps.search.outputs.found, 'true') }}
+        name: Report obsoleted branches (slack)
+        uses: slackapi/slack-github-action@70cd7be8e40a46e8b0eced40b0de447bdb42f68e # v1.26.0
+        with:
+          channel-id: '#ingest-notifications'
+          payload:  ":red_circle: Elastic Stack version for the `${{ matrix.branch }}` branch has not been updated for a while (`> 7 days`). Review the (<${{ env.URL_QUERY }}|open PRs>)"
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+
+      - if: ${{ contains(steps.search.outputs.found, 'true') }}
+        name: Report obsoleted branches (email)
+        uses: dawidd6/action-send-mail@6063705cefe50cb915fc53bb06d4049cae2953b2
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: '[${{ matrix.branch }}] ${{ steps.date.outputs.date }}: Elastic Stack version has not been updated recently.'
+          to: ${{ env.EMAIL }}
+          from: ${{ secrets.MAIL_FROM }}
+          reply_to: ${{ secrets.MAIL_REPLY }}
+          body: 'Elastic Stack version for the ${{ matrix.branch }} branch has not been updated for a while (> 7 days). Review the open PRs in ${{ env.URL_QUERY }}. Generated automatically with ${{ env.JOB_URL }}'
