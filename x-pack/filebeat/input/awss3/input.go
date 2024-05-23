@@ -70,22 +70,22 @@ type s3Input struct {
 func newInput(config config, store beater.StateStore) (*s3Input, error) {
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
 
-	if config.AWSConfig.Endpoint != "" {
-		// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
-		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
-			if service == s3.ServiceID {
-				return awssdk.Endpoint{
-					PartitionID:   "aws",
-					Source:        awssdk.EndpointSourceCustom,
-					URL:           config.AWSConfig.Endpoint,
-					SigningRegion: awsConfig.Region,
-				}, nil
-			}
+	// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
+	awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
 
-			// If the service is not S3, return an EndpointNotFoundError to let the SDK use the default endpoint resolver
-			return awssdk.Endpoint{}, &awssdk.EndpointNotFoundError{}
-		})
-	}
+		// If the service is S3 and the endpoint is set, return the custom endpoint AS-IS to the S3 service
+		if service == s3.ServiceID && config.AWSConfig.Endpoint != "" {
+			return awssdk.Endpoint{
+				PartitionID:   "aws",
+				Source:        awssdk.EndpointSourceCustom,
+				URL:           config.AWSConfig.Endpoint,
+				SigningRegion: awsConfig.Region,
+			}, nil
+		}
+
+		// If the service is not S3, return an EndpointNotFoundError to let the SDK use the default endpoint resolver
+		return awssdk.Endpoint{}, &awssdk.EndpointNotFoundError{}
+	})
 
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
@@ -250,7 +250,7 @@ type nonAWSBucketResolver struct {
 }
 
 func (n nonAWSBucketResolver) ResolveEndpoint(region string, options s3.EndpointResolverOptions) (awssdk.Endpoint, error) {
-	return awssdk.Endpoint{URL: n.endpoint, SigningRegion: region, HostnameImmutable: false, Source: awssdk.EndpointSourceCustom}, nil
+	return awssdk.Endpoint{URL: n.endpoint, SigningRegion: region, HostnameImmutable: true, Source: awssdk.EndpointSourceCustom}, nil
 }
 
 func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, client beat.Client, persistentStore *statestore.Store, states *states) (*s3Poller, error) {
