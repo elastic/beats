@@ -29,6 +29,7 @@ import (
 )
 
 func TestNewEventFromEbpfEvent(t *testing.T) {
+	containerID := "d12fe576354a1805165303a4e34a69e5fe8db791ceb7e545f17811d1fbfba68f"
 	ebpfEvent := ebpfevents.Event{
 		Header: ebpfevents.Header{
 			Type: ebpfevents.EventTypeFileCreate,
@@ -52,6 +53,7 @@ func TestNewEventFromEbpfEvent(t *testing.T) {
 				Suid: 5,
 				Sgid: 6,
 			},
+			CgroupPath: "/kubepods.slice/kubepods-burstable.slice/kubepods-burstable-pod123.slice/cri-containerd-" + containerID + ".scope",
 		},
 	}
 	event, ok := NewEventFromEbpfEvent(
@@ -72,9 +74,10 @@ func TestNewEventFromEbpfEvent(t *testing.T) {
 			Group: event.Info.Group,
 			Mode:  os.FileMode(0o644),
 		},
-		Process: event.Process, // 1:1 copy this as it changes on every machine
-		Source:  SourceEBPF,
-		errors:  nil,
+		Process:     event.Process, // 1:1 copy this as it changes on every machine
+		ContainerID: containerID,
+		Source:      SourceEBPF,
+		errors:      nil,
 	}
 	event.Timestamp = expectedEvent.Timestamp
 

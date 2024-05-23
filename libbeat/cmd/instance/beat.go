@@ -125,6 +125,7 @@ type beatConfig struct {
 	BufferConfig    *config.C              `config:"http.buffer"`
 	Path            paths.Path             `config:"path"`
 	Logging         *config.C              `config:"logging"`
+	EventLogging    *config.C              `config:"logging.event_data"`
 	MetricLogging   *config.C              `config:"logging.metrics"`
 	Keystore        *config.C              `config:"keystore"`
 	Instrumentation instrumentation.Config `config:"instrumentation"`
@@ -224,7 +225,7 @@ func Run(settings Settings, bt beat.Creator) error {
 
 // NewInitializedBeat creates a new beat where all information and initialization is derived from settings
 func NewInitializedBeat(settings Settings) (*Beat, error) {
-	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed)
+	b, err := NewBeat(settings.Name, settings.IndexPrefix, settings.Version, settings.ElasticLicensed, settings.Initialize)
 	if err != nil {
 		return nil, err
 	}
@@ -235,7 +236,12 @@ func NewInitializedBeat(settings Settings) (*Beat, error) {
 }
 
 // NewBeat creates a new beat instance
-func NewBeat(name, indexPrefix, v string, elasticLicensed bool) (*Beat, error) {
+func NewBeat(name, indexPrefix, v string, elasticLicensed bool, initFuncs []func()) (*Beat, error) {
+	// call all initialization functions
+	for _, f := range initFuncs {
+		f()
+	}
+
 	if v == "" {
 		v = version.GetDefaultVersion()
 	}
@@ -803,7 +809,7 @@ func (b *Beat) configure(settings Settings) error {
 		return fmt.Errorf("error setting timestamp precision: %w", err)
 	}
 
-	if err := configure.Logging(b.Info.Beat, b.Config.Logging); err != nil {
+	if err := configure.LoggingWithTypedOutputs(b.Info.Beat, b.Config.Logging, b.Config.EventLogging, logp.TypeKey, logp.EventType); err != nil {
 		return fmt.Errorf("error initializing logging: %w", err)
 	}
 

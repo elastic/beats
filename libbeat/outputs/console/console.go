@@ -85,7 +85,7 @@ func makeConsole(
 		}
 	}
 
-	return outputs.Success(config.Queue, config.BatchSize, 0, c)
+	return outputs.Success(config.Queue, config.BatchSize, 0, nil, c)
 }
 
 func newConsole(index string, observer outputs.Observer, codec codec.Codec) (*console, error) {

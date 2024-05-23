@@ -10,7 +10,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/processdb"
@@ -32,8 +32,7 @@ var (
 		{
 			testName: "enrich process",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			mockProcesses: []types.ProcessExecEvent{
 				{
@@ -43,6 +42,14 @@ var (
 						Ppid: uint32(50),
 						Pgid: uint32(100),
 						Sid:  uint32(40),
+					},
+					Creds: types.CredInfo{
+						Ruid: 0,
+						Euid: 0,
+						Suid: 0,
+						Rgid: 0,
+						Egid: 0,
+						Sgid: 0,
 					},
 					CWD:      "/",
 					Filename: "/bin/ls",
@@ -79,12 +86,24 @@ var (
 						"pid":               uint32(100),
 						"parent": mapstr.M{
 							"pid": uint32(50),
+							"user": mapstr.M{
+								"id":   "0",
+								"name": "root",
+							},
 						},
 						"session_leader": mapstr.M{
 							"pid": uint32(40),
+							"user": mapstr.M{
+								"id":   "0",
+								"name": "root",
+							},
 						},
 						"group_leader": mapstr.M{
 							"pid": uint32(100),
+							"user": mapstr.M{
+								"id":   "0",
+								"name": "root",
+							},
 						},
 					},
 				},
@@ -94,8 +113,7 @@ var (
 		{
 			testName: "no PID field in event",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -113,8 +131,7 @@ var (
 		{
 			testName: "PID not number",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -133,8 +150,7 @@ var (
 		{
 			testName: "PID not in DB",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -154,8 +170,7 @@ var (
 			testName: "process field not in event",
 			// This event, without a "process" field, is not supported by enrich, it should be handled gracefully
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "action.pid",
+				PIDField: "action.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -170,8 +185,7 @@ var (
 			testName: "process field not mapstr",
 			// Unsupported process field type should be handled gracefully
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "action.pid",
+				PIDField: "action.pid",
 			},
 			input: beat.Event{
 				Fields: mapstr.M{
@@ -189,8 +203,7 @@ var (
 		{
 			testName: "enrich event with map[string]any process field",
 			config: config{
-				ReplaceFields: false,
-				PIDField:      "process.pid",
+				PIDField: "process.pid",
 			},
 			mockProcesses: []types.ProcessExecEvent{
 				{
@@ -325,33 +338,35 @@ var (
 
 func TestEnrich(t *testing.T) {
 	for _, tt := range enrichTests {
-		reader := procfs.NewMockReader()
-		db, err := processdb.NewDB(reader, *logger)
-		assert.Nil(t, err)
+		t.Run(tt.testName, func(t *testing.T) {
+			reader := procfs.NewMockReader()
+			db, err := processdb.NewDB(reader, *logger)
+			require.Nil(t, err)
 
-		for _, ev := range tt.mockProcesses {
-			db.InsertExec(ev)
-		}
-		s := addSessionMetadata{
-			logger: logger,
-			db:     db,
-			config: tt.config,
-		}
-
-		// avoid taking address of loop variable
-		i := tt.input
-		actual, err := s.enrich(&i)
-		if tt.expect_error {
-			assert.Error(t, err, "%s: error unexpectedly nil", tt.testName)
-		} else {
-			assert.Nil(t, err, "%s: enrich error: %w", tt.testName, err)
-			assert.NotNil(t, actual, "%s: returned nil event", tt.testName)
-
-			//Validate output
-			if diff := cmp.Diff(tt.expected.Fields, actual.Fields, ignoreMissingFrom(tt.expected.Fields)); diff != "" {
-				t.Errorf("field mismatch:\n%s", diff)
+			for _, ev := range tt.mockProcesses {
+				db.InsertExec(ev)
 			}
-		}
+			s := addSessionMetadata{
+				logger: logger,
+				db:     db,
+				config: tt.config,
+			}
+
+			// avoid taking address of loop variable
+			i := tt.input
+			actual, err := s.enrich(&i)
+			if tt.expect_error {
+				require.Error(t, err, "%s: error unexpectedly nil", tt.testName)
+			} else {
+				require.Nil(t, err, "%s: enrich error: %w", tt.testName, err)
+				require.NotNil(t, actual, "%s: returned nil event", tt.testName)
+
+				//Validate output
+				if diff := cmp.Diff(tt.expected.Fields, actual.Fields, ignoreMissingFrom(tt.expected.Fields)); diff != "" {
+					t.Errorf("field mismatch:\n%s", diff)
+				}
+			}
+		})
 	}
 }
 
@@ -371,8 +386,10 @@ func ignoreMissingFrom(m mapstr.M) cmp.Option {
 // Note: This validates test code only
 func TestFilter(t *testing.T) {
 	for _, tt := range filterTests {
-		if eq := cmp.Equal(tt.mx, tt.my, ignoreMissingFrom(tt.mx)); eq != tt.expected {
-			t.Errorf("%s: unexpected comparator result", tt.testName)
-		}
+		t.Run(tt.testName, func(t *testing.T) {
+			if eq := cmp.Equal(tt.mx, tt.my, ignoreMissingFrom(tt.mx)); eq != tt.expected {
+				t.Errorf("%s: unexpected comparator result", tt.testName)
+			}
+		})
 	}
 }

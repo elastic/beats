@@ -8,19 +8,14 @@
 package system
 
 import (
-	"bytes"
-	"context"
 	"errors"
 	"fmt"
 	"io/fs"
 	"net"
 	"os"
-	"os/exec"
-	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -73,31 +68,4 @@ func TestDevices(t *testing.T) {
 	for _, ifc := range ifcs {
 		assert.Contains(t, stdout, ifc.Name)
 	}
-}
-
-func runPacketbeat(t testing.TB, args ...string) (stdout, stderr string, err error) {
-	t.Helper()
-
-	packetbeatPath, err := filepath.Abs("../../packetbeat.test")
-	require.NoError(t, err)
-
-	if _, err := os.Stat(packetbeatPath); err != nil {
-		t.Fatalf("%v binary not found: %v", filepath.Base(packetbeatPath), err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
-	defer cancel()
-
-	conf, err := filepath.Abs("../../packetbeat.yml")
-	if err != nil {
-		return "", "", err
-	}
-	cmd := exec.CommandContext(ctx, packetbeatPath, append([]string{"-systemTest", "-c", conf}, args...)...)
-	cmd.Dir = t.TempDir()
-	var stdoutBuf, stderrBuf bytes.Buffer
-	cmd.Stdout = &stdoutBuf
-	cmd.Stderr = &stderrBuf
-	err = cmd.Run()
-
-	return strings.TrimSpace(stdoutBuf.String()), strings.TrimSpace(stderrBuf.String()), err
 }

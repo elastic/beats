@@ -20,7 +20,7 @@ package elasticsearch
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/esleg/eslegclient"
@@ -120,21 +120,13 @@ func TestPipelineSelection(t *testing.T) {
 		test := _test
 		t.Run(name, func(t *testing.T) {
 			selector, err := buildPipelineSelector(config.MustNewConfigFrom(test.cfg))
-			assert.NoError(t, err)
-
-			client, err := NewClient(
-				clientSettings{
-					pipelineSelector: &selector,
-				},
-				nil,
-			)
-			assert.NoError(t, err)
+			require.NoError(t, err)
 
 			if err != nil {
 				t.Fatalf("Failed to parse configuration: %v", err)
 			}
 
-			got, err := client.getPipeline(&test.event)
+			got, err := getPipeline(&test.event, &selector)
 			if err != nil {
 				t.Fatalf("Failed to create pipeline name: %v", err)
 			}

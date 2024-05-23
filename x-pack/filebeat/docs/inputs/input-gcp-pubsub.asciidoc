@@ -73,7 +73,10 @@ set `subscription.max_outstanding_messages`. Default is 1.
 
 The maximum number of unprocessed messages (unacknowledged but not yet expired).
 If the value is negative, then there will be no limit on the number of
-unprocessed messages. Default is 1000.
+unprocessed messages. Due to the presence of internal queue, the input gets 
+blocked until `queue.mem.flush.min_events` or `queue.mem.flush.timeout` 
+is reached. To prevent this blockage, this option must be at least 
+`queue.mem.flush.min_events`. Default is 1600.
 
 [float]
 ==== `credentials_file`

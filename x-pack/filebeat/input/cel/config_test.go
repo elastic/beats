@@ -292,6 +292,16 @@ var oAuth2ValidationTests = []struct {
 		},
 	},
 	{
+		name: "if_password_is_set_credentials_may_be_missing_for_user-password_authentication",
+		input: map[string]interface{}{
+			"auth.oauth2": map[string]interface{}{
+				"user":      "a_client_user",
+				"password":  "a_client_password",
+				"token_url": "localhost",
+			},
+		},
+	},
+	{
 		name:    "must_fail_with_an_unknown_provider",
 		wantErr: errors.New("unknown provider \"unknown\" accessing 'auth.oauth2'"),
 		input: map[string]interface{}{

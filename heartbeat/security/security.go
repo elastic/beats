@@ -30,7 +30,8 @@ import (
 	"kernel.org/pub/linux/libs/security/libcap/cap"
 )
 
-func init() {
+// InitializeModule initializes this module.
+func InitializeModule() {
 	// Here we set a bunch of linux specific security stuff.
 	// In the context of a container, where users frequently run as root, we follow BEAT_SETUID_AS to setuid/gid
 	// and add capabilities to make this actually run as a regular user. This also helps Node.js in synthetics, which

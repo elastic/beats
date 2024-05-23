@@ -16,6 +16,7 @@ import (
 	"github.com/cespare/xxhash/v2"
 	"github.com/gofrs/uuid"
 
+	"github.com/elastic/beats/v7/auditbeat/ab"
 	"github.com/elastic/beats/v7/auditbeat/datastore"
 	"github.com/elastic/beats/v7/auditbeat/helper/hasher"
 	"github.com/elastic/beats/v7/libbeat/common/capabilities"
@@ -30,7 +31,6 @@ import (
 )
 
 const (
-	moduleName    = "system"
 	metricsetName = "process"
 	namespace     = "system.audit.process"
 
@@ -81,7 +81,7 @@ func (action eventAction) Type() string {
 }
 
 func init() {
-	mb.Registry.MustAddMetricSet(moduleName, metricsetName, New,
+	ab.Registry.MustAddMetricSet(system.ModuleName, metricsetName, New,
 		mb.DefaultMetricSet(),
 		mb.WithNamespace(namespace),
 	)
@@ -146,11 +146,11 @@ func (p Process) entityID(hostID string) string {
 
 // New constructs a new MetricSet.
 func New(base mb.BaseMetricSet) (mb.MetricSet, error) {
-	cfgwarn.Beta("The %v/%v dataset is beta", moduleName, metricsetName)
+	cfgwarn.Beta("The %v/%v dataset is beta", system.ModuleName, metricsetName)
 
 	config := defaultConfig
 	if err := base.Module().UnpackConfig(&config); err != nil {
-		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", moduleName, metricsetName, err)
+		return nil, fmt.Errorf("failed to unpack the %v/%v config: %w", system.ModuleName, metricsetName, err)
 	}
 
 	bucket, err := datastore.OpenBucket(bucketName)

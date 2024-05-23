@@ -33,6 +33,10 @@ import (
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
 
+func TestMain(m *testing.M) {
+	InitializeModule()
+}
+
 func TestGenerateHints(t *testing.T) {
 	tests := []struct {
 		message string

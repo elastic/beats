@@ -20,7 +20,7 @@ import (
 )
 
 func MajorTTY(ttyNr uint32) uint16 {
-	return uint16((ttyNr >> 8) & 0xf)
+	return uint16((ttyNr >> 8) & 0xff)
 }
 
 func MinorTTY(ttyNr uint32) uint16 {

@@ -31,6 +31,7 @@ import (
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/cfgfile"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/go-concert/ctxtool"
@@ -50,13 +51,14 @@ type factory struct {
 // On stop the runner triggers the shutdown signal and waits until the input
 // has returned.
 type runner struct {
-	id        string
-	log       *logp.Logger
-	agent     *beat.Info
-	wg        sync.WaitGroup
-	sig       ctxtool.CancelContext
-	input     v2.Input
-	connector beat.PipelineConnector
+	id             string
+	log            *logp.Logger
+	agent          *beat.Info
+	wg             sync.WaitGroup
+	sig            ctxtool.CancelContext
+	input          v2.Input
+	connector      beat.PipelineConnector
+	statusReporter status.StatusReporter
 }
 
 // RunnerFactory creates a cfgfile.RunnerFactory from an input Loader that is
@@ -109,6 +111,10 @@ func (f *factory) Create(
 	}, nil
 }
 
+func (r *runner) SetStatusReporter(reported status.StatusReporter) {
+	r.statusReporter = reported
+}
+
 func (r *runner) String() string { return r.input.Name() }
 
 func (r *runner) Start() {
@@ -121,10 +127,11 @@ func (r *runner) Start() {
 		log.Infof("Input '%s' starting", name)
 		err := r.input.Run(
 			v2.Context{
-				ID:          r.id,
-				Agent:       *r.agent,
-				Logger:      log,
-				Cancelation: r.sig,
+				ID:             r.id,
+				Agent:          *r.agent,
+				Logger:         log,
+				Cancelation:    r.sig,
+				StatusReporter: r.statusReporter,
 			},
 			r.connector,
 		)
@@ -140,6 +147,7 @@ func (r *runner) Stop() {
 	r.sig.Cancel()
 	r.wg.Wait()
 	r.log.Infof("Input '%s' stopped (runner)", r.input.Name())
+	r.statusReporter = nil
 }
 
 func configID(config *conf.C) (string, error) {

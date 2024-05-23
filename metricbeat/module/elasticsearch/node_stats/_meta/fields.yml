@@ -105,6 +105,11 @@
               type: long
             - name: query_total.count
               type: long
+        - name: shard_stats
+          type: group
+          fields:
+            - name: total_count
+              type: long
         - name: segments
           type: group
           fields:

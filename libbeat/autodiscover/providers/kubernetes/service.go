@@ -70,16 +70,18 @@ func NewServiceEventer(uuid uuid.UUID, cfg *conf.C, client k8s.Interface, publis
 	var namespaceMeta metadata.MetaGen
 	var namespaceWatcher kubernetes.Watcher
 
-	metaConf := metadata.GetDefaultResourceMetadataConfig()
-	namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
-		SyncTimeout: config.SyncPeriod,
-		Namespace:   config.Namespace,
-	}, nil)
-	if err != nil {
-		return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Namespace{}, err)
-	}
+	metaConf := config.AddResourceMetadata
 
-	namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)
+	if metaConf.Namespace.Enabled() || config.Hints.Enabled() {
+		namespaceWatcher, err = kubernetes.NewNamedWatcher("namespace", client, &kubernetes.Namespace{}, kubernetes.WatchOptions{
+			SyncTimeout: config.SyncPeriod,
+			Namespace:   config.Namespace,
+		}, nil)
+		if err != nil {
+			return nil, fmt.Errorf("couldn't create watcher for %T due to error %w", &kubernetes.Namespace{}, err)
+		}
+		namespaceMeta = metadata.NewNamespaceMetadataGenerator(metaConf.Namespace, namespaceWatcher.Store(), client)
+	}
 
 	p := &service{
 		config:           config,
@@ -155,7 +157,11 @@ func (s *service) GenerateHints(event bus.Event) bus.Event {
 		e["port"] = port
 	}
 
-	hints := utils.GenerateHints(annotations, "", s.config.Prefix)
+	hints, incorrecthints := utils.GenerateHints(annotations, "", s.config.Prefix, true, AllSupportedHints)
+	// We check whether the provided annotation follows the supported format and vocabulary. The check happens for annotations that have prefix co.elastic
+	for _, value := range incorrecthints {
+		s.logger.Debugf("provided hint: %s/%s is not in the supported list", s.config.Prefix, value)
+	}
 	s.logger.Debugf("Generated hints %+v", hints)
 
 	if len(hints) != 0 {
@@ -220,7 +226,7 @@ func (s *service) emit(svc *kubernetes.Service, flag string) {
 		}
 	}
 
-	var events []bus.Event
+	events := []bus.Event{}
 	for _, port := range svc.Spec.Ports {
 		event := bus.Event{
 			"provider":   s.uuid,

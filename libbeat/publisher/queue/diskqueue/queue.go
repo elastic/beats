@@ -110,8 +110,9 @@ func FactoryForSettings(settings Settings) queue.QueueFactory {
 		logger *logp.Logger,
 		ackCallback func(eventCount int),
 		inputQueueSize int,
+		encoderFactory queue.EncoderFactory,
 	) (queue.Queue, error) {
-		return NewQueue(logger, ackCallback, settings)
+		return NewQueue(logger, ackCallback, settings, encoderFactory)
 	}
 }
 
@@ -121,6 +122,7 @@ func NewQueue(
 	logger *logp.Logger,
 	writeToDiskCallback func(eventCount int),
 	settings Settings,
+	encoderFactory queue.EncoderFactory,
 ) (*diskQueue, error) {
 	logger = logger.Named("diskqueue")
 	logger.Debugf(
@@ -212,6 +214,11 @@ func NewQueue(
 	activeFrameCount -= int(nextReadPosition.frameIndex)
 	logger.Infof("Found %d existing events on queue start", activeFrameCount)
 
+	var encoder queue.Encoder
+	if encoderFactory != nil {
+		encoder = encoderFactory()
+	}
+
 	queue := &diskQueue{
 		logger:   logger,
 		settings: settings,
@@ -225,7 +232,7 @@ func NewQueue(
 
 		acks: newDiskQueueACKs(logger, nextReadPosition, positionFile),
 
-		readerLoop:  newReaderLoop(settings),
+		readerLoop:  newReaderLoop(settings, encoder),
 		writerLoop:  newWriterLoop(logger, writeToDiskCallback, settings),
 		deleterLoop: newDeleterLoop(settings),
 
@@ -282,16 +289,10 @@ func (dq *diskQueue) BufferConfig() queue.BufferConfig {
 }
 
 func (dq *diskQueue) Producer(cfg queue.ProducerConfig) queue.Producer {
-	var serializationFormat SerializationFormat
-	if dq.settings.UseProtobuf {
-		serializationFormat = SerializationProtobuf
-	} else {
-		serializationFormat = SerializationCBOR
-	}
 	return &diskQueueProducer{
 		queue:   dq,
 		config:  cfg,
-		encoder: newEventEncoder(serializationFormat),
+		encoder: newEventEncoder(SerializationCBOR),
 		done:    make(chan struct{}),
 	}
 }

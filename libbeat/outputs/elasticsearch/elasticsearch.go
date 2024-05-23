@@ -35,7 +35,7 @@ const logSelector = "elasticsearch"
 
 func makeES(
 	im outputs.IndexManager,
-	beat beat.Info,
+	beatInfo beat.Info,
 	observer outputs.Observer,
 	cfg *config.C,
 ) (outputs.Group, error) {
@@ -46,7 +46,7 @@ func makeES(
 		}
 	}
 
-	index, pipeline, err := buildSelectors(im, beat, cfg)
+	indexSelector, pipelineSelector, err := buildSelectors(im, beatInfo, cfg)
 	if err != nil {
 		return outputs.Fail(err)
 	}
@@ -94,6 +94,9 @@ func makeES(
 		params = nil
 	}
 
+	encoderFactory := newEventEncoderFactory(
+		esConfig.EscapeHTML, indexSelector, pipelineSelector)
+
 	clients := make([]outputs.NetworkClient, len(hosts))
 	for i, host := range hosts {
 		esURL, err := common.MakeURL(esConfig.Protocol, esConfig.Path, host, 9200)
@@ -106,7 +109,7 @@ func makeES(
 		client, err = NewClient(clientSettings{
 			connection: eslegclient.ConnectionSettings{
 				URL:              esURL,
-				Beatname:         beat.Beat,
+				Beatname:         beatInfo.Beat,
 				Kerberos:         esConfig.Kerberos,
 				Username:         esConfig.Username,
 				Password:         esConfig.Password,
@@ -119,8 +122,8 @@ func makeES(
 				Transport:        esConfig.Transport,
 				IdleConnTimeout:  esConfig.Transport.IdleConnTimeout,
 			},
-			indexSelector:    index,
-			pipelineSelector: pipeline,
+			indexSelector:    indexSelector,
+			pipelineSelector: pipelineSelector,
 			observer:         observer,
 			deadLetterIndex:  deadLetterIndex,
 		}, &connectCallbackRegistry)
@@ -132,7 +135,7 @@ func makeES(
 		clients[i] = client
 	}
 
-	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, clients)
+	return outputs.SuccessNet(esConfig.Queue, esConfig.LoadBalance, esConfig.BulkMaxSize, esConfig.MaxRetries, encoderFactory, clients)
 }
 
 func buildSelectors(
