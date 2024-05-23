@@ -148,10 +148,6 @@ type Producer interface {
 type Batch interface {
 	Count() int
 	Entry(i int) Entry
-	// Release the internal references to the contained events, if
-	// supported (the disk queue does not yet implement it).
-	// Count() and Entry() cannot be used after this call.
-	FreeEntries()
 	Done()
 }
 

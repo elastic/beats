@@ -25,13 +25,10 @@ import (
 	"fmt"
 	"time"
 
-	"google.golang.org/protobuf/proto"
-
 	"github.com/elastic/beats/v7/libbeat/beat"
 	"github.com/elastic/beats/v7/libbeat/outputs/codec"
 	"github.com/elastic/beats/v7/libbeat/publisher"
 	"github.com/elastic/elastic-agent-libs/mapstr"
-	"github.com/elastic/elastic-agent-shipper-client/pkg/proto/messages"
 	"github.com/elastic/go-structform/cborl"
 	"github.com/elastic/go-structform/gotype"
 	"github.com/elastic/go-structform/json"
@@ -40,9 +37,8 @@ import (
 type SerializationFormat int
 
 const (
-	SerializationJSON     SerializationFormat = iota // 0
-	SerializationCBOR                                // 1
-	SerializationProtobuf                            // 2
+	SerializationJSON SerializationFormat = iota // 0
+	SerializationCBOR                            // 1
 )
 
 type eventEncoder struct {
@@ -98,11 +94,6 @@ func (e *eventEncoder) encode(evt interface{}) ([]byte, error) {
 			return nil, fmt.Errorf("incompatible serialization for type %T. Only CBOR is supported", v)
 		}
 		return e.encode_publisher_event(v)
-	case *messages.Event:
-		if e.serializationFormat != SerializationProtobuf {
-			return nil, fmt.Errorf("incompatible serialization for type %T. Only Protobuf is supported", v)
-		}
-		return proto.Marshal(v)
 	default:
 		return nil, fmt.Errorf("no known serialization format for type %T", v)
 	}
@@ -160,8 +151,6 @@ func (d *eventDecoder) Decode() (interface{}, error) {
 	switch d.serializationFormat {
 	case SerializationJSON, SerializationCBOR:
 		return d.decodeJSONAndCBOR()
-	case SerializationProtobuf:
-		return d.decodeProtobuf()
 	default:
 		return nil, fmt.Errorf("unknown serialization format: %d", d.serializationFormat)
 	}
@@ -199,10 +188,4 @@ func (d *eventDecoder) decodeJSONAndCBOR() (publisher.Event, error) {
 			Meta:      to.Meta,
 		},
 	}, nil
-}
-
-func (d *eventDecoder) decodeProtobuf() (*messages.Event, error) {
-	e := messages.Event{}
-	err := proto.Unmarshal(d.buf, &e)
-	return &e, err
 }
