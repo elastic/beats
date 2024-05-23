@@ -73,13 +73,17 @@ func newInput(config config, store beater.StateStore) (*s3Input, error) {
 	if config.AWSConfig.Endpoint != "" {
 		// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
 		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
-			return awssdk.Endpoint{
-				PartitionID:       "aws",
-				HostnameImmutable: false,
-				Source:            awssdk.EndpointSourceCustom,
-				URL:               config.AWSConfig.Endpoint,
-				SigningRegion:     awsConfig.Region,
-			}, nil
+			if service == s3.ServiceID {
+				return awssdk.Endpoint{
+					PartitionID:   "aws",
+					Source:        awssdk.EndpointSourceCustom,
+					URL:           config.AWSConfig.Endpoint,
+					SigningRegion: awsConfig.Region,
+				}, nil
+			}
+
+			// If the service is not S3, return an EndpointNotFoundError to let the SDK use the default endpoint resolver
+			return awssdk.Endpoint{}, &awssdk.EndpointNotFoundError{}
 		})
 	}
 
@@ -138,7 +142,11 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 			// Warn of mismatch, but go ahead with configured region name.
 			inputContext.Logger.Warnf("%v: using %q", err, regionName)
 		}
-		in.awsConfig.Region = regionName
+
+		// If we got a region from the queue URL, use it to override the region in the AWS config.
+		if regionName == "" {
+			in.awsConfig.Region = in.config.RegionName
+		}
 
 		// Create SQS receiver and S3 notification processor.
 		receiver, err := in.createSQSReceiver(inputContext, pipeline)
@@ -188,31 +196,17 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 
 func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*sqsReader, error) {
 
-	sqsAWSConfig, err := awscommon.InitializeAWSConfig(in.config.AWSConfig)
-
 	sqsAPI := &awsSQSAPI{
-		client: sqs.NewFromConfig(sqsAWSConfig, func(o *sqs.Options) {
+		client: sqs.NewFromConfig(in.awsConfig, func(o *sqs.Options) {
 			if in.config.AWSConfig.FIPSEnabled {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 			}
 		}),
+
 		queueURL:          in.config.QueueURL,
 		apiTimeout:        in.config.APITimeout,
 		visibilityTimeout: in.config.VisibilityTimeout,
 		longPollWaitTime:  in.config.SQSWaitTime,
-	}
-
-	if in.config.AWSConfig.Endpoint != "" {
-		// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
-		sqsAWSConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
-			return awssdk.Endpoint{
-				PartitionID:       "aws",
-				HostnameImmutable: false,
-				Source:            awssdk.EndpointSourceCustom,
-				URL:               in.config.AWSConfig.Endpoint,
-				SigningRegion:     sqsAWSConfig.Region,
-			}, nil
-		})
 	}
 
 	s3API := &awsS3API{
