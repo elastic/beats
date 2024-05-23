@@ -21,6 +21,7 @@ package journald
 
 import (
 	"errors"
+	"flag"
 	"fmt"
 	"strconv"
 	"strings"
@@ -41,6 +42,15 @@ import (
 	conf "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 )
+
+var noVersionCheck bool
+
+func init() {
+	flag.BoolVar(&noVersionCheck,
+		"ignore-journald-version",
+		false,
+		"Does not check Journald version when starting the Journald input. This might cause Filebeat to crash!")
+}
 
 type journald struct {
 	Backoff            time.Duration
@@ -90,6 +100,11 @@ func Plugin(log *logp.Logger, store cursor.StateStore) input.Plugin {
 		Info:       "journald input",
 		Doc:        "The journald input collects logs from the local journald service",
 		Manager:    m,
+	}
+
+	if noVersionCheck {
+		log.Warn("Journald version check has been DISABLED! Filebeat might crash if Journald version is < 255.")
+		return p
 	}
 
 	version, err := systemdVersion()
@@ -358,9 +373,14 @@ func parseSystemdVersion(output string) (int, error) {
 	return version, err
 }
 
-// getSystemdVersionViaDBus foo
+// getSystemdVersionViaDBus gets the Systemd version from D-Bus
 //
-// Version string should not be parsed:
+// We get the version by reading the property
+// `org.freedesktop.systemd1.Manager.Version`. Even though this property is
+// is documented as not being part of the official API and having an unstable
+// scheme, on our tests it proved to be stable enough.
+//
+// The Systemd D-Bus documentation states:
 //
 //	 Version encodes the version string of the running systemd
 //	 instance. Note that the version string is purely informational,

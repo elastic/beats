@@ -21,12 +21,20 @@ package journald
 
 import (
 	"context"
+	"flag"
 	"fmt"
+	"os"
 	"path"
 	"testing"
 
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
+
+func TestMain(m *testing.M) {
+	flag.Parse()
+	noVersionCheck = true
+	os.Exit(m.Run())
+}
 
 func TestInputFieldsTranslation(t *testing.T) {
 	// A few random keys to verify

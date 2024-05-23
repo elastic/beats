@@ -63,6 +63,7 @@ func Filebeat(inputs beater.PluginFactory, settings instance.Settings) *cmd.Beat
 	command.PersistentFlags().AddGoFlag(flag.CommandLine.Lookup("M"))
 	command.TestCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
 	command.SetupCmd.Flags().AddGoFlag(flag.CommandLine.Lookup("modules"))
+	command.Flags().AddGoFlag(flag.CommandLine.Lookup("ignore-journald-version"))
 	command.AddCommand(cmd.GenModulesCmd(Name, "", buildModulesManager))
 	command.AddCommand(genGenerateCmd())
 	return command

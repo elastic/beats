@@ -744,12 +744,19 @@ the end of the file is reached. By default harvesters are closed after
 The `--once` option is not currently supported with the
 {filebeat-ref}/filebeat-input-filestream.html[`filestream`] input type.
 
+*`--ignore-journald-version`*::
+When the `--ignore-journald-version` is used, the Journald input
+**will not** validate the minimum Systemd version during the input
+initialisation. Running the Journald input with an unsupported version
+of Systemd might cause {beatname_uc} to crash.
 endif::[]
 
+ifeval::["{beatname_lc}"=="metricbeat"]
 *`--system.hostfs MOUNT_POINT`*::
 
 Specifies the mount point of the host's filesystem for use in monitoring a host. 
 This flag is depricated, and an alternate hostfs should be specified via the `hostfs` module config value.
+endif::[]
 
 
 ifeval::["{beatname_lc}"=="packetbeat"]
