@@ -250,7 +250,7 @@ steps:
           watch:
             - path:
                 - x-pack/osquerybeat/**
-                - .buildkite/x-pack/pipeline.xpack.metricbeat.yml
+                - .buildkite/x-pack/pipeline.xpack.osquerybeat.yml
                 - .buildkite/scripts/**
                 - .buildkite/hooks/**
                 # x-pack
@@ -279,7 +279,7 @@ steps:
       commit: "${BUILDKITE_COMMIT}"
       branch: "${BUILDKITE_BRANCH}"
 
-  - label: "Trigger Xpack/Winlogbeat"
+  - label: "Trigger x-pack/winlogbeat"
     if: build.pull_request.id != null
     plugins:
       - monorepo-diff#v1.0.1:
@@ -306,7 +306,7 @@ steps:
                     - BUILDKITE_PULL_REQUEST_BASE_BRANCH=${BUILDKITE_PULL_REQUEST_BASE_BRANCH}
                     - GITHUB_PR_LABELS=${GITHUB_PR_LABELS}
 
-  - label: "Triggering Build for Xpack/Winlogbeat"
+  - label: "Triggering Build for x-pack/winlogbeat"
     if: build.pull_request.id == null
     trigger: "beats-xpack-winlogbeat"
     build:
