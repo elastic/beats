@@ -74,9 +74,11 @@ func newInput(config config, store beater.StateStore) (*s3Input, error) {
 		// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
 		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
 			return awssdk.Endpoint{
-				PartitionID:   "aws",
-				URL:           config.AWSConfig.Endpoint,
-				SigningRegion: awsConfig.Region,
+				PartitionID:       "aws",
+				HostnameImmutable: false,
+				Source:            awssdk.EndpointSourceCustom,
+				URL:               config.AWSConfig.Endpoint,
+				SigningRegion:     awsConfig.Region,
 			}, nil
 		})
 	}
@@ -185,8 +187,11 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 }
 
 func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*sqsReader, error) {
+
+	sqsAWSConfig, err := awscommon.InitializeAWSConfig(in.config.AWSConfig)
+
 	sqsAPI := &awsSQSAPI{
-		client: sqs.NewFromConfig(in.awsConfig, func(o *sqs.Options) {
+		client: sqs.NewFromConfig(sqsAWSConfig, func(o *sqs.Options) {
 			if in.config.AWSConfig.FIPSEnabled {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 			}
@@ -195,6 +200,19 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 		apiTimeout:        in.config.APITimeout,
 		visibilityTimeout: in.config.VisibilityTimeout,
 		longPollWaitTime:  in.config.SQSWaitTime,
+	}
+
+	if in.config.AWSConfig.Endpoint != "" {
+		// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
+		sqsAWSConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
+			return awssdk.Endpoint{
+				PartitionID:       "aws",
+				HostnameImmutable: false,
+				Source:            awssdk.EndpointSourceCustom,
+				URL:               in.config.AWSConfig.Endpoint,
+				SigningRegion:     sqsAWSConfig.Region,
+			}, nil
+		})
 	}
 
 	s3API := &awsS3API{
@@ -238,7 +256,7 @@ type nonAWSBucketResolver struct {
 }
 
 func (n nonAWSBucketResolver) ResolveEndpoint(region string, options s3.EndpointResolverOptions) (awssdk.Endpoint, error) {
-	return awssdk.Endpoint{URL: n.endpoint, SigningRegion: region, HostnameImmutable: true, Source: awssdk.EndpointSourceCustom}, nil
+	return awssdk.Endpoint{URL: n.endpoint, SigningRegion: region, HostnameImmutable: false, Source: awssdk.EndpointSourceCustom}, nil
 }
 
 func (in *s3Input) createS3Lister(ctx v2.Context, cancelCtx context.Context, client beat.Client, persistentStore *statestore.Store, states *states) (*s3Poller, error) {
