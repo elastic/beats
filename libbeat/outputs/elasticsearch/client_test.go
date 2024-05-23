@@ -305,11 +305,15 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 }
 
 func TestCollectPublishFailDeadLetterSuccess(t *testing.T) {
-
+	t.FailNow()
 }
 
-func TestColllectPublishFailFatalErrorNotRetried(t *testing.T) {
+func TestCollectPublishFailFatalErrorNotRetried(t *testing.T) {
+	t.FailNow()
+}
 
+func TestInvalidBulkIndexResponse(t *testing.T) {
+	t.FailNow()
 }
 
 func TestCollectPublishFailDeadLetterIndex(t *testing.T) {
@@ -895,16 +899,16 @@ func TestBulkRequestHasFilterPath(t *testing.T) {
 		defer esMock.Close()
 		client := makePublishTestClient(t, esMock.URL, configParams)
 
-		events := encodeEvents(client, []publisher.Event{event1})
-		evt, err := client.publishEvents(ctx, events)
-		require.NoError(t, err)
+		batch := encodeBatch(client, &batchMock{events: []publisher.Event{event1}})
+		result := client.doBulkRequest(ctx, batch)
+		require.NoError(t, result.connErr)
 		require.Equal(t, len(reqParams), 2, "Bulk request should include configured parameter and standard filter path")
-
+		require.Equal(t, reqParams[filterPathKey], filterPathValue, "Bulk request should include standard filter path")
 	})
 }
 
-func TestPublishPayloadTooLargeReportsMetrics(t *testing.T) {
-
+func TestPublishPayloadTooLargeReportsFailed(t *testing.T) {
+	t.FailNow()
 }
 
 func TestSetDeadLetter(t *testing.T) {
