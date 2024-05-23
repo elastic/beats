@@ -163,6 +163,9 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - rabbitmq/queue - Change the mapping type of `rabbitmq.queue.consumers.utilisation.pct` to `scaled_float` from `long` because the values fall within the range of `[0.0, 1.0]`. Previously, conversion to integer resulted in reporting either `0` or `1`.
 - Fix timeout caused by the retrival of which indices are hidden {pull}39165[39165]
 - Fix Azure Monitor support for multiple aggregation types {issue}39192[39192] {pull}39204[39204]
+- Fix handling of access errors when reading process metrics {pull}39627[39627]
+- Fix behavior of cgroups path discovery when monitoring the host system from within a container {pull}39627[39627]
+- Fix issue where beats may report incorrect metrics for its own process when running inside a container {pull}39627[39627]
 
 *Osquerybeat*
 
