@@ -12,21 +12,14 @@ jobs:
   bump:
     runs-on: ubuntu-latest
     steps:
-<<<<<<< HEAD
 
-      - uses: actions/checkout@v3
-=======
       - uses: actions/checkout@v4
->>>>>>> 46de7e07de (updatecli: move to the .github folder and support for signed commits (#39472))
 
       - uses: elastic/apm-pipeline-library/.github/actions/updatecli@current
         with:
           vaultUrl: ${{ secrets.VAULT_ADDR }}
           vaultRoleId: ${{ secrets.VAULT_ROLE_ID }}
           vaultSecretId: ${{ secrets.VAULT_SECRET_ID }}
-<<<<<<< HEAD
-          pipeline: ./.ci/bump-golang.yml
-=======
           pipeline: .github/workflows/updatecli.d/bump-golang.yml
           values: .github/workflows/updatecli.d/scm.yml
           command: '--experimental apply'
@@ -48,4 +41,3 @@ jobs:
           command: '--experimental apply'
           notifySlackChannel: "#ingest-notifications"
           messageIfFailure: ":traffic_cone: updatecli failed for `${{ github.repository }}@${{ github.ref_name }}`, `@update-me-with-the-slack-team-to-be-poked` please look what's going on <${{ env.JOB_URL }}|here>"
->>>>>>> 46de7e07de (updatecli: move to the .github folder and support for signed commits (#39472))

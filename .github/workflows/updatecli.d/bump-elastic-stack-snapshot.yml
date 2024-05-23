@@ -14,10 +14,6 @@ actions:
         - backport-skip
         - build-monitoring
         - Team:Beats-On-Call
-<<<<<<< HEAD:.ci/bump-elastic-stack-snapshot.yml
-    scmid: default
-=======
->>>>>>> 46de7e07de (updatecli: move to the .github folder and support for signed commits (#39472)):.github/workflows/updatecli.d/bump-elastic-stack-snapshot.yml
 
 scms:
   default:
