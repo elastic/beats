@@ -18,6 +18,7 @@ import (
 
 	v2 "github.com/elastic/beats/v7/filebeat/input/v2"
 	"github.com/elastic/beats/v7/libbeat/beat"
+	"github.com/elastic/beats/v7/libbeat/common/backoff"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
 )
@@ -129,6 +130,16 @@ func (in *eventHubInputV2) setup(ctx context.Context) error {
 
 // run starts the main loop for processing events.
 func (in *eventHubInputV2) run(ctx context.Context) {
+
+	// Handle the case when the processor stops due to
+	// transient errors (network failures) and we need to
+	// restart.
+	processorRunBackoff := backoff.NewEqualJitterBackoff(
+		ctx.Done(),
+		10*time.Second,  // initial backoff
+		120*time.Second, // max backoff
+	)
+
 	for ctx.Err() == nil {
 		// Create a new processor for each run.
 		//
@@ -137,7 +148,7 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 		processor, err := azeventhubs.NewProcessor(
 			in.consumerClient,
 			in.checkpointStore,
-			nil,
+			nil, // default options
 		)
 		if err != nil {
 			in.log.Errorw("error creating processor", "error", err)
@@ -146,30 +157,39 @@ func (in *eventHubInputV2) run(ctx context.Context) {
 
 		// Launch one goroutines for each partition
 		// to process events.
-		go in.workersLoop(processor)
+		go in.workersLoop(ctx, processor)
 
 		// Run the processor to start processing events.
-		// This is a blocking call.
+		//
+		// This is a blocking call. It will return when the processor
+		// stops due to an error or when the context is cancelled.
 		if err := processor.Run(ctx); err != nil {
-			// FIXME: `Run()` returns an error when the processor thinks it's unrecoverable.
-			// We should check the error and decide if we want to retry or not. Should
-			// we add an and retry mechanism with exponential backoff?
-			in.log.Errorw("processor completed with an error", "error", err)
+			in.log.Errorw("processor exited with a non-nil error", "error", err)
 
 			// FIXME: `time.Sleep()` is not the best way to handle this.
 			// Using it for testing purposes.
-			time.Sleep(30 * time.Second)
+			// time.Sleep(30 * time.Second)
+			in.log.Infow("waiting before retrying starting the processor")
+
+			// FIXME: `Run()` returns an error when the processor thinks it's unrecoverable.
+			// We should check the error and decide if we want to retry or not. Should
+			// we add an and retry mechanism with exponential backoff?
+			processorRunBackoff.Wait()
+
+			in.log.Infow("ready to try to start the processor again")
 		}
 
-		in.log.Infow("run completed", "error", err)
+		in.log.Infow(
+			"run completed; continue if context error is nil",
+			"context_error", ctx.Err(),
+		)
 	}
-
 }
 
 // workersLoop starts a goroutine for each partition to process events.
-func (in *eventHubInputV2) workersLoop(processor *azeventhubs.Processor) {
+func (in *eventHubInputV2) workersLoop(ctx context.Context, processor *azeventhubs.Processor) {
 	for {
-		processorPartitionClient := processor.NextPartitionClient(context.TODO())
+		processorPartitionClient := processor.NextPartitionClient(ctx)
 		if processorPartitionClient == nil {
 			// We break out from the for loop when `NextPartitionClient`
 			// return `nil` (signals the processor has stopped).
@@ -177,13 +197,14 @@ func (in *eventHubInputV2) workersLoop(processor *azeventhubs.Processor) {
 		}
 
 		partitionID := processorPartitionClient.PartitionID()
+
 		go func() {
 			in.log.Infow(
 				"starting a partition worker",
 				"partition", partitionID,
 			)
 
-			if err := in.processEventsForPartition(processorPartitionClient); err != nil {
+			if err := in.processEventsForPartition(ctx, processorPartitionClient); err != nil {
 				// FIXME: it seems we always get an error, even when the processor is stopped.
 				in.log.Infow(
 					"stopping processing events for partition",
@@ -201,17 +222,17 @@ func (in *eventHubInputV2) workersLoop(processor *azeventhubs.Processor) {
 }
 
 // processEventsForPartition receives events from a partition and processes them.
-func (in *eventHubInputV2) processEventsForPartition(partitionClient *azeventhubs.ProcessorPartitionClient) error {
+func (in *eventHubInputV2) processEventsForPartition(ctx context.Context, partitionClient *azeventhubs.ProcessorPartitionClient) error {
 	// 1. [BEGIN] Initialize any partition specific resources for your application.
 	// 2. [CONTINUOUS] Loop, calling ReceiveEvents() and UpdateCheckpoint().
 	// 3. [END] Cleanup any resources.
-	partitionID := partitionClient.PartitionID()
-
 	defer func() {
 		// 3/3 [END] Do cleanup here, like shutting down database clients
 		// or other resources used for processing this partition.
 		shutdownPartitionResources(partitionClient)
 	}()
+
+	partitionID := partitionClient.PartitionID()
 
 	// 1/3 [BEGIN] Initialize any partition specific resources for your application.
 	if err := initializePartitionResources(partitionID); err != nil {
@@ -221,7 +242,7 @@ func (in *eventHubInputV2) processEventsForPartition(partitionClient *azeventhub
 	// 2/3 [CONTINUOUS] Receive events, checkpointing as needed using UpdateCheckpoint.
 	for {
 		// Wait up to a minute for 100 events, otherwise returns whatever we collected during that time.
-		receiveCtx, cancelReceive := context.WithTimeout(context.TODO(), 10*time.Second)
+		receiveCtx, cancelReceive := context.WithTimeout(ctx, 5*time.Second)
 		events, err := partitionClient.ReceiveEvents(receiveCtx, 100, nil)
 		cancelReceive()
 
@@ -252,7 +273,7 @@ func (in *eventHubInputV2) processEventsForPartition(partitionClient *azeventhub
 		//
 		// If processing needs to restart it will restart from this
 		// point, automatically.
-		if err := partitionClient.UpdateCheckpoint(context.TODO(), events[len(events)-1], nil); err != nil {
+		if err := partitionClient.UpdateCheckpoint(ctx, events[len(events)-1], nil); err != nil {
 			in.log.Errorw("error updating checkpoint", "error", err)
 			return err
 		}
