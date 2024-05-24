@@ -19,6 +19,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/ebpf_provider"
 	"github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/procfs_provider"
+	quarkprovider "github.com/elastic/beats/v7/x-pack/auditbeat/processors/sessionmd/provider/quark_provider"
 	cfg "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
@@ -82,8 +83,14 @@ func New(cfg *cfg.C) (beat.Processor, error) {
 	case "procfs":
 		p, err = procfs_provider.NewProvider(ctx, logger, db, reader, c.PIDField)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create ebpf provider: %w", err)
+			return nil, fmt.Errorf("failed to create procfs provider: %w", err)
 		}
+	case "quark":
+		p, err = quarkprovider.NewProvider(ctx, logger, db)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create quark provider: %w", err)
+		}
+
 	default:
 		return nil, fmt.Errorf("unknown backend configuration")
 	}

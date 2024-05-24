@@ -1,0 +1,3 @@
+[submodule "x-pack/auditbeat/processors/sessionmd/quark"]
+	path = x-pack/auditbeat/processors/sessionmd/quark
+	url = git@github.com:elastic/quark.git
