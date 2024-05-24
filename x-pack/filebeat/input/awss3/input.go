@@ -354,7 +354,7 @@ func getRegionFromQueueURL(queueURL string, endpoint, defaultRegion string) (reg
 	}
 
 	if (u.Scheme == "https" || u.Scheme == "http") && u.Host != "" {
-		queueHostSplit := strings.SplitN(u.Hostname(), ".", 3)
+		queueHostSplit := strings.SplitN(u.Host, ".", 3)
 		// check for sqs queue url
 
 		// Parse a user-provided custom endpoint
@@ -374,7 +374,7 @@ func getRegionFromQueueURL(queueURL string, endpoint, defaultRegion string) (reg
 
 		// Parse a standard SQS url
 		if len(queueHostSplit) == 3 && queueHostSplit[0] == "sqs" {
-			if queueHostSplit[2] == e.Hostname() || (endpoint == "" && strings.HasPrefix(queueHostSplit[2], "amazonaws.")) {
+			if queueHostSplit[2] == e.Host || (endpoint == "" && strings.HasPrefix(queueHostSplit[2], "amazonaws.")) {
 				region = queueHostSplit[1]
 				if defaultRegion != "" && region != defaultRegion {
 					return defaultRegion, regionMismatchError{queueURLRegion: region, defaultRegion: defaultRegion}
