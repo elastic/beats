@@ -212,6 +212,7 @@ func (client *Client) Clone() *Client {
 }
 
 func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error {
+	fmt.Printf("hi fae, Publish with %v events\n", len(batch.Events()))
 	span, ctx := apm.StartSpan(ctx, "publishEvents", "output")
 	defer span.End()
 	span.Context.SetLabel("events_original", len(batch.Events()))
@@ -223,6 +224,8 @@ func (client *Client) Publish(ctx context.Context, batch publisher.Batch) error 
 	if bulkResult.connErr != nil {
 		// If there was a connection-level error there is no per-item response,
 		// handle it and return.
+		fmt.Printf("hi fae, calling handleBulkResultError\n")
+		defer fmt.Printf("hi fae, returning from Publish\n")
 		return client.handleBulkResultError(ctx, batch, bulkResult)
 	}
 	span.Context.SetLabel("events_published", len(bulkResult.events))
@@ -255,6 +258,7 @@ func (client *Client) doBulkRequest(
 
 	rawEvents := batch.Events()
 
+	fmt.Printf("hi fae, doBulkRequest\n")
 	// encode events into bulk request buffer, dropping failed elements from
 	// events slice
 	resultEvents, bulkItems := client.bulkEncodePublishRequest(client.conn.GetVersion(), rawEvents)
@@ -266,6 +270,7 @@ func (client *Client) doBulkRequest(
 		begin := time.Now()
 		result.status, result.response, result.connErr =
 			client.conn.Bulk(ctx, "", "", bulkRequestParams, bulkItems)
+		fmt.Printf("hi fae, bulk status %v response %v\n", result.status, string(result.response))
 		if result.connErr == nil {
 			duration := time.Since(begin)
 			client.observer.ReportLatency(duration)
@@ -273,6 +278,8 @@ func (client *Client) doBulkRequest(
 				"doBulkRequest: %d events have been sent to elasticsearch in %v.",
 				len(result.events), duration)
 		}
+	} else {
+		fmt.Printf("hi fae, doBulkRequest had no events left after encoding\n")
 	}
 
 	return result
@@ -282,11 +289,14 @@ func (client *Client) handleBulkResultError(
 	ctx context.Context, batch publisher.Batch, bulkResult bulkResult,
 ) error {
 	if bulkResult.status == http.StatusRequestEntityTooLarge {
+		fmt.Printf("hi fae, got statusrequestentitytoolarge\n")
 		if batch.SplitRetry() {
+			fmt.Printf("hi fae, split a batch\n")
 			// Report that we split a batch
 			client.observer.BatchSplit()
 			client.observer.RetryableErrors(len(bulkResult.events))
 		} else {
+			fmt.Printf("hi fae, batch split failed\n")
 			// If the batch could not be split, there is no option left but
 			// to drop it and log the error state.
 			batch.Drop()
@@ -403,6 +413,7 @@ func getPipeline(event *beat.Event, defaultSelector *outil.Selector) (string, er
 // Each of the events will be reported in the returned stats as exactly one of
 // acked, duplicates, fails, nonIndexable, or deadLetter.
 func (client *Client) bulkCollectPublishFails(bulkResult bulkResult) ([]publisher.Event, bulkResultStats) {
+	fmt.Printf("hi fae, bulkCollectPublishFails\n")
 	events := bulkResult.events
 
 	if len(bulkResult.events) == 0 {

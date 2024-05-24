@@ -18,6 +18,7 @@
 package pipeline
 
 import (
+	"fmt"
 	"sync/atomic"
 
 	"github.com/elastic/beats/v7/libbeat/publisher"
@@ -161,6 +162,7 @@ func (b *ttlBatch) Cancelled() {
 }
 
 func (b *ttlBatch) RetryEvents(events []publisher.Event) {
+	fmt.Printf("hi fae, ttlBatch.RetryEvents\n")
 	b.events = events
 	b.Retry()
 }

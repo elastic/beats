@@ -217,21 +217,27 @@ func TestPublish(t *testing.T) {
 		// test results directly without atomics/mutexes.
 		done := false
 		retryCount := 0
+		var retryBatches []publisher.Batch
 		batch := encodeBatch(client, pipeline.NewBatchForTesting(
 			[]publisher.Event{event1, event2, event3},
 			func(b publisher.Batch) {
 				// The retry function sends the batch back through Publish.
 				// In a live pipeline it would instead be sent to eventConsumer
-				// first and then back to Publish when an output worker was
-				// available.
+				// and then back to Publish when an output worker was available.
 				retryCount++
-				err := client.Publish(ctx, b)
-				assert.NoError(t, err, "Publish should return without error")
+				retryBatches = append(retryBatches, b)
+				//err := client.Publish(ctx, b)
+				//assert.NoError(t, err, "Publish should return without error")
 			},
 			func() { done = true },
 		))
-		err := client.Publish(ctx, batch)
-		assert.NoError(t, err, "Publish should return without error")
+		retryBatches = []publisher.Batch{batch}
+		for len(retryBatches) > 0 {
+			batch := retryBatches[0]
+			retryBatches = retryBatches[1:]
+			err := client.Publish(ctx, batch)
+			assert.NoError(t, err, "Publish should return without error")
+		}
 
 		// There should be two retries: {[event1], [event2, event3]}.
 		// The first split batch should fail and be dropped since it contains
