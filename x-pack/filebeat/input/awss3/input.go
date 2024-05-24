@@ -80,8 +80,8 @@ func newInput(config config, store beater.StateStore) (*s3Input, error) {
 	if err == nil && config.AWSConfig.Endpoint != "" && !strings.HasPrefix(endpointUri.Hostname(), "s3") {
 
 		// For backwards compat:
-		// If the endpoint does not start with S3, we will use the endpoint resolver to all SDK requests through this endpoint
-		// If the endpoint does start with S3, we will use the default resolver which can replace s3 with the desired service name like sqs
+		// If the endpoint does not start with S3, we will use the endpoint resolver to make all SDK requests use the specified endpoint
+		// If the endpoint does start with S3, we will use the default resolver uses the endpoint field but can replace s3 with the desired service name like sqs
 
 		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
 			return awssdk.Endpoint{
@@ -123,8 +123,10 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 
 	if in.config.QueueURL != "" {
 		regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint, in.config.AWSConfig.DefaultRegion)
-		if err != nil && regionName != "" && in.config.RegionName == "" {
-			return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
+
+		// If we can't get a region from anywhere, error out
+		if err != nil && regionName == "" && in.config.RegionName == "" {
+			return fmt.Errorf("region not specified and failed to get AWS region from queue_url: %w", err)
 		}
 		var warn regionMismatchError
 		if errors.As(err, &warn) {
@@ -132,6 +134,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 			inputContext.Logger.Warnf("%v: using %q", err, regionName)
 		}
 
+		// Ensure we don't overwrite region when getRegionFromURL fails
 		if regionName != "" {
 			in.awsConfig.Region = regionName
 		}
