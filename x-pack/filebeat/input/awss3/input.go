@@ -123,7 +123,7 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 
 	if in.config.QueueURL != "" {
 		regionName, err := getRegionFromQueueURL(in.config.QueueURL, in.config.AWSConfig.Endpoint, in.config.AWSConfig.DefaultRegion)
-		if err != nil && in.config.RegionName == "" {
+		if err != nil && regionName != "" && in.config.RegionName == "" {
 			return fmt.Errorf("failed to get AWS region from queue_url: %w", err)
 		}
 		var warn regionMismatchError
@@ -358,7 +358,8 @@ func getRegionFromQueueURL(queueURL string, endpoint, defaultRegion string) (reg
 			// Check if everything after the second dot in the queue url matches everything after the second dot in the endpoint
 			endpointMatchesQueueUrl := strings.SplitN(u.Hostname(), ".", 3)[2] == strings.SplitN(e.Hostname(), ".", 3)[2]
 			if !endpointMatchesQueueUrl {
-				return "", fmt.Errorf("endpoint %q does not match queue_url %q", e.Hostname(), u.Hostname())
+				// We cannot infer the region by matching the endpoint and queue url
+				return "", regionMismatchError{queueURLRegion: queueHostSplit[1], defaultRegion: endpointSplit[1]}
 			}
 
 			region = queueHostSplit[1]
