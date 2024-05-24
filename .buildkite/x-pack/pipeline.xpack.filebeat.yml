@@ -238,8 +238,6 @@ steps:
               context: "x-pack/filebeat: macOS x86_64 Unit Tests"
 
       - label: ":mac: x-pack/filebeat macOS arm64 Unit Tests"
-        skip: "Skipping due to elastic/beats#33036"
-        # https://github.com/elastic/beats/issues/33036
         if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
         command: |
           set -euo pipefail
