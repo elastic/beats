@@ -474,17 +474,12 @@ func Config() {
 	mg.Deps(configYML)
 }
 
-// ControlProto generates pkg/agent/control/proto module.
+// ControlProto generates pkg/agent/control/cproto module.
 func ControlProto() error {
-	err := sh.RunV("protoc", "--go_out=plugins=grpc:.", "control.proto")
-	if err == nil {
-		return nil
-	}
-
 	return sh.RunV(
 		"protoc",
-		"--go_out=pkg/agent/control/proto/", "--go_opt=paths=source_relative",
-		"--go-grpc_out=pkg/agent/control/proto/", "--go-grpc_opt=paths=source_relative",
+		"--go_out=pkg/agent/control/cproto/", "--go_opt=paths=source_relative",
+		"--go-grpc_out=pkg/agent/control/cproto/", "--go-grpc_opt=paths=source_relative",
 		"control.proto")
 }
 
