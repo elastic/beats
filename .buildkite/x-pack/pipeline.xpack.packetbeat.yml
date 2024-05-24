@@ -3,11 +3,13 @@ name: "beats-xpack-packetbeat"
 
 env:
   AWS_ARM_INSTANCE_TYPE: "t4g.xlarge"
+  AWS_IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
   GCP_DEFAULT_MACHINE_TYPE: "c2d-highcpu-8"
   GCP_HI_PERF_MACHINE_TYPE: "c2d-highcpu-16"
   GCP_WIN_MACHINE_TYPE: "n2-standard-8"
   IMAGE_MACOS_X86_64: "generic-13-ventura-x64"
-  IMAGE_UBUNTU_ARM_64: "platform-ingest-beats-ubuntu-2204-aarch64"
+
   IMAGE_UBUNTU_X86_64: "family/platform-ingest-beats-ubuntu-2204"
   IMAGE_WIN_10: "family/platform-ingest-beats-windows-10"
   IMAGE_WIN_2016: "family/platform-ingest-beats-windows-2016"
@@ -23,8 +25,9 @@ env:
 steps:
   - group: "x-pack/packetbeat Mandatory Tests"
     key: "x-pack-packetbeat-mandatory-tests"
+
     steps:
-      - label: ":linux: Ubuntu Unit Tests"
+      - label: ":ubuntu: x-pack/packetbeat Linux x86_64 Unit Tests"
         key: "mandatory-linux-unit-test"
         command: |
           cd x-pack/packetbeat
@@ -41,9 +44,9 @@ steps:
           - "x-pack/packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/packetbeat: Ubuntu Unit Tests"
+              context: "x-pack/packetbeat: Linux x86_64 Unit Tests"
 
-      - label: ":linux: Ubuntu ARM Unit Tests"
+      - label: ":ubuntu: x-pack/packetbeat Linux arm64 Unit Tests"
         key: "extended-arm64-unit-test"
         command: |
           cd x-pack/packetbeat
@@ -54,16 +57,16 @@ steps:
             - limit: 3
         agents:
           provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         artifact_paths:
           - "x-pack/packetbeat/build/*.xml"
           - "x-pack/packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/packetbeat: Ubuntu ARM Unit Tests"
+              context: "x-pack/packetbeat: Linux arm64 Unit Tests"
 
-      - label: ":windows: Windows 2019 Unit Tests"
+      - label: ":windows: x-pack/packetbeat Win-2019 Unit Tests"
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
@@ -82,13 +85,14 @@ steps:
           - "x-pack/packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/packetbeat: Windows 2019 Unit Tests"
+              context: "x-pack/packetbeat: Win-2019 Unit Tests"
 
   - group: "x-pack/packetbeat Extended Windows Tests"
     key: "x-pack-packetbeat-extended-win-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*[Ww]indows.*/
+
     steps:
-      - label: ":windows: Windows 10 Unit Tests"
+      - label: ":windows: x-pack/packetbeat Win 10 Unit Tests"
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
@@ -107,9 +111,9 @@ steps:
           - "x-pack/packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/packetbeat: Windows 10 Unit Tests"
+              context: "x-pack/packetbeat: Win-10 Unit Tests"
 
-      - label: ":windows: Windows 2016 Unit Tests"
+      - label: ":windows: x-pack/packetbeat Win-2016 Unit Tests"
         command: |
           Set-Location -Path x-pack/packetbeat
           mage build unitTest
@@ -128,13 +132,14 @@ steps:
           - "x-pack/packetbeat/build/*.json"
         notify:
           - github_commit_status:
-              context: "x-pack/packetbeat: Windows 2016 Unit Tests"
+              context: "x-pack/packetbeat: Win-2016 Unit Tests"
 
-  - group: "x-pack/packetbeat MacOS Extended Tests"
+  - group: "x-pack/packetbeat Extended Tests"
     key: "x-pack-packetbeat-extended-macos-tests"
     if: build.env("BUILDKITE_PULL_REQUEST") == "false" || build.env("GITHUB_PR_LABELS") =~ /.*macOS.*/
+
     steps:
-      - label: ":mac: MacOS Unit Tests"
+      - label: ":mac: x-pack/packetbeat macOS Unit Tests"
         key: "extended-macos-unit-tests"
         command: |
           set -euo pipefail
@@ -160,8 +165,9 @@ steps:
     depends_on:
       - step: "x-pack-packetbeat-mandatory-tests"
         allow_failure: false
+
     steps:
-      - label: ":linux: Packaging Linux"
+      - label: ":ubuntu: x-pack/packetbeat Packaging Linux"
         key: "packaging-linux"
         command: |
           cd x-pack/packetbeat
@@ -182,7 +188,7 @@ steps:
           - github_commit_status:
               context: "x-pack/packetbeat: Packaging Linux"
 
-      - label: ":linux: Packaging ARM"
+      - label: ":ubuntu: x-pack/packetbeat Packaging Linux arm64"
         key: "packaging-arm"
         command: |
           cd x-pack/packetbeat
@@ -193,11 +199,11 @@ steps:
         timeout_in_minutes: 20
         agents:
           provider: "aws"
-          imagePrefix: "${IMAGE_UBUNTU_ARM_64}"
+          imagePrefix: "${AWS_IMAGE_UBUNTU_ARM_64}"
           instanceType: "${AWS_ARM_INSTANCE_TYPE}"
         env:
           PLATFORMS: "linux/arm64"
           PACKAGES: "docker"
         notify:
           - github_commit_status:
-              context: "x-pack/packetbeat: Packaging Linux ARM"
+              context: "x-pack/packetbeat: Packaging Linux arm64"
