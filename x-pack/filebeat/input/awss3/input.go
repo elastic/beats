@@ -81,9 +81,8 @@ func newInput(config config, store beater.StateStore) (*s3Input, error) {
 
 		// For backwards compat:
 		// If the endpoint does not start with S3, we will use the endpoint resolver to all SDK requests through this endpoint
-		// If the endpoint does start with S3, we will use the default resolver which can replace s3 with the service name
+		// If the endpoint does start with S3, we will use the default resolver which can replace s3 with the desired service name like sqs
 
-		// Get the resolver from the endpoint url
 		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
 			return awssdk.Endpoint{
 				PartitionID:       "aws",
@@ -336,6 +335,7 @@ var errBadQueueURL = errors.New("QueueURL is not in format: https://sqs.{REGION_
 
 func getRegionFromQueueURL(queueURL string, endpoint, defaultRegion string) (region string, err error) {
 	// get region from queueURL
+	// Example for custom domain queue: https://sqs.us-east-1.abc.xyz/12345678912/test-s3-logs
 	// Example for sqs queue: https://sqs.us-east-1.amazonaws.com/12345678912/test-s3-logs
 	// Example for vpce: https://vpce-test.sqs.us-east-1.vpce.amazonaws.com/12345678912/sqs-queue
 	u, err := url.Parse(queueURL)
