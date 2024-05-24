@@ -354,9 +354,9 @@ func getRegionFromQueueURL(queueURL string, endpoint, defaultRegion string) (reg
 		// check for sqs queue url
 
 		// Parse a user-provided custom endpoint
-		if endpoint != "" && queueHostSplit[0] == "sqs" && len(queueHostSplit) >= 3 && len(endpointSplit) >= 3 {
+		if endpoint != "" && queueHostSplit[0] == "sqs" && len(queueHostSplit) == 3 && len(endpointSplit) == 3 {
 			// Check if everything after the second dot in the queue url matches everything after the second dot in the endpoint
-			endpointMatchesQueueUrl := strings.SplitN(u.Hostname(), ".", 2)[2] == strings.SplitN(e.Hostname(), ".", 2)[2]
+			endpointMatchesQueueUrl := strings.SplitN(u.Hostname(), ".", 3)[2] == strings.SplitN(e.Hostname(), ".", 3)[2]
 			if !endpointMatchesQueueUrl {
 				return "", fmt.Errorf("endpoint %q does not match queue_url %q", e.Hostname(), u.Hostname())
 			}
