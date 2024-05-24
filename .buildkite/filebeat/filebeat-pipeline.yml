@@ -91,6 +91,7 @@ steps:
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet filebeat
 
+          cd filebeat
           STACK_ENVIRONMENT=prev-minor
           TESTING_FILEBEAT_SKIP_DIFF=1
           PYTEST_ADDOPTS='-k test_modules'
@@ -116,6 +117,7 @@ steps:
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet filebeat
 
+          cd filebeat
           STACK_ENVIRONMENT=next-major
           TESTING_FILEBEAT_SKIP_DIFF=1
           mage pythonIntegTest
