@@ -14,7 +14,9 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"reflect"
+	"strings"
 	"sync"
 	"time"
 
@@ -101,11 +103,26 @@ func (e *httpEndpoint) Test(_ v2.TestContext) error {
 func (e *httpEndpoint) Run(ctx v2.Context, publisher stateless.Publisher) error {
 	metrics := newInputMetrics(ctx.ID)
 	defer metrics.Close()
+
+	if e.config.Tracer != nil {
+		id := sanitizeFileName(ctx.ID)
+		e.config.Tracer.Filename = strings.ReplaceAll(e.config.Tracer.Filename, "*", id)
+	}
+
 	err := servers.serve(ctx, e, publisher, metrics)
 	if err != nil && !errors.Is(err, http.ErrServerClosed) {
 		return fmt.Errorf("unable to start server due to error: %w", err)
 	}
 	return nil
+}
+
+// sanitizeFileName returns name with ":" and "/" replaced with "_", removing repeated instances.
+// The request.tracer.filename may have ":" when a http_endpoint input has cursor config and
+// the macOS Finder will treat this as path-separator and causes to show up strange filepaths.
+func sanitizeFileName(name string) string {
+	name = strings.ReplaceAll(name, ":", string(filepath.Separator))
+	name = filepath.Clean(name)
+	return strings.ReplaceAll(name, string(filepath.Separator), "_")
 }
 
 // servers is the package-level server pool.
