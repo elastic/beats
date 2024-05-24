@@ -137,7 +137,10 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 			// Warn of mismatch, but go ahead with configured region name.
 			inputContext.Logger.Warnf("%v: using %q", err, regionName)
 		}
-		in.awsConfig.Region = regionName
+
+		if regionName != "" {
+			in.awsConfig.Region = regionName
+		}
 
 		// Create SQS receiver and S3 notification processor.
 		receiver, err := in.createSQSReceiver(inputContext, pipeline)
@@ -353,6 +356,23 @@ func getRegionFromQueueURL(queueURL string, endpoint, defaultRegion string) (reg
 	if (u.Scheme == "https" || u.Scheme == "http") && u.Host != "" {
 		queueHostSplit := strings.SplitN(u.Hostname(), ".", 3)
 		// check for sqs queue url
+
+		// Parse a user-provided custom endpoint
+		if endpoint != "" && len(queueHostSplit) >= 3 && queueHostSplit[0] == "sqs" {
+			// Check if everything after the first dot in the queue url matches everything after the first dot in the endpoint
+			endpointMatchesQueueUrl := strings.SplitN(u.Hostname(), ".", 2)[1] == strings.SplitN(e.Hostname(), ".", 2)[1]
+			if !endpointMatchesQueueUrl {
+				return "", fmt.Errorf("endpoint %q does not match queue_url %q", e.Hostname(), u.Hostname())
+			}
+
+			region = queueHostSplit[1]
+			if defaultRegion != "" && region != defaultRegion {
+				return region, regionMismatchError{queueURLRegion: region, defaultRegion: defaultRegion}
+			}
+			return region, nil
+		}
+
+		// Parse a standard SQS url
 		if len(queueHostSplit) == 3 && queueHostSplit[0] == "sqs" {
 			if queueHostSplit[2] == e.Hostname() || (endpoint == "" && strings.HasPrefix(queueHostSplit[2], "amazonaws.")) {
 				region = queueHostSplit[1]
