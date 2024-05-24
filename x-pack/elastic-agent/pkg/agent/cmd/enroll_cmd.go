@@ -7,9 +7,9 @@ package cmd
 import (
 	"bytes"
 	"context"
+	stderror "errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -27,7 +27,7 @@ import (
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/application/paths"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/configuration"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/client"
-	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/proto"
+	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/control/cproto"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/errors"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/install"
 	"github.com/elastic/beats/v7/x-pack/elastic-agent/pkg/agent/storage"
@@ -269,7 +269,7 @@ func (c *enrollCmd) writeDelayEnroll(streams *cli.IOStreams) error {
 			errors.TypeConfig,
 			errors.M("path", enrollPath))
 	}
-	err = ioutil.WriteFile(enrollPath, data, 0600)
+	err = os.WriteFile(enrollPath, data, 0600)
 	if err != nil {
 		return errors.New(
 			err,
@@ -602,7 +602,7 @@ func (c *enrollCmd) startAgent(ctx context.Context) (<-chan *os.ProcessState, er
 
 func (c *enrollCmd) stopAgent() {
 	if c.agentProc != nil {
-		c.agentProc.StopWait()
+		c.agentProc.StopWait() //nolint:errcheck // no error check here
 		c.agentProc = nil
 	}
 }
@@ -664,7 +664,7 @@ func waitForAgent(ctx context.Context, timeout time.Duration) error {
 		for {
 			backOff.Wait()
 			_, err := getDaemonStatus(innerCtx)
-			if err == context.Canceled {
+			if stderror.Is(err, context.Canceled) {
 				resChan <- waitResult{err: err}
 				return
 			}
@@ -714,7 +714,7 @@ func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessStat
 		for {
 			backExp.Wait()
 			status, err := getDaemonStatus(innerCtx)
-			if err == context.Canceled {
+			if stderror.Is(err, context.Canceled) {
 				resChan <- waitResult{err: err}
 				return
 			}
@@ -751,7 +751,7 @@ func waitForFleetServer(ctx context.Context, agentSubproc <-chan *os.ProcessStat
 				continue
 			}
 			log.Debugf("%s: %s - %s", waitingForFleetServer, app.Status, app.Message)
-			if app.Status == proto.Status_DEGRADED || app.Status == proto.Status_HEALTHY {
+			if app.Status == cproto.Status_DEGRADED || app.Status == cproto.Status_HEALTHY {
 				// app has started and is running
 				if app.Message != "" {
 					log.Infof("Fleet Server - %s", app.Message)
@@ -827,7 +827,7 @@ func safelyStoreAgentInfo(s saver, reader io.Reader) error {
 	for i := 0; i <= maxRetriesstoreAgentInfo; i++ {
 		backExp.Wait()
 		err = storeAgentInfo(s, reader)
-		if err != filelock.ErrAppAlreadyRunning {
+		if stderror.Is(err, filelock.ErrAppAlreadyRunning) {
 			break
 		}
 	}
@@ -841,7 +841,7 @@ func storeAgentInfo(s saver, reader io.Reader) error {
 	if err := fileLock.TryLock(); err != nil {
 		return err
 	}
-	defer fileLock.Unlock()
+	defer fileLock.Unlock() //nolint:errcheck // defered call
 
 	if err := s.Save(reader); err != nil {
 		return errors.New(err, "could not save enrollment information", errors.TypeFilesystem)
