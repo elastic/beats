@@ -198,7 +198,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - The environment variable `BEATS_ADD_CLOUD_METADATA_PROVIDERS` overrides configured/default `add_cloud_metadata` providers {pull}38669[38669]
 - Introduce log message for not supported annotations for Hints based autodiscover {pull}38213[38213]
 - Add persistent volume claim name to volume if available {pull}38839[38839]
-
+- Raw events are now logged to a different file, this prevents potentially sensitive information from leaking into log files {pull}38767[38767]
 
 *Auditbeat*
 
@@ -273,6 +273,7 @@ https://github.com/elastic/beats/compare/v8.8.1\...main[Check the HEAD diff]
 - Ensure all responses sent by HTTP Endpoint are HTML-escaped. {pull}39329[39329]
 - Update CEL mito extensions to v1.11.0 to improve type checking. {pull}39460[39460]
 - Improve logging of request and response with request trace logging in error conditions. {pull}39455[39455]
+- Implement Elastic Agent status and health reporting for CEL Filebeat input. {pull}39209[39209]
 - Add HTTP metrics to CEL input. {issue}39501[39501] {pull}39503[39503]
 - Add default user-agent to CEL HTTP requests. {issue}39502[39502] {pull}39587[39587]
 - Improve reindexing support in security module pipelines. {issue}38224[38224] {pull}[]

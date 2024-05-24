@@ -29,6 +29,7 @@ import (
 	"github.com/elastic/beats/v7/libbeat/common"
 	"github.com/elastic/beats/v7/libbeat/common/diagnostics"
 	"github.com/elastic/beats/v7/libbeat/common/reload"
+	"github.com/elastic/beats/v7/libbeat/management/status"
 	"github.com/elastic/beats/v7/libbeat/publisher/pipetool"
 	"github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
@@ -153,6 +154,12 @@ func (r *RunnerList) Reload(configs []*reload.ConfigWithMeta) error {
 
 		r.logger.Debugf("Starting runner: %s", runner)
 		r.runners[hash] = runner
+		if config.StatusReporter != nil {
+			if runnerWithStatus, ok := runner.(status.WithStatusReporter); ok {
+				runnerWithStatus.SetStatusReporter(config.StatusReporter)
+			}
+		}
+
 		runner.Start()
 		moduleStarts.Add(1)
 		if config.DiagCallback != nil {
