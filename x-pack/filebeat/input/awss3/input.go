@@ -6,6 +6,8 @@ package awss3
 
 import (
 	"fmt"
+	"net/url"
+	"strings"
 
 	awssdk "github.com/aws/aws-sdk-go-v2/aws"
 
@@ -48,13 +50,21 @@ func (im *s3InputManager) Create(cfg *conf.C) (v2.Input, error) {
 		return nil, fmt.Errorf("initializing AWS config: %w", err)
 	}
 
-	if config.AWSConfig.Endpoint != "" {
-		// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
+	endpointUri, err := url.Parse(config.AWSConfig.Endpoint)
+	// A custom endpoint has been specified!
+	if err == nil && config.AWSConfig.Endpoint != "" && !strings.HasPrefix(endpointUri.Hostname(), "s3") {
+
+		// For backwards compat:
+		// If the endpoint does not start with S3, we will use the endpoint resolver to make all SDK requests use the specified endpoint
+		// If the endpoint does start with S3, we will use the default resolver uses the endpoint field but can replace s3 with the desired service name like sqs
+
 		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
 			return awssdk.Endpoint{
-				PartitionID:   "aws",
-				URL:           config.AWSConfig.Endpoint,
-				SigningRegion: awsConfig.Region,
+				PartitionID:       "aws",
+				Source:            awssdk.EndpointSourceCustom,
+				URL:               config.AWSConfig.Endpoint,
+				SigningRegion:     awsConfig.Region,
+				HostnameImmutable: true,
 			}, nil
 		})
 	}

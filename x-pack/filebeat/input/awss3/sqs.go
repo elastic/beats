@@ -33,6 +33,7 @@ var errBadQueueURL = errors.New("QueueURL is not in format: https://sqs.{REGION_
 
 func getRegionFromQueueURL(queueURL, endpoint string) string {
 	// get region from queueURL
+	// Example for custom domain queue: https://sqs.us-east-1.abc.xyz/12345678912/test-s3-logs
 	// Example for sqs queue: https://sqs.us-east-1.amazonaws.com/12345678912/test-s3-logs
 	// Example for vpce: https://vpce-test.sqs.us-east-1.vpce.amazonaws.com/12345678912/sqs-queue
 	u, err := url.Parse(queueURL)
@@ -40,8 +41,33 @@ func getRegionFromQueueURL(queueURL, endpoint string) string {
 		return ""
 	}
 
-	// check for sqs queue url
+	e, err := url.Parse(endpoint)
+	if err != nil {
+		return ""
+	}
+
+	// Parse a user-provided custom endpoint to see if we can get the region from it
+	// requires the endpoint to be in the format of https://s3.{REGION_ENDPOINT}.{ENDPOINT}
+	// requires the queue url to be in the format of https://sqs.{REGION_ENDPOINT}.{ENDPOINT}
+	// If the endpoint value matches, return the region_endpoint
 	host := strings.SplitN(u.Host, ".", 3)
+	custom_endpoint := strings.SplitN(e.Host, ".", 3)
+
+	if endpoint != "" && custom_endpoint[0] == "s3" && len(host) == 3 && len(custom_endpoint) == 3 {
+		// Check if everything after the second dot in the queue url matches everything after the second dot in the endpoint
+		endpointMatchesQueueUrl := strings.SplitN(u.Hostname(), ".", 3)[2] == strings.SplitN(e.Hostname(), ".", 3)[2]
+
+		// We cannot infer the region by matching the endpoint and queue url
+		if !endpointMatchesQueueUrl {
+			return ""
+		}
+
+		region := host[1]
+		return region
+	}
+
+	// check for sqs queue url
+	host = strings.SplitN(u.Host, ".", 3)
 	if len(host) == 3 && host[0] == "sqs" {
 		if host[2] == endpoint || (endpoint == "" && strings.HasPrefix(host[2], "amazonaws.")) {
 			return host[1]
