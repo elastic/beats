@@ -70,35 +70,30 @@ type s3Input struct {
 func newInput(config config, store beater.StateStore) (*s3Input, error) {
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
 
-	// A custom endpoint has been specified!
-	if config.AWSConfig.Endpoint != "" {
-		endpointUri, err := url.Parse(config.AWSConfig.Endpoint)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
+	}
 
-		if err != nil {
-			// Log the error and continue with the default endpoint
-			fmt.Printf("Failed to parse the endpoint: %v", err)
-		}
+	endpointUri, err := url.Parse(config.AWSConfig.Endpoint)
+
+	// A custom endpoint has been specified!
+	if err == nil && config.AWSConfig.Endpoint != "" && !strings.HasPrefix(endpointUri.Hostname(), "s3") {
 
 		// For backwards compat:
 		// If the endpoint does not start with S3, we will use the endpoint resolver to all SDK requests through this endpoint
 		// If the endpoint does start with S3, we will use the default resolver which can replace s3 with the service name
 
-		if !strings.HasPrefix(endpointUri.Hostname(), "s3") {
-			// Get the resolver from the endpoint url
-			awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
-				return awssdk.Endpoint{
-					PartitionID:       "aws",
-					Source:            awssdk.EndpointSourceCustom,
-					URL:               config.AWSConfig.Endpoint,
-					SigningRegion:     awsConfig.Region,
-					HostnameImmutable: true,
-				}, nil
-			})
-		}
-	}
+		// Get the resolver from the endpoint url
+		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
+			return awssdk.Endpoint{
+				PartitionID:       "aws",
+				Source:            awssdk.EndpointSourceCustom,
+				URL:               config.AWSConfig.Endpoint,
+				SigningRegion:     awsConfig.Region,
+				HostnameImmutable: true,
+			}, nil
+		})
 
-	if err != nil {
-		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
 	}
 
 	return &s3Input{
@@ -355,12 +350,13 @@ func getRegionFromQueueURL(queueURL string, endpoint, defaultRegion string) (reg
 
 	if (u.Scheme == "https" || u.Scheme == "http") && u.Host != "" {
 		queueHostSplit := strings.SplitN(u.Host, ".", 3)
+		endpointSplit := strings.SplitN(e.Host, ".", 3)
 		// check for sqs queue url
 
 		// Parse a user-provided custom endpoint
-		if endpoint != "" && len(queueHostSplit) >= 3 && queueHostSplit[0] == "sqs" {
-			// Check if everything after the first dot in the queue url matches everything after the first dot in the endpoint
-			endpointMatchesQueueUrl := strings.SplitN(u.Hostname(), ".", 2)[1] == strings.SplitN(e.Hostname(), ".", 2)[1]
+		if endpoint != "" && queueHostSplit[0] == "sqs" && len(queueHostSplit) >= 3 && len(endpointSplit) >= 3 {
+			// Check if everything after the second dot in the queue url matches everything after the second dot in the endpoint
+			endpointMatchesQueueUrl := strings.SplitN(u.Hostname(), ".", 2)[2] == strings.SplitN(e.Hostname(), ".", 2)[2]
 			if !endpointMatchesQueueUrl {
 				return "", fmt.Errorf("endpoint %q does not match queue_url %q", e.Hostname(), u.Hostname())
 			}
@@ -374,7 +370,8 @@ func getRegionFromQueueURL(queueURL string, endpoint, defaultRegion string) (reg
 
 		// Parse a standard SQS url
 		if len(queueHostSplit) == 3 && queueHostSplit[0] == "sqs" {
-			if queueHostSplit[2] == e.Host || (endpoint == "" && strings.HasPrefix(queueHostSplit[2], "amazonaws.")) {
+			// handle endpoint with no scheme, handle endpoint with scheme
+			if queueHostSplit[2] == endpoint || queueHostSplit[2] == e.Host || (endpoint == "" && strings.HasPrefix(queueHostSplit[2], "amazonaws.")) {
 				region = queueHostSplit[1]
 				if defaultRegion != "" && region != defaultRegion {
 					return defaultRegion, regionMismatchError{queueURLRegion: region, defaultRegion: defaultRegion}
