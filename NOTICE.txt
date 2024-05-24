@@ -10459,11 +10459,11 @@ Contents of probable licence file $GOMODCACHE/github.com/containerd/fifo@v1.1.0/
 
 --------------------------------------------------------------------------------
 Dependency : github.com/coreos/go-systemd/v22
-Version: v22.5.0
+Version: v22.3.2
 Licence type (autodetected): Apache-2.0
 --------------------------------------------------------------------------------
 
-Contents of probable licence file $GOMODCACHE/github.com/coreos/go-systemd/v22@v22.5.0/LICENSE:
+Contents of probable licence file $GOMODCACHE/github.com/coreos/go-systemd/v22@v22.3.2/LICENSE:
 
 Apache License
 Version 2.0, January 2004
