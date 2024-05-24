@@ -25,9 +25,10 @@ RUN microdnf -y update && \
     microdnf -y install findutils shadow-utils && \
     microdnf clean all
 {{- else }}
+# Install nghttp2 to keep it up to date, it is present in the base image but at an older version.
 RUN for iter in {1..10}; do \
         apt-get update -y && \
-        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes ca-certificates curl gawk libcap2-bin xz-utils && \
+        DEBIAN_FRONTEND=noninteractive apt-get install --no-install-recommends --yes ca-certificates curl gawk libcap2-bin xz-utils nghttp2 && \
         apt-get clean all && \
         exit_code=0 && break || exit_code=$? && echo "apt-get error: retry $iter in 10s" && sleep 10; \
     done; \
@@ -152,7 +153,7 @@ RUN chown -R {{ .user }} $NODE_PATH
 USER {{ .user }}
 # If this fails dump the NPM logs
 RUN npm i -g --loglevel verbose --engine-strict @elastic/synthetics@stack_release || sh -c 'tail -n +1 /root/.npm/_logs/* && exit 1'
-RUN chmod ug+rwX -R $NODE_PATH 
+RUN chmod ug+rwX -R $NODE_PATH
 USER root
 
 # Install the deps as needed by the exact version of playwright elastic synthetics uses
