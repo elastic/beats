@@ -70,6 +70,29 @@ type s3Input struct {
 func newInput(config config, store beater.StateStore) (*s3Input, error) {
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
 
+	if config.AWSConfig.Endpoint != "" {
+		endpointUri, err := url.Parse(config.AWSConfig.Endpoint)
+
+		if err != nil {
+			// Log the error and continue with the default endpoint
+			fmt.Printf("Failed to parse the endpoint: %v", err)
+		}
+
+		// For backwards compat, if the endpoint does not start with S3, we will use the endpoint resolver to all SDK requests through this endpoint
+		if !strings.HasPrefix(endpointUri.Hostname(), "s3") {
+			// Get the resolver from the endpoint url
+			awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
+				return awssdk.Endpoint{
+					PartitionID:       "aws",
+					Source:            awssdk.EndpointSourceCustom,
+					URL:               config.AWSConfig.Endpoint,
+					SigningRegion:     awsConfig.Region,
+					HostnameImmutable: true,
+				}, nil
+			})
+		}
+	}
+
 	// Add a custom endpointResolver to the awsConfig so that all the requests are routed to this endpoint
 	awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
 
@@ -195,6 +218,8 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 }
 
 func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*sqsReader, error) {
+
+	// parse the Endpoint as a uri and extract the domain
 
 	sqsAPI := &awsSQSAPI{
 		client: sqs.NewFromConfig(in.awsConfig, func(o *sqs.Options) {
