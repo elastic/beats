@@ -135,7 +135,8 @@ func (in *s3Input) Run(inputContext v2.Context, pipeline beat.Pipeline) error {
 		}
 
 		// Ensure we don't overwrite region when getRegionFromURL fails
-		if regionName != "" {
+		// Ensure we don't overwrite a user-specified region with a parsed region.
+		if regionName != "" && in.config.RegionName == "" {
 			in.awsConfig.Region = regionName
 		}
 
@@ -361,8 +362,9 @@ func getRegionFromQueueURL(queueURL string, endpoint, defaultRegion string) (reg
 			// Check if everything after the second dot in the queue url matches everything after the second dot in the endpoint
 			endpointMatchesQueueUrl := strings.SplitN(u.Hostname(), ".", 3)[2] == strings.SplitN(e.Hostname(), ".", 3)[2]
 			if !endpointMatchesQueueUrl {
-				// We cannot infer the region by matching the endpoint and queue url
-				return "", regionMismatchError{queueURLRegion: queueHostSplit[1], defaultRegion: endpointSplit[1]}
+				// We couldn't resolve the URL
+				// We cannot infer the region by matching the endpoint and queue url, return the default region with a region mismatch warning
+				return defaultRegion, regionMismatchError{queueURLRegion: queueHostSplit[1], defaultRegion: endpointSplit[1]}
 			}
 
 			region = queueHostSplit[1]
