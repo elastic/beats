@@ -31,17 +31,17 @@ The module supports the following types of metrics:
 [float]
 === Suported tag extensions
 
-The `statsd` module supports the following tags:
+Example of tag styles supported by the `statsd` module:
 
-https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/?tab=metrics#the-dogstatsd-protocol[DogStatsD-style tags]
+https://docs.datadoghq.com/developers/dogstatsd/datagram_shell/?tab=metrics#the-dogstatsd-protocol[DogStatsD]
 
 `<metric name>:<value>|<type>|@samplerate|#<k>:<v>,<k>:<v>`
 
-https://github.com/influxdata/telegraf/blob/master/plugins/inputs/statsd/README.md#influx-statsd[InfluxDB-style tags]
+https://github.com/influxdata/telegraf/blob/master/plugins/inputs/statsd/README.md#influx-statsd[InfluxDB]
 
 `<metric name>,<k>=<v>,<k>=<v>:<value>|<type>|@samplerate`
 
-https://graphite.readthedocs.io/en/latest/tags.html#graphite-tag-support[Graphite_1.1.x-style tags]
+https://graphite.readthedocs.io/en/latest/tags.html#graphite-tag-support[Graphite_1.1.x]
 
 `<metric name>;<k>=<v>;<k>=<v>:<value>|<type>|@samplerate`
 
