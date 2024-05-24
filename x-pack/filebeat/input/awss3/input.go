@@ -69,30 +69,30 @@ type s3Input struct {
 
 func newInput(config config, store beater.StateStore) (*s3Input, error) {
 	awsConfig, err := awscommon.InitializeAWSConfig(config.AWSConfig)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
 	}
 
-	endpointUri, err := url.Parse(config.AWSConfig.Endpoint)
-
 	// A custom endpoint has been specified!
-	if err == nil && config.AWSConfig.Endpoint != "" && !strings.HasPrefix(endpointUri.Hostname(), "s3") {
+	if config.AWSConfig.Endpoint != "" {
+		endpointUri, err := url.Parse(config.AWSConfig.Endpoint)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse endpoint as url/domain: %w", err)
+		}
 
 		// For backwards compat:
 		// If the endpoint does not start with S3, we will use the endpoint resolver to make all SDK requests use the specified endpoint
 		// If the endpoint does start with S3, we will use the default resolver uses the endpoint field but can replace s3 with the desired service name like sqs
-
-		awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
-			return awssdk.Endpoint{
-				PartitionID:       "aws",
-				Source:            awssdk.EndpointSourceCustom,
-				URL:               config.AWSConfig.Endpoint,
-				SigningRegion:     awsConfig.Region,
-				HostnameImmutable: true,
-			}, nil
-		})
-
+		if !strings.HasPrefix(endpointUri.Hostname(), "s3") {
+			awsConfig.EndpointResolverWithOptions = awssdk.EndpointResolverWithOptionsFunc(func(service, region string, options ...interface{}) (awssdk.Endpoint, error) {
+				return awssdk.Endpoint{
+					PartitionID:   "aws",
+					Source:        awssdk.EndpointSourceCustom,
+					URL:           config.AWSConfig.Endpoint,
+					SigningRegion: awsConfig.Region,
+				}, nil
+			})
+		}
 	}
 
 	return &s3Input{
