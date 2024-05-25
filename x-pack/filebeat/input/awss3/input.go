@@ -73,11 +73,19 @@ func newInput(config config, store beater.StateStore) (*s3Input, error) {
 		return nil, fmt.Errorf("failed to initialize AWS credentials: %w", err)
 	}
 
+	// The awsConfig now contains the region from the credential profile or default region
+	// if the region is explicitly set in the config, then it wins
+	if config.RegionName != "" {
+		awsConfig.Region = config.RegionName
+	}
+
 	// A custom endpoint has been specified!
 	if config.AWSConfig.Endpoint != "" {
+
+		// Parse a URL for the host regardless of it missing the scheme
 		endpointUri, err := url.Parse(config.AWSConfig.Endpoint)
 		if err != nil {
-			return nil, fmt.Errorf("failed to parse endpoint as url/domain: %w", err)
+			return nil, fmt.Errorf("failed to parse endpoint: %w", err)
 		}
 
 		// For backwards compat:
@@ -203,7 +211,11 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 			if in.config.AWSConfig.FIPSEnabled {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
 			}
+			if in.config.AWSConfig.Endpoint != "" {
+				o.EndpointResolver = sqs.EndpointResolverFromURL(in.config.AWSConfig.Endpoint)
+			}
 		}),
+
 		queueURL:          in.config.QueueURL,
 		apiTimeout:        in.config.APITimeout,
 		visibilityTimeout: in.config.VisibilityTimeout,
@@ -214,6 +226,9 @@ func (in *s3Input) createSQSReceiver(ctx v2.Context, pipeline beat.Pipeline) (*s
 		client: s3.NewFromConfig(in.awsConfig, func(o *s3.Options) {
 			if in.config.AWSConfig.FIPSEnabled {
 				o.EndpointOptions.UseFIPSEndpoint = awssdk.FIPSEndpointStateEnabled
+			}
+			if in.config.AWSConfig.Endpoint != "" {
+				o.EndpointResolver = s3.EndpointResolverFromURL(in.config.AWSConfig.Endpoint)
 			}
 			o.UsePathStyle = in.config.PathStyle
 		}),
