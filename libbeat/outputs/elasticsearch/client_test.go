@@ -49,6 +49,7 @@ import (
 	c "github.com/elastic/elastic-agent-libs/config"
 	"github.com/elastic/elastic-agent-libs/logp"
 	"github.com/elastic/elastic-agent-libs/mapstr"
+	"github.com/elastic/elastic-agent-libs/monitoring"
 	libversion "github.com/elastic/elastic-agent-libs/version"
 )
 
@@ -83,17 +84,19 @@ func (bm *batchMock) RetryEvents(events []publisher.Event) {
 }
 
 func TestPublish(t *testing.T) {
-	makePublishTestClient := func(t *testing.T, url string) *Client {
+
+	makePublishTestClient := func(t *testing.T, url string) (*Client, *monitoring.Registry) {
+		reg := monitoring.NewRegistry()
 		client, err := NewClient(
 			clientSettings{
-				observer:      outputs.NewNilObserver(),
+				observer:      outputs.NewStats(reg),
 				connection:    eslegclient.ConnectionSettings{URL: url},
 				indexSelector: testIndexSelector{},
 			},
 			nil,
 		)
 		require.NoError(t, err)
-		return client
+		return client, reg
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -109,7 +112,7 @@ func TestPublish(t *testing.T) {
 			_, _ = w.Write([]byte("Request failed to get to the server (status code: 413)")) // actual response from ES
 		}))
 		defer esMock.Close()
-		client := makePublishTestClient(t, esMock.URL)
+		client, reg := makePublishTestClient(t, esMock.URL)
 
 		// Try publishing a batch that can be split
 		batch := encodeBatch(client, &batchMock{
@@ -120,6 +123,8 @@ func TestPublish(t *testing.T) {
 
 		assert.NoError(t, err, "Publish should split the batch without error")
 		assert.True(t, batch.didSplit, "batch should be split")
+		assertRegistryUint(t, reg, "events.failed", 1, "Splitting a batch should report the event as failed/retried")
+		assertRegistryUint(t, reg, "events.dropped", 0, "Splitting a batch should not report any dropped events")
 
 		// Try publishing a batch that cannot be split
 		batch = encodeBatch(client, &batchMock{
@@ -131,6 +136,9 @@ func TestPublish(t *testing.T) {
 		assert.NoError(t, err, "Publish should drop the batch without error")
 		assert.False(t, batch.didSplit, "batch should not be split")
 		assert.True(t, batch.drop, "unsplittable batch should be dropped")
+		assertRegistryUint(t, reg, "events.failed", 1, "Failed batch split should not report any more retryable failures")
+		assertRegistryUint(t, reg, "events.dropped", 1, "Failed batch split should report a dropped event")
+
 	})
 
 	t.Run("retries the batch if bad HTTP status", func(t *testing.T) {
@@ -138,7 +146,7 @@ func TestPublish(t *testing.T) {
 			w.WriteHeader(http.StatusInternalServerError)
 		}))
 		defer esMock.Close()
-		client := makePublishTestClient(t, esMock.URL)
+		client, reg := makePublishTestClient(t, esMock.URL)
 
 		batch := encodeBatch(client, &batchMock{
 			events: []publisher.Event{event1, event2},
@@ -149,40 +157,44 @@ func TestPublish(t *testing.T) {
 		assert.Error(t, err)
 		assert.False(t, batch.ack, "should not be acknowledged")
 		assert.Len(t, batch.retryEvents, 2, "all events should be retried")
+		assertRegistryUint(t, reg, "events.failed", 2, "HTTP failure should report failed events")
 	})
 
 	t.Run("live batches, still too big after split", func(t *testing.T) {
-		// Test a live (non-mocked) batch where both events by themselves are
-		// rejected by the server as too large after the initial split.
+		// Test a live (non-mocked) batch where all three events by themselves are
+		// rejected by the server as too large after the initial batch splits.
 		esMock := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusRequestEntityTooLarge)
 			_, _ = w.Write([]byte("Request failed to get to the server (status code: 413)")) // actual response from ES
 		}))
 		defer esMock.Close()
-		client := makePublishTestClient(t, esMock.URL)
+		client, reg := makePublishTestClient(t, esMock.URL)
 
 		// Because our tests don't use a live eventConsumer routine,
 		// everything will happen synchronously and it's safe to track
 		// test results directly without atomics/mutexes.
 		done := false
 		retryCount := 0
+		var retryBatches []publisher.Batch
 		batch := encodeBatch(client, pipeline.NewBatchForTesting(
 			[]publisher.Event{event1, event2, event3},
 			func(b publisher.Batch) {
 				// The retry function sends the batch back through Publish.
 				// In a live pipeline it would instead be sent to eventConsumer
-				// first and then back to Publish when an output worker was
-				// available.
+				// and then back to Publish when an output worker was available.
 				retryCount++
-				// We shouldn't need to re-encode the events since that was done
-				// before the initial Publish call
-				err := client.Publish(ctx, b)
-				assert.NoError(t, err, "Publish should return without error")
+				retryBatches = append(retryBatches, b)
 			},
 			func() { done = true },
 		))
-		err := client.Publish(ctx, batch)
-		assert.NoError(t, err, "Publish should return without error")
+		retryBatches = []publisher.Batch{batch}
+		// Loop until all pending retries are complete, the same as a pipeline caller would.
+		for len(retryBatches) > 0 {
+			batch := retryBatches[0]
+			retryBatches = retryBatches[1:]
+			err := client.Publish(ctx, batch)
+			assert.NoError(t, err, "Publish should return without error")
+		}
 
 		// For three events there should be four retries in total:
 		// {[event1], [event2, event3]}, then {[event2], [event3]}.
@@ -190,6 +202,15 @@ func TestPublish(t *testing.T) {
 		// events, all 3 will fail and be dropped.
 		assert.Equal(t, 4, retryCount, "3-event batch should produce 4 total retries")
 		assert.True(t, done, "batch should be marked as done")
+		// Metrics should report:
+		// 8 total events (3 + 1 + 2 + 1 + 1 from the batches described above)
+		// 3 dropped events (each event is dropped once)
+		// 5 failed events (8 - 3, for each event's attempted publish calls before being dropped)
+		// 0 active events (because Publish is complete)
+		assertRegistryUint(t, reg, "events.total", 8, "Publish is called on 8 events total")
+		assertRegistryUint(t, reg, "events.dropped", 3, "All 3 events should be dropped")
+		assertRegistryUint(t, reg, "events.failed", 5, "Split batches should retry 5 events before dropping them")
+		assertRegistryUint(t, reg, "events.active", 0, "Active events should be zero when Publish returns")
 	})
 
 	t.Run("live batches, one event too big after split", func(t *testing.T) {
@@ -206,11 +227,11 @@ func TestPublish(t *testing.T) {
 			} else {
 				// Report success with no events dropped
 				w.WriteHeader(200)
-				_, _ = io.WriteString(w, "{\"items\": []}")
+				_, _ = io.WriteString(w, "{\"items\": [{\"index\":{\"status\":200}},{\"index\":{\"status\":200}},{\"index\":{\"status\":200}}]}")
 			}
 		}))
 		defer esMock.Close()
-		client := makePublishTestClient(t, esMock.URL)
+		client, reg := makePublishTestClient(t, esMock.URL)
 
 		// Because our tests don't use a live eventConsumer routine,
 		// everything will happen synchronously and it's safe to track
@@ -226,8 +247,6 @@ func TestPublish(t *testing.T) {
 				// and then back to Publish when an output worker was available.
 				retryCount++
 				retryBatches = append(retryBatches, b)
-				//err := client.Publish(ctx, b)
-				//assert.NoError(t, err, "Publish should return without error")
 			},
 			func() { done = true },
 		))
@@ -246,7 +265,24 @@ func TestPublish(t *testing.T) {
 		// (one with failure, one with success).
 		assert.Equal(t, 2, retryCount, "splitting with one large event should produce two retries")
 		assert.True(t, done, "batch should be marked as done")
+		// The metrics should show:
+		// 6 total events (3 + 1 + 2)
+		// 1 dropped event (because only one event is uningestable)
+		// 2 acked events (because the other two ultimately succeed)
+		// 3 failed events (because all events fail and are retried on the first call)
+		// 0 active events (because Publish is finished)
+		assertRegistryUint(t, reg, "events.total", 6, "Publish is called on 6 events total")
+		assertRegistryUint(t, reg, "events.dropped", 1, "One event should be dropped")
+		assertRegistryUint(t, reg, "events.failed", 3, "Split batches should retry 3 events before dropping them")
+		assertRegistryUint(t, reg, "events.active", 0, "Active events should be zero when Publish returns")
 	})
+}
+
+func assertRegistryUint(t *testing.T, reg *monitoring.Registry, key string, expected uint64, message string) {
+	t.Helper()
+	value := reg.Get(key).(*monitoring.Uint)
+	assert.NotNilf(t, value, "expected registry entry for key '%v'", key)
+	assert.Equal(t, expected, value.Get(), message)
 }
 
 func TestCollectPublishFailsNone(t *testing.T) {
@@ -311,15 +347,94 @@ func TestCollectPublishFailMiddle(t *testing.T) {
 }
 
 func TestCollectPublishFailDeadLetterSuccess(t *testing.T) {
-	t.FailNow()
+	const deadLetterIndex = "test_index"
+	client, err := NewClient(
+		clientSettings{
+			observer:        outputs.NewNilObserver(),
+			deadLetterIndex: deadLetterIndex,
+		},
+		nil,
+	)
+	assert.NoError(t, err)
+
+	const errorMessage = "test error message"
+	// Return a successful response
+	response := []byte(`{"items": [{"create": {"status": 200}}]}`)
+
+	event1 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 1}}})
+	event1.EncodedEvent.(*encodedEvent).setDeadLetter(deadLetterIndex, 123, errorMessage)
+	events := []publisher.Event{event1}
+
+	// The event should be successful after being set to dead letter, so it
+	// should be reported in the metrics as deadLetter
+	res, stats := client.bulkCollectPublishFails(bulkResult{
+		events:   events,
+		status:   200,
+		response: response,
+	})
+	assert.Equal(t, bulkResultStats{acked: 0, deadLetter: 1}, stats)
+	assert.Equal(t, 0, len(res))
 }
 
 func TestCollectPublishFailFatalErrorNotRetried(t *testing.T) {
-	t.FailNow()
+	// Test that a fatal error sending to the dead letter index is reported as
+	// a dropped event, and is not retried forever
+	const deadLetterIndex = "test_index"
+	client, err := NewClient(
+		clientSettings{
+			observer:        outputs.NewNilObserver(),
+			deadLetterIndex: deadLetterIndex,
+		},
+		nil,
+	)
+	assert.NoError(t, err)
+
+	const errorMessage = "test error message"
+	// Return a fatal error
+	response := []byte(`{"items": [{"create": {"status": 499}}]}`)
+
+	event1 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 1}}})
+	event1.EncodedEvent.(*encodedEvent).setDeadLetter(deadLetterIndex, 123, errorMessage)
+	events := []publisher.Event{event1}
+
+	// The event should fail permanently while being sent to the dead letter
+	// index, so it should be dropped instead of retrying.
+	res, stats := client.bulkCollectPublishFails(bulkResult{
+		events:   events,
+		status:   200,
+		response: response,
+	})
+	assert.Equal(t, bulkResultStats{acked: 0, nonIndexable: 1}, stats)
+	assert.Equal(t, 0, len(res))
 }
 
-func TestInvalidBulkIndexResponse(t *testing.T) {
-	t.FailNow()
+func TestCollectPublishFailInvalidBulkIndexResponse(t *testing.T) {
+	client, err := NewClient(
+		clientSettings{observer: outputs.NewNilObserver()},
+		nil,
+	)
+	assert.NoError(t, err)
+
+	// Return a truncated response without valid item data
+	response := []byte(`{"items": [...`)
+
+	event1 := encodeEvent(client, publisher.Event{Content: beat.Event{Fields: mapstr.M{"bar": 1}}})
+	events := []publisher.Event{event1}
+
+	// The event should be successful after being set to dead letter, so it
+	// should be reported in the metrics as deadLetter
+	res, stats := client.bulkCollectPublishFails(bulkResult{
+		events:   events,
+		status:   200,
+		response: response,
+	})
+	// The event should be returned for retry, and should appear in aggregated
+	// stats as failed (retryable error)
+	assert.Equal(t, bulkResultStats{acked: 0, fails: 1}, stats)
+	assert.Equal(t, 1, len(res))
+	if len(res) > 0 {
+		assert.Equal(t, event1, res[0])
+	}
 }
 
 func TestCollectPublishFailDeadLetterIndex(t *testing.T) {
@@ -364,7 +479,7 @@ func TestCollectPublishFailDeadLetterIndex(t *testing.T) {
 		assert.Equalf(t, eventFail, res[0], "bulkCollectPublishFails should return failed event")
 		encodedEvent, ok := res[0].EncodedEvent.(*encodedEvent)
 		require.True(t, ok, "event must be encoded as *encodedEvent")
-		assert.True(t, encodedEvent.deadLetter, "faild event's dead letter flag should be set")
+		assert.True(t, encodedEvent.deadLetter, "failed event's dead letter flag should be set")
 		assert.Equalf(t, deadLetterIndex, encodedEvent.index, "failed event's index should match dead letter index")
 		assert.Contains(t, string(encodedEvent.encoding), errorMessage, "dead letter event should include associated error message")
 	}
@@ -882,7 +997,7 @@ func TestBulkRequestHasFilterPath(t *testing.T) {
 		require.NoError(t, result.connErr)
 		// Only param should be the standard filter path
 		require.Equal(t, len(reqParams), 1, "Only bulk request param should be standard filter path")
-		require.Equal(t, reqParams[filterPathKey], filterPathValue, "Bulk request should include standard filter path")
+		require.Equal(t, filterPathValue, reqParams.Get(filterPathKey), "Bulk request should include standard filter path")
 	})
 	t.Run("Single event with response filtering and preconfigured client params", func(t *testing.T) {
 		var configParams = map[string]string{
@@ -909,12 +1024,8 @@ func TestBulkRequestHasFilterPath(t *testing.T) {
 		result := client.doBulkRequest(ctx, batch)
 		require.NoError(t, result.connErr)
 		require.Equal(t, len(reqParams), 2, "Bulk request should include configured parameter and standard filter path")
-		require.Equal(t, reqParams[filterPathKey], filterPathValue, "Bulk request should include standard filter path")
+		require.Equal(t, filterPathValue, reqParams.Get(filterPathKey), "Bulk request should include standard filter path")
 	})
-}
-
-func TestPublishPayloadTooLargeReportsFailed(t *testing.T) {
-	t.FailNow()
 }
 
 func TestSetDeadLetter(t *testing.T) {
