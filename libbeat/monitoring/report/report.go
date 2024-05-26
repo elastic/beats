@@ -20,7 +20,6 @@ package report
 import (
 	"errors"
 	"fmt"
-	"os"
 
 	"github.com/elastic/beats/v7/libbeat/beat"
 	conf "github.com/elastic/elastic-agent-libs/config"
@@ -129,9 +128,7 @@ func collectSubObject(cfg *conf.C) *conf.C {
 	for _, field := range cfg.GetFields() {
 		if obj, err := cfg.Child(field, -1); err == nil {
 			// on error field is no object, but primitive value -> ignore
-			if err := out.SetChild(field, -1, obj); err != nil {
-				fmt.Fprintf(os.Stdout, "Failed to set the sub-configuration: %v\n", err)
-			}
+			out.SetChild(field, -1, obj) //nolint:errcheck // this error is safe to ignore
 			continue
 		}
 	}
