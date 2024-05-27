@@ -61,6 +61,7 @@ updates:
       gcp-sdks:
         patterns:
           - "cloud.google.com/go/*"
+          - "google.golang.org/*"
 
   # GitHub actions
   - package-ecosystem: "github-actions"
