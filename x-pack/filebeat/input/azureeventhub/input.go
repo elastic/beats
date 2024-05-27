@@ -51,18 +51,18 @@ func Plugin(log *logp.Logger) v2.Plugin {
 	}
 }
 
-// eventHubInputManager is the manager for the Azure Event Hub input.
-//
-// It is responsible for creating new instances of the input, according
-// to the configuration provided.
+// azureInputConfig is responsible for creating the right azure-eventhub input
+// based on the configuration.
 type eventHubInputManager struct {
 	log *logp.Logger
 }
 
+// Init initializes the input manager.
 func (m *eventHubInputManager) Init(unison.Group) error {
 	return nil
 }
 
+// Create creates a new azure-eventhub input based on the configuration.
 func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
 	var config azureInputConfig
 	if err := cfg.Unpack(&config); err != nil {
@@ -75,7 +75,7 @@ func (m *eventHubInputManager) Create(cfg *conf.C) (v2.Input, error) {
 	case "v2":
 		return newEventHubInputV2(config, m.log)
 	default:
-		return nil, fmt.Errorf("invalid azure-eventhub processor version: %s", config.ProcessorVersion)
+		return nil, fmt.Errorf("invalid azure-eventhub processor version: %s (available versions: v1, v2)", config.ProcessorVersion)
 	}
 
 	//return &azureInput{
