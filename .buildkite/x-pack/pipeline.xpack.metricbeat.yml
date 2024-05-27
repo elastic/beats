@@ -45,7 +45,7 @@ steps:
         notify:
           - github_commit_status:
               context: "x-pack/metricbeat: check/update"
-      
+
   - wait: ~
     # with PRs, we want to run mandatory tests only if check/update step succeed
     # for other cases, e.g. merge commits, we want to run mundatory test (and publish) independently of other tests
@@ -80,10 +80,6 @@ steps:
         key: "mandatory-int-test"
         command: |
           set -euo pipefail
-          # docker-compose problem debugging
-          which docker-compose
-          docker-compose --version
-          pwd
           # defines the MODULE env var based on what's changed in a PR
           source .buildkite/scripts/changesets.sh
           defineModuleFromTheChangeSet x-pack/metricbeat
