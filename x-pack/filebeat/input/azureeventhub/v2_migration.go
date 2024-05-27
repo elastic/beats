@@ -47,7 +47,12 @@ func (m *migrationAssistant) checkAndMigrate(ctx context.Context, eventHubConnec
 		return fmt.Errorf("failed to get event hub properties: %w", err)
 	}
 
-	m.log.Infof("Event Hub properties: %v", eventHubProperties)
+	m.log.Infow(
+		"Event Hub properties",
+		"name", eventHubProperties.Name,
+		"created_on", eventHubProperties.CreatedOn,
+		"partition_ids", eventHubProperties.PartitionIDs,
+	)
 
 	// Parse the connection string to get FQDN.
 	props, err := parseConnectionString(eventHubConnectionString)
