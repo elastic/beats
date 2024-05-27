@@ -51,6 +51,7 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 		sentEvents        uint64
 		processingTime    uint64
 		decodeErrors      uint64
+		processorRestarts uint64
 	}{
 		{
 			event:             []byte("{\"records\": [{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"),
@@ -61,6 +62,7 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			receivedEvents:    1,
 			sentEvents:        1,
 			decodeErrors:      0,
+			processorRestarts: 0,
 		},
 		{
 			event: []byte("{\"records\": [{\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}, {\"test\":\"this is some message\",\"time\":\"2019-12-17T13:43:44.4946995Z\"}]}"),
@@ -74,6 +76,7 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			receivedEvents:    2,
 			sentEvents:        2,
 			decodeErrors:      0,
+			processorRestarts: 0,
 		},
 		{
 			event: []byte("{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}"), // Thank you, Azure Functions logs.
@@ -87,6 +90,7 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			receivedEvents:     1,
 			sentEvents:         1,
 			decodeErrors:       0,
+			processorRestarts:  0,
 		},
 		{
 			event: []byte("{\"records\": [{'test':'this is some message','time':'2019-12-17T13:43:44.4946995Z'}]}"),
@@ -100,6 +104,7 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 			decodeErrors:       1,
 			receivedEvents:     0, // If we can't decode the message, we can't count the events in it.
 			sentEvents:         1, // The input sends the unmodified message as a string to the outlet.
+			processorRestarts:  0,
 		},
 	}
 
@@ -157,6 +162,9 @@ func TestInputMetricsEventsReceived(t *testing.T) {
 		// Events
 		assert.Equal(t, tc.receivedEvents, metrics.receivedEvents.Get())
 		assert.Equal(t, tc.sentEvents, metrics.sentEvents.Get())
+
+		// Processor
+		assert.Equal(t, tc.processorRestarts, metrics.processorRestarts.Get())
 
 		metrics.Close() // Stop the metrics collection.
 	}
